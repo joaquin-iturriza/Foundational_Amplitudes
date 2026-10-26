@@ -1760,9 +1760,12 @@ def _load_catalog_v3():
     with open(path) as f:
         d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
     n = 0
-    lp = os.path.join(os.path.dirname(path), "catalog_v3_loops.yaml")      # stage 2: the one-loop and loop-induced entries
-    loops = (_yaml.load(open(lp), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}).get("processes", {}) \
-        if os.path.exists(lp) else {}
+    loops = {}
+    # stage 2: the one-loop and loop-induced entries; the sign transfer's extension (gen_catalog_v3.py --write-loops-signext)
+    for lf in ("catalog_v3_loops.yaml", "catalog_v3_loops_signext.yaml"):
+        lp = os.path.join(os.path.dirname(path), lf)
+        if os.path.exists(lp):
+            loops.update((_yaml.load(open(lp), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}).get("processes", {}))
     for name, entry in list((d.get("processes") or {}).items()) + list(loops.items()):
         if name in PROCESSES:
             raise KeyError(f"catalog_v3 entry {name} collides with an existing process")

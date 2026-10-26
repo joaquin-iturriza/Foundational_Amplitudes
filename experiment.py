@@ -2183,6 +2183,8 @@ class AmplitudeExperiment(BaseExperiment):
         base_trafos = list(self.cfg.data.amp_trafos)
         self._amp_trafos_pp = None
         self._sign_head = bool(self.cfg.training.get("sign_head", False))
+        assert self._sign_head or not int(self.cfg.model.get("sign_pair_dim", 0) or 0), \
+            "model.sign_pair_dim needs training.sign_head (its channels feed the sign logit)"
         if self._sign_head:
             assert self.cfg.training.loss != "HETEROSC", "sign_head and HETEROSC are not combined"
             assert self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"), \

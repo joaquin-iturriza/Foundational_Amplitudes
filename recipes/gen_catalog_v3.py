@@ -364,6 +364,47 @@ def write_loops():
           f"({dict(Counter(p['role'] for p in procs.values()))})")
 
 
+OUT_LOOPS_SIGNEXT = os.path.join(ROOT, "recipes", "catalog_v3_loops_signext.yaml")
+OUT_GEN_SIGNEXT = os.path.join(ROOT, "recipes", "catalog_v3_gen_signext.yaml")
+
+
+def write_loops_signext():
+    """The one-loop sign transfer's extension (docs/results.tex, par. The signed one-loop pools' data; arm (c), more
+    sign-changing pools in training): [virt=QCD] of every coloured 2->3 training tree class the one-loop layer left out
+    (select_catalog_v3.py drew 2->3 classes per beam up to --n-loops 150), entries as write_loops' (role train; not in
+    catalog_v3_train.yaml), to recipes/catalog_v3_loops_signext.yaml, and their generation recipe at 1e4 / 1e3 / 1e3
+    (the short pretrainings read 1e4 train and 200 validation events per process), the trees' windows. Classes, not
+    strings: every tree here is a census representative, so none is equal to an H5 pool's tree. Which of them change
+    sign is read from the generated pools; only those enter the arm's training recipe."""
+    import yaml
+    Pr = yaml.load(open(OUT_PROC), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))["processes"]
+    roles = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))
+    win = {e["name"]: e["sqrts"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_census.yaml")))["processes"]}
+    have = {v["tree"] for v in roles["loops"].values()}
+    col = lambda e: any(abs(q) in (1, 2, 3, 4, 5, 21) for q in e["pdg_ids"])
+    trees = sorted(n for n, v in roles["trees"].items() if v["role"] == "train" and n in Pr and Pr[n]["nfinal"] == 3
+                   and col(Pr[n]) and n not in have)
+    virt, procs = {}, {}
+    for n in trees:
+        e = Pr[n]
+        virt[n] = {"mg5": e["mg5_generate"][0] + " [virt=QCD]", "pdg_ids": list(e["pdg_ids"]), "m_finals": list(e["m_finals"]),
+                   "certified": False}
+        procs[n + "_nlo"] = {"kind": "virt", "virt": True, "virt_base": n, "nfinal": e["nfinal"], "n_loops": 1,
+                             "alphas_power": int(e.get("alphas_power", 0)) + 1, "pdg_ids": list(e["pdg_ids"]),
+                             "m_finals": list(e["m_finals"]), "param_card_patches": {}, "layer": "nlo",
+                             "why": f"one-loop QCD of {n} (sign transfer extension)", "role": "signext",
+                             "certified": False}
+    yaml.safe_dump({"virt": virt, "processes": procs}, open(OUT_LOOPS_SIGNEXT, "w"), sort_keys=True)
+    with open(OUT_GEN_SIGNEXT, "w") as f:
+        f.write("# the one-loop sign transfer's extension (recipes/gen_catalog_v3.py --write-loops-signext): [virt=QCD] of\n"
+                "# every coloured 2->3 training tree class outside catalog_v3's one-loop layer, 1e4 / 1e3 / 1e3\n"
+                "sampling: {mode: mixture}\nprocesses:\n")
+        for n in trees:
+            f.write(f"  - {{name: {n}_nlo, sqrts: [{win[n][0]}, {win[n][1]}], n_train: 10000, n_val: 1000, n_test: 1000}}\n")
+    print(f"wrote {OUT_LOOPS_SIGNEXT} and {OUT_GEN_SIGNEXT}: {len(trees)} one-loop entries "
+          f"({dict(Counter(n.split('_')[1] for n in trees))})")
+
+
 def set_certified(verdicts):
     """scripts/build_nlo_backends.sh's verdict file ("<virt key> PASS|FAIL|..." per line) -> certified: true on the
     PASSes in recipes/catalog_v3_loops.yaml, false on everything else"""
@@ -383,6 +424,7 @@ def main():
     ap.add_argument("--write", nargs="+", default=None, help="the stage-2 outputs (checked.json, checked_ext.json)")
     ap.add_argument("--certified", default=None, help="the MadLoop verdicts file to mark the PASSes certified")
     ap.add_argument("--write-loops", action="store_true", help="the one-loop layer and the loop-induced entries (D102)")
+    ap.add_argument("--write-loops-signext", action="store_true", help="the one-loop sign transfer's extension")
     ap.add_argument("--stage3", action="store_true", help="choose the 2->5 probes and the alpha_s points (D102)")
     ap.add_argument("--extend24", default=None, help="stage-2 output to extend the 2->4 layer from (D100)")
     ap.add_argument("--cands", default=None, help="--check this candidate file instead of catalog_v3_candidates.json")
@@ -410,6 +452,8 @@ def main():
         stage3()
     if a.write_loops:
         write_loops()
+    if a.write_loops_signext:
+        write_loops_signext()
     if a.certified:
         set_certified(a.certified)
     if a.write:

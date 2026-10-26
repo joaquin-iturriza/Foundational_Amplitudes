@@ -78,6 +78,9 @@ case "$ARM" in
     #                        (model.sign_pair_dim 16 per-particle pair features; wrappers._sign_pair_logit)
     #   baseline_sign_near   the sign loss weighs the events within a factor 10 of zero 10 times the others, each
     #                        pool's mean weight kept (training.sign_near_weight)
+    # the factor 10 is the near-zero events' definition in that paragraph; sign_near_weight 10, sign_pair_dim 16 and
+    # the pair MLP's 32 hidden units are open (unsourced) settings, one untuned value each: a loss says that value
+    # does not help, not that the idea fails
     baseline_sign_pairs)   NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false ++model.sign_pair_dim=16) ;;
     baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;

@@ -1,0 +1,5357 @@
+processes:
+  v3_bb_abb_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 5
+    - 22
+    - 5
+    - 5
+    role: signext
+    virt: true
+    virt_base: v3_bb_abb
+    why: one-loop QCD of v3_bb_abb (sign transfer extension)
+  v3_bb_bbg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_bb_bbg
+    why: one-loop QCD of v3_bb_bbg (sign transfer extension)
+  v3_bb_bbh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bb_bbh
+    why: one-loop QCD of v3_bb_bbh (sign transfer extension)
+  v3_bbx_aaa_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 22
+    role: signext
+    virt: true
+    virt_base: v3_bbx_aaa
+    why: one-loop QCD of v3_bbx_aaa (sign transfer extension)
+  v3_bbx_aah_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bbx_aah
+    why: one-loop QCD of v3_bbx_aah (sign transfer extension)
+  v3_bbx_aaz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_aaz
+    why: one-loop QCD of v3_bbx_aaz (sign transfer extension)
+  v3_bbx_abbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 5
+    - -5
+    role: signext
+    virt: true
+    virt_base: v3_bbx_abbx
+    why: one-loop QCD of v3_bbx_abbx (sign transfer extension)
+  v3_bbx_accx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 4
+    - -4
+    role: signext
+    virt: true
+    virt_base: v3_bbx_accx
+    why: one-loop QCD of v3_bbx_accx (sign transfer extension)
+  v3_bbx_agg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_bbx_agg
+    why: one-loop QCD of v3_bbx_agg (sign transfer extension)
+  v3_bbx_agh_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bbx_agh
+    why: one-loop QCD of v3_bbx_agh (sign transfer extension)
+  v3_bbx_ahz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 25
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ahz
+    why: one-loop QCD of v3_bbx_ahz (sign transfer extension)
+  v3_bbx_awpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_bbx_awpwm
+    why: one-loop QCD of v3_bbx_awpwm (sign transfer extension)
+  v3_bbx_bbxg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_bbx_bbxg
+    why: one-loop QCD of v3_bbx_bbxg (sign transfer extension)
+  v3_bbx_bbxh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bbx_bbxh
+    why: one-loop QCD of v3_bbx_bbxh (sign transfer extension)
+  v3_bbx_bbxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_bbxz
+    why: one-loop QCD of v3_bbx_bbxz (sign transfer extension)
+  v3_bbx_ccxg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ccxg
+    why: one-loop QCD of v3_bbx_ccxg (sign transfer extension)
+  v3_bbx_ccxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ccxz
+    why: one-loop QCD of v3_bbx_ccxz (sign transfer extension)
+  v3_bbx_ddxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 1
+    - -1
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ddxz
+    why: one-loop QCD of v3_bbx_ddxz (sign transfer extension)
+  v3_bbx_epemg_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_bbx_epemg
+    why: one-loop QCD of v3_bbx_epemg (sign transfer extension)
+  v3_bbx_epvewm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 12
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_bbx_epvewm
+    why: one-loop QCD of v3_bbx_epvewm (sign transfer extension)
+  v3_bbx_ggg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ggg
+    why: one-loop QCD of v3_bbx_ggg (sign transfer extension)
+  v3_bbx_ggz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ggz
+    why: one-loop QCD of v3_bbx_ggz (sign transfer extension)
+  v3_bbx_ghz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_ghz
+    why: one-loop QCD of v3_bbx_ghz (sign transfer extension)
+  v3_bbx_gtaptam_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_bbx_gtaptam
+    why: one-loop QCD of v3_bbx_gtaptam (sign transfer extension)
+  v3_bbx_hhh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 25
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bbx_hhh
+    why: one-loop QCD of v3_bbx_hhh (sign transfer extension)
+  v3_bbx_taptamz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 1.777
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - -15
+    - 15
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_taptamz
+    why: one-loop QCD of v3_bbx_taptamz (sign transfer extension)
+  v3_bbx_vevexz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - -5
+    - 12
+    - -12
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bbx_vevexz
+    why: one-loop QCD of v3_bbx_vevexz (sign transfer extension)
+  v3_bg_aab_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 22
+    - 5
+    role: signext
+    virt: true
+    virt_base: v3_bg_aab
+    why: one-loop QCD of v3_bg_aab (sign transfer extension)
+  v3_bg_bepem_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - -11
+    - 11
+    role: signext
+    virt: true
+    virt_base: v3_bg_bepem
+    why: one-loop QCD of v3_bg_bepem (sign transfer extension)
+  v3_bg_bgh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bg_bgh
+    why: one-loop QCD of v3_bg_bgh (sign transfer extension)
+  v3_bg_bhh_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 125.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 25
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_bg_bhh
+    why: one-loop QCD of v3_bg_bhh (sign transfer extension)
+  v3_bg_bvevex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_bg_bvevex
+    why: one-loop QCD of v3_bg_bvevex (sign transfer extension)
+  v3_bg_bzz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 23
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_bg_bzz
+    why: one-loop QCD of v3_bg_bzz (sign transfer extension)
+  v3_db_bdg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_db_bdg
+    why: one-loop QCD of v3_db_bdg (sign transfer extension)
+  v3_db_bdh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_db_bdh
+    why: one-loop QCD of v3_db_bdh (sign transfer extension)
+  v3_db_buwm_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 2
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_db_buwm
+    why: one-loop QCD of v3_db_buwm (sign transfer extension)
+  v3_dbx_abxd_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -5
+    - 22
+    - -5
+    - 1
+    role: signext
+    virt: true
+    virt_base: v3_dbx_abxd
+    why: one-loop QCD of v3_dbx_abxd (sign transfer extension)
+  v3_dbx_bxdg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 1
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_dbx_bxdg
+    why: one-loop QCD of v3_dbx_bxdg (sign transfer extension)
+  v3_dbx_bxdz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 1
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_dbx_bxdz
+    why: one-loop QCD of v3_dbx_bxdz (sign transfer extension)
+  v3_dd_ddg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_dd_ddg
+    why: one-loop QCD of v3_dd_ddg (sign transfer extension)
+  v3_dd_ddh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_dd_ddh
+    why: one-loop QCD of v3_dd_ddh (sign transfer extension)
+  v3_dd_duwm_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 2
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_dd_duwm
+    why: one-loop QCD of v3_dd_duwm (sign transfer extension)
+  v3_ddx_aag_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 22
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_ddx_aag
+    why: one-loop QCD of v3_ddx_aag (sign transfer extension)
+  v3_ddx_abbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 5
+    - -5
+    role: signext
+    virt: true
+    virt_base: v3_ddx_abbx
+    why: one-loop QCD of v3_ddx_abbx (sign transfer extension)
+  v3_ddx_accx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 4
+    - -4
+    role: signext
+    virt: true
+    virt_base: v3_ddx_accx
+    why: one-loop QCD of v3_ddx_accx (sign transfer extension)
+  v3_ddx_addx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 1
+    - -1
+    role: signext
+    virt: true
+    virt_base: v3_ddx_addx
+    why: one-loop QCD of v3_ddx_addx (sign transfer extension)
+  v3_ddx_ahz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 25
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ddx_ahz
+    why: one-loop QCD of v3_ddx_ahz (sign transfer extension)
+  v3_ddx_ataptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_ddx_ataptam
+    why: one-loop QCD of v3_ddx_ataptam (sign transfer extension)
+  v3_ddx_avevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_ddx_avevex
+    why: one-loop QCD of v3_ddx_avevex (sign transfer extension)
+  v3_ddx_bbxg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_ddx_bbxg
+    why: one-loop QCD of v3_ddx_bbxg (sign transfer extension)
+  v3_ddx_ddxg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_ddx_ddxg
+    why: one-loop QCD of v3_ddx_ddxg (sign transfer extension)
+  v3_ddx_ddxh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_ddx_ddxh
+    why: one-loop QCD of v3_ddx_ddxh (sign transfer extension)
+  v3_ddx_ddxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ddx_ddxz
+    why: one-loop QCD of v3_ddx_ddxz (sign transfer extension)
+  v3_ddx_duxwp_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -2
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_ddx_duxwp
+    why: one-loop QCD of v3_ddx_duxwp (sign transfer extension)
+  v3_ddx_epemh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - -11
+    - 11
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_ddx_epemh
+    why: one-loop QCD of v3_ddx_epemh (sign transfer extension)
+  v3_ddx_gtaptam_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_ddx_gtaptam
+    why: one-loop QCD of v3_ddx_gtaptam (sign transfer extension)
+  v3_ddx_gwpwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_ddx_gwpwm
+    why: one-loop QCD of v3_ddx_gwpwm (sign transfer extension)
+  v3_ddx_hssx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 3
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_ddx_hssx
+    why: one-loop QCD of v3_ddx_hssx (sign transfer extension)
+  v3_ddx_htaptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_ddx_htaptam
+    why: one-loop QCD of v3_ddx_htaptam (sign transfer extension)
+  v3_ddx_huux_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 2
+    - -2
+    role: signext
+    virt: true
+    virt_base: v3_ddx_huux
+    why: one-loop QCD of v3_ddx_huux (sign transfer extension)
+  v3_ddx_hvevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_ddx_hvevex
+    why: one-loop QCD of v3_ddx_hvevex (sign transfer extension)
+  v3_ddx_hwpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_ddx_hwpwm
+    why: one-loop QCD of v3_ddx_hwpwm (sign transfer extension)
+  v3_ddx_wpwmz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -1
+    - 24
+    - -24
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ddx_wpwmz
+    why: one-loop QCD of v3_ddx_wpwmz (sign transfer extension)
+  v3_dg_aad_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 22
+    - 1
+    role: signext
+    virt: true
+    virt_base: v3_dg_aad
+    why: one-loop QCD of v3_dg_aad (sign transfer extension)
+  v3_dg_adg_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_dg_adg
+    why: one-loop QCD of v3_dg_adg (sign transfer extension)
+  v3_dg_adz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_dg_adz
+    why: one-loop QCD of v3_dg_adz (sign transfer extension)
+  v3_dg_auwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 2
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_dg_auwm
+    why: one-loop QCD of v3_dg_auwm (sign transfer extension)
+  v3_dg_bbxd_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 5
+    - -5
+    - 1
+    role: signext
+    virt: true
+    virt_base: v3_dg_bbxd
+    why: one-loop QCD of v3_dg_bbxd (sign transfer extension)
+  v3_dg_ccxd_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 4
+    - -4
+    - 1
+    role: signext
+    virt: true
+    virt_base: v3_dg_ccxd
+    why: one-loop QCD of v3_dg_ccxd (sign transfer extension)
+  v3_dg_cxsu_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - -4
+    - 3
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_dg_cxsu
+    why: one-loop QCD of v3_dg_cxsu (sign transfer extension)
+  v3_dg_dddx_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 1
+    - -1
+    role: signext
+    virt: true
+    virt_base: v3_dg_dddx
+    why: one-loop QCD of v3_dg_dddx (sign transfer extension)
+  v3_dg_depem_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - -11
+    - 11
+    role: signext
+    virt: true
+    virt_base: v3_dg_depem
+    why: one-loop QCD of v3_dg_depem (sign transfer extension)
+  v3_dg_dhz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 25
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_dg_dhz
+    why: one-loop QCD of v3_dg_dhz (sign transfer extension)
+  v3_dg_dtaptam_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_dg_dtaptam
+    why: one-loop QCD of v3_dg_dtaptam (sign transfer extension)
+  v3_dg_dvevex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_dg_dvevex
+    why: one-loop QCD of v3_dg_dvevex (sign transfer extension)
+  v3_dg_dwpwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_dg_dwpwm
+    why: one-loop QCD of v3_dg_dwpwm (sign transfer extension)
+  v3_dg_dzz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 23
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_dg_dzz
+    why: one-loop QCD of v3_dg_dzz (sign transfer extension)
+  v3_dg_emuvex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 11
+    - 2
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_dg_emuvex
+    why: one-loop QCD of v3_dg_emuvex (sign transfer extension)
+  v3_dg_guwm_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 21
+    - 21
+    - 2
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_dg_guwm
+    why: one-loop QCD of v3_dg_guwm (sign transfer extension)
+  v3_ds_dgs_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 21
+    - 3
+    role: signext
+    virt: true
+    virt_base: v3_ds_dgs
+    why: one-loop QCD of v3_ds_dgs (sign transfer extension)
+  v3_ds_dhs_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 25
+    - 3
+    role: signext
+    virt: true
+    virt_base: v3_ds_dhs
+    why: one-loop QCD of v3_ds_dhs (sign transfer extension)
+  v3_ds_dsz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 3
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ds_dsz
+    why: one-loop QCD of v3_ds_dsz (sign transfer extension)
+  v3_dsx_adsx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - 22
+    - 1
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_dsx_adsx
+    why: one-loop QCD of v3_dsx_adsx (sign transfer extension)
+  v3_dsx_cxgu_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 21
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_dsx_cxgu
+    why: one-loop QCD of v3_dsx_cxgu (sign transfer extension)
+  v3_dsx_cxhu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 25
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_dsx_cxhu
+    why: one-loop QCD of v3_dsx_cxhu (sign transfer extension)
+  v3_dsx_dgsx_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - 21
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_dsx_dgsx
+    why: one-loop QCD of v3_dsx_dgsx (sign transfer extension)
+  v3_dsx_dhsx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - 25
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_dsx_dhsx
+    why: one-loop QCD of v3_dsx_dhsx (sign transfer extension)
+  v3_epem_accx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 4
+    - -4
+    role: signext
+    virt: true
+    virt_base: v3_epem_accx
+    why: one-loop QCD of v3_epem_accx (sign transfer extension)
+  v3_epem_bbxg_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_epem_bbxg
+    why: one-loop QCD of v3_epem_bbxg (sign transfer extension)
+  v3_epem_bbxh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_epem_bbxh
+    why: one-loop QCD of v3_epem_bbxh (sign transfer extension)
+  v3_epem_ccxh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_epem_ccxh
+    why: one-loop QCD of v3_epem_ccxh (sign transfer extension)
+  v3_epem_ccxz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_epem_ccxz
+    why: one-loop QCD of v3_epem_ccxz (sign transfer extension)
+  v3_epem_csxwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -3
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_epem_csxwm
+    why: one-loop QCD of v3_epem_csxwm (sign transfer extension)
+  v3_epem_ddxg_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 11
+    - -11
+    - 1
+    - -1
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_epem_ddxg
+    why: one-loop QCD of v3_epem_ddxg (sign transfer extension)
+  v3_gg_abbx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 22
+    - 5
+    - -5
+    role: signext
+    virt: true
+    virt_base: v3_gg_abbx
+    why: one-loop QCD of v3_gg_abbx (sign transfer extension)
+  v3_gg_bbxh_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_gg_bbxh
+    why: one-loop QCD of v3_gg_bbxh (sign transfer extension)
+  v3_gg_bbxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_gg_bbxz
+    why: one-loop QCD of v3_gg_bbxz (sign transfer extension)
+  v3_gg_ccxg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 4
+    - -4
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_gg_ccxg
+    why: one-loop QCD of v3_gg_ccxg (sign transfer extension)
+  v3_gg_csxwm_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 4
+    - -3
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_gg_csxwm
+    why: one-loop QCD of v3_gg_csxwm (sign transfer extension)
+  v3_gg_ggg_nlo:
+    alphas_power: 4
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 21
+    - 21
+    - 21
+    - 21
+    - 21
+    role: signext
+    virt: true
+    virt_base: v3_gg_ggg
+    why: one-loop QCD of v3_gg_ggg (sign transfer extension)
+  v3_ub_abu_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 5
+    - 22
+    - 5
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_ub_abu
+    why: one-loop QCD of v3_ub_abu (sign transfer extension)
+  v3_ubx_abxu_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -5
+    - 22
+    - -5
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_ubx_abxu
+    why: one-loop QCD of v3_ubx_abxu (sign transfer extension)
+  v3_ubx_bxuz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -5
+    - -5
+    - 2
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ubx_bxuz
+    why: one-loop QCD of v3_ubx_bxuz (sign transfer extension)
+  v3_uc_chu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 4
+    - 4
+    - 25
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_uc_chu
+    why: one-loop QCD of v3_uc_chu (sign transfer extension)
+  v3_ucx_adsx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -4
+    - 22
+    - 1
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_ucx_adsx
+    why: one-loop QCD of v3_ucx_adsx (sign transfer extension)
+  v3_ucx_dsxz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -4
+    - 1
+    - -3
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ucx_dsxz
+    why: one-loop QCD of v3_ucx_dsxz (sign transfer extension)
+  v3_ud_dhu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 25
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_ud_dhu
+    why: one-loop QCD of v3_ud_dhu (sign transfer extension)
+  v3_ud_duz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 2
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ud_duz
+    why: one-loop QCD of v3_ud_duz (sign transfer extension)
+  v3_udx_aawp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 22
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_aawp
+    why: one-loop QCD of v3_udx_aawp (sign transfer extension)
+  v3_udx_aepve_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -11
+    - 12
+    role: signext
+    virt: true
+    virt_base: v3_udx_aepve
+    why: one-loop QCD of v3_udx_aepve (sign transfer extension)
+  v3_udx_ahwp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 25
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_ahwp
+    why: one-loop QCD of v3_udx_ahwp (sign transfer extension)
+  v3_udx_atapvt_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -15
+    - 16
+    role: signext
+    virt: true
+    virt_base: v3_udx_atapvt
+    why: one-loop QCD of v3_udx_atapvt (sign transfer extension)
+  v3_udx_awpz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 24
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_awpz
+    why: one-loop QCD of v3_udx_awpz (sign transfer extension)
+  v3_udx_bbxwp_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 5
+    - -5
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_bbxwp
+    why: one-loop QCD of v3_udx_bbxwp (sign transfer extension)
+  v3_udx_cgsx_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - 21
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_udx_cgsx
+    why: one-loop QCD of v3_udx_cgsx (sign transfer extension)
+  v3_udx_chsx_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - 25
+    - -3
+    role: signext
+    virt: true
+    virt_base: v3_udx_chsx
+    why: one-loop QCD of v3_udx_chsx (sign transfer extension)
+  v3_udx_csxz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - -3
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_csxz
+    why: one-loop QCD of v3_udx_csxz (sign transfer extension)
+  v3_udx_dxhu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -1
+    - 25
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_udx_dxhu
+    why: one-loop QCD of v3_udx_dxhu (sign transfer extension)
+  v3_udx_dxuz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -1
+    - 2
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_dxuz
+    why: one-loop QCD of v3_udx_dxuz (sign transfer extension)
+  v3_udx_epemwp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 11
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_epemwp
+    why: one-loop QCD of v3_udx_epemwp (sign transfer extension)
+  v3_udx_epvez_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 12
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_epvez
+    why: one-loop QCD of v3_udx_epvez (sign transfer extension)
+  v3_udx_ghwp_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 125.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 25
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_ghwp
+    why: one-loop QCD of v3_udx_ghwp (sign transfer extension)
+  v3_udx_gwpz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 24
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_gwpz
+    why: one-loop QCD of v3_udx_gwpz (sign transfer extension)
+  v3_udx_hhwp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 125.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - 25
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_hhwp
+    why: one-loop QCD of v3_udx_hhwp (sign transfer extension)
+  v3_udx_htapvt_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 1.777
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - -15
+    - 16
+    role: signext
+    virt: true
+    virt_base: v3_udx_htapvt
+    why: one-loop QCD of v3_udx_htapvt (sign transfer extension)
+  v3_udx_hwpz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - 24
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_hwpz
+    why: one-loop QCD of v3_udx_hwpz (sign transfer extension)
+  v3_udx_tapvtz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - -15
+    - 16
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_udx_tapvtz
+    why: one-loop QCD of v3_udx_tapvtz (sign transfer extension)
+  v3_udx_vevexwp_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -1
+    - 12
+    - -12
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_udx_vevexwp
+    why: one-loop QCD of v3_udx_vevexwp (sign transfer extension)
+  v3_ug_adwp_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 22
+    - 1
+    - 24
+    role: signext
+    virt: true
+    virt_base: v3_ug_adwp
+    why: one-loop QCD of v3_ug_adwp (sign transfer extension)
+  v3_ug_dwpz_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 1
+    - 24
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_ug_dwpz
+    why: one-loop QCD of v3_ug_dwpz (sign transfer extension)
+  v3_ug_uvevex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 2
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_ug_uvevex
+    why: one-loop QCD of v3_ug_uvevex (sign transfer extension)
+  v3_ug_uwpwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 21
+    - 2
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_ug_uwpwm
+    why: one-loop QCD of v3_ug_uwpwm (sign transfer extension)
+  v3_us_cdh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_us_cdh
+    why: one-loop QCD of v3_us_cdh (sign transfer extension)
+  v3_us_hsu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 3
+    - 25
+    - 3
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_us_hsu
+    why: one-loop QCD of v3_us_hsu (sign transfer extension)
+  v3_usx_hsxu_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -3
+    - 25
+    - -3
+    - 2
+    role: signext
+    virt: true
+    virt_base: v3_usx_hsxu
+    why: one-loop QCD of v3_usx_hsxu (sign transfer extension)
+  v3_uu_uuz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uu_uuz
+    why: one-loop QCD of v3_uu_uuz (sign transfer extension)
+  v3_uux_addx_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 1
+    - -1
+    role: signext
+    virt: true
+    virt_base: v3_uux_addx
+    why: one-loop QCD of v3_uux_addx (sign transfer extension)
+  v3_uux_aepem_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - -11
+    - 11
+    role: signext
+    virt: true
+    virt_base: v3_uux_aepem
+    why: one-loop QCD of v3_uux_aepem (sign transfer extension)
+  v3_uux_ataptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_uux_ataptam
+    why: one-loop QCD of v3_uux_ataptam (sign transfer extension)
+  v3_uux_avevex_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_uux_avevex
+    why: one-loop QCD of v3_uux_avevex (sign transfer extension)
+  v3_uux_awpwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_uux_awpwm
+    why: one-loop QCD of v3_uux_awpwm (sign transfer extension)
+  v3_uux_bbxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uux_bbxz
+    why: one-loop QCD of v3_uux_bbxz (sign transfer extension)
+  v3_uux_ccxh_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 4
+    - -4
+    - 25
+    role: signext
+    virt: true
+    virt_base: v3_uux_ccxh
+    why: one-loop QCD of v3_uux_ccxh (sign transfer extension)
+  v3_uux_ddxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uux_ddxz
+    why: one-loop QCD of v3_uux_ddxz (sign transfer extension)
+  v3_uux_epvewm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 12
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_uux_epvewm
+    why: one-loop QCD of v3_uux_epvewm (sign transfer extension)
+  v3_uux_gvevex_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 12
+    - -12
+    role: signext
+    virt: true
+    virt_base: v3_uux_gvevex
+    why: one-loop QCD of v3_uux_gvevex (sign transfer extension)
+  v3_uux_gwpwm_nlo:
+    alphas_power: 2
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 24
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_uux_gwpwm
+    why: one-loop QCD of v3_uux_gwpwm (sign transfer extension)
+  v3_uux_htaptam_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 125.0
+    - 1.777
+    - 1.777
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - -15
+    - 15
+    role: signext
+    virt: true
+    virt_base: v3_uux_htaptam
+    why: one-loop QCD of v3_uux_htaptam (sign transfer extension)
+  v3_uux_taptamz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 1.777
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -15
+    - 15
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uux_taptamz
+    why: one-loop QCD of v3_uux_taptamz (sign transfer extension)
+  v3_uux_tapvtwm_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 1.777
+    - 0.0
+    - 80.419
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - -15
+    - 16
+    - -24
+    role: signext
+    virt: true
+    virt_base: v3_uux_tapvtwm
+    why: one-loop QCD of v3_uux_tapvtwm (sign transfer extension)
+  v3_uux_uuxz_nlo:
+    alphas_power: 3
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uux_uuxz
+    why: one-loop QCD of v3_uux_uuxz (sign transfer extension)
+  v3_uux_vevexz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 12
+    - -12
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uux_vevexz
+    why: one-loop QCD of v3_uux_vevexz (sign transfer extension)
+  v3_uux_zzz_nlo:
+    alphas_power: 1
+    certified: false
+    kind: virt
+    layer: nlo
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    n_loops: 1
+    nfinal: 3
+    param_card_patches: {}
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23
+    role: signext
+    virt: true
+    virt_base: v3_uux_zzz
+    why: one-loop QCD of v3_uux_zzz (sign transfer extension)
+virt:
+  v3_bb_abb:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    mg5: generate b b > a b b [virt=QCD]
+    pdg_ids:
+    - 5
+    - 5
+    - 22
+    - 5
+    - 5
+  v3_bb_bbg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    mg5: generate b b > b b g [virt=QCD]
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 21
+  v3_bb_bbh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    mg5: generate b b > b b h [virt=QCD]
+    pdg_ids:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 25
+  v3_bbx_aaa:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a a a [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 22
+  v3_bbx_aah:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > a a h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 25
+  v3_bbx_aaz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > a a z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 22
+    - 23
+  v3_bbx_abbx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    mg5: generate b b~ > a b b~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 5
+    - -5
+  v3_bbx_accx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a c c~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 4
+    - -4
+  v3_bbx_agg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > a g g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    - 21
+  v3_bbx_agh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate b b~ > a g h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 21
+    - 25
+  v3_bbx_ahz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    mg5: generate b b~ > a h z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 25
+    - 23
+  v3_bbx_awpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate b b~ > a w+ w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 22
+    - 24
+    - -24
+  v3_bbx_bbxg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    mg5: generate b b~ > b b~ g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 21
+  v3_bbx_bbxh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    mg5: generate b b~ > b b~ h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 25
+  v3_bbx_bbxz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    mg5: generate b b~ > b b~ z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 5
+    - -5
+    - 23
+  v3_bbx_ccxg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > c c~ g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    - 21
+  v3_bbx_ccxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > c c~ z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 4
+    - -4
+    - 23
+  v3_bbx_ddxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > d d~ z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 1
+    - -1
+    - 23
+  v3_bbx_epemg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > e+ e- g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 11
+    - 21
+  v3_bbx_epvewm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate b b~ > e+ ve w- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -11
+    - 12
+    - -24
+  v3_bbx_ggg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate b b~ > g g g [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 21
+  v3_bbx_ggz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > g g z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 21
+    - 23
+  v3_bbx_ghz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    mg5: generate b b~ > g h z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 25
+    - 23
+  v3_bbx_gtaptam:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    mg5: generate b b~ > g ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - -15
+    - 15
+  v3_bbx_hhh:
+    certified: false
+    m_finals:
+    - 125.0
+    - 125.0
+    - 125.0
+    mg5: generate b b~ > h h h [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 25
+    - 25
+    - 25
+  v3_bbx_taptamz:
+    certified: false
+    m_finals:
+    - 1.777
+    - 1.777
+    - 91.188
+    mg5: generate b b~ > ta+ ta- z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - -15
+    - 15
+    - 23
+  v3_bbx_vevexz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate b b~ > ve ve~ z [virt=QCD]
+    pdg_ids:
+    - 5
+    - -5
+    - 12
+    - -12
+    - 23
+  v3_bg_aab:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 4.7
+    mg5: generate b g > a a b [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 22
+    - 22
+    - 5
+  v3_bg_bepem:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    mg5: generate b g > b e+ e- [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - -11
+    - 11
+  v3_bg_bgh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 125.0
+    mg5: generate b g > b g h [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 21
+    - 25
+  v3_bg_bhh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 125.0
+    - 125.0
+    mg5: generate b g > b h h [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 25
+    - 25
+  v3_bg_bvevex:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    mg5: generate b g > b ve ve~ [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 12
+    - -12
+  v3_bg_bzz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 91.188
+    - 91.188
+    mg5: generate b g > b z z [virt=QCD]
+    pdg_ids:
+    - 5
+    - 21
+    - 5
+    - 23
+    - 23
+  v3_db_bdg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    mg5: generate d b > b d g [virt=QCD]
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    - 21
+  v3_db_bdh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 125.0
+    mg5: generate d b > b d h [virt=QCD]
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 1
+    - 25
+  v3_db_buwm:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 80.419
+    mg5: generate d b > b u w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 5
+    - 5
+    - 2
+    - -24
+  v3_dbx_abxd:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    mg5: generate d b~ > a b~ d [virt=QCD]
+    pdg_ids:
+    - 1
+    - -5
+    - 22
+    - -5
+    - 1
+  v3_dbx_bxdg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 0.0
+    mg5: generate d b~ > b~ d g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 1
+    - 21
+  v3_dbx_bxdz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    mg5: generate d b~ > b~ d z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -5
+    - -5
+    - 1
+    - 23
+  v3_dd_ddg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d > d d g [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 21
+  v3_dd_ddh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate d d > d d h [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 25
+  v3_dd_duwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate d d > d u w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 1
+    - 1
+    - 2
+    - -24
+  v3_ddx_aag:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a a g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 22
+    - 21
+  v3_ddx_abbx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    mg5: generate d d~ > a b b~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 5
+    - -5
+  v3_ddx_accx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a c c~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 4
+    - -4
+  v3_ddx_addx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a d d~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 1
+    - -1
+  v3_ddx_ahz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    mg5: generate d d~ > a h z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 25
+    - 23
+  v3_ddx_ataptam:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    mg5: generate d d~ > a ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - -15
+    - 15
+  v3_ddx_avevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > a ve ve~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 22
+    - 12
+    - -12
+  v3_ddx_bbxg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    mg5: generate d d~ > b b~ g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 5
+    - -5
+    - 21
+  v3_ddx_ddxg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > d d~ g [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 21
+  v3_ddx_ddxh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate d d~ > d d~ h [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 25
+  v3_ddx_ddxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d d~ > d d~ z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -1
+    - 23
+  v3_ddx_duxwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate d d~ > d u~ w+ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 1
+    - -2
+    - 24
+  v3_ddx_epemh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate d d~ > e+ e- h [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - -11
+    - 11
+    - 25
+  v3_ddx_gtaptam:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    mg5: generate d d~ > g ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - -15
+    - 15
+  v3_ddx_gwpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate d d~ > g w+ w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 21
+    - 24
+    - -24
+  v3_ddx_hssx:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > h s s~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 3
+    - -3
+  v3_ddx_htaptam:
+    certified: false
+    m_finals:
+    - 125.0
+    - 1.777
+    - 1.777
+    mg5: generate d d~ > h ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - -15
+    - 15
+  v3_ddx_huux:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > h u u~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 2
+    - -2
+  v3_ddx_hvevex:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate d d~ > h ve ve~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 12
+    - -12
+  v3_ddx_hwpwm:
+    certified: false
+    m_finals:
+    - 125.0
+    - 80.419
+    - 80.419
+    mg5: generate d d~ > h w+ w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 25
+    - 24
+    - -24
+  v3_ddx_wpwmz:
+    certified: false
+    m_finals:
+    - 80.419
+    - 80.419
+    - 91.188
+    mg5: generate d d~ > w+ w- z [virt=QCD]
+    pdg_ids:
+    - 1
+    - -1
+    - 24
+    - -24
+    - 23
+  v3_dg_aad:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > a a d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 22
+    - 1
+  v3_dg_adg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > a d g [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    - 21
+  v3_dg_adz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d g > a d z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    - 23
+  v3_dg_auwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate d g > a u w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 2
+    - -24
+  v3_dg_bbxd:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    mg5: generate d g > b b~ d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 5
+    - -5
+    - 1
+  v3_dg_ccxd:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > c c~ d [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 4
+    - -4
+    - 1
+  v3_dg_cxsu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > c~ s u [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - -4
+    - 3
+    - 2
+  v3_dg_dddx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > d d d~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 1
+    - -1
+  v3_dg_depem:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > d e+ e- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - -11
+    - 11
+  v3_dg_dhz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    mg5: generate d g > d h z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 25
+    - 23
+  v3_dg_dtaptam:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    mg5: generate d g > d ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - -15
+    - 15
+  v3_dg_dvevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > d ve ve~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 12
+    - -12
+  v3_dg_dwpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate d g > d w+ w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 24
+    - -24
+  v3_dg_dzz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 91.188
+    - 91.188
+    mg5: generate d g > d z z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 23
+    - 23
+  v3_dg_emuvex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d g > e- u ve~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 11
+    - 2
+    - -12
+  v3_dg_guwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate d g > g u w- [virt=QCD]
+    pdg_ids:
+    - 1
+    - 21
+    - 21
+    - 2
+    - -24
+  v3_ds_dgs:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d s > d g s [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 21
+    - 3
+  v3_ds_dhs:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate d s > d h s [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 25
+    - 3
+  v3_ds_dsz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate d s > d s z [virt=QCD]
+    pdg_ids:
+    - 1
+    - 3
+    - 1
+    - 3
+    - 23
+  v3_dsx_adsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d s~ > a d s~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - 22
+    - 1
+    - -3
+  v3_dsx_cxgu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d s~ > c~ g u [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 21
+    - 2
+  v3_dsx_cxhu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate d s~ > c~ h u [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - -4
+    - 25
+    - 2
+  v3_dsx_dgsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate d s~ > d g s~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - 21
+    - -3
+  v3_dsx_dhsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate d s~ > d h s~ [virt=QCD]
+    pdg_ids:
+    - 1
+    - -3
+    - 1
+    - 25
+    - -3
+  v3_epem_accx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate e+ e- > a c c~ [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 22
+    - 4
+    - -4
+  v3_epem_bbxg:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 0.0
+    mg5: generate e+ e- > b b~ g [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 21
+  v3_epem_bbxh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    mg5: generate e+ e- > b b~ h [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 25
+  v3_epem_ccxh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate e+ e- > c c~ h [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 25
+  v3_epem_ccxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate e+ e- > c c~ z [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -4
+    - 23
+  v3_epem_csxwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate e+ e- > c s~ w- [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 4
+    - -3
+    - -24
+  v3_epem_ddxg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate e+ e- > d d~ g [virt=QCD]
+    pdg_ids:
+    - 11
+    - -11
+    - 1
+    - -1
+    - 21
+  v3_gg_abbx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 4.7
+    mg5: generate g g > a b b~ [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 22
+    - 5
+    - -5
+  v3_gg_bbxh:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 125.0
+    mg5: generate g g > b b~ h [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    - 25
+  v3_gg_bbxz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    mg5: generate g g > b b~ z [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 5
+    - -5
+    - 23
+  v3_gg_ccxg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate g g > c c~ g [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 4
+    - -4
+    - 21
+  v3_gg_csxwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate g g > c s~ w- [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 4
+    - -3
+    - -24
+  v3_gg_ggg:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate g g > g g g [virt=QCD]
+    pdg_ids:
+    - 21
+    - 21
+    - 21
+    - 21
+    - 21
+  v3_ub_abu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    mg5: generate u b > a b u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 5
+    - 22
+    - 5
+    - 2
+  v3_ubx_abxu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 4.7
+    - 0.0
+    mg5: generate u b~ > a b~ u [virt=QCD]
+    pdg_ids:
+    - 2
+    - -5
+    - 22
+    - -5
+    - 2
+  v3_ubx_bxuz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 0.0
+    - 91.188
+    mg5: generate u b~ > b~ u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -5
+    - -5
+    - 2
+    - 23
+  v3_uc_chu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate u c > c h u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 4
+    - 4
+    - 25
+    - 2
+  v3_ucx_adsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u c~ > a d s~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -4
+    - 22
+    - 1
+    - -3
+  v3_ucx_dsxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u c~ > d s~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -4
+    - 1
+    - -3
+    - 23
+  v3_ud_dhu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate u d > d h u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 25
+    - 2
+  v3_ud_duz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u d > d u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - 1
+    - 1
+    - 2
+    - 23
+  v3_udx_aawp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > a a w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 22
+    - 24
+  v3_udx_aepve:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u d~ > a e+ ve [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -11
+    - 12
+  v3_udx_ahwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 80.419
+    mg5: generate u d~ > a h w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 25
+    - 24
+  v3_udx_atapvt:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 0.0
+    mg5: generate u d~ > a ta+ vt [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - -15
+    - 16
+  v3_udx_awpz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    mg5: generate u d~ > a w+ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 22
+    - 24
+    - 23
+  v3_udx_bbxwp:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 80.419
+    mg5: generate u d~ > b b~ w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 5
+    - -5
+    - 24
+  v3_udx_cgsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u d~ > c g s~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - 21
+    - -3
+  v3_udx_chsx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate u d~ > c h s~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - 25
+    - -3
+  v3_udx_csxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u d~ > c s~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 4
+    - -3
+    - 23
+  v3_udx_dxhu:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 0.0
+    mg5: generate u d~ > d~ h u [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -1
+    - 25
+    - 2
+  v3_udx_dxuz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u d~ > d~ u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -1
+    - 2
+    - 23
+  v3_udx_epemwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > e+ e- w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 11
+    - 24
+  v3_udx_epvez:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u d~ > e+ ve z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -11
+    - 12
+    - 23
+  v3_udx_ghwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 125.0
+    - 80.419
+    mg5: generate u d~ > g h w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 25
+    - 24
+  v3_udx_gwpz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    mg5: generate u d~ > g w+ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 24
+    - 23
+  v3_udx_hhwp:
+    certified: false
+    m_finals:
+    - 125.0
+    - 125.0
+    - 80.419
+    mg5: generate u d~ > h h w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - 25
+    - 24
+  v3_udx_htapvt:
+    certified: false
+    m_finals:
+    - 125.0
+    - 1.777
+    - 0.0
+    mg5: generate u d~ > h ta+ vt [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - -15
+    - 16
+  v3_udx_hwpz:
+    certified: false
+    m_finals:
+    - 125.0
+    - 80.419
+    - 91.188
+    mg5: generate u d~ > h w+ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 25
+    - 24
+    - 23
+  v3_udx_tapvtz:
+    certified: false
+    m_finals:
+    - 1.777
+    - 0.0
+    - 91.188
+    mg5: generate u d~ > ta+ vt z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - -15
+    - 16
+    - 23
+  v3_udx_vevexwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u d~ > ve ve~ w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -1
+    - 12
+    - -12
+    - 24
+  v3_ug_adwp:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u g > a d w+ [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - 22
+    - 1
+    - 24
+  v3_ug_dwpz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 91.188
+    mg5: generate u g > d w+ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - 1
+    - 24
+    - 23
+  v3_ug_uvevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u g > u ve ve~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - 2
+    - 12
+    - -12
+  v3_ug_uwpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate u g > u w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - 21
+    - 2
+    - 24
+    - -24
+  v3_us_cdh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate u s > c d h [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 4
+    - 1
+    - 25
+  v3_us_hsu:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate u s > h s u [virt=QCD]
+    pdg_ids:
+    - 2
+    - 3
+    - 25
+    - 3
+    - 2
+  v3_usx_hsxu:
+    certified: false
+    m_finals:
+    - 125.0
+    - 0.0
+    - 0.0
+    mg5: generate u s~ > h s~ u [virt=QCD]
+    pdg_ids:
+    - 2
+    - -3
+    - 25
+    - -3
+    - 2
+  v3_uu_uuz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u u > u u z [virt=QCD]
+    pdg_ids:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 23
+  v3_uux_addx:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > a d d~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 1
+    - -1
+  v3_uux_aepem:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > a e+ e- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - -11
+    - 11
+  v3_uux_ataptam:
+    certified: false
+    m_finals:
+    - 0.0
+    - 1.777
+    - 1.777
+    mg5: generate u u~ > a ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - -15
+    - 15
+  v3_uux_avevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > a ve ve~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 12
+    - -12
+  v3_uux_awpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate u u~ > a w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 22
+    - 24
+    - -24
+  v3_uux_bbxz:
+    certified: false
+    m_finals:
+    - 4.7
+    - 4.7
+    - 91.188
+    mg5: generate u u~ > b b~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 5
+    - -5
+    - 23
+  v3_uux_ccxh:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 125.0
+    mg5: generate u u~ > c c~ h [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 4
+    - -4
+    - 25
+  v3_uux_ddxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u u~ > d d~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 1
+    - -1
+    - 23
+  v3_uux_epvewm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    mg5: generate u u~ > e+ ve w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -11
+    - 12
+    - -24
+  v3_uux_gvevex:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    mg5: generate u u~ > g ve ve~ [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 12
+    - -12
+  v3_uux_gwpwm:
+    certified: false
+    m_finals:
+    - 0.0
+    - 80.419
+    - 80.419
+    mg5: generate u u~ > g w+ w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 21
+    - 24
+    - -24
+  v3_uux_htaptam:
+    certified: false
+    m_finals:
+    - 125.0
+    - 1.777
+    - 1.777
+    mg5: generate u u~ > h ta+ ta- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 25
+    - -15
+    - 15
+  v3_uux_taptamz:
+    certified: false
+    m_finals:
+    - 1.777
+    - 1.777
+    - 91.188
+    mg5: generate u u~ > ta+ ta- z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -15
+    - 15
+    - 23
+  v3_uux_tapvtwm:
+    certified: false
+    m_finals:
+    - 1.777
+    - 0.0
+    - 80.419
+    mg5: generate u u~ > ta+ vt w- [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - -15
+    - 16
+    - -24
+  v3_uux_uuxz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u u~ > u u~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 2
+    - -2
+    - 23
+  v3_uux_vevexz:
+    certified: false
+    m_finals:
+    - 0.0
+    - 0.0
+    - 91.188
+    mg5: generate u u~ > ve ve~ z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 12
+    - -12
+    - 23
+  v3_uux_zzz:
+    certified: false
+    m_finals:
+    - 91.188
+    - 91.188
+    - 91.188
+    mg5: generate u u~ > z z z [virt=QCD]
+    pdg_ids:
+    - 2
+    - -2
+    - 23
+    - 23
+    - 23

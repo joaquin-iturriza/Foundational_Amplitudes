@@ -805,7 +805,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
     def _sign_pair_logit(self, h, p, ptr, seq_lens=None):
         """The pair term of the sign logit, (B, 1): the mean over each event's particle pairs i < j of
         sign_pair_mlp(h_i + h_j, h_i h_j, log(2|p_i.p_j|/s_hat)/5, (a_i + a_j)/10, a_i a_j/100, log s_hat/10), a_i =
-        log(|p_i^2|/s_hat) (clamped at 1e-8: the massless legs), s_hat = (p_0 + p_1)^2 of the two beams. The inputs of
+        log(|p_i^2|/s_hat) (clamped at 1e-6, the massless legs, as the pair term), s_hat = (p_0 + p_1)^2 of the two beams. The inputs of
         the per-pool sign classifier (prep_signed_pools.py), all Lorentz scalars; symmetric in i, j, so the head is
         permutation invariant. Events padded to the batch's largest multiplicity."""
         cnt = ptr[1:] - ptr[:-1]
@@ -820,11 +820,13 @@ class AmplitudeLLoCaWrapper(nn.Module):
         s_hat = dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]
         s_hat = s_hat.abs().clamp(min=1e-30)
         r = dots / s_hat[:, None, None]
-        a = torch.log(torch.diagonal(r, dim1=1, dim2=2).abs().clamp(min=1e-8))   # (B, n)
+        # floors above float32 rounding of the augmented momenta (a massless leg's p^2/s_hat is ~1e-7 noise that
+        # moves with the random Lorentz draw): a leg below 1e-6 reads as massless (the b up to ~4.7 TeV resolved), a pair below 1e-6 as collinear
+        a = torch.log(torch.diagonal(r, dim1=1, dim2=2).abs().clamp(min=1e-6))   # (B, n)
         iu = torch.triu_indices(n, n, 1, device=h.device)
         hi, hj = H[:, iu[0]], H[:, iu[1]]                                        # (B, M, K)
         ai, aj = a[:, iu[0]], a[:, iu[1]]
-        lp = torch.log((2 * r[:, iu[0], iu[1]]).abs().clamp(min=1e-8))          # (B, M)
+        lp = torch.log((2 * r[:, iu[0], iu[1]]).abs().clamp(min=1e-6))          # (B, M)
         ls = torch.log(s_hat)[:, None].expand_as(lp)
         x = torch.cat([hi + hj, hi * hj, torch.stack([lp / 5, (ai + aj) / 10, ai * aj / 100, ls / 10], -1).to(H.dtype)],
                       dim=-1)
