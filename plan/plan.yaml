@@ -256,6 +256,43 @@ entries:
     was: done
     writeup: fa3b8ab0
     why: 'continuous exploration (D83, D114): the signed check is done (fa3b8ab0); the queue continues with the sampling sensitivity'
+  designs:
+  - at: '2026-10-26T19:43:48+00:00'
+    question: Does the pair sign head (a pair term on the leg invariants added to the sign logit) carry the one-loop amplitude
+      sign to held-out processes better than the same model without it, once both are trained at the sign head search's best
+      hyperparameters with Muon? The search's best trial had it on and read 2.75% median held-out wrong-sign share against
+      3.8% for the Muon baseline, but that baseline ran at other hyperparameters (lr 5e-3, warmup 0.158) and each arm had
+      one seed, so the gain is not yet separated from the hyperparameters and the seed. This test decides whether the pair
+      head stays in the sign study's answer; after it the sign study stops and is written up either way.
+    measure: 'Held-out wrong-sign share at the best checkpoint (lowest aggregate val_loss_no_reg), read zero-shot on the 17
+      sign-changing one-loop held-out pools of catalog_v3''s axes (2000 events per pool, scored as in analysis/catalog_v3/sign_head_search.py
+      and prep_signed.py): the median over the 17 pools per run, the seed mean per arm, and per pool the arm whose two seeds
+      both sit lower. Secondary, reported not decided on: the zero-shot MSE ratio per probe on every held-out axis and val_loss_no_reg;
+      any blow-up listed with its step.'
+    check: 'Existing data where this measure moved with the tested change (analysis/catalog_v3/data/sign_head_search.json,
+      zero_shot): the search''s best trial (pair head 16/16 unbounded, lr 1.246e-2, warmup 0.081) has median held-out wrong-sign
+      share 2.75% against the Muon baseline''s 3.8% on the same 17 pools, lower on 12 pools, higher on 3; the untuned pair
+      arms moved it too (11.3% and 24.4% against 5.4%, prep_signed.json). So the measure responds to the pair head; what is
+      unknown is how much of the 1.05 point gap is the pair head rather than lr/warmup and seed.'
+    fixed: 'Everything of the more-signed-pools arm (runs/catalog_v3_short/baseline_more_signed config: baseline target, one
+      shared standardization, log|M|^2 plus sign head, recipes/catalog_v3_train_signext.yaml, 1492 pools, 4264 steps, batch
+      16384), MuonAdamW with decoupled weight decay 0.0217, lr 1.246e-2, warmup fraction 0.081 (the search''s best trial,
+      both arms), near-zero weighting off (sign_near_weight 1), same held-out reads (scripts/job_catalog_v3_short.sh mode
+      train then zero-shot over H1 H2 H2p5 H3 H5 H6 H7E H7c).'
+    control: 'Same configuration with the pair head off (sign_pair_dim 0) and near-zero weighting off: both sign knobs off,
+      everything else identical including lr and warmup, so the only difference between the arms is the pair head (width 16,
+      hidden 16, unbounded).'
+    seeds: 'Two per arm, seeds 42 and 43 (model init and batch order). Spread known on this measure: the binomial spread of
+      one pool''s share at 2000 events is about 0.4 points at 4% (sqrt(0.04*0.96/2000)); the existing seed pair of the more-signed-pools
+      arm (AdamW, baseline HPs, no pair head) read 4.75% and 3.3% median (1.45 points apart), and an unchanged rerun of its
+      seed 43 read 3.9% (0.6 points from the first), so run-to-run spread on the median is about 0.6 to 1.5 points, as large
+      as the 1.05 point gap the search showed. The design also measures the spread at these HPs from its own two seeds per
+      arm and states it.'
+    outcome: Yes (the pair head helps) if the pair head arm's seed-mean median is lower than the control's by more than the
+      seed spread (the larger of the within-arm seed differences here and the 1.45 point existing pair), and both pair head
+      seeds sit below both control seeds on most of the 17 pools (at least 9). No otherwise, including when either arm blows
+      up and its best-checkpoint read is not lower. Either way the sign study stops and is written up in docs/results.tex
+      (par:v3_prep_signed) with the four runs; no further sign head arms follow from this test.
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
