@@ -171,6 +171,11 @@ entries:
       its 19-pool subset held none of them. Fixed in 493fef01 (job checks the whole recipe''s sidecars in every mode), sidecars
       built by FA-ccin2p3-89daa7d6, arm rerun as FA-ccin2p3-ecc413f9'
     at: '2026-10-26T06:58:12+00:00'
+  - tried: pair sign head short arm FA-ccin2p3-161fc56b (sign logit pair term, 16 pair features, MLP 32, baseline HPs)
+    why: 'blew up a third of the way in (non-finite gradients from the 17th validation, val loss up a hundredfold); at its
+      best checkpoint the median held-out wrong-sign share is 11.3% vs the baseline''s 5.4% and the zero-shot MSE 1.77x the
+      baseline''s per probe: this untuned setting does not help'
+    at: '2026-10-26T07:12:49+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
