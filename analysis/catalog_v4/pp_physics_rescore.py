@@ -48,7 +48,7 @@ def main():
                 out.setdefault(g, {}).setdefault(s, {})[k] = e
                 print(f"{g:12s} {s:5s} {k:11s} n={len(ps_):3d} v4/v3 {e['v4_over_v3_muon']:.3g} ({e['v4_lower_both_pct']:.0f}% v4 lower both) "
                       f"v4/pp {e['v4_over_pp']:.3g} ({e['v4_lower_than_pp_pct']:.0f}% lower) pp/v3adamw {e['pp_over_v3_adamw']:.3g} recovered {rec if rec is None else round(rec, 3)}")
-                claims.setdefault(g, {}).setdefault(s, {})[k] = {kk: e[kk] for kk in ("n", "v4_over_v3_muon", "v4_over_pp", "recovered")}
+                claims.setdefault(g, {}).setdefault(s, {})[k] = e
     json.dump(out, open(os.path.join(HERE, "data", "pp_physics_rescore.json"), "w"), indent=1)
     print(json.dumps(claims))
 
