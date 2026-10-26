@@ -1509,9 +1509,10 @@ entries:
     - muon_hp
   decisions:
   - D160
-  next: 'Design the fine-tune search (single-fidelity DyHPO, HPO rule 6): fine_tune.lr_scale [0.1,10]@1, layer_decay [0.75,1],
-    Muon fine-tunes from the Muon pretraining on the small-D catalog_v3 probes, keeping the parent''s standardization; trials
-    and GPU-h under 30; then submit'
+  next: 'When the 12 trials of muon_hp_ft (CC, 3 waves of 4) have ended: read the trial logs, fetch the per-cell results,
+    write analysis/catalog_v3/data/muon_hp_ft.json (n_observed, best HP point and objective, per-cell values, against the
+    untuned lr_scale 1 / layer_decay 1 reference 0.00556) with a script and a figure (objective over lr_scale and layer_decay),
+    and write it up in par:v3_muon with claims'
   done_when: 'test -f analysis/catalog_v3/data/muon_hp_ft.json && python3 -c "import json; d=json.load(open(''analysis/catalog_v3/data/muon_hp_ft.json''));
     assert d[''n_observed''] >= 12 and d[''best''][''objective''] > 0" && grep -q ''claim: muon_hp_ft.best'' docs/results.tex'
   notes_ref: null
