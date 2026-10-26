@@ -2053,6 +2053,69 @@ def parallel_steps():
              w.entries()["par"]["next"] == {3: "C", 4: "D"} and "NEXT par step 3 of 2" in nx and "step 4 of 2" in nx, [w.entries()["par"]["next"], nx])
 
 
+SEND = os.path.join(ROOT, ".claude", "hooks", "send_check.py")
+
+
+def sent_figures():
+    """send_check.py (2026-10-27, the user: "no cryptic unexplained names"): a figure or deck sent with SendUserFile
+    is refused when its text holds a code; a glossary term passes; a clean figure passes."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    d = tempfile.mkdtemp()
+    os.makedirs(os.path.join(d, "docs"))
+
+    def fig(name, xlabel, ylabel="median MSE", legend=None):
+        f, ax = plt.subplots(figsize=(3, 2))
+        ax.plot([1, 2], [1, 2], label=legend)
+        ax.set_xlabel(xlabel); ax.set_ylabel(ylabel)
+        if legend:
+            ax.legend()
+        f.savefig(os.path.join(d, name + ".pdf"), bbox_inches="tight"); f.savefig(os.path.join(d, name + ".png"))
+        plt.close(f)
+        return os.path.join(d, name + ".pdf")
+
+    def send(path, glossary=""):
+        open(os.path.join(d, "docs", "glossary.txt"), "w").write(glossary)
+        r = subprocess.run([sys.executable, SEND], input=J({"tool_name": "SendUserFile", "cwd": d,
+                                                              "tool_input": {"files": [path]}}),
+                           capture_output=True, text=True, env=dict(os.environ, CLAUDE_PROJECT_DIR=d))
+        return r.returncode, r.stderr
+
+    rc, err = send(fig("arm", "training events", legend="tp3_baseline"))
+    scenario("a figure with an arm name is refused, naming the string and the page",
+             rc == 2 and "'tp3_baseline'" in err and "page 1" in err and "recipe or arm prefix" in err, err)
+    rc, err = send(fig("codes", "held-out axis H2p5, my call D145"))
+    scenario("held-out axis and decision codes are refused", rc == 2 and "'H2p5'" in err and "'D145'" in err, err)
+    stub = os.path.join(d, "stub.txt")
+    open(stub, "w").write("from FA-ccin2p3-cb09b906, trial_0012 at 3abde40c\nconfig val_loss_no_reg\n")
+    r = subprocess.run([sys.executable, SEND, "--scan", stub], capture_output=True, text=True,
+                       env=dict(os.environ, CLAUDE_PROJECT_DIR=d))
+    scenario("run ids, trial names, hashes and snake_case identifiers are found (text stub)",
+             r.returncode == 1 and all(x in r.stdout for x in ("'FA-ccin2p3-cb09b906'", "'trial_0012'", "'3abde40c'",
+                                                               "'val_loss_no_reg'")), r.stdout)
+    rc, err = send(fig("ratio", "error ratio"))
+    rc2, err2 = send(fig("ratio_ok", "error, fine-tune over scratch"))
+    rc3, err3 = send(fig("slash_ok", "fine-tune / scratch"))
+    scenario("a ratio that does not say what over what is refused; one that does passes",
+             rc == 2 and "ratio or gain" in err and rc2 == 0 and rc3 == 0, [err, err2, err3])
+    p = fig("gloss", "catalog_v3, seed 42")
+    rc, err = send(p)
+    rc2, err2 = send(p, "catalog_v3\tthe third catalog\n")
+    scenario("a code is refused until the glossary lists it, then passes", rc == 2 and rc2 == 0, [err, err2])
+    rc, err = send(fig("clean", "training events D", "MSE, dimensionless target", legend="with the context vector"))
+    scenario("a clean figure passes", rc == 0, err)
+    rc, err = send(os.path.join(d, "clean.png"))
+    os.remove(os.path.join(d, "arm.pdf"))
+    rc2, err2 = send(os.path.join(d, "arm.png"))
+    scenario("a .png is read through its sibling .pdf, and refused without one",
+             rc == 0 and rc2 == 2 and "no sibling .pdf" in err2, [err, err2])
+    r = subprocess.run([sys.executable, SEND], input=J({"tool_name": "Read", "tool_input": {"file_path": p}}),
+                       capture_output=True, text=True, env=dict(os.environ, CLAUDE_PROJECT_DIR=d))
+    scenario("another tool is left alone", r.returncode == 0, r.stderr)
+    shutil.rmtree(d)
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -2074,7 +2137,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, parallel_steps, the_suite_itself]
+          designs, design_prior, prompt_cap, parallel_steps, sent_figures, the_suite_itself]
 
 
 def main():
