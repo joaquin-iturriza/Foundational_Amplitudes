@@ -1009,7 +1009,14 @@ entries:
     and the question: generate the five mixed-order ones at the pure-QCD born as catalog_v3 did, or attempt the full QCD+EW
     one-loop; and for the three sub-percent ones, loosen the 1e-3 double-pole tolerance, or investigate further with aMC@NLO''s
     own pole check). Meanwhile read the full one-loop certification FA-ccin2p3-ce878798 when it ends and act on its FAIL and
-    ERROR lists. Regeneration part 2 (FA-ccin2p3-b67b49d6) built all 242 entries (726 pools), no certification failures.'
+    ERROR lists. Regeneration part 2 (FA-ccin2p3-b67b49d6) built all 242 entries (726 pools), no certification failures. Disk
+    on CC (2026-10-26, group space /sps/lpnhe, df): free 50.97 GB at 00:53 UTC, 38.36 at 00:58, 36.50 at 01:00, 34.98 at 01:01,
+    33.45 at 01:03, so 2.56, 1.11, 1.05 and 0.73 GB/min as parts end (the growth is the datasets dir and the train cache,
+    matching df; MadGraph work dir 11.0 GB). Four parts still run: 0 and 5 at 7820/7822 and 7800/7805 chunks, 3 at 7074/7861,
+    7 at 6868/8084 (about 15 GB planned each), so about 4 to 6 GB left to write: it fits, ending near 27 to 29 GB free, 11
+    to 13 GB above the 3% floor (16.1 GB). Disk guard 8bef50d (prebuild_recipes stops with DISK_LOW and exit 5 before a chunk,
+    backend build or assembly below max(3%, 15 GB) free), synced to CC; the running parts keep the old code. Six ended parts''
+    logs show V4REGEN_FAILED (rc=1 on four, rc=4 on two) besides part 6''s V4REGEN_DONE: not read for the cause in this step.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
