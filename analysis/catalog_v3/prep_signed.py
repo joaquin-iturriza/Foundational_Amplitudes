@@ -6,7 +6,9 @@ the medians of the negative share, the shares within a factor 10 and 100 of zero
 pool (err_major), of a classifier on the invariants (err_mlp, and within a factor 10 of zero) and on log s_hat alone
 (err_shat), and the magnitude's shape per target (raw, + (N - 4) log s_hat, + the emission scales) with the per-pool
 ratio of each to the raw one. On the held-out pools, per arm: the median wrong-sign share, how many pools it gets worse
-than one sign per pool would, and the median of its wrong-sign share less the classifier's.
+than one sign per pool would (by more than 0.01), how many it gets more than half wrong, and the median of its
+wrong-sign share less the classifier's; the held-out pools of one sign in every event that the scorer still reads as
+sign-changing count there with no error for one sign per pool.
 Figure: per sign-changing pool, (a) the classifier's wrong-sign share against one sign per pool's, (b) on the held-out
 pools, each arm's wrong-sign share against one sign per pool's.
     python3 analysis/catalog_v3/prep_signed.py   -> data/prep_signed.json, figs/prep_signed.{png,pdf}
@@ -19,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 SETS = ("train", "H5")
 TARGETS = ("raw", "dless", "qperp")
+PCT = ("neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near", "err_major_near", "err_shat")
 ARMS = {"baseline": "base", "dimensionless": "qperp", "dimensionless_shat": "shat", "dimensionless_hybrid": "hyb",
         "dimensionless_blend025": "b25", "dimensionless_blend050": "b50", "dimensionless_context": "ctx",
         "dimensionless_twin": "twin"}
@@ -68,6 +71,7 @@ def main():
         o["n_mlp_below_5pct"] = int(sum(r["err_mlp"] < 0.05 for r in d))
         o["n_major_below_5pct"] = int(sum(r["err_major"] < 0.05 for r in d))
         o["n_rare"] = int(sum(bool(r.get("rare")) for r in d))
+        o["n_shat_beats_major"] = int(sum(r["err_shat"] < r["err_major"] - 0.005 for r in d))
         for t in TARGETS:
             o[f"shape_{t}"] = med([r[f"shape_{t}"] for r in d])
             o[f"frac_{t}"] = med([r[f"frac_{t}"] for r in d])
@@ -79,25 +83,38 @@ def main():
         print(s, json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in o.items()}))
         sh = {"train": "tr", "H5": "H5"}[s]
         for k in ("n_pools", "n_signed", "neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near",
-                  "err_shat", "mlp_over_major", "n_mlp_below_5pct", "n_major_below_5pct", "n_rare", "shape_raw", "shape_dless", "shape_qperp",
+                  "err_major_near", "err_shat", "mlp_over_major", "n_mlp_below_5pct", "n_major_below_5pct", "n_rare", "n_shat_beats_major", "shape_raw", "shape_dless", "shape_qperp",
                   "dless_over_raw", "qperp_over_raw", "qperp_above_raw"):
             v = o[k]
+            if k in PCT:                              # shares of events, in percent as the notes write them
+                v = round(100 * v, 1)
             flat[f"{sh}_{k}"] = round(v, 3) if isinstance(v, float) else v
     # the arms' signs on the held-out pools, against the data's floors on the same pools
     h5 = {key(r): r for r in sig["H5"]}
+    # a held-out pool of one sign in every event the scorer still reads as sign-changing (it resolves the sign on
+    # data this check does not see; not checked why): one sign per pool and the classifier make no error there
+    one_sign = {key(r): {**r, "err_major": 0.0, "err_mlp": 0.0} for r in rows
+                if r["set"] == "H5" and "error" not in r and not r.get("signed")}
+    h5all = {**one_sign, **h5}
+    out["one_sign_scored"] = {}
     out["arms"] = {}
     for arm, sh in ARMS.items():
         ws = arm_signs(arm)
-        ps = sorted(set(ws) & set(h5))
-        w = np.array([ws[p] for p in ps]); mj = np.array([h5[p]["err_major"] for p in ps])
-        ml = np.array([h5[p]["err_mlp"] for p in ps])
-        o = {"n": len(ps), "unmatched": sorted(set(ws) - set(h5)), "wrong_sign": float(np.median(w)),
+        ps = sorted(set(ws) & set(h5all))
+        w = np.array([ws[p] for p in ps]); mj = np.array([h5all[p]["err_major"] for p in ps])
+        ml = np.array([h5all[p]["err_mlp"] for p in ps])
+        for p in sorted(set(ws) & set(one_sign)):
+            out["one_sign_scored"].setdefault(p, {"neg": one_sign[p]["neg"]})[arm] = ws[p]
+        o = {"n": len(ps), "n_one_sign": len(set(ws) & set(one_sign)), "unmatched": sorted(set(ws) - set(h5all)),
+             "wrong_sign": float(np.median(w)),
              "worse_than_major": int((w > mj + 0.01).sum()), "minus_mlp": float(np.median(w - ml)),
              "per_pool": {p: ws[p] for p in ps}}
         out["arms"][arm] = o
         print(f"{arm:24s} n={o['n']:2d} wrong {o['wrong_sign']:.3f} worse-than-one-sign {o['worse_than_major']} "
               f"minus-classifier {o['minus_mlp']:.3f} unmatched {o['unmatched']}")
         flat[f"{sh}_n"] = o["n"]
+        flat[f"{sh}_n_one_sign"] = o["n_one_sign"]
+        flat[f"{sh}_inverted"] = int((w > 0.5).sum())
         flat[f"{sh}_wrong"] = round(100 * o["wrong_sign"])
         flat[f"{sh}_worse_major"] = o["worse_than_major"]
         flat[f"{sh}_minus_mlp"] = round(100 * o["minus_mlp"])
@@ -106,6 +123,13 @@ def main():
                     for s in SETS}
     json.dump(out, open(os.path.join(HERE, "data", "prep_signed.json"), "w"), indent=1)
     plot(sig, h5, out)
+    # e+e- -> c cbar g at one loop: the pool every arm gets most wrong
+    cg = "v3_epem_ccxg_nlo_25-1000GeV"
+    wc = [out["arms"][a]["per_pool"][cg] for a in ARMS]
+    flat.update({"ccg_neg": round(100 * h5[cg]["neg"]), "ccg_mlp": round(100 * h5[cg]["err_mlp"], 1),
+                 "ccg_wrong_min": round(100 * min(wc)), "ccg_wrong_max": round(100 * max(wc))})
+    flat["n_one_sign_scored"] = len(out["one_sign_scored"])
+    print("one sign in every event, scored as sign-changing:", json.dumps(out["one_sign_scored"]))
     print(json.dumps(flat))
 
 
@@ -116,7 +140,7 @@ def plot(sig, h5, out):
     for s, col, mk, lab in (("train", ps.C.blue, "o", "training pools"), ("H5", ps.C.vermillion, "^", "held-out pools")):
         ax.plot([r["err_major"] for r in sig[s]], [r["err_mlp"] for r in sig[s]], mk, mfc="none", color=col, label=lab)
     ax.plot([0, 0.5], [0, 0.5], ls="--", color=ps.C.grey, label="equal")
-    ax.set_xlabel("wrong sign, one sign per pool"); ax.set_ylabel("wrong sign, classifier on the invariants")
+    ax.set_xlabel("wrong sign, one sign per pool"); ax.set_ylabel("wrong sign, classifier")
     ps.legend(ax, "upper left")
     ax = axs[1]
     ps_ = sorted(h5)
@@ -124,6 +148,9 @@ def plot(sig, h5, out):
                               ("dimensionless_hybrid", ps.C.vermillion, "^", "hybrid")):
         pp = out["arms"][arm]["per_pool"]
         xs = [h5[p]["err_major"] for p in ps_ if p in pp]; ys = [pp[p] for p in ps_ if p in pp]
+        # the pools of one sign in every event: at zero on one sign per pool's axis
+        xs += [0.0 for p in sorted(out["one_sign_scored"]) if p in pp]
+        ys += [pp[p] for p in sorted(out["one_sign_scored"]) if p in pp]
         ax.plot(xs, ys, mk, mfc="none", color=col, label=lab)
     ax.plot([0, 0.5], [0, 0.5], ls="--", color=ps.C.grey, label="one sign per pool")
     ax.set_xlabel("wrong sign, one sign per pool"); ax.set_ylabel("wrong sign, zero-shot")
