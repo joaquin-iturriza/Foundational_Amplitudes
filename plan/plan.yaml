@@ -1107,6 +1107,12 @@ entries:
     answers_after: '2026-10-26T05:01:38+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T14:20:17.099000+00:00'
+    text: Match steps.
+    decision: D161
+    answers_after: '2026-10-26T14:13:29+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -1118,6 +1124,7 @@ entries:
   - D142
   - D145
   - D154
+  - D161
   next: 'Chain on CC (commit 7bc4e8ed): catalog_v4 sidecar build FA-ccin2p3-7f2fb49d (alpha_s and diagram sidecars for catalog_v4_train
     and every v4 held-out axis; V3_PREP_DONE) -> smoke FA-ccin2p3-76ba6018 (v4_dimensionless_muon smoke: 40 steps, reads H1
     H5 XV3 PP; V3_SHORT_DONE, no V3_AXIS_SKIPPED) -> afterok (dependency retargeted by scontrol to slurm 62461424): v4_dimensionless_muon
@@ -1372,17 +1379,8 @@ entries:
       again but not their arms under Muon nor their cost; D155/D158 switch to Muon; ground rule 2's 30 GPU-h budget, which
       the full set exceeds; none names the arms or the horizon
     blocks: the other five arms and the epochs-versus-steps horizon; the dimensionless arm at equal steps keeps running
-  searched: CLAUDE.md canonical setup and A/B protocol; D130 approves the coverage proposal including the short pretrainings
-    again but not their arms under Muon nor their cost; D155/D158 switch to Muon; ground rule 2's 30 GPU-h budget, which the
-    full set exceeds; none names the arms or the horizon
-  ask: 'Your coverage approval included running the short pretrainings again on catalog_v4. catalog_v3''s short-pretraining
-    study has six arms, and with the switch to Muon all six would need a Muon run on both catalogs: about 36 GPU-h at one
-    seed (72 at two), over the 30 GPU-h budget. What is running now is the dimensionless arm only, both catalogs, two seeds
-    (10.6 GPU-h). Do you want the other five arms too, and at one or two seeds? And should the catalogs match in training
-    steps (same compute, my recommendation, what is running) or in epochs (5 each, the study''s rule, so catalog_v4 gets 18%
-    fewer steps)?'
-  waiting_since: '2026-10-26T14:13:29+00:00'
-  blocks: the other five arms and the epochs-versus-steps horizon; the dimensionless arm at equal steps keeps running
+    answered_at: '2026-10-26T14:20:17.008000+00:00'
+    decision: D161
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
