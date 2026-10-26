@@ -1673,15 +1673,20 @@ entries:
     searched: 'D130, D117/D119, D163/D166: none covers adding pp events to catalog_v4; the user asked why any regeneration
       is needed'
     blocks: the pp blend's relabelling and test; the switch's other steps continue
-  ask: 'Go ahead with the pp blend test without new generation: the existing 13 TeV pp pools'' training events relabelled
-    with catalog_v4''s matrix elements (~5 core-h, b classes left as they are), mixed in at about 10% (catalog_v4''s pools
-    whole) and 30% (catalog_v4 subsampled), against catalog_v4 as is and pp-only, all Muon, two seeds, ~9 GPU-h; more pp events
-    generated only if the test shows the share matters?'
-  waiting_since: '2026-10-26T21:24:11+00:00'
-  searched: 'D130, D117/D119, D163/D166: none covers adding pp events to catalog_v4; the user asked why any regeneration is
-    needed'
-  blocks: the pp blend's relabelling and test; the switch's other steps continue
-  checked_until: '2026-10-26T21:36:36+00:00'
+  - ask: 'catalog_v3''s pools (71.7 GB) go under your earlier call. Should these go too: catalog_v3''s MadGraph and MadLoop
+      backends (16.1 GB), the old pools and backends the width rebuild set aside (5.05 GB), the rebuild''s leftover staging
+      (6.41 GB), catalog_v3''s diagram sidecars (0.63 GB)?'
+    at: '2026-10-26T21:37:22+00:00'
+    searched: D163/D166 cover catalog_v3's pools only; D131, D136 and the other storage calls do not name catalog_v3's backends
+      or the width rebuild's leftovers
+    blocks: deleting the four extra groups only; the pools' deletion and everything else continue
+  ask: 'catalog_v3''s pools (71.7 GB) go under your earlier call. Should these go too: catalog_v3''s MadGraph and MadLoop
+    backends (16.1 GB), the old pools and backends the width rebuild set aside (5.05 GB), the rebuild''s leftover staging
+    (6.41 GB), catalog_v3''s diagram sidecars (0.63 GB)?'
+  waiting_since: '2026-10-26T21:37:22+00:00'
+  searched: D163/D166 cover catalog_v3's pools only; D131, D136 and the other storage calls do not name catalog_v3's backends
+    or the width rebuild's leftovers
+  blocks: deleting the four extra groups only; the pools' deletion and everything else continue
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
