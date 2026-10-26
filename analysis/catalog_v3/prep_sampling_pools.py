@@ -146,7 +146,7 @@ def one(args):
                   else np.zeros(n, bool))
             io = np.flatnonzero(~fl); io = io[np.argsort(tl[io], kind="stable")]
             op = np.argsort(la[:n], kind="stable")
-            perm = np.empty(n, int)
+            perm = np.zeros(n, int)
             perm[io] = op[match_skip(la[:n][op], tl[io])]
             keep = ~fl & (amp[perm] != 0)
             al = float(np.max(np.abs(tl[keep] - la[perm][keep]))) if keep.any() else np.inf
