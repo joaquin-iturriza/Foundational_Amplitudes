@@ -160,6 +160,11 @@ entries:
     why: 'submitted while the CC checkout was still at 3f7c3acd (the sync had refused: my audit json was untracked there),
       so the spooled script has no such arm and exits; resubmitted at dfa59624 as FA-ccin2p3-19f25524'
     at: '2026-10-26T06:43:43+00:00'
+  - tried: full arm with more sign-changing training pools FA-ccin2p3-3b0b7919 (dfa59624)
+    why: 'died in data setup: no diagram sidecars for the 95 new one-loop pools; the smoke FA-ccin2p3-19f25524 passed because
+      its 19-pool subset held none of them. Fixed in 493fef01 (job checks the whole recipe''s sidecars in every mode), sidecars
+      built by FA-ccin2p3-89daa7d6, arm rerun as FA-ccin2p3-ecc413f9'
+    at: '2026-10-26T06:58:12+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
