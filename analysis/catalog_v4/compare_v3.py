@@ -333,12 +333,12 @@ def main():
         for a, e in o[c].items():
             print(f"own {c} {a:5s}", {r: (v["n"], v["n_expected"], v["mse"] and round(v["mse"], 3)) for r, v in e.items()})
     claims = {"shared": {pool: {grp: {k: {kk: e[kk] for kk in ("n", "ratio", "v4_lower_both_pct", "v3_lower_both_pct",
-                                                                "gap", "v3_med", "v4_med", "exceeds_seed_spread")} | {"v3_lo": min(e["v3"]),
+                                                                "gap", "v3_med", "v4_med", "exceeds_seed_spread")} | {"spread_v3": e["seed_spread"]["v3"], "spread_v4": e["seed_spread"]["v4"], "v3_lo": min(e["v3"]),
                                                                 "v3_hi": max(e["v3"]), "v4_lo": min(e["v4"]), "v4_hi": max(e["v4"])}
                                      for k, e in sh[pool][grp].items() if e} for grp in sh[pool] if not grp.startswith("_")}
                          for pool in ("v3", "v4")},
               "pp": {bk: {g: {k: {kk: v[kk] for kk in ("n", "ratio", "v4_lower_both_pct", "v3_lower_both_pct", "gap", "v3_med", "v4_med", "exceeds_seed_spread")}
-                              | {"v3_lo": min(v["v3"]), "v3_hi": max(v["v3"]), "v4_lo": min(v["v4"]), "v4_hi": max(v["v4"])}
+                              | {"spread_v3": v["seed_spread"]["v3"], "spread_v4": v["seed_spread"]["v4"], "v3_lo": min(v["v3"]), "v3_hi": max(v["v3"]), "v4_lo": min(v["v4"]), "v4_hi": max(v["v4"])}
                               for k, v in e.items() if isinstance(v, dict)} for g, e in p[bk].items()} for bk in ("no_b", "b")},
               }
     claims["own"] = {c: {a: {"seed42": o[c][a][RUNS[c][0]]["mse"], "seed43": o[c][a][RUNS[c][1]]["mse"],
