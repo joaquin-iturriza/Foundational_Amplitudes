@@ -105,12 +105,11 @@ entries:
   - D129
   - D135
   - D165
-  next: 'Separate the learning rate from the pair head on the held-out sign: the Muon baseline arm (more sign-changing pools,
-    both sign knobs off) rerun as a short pretraining at the sign head search best trial''s lr 1.246e-2 and warmup 0.081 (one
-    seed, ~1.5 GPU-h on CC), read zero-shot in eval mode like sign_search_best, then rerun analysis/catalog_v3/sign_head_search.py
-    with it as a fourth arm (held-out wrong-sign share per pool and zero-shot MSE per probe against the best trial). Written
-    so far: d6b12413 (the training-pool validation signs separate no knob; the best trial beats the Muon baseline held out,
-    2.8% vs 3.8% median wrong sign, 0.67x zero-shot MSE, at 2.5x its rate).'
+  next: 'the 4-run pair sign head test (approved): pair head (width 16, hidden 16, unbounded) on against off, both at lr 1.246e-2
+    and warmup 0.081 (the search''s best trial), Muon wd 0.0217, 4264 steps, the more-signed-pools arm, seeds 42 and 43 each
+    (~6 GPU-h on CC); measure: held-out wrong-sign share on the 17 one-loop pools (median and per pool), yes if the pair head
+    is lower by more than the seed spread; first record the design (plan design) for the design reviewer, then submit once
+    it passes; after it, stop the sign study either way and write it up'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
