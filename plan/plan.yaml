@@ -98,12 +98,11 @@ entries:
   - D83
   - D129
   - D135
-  next: 'Read the two sign arms (pair head FA-ccin2p3-161fc56b, near-zero weighting FA-ccin2p3-a7009d00) zero-shot against
-    the baseline: the wrong-sign share on the 17 sign-changing H5 pools and the whole one-loop axis, against the classifier
-    and one sign per pool (prep_signed.py ARMS). When the extension generation FA-ccin2p3-8acabdd2 ends: read which of the
-    153 new one-loop pools certified, generated and change sign, write recipes/catalog_v3_train_signext.yaml (catalog_v3_train
-    plus only the sign-changing new pools), add arm baseline_more_signed at the baseline''s 4264 steps (same compute), smoke,
-    submit (~2 GPU-h).'
+  next: 'When the smoke FA-ccin2p3-19f25524 and the arm with more sign-changing training pools FA-ccin2p3-3b0b7919 (baseline_more_signed,
+    4264 steps, held on afterok of the smoke; if the smoke fails the arm never starts: read the smoke log, fix, resubmit)
+    and the two sign arms (pair head FA-ccin2p3-161fc56b, near-zero weighting FA-ccin2p3-a7009d00) end: read the three arms
+    zero-shot against the baseline (add them to prep_signed.py ARMS and short_reads): the wrong-sign share on the 17 sign-changing
+    H5 one-loop pools and the whole one-loop axis, against the per-pool classifier and one sign per pool; write up in par:v3_prep_signed'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
