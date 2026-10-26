@@ -1016,7 +1016,19 @@ entries:
     7 at 6868/8084 (about 15 GB planned each), so about 4 to 6 GB left to write: it fits, ending near 27 to 29 GB free, 11
     to 13 GB above the 3% floor (16.1 GB). Disk guard 8bef50d (prebuild_recipes stops with DISK_LOW and exit 5 before a chunk,
     backend build or assembly below max(3%, 15 GB) free), synced to CC; the running parts keep the old code. Six ended parts''
-    logs show V4REGEN_FAILED (rc=1 on four, rc=4 on two) besides part 6''s V4REGEN_DONE: not read for the cause in this step.'
+    logs show V4REGEN_FAILED (rc=1 on four, rc=4 on two) besides part 6''s V4REGEN_DONE: not read for the cause in this step.
+    UPDATE 2026-10-26 (logs read): part 0 (FA-ccin2p3-2424a38f) V4REGEN_DONE, 247 entries, 741 pools (all, 3 per entry), 33.2
+    GB free at end; part 6 (FA-ccin2p3-0ef20da7) V4REGEN_DONE, 248 entries, 744 pools (all), 36.2 GB free; part 4 (FA-ccin2p3-05f408b4)
+    245 entries, 732 pools = 244 entries built, rc=4 is CERT_SKIPPED only (v4_bbx_ccx_nlo set aside, pole certification FAIL),
+    no Traceback; part 1 (FA-ccin2p3-6bd04ec8) 241 entries, 720 pools = 240 built, rc=4 is CERT_SKIPPED only (v4_bbx_tapvtwm_nlo
+    set aside), no Traceback. Full one-loop certification with the fixed copier (FA-ccin2p3-ce878798): PASS 151, FAIL 8, ERROR
+    0, BUILD_FAIL 0 of 159; the 8 FAILs are exactly the 8 known ones, none new. Double-pole deviation (max abs c2_ML - pred,
+    max rel, 95th pct rel): u u~ > c c~ z 5.33, 1.00, 1.00 (MadLoop double pole 0); d d~ > b b~ z 5.33, 1.00, 1.00 (same);
+    d d~ > c c~ 0.623, 0.117, 4.2e-15; d d~ > b b~ 0.763, 0.143, 4.9e-15; b b~ > c c~ 0.623, 0.117, 4.2e-15; b g > b w+ w-
+    2.40e-2, 4.23e-3, 1.83e-3; b b~ > ta+ vt w- 1.22e-2, 4.56e-3, 3.59e-3; b b~ > h w+ w- 1.12e-2, 4.19e-3, 2.74e-3. When
+    the user answers: rebuild these 8 one-loop entries (v4_uux_ccxz_nlo, v4_ddx_bbxz_nlo, v4_ddx_ccx_nlo, v4_ddx_bbx_nlo,
+    v4_bbx_ccx_nlo, v4_bg_bwpwm_nlo, v4_bbx_tapvtwm_nlo, v4_bbx_hwpwm_nlo) per the answer; nothing else in the one-loop set
+    needs rework.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
