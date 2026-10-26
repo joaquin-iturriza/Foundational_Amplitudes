@@ -1274,10 +1274,18 @@ entries:
   - D161
   - D162
   - D166
-  next: 'The comparison is written (docs/results.tex par:v4_vs_v3, 7bf814b0). Waiting on the user''s call: switch pretraining
-    to catalog_v4 or not. If yes: the held Daniel''s-catalog studies adapted to catalog_v4, and catalog_v3''s deletion (D163,
-    only once the switch is confirmed, nothing deleted before). If no: say what catalog_v3 keeps and what of catalog_v4 is
-    kept.'
+  next: 'FIRST (the user, 2026-10-26: what mattered most was catalog_v4 against training on pp, on pp-generated data; D117
+    ''from that we decide if we switch'', D119 the pp-trained comparison): compare catalog_v4''s two Muon runs with the existing
+    pp-trained arm (dimensionless_pp, FA-ccin2p3-e786bd74 and its rerun 982b5a14, AdamW) on the same 13 TeV pp pools (1396
+    classes, inside and outside catalog_v3''s coverage, trained / held-out classes, b apart), at no compute: (a) directly,
+    stating that the optimizers differ (Muon against AdamW; the Muon test measured 3.3x zero-shot on catalog_v3); (b) each
+    relative to its own optimizer''s window-trained catalog_v3 arm (catalog_v4/v3-window with Muon; pp-trained/v3-window with
+    AdamW, analysis/catalog_v3/pp_compare.py), i.e. how much of the pp-training gain catalog_v4 recovers. Say what a clean
+    answer would need (a pp-trained Muon arm, 2 seeds, ~3 GPU-h; its design through the design gate) and propose it. Write
+    it into par:v4_vs_v3 next to the pp table, figure, provenance. THEN: The comparison is written (docs/results.tex par:v4_vs_v3,
+    7bf814b0). Waiting on the user''s call: switch pretraining to catalog_v4 or not. If yes: the held Daniel''s-catalog studies
+    adapted to catalog_v4, and catalog_v3''s deletion (D163, only once the switch is confirmed, nothing deleted before). If
+    no: say what catalog_v3 keeps and what of catalog_v4 is kept.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
