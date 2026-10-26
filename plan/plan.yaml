@@ -1609,7 +1609,7 @@ entries:
     and write it up in par:v3_muon with claims'
   done_when: 'test -f analysis/catalog_v3/data/muon_hp_ft.json && python3 -c "import json; d=json.load(open(''analysis/catalog_v3/data/muon_hp_ft.json''));
     assert d[''n_observed''] >= 12 and d[''best''][''objective''] > 0" && grep -q ''claim: muon_hp_ft.best'' docs/results.tex'
-  notes_ref: null
+  notes_ref: fig:v3_muon_hp_ft
   match: muon_hp*,zz_muon_hp*
   evidence:
     runs: []
