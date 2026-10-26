@@ -118,8 +118,10 @@ entries:
     runs:
     - FA-ccin2p3-0bddbf48
     - FA-ccin2p3-161fc56b
+    - FA-ccin2p3-1c11d753
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-37a95d76
+    - FA-ccin2p3-5a8c8fde
     - FA-ccin2p3-6d35589c
     - FA-ccin2p3-7145824e
     - FA-ccin2p3-878d6b9a
@@ -130,7 +132,8 @@ entries:
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-ecc413f9
     - FA-ccin2p3-f72f1379
-    commit: 0a616ed4
+    - FA-ccin2p3-fd393560
+    commit: 7e8d3d66
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
