@@ -35,7 +35,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, baseline_more_signed, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -86,6 +86,11 @@ case "$ARM" in
     # plus the 95 one-loop pools of the coloured 2->3 training trees whose train events take both signs,
     # recipes/make_catalog_v3_train_signext.py), at the baseline's 4264 steps (same compute)
     baseline_more_signed)  NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false)
+                           TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
+    # second seeds of the baseline and of the more-signed-pools arm (seed 43: model init and batch order; the pools and
+    # their order unchanged), to size the third sign arm's gain and cost against seed spread
+    baseline_seed2)        NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false seed=43) ;;
+    baseline_more_signed_seed2) NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false seed=43)
                            TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
     baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
