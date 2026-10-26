@@ -1124,15 +1124,11 @@ entries:
   - D154
   - D161
   - D162
-  next: 'The catalog comparison (catalog_v4 against catalog_v3, Muon at its search best, seeds 42 and 43) runs on the job
-    script before the fix 5f69bb20 (all five started before it: FA-ccin2p3-339ec100 and 380842ed catalog_v4, 190f0d06 catalog_v3
-    seed 43, 5209e83c catalog_v3 seed 42 still training, efc4c352 the cross read of trial_1860 on XV4 and PP only). Their
-    trainings are unaffected; on H1 to H7c each also reads the other catalog''s probes (a superset: every own-catalog recipe
-    is rewritten by the job before it reads). When they end: copy the reads home, keep only the probes of the run''s own axis
-    recipe (by name: v3_ for catalog_v3 runs, v4_ for catalog_v4 runs on H*; XV3 v3_, XV4 v4_, PP pp13_; the *_signed.txt
-    per pool likewise), list every expected probe with no prediction (a concurrent job rewriting the shared folder can lose
-    one), and read only those again in mode eval at the fixed script (V3_AXES, same arm) before comparing. Then the comparison
-    write-up per CLAUDE.md 0e.'
+  next: Reads of catalog_v4 seeds 42 and 43 (FA-ccin2p3-339ec100, 380842ed; best val_loss_no_reg 4.504e-3, 5.268e-3) and catalog_v3
+    seed 43 (190f0d06; 3.029e-3) are home in analysis/catalog_v3/data/short_reads/{v4_dimensionless_muon,v4_dimensionless_muon_seed2,dimensionless_muon_best_seed2},
+    filtered to own-catalog probes, none missing (no eval-only re-read needed). Wait for catalog_v3 seed 42 rerun (FA-ccin2p3-5209e83c)
+    and the cross read (efc4c352), copy and filter theirs the same way, then add the arms to short_reads.py and write the
+    comparison per CLAUDE.md 0e.
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
