@@ -120,6 +120,7 @@ def make_exp(agg="geometric_mean", tau=0.0, beta=0.0, lam=1e-3, accum=False, mic
     exp._consec_skips, exp._diverged, exp._diverge_patience = 0, False, 50
     exp.train_loss, exp.train_lr, exp.train_grad_norm, exp.train_loss_no_reg, exp.train_mse = [], [], [], [], []
     exp.training_start_time = 0.0
+    exp._step_log = []                                          # train() creates it; _step appends every step
     exp._excess_ref_cache = torch.tensor([3e-2, 1.0, 50.0])     # excess reference, per process
     exp.model.train()
     return exp

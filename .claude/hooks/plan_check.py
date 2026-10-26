@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Stop guard (setup redesign, D121): the one check that work is moving. It replaces the idle-work parts of
 ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cannot end while
-  - `plan next` lists a step not launched: a run of an entry ended, an entry has nothing in flight, or the user wrote
-    after a question (their answer has not reached its entry);
+  - `plan next` lists a step not launched for a running entry: a run of it ended, or it has nothing in flight;
+  - never blocking: the user wrote after a question an entry waits on. Whether it answers is the main session's call
+    through `plan next`, which lists it on every wake until plan answer or plan unanswered: a block put a non-answer on
+    the user's screen at every message (the user, 2026-10-26: "Me not answering a question from you it's not you not
+    answering a question from me, why would it need to retrigger you");
   - an entry waits on the user but no message sent to them carries its question (from 15 min before the ask on);
   - an entry is held by anything but a hold or forbid in force that names it;
   - a running entry has no approval in force naming it;
@@ -52,7 +55,7 @@ def problems():
     msgs = plan.messages(plan.oldest_open(d, st))     # from the oldest open question, or the previous re-ask scan
     out, once = list(unrecorded), []
     for e, why, launched in plan.next_steps(d, st, msgs=msgs):
-        if launched:
+        if launched or e.get("status") == "waiting_user":     # the user wrote after a question: plan next only
             continue
         out.append("%s: %s%s" % (e["id"], why, "; launch its step agent (plan next --prompts, then plan step %s "
                                  "--agent <subagent id>)" % e["id"] if e.get("status") == "running" else ""))
@@ -118,8 +121,9 @@ def main():
         return 2
     import plan
     if bad:
-        sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in bad + [
-            "note: " + n for n in plan.NOTES]) + "\n")
+        if plan.NOTES:                            # notes go to plan next, never to the user's screen with a block
+            plan._set_state("_stop_notes", list(plan.NOTES))
+        sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in bad) + "\n")
         return 2
     # Notes never reach the user: a passing check prints nothing (a systemMessage is shown on their screen; the user,
     # 2026-10-25 and 2026-10-26: "Why are you back again with this?"). They are kept for `plan next`, which prints them
