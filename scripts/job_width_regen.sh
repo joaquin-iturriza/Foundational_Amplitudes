@@ -35,6 +35,9 @@ python tools/width_regen.py migrate --quarantine "$Q/migrate" --apply || { echo 
 python tools/width_regen.py swap "$W/spec.yaml" --stage-frozen "$W/frozen" --stage-train "$W/train" --quarantine "$Q" \
     --apply || { echo "WIDTH_FAILED swap"; exit 5; }
 echo "WIDTH_SWAP_DONE wall $(( $(date +%s) - T0 )) s"
+# the swap quarantines each old pool's <pool>.alphas.npy (per-event alpha_s, read by data.target_physics_orders) and the
+# staged build writes none: recompute them for the swapped pools (exact, from each event's sqrt(s_hat))
+python tools/write_own_alphas.py "$W/spec.yaml" || { echo "WIDTH_FAILED alphas"; exit 6; }
 CERT_ARGS="--only v4_bg_bwpwm v4_bbx_tapvtwm v4_bbx_hwpwm" \
 V4REGEN_ONLY="v4_bg_bwpwm_nlo,v4_bbx_tapvtwm_nlo,v4_bbx_hwpwm_nlo" \
     bash "$_CCORCH_ROOT/scripts/job_v4_certify_then_regen.sh"

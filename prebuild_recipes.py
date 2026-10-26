@@ -433,7 +433,9 @@ def main():
                     if not (args.skip_cert_failed and datagen.is_virt(key[0]) and "pole guard" in str(e)):
                         raise
                     names0, keys0 = set(skipped_names), set(skipped_keys)
-                    skip_group(key[0], f"chunk refused by the pole guard ({key[1]}): {str(e).splitlines()[0]}")
+                    # the generator's own verdict ([POLE GUARD] ..., the last stderr line) says why; the first line only names the entry
+                    why = next((l for l in reversed(str(e).splitlines()) if "[POLE GUARD]" in l), str(e).splitlines()[0])
+                    skip_group(key[0], f"chunk refused by the pole guard ({key[1]}): {why}")
                     pole_names.update(set(skipped_names) - names0)
                     pole_keys.update(skipped_keys - keys0)
                     pole_backends.update(datagen._backend_key(n) for n in (set(skipped_names) - names0) | {key[0]})
