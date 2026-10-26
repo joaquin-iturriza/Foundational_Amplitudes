@@ -971,6 +971,20 @@ def fourth_lower():
     scenario("lower: reply_check keeps 'do not ask what a decision in force settles', without the self-explanation rule",
              "must not ask the researcher to decide something the decisions above already settle" in rc_src
              and "self-explanation" not in rc_src)
+    import importlib.util, tempfile
+    spec = importlib.util.spec_from_file_location("reply_check", os.path.join(ROOT, ".claude", "hooks", "reply_check.py"))
+    rcm = importlib.util.module_from_spec(spec); spec.loader.exec_module(rcm)
+    tr = tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False)
+    for rec in ({"type": "user", "message": {"content": "keep it as it is"}},
+                {"type": "assistant", "message": {"content": [{"type": "text", "text": "Joaquin, kept."}]}},
+                {"type": "user", "isCompactSummary": True,
+                 "message": {"content": "This session is being continued ... 6. All user messages: why would you?"}},
+                {"type": "user", "message": {"content": "<system-reminder>an agent report</system-reminder>"}}):
+        tr.write(json.dumps(rec) + "\n")
+    tr.close()
+    msgs, _ = rcm.scan(tr.name)
+    scenario("lower: reply_check never takes a compaction summary for a new user message (it quotes old questions)",
+             msgs == ["keep it as it is"], str(msgs))
     so = open(os.path.join(ROOT, "tools", "switch_over.sh")).read()
     scenario("lower: the switch-over stops on a failed migration commit and deletes the retired hook files",
              "|| true" not in so and "git rm -q .claude/hooks/plan_guard.py" in so)

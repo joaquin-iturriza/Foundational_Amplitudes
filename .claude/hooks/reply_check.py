@@ -54,7 +54,10 @@ def scan(path):
                         part = part.split("This is how Claude Code surfaces")[0].strip()
                         if part:
                             msgs.append(part)
-                elif t and not t.startswith(SKIP) and r.get("toolUseResult") is None and not r.get("isMeta"):
+                elif (t and not t.startswith(SKIP) and r.get("toolUseResult") is None and not r.get("isMeta")
+                      and not r.get("isCompactSummary")):
+                    # a compaction summary is written as a user record; it quotes the user's old questions, and was
+                    # checked as a new message (2026-10-26: three questions answered that morning were flagged again)
                     msgs = [t]        # a new prompt opens the window: earlier messages were answered in earlier turns
                     replies = []
         elif r.get("type") == "assistant":
