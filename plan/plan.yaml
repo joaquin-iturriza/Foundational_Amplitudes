@@ -1690,14 +1690,20 @@ entries:
       regenerating the pp pools or its CPU cost
     blocks: the pp pools' regeneration and everything that waits on it (the full-class pp comparison, the pp blend); the notes'
       restatement on the 544 matching classes, the guard, and the catalog_v3 deletion continue
-  ask: 'Regenerate the 13 TeV pp pools with catalog_v4''s physics for the 819 classes where it differs (566 with a b, 253
-    that gain electroweak diagrams) plus the 173 catalog_v4 classes with no pp pool: CPU only, about 160 to 420 core-hours
-    on CC, nothing on GPU; then today''s pp comparisons are redone on all classes. The pp blend waits for it.'
-  waiting_since: '2026-10-26T21:39:54+00:00'
-  searched: D117/D119 built the pp pools on catalog_v3's physics; D130 set catalog_v4's physics; D166 the switch; none covers
-    regenerating the pp pools or its CPU cost
-  blocks: the pp pools' regeneration and everything that waits on it (the full-class pp comparison, the pp blend); the notes'
-    restatement on the 544 matching classes, the guard, and the catalog_v3 deletion continue
+  - ask: Delete catalog_v3's pools on CC now (71.7 GB, 19329 files, exactly the manifest's 'pools' group, re-listed right
+      before, pp pools and everything else kept)? The automatic permission check refused to start the deletion agent without
+      your explicit go.
+    at: '2026-10-26T21:58:22+00:00'
+    searched: D163 and D166 cover deleting the pools after the switch; the deletion was refused by Claude Code's auto-mode
+      permission check, which only the user can override
+    blocks: the deletion of catalog_v3's pools; everything else continues
+  ask: Delete catalog_v3's pools on CC now (71.7 GB, 19329 files, exactly the manifest's 'pools' group, re-listed right before,
+    pp pools and everything else kept)? The automatic permission check refused to start the deletion agent without your explicit
+    go.
+  waiting_since: '2026-10-26T21:58:22+00:00'
+  searched: D163 and D166 cover deleting the pools after the switch; the deletion was refused by Claude Code's auto-mode permission
+    check, which only the user can override
+  blocks: the deletion of catalog_v3's pools; everything else continues
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
