@@ -132,6 +132,10 @@ entries:
     why: sklearn classifier refused a pool with one event of one sign in the fit split; fixed in e13bfd3 (no classifier under
       20, marked rare) and rerun as FA-ccin2p3-7145824e
     at: '2026-10-26T02:13:28+00:00'
+  - tried: sampling sensitivity job FA-ccin2p3-eaff0f54 (f4fd65a7)
+    why: the zero-shot reads shuffle the pool's first 2000 events, so every arm's events failed the alignment check (no network
+      numbers; data part fine); fixed in 54c3077d by matching events on log|M|^2 and rerun as FA-ccin2p3-f72f1379
+    at: '2026-10-26T03:16:00+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
