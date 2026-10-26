@@ -1443,6 +1443,12 @@ one seed each, and those two were trained before the mixed-order fix (two catalo
 powers). The groups are compare\_v3's, $b$ classes apart (the pp pools carry a $4.7$\,GeV $b$ that catalog\_v4 never
 saw). Medians over classes of the MSE of $\log|\mathcal M|^2$ (catalog\_v4: the geometric mean of its two seeds), in
 natural-log units, not the standardized units of the validation losses quoted elsewhere in these notes.
+\emph{Provisional.} The $13$\,TeV pp test pools were generated with catalog\_v3's physics: its param card ($b$ at
+$4.7$\,GeV, so a four-flavour proton; internal top at $173$\,GeV) and MadGraph's minimal QED order, so VBF, VBS and the
+electroweak-QCD interference that catalog\_v4 includes are missing from their labels. catalog\_v4's numbers here are
+scored against labels that differ from its own physics on some classes without $b$ as well, so they are provisional
+until the running check of which classes and by how much reports.
+% allow: 13 4.7 173 because they are the beam energy in TeV, the b mass and the internal top mass in GeV, settings
 % src: python3 analysis/catalog_v3/train_levels.py @187ae4f7
 % claim: dimensionless_pp.median=0.37
 % claim: dimensionless.median=0.37
@@ -1561,7 +1567,9 @@ and whether the per-class gap to the pp-trained arm follows that density gap.
   \caption{catalog\_v4 against training on pp, on the $13$\,TeV pp pools, no $b$: each run's median MSE of
     $\log|\mathcal M|^2$ over the classes trained in both catalogs (left) and held out in both (right), on the whole
     pool and on its events inside and outside what catalog\_v3's window pools cover. catalog\_v3 and the pp-trained arm
-    with AdamW (one seed each), catalog\_v3 and catalog\_v4 with Muon (seed $42$ filled, $43$ open).}
+    with AdamW (one seed each), catalog\_v3 and catalog\_v4 with Muon (seed $42$ filled, $43$ open). Provisional
+    for catalog\_v4: the pp pools have catalog\_v3's physics ($b$ at $4.7$\,GeV, minimal QED order).}
+  % allow: 4.7 because it is catalog_v3's b mass in GeV, a setting
   \label{fig:v4_vs_pp}
 \end{figure}
 \begin{figure}[t]
@@ -1575,6 +1583,143 @@ and whether the per-class gap to the pp-trained arm follows that density gap.
     (circles) and outside (squares) what catalog\_v3's window pools cover. Left the classes trained in both catalogs,
     right those held out in both.}
   \label{fig:v4_vs_pp_scatter}
+\end{figure}
+
+% src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+% claim: n_train_both_no_b=578
+% allow: 13 because it is the beam energy in TeV, a setting
+% allow: 20000 2000 because they are the catalog events and the scored pp events per class, settings
+% allow: 0.2 2 1 because they are the bin widths, settings
+% allow: 0.5 because it is a thin-bin threshold, a setting
+\paragraph{Where catalog\_v4's training events sit against the pp events (2026-10-26).}\label{par:v4_density} The check
+announced above, at no compute: is catalog\_v4's training density thin where the $13$\,TeV pp events sit, and does the
+per-class gap to the pp-trained arm follow it? It asks this because the coverage check before generation measured only
+containment (which share of a class's pp events lies inside the new cuts and window), and its effective sample size in
+$\sqrt{\hat s}$ is $1$ for any density proportional to pp's on pp's support, however thin. Design
+(\code{analysis/catalog\_v4/density\_check.py}, Fig.~\ref{fig:v4_density}): on the $578$ classes without $b$ trained in
+both catalogs, every event in the partonic rest frame, the first $20000$ events of the class's catalog\_v4 training pool
+(catalog\_v3's as the control) against the class's pp training pool (MadEvent's unweighted events), binned jointly in
+$\log_{10}\sqrt{\hat s}$, the forward angle of the most forward final ($\log 1/(1-|\cos\theta|)$) and the most
+collinear pair's $\log_{10} 2|p_i\cdot p_j|/\hat s$ (beams included, so small $|t|$ counts), in bins of $0.2$, $2$ and
+$1$ of these units; the pp events scored by the reads (the first $2000$ of the validation pool) are the weights. Three
+measures per class: the KL divergence of the catalog's density from pp's (an empty catalog bin floored at half an
+event), the median over the scored events of the catalog's density over pp's in their bin, and the share of scored
+events in thin bins (catalog below a third of pp). The bins, the third, the half-event floor and the $20000$ events are
+the check's own choices, not sourced; each number below is given with its span over five binnings (the three that keep
+all three variables, and two that drop $\sqrt{\hat s}$, or the angle and the collinear variable) and thresholds of
+$0.2$, a third and $0.5$. The pp component is MadEvent's events: the PDF-weighted sampler of the pp study's design was
+never built. \emph{Provisional.} The $13$\,TeV pp test pools were generated with catalog\_v3's physics ($b$ at
+$4.7$\,GeV, minimal QED order), so these numbers are provisional until the running check reports: the error gap
+they are correlated with is scored on those labels, and the pp events' own distribution follows catalog\_v3's
+$|\mathcal M|^2$, so the density itself moves too on classes where the missing electroweak diagrams matter (the $b$
+classes are already left out).
+% allow: 4.7 because it is catalog_v3's b mass in GeV, a setting
+% allow: M|^2
+\begin{itemize}
+  \item \emph{The density.} Medians over the classes: the KL is $1.38$ for catalog\_v4 and $2.29$ for catalog\_v3
+    ($1.09$ to $1.51$ for catalog\_v4 over the three joint binnings); at a scored pp event catalog\_v4's density is
+    $0.22$ of pp's (catalog\_v3 $0.12$), and $0.35$ of catalog\_v4's events lie in bins pp never reaches.
+    % src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+    % claim: density.v4.kl=1.38
+    % claim: density.v3.kl=2.29
+    % claim: density.v4.ratio=0.22
+    % claim: density.v3.ratio=0.12
+    % claim: density.v4.outside_pp=0.35
+    % claim: robustness_range_joint.kl.0=1.09
+    % claim: robustness_range_joint.kl.1=1.51
+    % claim: density.v4.gap=0.67
+    % claim: density.v3.gap=0.69
+    % claim: robustness_range.gap.0=0.0
+    % claim: robustness_range.gap.1=0.79
+    % claim: robustness_range_joint.gap.0=0.31
+    The share of scored pp events in thin bins is $0.67$ for catalog\_v4 and $0.69$ for catalog\_v3, but this measure
+    is not stable: $0.31$ to $0.79$ over the joint binnings and thresholds, $0.0$ to $0.79$ over all of them.
+  \item \emph{Where it is thin} (Fig.~\ref{fig:v4_density}, top). In $\sqrt{\hat s}$ catalog\_v4 is thin at the low end
+    and dense far above the pp events (its window runs to $6$\,TeV, log-uniform); in the forward angle it now follows pp
+    or exceeds it where catalog\_v3 fell to a hundredth.
+    % allow: 6 because it is the window's upper edge in TeV, a setting
+  \item \emph{Against the error, the KL.} Spearman rank correlation over the $578$ classes of the KL with the log of
+    % src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+    % claim: n_train_both_no_b=578
+    % claim: corr.direct.kl.rho=0.30
+    % claim: corr.direct.kl.ci95.0=0.23
+    % claim: corr.direct.kl.ci95.1=0.38
+    % claim: corr.shortfall.kl.rho=0.32
+    % claim: robustness_range_joint.rho_kl.0=0.27
+    % claim: robustness_range_joint.rho_kl.1=0.32
+    % claim: robustness_range.rho_kl.0=-0.01
+    % claim: corr.direct.kl_s.rho=-0.01
+    % claim: corr.direct.kl_u.rho=0.15
+    % claim: corr.direct.kl_y.rho=0.19
+    % claim: corr.direct.kl_pt.rho=0.26
+    % claim: n_control=617
+    % claim: corr.control.kl.rho=0.59
+    % allow: 95 because it is the confidence level in percent, a setting
+    catalog\_v4's MSE over the pp-trained arm's: $0.30$ ($95\%$ bootstrap interval $0.23$ to $0.38$); with the
+    optimizer's factor removed (catalog\_v4 over catalog\_v3 with Muon, less pp-trained over catalog\_v3 with AdamW)
+    $0.32$. Over the joint binnings $0.27$ to $0.32$; with $\sqrt{\hat s}$ alone $-0.01$, and per variable alone
+    $-0.01$ ($\sqrt{\hat s}$), $0.15$ (angle), $0.19$ (collinear), $0.26$ (smallest $p_T$). The control, catalog\_v3's
+    KL against what pp training gains over it on its $617$ training classes, reads $0.59$.
+  \item \emph{Against the error, the thin share and the ratio.} The thin share correlates $0.24$ with the same log
+    % src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+    % claim: corr.direct.gap.rho=0.24
+    % claim: robustness_range_joint.rho_gap.0=0.11
+    % claim: robustness_range_joint.rho_gap.1=0.25
+    % claim: robustness_range.rho_gap.0=-0.05
+    % claim: corr.direct.ratio.rho=0.26
+    % claim: terciles.0.direct=0.83
+    % claim: terciles.1.direct=1.58
+    % claim: terciles.2.direct=1.65
+    ratio ($0.11$ to $0.25$ over the joint binnings, down to $-0.05$ over all), the density ratio $0.26$. By tercile of
+    the thin share, catalog\_v4 over pp-trained is $0.83$, $1.58$ and $1.65$ (median per tercile, the thin share's own
+    binning dependence applies).
+  \item \emph{What a pp component would do} (Fig.~\ref{fig:v4_density}, bottom right). Mixing a fraction $f$ of the
+    % src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+    % claim: density.v4.kl=1.38
+    % claim: mixture.pp.0.1.kl=1.01
+    % claim: mixture.pp.0.3.kl=0.61
+    % claim: mixture.pp.0.5.kl=0.37
+    % claim: mixture.su_own.0.3.kl=0.77
+    % claim: mixture.s_own.0.3.kl=0.96
+    % claim: mixture.s_tmpl.0.3.kl=1.12
+    % claim: mixture_n.s_tmpl=561
+    % claim: template_min_others=5
+    % allow: 0.1 0.3 0.5 1 because they are mixing fractions f and the whole pool, settings
+    class's pp events into its catalog\_v4 pool takes the median KL from $1.38$ to $1.01$ at $f=0.1$, $0.61$ at $0.3$ and
+    $0.37$ at $0.5$. Reweighting catalog\_v4's own events instead, at $f=0.3$: $\sqrt{\hat s}$ and the angle drawn as pp
+    $0.77$, $\sqrt{\hat s}$ alone $0.96$, $\sqrt{\hat s}$ from a template of the other classes of the same beams and
+    multiplicity (what a class with no pp pool would get; leave one out, $561$ classes, groups with fewer than $5$
+    others left out) $1.12$. The thin share drops to zero for the pp component at $f$ of a third or more by construction (the
+    mixture is then at least a third of pp everywhere), so it is not used for the mixture. Every mixture keeps at least
+    $1-f$ of catalog\_v4's density in every bin.
+\end{itemize}
+% src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+% claim: corr.direct.kl.rho=0.30
+% claim: corr.control.kl.rho=0.59
+% allow: 0.3 because it is a mixing fraction f, a setting
+So catalog\_v4 is thin where the pp events sit (a fifth of pp's density at a scored event), thinner at low $\sqrt{\hat
+s}$, no longer in the forward angle. How far it is from pp's density follows its error gap to the pp-trained arm
+weakly: a rank correlation of about $0.30$ on the joint binnings, against $0.59$ for catalog\_v3, where pp training
+buys a factor of about seven. In $\sqrt{\hat s}$ alone it does not follow it at all. On these provisional labels,
+density explains part of the gap, not most of it. A
+pp component at $f=0.3$ halves the KL; reweighting catalog\_v4's own events in $\sqrt{\hat s}$ alone does much less. Whether
+the blend closes the error gap is the test proposed in the hand-off (sec.~\ref{sec:ladder-open}, \emph{The pp
+blend}), waiting on the user.
+
+\begin{figure}[t]
+  \centering
+  \widerow{\includegraphics{../analysis/catalog_v4/figs/density_check.pdf}}
+  % src: python3 analysis/catalog_v4/density_check.py @fcb9dae8
+  % allow: 13 because it is the beam energy in TeV, a setting
+  \caption{catalog\_v4's training density against the $13$\,TeV pp events, the $578$ classes without $b$ trained in both
+    % claim: n_train_both_no_b=578
+    catalogs. Top: the median over classes of each catalog's density over pp's, per bin of $\sqrt{\hat s}$ (left) and of
+    the most forward final's angle (right), with pp's mean distribution scaled to its maximum (dashed) and a third
+    (dotted). Bottom left: per class, the share of scored pp events in bins where catalog\_v4 is below a third of pp,
+    against catalog\_v4's MSE of $\log|\mathcal M|^2$ over the pp-trained arm's. Bottom right: that share, median over
+    classes, as a fraction $f$ of each component is mixed into catalog\_v4's pool.}
+  % allow: M|^2
+  \label{fig:v4_density}
 \end{figure}
 
 
@@ -10539,6 +10684,16 @@ of the three share a test set.
     catalog\_v4; then the held Daniel's-catalog studies adapted to the chosen catalog, and catalog\_v3's deletion only
     if the switch is confirmed. Disk on CC at $90\%$: the user is asked what to free.
     % allow: 21 00 90 because they are a clock time and the disk share, not results
+  \item \textbf{The pp blend (proposed 2026-10-26, waiting on the user).} From par.~\ref{par:v4_density}: catalog\_v4 is
+    thin where the $13$\,TeV pp events sit, and mixing a class's pp events into its pool lowers the distance to pp's
+    density most. Proposed: each hadronic tree training pool of catalog\_v4 ($797$ classes) becomes $70\%$ its current
+    events and $30\%$ MadEvent $13$\,TeV pp events of catalog\_v4's own processes (about $140$ to $350$ core-hours,
+    nothing regenerated), then a test of about $6$ GPU-hours: the blend against catalog\_v4 as it is and against the
+    pp-trained arm, all with Muon, two seeds; optionally a half and half blend (about $3$ GPU-hours more); and whether
+    held-out hadronic pools take the mix in production. Waits on the user's call, and now also on the pp pools being
+    regenerated with catalog\_v4's physics (massless $b$, every electroweak diagram, top at $172.5$\,GeV), since the
+    present ones carry catalog\_v3's.
+    % allow: 13 797 70 30 140 350 6 3 172.5 because they are the beam energy, the class count, the proposed blend shares, the cost estimates of a run not made and the top mass, settings of a proposal
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).
