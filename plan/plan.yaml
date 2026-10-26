@@ -1083,10 +1083,11 @@ entries:
     - FA-ccin2p3-84bc4800
     - FA-ccin2p3-a22a1770
     - FA-ccin2p3-b67b49d6
+    - FA-ccin2p3-c09de7d2
     - FA-ccin2p3-ce878798
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-ec84e913
-    commit: 97bc9419
+    commit: b341db18
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
