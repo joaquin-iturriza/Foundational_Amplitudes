@@ -1300,18 +1300,15 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'SMOKE CLEAN (FA-ccin2p3-27a6f23b: Muon on 32 matrices, 40-step val_loss_no_reg 0.151 then 0.095, H1/H5 reads written,
-    both smoke fine-tunes ran: AdamW 1.566, Muon 1.490 at 20 steps on v3_gg_attx d2; note pre-clip grad norm median 9.65,
-    clip bound on 65% of steps, watch this in the full Muon run). SUBMITTED in parallel at 66076d21, --mem=48G, ~5.1 GPU-h:
-    dimensionless_muon FA-ccin2p3-ee733aa9, dimensionless_seed2 FA-ccin2p3-87426222, dimensionless_muon_seed2 FA-ccin2p3-2bc30261
-    (CC had 40 GB free; a short run dir is ~115 MB). NEXT when they end: read each log (V3_SHORT_DONE, finite losses, Muon
-    line), add the three arms to analysis/catalog_v3/short_reads.py, then write the fine-tune job wrapper (like scripts/job_lowd_ft.sh)
-    and run tools/catalog_ft.py from runs/catalog_v3_short/dimensionless and dimensionless_muon, each with --optimizer AdamW
-    and MuonAdamW (64 runs, ~2.8 GPU-h). Stage 2 (~34 GPU-h) only if stage 1 is inconclusive.; ALSO: 16 from-scratch runs
-    on the same 4 probes x 4 D (~0.7 GPU-h), so the fine-tunes also answer whether fine-tuning a current pretraining beats
-    scratch at small D (moved from ft_harm, 2026-10-26); ALSO add a hand-off item for the Muon test in docs/results.tex''s
-    open items (its question, design, the 16 scratch runs approved by the user 2026-10-26 ''I agree with that reframing of
-    the question for the finetuning at small D, go ahead with it''), since par:ft_harm already points to it'
+  next: 'PRETRAINING AND ZERO-SHOT WRITTEN (par:v3_muon @a9da7fb9): Muon 7.9x / 7.1x lower best val_loss_no_reg than AdamW
+    (seeds 42/43), zero-shot AdamW/Muon median 4.47 over 617 probes (Muon lower at both seeds on 88%), gain shrinks at 2->5
+    (1.77) and ties at 1-10 TeV (1.18). FINE-TUNES SUBMITTED @880da85c, 5 jobs ~0.7 GPU-h each (~3.5 total): from AdamW parent
+    dimensionless with AdamW FA-ccin2p3-6e5d2ed2 and MuonAdamW FA-ccin2p3-ce1dba1c; from Muon parent dimensionless_muon with
+    AdamW FA-ccin2p3-54fd017f and MuonAdamW FA-ccin2p3-be7d9ff7; scratch (dimensionless config, AdamW) FA-ccin2p3-00d080ba.
+    NEXT when they end: read each log (CATFT lines, CATFT_DONE, no error cells), collect the CATFT lines into a committed
+    JSON, add the fine-tune read to muon_compare.py (per probe and D: the 2x2 of parent and fine-tune optimizer, and each
+    against scratch), figure, write it into par:v3_muon with provenance, then plan done. Stage 2 (~34 GPU-h) only if inconclusive
+    (D146).'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
