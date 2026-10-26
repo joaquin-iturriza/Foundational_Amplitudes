@@ -117,8 +117,10 @@ entries:
     - FA-ccin2p3-0bddbf48
     - FA-ccin2p3-161fc56b
     - FA-ccin2p3-2f7d86e7
+    - FA-ccin2p3-37a95d76
     - FA-ccin2p3-6d35589c
     - FA-ccin2p3-7145824e
+    - FA-ccin2p3-878d6b9a
     - FA-ccin2p3-89daa7d6
     - FA-ccin2p3-8acabdd2
     - FA-ccin2p3-a7009d00
@@ -126,17 +128,20 @@ entries:
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-ecc413f9
     - FA-ccin2p3-f72f1379
-    commit: 5de6392b
+    commit: 075724f5
     paths:
+    - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
     - analysis/catalog_v3/data/prep_sampling.json
     - analysis/catalog_v3/data/prep_shat_slope.json
     - analysis/catalog_v3/data/prep_signed.json
+    - analysis/catalog_v3/figs/pair_head_blowup.png
     - analysis/catalog_v3/figs/prep_blend.png
     - analysis/catalog_v3/figs/prep_hybrid.png
     - analysis/catalog_v3/figs/prep_sampling.png
     - analysis/catalog_v3/figs/prep_signed.png
     - analysis/catalog_v3/figs/prep_signed_arms.png
+    - analysis/catalog_v3/pair_head_blowup.py
     - analysis/catalog_v3/pool_audit_signext.json
     - analysis/catalog_v3/prep_sampling.py
     - analysis/catalog_v3/prep_shat_slope.py
