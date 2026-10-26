@@ -2222,7 +2222,9 @@ seed)).
     zero-shot read's events (Fig.~\ref{fig:v3_muon_ft}; \code{data/muon\_ft.json}, runs FA-ccin2p3-6e5d2ed2,
     FA-ccin2p3-ce1dba1c, FA-ccin2p3-54fd017f, FA-ccin2p3-be7d9ff7, FA-ccin2p3-00d080ba). The only seed reference is the
     zero-shot one above: the pretraining seed moves a probe's error by a median $0.124$ to $0.148$ decades, a factor
-    of about $1.4$, so a single-cell ratio inside that is not resolved.
+    of about $1.4$, so a single-cell ratio inside that is not resolved. These fine-tunes ran before the fix of the weight average that
+    started on the random initialisation (par.~\ref{par:ema_start}); their numbers below are being replaced by reruns at
+    the fix.
 % src: python3 analysis/catalog_v3/muon_compare.py @d66e2769
 % claim: ft.parent.AdamW.median=1.47
 % claim: ft.parent.AdamW.den_lower=15
@@ -8112,12 +8114,23 @@ $D$), $0.00$ to $-0.87$ for L2-SP, $-0.06$ to $-0.19$ for the frozen half, and $
 falls further behind as $D$ grows; the per-cell choice takes the read-out in $3$, $5$, $2$ and $1$ of the $15$ cells
 per $D$ (its median gain over scratch $+0.77$ decades against the default's $+0.57$ at $D=10^{1.5}$, equal at the others). On $ee\to Z\gamma$ alone linear probe then fine-tune beats the
 default at every $D$, by $+0.11$, $+0.21$, $+0.21$ and $+0.38$ decades (medians over the three rungs), and the read-out by
-$+0.16$ and $+0.38$ at $D=10$ and $10^{1.5}$; yet the best of all methods stays below scratch there ($-0.07$, $-0.25$,
+$+0.16$ and $+0.38$ at $D=10$ and $10^{1.5}$. The first of those gains is a lower bound: on rung $1$ at $D=10$ linear
+probe then fine-tune's reported value, $0.130$, is its validation after $2$ updates, where the weight average still
+held $0.045$ of the random initialisation (par.~\ref{par:ema_start}), so it is biased upward, likely to near its
+read-out ($0.116$); a lower value there can only raise that cell's gain and the median with it, and even at its read-out
+the cell stays above scratch ($0.0619$). Yet the best of all methods stays below scratch there ($-0.07$, $-0.25$,
 $-0.71$, $-0.01$ decades). So on the probe that does not gain the head-first start recovers part of the loss, never all of
 it, and the same start costs a little on the probes that gain. The head-first start can also be lost: on $ee\to Z\gamma$, rung
 $7$, $D=10^{1.5}$, the run starts from the read-out's head (the frozen read-out scores $8.1\times10^{-3}$) and its best
 validation checkpoint is $2.4\times10^{-2}$, $2.9\times$ above that start and $3.4\times$ above the default
 ($7.0\times10^{-3}$), so at the default's HPs that fine-tune undoes the head it was given.
+% src: python3 analysis/transfer/ema_start_audit.py @7f719341
+% claim: lowd_za_r1_d10.lpft=0.130
+% claim: lowd_za_r1_d10.update=2
+% claim: W2=0.045
+% claim: lowd_za_r1_d10.readout=0.116
+% claim: lowd_za_r1_d10.scratch=0.0619
+% allow: 1 10 because they are a rung index and a design D, settings
 
 \begin{figure}[t]
 \centering
@@ -8219,6 +8232,31 @@ over the method's (\code{analysis/transfer/lowd\_dyhpo.py}).}
 \label{fig:lowd_dyhpo}
 \end{figure}
 
+\paragraph{The fine-tunes' weight average started on the random initialisation (2026-10-26).}\label{par:ema_start}
+Until commit \code{ddfc0314} a fine-tune with EMA on built its weight average on the network's fresh random
+initialisation and loaded the parent's weights only afterwards, and the average was never reset, so it kept a share of
+the random weights. With the average's warm-up decay $\min(\beta,(1+n)/(10+n))$ at update $n$, that share after $N$
+updates is $W(N)=10!\,(N+1)!/(N+10)!$, the same for every $\beta$ the fine-tunes used: $0.18$ after one update,
+$0.045$ after two, $0.014$ after three. Every validation of such a run scores the average, so its checkpoint choice and
+its reported value carry the share. It touched every fine-tune with EMA on run before the fix: the transfer study's,
+both small-$D$ rounds' and the Muon test's (par.~\ref{par:v3_muon}); scratch runs and runs with EMA off are not
+affected. A fine-tune validates every $1\%$ of its updates and at least every update, so only the $D=10$ fine-tunes
+($176$ updates, a validation after each) can report a validation within the first few updates; from $D=10^{1.5}$ on
+the first validation comes at update $7$ or later, where the share is negligible. In the transfer study none of the
+$327$ fine-tune searches at $D=10$ reports its value at updates $1$ to $3$, so none of its conclusions changes. It does
+reach linear probe then fine-tune's first validation in par.~\ref{par:ft_harm}, and one cell of the first small-$D$
+round (par.~\ref{par:lowd_ft}), both corrected there. $D=10$ fine-tunes run before and after the fix are not
+comparable without this correction (\code{analysis/transfer/ema\_start\_audit.py},
+\code{data/ema\_start\_audit.json}).
+% src: python3 analysis/transfer/ema_start_audit.py @7f719341
+% claim: W1=0.18
+% claim: W2=0.045
+% claim: W3=0.014
+% claim: transfer_d10.searches=327
+% allow: 10 1 because they are the constants of the average's warm-up decay and the design's smallest D, settings
+% allow: 10^{1.5} 176 7 because they are a design D, the D=10 cell's update count and the first validation update at D=10^{1.5}, settings
+% allow: 3 because it bounds the updates read, a setting
+
 \paragraph{Why a fine-tune loses to scratch at small $D$ (2026-10-26).}\label{par:ft_harm} Whether the fine-tunes that
 end above scratch, in the grid (par.~\ref{par:nogain}) and in the two rounds above, start from a pretrained network that
 already holds less than scratch reaches, or start better and lose it. A reported value is its curve's minimum, so a
@@ -8240,7 +8278,10 @@ and fine-tuning gains much on it, $-1.00$ and $-0.60$ decades below the read-out
 Z\gamma$ ($92$ losing rows: $48$ (i), $2$ (ii), $42$ (iii)) the start is nearer, $+0.80$ decades, but fine-tuning gains
 nothing on it: the median fine-tune ends at the read-out ($-0.03$ decades), and in about half of its losing rows above
 it. What the first steps do to a fitted head shows in linear probe then fine-tune, which starts at the read-out: its
-first validation is above it in $96$ of $120$ runs (median $1.25\times$), and its best is below it in all but $10$.
+first validation is above it in $78$ of the $102$ runs the random initialisation's share does not reach (median
+$1.09\times$). The other $18$, its $D=10$ runs with EMA on, are contaminated by that share at their first validation
+(par.~\ref{par:ema_start}) and are not counted: all $18$ sit above the read-out there, by a median $4.9\times$, and
+Fig.~\ref{fig:ft_harm}b still shows them. Its best is below the read-out in all but $10$ of the $120$.
 The losing curves reach their minimum later in the run than the winning ones (median at $0.55$ of the run against
 $0.33$), a fine-tune still improving slowly, not one overfitting after an early best. So fine-tuning seldom destroys
 a start that beats scratch ($4$ rows); the losses are a start the pretraining did not prepare for these probes at these
@@ -8281,12 +8322,17 @@ on the same four probes at the same four $D$ so each fine-tune has its scratch, 
 % claim: za.cls.iii-worse=42
 % claim: za.readout_over_scratch=0.80
 % claim: za.ft_over_readout=-0.03
-% claim: lpft.first_above=96
 % claim: lpft.runs=120
-% claim: lpft.first_over_readout=1.25
 % claim: lpft.best_above=10
 % claim: best_frac_losing=0.55
 % claim: best_frac_winning=0.33
+% src: python3 analysis/transfer/ema_start_audit.py @7f719341
+% claim: lpft.clean.first_above_readout=78
+% claim: lpft.clean.runs=102
+% claim: lpft.clean.median_first_over_readout=1.09
+% claim: lpft.exposed.runs=18
+% claim: lpft.exposed.first_above_readout=18
+% claim: lpft.exposed.median_first_over_readout=4.9
 % allow: 0 10 10^{2.5} 60 because they are step zero, the design's smallest and largest D and its cell count, settings
 
 \begin{figure}[t]
