@@ -626,8 +626,9 @@ entries:
     - signed_ab
   decisions:
   - D99
-  next: 'one GPU job on CC, tools/factorised_2to4_net.py: DlessInOrdQc''s prediction of each 2->4 probe''s parent on its 2000
-    mapped events, 40 probes; under 1 GPU-h'
+  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
+    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
+    that decides'
   done_when: null
   match: zz_factorised_2to4_net*
   notes_ref: null
