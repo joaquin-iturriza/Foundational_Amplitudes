@@ -1326,7 +1326,10 @@ entries:
   - D161
   - D162
   - D166
-  next: null
+  next: 'Waiting on the user (two open questions): the catalog_v3 pools'' deletion (the manifest''s ''pools'' group; the deletion
+    agent was refused by Claude Code''s auto-mode permission check, so it needs the user''s explicit go; on a go: re-list
+    with v3_disk_listing.py, refuse changed files, delete only the manifest''s pools, log every path) and the pp pools'' regeneration
+    with catalog_v4''s physics. Nothing to launch until one is answered.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
