@@ -189,6 +189,10 @@ entries:
       best checkpoint the median held-out wrong-sign share is 11.3% vs the baseline''s 5.4% and the zero-shot MSE 1.77x the
       baseline''s per probe: this untuned setting does not help'
     at: '2026-10-26T07:12:49+00:00'
+  - tried: pair sign head with tanh-bounded pair channels, FA-ccin2p3-1c11d753 (baseline HPs, AdamW, one seed)
+    why: 'blew up earlier (steps 680 to 765, at the learning-rate peak); read at step 595 its held-out wrong-sign median is
+      24.4% and its zero-shot MSE 2.28x the baseline''s: bounding the pair inputs is not the fix'
+    at: '2026-10-26T13:37:31+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
