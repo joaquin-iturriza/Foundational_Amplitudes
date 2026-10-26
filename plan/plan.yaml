@@ -1643,16 +1643,22 @@ entries:
       pp events to catalog_v4 or its compute; the user asked for the design'
     blocks: the pp blend's generation and test; the switch's other steps (adapting the held studies, the catalog_v3 deletion
       manifest) continue
-  ask: 'Build the pp blend for catalog_v4: each hadronic tree training pool (797 classes) becomes 70% its current events plus
-    30% MadEvent 13 TeV pp events from catalog_v4''s own processes (about 140 to 350 core-hours, nothing regenerated), then
-    a 6 GPU-h test (blend vs catalog_v4 as is vs pp-only, all Muon, 2 seeds)? Also f=0.5 (+3 GPU-h)? And should held-out hadronic
-    pools take the mix for production?'
-  waiting_since: '2026-10-26T20:34:43+00:00'
-  searched: 'D130 (catalog_v4 coverage), D117/D119 (pp study), D163/D166 (switch, deletion): none covers adding generated
-    pp events to catalog_v4 or its compute; the user asked for the design'
-  blocks: the pp blend's generation and test; the switch's other steps (adapting the held studies, the catalog_v3 deletion
-    manifest) continue
-  checked_until: '2026-10-26T21:24:11+00:00'
+  - ask: 'Go ahead with the pp blend test without new generation: the existing 13 TeV pp pools'' training events relabelled
+      with catalog_v4''s matrix elements (~5 core-h, b classes left as they are), mixed in at about 10% (catalog_v4''s pools
+      whole) and 30% (catalog_v4 subsampled), against catalog_v4 as is and pp-only, all Muon, two seeds, ~9 GPU-h; more pp
+      events generated only if the test shows the share matters?'
+    at: '2026-10-26T21:24:11+00:00'
+    searched: 'D130, D117/D119, D163/D166: none covers adding pp events to catalog_v4; the user asked why any regeneration
+      is needed'
+    blocks: the pp blend's relabelling and test; the switch's other steps continue
+  ask: 'Go ahead with the pp blend test without new generation: the existing 13 TeV pp pools'' training events relabelled
+    with catalog_v4''s matrix elements (~5 core-h, b classes left as they are), mixed in at about 10% (catalog_v4''s pools
+    whole) and 30% (catalog_v4 subsampled), against catalog_v4 as is and pp-only, all Muon, two seeds, ~9 GPU-h; more pp events
+    generated only if the test shows the share matters?'
+  waiting_since: '2026-10-26T21:24:11+00:00'
+  searched: 'D130, D117/D119, D163/D166: none covers adding pp events to catalog_v4; the user asked why any regeneration is
+    needed'
+  blocks: the pp blend's relabelling and test; the switch's other steps continue
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
