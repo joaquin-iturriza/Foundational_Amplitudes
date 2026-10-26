@@ -1233,7 +1233,9 @@ entries:
     8 trials (HPO rule 5) about 10 GPU-h; the baseline''s HPs come from Daniel''s-catalog sweep at 32k steps, not from this
     catalog and horizon, so a fair best-against-best needs the same 8-trial DyHPO on AdamW, another ~10; fine-tune DyHPO 5
     trials per cell on the 64 cells about 14; stage 2 up to ~34 GPU-h.'
-  done_when: null
+  done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
+    analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
+    docs/results.tex'
   notes_ref: null
   match: '*muon*'
   evidence:
