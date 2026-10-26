@@ -618,7 +618,17 @@ its windows (the user's scope, 2026-10-25). It was read on the same pp pools and
 all $1396$ classes with a prediction and $0$ without (the last training classes in a rerun,
 \code{FA-ccin2p3-982b5a14}, after the first read stopped on a full disk). Against the dimensionless arm, the one it
 differs from only in how the hadronic classes are sampled, the medians per group and the median per-class ratio of the
-pp-trained arm's MSE to the window-trained one's (Fig.~\ref{fig:v3_pp_trained}):
+pp-trained arm's MSE to the window-trained one's (Fig.~\ref{fig:v3_pp_trained}).
+% src: python3 analysis/catalog_v3/train_levels.py @187ae4f7
+% claim: dimensionless.median=0.37
+% claim: dimensionless_pp.median=0.37
+% claim: dimensionless.rms=0.6
+% claim: dimensionless.factor=1.8
+% allow: M|^2
+The MSE is of $\log|\mathcal M|^2$ in natural-log units, not the standardized units of the validation losses quoted
+elsewhere in these notes; for scale, each arm's own median per-process validation MSE on its training pools, at its
+best checkpoint and in the same units, is $0.37$ for the window-trained arm and $0.37$ for the pp-trained one, an rms
+error of about $0.6$ in $\ln|\mathcal M|^2$, a factor of about $1.8$ on $|\mathcal M|^2$ per event:
 \begin{itemize}
   \item \emph{Training classes:} on pp $0.43$ against $2.86$, ratio $0.19$, lower in $963$ of $986$; on the pp events
     % src: python3 analysis/catalog_v3/pp_compare.py @d1dec67
@@ -1239,7 +1249,19 @@ $\log|\mathcal M|^2$ (\code{analysis/catalog\_v4/compare\_v3.py}, Figs.~\ref{fig
 and~\ref{fig:v4_vs_v3_pp}). Per group: each run's median over probes; the catalog ratio, the median over probes of
 catalog\_v4's MSE over catalog\_v3's (each the geometric mean of its two seeds); the share of probes lower in both
 seeds; and the gap, the median $|\log_{10}|$ of that ratio, against each catalog's seed spread, the median
-$|\log_{10}|$ of seed $43$ over seed $42$ (the convention of par.~\ref{par:v3_muon}). Both catalog\_v3 runs were
+$|\log_{10}|$ of seed $43$ over seed $42$ (the convention of par.~\ref{par:v3_muon}).
+% src: python3 analysis/catalog_v3/train_levels.py @187ae4f7
+% claim: dimensionless_muon_best.median=0.074
+% claim: dimensionless_muon_best_seed2.median=0.070
+% claim: v4_dimensionless_muon.median=0.11
+% claim: v4_dimensionless_muon_seed2.median=0.13
+% claim: dimensionless.median=0.37
+% claim: dimensionless.rms=0.6
+% claim: dimensionless.factor=1.8
+The MSE is in natural-log units of $|\mathcal M|^2$, not the standardized units of the validation losses quoted
+elsewhere in these notes. For scale, each run's own median per-process validation MSE on its training pools, at its
+best checkpoint and in the same units: catalog\_v3's runs $0.074$ and $0.070$, catalog\_v4's $0.11$ and $0.13$; and an
+MSE near $0.37$ (the AdamW arms' level) is an rms error of about $0.6$, a factor of about $1.8$ on $|\mathcal M|^2$ per event. Both catalog\_v3 runs were
 trained after the mixed-order fix: until then the catalog table gave catalog\_v3's two BSM pools with a gluon the
 wrong coupling powers, $Z'$ plus a gluon from $u\bar u$ ($[0,0,0,2]$, its diagrams $[0,0,1,0]$) and $u\bar u\to
 h_2h_3g$ ($[0,0,0,3]$, its diagrams $[0,0,1,2]$), in the order features and the target, so every earlier catalog\_v3
@@ -1419,7 +1441,20 @@ catalog\_v3's fiducial cuts in the partonic frame and the class's $\sqrt{\hat s}
 not clean: catalog\_v4's two runs use Muon (seeds $42$, $43$), the pp-trained arm and its catalog\_v3 reference AdamW,
 one seed each, and those two were trained before the mixed-order fix (two catalog\_v3 BSM pools with wrong coupling
 powers). The groups are compare\_v3's, $b$ classes apart (the pp pools carry a $4.7$\,GeV $b$ that catalog\_v4 never
-saw). Medians over classes of the MSE of $\log|\mathcal M|^2$ (catalog\_v4: the geometric mean of its two seeds):
+saw). Medians over classes of the MSE of $\log|\mathcal M|^2$ (catalog\_v4: the geometric mean of its two seeds), in
+natural-log units, not the standardized units of the validation losses quoted elsewhere in these notes.
+% src: python3 analysis/catalog_v3/train_levels.py @187ae4f7
+% claim: dimensionless_pp.median=0.37
+% claim: dimensionless.median=0.37
+% claim: dimensionless_muon_best.median=0.074
+% claim: dimensionless_muon_best_seed2.median=0.070
+% claim: v4_dimensionless_muon.median=0.11
+% claim: v4_dimensionless_muon_seed2.median=0.13
+% claim: dimensionless.rms=0.6
+% claim: dimensionless.factor=1.8
+For scale, each run's own median per-process validation MSE on its training pools, at its best checkpoint and in the
+same units: the pp-trained arm $0.37$, catalog\_v3 with AdamW $0.37$, with Muon $0.074$ and $0.070$, catalog\_v4 $0.11$
+and $0.13$; an MSE near $0.37$ is an rms error of about $0.6$, a factor of about $1.8$ on $|\mathcal M|^2$ per event:
 \begin{itemize}
   \item \emph{Directly.} On the $578$ classes trained in both catalogs: pp-trained $0.47$, catalog\_v4 $0.86$, catalog\_v3
     % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
