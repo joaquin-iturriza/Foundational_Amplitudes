@@ -43,20 +43,22 @@ RESOURCE = "SubProcesses/P0_*/MadLoop5_resources/MadLoopParams.dat"
 def copy_backend(src, dst):
     """Copy a built standalone so that MadLoop finds its resources in the copy. MadGraph's tree is full of relative
     links (P0_*/MadLoop5_resources -> ../MadLoop5_resources -> ../MadLoopParams.dat -> ../Cards/...): they are kept as
-    links, so they resolve inside the copy (and the width patch of the check touches the copy's card only). A link
-    leaving the tree is replaced by a copy of its target, a dangling one dropped. (copytree(symlinks=False,
+    links, so they resolve inside the copy (and the width patch of the check touches the copy's card only). A link that
+    resolves into the production tree is replaced by a copy of its target; links to the MadGraph installation (lib/:
+    collier, ninja, cts, ~230 MB per backend if copied) stay links, only read; a dangling one is dropped. (copytree(symlinks=False,
     ignore_dangling_symlinks=True) tested each relative link against the CWD, not its own directory, and dropped
     MadLoopParams.dat, ident_card.dat and param_card.dat from MadLoop5_resources: every copied backend failed with
     "could not automatically find the file MadLoopParams.dat", FA-ccin2p3-e425f8aa.)"""
     shutil.copytree(src, dst, symlinks=True)
-    top = os.path.realpath(dst)
+    top, prod = os.path.realpath(dst), os.path.realpath(src)
+    inside = lambda t, d: t == d or t.startswith(d + os.sep)
     for root, dirs, files in os.walk(dst):
         for n in dirs + files:
             p = os.path.join(root, n)
             if not os.path.islink(p):
                 continue
             t = os.path.realpath(p)
-            if t == top or t.startswith(top + os.sep):
+            if inside(t, top) or (os.path.exists(t) and not inside(t, prod)):
                 continue
             os.unlink(p)
             if os.path.isdir(t):
