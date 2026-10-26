@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: running
+- status: waiting_user
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -244,6 +244,14 @@ entries:
     blocks: any further sign job; the rest of the exploration continues
     answered_at: '2026-10-26T19:32:11.762000+00:00'
     decision: D165
+  - ask: The sign study is closed. Close the whole preprocessing exploration on catalog_v3 now that pretraining moves to catalog_v4,
+      carrying its adopted choices (the dimensionless target, Muon at its search best, more sign-changing pools in training)
+      into the catalog_v4 runs; or keep exploring preprocessing, on catalog_v4?
+    at: '2026-10-26T21:37:13+00:00'
+    searched: 'D114 (''Keep iterating'', moved the exploration to catalog_v3), D166 (switch to catalog_v4), D165 (the sign
+      test): none says whether the exploration continues after the switch'
+    holds_all: the entry has no next step left on catalog_v3; what follows depends on whether the exploration continues on
+      catalog_v4
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -388,6 +396,13 @@ entries:
       to the user with the 6 to 8 seed cost. Reading of an overlap in the outcome rules: per the design, the paired per-pool
       count is the decision statistic, so a seed-mean median not lower while the count is lower on most pools is reported
       as inconclusive, not no; no = count not lower on most pools (or higher on most). Not a repeat; within D165.'
+  ask: The sign study is closed. Close the whole preprocessing exploration on catalog_v3 now that pretraining moves to catalog_v4,
+    carrying its adopted choices (the dimensionless target, Muon at its search best, more sign-changing pools in training)
+    into the catalog_v4 runs; or keep exploring preprocessing, on catalog_v4?
+  waiting_since: '2026-10-26T21:37:13+00:00'
+  searched: 'D114 (''Keep iterating'', moved the exploration to catalog_v3), D166 (switch to catalog_v4), D165 (the sign test):
+    none says whether the exploration continues after the switch'
+  holds_all: the entry has no next step left on catalog_v3; what follows depends on whether the exploration continues on catalog_v4
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
