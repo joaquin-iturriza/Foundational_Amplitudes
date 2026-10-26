@@ -1313,9 +1313,10 @@ entries:
   decisions:
   - D144
   - D146
-  next: Fine-tune jobs ce1dba1c, 6e5d2ed2, 00d080ba, 54fd017f all 16/16 cells with result files, no failures; be7d9ff7 (dimensionless_muon
-    MuonAdamW) dir also shows 16 result files, confirm its run end. Then the stage 2 search reads and CATFT read as in the
-    previous next step.
+  next: 'Fine-tunes written up (b27fd525). Read stage 2''s two 8-trial searches (muon_test_search_muon, muon_test_search_adamw)
+    when they end: best against best, at best checkpoints, into the Muon paragraph; then plan done. Open design point for
+    the user: the fine-tunes refit target stats on the probe (target_stats=own) and so start far above the zero-shot; a fine-tune
+    keeping the parent''s standardization was not run.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
