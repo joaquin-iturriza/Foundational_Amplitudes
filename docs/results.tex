@@ -2118,7 +2118,7 @@ each validation.}\label{fig:v3_pair_head_blowup}
     step (run FA-ccin2p3-5a8c8fde). The two runs are not the same run: the per-step record is the only code change,
     yet the first validation already differs, $0.247$ against $0.127$ (the runs' logs), so a run at a fixed seed is
     not reproducible on these GPUs, and a blow-up is a property of the run, not of the seed.
-% src: python3 analysis/catalog_v3/pair_head_blowup.py @f9223ba6
+% src: python3 analysis/catalog_v3/pair_head_blowup.py @45563eb2
 % claim: r_jumps=0
 % claim: r_final_val=0.00442
 % claim: r_win_grad_max=1.83
@@ -2135,7 +2135,7 @@ each validation.}\label{fig:v3_pair_head_blowup}
     ($0.0\%$, median norm $0.132$), against $33.3\%$ of the first $600$, the start of warmup, which ends at step $675$.
     It ends at a validation loss of $0.00442$, level with the baseline's first seed ($4.40\times10^{-3}$) and the arm's
     ($4.67\times10^{-3}$), below the baseline's second seed ($5.88\times10^{-3}$).
-% src: python3 analysis/catalog_v3/prep_signed.py @f9223ba6
+% src: python3 analysis/catalog_v3/prep_signed.py @45563eb2
 % claim: rerun_mse_ratio=0.74
 % claim: rerun_n_probes_worse=192
 % claim: rerun_n_probes=617
@@ -2183,7 +2183,7 @@ each validation.}\label{fig:v3_pair_head_blowup}
     its $16$ pair channels through $\tanh$ before their sums and products (\code{model.sign\_pair\_bound}), everything
     else as the first pair head, one seed (run FA-ccin2p3-1c11d753, with the per-step record; no second seed, the user's
     call of 2026-10-26).
-% src: python3 analysis/catalog_v3/pair_head_blowup.py @f9223ba6
+% src: python3 analysis/catalog_v3/pair_head_blowup.py @45563eb2
 % claim: b_jump_validation=9
 % claim: b_jump_step_before=680
 % claim: b_jump_step=765
@@ -2236,7 +2236,7 @@ each validation.}\label{fig:v3_pair_head_blowup}
     factor $3.5$ on the $62$ pools with a negative value in some role, $3.53$ on the other one-loop pools and $4.59$ on
     the trees, while the median sign accuracy on the sign-changing training pools fell from $0.965$ to $0.785$: both
     at once, the trees as much as the signed pools, so the failure is the whole network's, not the sign logit's alone.
-% src: python3 analysis/catalog_v3/prep_signed.py @f9223ba6
+% src: python3 analysis/catalog_v3/prep_signed.py @45563eb2
 % claim: bpair_wrong1=24.4
 % claim: base_wrong1=5.4
 % claim: pair_wrong1=11.3
