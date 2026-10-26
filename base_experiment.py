@@ -683,7 +683,7 @@ class BaseExperiment:
         if (
             self.cfg.training.get("fused_optimizer", True)
             and torch.cuda.is_available()
-            and self.cfg.training.optimizer in ("Adam", "AdamW")
+            and self.cfg.training.optimizer in ("Adam", "AdamW", "MuonAdamW")
         ):
             adam_extra["fused"] = True
 
@@ -722,6 +722,29 @@ class BaseExperiment:
                     weight_decay=self.cfg.training.weight_decay,
                     **adam_extra,
                 )
+
+        elif self.cfg.training.optimizer == "MuonAdamW":
+            # Muon (decoupled weight decay, update RMS matched to AdamW's) on muP's hidden matrices, AdamW as above
+            # on everything else, one optimizer object (optim/muon.py)
+            from optim.muon import MuonAdamW
+            assert use_mup and self.cfg.training.mup_use_optim, "MuonAdamW acts on muP's matrix-like parameters"
+            tr = self.cfg.training
+            self.optimizer = MuonAdamW(
+                param_groups,
+                lr=tr.lr,
+                betas=tr.betas,
+                eps=tr.eps,
+                weight_decay=tr.weight_decay,
+                momentum=tr.get("muon_momentum", 0.95),
+                nesterov=bool(tr.get("muon_nesterov", True)),
+                ns_steps=int(tr.get("muon_ns_steps", 5)),
+                muon_weight_decay=tr.get("muon_weight_decay", 0.1),
+                rms=tr.get("muon_rms", 0.2),
+                fused=adam_extra.get("fused", False),
+            )
+            n_mu = sum(p.numel() for g in self.optimizer.param_groups if g["use_muon"] for p in g["params"])
+            n_mx = sum(len(g["params"]) for g in self.optimizer.param_groups if g["use_muon"])
+            LOGGER.info(f"MuonAdamW: Muon on {n_mx} matrices ({n_mu} weights), AdamW on the rest")
 
         elif self.cfg.training.optimizer == "RAdam":
             # no MuRAdam implemented yet

@@ -26,11 +26,16 @@
 #   dimensionless_shat     the same with s_hat alone as the target's reference scale (the shape proxy's candidate)
 #   dimensionless_hybrid   the s_hat target plus a per-process constant from the events' momenta (the hybrid reference scale)
 #   dimensionless_blend050, dimensionless_blend025   the hybrid target plus 0.5 / 0.25 of the emission-scale term minus its process mean
+#   dimensionless_muon     the dimensionless arm trained with Muon (decoupled weight decay 0.1, update RMS matched to AdamW's)
+#                          on muP's 32 hidden matrices and AdamW as before on the rest (optim/muon.py; the Muon test, D144/D146)
+#   dimensionless_seed2, dimensionless_muon_seed2   the same two with a second seed (model init and batch order, seed 43;
+#                          the pools and their order unchanged)
+# Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py).
 #   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin or dimensionless_pp}"; MODE="${2:-}"
+ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -62,6 +67,11 @@ case "$ARM" in
     # the pp study: the same target trained with every hadronic tree class on 13 TeV MadEvent pp events in place of its
     # shaped window (recipes/catalog_v3_pp_mixed_train.yaml; the other pools as in catalog_v3_train.yaml)
     dimensionless_pp)      NORM=("${DIM[@]}"); TRAIN="$PROJECT_DIR/recipes/catalog_v3_pp_mixed_train.yaml" ;;
+    # the Muon test (D144, D146): the dimensionless arm with MuonAdamW at the same lr number (by muP's rule for Muon, its
+    # update matches AdamW's at the base width); the second seeds of it and of the AdamW arm
+    dimensionless_muon)    NORM=("${DIM[@]}" training.optimizer=MuonAdamW) ;;
+    dimensionless_seed2)   NORM=("${DIM[@]}" seed=43) ;;
+    dimensionless_muon_seed2) NORM=("${DIM[@]}" training.optimizer=MuonAdamW seed=43) ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"
@@ -134,4 +144,10 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
         [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     fi
 done
+if [ "$MODE" = smoke ]; then   # the fine-tune path from a catalog_v3 short parent, both fine-tune optimizers
+    for O in AdamW MuonAdamW; do
+        python tools/catalog_ft.py --parent "$OUT" --optimizer "$O" --out "$OUT/ft" --probes v3_gg_attx --only d2 \
+            --steps-cap 20 || exit 1
+    done
+fi
 echo "V3_SHORT_DONE $ARM"

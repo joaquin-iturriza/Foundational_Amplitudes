@@ -107,7 +107,13 @@ training:
  betas: [.9, .999]
  eps: 1.e-8
  weight_decay: 0
- 
+ # optimizer MuonAdamW (optim/muon.py): Muon on muP's hidden matrices, AdamW (the keys above) on the rest
+ muon_momentum: 0.95     # Nesterov momentum (Moonshot)
+ muon_nesterov: true
+ muon_ns_steps: 5        # Newton-Schulz steps, float32
+ muon_weight_decay: 0.1  # decoupled, Muon matrices only (Moonshot's value)
+ muon_rms: 0.2           # update RMS at muP's base width (AdamW's typical RMS)
+
  scheduler: CosineAnnealingLR
  scheduler_scale: 1
  cosanneal_warmup_steps: 0
