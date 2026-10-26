@@ -81,7 +81,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      <entry> --ask "<the question>" --searched "<what was read, and why none settles it>"`. My answer goes in with
      `plan answer <entry> --kind K --quote "<my words>"`, which records the decision and changes the entry in one step.
      Inside a running entry I approved, a new step (a design, an analysis, a job under 10 GPU-h) goes ahead without
-     coming to me; only the items a hold names stop at their design (`site decisions`, the "stop at the design" hold).
+     coming to me; only work a decision of mine sends back at its design stops there (`site decisions`: the "stop at
+     the design" hold, the larger synthetic catalogs' "consult with me on the design").
    - **Done** is `plan done <entry> --writeup <commit>`: it passes only when `done_when` passes and the write-up is
      committed. Every number added to `docs/results.tex` carries its provenance (`% src: python3 <script> @<commit>`,
      `% claim: key=value`); `tools/verify_claims.py` reruns the script and refuses a commit or merge whose numbers it
