@@ -1335,7 +1335,10 @@ entries:
   match: zz_ft_harm*,tp3_ftharm*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 68e736c7
+    paths:
+    - analysis/transfer/data/ft_harm.json
+    - analysis/transfer/data/lowd_ft_curves.json
+    - analysis/transfer/figs/ft_harm.png
   dead_ends: []
   asks: []
