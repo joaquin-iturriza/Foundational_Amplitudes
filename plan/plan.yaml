@@ -98,18 +98,23 @@ entries:
   - D83
   - D129
   - D135
-  next: 'Two seeds read (f86b5242): the more-signed pools'' sign gain is beyond the seed spread (near zero 39.4/41.3% baseline
-    vs 14.2/14.6% arm; axis 13.1/14.8% vs 7.7/8.0%; 14 of 17 pools better on the two-seed mean); the zero-shot cost is not
-    resolved (1.07 at seed 42 inside the baseline''s own seed spread 1.14; 1.32 at seed 43 confounded: the arm''s seed-43
-    run blew up at steps 1360 to 1445, the pair head''s interval, and is read at step 1360). Code in 0a616ed4: model.sign_pair_bound
-    (tanh on the pair channels) and per-step grad norm/loss/lr in <run_dir>/train_steps.npz at each validation; arm baseline_sign_pairs_bounded.
-    Next: site sync, smoke then full run of baseline_sign_pairs_bounded on CC (scripts/job_catalog_v3_short.sh, ~1.3 GPU-h,
-    --item v3_prep_explore); read its train_steps.npz (grad norms before any jump) and compare its sign and zero-shot reads
-    to the baseline''s two seeds. Because the plain sign head also blew up in the same interval, read whether the step 1360
-    to 1445 coincidence is the data order or the lr schedule (lr 8.9e-3, warmup 676 steps) before blaming the pair term. Then
-    the DyHPO search over sign_pair_dim, sign_pair_hidden, sign_near_weight/factor with lr and the template''s other HPs,
-    single fidelity at 4264 steps: priced at 16 trials x ~1.1 GPU-h = ~18 GPU-h plus ~1 GPU-h for the best trial''s zero-shot
-    read, under the 30 GPU-h budget; objective val_loss_no_reg (canonical), held-out signs read on the best only.'
+  next: 'Running on CC since 12:22: the smoke of the pair head with tanh-bounded pair channels (baseline_sign_pairs_bounded
+    smoke, FA-ccin2p3-fd393560), its full arm afterok on it (FA-ccin2p3-1c11d753, 4264 steps), and the more-signed-pools seed
+    43 rerun with the per-step record (baseline_more_signed_seed2_steplog, FA-ccin2p3-5a8c8fde, ~1.3 h each). Read before
+    submitting (af450a3b): nothing in the schedule or data order is shared at steps 1360 to 1445 by the two blown runs and
+    not the baselines: all four runs have the same lr schedule (lr 8.94e-3, linear warmup to step 675, cosine to 4264: 0.913
+    to 0.891 of peak in that interval); epoch boundaries fall at 852/1704 (1397 pools, 852 batches) and 910/1820 (1492 pools),
+    none in the interval; the batch order differs in all four (seed 42 vs 43, the pair head''s extra parameters shift the
+    RNG, and the pool counts differ); the interval is one 85-step validation interval, so the coincidence is at that resolution;
+    the non-blown runs had recoverable rises at 1700 to 1785 (baseline seed 43 2.65x its running minimum, more-signed seed
+    42 1.53x; its pre-clip grad norm reached 7e10). What the blown runs share is a heavier sign channel (pair term; 155 vs
+    60 signed pools), and at the jump the median sign accuracy on the signed training pools collapses (pair head 0.978 to
+    0.320, more-signed seed 43 0.980 to 0.870). When the runs end: check V3_SIDECARS and V3_SHORT_DONE; copy train.log and
+    zz_v3_short_<arm> home into analysis/catalog_v3/data/short_reads/; fetch both runs'' train_steps.npz; read the seed 43
+    rerun''s per-step grad norm, loss and lr from step ~1200 to the jump (does it reproduce at the same step? which grows
+    first, grad norm or loss?); read the bounded pair head against the unbounded one and the baseline (blow-up or not; held-out
+    wrong-sign share and zero-shot MSE vs baseline); add to pair_head_blowup.py / prep_signed.py and write up in par:v3_prep_signed
+    with provenance. Then the pair head''s DyHPO search, priced against the 30 GPU-h budget.'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
