@@ -1023,7 +1023,7 @@ entries:
     - FA-ccin2p3-b67b49d6
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-ec84e913
-    commit: 348a984
+    commit: 8bef50d
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
