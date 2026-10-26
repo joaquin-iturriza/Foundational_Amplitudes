@@ -36,14 +36,22 @@ def expected(axis):
 
 
 def read(arm, axis):
-    rows = {}
+    """only the axis recipe's probes: a read folder can hold other catalogs' probes (the held-out recipe folder the
+    short job once shared across catalogs; baseline_more_signed_muon has 62 catalog_v4 probes on H1, 28 on H5),
+    which are dropped by name and counted"""
+    rows, keep, foreign = {}, set(expected(axis)), 0
     for f in sorted(glob.glob(os.path.join(HERE, "data", "short_reads", arm, axis, "*.npz"))):
+        if os.path.basename(f)[:-4] not in keep:
+            foreign += 1
+            continue
         z = np.load(f)
         if "q" not in z.files:
             continue
         d = z["q"].astype(float) - z["t"].astype(float)
         rows[os.path.basename(f)[:-4]] = {"mse": float(np.mean(d ** 2)), "level": float(np.mean(d) ** 2),
                                           "shape": float(np.var(d))}
+    if foreign:
+        print(f"{arm} {axis}: {foreign} reads not of the axis recipe dropped")
     return rows
 
 

@@ -77,7 +77,7 @@ def arm_signs(arm, field="wrong_sign"):
     for l in open(f):
         if "SIGNED_AB " in l:
             d = json.loads(l.split("SIGNED_AB ", 1)[1])
-            if "skipped" not in d and "error" not in d:
+            if "skipped" not in d and "error" not in d and d["pool"].startswith("v3_"):   # catalog_v4 pools a shared folder let in
                 out[d["pool"]] = d[field]
     return out
 

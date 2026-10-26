@@ -22,7 +22,7 @@ ARM, REFS = "dimensionless_shat", ("dimensionless", "baseline")
 def signed(arm):
     f = os.path.join(HERE, "data", "short_reads", arm, "H5_signed.txt")
     rows = [json.loads(l.split("SIGNED_AB ", 1)[1]) for l in open(f) if "SIGNED_AB" in l]
-    s = [r for r in rows if "skipped" not in r]
+    s = [r for r in rows if "skipped" not in r and r["pool"].startswith("v3_")]   # catalog_v4 pools a shared folder let in
     return {"pools": len(s), "wrong_sign": float(np.median([r["wrong_sign"] for r in s]))}
 
 

@@ -192,10 +192,19 @@ if [ "$MODE" != eval ]; then
     fi
 fi
 ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
-R="$SCRATCH/zz_v3_heldout_recipes"
+# the held-out recipes this job reads: a folder of its own, made fresh (plain mkdir refuses an existing one). The folder
+# was once one per axis shared by every job of both catalogs and never emptied, so catalog_v3 runs read catalog_v4's
+# probes and the reverse (baseline_more_signed_muon: 62 on H1, 28 on H5); jobs rewriting it while another read it
+# could also lose a read
+R="$SCRATCH/zz_${CAT}_heldout_recipes_${ARM}_${SLURM_JOB_ID:-$$}"
+mkdir "$R" || { echo "V3_RECIPES $R exists: refusing to read from a folder this job did not make"; exit 1; }
 for A in "${AXES[@]}"; do
     AR=$(axis_recipe "$A")   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
-    mkdir -p "$R/$A" "$PRED/$A"
+    mkdir "$R/$A" || exit 1
+    # an earlier job's predictions for this arm and axis are moved aside (never deleted): the folder then holds this
+    # job's reads only, so a probe this job fails cannot be answered by a stale prediction
+    if [ -d "$PRED/$A" ] && [ -n "$(ls -A "$PRED/$A")" ]; then mv "$PRED/$A" "$PRED/$A.prev_${SLURM_JOB_ID:-$$}" || exit 1; fi
+    mkdir -p "$PRED/$A"
     python - "$R/$A" "$AR" <<'PY'
 import sys, yaml
 r = yaml.safe_load(open(sys.argv[2]))
@@ -219,6 +228,21 @@ neg = lambda f: au.get(os.path.basename(f)[:-5], {}).get('val', {}).get('negativ
 fs = sys.argv[2:]
 print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1]) if sys.argv[1] == 'H5' else fs[:2]))" "$A" "${P[@]}"))
     fi
+    # every recipe about to be read is one of this axis's recipe and of the run's catalog (its probes' name prefix: the
+    # arm's catalog on its own axes, v3_ / v4_ / pp13_ on the cross reads); outside smoke, all of the axis's probes
+    python - "$CAT" "$A" "$AR" "$MODE" "${P[@]}" <<'PY' || exit 1
+import os, sys, yaml
+cat, axis, ar, mode, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
+pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_"}.get(axis, f"{cat}_")
+names = {p["name"] for p in yaml.safe_load(open(ar))["processes"]}
+got = [os.path.basename(f)[:-len(".yaml")] for f in files]
+bad = sorted(n for n in got if n not in names or not n.startswith(pfx))
+if bad:
+    sys.exit(f"V3_RECIPE_CHECK FAIL {axis}: {len(bad)} recipes not in {os.path.basename(ar)} or not {pfx}*: {bad[:10]}")
+if mode != "smoke" and set(got) != names:
+    sys.exit(f"V3_RECIPE_CHECK FAIL {axis}: {len(names - set(got))} probes of {os.path.basename(ar)} without a recipe")
+print(f"V3_RECIPE_CHECK {axis}: {len(got)} recipes, all {pfx}* probes of {os.path.basename(ar)}")
+PY
     # every axis on log max(|M|^2, floor) for a sign-changing pool (the one-loop pools of H5, and the twin's tau
     # one-loop pools of H3p); a positive pool's target is log|M|^2 either way
     SM=(--signed-magnitude)
@@ -238,4 +262,5 @@ if [ "$MODE" = smoke ] && [ "$CAT" = v3 ]; then   # the fine-tune path from a ca
             --steps-cap 20 || exit 1
     done
 fi
+rm -rf "$R"   # this job's own recipe folder, made above
 echo "V3_SHORT_DONE $ARM"
