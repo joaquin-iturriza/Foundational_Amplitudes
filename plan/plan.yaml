@@ -1307,7 +1307,7 @@ entries:
     structure, by up to 20% at 4 to 6 TeV. Should I generate this one process at zero top width (exact here, since the top
     can never be on shell), or drop it from the catalog?
   waiting_since: '2026-10-26T05:01:38+00:00'
-  checked_until: '2026-10-26T11:54:51+00:00'
+  checked_until: '2026-10-26T12:25:15+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
