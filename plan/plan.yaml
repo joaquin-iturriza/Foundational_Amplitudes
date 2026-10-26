@@ -1132,20 +1132,15 @@ entries:
   - D154
   - D161
   - D162
-  next: 'Chain on CC (commit 7bc4e8ed): catalog_v4 sidecar build FA-ccin2p3-7f2fb49d (alpha_s and diagram sidecars for catalog_v4_train
-    and every v4 held-out axis; V3_PREP_DONE) -> smoke FA-ccin2p3-76ba6018 (v4_dimensionless_muon smoke: 40 steps, reads H1
-    H5 XV3 PP; V3_SHORT_DONE, no V3_AXIS_SKIPPED) -> afterok (dependency retargeted by scontrol to slurm 62461424): v4_dimensionless_muon
-    FA-ccin2p3-8c8937d5, v4_dimensionless_muon_seed2 FA-ccin2p3-8b1cb186 (catalog_v4_train 1153 pools, 4264 steps, MuonAdamW
-    lr 4.997423e-3 wd 0.02171863, dimensionless arm, seeds 42/43; v4 axes, XV3, PP), dimensionless_muon_best_seed2 FA-ccin2p3-767f32ce
-    (catalog_v3, same HPs, seed 43; v3 axes, XV4, PP), FA-ccin2p3-9ae87934 (trial_1860 = catalog_v3 seed 42, reused; eval
-    V3_AXES=''XV4 PP''). If the prep or smoke fails, the four sit on DependencyNeverSatisfied: fix, rerun, retarget their
-    dependency (site run --item catalog_coverage ccin2p3 FA -- scontrol update JobId=<id> Dependency=afterok:<new>). When
-    the four end: read logs, copy reads (SCRATCH zz_v4_short_<arm>/<axis>, zz_v3_short_<arm>/<axis>) into analysis/catalog_v4/data/short_reads/,
-    write analysis/catalog_v4/short_compare.py: (1) in-run validation loss per catalog (own measure, not comparable across);
-    (2) the 555 probes held out in both, each model on both catalogs'' pools, per axis: v3 over v4 MSE ratio (two seeds''
-    geometric mean), share each wins at both seeds, seed spread; (3) the 1396 pp pools by role in each catalog, external-b
-    classes apart (4.7 GeV b, never trained in v4), inside vs outside v3 coverage as pp_compare.py; (4) each catalog''s own
-    axes separately (H7E differs: 1-10 vs 6-20 TeV); figure, write-up with provenance, then the switch question to the user.'
+  next: 'Resubmit the catalog comparison at 6dee967a or later (the dimensionless target now reads each entry''s alpha_s power
+    from its diagram sidecar and divides a mixed-order entry by its highest power): the smoke of v4_dimensionless_muon first
+    (job_catalog_v3_short.sh, after the v4 sidecars, which exist: FA-ccin2p3-7f2fb49d), then afterok on it v4_dimensionless_muon
+    and v4_dimensionless_muon_seed2, dimensionless_muon_best_seed2 on catalog_v3, the catalog_v3 seed-42 read (trial_1860)
+    on catalog_v4''s shared held-out and pp pools; and a rerun of the catalog_v3 seed-42 arm at the current code, because
+    trial_1860 was trained with the old alpha_s power on zp_uux_Y1g and thdm_uux_h2h3g (the order vector misses their gluon),
+    so both catalog_v3 seeds carry the same target (about 3 GPU-h more, total about 14 GPU-h, under the budget). In the write-up:
+    par:dimless_orders says mixed-order entries are refused; replace with the highest-power rule and the audit''s numbers
+    (tools/mixed_order_audit.py, analysis/catalog_v4/data/mixed_order_audit.json).'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
