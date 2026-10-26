@@ -979,9 +979,11 @@ entries:
   - D134
   - D136
   - D137
-  next: regenerate catalog_v4's pools on CC (CPU, about 39 core-h, about 66 GB; 1826 tree entries with the energy hold-out
-    on 6 to 20 TeV, 38 of its 40 probes, the 34 b-Higgs classes dropped; CC has 89 GB free after the storage cleanup); then
-    classes and roles on v4; then the b mass in particle_ids.py
+  next: 'when the regeneration ends (8 CPU shards, scripts/job_catalog_v4_regen.sh, 16 cores each, runs FA-ccin2p3-10321cd6
+    2122d2e5 d1e40f19 3a1536c9 b5645ec8 cbccafbd cad2029f 151543c4 for shards 0..7; a failed shard is resubmitted with the
+    same V4REGEN_K, it resumes): check every pool (counts, cuts, sidecars; tools/check_pp_pools.py style), report CPU-h and
+    disk used (V4REGEN_FREE_KB_START/END, V4REGEN_WALL_S in the logs; 89 GB free before); then the v4 equality step and classes
+    and roles; then the b mass in particle_ids.py; then the short pretrainings (GPU estimate to the user)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
