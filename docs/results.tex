@@ -9631,11 +9631,12 @@ of the three share a test set.
     widths, the old pools quarantined, not deleted (\code{tools/width\_regen.py}); waiting on the user: whether the one-loop
     $b\bar b\to hW^+W^-$, whose top is only in the $t$-channel, is built at zero top width or dropped (the entry waits,
     so catalog\_v4's short pretrainings wait too); still to do: catalog\_v3's six loop-induced Higgs pools' $Z$/$W$ widths,
-    the 2HDM $u\bar u\to h_2h_3g$ build check, tree pools with a $t$-channel top at multi-TeV. \emph{Preprocessing exploration}:
-    the signed-data check, the sampling sensitivity, the $\hat s$-factor slopes and the three one-loop sign arms (pair
-    head, near-zero weighting, more sign-changing pools) are written up (par.~\ref{par:v3_prep_signed}).
-    \emph{Fine-tuning at small $D$}: closed (par.~\ref{par:ft_harm}); the question moved to the Muon fine-tunes, now
-    written up (par.~\ref{par:v3_muon}), and catalog\_v4 (the user: ``I agree with that reframing''). \emph{Storage}: the finished runs' model files deleted from a
+    the 2HDM $u\bar u\to h_2h_3g$ build check, tree pools with a $t$-channel top at multi-TeV. \emph{Preprocessing exploration} (open part):
+    the blow-up shared by the pair sign head's run and the more-signed-pools arm's second seed, in the same validation
+    interval, while the baselines' two seeds and the more-signed arm's first seed pass it (par.~\ref{par:v3_prep_signed});
+    running: the pair head with its pair channels bounded (tanh), and that second seed again with the per-step gradient
+    norm recorded; next, read the lead-up step by step, then the pair head's search over its sizes and near-zero
+    weighting, priced against the GPU budget. \emph{Storage}: the finished runs' model files deleted from a
     committed manifest (the user: ``we can delete the models of the runs already done''). GPU budget $30$\,GPU-h while
     Jean Zay is unused (the user, 2026-10-26).
     % allow: 07 40 1.4915 30 because they are a clock time, the user's chosen width and the user's budget, not results
@@ -9650,7 +9651,7 @@ of the three share a test set.
     preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog\_v3 since
     D114 moved it there (D83; item \code{v3\_prep\_explore}; done on catalog\_v3: the few-shot calibration, par.\ The
     context vector's $K$-shot fits on catalog\_v3, and the shape proxy per target, par.~\ref{par:v3_shape_proxy};
-    queue: the signed-data check, sampling sensitivity, then new ideas). Held (D78): \code{dancat\_ext},
+    queue: the shared blow-up of the sign arms, then new ideas). Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
     \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*}.
   \item \textbf{Standing since 2026-10-15.} The work lives in \code{site}'s registers (\code{site items -v},
