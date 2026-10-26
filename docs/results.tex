@@ -2236,7 +2236,7 @@ against an untuned AdamW, not against AdamW at its best, which the A/B protocol 
 each an 8-trial single-fidelity search at this horizon from this run's exact configuration (learning rate in
 $[3\times10^{-3}, 2.7\times10^{-2}]$ for both, Muon's decoupled weight decay in $[10^{-3}, 0.3]$, AdamW's L2 weight in
 $[10^{-10}, 10^{-6}]$; \code{sweep/sweep\_config\_ccin2p3\_muon\_test\_search\_\{muon,adamw\}.yaml}), read best
-against best in the hand-off.
+against best in the item below.
 % allow: 8.94 32000 because they are the transferred learning rate and the source search's horizon, settings
 % allow: 3 2.7 0.3 10 8 because they are the stage-2 search windows and trial count, settings
 % allow: 1 2 because they number the stages of the test
@@ -2295,6 +2295,78 @@ seed)).
     $7.53$. The two extrapolation axes gain least: $2\to5$ $1.77$ (Muon lower at both seeds on $68\%$, AdamW on $15\%$),
     and $1$ to $10$\,TeV $1.18$, a tie (Muon lower on $50\%$, AdamW on $30\%$; the median error is $2.88$ for AdamW's
     first seed and $3.42$ for Muon's second).
+  \item \emph{Stage 2: each optimizer at its own HPs.} The question: does Muon's lead survive once AdamW, whose
+    stage-1 curves spike, is tuned for this catalog and horizon? The design: two single-fidelity DyHPO searches at the
+    short pretraining's $4264$ steps on CC, $8$ trials each ($3$ random start-up, then the GP surrogate, run in three
+    waves through \code{sweep\_manager}), every trial the AdamW short arm's exact configuration with only the searched
+    HPs changed (seed 42, the same pools and validation events as stage 1): the learning rate in $[3\times10^{-3},
+    2.7\times10^{-2}]$ for both, Muon's decoupled weight decay in $[10^{-3}, 0.3]$, AdamW's L2 weight in
+    $[10^{-10}, 10^{-6}]$; the warmup fraction, the minimum learning rate and the EMA at stage 1's values. Both searches
+    draw from one candidate pool (seed 42), so the start-up trials share their learning rates. The objective DyHPO
+    observed is each trial's \code{val\_loss\_no\_reg} at its best checkpoint (the MSE loss, no regularization), the
+    number stage 1 reports. All $16$ trials ended, none failed (\code{data/muon\_search.json},
+    Fig.~\ref{fig:v3_muon_search}).
+% src: python3 analysis/catalog_v3/muon_compare.py @54478a51
+% claim: search.AdamW.best.val_loss_no_reg=0.0141
+% claim: search.AdamW.best.lr=0.00782
+% claim: search.AdamW.best.hp2=9.99e-07
+% claim: search.Muon.best.val_loss_no_reg=0.00286
+% claim: search.Muon.best.lr=0.005
+% claim: search.Muon.best.hp2=0.0217
+% claim: search.best_ratio=4.91
+% claim: search.adamw_best_vs_stage1=1.1
+% claim: search.muon_best_vs_stage1=1.45
+% claim: search.best_adamw_vs_stage1_muon=7.14
+% claim: search.AdamW.blown_up=3
+% claim: search.Muon.blown_up=3
+% claim: search.AdamW.trials.hp1333.lr=0.0148
+% claim: search.AdamW.trials.hp1333.blew_up_at=850
+% claim: search.AdamW.trials.hp353.blew_up_at=680
+% claim: search.AdamW.trials.hp1286.val=0.0933
+% claim: search.AdamW.trials.hp353.val=0.088
+% claim: search.Muon.trials.hp1286.blew_up_at=1020
+% claim: search.Muon.trials.hp1333.blew_up_at=595
+% claim: search.Muon.trials.hp1286.val=0.0246
+% claim: search.Muon.trials.hp353.val=0.0476
+% claim: search.Muon.trials.hp258.lr=0.0105
+% claim: search.AdamW.trials.hp1860.spike_at=1445
+% claim: search.AdamW.trials.hp1860.val=0.0196
+% claim: search.AdamW.trials.hp1860.hp2=1.44e-08
+% claim: search.AdamW.trials.hp1420.lr=0.00349
+% claim: search.AdamW.trials.hp1420.val=0.0176
+% claim: search.Muon.trials.hp364.lr=0.00391
+% claim: search.Muon.trials.hp768.val=0.00322
+% claim: search.Muon.trials.hp768.hp2=0.3
+% claim: pre.dimensionless=0.0155
+% claim: pre.dimensionless_muon=0.00197
+% claim: pre.dimensionless_muon_seed2=0.00245
+% allow: 4264 8 3 because they are the horizon, the trial count and the start-up trials, settings
+% allow: 3 2.7 0.3 10 because they are the search windows' edges, settings
+% allow: 16 because it is the two searches' trial count
+% allow: 42 because it is the seed, a setting
+% allow: 8.94 0.1 because they are stage 1's learning rate and weight decay, settings
+% allow: 1 2 because they number the stages of the test
+    \emph{Best against best}: AdamW $0.0141$ (learning rate $0.00782$, L2 weight $9.99\times10^{-7}$, at the window's
+    top), Muon $0.00286$ (learning rate $0.005$, weight decay $0.0217$): AdamW over Muon $4.91$. Tuning AdamW gained
+    $1.1\times$ over stage 1's $0.0155$ (seed 42). Muon's search did not reach stage 1's untuned point: its best is
+    $1.45$ times stage 1's $0.00197$ (learning rate $8.94\times10^{-3}$, weight decay $0.1$, not among the trials), and
+    stage 1's second seed ($0.00245$) is also below every Muon trial. The configurations differ only in the searched
+    HPs (checked on the run configs), and the code between the stage-1 runs and the searches changed nothing a fresh
+    pretraining runs (the EMA restart rebuilds the same shadow), so that point is either a narrow optimum the eight
+    trials missed or a favourable draw; not resolved. Against the best Muon run known, the stage-1 point, the best
+    AdamW is $7.14$ times higher. \emph{The landscape}: both optimizers are flat inside the stable range and fail at
+    the same learning rate. AdamW runs from $0.0176$ at learning rate $0.00349$ to $0.0141$ at $0.00782$, Muon stays
+    between $0.00286$ and $0.00322$ from $0.00391$ to $0.0105$ (the worst at weight decay $0.3$): neither second HP,
+    over two decades, moves its optimizer by as much as the gap between them. From $0.0148$ up every trial of both
+    blew up, whatever its second HP (no trial lies between $0.0105$ and $0.0148$): $3$ per optimizer, AdamW's at
+    steps $680$ to $850$ (best checkpoints $0.088$ to $0.0933$), Muon's at $595$ to $1020$ ($0.0246$ to $0.0476$),
+    each read at its best checkpoint before the blow-up (a validation over ten times its running minimum). One more
+    AdamW trial (learning rate $0.005$, L2 weight $1.44\times10^{-8}$) spiked at step $1445$ and recovered to
+    $0.0196$, best at its last validation like every stable trial. So after both searches Muon's pretraining lead is
+    about five times (search against search) to seven (against stage 1's Muon point), not an artefact of an untuned
+    AdamW. The searches made no zero-shot reads; both bests are being read zero-shot on every held-out axis as the
+    stage-1 runs were (\code{scripts/job\_catalog\_v3\_short.sh}, arms \code{muon\_search\_best\_\{adamw,muon\}}, mode
+    eval; runs FA-ccin2p3-41b4f15a, FA-ccin2p3-0caa5e2a).
   \item \emph{Fine-tunes at small $D$} (the user, 2026-10-26: ``I agree with that reframing of the question for the
     finetuning at small D, go ahead with it''), three questions: does the Muon pretraining transfer better, does
     fine-tuning a current pretraining beat scratch at small $D$ (the question par.~\ref{par:ft_harm} hands on), and
@@ -2461,8 +2533,8 @@ most of that into the held-out processes inside the catalog's range; beyond it (
 energy) the gain shrinks or vanishes. Fine-tuned at small $D$, the Muon pretraining stays ahead, every fine-tune
 beats scratch, keeping the parent's standardization beats refitting it, and Muon as the fine-tune optimizer does not
 help. All of this is against an untuned AdamW and with
-untuned fine-tunes, one seed each: whether the lead survives both optimizers' own searches is stage 2's question, and
-the full horizon is not tested.
+untuned fine-tunes, one seed each. Both optimizers' own searches (stage 2) keep the pretraining lead at about five
+to seven times; their bests' zero-shot reads are pending, and the full horizon is not tested.
 \begin{figure}[t]
 \centering
 \includegraphics{../analysis/catalog_v3/figs/muon_compare.pdf}
@@ -2475,6 +2547,17 @@ axis (1 new combinations, 2 $2\to4$ families, 3 $2\to5$, 4 the top, 5 one loop, 
 % allow: 42 43 because they are the seeds, settings
 % allow: 0.13 10 30 because they are the held-out coupling, the energy window in TeV and the pT threshold, settings
 \label{fig:v3_muon}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/muon_search.pdf}
+\caption{Stage 2 of the Muon test: each optimizer's 8-trial single-fidelity search on catalog\_v3's short pretraining
+(4264 steps, seed 42). (a) Every trial's best-checkpoint validation loss (no regularization) against its learning
+rate, open for the trials that blew up (read at their best checkpoint before it); stars, stage 1's two seeds at the
+transferred HPs. (b) The validation curves of each search's best trial and of stage 1's seed-42 run. (c) Muon's
+trials against their decoupled weight decay. (d) AdamW's against their L2 weight.}
+% allow: 8 4264 42 1 2 because they are the trial count, the horizon, the seed and the stage numbers, settings
+\label{fig:v3_muon_search}
 \end{figure}
 \begin{figure}[t]
 \centering
