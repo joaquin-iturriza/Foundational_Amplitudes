@@ -1956,7 +1956,50 @@ network part, $0$ arm and probe pairs without numbers. Medians over classes, tra
     $\log\hat s$, the level of $\log|\mathcal M|^2$ moves by $0.30$ and $0.25$ of the pool's std, of the $\hat s$ factor's
     target by $0.10$ and $0.074$, of the emission scales' by $0.11$ and $0.087$ (the soft minimum's the same), and the
     std hardly changes (ratio $0.97$ to $0.98$). On Daniel's catalog the factor raised it ($0.30$ to $0.39$, par.\
-    More data-free normalizations); why the two catalogs differ is not checked.
+    More data-free normalizations); the next item says why.
+  \item \emph{Why the factor helps on catalog\_v3 and hurt on Daniel's catalog: the cuts, not the factor.} The factor
+    adds $N-4$ to the within-process slope of $\log|\mathcal M|^2$ on $\log\hat s$, so it removes the level's
+    dependence on the energy draw only where that slope follows the mass dimension ($0$, $-1$, $-2$ at $2\to2$, $2\to3$,
+    $2\to4$). Per training class, the slope of $\log|\mathcal M|^2$ and of the least pair invariant over $\hat s$ on
+    $\log\hat s$ (\code{analysis/catalog\_v3/prep\_shat\_slope.py}: catalog\_v3's $200$ training classes on CC's login
+    node at \code{47d38a08}, Daniel's $1352$ from their stored moments):
+% src: python3 analysis/catalog_v3/prep_shat_slope.py @823c9747
+% claim: catalog_v3.n=200
+% claim: daniel.n=1352
+% claim: catalog_v3.byN.5.b=-1.14
+% claim: catalog_v3.byN.6.b=-2.15
+% claim: catalog_v3.byN.5.b_plus_factor=-0.14
+% claim: catalog_v3.byN.6.b_plus_factor=-0.15
+% claim: catalog_v3.byN.5.b_lmin=-0.03
+% claim: catalog_v3.byN.6.b_lmin=-0.014
+% claim: catalog_v3.byN.6.share=0.73
+% claim: catalog_v3.byN.5.abs_raw=0.28
+% claim: catalog_v3.byN.5.abs_dless=0.105
+% claim: daniel.byN.5.b=0.62
+% claim: daniel.byN.5.b_plus_factor=1.62
+% claim: daniel.byN.4.b=1.14
+% claim: daniel.byN.5.b_lmin=-0.65
+% claim: daniel.byN.4.b_lmin=-0.47
+% claim: daniel.byN.5.share=0.825
+% claim: daniel.byN.5.abs_raw=0.27
+% claim: daniel.byN.5.abs_dless=0.36
+% allow: ^2
+% allow: 0 because it is the mass dimension's slope at 2\to2
+% allow: -1 because it is the mass dimension's slope at 2\to3
+% allow: -2 because it is the mass dimension's slope at 2\to4
+% allow: 4 because it is the 4 of the factor's exponent N-4
+    on catalog\_v3 $\log|\mathcal M|^2$ falls with $\log\hat s$ as its mass dimension says, slope $-1.14$ at $2\to3$ and
+    $-2.15$ at $2\to4$ ($-0.14$ and $-0.15$ with the factor), and the least invariant over $\hat s$ does not move with
+    $\hat s$ (slope $-0.03$ and $-0.014$): its pools reach the singular regions at the same fraction of $\hat s$ at every
+    energy. On Daniel's catalog the least invariant over $\hat s$ falls with $\hat s$ (slope $-0.65$ at $2\to3$,
+    $-0.47$ at $2\to2$), the cut fixed in GeV letting a high-$\hat s$ event reach closer to its soft and collinear
+    limits, and that lifts $\log|\mathcal M|^2$ above its mass dimension (slope $+0.62$ at $2\to3$, $+1.14$ at
+    $2\to2$); the factor then adds to a slope that was already positive ($+1.62$). At $2\to3$, the multiplicity both
+    catalogs share, the shift goes from $0.28$ to $0.105$ on catalog\_v3 and from $0.27$ to $0.36$ on Daniel's. The mix
+    of multiplicities only sets the size: $2\to4$ is $0.73$ of catalog\_v3's training classes, $2\to3$ is $0.825$ of
+    Daniel's. So the $\hat s$ factor makes a target independent of the energy draw only on pools whose singular reach
+    scales with $\hat s$, as catalog\_v3's do; on pools cut in GeV only a per-event scale that sees the singular region (the
+    per-event scales of par.\ More data-free normalizations) lowered it.
   \item \emph{Toward the singular regions every target moves by about a fifth of its std.} The level moves by $0.135$
 % src: python3 analysis/catalog_v3/prep_sampling.py @26c4ecf0
 % allow: ^2
