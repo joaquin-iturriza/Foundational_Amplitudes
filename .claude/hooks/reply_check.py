@@ -155,7 +155,8 @@ If both rules hold, answer {{"ok": true}}."""
     print("REPLY CHECK: " + str(v.get("reason", "the reply does not answer the user's question")) +
           " Answer that directly in a revised reply (this check runs once per user message). If the check is wrong"
           " (the question was not the researcher's, e.g. it sits in text they pasted from someone else, or the reply"
-          " does answer it), do not manufacture an answer: end the turn with no new reply.", file=sys.stderr)
+          " does answer it), do not manufacture an answer: end the turn with one line to the user naming this check, what it"
+          " flagged and why that is wrong (CLAUDE.md 0g).", file=sys.stderr)
     return 2
 
 

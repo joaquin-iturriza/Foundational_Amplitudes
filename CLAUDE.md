@@ -59,7 +59,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    `no_blocking_question.sh`). A question for me goes in the message; only the part of the entry that needs the answer waits
    (`plan ask --blocks`; the whole entry only with `--holds-all` and its reason), everything else continues. An interrupt or a rejected tool call that comes with a question
    is answered and the work continues; only my words "stop" or "wait" stop it. Every word written in a turn is to me:
-   a hook whose check is wrong gets no reply (end the turn silently), never a line addressed to the hook.
+   a hook whose check is wrong gets one line to me naming the check, what it flagged and why it is wrong (a silent
+   end is refused by Claude Code, and the hook's text is hidden from me), never a reply addressed to the hook.
 
 0h. **A question of mine is answered in text first, before any tool call of that turn.** Then the work my answer
    unblocks goes out, in that same turn, before write-ups, events or other entries. A batch of jobs goes out in
