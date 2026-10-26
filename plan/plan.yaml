@@ -994,7 +994,7 @@ entries:
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-44e6a15b
     - FA-ccin2p3-ec84e913
-    commit: 417a565
+    commit: 37198d1
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
