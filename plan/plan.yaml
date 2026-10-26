@@ -367,6 +367,18 @@ entries:
       two seeds resolve (with the measured spread) and that settling it needs about 6 to 8 seeds per arm, which goes to the
       user as a question with its GPU cost, not run. In every case the sign study stops after these four runs and is written
       up in docs/results.tex par:v3_prep_signed.'
+    passed_at: '2026-10-26T19:48:31+00:00'
+    reviewer: 'Matched: job arms sign_pair_best/sign_off_best (0d54c999) differ only in sign_pair_dim 16/hidden 16/unbounded
+      vs 0, same lr 1.246e-2, warmup 0.081, Muon wd 0.0217, signext recipe, 4264 steps, seed=43 for _seed2; control at the
+      pair arm''s HPs is the user''s approved test, a control blow-up scored inconclusive with the Muon baseline at its own
+      HPs as best-vs-best reference. Measure responds: sign_head_search.json zero_shot, search best vs Muon baseline lower
+      on 12 pools, higher on 3 (median 2.75% vs 3.8%); the more-signed-pools change gave 14 of 15 at two-seed means (prep_signed.json
+      seeds m2). Spread of the decision statistic: same-config single-run per-pool splits in prep_signed.json seeds are 6/9,
+      4/10, 8/9, 9/7 (most lopsided 10 of 14, sign-test p about 0.09), so 13 of 17 on two-seed means (p about 0.025) sits
+      above the measured null and the 12/3 seen; a smaller true effect lands in the stated inconclusive outcome, which goes
+      to the user with the 6 to 8 seed cost. Reading of an overlap in the outcome rules: per the design, the paired per-pool
+      count is the decision statistic, so a seed-mean median not lower while the count is lower on most pools is reported
+      as inconclusive, not no; no = count not lower on most pools (or higher on most). Not a repeat; within D165.'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
