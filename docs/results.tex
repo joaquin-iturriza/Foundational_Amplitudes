@@ -9016,23 +9016,26 @@ of the three share a test set.
     $b\bar b\to gggh$). The regeneration is now $1826$ tree entries ($218$M events, about $39$ core-hours) and $142$
     one-loop entries, about $53$\,GB of pools and $66$\,GB with the backends. Next: the regeneration on CC; then
     classes and roles on v4; then the $b$ mass in \code{particle\_ids.py}.
-  \item \textbf{State (2026-10-26, 01:20).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
-    next}); this item only summarises it. The pp study is finished and written up (par.\ The pp-trained arm); the
-    user's call on switching to pp sampling waits on catalog\_v4's short pretrainings read on the same pp pools. Running
-    on CC: catalog\_v4's regeneration (approved 2026-10-25 ``Okay, yes to 1 to 3, yes to electroweak production and
-    the smaller fixes, no to the decayed final states''; 2026-10-26 ``Yes, okay, that's fine, go ahead.'' for the
-    $6$\,TeV range with the energy hold-out at $6$ to $20$\,TeV; ``Drop the b to higgs events.''), eight CPU parts that
-    all failed at the first one-loop entry (\code{tools/nlo\_virtual\_pipeline.py}), a step agent diagnosing them and
-    resubmitting only what is missing. The two blended-target short pretrainings are read (par.\ Blending the hybrid
-    with the emission scales). After the regeneration: check every pool, the classes and roles on catalog\_v4, the
-    massless $b$ in \code{particle\_ids.py}, then catalog\_v4's short pretrainings (GPU estimate to the user). Storage
-    on CC (approved 2026-10-25 ``About the storage, yes to 1, 2 under 5 h, keep the tars.''): the MadGraph events
-    directories and the concluded studies' model files under $5$\,h deleted from a committed manifest
-    (\code{analysis/storage/}); catalog\_v4 builds write no events directory; the disk watch alerts at $90\%$ and pauses
-    the feeders at $97\%$. Pools stay float64 (the user's call after the float32 check). Mechanical step agents run at
-    low effort (the user's preference, 2026-10-26).
-    % allow: 6 20 0.5 0.25 5 90 97 because they are the approved design's settings and the watch's thresholds, not results
-    % allow: 01 1 2 3 because they are a clock time and item numbers inside the user's quotes
+  \item \textbf{State (2026-10-26, 07:40).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
+    next}); this item only summarises it. \emph{catalog\_v4}: all eight regeneration parts ended; the one-loop entries
+    whose tree mixes QCD and electroweak orders are built at the pure-QCD tree (the user: ``qcd only is fine''); MadGraph
+    had ignored every width written on an indented line, so catalog\_v4's top width is $1.4915$ everywhere (the user:
+    ``do 1.4915 for all'') and the heavy-quark, $Z'$, 2HDM and loop-induced Higgs families were rebuilt at their intended
+    widths, the old pools quarantined, not deleted (\code{tools/width\_regen.py}); waiting on the user: whether the one-loop
+    $b\bar b\to hW^+W^-$, whose top is only in the $t$-channel, is built at zero top width or dropped (the entry waits,
+    so catalog\_v4's short pretrainings wait too); still to do: catalog\_v3's six loop-induced Higgs pools' $Z$/$W$ widths,
+    the 2HDM $u\bar u\to h_2h_3g$ build check, tree pools with a $t$-channel top at multi-TeV. \emph{Muon test} (the user:
+    ``Yes, go ahead with muon's step 1 and 2 if results are not conclusive. Also add one seed, yes.''): stage 1 written
+    up (par.\ Muon against AdamW on the short pretraining); stage 2's two searches (Muon and AdamW, learning rate and weight
+    decay) and the small-$D$ fine-tunes with their from-scratch runs are running on CC. \emph{Preprocessing exploration}:
+    the signed-data check, the sampling sensitivity and the $\hat s$-factor slopes are written up; the one-loop sign arms
+    (pair head, near-zero weighting) run on CC and the third arm (more sign-changing pools) is being submitted.
+    \emph{Fine-tuning at small $D$}: closed (par.~\ref{par:ft_harm}); the question moved to the Muon fine-tunes and
+    catalog\_v4 (the user: ``I agree with that reframing''). \emph{Storage}: the finished runs' model files deleted from a
+    committed manifest (the user: ``we can delete the models of the runs already done''). GPU budget $30$\,GPU-h while
+    Jean Zay is unused (the user, 2026-10-26).
+    % allow: 07 40 1.4915 30 because they are a clock time, the user's chosen width and the user's budget, not results
+    % allow: 2 3 6 because they are the h_2 h_3 particle labels and a count of pools named in a plan step, not results
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).
