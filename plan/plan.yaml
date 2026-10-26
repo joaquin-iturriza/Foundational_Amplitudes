@@ -999,11 +999,12 @@ entries:
   - D137
   - D139
   - D140
-  next: 'D139 (investigate): take all failing one-loop certifications together: the four mixed-order ones plus v4_bbx_tapvtwm,
-    v4_bbx_hwpwm, v4_bg_bwpwm (few-per-mille c2 at rc 216, maybe a tolerance/stability question) and v4_bbx_ccx (like d d~
-    > c c~); before any rerun, run the certify over every one-loop entry of all 8 shards (CPU dry certify, not prebuild) so
-    one job lists every failure; part 3 needs a rerun too; also make a failing certification skip-and-log its group instead
-    of aborting the shard (user decision needed only if entries are dropped)'
+  next: 'D139 (investigate) continues for the failing one-loop certifications. Regeneration parts 1, 3, 4, 7 resubmitted at
+    929e1a9 with skip-and-log (abd3ee7: a failed one-loop certification or pole-guard refusal skips its backend group, logged
+    CERT_FAILED <name>: <reason>, rest of the shard builds, exit 4 with V4REGEN_CERT_SKIPPED list; mixed-order V4REGEN_SKIP
+    kept on 1, 4, 7): part 1 FA-ccin2p3-6bd04ec8, part 3 FA-ccin2p3-7a70bae4, part 4 FA-ccin2p3-05f408b4, part 7 FA-ccin2p3-b6969e26.
+    When they end: read each log for CERT_FAILED lines and confirm the tree pools built; skipped entries stay in the catalog
+    for a rerun once the investigation settles them.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
