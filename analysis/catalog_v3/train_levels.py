@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """The reference level of the pretraining comparisons' MSEs: each run's own per-process validation MSE of
 log|M|^2 on its training pools, at its best checkpoint, in natural-log units (the units the pp and zero-shot reads
-are quoted in), against which a read of 0.4 to 3 is placed.
+are quoted in), against which a read of 0.4 to 3 is placed; and that median as an rms error and a factor
+on |M|^2 per event.
 
 result.json's proc_val_losses_no_reg is in standardized target units; with one shared standardization (asserted)
 it is multiplied by that std squared, as pp_compare.collect does for window_train.
@@ -17,7 +18,6 @@ RUNS = {"dimensionless": "runs/catalog_v3_short/dimensionless",                 
         "dimensionless_muon_best_seed2": "runs/catalog_v3_short/dimensionless_muon_best_seed2",
         "v4_dimensionless_muon": "runs/catalog_v4_short/v4_dimensionless_muon",
         "v4_dimensionless_muon_seed2": "runs/catalog_v4_short/v4_dimensionless_muon_seed2"}
-RMS = 0.6        # an rms error in ln|M|^2 read as a factor per event, exp(RMS)
 
 
 def collect():
@@ -34,9 +34,12 @@ def collect():
 
 def main():
     d = json.load(open(DATA))
-    out = {r: {"median": round(statistics.median(v["mse"].values()), 4), "n": len(v["mse"]),
-               "best_step": v["best_step"]} for r, v in d.items()}
-    out["rms_factor"] = round(math.exp(RMS), 3)
+    out = {}
+    for r, v in d.items():
+        m = statistics.median(v["mse"].values())
+        # the median MSE as an rms error in ln|M|^2, and that error as a factor on |M|^2 per event
+        out[r] = {"median": round(m, 4), "rms": round(math.sqrt(m), 3), "factor": round(math.exp(math.sqrt(m)), 3),
+                  "n": len(v["mse"]), "best_step": v["best_step"]}
     print(json.dumps(out))
 
 
