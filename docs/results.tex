@@ -1761,6 +1761,125 @@ less its process mean ($\lambda=0$ the hybrid, $1$ the emission scales), per hel
 \label{fig:v3_prep_blend}
 \end{figure}
 
+% allow: 7500 2500 because they are the fit and scoring event counts, settings
+% allow: 64 because it is the classifier's layer width, a setting
+% allow: 20 because it is the least count of one sign a classifier is fitted on, a setting
+% allow: 1 because it is the floor's quantile in percent, a setting
+\paragraph{The signed one-loop pools' data (2026-10-26).}\label{par:v3_prep_signed} The shape proxy left the
+sign-changing one-loop pools apart (par.~\ref{par:v3_shape_proxy}); this is their check: how often the stored value is
+negative, how much of its sign the event's kinematics decide, and what each target costs on its magnitude. On every
+one-loop pool of catalog\_v3's training recipe and of the one-loop held-out axis, on its validation and test events
+together, the first $7500$ to fit and the next $2500$ to score (\code{analysis/catalog\_v3/prep\_signed\_pools.py}, run
+FA-ccin2p3-7145824e on CC's CPUs; \code{prep\_signed.py}, \code{data/prep\_signed.json}, Fig.~\ref{fig:v3_prep_signed}):
+the share of negative events, the wrong-sign share of one sign per pool and of a classifier on the shape proxy's inputs
+(sklearn MLP $(64,64)$; none when the fit events hold fewer than $20$ of one sign), the same classifier on $\log\hat s$
+alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s$ the pool's $1\%$ quantile of $\abs x$
+(the sign head's floor). Medians over the sign-changing pools, training then held out:
+\begin{itemize}
+  \item \emph{Few pools change sign, and their crossings are thin.} $53$ of the $137$ training one-loop pools and $14$
+% src: python3 analysis/catalog_v3/prep_signed.py @32b9b2f3
+% allow: 10 100 because they are the factors from zero that define the near-zero events, settings
+% allow: 20 because it is the least count of one sign a classifier is fitted on, a setting
+% claim: tr_n_signed=53
+% claim: tr_n_pools=137
+% claim: H5_n_signed=14
+% claim: H5_n_pools=30
+% claim: tr_n_rare=9
+% claim: H5_n_rare=2
+% claim: tr_neg=22.2
+% claim: H5_neg=26.0
+% claim: tr_near10=11.6
+% claim: H5_near10=8.9
+% claim: tr_near100=1.1
+% claim: H5_near100=0.8
+    of the $30$ held-out ones have events of both signs ($9$ and $2$ of them with fewer than $20$ of one sign among the
+    fit events). The median negative share is $22.2\%$ and $26.0\%$; $11.6\%$ and $8.9\%$ of the events lie within a
+    factor $10$ of zero (relative to the pool's median), $1.1\%$ and $0.8\%$ within a factor $100$.
+  \item \emph{Within a pool the kinematics decide the sign.} The classifier gets $0.8\%$ and $0.7\%$ of the signs wrong,
+% src: python3 analysis/catalog_v3/prep_signed.py @32b9b2f3
+% allow: 5 because it is a threshold in percent, a setting
+% allow: 10 because it is the factor from zero that defines the near-zero events, a setting
+% claim: tr_err_mlp=0.8
+% claim: H5_err_mlp=0.7
+% claim: tr_err_major=4.0
+% claim: H5_err_major=4.6
+% claim: tr_n_mlp_below_5pct=42
+% claim: tr_n_signed=53
+% claim: H5_n_mlp_below_5pct=13
+% claim: H5_n_signed=14
+% claim: tr_err_mlp_near=5.0
+% claim: H5_err_mlp_near=7.0
+% claim: tr_err_major_near=18.0
+% claim: H5_err_major_near=11.5
+% claim: tr_n_shat_beats_major=2
+    against $4.0\%$ and $4.6\%$ for one sign per pool, and stays under $5\%$ on $42$ of the $53$ and $13$ of the $14$
+    pools; within a factor $10$ of zero it is $5.0\%$ and $7.0\%$ against $18.0\%$ and $11.5\%$. On $\log\hat s$ alone it
+    beats one sign per pool on $2$ of the $53$ and none of the $14$: the sign changes across the angles, not with the
+    energy.
+  \item \emph{On the magnitude the targets barely differ.} The regressor's MSE is $0.053$ on $\log\abs x$, $0.056$ with
+% src: python3 analysis/catalog_v3/prep_signed.py @32b9b2f3
+% allow: 1.6 because it is the trees' ratio quoted from the shape proxy paragraph
+% claim: tr_shape_raw=0.053
+% claim: tr_shape_dless=0.056
+% claim: tr_shape_qperp=0.063
+% claim: H5_shape_raw=0.088
+% claim: H5_shape_dless=0.081
+% claim: H5_shape_qperp=0.096
+% claim: tr_qperp_over_raw=1.061
+% claim: tr_qperp_above_raw=33
+% claim: tr_n_signed=53
+% claim: tr_dless_over_raw=0.997
+    the $\hat s$ factor and $0.063$ with the emission scales on the training pools ($0.088$, $0.081$, $0.096$ held out);
+    per pool the emission scales cost $1.061$ times $\log\abs x$'s (above it on $33$ of the $53$) and the $\hat s$ factor
+    $0.997$, where on the trees' $2\to4$ the emission scales cost $1.6$ times (par.~\ref{par:v3_shape_proxy}).
+  \item \emph{The networks' zero-shot signs are far from what the data allow.} On the $17$ held-out pools the short
+% src: python3 analysis/catalog_v3/prep_signed.py @32b9b2f3
+% claim: base_n=17
+% claim: H5_n_signed=14
+% claim: n_one_sign_scored=3
+% claim: base_wrong=5
+% claim: hyb_wrong=10
+% claim: b25_wrong=9
+% claim: b50_wrong=21
+% claim: twin_wrong=12
+% claim: shat_wrong=15
+% claim: qperp_wrong=18
+% claim: ctx_wrong=19
+% claim: H5_err_mlp=0.7
+% claim: b50_worse_major=7
+% claim: qperp_worse_major=10
+% claim: b25_inverted=1
+% claim: base_inverted=4
+% claim: ccg_neg=28
+% claim: ccg_mlp=0.7
+% claim: ccg_wrong_min=71
+% claim: ccg_wrong_max=72
+% allow: 0.25 0.5 because they are the blend weights lambda, settings
+    pretrainings' scorer reads as sign-changing (the $14$ above and $3$ whose events all carry one sign, which it still
+    resolves as sign-changing; why is not checked), the median wrong-sign share is $5\%$ for the baseline, $10\%$ for
+    the hybrid, $9\%$ and $21\%$ for its blends at $\lambda=0.25$ and $0.5$, $12\%$ for the twin, $15\%$ for $\hat s$
+    alone, $18\%$ for the emission scales and $19\%$ with the context vector, against the classifier's $0.7\%$. Every
+    arm is worse than one sign per pool on $7$ to $10$ of the $17$ and gets more than half of the signs wrong on $1$ to
+    $4$. On $e^+e^-\to c\bar cg$ ($28\%$ negative, the classifier $0.7\%$ wrong) every arm gets $71$ to $72\%$ wrong: it
+    predicts the minority sign on nearly every event.
+\end{itemize}
+% src: python3 analysis/catalog_v3/prep_signed.py @32b9b2f3
+% claim: H5_err_mlp=0.7
+% claim: base_wrong=5
+% claim: b50_wrong=21
+So the sign is no data problem: within a pool a small classifier on the invariants gets all but $0.7\%$ of it, and the
+zero-shot errors of $5$ to $21\%$ are a transfer failure from the training pools' signs, smallest for the baseline. The
+magnitude's target matters less on these pools than on the trees. One seed each arm.
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_signed.pdf}
+\caption{catalog\_v3's sign-changing one-loop pools. (a) Per pool, the wrong-sign share of a classifier on the event's
+invariants against that of one sign per pool, on the training and the held-out pools. (b) Per held-out pool, the
+short pretrainings' zero-shot wrong-sign share against one sign per pool's; the pools of one sign in every event sit
+at zero on the horizontal axis.}
+\label{fig:v3_prep_signed}
+\end{figure}
+
 \paragraph{Pretraining on it (2026-10-16, D59).} The sweep \code{dancat\_het\_pre}
 (\code{sweep/sweep\_config\_dancat\_het\_pre.yaml}): the $1352$ training processes of its split ($10^5$ events each,
 generated with its MadEvent setup), the user's heteroscedastic loss ranked on the validation NLL, Daniel's diagram
