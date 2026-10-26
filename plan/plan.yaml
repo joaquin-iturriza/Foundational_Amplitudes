@@ -1347,6 +1347,7 @@ entries:
     - FA-ccin2p3-00d080ba
     - FA-ccin2p3-13e57de7
     - FA-ccin2p3-27a6f23b
+    - FA-ccin2p3-29e8ad2f
     - FA-ccin2p3-2bc30261
     - FA-ccin2p3-3a2f3a89
     - FA-ccin2p3-483f4bfc
@@ -1354,12 +1355,15 @@ entries:
     - FA-ccin2p3-60177afb
     - FA-ccin2p3-6e5d2ed2
     - FA-ccin2p3-70adfc03
+    - FA-ccin2p3-8103a0bb
     - FA-ccin2p3-87426222
     - FA-ccin2p3-be7d9ff7
     - FA-ccin2p3-ce1dba1c
+    - FA-ccin2p3-e5265e31
     - FA-ccin2p3-ee733aa9
+    - FA-ccin2p3-f620ed40
     - FA-ccin2p3-fe864fda
-    commit: 2f40a595
+    commit: f4e6a54a
     paths:
     - analysis/catalog_v3/data/muon_compare.json
     - analysis/catalog_v3/data/muon_ft.json
