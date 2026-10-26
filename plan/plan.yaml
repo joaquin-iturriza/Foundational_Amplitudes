@@ -1266,24 +1266,14 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'BUILT (6584c2fa): optim/muon.py MuonAdamW as designed (Muon on muP''s ninf==2 matrices, scale 0.2*sqrt(max(fan_out,fan_in))/sqrt(width
-    mult), Nesterov 0.95, NS5 float32, decoupled wd 0.1 via training.muon_*; an inner torch AdamW sharing the group dicts,
-    fused on CUDA, MuAdamW''s grouping for the rest); the MuonAdamW branch in base_experiment._init_optimizer (logs ''MuonAdamW:
-    Muon on N matrices''); tests/test_muon.py 6 tests, all pass on the laptop and on CC torch 2.1.2 (real LLoCa at 8 heads:
-    Muon on exactly 32 block matrices, width multiplier 4); arms dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2
-    (seed 43; pools unchanged) in scripts/job_catalog_v3_short.sh, whose smoke mode now also fine-tunes the smoke parent on
-    v3_gg_attx d2 for 20 steps with AdamW and Muon; tools/catalog_ft.py (4 probes x d2..d5, lr_scale 1, target_stats own,
-    offshell parent, 2000 val events, --optimizer AdamW|MuonAdamW, CATFT lines, exit 1 on any failed cell). Repo review passed
-    (watermark 3ba9df35); note for the write-up: the baseline''s L2 term (4.96e-7) still applies to the Muon matrices on top
-    of the decoupled wd. SMOKE RUNNING: FA-ccin2p3-27a6f23b (dimensionless_muon smoke, 40 steps, H1/H5 reads, 2 fine-tune
-    cells; est 0.3 GPU-h). The user approved one extra seed of BOTH pretrainings (D146). NEXT: read the smoke log (site logs;
-    check the MuonAdamW line says 32 matrices, loss finite, both CATFT lines without error, V3_SHORT_DONE). If clean: check
-    df on /sps/lpnhe (41 GB free at submission, cache cleanup running), sync once, then submit in parallel with --item muon_test
-    and --hdr=--mem=48G: dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2 (full runs, ~1.7 GPU-h each, ~5.1
-    total). After the pretrainings end: add the arms to analysis/catalog_v3/short_reads.py, then the fine-tunes: tools/catalog_ft.py
-    from runs/catalog_v3_short/dimensionless and dimensionless_muon, each with --optimizer AdamW and MuonAdamW (64 runs, ~2.8
-    GPU-h; a job wrapper for it still to write, like scripts/job_lowd_ft.sh). Stage 2 (~34 GPU-h, user-approved only if stage
-    1 is inconclusive) after reading stage 1.'
+  next: 'SMOKE CLEAN (FA-ccin2p3-27a6f23b: Muon on 32 matrices, 40-step val_loss_no_reg 0.151 then 0.095, H1/H5 reads written,
+    both smoke fine-tunes ran: AdamW 1.566, Muon 1.490 at 20 steps on v3_gg_attx d2; note pre-clip grad norm median 9.65,
+    clip bound on 65% of steps, watch this in the full Muon run). SUBMITTED in parallel at 66076d21, --mem=48G, ~5.1 GPU-h:
+    dimensionless_muon FA-ccin2p3-ee733aa9, dimensionless_seed2 FA-ccin2p3-87426222, dimensionless_muon_seed2 FA-ccin2p3-2bc30261
+    (CC had 40 GB free; a short run dir is ~115 MB). NEXT when they end: read each log (V3_SHORT_DONE, finite losses, Muon
+    line), add the three arms to analysis/catalog_v3/short_reads.py, then write the fine-tune job wrapper (like scripts/job_lowd_ft.sh)
+    and run tools/catalog_ft.py from runs/catalog_v3_short/dimensionless and dimensionless_muon, each with --optimizer AdamW
+    and MuonAdamW (64 runs, ~2.8 GPU-h). Stage 2 (~34 GPU-h) only if stage 1 is inconclusive.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
