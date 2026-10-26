@@ -1325,13 +1325,10 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'When the four parent-stats fine-tune jobs end (FA-ccin2p3-483f4bfc AdamW parent/AdamW ft, 8fe3a758 AdamW parent/Muon
-    ft, 3a2f3a89 Muon parent/AdamW ft, b03e4c9a Muon parent/Muon ft; tools/catalog_ft.py --keep-parent-stats, kind catft_parentstats,
-    64 cells, fine_tune.target_stats=parent_shared), read their logs, add the kind to analysis/catalog_v3/muon_compare.py
-    and read them against the refit fine-tunes, the parent''s zero-shot and scratch (does keeping the parent''s standardization
-    end below the zero-shot; a run''s first validation should sit near zero-shot MSE / sigma_c^2, sigma_c 4.498 for the AdamW
-    parent), add to the Muon paragraph. Also still pending: stage 2''s two 8-trial searches (muon_test_search_muon, muon_test_search_adamw),
-    best against best, into the Muon paragraph; then plan done.'
+  next: 'The parent-stats fine-tunes do not start at the zero-shot: first validation (step 1, after one update) is 0.203 vs
+    expected 0.043 (AdamW parent) and 0.703 vs 0.0035 (Muon parent), dg_dgwpwm d2. Diagnose at default effort before reading
+    them: add a step-0 validation (no update) to confirm parent_shared reproduces the zero-shot, then check whether the first
+    AdamW update (lr, warmup, fresh optimizer state) destroys it. Still pending: jobs 8fe3a758, b03e4c9a; stage 2 searches.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
