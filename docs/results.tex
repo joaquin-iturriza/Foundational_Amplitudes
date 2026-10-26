@@ -1958,6 +1958,52 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
     of magnitude and never came back; its reads are at its best checkpoint, before the blow-up, whose validation loss
     is about five times the baseline's, while the weighting's ends level with it (the runs' logs).
     Fig.~\ref{fig:v3_prep_signed_arms}.
+  \item \emph{More sign-changing training pools help the sign, not the rest.} The third arm changes the data, not the
+% src: python3 analysis/catalog_v3/prep_signed.py @25e15ada
+% allow: 95 1492 1397 232 4264 4.7 5 because they are the arm's design (pools added, the recipes' process counts, the training one-loop pools after, the shared step count and the epochs it gives each pool)
+% claim: tr_n_pools=137
+% claim: more_n=17
+% claim: base_wrong1=5.4
+% claim: more_wrong1=4.8
+% claim: more_better_base=12
+% claim: more_worse_base=3
+% claim: base_inverted=4
+% claim: more_inverted=1
+% claim: base_wrong_near=39.4
+% claim: more_wrong_near=14.2
+% claim: axis_n_pools=30
+% claim: base_axis_wrong=13.1
+% claim: more_axis_wrong=7.7
+% claim: pos_one_sign_base_wrong=90
+% claim: pos_one_sign_more_wrong=0.3
+% claim: more_ccg_wrong=71
+% claim: more_mse_ratio=1.07
+% claim: more_n_probes_worse=355
+% claim: pair_n_probes=617
+% claim: more_H5_mse=0.84
+% claim: base_H5_mse=1.25
+% claim: more_H5_ratio=0.86
+% claim: more_H7E_ratio=1.36
+% claim: more_H2p5_ratio=1.17
+% claim: more_mse_mag=1.42
+% claim: base_mse_mag=1.25
+% allow: 2 3 10 because they are the 2 to 3 multiplicity, the square in |M|^2 and the near-zero factor of the scorer
+    model: the baseline at its HPs, one seed (run FA-ccin2p3-ecc413f9), trained on the one-loop QCD virtual of every
+    coloured $2\to3$ training tree class that catalog\_v3's one-loop layer lacked, $95$ pools of $10^4$ training events
+    (\code{recipes/catalog\_v3\_train\_signext.yaml}, $1492$ processes against the baseline's $1397$, the training
+    one-loop pools from $137$ to $232$). The new pools are training classes only, so no held-out pool or its class is
+    among them. Their sign-changing share was the point, but the arm also has more processes, more one-loop data
+    and, at the baseline's $4264$ steps, $4.7$ epochs per pool instead of $5$: a gain cannot be told from more one-loop
+    data of any sign, and a cost elsewhere may be the fewer epochs. On the $17$ held-out pools the median wrong-sign
+    share is $4.8\%$ against the baseline's $5.4\%$; it beats the baseline on $12$ of the $17$ and loses on $3$, and the
+    pools it gets more than half wrong drop from $4$ to $1$. Within a factor $10$ of zero it is $14.2\%$ against
+    $39.4\%$, and over the whole one-loop axis ($30$ pools) $7.7\%$ against $13.1\%$; about $3$ points of that are
+    $u\bar u\to e^+e^-Z$, all positive in validation, which the baseline calls $90\%$ negative and this arm $0.3\%$.
+    $e^+e^-\to c\bar cg$ stays at $71\%$ wrong. The size moves the other way: the zero-shot MSE on
+    $\log|\mathcal M|^2$ per held-out probe over the baseline's has the median $1.07$ (above $1$ on $355$ of the $617$
+    probes), $0.86$ on the one-loop axis (median MSE $0.84$ against $1.25$) but $1.17$ on $2\to5$ and $1.36$ on the
+    $1$ to $10$\,TeV axis; the magnitude's MSE on the $17$ sign-changing pools is $1.42$ against $1.25$. One seed, so
+    the $1.07$ is within what a seed could move; the sign gain on $12$ of $17$ pools is the clearer part.
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
@@ -1983,7 +2029,9 @@ at zero on the horizontal axis.}
 \centering
 \includegraphics{../analysis/catalog_v3/figs/prep_signed_arms.pdf}
 % allow: 2 because it is the square in |M|^2
-\caption{The two sign arms on catalog\_v3's held-out probes, zero-shot, one seed each. (a) Per held-out one-loop pool
+% allow: 95 because it is the third arm's design, the pools it adds
+\caption{The three sign arms (pair sign head, near-zero weighting, $95$ more sign-changing training pools) on
+catalog\_v3's held-out probes, zero-shot, one seed each. (a) Per held-out one-loop pool
 the scorer reads as sign-changing, each arm's wrong-sign share against the baseline's. (b) Per held-out probe of every
 axis, each arm's MSE on $\log|\mathcal M|^2$ against the baseline's.}
 \label{fig:v3_prep_signed_arms}
@@ -9231,8 +9279,8 @@ of the three share a test set.
     ``Yes, go ahead with muon's step 1 and 2 if results are not conclusive. Also add one seed, yes.''): stage 1 written
     up (par.\ Muon against AdamW on the short pretraining); the small-$D$ fine-tunes written up in the same paragraph; stage 2's two
     searches (Muon and AdamW, learning rate and weight decay) are running on CC. \emph{Preprocessing exploration}:
-    the signed-data check, the sampling sensitivity and the $\hat s$-factor slopes are written up; the one-loop sign arms
-    (pair head, near-zero weighting) run on CC and the third arm (more sign-changing pools) is being submitted.
+    the signed-data check, the sampling sensitivity, the $\hat s$-factor slopes and the three one-loop sign arms (pair
+    head, near-zero weighting, more sign-changing pools) are written up (par.~\ref{par:v3_prep_signed}).
     \emph{Fine-tuning at small $D$}: closed (par.~\ref{par:ft_harm}); the question moved to the Muon fine-tunes, now
     written up (par.~\ref{par:v3_muon}), and catalog\_v4 (the user: ``I agree with that reframing''). \emph{Storage}: the finished runs' model files deleted from a
     committed manifest (the user: ``we can delete the models of the runs already done''). GPU budget $30$\,GPU-h while
