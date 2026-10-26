@@ -35,7 +35,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_near, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2 or dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -72,6 +72,15 @@ case "$ARM" in
     dimensionless_muon)    NORM=("${DIM[@]}" training.optimizer=MuonAdamW) ;;
     dimensionless_seed2)   NORM=("${DIM[@]}" seed=43) ;;
     dimensionless_muon_seed2) NORM=("${DIM[@]}" training.optimizer=MuonAdamW seed=43) ;;
+    # the one-loop sign transfer (docs/results.tex, par. The signed one-loop pools' data: the kinematics decide the
+    # sign within a pool, the arms fail it zero-shot), each the baseline with one change, at its HPs:
+    #   baseline_sign_pairs  the sign logit also gets a pair term on the invariants the per-pool classifier used
+    #                        (model.sign_pair_dim 16 per-particle pair features; wrappers._sign_pair_logit)
+    #   baseline_sign_near   the sign loss weighs the events within a factor 10 of zero 10 times the others, each
+    #                        pool's mean weight kept (training.sign_near_weight)
+    baseline_sign_pairs)   NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false ++model.sign_pair_dim=16) ;;
+    baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
+                                 ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/runs/catalog_v3_short/$ARM"; PRED="$SCRATCH/zz_v3_short_$ARM"
@@ -89,6 +98,11 @@ if [ "$MODE" = smoke ]; then
 import random, sys, yaml
 r = yaml.safe_load(open(sys.argv[1])); ps = r["processes"]
 loops = [p for p in ps if p["name"].endswith(("_nlo", "_loop"))]
+# the sign-changing one-loop pools first (any role with a negative value), so the sign loss is exercised
+import json
+au = json.load(open("analysis/catalog_v3/pool_audit.json"))["pools"]
+neg = lambda n: any(v.get("negative", 0) > 0 for v in au.get(n, {}).values() if isinstance(v, dict))
+loops = sorted(loops, key=lambda p: not neg(p["name"]))
 random.Random(0).shuffle(ps); r["processes"] = ps[:16] + loops[:3]
 yaml.safe_dump(r, open(sys.argv[2], "w"))
 PY

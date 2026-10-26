@@ -15,6 +15,12 @@ particle_encoder_hidden: 0   # off (docs/results.tex tab:bigrun_arms, not load-b
 # context_dropout, so the zero vector is the zero-shot model; a held-out process gets c_p fitted on K labelled events
 # with everything else frozen (tools/kshot_context.py). The table's processes are written to
 # <run_dir>/context_names.json; a run warm-started from it (fine_tune.pretrained_path) reads that file.
+# --- Pair sign head (training.sign_head on) -------------------------------------
+# sign_pair_dim K > 0: K more per-particle output channels h_i, and the sign logit gets the mean over the event's
+# particle pairs of a small MLP of (h_i + h_j, h_i h_j, log(2|p_i.p_j|/s_hat), the legs' log(m^2/s_hat), log s_hat):
+# the invariants the per-pool sign classifier used (analysis/catalog_v3/prep_signed_pools.py). Zero-init output.
+sign_pair_dim: 0
+sign_pair_hidden: 32
 context_dim: 0
 context_dropout: 0.5
 context_names_file: null

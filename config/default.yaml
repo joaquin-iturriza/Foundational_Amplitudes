@@ -191,6 +191,10 @@ training:
  # with the sign accuracy on the signed pools logged. LLoCa path only.
  sign_head: false
  sign_loss_weight: 1.0
+ # >1: the sign loss weighs the events within a factor sign_near_factor of zero (|x| below the pool's training
+ # median over it) this many times the others, each pool's mean weight kept at 1 (in-memory data path only)
+ sign_near_weight: 1.0
+ sign_near_factor: 10.0
  loss_aggregation_tau: 0.0   # τ-floor for the geometric mean (TRAINING loss only): aggregate
                         # log(MSE_p + τ), capping a converged process's gradient weight at 1/τ
                         # (a 1e-4 process otherwise outweighs a stuck one by 1e4). 0 = exact

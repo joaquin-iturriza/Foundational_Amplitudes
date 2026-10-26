@@ -1627,6 +1627,8 @@ class AmplitudeExperiment(BaseExperiment):
             # host memory that scales with the batch: the same arrays, built once per input set into
             # memory-mapped files and gathered by index (data_mmap.py)
             from data_mmap import init_data_recipes_mmap
+            assert float(self.cfg.training.get("sign_near_weight", 1.0) or 1.0) <= 1, \
+                "training.sign_near_weight is built on the in-memory path only (data.memmap=false)"
             init_data_recipes_mmap(self, dict(
                 specs=specs, names=names, roles=roles, paths=paths, use_pids=use_pids, per_dataset=per_dataset,
                 mom_div=mom_div, mom_mean=mom_mean, mom_std=mom_std, amp_trafos=amp_trafos,
@@ -1953,6 +1955,10 @@ class AmplitudeExperiment(BaseExperiment):
         role_lrs = []        # per-event log10 sqrt(s_hat) (dimensionless_inputs)
         role_factor = []     # per-event target factor (data.target_propagators; 1 when off)
         role_sign = []       # per-event sign target (1 for x >= 0), used by training.sign_head
+        _near_w = float(self.cfg.training.get("sign_near_weight", 1.0) or 1.0) if getattr(self, "_sign_head", False) else 1.0
+        _near_f = float(self.cfg.training.get("sign_near_factor", 10.0))
+        _near_thr = np.full(len(names), -np.inf)      # per pool: near-zero threshold on the standardized target
+        _near_q = np.zeros(len(names))                # per pool: share of its training events below it
         rng = np.random.default_rng(seed=42)
         part_base = 0   # cumulative particle offset into the final flat array
 
@@ -1988,6 +1994,15 @@ class AmplitudeExperiment(BaseExperiment):
                 ev_factor.append(np.asarray(rec.get("amp_factor", np.ones_like(rec["raw_amp"])),
                                             dtype=np.float64).reshape(-1))
                 ev_sign.append((np.asarray(rec["raw_amp"]).reshape(-1) >= 0).astype(np.float32))
+                if role == "train" and _near_w > 1:
+                    # training.sign_near_weight: the events within a factor sign_near_factor of zero (|x| below the
+                    # pool's training median over that factor, prep_signed_pools.py's near-zero events), as a
+                    # threshold on this pool's standardized target, and their share
+                    ax = np.abs(np.asarray(rec["raw_amp"], dtype=np.float64).reshape(-1))
+                    thr = float(np.median(ax)) / _near_f
+                    ty, _, _ = preprocess_amplitude(np.array([max(thr, 1e-300)]), trafos=tr, mean=m, std=s)
+                    _near_thr[proc_idx] = float(np.asarray(ty).reshape(-1)[0])
+                    _near_q[proc_idx] = float((ax < thr).mean())
                 if _dimless:
                     ev_lrs.append(np.log10(rec["rs"]).astype(np.float32))
                 if _want_resarg:
@@ -2076,6 +2091,15 @@ class AmplitudeExperiment(BaseExperiment):
                                   f"(frozen stats from a run without the sign head?), e.g. {leftover[:3]}")
             self._proc_signed = np.array([bool(t and str(t[0]).startswith("abslog")) for t in pp_tr],
                                          dtype=np.float32)
+            if _near_w > 1 and "train" in roles:
+                # per-event BCE weight (1 + (w - 1) near) / (1 + (w - 1) q_p): the near-zero events weigh w times the
+                # others and each pool's mean weight stays 1, so the sign loss is moved toward the crossing, not grown
+                self._sign_near_thr = _near_thr.astype(np.float32)
+                self._sign_near_norm = (1.0 / (1.0 + (_near_w - 1.0) * _near_q)).astype(np.float32)
+                sg = self._proc_signed > 0
+                LOGGER.info(f"sign_near_weight {_near_w}: events within a factor {_near_f} of zero weigh {_near_w}x in "
+                            f"the sign loss; their median share on the signed pools "
+                            f"{float(np.median(_near_q[sg])) if sg.any() else float('nan'):.4f}")
             LOGGER.info(f"sign_head ON: {int(self._proc_signed.sum())}/{self.n_datasets} sign-changing pools "
                         f"carry the sign loss (weight {float(self.cfg.training.get('sign_loss_weight', 1.0))}); "
                         f"their target is log|x|")
@@ -2163,8 +2187,11 @@ class AmplitudeExperiment(BaseExperiment):
             assert self.cfg.training.loss != "HETEROSC", "sign_head and HETEROSC are not combined"
             assert self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"), \
                 "sign_head is implemented on the LLoCa path"
+            # model.sign_pair_dim K > 0: K more per-particle channels feed the wrapper's pair sign head
+            # (wrappers.AmplitudeLLoCaWrapper._sign_pair_logit); the wrapper still returns [magnitude, sign logit]
+            k_pair = int(self.cfg.model.get("sign_pair_dim", 0) or 0)
             with open_dict(self.cfg):
-                self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1
+                self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1 + k_pair
         q = self._signedlog_quantile()
         shift = self._signedlog_scale_shift()
         _abslog = self._sign_head or bool(self.cfg.data.get("signed_abslog", False))
@@ -3861,6 +3888,14 @@ class AmplitudeExperiment(BaseExperiment):
             w = float(self.cfg.training.get("sign_loss_weight", 1.0))
             if not hasattr(self, "_proc_signed_t"):
                 self._proc_signed_t = torch.as_tensor(self._proc_signed, device=per_event.device)
+            if getattr(self, "_sign_near_thr", None) is not None and self.model.training:
+                # training.sign_near_weight: weight toward the events near the zero crossing (see init_data)
+                if not hasattr(self, "_sign_near_thr_t"):
+                    self._sign_near_thr_t = torch.as_tensor(self._sign_near_thr, device=per_event.device)
+                    self._sign_near_norm_t = torch.as_tensor(self._sign_near_norm, device=per_event.device)
+                wn = float(self.cfg.training.get("sign_near_weight", 1.0))
+                near = (y.reshape(y.shape[0], -1)[:, 0] <= self._sign_near_thr_t[process_ids]).to(bce.dtype)
+                bce = bce * (1.0 + (wn - 1.0) * near) * self._sign_near_norm_t.to(bce.dtype)[process_ids]
             per_event = per_event + w * bce * self._proc_signed_t.to(per_event.dtype)[process_ids]
         n_proc = self.n_datasets
         sums   = per_event.new_zeros(n_proc)

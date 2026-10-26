@@ -184,9 +184,20 @@ class AmplitudeLLoCaWrapper(nn.Module):
                  diagram_encoder_impl: str = "ours",  # "ours" | "llm4lhc" (models/diagram_encoder_llm4lhc.py)
                  diagram_encoder_llm4lhc=None,        # its hyperparameters; consumed by the experiment
                  context_dim: int = 0, context_dropout: float = 0.5,   # read in experiment._post_instantiate_model
-                 context_names_file=None):
+                 context_names_file=None,
+                 sign_pair_dim: int = 0, sign_pair_hidden: int = 32):
         super().__init__()
         self.net = net
+        # Pair sign head (model.sign_pair_dim, training.sign_head): the net's last sign_pair_dim per-particle channels
+        # are pair features; the sign logit gets the mean over the event's particle pairs of an MLP of them and of the
+        # pair's invariants (see _sign_pair_logit). Output layer zeroed: at init the head is the pooled channel alone.
+        self.sign_pair_dim = int(sign_pair_dim or 0)
+        if self.sign_pair_dim > 0:
+            K = self.sign_pair_dim
+            self.sign_pair_mlp = nn.Sequential(nn.Linear(2 * K + 4, int(sign_pair_hidden)), nn.SiLU(),
+                                               nn.Linear(int(sign_pair_hidden), 1))
+            nn.init.zeros_(self.sign_pair_mlp[-1].weight)
+            nn.init.zeros_(self.sign_pair_mlp[-1].bias)
         # Per-process context vector (model.context_dim, D105): off until the experiment calls setup_context().
         self.context = None
         self.context_override = None
@@ -791,6 +802,36 @@ class AmplitudeLLoCaWrapper(nn.Module):
         counts = ptr[1:] - ptr[:-1]                                        # (B,)
         return E_event.repeat_interleave(counts, dim=0)                    # (N_total, d_diag)
 
+    def _sign_pair_logit(self, h, p, ptr, seq_lens=None):
+        """The pair term of the sign logit, (B, 1): the mean over each event's particle pairs i < j of
+        sign_pair_mlp(h_i + h_j, h_i h_j, log(2|p_i.p_j|/s_hat)/5, (a_i + a_j)/10, a_i a_j/100, log s_hat/10), a_i =
+        log(|p_i^2|/s_hat) (clamped at 1e-8: the massless legs), s_hat = (p_0 + p_1)^2 of the two beams. The inputs of
+        the per-pool sign classifier (prep_signed_pools.py), all Lorentz scalars; symmetric in i, j, so the head is
+        permutation invariant. Events padded to the batch's largest multiplicity."""
+        cnt = ptr[1:] - ptr[:-1]
+        n = int(max(seq_lens)) if seq_lens is not None else int(cnt.max())
+        ar = torch.arange(n, device=h.device)
+        valid = ar[None, :] < cnt[:, None]                                       # (B, n)
+        idx = (ptr[:-1, None] + ar[None, :]).clamp(max=h.shape[0] - 1)
+        H = h[idx]                                                               # (B, n, K)
+        P = p[idx].to(torch.float32)                                             # (B, n, 4)
+        eta = torch.tensor([1.0, -1.0, -1.0, -1.0], device=h.device, dtype=P.dtype)
+        dots = torch.einsum("bic,bjc,c->bij", P, P, eta)                         # (B, n, n)
+        s_hat = dots[:, 0, 0] + dots[:, 1, 1] + 2 * dots[:, 0, 1]
+        s_hat = s_hat.abs().clamp(min=1e-30)
+        r = dots / s_hat[:, None, None]
+        a = torch.log(torch.diagonal(r, dim1=1, dim2=2).abs().clamp(min=1e-8))   # (B, n)
+        iu = torch.triu_indices(n, n, 1, device=h.device)
+        hi, hj = H[:, iu[0]], H[:, iu[1]]                                        # (B, M, K)
+        ai, aj = a[:, iu[0]], a[:, iu[1]]
+        lp = torch.log((2 * r[:, iu[0], iu[1]]).abs().clamp(min=1e-8))          # (B, M)
+        ls = torch.log(s_hat)[:, None].expand_as(lp)
+        x = torch.cat([hi + hj, hi * hj, torch.stack([lp / 5, (ai + aj) / 10, ai * aj / 100, ls / 10], -1).to(H.dtype)],
+                      dim=-1)
+        pm = (valid[:, iu[0]] & valid[:, iu[1]]).to(H.dtype)                    # (B, M)
+        z = self.sign_pair_mlp(x).squeeze(-1) * pm
+        return (z.sum(1) / pm.sum(1).clamp(min=1)).unsqueeze(-1)
+
     def forward(self, fourmomenta, particle_type_indices, mean, std, ptr, order_labels=None,
                 seq_lens=None, process_ids=None):
         """
@@ -879,8 +920,15 @@ class AmplitudeLLoCaWrapper(nn.Module):
         outputs = self.net(fourmomenta, particle_type, mean, std, ptr=ptr,
                            seq_lens=seq_lens, pair_ctx=pair_ctx, **net_kwargs)
 
+        pair_feats = None
+        if self.sign_pair_dim > 0:
+            pair_feats, outputs = outputs[:, -self.sign_pair_dim:], outputs[:, :-self.sign_pair_dim]
         # Per-event mean pool (vectorised; see _pool_events / LLOCA_POOL env toggle)
         pooled = _pool_events(outputs, ptr)
+        if pair_feats is not None:
+            # the last pooled channel is the sign logit (training.sign_head)
+            pooled = torch.cat([pooled[:, :-1], pooled[:, -1:] + self._sign_pair_logit(
+                pair_feats, fourmomenta, ptr, seq_lens).to(pooled.dtype)], dim=-1)
 
         # HETEROSC + sigma_after_pool: the net handed us a RAW per-particle sigma logit, so the
         # positivity nonlinearity is applied here — ONCE, to the pooled per-event value:
