@@ -105,7 +105,13 @@ entries:
     into analysis/catalog_v3/data/short_reads/. When the 20 trials end: collect the trials (objective, val_loss_no_reg, HPs,
     blow-ups), take the best trial''s run dir, read it zero-shot with job_catalog_v3_short.sh in mode eval (add an OUT_FIXED
     arm for it, ~0.3 GPU-h), compare against the Muon baseline on held-out wrong-sign share and zero-shot MSE per probe (and
-    against baseline_more_signed AdamW for reference), figure, write up in par:v3_prep_signed with provenance.'
+    against baseline_more_signed AdamW for reference), figure, write up in par:v3_prep_signed with provenance.; ALSO from
+    the code review (2026-10-26 15:20): (a) base_experiment.py:1256 val_total missing from _START_CURVES, so a sign-head fine-tune
+    reports val_total one validation off its selected checkpoint: add it, test in tests/test_val_total.py; (b) the Muon baseline''s
+    lr and weight decay come from a search on the dimensionless target while the trials search lr on the baseline target,
+    so compare best-off (pair width 0 and near weight 1) against best-on inside the search, not against that baseline alone;
+    (c) the pair and near-zero ranges are agent-chosen: say so with the result; (d) RESULT_JSON''s val_loss carries val_total
+    for this search: name it so a harvester cannot misread it'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
