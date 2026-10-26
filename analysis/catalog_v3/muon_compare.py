@@ -18,19 +18,23 @@ Figure muon_compare (2x2): (a) the validation curves; (b) per training pool, Muo
 seed 43 against seed 42 as the seed reference; (c) the median zero-shot MSE per axis, one marker per run; (d) per
 held-out probe, as (b). The last line printed is the numbers docs/results.tex quotes, as one JSON object.
   collect-ft: the small-D fine-tunes (tools/catalog_ft.py, scripts/job_catalog_ft.sh), one CATFT JSON line per cell in
-           each job's log, gathered into one list (80 cells: 4 probes x 4 D x {AdamW, Muon parent} x {AdamW, Muon
-           fine-tune}, and the same 16 from scratch with AdamW):
-    for r in 6e5d2ed2 ce1dba1c 54fd017f be7d9ff7 00d080ba; do site logs FA-ccin2p3-$r -n 200000; done \
-        | python3 analysis/catalog_v3/muon_compare.py collect-ft > analysis/catalog_v3/data/muon_ft.json
+           each job's log, gathered into one list (144 cells: 4 probes x 4 D x {AdamW, Muon parent} x {AdamW, Muon
+           fine-tune} x {the parent's standardization kept, refit on the probe}, and the same 16 from scratch with
+           AdamW), all at the weight-average fix (ddfc0314; the pre-fix refit jobs 6e5d2ed2 ce1dba1c 54fd017f be7d9ff7
+           and parent-stats jobs 483f4bfc 8fe3a758 3a2f3a89 b03e4c9a are not read):
+    for r in 70adfc03 8103a0bb 13e57de7 e5265e31 fe864fda f620ed40 60177afb 29e8ad2f 00d080ba; do
+        site logs FA-ccin2p3-$r -n 200000; done | python3 analysis/catalog_v3/muon_compare.py collect-ft \
+        > analysis/catalog_v3/data/muon_ft.json
   fine-tune read (in main, from data/muon_ft.json): each cell's best-checkpoint MSE in log|M|^2 (val_loss_no_reg times
-        the probe's own std^2, on the probe's first 2000 validation events, the zero-shot read's events), one seed per
-        cell; per fine-tune optimizer the ratio of the AdamW parent's cell to the Muon parent's (does Muon's
-        pretraining transfer better), per parent the ratio AdamW fine-tune / Muon fine-tune, every fine-tune against
-        scratch (scratch / fine-tune) and against its parent's zero-shot MSE (fine-tune / zero-shot), with the
-        fine-tune's start, the parent's output read in the probe's own standardization (q_own; the fine-tunes refit the
-        target statistics on the probe, fine_tune.target_stats=own), as context. Medians over the 16 cells and counts.
-        Figure muon_ft (2x2, one panel per probe): MSE against D, the four fine-tunes and scratch, the two parents'
-        zero-shot as horizontal lines.
+        the std^2 of the target standardization the cell trained in, on the probe's first 2000 validation events, the
+        zero-shot read's events), one seed per cell. The zero-shot reference of a (parent, probe, D) is the
+        parent-stats cell's step-0 validation (the parent's weights, the cell's own events and target transform; equal
+        to the zero-shot read on the tree probes; on the sign-changing one-loop probe the signedlog scale is the 1%
+        quantile of |M|^2 over the D training events, so the target and its step 0 move slightly with D). Ratios, with
+        medians over the 16 cells and counts: fine-tune / zero-shot (below, within 0.1%, above), refit / parent stats,
+        AdamW parent / Muon parent, AdamW fine-tune / Muon fine-tune, scratch / fine-tune, and per D over the 4 probes.
+        Figure muon_ft (2x2, one panel per probe): MSE against D, the eight fine-tunes and scratch, each parent's step
+        0 dotted.
     python3 analysis/catalog_v3/muon_compare.py   -> data/muon_compare.json, figs/muon_compare.{png,pdf}, figs/muon_ft.{png,pdf}
 """
 import glob, json, os, sys
@@ -72,80 +76,123 @@ def collect_ft():
               indent=0)
 
 
+STATS = ("parent", "refit")          # fine_tune.target_stats=parent_shared (catft_parentstats) or own (catft)
+KIND_STATS = {"catft_parentstats": "parent", "catft": "refit"}
+FT_ARMS = [(st, pa, op) for st in STATS for pa, op in FT_COMBOS]
+
+
 def ft_read():
-    """per (kind, parent, optimizer): {(probe, D): mse_log}; per parent and probe the zero-shot MSE and the start"""
+    """per arm (stats, parent, optimizer) or ("scratch",): {(probe, D): best-checkpoint mse_log}; the zero-shot reference
+    per (parent, probe, D): the parent-stats cell's step-0 validation (the parent's weights before any update, the
+    cell's own validation events and target transform), checked against the zero-shot read (short_reads) on the tree
+    probes, where the transform does not depend on D"""
     cells = json.load(open(os.path.join(HERE, "data", "muon_ft.json")))
     assert not any("error" in c for c in cells), [c for c in cells if "error" in c]
-    tab = {}
+    tab, z0, step0_refit = {}, {}, {}
     for c in cells:
-        key = ("scratch", None) if c["kind"] == "scratch" else (c["parent"], c["optimizer"])
-        tab.setdefault(key, {})[(c["probe"], c["D"])] = c["mse_log"]
-    z0, start = {}, {}
+        k = (c["probe"], c["D"])
+        if c["kind"] == "scratch":
+            tab.setdefault(("scratch",), {})[k] = c["mse_log"]
+            continue
+        st = KIND_STATS[c["kind"]]
+        tab.setdefault((st, c["parent"], c["optimizer"]), {})[k] = c["mse_log"]
+        if st == "parent":
+            k0 = (c["parent"],) + k
+            if k0 in z0:      # the same parent weights on the same events: both fine-tune optimizers start equal
+                assert abs(z0[k0] / c["mse_log_step0"] - 1) < 1e-4, (k0, z0[k0], c["mse_log_step0"])
+            z0[k0] = c["mse_log_step0"]
+        else:
+            step0_refit[(c["parent"], c["optimizer"]) + k] = c["mse_log_step0"]
+    read = {}
     for parent in ("dimensionless", "dimensionless_muon"):
         for probe, (ax, _) in FT_PROBES.items():
             z = np.load(os.path.join(HERE, "data", "short_reads", parent, ax, probe + ".npz"))
             t = z["t"].astype(float)
-            z0[(parent, probe)] = float(np.mean((z["q"].astype(float) - t) ** 2))
-            start[(parent, probe)] = float(np.mean((z["q_own"].astype(float) - t) ** 2))
-    return tab, z0, start
+            read[(parent, probe)] = float(np.mean((z["q"].astype(float) - t) ** 2))
+            if probe != "v3_udx_agwp_nlo":
+                for D in FT_D:
+                    assert abs(z0[(parent, probe, D)] / read[(parent, probe)] - 1) < 1e-3, (parent, probe, D)
+    return tab, z0, read, step0_refit
 
 
-def ft_compare(tab, z0, start):
+def ft_compare(tab, z0, read, step0_refit):
     keys = [(p, D) for p in FT_PROBES for D in FT_D]
-    for k in list(FT_COMBOS) + [("scratch", None)]:
+    for k in FT_ARMS + [("scratch",)]:
         assert set(tab[k]) == set(keys), (k, set(keys) - set(tab[k]))
+    name = lambda arm: "_".join([arm[0]] + [FT_NAME[x] for x in arm[1:]])
 
-    def ratio(num, den):
-        r = np.array([num[k] / den[k] for k in keys])
+    def ratio(num, den, ks=keys):
+        r = np.array([num[k] / den[k] for k in ks])
         return {"median": float(np.median(r)), "min": float(r.min()), "max": float(r.max()),
                 "den_lower": int(np.sum(r > 1)), "n": len(r)}
 
-    out = {"parent": {}, "ft_opt": {}, "vs_scratch": {}, "vs_zero_shot": {}, "cells": {}}
-    for opt in ("AdamW", "MuonAdamW"):   # does Muon's pretraining transfer better: AdamW parent / Muon parent
-        out["parent"][FT_NAME[opt]] = ratio(tab[("dimensionless", opt)], tab[("dimensionless_muon", opt)])
+    out = {"vs_zero_shot": {}, "refit_vs_parent": {}, "parent": {}, "ft_opt": {}, "vs_scratch": {}, "cells": {}}
+    # 1. does the fine-tune end below its parent's zero-shot (step 0)? below: under it by more than 0.1%; at: within
+    for arm in FT_ARMS:
+        r = np.array([tab[arm][(p, D)] / z0[(arm[1], p, D)] for p, D in keys])
+        d = {"median": float(np.median(r)), "below": int(np.sum(r < 0.999)), "at": int(np.sum(abs(r - 1) <= 1e-3)),
+             "above": int(np.sum(r > 1.001)), "n": len(r), "max": float(r.max())}
         for D in FT_D:
-            r = np.array([tab[("dimensionless", opt)][(p, D)] / tab[("dimensionless_muon", opt)][(p, D)] for p in FT_PROBES])
-            out["parent"][f"{FT_NAME[opt]}_D{D}"] = {"median": float(np.median(r)), "den_lower": int(np.sum(r > 1))}
-    for parent in ("dimensionless", "dimensionless_muon"):   # the fine-tune optimizer: AdamW ft / Muon ft
-        out["ft_opt"][FT_NAME[parent]] = ratio(tab[(parent, "AdamW")], tab[(parent, "MuonAdamW")])
-    for parent, opt in FT_COMBOS:
-        name = f"{FT_NAME[parent]}_{FT_NAME[opt]}"
-        out["vs_scratch"][name] = ratio(tab[("scratch", None)], tab[(parent, opt)])
-        r = np.array([tab[(parent, opt)][(p, D)] / z0[(parent, p)] for p, D in keys])
-        out["vs_zero_shot"][name] = {"median": float(np.median(r)), "ft_lower": int(np.sum(r < 1)), "n": len(r),
-                                     "ft_lower_D316": int(sum(tab[(parent, opt)][(p, 316)] < z0[(parent, p)]
-                                                              for p in FT_PROBES))}
-    # scratch / fine-tune per D, over the four probes, for every combination
-    for parent, opt in FT_COMBOS:
-        name = f"{FT_NAME[parent]}_{FT_NAME[opt]}"
+            rD = np.array([tab[arm][(p, D)] / z0[(arm[1], p, D)] for p in FT_PROBES])
+            d[f"D{D}"] = {"median": float(np.median(rD)), "below": int(np.sum(rD < 0.999))}
+        out["vs_zero_shot"][name(arm)] = d
+    # 2. refit over parent stats, same parent and fine-tune optimizer
+    for pa, op in FT_COMBOS:
+        d = ratio(tab[("refit", pa, op)], tab[("parent", pa, op)])
         for D in FT_D:
-            r = np.array([tab[("scratch", None)][(p, D)] / tab[(parent, opt)][(p, D)] for p in FT_PROBES])
-            out["vs_scratch"][f"{name}_D{D}"] = {"median": float(np.median(r)), "ft_lower": int(np.sum(r > 1))}
-    out["zs_ratio_median"] = float(np.median([z0[("dimensionless", p)] / z0[("dimensionless_muon", p)] for p in FT_PROBES]))
+            ks = [(p, D) for p in FT_PROBES]
+            d[f"D{D}"] = ratio(tab[("refit", pa, op)], tab[("parent", pa, op)], ks)["median"]
+        out["refit_vs_parent"][f"{FT_NAME[pa]}_{FT_NAME[op]}"] = d
+    # 3. AdamW parent over Muon parent, per target statistics and fine-tune optimizer
+    for st in STATS:
+        for op in ("AdamW", "MuonAdamW"):
+            d = ratio(tab[(st, "dimensionless", op)], tab[(st, "dimensionless_muon", op)])
+            for D in FT_D:
+                d[f"D{D}"] = ratio(tab[(st, "dimensionless", op)], tab[(st, "dimensionless_muon", op)],
+                                   [(p, D) for p in FT_PROBES])["median"]
+            out["parent"][f"{st}_{FT_NAME[op]}"] = d
+    # 4. AdamW fine-tune over Muon fine-tune
+    for st in STATS:
+        for pa in ("dimensionless", "dimensionless_muon"):
+            out["ft_opt"][f"{st}_{FT_NAME[pa]}"] = ratio(tab[(st, pa, "AdamW")], tab[(st, pa, "MuonAdamW")])
+    # 5. scratch over fine-tune
+    for arm in FT_ARMS:
+        d = ratio(tab[("scratch",)], tab[arm])
+        for D in FT_D:
+            d[f"D{D}"] = ratio(tab[("scratch",)], tab[arm], [(p, D) for p in FT_PROBES])["median"]
+        out["vs_scratch"][name(arm)] = d
+    # the zero-shot reference itself: per parent and probe at each D, and the zero-shot read
+    out["zs_ratio_median"] = float(np.median([z0[("dimensionless", p, D)] / z0[("dimensionless_muon", p, D)]
+                                              for p, D in keys]))
     for parent in ("dimensionless", "dimensionless_muon"):
         for p in FT_PROBES:
-            out["cells"][f"{FT_NAME[parent]}/{p}"] = {"zero_shot": z0[(parent, p)], "start_own": start[(parent, p)]}
+            out["cells"][f"{FT_NAME[parent]}/{p}"] = {
+                "zero_shot_read": read[(parent, p)], **{f"step0_D{D}": z0[(parent, p, D)] for D in FT_D},
+                **{f"refit_start_D{D}": step0_refit[(parent, "AdamW", p, D)] for D in FT_D}}
     for k, v in tab.items():
-        out["cells"]["/".join(FT_NAME.get(x, x or "") for x in k if x)] = {f"{p}/{D}": v[(p, D)] for p, D in keys}
+        out["cells"][name(k) if k[0] != "scratch" else "scratch"] = {f"{p}/{D}": v[(p, D)] for p, D in keys}
     return out
 
 
 def plot_ft(tab, z0):
     import plot_style as ps
     fig, axs = ps.figure(ncols=2, nrows=2)
-    sty = {("dimensionless", "AdamW"): (ps.C.blue, "-", "o"), ("dimensionless", "MuonAdamW"): (ps.C.blue, "--", "s"),
-           ("dimensionless_muon", "AdamW"): (ps.C.vermillion, "-", "^"),
-           ("dimensionless_muon", "MuonAdamW"): (ps.C.vermillion, "--", "v")}
+    col = {"dimensionless": ps.C.blue, "dimensionless_muon": ps.C.vermillion}
+    ls = {"parent": "-", "refit": "--"}
+    mk = {"AdamW": "o", "MuonAdamW": "s"}
+    lab = {"parent": "parent's standardization", "refit": "refit"}
     for ax, (probe, (axis, label)) in zip(axs.flat, FT_PROBES.items()):
-        for (parent, opt), (col, ls, mk) in sty.items():
-            ax.plot(FT_D, [tab[(parent, opt)][(probe, D)] for D in FT_D], ls=ls, marker=mk, color=col, mfc="none",
-                    label=f"{FT_NAME[parent]} parent, {FT_NAME[opt]} fine-tune")
-        ax.plot(FT_D, [tab[("scratch", None)][(probe, D)] for D in FT_D], ls="-", marker="D", color=ps.C.grey,
+        for st, pa, op in FT_ARMS:
+            ax.plot(FT_D, [tab[(st, pa, op)][(probe, D)] for D in FT_D], ls=ls[st], marker=mk[op], color=col[pa],
+                    mfc=col[pa] if st == "parent" else "none",
+                    label=f"{FT_NAME[pa]} parent, {FT_NAME[op]} fine-tune, {lab[st]}")
+        ax.plot(FT_D, [tab[("scratch",)][(probe, D)] for D in FT_D], ls="-", marker="D", color=ps.C.grey,
                 label="scratch, AdamW")
-        ax.axhline(z0[("dimensionless", probe)], color=ps.C.blue, ls=":", label="AdamW parent zero-shot")
-        ax.axhline(z0[("dimensionless_muon", probe)], color=ps.C.vermillion, ls=":", label="Muon parent zero-shot")
-        ys = [v[(probe, D)] for v in tab.values() for D in FT_D] + [z0[(p, probe)] for p in ("dimensionless",
-                                                                                               "dimensionless_muon")]
+        for pa in ("dimensionless", "dimensionless_muon"):
+            ax.plot(FT_D, [z0[(pa, probe, D)] for D in FT_D], ls=":", color=col[pa],
+                    label=f"{FT_NAME[pa]} parent zero-shot (step 0)")
+        ys = [v[(probe, D)] for v in tab.values() for D in FT_D] + [z0[(p, probe, D)] for p in
+                                                                    ("dimensionless", "dimensionless_muon") for D in FT_D]
         ax.set_xscale("log"); ax.set_yscale("log"); ax.set_ylim(min(ys) / 1.5, max(ys) * 2.5)
         ax.set_xlabel(r"training events $D$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, label, loc="upper right")
@@ -197,8 +244,8 @@ def main():
         res["zero_shot"][a] = c
     allp = {arm: {f"{a}/{k}": v for a in AXES for k, v in reads[arm][a].items()} for arm in RUNS.values()}
     res["zero_shot"]["all"] = compare(*(allp[RUNS[k]] for k in (("AdamW", 42), ("AdamW", 43), ("Muon", 42), ("Muon", 43))))
-    tab, z0, start = ft_read()
-    res["fine_tune"] = ft_compare(tab, z0, start)
+    tab, z0, read, step0_refit = ft_read()
+    res["fine_tune"] = ft_compare(tab, z0, read, step0_refit)
     json.dump(res, open(os.path.join(HERE, "data", "muon_compare.json"), "w"), indent=1)
     plot(pre, reads)
     plot_ft(tab, z0)
@@ -217,11 +264,12 @@ def main():
                       **({"mse": {k: r2(v) for k, v in z["median_mse"].items()}} if "median_mse" in z else {})}
                   for a, z in res["zero_shot"].items()}}
     ft = res["fine_tune"]
-    out["ft"] = {sec: {k: {kk: (r2(vv) if isinstance(vv, float) else vv) for kk, vv in v.items()} for k, v in ft[sec].items()}
-                 for sec in ("parent", "ft_opt", "vs_scratch", "vs_zero_shot")}
+    rr = lambda v: {kk: (r2(vv) if isinstance(vv, float) else rr(vv) if isinstance(vv, dict) else vv)
+                    for kk, vv in v.items()}
+    out["ft"] = {sec: {k: rr(v) for k, v in ft[sec].items()}
+                 for sec in ("vs_zero_shot", "refit_vs_parent", "parent", "ft_opt", "vs_scratch")}
     out["ft"]["zs_ratio_median"] = r2(ft["zs_ratio_median"])
-    out["ft"]["zs"] = {k: r2(v["zero_shot"]) for k, v in ft["cells"].items() if "zero_shot" in v}
-    out["ft"]["start"] = {k: r2(v["start_own"]) for k, v in ft["cells"].items() if "start_own" in v}
+    out["ft"]["zs"] = {k: rr(v) for k, v in ft["cells"].items() if "zero_shot_read" in v}
     print(json.dumps(out))
 
 
