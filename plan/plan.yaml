@@ -1017,12 +1017,11 @@ entries:
   - D139
   - D140
   - D142
-  next: '(1) the five mixed-order one-loop entries (u u~ > c c~ z, d d~ > b b~ z, d d~ > c c~, d d~ > b b~, b b~ > c c~):
-    verify that a pool generated at the pure-QCD born gets an order vector (mg5_pipeline_final.order_vector, data.amp_orders)
-    different from the full-order tree pool of the same process; if yes, generate them at the pure-QCD born as catalog_v3
-    did, certify, build; if not, drop them from catalog_v4 (recorded); (2) the three off by ~0.4% (b g > b w+ w-, b b~ > ta+
-    vt w-, b b~ > h w+ w-): investigate with aMC@NLO''s own pole check (fix the check_poles command) and the per-split-order
-    variants, CPU only, report the cause before building'
+  next: 'when the two CPU jobs end (FA-ccin2p3-790fac19: build + certification of the five one-loop entries at the pure-QCD
+    born, v4_<x>_qcdborn_nlo; FA-ccin2p3-a22a1770: the three sub-percent entries b g > b w+ w-, b b~ > ta+ vt w-, b b~ > h
+    w+ w- with aMC@NLO check_poles via compile FO, the split-order variant, catalog_v3''s internal top 173), read both logs;
+    report to the user the order vectors (tree [0,0,2,3] / [0,0,2,2] against one-loop at the QCD born [1,0,2,1] / [1,0,2,0]),
+    the five''s build and certification, and the cause found for the three, before building those three'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
