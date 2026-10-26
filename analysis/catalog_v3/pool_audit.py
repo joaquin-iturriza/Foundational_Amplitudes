@@ -9,7 +9,7 @@ Per recipe entry and role (train in $SCRATCH/amp_data_cache, val and test in $DA
             one distribution, CLAUDE.md "Every role of a process samples the same distribution")
 A pool is flagged when it is missing, short, has a non-finite or zero |M|^2, ids that change, momentum violation above
 1e-6, a log10|M|^2 spread below 1e-3 (constant), or train and val medians apart by more than 0.25 val spreads.
-    python analysis/catalog_v3/pool_audit.py [--workers 8] [--out analysis/catalog_v3/pool_audit.json]
+    python analysis/catalog_v3/pool_audit.py [--workers 8] [--stages stage1 stage2 stage3] [--out analysis/catalog_v3/pool_audit.json]
 """
 import argparse, glob, json, os
 from multiprocessing import Pool
@@ -19,7 +19,10 @@ import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 STAGES = {"stage1": "recipes/catalog_v3_gen_stage1.yaml", "stage2": "recipes/catalog_v3_gen_stage2.yaml",
-          "stage3": "recipes/catalog_v3_gen_stage3.yaml"}
+          "stage3": "recipes/catalog_v3_gen_stage3.yaml",
+          # the one-loop sign transfer's extension (gen_catalog_v3.py --write-loops-signext); audited on its own
+          # (--stages signext --out analysis/catalog_v3/pool_audit_signext.json)
+          "signext": "recipes/catalog_v3_gen_signext.yaml"}
 ROLES = ("train", "val", "test")
 
 
@@ -84,8 +87,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--out", default=os.path.join(ROOT, "analysis/catalog_v3/pool_audit.json"))
+    ap.add_argument("--stages", nargs="+", default=["stage1", "stage2", "stage3"], choices=list(STAGES))
     a = ap.parse_args()
-    jobs = [(s, e) for s, r in STAGES.items() for e in yaml.safe_load(open(os.path.join(ROOT, r)))["processes"]]
+    stages = {s: STAGES[s] for s in a.stages}
+    jobs = [(s, e) for s, r in stages.items() for e in yaml.safe_load(open(os.path.join(ROOT, r)))["processes"]]
     res = {}
     with Pool(a.workers) as pl:
         for name, r in pl.imap_unordered(one, jobs, chunksize=4):
@@ -93,7 +98,7 @@ def main():
             if r["flags"]:
                 print("FLAG", r["stage"], name, "; ".join(r["flags"]), flush=True)
     summ = {}
-    for s in STAGES:
+    for s in stages:
         rs = [r for r in res.values() if r["stage"] == s]
         summ[s] = {"entries": len(rs), "flagged": sum(bool(r["flags"]) for r in rs),
                    "pools_present": sum(not r[x].get("missing") for r in rs for x in ROLES),
@@ -102,6 +107,9 @@ def main():
                                        default=None)}
         print("SUMMARY", s, json.dumps(summ[s]), flush=True)
     json.dump({"summary": summ, "pools": res}, open(a.out, "w"), indent=0)
+    for name, r in sorted(res.items()):   # one line per entry, for a reader without the cluster's file
+        print("POOL", name, json.dumps({**{x: {k: r[x].get(k) for k in ("rows", "negative", "missing")} for x in ROLES},
+                                        "flags": r["flags"]}), flush=True)
 
 
 if __name__ == "__main__":
