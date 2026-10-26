@@ -9789,24 +9789,22 @@ of the three share a test set.
     $b\bar b\to gggh$). The regeneration is now $1826$ tree entries ($218$M events, about $39$ core-hours) and $142$
     one-loop entries, about $53$\,GB of pools and $66$\,GB with the backends. Next: the regeneration on CC; then
     classes and roles on v4; then the $b$ mass in \code{particle\_ids.py}.
-  \item \textbf{State (2026-10-26, 07:40).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show}, \code{plan
-    next}); this item only summarises it. \emph{catalog\_v4}: all eight regeneration parts ended; the one-loop entries
-    whose tree mixes QCD and electroweak orders are built at the pure-QCD tree (the user: ``qcd only is fine''); MadGraph
-    had ignored every width written on an indented line, so catalog\_v4's top width is $1.4915$ everywhere (the user:
-    ``do 1.4915 for all'') and the heavy-quark, $Z'$, 2HDM and loop-induced Higgs families were rebuilt at their intended
-    widths, the old pools quarantined, not deleted (\code{tools/width\_regen.py}); waiting on the user: whether the one-loop
-    $b\bar b\to hW^+W^-$, whose top is only in the $t$-channel, is built at zero top width or dropped (the entry waits,
-    so catalog\_v4's short pretrainings wait too); still to do: catalog\_v3's six loop-induced Higgs pools' $Z$/$W$ widths,
-    the 2HDM $u\bar u\to h_2h_3g$ build check, tree pools with a $t$-channel top at multi-TeV. \emph{Preprocessing exploration} (open part):
-    the blow-up shared by the pair sign head's run and the more-signed-pools arm's second seed, in the same validation
-    interval, while the baselines' two seeds and the more-signed arm's first seed pass it (par.~\ref{par:v3_prep_signed});
-    running: the pair head with its pair channels bounded (tanh), and that second seed again with the per-step gradient
-    norm recorded; next, read the lead-up step by step, then the pair head's search over its sizes and near-zero
-    weighting, priced against the GPU budget. \emph{Storage}: the finished runs' model files deleted from a
-    committed manifest (the user: ``we can delete the models of the runs already done''). GPU budget $30$\,GPU-h while
-    Jean Zay is unused (the user, 2026-10-26).
-    % allow: 07 40 1.4915 30 because they are a clock time, the user's chosen width and the user's budget, not results
-    % allow: 2 3 6 because they are the h_2 h_3 particle labels and a count of pools named in a plan step, not results
+  \item \textbf{State (2026-10-26, 16:00).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
+    \code{plan next}); this item only summarises it. Running on CC-IN2P3: catalog\_v4 against catalog\_v3, the
+    dimensionless arm only with Muon at its search best, two seeds each, equal steps (4264; the user: ``Match steps.'',
+    ``only the winner''), with the cross reads on the 555 probes held out in both catalogs and the 13 TeV pp pools
+    (smoke passed; trainings running, the catalog\_v3 seed-42 rerun and the cross read pending); the sign-head search
+    (20 trials, Muon, objective the total validation loss on training processes; its plain Muon baseline running;
+    the collect step compares best heads-off against best heads-on inside the search and states the agent-chosen
+    ranges); the Muon fine-tune search (12 trials, lr scale and layer decay, from the stage-1 Muon parent keeping its
+    standardization). Decided today: Muon for pretraining and fine-tuning; zero top width for the one-loop
+    $b\bar b\to hW^+W^-$ only; no second seeds for the old sign arms; the 18 contaminated fine-tunes not rerun.
+    Done today: the Muon test (closed), the fine-tune weight-average bug (fixed, audited, written up), catalog\_v4
+    (complete: stage 5 built, audits clean, classes and roles its own, massless $b$ in the particle table, coupling
+    orders read from the diagrams for target and features; mixed-order entries divided by their highest
+    $\alpha_s$ power). Next: read the catalog comparison and decide the switch with the user; then the held
+    Daniel's-catalog studies adapted to the chosen catalog. Disk on CC at 90\%: the user is asked what to free.
+    % allow: 16 00 2 42 1 4264 555 13 20 12 5 90 18 4 because they are a clock time, seed and trial counts, the step horizon, the probe and pool counts, the disk share and the stage number, settings and counts named in the plan, not results
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).
