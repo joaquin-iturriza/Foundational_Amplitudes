@@ -53,6 +53,14 @@ The step
 Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
 to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 30 GPU-h (10 on Jean Zay) only if the user's words above cover it.
+How to:
+- read an entry only with `python3 tools/plan.py show <id>` (grep, awk or python on plan/plan.yaml is refused);
+  every plan subcommand takes --help.
+- `site logs <run> -n 100000` reads the whole log (the default is the last 40 lines).
+- right before submitting, `site pick FA --jobs N` with N = the jobs about to go (one pick covers N submissions
+  for 60 min).
+- ack an event with `site ack E<n> --note "<run id>: <what the log showed>"`.
+- never wait in the foreground (no sleep, no polling loop): record the job and end the step.
 Final message, short, readable by someone who has forgotten this entry (CLAUDE.md 0e): first the question this step
 answers and why it was asked, then what you did, what you found (numbers) and what it changes, the figure files that show it (absolute paths of the
 .png, every result has one: the main session sends them to the user with the result), what you recorded, the next

@@ -14,7 +14,14 @@ A merge's range check gets CHECK_S seconds; past that the merge is let through (
 Installed with the switch-over (tools/switch_over.sh), which sets core.hooksPath once, before this guard exists."""
 import json, os, re, shlex, subprocess, sys
 
-WRAPPERS = {"command", "env", "sudo", "nice", "time", "nohup", "exec"}
+WRAPPERS = {"command", "env", "sudo", "nice", "time", "nohup", "exec", "then", "do", "else", "elif", "if", "while",
+            "until", "!", "{", "xargs"}
+# git in command position, for a command shlex cannot parse (a heredoc with an apostrophe, $'...'): only then is it
+# refused as unparseable; a python -c or sed that merely names git is not a git command
+GIT_AT_CMD = re.compile(r"(?:^|[;&|()`\n{!]|\$\(|-c\s+['\"]|\b(?:then|do|else|elif|if|while|until|xargs)\s)\s*"
+                        r"(?:[A-Za-z_]\w*=\S*\s+)*(?:(?:command|env|sudo|nice|time|nohup|exec)\s+(?:-\S+\s+)*)*"
+                        r"(?:\S*/)?git(?=\s|$|[;&|)])")
+READ_OPTS = {"--get", "--get-all", "--show-origin", "--show-scope", "--local", "--global", "--system", "--worktree"}
 GLOBAL_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env", "--exec-path"}
 COMMIT_ARG = set("mFCct")                      # git commit short options that take a value
 CHECK_S = 90             # seconds for the claims check of a merge's range; registered with a 120 s hook timeout
@@ -98,6 +105,14 @@ def refs(args, with_value=("-m", "-s", "-X", "--strategy", "--strategy-option", 
     return out
 
 
+def reads_hookspath(sub, args):
+    """`git config [--get|--show-origin|scope...] core.hooksPath` or `git config get core.hooksPath`: a read."""
+    a = [x.lower() for x in args]
+    if a[:1] == ["get"]:
+        a = a[1:]
+    return sub == "config" and [x for x in a if x not in READ_OPTS] == ["core.hookspath"]
+
+
 def check_range(repo, rng):
     v = os.path.join(repo, "tools", "verify_claims.py")
     if not os.path.exists(v):
@@ -119,15 +134,23 @@ def git(repo, *a):
 def refusal(cmd, cwd, depth=0):
     if re.search(r"\bGIT_CONFIG\w*", cmd):
         return "a GIT_CONFIG_* variable (it injects git config, core.hooksPath included)"
-    if re.search(r"core\.hookspath", cmd, re.I) and not re.fullmatch(
-            r"\s*git\s+config\s+(?:--get\s+)?core\.hookspath\s*", cmd, re.I):
-        return "core.hooksPath named in a command (only reading it, `git config --get core.hooksPath`, is allowed)"
-    if "git" not in cmd:
+    hp = re.search(r"core\.hookspath", cmd, re.I)
+    if not hp and "git" not in cmd:
         return None
     try:
-        segs = segments(cmd)
+        segs = segments(cmd.replace("\n", ";"))
     except ValueError:
-        return "a git command that cannot be parsed"
+        if hp:
+            return "core.hooksPath named in a command that cannot be parsed"
+        return "a git command that cannot be parsed" if GIT_AT_CMD.search(cmd) else None
+    for seg in segs:
+        if any(re.search(r"core\.hookspath", t, re.I) for t in seg):
+            g = git_call(seg)
+            words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
+            shell = bool(words) and os.path.basename(words[0]) in ("sh", "bash", "zsh", "dash", "eval")
+            if not shell and not (g and not g[1] and reads_hookspath(g[2], g[3])):
+                return ("core.hooksPath named in a command (only reading it, `git config core.hooksPath`, "
+                        "is allowed)")
     for seg in segs:
         words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
         prog = os.path.basename(words[0]) if words else ""
@@ -149,8 +172,7 @@ def refusal(cmd, cwd, depth=0):
         repo = os.path.join(cwd, cdir) if cdir else cwd
         if any(c.split("=")[0].lower() in ("core.hookspath",) for c in confs):
             return "git -c core.hooksPath (it skips the claims hooks)"
-        reading = [a.lower() for a in args] in (["core.hookspath"], ["--get", "core.hookspath"])
-        if sub == "config" and not reading and any(a.lower().split("=")[0] == "core.hookspath" for a in args):
+        if sub == "config" and not reads_hookspath(sub, args) and any(a.lower().split("=")[0] == "core.hookspath" for a in args):
             return "git config core.hooksPath (set once by tools/switch_over.sh)"
         if sub == "commit" and commit_skips(args):
             return "git commit -n / --no-verify (it skips the claims check)"

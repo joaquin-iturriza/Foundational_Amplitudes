@@ -14,7 +14,7 @@ Two files in the MAIN checkout (resolved through git's common dir, so worktrees 
                      reviewers launched [{agent, at, design_at}] and runs
 Both change only under an exclusive lock (plan/plan.yaml.lock), written through a temp file in the same directory.
 
-  plan show [--compact] | where
+  plan show [<id>] [--compact] | where   (one entry in full with an id; --help on every subcommand)
   plan add <id> --title --question --next --match GLOBS (--decision D | --ask Q)   (done_when set apart, see check)
   plan item <id> --decision D             create or attach the entry's site work item (same id, its match globs)
   plan check <id> --done-when CMD         the machine check that finishes it; refused if it passes in an empty dir
@@ -1128,6 +1128,8 @@ def cmd_where(a):
 
 def cmd_show(a):
     d, st = load()
+    if a.id and not any(e["id"] == a.id for e in d["entries"]):
+        sys.exit("plan: no entry %r (plan show lists them)" % a.id)
     for e in d["entries"]:
         s = e.get("status")
         if (a.compact and s == "done") or (a.id and e["id"] != a.id):
@@ -1800,46 +1802,95 @@ def main(argv=None):
     sub = p.add_subparsers(dest="cmd", required=True)
     A = lambda *n, **k: (n, k)
 
-    def cmd(name, f, *args):
-        s = sub.add_parser(name)
+    def cmd(name, f, help, *args):
+        s = sub.add_parser(name, help=help, description=help)
         for n, k in args:
             s.add_argument(*n, **k)
         s.set_defaults(f=f)
-    cmd("where", cmd_where)
-    cmd("show", cmd_show, A("id", nargs="?", help="one entry, with its whole evidence"), A("--compact", action="store_true"))
-    cmd("add", cmd_add, A("id"), A("--title", required=True), A("--question", required=True),
-        A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"), A("--searched"))
-    cmd("item", cmd_item, A("id"), A("--decision", required=True), A("--match"))
-    cmd("check", cmd_check, A("id"), A("--done-when", required=True), A("--replace", action="store_true"),
-        A("--stale", action="store_true"), A("--why"))
-    cmd("recheck", cmd_recheck, A("id", nargs="?"))
-    cmd("ref", cmd_ref, A("id"), A("--label", required=True))
-    cmd("answer", cmd_answer, A("id"), A("--quote", required=True), A("--kind", required=True, choices=KINDS),
-        A("--set", action="append"))
-    cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True),
+    ID = A("id", help="the plan entry's id")
+    cmd("where", cmd_where, "print the paths of the plan file, the state file and the run registry")
+    cmd("show", cmd_show, "print the entries; with an id, that one entry in full (read an entry this way, never by "
+        "grepping plan/plan.yaml)",
+        A("id", nargs="?", help="one entry, with its whole evidence, dead ends, quotes and design"),
+        A("--compact", action="store_true", help="skip done entries and print only each entry's next step"))
+    cmd("add", cmd_add, "add a new entry (running with --decision, waiting on the user with --ask)", ID,
+        A("--title", required=True, help="a plain name of the work"),
+        A("--question", required=True, help="the question the entry answers"),
+        A("--next", required=True, help="the next step"),
+        A("--match", required=True, help="comma-separated globs of the runs/sweeps its site work item covers"),
+        A("--decision", help="the decision (D<n>) of the user's that authorises it"),
+        A("--ask", help="the question for the user it waits on, when no decision authorises it yet"),
+        A("--searched", help="with --ask: what was read before asking, and why none of it settles the question"))
+    cmd("item", cmd_item, "create or attach the entry's site work item (same id, its match globs)", ID,
+        A("--decision", required=True, help="the decision (D<n>) that authorises the item"),
+        A("--match", help="comma-separated globs; default the entry's match"))
+    cmd("check", cmd_check, "set the entry's done_when shell check (refused if it passes in an empty dir)", ID,
+        A("--done-when", required=True, help="shell command, exit 0 = the entry is finished"),
+        A("--replace", action="store_true", help="change a done entry's check (it must pass now)"),
+        A("--stale", action="store_true", help="an open entry's check names the wrong files: the old one must fail, the new one pass (needs --why)"),
+        A("--why", help="with --stale: what in the old check was wrong"))
+    cmd("recheck", cmd_recheck, "rerun the done entries' done_when checks with no time limit",
+        A("id", nargs="?", help="only this entry"))
+    cmd("ref", cmd_ref, "set the entry's notes_ref", ID,
+        A("--label", required=True, help="an existing \\label in docs/results.tex"))
+    cmd("answer", cmd_answer, "record the user's answer: site decide, then the entry, all or nothing", ID,
+        A("--quote", required=True, help="the user's exact words"),
+        A("--kind", required=True, choices=KINDS, help="the kind of decision the words make"),
+        A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
+          "(repeatable)"))
+    cmd("ask", cmd_ask, "put an open question for the user on the entry", ID,
+        A("--ask", required=True, help="the question, as sent to the user"),
+        A("--searched", required=True, help="what was read before asking (CLAUDE.md rules, site decisions) and why "
+          "none settles it"),
         A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
         A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
-    cmd("design", cmd_design, A("id"), *[A("--" + k, required=True) for k in DESIGN_FIELDS])
-    cmd("design-pass", cmd_design_pass, A("id"), A("--reviewer", required=True))
-    cmd("design-fix", cmd_design_fix, A("id"), A("--reasons", required=True))
-    cmd("review", cmd_review, A("id"), A("--agent", required=True))
-    cmd("unanswered", cmd_unanswered, A("id"))
-    cmd("step", cmd_step, A("id"), A("--agent", required=True))
-    cmd("run", cmd_run, A("id"), A("runs", nargs="*"),
+    cmd("design", cmd_design, "record the design of the entry's next job (needed, and passed by the design reviewer, "
+        "before any submission)", ID,
+        *[A("--" + k, required=True, help={
+            "question": "the question the job answers",
+            "measure": "the measurement that answers it",
+            "check": "how existing data showed the measurement moves with the tested change",
+            "fixed": "what is held fixed",
+            "control": "the matched control",
+            "seeds": "the seeds",
+            "outcome": "how the outcome reads as yes and as no"}.get(k)) for k in DESIGN_FIELDS])
+    cmd("design-pass", cmd_design_pass, "the design reviewer's PASS on the latest design (the reviewer runs it)", ID,
+        A("--reviewer", required=True, help="the reviewer's note"))
+    cmd("design-fix", cmd_design_fix, "the design reviewer's FIX on the latest design (the reviewer runs it)", ID,
+        A("--reasons", required=True, help="what must change before the job goes"))
+    cmd("review", cmd_review, "record the design reviewer the main session launched for a design left without a "
+        "verdict", ID, A("--agent", required=True, help="the reviewer subagent's id"))
+    cmd("unanswered", cmd_unanswered, "the user's messages since the open question do not answer it (it stays open)",
+        ID)
+    cmd("step", cmd_step, "record the step agent launched for a running entry", ID,
+        A("--agent", required=True, help="the step subagent's id"))
+    cmd("run", cmd_run, "record jobs of the entry: registry runs or sweeps", ID,
+        A("runs", nargs="*", help="registry run ids (site runs)"),
         A("--sweep", action="append", help="SITE:NAME of a sweep submitted through sweep_manager (repeatable)"))
-    cmd("sweeps", cmd_sweeps, A("--fresh", action="store_true", help="read the sites now, not the cache"))
-    cmd("evidence", cmd_evidence, A("id"), A("--run", action="append"), A("--commit"), A("--path", action="append"),
+    cmd("sweeps", cmd_sweeps, "every recorded sweep's state on its site; records the unrecorded ones",
+        A("--fresh", action="store_true", help="read the sites now, not the cache"))
+    cmd("evidence", cmd_evidence, "add evidence to the entry", ID,
+        A("--run", action="append", help="a run id (repeatable)"),
+        A("--commit", help="the commit that holds the evidence"),
+        A("--path", action="append", help="a repo path (repeatable)"),
         A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
-    cmd("set-next", cmd_set_next, A("id"), A("text"))
-    cmd("dead-end", cmd_dead_end, A("id"), A("--tried", required=True), A("--why", required=True))
-    cmd("next", cmd_next, A("--prompts", action="store_true"))
-    cmd("done", cmd_done, A("id"), A("--writeup", required=True), A("--override-runs"),
+    cmd("set-next", cmd_set_next, "set the entry's next step", ID, A("text", help="the next step"))
+    cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
+        A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
+    cmd("next", cmd_next, "what can move now (exit 1 while a listed step is not launched)",
+        A("--prompts", action="store_true", help="print each step agent's exact prompt"))
+    cmd("done", cmd_done, "close the entry: done_when passes and the write-up is committed", ID,
+        A("--writeup", required=True, help="the commit of the write-up"),
+        A("--override-runs", metavar="WHY", help="close despite runs in an unknown or unreadable state; say why"),
         A("--record", help="setup entries: the file that is their record (CLAUDE.md, a tool), changed by the write-up"))
-    cmd("kind", cmd_kind, A("id"), A("kind", choices=("setup", "work")))
-    cmd("view", cmd_view, A("--write", action="store_true"))
-    cmd("claims", cmd_claims, A("--verified", action="store_true"))
-    cmd("reopen", cmd_reopen, A("id"), A("--why", required=True))
-    cmd("commit", cmd_commit)
+    cmd("kind", cmd_kind, "mark the entry setup (its record may be CLAUDE.md or a tool) or work (written up in "
+        "docs/results.tex)", ID, A("kind", choices=("setup", "work"), help="setup or work"))
+    cmd("view", cmd_view, "render the open entries as the plan block of docs/results.tex",
+        A("--write", action="store_true", help="write it into docs/results.tex instead of printing"))
+    cmd("claims", cmd_claims, "the claims check of trunk since the last verified commit, no time limit",
+        A("--verified", action="store_true", help="print the last verified commit and run nothing"))
+    cmd("reopen", cmd_reopen, "a done entry back to running", ID, A("--why", required=True, help="why it reopens"))
+    cmd("commit", cmd_commit, "commit plan/plan.yaml when a write left it uncommitted")
     a = p.parse_args(argv)
     COMMAND[:] = [a.cmd] + ([a.id] if getattr(a, "id", None) else [])
     return a.f(a) or 0

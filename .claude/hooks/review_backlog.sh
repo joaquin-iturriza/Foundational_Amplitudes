@@ -174,6 +174,15 @@ case "$mode" in
     pillar_field "$who" 1 | grep -q . || { echo "unknown reviewer '$who'" >&2; exit 2; }
     mkdir -p "$REPO/$STATE_REL"; : > "$(lock_file "$who")"
     echo "[review-backlog] $who holds the lock — edits to its pillar are allowed until 'advance'"
+    # the backlog to read, as commands: reviewers otherwise cat the state files and read this script to find it
+    read -r bl bc <<< "$(backlog_for "$who")"
+    sha=$(read_state "$who" | awk '{print $1}')
+    paths=$(pillar_field "$who" 4)
+    q=""; for p in $paths; do q="$q '$p'"; done
+    echo "watermark: $(git log -1 --format='%h %cs %s' "$sha" 2>/dev/null) (backlog: $bl lines, $bc commits)"
+    echo "the backlog (committed and uncommitted):  git diff $sha --$q"
+    echo "commits in it:                            git log --oneline $sha..HEAD --$q"
+    echo "untracked files in it:                    git ls-files --others --exclude-standard --$q"
     exit 0
     ;;
 

@@ -681,9 +681,18 @@ def git_bypass():
                "git config core.hooksPath /dev/null", "git config --unset core.hooksPath",
                "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git commit -m x",
                "git merge --no-verify side", "git pull", "bash -c 'git commit -n -m x'",
-               "eval git commit --no-verify -m x", "cd x && git commit -n -m y", "echo x >> .git/hooks/pre-commit")
+               "eval git commit --no-verify -m x", "cd x && git commit -n -m y", "echo x >> .git/hooks/pre-commit",
+               "git config --global core.hooksPath /dev/null", "git -C x config core.hooksPath /dev/null",
+               "cd x && git config core.hooksPath /dev/null", "echo core.hooksPath > f",
+               "cd x\ngit commit -n -m y", "if true; then git commit -n -m y; fi",
+               "cat <<'EOF' > f\nit's\nEOF\ngit commit -n -m y")
     allowed = ("git commit -m 'fix the -n flag'", "git commit -m -n", "git commit -am x", "git log -n 5",
-               "git config --get core.hooksPath", "git merge --abort", "git status")
+               "git config --get core.hooksPath", "git merge --abort", "git status",
+               # a read of core.hooksPath anywhere in a command; commands that only name git, even unparseable ones
+               "git config core.hooksPath", "cd /x && git config core.hooksPath",
+               "git config --show-origin core.hooksPath", "git -C /x config --get core.hooksPath",
+               "python3 -c \"print('git')\" && echo it's", "sed -i \"s/it's/x/\" tools/verify_claims.py && echo git's",
+               "grep -n git tools/verify_claims.py", "cat <<'EOF' > f\nit's git\nEOF")
     for c in refused + allowed:
         rc, out = hook(GUARD_GIT, {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": ROOT})
         scenario("3: `%s` is %s" % (c[:60], "refused" if c in refused else "allowed"), rc == (2 if c in refused else 0),
