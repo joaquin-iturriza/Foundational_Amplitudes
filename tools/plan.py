@@ -877,6 +877,9 @@ def next_steps(d, st, t=None, msgs=None):
     return out
 
 
+PROMPT_TAIL = 8               # dead ends and evidence runs / paths a step prompt carries; plan show <id> has them all
+
+
 def step_prompt(e, reason):
     tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
     qs = [(x.get("text"), x.get("said_at")) for x in e.get("quotes") or []]
@@ -886,7 +889,18 @@ def step_prompt(e, reason):
         if dd and dd["quote"]:
             qs.append((dd["quote"], dd["said_at"].isoformat() if dd["said_at"] else ""))
     q = "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
-    de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in e.get("dead_ends") or []) or "  none"
+    # the last PROMPT_TAIL dead ends and evidence items only: an entry's whole history made one prompt 17k characters
+    dl = e.get("dead_ends") or []
+    de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in dl[-PROMPT_TAIL:]) or "  none"
+    if len(dl) > PROMPT_TAIL:
+        de = "  (%d earlier dead ends not shown: python3 tools/plan.py show %s)\n" % (len(dl) - PROMPT_TAIL, e["id"]) + de
+    ev, cut = dict(e.get("evidence") or {}), []
+    for k in ("runs", "paths"):
+        if len(ev.get(k) or []) > PROMPT_TAIL:
+            cut.append("%d earlier %s" % (len(ev[k]) - PROMPT_TAIL, k))
+            ev[k] = ev[k][-PROMPT_TAIL:]
+    evidence = json.dumps(ev) + ("\n  (%s not shown: python3 tools/plan.py show %s)" % (" and ".join(cut), e["id"])
+                                 if cut else "")
     oq = "  none"
     if open_question(e):
         oq = ('  asked %s: "%s"\n  Waits on the answer: %s. Do not do or decide that part; work on the rest of the '
@@ -894,7 +908,7 @@ def step_prompt(e, reason):
                           "not recorded (only what the question itself decides)"))
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"), reason=reason,
                       next=e.get("next"), done_when=e.get("done_when"), quotes=q or "  none", dead_ends=de,
-                      evidence=json.dumps(e.get("evidence") or {}), open_question=oq,
+                      evidence=evidence, open_question=oq,
                       design=design_text(last_design(e)))
 
 
@@ -1116,7 +1130,7 @@ def cmd_show(a):
     d, st = load()
     for e in d["entries"]:
         s = e.get("status")
-        if a.compact and s == "done":
+        if (a.compact and s == "done") or (a.id and e["id"] != a.id):
             continue
         extra = ""
         if s == "running":
@@ -1149,6 +1163,8 @@ def cmd_show(a):
                 print("    user %s: \"%s\"" % ((q.get("said_at") or "")[:16], q.get("text")))
             for x in e.get("dead_ends") or []:
                 print("    dead end: %s (%s)" % (x["tried"], x["why"]))
+            if a.id and e.get("evidence"):
+                print("    evidence: " + json.dumps(e["evidence"]))
             if last_design(e):
                 print("    design:\n" + design_text(last_design(e), "      "))
 
@@ -1790,7 +1806,7 @@ def main(argv=None):
             s.add_argument(*n, **k)
         s.set_defaults(f=f)
     cmd("where", cmd_where)
-    cmd("show", cmd_show, A("--compact", action="store_true"))
+    cmd("show", cmd_show, A("id", nargs="?", help="one entry, with its whole evidence"), A("--compact", action="store_true"))
     cmd("add", cmd_add, A("id"), A("--title", required=True), A("--question", required=True),
         A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"), A("--searched"))
     cmd("item", cmd_item, A("id"), A("--decision", required=True), A("--match"))

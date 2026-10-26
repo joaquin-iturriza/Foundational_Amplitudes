@@ -1851,6 +1851,28 @@ def designs():
              rc != 0 and "existing data" in out and "designs" not in w.entries()["other"], out)
 
 
+def prompt_cap():
+    """A step prompt carries the last 8 dead ends and evidence runs / paths, with a line naming how many earlier ones
+    exist and where they are (catalog_coverage's whole history made one prompt 17k characters); plan show <id> prints
+    them all. A mechanical collect step is told to use tools/collect_run.py."""
+    des = [{"tried": "tried %02d" % i, "why": "why %02d" % i, "at": ago(60 - i)} for i in range(12)]
+    runs = ["FA-ccin2p3-r%02d" % i for i in range(20)]
+    w = World([E("cov", dead_ends=des, evidence={"runs": runs, "commit": "abc", "paths": ["p1", "p2"]})])
+    pr = w.plan_cmd("next", "--prompts")[1]
+    scenario("step prompt: only the last 8 dead ends and evidence runs, with how many earlier ones and plan show",
+             "tried 11: why 11" in pr and "tried 04: why 04" in pr and "tried 03" not in pr
+             and "(4 earlier dead ends not shown: python3 tools/plan.py show cov)" in pr
+             and "FA-ccin2p3-r19" in pr and "FA-ccin2p3-r12" in pr and "FA-ccin2p3-r11" not in pr
+             and "(12 earlier runs not shown: python3 tools/plan.py show cov)" in pr and '"p1"' in pr
+             and "earlier paths" not in pr, pr[:2500])
+    show = w.plan_cmd("show", "cov")[1]
+    scenario("plan show <id> prints that entry's every dead end and its whole evidence",
+             "tried 00" in show and "FA-ccin2p3-r00" in show and "FA-ccin2p3-r19" in show, show[-1500:])
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    scenario("the step prompt sends a mechanical collect step to tools/collect_run.py",
+             "tools/collect_run.py" in tpl and os.path.exists(os.path.join(ROOT, "tools", "collect_run.py")))
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1872,7 +1894,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
-          designs, the_suite_itself]
+          designs, prompt_cap, the_suite_itself]
 
 
 def main():
