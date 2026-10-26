@@ -2429,16 +2429,16 @@ class AmplitudeExperiment(BaseExperiment):
             # tools/mixed_order_audit.py): a mixed entry (catalog_v4's full coupling orders: QCD-EW interference, 35%
             # of its training pools) is a polynomial of total degree deg in (alpha_s, alpha), so no single monomial is
             # exact; it is divided by its highest alpha_s power, the term catalog_v3's minimal-QED pool of the same
-            # process stored alone, and the rest (a function of alpha / alpha_s) is left in the target. At the nominal
+            # process stored alone, with that term's alpha power (its diagrams' QED order: a BSM coupling such as the
+            # Z' model's enters neither power), and the rest (a function of alpha / alpha_s) is left in the target. At the nominal
             # alpha_s(M_Z) each event's alpha_s is fixed by its s_hat, so that rest is a function of the momenta. The
             # sidecar also corrects the order vector's alpha_s power where it is wrong: v4's b-quark Higgs entries
             # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g; the order
             # features read the same sidecar (_orders_from_diagrams), so input and target agree
             if pc.get("order") is None:
-                qd = self._diagram_alphas_powers(name)
-                if qd is not None:
-                    q = max(qd) + (1 if (virt and pc.get("alphas_prefactor")) else 0)
-                    e = deg - q
+                bo = self._diagram_born_orders(name)
+                if bo is not None:
+                    q, e = mg.target_monomial_from_diagrams(pc, bo)
             assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), \
                 f"target_physics_orders: {name} is a mixed-order entry {o} with no diagram sidecar to read its powers"
             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
@@ -2481,11 +2481,10 @@ class AmplitudeExperiment(BaseExperiment):
         from physics_scales import hybrid_cp
         return hybrid_cp(mom_phys)
 
-    def _diagram_alphas_powers(self, name):
-        """The alpha_s powers of a process's (Born) amplitudes, sorted, from its diagram sidecar: each diagram's QCD
-        order (the sum over its vertices), minus 2 for a one-loop QCD diagram; None without a sidecar. |M|^2's powers
-        are the pairwise means, so the highest is the largest of these (tools/mixed_order_audit.py)."""
-        cache = self.__dict__.setdefault("_diag_as_powers", {})
+    def _diagram_born_orders(self, name):
+        """The (QCD, QED) orders of a process's Born amplitudes from its diagram sidecar
+        (mg5_pipeline_final.sidecar_born_orders); None without a sidecar."""
+        cache = self.__dict__.setdefault("_diag_born_orders", {})
         if name not in cache:
             ddir = self.cfg.model.get("diagrams_dir", "data/diagrams")
             ddir = ddir if os.path.isabs(ddir) else os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
@@ -2494,14 +2493,15 @@ class AmplitudeExperiment(BaseExperiment):
                 cache[name] = None
             else:
                 import mg5_pipeline_final as mg
-                cache[name] = mg.sidecar_qcd_orders(path)
+                cache[name] = mg.sidecar_born_orders(path)
         return cache[name]
 
     def _orders_from_diagrams(self, names, orders):
         """The order features' coupling powers from the generated diagrams (mg5_pipeline_final.order_vector_from_diagrams),
-        the same source the dimensionless target's alpha_s power reads (_diagram_alphas_powers), so input and target
+        the same source the dimensionless target's coupling monomial reads (_diagram_born_orders), so input and target
         cannot disagree: the hand-set table claims an alpha_s^2 term for catalog_v4's b-quark Higgs entries (massless b,
-        purely electroweak) and misses the gluon of zp_uux_Y1g and thdm_uux_h2h3g (plan catalog_coverage). A mixed entry
+        purely electroweak) and misses the gluon of zp_uux_Y1g and thdm_uux_h2h3g, and counts the Z' coupling of
+        zp_uux_Y1g as alpha^2 (plan catalog_coverage). A mixed entry
         keeps the convention of the four-quark entries, both maxima (the largest alpha_s power and the largest alpha
         power), so the feature says which monomials the stored target holds; the target divides by the first.
         Idempotent; entries with an explicit order (loop-induced) or without a sidecar keep theirs (the latter listed).
@@ -2518,7 +2518,7 @@ class AmplitudeExperiment(BaseExperiment):
             if pc is None or pc.get("order") is not None or "nfinal" not in pc or len(o) != 4:
                 out.append(o)
                 continue
-            qd = self._diagram_alphas_powers(name)
+            qd = self._diagram_born_orders(name)
             if qd is None:
                 missing.append(name)
                 out.append(o)

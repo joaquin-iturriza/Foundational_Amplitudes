@@ -516,37 +516,49 @@ def normalize_order_vector(o, cfg=None):
     raise ValueError(f"amp_orders entry must have 2 or 4 components, got {o}")
 
 
-def sidecar_qcd_orders(path):
-    """The QCD orders of a process's Born amplitudes, sorted, from its diagram sidecar (tools/dump_diagrams.py): each
-    diagram's QCD order (the sum over its vertices), minus 2 for a one-loop QCD diagram. An amplitude of QCD order a
-    carries g_s^a, so |M|^2's alpha_s powers run from the least to the largest of these (tools/mixed_order_audit.py)."""
+def sidecar_born_orders(path):
+    """The (QCD, QED) orders of a process's Born amplitudes, sorted, from its diagram sidecar (tools/dump_diagrams.py):
+    each diagram's sums over its vertices, the QCD one minus 2 for a one-loop diagram (the loop's two powers of g_s;
+    the sum is then the Born's whatever the loop, so an electroweak loop lands on the same total). An amplitude of
+    orders (a, b) carries g_s^a e^b, so |M|^2's alpha_s powers run between the least and the largest a, its alpha
+    powers between the least and the largest b. A non-SM coupling (the Z' model's DMV) is neither: a fixed constant
+    of the model, it enters no power. None without diagrams (tools/mixed_order_audit.py reads the QCD half)."""
     out = set()
     with open(path) as f:
         d = json.load(f)
     for sp in d["subprocesses"]:
         for dg in sp["diagrams"]:
-            a = sum(int(n.get("orders", {}).get("QCD", 0)) for n in dg["nodes"] if n["kind"] == "vertex")
-            out.add(a - 2 if dg.get("diagram_type") == "loop" else a)
+            o = [n.get("orders", {}) for n in dg["nodes"] if n["kind"] == "vertex"]
+            a = sum(int(x.get("QCD", 0)) for x in o)
+            b = sum(int(x.get("QED", 0)) for x in o)
+            out.add((a - 2 if dg.get("diagram_type") == "loop" else a, b))
     return sorted(out) or None
 
 
-def order_vector_from_diagrams(cfg, qcd_orders, o=None):
+def order_vector_from_diagrams(cfg, born_orders, o=None):
     """The order vector of a catalog entry's stored target with its coupling powers read from the generated diagrams
-    (sidecar_qcd_orders) instead of the catalog's hand-set alphas_power and QED<=N, in order_vector's convention:
-    [L_QCD, L_EW, alpha_s power max, alpha power max]. Tree |M|^2 (or a stripped virtual's Born) is a polynomial of total
-    degree nfinal in (alpha_s, alpha), its alpha_s powers from min to max of the amplitude QCD orders, so the alpha_s
-    maximum is the largest order and the alpha maximum nfinal minus the least: a pure entry gets [k, nfinal - k], a
-    mixed one both maxima, as order_vector records the four-quark entries. With alphas_prefactor (an alpha_s scan of a
-    stripped virtual) the restored alpha_s / 2 pi adds one alpha_s power. The loop counts are kept from `o` (default
-    order_vector(cfg)); an entry with an explicit order (loop-induced) or without diagrams keeps `o`.
-    Only the model's order features and the target read this: the pools' recipe_id leaves amp_orders out and keys on
-    alphas_power, which stays the catalog's, so no stored pool or recipe id changes."""
+    (sidecar_born_orders) instead of the catalog's hand-set alphas_power and QED<=N, in order_vector's convention:
+    [L_QCD, L_EW, alpha_s power max, alpha power max]. A pure entry gets its one monomial, a mixed one (QCD-EW
+    interference) both maxima, as order_vector records the four-quark entries; for the SM's trees this is
+    [k, nfinal - k] and [k_max, nfinal - k_min], and a BSM coupling counts in neither (zp_ee_Y1a: alpha^1, not 2).
+    With alphas_prefactor (an alpha_s scan of a stripped virtual) the restored alpha_s / 2 pi adds one alpha_s power.
+    The loop counts are kept from `o` (default order_vector(cfg)); an entry with an explicit order (loop-induced) or
+    without diagrams keeps `o`. Only the model's order features and the target read this: the pools' recipe_id leaves
+    amp_orders out and keys on alphas_power, which stays the catalog's, so no stored pool or recipe id changes."""
     o = list(order_vector(cfg) if o is None else o)
-    if cfg.get("order") is not None or not qcd_orders:
+    if cfg.get("order") is not None or not born_orders:
         return o
     pref = 1 if (cfg.get("kind") == "virt" and cfg.get("alphas_prefactor")) else 0
-    n = int(cfg["nfinal"])
-    return [int(o[0]), int(o[1]), int(max(qcd_orders)) + pref, n - int(min(qcd_orders))]
+    return [int(o[0]), int(o[1]), max(a for a, _ in born_orders) + pref, max(b for _, b in born_orders)]
+
+
+def target_monomial_from_diagrams(cfg, born_orders):
+    """(alpha_s power, alpha power) the dimensionless target divides by: the monomial with the highest alpha_s power
+    (catalog_v3's minimal-QED pool of the same process stores it alone) and, among its diagrams, the highest alpha
+    power; alphas_prefactor adds one alpha_s power as above."""
+    pref = 1 if (cfg.get("kind") == "virt" and cfg.get("alphas_prefactor")) else 0
+    q = max(a for a, _ in born_orders)
+    return q + pref, max(b for a, b in born_orders if a == q)
 
 
 PROCESSES = {

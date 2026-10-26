@@ -6,7 +6,8 @@ The catalog table (mg5_pipeline_final.order_vector, from alphas_power and QED<=N
 Higgs entries (massless b, no Yukawa: purely electroweak, the table claims alpha_s^2 or alpha_s^3) and for the two BSM
 entries with a gluon (Z' + g, the 2HDM h2 h3 + g: the table has no alpha_s), in both catalogs. Expected values: the
 diagram audit (tools/mixed_order_audit.py, analysis/catalog_v4/data/mixed_order_audit.json), each a single amplitude
-QCD order k, so [0, 0, k, nfinal - k].
+QCD order k, so [0, 0, k, nfinal - k] for the SM entries; the Z' coupling (the model's DMV order) is neither alpha_s
+nor alpha, so Z' + g is [0, 0, 1, 0].
 
 Part 1 (any machine, no torch): order_vector_from_diagrams on hand-made sidecars (pure, mixed, stripped virtual,
 alphas_prefactor, explicit order) and recipe_id's independence of amp_orders.
@@ -26,7 +27,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import mg5_pipeline_final as mg  # noqa: E402
 
-# name: (nfinal, the single amplitude QCD order the diagrams have)
+# name: (nfinal, the single amplitude QCD order the diagrams have); the alpha power is nfinal - k unless EXPECT says
 B_HIGGS_TRAIN = {
     "v4_bb_abbh": (4, 0), "v4_bb_bbgh": (4, 1), "v4_bb_bbh": (3, 0), "v4_bb_bbhh": (4, 0), "v4_bbx_abbxh": (4, 0),
     "v4_bbx_bbxgh": (4, 1), "v4_bbx_bbxh": (3, 0), "v4_bbx_ccxh": (3, 0), "v4_db_abdh": (4, 0), "v4_db_bdh": (3, 0),
@@ -39,15 +40,21 @@ B_HIGGS_HELDOUT = {
 }
 BSM = {"v4_zp_uux_Y1g": (2, 1), "v4_thdm_uux_h2h3g": (3, 1), "zp_uux_Y1g": (2, 1), "thdm_uux_h2h3g": (3, 1)}
 AFFECTED = {**B_HIGGS_TRAIN, **B_HIGGS_HELDOUT, **BSM}
+EXPECT = {n: [0, 0, k, nf - k] for n, (nf, k) in AFFECTED.items()}
+EXPECT.update({"v4_zp_uux_Y1g": [0, 0, 1, 0], "zp_uux_Y1g": [0, 0, 1, 0]})
 RECIPES = ["recipes/catalog_v4_train.yaml", "recipes/catalog_v4_shared_heldout.yaml",
            "recipes/catalog_v3_train.yaml", "recipes/catalog_v3_shared_heldout.yaml"]
 
 
 def _sidecar(d, name, orders, loop=False):
-    """A minimal sidecar: one diagram per QCD order, its vertices carrying that order."""
-    dg = [{"diagram_type": "loop" if loop else "tree",
-           "nodes": [{"kind": "vertex", "orders": {"QCD": a + (2 if loop else 0)}}, {"kind": "external"}]}
-          for a in orders]
+    """A minimal sidecar: one diagram per (QCD, QED[, DMV]) order, one vertex carrying it."""
+    dg = []
+    for o in orders:
+        od = {"QCD": o[0] + (2 if loop else 0), "QED": o[1]}
+        if len(o) > 2:
+            od["DMV"] = o[2]
+        dg.append({"diagram_type": "loop" if loop else "tree",
+                   "nodes": [{"kind": "vertex", "orders": od}, {"kind": "external"}]})
     p = os.path.join(d, f"{name}.diagrams.json")
     json.dump({"subprocesses": [{"diagrams": dg}]}, open(p, "w"))
     return p
@@ -57,24 +64,30 @@ def test_from_diagrams():
     with tempfile.TemporaryDirectory() as d:
         pure = {"nfinal": 3, "alphas_power": 2, "mg5_generate": ["b b~ > b b~ h QED<=3"]}
         assert mg.order_vector(pure) == [0, 0, 2, 3]                       # the table's claim
-        q = mg.sidecar_qcd_orders(_sidecar(d, "pure", [0]))
-        assert q == [0] and mg.order_vector_from_diagrams(pure, q) == [0, 0, 0, 3]
+        q = mg.sidecar_born_orders(_sidecar(d, "pure", [(0, 3)]))
+        assert q == [(0, 3)] and mg.order_vector_from_diagrams(pure, q) == [0, 0, 0, 3]
+        assert mg.target_monomial_from_diagrams(pure, q) == (0, 3)
         mixed = {"nfinal": 2, "alphas_power": 2, "mg5_generate": ["u u~ > d d~ QED<=2"]}
-        q = mg.sidecar_qcd_orders(_sidecar(d, "mixed", [0, 2, 1]))
-        assert q == [0, 1, 2] and mg.order_vector_from_diagrams(mixed, q) == [0, 0, 2, 2]   # both maxima
+        q = mg.sidecar_born_orders(_sidecar(d, "mixed", [(0, 2), (2, 0), (1, 1)]))
+        assert mg.order_vector_from_diagrams(mixed, q) == [0, 0, 2, 2]   # both maxima
+        assert mg.target_monomial_from_diagrams(mixed, q) == (2, 0)      # the highest alpha_s monomial
+        zp = {"nfinal": 2, "alphas_power": 0, "mg5_generate": ["u u~ > y1 g"]}
+        q = mg.sidecar_born_orders(_sidecar(d, "zp", [(1, 0, 1)]))
+        assert mg.order_vector_from_diagrams(zp, q) == [0, 0, 1, 0] and mg.target_monomial_from_diagrams(zp, q) == (1, 0)
         # a stripped virtual: loop diagrams' QCD orders minus 2 are the Born's; the loop count is kept
         virt = {"nfinal": 2, "kind": "virt", "alphas_power": 1, "virt_base": None}
-        q = mg.sidecar_qcd_orders(_sidecar(d, "virt", [0], loop=True))
-        assert q == [0] and mg.order_vector_from_diagrams(virt, q, [1, 0, 0, 2]) == [1, 0, 0, 2]
+        q = mg.sidecar_born_orders(_sidecar(d, "virt", [(0, 2)], loop=True))
+        assert q == [(0, 2)] and mg.order_vector_from_diagrams(virt, q, [1, 0, 0, 2]) == [1, 0, 0, 2]
         assert mg.order_vector_from_diagrams({**virt, "alphas_prefactor": True}, q, [1, 0, 1, 2]) == [1, 0, 1, 2]
+        assert mg.target_monomial_from_diagrams({**virt, "alphas_prefactor": True}, q) == (1, 2)
         expl = {"nfinal": 2, "order": [1, 0, 2, 2]}
-        assert mg.order_vector_from_diagrams(expl, [0]) == [1, 0, 2, 2]  # loop-induced: explicit order kept
-        assert mg.order_vector_from_diagrams(pure, None) == [0, 0, 2, 3]  # no sidecar: the table
-    # the affected entries' table values really are wrong, and the expected vectors are pure
+        assert mg.order_vector_from_diagrams(expl, [(0, 2)]) == [1, 0, 2, 2]  # loop-induced: explicit order kept
+        assert mg.order_vector_from_diagrams(pure, None) == [0, 0, 2, 3]     # no sidecar: the table
+    # the affected entries' table values really are wrong
     for n, (nf, k) in AFFECTED.items():
         pc = mg.PROCESSES[n]
         assert int(pc["nfinal"]) == nf, n
-        assert mg.order_vector(pc)[2] != k, (n, mg.order_vector(pc))
+        assert mg.order_vector(pc) != EXPECT[n], (n, mg.order_vector(pc))
     print("[from_diagrams] ok")
 
 
@@ -83,7 +96,7 @@ def test_recipe_id_ignores_orders():
         pc = mg.PROCESSES[n]
         lo = max(25.0, 1.05 * sum(pc.get("m_finals", [0.0] * nf)))
         rec = mg.variable_energy_recipe(n, lo, 1000.0, 10000, role="val", seed=42)
-        alt = dict(rec, amp_orders=[0, 0, k, nf - k])
+        alt = dict(rec, amp_orders=EXPECT[n])
         assert mg.recipe_id(rec) == mg.recipe_id(alt), n
         assert mg.recipe_output_path(rec, "/x") == mg.recipe_output_path(alt, "/x"), n
     print("[recipe_id] ok: amp_orders is not part of a pool's identity or path")
@@ -111,15 +124,30 @@ def test_site():
         base = {p["name"]: p.get("base", p["name"]).split("__")[0] for p in procs}   # a decorated variant (__c30)
         hit = [n for n in names if base[n] in AFFECTED]
         for n in hit:
-            nf, k = AFFECTED[base[n]]
-            assert got[n] == [0, 0, k, nf - k], (n, got[n], table[n])
-        # every other change must be a mixed entry's alpha maximum the diagrams pin below the QED<=N bound, never an
-        # alpha_s power (the audit found the 17 + 8 above as the only alpha_s disagreements)
+            assert got[n] == EXPECT[base[n]], (n, got[n], table[n])
+        # no other entry may change: the audit found the 17 + 8 above as the only alpha_s disagreements, and the QED
+        # orders of every other entry agree with the table (QED<=N where it bounds a mixed entry, nfinal - k otherwise)
         other = {n: (table[n], got[n]) for n in names if base[n] not in AFFECTED and got[n] != table[n]}
-        bad = {n: v for n, v in other.items() if v[0][:3] != v[1][:3]}
-        assert not bad, f"{rf}: alpha_s power changed outside the expected entries: {bad}"
-        print(f"[site] {os.path.basename(rf)}: {len(hit)} expected entries have the diagram's orders; "
-              f"{len(other)} others change only their alpha maximum: {sorted(other.items())[:10]}")
+        assert not other, f"{rf}: order features changed outside the expected entries: {other}"
+        print(f"[site] {os.path.basename(rf)}: {len(hit)} expected entries have the diagram's orders, "
+              f"the other {len(names) - len(hit)} the table's")
+        # the target's monomial against the rule it replaces (alpha power = total degree - alpha_s power): they differ
+        # only where a non-SM coupling enters (listed)
+        tdiff = {}
+        for n in names:
+            pc = mg.PROCESSES.get(n) or mg.PROCESSES.get(base[n])
+            bo = exp._diagram_born_orders(n)
+            if bo is None or pc.get("order") is not None:
+                continue
+            virt = pc.get("kind") == "virt"
+            deg = int(pc["nfinal"]) + (1 if (virt and pc.get("alphas_prefactor")) else 0)
+            q, e = mg.target_monomial_from_diagrams(pc, bo)
+            if (q, e) != (q, deg - q):
+                tdiff[n] = (q, e, deg - q)
+        assert set(base[n] for n in tdiff) <= {"v4_zp_uux_Y1g", "zp_uux_Y1g", "v4_zp_ee_Y1a", "zp_ee_Y1a",
+                                                "v4_zp_uux_Y1z", "zp_uux_Y1z"}, tdiff
+        print(f"[site] {os.path.basename(rf)}: target alpha power differs from total degree minus alpha_s power on "
+              f"{len(tdiff)} entries (the Z' coupling, counted in neither): {tdiff}")
         # pools: the same paths and recipe ids at the current code (a cache hit, nothing generated)
         for p in procs:
             if base[p["name"]] not in AFFECTED:
