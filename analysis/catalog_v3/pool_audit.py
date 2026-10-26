@@ -25,7 +25,7 @@ STAGES = {"stage1": "recipes/catalog_v3_gen_stage1.yaml", "stage2": "recipes/cat
           "signext": "recipes/catalog_v3_gen_signext.yaml",
           # catalog_v4 (D130), audited on its own (--stages v4_stage1 v4_stage2 v4_stage3 v4_stage4 --out ...): the same
           # checks plus the v4 kinematics, b legs massless (the five-flavour scheme) and sqrt(s_hat) inside the window
-          **{f"v4_stage{k}": f"recipes/catalog_v4_gen_stage{k}.yaml" for k in (1, 2, 3, 4)}}
+          **{f"v4_stage{k}": f"recipes/catalog_v4_gen_stage{k}.yaml" for k in (1, 2, 3, 4, 5)}}
 B_MASS_TOL = 1e-2      # GeV: a massless leg's sqrt|E^2 - p^2| in float64 at 20 TeV is ~1e-5 GeV, a 4.7 GeV b is far above
 ROLES = ("train", "val", "test")
 
