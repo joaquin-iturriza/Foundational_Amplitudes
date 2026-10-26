@@ -1112,11 +1112,9 @@ entries:
   - D142
   - D145
   - D154
-  next: 'When the four stage-5 tree shards (FA-ccin2p3-5826d401, e1bd8668, 16686dbf, f5a04d70; job_catalog_v4_regen.sh V4REGEN_STAGES=5
-    N=4) and the pool audit chained after them (FA-ccin2p3-0dea3852, AUDIT_STAGES=v4_stage5, $SCRATCH/zz_pool_audit_v4_stage5.json,
-    POOL/FLAG lines in its log) end: read the logs (V4REGEN_DONE per shard, every stage-5 pool 1e5/1e4/1e4 rows, no FLAG lines),
-    rerun any failed shard (resumable). Then catalog_v4''s short pretrainings: the baseline arm on catalog_v4 against catalog_v3''s
-    baseline short pretraining, Muon per D155 at its stage-2 search best, design per CLAUDE.md 0e, under the GPU budget'
+  next: 'Stage-5 pools complete and clean (525/525, audit 0 flagged). Next: catalog_v4''s short pretrainings: the baseline
+    arm on catalog_v4 against catalog_v3''s baseline short pretraining, Muon per D155 at its stage-2 search best, design per
+    CLAUDE.md 0e, under the GPU budget'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
