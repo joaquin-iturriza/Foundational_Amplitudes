@@ -1,0 +1,137 @@
+"""Reads the signed-data check on catalog_v3 (prep_signed_pools.py, run on CC; its SIGNED_DATA lines copied home into
+data/prep_signed_raw.txt) against the short pretrainings' signs on the same pools (data/short_reads/<arm>/H5_signed.txt,
+tools/signed_ab_score.py: each arm's wrong-sign share on the held-out one-loop pools it resolves as sign-changing).
+Per set (the one-loop pools of the training recipe, and of the one-loop held-out axis H5), over the sign-changing pools:
+the medians of the negative share, the shares within a factor 10 and 100 of zero, the wrong-sign share of one sign per
+pool (err_major), of a classifier on the invariants (err_mlp, and within a factor 10 of zero) and on log s_hat alone
+(err_shat), and the magnitude's shape per target (raw, + (N - 4) log s_hat, + the emission scales) with the per-pool
+ratio of each to the raw one. On the held-out pools, per arm: the median wrong-sign share, how many pools it gets worse
+than one sign per pool would, and the median of its wrong-sign share less the classifier's.
+Figure: per sign-changing pool, (a) the classifier's wrong-sign share against one sign per pool's, (b) on the held-out
+pools, each arm's wrong-sign share against one sign per pool's.
+    python3 analysis/catalog_v3/prep_signed.py   -> data/prep_signed.json, figs/prep_signed.{png,pdf}
+"""
+import json, os, sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+SETS = ("train", "H5")
+TARGETS = ("raw", "dless", "qperp")
+ARMS = {"baseline": "base", "dimensionless": "qperp", "dimensionless_shat": "shat", "dimensionless_hybrid": "hyb",
+        "dimensionless_blend025": "b25", "dimensionless_blend050": "b50", "dimensionless_context": "ctx",
+        "dimensionless_twin": "twin"}
+
+
+def load_raw():
+    rows = []
+    for l in open(os.path.join(HERE, "data", "prep_signed_raw.txt")):
+        if l.startswith("SIGNED_DATA "):
+            rows.append(json.loads(l[len("SIGNED_DATA "):]))
+    return rows
+
+
+def key(r):
+    f = r["files"][0]
+    return f[: f.index("GeV_") + 3]                    # v3_<name>_<lo>-<hi>GeV, the scorer's pool name
+
+
+def arm_signs(arm):
+    f = os.path.join(HERE, "data", "short_reads", arm, "H5_signed.txt")
+    out = {}
+    for l in open(f):
+        if "SIGNED_AB " in l:
+            d = json.loads(l.split("SIGNED_AB ", 1)[1])
+            if "skipped" not in d and "error" not in d:
+                out[d["pool"]] = d["wrong_sign"]
+    return out
+
+
+def med(v):
+    v = [x for x in v if x is not None]
+    return float(np.median(v)) if v else None
+
+
+def main():
+    rows = load_raw()
+    out = {"errors": [(r["set"], r["name"], r["error"]) for r in rows if "error" in r]}
+    flat = {"n_errors": len(out["errors"])}
+    sig = {s: [r for r in rows if r["set"] == s and r.get("signed") and "error" not in r] for s in SETS}
+    for s in SETS:
+        allp = [r for r in rows if r["set"] == s and "error" not in r]
+        d = sig[s]
+        o = {"n_pools": len(allp), "n_signed": len(d)}
+        for k in ("neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near", "err_major_near", "err_shat"):
+            o[k] = med([r[k] for r in d])
+        o["mlp_over_major"] = med([r["err_mlp"] / r["err_major"] for r in d if r["err_major"] > 0])
+        o["n_mlp_below_5pct"] = int(sum(r["err_mlp"] < 0.05 for r in d))
+        o["n_major_below_5pct"] = int(sum(r["err_major"] < 0.05 for r in d))
+        o["n_rare"] = int(sum(bool(r.get("rare")) for r in d))
+        for t in TARGETS:
+            o[f"shape_{t}"] = med([r[f"shape_{t}"] for r in d])
+            o[f"frac_{t}"] = med([r[f"frac_{t}"] for r in d])
+            if t != "raw":
+                rr = np.array([r[f"shape_{t}"] / r["shape_raw"] for r in d])
+                o[f"{t}_over_raw"] = float(np.median(rr))
+                o[f"{t}_above_raw"] = int((rr > 1).sum())
+        out[s] = o
+        print(s, json.dumps({k: (round(v, 4) if isinstance(v, float) else v) for k, v in o.items()}))
+        sh = {"train": "tr", "H5": "H5"}[s]
+        for k in ("n_pools", "n_signed", "neg", "near10", "near100", "err_major", "err_mlp", "err_mlp_near",
+                  "err_shat", "mlp_over_major", "n_mlp_below_5pct", "n_major_below_5pct", "n_rare", "shape_raw", "shape_dless", "shape_qperp",
+                  "dless_over_raw", "qperp_over_raw", "qperp_above_raw"):
+            v = o[k]
+            flat[f"{sh}_{k}"] = round(v, 3) if isinstance(v, float) else v
+    # the arms' signs on the held-out pools, against the data's floors on the same pools
+    h5 = {key(r): r for r in sig["H5"]}
+    out["arms"] = {}
+    for arm, sh in ARMS.items():
+        ws = arm_signs(arm)
+        ps = sorted(set(ws) & set(h5))
+        w = np.array([ws[p] for p in ps]); mj = np.array([h5[p]["err_major"] for p in ps])
+        ml = np.array([h5[p]["err_mlp"] for p in ps])
+        o = {"n": len(ps), "unmatched": sorted(set(ws) - set(h5)), "wrong_sign": float(np.median(w)),
+             "worse_than_major": int((w > mj + 0.01).sum()), "minus_mlp": float(np.median(w - ml)),
+             "per_pool": {p: ws[p] for p in ps}}
+        out["arms"][arm] = o
+        print(f"{arm:24s} n={o['n']:2d} wrong {o['wrong_sign']:.3f} worse-than-one-sign {o['worse_than_major']} "
+              f"minus-classifier {o['minus_mlp']:.3f} unmatched {o['unmatched']}")
+        flat[f"{sh}_n"] = o["n"]
+        flat[f"{sh}_wrong"] = round(100 * o["wrong_sign"])
+        flat[f"{sh}_worse_major"] = o["worse_than_major"]
+        flat[f"{sh}_minus_mlp"] = round(100 * o["minus_mlp"])
+    out["pools"] = {s: {key(r): {k: r.get(k) for k in ("name", "neg", "near10", "err_major", "err_mlp", "err_shat",
+                                                         "shape_raw", "shape_dless", "shape_qperp")} for r in sig[s]}
+                    for s in SETS}
+    json.dump(out, open(os.path.join(HERE, "data", "prep_signed.json"), "w"), indent=1)
+    plot(sig, h5, out)
+    print(json.dumps(flat))
+
+
+def plot(sig, h5, out):
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    ax = axs[0]
+    for s, col, mk, lab in (("train", ps.C.blue, "o", "training pools"), ("H5", ps.C.vermillion, "^", "held-out pools")):
+        ax.plot([r["err_major"] for r in sig[s]], [r["err_mlp"] for r in sig[s]], mk, mfc="none", color=col, label=lab)
+    ax.plot([0, 0.5], [0, 0.5], ls="--", color=ps.C.grey, label="equal")
+    ax.set_xlabel("wrong sign, one sign per pool"); ax.set_ylabel("wrong sign, classifier on the invariants")
+    ps.legend(ax, "upper left")
+    ax = axs[1]
+    ps_ = sorted(h5)
+    for arm, col, mk, lab in (("baseline", ps.C.grey, "s", "baseline"), ("dimensionless", ps.C.blue, "o", "emission scales"),
+                              ("dimensionless_hybrid", ps.C.vermillion, "^", "hybrid")):
+        pp = out["arms"][arm]["per_pool"]
+        xs = [h5[p]["err_major"] for p in ps_ if p in pp]; ys = [pp[p] for p in ps_ if p in pp]
+        ax.plot(xs, ys, mk, mfc="none", color=col, label=lab)
+    ax.plot([0, 0.5], [0, 0.5], ls="--", color=ps.C.grey, label="one sign per pool")
+    ax.set_xlabel("wrong sign, one sign per pool"); ax.set_ylabel("wrong sign, zero-shot")
+    ps.legend(ax, "upper left")
+    for ax in axs:
+        ps.make_room(ax, max_growth=4)
+    ps.save(fig, os.path.join(HERE, "figs", "prep_signed"))
+
+
+if __name__ == "__main__":
+    main()
