@@ -1103,10 +1103,10 @@ entries:
   - D142
   - D145
   - D154
-  next: 'Read FA-ccin2p3-b508f477''s log: WT0_CARD lines (b b~ > h w+ w- one-loop card DECAY 6 at 0 in column 1, b b~ > ta+
-    vt w- at 1.4915), WT0_DIAG redrawn fraction over [286, 6000] GeV against the 2% guard, then whether V4REGEN_DONE built
-    v4_bbx_hwpwm_nlo''s three pools; then the pool check, classes and roles, the massless b in particle_ids.py, and catalog_v4''s
-    short pretrainings'
+  next: 'Read FA-ccin2p3-66920c4c''s log (cards and pole guard already passed: 0 of 1000 refused, max double-pole deviation
+    8e-6 over 286 to 6000 GeV at zero top width): check V4REGEN_DONE and that v4_bbx_hwpwm_nlo''s train, val and test pools
+    were built with no pole-guard refusal; then the pool check, classes and roles, the massless b in particle_ids.py, and
+    catalog_v4''s short pretrainings'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
