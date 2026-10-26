@@ -1303,7 +1303,9 @@ entries:
     and run tools/catalog_ft.py from runs/catalog_v3_short/dimensionless and dimensionless_muon, each with --optimizer AdamW
     and MuonAdamW (64 runs, ~2.8 GPU-h). Stage 2 (~34 GPU-h) only if stage 1 is inconclusive.; ALSO: 16 from-scratch runs
     on the same 4 probes x 4 D (~0.7 GPU-h), so the fine-tunes also answer whether fine-tuning a current pretraining beats
-    scratch at small D (moved from ft_harm, 2026-10-26)'
+    scratch at small D (moved from ft_harm, 2026-10-26); ALSO add a hand-off item for the Muon test in docs/results.tex''s
+    open items (its question, design, the 16 scratch runs approved by the user 2026-10-26 ''I agree with that reframing of
+    the question for the finetuning at small D, go ahead with it''), since par:ft_harm already points to it'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
