@@ -1179,6 +1179,7 @@ entries:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
     - analysis/catalog_v3/data/short_reads/v4_dimensionless_muon
+    - analysis/catalog_v3/data/short_reads/v4_dimensionless_muon_seed2
     - analysis/catalog_v3/figs/coverage_fwd_c.png
     - analysis/catalog_v3/figs/coverage_pp_a.png
     - analysis/catalog_v3/figs/coverage_range_a.png
