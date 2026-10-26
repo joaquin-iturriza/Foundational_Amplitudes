@@ -21,16 +21,29 @@ def main():
         row = {"D": 10 ** (k / 2), "scratch": sc}
         for r in (6, 7):
             x = R[f"tp3_r{r}fte_uubar_Zg_d{k}"]
-            s2 = x["prepd_std"] ** 2
             ft, t = best(f"tp3_r{r}fte_uubar_Zg_d{k}")
             assert abs(t["prepd_std"] - x["prepd_std"]) < 1e-6 * x["prepd_std"]
-            row[f"r{r}"] = {"readout": x["readout_val_mse"] * s2, "head_affine": x["head_affine_val_mse"] * s2,
-                            "finetune": ft, "var": x["val_var"] * s2}
+            # tools/linear_readout.py already reports these times prepd_std^2 (the MSE of log|M|^2, as cells.py)
+            row[f"r{r}"] = {"readout": x["readout_val_mse"], "head_affine": x["head_affine_val_mse"],
+                            "finetune": ft, "var": x["val_var"]}
         out[k] = row
         print(f"d{k} scratch {sc:.2e} | " + " | ".join(
             f"r{r}: read-out {row[f'r{r}']['readout']:.2e}, head+affine {row[f'r{r}']['head_affine']:.2e}, "
             f"fine-tune {row[f'r{r}']['finetune']:.2e}" for r in (6, 7)))
     json.dump(out, open(os.path.join(HERE, "data", "nogain_readout.json"), "w"), indent=1)
+    # the numbers par:nogain quotes, as the last JSON line (tools/verify_claims.py)
+    g = lambda x: float(f"{x:.3g}")
+    ratio = [out[k]["r6"]["readout"] / out[k]["r7"]["readout"] for k in range(3, 9)]
+    hi = range(6, 9)
+    ha = [out[k][f"r{r}"]["head_affine"] for k in out for r in (6, 7)]
+    print(json.dumps({
+        "d4": {"scratch": g(out[4]["scratch"]), "r7_readout": g(out[4]["r7"]["readout"]),
+               "r6_readout": g(out[4]["r6"]["readout"]), "r7_over_scratch": round(out[4]["r7"]["readout"] / out[4]["scratch"], 2),
+               "r6_over_r7": round(ratio[1], 1)},
+        "r6_over_r7_min": round(min(ratio), 1), "r6_over_r7_max": round(max(ratio), 1),
+        "hiD": {"r7_min": g(min(out[k]["r7"]["readout"] for k in hi)), "r7_max": g(max(out[k]["r7"]["readout"] for k in hi)),
+                "r6_min": g(min(out[k]["r6"]["readout"] for k in hi)), "r6_max": g(max(out[k]["r6"]["readout"] for k in hi))},
+        "head_affine_min": round(min(ha), 2), "head_affine_max": round(max(ha), 2)}))
 
 
 if __name__ == "__main__":

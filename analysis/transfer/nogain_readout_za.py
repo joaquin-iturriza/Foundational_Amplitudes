@@ -32,12 +32,13 @@ def main():
                 row["arms"][a] = {"label": lab, "missing": True}
                 continue
             x = R[sw]
-            s2 = x["prepd_std"] ** 2
             ft, t = best(sw)                     # None: the cell's fine-tune results are not collected here
             if t is not None:
                 assert abs(t["prepd_std"] - x["prepd_std"]) < 1e-6 * x["prepd_std"], sw
-            row["arms"][a] = {"label": lab, "readout": x["readout_val_mse"] * s2,
-                              "head_affine": x["head_affine_val_mse"] * s2, "finetune": ft, "var": x["val_var"] * s2}
+            # tools/linear_readout.py already reports every *_mse and val_var times prepd_std^2 (the MSE of
+            # log|M|^2, as cells.py); prepd_std is read here only to check it against the fine-tune's
+            row["arms"][a] = {"label": lab, "readout": x["readout_val_mse"],
+                              "head_affine": x["head_affine_val_mse"], "finetune": ft, "var": x["val_var"]}
         out[k] = row
         print(f"d{k} D={row['D']:.0f} scratch {sc:.2e}")
         for a, lab in ARMS:
@@ -50,6 +51,31 @@ def main():
                   + (f"{f:.2e} ({f / sc:5.1f}x)" if f else "not collected") + f"  head+affine {v['head_affine']:.2e}")
     json.dump(out, open(os.path.join(HERE, "data", "nogain_readout_za.json"), "w"), indent=1)
     plot(out)
+    print(json.dumps(summary(out)))
+
+
+def summary(out):
+    """The numbers par. 'What the start already holds on ee -> Z gamma' quotes, as the last JSON line (verify_claims)."""
+    s = {}
+    for k in KS:
+        row = out[k]
+        sc = row["scratch"]
+        arms = {a: v for a, v in row["arms"].items() if not v.get("missing")}
+        rungs = {a: v for a, v in arms.items() if v["finetune"]}          # the ones with a collected fine-tune
+        win = {a: v["finetune"] / v["readout"] for a, v in rungs.items() if v["readout"] < v["finetune"]}
+        lose = {a: v["finetune"] / v["readout"] for a, v in rungs.items() if v["readout"] >= v["finetune"]}
+        s[f"d{k}"] = {
+            "scratch": float(f"{sc:.3g}"),
+            "ro": {a: float(f"{v['readout']:.3g}") for a, v in arms.items()},
+            "ro_over_sc": {a: round(v["readout"] / sc, 2) for a, v in arms.items()},
+            "ft_over_sc": {a: round(v["finetune"] / sc, 2) for a, v in rungs.items()},
+            "ro_below_sc": sum(v["readout"] < sc for v in arms.values()),
+            "ro_beats_ft": len(win), "ro_beats_ft_2x": sum(r > 2 for r in win.values()),
+            "ft_over_ro_when_ro_wins_min": round(min(win.values()), 2) if win else None,
+            "ft_over_ro_when_ro_wins_max": round(max(win.values()), 2) if win else None,
+            "ro_over_ft_when_ft_wins": {a: round(1 / r, 2) for a, r in lose.items()},
+        }
+    return s
 
 
 def plot(out):
