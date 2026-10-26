@@ -220,6 +220,13 @@ entries:
       the hybrid test
     answered_at: '2026-10-25T22:55:35.895000+00:00'
     decision: D135
+  - ask: Run the one 4-run test of the pair sign head (on against off at the best trial's learning rate and warmup, two seeds
+      each, about 6 GPU-h, judged on the held-out wrong-sign share of the 17 one-loop pools), then stop either way; or park
+      the sign work now?
+    at: '2026-10-26T19:29:13+00:00'
+    searched: D111 and the step prompt settle technical choices, not whether a line of study is worth more compute; no decision
+      covers continuing or parking the sign study after the user called it aimless
+    blocks: any further sign job; the rest of the exploration continues
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -236,13 +243,18 @@ entries:
     per target, par.\ The shape proxy on catalog_v3; queue: the signed-data check, sampling sensitivity, then new ideas).
     Held (D78): dancat_ext, catalog_global. Left on CC from my tests, not deleted: zz_memprof, zz_memmap_*, zz_ema_ckpt_*,
     zz_step_profile_*, zz_catalog_norm_smoke_*, zeroshot_*.'
-  searched: D114 'Keep iterating' and the goal say design iterations come to the user before any job; D128 approved only the
-    hybrid test
+  searched: D111 and the step prompt settle technical choices, not whether a line of study is worth more compute; no decision
+    covers continuing or parking the sign study after the user called it aimless
   history:
   - at: '2026-10-26T02:25:22+00:00'
     was: done
     writeup: fa3b8ab0
     why: 'continuous exploration (D83, D114): the signed check is done (fa3b8ab0); the queue continues with the sampling sensitivity'
+  ask: Run the one 4-run test of the pair sign head (on against off at the best trial's learning rate and warmup, two seeds
+    each, about 6 GPU-h, judged on the held-out wrong-sign share of the 17 one-loop pools), then stop either way; or park
+    the sign work now?
+  waiting_since: '2026-10-26T19:29:13+00:00'
+  blocks: any further sign job; the rest of the exploration continues
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
