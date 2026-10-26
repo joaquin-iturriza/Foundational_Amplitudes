@@ -98,9 +98,8 @@ entries:
   - D83
   - D129
   - D135
-  next: 'when both blend pretrainings end (lambda 0.5 [FA-ccin2p3-0bddbf48], lambda 0.25 [FA-ccin2p3-6d35589c]; code @cdcfaf5):
-    read them zero-shot on every axis like the six arms (short_reads, prep_hybrid split), compare level and shape against
-    the hybrid and the emission scales, write up beside the hybrid paragraph'
+  next: 'blend read written up (par. Blending the hybrid with the emission scales); continue the queue: the signed-data check
+    (analysis/catalog_v3/prep_signed.py, par:v3_prep_signed), then sampling sensitivity'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
