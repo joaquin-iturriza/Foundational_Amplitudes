@@ -178,9 +178,9 @@ def cmd_migrate(a):
     assert mg.V4_WT == 1.4915, mg.V4_WT
     procs = [e for e in stage_entries() if e["name"].startswith("v4_") and not family(e)]
     mg.register_recipe_processes(procs)
-    log = open(os.path.join(a.quarantine, "migrate_manifest.tsv"), "a") if a.apply else None
     if a.apply:
-        os.makedirs(a.quarantine, exist_ok=True)
+        os.makedirs(a.quarantine, exist_ok=True)       # before the manifest is opened in it
+    log = open(os.path.join(a.quarantine, "migrate_manifest.tsv"), "a") if a.apply else None
     eff_cache, counts = {}, {"rewritten": 0, "chunks_renamed": 0, "quarantined": 0, "current": 0, "absent": 0}
     for name, role, r, fname, rid in pools(procs):
         if (r.get("param_card_patches") or {}).get("WT") != mg.V4_WT:
