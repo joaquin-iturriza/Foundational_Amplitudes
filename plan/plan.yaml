@@ -1518,7 +1518,8 @@ entries:
   match: muon_hp*,zz_muon_hp*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: d3cb1479
+    paths:
+    - sweep/sweep_config_ccin2p3_muon_hp_ft.yaml
   dead_ends: []
   asks: []
