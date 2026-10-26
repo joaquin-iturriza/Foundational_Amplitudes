@@ -99,6 +99,20 @@ EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=fals
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
 [ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"
+# every process of the arm's whole training recipe needs its diagram sidecar (the parent's diagram encoder refuses a
+# missing one, the off-shellness silently skips it); checked here before any training, in every mode, so a smoke on
+# its 19-pool subset fails on what the full run would (baseline_more_signed's full run died on 95 missing sidecars
+# after a passing smoke). Build missing ones with scripts/job_catalog_v3_prep.sh <recipe>.
+if [ "$MODE" != eval ]; then
+    python - "$TRAIN" <<'PY' || exit 1
+import os, sys, yaml
+names = sorted({p.get("base", p["name"]) for p in yaml.safe_load(open(sys.argv[1]))["processes"]})
+miss = [n for n in names if not os.path.exists(f"data/diagrams/{n}.diagrams.json")]
+print(f"V3_SIDECARS {len(names) - len(miss)}/{len(names)} present for {os.path.basename(sys.argv[1])}")
+if miss:
+    sys.exit(f"V3_SIDECARS missing {len(miss)}: {miss}; run scripts/job_catalog_v3_prep.sh {sys.argv[1]}")
+PY
+fi
 if [ "$MODE" = smoke ]; then
     OUT="$SCRATCH/zz_v3_smoke_${ARM}_$SLURM_JOB_ID"; PRED="$OUT/preds"
     SUB="$OUT.recipe.yaml"
