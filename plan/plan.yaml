@@ -1314,7 +1314,7 @@ entries:
     saved validation curves of the small-D fine-tunes (both rounds) and the grid''s fine-tunes on the losing probes, per cell
     the first validation, the minimum and where, against scratch''s best; classify each losing cell; copy the curves home
     before any model deletion (D149).'
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-26T03:46:36.177000+00:00'
     text: about the small D study, okay, but we still didn't figure out what's happening then, if the finetuning is actively
@@ -1344,4 +1344,14 @@ entries:
     - analysis/transfer/data/lowd_ft_curves.json
     - analysis/transfer/figs/ft_harm.png
   dead_ends: []
-  asks: []
+  asks:
+  - ask: Do you approve the starting-point blend test (the 30 losing cells x 5 blends of pretrained and fresh weights x 3
+      seeds, about 18 GPU-h on CC), and should it include read-outs for the 75 unclassified grid cells?
+    at: '2026-10-26T03:57:50+00:00'
+    searched: CLAUDE.md ground rule 2 (over 10 GPU-h needs the user's words); the user's approval of this entry ('this needs
+      to be understood') names no cost
+  ask: Do you approve the starting-point blend test (the 30 losing cells x 5 blends of pretrained and fresh weights x 3 seeds,
+    about 18 GPU-h on CC), and should it include read-outs for the 75 unclassified grid cells?
+  waiting_since: '2026-10-26T03:57:50+00:00'
+  searched: CLAUDE.md ground rule 2 (over 10 GPU-h needs the user's words); the user's approval of this entry ('this needs
+    to be understood') names no cost
