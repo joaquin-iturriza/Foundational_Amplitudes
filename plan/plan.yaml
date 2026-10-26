@@ -1680,13 +1680,22 @@ entries:
     searched: D163/D166 cover catalog_v3's pools only; D131, D136 and the other storage calls do not name catalog_v3's backends
       or the width rebuild's leftovers
     blocks: deleting the four extra groups only; the pools' deletion and everything else continue
-  ask: 'catalog_v3''s pools (71.7 GB) go under your earlier call. Should these go too: catalog_v3''s MadGraph and MadLoop
-    backends (16.1 GB), the old pools and backends the width rebuild set aside (5.05 GB), the rebuild''s leftover staging
-    (6.41 GB), catalog_v3''s diagram sidecars (0.63 GB)?'
-  waiting_since: '2026-10-26T21:37:22+00:00'
-  searched: D163/D166 cover catalog_v3's pools only; D131, D136 and the other storage calls do not name catalog_v3's backends
-    or the width rebuild's leftovers
-  blocks: deleting the four extra groups only; the pools' deletion and everything else continue
+  - ask: 'Regenerate the 13 TeV pp pools with catalog_v4''s physics for the 819 classes where it differs (566 with a b, 253
+      that gain electroweak diagrams) plus the 173 catalog_v4 classes with no pp pool: CPU only, about 160 to 420 core-hours
+      on CC, nothing on GPU; then today''s pp comparisons are redone on all classes. The pp blend waits for it.'
+    at: '2026-10-26T21:39:54+00:00'
+    searched: D117/D119 built the pp pools on catalog_v3's physics; D130 set catalog_v4's physics; D166 the switch; none covers
+      regenerating the pp pools or its CPU cost
+    blocks: the pp pools' regeneration and everything that waits on it (the full-class pp comparison, the pp blend); the notes'
+      restatement on the 544 matching classes, the guard, and the catalog_v3 deletion continue
+  ask: 'Regenerate the 13 TeV pp pools with catalog_v4''s physics for the 819 classes where it differs (566 with a b, 253
+    that gain electroweak diagrams) plus the 173 catalog_v4 classes with no pp pool: CPU only, about 160 to 420 core-hours
+    on CC, nothing on GPU; then today''s pp comparisons are redone on all classes. The pp blend waits for it.'
+  waiting_since: '2026-10-26T21:39:54+00:00'
+  searched: D117/D119 built the pp pools on catalog_v3's physics; D130 set catalog_v4's physics; D166 the switch; none covers
+    regenerating the pp pools or its CPU cost
+  blocks: the pp pools' regeneration and everything that waits on it (the full-class pp comparison, the pp blend); the notes'
+    restatement on the 544 matching classes, the guard, and the catalog_v3 deletion continue
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
