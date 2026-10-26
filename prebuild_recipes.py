@@ -109,6 +109,9 @@ def main():
                          "pole guard refuses) is skipped with every entry of its backend group, logged as "
                          "CERT_FAILED <name>, and the rest is built; the skipped names go to LIST_FILE and the "
                          "exit status is 4. Without it such a failure aborts the whole spec.")
+    ap.add_argument("--quarantine-dir", default=None,
+                    help="where a group skipped by the pole guard mid-generation has its pools and chunk dirs moved, "
+                         "with their sidecars (default: quarantine/ next to LIST_FILE); listed in LIST_FILE")
     ap.add_argument("--auto-workers", action="store_true",
                     help="raise --workers up to ncpu when the cost estimate shows "
                          "more cores would shorten the prebuild (free on prepost)")
@@ -130,6 +133,42 @@ def main():
     from shard_recipes import groups_of
     group_of = {e["name"]: [x["name"] for x in g] for g in groups_of(procs) for e in g}
     skipped_names, skipped_keys = {}, set()
+    pools = {}            # (process, role) -> canonical pool path, for every pool this spec touches (cached or not)
+    quarantined = []      # (pool or chunk dir, where it was moved)
+    pole_names, pole_keys = set(), set()   # entries / datasets skipped because the pole guard refused a chunk
+
+    def write_cert():
+        """LIST_FILE: one `name<TAB>reason` line per skipped entry, then one `#quarantined<TAB>pool<TAB>moved to` line
+        per file moved aside. Rewritten on every change, so a crash later in the run leaves the moves recorded."""
+        with open(args.skip_cert_failed, "w") as f:
+            f.write("".join(f"{n}\t{skipped_names[n]}\n" for n in sorted(skipped_names)))
+            f.write("".join(f"#quarantined\t{a}\t{b}\n" for a, b in quarantined))
+
+    def quarantine_group(chunks=False):
+        """A pole-guard refusal mid-generation: the skipped group's pools already on disk (finalized earlier in this
+        run, or cached from a previous one: val/test or train of the refused process or of a group-mate) are built
+        from the one-loop definition the guard refused. Left in place they would be cache hits for the rerun after
+        the entry is fixed (recipe_id does not see the fix), mixing two definitions in one group; they are moved,
+        with their .recipe.json sidecars, to the quarantine directory (never deleted). With `chunks` (once the pool
+        has exited, so no worker still writes there) the group's chunk directories go too: a finished chunk is
+        reused by a rerun (datagen._chunk_done) just as a pool is."""
+        qdir = args.quarantine_dir or os.path.join(
+            os.path.dirname(os.path.abspath(args.skip_cert_failed)), "quarantine")
+        mine = lambda key: key[0] in pole_names or key in pole_keys
+        srcs = [x for key, out in sorted(pools.items()) if mine(key) for x in (out, out + ".recipe.json")]
+        if chunks:
+            srcs += sorted(meta["work"] for key, meta in datasets.items() if mine(key))
+        for src in srcs:
+            if not os.path.exists(src):
+                continue
+            os.makedirs(qdir, exist_ok=True)
+            dst = os.path.join(qdir, os.path.basename(src))
+            if os.path.exists(dst):          # an earlier run's quarantined copy: keep both
+                dst += time.strftime(".%Y%m%d-%H%M%S")
+            shutil.move(src, dst)
+            quarantined.append((src, dst))
+            print(f"QUARANTINED {src} -> {dst}", flush=True)
+        write_cert()
 
     def skip_group(process, why):
         """Skip every entry of `process`'s backend group (process may be a stripped parent outside the spec)."""
@@ -171,6 +210,7 @@ def main():
             recipe = mg.variable_energy_recipe(name, smin, smax, n_ev,
                                                role=role, seed=args.seed)
             out, rid = mg.recipe_output_path(recipe, dest), mg.recipe_id(recipe)
+            pools[(name, role)] = out
             if datagen._is_cached(out, rid):
                 n_cached += 1
                 print(f"  [cached] [{role:5s}] {name}")
@@ -185,6 +225,7 @@ def main():
                                                     role=role, seed=args.seed)
                 pout, prid = mg.recipe_output_path(precipe, dest), mg.recipe_id(precipe)
                 pkey = (parent, role)
+                pools[pkey] = pout
                 if not datagen._is_cached(pout, prid) and pkey not in datasets:
                     pwork  = os.path.join(dest, f".chunks_{prid}")
                     ptasks = datagen.chunk_tasks(parent, smin, smax, n_ev, role, args.seed, pwork)
@@ -316,7 +357,11 @@ def main():
                 except RuntimeError as e:
                     if not (args.skip_cert_failed and datagen.is_virt(key[0]) and "pole guard" in str(e)):
                         raise
+                    names0, keys0 = set(skipped_names), set(skipped_keys)
                     skip_group(key[0], f"chunk refused by the pole guard ({key[1]}): {str(e).splitlines()[0]}")
+                    pole_names.update(set(skipped_names) - names0)
+                    pole_keys.update(skipped_keys - keys0)
+                    quarantine_group()
                     for f, k in futs.items():
                         if k in skipped_keys:
                             f.cancel()
@@ -327,6 +372,8 @@ def main():
                     print(f"  chunks {done}/{len(all_tasks)}")
                 if len(results[key]) == datasets[key]["n_chunks"]:
                     finalize(key)
+        if pole_names:
+            quarantine_group(chunks=True)
 
     # 5) Reweight NLO α_s-scan datasets from their (now materialized) stripped
     # parents — cheap numpy, no MadLoop. Each parent feeds all its α_s points.
@@ -344,9 +391,11 @@ def main():
           f"in {time.time()-t_all:.1f}s ({n_cached} were cached).")
     if skipped_names:
         names = sorted(skipped_names)
-        with open(args.skip_cert_failed, "w") as f:
-            f.write("".join(f"{n}\t{skipped_names[n]}\n" for n in names))
+        write_cert()
         print(f"\nCERT_SKIPPED {len(names)} entries (not built, still in the catalog): {' '.join(names)}", flush=True)
+        if quarantined:
+            print(f"QUARANTINED {len(quarantined)} files of the skipped groups (listed in {args.skip_cert_failed})",
+                  flush=True)
     if lhe_failed:
         sys.exit(1)
     if skipped_names:

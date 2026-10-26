@@ -16,6 +16,9 @@
 # A one-loop entry whose backend build or pole certification fails is skipped with its backend group (the entries
 # sharing its backend), each logged as CERT_FAILED <name>: <reason>, and the rest of the shard is built; the job then
 # exits nonzero listing them (V4REGEN_CERT_SKIPPED). They stay in the catalog, built by a rerun once fixed.
+# When the pole guard refuses a chunk mid-generation, the group's pools and chunk dirs already on disk (any role, any
+# group-mate) are moved with their sidecars to $SCRATCH/zz_catalog_v4_regen/quarantine/ and listed in the CERT file
+# (#quarantined lines), so the rerun after the fix rebuilds the whole group under one one-loop definition.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
@@ -38,7 +41,7 @@ RC=$?
 df -k "$DATA_DIR" | tail -1 | awk '{print "V4REGEN_FREE_KB_END", $4}'
 echo "V4REGEN_WALL_S $(( $(date +%s) - T0 )) cores $W"
 if [ -s "$CERTF" ]; then
-    echo "V4REGEN_CERT_SKIPPED $(wc -l < "$CERTF") entries:"
+    echo "V4REGEN_CERT_SKIPPED $(grep -vc "^#" "$CERTF") entries (#quarantined lines: pools of theirs moved aside):"
     sed 's/^/  /' "$CERTF"
 fi
 [ $RC -eq 0 ] || { echo "V4REGEN_FAILED rc=$RC"; exit $RC; }
