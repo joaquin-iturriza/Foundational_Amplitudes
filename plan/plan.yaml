@@ -1538,6 +1538,11 @@ entries:
     why: submitted without V3_AXES, so it would have re-read catalog_v3's own axes too; cancelled before start (scancel 62464702)
       and resubmitted on the cross reads only as FA-ccin2p3-efc4c352
     at: '2026-10-26T15:05:32+00:00'
+  - tried: density check's error correlation and the pp-vs-catalog_v4 gap on all no-b classes (density_check @fcb9dae8, compare_pp_trained)
+    why: 'the 13 TeV pp pools carry catalog_v3''s physics (minimal QED order, b 4.7 GeV): on the 161+77 classes where catalog_v4
+      adds electroweak diagrams catalog_v4 is scored on another function (5.98 vs pp-trained); on the 417 matching trained
+      classes catalog_v4 is ahead (0.66) and the KL correlation drops to 0.19 (e33a2eaa)'
+    at: '2026-10-26T21:54:06+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
