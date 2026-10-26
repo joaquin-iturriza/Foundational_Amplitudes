@@ -98,13 +98,13 @@ entries:
   - D83
   - D129
   - D135
-  next: 'When the sidecar build FA-ccin2p3-89daa7d6 ends: its log must end V3_PREP_DONE with ''Done: N ok, 0 failed'' and
-    the 95 new pools'' sidecars present (the full arm FA-ccin2p3-ecc413f9 runs on afterok and prints V3_SIDECARS 1492/1492;
-    if the build fails the arm never starts: read, fix, resubmit). When the arm with more sign-changing training pools FA-ccin2p3-ecc413f9
-    (baseline_more_signed, 4264 steps) and the two sign arms (pair head FA-ccin2p3-161fc56b, near-zero weighting FA-ccin2p3-a7009d00)
-    end: read the three arms zero-shot against the baseline (add them to prep_signed.py ARMS and short_reads): the wrong-sign
-    share on the 17 sign-changing H5 one-loop pools and the whole one-loop axis, against the per-pool classifier and one sign
-    per pool; write up in par:v3_prep_signed'
+  next: 'When the arm with more sign-changing training pools FA-ccin2p3-ecc413f9 (baseline_more_signed, 4264 steps) ends:
+    check its log prints V3_SIDECARS 1492/1492 and V3_SHORT_DONE, copy $SCRATCH/zz_v3_short_baseline_more_signed home (site
+    run tar|base64 into analysis/catalog_v3/data/short_reads/), add it to prep_signed.py SIGN_ARMS and short_reads.py ARMS,
+    and read it like the two sign arms (wrong-sign share on the 17 held-out pools, near zero, over the whole one-loop axis,
+    zero-shot MSE ratio per probe); write it into par:v3_prep_signed after the two sign arms'' items. The pair head and the
+    near-zero weighting (one untuned value each) did not beat the baseline''s sign (11.3% and 9.8% vs 5.4%); the user may
+    want a seeded or tuned version: ask with the arm (c) result'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
