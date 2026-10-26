@@ -87,9 +87,10 @@ def part1(recipes, diagrams_dir):
 
 
 def _pool(data_dir, name):
-    """The pool files of a process, its val and test roles (the train role is stored in chunks)"""
+    """The pool files of a process, its val and test roles (the train role is stored in chunks), those with an alpha_s sidecar"""
     c = [f for r in ("val", "test")
-         for f in sorted(glob.glob(os.path.join(data_dir, f"{name}_[0-9]*GeV_{r}_smix_amplitudes.npy")))]
+         for f in sorted(glob.glob(os.path.join(data_dir, f"{name}_[0-9]*GeV_{r}_smix_amplitudes.npy")))
+         if os.path.exists(f[: -len(".npy")] + ".alphas.npy")]
     return c or None
 
 
