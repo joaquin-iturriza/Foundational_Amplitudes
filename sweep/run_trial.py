@@ -152,6 +152,26 @@ def _failure_penalty(sampler, cfg):
     return worst * margin if worst > 0 else worst + (margin - 1) * (abs(worst) or (worst - min(observed)) or 1.0)
 
 
+def _objective_value(cfg, result):
+    """What DyHPO observes from a run's result json: result[cfg["objective"]], default "val_loss" (the best
+    checkpoint's val_loss_no_reg). A sign-head search sets `objective: val_total` (the magnitude loss plus the sign
+    head's cross-entropy at that checkpoint, experiment._val_total). A result without the key fails the trial: a
+    silent fall-back would mix two objectives in one surrogate."""
+    key = cfg.get("objective", "val_loss")
+    if key not in result:
+        raise KeyError(f"objective {key} not in the run's result ({sorted(result)[:8]}...)")
+    return float(result[key])
+
+
+def _check_objective(cfg):
+    """val_total weighs the sign cross-entropy by training.sign_loss_weight: searched, DyHPO would drive it to 0."""
+    if cfg.get("objective") == "val_total":
+        searched = {e["name"] for e in cfg.get("search_space", [])}
+        if "training.sign_loss_weight" in searched:
+            raise ValueError("objective val_total with training.sign_loss_weight searched: the objective would "
+                             "follow its own weight")
+
+
 def format_value(v):
     if isinstance(v, float):
         return f"{v:.6e}"
@@ -313,6 +333,7 @@ def main():
         parser.error("--detached needs --hp-idx and --t-steps")
 
     cfg        = load_config(args.sweep_config)
+    _check_objective(cfg)
     sweep_name = cfg["sweep_name"]
     project_dir= cfg["paths"]["project_dir"]
 
@@ -430,7 +451,7 @@ def main():
 
             with open(result_path) as f:
                 result = json.load(f)
-            val_loss        = float(result["val_loss"])
+            val_loss        = _objective_value(cfg, result)
             proc_val_losses = result.get("proc_val_losses")
             _drop_last_model(cfg, run_dir, run_idx, t_steps)
 
@@ -448,7 +469,8 @@ def main():
         if args.detached:
             print("RESULT_JSON " + json.dumps({
                 "hp_idx": hp_idx, "t_steps": t_steps, "trial_idx": args.trial_idx,
-                "val_loss": val_loss, "observe_loss": float(observe_loss),
+                "val_loss": val_loss, "objective": cfg.get("objective", "val_loss"),
+                "observe_loss": float(observe_loss),
                 "hpo_obj": hpo_obj, "proc_val_losses": proc_val_losses,
                 "result_path": result_path, "run_dir": run_dir}), flush=True)
             return

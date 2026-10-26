@@ -4282,6 +4282,7 @@ class AmplitudeExperiment(BaseExperiment):
             counts = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
             mse_sums = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
             sign_ok = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
+            bce_sums = torch.zeros(n_proc, device=self.device, dtype=torch.float64)
             ema_ctx = self.ema.average_parameters() if self.ema is not None else contextlib.nullcontext()
             with torch.no_grad(), ema_ctx:
                 for data in self.val_loader:
@@ -4293,12 +4294,18 @@ class AmplitudeExperiment(BaseExperiment):
                         logit, target = self._last_sign
                         ok = ((logit.reshape(-1) > 0) == (target.reshape(-1) > 0.5)).to(torch.float64)
                         sign_ok.index_add_(0, pids, ok)
+                        # the sign head's cross-entropy per event, unweighted (no sign_near_weight: a searched
+                        # training knob must not move the number it is judged by), for val_total below
+                        bce = torch.nn.functional.binary_cross_entropy_with_logits(
+                            logit.reshape(-1).float(), target.reshape(-1).float(), reduction="none")
+                        bce_sums.index_add_(0, pids, bce.to(torch.float64))
                     if sigma is not None:
                         mse_e = ((y_pred - y) ** 2).flatten(1).mean(dim=1).to(torch.float64)
                         mse_sums.index_add_(0, pids, mse_e)
                 reg_val = float(self._reg_term(self.model))
             sums, counts, mse_sums = sums.cpu().numpy(), counts.cpu().numpy(), mse_sums.cpu().numpy()
             if getattr(self, "_sign_head", False):
+                self._val_total_proc = self._val_total_per_process(sums, counts, bce_sums.cpu().numpy())
                 acc = sign_ok.cpu().numpy() / np.maximum(counts, 1)
                 signed = np.asarray(self._proc_signed) > 0
                 if signed.any():
@@ -4401,6 +4408,10 @@ class AmplitudeExperiment(BaseExperiment):
             self.val_loss.append(val_loss)
             if val_loss_no_reg is not None:
                 self.val_loss_no_reg.append(val_loss_no_reg)
+            vt = self._val_total(monitors, _combine)
+            if vt is not None:
+                # one entry per validation, aligned with val_loss_no_reg (the best checkpoint's index reads it)
+                self.val_total = getattr(self, "val_total", []) + [vt]
             if monitors and lnr_all:
                 self.val_loss_no_reg_all = getattr(self, "val_loss_no_reg_all", []) + [_combine(lnr_all)]
             mse = [v for v in proc_mse_vals.values() if v is not None]
@@ -4490,6 +4501,38 @@ class AmplitudeExperiment(BaseExperiment):
 
         return val_loss
 
+    def _val_total_per_process(self, sums, counts, bce_sums):
+        """Per process, the loss the model trains on, on its validation events: the mean per-event magnitude loss
+        plus sign_loss_weight times the sign head's mean cross-entropy on the sign-changing pools (as
+        _aggregate_per_process_loss adds it in training), without the training-only sign_near_weight. {name: value}."""
+        w = float(self.cfg.training.get("sign_loss_weight", 1.0))
+        signed = np.asarray(self._proc_signed, dtype=np.float64)
+        out = {}
+        loaders = getattr(self, "proc_val_loaders", None)
+        for p, name in enumerate(self.cfg.data.dataset):
+            # the processes val_loss_no_reg covers (a validation loader, events present)
+            if counts[p] > 0 and (loaders is None or name in loaders):
+                out[name] = float(sums[p] / counts[p] + w * signed[p] * bce_sums[p] / counts[p])
+        return out
+
+    def _val_total(self, monitors=(), combine=None):
+        """val_total: the loss the model trains on (magnitude loss plus the sign head's cross-entropy, per process),
+        on validation events of the training processes (monitor processes left out), combined over processes by the
+        validation metric's own aggregation (`combine`: _validate's, training.val_aggregation), never by a
+        training-side knob (loss_aggregation, tau), as val_loss_no_reg. Read at the selected checkpoint (the best
+        val_loss_no_reg, CLAUDE.md "Reported values"), not at its own minimum. The HPO objective of a sign-head
+        search (sweep config `objective: val_total`, sweep/run_trial.py), where val_loss_no_reg would ignore the sign
+        head. None without the sign head."""
+        per = getattr(self, "_val_total_proc", None)
+        if not getattr(self, "_sign_head", False) or not per:
+            return None
+        vals = [v for k, v in per.items() if k not in set(monitors)]
+        if not vals:
+            return None
+        if combine is None:
+            return float(np.exp(np.mean(np.log(np.clip(vals, 1e-10, None)))))
+        return combine(vals)
+
     def _result_extra(self) -> dict:
         """Return per-dataset val_losses and compute counts at the best checkpoint.
 
@@ -4515,6 +4558,11 @@ class AmplitudeExperiment(BaseExperiment):
             return {}
 
         result = {"proc_val_losses": proc}
+        vt = getattr(self, "val_total", None)
+        if vt and best_idx < len(vt):
+            # the total validation loss (magnitude MSE + sign cross-entropy) at the selected checkpoint, and its curve
+            result["val_total"] = float(vt[best_idx])
+            result["val_total_curve"] = [float(x) for x in vt]
 
         proc_nr = {}
         for name, losses in self.proc_val_losses_no_reg.items():

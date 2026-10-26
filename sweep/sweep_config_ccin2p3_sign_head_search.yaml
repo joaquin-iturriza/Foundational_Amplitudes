@@ -1,0 +1,72 @@
+# The sign head's search on catalog_v3 (plan entry v3_prep_explore; D99, D155, D156; docs/results.tex par:v3_prep_signed).
+# The question: can the sign head be made to carry the one-loop sign to held-out processes, once its own knobs and the
+# learning rate are searched with Muon? The untuned pair sign head and near-zero weighting arms (AdamW, the baseline's
+# HPs) lost or blew up near the learning-rate peak; the 95 extra sign-changing training pools helped at two seeds.
+# A single-fidelity DyHPO at the short pretraining's 4264 steps (HPO rule 6), every trial the exact configuration of
+# the more-signed-pools arm (runs/catalog_v3_short/baseline_more_signed: the baseline target, one shared
+# standardization, log|M|^2 with the sign head, recipes/catalog_v3_train_signext.yaml, 1492 pools, seed 42) with
+# MuonAdamW at the Muon search's decoupled weight decay (0.0217, par:v3_muon) and only the lines below changed.
+# Searched: the learning rate in [c/3, 3c] around the Muon search's best c = 5e-3 (the template's band), the warmup
+# fraction in HPO rule 3's [0.05, 0.2]; the pair sign head on/off and its sizes (sign_pair_dim 0 = off), its tanh
+# bound; the near-zero weighting on/off and its factor (sign_near_weight 1 = off) and the near-zero band
+# (sign_near_factor). The pair and near-zero values (dims 8/16/32, hidden 16/32/64, weights 3/10/30, bands 3/10/30)
+# are open (unsourced): one octave or half-decade around the untuned arms' 16, 32, 10 and 10.
+# Objective (`objective: val_total`, sweep/run_trial.py): the loss the model trains on, on validation events of the
+# training processes only (never held-out pools): the per-process magnitude MSE plus the sign head's cross-entropy on
+# the sign-changing pools, combined over processes by the validation metric's aggregation (training.val_aggregation,
+# the geometric mean, as val_loss_no_reg; never a training-side knob), without the near-zero weight (a searched knob),
+# read at the selected checkpoint (the best val_loss_no_reg, CLAUDE.md "Reported values"), not at its own minimum.
+# 20 trials, 6 random start-up, then the GP; ~1.3 GPU-h each.
+# Its comparison point: the Muon baseline at the Muon search's best (scripts/job_catalog_v3_short.sh
+# baseline_more_signed_muon), read zero-shot against the best trial.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 48G
+  cpus_per_task: 5
+  time: '03:00:00'
+paths: null
+sweep_name: sign_head_search
+base_config: ${PROJECT_DIR}/runs/catalog_v3_short/baseline_more_signed
+n_trials: 20
+objective: val_total
+dyhpo:
+  n_candidates: 2000
+  seed: 42
+  n_startup: 6
+  total_budget: 10000
+  surrogate: gp
+  objective_scale: log
+fidelity_schedule:
+  t_steps:
+  - 4264
+fixed_params:
+  training.optimizer: MuonAdamW
+  training.muon_weight_decay: 0.0217
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 1.667e-03
+  high: 1.5e-02
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: model.sign_pair_dim
+  type: categorical
+  choices: [0, 8, 16, 32]
+- name: model.sign_pair_hidden
+  type: categorical
+  choices: [16, 32, 64]
+- name: model.sign_pair_bound
+  type: categorical
+  choices: [false, true]
+- name: training.sign_near_weight
+  type: categorical
+  choices: [1.0, 3.0, 10.0, 30.0]
+- name: training.sign_near_factor
+  type: categorical
+  choices: [3.0, 10.0, 30.0]

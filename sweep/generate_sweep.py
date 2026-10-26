@@ -348,6 +348,8 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
     """
     config_abs_path = os.path.abspath(config_path)
     cfg = load_config(config_abs_path)
+    from run_trial import _check_objective   # an objective the search could game is refused before any trial
+    _check_objective(cfg)
     # Fix the init seed by default so trials differ only by hyperparameters
     # (a config may override by setting its own fixed_params.seed).
     cfg.setdefault("fixed_params", {}).setdefault("seed", 42)
