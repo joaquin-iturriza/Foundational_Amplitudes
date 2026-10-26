@@ -25,6 +25,7 @@ everywhere. Per pp class:
     site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/pp_physics_check.py eval --n 200 \
         --part K --parts P  > data/pp_physics_eval_K.json
     python3 analysis/catalog_v4/pp_physics_check.py classify            -> data/pp_physics_classes.json
+    site run ... -- python analysis/catalog_v4/pp_physics_check.py cost > data/pp_physics_cost.json
     python3 analysis/catalog_v4/pp_physics_check.py summary             (reads the eval parts, the classes)
 The last line printed by summary is the JSON of its numbers.
 """
@@ -161,6 +162,21 @@ def evaluate(n_ev, part, parts, only=None):
     json.dump(out, sys.stdout)
 
 
+def cost():
+    """per pp class, the MadEvent run behind its pools, from the val pool's sidecar (<pool>.npy.recipe.json, lhe_run):
+    seconds per stage, cores, events MadEvent returned and the runs it took; a run that came back short and was redone
+    leaves only the redo's record"""
+    out = {}
+    for n in pp_names():
+        f = os.path.join(os.environ["DATA_DIR"], f"{n}_13000-13000GeV_val_lhe_amplitudes.npy.recipe.json")
+        try:
+            r = json.load(open(f))["lhe_run"]
+            out[n] = {"s": r["seconds"], "cores": r["mg_cores"], "n_lhe": r["n_lhe_events"], "runs": len(r["iseeds"])}
+        except Exception as ex:
+            out[n] = {"error": repr(ex)[:200]}
+    json.dump(out, sys.stdout)
+
+
 def summary():
     C = classify()
     E = {}
@@ -206,7 +222,7 @@ def summary():
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=("classify", "eval", "summary"))
+    ap.add_argument("mode", choices=("classify", "eval", "summary", "cost"))
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--part", type=int, default=0)
     ap.add_argument("--parts", type=int, default=1)
@@ -217,5 +233,7 @@ if __name__ == "__main__":
         print(json.dumps(Counter(c["cls"] for c in C.values())))
     elif a.mode == "eval":
         evaluate(a.n, a.part, a.parts, a.only)
+    elif a.mode == "cost":
+        cost()
     else:
         summary()
