@@ -310,6 +310,17 @@ def event_ownership():
               events=ev("cov"))
     rc, err = w.check()
     scenario("the event blocks when the step agent is quiet 35 min", rc == 2 and "open event" in err, err)
+    w = World([E("cov")], state={"cov": step(40, "wk4")}, agents=[("wk4", ago(40), "cov", [(ago(-0.2), "work")])],
+              events=ev("cov"))
+    rc, err = w.check()
+    scenario("a step agent writing while the check runs (records later than the check's now) exempts its event",
+             rc == 0 and "open event" not in err, err)
+    w = World([E("cov", next={1: "score the sign test", 2: "draw the density figure"})],
+              state={"cov": {"steps": [{"agent": "wk5", "at": ago(5), "next": 1}]}},
+              agents=[("wk5", ago(5), "cov", [(ago(-0.2), "work")])], events=ev("cov"))
+    rc, err = w.check()
+    scenario("a step agent recorded with plan step --next exempts the entry's event (step 2 is still listed)",
+             "open event" not in err and "cov step 2" in err and "cov step 1" not in err, err)
     w = World([E("cov")], state={"cov": step(10, "wk2")}, events=ev("other_item"))
     rc, err = w.check()
     scenario("an event whose item is not a plan entry still blocks", rc == 2 and "open event" in err, err)
@@ -1881,6 +1892,16 @@ def design_prior():
     rc, out = w.plan_cmd("design", "pp", *args)
     scenario("design prior: none found with the search terms is recorded", rc == 0
              and "pp-trained" in w.entries()["pp"]["designs"][-1]["prior"], out)
+    args = list(DESIGN)
+    args[i] = "none of the AdamW seeds of the pp-trained arm reached the e+e- arm's loss (par:v4_vs_pp)"
+    rc, out = w.plan_cmd("design", "pp", *args)
+    scenario("design prior: a substantive prior opening with a bare 'none' is checked by length, not as a none found",
+             rc == 0 and "AdamW seeds" in w.entries()["pp"]["designs"][-1]["prior"], out)
+    n0 = len(w.entries()["pp"]["designs"])
+    args[i] = "none of it: pp arm"
+    rc, out = w.plan_cmd("design", "pp", *args)
+    scenario("design prior: a short prior opening with a bare 'none' is refused by the length rule",
+             rc != 0 and "at least" in out and "characters" in out and len(w.entries()["pp"]["designs"]) == n0, out)
     rc, out = w.plan_cmd("design", "pp", *DESIGN)
     show = w.plan_cmd("show", "pp")[1]
     pr = w.plan_cmd("next", "--prompts")[1]
@@ -1930,6 +1951,108 @@ def prompt_cap():
              "tools/collect_run.py" in tpl and os.path.exists(os.path.join(ROOT, "tools", "collect_run.py")))
 
 
+def parallel_steps():
+    """Independent next steps run in parallel (the user, 2026-10-26: "what is the point of setting up all of this to
+    do parallel work if you are going to queue stuff like that?"): an entry holds several numbered next steps, each
+    listed, launched and in flight on its own, so a free step is listed while another step of the entry runs."""
+    two = {1: "analyse the density gap", 2: "submit the pp-trained Muon arm"}
+    w = World([E("par", next=dict(two))])
+    rc, out = w.check()
+    nx = w.plan_cmd("next")[1]
+    scenario("two independent next steps, nothing in flight: both listed, and the stop check counts both",
+             rc == 2 and "par step 1" in out and "par step 2" in out and "--next 2" in out
+             and "NEXT par step 1 of 2" in nx and "NEXT par step 2 of 2" in nx and "2 step(s) to launch" in nx, out + nx)
+    w = World([E("par", next=dict(two))], state={"par": {"steps": [{"agent": "w1", "at": ago(10), "next": 1}]}})
+    rc, out = w.check()
+    nx = w.plan_cmd("next")[1]
+    scenario("step 1's agent works: step 2 is still listed (a free step is never queued behind it)",
+             rc == 2 and "par step 2" in out and "par step 1" not in out and "1 step(s) to launch" in nx, out + nx)
+    w = World([E("par", next=dict(two))], state={"par": {"steps": [{"agent": "w1", "at": ago(10), "next": 1},
+                                                                   {"agent": "w2", "at": ago(5), "next": 2}]}})
+    scenario("both steps' agents work: nothing to launch", w.check()[0] == 0, w.check()[1])
+    w = World([E("par", next=dict(two))], runs=[("FA-ccin2p3-j2", "RUNNING", "par", epoch(30), None)],
+              state={"par": {"runs": ["FA-ccin2p3-j2"], "run_steps": {"FA-ccin2p3-j2": 2}}})
+    nx = w.plan_cmd("next")[1]
+    scenario("a live job recorded on step 2 holds step 2 only; step 1 is listed",
+             "NEXT par step 1 of 2" in nx and "step 2 of 2" not in nx, nx)
+    w = World([E("par", next=dict(two))], runs=[("FA-ccin2p3-j0", "RUNNING", "par", epoch(30), None)])
+    nx = w.plan_cmd("next")[1]
+    scenario("a live job recorded without a step number belongs to the first step: step 2 is listed",
+             "NEXT par step 2 of 2" in nx and "step 1 of 2" not in nx, nx)
+    w = World([E("par", next=dict(two))], runs=[("FA-ccin2p3-j2", "COMPLETED", "par", epoch(60), epoch(5))],
+              state={"par": {"runs": ["FA-ccin2p3-j2"], "run_steps": {"FA-ccin2p3-j2": 2},
+                             "steps": [{"agent": "w1", "at": ago(10), "next": 1}]}})
+    nx = w.plan_cmd("next")[1]
+    scenario("step 2's job ended while step 1's agent works: step 2 is listed for the ended run, step 1 is not",
+             "NEXT par step 2 of 2" in nx and "runs ended: FA-ccin2p3-j2" in nx and "step 1 of 2" not in nx, nx)
+    # the prompts: each names its own step, the other as running in parallel, and the no-chaining rule
+    w = World([E("par", next=dict(two))])
+    pr = w.plan_cmd("next", "--prompts")[1]
+    p2 = pr[pr.index("NEXT par step 2 of 2"):]
+    scenario("each listed step has its own prompt: its step as {next}, the other named as running in parallel",
+             "Your step (number 1 of the entry's next steps): analyse the density gap" in pr
+             and "Your step (number 2 of the entry's next steps): submit the pp-trained Muon arm" in p2
+             and "  1: analyse the density gap" in p2 and "set-next par --next 2" in p2 and "run par <run id> --next 2"
+             in p2 and 'never chained with "then"' in p2, pr[:3000])
+    # recording: plan step needs --next on a several-step entry, names an existing step, and matches the prompt
+    w = World([E("par", next=dict(two))], agents=[("a1", ago(2), "par"), ("a2", ago(2), "par"), ("a3", ago(2), "par")])
+    rc1, o1 = w.plan_cmd("step", "par", "--agent", "a1")
+    rc2, o2 = w.plan_cmd("step", "par", "--agent", "a1", "--next", "3")
+    rc3, o3 = w.plan_cmd("step", "par", "--agent", "a1", "--next", "2")
+    rec = json.load(open(w.state))["par"]["steps"]
+    nx = w.plan_cmd("next")[1]
+    scenario("plan step: --next needed with several steps, refused for a step the entry lacks, recorded on its step",
+             rc1 != 0 and "--next N" in o1 and rc2 != 0 and "no next step 3" in o2 and rc3 == 0
+             and rec[-1].get("next") == 2 and "NEXT par step 1 of 2" in nx and "step 2 of 2" not in nx,
+             o1 + o2 + o3 + nx)
+    pa = os.path.join(w.ag, "agent-a2.jsonl")
+    m = json.loads(open(pa).readline())
+    m["message"]["content"] += "\nYour step (number 1 of the entry's next steps): analyse the density gap"
+    open(pa, "w").write(json.dumps(m) + "\n")
+    rc4, o4 = w.plan_cmd("step", "par", "--agent", "a2", "--next", "2")
+    scenario("plan step refuses an agent started with another step's prompt", rc4 != 0 and "step 1, not 2" in o4, o4)
+    w.plan_cmd("run", "par", "FA-ccin2p3-x9", "--next", "2")
+    scenario("plan run --next records which step the job belongs to",
+             json.load(open(w.state))["par"].get("run_steps") == {"FA-ccin2p3-x9": 2})
+    # set-next / add-next / drop-next: stable numbers, a step agent touches only its own step
+    w = World([E("par", next="one thing")], state={"par": {"steps": [{"agent": "w1", "at": ago(10)}]}})
+    scenario("an entry holding one string is in flight while its step agent (recorded without a number) works",
+             w.check()[0] == 0, w.check()[1])
+    w.plan_cmd("set-next", "par", "first", "--also", "second", "--also", "third")
+    a = w.entries()["par"]["next"]
+    w.plan_cmd("set-next", "par", "second, then its follow-up", "--next", "2")
+    b = w.entries()["par"]["next"]
+    w.plan_cmd("drop-next", "par", "1")
+    w.plan_cmd("add-next", "par", "fourth")
+    c = w.entries()["par"]["next"]
+    show = w.plan_cmd("show", "par")[1]
+    scenario("set-next --also holds independent steps; --next N replaces only N; drop and add keep the numbers",
+             a == {1: "first", 2: "second", 3: "third"} and b == {1: "first", 2: "second, then its follow-up",
+                                                                  3: "third"}
+             and c == {2: "second, then its follow-up", 3: "third", 4: "fourth"} and "next 4: fourth" in show,
+             [a, b, c, show])
+    w.plan_cmd("drop-next", "par", "2"); w.plan_cmd("drop-next", "par", "3")
+    d1 = w.entries()["par"]["next"]
+    w.plan_cmd("set-next", "par", "only")
+    d2 = w.entries()["par"]["next"]
+    rc5, o5 = w.plan_cmd("drop-next", "par", "7")
+    w.plan_cmd("set-next", "par", "x", "--also", "y")
+    d3 = w.entries()["par"]["next"]
+    scenario("one step left keeps its number, a plain set-next replaces it in place, --also numbers past the records "
+             "(none here: from 1), a missing step refused",
+             d1 == {4: "fourth"} and d2 == {4: "only"} and d3 == {1: "x", 2: "y"} and rc5 != 0, [d1, d2, d3, o5])
+    w = World([E("par", next={1: "a", 2: "b"})], state={"par": {"steps": [{"agent": "w9", "at": ago(10), "next": 2}]}})
+    w.plan_cmd("drop-next", "par", "2")
+    w.plan_cmd("add-next", "par", "c")
+    scenario("a new step never reuses the number of a dropped step an agent record still names",
+             w.entries()["par"]["next"] == {1: "a", 3: "c"}, w.entries()["par"]["next"])
+    w = World([E("par", next={1: "A", 2: "B"})], state={"par": {"steps": [{"agent": "w8", "at": ago(10), "next": 2}]}})
+    w.plan_cmd("set-next", "par", "C", "--also", "D")
+    nx = w.plan_cmd("next")[1]
+    scenario("a plain set-next --also over numbered records numbers past them: an old agent never holds a new step",
+             w.entries()["par"]["next"] == {3: "C", 4: "D"} and "NEXT par step 3 of 2" in nx and "step 4 of 2" in nx, [w.entries()["par"]["next"], nx])
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1951,7 +2074,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, the_suite_itself]
+          designs, design_prior, prompt_cap, parallel_steps, the_suite_itself]
 
 
 def main():

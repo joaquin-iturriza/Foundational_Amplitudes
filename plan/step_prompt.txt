@@ -5,7 +5,9 @@ when `plan next` says it can move.
 Entry: {id} ({title})
 Question: {question}
 Why you were started: {reason}
-The next step on record: {next}
+Your step (number {n} of the entry's next steps): {next}
+The entry's other next steps, taken in parallel by other step agents (not yours: leave them, never wait on them):
+{others}
 Done when (a check that must pass): {done_when}
 Evidence so far: {evidence}
 Dead ends so far (do not repeat them):
@@ -23,8 +25,9 @@ The step
    is one call: `python3 tools/collect_run.py <run> [<run> ...] --entry {id}` (--help for what it covers); it acks and
    records only when nothing is off, and otherwise prints what is off for you to report.
 2. Do one thing that moves the entry: an analysis, a fix, a write-up, or a job (`site pick`, then
-   `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id>`; a sweep submitted through
-   sweep_manager with `site run ... --item {id}` is recorded with `python3 tools/plan.py run {id} --sweep <site>:<name>`).
+   `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id> --next {n}`; a sweep submitted
+   through sweep_manager with `site run ... --item {id}` is recorded with
+   `python3 tools/plan.py run {id} --sweep <site>:<name> --next {n}`).
    Before a job, record its design with `python3 tools/plan.py design {id} --question --prior --measure --check
    --fixed --control --seeds --outcome` (--prior: the work already done on this question, found by searching
    docs/results.tex, `plan show {id}` (evidence, dead ends) and `site decisions --project FA` for the process, arm,
@@ -38,7 +41,11 @@ The step
 3. Record, through the plan CLI only:
      python3 tools/plan.py evidence {id} --run <id> --commit <sha> --path <figure or metrics file>
      python3 tools/plan.py dead-end {id} --tried "<what>" --why "<why it failed>"
-     python3 tools/plan.py set-next {id} "<the next step>"
+     python3 tools/plan.py set-next {id} --next {n} "<what follows your step>"   (replaces your step only)
+     python3 tools/plan.py drop-next {id} {n}             (your step is finished and nothing follows it)
+     python3 tools/plan.py add-next {id} "<another step>"   (independent work found on the way)
+   Independent pieces of work are separate next steps, never chained with "then"; chain only when one needs the
+   other's result.
      python3 tools/plan.py answer {id} --quote "<the user's words>" [--set ...]      (only for the user's answer)
 4. If done_when now passes and the result is written up in docs/results.tex (numbers with their provenance comment,
    `% src: <command> @<commit>` and `% claim: key=value`), and, for a write-up that answers a decision, list in it and

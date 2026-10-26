@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Stop guard (setup redesign, D121): the one check that work is moving. It replaces the idle-work parts of
 ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cannot end while
-  - `plan next` lists a step not launched for a running entry: a run of it ended, or it has nothing in flight, or
+  - `plan next` lists a step not launched for a running entry (each of its independent next steps counted on its
+    own): a run of it ended, or it has nothing in flight, or
     its latest design has had no verdict for 30 min with its step agent gone (the fallback: the step agent runs
     the design reviewer itself);
   - never blocking: the user wrote after a question an entry waits on. Whether it answers is the main session's call
@@ -57,15 +58,18 @@ def problems():
     d, st = plan.load()
     msgs = plan.messages(plan.oldest_open(d, st))     # from the oldest open question, or the previous re-ask scan
     out, once = list(unrecorded), []
-    for e, why, launched in plan.next_steps(d, st, msgs=msgs):
+    # each unlaunched next step counts on its own: an entry with independent next steps lists every free one
+    for e, why, launched, k in plan.next_steps_keyed(d, st, msgs=msgs):
         if launched or e.get("status") == "waiting_user":     # the user wrote after a question: plan next only
             continue
         if why.startswith("design to review"):
             out.append("%s: %s (plan next --prompts gives its prompt; subagent_type design-reviewer, then plan review "
                        "%s --agent <subagent id>)" % (e["id"], why, e["id"]))
             continue
-        out.append("%s: %s%s" % (e["id"], why, "; launch its step agent (plan next --prompts, then plan step %s "
-                                 "--agent <subagent id>)" % e["id"] if e.get("status") == "running" else ""))
+        out.append("%s%s: %s%s" % (e["id"], "" if k is None else " step %d" % k, why,
+                                   "; launch its step agent (plan next --prompts, then plan step %s --agent <subagent "
+                                   "id>%s)" % (e["id"], "" if k is None else " --next %d" % k)
+                                   if e.get("status") == "running" else ""))
     sent = [(ts, text) for ts, role, text in msgs if role == "assistant"]
     for e in d["entries"]:
         if plan.open_question(e):                   # waiting, or running with a question open on part of it

@@ -42,10 +42,13 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           (.claude/agents/design-reviewer.md) from that prompt and records it here
   plan design-pass <id> --reviewer NOTE | design-fix <id> --reasons R    the reviewer's verdict on the latest design
                                           (run by the reviewer itself; design_guard.py refuses them from anyone else)
-  plan unanswered <id> | step <id> --agent <subagent id>
-  plan run <id> [RUN...] [--sweep SITE:NAME]   a registry run, or a sweep sweep_manager submitted (never in runs.db)
+  plan unanswered <id> | step <id> --agent <subagent id> [--next N]
+  plan run <id> [RUN...] [--sweep SITE:NAME] [--next N]   a registry run, or a sweep sweep_manager submitted (never in
+                                          runs.db); --next: the step it belongs to
+  plan set-next <id> "<step>" [--also "<independent step>" ...] [--next N]   the entry's next steps (with --next N:
+                                          replace step N only) | add-next <id> "<step>" | drop-next <id> <N>
   plan sweeps [--fresh]                   every recorded sweep's state on its site, and the unrecorded ones recorded
-  plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W | set-next <id> T
+  plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W
   plan next [--prompts]                   deterministic: what can move now, with each step agent's exact prompt
   plan done <id> --writeup C [--override-runs WHY]
   plan view [--write]
@@ -54,7 +57,10 @@ ends and the next step through this CLI, and exits. A running entry is in flight
 a sweep recorded on it has a job in its site's queue, a unit of its site item's check is active, or a step agent
 recorded for it started within STEP_MIN minutes. A sweep no entry records, live or submitted within SWEEP_RECENT_H
 hours, is recorded on the one running entry whose match globs name it whenever plan next or the Stop check runs;
-one that fits several blocks until recorded by hand. A step is
+one that fits several blocks until recorded by hand. An entry holds one or several independent next steps (numbered,
+the numbers stable while others are added or dropped): each is listed, launched and in flight on its own, so a free step
+is listed while another step of the entry runs; its runs, sweeps and step agents are the ones recorded with its number
+(--next N), and anything recorded without one belongs to the first step. A step is
 a real subagent started with that entry's step prompt ("Entry: <id>"), one step per subagent, re-validated against its
 transcript on every read (a step written into the state file by hand does not count). A waiting entry moves only
 through plan answer or plan unanswered; a running entry with an open question keeps moving on everything the
@@ -226,6 +232,49 @@ def entry(d, eid):
         if e["id"] == eid:
             return e
     sys.exit("plan: no entry %r" % eid)
+
+
+# ---------------------------------------------------------------- an entry's independent next steps
+def nexts(e):
+    """[(number, text)] of the entry's next steps: one string (step 1, as every entry held before), or {number: text}
+    when it holds several independent ones. The numbers are stable: a step agent's number stays its own while other
+    steps are added or dropped."""
+    n = e.get("next")
+    if isinstance(n, dict):
+        return sorted((int(k), v) for k, v in n.items() if v)
+    if isinstance(n, list):
+        return [(i + 1, v) for i, v in enumerate(n) if v]
+    return [(1, n)] if n else []
+
+
+def step_keys(e):
+    return [k for k, _ in nexts(e)] or [1]
+
+
+def step_text(e, k):
+    return dict(nexts(e)).get(k)
+
+
+def put_nexts(e, items):
+    """Store [(number, text)]: a lone step 1 as a plain string (the one-step form), else {number: text}."""
+    items = [(k, t) for k, t in items if t]
+    e["next"] = None if not items else items[0][1] if len(items) == 1 and items[0][0] == 1 else dict(items)
+
+
+def step_of(e, k):
+    """The step a run or sweep recorded with number k belongs to: k while the entry holds it, else (recorded without
+    a number, or its step dropped) the first step, so no job of the entry goes unwatched."""
+    keys = step_keys(e)
+    return k if k in keys else keys[0]
+
+
+def rec_of(e, x):
+    """The step a recorded step agent belongs to: its number, or the first step when recorded without one (before
+    numbered steps); None when its step was dropped (its agent no longer holds any step of the entry)."""
+    k = x.get("next")
+    if k is None:
+        return step_keys(e)[0]
+    return k if k in step_keys(e) else None
 
 
 def words(s):
@@ -491,11 +540,14 @@ def sweep_label(name, site, f):
         "?" if f.get("results") is None else f["results"])
 
 
-def sweep_status(eid, st, sw):
-    """(ended [(label, ended at, recorded at)], live [label], unread [label]) of the sweeps recorded on the entry. One
-    missing from its site's registry is listed as ended (from when it was recorded), so a step agent looks at it."""
+def sweep_status(eid, st, sw, keep=None):
+    """(ended [(label, ended at, recorded at)], live [label], unread [label]) of the sweeps recorded on the entry (those
+    `keep` takes, when given). One missing from its site's registry is listed as ended (from when it was recorded), so
+    a step agent looks at it."""
     ended, lv, unread = [], [], []
     for x in sweeps_of(st, eid):
+        if keep and not keep(x):
+            continue
         site, name, rec = x["site"], x["name"], parse(x.get("at"))
         data = sw.get(site)
         if data is None:
@@ -647,13 +699,18 @@ def subagent(agent_id):
     return out
 
 
-def working_steps(st, eid, t):
-    """(started, last record) of each recorded step agent of the entry that has not handed back and wrote to its
-    transcript within STEP_MIN of t."""
+def working_steps(st, eid, t, e=None, key=None):
+    """(started, last record) of each recorded step agent of the entry (with `key`, of that step of it) that has not
+    handed back and wrote to its transcript within STEP_MIN of t."""
     out = []
     for x in (st.get(eid) or {}).get("steps") or []:
+        if key is not None and rec_of(e, x) != key:
+            continue
         a = None if step_problem(st, eid, x) else subagent_activity(x.get("agent"))
-        if a and not a[1] and 0 <= (t - a[0]).total_seconds() / 60 <= STEP_MIN:
+        # no lower bound: an agent writing while the check runs has records later than t (now() drops the
+        # microseconds), and that is the most active agent there is (2026-10-26: an open event of an entry blocked
+        # the turn while its step agent was reading those very runs)
+        if a and not a[1] and (t - a[0]).total_seconds() / 60 <= STEP_MIN:
             out.append((parse(x.get("at")), a[0]))
     return out
 
@@ -736,15 +793,16 @@ def bad_steps(st):
 
 
 # ---------------------------------------------------------------- what can move now
-def last_step(st, eid):
-    """The latest recorded step that is a real step agent of the entry."""
-    steps = [parse(s["at"]) for s in (st.get(eid) or {}).get("steps") or [] if not step_problem(st, eid, s)]
+def last_step(st, eid, e=None, key=None):
+    """The latest recorded step that is a real step agent of the entry (with `key`, of that step of it)."""
+    steps = [parse(s["at"]) for s in (st.get(eid) or {}).get("steps") or [] if not step_problem(st, eid, s)
+             and (key is None or rec_of(e, s) == key)]
     return max(steps) if steps else None
 
 
-def mark(d, st, eid):
-    """The entry's last step, or the switch-over (plan.yaml's migrated_at, in git) when it is later."""
-    ts = [x for x in (last_step(st, eid), parse(d.get("migrated_at"))) if x]
+def mark(d, st, eid, e=None, key=None):
+    """The entry's (or its step's) last step, or the switch-over (plan.yaml's migrated_at, in git) when it is later."""
+    ts = [x for x in (last_step(st, eid, e, key), parse(d.get("migrated_at"))) if x]
     return max(ts) if ts else None
 
 
@@ -765,22 +823,28 @@ def budget():
     return 10 ** 6 if DEADLINE[0] is None else max(0.0, DEADLINE[0] - time.monotonic())
 
 
-def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None):
-    """(reason, since) when the entry can move now, else None. `since` is when the reason arose."""
-    s, ls = e.get("status"), mark(d or {}, st, e["id"])
+def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
+    """(reason, since) when the entry's step `key` (default its first) can move now, else None. `since` is when the
+    reason arose. Each next step is in flight on its own: its runs and sweeps (recorded with its number; those recorded
+    without one are the first step's), its step agents, and the item check's active units for the steps that hold the
+    entry's sweeps (the first step when none does)."""
+    key = step_of(e, key)
+    s, ls = e.get("status"), mark(d or {}, st, e["id"], e, key)
     if s == "running":
-        rows = runs_of(e, st)
+        tags = (st.get(e["id"]) or {}).get("run_steps") or {}
+        rows = [r for r in runs_of(e, st) if step_of(e, tags.get(r[0])) == key]
+        mine = lambda x: step_of(e, x.get("next")) == key
         ended = [(r, fin) for r, state, fin in rows if terminal(state) and fin and (not ls or fin > ls.timestamp())]
         if sweeps is None:
             sweeps = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps_of(st, e["id"]) else {}
-        sw_end, sw_live, sw_unread = sweep_status(e["id"], st, sweeps)
+        sw_end, sw_live, sw_unread = sweep_status(e["id"], st, sweeps, mine)
         # a sweep that ended after the last step, as (label, ended, recorded) in epoch seconds
         sended = [(lab, f.timestamp(), r.timestamp() if r else 0) for lab, f, r in sw_end if not ls or f > ls]
         # an ended run a working step agent owns is its to handle: one it submitted (after its step started) or one
         # that ended before its last transcript record; once it hands back, the run is listed again (it ended after
         # the step started, so after `ls`). Hidden only when every ended run is owned: when one is not, the reason
         # lists them all, owned ones included, since the step it starts moves `ls` past every one of them
-        work = working_steps(st, e["id"], t) if ended or sended else []
+        work = working_steps(st, e["id"], t, e, key) if ended or sended else []
         if work:
             sub = run_submitted([r for r, _ in ended])
             owned = lambda subm, fin: any(subm >= s0.timestamp() or fin <= last.timestamp() for s0, last in work)
@@ -792,22 +856,24 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None):
             return "; ".join(why), parse(max([f for _, f in ended] + [f for _, f, _ in sended]))
         if any(live(state) for r, state, fin in rows) or sw_live or sw_unread:
             return None
-        active = (checks or {}).get(e["id"], 0) if checks is not None else item_check_active(e["id"])
+        holders = {step_of(e, x.get("next")) for x in sweeps_of(st, e["id"])} or {step_keys(e)[0]}
+        active = 0 if key not in holders else \
+            (checks or {}).get(e["id"], 0) if checks is not None else item_check_active(e["id"])
         if active is None or active > 0:          # None: the check could not run; counted in flight, with a note
             return None
         if ls and 0 <= (t - ls).total_seconds() / 60 <= STEP_MIN:
             return None
         # a step agent still writing its transcript is in flight; one that handed back is not
         acts = [a for a in (subagent_activity(x.get("agent")) for x in (st.get(e["id"]) or {}).get("steps") or []
-                            if not step_problem(st, e["id"], x)) if a]
-        if step_working(st, e["id"], t):
+                            if not step_problem(st, e["id"], x) and rec_of(e, x) == key) if a]
+        if working_steps(st, e["id"], t, e, key):
             return None
         # the reason arose when the last step's window lapsed, its agent handed back or went quiet for the window, or
         # the last run ended, whichever is later
         fins = [parse(fin) for r, state, fin in rows if fin] + [f for _, f, _ in sw_end]
         quiet = [last if handed else last + dt.timedelta(minutes=STEP_MIN) for last, handed in acts]
         marks = [x for x in [ls + dt.timedelta(minutes=STEP_MIN) if ls else None] + fins + quiet if x]
-        return "nothing in flight: " + (e.get("next") or "take the next step"), (max(marks) if marks else None)
+        return "nothing in flight: " + (step_text(e, key) or "take the next step"), (max(marks) if marks else None)
     if s == "waiting_user":
         return replied(e, msgs)
     return None
@@ -852,8 +918,14 @@ def oldest_open(d, st=None):
 
 
 def next_steps(d, st, t=None, msgs=None):
-    """Deterministic: [(entry, reason, launched)]. A running entry's step is launched when a step agent was recorded
-    after the reason arose; a waiting entry is never launched by a step (only plan answer or unanswered clear it)."""
+    """Deterministic: [(entry, reason, launched)], one per step that can move (next_steps_keyed has the step's number)."""
+    return [x[:3] for x in next_steps_keyed(d, st, t, msgs)]
+
+
+def next_steps_keyed(d, st, t=None, msgs=None):
+    """Deterministic: [(entry, reason, launched, step number or None)]. Each next step of a running entry is listed on
+    its own and is launched when a step agent was recorded for that step after its reason arose; a waiting entry is
+    never launched by a step (only plan answer or unanswered clear it)."""
     t = t or now()
     msgs = messages(oldest_open(d, st)) if msgs is None else msgs
     running = [e["id"] for e in d["entries"] if e.get("status") == "running"]
@@ -868,14 +940,15 @@ def next_steps(d, st, t=None, msgs=None):
                 not step_working(st, e["id"], t):
             launched, why = review_launched(st, e, t)
             out.append((e, "design to review: the design recorded %s has no verdict%s; launch the design reviewer" % (
-                (last_design(e).get("at") or "")[:16], why), launched))
+                (last_design(e).get("at") or "")[:16], why), launched, None))
             continue
-        r = why_moves(e, st, msgs, t, d, checks, sweeps)
-        if r:
-            reason, since = r
-            ls = last_step(st, e["id"])
-            launched = e.get("status") == "running" and ls is not None and since is not None and ls >= since
-            out.append((e, reason, launched))
+        for k in step_keys(e) if e.get("status") == "running" else [None]:
+            r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
+            if r:
+                reason, since = r
+                ls = last_step(st, e["id"], e, k) if k is not None else None
+                launched = e.get("status") == "running" and ls is not None and since is not None and ls >= since
+                out.append((e, reason, launched, k if len(nexts(e)) > 1 else None))
     return out
 
 
@@ -893,8 +966,12 @@ def entry_quotes(e):
     return "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
 
 
-def step_prompt(e, reason):
+def step_prompt(e, reason, key=None):
+    """The step agent's prompt for the entry's step `key` (default its first): {next} is that step, {others} the
+    entry's other next steps, which other step agents take in parallel."""
     tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
+    key = step_of(e, key)
+    others = "\n".join("  %d: %s" % (k, x) for k, x in nexts(e) if k != key) or "  none"
     q = entry_quotes(e)
     # the last PROMPT_TAIL dead ends and evidence items only: an entry's whole history made one prompt 17k characters
     dl = e.get("dead_ends") or []
@@ -914,7 +991,8 @@ def step_prompt(e, reason):
               'entry.' % ((e.get("waiting_since") or "")[:16], e["ask"], e.get("blocks") or
                           "not recorded (only what the question itself decides)"))
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"), reason=reason,
-                      next=e.get("next"), done_when=e.get("done_when"), quotes=q or "  none", dead_ends=de,
+                      next=step_text(e, key), n=key, others=others, done_when=e.get("done_when"),
+                      quotes=q or "  none", dead_ends=de,
                       evidence=evidence, open_question=oq,
                       design=design_text(last_design(e)))
 
@@ -1165,7 +1243,10 @@ def cmd_show(a):
             extra = "held by %s" % e.get("hold_decision")
         print("- [%s] %s (%s): %s" % (s, e.get("title"), e["id"], extra))
         for k in (("next",) if a.compact else ("question", "next", "done_when", "notes_ref")):
-            if e.get(k):
+            if k == "next" and len(nexts(e)) > 1:
+                for n, x in nexts(e):
+                    print("    next %d: %s" % (n, x))
+            elif e.get(k):
                 print("    %s: %s" % (k, e[k]))
         if not a.compact:
             for q in e.get("quotes") or []:
@@ -1200,7 +1281,8 @@ DESIGN_H = 24                 # hours a recorded design covers submissions of it
 CHECK_MIN = 40                # characters: how the measure was seen to move with the change, named, not a token
 PRIOR_MIN = 40                # characters: the prior work found, its result and how this design differs
 PRIOR_TERMS = 3               # search terms a "none found" names
-NONE_FOUND = re.compile(r"\b(none found|nothing found|no prior( work)?( found)?|none)\b", re.I)
+# a bare "none" is no claim of an empty search: "none of the AdamW seeds reached ..." names prior work
+NONE_FOUND = re.compile(r"\bnone found\b|\bnothing found\b|\bno prior( work)?( found)?\b", re.I)
 
 
 def last_design(e):
@@ -1608,14 +1690,25 @@ def cmd_step(a):
         if used:
             sys.exit("plan: subagent %s is already recorded as a step of %s; one subagent is one step" % (
                 a.agent, ", ".join(used)))
-        r = why_moves(e, st, [], now(), d)
+        key = a.next
+        if key is None:
+            if len(nexts(e)) > 1:
+                sys.exit("plan: %s has %d next steps (%s); name the one this agent takes with --next N, as plan next "
+                         "--prompts listed it" % (a.id, len(nexts(e)), ", ".join(str(k) for k in step_keys(e))))
+            key = step_keys(e)[0]
+        elif key not in step_keys(e):
+            sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, key, ", ".join(str(k) for k in step_keys(e))))
+        m = re.search(r"(?m)^Your step \(number (\d+)", prompt or "")
+        if m and int(m.group(1)) != key:
+            sys.exit("plan: subagent %s was started with the prompt of step %s, not %d" % (a.agent, m.group(1), key))
+        r = why_moves(e, st, [], now(), d, key=key)
         since = r[1] if r else None
         if since and started < since:
             sys.exit("plan: subagent %s started %s, before the reason arose (%s)" % (
                 a.agent, started.isoformat()[:16], since.isoformat()[:16]))
         st.setdefault(a.id, {}).setdefault("steps", []).append({"agent": a.agent, "at": started.isoformat(),
-                                                               "reason": r[0] if r else ""})
-    print("plan: step on %s recorded (%s, started %s)" % (a.id, a.agent, started.isoformat()[:16]))
+                                                               "reason": r[0] if r else "", "next": key})
+    print("plan: step %d on %s recorded (%s, started %s)" % (key, a.id, a.agent, started.isoformat()[:16]))
 
 
 def cmd_run(a):
@@ -1642,13 +1735,21 @@ def cmd_run(a):
         if missing:
             sys.exit("plan: not recorded: no sweep %s in the site's sweep_manager registry" % ", ".join(missing))
     with transaction() as (d, st):
-        entry(d, a.id)
+        e = entry(d, a.id)
+        if a.next is not None and a.next not in step_keys(e):
+            sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, a.next, ", ".join(str(k) for k in step_keys(e))))
         rs = st.setdefault(a.id, {}).setdefault("runs", [])
         rs += [r for r in a.runs if r not in rs]
+        if a.next is not None:
+            st[a.id].setdefault("run_steps", {}).update({r: a.next for r in a.runs})
         sl = st[a.id].setdefault("sweeps", [])
         for site, name in specs:
-            if not any(x.get("site") == site and x.get("name") == name for x in sl):
-                sl.append({"site": site, "name": name, "at": now().isoformat()})
+            x = next((x for x in sl if x.get("site") == site and x.get("name") == name), None)
+            if x is None:
+                x = {"site": site, "name": name, "at": now().isoformat()}
+                sl.append(x)
+            if a.next is not None:
+                x["next"] = a.next
     for site, name in specs:
         print("plan: sweep %s (%s) recorded on %s" % (name, site, a.id))
     for n in NOTES:
@@ -1684,9 +1785,70 @@ def cmd_evidence(a):
             ev["commit"] = a.commit
 
 
+def used_keys(e, st):
+    """Every step number the entry holds or its state still names (step agents, runs, sweeps): a new step never
+    takes a number an old record points at."""
+    v = st.get(e["id"]) or {}
+    return set(step_keys(e)) | {x.get("next") for x in (v.get("steps") or []) + (v.get("sweeps") or [])
+                                if x.get("next") is not None} | set((v.get("run_steps") or {}).values())
+
+
 def cmd_set_next(a):
+    """Without --next: the entry's next steps become TEXT and every --also (independent steps); a lone TEXT on an entry
+    of one step replaces it in place, otherwise they are numbered from 1 when no record names a number, else past every
+    number a step agent, run or sweep record names (an old record never lands on a new step). With --next N: step N
+    becomes TEXT (a step agent replaces only its own step), the --also ones added beside it."""
     with transaction() as (d, st):
-        entry(d, a.id)["next"] = a.text
+        e = entry(d, a.id)
+        if a.next is None and not a.also and len(nexts(e)) <= 1:
+            put_nexts(e, [(step_keys(e)[0], a.text)])
+        elif a.next is None:
+            v = st.get(e["id"]) or {}
+            named = v.get("run_steps") or any(x.get("next") is not None
+                                              for x in (v.get("steps") or []) + (v.get("sweeps") or []))
+            k0 = max(used_keys(e, st)) if named else 0
+            put_nexts(e, list(enumerate([a.text] + (a.also or []), k0 + 1)))
+        else:
+            if a.next not in dict(nexts(e)) and not (a.next == 1 and not nexts(e)):
+                sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, a.next,
+                                                                      ", ".join(str(k) for k, _ in nexts(e)) or "none"))
+            items = dict(nexts(e))
+            items[a.next] = a.text
+            k0 = max(used_keys(e, st) | set(items))
+            items.update({k0 + i: x for i, x in enumerate(a.also or [], 1)})
+            put_nexts(e, sorted(items.items()))
+    print_nexts(a.id)
+
+
+def cmd_add_next(a):
+    """One more independent next step, numbered past every number the entry used."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        items = dict(nexts(e))
+        k = max(used_keys(e, st) | set(items) | {0}) + 1
+        items[k] = a.text
+        put_nexts(e, sorted(items.items()))
+    print_nexts(a.id)
+
+
+def cmd_drop_next(a):
+    """Step N is finished and nothing follows it: it leaves the list; the others keep their numbers."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        items = dict(nexts(e))
+        if a.n not in items:
+            sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, a.n, ", ".join(str(k) for k in items) or "none"))
+        del items[a.n]
+        put_nexts(e, sorted(items.items()))
+    print_nexts(a.id)
+
+
+def print_nexts(eid):
+    e = entry(load()[0], eid)
+    for k, x in nexts(e):
+        print("plan: %s next %d: %s" % (eid, k, x))
+    if not nexts(e):
+        print("plan: %s has no next step" % eid)
 
 
 def cmd_dead_end(a):
@@ -1699,13 +1861,17 @@ def cmd_next(a):
     probs = reconcile_sweeps()
     d, st = load()
     msgs = messages(oldest_open(d, st))
-    todo = [(e, why) for e, why, launched in next_steps(d, st, msgs=msgs) if not launched]
+    todo = [(e, why, k) for e, why, launched, k in next_steps_keyed(d, st, msgs=msgs) if not launched]
     for p in probs:
         print("UNRECORDED " + p)
-    for e, why in todo:
-        print("NEXT %s: %s" % (e["id"], why))
+    for e, why, k in todo:
+        if k is None:
+            print("NEXT %s: %s" % (e["id"], why))
+        else:
+            print("NEXT %s step %d of %d (plan step %s --agent <id> --next %d): %s" % (
+                e["id"], k, len(nexts(e)), e["id"], k, why))
         if a.prompts and e.get("status") == "running":
-            print(review_prompt(e) if why.startswith("design to review") else step_prompt(e, why))
+            print(review_prompt(e) if why.startswith("design to review") else step_prompt(e, why, k))
             print("-" * 60)
     for e in d["entries"]:                        # a running entry's open question: a reply is listed, never a step
         r = replied(e, msgs) if e.get("status") == "running" else None
@@ -1811,7 +1977,7 @@ def render(d):
     for e in d["entries"]:
         st = {"running": "running", "waiting_user": "waiting on the user", "held": "held"}.get(e.get("status"))
         if st:
-            body = tex(e.get("question")) + (" Next: " + tex(e["next"]) if e.get("next") else "")
+            body = tex(e.get("question")) + (" Next: " + tex("; ".join(x for _, x in nexts(e))) if nexts(e) else "")
             if open_question(e):
                 body += " Asked: " + tex(e.get("ask")) + " Searched first: " + tex(e.get("searched") or "not recorded")
                 body += (" Waits on it: everything, " + tex(e["holds_all"])) if e.get("holds_all") else \
@@ -1901,10 +2067,12 @@ def main(argv=None):
     cmd("unanswered", cmd_unanswered, "the user's messages since the open question do not answer it (it stays open)",
         ID)
     cmd("step", cmd_step, "record the step agent launched for a running entry", ID,
-        A("--agent", required=True, help="the step subagent's id"))
+        A("--agent", required=True, help="the step subagent's id"),
+        A("--next", type=int, help="the number of the next step it takes (needed when the entry holds several)"))
     cmd("run", cmd_run, "record jobs of the entry: registry runs or sweeps", ID,
         A("runs", nargs="*", help="registry run ids (site runs)"),
-        A("--sweep", action="append", help="SITE:NAME of a sweep submitted through sweep_manager (repeatable)"))
+        A("--sweep", action="append", help="SITE:NAME of a sweep submitted through sweep_manager (repeatable)"),
+        A("--next", type=int, help="the number of the next step the jobs belong to (default: the first step)"))
     cmd("sweeps", cmd_sweeps, "every recorded sweep's state on its site; records the unrecorded ones",
         A("--fresh", action="store_true", help="read the sites now, not the cache"))
     cmd("evidence", cmd_evidence, "add evidence to the entry", ID,
@@ -1912,7 +2080,13 @@ def main(argv=None):
         A("--commit", help="the commit that holds the evidence"),
         A("--path", action="append", help="a repo path (repeatable)"),
         A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
-    cmd("set-next", cmd_set_next, "set the entry's next step", ID, A("text", help="the next step"))
+    cmd("set-next", cmd_set_next, "set the entry's next steps: independent pieces of work are separate steps (--also), "
+        "never chained with 'then'", ID, A("text", help="the next step"),
+        A("--also", action="append", help="another independent next step, run in parallel (repeatable)"),
+        A("--next", type=int, help="replace only next step N (a step agent's own step), keeping the others"))
+    cmd("add-next", cmd_add_next, "add an independent next step to the entry", ID, A("text", help="the step"))
+    cmd("drop-next", cmd_drop_next, "remove next step N (finished, nothing follows it)", ID,
+        A("n", type=int, help="the step's number"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
         A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
     cmd("next", cmd_next, "what can move now (exit 1 while a listed step is not launched)",
