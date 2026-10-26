@@ -5,8 +5,10 @@ Two files in the MAIN checkout (resolved through git's common dir, so worktrees 
   plan/plan.yaml     durable content, in git: id, title, question, status (running | waiting_user | held | done),
                      quotes [{said_at, text, decision}], decisions, next, done_when (a shell check, exit 0 = done),
                      notes_ref (a \\label in docs/results.tex), match (the site item's globs), evidence {runs, commit,
-                     paths}, dead_ends [{tried, why, at}], asks [{ask, at, answered_at, decision}], ask + waiting_since
-                     + checked_until (waiting_user), hold_decision (held), writeup (done)
+                     paths}, dead_ends [{tried, why, at}], asks [{ask, at, answered_at, decision}], the open question: ask +
+                     waiting_since + searched + blocks (what waits on the answer) + checked_until, on a running entry,
+                     or with holds_all (why everything waits) on a waiting_user one, hold_decision (held), writeup
+                     (done)
   plan/.state.json   runtime state, gitignored: per entry the step agents launched [{agent, at, reason}] and runs
 Both change only under an exclusive lock (plan/plan.yaml.lock), written through a temp file in the same directory.
 
@@ -18,7 +20,11 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
   plan answer <id> --kind K --quote Q [--set title|question|next=V]   the user's words: typed after the entry's last
                                           ask or step (after the hold, for a release), then `site decide`, then the
                                           entry; all or nothing
-  plan ask <id> --ask Q --searched S | unanswered <id> | step <id> --agent <subagent id>
+  plan ask <id> --ask Q --searched S [--blocks B | --holds-all WHY]   an open question on the entry: it stays running
+                                          and routed, its step prompt names the question and what waits on it (B);
+                                          --holds-all makes the whole entry wait on the user (WHY: why nothing in
+                                          it can move without the answer)
+  plan unanswered <id> | step <id> --agent <subagent id>
   plan run <id> [RUN...] [--sweep SITE:NAME]   a registry run, or a sweep sweep_manager submitted (never in runs.db)
   plan sweeps [--fresh]                   every recorded sweep's state on its site, and the unrecorded ones recorded
   plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W | set-next <id> T
@@ -33,7 +39,8 @@ hours, is recorded on the one running entry whose match globs name it whenever p
 one that fits several blocks until recorded by hand. A step is
 a real subagent started with that entry's step prompt ("Entry: <id>"), one step per subagent, re-validated against its
 transcript on every read (a step written into the state file by hand does not count). A waiting entry moves only
-through plan answer or plan unanswered. The plan files change only through this CLI (plan_files_guard.py).
+through plan answer or plan unanswered; a running entry with an open question keeps moving on everything the
+question does not block (CLAUDE.md 0g: only what needs the answer waits). The plan files change only through this CLI (plan_files_guard.py).
 Env for tests: PLAN_FILE, PLAN_STATE, PLAN_RUNS_DB, PLAN_SITE, PLAN_SITE_MODULE, PLAN_TRANSCRIPTS, PLAN_AGENTS,
 PLAN_ROOT, PLAN_SWEEP_SITES."""
 import argparse, contextlib, datetime as dt, fcntl, fnmatch, glob, importlib.machinery, importlib.util, json, os, re
@@ -802,11 +809,17 @@ def asks_mark(st):
     return parse(st.get("_asks_scanned")) or now() - dt.timedelta(minutes=ASKS_FIRST_MIN)
 
 
+def open_question(e):
+    """The entry's question to the user not yet answered: on a waiting entry (it holds everything) or on a running one
+    (it holds only what `blocks` names; the rest of the entry keeps moving)."""
+    return bool(e.get("ask") and e.get("waiting_since") and e.get("status") in ("running", "waiting_user"))
+
+
 def oldest_open(d, st=None):
     """The earliest time the transcripts are read from: the oldest OPEN question (less the margin) or the end of the
     previous re-ask scan, whichever is earlier."""
     ts = [parse(e.get("waiting_since")) - dt.timedelta(minutes=ASK_MARGIN_MIN) for e in d["entries"]
-          if e.get("status") == "waiting_user" and e.get("waiting_since")]
+          if open_question(e)]
     ts.append(asks_mark(st or {}))
     return min(ts)
 
@@ -840,9 +853,14 @@ def step_prompt(e, reason):
             qs.append((dd["quote"], dd["said_at"].isoformat() if dd["said_at"] else ""))
     q = "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
     de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in e.get("dead_ends") or []) or "  none"
+    oq = "  none"
+    if open_question(e):
+        oq = ('  asked %s: "%s"\n  Waits on the answer: %s. Do not do or decide that part; work on the rest of the '
+              'entry.' % ((e.get("waiting_since") or "")[:16], e["ask"], e.get("blocks") or
+                          "not recorded (only what the question itself decides)"))
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"), reason=reason,
                       next=e.get("next"), done_when=e.get("done_when"), quotes=q or "  none", dead_ends=de,
-                      evidence=json.dumps(e.get("evidence") or {}))
+                      evidence=json.dumps(e.get("evidence") or {}), open_question=oq)
 
 
 # ---------------------------------------------------------------- site writes
@@ -1070,6 +1088,10 @@ def cmd_show(a):
             ls = last_step(st, e["id"])
             lr = [r for r, state, fin in runs_of(e, st) if live(state)]
             extra = ("live runs " + ", ".join(lr)) if lr else ("last step %s" % ls.isoformat()[:16] if ls else "no step")
+            if open_question(e):
+                extra += "; open question asked %s: %s (blocks: %s; searched first: %s)" % (
+                    e["waiting_since"][:16], e["ask"], e.get("blocks") or "not recorded",
+                    e.get("searched") or "not recorded")
             if sweeps_of(st, e["id"]):
                 ended, lv, unread = sweep_status(e["id"], st, site_sweeps(want_of(st, [e["id"]]), all_sites=False,
                                                                           fetch=False))
@@ -1078,8 +1100,9 @@ def cmd_show(a):
         elif sweeps_of(st, e["id"]):
             extra = "sweeps " + ", ".join("%s (%s)" % (x["name"], x["site"]) for x in sweeps_of(st, e["id"]))
         elif s == "waiting_user":
-            extra = "asked %s: %s (searched first: %s)" % ((e.get("waiting_since") or "?")[:16], e.get("ask", ""),
-                                                           e.get("searched") or "not recorded")
+            extra = "asked %s: %s (searched first: %s; holds all: %s)" % (
+                (e.get("waiting_since") or "?")[:16], e.get("ask", ""), e.get("searched") or "not recorded",
+                e.get("holds_all") or "not recorded")
         elif s == "held":
             extra = "held by %s" % e.get("hold_decision")
         print("- [%s] %s (%s): %s" % (s, e.get("title"), e["id"], extra))
@@ -1224,7 +1247,7 @@ def cmd_answer(a):
         times = typed_at(a.quote)
         if not times:
             sys.exit("plan: not recorded, the entry is unchanged: these words are not in any message the user typed")
-        if e.get("status") == "waiting_user":
+        if open_question(e):
             since, what = parse(e.get("waiting_since")), "the question was asked"
         elif a.kind == "release" and e.get("status") == "held":
             since, what = (decision(e.get("hold_decision")) or {}).get("said_at"), "the hold was said"
@@ -1288,7 +1311,7 @@ def cmd_answer(a):
             for x in e.get("asks") or []:
                 x.setdefault("answered_at", after[0].isoformat())
                 x.setdefault("decision", did)
-            for k in ("ask", "waiting_since", "checked_until"):
+            for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "holds_all"):
                 e.pop(k, None)
     print("plan: %s recorded as %s; entry %s now %s" % (a.kind, did, e["id"], e["status"]))
 
@@ -1297,9 +1320,21 @@ def answered_asks(d):
     return [(e, x) for e in d["entries"] for x in e.get("asks") or [] if x.get("answered_at")]
 
 
+HOLDS_ALL_MIN = 40           # characters: why nothing in the entry can move without the answer
+
+
 def cmd_ask(a):
+    """An open question on the entry. Only what needs the answer waits (CLAUDE.md 0g): the entry stays running, routed
+    by plan next, and its step prompt names the question and what it blocks. --holds-all (the whole entry waits)
+    must say why nothing else in it can move. (catalog_coverage, 2026-10-26: a question on one process's top width
+    froze the entry's independent work for 8 h.)"""
     _ask_ok(a.ask)
     _searched_ok(a.searched)
+    if a.holds_all is not None and a.blocks:
+        sys.exit("plan: --blocks names the part that waits; --holds-all makes everything wait: pass one")
+    if a.holds_all is not None and len(a.holds_all.strip()) < HOLDS_ALL_MIN:
+        sys.exit("plan: --holds-all must say why nothing else in the entry can move without the answer, in at least "
+                 "%d characters (otherwise pass --blocks: only what needs the answer waits)" % HOLDS_ALL_MIN)
     with transaction() as (d, st):
         e = entry(d, a.id)
         if e.get("status") not in ("running", "waiting_user"):
@@ -1310,18 +1345,31 @@ def cmd_ask(a):
             sys.exit("plan: already answered: %r on %s, %s (%s); act on that answer" % (
                 x["ask"], o["id"], x["answered_at"][:16], x.get("decision")))
         t = now().isoformat()
-        e.update(status="waiting_user", ask=a.ask, waiting_since=t, searched=a.searched)
-        e.pop("checked_until", None)
-        e.setdefault("asks", []).append({"ask": a.ask, "at": t, "searched": a.searched})
-    print("plan: %s waits on the user from %s" % (a.id, t))
+        for k in ("checked_until", "blocks", "holds_all"):
+            e.pop(k, None)
+        e.update(ask=a.ask, waiting_since=t, searched=a.searched)
+        rec = {"ask": a.ask, "at": t, "searched": a.searched}
+        if a.holds_all is not None:
+            e.update(status="waiting_user", holds_all=a.holds_all)
+            rec["holds_all"] = a.holds_all
+        else:
+            e["status"] = "running"
+            if a.blocks:
+                e["blocks"] = rec["blocks"] = a.blocks
+        e.setdefault("asks", []).append(rec)
+    if e["status"] == "waiting_user":
+        print("plan: %s waits on the user from %s (everything: %s)" % (a.id, t, a.holds_all))
+    else:
+        print("plan: %s keeps running; question open from %s, waiting on it: %s" % (
+            a.id, t, a.blocks or "not recorded"))
 
 
 def cmd_unanswered(a):
     """The user's messages since the question do not answer it (it stays open)."""
     with transaction() as (d, st):
         e = entry(d, a.id)
-        if e.get("status") != "waiting_user":
-            sys.exit("plan: %s is not waiting on the user" % a.id)
+        if not open_question(e):
+            sys.exit("plan: %s has no open question" % a.id)
         e["checked_until"] = now().isoformat()
 
 
@@ -1542,8 +1590,10 @@ def render(d):
         st = {"running": "running", "waiting_user": "waiting on the user", "held": "held"}.get(e.get("status"))
         if st:
             body = tex(e.get("question")) + (" Next: " + tex(e["next"]) if e.get("next") else "")
-            if e.get("status") == "waiting_user":
+            if open_question(e):
                 body += " Asked: " + tex(e.get("ask")) + " Searched first: " + tex(e.get("searched") or "not recorded")
+                body += (" Waits on it: everything, " + tex(e["holds_all"])) if e.get("holds_all") else \
+                    (" Waits on it: " + tex(e["blocks"]) if e.get("blocks") else "")
             out.append("  \\item \\textbf{%s} (%s). %s" % (tex(e.get("title")), st, body))
     return "\n".join(out + ["\\end{itemize}", END])
 
@@ -1581,7 +1631,9 @@ def main(argv=None):
     cmd("ref", cmd_ref, A("id"), A("--label", required=True))
     cmd("answer", cmd_answer, A("id"), A("--quote", required=True), A("--kind", required=True, choices=KINDS),
         A("--set", action="append"))
-    cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True))
+    cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True),
+        A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
+        A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
     cmd("unanswered", cmd_unanswered, A("id"))
     cmd("step", cmd_step, A("id"), A("--agent", required=True))
     cmd("run", cmd_run, A("id"), A("runs", nargs="*"),

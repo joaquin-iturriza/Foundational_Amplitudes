@@ -6,7 +6,8 @@ ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cann
     through `plan next`, which lists it on every wake until plan answer or plan unanswered: a block put a non-answer on
     the user's screen at every message (the user, 2026-10-26: "Me not answering a question from you it's not you not
     answering a question from me, why would it need to retrigger you");
-  - an entry waits on the user but no message sent to them carries its question (from 15 min before the ask on);
+  - an entry has an open question (waiting, or running with the question blocking part of it) but no message sent to
+    the user carries it (from 15 min before the ask on);
   - an entry is held by anything but a hold or forbid in force that names it;
   - a running entry has no approval in force naming it;
   - once, at one stop (checks of history): a step recorded in the state file is not a real step agent of its entry; a
@@ -61,10 +62,11 @@ def problems():
                                  "--agent <subagent id>)" % e["id"] if e.get("status") == "running" else ""))
     sent = [(ts, text) for ts, role, text in msgs if role == "assistant"]
     for e in d["entries"]:
-        if e.get("status") == "waiting_user":
+        if plan.open_question(e):                   # waiting, or running with a question open on part of it
             t0 = plan.parse(e.get("waiting_since")) - dt.timedelta(minutes=plan.ASK_MARGIN_MIN)
             if not any(ts >= t0 and plan.overlap(e.get("ask"), text) for ts, text in sent):
-                out.append("%s waits on the user, but no message sent to them asks: %s" % (e["id"], e.get("ask")))
+                out.append("%s has a question open for the user, but no message sent to them asks: %s" % (
+                    e["id"], e.get("ask")))
         if e.get("status") == "running":
             why = plan.approval_problem(e)
             if why:

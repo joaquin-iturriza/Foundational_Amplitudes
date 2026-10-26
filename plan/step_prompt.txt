@@ -12,6 +12,8 @@ Dead ends so far (do not repeat them):
 {dead_ends}
 The user's words on it (they authorise and shape it; never narrow them, CLAUDE.md 0b):
 {quotes}
+Open question to the user (only what it blocks waits; CLAUDE.md 0g):
+{open_question}
 
 The step
 1. Read what the reason points to: an ended run's log (`site logs <run>`, then ack its event with what the log shows),
@@ -34,7 +36,10 @@ The step
    canonical run setup and its HPO search-space rules, and `site decisions --project FA` (the user's calls in force).
    Only a call none of them settles goes to the user: write the question, word for word, in your final message, with
    what you read and why none settles it; the main session sends it and runs
-   `plan ask {id} --ask "<the question>" --searched "<the rules and decisions read, and why none settles it>"`.
+   `plan ask {id} --ask "<the question>" --searched "<the rules and decisions read, and why none settles it>"
+   --blocks "<what in the entry waits on the answer>"`. Name what waits on it: the rest of the entry keeps moving.
+   Only when nothing in the entry can move without the answer, say so and why (the main session then passes
+   `--holds-all "<why>"` instead).
 Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
 to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 30 GPU-h (10 on Jean Zay) only if the user's words above cover it.

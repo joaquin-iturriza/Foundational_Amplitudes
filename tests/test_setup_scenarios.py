@@ -1611,6 +1611,71 @@ def sweeps():
              "refused mu_search_d" in r4.stdout and "SWEEP_SUBMITTED" not in r4.stdout, r4.stdout + r4.stderr)
 
 
+def open_questions():
+    """Only what needs the answer waits (CLAUDE.md 0g; the user, 2026-10-26: "why would you hold up all the catalog
+    study for a question you can answer yourself?"). On catalog_coverage a question about one process's top width
+    froze the entry's independent work for 8 h: plan ask kept the whole entry waiting."""
+    q = "Should the heavy-quark pools take the leading-order width at each mass?"
+    blocks = "the heavy-quark width rule; the massless b and the pool check go on"
+    w = World([E("cov")])
+    rc, out = w.plan_cmd("ask", "cov", "--ask", q, "--searched", SEARCHED, "--blocks", blocks)
+    e = w.entries()["cov"]
+    rc2, nxt = w.plan_cmd("next", "--prompts")
+    scenario("open question: an ask with --blocks keeps the entry running, routed by plan next, and its step prompt "
+             "names the question and what waits on it",
+             rc == 0 and e["status"] == "running" and e["ask"] == q and e["blocks"] == blocks
+             and e["asks"][-1]["blocks"] == blocks and rc2 == 1 and "NEXT cov: nothing in flight" in nxt
+             and "Open question to the user" in nxt and q in nxt and "Waits on the answer: " + blocks in nxt,
+             out + nxt[-1500:])
+    w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])],
+              state={"cov": step(1)})
+    rc, err = w.check()
+    scenario("open question: a running entry's question must still reach the user", rc == 2 and "no message sent" in err,
+             err)
+    w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])],
+              state={"cov": step(1)},
+              transcript=[(ago(19), "assistant", "Joaquin, should the heavy-quark pools take the leading-order width "
+                                                 "at each mass?")])
+    rc, err = w.check()
+    scenario("open question: once sent, the running entry with steps in flight lets the turn end", rc == 0, err)
+    say = [(ago(19), "assistant", "Joaquin, should the heavy-quark pools take the leading-order width at each mass?"),
+           (ago(10), "user", "Yes, take the leading-order width at each mass")]
+    w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])],
+              state={"cov": step(5)}, transcript=say)
+    rc, out = w.plan_cmd("answer", "cov", "--kind", "scope", "--quote", "Yes, take the leading-order width at each mass")
+    e = w.entries()["cov"]
+    pr = World([e]).plan_cmd("next", "--prompts")[1]
+    scenario("open question: plan answer (words typed after the ask, before the entry's later step) records the "
+             "decision and clears the question; the prompt shows none",
+             rc == 0 and e["status"] == "running" and not any(k in e for k in ("ask", "waiting_since", "blocks"))
+             and e["asks"][-1]["answered_at"] and e["asks"][-1]["decision"] == "D900"
+             and "Open question to the user (only what it blocks waits; CLAUDE.md 0g):\n  none" in pr, out + pr[-800:])
+    rc, out = w.plan_cmd("ask", "cov", "--ask", "Should the heavy-quark pools take the leading-order width at each "
+                         "mass point?", "--searched", SEARCHED)
+    scenario("open question: once answered, asking it again is refused", rc != 0 and "already answered" in out, out)
+    why = "every remaining step of the entry builds pools whose card the answer changes"
+    w = World([E("cov")], transcript=[(ago(1), "assistant", "Joaquin, should the heavy-quark pools take the "
+                                                            "leading-order width at each mass?")])
+    rc, out = w.plan_cmd("ask", "cov", "--ask", q, "--searched", SEARCHED, "--holds-all", why)
+    e = w.entries()["cov"]
+    rc2, nxt = w.plan_cmd("next", "--prompts")
+    rc3, out3 = w.plan_cmd("step", "cov", "--agent", "a9")
+    scenario("open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a "
+             "step is refused) and records why",
+             rc == 0 and e["status"] == "waiting_user" and e["holds_all"] == why and "NEXT cov" not in nxt
+             and rc3 != 0 and w.check()[0] == 0, out + nxt + out3)
+    w = World([E("cov")])
+    r1 = w.plan_cmd("ask", "cov", "--ask", q, "--searched", SEARCHED, "--holds-all", "it all waits")
+    r2 = w.plan_cmd("ask", "cov", "--ask", q, "--searched", SEARCHED, "--holds-all", why, "--blocks", blocks)
+    scenario("open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded",
+             r1[0] != 0 and r2[0] != 0 and "ask" not in w.entries()["cov"], r1[1] + r2[1])
+    w = World([E("cov", ask=q, blocks=blocks, waiting_since=ago(20), asks=[{"ask": q, "at": ago(20)}])])
+    view, show = w.plan_cmd("view")[1], w.plan_cmd("show")[1]
+    scenario("open question: plan view and show print a running entry's question and what waits on it",
+             "Asked: Should the heavy" in view and "Waits on it: the heavy" in view and "open question" in show
+             and "blocks: the heavy" in show, view + show)
+
+
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
     once let the suite exit 0 with failures: main() was split by an edit)."""
@@ -1631,7 +1696,8 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, sweeps, the_suite_itself]
+          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, sweeps, open_questions,
+          the_suite_itself]
 
 
 def main():
