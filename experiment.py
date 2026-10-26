@@ -1572,6 +1572,7 @@ class AmplitudeExperiment(BaseExperiment):
                              if _k in ("target_physics_s0", "target_physics_alpha_inv", "target_physics_hybrid_blend")
                              else str(_a) == str(_b))
                     assert _same, f"frozen data stats were fitted with {_k}={_a}, this run sets {_b}"
+                self._check_frozen_orders_source(stats)
             # the momentum scale of these stats is in GeV or in units of each event's sqrt(s_hat)
             _di_stats = bool(stats.get("dimensionless_inputs", False))
             _di_cfg = bool(self.cfg.data.get("dimensionless_inputs", False))
@@ -2435,12 +2436,18 @@ class AmplitudeExperiment(BaseExperiment):
             # sidecar also corrects the order vector's alpha_s power where it is wrong: v4's b-quark Higgs entries
             # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g; the order
             # features read the same sidecar (_orders_from_diagrams), so input and target agree
-            if pc.get("order") is None:
+            # data.orders_from_diagrams=false: the catalog table's powers (o) for the target too, the target as it was
+            # before the diagrams were read (a mixed entry refused); recorded in the frozen stats
+            # (_target_orders_source), so a run reusing a parent's statistics cannot switch it silently
+            _from_diag = self._target_orders_source() != "table"
+            if _from_diag and pc.get("order") is None:
                 bo = self._diagram_born_orders(name)
                 if bo is not None:
                     q, e = mg.target_monomial_from_diagrams(pc, bo)
-            assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), \
+            assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), (
                 f"target_physics_orders: {name} is a mixed-order entry {o} with no diagram sidecar to read its powers"
+                if _from_diag else
+                f"target_physics_orders: {name} is a mixed-order entry {o}, its coupling homogeneity is not exact")
             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
             lord = q * np.log(4 * np.pi * np.asarray(alphas, dtype=np.float64)) + e * np.log(4 * np.pi * a_em)
         n_eik, leik = 0, 0.0
@@ -2480,6 +2487,25 @@ class AmplitudeExperiment(BaseExperiment):
         analysis/catalog_v3/hybrid_check.py)."""
         from physics_scales import hybrid_cp
         return hybrid_cp(mom_phys)
+
+    def _target_orders_source(self):
+        """Where the dimensionless target's coupling monomial comes from (data.target_physics_orders), recorded in the
+        frozen data stats: "diagrams_highest_alphas" (data.orders_from_diagrams, default: the generated diagrams'
+        powers where the entry has a sidecar, a mixed entry divided by its highest alpha_s power with that term's
+        alpha power, mg5_pipeline_final.target_monomial_from_diagrams) or "table" (the catalog's order vector, a mixed
+        entry refused). Stats written before the record were fitted with the table."""
+        return "diagrams_highest_alphas" if bool(self.cfg.data.get("orders_from_diagrams", True)) else "table"
+
+    def _check_frozen_orders_source(self, stats):
+        """Refuse frozen data stats (a warm start's, a fine-tune parent's) fitted with another coupling-monomial source
+        than this run's (_target_orders_source) while the target divides by the monomial (data.target_physics_orders):
+        the diagrams' powers and the table's differ on the mixed and the mislabelled entries, a per-process shift of
+        the target the parent's standardization would hide (like target_propagators)."""
+        if not bool(self.cfg.data.get("target_physics_orders", False)):
+            return
+        _a, _b = str(stats.get("target_physics_orders_source", "table")), self._target_orders_source()
+        assert _a == _b, (f"frozen data stats were fitted with target_physics_orders_source={_a}, this run sets {_b} "
+                          f"(data.orders_from_diagrams)")
 
     def _diagram_born_orders(self, name):
         """The (QCD, QED) orders of a process's Born amplitudes from its diagram sidecar
@@ -2593,6 +2619,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
                 "target_physics_orders": bool(self.cfg.data.get("target_physics_orders", False)),
+                "target_physics_orders_source": self._target_orders_source(),
                 "target_physics_hybrid": bool(self.cfg.data.get("target_physics_hybrid", False)),
                 "target_physics_hybrid_cp": getattr(self, "_phys_cp", None) or None,
                 "target_physics_hybrid_blend": float(self.cfg.data.get("target_physics_hybrid_blend", 0.0)),
