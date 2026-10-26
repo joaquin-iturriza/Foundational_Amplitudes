@@ -1109,6 +1109,15 @@ entries:
   - tried: zero-width certification FA-ccin2p3-f470a7f2
     why: names with _nlo suffix refused by argparse; nothing checked
     at: '2026-10-26T02:41:12+00:00'
+  - tried: zero-width certification after the regex fix 7f879cd7 (FA-ccin2p3-1e4f6802)
+    why: 'the regex matched and zeroed the line, but kept its leading blank: MadGraph''s lha_read.f reads a width only from
+      a line whose first five characters are DECAY, so MadLoop skipped it and ran at the compiled default WT 1.4915 (cards
+      with WT 0, 1.48 and 50 in an indented line give bit-identical borns and poles; with DECAY 6 0 in column 1 the three
+      pass: max rel 4.8e-5, 3.5e-5, 7.2e-7; with 1.480327 in column 1 they deviate 4.5e-3, 4.2e-3, 4.2e-3; WT 50 in column
+      1 moves them to 0.3-1.1). The top width WAS the cause; the zeroing never reached MadLoop. Also found: the ~1e-6 double-pole
+      deviations of every light-quark W process come from the checker''s W mass 80.419 against the card''s derived 80.4190024
+      (d d~ > w+ w-: 2.2e-6 -> 5.7e-14 at the card value); harmless under the 1e-3 tolerance, not fixed'
+    at: '2026-10-26T03:08:59+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
