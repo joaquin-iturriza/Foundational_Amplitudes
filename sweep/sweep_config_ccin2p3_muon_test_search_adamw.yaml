@@ -1,0 +1,43 @@
+# The Muon test, stage 2 (D144; D146, the user 2026-10-26: "Yes, go ahead with muon's step 1 and 2 if results are not
+# conclusive"): stage 1 compared Muon and AdamW at AdamW's HPs transferred from the 32k-step sweep on Daniel's catalog
+# (dancat_het_pre trial 58), not tuned for this horizon or catalog. Each optimizer now gets its own single-fidelity DyHPO
+# at the short pretraining's horizon (4264 steps), and the two are read best against best (CLAUDE.md, A/B protocol).
+# Every trial starts from the exact resolved configuration of the AdamW short pretraining
+# (runs/catalog_v3_short/dimensionless, base_config: sweep/run_trial.py), so the trials differ from it and from the
+# stage-1 runs only in the lines below. Searched (the AdamW arm): the lr in the same window as Muon's, [3e-3, 2.7e-2], and the L2 lambda in
+# [1e-10, 1e-6] (CLAUDE.md HPO rule 3); the rest (warmup fraction 0.158, eta_min 1.8e-10, EMA on at 0.941) stays at the stage-1 values. 8 trials, 3 random start-up.
+# Its twin: sweep_config_ccin2p3_muon_test_search_muon.yaml.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 48G
+  cpus_per_task: 5
+  time: '04:00:00'
+paths: null
+sweep_name: muon_test_search_adamw
+base_config: ${PROJECT_DIR}/runs/catalog_v3_short/dimensionless
+n_trials: 8
+dyhpo:
+  n_candidates: 2000
+  seed: 42
+  n_startup: 3
+  total_budget: 10000
+  surrogate: gp
+  objective_scale: linear
+fidelity_schedule:
+  t_steps:
+  - 4264
+fixed_params:
+  training.optimizer: AdamW
+range_extension:
+  enabled: false
+search_space:
+- name: training.lr
+  type: float_log
+  low: 0.003
+  high: 0.027
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06

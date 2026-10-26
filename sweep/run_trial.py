@@ -165,17 +165,26 @@ def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
     sweep_name  = cfg["sweep_name"]
 
     cmd = [sys.executable, run_script]
-    cmd.append("local=none")
+    # base_config (a run directory holding its resolved config.yaml): every trial starts from that run's exact
+    # configuration instead of config/amplitudes.yaml, so a search around an existing run differs from it only in the
+    # fixed_params and the searched HPs (the Muon test's searches around the catalog_v3 short pretraining). Every
+    # override is then `++key=value` (add or override: the run's config may predate a key, e.g. training.muon_*).
+    base = cfg.get("base_config")
+    pre = "++" if base else ""
+    if base:
+        cmd += ["--config-path", base, "--config-name", "config", "run_name=null"]
+    else:
+        cmd.append("local=none")
 
     # Fixed params (excluding training.iterations — set below)
     skip_keys = {"training.iterations"}
     for key, val in cfg.get("fixed_params", {}).items():
         if key not in skip_keys:
-            cmd.append(f"{key}={val}")
+            cmd.append(f"{pre}{key}={val}")
 
     # Suggested HP params
     for key, val in hp_params.items():
-        cmd.append(f"{key}={format_value(val)}")
+        cmd.append(f"{pre}{key}={format_value(val)}")
 
     cmd.append(f"training.iterations={increment_steps}")
     cmd.append(f"training.is_dyhpo_run=true")
