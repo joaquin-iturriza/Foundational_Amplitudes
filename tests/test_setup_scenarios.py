@@ -1442,6 +1442,38 @@ def tooling_fixes():
                  out)
 
 
+def reviewed_content():
+    """A CLAUDE.md diff the reviewer passed uncommitted is not owed again once committed; a further edit is."""
+    repo = tempfile.mkdtemp(prefix="backlog_content_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q")
+    os.makedirs(os.path.join(repo, ".claude", "hooks"))
+    shutil.copy(os.path.join(ROOT, ".claude", "hooks", "review_backlog.sh"), os.path.join(repo, ".claude", "hooks"))
+    open(os.path.join(repo, ".gitignore"), "w").write(".claude/.review_state/\n")
+    md = os.path.join(repo, "CLAUDE.md")
+    open(md, "w").write("# rules\n")
+    g("add", "."); g("commit", "-qm", "base")
+    rb = lambda *a, stdin="": subprocess.run(["bash", ".claude/hooks/review_backlog.sh"] + list(a), cwd=repo,
+                                             input=stdin, capture_output=True, text=True)
+    due = lambda: next((l for l in rb("status").stdout.splitlines() if l.startswith("claudemd-keeper")), "")
+    commit = json.dumps({"tool_name": "Bash", "tool_input": {"command": "git commit -qam 'rule'"}})
+    rb("init")
+    open(md, "a").write("a new rule\n")
+    before = due()
+    refused = rb("bashpre", stdin=commit).returncode
+    rb("begin", "claudemd-keeper"); rb("advance", "claudemd-keeper")
+    allowed = rb("bashpre", stdin=commit).returncode
+    g("commit", "-qam", "rule")
+    after = due()
+    scenario("review backlog: a CLAUDE.md edit reviewed uncommitted, then committed, is not due again",
+             "DUE" in before and refused == 2 and allowed == 0 and "DUE" not in after and rb("check").stdout == "",
+             before + "\n" + after)
+    open(md, "a").write("another rule\n")
+    again = due()
+    scenario("review backlog: a further CLAUDE.md edit after that commit is due, and its commit refused",
+             "DUE" in again and rb("bashpre", stdin=commit).returncode == 2 and '"block"' in rb("check").stdout, again)
+
+
 SM = os.path.join(ROOT, "sweep", "sweep_manager.py")
 
 
@@ -1701,7 +1733,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, sweeps, open_questions,
+          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
           the_suite_itself]
 
 

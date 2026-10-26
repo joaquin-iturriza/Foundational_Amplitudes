@@ -85,7 +85,22 @@ pillar_lines() {
 
 pillar_commits() { git rev-list --count "$1"..HEAD -- $2 2>/dev/null || echo 0; }
 
-# state file: "<sha> <baseline_lines> <baseline_commits>"
+# What a reviewer passed, as content: the files of the pillar that differ from the watermark commit $1 (committed
+# since or not, untracked included), each with its blob id (or "deleted"), hashed. Committing the reviewed diff leaves
+# this unchanged, so the commit is not a new backlog; any further edit (or reverting one of those files) changes it.
+# Only the files changed since the watermark are read, so the repo-reviewer's wide pathspec stays cheap.
+reviewed_hash() {
+  local since="$1" paths="$2" f
+  { git -c core.quotePath=false diff --name-only "$since" -- $paths 2>/dev/null
+    git -c core.quotePath=false ls-files --others --exclude-standard -- $paths 2>/dev/null; } | LC_ALL=C sort -u |
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    if [ -f "$f" ]; then printf '%s %s\n' "$(git hash-object -- "$f" 2>/dev/null)" "$f"
+    else printf 'deleted %s\n' "$f"; fi
+  done | cksum | awk '{print $1"-"$2}'
+}
+
+# state file: "<sha> <baseline_lines> <baseline_commits> [<reviewed_hash>]"
 state_file() { echo "$REPO/$STATE_REL/$1"; }
 
 read_state() {                       # $1=reviewer -> echoes "sha lines commits"
@@ -93,9 +108,9 @@ read_state() {                       # $1=reviewer -> echoes "sha lines commits"
   if [ -f "$f" ]; then cat "$f"; else echo ""; fi
 }
 
-write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits
+write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits $5=reviewed_hash
   mkdir -p "$REPO/$STATE_REL"
-  printf '%s %s %s\n' "$2" "$3" "$4" > "$(state_file "$1")"
+  printf '%s %s %s %s\n' "$2" "$3" "$4" "${5:-}" > "$(state_file "$1")"
 }
 
 lock_file() { echo "$REPO/$STATE_REL/$1.lock"; }
@@ -124,7 +139,7 @@ reset_pillar() {
   paths=$(pillar_field "$who" 4)
   sha=$(git rev-parse HEAD)
   lines=$(pillar_lines "$sha" "$paths")     # the uncommitted remainder just reviewed
-  write_state "$who" "$sha" "$lines" 0
+  write_state "$who" "$sha" "$lines" 0 "$(reviewed_hash "$sha" "$paths")"
 }
 
 # Backlog for a pillar -> echoes "lines commits"; empty state self-initializes to zero owed.
@@ -140,6 +155,12 @@ backlog_for() {
   git cat-file -e "$sha^{commit}" 2>/dev/null || { reset_pillar "$who"; echo "0 0"; return; }
   tl=$(pillar_lines "$sha" "$paths")
   tc=$(pillar_commits "$sha" "$paths")
+  # nothing owed while the pillar's content is what the reviewer passed, whatever commits sit in between (committing a
+  # reviewed but uncommitted diff counted as a new commit and asked for a second review of identical content)
+  if [ "$tl" -gt "$base_l" ] || [ "$tc" -gt "$base_c" ]; then
+    local rh; rh=$(echo "$st" | awk '{print $4}')
+    [ -n "$rh" ] && [ "$rh" = "$(reviewed_hash "$sha" "$paths")" ] && { echo "0 0"; return; }
+  fi
   # subtract what was already reviewed at the watermark; clamp (a revert can go negative)
   echo "$(( tl > base_l ? tl - base_l : 0 )) $(( tc > base_c ? tc - base_c : 0 ))"
 }
