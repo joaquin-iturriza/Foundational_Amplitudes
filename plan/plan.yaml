@@ -370,8 +370,9 @@ entries:
     - signed_ab
   decisions:
   - D83
-  next: catalog pretraining at hp58's config and HPs under normalization A and B (2 runs, ~5.5 GPU-h each, CC V100) + the
-    139 held-out zero-shot; a smoke test first
+  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
+    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
+    that decides'
   done_when: null
   match: runs/catalog_norm/*,zz_catalog_norm*
   notes_ref: null
