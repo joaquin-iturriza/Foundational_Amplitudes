@@ -28,6 +28,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
 from rebuild_run import _build, load_best_weights  # noqa: E402
+from multiplicity_extrap import parent_target_standardization  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--parent", required=True, help="pretraining run dir (config.yaml, data_stats.json, models/)")
@@ -118,11 +119,9 @@ for recipe in a.recipes:
         continue
     mu_p, sd_p = float(exp.prepd_mean[0]), float(exp.prepd_std[0])
     t = mu_p + sd_p * z                                                   # the probe's log|M|^2 (abslog: log max(|M|^2, s))
-    if pstats.get("affine_multiplicity"):
-        am = pstats["affine_multiplicity"]
-        mu_c, sd_c, kind = float(am["a"]) + float(am["b"]) * N, float(am["sigma"]), "affine_multiplicity"
-    elif pstats.get("shared_standardization"):
-        mu_c, sd_c, kind = float(pstats["prepd_mean"][0]), float(pstats["prepd_std"][0]), "shared"
+    if pstats.get("affine_multiplicity") or pstats.get("shared_standardization"):
+        # the statistics a fine-tune with fine_tune.target_stats=parent_shared standardizes the probe with
+        (mu_c,), (sd_c,), kind = parent_target_standardization(pstats, [N])
     elif probe in twins:
         i = parent_index[twins[probe]]
         mu_c, sd_c, kind = float(pstats["prepd_mean"][i]), float(pstats["prepd_std"][i]), "twin"

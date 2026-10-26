@@ -78,3 +78,19 @@ def fit_affine_multiplicity(n_events, n_particles, means, stds):
     a = float(mb - b * Nb)
     sigma = float(np.sqrt((w * (s ** 2 + (m - a - b * N) ** 2)).sum()))
     return a, b, sigma
+
+
+def parent_target_standardization(stats, n_particles):
+    """A parent's target standardization carried onto processes it never saw (fine_tune.target_stats=parent_shared,
+    and the zero-shot read tools/zero_shot_parent.py): stats = the parent's data_stats.json, n_particles = each new
+    process's particle count. Returns (means, stds, kind): data.affine_multiplicity_std, mu_N = a + b N and the
+    shared sigma; data.shared_standardization, the pooled (mu, sigma) for every process; a per-process parent has
+    no standardization for a new process (ValueError)."""
+    am = stats.get("affine_multiplicity")
+    if am:
+        a, b, s = float(am["a"]), float(am["b"]), float(am["sigma"])
+        return [a + b * int(N) for N in n_particles], [s] * len(n_particles), "affine_multiplicity"
+    if stats.get("shared_standardization"):
+        mu, sd = float(np.atleast_1d(stats["prepd_mean"])[0]), float(np.atleast_1d(stats["prepd_std"])[0])
+        return [mu] * len(n_particles), [sd] * len(n_particles), "shared"
+    raise ValueError("the parent standardized each process on its own: it has no target statistics for a new process")

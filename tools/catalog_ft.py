@@ -8,6 +8,9 @@ fine-tune's optimizer chosen apart from the parent's (AdamW or MuonAdamW: the 2x
 --scratch trains the same cells from a fresh initialisation instead (no pretrained weights, the target's and the
 off-shellness statistics the probe's own), with the parent's config and HPs otherwise: whether fine-tuning a current
 pretraining beats training from scratch at small D (the user, 2026-10-26).
+--keep-parent-stats fine-tunes the same cells keeping the parent's target standardization (fine_tune.target_stats=
+parent_shared: the probe's own transform, the parent's pooled mean and sigma), so the loss at step 0 is the parent's
+zero-shot on the probe instead of its output read in the probe's own units (the refit fine-tunes threw that level away).
 The four probes are the dimensionless arm's median-MSE probe of each axis (H1 new combinations, H2 2->4, H3 the top,
 H5 one loop), fixed before any fine-tune ran.
 One CATFT JSON line per cell: the best-checkpoint val_loss_no_reg (the run's result file) and that times prepd_std^2,
@@ -38,10 +41,10 @@ def probe_recipe(probe, out):
     raise KeyError(f"{probe} is in no recipes/catalog_v3_heldout_*.yaml")
 
 
-def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False):
+def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False, target_stats="own"):
     ft = [] if scratch else [
         f"fine_tune.pretrained_path={os.path.abspath(parent)}/models/model_run0_best.pt",
-        "fine_tune.lr_scale=1.0", "fine_tune.layer_decay=1.0", "fine_tune.target_stats=own",
+        "fine_tune.lr_scale=1.0", "fine_tune.layer_decay=1.0", f"fine_tune.target_stats={target_stats}",
         "fine_tune.offshell_stats=parent"]
     return [sys.executable, os.path.join(ROOT, "run.py"), "--config-path", os.path.abspath(parent),
             "--config-name", "config", f"run_dir={run_dir}", "run_name=null", "warm_start_idx=null",
@@ -60,10 +63,14 @@ def main():
     ap.add_argument("--probes", nargs="*", default=PROBES)
     ap.add_argument("--only", nargs="*", help="cells by tag (d2 d3 d4 d5)")
     ap.add_argument("--scratch", action="store_true", help="fresh initialisation, no pretrained weights")
+    ap.add_argument("--keep-parent-stats", action="store_true",
+                    help="the parent's target standardization on the probe (fine_tune.target_stats=parent_shared)")
     ap.add_argument("--steps-cap", type=int, default=None, help="cap every cell's steps (the smoke test)")
     a = ap.parse_args()
     pname = os.path.basename(os.path.normpath(a.parent))
-    kind = "scratch" if a.scratch else "catft"
+    assert not (a.scratch and a.keep_parent_stats), "scratch has no parent statistics"
+    kind = "scratch" if a.scratch else ("catft_parentstats" if a.keep_parent_stats else "catft")
+    target_stats = "parent_shared" if a.keep_parent_stats else "own"
     base = os.path.join(a.out, f"{kind}_{pname}_{a.optimizer}")
     os.makedirs(base, exist_ok=True)
     failed = 0
@@ -75,11 +82,11 @@ def main():
             T = min(T, a.steps_cap) if a.steps_cap else T
             run_dir = os.path.join(base, f"{probe}_{tag}")
             res = run_dir + "_result.json"
-            rec = dict(kind=kind, parent=pname, optimizer=a.optimizer, probe=probe, tag=tag, D=D, steps=T)
+            rec = dict(kind=kind, target_stats=None if a.scratch else target_stats, parent=pname, optimizer=a.optimizer, probe=probe, tag=tag, D=D, steps=T)
             t0 = time.time()
             try:
                 p = subprocess.run(command(a.parent, a.optimizer, recipe, D, T, run_dir, res,
-                                           f"{kind}_{pname}_{a.optimizer}", a.scratch), cwd=ROOT)
+                                           f"{kind}_{pname}_{a.optimizer}", a.scratch, target_stats), cwd=ROOT)
                 if p.returncode:
                     raise RuntimeError(f"run.py exit {p.returncode}")
                 r = json.load(open(res))

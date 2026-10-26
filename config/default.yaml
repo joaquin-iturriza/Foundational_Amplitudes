@@ -250,7 +250,7 @@ mlflow:
 
 fine_tune:
  pretrained_path: null        # absolute path to pretrained .pt checkpoint
- target_stats: parent         # amplitude standardization: parent's frozen stats, or `own` (fit on this run's train split; for a target the parent never saw)
+ target_stats: parent         # amplitude standardization: parent's frozen stats, `own` (fit on this run's train split; for a target the parent never saw), or `parent_shared` (a new target, its own transform, the parent's pooled or affine mu/sigma: step 0 is the zero-shot)
  offshell_stats: parent       # off-shellness input: the parent's column scale where the parent saw it vary (else fitted here), or `own` (refit every column)
  parent_offshell_stats: null  # [mean, std] per column, for a parent older than data_stats.json's record (tools/offshell_stats.py)
  lr_scale: 0.1                # global LR multiplier on top of base LR (sweep: 0.01–1.0)

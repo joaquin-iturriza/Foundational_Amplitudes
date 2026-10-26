@@ -23,7 +23,7 @@ from logger import LOGGER
 #from mlflow_util import log_mlflow
 from losses import LogCoshLoss, RelL1Loss, HeteroscedasticLoss
 from dataset import AmplitudeDataset, collate_variable_length
-from multiplicity_extrap import order_identical_particles, fit_affine_multiplicity
+from multiplicity_extrap import order_identical_particles, fit_affine_multiplicity, parent_target_standardization
 
 from lloca.utils.rand_transforms import rand_lorentz
 from lloca.utils.polar_decomposition import restframe_boost
@@ -1593,6 +1593,20 @@ class AmplitudeExperiment(BaseExperiment):
                 per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
                 LOGGER.info("Fine-tuning: amplitude stats fitted on this run's train split "
                             "(fine_tune.target_stats=own); momentum stats from the parent")
+            if ft_path is not None and not self.warm_start \
+                    and str(ft.get("target_stats", "parent")) == "parent_shared":
+                # fine-tune onto a process the parent never saw, keeping the parent's target standardization: the
+                # probe's own transform (log, or signedlog for a signed pool, resolved as a fresh run does) and the
+                # parent's pooled (mu, sigma) (or its mu_N = a + b N), so the loss at step 0 is the parent's zero-shot
+                # (tools/zero_shot_parent.py reads it with the same statistics, multiplicity_extrap.parent_target_standardization)
+                amp_trafos = amp_trafos_pp = None
+                prepd_means = prepd_stds = None
+                per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
+                assert not bool(self.cfg.data.get("memmap", False)), \
+                    "fine_tune.target_stats=parent_shared is built on the in-memory path (the memmap cache key does not carry it)"
+                self._ft_parent_target_stats = stats
+                LOGGER.info("Fine-tuning: the parent's target standardization kept on the probe "
+                            "(fine_tune.target_stats=parent_shared), transform resolved on its own train split")
         else:
             mom_div = mom_mean = mom_std = None
             amp_trafos = None
@@ -2246,7 +2260,14 @@ class AmplitudeExperiment(BaseExperiment):
         assert not self.cfg.data.get("affine_multiplicity_std", False) or (
             per_dataset and self.cfg.data.get("shared_standardization", False)), \
             "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
-        if prepd_means is None:
+        _pts = getattr(self, "_ft_parent_target_stats", None)
+        if prepd_means is None and _pts is not None:
+            prepd_means, prepd_stds, _kind = parent_target_standardization(_pts, [npart_of(nm) for nm in names])
+            if _kind == "affine_multiplicity":
+                self._affine_multiplicity = dict(_pts["affine_multiplicity"])
+            LOGGER.info(f"parent_shared: the parent's {_kind} standardization, means "
+                        f"{[f'{m:.3f}' for m in prepd_means]}, sigma {prepd_stds[0]:.3f}")
+        elif prepd_means is None:
             if per_dataset:
                 prepd_means, prepd_stds = [], []
                 for i, name in enumerate(names):
