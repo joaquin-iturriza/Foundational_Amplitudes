@@ -24,9 +24,9 @@ everywhere. Per pp class:
             the same units, natural log of |M|^2). The card values (MT, ymt, MB, ymb, WT, WZ, WW, WH) of both standalones.
     site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/pp_physics_check.py eval --n 200 \
         --part K --parts P  > data/pp_physics_eval_K.json
-    python3 analysis/catalog_v4/pp_physics_check.py classify            -> data/pp_physics_classes.json
+    python3 analysis/catalog_v4/pp_physics_check.py classify            (counts)
     site run ... -- python analysis/catalog_v4/pp_physics_check.py cost > data/pp_physics_cost.json
-    python3 analysis/catalog_v4/pp_physics_check.py summary             (reads the eval parts, the classes)
+    python3 analysis/catalog_v4/pp_physics_check.py summary             -> data/pp_physics_check.json (classes, evals)
 The last line printed by summary is the JSON of its numbers.
 """
 import glob, json, os, sys
@@ -182,7 +182,6 @@ def summary():
     E = {}
     for f in sorted(glob.glob(os.path.join(HERE, "data", "pp_physics_eval_*.json"))):
         E.update(json.load(open(f)))
-    json.dump(C, open(os.path.join(HERE, "data", "pp_physics_classes.json"), "w"), indent=0)
     res = {"counts": dict(Counter(c["cls"] for c in C.values())),
            "counts_detail": dict(Counter(f"{c['cls']}{'/ew' if c.get('ew') and c['cls'] == 'b' else ''}"
                                          f"{'/itop' if c.get('itop') else ''}" for c in C.values())),
