@@ -3,7 +3,10 @@ sweep/run_trial.py `objective:`): on the same events, per process, it is the los
 (_aggregate_per_process_loss with the sign head), combined over processes by the validation aggregation (the training's
 own aggregation does not move it); the near-zero weight (training only) does not move it; monitor processes are left
 out; it is None without the sign head; run_trial observes the configured result key, fails a result without it, and
-refuses a search over sign_loss_weight with this objective.
+refuses a search over sign_loss_weight with this objective; the step-0 validation of a fine-tune is taken back out
+of val_total too (base_experiment._START_CURVES), so val_total stays aligned with val_loss_no_reg's best index; a
+detached trial's RESULT_JSON reports val_loss_no_reg as `val_loss` and the objective as `objective_value`, and
+run_trial.result_fields reads both the new lines and the ones written before the fix.
     python tests/test_val_total.py        (or pytest tests/test_val_total.py)
 """
 import os
@@ -112,6 +115,102 @@ def test_run_trial_objective():
         pass
     else:
         raise AssertionError("val_total with sign_loss_weight searched must be refused")
+
+
+def _start_stub(with_vt):
+    """A fine-tune-like experiment with two validations done, whose _validate appends like experiment._validate
+    (val_total rebound, not appended in place)."""
+    from base_experiment import BaseExperiment as B
+    s = types.SimpleNamespace(_START_CURVES=B._START_CURVES, _START_PER_PROCESS=B._START_PER_PROCESS,
+                              train_sampler=None, val_loss=[3.0, 2.0], val_loss_no_reg=[3.0, 2.0], val_mse=[],
+                              proc_val_losses={"p0": [3.0, 2.0]}, proc_val_losses_no_reg={"p0": [3.0, 2.0]})
+    if with_vt:
+        s.val_total = [5.0, 4.0]
+
+    def _validate(step):
+        s.val_loss.append(1.0)
+        s.val_loss_no_reg.append(1.0)
+        s.proc_val_losses["p0"].append(1.0)
+        s.proc_val_losses_no_reg["p0"].append(1.0)
+        s.val_total = getattr(s, "val_total", []) + [0.5]
+    s._validate = _validate
+    return s, B
+
+
+def test_validate_start_val_total():
+    for with_vt in (False, True):
+        s, B = _start_stub(with_vt)
+        assert B._validate_start(s) == 1.0
+        assert s.val_loss_no_reg == [3.0, 2.0] and s.proc_val_losses["p0"] == [3.0, 2.0]
+        if with_vt:
+            assert s.val_total == [5.0, 4.0], s.val_total
+        else:
+            assert not hasattr(s, "val_total"), "a step-0 val_total must not survive as the first entry"
+    # a fresh run: step-0 then the training validations; val_total read at val_loss_no_reg's best index is that step's
+    s, B = _start_stub(False)
+    s.val_loss, s.val_loss_no_reg, s.proc_val_losses["p0"], s.proc_val_losses_no_reg["p0"] = [], [], [], []
+    B._validate_start(s)
+    for nr, vt in ((2.0, 7.0), (1.0, 6.0), (1.5, 6.5)):
+        s.val_loss_no_reg.append(nr)
+        s.val_total = getattr(s, "val_total", []) + [vt]
+    assert s.val_total[int(np.argmin(s.val_loss_no_reg))] == 6.0
+
+
+def test_result_json_fields():
+    import run_trial as rt
+    # after the fix
+    new = {"val_loss": 0.01, "objective": "val_total", "objective_value": 0.05, "observe_loss": 0.05}
+    assert rt.result_fields(new) == (0.01, "val_total", 0.05)
+    # a line written before the fix by a val_total search: val_loss carried the objective
+    old = {"val_loss": 0.05, "objective": "val_total", "observe_loss": 0.05}
+    assert rt.result_fields(old) == (None, "val_total", 0.05)
+    old_default = {"val_loss": 0.01, "objective": "val_loss", "observe_loss": 0.01}
+    assert rt.result_fields(old_default) == (0.01, "val_loss", 0.01)
+    assert rt.result_fields({"val_loss": 0.01, "observe_loss": 0.01}) == (0.01, "val_loss", 0.01)
+
+
+def test_detached_result_json():
+    """run_trial.main --detached on a stubbed run.py: the printed RESULT_JSON names each number by what it is."""
+    import contextlib
+    import io
+    import json
+    import tempfile
+    import run_trial as rt
+    tmp = tempfile.mkdtemp(prefix="zz_val_total_")
+    for objective, want_obj in (("val_total", 0.05), (None, 0.01)):
+        cfg = {"sweep_name": "zz_sweep", "paths": {"project_dir": tmp, "sweep_dir": tmp},
+               "fidelity_schedule": {"t_steps": [10]}}
+        if objective:
+            cfg["objective"] = objective
+        seen = {}
+
+        def build(cfg_, hp, run_dir, run_idx, result_path, *a, **k):
+            seen["rp"] = result_path
+            return ["true"]
+
+        def run(cmd, cwd=None):
+            with open(seen["rp"], "w") as f:
+                json.dump({"val_loss": 0.01, "val_total": 0.05, "proc_val_losses": {"p0": 0.01}}, f)
+            return types.SimpleNamespace(returncode=0)
+
+        saved = (rt.load_config, rt.build_command, rt.subprocess.run, sys.argv)
+        rt.load_config, rt.build_command, rt.subprocess.run = (lambda p: dict(cfg)), build, run
+        sys.argv = ["run_trial.py", "--sweep-config", "x.yaml", "--trial-idx", "0", "--detached",
+                    "--hp-idx", "3", "--t-steps", "10", "--hp", "training.lr=0.001"]
+        out = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(out):
+                rt.main()
+        finally:
+            rt.load_config, rt.build_command, rt.subprocess.run, sys.argv = saved
+        line = [l for l in out.getvalue().splitlines() if l.startswith("RESULT_JSON ")][-1]
+        res = json.loads(line[len("RESULT_JSON "):])
+        assert res["val_loss"] == 0.01, res                       # always val_loss_no_reg
+        assert res["objective"] == (objective or "val_loss") and res["objective_value"] == want_obj, res
+        assert res["observe_loss"] == want_obj, res
+        assert rt.result_fields(res) == (0.01, objective or "val_loss", want_obj)
+    import shutil
+    shutil.rmtree(tmp)                                            # the test's own temporary dir only
 
 
 if __name__ == "__main__":

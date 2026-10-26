@@ -326,10 +326,13 @@ class Sweep:
             if res and not res.get("failed"):
                 self.sampler.observe(t["hp_idx"], t["t_steps"], float(res["observe_loss"]),
                                      res.get("proc_val_losses"))
-                t.update(status="observed", val_loss=res.get("val_loss"), observe_loss=res["observe_loss"],
-                         finished=int(time.time()), sched_state=stt)
+                from sweep.run_trial import result_fields
+                vnr, oname, oval = result_fields(res)
+                t.update(status="observed", val_loss=vnr, objective=oname, objective_value=oval,
+                         observe_loss=res["observe_loss"], finished=int(time.time()), sched_state=stt)
                 json.dump(res, open(os.path.join(self.dir, "results", "hp%04d_t%d.json" % (t["hp_idx"], t["t_steps"])), "w"), indent=1)
-                log("%s: trial %d on %s -> val_loss %.6g" % (self.name, t["idx"], t["site"], float(res.get("val_loss", res["observe_loss"]))))
+                log("%s: trial %d on %s -> %s %.6g" % (self.name, t["idx"], t["site"], oname,
+                                                       float(oval if oval is not None else res["observe_loss"])))
             else:
                 from sweep.run_trial import _failure_penalty
                 pen = _failure_penalty(self.sampler, self.cfg)

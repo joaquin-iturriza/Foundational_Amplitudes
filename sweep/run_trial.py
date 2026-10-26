@@ -163,6 +163,19 @@ def _objective_value(cfg, result):
     return float(result[key])
 
 
+def result_fields(res):
+    """(val_loss_no_reg, objective name, objective value) from a detached trial's RESULT_JSON. Since the fix of the
+    sign-head search's report, `val_loss` is always the best checkpoint's val_loss_no_reg and the objective has its own
+    `objective_value`. A line written before it (no `objective_value`) carried the objective in `val_loss`: then
+    val_loss_no_reg is known only when the objective was val_loss itself, else None (read it from the trial's result
+    json, `result_path`)."""
+    name = res.get("objective", "val_loss")
+    if "objective_value" in res:
+        return res.get("val_loss"), name, res["objective_value"]
+    v = res.get("val_loss")
+    return (v if name == "val_loss" else None), name, v
+
+
 def _check_objective(cfg):
     """val_total weighs the sign cross-entropy by training.sign_loss_weight: searched, DyHPO would drive it to 0."""
     if cfg.get("objective") == "val_total":
@@ -281,6 +294,11 @@ def _drop_last_model(cfg, run_dir, run_idx, t_steps):
 def _write_summary(cfg, sampler, eos_dir):
     results = sampler.all_results()
     best    = sampler.best_result()
+    # what the sampler holds is the observed objective (its field is named val_loss whatever the objective is)
+    # (with a scaling law, the transfer-ratio hpo_obj where it could be computed, the configured objective elsewhere)
+    obj = cfg.get("objective", "val_loss")
+    if cfg.get("scaling_law"):
+        obj = f"hpo_obj/{obj}"
 
     lines = [
         f"Sweep: {cfg['sweep_name']}",
@@ -288,7 +306,7 @@ def _write_summary(cfg, sampler, eos_dir):
     ]
     if best:
         params, loss = best
-        lines += [f"Best val_loss: {loss:.6g}", "Best params:"]
+        lines += [f"Best {obj}: {loss:.6g}", "Best params:"]
         for k, v in params.items():
             lines.append(f"  {k} = {v}")
     lines.append("")
@@ -299,7 +317,7 @@ def _write_summary(cfg, sampler, eos_dir):
             for k, v in r['params'].items()
         )
         lines.append(
-            f"  hp_{r['hp_idx']:04d}  val_loss={r['val_loss']:.6f}"
+            f"  hp_{r['hp_idx']:04d}  {obj}={r['val_loss']:.6f}"
             f"  t_steps={r['t_steps']}  {ps}"
         )
 
@@ -444,6 +462,7 @@ def main():
             val_loss, proc_val_losses, result_path = _run_cells(cfg, hp_params, run_dir, results_dir, hp_idx,
                                                                 t_steps, project_dir)
             result = {"val_loss": val_loss}
+            obj_value = _objective_value(cfg, result)
         else:
             proc = subprocess.run(cmd, cwd=project_dir)
             if proc.returncode != 0:
@@ -451,16 +470,21 @@ def main():
 
             with open(result_path) as f:
                 result = json.load(f)
-            val_loss        = _objective_value(cfg, result)
+            # the objective DyHPO observes (val_loss_no_reg unless the config names another key) and, separately,
+            # the best checkpoint's val_loss_no_reg: each reported under its own name, never one in the other's field
+            obj_value       = _objective_value(cfg, result)
+            val_loss        = float(result["val_loss"]) if "val_loss" in result else None
             proc_val_losses = result.get("proc_val_losses")
             _drop_last_model(cfg, run_dir, run_idx, t_steps)
 
         # Use transfer-ratio geometric mean as HPO objective when scaling law
-        # params are available; fall back to raw combined val_loss otherwise.
+        # params are available; fall back to the configured objective otherwise.
         hpo_obj = compute_hpo_objective(result, cfg.get("scaling_law", {}))
-        observe_loss = hpo_obj if hpo_obj is not None else val_loss
+        observe_loss = hpo_obj if hpo_obj is not None else obj_value
+        obj_name = cfg.get("objective", "val_loss")
         print(f"[run_trial] hp_{hp_idx:04d}  t_steps={t_steps}"
-              f"  val_loss={val_loss:.6f}"
+              + (f"  val_loss_no_reg={val_loss:.6f}" if val_loss is not None else "")
+              + (f"  {obj_name}={obj_value:.6f}" if obj_name != "val_loss" else "")
               + (f"  hpo_obj={hpo_obj:.4f}" if hpo_obj is not None else ""))
 
         # -----------------------------------------------------------
@@ -469,7 +493,7 @@ def main():
         if args.detached:
             print("RESULT_JSON " + json.dumps({
                 "hp_idx": hp_idx, "t_steps": t_steps, "trial_idx": args.trial_idx,
-                "val_loss": val_loss, "objective": cfg.get("objective", "val_loss"),
+                "val_loss": val_loss, "objective": obj_name, "objective_value": obj_value,
                 "observe_loss": float(observe_loss),
                 "hpo_obj": hpo_obj, "proc_val_losses": proc_val_losses,
                 "result_path": result_path, "run_dir": run_dir}), flush=True)

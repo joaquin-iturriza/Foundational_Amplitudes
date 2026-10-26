@@ -1254,7 +1254,7 @@ class BaseExperiment:
 
     # the curves a validation appends to, restored by _validate_start
     _START_CURVES = ("val_loss", "val_loss_no_reg", "val_mse", "val_loss_no_reg_all",
-                     "train_eval_loss_no_reg", "train_eval_mse")
+                     "train_eval_loss_no_reg", "train_eval_mse", "val_total")
     _START_PER_PROCESS = ("proc_val_losses", "proc_val_losses_no_reg")
 
     def _validate_start(self):
