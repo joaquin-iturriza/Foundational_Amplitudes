@@ -171,7 +171,7 @@ def cost():
         f = os.path.join(os.environ["DATA_DIR"], f"{n}_13000-13000GeV_val_lhe_amplitudes.npy.recipe.json")
         try:
             r = json.load(open(f))["lhe_run"]
-            out[n] = {"s": r["seconds"], "cores": r["mg_cores"], "n_lhe": r["n_lhe_events"], "runs": len(r["iseeds"])}
+            out[n] = {"s": r["seconds"], "cores": r["mg_cores"], "n_lhe": r["n_lhe_events"], "runs": len(r.get("iseeds") or [0])}
         except Exception as ex:
             out[n] = {"error": repr(ex)[:200]}
     json.dump(out, sys.stdout)
