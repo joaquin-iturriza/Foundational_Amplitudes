@@ -9,7 +9,8 @@ optimizer, EMA and Fisher states included) or any non-text file under a run's mo
 result json, data_stats, the tokenizer, base shapes, predictions (.npz) and plots are never listed.
 A run stays whole when: it is named as pretrained_path by any config.yaml under runs/, runs_from_lxplus/ or $SCRATCH
 (a parent: the transfer study's pretraining rungs, catalog parents, a fine-tune that is itself fine-tuned from), or by
-sweep/prune.py's parents; it holds a file written in the last 6 h; or a job of this site's queue names it.
+sweep/prune.py's parents or the Delta lists (the active Delta item evaluates those fine-tunes); an active or held
+work item's glob names it (CCORCH_WORK; the finished small-D items excepted); it holds a file written in the last 6 h; or a job of this site's queue names it.
 Pretrainings (no pretrained_path) and runs/catalog_v3_short are out of scope and never listed.
 
     python analysis/storage/model_manifest.py list > manifest.tsv                 # read-only
@@ -76,11 +77,31 @@ def all_parents():
     try:
         sys.path.insert(0, os.path.join(REPO, "sweep"))
         import prune
-        for t in prune.parents():                        # <sweep>/<trial>, under either run root
+        for t in set(prune.parents()) | set(prune.delta_runs()):   # <sweep>/<trial>, under either run root
             out |= {os.path.join(r, t) for r in RUN_ROOTS}
     except Exception as e:  # noqa: BLE001
         print("#WARN\tsweep/prune.py parents not read: %s" % e)
     return {os.path.realpath(p.replace(".gz", "")) for p in out}
+
+
+DONE_ITEMS = ("tp3_lowd*", "zz_lowd*")    # the small-D first round and its DyHPO round: finished (lowd_ft 900/900)
+
+
+def item_globs():
+    """The active and held work items' globs (CCORCH_WORK, exported by `site run`), less the finished small-D ones."""
+    import json
+    try:
+        w = json.loads(os.environ.get("CCORCH_WORK", "{}"))
+    except ValueError:
+        return []
+    return [g for g in w.get("active", []) + w.get("held", []) if g not in DONE_ITEMS]
+
+
+def item_match(rd, top, globs):
+    import fnmatch
+    names = [os.path.basename(top), os.path.relpath(rd, os.path.dirname(top)),
+             "runs/" + os.path.relpath(rd, os.path.dirname(top))]
+    return next((g for g in globs if any(fnmatch.fnmatch(n, g) for n in names)), None)
 
 
 def queue_names():
@@ -120,6 +141,8 @@ def cmd_list():
     now = time.time()
     parents = all_parents()
     queue = queue_names()
+    globs = item_globs()
+    print("#ITEM_GLOBS\t" + " ".join(globs))
     runs = {}
     for kind, top in tops():
         for dp, dns, fns in os.walk(top):
@@ -145,6 +168,8 @@ def cmd_list():
             why = "a pretraining or scratch run (no pretrained_path), out of scope"
         elif any(p == rrd or p.startswith(rrd + os.sep) for p in parents):
             why = "a parent: named as pretrained_path by a run on this site"
+        elif item_match(rd, r["top"], globs):
+            why = "an active or held work item names it (%s)" % item_match(rd, r["top"], globs)
         elif r["recent"]:
             why = "a file written in the last 6 h"
         elif os.path.basename(r["top"]) in queue or os.path.basename(rd) in queue:
