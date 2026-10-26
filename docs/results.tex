@@ -2789,6 +2789,132 @@ rate. (c) The wrong-sign share on the worst sign-changing training pool's valida
 against the learning rate. (d) Per held-out sign-changing one-loop pool, the zero-shot wrong-sign share of the best
 trial (the pair head's) and of the AdamW arm against the Muon baseline's; the line is equality.}\label{fig:v3_sign_head_search}
 \end{figure}
+  \item \emph{At the search's best hyperparameters the pair sign head does not help, and three of the four runs blow
+    up.} The question, from the search above: is the best trial's held-out sign gain over the Muon baseline the pair
+    head's, or its learning rate's? The design (the user's call of 2026-10-26, ``Yes, run that test.''; passed review
+    before submission): the more-signed-pools arm with Muon at the best trial's settings, learning rate
+    $1.246\times10^{-2}$, warmup $0.081$, decoupled weight decay $0.0217$, $4264$ steps, near-zero weighting off, with
+    the pair head on (width $16$, hidden $16$, unbounded) and off, nothing else different, seeds $42$ and $43$ (runs
+    FA-ccin2p3-61c09ed7 and FA-ccin2p3-0239c199 on, FA-ccin2p3-19971006 and FA-ccin2p3-36586b54 off); every run read
+    zero-shot as \code{prep\_signed.py} reads the others, at its best checkpoint. The decision statistic, fixed before
+    the runs: per held-out sign-changing one-loop pool the mean of the two seeds of each arm, and the count of pools
+    where the pair head is less wrong, ties left out, with a one-sided sign test; yes needed at least $13$ of the $17$
+    lower, a lower median and the same direction at seed $43$ alone; no, a median not lower or most pools higher;
+    between them, or a blow-up of the control alone, inconclusive (\code{data/prep\_signed.json}, key
+    \code{pair\_best}; Fig.~\ref{fig:v3_prep_signed_pair_best}).
+% src: python3 analysis/catalog_v3/prep_signed.py @da7747e2
+% allow: 1.246 0.081 0.0217 4264 16 because they are the test's design (the best trial's rate, warmup, weight decay, steps, the pair head's widths)
+% allow: 42 43 because they are the seeds
+% allow: 13 because it is the design's yes threshold
+% allow: 10 because it is the blow-up rule's factor
+% allow: -2 because it is the power of ten of the rate
+% allow: 345 because it is the end of warmup, 0.081 of the 4264 steps, the design
+% claim: pb_n_pools=17
+% claim: pb_sign_pair_best_best=0.00796
+% claim: pb_sign_pair_best_best_step=595
+% claim: pb_sign_pair_best_blow_step_before=680
+% claim: pb_sign_pair_best_blow_step=765
+% claim: pb_sign_pair_best_blow_val_before=0.0134
+% claim: pb_sign_pair_best_blow_val=2.09
+% claim: pb_sign_pair_best_skipped=218
+% claim: pb_sign_pair_best_final=28.5
+% claim: pb_sign_pair_best_seed2_best=0.00602
+% claim: pb_sign_pair_best_seed2_blow_step=680
+% claim: pb_sign_pair_best_seed2_blow_val=1.17
+% claim: pb_sign_pair_best_seed2_skipped=49
+% claim: pb_sign_pair_best_seed2_final=5.35
+% claim: pb_sign_off_best_seed2_best=0.00997
+% claim: pb_sign_off_best_seed2_blow_val_before=0.0133
+% claim: pb_sign_off_best_seed2_blow_val=0.141
+% claim: pb_sign_off_best_seed2_skipped=14
+% claim: pb_sign_off_best_seed2_final=4.89
+% claim: pb_sign_off_best_best=0.00125
+% claim: pb_sign_off_best_best_step=4264
+% claim: pb_baseline_more_signed_muon_best=0.00111
+    The runs first. Three of the four blew up (a validation over $10$ times the running minimum, the rule above), all
+    early, between steps $595$ and $765$, about twice the warmup's length (it ends at step $345$): the pair head at seed $42$ from $0.0134$ at step $680$ to $2.09$ at
+    step $765$ ($218$ steps skipped for a non-finite gradient norm, ending at $28.5$), the pair head at seed $43$ from
+    its best $0.00602$ at step $595$ to $1.17$ at step $680$ ($49$ skipped, ending at $5.35$), and the control at seed
+    $43$ from $0.0133$ at step $680$ to $0.141$ at step $765$ ($14$ skipped, ending at $4.89$). None recovered. Each is
+    read at its best checkpoint, all three at step $595$ (validation loss $0.00796$, $0.00602$ and $0.00997$), a
+    seventh of the way through. Only the control at seed $42$ ran clean, to $0.00125$ at step $4264$, against the
+    Muon baseline's $0.00111$ at its own settings.
+% src: python3 analysis/catalog_v3/sign_head_search.py @151979fe
+% claim: best_mag=9.673e-4
+% allow: 42 because it is the seed
+    The search's best trial had the same settings and seed $42$ as the pair head's first run and ran clean to
+    $9.673\times10^{-4}$: at this rate a run blows up or not by chance, with the pair head and without it.
+% src: python3 analysis/catalog_v3/prep_signed.py @da7747e2
+% allow: 42 43 because they are the seeds
+% allow: 13 because it is the design's yes threshold
+% allow: 595 because it is the best checkpoint's step, read above
+% claim: pb_n_pools=17
+% claim: pb_mean_lower=6
+% claim: pb_mean_higher=11
+% claim: pb_mean_p=0.928
+% claim: pb_mean_med_y=4.2
+% claim: pb_mean_med_x=3.5
+% claim: pb_s43_lower=7
+% claim: pb_s43_higher=7
+% claim: pb_s43_ties=3
+% claim: pb_s43_med_y=4.1
+% claim: pb_s43_med_x=2.3
+% claim: pb_sign_pair_best_wrong=2.2
+% claim: pb_sign_off_best_wrong=2.2
+% claim: pb_s42_lower=6
+% claim: pb_s42_higher=11
+    The sign. On the seed means the pair head is less wrong on $6$ of the $17$ pools and more on $11$ (sign test
+    $p=0.928$), median $4.2\%$ against $3.5\%$: the outcome is no by the design's rule. At seed $43$ alone, where both
+    arms are read at step $595$ and so compared like for like, it is $7$ less and $7$ more with $3$ ties, median $4.1\%$
+    against $2.3\%$; at seed $42$, $6$ and $11$, both medians $2.2\%$. The control's blow-up does not make it
+    inconclusive, since the pair head blew up at both seeds.
+% claim: pb_baseline_more_signed_muon_wrong=3.8
+% claim: pb_pair_muon_lower=6
+% claim: pb_pair_muon_higher=11
+% claim: pb_off_muon_lower=8
+% claim: pb_off_muon_higher=9
+% claim: pb_rerun42_lower=2
+% claim: pb_rerun42_higher=15
+% claim: pb_clean42_lower=8
+% claim: pb_clean42_higher=8
+% claim: pb_clean42_ties=1
+% claim: pb_sign_search_best_wrong=2.8
+% claim: pb_mse_mean_ratio=1.47
+% claim: pb_mse_mean_above=525
+% claim: pb_mse_mean_n=617
+% claim: pb_mse_s43_ratio=0.79
+% claim: pb_mse_s43_above=174
+% claim: pb_mse_off_muon_ratio=1.31
+% claim: pb_mse_off_muon_above=442
+% claim: pb_mse_pair_muon_ratio=1.99
+% claim: pb_mse_pair_muon_above=536
+% allow: 42 because it is the seed
+% allow: 1 because it is the ratio of equal errors, no result
+% allow: 2 because it is the square in |M|^2
+    Against the Muon baseline at its own settings ($3.8\%$), the pair head's seed means are less wrong on $6$ pools
+    and more on $11$, the control's on $8$ and $9$. The only two clean runs at these settings with and without the pair
+    head, both at seed $42$, are the search's trial and this control: the trial is less wrong on $8$ pools, more on $8$,
+    tied on $1$, median $2.8\%$ against $2.2\%$; and the pair head's blown-up rerun of that trial is more wrong than
+    the trial on $15$ pools and less on $2$, so what the trial's reads carried was a clean run, not the head. The size
+    follows the blow-ups: the zero-shot MSE on $\log|\mathcal M|^2$ per held-out probe, pair head over control on the
+    two seeds' geometric mean, has the median $1.47$ (above $1$ on $525$ of the $617$ probes), but $0.79$ at seed $43$
+    alone (above on $174$), where both runs stopped at the same step; over the Muon baseline it is $1.31$ for the
+    control (above on $442$) and $1.99$ for the pair head (above on $536$). So the best trial's gain over the Muon
+    baseline is neither the pair head's nor a usable rate's: at learning rate $1.246\times10^{-2}$ three of four runs
+    blow up, and the one clean control is no better than the Muon baseline on the sign.
+% allow: 1.246 because it is the test's rate
+% allow: -2 because it is the power of ten of the rate
+\begin{figure}[t]\centering
+\includegraphics{../analysis/catalog_v3/figs/prep_signed_pair_best.pdf}
+% allow: 42 43 because they are the seeds
+% allow: 595 because it is the best checkpoint's step, read in the text
+\caption{The pair sign head test on catalog\_v3: the more-signed-pools arm with Muon at the sign head search's best
+settings, the pair head on and off, seeds $42$ and $43$. (a) Per held-out sign-changing one-loop pool, the zero-shot
+wrong-sign share with the pair head against without it, on the two seeds' mean and at seed $43$ alone, each run at
+its best checkpoint; the line is equality. (b) Validation loss without regularisation against step for the four runs
+and the Muon baseline at its own settings. Three of the four runs blew up and are read at step $595$, the control
+at seed $42$ at its last step, so the seed means mix checkpoints at different steps.}\label{fig:v3_prep_signed_pair_best}
+\end{figure}
 \end{itemize}
 % src: python3 analysis/catalog_v3/prep_signed.py @f0148b27
 % claim: H5_err_mlp=0.8
@@ -2800,6 +2926,16 @@ So the sign is no data problem: within a pool a small classifier on the invarian
 it (the pools with too few of one sign to fit it are nearly all one sign), and the
 zero-shot errors of $5$ to $21\%$ are a transfer failure from the training pools' signs, smallest for the baseline. The
 magnitude's target matters less on these pools than on the trees. One seed each arm.
+% src: python3 analysis/catalog_v3/prep_signed.py @da7747e2
+% claim: m2_better=14
+% claim: m2_worse=1
+% allow: 17 because it is the held-out sign-changing pools' count, claimed above
+The sign study stops here, as decided before the last test. What it leaves: the one change that carries the one-loop
+sign to held-out processes is more sign-changing pools in training ($95$ added, less wrong on $14$ of the $17$ held-out
+pools and more on $1$ on two seeds' means, at no zero-shot cost overall); the pair sign head (no, at the baseline's
+settings, bounded, and at the search's best) and the near-zero weighting (no, one seed) are dropped; and the search's
+best rate is unstable for this arm with or without the pair head.
+% allow: 95 because it is the arm's design, the pools it adds
 \begin{figure}[t]
 \centering
 \includegraphics{../analysis/catalog_v3/figs/prep_signed.pdf}
