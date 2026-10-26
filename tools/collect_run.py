@@ -22,6 +22,9 @@ Per run:
      test recipe);
   4. if nothing is off: `site ack` of the run's open events with a one-line summary, and
      `plan evidence <entry> --run <run> --path <dest>`.
+Physics (tools/pool_physics.py zs_status): every scored probe's ZERO_SHOT record carries its physics check; a probe read
+with a mismatch on purpose is named with its reason in the summary, a probe refused for a mismatch is an errored probe,
+and a probe read without the check (code before it) is off unless --allow-physics-unchecked "<reason>".
 One compact summary per run. Exit 1 if anything is off (an expected probe without a prediction, an errored or
 non-finite probe, an axis skipped, a Traceback, a non-finite step or a divergence, no done marker, the run not
 finished); such a run is neither acked nor recorded: the step stops and reports.
@@ -35,6 +38,8 @@ recorded.
 import argparse, base64, io, json, math, os, re, shlex, shutil, subprocess, sys, tarfile, tempfile
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(HERE, "tools"))
+import pool_physics  # noqa: E402  (standard library only at import)
 SITE = shlex.split(os.environ.get("PLAN_SITE", "site"))
 PLAN = [sys.executable, os.path.join(HERE, "tools", "plan.py")]
 CROSS_PREFIX = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_"}
@@ -86,6 +91,11 @@ def parse_log(text):
             ax = p["zs"].setdefault(m.group(1), {"ok": set(), "err": {}, "nonfinite": set()})
             name = rec.get("probe") or os.path.basename(str(rec.get("recipe", "")))[:-len(".yaml")]
             p["parent"] = p["parent"] or rec.get("parent")
+            st = pool_physics.zs_status(rec)
+            if st == "unchecked":
+                ax.setdefault("physics_unchecked", set()).add(name)
+            elif st == "allowed":
+                ax.setdefault("physics_allowed", {})[name] = (rec.get("physics") or {}).get("reason", "")
             if "error" in rec:
                 ax["err"][name] = rec["error"][:120]
             elif not all(finite(v) for v in rec.values()):
@@ -207,6 +217,17 @@ def collect(run, a):
             off.append("%s: %d probes errored (%s: %s)" % (ax, len(z["err"]), k, v))
         if z["nonfinite"]:
             off.append("%s: %d probes non-finite (%s)" % (ax, len(z["nonfinite"]), ", ".join(sorted(z["nonfinite"])[:5])))
+        unchecked = sorted(z.get("physics_unchecked", ()))
+        if unchecked and not a.allow_physics_unchecked:
+            off.append("%s: %d probes read without the physics check (%s); --allow-physics-unchecked \"<reason>\" to "
+                       "collect them" % (ax, len(unchecked), ", ".join(unchecked[:5])))
+        elif unchecked:
+            notes.append("%s: %d probes read without the physics check, collected: %s"
+                         % (ax, len(unchecked), a.allow_physics_unchecked))
+        allowed = z.get("physics_allowed", {})
+        if allowed:
+            notes.append("%s: %d probes read with a physics mismatch on purpose (%s)"
+                         % (ax, len(allowed), "; ".join(sorted(set(allowed.values())))[:200]))
         plan_axes.append((ax, pfx, set(exp)))
     dest = a.dest or os.path.join("analysis", "catalog_v3", "data", "short_reads", arm or run)
     res, kept = None, {}
@@ -254,8 +275,8 @@ def collect(run, a):
             off.append("non-finite validation loss in result.json")
     fetched = " | home " + ", ".join("%s %d%s" % (x, k, " (dropped %d foreign)" % f if f else "")
                                       for x, (k, f) in kept.items()) if kept else ""
-    summary = "%s %s (%s, arm %s, %s): %s%s%s" % (run, state, site, arm, cat, "; ".join(lines) or "no zero-shot reads",
-                                                  best, fetched)
+    summary = "%s %s (%s, arm %s, %s): %s%s%s%s" % (run, state, site, arm, cat, "; ".join(lines) or "no zero-shot reads",
+                                                    best, fetched, (" | physics: " + "; ".join(notes)) if notes else "")
     return off, summary, dest if kept else None
 
 
@@ -269,6 +290,8 @@ def main():
                     help="auto (the run's catalog per axis), none, or one prefix for every axis")
     ap.add_argument("--arm", help="the arm, when the log does not name it (no done marker)")
     ap.add_argument("--dry-run", action="store_true", help="read and count only: nothing written, acked or recorded")
+    ap.add_argument("--allow-physics-unchecked", metavar="REASON",
+                    help="collect probes read before the physics check existed (the reason goes into the ack note)")
     a = ap.parse_args()
     bad = 0
     for run in a.runs:

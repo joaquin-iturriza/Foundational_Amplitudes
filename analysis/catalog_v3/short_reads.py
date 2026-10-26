@@ -8,6 +8,8 @@ Per arm and axis: the medians over its probes, the 10% and 90% quantiles of the 
 axis recipe's (recipes/catalog_v3_heldout_<axis>.yaml; the pp-trained arm's and the twin's own axes likewise), and every
 expected probe with no prediction, listed by name (a probe that errored on the site writes no .npz). A sign-changing one-loop pool (H5, the twin's H3p) is read on
 log max(|M|^2, floor) (--signed-magnitude), the sign head's magnitude; its sign is scored apart (<axis>_signed.txt). Figure: the median zero-shot MSE per axis, one marker per arm.
+Each prediction's physics check (tools/pool_physics.py require_npz): one refused without a reason stops the script; the
+probes read with a mismatch on purpose (and their reasons) and those read before the check existed are listed per axis.
     python3 analysis/catalog_v3/short_reads.py   -> data/short_reads.json, figs/short_reads.{png,pdf}
 """
 import glob, json, os, sys
@@ -16,6 +18,8 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(HERE)), "tools"))
+import pool_physics  # noqa: E402
 ARMS = ("baseline", "dimensionless", "dimensionless_shat", "dimensionless_hybrid", "dimensionless_blend050", "dimensionless_blend025",
         "dimensionless_context", "dimensionless_twin", "dimensionless_pp", "dimensionless_seed2", "dimensionless_muon",
         "dimensionless_muon_seed2", "muon_search_best_adamw", "muon_search_best_muon", "baseline_sign_pairs", "baseline_sign_near", "baseline_more_signed",
@@ -29,6 +33,9 @@ AXES = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$",
         "H3p": r"$\tau$, $\nu_\tau$ never seen", "H4": "quartic vertex never seen"}
 
 
+PHYSICS = {}      # (arm, axis) -> the physics status of its predictions (unchecked: read before the check existed)
+
+
 def expected(axis):
     import yaml
     f = os.path.join(os.path.dirname(os.path.dirname(HERE)), "recipes", f"catalog_v3_heldout_{axis}.yaml")
@@ -40,11 +47,17 @@ def read(arm, axis):
     short job once shared across catalogs; baseline_more_signed_muon has 62 catalog_v4 probes on H1, 28 on H5),
     which are dropped by name and counted"""
     rows, keep, foreign = {}, set(expected(axis)), 0
+    phys = {"unchecked": [], "allowed": {}}
     for f in sorted(glob.glob(os.path.join(HERE, "data", "short_reads", arm, axis, "*.npz"))):
         if os.path.basename(f)[:-4] not in keep:
             foreign += 1
             continue
         z = np.load(f)
+        st, why = pool_physics.require_npz(z, f)
+        if st == "unchecked":
+            phys["unchecked"].append(os.path.basename(f)[:-4])
+        elif st == "allowed":
+            phys["allowed"][os.path.basename(f)[:-4]] = why
         if "q" not in z.files:
             continue
         d = z["q"].astype(float) - z["t"].astype(float)
@@ -52,6 +65,10 @@ def read(arm, axis):
                                           "shape": float(np.var(d))}
     if foreign:
         print(f"{arm} {axis}: {foreign} reads not of the axis recipe dropped")
+    if phys["allowed"]:
+        print(f"{arm} {axis}: {len(phys['allowed'])} probes read with a physics mismatch on purpose: "
+              f"{sorted(set(phys['allowed'].values()))}")
+    PHYSICS[(arm, axis)] = phys
     return rows
 
 
@@ -70,7 +87,9 @@ def main():
                 print(f"{arm:24s} {axis:5s} n=   0/{len(exp):4d}  NO READS")
                 continue
             m = np.array([v["mse"] for v in r.values()])
+            ph = PHYSICS.get((arm, axis), {})
             res.setdefault(arm, {})[axis] = {
+                "physics": {"n_unchecked": len(ph.get("unchecked", [])), "allowed": ph.get("allowed", {})},
                 "n": len(r), "n_expected": len(exp), "missing": missing, "mse": float(np.median(m)), "mse_q10_q90": [float(x) for x in np.quantile(m, [0.1, 0.9])],
                 "level": float(np.median([v["level"] for v in r.values()])),
                 "shape": float(np.median([v["shape"] for v in r.values()])), "probes": r}

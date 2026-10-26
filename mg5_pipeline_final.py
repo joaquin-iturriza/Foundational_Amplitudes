@@ -357,7 +357,11 @@ def recipe_id(recipe):
                 "chunked", "chunk_size", "gen_weight",
                 # `lhe_run`: what an lhe_pp MadEvent run reported (event count, cross section,
                 # MG5 version, timings): a record of the run, not "what the data is".
-                "lhe_run"}
+                "lhe_run",
+                # `physics`: the model, card values, coupling-order clause and alpha_s rule the labels were computed
+                # with, read back from the backend (tools/pool_physics.py): a record of what the backend did, written
+                # after the fact (and backfilled into older sidecars), so it must not move a pool's id.
+                "physics"}
     core = {k: recipe[k] for k in sorted(recipe) if k not in volatile}
     blob = json.dumps(core, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(blob.encode()).hexdigest()[:16]
@@ -375,6 +379,12 @@ def write_recipe(output_file, recipe):
     }
     rid = recipe_id(recipe)
     recipe["recipe_id"] = rid
+    # the physics the labels were computed with, read from the backend's own cards (tools/pool_physics.py): what a
+    # probe read checks against its parent's training catalog. Never fails generation: an unreadable block is
+    # recorded as {schema, error} and recomputed at read.
+    if "physics" not in recipe:
+        from tools import pool_physics
+        recipe["physics"] = pool_physics.safe_block(recipe["process"], recipe)
 
     sidecar = output_file + ".recipe.json"
     with open(sidecar, "w") as f:
@@ -3959,6 +3969,31 @@ def _banner_xsec(banner):
         return None
 
 
+def lhe_parent_physics_check(process):
+    """An lhe_pp entry made as the pp version of a catalog entry (`parent`, recipes/gen_catalog_v3_pp.py) must label its
+    events with the parent's physics: the physics block of its standalone (model, card values, coupling-order clause,
+    order vector, alpha_s rule, the b's particle-table row; tools/pool_physics.py) against the parent's. A difference
+    raises, unless the entry gives `physics_mismatch_reason` (or its lhe block does). Returns the check."""
+    from tools import pool_physics as pp
+    cfg = PROCESSES[process]
+    parent = cfg.get("parent")
+    if not parent or parent not in PROCESSES:
+        return None
+    blk = pp.physics_block(process, cfg=cfg)
+    pcfg = PROCESSES[parent]
+    ref = [{"name": parent, "pdg": [int(p) for p in pcfg["pdg_ids"]], "block": pp.physics_block(parent, cfg=pcfg)}]
+    bad, skipped, _ = pp.compare(blk, cfg["pdg_ids"], ref, pp.SAME_FIELDS)
+    chk = {"probe": process, "parent": parent, "status": "mismatch" if bad else "ok", "mismatches": bad,
+           "not_compared": skipped}
+    why = cfg.get("physics_mismatch_reason") or (cfg.get("lhe") or {}).get("physics_mismatch_reason")
+    if bad and not pp.apply_allowance(chk, why):
+        raise RuntimeError(f"{process}: its standalone's physics differs from its parent {parent}'s "
+                           f"({pp.summary(chk)}); fix the cards or model, or set physics_mismatch_reason on the entry")
+    print(f"[LHE] {process}: physics vs parent {parent}: {chk['status']}"
+          + (f" (not compared: {', '.join(skipped)})" if skipped else ""), flush=True)
+    return chk
+
+
 def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True, keep_dir=None):
     """Generate the pools `items` = [(recipe, out_path), ...] of ONE lhe_pp process from one
     MadEvent run: MG5 output (+ standalone backend if missing), generate_events, stream-parse the
@@ -3981,6 +4016,7 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
     open(log_path, "w").close()
     secs, t0 = {}, time.time()
     ev, sa = lhe_prepare(process, work_root, log_path)
+    lhe_parent_physics_check(process)            # before MadEvent: a pool labelled with other physics is refused cheaply
     secs["output"] = time.time() - t0; t0 = time.time()
     # a process whose MadEvent run returns a fixed few thousand events however many are asked (its unweighting stalls)
     # runs n_runs times with seeds iseed + 7919 k (lhe.n_runs, in its pool identity), the unweighted events concatenated

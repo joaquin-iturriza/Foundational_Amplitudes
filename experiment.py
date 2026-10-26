@@ -1505,6 +1505,7 @@ class AmplitudeExperiment(BaseExperiment):
             } for s in specs]
             paths[role] = datagen.ensure_split_set(
                 role_specs, role=role, seed=seed, require_cache=require_cache)
+        self._pool_paths = paths     # {role: {name: npy}}: what a probe read checks the physics of (tools/pool_physics.py)
 
         # --- frozen normalization stats (all GLOBAL scalars, train-only) ---
         # Source of truth, in priority order:
