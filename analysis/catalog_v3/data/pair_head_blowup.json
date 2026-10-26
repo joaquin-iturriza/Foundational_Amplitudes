@@ -1,0 +1,72 @@
+{
+ "arms": {
+  "baseline": {
+   "grad_norm": {
+    "median": 0.144,
+    "p90": 1.29,
+    "max": 385000.0,
+    "clipped_pct": 4.9
+   },
+   "n_skipped": 0,
+   "best_val_loss_no_reg": 0.004400387,
+   "best_step": 3995,
+   "final_val_loss_no_reg": 0.004415188
+  },
+  "baseline_sign_near": {
+   "grad_norm": {
+    "median": 0.148,
+    "p90": 1.29,
+    "max": 21800.0,
+    "clipped_pct": 5.3
+   },
+   "n_skipped": 0,
+   "best_val_loss_no_reg": 0.004432123,
+   "best_step": 4335,
+   "final_val_loss_no_reg": 0.004432123
+  },
+  "baseline_more_signed": {
+   "grad_norm": {
+    "median": 0.181,
+    "p90": 1.22,
+    "max": 70300000000.0,
+    "clipped_pct": 5.4
+   },
+   "n_skipped": 0,
+   "best_val_loss_no_reg": 0.004667421,
+   "best_step": 4335,
+   "final_val_loss_no_reg": 0.004667421
+  },
+  "baseline_sign_pairs": {
+   "grad_norm": {
+    "median": 9090000.0,
+    "p90": 1360000000.0,
+    "max": 8.78e+17,
+    "clipped_pct": 73.3
+   },
+   "n_skipped": 12,
+   "best_val_loss_no_reg": 0.02084069,
+   "best_step": 1360,
+   "final_val_loss_no_reg": 1.167014
+  }
+ },
+ "jump": {
+  "validation": 17,
+  "step_before": 1360,
+  "step": 1445,
+  "val_before": 0.02084069,
+  "val_at": 0.3910497,
+  "baseline_at": 0.01037311,
+  "median_ratio_all": 9.308084486525857,
+  "n_pools": 1385,
+  "median_ratio_one_loop": 78.86597938144331,
+  "n_one_loop": 137,
+  "share_above_3x": 0.9003610108303249,
+  "sign_acc_before": 0.9775,
+  "sign_acc_at": 0.32,
+  "baseline_sign_acc_at": 0.98,
+  "first_skip_after_validation": 17,
+  "pairs_vs_baseline_before": 1.8229672270385022,
+  "final_over_best": 55.996898375245735,
+  "peak_over_best": 897.1118518628703
+ }
+}
