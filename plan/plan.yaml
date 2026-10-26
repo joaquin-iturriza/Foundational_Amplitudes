@@ -1113,6 +1113,12 @@ entries:
     answers_after: '2026-10-26T14:13:29+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T14:21:08.056000+00:00'
+    text: No, let's not redo all of that, only the winner
+    decision: D162
+    answers_after: '2026-10-26T14:20:38+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -1125,6 +1131,7 @@ entries:
   - D145
   - D154
   - D161
+  - D162
   next: 'Chain on CC (commit 7bc4e8ed): catalog_v4 sidecar build FA-ccin2p3-7f2fb49d (alpha_s and diagram sidecars for catalog_v4_train
     and every v4 held-out axis; V3_PREP_DONE) -> smoke FA-ccin2p3-76ba6018 (v4_dimensionless_muon smoke: 40 steps, reads H1
     H5 XV3 PP; V3_SHORT_DONE, no V3_AXIS_SKIPPED) -> afterok (dependency retargeted by scontrol to slurm 62461424): v4_dimensionless_muon
@@ -1388,13 +1395,8 @@ entries:
     searched: D130 approves the short pretrainings again without naming the arms; D161 settles the horizon only; ground rule
       2's budget is exceeded by the full set
     blocks: training the other five target variants on catalog_v4; the dimensionless arm continues
-  ask: 'Should the other five target variants of catalog_v3''s short-pretraining study also be trained on catalog_v4 (about
-    36 GPU-h), to check the dimensionless target still wins there? My recommendation is no: the switch decision only needs
-    the target we would use.'
-  waiting_since: '2026-10-26T14:20:38+00:00'
-  searched: D130 approves the short pretrainings again without naming the arms; D161 settles the horizon only; ground rule
-    2's budget is exceeded by the full set
-  blocks: training the other five target variants on catalog_v4; the dimensionless arm continues
+    answered_at: '2026-10-26T14:21:07.999000+00:00'
+    decision: D162
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
