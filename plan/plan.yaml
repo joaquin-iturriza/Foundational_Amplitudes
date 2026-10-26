@@ -98,16 +98,16 @@ entries:
   - D83
   - D129
   - D135
-  next: 'When the arm with more sign-changing training pools FA-ccin2p3-ecc413f9 (baseline_more_signed, 4264 steps) ends:
-    check its log prints V3_SIDECARS 1492/1492 and V3_SHORT_DONE, copy $SCRATCH/zz_v3_short_baseline_more_signed home (site
-    run tar|base64 into analysis/catalog_v3/data/short_reads/), add it to prep_signed.py SIGN_ARMS and short_reads.py ARMS,
-    and read it like the two sign arms (wrong-sign share on the 17 held-out pools, near zero, over the whole one-loop axis,
-    zero-shot MSE ratio per probe); write it into par:v3_prep_signed after the two sign arms'' items. The pair head and the
-    near-zero weighting (one untuned value each) did not beat the baseline''s sign (11.3% and 9.8% vs 5.4%); the user may
-    want a seeded or tuned version: ask with the arm (c) result; THEN decide the sign arms'' follow-up without asking the
-    user (CLAUDE.md 0i, within the approved exploration and budget): if arm (c) helps, keep it; for the pair head and near-zero
-    weighting, their untuned values (10x, 16, 32) are HPs, so any retry goes through a small single-fidelity DyHPO search
-    (CLAUDE.md HPO rule 6) over them at the baseline''s HPs, and the pair head''s blow-up is diagnosed first (grad norm, clipping)'
+  next: 'The more-signed-pools arm (FA-ccin2p3-ecc413f9) is written up in par:v3_prep_signed (5de6392b): sign better on 12
+    of 17 held-out pools, near zero 14.2% vs 39.4%, whole one-loop axis 7.7% vs 13.1%, zero-shot MSE 1.07x the baseline''s
+    per probe elsewhere (0.86 on one loop, 1.36 on 1-10 TeV), one seed, confounded by more one-loop data and 4.7 vs 5 epochs
+    per pool. Decided (0i, within the approved exploration and budget): keep the 95 extra pools (recipes/catalog_v3_train_signext.yaml)
+    as the recipe of any further sign arm. Next, in order: (1) CPU: diagnose the pair sign head''s blow-up from FA-ccin2p3-161fc56b''s
+    log (grad norms, clipping share, which validation it starts at); (2) a second seed of the baseline and of baseline_more_signed
+    (about 2.5 GPU-h; scripts/job_catalog_v3_short.sh with a seed override) to size whether the 1.07 cost and the 12/17 sign
+    gain exceed seed spread; (3) only after (1), a small single-fidelity DyHPO search (HPO rule 6) over the pair head''s dims
+    (16, 32) and the near-zero weighting''s factor and weight (10, 10) at the baseline''s HPs on the extended recipe, priced
+    against the 30 GPU-h budget before submitting.'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
