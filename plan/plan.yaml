@@ -1325,12 +1325,11 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'When the four reruns end (FA-ccin2p3-70adfc03 AdamW parent/AdamW ft, 8103a0bb AdamW parent/Muon ft, 13e57de7 Muon
-    parent/AdamW ft, e5265e31 Muon parent/Muon ft; out $SCRATCH/zz_catft_emafix, code ddfc0314 with the EMA restarted on the
-    parent''s weights and val_loss_step0 in each CATFT line), read their logs, add the kind to analysis/catalog_v3/muon_compare.py
-    and read best against step 0 (the zero-shot) and against the refit fine-tunes and scratch. The earlier refit fine-tunes
-    (kind catft, muon_ft.json) ran with the same EMA bug: check which have best steps before about 10 and whether they need
-    a rerun. Also still pending: stage 2''s two 8-trial searches, best against best, into the Muon paragraph; then plan done.'
+  next: 'When the four EMA-fixed refit fine-tunes end (FA-ccin2p3-fe864fda AdamW parent/AdamW ft, f620ed40 AdamW parent/Muon
+    ft, 60177afb Muon parent/AdamW ft, 29e8ad2f Muon parent/Muon ft; output $SCRATCH/zz_catft_refit_emafix), read them together
+    with the four parent-stats reruns (FA-ccin2p3-70adfc03, 8103a0bb, 13e57de7, e5265e31) and scratch (00d080ba, unaffected,
+    kept), replace the Muon paragraph''s fine-tune numbers (muon_ft.json from the old refit jobs is polluted). Still pending:
+    stage 2''s two 8-trial searches, best against best; then plan done.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
