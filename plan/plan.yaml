@@ -1289,6 +1289,15 @@ entries:
     why: no catalog_v4 diagram sidecars on CC (0/1069 for catalog_v4_train.yaml); the v4 strings with full coupling orders
       need their own; built by FA-ccin2p3-7f2fb49d
     at: '2026-10-26T14:10:10+00:00'
+  - tried: catalog_v4 short pretrainings of the dimensionless arm with Muon at the search best (FA-ccin2p3-8c8937d5, 8b1cb186;
+      catalog_v3 seed 43 767f32ce; catalog_v3 seed 42 cross read 9ae87934), chained afterok on the smoke FA-ccin2p3-76ba6018
+      after the v4 diagram sidecar build FA-ccin2p3-7f2fb49d (COMPLETED, 1069/1069 sidecars)
+    why: 'the smoke failed in init_data: target_physics_orders refused v4_udx_adxgu, a mixed-order entry [0,0,3,3]: catalog_v4''s
+      full coupling orders make 388 of its 1153 training pools (and 211 of the 555 shared held-out pools) a sum of alpha_s/alpha
+      monomials, which the target''s single-monomial assertion refused (catalog_v3 has none). The four dependants were cancelled
+      (scancel 62461373-62461376); fixed in 6dee967a: the target''s alpha_s power is read from the diagram sidecars and a
+      mixed entry is divided by its highest power'
+    at: '2026-10-26T14:51:19+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
