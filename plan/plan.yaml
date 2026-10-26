@@ -1112,11 +1112,11 @@ entries:
   - D142
   - D145
   - D154
-  next: 'Generate the 175 tree classes the electroweak orders split off (recipes/catalog_v4_gen_stage5.yaml, CPU on CC, the
-    v4 tree generation job as for gen_stage1, then the pool audit on them); the v4 training and held-out recipes (recipes/catalog_v4_train.yaml,
-    catalog_v4_heldout_*.yaml, from recipes/select_catalog_v4.py @bfccb647) need them. Then catalog_v4''s short pretrainings:
-    the baseline arm on catalog_v4 against catalog_v3''s baseline short pretraining, Muon per D155 at its stage-2 search best,
-    design per CLAUDE.md 0e (what is compared, data, runs and seeds, what is held fixed), submitted under the GPU budget'
+  next: 'When the four stage-5 tree shards (FA-ccin2p3-5826d401, e1bd8668, 16686dbf, f5a04d70; job_catalog_v4_regen.sh V4REGEN_STAGES=5
+    N=4) and the pool audit chained after them (FA-ccin2p3-0dea3852, AUDIT_STAGES=v4_stage5, $SCRATCH/zz_pool_audit_v4_stage5.json,
+    POOL/FLAG lines in its log) end: read the logs (V4REGEN_DONE per shard, every stage-5 pool 1e5/1e4/1e4 rows, no FLAG lines),
+    rerun any failed shard (resumable). Then catalog_v4''s short pretrainings: the baseline arm on catalog_v4 against catalog_v3''s
+    baseline short pretraining, Muon per D155 at its stage-2 search best, design per CLAUDE.md 0e, under the GPU budget'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
