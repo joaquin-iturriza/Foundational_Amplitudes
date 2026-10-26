@@ -103,6 +103,7 @@ def main():
     ap.add_argument("--out", default=os.path.join(ROOT, "analysis/catalog_v3/pool_audit.json"))
     ap.add_argument("--stages", nargs="+", default=["stage1", "stage2", "stage3"], choices=list(STAGES))
     a = ap.parse_args()
+    a.out = os.path.expandvars(a.out)       # a path handed through the job's environment ($SCRATCH/...) arrives unexpanded
     stages = {s: STAGES[s] for s in a.stages}
     jobs = [(s, e) for s, r in stages.items() for e in yaml.safe_load(open(os.path.join(ROOT, r)))["processes"]]
     res = {}
