@@ -5551,6 +5551,7 @@ virt:
     v3_name: v3_bbx_hvevex
   v4_bbx_hwpwm:
     beam_masses: {}
+    c2_rel_tol: 0.01
     certified: false
     fiducial_cuts:
       cos_max: 0.9999092042625951
@@ -5647,6 +5648,7 @@ virt:
     v3_name: v3_bbx_taptam
   v4_bbx_tapvtwm:
     beam_masses: {}
+    c2_rel_tol: 0.01
     certified: false
     fiducial_cuts:
       cos_max: 0.9999092042625951
@@ -6012,6 +6014,7 @@ virt:
     v3_name: v3_bg_btaptam
   v4_bg_bwpwm:
     beam_masses: {}
+    c2_rel_tol: 0.01
     certified: false
     fiducial_cuts:
       cos_max: 0.9999092042625951

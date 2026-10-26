@@ -63,6 +63,10 @@ E_HOLDOUT = [6000, 20000]      # GeV, the energy hold-out's window (the user 202
 # carry _qcdborn (virt base v4_<x>_qcdborn, entry v4_<x>_qcdborn_nlo), so no pool, standalone or quarantined chunk of
 # the mixed-order one-loop definition is ever reused for them.
 QCD_BORN = {"v3_uux_ccxz", "v3_ddx_bbxz", "v3_ddx_ccx", "v3_ddx_bbx", "v3_bbx_ccx"}
+# One-loop entries with an internal top that can go on shell: the physical top width moves MadLoop's double pole off the
+# analytic one by ~width/mass (4.2e-3 to 4.6e-3 at WT, below 5e-5 with it zeroed; plan catalog_coverage), above the 1e-3
+# per-event guard, so they carry catalog_v3's v3_bg_bwpwm tolerance (c2_rel_tol 0.01, pole_width_diag.txt).
+C2_WIDTH_TOL = {"v3_bg_bwpwm": 0.01, "v3_bbx_tapvtwm": 0.01, "v3_bbx_hwpwm": 0.01}
 
 
 def qcdborn_name(n, virt_key=False):
@@ -155,6 +159,8 @@ def loop_entries(trees):
             w.update(mg5=born + " [" + tail, model=LOOP_MODEL[v.get("model", "loop_sm")])
             if k in QCD_BORN:
                 w["qcd_born"] = True
+        if k in C2_WIDTH_TOL:
+            w["c2_rel_tol"] = C2_WIDTH_TOL[k]
         virt[qcdborn_name(nk, virt_key=True)] = w
     for n, p in L["processes"].items():
         e = {k: v for k, v in p.items() if k not in ("param_card_patches",)}
