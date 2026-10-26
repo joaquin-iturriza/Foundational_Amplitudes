@@ -1163,7 +1163,7 @@ entries:
     small-D fine-tunes'
   question: Does Muon with decoupled weight decay beat AdamW in our setup on the catalog_v3 short pretraining, its zero-shot
     reads on every held-out axis, and small-D fine-tunes of held-out processes (the claim that it transfers better)?
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-26T02:03:46.363000+00:00'
     text: I head that the muon optimizer is gaining traction, in particular after a team implemented weight decay to it, perhaps
@@ -1241,4 +1241,22 @@ entries:
     commit: null
     paths: []
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'The Muon against AdamW test: go ahead with stage 1 as designed (one Muon short pretraining at the transferred lr
+      8.94e-3 and weight decay 0.1, its zero-shot reads on all eight axes, and 64 small-D fine-tunes: 4 held-out processes
+      x 4 D x both pretrainings x both fine-tune optimizers), about 5 GPU-h on CC? And if Muon is not better at those HPs,
+      may stage 2 run (Muon and AdamW each an 8-trial DyHPO over lr and weight decay, the fine-tunes 5 trials per cell), up
+      to about 34 GPU-h more, or do you stop at the shortcut?'
+    at: '2026-10-26T02:10:39+00:00'
+    searched: 'site decisions --project FA: the approval of the quick Muon test (2026-10-26) names no budget; CLAUDE.md 2
+      allows under 10 GPU-h without asking but the step was told to wait at the design for the user to see the cost, and stage
+      2 exceeds 10 GPU-h; no rule settles whether to sweep the baseline too when its HPs come from another catalog''s sweep'
+  ask: 'The Muon against AdamW test: go ahead with stage 1 as designed (one Muon short pretraining at the transferred lr 8.94e-3
+    and weight decay 0.1, its zero-shot reads on all eight axes, and 64 small-D fine-tunes: 4 held-out processes x 4 D x both
+    pretrainings x both fine-tune optimizers), about 5 GPU-h on CC? And if Muon is not better at those HPs, may stage 2 run
+    (Muon and AdamW each an 8-trial DyHPO over lr and weight decay, the fine-tunes 5 trials per cell), up to about 34 GPU-h
+    more, or do you stop at the shortcut?'
+  waiting_since: '2026-10-26T02:10:39+00:00'
+  searched: 'site decisions --project FA: the approval of the quick Muon test (2026-10-26) names no budget; CLAUDE.md 2 allows
+    under 10 GPU-h without asking but the step was told to wait at the design for the user to see the cost, and stage 2 exceeds
+    10 GPU-h; no rule settles whether to sweep the baseline too when its HPs come from another catalog''s sweep'
