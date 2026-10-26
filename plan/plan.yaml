@@ -1345,7 +1345,7 @@ entries:
     - FA-ccin2p3-be7d9ff7
     - FA-ccin2p3-ce1dba1c
     - FA-ccin2p3-ee733aa9
-    commit: b27fd525
+    commit: 96a53d89
     paths:
     - analysis/catalog_v3/data/muon_compare.json
     - analysis/catalog_v3/data/muon_ft.json
@@ -1356,6 +1356,7 @@ entries:
     - sweep/sweep_config_ccin2p3_muon_test_search_adamw.yaml
     - sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml
     - tests/test_muon.py
+    - tests/test_parent_target_stats.py
     - tools/catalog_ft.py
   dead_ends: []
   asks:
