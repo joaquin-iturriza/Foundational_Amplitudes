@@ -209,7 +209,7 @@ def one(args):
         row["card"] = c = card(sa)
         want_model = cfg.get("model") or "sm"
         row["card_ok"] = bool(c["MT"] == m_t and c["ymt"] == m_t and c["WT"] is not None
-                              and abs(c["WT"] - mg.top_width_lo(m_t)) < 1e-5 * max(1, c["WT"])
+                              and abs(c["WT"] - (mg.V4_WT if m_t == mg.V4_MT else mg.top_width_lo(m_t))) < 1e-5 * max(1, c["WT"])
                               and (want_model != mg.V4_MODEL or (c["MB"] in (None, 0.0) and c["ymb"] in (None, 0.0)))
                               and c["model"] == want_model.replace("-", "_"))
         task = {"process": name, "count": n, "sqrts_min": float(lo), "sqrts_max": float(hi), "role": "val",

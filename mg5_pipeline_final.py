@@ -2689,7 +2689,9 @@ _NEUTRINOS = frozenset((12, 14, 16))
 #   forward     f_fwd of each pool from the forward component (rotate_forward), fwd_cand of the flat part's
 #               candidates turned forward: the coverage check's settings (analysis/catalog_v3/coverage_check.py
 #               FWD_SHARE, FWD_CAND), open (no decision behind the values)
-#   top         MT = ymt = 172.5 in every entry, internal tops too, WT its LO width (V4_WT; this width rule is an open choice, not the user's: the approval covered the 172.5 mass)
+#   top         MT = ymt = 172.5 in every entry, internal tops too, WT 1.4915 (V4_WT): the width every catalog_v4 pool
+#               built before the DECAY-column fix (7b00eb21) actually has, MadGraph having ignored the indented 1.480327
+#               line (the user 2026-10-26, "do 1.4915 for all"); the heavy-quark layer keeps top_width_lo at its mass
 #   b           massless, beams and finals: MadGraph's sm-no_b_mass (the five-flavour scheme, no b Yukawa)
 V4_COS_ETA5 = float(np.tanh(5.0))      # |eta| < 5 is |cos theta| < tanh 5 for any particle
 V4_CUTS = {"hadronic": {"pt_min": 10.0, "cos_max": V4_COS_ETA5, "dr_min": 0.4, "m_min": -1.0, "cut_pdgs": [5, 15]},
@@ -2703,15 +2705,15 @@ V4_MT = 172.5
 
 def top_width_lo(m, mw=80.419, gf=1.16639e-5):
     """LO Gamma(t -> b W+) with a massless b and V_tb = 1: G_F m^3 / (8 pi sqrt 2) (1 - x)^2 (1 + 2x), x = M_W^2 / m^2;
-    the top's only LO decay with a diagonal CKM, so the total width; 0 at or below M_W (catalog_v4's width rule: the
-    physical top and the heavy-quark layer alike)"""
+    the top's only LO decay with a diagonal CKM, so the total width; 0 at or below M_W (catalog_v4's width rule for the
+    heavy-quark layer; the physical top takes V4_WT)"""
     if m <= mw:
         return 0.0
     x = mw ** 2 / m ** 2
     return float(gf * m ** 3 / (8.0 * np.pi * np.sqrt(2.0)) * (1.0 - x) ** 2 * (1.0 + 2.0 * x))
 
 
-V4_WT = round(top_width_lo(V4_MT), 6)
+V4_WT = 1.4915         # the user 2026-10-26, "do 1.4915 for all" (top_width_lo(172.5) = 1.480327 is not used)
 V4_TOP_PATCHES = {"MT": V4_MT, "ymt": V4_MT, "WT": V4_WT}
 
 

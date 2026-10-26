@@ -4931,7 +4931,7 @@ virt:
     mg5: generate b b > b b QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 5
@@ -4955,7 +4955,7 @@ virt:
     mg5: generate b b > b b z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 5
@@ -4979,7 +4979,7 @@ virt:
     mg5: generate b b~ > a a QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5003,7 +5003,7 @@ virt:
     mg5: generate b b~ > a a g QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5028,7 +5028,7 @@ virt:
     mg5: generate b b~ > a d d~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5053,7 +5053,7 @@ virt:
     mg5: generate b b~ > a e+ e- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5077,7 +5077,7 @@ virt:
     mg5: generate b b~ > a g QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5101,7 +5101,7 @@ virt:
     mg5: generate b b~ > a g z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5126,7 +5126,7 @@ virt:
     mg5: generate b b~ > a ta+ ta- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5151,7 +5151,7 @@ virt:
     mg5: generate b b~ > a ve ve~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5175,7 +5175,7 @@ virt:
     mg5: generate b b~ > a z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5199,7 +5199,7 @@ virt:
     mg5: generate b b~ > a z z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5223,7 +5223,7 @@ virt:
     mg5: generate b b~ > b b~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5246,7 +5246,7 @@ virt:
     mg5: generate b b~ > c c~ [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5271,7 +5271,7 @@ virt:
     mg5: generate b b~ > c c~ h QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5295,7 +5295,7 @@ virt:
     mg5: generate b b~ > e+ e- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5319,7 +5319,7 @@ virt:
     mg5: generate b b~ > e+ e- h QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5344,7 +5344,7 @@ virt:
     mg5: generate b b~ > e+ e- z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5368,7 +5368,7 @@ virt:
     mg5: generate b b~ > g g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5392,7 +5392,7 @@ virt:
     mg5: generate b b~ > g ve ve~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5417,7 +5417,7 @@ virt:
     mg5: generate b b~ > g w+ w- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5441,7 +5441,7 @@ virt:
     mg5: generate b b~ > g z QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5465,7 +5465,7 @@ virt:
     mg5: generate b b~ > g z z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5490,7 +5490,7 @@ virt:
     mg5: generate b b~ > h h z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5515,7 +5515,7 @@ virt:
     mg5: generate b b~ > h ta+ ta- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5540,7 +5540,7 @@ virt:
     mg5: generate b b~ > h ve ve~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5566,7 +5566,7 @@ virt:
     mg5: generate b b~ > h w+ w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5590,7 +5590,7 @@ virt:
     mg5: generate b b~ > h z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5614,7 +5614,7 @@ virt:
     mg5: generate b b~ > h z z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5638,7 +5638,7 @@ virt:
     mg5: generate b b~ > ta+ ta- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5663,7 +5663,7 @@ virt:
     mg5: generate b b~ > ta+ vt w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5687,7 +5687,7 @@ virt:
     mg5: generate b b~ > ve ve~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5710,7 +5710,7 @@ virt:
     mg5: generate b b~ > w+ w- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5734,7 +5734,7 @@ virt:
     mg5: generate b b~ > w+ w- z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5758,7 +5758,7 @@ virt:
     mg5: generate b b~ > z z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5782,7 +5782,7 @@ virt:
     mg5: generate b b~ > z z z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - -5
@@ -5806,7 +5806,7 @@ virt:
     mg5: generate b g > a b QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5830,7 +5830,7 @@ virt:
     mg5: generate b g > a b g QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5855,7 +5855,7 @@ virt:
     mg5: generate b g > a b z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5880,7 +5880,7 @@ virt:
     mg5: generate b g > b b b~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5905,7 +5905,7 @@ virt:
     mg5: generate b g > b c c~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5929,7 +5929,7 @@ virt:
     mg5: generate b g > b g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5953,7 +5953,7 @@ virt:
     mg5: generate b g > b g g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -5978,7 +5978,7 @@ virt:
     mg5: generate b g > b h z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -6003,7 +6003,7 @@ virt:
     mg5: generate b g > b ta+ ta- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -6029,7 +6029,7 @@ virt:
     mg5: generate b g > b w+ w- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -6053,7 +6053,7 @@ virt:
     mg5: generate b g > b z QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 5
     - 21
@@ -6077,7 +6077,7 @@ virt:
     mg5: generate d b > a b d QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 5
@@ -6101,7 +6101,7 @@ virt:
     mg5: generate d b > b d QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 5
@@ -6125,7 +6125,7 @@ virt:
     mg5: generate d b > b d z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 5
@@ -6150,7 +6150,7 @@ virt:
     mg5: generate d d > a d d QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 1
@@ -6174,7 +6174,7 @@ virt:
     mg5: generate d d > d d QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 1
@@ -6198,7 +6198,7 @@ virt:
     mg5: generate d d > d d z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 1
@@ -6222,7 +6222,7 @@ virt:
     mg5: generate d d~ > a a QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6246,7 +6246,7 @@ virt:
     mg5: generate d d~ > a a a QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6270,7 +6270,7 @@ virt:
     mg5: generate d d~ > a g QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6294,7 +6294,7 @@ virt:
     mg5: generate d d~ > a g g QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6319,7 +6319,7 @@ virt:
     mg5: generate d d~ > a w+ w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6343,7 +6343,7 @@ virt:
     mg5: generate d d~ > b b~ [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6368,7 +6368,7 @@ virt:
     mg5: generate d d~ > b b~ h QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6393,7 +6393,7 @@ virt:
     mg5: generate d d~ > b b~ z [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6418,7 +6418,7 @@ virt:
     mg5: generate d d~ > c c~ [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6443,7 +6443,7 @@ virt:
     mg5: generate d d~ > c c~ h QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6467,7 +6467,7 @@ virt:
     mg5: generate d d~ > d d~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6490,7 +6490,7 @@ virt:
     mg5: generate d d~ > e+ e- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6514,7 +6514,7 @@ virt:
     mg5: generate d d~ > e+ ve w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6538,7 +6538,7 @@ virt:
     mg5: generate d d~ > g g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6562,7 +6562,7 @@ virt:
     mg5: generate d d~ > g g g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6587,7 +6587,7 @@ virt:
     mg5: generate d d~ > g h z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6612,7 +6612,7 @@ virt:
     mg5: generate d d~ > g ve ve~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6642,7 +6642,7 @@ virt:
     - 3
     - 1
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6671,7 +6671,7 @@ virt:
     - 0
     - 4
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6701,7 +6701,7 @@ virt:
     - 0
     - 5
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6726,7 +6726,7 @@ virt:
     mg5: generate d d~ > h h z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6750,7 +6750,7 @@ virt:
     mg5: generate d d~ > h z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6774,7 +6774,7 @@ virt:
     mg5: generate d d~ > ta+ vt w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6798,7 +6798,7 @@ virt:
     mg5: generate d d~ > w+ w- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -1
@@ -6821,7 +6821,7 @@ virt:
     mg5: generate d g > a d QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6844,7 +6844,7 @@ virt:
     mg5: generate d g > d g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6868,7 +6868,7 @@ virt:
     mg5: generate d g > d g g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6893,7 +6893,7 @@ virt:
     mg5: generate d g > d g z QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6917,7 +6917,7 @@ virt:
     mg5: generate d g > d z QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6941,7 +6941,7 @@ virt:
     mg5: generate d g > h u w- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6966,7 +6966,7 @@ virt:
     mg5: generate d g > ta- u vt~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -6990,7 +6990,7 @@ virt:
     mg5: generate d g > u w- QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -7014,7 +7014,7 @@ virt:
     mg5: generate d g > u w- z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 21
@@ -7039,7 +7039,7 @@ virt:
     mg5: generate d s > a d s QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 3
@@ -7064,7 +7064,7 @@ virt:
     mg5: generate d s > c d w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 3
@@ -7088,7 +7088,7 @@ virt:
     mg5: generate d s > d s QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - 3
@@ -7112,7 +7112,7 @@ virt:
     mg5: generate d s~ > a c~ u QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -3
@@ -7136,7 +7136,7 @@ virt:
     mg5: generate d s~ > c~ u QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -3
@@ -7160,7 +7160,7 @@ virt:
     mg5: generate d s~ > c~ u z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -3
@@ -7185,7 +7185,7 @@ virt:
     mg5: generate d s~ > d s~ z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 1
     - -3
@@ -7210,7 +7210,7 @@ virt:
     mg5: generate e+ e- > a b b~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7235,7 +7235,7 @@ virt:
     mg5: generate e+ e- > a d d~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7259,7 +7259,7 @@ virt:
     mg5: generate e+ e- > b b~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7283,7 +7283,7 @@ virt:
     mg5: generate e+ e- > b b~ z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7307,7 +7307,7 @@ virt:
     mg5: generate e+ e- > c c~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7331,7 +7331,7 @@ virt:
     mg5: generate e+ e- > c c~ g QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7356,7 +7356,7 @@ virt:
     mg5: generate e+ e- > d d~ z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7386,7 +7386,7 @@ virt:
     - 0
     - 4
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7416,7 +7416,7 @@ virt:
     - 0
     - 5
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 11
     - -11
@@ -7446,7 +7446,7 @@ virt:
     - 2
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7476,7 +7476,7 @@ virt:
     - 3
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7501,7 +7501,7 @@ virt:
     mg5: generate g g > a c c~ QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7525,7 +7525,7 @@ virt:
     mg5: generate g g > b b~ QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7549,7 +7549,7 @@ virt:
     mg5: generate g g > b b~ g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7574,7 +7574,7 @@ virt:
     mg5: generate g g > c c~ z QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7598,7 +7598,7 @@ virt:
     mg5: generate g g > g g QED<=0 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7627,7 +7627,7 @@ virt:
     - 3
     - 1
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7656,7 +7656,7 @@ virt:
     - 2
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7686,7 +7686,7 @@ virt:
     - 2
     - 3
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7716,7 +7716,7 @@ virt:
     - 2
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7745,7 +7745,7 @@ virt:
     - 2
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7774,7 +7774,7 @@ virt:
     - 2
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7803,7 +7803,7 @@ virt:
     - 2
     - 2
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 21
     - 21
@@ -7827,7 +7827,7 @@ virt:
     mg5: generate u b > b u z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 5
@@ -7852,7 +7852,7 @@ virt:
     mg5: generate u c > c u z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 4
@@ -7877,7 +7877,7 @@ virt:
     mg5: generate u c~ > c~ h u QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -4
@@ -7902,7 +7902,7 @@ virt:
     mg5: generate u c~ > c~ u z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -4
@@ -7927,7 +7927,7 @@ virt:
     mg5: generate u d > a d u QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 1
@@ -7952,7 +7952,7 @@ virt:
     mg5: generate u d > d d w+ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 1
@@ -7977,7 +7977,7 @@ virt:
     mg5: generate u d~ > a c s~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8002,7 +8002,7 @@ virt:
     mg5: generate u d~ > a d~ u QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8027,7 +8027,7 @@ virt:
     mg5: generate u d~ > a g w+ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8051,7 +8051,7 @@ virt:
     mg5: generate u d~ > a w+ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8075,7 +8075,7 @@ virt:
     mg5: generate u d~ > c c~ w+ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8099,7 +8099,7 @@ virt:
     mg5: generate u d~ > c s~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8123,7 +8123,7 @@ virt:
     mg5: generate u d~ > d d~ w+ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8148,7 +8148,7 @@ virt:
     mg5: generate u d~ > e+ g ve QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8173,7 +8173,7 @@ virt:
     mg5: generate u d~ > g g w+ QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8198,7 +8198,7 @@ virt:
     mg5: generate u d~ > g ta+ vt QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8222,7 +8222,7 @@ virt:
     mg5: generate u d~ > g w+ QED<=1 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8245,7 +8245,7 @@ virt:
     mg5: generate u d~ > h w+ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8269,7 +8269,7 @@ virt:
     mg5: generate u d~ > ta+ ta- w+ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8293,7 +8293,7 @@ virt:
     mg5: generate u d~ > ta+ vt QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8317,7 +8317,7 @@ virt:
     mg5: generate u d~ > w+ w+ w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8341,7 +8341,7 @@ virt:
     mg5: generate u d~ > w+ z QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8365,7 +8365,7 @@ virt:
     mg5: generate u d~ > w+ z z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -1
@@ -8390,7 +8390,7 @@ virt:
     mg5: generate u g > d ta+ vt QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 21
@@ -8415,7 +8415,7 @@ virt:
     mg5: generate u g > e+ e- u QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 21
@@ -8440,7 +8440,7 @@ virt:
     mg5: generate u g > ta+ ta- u QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 21
@@ -8465,7 +8465,7 @@ virt:
     mg5: generate u s > a c d QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 3
@@ -8489,7 +8489,7 @@ virt:
     mg5: generate u s > c d QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 3
@@ -8513,7 +8513,7 @@ virt:
     mg5: generate u s > c d g QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - 3
@@ -8538,7 +8538,7 @@ virt:
     mg5: generate u u~ > a b b~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8563,7 +8563,7 @@ virt:
     mg5: generate u u~ > c c~ z [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8589,7 +8589,7 @@ virt:
     mg5: generate u u~ > e+ e- g QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8614,7 +8614,7 @@ virt:
     mg5: generate u u~ > e+ e- z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8644,7 +8644,7 @@ virt:
     - 3
     - 1
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8673,7 +8673,7 @@ virt:
     - 0
     - 4
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8703,7 +8703,7 @@ virt:
     - 0
     - 5
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8728,7 +8728,7 @@ virt:
     mg5: generate u u~ > h u u~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8753,7 +8753,7 @@ virt:
     mg5: generate u u~ > h ve ve~ QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8778,7 +8778,7 @@ virt:
     mg5: generate u u~ > h w+ w- QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8802,7 +8802,7 @@ virt:
     mg5: generate u u~ > ta+ ta- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8825,7 +8825,7 @@ virt:
     mg5: generate u u~ > ve ve~ QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8848,7 +8848,7 @@ virt:
     mg5: generate u u~ > w+ w- QED<=2 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2
@@ -8872,7 +8872,7 @@ virt:
     mg5: generate u u~ > w+ w- z QED<=3 [virt=QCD]
     model: loop_sm-no_b_mass
     param_card_patches:
-      WT: 1.480327
+      WT: 1.4915
     pdg_ids:
     - 2
     - -2

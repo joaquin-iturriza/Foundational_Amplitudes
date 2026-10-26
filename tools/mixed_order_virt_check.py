@@ -205,7 +205,7 @@ def build(name, var, string, model, patches=None):
     p0 = p0s[0]
     with open(f"{p0}/f2py_wrapper.f", "a") as f:
         f.write(NV.GET_ME_FULL_F + GET_ME_SPLIT_F)
-    NV.patch_param_card_slha(f"{sa}/Cards/param_card.dat", {**C.PARAM_CARD_PATCHES, "WT": 1.480327, **(patches or {})})
+    NV.patch_param_card_slha(f"{sa}/Cards/param_card.dat", {**C.PARAM_CARD_PATCHES, "WT": 1.4915, **(patches or {})})   # catalog_v4's V4_WT (the user 2026-10-26)
     # the squared orders MadGraph wrote into the code, for reading the columns
     so = []
     for fn in sorted(glob.glob(f"{p0}/*.f")):

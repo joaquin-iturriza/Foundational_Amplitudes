@@ -18,8 +18,9 @@ What changes against catalog_v3, all of it as fields of the v4 entries that mg5_
                them all: VBF, VBS and the EW-QCD interference. QCD stays unbounded (MadGraph applies no default order
                once one is given; catalog_v2's four-quark entries, "QED<=2", are the precedent). The order vector reads
                the bound (order_vector: [0, 0, a_max, b]); a_max is catalog_v3's (minimal QED = maximal QCD)
-  top          MT = ymt = 172.5 in every entry, internal tops and the one-loop layer too, WT = V4_WT (the LO width at
-               172.5, massless b); the heavy-quark layer's width the same formula at its mass
+  top          MT = ymt = 172.5 in every entry, internal tops and the one-loop layer too, WT = V4_WT = 1.4915, the width
+               the pools built before the DECAY-column fix have (the user 2026-10-26, "do 1.4915 for all"); the
+               heavy-quark layer's width the LO formula at its mass (mg5_pipeline_final.top_width_lo)
   b            massless in beams and finals: model sm-no_b_mass (loop_sm-no_b_mass for MadLoop), beam_masses {}
 Not changed: the classes (catalog_v3's census until --check and the equality step are rerun on v4: a class can split
 when EW diagrams tell its relabelled members apart, merge when the massless b equals a d or s, vanish when only the b
