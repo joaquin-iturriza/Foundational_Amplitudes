@@ -2830,7 +2830,7 @@ seed)).
     is larger again). The validation target, and with it the step-$0$ error, therefore shifts slightly with $D$ in
     every cell of that probe (refit and scratch too); the cells of one $D$ share it, so the comparisons above, all
     within one $D$, are unaffected.
-  \item \emph{The Muon fine-tune's own HPs} (the user, 2026-10-26: ``We may have to explore a bit the HP space for
+  \item \emph{The Muon fine-tune hyperparameters} (the user, 2026-10-26: ``We may have to explore a bit the HP space for
     muon, that's fine, the gain is clearly worth it''). The question: the fine-tunes above ran untuned (the parent's
     learning rate, no layer decay); now that Muon is the fine-tune optimizer too, where are its best fine-tune
     learning rate scale and layer decay, and how much do they gain? The design: one single-fidelity DyHPO search
