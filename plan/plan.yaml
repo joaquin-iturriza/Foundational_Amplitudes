@@ -1013,8 +1013,9 @@ entries:
     - FA-ccin2p3-2e1a0894
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-44e6a15b
+    - FA-ccin2p3-84bc4800
     - FA-ccin2p3-ec84e913
-    commit: 929e1a9
+    commit: 348a984
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
