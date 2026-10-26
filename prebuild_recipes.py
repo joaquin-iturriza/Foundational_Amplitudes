@@ -48,11 +48,45 @@ def _cores_available():
     except (AttributeError, OSError):
         return os.cpu_count() or 1
 
-def _gen_chunk(task):
+# Disk guard (2026-10-26, /sps/lpnhe at 91% during catalog_v4's regeneration; a full disk killed jobs on 10-25): before
+# each chunk, backend build, MadEvent run or pool assembly starts, the filesystem it writes to must keep
+# max(DISK_LOW_FRAC of its size, DISK_LOW_GB) free. Below that the build stops cleanly: nothing new starts, running
+# chunks finish their files, the log says DISK_LOW and the exit status is DISK_LOW_RC; a rerun builds only what is
+# missing (finished chunks are reused, built pools are cache hits). Set from --disk-low-frac / --disk-low-gb.
+DISK_LOW_FRAC, DISK_LOW_GB, DISK_LOW_RC = 0.03, 15.0, 5
+
+
+class DiskLow(Exception):
+    pass
+
+
+def _disk_floor(path):
+    """(free bytes, floor bytes) of the filesystem holding `path` (its nearest existing ancestor)."""
+    p = os.path.abspath(path)
+    while not os.path.exists(p):
+        p = os.path.dirname(p)
+    u = shutil.disk_usage(p)
+    return u.free, max(DISK_LOW_FRAC * u.total, DISK_LOW_GB * 1e9)
+
+
+def _check_disk(path, need=0, what=""):
+    """Raise DiskLow when writing `need` more bytes under `path` would leave less than the floor free."""
+    free, floor = _disk_floor(path)
+    if free - need < floor:
+        raise DiskLow(f"{free / 1e9:.1f} GB free on {path}, {need / 1e9:.1f} GB to write for {what or 'the next step'}, "
+                      f"floor {floor / 1e9:.1f} GB (max({100 * DISK_LOW_FRAC:g}% of the filesystem, {DISK_LOW_GB:g} GB))")
+
+
+def _gen_chunk(task, frac=None, gb=None):
     """One chunk, retried on a transient OS failure (EAGAIN on fork when the node's
     process limit is momentarily hit) so a single hiccup does not abort a pool that has
-    hours of finished chunks in flight."""
+    hours of finished chunks in flight. Refuses to start (DiskLow) below the disk floor;
+    `frac`/`gb` carry the floor into a spawned worker."""
     import time
+    global DISK_LOW_FRAC, DISK_LOW_GB
+    if frac is not None:
+        DISK_LOW_FRAC, DISK_LOW_GB = frac, gb
+    _check_disk(task["out_dir"], what=f"chunk {task['process']} {task.get('role')} {task['idx']}")
     for attempt in range(4):
         try:
             return datagen.gen_chunk(task)
@@ -94,11 +128,17 @@ def _run_lhe_jobs(lhe_jobs, args):
 
 
 def main():
+    global DISK_LOW_FRAC, DISK_LOW_GB
     ap = argparse.ArgumentParser()
     ap.add_argument("spec")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--min-free-gb", type=float, default=20.0,
                     help="space to leave free on the destination after the build (a shared filesystem)")
+    ap.add_argument("--disk-low-frac", type=float, default=DISK_LOW_FRAC,
+                    help="stop cleanly (DISK_LOW, exit 5) before starting a chunk, backend build or pool assembly "
+                         "when the destination filesystem would keep less than this fraction free ...")
+    ap.add_argument("--disk-low-gb", type=float, default=DISK_LOW_GB,
+                    help="... or less than this many GB free, whichever is larger")
     ap.add_argument("--workers", type=int, default=min(24, _cores_available()),
                     help="parallel chunk-generation workers (default: min(24, ncpu))")
     ap.add_argument("--lhe-cores", type=int, default=int(os.environ.get("AMP_LHE_CORES", "1")),
@@ -116,6 +156,7 @@ def main():
                     help="raise --workers up to ncpu when the cost estimate shows "
                          "more cores would shorten the prebuild (free on prepost)")
     args = ap.parse_args()
+    DISK_LOW_FRAC, DISK_LOW_GB = args.disk_low_frac, args.disk_low_gb
 
     with open(args.spec) as f:
         spec = yaml.safe_load(f)
@@ -253,6 +294,19 @@ def main():
           f"{len(reweight_jobs)} NLO α_s datasets reweighted from "
           f"{len({j[2] for j in reweight_jobs})} stripped parents; "
           f"{len(lhe_jobs)} lhe_pp processes ({sum(map(len, lhe_jobs.values()))} pools) from MadEvent.")
+    def disk_low(e):
+        """Stop cleanly: report, record skipped entries if any, exit DISK_LOW_RC."""
+        print(f"\nDISK_LOW: {e}. Stopped before starting anything new; finished chunks and pools are kept, "
+              f"a rerun builds only what is missing.", flush=True)
+        if skipped_names and args.skip_cert_failed:
+            write_cert()
+        sys.exit(DISK_LOW_RC)
+
+    if lhe_jobs:
+        try:
+            _check_disk(mg.lhe_work_dir(), what="the MadEvent phase")
+        except DiskLow as e:
+            disk_low(e)
     lhe_failed = _run_lhe_jobs(lhe_jobs, args) if lhe_jobs else []
     if not datasets and not reweight_jobs:
         if lhe_failed:
@@ -325,6 +379,12 @@ def main():
 
         # 2) Compile backends, in parallel over distinct backends (each in its own dir).
         names = sorted({m["process"] for m in datasets.values()})
+        try:
+            _check_disk(mg.WORK_DIR, what="the backend builds")
+            for d in dests:
+                _check_disk(d, what="the chunk generation")
+        except DiskLow as e:
+            disk_low(e)
         failed_keys = {} if args.skip_cert_failed else None
         datagen.ensure_backends(names, workers=args.workers, failed=failed_keys)
         for k, why in (failed_keys or {}).items():
@@ -340,8 +400,12 @@ def main():
         # lands, and its chunk dir removed then: the disk holds one dataset twice at a time, not the whole recipe
         # (2026-10-24: catalog_v3's stage 1 filled /sps/lpnhe with 47808 chunks before a single pool was assembled).
         def finalize(key):
+            """Assembly writes the pool next to its chunks (one dataset twice): checked against the floor first. Raises
+            DiskLow, leaving the chunks in place for the rerun to assemble."""
             meta = datasets[key]
             ordered = [results[key][i] for i in sorted(results[key])]
+            _check_disk(meta["dest"], need=sum(os.path.getsize(p) for p in ordered),
+                        what=f"assembling {meta['process']} {meta['role']}")
             t0 = time.time()
             final = datagen.finalize_dataset(
                 meta["process"], meta["smin"], meta["smax"], meta["n_ev"],
@@ -349,14 +413,22 @@ def main():
             print(f"  [{meta['role']:5s}] {meta['process']:10s} "
                   f"({meta['n_chunks']} chunks) -> {final}  ({time.time()-t0:.1f}s)", flush=True)
 
+        low = None    # the first DiskLow: nothing new is started after it, running chunks finish their files
         with ProcessPoolExecutor(max_workers=args.workers) as ex:
-            futs = {ex.submit(_gen_chunk, t): t["_key"] for t in all_tasks}
+            futs = {ex.submit(_gen_chunk, t, DISK_LOW_FRAC, DISK_LOW_GB): t["_key"] for t in all_tasks}
             for fut in as_completed(futs):
                 key = futs[fut]
-                if key in skipped_keys:
+                if key in skipped_keys or fut.cancelled():
                     continue
                 try:
                     idx, path = fut.result()
+                except DiskLow as e:
+                    if low is None:
+                        low = e
+                        print(f"DISK_LOW (generation): {e}; cancelling the chunks not started", flush=True)
+                        for f in futs:
+                            f.cancel()
+                    continue
                 except RuntimeError as e:
                     if not (args.skip_cert_failed and datagen.is_virt(key[0]) and "pole guard" in str(e)):
                         raise
@@ -374,15 +446,28 @@ def main():
                 done += 1
                 if done % max(1, len(all_tasks) // 20) == 0 or done == len(all_tasks):
                     print(f"  chunks {done}/{len(all_tasks)}")
-                if len(results[key]) == datasets[key]["n_chunks"]:
-                    finalize(key)
+                if len(results[key]) == datasets[key]["n_chunks"] and low is None:
+                    try:
+                        finalize(key)
+                    except DiskLow as e:
+                        low = e
+                        print(f"DISK_LOW (assembly): {e}; cancelling the chunks not started", flush=True)
+                        for f in futs:
+                            f.cancel()
         if pole_names:
             quarantine_group(chunks=True)
+        if low is not None:
+            disk_low(low)
 
     # 5) Reweight NLO α_s-scan datasets from their (now materialized) stripped
     # parents — cheap numpy, no MadLoop. Each parent feeds all its α_s points.
     reweight_jobs = [j for j in reweight_jobs if j[0] not in skipped_names]
     if reweight_jobs:
+        try:
+            _check_disk(os.path.dirname(reweight_jobs[0][1]), need=sum(os.path.getsize(j[2]) for j in reweight_jobs),
+                        what="the alpha_s reweighting")
+        except DiskLow as e:
+            disk_low(e)
         print(f"\nReweighting {len(reweight_jobs)} NLO α_s datasets from stripped parents...")
         for (name, out, pout, role, recipe) in reweight_jobs:
             datagen.reweight_virt_alphas(pout, name, out)
