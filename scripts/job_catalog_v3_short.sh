@@ -38,7 +38,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon or v4_dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -135,6 +135,19 @@ case "$ARM" in
     # par:v3_muon), no pair head, no near-zero weighting; its result json carries val_total, the search's objective
     baseline_more_signed_muon) NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                            ++training.optimizer=MuonAdamW ++training.lr=0.005 ++training.muon_weight_decay=0.0217)
+                           TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
+    # the pair sign head test (v3_prep_explore, the user 2026-10-26 "Yes, run that test."): the sign head search's
+    # best trial (trial_0177: pair head width 16, hidden 16, unbounded; lr 1.246032e-2, warmup 0.08121988) retrained
+    # at seeds 42 and 43, against the same with both sign knobs off (no pair head, no near-zero weighting), so the
+    # pair head is the only difference; MuonAdamW at decay 0.0217, the more-signed-pools recipe, 4264 steps
+    sign_pair_best|sign_pair_best_seed2|sign_off_best|sign_off_best_seed2)
+                           NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
+                                 ++training.optimizer=MuonAdamW ++training.lr=0.01246032 ++training.muon_weight_decay=0.0217
+                                 ++training.cosanneal_warmup_frac=0.08121988 ++training.sign_near_weight=1.0)
+                           case "$ARM" in sign_pair_*) NORM+=(++model.sign_pair_dim=16 ++model.sign_pair_hidden=16
+                                                              ++model.sign_pair_bound=false) ;;
+                                          *) NORM+=(++model.sign_pair_dim=0) ;; esac
+                           case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
                            TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
     baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
