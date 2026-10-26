@@ -44,7 +44,12 @@ held-out probe, as (b). The last line printed is the numbers docs/results.tex qu
         Figure muon_search (2x2): (a) every trial's loss against its lr, stage 1 starred; (b) the best trials' and
         stage 1's validation curves; (c) Muon's against its decoupled weight decay; (d) AdamW's against its L2 weight.
     python3 analysis/catalog_v3/muon_compare.py   -> data/muon_compare.json, figs/muon_compare.{png,pdf}, figs/muon_ft.{png,pdf},
-                                                     figs/muon_search.{png,pdf}
+                                                     figs/muon_search.{png,pdf}, figs/muon_search_zs.{png,pdf}
+  search zero-shot (in main): the two search bests read zero-shot on every held-out axis (arms
+        muon_search_best_{adamw,muon} of scripts/job_catalog_v3_short.sh, mode eval, copied home like stage 1's), against
+        each other and against stage 1, per axis on the probes every run has (search_zs). Figure muon_search_zs (1x2):
+        (a) the median zero-shot MSE per axis, stage 1's four runs and the two search bests; (b) per probe, Muon against
+        AdamW, the search bests and stage 1's seed 42.
 """
 import glob, json, os, sys
 
@@ -324,6 +329,82 @@ def search_compare(pre):
     return out
 
 
+SEARCH_ARMS = {"AdamW": "muon_search_best_adamw", "Muon": "muon_search_best_muon"}
+
+
+def search_zs(reads):
+    """stage 2, zero-shot: the two searches' best trials read on every held-out axis like stage 1 (one seed each, 42).
+    Per axis, on the probes every compared run has: the median MSE of each, and per probe the ratios AdamW search best
+    over Muon search best (median, share of probes each is lower), each search best over its own optimizer's stage-1
+    seed-42 run, and AdamW's search best over stage 1's Muon seed 42; the stage-1 seed spread (median abs log10 of
+    seed 43 over seed 42, per optimizer) is the reference a ratio is read against. A probe with no prediction in a
+    run is listed by name, never filled."""
+    zsr = {arm: {a: zs(arm, a) for a in AXES} for arm in SEARCH_ARMS.values()}
+    every = dict(reads, **zsr)
+    out = {}
+
+    def one(get):
+        r = {arm: get(arm) for arm in every}
+        ks = sorted(set.intersection(*(set(v) for v in r.values())))
+        allk = sorted(set.union(*(set(v) for v in r.values())))
+        v = {arm: np.array([r[arm][k] for k in ks]) for arm in r}
+        A, M = v[SEARCH_ARMS["AdamW"]], v[SEARCH_ARMS["Muon"]]
+        A1, M1 = v[RUNS[("AdamW", 42)]], v[RUNS[("Muon", 42)]]
+        med = lambda x: float(np.median(x))
+        return {"n": len(ks), "missing": {arm: sorted(set(allk) - set(r[arm])) for arm in r if set(allk) - set(r[arm])},
+                "median_mse": {arm: med(v[arm]) for arm in v},
+                "best_ratio": med(A / M), "best_ratio_q10_q90": [float(x) for x in np.quantile(A / M, [0.1, 0.9])],
+                "muon_lower_pct": float(100 * np.mean(M < A)), "adamw_lower_pct": float(100 * np.mean(A < M)),
+                "adamw_vs_stage1": med(A / A1), "muon_vs_stage1": med(M / M1),
+                "muon_vs_stage1_lower_pct": float(100 * np.mean(M < M1)),
+                "adamw_best_vs_stage1_muon": med(A / M1),
+                "seed_spread_adamw": med(np.abs(np.log10(v[RUNS[("AdamW", 43)]] / A1))),
+                "seed_spread_muon": med(np.abs(np.log10(v[RUNS[("Muon", 43)]] / M1)))}
+
+    for a in AXES:
+        out[a] = one(lambda arm: every[arm][a])
+    out["all"] = one(lambda arm: {f"{a}/{k}": x for a in AXES for k, x in every[arm][a].items()})
+    return out, zsr
+
+
+def plot_search_zs(reads, zsr):
+    """(a) the median zero-shot MSE per held-out axis: stage 1's four runs and the two search bests; (b) per held-out
+    probe, the Muon search best against the AdamW search best, with stage 1's Muon seed 42 against AdamW seed 42"""
+    import plot_style as ps
+    fig, (a, b) = ps.figure(ncols=2)
+    every = dict(reads, **zsr)
+    sty = [(RUNS[("AdamW", 42)], ps.C.blue, "o", True, "AdamW stage 1, seed 42"),
+           (RUNS[("AdamW", 43)], ps.C.blue, "o", False, "AdamW stage 1, seed 43"),
+           (SEARCH_ARMS["AdamW"], ps.C.blue, "D", True, "AdamW search best"),
+           (RUNS[("Muon", 42)], ps.C.vermillion, "^", True, "Muon stage 1, seed 42"),
+           (RUNS[("Muon", 43)], ps.C.vermillion, "^", False, "Muon stage 1, seed 43"),
+           (SEARCH_ARMS["Muon"], ps.C.vermillion, "D", True, "Muon search best")]
+    xs = np.arange(len(AXES))
+    for i, (arm, col, mk, fill, lab) in enumerate(sty):
+        a.plot(xs + (i - 2.5) * 0.11, [np.median(list(every[arm][ax].values())) for ax in AXES], mk, color=col,
+               mfc=col if fill else "none", label=lab)
+    a.set_yscale("log"); a.set_xticks(xs); a.set_xticklabels([str(i + 1) for i in xs])
+    a.set_xlabel("held-out axis"); a.set_ylabel("zero-shot MSE, median")
+    ps.legend(a, "upper left", ncol=2)
+    ps.make_room(a, max_growth=6)
+    flat = lambda arm: {f"{ax}/{k}": v for ax in AXES for k, v in every[arm][ax].items()}
+    pairs = [(RUNS[("AdamW", 42)], RUNS[("Muon", 42)], "^", ps.C.grey, "stage 1, seed 42"),
+             (SEARCH_ARMS["AdamW"], SEARCH_ARMS["Muon"], "D", ps.C.vermillion, "search bests")]
+    lo, hi = np.inf, 0
+    for xa, ya, mk, col, lab in pairs:
+        X, Y = flat(xa), flat(ya)
+        ks = sorted(set(X) & set(Y))
+        x, y = np.array([X[k] for k in ks]), np.array([Y[k] for k in ks])
+        b.plot(x, y, mk, mfc="none", color=col, label=lab)
+        lo, hi = min(lo, x.min(), y.min()), max(hi, x.max(), y.max())
+    b.plot([lo, hi], [lo, hi], ls="--", color="k", label="equal")
+    b.set_xscale("log"); b.set_yscale("log")
+    b.set_xlabel("zero-shot MSE, AdamW"); b.set_ylabel("zero-shot MSE, Muon")
+    ps.legend(b, "upper left")
+    ps.make_room(b, max_growth=4)
+    ps.save(fig, os.path.join(HERE, "figs", "muon_search_zs"))
+
+
 def plot_search(sr, pre):
     import plot_style as ps
     S = json.load(open(os.path.join(HERE, "data", "muon_search.json")))
@@ -389,9 +470,11 @@ def main():
     tab, z0, read, step0_refit = ft_read()
     res["fine_tune"] = ft_compare(tab, z0, read, step0_refit)
     res["search"] = search_compare(pre)
+    res["search_zs"], zsr = search_zs(reads)
     json.dump(res, open(os.path.join(HERE, "data", "muon_compare.json"), "w"), indent=1)
     plot(pre, reads)
     plot_search(res["search"], pre)
+    plot_search_zs(reads, zsr)
     plot_ft(tab, z0)
     for a in AXES + ("all",):
         z = res["zero_shot"][a]
@@ -424,6 +507,9 @@ def main():
                      for o in ("AdamW", "Muon")}
     for k in ("best_ratio", "adamw_best_vs_stage1", "muon_best_vs_stage1", "best_adamw_vs_stage1_muon"):
         out["search"][k] = r2(sr[k])
+    out["search_zs"] = {a: {k: (r2(v) if isinstance(v, float) else {kk: r2(vv) for kk, vv in v.items()}
+                                if k == "median_mse" else v) for k, v in z.items() if k != "best_ratio_q10_q90"}
+                        for a, z in res["search_zs"].items()}
     print(json.dumps(out))
 
 
