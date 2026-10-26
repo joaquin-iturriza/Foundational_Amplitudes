@@ -62,6 +62,37 @@ def collect():
     json.dump(out, sys.stdout)
 
 
+SEARCHES = {"AdamW": ("muon_test_search_adamw", "training.regularization_lambda"),
+            "Muon": ("muon_test_search_muon", "training.muon_weight_decay")}
+
+
+def collect_search():
+    """stage 2: every trial of the two searches, from its result file (val_loss = the best checkpoint's
+    val_loss_no_reg, what DyHPO observed; its curve) and its run directory's config (the HPs it ran) and std"""
+    import yaml
+    out = {}
+    for opt, (sweep, hp2) in SEARCHES.items():
+        rows = []
+        for f in sorted(glob.glob(os.path.join(ROOT, "sweeps", sweep, "results", "hp*_t*.json"))):
+            hp = int(os.path.basename(f)[2:6])
+            r = json.load(open(f))
+            d = os.path.join(ROOT, "runs", sweep, f"trial_{hp:04d}")
+            c = yaml.safe_load(open(os.path.join(d, "config.yaml")))
+            g = lambda k: float(c[k.split(".")[0]][k.split(".")[1]])
+            std = float(json.load(open(os.path.join(d, "data_stats.json")))["prepd_std"][0])
+            rows.append({"hp_idx": hp, "lr": g("training.lr"), "hp2": g(hp2), "optimizer": c["training"]["optimizer"],
+                         "seed": c.get("seed"), "loss": c["training"]["loss"], "val_loss_no_reg": r["val_loss"],
+                         "best_step": r["best_step"], "validate_every": r["validate_every"],
+                         "val_curve": r["val_curve"], "prepd_std": std,
+                         "has_best_model": any(os.path.exists(os.path.join(d, "models", "model_run0_best.pt" + z))
+                                               for z in ("", ".gz"))})
+        failed = [os.path.basename(e) for e in glob.glob(os.path.join(ROOT, "sweeps", sweep, "error", "*.err"))
+                  if "Trial FAILED" in open(e, errors="replace").read()]
+        out[opt] = {"sweep": sweep, "hp2": hp2, "trials": rows, "failed_logs": failed,
+                    "n_jobs": len(glob.glob(os.path.join(ROOT, "sweeps", sweep, "jobs", "trial_*.sh")))}
+    json.dump(out, sys.stdout)
+
+
 FT_PROBES = {"v3_dg_dgwpwm": ("H1", r"$dg\to dgW^+W^-$"), "v3_usx_cxuwpz": ("H2", r"$u\bar s\to \bar c uW^+Z$"),
              "v3_gg_attx": ("H3", r"$gg\to\gamma t\bar t$"), "v3_udx_agwp_nlo": ("H5", r"$u\bar d\to\gamma gW^+$, one loop")}
 FT_D = (10, 32, 100, 316)
@@ -336,4 +367,4 @@ def plot(pre, reads):
 
 
 if __name__ == "__main__":
-    {"collect": collect, "collect-ft": collect_ft}.get(sys.argv[1] if sys.argv[1:] else "", main)()
+    {"collect": collect, "collect-ft": collect_ft, "collect-search": collect_search}.get(sys.argv[1] if sys.argv[1:] else "", main)()
