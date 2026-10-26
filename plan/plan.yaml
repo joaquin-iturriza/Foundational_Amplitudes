@@ -1512,7 +1512,8 @@ entries:
   next: 'Design the fine-tune search (single-fidelity DyHPO, HPO rule 6): fine_tune.lr_scale [0.1,10]@1, layer_decay [0.75,1],
     Muon fine-tunes from the Muon pretraining on the small-D catalog_v3 probes, keeping the parent''s standardization; trials
     and GPU-h under 30; then submit'
-  done_when: null
+  done_when: 'test -f analysis/catalog_v3/data/muon_hp_ft.json && python3 -c "import json; d=json.load(open(''analysis/catalog_v3/data/muon_hp_ft.json''));
+    assert d[''n_observed''] >= 12 and d[''best''][''objective''] > 0" && grep -q ''claim: muon_hp_ft.best'' docs/results.tex'
   notes_ref: null
   match: muon_hp*,zz_muon_hp*
   evidence:
