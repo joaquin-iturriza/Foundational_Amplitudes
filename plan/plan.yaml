@@ -1102,6 +1102,12 @@ entries:
       library, impossible for a tree); its sq<k> variants crashed (row_to_slot_perm on the QED^2== string) and its aMC@NLO
       check_poles step never ran (command not recognised in the mg5 shell)
     at: '2026-10-26T01:03:23+00:00'
+  - tried: aMC@NLO check_poles, coupling-order and squared split-order variants, catalog_v3's top 173/1.4915 on the three
+      sub-percent one-loop entries (FA-ccin2p3-a22a1770)
+    why: 'all identical (max double-pole deviation 4.2e-3 to 4.6e-3, aMC 0/50 points): the deviation was never the string;
+      the certifier''s top-width zeroing was a no-op on v4 cards (regex anchored at column 0, cards patched with a leading
+      blank), so every check ran at the physical top width'
+    at: '2026-10-26T02:33:39+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
