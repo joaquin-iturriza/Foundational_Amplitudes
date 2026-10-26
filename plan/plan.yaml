@@ -98,19 +98,12 @@ entries:
   - D83
   - D129
   - D135
-  next: 'When FA-ccin2p3-ef655fd7 (arm sign_search_best: the sign head search''s best trial, trial_0177, pair head 16/16 unbounded,
-    lr 1.246e-2, read zero-shot in mode eval) ends: read its log (site logs), copy $SCRATCH/zz_v3_short_sign_search_best/<axis>/*.npz
-    and H5_signed.txt into analysis/catalog_v3/data/short_reads/sign_search_best/ as the other arms, rerun python3 analysis/catalog_v3/sign_head_search.py
-    (its zero_shot part then compares held-out wrong-sign share and zero-shot MSE per probe against baseline_more_signed_muon
-    and baseline_more_signed AdamW), and add the zero-shot numbers to the sign head search item of par:v3_prep_signed (src
-    sign_head_search.py, claims zs_*). The search itself is written up (78458ce4): 20/20 trials, 4 blow-ups (all unbounded
-    pair heads at lr >= 8.96e-3), best trial 0.86 of the Muon baseline''s objective, the objective tracks lr (rank corr -0.89)
-    and is 1.18-1.25x the magnitude loss in every trial, so the knobs do not show in it. Code-review items a and d were done
-    in 577164a6; b and c are in the write-up.; ALSO: the search objective (val_total, chosen by the main session) turned out
-    to be 1.18 to 1.25 times the magnitude loss in every trial, so it ranked trials by magnitude and cannot see the sign.
-    Re-rank the 20 trials, at no compute, by their validation wrong-sign share on the sign-changing training pools (training
-    processes'' validation events, no held-out pool), from their logs or a CPU eval of the saved checkpoints; say whether
-    a sign knob wins there, and use that, with the held-out zero-shot read, for the conclusion'
+  next: 'Separate the learning rate from the pair head on the held-out sign: the Muon baseline arm (more sign-changing pools,
+    both sign knobs off) rerun as a short pretraining at the sign head search best trial''s lr 1.246e-2 and warmup 0.081 (one
+    seed, ~1.5 GPU-h on CC), read zero-shot in eval mode like sign_search_best, then rerun analysis/catalog_v3/sign_head_search.py
+    with it as a fourth arm (held-out wrong-sign share per pool and zero-shot MSE per probe against the best trial). Written
+    so far: d6b12413 (the training-pool validation signs separate no knob; the best trial beats the Muon baseline held out,
+    2.8% vs 3.8% median wrong sign, 0.67x zero-shot MSE, at 2.5x its rate).'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
