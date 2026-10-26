@@ -1312,3 +1312,35 @@ entries:
   searched: 'site decisions --project FA: the approval of the quick Muon test (2026-10-26) names no budget; CLAUDE.md 2 allows
     under 10 GPU-h without asking but the step was told to wait at the design for the user to see the cost, and stage 2 exceeds
     10 GPU-h; no rule settles whether to sweep the baseline too when its HPs come from another catalog''s sweep'
+- id: ft_harm
+  title: 'why fine-tuning loses to scratch at small D: a bad start or fine-tuning undoing a good one'
+  question: 'On the probes and small D where a fine-tune ends worse than scratch (ee->Z gamma and others; par:nogain, par:lowd_ft,
+    par:lowd_dyhpo), is it because the pretrained start is worse than what scratch reaches and the fine-tune never gets there,
+    or because the start (or the fine-tune on its way) is better and fine-tuning then loses it? First step (CPU): from the
+    saved validation curves of the small-D fine-tunes (both rounds) and the grid''s fine-tunes on the losing probes, per cell
+    the first validation, the minimum and where, against scratch''s best; classify each losing cell; copy the curves home
+    before any model deletion (D149).'
+  status: running
+  quotes:
+  - said_at: '2026-10-26T03:46:36.177000+00:00'
+    text: about the small D study, okay, but we still didn't figure out what's happening then, if the finetuning is actively
+      hurting the pretrained model, this needs to be understood.
+    decision: D151
+    covers:
+    - ft_harm
+    - understand why fine-tuning loses to scratch on some probes at small D (ee->Z gamma and others; par:nogain; par:lowd_ft;
+      par:lowd_dyhpo)
+  decisions:
+  - D151
+  next: 'CPU: copy the first round''s result files (curves) home from CC zz_lowd; classify the losing cells from the curves
+    (start, minimum and step, final) against scratch''s best and the frozen read-out; figure; paragraph par:ft_harm after
+    par:lowd_dyhpo with provenance; then design a targeted test of the dominant mechanism with its GPU cost for the user.'
+  done_when: null
+  notes_ref: null
+  match: zz_ft_harm*,tp3_ftharm*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
