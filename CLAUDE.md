@@ -35,6 +35,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    and is checked before the message ends); the change that stops it recurring (a rule here, a guard, a tool fix), made
    in the same turn; then the fix of the instance. A change to this file is shown to me as a diff in the same message;
    a prevention that needs a permission I hold (a hook registration, a setting) is proposed to me as a concrete diff.
+   A claim about current state (a setting's level, a job's status, what an agent runs on) is read from its live
+   source in the same turn, never inferred from a default, a config file or memory; unread, it says "not checked".
 
 0e. **Plain names, no internal codes, in anything I read.** Messages to me and the notes name a thing by what it is
    ("the dimensionless target with the context vector", "my decision to delete catalog_v2", "the prep job's failure"),
