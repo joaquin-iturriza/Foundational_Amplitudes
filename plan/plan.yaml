@@ -1036,19 +1036,13 @@ entries:
   - D139
   - D140
   - D142
-  next: 'Fixed (7b00eb21, synced to CC): patch_param_card_slha writes DECAY lines from column 1 and the certifier''s top-width
-    zeroing too; tested on copies, all three one-loop entries now certify at zero width (max rel 4.8e-5 b b~ > ta+ vt w-,
-    3.5e-5 b g > b w+ w-, 7.2e-7 b b~ > h w+ w-). For the USER (scope beyond this entry): 2216 of 7098 production cards under
-    mg5amcnlo/ have indented DECAY lines MadGraph never read (audit: $SCRATCH/zz_probe_card_read/decay_audit.txt): every catalog_v4
-    entry''s WT 1.480327 (ran at the compiled default, 1.4915 in the loop models), catalog_v3''s heavy-quark layer widths
-    (m_Q 300: 8.80, 600: 71.35, 50: 0, all ran at the default width), the Z'' width 18.64 (12 cards, ran at the model default),
-    the 2HDM cards'' WT (1.4915 = default, harmless); WZ/WW/WH patches equal the defaults (harmless). Existing cards are NOT
-    repaired: repairing changes the physics of pools already generated (catalog_v4 so far, v3 heavy-quark and Z'' pools),
-    so whether to repair the cards and regenerate those pools is the user''s call; ask. To build the three: their catalog_v4
-    entries carry no c2_rel_tol, and at the effective physical width their double pole sits 4.2e-3 to 4.6e-3 off, above the
-    1e-3 per-event guard, so carry v3_bg_bwpwm''s c2_rel_tol 0.01 into gen_catalog_v4 for all three (same mechanism: the physical
-    top width, pole_width_diag), certify (CERT_ARGS=''--only v4_bg_bwpwm v4_bbx_tapvtwm v4_bbx_hwpwm''), then V4REGEN_ONLY
-    with the three names; and read part 5 (FA-ccin2p3-23fe1dcb) when it ends'
+  next: 'Build the three one-loop entries (v4_bg_bwpwm_nlo, v4_bbx_tapvtwm_nlo, v4_bbx_hwpwm_nlo; c2_rel_tol 0.01 in gen_catalog_v4
+    @19ab7f76) once the user picks catalog_v4''s top width: scripts/job_v4_certify_then_regen.sh (@7e670958) with --env CERT_ARGS=''--only
+    v4_bg_bwpwm v4_bbx_tapvtwm v4_bbx_hwpwm'' --env V4REGEN_ONLY=v4_bg_bwpwm_nlo,v4_bbx_tapvtwm_nlo,v4_bbx_hwpwm_nlo --item
+    catalog_coverage (site pick: ccin2p3 htc). Their production backends already exist with the indented WT line, so as they
+    stand they would run at the compiled 1.4915 like the other 158 v4 one-loop backends; a width change means rebuilding them.
+    Card-width repair of existing cards and pools also waits on the user (table: analysis/catalog_v4/data/card_width_audit.json).
+    Part 5 (FA-ccin2p3-23fe1dcb) still RUNNING at 2026-10-26: read and ack its event when it ends.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
