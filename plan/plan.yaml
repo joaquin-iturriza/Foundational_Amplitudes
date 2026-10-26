@@ -104,7 +104,10 @@ entries:
     and read it like the two sign arms (wrong-sign share on the 17 held-out pools, near zero, over the whole one-loop axis,
     zero-shot MSE ratio per probe); write it into par:v3_prep_signed after the two sign arms'' items. The pair head and the
     near-zero weighting (one untuned value each) did not beat the baseline''s sign (11.3% and 9.8% vs 5.4%); the user may
-    want a seeded or tuned version: ask with the arm (c) result'
+    want a seeded or tuned version: ask with the arm (c) result; THEN decide the sign arms'' follow-up without asking the
+    user (CLAUDE.md 0i, within the approved exploration and budget): if arm (c) helps, keep it; for the pair head and near-zero
+    weighting, their untuned values (10x, 16, 32) are HPs, so any retry goes through a small single-fidelity DyHPO search
+    (CLAUDE.md HPO rule 6) over them at the baseline''s HPs, and the pair head''s blow-up is diagnosed first (grad norm, clipping)'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
