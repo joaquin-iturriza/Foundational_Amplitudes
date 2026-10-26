@@ -106,7 +106,11 @@ entries:
     sign_head_search.py, claims zs_*). The search itself is written up (78458ce4): 20/20 trials, 4 blow-ups (all unbounded
     pair heads at lr >= 8.96e-3), best trial 0.86 of the Muon baseline''s objective, the objective tracks lr (rank corr -0.89)
     and is 1.18-1.25x the magnitude loss in every trial, so the knobs do not show in it. Code-review items a and d were done
-    in 577164a6; b and c are in the write-up.'
+    in 577164a6; b and c are in the write-up.; ALSO: the search objective (val_total, chosen by the main session) turned out
+    to be 1.18 to 1.25 times the magnitude loss in every trial, so it ranked trials by magnitude and cannot see the sign.
+    Re-rank the 20 trials, at no compute, by their validation wrong-sign share on the sign-changing training pools (training
+    processes'' validation events, no held-out pool), from their logs or a CPU eval of the saved checkpoints; say whether
+    a sign knob wins there, and use that, with the held-out zero-shot read, for the conclusion'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
