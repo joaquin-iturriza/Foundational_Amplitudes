@@ -1958,6 +1958,46 @@ alone, and the shape proxy's regressor on the magnitude $\log\max(\abs x,s)$, $s
     of magnitude and never came back; its reads are at its best checkpoint, before the blow-up, whose validation loss
     is about five times the baseline's, while the weighting's ends level with it (the runs' logs).
     Fig.~\ref{fig:v3_prep_signed_arms}.
+% src: python3 analysis/catalog_v3/pair_head_blowup.py @28cefc5d
+% claim: jump_validation=17
+% claim: jump_step_before=1360
+% claim: jump_step=1445
+% claim: jump_val_before=0.0208
+% claim: jump_val_at=0.391
+% claim: jump_ratio_all=9.3
+% claim: jump_ratio_loop=79
+% claim: jump_share_3x=90
+% claim: sign_acc_before=0.9775
+% claim: sign_acc_at=0.32
+% claim: pairs_vs_base_before=1.82
+% claim: pairs_skipped=12
+% claim: peak_over_best=900
+% claim: final_over_best=56
+% claim: pairs_grad_median=9.09e+06
+% claim: base_grad_median=0.144
+% claim: pairs_clip_pct=73.3
+% claim: base_clip_pct=4.9
+% allow: 16 60 5 because they are the validation before the jump, the sign-changing training pools' count and the clipping bound
+    Where it blew up (Fig.~\ref{fig:v3_pair_head_blowup}): between the $16$th and the $17$th validation (steps $1360$
+    to $1445$) its validation loss went from $0.0208$ to $0.391$, on every pool at once: the median pool's loss rose
+    $9.3$ times, the one-loop pools' $79$ times, $90\%$ of the pools more than threefold; later it peaked at about
+    $900$ times its best and ended $56$ times above it, with $12$ steps skipped in all. In the same interval the
+    median sign accuracy on the $60$ sign-changing training pools fell from $0.9775$ to $0.32$, below one sign per
+    pool: the sign logit flipped and stayed flipped. The first non-finite gradient comes after that validation, so the
+    skipped steps follow the jump, they do not start it. Over the run the gradient norm before clipping has the median
+    $9.09\times10^{6}$ against the baseline's $0.144$, and clipping at $5$ bounds $73.3\%$ of the steps against
+    $4.9\%$; the run keeps no per-step norm, so whether the norms grew before step $1360$ is not read. It was already
+    less stable before the jump: $1.82$ times the baseline's validation loss at the $16$th validation. The pair term
+    feeds the products $h_ih_j$ of two unnormalised output channels into an unbounded logit; that this is the route is
+    not checked. A retry bounds the pair inputs and logs the gradient norm per step, and the head's sizes and rate go
+    into the search that follows.
+\begin{figure}[t]\centering
+\includegraphics{../analysis/catalog_v3/figs/pair_head_blowup.pdf}
+\caption{The sign arms' short pretrainings on catalog\_v3, one seed each, at the baseline's hyperparameters.
+(a) Validation loss without regularisation against step; crosses: the pair sign head's steps skipped for a non-finite
+gradient norm, at the validation interval they fall in. (b) Median sign accuracy on the sign-changing training pools at
+each validation.}\label{fig:v3_pair_head_blowup}
+\end{figure}
   \item \emph{More sign-changing training pools help the sign, not the rest.} The third arm changes the data, not the
 % src: python3 analysis/catalog_v3/prep_signed.py @25e15ada
 % allow: 95 1492 1397 232 4264 4.7 5 because they are the arm's design (pools added, the recipes' process counts, the training one-loop pools after, the shared step count and the epochs it gives each pool)
