@@ -337,6 +337,22 @@ def summary():
         C[f"control.{x}"] = spear([per[n]["v3"][x] for n in ctl], [-np.log(M[n]["pp"] / M[n]["v3a"]) for n in ctl])
         C[f"v4_minus_v3.{x}"] = spear([per[n]["v4"][x] - per[n]["v3"][x] for n in tr], [lg(n, "v4", "v3m") for n in tr])
     out["corr"] = C
+    # the same on the classes whose |M|^2 is one function under both catalogs' physics (pp_physics_check: the pp pools
+    # carry catalog_v3's physics; 'none' = no b and no electroweak diagram added by catalog_v4's orders), and on the
+    # classes catalog_v4's electroweak orders change ('ew'), where catalog_v4 is scored on another function's labels
+    chk = json.load(open(os.path.join(HERE, "data", "pp_physics_check.json")))["classes"]
+    for sub in ("none", "ew"):
+        sel = [n for n in tr if chk[n]["cls"] == sub]
+        Cs = {"n": len(sel)}
+        for y, yv in Y.items():
+            for x in ("gap", "kl", "ratio"):
+                sgn = -1.0 if x == "ratio" else 1.0
+                Cs[f"{y}.{x}"] = spear([sgn * per[n]["v4"][x] for n in sel], [yv[n] for n in sel])
+            for var in ("s", "u", "y", "pt"):
+                Cs[f"{y}.kl_{var}"] = spear([per[n]["v4"][var]["kl"] for n in sel], [yv[n] for n in sel])
+        Cs["density"] = {x: float(np.median([per[n]["v4"][x] for n in sel])) for x in ("gap", "ratio", "kl")}
+        Cs["median_direct"] = float(np.exp(np.median([Y["direct"][n] for n in sel])))
+        out["corr_" + {"none": "agree", "ew": "ew"}[sub]] = Cs
     out["n_control"] = len(ctl)
 
     # --- the densities, medians over the trained-in-both classes
@@ -415,15 +431,18 @@ def summary():
                 m_ = metrics(c_ / c_.sum(), P_ / P_.sum(), dense(r["ppval"], co), gp)
                 g_.append(m_["gap"])
                 k_.append(metrics(norm_sample(c_, 0), P_ / P_.sum(), dense(r["ppval"], co), gp)["kl"])
+            ag = [i for i, n in enumerate(tr) if chk[n]["cls"] == "none"]
             rob[f"{co[0]}{co[1]}{co[2]}_{gp:.2f}"] = {"gap": md(g_), "rho_gap": spear(g_, yd, 300)["rho"],
-                                                     "kl": md(k_), "rho_kl": spear(k_, yd, 300)["rho"]}
+                                                     "kl": md(k_), "rho_kl": spear(k_, yd, 300)["rho"],
+                                                     "rho_gap_agree": spear([g_[i] for i in ag], [yd[i] for i in ag], 300)["rho"],
+                                                     "rho_kl_agree": spear([k_[i] for i in ag], [yd[i] for i in ag], 300)["rho"]}
     out["robustness"] = rob
     out["robustness_range"] = {x: [float(min(v[x] for v in rob.values())), float(max(v[x] for v in rob.values()))]
-                               for x in ("gap", "rho_gap", "kl", "rho_kl")}
+                               for x in ("gap", "rho_gap", "kl", "rho_kl", "rho_gap_agree", "rho_kl_agree")}
     # the same over the three binnings that keep all three variables (the other two drop s, or u and y)
     jt = [v for k, v in rob.items() if k.split("_")[0] in ("111", "221", "453")]
     out["robustness_range_joint"] = {x: [float(min(v[x] for v in jt)), float(max(v[x] for v in jt))]
-                                     for x in ("gap", "rho_gap", "kl", "rho_kl")}
+                                     for x in ("gap", "rho_gap", "kl", "rho_kl", "rho_gap_agree", "rho_kl_agree")}
     out["mixture_n"] = {k: len(mix[k][FS[0]]["gap"]) for k in KINDS}
     out["template_groups"] = {f"{a}_2to{b}": len(v) for (a, b), v in tmpl.items()}
     out["template_min_others"] = MIN_OTHERS
