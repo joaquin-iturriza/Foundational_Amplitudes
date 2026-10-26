@@ -87,6 +87,11 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      ack, check a count, collect, sync and submit an already-designed job) runs at `effort: low`;
      a low-effort step that finds something off reports it and stops, and the next step takes it at the default.
      Analyses, write-ups, designs, implementation and the reviewers run at the default (my preference, 2026-10-26).
+   - **Prior work first.** Before proposing or designing any run or analysis, search `docs/results.tex`, `plan show`
+     and `site decisions` for prior work on the same question (its processes, arms, data and quantity), and name what
+     was found with its result, or "none found" with what was searched. Proposing again what exists, or answering a
+     decision without the work it named, is a bug; `plan design --prior` records the search and the design reviewer
+     redoes it.
    - **Questions.** Before a question reaches me, the rules here and `site decisions --project FA` are searched for
      what settles it; only a call none of them settles is asked, in a message to me, and recorded with `plan ask
      <entry> --ask "<the question>" --searched "<what was read, and why none settles it>" --blocks "<what waits on it>"`. My answer goes in with
