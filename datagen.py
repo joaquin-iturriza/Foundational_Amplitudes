@@ -107,7 +107,11 @@ def ensure_virt_backend(process):
     base = mg.PROCESSES[process]["virt_base"]
     sa   = _virt_standalone_dir(process)
     import glob
-    if glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so"):
+    # A built module is reused only once certified: a build whose pole check failed leaves its module behind, and the
+    # rerun after the failure must certify it again, not generate from it (catalog_v4's first regeneration). Required
+    # for catalog_v4 (v4_*) only; older standalones predate the marker.
+    certified = os.path.exists(f"{sa}/.certified") or not base.startswith("v4_")
+    if glob.glob(f"{sa}/SubProcesses/P0_*/matrix2py*.so") and certified:
         return sa
     env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib")
     subprocess.run([sys.executable, _NLO_PIPELINE, base, "--build", "--certify"],

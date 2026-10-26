@@ -678,6 +678,10 @@ def main():
     if args.certify:
         if not pole_certify(args.process):
             sys.exit(2)                      # a FAIL verdict is an error to callers
+        # the marker datagen.ensure_virt_backend reuses a built module on: written only on a PASS
+        sa = virt_standalone_dir(args.process)
+        if os.path.isdir(sa):
+            open(os.path.join(sa, ".certified"), "w").write(VIRT_PROCESSES[args.process]["mg5"].strip() + "\n")
     if args.generate:
         cfg = VIRT_PROCESSES[args.process]
         smin = args.sqrts_min
