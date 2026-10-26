@@ -105,10 +105,11 @@ entries:
   - D129
   - D135
   - D165
-  next: 'when the four pair sign head test runs end (pair head on: sign_pair_best, sign_pair_best_seed2; off: sign_off_best,
-    sign_off_best_seed2), read their logs and zero-shot reads, score the per-pool held-out wrong-sign shares against the passed
-    design (paired per-pool sign test decides; median secondary; an outcome with the median not lower but most pools lower
-    is inconclusive, per the reviewer''s reading), then write up the sign study in par:v3_prep_signed and stop it'
+  next: 'when the four pair sign head test runs end (pair head on: sign_pair_best FA-ccin2p3-61c09ed7, sign_pair_best_seed2
+    FA-ccin2p3-0239c199; off: sign_off_best FA-ccin2p3-19971006, sign_off_best_seed2 FA-ccin2p3-36586b54), read their logs
+    and zero-shot reads, score the per-pool held-out wrong-sign shares against the passed design (the paired per-pool sign
+    test decides, the median is secondary; median not lower but most pools lower is inconclusive, per the reviewer''s reading),
+    then write up the sign study in par:v3_prep_signed and stop it'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
