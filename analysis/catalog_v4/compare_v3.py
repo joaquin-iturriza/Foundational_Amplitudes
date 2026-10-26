@@ -230,7 +230,8 @@ def pp(site):
     b = {n: has_b(n) for n in names}
     groups = {"train": lambda n: role[n]["v3"] == "train" and role[n]["v4"] == "train",
               "heldout": lambda n: role[n]["v3"] == "heldout" and role[n]["v4"] == "heldout",
-              "role_changed": lambda n: role[n]["v3"] != role[n]["v4"]}
+              "role_changed": lambda n: role[n]["v3"] != role[n]["v4"] and role[n]["v4"] != "absent",
+              "dropped_in_v4": lambda n: role[n]["v4"] == "absent"}
     out = {"n": len(names), "max_event_mismatch": xmax, "no_prediction": {r: v for r, v in bad.items() if v}, "n_b": sum(b.values()),
            "roles": {}, "frac_inside": float(np.median(list(frac.values()))) if frac else None}
     for n in names:
