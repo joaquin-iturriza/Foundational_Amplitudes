@@ -33,10 +33,15 @@ ARMS = {"baseline": "base", "dimensionless": "qperp", "dimensionless_shat": "sha
 # the notes before them (e+e- -> c cbar g, the all-negative pools) stay over ARMS, the sign arms' values are apart.
 # The third, the baseline at its HPs and step count with 95 more sign-changing one-loop training pools
 # (recipes/catalog_v3_train_signext.yaml, 1492 processes against 1397), changes the data, not the model
-SIGN_ARMS = {"baseline_sign_pairs": "pair", "baseline_sign_near": "near", "baseline_more_signed": "more"}
+SIGN_ARMS = {"baseline_sign_pairs": "pair", "baseline_sign_near": "near", "baseline_more_signed": "more",
+             # the pair sign head again with its pair channels bounded by tanh (model.sign_pair_bound), one seed (42)
+             "baseline_sign_pairs_bounded": "bpair"}
 # second seeds (43; the arms above are seed 42) of the baseline and of the more-signed-pools arm, everything else
 # unchanged, to size that arm's sign gain and zero-shot cost against the seed-to-seed spread of each
-SEED2 = {"baseline_seed2": "base2", "baseline_more_signed_seed2": "more2"}
+SEED2 = {"baseline_seed2": "base2", "baseline_more_signed_seed2": "more2",
+         # the more-signed-pools arm's seed 43 run again, config unchanged (it writes the per-step record): it did not
+         # blow up, so the seed-43 comparisons are read on it too (the r pairs below)
+         "baseline_more_signed_seed2_steplog": "more2r"}
 # the comparisons, each y against x on the same pools and probes: one setting's two seeds (the spread), the arm
 # against the baseline at each seed, and the two-seed means (per pool the mean wrong-sign share, per probe the
 # geometric mean MSE)
@@ -44,7 +49,13 @@ PAIRS = {"sd_base": (("baseline",), ("baseline_seed2",)),
          "sd_more": (("baseline_more_signed",), ("baseline_more_signed_seed2",)),
          "s42": (("baseline",), ("baseline_more_signed",)),
          "s43": (("baseline_seed2",), ("baseline_more_signed_seed2",)),
-         "m2": (("baseline", "baseline_seed2"), ("baseline_more_signed", "baseline_more_signed_seed2"))}
+         "m2": (("baseline", "baseline_seed2"), ("baseline_more_signed", "baseline_more_signed_seed2")),
+         # with the seed-43 rerun that did not blow up in place of the one that did
+         "sd_more_r": (("baseline_more_signed",), ("baseline_more_signed_seed2_steplog",)),
+         "s43r": (("baseline_seed2",), ("baseline_more_signed_seed2_steplog",)),
+         "m2r": (("baseline", "baseline_seed2"), ("baseline_more_signed", "baseline_more_signed_seed2_steplog")),
+         # the two seed-43 runs of one config against each other: the run-to-run spread at a fixed seed
+         "rerun": (("baseline_more_signed_seed2",), ("baseline_more_signed_seed2_steplog",))}
 
 
 def load_raw():
@@ -333,7 +344,8 @@ def plot_sign_arms(out, sr):
     fig, axs = ps.figure(ncols=2)
     sty = {"baseline_sign_pairs": (ps.C.blue, "o", "pair sign head"),
            "baseline_sign_near": (ps.C.vermillion, "^", "near-zero weighting"),
-           "baseline_more_signed": (ps.C.green, "s", "more signed pools")}
+           "baseline_more_signed": (ps.C.green, "s", "more signed pools"),
+           "baseline_sign_pairs_bounded": (ps.C.purple, "D", "bounded pair sign head")}
     b = out["arms"]["baseline"]["per_pool"]
     for arm, (col, mk, lab) in sty.items():
         pp = out["arms"][arm]["per_pool"]
