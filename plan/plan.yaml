@@ -953,7 +953,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -997,6 +997,13 @@ entries:
     answers_after: '2026-10-26T00:23:11+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T02:03:46.363000+00:00'
+    text: As long as there is a way to encode this difference in the data, then yes, qcd only is fine, if not drop them. for
+      the other three, investigate.
+    decision: D142
+    answers_after: '2026-10-26T01:04:15+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -1005,30 +1012,13 @@ entries:
   - D137
   - D139
   - D140
-  next: 'Waiting for the user''s call on the eight mixed-order one-loop entries (main session sends the investigation''s findings
-    and the question: generate the five mixed-order ones at the pure-QCD born as catalog_v3 did, or attempt the full QCD+EW
-    one-loop; and for the three sub-percent ones, loosen the 1e-3 double-pole tolerance, or investigate further with aMC@NLO''s
-    own pole check). Meanwhile read the full one-loop certification FA-ccin2p3-ce878798 when it ends and act on its FAIL and
-    ERROR lists. Regeneration part 2 (FA-ccin2p3-b67b49d6) built all 242 entries (726 pools), no certification failures. Disk
-    on CC (2026-10-26, group space /sps/lpnhe, df): free 50.97 GB at 00:53 UTC, 38.36 at 00:58, 36.50 at 01:00, 34.98 at 01:01,
-    33.45 at 01:03, so 2.56, 1.11, 1.05 and 0.73 GB/min as parts end (the growth is the datasets dir and the train cache,
-    matching df; MadGraph work dir 11.0 GB). Four parts still run: 0 and 5 at 7820/7822 and 7800/7805 chunks, 3 at 7074/7861,
-    7 at 6868/8084 (about 15 GB planned each), so about 4 to 6 GB left to write: it fits, ending near 27 to 29 GB free, 11
-    to 13 GB above the 3% floor (16.1 GB). Disk guard 8bef50d (prebuild_recipes stops with DISK_LOW and exit 5 before a chunk,
-    backend build or assembly below max(3%, 15 GB) free), synced to CC; the running parts keep the old code. Six ended parts''
-    logs show V4REGEN_FAILED (rc=1 on four, rc=4 on two) besides part 6''s V4REGEN_DONE: not read for the cause in this step.
-    UPDATE 2026-10-26 (logs read): part 0 (FA-ccin2p3-2424a38f) V4REGEN_DONE, 247 entries, 741 pools (all, 3 per entry), 33.2
-    GB free at end; part 6 (FA-ccin2p3-0ef20da7) V4REGEN_DONE, 248 entries, 744 pools (all), 36.2 GB free; part 4 (FA-ccin2p3-05f408b4)
-    245 entries, 732 pools = 244 entries built, rc=4 is CERT_SKIPPED only (v4_bbx_ccx_nlo set aside, pole certification FAIL),
-    no Traceback; part 1 (FA-ccin2p3-6bd04ec8) 241 entries, 720 pools = 240 built, rc=4 is CERT_SKIPPED only (v4_bbx_tapvtwm_nlo
-    set aside), no Traceback. Full one-loop certification with the fixed copier (FA-ccin2p3-ce878798): PASS 151, FAIL 8, ERROR
-    0, BUILD_FAIL 0 of 159; the 8 FAILs are exactly the 8 known ones, none new. Double-pole deviation (max abs c2_ML - pred,
-    max rel, 95th pct rel): u u~ > c c~ z 5.33, 1.00, 1.00 (MadLoop double pole 0); d d~ > b b~ z 5.33, 1.00, 1.00 (same);
-    d d~ > c c~ 0.623, 0.117, 4.2e-15; d d~ > b b~ 0.763, 0.143, 4.9e-15; b b~ > c c~ 0.623, 0.117, 4.2e-15; b g > b w+ w-
-    2.40e-2, 4.23e-3, 1.83e-3; b b~ > ta+ vt w- 1.22e-2, 4.56e-3, 3.59e-3; b b~ > h w+ w- 1.12e-2, 4.19e-3, 2.74e-3. When
-    the user answers: rebuild these 8 one-loop entries (v4_uux_ccxz_nlo, v4_ddx_bbxz_nlo, v4_ddx_ccx_nlo, v4_ddx_bbx_nlo,
-    v4_bbx_ccx_nlo, v4_bg_bwpwm_nlo, v4_bbx_tapvtwm_nlo, v4_bbx_hwpwm_nlo) per the answer; nothing else in the one-loop set
-    needs rework.'
+  - D142
+  next: '(1) the five mixed-order one-loop entries (u u~ > c c~ z, d d~ > b b~ z, d d~ > c c~, d d~ > b b~, b b~ > c c~):
+    verify that a pool generated at the pure-QCD born gets an order vector (mg5_pipeline_final.order_vector, data.amp_orders)
+    different from the full-order tree pool of the same process; if yes, generate them at the pure-QCD born as catalog_v3
+    did, certify, build; if not, drop them from catalog_v4 (recorded); (2) the three off by ~0.4% (b g > b w+ w-, b b~ > ta+
+    vt w-, b b~ > h w+ w-): investigate with aMC@NLO''s own pole check (fix the check_poles command) and the per-split-order
+    variants, CPU only, report the cause before building'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -1163,11 +1153,8 @@ entries:
     searched: CLAUDE.md's catalog_v4 table and the coverage decision (2026-10-25, electroweak production, which sets the trees'
       orders, not the one-loop born definition), and the user's 'c) Investigate it'; none settles the one-loop born definition
       or the pole tolerance
+    answered_at: '2026-10-26T02:03:46.244000+00:00'
+    decision: D142
   searched: CLAUDE.md's catalog_v4 table and the coverage decision (2026-10-25, electroweak production, which sets the trees'
     orders, not the one-loop born definition), and the user's 'c) Investigate it'; none settles the one-loop born definition
     or the pole tolerance
-  ask: For the five one-loop entries whose born mixes QCD and electroweak orders (u u~ > c c~ z, d d~ > b b~ z, d d~ > c c~,
-    d d~ > b b~, b b~ > c c~), should they be generated at the pure-QCD born as in catalog_v3, or should I attempt the full
-    QCD plus electroweak one-loop? And for the three entries off by about 0.4% (b g > b w+ w-, b b~ > ta+ vt w-, b b~ > h
-    w+ w-), accept them with a 1e-2 double-pole tolerance, or investigate further with MadGraph's own pole check first?
-  waiting_since: '2026-10-26T01:04:15+00:00'
