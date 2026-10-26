@@ -1308,7 +1308,7 @@ entries:
     small-D fine-tunes'
   question: Does Muon with decoupled weight decay beat AdamW in our setup on the catalog_v3 short pretraining, its zero-shot
     reads on every held-out axis, and small-D fine-tunes of held-out processes (the claim that it transfers better)?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-10-26T02:03:46.363000+00:00'
     text: I head that the muon optimizer is gaining traction, in particular after a team implemented weight decay to it, perhaps
@@ -1409,6 +1409,7 @@ entries:
   searched: 'site decisions --project FA: the approval of the quick Muon test (2026-10-26) names no budget; CLAUDE.md 2 allows
     under 10 GPU-h without asking but the step was told to wait at the design for the user to see the cost, and stage 2 exceeds
     10 GPU-h; no rule settles whether to sweep the baseline too when its HPs come from another catalog''s sweep'
+  writeup: 472d78e4
 - id: ft_harm
   title: 'why fine-tuning loses to scratch at small D: a bad start or fine-tuning undoing a good one'
   question: 'On the probes and small D where a fine-tune ends worse than scratch (ee->Z gamma and others; par:nogain, par:lowd_ft,
