@@ -9,7 +9,7 @@ alpha_s / alpha of fixed total degree. A one-loop QCD virtual's Born orders are 
 
 Part 1 (--recipes): per entry the set of amplitude QCD orders, against the order vector the target divides by
 (mg5_pipeline_final.order_vector: [L_QCD, L_EW, alpha_s max, alpha max]).
-Part 2 (--scans): for each alpha_s scan process (pools <name>__as090/__as130/__as150 next to the nominal one, every
+Part 2 (--scans): for each alpha_s scan process (val and test pools <name>__as090/__as130/__as150 next to the nominal one, every
 event labelled at its own alpha_s, <pool>.alphas.npy), y = log|M|^2 - k log alpha_s(event) with k the highest amplitude
 QCD order; for a single monomial y is the same function of the momenta in every pool. Bins of (log sqrt(s_hat), log
 of each final pair's invariant mass, the pair with the largest spread), means compared with the nominal pool's: the
@@ -86,12 +86,19 @@ def part1(recipes, diagrams_dir):
     return rows, summ
 
 
-def _pool(data_dir, name, role="train"):
-    c = sorted(glob.glob(os.path.join(data_dir, f"{name}_[0-9]*GeV_{role}_smix_amplitudes.npy")))
-    return c[0] if c else None
+def _pool(data_dir, name):
+    """The pool files of a process, its val and test roles (the train role is stored in chunks)"""
+    c = [f for r in ("val", "test")
+         for f in sorted(glob.glob(os.path.join(data_dir, f"{name}_[0-9]*GeV_{r}_smix_amplitudes.npy")))]
+    return c or None
 
 
-def _load(path):
+def _load(paths):
+    parts = [_load1(p) for p in paths]
+    return tuple(np.concatenate([x[i] for x in parts]) for i in range(3))
+
+
+def _load1(path):
     a = np.load(path, mmap_mode="r")
     pdg_cols = (a.shape[1] - 1) // 5
     n = pdg_cols
@@ -107,7 +114,7 @@ def _m2(p):
 
 def part2(data_dir, rows, nbins=12, min_n=30):
     scans = sorted({os.path.basename(f).split("__as")[0] for f in glob.glob(os.path.join(data_dir, "v4_*__as1[35]0_*"))
-                    if "_train_" in f or "_test_" in f})
+                    if "_test_" in f or "_val_" in f})
     out = {}
     for base in scans:
         nom = _pool(data_dir, base)
@@ -144,10 +151,10 @@ def part2(data_dir, rows, nbins=12, min_n=30):
             var = sq / np.maximum(cnt, 1) - mean ** 2
             return cnt, mean, var
         c0, y0, v0 = binned(mom0, amp0, as0)
-        res = {"amp_qcd_orders": orders, "k": k, "pair_legs": list(pr), "nominal": os.path.basename(nom),
+        res = {"amp_qcd_orders": orders, "k": k, "pair_legs": list(pr), "nominal": [os.path.basename(x) for x in nom],
                "alphas_nominal_median": float(np.median(as0)), "points": {}}
         for tag in ("as090", "as130", "as150"):
-            f = _pool(data_dir, f"{base}__{tag}") or _pool(data_dir, f"{base}__{tag}", "test")
+            f = _pool(data_dir, f"{base}__{tag}")
             if f is None:
                 continue
             mom, amp, als = _load(f)
@@ -156,7 +163,7 @@ def part2(data_dir, rows, nbins=12, min_n=30):
             d = (y - y0)[ok]
             se = np.sqrt(v[ok] / c[ok] + v0[ok] / c0[ok])
             w = 1 / np.maximum(se, 1e-9) ** 2
-            res["points"][tag] = {"pool": os.path.basename(f), "alphas_median": float(np.median(als)),
+            res["points"][tag] = {"pool": [os.path.basename(x) for x in f], "events": int(len(amp)), "alphas_median": float(np.median(als)),
                                   "bins": int(ok.sum()), "mean_diff": float((w * d).sum() / w.sum()),
                                   "rms_diff": float(np.sqrt(np.mean(d ** 2))), "max_abs_diff": float(np.abs(d).max()),
                                   "median_se": float(np.median(se)),
