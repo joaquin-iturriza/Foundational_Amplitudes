@@ -1330,13 +1330,12 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'Stage 2''s two 8-trial searches (sweeps/muon_test_search_adamw and _muon on CC-IN2P3, submitted through sweep_manager
-    at about 07:03 in 3 waves, code c286a355; not in site runs, the item check counts them) are in their last wave (SLURM
-    62412116-62412120, started 09:48, about 82 min per wave). When the item check reads 16/16: read both summary.txt and the
-    result JSONs, confirm the objective is val_loss_no_reg at the best checkpoint, compare best against best (partial at 6
-    and 5 of 8: AdamW 0.0156 at lr 4.6e-3, L2 6.5e-8; Muon 0.00286 at lr 5.0e-3, weight decay 0.022) and against stage 1,
-    write it into par:v3_muon with provenance, then plan done. Still also pending: the refit fine-tune numbers and the one-loop
-    probe''s step-0 explanation if not yet written.'
+  next: 'When the zero-shot read jobs FA-ccin2p3-41b4f15a (AdamW search best, runs/muon_test_search_adamw/trial_0768) and
+    FA-ccin2p3-0caa5e2a (Muon search best, trial_1860) end: read their logs, copy $SCRATCH/zz_v3_short_muon_search_best_{adamw,muon}/<axis>/*.npz
+    into analysis/catalog_v3/data/short_reads/<arm>/ (as the stage-1 arms), run short_reads.py and extend muon_compare.py
+    with the search bests'' zero-shot (AdamW search best against Muon search best and against stage-1 Muon, per axis, the
+    stage-1 seed spread as reference); write it into the stage-2 item of par:v3_muon (replace ''are being read''), then plan
+    done.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
