@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Stop guard (setup redesign, D121): the one check that work is moving. It replaces the idle-work parts of
 ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cannot end while
-  - `plan next` lists a step not launched for a running entry: a run of it ended, or it has nothing in flight;
+  - `plan next` lists a step not launched for a running entry: a run of it ended, or it has nothing in flight, or
+    its latest design has had no verdict for 30 min with its step agent gone (the fallback: the step agent runs
+    the design reviewer itself);
   - never blocking: the user wrote after a question an entry waits on. Whether it answers is the main session's call
     through `plan next`, which lists it on every wake until plan answer or plan unanswered: a block put a non-answer on
     the user's screen at every message (the user, 2026-10-26: "Me not answering a question from you it's not you not
@@ -57,6 +59,10 @@ def problems():
     out, once = list(unrecorded), []
     for e, why, launched in plan.next_steps(d, st, msgs=msgs):
         if launched or e.get("status") == "waiting_user":     # the user wrote after a question: plan next only
+            continue
+        if why.startswith("design to review"):
+            out.append("%s: %s (plan next --prompts gives its prompt; subagent_type design-reviewer, then plan review "
+                       "%s --agent <subagent id>)" % (e["id"], why, e["id"]))
             continue
         out.append("%s: %s%s" % (e["id"], why, "; launch its step agent (plan next --prompts, then plan step %s "
                                  "--agent <subagent id>)" % e["id"] if e.get("status") == "running" else ""))

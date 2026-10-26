@@ -1726,6 +1726,130 @@ def open_questions():
              "Asked: Should the heavy" in view and "Waits on it: the heavy" in view and "open question" in show
              and "blocks: the heavy" in show, view + show)
 
+DESIGN_GUARD = os.path.join(ROOT, ".claude", "hooks", "design_guard.py")
+DESIGN = ["--question", "does the sign head lower the wrong-sign share on the held-out pools",
+          "--measure", "the wrong-sign share on the held-out pools at the best checkpoint",
+          "--check", "on the two finished sign runs the share moved 4x between heads, above its binomial spread",
+          "--fixed", "pools, horizon, optimizer, every other HP", "--control", "the same search with the pair head",
+          "--seeds", "0 1 2", "--outcome", "yes: share lower by more than the seed spread; no: within it"]
+
+
+def designs():
+    """2026-10-26, the sign head search: jobs designed without first checking that their measurement responds to the
+    tested change. A submission for a plan entry needs a design recorded within 24 h and passed by the design reviewer
+    (design_guard.py); the reviewer's verdict is the design-reviewer subagent's alone."""
+    w = World([E("sg"), E("other")])
+    sub = lambda c, who=None: hook(DESIGN_GUARD, dict({"tool_name": "Bash", "tool_input": {"command": c}},
+                                                      **({"agent_type": who} if who else {})), env=w.env)
+    cmds = {"submit": "site submit auto FA scripts/job.sh --item sg --est-gpu-hours 2",
+            "sweep": "site run ccin2p3 FA --item sg -- python sweep/sweep_manager.py submit /sps/x/tp3_sign",
+            "generator": "site run ccin2p3 FA --item=sg -- python sweep/generate_sweep.py --config sweep/c.yaml "
+                         "--auto-submit",
+            "launch script": "NOSYNC=1 bash scripts/launch_cc_only.sh sg 2 note scripts/job.sh",
+            "queued launch": "site launch add FA sg_l --item sg --run 'bash scripts/x.sh'"}
+    for k, c in cmds.items():
+        rc, out = sub(c)
+        scenario("design: a %s for an entry with no design is refused, and says what to record" % k,
+                 rc == 2 and "plan.py design" in out and "sg" in out, out)
+    rc, out = w.plan_cmd("design", "sg", *DESIGN)
+    e = w.entries()["sg"]
+    scenario("design: plan design records every field with its time", rc == 0 and e["designs"][-1]["seeds"] == "0 1 2"
+             and e["designs"][-1]["at"] and "design-reviewer" in out, out)
+    rc, out = sub(cmds["submit"])
+    scenario("design: a recorded design not yet reviewed does not let the job go, and the refusal says to run the "
+             "reviewer", rc == 2 and "waits for the design reviewer" in out and "subagent_type design-reviewer" in out,
+             out)
+    nxt = w.plan_cmd("next", "--prompts")[1]
+    scenario("design: a fresh design is its step agent's to review: plan next routes no review for it",
+             "design to review" not in nxt and "The latest design on record" in nxt and "not reviewed yet" in nxt, nxt)
+    # the fallback: a design left 40 min without a verdict, its step agent gone
+    D40 = dict(zip([k[2:] for k in DESIGN[0::2]], DESIGN[1::2]), at=ago(40))
+    wf = World([E("sg", designs=[D40])])
+    rc, err = wf.check()
+    rc2, nxt = wf.plan_cmd("next", "--prompts")
+    scenario("design: fallback, a design without a verdict after 30 min is listed as a design to review, with the "
+             "reviewer's prompt, and the stop check counts it like a step to launch",
+             rc == 2 and "sg: design to review" in err and rc2 == 1 and "NEXT sg: design to review" in nxt
+             and "Design review." in nxt and "Entry: sg" in nxt and "design-pass sg" in nxt, err + nxt)
+    started = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+    open(os.path.join(wf.ag, "agent-rv1.jsonl"), "w").write(J({"type": "user", "timestamp": started, "message": {
+        "role": "user", "content": "Design review. Review it.\n\nEntry: sg (sg)\nQuestion of the entry: q"}}) + "\n")
+    rs = wf.plan_cmd("step", "sg", "--agent", "rv1")
+    rc, out = wf.plan_cmd("review", "sg", "--agent", "rv1")
+    rc3, err3 = wf.check()
+    scenario("design: fallback, the reviewer is recorded with plan review (never as a step) and, while it works, the "
+             "entry waits on its verdict", rs[0] != 0 and rc == 0 and "design to review" not in err3,
+             rs[1] + out + err3)
+    for who in (None, "general-purpose"):
+        rc, out = sub("python3 tools/plan.py design-pass sg --reviewer ok", who)
+        scenario("design: design-pass from %s is refused" % (who or "the main session"), rc == 2
+                 and "design-reviewer" in out, out)
+    rc, out = sub("python3 tools/plan.py design-pass sg --reviewer ok", "design-reviewer")
+    scenario("design: design-pass from the design-reviewer subagent passes the guard", rc == 0, out)
+    w.plan_cmd("design-pass", "sg", "--reviewer", "control matched; share moved 4x on the sign runs")
+    for k, c in cmds.items():
+        rc, out = sub(c)
+        scenario("design: the %s passes once the design passed review" % k, rc == 0, out)
+    show, pr = w.plan_cmd("show")[1], w.plan_cmd("next", "--prompts")[1]
+    scenario("design: plan show prints the latest design and its verdict, and no review is listed after a pass",
+             "measure: the wrong-sign share" in show and "passed review" in show and "design to review" not in pr,
+             show + pr[-1500:])
+    rc, out = sub("site submit auto FA scripts/job.sh --item sg --item other")
+    scenario("design: a submission naming a second entry without a design is refused", rc == 2 and "other" in out, out)
+    w.plan_cmd("design", "sg", *DESIGN)
+    rc, out = sub(cmds["submit"])
+    scenario("design: a new design resets the pass", rc == 2 and "waits for the design reviewer" in out, out)
+    rc, out = w.plan_cmd("design-fix", "sg", "--reasons", "the control differs in the optimizer too")
+    rc2, out2 = sub(cmds["submit"])
+    pr = w.plan_cmd("next", "--prompts")[1]
+    scenario("design: a FIX keeps the job refused, ends the review listing, and the next step prompt carries the "
+             "design and the reasons", rc == 0 and rc2 == 2 and "sent back" in out2 and "design to review" not in pr
+             and "The latest design on record" in pr and "control: the same search with the pair head" in pr
+             and "review asked for a fix" in pr and "the optimizer too" in pr, out + out2 + pr[-1500:])
+    w2 = World([E("sg", designs=[dict(zip([k[2:] for k in DESIGN[0::2]], DESIGN[1::2]), at=ago(25 * 60),
+                                      passed_at=ago(25 * 60 - 5), reviewer="r")])])
+    rc, out = hook(DESIGN_GUARD, {"tool_name": "Bash", "tool_input": {"command": cmds["submit"]}}, env=w2.env)
+    scenario("design: a passed design older than 24 h does not cover a new submission", rc == 2
+             and "more than 24 h ago" in out, out)
+    # an eval-only re-read of an arm that already ran: REREAD=<run id of the entry>, under its passed design (any age)
+    old = dict(D40, at=ago(30 * 60), passed_at=ago(30 * 60 - 5), reviewer="r")
+    wr = World([E("sg", designs=[old]), E("nd", designs=[dict(D40, at=ago(30 * 60))])],
+               runs=[("FA-ccin2p3-r1", "COMPLETED", "sg", epoch(600), epoch(500)),
+                     ("FA-ccin2p3-r2", "COMPLETED", "zz", epoch(600), epoch(500)),
+                     ("FA-ccin2p3-r3", "COMPLETED", "nd", epoch(600), epoch(500))])
+    rr = lambda c: hook(DESIGN_GUARD, {"tool_name": "Bash", "tool_input": {"command": c}}, env=wr.env)
+    ok = rr("REREAD=FA-ccin2p3-r1 site submit auto FA scripts/eval.sh --item sg")
+    other = rr("REREAD=FA-ccin2p3-r2 site submit auto FA scripts/eval.sh --item sg")
+    unpassed = rr("REREAD=FA-ccin2p3-r3 site submit auto FA scripts/eval.sh --item nd")
+    plain = rr("site submit auto FA scripts/eval.sh --item sg")
+    scenario("design: a re-read (REREAD=<run of the entry>) under a passed design passes; another entry's run, an "
+             "unpassed design, or no marker is refused", ok[0] == 0 and other[0] == 2 and unpassed[0] == 2
+             and plain[0] == 2, ok[1] + other[1] + unpassed[1] + plain[1])
+    for c in ("site run ccin2p3 FA --item '*' -- python sweep/sweep_manager.py submit /sps/x/a",
+              "site submit auto FA scripts/job.sh --item '*'", "site submit auto FA scripts/job.sh --item not_in_plan",
+              "site run ccin2p3 FA --item sg -- python sweep/generate_sweep.py --config c.yaml --dry-run",
+              "site logs FA-ccin2p3-1 && site poll", "site status ccin2p3", "cat scripts/launch_cc_only.sh",
+              "git commit -m 'site submit auto FA x --item sg'", "python3 tools/plan.py show"):
+        rc, out = sub(c)
+        scenario("design: `%s` passes (upkeep, no plan entry, or no submission)" % c[:60], rc == 0, out)
+    w3 = World([E("sg")], state=None)
+    os.remove(w3.plan)
+    open(w3.plan, "w").write("entries: [: broken")
+    r3 = hook(DESIGN_GUARD, {"tool_name": "Bash", "tool_input": {"command": cmds["submit"]}}, env=w3.env)
+    r4 = hook(DESIGN_GUARD, {"tool_name": "Bash", "tool_input": {"command": "site poll"}}, env=w3.env)
+    scenario("design: an error while checking a submission refuses it; a non-submission still passes",
+             r3[0] == 2 and "could not check" in r3[1] and r4[0] == 0, r3[1] + r4[1])
+    for i in range(1, len(DESIGN), 2):
+        args = list(DESIGN)
+        args[i] = "   "
+        rc, out = w.plan_cmd("design", "other", *args)
+        scenario("design: plan design refuses an empty %s" % DESIGN[i - 1], rc != 0 and DESIGN[i - 1] in out, out)
+    args = list(DESIGN)
+    args[5] = "checked"
+    rc, out = w.plan_cmd("design", "other", *args)
+    scenario("design: a check that does not say how it was verified is refused, nothing is recorded",
+             rc != 0 and "existing data" in out and "designs" not in w.entries()["other"], out)
+
 
 def the_suite_itself():
     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
@@ -1748,7 +1872,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
-          the_suite_itself]
+          designs, the_suite_itself]
 
 
 def main():

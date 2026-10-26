@@ -80,10 +80,13 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    - **A step agent does one step and exits:** an analysis, a fix, a write-up, or a job (`site submit ... --item
      <entry>`, recorded with `plan run`). It records evidence, dead ends and the next step through the plan CLI and
      never waits on a job: when the job ends, `plan next` lists the entry again and a fresh step agent takes it. No entry
-     has a long-lived owner. A mechanical step (requeue or resubmit a job, read a log and ack, check a count, collect,
-     sync and submit an already-designed job) runs at `effort: low`; a low-effort step that finds something off reports
-     it and stops, and the next step takes it at the default. Analyses, write-ups, designs, implementation and the
-     reviewers run at the default (my preference, 2026-10-26).
+     has a long-lived owner. A job needs a recorded design (`plan design`: the question, the measure and the check, on
+     existing data, that it moves with the tested change, what is fixed, the matched control, seeds, the outcome for
+     yes and for no) passed by the design-reviewer subagent, which the step agent runs itself before submitting;
+     `design_guard.py` refuses the submission otherwise. A mechanical step (requeue or resubmit a job, read a log and
+     ack, check a count, collect, sync and submit an already-designed job) runs at `effort: low`;
+     a low-effort step that finds something off reports it and stops, and the next step takes it at the default.
+     Analyses, write-ups, designs, implementation and the reviewers run at the default (my preference, 2026-10-26).
    - **Questions.** Before a question reaches me, the rules here and `site decisions --project FA` are searched for
      what settles it; only a call none of them settles is asked, in a message to me, and recorded with `plan ask
      <entry> --ask "<the question>" --searched "<what was read, and why none settles it>" --blocks "<what waits on it>"`. My answer goes in with

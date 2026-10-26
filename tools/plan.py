@@ -8,8 +8,10 @@ Two files in the MAIN checkout (resolved through git's common dir, so worktrees 
                      paths}, dead_ends [{tried, why, at}], asks [{ask, at, answered_at, decision}], the open question: ask +
                      waiting_since + searched + blocks (what waits on the answer) + checked_until, on a running entry,
                      or with holds_all (why everything waits) on a waiting_user one, hold_decision (held), writeup
-                     (done)
-  plan/.state.json   runtime state, gitignored: per entry the step agents launched [{agent, at, reason}] and runs
+                     (done), designs [{at, question, measure, check, fixed, control, seeds, outcome, passed_at, reviewer,
+                     fix_at, fix}]
+  plan/.state.json   runtime state, gitignored: per entry the step agents launched [{agent, at, reason}], the design
+                     reviewers launched [{agent, at, design_at}] and runs
 Both change only under an exclusive lock (plan/plan.yaml.lock), written through a temp file in the same directory.
 
   plan show [--compact] | where
@@ -24,6 +26,20 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           and routed, its step prompt names the question and what waits on it (B);
                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
                                           it can move without the answer)
+  plan design <id> --question Q --measure M --check C --fixed F --control K --seeds S --outcome O
+                                          the design of the next job, before it is submitted: the question it
+                                          answers, the measurement that answers it, how it was checked on existing
+                                          data that the measurement moves with the tested change, what is held
+                                          fixed, the matched control, the seeds, the outcome read as yes and as no;
+                                          design_guard.py refuses a submission for an entry without one recorded
+                                          in DESIGN_H h and passed by the design reviewer, which the step agent
+                                          that recorded it runs itself before submitting
+  plan review <id> --agent <subagent id>  the fallback: a design with no verdict REVIEW_FALLBACK_MIN after it was
+                                          recorded (its step agent gone) is listed by plan next as a design to
+                                          review; the main session launches the design reviewer
+                                          (.claude/agents/design-reviewer.md) from that prompt and records it here
+  plan design-pass <id> --reviewer NOTE | design-fix <id> --reasons R    the reviewer's verdict on the latest design
+                                          (run by the reviewer itself; design_guard.py refuses them from anyone else)
   plan unanswered <id> | step <id> --agent <subagent id>
   plan run <id> [RUN...] [--sweep SITE:NAME]   a registry run, or a sweep sweep_manager submitted (never in runs.db)
   plan sweeps [--fresh]                   every recorded sweep's state on its site, and the unrecorded ones recorded
@@ -843,6 +859,15 @@ def next_steps(d, st, t=None, msgs=None):
     sweeps = site_sweeps(want_of(st, running), all_sites=False)
     out = []
     for e in d["entries"]:
+        # a fallback: the step agent that records a design runs the design reviewer itself; a design left without a
+        # verdict REVIEW_FALLBACK_MIN after it was recorded, its step agent gone, goes to the main session
+        if e.get("status") == "running" and design_pending(e) and \
+                (t - parse(last_design(e)["at"])).total_seconds() / 60 > REVIEW_FALLBACK_MIN and \
+                not step_working(st, e["id"], t):
+            launched, why = review_launched(st, e, t)
+            out.append((e, "design to review: the design recorded %s has no verdict%s; launch the design reviewer" % (
+                (last_design(e).get("at") or "")[:16], why), launched))
+            continue
         r = why_moves(e, st, msgs, t, d, checks, sweeps)
         if r:
             reason, since = r
@@ -869,7 +894,8 @@ def step_prompt(e, reason):
                           "not recorded (only what the question itself decides)"))
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"), reason=reason,
                       next=e.get("next"), done_when=e.get("done_when"), quotes=q or "  none", dead_ends=de,
-                      evidence=json.dumps(e.get("evidence") or {}), open_question=oq)
+                      evidence=json.dumps(e.get("evidence") or {}), open_question=oq,
+                      design=design_text(last_design(e)))
 
 
 # ---------------------------------------------------------------- site writes
@@ -1123,6 +1149,8 @@ def cmd_show(a):
                 print("    user %s: \"%s\"" % ((q.get("said_at") or "")[:16], q.get("text")))
             for x in e.get("dead_ends") or []:
                 print("    dead end: %s (%s)" % (x["tried"], x["why"]))
+            if last_design(e):
+                print("    design:\n" + design_text(last_design(e), "      "))
 
 
 SEARCHED_MIN = 40             # characters: what was looked for before asking, named, not a token
@@ -1140,6 +1168,133 @@ def _searched_ok(searched):
 def _ask_ok(ask):
     if len(words(ask)) < 3:
         sys.exit("plan: the question needs at least three words of five letters or more, to be found in a message")
+
+
+DESIGN_FIELDS = ("question", "measure", "check", "fixed", "control", "seeds", "outcome")
+DESIGN_H = 24                 # hours a recorded design covers submissions of its entry (design_guard.py)
+CHECK_MIN = 40                # characters: how the measure was seen to move with the change, named, not a token
+
+
+def last_design(e):
+    return (e.get("designs") or [None])[-1]
+
+
+def design_fresh(e, hours=DESIGN_H):
+    """The entry's latest design, if recorded within `hours` and passed by the design reviewer; else None."""
+    x = last_design(e)
+    t = parse(x.get("at")) if x else None
+    return x if t and x.get("passed_at") and now() - t <= dt.timedelta(hours=hours) else None
+
+
+REVIEW_FALLBACK_MIN = 30     # minutes a design may wait for its verdict before plan next lists it for review
+
+
+def design_pending(e):
+    """The latest design has no verdict yet (after REVIEW_FALLBACK_MIN, plan next lists it as a design to review)."""
+    x = last_design(e)
+    return bool(x) and not x.get("passed_at") and not x.get("fix_at")
+
+
+REVIEW_HEAD = "Design review."
+
+
+def review_prompt(e):
+    x = last_design(e)
+    de = "\n".join("  %s: %s" % (y["tried"], y["why"]) for y in e.get("dead_ends") or []) or "  none"
+    return ("%s Review the latest recorded design of one plan entry (your instructions: "
+            ".claude/agents/design-reviewer.md).\n\nEntry: %s (%s)\nQuestion of the entry: %s\nThe design, recorded "
+            "%s:\n%s\nEvidence so far: %s\nDead ends so far:\n%s\n\nOn PASS run `python3 tools/plan.py design-pass "
+            "%s --reviewer \"<your note>\"`; on FIX run `python3 tools/plan.py design-fix %s --reasons \"<what to "
+            "change>\"`. Then report the verdict and its reasons." % (
+                REVIEW_HEAD, e["id"], e.get("title"), e.get("question"), (x.get("at") or "")[:16],
+                design_text(x), json.dumps(e.get("evidence") or {}), de, e["id"], e["id"]))
+
+
+def review_launched(st, e, t):
+    """(launched, note): a design reviewer recorded after the latest design that is still working (it has not
+    handed back and wrote within STEP_MIN), so the entry waits on its verdict."""
+    at = parse(last_design(e).get("at"))
+    revs = [x for x in (st.get(e["id"]) or {}).get("reviews") or [] if x.get("design_at") == last_design(e).get("at")
+            and parse(x.get("at")) >= at]
+    for x in revs:
+        a = subagent_activity(x.get("agent"))
+        if a and not a[1] and 0 <= (t - a[0]).total_seconds() / 60 <= STEP_MIN:
+            return True, ""
+    return False, (" (the reviewer %s ended without design-pass or design-fix)" % revs[-1]["agent"]) if revs else ""
+
+
+def design_text(x, indent="  "):
+    if not x:
+        return indent + "none recorded (a job needs one first: python3 tools/plan.py design, step 2)"
+    verdict = ("passed review %s (%s)" % (x["passed_at"][:16], x.get("reviewer")) if x.get("passed_at") else
+               "review asked for a fix %s: %s" % (x["fix_at"][:16], x.get("fix")) if x.get("fix_at") else
+               "not reviewed yet")
+    return "\n".join(["%srecorded %s, %s" % (indent, (x.get("at") or "")[:16], verdict)] +
+                      ["%s%s: %s" % (indent, k, x.get(k)) for k in DESIGN_FIELDS])
+
+
+def cmd_design(a):
+    """A job answers its question only if its measurement can see the tested change (the sign head search,
+    2026-10-26: an objective blind to the sign, a comparison that changed two things at once, untuned arms; the user:
+    "it's the second or third time you bring back results that show nothing and the conclusion is that the way you
+    are testing was wrong"). So the design is written down before the job, every field of it."""
+    vals = {k: (getattr(a, k) or "").strip() for k in DESIGN_FIELDS}
+    empty = [k for k, v in vals.items() if not v]
+    if empty:
+        sys.exit("plan: a design needs every field; empty: %s" % ", ".join("--" + k for k in empty))
+    if len(vals["check"]) < CHECK_MIN:
+        sys.exit("plan: --check must say how it was verified, on existing data, that the measure moves with the "
+                 "tested change (which runs or pools, what moved and by how much), in at least %d characters"
+                 % CHECK_MIN)
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        e.setdefault("designs", []).append(dict(at=now().isoformat(), **vals))
+    print("plan: design recorded on %s; now run the design-reviewer subagent on it (Agent tool, subagent_type "
+          "design-reviewer); submissions for it pass design_guard for %d h once it passes" % (a.id, DESIGN_H))
+
+
+def cmd_design_pass(a):
+    with transaction() as (d, st):
+        x = last_design(entry(d, a.id))
+        if not x:
+            sys.exit("plan: %s has no design to pass" % a.id)
+        if not a.reviewer.strip():
+            sys.exit("plan: --reviewer needs the reviewer's note")
+        x.update(passed_at=now().isoformat(), reviewer=a.reviewer.strip())
+        x.pop("fix_at", None), x.pop("fix", None)
+    print("plan: the latest design of %s passed review" % a.id)
+
+
+def cmd_design_fix(a):
+    with transaction() as (d, st):
+        x = last_design(entry(d, a.id))
+        if not x:
+            sys.exit("plan: %s has no design to review" % a.id)
+        if not a.reasons.strip():
+            sys.exit("plan: --reasons needs what to change")
+        x.update(fix_at=now().isoformat(), fix=a.reasons.strip())
+        x.pop("passed_at", None), x.pop("reviewer", None)
+    print("plan: the latest design of %s needs a fix; the next step records a new one" % a.id)
+
+
+def cmd_review(a):
+    """The design reviewer (a real subagent started from the entry's review prompt) launched on the latest design."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        x = last_design(e)
+        if not design_pending(e):
+            sys.exit("plan: %s has no design waiting for review" % a.id)
+        rec = subagent(a.agent)
+        if rec is None:
+            sys.exit("plan: no subagent %s in this project's transcripts" % a.agent)
+        started, prompt = rec
+        if not names_entry(prompt, a.id) or REVIEW_HEAD not in (prompt or ""):
+            sys.exit("plan: subagent %s was not started with %s's review prompt (plan next --prompts)" % (a.agent, a.id))
+        if started < parse(x["at"]):
+            sys.exit("plan: subagent %s started before the design was recorded" % a.agent)
+        st.setdefault(a.id, {}).setdefault("reviews", []).append({"agent": a.agent, "at": started.isoformat(),
+                                                                 "design_at": x["at"]})
+    print("plan: design reviewer on %s recorded (%s)" % (a.id, a.agent))
 
 
 def cmd_add(a):
@@ -1393,7 +1548,7 @@ def cmd_step(a):
         if rec is None:
             sys.exit("plan: no subagent %s in this project's transcripts" % a.agent)
         started, prompt = rec
-        if not names_entry(prompt, a.id):
+        if not names_entry(prompt, a.id) or (prompt or "").startswith(REVIEW_HEAD):
             sys.exit("plan: subagent %s was not started with %s's step prompt (plan next --prompts; its \"Entry: %s\" "
                      "line)" % (a.agent, a.id, a.id))
         used = [k for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == a.agent]
@@ -1497,7 +1652,7 @@ def cmd_next(a):
     for e, why in todo:
         print("NEXT %s: %s" % (e["id"], why))
         if a.prompts and e.get("status") == "running":
-            print(step_prompt(e, why))
+            print(review_prompt(e) if why.startswith("design to review") else step_prompt(e, why))
             print("-" * 60)
     for e in d["entries"]:                        # a running entry's open question: a reply is listed, never a step
         r = replied(e, msgs) if e.get("status") == "running" else None
@@ -1648,6 +1803,10 @@ def main(argv=None):
     cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True),
         A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
         A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
+    cmd("design", cmd_design, A("id"), *[A("--" + k, required=True) for k in DESIGN_FIELDS])
+    cmd("design-pass", cmd_design_pass, A("id"), A("--reviewer", required=True))
+    cmd("design-fix", cmd_design_fix, A("id"), A("--reasons", required=True))
+    cmd("review", cmd_review, A("id"), A("--agent", required=True))
     cmd("unanswered", cmd_unanswered, A("id"))
     cmd("step", cmd_step, A("id"), A("--agent", required=True))
     cmd("run", cmd_run, A("id"), A("runs", nargs="*"),

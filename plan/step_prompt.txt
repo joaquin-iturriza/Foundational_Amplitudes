@@ -14,6 +14,8 @@ The user's words on it (they authorise and shape it; never narrow them, CLAUDE.m
 {quotes}
 Open question to the user (only what it blocks waits; CLAUDE.md 0g):
 {open_question}
+The latest design on record (python3 tools/plan.py design):
+{design}
 
 The step
 1. Read what the reason points to: an ended run's log (`site logs <run>`, then ack its event with what the log shows),
@@ -21,6 +23,12 @@ The step
 2. Do one thing that moves the entry: an analysis, a fix, a write-up, or a job (`site pick`, then
    `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id>`; a sweep submitted through
    sweep_manager with `site run ... --item {id}` is recorded with `python3 tools/plan.py run {id} --sweep <site>:<name>`).
+   Before a job, record its design with `python3 tools/plan.py design {id} --question --measure --check --fixed
+   --control --seeds --outcome` (--check: how you verified on existing data that the measure moves with the tested
+   change; a design whose check fails is not run), then launch the design reviewer yourself (Agent tool,
+   subagent_type design-reviewer, naming the entry): on PASS submit in this step; on FIX revise the design once and
+   ask again, or record its reasons as a dead end and end the step (design_guard.py lets no job go without a pass; an
+   eval-only re-read of a run of the entry under its passed design carries REREAD=<run id> and needs no new design).
 3. Record, through the plan CLI only:
      python3 tools/plan.py evidence {id} --run <id> --commit <sha> --path <figure or metrics file>
      python3 tools/plan.py dead-end {id} --tried "<what>" --why "<why it failed>"
