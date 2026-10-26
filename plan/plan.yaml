@@ -119,6 +119,10 @@ entries:
   - tried: hybrid short pretraining FA-ccin2p3-9b88e434
     why: CC disk full at 20:36; log stops mid-run, job failed; not a result
     at: '2026-10-25T20:05:43+00:00'
+  - tried: signed-data check job FA-ccin2p3-af7727ac
+    why: sklearn classifier refused a pool with one event of one sign in the fit split; fixed in e13bfd3 (no classifier under
+      20, marked rare) and rerun as FA-ccin2p3-7145824e
+    at: '2026-10-26T02:13:28+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
