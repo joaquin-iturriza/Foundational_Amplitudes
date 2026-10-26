@@ -987,7 +987,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -1255,9 +1255,18 @@ entries:
       the ignored-width finding
     answered_at: '2026-10-26T03:30:55.921000+00:00'
     decision: D145
-  searched: CLAUDE.md's catalog_v4 table (top width rule marked open, unsourced) and the coverage decision (172.5 everywhere,
-    no width); the heavy-quark and BSM widths rows (width rule open; BSM points open); none settles a regeneration after the
-    ignored-width finding
+  - ask: For the one-loop b b~ > h W+ W-, the top appears only in the t-channel, so the fixed 1.4915 top width breaks the
+      pole structure, by up to 20% at 4 to 6 TeV. Should I generate this one process at zero top width (exact here, since
+      the top can never be on shell), or drop it from the catalog?
+    at: '2026-10-26T05:01:38+00:00'
+    searched: D145 'do 1.4915 for all' chose which nonzero width, not zero; D142 'for the other three, investigate' authorises
+      the investigation, not a width change; no other decision covers a per-process width
+  searched: D145 'do 1.4915 for all' chose which nonzero width, not zero; D142 'for the other three, investigate' authorises
+    the investigation, not a width change; no other decision covers a per-process width
+  ask: For the one-loop b b~ > h W+ W-, the top appears only in the t-channel, so the fixed 1.4915 top width breaks the pole
+    structure, by up to 20% at 4 to 6 TeV. Should I generate this one process at zero top width (exact here, since the top
+    can never be on shell), or drop it from the catalog?
+  waiting_since: '2026-10-26T05:01:38+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
