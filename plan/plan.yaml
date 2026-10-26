@@ -1613,8 +1613,10 @@ entries:
   match: muon_hp*,zz_muon_hp*
   evidence:
     runs: []
-    commit: d3cb1479
+    commit: c704e8fc
     paths:
+    - analysis/catalog_v3/data/muon_hp_ft.json
+    - analysis/catalog_v3/figs/muon_hp_ft.png
     - sweep/sweep_config_ccin2p3_muon_hp_ft.yaml
   dead_ends: []
   asks: []
