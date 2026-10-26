@@ -1124,10 +1124,14 @@ entries:
   - D154
   - D161
   - D162
-  next: Cross reads of the old catalog_v3 seed 42 run trial_1860 (FA-ccin2p3-efc4c352) are home in analysis/catalog_v3/data/short_reads/muon_search_best_muon/{XV4,PP,XV4_signed.txt}
+  next: 'Cross reads of the old catalog_v3 seed 42 run trial_1860 (FA-ccin2p3-efc4c352) are home in analysis/catalog_v3/data/short_reads/muon_search_best_muon/{XV4,PP,XV4_signed.txt}
     (555 v4_ and 1396 pp13_, none missing or foreign), next to the reads of catalog_v4 seeds 42, 43 and catalog_v3 seed 43.
     Wait for the catalog_v3 seed 42 rerun (FA-ccin2p3-5209e83c), copy and filter its reads the same way, then add the arms
-    to short_reads.py and write the comparison per CLAUDE.md 0e.
+    to short_reads.py and write the comparison per CLAUDE.md 0e.; ALSO (repo-reviewer 2026-10-26 18:40): (1) FA-ccin2p3-5209e83c''s
+    catalog_v4 cross reads (XV4) failed on the orders-source assertion (its read processes started before the 5cd8c2b3 sync);
+    when the job ends, rerun this arm''s XV4 axis (and PP if its log shows the same) in eval mode at the current code; (2)
+    make tools/catalog_ft.py set data.orders_from_diagrams from the parent''s inferred source (experiment._infer_orders_source)
+    so a fine-tune of an older parent keeps the parent''s target convention without a manual flag; test'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
