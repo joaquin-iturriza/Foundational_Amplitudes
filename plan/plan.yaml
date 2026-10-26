@@ -1362,7 +1362,7 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: b499d470
+    commit: f494c9fe
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1380,6 +1380,7 @@ entries:
     - analysis/catalog_v4/compare_pp_trained.py
     - analysis/catalog_v4/compare_v3.py
     - analysis/catalog_v4/data/card_width_audit.json
+    - analysis/catalog_v4/data/catalog_v3_delete_manifest.json
     - analysis/catalog_v4/data/checked.json
     - analysis/catalog_v4/data/class_changes.json
     - analysis/catalog_v4/data/compare_pp_trained.json
@@ -1397,6 +1398,8 @@ entries:
     - analysis/catalog_v4/figs/pool_sqrts_forward.png
     - analysis/catalog_v4/mixed_order_fig.py
     - analysis/catalog_v4/read_validation.py
+    - analysis/catalog_v4/v3_delete_manifest.py
+    - analysis/catalog_v4/v3_disk_listing.py
     - analysis/catalog_v4/validate_v4.py
     - analysis/storage/free_manifest_2026-10-26.tsv
     - analysis/storage/free_space.py
