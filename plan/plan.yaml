@@ -218,6 +218,12 @@ entries:
     why: 'blew up earlier (steps 680 to 765, at the learning-rate peak); read at step 595 its held-out wrong-sign median is
       24.4% and its zero-shot MSE 2.28x the baseline''s: bounding the pair inputs is not the fix'
     at: '2026-10-26T13:37:31+00:00'
+  - tried: pair sign head at the search's best HPs with Muon (lr 1.246e-2, warmup 0.081), on vs off, seeds 42 and 43 (FA-ccin2p3-61c09ed7,
+      -0239c199 on; -19971006, -36586b54 off)
+    why: 'no by the passed design''s rule: on seed means the pair head is less wrong on 6 of 17 held-out pools, more on 11
+      (median 4.2% vs 3.5%); seed 43 alone 7/7, 3 ties; three of four runs blew up between steps 595 and 765 (both pair runs,
+      the seed-43 control), so that rate is unstable for this arm with or without the head'
+    at: '2026-10-26T21:36:28+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
