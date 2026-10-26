@@ -38,7 +38,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon or v4_dimensionless_muon_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon or v4_dimensionless_muon_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -82,6 +82,10 @@ case "$ARM" in
     # (sweep/sweep_config_ccin2p3_muon_test_search_{adamw,muon}.yaml), read zero-shot only (mode eval) from its run dir
     muon_search_best_adamw) OUT_FIXED=runs/muon_test_search_adamw/trial_0768 ;;
     muon_search_best_muon)  OUT_FIXED=runs/muon_test_search_muon/trial_1860; CROSS=(XV4 PP) ;;
+    # the sign head search's best trial by its objective val_total (sweep/sweep_config_ccin2p3_sign_head_search.yaml,
+    # D155: pair sign head width 16, hidden 16, unbounded, no near-zero weighting, lr 1.246e-2), read zero-shot only
+    # (mode eval) against baseline_more_signed_muon; catalog_v3's own axes only
+    sign_search_best)       OUT_FIXED=runs/sign_head_search/trial_0177 ;;
     # catalog_v4's short pretrainings against catalog_v3's (catalog_coverage; D130 the coverage, D155 Muon): the
     # dimensionless arm with MuonAdamW at the Muon search's best (trial_1860 above: lr 4.997423e-3, decoupled weight
     # decay 0.02171863, the rest the arm's) on recipes/catalog_v4_train.yaml (1153 pools) at catalog_v3's 4264 steps:
