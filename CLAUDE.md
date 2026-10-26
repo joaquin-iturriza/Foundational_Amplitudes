@@ -56,8 +56,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    names the rule behind it (the GPU budget, or which decision of mine sends the work back at its design).
 
 0g. **Never stop the turn for my answer.** No interactive question prompt (AskUserQuestion, refused by
-   `no_blocking_question.sh`). A question for me goes in the message; only the plan entry that needs the answer waits
-   (status `waiting_user`), everything else continues. An interrupt or a rejected tool call that comes with a question
+   `no_blocking_question.sh`). A question for me goes in the message; only the part of the entry that needs the answer waits
+   (`plan ask --blocks`; the whole entry only with `--holds-all` and its reason), everything else continues. An interrupt or a rejected tool call that comes with a question
    is answered and the work continues; only my words "stop" or "wait" stop it. Every word written in a turn is to me:
    a hook whose check is wrong gets no reply (end the turn silently), never a line addressed to the hook.
 
@@ -85,7 +85,7 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      reviewers run at the default (my preference, 2026-10-26).
    - **Questions.** Before a question reaches me, the rules here and `site decisions --project FA` are searched for
      what settles it; only a call none of them settles is asked, in a message to me, and recorded with `plan ask
-     <entry> --ask "<the question>" --searched "<what was read, and why none settles it>"`. My answer goes in with
+     <entry> --ask "<the question>" --searched "<what was read, and why none settles it>" --blocks "<what waits on it>"`. My answer goes in with
      `plan answer <entry> --kind K --quote "<my words>"`, which records the decision and changes the entry in one step.
      Inside a running entry I approved, a new step (a design, an analysis, a job under the GPU budget of 2) goes ahead without
      coming to me; only work a decision of mine sends back at its design stops there (`site decisions`: the "stop at
