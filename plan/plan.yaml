@@ -136,7 +136,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 78458ce4
+    commit: 151979fe
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -147,6 +147,7 @@ entries:
     - analysis/catalog_v3/data/short_reads/baseline_more_signed_seed2
     - analysis/catalog_v3/data/short_reads/baseline_seed2
     - analysis/catalog_v3/data/sign_head_search.json
+    - analysis/catalog_v3/data/sign_head_search_signlog.txt
     - analysis/catalog_v3/data/sign_head_search_trials.json
     - analysis/catalog_v3/figs/pair_head_blowup.png
     - analysis/catalog_v3/figs/pair_head_steps.png
