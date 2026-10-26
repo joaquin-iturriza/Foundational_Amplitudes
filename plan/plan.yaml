@@ -1177,7 +1177,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -1254,6 +1254,12 @@ entries:
     answers_after: '2026-10-26T14:20:38+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-26T19:53:27.846000+00:00'
+    text: Okay, switching makes sense then
+    decision: D166
+    answers_after: '2026-10-26T19:48:10+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -1267,6 +1273,7 @@ entries:
   - D154
   - D161
   - D162
+  - D166
   next: 'The comparison is written (docs/results.tex par:v4_vs_v3, 7bf814b0). Waiting on the user''s call: switch pretraining
     to catalog_v4 or not. If yes: the held Daniel''s-catalog studies adapted to catalog_v4, and catalog_v3''s deletion (D163,
     only once the switch is confirmed, nothing deleted before). If no: say what catalog_v3 keeps and what of catalog_v4 is
@@ -1580,14 +1587,8 @@ entries:
       user'
     holds_all: the switch, the held studies on the chosen catalog and the catalog_v3 deletion all depend on the answer; nothing
       else in the entry can move
-  ask: Switch pretraining to catalog_v4? At equal steps it is better on 13 TeV pp and five times better on its own wider region,
-    about 25% worse per process on catalog_v3's region (2.7 times on its one-loop pools), and loses the 4.7 GeV b. A yes also
-    starts deleting catalog_v3, per your earlier call.
-  waiting_since: '2026-10-26T19:48:10+00:00'
-  searched: 'CLAUDE.md, site decisions: D130 (coverage design), the match-steps and only-the-winner answers, D163 (delete
-    catalog_v3 once the switch is confirmed) shape the comparison but none decides the switch, which D163 leaves to the user'
-  holds_all: the switch, the held studies on the chosen catalog and the catalog_v3 deletion all depend on the answer; nothing
-    else in the entry can move
+    answered_at: '2026-10-26T19:53:27.783000+00:00'
+    decision: D166
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
