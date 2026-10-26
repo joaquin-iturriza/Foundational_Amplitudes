@@ -403,6 +403,7 @@ entries:
   searched: 'D114 (''Keep iterating'', moved the exploration to catalog_v3), D166 (switch to catalog_v4), D165 (the sign test):
     none says whether the exploration continues after the switch'
   holds_all: the entry has no next step left on catalog_v3; what follows depends on whether the exploration continues on catalog_v4
+  checked_until: '2026-10-26T22:01:31+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
