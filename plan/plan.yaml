@@ -1112,9 +1112,22 @@ entries:
   - D142
   - D145
   - D154
-  next: 'Stage-5 pools complete and clean (525/525, audit 0 flagged). Next: catalog_v4''s short pretrainings: the baseline
-    arm on catalog_v4 against catalog_v3''s baseline short pretraining, Muon per D155 at its stage-2 search best, design per
-    CLAUDE.md 0e, under the GPU budget'
+  next: 'catalog_v4''s short pretrainings submitted on CC (commit 7bc4e8ed): smoke FA-ccin2p3-a4df3671 (v4_dimensionless_muon
+    smoke: 40 steps, reads H1 H5 XV3 PP, 2 probes each); after it (afterok): v4_dimensionless_muon FA-ccin2p3-8c8937d5 and
+    v4_dimensionless_muon_seed2 FA-ccin2p3-8b1cb186 (catalog_v4_train 1153 pools, 4264 steps, MuonAdamW lr 4.997423e-3 wd
+    0.02171863, dimensionless arm, seeds 42/43; reads v4 axes H1 H2 H2p5 H3 H5 H6 H7E H7c, XV3 and PP), dimensionless_muon_best_seed2
+    FA-ccin2p3-767f32ce (catalog_v3 at the same HPs, seed 43; v3 axes, XV4, PP), and FA-ccin2p3-9ae87934 (trial_1860, catalog_v3
+    seed 42, reused; mode eval V3_AXES=''XV4 PP''). When the smoke ends: read its log (V3_SHORT_DONE, no V3_AXIS_SKIPPED for
+    XV3 or PP); if it failed, scancel nothing (the afterok jobs die with DependencyNeverSatisfied), fix and resubmit all five.
+    When the four end: read logs (V3_SHORT_DONE each), copy the npz reads (/zz_v4_short_<arm>/<axis>, zz_v3_short_<arm>/<axis>)
+    into analysis/catalog_v4/data/short_reads/, write analysis/catalog_v4/short_compare.py: (1) the in-run validation loss
+    per catalog (not comparable across catalogs, own measure, stated); (2) the 555 probes held out in both, each model on
+    catalog_v3''s pools and on catalog_v4''s pools, per axis, the ratio v3 model MSE over v4 model MSE (two seeds'' geometric
+    mean), share of probes each wins at both seeds, seed spread; (3) the 1396 pp pools by each catalog''s role (held out in
+    both, trained in both, trained in one), the pp13 classes with an external b apart (they carry the 4.7 GeV b catalog_v4
+    never trains on), and inside vs outside catalog_v3''s coverage as pp_compare.py; (4) each catalog''s own zero-shot on
+    its own axes reported separately (H7E differs: 1-10 TeV vs 6-20 TeV); figure, write-up in docs/results.tex with provenance,
+    then the switch question goes to the user.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
