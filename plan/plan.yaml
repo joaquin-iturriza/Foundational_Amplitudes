@@ -1314,7 +1314,7 @@ entries:
     saved validation curves of the small-D fine-tunes (both rounds) and the grid''s fine-tunes on the losing probes, per cell
     the first validation, the minimum and where, against scratch''s best; classify each losing cell; copy the curves home
     before any model deletion (D149).'
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-10-26T03:46:36.177000+00:00'
     text: about the small D study, okay, but we still didn't figure out what's happening then, if the finetuning is actively
@@ -1324,14 +1324,21 @@ entries:
     - ft_harm
     - understand why fine-tuning loses to scratch on some probes at small D (ee->Z gamma and others; par:nogain; par:lowd_ft;
       par:lowd_dyhpo)
+  - said_at: '2026-10-26T04:04:12.109000+00:00'
+    text: About the small D result, I think I see a problem in continuing hammering this, tell me if you agree, but taking
+      the pretrained network from it's readout is basically just looking at how well it zero shoots, on models with a way
+      smaller and less diverse catalog
+    decision: D152
+    answers_after: '2026-10-26T03:57:50+00:00'
+    covers:
+    - ft_harm
   decisions:
   - D151
-  next: 'Waiting on the user''s go (about 18 GPU-h, over 10): targeted test of the bad start. On the 30 losing cells, start
-    the fine-tune from a blend of the pretrained and a fresh muP init, theta0 = a*pretrained + (1-a)*fresh, a in {0, 0.25,
-    0.5, 0.75, 1}, at each cell''s best default fine-tune HPs and steps, 3 seeds (450 runs). Needs a new knob fine_tune.init_blend
-    (base_experiment warm start). Loss rising with a everywhere = the pretrained weights themselves are the harm; a minimum
-    inside (0,1) = the start helps but pins the fine-tune (ee->Z gamma). Optional: read-outs for the 75 grid losing cells
-    with none (classification completeness).'
+  - D152
+  next: 'no blend test (the user: the read-out only measures the old small-catalog pretrainings'' zero-shot, so the start''s
+    quality says little about current models); add to par:ft_harm the limitation in those words'' sense, then close the entry
+    with plan done; the real question (does fine-tuning a current pretraining beat scratch at small D) moves to muon_test''s
+    fine-tunes (add 16 scratch runs on the same 4 probes x 4 D, ~0.7 GPU-h) and to catalog_v4''s pretraining'
   done_when: 'grep -q ''label{par:ft_harm}'' docs/results.tex && test -f analysis/transfer/data/ft_harm.json && test -f analysis/transfer/figs/ft_harm.png
     && test -f analysis/transfer/figs/ft_harm.pdf && grep -q ''% src: python3 analysis/transfer/ft_harm.py'' docs/results.tex'
   notes_ref: null
@@ -1350,8 +1357,7 @@ entries:
     at: '2026-10-26T03:57:50+00:00'
     searched: CLAUDE.md ground rule 2 (over 10 GPU-h needs the user's words); the user's approval of this entry ('this needs
       to be understood') names no cost
-  ask: Do you approve the starting-point blend test (the 30 losing cells x 5 blends of pretrained and fresh weights x 3 seeds,
-    about 18 GPU-h on CC), and should it include read-outs for the 75 unclassified grid cells?
-  waiting_since: '2026-10-26T03:57:50+00:00'
+    answered_at: '2026-10-26T04:04:12.039000+00:00'
+    decision: D152
   searched: CLAUDE.md ground rule 2 (over 10 GPU-h needs the user's words); the user's approval of this entry ('this needs
     to be understood') names no cost
