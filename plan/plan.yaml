@@ -1013,7 +1013,7 @@ entries:
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-44e6a15b
     - FA-ccin2p3-ec84e913
-    commit: abd3ee7
+    commit: 929e1a9
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1032,6 +1032,8 @@ entries:
     - recipes/gen_catalog_v4.py
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
+    - tools/certify_v4_loops.py
+    - tools/mixed_order_virt_check.py
   dead_ends:
   - tried: first catalog_v4 regeneration, 8 parts (FA-ccin2p3-10321cd6 ...)
     why: 'all 8 died in the backend phase (~5-7 min each, no pool written): 51 one-loop entries with a b beam failed the pole
