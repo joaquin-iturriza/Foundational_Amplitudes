@@ -40,8 +40,8 @@ def defaults(d):
                 out[int(m.group(1))] = comp[m.group(2).lower()]
         pcard = os.path.join(d, "Cards", "proc_card_mg5.dat")
         if os.path.exists(pcard):
-            m = re.search(r"^\s*import model\s+(\S+)", open(pcard).read(), re.M)
-            model = m.group(1) if m else None
+            m = re.findall(r"^\s*import model\s+(\S+)", open(pcard).read(), re.M)
+            model = m[-1] if m else None     # the last import is the one output
         return out, model, "one-loop (MadLoop)"
     return out, model, "unknown"
 
