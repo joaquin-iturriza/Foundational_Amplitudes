@@ -953,7 +953,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: running
+  status: waiting_user
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -1137,6 +1137,20 @@ entries:
       a failed certification'
     answered_at: '2026-10-26T00:26:32.876000+00:00'
     decision: D139
-  searched: 'CLAUDE.md data-generation table (coupling orders row) and site decisions: the approval of full coupling orders
-    for catalog_v4 covers the tree strings and says nothing on one-loop entries whose born mixes orders; no decision settles
-    a failed certification'
+  - ask: For the five one-loop entries whose born mixes QCD and electroweak orders (u u~ > c c~ z, d d~ > b b~ z, d d~ > c
+      c~, d d~ > b b~, b b~ > c c~), should they be generated at the pure-QCD born as in catalog_v3, or should I attempt the
+      full QCD plus electroweak one-loop? And for the three entries off by about 0.4% (b g > b w+ w-, b b~ > ta+ vt w-, b
+      b~ > h w+ w-), accept them with a 1e-2 double-pole tolerance, or investigate further with MadGraph's own pole check
+      first?
+    at: '2026-10-26T01:04:15+00:00'
+    searched: CLAUDE.md's catalog_v4 table and the coverage decision (2026-10-25, electroweak production, which sets the trees'
+      orders, not the one-loop born definition), and the user's 'c) Investigate it'; none settles the one-loop born definition
+      or the pole tolerance
+  searched: CLAUDE.md's catalog_v4 table and the coverage decision (2026-10-25, electroweak production, which sets the trees'
+    orders, not the one-loop born definition), and the user's 'c) Investigate it'; none settles the one-loop born definition
+    or the pole tolerance
+  ask: For the five one-loop entries whose born mixes QCD and electroweak orders (u u~ > c c~ z, d d~ > b b~ z, d d~ > c c~,
+    d d~ > b b~, b b~ > c c~), should they be generated at the pure-QCD born as in catalog_v3, or should I attempt the full
+    QCD plus electroweak one-loop? And for the three entries off by about 0.4% (b g > b w+ w-, b b~ > ta+ vt w-, b b~ > h
+    w+ w-), accept them with a 1e-2 double-pole tolerance, or investigate further with MadGraph's own pole check first?
+  waiting_since: '2026-10-26T01:04:15+00:00'
