@@ -769,7 +769,9 @@ entries:
     - signed_ab
   decisions:
   - D99
-  next: 'GPU: DlessInOrdQs short run (~1 GPU-h) and its 2to4 scoring (~0.3 GPU-h) on CC; CPU: the pool stats with Lqt'
+  next: 'adapt to the new catalog (the user, 2026-10-26: "the right moment to do it is after we settle if we should switch
+    to catalog 4"): starts once catalog_v4''s short pretrainings are read and the switch is decided; run on whichever catalog
+    that decides'
   done_when: null
   match: runs/catalog_norm_short/DlessInOrdQs*,zz_catalog_norm_short_DlessInOrdQs*
   notes_ref: null
