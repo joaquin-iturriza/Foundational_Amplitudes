@@ -246,7 +246,7 @@ def main():
                   W3=W_curve(1, 3, DEFAULT_BETA)[0],
                   transfer_d10=dict(searches=sum(t1.values()), at_update_1_to_3=sum(t1.get(k, 0) for k in "123")),
                   lpft=dict((k, lp[k]) for k in ("all", "exposed", "clean")),
-                  lowd_za_r1_d10=dict(lpft=za["lpft"], readout=za["readout"], update=za_audit["best_update"],
+                  lowd_za_r1_d10=dict(lpft=za["lpft"], readout=za["readout"], scratch=za["scratch"], update=za_audit["best_update"],
                                       W=za_audit["W_best"], gain_over_default=za["gain_over_default"]["lpft"]))
     print("\nclaims:")
     print(json.dumps(claims))
