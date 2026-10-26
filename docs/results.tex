@@ -7704,10 +7704,27 @@ pretrained function sits in a basin that $u\bar u\to Zg$ at small $D$ cannot lea
 Rung $7$'s frozen features already carry the target (D108; \code{tools/linear\_readout.py}, \code{nogain\_readout.py},
 \code{data/nogain\_readout.json}: a ridge read-out of the head's input, mean-pooled per event, fitted on the cell's $D$
 training events with the penalty from leave-one-out on them, scored on the validation split). At $D=10^2$ the read-out
-on rung $7$'s frozen trunk reaches $2.6\times10^{-4}$, scratch's $2.5\times10^{-4}$ with no weight of the trunk moved,
-and rung $6$'s $8.1\times10^{-3}$, $30\times$ worse; at every $D$ from $10^{1.5}$ rung $7$'s read-out is $2.4$ to
-$30\times$ below rung $6$'s, and with $D\ge10^{3}$ it settles at $2.2$--$2.4\times10^{-5}$ against $1.3$--$1.7\times10^{-4}$. Neither
-pretrained head, refitted only by an affine map, is close ($0.09$ to $0.48$). So adding $u\bar d\to Wgg$ puts the
+on rung $7$'s frozen trunk reaches $1.5\times10^{-4}$, below scratch's $2.5\times10^{-4}$ ($0.6\times$) with no weight
+of the trunk moved, and rung $6$'s $4.6\times10^{-3}$, $30\times$ worse; at every $D$ from $10^{1.5}$ rung $7$'s read-out is $2.4$ to
+$30\times$ below rung $6$'s, and with $D\ge10^{3}$ it settles at $1.5\times10^{-5}$--$1.6\times10^{-5}$ against $8.8\times10^{-5}$--$1.2\times10^{-4}$. Neither
+pretrained head, refitted only by an affine map, is close ($0.12$ to $0.40$). (These read-outs were first reported
+multiplied by the target's variance factor a second time, which put rung $7$'s at $D=10^2$ just above scratch.)
+% src: python3 analysis/transfer/nogain_readout.py @3ca721f3
+% claim: d4.r7_readout=1.5e-4
+% claim: d4.scratch=2.5e-4
+% claim: d4.r7_over_scratch=0.6
+% claim: d4.r6_readout=4.6e-3
+% claim: d4.r6_over_r7=30
+% claim: r6_over_r7_min=2.4
+% claim: r6_over_r7_max=30
+% claim: hiD.r7_min=1.5e-5
+% claim: hiD.r7_max=1.6e-5
+% claim: hiD.r6_min=8.8e-5
+% claim: hiD.r6_max=1.2e-4
+% claim: head_affine_min=0.12
+% claim: head_affine_max=0.40
+% allow: 10^2 10^{2} $7$ because they are a cell's D and a rung's number, settings
+So adding $u\bar d\to Wgg$ puts the
 structure $u\bar u\to Zg$ needs into rung $7$'s representation, linearly readable, and the fine-tune's head start
 appears to come from the head finding it rather than the trunk relearning it (the read-out does not show which
 weights a fine-tune moves).
@@ -7740,17 +7757,48 @@ exception: the fine-tunes start $0.9$ decades lower and improve $1.9$ decades, s
 \paragraph{What the start already holds on $ee\to Z\gamma$ (2026-10-25).} A ridge read-out of every rung's frozen
 pretraining (\code{tools/linear\_readout.py} as above; rung $0$ is the $ee\to u\bar u$ one; run FA-ccin2p3-b0302fe9,
 \code{nogain\_readout\_za.py}, \code{data/nogain\_readout\_za.json}, Fig.~\ref{fig:nogain_readout_za}). At $D=10^{1.5}$ scratch reaches
-$1.0\times10^{-2}$: the frozen features of rungs $5$, $7$ and $8$ read out at or below it ($9.9$, $7.1$, $7.8\times10^{-3}$)
-and those of rungs $2$, $3$ and $6$ within $1.4\times$, while the fine-tunes of rungs $0$ to $6$ and $9$ sit $2.7$ to
-$5.6\times$ above scratch; the read-out beats the rung's own fine-tune in $7$ of the $10$ rungs, by more than $2\times$
-in $6$, and ties it in one (rung $7$, $7.099$ against $7.101\times10^{-3}$). There the start holds the target, linearly, and the fine-tune loses it. At $D=10^2$ scratch reaches
-$5.0\times10^{-5}$ and no start does: the best read-out is rung $8$'s at $9.4\times10^{-5}$ ($1.9\times$), then rung $6$'s
-($4.8\times$), rung $9$'s ($6.9\times$) and the finale's ($9.0\times$), up to $145\times$ for rung $0$; the fine-tunes sit
-$4.6$ to $35\times$ above, and in rungs $5$, $6$ and $8$ the frozen read-out still beats the fine-tune, by $2.0$ to
-$6.1\times$. So $ee\to Z\gamma$'s dip has two parts: at $D=10^{1.5}$ it is the fine-tune failing to keep what its start
-already carries, and at $D=10^2$ it is mostly that no pretrained representation carries the structure scratch finds
-with $100$ events (at least $1.9\times$ short of scratch with a linear read-out), with the same failure on top in three
+$1.0\times10^{-2}$: the frozen features of rungs $7$ and $8$ read out below it ($8.1\times10^{-3}$, $9.0\times10^{-3}$)
+and those of rungs $5$, $3$, $2$ and $6$ within $1.12$ to $1.55\times$ of it, while the fine-tunes of rungs $0$ to $6$
+and $9$ sit $2.7$ to $5.6\times$ above scratch. The two rungs whose start beats scratch keep it: their fine-tunes end
+lower still, $1.15$ and $1.28\times$ below the read-out. In the six other rungs
+with a fine-tune the read-out beats it, by $1.81$ to $3.89\times$, by more than $2\times$ in $4$. There the start sits
+near what scratch reaches and the fine-tune moves away from it. At $D=10^2$ scratch reaches
+$5.0\times10^{-5}$ and no start does: the best read-out is rung $8$'s at $8.6\times10^{-5}$ ($1.70\times$), then rung $6$'s
+($4.42\times$), rung $9$'s ($6.33\times$) and the finale's ($8.23\times$), up to $132\times$ for rung $0$; the fine-tunes sit
+$4.6$ to $35\times$ above, and in rungs $5$, $6$ and $8$ the frozen read-out still beats the fine-tune, by $2.20$ to
+$6.69\times$. So $ee\to Z\gamma$'s dip has two parts: at $D=10^{1.5}$ it is the fine-tune moving off a start within
+$1.55\times$ of scratch, and at $D=10^2$ it is mostly that no pretrained representation carries the structure scratch finds
+with $100$ events (at least $1.70\times$ short of scratch with a linear read-out), with the same failure on top in three
 rungs. The finale's fine-tune cells are not in the collected grid, so its read-out has no fine-tune to compare.
+(These read-outs were first reported multiplied by the target's variance factor a second time, which at
+$D=10^{1.5}$ put rung $5$'s below scratch and made rung $7$'s tie its fine-tune.)
+% src: python3 analysis/transfer/nogain_readout_za.py @3ca721f3
+% claim: d3.scratch=1.0e-2
+% claim: d3.ro_below_sc=2
+% claim: d3.ro.r7fte=8.1e-3
+% claim: d3.ro.r8fte=9.0e-3
+% claim: d3.ro_over_sc.r5fte=1.12
+% claim: d3.ro_over_sc.r6fte=1.55
+% claim: d3.ft_over_sc.uufte=2.7
+% claim: d3.ft_over_sc.r9fte=5.6
+% claim: d3.ro_over_ft_when_ft_wins.r7fte=1.15
+% claim: d3.ro_over_ft_when_ft_wins.r8fte=1.28
+% claim: d3.ro_beats_ft=6
+% claim: d3.ft_over_ro_when_ro_wins_min=1.81
+% claim: d3.ft_over_ro_when_ro_wins_max=3.89
+% claim: d3.ro_beats_ft_2x=4
+% claim: d4.scratch=5.0e-5
+% claim: d4.ro.r8fte=8.6e-5
+% claim: d4.ro_over_sc.r8fte=1.70
+% claim: d4.ro_over_sc.r6fte=4.42
+% claim: d4.ro_over_sc.r9fte=6.33
+% claim: d4.ro_over_sc.finfte=8.23
+% claim: d4.ro_over_sc.uufte=132
+% claim: d4.ft_over_sc.r1fte=4.6
+% claim: d4.ft_over_sc.r5fte=35
+% claim: d4.ft_over_ro_when_ro_wins_min=2.20
+% claim: d4.ft_over_ro_when_ro_wins_max=6.69
+% allow: 100 10^{1.5} $5$ because they are the cells' D and a rung's number, settings
 
 \begin{figure}[t]
 \centering
@@ -7932,19 +7980,19 @@ bad start, $R\ge S$ and $F\le R$: fine-tuning improves on the start, not enough;
 no read-out. The sources are the grid's fine-tunes at $D=10$ to $10^{2.5}$ (each cell's best trial), the first round's
 $240$ runs (their validation curves copied home from CC, \code{data/lowd\_ft\_curves.json}) and each method's best
 trial of the DyHPO round; a cell counts once per source and method, $224$ losing rows over $30$ of the $60$ cells of
-the two rounds. They split $99$ (i), $5$ (ii), $45$ (iii, worse than the read-out) and $75$ (iii, grid cells on rungs
+the two rounds. They split $100$ (i), $4$ (ii), $45$ (iii, worse than the read-out) and $75$ (iii, grid cells on rungs
 and probes no read-out was run for). Over the $149$ rows with a read-out, the read-out sits a median $+1.09$ decades
-above scratch and the fine-tune $-0.37$ decades below the read-out: the trunk holds a fit about ten times worse than
+above scratch and the fine-tune $-0.36$ decades below the read-out: the trunk holds a fit about ten times worse than
 scratch reaches, and fine-tuning closes about a third of that gap. The probes differ. On $ud\to ud$ ($41$ losing rows,
 $38$ of them (i)) and $u\bar u\to gg$ ($16$, $14$ (i)) the start is far worse, $+1.77$ and $+1.31$ decades over scratch,
 and fine-tuning gains much on it, $-1.00$ and $-0.60$ decades below the read-out, without getting there. On $ee\to
-Z\gamma$ ($92$ losing rows: $47$ (i), $3$ (ii), $42$ (iii)) the start is nearer, $+0.80$ decades, but fine-tuning gains
-nothing on it: the median fine-tune ends at the read-out ($-0.02$ decades), and in about half of its losing rows above
+Z\gamma$ ($92$ losing rows: $48$ (i), $2$ (ii), $42$ (iii)) the start is nearer, $+0.80$ decades, but fine-tuning gains
+nothing on it: the median fine-tune ends at the read-out ($-0.03$ decades), and in about half of its losing rows above
 it. What the first steps do to a fitted head shows in linear probe then fine-tune, which starts at the read-out: its
 first validation is above it in $96$ of $120$ runs (median $1.25\times$), and its best is below it in all but $10$.
 The losing curves reach their minimum later in the run than the winning ones (median at $0.55$ of the run against
 $0.33$), a fine-tune still improving slowly, not one overfitting after an early best. So fine-tuning seldom destroys
-a start that beats scratch ($5$ rows); the losses are a start the pretraining did not prepare for these probes at these
+a start that beats scratch ($4$ rows); the losses are a start the pretraining did not prepare for these probes at these
 $D$, and on $ee\to Z\gamma$ a fine-tune that does not move off that start (Fig.~\ref{fig:ft_harm};
 \code{analysis/transfer/ft\_harm.py}, \code{data/ft\_harm.json}).
 % par:ft_harm, the read-out's limit
@@ -7956,17 +8004,17 @@ pretraining would be, so the test that blends the read-out into the fine-tune's 
 current pretraining beats scratch at small $D$ moves to the Muon test's fine-tunes, with sixteen scratch runs added
 on the same four probes at the same four $D$ so each fine-tune has its scratch, and to catalog\_v4's pretraining once
 it exists.
-% src: python3 analysis/transfer/ft_harm.py @9ff0af38
+% src: python3 analysis/transfer/ft_harm.py @3ca721f3
 % claim: curves_first_round=240
 % claim: losing=224
 % claim: losing_cells=30
-% claim: cls.i=99
-% claim: cls.ii=5
+% claim: cls.i=100
+% claim: cls.ii=4
 % claim: cls.iii-worse=45
 % claim: cls.iii-noreadout=75
 % claim: with_readout=149
 % claim: readout_over_scratch=1.09
-% claim: ft_over_readout=-0.37
+% claim: ft_over_readout=-0.36
 % claim: probe.ud_ud.losing=41
 % claim: probe.ud_ud.i=38
 % claim: probe.uubar_gg.losing=16
@@ -7976,11 +8024,11 @@ it exists.
 % claim: probe.ud_ud.ft_over_readout=-1.00
 % claim: probe.uubar_gg.ft_over_readout=-0.60
 % claim: za.losing=92
-% claim: za.cls.i=47
-% claim: za.cls.ii=3
+% claim: za.cls.i=48
+% claim: za.cls.ii=2
 % claim: za.cls.iii-worse=42
 % claim: za.readout_over_scratch=0.80
-% claim: za.ft_over_readout=-0.02
+% claim: za.ft_over_readout=-0.03
 % claim: lpft.first_above=96
 % claim: lpft.runs=120
 % claim: lpft.first_over_readout=1.25
