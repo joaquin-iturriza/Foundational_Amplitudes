@@ -999,9 +999,11 @@ entries:
   - D137
   - D139
   - D140
-  next: investigate MadLoop's mixed-order one-loop virtual on the 4 failing catalog_v4 entries (CPU only, a few CPU-hours),
-    report the cause and what generating them correctly needs to the user before building them; meanwhile the rest of the
-    regeneration runs
+  next: 'D139 (investigate): take all failing one-loop certifications together: the four mixed-order ones plus v4_bbx_tapvtwm,
+    v4_bbx_hwpwm, v4_bg_bwpwm (few-per-mille c2 at rc 216, maybe a tolerance/stability question) and v4_bbx_ccx (like d d~
+    > c c~); before any rerun, run the certify over every one-loop entry of all 8 shards (CPU dry certify, not prebuild) so
+    one job lists every failure; part 3 needs a rerun too; also make a failing certification skip-and-log its group instead
+    of aborting the shard (user decision needed only if entries are dropped)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
