@@ -1261,61 +1261,24 @@ entries:
   decisions:
   - D144
   - D146
-  next: 'DESIGN (waits for the user''s go; nothing built or submitted). Stage 1, the A/B shortcut, about 5 GPU-h on CC:
-
-    (1) Optimizer. Muon with decoupled weight decay and the update RMS matched to AdamW''s (Moonshot, "Muon is Scalable"):
-    momentum 0.95 with Nesterov, 5 Newton-Schulz steps (coefficients 3.4445, -4.7750, 2.0315) in float32 (V100 has no bf16),
-    update = 0.2*sqrt(max(fan_out, fan_in)) * orthogonalised momentum, W <- W - lr*(update + wd*W). It acts on exactly the
-    backbone''s hidden matrices, the parameters muP already marks matrix-like (infshape.ninf()==2: per block qkv, attention
-    out, the two MLP layers; 32 matrices, most of the weights). Everything else stays on AdamW exactly as in the baseline
-    (no weight decay, the L2 term in the loss): linear_in and linear_out (muP''s input and readout), biases, norms, the particle
-    embedding, the sign head, the framesnet and the diagram encoder (both standard parametrisation, outside muP). Implementation:
-    our own ~80-line optim/muon.py, one torch.optim.Optimizer holding both kinds of group (so CosineAnnealingLR, clipping,
-    EMA, fused AdamW and the fine-tune lr groups work unchanged), a new optimizer: MuonAdamW branch in base_experiment._init_optimizer,
-    a CPU unit test (orthogonality, RMS 0.2, muP scale). Not a pip package: torch.optim.Muon needs torch >= 2.9, Keller Jordan''s
-    muon package is built around torch.distributed; ours needs only matmul, so torch 2.1.2 is fine (CC venv not checked for
-    any package).
-
-    (2) muP. MuAdamW divides a hidden matrix''s lr by its width multiplier (fan_in/base fan_in = 4 at 8 heads, base 2): Adam''s
-    update is close to low rank, its spectral norm grows like the width, and 1/width keeps it O(1). Muon''s orthogonalised
-    update has every singular value 1; with the Moonshot factor its spectral norm grows like sqrt(width), so the muP rule
-    for Muon matrices is lr/sqrt(width multiplier), not 1/width (the spectral condition, Yang-Simon-Bernstein). Implemented
-    as the factor 0.2*sqrt(max(fan_out,fan_in))/sqrt(width multiplier) = the Moonshot RMS match at the base width, and the
-    lr is then width-independent. At 8 heads the Muon update RMS is therefore 2x MuAdamW''s at the same lr number (0.1*lr
-    against ~0.05*lr). This test runs at one width only, so muP transfer across width is not tested.
-
-    (3) Baseline, not rerun: the catalog_v3 short pretraining with the adopted dimensionless target (run FA-ccin2p3-ff0533da,
-    runs/catalog_v3_short/dimensionless): hp58''s config, 4264 steps (5 epochs of 1e4 events x 1397 pools), batch 16384, lr
-    8.94e-3, L2 4.96e-7, warmup 0.158, eta_min 1.8e-10, EMA 0.941, MSE with the arithmetic mean, sign head, diagram encoder;
-    one seed; trained in 61.5 min (0.86 s/step), job 1.65 h with its reads.
-
-    (4) Muon pretraining, one run (scripts/job_catalog_v3_short.sh, new arm dimensionless_muon = the dimensionless arm plus
-    training.optimizer=MuonAdamW): everything as the baseline, lr 8.94e-3 (the same number: by (2) at the base width Muon''s
-    update matches AdamW''s), Muon weight decay 0.1 (Moonshot''s value; with the integrated lr of this run, about 19, it shrinks
-    an unused weight by e^-1.9, the same order as in their runs). A 40-step smoke first. Compared on val_loss_no_reg at the
-    best checkpoint (same target and preprocessing, directly comparable) and on the training curves.
-
-    (5) Zero-shot: the same job reads every axis the six arms read (H1, H2, H2p5, H3, H5, H6, H7E, H7c, 617 probes, the signed
-    scoring on H5); short_reads.py gets the arm; per probe Muon against AdamW, as fig:v3_short.
-
-    (6) Fine-tunes, from both pretrainings, 2x2: each parent fine-tuned with AdamW and with Muon (the cross arms separate
-    "Muon weights transfer better" from "Muon fine-tunes better"; cheap). Four held-out probes, the dimensionless arm''s median-MSE
-    probe of each axis (not picked by result): v3_dg_dgwpwm (new combinations), v3_usx_cxuwpz (2->4), v3_gg_attx (the top),
-    v3_udx_agwp_nlo (one loop). The small-D machinery''s cells: D = 10, 10^1.5, 10^2, 10^2.5 events at 176, 704, 2816, 4576
-    steps, full retraining, lr_scale 1 (fine-tune lr = the parent''s), the parent''s remaining HPs; a new tools/catalog_ft.py
-    modelled on tools/lowd_ft.py (that tool reads the ladder''s cells; no fine-tune from a catalog_v3 short parent has run
-    yet, so a one-cell smoke first). 4 probes x 4 D x 4 = 64 runs; compared on medians over the 16 cells per arm (the single-run
-    noise of the small-D round is 0.41 decades at the 90% quantile), and against each probe''s zero-shot.
-
-    (7) Cost from measured times: Muon pretraining + reads 1.7 GPU-h (the dimensionless job; Newton-Schulz on 32 matrices
-    of at most 128x512 adds well under 1% of a 0.86 s step), smokes 0.3, fine-tunes 64 x 0.043 GPU-h (the small-D round: 12-cell
-    jobs in 31 min on the same 8-block 8-head model) = 2.8; stage 1 total about 4.8 GPU-h on CC V100/H100.
-
-    Stage 2, only if the shortcut is not better and only with the user''s words: Muon single-fidelity DyHPO at 4264 steps
-    over lr [3e-3, 2.7e-2] (half a decade around the transferred value) and weight decay [1e-3, 0.3] (log), the rest fixed,
-    8 trials (HPO rule 5) about 10 GPU-h; the baseline''s HPs come from Daniel''s-catalog sweep at 32k steps, not from this
-    catalog and horizon, so a fair best-against-best needs the same 8-trial DyHPO on AdamW, another ~10; fine-tune DyHPO 5
-    trials per cell on the 64 cells about 14; stage 2 up to ~34 GPU-h.'
+  next: 'BUILT (6584c2fa): optim/muon.py MuonAdamW as designed (Muon on muP''s ninf==2 matrices, scale 0.2*sqrt(max(fan_out,fan_in))/sqrt(width
+    mult), Nesterov 0.95, NS5 float32, decoupled wd 0.1 via training.muon_*; an inner torch AdamW sharing the group dicts,
+    fused on CUDA, MuAdamW''s grouping for the rest); the MuonAdamW branch in base_experiment._init_optimizer (logs ''MuonAdamW:
+    Muon on N matrices''); tests/test_muon.py 6 tests, all pass on the laptop and on CC torch 2.1.2 (real LLoCa at 8 heads:
+    Muon on exactly 32 block matrices, width multiplier 4); arms dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2
+    (seed 43; pools unchanged) in scripts/job_catalog_v3_short.sh, whose smoke mode now also fine-tunes the smoke parent on
+    v3_gg_attx d2 for 20 steps with AdamW and Muon; tools/catalog_ft.py (4 probes x d2..d5, lr_scale 1, target_stats own,
+    offshell parent, 2000 val events, --optimizer AdamW|MuonAdamW, CATFT lines, exit 1 on any failed cell). Repo review passed
+    (watermark 3ba9df35); note for the write-up: the baseline''s L2 term (4.96e-7) still applies to the Muon matrices on top
+    of the decoupled wd. SMOKE RUNNING: FA-ccin2p3-27a6f23b (dimensionless_muon smoke, 40 steps, H1/H5 reads, 2 fine-tune
+    cells; est 0.3 GPU-h). The user approved one extra seed of BOTH pretrainings (D146). NEXT: read the smoke log (site logs;
+    check the MuonAdamW line says 32 matrices, loss finite, both CATFT lines without error, V3_SHORT_DONE). If clean: check
+    df on /sps/lpnhe (41 GB free at submission, cache cleanup running), sync once, then submit in parallel with --item muon_test
+    and --hdr=--mem=48G: dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2 (full runs, ~1.7 GPU-h each, ~5.1
+    total). After the pretrainings end: add the arms to analysis/catalog_v3/short_reads.py, then the fine-tunes: tools/catalog_ft.py
+    from runs/catalog_v3_short/dimensionless and dimensionless_muon, each with --optimizer AdamW and MuonAdamW (64 runs, ~2.8
+    GPU-h; a job wrapper for it still to write, like scripts/job_lowd_ft.sh). Stage 2 (~34 GPU-h, user-approved only if stage
+    1 is inconclusive) after reading stage 1.'
   done_when: 'test -f analysis/catalog_v3/data/short_reads/dimensionless_muon/H1/v3_dg_dgwpwm.npz && grep -q ''dimensionless_muon''
     analysis/catalog_v3/short_reads.py && grep -q ''label{par:v3_muon}'' docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/muon_compare.py''
     docs/results.tex'
