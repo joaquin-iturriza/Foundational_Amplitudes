@@ -18,13 +18,17 @@ Three comparisons:
           classes apart (the pp pools have catalog_v3's 4.7 GeV b, so they are off catalog_v4's b)
   own     each catalog's own held-out axes, per run: different pools, cuts and windows, not comparable across catalogs
 Per group the median MSE over probes for each run; the catalog ratio is the median over probes of the per-probe ratio of
-the two catalogs' seed-geometric-mean MSEs (catalog_v4 over catalog_v3); the seed spread is the per-run medians' range
-within each catalog, and a difference exceeds it when the two catalogs' ranges do not overlap.
+the two catalogs' seed-geometric-mean MSEs (catalog_v4 over catalog_v3), with the share of probes lower in both seeds;
+the gap (median |log10 ratio|) is read against each catalog's seed spread (median |log10 seed 43 / seed 42|), the
+convention of analysis/catalog_v3/muon_compare.py, and a difference exceeds the seed spread when the gap is larger
+than both. A pp class's catalog_v4 role is its catalog_v4 class's (data/class_changes.json: a catalog_v3 class merged
+into or split across catalog_v4 classes takes the role of the one holding its tree); the 33 b-Higgs classes catalog_v4
+dropped have none and are counted apart.
     site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/compare_v3.py collect > analysis/catalog_v4/data/compare_v3_site.json
     python3 analysis/catalog_v4/compare_v3.py   -> data/compare_v3.json, figs/compare_v3_{shared,pp}.{png,pdf}
 The last line printed is the JSON of the numbers docs/results.tex quotes.
 """
-import glob, json, os, re, sys
+import glob, json, os, sys
 
 import numpy as np
 import yaml
@@ -87,10 +91,7 @@ def axis_of(cat):
 
 def has_b(name):
     import mg5_pipeline_final as mg
-    for k in (name, name.split("__")[0], re.sub(r"_nlo$", "", name.split("__")[0])):   # a cut or energy variant, a one-loop pool
-        if k in mg.PROCESSES:
-            return any(abs(int(x)) == 5 for x in mg.PROCESSES[k]["pdg_ids"])
-    raise KeyError(name)
+    return any(abs(int(x)) == 5 for x in mg.PROCESSES[name]["pdg_ids"])
 
 
 def gmean(x):
@@ -98,24 +99,28 @@ def gmean(x):
 
 
 def compare(rows, probes):
-    """rows[run][probe] -> mse; the four runs' medians, the catalog ratio and whether it exceeds the seed spread, on
-    the probes every run has"""
+    """rows[run][probe] -> mse, on the probes every run has: each run's median; per probe the ratio of the two catalogs'
+    seed-geometric-mean MSEs (catalog_v4 over catalog_v3), its median and 10%/90% quantiles; the share of probes lower
+    with catalog_v4 in both seeds (and with catalog_v3 in both); the gap, the median over probes of |log10 ratio|,
+    read against each catalog's seed spread, the median over probes of |log10 (seed 43 / seed 42)|, as
+    analysis/catalog_v3/muon_compare.py compare() does; the difference exceeds the seed spread when the gap is larger
+    than both catalogs' spreads"""
     ps_ = [p for p in probes if all(p in rows[r] for c in RUNS for r in RUNS[c])]
     if not ps_:
         return None
     e = {"n": len(ps_), "n_expected": len(probes), "missing": sorted(set(probes) - set(ps_))}
     for c in RUNS:
         e[c] = [float(np.median([rows[r][p] for p in ps_])) for r in RUNS[c]]
-    g = {c: np.array([gmean([rows[r][p] for r in RUNS[c]]) for p in ps_]) for c in RUNS}
-    lr = np.log10(g["v4"] / g["v3"])
-    e["ratio"] = float(10 ** np.median(lr))
-    e["ratio_q10_q90"] = [float(10 ** x) for x in np.quantile(lr, [0.1, 0.9])]
-    e["n_v4_lower"] = int((lr < 0).sum())
-    # within a catalog, the second seed against the first, per probe: the seed-to-seed scatter of one probe
-    e["seed_ratio"] = {c: float(10 ** np.median(np.abs(np.log10(np.array([rows[RUNS[c][1]][p] / rows[RUNS[c][0]][p]
-                                                                           for p in ps_]))))) for c in RUNS}
-    lo3, hi3, lo4, hi4 = min(e["v3"]), max(e["v3"]), min(e["v4"]), max(e["v4"])
-    e["exceeds_seed_spread"] = bool(hi4 < lo3 or hi3 < lo4)
+    A = {c: [np.array([rows[r][p] for p in ps_]) for r in RUNS[c]] for c in RUNS}
+    ratio = np.sqrt(A["v4"][0] * A["v4"][1]) / np.sqrt(A["v3"][0] * A["v3"][1])
+    lr = np.log10(ratio)
+    e["ratio"] = float(np.median(ratio))
+    e["ratio_q10_q90"] = [float(x) for x in np.quantile(ratio, [0.1, 0.9])]
+    e["v4_lower_both_pct"] = float(100 * np.mean((A["v4"][0] < A["v3"][0]) & (A["v4"][1] < A["v3"][1])))
+    e["v3_lower_both_pct"] = float(100 * np.mean((A["v3"][0] < A["v4"][0]) & (A["v3"][1] < A["v4"][1])))
+    e["gap"] = float(np.median(np.abs(lr)))
+    e["seed_spread"] = {c: float(np.median(np.abs(np.log10(A[c][1] / A[c][0])))) for c in RUNS}
+    e["exceeds_seed_spread"] = bool(e["gap"] > max(e["seed_spread"].values()))
     e["v3_med"], e["v4_med"] = gmean(e["v3"]), gmean(e["v4"])
     return e
 
@@ -140,7 +145,9 @@ def shared():
     for n in s3:
         k = f"{a3[n]}/{a4[n]}"
         out["axis_pairs"][k] = out["axis_pairs"].get(k, 0) + 1
-    bq = {n: has_b("v4_" + n) for n in s3}
+    base = {e["name"][3:]: e.get("base", e["name"]) for e in
+            yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_shared_heldout.yaml")))["processes"]}
+    bq = {n: has_b(base[n]) for n in s3}
     for pool in ("v3", "v4"):
         mse = {r: {n: v["mse"] for n, v in reads[pool][r].items()} for r in reads[pool]}
         lev = {r: {n: v["level"] for n, v in reads[pool][r].items()} for r in reads[pool]}
@@ -165,14 +172,23 @@ def pp(site):
     R3 = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"]
     R4 = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_roles.json")))["trees"]
     names = [e["name"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml")))["processes"]]
+    cc = json.load(open(os.path.join(HERE, "data", "class_changes.json")))
+    m4 = {k: v["role"] for k, v in R4.items()}
+    for g in cc["merges"]:
+        for x in g["members"]:
+            m4.setdefault(x, g["role"][0])
+    for sp in cc["splits"]:
+        for v in sp["v4_classes"].values():
+            for x in v["members"]:
+                m4.setdefault(x, v["role"][0])
     role = {}
     for n in names:
         x = n[len("pp13_"):]
         r3 = R3["v3_" + x]["role"]
-        r4 = R4.get("v4_" + x, {}).get("role", "absent")
+        r4 = m4.get("v4_" + x, "absent")
         role[n] = {"v3": r3, "v4": r4, "axis3": R3["v3_" + x].get("axis")}
     rows = {k: {} for k in ("mse", "mse_inside", "mse_outside")}
-    bad, frac = {}, {}
+    bad, frac, srt = {}, {}, {}
     for c in RUNS:
         for r in RUNS[c]:
             for k in rows:
@@ -192,7 +208,9 @@ def pp(site):
                 s = site["pp"].get(n)
                 if s is None:
                     continue
-                la = z["t"].astype(float) - z["logF"].astype(float)
+                lf = z["logF"].astype(float) if ("logF" in z.files and len(z["logF"]) == len(d)) else 0.0
+                la = z["t"].astype(float) - lf
+                srt.setdefault(n, []).append(np.sort(la))
                 o = np.argsort(la, kind="stable")
                 chk = np.max(np.abs(la[o][::2000 // CHECK] - np.array(s["check"])))
                 if chk > 1e-3:                 # not the same events: no split for this probe, counted
@@ -205,11 +223,15 @@ def pp(site):
                     rows["mse_inside"][r][n] = float(np.mean(d[ins] ** 2))
                 if (~ins).any():
                     rows["mse_outside"][r][n] = float(np.mean(d[~ins] ** 2))
+    # the 40 sorted quantiles checked each read against the pool; the four runs' reads of a probe are checked against
+    # each other on all 2000 sorted events (the same events, whatever their order)
+    xmax = max(float(np.max(np.abs(a - v[0]))) for v in srt.values() for a in v[1:])
+    assert xmax < 1e-3, f"the runs' reads of a pp probe are not the same events (max {xmax})"
     b = {n: has_b(n) for n in names}
     groups = {"train": lambda n: role[n]["v3"] == "train" and role[n]["v4"] == "train",
               "heldout": lambda n: role[n]["v3"] == "heldout" and role[n]["v4"] == "heldout",
               "role_changed": lambda n: role[n]["v3"] != role[n]["v4"]}
-    out = {"n": len(names), "no_prediction": {r: v for r, v in bad.items() if v}, "n_b": sum(b.values()),
+    out = {"n": len(names), "max_event_mismatch": xmax, "no_prediction": {r: v for r, v in bad.items() if v}, "n_b": sum(b.values()),
            "roles": {}, "frac_inside": float(np.median(list(frac.values()))) if frac else None}
     for n in names:
         k = f"{role[n]['v3']}/{role[n]['v4']}" + ("/b" if b[n] else "")
@@ -248,22 +270,21 @@ def plot(sh, p):
     import plot_style as ps
     # shared: per axis, the four runs' median MSE on each pool set (no b), one panel per pool set
     fig, axs = ps.figure(ncols=2)
-    for ax, pool, lab in zip(axs, ("v3", "v4"), ("catalog_v3's pools", "catalog_v4's pools")):
+    for ax, pool, lab in zip(axs, ("v3", "v4"), ("catalog v3's pools", "catalog v4's pools")):
         ax_ = [a for a in AXES if sh[pool]["all_no_b"].get(a)]
         x = np.arange(len(ax_))
         for c, col, mk, dx in (("v3", ps.C.blue, "o", -0.12), ("v4", ps.C.vermillion, "s", 0.12)):
             for j in range(2):
                 y = [sh[pool]["all_no_b"][a][c][j] for a in ax_]
                 ax.plot(x + dx, y, mk, color=col, mfc=col if j == 0 else "none",
-                        label=f"catalog_{c}, seed {42 + j}")
+                        label=f"catalog {c}, seed {42 + j}")
         ax.set_xticks(x)
         ax.set_xticklabels([a for a in ax_])
         ax.set_yscale("log")
-        ax.set_ylabel("median MSE, " + lab)
-        ax.set_xlabel("held-out axis (catalog_v3's)")
+        ax.set_ylabel("median MSE")
+        ax.set_ylim(0.008, 60)                           # one range for both panels, room for the legend
+        ax.set_xlabel("held-out axis, on " + lab)
     ps.legend(axs[0], "upper left")
-    for ax in axs:
-        ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "compare_v3_shared"))
     # pp: per group, the four runs' median MSE on the whole pool, inside and outside catalog_v3's coverage
     fig, axs = ps.figure(ncols=2)
@@ -273,15 +294,14 @@ def plot(sh, p):
         for c, col, mk, dx in (("v3", ps.C.blue, "o", -0.12), ("v4", ps.C.vermillion, "s", 0.12)):
             for j in range(2):
                 y = [p["no_b"][g][k][c][j] for k, _ in ks]
-                ax.plot(x + dx, y, mk, color=col, mfc=col if j == 0 else "none", label=f"catalog_{c}, seed {42 + j}")
+                ax.plot(x + dx, y, mk, color=col, mfc=col if j == 0 else "none", label=f"catalog {c}, seed {42 + j}")
         ax.set_xticks(x)
-        ax.set_xticklabels(["whole", "inside", "outside"])
+        ax.set_xticklabels(["whole pool", "inside", "outside"])
         ax.set_yscale("log")
         ax.set_ylabel("median MSE, 13 TeV pp")
-        ax.set_xlabel(f"classes {lab}, no b; events vs catalog_v3's coverage")
+        ax.set_ylim(0.08, 30)                            # one range for both panels, room for the legend
+        ax.set_xlabel(f"classes {lab}")
     ps.legend(axs[0], "upper left")
-    for ax in axs:
-        ps.make_room(ax, max_growth=4)
     ps.save(fig, os.path.join(HERE, "figs", "compare_v3_pp"))
 
 
@@ -293,7 +313,8 @@ def main():
     plot(sh, p)
     fmt = lambda e: (f"n={e['n']:3d} v3 {e['v3'][0]:.3g}/{e['v3'][1]:.3g} v4 {e['v4'][0]:.3g}/{e['v4'][1]:.3g} "
                      f"ratio {e['ratio']:.3g} [{e['ratio_q10_q90'][0]:.2g},{e['ratio_q10_q90'][1]:.2g}] "
-                     f"v4 lower {e['n_v4_lower']} seed |ratio| v3 {e['seed_ratio']['v3']:.3g} v4 {e['seed_ratio']['v4']:.3g}"
+                     f"v4 lower both {e['v4_lower_both_pct']:.0f}% v3 lower both {e['v3_lower_both_pct']:.0f}% gap {e['gap']:.3g} "
+                     f"spread v3 {e['seed_spread']['v3']:.3g} v4 {e['seed_spread']['v4']:.3g}"
                      f"{' EXCEEDS' if e['exceeds_seed_spread'] else ''}") if e else "none"
     print("runs", json.dumps(site["runs"]))
     print("shared axis pairs", sh["axis_pairs"], "b", sh["n_b"])
@@ -310,15 +331,15 @@ def main():
     for c in o:
         for a, e in o[c].items():
             print(f"own {c} {a:5s}", {r: (v["n"], v["n_expected"], v["mse"] and round(v["mse"], 3)) for r, v in e.items()})
-    claims = {"shared": {pool: {grp: {k: {kk: e[kk] for kk in ("n", "ratio", "n_v4_lower", "v3_med", "v4_med",
-                                                                "exceeds_seed_spread")} | {"v3_lo": min(e["v3"]),
+    claims = {"shared": {pool: {grp: {k: {kk: e[kk] for kk in ("n", "ratio", "v4_lower_both_pct", "v3_lower_both_pct",
+                                                                "gap", "v3_med", "v4_med", "exceeds_seed_spread")} | {"v3_lo": min(e["v3"]),
                                                                 "v3_hi": max(e["v3"]), "v4_lo": min(e["v4"]), "v4_hi": max(e["v4"])}
                                      for k, e in sh[pool][grp].items() if e} for grp in sh[pool] if not grp.startswith("_")}
                          for pool in ("v3", "v4")},
-              "pp": {bk: {g: {k: {kk: v[kk] for kk in ("n", "ratio", "n_v4_lower", "v3_med", "v4_med", "exceeds_seed_spread")}
+              "pp": {bk: {g: {k: {kk: v[kk] for kk in ("n", "ratio", "v4_lower_both_pct", "v3_lower_both_pct", "gap", "v3_med", "v4_med", "exceeds_seed_spread")}
                               | {"v3_lo": min(v["v3"]), "v3_hi": max(v["v3"]), "v4_lo": min(v["v4"]), "v4_hi": max(v["v4"])}
                               for k, v in e.items() if isinstance(v, dict)} for g, e in p[bk].items()} for bk in ("no_b", "b")},
-              "own": {c: {a: {r[:2] if r.startswith("v4") else "v3": None} for a in o[c]} for c in o}}
+              }
     claims["own"] = {c: {a: {"seed42": o[c][a][RUNS[c][0]]["mse"], "seed43": o[c][a][RUNS[c][1]]["mse"],
                              "n": o[c][a][RUNS[c][0]]["n"]} for a in o[c]} for c in o}
     claims["n_shared"] = sh["n_shared"]
