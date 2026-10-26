@@ -2364,9 +2364,64 @@ seed)).
     AdamW trial (learning rate $0.005$, L2 weight $1.44\times10^{-8}$) spiked at step $1445$ and recovered to
     $0.0196$, best at its last validation like every stable trial. So after both searches Muon's pretraining lead is
     about five times (search against search) to seven (against stage 1's Muon point), not an artefact of an untuned
-    AdamW. The searches made no zero-shot reads; both bests are being read zero-shot on every held-out axis as the
-    stage-1 runs were (\code{scripts/job\_catalog\_v3\_short.sh}, arms \code{muon\_search\_best\_\{adamw,muon\}}, mode
-    eval; runs FA-ccin2p3-41b4f15a, FA-ccin2p3-0caa5e2a).
+    AdamW.
+    \emph{Zero-shot, best against best.} The question: does Muon's zero-shot lead of stage 1 hold once both are at
+    their own searched HPs? The design: each search's best trial (seed 42, one run each) read zero-shot on all eight
+    held-out axes exactly as stage 1's runs were (\code{scripts/job\_catalog\_v3\_short.sh}, arms
+    \code{muon\_search\_best\_\{adamw,muon\}}, mode eval; the MSE of $\log|\mathcal M|^2$ on each probe's $2000$
+    validation events; runs FA-ccin2p3-41b4f15a, FA-ccin2p3-0caa5e2a), compared per probe on the probes every run has,
+    with stage 1's seed spread as the scale a ratio is read against (Fig.~\ref{fig:v3_muon_search_zs}).
+% src: python3 analysis/catalog_v3/muon_compare.py @b9e826e6
+% claim: search_zs.all.n=616
+% claim: search_zs.all.best_ratio=3.29
+% claim: search_zs.all.muon_lower_pct=91.2
+% claim: search_zs.all.adamw_vs_stage1=1.03
+% claim: search_zs.all.muon_vs_stage1=1.47
+% claim: search_zs.all.muon_vs_stage1_lower_pct=21.8
+% claim: search_zs.all.adamw_best_vs_stage1_muon=4.87
+% claim: search_zs.all.seed_spread_muon=0.148
+% claim: search_zs.all.median_mse.muon_search_best_adamw=1.14
+% claim: search_zs.all.median_mse.muon_search_best_muon=0.397
+% claim: search_zs.H1.best_ratio=4.63
+% claim: search_zs.H1.muon_lower_pct=100
+% claim: search_zs.H2.best_ratio=3.87
+% claim: search_zs.H3.best_ratio=2.84
+% claim: search_zs.H6.best_ratio=7.16
+% claim: search_zs.H7c.best_ratio=4.59
+% claim: search_zs.H7c.muon_lower_pct=100
+% claim: search_zs.H2p5.best_ratio=1.89
+% claim: search_zs.H2p5.muon_lower_pct=85
+% claim: search_zs.H5.best_ratio=1.79
+% claim: search_zs.H7E.best_ratio=2.94
+% claim: search_zs.H7E.muon_lower_pct=75
+% claim: search_zs.H7E.muon_vs_stage1=0.781
+% claim: search_zs.H7E.median_mse.muon_search_best_adamw=2.46
+% claim: search_zs.H7E.median_mse.muon_search_best_muon=1.26
+% claim: search_zs.H2p5.muon_vs_stage1=1.01
+% claim: search_zs.H5.muon_vs_stage1=1.05
+% claim: search_zs.H1.muon_vs_stage1=1.73
+% claim: search_zs.H2.muon_vs_stage1=1.64
+% allow: 2000 because it is the validation events read, a setting
+% allow: 42 because it is the seed, a setting
+% allow: 617 because it is the probe count of the eight axes
+% allow: 0.13 30 because they are the held-out coupling and the pT threshold, settings
+% allow: 1 2 because they number the stages of the test
+% allow: 1.4 because it is 10^0.148 rounded, the seed spread restated as a factor
+    The AdamW best's read of one probe of new combinations ($u\bar b\to\gamma\bar b uZ$) failed once on the site
+    (its checkpoint reported missing, the same file every other probe loaded), so the comparison is on $616$ of the
+    $617$ probes. Over all of them AdamW's best over Muon's best is a median $3.29$ per probe, and Muon's is lower on
+    $91.2\%$ (median errors $1.14$ and $0.397$). Inside the catalog's range the lead is large on every axis: new
+    combinations $4.63$ (Muon lower on $100\%$), $2\to4$ families $3.87$, the top $2.84$, $\alpha_s=0.13$ $7.16$,
+    $p_T\geq30$\,GeV $4.59$ ($100\%$); one loop $1.79$ and $2\to5$ $1.89$ ($85\%$). The energy extrapolation, a tie
+    at stage 1, is now Muon's too: $2.94$, lower on $75\%$ (median $2.46$ against $1.26$), because the Muon search's
+    best extrapolates better than stage 1's Muon there ($0.781$ times its error) while elsewhere it is equal or worse.
+    Against stage 1: tuning moved AdamW by nothing ($1.03$ times stage 1's seed-42 error, inside the seed spread),
+    and the Muon best is $1.47$ times stage 1's Muon (lower on only $21.8\%$ of the probes; $1.73$ on new combinations,
+    $1.64$ on $2\to4$, flat on $2\to5$ ($1.01$) and one loop ($1.05$)), just past the seed spread of $0.148$ decades,
+    a factor of about $1.4$, and the same factor as its pretraining loss ($1.45$). Against stage 1's Muon point, the
+    best AdamW is $4.87$ times higher. So the zero-shot follows the pretraining: tuned AdamW does not close the gap,
+    which is about three times search against search and five against stage 1's Muon, smallest on the two
+    extrapolations in particle count and on one loop.
   \item \emph{Fine-tunes at small $D$} (the user, 2026-10-26: ``I agree with that reframing of the question for the
     finetuning at small D, go ahead with it''), three questions: does the Muon pretraining transfer better, does
     fine-tuning a current pretraining beat scratch at small $D$ (the question par.~\ref{par:ft_harm} hands on), and
@@ -2532,9 +2587,9 @@ So at this horizon and at AdamW's learning rate, Muon fits the training pools ab
 most of that into the held-out processes inside the catalog's range; beyond it (one more particle, ten times the
 energy) the gain shrinks or vanishes. Fine-tuned at small $D$, the Muon pretraining stays ahead, every fine-tune
 beats scratch, keeping the parent's standardization beats refitting it, and Muon as the fine-tune optimizer does not
-help. All of this is against an untuned AdamW and with
-untuned fine-tunes, one seed each. Both optimizers' own searches (stage 2) keep the pretraining lead at about five
-to seven times; their bests' zero-shot reads are pending, and the full horizon is not tested.
+help. Both optimizers' own searches (stage 2) keep the lead: about five to seven times in pretraining and about
+three to five zero-shot, now on every held-out axis including the energy extrapolation. The fine-tunes are untuned
+and from stage 1's parents, one seed each, and the full horizon is not tested.
 \begin{figure}[t]
 \centering
 \includegraphics{../analysis/catalog_v3/figs/muon_compare.pdf}
@@ -2558,6 +2613,19 @@ transferred HPs. (b) The validation curves of each search's best trial and of st
 trials against their decoupled weight decay. (d) AdamW's against their L2 weight.}
 % allow: 8 4264 42 1 2 because they are the trial count, the horizon, the seed and the stage numbers, settings
 \label{fig:v3_muon_search}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics{../analysis/catalog_v3/figs/muon_search_zs.pdf}
+\caption{Stage 2 of the Muon test, zero-shot: the two searches' best trials read on catalog\_v3's held-out axes. (a)
+The median zero-shot MSE of $\log|\mathcal M|^2$ per axis (1 new combinations, 2 $2\to4$ families, 3 $2\to5$, 4 the
+top, 5 one loop, 6 $\alpha_s=0.13$, 7 $1$ to $10$\,TeV, 8 $p_T\geq30$\,GeV) on the probes every run has: stage 1's
+four runs (circles AdamW, triangles Muon, filled seed 42, open seed 43) and the search bests (diamonds). (b) Per
+held-out probe, Muon's zero-shot MSE against AdamW's: the two search bests, and stage 1's seed-42 runs.}
+% allow: 1 2 3 4 5 6 7 8 because they number the axes on the figure
+% allow: 42 43 because they are the seeds, settings
+% allow: 0.13 10 30 because they are the held-out coupling, the energy window in TeV and the pT threshold, settings
+\label{fig:v3_muon_search_zs}
 \end{figure}
 \begin{figure}[t]
 \centering
@@ -9481,10 +9549,7 @@ of the three share a test set.
     widths, the old pools quarantined, not deleted (\code{tools/width\_regen.py}); waiting on the user: whether the one-loop
     $b\bar b\to hW^+W^-$, whose top is only in the $t$-channel, is built at zero top width or dropped (the entry waits,
     so catalog\_v4's short pretrainings wait too); still to do: catalog\_v3's six loop-induced Higgs pools' $Z$/$W$ widths,
-    the 2HDM $u\bar u\to h_2h_3g$ build check, tree pools with a $t$-channel top at multi-TeV. \emph{Muon test} (the user:
-    ``Yes, go ahead with muon's step 1 and 2 if results are not conclusive. Also add one seed, yes.''): stage 1 written
-    up (par.\ Muon against AdamW on the short pretraining); the small-$D$ fine-tunes written up in the same paragraph; stage 2's two
-    searches (Muon and AdamW, learning rate and weight decay) are running on CC. \emph{Preprocessing exploration}:
+    the 2HDM $u\bar u\to h_2h_3g$ build check, tree pools with a $t$-channel top at multi-TeV. \emph{Preprocessing exploration}:
     the signed-data check, the sampling sensitivity, the $\hat s$-factor slopes and the three one-loop sign arms (pair
     head, near-zero weighting, more sign-changing pools) are written up (par.~\ref{par:v3_prep_signed}).
     \emph{Fine-tuning at small $D$}: closed (par.~\ref{par:ft_harm}); the question moved to the Muon fine-tunes, now
