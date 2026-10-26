@@ -105,11 +105,14 @@ entries:
   - D129
   - D135
   - D165
-  next: 'when the four pair sign head test runs end (pair head on: sign_pair_best FA-ccin2p3-61c09ed7, sign_pair_best_seed2
-    FA-ccin2p3-0239c199; off: sign_off_best FA-ccin2p3-19971006, sign_off_best_seed2 FA-ccin2p3-36586b54), read their logs
-    and zero-shot reads, score the per-pool held-out wrong-sign shares against the passed design (the paired per-pool sign
-    test decides, the median is secondary; median not lower but most pools lower is inconclusive, per the reviewer''s reading),
-    then write up the sign study in par:v3_prep_signed and stop it'
+  next: 'when the seed-43 runs end (pair head on FA-ccin2p3-0239c199, off FA-ccin2p3-36586b54), collect them and score the
+    per-pool held-out wrong-sign shares under the passed design (paired per-pool sign test on seed means decides, median secondary,
+    seed 43 alone stated), with the Muon baseline at its own HPs beside; list the blow-up of the pair head seed 42 (FA-ccin2p3-61c09ed7:
+    clean to its best at step 595, val_loss_no_reg 0.00796; val 0.0134 at step 680 then 2.09 at step 765, non-finite gradients
+    from between steps 765 and 850 at lr 1.22e-2, 98% of peak; never recovered, 218 skipped steps, final 28.5; read at its
+    best checkpoint like every run, reads in short_reads/sign_pair_best) and note that the search''s trial_0177, same HPs
+    and same seed 42, ran clean (0.000967 at step 4250), so the pair head at this lr is unstable run to run; then write up
+    the sign study in par:v3_prep_signed and stop it'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
