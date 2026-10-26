@@ -1049,6 +1049,10 @@ entries:
       but 12% off at an rc 236 point (same pattern as d d~ > c c~); part 3 (FA-ccin2p3-1116cde3, not rerun) died the same
       way on v4_bg_bwpwm_nlo (0.4%, rc 216). A failing certification aborts the whole shard'
     at: '2026-10-26T00:31:07+00:00'
+  - tried: parts 1, 4, 7 resubmitted with the four mixed-order entries skipped
+    why: 'each part still died on a one-loop certification (nlo_virtual_pipeline --certify exit 2): v4_bbx_tapvtwm (part 1),
+      v4_bbx_ccx (part 4), v4_bbx_hwpwm (part 7)'
+    at: '2026-10-26T00:40:20+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
