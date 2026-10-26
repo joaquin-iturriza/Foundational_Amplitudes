@@ -121,6 +121,7 @@ def ft_compare(tab, z0, start):
         for D in FT_D:
             r = np.array([tab[("scratch", None)][(p, D)] / tab[(parent, opt)][(p, D)] for p in FT_PROBES])
             out["vs_scratch"][f"{name}_D{D}"] = {"median": float(np.median(r)), "ft_lower": int(np.sum(r > 1))}
+    out["zs_ratio_median"] = float(np.median([z0[("dimensionless", p)] / z0[("dimensionless_muon", p)] for p in FT_PROBES]))
     for parent in ("dimensionless", "dimensionless_muon"):
         for p in FT_PROBES:
             out["cells"][f"{FT_NAME[parent]}/{p}"] = {"zero_shot": z0[(parent, p)], "start_own": start[(parent, p)]}
@@ -218,6 +219,7 @@ def main():
     ft = res["fine_tune"]
     out["ft"] = {sec: {k: {kk: (r2(vv) if isinstance(vv, float) else vv) for kk, vv in v.items()} for k, v in ft[sec].items()}
                  for sec in ("parent", "ft_opt", "vs_scratch", "vs_zero_shot")}
+    out["ft"]["zs_ratio_median"] = r2(ft["zs_ratio_median"])
     out["ft"]["zs"] = {k: r2(v["zero_shot"]) for k, v in ft["cells"].items() if "zero_shot" in v}
     out["ft"]["start"] = {k: r2(v["start_own"]) for k, v in ft["cells"].items() if "start_own" in v}
     print(json.dumps(out))
