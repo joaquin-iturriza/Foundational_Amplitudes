@@ -1055,12 +1055,14 @@ entries:
   - D140
   - D142
   - D145
-  next: 'read the width rebuild rerun FA-ccin2p3-e957351b (site logs, grep WIDTH_|MIGRATE_SUMMARY|SWAP_SUMMARY|SWAP_REFUSED|Traceback):
-    check the staged build was reused, migrate and swap summaries (swap all-or-nothing per family, manifests in $SCRATCH/zz_width_regen/quarantine),
-    then the three held one-loop entries'' certification and build; then commit CLAUDE.md''s width rows once claudemd-keeper
-    passes; the pool check, classes and roles, the massless b in particle_ids.py, catalog_v4''s short pretrainings. Still
-    open: catalog_v3''s six loop-induced HH/HHH pools rebuild at Z 2.441404 / W 2.0476 (D145), the 2HDM u u~ > h2 h3 g ''0
-    diagrams'' subprocess, results.tex val.wt=1.4803 claim vs 1.4915'
+  next: 'waiting on the user for b b~ > h w+ w- one-loop (generate it at zero top width, the top is t-channel only there;
+    or drop it; question in the step report). State now: width rebuild complete (1440 pools and sidecars swapped in, 2046
+    old files in $SCRATCH/zz_width_regen/quarantine listed in swap_manifest.tsv; 5076 tree sidecars migrated, migrate_manifest.tsv),
+    the 720 swapped pools'' alpha_s sidecars rewritten (write_own_alphas, 0 refused), b b~ > ta+ vt w- and b g > b w+ w- one-loop
+    pools built. Meanwhile: commit CLAUDE.md''s width rows once claudemd-keeper passes; the pool check, classes and roles,
+    the massless b in particle_ids.py, catalog_v4''s short pretrainings. Still open: the 2HDM u u~ > h2 h3 g ''0 diagrams''
+    subprocess, results.tex val.wt=1.4803 claim vs 1.4915; whether the trees with a t-channel top (b b~ > w+ w-, b b~ > h
+    w+ w- ...) carry the same width artefact at multi-TeV (not checked)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
