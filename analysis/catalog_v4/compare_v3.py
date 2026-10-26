@@ -232,7 +232,7 @@ def pp(site):
               "heldout": lambda n: role[n]["v3"] == "heldout" and role[n]["v4"] == "heldout",
               "role_changed": lambda n: role[n]["v3"] != role[n]["v4"] and role[n]["v4"] != "absent",
               "dropped_in_v4": lambda n: role[n]["v4"] == "absent"}
-    out = {"n": len(names), "max_event_mismatch": xmax, "no_prediction": {r: v for r, v in bad.items() if v}, "n_b": sum(b.values()),
+    out = {"_rows": rows, "_role": role, "_b": b, "_frac_inside": frac, "n": len(names), "max_event_mismatch": xmax, "no_prediction": {r: v for r, v in bad.items() if v}, "n_b": sum(b.values()),
            "roles": {}, "frac_inside": float(np.median(list(frac.values()))) if frac else None}
     for n in names:
         k = f"{role[n]['v3']}/{role[n]['v4']}" + ("/b" if b[n] else "")
@@ -309,7 +309,7 @@ def plot(sh, p):
 def main():
     site = json.load(open(os.path.join(HERE, "data", "compare_v3_site.json")))
     sh, p, o = shared(), pp(site), own()
-    res = {"shared": sh, "pp": p, "own": o, "runs": site["runs"]}
+    res = {"shared": sh, "pp": {k: v for k, v in p.items() if not k.startswith("_")}, "own": o, "runs": site["runs"]}
     json.dump(res, open(os.path.join(HERE, "data", "compare_v3.json"), "w"), indent=1)
     plot(sh, p)
     fmt = lambda e: (f"n={e['n']:3d} v3 {e['v3'][0]:.3g}/{e['v3'][1]:.3g} v4 {e['v4'][0]:.3g}/{e['v4'][1]:.3g} "
