@@ -1132,15 +1132,15 @@ entries:
   - D154
   - D161
   - D162
-  next: 'Resubmit the catalog comparison at 6dee967a or later (the dimensionless target now reads each entry''s alpha_s power
-    from its diagram sidecar and divides a mixed-order entry by its highest power): the smoke of v4_dimensionless_muon first
-    (job_catalog_v3_short.sh, after the v4 sidecars, which exist: FA-ccin2p3-7f2fb49d), then afterok on it v4_dimensionless_muon
-    and v4_dimensionless_muon_seed2, dimensionless_muon_best_seed2 on catalog_v3, the catalog_v3 seed-42 read (trial_1860)
-    on catalog_v4''s shared held-out and pp pools; and a rerun of the catalog_v3 seed-42 arm at the current code, because
-    trial_1860 was trained with the old alpha_s power on zp_uux_Y1g and thdm_uux_h2h3g (the order vector misses their gluon),
-    so both catalog_v3 seeds carry the same target (about 3 GPU-h more, total about 14 GPU-h, under the budget). In the write-up:
-    par:dimless_orders says mixed-order entries are refused; replace with the highest-power rule and the audit''s numbers
-    (tools/mixed_order_audit.py, analysis/catalog_v4/data/mixed_order_audit.json).'
+  next: 'When the smoke FA-ccin2p3-0e8c605e (v4_dimensionless_muon smoke, code 1d9d6a29) ends: read its log (the line ''orders_from_diagrams:
+    coupling powers read from the diagrams for N/N processes'', no missing-sidecar warning, V3_SHORT_DONE); its afterok dependants
+    then run: catalog_v4 seeds 42 and 43 (FA-ccin2p3-339ec100, 380842ed), catalog_v3 seed 43 (190f0d06), catalog_v3 seed 42
+    retrained at the new code (dimensionless_muon_best, 5209e83c), trial_1860''s cross reads on catalog_v4''s shared held-out
+    and the pp pools (efc4c352, V3_AXES=''XV4 PP''). If the smoke fails, the dependants stay pending on DependencyNeverSatisfied:
+    fix, rerun the smoke, and move them (scontrol update dependency) or resubmit. When the four trainings and the read end:
+    the comparison catalog_v4 against catalog_v3, two seeds each, in docs/results.tex (par:dimless_orders: replace ''mixed-order
+    entries are refused'' with the highest-alpha_s-monomial rule, the audit''s numbers and the diagram-derived order features;
+    say catalog_v3''s earlier runs had zp_uux_Y1g and thdm_uux_h2h3g''s powers wrong, 2 of 1397 pools)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
