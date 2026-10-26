@@ -1181,17 +1181,10 @@ entries:
   - D154
   - D161
   - D162
-  next: 'The catalog_v3 seed 42 rerun (FA-ccin2p3-5209e83c, arm dimensionless_muon_best) read its own axes and PP with no
-    error; copied home filtered by name into analysis/catalog_v3/data/short_reads/dimensionless_muon_best (54/168/40/237/30/8/40/40
-    v3_ probes on H1..H7c, 1396 pp13_, H5_signed.txt v3_ lines). All 555 of its XV4 cross reads failed on the orders-source
-    assertion; the eval re-read of XV4 alone at the current code is FA-ccin2p3-718253fe (V3_AXES=XV4, 1.5 h limit). When it
-    ends: read its log (555 XV4 ZERO_SHOT with no error), copy $SCRATCH/zz_v3_short_dimensionless_muon_best/XV4/v4_*.npz and
-    the v4_ lines of XV4_signed.txt home into the same folder, add dimensionless_muon_best, dimensionless_muon_best_seed2,
-    v4_dimensionless_muon, v4_dimensionless_muon_seed2 to short_reads.py, then write the comparison (catalog_v4 against catalog_v3,
-    two seeds each, CLAUDE.md 0e): the 555 shared held-out probes per axis, the 13 TeV pp pools by role and coverage with
-    the b processes apart, each catalog''s own axes separately; then, per D163, the catalog_v3 deletion only if the switch
-    is confirmed. Done: tools/catalog_ft.py now sets data.orders_from_diagrams from the parent''s source (6e0eece0, test passes
-    on CC).'
+  next: 'The comparison is written (docs/results.tex par:v4_vs_v3, 7bf814b0). Waiting on the user''s call: switch pretraining
+    to catalog_v4 or not. If yes: the held Daniel''s-catalog studies adapted to catalog_v4, and catalog_v3''s deletion (D163,
+    only once the switch is confirmed, nothing deleted before). If no: say what catalog_v3 keeps and what of catalog_v4 is
+    kept.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
