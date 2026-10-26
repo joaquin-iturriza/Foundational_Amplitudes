@@ -1314,10 +1314,6 @@ entries:
       2f12de30 b499d470: catalog_v4 at 0.21 of pp''s density where pp events sit, 0.66 of pp events in thin bins, rank corr
       0.30 with the error gap; the PDF-weighted sampler of D117 was never built, MadEvent pp events were used) into par:v4_vs_pp
       with provenance, and the pp blend proposal as an open item in the hand-off (waiting on the user''s call)'
-    2: 'The switch to catalog_v4 (D166 ''Okay, switching makes sense then''): adapt the held studies (catalog_norm, qperp_soft,
-      f24, f24net) to catalog_v4: for each, what changes (recipes, pools, axes) and whether its design still holds; release
-      is the user''s (they are held by D114), so this step writes the adaptation into each entry''s next step and lists what
-      would run, no job'
     3: 'catalog_v3''s deletion (D163, after the switch): write the manifest (paths, sizes, what reads them) of catalog_v3''s
       pools on CC; check that nothing running or queued reads them (the pair sign head test''s seed-43 runs train on catalog_v3
       now; the pp blend test would compare against catalog_v3-trained arms only through stored reads); delete nothing until
