@@ -1169,7 +1169,7 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: 5f69bb20
+    commit: 77b43ae3
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1214,6 +1214,7 @@ entries:
     - scripts/job_v4_hwpwm_zero_width.sh
     - scripts/job_width_regen.sh
     - tests/test_order_features.py
+    - tests/test_orders_source.py
     - tests/test_particle_encoding.py
     - tools/certify_v4_loops.py
     - tools/mixed_order_audit.py
