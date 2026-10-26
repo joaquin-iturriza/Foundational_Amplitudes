@@ -1348,7 +1348,7 @@ entries:
     - FA-ccin2p3-be7d9ff7
     - FA-ccin2p3-ce1dba1c
     - FA-ccin2p3-ee733aa9
-    commit: ddfc0314
+    commit: 588199ff
     paths:
     - analysis/catalog_v3/data/muon_compare.json
     - analysis/catalog_v3/data/muon_ft.json
