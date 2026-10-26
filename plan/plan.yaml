@@ -98,13 +98,13 @@ entries:
   - D83
   - D129
   - D135
-  next: 'When FA-ccin2p3-eaff0f54 ends: read its log (site logs), copy the SAMPLING lines home to analysis/catalog_v3/data/prep_sampling_raw.txt,
-    write the reader analysis/catalog_v3/prep_sampling.py (per set and target the median level shift in std units and std
-    ratio under flat-in-log-shat and singular-region weights; per arm and axis the zero-shot MSE, level, shape under each
-    weighting and whether the arm ranking changes; figure png+pdf), write par. The sampling sensitivity on catalog_v3 in docs/results.tex
-    with provenance. Also from the code review (f4fd65a7): prep_signed.py substitutes err_major for err_mlp/err_shat on the
-    pools with under 20 fit events of one sign and uses unsourced margins +0.01 and 0.005; the par:v3_prep_signed numbers
-    need recomputing without them. Then new ideas.'
+  next: 'When FA-ccin2p3-f72f1379 ends (about 5 min of CPU): read its log (site logs -n 5000), copy the SAMPLING lines home
+    to analysis/catalog_v3/data/prep_sampling_raw.txt, check every arm aligned (no ''not aligned''), write the reader analysis/catalog_v3/prep_sampling.py
+    (per set and target the median level shift in std units and std ratio under flat-in-log-shat and singular-region weights;
+    per arm and axis the zero-shot MSE, level, shape under each weighting and whether the arm ranking changes; figure png+pdf),
+    write par. The sampling sensitivity on catalog_v3 in docs/results.tex with provenance. Also from the code review: prep_signed.py
+    substitutes err_major for err_mlp/err_shat on pools with under 20 fit events of one sign and uses unsourced margins +0.01
+    and 0.005; the par:v3_prep_signed numbers need recomputing without them. Then new ideas.'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
