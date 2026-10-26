@@ -127,7 +127,7 @@ entries:
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-ecc413f9
     - FA-ccin2p3-f72f1379
-    commit: f86b5242
+    commit: 0a616ed4
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
