@@ -1042,12 +1042,14 @@ entries:
     - FA-ccin2p3-33503e6c
     - FA-ccin2p3-44e6a15b
     - FA-ccin2p3-6bd04ec8
+    - FA-ccin2p3-790fac19
     - FA-ccin2p3-84bc4800
+    - FA-ccin2p3-a22a1770
     - FA-ccin2p3-b67b49d6
     - FA-ccin2p3-ce878798
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-ec84e913
-    commit: 642801f
+    commit: 7f879cd7
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1070,6 +1072,7 @@ entries:
     - scripts/job_mixed_order_virt.sh
     - tools/certify_v4_loops.py
     - tools/mixed_order_virt_check.py
+    - tools/nlo_virtual_pipeline.py
     - tools/shard_recipes.py
   dead_ends:
   - tried: first catalog_v4 regeneration, 8 parts (FA-ccin2p3-10321cd6 ...)
