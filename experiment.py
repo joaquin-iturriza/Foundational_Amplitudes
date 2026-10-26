@@ -1572,7 +1572,7 @@ class AmplitudeExperiment(BaseExperiment):
                              if _k in ("target_physics_s0", "target_physics_alpha_inv", "target_physics_hybrid_blend")
                              else str(_a) == str(_b))
                     assert _same, f"frozen data stats were fitted with {_k}={_a}, this run sets {_b}"
-                self._check_frozen_orders_source(stats)
+                self._check_frozen_orders_source(stats, os.path.dirname(os.path.abspath(stats_src)))
             # the momentum scale of these stats is in GeV or in units of each event's sqrt(s_hat)
             _di_stats = bool(stats.get("dimensionless_inputs", False))
             _di_cfg = bool(self.cfg.data.get("dimensionless_inputs", False))
@@ -2496,14 +2496,69 @@ class AmplitudeExperiment(BaseExperiment):
         entry refused). Stats written before the record were fitted with the table."""
         return "diagrams_highest_alphas" if bool(self.cfg.data.get("orders_from_diagrams", True)) else "table"
 
-    def _check_frozen_orders_source(self, stats):
+    # the commits that changed where the dimensionless target's coupling monomial comes from, oldest first, each with
+    # the source its code wrote: before the first, the catalog table's order vector; 6dee967a the alpha_s power from
+    # the diagrams with alpha = degree - alpha_s; 1d9d6a29 the alpha power from the diagrams' QED orders too (the
+    # current "diagrams_highest_alphas"). Commits from 77b43ae3 on record the source in data_stats.json.
+    _ORDERS_SOURCE_COMMITS = (("6dee967a49596d36a16055653cdf5a7df05f520b", "diagrams_alphas_only"),
+                              ("1d9d6a29464211df804574c3aeafea1cbbde11f8", "diagrams_highest_alphas"))
+
+    @classmethod
+    def _infer_orders_source(cls, run_dir):
+        """The coupling-monomial source of frozen data stats written before target_physics_orders_source was recorded,
+        inferred from the run that wrote them (run_dir, the folder of its data_stats.json), never from this run's
+        config: 1. the commit in its first log (out_0.log, "git_hash=..."), placed against _ORDERS_SOURCE_COMMITS with
+        git; 2. where no log or git answers, its dumped config.yaml: data.orders_from_diagrams present means the code
+        had the switch (its value), absent means "table" (the key is dumped only when a run sets it, so this fallback
+        reads a diagrams run of 6dee967a..77b43ae3 as the table; the log decides those). Returns (source, how)."""
+        import glob
+        import re
+        import subprocess
+        logs = sorted(glob.glob(os.path.join(run_dir, "out_*.log")),
+                      key=lambda p: (os.path.basename(p) != "out_0.log", p))
+        for log in logs:
+            try:
+                with open(log, errors="replace") as f:
+                    m = next((re.search(r"git_hash=([0-9a-f]{7,40})", ln) for ln in f if "git_hash=" in ln), None)
+            except OSError:
+                m = None
+            if not m:
+                continue
+            repo = os.path.dirname(os.path.abspath(__file__))
+            src = "table"
+            for commit, label in cls._ORDERS_SOURCE_COMMITS:
+                rc = subprocess.run(["git", "-C", repo, "merge-base", "--is-ancestor", commit, m.group(1)],
+                                    capture_output=True).returncode
+                if rc not in (0, 1):      # the commit is not in this checkout's history: ask the config instead
+                    src = None
+                    break
+                if rc == 0:
+                    src = label
+            if src is not None:
+                return src, f"{os.path.basename(log)} git_hash={m.group(1)[:8]}"
+            break
+        cfg_path = os.path.join(run_dir, "config.yaml")
+        if os.path.exists(cfg_path):
+            data = OmegaConf.load(cfg_path).get("data", {}) or {}
+            if "orders_from_diagrams" in data:
+                return ("diagrams_highest_alphas" if bool(data["orders_from_diagrams"]) else "table",
+                        "config.yaml data.orders_from_diagrams")
+            return "table", "config.yaml without data.orders_from_diagrams"
+        return "table", "no log commit, no config.yaml"
+
+    def _check_frozen_orders_source(self, stats, stats_dir=None):
         """Refuse frozen data stats (a warm start's, a fine-tune parent's) fitted with another coupling-monomial source
         than this run's (_target_orders_source) while the target divides by the monomial (data.target_physics_orders):
         the diagrams' powers and the table's differ on the mixed and the mislabelled entries, a per-process shift of
-        the target the parent's standardization would hide (like target_propagators)."""
+        the target the parent's standardization would hide (like target_propagators). Stats without the record are
+        placed by the run that wrote them (_infer_orders_source on stats_dir), else read as the table."""
         if not bool(self.cfg.data.get("target_physics_orders", False)):
             return
-        _a, _b = str(stats.get("target_physics_orders_source", "table")), self._target_orders_source()
+        _a = stats.get("target_physics_orders_source")
+        if _a is None:
+            _a, how = self._infer_orders_source(stats_dir) if stats_dir else ("table", "no run directory")
+            LOGGER.info(f"frozen data stats without target_physics_orders_source: {_a} ({how})")
+        _a, _b = str(_a), self._target_orders_source()
         assert _a == _b, (f"frozen data stats were fitted with target_physics_orders_source={_a}, this run sets {_b} "
                           f"(data.orders_from_diagrams)")
 

@@ -11,6 +11,11 @@ where it came from (plan catalog_coverage, the repo review of the coupling-order
 3. _save_data_stats writes target_physics_orders_source; _check_frozen_orders_source refuses a mismatch while
    target_physics_orders is on (stats without the key count as the table, which wrote them), ignores it when off, and
    init_data calls it on every reload of frozen stats.
+4. Stats written before the record (the dimensionless runs of 6dee967a..77b43ae3, whose dumped config has no
+   data.orders_from_diagrams: the key was read with a default and never dumped) are placed by the run that wrote
+   them: the commit in its out_0.log against the history (before 6dee967a the table, 6dee967a and 5e4040a9 the
+   alpha_s power alone, from 1d9d6a29 the current source), else its config.yaml (the key true: the diagrams; absent:
+   the table). A parent of today's catalog comparison (git_hash 1d9d6a29) passes a diagrams run's check.
 
 Needs the project's env (torch, omegaconf): run on a site,  python tests/test_orders_source.py
 """
@@ -146,12 +151,88 @@ def test_frozen_stats_record_and_check():
         pass
     src = open(os.path.join(ROOT, "experiment.py")).read()
     body = src[src.index("Loaded frozen data stats") - 6000: src.index("Loaded frozen data stats")]
-    assert re.search(r"self\._check_frozen_orders_source\(stats\)", body), "init_data does not check the source"
+    assert re.search(r"self\._check_frozen_orders_source\(stats\b", body), "init_data does not check the source"
     print("[stats] the source is recorded, a mismatch refused, stats without it read as the table")
+
+
+def _parent(d, cfg_data=None, git_hash=None):
+    """A parent run folder as a run leaves it: config.yaml (data block), out_0.log with the start line."""
+    os.makedirs(d, exist_ok=True)
+    OmegaConf.save(OmegaConf.create({"data": cfg_data or {"target_physics_orders": True}}),
+                   os.path.join(d, "config.yaml"))
+    if git_hash is not None:
+        with open(os.path.join(d, "out_0.log"), "w") as f:
+            f.write("[2026-10-26 16:10:00 I] ### Starting experiment catalog_v4_short/run (mlflowid=0) (jobid=1) "
+                    f"(git_hash={git_hash} ###\n")
+    return d
+
+
+def _git_has(commit):
+    return subprocess.run(["git", "-C", ROOT, "cat-file", "-e", commit + "^{commit}"],
+                          capture_output=True).returncode == 0
+
+
+def test_stats_without_record_inferred_from_parent():
+    infer = AmplitudeExperiment._infer_orders_source
+    exp = AmplitudeExperiment.__new__(AmplitudeExperiment)
+    diag_run = OmegaConf.create({"data": {"target_physics_orders": True}})                 # the default: diagrams
+    table_run = OmegaConf.create({"data": {"target_physics_orders": True, "orders_from_diagrams": False}})
+    with tempfile.TemporaryDirectory() as d:
+        # the config fallback (no log): the key true -> the diagrams, absent -> the table
+        on = _parent(os.path.join(d, "cfg_on"), {"target_physics_orders": True, "orders_from_diagrams": True})
+        off = _parent(os.path.join(d, "cfg_absent"))
+        assert infer(on)[0] == "diagrams_highest_alphas", infer(on)
+        assert infer(off)[0] == "table", infer(off)
+        exp.cfg = diag_run
+        exp._check_frozen_orders_source({}, on)
+        try:
+            exp._check_frozen_orders_source({}, off)
+            raise RuntimeError("a parent without the key (table) accepted by a diagrams run")
+        except AssertionError as err:
+            assert "target_physics_orders_source=table" in str(err), err
+        exp.cfg = table_run
+        exp._check_frozen_orders_source({}, off)
+        # a commit this checkout does not know: the config decides
+        unk = _parent(os.path.join(d, "unknown_commit"), {"orders_from_diagrams": True}, git_hash="f" * 40)
+        assert infer(unk)[0] == "diagrams_highest_alphas", infer(unk)
+        print("[infer] config.yaml: data.orders_from_diagrams true -> diagrams, absent -> table; unknown commit -> config")
+        # the log's commit, placed in the history (needs the checkout's git history, as on a site)
+        cases = (("3694e90eba4830d3d4aca8a7fdac6b0791b76186", "table"),                    # 6dee967a^
+                 ("6dee967a49596d36a16055653cdf5a7df05f520b", "diagrams_alphas_only"),
+                 ("5e4040a9724f562b260cab781c039b531dc3e5bf", "diagrams_alphas_only"),
+                 ("1d9d6a29464211df804574c3aeafea1cbbde11f8", "diagrams_highest_alphas"))  # today's comparison
+        if not all(_git_has(c) for c, _ in cases):
+            print("[infer] git history not at hand: the commit cases skipped")
+            return
+        for c, want in cases:
+            run = _parent(os.path.join(d, c[:8]), git_hash=c)       # its config has no key, like the real parents
+            got = infer(run)
+            assert got[0] == want, (c[:8], got)
+        today = os.path.join(d, "1d9d6a29")
+        exp.cfg = diag_run
+        exp._check_frozen_orders_source({}, today)                  # fine-tune / warm start from it: accepted
+        exp.cfg = table_run
+        try:
+            exp._check_frozen_orders_source({}, today)
+            raise RuntimeError("a diagrams parent accepted by a table run")
+        except AssertionError:
+            pass
+        exp.cfg = diag_run
+        try:
+            exp._check_frozen_orders_source({}, os.path.join(d, "6dee967a"))
+            raise RuntimeError("an alpha_s-only parent accepted by a current diagrams run")
+        except AssertionError:
+            pass
+    src = open(os.path.join(ROOT, "experiment.py")).read()
+    assert re.search(r"self\._check_frozen_orders_source\(stats, os\.path\.dirname\(os\.path\.abspath\(stats_src\)\)\)",
+                     src), "init_data does not pass the stats' run folder"
+    print("[infer] the log's commit: before 6dee967a table, 6dee967a/5e4040a9 alpha_s only, 1d9d6a29 the diagrams; "
+          "a parent at 1d9d6a29 passes a diagrams run")
 
 
 if __name__ == "__main__":
     test_switch_off_is_the_table_target()
     test_mixed_entry()
     test_frozen_stats_record_and_check()
+    test_stats_without_record_inferred_from_parent()
     print("all ok")
