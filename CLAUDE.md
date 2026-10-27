@@ -43,7 +43,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
 0e. **Plain names, no internal codes, in anything I read.** Messages to me and the notes name a thing by what it is
    ("the dimensionless target with the context vector", "my decision to delete catalog_v2", "the prep job's failure"),
    never by a code: no D-numbers, E-numbers, run ids, arm codes or recipe tags on their own. An id may follow the
-   description in brackets when I need it to look something up. New arms, sweeps and run directories get descriptive
+   description in brackets when I need it to look something up. Plain names are for things (runs, arms, datasets,
+   axes): a quantity is written as its formula, in math, never spelled out in words, and a figure carries short labels,
+   its explanation going in the caption or the talk, never inside the plot. New arms, sweeps and run directories get descriptive
    names (`dimensionless_context`, not `Qc`).
    **A result reaches me self-contained**, never as a continuation I must decode: first the question it answers and
    why it was asked (which study, which decision it feeds), then how it was designed (what is compared against what,
