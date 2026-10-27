@@ -245,9 +245,10 @@ def dotplot(name, sets, order_by=1):
     axes[0].set_ylim(-0.6, len(ARMS) - 0.4)
     h, l = axes[0].get_legend_handles_labels()
     keep = {lab: hh for hh, lab in zip(h, l)}
-    fig.legend([keep[k] for k in ("zero-shot MSE", "level", "shape")],
-               [r"MSE $=\langle\Delta^2\rangle$", r"level $\langle\Delta\rangle^2$", r"shape $\mathrm{Var}(\Delta)$"],
-               loc="upper center", ncol=3, bbox_to_anchor=(0.6, 1.0), fontsize=10)
+    fig.legend([keep[k] for k in ("zero-shot MSE", "level", "shape")] + [plt.Line2D([], [], ls="none")],
+               [r"MSE $=\langle\Delta^2\rangle$", r"level $\langle\Delta\rangle^2$", r"shape $\mathrm{Var}(\Delta)$",
+                "short runs unless marked (full run)"], ncol=4,
+               loc="upper center", bbox_to_anchor=(0.6, 1.0), fontsize=10)
     save(fig, name)
     return out
 
@@ -309,8 +310,10 @@ AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ of new families"), ("H2p5",
         ("H7E", r"$\sqrt{\hat s}$ 1 to 10 TeV (trained up to 1)")]
 
 
-def v3_dots(name, arms, title_l, title_r, right="level", AXES=AXES, legend_title=None):
+def v3_dots(name, arms, title_l, title_r, right="level", AXES=AXES, legend_title=None, order_arm=None):
     R = json.load(open(os.path.join(V3, "short_reads.json")))
+    if order_arm:
+        AXES = sorted(AXES, key=lambda a: R[order_arm].get(a[0], {}).get("mse", R["dimensionless_twin"].get(a[0], {}).get("mse", 1e9)))
     fig, axes = plt.subplots(1, 2, figsize=(10.4, 5.6), sharey=True)
     fig.subplots_adjust(left=0.25, right=0.99, top=0.82, bottom=0.10, wspace=0.06)
     y = np.arange(len(AXES))[::-1]
@@ -347,13 +350,13 @@ def fig_v3():
                  ("dimensionless", "emission scales + coupling orders", ps.C.blue, "s"),
                  ("dimensionless_context", "+ context vector", ps.C.green, "D"),
                  ("dimensionless_twin", "twin without $\\tau$, $\\nu_\\tau$, quartic vertex", ps.C.orange, "^")],
-                r"zero-shot MSE$(\log|\mathcal{M}|^2)$", r"level $\langle\Delta\rangle^2$")
+                r"zero-shot MSE$(\log|\mathcal{M}|^2)$", r"level $\langle\Delta\rangle^2$", order_arm="dimensionless")
     b = v3_dots("v3_muon",
                 [("muon_search_best_adamw", "AdamW (searched)", ps.C.grey, "o"),
                  ("muon_search_best_muon", "Muon (searched)", ps.C.vermillion, "s")],
                 r"zero-shot MSE$(\log|\mathcal{M}|^2)$", r"level $\langle\Delta\rangle^2$",
                 AXES=[a for a in AXES if a[0] not in ("H3p", "H4")],
-                legend_title=None)
+                legend_title=None, order_arm="muon_search_best_muon")
     return {**a, **b}
 
 
@@ -379,9 +382,9 @@ def fig_ft():
         fm = get("catft_parentstats", "dimensionless_muon", "MuonAdamW")
         tuned = {D: fm[D]["mse_log"] / H["best"]["cell_gain"][f"{p}_{tag[D]}"] for D in Ds}
         ax.plot(Ds, [sc[D]["mse_log"] for D in Ds], "-o", color=ps.C.grey, label="scratch (AdamW)")
-        ax.plot(Ds, [fa[D]["mse_log"] for D in Ds], "-s", color=ps.C.blue, label="fine-tune, AdamW pretraining")
+        ax.plot(Ds, [fa[D]["mse_log"] for D in Ds], "-s", color=ps.C.blue, label="fine-tune, AdamW pretraining (untuned: pretraining lr, no layer decay)")
         ax.plot(Ds, [fm[D]["mse_log"] for D in Ds], "-^", color=ps.C.vermillion,
-                label="fine-tune, Muon pretraining")
+                label="fine-tune, Muon pretraining (untuned: pretraining lr, no layer decay)")
         ax.plot(Ds, [tuned[D] for D in Ds], "--v", color=ps.C.vermillion, mfc="w",
                 label="fine-tune, Muon pretraining, searched HPs")
         ax.axhline(fa[10]["mse_log_step0"], color=ps.C.blue, ls=":", label="zero shot, AdamW pretraining")
@@ -467,14 +470,14 @@ def fig_diagrams_zs():
         out[lab] = dict(n=len(pp), better=better, med_off=float(np.median(xa)), med_on=float(np.median(yb)),
                         p=float(wilcoxon(np.log(xa / yb)).pvalue))
         ax.plot(xa, yb, mk, color=c, ms=4.5, alpha=0.8, ls="none",
-                label=f"{lab} ({better} better)")
+                label=f"{lab} (diagrams better on {better})")
         lo, hi = min(lo, xa.min(), yb.min()), max(hi, xa.max(), yb.max())
     ax.plot([lo / 2, hi * 2], [lo / 2, hi * 2], "--", color="0.4", lw=1)
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlim(lo / 2, hi * 2); ax.set_ylim(lo / 2, hi * 2)
     ax.set_xlabel(r"$\mathrm{MSE}_{\rm no\,diagrams}$")
     ax.set_ylabel(r"$\mathrm{MSE}_{\rm diagrams}$")
-    ax.legend(loc="upper left", fontsize=9)
+    ax.legend(loc="upper left", fontsize=9, title="dimensionless + inputs, short run", title_fontsize=9)
     save(fig, "diagrams_zero_shot")
     return out
 
@@ -522,11 +525,11 @@ def fig_kshot():
     KS = np.array([0, 1, 2, 4, 8, 16, 32, 64])
     sets = [("2to4 +g|DlessInOrd", r"$2\to4$, one more gluon", ps.C.purple),
             ("2to4 +a|DlessInOrd", r"$2\to4$, one more photon", ps.C.sky),
-            ("top, never seen|DlessInOrd", "top never trained", ps.C.green),
-            ("loop one-loop|DlessInOrd", "one loop", ps.C.orange),
+            ("top, never seen|DlessInOrd", "top never trained (extra probes)", ps.C.green),
+            ("loop one-loop|DlessInOrd", "one loop (extra probes)", ps.C.orange),
             ("43 new|DlessInOrd", "43 new", ps.C.vermillion)]
-    fig, ax = plt.subplots(figsize=(6.4, 4.4))
-    fig.subplots_adjust(left=0.13, right=0.70, top=0.97, bottom=0.14)
+    fig, ax = plt.subplots(figsize=(7.4, 4.6))
+    fig.subplots_adjust(left=0.11, right=0.66, top=0.92, bottom=0.13)
     for k, lab, c in sets:
         r = d[k]
         ax.plot(KS + 1, r["offset"], "-o", color=c, ms=4, label=lab)
@@ -540,6 +543,8 @@ def fig_kshot():
     ax.set_ylabel(r"median MSE$(\log|\mathcal{M}|^2)$")
     ax.plot([], [], "--", color="0.4", lw=1, label=r"$\mathrm{Var}(\Delta)$")
     ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), fontsize=9)
+    fig.suptitle(r"Daniel's catalog, dimensionless + coupling orders (short run): one offset per process fitted on $K$ events",
+                 fontsize=9.5, x=0.5, y=0.995)
     save(fig, "kshot_level")
 
 
