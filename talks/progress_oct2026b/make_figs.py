@@ -62,10 +62,10 @@ META = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classe
 DRAFT = json.load(open(os.path.join(HERE, "data", "draft_pid_by_process.json")))   # {"interp"|"extrap": {name: [x, mse]}}
 
 ARMS_FULL = [  # (label, reader); the full-length runs, 1e5 events per process, 32k steps
-    ("per-process standardization\n(full run)", hp58),
-    ("shared standardization\n(full run, diverged at 8734)", lambda: load("catalog_norm_B")),
-    ("$\\hat s$ factor + couplings\n(full run)", lambda: load("catalog_norm_A")),
-    ("dimensionless + coupling\norders (short run)", lambda: load("catalog_short_DlessInOrd_sigstage")),
+    ("per-process standardization\n(3.9 epochs)", hp58),
+    ("shared standardization\n(diverged after 1.1 epochs)", lambda: load("catalog_norm_B")),
+    ("$\\hat s$ factor + couplings\n(3.9 epochs)", lambda: load("catalog_norm_A")),
+    ("dimensionless + coupling orders\n(5 epochs of $10^4$ events)", lambda: load("catalog_short_DlessInOrd_sigstage")),
 ]
 GROUPS = {"interp": [("ss~ annihilation processes (flavor-degenerate with dd~ and uu~)", r"$s\bar s$ annihilation"),
                      ("Muon final states from bb~ annihilation", r"$b\bar b\to\mu,\nu_\mu$"),
@@ -90,9 +90,9 @@ def proc_label(name):
 
 def fig_per_process():
     """The draft's mse_per_process_two_rows form: one point per held-out process, the draft's order and groups."""
-    arms = [("particle-ID embedding (Suprio, seed 0)", None, "*", "k", 6),
-            ("shared standardization (full run, diverged at step 8734)", parts(ARMS_FULL[1][1]()), "o", ps.C.blue, 3.5),
-            ("dimensionless + coupling orders (short run)", parts(ARMS_FULL[3][1]()), "D",
+    arms = [("particle-ID embedding (Suprio, seed 0, 20 epochs)", None, "*", "k", 6),
+            ("shared standardization (diverged after 1.1 epochs)", parts(ARMS_FULL[1][1]()), "o", ps.C.blue, 3.5),
+            (r"dimensionless + coupling orders (5 epochs of $10^4$ events)", parts(ARMS_FULL[3][1]()), "D",
              ps.C.vermillion, 3.2)]
     fig, axes = plt.subplots(2, 1, figsize=(8.4, 5.2))
     fig.subplots_adjust(left=0.085, right=0.995, top=0.82, bottom=0.10, hspace=1.0)
@@ -131,14 +131,14 @@ def fig_per_process():
         ax.text(0.0, 1.16, PANEL_TITLE[sp], transform=ax.transAxes, ha="left", va="bottom", fontsize=9.5)
     h, l = axes[0].get_legend_handles_labels()
     h.append(plt.Rectangle((0, 0), 1, 1, color="0.88")); l.append(r"$2\to2$")
-    fig.legend(h, l, loc="upper center", ncol=4, fontsize=8, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
+    fig.legend(h, l, loc="upper center", ncol=2, fontsize=8, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
                columnspacing=1.5)
     save(fig, "dan_per_process")
 
 
 def fig_grid():
     """The draft's mse_grid_by_type form: per-process MSE histograms, one row per run, medians dashed."""
-    rows = [("particle-ID embedding\n(Suprio, seed 0)", None, "0.35")] + \
+    rows = [("particle-ID embedding\n(Suprio, seed 0, 20 epochs)", None, "0.35")] + \
            [(lab, parts(f()), c) for (lab, f), c in
             zip(ARMS_FULL, (ps.C.grey, ps.C.blue, ps.C.green, ps.C.vermillion))]
     edges = 10 ** (np.log10(2e-4) + 0.2 * np.arange(-5, 31))   # the draft's bins (0.2 decades on its grid from 2e-4), five more below for our smallest
@@ -518,6 +518,29 @@ def fig_diagrams_ft():
     return out
 
 
+def fig_stats():
+    """The per-process pretraining on Daniel's held-out processes: per-process MSE with mu_p, sigma_p predicted by the
+    statistics predictor (stats_net.py: ridge plus boosted trees on the process's particle counts, coupling powers and
+    flavour structure) against mu_p, sigma_p of the process's own training events."""
+    zp = parts(hp58())
+    z = load("heldout_preds")
+    own = {k[:-3]: float(np.mean((z[k[:-3] + "__q_own"] - z[k]) ** 2)) for k in z if k.endswith("__t")}
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.8), sharey=True)
+    fig.subplots_adjust(left=0.08, right=0.99, top=0.80, bottom=0.15, wspace=0.06)
+    for ax, (title, sel) in zip(axes, (("96 relabels", lambda n: n in TWINS), ("43 new", lambda n: n not in TWINS))):
+        for lab, m, c in ((r"$\mu_p,\sigma_p$ predicted from the process", {k: v[0] for k, v in zp.items()}, ps.C.vermillion),
+                          (r"$\mu_p,\sigma_p$ of its own events", own, ps.C.blue)):
+            v = np.sort([m[n] for n in m if sel(n)])
+            ax.step(np.r_[v[0], v], np.r_[0, np.arange(1, len(v) + 1) / len(v)], where="post", color=c, label=lab)
+            ax.axvline(np.median(v), color=c, ls=":", lw=1)
+        ax.set_xscale("log"); ax.set_title(title, fontsize=11)
+        ax.set_xlabel(r"per-process MSE$(\log|\mathcal{M}|^2)$")
+    axes[0].set_ylabel("fraction of processes")
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=2, fontsize=10, bbox_to_anchor=(0.53, 1.0))
+    save(fig, "stats_predicted")
+
+
 def fig_kshot():
     """Daniel's catalog, dimensionless + coupling orders: median MSE after one offset per process fitted on K of its
     events (kshot_level.py), against K; dashed: the shape part, what any offset leaves."""
@@ -558,6 +581,7 @@ if __name__ == "__main__":
     res["ft"] = fig_ft()
     res["diag_zs"] = fig_diagrams_zs()
     fig_kshot()
+    fig_stats()
     json.dump(res, open(os.path.join(HERE, "data", "deck_numbers.json"), "w"), indent=1, default=float)
     for k, v in res.items():
         print(k, json.dumps(v, default=float)[:1500])

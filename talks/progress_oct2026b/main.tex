@@ -53,7 +53,7 @@
       \item 1352 trained. Held out, 96 relabels of a trained process (interpolation) and 43 new (extrapolation)
       \item $\Delta=\log|\mathcal M|^2_{\rm pred}-\log|\mathcal M|^2$ on 2000 events per process, nothing fitted
       \item $\mathrm{MSE}=\langle\Delta^2\rangle=\langle\Delta\rangle^2+\mathrm{Var}(\Delta)$, level plus shape
-      \item Full run $10^5$ events per process, 32k steps. Short run $10^4$, 4k steps. One seed
+      \item Full run $10^5$ events per process, 3.9 epochs. Short run $10^4$, 5 epochs. One seed
     \end{itemize}
   \end{minipage}
   \vfill
@@ -70,17 +70,13 @@
 \end{frame}
 
 \begin{frame}{Per-process statistics cannot zero shot}
-  \vfill
-  \begin{minipage}{0.97\textwidth}
-    \small
-    \begin{itemize}\setlength{\itemsep}{0.6em}
-      \item $y=(\log|\mathcal M|^2-\mu_p)/\sigma_p$, with $\mu_p$, $\sigma_p$ from the process's own events
-      \item $\mu_p$, $\sigma_p$ move with how the events were drawn, sampling, $\sqrt{\hat s}$ window, cuts
-      \item A held-out process has none. Predicted from the process, median $\mathrm{MSE}=1.27$ on the 43 new, $0.46$ with its true $\mu_p$, $\sigma_p$
-      \item Needed, a target and inputs that depend on neither
-    \end{itemize}
-  \end{minipage}
-  \vfill
+  \small
+  \begin{itemize}\setlength{\itemsep}{0.2em}
+    \item $y=(\log|\mathcal M|^2-\mu_p)/\sigma_p$, $\mu_p$, $\sigma_p$ depend on the sampling, the $\sqrt{\hat s}$ window and the cuts
+    \item Predicted, a fit to the trained processes' $\mu_p$, $\sigma_p$ from particle counts, coupling powers and flavour structure
+  \end{itemize}
+  \centering
+  \includegraphics[width=\textwidth,height=0.60\textheight,keepaspectratio]{stats_predicted.pdf}
 \end{frame}
 
 \begin{frame}{Targets, inputs and conditioning}
@@ -90,7 +86,7 @@
     \begin{itemize}\setlength{\itemsep}{0.35em}
       \item Shared standardization, $y=(T-\mu)/\sigma$ with one $\mu$, $\sigma$ for all processes, on every $T$ below
       \item $\hat s$ factor, $T=\log\big[|\mathcal M|^2(\hat s/s_0)^{N-4}\big]$, $s_0=289$ GeV$^2$ fitted on the trained processes
-      \item $+$ couplings, $|\mathcal M|^2/C_p$, $C_p=\max_{\rm diagrams}\prod_{i\in\rm vertices}c_i^2$, $c_i\in\{g_s,e,g_W,g_Z,y_f,\dots\}$, dimensionful ones over $v$
+      \item $+$ couplings, $|\mathcal M|^2/C_p$, $C_p=\max_{\rm diagrams}\prod_{i\in\rm vertices}c_i^2$, $c_i\in\{g_s,e,g_W,g_Z,y_f,\dots\}$, dimensionful ones over $v=246$ GeV
       \item Dimensionless, $|\mathcal M|^2\Lambda^{2(N-4)}$, $\Lambda^2=\hat s$. Pair scale, $\log\Lambda^2=\langle\log|2p_i\cdot p_j|\rangle_{i<j}$
       \item $+$ inputs, $p_i/\sqrt{\hat s}$ and $\log_{10}(m_i/\sqrt{\hat s})$, no other input in GeV
       \item $+$ coupling orders, $|\mathcal M|^2/\big[(4\pi\alpha_s)^{q}(4\pi\alpha)^{e}\big]$, $q$, $e$ the QCD and QED orders
