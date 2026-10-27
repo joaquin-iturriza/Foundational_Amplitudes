@@ -9701,7 +9701,12 @@ default fine-tune, both $\log_{10}$ of the reference's MSE of $\log|\mathcal M|^
 \label{fig:lowd_ft}
 \end{figure}
 
-\paragraph{Fine-tuning at small $D$, each method with its own search (2026-10-26).}\label{par:lowd_dyhpo} The
+\paragraph{Fine-tuning at small $D$, each method with its own search (2026-10-26).}\label{par:lowd_dyhpo}
+\emph{Its premise no longer holds.} Both rounds were motivated by fine-tunes that seemed to end worse than the
+pretraining's own zero-shot read. That was a mistake in the fine-tune, the target's standardization refitted on the
+probe's few events, since fixed: with the parent's standardization kept, a fine-tune starts at the zero-shot and ends
+below it, and a current pretraining never loses to scratch (par.~\ref{par:v3_muon}). The results below stand on their
+own, as a comparison of fine-tuning methods, but no longer answer a failure of fine-tuning. The
 first round ran every method at the default's HPs (par.~\ref{par:lowd_ft}). Here the three methods it did not settle,
 linear probe then fine-tune, L2-SP and the frozen lower blocks, each get their own single-fidelity DyHPO search of five
 trials per cell, on the same $60$ cells and steps: the grid's fine-tune space, plus for L2-SP its strength $\lambda$
