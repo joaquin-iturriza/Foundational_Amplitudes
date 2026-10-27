@@ -2103,6 +2103,8 @@ def sent_figures():
     rc, err = send(p)
     rc2, err2 = send(p, "catalog_v3\tthe third catalog\n")
     scenario("a code is refused until the glossary lists it, then passes", rc == 2 and rc2 == 0, [err, err2])
+    rc3, err3 = send(p, "# PROPOSED, NOT YET ACCEPTED\ncatalog_v3\tthe third catalog\n")
+    scenario("a term below the glossary's PROPOSED marker is still refused", rc3 == 2, err3)
     rc, err = send(fig("clean", "training events D", "MSE, dimensionless target", legend="with the context vector"))
     scenario("a clean figure passes", rc == 0, err)
     rc, err = send(os.path.join(d, "clean.png"))

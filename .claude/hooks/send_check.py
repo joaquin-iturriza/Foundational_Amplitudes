@@ -42,6 +42,8 @@ def glossary(root=ROOT):
     p = os.path.join(root, "docs", "glossary.txt")
     if os.path.exists(p):
         for line in open(p, encoding="utf-8"):
+            if "PROPOSED" in line and line.lstrip().startswith("#"):
+                break                     # entries below the marker wait for the user's acceptance: not allowed yet
             t = line.split("\t", 1)[0].strip()
             if t and not t.startswith("#"):
                 terms.append(t)
