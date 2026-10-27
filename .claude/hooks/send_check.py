@@ -6,13 +6,14 @@ too. So it's a general problem"; CLAUDE.md 0e).
 For each file the tool call names: a .png is read through its sibling .pdf (every figure ships as both; a .png
 without one is refused), a .pdf (figure or deck) through pdftotext, page by page. The send is refused (exit 2) when
 the text holds, on any page:
-  - an identifier with an underscore (snake_case, a config key, a file stem);
+  - an identifier with an underscore (snake_case, a config key, a file stem); a math subscript (one letter, then up
+    to three characters: s_0, m_k, c_v) is not one, so formulas keep their symbols;
   - a code-like token that lost its underscore in the PDF (TeX draws \\_ as a rule, so "catalog\\_v3" extracts as
     "catalog v3"): a short lowercase stem glued to digits, such as v3, tp3, pp13;
   - a run id (FA-<site>-<hash>, trial_NNNN) or a bare hex hash;
   - a recipe or arm prefix (tp3_, tp2_, v3_, v4_, pp13_, dc_, zz_);
   - a held-out axis code (H1..H9 with any suffix, H2p5, H7E, H7c, XV3, XV4) or a decision or event code (D12, E345);
-  - a label with "ratio" or "gain" that does not say what over what ("over", or "a / b"), or a "/" with nothing named
+  - a label with "ratio" or "gain" that is not written as a formula a/b, or a "/" with one side empty (a quantity is math, never spelled out in words)
     on one side.
 A term listed in docs/glossary.txt (term<TAB>plain definition) is allowed, in its underscore or its spaced form.
 
@@ -30,8 +31,8 @@ RULES = [  # (what it is, pattern); order = priority when several match the same
     ("held-out axis code", re.compile(r"\bH[1-9](?:p\d|[A-Za-z])?\b|\bXV[0-9]\b")),
     ("decision or event code", re.compile(r"\b[DE]\d+\b")),
     ("hex hash", re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b")),
-    ("identifier with an underscore", re.compile(r"\b\w*[A-Za-z0-9]_\w*|\b_\w+")),
-    ("code-like token (a lost underscore?)", re.compile(r"(?<![\w.])(?!log\d|ln\d)[a-z]{1,4}\d+[a-z0-9]*\b")),
+    ("identifier with an underscore", re.compile(r"\b(?![A-Za-z]_[A-Za-z0-9]{1,3}\b)\w*[A-Za-z0-9]_\w*|\b_\w+")),
+    ("code-like token (a lost underscore?)", re.compile(r"(?<![\w.])(?!log\d|ln\d)(?:[a-z]{2,4}\d+[a-z0-9]*|v\d+)\b")),
 ]
 RATIO = re.compile(r"\b(ratios?|gains?)\b", re.I)
 BOTH_SIDES = re.compile(r"[A-Za-z]\S*\s*/\s*\S*[A-Za-z0-9]")
@@ -90,8 +91,8 @@ def findings(text, terms):
                     seen.add(m.group(0))
                     out.append((what, m.group(0)))
         s = raw.strip()                  # unmasked: a glossary term names a side of a ratio
-        if RATIO.search(s) and not (re.search(r"\bover\b", s, re.I) or BOTH_SIDES.search(s)):
-            key = ("ratio or gain without what over what", s)
+        if RATIO.search(s) and not BOTH_SIDES.search(s):
+            key = ("ratio or gain not written as a formula a/b", s)
         elif "/" in s and re.search(r"(^|\s)/|/(\s|$)", s) and not BOTH_SIDES.search(s):
             key = ("'/' with a side unnamed", s)
         else:
