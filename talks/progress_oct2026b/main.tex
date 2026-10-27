@@ -89,12 +89,12 @@
     \footnotesize
     \begin{itemize}\setlength{\itemsep}{0.35em}
       \item Shared standardization, $y=(T-\mu)/\sigma$ with one $\mu$, $\sigma$ for all processes, on every $T$ below
-      \item $\hat s$ factor, $T=\log\big[|\mathcal M|^2(\hat s/\Lambda_0^2)^{N-4}\big]$, $\Lambda_0^2=289$ GeV$^2$ fitted on the trained processes
-      \item $+$ couplings, $|\mathcal M|^2/C_p$, $C_p=\max_{\rm diagrams}\prod_{\rm vertices}(c_v)^2$ (SM couplings, $v$ for dimensionful ones)
+      \item $\hat s$ factor, $T=\log\big[|\mathcal M|^2(\hat s/s_0)^{N-4}\big]$, $s_0=289$ GeV$^2$ fitted on the trained processes
+      \item $+$ couplings, $|\mathcal M|^2/C_p$, $C_p=\max_{\rm diagrams}\prod_{\rm vertices}c_v^2$ (SM couplings, $v$ for dimensionful ones)
       \item Dimensionless, $|\mathcal M|^2\Lambda^{2(N-4)}$, $\Lambda^2=\hat s$. Pair scale, $\log\Lambda^2=\langle\log|2p_i\cdot p_j|\rangle_{i<j}$
       \item $+$ inputs, $p_i/\sqrt{\hat s}$ and $\log_{10}(m_i/\sqrt{\hat s})$, no other input in GeV
       \item $+$ coupling orders, $|\mathcal M|^2/\big[(4\pi\alpha_s)^{q}(4\pi\alpha)^{e}\big]$, $q$, $e$ the QCD and QED orders
-      \item Emission scales, $\Lambda^{2(N-4)}\to\prod_{k=1}^{N-4}q_k^2$, $q_k^2=\min_{a,b}\frac{s_{ak}s_{bk}}{s_{ab}}+(m_k)^2$, softest particle removed first
+      \item Emission scales, $\Lambda^{2(N-4)}\to\prod_{k=1}^{N-4}q_k^2$, $q_k^2=\min_{a,b}\frac{s_{ak}s_{bk}}{s_{ab}}+m_k^2$, softest particle removed first
       \item Diagrams, the graph encoder of arXiv:2606.23791 over the tree diagrams
       \item Context vector, $c_p\in\mathbb R^{16}$ per trained process added to each particle's encoding, $c_p=0$ on half the events; a new process takes $c=0$, or $c$ fitted on $K$ of its events with the network frozen
     \end{itemize}

@@ -285,7 +285,6 @@ def fig_why():
     ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), fontsize=9)
     ax.set_ylim(0, 1400)
     ax.grid(False)
-    ax.set_title(r"no $2\to4$, no one loop", fontsize=10, pad=48)
     ax = axes[1]
     labs = ["Daniel's catalog", "new catalog"]
     rel = [96, 0]
@@ -300,7 +299,6 @@ def fig_why():
     ax.set_ylim(-0.6, 1.9)
     ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), fontsize=9)
     ax.grid(False)
-    ax.set_title("96 of 139 held out are relabels", fontsize=10, pad=40)
     save(fig, "why_new_catalog")
 
 
@@ -538,10 +536,10 @@ def fig_kshot():
     ax.xaxis.set_minor_formatter(plt.NullFormatter())
     ax.set_yticks([0.3, 1, 3, 10, 30]); ax.set_yticklabels(["0.3", "1", "3", "10", "30"])
     ax.yaxis.set_minor_formatter(plt.NullFormatter())
-    ax.set_xlabel(r"$K$, events of the process fitting its offset")
+    ax.set_xlabel(r"$K$, events of the process")
     ax.set_ylabel(r"median MSE$(\log|\mathcal{M}|^2)$")
+    ax.plot([], [], "--", color="0.4", lw=1, label=r"$\mathrm{Var}(\Delta)$")
     ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), fontsize=9)
-    ax.text(1.04, 0.25, r"dashed: $\mathrm{Var}(\Delta)$", transform=ax.transAxes, fontsize=9, va="top")
     save(fig, "kshot_level")
 
 
