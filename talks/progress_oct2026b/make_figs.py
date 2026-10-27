@@ -536,8 +536,9 @@ def fig_stats():
         ax.set_xscale("log"); ax.set_title(title, fontsize=11)
         ax.set_xlabel(r"per-process MSE$(\log|\mathcal{M}|^2)$")
     axes[0].set_ylabel("fraction of processes")
+    axes[0].plot([], [], ls=":", color="0.4", lw=1, label="median")
     h, l = axes[0].get_legend_handles_labels()
-    fig.legend(h, l, loc="upper center", ncol=2, fontsize=10, bbox_to_anchor=(0.53, 1.0))
+    fig.legend(h, l, loc="upper center", ncol=3, fontsize=10, bbox_to_anchor=(0.53, 1.0))
     save(fig, "stats_predicted")
 
 
