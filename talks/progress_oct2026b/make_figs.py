@@ -63,9 +63,9 @@ DRAFT = json.load(open(os.path.join(HERE, "data", "draft_pid_by_process.json")))
 
 ARMS_FULL = [  # (label, reader); the full-length runs, 1e5 events per process, 32k steps
     ("per-process standardization\n(full run)", hp58),
-    ("one shared standardization (full run,\nbest checkpoint before it diverged\nat step 8734 of 32000)", lambda: load("catalog_norm_B")),
-    ("$\\hat s$ factor and coupling product\n(full run)", lambda: load("catalog_norm_A")),
-    ("dimensionless target and inputs,\ncoupling orders (short run)", lambda: load("catalog_short_DlessInOrd_sigstage")),
+    ("shared standardization\n(full run, diverged at 8734)", lambda: load("catalog_norm_B")),
+    ("$\\hat s$ factor + couplings\n(full run)", lambda: load("catalog_norm_A")),
+    ("dimensionless + coupling\norders (short run)", lambda: load("catalog_short_DlessInOrd_sigstage")),
 ]
 GROUPS = {"interp": [("ss~ annihilation processes (flavor-degenerate with dd~ and uu~)", r"$s\bar s$ annihilation"),
                      ("Muon final states from bb~ annihilation", r"$b\bar b\to\mu,\nu_\mu$"),
@@ -79,8 +79,8 @@ GROUPS = {"interp": [("ss~ annihilation processes (flavor-degenerate with dd~ an
                      ("Triple-W production (W+W+W-, W+W-W-)", r"$WWW$"), ("Triple-Z production (ZZZ)", r"$ZZZ$"),
                      ("gg -> W + qq' (W production from gluon fusion)", r"$gg\to W$ + quarks"),
                      ("gg -> tt~ + boson (ttX via gluon fusion)", r"$gg\to t\bar tX$")]}
-PANEL_TITLE = {"interp": "held out, interpolation: 96 relabels of a training process",
-               "extrap": "held out, extrapolation: 43 with no relabel in training"}
+PANEL_TITLE = {"interp": "interpolation: 96 relabels",
+               "extrap": "extrapolation: 43 new"}
 
 
 def proc_label(name):
@@ -90,12 +90,12 @@ def proc_label(name):
 
 def fig_per_process():
     """The draft's mse_per_process_two_rows form: one point per held-out process, the draft's order and groups."""
-    arms = [("draft, particle-ID embedding only (one run, seed 0)", None, "*", "k", 6),
-            ("ours, one shared standardization (full run, best checkpoint before it diverged at step 8734 of 32000)", parts(ARMS_FULL[1][1]()), "o", ps.C.blue, 3.5),
-            ("ours, dimensionless target and inputs, coupling orders (short run)", parts(ARMS_FULL[3][1]()), "D",
+    arms = [("particle-ID embedding (Suprio, seed 0)", None, "*", "k", 6),
+            ("shared standardization (full run, diverged at step 8734)", parts(ARMS_FULL[1][1]()), "o", ps.C.blue, 3.5),
+            ("dimensionless + coupling orders (short run)", parts(ARMS_FULL[3][1]()), "D",
              ps.C.vermillion, 3.2)]
     fig, axes = plt.subplots(2, 1, figsize=(8.4, 5.2))
-    fig.subplots_adjust(left=0.085, right=0.995, top=0.73, bottom=0.10, hspace=1.0)
+    fig.subplots_adjust(left=0.085, right=0.995, top=0.82, bottom=0.10, hspace=1.0)
     for ax, sp in zip(axes, ("interp", "extrap")):
         names = sorted(DRAFT[sp], key=lambda n: DRAFT[sp][n][0])
         x = np.arange(len(names))
@@ -130,16 +130,16 @@ def fig_per_process():
         ax.grid(False)
         ax.text(0.0, 1.16, PANEL_TITLE[sp], transform=ax.transAxes, ha="left", va="bottom", fontsize=9.5)
     h, l = axes[0].get_legend_handles_labels()
-    h.append(plt.Rectangle((0, 0), 1, 1, color="0.88")); l.append(r"grey band: $2\to2$ process (the others $2\to3$)")
-    fig.legend(h, l, loc="upper center", ncol=1, fontsize=8, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
+    h.append(plt.Rectangle((0, 0), 1, 1, color="0.88")); l.append(r"$2\to2$")
+    fig.legend(h, l, loc="upper center", ncol=4, fontsize=8, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
                columnspacing=1.5)
     save(fig, "dan_per_process")
 
 
 def fig_grid():
     """The draft's mse_grid_by_type form: per-process MSE histograms, one row per run, medians dashed."""
-    rows = [("draft: particle-ID\nembedding only\n(one run, seed 0)", None, "0.35")] + \
-           [("ours: " + lab, parts(f()), c) for (lab, f), c in
+    rows = [("particle-ID embedding\n(Suprio, seed 0)", None, "0.35")] + \
+           [(lab, parts(f()), c) for (lab, f), c in
             zip(ARMS_FULL, (ps.C.grey, ps.C.blue, ps.C.green, ps.C.vermillion))]
     edges = 10 ** (np.log10(2e-4) + 0.2 * np.arange(-5, 31))   # the draft's bins (0.2 decades on its grid from 2e-4), five more below for our smallest
     fig, axes = plt.subplots(len(rows), 2, figsize=(10.0, 5.6), sharex=True)
@@ -166,8 +166,8 @@ def fig_grid():
             ax.set_ylim(0, max(1.0, dens.max() * 1.45))
             ax.grid(False)
             if r == 0:
-                ax.set_title("held out, interpolation (96 relabels)" if sp == "interp"
-                             else "held out, extrapolation (43 new)", fontsize=11)
+                ax.set_title("interpolation: 96 relabels" if sp == "interp"
+                             else "extrapolation: 43 new", fontsize=11)
             if j == 0:
                 ax.text(-0.04, 0.5, lab, transform=ax.transAxes, ha="right", va="center", fontsize=8.5)
         pass
@@ -175,25 +175,25 @@ def fig_grid():
         ax.set_xlabel(r"per-process MSE$(\log|\mathcal{M}|^2)$")
         ax.set_xticks([1e-4, 1e-3, 1e-2, 1e-1, 1, 10, 100])
         ax.set_xticklabels(["$10^{-4}$", "0.001", "0.01", "0.1", "1", "10", "100"])
-    fig.text(0.985, 0.52, "fraction of the column's processes per decade of MSE", rotation=90, ha="center",
+    fig.text(0.985, 0.52, "fraction per decade", rotation=90, ha="center",
              va="center", fontsize=9)
     save(fig, "dan_grid")
     return out
 
 
 # ------------------------------------------------------------------ what moves the zero-shot error
-SHORT_ARMS = [  # (label, file stem, has 2->4 / 100 TeV reads)
+SHORT_ARMS = [  # (label, file stem, has 2->4 / 100 TeV reads); short runs unless marked
     ("per-process standardization (full run)", "hp58", False),
-    ("one shared standardization (short run)", "B", True),
-    ("$\\hat s$ factor, fixed scale (short run)", "Adim", True),
-    ("$\\hat s$ factor and coupling product (short run)", "A", False),
-    ("dimensionless target (short run)", "Dless", True),
-    ("dimensionless target, pair scale (short run)", "Dpair_seed1", True),
-    ("dimensionless target and inputs (short run)", "DlessIn", True),
-    ("dimensionless target and inputs,\nwithout diagrams (short run)", "DlessInNoDiag", True),
-    ("dimensionless target and inputs,\ncoupling orders (short run)", "DlessInOrd", True),
-    ("emission scales with coupling orders (short run)", "DlessInOrdQ", True),
-    ("emission scales with coupling orders,\ncontext vector (short run)", "DlessInOrdQc", False),
+    ("shared standardization", "B", True),
+    ("$\\hat s$ factor", "Adim", True),
+    ("$\\hat s$ factor + couplings", "A", False),
+    ("dimensionless", "Dless", True),
+    ("dimensionless, pair scale", "Dpair_seed1", True),
+    ("dimensionless + inputs", "DlessIn", True),
+    ("dimensionless + inputs, no diagrams", "DlessInNoDiag", True),
+    ("dimensionless + coupling orders", "DlessInOrd", True),
+    ("emission scales + coupling orders", "DlessInOrdQ", True),
+    ("emission scales + context vector", "DlessInOrdQc", False),
 ]
 
 
@@ -206,9 +206,14 @@ def short_parts(stem, pre="catalog_short"):
     return parts(load(f))
 
 
-def dotplot(name, sets):
+def dotplot(name, sets, order_by=1):
     """One panel per held-out set, one row per run: the median per-process MSE and its level and shape parts."""
     ARMS = [a for a in SHORT_ARMS if any(short_parts(a[1], pre) is not None for _, pre, _ in sets)]
+    _, pre_o, sel_o = sets[order_by]
+    def key(a):
+        p = short_parts(a[1], pre_o)
+        return np.median([p[n][0] for n in p if sel_o(n)]) if p is not None else np.inf
+    ARMS = sorted(ARMS, key=key)
     fig, axes = plt.subplots(1, 2, figsize=(10.4, 5.8), sharey=True)
     fig.subplots_adjust(left=0.30, right=0.99, top=0.83, bottom=0.10, wspace=0.06)
     y = np.arange(len(ARMS))[::-1]
@@ -225,12 +230,12 @@ def dotplot(name, sets):
                 continue
             med = np.median(v, axis=0)
             out[f"{title}|{stem}"] = dict(n=len(v), mse=med[0], level=med[1], shape=med[2])
-            ax.plot([med[1]], [yy + 0.18], "^", color=ps.C.blue, ms=6, label="level part")
-            ax.plot([med[2]], [yy - 0.18], "s", color=ps.C.orange, ms=5.5, label="shape part")
+            ax.plot([med[1]], [yy + 0.18], "^", color=ps.C.blue, ms=6, label="level")
+            ax.plot([med[2]], [yy - 0.18], "s", color=ps.C.orange, ms=5.5, label="shape")
             ax.plot([med[0]], [yy], "o", color="k", ms=7, label="zero-shot MSE")
         ax.set_xscale("log")
         ax.set_title(title, fontsize=11)
-        ax.set_xlabel(r"median over processes of MSE$(\log|\mathcal{M}|^2)$")
+        ax.set_xlabel(r"median MSE$(\log|\mathcal{M}|^2)$")
         ax.grid(True, axis="x", alpha=0.3)
         ax.grid(False, axis="y")
         for yy in y[::2]:
@@ -240,8 +245,8 @@ def dotplot(name, sets):
     axes[0].set_ylim(-0.6, len(ARMS) - 0.4)
     h, l = axes[0].get_legend_handles_labels()
     keep = {lab: hh for hh, lab in zip(h, l)}
-    fig.legend([keep[k] for k in ("zero-shot MSE", "level part", "shape part")],
-               ["zero-shot MSE", "level part: squared mean error", "shape part: variance of the error"],
+    fig.legend([keep[k] for k in ("zero-shot MSE", "level", "shape")],
+               [r"MSE $=\langle\Delta^2\rangle$", r"level $\langle\Delta\rangle^2$", r"shape $\mathrm{Var}(\Delta)$"],
                loc="upper center", ncol=3, bbox_to_anchor=(0.6, 1.0), fontsize=10)
     save(fig, name)
     return out
@@ -249,10 +254,10 @@ def dotplot(name, sets):
 
 def fig_moves():
     a = dotplot("dan_moves_heldout", [("96 relabels", "catalog_short", lambda n: n in TWINS),
-                                      ("43 new processes", "catalog_short", lambda n: n not in TWINS)])
-    b = dotplot("dan_moves_ood", [(r"40 probes, one more particle ($2\to4$)" + "\n" + r"(trained up to $2\to3$)", "catalog_2to4_short", lambda n: True),
-                                  (r"40 training $2\to3$ processes at 100 TeV" + "\n" + "(trained at 13 TeV)", "catalog_2to4E100_short",
-                                   lambda n: True)])
+                                      ("43 new", "catalog_short", lambda n: n not in TWINS)])
+    b = dotplot("dan_moves_ood", [(r"one more particle: 40 $2\to4$" + "\n" + r"(trained up to $2\to3$)", "catalog_2to4_short", lambda n: True),
+                                  (r"40 trained $2\to3$ at 100 TeV" + "\n" + "(trained at 13 TeV)", "catalog_2to4E100_short",
+                                   lambda n: True)], order_by=0)
     return {**a, **b}
 
 
@@ -266,9 +271,9 @@ def fig_why():
     dan_cls = [65, 340, 0, 0]
     v3_cls = [65, 321, 1200, 150]
     x = np.arange(4)
-    ax.bar(x - 0.27, dan_str, 0.27, color="0.75", label="Daniel's catalog, as listed (1491)")
-    ax.bar(x, dan_cls, 0.27, color=ps.C.grey, label="Daniel's catalog, distinct processes (relabels merged)")
-    ax.bar(x + 0.27, v3_cls, 0.27, color=ps.C.blue, label="new catalog, distinct SM processes (relabels merged; heavy-quark,\nBSM, extra $\\alpha_s$ and loop-induced pools not counted)")
+    ax.bar(x - 0.27, dan_str, 0.27, color="0.75", label="Daniel's catalog, as listed")
+    ax.bar(x, dan_cls, 0.27, color=ps.C.grey, label="Daniel's catalog, distinct")
+    ax.bar(x + 0.27, v3_cls, 0.27, color=ps.C.blue, label="new catalog, distinct")
     for xx, v in zip(x, dan_str):
         ax.text(xx - 0.27, v + 15, str(v), ha="center", fontsize=8)
     for xx, v in zip(x, dan_cls):
@@ -280,22 +285,22 @@ def fig_why():
     ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), fontsize=9)
     ax.set_ylim(0, 1400)
     ax.grid(False)
-    ax.set_title(r"Daniel's catalog has no $2\to4$ and no one loop", fontsize=10, pad=62)
+    ax.set_title(r"no $2\to4$, no one loop", fontsize=10, pad=48)
     ax = axes[1]
     labs = ["Daniel's catalog", "new catalog"]
     rel = [96, 0]
     new = [43, 617]
-    ax.barh([1, 0], rel, color="0.75", label="relabel of a training process")
-    ax.barh([1, 0], new, left=rel, color=ps.C.vermillion, label="new: no relabel in training")
+    ax.barh([1, 0], rel, color="0.75", label="relabel of a trained process")
+    ax.barh([1, 0], new, left=rel, color=ps.C.vermillion, label="new")
     ax.text(96 / 2, 1, "96", ha="center", va="center", fontsize=9)
     ax.text(96 + 43 + 8, 1, "43", ha="left", va="center", fontsize=9)
-    ax.text(617 / 2, 0, "617 over 8 axes (the twin run adds 151 on 2 more)", ha="center", va="center", fontsize=8.5, color="w")
+    ax.text(617 / 2, 0, "617", ha="center", va="center", fontsize=8.5, color="w")
     ax.set_yticks([1, 0]); ax.set_yticklabels(labs)
     ax.set_xlabel("held-out processes")
     ax.set_ylim(-0.6, 1.9)
     ax.legend(loc="lower left", bbox_to_anchor=(0, 1.01), fontsize=9)
     ax.grid(False)
-    ax.set_title("96 of his 139 held-out processes are relabels", fontsize=10, pad=40)
+    ax.set_title("96 of 139 held out are relabels", fontsize=10, pad=40)
     save(fig, "why_new_catalog")
 
 
@@ -309,7 +314,7 @@ AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ of new families"), ("H2p5",
 def v3_dots(name, arms, title_l, title_r, right="level", AXES=AXES, legend_title=None):
     R = json.load(open(os.path.join(V3, "short_reads.json")))
     fig, axes = plt.subplots(1, 2, figsize=(10.4, 5.6), sharey=True)
-    fig.subplots_adjust(left=0.25, right=0.99, top=0.74 if len(arms) > 2 else 0.80, bottom=0.10, wspace=0.06)
+    fig.subplots_adjust(left=0.25, right=0.99, top=0.82, bottom=0.10, wspace=0.06)
     y = np.arange(len(AXES))[::-1]
     out = {}
     for ax, key, title in zip(axes, ("mse", right), (title_l, title_r)):
@@ -323,7 +328,7 @@ def v3_dots(name, arms, title_l, title_r, right="level", AXES=AXES, legend_title
                 out[f"{arm}|{h}|{key}"] = r[key]
         ax.set_xscale("log")
         ax.set_title(title, fontsize=11)
-        ax.set_xlabel(r"median over the axis's processes")
+        ax.set_xlabel(r"median over the axis")
         ax.grid(True, axis="x", alpha=0.3); ax.grid(False, axis="y")
         for yy in y[::2]:
             ax.axhspan(yy - 0.5, yy + 0.5, color="0.95", lw=0, zorder=0)
@@ -332,7 +337,7 @@ def v3_dots(name, arms, title_l, title_r, right="level", AXES=AXES, legend_title
     axes[0].set_ylim(-0.6, len(AXES) - 0.4)
     h, l = axes[0].get_legend_handles_labels()
     keep = dict(zip(l, h))
-    fig.legend(list(keep.values()), list(keep.keys()), loc="upper center", ncol=1 if len(keep) > 2 else 2,
+    fig.legend(list(keep.values()), list(keep.keys()), loc="upper center", ncol=2,
                fontsize=9.5, bbox_to_anchor=(0.6, 1.0), title=legend_title, title_fontsize=9.5)
     save(fig, name)
     return out
@@ -340,30 +345,30 @@ def v3_dots(name, arms, title_l, title_r, right="level", AXES=AXES, legend_title
 
 def fig_v3():
     a = v3_dots("v3_zero_shot",
-                [("baseline", "one shared standardization (short run)", ps.C.grey, "o"),
-                 ("dimensionless", "emission scales with coupling orders (short run)", ps.C.blue, "s"),
-                 ("dimensionless_context", "emission scales with coupling orders, context vector (zeros for a new process)", ps.C.green, "D"),
-                 ("dimensionless_twin", "emission scales with coupling orders, twin trained without $\\tau$, $\\nu_\\tau$, quartic vertex", ps.C.orange, "^")],
-                r"zero-shot MSE$(\log|\mathcal{M}|^2)$", "its level part (squared mean error)")
+                [("baseline", "shared standardization", ps.C.grey, "o"),
+                 ("dimensionless", "emission scales + coupling orders", ps.C.blue, "s"),
+                 ("dimensionless_context", "+ context vector", ps.C.green, "D"),
+                 ("dimensionless_twin", "twin without $\\tau$, $\\nu_\\tau$, quartic vertex", ps.C.orange, "^")],
+                r"zero-shot MSE$(\log|\mathcal{M}|^2)$", r"level $\langle\Delta\rangle^2$")
     b = v3_dots("v3_muon",
-                [("muon_search_best_adamw", "AdamW, best of its 8-trial search (not the run on the previous slide)", ps.C.grey, "o"),
-                 ("muon_search_best_muon", "Muon, best of its 8-trial search", ps.C.vermillion, "s")],
-                r"zero-shot MSE$(\log|\mathcal{M}|^2)$", "its level part (squared mean error)",
+                [("muon_search_best_adamw", "AdamW (searched)", ps.C.grey, "o"),
+                 ("muon_search_best_muon", "Muon (searched)", ps.C.vermillion, "s")],
+                r"zero-shot MSE$(\log|\mathcal{M}|^2)$", r"level $\langle\Delta\rangle^2$",
                 AXES=[a for a in AXES if a[0] not in ("H3p", "H4")],
-                legend_title="emission scales with coupling orders, short runs of 4264 steps, seed 42")
+                legend_title=None)
     return {**a, **b}
 
 
 # ------------------------------------------------------------------ fine-tunes on catalog_v3 probes
-PROBES = [("v3_dg_dgwpwm", r"$dg\to dgW^+W^-$, new combination"), ("v3_usx_cxuwpz", r"$u\bar s\to\bar c uW^+Z$, $2\to4$ of a new family"),
-          ("v3_gg_attx", r"$gg\to\gamma t\bar t$, the top"), ("v3_udx_agwp_nlo", r"$u\bar d\to\gamma gW^+$, one loop")]
+PROBES = [("v3_dg_dgwpwm", r"$dg\to dgW^+W^-$"), ("v3_usx_cxuwpz", r"$u\bar s\to\bar c uW^+Z$"),
+          ("v3_gg_attx", r"$gg\to\gamma t\bar t$"), ("v3_udx_agwp_nlo", r"$u\bar d\to\gamma gW^+$, one loop")]
 
 
 def fig_ft():
     M = json.load(open(os.path.join(V3, "muon_ft.json")))
     H = json.load(open(os.path.join(V3, "muon_hp_ft.json")))
     fig, axes = plt.subplots(2, 2, figsize=(9.6, 6.4))
-    fig.subplots_adjust(left=0.09, right=0.99, top=0.80, bottom=0.08, wspace=0.22, hspace=0.42)
+    fig.subplots_adjust(left=0.09, right=0.99, top=0.84, bottom=0.08, wspace=0.22, hspace=0.42)
     Ds = [10, 32, 100, 316]
     tag = {10: "d2", 32: "d3", 100: "d4", 316: "d5"}
     out = {}
@@ -375,12 +380,12 @@ def fig_ft():
         fa = get("catft_parentstats", "dimensionless", "MuonAdamW")
         fm = get("catft_parentstats", "dimensionless_muon", "MuonAdamW")
         tuned = {D: fm[D]["mse_log"] / H["best"]["cell_gain"][f"{p}_{tag[D]}"] for D in Ds}
-        ax.plot(Ds, [sc[D]["mse_log"] for D in Ds], "-o", color=ps.C.grey, label="from scratch (AdamW, the pretraining's HPs)")
-        ax.plot(Ds, [fa[D]["mse_log"] for D in Ds], "-s", color=ps.C.blue, label="fine-tune of the AdamW pretraining (Muon, untuned)")
+        ax.plot(Ds, [sc[D]["mse_log"] for D in Ds], "-o", color=ps.C.grey, label="scratch (AdamW)")
+        ax.plot(Ds, [fa[D]["mse_log"] for D in Ds], "-s", color=ps.C.blue, label="fine-tune, AdamW pretraining")
         ax.plot(Ds, [fm[D]["mse_log"] for D in Ds], "-^", color=ps.C.vermillion,
-                label="fine-tune of the Muon pretraining (Muon, untuned)")
+                label="fine-tune, Muon pretraining")
         ax.plot(Ds, [tuned[D] for D in Ds], "--v", color=ps.C.vermillion, mfc="w",
-                label="fine-tune of the Muon pretraining, HPs of a 12-trial search")
+                label="fine-tune, Muon pretraining, searched HPs")
         ax.axhline(fa[10]["mse_log_step0"], color=ps.C.blue, ls=":", label="zero shot, AdamW pretraining")
         ax.axhline(fm[10]["mse_log_step0"], color=ps.C.vermillion, ls=":", label="zero shot, Muon pretraining")
         out[p] = {D: dict(scratch=sc[D]["mse_log"], ft_adamw=fa[D]["mse_log"], ft_muon=fm[D]["mse_log"],
@@ -393,11 +398,10 @@ def fig_ft():
         ax.set_yticks(tk); ax.set_yticklabels([f"{t:g}" for t in tk]); ax.set_ylim(lo, hi)
         ax.set_title(plab, fontsize=10.5)
         ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
-        ax.set_xlabel("training events of the probe")
+        ax.set_xlabel("training events")
     h, l = axes[0, 0].get_legend_handles_labels()
     fig.legend(h, l, loc="upper center", ncol=2, fontsize=9, bbox_to_anchor=(0.53, 1.0),
-               title="fine tunes keep the parent's standardization (no refit); untuned = the parent's learning rate, no layer decay; one seed per point",
-               title_fontsize=9)
+               )
     save(fig, "v3_finetune")
     return out
 
@@ -450,9 +454,9 @@ def fig_lowd():
 def fig_diagrams_zs():
     from scipy.stats import wilcoxon
     sets = [("96 relabels", "catalog_short", lambda n: n in TWINS, ps.C.blue, "o"),
-            ("40 training processes at 100 TeV", "catalog_2to4E100_short", None, ps.C.green, "s"),
-            ("43 new processes", "catalog_short", lambda n: n not in TWINS, ps.C.vermillion, "D"),
-            (r"40 with one more particle ($2\to4$)", "catalog_2to4_short", None, ps.C.purple, "^")]
+            ("40 trained at 100 TeV", "catalog_2to4E100_short", None, ps.C.green, "s"),
+            ("43 new", "catalog_short", lambda n: n not in TWINS, ps.C.vermillion, "D"),
+            (r"40 with one more particle", "catalog_2to4_short", None, ps.C.purple, "^")]
     fig, ax = plt.subplots(figsize=(6.2, 5.0))
     fig.subplots_adjust(left=0.14, right=0.98, top=0.98, bottom=0.12)
     out = {}
@@ -465,54 +469,80 @@ def fig_diagrams_zs():
         out[lab] = dict(n=len(pp), better=better, med_off=float(np.median(xa)), med_on=float(np.median(yb)),
                         p=float(wilcoxon(np.log(xa / yb)).pvalue))
         ax.plot(xa, yb, mk, color=c, ms=4.5, alpha=0.8, ls="none",
-                label=f"{lab}: better with diagrams on {better} of {len(pp)}")
+                label=f"{lab} ({better} better)")
         lo, hi = min(lo, xa.min(), yb.min()), max(hi, xa.max(), yb.max())
     ax.plot([lo / 2, hi * 2], [lo / 2, hi * 2], "--", color="0.4", lw=1)
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlim(lo / 2, hi * 2); ax.set_ylim(lo / 2, hi * 2)
-    ax.set_xlabel(r"zero-shot MSE$(\log|\mathcal{M}|^2)$, no diagrams")
-    ax.set_ylabel(r"zero-shot MSE$(\log|\mathcal{M}|^2)$, with diagrams")
-    ax.legend(loc="upper left", fontsize=8.5, title="dimensionless target and inputs (short run),\nwith and without diagrams", title_fontsize=8.5)
+    ax.set_xlabel(r"$\mathrm{MSE}_{\rm no\,diagrams}$")
+    ax.set_ylabel(r"$\mathrm{MSE}_{\rm diagrams}$")
+    ax.legend(loc="upper left", fontsize=9)
     save(fig, "diagrams_zero_shot")
     return out
 
 
 def fig_diagrams_ft():
+    """Transfer study, D = 10^4 (32k steps, best of each cell's chosen points): per probe, MSE without diagrams over
+    MSE with them, for our diagram encoder and the encoder of arXiv:2606.23791, both on the 19-process pretraining.
+    Also written to analysis/transfer/figs/diagrams_ft_d1e4.{pdf,png}."""
     sys.path.insert(0, os.path.join(ROOT, "analysis", "transfer"))
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
         from cells import S  # noqa: F401
-        from finale_synth import LAB, P, cell
+        from finale_synth import LAB, P
         from levdiagl import cell32
-    rows = [(4, r"100 events", lambda p: cell("tp3_levdiaglfte", p, 4), lambda p: cell("tp3_r9fte", p, 4), "o", ps.C.blue),
-            (6, r"1000 events", lambda p: cell("tp3_levdiaglfte", p, 6), lambda p: cell("tp3_r9fte", p, 6), "s",
-             ps.C.green),
-            (8, r"10000 events", lambda p: cell32("tp3_levdiaglfte", p, 8), lambda p: cell32("tp3_r9fte", p, 8), "D",
-             ps.C.vermillion)]
-    fig, ax = plt.subplots(figsize=(6.6, 5.6))
-    fig.subplots_adjust(left=0.30, right=0.98, top=0.70, bottom=0.12)
+    arms = [("tp3_levdiagfte", "our encoder", "o", ps.C.blue, -0.12),
+            ("tp3_levdiaglfte", "encoder of arXiv:2606.23791", "s", ps.C.vermillion, 0.12)]
+    fig, ax = plt.subplots(figsize=(6.0, 4.8))
+    fig.subplots_adjust(left=0.30, right=0.98, top=0.88, bottom=0.13)
     out = {}
-    for k, (_, lab, arm, ref, mk, c) in enumerate(rows):
+    for fam, lab, mk, c, off in arms:
         xs, ys = [], []
         for i, p in enumerate(P):
-            a, r = arm(p), ref(p)
+            a, r = cell32(fam, p, 8), cell32("tp3_r9fte", p, 8)
             if a and r:
-                xs.append(r / a); ys.append(i + (k - 1) * 0.22)
+                xs.append(r / a); ys.append(i + off)
         v = np.array(xs)
         out[lab] = dict(n=len(v), median=float(np.median(v)), better=int((v > 1).sum()))
-        ax.plot(xs, ys, mk, color=c, ms=5.5, ls="none",
-                label=f"{lab}: diagrams better on {int((v > 1).sum())} of {len(v)} probes")
+        ax.plot(xs, ys, mk, color=c, ms=6, ls="none", label=f"{lab} ({int((v > 1).sum())} of {len(v)} better)")
     ax.axvline(1, color="0.4", ls="--", lw=1)
     ax.set_xscale("log")
-    ax.set_yticks(range(len(P))); ax.set_yticklabels([LAB[p].replace("1-loop", "one loop") for p in P])
-    ax.invert_yaxis()
-    ax.set_xlabel("MSE without diagrams over MSE with diagrams\n(right of 1: the diagrams help)")
     ax.set_xticks([0.3, 0.5, 1, 2, 3]); ax.set_xticklabels(["0.3", "0.5", "1", "2", "3"])
     ax.xaxis.set_minor_formatter(plt.NullFormatter())
+    ax.set_yticks(range(len(P))); ax.set_yticklabels([LAB[p].replace("1-loop", "one loop") for p in P])
+    ax.invert_yaxis()
+    ax.set_xlabel(r"$\mathrm{MSE}_{\rm no\,diagrams}/\mathrm{MSE}_{\rm diagrams}$, $10^4$ training events")
     ax.grid(False, axis="y")
-    fig.legend(loc="upper center", ncol=1, fontsize=9, bbox_to_anchor=(0.62, 1.0), title="fine tunes of the transfer study's 19-process pretraining (64k steps), with and\nwithout the diagram encoder of Daniel's paper; 100 and 1000 events: best of a\n5-trial search per probe, 10000 events: best of 2 chosen points at 32k steps",
-               title_fontsize=9)
+    fig.legend(loc="upper center", ncol=1, fontsize=9, bbox_to_anchor=(0.62, 1.0))
     save(fig, "diagrams_finetune")
     return out
+
+
+def fig_kshot():
+    """Daniel's catalog, dimensionless + coupling orders: median MSE after one offset per process fitted on K of its
+    events (kshot_level.py), against K; dashed: the shape part, what any offset leaves."""
+    d = json.load(open(os.path.join(DAN, "data", "kshot_level.json")))
+    KS = np.array([0, 1, 2, 4, 8, 16, 32, 64])
+    sets = [("2to4 +g|DlessInOrd", r"$2\to4$, one more gluon", ps.C.purple),
+            ("2to4 +a|DlessInOrd", r"$2\to4$, one more photon", ps.C.sky),
+            ("top, never seen|DlessInOrd", "top never trained", ps.C.green),
+            ("loop one-loop|DlessInOrd", "one loop", ps.C.orange),
+            ("43 new|DlessInOrd", "43 new", ps.C.vermillion)]
+    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    fig.subplots_adjust(left=0.13, right=0.70, top=0.97, bottom=0.14)
+    for k, lab, c in sets:
+        r = d[k]
+        ax.plot(KS + 1, r["offset"], "-o", color=c, ms=4, label=lab)
+        ax.axhline(r["shape"], color=c, ls="--", lw=1)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xticks(KS + 1); ax.set_xticklabels([str(k) for k in KS])
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
+    ax.set_yticks([0.3, 1, 3, 10, 30]); ax.set_yticklabels(["0.3", "1", "3", "10", "30"])
+    ax.yaxis.set_minor_formatter(plt.NullFormatter())
+    ax.set_xlabel(r"$K$, events of the process fitting its offset")
+    ax.set_ylabel(r"median MSE$(\log|\mathcal{M}|^2)$")
+    ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), fontsize=9)
+    ax.text(1.04, 0.25, r"dashed: $\mathrm{Var}(\Delta)$", transform=ax.transAxes, fontsize=9, va="top")
+    save(fig, "kshot_level")
 
 
 if __name__ == "__main__":
@@ -523,9 +553,8 @@ if __name__ == "__main__":
     fig_why()
     res["v3"] = fig_v3()
     res["ft"] = fig_ft()
-    fig_lowd()
     res["diag_zs"] = fig_diagrams_zs()
-    res["diag_ft"] = fig_diagrams_ft()
+    fig_kshot()
     json.dump(res, open(os.path.join(HERE, "data", "deck_numbers.json"), "w"), indent=1, default=float)
     for k, v in res.items():
         print(k, json.dumps(v, default=float)[:1500])

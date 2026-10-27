@@ -14,7 +14,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{xcolor}
 
-\graphicspath{{figs/}}
+\graphicspath{{figs/}{../../analysis/transfer/figs/}}
 
 \definecolor{navy}{RGB}{38,38,110}
 
@@ -44,57 +44,77 @@
 \end{frame}
 
 %---------------------------------------------------------------- Daniel's catalog
-\begin{frame}{Daniel's catalog and what is measured}
+\begin{frame}{Daniel's catalog}
   \vfill
   \begin{minipage}{0.97\textwidth}
-    \footnotesize
-    \begin{itemize}\setlength{\itemsep}{0.15em}
-        \item Daniel's 1491 processes, $2\to2$ and $2\to3$ with proton partons at 13 TeV collider energy, his generator settings, our own events
-        \item His split, 1352 training and 139 held out. Interpolation, 96 held-out processes that are a relabel of a training process (swap of massless quarks of equal charge, of $e$ and $\mu$, or charge conjugation). Extrapolation, the 43 with no relabel in training
-        \item Every number in this deck is the per-process MSE of $\log|\mathcal M|^2$ (natural log) on 2000 events of that process, with nothing fitted on the held-out process, no rescale and no shift
-        \item Level part, the squared mean error, which one number per process would remove. Shape part, the variance of the error. Per process the two add up to the MSE; the plots show the median of each part over processes, and medians do not add up
-        \item Full run, $10^5$ events per process and 32k steps. Short run, $10^4$ events per process and about 4k steps, otherwise the same. One seed each
+    \small
+    \begin{itemize}\setlength{\itemsep}{0.6em}
+      \item 1491 processes, $2\to2$ and $2\to3$, $pp$ partons at 13 TeV
+      \item 1352 trained. Held out, 96 relabels of a trained process (interpolation) and 43 new (extrapolation)
+      \item $\Delta=\log|\mathcal M|^2_{\rm pred}-\log|\mathcal M|^2$ on 2000 events per process, nothing fitted
+      \item $\mathrm{MSE}=\langle\Delta^2\rangle=\langle\Delta\rangle^2+\mathrm{Var}(\Delta)$, level plus shape
+      \item Full run $10^5$ events per process, 32k steps. Short run $10^4$, 4k steps. One seed
     \end{itemize}
   \end{minipage}
   \vfill
 \end{frame}
 
-\begin{frame}{What the network is trained to output}
-  \vfill
-  \begin{minipage}{0.97\textwidth}
-    \footnotesize
-    \begin{itemize}\setlength{\itemsep}{0.15em}
-        \item \textbf{Per-process standardization}, $\log|\mathcal M|^2$ minus the process's own mean over its own spread. A new process has neither, so both are predicted from the process by a small fit to the training processes
-        \item \textbf{One shared standardization}, one mean and one spread for all processes. The network learns each process's level itself
-        \item \textbf{$\hat s$ factor, fixed scale}, $|\mathcal M|^2$ times $(\hat s\,\Lambda^{-2})^{N-4}$ with one fixed scale $\Lambda$, its mass dimension for $N$ particles. \textbf{$\hat s$ factor and coupling product}, also divided by the couplings of the leading diagram
-        \item \textbf{Dimensionless target}, $|\mathcal M|^2\,\hat s^{\,N-4}$, no units and no fitted scale. \textbf{Pair scale}, the event's pair invariants in place of $\hat s$. \textbf{Dimensionless target and inputs}, also momenta divided by $\sqrt{\hat s}$
-        \item \textbf{Coupling orders}, also divided by $(4\pi\alpha_s)^q(4\pi\alpha)^e$ with $q$, $e$ the process's QCD and QED orders
-        \item \textbf{Emission scales with coupling orders}, dimensionless target and inputs with coupling orders, where each particle beyond $2\to2$ brings its own soft or collinear scale in place of $\hat s$
-        \item \textbf{Context vector}, 16 learned numbers per training process. A new process gets zeros, so zero shot runs without it; it is meant to be fitted on a few labelled events
-        \item \textbf{Diagrams}, the Feynman diagram encoder of Daniel's paper. On in every run unless a label says without diagrams
-    \end{itemize}
-  \end{minipage}
-  \vfill
-\end{frame}
-
-\begin{frame}{Zero shot per held-out process, in the draft's form}
+\begin{frame}{Zero shot per held-out process}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_per_process.pdf}
 \end{frame}
 
-\begin{frame}{Zero shot on Daniel's catalog, in the draft's form}
+\begin{frame}{Zero shot on Daniel's catalog}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_grid.pdf}
 \end{frame}
 
-\begin{frame}{What moves the zero-shot error, relabels and new processes}
+\begin{frame}{Per-process statistics cannot zero shot}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \small
+    \begin{itemize}\setlength{\itemsep}{0.6em}
+      \item $y=(\log|\mathcal M|^2-\mu_p)/\sigma_p$, with $\mu_p$, $\sigma_p$ from the process's own events
+      \item $\mu_p$, $\sigma_p$ move with how the events were drawn, sampling, $\sqrt{\hat s}$ window, cuts
+      \item A held-out process has none. Predicted from the process, $\mathrm{MSE}=1.27$ on the 43 new, $0.46$ with its true $\mu_p$, $\sigma_p$
+      \item Needed, a target and inputs that depend on neither
+    \end{itemize}
+  \end{minipage}
+  \vfill
+\end{frame}
+
+\begin{frame}{Targets, inputs and conditioning}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \footnotesize
+    \begin{itemize}\setlength{\itemsep}{0.35em}
+      \item Shared standardization, $y=(T-\mu)/\sigma$ with one $\mu$, $\sigma$ for all processes, on every $T$ below
+      \item $\hat s$ factor, $T=\log\big[|\mathcal M|^2(\hat s/\Lambda_0^2)^{N-4}\big]$, $\Lambda_0^2=289$ GeV$^2$ fitted on the trained processes
+      \item $+$ couplings, $|\mathcal M|^2/C_p$, $C_p=\max_{\rm diagrams}\prod_{\rm vertices}(c_v)^2$ (SM couplings, $v$ for dimensionful ones)
+      \item Dimensionless, $|\mathcal M|^2\Lambda^{2(N-4)}$, $\Lambda^2=\hat s$. Pair scale, $\log\Lambda^2=\langle\log|2p_i\cdot p_j|\rangle_{i<j}$
+      \item $+$ inputs, $p_i/\sqrt{\hat s}$ and $\log_{10}(m_i/\sqrt{\hat s})$, no other input in GeV
+      \item $+$ coupling orders, $|\mathcal M|^2/\big[(4\pi\alpha_s)^{q}(4\pi\alpha)^{e}\big]$, $q$, $e$ the QCD and QED orders
+      \item Emission scales, $\Lambda^{2(N-4)}\to\prod_{k=1}^{N-4}q_k^2$, $q_k^2=\min_{a,b}\frac{s_{ak}s_{bk}}{s_{ab}}+(m_k)^2$, softest particle removed first
+      \item Diagrams, the graph encoder of arXiv:2606.23791 over the tree diagrams
+      \item Context vector, $c_p\in\mathbb R^{16}$ per trained process added to each particle's encoding, $c_p=0$ on half the events; a new process takes $c=0$, or $c$ fitted on $K$ of its events with the network frozen
+    \end{itemize}
+  \end{minipage}
+  \vfill
+\end{frame}
+
+\begin{frame}{Level and shape of the zero-shot error}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_moves_heldout.pdf}
 \end{frame}
 
-\begin{frame}{What moves the zero-shot error, beyond the trained range}
+\begin{frame}{Level and shape beyond the trained range}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{dan_moves_ood.pdf}
+\end{frame}
+
+\begin{frame}{A few events of the process remove the level}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{kshot_level.pdf}
 \end{frame}
 
 %---------------------------------------------------------------- new catalog
@@ -106,44 +126,38 @@
 \begin{frame}{The new catalog}
   \vfill
   \begin{minipage}{0.97\textwidth}
-    \scriptsize
-    \begin{itemize}\setlength{\itemsep}{0.15em}
-        \item One process per class of processes equal up to relabelling, checked numerically on $|\mathcal M|^2$, so no held-out process is a relabel of a training one
-        \item Trees at $2\to2$, $2\to3$, $2\to4$ on every beam ($e^+e^-$, quark pairs, quark and gluon, two gluons), one-loop QCD virtuals, loop-induced processes, two $\alpha_s$ values, a heavy quark with the top's quantum numbers at 50, 300, 600 GeV, a $Z'$ and a two-Higgs-doublet model
-        \item Held out, each process with its whole class
-        \begin{itemize}\setlength{\itemsep}{0.05em}
-          \item New combinations, about 5\% of the classes, every particle, multiplicity and order of which is seen in training
-          \item Higher multiplicity, the $2\to4$ processes of families whose $2\to4$ is never trained, and $2\to5$ probes
-          \item Particle content, every process with a physical top. In a twin run trained without them, every process with a $\tau$ or $\nu_\tau$, and every process with a quartic gauge vertex
-          \item One loop, one-loop processes held out while their trees train
-          \item $\alpha_s=0.13$, trained at 0.09 and 0.15
-          \item Outside the trained kinematics, training processes at $\sqrt{\hat s}$ from 1 to 10 TeV (trained from threshold up to 1 TeV), and at $p_T\geq30$ GeV (trained at 10)
-        \end{itemize}
-        \item Short runs, 4264 steps over 1397 training pools, one seed each, read on 2000 events per held-out process. The main run is emission scales with coupling orders; the fine tunes start from it
+    \small
+    \begin{itemize}\setlength{\itemsep}{0.3em}
+      \item One process per relabelling class, trees to $2\to4$, one loop, heavy quarks, $Z'$, two Higgs doublets
+      \item Held out, each with its whole class
+      \begin{itemize}
+        \item New combinations of trained particles
+        \item $2\to4$ of new families, and $2\to5$
+        \item The top (heavy quarks 50 to 600 GeV trained); $\tau$, $\nu_\tau$, quartic vertex (twin run)
+        \item One loop, trees trained
+        \item $\alpha_s=0.13$ (0.09, 0.15 trained)
+        \item $p_T\geq30$ GeV and $\sqrt{\hat s}$ 1 to 10 TeV (10 GeV, up to 1 TeV trained)
+      \end{itemize}
+      \item Short runs, 4264 steps, one seed
     \end{itemize}
   \end{minipage}
   \vfill
 \end{frame}
 
-\begin{frame}{Zero shot on the new catalog, per held-out axis}
+\begin{frame}{Zero shot on the new catalog}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{v3_zero_shot.pdf}
 \end{frame}
 
 %---------------------------------------------------------------- transfer
-\begin{frame}{Muon against AdamW, zero shot on the new catalog}
+\begin{frame}{Muon against AdamW, zero shot}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{v3_muon.pdf}
 \end{frame}
 
-\begin{frame}{Fine tuning held-out processes from few events}
+\begin{frame}{Fine tuning from few events, parent's standardization}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{v3_finetune.pdf}
-\end{frame}
-
-\begin{frame}{Gentler fine tunes, inside the default's spread}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{lowd_methods.pdf}
 \end{frame}
 
 %---------------------------------------------------------------- diagrams
@@ -152,9 +166,9 @@
   \includegraphics[width=\textwidth,height=0.76\textheight,keepaspectratio]{diagrams_zero_shot.pdf}
 \end{frame}
 
-\begin{frame}{Feynman diagrams, fine tuning the 12 transfer study probes}
+\begin{frame}{Feynman diagrams, fine tuning}
   \centering
-  \includegraphics[width=\textwidth,height=0.76\textheight,keepaspectratio]{diagrams_finetune.pdf}
+  \includegraphics[width=\textwidth,height=0.76\textheight,keepaspectratio]{diagrams_on_off_d4.pdf}
 \end{frame}
 
 \end{document}
