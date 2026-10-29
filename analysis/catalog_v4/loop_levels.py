@@ -278,6 +278,8 @@ def analyse_trees():
                   "median_nearest_in_sd"):
             flat[f"{a}.{k}"] = None if S[k] is None else round(S[k], 3)
         flat[f"{a}.level_check_maxabs"] = round(S["level_check_maxabs"], 3)
+        for n in big:
+            flat[f"{a}.match_n.{n}"] = R[n]["n_match"]
     flat["n_train"], flat["train_level_sd"] = s["n_train"], round(s["train_level_sd"], 2)
     json.dump({"summary": s, "heldout": res, "train": {m: {"level": T[m][0], **P[m]} for m in T},
                "train_missing": miss_tr}, open(os.path.join(HERE, "data", "tree_levels.json"), "w"), indent=1)
