@@ -11691,6 +11691,96 @@ recorded validation MSE$(\log|\mathcal M|^2)$.}
 \label{fig:tf32_eval}
 \end{figure}
 
+\subsection{How often the code review finds a blocking error}\label{sec:review-rates}
+
+% src: python3 analysis/review_rates/review_rates.py @7fc6ce6a
+% claim: n_runs=138
+% claim: n_episodes=106
+% claim: fired_lines=62
+% claim: fired_both=2
+% claim: fired_neither=44
+% claim: ep_blocking=79
+% claim: n_find=278
+% claim: n_scope=24
+% claim: all_klines=953
+% claim: configs_klines=885
+% claim: n_configs=17
+% claim: hand_klines=67.6
+% claim: n_hand=261
+% claim: commits_hand=1044
+% claim: per_commit=0.25
+% claim: n_pre=17
+% claim: n_outside=10
+% claim: median_hand=413
+% allow: 600 30 because they are the review hook's thresholds, settings
+The code reviewer is asked for once its backlog passes 600 changed lines or 30 commits in the code paths of
+\code{review\_backlog.sh}. To set that threshold from what the reviews found rather than by guess, every review run so
+far was read back from the session transcripts: 138 reviewer runs, grouped into 106 reviews by the watermark moves
+that close them (a re-check after fixes and two reviewers of one backlog are one review). Each blocking finding was
+taken from the reviewer's report and counted once when a later run re-reported it; a scope finding (a design choice no
+decision of the user's covers) counts with the defects, 24 of the 278 findings. Left out:
+17 findings in code the backlog did not change, and 10 in files outside the code paths. The trigger was the line count in 62
+reviews (2 of them also past 30 commits), never the commit count alone, and 44 reviews started below both thresholds by a
+count rebuilt from the committed history (asked for after a change, or run next to another review); where the
+hook printed its own backlog (three reviews) the commit counts agree and the line counts are within a factor of two. 79 of the 106 reviews found at least one blocking error.
+The line count is a poor measure of work: of the 953 thousand changed lines, 885 thousand are sweep configs and recipe
+files written in bulk by generators, with 17 findings. The other 67.6 thousand hand-written lines carry 261 findings,
+and the median review covered 413 of them. Per commit of hand-written code it is 0.25 findings, over 1044 commits.
+
+% src: python3 analysis/review_rates/review_rates.py @7fc6ce6a
+% claim: rate=3.86
+% claim: rate_lo=3.26
+% claim: rate_hi=4.49
+% claim: rate_p_lo=3.62
+% claim: rate_p_hi=4.11
+% claim: exp600=2.32
+% claim: exp1500=5.79
+% claim: analysis_rate=2.8
+% claim: analysis_lo=2.31
+% claim: analysis_hi=3.35
+% claim: jobs_rate=6.06
+% claim: jobs_lo=5.09
+% claim: jobs_hi=7.08
+% claim: generation_rate=4.01
+% claim: generation_lo=3.06
+% claim: generation_hi=5.43
+% claim: training_rate=4.03
+% claim: training_lo=2.83
+% claim: training_hi=5.61
+% claim: tooling_rate=5.3
+% claim: tooling_lo=1.7
+% claim: tooling_hi=10.84
+% claim: tooling_n=43
+% claim: tooling_top_review=29
+% claim: new_rate=3.07
+% claim: new_lo=2.36
+% claim: new_hi=3.85
+% claim: edit_rate=5.67
+% claim: edit_lo=4.83
+% claim: edit_hi=6.6
+% allow: 68 because it is the coverage of the interval, a setting
+% allow: 600 1500 because they are the backlog sizes being compared, settings
+Per thousand hand-written lines the reviewer finds $3.86$ blocking errors, $68\%$ interval $[3.26,4.49]$ from
+resampling reviews; findings cluster within a review, so the Poisson interval per line, $[3.62,4.11]$, is too
+narrow. A backlog of 600 hand-written lines waits with $2.32$ errors on average, one of 1500 with $5.79$
+(Fig.~\ref{fig:review_rates}). The areas separate only in part: analysis scripts carry $2.8$ per thousand lines
+($[2.31,3.35]$), below job and sweep scripts, $6.06$ ($[5.09,7.08]$); every other pair overlaps: data generation
+$4.01$ ($[3.06,5.43]$), training code $4.03$ ($[2.83,5.61]$), and hooks and plan tooling, $5.3$ ($[1.7,10.84]$: 29 of its
+43 findings come from the one review of the plan tool's redesign). Edits of existing files are more error-prone than new files, $5.67$
+($[4.83,6.6]$) against $3.07$ ($[2.36,3.85]$) per thousand lines, disjoint. The findings were classified by hand from
+the reports (the table in the script), which no second reader has checked.
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/review_rates/figs/review_rates_by_area.pdf}
+% allow: 68 because it is the coverage of the interval, a setting
+\caption{Blocking findings of the code reviewer per thousand hand-written changed lines, by the area of the file, with
+$68\%$ Poisson intervals; dashed: all hand-written code. hooks: \code{.claude/}, plan tooling and its tests; analysis:
+\code{analysis/} and the scoring tools; train: the training code; jobs: \code{scripts/}, \code{sweep/} code; gen:
+\code{mg5\_pipeline\_final.py}, recipe generators and the pool tools.}
+\label{fig:review_rates}
+\end{figure}
+
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
 % ==========================================================================
