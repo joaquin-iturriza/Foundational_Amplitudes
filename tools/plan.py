@@ -859,8 +859,6 @@ def step_problem(st, eid, s):
         return "no subagent %s in this project's transcripts" % s.get("agent")
     if abs((r[0] - parse(s.get("at"))).total_seconds()) > 1:
         return "recorded at %s, but subagent %s started %s" % (s.get("at"), s["agent"], r[0].isoformat())
-    if not names_entry(r[1], eid):
-        return "subagent %s was not started with %s's step prompt (no \"Entry: %s\" line)" % (s["agent"], eid, eid)
     uses = [k for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == s["agent"]]
     if len(uses) > 1:
         return "subagent %s is recorded as %d steps (%s)" % (s["agent"], len(uses), ", ".join(uses))
@@ -993,6 +991,26 @@ def open_question(e):
     return bool(e.get("ask") and e.get("waiting_since") and e.get("status") in ("running", "waiting_user"))
 
 
+def blocked_steps(e):
+    """The next steps the entry's open question holds: `blocks_steps` (plan ask --blocks-steps) when recorded, else the
+    step numbers the `blocks` text names ("step 1", "steps 1, 6 and 7", "step 4's ..."), else the steps whose text the
+    `blocks` text overlaps. A held step waits on the user: plan next and the stop check note it, never demand it (the
+    user, 2026-10-29: "if it's not possible to do in any way, then it shouldn't be a hook, or at least not a hook that
+    prevents the end of the turn")."""
+    if not open_question(e):
+        return set()
+    keys = set(step_keys(e))
+    if e.get("blocks_steps"):
+        return keys & {int(x) for x in e["blocks_steps"]}
+    b = e.get("blocks") or ""
+    nums = set()
+    for m in re.finditer(r"(?i)\bsteps?\s+(\d+(?:(?:\s*,\s*|\s*,?\s+and\s+|\s*&\s*)\d+)*)", b):
+        nums |= {int(x) for x in re.findall(r"\d+", m.group(1))}
+    if nums:
+        return keys & nums
+    return {k for k in keys if b and overlap(step_text(e, k), b)}
+
+
 def oldest_open(d, st=None):
     """The earliest time the transcripts are read from: the oldest OPEN question (less the margin) or the end of the
     previous re-ask scan, whichever is earlier."""
@@ -1027,12 +1045,20 @@ def next_steps_keyed(d, st, t=None, msgs=None):
             out.append((e, "design to review: the design recorded %s has no verdict%s; launch the design reviewer" % (
                 (last_design(e).get("at") or "")[:16], why), launched, None))
             continue
+        held = blocked_steps(e) if e.get("status") == "running" else set()
         for k in step_keys(e) if e.get("status") == "running" else [None]:
             r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
+            if r and k in held:
+                note("%s step %d waits on the open question to the user (blocks: %s); not listed until it is answered"
+                     % (e["id"], k, e.get("blocks_steps") or e.get("blocks")))
+                continue
             if r:
                 reason, since = r
                 ls = last_step(st, e["id"], e, k) if k is not None else None
-                launched = e.get("status") == "running" and ls is not None and since is not None and ls >= since
+                # a step agent still working on the step is its launch, whenever it started (one started before the
+                # reason arose cannot be launched again: the demand would be unsatisfiable)
+                launched = e.get("status") == "running" and (
+                    (ls is not None and since is not None and ls >= since) or bool(working_steps(st, e["id"], t, e, k)))
                 out.append((e, reason, launched, k if len(nexts(e)) > 1 else None))
     return out
 
@@ -1723,7 +1749,7 @@ def cmd_answer(a):
             for x in e.get("asks") or []:
                 x.setdefault("answered_at", after[0].isoformat())
                 x.setdefault("decision", did)
-            for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "holds_all"):
+            for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "blocks_steps", "holds_all"):
                 e.pop(k, None)
     print("plan: %s recorded as %s; entry %s now %s" % (a.kind, did, e["id"], e["status"]))
 
@@ -1766,7 +1792,7 @@ def cmd_withdraw(a):
         rec.update(answered_at=t, decision=a.decision, withdrawn_at=t, withdrawn_why=a.why)
         if e.get("status") == "waiting_user":
             e["status"] = "running"
-        for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "holds_all"):
+        for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "blocks_steps", "holds_all"):
             e.pop(k, None)
         for k, v in sets.items():
             e[k] = v
@@ -1790,7 +1816,13 @@ def cmd_ask(a):
     froze the entry's independent work for 8 h.)"""
     _ask_ok(a.ask)
     _searched_ok(a.searched)
-    if a.holds_all is not None and a.blocks:
+    bsteps = None
+    if a.blocks_steps:
+        try:
+            bsteps = sorted({int(x) for x in re.split(r"[,\s]+", a.blocks_steps.strip()) if x})
+        except ValueError:
+            sys.exit("plan: --blocks-steps takes step numbers, e.g. 1,6,7")
+    if a.holds_all is not None and (a.blocks or bsteps):
         sys.exit("plan: --blocks names the part that waits; --holds-all makes everything wait: pass one")
     if a.holds_all is not None and len(a.holds_all.strip()) < HOLDS_ALL_MIN:
         sys.exit("plan: --holds-all must say why nothing else in the entry can move without the answer, in at least "
@@ -1805,8 +1837,11 @@ def cmd_ask(a):
             sys.exit("plan: already answered: %r on %s, %s (%s); act on that answer" % (
                 x["ask"], o["id"], x["answered_at"][:16], x.get("decision")))
         t = now().isoformat()
-        for k in ("checked_until", "blocks", "holds_all"):
+        for k in ("checked_until", "blocks", "blocks_steps", "holds_all"):
             e.pop(k, None)
+        if bsteps and set(bsteps) - set(step_keys(e)):
+            sys.exit("plan: %s has no next step %s (it has %s)" % (a.id, ", ".join(
+                str(k) for k in sorted(set(bsteps) - set(step_keys(e)))), ", ".join(str(k) for k in step_keys(e))))
         e.update(ask=a.ask, waiting_since=t, searched=a.searched)
         rec = {"ask": a.ask, "at": t, "searched": a.searched}
         if a.holds_all is not None:
@@ -1816,6 +1851,8 @@ def cmd_ask(a):
             e["status"] = "running"
             if a.blocks:
                 e["blocks"] = rec["blocks"] = a.blocks
+            if bsteps:
+                e["blocks_steps"] = rec["blocks_steps"] = bsteps
         e.setdefault("asks", []).append(rec)
     if e["status"] == "waiting_user":
         print("plan: %s waits on the user from %s (everything: %s)" % (a.id, t, a.holds_all))
@@ -1834,7 +1871,11 @@ def cmd_unanswered(a):
 
 
 def cmd_step(a):
-    """A step agent (a real subagent, its id) was launched for a running entry after the entry's reason arose."""
+    """Record a step agent (a real subagent, its id) of a running entry. Any agent that runs or ran on the step is
+    recorded, whatever its start time and prompt: an odd one gets a note, never a refusal (the user, 2026-10-29: "if
+    it's not possible to do in any way, then it shouldn't be a hook, or at least not a hook that prevents the end of
+    the turn"; a refusal here left the stop check demanding a launch that had already happened)."""
+    notes = []
     with transaction() as (d, st):
         e = entry(d, a.id)
         if e.get("status") != "running":
@@ -1844,13 +1885,6 @@ def cmd_step(a):
         if rec is None:
             sys.exit("plan: no subagent %s in this project's transcripts" % a.agent)
         started, prompt = rec
-        if not names_entry(prompt, a.id) or (prompt or "").startswith(REVIEW_HEAD):
-            sys.exit("plan: subagent %s was not started with %s's step prompt (plan next --prompts; its \"Entry: %s\" "
-                     "line)" % (a.agent, a.id, a.id))
-        used = [k for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == a.agent]
-        if used:
-            sys.exit("plan: subagent %s is already recorded as a step of %s; one subagent is one step" % (
-                a.agent, ", ".join(used)))
         key = a.next
         if key is None:
             if len(nexts(e)) > 1:
@@ -1859,16 +1893,29 @@ def cmd_step(a):
             key = step_keys(e)[0]
         elif key not in step_keys(e):
             sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, key, ", ".join(str(k) for k in step_keys(e))))
+        used = [(k, x) for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == a.agent]
+        if used:
+            print("plan: note: subagent %s is already recorded (%s); nothing to add" % (a.agent, ", ".join(
+                "%s step %s" % (k, x.get("next")) for k, x in used)))
+            return
+        if not names_entry(prompt, a.id) or (prompt or "").startswith(REVIEW_HEAD):
+            notes.append("subagent %s was not started with %s's step prompt (no \"Entry: %s\" line)" % (
+                a.agent, a.id, a.id))
         m = re.search(r"(?m)^Your step \(number (\d+)", prompt or "")
         if m and int(m.group(1)) != key:
-            sys.exit("plan: subagent %s was started with the prompt of step %s, not %d" % (a.agent, m.group(1), key))
+            notes.append("subagent %s was started with the prompt of step %s, recorded on step %d" % (
+                a.agent, m.group(1), key))
         r = why_moves(e, st, [], now(), d, key=key)
         since = r[1] if r else None
         if since and started < since:
-            sys.exit("plan: subagent %s started %s, before the reason arose (%s)" % (
+            notes.append("subagent %s started %s, before the reason arose (%s); it counts while it works" % (
                 a.agent, started.isoformat()[:16], since.isoformat()[:16]))
-        st.setdefault(a.id, {}).setdefault("steps", []).append({"agent": a.agent, "at": started.isoformat(),
-                                                               "reason": r[0] if r else "", "next": key})
+        x = {"agent": a.agent, "at": started.isoformat(), "reason": r[0] if r else "", "next": key}
+        if notes:
+            x["note"] = "; ".join(notes)
+        st.setdefault(a.id, {}).setdefault("steps", []).append(x)
+    for n in notes:
+        print("plan: note: " + n)
     print("plan: step %d on %s recorded (%s, started %s)" % (key, a.id, a.agent, started.isoformat()[:16]))
 
 
@@ -2242,6 +2289,8 @@ def main(argv=None):
         A("--searched", required=True, help="what was read before asking (CLAUDE.md rules, site decisions) and why "
           "none settles it"),
         A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
+        A("--blocks-steps", metavar="N,N", help="the next steps (numbers) the answer holds; parsed from --blocks "
+          "(\"steps 1, 6 and 7\") when not given"),
         A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
     cmd("design", cmd_design, "record the design of the entry's next job (needed, and passed by the design reviewer, "
         "before any submission)", ID,

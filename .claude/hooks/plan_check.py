@@ -4,7 +4,11 @@ ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cann
   - `plan next` lists a step not launched for a running entry (each of its independent next steps counted on its
     own): a run of it ended, or it has nothing in flight, or
     its latest design has had no verdict for 30 min with its step agent gone (the fallback: the step agent runs
-    the design reviewer itself);
+    the design reviewer itself). Never demanded, a note for plan next: a step whose recorded step agent is still
+    working (whenever it started), and a step the entry's open question holds (plan ask --blocks-steps, or the step
+    numbers its --blocks text names). A refusal is only for what the turn can do (the user, 2026-10-29: "if it's not
+    possible to do in any way, then it shouldn't be a hook, or at least not a hook that prevents the end of the
+    turn");
   - never blocking: the user wrote after a question an entry waits on. Whether it answers is the main session's call
     through `plan next`, which lists it on every wake until plan answer or plan unanswered: a block put a non-answer on
     the user's screen at every message (the user, 2026-10-26: "Me not answering a question from you it's not you not
@@ -20,7 +24,7 @@ ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cann
   - numbers committed to docs/results.tex on trunk since the last verified commit fail tools/verify_claims.py (the
     gate on the numbers, a check of state; the git hooks only catch a problem earlier);
   - a site event is open;
-  - every live entry waits on the user (waiting_user with holds_all, or running with an open question whose `blocks`
+  - never blocking, a note: every live entry waits on the user (waiting_user with holds_all, or running with an open question whose `blocks`
     names every next step) while no `site supervise` process for FA runs (/proc, as the turn ends): nothing would
     move until the user came back (2026-10-29, 7 hours idle after the supervisor was stopped);
   - a sweep on a site, live or just submitted, that no entry records and that fits several running entries (one that
@@ -78,9 +82,9 @@ def waits_on_user(e):
     import plan
     if e.get("status") == "waiting_user":
         return True
-    if e.get("status") != "running" or not plan.open_question(e) or not e.get("blocks"):
+    if e.get("status") != "running" or not plan.open_question(e) or not (e.get("blocks") or e.get("blocks_steps")):
         return False
-    return all(plan.overlap(plan.step_text(e, k), e["blocks"]) for k in plan.step_keys(e))
+    return set(plan.step_keys(e)) <= plan.blocked_steps(e)
 
 
 def problems():
@@ -137,8 +141,10 @@ def problems():
         plan.NOTES.append("%s is marked done but %s: plan reopen %s --why ..., or fix it (see plan next)" % (
             e["id"], why, e["id"]))
     live = [e for e in d["entries"] if e.get("status") in ("running", "waiting_user")]
+    # Everything waits on the user: no turn can move it, and restarting the watch is not the turn's to do (it can go
+    # against the user's stop, 2026-10-29). A note for plan next, never a refusal.
     if live and all(waits_on_user(e) for e in live) and not supervisor_running():
-        out.append("every live entry waits on the user (%s) and `site supervise` is not running: nothing moves until "
+        plan.NOTES.append("every live entry waits on the user (%s) and `site supervise` is not running: nothing moves until "
                    "they answer. Start it in the background (`site supervise --project FA`), and take what does not "
                    "need the answer: a question a decision in force settles is withdrawn (plan withdraw), a part that "
                    "can move is a next step of its own (plan add-next)" % ", ".join(e["id"] for e in live))
@@ -175,19 +181,7 @@ def main():
     if bad:
         if plan.NOTES:                            # notes go to plan next, never to the user's screen with a block
             plan._set_state("_stop_notes", list(plan.NOTES))
-        # A refusal identical to the previous one, within 30 min, passes: nothing the main session did in between
-        # cleared it, so blocking again only re-pastes it (2026-10-29: the same ~15k-token refusal, 89 events of one
-        # disk-full batch and steps waiting on the user's disk call, returned some twenty times). Long run lists are
-        # cut to a count so a refusal stays short.
-        import hashlib, json, re, time
-        key = hashlib.sha1("\n".join(bad).encode()).hexdigest()
-        try:
-            last = json.load(open(plan.STATE_FILE)).get("_last_block") or {}
-        except Exception:
-            last = {}
-        if last.get("key") == key and time.time() - last.get("t", 0) < 1800:
-            return 0
-        plan._set_state("_last_block", {"key": key, "t": time.time()})
+        import re
         def short(b):
             m = re.search(r"runs ended: ((?:FA-\S+, )+FA-\S+?);", b)
             if m and m.group(1).count(",") >= 3:

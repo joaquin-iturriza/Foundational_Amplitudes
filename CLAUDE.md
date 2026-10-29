@@ -723,7 +723,8 @@ in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
 per-task shell variable — because HP search goes through DyHPO (allowlist
 `.claude/hpo_grid_allowlist.txt`). Arrays over **non-HP** axes (loss type, data
 tag, warm-start ckpt, ablation flags, seeds) stay allowed.
-Every `Stop` hook runs through `.claude/hooks/stop_once.py`: when the turn is already continuing after a Stop refusal, all pass, so none refuses twice in a row.
+A `Stop` hook refuses a turn's end only for what the turn itself can do; what waits on the outside (a running agent, a job, a
+cluster's state, my answer) goes in the reply, never in a refusal.
 
 ### Batched pillar review (`review_backlog.sh` + three reviewer subagents)
 
