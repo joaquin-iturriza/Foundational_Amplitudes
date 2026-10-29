@@ -37,9 +37,10 @@ PATHS = ["*.py", "*.sh", "config", "recipes", "models", "sweep", "tools", "tests
          ":(exclude)sweeps/*"]       # review_backlog.sh PILLARS, repo-reviewer row
 LINES_T, COMMITS_T = 600, 30
 CUTOFF = "2026-10-28T00:00:00Z"        # runs launched and watermark moves made after this are left out (reproducible numbers)
-SKIP = {"ac57e4c2d"}
+SKIP = {"ac57e4c2d"}   # a review of the unmerged branch diag-llm4lhc, launched by the main session before the merge
+                       # (2026-10-08); the same lines are reviewed again after the merge, so counting both would count them twice
 WORKTREE = {"ab3551ca1", "a48d20fe6"}   # their reports review worktrees/wt-decomp and .claude/worktrees/agent-a6859ebf5e...
-NO_CONFIGS = [":(exclude,glob)sweep/**/*.yaml", ":(exclude,glob)recipes/**/*.yaml"]                    # review of an unmerged branch on request; its lines are reviewed again after the merge
+NO_CONFIGS = [":(exclude,glob)sweep/**/*.yaml", ":(exclude,glob)recipes/**/*.yaml"]
 
 
 def F(*a):

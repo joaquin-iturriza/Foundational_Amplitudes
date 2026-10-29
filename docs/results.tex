@@ -11716,7 +11716,8 @@ recorded validation MSE$(\log|\mathcal M|^2)$.}
 The code reviewer is asked for once its backlog passes 600 changed lines or 30 commits in the code paths of
 \code{review\_backlog.sh}. To set that threshold from what the reviews found rather than by guess, every review run so
 far was read back from the session transcripts: 138 reviewer runs, grouped into 106 reviews by the watermark moves
-that close them (a re-check after fixes and two reviewers of one backlog are one review). Each blocking finding was
+that close them (a re-check after fixes and two reviewers of one backlog are one review; one run is left out, the
+review of an unmerged branch before its merge, whose lines were reviewed again after it). Each blocking finding was
 taken from the reviewer's report and counted once when a later run re-reported it; a scope finding (a design choice no
 decision of the user's covers) counts with the defects, 24 of the 278 findings. Left out:
 17 findings in code the backlog did not change, and 10 in files outside the code paths. The trigger was the line count in 62

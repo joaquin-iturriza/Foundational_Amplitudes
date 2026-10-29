@@ -71,12 +71,8 @@ never by launching a new one.
 Reading costs: every tool call re-reads your whole context, so calls, not lines, are what is expensive.
 - Read what you need in few calls: one `grep -n` over all the files that may hold it, then one `sed -n` (or Read) of
   each whole function or paragraph you need, several files in one Bash call; never a file in many small slices.
-- Start from the files and lines the evidence, the design and the entry's map below name; read other code only for
-  what they do not cover. When you learn where something lives that the next step will need, record it:
-  `python3 tools/plan.py map {id} "<file>:<line> <what is there>"`.
+- Start from the files and paths the evidence and the design name; read other code only for what they do not cover.
 - docs/results.tex: read only the paragraphs the evidence or the design names (grep their labels), never whole sections.
-Where things are (the entry's map, from earlier steps):
-{map}
 How to:
 - read an entry only with `python3 tools/plan.py show <id>` (grep, awk or python on plan/plan.yaml is refused);
   every plan subcommand takes --help.

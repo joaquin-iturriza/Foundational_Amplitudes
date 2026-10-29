@@ -5,8 +5,8 @@ trigger fires at about two blocking errors waiting, "Okay, two errors waiting se
 Each changed line counts by how often the code review found a blocking error in its area and kind of change
 (docs/results.tex sec:review-rates, analysis/review_rates/review_rates.json): area rate times kind rate over the
 square of the hand-written rate, so an average line weighs 1. Generated sweep configs and recipes (sweep/*.yaml,
-recipes/*.yaml) count once per family: a family is the files whose names agree up to their last `_` part, with at
-least three members; only its largest file counts, at weight 1 (one generator run writes the same mistake into every
+recipes/*.yaml) count once per family: a family is the files whose names agree up to their last `_` part (a lone
+file is a family of one); only its largest file counts, at weight 1 (one generator run writes the same mistake into every
 file of it). Untracked files count at their full length as new files.
 
   python3 tools/review_weight.py <since-commit> <pathspec...>     prints the weighted line count (an integer)
@@ -30,7 +30,9 @@ def weights():
     try:
         d = json.load(open(RATES))
         base = d["hand_written"]["per_kline"]
-        wa = {k: v["per_kline"] / base for k, v in d["by_area"].items() if v.get("lines")}
+        # a rate measured on no finding is no measurement: that area or kind weighs 1 (an area with 0 findings in
+        # 511 lines, the analysis's "other", weighed 0 and never fired a review)
+        wa = {k: v["per_kline"] / base for k, v in d["by_area"].items() if v.get("lines") and v.get("n")}
         wk = {k: v["per_kline"] / base for k, v in d["by_kind"].items() if v.get("lines") and v.get("n")}
         return wa, wk
     except (OSError, ValueError, KeyError, ZeroDivisionError):
@@ -42,14 +44,18 @@ def git(*a):
 
 
 def changes(since, paths):
-    """[(path, changed lines, kind)] since the commit, untracked files included."""
-    existed = set(git("ls-tree", "-r", "--name-only", since).split("\n"))   # ls-tree takes no globs
+    """[(path, changed lines, kind)] since the commit, untracked files included; kinds as review_rates.py measures
+    them (no rename detection; A = new file, D = deletion, anything else = edit)."""
+    kinds = {}
+    for line in git("diff", "--no-renames", "--name-status", since, "--", *paths).splitlines():
+        st, _, p = line.partition("\t")
+        kinds[p] = {"A": "new file", "D": "deletion"}.get(st[:1], "edit")
     out = []
-    for line in git("diff", "--numstat", since, "--", *paths).splitlines():
+    for line in git("diff", "--no-renames", "--numstat", since, "--", *paths).splitlines():
         a, d, p = (line.split("\t") + ["", "", ""])[:3]
         if a == "-" or not p:
             continue                                   # binary
-        out.append((p, int(a) + int(d), "edit" if p in existed else "new file"))
+        out.append((p, int(a) + int(d), kinds.get(p, "edit")))
     for p in git("ls-files", "--others", "--exclude-standard", "--", *paths).splitlines():
         try:
             out.append((p, sum(1 for _ in open(os.path.join(HERE, p), errors="replace")), "new file"))
@@ -67,7 +73,7 @@ def weighted(since, paths):
             continue
         total += n * wa.get(area(p), 1.0) * wk.get(kind, 1.0)
     for members in fam.values():
-        total += max(n for _, n in members) if len(members) >= 3 else sum(n for _, n in members)
+        total += max(n for _, n in members)          # every family once, a lone file a family of one (D171)
     return int(round(total))
 
 

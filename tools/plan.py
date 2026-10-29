@@ -957,7 +957,6 @@ def next_steps_keyed(d, st, t=None, msgs=None):
     return out
 
 
-MAP_KEEP = 25  # the entry's map keeps its last 25 lines
 PROMPT_TAIL = 8               # dead ends and evidence runs / paths a step prompt carries; plan show <id> has them all
 
 
@@ -1000,8 +999,7 @@ def step_prompt(e, reason, key=None):
                       next=step_text(e, key), n=key, others=others, done_when=e.get("done_when"),
                       quotes=q or "  none", dead_ends=de,
                       evidence=evidence, open_question=oq,
-                      design=design_text(last_design(e)),
-                      map="\n".join("  " + x for x in (e.get("map") or [])) or "  none yet")
+                      design=design_text(last_design(e)))
 
 
 # ---------------------------------------------------------------- site writes
@@ -1909,17 +1907,6 @@ def cmd_dead_end(a):
         entry(d, a.id).setdefault("dead_ends", []).append({"tried": a.tried, "why": a.why, "at": now().isoformat()})
 
 
-def cmd_map(a):
-    """Where something the entry's steps need lives (file:line and what is there), shown to every later step agent
-    so it does not search the code again (2026-10-29: 39% of a step agent's calls were source reads, most of them
-    re-finding what an earlier step had found)."""
-    with transaction() as (d, st):
-        m = entry(d, a.id).setdefault("map", [])
-        if a.text not in m:
-            m.append(a.text)
-        del m[:-MAP_KEEP]
-
-
 def cmd_next(a):
     """What can move now, and the exact prompt of each step agent to launch (exit 1 while anything is unlaunched)."""
     probs = reconcile_sweeps()
@@ -2158,8 +2145,6 @@ def main(argv=None):
         A("n", type=int, help="the step's number"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
         A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
-    cmd("map", cmd_map, "record where something the entry needs lives, for later step agents", ID,
-        A("text", help='"<file>:<line> <what is there>"'))
     cmd("next", cmd_next, "what can move now (exit 1 while a listed step is not launched)",
         A("--prompts", action="store_true", help="print each step agent's exact prompt"))
     cmd("done", cmd_done, "close the entry: done_when passes and the write-up is committed", ID,
