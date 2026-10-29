@@ -123,12 +123,15 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Read catalog_v4''s one-loop axis (H5) zero-shot error in level and shape as the tree reads did (CPU, existing reads
-      only, extend analysis/catalog_v4/loop_levels.py''s group_read, never copy): per held-out one-loop pool its seed-mean
-      absolute offset and floor var(q - t) (kshot_level.json), grouped by whether it has an external top and, for those, whether
-      its process is trained at another top mass (the heavy-quark layer''s one-loop pools, if any; count them first) or at
-      none, against the pools without a top, in cells of multiplicity and initial state; loop-induced and virtual pools read
-      apart'
+    2: 'Design and check on existing reads (CPU, no run; extend analysis/catalog_v4/loop_levels.py, never copy) a target or
+      input change for catalog_v4''s one-loop axis, whose error has a source of its own (par:v4_loop_groups: no one-loop pool
+      has a top; on the 27 held-out virtual pools median |offset| 0.33 and floor 0.505, 0.756 and 0.807 of the trees'' top-at-no-mass
+      group, the floor above it in 15 of 16 cell comparisons; offset signed low, median -0.192, 0.296 placed too high; offset
+      rank correlation -0.41 with the matched class size; floor 0.6 with multiplicity; e+e- largest, offset 1.133 floor 1.984;
+      the loop-induced gg->ZH 1.817 and 1.42). Per candidate, its form named from the target''s definition (e.g. the one-loop
+      target taken relative to its own Born''s tree level where that tree pool is read, so the born''s level drops out), on
+      loop_levels_cc.json and tree_levels_cc.json: whether it narrows the held-out one-loop pools'' departure from their matched
+      training pools and the training one-loop levels'' spread within classes; no free scale without a source'
     3: 'Design and check on existing reads (CPU, no run; extend analysis/catalog_v4/loop_levels.py) a target or input change
       for the tree level''s dependence on multiplicity: par:v4_mult_bias found the multiplicity pools'' signed offset follows
       their level''s step from the five particle training parent (rank correlation -0.34 with the own step, -0.37 with the
@@ -974,19 +977,16 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     2:
-      feeds: 'the zero-shot bias, the user''s first priority (D178), then the shape: on trees both the level (par:v4_tree_newproc)
-        and the shape (par:v4_tree_shape: floor medians 0.24 new combinations, 0.155 top at another mass, 0.626 top at none)
-        are largest where the top is held out at its mass; whether the one-loop axis, catalog_v4''s weakest against catalog_v3
-        (par:v4_vs_v3), has the same source decides whether the top mass coverage is the one catalog design question for the
-        zero-shot error or the one-loop axis needs its own fix'
+      feeds: 'the zero-shot bias, the user''s first priority (D178), then the shape: whether a one-loop-aware target or input
+        removes the one-loop axis''s own low-placed level, catalog_v4''s weakest axis against catalog_v3 (par:v4_vs_v3), since
+        the top mass coverage does not reach it'
       if:
-      - 'the one-loop top pools at no trained top mass carry the largest offset and floor, the others near the pools without
-        a top: the held-out top mass is the zero-shot error on both trees and one loops; write it up and put to the user,
-        as a catalog design question (their call), training the top at 172.5 GeV in some processes, with the measured share
-        of the tree and one-loop error it would address'
-      - 'the one-loop error is large without a top (pools without a top near or above the top pools): the one-loop axis has
-        a source of its own; read what in the pool predicts it (loop-induced or virtual, born orders, multiplicity, initial
-        state, the departure from the matched training level of par:v4_loop_levels) and design a target or input fix for it'
+      - 'a candidate narrows the held-out one-loop departures and the within-class spread on the existing reads: record a
+        design for a short pretraining arm with it against the control pair v4_dimensionless_muon seeds 42 and 43, measured
+        on the one-loop axis''s signed offset, floor and zero-shot MSE'
+      - 'no candidate narrows them: record it as a dead end with the candidates'' numbers and put to the user, as a catalog
+        design question (their call), more one-loop training pools in the thin classes (e+e-, bg, qg beams), with the measured
+        share of the one-loop error on thin classes'
     3:
       feeds: 'the zero-shot bias, the user''s first priority (D178): whether a multiplicity-aware target removes the multiplicity
         axis''s signed bias, found to be a partial under-extrapolation of the level''s step with multiplicity'
