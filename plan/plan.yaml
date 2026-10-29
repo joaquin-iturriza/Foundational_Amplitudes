@@ -299,6 +299,18 @@ entries:
       names, the order vector carrying the lower electroweak maximum; the 123 entries are kept, none dropped; the design passed
       2026-10-29 05:39 named 123 entries at full order and is amended by this'
     at: '2026-10-29T13:40:33+00:00'
+  - tried: 'target or input changes for the tree level''s step from five to six particles, checked on the existing per-pool
+      levels (CPU, loop_levels.py --mult-candidates @8121459b, par:v4_mult_cand): the soft limit''s normalisation -(N-4) log
+      4, that plus the soft limit''s colour or charge weight per final gluon or photon (log(2 sum C_a), log(2 sum Q_a^2) over
+      the other legs), and the parent''s level as an input scale'
+    why: 'none shrinks the steps (rule fixed before reading: median |step| and class spread both lower on training and held-out
+      pools). Reference median |step| 0.966 training / 1.071 held out, class spread 1.026 / 1.432, median signed step 0.195
+      / 0.183. The normalisation only shifts every step (1.282 / 1.36). The colour or charge weight cuts the class spread
+      to 0.927 / 1.094 and the level spread at 4, 5, 6 particles (2.987, 2.875, 3.33 to 2.591, 2.627, 3.052) but overshoots
+      at the soft limit''s size (median |step| 2.788 / 2.914), the events sitting at the cuts. The parent-level input cannot
+      be read: all 240 five particle training pools are exhaustive, with no four particle parent. Untested: the weight per
+      event from each event''s own dipoles (needs the pools'' momenta).'
+    at: '2026-10-29T16:59:54+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
