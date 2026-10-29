@@ -1713,15 +1713,14 @@ entries:
   - D167
   - D169
   - D174
-  next: 'Written (docs/results.tex par:v4_vs_v3, catalog_v4 against training on pp, 6ffc041e; analysis/catalog_v4/compare_pp_trained.py):
-    same pp events and one inside/outside split checked. On the no-b classes where catalog_v4''s function is the pp pool''s
-    (417 trained in both, 103 held out in both; the 161 and 77 with electroweak diagrams added read apart), catalog_v4 with
-    Muon reads 0.66 and 0.58 times the pp-trained arm with AdamW; Muon alone is worth 0.27 to 0.29 there; relative to their
-    own catalog_v3 window arms catalog_v4 recovers a share 0.38 and 0.43 of the pp-training gain (0.52 and 0.64 outside catalog_v3''s
-    coverage, almost none inside). Waiting on the user: (1) run the clean comparison, the pp-trained arm with Muon at the
-    catalog_v4 runs'' settings, 2 seeds, about 3 GPU-h (design through the design gate first); (2) switch pretraining to catalog_v4
-    or not. If yes to (2): the held Daniel''s-catalog studies adapted to catalog_v4, and catalog_v3''s deletion (D163, only
-    once the switch is confirmed). If no: say what catalog_v3 keeps and what of catalog_v4 is kept.'
+  next: 'Submit the 13 TeV pp regeneration with catalog_v4''s physics (design passed 2026-10-29; recipes committed 1cffe26d:
+    992 entries pp13v4_ in recipes/catalog_v4_pp_part0..7.yaml, 124 each, of which 124 are merged members no recipe reads;
+    433 reused pp13 pools checked present on CC (866 val/test files with sidecars) and pp13_gg_ttx, pp13_uux_wpwm reproduce
+    catalog_v4''s |M|^2 exactly on 200 events): blocked on placement, waiting for the user: site pick puts CC on AVOID (site
+    env fails: the anaconda/3.11 module is now denied on CC) and CC''s login notice now forbids generative AI tools on IN2P3
+    machines, non-interactive commands included; lxplus is the plan but its verify timed out and MadGraph there is unverified.
+    On the user''s answer: job_probe on the chosen site, then scripts/job_gen_daniel_catalog.sh x8 with --env DANIEL_SPEC=recipes/catalog_v4_pp_part<k>.yaml
+    --env DANIEL_PREFIX=pp13v4_ --item catalog_coverage, plan run each with --next 5'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
