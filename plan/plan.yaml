@@ -1956,11 +1956,20 @@ entries:
       Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio to catalog_v4''s
       standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density check''s error correlation)
       on recipes/catalog_v4_pp_test.yaml'
-    6: 'Run the pure-default bound (design passed 2026-10-29): the Muon short pretraining on recipes/catalog_v4_pp_mixed_train.yaml
-      (466 hadronic tree training classes on their 13 TeV pp events, the rest catalog_v4''s own pools), seeds 42 and 43, at
-      catalog_v4''s Muon short-run settings (4264 steps), about 3.5 GPU-h; first check by recipe id that the control''s non-swapped
-      pools match (else rerun the control, about 3 GPU-h more); submit only once the pp13v4 validation (step 1) has passed;
-      read on pp13v4 test rows and the smart test pools'
+    6: 'Submit the pure-default bound pair once step 1''s validation passes (every pp13v4 entry built, pp_physics_check ratio
+      0 on every class; at 17:45 on 2026-10-29, 8 of the mixed recipe''s 797 pp pools still had no val/test file, all 1074
+      diagram sidecars present): sync once, then scripts/job_catalog_v3_short.sh v4_dimensionless_muon_pp smoke, and v4_dimensionless_muon_pp
+      and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G, --item catalog_coverage, about 1.5 GPU-h each), plus
+      the controls'' read of the pp13v4 pools in mode eval (v4_dimensionless_muon and _seed2, V3_AXES=PP4, a fraction of a
+      GPU-h). Control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29) read exactly
+      the 1068 pools (356 entries x 3 roles) the mixed recipe keeps: same file names and recipe ids at 1d9d6a29 and now, the
+      .npy files older than their submission, none swapped in after (analysis/catalog_v4/control_pool_check.py @c809ca44:
+      1068 same). Two points for whoever submits, to state in the submission message: the mixed recipe swaps 797 hadronic
+      tree training classes (466 regenerated pp13v4_ pools plus 331 reused pp13_ pools of the same |M|^2 function), not the
+      466 the design text names; and the job reads score the first 2000 rows of each pp pool''s val split (tools/zero_shot_parent.py
+      has no test-role read, as in par:v4_vs_pp), while the design says the test pool; for the arm''s training classes that
+      val split is its own checkpoint-selection pool. Either take the design back through plan design for these two lines,
+      or add a test-role read before the reads are taken'
     7: 'Default-share generation layout (implementation done at c865826b; nothing submitted): the dsh pools hold 48.8M new
       MadEvent events over 912 training classes (recipes/catalog_v4_default_lhe.yaml, 0.50 arm with a 0.10 acceptance margin;
       the 0.25 arm reads a prefix) plus 340k e+e- test events (catalog_v4_ee_test.yaml). One job per class does not fit CC''s
