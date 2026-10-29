@@ -376,6 +376,19 @@ def db():
     return sqlite3.connect(RUNS_DB) if os.path.exists(RUNS_DB) else None
 
 
+def acked_runs(ids):
+    """The runs among `ids` whose RUN event is acked with a note that names the run."""
+    c = db()
+    if c is None or not ids:
+        return set()
+    out = set()
+    for key, note in c.execute("select key, ack_note from events where kind='RUN' and acked is not null"):
+        r = (key or "").split(":")[0]
+        if r in ids and r in (note or ""):
+            out.add(r)
+    return out
+
+
 def runs_of(e, st):
     """(id, state, finished) of every run of the entry: its recorded runs, its evidence runs and every run filed under
     item == id, read from the whole registry (no row limit)."""
@@ -925,6 +938,10 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
         rows = [r for r in runs_of(e, st) if step_of(e, tags.get(r[0])) == key]
         mine = lambda x: step_of(e, x.get("next")) == key
         ended = [(r, fin) for r, state, fin in rows if terminal(state) and fin and (not ls or fin > ls.timestamp())]
+        # a run whose end event was acked with a note naming it was read and handled (by the main session or an
+        # agent): demanding a step agent for it again asks for nothing the turn has left to do (2026-10-29)
+        handled = acked_runs([r for r, _ in ended])
+        ended = [(r, fin) for r, fin in ended if r not in handled]
         if sweeps is None:
             sweeps = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps_of(st, e["id"]) else {}
         sw_end, sw_live, sw_unread = sweep_status(e["id"], st, sweeps, mine)
