@@ -2120,6 +2120,15 @@ entries:
       blockers in the dead end above). Done locally: tools/check_site_data.py now defaults to recipes/catalog_v4_train.yaml
       (8a2f803e).'
     at: '2026-10-29T13:19:41+00:00'
+  - tried: pp13v4 first pass, 8 parts of 124 entries at 48 cores (FA-ccin2p3-ce932f17, 64d32778, 8d9b94ef, 7619b7c0, 8a202730,
+      79989476, 04fa201c, cef57592)
+    why: '675 of 992 entries built. 277 entries with a b beam were refused by the physics check in about 2 min each: the pp
+      entries had no beam_masses, so the b-row check read their b beams at 4.7 GeV against the massless-b parent (b_mass_of_process
+      default), and nothing checked the b mass locally. 27 entries came back short from MadEvent (49 to 11124 of 14280 events).
+      Fixed in e7a1775d: beam_masses {} copied from the parent (not in an lhe_pp identity, so built pools stay cache hits;
+      checked: recipe ids match the sidecars at seed 42), own margins of 1.25 x the shortfall, and a local b-mass check against
+      the parent in gen_catalog_v4_pp.py'
+    at: '2026-10-29T15:43:36+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
