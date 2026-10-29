@@ -6,6 +6,10 @@ Entry: {id} ({title})
 Question: {question}
 Why you were started: {reason}
 Your step (number {n} of the entry's next steps): {next}
+Feeds (the decision of the entry's question this step settles): {feeds}
+Branches (what each result leads to):
+{branches}
+Your step serves the decision under 'Feeds'; your write-up states which branch the result took and does that branch's action as the next step.
 The entry's other next steps, taken in parallel by other step agents (not yours: leave them, never wait on them):
 {others}
 Done when (a check that must pass): {done_when}
@@ -41,9 +45,11 @@ The step
 3. Record, through the plan CLI only:
      python3 tools/plan.py evidence {id} --run <id> --commit <sha> --path <figure or metrics file>
      python3 tools/plan.py dead-end {id} --tried "<what>" --why "<why it failed>"
-     python3 tools/plan.py set-next {id} --next {n} "<what follows your step>"   (replaces your step only)
+     python3 tools/plan.py set-next {id} --next {n} "<what follows your step>" --feeds "<the decision it settles>"
+         --if "<result A>: <what we do then>" --if "<result B>: <what we do then>"   (replaces your step only)
      python3 tools/plan.py drop-next {id} {n}             (your step is finished and nothing follows it)
-     python3 tools/plan.py add-next {id} "<another step>"   (independent work found on the way)
+     python3 tools/plan.py add-next {id} "<another step>" --feeds "..." --if "..." --if "..."   (independent work
+         found on the way)
    Independent pieces of work are separate next steps, never chained with "then"; chain only when one needs the
    other's result.
      python3 tools/plan.py answer {id} --quote "<the user's words>" [--set ...]      (only for the user's answer)

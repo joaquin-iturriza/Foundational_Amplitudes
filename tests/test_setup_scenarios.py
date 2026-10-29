@@ -184,6 +184,9 @@ def step(m, agent=None):
 
 
 RESULTS = []
+# what every set-next / add-next step must carry: the decision it feeds and two branches, each with an action
+WHY = ("--feeds", "whether the arm is adopted at catalog scale", "--if", "it wins: adopt it in the template",
+       "--if", "it loses: drop it and record a dead end")
 
 
 def scenario(name, ok, detail=""):
@@ -898,14 +901,14 @@ def plan_repo():
 def plan_commits():
     """Fourth review 2: a plan write leaves the checkout clean, so the next launch's `site sync` goes through."""
     repo, g, tex, base, env = plan_repo()
-    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "the DyHPO round"], env=env, capture_output=True,
+    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "the DyHPO round", *WHY], env=env, capture_output=True,
                        text=True)
     st = g("status", "--porcelain").stdout
     msg = g("log", "-1", "--format=%s").stdout.strip()
     scenario("2: a plan write commits plan/plan.yaml alone; the tree is clean for site sync", r.returncode == 0
              and st == "" and msg == "plan: set-next x", r.stdout + r.stderr + st + msg)
     open(os.path.join(repo, "other.txt"), "w").write("w"); g("add", "other.txt")
-    subprocess.run([sys.executable, PLAN, "set-next", "x", "again"], env=env, capture_output=True, text=True)
+    subprocess.run([sys.executable, PLAN, "set-next", "x", "again", *WHY], env=env, capture_output=True, text=True)
     files = g("show", "--name-only", "--format=", "HEAD").stdout.split()
     scenario("2: the plan commit takes plan/plan.yaml only, never other staged work", files == ["plan/plan.yaml"]
              and "A  other.txt" in g("status", "--porcelain").stdout, files)
@@ -1080,7 +1083,7 @@ def reopen():
              rc0 == 0 and rc1 == 0 and "marked done" not in err0 + err1
              and w.entries()["rd"]["evidence"]["paths"] == ["an/fig.png"], err0 + err1)
     os.remove(os.path.join(repo, "an", "fig.png"))
-    w.plan_cmd("set-next", "rd", "redo the figure")
+    w.plan_cmd("set-next", "rd", "redo the figure", *WHY)
     rc2, err2 = w.check()
     r = w.plan_cmd("reopen", "rd", "--why", "its figure was pruned")
     e = w.entries()["rd"]
@@ -1096,13 +1099,13 @@ def commit_retry():
     lock = os.path.join(repo, ".git", "index.lock")
     open(lock, "w").close()
     threading.Timer(2.0, lambda: os.remove(lock)).start()
-    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "after the lock"], env=env, capture_output=True,
+    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "after the lock", *WHY], env=env, capture_output=True,
                        text=True)
     scenario("lower: a plan write retries through a short index.lock and commits", r.returncode == 0
              and g("status", "--porcelain").stdout == "", r.stdout + r.stderr)
     open(lock, "w").close()
     t0 = time.monotonic()
-    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "while git is busy"], env=env, capture_output=True,
+    r = subprocess.run([sys.executable, PLAN, "set-next", "x", "while git is busy", *WHY], env=env, capture_output=True,
                        text=True)
     os.remove(lock)
     r2 = subprocess.run([sys.executable, PLAN, "commit"], env=env, capture_output=True, text=True)
@@ -2045,12 +2048,12 @@ def parallel_steps():
     w = World([E("par", next="one thing")], state={"par": {"steps": [{"agent": "w1", "at": ago(10)}]}})
     scenario("an entry holding one string is in flight while its step agent (recorded without a number) works",
              w.check()[0] == 0, w.check()[1])
-    w.plan_cmd("set-next", "par", "first", "--also", "second", "--also", "third")
+    w.plan_cmd("set-next", "par", "first", *WHY, "--also", "second", *WHY, "--also", "third", *WHY)
     a = w.entries()["par"]["next"]
-    w.plan_cmd("set-next", "par", "second, then its follow-up", "--next", "2")
+    w.plan_cmd("set-next", "par", "second, then its follow-up", "--next", "2", *WHY)
     b = w.entries()["par"]["next"]
     w.plan_cmd("drop-next", "par", "1")
-    w.plan_cmd("add-next", "par", "fourth")
+    w.plan_cmd("add-next", "par", "fourth", *WHY)
     c = w.entries()["par"]["next"]
     show = w.plan_cmd("show", "par")[1]
     scenario("set-next --also holds independent steps; --next N replaces only N; drop and add keep the numbers",
@@ -2060,24 +2063,67 @@ def parallel_steps():
              [a, b, c, show])
     w.plan_cmd("drop-next", "par", "2"); w.plan_cmd("drop-next", "par", "3")
     d1 = w.entries()["par"]["next"]
-    w.plan_cmd("set-next", "par", "only")
+    w.plan_cmd("set-next", "par", "only", *WHY)
     d2 = w.entries()["par"]["next"]
     rc5, o5 = w.plan_cmd("drop-next", "par", "7")
-    w.plan_cmd("set-next", "par", "x", "--also", "y")
+    w.plan_cmd("set-next", "par", "x", *WHY, "--also", "y", *WHY)
     d3 = w.entries()["par"]["next"]
     scenario("one step left keeps its number, a plain set-next replaces it in place, --also numbers past the records "
              "(none here: from 1), a missing step refused",
              d1 == {4: "fourth"} and d2 == {4: "only"} and d3 == {1: "x", 2: "y"} and rc5 != 0, [d1, d2, d3, o5])
     w = World([E("par", next={1: "a", 2: "b"})], state={"par": {"steps": [{"agent": "w9", "at": ago(10), "next": 2}]}})
     w.plan_cmd("drop-next", "par", "2")
-    w.plan_cmd("add-next", "par", "c")
+    w.plan_cmd("add-next", "par", "c", *WHY)
     scenario("a new step never reuses the number of a dropped step an agent record still names",
              w.entries()["par"]["next"] == {1: "a", 3: "c"}, w.entries()["par"]["next"])
     w = World([E("par", next={1: "A", 2: "B"})], state={"par": {"steps": [{"agent": "w8", "at": ago(10), "next": 2}]}})
-    w.plan_cmd("set-next", "par", "C", "--also", "D")
+    w.plan_cmd("set-next", "par", "C", *WHY, "--also", "D", *WHY)
     nx = w.plan_cmd("next")[1]
     scenario("a plain set-next --also over numbered records numbers past them: an old agent never holds a new step",
              w.entries()["par"]["next"] == {3: "C", 4: "D"} and "NEXT par step 3 of 2" in nx and "step 4 of 2" in nx, [w.entries()["par"]["next"], nx])
+    # feeds and branches: required on set-next / add-next, stored per step, shown in the prompt and plan show
+    w = World([E("fb", next="legacy step")])
+    pr0 = w.plan_cmd("next", "--prompts")[1]
+    sh0 = w.plan_cmd("show", "fb")[1]
+    scenario("a step set before feeds and branches stays readable; its prompt and plan show flag it",
+             "Your step (number 1 of the entry's next steps): legacy step" in pr0
+             and "no feeds/branches recorded: record them with plan set-next before working" in pr0
+             and "no feeds/branches recorded" in sh0 and "next: legacy step" in sh0, pr0[:2000] + sh0)
+    r1 = w.plan_cmd("set-next", "fb", "measure the gap")
+    r2 = w.plan_cmd("set-next", "fb", "measure the gap", "--feeds", "whether the gap closes at full horizon",
+                    "--if", "it closes: run the long arm")
+    r3 = w.plan_cmd("add-next", "fb", "a side check", "--feeds", "whether the gap closes at full horizon",
+                    "--if", "it closes: run the long arm", "--if", "it stays:")
+    r4 = w.plan_cmd("set-next", "fb", "A", *WHY, "--also", "B")
+    scenario("set-next and add-next refuse a step without --feeds, with one branch, with a branch naming no action, "
+             "or an --also step without its own; nothing is written",
+             all(r[0] != 0 for r in (r1, r2, r3, r4)) and "--feeds" in r1[1] and "at least two --if" in r1[1]
+             and "(got 1)" in r2[1] and "it stays:" in r3[1] and "'B'" in r4[1]
+             and w.entries()["fb"]["next"] == "legacy step", [r1, r2, r3, r4])
+    rc, o = w.plan_cmd("set-next", "fb", "measure the gap", "--feeds", "whether the gap closes at full horizon",
+                       "--if", "it closes: run the long arm", "--if", "it stays: write it up as a floor",
+                       "--also", "the side check", *WHY)
+    e = w.entries()["fb"]
+    pr = w.plan_cmd("next", "--prompts")[1]
+    sh = w.plan_cmd("show", "fb")[1]
+    p2 = pr[pr.index("NEXT fb step 2 of 2"):]
+    scenario("a step's feeds and branches are stored with it and shown in its own prompt and in plan show",
+             rc == 0 and e["step_why"][1]["feeds"] == "whether the gap closes at full horizon"
+             and e["step_why"][2]["if"] == list(WHY[3::2])
+             and "Feeds (the decision of the entry's question this step settles): whether the gap closes" in pr
+             and "  if it stays: write it up as a floor" in pr
+             and "Feeds (the decision of the entry's question this step settles): whether the arm is adopted" in p2
+             and "  if it loses: drop it and record a dead end" in p2
+             and "Your step serves the decision under 'Feeds'" in pr and "no feeds/branches recorded" not in pr
+             and "feeds: whether the gap closes at full horizon" in sh and "if it wins: adopt it in the template" in sh,
+             o + pr[:2500] + sh)
+    w.plan_cmd("drop-next", "fb", "1")
+    w.plan_cmd("add-next", "fb", "a third", "--feeds", "which floor the long arm reaches",
+               "--if", "below 1e-6: adopt", "--if", "above: stop and report")
+    e = w.entries()["fb"]
+    scenario("drop-next takes the step's feeds with it; add-next stores its own",
+             set(e["step_why"]) == {2, 3} and e["step_why"][3]["if"] == ["below 1e-6: adopt", "above: stop and report"],
+             e.get("step_why"))
 
 
 SEND = os.path.join(ROOT, ".claude", "hooks", "send_check.py")

@@ -50,8 +50,10 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
   plan unanswered <id> | step <id> --agent <subagent id> [--next N]
   plan run <id> [RUN...] [--sweep SITE:NAME] [--next N]   a registry run, or a sweep sweep_manager submitted (never in
                                           runs.db); --next: the step it belongs to
-  plan set-next <id> "<step>" [--also "<independent step>" ...] [--next N]   the entry's next steps (with --next N:
-                                          replace step N only) | add-next <id> "<step>" | drop-next <id> <N>
+  plan set-next <id> "<step>" --feeds "<decision>" --if "<result>: <action>" --if ... [--also "<step>" --feeds ...
+                                          --if ... --if ...] [--next N]   the entry's next steps, each with the decision
+                                          it settles and what each result leads to (with --next N: replace step N only)
+                                          | add-next <id> "<step>" --feeds ... --if ... --if ... | drop-next <id> <N>
   plan sweeps [--fresh]                   every recorded sweep's state on its site, and the unrecorded ones recorded
   plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W
   plan next [--prompts]                   deterministic: what can move now, with each step agent's exact prompt
@@ -268,6 +270,80 @@ def put_nexts(e, items):
     """Store [(number, text)]: a lone step 1 as a plain string (the one-step form), else {number: text}."""
     items = [(k, t) for k, t in items if t]
     e["next"] = None if not items else items[0][1] if len(items) == 1 and items[0][0] == 1 else dict(items)
+    why = {k: v for k, v in why_all(e).items() if k in dict(items)}
+    if why:
+        e["step_why"] = why
+    else:
+        e.pop("step_why", None)
+
+
+# ---------------------------------------------------------------- what a next step feeds, and what each result leads to
+# The user (2026-10-29): "each step has a design that seems reasonable, but I don't understand the reasoning for doing
+# it, what's the big picture, what you expect will happen from that, what you'd do if you get one result or the other."
+# So every step set through set-next / add-next names the decision of the entry's question it settles (--feeds) and at
+# least two results with the action each leads to (--if "<result>: <action>"). Steps set before this have none; they
+# stay readable and their prompt says to record them first.
+FEEDS_MIN = 15                # characters: a decision named, not a token
+LEGACY_WHY = "no feeds/branches recorded: record them with plan set-next before working"
+
+
+def why_all(e):
+    return {int(k): v for k, v in (e.get("step_why") or {}).items() if v}
+
+
+def why_of(e, k):
+    """{"feeds": str, "if": [str]} of step k, or None for a step set before feeds and branches were required."""
+    return why_all(e).get(k)
+
+
+def check_why(text, feeds, ifs):
+    """The step's why, or exit naming what is missing: the decision it feeds, and two branches each with an action."""
+    miss = []
+    if len((feeds or "").strip()) < FEEDS_MIN:
+        miss.append('--feeds "<the decision of the entry\'s question this step settles>"' + (
+            " (%r is too short to name one)" % feeds if feeds else ""))
+    bad = [b for b in ifs if not re.fullmatch(r"\s*\S[^:]*:\s*\S.*", b, re.S)]
+    if bad:
+        miss.append("--if as \"<result>: <what we do then>\", a result and an action after its colon (not: %s)"
+                    % "; ".join(repr(b) for b in bad))
+    if len(ifs) < 2:
+        miss.append('at least two --if "<result A>: <what we do then>" --if "<result B>: <what we do then>" (got %d)'
+                    % len(ifs))
+    if miss:
+        sys.exit("plan: step %r refused, nothing recorded: it needs %s. A step names the decision it serves and what "
+                 "each result leads to; after an --also, its own --feeds and --if follow it." % (text, "; ".join(miss)))
+    return {"feeds": feeds.strip(), "if": [b.strip() for b in ifs]}
+
+
+class _Seq(__import__("argparse").Action):
+    """--also, --feeds and --if in the order typed: a --feeds or --if belongs to the step before it (TEXT, or the last
+    --also)."""
+    def __call__(self, parser, ns, values, option_string=None):
+        seq = getattr(ns, "seq", None) or []
+        seq.append((self.dest, values))
+        ns.seq = seq
+
+
+def steps_with_why(text, seq):
+    """[(text, why)] of TEXT and each --also, each checked; every step is checked before anything is written."""
+    groups = [[text, None, []]]
+    for k, v in seq or []:
+        if k == "also":
+            groups.append([v, None, []])
+        elif k == "feeds":
+            if groups[-1][1] is not None:
+                sys.exit("plan: step %r has two --feeds; one decision per step" % groups[-1][0])
+            groups[-1][1] = v
+        else:
+            groups[-1][2].append(v)
+    return [(t, check_why(t, f, i)) for t, f, i in groups]
+
+
+def why_lines(e, k, ind="  "):
+    w = why_of(e, k)
+    if not w:
+        return [ind + LEGACY_WHY]
+    return [ind + "feeds: " + w["feeds"]] + [ind + "if " + b for b in w["if"]]
 
 
 def step_of(e, k):
@@ -1010,7 +1086,9 @@ def step_prompt(e, reason, key=None):
               'entry.' % ((e.get("waiting_since") or "")[:16], e["ask"], e.get("blocks") or
                           "not recorded (only what the question itself decides)"))
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"), reason=reason,
-                      next=step_text(e, key), n=key, others=others, done_when=e.get("done_when"),
+                      next=step_text(e, key), n=key, others=others,
+                      feeds=(why_of(e, key) or {}).get("feeds") or LEGACY_WHY,
+                      branches="\n".join("  if " + b for b in (why_of(e, key) or {}).get("if") or []) or "  none", done_when=e.get("done_when"),
                       quotes=q or "  none", dead_ends=de,
                       evidence=evidence, open_question=oq,
                       design=design_text(last_design(e)), readers=readers_index())
@@ -1276,8 +1354,11 @@ def cmd_show(a):
             if k == "next" and len(nexts(e)) > 1:
                 for n, x in nexts(e):
                     print("    next %d: %s" % (n, x))
+                    print("\n".join(why_lines(e, n, "      ")))
             elif e.get(k):
                 print("    %s: %s" % (k, e[k]))
+                if k == "next":
+                    print("\n".join(why_lines(e, step_keys(e)[0], "      ")))
         if not a.compact:
             for q in e.get("quotes") or []:
                 print("    user %s: \"%s\"" % ((q.get("said_at") or "")[:16], q.get("text")))
@@ -1629,6 +1710,8 @@ def cmd_answer(a):
         e.setdefault("decisions", []).append(did)
         for k, v in sets.items():
             e[k] = v
+        if "next" in sets:                        # a new text: its old feeds and branches no longer describe it
+            e.pop("step_why", None)
         if a.kind in ("hold", "forbid"):
             e["status"], e["hold_decision"] = "held", did
         elif a.kind == "release" and e.get("status") == "held":
@@ -1687,6 +1770,8 @@ def cmd_withdraw(a):
             e.pop(k, None)
         for k, v in sets.items():
             e[k] = v
+        if "next" in sets:                        # a new text: its old feeds and branches no longer describe it
+            e.pop("step_why", None)
     print("plan: %s's question withdrawn, settled by %s (%s); entry now %s" % (a.id, a.decision, a.why,
                                                                                e["status"]))
 
@@ -1874,35 +1959,44 @@ def cmd_set_next(a):
     of one step replaces it in place, otherwise they are numbered from 1 when no record names a number, else past every
     number a step agent, run or sweep record names (an old record never lands on a new step). With --next N: step N
     becomes TEXT (a step agent replaces only its own step), the --also ones added beside it."""
+    steps = steps_with_why(a.text, getattr(a, "seq", None))
+    also = [t for t, _ in steps[1:]]
     with transaction() as (d, st):
         e = entry(d, a.id)
-        if a.next is None and not a.also and len(nexts(e)) <= 1:
-            put_nexts(e, [(step_keys(e)[0], a.text)])
+        why = why_all(e)
+        if a.next is None and not also and len(nexts(e)) <= 1:
+            keys = [step_keys(e)[0]]
         elif a.next is None:
             v = st.get(e["id"]) or {}
             named = v.get("run_steps") or any(x.get("next") is not None
                                               for x in (v.get("steps") or []) + (v.get("sweeps") or []))
             k0 = max(used_keys(e, st)) if named else 0
-            put_nexts(e, list(enumerate([a.text] + (a.also or []), k0 + 1)))
+            keys = list(range(k0 + 1, k0 + 1 + len(steps)))
+            why = {}
         else:
             if a.next not in dict(nexts(e)) and not (a.next == 1 and not nexts(e)):
                 sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, a.next,
                                                                       ", ".join(str(k) for k, _ in nexts(e)) or "none"))
-            items = dict(nexts(e))
-            items[a.next] = a.text
-            k0 = max(used_keys(e, st) | set(items))
-            items.update({k0 + i: x for i, x in enumerate(a.also or [], 1)})
-            put_nexts(e, sorted(items.items()))
+            k0 = max(used_keys(e, st) | set(dict(nexts(e))))
+            keys = [a.next] + [k0 + i for i in range(1, len(steps))]
+        items = dict(nexts(e)) if a.next is not None else {}
+        for k, (t, w) in zip(keys, steps):
+            items[k], why[k] = t, w
+        e["step_why"] = why
+        put_nexts(e, sorted(items.items()))
     print_nexts(a.id)
 
 
 def cmd_add_next(a):
     """One more independent next step, numbered past every number the entry used."""
+    w = steps_with_why(a.text, getattr(a, "seq", None))[0][1]
     with transaction() as (d, st):
         e = entry(d, a.id)
         items = dict(nexts(e))
         k = max(used_keys(e, st) | set(items) | {0}) + 1
         items[k] = a.text
+        e["step_why"] = dict(why_all(e))
+        e["step_why"][k] = w
         put_nexts(e, sorted(items.items()))
     print_nexts(a.id)
 
@@ -1923,6 +2017,7 @@ def print_nexts(eid):
     e = entry(load()[0], eid)
     for k, x in nexts(e):
         print("plan: %s next %d: %s" % (eid, k, x))
+        print("\n".join(why_lines(e, k, "      ")))
     if not nexts(e):
         print("plan: %s has no next step" % eid)
 
@@ -2097,6 +2192,9 @@ def main(argv=None):
     p = argparse.ArgumentParser(prog="plan")
     sub = p.add_subparsers(dest="cmd", required=True)
     A = lambda *n, **k: (n, k)
+    WHY_ARGS = (A("--feeds", action=_Seq, help="the decision of the entry's question this step settles (required)"),
+                A("--if", dest="if_", action=_Seq, metavar="'RESULT: ACTION'",
+                  help="a result and what we do then (at least two, required)"))
 
     def cmd(name, f, help, *args):
         s = sub.add_parser(name, help=help, description=help)
@@ -2181,10 +2279,14 @@ def main(argv=None):
         A("--path", action="append", help="a repo path (repeatable)"),
         A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
     cmd("set-next", cmd_set_next, "set the entry's next steps: independent pieces of work are separate steps (--also), "
-        "never chained with 'then'", ID, A("text", help="the next step"),
-        A("--also", action="append", help="another independent next step, run in parallel (repeatable)"),
+        "never chained with 'then'; each step names the decision it feeds and what each result leads to",
+        ID, A("text", help="the next step"),
+        A("--also", action=_Seq, help="another independent next step, run in parallel (repeatable); its own --feeds "
+                                       "and --if follow it"),
+        *WHY_ARGS,
         A("--next", type=int, help="replace only next step N (a step agent's own step), keeping the others"))
-    cmd("add-next", cmd_add_next, "add an independent next step to the entry", ID, A("text", help="the step"))
+    cmd("add-next", cmd_add_next, "add an independent next step to the entry", ID, A("text", help="the step"),
+        *WHY_ARGS)
     cmd("drop-next", cmd_drop_next, "remove next step N (finished, nothing follows it)", ID,
         A("n", type=int, help="the step's number"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,

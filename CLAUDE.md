@@ -88,9 +88,10 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      Independent pieces of work are separate next steps of the entry (`plan set-next <entry> "<step>" --also "<step>"`,
      `add-next`), each listed and launched on its own (`plan step ... --next N`), never one step chained with "then".
    - **A step agent does one step and exits:** an analysis, a fix, a write-up, or a job (`site submit ... --item
-     <entry>`, recorded with `plan run`). It records evidence, dead ends and the next step through the plan CLI and
-     never waits on a job: when the job ends, `plan next` lists the entry again and a fresh step agent takes it. No entry
-     has a long-lived owner. A job needs a recorded design (`plan design`: the question, the measure and the check, on
+     <entry>`, recorded with `plan run`). It records evidence, dead ends and the next step through the plan CLI (each
+     step with the decision it feeds and its branches, `--feeds` and two `--if "<result>: <action>"`, and its write-up
+     says which branch the result took) and never waits on a job: when the job ends, `plan next` lists the entry again
+     and a fresh step agent takes it. No entry has a long-lived owner. A job needs a recorded design (`plan design`: the question, the measure and the check, on
      existing data, that it moves with the tested change, what is fixed, the matched control, seeds, the outcome for
      yes and for no) passed by the design-reviewer subagent, which the step agent runs itself before submitting;
      `design_guard.py` refuses the submission otherwise. A mechanical step (requeue or resubmit a job, read a log and
