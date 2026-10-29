@@ -16,6 +16,7 @@ import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.join(ROOT, "recipes"))   # gen_catalog_v4_default (test_generated), under pytest too
 import mg5_pipeline_final as mg  # noqa: E402
 import datagen  # noqa: E402
 

@@ -8,6 +8,7 @@ lhe:
   n_test: 2000
   n_train: 0
   label_alphas: running_sqrt_shat
+  parts: true
   source: catalog_v4's parameter card, an e+e- run card with catalog_v4's e+e- acceptance,
     no ISR
 processes:

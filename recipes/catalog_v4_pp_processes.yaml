@@ -21788,6 +21788,7 @@ processes:
   pp13v4_ud_dggu:
     lhe:
       n_runs: 32
+      parts: true
     kind: lhe_pp
     folder: pp13v4_ud_dggu
     mg5_generate:

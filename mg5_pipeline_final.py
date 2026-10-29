@@ -3958,6 +3958,12 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             "param_card_sha256": _file_sha256(param_card),
             # several MadEvent runs only where set (lhe.n_runs > 1), so every other pool keeps its identity
             **({"n_runs": int(cfg["lhe"]["n_runs"])} if int(cfg["lhe"].get("n_runs", 1)) > 1 else {}),
+            # the events asked of each run where set (lhe.run_events: a pool split into runs of one job each,
+            # recipes/gen_catalog_v4_default.py); absent, each run asks n_requested (every pool built before)
+            **({"run_events": int(cfg["lhe"]["run_events"])} if cfg["lhe"].get("run_events") else {}),
+            # built from one-run part jobs (lhe.parts: tools/lhe_parts.py, lhe_assemble): its own identity, since a
+            # part's fresh MadEvent directory is not shown to give the events a run in a reused directory gives
+            **({"build": "parts"} if cfg["lhe"].get("parts") else {}),
             # an e+e- entry's fixed collider energies (lhe.energies), one MadEvent run each; absent for pp
             **({"energies": [float(e) for e in cfg["lhe"]["energies"]]} if cfg["lhe"].get("energies") else {}),
         },
@@ -3972,9 +3978,11 @@ def lhe_runs(process, iseed, n_req):
     n_runs = int(l.get("n_runs", 1))
     seed_k = lambda k: (iseed + 7919 * k - 1) % 30000 + 1
     energies = [float(e) for e in (l.get("energies") or [])]
+    # lhe.run_events (set only on pools split into one-run jobs): each run asks that many events instead of n_req
+    r_ev = int(l["run_events"]) if l.get("run_events") else None
     if not energies:
-        return [(seed_k(k), n_req, {}, f"run_{k + 1:02d}") for k in range(n_runs)]
-    n_e = int(math.ceil(n_req / len(energies)))
+        return [(seed_k(k), r_ev or n_req, {}, f"run_{k + 1:02d}") for k in range(n_runs)]
+    n_e = r_ev or int(math.ceil(n_req / len(energies)))
     return [(seed_k(j * n_runs + k), n_e, {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{j * n_runs + k + 1:02d}")
             for j, E in enumerate(energies) for k in range(n_runs)]
 
@@ -4014,20 +4022,24 @@ def _set_me5_config(path, values):
         f.writelines(lines)
 
 
-def lhe_prepare(process, work_root, log_path):
-    """MG5 `output` of a fresh MadEvent directory and, unless already compiled, of the
-    standalone_cpp backend (their param card in its Cards/, C++ pipe driver). Returns (ev_dir, sa_dir)."""
+def lhe_prepare(process, work_root, log_path, madevent=True, standalone=True):
+    """MG5 `output` of a fresh MadEvent directory (madevent) and, unless already compiled, of the
+    standalone_cpp backend (standalone; their param card in its Cards/, C++ pipe driver). Returns (ev_dir, sa_dir);
+    ev_dir is None without madevent. A one-run part job (lhe_build_part) asks for the MadEvent directory only, so
+    parallel runs of one process never compile the same standalone; its assembly (lhe_assemble) builds that."""
     cfg = PROCESSES[process]
     sa = lhe_standalone_dir(process)
     _, sub, drv, _ = detect_compiled_backend(sa)
-    need_sa = not (sub and drv and os.path.exists(f"{sa}/Cards/param_card.dat"))
-    ev = os.path.join(work_root, f"{process}_madevent")
-    for d in [ev] + ([sa] if need_sa else []):
+    need_sa = standalone and not (sub and drv and os.path.exists(f"{sa}/Cards/param_card.dat"))
+    ev = os.path.join(work_root, f"{process}_madevent") if madevent else None
+    if not (madevent or need_sa):
+        return ev, sa
+    for d in ([ev] if ev else []) + ([sa] if need_sa else []):
         if os.path.isdir(d):
             shutil.rmtree(d)          # a half-written output from an interrupted run
     os.makedirs(work_root, exist_ok=True)
     script = (f"import model {cfg['lhe'].get('model', 'sm')}\n" + "\n".join(cfg["mg5_generate"]) +
-              f"\noutput {ev}\n" + (f"output standalone_cpp {sa}\n" if need_sa else "") + "quit\n")
+              (f"\noutput {ev}" if ev else "") + "\n" + (f"output standalone_cpp {sa}\n" if need_sa else "") + "quit\n")
     _mg5_script(script, log_path)
     if need_sa:
         shutil.copy2(lhe_cards(cfg)[1], f"{sa}/Cards/param_card.dat")
@@ -4172,6 +4184,9 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
     serially, from the returned recipes). The banner is kept next to each pool directory, the
     MadEvent directory is deleted (AMP_LHE_KEEP=1 keeps it). Returns [(out_path, full_recipe)]."""
     cfg = PROCESSES[process]
+    if cfg["lhe"].get("parts"):
+        raise RuntimeError(f"{process}: lhe.parts is set, its pools are built from one-run part jobs "
+                           f"(tools/lhe_parts.py plan/work), not in series")
     recs = [r for r, _ in items]
     if not recs or any(r["process"] != process or r.get("mode") != "lhe_pp" for r in recs):
         raise ValueError(f"build_lhe_pp({process}): items must be lhe_pp recipes of this process")
@@ -4199,6 +4214,32 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
         m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
         moms.append(m_k); aqcds.append(a_k)
     secs["madevent"] = time.time() - t0; t0 = time.time()
+    out = _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed, iseed, n_req, mg_cores,
+                      write_sidecars)
+    if not keep_dir:
+        shutil.rmtree(ev, ignore_errors=True)
+    return out
+
+
+def _lhe_check_recipes(process, items):
+    """(seed, iseed, n_req) of the one MadEvent layout the recipes `items` read."""
+    recs = [r for r, _ in items]
+    if not recs or any(r["process"] != process or r.get("mode") != "lhe_pp" for r in recs):
+        raise ValueError(f"lhe build of {process}: items must be lhe_pp recipes of this process")
+    runs = {(r["seed"], r["lhe"]["iseed"], r["lhe"]["n_requested"]) for r in recs}
+    if len(runs) != 1:
+        raise ValueError(f"lhe build of {process}: recipes from different MadEvent runs {runs}")
+    return runs.pop()
+
+
+def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed, iseed, n_req, mg_cores,
+                write_sidecars):
+    """The events of the runs (moms, aqcds: per run, in run order) -> the pools of `items`: concatenated in run
+    order, seeded shuffle, each recipe's block labelled and written. Shared by build_lhe_pp (runs in sequence in one
+    job) and lhe_assemble (runs as separate part jobs), so both give the same bytes for the same runs."""
+    cfg = PROCESSES[process]
+    n_runs = len(runs)
+    t0 = time.time()
     mom, aqcd = np.concatenate(moms), np.concatenate(aqcds)
     secs["parse"] = time.time() - t0; t0 = time.time()
     n_lhe = len(mom)
@@ -4260,11 +4301,111 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
         print(f"[LHE] {process} {rec['role']}: {n} events [{lo}:{hi}] of {n_lhe} -> {path}  "
               f"|M|^2 in [{amps.min():.3e}, {amps.max():.3e}]", flush=True)
     secs["label+write"] = time.time() - t0
-    if not keep_dir:
-        shutil.rmtree(ev, ignore_errors=True)
     print(f"[LHE] {process}: done (iseed {iseed}, xsec {xsec} pb, MG5 {version}); seconds "
           + ", ".join(f"{k} {v:.1f}" for k, v in secs.items()), flush=True)
     return out
+
+
+# One-run part jobs (catalog_coverage step 7: a pool of several MadEvent runs, built in parallel). A part job runs ONE
+# of an lhe entry's runs (lhe_runs: the same iseed, events and patches as the k-th run of build_lhe_pp) in a fresh
+# MadEvent directory and keeps its events, unlabelled and in LHE order, as a part file named by the run's whole
+# identity. Once every run's part is there, lhe_assemble concatenates them in run order and finishes as build_lhe_pp
+# does (_lhe_finish: seeded shuffle, blocks, labels). Only entries with lhe.parts are built this way, and that flag is
+# in their pool identity ("build": "parts"): a fresh MadEvent directory per run is not shown to give the events the
+# serial build's reused directory gives, so the two never share a recipe id.
+
+def lhe_parts_dir():
+    d = os.environ.get("AMP_LHE_PARTS_DIR")
+    if d:
+        return d
+    s = os.environ.get("SCRATCH")
+    return os.path.join(s, "lhe_parts") if s else os.path.join(OUTPUT_DIR, ".lhe_parts")
+
+
+def _lhe_events_id(rec):
+    """The MadEvent events' identity of an lhe_pp recipe: everything but which role and block of them it reads."""
+    ev = {k: v for k, v in rec.items() if k not in ("role", "n_events")}
+    ev["lhe"] = {k: v for k, v in rec["lhe"].items() if k != "block"}
+    return recipe_id(ev)
+
+
+def lhe_part_paths(process, items):
+    """[(part path, run)] of the runs of the pools `items`, in run order. A part is named by the events' identity
+    (cards' sha256, generate lines, model, iseed, layout: _lhe_events_id) and its run, so a part made under other cards
+    or another layout is never taken for this one."""
+    seed, iseed, n_req = _lhe_check_recipes(process, items)
+    ids = {_lhe_events_id(r) for r, _ in items}
+    if len(ids) != 1:
+        raise ValueError(f"{process}: recipes of different MadEvent events {ids}")
+    eid = ids.pop()
+    runs = lhe_runs(process, iseed, n_req)
+    if len({r[0] for r in runs}) != len(runs):
+        raise ValueError(f"{process}: two of its {len(runs)} runs share a MadEvent iseed")
+    d = os.path.join(lhe_parts_dir(), process)
+    return [(os.path.join(d, f"{process}_{eid}_{r[3]}_seed{r[0]}_ev{r[1]}.npz"), r) for r in runs]
+
+
+def lhe_build_part(process, items, k, mg_cores=1, work_root=None):
+    """Run the k-th MadEvent run of the pools `items` and write its part file (atomic). Returns its path; an existing
+    part is kept (a rerun does nothing)."""
+    cfg = PROCESSES[process]
+    if not cfg["lhe"].get("parts"):
+        raise RuntimeError(f"{process}: no lhe.parts, its pools are built in series (build_lhe_pp)")
+    path, (iseed_k, n_k, patches_k, name_k) = lhe_part_paths(process, items)[k]
+    if os.path.exists(path):
+        return path
+    work_root = os.path.join(work_root or lhe_work_dir(), "parts", f"{process}__{name_k}")
+    os.makedirs(work_root, exist_ok=True)
+    log_path = os.path.join(work_root, f"{process}.mg5.log")
+    open(log_path, "w").close()
+    t0 = time.time()
+    ev, _ = lhe_prepare(process, work_root, log_path, madevent=True, standalone=False)
+    t_out = time.time() - t0; t0 = time.time()
+    lhe, banner = lhe_run_madevent(process, ev, n_k, iseed_k, log_path, mg_cores, run_name=name_k, patches=patches_k)
+    t_me = time.time() - t0
+    m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path[:-len(".npz")] + f".tmp{os.getpid()}.npz"
+    np.savez(tmp, mom=m_k, aqcd=a_k, seconds=np.array([t_out, t_me]), mg_cores=np.array(int(mg_cores)),
+             banner=np.array(open(banner).read() if banner else ""))
+    os.replace(tmp, path)
+    shutil.rmtree(work_root, ignore_errors=True)
+    print(f"[LHE PART] {process} {name_k}: {len(m_k)} events (asked {n_k}, iseed {iseed_k}) in {t_me:.0f}s "
+          f"-> {path}", flush=True)
+    return path
+
+
+def lhe_assemble(process, items, mg_cores=1, write_sidecars=True, work_root=None):
+    """The pools `items` from their part files (every run's, lhe_build_part): the standalone built if missing, the
+    parent physics check, then _lhe_finish on the runs' events in run order. A missing part raises."""
+    parts = lhe_part_paths(process, items)
+    missing = [p for p, _ in parts if not os.path.exists(p)]
+    if missing:
+        raise RuntimeError(f"{process}: {len(missing)} of {len(parts)} part files missing, e.g. {missing[0]}")
+    seed, iseed, n_req = _lhe_check_recipes(process, items)
+    work_root = work_root or lhe_work_dir()
+    os.makedirs(work_root, exist_ok=True)
+    log_path = os.path.join(work_root, f"{process}.assemble.mg5.log")
+    open(log_path, "w").close()
+    t0 = time.time()
+    _, sa = lhe_prepare(process, work_root, log_path, madevent=False, standalone=True)
+    lhe_parent_physics_check(process)
+    secs = {"output": time.time() - t0, "madevent": 0.0}
+    if not PROCESSES[process]["lhe"].get("parts"):
+        raise RuntimeError(f"{process}: no lhe.parts, its pools are built in series (build_lhe_pp)")
+    moms, aqcds, banner = [], [], None
+    for k, (p, _) in enumerate(parts):
+        z = np.load(p)
+        moms.append(np.asarray(z["mom"])); aqcds.append(np.asarray(z["aqcd"]))
+        mg_cores = max(int(mg_cores), int(z["mg_cores"]))     # recorded: the most cores a part ran on
+        secs["output"] += float(z["seconds"][0]); secs["madevent"] += float(z["seconds"][1])
+        if k == 0 and str(z["banner"]):
+            banner = p[:-len(".npz")] + ".banner.txt"
+            with open(banner, "w") as f:
+                f.write(str(z["banner"]))
+    # secs["madevent"]: summed over the part jobs (each run's wall time, not this job's)
+    return _lhe_finish(process, [r for r, _ in items], items, moms, aqcds, [r for _, r in parts], banner, secs, sa,
+                       seed, iseed, n_req, mg_cores, write_sidecars)
 
 
 # =============================================================================

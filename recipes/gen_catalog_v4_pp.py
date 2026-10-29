@@ -69,6 +69,9 @@ def main():
     own_margins = json.load(open(os.path.join(HERE, "catalog_v4_pp_margins.json")))
     own_runs = json.load(open(os.path.join(HERE, "catalog_v4_pp_runs.json")))
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
+    # built as parallel one-run part jobs (lhe.parts, tools/lhe_parts.py; catalog_coverage step 7): the main session's
+    # call of 2026-10-29 for pp13v4_ud_dggu, whose 32 stalling runs took 13 to 24 h in series in one job
+    parts = {"pp13v4_ud_dggu"}
     procs = {}
     for n in regen:
         c = mg.PROCESSES[n]
@@ -82,6 +85,8 @@ def main():
             own = {"lhe": {"n_runs": runs[old]}}
         elif old in margins:
             own = {"lhe": {"margin": margins[old]}}
+        if pp(n) in parts:
+            own = {**own, "lhe": {**own.get("lhe", {}), "parts": True}}
         split = T[n]["role"] if n in T else mg.PROCESSES[old].get("split")
         procs[pp(n)] = {**own,
             "kind": "lhe_pp", "folder": pp(n), "mg5_generate": list(c["mg5_generate"]),
