@@ -2208,6 +2208,13 @@ entries:
     answers_after: '2026-10-26T22:04:37.936000+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-29T19:06:22.313000+00:00'
+    text: Yes, of course delete those working dirs, and make the change so that they get deleted once they are not needed
+      anymore
+    decision: D181
+    answers_after: '2026-10-29T18:18:02+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -2225,6 +2232,7 @@ entries:
   - D167
   - D169
   - D174
+  - D181
   next:
     1: 'Collect the pp13v4 regeneration once its jobs end. State at 16:45 UTC+1 on 2026-10-29: 937 of the 992 pp13v4 entries
       built in all 3 roles. The 304 entries left by the first pass were resubmitted after the fix at e7a1775d as one 8-core
@@ -3091,6 +3099,8 @@ entries:
     searched: CLAUDE.md rule 4 forbids deleting on clusters without the user's call; no decision in force covers freeing space
       or a quota request
     blocks: 'steps 1, 6 and 7: every resubmission and new job on CC'
+    answered_at: '2026-10-29T19:06:22.262000+00:00'
+    decision: D181
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -3440,13 +3450,6 @@ entries:
       - 'every pool assembled and the pp validation passed: design the A/B pretrainings (default share 0.50 and 0.25 against
         catalog_v4), with the user''s calls on fractions and e+e- energies asked first if still open'
       - 'tasks failed or pools short: list them with their cause, fix and requeue only those, then collect again'
-  ask: 'CC''s group space /sps/lpnhe is full (512G of 512G; ours about 290G: data cache 76G, run directories 50G, datasets
-    51G). Free space through the pruning tool, or will you ask CC for more quota? And cancel our 91 running generation jobs
-    until then?'
-  waiting_since: '2026-10-29T18:18:02+00:00'
-  searched: CLAUDE.md rule 4 forbids deleting on clusters without the user's call; no decision in force covers freeing space
-    or a quota request
-  blocks: 'steps 1, 6 and 7: every resubmission and new job on CC'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
