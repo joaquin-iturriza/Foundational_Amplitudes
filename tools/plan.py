@@ -74,7 +74,7 @@ through plan answer or plan unanswered; a running entry with an open question ke
 question does not block (CLAUDE.md 0g: only what needs the answer waits). The plan files change only through this CLI (plan_files_guard.py).
 Env for tests: PLAN_FILE, PLAN_STATE, PLAN_RUNS_DB, PLAN_SITE, PLAN_SITE_MODULE, PLAN_TRANSCRIPTS, PLAN_AGENTS,
 PLAN_ROOT, PLAN_SWEEP_SITES."""
-import argparse, contextlib, datetime as dt, fcntl, fnmatch, glob, importlib.machinery, importlib.util, json, os, re
+import argparse, contextlib, datetime as dt, fcntl, fnmatch, glob, importlib.machinery, importlib.util, json, math, os, re
 import shlex, shutil, sqlite3, subprocess, sys, tempfile
 
 import yaml
@@ -1300,9 +1300,12 @@ def _ask_ok(ask):
 
 # A question a decision in force already covers is not asked (2026-10-29: the user's call to ignore CC-IN2P3's login
 # notice, D176, was asked again as a new plan question, the supervisor stopped, and nothing moved for 7 hours). Its
-# topic is matched on the decision's covers text: TOPIC_SHARED content words in common, or every site or tool name the
-# covers text has (at least TOPIC_NAMES of them) also in the question. --not-settled-by names what it leaves open.
-TOPIC_SHARED, TOPIC_NAMES, NOT_SETTLED_MIN = 3, 2, 20
+# topic is matched on each decision's covers text, words weighted by their rarity across all the covers texts in force
+# (idf = log((N + 1) / (df + 1))): the shared weight is at least TOPIC_Q_SHARE of the question's own and TOPIC_D_SHARE
+# of the decision's, over at least two words; or the covers text has at least TOPIC_NAMES site or tool names and the
+# question has every one. Tuned on the 30 questions asked before 2026-10-29 against the 168 decisions then in force
+# (`plan topic-audit`): a plain count of 3 shared words refused 26 of them. --not-settled-by names what it leaves open.
+TOPIC_Q_SHARE, TOPIC_D_SHARE, TOPIC_NAMES, NOT_SETTLED_MIN = 0.2, 0.3, 2, 20
 STOPWORDS = set("""about above after again against also among another because been before being below between both
 could does doing done down during each either else even every from further have having here into itself just
 like made make many more most much must never none only other ours over same shall should since some such than
@@ -1324,11 +1327,25 @@ def names_in(s):
     return {n for n in NAMES if re.search(r"\b%s\b" % n, t)}
 
 
-def topic_overlap(ask, covers):
+def topic_weights(covers_texts):
+    """idf of each word over the covers texts: a word every decision has weighs nothing."""
+    sets = [content_words(c) for c in covers_texts]
+    df = {}
+    for ws in sets:
+        for w in ws:
+            df[w] = df.get(w, 0) + 1
+    n = len(sets)
+    return lambda w: math.log((n + 1) / (df.get(w, 0) + 1))
+
+
+def topic_overlap(ask, covers, idf):
     """Why the question shares its topic with a decision's covers text (None: it does not)."""
-    shared = content_words(ask) & content_words(covers)
-    if len(shared) >= TOPIC_SHARED:
-        return "shares %s" % ", ".join(sorted(shared))
+    q, c = content_words(ask), content_words(covers)
+    shared = q & c
+    wq, wc, ws = (sum(idf(w) for w in x) for x in (q, c, shared))
+    if len(shared) >= 2 and wq and wc and ws >= TOPIC_Q_SHARE * wq and ws >= TOPIC_D_SHARE * wc:
+        return "shares %s (%.0f%% of the question's weight, %.0f%% of the decision's)" % (
+            ", ".join(sorted(shared, key=idf, reverse=True)), 100 * ws / wq, 100 * ws / wc)
     nm = names_in(covers)
     if len(nm) >= TOPIC_NAMES and nm <= names_in(ask):
         return "names all of %s" % ", ".join(sorted(nm))
@@ -1354,8 +1371,10 @@ def settled_problem(ask, not_settled):
         if not dd or not dd["in_force"]:
             return "--not-settled-by names %s, which is not a decision in force" % m.group(1)
         named[m.group(1)] = m.group(2).strip()
-    hits = [(did, quote, covers, why) for did, quote, covers in decisions_in_force()
-            for why in [topic_overlap(ask, covers)] if why and did not in named]
+    dec = decisions_in_force()
+    idf = topic_weights([c for _, _, c in dec])
+    hits = [(did, quote, covers, why) for did, quote, covers in dec
+            for why in [topic_overlap(ask, covers, idf)] if why and did not in named]
     if not hits:
         return None
     return ("the question shares its topic with a decision in force; follow it instead of asking (CLAUDE.md 0i "
@@ -1806,6 +1825,22 @@ def cmd_ask(a):
             a.id, t, a.blocks or "not recorded"))
 
 
+def cmd_topic_audit(a):
+    """Every question on record (the entries' ask histories) against the decisions in force: which ones plan ask would
+    refuse now, and on which decision (how the topic rule was tuned)."""
+    d, st = load()
+    dec = decisions_in_force()
+    idf = topic_weights([c for _, _, c in dec])
+    asks = [(e["id"], x["ask"]) for e in d["entries"] for x in e.get("asks") or [] if x.get("ask")]
+    hit = 0
+    for eid, q in asks:
+        why = [(did, w) for did, _, c in dec for w in [topic_overlap(q, c, idf)] if w]
+        if why:
+            hit += 1
+            print("%s: %s\n%s" % (eid, q[:160], "\n".join("    %s: %s" % x for x in why)))
+    print("%d of %d questions on record would be refused, against %d decisions in force" % (hit, len(asks), len(dec)))
+
+
 def cmd_unanswered(a):
     """The user's messages since the question do not answer it (it stays open)."""
     with transaction() as (d, st):
@@ -2208,6 +2243,7 @@ def main(argv=None):
         A("--why", required=True, help="how that decision settles the question"),
         A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
           "(repeatable)"))
+    cmd("topic-audit", cmd_topic_audit, "the questions on record plan ask would now refuse, with the decision each hits")
     cmd("ask", cmd_ask, "put an open question for the user on the entry", ID,
         A("--ask", required=True, help="the question, as sent to the user"),
         A("--searched", required=True, help="what was read before asking (CLAUDE.md rules, site decisions) and why "
