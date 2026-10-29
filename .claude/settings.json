@@ -190,15 +190,6 @@
         ]
       },
       {
-        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/main_session_guard.py\""
-          }
-        ]
-      },
-      {
         "matcher": "SendUserFile",
         "hooks": [
           {
