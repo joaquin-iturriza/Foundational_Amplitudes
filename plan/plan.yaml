@@ -137,6 +137,10 @@ entries:
       the emission-scale target, or the parent level as an input scale), whether it shrinks the steps from five to six particles
       of the training and held-out multiplicity pools (median abs own step, its spread across classes), since the offset tracks
       that step; no fit of a free scale without a source, the candidate''s form named from the target''s definition'
+    4: 'The zero-shot shape gap: the shape error var(q - t) of catalog_v4''s training pools on their own validation events
+      (in-distribution), per cell of multiplicity and initial state, against the held-out new-combination and multiplicity
+      pools in the same cells (par:v4_tree_shape); the training pools'' validation reads come from the control pair''s checkpoints
+      (a CPU eval on CC if not saved, with site pick and --item v3_prep_explore)'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -990,6 +994,15 @@ entries:
         measured on the multiplicity axis''s signed offset and positive share'
       - 'no candidate shrinks the steps without widening the level spread elsewhere: record it as a dead end with the candidates''
         numbers and move to the one-loop axis''s level bias'
+    4:
+      feeds: 'the user''s shape priority (D178): whether the 0.24 shape error of new processes with known particles is a generalisation
+        gap (held-out well above in-distribution) or the network''s floor at this compute (held-out near in-distribution),
+        which decides whether shape work targets transfer or capacity'
+      if:
+      - 'held-out shape error well above in-distribution in the same cells: a transfer gap; design target or input priors
+        aimed at it, starting with the cells where the gap is largest (gluon-gluon, e+e-)'
+      - 'held-out close to in-distribution: the shape error is the fit''s floor at this compute; the shape lever is capacity
+        and training length, recorded for the full pretraining''s design'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
