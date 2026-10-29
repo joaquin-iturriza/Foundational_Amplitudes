@@ -1773,6 +1773,42 @@ entries:
     withdrawn_at: '2026-10-29T05:12:23+00:00'
     withdrawn_why: the user ran the deletion themselves (2026-10-29); a dry run on CC finds all 19329 manifest files gone
       (would delete 0), /sps/lpnhe 71% used, 152 GB free (81%, 105.3 GB before)
+  designs:
+  - at: '2026-10-29T05:15:16+00:00'
+    question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
+      pp-trained arm, the density check''s error correlation) can be redone on every hadronic catalog_v4 class instead of
+      only the 544 pp classes whose physics already matched. A data generation job, not an A/B: no model is trained.'
+    prior: 'pp study generation (D117, D119; recipes/gen_catalog_v3_pp.py, job_gen_daniel_catalog.sh in 8 parts plus reruns,
+      2026-10-25, runs FA-ccin2p3-5f43c90c..97b257f5): 1396 pp13 pools at catalog_v3''s physics (sm, b 4.7 GeV, minimal QED
+      order, MT 173 internal), 238 core-hours, longest process 6.5 h, 40 short runs redone at per-process margins, 5 stalled
+      ones in several runs. pp_physics_check.py (analysis/catalog_v4/data/pp_physics_check.json): catalog_v4''s standalone
+      on the pp13 labels gives mean squared log ratio at most 4e-25 on the 544 classes with no b and no new diagram, median
+      0.0095 (max 5.1) on the 253 that gain electroweak diagrams, median 0.015 (max 45.6) on the 566 with a b. results.tex
+      par:v4_vs_pp and par:v4_density: on the 417 matching trained classes catalog_v4 is ahead (0.66) and the KL correlation
+      drops to 0.19; the rest is scored on labels of another function, hence this regeneration (D167). This design differs
+      only in the physics: catalog_v4''s parents, model sm-no_b_mass and card, same run card, sizes, label alpha_s rule and
+      pipeline.'
+    measure: 'Per regenerated pool: the pipeline''s physics-block check of the pp standalone against its catalog_v4 parent
+      (model, card values, coupling-order clause, order vector, alpha_s rule, b row) before MadEvent runs, recorded in each
+      sidecar; after the job, pp_physics_check eval on the first 200 validation events of every pp13v4 pool: natural log ratio
+      of catalog_v4''s standalone |M|^2 to the stored label, per class median and mean square, plus the count of pools built
+      against the 992 asked (3 roles each).'
+    check: 'On the existing pp13 pools the same eval separates the two physics: mean squared log ratio at most 4e-25 on the
+      544 matching classes against medians 0.0095 and 0.015 (max 5.1 and 45.6) on the electroweak and b classes, so a pool
+      labelled with the wrong function is caught by it. The recipe entries were checked locally: 992 pp13v4 entries load,
+      each generate string equals its parent''s, model sm-no_b_mass, param card sha256 bcd8f754 equal to the catalog_v4 tree
+      standalones'' card on CC (4 standalones checked), run card byte-identical to Daniel''s.'
+    fixed: Daniel's 13 TeV run card (nn23lo1, maxjetflavor 5, pT > 10 GeV, abs(eta) < 5), 1e4/2e3/2e3 events per pool, labels
+      at alpha_s(sqrt(s_hat)) one-loop from 0.118, MadEvent seeds from the process name, the pipeline's LHE path and sidecars,
+      catalog_v3's per-process margins and run counts carried over by name (20 and 2 processes).
+    control: The 433 hadronic catalog_v4 classes (544 pp13 classes) whose pp13 pools already carry catalog_v4's function (ratio
+      at most 4e-25) are reused as they are in catalog_v4_pp_test.yaml; the old pp13 pools of the regenerated classes stay
+      on disk until the comparison is redone, so old and new can be read side by side.
+    seeds: One MadEvent run per process, iseed from (process name, seed 0) as the pp13 pools; no training seeds.
+    outcome: 'Yes (pools ready): all 992 entries built in 3 roles and every pp13v4 class''s log ratio against catalog_v4''s
+      standalone is 0 to float precision (mean square below 1e-12); then the pp comparisons are redone on catalog_v4_pp_test.yaml.
+      No: a class whose physics check refuses or whose ratio is not 0 is listed with its cause and fixed before any comparison
+      uses it; processes that come back short are rerun at their own margin like the pp study''s 40, never dropped.'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
