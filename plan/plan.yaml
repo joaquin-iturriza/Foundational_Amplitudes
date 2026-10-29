@@ -491,6 +491,25 @@ entries:
       most pools but short of the yes rule: written up as below what two seeds resolve, with the measured spread, and a third
       and fourth seed (about 6 GPU-h) go to the user as a question, not run. In every case the result goes in docs/results.tex
       beside par:v3_prep_signed, under catalog_v4.'
+    fix_at: '2026-10-29T05:22:36+00:00'
+    fix: 'Everything but one point holds; change only this and resubmit. (Check 4 with the A/B protocol, CLAUDE.md rule 4)
+      The no branch contradicts the control field. The control field says the same-HP run is the cheap shortcut and a sweep
+      follows only if it is not better, but the outcome for no says ''written up, the extension dropped''. Under the A/B protocol
+      a feature that is not better at the baseline''s HPs gets the same HPO sweep before it can be dropped. Fix: make the
+      no and inconclusive branches say what happens next. Either a Muon DyHPO sweep of the extension arm, the same search
+      that produced trial_1860, compared best against best (say whether that goes to the user under the GPU budget), or an
+      explicit reason why a data-only change needs no sweep here. If you give a reason, have the outcome say the drop is provisional
+      on it. (Prior, minor, fix in the same pass) Prior item (1) quotes the catalog_v3 zero-shot cost as ''per-probe ratio
+      1.07 at one seed, cost at 2->5 and 1 to 10 TeV not resolved''. results.tex after the seed-43 rerun (FA-ccin2p3-5a8c8fde)
+      says the two-seed ratio is 0.97 and that a 2->5 cost of 1.58 (1.17 and 2.15) remains at both seeds, the 1 to 10 TeV
+      cost being inside the run-to-run spread. State that, so the yes branch''s proposal to the user carries the known 2->5
+      cost as the thing to watch. Checks that passed, for the record: one change (recipe only; the controls ran 2026-10-26
+      16:04, after the width rebuild of 10-26 morning and the 14:43 roles commit; code diff from 1d9d6a29 is experiment.py
+      and the job script, to be listed); measure seen to move (prep_signed.json m2: 14 lower, 1 higher of 17); null measured
+      on the 21 v4 pools (11/10, median absolute difference 2.25 points, medians 5.6% and 8.55%, seed-mean 6.475%: reproduced
+      from H5_signed.txt); 15 of 21 gives one-sided p=0.039; searched signext, more_signed, more sign-changing, sign-changing
+      pools, v4 sign, signed_ab, loop_signed, and catalog_norm, qperp_soft, f24, f24net, catalog_coverage: no catalog_v4 run
+      of the extension exists.'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
