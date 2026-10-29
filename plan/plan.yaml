@@ -123,13 +123,13 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Continuous CPU exploration while the sign extension runs (the user''s ''Keep iterating.''): does the thin-class reading
-      of the one-loop level (par:v4_loop_levels: held-out levels inside the training range, the largest offsets on pools whose
-      property class has one training pool or none) hold on the tree axes: for catalog_v4''s held-out tree axes H1, H2, H3
-      (kshot_level.json offsets, both seeds) dump the training trees'' train-split levels on CC through site run (extend analysis/catalog_v4/loop_levels.py
-      with a tree mode, same one match rule), and read each held-out pool''s absolute offset against its matched class size;
-      if the level error falls with class size on trees too, the fix to propose is coverage of the thin classes, not a target
-      change; write it up with provenance; never wait on the GPU runs'
+    2: 'Continuous CPU exploration (the user''s ''Keep iterating.''), no new run: the largest tree level offsets sit in covered
+      classes, H3''s top pools first (par:v4_tree_levels). Read, from data/tree_levels.json and kshot_level.json (both seeds),
+      whether an external top carries the tree level error: per tree held-out axis the seed-mean |offset| of pools with and
+      without an external top, the six largest''s top count against the top share, and for top pools whether their level departs
+      from the matched training pools that also have an external top (a property read beside the one match rule, as par:v4_loop_levels
+      read born orders and initial state, never a re-match); extend analysis/catalog_v4/loop_levels.py, no free fits; write
+      up with provenance'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -927,6 +927,15 @@ entries:
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
+  step_why:
+    2:
+      feeds: what the tree level error follows (the coverage-or-target question of par:v4_loop_levels, the fix to propose
+        for the level)
+      if:
+      - 'top pools carry most of the large tree offsets: the level fix to examine is the top''s treatment (its mass scale
+        in the emission-scale target or its coverage), written up for the user beside the one-loop thin-class result'
+      - 'no property separates them: the tree level error is diffuse and small beside the shape on H1 and H2; record it and
+        move the exploration queue on'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
