@@ -878,8 +878,15 @@ def bad_steps(st):
 # ---------------------------------------------------------------- what can move now
 def last_step(st, eid, e=None, key=None):
     """The latest recorded step that is a real step agent of the entry (with `key`, of that step of it)."""
-    steps = [parse(s["at"]) for s in (st.get(eid) or {}).get("steps") or [] if not step_problem(st, eid, s)
-             and (key is None or rec_of(e, s) == key)]
+    # a step agent's last record counts, not only its start: runs that ended while it was working were its to read
+    # (2026-10-29: 83 worker runs read and acked by the step's agent were demanded again because they ended after
+    # it started)
+    steps = []
+    for s in (st.get(eid) or {}).get("steps") or []:
+        if step_problem(st, eid, s) or (key is not None and rec_of(e, s) != key):
+            continue
+        a = subagent_activity(s.get("agent"))
+        steps.append(max(parse(s["at"]), a[0]) if a and a[0] else parse(s["at"]))
     return max(steps) if steps else None
 
 
@@ -1048,6 +1055,10 @@ def next_steps_keyed(d, st, t=None, msgs=None):
         held = blocked_steps(e) if e.get("status") == "running" else set()
         for k in step_keys(e) if e.get("status") == "running" else [None]:
             r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
+            if r and k in (e.get("step_waits") or {}) or r and str(k) in (e.get("step_waits") or {}):
+                note("%s step %d waits on %s (plan wait); not listed until plan unwait" % (
+                    e["id"], k, (e.get("step_waits") or {}).get(str(k))))
+                continue
             if r and k in held:
                 note("%s step %d waits on the open question to the user (blocks: %s); not listed until it is answered"
                      % (e["id"], k, e.get("blocks_steps") or e.get("blocks")))
@@ -2030,6 +2041,8 @@ def cmd_set_next(a):
         for k, (t, w) in zip(keys, steps):
             items[k], why[k] = t, w
         e["step_why"] = why
+        for k in keys:
+            (e.get("step_waits") or {}).pop(str(k), None)
         put_nexts(e, sorted(items.items()))
     print_nexts(a.id)
 
@@ -2048,6 +2061,25 @@ def cmd_add_next(a):
     print_nexts(a.id)
 
 
+def cmd_wait(a):
+    """Step N waits on something outside the turn (a cluster's state, another step's result): plan next and the stop
+    check note it and never demand it, until plan unwait (the user, 2026-10-29: a hook must not loop on what the turn
+    cannot do)."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        if a.n not in dict(nexts(e)):
+            sys.exit("plan: %s has no next step %d" % (a.id, a.n))
+        e.setdefault("step_waits", {})[str(a.n)] = a.on
+    print("plan: %s step %d waits on: %s" % (a.id, a.n, a.on))
+
+
+def cmd_unwait(a):
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        (e.get("step_waits") or {}).pop(str(a.n), None)
+    print("plan: %s step %d no longer waits" % (a.id, a.n))
+
+
 def cmd_drop_next(a):
     """Step N is finished and nothing follows it: it leaves the list; the others keep their numbers."""
     with transaction() as (d, st):
@@ -2056,6 +2088,7 @@ def cmd_drop_next(a):
         if a.n not in items:
             sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, a.n, ", ".join(str(k) for k in items) or "none"))
         del items[a.n]
+        (e.get("step_waits") or {}).pop(str(a.n), None)
         put_nexts(e, sorted(items.items()))
     print_nexts(a.id)
 
@@ -2334,6 +2367,9 @@ def main(argv=None):
                                        "and --if follow it"),
         *WHY_ARGS,
         A("--next", type=int, help="replace only next step N (a step agent's own step), keeping the others"))
+    cmd("wait", cmd_wait, "step N waits on something outside the turn: noted, never demanded, until unwait", ID,
+        A("n", type=int, help="the step"), A("--on", required=True, help="what it waits on"))
+    cmd("unwait", cmd_unwait, "step N no longer waits", ID, A("n", type=int, help="the step"))
     cmd("add-next", cmd_add_next, "add an independent next step to the entry", ID, A("text", help="the step"),
         *WHY_ARGS)
     cmd("drop-next", cmd_drop_next, "remove next step N (finished, nothing follows it)", ID,
