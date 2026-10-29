@@ -132,13 +132,6 @@ entries:
       target taken relative to its own Born''s tree level where that tree pool is read, so the born''s level drops out), on
       loop_levels_cc.json and tree_levels_cc.json: whether it narrows the held-out one-loop pools'' departure from their matched
       training pools and the training one-loop levels'' spread within classes; no free scale without a source'
-    3: 'The one-loop axis''s signed level bias, read as the tree multiplicity bias was (CPU, existing reads: data/loop_levels_cc.json,
-      data/kshot_level.json; extend analysis/catalog_v4/loop_levels.py, never copy; no run; after step 2''s grouping of the
-      one-loop zero-shot error, which it does not repeat): per held-out one-loop pool, the sign of its seed-mean offset against
-      its level''s step from its born tree (the one-loop level less the training level of its born''s tree class, where that
-      class is in training) and against the same step of the training one-loop pools of its class (born orders, multiplicity,
-      initial state; loop-induced and virtual apart); rank correlations per seed and on the seed mean, the positive share
-      where the step is below and above the class''s, no fit, no threshold'
     4: 'The zero-shot shape gap, redesigned after the design review''s FIX of 2026-10-29 18:00 (plan show: the design''s review),
       then the job: (a) the free read first: the control pair''s (FA-ccin2p3-339ec100, -380842ed) result.json per-process
       val_loss_no_reg times the shared standardization''s sigma^2 (the conversion of docs/results.tex near line 2672, 0.50
@@ -1092,20 +1085,6 @@ entries:
       - 'no candidate narrows them: record it as a dead end with the candidates'' numbers and put to the user, as a catalog
         design question (their call), more one-loop training pools in the thin classes (e+e-, bg, qg beams), with the measured
         share of the one-loop error on thin classes'
-    3:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): the tree multiplicity bias follows the level''s class-to-class
-        step and no particle-content target change removes it (par:v4_mult_cand); whether the one-loop axis''s level error
-        is the same kind of under-extrapolated step (from tree to loop) decides whether a step-aware input (the born tree''s
-        level) is the lead for the one-loop level, or its error is the pool''s own'
-      if:
-      - 'the one-loop offsets follow the step from the born tree (rank correlation of the same sign and size as the trees'',
-        -0.3 or beyond, on both seeds): design a short arm against the control pair v4_dimensionless_muon seeds 42 and 43
-        that gives the network the born tree''s level (or its class''s training step) as an input scale, checked first on
-        these reads for how much of the offset it would remove, measured on the one-loop axis''s signed offset and positive
-        share'
-      - 'no relation to the step (the offsets as large on pools whose level is at their class''s step): the one-loop level
-        error is the pool''s own, not an extrapolation; record it with the numbers and take the one-loop level fix from step
-        2''s grouping (top mass, loop-induced or virtual, born orders)'
     4:
       feeds: 'the user''s shape priority (D178): whether the 0.24 shape error of new processes with known particles is a generalisation
         gap (held-out well above in-distribution, beyond the intrinsic difficulty the shape proxy measures) or the network''s
