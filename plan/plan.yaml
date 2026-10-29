@@ -2679,6 +2679,7 @@ entries:
     - tests/test_orders_source.py
     - tests/test_particle_encoding.py
     - tests/test_zero_shot_split.py
+    - 'the lhe_parts gc job: 2435 directories trimmed to their logs, 122.4 GB; CC at 115G free'
     - tools/catalog_ft.py
     - tools/certify_v4_loops.py
     - tools/mixed_order_audit.py
