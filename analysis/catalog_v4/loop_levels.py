@@ -1305,6 +1305,64 @@ def shape_gap():
                 flat[f"sg.{c}.{k}"] = round(v[k], 3)
     for k, x in S.items():
         flat[f"sg.{k}"] = round(x, 3) if isinstance(x, float) else x
+    # per held-out group (the design review of 2026-10-29: the two top groups carry the untrained top mass, so the
+    # decision is on the new combinations and the multiplicity pools, each apart; the top groups reported beside):
+    # per pool d = log10(floor / its cell's median training floor), the proxy's p = log10(proxy MSE / its cell's
+    # median training proxy MSE) and e = d - p, over pools in cells with >= MIN_TRAIN training pools; per seed and
+    # the seed mean. Secondary: log floor against log proxy MSE fitted over the training pools (one slope, an
+    # intercept per cell), the held-out pools' residual in log10.
+    MIN_TRAIN = 5
+    grp = {lab: [n for n in tl["heldout"][ax] if n in H and sel(H[n])] for lab, ax, sel in NP_GROUPS}
+    trs = {"free": (lambda m, i: free_s[m][i] if i is not None else free[m], free)}
+    if net_tr:
+        trs["tr"] = (lambda m, i: net_tr[m][i] if i is not None else float(np.mean(net_tr[m])), net_tr)
+    cmed = {k: {c: [med([f(m, i) for m in T if cell(T[m]) == c and m in have]) for i in (None, 0, 1)]
+                for c in cells} for k, (f, have) in trs.items()}
+    pmed = {c: med([pmse[m] for m in T if cell(T[m]) == c and m in pmse]) for c in cells} if pmse else {}
+    fit = None
+    if pmse and net_tr:
+        tm = [m for m in T if m in pmse and m in net_tr and cells.get(cell(T[m]), {}).get("n_train", 0) >= MIN_TRAIN]
+        cs = sorted({cell(T[m]) for m in tm})
+        X = np.array([[np.log10(pmse[m])] + [cell(T[m]) == c for c in cs] for m in tm], float)
+        y = np.array([np.log10(np.mean(net_tr[m])) for m in tm])
+        beta = np.linalg.lstsq(X, y, rcond=None)[0]
+        fit = {"slope": float(beta[0]), "n": len(tm), "intercepts": dict(zip(cs, map(float, beta[1:]))),
+               "train_resid_sd": float(np.std(y - X @ beta))}
+        S["fit"] = fit
+    G = {}
+    for lab, ns in grp.items():
+        q = [n for n in ns if cells[cell(H[n])]["n_train"] >= MIN_TRAIN]
+        O = {"n": len(ns), "n_in_cells": len(q), "by_cell": {c: sum(cell(H[n]) == c for n in q) for c in sorted({cell(H[n]) for n in q})}}
+        for k in trs:
+            for j, i in enumerate((None, 0, 1)):
+                tag = "" if i is None else f"_seed{RUNS[i][-5:] == 'seed2' and 43 or 42}"
+                fl = lambda n: H[n]["shape"] if i is None else H[n]["floor"][i]
+                d = [np.log10(fl(n) / cmed[k][cell(H[n])][j]) for n in q]
+                O[f"median_d_{k}{tag}"] = med(d)
+                if pmse:
+                    e = [np.log10(fl(n) / cmed[k][cell(H[n])][j]) - np.log10(pmse[n] / pmed[cell(H[n])])
+                         for n in q if n in pmse]
+                    O[f"median_e_{k}{tag}"] = med(e)
+        if pmse:
+            O["median_p"] = med([np.log10(pmse[n] / pmed[cell(H[n])]) for n in q if n in pmse])
+        if fit:
+            O["median_resid"] = med([np.log10(H[n]["shape"]) - fit["slope"] * np.log10(pmse[n])
+                                     - fit["intercepts"][cell(H[n])] for n in q if n in pmse and cell(H[n]) in fit["intercepts"]])
+        O["median_seed_spread_pool"] = med([abs(np.log10(H[n]["floor"][0] / H[n]["floor"][1])) for n in q])
+        # the seed spread of a group median at this count: |median d seed 42 - median d seed 43|
+        O["seed_diff_median_d_free"] = abs(O["median_d_free_seed42"] - O["median_d_free_seed43"])
+        G[lab] = O
+        key = NP_KEY[lab]
+        print(f"group {lab}: {O['n']} pools, {O['n_in_cells']} in cells with >= {MIN_TRAIN} training pools; median "
+              f"log10(floor / cell training) free {O['median_d_free']:+.3f} (seeds {O['median_d_free_seed42']:+.3f} / "
+              f"{O['median_d_free_seed43']:+.3f}); pool seed spread {O['median_seed_spread_pool']:.3f}"
+              + (f"; proxy {O['median_p']:+.3f}, excess free {O['median_e_free']:+.3f}" if pmse else "")
+              + (f", excess TR {O['median_e_tr']:+.3f} ({O['median_e_tr_seed42']:+.3f} / {O['median_e_tr_seed43']:+.3f})"
+                 if pmse and net_tr else ""))
+        for k2, x in O.items():
+            if isinstance(x, (int, float)):
+                flat[f"sg.{key}.{k2}"] = round(x, 3) if isinstance(x, float) else x
+    S["groups"] = G
     json.dump({"summary": S, "cells": cells}, open(os.path.join(HERE, "data", "shape_gap.json"), "w"), indent=1)
     print(json.dumps(flat))
 

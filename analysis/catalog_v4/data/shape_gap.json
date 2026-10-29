@@ -13,7 +13,103 @@
   "n_heldout_in_cells": 559,
   "median_log_ratio_free": 0.6094272533057984,
   "n_cells_free_above": 19,
-  "median_pool_log_ratio_free": 0.4746650921784569
+  "median_pool_log_ratio_free": 0.4746650921784569,
+  "groups": {
+   "new combinations": {
+    "n": 62,
+    "n_in_cells": 62,
+    "by_cell": {
+     "4qq": 2,
+     "5bb": 1,
+     "5bg": 1,
+     "5ee": 1,
+     "5qq": 10,
+     "6bb": 6,
+     "6bg": 1,
+     "6bq": 6,
+     "6ee": 5,
+     "6qg": 6,
+     "6qq": 23
+    },
+    "median_d_free": 0.20119135080487083,
+    "median_d_free_seed42": 0.22644912100178297,
+    "median_d_free_seed43": 0.1778924074453515,
+    "median_seed_spread_pool": 0.06398452298387157,
+    "seed_diff_median_d_free": 0.04855671355643146
+   },
+   "multiplicity": {
+    "n": 218,
+    "n_in_cells": 218,
+    "by_cell": {
+     "6bb": 28,
+     "6bg": 6,
+     "6bq": 8,
+     "6ee": 21,
+     "6gg": 17,
+     "6qg": 28,
+     "6qq": 110
+    },
+    "median_d_free": 0.33428625444394666,
+    "median_d_free_seed42": 0.3506259980511437,
+    "median_d_free_seed43": 0.3190685570118542,
+    "median_seed_spread_pool": 0.05358532763739427,
+    "seed_diff_median_d_free": 0.03155744103928948
+   },
+   "top, process at another top mass": {
+    "n": 35,
+    "n_in_cells": 35,
+    "by_cell": {
+     "4bb": 1,
+     "4bg": 1,
+     "4bq": 2,
+     "4ee": 1,
+     "4gg": 1,
+     "4qq": 1,
+     "5bb": 2,
+     "5bq": 1,
+     "5gg": 1,
+     "5qq": 1,
+     "6bb": 4,
+     "6bg": 3,
+     "6bq": 3,
+     "6ee": 2,
+     "6gg": 2,
+     "6qg": 2,
+     "6qq": 7
+    },
+    "median_d_free": 0.2151595450971914,
+    "median_d_free_seed42": 0.15945990219635534,
+    "median_d_free_seed43": 0.20854630117785541,
+    "median_seed_spread_pool": 0.03802485034212969,
+    "seed_diff_median_d_free": 0.04908639898150008
+   },
+   "top, process at no top mass": {
+    "n": 244,
+    "n_in_cells": 244,
+    "by_cell": {
+     "4qq": 1,
+     "5bb": 4,
+     "5bg": 8,
+     "5bq": 11,
+     "5ee": 5,
+     "5gg": 4,
+     "5qg": 4,
+     "5qq": 13,
+     "6bb": 19,
+     "6bg": 28,
+     "6bq": 43,
+     "6ee": 20,
+     "6gg": 17,
+     "6qg": 14,
+     "6qq": 53
+    },
+    "median_d_free": 0.6960184841459713,
+    "median_d_free_seed42": 0.7083596845394089,
+    "median_d_free_seed43": 0.6729447900019239,
+    "median_seed_spread_pool": 0.07635788836874641,
+    "seed_diff_median_d_free": 0.03541489453748503
+   }
+  }
  },
  "cells": {
   "4bb": {
