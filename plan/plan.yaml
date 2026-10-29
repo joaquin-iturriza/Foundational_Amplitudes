@@ -119,7 +119,9 @@ entries:
   - D165
   - D170
   - D175
-  next: after the code reviewer's re-check passes, resubmit the sign extension and its two chained pretrainings
+  next: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
+    says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
+    median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
