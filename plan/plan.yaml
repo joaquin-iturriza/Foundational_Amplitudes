@@ -1125,6 +1125,33 @@ entries:
       for the full pretraining''s design. Either way written up beside par:v4_tree_shape with the per-cell table (free read,
       TR read, proxy). Cost: two eval-only GPU jobs, 1153 probes at about 1.1 s each plus setup, about 0.5 GPU-h each, 1 GPU-h
       in all (budget 30); one CPU job, 32 cores, up to 3 h (the proxy on 1604 pools, two targets).'
+    fix_at: '2026-10-29T17:07:16+00:00'
+    fix: 'Checks 1 and 6 fail, the rest hold. (1, 6) The decision statistic mixes held-out groups that differ in more than
+      being untrained. The question is the shape of new processes with known particles (0.24 on the 62 new combinations, 0.392
+      on the 218 multiplicity pools), but the median of E is taken over all held-out pools, each carrying its cell''s E, and
+      the cell''s held-out median is over all three axes. By analysis/catalog_v4/data/shape_gap.json the 559 held-out pools
+      are 279 top (H3, 244 of them at a top mass never trained, the group par:v4_tree_shape already shows has the largest
+      floor, 0.626), 218 multiplicity (H2) and 62 new combinations (H1). Every 4- and 5-particle cell is H3 by majority (5bq
+      12 of 12, 5gg 5 of 5, 5bg 8 of 9), and so are 6bq (46 of 60) and 6bg (31 of 38). So a yes could come from the untrained
+      top mass, which is already known, and would send the next step to priors for the wrong cause. Fix: compute R_net, R_proxy
+      and E per cell for each held-out group separately (H1 new combinations, H2 multiplicity, H3 at another trained mass,
+      H3 at no trained mass), against the same cell''s training pools. Put the decision rule (E >= 0.3 on both seeds) on H1
+      and H2, each stated, or on H1 and H2 pooled if you say why. Report H3''s two groups beside them, not in the decision.
+      H1 has only 60 pools in eligible cells, 23 of them in 6qq, so state the minimum pools per cell for H1 (or make the per-pool
+      log10(network floor / proxy MSE), H1 against the same cell''s training pools, the primary statistic for H1), and its
+      seed spread at that count (per-pool spread 0.062 in shape_gap.json). Recommended, not required: the ratio of ratios
+      assumes the network floor is proportional to the proxy MSE (par:v3_shape_proxy says the proxy ranks and does not bound
+      the network, 7 to 20 times apart). Fit log network floor against log proxy MSE over the training pools within each cell
+      and read the held-out pools'' residuals from that fit, so a slope other than 1 is not counted as a gap. Checks that
+      hold: (2) the free read moves, median per-cell log10 ratio 0.61, 19 of 20 cells above, against a cell seed spread of
+      0.081; the proxy separated training from held-out classes on catalog_v3 (0.059 against 0.077) with rank 0.68 to 0.80
+      against the network. (3) Threshold 0.3 against spreads of 0.081 per cell and 0.062 per pool, two seeds, deterministic
+      proxy. (4) yes and no stated. (5) Searched docs/results.tex for in-distribution, generalisation gap, shape gap, train_levels,
+      training floor, own training, training classes, v4_tree_shape and shape proxy, plus the plan''s dead ends and site decisions
+      (D178, D179): the prior is complete (line 2006 records the gap this fills). The GPU read redoes the free read, but the
+      design says what differs: test split, 2000 events, var(q - t) by the held-out scorer. (7) No decision names a comparison
+      this design leaves out. The proxy job is fine as written: v4 tree validation pools hold 1e4 events, enough for 7500
+      + 2500, and the qperp target is the control''s (target_physics_dim_ref=qperp).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
