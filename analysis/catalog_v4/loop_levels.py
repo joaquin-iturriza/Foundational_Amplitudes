@@ -129,6 +129,13 @@ def analyse():
     slope = float(np.polyfit(dep, om, 1)[0]); corr = float(np.corrcoef(dep, om)[0, 1])
     # the predicted level against the matched training mean: what the network places, if it places the class level
     pdev = np.array([np.mean(res[n]["pred_level"]) - res[n]["match_mean"] for n in names])
+    # per seed, and without the pool of largest departure (one point can carry a slope)
+    per_seed = [float(np.polyfit(dep, [res[n]["offset"][i] for n in names], 1)[0]) for i in range(len(RUNS))]
+    keep = np.abs(dep) < np.abs(dep).max()
+    slope_trim = float(np.polyfit(dep[keep], om[keep], 1)[0]); corr_trim = float(np.corrcoef(dep[keep], om[keep])[0, 1])
+    lvl = np.array([res[n]["level"] for n in names])
+    corr_level = float(np.corrcoef(lvl - np.median(lv), om)[0, 1])
+    ee = [n for n in names if res[n]["initial"] == "ee"]
     big = sorted(names, key=lambda n: -abs(np.mean(res[n]["offset"])))[:6]
     s = {"n_train": len(T), "n_train_missing": len(miss_tr), "n_heldout": len(names),
          "train_level_range": [float(lv.min()), float(np.median(lv)), float(lv.max())], "train_level_sd": sd_all,
@@ -137,13 +144,20 @@ def analyse():
          "median_nearest_in_sd": float(np.median([res[n]["nearest_in_sd"] for n in names])),
          "corr_departure_offset": corr, "slope_offset_on_departure": slope,
          "sd_departure": float(dep.std()), "sd_offset": float(om.std()), "sd_pred_minus_match": float(pdev.std()),
-         "level_check_maxabs": float(max(check)), "largest": big}
+         "level_check_maxabs": float(max(check)), "largest": big,
+         "slope_per_seed": per_seed, "slope_trim": slope_trim, "corr_trim": corr_trim, "corr_level_offset": corr_level,
+         "n_train_ee": int(sum(P[m]["initial"] == "ee" for m in T)), "ee_heldout": {n: [res[n]["departure"],
+         float(np.mean(res[n]["offset"]))] for n in ee},
+         "outside_names": [n for n in names if res[n]["outside_all"]]}
     print(f"training one-loop pools {len(T)} (missing {len(miss_tr)}), levels [{lv.min():.2f}, {np.median(lv):.2f}, "
           f"{lv.max():.2f}] sd {sd_all:.2f}; held-out {len(names)}: outside overall {s['outside_all']}, at their N "
           f"{s['outside_atN']}; nearest training level median {s['median_nearest_in_sd']:.3f} sd; level check max "
           f"{s['level_check_maxabs']:.2g}")
     print(f"departure from matched training mean vs seed-mean offset: corr {corr:+.2f}, slope {slope:+.2f}; sd departure "
           f"{dep.std():.2f}, sd offset {om.std():.2f}, sd (predicted level - matched mean) {pdev.std():.2f}")
+    print(f"slope per seed {per_seed[0]:+.2f} / {per_seed[1]:+.2f}; without the largest departure {slope_trim:+.2f} "
+          f"(corr {corr_trim:+.2f}); corr(level - training median, offset) {corr_level:+.2f}; e+e- training pools "
+          f"{s['n_train_ee']}, held out {len(ee)}; outside {s['outside_names']}")
     for n in sorted(names, key=lambda n: -abs(np.mean(res[n]["offset"]))):
         r = res[n]
         print(f"  {n:28s} N={r['n']} {r['initial']:3s} {r['born']:7s}{' qcdborn' if r['qcd_born'] else ''}"
@@ -155,9 +169,14 @@ def analyse():
     for k in ("n_train", "n_heldout", "outside_all", "outside_atN"):
         flat[k] = s[k]
     for k in ("median_nearest_in_sd", "corr_departure_offset", "slope_offset_on_departure", "sd_departure", "sd_offset",
-              "sd_pred_minus_match", "train_level_sd"):
+              "sd_pred_minus_match", "train_level_sd", "slope_trim", "corr_trim", "corr_level_offset"):
         flat[k] = round(s[k], 2)
+    flat["slope_seed42"], flat["slope_seed43"] = round(per_seed[0], 2), round(per_seed[1], 2)
+    flat["n_train_ee"] = s["n_train_ee"]
+    flat["train_level_min"], flat["train_level_max"] = round(float(lv.min()), 2), round(float(lv.max()), 2)
+    flat["level_check_maxabs"] = round(s["level_check_maxabs"], 3)
     for n in big:
+        flat[f"level.{n}"] = round(res[n]["level"], 2)
         flat[f"departure.{n}"] = round(res[n]["departure"], 2)
         flat[f"match_n.{n}"] = res[n]["n_match"]
     plot(res, names, T, P)
@@ -174,6 +193,8 @@ def plot(res, names, T, P):
            label=f"held out ({len(names)})")
     a.plot([res[n]["n"] + 0.12 for n in names], [np.mean(res[n]["pred_level"]) for n in names], "x", color=ps.C.green,
            label="held out, predicted")
+    from matplotlib.ticker import MaxNLocator
+    a.xaxis.set_major_locator(MaxNLocator(integer=True))
     a.set_xlabel(r"particles $N$"); a.set_ylabel(r"$\overline{t}$")
     ps.legend(a, "upper right"); ps.make_room(a)
     dep = [res[n]["departure"] for n in names]
