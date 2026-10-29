@@ -1,0 +1,9 @@
+# one remaining pp13v4 entry of recipes/catalog_v4_pp_part*.yaml (unchanged), one CPU job each (plan catalog_coverage); do not edit
+processes:
+- name: pp13v4_bbx_gtaptamz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000

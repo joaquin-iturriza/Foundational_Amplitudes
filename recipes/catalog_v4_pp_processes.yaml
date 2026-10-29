@@ -36,6 +36,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bb_aabb
@@ -62,6 +63,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_abb
@@ -92,6 +94,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bb_abbg
@@ -120,6 +123,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_abbh
@@ -148,6 +152,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_abbz
@@ -176,6 +181,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bb_abtwm
@@ -200,6 +206,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bb
@@ -228,6 +235,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbbbx
@@ -256,6 +264,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbddx
@@ -284,6 +293,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbepem
@@ -310,6 +320,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbg
@@ -340,6 +351,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbgg
@@ -368,6 +380,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbgh
@@ -396,6 +409,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbgz
@@ -422,6 +436,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbh
@@ -450,6 +465,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbhh
@@ -478,6 +494,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbhz
@@ -506,6 +523,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbuux
@@ -534,6 +552,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbvevex
@@ -560,6 +579,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbz
@@ -588,6 +608,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bb_bbzz
@@ -616,6 +637,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bb_bgtwm
@@ -644,6 +666,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bb_bhtwm
@@ -670,6 +693,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bb_btwm
@@ -698,6 +722,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bb_btwmz
@@ -722,6 +747,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aa
@@ -748,6 +774,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaa
@@ -776,6 +803,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaaa
@@ -804,6 +832,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaag
@@ -832,6 +861,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaaz
@@ -860,6 +890,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_aabbx
@@ -888,6 +919,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaccx
@@ -916,6 +948,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaddx
@@ -944,6 +977,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaepem
@@ -970,6 +1004,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aag
@@ -998,6 +1033,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_aagg
@@ -1026,6 +1062,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aagz
@@ -1054,6 +1091,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aahz
@@ -1084,6 +1122,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aataptam
@@ -1112,6 +1151,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_aattx
@@ -1140,6 +1180,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aavevex
@@ -1168,6 +1209,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aawpwm
@@ -1194,6 +1236,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aaz
@@ -1222,6 +1265,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aazz
@@ -1248,6 +1292,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_abbx
@@ -1276,6 +1321,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_abbxg
@@ -1304,6 +1350,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_abbxh
@@ -1332,10 +1379,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_abbxz
   pp13v4_bbx_abtxwp:
+    lhe:
+      margin: 4.81
     kind: lhe_pp
     folder: pp13v4_bbx_abtxwp
     mg5_generate:
@@ -1360,6 +1410,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_abtxwp
@@ -1386,6 +1437,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_accx
@@ -1414,6 +1466,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_accxg
@@ -1444,6 +1497,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_accxh
@@ -1472,6 +1526,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_accxz
@@ -1500,6 +1555,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_acsxwm
@@ -1526,6 +1582,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_addx
@@ -1554,6 +1611,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_addxg
@@ -1582,6 +1640,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_addxh
@@ -1610,6 +1669,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_addxz
@@ -1636,6 +1696,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aepem
@@ -1664,6 +1725,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aepemg
@@ -1692,6 +1754,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_aepemh
@@ -1720,6 +1783,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aepemz
@@ -1748,6 +1812,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aepvewm
@@ -1772,6 +1837,7 @@ processes:
     - 1
     - 1
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ag
@@ -1800,6 +1866,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_agg
@@ -1828,6 +1895,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aggg
@@ -1856,6 +1924,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aggz
@@ -1884,6 +1953,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aghz
@@ -1914,6 +1984,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_agtaptam
@@ -1942,6 +2013,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_agttx
@@ -1970,6 +2042,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_agvevex
@@ -1998,6 +2071,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_agwpwm
@@ -2024,6 +2098,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_agz
@@ -2052,6 +2127,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_agzz
@@ -2080,6 +2156,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ahhz
@@ -2108,6 +2185,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ahtaptam
@@ -2136,6 +2214,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ahttx
@@ -2164,6 +2243,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ahvevex
@@ -2192,6 +2272,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ahwpwm
@@ -2218,6 +2299,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ahz
@@ -2246,6 +2328,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ahzz
@@ -2272,6 +2355,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ataptam
@@ -2300,6 +2384,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ataptamz
@@ -2328,6 +2413,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_atapvtwm
@@ -2354,6 +2440,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_attx
@@ -2382,6 +2469,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_attxz
@@ -2408,6 +2496,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_avevex
@@ -2436,6 +2525,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_avevexz
@@ -2462,6 +2552,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_awpwm
@@ -2490,6 +2581,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_awpwmz
@@ -2514,6 +2606,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_az
@@ -2540,6 +2633,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_azz
@@ -2568,6 +2662,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_azzz
@@ -2596,6 +2691,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbbxbx
@@ -2620,6 +2716,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbx
@@ -2648,6 +2745,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_bbxddx
@@ -2676,6 +2774,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxepem
@@ -2702,6 +2801,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxg
@@ -2732,6 +2832,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxgg
@@ -2760,6 +2861,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxgh
@@ -2788,6 +2890,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxgz
@@ -2814,6 +2917,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxh
@@ -2842,6 +2946,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_bbxhh
@@ -2870,6 +2975,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxhz
@@ -2898,6 +3004,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxtaptam
@@ -2926,6 +3033,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_bbxttx
@@ -2954,10 +3062,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxvevex
   pp13v4_bbx_bbxwpwm:
+    lhe:
+      margin: 2.28
     kind: lhe_pp
     folder: pp13v4_bbx_bbxwpwm
     mg5_generate:
@@ -2982,6 +3093,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxwpwm
@@ -3008,6 +3120,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxz
@@ -3036,6 +3149,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_bbxzz
@@ -3064,6 +3178,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_bgtxwp
@@ -3092,6 +3207,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_bhtxwp
@@ -3118,6 +3234,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_btxwp
@@ -3146,6 +3263,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_btxwpz
@@ -3170,6 +3288,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ccx
@@ -3198,6 +3317,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ccxddx
@@ -3226,6 +3346,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ccxepem
@@ -3252,6 +3373,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ccxg
@@ -3280,6 +3402,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ccxgg
@@ -3308,6 +3431,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ccxgh
@@ -3336,6 +3460,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ccxgz
@@ -3362,6 +3487,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ccxh
@@ -3390,6 +3516,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ccxuux
@@ -3418,6 +3545,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ccxvevex
@@ -3446,6 +3574,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ccxz
@@ -3474,6 +3603,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_cgsxwm
@@ -3502,6 +3632,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_chsxwm
@@ -3528,6 +3659,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_csxwm
@@ -3556,6 +3688,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_csxwmz
@@ -3584,6 +3717,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_dddxdx
@@ -3612,6 +3746,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ddxepem
@@ -3640,6 +3775,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxgz
@@ -3670,6 +3806,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ddxhh
@@ -3698,6 +3835,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxhz
@@ -3726,6 +3864,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxtaptam
@@ -3754,6 +3893,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ddxttx
@@ -3782,6 +3922,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ddxuux
@@ -3810,6 +3951,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxvevex
@@ -3840,6 +3982,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxwpwm
@@ -3866,6 +4009,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxz
@@ -3894,6 +4038,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ddxzz
@@ -3920,6 +4065,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epem
@@ -3946,6 +4092,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemg
@@ -3974,6 +4121,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemgg
@@ -4004,6 +4152,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_epemgh
@@ -4032,6 +4181,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemgz
@@ -4058,6 +4208,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemh
@@ -4086,6 +4237,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_epemhh
@@ -4114,6 +4266,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_epemhz
@@ -4142,6 +4295,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemtaptam
@@ -4170,6 +4324,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_epemttx
@@ -4198,6 +4353,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_epemvevex
@@ -4226,6 +4382,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemvtvtx
@@ -4254,6 +4411,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemwpwm
@@ -4280,6 +4438,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemz
@@ -4308,6 +4467,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epemzz
@@ -4336,6 +4496,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epepemem
@@ -4366,6 +4527,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epgvewm
@@ -4394,6 +4556,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ephvewm
@@ -4420,6 +4583,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_epvewm
@@ -4448,6 +4612,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_epvewmz
@@ -4472,6 +4637,7 @@ processes:
     - 2
     - 0
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gg
@@ -4498,6 +4664,7 @@ processes:
     - 3
     - 0
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ggg
@@ -4526,6 +4693,7 @@ processes:
     - 4
     - 0
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gggg
@@ -4554,6 +4722,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gggz
@@ -4582,6 +4751,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gghz
@@ -4610,6 +4780,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ggtaptam
@@ -4638,6 +4809,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ggttx
@@ -4666,6 +4838,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ggvevex
@@ -4694,6 +4867,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_ggwpwm
@@ -4720,6 +4894,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ggz
@@ -4748,6 +4923,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ggzz
@@ -4776,6 +4952,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ghhz
@@ -4804,6 +4981,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ghtaptam
@@ -4832,6 +5010,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ghttx
@@ -4860,6 +5039,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ghvevex
@@ -4888,6 +5068,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ghwpwm
@@ -4914,6 +5095,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ghz
@@ -4942,6 +5124,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_ghzz
@@ -4968,6 +5151,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gtaptam
@@ -4996,6 +5180,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gtaptamz
@@ -5024,6 +5209,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gtapvtwm
@@ -5050,6 +5236,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_gttx
@@ -5078,6 +5265,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_gttxz
@@ -5104,6 +5292,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gvevex
@@ -5132,6 +5321,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gvevexz
@@ -5158,6 +5348,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gwpwm
@@ -5186,6 +5377,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gwpwmz
@@ -5210,6 +5402,7 @@ processes:
     - 1
     - 1
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gz
@@ -5236,6 +5429,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gzz
@@ -5264,6 +5458,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_gzzz
@@ -5292,6 +5487,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_hhhz
@@ -5320,6 +5516,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hhtaptam
@@ -5348,6 +5545,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_hhttx
@@ -5376,6 +5574,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_hhvevex
@@ -5404,6 +5603,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hhwpwm
@@ -5430,6 +5630,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hhz
@@ -5458,6 +5659,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hhzz
@@ -5484,6 +5686,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_htaptam
@@ -5512,6 +5715,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_htaptamz
@@ -5540,6 +5744,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_htapvtwm
@@ -5566,6 +5771,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_httx
@@ -5594,6 +5800,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_httxz
@@ -5622,6 +5829,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_huuxz
@@ -5650,6 +5858,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hvevex
@@ -5678,6 +5887,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hvevexz
@@ -5704,6 +5914,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hwpwm
@@ -5732,6 +5943,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hwpwmz
@@ -5756,6 +5968,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hz
@@ -5782,6 +5995,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hzz
@@ -5810,6 +6024,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_hzzz
@@ -5834,6 +6049,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_taptam
@@ -5862,6 +6078,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_taptamuux
@@ -5890,6 +6107,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_taptamvevex
@@ -5916,6 +6134,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_taptamz
@@ -5944,6 +6163,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bbx_taptamzz
@@ -5970,6 +6190,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_tapvtwm
@@ -5998,6 +6219,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_tapvtwmz
@@ -6022,6 +6244,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ttx
@@ -6050,6 +6273,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ttxuux
@@ -6078,6 +6302,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ttxvevex
@@ -6104,6 +6329,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ttxz
@@ -6132,6 +6358,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bbx_ttxzz
@@ -6160,6 +6387,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_uuxwpwm
@@ -6188,6 +6416,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bbx_uuxzz
@@ -6216,6 +6445,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_vevevexvex
@@ -6240,6 +6470,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_vevex
@@ -6268,6 +6499,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_vevexvtvtx
@@ -6296,6 +6528,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_vevexwpwm
@@ -6322,6 +6555,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_vevexz
@@ -6350,6 +6584,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_vevexzz
@@ -6374,6 +6609,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_wpwm
@@ -6400,6 +6636,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_wpwmz
@@ -6428,6 +6665,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_wpwmzz
@@ -6452,6 +6690,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_zz
@@ -6478,6 +6717,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_zzz
@@ -6506,6 +6746,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_zzzz
@@ -6534,6 +6775,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_aaab
@@ -6560,6 +6802,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_aab
@@ -6588,6 +6831,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_aabg
@@ -6616,6 +6860,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_aabz
@@ -6644,6 +6889,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_aatwm
@@ -6668,6 +6914,7 @@ processes:
     - 1
     - 1
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_ab
@@ -6696,6 +6943,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bg_abbbx
@@ -6724,6 +6972,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abccx
@@ -6754,6 +7003,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abddx
@@ -6784,6 +7034,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abepem
@@ -6812,6 +7063,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abg
@@ -6840,6 +7092,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bg_abgg
@@ -6868,6 +7121,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bg_abgz
@@ -6896,6 +7150,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abhz
@@ -6926,6 +7181,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abtaptam
@@ -6956,6 +7212,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_abttx
@@ -6984,6 +7241,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abvevex
@@ -7012,6 +7270,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abwpwm
@@ -7038,6 +7297,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abz
@@ -7066,6 +7326,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_abzz
@@ -7094,6 +7355,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_acxst
@@ -7122,6 +7384,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_aemtvex
@@ -7150,6 +7413,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_agtwm
@@ -7178,6 +7442,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_ahtwm
@@ -7206,6 +7471,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_attamvtx
@@ -7232,6 +7498,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_atwm
@@ -7260,6 +7527,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_atwmz
@@ -7286,6 +7554,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bbbx
@@ -7316,6 +7585,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bg_bbbxg
@@ -7344,6 +7614,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bg_bbbxh
@@ -7372,6 +7643,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bbbxz
@@ -7400,6 +7672,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_bbxtwm
@@ -7426,6 +7699,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bccx
@@ -7454,6 +7728,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bg_bccxg
@@ -7482,6 +7757,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bddxh
@@ -7512,6 +7788,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_bg_bddxz
@@ -7538,6 +7815,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bepem
@@ -7566,6 +7844,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bepemg
@@ -7596,6 +7875,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bepemh
@@ -7626,6 +7906,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bepemz
@@ -7652,6 +7933,7 @@ processes:
     - 2
     - 0
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bg
@@ -7678,6 +7960,7 @@ processes:
     - 3
     - 0
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bgg
@@ -7706,6 +7989,7 @@ processes:
     - 4
     - 0
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bggg
@@ -7734,6 +8018,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bggz
@@ -7762,6 +8047,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bghz
@@ -7792,6 +8078,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bgtaptam
@@ -7822,6 +8109,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_bgttx
@@ -7850,6 +8138,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bgvevex
@@ -7878,6 +8167,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bgwpwm
@@ -7904,6 +8194,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_bg_bgz
@@ -7932,6 +8223,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bgzz
@@ -7960,6 +8252,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bhhz
@@ -7990,6 +8283,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bhtaptam
@@ -8020,6 +8314,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_bhttx
@@ -8048,6 +8343,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bhvevex
@@ -8076,6 +8372,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bhwpwm
@@ -8102,6 +8399,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bhz
@@ -8130,6 +8428,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bhzz
@@ -8158,6 +8457,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_btaptam
@@ -8186,6 +8486,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_btaptamz
@@ -8214,6 +8515,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_bttx
@@ -8242,6 +8544,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_bttxz
@@ -8270,6 +8573,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_buuxz
@@ -8296,6 +8600,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bvevex
@@ -8324,6 +8629,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bvevexz
@@ -8350,6 +8656,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bwpwm
@@ -8378,6 +8685,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bwpwmz
@@ -8402,6 +8710,7 @@ processes:
     - 1
     - 1
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bz
@@ -8428,6 +8737,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bzz
@@ -8456,6 +8766,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bg_bzzz
@@ -8484,6 +8795,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_cxgst
@@ -8512,6 +8824,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_cxhst
@@ -8538,6 +8851,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_cxst
@@ -8566,6 +8880,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_cxstz
@@ -8594,6 +8909,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_ddxtwm
@@ -8622,6 +8938,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_emgtvex
@@ -8650,6 +8967,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_emhtvex
@@ -8676,6 +8994,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_emtvex
@@ -8704,6 +9023,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_emtvexz
@@ -8732,6 +9052,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_epemtwm
@@ -8760,6 +9081,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_ggtwm
@@ -8788,6 +9110,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_ghtwm
@@ -8816,6 +9139,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_gttamvtx
@@ -8842,6 +9166,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_gtwm
@@ -8870,6 +9195,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_gtwmz
@@ -8898,6 +9224,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_hhtwm
@@ -8926,6 +9253,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_httamvtx
@@ -8952,6 +9280,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_htwm
@@ -8980,6 +9309,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_htwmz
@@ -9006,6 +9336,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_ttamvtx
@@ -9034,6 +9365,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_ttamvtxz
@@ -9062,6 +9394,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_tuuxwm
@@ -9090,6 +9423,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_tvevexwm
@@ -9114,6 +9448,7 @@ processes:
     - 1
     - 1
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_twm
@@ -9140,6 +9475,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_twmz
@@ -9168,6 +9504,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_bg_twmzz
@@ -9196,6 +9533,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_aabd
@@ -9222,6 +9560,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_abd
@@ -9250,6 +9589,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_abdg
@@ -9278,6 +9618,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_abdh
@@ -9306,6 +9647,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_abdz
@@ -9336,6 +9678,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_abuwm
@@ -9364,6 +9707,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_db_adtwm
@@ -9392,6 +9736,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_db_bbbxd
@@ -9416,6 +9761,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bd
@@ -9444,6 +9790,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdddx
@@ -9474,6 +9821,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdepem
@@ -9500,6 +9848,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdg
@@ -9530,6 +9879,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdgg
@@ -9560,6 +9910,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdgh
@@ -9590,6 +9941,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdgz
@@ -9616,6 +9968,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdh
@@ -9644,6 +9997,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdhh
@@ -9672,6 +10026,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdhz
@@ -9700,6 +10055,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bduux
@@ -9728,6 +10084,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdvevex
@@ -9754,6 +10111,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdz
@@ -9782,6 +10140,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bdzz
@@ -9812,6 +10171,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bguwm
@@ -9840,6 +10200,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_bhuwm
@@ -9866,6 +10227,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_buwm
@@ -9894,6 +10256,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_db_buwmz
@@ -9922,6 +10285,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_db_dgtwm
@@ -9950,6 +10314,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_db_dhtwm
@@ -9976,6 +10341,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_db_dtwm
@@ -10004,6 +10370,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_db_dtwmz
@@ -10032,6 +10399,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dbx_aabxd
@@ -10060,6 +10428,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_aatxu
@@ -10086,6 +10455,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_abxd
@@ -10114,6 +10484,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dbx_abxdg
@@ -10142,6 +10513,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_abxdh
@@ -10170,10 +10542,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_abxdz
   pp13v4_dbx_abxuwm:
+    lhe:
+      margin: 6.32
     kind: lhe_pp
     folder: pp13v4_dbx_abxuwm
     mg5_generate:
@@ -10198,6 +10573,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_abxuwm
@@ -10226,6 +10602,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_adtxwp
@@ -10254,6 +10631,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_agtxu
@@ -10282,6 +10660,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_ahtxu
@@ -10308,6 +10687,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_atxu
@@ -10336,6 +10716,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_atxuz
@@ -10364,6 +10745,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bbxbxd
@@ -10392,6 +10774,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_bbxtxu
@@ -10420,6 +10803,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdddx
@@ -10450,6 +10834,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdepem
@@ -10476,6 +10861,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdg
@@ -10506,6 +10892,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_dbx_bxdgg
@@ -10534,6 +10921,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdgh
@@ -10562,6 +10950,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdgz
@@ -10590,6 +10979,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdhz
@@ -10618,6 +11008,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxduux
@@ -10646,6 +11037,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdvevex
@@ -10672,6 +11064,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdz
@@ -10700,6 +11093,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxdzz
@@ -10730,6 +11124,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxguwm
@@ -10758,6 +11153,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxhuwm
@@ -10784,10 +11180,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxuwm
   pp13v4_dbx_bxuwmz:
+    lhe:
+      margin: 363.29
     kind: lhe_pp
     folder: pp13v4_dbx_bxuwmz
     mg5_generate:
@@ -10812,6 +11211,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxuwmz
@@ -10840,6 +11240,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_ddxtxu
@@ -10868,6 +11269,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_dgtxwp
@@ -10896,6 +11298,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_dhtxwp
@@ -10922,6 +11325,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_dtxwp
@@ -10950,6 +11354,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_dtxwpz
@@ -10978,6 +11383,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_epemtxu
@@ -11006,6 +11412,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_ggtxu
@@ -11034,6 +11441,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_ghtxu
@@ -11060,6 +11468,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_gtxu
@@ -11088,6 +11497,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_gtxuz
@@ -11116,6 +11526,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_hhtxu
@@ -11142,6 +11553,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_htxu
@@ -11172,6 +11584,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_htxuz
@@ -11196,6 +11609,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_txu
@@ -11224,6 +11638,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_txuuux
@@ -11252,6 +11667,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_txuvevex
@@ -11278,6 +11694,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_txuz
@@ -11306,6 +11723,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_txuzz
@@ -11334,6 +11752,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_aadd
@@ -11362,6 +11781,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_dd_add
@@ -11392,6 +11812,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_addg
@@ -11422,6 +11843,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_addz
@@ -11452,6 +11874,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_aduwm
@@ -11480,6 +11903,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_bbxdd
@@ -11506,6 +11930,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_dd
@@ -11536,6 +11961,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddddx
@@ -11566,6 +11992,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddepem
@@ -11594,6 +12021,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddg
@@ -11626,6 +12054,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddgg
@@ -11656,6 +12085,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddgz
@@ -11686,6 +12116,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddhz
@@ -11716,6 +12147,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_dduux
@@ -11744,6 +12176,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddvevex
@@ -11772,6 +12205,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddz
@@ -11802,6 +12236,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_ddzz
@@ -11834,6 +12269,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_dguwm
@@ -11862,6 +12298,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_dhuwm
@@ -11888,6 +12325,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_duwm
@@ -11916,6 +12354,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dd_duwmz
@@ -11944,6 +12383,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_aabbx
@@ -11974,6 +12414,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_aaddx
@@ -12004,6 +12445,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_aassx
@@ -12034,6 +12476,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_aattx
@@ -12062,6 +12505,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_aauux
@@ -12088,6 +12532,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_abbx
@@ -12118,6 +12563,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_abbxg
@@ -12148,6 +12594,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_abbxh
@@ -12178,6 +12625,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_abbxz
@@ -12208,6 +12656,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_abtxwp
@@ -12234,6 +12683,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_accx
@@ -12264,6 +12714,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ddx_accxg
@@ -12292,6 +12743,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_acsxwm
@@ -12318,6 +12770,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_addx
@@ -12348,6 +12801,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_addxg
@@ -12378,6 +12832,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_addxz
@@ -12408,6 +12863,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_aduxwp
@@ -12436,6 +12892,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_agssx
@@ -12466,6 +12923,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_agttx
@@ -12494,6 +12952,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ddx_aguux
@@ -12522,6 +12981,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ahttx
@@ -12548,6 +13008,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_attx
@@ -12576,6 +13037,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_attxz
@@ -12602,6 +13064,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_auux
@@ -12630,6 +13093,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_auuxz
@@ -12658,6 +13122,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbbxbx
@@ -12684,6 +13149,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbx
@@ -12714,6 +13180,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxccx
@@ -12744,6 +13211,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxddx
@@ -12774,6 +13242,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxepem
@@ -12802,6 +13271,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxg
@@ -12830,6 +13300,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_bbxgg
@@ -12858,6 +13329,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_bbxgh
@@ -12886,6 +13358,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ddx_bbxgz
@@ -12912,6 +13385,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxh
@@ -12940,6 +13414,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxhh
@@ -12970,6 +13445,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxhz
@@ -13000,6 +13476,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_bbxssx
@@ -13028,6 +13505,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxtaptam
@@ -13058,6 +13536,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_bbxttx
@@ -13086,6 +13565,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_bbxuux
@@ -13114,6 +13594,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxvevex
@@ -13144,6 +13625,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_bbxwpwm
@@ -13170,6 +13652,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_bbxz
@@ -13200,6 +13683,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ddx_bbxzz
@@ -13228,6 +13712,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_bgtxwp
@@ -13256,6 +13741,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_bhtxwp
@@ -13282,6 +13768,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_btxwp
@@ -13310,6 +13797,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_btxwpz
@@ -13334,6 +13822,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ccx
@@ -13364,6 +13853,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ccxddx
@@ -13392,6 +13882,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ccxgg
@@ -13422,6 +13913,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ccxhz
@@ -13450,6 +13942,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ccxuux
@@ -13478,6 +13971,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ccxvevex
@@ -13506,6 +14000,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ddx_cgsxwm
@@ -13534,6 +14029,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_chsxwm
@@ -13560,6 +14056,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ddx_csxwm
@@ -13588,6 +14085,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_csxwmz
@@ -13616,6 +14114,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_dddxdx
@@ -13642,6 +14141,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddx
@@ -13672,6 +14172,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxepem
@@ -13700,6 +14201,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxg
@@ -13732,6 +14234,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxgg
@@ -13762,6 +14265,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxgz
@@ -13792,6 +14296,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxhz
@@ -13822,6 +14327,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxtaptam
@@ -13852,6 +14358,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ddxttx
@@ -13880,6 +14387,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ddxuux
@@ -13908,6 +14416,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxvevex
@@ -13938,6 +14447,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ddxwpwm
@@ -13964,6 +14474,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxz
@@ -13994,6 +14505,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_ddxzz
@@ -14024,6 +14536,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_dguxwp
@@ -14052,6 +14565,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_dhuxwp
@@ -14078,10 +14592,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_duxwp
   pp13v4_ddx_duxwpz:
+    lhe:
+      margin: 3.43
     kind: lhe_pp
     folder: pp13v4_ddx_duxwpz
     mg5_generate:
@@ -14106,6 +14623,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_duxwpz
@@ -14134,6 +14652,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_epemttx
@@ -14162,6 +14681,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_epemuux
@@ -14190,6 +14710,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ggttx
@@ -14218,6 +14739,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_gguux
@@ -14246,6 +14768,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ghttx
@@ -14272,6 +14795,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_gttx
@@ -14300,6 +14824,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_gttxz
@@ -14326,6 +14851,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_guux
@@ -14354,6 +14880,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_guuxz
@@ -14382,6 +14909,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_hhttx
@@ -14410,6 +14938,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_hssxz
@@ -14438,6 +14967,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_httx
@@ -14466,6 +14996,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_httxz
@@ -14494,6 +15025,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_huuxz
@@ -14522,6 +15054,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_ssxvevex
@@ -14550,6 +15083,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_taptamuux
@@ -14578,6 +15112,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ttaptamtx
@@ -14606,6 +15141,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_tttxtx
@@ -14630,6 +15166,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ttx
@@ -14658,6 +15195,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ttxuux
@@ -14686,6 +15224,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ttxvevex
@@ -14712,6 +15251,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ttxz
@@ -14740,6 +15280,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ddx_ttxzz
@@ -14768,6 +15309,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_uuuxux
@@ -14792,6 +15334,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_uux
@@ -14820,6 +15363,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_uuxvevex
@@ -14848,6 +15392,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_uuxwpwm
@@ -14874,6 +15419,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ddx_uuxz
@@ -14902,6 +15448,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ddx_uuxzz
@@ -14930,6 +15477,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dg_abbxd
@@ -14958,6 +15506,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_abtxu
@@ -14986,6 +15535,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_dg_accxd
@@ -15014,6 +15564,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_adddx
@@ -15044,6 +15595,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_adssx
@@ -15074,6 +15626,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_adttx
@@ -15102,6 +15655,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_dg_aduux
@@ -15128,6 +15682,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_bbxd
@@ -15158,6 +15713,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dg_bbxdg
@@ -15186,6 +15742,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dg_bbxdh
@@ -15214,6 +15771,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_bbxdz
@@ -15244,6 +15802,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_bbxuwm
@@ -15272,6 +15831,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_bgtxu
@@ -15300,6 +15860,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_bhtxu
@@ -15326,6 +15887,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_btxu
@@ -15354,6 +15916,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_btxuz
@@ -15380,6 +15943,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_ccxd
@@ -15410,6 +15974,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_ccxdg
@@ -15440,6 +16005,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_ccxdz
@@ -15468,6 +16034,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_dddx
@@ -15498,6 +16065,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_dddxg
@@ -15528,6 +16096,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_dddxz
@@ -15558,6 +16127,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_ddxuwm
@@ -15586,10 +16156,13 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_dgttx
   pp13v4_dg_dguux:
+    lhe:
+      margin: 25.25
     kind: lhe_pp
     folder: pp13v4_dg_dguux
     mg5_generate:
@@ -15614,6 +16187,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_dguux
@@ -15642,6 +16216,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_dhttx
@@ -15670,6 +16245,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_dssxz
@@ -15698,6 +16274,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_dttx
@@ -15726,6 +16303,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dg_dttxz
@@ -15752,6 +16330,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_duux
@@ -15780,6 +16359,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_duuxz
@@ -15808,6 +16388,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dg_uuuxwm
@@ -15836,6 +16417,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_aads
@@ -15866,6 +16448,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ds_acdwm
@@ -15894,6 +16477,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_adgs
@@ -15922,6 +16506,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_ads
@@ -15952,6 +16537,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ds_adsz
@@ -15980,6 +16566,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_bbxds
@@ -16008,6 +16595,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ds_cdgwm
@@ -16036,6 +16624,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ds_cdhwm
@@ -16062,6 +16651,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_cdwm
@@ -16090,6 +16680,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ds_cdwmz
@@ -16118,6 +16709,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dddxs
@@ -16148,6 +16740,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_depems
@@ -16180,6 +16773,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ds_dggs
@@ -16206,6 +16800,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dgs
@@ -16236,6 +16831,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dgsz
@@ -16266,6 +16862,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dhsz
@@ -16292,6 +16889,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_ds
@@ -16322,6 +16920,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dsuux
@@ -16352,6 +16951,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dsvevex
@@ -16380,6 +16980,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dsz
@@ -16410,6 +17011,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ds_dszz
@@ -16440,6 +17042,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_aadsx
@@ -16470,6 +17073,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dsx_acxdwp
@@ -16498,6 +17102,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_adgsx
@@ -16526,6 +17131,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_adsx
@@ -16556,6 +17162,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_adsxz
@@ -16586,6 +17193,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_bbxcxu
@@ -16614,6 +17222,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_bbxdsx
@@ -16642,6 +17251,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_cxddxu
@@ -16670,6 +17280,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dsx_cxdgwp
@@ -16698,6 +17309,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dsx_cxdhwp
@@ -16724,10 +17336,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_cxdwp
   pp13v4_dsx_cxdwpz:
+    lhe:
+      margin: 4.43
     kind: lhe_pp
     folder: pp13v4_dsx_cxdwpz
     mg5_generate:
@@ -16752,6 +17367,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_dsx_cxdwpz
@@ -16780,6 +17396,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_cxuuux
@@ -16808,6 +17425,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dddxsx
@@ -16838,6 +17456,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_depemsx
@@ -16870,6 +17489,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dggsx
@@ -16898,6 +17518,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dgsx
@@ -16928,6 +17549,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dgsxz
@@ -16958,6 +17580,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dhsxz
@@ -16988,6 +17611,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dsxuux
@@ -17018,6 +17642,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dsxvevex
@@ -17046,6 +17671,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dsxz
@@ -17076,6 +17702,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dsx_dsxzz
@@ -17106,6 +17733,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_aabbx
@@ -17132,6 +17760,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_abbx
@@ -17160,6 +17789,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_abbxg
@@ -17188,6 +17818,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_abbxz
@@ -17216,6 +17847,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_abtxwp
@@ -17244,6 +17876,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbbxbx
@@ -17268,6 +17901,7 @@ processes:
     - 2
     - 0
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_bbx
@@ -17298,6 +17932,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbxddx
@@ -17326,6 +17961,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbxepem
@@ -17352,6 +17988,7 @@ processes:
     - 3
     - 0
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_bbxg
@@ -17380,6 +18017,7 @@ processes:
     - 4
     - 0
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_bbxgg
@@ -17408,6 +18046,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbxgz
@@ -17436,6 +18075,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbxhz
@@ -17464,6 +18104,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_bbxttx
@@ -17492,6 +18133,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbxvevex
@@ -17518,6 +18160,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_bbxz
@@ -17546,6 +18189,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_bbxzz
@@ -17574,6 +18218,7 @@ processes:
     - 3
     - 1
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_bgtxwp
@@ -17602,6 +18247,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_bhtxwp
@@ -17628,6 +18274,7 @@ processes:
     - 2
     - 1
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_btxwp
@@ -17656,6 +18303,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_btxwpz
@@ -17684,6 +18332,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_ccxddx
@@ -17712,6 +18361,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_ccxuux
@@ -17740,6 +18390,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_gg_dddxdx
@@ -17770,6 +18421,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_ddxttx
@@ -17798,6 +18450,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_gg_ddxuux
@@ -17826,6 +18479,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_gg_ttxuux
@@ -17854,6 +18508,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_aabu
@@ -17882,10 +18537,13 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_aadt
   pp13v4_ub_abdwp:
+    lhe:
+      margin: 158.38
     kind: lhe_pp
     folder: pp13v4_ub_abdwp
     mg5_generate:
@@ -17910,6 +18568,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_abdwp
@@ -17938,6 +18597,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_abgu
@@ -17966,6 +18626,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_abhu
@@ -17994,6 +18655,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_abu
@@ -18022,6 +18684,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ub_abuz
@@ -18050,6 +18713,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_adgt
@@ -18078,6 +18742,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_adht
@@ -18104,6 +18769,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_adt
@@ -18134,6 +18800,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_adtz
@@ -18162,6 +18829,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_atuwm
@@ -18190,6 +18858,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ub_bbbxu
@@ -18218,6 +18887,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_bbxdt
@@ -18246,6 +18916,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bddxu
@@ -18274,6 +18945,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bdgwp
@@ -18302,6 +18974,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bdhwp
@@ -18328,10 +19001,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bdwp
   pp13v4_ub_bdwpz:
+    lhe:
+      margin: 0.6
     kind: lhe_pp
     folder: pp13v4_ub_bdwpz
     mg5_generate:
@@ -18356,6 +19032,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bdwpz
@@ -18384,10 +19061,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bepemu
   pp13v4_ub_bggu:
+    lhe:
+      margin: 4.21
     kind: lhe_pp
     folder: pp13v4_ub_bggu
     mg5_generate:
@@ -18412,6 +19092,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ub_bggu
@@ -18438,6 +19119,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_bgu
@@ -18466,6 +19148,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ub_bguz
@@ -18494,6 +19177,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ub_bhuz
@@ -18522,6 +19206,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_buuux
@@ -18550,6 +19235,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_buvevex
@@ -18576,6 +19262,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ub_buz
@@ -18604,6 +19291,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ub_buzz
@@ -18632,6 +19320,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dddxt
@@ -18660,6 +19349,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_depemt
@@ -18688,6 +19378,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dggt
@@ -18716,6 +19407,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dght
@@ -18742,6 +19434,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dgt
@@ -18770,6 +19463,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dgtz
@@ -18798,6 +19492,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dhht
@@ -18824,6 +19519,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dht
@@ -18854,6 +19550,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dhtz
@@ -18878,6 +19575,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dt
@@ -18906,6 +19604,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dtuux
@@ -18934,6 +19633,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dtvevex
@@ -18960,6 +19660,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dtz
@@ -18988,6 +19689,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_dtzz
@@ -19016,6 +19718,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_gtuwm
@@ -19044,6 +19747,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_htuwm
@@ -19070,6 +19774,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_tuwm
@@ -19098,6 +19803,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ub_tuwmz
@@ -19126,6 +19832,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ubx_aabxu
@@ -19154,6 +19861,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_abxdwp
@@ -19184,6 +19892,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ubx_abxgu
@@ -19212,6 +19921,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_abxhu
@@ -19238,6 +19948,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_abxu
@@ -19266,6 +19977,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ubx_abxuz
@@ -19294,6 +20006,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ubx_atxuwp
@@ -19322,6 +20035,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bbxbxu
@@ -19350,6 +20064,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxddxu
@@ -19378,6 +20093,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxdgwp
@@ -19406,6 +20122,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxdhwp
@@ -19432,6 +20149,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxdwp
@@ -19460,6 +20178,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxdwpz
@@ -19488,6 +20207,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxepemu
@@ -19516,6 +20236,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxguz
@@ -19544,6 +20265,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ubx_bxhuz
@@ -19572,6 +20294,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxuuux
@@ -19600,6 +20323,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxuvevex
@@ -19626,6 +20350,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxuz
@@ -19654,6 +20379,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ubx_bxuzz
@@ -19682,6 +20408,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ubx_gtxuwp
@@ -19710,6 +20437,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ubx_htxuwp
@@ -19736,6 +20464,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ubx_txuwp
@@ -19764,6 +20493,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ubx_txuwpz
@@ -19792,6 +20522,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uc_acdwp
@@ -19820,6 +20551,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_acgu
@@ -19848,6 +20580,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_acuz
@@ -19876,6 +20609,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_bbxcu
@@ -19904,6 +20638,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cddxu
@@ -19932,10 +20667,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uc_cdhwp
   pp13v4_uc_cdwpz:
+    lhe:
+      margin: 15.51
     kind: lhe_pp
     folder: pp13v4_uc_cdwpz
     mg5_generate:
@@ -19960,6 +20698,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uc_cdwpz
@@ -19988,10 +20727,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cepemu
   pp13v4_uc_cggu:
+    lhe:
+      margin: 27.15
     kind: lhe_pp
     folder: pp13v4_uc_cggu
     mg5_generate:
@@ -20016,6 +20758,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uc_cggu
@@ -20042,6 +20785,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cgu
@@ -20070,6 +20814,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uc_cguz
@@ -20098,6 +20843,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_chuz
@@ -20126,6 +20872,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cuuux
@@ -20154,6 +20901,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cuvevex
@@ -20180,6 +20928,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cuz
@@ -20208,6 +20957,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uc_cuzz
@@ -20236,6 +20986,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ucx_acxdwp
@@ -20264,6 +21015,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_acxuz
@@ -20292,6 +21044,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_bbxcxu
@@ -20320,6 +21073,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_bbxdsx
@@ -20348,6 +21102,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ucx_cxdhwp
@@ -20376,6 +21131,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ucx_cxdwpz
@@ -20404,10 +21160,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxepemu
   pp13v4_ucx_cxggu:
+    lhe:
+      margin: 30.1
     kind: lhe_pp
     folder: pp13v4_ucx_cxggu
     mg5_generate:
@@ -20432,6 +21191,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxggu
@@ -20458,6 +21218,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxgu
@@ -20486,6 +21247,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxguz
@@ -20514,6 +21276,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ucx_cxhuz
@@ -20542,6 +21305,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxuuux
@@ -20570,6 +21334,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxuvevex
@@ -20596,6 +21361,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxuz
@@ -20624,6 +21390,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ucx_cxuzz
@@ -20652,6 +21419,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_aadu
@@ -20680,6 +21448,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_addwp
@@ -20708,6 +21477,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_adgu
@@ -20734,6 +21504,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_adu
@@ -20764,6 +21535,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ud_aduz
@@ -20792,10 +21564,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_auuwm
   pp13v4_ud_bbxdu:
+    lhe:
+      margin: 164.28
     kind: lhe_pp
     folder: pp13v4_ud_bbxdu
     mg5_generate:
@@ -20820,6 +21595,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_bbxdu
@@ -20848,6 +21624,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_dddxu
@@ -20876,6 +21653,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_ddgwp
@@ -20904,6 +21682,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_ddhwp
@@ -20930,10 +21709,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_ddwp
   pp13v4_ud_ddwpz:
+    lhe:
+      margin: 14.71
     kind: lhe_pp
     folder: pp13v4_ud_ddwpz
     mg5_generate:
@@ -20958,6 +21740,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_ddwpz
@@ -20988,6 +21771,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_depemu
@@ -21016,6 +21800,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_ud_dggu
@@ -21042,6 +21827,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_dgu
@@ -21072,6 +21858,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ud_dguz
@@ -21100,6 +21887,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ud_dhuz
@@ -21124,6 +21912,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_du
@@ -21152,6 +21941,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_duuux
@@ -21180,6 +21970,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_duvevex
@@ -21206,10 +21997,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_duz
   pp13v4_ud_duzz:
+    lhe:
+      margin: 11.14
     kind: lhe_pp
     folder: pp13v4_ud_duzz
     mg5_generate:
@@ -21234,6 +22028,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ud_duzz
@@ -21262,6 +22057,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_huuwm
@@ -21290,6 +22086,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_uuwmz
@@ -21318,6 +22115,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_aabxt
@@ -21346,6 +22144,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_aadxu
@@ -21374,6 +22173,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_udx_abbxwp
@@ -21402,10 +22202,13 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_abxgt
   pp13v4_udx_abxht:
+    lhe:
+      margin: 29.67
     kind: lhe_pp
     folder: pp13v4_udx_abxht
     mg5_generate:
@@ -21430,6 +22233,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_abxht
@@ -21456,6 +22260,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_abxt
@@ -21484,6 +22289,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_abxtz
@@ -21512,6 +22318,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_accxwp
@@ -21540,6 +22347,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_addxwp
@@ -21568,6 +22376,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_adxgu
@@ -21594,6 +22403,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_adxu
@@ -21622,6 +22432,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_adxuz
@@ -21650,6 +22461,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_udx_assxwp
@@ -21678,6 +22490,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_attxwp
@@ -21706,6 +22519,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_auuxwp
@@ -21734,6 +22548,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bbxbxt
@@ -21762,6 +22577,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_bbxcsx
@@ -21790,6 +22606,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_bbxdxu
@@ -21818,6 +22635,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_bbxepve
@@ -21846,6 +22664,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_udx_bbxgwp
@@ -21874,6 +22693,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_bbxhwp
@@ -21902,6 +22722,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_bbxtapvt
@@ -21928,6 +22749,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_bbxwp
@@ -21956,6 +22778,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_udx_bbxwpz
@@ -21984,6 +22807,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxddxt
@@ -22012,6 +22836,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxepemt
@@ -22040,6 +22865,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxggt
@@ -22068,6 +22894,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxght
@@ -22094,10 +22921,13 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxgt
   pp13v4_udx_bxgtz:
+    lhe:
+      margin: 15.57
     kind: lhe_pp
     folder: pp13v4_udx_bxgtz
     mg5_generate:
@@ -22122,6 +22952,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxgtz
@@ -22150,6 +22981,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxhht
@@ -22176,6 +23008,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxht
@@ -22204,6 +23037,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxhtz
@@ -22228,6 +23062,7 @@ processes:
     - 0
     - 2
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxt
@@ -22256,6 +23091,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxtuux
@@ -22284,6 +23120,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxtvevex
@@ -22310,6 +23147,7 @@ processes:
     - 0
     - 3
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxtz
@@ -22338,6 +23176,7 @@ processes:
     - 0
     - 4
     alphas_power: 0
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_bxtzz
@@ -22366,6 +23205,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ccxgwp
@@ -22394,6 +23234,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ccxhwp
@@ -22420,6 +23261,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ccxwp
@@ -22448,6 +23290,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ccxwpz
@@ -22476,6 +23319,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_cddxsx
@@ -22504,6 +23348,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ddxdxu
@@ -22532,6 +23377,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ddxepve
@@ -22560,6 +23406,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ddxgwp
@@ -22588,6 +23435,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ddxhwp
@@ -22616,6 +23464,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ddxtapvt
@@ -22642,10 +23491,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_ddxwp
   pp13v4_udx_ddxwpz:
+    lhe:
+      margin: 1.92
     kind: lhe_pp
     folder: pp13v4_udx_ddxwpz
     mg5_generate:
@@ -22670,6 +23522,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_udx_ddxwpz
@@ -22698,6 +23551,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxepemu
@@ -22726,6 +23580,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxggu
@@ -22752,6 +23607,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxgu
@@ -22780,6 +23636,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxguz
@@ -22808,6 +23665,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_udx_dxhuz
@@ -22832,6 +23690,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxu
@@ -22860,6 +23719,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxuuux
@@ -22888,6 +23748,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxuvevex
@@ -22914,6 +23775,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxuz
@@ -22942,6 +23804,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_dxuzz
@@ -22970,6 +23833,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_epuuxve
@@ -22998,6 +23862,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_gssxwp
@@ -23026,6 +23891,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_gttxwp
@@ -23054,6 +23920,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_guuxwp
@@ -23082,6 +23949,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_hssxwp
@@ -23110,6 +23978,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_httxwp
@@ -23138,6 +24007,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_huuxwp
@@ -23166,6 +24036,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_udx_ssxwpz
@@ -23194,6 +24065,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_udx_tapuuxvt
@@ -23220,6 +24092,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_ttxwp
@@ -23248,6 +24121,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_udx_ttxwpz
@@ -23278,6 +24152,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_udx_uuxwpz
@@ -23306,6 +24181,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_ug_abbxu
@@ -23334,6 +24210,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_abxdt
@@ -23362,6 +24239,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_accxu
@@ -23390,6 +24268,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_addxu
@@ -23418,6 +24297,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_attxu
@@ -23446,6 +24326,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_auuux
@@ -23474,6 +24355,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_bbxdwp
@@ -23502,6 +24384,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_bbxuz
@@ -23530,6 +24413,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_bxdgt
@@ -23558,6 +24442,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_bxdht
@@ -23584,6 +24469,7 @@ processes:
     - 1
     - 2
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_bxdt
@@ -23612,6 +24498,7 @@ processes:
     - 1
     - 3
     alphas_power: 1
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_bxdtz
@@ -23640,6 +24527,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_ccxgu
@@ -23666,6 +24554,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_ccxu
@@ -23694,6 +24583,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_ccxuz
@@ -23722,6 +24612,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_ddxuz
@@ -23750,6 +24641,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_gttxu
@@ -23778,6 +24670,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_guuux
@@ -23806,6 +24699,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_httxu
@@ -23832,6 +24726,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_ttxu
@@ -23860,6 +24755,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ug_ttxuz
@@ -23886,6 +24782,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_uuux
@@ -23914,6 +24811,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ug_uuuxz
@@ -23942,6 +24840,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_acuwm
@@ -23970,6 +24869,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_adswp
@@ -23998,6 +24898,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_us_bbxcd
@@ -24026,6 +24927,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_us_bbxsu
@@ -24054,6 +24956,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_us_cdddx
@@ -24082,6 +24985,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_us_cduux
@@ -24110,6 +25014,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_cguwm
@@ -24138,6 +25043,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_chuwm
@@ -24164,10 +25070,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_us_cuwm
   pp13v4_us_cuwmz:
+    lhe:
+      margin: 18.68
     kind: lhe_pp
     folder: pp13v4_us_cuwmz
     mg5_generate:
@@ -24192,6 +25101,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_cuwmz
@@ -24220,6 +25130,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_us_ddxsu
@@ -24248,6 +25159,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_dhswp
@@ -24276,6 +25188,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_us_dswpz
@@ -24304,6 +25217,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_acxuwp
@@ -24332,6 +25246,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_adsxwp
@@ -24360,6 +25275,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_usx_bbxsxu
@@ -24388,6 +25304,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_cxguwp
@@ -24416,6 +25333,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_cxhuwp
@@ -24442,6 +25360,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_usx_cxuwp
@@ -24470,6 +25389,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_cxuwpz
@@ -24498,6 +25418,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_dgsxwp
@@ -24526,10 +25447,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_dhsxwp
   pp13v4_usx_dsxwpz:
+    lhe:
+      margin: 18.9
     kind: lhe_pp
     folder: pp13v4_usx_dsxwpz
     mg5_generate:
@@ -24554,10 +25478,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_usx_dsxwpz
   pp13v4_uu_aauu:
+    lhe:
+      margin: 1.36
     kind: lhe_pp
     folder: pp13v4_uu_aauu
     mg5_generate:
@@ -24582,6 +25509,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_aauu
@@ -24610,6 +25538,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_aduwp
@@ -24638,6 +25567,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_aguu
@@ -24664,6 +25594,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uu_auu
@@ -24692,6 +25623,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_auuz
@@ -24720,6 +25652,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_bbxuu
@@ -24748,6 +25681,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_ddxuu
@@ -24776,10 +25710,13 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_dhuwp
   pp13v4_uu_duwpz:
+    lhe:
+      margin: 11.85
     kind: lhe_pp
     folder: pp13v4_uu_duwpz
     mg5_generate:
@@ -24804,6 +25741,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_duwpz
@@ -24832,6 +25770,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_epemuu
@@ -24860,6 +25799,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_gguu
@@ -24886,6 +25826,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_guu
@@ -24916,6 +25857,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_guuz
@@ -24944,6 +25886,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_huuz
@@ -24968,6 +25911,7 @@ processes:
     - 2
     - 2
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_uu
@@ -24996,6 +25940,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_uuuux
@@ -25024,6 +25969,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_uuvevex
@@ -25050,6 +25996,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_uuz
@@ -25078,6 +26025,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_uuzz
@@ -25106,6 +26054,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_aabbx
@@ -25134,6 +26083,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_aaddx
@@ -25162,6 +26112,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_aattx
@@ -25188,6 +26139,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_abbx
@@ -25216,6 +26168,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_abbxg
@@ -25244,6 +26197,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_abbxh
@@ -25274,6 +26228,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_abbxz
@@ -25302,6 +26257,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_abtxwp
@@ -25330,6 +26286,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_accxg
@@ -25358,6 +26315,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_accxz
@@ -25386,6 +26344,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_acsxwm
@@ -25412,6 +26371,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_addx
@@ -25440,6 +26400,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_addxg
@@ -25468,6 +26429,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_addxz
@@ -25496,6 +26458,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_aduxwp
@@ -25524,10 +26487,13 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_agttx
   pp13v4_uux_aguux:
+    lhe:
+      margin: 70.4
     kind: lhe_pp
     folder: pp13v4_uux_aguux
     mg5_generate:
@@ -25552,6 +26518,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_aguux
@@ -25580,6 +26547,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ahttx
@@ -25606,6 +26574,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_attx
@@ -25634,6 +26603,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_attxz
@@ -25660,6 +26630,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_auux
@@ -25688,6 +26659,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_auuxz
@@ -25716,6 +26688,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_bbbxbx
@@ -25744,6 +26717,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxccx
@@ -25772,6 +26746,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxddx
@@ -25800,6 +26775,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxepem
@@ -25828,6 +26804,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_bbxgz
@@ -25856,6 +26833,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxhz
@@ -25884,6 +26862,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxssx
@@ -25912,6 +26891,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_bbxtaptam
@@ -25940,6 +26920,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_bbxttx
@@ -25968,6 +26949,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxuux
@@ -25996,6 +26978,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_bbxvevex
@@ -26024,6 +27007,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_bbxwpwm
@@ -26050,6 +27034,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_bbxz
@@ -26078,6 +27063,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_bbxzz
@@ -26106,6 +27092,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_bgtxwp
@@ -26134,6 +27121,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_bhtxwp
@@ -26160,6 +27148,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_btxwp
@@ -26188,6 +27177,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_btxwpz
@@ -26216,6 +27206,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ccxddx
@@ -26244,6 +27235,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ccxepem
@@ -26270,6 +27262,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ccxg
@@ -26298,6 +27291,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ccxgg
@@ -26326,6 +27320,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uux_ccxgz
@@ -26354,6 +27349,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ccxhz
@@ -26382,6 +27378,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ccxuux
@@ -26410,6 +27407,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ccxvevex
@@ -26436,6 +27434,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uux_ccxz
@@ -26464,6 +27463,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uux_ccxzz
@@ -26492,6 +27492,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uux_cgsxwm
@@ -26520,6 +27521,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_chsxwm
@@ -26546,6 +27548,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H1'
     parent: v4_uux_csxwm
@@ -26574,6 +27577,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_csxwmz
@@ -26602,6 +27606,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ddxepem
@@ -26630,6 +27635,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ddxgz
@@ -26658,6 +27664,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ddxhz
@@ -26686,6 +27693,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ddxtaptam
@@ -26714,6 +27722,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ddxttx
@@ -26742,6 +27751,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ddxuux
@@ -26770,6 +27780,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H2'
     parent: v4_uux_ddxvevex
@@ -26798,6 +27809,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ddxwpwm
@@ -26824,10 +27836,13 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ddxz
   pp13v4_uux_ddxzz:
+    lhe:
+      margin: 3.46
     kind: lhe_pp
     folder: pp13v4_uux_ddxzz
     mg5_generate:
@@ -26852,6 +27867,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_ddxzz
@@ -26880,6 +27896,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_dguxwp
@@ -26908,6 +27925,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_dhuxwp
@@ -26936,6 +27954,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_duxwpz
@@ -26964,6 +27983,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_epemttx
@@ -26992,6 +28012,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_epemuux
@@ -27020,10 +28041,13 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ggttx
   pp13v4_uux_gguux:
+    lhe:
+      margin: 68.73
     kind: lhe_pp
     folder: pp13v4_uux_gguux
     mg5_generate:
@@ -27048,6 +28072,7 @@ processes:
     - 4
     - 2
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_gguux
@@ -27076,6 +28101,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ghttx
@@ -27102,6 +28128,7 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_gttx
@@ -27130,6 +28157,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_gttxz
@@ -27156,10 +28184,13 @@ processes:
     - 3
     - 2
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_guux
   pp13v4_uux_guuxz:
+    lhe:
+      margin: 13.37
     kind: lhe_pp
     folder: pp13v4_uux_guuxz
     mg5_generate:
@@ -27184,6 +28215,7 @@ processes:
     - 3
     - 3
     alphas_power: 3
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_guuxz
@@ -27212,6 +28244,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_httxz
@@ -27240,6 +28273,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_huuxz
@@ -27268,6 +28302,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_taptamuux
@@ -27296,6 +28331,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ttaptamtx
@@ -27324,6 +28360,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_tttxtx
@@ -27352,6 +28389,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ttxuux
@@ -27380,6 +28418,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ttxvevex
@@ -27406,6 +28445,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ttxz
@@ -27434,6 +28474,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: heldout
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_uux_ttxzz
@@ -27462,6 +28503,7 @@ processes:
     - 4
     - 4
     alphas_power: 4
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_uuuxux
@@ -27490,6 +28532,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_uuxvevex
@@ -27518,6 +28561,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_uuxwpwm
@@ -27544,6 +28588,7 @@ processes:
     - 2
     - 3
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_uuxz
@@ -27572,6 +28617,7 @@ processes:
     - 2
     - 4
     alphas_power: 2
+    beam_masses: {}
     split: train
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uux_uuxzz
