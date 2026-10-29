@@ -3181,6 +3181,11 @@ sign to held-out processes is more sign-changing pools in training ($95$ added, 
 pools and more on $1$ on two seeds' means, at no zero-shot cost overall); the pair sign head (no, at the baseline's
 settings, bounded, and at the search's best) and the near-zero weighting (no, one seed) are dropped; and the search's
 best rate is unstable for this arm with or without the pair head.
+This closes the preprocessing exploration on catalog\_v3 (2026-10-29): the shape proxy per target
+(Fig.~\ref{fig:v3_prep_shape}), the hybrid reference scale and its blends with the emission scales
+(Figs.~\ref{fig:v3_prep_hybrid} and~\ref{fig:v3_prep_blend}), the sampling sensitivity (par.~\ref{par:v3_prep_sampling})
+and this sign study. The pretraining catalog is now catalog\_v4; carrying these targets to it is a new design, the
+user's call.
 % allow: 95 because it is the arm's design, the pools it adds
 \begin{figure}[t]
 \centering
@@ -10811,10 +10816,8 @@ of the three share a test set.
     $\hat s$+coupling target with IDEN, colour and the diagram sum, and the shared target's blow-up at the per-process
     pretraining's HPs, are inputs to it); the D66 designs (decomp, loops, nonsm, threephase: bring them back to the user
     as the concrete designs of 2026-10-15 when they ask; D48, D44, D49, D46). The zero-shot fix is dropped until the
-    preprocessing is settled (D86). Running: the preprocessing exploration as a continuous CPU task, on catalog\_v3 since
-    D114 moved it there (D83; item \code{v3\_prep\_explore}; done on catalog\_v3: the few-shot calibration, par.\ The
-    context vector's $K$-shot fits on catalog\_v3, and the shape proxy per target, par.~\ref{par:v3_shape_proxy};
-    queue: the shared blow-up of the sign arms, then new ideas). Held (D78): \code{dancat\_ext},
+    preprocessing is settled (D86). The preprocessing exploration on catalog\_v3 is closed (par.~\ref{par:v3_prep_signed},
+    its last paragraph); its carry-over to catalog\_v4 is the user's call. Held (D78): \code{dancat\_ext},
     \code{catalog\_global}. Left on CC from my tests, not deleted: \code{zz\_memprof}, \code{zz\_memmap\_*},
     \code{zz\_ema\_ckpt\_*}, \code{zz\_step\_profile\_*}, \code{zz\_catalog\_norm\_smoke\_*}, \code{zeroshot\_*}.
   \item \textbf{Standing since 2026-10-15.} The work lives in \code{site}'s registers (\code{site items -v},
