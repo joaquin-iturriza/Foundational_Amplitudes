@@ -132,14 +132,13 @@ entries:
       target taken relative to its own Born''s tree level where that tree pool is read, so the born''s level drops out), on
       loop_levels_cc.json and tree_levels_cc.json: whether it narrows the held-out one-loop pools'' departure from their matched
       training pools and the training one-loop levels'' spread within classes; no free scale without a source'
-    3: 'Design and check on existing reads (CPU, no run; extend analysis/catalog_v4/loop_levels.py) a target or input change
-      for the tree level''s dependence on multiplicity: par:v4_mult_bias found the multiplicity pools'' signed offset follows
-      their level''s step from the five particle training parent (rank correlation -0.34 with the own step, -0.37 with the
-      class''s training step, -0.19 within class; positive on 0.75 of the pools whose level falls, 0.542 where it rises; e+e-
-      rise and sit low, gluon-gluon fall and sit high). On tree_levels_cc.json, per candidate (e.g. a per-particle term in
-      the emission-scale target, or the parent level as an input scale), whether it shrinks the steps from five to six particles
-      of the training and held-out multiplicity pools (median abs own step, its spread across classes), since the offset tracks
-      that step; no fit of a free scale without a source, the candidate''s form named from the target''s definition'
+    3: 'The one-loop axis''s signed level bias, read as the tree multiplicity bias was (CPU, existing reads: data/loop_levels_cc.json,
+      data/kshot_level.json; extend analysis/catalog_v4/loop_levels.py, never copy; no run; after step 2''s grouping of the
+      one-loop zero-shot error, which it does not repeat): per held-out one-loop pool, the sign of its seed-mean offset against
+      its level''s step from its born tree (the one-loop level less the training level of its born''s tree class, where that
+      class is in training) and against the same step of the training one-loop pools of its class (born orders, multiplicity,
+      initial state; loop-induced and virtual apart); rank correlations per seed and on the seed mean, the positive share
+      where the step is below and above the class''s, no fit, no threshold'
     4: 'The zero-shot shape gap: the shape error var(q - t) of catalog_v4''s training pools on their own validation events
       (in-distribution), per cell of multiplicity and initial state, against the held-out new-combination and multiplicity
       pools in the same cells (par:v4_tree_shape); the training pools'' validation reads come from the control pair''s checkpoints
@@ -1074,14 +1073,19 @@ entries:
         design question (their call), more one-loop training pools in the thin classes (e+e-, bg, qg beams), with the measured
         share of the one-loop error on thin classes'
     3:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): whether a multiplicity-aware target removes the multiplicity
-        axis''s signed bias, found to be a partial under-extrapolation of the level''s step with multiplicity'
+      feeds: 'the zero-shot bias, the user''s first priority (D178): the tree multiplicity bias follows the level''s class-to-class
+        step and no particle-content target change removes it (par:v4_mult_cand); whether the one-loop axis''s level error
+        is the same kind of under-extrapolated step (from tree to loop) decides whether a step-aware input (the born tree''s
+        level) is the lead for the one-loop level, or its error is the pool''s own'
       if:
-      - 'a candidate shrinks the steps from five to six particles across classes (training and held out) on the existing reads:
-        record a design for a short pretraining arm with it against the control pair v4_dimensionless_muon seeds 42 and 43,
-        measured on the multiplicity axis''s signed offset and positive share'
-      - 'no candidate shrinks the steps without widening the level spread elsewhere: record it as a dead end with the candidates''
-        numbers and move to the one-loop axis''s level bias'
+      - 'the one-loop offsets follow the step from the born tree (rank correlation of the same sign and size as the trees'',
+        -0.3 or beyond, on both seeds): design a short arm against the control pair v4_dimensionless_muon seeds 42 and 43
+        that gives the network the born tree''s level (or its class''s training step) as an input scale, checked first on
+        these reads for how much of the offset it would remove, measured on the one-loop axis''s signed offset and positive
+        share'
+      - 'no relation to the step (the offsets as large on pools whose level is at their class''s step): the one-loop level
+        error is the pool''s own, not an extrapolation; record it with the numbers and take the one-loop level fix from step
+        2''s grouping (top mass, loop-induced or virtual, born orders)'
     4:
       feeds: 'the user''s shape priority (D178): whether the 0.24 shape error of new processes with known particles is a generalisation
         gap (held-out well above in-distribution) or the network''s floor at this compute (held-out near in-distribution),
