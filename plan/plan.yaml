@@ -119,16 +119,7 @@ entries:
   - D165
   - D170
   - D175
-  next: 'Once site env ccin2p3 FA passes (CC''s environment check is being repaired on catalog_coverage; site pick FA --jobs
-    3 at 2026-10-29 avoided CC: ''setup incomplete: not runnable: .venv/lib/python3.11/...''; Jean Zay down, lxplus not deployed
-    and the catalog_v4 pools exist only on CC), submit catalog_v4''s one-loop sign extension (built at f5949014; the design
-    passed 2026-10-29 05:39 unlocks submission until 2026-10-30 05:39): site sync ccin2p3 FA, site pick FA --jobs 3, then
-    scripts/job_catalog_v4_signext.sh (CPU: build, certify, generate the 123 one-loop pools, audit, train recipe at $SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml,
-    alpha_s and sidecars; exit 3 when over a fifth fail certification) and the two pretrainings scripts/job_catalog_v3_short.sh
-    v4_dimensionless_muon_more_signed and v4_dimensionless_muon_more_signed_seed2 (--hdr=--mem=48G, about 1.8 GPU-h each)
-    chained afterok on it, each with --item v3_prep_explore, recorded with plan run. Note: site sync refuses on untracked
-    files not of this entry (analysis/ponytail_ab/*2*, docs/glossary.txt, tests/*_output.txt); pass --allow-dirty (only committed
-    work is pushed). If the 24 h window lapses, the design is re-recorded and re-reviewed before submission.'
+  next: after the code reviewer's re-check passes, resubmit the sign extension and its two chained pretrainings
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
