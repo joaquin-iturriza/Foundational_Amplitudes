@@ -595,14 +595,174 @@ def plot(res, mt, names, T, P):
     ps.save(fig, os.path.join(HERE, "figs", "loop_levels"))
 
 
+def multiplicity_read():
+    """The multiplicity axis's signed level bias (v3_prep_explore, the user's first priority D178: the zero-shot bias).
+    par:v4_tree_newproc found the multiplicity pools' (H2, all 2->4) seed-mean offset positive on most of them: the
+    network places their level too high. Is that an under-extrapolation of the level's fall from five to six
+    particles? Reads data/tree_levels.json (analyse_trees, no new dump). Each 2->4 process of catalog_v4 is a 2->3 or
+    2->2 process with particles added (recipes/catalog_v4_processes.yaml `why`, the parent rule of
+    recipes/select_catalog_v4.py, mapped to class representatives); an H2 pool's family parent stays in training, its
+    2->4 children do not. Per H2 pool: its own step, its level minus the mean level of its five particle training
+    parents (one particle added, one coupling power); per class of the one match rule (initial state and born orders
+    at six particles) the training step, the median of the same step over the training six particle pools of that
+    class with a five particle training parent. No fit, no threshold: the rank correlations (Spearman, per seed and on
+    the seed mean) of the signed offset with the own step, the class's training step and the departure from the
+    matched class, and within class (offset and own step less their class medians); the positive share where the level falls (own step below zero) and where it rises; and two
+    predictors with no free parameter set against the offset: a network that predicts the matched class mean
+    (offset = -departure) and one that predicts the parent's level plus the class's training step (offset = training
+    step - own step). Pools with no five particle training parent (pairs added to a 2->2) or no class step are counted
+    and left out of the step reads.
+        python3 analysis/catalog_v4/loop_levels.py --multiplicity -> data/tree_levels_mult.json,
+                                                                     figs/tree_levels_mult.{png,pdf}"""
+    from scipy.stats import spearmanr
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    from select_catalog_v4 import ADDS
+    d = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
+    T, H = d["train"], {n: r for n, r in d["heldout"]["H2"].items() if not r.get("missing")}
+    P4 = yaml.load(open(os.path.join(ROOT, "recipes", "catalog_v4_processes.yaml")),
+                   Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))["processes"]
+    cls = json.load(open(os.path.join(HERE, "census_classes.json")))["classes"]
+    rep_of = {m: r for r, ms in cls.items() for m in ms}
+
+    def parents5(r):
+        out = set()
+        for m in cls.get(r, [r]):
+            why = P4.get(m, {}).get("why", "")
+            for s_ in ADDS:
+                if why.endswith(s_) and why[: -len(s_)] in rep_of:
+                    out.add(rep_of[why[: -len(s_)]]); break
+        return sorted(p for p in out if p in T and not T[p]["heavy_layer"] and T[p]["n"] == 5)
+
+    key = lambda r: (r["initial"], r["born"])
+    steps = {}
+    for c, r in T.items():
+        ps = parents5(c) if r["n"] == 6 and not r["heavy_layer"] else []
+        if ps:
+            steps.setdefault(key(r), []).append(r["level"] - float(np.mean([T[p]["level"] for p in ps])))
+    cstep = {k: float(np.median(v)) for k, v in steps.items()}
+    rows, no_parent, no_class = [], [], []
+    for n, r in H.items():
+        ps = parents5(n)
+        if not ps:
+            no_parent.append(n); continue
+        if key(r) not in cstep:
+            no_class.append(n); continue
+        own = r["level"] - float(np.mean([T[p]["level"] for p in ps]))
+        rows.append({"name": n, "initial": r["initial"], "born": r["born"], "parents": ps, "own_step": own,
+                     "class_step": cstep[key(r)], "n_class_step": len(steps[key(r)]), "departure": r.get("departure"),
+                     "offset": r["offset"], "off": float(np.mean(r["offset"]))})
+    off = np.array([x["off"] for x in rows]); own = np.array([x["own_step"] for x in rows])
+    cs = np.array([x["class_step"] for x in rows])
+    rho = lambda a, b: [float(v) for v in spearmanr(a, b)]
+    S = {"n_heldout": len(H), "n_read": len(rows), "no_five_particle_parent": no_parent, "no_class_step": no_class,
+         "n_train_children": int(sum(len(v) for v in steps.values())), "n_classes_with_step": len(cstep),
+         "median_signed_off_all": float(np.median([np.mean(r["offset"]) for r in H.values()])),
+         "positive_share_all": float(np.mean([np.mean(r["offset"]) > 0 for r in H.values()])),
+         "median_signed_off": float(np.median(off)), "positive_share": float(np.mean(off > 0)),
+         "median_own_step": float(np.median(own)), "median_class_step": float(np.median(cs)),
+         "median_own_minus_class_step": float(np.median(own - cs)),
+         "share_own_below_class_step": float(np.mean(own < cs))}
+    for lab, x in (("own_step", own), ("class_step", cs), ("own_minus_class_step", own - cs)):
+        S[f"rho_{lab}"] = rho(x, off)
+        S[f"rho_{lab}_per_seed"] = [rho(x, [r["offset"][i] for r in rows])[0] for i in range(len(RUNS))]
+    dm = [i for i, x in enumerate(rows) if x["departure"] is not None]
+    S["rho_departure"] = rho([rows[i]["departure"] for i in dm], off[dm])
+    S["rho_departure_per_seed"] = [rho([rows[i]["departure"] for i in dm], [rows[i]["offset"][k] for i in dm])[0]
+                                   for k in range(len(RUNS))]
+    falls, rises = own < 0, own >= 0
+    S.update({"n_falls": int(falls.sum()), "n_rises": int(rises.sum()),
+              "positive_share_falls": float(np.mean(off[falls] > 0)) if falls.any() else None,
+              "positive_share_rises": float(np.mean(off[rises] > 0)) if rises.any() else None,
+              "median_off_falls": float(np.median(off[falls])) if falls.any() else None,
+              "median_off_rises": float(np.median(off[rises])) if rises.any() else None})
+    predA = np.array([-rows[i]["departure"] for i in dm]); predB = cs - own
+    S.update({"median_abs_resid_zero": float(np.median(np.abs(off))),
+              "median_abs_resid_match_mean": float(np.median(np.abs(off[dm] - predA))),
+              "median_abs_resid_parent_step": float(np.median(np.abs(off - predB))),
+              "rho_pred_match_mean": rho(predA, off[dm]), "rho_pred_parent_step": rho(predB, off),
+              "n_departure": len(dm)})
+    by = {}
+    for x in rows:
+        by.setdefault(f"{x['initial']} {x['born']}", []).append(x)
+    S["by_class"] = {k: {"n": len(v), "median_off": float(np.median([x["off"] for x in v])),
+                         "positive_share": float(np.mean([x["off"] > 0 for x in v])),
+                         "median_own_step": float(np.median([x["own_step"] for x in v])),
+                         "class_step": v[0]["class_step"], "n_class_step": v[0]["n_class_step"]}
+                     for k, v in sorted(by.items(), key=lambda kv: -len(kv[1]))}
+    # within class: each pool's offset and own step less its class's medians (classes of two pools or more, the least
+    # a within-class difference needs), so the class's common level and step drop out
+    wc = [(x["off"] - S["by_class"][k]["median_off"], x["own_step"] - S["by_class"][k]["median_own_step"])
+          for k, v in by.items() if len(v) > 1 for x in v]
+    S["n_within_class"] = len(wc)
+    S["rho_within_class"] = rho([w[1] for w in wc], [w[0] for w in wc])
+    byi = {}
+    for x in rows:
+        byi.setdefault(x["initial"], []).append(x)
+    S["by_initial"] = {k: {"n": len(v), "median_off": float(np.median([x["off"] for x in v])),
+                           "positive_share": float(np.mean([x["off"] > 0 for x in v])),
+                           "median_own_step": float(np.median([x["own_step"] for x in v])),
+                           "median_class_step": float(np.median([x["class_step"] for x in v]))}
+                       for k, v in sorted(byi.items())}
+    print(f"multiplicity axis: {S['n_read']} of {S['n_heldout']} read (no five particle training parent "
+          f"{len(no_parent)}, no class step {len(no_class)}); training children with a parent {S['n_train_children']} in "
+          f"{S['n_classes_with_step']} classes")
+    for k, v in S.items():
+        if k not in ("by_class", "by_initial", "no_five_particle_parent", "no_class_step"):
+            print(f"  {k}: {v}")
+    for k, v in S["by_class"].items():
+        print(f"  class {k:10s} {v}")
+    for k, v in S["by_initial"].items():
+        print(f"  initial {k:3s} {v}")
+    json.dump({"summary": S, "pools": rows}, open(os.path.join(HERE, "data", "tree_levels_mult.json"), "w"), indent=1)
+    flat = {}
+    for k, v in S.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            flat[f"mb.{k}"] = round(v, 3) if isinstance(v, float) else v
+        elif k.startswith("rho_") and isinstance(v, list):
+            if k.endswith("per_seed"):
+                flat[f"mb.{k[:-9]}.seed42"], flat[f"mb.{k[:-9]}.seed43"] = [round(x, 2) for x in v]
+            else:
+                flat[f"mb.{k}"], flat[f"mb.{k}.p"] = round(v[0], 2), float(f"{v[1]:.2g}")
+    flat["mb.n_no_parent"], flat["mb.n_no_class"] = len(no_parent), len(no_class)
+    for k, v in S["by_initial"].items():
+        for kk, x in v.items():
+            flat[f"mb.initial.{k}.{kk}"] = round(x, 3) if isinstance(x, float) else x
+    plot_mult(rows, dm, predA, predB)
+    print(json.dumps(flat))
+
+
+def plot_mult(rows, dm, predA, predB):
+    import plot_style as ps
+    fig, (a, b) = ps.figure(ncols=2)
+    own = [x["own_step"] for x in rows]
+    a.errorbar(own, [x["off"] for x in rows], yerr=[abs(x["offset"][0] - x["offset"][1]) / 2 for x in rows],
+               fmt=".", color=ps.C.blue, alpha=0.6, label=f"own step ({len(rows)})")
+    a.plot([x["class_step"] for x in rows], [x["off"] for x in rows], "x", color=ps.C.vermillion, alpha=0.5,
+           label="class training step")
+    a.axhline(0, color=ps.C.grey, lw=0.8)
+    a.set_xlabel(r"$\overline{t}_{6}-\overline{t}_{5}$"); a.set_ylabel(r"$\overline{q-t}$")
+    ps.legend(a, "upper right"); ps.make_room(a)
+    off = np.array([x["off"] for x in rows])
+    b.plot(predA, off[dm], ".", color=ps.C.green, alpha=0.6, label="matched class mean")
+    b.plot(predB, off, ".", color=ps.C.vermillion, alpha=0.6, label="parent + training step")
+    lo, hi = min(predA.min(), predB.min()), max(predA.max(), predB.max())
+    b.plot([lo, hi], [lo, hi], "--", color=ps.C.grey, label="offset = prediction")
+    b.set_xlabel(r"predicted $\overline{q-t}$"); b.set_ylabel(r"$\overline{q-t}$")
+    ps.legend(b, "upper left"); ps.make_room(b)
+    ps.save(fig, os.path.join(HERE, "figs", "tree_levels_mult"))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--dump", action="store_true")
     ap.add_argument("--trees", action="store_true", help="the tree held-out axes H1, H2, H3")
+    ap.add_argument("--multiplicity", action="store_true", help="the multiplicity axis's signed bias (multiplicity_read)")
     ap.add_argument("--chunk", type=int, default=0)
     ap.add_argument("--nchunks", type=int, default=1)
     A = ap.parse_args()
     if A.dump:
         dump(A.trees, A.chunk, A.nchunks)
+    elif A.multiplicity:
+        multiplicity_read()
     else:
         (analyse_trees if A.trees else analyse)()
