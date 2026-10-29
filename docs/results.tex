@@ -2098,6 +2098,66 @@ on these reads.
   \label{fig:v4_mult_bias}
 \end{figure}
 
+% src: python3 analysis/catalog_v4/loop_levels.py --mult-candidates @8121459b
+% claim: mc.none.train_6.n=438
+% claim: mc.none.heldout_6.n=156
+% claim: mc.none.train_6.median_abs_step=0.966
+% claim: mc.none.heldout_6.median_abs_step=1.071
+% claim: mc.none.train_6.class_spread=1.026
+% claim: mc.none.heldout_6.class_spread=1.432
+% claim: mc.none.train_6.median_step=0.195
+% claim: mc.none.heldout_6.median_step=0.183
+% claim: mc.soft_norm.train_6.median_abs_step=1.282
+% claim: mc.soft_norm.heldout_6.median_abs_step=1.36
+% claim: mc.eikonal.train_6.median_abs_step=2.788
+% claim: mc.eikonal.heldout_6.median_abs_step=2.914
+% claim: mc.eikonal.heldout_6.median_step=-2.874
+% claim: mc.eikonal.train_6.class_spread=0.927
+% claim: mc.eikonal.heldout_6.class_spread=1.094
+% claim: mc.none.level_sd.4=2.987
+% claim: mc.none.level_sd.5=2.875
+% claim: mc.none.level_sd.6=3.33
+% claim: mc.eikonal.level_sd.4=2.591
+% claim: mc.eikonal.level_sd.5=2.627
+% claim: mc.eikonal.level_sd.6=3.052
+% claim: mc.none.heldout_6.initial.gg=-1.212
+% claim: mc.none.heldout_6.initial.ee=0.999
+% claim: mc.eikonal.heldout_6.initial.gg=-3.156
+% claim: mc.eikonal.heldout_6.initial.ee=-2.13
+% claim: mc.five_origin.other=240
+% allow: 4 2 because they are the soft limit's normalisation and the pair-sum factor of the candidates' definitions
+% allow: 10 0.4 because they are catalog_v4's acceptance cuts, settings
+\paragraph{Target or input changes for the multiplicity step, checked on the levels (2026-10-29).}\label{par:v4_mult_cand}
+The question, from par.~\ref{par:v4_mult_bias} and the user's first priority, the zero-shot bias: the multiplicity
+pools' offset follows the step of their level from the five particle parent, so a target or input change that makes
+that step small and alike across classes should remove the bias at its source. Design: no new run; the per-pool train
+levels of the pretraining default's target (the emission scales with coupling orders) and the parent rule of the
+paragraph above (\code{analysis/catalog\_v4/loop\_levels.py --mult-candidates}), on the $438$ training six particle
+pools with a five particle training parent and the $156$ multiplicity held-out pools that have one. Three candidates,
+fixed before their numbers were read, each a function of the process's particles alone (every process alike, no beam
+term, no fitted scale): (i) the soft limit's normalisation, the $4$ in $|\mathcal M_{n+1}|^2\to4\pi\alpha\cdot
+4(-T_a\cdot T_b)/q^2_{ab}\,|\mathcal M_n|^2$, taken out as $-(N-4)\log4$; (ii) that and the soft limit's colour or charge
+weight of each final gluon or photon, $\log(2\sum_a C_a)$ or $\log(2\sum_a Q_a^2)$ over the other legs; (iii) the parent's
+level as an input scale, which leaves the network the step's change along the family to extrapolate. Measure: the
+median $|\bar t_6-\bar t_5|$ and the standard deviation of its class medians (classes of the one match rule with two
+pools or more), on training and held-out pools; beside them the spread of all training tree levels at each
+multiplicity. A candidate shrinks the steps only if all four step numbers fall. Reference: median $|\bar t_6-\bar
+t_5|$ $0.966$ (training) and $1.071$ (held out), class spread $1.026$ and $1.432$, median signed step $0.195$ and
+$0.183$. So the emission scales already leave the common part of the step near zero, and what the network must
+extrapolate is the step's class-to-class part. (i) shifts every step by $-\log4$: $1.282$ and $1.36$, spread unchanged.
+(ii) carries part of the class-to-class step: the class spread falls to $0.927$ and $1.094$, the level spread at four,
+five and six particles from $2.987$, $2.875$, $3.33$ to $2.591$, $2.627$, $3.052$, and the held-out gluon-gluon and
+$e^+e^-$ medians, $-1.212$ and $0.999$ before, move to $-3.156$ and $-2.13$; but at the soft limit's size it
+overshoots, median $|\bar t_6-\bar t_5|$ $2.788$ and $2.914$ (held-out median step $-2.874$), since catalog\_v4's events
+sit at its cuts ($p_T>10$\,GeV, $\Delta R>0.4$), not at the soft end. (iii) cannot be read: all $240$ five particle
+training pools were generated exhaustively, with no four particle parent, so the step's change along a family is not
+in the data; the nearest reading, the parent's level plus the class's training step, was off by more than the network
+(par.~\ref{par:v4_mult_bias}). No candidate shrinks the steps, so none goes to a run: a dead end for this target-side
+route. What it changes: the bias is in how the step differs between classes, and the colour or charge weight is the part
+of the target that tracks it; the weight per event, from each event's own dipoles rather than the soft limit's
+constant, is the form left untested (it needs the pools' momenta), and the next step of the zero-shot bias moves to
+the one-loop axis's level.
+
 % src: python3 analysis/catalog_v4/loop_levels.py --loop-groups @ebf131bc
 % claim: lg.n_heldout=28
 % claim: lg.n_heldout_top=0
