@@ -1714,14 +1714,18 @@ entries:
   - D167
   - D169
   - D174
-  next: 'Submit the 13 TeV pp regeneration with catalog_v4''s physics (design passed 2026-10-29; recipes committed 1cffe26d:
-    992 entries pp13v4_ in recipes/catalog_v4_pp_part0..7.yaml, 124 each, of which 124 are merged members no recipe reads;
-    433 reused pp13 pools checked present on CC (866 val/test files with sidecars) and pp13_gg_ttx, pp13_uux_wpwm reproduce
-    catalog_v4''s |M|^2 exactly on 200 events): blocked on placement, waiting for the user: site pick puts CC on AVOID (site
-    env fails: the anaconda/3.11 module is now denied on CC) and CC''s login notice now forbids generative AI tools on IN2P3
-    machines, non-interactive commands included; lxplus is the plan but its verify timed out and MadGraph there is unverified.
-    On the user''s answer: job_probe on the chosen site, then scripts/job_gen_daniel_catalog.sh x8 with --env DANIEL_SPEC=recipes/catalog_v4_pp_part<k>.yaml
-    --env DANIEL_PREFIX=pp13v4_ --item catalog_coverage, plan run each with --next 5'
+  next: 'Submit the pp13v4 regeneration (992 entries in recipes/catalog_v4_pp_part0..7.yaml, scripts/job_gen_daniel_catalog.sh
+    with DANIEL_SPEC and DANIEL_PREFIX=pp13v4_, --item catalog_coverage, plan run each with --next 1). Blocked on placement:
+    CC-IN2P3 not to be operated while its login notice forbids generative AI tools; lxplus env runs (2026-10-29) but is not
+    ready for this job: site pick lists it AVOID because sites/setup.sh --verify checks catalog_v3_train.yaml pools (catalog_v3
+    deleted, none on lxplus); its MadGraph is 3.6.7 against CC''s 3.7.0 (the design fixes the pipeline; setup.sh says pools
+    are not generated off CC because the recipe id does not record the version; 3.7.0 exists only as the GitHub tag v3.7.0);
+    its nodes have 8 cores against the parts'' 48. For lxplus: install MadGraph 3.7.0 from the GitHub tag beside 3.6.7 (never
+    replacing it) and point the lxplus env at it, make the verify accept a generation-only site (check_site_data default to
+    the catalog in use, or a tools-only verify), re-split the 992 processes into 8-core parts at the same wall time; the main
+    session decides whether that, or waiting for CC, is the route. Afterwards: validate with pp_physics_check.py taught the
+    pp13v4_ names and without its b reshelling; the 433 reused pp13 pools stay on CC, so the comparison needs them and the
+    new pools on one site (site copy)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
