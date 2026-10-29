@@ -132,21 +132,14 @@ entries:
       v3_prep_explore) and first checks the pool-level proxy (tree pools mixture-shaped, one-loop pools never shaped) on a
       few pools: per-event mean of t_virt - t_Born against the pool-level step; loop-induced pools (no Born) stay on the target
       as trained and are named'
-    4: 'The zero-shot shape gap, redesigned after the design review''s FIX of 2026-10-29 18:00 (plan show: the design''s review),
-      then the job: (a) the free read first: the control pair''s (FA-ccin2p3-339ec100, -380842ed) result.json per-process
-      val_loss_no_reg times the shared standardization''s sigma^2 (the conversion of docs/results.tex near line 2672, 0.50
-      against the scorer''s 0.51 on 40 catalog_v3 parents), 200 val events per pool with the offset in, as a first in-distribution
-      reference per cell of multiplicity and initial state; (b) the intrinsic-difficulty control: the shape proxy (analysis/catalog_v3/prep_shape.py,
-      CPU, par:v3_shape_proxy: per-class regressor MSE 0.059 on training classes against 0.077 held out on catalog_v3, rank
-      correlation 0.68 to 0.80 with the network''s zero-shot shape) run on catalog_v4''s training and held-out tree pools
-      in the same cells; decide on the network''s held-out over training floor ratio against the proxy''s ratio per cell (or
-      the network floor over the proxy MSE per pool), with a stated smallest log10 gap beyond the proxy''s ratio and the per-pool
-      seed spread of the existing short_reads; (c) record that design (plan design), run the design-reviewer, then submit
-      the two eval jobs, already wired: site sync ccin2p3 FA once, then scripts/job_catalog_v3_short.sh v4_dimensionless_muon
-      eval and v4_dimensionless_muon_seed2 eval with --env V3_AXES=TR --hdr=--mem=48G --hdr=--time=01:30:00 --item v3_prep_explore
-      (the TR axis, commits 94a18ed5 and d4700d3b: the training pools on their test split, 2000 events, all 1153 test pools
-      present on CC; collect with tools/collect_run.py --axes TR; about 0.5 GPU-h each), and extend analysis/catalog_v4/loop_levels.py
-      for the read'
+    4: 'When the three shape-gap jobs end (TR reads of the control pair FA-ccin2p3-c8411ffc seed 42, -5f368c52 seed 43; the
+      shape proxy on catalog_v4 FA-ccin2p3-45d20a1f), read the logs, collect the TR reads (tools/collect_run.py --axes TR
+      into analysis/catalog_v3/data/short_reads/v4_dimensionless_muon[_seed2]/TR), bring $SCRATCH/zz_v4_prep/prep_shape_v4.json
+      home as analysis/catalog_v4/data/prep_shape_v4.json (site run cat), rerun python3 analysis/catalog_v4/loop_levels.py
+      --shape-gap and decide by the passed design (per group, new combinations and multiplicity apart: median e = d - p >=
+      0.3 on both seeds = transfer gap; the log-log fit''s residual on the other side of 0.3 = unresolved; the two top groups
+      beside); write up beside par:v4_tree_shape with the per-group and per-cell table (free read, TR read, proxy), % src
+      / % claim'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1242,15 +1235,16 @@ entries:
       - 'the per-event mean departs from the pool-level step enough to change which pools narrow: redo the par:v4_loop_born
         read on the per-event values before any arm, and record the pool-level result as a proxy that failed its check'
     4:
-      feeds: 'the user''s shape priority (D178): whether the 0.24 shape error of new processes with known particles is a generalisation
-        gap (held-out well above in-distribution, beyond the intrinsic difficulty the shape proxy measures) or the network''s
-        floor at this compute, which decides whether shape work targets transfer or capacity'
+      feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
+        gap beyond intrinsic difficulty or the network''s floor at this compute, which decides whether shape work targets
+        transfer or capacity'
       if:
-      - 'held-out shape error above in-distribution by more than the proxy''s ratio and the stated gap, in the same cells:
-        a transfer gap; design target or input priors aimed at it, starting with the cells where the gap is largest (gluon-gluon,
-        e+e-)'
-      - 'held-out within the proxy''s ratio of in-distribution: the shape error is the fit''s floor at this compute plus intrinsic
+      - 'a new-process group''s median e >= 0.3 on both seeds: a transfer gap; design target or input priors aimed at it,
+        starting with the cells where e is largest (gluon-gluon, e+e-)'
+      - 'median e < 0.3 on either seed for both groups: the shape error is the fit''s floor at this compute plus intrinsic
         difficulty; the shape lever is capacity and training length, recorded for the full pretraining''s design'
+      - 'e and the log-log residual disagree on a group''s side of 0.3: report that group as unresolved with both numbers,
+        no decision'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
