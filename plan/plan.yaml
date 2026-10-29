@@ -1936,6 +1936,18 @@ entries:
       adds electroweak diagrams catalog_v4 is scored on another function (5.98 vs pp-trained); on the 417 matching trained
       classes catalog_v4 is ahead (0.66) and the KL correlation drops to 0.19 (e33a2eaa)'
     at: '2026-10-26T21:54:06+00:00'
+  - tried: 'pp13v4 regeneration on lxplus instead of CC-IN2P3: site env lxplus FA (2026-10-29)'
+    why: 'the env now runs on lxplus (python 3.11.13, torch 2.1.2, activate.sh ok, gfortran, g++, MadGraph present, AFS writable),
+      but three things stop the submission: (1) sites/setup.sh --verify refuses the site because tools/check_site_data.py''s
+      default recipe is catalog_v3_train.yaml (catalog_v3 was deleted by the user''s decision) and none of its pools are on
+      lxplus, so site pick lists lxplus as AVOID and picks nothing; a generation job needs only MadGraph and the compilers,
+      but the verify has one meaning (runnable for training) and the gate is in the site tool, outside FA; (2) lxplus''s MadGraph
+      is 3.6.7 (3.7.0 is not on launchpad, its tarball 404s; the GitHub tag v3.7.0 exists), CC-IN2P3''s is 3.7.0, and setup.sh
+      itself says pools are not generated off CC because a pool''s recipe id does not record the version: generating there
+      breaks the design''s ''pipeline fixed'' against the 433 reused pp13 pools and the catalog_v4 standalones; (3) lxplus
+      nodes have 8 cores and the parts are sized at 48 cores x 12 h; HTCondor 48-core slots are not checked. Nothing submitted,
+      no probe run.'
+    at: '2026-10-29T06:34:22+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
