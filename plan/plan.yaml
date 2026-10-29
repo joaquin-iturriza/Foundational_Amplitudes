@@ -1281,7 +1281,6 @@ entries:
       - 'e and the log-log residual disagree on a group''s side of 0.3: report that group as unresolved with both numbers,
         no decision'
   step_waits:
-    '5': CC's /sps/lpnhe disk to have 50G free (the parts cleanup is freeing about 340G)
     '6': CC's /sps/lpnhe disk to have 50G free (the parts cleanup is freeing about 340G)
 - status: done
   quotes:
