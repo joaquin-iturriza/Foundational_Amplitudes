@@ -2262,7 +2262,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: e7a1775d
+    commit: c865826b
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -2320,6 +2320,7 @@ entries:
     - recipes/catalog_v4_roles.json
     - recipes/catalog_v4_shared_heldout.yaml
     - recipes/gen_catalog_v4.py
+    - recipes/gen_catalog_v4_default.py
     - recipes/gen_catalog_v4_pp.py
     - recipes/make_catalog_v3v4_shared.py
     - recipes/select_catalog_v4.py
@@ -2331,6 +2332,7 @@ entries:
     - scripts/job_mixed_order_virt.sh
     - scripts/job_v4_hwpwm_zero_width.sh
     - scripts/job_width_regen.sh
+    - tests/test_default_share.py
     - tests/test_order_features.py
     - tests/test_orders_source.py
     - tests/test_particle_encoding.py
