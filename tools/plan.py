@@ -5,7 +5,8 @@ Two files in the MAIN checkout (resolved through git's common dir, so worktrees 
   plan/plan.yaml     durable content, in git: id, title, question, status (running | waiting_user | held | done),
                      quotes [{said_at, text, decision}], decisions, next, done_when (a shell check, exit 0 = done),
                      notes_ref (a \\label in docs/results.tex), match (the site item's globs), evidence {runs, commit,
-                     paths}, dead_ends [{tried, why, at}], asks [{ask, at, answered_at, decision}], the open question: ask +
+                     paths}, dead_ends [{tried, why, at}], asks [{ask, at, answered_at, decision,
+                     withdrawn_at, withdrawn_why}], the open question: ask +
                      waiting_since + searched + blocks (what waits on the answer) + checked_until, on a running entry,
                      or with holds_all (why everything waits) on a waiting_user one, hold_decision (held), writeup
                      (done), designs [{at, question, prior, measure, check, fixed, control, seeds, outcome, passed_at, reviewer,
@@ -26,6 +27,10 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           and routed, its step prompt names the question and what waits on it (B);
                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
                                           it can move without the answer)
+  plan withdraw <id> --decision D --why W [--set title|question|next=V]   the open question is settled by a decision
+                                          already in force (asked although D settles it): recorded in the ask
+                                          history with D, why and when, the question cleared, a waiting entry back
+                                          to running
   plan design <id> --question Q --prior P --measure M --check C --fixed F --control K --seeds S --outcome O
                                           the design of the next job, before it is submitted: the question it
                                           answers, the prior work found on that question (each with its result
@@ -952,6 +957,7 @@ def next_steps_keyed(d, st, t=None, msgs=None):
     return out
 
 
+MAP_KEEP = 25  # the entry's map keeps its last 25 lines
 PROMPT_TAIL = 8               # dead ends and evidence runs / paths a step prompt carries; plan show <id> has them all
 
 
@@ -994,7 +1000,8 @@ def step_prompt(e, reason, key=None):
                       next=step_text(e, key), n=key, others=others, done_when=e.get("done_when"),
                       quotes=q or "  none", dead_ends=de,
                       evidence=evidence, open_question=oq,
-                      design=design_text(last_design(e)))
+                      design=design_text(last_design(e)),
+                      map="\n".join("  " + x for x in (e.get("map") or [])) or "  none yet")
 
 
 # ---------------------------------------------------------------- site writes
@@ -1615,6 +1622,52 @@ def cmd_answer(a):
     print("plan: %s recorded as %s; entry %s now %s" % (a.kind, did, e["id"], e["status"]))
 
 
+WITHDRAW_WHY_MIN = 20       # characters: how the decision settles the question
+
+
+def cmd_withdraw(a):
+    """The open question was asked although a decision already in force settles it (CLAUDE.md 0i: the rules and site
+    decisions are searched before asking). plan answer refuses words typed before the question, so the question is
+    withdrawn instead: the decision must be in the registry and in force; the withdrawal (decision, why, when) goes
+    in the entry's ask history, the question is cleared and a waiting entry runs again. (v3_prep_explore, 2026-10-26:
+    asked what D114/D115 already settle.)"""
+    sets = dict(s.split("=", 1) for s in a.set or [])
+    bad = [k for k in sets if k not in SETTABLE]
+    if bad:
+        sys.exit("plan: cannot set %s here (settable: %s)" % (", ".join(bad), ", ".join(SETTABLE)))
+    if not re.fullmatch(r"D\d+", a.decision or ""):
+        sys.exit("plan: --decision takes a decision id, D<n>")
+    if len((a.why or "").strip()) < WITHDRAW_WHY_MIN:
+        sys.exit("plan: --why must say how %s settles the question, in at least %d characters" % (
+            a.decision, WITHDRAW_WHY_MIN))
+    dd = decision(a.decision)
+    if not dd:
+        sys.exit("plan: not withdrawn: %s is not in the decisions registry (site decisions --project %s)" % (
+            a.decision, PROJECT))
+    if not dd["in_force"]:
+        sys.exit("plan: not withdrawn: %s is no longer in force (site decisions --project %s)" % (a.decision, PROJECT))
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        if not open_question(e):
+            sys.exit("plan: %s has no open question to withdraw" % a.id)
+        t = now().isoformat()
+        rec = next((x for x in reversed(e.get("asks") or []) if x.get("ask") == e.get("ask")
+                    and not x.get("answered_at")), None)
+        if rec is None:
+            rec = {"ask": e["ask"], "at": e.get("waiting_since")}
+            e.setdefault("asks", []).append(rec)
+        # answered_at + decision: the re-ask guards (plan ask, the Stop check) treat it as settled from now on
+        rec.update(answered_at=t, decision=a.decision, withdrawn_at=t, withdrawn_why=a.why)
+        if e.get("status") == "waiting_user":
+            e["status"] = "running"
+        for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "holds_all"):
+            e.pop(k, None)
+        for k, v in sets.items():
+            e[k] = v
+    print("plan: %s's question withdrawn, settled by %s (%s); entry now %s" % (a.id, a.decision, a.why,
+                                                                               e["status"]))
+
+
 def answered_asks(d):
     return [(e, x) for e in d["entries"] for x in e.get("asks") or [] if x.get("answered_at")]
 
@@ -1856,6 +1909,17 @@ def cmd_dead_end(a):
         entry(d, a.id).setdefault("dead_ends", []).append({"tried": a.tried, "why": a.why, "at": now().isoformat()})
 
 
+def cmd_map(a):
+    """Where something the entry's steps need lives (file:line and what is there), shown to every later step agent
+    so it does not search the code again (2026-10-29: 39% of a step agent's calls were source reads, most of them
+    re-finding what an earlier step had found)."""
+    with transaction() as (d, st):
+        m = entry(d, a.id).setdefault("map", [])
+        if a.text not in m:
+            m.append(a.text)
+        del m[:-MAP_KEEP]
+
+
 def cmd_next(a):
     """What can move now, and the exact prompt of each step agent to launch (exit 1 while anything is unlaunched)."""
     probs = reconcile_sweeps()
@@ -2039,6 +2103,11 @@ def main(argv=None):
         A("--kind", required=True, choices=KINDS, help="the kind of decision the words make"),
         A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
           "(repeatable)"))
+    cmd("withdraw", cmd_withdraw, "withdraw the entry's open question: a decision already in force settles it", ID,
+        A("--decision", required=True, help="the decision (D<n>) in force that settles the question"),
+        A("--why", required=True, help="how that decision settles the question"),
+        A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
+          "(repeatable)"))
     cmd("ask", cmd_ask, "put an open question for the user on the entry", ID,
         A("--ask", required=True, help="the question, as sent to the user"),
         A("--searched", required=True, help="what was read before asking (CLAUDE.md rules, site decisions) and why "
@@ -2089,6 +2158,8 @@ def main(argv=None):
         A("n", type=int, help="the step's number"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
         A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
+    cmd("map", cmd_map, "record where something the entry needs lives, for later step agents", ID,
+        A("text", help='"<file>:<line> <what is there>"'))
     cmd("next", cmd_next, "what can move now (exit 1 while a listed step is not launched)",
         A("--prompts", action="store_true", help="print each step agent's exact prompt"))
     cmd("done", cmd_done, "close the entry: done_when passes and the write-up is committed", ID,
