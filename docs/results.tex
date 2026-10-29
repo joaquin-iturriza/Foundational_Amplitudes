@@ -2020,6 +2020,195 @@ the one-loop axis.
   \label{fig:v4_tree_shape}
 \end{figure}
 
+\paragraph{The shape gap of catalog\_v4's new tree processes, first read (2026-10-29).}\label{par:v4_shape_gap} The
+question, from par.~\ref{par:v4_tree_shape} and the user's priority on the shape: is the floor $\mathrm{var}(q-t)$ of a
+held-out new process made of particles trained at their masses above the in-distribution floor of the training pools in
+its cell of multiplicity and initial state by more than the pools' intrinsic difficulty explains (a transfer gap, to be
+met with target or input priors), or is it the network's floor at this compute plus that difficulty (a matter of
+capacity and training length)? Design (passed review): no retraining; the control pair (seeds $42$ and $43$) at its best
+checkpoint; per held-out pool $d=\log_{10}$ of its floor over its cell's median training floor, $p$ the same ratio for the
+shape proxy (par.~\ref{par:v3_shape_proxy}, one small regressor per pool, now on all $1045$ training and $559$ held-out
+catalog\_v4 tree pools, target as the control's), $e=d-p$; per group the median of $e$ on each seed, a transfer gap when it is at
+least $0.3$ on both, the network's floor when it is below on either, unresolved when a fit of $\log$ floor on $\log$
+proxy over the training pools puts the group on the other side. The decision is taken on the new combinations and the
+multiplicity pools; the two top groups are reported beside. The training floor was to come from the control pair's own
+scorer on the training pools' test split; both of those reads failed (the cluster's project disk was full) and wait to
+be rerun. What is read here is the free training floor, each training pool's result.json validation loss at the best
+checkpoint times the shared $\sigma^2$ (the conversion that matched the zero-shot scorer on catalog\_v3's
+parents): it keeps the offset and is read on the
+checkpoint-selection events, so it lies above the true training floor and every $d$ and $e$ below is a lower bound.
+% src: python3 analysis/catalog_v4/loop_levels.py --shape-gap @84630b29
+% claim: sg.n_train=1045
+% claim: sg.n_heldout=559
+% claim: sg.H1.n=62
+% claim: sg.H2.n=218
+% claim: sg.other_mass.n=35
+% claim: sg.no_mass.n=244
+% claim: sg.H1.median_d_free_seed42=0.226
+% claim: sg.H1.median_d_free_seed43=0.178
+% claim: sg.H1.median_p=-0.013
+% claim: sg.H1.median_e_free_seed42=0.301
+% claim: sg.H1.median_e_free_seed43=0.278
+% claim: sg.H2.median_d_free_seed42=0.351
+% claim: sg.H2.median_d_free_seed43=0.319
+% claim: sg.H2.median_p=-0.047
+% claim: sg.H2.median_e_free_seed42=0.389
+% claim: sg.H2.median_e_free_seed43=0.358
+% claim: sg.other_mass.median_e_free_seed42=0.299
+% claim: sg.other_mass.median_e_free_seed43=0.274
+% claim: sg.no_mass.median_e_free_seed42=0.938
+% claim: sg.no_mass.median_e_free_seed43=0.892
+% claim: sg.H1.median_seed_spread_pool=0.064
+% claim: sg.H2.median_seed_spread_pool=0.054
+% allow: 42 43 because they are the seeds, settings
+% allow: 0.3 because it is the design's threshold, a setting
+The proxy finds the held-out pools no harder than the training pools of their cells: median $p$ is $-0.013$ on the
+$62$ new combinations and $-0.047$ on the $218$ multiplicity pools, so intrinsic difficulty explains none of their
+excess and $e$ is $d$ or a little above it. On the multiplicity pools $e$ is $0.389$ and $0.358$ (seeds $42$ and $43$;
+$d$ $0.351$ and $0.319$), above $0.3$ on both seeds already as a lower bound, against a per-pool seed spread of $0.054$.
+On the new combinations $e$ is $0.301$ and $0.278$ ($d$ $0.226$ and $0.178$, spread $0.064$), on the threshold. Read
+against the rule these lower bounds would say the network's floor on seed $43$, but the rule is applied to the scorer's
+$e$ only, and the true training floor can only move $e$ up, so the free read cannot decide this group. Beside, the top processes at another trained mass give $0.299$ and $0.274$,
+the $244$ at no trained mass $0.938$ and $0.892$. Table~\ref{tab:v4_shape_gap} gives the cells: every one but four
+particles from $e^+e^-$ has the held-out floor above the training floor, and the proxy's ratio is near zero or negative
+in every cell of five and six particles. What it changes: nothing is decided yet. The lower bounds point at a transfer
+gap on the multiplicity pools and leave the new combinations at the threshold; the decision, and the fit's residual
+that could make a group unresolved, wait for the two training reads.
+\begin{table}[t]
+  \centering\small
+  % src: python3 analysis/catalog_v4/loop_levels.py --shape-gap @84630b29
+  % claim: sg.4bb.n_train=16
+  % claim: sg.4bb.n_heldout=1
+  % claim: sg.4bb.log_ratio_free=2.58
+  % claim: sg.4bb.log_ratio_proxy=0.00
+  % claim: sg.4bb.excess_free=2.57
+  % claim: sg.4bg.n_train=6
+  % claim: sg.4bg.n_heldout=1
+  % claim: sg.4bg.log_ratio_free=0.33
+  % claim: sg.4bg.log_ratio_proxy=0.11
+  % claim: sg.4bg.excess_free=0.21
+  % claim: sg.4bq.n_train=7
+  % claim: sg.4bq.n_heldout=2
+  % claim: sg.4bq.log_ratio_free=0.43
+  % claim: sg.4bq.log_ratio_proxy=0.19
+  % claim: sg.4bq.excess_free=0.24
+  % claim: sg.4ee.n_train=15
+  % claim: sg.4ee.n_heldout=1
+  % claim: sg.4ee.log_ratio_free=-0.57
+  % claim: sg.4ee.log_ratio_proxy=-2.36
+  % claim: sg.4ee.excess_free=1.80
+  % claim: sg.4gg.n_train=6
+  % claim: sg.4gg.n_heldout=1
+  % claim: sg.4gg.log_ratio_free=0.25
+  % claim: sg.4gg.log_ratio_proxy=-0.51
+  % claim: sg.4gg.excess_free=0.75
+  % claim: sg.4qq.n_train=23
+  % claim: sg.4qq.n_heldout=4
+  % claim: sg.4qq.log_ratio_free=0.77
+  % claim: sg.4qq.log_ratio_proxy=-0.95
+  % claim: sg.4qq.excess_free=1.72
+  % claim: sg.5bb.n_train=53
+  % claim: sg.5bb.n_heldout=7
+  % claim: sg.5bb.log_ratio_free=1.25
+  % claim: sg.5bb.log_ratio_proxy=-0.22
+  % claim: sg.5bb.excess_free=1.47
+  % claim: sg.5bg.n_train=12
+  % claim: sg.5bg.n_heldout=9
+  % claim: sg.5bg.log_ratio_free=1.05
+  % claim: sg.5bg.log_ratio_proxy=-0.10
+  % claim: sg.5bg.excess_free=1.15
+  % claim: sg.5bq.n_train=21
+  % claim: sg.5bq.n_heldout=12
+  % claim: sg.5bq.log_ratio_free=1.16
+  % claim: sg.5bq.log_ratio_proxy=0.11
+  % claim: sg.5bq.excess_free=1.05
+  % claim: sg.5ee.n_train=31
+  % claim: sg.5ee.n_heldout=6
+  % claim: sg.5ee.log_ratio_free=0.56
+  % claim: sg.5ee.log_ratio_proxy=-0.84
+  % claim: sg.5ee.excess_free=1.40
+  % claim: sg.5gg.n_train=8
+  % claim: sg.5gg.n_heldout=5
+  % claim: sg.5gg.log_ratio_free=1.23
+  % claim: sg.5gg.log_ratio_proxy=0.13
+  % claim: sg.5gg.excess_free=1.10
+  % claim: sg.5qg.n_train=22
+  % claim: sg.5qg.n_heldout=4
+  % claim: sg.5qg.log_ratio_free=1.03
+  % claim: sg.5qg.log_ratio_proxy=-0.25
+  % claim: sg.5qg.excess_free=1.28
+  % claim: sg.5qq.n_train=108
+  % claim: sg.5qq.n_heldout=24
+  % claim: sg.5qq.log_ratio_free=0.65
+  % claim: sg.5qq.log_ratio_proxy=-0.08
+  % claim: sg.5qq.excess_free=0.73
+  % claim: sg.6bb.n_train=114
+  % claim: sg.6bb.n_heldout=57
+  % claim: sg.6bb.log_ratio_free=0.57
+  % claim: sg.6bb.log_ratio_proxy=0.06
+  % claim: sg.6bb.excess_free=0.51
+  % claim: sg.6bg.n_train=27
+  % claim: sg.6bg.n_heldout=38
+  % claim: sg.6bg.log_ratio_free=0.70
+  % claim: sg.6bg.log_ratio_proxy=-0.04
+  % claim: sg.6bg.excess_free=0.75
+  % claim: sg.6bq.n_train=58
+  % claim: sg.6bq.n_heldout=60
+  % claim: sg.6bq.log_ratio_free=0.48
+  % claim: sg.6bq.log_ratio_proxy=-0.13
+  % claim: sg.6bq.excess_free=0.61
+  % claim: sg.6ee.n_train=86
+  % claim: sg.6ee.n_heldout=48
+  % claim: sg.6ee.log_ratio_free=0.44
+  % claim: sg.6ee.log_ratio_proxy=-0.27
+  % claim: sg.6ee.excess_free=0.71
+  % claim: sg.6gg.n_train=10
+  % claim: sg.6gg.n_heldout=36
+  % claim: sg.6gg.log_ratio_free=0.90
+  % claim: sg.6gg.log_ratio_proxy=0.10
+  % claim: sg.6gg.excess_free=0.80
+  % claim: sg.6qg.n_train=70
+  % claim: sg.6qg.n_heldout=50
+  % claim: sg.6qg.log_ratio_free=0.40
+  % claim: sg.6qg.log_ratio_proxy=-0.06
+  % claim: sg.6qg.excess_free=0.46
+  % claim: sg.6qq.n_train=351
+  % claim: sg.6qq.n_heldout=193
+  % claim: sg.6qq.log_ratio_free=0.30
+  % claim: sg.6qq.log_ratio_proxy=-0.21
+  % claim: sg.6qq.excess_free=0.51
+  % allow: 4 5 6 because they are particle counts, the cells' labels
+  \begin{tabular}{lrrrrrr}
+  particles, initial state & training & held out & $d$ (free) & $p$ & $e$ (free) & $e$ (scorer) \\
+  \hline
+  4, bb & 16 & 1 & $2.58$ & $0.00$ & $2.57$ & -- \\
+  4, bg & 6 & 1 & $0.33$ & $0.11$ & $0.21$ & -- \\
+  4, bq & 7 & 2 & $0.43$ & $0.19$ & $0.24$ & -- \\
+  4, ee & 15 & 1 & $-0.57$ & $-2.36$ & $1.80$ & -- \\
+  4, gg & 6 & 1 & $0.25$ & $-0.51$ & $0.75$ & -- \\
+  4, qq & 23 & 4 & $0.77$ & $-0.95$ & $1.72$ & -- \\
+  5, bb & 53 & 7 & $1.25$ & $-0.22$ & $1.47$ & -- \\
+  5, bg & 12 & 9 & $1.05$ & $-0.10$ & $1.15$ & -- \\
+  5, bq & 21 & 12 & $1.16$ & $0.11$ & $1.05$ & -- \\
+  5, ee & 31 & 6 & $0.56$ & $-0.84$ & $1.40$ & -- \\
+  5, gg & 8 & 5 & $1.23$ & $0.13$ & $1.10$ & -- \\
+  5, qg & 22 & 4 & $1.03$ & $-0.25$ & $1.28$ & -- \\
+  5, qq & 108 & 24 & $0.65$ & $-0.08$ & $0.73$ & -- \\
+  6, bb & 114 & 57 & $0.57$ & $0.06$ & $0.51$ & -- \\
+  6, bg & 27 & 38 & $0.70$ & $-0.04$ & $0.75$ & -- \\
+  6, bq & 58 & 60 & $0.48$ & $-0.13$ & $0.61$ & -- \\
+  6, ee & 86 & 48 & $0.44$ & $-0.27$ & $0.71$ & -- \\
+  6, gg & 10 & 36 & $0.90$ & $0.10$ & $0.80$ & -- \\
+  6, qg & 70 & 50 & $0.40$ & $-0.06$ & $0.46$ & -- \\
+  6, qq & 351 & 193 & $0.30$ & $-0.21$ & $0.51$ & -- \\
+  \end{tabular}
+  \caption{The shape gap of catalog\_v4's tree held-out pools per cell, all four groups together, seed means: the
+    cell's training and held-out pool counts; $d$, $\log_{10}$ of the held-out pools' median floor over the training
+    pools' median free floor (the result.json validation loss times $\sigma^2$, offset included); $p$, the same for the shape proxy's MSE; $e=d-p$. The last column waits for the scorer's
+    reads of the training pools.}
+  \label{tab:v4_shape_gap}
+\end{table}
+
 % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
 % claim: mb.median_signed_off_all=0.12
 % claim: mb.positive_share_all=0.642
