@@ -366,8 +366,9 @@ def refused(res, call):
     return "tool error" if source(res, call).startswith("tool error") else "hook/permission refusal"
 
 
-def launches(sid):
-    """tool_use id -> (type, effort, timestamp) of every Agent call, in the main and subagent transcripts."""
+def launch_records(sid):
+    """tool_use id -> {type, effort, model, ts, prompt, description, file} of every Agent call, in the main and
+    subagent transcripts (file: the transcript that made the call)."""
     out = {}
     files = [os.path.join(PROJ, sid + ".jsonl")] + glob.glob(os.path.join(PROJ, sid, "subagents", "agent-*.jsonl"))
     for f in files:
@@ -375,12 +376,21 @@ def launches(sid):
             if '"Agent"' not in line:
                 continue
             r = json.loads(line)
+            if r.get("type") != "assistant":
+                continue
             for x in (r.get("message") or {}).get("content") or []:
                 if isinstance(x, dict) and x.get("type") == "tool_use" and x.get("name") == "Agent":
                     i = x.get("input") or {}
-                    out[x["id"]] = (i.get("subagent_type") or "general-purpose", i.get("effort") or "default",
-                                    r.get("timestamp") or "")
+                    out[x["id"]] = {"type": i.get("subagent_type") or "general-purpose",
+                                    "effort": i.get("effort") or "default", "model": i.get("model") or "inherit",
+                                    "ts": r.get("timestamp") or "", "prompt": i.get("prompt") or "",
+                                    "description": i.get("description") or "", "file": f}
     return out
+
+
+def launches(sid):
+    """tool_use id -> (type, effort, timestamp) of every Agent call, in the main and subagent transcripts."""
+    return {k: (v["type"], v["effort"], v["ts"]) for k, v in launch_records(sid).items()}
 
 
 NUMPFX = re.compile(r"^\s*\d+[\t:-]")
