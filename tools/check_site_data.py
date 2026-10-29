@@ -6,7 +6,8 @@ exists (data/diagrams/<process>.diagrams.json, resolved through the recipe's `ba
 scan variant, as the off-shellness masks and the target propagators resolve it; without it
 those features are silently off for that process). Also that the env has the packages
 a run and a sweep trial import. Prints one line per recipe and exits non-zero if anything is missing.
-    python tools/check_site_data.py [recipes/<spec>.yaml ...]     (default: the catalog recipe)
+    python tools/check_site_data.py [--list] [recipes/<spec>.yaml ...]     (default: the catalog recipe)
+--list prints every pool not prebuilt, one `MISSING <process>/<role>` line each, after the recipe's line.
 Used by sites/setup.sh --verify, so `site pick` only picks a site that can run the catalog."""
 import importlib.util, os, sys
 import yaml
@@ -16,6 +17,8 @@ DEFAULT = ["recipes/catalog_v4_train.yaml"]   # the catalog in use (catalog_v4, 
 SEED = 42                      # data.seed of every catalog run
 
 ok = True
+LIST = "--list" in sys.argv[1:]
+ARGS = [a for a in sys.argv[1:] if a != "--list"]
 # what a training run imports, and what every DyHPO sweep's run_trial imports on top; lloca.mup exists only
 # in the mup-parametrization build (requirements.txt), not in the PyPI release
 env_missing = [m for m in ("torch", "lloca", "lloca.mup", "xformers", "gpytorch", "sklearn", "scipy")
@@ -24,7 +27,7 @@ if env_missing:
     print(f"env: missing {' '.join(env_missing)}"); ok = False
 import datagen
 import mg5_pipeline_final as mg
-for spec in sys.argv[1:] or DEFAULT:
+for spec in ARGS or DEFAULT:
     doc = yaml.safe_load(open(os.path.join(ROOT, spec)))
     procs = doc["processes"] if isinstance(doc, dict) else doc
     # as training does: scan variants into the registry, the recipe's sampling onto every
@@ -47,4 +50,7 @@ for spec in sys.argv[1:] or DEFAULT:
     if nosidecar:
         line += f", {len(nosidecar)} without a diagram sidecar (e.g. {', '.join(nosidecar[:3])})"; ok = False
     print(line + ("" if (uncached or nosidecar) else ", pools prebuilt, sidecars present"))
+    if LIST:
+        for u in uncached:
+            print(f"MISSING {u}")
 sys.exit(0 if ok else 1)
