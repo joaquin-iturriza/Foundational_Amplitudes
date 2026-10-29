@@ -505,6 +505,8 @@ def done():
              ("a run stuck UNKNOWN, no override", {}, [("FA-ccin2p3-z", "UNKNOWN", "rd", 1, None)], {}, "override"),
              ("notes_ref no label", dict(notes_ref="par:none"), [], {}, "not a \\label"),
              ("a write-up that does not name it", dict(title="other", notes_ref="par:readout2"), [], {}, "names"),
+             ("continuous work the user has not closed", dict(title="the readout on every rung (keep iterating)"),
+              [], {}, "continuous work"),
              ("a write-up older than the last step", {}, [], {"rd": {"steps": [{"agent": "s", "at":
                  dt.datetime.fromtimestamp(ct + 60, dt.timezone.utc).isoformat()}]}}, "before the entry's last step"))
     for name, kw, rr, st, why in cases:

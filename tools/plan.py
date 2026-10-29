@@ -2001,6 +2001,18 @@ def done_refusals(e, st, commit, override_runs=None, timeout=600, record=None): 
     return out
 
 
+CONTINUOUS = re.compile(r"keep (?:iterating|working|going|exploring)|continu\w*|iterat\w*", re.I)
+
+
+def closure_decided(eid):
+    """A decision in force covering '<entry> closed' (site decisions); unreadable counts as not decided."""
+    try:
+        out = subprocess.run(["site", "decisions", "--project", "FA"], capture_output=True, text=True, timeout=60).stdout
+    except Exception:
+        return False
+    return re.search(r"covers:[^\n]*\b%s closed\b" % re.escape(eid), out) is not None
+
+
 def cmd_done(a):
     with transaction() as (d, st):
         e = entry(d, a.id)
@@ -2012,6 +2024,12 @@ def cmd_done(a):
             if unread and not a.override_runs:
                 why.append("sweeps whose site could not be read: %s (pass --override-runs with the reason)"
                            % ", ".join(unread))
+        cont = CONTINUOUS.search("%s %s" % (entry_quotes(e), e.get("title") or ""))
+        if cont and not closure_decided(a.id):
+            # 2026-10-29: a step agent closed the preprocessing exploration, whose mandate was "Keep iterating",
+            # because its check (one sub-study's paragraph) passed; work the user asked to continue ends on their word
+            why.append("the user's words on it ask for continuous work (%r): it closes only when they say so (a "
+                       "decision covering '%s closed'); give it its next step instead" % (cont.group(0), a.id))
         if why:
             sys.exit("plan: %s is not done:\n  " % a.id + "\n  ".join(why))
         e["status"], e["writeup"] = "done", a.writeup
