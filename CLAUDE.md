@@ -130,9 +130,10 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    legacy models in solutions by default.
 
 2. **The working copy is the local checkout `~/work/FA`; clusters are sites.** The general rules and the `site` verbs
-   are in `~/work/CLAUDE.md`; this file adds only what is FA's. There is no project python env on the laptop (no
-   torch): anything that imports the project runs inside a job on a site, or locally only as a CPU dry-run of the sweep
-   generators.
+   are in `~/work/CLAUDE.md`; this file adds only what is FA's. The laptop has a CPU copy of the CC env, `.venv-cpu`
+   (`bash scripts/cpu_env.sh`; no xformers): tests run there, only those a change touches
+   (`.venv-cpu/bin/pytest --testmon --continue-on-collection-errors tests/`), and CPU dry-runs of the sweep generators;
+   training and anything CUDA runs inside a job on a site.
    - **The sites.** Jean Zay: A100 through `itg@a100`/`gpu_p5` (`-C a100`, QOS `qos_gpu_a100-t3`); `itg@v100` is in
      over-consumption. A pending job moved by `scontrol` needs Account, Partition, Features **and** QOS, else it sits on
      `InvalidQOS`. lxplus: HTCondor, code on EOS, submission from AFS; its ssh master needs a 2FA code only I can enter.
