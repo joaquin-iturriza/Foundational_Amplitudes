@@ -7556,6 +7556,19 @@ generator; 1 waits for a compute plan.
 \code{catalog\_v2} (Sec.~\ref{sec:catalog}) is generated (train, scan, hold-outs); the first
 pretraining wave (Sec.~\ref{sec:catv2-census}) leaves these decisions before the next one:
 \begin{itemize}
+  \item \textbf{The 13\,TeV pp pools at catalog\_v4's physics (2026-10-29, in progress).} The regeneration
+% allow: 13 because it is the beam energy in TeV, a setting
+% allow: 8 124 4600 because they are the job design's part count, part size and estimated core-hours, settings
+% allow: 433 because it is the count of reused pools fixed by the passed design, a setting
+    (8 part recipes \code{recipes/catalog\_v4\_pp\_part<k>.yaml}, 124 processes each, prefix \code{pp13v4\_},
+    about $4600$ core-hours, CPU only) goes to lxplus while CC-IN2P3 is not used. lxplus's Python environment now
+    runs (python and torch import there, checked by \code{site env}); \code{sites/setup.sh --verify} still refuses the
+    site because the catalog\_v3 training pools are not on it, a check that does not concern a pp generation job.
+    Nothing is submitted yet. Next: make the verify pass (or the pick accept a generation-only site), then
+    \code{site pick FA --only lxplus --jobs 8 --cpus 48 --hours 12}, the probe, the 8 parts with
+    \code{--item catalog\_coverage}; afterwards the validation with \code{pp\_physics\_check.py} taught the
+    \code{pp13v4\_} names and without its $b$ reshelling. The 433 reused pp13 pools stay on CC-IN2P3, so the
+    comparison will need them and the new pools on one site.
   \item \textbf{Re-measure with the generation feature at the full horizon.} The
     $1000$-step A/B (Sec.~\ref{sec:catv2-census}) resolves $ud\to ud$ and makes $ds\to ds$
     at one loop representable but not held; whether $8601$ steps hold both is open. At
@@ -10788,16 +10801,17 @@ of the three share a test set.
     $b\bar b\to gggh$). The regeneration is now $1826$ tree entries ($218$M events, about $39$ core-hours) and $142$
     one-loop entries, about $53$\,GB of pools and $66$\,GB with the backends. Next: the regeneration on CC; then
     classes and roles on v4; then the $b$ mass in \code{particle\_ids.py}.
-  \item \textbf{State (2026-10-27, 00:30).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
-    \code{plan next}); this item only summarises it. Everything is on the user's hold (2026-10-26, ``let's put things on
-    hold for a bit''): the catalog coverage and preprocessing entries are held, no job runs on any site. Decided: the
-    switch to catalog\_v4; catalog\_v3's pools to be deleted (the manifest's pools group, checked and dry-run; the apply
-    was refused by the session's permission check, so the user runs it); the $13$\,TeV pp pools to be regenerated with
-    catalog\_v4's physics for the classes where it differs (not started). Open for the user: the four extra catalog\_v3
-    groups, releasing the four held studies on catalog\_v4, registering the label check \code{send\_check.py} and the
-    glossary file. The sign study is closed (no for the pair head). In progress: the Wednesday deck
-    (\code{talks/progress\_oct2026b}), being fixed after an independent slide check.
-    % allow: 2026 10 27 00 30 26 13 because they are dates, a clock time and the beam energy, not results
+  \item \textbf{State (2026-10-29, 07:40).} The plan lives in \code{plan/plan.yaml} (\code{tools/plan.py show},
+    \code{plan next}); this item only summarises it. Released by the user (2026-10-29): the catalog coverage and the
+    preprocessing entries. catalog\_v3's pools on CC are deleted (the user ran it; all manifest files gone, $152$\,GB
+    free). The main session does not operate on CC-IN2P3 while its login notice forbids generative AI tools (the
+    user's own call is to ignore it); the supervisor is stopped because it polls CC. Waiting on the user: an exception
+    from CC, or a copy of the project's data from CC to lxplus, which the pp regeneration (designed, passed review,
+    $8$ CPU jobs, \code{recipes/gen\_catalog\_v4\_pp.py}) and the preprocessing entry's sign extension on catalog\_v4
+    (built, design passed until 2026-10-30 05:39) both need. In progress: lxplus being deployed for the pp
+    regeneration; the second round of the ponytail test (analysis tasks, two runs per arm). The preprocessing
+    exploration is continuous (\code{plan continuous}, the user's ``Keep iterating.''); it closes only on their word.
+    % allow: 2026 10 29 07 40 152 8 30 05 39 because they are dates, clock times, a disk size and a job count, not results
   \item \textbf{The pp blend (proposed 2026-10-26, on hold).} Proposed from par.~\ref{par:v4_density}: each hadronic
     tree training pool of catalog\_v4 ($797$ classes) becomes $70\%$ its current events and $30\%$ MadEvent $13$\,TeV
     pp events of its own processes (about $140$ to $350$ core-hours), then a test of about $6$ GPU-hours (the blend
