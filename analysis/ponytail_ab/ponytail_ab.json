@@ -1,0 +1,407 @@
+{
+ "gate": {
+  "original": {
+   "lines_added": 55,
+   "lines_code": 24,
+   "lines_tests": 31,
+   "lines_text": 0,
+   "tests_added": 2,
+   "reused": [
+    "scenario",
+    "state_file",
+    "write_state"
+   ],
+   "api_calls": 18,
+   "tool_calls": 25,
+   "input": 36,
+   "cache_read": 1293056,
+   "cache_write": 68415,
+   "output": 298,
+   "reread": 1361507
+  },
+  "on": {
+   "ponytail": true,
+   "api_calls": 16,
+   "tool_calls": 22,
+   "input": 32,
+   "cache_read": 1188528,
+   "cache_write": 77178,
+   "output": 12504,
+   "reread": 1265738,
+   "lines_added": 47,
+   "lines_code": 28,
+   "lines_tests": 19,
+   "lines_text": 0,
+   "tests_added": 2,
+   "reread_M": 1.27,
+   "reused": [
+    "scenario",
+    "state_file",
+    "write_state"
+   ],
+   "reused_like_original": [
+    "scenario",
+    "state_file",
+    "write_state"
+   ],
+   "n_reused": 3,
+   "n_like_original": 3,
+   "n_original_reused": 3,
+   "review_reread": 194580,
+   "blocking": 0,
+   "hit_turn_cap": false
+  },
+  "off": {
+   "ponytail": false,
+   "api_calls": 15,
+   "tool_calls": 16,
+   "input": 30,
+   "cache_read": 1087257,
+   "cache_write": 82138,
+   "output": 16432,
+   "reread": 1169425,
+   "lines_added": 86,
+   "lines_code": 30,
+   "lines_tests": 56,
+   "lines_text": 0,
+   "tests_added": 5,
+   "reread_M": 1.17,
+   "reused": [
+    "read_state",
+    "reset_pillar",
+    "scenario",
+    "state_file",
+    "write_state"
+   ],
+   "reused_like_original": [
+    "scenario",
+    "state_file",
+    "write_state"
+   ],
+   "n_reused": 5,
+   "n_like_original": 3,
+   "n_original_reused": 3,
+   "review_reread": 197305,
+   "blocking": 0,
+   "hit_turn_cap": false
+  }
+ },
+ "lookups": {
+  "original": {
+   "lines_added": 141,
+   "lines_code": 122,
+   "lines_tests": 11,
+   "lines_text": 8,
+   "tests_added": 0,
+   "reused": [
+    "backlog_for",
+    "cmd",
+    "git",
+    "git_call",
+    "pillar_field",
+    "read_state",
+    "segments"
+   ],
+   "api_calls": 29,
+   "tool_calls": 34,
+   "input": 58,
+   "cache_read": 2476863,
+   "cache_write": 91787,
+   "output": 326,
+   "reread": 2568708
+  },
+  "off": {
+   "ponytail": false,
+   "api_calls": 40,
+   "tool_calls": 48,
+   "input": 84,
+   "cache_read": 4241692,
+   "cache_write": 130731,
+   "output": 30974,
+   "reread": 4372507,
+   "lines_added": 209,
+   "lines_code": 150,
+   "lines_tests": 54,
+   "lines_text": 5,
+   "tests_added": 5,
+   "reread_M": 4.37,
+   "reused": [
+    "E",
+    "backlog_for",
+    "cmd",
+    "entry",
+    "git",
+    "git_call",
+    "pillar_field",
+    "read_state",
+    "refusal",
+    "runs_of",
+    "scenario",
+    "segments"
+   ],
+   "reused_like_original": [
+    "backlog_for",
+    "cmd",
+    "git",
+    "git_call",
+    "pillar_field",
+    "read_state",
+    "segments"
+   ],
+   "n_reused": 12,
+   "n_like_original": 7,
+   "n_original_reused": 7,
+   "review_reread": 214355,
+   "blocking": 1,
+   "hit_turn_cap": false
+  },
+  "on": {
+   "ponytail": true,
+   "api_calls": 34,
+   "tool_calls": 46,
+   "input": 68,
+   "cache_read": 3216346,
+   "cache_write": 114190,
+   "output": 26697,
+   "reread": 3330604,
+   "lines_added": 123,
+   "lines_code": 105,
+   "lines_tests": 11,
+   "lines_text": 7,
+   "tests_added": 0,
+   "reread_M": 3.33,
+   "reused": [
+    "backlog_for",
+    "cmd",
+    "entry",
+    "git",
+    "pillar_field",
+    "read_state",
+    "refusal"
+   ],
+   "reused_like_original": [
+    "backlog_for",
+    "cmd",
+    "git",
+    "pillar_field",
+    "read_state"
+   ],
+   "n_reused": 7,
+   "n_like_original": 5,
+   "n_original_reused": 7,
+   "review_reread": 460116,
+   "blocking": 2,
+   "hit_turn_cap": false
+  }
+ },
+ "prior": {
+  "original": {
+   "lines_added": 124,
+   "lines_code": 44,
+   "lines_tests": 48,
+   "lines_text": 32,
+   "tests_added": 6,
+   "reused": [
+    "E",
+    "answers",
+    "launch",
+    "scenario",
+    "step_prompt"
+   ],
+   "api_calls": 14,
+   "tool_calls": 18,
+   "input": 28,
+   "cache_read": 1079688,
+   "cache_write": 78902,
+   "output": 159,
+   "reread": 1158618
+  },
+  "on": {
+   "ponytail": true,
+   "api_calls": 19,
+   "tool_calls": 20,
+   "input": 38,
+   "cache_read": 1502929,
+   "cache_write": 86409,
+   "output": 13274,
+   "reread": 1589376,
+   "lines_added": 96,
+   "lines_code": 26,
+   "lines_tests": 40,
+   "lines_text": 30,
+   "tests_added": 6,
+   "reread_M": 1.59,
+   "reused": [
+    "E",
+    "design_text",
+    "launch",
+    "scenario",
+    "step_prompt"
+   ],
+   "reused_like_original": [
+    "E",
+    "launch",
+    "scenario",
+    "step_prompt"
+   ],
+   "n_reused": 5,
+   "n_like_original": 4,
+   "n_original_reused": 5,
+   "review_reread": 245519,
+   "blocking": 0,
+   "hit_turn_cap": false
+  },
+  "off": {
+   "ponytail": false,
+   "api_calls": 25,
+   "tool_calls": 32,
+   "input": 50,
+   "cache_read": 2106290,
+   "cache_write": 96774,
+   "output": 19257,
+   "reread": 2203114,
+   "lines_added": 125,
+   "lines_code": 48,
+   "lines_tests": 42,
+   "lines_text": 35,
+   "tests_added": 7,
+   "reread_M": 2.2,
+   "reused": [
+    "E",
+    "design_text",
+    "entry",
+    "launch",
+    "scenario",
+    "step_prompt"
+   ],
+   "reused_like_original": [
+    "E",
+    "launch",
+    "scenario",
+    "step_prompt"
+   ],
+   "n_reused": 6,
+   "n_like_original": 4,
+   "n_original_reused": 5,
+   "review_reread": 143179,
+   "blocking": 0,
+   "hit_turn_cap": false
+  }
+ },
+ "sendcheck": {
+  "original": {
+   "lines_added": 197,
+   "lines_code": 140,
+   "lines_tests": 57,
+   "lines_text": 0,
+   "tests_added": 8,
+   "reused": [
+    "scenario"
+   ],
+   "api_calls": 28,
+   "tool_calls": 29,
+   "input": 58,
+   "cache_read": 2346700,
+   "cache_write": 89670,
+   "output": 334,
+   "reread": 2436428
+  },
+  "off": {
+   "ponytail": false,
+   "api_calls": 26,
+   "tool_calls": 28,
+   "input": 52,
+   "cache_read": 2249414,
+   "cache_write": 105839,
+   "output": 28920,
+   "reread": 2355305,
+   "lines_added": 281,
+   "lines_code": 171,
+   "lines_tests": 89,
+   "lines_text": 21,
+   "tests_added": 12,
+   "reread_M": 2.36,
+   "reused": [
+    "hook",
+    "labels",
+    "scenario"
+   ],
+   "reused_like_original": [
+    "scenario"
+   ],
+   "n_reused": 3,
+   "n_like_original": 1,
+   "n_original_reused": 1,
+   "review_reread": 327848,
+   "blocking": 1,
+   "hit_turn_cap": false
+  },
+  "on": {
+   "ponytail": true,
+   "api_calls": 27,
+   "tool_calls": 26,
+   "input": 54,
+   "cache_read": 2213451,
+   "cache_write": 94046,
+   "output": 21689,
+   "reread": 2307551,
+   "lines_added": 154,
+   "lines_code": 84,
+   "lines_tests": 51,
+   "lines_text": 19,
+   "tests_added": 6,
+   "reread_M": 2.31,
+   "reused": [
+    "hook",
+    "scenario"
+   ],
+   "reused_like_original": [
+    "scenario"
+   ],
+   "n_reused": 2,
+   "n_like_original": 1,
+   "n_original_reused": 1,
+   "review_reread": 423927,
+   "blocking": 1,
+   "hit_turn_cap": false
+  }
+ },
+ "total_runs": {
+  "reread": 18593620,
+  "cache_read": 17805907,
+  "cache_write": 787305,
+  "output": 169747,
+  "review_reread": 2206829,
+  "reread_M": 18.6,
+  "review_reread_M": 2.2,
+  "all_reread_M": 20.8
+ },
+ "sum": {
+  "on": {
+   "tool_calls": 114,
+   "reread": 8493269,
+   "output": 74164,
+   "lines_added": 420,
+   "lines_code": 243,
+   "tests_added": 14,
+   "blocking": 3,
+   "n_reused": 17,
+   "n_like_original": 13,
+   "n_original_reused": 16,
+   "reread_M": 8.5
+  },
+  "off": {
+   "tool_calls": 124,
+   "reread": 10100351,
+   "output": 95583,
+   "lines_added": 701,
+   "lines_code": 399,
+   "tests_added": 29,
+   "blocking": 2,
+   "n_reused": 26,
+   "n_like_original": 15,
+   "n_original_reused": 16,
+   "reread_M": 10.1
+  }
+ }
+}

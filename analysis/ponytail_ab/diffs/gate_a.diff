@@ -1,0 +1,110 @@
+diff --git a/.claude/hooks/review_backlog.sh b/.claude/hooks/review_backlog.sh
+index 1f0428e6..a1e75a1e 100755
+--- a/.claude/hooks/review_backlog.sh
++++ b/.claude/hooks/review_backlog.sh
+@@ -25,7 +25,8 @@
+ #   check                 (Stop hook, default) nudge once if any pillar is over threshold
+ #   gate                  (PreToolUse(Edit|Write)) DENY edits to an over-threshold pillar
+ #   begin <reviewer>      reviewer takes the lock: lifts `gate` so it can apply its own fixes
+-#   advance <reviewer>    reviewer PASSED; resets its watermark and drops the lock
++#   advance <reviewer>    reviewer PASSED; resets its watermark, records the reviewed content's hash (while the
++#                         pillar's files still hash to it, committed or not, nothing is owed) and drops the lock
+ #   status                human-readable backlog table (also: what /review-now would run)
+ #   init                  set every watermark to "everything so far is reviewed"
+ #
+@@ -85,7 +86,21 @@ pillar_lines() {
+ 
+ pillar_commits() { git rev-list --count "$1"..HEAD -- $2 2>/dev/null || echo 0; }
+ 
+-# state file: "<sha> <baseline_lines> <baseline_commits>"
++# Hash of the pillar's CURRENT content, committed or not: every tracked file's blob id (the index's, or the working
++# tree's where it differs; a deleted file drops out) plus every untracked file's. Only the files that differ are hashed.
++pillar_content() {
++  local paths="$1" f
++  { git ls-files -s -- $paths 2>/dev/null | awk -F'\t' '{split($1, a, " "); print $2 "\t" a[2]}'
++    { git diff --name-only -- $paths; git ls-files --others --exclude-standard -- $paths; } 2>/dev/null |
++      while IFS= read -r f; do
++        [ -z "$f" ] && continue
++        printf '%s\t%s\n' "$f" "$(git hash-object -- "$f" 2>/dev/null || echo deleted)"
++      done
++  } | awk -F'\t' '{last[$1] = $2} END {for (k in last) if (last[k] != "deleted") print k "\t" last[k]}' |
++    LC_ALL=C sort | cksum | awk '{print $1"-"$2}'
++}
++
++# state file: "<sha> <baseline_lines> <baseline_commits> [<reviewed content hash>]"
+ state_file() { echo "$REPO/$STATE_REL/$1"; }
+ 
+ read_state() {                       # $1=reviewer -> echoes "sha lines commits"
+@@ -93,9 +108,9 @@ read_state() {                       # $1=reviewer -> echoes "sha lines commits"
+   if [ -f "$f" ]; then cat "$f"; else echo ""; fi
+ }
+ 
+-write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits
++write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits $5=content hash
+   mkdir -p "$REPO/$STATE_REL"
+-  printf '%s %s %s\n' "$2" "$3" "$4" > "$(state_file "$1")"
++  printf '%s %s %s %s\n' "$2" "$3" "$4" "$5" > "$(state_file "$1")"
+ }
+ 
+ lock_file() { echo "$REPO/$STATE_REL/$1.lock"; }
+@@ -124,12 +139,12 @@ reset_pillar() {
+   paths=$(pillar_field "$who" 4)
+   sha=$(git rev-parse HEAD)
+   lines=$(pillar_lines "$sha" "$paths")     # the uncommitted remainder just reviewed
+-  write_state "$who" "$sha" "$lines" 0
++  write_state "$who" "$sha" "$lines" 0 "$(pillar_content "$paths")"
+ }
+ 
+ # Backlog for a pillar -> echoes "lines commits"; empty state self-initializes to zero owed.
+ backlog_for() {
+-  local who="$1" paths st sha base_l base_c tl tc
++  local who="$1" paths st sha base_l base_c tl tc rh
+   paths=$(pillar_field "$who" 4)
+   st=$(read_state "$who")
+   if [ -z "$st" ]; then reset_pillar "$who"; echo "0 0"; return; fi
+@@ -141,7 +156,14 @@ backlog_for() {
+   tl=$(pillar_lines "$sha" "$paths")
+   tc=$(pillar_commits "$sha" "$paths")
+   # subtract what was already reviewed at the watermark; clamp (a revert can go negative)
+-  echo "$(( tl > base_l ? tl - base_l : 0 )) $(( tc > base_c ? tc - base_c : 0 ))"
++  tl=$(( tl > base_l ? tl - base_l : 0 )); tc=$(( tc > base_c ? tc - base_c : 0 ))
++  # content identical to what the reviewer passed: nothing owed, whatever commits sit in between (committing a reviewed
++  # CLAUDE.md edit counted as a new commit and asked for a second review of the same text, six times on 2026-10-29)
++  if [ $(( tl + tc )) -gt 0 ]; then
++    rh=$(echo "$st" | awk '{print $4}')
++    [ -n "$rh" ] && [ "$(pillar_content "$paths")" = "$rh" ] && { echo "0 0"; return; }
++  fi
++  echo "$tl $tc"
+ }
+ 
+ mode="${1:-check}"
+diff --git a/tests/test_setup_scenarios.py b/tests/test_setup_scenarios.py
+index 4041fc65..368a67de 100644
+--- a/tests/test_setup_scenarios.py
++++ b/tests/test_setup_scenarios.py
+@@ -1419,6 +1419,25 @@ def tooling_fixes():
+     row = next((l.split() for l in st.splitlines() if l.startswith("repo-reviewer")), [])
+     scenario("review backlog: a .py change two directories down counts toward the repo-reviewer (lines and commits)",
+              row[1:3] == ["10/600", "1/30"], st)
++    # a reviewed, uncommitted CLAUDE.md edit: its commit is not a new backlog; a further edit is
++    rb = lambda *a, stdin="": subprocess.run(["bash", ".claude/hooks/review_backlog.sh"] + list(a), cwd=repo,
++                                             input=stdin, capture_output=True, text=True, env=GIT_ENV)
++    commit = J({"tool_name": "Bash", "tool_input": {"command": "git commit -qam x"}})
++    open(os.path.join(repo, "CLAUDE.md"), "w").write("rule one\n")
++    pre = rb("bashpre", stdin=commit)
++    adv = rb("advance", "claudemd-keeper")
++    pre2 = rb("bashpre", stdin=commit)
++    g("add", "CLAUDE.md"); g("commit", "-qm", "reviewed rule")
++    st, chk = rb("status").stdout, rb("check").stdout
++    scenario("review backlog: a CLAUDE.md edit reviewed uncommitted is not due again once committed",
++             pre.returncode == 2 and adv.returncode == 0 and pre2.returncode == 0
++             and "claudemd-keeper" in st and "DUE" not in st and "claudemd-keeper" not in chk, st + chk + pre2.stderr)
++    open(os.path.join(repo, "CLAUDE.md"), "a").write("rule two\n")
++    st = rb("status").stdout
++    gate = rb("gate", stdin=J({"tool_name": "Edit", "tool_input": {"file_path": os.path.join(repo, "CLAUDE.md")}}))
++    scenario("review backlog: a further CLAUDE.md edit after that commit is due",
++             "DUE" in next((l for l in st.splitlines() if l.startswith("claudemd-keeper")), "")
++             and gate.returncode == 2 and rb("bashpre", stdin=commit).returncode == 2, st + gate.stderr)
+     repo2, g2, tex, base2 = repo_with_script()
+     open(tex, "a").write("\n%% src: python3 analysis/s.py @%s\n%% claim: h3.shape=0.80\nThe rerun FA-ccin2p3-60b47206 "
+                          "gives $0.80$.\n" % base2)

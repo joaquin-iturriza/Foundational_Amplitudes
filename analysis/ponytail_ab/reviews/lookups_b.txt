@@ -1,0 +1,6 @@
+Reviewer R7 (repo-reviewer, blind), diff lookups_b against f1a5276c.
+Verdict: fix first (checked on a copy of the patched guard; the base refuses both cases).
+1. .claude/hooks/git_verify_guard.py:27 and :167: the config read words are dropped wherever they appear, so a config command that sets core.hooksPath to the path "get" counts as a read and is allowed, the bypass the guard exists to stop.
+2. .claude/hooks/git_verify_guard.py:35-39 (segments): with a newline added to the punctuation characters, a backslash-newline continuation becomes a separator token, so a commit split over two lines with its skip-hooks flag on the second is allowed.
+Non-blocking: the deleted "core.hooksPath named anywhere" check gives up indirection through a variable; heredoc fed by a pipe to bash not treated as shell (also at the base); show <id> already existed at the base; step prompt names plan <command> -h in a shorter form than the line above.
+BLOCKING: 2

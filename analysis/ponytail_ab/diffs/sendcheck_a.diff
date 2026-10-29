@@ -1,0 +1,347 @@
+diff --git a/.claude/hooks/send_check.py b/.claude/hooks/send_check.py
+new file mode 100644
+index 00000000..07ca9ead
+--- /dev/null
++++ b/.claude/hooks/send_check.py
+@@ -0,0 +1,199 @@
++#!/usr/bin/env python3
++"""PreToolUse(SendUserFile) hook: what the user is sent reads in plain names (CLAUDE.md 0e). 2026-10-27, after the
++user's "the rules say that your figures should be understandable and self contained ... And no cryptic unexplained
++names too. So it's a general problem".
++
++For each sent file, the text the user will read is extracted with pdftotext: a .pdf (figure or deck) itself, a .png
++through its sibling .pdf (every figure ships as both; a .png without one is refused). Other files pass unread. The
++caption is checked too, for the codes (not for the ratio rule, which is about axis and legend labels). Refused (exit
++2, each offending string with its page):
++  - a token with an underscore (snake_case identifiers, paths, config keys);
++  - a run id: FA-<site>-<id>, trial_NNNN, a hex hash (7+ lowercase hex characters with a letter and a digit);
++  - a recipe or arm prefix: tp3_, tp2_, v3_, v4_, pp13_, dc_, zz_ (and bare tp2, tp3, pp13);
++  - a held-out axis code (H1..H9, H2p5, H2.5, H3p, H7E, H7c, XV3, XV4) or a decision or event code (D12, E1519);
++  - a label with "ratio" or "gain", or with a "/", that names no two sides (no "over", no "/" with text on both sides).
++A label is a run of text on one line of `pdftotext -layout`, split at gaps of three spaces or more.
++Allowed: any term of docs/glossary.txt (term<TAB>plain definition), matched whole-word and case-insensitive; and a code
++in brackets right after plain words ("new combinations (H1)", 0e: "An id may follow the description in brackets").
++A failure of the check itself (no pdftotext, an unreadable pdf) lets the send through with a note on stderr.
++
++    python3 .claude/hooks/send_check.py --scan FILE...    # read-only report, exit 1 when anything is found
++"""
++import json, os, re, subprocess, sys
++
++ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++GLOSSARY = os.environ.get("SEND_CHECK_GLOSSARY") or os.path.join(ROOT, "docs", "glossary.txt")
++
++STRIP = "()[]{},;:'\"`.!?"
++PREFIX = re.compile(r"^(tp3|tp2|v3|v4|pp13|dc|zz)_")
++RUN_ID = re.compile(r"^(FA-[A-Za-z0-9]+-[A-Za-z0-9]+|trial_\d+)$")
++HEX = re.compile(r"^[0-9a-f]{7,40}$")
++AXIS = re.compile(r"^(H[1-9](p5|\.5|E|c|p)?|XV[34])$")
++DECISION = re.compile(r"^[DE]\d+$")
++BARE_RECIPE = re.compile(r"^(tp2|tp3|pp13)$")
++RATIO_WORD = re.compile(r"\b(ratios?|gains?)\b", re.I)
++OVER = re.compile(r"\bover\b", re.I)
++SLASH_BOTH = re.compile(r"\S\s*/\s*\S")
++
++
++def glossary_terms(path=None):
++    terms = []
++    try:
++        for line in open(path or GLOSSARY, encoding="utf-8"):
++            if line.strip() and not line.startswith("#") and "\t" in line:
++                terms.append(line.split("\t", 1)[0].strip())
++    except OSError:
++        pass
++    return [t for t in terms if t]
++
++
++def blank_glossary(text, terms):
++    """Replace every glossary term by spaces (same length), so nothing inside it is flagged."""
++    for t in sorted(terms, key=len, reverse=True):
++        text = re.sub(r"(?<![\w-])%s(?![\w-])" % re.escape(t), lambda m: " " * len(m.group(0)), text, flags=re.I)
++    return text
++
++
++def classify(tok):
++    """The reason a token is refused, or None."""
++    if RUN_ID.match(tok) or (HEX.match(tok) and re.search(r"[a-f]", tok) and re.search(r"\d", tok)):
++        return "run id or hash"
++    if PREFIX.match(tok) or BARE_RECIPE.match(tok):
++        return "recipe or arm prefix"
++    if AXIS.match(tok):
++        return "held-out axis code"
++    if DECISION.match(tok):
++        return "decision or event code"
++    if "_" in tok.strip("_"):
++        return "identifier with an underscore"
++    return None
++
++
++def labels(line):
++    return [c.strip() for c in re.split(r"\s{3,}", line) if c.strip()]
++
++
++def check_label(label, ratio_rule=True):
++    """[(string, reason)] for one label."""
++    out = []
++    toks = label.split()
++    for i, raw in enumerate(toks):
++        tok = raw.strip(STRIP)
++        if not tok:
++            continue
++        why = classify(tok)
++        if not why:
++            continue
++        # a code in brackets after plain words is the description's id (0e)
++        bracketed = re.fullmatch(r"[(\[][^\s()\[\]]+[)\]][,;:.]?", raw)
++        before = [t.strip(STRIP) for t in toks[:i]]
++        if bracketed and before and re.fullmatch(r"[A-Za-z][A-Za-z'\-]+", before[-1]) and not classify(before[-1]):
++            continue
++        out.append((tok, why))
++    if ratio_rule:
++        if RATIO_WORD.search(label) and not (OVER.search(label) or SLASH_BOTH.search(label)):
++            out.append((label, "a ratio or gain that does not say what over what"))
++        elif "/" in label and not SLASH_BOTH.search(label):
++            out.append((label, "a '/' without both sides"))
++    return out
++
++
++def check_text(text, terms, ratio_rule=True):
++    """[(page, string, reason)]; pages are separated by form feeds, as pdftotext writes them."""
++    found, seen = [], set()
++    for p, page in enumerate(blank_glossary(text, terms).split("\f"), 1):
++        for line in page.splitlines():
++            for lab in labels(line):
++                for s, why in check_label(lab, ratio_rule):
++                    if (p, s, why) not in seen:
++                        seen.add((p, s, why))
++                        found.append((p, s, why))
++    return found
++
++
++def pdf_text(path):
++    r = subprocess.run(["pdftotext", "-layout", path, "-"], capture_output=True, text=True, timeout=60)
++    if r.returncode != 0:
++        raise RuntimeError(r.stderr.strip() or "pdftotext failed")
++    return r.stdout
++
++
++def check_file(path, terms):
++    """(findings, note): findings as [(page, string, reason)]; note says why a file was not read."""
++    base, ext = os.path.splitext(path)
++    ext = ext.lower()
++    if ext == ".png":
++        pdf = base + ".pdf"
++        if not os.path.exists(pdf):
++            return [(0, os.path.basename(pdf), "no sibling .pdf to read the figure's text from (figures ship as both)")], None
++        path = pdf
++    elif ext != ".pdf":
++        return [], None
++    try:
++        return check_text(pdf_text(path), terms), None
++    except (OSError, RuntimeError, subprocess.TimeoutExpired) as e:
++        return [], "send_check: could not read %s (%s); not checked" % (path, e)
++
++
++def report(path, found):
++    lines = []
++    for p, s, why in found:
++        where = "page %d" % p if p else "file"
++        lines.append("  %s, %s: %r (%s)" % (path, where, s, why))
++    return lines
++
++
++def main_hook():
++    try:
++        inp = json.load(sys.stdin)
++    except ValueError:
++        return 0
++    ti = inp.get("tool_input") or {}
++    cwd = inp.get("cwd") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
++    files = ti.get("files") or []
++    files = [files] if isinstance(files, str) else files
++    files = [f.get("path") or f.get("file_path") if isinstance(f, dict) else f for f in files]
++    files += [ti[k] for k in ("file_path", "path") if isinstance(ti.get(k), str)]
++    terms = glossary_terms()
++    bad, notes = [], []
++    for f in files:
++        if not f:
++            continue
++        path = f if os.path.isabs(f) else os.path.join(cwd, f)
++        found, note = check_file(path, terms)
++        bad += report(f, found)
++        if note:
++            notes.append(note)
++    cap = ti.get("caption")
++    if isinstance(cap, str) and cap:
++        bad += report("caption", [(1, s, w) for _, s, w in check_text(cap, terms, ratio_rule=False)])
++        bad = [b.replace("caption, page 1", "caption") for b in bad]
++    for n in notes:
++        sys.stderr.write(n + "\n")
++    if bad:
++        sys.stderr.write(
++            "send_check: what the user reads must use plain names (CLAUDE.md 0e: no internal codes, no snake_case, a "
++            "ratio says what over what). Redraw or recaption, or add a term to docs/glossary.txt with its plain "
++            "definition (the user approves that file):\n" + "\n".join(bad) + "\n")
++        return 2
++    return 0
++
++
++def main_scan(paths):
++    terms, any_found = glossary_terms(), False
++    for f in paths:
++        found, note = check_file(f, terms)
++        if note:
++            print(note)
++        for line in report(f, found):
++            print(line)
++        any_found = any_found or bool(found)
++        if not found and not note:
++            print("  %s: clean" % f)
++    return 1 if any_found else 0
++
++
++if __name__ == "__main__":
++    if len(sys.argv) > 1 and sys.argv[1] == "--scan":
++        sys.exit(main_scan(sys.argv[2:]))
++    sys.exit(main_hook())
+diff --git a/docs/glossary.txt b/docs/glossary.txt
+new file mode 100644
+index 00000000..4ca06a7e
+--- /dev/null
++++ b/docs/glossary.txt
+@@ -0,0 +1,21 @@
++# Plain names the user reads in figures, decks and captions. One term per line: term<TAB>plain definition.
++# .claude/hooks/send_check.py lets a listed term through (whole word, any case). The user approves every entry.
++dimensionless target	the network's target made free of units: |M|^2 times the product of the event's emission scales (one per leg beyond 2->2), divided by (4 pi alpha_s)^q (4 pi alpha)^e for the process's QCD and QED orders, with momenta and masses given to the network in units of the collision energy sqrt(s_hat)
++context vector	16 learned numbers per training process, added to every particle's encoding and learned with the network (set to zero on half the events); a new process gets zero, or a vector fitted on a few of its events with the network frozen
++catalog_v3	the catalog generated on 2026-10-24: one process per relabelling class, trees up to 2->4 (2->5 as probes), one-loop QCD corrections, loop-induced processes, the strong coupling at 0.09 and 0.15, heavy quarks at 50, 300 and 600 GeV, Z' and two-Higgs-doublet processes; collision energy up to 1 TeV, b quark of 4.7 GeV, transverse momentum above 10 GeV
++catalog_v4	catalog_v3's processes regenerated with wider coverage: collision energy up to 6 TeV drawn uniform in its logarithm, a hadron-collider acceptance (transverse momentum above 10 GeV, pseudorapidity within 5), a share of events turned forward, every tree diagram including the electroweak ones, a massless b quark, the top at 172.5 GeV everywhere
++new combinations	held-out axis H1: processes whose particles all appear in training, in combinations never trained on
++higher multiplicity	held-out axis H2: 2->4 processes of families with no 2->4 member in training; the 2->5 probes are H2.5 (also written H2p5)
++the top	held-out axis H3, particle content: processes with the physical top quark, while heavy quarks with the top's quantum numbers at 50, 300 and 600 GeV are trained; in the twin run also every process with a tau or tau neutrino
++quartic vertex	held-out axis H4, vertex class: processes built on the quartic gauge vertex, held out in the twin run
++one loop	held-out axis H5, perturbative order: one-loop amplitudes of processes whose trees are trained
++strong coupling 0.13	held-out axis H6, parameter interpolation: the strong coupling at 0.13, with 0.09 and 0.15 trained
++energy and cuts	held-out axis H7: a tighter cut, transverse momentum of at least 30 GeV with 10 GeV trained (H7c); and higher collision energy (H7E), 1 to 10 TeV on catalog_v3 (up to 1 TeV trained), 6 to 20 TeV on catalog_v4 (up to 6 TeV trained)
++zero-shot	a held-out process predicted by the pretrained network with nothing trained or fitted on it
++fine-tune	the pretrained network trained further on the events of one new process, all weights, the layers nearest the input at a smaller learning rate (layer decay)
++Muon	the optimizer in use since 2026-10-26: momentum updates orthogonalised on the network's hidden weight matrices, AdamW on the other weights
++AdamW	Adam with decoupled weight decay; the optimizer before Muon
++relabelled processes	held-out processes equal to a training process up to a relabelling of particles (the same |M|^2 up to a constant, for instance one massless quark flavour for another): interpolation
++new processes	held-out processes equal to no training process under any relabelling: extrapolation
++level of the error	with Delta = predicted minus true log|M|^2 over a process's events, the squared mean of Delta: an overall offset
++shape of the error	the variance of Delta over a process's events, what no offset removes; the mean squared error is level plus shape
+diff --git a/tests/test_setup_scenarios.py b/tests/test_setup_scenarios.py
+index 0ace476d..91c5fd43 100644
+--- a/tests/test_setup_scenarios.py
++++ b/tests/test_setup_scenarios.py
+@@ -2053,6 +2053,101 @@ def parallel_steps():
+              w.entries()["par"]["next"] == {3: "C", 4: "D"} and "NEXT par step 3 of 2" in nx and "step 4 of 2" in nx, [w.entries()["par"]["next"], nx])
+ 
+ 
++SEND = os.path.join(ROOT, ".claude", "hooks", "send_check.py")
++
++
++def send_check():
++    """The user's "no cryptic unexplained names" (2026-10-27): SendUserFile is refused on a code in what the user reads,
++    passes a glossary term and a clean figure. Small figures drawn with matplotlib; codes as text stubs too."""
++    import importlib.util
++    spec = importlib.util.spec_from_file_location("send_check", SEND)
++    sc = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(sc)
++    found = sc.check_text("seeds of trial_0042 on FA-ccin2p3-cb09b906 at 9f3c2a1b\nby D155 after E1519\n\fH7E and "
++                          "XV3 in v4_dimensionless_muon, tp3 sweep\fval_loss_no_reg", [])
++    reasons = {s: (p, w) for p, s, w in found}
++    scenario("send_check: every kind of code in a text stub is named with its page and reason",
++             reasons.get("trial_0042") == (1, "run id or hash") and reasons.get("FA-ccin2p3-cb09b906", ())[1:] ==
++             ("run id or hash",) and reasons.get("9f3c2a1b", ())[1:] == ("run id or hash",)
++             and reasons.get("D155") == (1, "decision or event code") and reasons.get("E1519") == (1, "decision or event code")
++             and reasons.get("H7E") == (2, "held-out axis code") and reasons.get("XV3") == (2, "held-out axis code")
++             and reasons.get("v4_dimensionless_muon") == (2, "recipe or arm prefix")
++             and reasons.get("tp3") == (2, "recipe or arm prefix")
++             and reasons.get("val_loss_no_reg") == (3, "identifier with an underscore"), found)
++    clean = sc.check_text("2 → 4 processes, 4264 steps, 1.4915 GeV, D = 10^4, log10 |M|^2 / GeV, Higgs H, "
++                          "catalog v3 against catalog v4, new combinations (H1)", [])
++    scenario("send_check: plain text, numbers, units and a code in brackets after its description pass", not clean, clean)
++    rat = sc.check_text("density ratio   catalog v4 / catalog v3   gain of v4 over v3   / GeV", [])
++    scenario("send_check: a ratio or a '/' that names no two sides is refused, one that does passes",
++             [s for _, s, _ in rat] == ["density ratio", "/ GeV"], rat)
++
++    try:
++        import matplotlib
++        matplotlib.use("Agg")
++        import matplotlib.pyplot as plt
++        from matplotlib.backends.backend_pdf import PdfPages
++    except ImportError:
++        scenario("send_check: matplotlib available for the figure scenarios", False, "no matplotlib")
++        return
++    d = tempfile.mkdtemp()
++    gl = os.path.join(d, "glossary.txt")
++    open(gl, "w").write("# test\ncatalog_v3\tthe catalog generated on 2026-10-24\n")
++    env = dict(os.environ, SEND_CHECK_GLOSSARY=gl)
++
++    def fig(name, ticks=None, ylabel="", legend=None, pages=1):
++        base = os.path.join(d, name)
++        with PdfPages(base + ".pdf") as pp:
++            for k in range(pages):
++                f, ax = plt.subplots(figsize=(6, 4))
++                ax.plot([0, 1, 2], [1, 2, 3], label=legend if k == pages - 1 else None)
++                if ticks:
++                    ax.set_xticks(range(len(ticks)), ticks)
++                ax.set_ylabel(ylabel)
++                if legend and k == pages - 1:
++                    ax.legend()
++                pp.savefig(f, bbox_inches="tight")
++                if k == 0:
++                    f.savefig(base + ".png", bbox_inches="tight")
++                plt.close(f)
++        return base
++
++    send = lambda files, caption="", e=env: hook(SEND, {"tool_name": "SendUserFile", "cwd": d,
++                                                       "tool_input": {"files": files, "caption": caption}}, env=e)
++    axes = fig("axes", ticks=["H1", "H2", "H7c"], ylabel="median MSE")
++    rc, out = send([axes + ".png"])
++    scenario("send_check: a figure with held-out axis codes is refused, each code named with its page (png read "
++             "through its pdf)", rc == 2 and all("'%s' (held-out axis code)" % c in out for c in ("H1", "H2", "H7c"))
++             and "page 1" in out, (rc, out))
++    arm = fig("arm", ylabel="median MSE", legend="tp3_ladder seed 42", pages=2)
++    rc, out = send([arm + ".pdf"])
++    scenario("send_check: an arm prefix in a legend is refused on the page it is on", rc == 2 and
++             "page 2: 'tp3_ladder' (recipe or arm prefix)" in out, (rc, out))
++    rat = fig("ratio", ylabel="density ratio")
++    rc, out = send([rat + ".pdf"])
++    scenario("send_check: an axis 'density ratio' that does not say what over what is refused",
++             rc == 2 and "'density ratio'" in out, (rc, out))
++    gls = fig("gloss", ylabel="MSE, catalog_v3", legend="zero-shot")
++    rc, out = send([gls + ".png"])
++    rc2, out2 = send([gls + ".png"], e=dict(os.environ, SEND_CHECK_GLOSSARY=os.path.join(d, "none.txt")))
++    scenario("send_check: an underscored term passes when docs/glossary.txt lists it, and is refused when it does not",
++             rc == 0 and rc2 == 2 and "'catalog_v3'" in out2, (rc, out, rc2, out2))
++    ok = fig("clean", ticks=["new combinations", "2 → 4", "one loop"], ylabel="MSE, catalog v4 / catalog v3",
++             legend="catalog v4, seed 42")
++    rc, out = send([ok + ".png", ok + ".pdf"], caption="catalog v4 against catalog v3 on the processes held out in both")
++    scenario("send_check: a clean figure with a plain caption passes", rc == 0, (rc, out))
++    rc, out = send([ok + ".png"], caption="the prep job's failure on FA-ccin2p3-cb09b906")
++    scenario("send_check: a run id in the caption is refused", rc == 2 and "caption: 'FA-ccin2p3-cb09b906'" in out,
++             (rc, out))
++    os.remove(rat + ".pdf")
++    rc, out = send([rat + ".png"])
++    scenario("send_check: a png without its pdf is refused (its text cannot be read)", rc == 2 and "ratio.pdf" in out,
++             (rc, out))
++    open(os.path.join(d, "t.json"), "w").write('{"trial_0001": 1}')
++    rc, _ = send(["t.json"])
++    scenario("send_check: a file that is neither png nor pdf is not read", rc == 0, rc)
++    shutil.rmtree(d, ignore_errors=True)
++
++
+ def the_suite_itself():
+     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
+     once let the suite exit 0 with failures: main() was split by an edit)."""
+@@ -2074,7 +2169,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
+           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
+           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
+           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
+-          designs, design_prior, prompt_cap, parallel_steps, the_suite_itself]
++          designs, design_prior, prompt_cap, parallel_steps, send_check, the_suite_itself]
+ 
+ 
+ def main():

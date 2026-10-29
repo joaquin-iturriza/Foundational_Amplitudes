@@ -1,0 +1,5 @@
+Reviewer R1 (repo-reviewer, blind), diff sendcheck_b against 16be8949.
+Verdict: fix first; the hook does what the task asks.
+1. docs/glossary.txt:5-11 with send_check.py findings(): the glossary terms are the bare held-out axis codes H1 to H7 and findings() blanks every glossary term before the rules run, so a figure labelled only "H3" passes; the axis-code rule then catches only the codes outside the glossary. Fix: key the entries on the plain name, or allow a code only in brackets after its plain name.
+Non-blocking: tool_input["files"] shape unverified (a different key makes the hook pass every send); fails open when pdftotext is missing; "against" not accepted as naming the second side of a ratio; the glossary test never exercises the ratio rule; two glossary details not traced to the notes.
+BLOCKING: 1

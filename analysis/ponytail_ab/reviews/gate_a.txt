@@ -1,0 +1,4 @@
+Reviewer R5 (repo-reviewer, blind), diff gate_a against 45d1df0d.
+Verdict: clean; does what the task asked (4th state field, content hash of index blobs overridden by working tree, all modes through backlog_for, old 3-field state keeps the old behaviour).
+Non-blocking: one git hash-object per modified file on every gate/bashpre/bashpost (--stdin-paths would be one process); the reviewed commit still counts toward the commit total after a later differing edit; one test assertion may pass trivially when the temp repo's default branch is main; only the new-file case of CLAUDE.md is tested; cksum is CRC32 (matches the existing fingerprint).
+BLOCKING: 0

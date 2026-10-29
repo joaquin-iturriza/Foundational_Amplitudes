@@ -1,0 +1,86 @@
+{
+ "gate": {
+  "base": "45d1df0d",
+  "original_commits": [
+   "f9223ba6"
+  ],
+  "original_agent": "ab0a3b5d2a27ab3ac",
+  "arms": {
+   "a": {
+    "ponytail": true,
+    "session": "fa46d7f5-f3c6-4cbf-b393-6ba56d551b0b",
+    "reviewer": "a22e1b3a4553b7fc1",
+    "review_label": "R5"
+   },
+   "b": {
+    "ponytail": false,
+    "session": "497f8c1b-0722-4c42-931f-33b742e4a1c2",
+    "reviewer": "ab4e4ab1ce045fc4b",
+    "review_label": "R2"
+   }
+  }
+ },
+ "lookups": {
+  "base": "f1a5276c",
+  "original_commits": [
+   "6e34f573"
+  ],
+  "original_agent": "ab2947758a9c39439",
+  "arms": {
+   "a": {
+    "ponytail": false,
+    "session": "9b022a70-2779-4522-8ac6-7406dbd2674b",
+    "reviewer": "a5817e6d72ee89166",
+    "review_label": "R4"
+   },
+   "b": {
+    "ponytail": true,
+    "session": "b671970e-cf79-407e-902f-c64c42725117",
+    "reviewer": "af5a195b435d3e012",
+    "review_label": "R7"
+   }
+  }
+ },
+ "prior": {
+  "base": "c184e6d5",
+  "original_commits": [
+   "be50470b"
+  ],
+  "original_agent": "a0ee7d4d0ae0a7194",
+  "arms": {
+   "a": {
+    "ponytail": true,
+    "session": "27f743f9-8093-4297-876d-88db3c614019",
+    "reviewer": "a79b2416c8e56c021",
+    "review_label": "R3"
+   },
+   "b": {
+    "ponytail": false,
+    "session": "d53f3b56-da12-4737-8961-852d1a0ac02b",
+    "reviewer": "a06198cf4404b7830",
+    "review_label": "R8"
+   }
+  }
+ },
+ "sendcheck": {
+  "base": "16be8949",
+  "original_commits": [
+   "1909c70d"
+  ],
+  "original_agent": "ae23c22e914c6a09c",
+  "arms": {
+   "a": {
+    "ponytail": false,
+    "session": "de84b471-5779-4511-9d5c-596004bbd514",
+    "reviewer": "abd778235f425efb0",
+    "review_label": "R6"
+   },
+   "b": {
+    "ponytail": true,
+    "session": "a865e087-a563-4f57-9148-aa08a8d49d8d",
+    "reviewer": "a927e0a50efc671eb",
+    "review_label": "R1"
+   }
+  }
+ }
+}

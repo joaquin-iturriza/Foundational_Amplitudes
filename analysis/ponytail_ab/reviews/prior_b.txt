@@ -1,0 +1,4 @@
+Reviewer R8 (repo-reviewer, blind), diff prior_b against c184e6d5.
+Verdict: clean; does what the task asked.
+Non-blocking: _prior_ok refuses a long --prior naming real prior work that also says "otherwise none found" unless "searched: a, b" follows; terms read only after "searched:" or "terms:" with a colon; PRIOR_MIN = 40 and the two-term minimum are tooling limits modelled on CHECK_MIN; suite not run (read-only review).
+BLOCKING: 0

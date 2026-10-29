@@ -1,0 +1,5 @@
+Reviewer R6 (repo-reviewer, blind), diff sendcheck_a against 16be8949.
+Verdict: fix first; the hook and tests read correct.
+1. docs/glossary.txt line 8: the definition of the top-quark held-out axis merges it with the separate tau axis (tau and tau neutrino never seen, read only on the twin run; analysis/catalog_v3/short_reads.py:29-33, tab:v3_short), so the user would approve a wrong meaning and the tau axis has no entry.
+Non-blocking: a PDF the check cannot read passes with a note (not asked for); the ratio rule skipped for captions; on a deck every prose line counts as a label, so many refusals expected; pdftotext garbles mathtext; one glossary definition not checked against the notes.
+BLOCKING: 1

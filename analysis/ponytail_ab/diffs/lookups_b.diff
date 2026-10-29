@@ -1,0 +1,283 @@
+diff --git a/.claude/hooks/git_verify_guard.py b/.claude/hooks/git_verify_guard.py
+index 8e60be21..f025f6b5 100755
+--- a/.claude/hooks/git_verify_guard.py
++++ b/.claude/hooks/git_verify_guard.py
+@@ -7,25 +7,36 @@ tools/verify_claims.py over every trunk commit since the last verified one (`pla
+   - git -c core.hooksPath=..., --config-env for it, git config of core.hooksPath (set, unset, any scope), any GIT_CONFIG_*
+     variable (they inject config), and Edit/Write of .git/config or .git/hooks;
+   - git pull (fetch, then merge: the merge is checked);
+-  - the same inside sh -c, bash -c or eval;
++  - the same inside sh -c, bash -c, eval or a heredoc fed to a shell;
+   - git merge <ref> and git cherry-pick <commit> whose incoming change to docs/results.tex fails
+     tools/verify_claims.py (a fast-forward merge runs no hook, so the range is checked here, ff or not).
+ A merge's range check gets CHECK_S seconds; past that the merge is let through (the state check catches it later).
++Only git in command position is read (a segment's first word after VAR=value and wrappers): a command that merely
++mentions git (python -c, sed on verify_claims.py, a commit message, a heredoc body not fed to a shell) is not, and
++reading core.hooksPath (`git config [--get] core.hooksPath`) is allowed.
+ Installed with the switch-over (tools/switch_over.sh), which sets core.hooksPath once, before this guard exists."""
+ import json, os, re, shlex, subprocess, sys
+ 
++sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
++from plan_files_guard import HEREDOC, SHELLS, heredocs
++
+ WRAPPERS = {"command", "env", "sudo", "nice", "time", "nohup", "exec"}
+ GLOBAL_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env", "--exec-path"}
+ COMMIT_ARG = set("mFCct")                      # git commit short options that take a value
++CONFIG_READ = {"--get", "--get-all", "get", "--local", "--global", "--system", "--worktree", "--show-origin",
++               "--show-scope"}
++# git where a command starts, for a line shlex cannot parse
++GIT_AT = re.compile(r"(?:^|[;&|(`\n]|\$\()\s*(?:[A-Za-z_]\w*=\S*\s+|(?:command|env|sudo|nice|time|nohup|exec|eval)\s+)*"
++                    r"(?:\S*/)?git(?=\s|$)")
+ CHECK_S = 90             # seconds for the claims check of a merge's range; registered with a 120 s hook timeout
+ 
+ 
+ def segments(cmd):
+-    lx = shlex.shlex(cmd, posix=True, punctuation_chars=";&|<>()")
+-    lx.whitespace_split = True
++    lx = shlex.shlex(cmd, posix=True, punctuation_chars=";&|<>()\n")
++    lx.whitespace, lx.whitespace_split = " \t\r", True          # a newline ends a command, as in the shell
+     out, cur = [], []
+     for t in lx:
+-        if t and set(t) <= set(";&|()<>"):
++        if t and set(t) <= set(";&|()<>\n"):
+             if cur:
+                 out.append(cur)
+             cur = []
+@@ -117,17 +128,21 @@ def git(repo, *a):
+ 
+ 
+ def refusal(cmd, cwd, depth=0):
+-    if re.search(r"\bGIT_CONFIG\w*", cmd):
++    cmd, bodies = heredocs(cmd)
++    for line, body in bodies:
++        lead = (HEREDOC.split(line)[0].split("|")[-1].split() or [""])[0]
++        if os.path.basename(lead) in SHELLS:            # a shell's heredoc is commands; any other body is data
++            why = refusal(body, cwd, depth + 1) if depth < 4 else "nested shells"
++            if why:
++                return why
++    if re.search(r"(?:^|[\s;&|(])(?:export\s+)?GIT_CONFIG\w*=", cmd):
+         return "a GIT_CONFIG_* variable (it injects git config, core.hooksPath included)"
+-    if re.search(r"core\.hookspath", cmd, re.I) and not re.fullmatch(
+-            r"\s*git\s+config\s+(?:--get\s+)?core\.hookspath\s*", cmd, re.I):
+-        return "core.hooksPath named in a command (only reading it, `git config --get core.hooksPath`, is allowed)"
+     if "git" not in cmd:
+         return None
+     try:
+         segs = segments(cmd)
+     except ValueError:
+-        return "a git command that cannot be parsed"
++        return "a git command that cannot be parsed" if GIT_AT.search(cmd) else None
+     for seg in segs:
+         words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
+         prog = os.path.basename(words[0]) if words else ""
+@@ -149,7 +164,7 @@ def refusal(cmd, cwd, depth=0):
+         repo = os.path.join(cwd, cdir) if cdir else cwd
+         if any(c.split("=")[0].lower() in ("core.hookspath",) for c in confs):
+             return "git -c core.hooksPath (it skips the claims hooks)"
+-        reading = [a.lower() for a in args] in (["core.hookspath"], ["--get", "core.hookspath"])
++        reading = [a.lower() for a in args if a.lower() not in CONFIG_READ] == ["core.hookspath"]
+         if sub == "config" and not reading and any(a.lower().split("=")[0] == "core.hookspath" for a in args):
+             return "git config core.hooksPath (set once by tools/switch_over.sh)"
+         if sub == "commit" and commit_skips(args):
+diff --git a/.claude/hooks/review_backlog.sh b/.claude/hooks/review_backlog.sh
+index 01581f11..6fd05916 100755
+--- a/.claude/hooks/review_backlog.sh
++++ b/.claude/hooks/review_backlog.sh
+@@ -174,6 +174,13 @@ case "$mode" in
+     pillar_field "$who" 1 | grep -q . || { echo "unknown reviewer '$who'" >&2; exit 2; }
+     mkdir -p "$REPO/$STATE_REL"; : > "$(lock_file "$who")"
+     echo "[review-backlog] $who holds the lock — edits to its pillar are allowed until 'advance'"
++    # the backlog to read, so the reviewer need not cat the state files or this script
++    bl=$(backlog_for "$who"); sha=$(read_state "$who" | awk '{print $1}')
++    spec=$(for p in $(pillar_field "$who" 4); do printf " '%s'" "$p"; done)
++    echo "[review-backlog] watermark $(git log -1 --format='%h %cs %s' "$sha"); backlog ${bl% *} lines, ${bl#* } commits"
++    echo "  the backlog:   git diff $sha --$spec"
++    echo "  its commits:   git log --oneline $sha..HEAD --$spec"
++    echo "  new files:     git ls-files --others --exclude-standard --$spec"
+     exit 0
+     ;;
+ 
+diff --git a/plan/step_prompt.txt b/plan/step_prompt.txt
+index c8a59f8d..3d20d191 100644
+--- a/plan/step_prompt.txt
++++ b/plan/step_prompt.txt
+@@ -53,6 +53,13 @@ The step
+ Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
+ to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
+ only in docs/results.tex, over 30 GPU-h (10 on Jean Zay) only if the user's words above cover it.
++  - Read an entry only with `python3 tools/plan.py show <id>` (grep, awk or python on plan/plan.yaml is refused);
++    `plan <command> -h` documents every command.
++  - `site logs <run> -n 100000` reads the whole log (the default is the last 40 lines).
++  - Right before submitting, `site pick FA --jobs N` with N the jobs about to go: one pick covers N submissions
++    for 60 min.
++  - Ack an event with `site ack E<n> --note "<run id>: <what the log showed>"`.
++  - Never wait in the foreground (no sleep, no polling loop): a job's end opens an event for the next step.
+ Final message, short, readable by someone who has forgotten this entry (CLAUDE.md 0e): first the question this step
+ answers and why it was asked, then what you did, what you found (numbers) and what it changes, the figure files that show it (absolute paths of the
+ .png, every result has one: the main session sends them to the user with the result), what you recorded, the next
+diff --git a/tests/test_setup_scenarios.py b/tests/test_setup_scenarios.py
+index 758590de..8b5bef28 100644
+--- a/tests/test_setup_scenarios.py
++++ b/tests/test_setup_scenarios.py
+@@ -681,9 +681,18 @@ def git_bypass():
+                "git config core.hooksPath /dev/null", "git config --unset core.hooksPath",
+                "GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null git commit -m x",
+                "git merge --no-verify side", "git pull", "bash -c 'git commit -n -m x'",
+-               "eval git commit --no-verify -m x", "cd x && git commit -n -m y", "echo x >> .git/hooks/pre-commit")
++               "eval git commit --no-verify -m x", "cd x && git commit -n -m y", "echo x >> .git/hooks/pre-commit",
++               "cd x\ngit commit -n -m y", "bash <<'EOF'\ngit commit -n -m x\nEOF", "export GIT_CONFIG_COUNT=1",
++               "git config --local core.hooksPath /dev/null", "git -C x config set core.hooksPath /dev/null",
++               "bash -c 'git config core.hooksPath /dev/null'", "git commit -n -m \"it's")
+     allowed = ("git commit -m 'fix the -n flag'", "git commit -m -n", "git commit -am x", "git log -n 5",
+-               "git config --get core.hooksPath", "git merge --abort", "git status")
++               "git config --get core.hooksPath", "git merge --abort", "git status",
++               # commands that only mention git, or read core.hooksPath (the agents' scan: refused as unparsable)
++               "git config core.hooksPath", "git -C x config --local --get core.hooksPath",
++               "cd x && git config core.hooksPath", "python3 -c \"print('git commit -n')\"",
++               "sed -n '/core.hooksPath/p;/git/p' tools/verify_claims.py", "grep -n GIT_CONFIG .claude/hooks/*.py",
++               "python3 - <<'EOF'\nprint(\"don't git commit -n\")\nEOF", "echo \"it's\" ' # git commit -n",
++               "git commit -F - <<'EOF'\ngit pull isn't refused in a message\nEOF")
+     for c in refused + allowed:
+         rc, out = hook(GUARD_GIT, {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": ROOT})
+         scenario("3: `%s` is %s" % (c[:60], "refused" if c in refused else "allowed"), rc == (2 if c in refused else 0),
+diff --git a/tools/plan.py b/tools/plan.py
+index 596092d5..5e38e30e 100644
+--- a/tools/plan.py
++++ b/tools/plan.py
+@@ -14,7 +14,7 @@ Two files in the MAIN checkout (resolved through git's common dir, so worktrees
+                      reviewers launched [{agent, at, design_at}] and runs
+ Both change only under an exclusive lock (plan/plan.yaml.lock), written through a temp file in the same directory.
+ 
+-  plan show [--compact] | where
++  plan show [<id>] [--compact] | where    one entry in full, or all; `plan <cmd> -h` documents every command
+   plan add <id> --title --question --next --match GLOBS (--decision D | --ask Q)   (done_when set apart, see check)
+   plan item <id> --decision D             create or attach the entry's site work item (same id, its match globs)
+   plan check <id> --done-when CMD         the machine check that finishes it; refused if it passes in an empty dir
+@@ -1128,6 +1128,8 @@ def cmd_where(a):
+ 
+ def cmd_show(a):
+     d, st = load()
++    if a.id:
++        entry(d, a.id)          # an unknown id exits with the error, not an empty print
+     for e in d["entries"]:
+         s = e.get("status")
+         if (a.compact and s == "done") or (a.id and e["id"] != a.id):
+@@ -1799,47 +1801,86 @@ def main(argv=None):
+     p = argparse.ArgumentParser(prog="plan")
+     sub = p.add_subparsers(dest="cmd", required=True)
+     A = lambda *n, **k: (n, k)
++    ID = A("id", help="the entry's id (plan show --compact lists them)")
+ 
+-    def cmd(name, f, *args):
+-        s = sub.add_parser(name)
++    def cmd(name, f, help, *args):
++        s = sub.add_parser(name, help=help, description=help)
+         for n, k in args:
+             s.add_argument(*n, **k)
+         s.set_defaults(f=f)
+-    cmd("where", cmd_where)
+-    cmd("show", cmd_show, A("id", nargs="?", help="one entry, with its whole evidence"), A("--compact", action="store_true"))
+-    cmd("add", cmd_add, A("id"), A("--title", required=True), A("--question", required=True),
+-        A("--next", required=True), A("--match", required=True), A("--decision"), A("--ask"), A("--searched"))
+-    cmd("item", cmd_item, A("id"), A("--decision", required=True), A("--match"))
+-    cmd("check", cmd_check, A("id"), A("--done-when", required=True), A("--replace", action="store_true"),
+-        A("--stale", action="store_true"), A("--why"))
+-    cmd("recheck", cmd_recheck, A("id", nargs="?"))
+-    cmd("ref", cmd_ref, A("id"), A("--label", required=True))
+-    cmd("answer", cmd_answer, A("id"), A("--quote", required=True), A("--kind", required=True, choices=KINDS),
+-        A("--set", action="append"))
+-    cmd("ask", cmd_ask, A("id"), A("--ask", required=True), A("--searched", required=True),
++    cmd("where", cmd_where, "print the plan file, state file and run registry paths")
++    cmd("show", cmd_show, "print the entries, or one entry in full (the way to read plan/plan.yaml)",
++        A("id", nargs="?", help="one entry, with its whole evidence"),
++        A("--compact", action="store_true", help="skip done entries; title, status and next only"))
++    cmd("add", cmd_add, "add a running entry (with --decision) or a waiting_user one (with --ask)", ID,
++        A("--title", required=True, help="a plain name"), A("--question", required=True, help="what it answers"),
++        A("--next", required=True, help="the next step"),
++        A("--match", required=True, help="comma-separated globs of the site item's run names"),
++        A("--decision", help="the decision (D<n>) that approves it"),
++        A("--ask", help="the question for the user, instead of --decision"),
++        A("--searched", help="with --ask: what was read first, and why none of it settles the question"))
++    cmd("item", cmd_item, "create or attach the entry's site work item (same id, its match globs)", ID,
++        A("--decision", required=True, help="the decision (D<n>) that authorises it"),
++        A("--match", help="comma-separated globs; default the entry's"))
++    cmd("check", cmd_check, "set the done_when shell check that finishes the entry", ID,
++        A("--done-when", required=True, help="shell command, exit 0 = done; refused if it passes in an empty dir"),
++        A("--replace", action="store_true", help="change a done entry's check (it must pass now)"),
++        A("--stale", action="store_true", help="an open entry's check names the wrong files (needs --why)"),
++        A("--why", help="with --stale: what in the old check was wrong"))
++    cmd("recheck", cmd_recheck, "rerun the done entries' checks with no time limit",
++        A("id", nargs="?", help="only this entry"))
++    cmd("ref", cmd_ref, "set notes_ref, the entry's label in docs/results.tex", ID,
++        A("--label", required=True, help="an existing label in docs/results.tex"))
++    cmd("answer", cmd_answer, "record the user's answer: site decide, then the entry, all or nothing", ID,
++        A("--quote", required=True, help="the user's exact words"),
++        A("--kind", required=True, choices=KINDS, help="the decision's kind"),
++        A("--set", action="append", metavar="FIELD=V", help="title|question|next=V changed with it (repeatable)"))
++    cmd("ask", cmd_ask, "open a question for the user on the entry", ID,
++        A("--ask", required=True, help="the question"),
++        A("--searched", required=True, help="what was read first, and why none of it settles the question"),
+         A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
+         A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
+-    cmd("design", cmd_design, A("id"), *[A("--" + k, required=True) for k in DESIGN_FIELDS])
+-    cmd("design-pass", cmd_design_pass, A("id"), A("--reviewer", required=True))
+-    cmd("design-fix", cmd_design_fix, A("id"), A("--reasons", required=True))
+-    cmd("review", cmd_review, A("id"), A("--agent", required=True))
+-    cmd("unanswered", cmd_unanswered, A("id"))
+-    cmd("step", cmd_step, A("id"), A("--agent", required=True))
+-    cmd("run", cmd_run, A("id"), A("runs", nargs="*"),
++    cmd("design", cmd_design, "record the design of the entry's next job (design_guard.py needs it, passed)", ID,
++        *[A("--" + k, required=True, help=h) for k, h in zip(DESIGN_FIELDS, (
++            "the question the job answers", "the measurement that answers it",
++            "how existing data shows the measure moves with the tested change", "what is held fixed",
++            "the matched control", "the seeds", "the outcome read as yes and as no"))])
++    cmd("design-pass", cmd_design_pass, "the design reviewer's pass of the latest design (reviewer only)", ID,
++        A("--reviewer", required=True, help="the reviewer's note"))
++    cmd("design-fix", cmd_design_fix, "the design reviewer's refusal of the latest design (reviewer only)", ID,
++        A("--reasons", required=True, help="what must change"))
++    cmd("review", cmd_review, "record the design reviewer launched for a design plan next listed", ID,
++        A("--agent", required=True, help="the reviewer subagent's id"))
++    cmd("unanswered", cmd_unanswered, "the user's messages since the question do not answer it", ID)
++    cmd("step", cmd_step, "record the step agent launched for a running entry", ID,
++        A("--agent", required=True, help="the step subagent's id"))
++    cmd("run", cmd_run, "record runs or sweeps submitted for the entry", ID,
++        A("runs", nargs="*", help="registry run ids (site runs)"),
+         A("--sweep", action="append", help="SITE:NAME of a sweep submitted through sweep_manager (repeatable)"))
+-    cmd("sweeps", cmd_sweeps, A("--fresh", action="store_true", help="read the sites now, not the cache"))
+-    cmd("evidence", cmd_evidence, A("id"), A("--run", action="append"), A("--commit"), A("--path", action="append"),
++    cmd("sweeps", cmd_sweeps, "every recorded sweep's state on its site; records the unrecorded ones",
++        A("--fresh", action="store_true", help="read the sites now, not the cache"))
++    cmd("evidence", cmd_evidence, "add evidence to the entry", ID,
++        A("--run", action="append", help="a run id (repeatable)"), A("--commit", help="the commit holding the result"),
++        A("--path", action="append", help="a repo path (repeatable)"),
+         A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
+-    cmd("set-next", cmd_set_next, A("id"), A("text"))
+-    cmd("dead-end", cmd_dead_end, A("id"), A("--tried", required=True), A("--why", required=True))
+-    cmd("next", cmd_next, A("--prompts", action="store_true"))
+-    cmd("done", cmd_done, A("id"), A("--writeup", required=True), A("--override-runs"),
++    cmd("set-next", cmd_set_next, "set the entry's next step", ID, A("text", help="the next step"))
++    cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
++        A("--tried", required=True, help="what was tried, with its run ids"),
++        A("--why", required=True, help="why it did not work"))
++    cmd("next", cmd_next, "what can move now (deterministic)",
++        A("--prompts", action="store_true", help="with each step agent's exact prompt"))
++    cmd("done", cmd_done, "close the entry: done_when passes and the write-up is committed", ID,
++        A("--writeup", required=True, help="the commit with the write-up"),
++        A("--override-runs", metavar="WHY", help="close with runs in an unknown state or sweeps unread, and why"),
+         A("--record", help="setup entries: the file that is their record (CLAUDE.md, a tool), changed by the write-up"))
+-    cmd("kind", cmd_kind, A("id"), A("kind", choices=("setup", "work")))
+-    cmd("view", cmd_view, A("--write", action="store_true"))
+-    cmd("claims", cmd_claims, A("--verified", action="store_true"))
+-    cmd("reopen", cmd_reopen, A("id"), A("--why", required=True))
+-    cmd("commit", cmd_commit)
++    cmd("kind", cmd_kind, "mark the entry setup (its record may be CLAUDE.md or a tool) or work (results.tex)", ID,
++        A("kind", choices=("setup", "work"), help="setup or work"))
++    cmd("view", cmd_view, "render the open entries as LaTeX for docs/results.tex",
++        A("--write", action="store_true", help="write it between the plan markers in docs/results.tex"))
++    cmd("claims", cmd_claims, "the claims check of trunk since the last verified commit, no time limit",
++        A("--verified", action="store_true", help="print the last verified commit, run nothing"))
++    cmd("reopen", cmd_reopen, "a done entry back to running", ID, A("--why", required=True, help="why it reopens"))
++    cmd("commit", cmd_commit, "commit plan/plan.yaml when a write left it uncommitted")
+     a = p.parse_args(argv)
+     COMMAND[:] = [a.cmd] + ([a.id] if getattr(a, "id", None) else [])
+     return a.f(a) or 0

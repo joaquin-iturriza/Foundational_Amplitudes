@@ -1,0 +1,265 @@
+diff --git a/.claude/agents/design-reviewer.md b/.claude/agents/design-reviewer.md
+index 5416a098..68882799 100644
+--- a/.claude/agents/design-reviewer.md
++++ b/.claude/agents/design-reviewer.md
+@@ -16,10 +16,13 @@ of a job before submitting it; you decide whether that job can answer its questi
+ because jobs were run whose measurement could not see the change they tested (the sign head
+ search, 2026-10-26: a sweep objective blind to the sign, a best-versus-baseline comparison that
+ changed two things at once, arms left untuned), and the user was handed results that showed
+-nothing, "and the conclusion is that the way you are testing was wrong".
++nothing, "and the conclusion is that the way you are testing was wrong". And because a comparison
++was designed while the same arm had already run and been written up (the pp-trained arm on the
++13 TeV pp pools, which the entry's own decisions named as the reference) and a rerun of it was
++proposed: "that's completely wasteful and can't happen ever again".
+ 
+ Your prompt names the entry. Read its latest design (question, measure, check, fixed, control,
+-seeds, outcome), evidence and dead ends with `python3 tools/plan.py show`, and what you need to
++seeds, outcome, prior), evidence, dead ends and the user's words on it with `python3 tools/plan.py show`, and what you need to
+ judge it:
+ `docs/results.tex`, the analysis scripts and metrics the check names
+ (`~/.local/share/ccorch/artifacts/FA/<run>/`, `analysis/`), CLAUDE.md (its A/B protocol and HPO
+@@ -46,15 +49,28 @@ rules). You do not edit files and you do not submit anything. Reading state is f
+    fewer suffice. No spread measured anywhere: the design must include measuring it, or fail.
+ 4. **The outcome is stated before the run, for yes and for no.** What number means yes, what
+    means no, and what each changes for the entry. An outcome that any result would confirm fails.
+-5. **Not a repeat.** It does not redo an entry's dead end or re-measure what the evidence already
+-   settles, unless it says what is different this time and why that difference matters.
+-6. **It answers the entry's question** and stays within what the user asked (CLAUDE.md 0b: no
++5. **Not a repeat, searched independently.** Do not take the design's `prior` field on trust:
++   search yourself for the design's processes, arms, data (pools, catalog, energy) and quantity,
++   under their plain names and their codes, in `docs/results.tex` (grep), in `python3 tools/plan.py
++   show <entry>` (evidence and dead ends; also other entries that name the same arm) and in `site
++   decisions --project FA`. FIX if you find prior work on the same question that `prior` omits,
++   if the job reruns an arm or re-measures a number that already exists (an arm already run is
++   reused, read again if needed, never retrained) without a stated reason why the existing one
++   cannot serve, or if it redoes a dead end. A `prior` of "none found" passes only when your own
++   search finds nothing either; name your search terms in the verdict.
++6. **It answers every decision quoted on the entry that names a comparison.** For each of the
++   user's words on the entry (your prompt lists them; `site decisions` has the full quotes) that
++   names a comparison, a reference or an arm, the design makes that comparison with every arm the
++   quote names, the ones already run included, or says why not. A comparison written without the
++   reference the user named fails.
++7. **It answers the entry's question** and stays within what the user asked (CLAUDE.md 0b: no
+    narrowed scope; a cut is the user's call).
+ 
+ ## The verdict
+ 
+ - **PASS**: run `python3 tools/plan.py design-pass <entry> --reviewer "<one line: what you
+-  checked, and the numbers that convinced you on checks 2 and 3>"`.
++  checked, the numbers that convinced you on checks 2 and 3, and the terms you searched for
++  check 5>"`.
+ - **FIX**: run `python3 tools/plan.py design-fix <entry> --reasons "<each failed check: what is
+   wrong and what would fix it>"`. The next step agent reads your reasons in its prompt and
+   records a new design.
+diff --git a/.claude/hooks/design_guard.py b/.claude/hooks/design_guard.py
+index 3bdeaeeb..fbc94a5c 100644
+--- a/.claude/hooks/design_guard.py
++++ b/.claude/hooks/design_guard.py
+@@ -158,7 +158,8 @@ def main():
+           "  python3 tools/plan.py design <entry> --question \"<what the job answers>\" --measure \"<the number that "
+           "answers it>\" --check \"<how it was seen to move with the change, on which data>\" --fixed \"<what is "
+           "held fixed>\" --control \"<the matched control>\" --seeds \"<seeds>\" --outcome \"<what yes and what no "
+-          "look like>\"\nthen submit again." % (hours, ", ".join(bad)), file=sys.stderr)
++          "look like>\" --prior \"<the prior work on the same question, each with its result and how this "
++          "design differs; or none found; searched: <terms>>\"\nthen submit again." % (hours, ", ".join(bad)), file=sys.stderr)
+     return 2
+ 
+ 
+diff --git a/plan/step_prompt.txt b/plan/step_prompt.txt
+index 99bf69e1..50fbdcc5 100644
+--- a/plan/step_prompt.txt
++++ b/plan/step_prompt.txt
+@@ -26,8 +26,11 @@ The step
+    `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id>`; a sweep submitted through
+    sweep_manager with `site run ... --item {id}` is recorded with `python3 tools/plan.py run {id} --sweep <site>:<name>`).
+    Before a job, record its design with `python3 tools/plan.py design {id} --question --measure --check --fixed
+-   --control --seeds --outcome` (--check: how you verified on existing data that the measure moves with the tested
+-   change; a design whose check fails is not run), then launch the design reviewer yourself (Agent tool,
++   --control --seeds --outcome --prior` (--check: how you verified on existing data that the measure moves with the
++   tested change; a design whose check fails is not run; --prior: the work already done on the same question, found by
++   grepping docs/results.tex, `plan show {id}` and `site decisions --project FA` for the design's processes, arms,
++   data and quantity, each with its result and how this design differs, or "none found; searched: <the terms>"; an
++   arm that already ran is reused, never rerun), then launch the design reviewer yourself (Agent tool,
+    subagent_type design-reviewer, naming the entry): on PASS submit in this step; on FIX revise the design once and
+    ask again, or record its reasons as a dead end and end the step (design_guard.py lets no job go without a pass; an
+    eval-only re-read of a run of the entry under its passed design carries REREAD=<run id> and needs no new design).
+@@ -39,6 +42,9 @@ The step
+ 4. If done_when now passes and the result is written up in docs/results.tex (numbers with their provenance comment,
+    `% src: <command> @<commit>` and `% claim: key=value`), commit and run `python3 tools/plan.py done {id} --writeup
+    <commit>`.
++   A write-up that answers the user's words (a decision on the entry, above) lists each of those quotes and names the
++   result that answers it (a comparison the user named is made with every arm it names, the ones already run and
++   written up included); a quote no result answers is said, with why, in the write-up and in your final message.
+ 5. Before asking the user anything, look for what settles it and apply that instead of asking. First: a choice with
+    one physically or technically correct answer (exact where an approximation would be wrong, a bug fix, a
+    convention the field settles) is made, never asked: the user's standing call is "Just do whatever is correct and
+diff --git a/tests/test_setup_scenarios.py b/tests/test_setup_scenarios.py
+index 423c81bc..2b3fb298 100644
+--- a/tests/test_setup_scenarios.py
++++ b/tests/test_setup_scenarios.py
+@@ -1740,7 +1740,8 @@ DESIGN = ["--question", "does the sign head lower the wrong-sign share on the he
+           "--measure", "the wrong-sign share on the held-out pools at the best checkpoint",
+           "--check", "on the two finished sign runs the share moved 4x between heads, above its binomial spread",
+           "--fixed", "pools, horizon, optimizer, every other HP", "--control", "the same search with the pair head",
+-          "--seeds", "0 1 2", "--outcome", "yes: share lower by more than the seed spread; no: within it"]
++          "--seeds", "0 1 2", "--outcome", "yes: share lower by more than the seed spread; no: within it",
++          "--prior", "the pair head search (wrong-sign share 0.31, objective blind to the sign): this one scores it"]
+ 
+ 
+ def designs():
+@@ -1860,6 +1861,45 @@ def designs():
+              rc != 0 and "existing data" in out and "designs" not in w.entries()["other"], out)
+ 
+ 
++def design_prior():
++    """2026-10-26: a pp comparison was written without the pp-trained arm, already run and written up and named by
++    the entry's decisions as the reference, and a rerun of it proposed ("that's completely wasteful and can't happen
++    ever again"). A design names the prior work on its question, or says none was found and what was searched; the
++    prior and the user's words reach the step agent and the design reviewer."""
++    w = World([E("pp", quotes=[{"text": "compare it against the pp-trained arm", "said_at": ago(60)}])])
++    i = DESIGN.index("--prior") + 1
++    for bad, why in (("  ", "empty"), ("none found", "none found without search terms"),
++                     ("None found.", "none found without search terms, any case")):
++        args = list(DESIGN)
++        args[i] = bad
++        rc, out = w.plan_cmd("design", "pp", *args)
++        scenario("design prior: %s is refused, nothing is recorded" % why,
++                 rc != 0 and "--prior" in out and "designs" not in w.entries()["pp"], out)
++    args = list(DESIGN)
++    args[i] = "none found; searched: pp13, pp-trained, 13 TeV, ee_uu in docs/results.tex and site decisions"
++    rc, out = w.plan_cmd("design", "pp", *args)
++    scenario("design prior: none found with its search terms is recorded", rc == 0
++             and "searched: pp13" in w.entries()["pp"]["designs"][-1]["prior"], out)
++    w.plan_cmd("design", "pp", *DESIGN)
++    show, pr = w.plan_cmd("show", "pp")[1], w.plan_cmd("next", "--prompts")[1]
++    scenario("design prior: plan show and the step prompt carry the prior work, the prompt tells how to search it",
++             "prior: the pair head search" in show and "prior: the pair head search" in pr and "--prior" in pr
++             and "none found; searched:" in pr, show + pr[-2500:])
++    D40 = dict(zip([k[2:] for k in DESIGN[0::2]], DESIGN[1::2]), at=ago(40))
++    nxt = World([E("pp", designs=[D40], quotes=[{"text": "compare it against the pp-trained arm",
++                                                "said_at": ago(60)}])]).plan_cmd("next", "--prompts")[1]
++    scenario("design prior: the design reviewer's prompt carries the prior and the user's words on the entry",
++             "Design review." in nxt and "prior: the pair head search" in nxt
++             and "compare it against the pp-trained arm" in nxt, nxt[-2500:])
++    old = World([E("pp", designs=[{k: v for k, v in D40.items() if k != "prior"}])]).plan_cmd("show", "pp")[1]
++    scenario("design prior: a design recorded before the field shows it as not recorded",
++             "prior: not recorded" in old, old)
++    rv = " ".join(open(os.path.join(ROOT, ".claude", "agents", "design-reviewer.md")).read().split())
++    scenario("design prior: the reviewer searches for prior work itself and checks the quoted comparisons",
++             "searched independently" in rv and "site decisions --project FA" in rv and "docs/results.tex" in rv
++             and "names a comparison" in rv)
++
++
+ def prompt_cap():
+     """A step prompt carries the last 8 dead ends and evidence runs / paths, with a line naming how many earlier ones
+     exist and where they are (catalog_coverage's whole history made one prompt 17k characters); plan show <id> prints
+@@ -1903,7 +1943,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
+           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
+           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
+           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
+-          designs, prompt_cap, the_suite_itself]
++          designs, design_prior, prompt_cap, the_suite_itself]
+ 
+ 
+ def main():
+diff --git a/tools/plan.py b/tools/plan.py
+index 047bd545..52559ea9 100644
+--- a/tools/plan.py
++++ b/tools/plan.py
+@@ -26,11 +26,13 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through
+                                           and routed, its step prompt names the question and what waits on it (B);
+                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
+                                           it can move without the answer)
+-  plan design <id> --question Q --measure M --check C --fixed F --control K --seeds S --outcome O
++  plan design <id> --question Q --measure M --check C --fixed F --control K --seeds S --outcome O --prior P
+                                           the design of the next job, before it is submitted: the question it
+                                           answers, the measurement that answers it, how it was checked on existing
+                                           data that the measurement moves with the tested change, what is held
+-                                          fixed, the matched control, the seeds, the outcome read as yes and as no;
++                                          fixed, the matched control, the seeds, the outcome read as yes and as no,
++                                          the prior work on the same question (each with its result and how this
++                                          design differs, or "none found; searched: <terms>");
+                                           design_guard.py refuses a submission for an entry without one recorded
+                                           in DESIGN_H h and passed by the design reviewer, which the step agent
+                                           that recorded it runs itself before submitting
+@@ -880,15 +882,20 @@ def next_steps(d, st, t=None, msgs=None):
+ PROMPT_TAIL = 8               # dead ends and evidence runs / paths a step prompt carries; plan show <id> has them all
+ 
+ 
+-def step_prompt(e, reason):
+-    tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
++def quotes_text(e):
++    """The user's words on the entry: its own quotes and the quotes of the decisions it was added under."""
+     qs = [(x.get("text"), x.get("said_at")) for x in e.get("quotes") or []]
+     have = {x.get("decision") for x in e.get("quotes") or []}
+     for did in e.get("decisions") or []:                # an entry added under a decision has no quote of its own
+         dd = decision(did) if did not in have else None
+         if dd and dd["quote"]:
+             qs.append((dd["quote"], dd["said_at"].isoformat() if dd["said_at"] else ""))
+-    q = "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
++    return "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
++
++
++def step_prompt(e, reason):
++    tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
++    q = quotes_text(e)
+     # the last PROMPT_TAIL dead ends and evidence items only: an entry's whole history made one prompt 17k characters
+     dl = e.get("dead_ends") or []
+     de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in dl[-PROMPT_TAIL:]) or "  none"
+@@ -1188,7 +1195,7 @@ def _ask_ok(ask):
+         sys.exit("plan: the question needs at least three words of five letters or more, to be found in a message")
+ 
+ 
+-DESIGN_FIELDS = ("question", "measure", "check", "fixed", "control", "seeds", "outcome")
++DESIGN_FIELDS = ("question", "measure", "check", "fixed", "control", "seeds", "outcome", "prior")
+ DESIGN_H = 24                 # hours a recorded design covers submissions of its entry (design_guard.py)
+ CHECK_MIN = 40                # characters: how the measure was seen to move with the change, named, not a token
+ 
+@@ -1221,11 +1228,12 @@ def review_prompt(e):
+     de = "\n".join("  %s: %s" % (y["tried"], y["why"]) for y in e.get("dead_ends") or []) or "  none"
+     return ("%s Review the latest recorded design of one plan entry (your instructions: "
+             ".claude/agents/design-reviewer.md).\n\nEntry: %s (%s)\nQuestion of the entry: %s\nThe design, recorded "
+-            "%s:\n%s\nEvidence so far: %s\nDead ends so far:\n%s\n\nOn PASS run `python3 tools/plan.py design-pass "
++            "%s:\n%s\nThe user's words on the entry (the design answers each that names a comparison):\n%s\n"
++            "Evidence so far: %s\nDead ends so far:\n%s\n\nOn PASS run `python3 tools/plan.py design-pass "
+             "%s --reviewer \"<your note>\"`; on FIX run `python3 tools/plan.py design-fix %s --reasons \"<what to "
+             "change>\"`. Then report the verdict and its reasons." % (
+                 REVIEW_HEAD, e["id"], e.get("title"), e.get("question"), (x.get("at") or "")[:16],
+-                design_text(x), json.dumps(e.get("evidence") or {}), de, e["id"], e["id"]))
++                design_text(x), quotes_text(e) or "  none", json.dumps(e.get("evidence") or {}), de, e["id"], e["id"]))
+ 
+ 
+ def review_launched(st, e, t):
+@@ -1248,7 +1256,7 @@ def design_text(x, indent="  "):
+                "review asked for a fix %s: %s" % (x["fix_at"][:16], x.get("fix")) if x.get("fix_at") else
+                "not reviewed yet")
+     return "\n".join(["%srecorded %s, %s" % (indent, (x.get("at") or "")[:16], verdict)] +
+-                      ["%s%s: %s" % (indent, k, x.get(k)) for k in DESIGN_FIELDS])
++                      ["%s%s: %s" % (indent, k, x.get(k, "not recorded")) for k in DESIGN_FIELDS])
+ 
+ 
+ def cmd_design(a):
+@@ -1264,6 +1272,11 @@ def cmd_design(a):
+         sys.exit("plan: --check must say how it was verified, on existing data, that the measure moves with the "
+                  "tested change (which runs or pools, what moved and by how much), in at least %d characters"
+                  % CHECK_MIN)
++    # 2026-10-26: a pp comparison was written without the pp-trained arm already run and written up, and a rerun of
++    # it proposed; the user: "that's completely wasteful and can't happen ever again"
++    if re.search(r"\bnone found\b", vals["prior"], re.I) and not re.search(r"searched\s*:\s*\S+", vals["prior"], re.I):
++        sys.exit("plan: --prior \"none found\" needs what was searched: \"none found; searched: <the process, arm, "
++                 "data and quantity names grepped in docs/results.tex, plan show and site decisions>\"")
+     with transaction() as (d, st):
+         e = entry(d, a.id)
+         e.setdefault("designs", []).append(dict(at=now().isoformat(), **vals))
+@@ -1853,7 +1866,10 @@ def main(argv=None):
+             "fixed": "what is held fixed",
+             "control": "the matched control",
+             "seeds": "the seeds",
+-            "outcome": "how the outcome reads as yes and as no"}.get(k)) for k in DESIGN_FIELDS])
++            "outcome": "how the outcome reads as yes and as no",
++            "prior": "the prior work on the same question (docs/results.tex, plan show, site decisions searched for "
++                     "its processes, arms, data and quantity): each with its result and how this design differs; "
++                     "or \"none found; searched: <terms>\""}.get(k)) for k in DESIGN_FIELDS])
+     cmd("design-pass", cmd_design_pass, "the design reviewer's PASS on the latest design (the reviewer runs it)", ID,
+         A("--reviewer", required=True, help="the reviewer's note"))
+     cmd("design-fix", cmd_design_fix, "the design reviewer's FIX on the latest design (the reviewer runs it)", ID,

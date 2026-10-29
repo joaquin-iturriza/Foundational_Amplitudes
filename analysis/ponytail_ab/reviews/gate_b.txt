@@ -1,0 +1,4 @@
+Reviewer R2 (repo-reviewer, blind), diff gate_b against 45d1df0d.
+Verdict: clean; does what the task asked (reviewed-uncommitted then commit not due; partial commit, untracked file, deletions, old 3-field state handled; tests cover the asked cases and more).
+Non-blocking: content_hash runs on every gate/bashpre/bashpost call when the backlog is non-zero (an extra git diff and ls-files pass; could run only at threshold); read-only modes rewrite state when the hash matches; CLAUDE.md batched-review paragraph does not mention the hash; one long GROUPS line.
+BLOCKING: 0

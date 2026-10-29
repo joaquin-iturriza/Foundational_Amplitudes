@@ -1,0 +1,204 @@
+diff --git a/.claude/hooks/send_check.py b/.claude/hooks/send_check.py
+new file mode 100755
+index 00000000..5a7044be
+--- /dev/null
++++ b/.claude/hooks/send_check.py
+@@ -0,0 +1,98 @@
++#!/usr/bin/env python3
++"""PreToolUse(SendUserFile): a figure or deck reaches the user only in plain names (CLAUDE.md 0e; the user, 2026-10-27:
++"the rules say that your figures should be understandable and self contained ... And no cryptic unexplained names
++too. So it's a general problem").
++
++Every sent .pdf (a figure or a deck) is read with pdftotext; a .png is read through its sibling .pdf (same basename,
++the figure pair rule), and a .png without one is refused, since it cannot be read. Other file types pass. Refused
++(exit 2, each offending string with its page): run ids (FA-<site>-..., trial_NNNN, hex hashes), recipe and arm
++prefixes (tp3_, tp2_, v3_, v4_, pp13_, dc_, zz_), any other token with an underscore (snake_case identifiers), held-out
++axis codes (H1..H9, H2p5, H3p, H7E, H7c, XV3, XV4), decision and event codes (D12, E1519), and a line saying "ratio",
++"gain" or "/" that names no two sides ("over", or a "/" between two named things).
++A term listed in docs/glossary.txt (term<TAB>plain definition, approved by the user) is allowed wherever it appears.
++    python3 .claude/hooks/send_check.py FILE...     # read-only report, exit 2 if anything is found
++Env for tests: SEND_CHECK_GLOSSARY (path of the glossary)."""
++import json, os, re, subprocess, sys
++
++HERE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++GLOSSARY = os.environ.get("SEND_CHECK_GLOSSARY", os.path.join(HERE, "docs", "glossary.txt"))
++# most specific first: a span reported by one rule is blanked before the next, so a run id is not also "an underscore"
++RULES = [
++    ("run id", re.compile(r"\bFA-[A-Za-z0-9]+-[\w.-]+|\btrial_\d+\b")),
++    ("recipe or arm prefix", re.compile(r"\b(?:tp3|tp2|v3|v4|pp13|dc|zz)_\w*")),
++    ("held-out axis code", re.compile(r"\b(?:H[1-9](?:p5|p|E|c)?|XV[34])\b")),
++    ("decision or event code", re.compile(r"\b[DE]\d+\b")),
++    ("hex hash", re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b")),
++    ("identifier with an underscore", re.compile(r"\w*_\w*")),
++]
++RATIO = re.compile(r"\b(?:ratio|gain)s?\b|/", re.I)
++# a side is any mark but a bracket opening or closing on the slash: "(s/s0)" names both, "ratio /" and "(/ x)" do not
++TWO_SIDES = re.compile(r"\bover\b|[^\s/(\[{]\s*/\s*[^\s/)\]}]", re.I)
++
++
++def glossary_terms(path=GLOSSARY):
++    if not os.path.exists(path):
++        return []
++    terms = [l.split("\t", 1)[0].strip() for l in open(path) if l.strip() and not l.startswith("#")]
++    return sorted((t for t in terms if t), key=len, reverse=True)
++
++
++def findings(text, terms):
++    """[(page, kind, string)] for a pdftotext output (pages split by form feeds)"""
++    out = []
++    for page, pt in enumerate(text.split("\f"), 1):
++        for t in terms:
++            pt = re.sub(r"(?<!\w)%s(?!\w)" % re.escape(t), " ", pt, flags=re.I)
++        for kind, rx in RULES:
++            for m in rx.finditer(pt):
++                out.append((page, kind, m.group()))
++            pt = rx.sub(lambda m: " " * len(m.group()), pt)
++        for line in pt.splitlines():
++            if RATIO.search(line) and not TWO_SIDES.search(line):
++                out.append((page, "ratio, gain or / naming no two sides", " ".join(line.split())[:90]))
++    seen = set()
++    return [f for f in out if not (f in seen or seen.add(f))]
++
++
++def check(path, terms):
++    """problems of one sent file, as message lines"""
++    base, ext = os.path.splitext(path)
++    ext = ext.lower()
++    if ext == ".png":
++        pdf = base + ".pdf"
++        if not os.path.exists(pdf):
++            return ["%s: no sibling %s to read its text from (every figure ships as .png and .pdf)" % (path, pdf)]
++    elif ext == ".pdf":
++        pdf = path
++    else:
++        return []
++    r = subprocess.run(["pdftotext", "-enc", "UTF-8", pdf, "-"], capture_output=True, text=True)
++    if r.returncode:
++        return ["%s: pdftotext failed: %s" % (pdf, r.stderr.strip()[:200])]
++    return ['%s, page %d: %s "%s"' % (pdf, p, k, s) for p, k, s in findings(r.stdout, terms)]
++
++
++def report(paths):
++    terms = glossary_terms()
++    probs = [p for f in paths for p in check(f, terms)]
++    if probs:
++        sys.stderr.write("send_check: not sent; these strings are codes or unexplained names (CLAUDE.md 0e). Redraw "
++                         "with plain names, or, if a term is the plain name, have the user approve it into "
++                         "docs/glossary.txt:\n  " + "\n  ".join(probs) + "\n")
++        return 2
++    return 0
++
++
++def main():
++    if len(sys.argv) > 1:
++        return report(sys.argv[1:])
++    inp = json.load(sys.stdin)
++    if inp.get("tool_name") not in (None, "SendUserFile"):
++        return 0
++    files = (inp.get("tool_input") or {}).get("files") or []
++    cwd = inp.get("cwd") or os.getcwd()
++    return report([f if os.path.isabs(f) else os.path.join(cwd, f) for f in files])
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/docs/glossary.txt b/docs/glossary.txt
+new file mode 100644
+index 00000000..71daba96
+--- /dev/null
++++ b/docs/glossary.txt
+@@ -0,0 +1,19 @@
++dimensionless target	log |M|^2 with its units removed by the event's own scales (the product of its emission scales), trained with dimensionless inputs (momenta over the collision energy) and the coupling orders as features
++context vector	16 learned numbers per training process, added to every particle's encoding and zeroed on half the training events; a held-out process is read with it at zero, or with it fitted on a few labelled events
++catalog_v3	the third process catalog (2026-10-23): MadGraph tree and one-loop amplitudes for e+e-, quark and gluon beams and two BSM models, collision energy from threshold to 1 TeV, one pool per class of processes equal up to relabelling, held-out sets H1 to H7
++catalog_v4	catalog_v3's processes regenerated with wider coverage (2026-10-25): acceptance as at a hadron collider (pT > 10 GeV, abs(eta) < 5), collision energy up to 6 TeV, a forward-angle component, every electroweak diagram, a massless b quark
++H1	held-out set, new combinations: processes whose particles, multiplicity and coupling order are all seen in training, never together (about 5% of the classes, drawn at random)
++H2	held-out set, multiplicity: the 2->4 processes of families whose 2->2 and 2->3 members train, plus 2->5 processes (a trained 2->4 with one more gluon or photon)
++H3	held-out set, particle content: every process with an external top quark (mass 172.5 GeV); the training has a top-like quark at 50, 300 and 600 GeV
++H4	held-out set, vertex: processes with four or more external W, Z or photons, at least two of them W (the quartic gauge vertex); held out only in the run trained without them
++H5	held-out set, perturbative order: one-loop amplitudes of processes whose one loop is not trained (15% of the coloured one-loop classes, and the one loop of every held-out tree)
++H6	held-out set, parameter: the strong coupling alpha_s(M_Z) = 0.13 on the families trained at 0.09 and 0.15
++H7	held-out set, energy and cuts: training processes read outside the trained region, at collision energies above it (1 to 10 TeV for catalog_v3, 6 to 20 TeV for catalog_v4) and with every final particle at pT >= 30 GeV
++zero-shot	a held-out process scored by the pretrained network with no training on it
++fine-tune	a pretrained network trained further on one process, all its weights updated
++Muon	the optimizer used since 2026-10-26: each hidden weight matrix gets an orthogonalised update (Muon), the other parameters AdamW
++AdamW	Adam with decoupled weight decay, the optimizer before Muon
++relabelled processes	held-out processes whose |M|^2 equals a training process's up to a relabelling of the particles and a constant factor
++new processes	held-out processes with no relabelling of themselves in training
++level of the error	the squared mean, over a process's events, of the error on log |M|^2: an overall offset
++shape of the error	the variance of that error over the events: what remains once the offset is removed
+diff --git a/tests/test_setup_scenarios.py b/tests/test_setup_scenarios.py
+index 0ace476d..c3a7fca3 100644
+--- a/tests/test_setup_scenarios.py
++++ b/tests/test_setup_scenarios.py
+@@ -2053,6 +2053,61 @@ def parallel_steps():
+              w.entries()["par"]["next"] == {3: "C", 4: "D"} and "NEXT par step 3 of 2" in nx and "step 4 of 2" in nx, [w.entries()["par"]["next"], nx])
+ 
+ 
++def send_check():
++    """A figure or deck sent to the user carries no code (CLAUDE.md 0e; the user, 2026-10-27: "no cryptic unexplained
++    names"): send_check.py reads each sent PDF (a PNG through its sibling PDF) and refuses codes not in the glossary."""
++    import importlib.util
++    import matplotlib
++    matplotlib.use("Agg")
++    import matplotlib.pyplot as plt
++    path = os.path.join(ROOT, ".claude", "hooks", "send_check.py")
++    d = tempfile.mkdtemp()
++    gl = os.path.join(d, "glossary.txt")
++    open(gl, "w").write("catalog_v3\tthe third process catalog\nH1\theld-out set, new combinations\n")
++    env = dict(os.environ, SEND_CHECK_GLOSSARY=gl)
++
++    def fig(name, *labels):
++        f, ax = plt.subplots()
++        ax.plot([1, 2], [1, 2], label=labels[0])
++        ax.set_xlabel(labels[1] if len(labels) > 1 else "step")
++        ax.legend()
++        base = os.path.join(d, name)
++        f.savefig(base + ".pdf")
++        f.savefig(base + ".png")
++        plt.close(f)
++        return base
++
++    def send(*files):
++        return hook(path, {"tool_name": "SendUserFile", "tool_input": {"files": list(files)}, "cwd": d}, env=env)
++
++    code = fig("code", "trial_0042, H2p5", "MSE ratio")
++    rc, out = send(code + ".png")
++    scenario("send_check: a figure with a run id, an axis code and a one-sided ratio is refused, each named with its page",
++             rc == 2 and all(s in out for s in ('run id "trial_0042"', 'axis code "H2p5"', 'sides "MSE ratio"', "page 1")),
++             (rc, out))
++    rc, out = send(fig("gloss", "catalog_v3, H1", "MSE of the dimensionless target over the baseline's") + ".pdf")
++    scenario("send_check: a term in the glossary passes, and a ratio that says over what", rc == 0, (rc, out))
++    fig("clean", "seed 42", "learning rate")
++    rc, out = send("clean.pdf", "notes.json")
++    scenario("send_check: a clean figure passes, a file that is no figure is not read", rc == 0, (rc, out))
++    os.remove(fig("lone", "seed 42") + ".pdf")
++    rc, out = send(os.path.join(d, "lone.png"))
++    scenario("send_check: a PNG without its PDF is refused (it cannot be read)", rc == 2 and "no sibling" in out, (rc, out))
++    rc, out = hook(path, {"tool_name": "SendUserFile", "tool_input": {"files": [code + ".pdf"]}, "cwd": d},
++                   env=dict(os.environ, SEND_CHECK_GLOSSARY=os.path.join(d, "none.txt")))
++    scenario("send_check: without the glossary the same codes are refused", rc == 2 and "trial_0042" in out, (rc, out))
++    spec = importlib.util.spec_from_file_location("send_check", path)
++    m = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(m)
++    stub = "FA-ccin2p3-5f2a91c0 and 3abde40c\fv4_dimensionless_muon, tp3_x, D145, E1519, XV3, val_loss_no_reg, gain\f" \
++           "seed 42 over seed 43, (s/s0), D = 10^3, H2O-free 10 TeV"
++    got = {(p, k) for p, k, _ in m.findings(stub, [])}
++    want = {(1, "run id"), (1, "hex hash"), (2, "recipe or arm prefix"), (2, "decision or event code"),
++            (2, "held-out axis code"), (2, "identifier with an underscore"), (2, "ratio, gain or / naming no two sides")}
++    scenario("send_check: on text, every kind of code is found on its page and the clean page has none", got == want,
++             sorted(got ^ want))
++
++
+ def the_suite_itself():
+     """The exit code reflects every scenario, and every group of scenarios is run (a group defined but never called
+     once let the suite exit 0 with failures: main() was split by an edit)."""
+@@ -2074,7 +2129,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
+           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
+           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
+           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
+-          designs, design_prior, prompt_cap, parallel_steps, the_suite_itself]
++          designs, design_prior, prompt_cap, parallel_steps, send_check, the_suite_itself]
+ 
+ 
+ def main():

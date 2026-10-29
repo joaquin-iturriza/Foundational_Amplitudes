@@ -1,0 +1,5 @@
+Reviewer R4 (repo-reviewer, blind), diff lookups_a against f1a5276c.
+Verdict: fix first. Plan help strings and plan show <id>, the review_backlog begin printout and the step prompt lines are fine.
+1. .claude/hooks/git_verify_guard.py:24-25 and :178: the new GIT_CMD pre-filter reads the raw command text before shell quoting is removed, so a quoted or backslash-escaped git in command position (a commit that skips its hooks) is let through; the base guard refused it (checked on a copy of the patched guard: exit 0 where the base exits 2).
+Non-blocking: heredoc fed by a pipe to bash not treated as shell (also missed at the base); <<WORD inside quotes swallows a later git line; cmd_show json.dumps without default=str; plan show <id> --compact on a done entry prints nothing; begin now writes a fresh watermark when a pillar has no state.
+BLOCKING: 1

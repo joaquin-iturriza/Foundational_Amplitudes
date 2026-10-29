@@ -1,0 +1,166 @@
+diff --git a/.claude/hooks/review_backlog.sh b/.claude/hooks/review_backlog.sh
+index 1f0428e6..052d7799 100755
+--- a/.claude/hooks/review_backlog.sh
++++ b/.claude/hooks/review_backlog.sh
+@@ -11,7 +11,8 @@
+ # which it was last reviewed, plus the size of the change that was reviewed then. The
+ # Stop hook accumulates everything since that watermark and only asks for a reviewer once
+ # the backlog is worth a pass. The reviewer then sees the WHOLE backlog at once, which is
+-# also a better review: it can judge a section, not a hunk.
++# also a better review: it can judge a section, not a hunk. The watermark also records a hash
++# of the content passed, so committing what was reviewed (uncommitted) owes nothing.
+ #
+ # WHERE THE TEETH ARE. A Stop hook can only ever NUDGE: the harness sets stop_hook_active on
+ # the next stop so a hook cannot block a turn twice, otherwise it would loop forever. So
+@@ -85,17 +86,30 @@ pillar_lines() {
+ 
+ pillar_commits() { git rev-list --count "$1"..HEAD -- $2 2>/dev/null || echo 0; }
+ 
+-# state file: "<sha> <baseline_lines> <baseline_commits>"
++# What the pillar's files hold now, as seen from the watermark $1: every path that differs from $1 or is untracked,
++# with the blob hash of its working-tree content ("-" if gone). The set and the hashes are the same whether the
++# change is committed or not, and whatever commits sit between $1 and HEAD, so it identifies reviewed content.
++content_hash() {
++  local since="$1" paths="$2" list present
++  list=$( { git -c core.quotePath=false diff --name-only --no-renames "$since" -- $paths 2>/dev/null
++            git -c core.quotePath=false ls-files --others --exclude-standard -- $paths 2>/dev/null; } | sort -u)
++  present=$(printf '%s\n' "$list" | while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && printf '%s\n' "$f"; done)
++  { [ -n "$present" ] && paste -d' ' <(printf '%s\n' "$present") <(printf '%s\n' "$present" | git hash-object --stdin-paths)
++    printf '%s\n' "$list" | while IFS= read -r f; do [ -n "$f" ] && [ ! -f "$f" ] && printf '%s -\n' "$f"; done
++  } | sort | cksum | awk '{print $1"-"$2}'
++}
++
++# state file: "<sha> <baseline_lines> <baseline_commits> <content_hash>" (older files lack the hash)
+ state_file() { echo "$REPO/$STATE_REL/$1"; }
+ 
+-read_state() {                       # $1=reviewer -> echoes "sha lines commits"
++read_state() {                       # $1=reviewer -> echoes "sha lines commits [hash]"
+   local f; f=$(state_file "$1")
+   if [ -f "$f" ]; then cat "$f"; else echo ""; fi
+ }
+ 
+-write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits
++write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits $5=content hash
+   mkdir -p "$REPO/$STATE_REL"
+-  printf '%s %s %s\n' "$2" "$3" "$4" > "$(state_file "$1")"
++  printf '%s %s %s %s\n' "$2" "$3" "$4" "$5" > "$(state_file "$1")"
+ }
+ 
+ lock_file() { echo "$REPO/$STATE_REL/$1.lock"; }
+@@ -124,24 +138,33 @@ reset_pillar() {
+   paths=$(pillar_field "$who" 4)
+   sha=$(git rev-parse HEAD)
+   lines=$(pillar_lines "$sha" "$paths")     # the uncommitted remainder just reviewed
+-  write_state "$who" "$sha" "$lines" 0
++  write_state "$who" "$sha" "$lines" 0 "$(content_hash "$sha" "$paths")"
+ }
+ 
+ # Backlog for a pillar -> echoes "lines commits"; empty state self-initializes to zero owed.
++# Reviewed content owes nothing: a reviewer passing an uncommitted CLAUDE.md edit set the watermark at HEAD, so
++# committing it then counted as one new commit and asked for a second review of the same text (six times on
++# 2026-10-29). While the pillar's files hash to what was reviewed, the backlog is empty and the watermark rolls
++# forward to HEAD, as if `advance` ran now; any other content is counted from the watermark as before.
+ backlog_for() {
+-  local who="$1" paths st sha base_l base_c tl tc
++  local who="$1" paths st sha base_l base_c base_h tl tc dl dc
+   paths=$(pillar_field "$who" 4)
+   st=$(read_state "$who")
+   if [ -z "$st" ]; then reset_pillar "$who"; echo "0 0"; return; fi
+   sha=$(echo "$st" | awk '{print $1}')
+   base_l=$(echo "$st" | awk '{print $2+0}')
+   base_c=$(echo "$st" | awk '{print $3+0}')
++  base_h=$(echo "$st" | awk '{print $4}')
+   # watermark commit gone (rebase/gc) -> re-baseline rather than diff against nothing
+   git cat-file -e "$sha^{commit}" 2>/dev/null || { reset_pillar "$who"; echo "0 0"; return; }
+   tl=$(pillar_lines "$sha" "$paths")
+   tc=$(pillar_commits "$sha" "$paths")
+   # subtract what was already reviewed at the watermark; clamp (a revert can go negative)
+-  echo "$(( tl > base_l ? tl - base_l : 0 )) $(( tc > base_c ? tc - base_c : 0 ))"
++  dl=$(( tl > base_l ? tl - base_l : 0 )); dc=$(( tc > base_c ? tc - base_c : 0 ))
++  if [ $(( dl + dc )) -gt 0 ] && [ -n "$base_h" ] && [ "$(content_hash "$sha" "$paths")" = "$base_h" ]; then
++    reset_pillar "$who"; echo "0 0"; return
++  fi
++  echo "$dl $dc"
+ }
+ 
+ mode="${1:-check}"
+diff --git a/tests/test_setup_scenarios.py b/tests/test_setup_scenarios.py
+index 4041fc65..3b499bed 100644
+--- a/tests/test_setup_scenarios.py
++++ b/tests/test_setup_scenarios.py
+@@ -1442,6 +1442,66 @@ def tooling_fixes():
+                  out)
+ 
+ 
++def reviewed_content():
++    """A pillar whose files hold what its reviewer passed owes nothing, committed or not (2026-10-29: each CLAUDE.md edit
++    took two reviews, the second of the same text after its commit); a further edit is owed as before."""
++    repo = tempfile.mkdtemp(prefix="backlog_")
++    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
++    g("init", "-q", "-b", "trunk")
++    os.makedirs(os.path.join(repo, ".claude", "hooks"))
++    shutil.copy(os.path.join(ROOT, ".claude", "hooks", "review_backlog.sh"), os.path.join(repo, ".claude", "hooks"))
++    open(os.path.join(repo, ".gitignore"), "w").write(".claude/.review_state/\n")
++    open(os.path.join(repo, "CLAUDE.md"), "w").write("# guide\n\n1. a rule\n")
++    open(os.path.join(repo, "mod.py"), "w").write("x = 1\n")
++    g("add", "."); g("commit", "-qm", "base")
++
++    def rb(*a, inp=""):
++        r = subprocess.run(["bash", ".claude/hooks/review_backlog.sh"] + list(a), cwd=repo, input=inp,
++                           capture_output=True, text=True, env=GIT_ENV)
++        return r.returncode, r.stdout + r.stderr
++
++    def row(who):
++        st = rb("status")[1]
++        return next((l.split()[1:3] + ["DUE" in l] for l in st.splitlines() if l.startswith(who)), [st])
++
++    commit = J({"tool_name": "Bash", "tool_input": {"command": "git commit -qam x"}})
++    edit = J({"tool_name": "Edit", "tool_input": {"file_path": os.path.join(repo, "CLAUDE.md")}})
++    rb("init")
++    open(os.path.join(repo, "CLAUDE.md"), "a").write("2. another rule\n")
++    due, refused = row("claudemd-keeper"), rb("bashpre", inp=commit)[0]
++    rb("begin", "claudemd-keeper"); rb("advance", "claudemd-keeper")
++    allowed = rb("bashpre", inp=commit)[0]
++    g("commit", "-qam", "CLAUDE.md: another rule")
++    after = row("claudemd-keeper")
++    chk, gate, post = rb("check", inp="{}"), rb("gate", inp=edit)[0], rb("bashpost", inp=commit)[1]
++    scenario("review backlog: an uncommitted CLAUDE.md edit is due and refuses the commit until its reviewer passes it",
++             due == ["1/1", "0/1", True] and refused == 2 and allowed == 0, (due, refused, allowed))
++    scenario("review backlog: committing the reviewed CLAUDE.md edit leaves the pillar not due "
++             "(status, check, gate, bashpost)",
++             after == ["0/1", "0/1", False] and chk == (0, "") and gate == 0 and "block" not in post,
++             (after, chk, gate, post))
++    open(os.path.join(repo, "mod.py"), "a").write("y = 2\n")
++    g("commit", "-qam", "unrelated code")
++    still = row("claudemd-keeper")
++    open(os.path.join(repo, "CLAUDE.md"), "a").write("3. a third rule\n")
++    again, gate2 = row("claudemd-keeper"), rb("gate", inp=edit)[0]
++    scenario("review backlog: other commits keep it not due; a further CLAUDE.md edit makes it due again",
++             still[2] is False and again == ["1/1", "0/1", True] and gate2 == 2, (still, again, gate2))
++    rb("advance", "claudemd-keeper")
++    open(os.path.join(repo, "CLAUDE.md"), "a").write("4. a fourth\n")
++    scenario("review backlog: the reviewed text plus an edit made after the review is due",
++             row("claudemd-keeper")[2] is True, row("claudemd-keeper"))
++    open(os.path.join(repo, "big.py"), "w").write("".join("v%d = %d\n" % (i, i) for i in range(700)))
++    rb("advance", "repo-reviewer")
++    g("add", "big.py"); g("commit", "-qm", "big module")
++    reviewed = row("repo-reviewer")
++    open(os.path.join(repo, "big.py"), "a").write("".join("w%d = %d\n" % (i, i) for i in range(5)))
++    counted = row("repo-reviewer")
++    scenario("review backlog: a reviewed untracked module, once committed, owes nothing; "
++             "a later edit counts only its own lines",
++             reviewed == ["0/600", "0/30", False] and counted == ["5/600", "0/30", False], (reviewed, counted))
++
++
+ SM = os.path.join(ROOT, "sweep", "sweep_manager.py")
+ 
+ 
+@@ -1701,7 +1761,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
+           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
+           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
+           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
+-          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, sweeps, open_questions,
++          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
+           the_suite_itself]
+ 
+ 
