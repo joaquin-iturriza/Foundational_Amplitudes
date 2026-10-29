@@ -424,6 +424,11 @@ entries:
     searched: CLAUDE.md rule 4 forbids deleting on clusters without the user's call; no decision in force covers freeing space
       or a quota request
     blocks: 'step 1 and the resubmission of step 4''s failed reads: every job on CC'
+  - ask: CC's group space /sps/lpnhe is full (512G of 512G). Free space through the pruning tool, or will you ask CC for more
+      quota?
+    at: '2026-10-29T18:38:52+00:00'
+    searched: 'CLAUDE.md rule 4 and site decisions: no decision covers freeing space on CC'
+    blocks: 'steps 1, 2 and 4: every job on CC'
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -1271,13 +1276,11 @@ entries:
         difficulty; the shape lever is capacity and training length, recorded for the full pretraining''s design'
       - 'e and the log-log residual disagree on a group''s side of 0.3: report that group as unresolved with both numbers,
         no decision'
-  ask: 'CC''s group space /sps/lpnhe is full (512G of 512G; ours about 290G: data cache 76G, run directories 50G, datasets
-    51G). Free space through the pruning tool, or will you ask CC for more quota? And cancel our 91 running generation jobs
-    until then?'
-  waiting_since: '2026-10-29T18:18:03+00:00'
-  searched: CLAUDE.md rule 4 forbids deleting on clusters without the user's call; no decision in force covers freeing space
-    or a quota request
-  blocks: 'step 1 and the resubmission of step 4''s failed reads: every job on CC'
+  ask: CC's group space /sps/lpnhe is full (512G of 512G). Free space through the pruning tool, or will you ask CC for more
+    quota?
+  waiting_since: '2026-10-29T18:38:52+00:00'
+  searched: 'CLAUDE.md rule 4 and site decisions: no decision covers freeing space on CC'
+  blocks: 'steps 1, 2 and 4: every job on CC'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
