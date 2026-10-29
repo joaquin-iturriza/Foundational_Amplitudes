@@ -597,6 +597,31 @@ entries:
       12 GPU-h, the arm''s two plus the control''s two) are proposed to the user as a question, not run, and the A/B search
       above is not run on an inconclusive read (it answers a no, not a near-tie). In every case the result goes in docs/results.tex
       beside par:v3_prep_signed, under catalog_v4.'
+    fix_at: '2026-10-29T05:38:20+00:00'
+    fix: 'Both points of the 05:22 review are fixed: the no branch now runs the A/B rule-4 search (8-trial single-fidelity
+      Muon DyHPO at 4264 steps, lr [3e-3, 2.7e-2], Muon weight decay [1e-3, 0.3], warmup/eta_min/EMA at trial_1860''s, as
+      par:v3_muon stage 2 and sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml), costed under 30 GPU-h, with the control''s
+      search going to the user; the inconclusive branch proposes seeds 3 and 4 to the user; prior (1) quotes 0.97, 1.17/2.15
+      (mean 1.58) and the 1 to 10 TeV axis inside the spread, and the yes branch carries the 2->5 cost. The revision introduces
+      two problems. (A) Check 5, prior incomplete: catalog_v3''s more-signed-pools arm was also run with Muon, and that is
+      the prior closest to this design (Muon plus the extension), but prior names only the AdamW runs. Missing: the Muon run
+      of the extension arm at lr 5e-3 / warmup 0.158 (FA-ccin2p3-0a9d3d4c, held-out wrong-sign median 3.8%); the 20-trial
+      sign head search on that arm (sweep sign_head_search, docs/results.tex near line 2878); and the pair-head test''s controls,
+      the extension arm with Muon at lr 1.246e-2 and seeds 42/43 (FA-ccin2p3-19971006, -36586b54; the seed-43 control blew
+      up). Fix: quote them with their numbers and say what they mean for this design. (B) Check 2, applied to the new no-branch
+      search: the search ranks trials by val_loss_no_reg, and the sign head search on this same arm showed that objective
+      cannot see the sign. It ran at 1.18 to 1.25 times the magnitude loss in every trial, its rank correlation with the learning
+      rate was -0.89, and the training pools'' wrong-sign median separated nothing across trials. So the ''best'' trial that
+      would decide the no branch is chosen on magnitude and learning rate, the 2026-10-26 failure mode. Its window also goes
+      up to 2.7e-2, while on catalog_v3 this arm blew up from 8.96e-3 (4 of 7 trials at or above it) and at 1.246e-2 even
+      without the pair head. Fix: either select the arm''s best trial on a quantity that sees the sign (the logged wrong-sign
+      share of the sign-changing training pools'' validation events, as data/sign_head_search_signlog.txt, or a named combination),
+      or state why a magnitude-tuned best is the fair rule-4 comparison and that the sign read on it is the decision. Then
+      say how blow-ups are handled in the search and the best-against-best read (reported at the best checkpoint, and whether
+      a blown-up best is replaced by the next trial), with the lr window justified against those blow-ups. Minor, not failing:
+      the 3 GPU-h per run is padded. The controls ran about 1.6 h each (339ec100 / 380842ed, 16:10 to 17:47), and catalog_v3''s
+      extension arm about 1.9 h against its baseline''s 1.7 h, so the search''s 27 GPU-h is nearer 16; state the measured
+      number (CLAUDE.md: sized, never padded).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
