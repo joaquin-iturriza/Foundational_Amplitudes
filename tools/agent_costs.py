@@ -3,7 +3,8 @@
 read from the Agent tool calls themselves, never from prompt text (2026-10-29: a keyword filter on prompts called
 167 agents mechanical because the step-prompt template mentions collect_run; the launch parameter gives 23).
 
-  python3 tools/agent_costs.py [SESSION_ID]      (default: the newest session of this project)
+  python3 tools/agent_costs.py [SESSION_ID] [--after YYYY-MM-DDTHH:MM]   (default: the newest session; --after: only
+                                                                        agents launched after that time, UTC)
 
 Per group: agents, median tool calls, median context at start, median tokens re-read over the agent's calls (each
 call re-reads the whole context), and the group's share of all agents' re-read tokens."""
@@ -14,6 +15,9 @@ PROJ = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA")
 
 
 def main(argv):
+    after = ""
+    if "--after" in argv:
+        i = argv.index("--after"); after = argv[i + 1]; argv = argv[:i] + argv[i + 2:]
     sid = argv[1] if len(argv) > 1 else os.path.basename(max(glob.glob(PROJ + "/*.jsonl"), key=os.path.getmtime))[:-6]
     launch, ids = {}, {}
     for line in open(os.path.join(PROJ, sid + ".jsonl")):
@@ -24,7 +28,7 @@ def main(argv):
         for x in c:
             if not isinstance(x, dict):
                 continue
-            if x.get("type") == "tool_use" and x.get("name") == "Agent":
+            if x.get("type") == "tool_use" and x.get("name") == "Agent" and (r.get("timestamp") or "") >= after:
                 i = x.get("input") or {}
                 launch[x["id"]] = (i.get("subagent_type") or "general-purpose", i.get("effort") or "default",
                                    i.get("model") or "inherit")

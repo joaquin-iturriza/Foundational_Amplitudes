@@ -66,6 +66,8 @@ The step
 Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
 to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
 only in docs/results.tex, over 30 GPU-h (10 on Jean Zay) only if the user's words above cover it.
+A pillar reviewer you launched that blocked is re-checked by continuing it (SendMessage to it with the fix commits),
+never by launching a new one.
 Reading costs: every tool call re-reads your whole context, so calls, not lines, are what is expensive.
 - Read what you need in few calls: one `grep -n` over all the files that may hold it, then one `sed -n` (or Read) of
   each whole function or paragraph you need, several files in one Bash call; never a file in many small slices.
