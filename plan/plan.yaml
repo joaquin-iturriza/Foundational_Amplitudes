@@ -3164,6 +3164,20 @@ entries:
       a sweep of the pp arm would be owed only if it loses on (a) by less than the spread and the user wants it settled. Cost:
       2 short pretrainings, about 1.5 GPU-h each (estimate from par:v4_vs_pp''s 3 GPU-h), plus about 0.5 GPU-h of reads, 3.5
       GPU-h (6.5 with the control rerun), under the 30 GPU-h budget.'
+    passed_at: '2026-10-29T16:57:24+00:00'
+    reviewer: 'Amendment to the design passed 2026-10-29T16:09, the two changed lines checked, the rest as passed. (1) Count
+      read from recipes/catalog_v4_pp_mixed_train.yaml: 1153 entries = 466 pp13v4_ + 331 pp13_ + 356 catalog_v4 own, matching
+      the 797 swapped classes now stated in question, fixed and control. (2) Reads: uncommitted diff of tools/zero_shot_parent.py
+      adds --split {val,test} through rebuild_run.scored_split (test_loader, the test pool path for the physics check, test
+      indices for the per-event factor); experiment.py caps val and test alike by eval_subsample, so the first 2000 test rows
+      are read (all of a 2e3 pp test pool); job_catalog_v3_short.sh passes --split test on PP4 only, so arm and controls''
+      mode-eval read the same test pools and the arm''s checkpoint-selection val pools are never scored. (b) for the 797 training
+      classes on their catalog_v4 test pools is stated as owed before it is reported; the yes/no rests on (a), so the job
+      can answer without it. Checks 2 and 3 unchanged from the pass: measure moved 0.19-0.26 on catalog_v3, 0.66/0.58 on catalog_v4
+      with scatter 0.50/0.36 above seed spread 0.10/0.14. Check 5 re-searched: results.tex for dimensionless_muon_pp, Muon
+      pp, pp_mixed_train (only par:v4_vs_pp''s line naming this arm as not run); site decisions of 2026-10-29 (D171-D179:
+      none bears on this comparison). Implementation note: tests/test_zero_shot_split.py does not exist yet and the diff is
+      uncommitted; both must land before the submission.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
