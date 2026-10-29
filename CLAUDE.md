@@ -103,7 +103,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
      decision without the work it named, is a bug; `plan design --prior` records the search and the design reviewer
      redoes it.
    - **Questions.** Before a question reaches me, the rules here and `site decisions --project FA` are searched for
-     what settles it; only a call none of them settles is asked, in a message to me, and recorded with `plan ask
+     what settles it; only a call none of them settles is asked, in a message to me (a decision of mine in force is
+     followed, never re-asked in other words or argued around: a doubt about it goes in the message, the work goes on), and recorded with `plan ask
      <entry> --ask "<the question>" --searched "<what was read, and why none settles it>" --blocks "<what waits on it>"`. My answer goes in with
      `plan answer <entry> --kind K --quote "<my words>"`, which records the decision and changes the entry in one step.
      Inside a running entry I approved, a new step (a design, an analysis, a job under the GPU budget of 2) goes ahead without
