@@ -119,17 +119,16 @@ entries:
   - D165
   - D170
   - D175
-  next: 'Submit catalog_v4''s one-loop sign extension (built at f5949014; the design passed 2026-10-29 05:39 unlocks submission
-    until 2026-10-30 05:39): site sync, site pick FA --jobs 3, then scripts/job_catalog_v4_signext.sh (CPU: build, certify,
-    generate the 123 one-loop pools, audit, train recipe at $SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml, alpha_s
-    and sidecars; refuses with exit 3 when over a fifth fail certification) and the two pretrainings scripts/job_catalog_v3_short.sh
+  next: 'Once site env ccin2p3 FA passes (CC''s environment check is being repaired on catalog_coverage; site pick FA --jobs
+    3 at 2026-10-29 avoided CC: ''setup incomplete: not runnable: .venv/lib/python3.11/...''; Jean Zay down, lxplus not deployed
+    and the catalog_v4 pools exist only on CC), submit catalog_v4''s one-loop sign extension (built at f5949014; the design
+    passed 2026-10-29 05:39 unlocks submission until 2026-10-30 05:39): site sync ccin2p3 FA, site pick FA --jobs 3, then
+    scripts/job_catalog_v4_signext.sh (CPU: build, certify, generate the 123 one-loop pools, audit, train recipe at $SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml,
+    alpha_s and sidecars; exit 3 when over a fifth fail certification) and the two pretrainings scripts/job_catalog_v3_short.sh
     v4_dimensionless_muon_more_signed and v4_dimensionless_muon_more_signed_seed2 (--hdr=--mem=48G, about 1.8 GPU-h each)
-    chained afterok on it, each with --item v3_prep_explore, recorded with plan run. Not submitted 2026-10-29: the main session
-    operates on no CC-IN2P3 command while its login notice forbids generative AI tools, Jean Zay is not asked for by the user,
-    and lxplus is not deployed (site pick: setup incomplete, no .venv); the catalog_v4 training and held-out pools exist only
-    on CC, so a site other than CC also needs them copied there first. Expected certification failures to name in the write-up:
-    one-loop entries with an internal top that can go on shell (e.g. v4_udx_bbxwp, v4_bbx_awpwm, v4_ub_bdwp) get no width
-    tolerance or zero-width override. If the 24 h window lapses, the design is re-recorded and re-reviewed before submission.'
+    chained afterok on it, each with --item v3_prep_explore, recorded with plan run. Note: site sync refuses on untracked
+    files not of this entry (analysis/ponytail_ab/*2*, docs/glossary.txt, tests/*_output.txt); pass --allow-dirty (only committed
+    work is pushed). If the 24 h window lapses, the design is re-recorded and re-reviewed before submission.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
