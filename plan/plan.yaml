@@ -3070,6 +3070,13 @@ entries:
     withdrawn_why: 'D178 settles the mixing on every beam; the share is what the A/B measures (0.25 and 0.50 arms, one generation
       at 0.50 covers both); the rest at defaults: standard e+e- energies (91.1876 above threshold, 240, 365, 500, 1000, 3000
       GeV), the catalog''s own cuts, no ISR, one-loop and variant pools unchanged until the tree result'
+  - ask: 'CC''s group space /sps/lpnhe is full (512G of 512G; ours about 290G: data cache 76G, run directories 50G, datasets
+      51G). Free space through the pruning tool, or will you ask CC for more quota? And cancel our 91 running generation jobs
+      until then?'
+    at: '2026-10-29T18:18:02+00:00'
+    searched: CLAUDE.md rule 4 forbids deleting on clusters without the user's call; no decision in force covers freeing space
+      or a quota request
+    blocks: 'steps 1, 6 and 7: every resubmission and new job on CC'
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -3419,6 +3426,13 @@ entries:
       - 'every pool assembled and the pp validation passed: design the A/B pretrainings (default share 0.50 and 0.25 against
         catalog_v4), with the user''s calls on fractions and e+e- energies asked first if still open'
       - 'tasks failed or pools short: list them with their cause, fix and requeue only those, then collect again'
+  ask: 'CC''s group space /sps/lpnhe is full (512G of 512G; ours about 290G: data cache 76G, run directories 50G, datasets
+    51G). Free space through the pruning tool, or will you ask CC for more quota? And cancel our 91 running generation jobs
+    until then?'
+  waiting_since: '2026-10-29T18:18:02+00:00'
+  searched: CLAUDE.md rule 4 forbids deleting on clusters without the user's call; no decision in force covers freeing space
+    or a quota request
+  blocks: 'steps 1, 6 and 7: every resubmission and new job on CC'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
