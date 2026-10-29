@@ -119,9 +119,14 @@ entries:
   - D165
   - D170
   - D175
-  next: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
-    says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
-    median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
+  next:
+    1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
+      says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
+      median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
+    2: 'Continuous CPU exploration while the sign extension runs (the user''s ''Keep iterating.''): pick the most informative
+      open idea on existing catalog_v4 data (the control pair''s reads, the pools on CC, docs/results.tex''s open items of
+      this study), run it as a CPU analysis, write it up with provenance, and set the next exploration step; never wait on
+      the GPU runs'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
