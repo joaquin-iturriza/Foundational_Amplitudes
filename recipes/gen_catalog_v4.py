@@ -55,6 +55,7 @@ OUT_SIGNEXT_AUDIT = os.path.join(ROOT, "analysis", "catalog_v4", "data", "signex
 COLOURED = {1, 2, 3, 4, 5, 21}
 QUARKS = {1, 2, 3, 4, 5, 6}
 CHECKED = os.path.join(ROOT, "analysis", "catalog_v4", "data", "checked.json")
+MIXED_AUDIT = os.path.join(ROOT, "analysis", "catalog_v4", "data", "mixed_order_audit.json")   # tools/mixed_order_audit.py
 LOOP_MODEL = {"loop_sm": "loop_sm-no_b_mass", "loop_qcd_qed_sm": "loop_qcd_qed_sm-no_b_mass"}
 # the v3 stage and training recipes mapped to v4
 # (the generation stages only: the training and held-out recipes come from catalog_v4's own classes and roles,
@@ -300,6 +301,8 @@ def signext_trees(P=None, roles=None):
             held |= {e["name"] for e in load(os.path.join(HERE, f))["processes"]}
     bad = sorted(n for n in trees for m in members.get(n, [n]) if m in loop_trees or m in held or m + "_nlo" in held)
     assert not bad, bad
+    MIXED = json.load(open(MIXED_AUDIT))["entries"]
+    assert all(n in MIXED for n in trees), sorted(n for n in trees if n not in MIXED)
     # held-out probes that are physics variants of a training class (alpha_s points, energy probes, heavy quark): the
     # tree of those classes trains already; listed, not excluded (the one-loop pool is no held-out pool's process)
     var = {"alphas_heldout": sorted({v["base"] for v in roles["alphas"].values() if v["role"] != "train"} & set(trees)),
@@ -310,7 +313,12 @@ def signext_trees(P=None, roles=None):
            "twin_out": sorted(set(roles["twin_out"]) & set(trees)),
            "held_out_families_parents": sorted(set(roles["held_out_families"]) & set(trees))}
     audit = {"n": len(trees), "by_beams": dict(Counter(n.split("_")[1] for n in trees)),
-             "mixed_order_born": sorted(n for n in trees if qed_max(P[n]["pdg_ids"]) > 3 - int(P[n].get("alphas_power", 0))),
+             # read from the trees' diagrams (tools/mixed_order_audit.py: more than one amplitude-level QCD power), not
+             # from the QED bound: with massless b the three b-Higgs trees have no Yukawa diagram and are pure
+             # electroweak at full order, though QED<=3 exceeds 3 - alphas_power (listed under qed_bound_only)
+             "mixed_order_born": sorted(n for n in trees if MIXED[n]["mixed"]),
+             "qed_bound_only": sorted(n for n in trees if not MIXED[n]["mixed"]
+                                      and qed_max(P[n]["pdg_ids"]) > 3 - int(P[n].get("alphas_power", 0))),
              "one_loop_classes": len(loop_cls), "training_classes": sum(v["role"] == "train" for v in roles["trees"].values()),
              "checked": "role train, not the class of any one-loop pool (the filter); then no member of the class is the tree of "
                         "any one-loop pool or a pool of any catalog_v4_heldout_*.yaml (the assertion)",
@@ -318,9 +326,19 @@ def signext_trees(P=None, roles=None):
     return trees, audit
 
 
+def signext_names(trees, audit):
+    """tree -> its sign-extension entry's name: v4_<x>_nlo, v4_<x>_qcdborn_nlo for a mixed-order born"""
+    mixed = set(audit["mixed_order_born"])
+    return {n: n + ("_qcdborn_nlo" if n in mixed else "_nlo") for n in trees}
+
+
 def write_loops_signext():
     """The one-loop sign extension: [virt=QCD] of every signext_trees class on its catalog_v4 tree string (full
-    coupling orders), model, cuts, measure and top width, as loop_entries' (role signext), to
+    coupling orders), model, cuts, measure and top width, as loop_entries' (role signext); a class whose tree mixes QCD
+    and electroweak powers (the audit's mixed_order_born) takes the pure-QCD born instead, as the QCD_BORN entries: the
+    tree string without its QED bound (MadGraph's minimal QED order, the largest QCD power alone), which order_vector
+    encodes as the lower electroweak maximum, under the names v4_<x>_qcdborn / v4_<x>_qcdborn_nlo (D142, see QCD_BORN);
+    to
     recipes/catalog_v4_loops_signext.yaml, and their generation recipe at 1e4 / 1e3 / 1e3 in the v4 mixture and the
     tree's window, recipes/catalog_v4_gen_signext.yaml; the class audit to analysis/catalog_v4/data/signext_classes.json.
     No string is fixed by hand: an entry whose MadLoop build or pole certification fails is dropped by the generation
@@ -331,21 +349,30 @@ def write_loops_signext():
     P = load(OUT_PROC)["processes"]
     trees, audit = signext_trees(P)
     virt, procs = {}, {}
+    mixed = set(audit["mixed_order_born"])
+    names = signext_names(trees, audit)
     for n in trees:
-        e = P[n]; pdg = list(e["pdg_ids"])
+        e = P[n]; pdg = list(e["pdg_ids"]); vb = names[n][:-len("_nlo")]
         assert n not in mg.PROCESSES or mg.PROCESSES[n].get("_v4"), n
-        virt[n] = {"mg5": e["mg5_generate"][0] + " [virt=QCD]", "model": LOOP_MODEL["loop_sm"], "pdg_ids": pdg,
-                   "m_finals": list(e["m_finals"]), "certified": False, "param_card_patches": {"WT": mg.V4_WT},
-                   **common(pdg)}
-        procs[n + "_nlo"] = {"kind": "virt", "virt": True, "virt_base": n, "nfinal": int(e["nfinal"]), "n_loops": 1,
+        born = e["mg5_generate"][0]
+        if n in mixed:   # the pure-QCD born: the tree string without its QED bound (v4_string's inverse)
+            born = re.sub(r"\s+QED<=\d+$", "", born)
+            assert born != e["mg5_generate"][0] and "QED" not in born, (n, born)
+        virt[vb] = {"mg5": born + " [virt=QCD]", "model": LOOP_MODEL["loop_sm"], "pdg_ids": pdg,
+                    "m_finals": list(e["m_finals"]), "certified": False, "param_card_patches": {"WT": mg.V4_WT},
+                    **common(pdg)}
+        if n in mixed:
+            virt[vb]["qcd_born"] = True
+        procs[names[n]] = {"kind": "virt", "virt": True, "virt_base": vb, "nfinal": int(e["nfinal"]), "n_loops": 1,
                              "alphas_power": int(e.get("alphas_power", 0)) + 1, "pdg_ids": pdg,
                              "m_finals": list(e["m_finals"]), "param_card_patches": {}, "layer": "nlo",
-                             "why": f"one-loop QCD of {n} (sign extension)", "role": "signext", "certified": False,
+                             "why": f"one-loop QCD of {n}" + (" at its pure-QCD born" if n in mixed else "")
+                                    + " (sign extension)", "role": "signext", "certified": False,
                              **common(pdg)}
     hdr = "# catalog_v4's one-loop sign extension: generated by recipes/gen_catalog_v4.py --write-loops-signext; do not edit\n"
     with open(OUT_LOOPS_SIGNEXT, "w") as f:
         f.write(hdr); yaml.safe_dump({"virt": virt, "processes": procs}, f, sort_keys=True)
-    out = [{"name": n + "_nlo", "sqrts": window(P[n]), "n_train": 10000, "n_val": 1000, "n_test": 1000} for n in trees]
+    out = [{"name": names[n], "sqrts": window(P[n]), "n_train": 10000, "n_val": 1000, "n_test": 1000} for n in trees]
     with open(OUT_GEN_SIGNEXT, "w") as f:
         f.write(hdr + "# [virt=QCD] of every coloured 2->3 training tree class outside catalog_v4's one-loop layer, "
                 "1e4 / 1e3 / 1e3, the trees' windows, the v4 mixture\n")
@@ -353,7 +380,8 @@ def write_loops_signext():
     os.makedirs(os.path.dirname(OUT_SIGNEXT_AUDIT), exist_ok=True)
     json.dump(audit, open(OUT_SIGNEXT_AUDIT, "w"), indent=1)
     print(f"wrote {OUT_LOOPS_SIGNEXT}, {OUT_GEN_SIGNEXT} ({len(trees)} one-loop entries, by beams "
-          f"{audit['by_beams']}; {len(audit['mixed_order_born'])} with a mixed-order born) and {OUT_SIGNEXT_AUDIT}")
+          f"{audit['by_beams']}; {len(audit['mixed_order_born'])} with a mixed-order born, on the pure-QCD born) and "
+          f"{OUT_SIGNEXT_AUDIT}")
 
 
 def check(workers, out, only=None):

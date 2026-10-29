@@ -26,16 +26,13 @@
  },
  "mixed_order_born": [
   "v4_bb_bbg",
-  "v4_bb_bbh",
   "v4_bbx_abbx",
   "v4_bbx_accx",
   "v4_bbx_bbxg",
-  "v4_bbx_bbxh",
   "v4_bbx_bbxz",
   "v4_bbx_ccxg",
   "v4_bbx_ccxz",
   "v4_db_bdg",
-  "v4_db_bdh",
   "v4_db_buwm",
   "v4_dbx_abxd",
   "v4_dbx_bxdg",
@@ -75,6 +72,11 @@
   "v4_uux_ddxz",
   "v4_uux_guux",
   "v4_uux_uuxz"
+ ],
+ "qed_bound_only": [
+  "v4_bb_bbh",
+  "v4_bbx_bbxh",
+  "v4_db_bdh"
  ],
  "one_loop_classes": 119,
  "training_classes": 912,

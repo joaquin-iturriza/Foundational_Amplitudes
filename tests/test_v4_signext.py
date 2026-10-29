@@ -34,13 +34,30 @@ def test_written_entries_match_their_trees():
     P = G.load(G.OUT_PROC)["processes"]
     L = G.load(G.OUT_LOOPS_SIGNEXT)
     gen = yaml.safe_load(open(G.OUT_GEN_SIGNEXT))
-    trees, _ = G.signext_trees(P)
-    assert sorted(L["virt"]) == trees and sorted(L["processes"]) == [n + "_nlo" for n in trees]
+    trees, audit = G.signext_trees(P)
+    mixed = set(audit["mixed_order_born"])
+    # the diagrams decide which borns mix QCD and electroweak powers (the three b-Higgs trees only exceed the QED bound)
+    MIX = json.load(open(G.MIXED_AUDIT))["entries"]
+    assert mixed == {n for n in trees if len(MIX[n]["amp_qcd_orders"]) > 1} and len(mixed) == 47
+    assert audit["qed_bound_only"] == ["v4_bb_bbh", "v4_bbx_bbxh", "v4_db_bdh"]
+    names = G.signext_names(trees, audit)
+    assert sorted(L["virt"]) == sorted(x[:-len("_nlo")] for x in names.values())
+    assert sorted(L["processes"]) == sorted(names.values()) == sorted(p["name"] for p in gen["processes"])
+    import mg5_pipeline_final as mg
     for n in trees:
-        v, e = L["virt"][n], L["processes"][n + "_nlo"]
-        assert v["mg5"] == P[n]["mg5_generate"][0] + " [virt=QCD]" and "QED<=" in v["mg5"]
+        e = L["processes"][names[n]]; v = L["virt"][names[n][:-len("_nlo")]]
+        assert e["virt_base"] == names[n][:-len("_nlo")]
+        tree = P[n]["mg5_generate"][0]
+        if n in mixed:   # D142: the pure-QCD born, its lower electroweak maximum in the order vector
+            assert names[n] == n + "_qcdborn_nlo" and v["qcd_born"] is True
+            assert v["mg5"] == tree.rsplit(" QED<=", 1)[0] + " [virt=QCD]" and "QED" not in v["mg5"]
+            k = int(P[n]["alphas_power"])
+            assert MIX[n]["k_max"] == k and mg.order_vector(e) == [1, 0, k, int(P[n]["nfinal"]) - k]
+        else:
+            assert names[n] == n + "_nlo" and "qcd_born" not in v
+            assert v["mg5"] == tree + " [virt=QCD]" and "QED<=" in v["mg5"]
         assert v["model"] == "loop_sm-no_b_mass" and v["param_card_patches"]["WT"] == 1.4915
-        assert e["alphas_power"] == int(P[n].get("alphas_power", 0)) + 1 and e["virt_base"] == n
+        assert e["alphas_power"] == int(P[n].get("alphas_power", 0)) + 1
         assert e["fiducial_cuts"] == P[n]["fiducial_cuts"] and e["sqrts_measure"] == "log"
     assert all(p["n_train"] == 10000 and p["n_val"] == 1000 and p["n_test"] == 1000 for p in gen["processes"])
     assert gen["sampling"] == yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_gen_stage2.yaml")))["sampling"]

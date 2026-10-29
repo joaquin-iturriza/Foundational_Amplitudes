@@ -5,7 +5,7 @@ sampling:
   f_fwd: 0.15
   fwd_cand: 0.3333333333333333
 processes:
-- name: v4_bb_bbg_nlo
+- name: v4_bb_bbg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -26,14 +26,14 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_bbx_abbx_nlo
+- name: v4_bbx_abbx_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_bbx_accx_nlo
+- name: v4_bbx_accx_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -54,7 +54,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_bbx_bbxg_nlo
+- name: v4_bbx_bbxg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -68,21 +68,21 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_bbx_bbxz_nlo
+- name: v4_bbx_bbxz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_bbx_ccxg_nlo
+- name: v4_bbx_ccxg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_bbx_ccxz_nlo
+- name: v4_bbx_ccxz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
@@ -159,7 +159,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_db_bdg_nlo
+- name: v4_db_bdg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -173,63 +173,63 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_db_buwm_nlo
+- name: v4_db_buwm_qcdborn_nlo
   sqrts:
   - 101
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dbx_abxd_nlo
+- name: v4_dbx_abxd_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dbx_bxdg_nlo
+- name: v4_dbx_bxdg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dbx_bxuwm_nlo
+- name: v4_dbx_bxuwm_qcdborn_nlo
   sqrts:
   - 101
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dd_duwm_nlo
+- name: v4_dd_duwm_qcdborn_nlo
   sqrts:
   - 101
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ddx_auux_nlo
+- name: v4_ddx_auux_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ddx_bbxg_nlo
+- name: v4_ddx_bbxg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ddx_duxwp_nlo
+- name: v4_ddx_duxwp_qcdborn_nlo
   sqrts:
   - 101
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ddx_guux_nlo
+- name: v4_ddx_guux_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -257,7 +257,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ddx_uuxz_nlo
+- name: v4_ddx_uuxz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
@@ -278,7 +278,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dg_bbxd_nlo
+- name: v4_dg_bbxd_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -292,7 +292,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dg_duux_nlo
+- name: v4_dg_duux_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -320,7 +320,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_dsx_cxdwp_nlo
+- name: v4_dsx_cxdwp_qcdborn_nlo
   sqrts:
   - 101
   - 6000
@@ -397,49 +397,49 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ub_abu_nlo
+- name: v4_ub_abu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ub_bdwp_nlo
+- name: v4_ub_bdwp_qcdborn_nlo
   sqrts:
   - 101
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ub_bgu_nlo
+- name: v4_ub_bgu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ubx_abxu_nlo
+- name: v4_ubx_abxu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ubx_bxdwp_nlo
+- name: v4_ubx_bxdwp_qcdborn_nlo
   sqrts:
   - 101
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ubx_bxuz_nlo
+- name: v4_ubx_bxuz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uc_cgu_nlo
+- name: v4_uc_cgu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -460,7 +460,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ucx_cxgu_nlo
+- name: v4_ucx_cxgu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -474,7 +474,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ud_dgu_nlo
+- name: v4_ud_dgu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -488,7 +488,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ud_duz_nlo
+- name: v4_ud_duz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
@@ -530,7 +530,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_udx_bbxwp_nlo
+- name: v4_udx_bbxwp_qcdborn_nlo
   sqrts:
   - 101
   - 6000
@@ -558,7 +558,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_udx_dxgu_nlo
+- name: v4_udx_dxgu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -572,7 +572,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_udx_dxuz_nlo
+- name: v4_udx_dxuz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
@@ -649,7 +649,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ug_ccxu_nlo
+- name: v4_ug_ccxu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -663,7 +663,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_ug_uuux_nlo
+- name: v4_ug_uuux_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -684,7 +684,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_us_cuwm_nlo
+- name: v4_us_cuwm_qcdborn_nlo
   sqrts:
   - 101
   - 6000
@@ -698,7 +698,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_usx_cxuwp_nlo
+- name: v4_usx_cxuwp_qcdborn_nlo
   sqrts:
   - 101
   - 6000
@@ -712,21 +712,21 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uu_guu_nlo
+- name: v4_uu_guu_qcdborn_nlo
   sqrts:
   - 30
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uu_uuz_nlo
+- name: v4_uu_uuz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_addx_nlo
+- name: v4_uux_addx_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -747,7 +747,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_auux_nlo
+- name: v4_uux_auux_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -768,14 +768,14 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_bbxz_nlo
+- name: v4_uux_bbxz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_ccxg_nlo
+- name: v4_uux_ccxg_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -789,7 +789,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_ddxz_nlo
+- name: v4_uux_ddxz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
@@ -803,7 +803,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_guux_nlo
+- name: v4_uux_guux_qcdborn_nlo
   sqrts:
   - 30
   - 6000
@@ -845,7 +845,7 @@ processes:
   n_train: 10000
   n_val: 1000
   n_test: 1000
-- name: v4_uux_uuxz_nlo
+- name: v4_uux_uuxz_qcdborn_nlo
   sqrts:
   - 112
   - 6000
