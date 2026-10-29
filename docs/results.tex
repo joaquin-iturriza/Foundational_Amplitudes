@@ -1642,6 +1642,71 @@ beside the MSE, or the spread of the level hides the shape.
   \label{fig:v4_kshot_level}
 \end{figure}
 
+\paragraph{What sets catalog\_v4's one-loop zero-shot level (2026-10-29).}\label{par:v4_loop_levels} The question, from
+the paragraph above: a third of catalog\_v4's one-loop zero-shot error is one number per pool; is that because a
+held-out one-loop pool's level lies outside the levels the training one-loop pools span, so the network has to
+extrapolate it, or inside that range and placed wrong; and does the error follow the pool's properties (born coupling
+orders, pure-QCD or full-order born, multiplicity, initial state, loop-induced or virtual), as the level reads on
+Daniel's catalog asked (par.~\ref{par:kshot_level}, \code{analysis/catalog\_daniel/level\_range.py}). No new run: the
+same two pretrainings and zero-shot offsets as above (the mean of $q-t$ per pool, both seeds), against each pool's level
+$\overline t$, the mean of its target $t=\log(|\mathcal M|^2F)$ on its train split ($F$ the pretraining's
+emission-scale factor), computed on CC from the pretraining's own config with per-pool statistics
+(\code{analysis/catalog\_v4/loop\_levels.py}, Fig.~\ref{fig:v4_loop_levels}). The held-out levels agree with the train
+means the zero-shot reads saved, to $0.016$. Each held-out pool is matched to the training one-loop pools of the same
+multiplicity, initial state and born orders, one rule; its departure is $\overline t$ minus their mean level, and an
+offset equal to minus the departure is what a network that predicts that mean would make.
+% src: python3 analysis/catalog_v4/loop_levels.py @4c35f489
+% claim: n_train=108
+% claim: n_heldout=28
+% claim: train_level_min=-9.2
+% claim: train_level_max=6.79
+% claim: train_level_sd=3.94
+% claim: outside_all=1
+% claim: level.v4_bbx_ccxh_nlo=-9.27
+% claim: median_nearest_in_sd=0.01
+% claim: level_check_maxabs=0.016
+% claim: n_matched=23
+% claim: n_unmatched=5
+% claim: median_abs_departure=1.5
+% claim: median_abs_offset_matched=0.24
+% claim: n_closer_than_match=17
+% claim: n_closer_seed42=18
+% claim: n_closer_seed43=17
+% claim: corr_departure_offset=-0.4
+% claim: n_train_ee=4
+% claim: departure.v4_epem_bbx_nlo=-0.61
+% claim: departure.v4_bbx_ccxh_nlo=-11.02
+% claim: departure.v4_gg_zh_loop=-1.48
+% claim: departure.v4_bg_ab_nlo=-3.67
+% allow: 2 because it is the count of the seeds, a setting
+The $108$ training one-loop pools span $\overline t\in[-9.20,6.79]$ (spread $3.94$); of the $28$ held-out pools one lies
+outside, $b\bar b\to c\bar cH$ at one loop ($-9.27$, just below the lowest), and the median held-out pool sits $0.01$
+training spreads from the nearest training level. So the one-loop levels are interpolations, not extrapolations: the
+level error is a misplacement inside the range. $23$ held-out pools have matched training pools; $5$ have none
+($bg\to bgg$, $dg\to dgZ$, $dg\to uW^-$, $e^+e^-\to c\bar cg$, $gg\to b\bar bg$). On the $23$ the network places the
+level well beyond its property class: the median departure is $1.50$ in size, the median offset $0.24$, and the offset is
+the smaller on $17$ of them (seed by seed $18$ and $17$); offset and departure correlate at $-0.40$. The offsets left are
+not set by one property: pure-QCD and full-order borns, $2\to2$ and $2\to3$, loop-induced and virtual carry offsets of
+both signs. Two kinds of pool carry the largest. $b\bar b\to c\bar cH$ departs $-11.02$ from the two $b\bar b$ pools of
+its orders (its Higgs couples to the charm, not the beam) and the network recovers most of that, not all; $bg\to\gamma b$
+departs $-3.67$ from its one match. And pools whose level is near their class but placed away from it: $e^+e^-\to b\bar
+b$ departs only $-0.61$ from its one match, yet carries one of the axis's two largest offsets in both seeds, and $gg\to ZH$, the
+loop-induced pool, $-1.48$ from the $gg$ pools of its orders with a larger offset. These sit in thin classes ($4$
+training $e^+e^-$ one-loop pools in all, each held-out $e^+e^-$ pool matched to at most one), so the level the network
+gives them is not its class mean but whatever its inputs map to from far-off classes. The one-loop level error is thus
+an interpolation error, largest where the pool's class has one or two training pools or none.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/loop_levels.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py @4c35f489
+  \caption{catalog\_v4's one-loop pools. Left: per pool its level $\overline t$, the train-split mean of the pretraining's
+    target, against its particle count, training pools and held-out pools, with the held-out pools' predicted level
+    $\overline t+\overline{q-t}$ (seed mean). Right: per held-out pool with matched training pools (same multiplicity, initial state and
+    born orders) its zero-shot offset (seed mean, bar half the seeds' difference) against its departure from their mean
+    level; the dashed line is the offset of a network that predicts that mean.}
+  \label{fig:v4_loop_levels}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
