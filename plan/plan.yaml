@@ -139,10 +139,21 @@ entries:
       class is in training) and against the same step of the training one-loop pools of its class (born orders, multiplicity,
       initial state; loop-induced and virtual apart); rank correlations per seed and on the seed mean, the positive share
       where the step is below and above the class''s, no fit, no threshold'
-    4: 'The zero-shot shape gap: the shape error var(q - t) of catalog_v4''s training pools on their own validation events
-      (in-distribution), per cell of multiplicity and initial state, against the held-out new-combination and multiplicity
-      pools in the same cells (par:v4_tree_shape); the training pools'' validation reads come from the control pair''s checkpoints
-      (a CPU eval on CC if not saved, with site pick and --item v3_prep_explore)'
+    4: 'The zero-shot shape gap, redesigned after the design review''s FIX of 2026-10-29 18:00 (plan show: the design''s review),
+      then the job: (a) the free read first: the control pair''s (FA-ccin2p3-339ec100, -380842ed) result.json per-process
+      val_loss_no_reg times the shared standardization''s sigma^2 (the conversion of docs/results.tex near line 2672, 0.50
+      against the scorer''s 0.51 on 40 catalog_v3 parents), 200 val events per pool with the offset in, as a first in-distribution
+      reference per cell of multiplicity and initial state; (b) the intrinsic-difficulty control: the shape proxy (analysis/catalog_v3/prep_shape.py,
+      CPU, par:v3_shape_proxy: per-class regressor MSE 0.059 on training classes against 0.077 held out on catalog_v3, rank
+      correlation 0.68 to 0.80 with the network''s zero-shot shape) run on catalog_v4''s training and held-out tree pools
+      in the same cells; decide on the network''s held-out over training floor ratio against the proxy''s ratio per cell (or
+      the network floor over the proxy MSE per pool), with a stated smallest log10 gap beyond the proxy''s ratio and the per-pool
+      seed spread of the existing short_reads; (c) record that design (plan design), run the design-reviewer, then submit
+      the two eval jobs, already wired: site sync ccin2p3 FA once, then scripts/job_catalog_v3_short.sh v4_dimensionless_muon
+      eval and v4_dimensionless_muon_seed2 eval with --env V3_AXES=TR --hdr=--mem=48G --hdr=--time=01:30:00 --item v3_prep_explore
+      (the TR axis, commits 94a18ed5 and d4700d3b: the training pools on their test split, 2000 events, all 1153 test pools
+      present on CC; collect with tools/collect_run.py --axes TR; about 0.5 GPU-h each), and extend analysis/catalog_v4/loop_levels.py
+      for the read'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1088,13 +1099,14 @@ entries:
         2''s grouping (top mass, loop-induced or virtual, born orders)'
     4:
       feeds: 'the user''s shape priority (D178): whether the 0.24 shape error of new processes with known particles is a generalisation
-        gap (held-out well above in-distribution) or the network''s floor at this compute (held-out near in-distribution),
-        which decides whether shape work targets transfer or capacity'
+        gap (held-out well above in-distribution, beyond the intrinsic difficulty the shape proxy measures) or the network''s
+        floor at this compute, which decides whether shape work targets transfer or capacity'
       if:
-      - 'held-out shape error well above in-distribution in the same cells: a transfer gap; design target or input priors
-        aimed at it, starting with the cells where the gap is largest (gluon-gluon, e+e-)'
-      - 'held-out close to in-distribution: the shape error is the fit''s floor at this compute; the shape lever is capacity
-        and training length, recorded for the full pretraining''s design'
+      - 'held-out shape error above in-distribution by more than the proxy''s ratio and the stated gap, in the same cells:
+        a transfer gap; design target or input priors aimed at it, starting with the cells where the gap is largest (gluon-gluon,
+        e+e-)'
+      - 'held-out within the proxy''s ratio of in-distribution: the shape error is the fit''s floor at this compute plus intrinsic
+        difficulty; the shape lever is capacity and training length, recorded for the full pretraining''s design'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
