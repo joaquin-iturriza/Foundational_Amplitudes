@@ -1776,6 +1776,15 @@ entries:
     withdrawn_at: '2026-10-29T05:12:23+00:00'
     withdrawn_why: the user ran the deletion themselves (2026-10-29); a dry run on CC finds all 19329 manifest files gone
       (would delete 0), /sps/lpnhe 71% used, 152 GB free (81%, 105.3 GB before)
+  - ask: CC-IN2P3's login notice now says generative AI tools such as Claude are not allowed on IN2P3 machines, including
+      through non-interactive commands, and site env there fails because the anaconda 3.11 module is now denied, so site pick
+      puts CC on avoid. Should the 13 TeV pp regeneration (8 CPU jobs of 48 cores, about 12 h each) still run on CC, with
+      you repairing its Python environment, or go to lxplus, where MadGraph is not yet verified and the reused pp pools would
+      have to be copied?
+    at: '2026-10-29T05:20:05+00:00'
+    searched: 'site decisions --project FA, CLAUDE.md (both), plan show catalog_coverage: D167 approves the regeneration but
+      no decision or rule covers the site''s AI-use policy; site pick plans lxplus, but its verify timed out'
+    blocks: next step 5 only (the pp regeneration submission); the deletion question is separate
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -1824,6 +1833,14 @@ entries:
       the outcome can be read. Searched: pp13v4, catalog_v4_pp, pp-trained, pp pools, massless b pp, regeneration, gen_daniel_catalog
       in results.tex, plan show, site runs, site decisions (D117, D119, D136, D161, D162, D163, D167): no earlier v4-physics
       pp generation.'
+  ask: CC-IN2P3's login notice now says generative AI tools such as Claude are not allowed on IN2P3 machines, including through
+    non-interactive commands, and site env there fails because the anaconda 3.11 module is now denied, so site pick puts CC
+    on avoid. Should the 13 TeV pp regeneration (8 CPU jobs of 48 cores, about 12 h each) still run on CC, with you repairing
+    its Python environment, or go to lxplus, where MadGraph is not yet verified and the reused pp pools would have to be copied?
+  waiting_since: '2026-10-29T05:20:05+00:00'
+  searched: 'site decisions --project FA, CLAUDE.md (both), plan show catalog_coverage: D167 approves the regeneration but
+    no decision or rule covers the site''s AI-use policy; site pick plans lxplus, but its verify timed out'
+  blocks: next step 5 only (the pp regeneration submission); the deletion question is separate
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
