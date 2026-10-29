@@ -146,15 +146,17 @@ def _load_catalog_v4_virt():
     fiducial_cuts, sqrts_measure, beam_masses (the five-flavour scheme: none massive) and param_card_patches (the top
     width at 172.5), read below in place of the global ones; no earlier entry has them."""
     import yaml as _yaml
-    path = os.path.join(ROOT, "recipes", "catalog_v4_loops.yaml")
-    if not os.path.exists(path):
-        return 0
-    d = _yaml.load(open(path), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
     n = 0
-    for name, entry in (d.get("virt") or {}).items():
-        if name in VIRT_PROCESSES:
-            raise KeyError(f"catalog_v4 one-loop entry {name} collides with an existing one")
-        VIRT_PROCESSES[name] = dict(entry, _v4=True); n += 1
+    # the layer, and the one-loop sign extension (gen_catalog_v4.py --write-loops-signext)
+    for f in ("catalog_v4_loops.yaml", "catalog_v4_loops_signext.yaml"):
+        path = os.path.join(ROOT, "recipes", f)
+        if not os.path.exists(path):
+            continue
+        d = _yaml.load(open(path), Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
+        for name, entry in (d.get("virt") or {}).items():
+            if name in VIRT_PROCESSES:
+                raise KeyError(f"catalog_v4 one-loop entry {name} collides with an existing one")
+            VIRT_PROCESSES[name] = dict(entry, _v4=True); n += 1
     return n
 
 CATALOG_V4_VIRT = _load_catalog_v4_virt()

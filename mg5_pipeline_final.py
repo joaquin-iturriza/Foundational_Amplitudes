@@ -1837,7 +1837,8 @@ def _load_catalog_v4():
     import yaml as _yaml
     here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes")
     n = 0
-    for f in ("catalog_v4_processes.yaml", "catalog_v4_loops.yaml"):
+    # the one-loop sign extension (gen_catalog_v4.py --write-loops-signext) too
+    for f in ("catalog_v4_processes.yaml", "catalog_v4_loops.yaml", "catalog_v4_loops_signext.yaml"):
         path = os.path.join(here, f)
         if not os.path.exists(path):
             continue

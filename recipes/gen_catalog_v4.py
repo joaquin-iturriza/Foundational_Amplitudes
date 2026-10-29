@@ -36,6 +36,7 @@ gluons or Higgses, b g > b h ..., g g > b b~ h ...), MadGraph's verdict in analy
     python3 recipes/gen_catalog_v4.py --write            entries + generation recipes (no MadGraph, laptop or site)
     python recipes/gen_catalog_v4.py --check [--workers N] [--only NAME ...]   (CC) MadGraph on the v4 strings
     python3 recipes/gen_catalog_v4.py --summary <checked.json>   census change: existence, diagrams
+    python3 recipes/gen_catalog_v4.py --write-loops-signext   the one-loop sign extension (write_loops_signext)
 """
 import argparse, json, os, re, sys
 from collections import Counter
@@ -48,6 +49,10 @@ sys.path.insert(0, ROOT)
 OUT_PROC = os.path.join(HERE, "catalog_v4_processes.yaml")
 OUT_LOOPS = os.path.join(HERE, "catalog_v4_loops.yaml")
 OUT_CENSUS = os.path.join(HERE, "catalog_v4_census.yaml")
+OUT_LOOPS_SIGNEXT = os.path.join(HERE, "catalog_v4_loops_signext.yaml")
+OUT_GEN_SIGNEXT = os.path.join(HERE, "catalog_v4_gen_signext.yaml")
+OUT_SIGNEXT_AUDIT = os.path.join(ROOT, "analysis", "catalog_v4", "data", "signext_classes.json")
+COLOURED = {1, 2, 3, 4, 5, 21}
 QUARKS = {1, 2, 3, 4, 5, 6}
 CHECKED = os.path.join(ROOT, "analysis", "catalog_v4", "data", "checked.json")
 LOOP_MODEL = {"loop_sm": "loop_sm-no_b_mass", "loop_qcd_qed_sm": "loop_qcd_qed_sm-no_b_mass"}
@@ -271,6 +276,86 @@ def write():
           f"{floor} trees at the {mg.V4_SQRTS_FLOOR:.0f} GeV floor")
 
 
+def signext_trees(P=None, roles=None):
+    """The classes of catalog_v4's one-loop sign extension (plan v3_prep_explore, the design of 2026-10-29): every
+    training tree class (recipes/catalog_v4_roles.json, keyed by class representative) that is 2->3, coloured (a quark
+    or gluon leg) and holds no catalog_v4 one-loop pool, train or held out (each one-loop entry's `class`); catalog_v3's
+    rule (gen_catalog_v3.write_loops_signext) applied at class level. Returns (sorted representatives, audit dict)."""
+    P = P if P is not None else load(OUT_PROC)["processes"]
+    roles = roles if roles is not None else json.load(open(os.path.join(HERE, "catalog_v4_roles.json")))
+    loop_cls = {v["class"] for v in roles["loops"].values()}
+    col = lambda e: any(abs(int(q)) in COLOURED for q in e["pdg_ids"])
+    trees = sorted(n for n, v in roles["trees"].items() if v["role"] == "train" and n in P and int(P[n]["nfinal"]) == 3
+                   and col(P[n]) and n not in loop_cls)
+    # the class-level check, independent of the filter above: no member of a chosen class (the census classes) is the
+    # tree of any one-loop pool (train or held out, duplicates included) or a pool of any held-out recipe
+    members = json.load(open(os.path.join(ROOT, "analysis", "catalog_v4", "census_classes.json")))["classes"]
+    loop_trees = {v["tree"] for v in roles["loops"].values()}
+    # (the removal twin's axes H3p and H4 are held out of the twin's recipe only; their classes train in
+    # catalog_v4_train.yaml, which is the arm's base, and are listed under twin_out below)
+    held = set()
+    for f in sorted(os.listdir(HERE)):
+        if f.startswith("catalog_v4_heldout_") and f.endswith(".yaml") and f not in ("catalog_v4_heldout_H3p.yaml",
+                                                                                     "catalog_v4_heldout_H4.yaml"):
+            held |= {e["name"] for e in load(os.path.join(HERE, f))["processes"]}
+    bad = sorted(n for n in trees for m in members.get(n, [n]) if m in loop_trees or m in held or m + "_nlo" in held)
+    assert not bad, bad
+    # held-out probes that are physics variants of a training class (alpha_s points, energy probes, heavy quark): the
+    # tree of those classes trains already; listed, not excluded (the one-loop pool is no held-out pool's process)
+    var = {"alphas_heldout": sorted({v["base"] for v in roles["alphas"].values() if v["role"] != "train"} & set(trees)),
+           "h7_classes": sorted(set(roles["h7_classes"]) & set(trees)),
+           "heavy_quark_heldout": sorted({v["tree"] for v in roles["heavy_quark"].values() if v["role"] != "train"}
+                                         & set(trees)),
+           # the removal twin's held-out classes: the arm builds on catalog_v4_train.yaml only, never the twin's recipe
+           "twin_out": sorted(set(roles["twin_out"]) & set(trees)),
+           "held_out_families_parents": sorted(set(roles["held_out_families"]) & set(trees))}
+    audit = {"n": len(trees), "by_beams": dict(Counter(n.split("_")[1] for n in trees)),
+             "mixed_order_born": sorted(n for n in trees if qed_max(P[n]["pdg_ids"]) > 3 - int(P[n].get("alphas_power", 0))),
+             "one_loop_classes": len(loop_cls), "training_classes": sum(v["role"] == "train" for v in roles["trees"].values()),
+             "checked": "role train, not the class of any one-loop pool (the filter); then no member of the class is the tree of "
+                        "any one-loop pool or a pool of any catalog_v4_heldout_*.yaml (the assertion)",
+             "variants_of_training_classes": var, "trees": trees}
+    return trees, audit
+
+
+def write_loops_signext():
+    """The one-loop sign extension: [virt=QCD] of every signext_trees class on its catalog_v4 tree string (full
+    coupling orders), model, cuts, measure and top width, as loop_entries' (role signext), to
+    recipes/catalog_v4_loops_signext.yaml, and their generation recipe at 1e4 / 1e3 / 1e3 in the v4 mixture and the
+    tree's window, recipes/catalog_v4_gen_signext.yaml; the class audit to analysis/catalog_v4/data/signext_classes.json.
+    No string is fixed by hand: an entry whose MadLoop build or pole certification fails is dropped by the generation
+    (prebuild_recipes.py --skip-cert-failed) and listed. Which pools change sign is read from the generated pools
+    (analysis/catalog_v3/pool_audit.py --stages v4_signext); only those enter the arm's training recipe
+    (recipes/make_catalog_v4_train_signext.py)."""
+    import mg5_pipeline_final as mg
+    P = load(OUT_PROC)["processes"]
+    trees, audit = signext_trees(P)
+    virt, procs = {}, {}
+    for n in trees:
+        e = P[n]; pdg = list(e["pdg_ids"])
+        assert n not in mg.PROCESSES or mg.PROCESSES[n].get("_v4"), n
+        virt[n] = {"mg5": e["mg5_generate"][0] + " [virt=QCD]", "model": LOOP_MODEL["loop_sm"], "pdg_ids": pdg,
+                   "m_finals": list(e["m_finals"]), "certified": False, "param_card_patches": {"WT": mg.V4_WT},
+                   **common(pdg)}
+        procs[n + "_nlo"] = {"kind": "virt", "virt": True, "virt_base": n, "nfinal": int(e["nfinal"]), "n_loops": 1,
+                             "alphas_power": int(e.get("alphas_power", 0)) + 1, "pdg_ids": pdg,
+                             "m_finals": list(e["m_finals"]), "param_card_patches": {}, "layer": "nlo",
+                             "why": f"one-loop QCD of {n} (sign extension)", "role": "signext", "certified": False,
+                             **common(pdg)}
+    hdr = "# catalog_v4's one-loop sign extension: generated by recipes/gen_catalog_v4.py --write-loops-signext; do not edit\n"
+    with open(OUT_LOOPS_SIGNEXT, "w") as f:
+        f.write(hdr); yaml.safe_dump({"virt": virt, "processes": procs}, f, sort_keys=True)
+    out = [{"name": n + "_nlo", "sqrts": window(P[n]), "n_train": 10000, "n_val": 1000, "n_test": 1000} for n in trees]
+    with open(OUT_GEN_SIGNEXT, "w") as f:
+        f.write(hdr + "# [virt=QCD] of every coloured 2->3 training tree class outside catalog_v4's one-loop layer, "
+                "1e4 / 1e3 / 1e3, the trees' windows, the v4 mixture\n")
+        yaml.safe_dump({"sampling": dict(mg.V4_SAMPLING), "processes": out}, f, sort_keys=False)
+    os.makedirs(os.path.dirname(OUT_SIGNEXT_AUDIT), exist_ok=True)
+    json.dump(audit, open(OUT_SIGNEXT_AUDIT, "w"), indent=1)
+    print(f"wrote {OUT_LOOPS_SIGNEXT}, {OUT_GEN_SIGNEXT} ({len(trees)} one-loop entries, by beams "
+          f"{audit['by_beams']}; {len(audit['mixed_order_born'])} with a mixed-order born) and {OUT_SIGNEXT_AUDIT}")
+
+
 def check(workers, out, only=None):
     """MadGraph `display processes` on every v4 tree string (catalog_v2's mg5_check): existence under sm-no_b_mass and
     the diagram count; diagrams_v3 is catalog_v3's count of the same process (sm, minimal QED)"""
@@ -307,6 +392,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--write-loops-signext", action="store_true", help="the one-loop sign extension")
     ap.add_argument("--only", nargs="*", default=None)
     ap.add_argument("--summary", default=None)
     ap.add_argument("--workers", type=int, default=16)
@@ -314,6 +400,8 @@ def main():
     a = ap.parse_args()
     if a.write:
         write()
+    if a.write_loops_signext:
+        write_loops_signext()
     if a.check:
         check(a.workers, a.out, a.only)
     if a.summary:

@@ -38,7 +38,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -102,6 +102,26 @@ case "$ARM" in
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
     v4_dimensionless_muon_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP)
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+    # catalog_v4 with more sign-changing one-loop pools (plan v3_prep_explore, the design of 2026-10-29): the control
+    # v4_dimensionless_muon[_seed2] with only the training recipe changed, catalog_v4_train.yaml plus the extension's
+    # pools whose train split holds both signs ($SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml, written by
+    # scripts/job_catalog_v4_signext.sh, which builds their sidecars); the same 4264 steps. No XV3 read: catalog_v3's
+    # pools are deleted (D167)
+    v4_dimensionless_muon_more_signed|v4_dimensionless_muon_more_signed_seed2)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP)
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            TRAIN="$SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml"; ITERS_FIXED=4264
+                            # the control's pools, in its order, then only one-loop extension pools
+                            python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_train.yaml" <<'PY' || exit 1
+import sys, yaml
+a, b = (yaml.safe_load(open(f)) for f in sys.argv[1:])
+n = len(b["processes"]); ext = a["processes"][n:]
+assert a["processes"][:n] == b["processes"] and {k: v for k, v in a.items() if k != "processes"} == \
+    {k: v for k, v in b.items() if k != "processes"}, "V4_SIGNEXT base recipe differs from catalog_v4_train.yaml"
+assert ext and all(p["name"].endswith("_nlo") for p in ext), "V4_SIGNEXT extension pools missing or not one-loop"
+print(f"V4_SIGNEXT_RECIPE {n} control pools + {len(ext)} sign-changing one-loop pools")
+PY
+                            ;;
     # the one-loop sign transfer (docs/results.tex, par. The signed one-loop pools' data: the kinematics decide the
     # sign within a pool, the arms fail it zero-shot), each the baseline with one change, at its HPs:
     #   baseline_sign_pairs  the sign logit also gets a pair term on the invariants the per-pool classifier used
