@@ -2009,18 +2009,16 @@ entries:
       on recipes/catalog_v4_pp_test.yaml'
     6: 'Submit the pure-default bound pair once step 1''s validation passes (every pp13v4 entry built, pp_physics_check ratio
       0 on every class; at 17:45 on 2026-10-29, 8 of the mixed recipe''s 797 pp pools still had no val/test file, all 1074
-      diagram sidecars present): sync once, then scripts/job_catalog_v3_short.sh v4_dimensionless_muon_pp smoke, and v4_dimensionless_muon_pp
-      and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G, --item catalog_coverage, about 1.5 GPU-h each), plus
-      the controls'' read of the pp13v4 pools in mode eval (v4_dimensionless_muon and _seed2, V3_AXES=PP4, a fraction of a
-      GPU-h). Control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29) read exactly
-      the 1068 pools (356 entries x 3 roles) the mixed recipe keeps: same file names and recipe ids at 1d9d6a29 and now, the
-      .npy files older than their submission, none swapped in after (analysis/catalog_v4/control_pool_check.py @c809ca44:
-      1068 same). Two points for whoever submits, to state in the submission message: the mixed recipe swaps 797 hadronic
-      tree training classes (466 regenerated pp13v4_ pools plus 331 reused pp13_ pools of the same |M|^2 function), not the
-      466 the design text names; and the job reads score the first 2000 rows of each pp pool''s val split (tools/zero_shot_parent.py
-      has no test-role read, as in par:v4_vs_pp), while the design says the test pool; for the arm''s training classes that
-      val split is its own checkpoint-selection pool. Either take the design back through plan design for these two lines,
-      or add a test-role read before the reads are taken'
+      diagram sidecars present) and the amended design (797 swapped hadronic training classes: 466 pp13v4_ plus 331 reused
+      pp13_; PP4 scored on the pp pools'' test split) has passed review: sync once, then scripts/job_catalog_v3_short.sh v4_dimensionless_muon_pp
+      smoke, and v4_dimensionless_muon_pp and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G, --item catalog_coverage,
+      about 1.5 GPU-h each), plus the controls'' read of the pp pools in mode eval (v4_dimensionless_muon and _seed2, V3_AXES=PP4,
+      a fraction of a GPU-h). The job script now passes tools/zero_shot_parent.py --split test on PP4 (val on every other
+      axis, as before), so both arms and controls score the same 2000 test events per class, none of them a checkpoint-selection
+      pool. Still owed before (b) is reported for training classes: a test-split read of the 797 swapped classes'' catalog_v4
+      smart-mixture pools by the arm and both controls (an axis the job script lacks; not needed to submit). Control reused:
+      catalog_v4''s Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29) read exactly the 1068 pools (356 entries
+      x 3 roles) the mixed recipe keeps (analysis/catalog_v4/control_pool_check.py @c809ca44: 1068 same).'
     7: 'Default-share generation layout (implementation done at c865826b; nothing submitted): the dsh pools hold 48.8M new
       MadEvent events over 912 training classes (recipes/catalog_v4_default_lhe.yaml, 0.50 arm with a 0.10 acceptance margin;
       the 0.25 arm reads a prefix) plus 340k e+e- test events (catalog_v4_ee_test.yaml). One job per class does not fit CC''s
