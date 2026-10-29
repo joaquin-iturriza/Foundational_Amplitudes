@@ -2224,17 +2224,14 @@ entries:
       to catalog_v4''s standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density
       check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
     6: 'Submit the pure-default bound pair once step 1''s validation passes (every pp13v4 entry built, pp_physics_check ratio
-      0 on every class; at 17:45 on 2026-10-29, 8 of the mixed recipe''s 797 pp pools still had no val/test file, all 1074
-      diagram sidecars present) and the amended design (797 swapped hadronic training classes: 466 pp13v4_ plus 331 reused
-      pp13_; PP4 scored on the pp pools'' test split) has passed review: sync once, then scripts/job_catalog_v3_short.sh v4_dimensionless_muon_pp
-      smoke, and v4_dimensionless_muon_pp and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G, --item catalog_coverage,
-      about 1.5 GPU-h each), plus the controls'' read of the pp pools in mode eval (v4_dimensionless_muon and _seed2, V3_AXES=PP4,
-      a fraction of a GPU-h). The job script now passes tools/zero_shot_parent.py --split test on PP4 (val on every other
-      axis, as before), so both arms and controls score the same 2000 test events per class, none of them a checkpoint-selection
-      pool. Still owed before (b) is reported for training classes: a test-split read of the 797 swapped classes'' catalog_v4
-      smart-mixture pools by the arm and both controls (an axis the job script lacks; not needed to submit). Control reused:
-      catalog_v4''s Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29) read exactly the 1068 pools (356 entries
-      x 3 roles) the mixed recipe keeps (analysis/catalog_v4/control_pool_check.py @c809ca44: 1068 same).'
+      0 on every class; at 2026-10-29 step 1 was still collecting the pp13v4 regeneration and pp_physics_check had not been
+      rerun on pp13v4 since 2026-10-26) and the amended design (797 swapped hadronic training classes: 466 pp13v4_ plus 331
+      reused pp13_; PP4 scored on the pp pools'' test split) has passed review: sync once, then scripts/job_catalog_v3_short.sh
+      v4_dimensionless_muon_pp smoke, and v4_dimensionless_muon_pp and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G,
+      --item catalog_coverage, about 1.5 GPU-h each), plus the controls'' read of the pp pools in mode eval (v4_dimensionless_muon
+      and _seed2, V3_AXES=PP4, a fraction of a GPU-h). Still owed before (b) is reported for training classes: a test-split
+      read of the 797 swapped classes'' catalog_v4 smart-mixture pools by the arm and both controls. Control reused: catalog_v4''s
+      Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29), 1068 pools same (control_pool_check.py @c809ca44).'
     7: 'Collect the default-share generation: the parts queues $SCRATCH/lhe_queue/catalog_v4_default (4243 one-run MadEvent
       tasks: 912 dsh pools and 170 e+e- test pools, estimated 1000 core-h, 150 workers of 16 cores, 2 h limit) and $SCRATCH/lhe_queue/pp13v4_ud_dggu
       (32 runs at 8 cores, 16 workers, 3 h limit), read with site run ... python tools/lhe_parts.py status --queue Q and the
@@ -3419,13 +3416,12 @@ entries:
         that entry'
     6:
       feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
-        mixture A/B the user asked for (2026-10-29)
+        mixture A/B the user asked for (2026-10-29); waits on step 1's pp13v4 validation
       if:
-      - 'the pp arm is below catalog_v4 on default-sampled events beyond the seed spread (per-class ratio below 0.8, lower
-        in both seeds on most classes): design the mixture A/B (default share 0.50 and 0.25, e+e- at fixed collider energies
-        as its own group), asking the user the fractions, energies, loops and variants first'
-      - 'within the spread or above catalog_v4: report to the user with the 1e4-vs-1e5 pool-size caveat and propose dropping
-        the hadronic default share, their call; ask the e+e- question separately'
+      - 'step 1 validation passed (all 992 built, every ratio 0): submit the smoke and the two seeds afterok on it, plus the
+        controls'' PP4 mode-eval reads'
+      - 'step 1 not yet passed or a class fails it: keep waiting on step 1; a failing class is left out of the arm''s scoring
+        and listed'
     7:
       feeds: whether catalog_v4's final mixture includes a default-sampled share, and at which fraction
       if:
