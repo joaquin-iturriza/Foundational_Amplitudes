@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
-"""The main session works no entry itself (CLAUDE.md 0i): it launches step agents and talks to the user.
+"""The main session works no entry itself (CLAUDE.md 0i), within a budget: up to 3 work calls per user message.
+
+The user (2026-10-29): "It seems a bit to extreme, you should still be able to do those small things in some
+situations". So the main session may make BUDGET work calls since the user's last message; the 4th and later are
+refused. The number 3, its per-message scope and that submissions count like any other work call are **open
+(unsourced)**: set by the main session's request, not by the user; to be confirmed when the hook's registration is
+proposed to the user. Non-work calls never count. The user's last message is found from the end of the transcript
+(`transcript_path`) with reply_check.py's rule: a "user" record whose text is not a tool_result, not isMeta, not a
+compaction summary and does not start with one of its SKIP prefixes (system reminders, task notifications, hook
+feedback, command output); a message sent mid-turn (MIDTURN, inside a tool_result) counts as one too. The work calls
+counted are the main session's tool_use records after it (sidechain records skipped; the current call, by its
+tool_use_id, never counted), classified by the same rules as the current call. No transcript: the budget is full.
 
 PreToolUse(Bash|Edit|Write|MultiEdit). A tool call made inside a subagent carries `agent_id` and `agent_type` in its
 hook input; the main session's carries neither (read from the real inputs logged by lock_guard.py in
 .claude/.review_state/lock_calls.log: every subagent call, general-purpose included, has both keys, the main
-session's has none). Every subagent call passes. In the main session (exit 2):
+session's has none). Every subagent call passes, and never counts. Work, in the main session:
   - Bash: `site submit|sync|run|pick|env|copy|fetch`, `sbatch`, `scancel`, `condor_submit`, any python or pytest
     run except `python3 tools/plan.py ...` and `python3 tools/agent_costs.py`, a project script run through
     bash/sh/./ (scripts/, sweep/, tools/, .claude/hooks/) except `review_backlog.sh begin|status`, and the shell
@@ -19,7 +30,13 @@ Python on purpose: a crash here exits 1, which does not block (hook_syntax_guard
 """
 import json, os, re, sys
 
-MSG = "main session: this is a step agent's work (CLAUDE.md 0i); launch a fresh agent with a written prompt."
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from reply_check import MIDTURN, SKIP, texts  # noqa: E402  (the same reading of "the user's message")
+
+BUDGET = 3
+MSG = ("main session: %d work calls already since the user's last message; this is a step agent's work (CLAUDE.md 0i):"
+       " launch a fresh agent with a written prompt." % BUDGET)
+CHUNK = 1 << 16
 SITE_WORK = {"submit", "sync", "run", "pick", "env", "copy", "fetch"}
 PY_OK = re.compile(r"^(?:\S*/)?python3?\s+(?:\S*/)?tools/(?:plan\.py(?:\s|$)|agent_costs\.py(?:\s|$))")
 SCRIPT_DIRS = re.compile(r"(?:^|/)(?:scripts|sweep|tools|\.claude/hooks)/\S+")
@@ -113,6 +130,69 @@ def path_ok(path, scratch):
     return bool(scratch) and (p == scratch or p.startswith(scratch.rstrip("/") + "/"))
 
 
+def work(tool, ti, scratch):
+    """Why this call is work, or None."""
+    if tool == "Bash":
+        return bash_refusal(ti.get("command", "") or "", scratch)
+    if tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
+        path = ti.get("file_path") or ti.get("notebook_path") or ""
+        return None if path_ok(path, scratch) else "%s of %s" % (tool, path)
+    return None
+
+
+def lines_backwards(path):
+    with open(path, "rb") as f:
+        f.seek(0, 2)
+        pos, rest = f.tell(), b""
+        while pos > 0:
+            step = min(CHUNK, pos)
+            pos -= step
+            f.seek(pos)
+            parts = (f.read(step) + rest).split(b"\n")
+            rest = parts[0]
+            for ln in reversed(parts[1:]):
+                yield ln
+        yield rest
+
+
+def is_user_message(r):
+    if r.get("type") != "user":
+        return False
+    for t in texts((r.get("message") or {}).get("content")):
+        t = t.strip()
+        if MIDTURN in t:
+            return True
+        if (t and not t.startswith(SKIP) and r.get("toolUseResult") is None and not r.get("isMeta")
+                and not r.get("isCompactSummary")):
+            return True
+    return False
+
+
+def used(path, scratch, current_id):
+    """The main session's work calls since the user's last message, reading the transcript from its end."""
+    seen = set()
+    for ln in lines_backwards(path):
+        if not ln.strip():
+            continue
+        try:
+            r = json.loads(ln)
+        except ValueError:
+            continue
+        if r.get("isSidechain"):
+            continue
+        if is_user_message(r):
+            break
+        if r.get("type") != "assistant":
+            continue
+        for c in (r.get("message") or {}).get("content") or []:
+            if (isinstance(c, dict) and c.get("type") == "tool_use" and c.get("id") != current_id
+                    and work(c.get("name", ""), c.get("input") or {}, scratch)):
+                seen.add(c.get("id"))
+        if len(seen) >= BUDGET:
+            break
+    return len(seen)
+
+
 def main():
     try:
         inp = json.loads(sys.stdin.read() or "{}")
@@ -122,17 +202,15 @@ def main():
         return 0
     tool, ti = inp.get("tool_name", ""), inp.get("tool_input") or {}
     scratch = os.path.abspath(inp["scratchpad_dir"]) if inp.get("scratchpad_dir") else ""
-    if tool == "Bash":
-        why = bash_refusal(ti.get("command", "") or "", scratch)
-    elif tool in ("Edit", "Write", "MultiEdit", "NotebookEdit"):
-        path = ti.get("file_path") or ti.get("notebook_path") or ""
-        why = None if path_ok(path, scratch) else "%s of %s" % (tool, path)
-    else:
-        why = None
-    if why:
-        print("BLOCKED (%s). %s" % (why, MSG), file=sys.stderr)
-        return 2
-    return 0
+    why = work(tool, ti, scratch)
+    if not why:
+        return 0
+    path = inp.get("transcript_path")
+    n = used(path, scratch, inp.get("tool_use_id")) if path and os.path.exists(path) else BUDGET
+    if n < BUDGET:
+        return 0
+    print("BLOCKED (%s). %s" % (why, MSG), file=sys.stderr)
+    return 2
 
 
 if __name__ == "__main__":

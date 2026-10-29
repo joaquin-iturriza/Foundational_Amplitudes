@@ -2207,7 +2207,8 @@ def idle_wait():
 
 
 def main_session_work():
-    """The main session works no entry itself (0i): its work calls are refused, a subagent's pass (main_session_guard).
+    """The main session works no entry itself (0i) beyond 3 work calls per user message (main_session_guard); without a
+    transcript the budget is full, so the table below is the classification. A subagent's calls pass and never count.
     The subagent marker is agent_id/agent_type, as in the hook inputs lock_guard logs."""
     sub = {"agent_id": "a1b2", "agent_type": "general-purpose"}
     scratch = "/tmp/claude-1000/x/scratchpad"
@@ -2235,6 +2236,70 @@ def main_session_work():
         rc, out = hook(MAIN_GUARD, inp)
         scenario("main session guard: %s %s `%s` is %s" % (who, tool, list(ti.values())[0][:50].replace("\n", " "),
                  "refused" if want else "allowed"), rc == want and (not want or "step agent's work" in out), out)
+
+    # the budget: 3 work calls per user message (the user, 2026-10-29: "you should still be able to do those small
+    # things in some situations"), counted from the transcript since the user's last message
+    import tempfile
+    d = tempfile.mkdtemp()
+    tp = os.path.join(d, "t.jsonl")
+    k = [0]
+
+    def user(text, **kw):
+        return dict(kw, type="user", message={"role": "user", "content": text})
+
+    def call(name, ti, sidechain=False):
+        k[0] += 1
+        return {"type": "assistant", "isSidechain": sidechain, "message": {"role": "assistant", "content": [
+            {"type": "tool_use", "id": "tu%d" % k[0], "name": name, "input": ti}]}}
+
+    def result():
+        return {"type": "user", "toolUseResult": {}, "message": {"role": "user", "content": [
+            {"type": "tool_result", "tool_use_id": "tu%d" % k[0], "content": "ok"}]}}
+
+    edit = {"file_path": "/home/joaquin/work/FA/tools/plan.py"}
+    sub_work = ("Bash", {"command": "site sync ccin2p3 FA"})
+
+    def probe(records, inp_extra=None):
+        with open(tp, "w") as f:
+            for r in records:
+                f.write(json.dumps(r) + "\n")
+        inp = dict(inp_extra or {}, tool_name="Edit", tool_input=edit, scratchpad_dir=scratch, transcript_path=tp,
+                   tool_use_id="tu_now")
+        return hook(MAIN_GUARD, inp)
+
+    def works(n):
+        out = []
+        for _ in range(n):
+            out += [call("Edit", edit), result()]
+        return out
+
+    noise = [user("<task-notification>agent done</task-notification>"), user("Stop hook feedback: x"),
+             user("<system-reminder>r</system-reminder>", isMeta=True)]
+    for name, recs, want in (
+            ("the 1st work call after the user's message passes", [user("do it")], 0),
+            ("the 3rd work call passes", [user("do it")] + works(2), 0),
+            ("the 4th work call is refused", [user("do it")] + works(3), 2),
+            ("a new user message resets the count", [user("do it")] + works(3) + [user("now this")] + works(2), 0),
+            ("a mid-turn user message resets the count", [user("do it")] + works(3) + [{
+                "type": "user", "toolUseResult": {}, "message": {"role": "user", "content": [{
+                    "type": "tool_result", "tool_use_id": "x", "content":
+                    "The user sent a new message while you were working:\nalso this"}]}}], 0),
+            ("task notifications, hook feedback and reminders are not user messages",
+             [user("do it")] + works(1) + noise[:1] + works(1) + noise[1:] + works(1), 2),
+            ("reads never count", [user("do it")] + works(2) + [call("Bash", {"command": "site poll"}), result(),
+              call("Read", {"file_path": "x"}), result(), call("Bash", {"command": "git log -3"}), result()], 0),
+            ("subagent (sidechain) calls never count", [user("do it")] + works(2) + [
+                call(*sub_work, sidechain=True), result(), call(*sub_work, sidechain=True)], 0),
+            ("the current call is not counted against itself", [user("do it")] + works(2) + [
+                {"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "tu_now", "name": "Edit",
+                                                               "input": edit}]}}], 0),
+            ("parallel work calls in one message each count", [user("do it"), {"type": "assistant", "message": {
+                "content": [{"type": "tool_use", "id": "p%d" % i, "name": "Edit", "input": edit} for i in range(3)]}}],
+             2)):
+        rc, out = probe(recs)
+        scenario("main session budget: %s" % name, rc == want and (not want or "3 work calls already" in out), out)
+    rc, out = probe([user("do it")] + works(5), {"agent_id": "a1", "agent_type": "general-purpose"})
+    scenario("main session budget: a subagent's call passes whatever the main session used", rc == 0, out)
 
 
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
