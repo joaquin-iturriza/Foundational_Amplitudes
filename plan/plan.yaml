@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: done
+- status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -289,6 +289,12 @@ entries:
     was: done
     writeup: fa3b8ab0
     why: 'continuous exploration (D83, D114): the signed check is done (fa3b8ab0); the queue continues with the sampling sensitivity'
+  - at: '2026-10-29T05:13:49+00:00'
+    was: done
+    writeup: 033a0f78
+    why: 'closed by mistake: the user''s mandate is continuous (''Keep iterating'', 2026-10-24; ''keep working on this'',
+      2026-10-22); the main session''s brief offered closing once the listed jobs were written up and left the mandate out;
+      the iteration continues on catalog_v4, the pretraining catalog since 2026-10-26'
   designs:
   - at: '2026-10-26T19:43:48+00:00'
     question: Does the pair sign head (a pair term on the leg invariants added to the sign logit) carry the one-loop amplitude
@@ -412,7 +418,6 @@ entries:
       to the user with the 6 to 8 seed cost. Reading of an overlap in the outcome rules: per the design, the paired per-pool
       count is the decision statistic, so a seed-mean median not lower while the count is lower on most pools is reported
       as inconclusive, not no; no = count not lower on most pools (or higher on most). Not a repeat; within D165.'
-  writeup: 033a0f78
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
