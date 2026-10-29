@@ -972,6 +972,55 @@ entries:
       sign-changing, mixed order in docs/results.tex; plan show v3_prep_explore and catalog_coverage dead ends (mixed-order
       one-loop certification failures); site decisions (D142, D161, D165, D175): no repeat; the full-order version is the
       recorded dead end this replaces.'
+  - at: '2026-10-29T16:55:47+00:00'
+    question: 'Is the shape error of catalog_v4''s new tree processes (median floor var(q - t) 0.24 on the 62 new combinations,
+      0.392 on the 218 multiplicity pools, par:v4_tree_shape) a generalisation gap or the network''s floor at this compute?
+      The user''s shape priority (D178) needs it: it decides whether shape work targets transfer (target or input priors)
+      or capacity and training length. The training pools'' own in-distribution floor in the same cells of multiplicity and
+      initial state is not in any read (the short runs'' reads hold held-out pools only). Eval only, no training: the control
+      pair''s best checkpoints read on catalog_v4''s 1153 training pools'' validation split (1045 trees, 108 one-loop).'
+    prior: 'Searched docs/results.tex (par:v4_tree_shape, par:v4_tree_newproc, par:v4_kshot_level, par:v4_loop_levels, ''in-distribution'',
+      ''floor'', ''shape''), plan show v3_prep_explore and catalog_coverage, site decisions (D178, D161, D167). Found: par:v4_tree_shape
+      (seeds 42 and 43, the held-out reads of the control pair FA-ccin2p3-339ec100 / -380842ed @1d9d6a29): the shape is most
+      of the tree zero-shot error (level share 0.04 on new combinations), floors 0.24 / 0.392 / 0.155 / 0.626 on the four
+      groups, gluon-gluon 0.652 and e+e- 0.445 against quark-antiquark 0.347; it states the in-distribution floor in the same
+      cells is missing. par:v4_kshot_level: the floor is what a per-pool offset fit reaches (K-shot). No prior in-distribution
+      per-pool read of catalog_v4 exists (short_reads hold H1..H7c, XV3, PP only; result.json per-process losses are in the
+      shared standardized units, not var(q - t) in log|M|^2 by the zero-shot scorer). Differs: same scorer (tools/zero_shot_parent.py
+      --signed-magnitude, 2000 val events, best checkpoint, EMA weights) on the training pools instead of held-out ones.'
+    measure: 'Per training pool and seed, floor = var(q - t) over its 2000 validation events (the kshot_level estimator) and
+      its offset; per cell (particle count, initial state) the median training floor (seed mean). Per held-out pool of H1
+      and H2 (and H3 reported), log10(floor / its cell''s median training floor) and its rank within the cell''s training
+      floors. Decision statistic: the median over held-out pools of that log10 ratio, and the count of held-out pools above
+      their cell''s training median as a one-sided sign test over pools (null 1/2: a new process as hard to shape as a typical
+      trained one). Also reported: the training pools'' offsets (should be near 0: a check that the read is in-distribution),
+      per cell medians beside the held-out ones, the same per initial state (gluon-gluon, e+e-, quark-antiquark first), the
+      one-loop training pools against H5 (secondary).'
+    check: 'The measure separates groups that differ in what was trained, on existing reads: the same floor is 0.155 on the
+      35 top processes trained at another top mass and 0.626 on the 244 at no trained top mass (par:v4_tree_shape, sh.other_mass
+      / sh.no_mass), a factor 4 between pools nearer and farther from training, and it tracks the offset (rank correlation
+      0.56 over all groups), so the in-distribution end of that scale (the training pools) is what is missing to place the
+      new processes on it. The two seeds give the spread: the per-cell medians of each seed are compared and their difference
+      is the resolution of the log10 ratio.'
+    fixed: 'Everything of the held-out reads: the two control checkpoints (best by aggregate val_loss_no_reg, EMA weights),
+      tools/zero_shot_parent.py with --signed-magnitude, 2000 validation events and 10000 train events per pool for the probe''s
+      own statistics, the scripts/job_catalog_v3_short.sh eval path (one recipe per pool, the recipe''s top-level keys kept).
+      The training pools'' validation split was used only for checkpoint selection, never trained on. The code at the current
+      commit; zero_shot_parent.py differs from 1d9d6a29 only by the physics check (no change to the scoring); the pools are
+      checked as the control''s with analysis/catalog_v4/control_pool_check.py (ids at 1d9d6a29) and any not ''same'' listed
+      and excluded.'
+    control: 'The held-out pools'' existing reads of the same two checkpoints (analysis/catalog_v3/data/short_reads/v4_dimensionless_muon[_seed2]/H1,H2,H3):
+      the comparison is held-out against in-distribution of the same network, same scorer, same cells. Nothing retrained (A/B
+      rule 1).'
+    seeds: The control pair's two, 42 and 43; every number is a seed mean and both seeds are shown.
+    outcome: 'Transfer gap (yes): held-out pools above their cell''s training median on enough pools for a one-sided sign
+      test p < 0.05 (the entry''s convention) and the median log10 ratio larger than the two seeds'' difference of it; then
+      the next step designs target or input priors aimed at the gap, starting with the cells where it is largest (gluon-gluon,
+      e+e-). Floor (no): the sign test not significant or the median ratio within the seed difference: the new processes''
+      shape error is the fit''s floor at this compute, the shape lever is capacity and training length, recorded for the full
+      pretraining''s design. Both are written up beside par:v4_tree_shape with the per-cell table. Cost: two eval-only GPU
+      jobs (one per seed, mode eval, V3_AXES=TR), about 1153 probes at the 1.1 s per probe of the controls'' PP read (474
+      in 9 min) plus setup: about 0.5 GPU-h each, 1 GPU-h in all, under the budget of 30.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
