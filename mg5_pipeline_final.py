@@ -1885,7 +1885,12 @@ def _load_catalog_2to4():
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
                                                 "catalog_v3_pp_processes.yaml"))
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
-                                                "catalog_v4_pp_processes.yaml"))):
+                                                "catalog_v4_pp_processes.yaml"))
+                       # catalog_v4's default-sampled share and e+e- MadEvent test pools (recipes/gen_catalog_v4_default.py)
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_ee_processes.yaml"))
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_default_processes.yaml"))):
         with open(path) as f:
             d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
         lhe = dict(d.get("lhe") or {})
@@ -3091,7 +3096,108 @@ def sampling_policy(cfg, role=None):
     pol = dict(DEFAULT_SAMPLING); pol.update(cfg.get("sampling") or {})
     if cfg.get("kind") == "virt" or float(pol.get("f_flat", 0)) <= 0:
         pol["mode"] = "flat"
+    if float(pol.get("f_default", 0)) > 0:
+        # the default-sampled share (D178): that fraction of the pool is the generator's own unweighted events, read
+        # from the MadEvent pools of the lhe entry `default_source` (default_share_momenta); only in the mixture
+        src = pol.get("default_source")
+        if pol["mode"] != "mixture":
+            raise ValueError(f"f_default is part of the mixture policy (mode: mixture), got {pol['mode']}")
+        if not src or PROCESSES.get(src, {}).get("kind") != "lhe_pp":
+            raise ValueError(f"f_default {pol['f_default']} needs default_source, an lhe_pp entry (got {src!r})")
     return pol
+
+
+# =============================================================================
+# DEFAULT-SAMPLED SHARE (catalog_coverage, the user's priority of 2026-10-29, D178)
+# =============================================================================
+# A shaped entry with sampling.f_default > 0 takes that share of each pool from MadEvent unweighted events, as a user
+# makes them, instead of the RAMBO bulk: the events of the lhe entry `default_source` (recipes/gen_catalog_v4_default.py,
+# dsh_<x>: the class's generate string, model and cards, 13 TeV pp with Daniel's run card or e+e- at fixed energies),
+# preceded by the events already generated for the class where `default_source` names a `reuse` entry (its pp13v4 /
+# pp13 / ee4 pool of the same role), never repeating them (the dsh entry's own iseeds). The momenta are boosted to the
+# partonic rest frame (every catalog pool's frame) and labelled by the entry's own backend with the rest of the pool,
+# so the default share carries exactly the pool's |M|^2 function. Only events inside the pool's own sqrt(s_hat) window
+# and fiducial cuts (in the partonic frame, as every other event of the pool) are kept, so no 13 TeV event above the
+# 6 TeV training edge leaks the held-out energy probes into training; the kept events, in order, are what a pool reads.
+# A role's pool reads the first rows: chunk c of a chunked pool reads [round(f N_<c), round(f N_<=c)) with N the
+# cumulative chunk counts (datagen.chunk_tasks), so a chunked pool reads exactly [0, round(f n)) as an unchunked one,
+# and a smaller f_default reads a prefix of a larger one's events and needs no generation of its own.
+
+def to_partonic_frame(P):
+    """P (n, k, 4) with the beams in rows 0 and 1 -> the same events in the beams' rest frame (a boost along the
+    beams' total momentum; the identity for e+e- without ISR)."""
+    P = np.asarray(P, dtype=np.float64)
+    n, k = P.shape[:2]
+    Q = P[:, 0] + P[:, 1]
+    Qinv = np.concatenate([Q[:, :1], -Q[:, 1:]], axis=1)          # boosting from the rest of Qinv undoes Q's motion
+    out = _boost_from_rest(P.reshape(n * k, 4), np.repeat(Qinv, k, axis=0)).reshape(n, k, 4)
+    return out
+
+
+def default_share_pools(source, role, seed):
+    """[(process, recipe, path)] of the pools the default share of `role` reads, in order: the `reuse` entry's pool
+    (if any) then the source's own (dsh) pool, each at its full block of the role."""
+    import datagen
+    out = []
+    for name in ([PROCESSES[source]["reuse"]] if PROCESSES[source].get("reuse") else []) + [source]:
+        lo, hi = lhe_layout(PROCESSES[name])[role]
+        if hi - lo <= 0:
+            continue
+        rec = lhe_pp_recipe(name, 13000, 13000, hi - lo, role=role, seed=seed)
+        out.append((name, rec, recipe_output_path(rec, datagen.dest_for_role(role))))
+    return out
+
+
+def default_share_identity(source, role, seed):
+    """The default share's part of a mixture pool's identity: the recipe ids of the pools its rows come from."""
+    return {"source": source, "frame": "partonic", "accept": "pool window and fiducial cuts",
+            "pools": [{"process": n, "recipe_id": recipe_id(r)} for n, r, _ in default_share_pools(source, role, seed)]}
+
+
+def default_share_momenta(source, role, seed, rows, accept=None):
+    """Momenta (n, k, 4) in the partonic rest frame and sqrt(s_hat) (n,) of rows [a, b) of the default share of
+    `role`: the reuse pool's rows then the source's, boosted to the partonic frame and, with `accept` = (sqrts_lo,
+    sqrts_hi, m_finals, pdg_ids, cuts), only those inside the pool's window and cuts. Every pool must be built with its
+    recipe id (a MadEvent CPU job: prebuild_recipes.py on recipes/catalog_v4_default_lhe*.yaml); a missing or stale one
+    raises, so a mixture chunk never starts MadEvent."""
+    a, b = int(rows[0]), int(rows[1])
+    if b <= a:
+        return np.zeros((0, 0, 4)), np.zeros(0)
+    parts = []
+    for name, rec, path in default_share_pools(source, role, seed):
+        try:
+            with open(path + ".recipe.json") as f:
+                ok = json.load(f).get("recipe_id") == recipe_id(rec)
+        except (FileNotFoundError, json.JSONDecodeError):
+            ok = False
+        if not ok or not os.path.exists(path):
+            raise RuntimeError(f"default share of {source} ({role}): pool {path} missing or stale "
+                               f"(recipe_id {recipe_id(rec)}); build the default-share lhe pools first")
+        k = int(PROCESSES[name]["nfinal"]) + 2
+        x = np.load(path, mmap_mode="r")
+        parts.append(np.asarray(x[:, :4 * k], dtype=np.float64).reshape(len(x), k, 4))
+    P = to_partonic_frame(np.concatenate(parts))
+    Q = P[:, 0] + P[:, 1]
+    sq = np.sqrt(np.clip(Q[:, 0] ** 2 - (Q[:, 1:] ** 2).sum(1), 0.0, None))
+    n_all = len(P)
+    if accept is not None:
+        lo, hi, m_finals, pdg_ids, cuts = accept
+        ok = (sq >= float(lo)) & (sq <= float(hi))
+        if cuts:
+            ok &= fiducial_pass_mask(P, np.asarray(m_finals, float), np.asarray(pdg_ids, int), cuts)
+        P, sq = P[ok], sq[ok]
+    if len(P) < b:
+        raise RuntimeError(f"default share of {source} ({role}): rows [{a}, {b}) asked, its pools hold {len(P)} "
+                           f"accepted of {n_all}; raise ACCEPT_MARGIN in recipes/gen_catalog_v4_default.py and rebuild")
+    return P[a:b], sq[a:b]
+
+
+def default_share_rows(f_default, counts):
+    """[(a_c, b_c)] the default-share rows of each chunk of a pool split into `counts`: consecutive, cumulative
+    rounding, so the chunks never read the same event and together read [0, round(f_default * n))."""
+    cum = np.concatenate([[0], np.cumsum([int(c) for c in counts])])
+    edge = [int(round(float(f_default) * int(x))) for x in cum]
+    return [(edge[i], edge[i + 1]) for i in range(len(counts))]
 
 
 def _sqrts_sampler(lo, hi, measure, rng):
@@ -3276,18 +3382,24 @@ def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo, fr
 
 
 def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng, cuts, pol, label,
-                          sqrts_measure="uniform", beam_mass=None):
+                          sqrts_measure="uniform", beam_mass=None, default=None):
     """The mixture policy above. `label(events, sqrts) -> |M|^2` is the exact matrix
     element (the pipeline's backend). Returns (events, sqrts, me2) shuffled.
     catalog_v4 (D130) adds, all absent from every earlier policy (so their pools are unchanged): sqrts_measure "log"
     (the bulk, the forward part and the first candidate pass log-uniform in sqrt(s); the adaptive pass bins in
     log sqrt(s)), pol["f_fwd"] (that share of the dataset from the forward component, out of the bulk) and
     pol["fwd_cand"] (that share of the flat part's candidates turned forward, so the flat selection reaches the
-    forward extremes too); beam_mass as _beams."""
+    forward extremes too); beam_mass as _beams.
+    `default` = (P (n_d, k, 4), sqrt(s_hat) (n_d,)): the default-sampled share (pol["f_default"], D178), MadEvent events
+    already in the partonic frame (default_share_momenta), labelled here with the rest; they take n_d events out of the
+    bulk. None (every earlier pool) draws exactly the random numbers it drew before."""
     lo, hi = float(sqrts_min), float(sqrts_max)
     f_fwd, fwd_cand = float(pol.get("f_fwd", 0.0)), float(pol.get("fwd_cand", 0.0))
     n_flat = int(round(pol["f_flat"] * n_events)); n_fwd = int(round(f_fwd * n_events))
-    n_bulk = n_events - n_flat - n_fwd
+    n_def = 0 if default is None else len(default[0])
+    n_bulk = n_events - n_flat - n_fwd - n_def
+    if n_bulk < 0:
+        raise ValueError(f"mixture shares exceed the pool: flat {n_flat} + forward {n_fwd} + default {n_def} > {n_events}")
     uni = _sqrts_sampler(lo, hi, sqrts_measure, rng)
     log_s = sqrts_measure == "log"
     ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 0.0, beam_mass)   # bulk
@@ -3296,6 +3408,12 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
         ev_w, sq_w = _candidates(n_fwd, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 1.0, beam_mass)
         ev_b = ev_b + ev_w; sq_b = np.concatenate([sq_b, sq_w])
         me_b = np.concatenate([me_b, np.asarray(label(ev_w, sq_w), float)])
+    if n_def:
+        pdg = np.asarray(pdg_ids, int)
+        ev_d = [(default[0][i], pdg) for i in range(n_def)]
+        sq_d = np.asarray(default[1], float)
+        ev_b = ev_b + ev_d; sq_b = np.concatenate([sq_b, sq_d])
+        me_b = np.concatenate([me_b, np.asarray(label(ev_d, sq_d), float)])
     ev_f, sq_f, me_f = [], np.zeros(0), np.zeros(0)
     if n_flat:
         n_cand = max(int(pol["oversample"]) * n_flat, n_flat)
@@ -3341,7 +3459,8 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
 
 def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
                                    standalone_dir, backend, subproc_dirs,
-                                   driver_bin, config, output_file, rng=None, role=None):
+                                   driver_bin, config, output_file, rng=None, role=None,
+                                   default_rows=None, default_seed=None):
     """
     Build a variable-√s LO amplitude dataset by direct phase-space sampling.
     Bypasses MadGraph event generation entirely.
@@ -3351,6 +3470,9 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
 
     α_s is evaluated per event at μ = √s for matrix2py backend.
     C++ pipe driver uses fixed α_s at the geometric-mean scale.
+
+    `default_rows` = (a, b): the rows of the default-sampled share this pool (or chunk) reads (sampling f_default > 0;
+    None reads [0, round(f_default * n_events))), from the default-share pools of seed `default_seed`.
 
     `rng` is a seeded np.random.Generator. The only randomness in this path is
     the phase-space sampling, so a fixed rng makes the dataset reproducible
@@ -3386,15 +3508,21 @@ def build_dataset_variable_energy(n_events, sqrts_min, sqrts_max,
                  (list(config["m_final"]) if isinstance(config["m_final"], (list, tuple)) else [float(config["m_final"])] * nfinal)
         print(f"\n[DATA] Sampling {n_events:,} events  √s ∈ [{sqrts_min}, {sqrts_max}] GeV{cut_msg}"
               f"  policy=mixture f_flat={pol['f_flat']} oversample={pol['oversample']}")
+        default = None
+        if float(pol.get("f_default", 0)) > 0:
+            rows = default_rows or (0, int(round(float(pol["f_default"]) * n_events)))
+            default = default_share_momenta(pol["default_source"], role or "train", default_seed, rows,
+                                            accept=(sqrts_min, sqrts_max, m_list, pdg_ids, cuts))
+            print(f"  [SAMPLE] default share: rows [{rows[0]}, {rows[1]}) of {pol['default_source']} ({role})")
         if synthetic:
             events, sqrts_arr, total_me2 = build_mixture_dataset(
-                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, syn_label, measure, beam_mass)
+                n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, syn_label, measure, beam_mass, default)
         else:
             perm = row_to_slot_perm(pdg_ids, config["mg5_generate"])
             with CppDriverPipe(driver_bin, standalone_dir) as pipe:
                 label = lambda ev, sq: pipe.compute(ev, perm=perm, alphas=compute_alphas(np.asarray(sq, float), alphas_mz=amz))
                 events, sqrts_arr, total_me2 = build_mixture_dataset(
-                    n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label, measure, beam_mass)
+                    n_events, sqrts_min, sqrts_max, m_list, pdg_ids, rng, cuts, pol, label, measure, beam_mass, default)
         os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
         mmap_path = output_file + ".mmap"
         mmap = np.lib.format.open_memmap(mmap_path, mode="w+", dtype=np.float64, shape=(n_events, ncols))
@@ -3623,6 +3751,9 @@ def variable_energy_recipe(process, sqrts_min, sqrts_max, n_events,
     pol = sampling_policy(cfg, role)
     if pol["mode"] != "flat":
         recipe["sampling"] = {k: pol[k] for k in sorted(pol)}
+    if float(pol.get("f_default", 0)) > 0:
+        # the MadEvent pools the default share reads (their recipe ids), so a rebuilt source mints a new pool id
+        recipe["default_share"] = default_share_identity(pol["default_source"], role or "train", seed)
     # sampling masses are identity-bearing for every entry (a changed mass changes the
     # events), not only for mass scans
     recipe["m_finals"] = [float(m) for m in cfg.get("m_finals", cfg.get("m_final", []) if isinstance(cfg.get("m_final"), (list, tuple)) else [cfg.get("m_final", 0.0)] * int(cfg.get("nfinal", 0)))]
@@ -3652,6 +3783,9 @@ def recipe_output_path(recipe, out_dir):
     # a steered pool (tools/steer_pool.py) has its own tag: it is built from a reference model's
     # sigma, never by this generator, and must not shadow the mixture pool of the same spec
     samp_tag = {"flat": "", "steered": "_ssteer"}.get(mode, "_smix")
+    f_def = float((recipe.get("sampling") or {}).get("f_default", 0))
+    if f_def > 0:
+        samp_tag += f"d{int(round(100 * f_def)):02d}"     # a default-share pool never shadows its catalog's _smix pool
     if recipe.get("mode") == "lhe_pp":
         samp_tag = "_lhe"          # MadEvent pp events (catalog_daniel), never a sampler's pool
     return (f"{out_dir}/{recipe['process']}"
@@ -3715,7 +3849,7 @@ def generate_from_recipe(recipe, out_dir=None, reuse=True, compile_if_needed=Tru
 
     build_dataset_variable_energy(
         recipe["n_events"], recipe["sqrts_min"], recipe["sqrts_max"],
-        eff_dir, backend, subproc_dirs, driver_bin, cfg, output_file, rng=rng, role=role)
+        eff_dir, backend, subproc_dirs, driver_bin, cfg, output_file, rng=rng, role=role, default_seed=seed)
 
     full = dict(recipe)
     full["effective_seed"] = eff_seed
@@ -3810,8 +3944,25 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             "param_card_sha256": _file_sha256(param_card),
             # several MadEvent runs only where set (lhe.n_runs > 1), so every other pool keeps its identity
             **({"n_runs": int(cfg["lhe"]["n_runs"])} if int(cfg["lhe"].get("n_runs", 1)) > 1 else {}),
+            # an e+e- entry's fixed collider energies (lhe.energies), one MadEvent run each; absent for pp
+            **({"energies": [float(e) for e in cfg["lhe"]["energies"]]} if cfg["lhe"].get("energies") else {}),
         },
     }
+
+
+def lhe_runs(process, iseed, n_req):
+    """[(iseed, nevents, run-card patches, run name)] of an lhe entry's MadEvent runs. pp: lhe.n_runs runs of n_req at
+    iseed + 7919 k (the runs every pp pool was built with). e+e- (lhe.energies): each energy E gets n_runs runs of
+    ceil(n_req / len(energies)) with ebeam1 = ebeam2 = E / 2, so the energies have equal shares of the events."""
+    l = PROCESSES[process]["lhe"]
+    n_runs = int(l.get("n_runs", 1))
+    seed_k = lambda k: (iseed + 7919 * k - 1) % 30000 + 1
+    energies = [float(e) for e in (l.get("energies") or [])]
+    if not energies:
+        return [(seed_k(k), n_req, {}, f"run_{k + 1:02d}") for k in range(n_runs)]
+    n_e = int(math.ceil(n_req / len(energies)))
+    return [(seed_k(j * n_runs + k), n_e, {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{j * n_runs + k + 1:02d}")
+            for j, E in enumerate(energies) for k in range(n_runs)]
 
 
 def lhe_work_dir():
@@ -3824,7 +3975,9 @@ def lhe_work_dir():
 
 
 def lhe_standalone_dir(process):
-    return f"{WORK_DIR}/{process}_standalone"
+    # a default-share entry (dsh_<x>) labels with the standalone of the entry it names (same generate line, model and
+    # card), so the 13 TeV pp standalones already compiled for pp13v4 are not built again
+    return f"{WORK_DIR}/{PROCESSES.get(process, {}).get('standalone_of') or process}_standalone"
 
 
 def _mg5_script(script, log_path):
@@ -3868,14 +4021,14 @@ def lhe_prepare(process, work_root, log_path):
     return ev, sa
 
 
-def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01"):
+def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01", patches=None):
     """generate_events in `ev` with the catalog's cards (nevents and iseed set). run_mode 0 (one core)
     unless mg_cores > 1. Returns (lhe_path, banner_path)."""
     cfg = PROCESSES[process]
     run_card, param_card = lhe_cards(cfg)
     shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
     shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
-    patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(nevents), "iseed": int(iseed)})
+    patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(nevents), "iseed": int(iseed), **(patches or {})})
     mg_cores = max(1, int(mg_cores))
     _set_me5_config(f"{ev}/Cards/me5_configuration.txt",
                     {"run_mode": 0 if mg_cores == 1 else 2, "nb_core": mg_cores,
@@ -4023,11 +4176,11 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
     secs["output"] = time.time() - t0; t0 = time.time()
     # a process whose MadEvent run returns a fixed few thousand events however many are asked (its unweighting stalls)
     # runs n_runs times with seeds iseed + 7919 k (lhe.n_runs, in its pool identity), the unweighted events concatenated
-    n_runs = int(cfg["lhe"].get("n_runs", 1))
+    runs = lhe_runs(process, iseed, n_req)
+    n_runs = len(runs)
     moms, aqcds = [], []
-    for k in range(n_runs):
-        lhe, b = lhe_run_madevent(process, ev, n_req, (iseed + 7919 * k - 1) % 30000 + 1, log_path, mg_cores,
-                                  run_name=f"run_{k + 1:02d}")
+    for k, (iseed_k, n_k, patches_k, name_k) in enumerate(runs):
+        lhe, b = lhe_run_madevent(process, ev, n_k, iseed_k, log_path, mg_cores, run_name=name_k, patches=patches_k)
         banner = banner if k else b
         m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
         moms.append(m_k); aqcds.append(a_k)
@@ -4081,7 +4234,7 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
         full["effective_seed"] = seed
         full["backend"] = "cpp"
         full["lhe_run"] = {"n_lhe_events": n_lhe, "xsec_pb": xsec, "mg5_version": version,
-                           "iseeds": [(iseed + 7919 * k - 1) % 30000 + 1 for k in range(n_runs)],
+                           "iseeds": [r[0] for r in runs],
                            "events_per_run": [len(m_k) for m_k in moms],
                            "banner": bcopy, "mg_cores": int(mg_cores),
                            "alphas_range": [float(a.min()), float(a.max())],

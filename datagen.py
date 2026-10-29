@@ -240,7 +240,12 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
     # NLO-virtual is generated as one unit (see mg.process_n_chunks); LO uses the
     # cost-aware split. Both go through the same per-chunk seed / identity machinery.
     nch    = mg.process_n_chunks(process, n_events)
-    for idx, count in enumerate(split_counts(n_events, nch)):
+    counts = split_counts(n_events, nch)
+    pol    = mg.sampling_policy(mg.PROCESSES.get(process, {}), role) if process in mg.PROCESSES else {}
+    f_def  = float(pol.get("f_default", 0))
+    # the default-sampled share (mg.default_share_rows): each chunk reads its own consecutive rows
+    drows  = mg.default_share_rows(f_def, counts) if f_def > 0 else [None] * len(counts)
+    for idx, count in enumerate(counts):
         tasks.append({
             "process":   process,
             "sqrts_min": float(sqrts_min),
@@ -254,6 +259,7 @@ def chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, work_dir):
             # weight), in 2→2-equivalent events. For LPT scheduling + reporting
             # only — never touches the data.
             "est_cost":  float(count) * weight,
+            **({"default_rows": list(drows[idx]), "default_seed": seed} if drows[idx] is not None else {}),
         })
     return tasks
 
@@ -343,7 +349,8 @@ def gen_chunk(task):
     t0 = time.perf_counter()
     mg.build_dataset_variable_energy(
         task["count"], task["sqrts_min"], task["sqrts_max"],
-        eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng, role=task.get("role"))
+        eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng, role=task.get("role"),
+        default_rows=task.get("default_rows"), default_seed=task.get("default_seed"))
     _report_chunk_time(task, time.perf_counter() - t0)
     return task["idx"], out_path
 
