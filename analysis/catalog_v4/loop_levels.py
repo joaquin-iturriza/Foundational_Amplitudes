@@ -789,8 +789,7 @@ def multiplicity_candidates():
     four to five particles of the training pools, and the spread (standard deviation) of all training tree levels at
     each multiplicity. No threshold: a candidate shrinks the steps if each of the four numbers at five to six particles
     is below the reference's.
-        python3 analysis/catalog_v4/loop_levels.py --mult-candidates -> data/tree_levels_mult_cand.json,
-                                                                          figs/tree_levels_mult_cand.{png,pdf}"""
+        python3 analysis/catalog_v4/loop_levels.py --mult-candidates -> data/tree_levels_mult_cand.json"""
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     from select_catalog_v4 import ADDS
     d = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
@@ -895,24 +894,8 @@ def multiplicity_candidates():
                 flat[f"mc.{c}.{lab}.initial.{k}"] = round(v, 3)
         for k, v in R[c].get("level_sd", {}).items():
             flat[f"mc.{c}.level_sd.{k}"] = round(v, 3)
-    plot_mult_cand(per, C)
     print(json.dumps(flat))
     return R
-
-
-def plot_mult_cand(per, C):
-    import plot_style as ps
-    fig, axs = ps.figure(ncols=2)
-    col = {"none": ps.C.grey, "soft_norm": ps.C.blue, "eikonal": ps.C.vermillion, "parent_scale": ps.C.green}
-    lab = {"none": "emission scales", "soft_norm": r"$-(N-4)\log 4$", "eikonal": "soft-limit weight",
-           "parent_scale": "parent level as input"}
-    for a, k in zip(axs, ("train_6", "heldout_6")):
-        for c in C:
-            s = np.sort(np.abs([x[1] for x in per[c][k]]))
-            a.plot(s, np.arange(1, len(s) + 1) / len(s), color=col[c], label=f"{lab[c]} ({len(s)})")
-        a.set_xscale("log"); a.set_xlabel(r"$|\overline{t}_{6}-\overline{t}_{5}|$"); a.set_ylabel("fraction of pools")
-        ps.legend(a, "upper left"); ps.make_room(a)
-    ps.save(fig, os.path.join(HERE, "figs", "tree_levels_mult_cand"))
 
 
 def multiplicity_read():
