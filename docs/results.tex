@@ -1714,6 +1714,78 @@ offsets are on pools with two matched training pools or fewer.
   \label{fig:v4_loop_levels}
 \end{figure}
 
+\paragraph{Does the thin-class reading hold on catalog\_v4's tree axes (2026-10-29).}\label{par:v4_tree_levels} The
+question, from the paragraph above: five of the six largest one-loop offsets sit on pools with two matched training
+pools or fewer, which would make coverage of thin property classes, not a change of target, the fix to propose for the
+level. Here the same reading on the three tree held-out axes (H1 new combinations, H2 multiplicity, H3 particle
+content). No new run: the same two pretrainings (seeds $42$ and $43$) and their zero-shot offsets per pool, the same
+levels $\overline t$ computed on CC from the pretraining's config, now for the $1045$ training tree pools and the $62$,
+$218$ and $279$ held-out pools, and the same single match rule (same multiplicity, initial state and born orders,
+against the training tree pools; unmatched pools kept as such). Per held-out pool its seed-mean absolute offset is
+read against its matched class size, in the paragraph above's two bins (two matches or fewer, unmatched included, and
+more) and through the six largest offsets per axis (\code{analysis/catalog\_v4/loop\_levels.py --trees},
+Fig.~\ref{fig:v4_tree_levels}). The held-out levels agree with the zero-shot reads' saved train means to $0.001$.
+% src: python3 analysis/catalog_v4/loop_levels.py --trees @d27a8391
+% claim: n_train=1045
+% claim: H1.n=62
+% claim: H2.n=218
+% claim: H3.n=279
+% claim: H1.level_check_maxabs=0.001
+% claim: H1.outside_all=0
+% claim: H2.outside_all=0
+% claim: H3.outside_all=0
+% claim: H1.n_thin=4
+% claim: H2.n_thin=13
+% claim: H3.n_thin=35
+% claim: H1.n_unmatched=2
+% claim: H2.n_unmatched=8
+% claim: H3.n_unmatched=24
+% claim: H1.median_abs_off_thin=0.124
+% claim: H2.median_abs_off_thin=0.333
+% claim: H3.median_abs_off_thin=0.742
+% claim: H1.median_abs_off_wide=0.091
+% claim: H2.median_abs_off_wide=0.192
+% claim: H3.median_abs_off_wide=0.346
+% claim: H1.largest_thin=0
+% claim: H2.largest_thin=1
+% claim: H3.largest_thin=2
+% claim: H2.largest_thin_seed43=0
+% claim: H1.thin_share=0.065
+% claim: H2.thin_share=0.06
+% claim: H3.thin_share=0.125
+% claim: H1.n_matched=60
+% claim: H2.n_matched=210
+% claim: H3.n_matched=255
+% claim: H1.n_closer_than_match=60
+% claim: H2.n_closer_than_match=198
+% claim: H3.n_closer_than_match=216
+% claim: H3.match_n.v4_udx_ttxwp=28
+% claim: H2.match_n.v4_gg_ccxepem=7
+% claim: H2.match_n.v4_gg_bbxepem=7
+% allow: 42 43 2 6 because they are the seeds, the bin edge and the count of largest offsets carried from the paragraph above, settings
+No held-out tree level lies outside the training range on any axis, so the tree levels too are interpolations. Thin
+classes are rare on trees: $4$, $13$ and $35$ held-out pools (shares $0.065$, $0.06$, $0.125$) have two matches or
+fewer, of which $2$, $8$ and $24$ none. Their typical offset is larger, on every axis: the median absolute offset is
+$0.124$ against $0.091$ on H1, $0.333$ against $0.192$ on H2, $0.742$ against $0.346$ on H3 (H1's thin bin holds four
+pools). But the largest offsets are not theirs: of each axis's six largest, $0$ on H1, $1$ on H2 (seed $43$ alone:
+$0$) and $2$ on H3 are thin, about the thin share of six. They sit in well-covered classes: on H3 $u\bar d\to t\bar
+tW^+$ ($28$ matches, the largest tree offset in both seeds), $e^+e^-\to HHt\bar t$ and $e^+e^-\to Ht\bar tZ$; on H2
+$e^+e^-\to dH\bar uW^+$ and the $gg\to c\bar c\ell^+\ell^-$-type pools ($7$ matches each). As on one loop, the network
+places the level much closer than its class mean: the offset is smaller than the departure on $60$ of $60$, $198$ of
+$210$ and $216$ of $255$ matched pools. So a thin class raises the typical tree offset, but the error that matters on
+the tree axes is in covered classes, largest on H3's top pools: coverage of thin classes would not remove it, and the
+one-loop reading (thin classes carry the largest offsets) does not carry to trees as a general rule.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/tree_levels.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --trees @d27a8391
+  \caption{catalog\_v4's tree held-out axes. Left: per held-out pool its seed-mean absolute zero-shot offset against
+    the number of matched training tree pools (same multiplicity, initial state and born orders) plus one; the dashed
+    line separates two matches or fewer. Right: per matched pool its offset (seed mean) against its departure from the
+    matched pools' mean level; the dashed line is the offset of a network that predicts that mean.}
+  \label{fig:v4_tree_levels}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
