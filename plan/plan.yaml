@@ -3452,6 +3452,7 @@ entries:
       - 'tasks failed or pools short: list them with their cause, fix and requeue only those, then collect again'
   step_waits:
     '1': CC's /sps/lpnhe disk to have 50G free (the parts cleanup is freeing about 340G)
+    '6': catalog_coverage step 1's pp13v4 validation passing
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
