@@ -123,17 +123,12 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'When the Born re-evaluation job FA-ccin2p3-4ecff34d (scripts/job_v4_loop_born.sh @086cd929: MadLoop''s Born on 2000
-      train events of 17 catalog_v4 one-loop pools, the stored target recomputed and checked) ends: read its log (site logs),
-      save the LOOP_BORN_EVENTS line as analysis/catalog_v4/data/loop_born_events_cc.json, run python3 analysis/catalog_v4/loop_born_events.py
-      (the rule fixed in its docstring before reading: the proxy holds if the median |per-event mean of log|c0+shift| - pool-level
-      step| < 0.2 and no fully re-evaluated held-out pool, v4_bb_bb, v4_bbx_hz, v4_bbx_zz, v4_ddx_ag, v4_bbx_ccxh with their
-      whole matched classes, changes its narrower-or-not verdict); also report the stored mass-scheme shift: catalog_v4''s
-      one-loop entries carry no _v3 flag, so generate_virt_dataset applies C_F(3 ln(s/m^2)+5) with m the first massive final
-      (a W, Z, H too), against catalog_v3''s no-shift call; the job''s log|c0| beside log|c0+shift| shows its size; write
-      up beside par:v4_loop_born (% src / % claim). Then, on the proxy''s verdict, design (plan design, design-reviewer) the
-      short pretraining arm with the Born-relative one-loop target against the control pair v4_dimensionless_muon seeds 42
-      and 43'
+    2: 'Design and, once CC-IN2P3''s /sps/lpnhe project disk has space (full, 512G of 512G, on 2026-10-29), submit the per-event
+      Born re-evaluation over every read catalog_v4 one-loop pool (the 85 training and 21 held-out virtual pools of par:v4_loop_born,
+      analysis/catalog_v4/loop_born_events.py extended to them, tools/nlo_virtual_pipeline.py --born-of, split one CPU job
+      per pool or finer as site pick allows): plan design with prior par:v4_loop_born and par:v4_loop_born_events, design-reviewer,
+      then submit; it yields both the per-event Born-relative read and, exactly, the target without the mass-scheme shift
+      (stored - shift*Born)'
     4: 'When CC''s /sps/lpnhe disk has space again (it was 512G of 512G when FA-ccin2p3-5f368c52 and -c8411ffc died at the
       task epilog, ''No space left on device''): resubmit the two TR reads of the control pair under the passed shape-gap
       design (REREAD of FA-ccin2p3-339ec100 seed 42 and -380842ed seed 43, scripts/job_catalog_v3_short.sh mode eval V3_AXES=TR,
@@ -1258,19 +1253,13 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     2:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): whether a Born-relative one-loop target removes the one-loop
-        axis''s own low-placed level (par:v4_loop_groups, par:v4_loop_born), and whether the pool-level read that proposed
-        it can be trusted'
+      feeds: 'the zero-shot bias (D178): whether a Born-relative one-loop target narrows the held-out one-loop departures
+        on per-event values, the pool-level proxy having failed its check'
       if:
-      - 'the proxy holds by the fixed rule: record the arm''s design (the Born per event from --born-of on every one-loop
-        training and held-out pool as a CPU job, or the sidecar in a regeneration), run the design-reviewer, then submit under
-        the GPU budget'
-      - 'the proxy fails (median gap >= 0.2 or a verdict flips): redo the par:v4_loop_born read on per-event values for every
-        read one-loop pool (a CPU job of --born-of over all 106 pools) before any arm, and record the pool-level result as
-        a proxy that failed its check'
-      - 'the stored target does not reproduce (max_rel above 1e-6 on a pool) or the shift dominates log|c0+shift| on the W/Z/H
-        pools: report it to the user as a question on catalog_v4''s one-loop target (the shift is a pool-content call), the
-        arm waits on it'
+      - 'the per-event read narrows held-out departures and class spreads by the par:v4_loop_born sign tests: design the short
+        pretraining arm with the Born-relative target against the control pair v4_dimensionless_muon seeds 42 and 43, on the
+        shift the user chooses'
+      - 'it does not narrow: record the Born-relative target as a dead end and return the one-loop level question to par:v4_loop_groups'
     4:
       feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
         gap beyond intrinsic difficulty or the network''s floor at this compute, which decides whether shape work targets
