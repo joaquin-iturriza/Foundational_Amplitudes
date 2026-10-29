@@ -248,6 +248,13 @@ entries:
       (median 4.2% vs 3.5%); seed 43 alone 7/7, 3 ties; three of four runs blew up between steps 595 and 765 (both pair runs,
       the seed-43 control), so that rate is unstable for this arm with or without the head'
     at: '2026-10-26T21:36:28+00:00'
+  - tried: sign-extension generation jobs FA-ccin2p3-d634e7d6, FA-ccin2p3-9d6b050f, FA-ccin2p3-8d79da6f (recipes/gen_catalog_v4.py
+      as of their submission)
+    why: 'cancelled deliberately: 50 of the 123 one-loop entries were built at full coupling order on a mixed QCD/EW Born,
+      which MadLoop cannot certify; being rebuilt on the pure-QCD Born per D142. d634e7d6 had only the site banner in its
+      log; 9d6b050f and 8d79da6f had started (pp13v4 tree pools compiled and checked ok vs parent) when cancelled; no results
+      kept'
+    at: '2026-10-29T13:38:30+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
