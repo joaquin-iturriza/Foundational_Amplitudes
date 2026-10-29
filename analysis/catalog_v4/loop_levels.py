@@ -726,6 +726,195 @@ def plot(res, mt, names, T, P):
     ps.save(fig, os.path.join(HERE, "figs", "loop_levels"))
 
 
+def training_parents(r, n_parent, T, P4, cls, rep_of, adds):
+    """The parent rule of multiplicity_read: the training class representatives (heavy-quark layer out) with n_parent
+    particles from which a member of class r was built by one recorded addition (catalog_v4_processes.yaml `why`)."""
+    out = set()
+    for m in cls.get(r, [r]):
+        why = P4.get(m, {}).get("why", "")
+        for s_ in adds:
+            if why.endswith(s_) and why[: -len(s_)] in rep_of:
+                out.add(rep_of[why[: -len(s_)]]); break
+    return sorted(p for p in out if p in T and not T[p]["heavy_layer"] and T[p]["n"] == n_parent)
+
+
+# colour Casimir and squared electric charge per |pdg| (SM, the 2HDM's H+ 37, h2 35, h3 36 neutral)
+CF, CA = 4.0 / 3.0, 3.0
+CHARGES = {**{q: (CF, 4.0 / 9.0) for q in (2, 4, 6)}, **{q: (CF, 1.0 / 9.0) for q in (1, 3, 5)}, 21: (CA, 0.0),
+           **{l: (0.0, 1.0) for l in (11, 13, 15, 24, 37)}, **{z: (0.0, 0.0) for z in (12, 14, 16, 22, 23, 25, 35, 36)}}
+
+
+def eikonal_term(pdgs):
+    """Candidate 1 of multiplicity_candidates, from the emission-scale target's soft limit: an emitted soft gluon
+    (photon) k gives |M_{n+1}|^2 -> 4 pi alpha_s (alpha) * sum over unordered pairs a<b of the rest of
+    4 (-T_a.T_b) / q^2_ab |M_n|^2 (q^2_ab = s_ak s_bk / s_ab, the target's emission scale; for e+e- -> q q~ g,
+    4 C_F / q^2, the known (x1^2 + x2^2) / ((1-x1)(1-x2)) at its soft end). The target divides out 4 pi alpha and q^2,
+    so each soft emission leaves log(4 x colour weight) in the level. Weighting the pairs alike, colour conservation
+    gives sum_{a<b} (-T_a.T_b) = (1/2) sum_a C_a, so the term is log(2 sum_a C_a) over the rest's legs (incoming and
+    outgoing), log(2 sum_a Q_a^2) for a photon. Returns the sum over the final gluons and photons, None for a species
+    outside CHARGES or an emission with no charged rest. Z and H are massive (no soft limit) and get none."""
+    if any(abs(p) not in CHARGES for p in pdgs):
+        return None
+    tot = 0.0
+    for k in range(2, len(pdgs)):
+        if abs(pdgs[k]) not in (21, 22):
+            continue
+        rest = [CHARGES[abs(p)][0 if abs(pdgs[k]) == 21 else 1] for i, p in enumerate(pdgs) if i != k]
+        if sum(rest) <= 0:
+            return None
+        tot += float(np.log(2.0 * sum(rest)))
+    return tot
+
+
+def multiplicity_candidates():
+    """Candidate target or input changes for the level's dependence on multiplicity (v3_prep_explore, the user's first
+    priority D178; par:v4_mult_bias: the multiplicity pools' signed offset follows the level's step from the five
+    particle parent). No new run: the per-pool train levels of data/tree_levels.json (analyse_trees, from
+    tree_levels_cc.json) and multiplicity_read's parent rule. Candidates, fixed before their numbers were read, each a
+    function of the process's particles alone (every process alike, never per beam), none with a fitted scale:
+      none        the pretraining default (the emission-scale target, coupling orders, s0 = 1), the reference;
+      soft_norm   the soft limit's normalisation, log 4 per emission step beyond the 2->2 core, taken out of the target
+                  ((N - 4) log 4; a constant per particle, which moves every step alike and so tests the steps' common
+                  part only);
+      eikonal     the soft limit's colour or charge weight taken out as well: minus eikonal_term (per final gluon or
+                  photon, log(2 sum C_a) or log(2 sum Q_a^2) over the other legs);
+      parent_scale the parent's level as an input scale, the network predicting a pool's level less its one-particle-
+                  fewer training parents' mean level: the step it must then extrapolate from five to six particles is
+                  the step's change along the family, the own step less the parent's own step from its four particle
+                  training parents (read on the pools whose parent has one).
+    Per candidate, on the training six particle pools with a five particle training parent and on the multiplicity
+    held-out pools (H2): the median absolute own step and its spread across classes (one match rule: initial state and
+    born orders at six particles; the standard deviation of the class medians, over classes with two pools or more);
+    beside them, as the check that a candidate does not widen the level spread elsewhere, the same for the steps from
+    four to five particles of the training pools, and the spread (standard deviation) of all training tree levels at
+    each multiplicity. No threshold: a candidate shrinks the steps if each of the four numbers at five to six particles
+    is below the reference's.
+        python3 analysis/catalog_v4/loop_levels.py --mult-candidates -> data/tree_levels_mult_cand.json,
+                                                                          figs/tree_levels_mult_cand.{png,pdf}"""
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    from select_catalog_v4 import ADDS
+    d = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
+    T, H = d["train"], {n: r for n, r in d["heldout"]["H2"].items() if not r.get("missing")}
+    P4 = yaml.load(open(os.path.join(ROOT, "recipes", "catalog_v4_processes.yaml")),
+                   Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))["processes"]
+    cls = json.load(open(os.path.join(HERE, "census_classes.json")))["classes"]
+    rep_of = {m: r for r, ms in cls.items() for m in ms}
+    pdg = lambda n: next((P4[m]["pdg_ids"] for m in cls.get(n, [n]) if m in P4), None)
+    eik = {n: (eikonal_term(pdg(n)) if pdg(n) is not None else None) for n in list(T) + list(H)}
+    shift = {"none": lambda n, r: 0.0, "soft_norm": lambda n, r: -(r["n"] - 4) * np.log(4.0),
+             "eikonal": lambda n, r: (None if eik[n] is None else -(r["n"] - 4) * np.log(4.0) - eik[n])}
+    key = lambda r: f"{r['initial']} {r['born']}"
+    par = lambda n, k: training_parents(n, k, T, P4, cls, rep_of, ADDS)
+
+    def steps(pools, n_child, cand):
+        """per pool with n_child particles and a training parent of one fewer: (class, own step) under cand"""
+        out, skipped = [], 0
+        for n, r in pools.items():
+            if r["n"] != n_child or r.get("heavy_layer"):
+                continue
+            ps = par(n, n_child - 1)
+            if not ps:
+                continue
+            if cand == "parent_scale":
+                gps = {p: par(p, n_child - 2) for p in ps}
+                if not all(gps.values()):
+                    skipped += 1; continue
+                own = r["level"] - np.mean([T[p]["level"] for p in ps])
+                pst = np.mean([T[p]["level"] - np.mean([T[g]["level"] for g in gps[p]]) for p in ps])
+                out.append((key(r), float(own - pst), n)); continue
+            f = shift[cand]
+            fc, fp = f(n, r), [f(p, T[p]) for p in ps]
+            if fc is None or any(x is None for x in fp):
+                skipped += 1; continue
+            out.append((key(r), float((r["level"] + fc) - np.mean([T[p]["level"] + x for p, x in zip(ps, fp)])), n))
+        return out, skipped
+
+    def summ(rows):
+        by = {}
+        for k, s, _ in rows:
+            by.setdefault(k, []).append(s)
+        cm = [float(np.median(v)) for v in by.values() if len(v) > 1]
+        bi = {}
+        for k, s, _ in rows:
+            bi.setdefault(k.split()[0], []).append(s)
+        return {"median_step_by_initial": {k: float(np.median(v)) for k, v in sorted(bi.items())},"n": len(rows), "median_abs_step": float(np.median([abs(s) for _, s, _ in rows])) if rows else None,
+                "median_step": float(np.median([s for _, s, _ in rows])) if rows else None,
+                "class_spread": float(np.std(cm)) if len(cm) > 1 else None, "n_classes": len(cm)}
+
+    C = ("none", "soft_norm", "eikonal", "parent_scale")
+    R, per = {}, {}
+    for c in C:
+        tr6, s1 = steps(T, 6, c); ho6, s2 = steps(H, 6, c); tr5, s3 = steps(T, 5, c)
+        R[c] = {"train_6": summ(tr6), "heldout_6": summ(ho6), "train_5": summ(tr5),
+                "skipped": {"train_6": s1, "heldout_6": s2, "train_5": s3}}
+        per[c] = {"train_6": tr6, "heldout_6": ho6}
+        if c != "parent_scale":   # the level spread at each multiplicity (parent_scale is an input, the level unchanged)
+            lv = {}
+            for n, r in T.items():
+                x = shift[c](n, r)
+                if x is not None and not r["heavy_layer"]:
+                    lv.setdefault(r["n"], []).append(r["level"] + x)
+            R[c]["level_sd"] = {str(k): float(np.std(v)) for k, v in sorted(lv.items())}
+        # a common subset for the reference: the same pools as this candidate reads (eikonal and parent_scale skip some)
+        if c != "none":
+            for lab, rows in (("train_6", tr6), ("heldout_6", ho6)):
+                keep = {n for _, _, n in rows}
+                R[c][f"{lab}_ref_same_pools"] = summ([x for x in per["none"][lab] if x[2] in keep])
+    # why parent_scale may read no pool: the recorded origin of the five particle training pools (a 2->3 built by
+    # one addition to a 2->2 has a four particle parent; "exhaustive" ones have none)
+    import collections
+    R["origin_of_five_particle_training_pools"] = dict(collections.Counter(
+        ("addition" if any(P4.get(m, {}).get("why", "").endswith(a) for m in cls.get(n, [n]) for a in ADDS)
+         else "other") for n, r in T.items() if r["n"] == 5 and not r["heavy_layer"]))
+    for c in C[1:]:
+        R[c]["shrinks"] = all(
+            R[c][lab][m] is not None and R[c][f"{lab}_ref_same_pools"][m] is not None
+            and R[c][lab][m] < R[c][f"{lab}_ref_same_pools"][m]
+            for lab in ("train_6", "heldout_6") for m in ("median_abs_step", "class_spread"))
+    for c in C:
+        print(f"{c:13s}", {k: v for k, v in R[c].items()})
+    print("origin of the five particle training pools:", R["origin_of_five_particle_training_pools"])
+    json.dump({"summary": R, "pools": per, "eikonal_term": eik},
+              open(os.path.join(HERE, "data", "tree_levels_mult_cand.json"), "w"), indent=1)
+    flat = {f"mc.five_origin.{k}": v for k, v in R["origin_of_five_particle_training_pools"].items()}
+    for c in C:
+        for lab in ("train_6", "heldout_6", "train_5"):
+            for m in ("n", "median_abs_step", "class_spread", "median_step"):
+                v = R[c][lab][m]
+                if v is not None:
+                    flat[f"mc.{c}.{lab}.{m}"] = round(v, 3) if isinstance(v, float) else v
+        if c != "none":
+            for lab in ("train_6", "heldout_6"):
+                for m in ("median_abs_step", "class_spread"):
+                    v = R[c][f"{lab}_ref_same_pools"][m]
+                    if v is not None:
+                        flat[f"mc.{c}.{lab}.ref.{m}"] = round(v, 3)
+            flat[f"mc.{c}.shrinks"] = int(R[c]["shrinks"])
+        for lab in ("train_6", "heldout_6"):
+            for k, v in R[c][lab].get("median_step_by_initial", {}).items():
+                flat[f"mc.{c}.{lab}.initial.{k}"] = round(v, 3)
+        for k, v in R[c].get("level_sd", {}).items():
+            flat[f"mc.{c}.level_sd.{k}"] = round(v, 3)
+    plot_mult_cand(per, C)
+    print(json.dumps(flat))
+    return R
+
+
+def plot_mult_cand(per, C):
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    col = {"none": ps.C.grey, "soft_norm": ps.C.blue, "eikonal": ps.C.vermillion, "parent_scale": ps.C.green}
+    lab = {"none": "emission scales", "soft_norm": r"$-(N-4)\log 4$", "eikonal": "soft-limit weight",
+           "parent_scale": "parent level as input"}
+    for a, k in zip(axs, ("train_6", "heldout_6")):
+        for c in C:
+            s = np.sort(np.abs([x[1] for x in per[c][k]]))
+            a.plot(s, np.arange(1, len(s) + 1) / len(s), color=col[c], label=f"{lab[c]} ({len(s)})")
+        a.set_xscale("log"); a.set_xlabel(r"$|\overline{t}_{6}-\overline{t}_{5}|$"); a.set_ylabel("fraction of pools")
+        ps.legend(a, "upper left"); ps.make_room(a)
+    ps.save(fig, os.path.join(HERE, "figs", "tree_levels_mult_cand"))
+
+
 def multiplicity_read():
     """The multiplicity axis's signed level bias (v3_prep_explore, the user's first priority D178: the zero-shot bias).
     par:v4_tree_newproc found the multiplicity pools' (H2, all 2->4) seed-mean offset positive on most of them: the
@@ -756,13 +945,7 @@ def multiplicity_read():
     rep_of = {m: r for r, ms in cls.items() for m in ms}
 
     def parents5(r):
-        out = set()
-        for m in cls.get(r, [r]):
-            why = P4.get(m, {}).get("why", "")
-            for s_ in ADDS:
-                if why.endswith(s_) and why[: -len(s_)] in rep_of:
-                    out.add(rep_of[why[: -len(s_)]]); break
-        return sorted(p for p in out if p in T and not T[p]["heavy_layer"] and T[p]["n"] == 5)
+        return training_parents(r, 5, T, P4, cls, rep_of, ADDS)
 
     key = lambda r: (r["initial"], r["born"])
     steps = {}
@@ -888,12 +1071,16 @@ if __name__ == "__main__":
     ap.add_argument("--dump", action="store_true")
     ap.add_argument("--trees", action="store_true", help="the tree held-out axes H1, H2, H3")
     ap.add_argument("--multiplicity", action="store_true", help="the multiplicity axis's signed bias (multiplicity_read)")
+    ap.add_argument("--mult-candidates", action="store_true",
+                    help="candidate target or input changes for the multiplicity step (multiplicity_candidates)")
     ap.add_argument("--loop-groups", action="store_true", help="the one-loop axis by the tree reads (loop_group_read)")
     ap.add_argument("--chunk", type=int, default=0)
     ap.add_argument("--nchunks", type=int, default=1)
     A = ap.parse_args()
     if A.dump:
         dump(A.trees, A.chunk, A.nchunks)
+    elif A.mult_candidates:
+        multiplicity_candidates()
     elif A.multiplicity:
         multiplicity_read()
     elif A.loop_groups:
