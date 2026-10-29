@@ -225,6 +225,32 @@ def test_generated():
     print(f"[generated] ok ({len(dsh)} dsh entries)")
 
 
+def test_chunked_full_shares():
+    """f_default 0.50 fills the pool with 0.35 flat and 0.15 forward (no bulk): chunks of [334, 333, 333] round the
+    flat and forward shares per chunk and the default rows cumulatively (default_share_rows), which overshot a chunk by
+    one event before the remainder went to the forward share. Every chunk must come out at its count, and the chunks
+    together read the default rows [0, round(0.5 N)) exactly once."""
+    k = 5
+    rng = np.random.default_rng(5)
+    counts = [334, 333, 333]
+    pol = {**mg.DEFAULT_SAMPLING, **mg.V4_SAMPLING, "f_default": 0.5, "default_source": "zz_unused"}
+    label = lambda ev, s: np.array([1.0 + abs(e[0][2, 3]) / s_ for e, s_ in zip(ev, s)])
+    cuts = dict(mg.V4_CUTS["hadronic"])
+    n_d = int(round(0.5 * sum(counts)))
+    D, _, Dsq = _boosted_events(n_d, k, rng)
+    seen = []
+    for c, (a, b) in zip(counts, mg.default_share_rows(0.5, counts)):
+        ev, s, me = mg.build_mixture_dataset(c, 30, 6000, [0.0] * 3, [21] * k, np.random.default_rng(10 + c), cuts,
+                                             pol, label, "log", {}, (D[a:b], Dsq[a:b]))
+        assert len(ev) == c and len(s) == c and len(me) == c, (c, len(ev))
+        M = np.stack([e[0] for e in ev])
+        for i in range(a, b):
+            assert len(np.where(np.all(np.isclose(M, D[i], atol=1e-12), axis=(1, 2)))[0]) == 1, (c, i)
+        seen += list(range(a, b))
+    assert seen == list(range(n_d)), "default rows not read exactly once"
+    print("[chunked full shares] ok")
+
+
 if __name__ == "__main__":
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     test_partonic_frame()
@@ -232,4 +258,5 @@ if __name__ == "__main__":
     test_lhe_runs()
     test_identity_and_path()
     test_read_and_mixture()
+    test_chunked_full_shares()
     test_generated()

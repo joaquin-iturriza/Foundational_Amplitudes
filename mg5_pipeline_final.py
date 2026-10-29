@@ -3398,12 +3398,26 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
     n_flat = int(round(pol["f_flat"] * n_events)); n_fwd = int(round(f_fwd * n_events))
     n_def = 0 if default is None else len(default[0])
     n_bulk = n_events - n_flat - n_fwd - n_def
+    if default is not None:
+        # the default share's rows round cumulatively over chunks (default_share_rows), the flat and forward shares
+        # per chunk: when the shares fill the pool (f_default 0.50 with 0.35 + 0.15, no bulk left) or a chunk's
+        # roundings overshoot it, the remainder goes to the forward share, so the shares sum to the chunk exactly.
+        # The default=None path (every pool without a default share) is untouched.
+        f_sum = float(pol["f_flat"]) + f_fwd + float(pol.get("f_default", 0.0))
+        if n_bulk < 0 or abs(f_sum - 1.0) < 1e-9:
+            n_fwd += n_bulk
+            n_bulk = 0
+            if n_fwd < 0:
+                raise ValueError(f"mixture shares exceed the pool: flat {n_flat} + default {n_def} > {n_events}")
     if n_bulk < 0:
         raise ValueError(f"mixture shares exceed the pool: flat {n_flat} + forward {n_fwd} + default {n_def} > {n_events}")
     uni = _sqrts_sampler(lo, hi, sqrts_measure, rng)
     log_s = sqrts_measure == "log"
-    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 0.0, beam_mass)   # bulk
-    me_b = np.asarray(label(ev_b, sq_b), float)
+    if n_bulk:
+        ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 0.0, beam_mass)   # bulk
+        me_b = np.asarray(label(ev_b, sq_b), float)
+    else:   # no bulk left (f_default 0.50: flat + forward + default fill the pool); _candidates(0) cannot run
+        ev_b, sq_b, me_b = [], np.zeros(0), np.zeros(0)
     if n_fwd:
         ev_w, sq_w = _candidates(n_fwd, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 1.0, beam_mass)
         ev_b = ev_b + ev_w; sq_b = np.concatenate([sq_b, sq_w])
