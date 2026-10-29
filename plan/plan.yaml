@@ -123,15 +123,17 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Design (plan design, design-reviewer before any job) a short pretraining arm with catalog_v4''s one-loop QCD virtual
-      target taken relative to its Born event by event (t_virt - t_Born = log|c0 + shift|, the candidate that passed par:v4_loop_born
-      on the pool-level reads: median held-out departure 1.24 -> 0.851, narrower on 12 of 16, p 0.0384; within-class spread
-      2.55 -> 1.01, 12 of 12), against the control pair v4_dimensionless_muon seeds 42 and 43, measured on the one-loop axis''s
-      signed offset, floor and zero-shot MSE. The Born per event is not stored (MadLoop returns it, tools/nlo_virtual_pipeline.py
-      discards it): the design names how it is obtained on the pools'' events (a CPU re-evaluation on CC, site pick, --item
-      v3_prep_explore) and first checks the pool-level proxy (tree pools mixture-shaped, one-loop pools never shaped) on a
-      few pools: per-event mean of t_virt - t_Born against the pool-level step; loop-induced pools (no Born) stay on the target
-      as trained and are named'
+    2: 'When the Born re-evaluation job FA-ccin2p3-4ecff34d (scripts/job_v4_loop_born.sh @086cd929: MadLoop''s Born on 2000
+      train events of 17 catalog_v4 one-loop pools, the stored target recomputed and checked) ends: read its log (site logs),
+      save the LOOP_BORN_EVENTS line as analysis/catalog_v4/data/loop_born_events_cc.json, run python3 analysis/catalog_v4/loop_born_events.py
+      (the rule fixed in its docstring before reading: the proxy holds if the median |per-event mean of log|c0+shift| - pool-level
+      step| < 0.2 and no fully re-evaluated held-out pool, v4_bb_bb, v4_bbx_hz, v4_bbx_zz, v4_ddx_ag, v4_bbx_ccxh with their
+      whole matched classes, changes its narrower-or-not verdict); also report the stored mass-scheme shift: catalog_v4''s
+      one-loop entries carry no _v3 flag, so generate_virt_dataset applies C_F(3 ln(s/m^2)+5) with m the first massive final
+      (a W, Z, H too), against catalog_v3''s no-shift call; the job''s log|c0| beside log|c0+shift| shows its size; write
+      up beside par:v4_loop_born (% src / % claim). Then, on the proxy''s verdict, design (plan design, design-reviewer) the
+      short pretraining arm with the Born-relative one-loop target against the control pair v4_dimensionless_muon seeds 42
+      and 43'
     4: 'When the three shape-gap jobs end (TR reads of the control pair FA-ccin2p3-c8411ffc seed 42, -5f368c52 seed 43; the
       shape proxy on catalog_v4 FA-ccin2p3-45d20a1f), read the logs, collect the TR reads (tools/collect_run.py --axes TR
       into analysis/catalog_v3/data/short_reads/v4_dimensionless_muon[_seed2]/TR), bring $SCRATCH/zz_v4_prep/prep_shape_v4.json
@@ -1233,12 +1235,18 @@ entries:
   step_why:
     2:
       feeds: 'the zero-shot bias, the user''s first priority (D178): whether a Born-relative one-loop target removes the one-loop
-        axis''s own low-placed level (par:v4_loop_groups, par:v4_loop_born)'
+        axis''s own low-placed level (par:v4_loop_groups, par:v4_loop_born), and whether the pool-level read that proposed
+        it can be trusted'
       if:
-      - 'the per-event proxy check agrees with the pool-level step on the checked pools and the design passes review: submit
-        the arm under the GPU budget and record it with plan run'
-      - 'the per-event mean departs from the pool-level step enough to change which pools narrow: redo the par:v4_loop_born
-        read on the per-event values before any arm, and record the pool-level result as a proxy that failed its check'
+      - 'the proxy holds by the fixed rule: record the arm''s design (the Born per event from --born-of on every one-loop
+        training and held-out pool as a CPU job, or the sidecar in a regeneration), run the design-reviewer, then submit under
+        the GPU budget'
+      - 'the proxy fails (median gap >= 0.2 or a verdict flips): redo the par:v4_loop_born read on per-event values for every
+        read one-loop pool (a CPU job of --born-of over all 106 pools) before any arm, and record the pool-level result as
+        a proxy that failed its check'
+      - 'the stored target does not reproduce (max_rel above 1e-6 on a pool) or the shift dominates log|c0+shift| on the W/Z/H
+        pools: report it to the user as a question on catalog_v4''s one-loop target (the shift is a pool-content call), the
+        arm waits on it'
     4:
       feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
         gap beyond intrinsic difficulty or the network''s floor at this compute, which decides whether shape work targets
