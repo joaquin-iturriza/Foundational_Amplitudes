@@ -2736,6 +2736,12 @@ entries:
       e+e- run card; docs/results.tex fraction sweeps (genmix, deep_sampling) measured the flat share against RAMBO, never
       a MadEvent share. None settles these five calls.'
     blocks: only the job submission of this design (arm B's MadEvent generation on CC and the A/B short pretrainings)
+    answered_at: '2026-10-29T16:27:24+00:00'
+    decision: D178
+    withdrawn_at: '2026-10-29T16:27:24+00:00'
+    withdrawn_why: 'D178 settles the mixing on every beam; the share is what the A/B measures (0.25 and 0.50 arms, one generation
+      at 0.50 covers both); the rest at defaults: standard e+e- energies (91.1876 above threshold, 240, 365, 500, 1000, 3000
+      GeV), the catalog''s own cuts, no ISR, one-loop and variant pools unchanged until the tree result'
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -2990,59 +2996,6 @@ entries:
         as its own group), asking the user the fractions, energies, loops and variants first'
       - 'within the spread or above catalog_v4: report to the user with the 1e4-vs-1e5 pool-size caveat and propose dropping
         the hadronic default share, their call; ask the e+e- question separately'
-  ask: 'Default-sampled share in catalog_v4 (your priority of 2026-10-29: a final catalog that mixes the generator''s default
-    sampling, MadEvent unweighted events as most users make them, with the smart components on every beam). The A/B is designed
-    as short pretrainings, two seeds per arm, against catalog_v4 as it is (0.50 RAMBO bulk / 0.35 flat in log|M|^2 / 0.15
-    forward), read on default-sampled test events and on the current smart test pools. Five calls are yours before any generation.
-    Costs are estimates from the pp13 generation rate (about 12 core-hours per million MadEvent events) and the 2026-10-26
-    short-run cost (about 1.5 GPU-h per run).
-
-    (1) Default fractions. (a) As designed: arm B, the MadEvent share replaces the RAMBO bulk (0.50 MadEvent / 0.35 / 0.15);
-    arm C, half of it (0.25 MadEvent / 0.25 RAMBO / 0.35 / 0.15), built from B''s events, so C costs no MadEvent. About 500
-    core-hours CPU on CC (the 912 training trees, 797 hadronic and 115 e+e-, at 6e4 default events each, less the 1.4e4 per
-    hadronic class the pp13v4 pools already hold) and 4 runs, 6 GPU-h, plus up to 3 GPU-h of baseline reruns. (b) Add a 0.75
-    arm (taken out of the bulk and the flat part): about +250 core-hours and +3 GPU-h; it tells whether the gain keeps growing
-    past 0.5. (c) Only 0.25: about 250 core-hours, 3 GPU-h fewer; cannot tell 0.25 from 0.5. Neither 0.50 nor 0.25 is measured;
-    the only measured basin is for the flat share (0.25 to 0.5, kept at 0.35).
-
-    (2) e+e- collider energies (MadEvent, no PDF). (a) Proposed: 91.1876 (only past threshold), 240, 365, 500, 1000, 3000
-    GeV, equal shares among the energies past a class''s threshold: LEP1/FCC-ee Z pole, ZH, ttbar threshold, ILC, CLIC. (b)
-    Drop 91.1876 (most multi-leg classes are below or near threshold there; their share goes to the others). (c) Add LEP2
-    (161, 200 GeV). Cost: 6.9M e+e- events for the 115 training classes, at most about 80 core-hours (no PDF, so likely less;
-    not measured), plus one MadEvent survey per energy and class (690 runs at 6 energies); each added energy thins the others''
-    share; the default-sampled e+e- test pools (175 classes x 2000) about 4 core-hours more.
-
-    (3) e+e- run-card cuts and ISR. (a) Proposed: the catalog''s own e+e- acceptance in the run card (pT > 10 GeV, abs(cos
-    theta) < 0.99, Delta R > 0.4, pair mass > 10 GeV), no ISR: the default events stay within the smart pools'' support. (b)
-    MadGraph''s stock e+e- run card cuts as a user would leave them: closer to ''as most people sample'', but its jet and
-    lepton cuts differ from the catalog''s, so the default share holds or lacks regions the rest of the pool does not. (c)
-    Either, with electron ISR on (lpp 3): sqrt(s_hat) spreads below the collider energy as in FCC-ee studies; one more MadGraph
-    setting nobody here has run.
-
-    (4) One-loop pools (104 training virtuals, 16 loop-induced; today RAMBO, uniform sqrt(s_hat), never shaped). (a) Proposed:
-    none in this A/B (they stay as now, and are identical in all arms, so they are no confound). (b) A default share: born-kinematics
-    MadEvent events, MadLoop-labelled; where the one-loop''s tree is a training tree its default events are reused, so the
-    MadEvent cost is small, but the MadLoop labelling is about one rebuild of the one-loop layer (cost not measured) and it
-    adds a second change to the A/B.
-
-    (5) Variants. Heavy-quark masses (105 training pools at m_Q 50, 300, 600): (a) none (proposed for the A/B) or (b) own
-    MadEvent runs at each mass, about 6.3M events, 75 core-hours. alpha_s points (16 training, 8 held out): (a) none or (b)
-    the base class''s default events relabelled at their alpha_s, no MadEvent cost (exact kinematics for a pure-QCD power,
-    an approximation of their own default sampling for mixed orders). Cut points (34 held-out pools): (a) none or (b) own
-    runs with their cut in the run card, about 3 core-hours. The 34 held-out probes beyond the trained sqrt(s_hat) get no
-    share (no collider default exists there).
-
-    What waits: only the job submission of this design (the generation of arm B''s pools and the A/B runs). The implementation
-    goes on now.'
-  waiting_since: '2026-10-29T16:13:05+00:00'
-  searched: 'CLAUDE.md (catalog_v3/v4 knob tables: f_flat 0.35 sourced from fig:eeuu_genmix_fraction_sweep, one-loop pools
-    never shaped unsourced, the heavy-quark layer D98/D100, alpha_s points D102, energy probes D137, the GPU budget rule);
-    site decisions --project FA: D178 sets the goal (mix default generator sampling with the smart choices on every beam)
-    but not the fraction, the e+e- energies, cuts or ISR, nor whether the one-loop and variant pools take a share; D17 (no
-    PDF sampling) is superseded for the catalog by D117/D130/D178; D130 approves catalog_v4''s acceptance but not a MadEvent
-    e+e- run card; docs/results.tex fraction sweeps (genmix, deep_sampling) measured the flat share against RAMBO, never a
-    MadEvent share. None settles these five calls.'
-  blocks: only the job submission of this design (arm B's MadEvent generation on CC and the A/B short pretrainings)
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
