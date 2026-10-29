@@ -23,6 +23,8 @@ Two modes.
     python3 analysis/catalog_v4/loop_levels.py   -> data/loop_levels.json, figs/loop_levels.{png,pdf}
 The last line printed is the JSON of the numbers docs/results.tex quotes.
 
+Top read (in --trees): does an external top carry the tree level error; see top_read.
+
 Tree mode (--trees, both steps): does the thin-class reading above (the largest one-loop offsets on pools with two
 matched training pools or fewer) hold on catalog_v4's tree held-out axes H1 (new combinations), H2 (multiplicity), H3
 (particle content). The same dump over the training recipe's tree pools and the three axes' recipes (split into
@@ -110,7 +112,8 @@ def props(name):
     st = ("ee" if ini[0] == 11 else "gg" if ini == [21, 21] else
           ("bg" if 5 in ini else "qg") if 21 in ini else "bb" if ini == [5, 5] else "bq" if 5 in ini else "qq")
     return {"n": len(c["pdg_ids"]), "initial": st, "born": f"as{o[2]} a{o[3]}",
-            "qcd_born": "_qcdborn" in name, "loop_induced": bool(c.get("loopind")), "order": o}
+            "qcd_born": "_qcdborn" in name, "loop_induced": bool(c.get("loopind")), "order": o,
+            "top": 6 in [abs(x) for x in c["pdg_ids"]], "heavy_layer": "__mt" in name}
 
 
 def analyse():
@@ -281,10 +284,124 @@ def analyse_trees():
         for n in big:
             flat[f"{a}.match_n.{n}"] = R[n]["n_match"]
     flat["n_train"], flat["train_level_sd"] = s["n_train"], round(s["train_level_sd"], 2)
+    s["top"] = top_read(res, T, P, flat)
     json.dump({"summary": s, "heldout": res, "train": {m: {"level": T[m][0], **P[m]} for m in T},
                "train_missing": miss_tr}, open(os.path.join(HERE, "data", "tree_levels.json"), "w"), indent=1)
     plot_trees(res)
+    plot_top(res, T)
     print(json.dumps(flat))
+
+
+def top_read(res, T, P, flat):
+    """Does an external top carry the tree level error (v3_prep_explore, next step of par:v4_tree_levels). Three reads,
+    no fit, no new threshold: per axis and pooled over the three, the seed-mean |offset| of pools with an external top
+    against those without; the TOP largest offsets' top count against the top share; and, for top pools, the level
+    against the matched training pools (the one match rule) that also have an external top, a property read beside
+    the match, never a re-match. The training tree pools' only external tops are the heavy-quark layer's (the top's
+    quantum numbers at m_Q = 50, 300, 600 GeV); a held-out pool whose own process is in that layer is also read against
+    those siblings' levels (inside their range or not)."""
+    sib = {}
+    for m in T:
+        if P[m]["heavy_layer"]:
+            sib.setdefault(BASE[m], []).append(m)
+    out, allp = {"train_top": int(sum(P[m]["top"] for m in T)),
+                 "train_top_heavy_layer": int(sum(P[m]["top"] and P[m]["heavy_layer"] for m in T))}, []
+    for a in TREE_AXES:
+        R = {n: r for n, r in res[a].items() if not r.get("missing")}
+        allp += [(a, n) for n in R]
+        top = [n for n in R if R[n]["top"]]
+        no = [n for n in R if not R[n]["top"]]
+        out[a] = {"n_top": len(top), "n_no_top": len(no),
+                  "median_abs_off_top": float(np.median([R[n]["abs_off"] for n in top])) if top else None,
+                  "median_abs_off_no_top": float(np.median([R[n]["abs_off"] for n in no])) if no else None}
+        for n in top:
+            r = R[n]
+            mtop = [m for m in r["matched"] if P[m]["top"]]
+            r["n_match_top"] = len(mtop)
+            if mtop:
+                r["departure_top"] = r["level"] - float(np.mean([T[m][0] for m in mtop]))
+            sl = [T[m][0] for m in sib.get(n, [])]
+            r["n_sibling"] = len(sl)
+            if sl:
+                r["inside_sibling_range"] = bool(min(sl) <= r["level"] <= max(sl))
+        wt = [n for n in top if R[n]["n_match_top"]]
+        if wt:
+            out[a].update({
+                "n_match_top": len(wt), "n_no_match_top": len(top) - len(wt),
+                "median_abs_off_match_top": float(np.median([R[n]["abs_off"] for n in wt])),
+                "median_abs_off_no_match_top": float(np.median([R[n]["abs_off"] for n in top if n not in wt])),
+                "median_abs_departure_top": float(np.median([abs(R[n]["departure_top"]) for n in wt])),
+                "median_abs_departure_all": float(np.median([abs(R[n]["departure"]) for n in wt])),
+                "n_departure_top_smaller": int(sum(abs(R[n]["departure_top"]) < abs(R[n]["departure"]) for n in wt)),
+                "n_off_smaller_than_departure_top": int(sum(R[n]["abs_off"] < abs(R[n]["departure_top"]) for n in wt))})
+        ws = [n for n in top if R[n]["n_sibling"]]
+        if ws:
+            out[a].update({
+                "n_sibling": len(ws),
+                "n_inside_sibling_range": int(sum(R[n]["inside_sibling_range"] for n in ws)),
+                "median_abs_off_sibling": float(np.median([R[n]["abs_off"] for n in ws])),
+                "median_abs_off_no_sibling": float(np.median([R[n]["abs_off"] for n in top if n not in ws]))})
+            for N in sorted({R[n]["n"] for n in ws}):  # the same split at one multiplicity (siblings are mostly small N)
+                a1 = [R[n]["abs_off"] for n in ws if R[n]["n"] == N]
+                a0 = [R[n]["abs_off"] for n in top if n not in ws and R[n]["n"] == N]
+                out[a].update({f"n_sibling_N{N}": len(a1), f"median_abs_off_sibling_N{N}": float(np.median(a1)),
+                               f"n_no_sibling_N{N}": len(a0),
+                               f"median_abs_off_no_sibling_N{N}": float(np.median(a0)) if a0 else None})
+    off = {k: res[k[0]][k[1]]["abs_off"] for k in allp}
+    big = sorted(allp, key=lambda k: -off[k])[:TOP]
+    ntop = sum(res[a][n]["top"] for a, n in allp)
+    sq = sum(off[k] ** 2 for k in allp)
+    out["pooled"] = {"n": len(allp), "n_top": ntop, "top_share": ntop / len(allp),
+                     "largest": [f"{a}:{n}" for a, n in big], "largest_top": int(sum(res[a][n]["top"] for a, n in big)),
+                     "largest_top_per_seed": [int(sum(res[a][n]["top"] for a, n in sorted(
+                         allp, key=lambda k: -abs(res[k[0]][k[1]]["offset"][i]))[:TOP])) for i in range(len(RUNS))],
+                     "top_share_sq_offset": sum(off[k] ** 2 for k in allp if res[k[0]][k[1]]["top"]) / sq}
+    O = out["pooled"]
+    print(f"top: training tree pools with an external top {out['train_top']} (heavy-quark layer "
+          f"{out['train_top_heavy_layer']}); pooled {O['n']} held out, {O['n_top']} with a top (share "
+          f"{O['top_share']:.2f}); {TOP} largest: {O['largest_top']} top (per seed {O['largest_top_per_seed']}); top "
+          f"share of the summed squared offset {O['top_share_sq_offset']:.2f}")
+    for a in TREE_AXES:
+        print(f"  {a}: {out[a]}")
+    flat.update({"top.train_top": out["train_top"], "top.train_top_heavy_layer": out["train_top_heavy_layer"],
+                 "top.n": O["n"], "top.n_top": O["n_top"], "top.top_share": round(O["top_share"], 3),
+                 "top.largest_top": O["largest_top"], "top.top_share_sq_offset": round(O["top_share_sq_offset"], 3)})
+    flat["top.largest_top_seed42"], flat["top.largest_top_seed43"] = O["largest_top_per_seed"]
+    for a in TREE_AXES:
+        for k, v in out[a].items():
+            flat[f"top.{a}.{k}"] = round(v, 3) if isinstance(v, float) else v
+    return out
+
+
+AXIS_NAME = {"H1": "new combinations", "H2": "multiplicity", "H3": "particle content"}
+
+
+def plot_top(res, T):
+    import plot_style as ps
+    fig, (a, b) = ps.figure(ncols=2)
+    R = {n: r for n, r in res["H3"].items() if not r.get("missing")}
+    wt = [r for r in R.values() if r.get("n_match_top")]
+    nt = [r for r in R.values() if r["n_match"] and not r.get("n_match_top")]
+    a.plot([r["departure"] for r in nt], [np.mean(r["offset"]) for r in nt], ".", color=ps.C.grey,
+           label=f"no matched top pool ({len(nt)})")
+    a.plot([r["departure"] for r in wt], [np.mean(r["offset"]) for r in wt], ".", color=ps.C.vermillion,
+           label=f"all matched pools ({len(wt)})")
+    a.plot([r["departure_top"] for r in wt], [np.mean(r["offset"]) for r in wt], "o", mfc="none", color=ps.C.blue,
+           label="matched top pools")
+    yo = [np.mean(r["offset"]) for r in R.values() if r["n_match"]]
+    a.plot([-max(yo), -min(yo)], [max(yo), min(yo)], "--", color=ps.C.grey, label="offset $=-$departure")
+    a.set_xlabel(r"$\overline{t}-\overline{t}_{\rm matched}$"); a.set_ylabel(r"$\overline{q-t}$")
+    ps.legend(a, "upper right"); ps.make_room(a)
+    ws = [r for r in R.values() if r.get("n_sibling")]
+    rest = [r for r in R.values() if not r.get("n_sibling")]
+    rng = np.random.default_rng(0)
+    for i, (grp, c) in enumerate(((rest, ps.C.grey), ([r for r in ws if r["inside_sibling_range"]], ps.C.blue),
+                                  ([r for r in ws if not r["inside_sibling_range"]], ps.C.vermillion))):
+        b.plot(i + rng.uniform(-0.15, 0.15, len(grp)), [r["abs_off"] for r in grp], ".", color=c)
+    b.set_xticks([0, 1, 2], ["no sibling\n(%d)" % len(rest), "inside\n(%d)" % sum(r["inside_sibling_range"] for r in ws),
+                             "outside\n(%d)" % sum(not r["inside_sibling_range"] for r in ws)])
+    b.set_yscale("log"); b.set_ylabel(r"$|\overline{q-t}|$")  # no legend: the groups are the ticks
+    ps.save(fig, os.path.join(HERE, "figs", "tree_levels_top"))
 
 
 def plot_trees(res):
@@ -295,13 +412,15 @@ def plot_trees(res):
     for ax, c in zip(TREE_AXES, cols):
         R = {n: r for n, r in res[ax].items() if not r.get("missing")}
         a.plot([r["n_match"] + 1 + rng.uniform(-0.15, 0.15) * (r["n_match"] + 1) for r in R.values()],
-               [r["abs_off"] for r in R.values()], ".", color=c, label=f"{ax} ({len(R)})")
+               [r["abs_off"] for r in R.values()], ".", color=c)
         mt = [r for r in R.values() if r["n_match"]]
-        b.plot([r["departure"] for r in mt], [np.mean(r["offset"]) for r in mt], ".", color=c, label=ax)
+        b.plot([r["departure"] for r in mt], [np.mean(r["offset"]) for r in mt], ".", color=c,
+               label=f"{AXIS_NAME[ax]} ({len(R)})")
     a.axvline(THIN + 1.5, ls="--", color=ps.C.grey)
     a.set_xscale("log"); a.set_yscale("log")
+    yo = [r["abs_off"] for ax in TREE_AXES for r in res[ax].values() if not r.get("missing")]
+    a.set_ylim(min(yo) / 1.5, max(yo) * 1.5)  # trimmed to the data; no legend here (the right panel's colours)
     a.set_xlabel(r"matched training pools $+1$"); a.set_ylabel(r"$|\overline{q-t}|$")
-    ps.legend(a, "upper right"); ps.make_room(a)
     lo, hi = b.get_xlim()
     b.plot([lo, hi], [-lo, -hi], "--", color=ps.C.grey, label="offset $=-$departure")
     b.set_xlabel(r"$\overline{t}-\overline{t}_{\rm matched}$"); b.set_ylabel(r"$\overline{q-t}$")
