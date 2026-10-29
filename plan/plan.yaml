@@ -326,6 +326,12 @@ entries:
       the result.json times sigma^2 conversion and the shape proxy were missed as prior work; validation split was the checkpoint-selection
       pool (now test)'
     at: '2026-10-29T17:00:32+00:00'
+  - tried: TR reads of the control pair for the shape gap, FA-ccin2p3-c8411ffc (seed 42) and FA-ccin2p3-5f368c52 (seed 43),
+      eval-only on catalog_v4's training pools' test split
+    why: 'both FAILED on CC-IN2P3: /sps/lpnhe was full (512G of 512G); the log ends at the fine-tune tokenizer load, then
+      ''echo: write error: No space left on device'' in the task epilog; no TR reads written; to be resubmitted unchanged
+      once disk is freed (next step 4)'
+    at: '2026-10-29T18:16:43+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
