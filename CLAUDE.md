@@ -22,7 +22,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    Any difference between what was asked and what was submitted goes in the same message that
    reports the submission, in its first lines, never only in a commit message or the notes'
    hand-off. A figure or number that mixes cells run at different compute says so wherever it is
-   shown.
+   shown. The ponytail plugin's "smallest change" governs code, never a study's design: its arms, seeds,
+   probes and horizons follow this rule.
 
 0c. **A plan I was told is a commitment: its cores, jobs and wall time.** When a tool refuses it ("fits NOWHERE",
    a cap, a wrong default), the refusal is a gap to fix or route around (split the work into parallel jobs of what fits
