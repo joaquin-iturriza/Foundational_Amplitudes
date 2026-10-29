@@ -2098,6 +2098,101 @@ on these reads.
   \label{fig:v4_mult_bias}
 \end{figure}
 
+% src: python3 analysis/catalog_v4/loop_levels.py --loop-groups @ebf131bc
+% claim: lg.n_heldout=28
+% claim: lg.n_heldout_top=0
+% claim: lg.n_train=108
+% claim: lg.n_train_top=0
+% claim: lg.n_train_heavy_layer=0
+% claim: lg.n_heldout_loop_induced=1
+% claim: lg.n_train_loop_induced=16
+% claim: lgo.loop_virtual.n=27
+% claim: lgo.loop_virtual.median_abs_off=0.33
+% claim: lgo.loop_virtual.median_signed_off=-0.192
+% claim: lgo.loop_virtual.positive_share=0.296
+% claim: lgo.no_mass.median_abs_off=0.437
+% claim: lgo.other_mass.median_abs_off=0.063
+% claim: lgo.H1.median_abs_off=0.096
+% claim: lgs.loop_virtual.median_shape=0.505
+% claim: lgs.no_mass.median_shape=0.626
+% claim: lgs.other_mass.median_shape=0.155
+% claim: lgs.H1.median_shape=0.24
+% claim: lg.ratio_virtual_to_no_mass.abs_off=0.756
+% claim: lg.ratio_virtual_to_no_mass.shape=0.807
+% claim: lgo.loop_virtual.n_compared=16
+% claim: lgo.loop_virtual.n_cells_compared=5
+% claim: lgo.loop_virtual.n_nearer_no_mass=11
+% claim: lgo.loop_virtual.median_log_ratio_no_mass=-0.185
+% claim: lgo.loop_virtual.median_log_ratio_other_mass=0.304
+% claim: lgs.loop_virtual.n_nearer_no_mass=15
+% claim: lgs.loop_virtual.median_log_ratio_no_mass=0.228
+% claim: lgs.loop_virtual.median_log_ratio_other_mass=0.51
+% claim: lgs.loop_virtual.median_level_share=0.298
+% claim: lgs.no_mass.median_level_share=0.266
+% claim: lg.loop_induced.v4_gg_zh_loop.abs_off=1.817
+% claim: lg.loop_induced.v4_gg_zh_loop.shape=1.42
+% claim: lgo.rho.matched_class_size=-0.41
+% claim: lgo.rho.particles=0.14
+% claim: lgo.rho.alpha_power=-0.22
+% claim: lgo.rho.alpha_s_power=0.07
+% claim: lgo.rho.departure_from_the_matched_class=-0.13
+% claim: lgs.rho.particles=0.6
+% claim: lgs.rho.alpha_s_power=0.32
+% claim: lgs.rho.massive_legs=-0.36
+% claim: lgs.rho.abs_offset=0.34
+% claim: lgo.initial.ee.n=3
+% claim: lgo.initial.ee.median_abs_off=1.133
+% claim: lgs.initial.ee.median_shape=1.984
+% claim: lgo.initial.qq.n=12
+% claim: lgo.initial.qq.median_abs_off=0.215
+% claim: lgs.initial.qq.median_shape=0.497
+% allow: 42 43 because they are the seeds, settings
+% allow: 172.5 because it is the top mass in GeV, a setting
+% allow: 2 because it is the square of the offset, notation
+\paragraph{catalog\_v4's one-loop axis by the tree reads (2026-10-29).}\label{par:v4_loop_groups} The question, from
+the two paragraphs on the tree shape and the tree level and the user's priorities (the zero-shot bias first, then the
+shape): on trees both the offset and the floor are largest where the top is held out at its mass; does the one-loop axis,
+catalog\_v4's weakest against catalog\_v3 (par.~\ref{par:v4_vs_v3}), have the same source? If its error sits on one-loop
+pools with a top at no trained top mass, the top mass coverage is the one catalog design question for the zero-shot
+error; if it is as large without a top, the one-loop axis has a source of its own and needs its own fix. No new run:
+the same two pretrainings (seeds $42$ and $43$) and per-pool reads as par.~\ref{par:v4_loop_levels} and
+par.~\ref{par:v4_tree_shape}, the seed-mean absolute offset and the seed-mean floor $\mathrm{var}(q-t)$ of each held-out
+one-loop pool, read with the tree read's four groups and its cell comparison against the two tree top groups
+(\code{analysis/catalog\_v4/loop\_levels.py --loop-groups}, one reader for trees and one loops,
+Fig.~\ref{fig:v4_loop_groups}); loop-induced and virtual pools apart. One-loop and tree pools have different targets,
+each its own $t=\log(|\mathcal M|^2F)$; offset and floor are in the same units of $t$. No fit, no new threshold.
+The count the split needs comes first, and it ends the top question on this axis: none of the $28$ held-out one-loop
+pools has an external top, nor any of the $108$ training one-loop pools ($0$ of the heavy-quark layer). So the one-loop
+error is all on pools without a top. It is as large as the trees' worst group: on the $27$ virtual pools the median
+absolute offset is $0.33$ and the median floor $0.505$, against $0.437$ and $0.626$ on the tree top processes at no
+trained top mass ($0.756$ and $0.807$ of them), $0.063$ and $0.155$ on those at another top mass, and $0.096$ and
+$0.24$ on the tree new combinations, the pools without a top. Cell by cell (multiplicity and initial state; $16$ of the
+virtual pools in the $5$ cells holding both tree top groups), $11$ are nearer the no-mass group in offset and $15$ in
+floor, the median log$_{10}$ ratio to the no-mass cell median $-0.185$ and $0.228$, to the other-mass one $0.304$ and
+$0.51$: within the same cells the floor lies above the trees' worst group. The level share is $0.298$ (no-mass trees $0.266$). Unlike the
+tree new-combination and top groups, the one-loop offset has a sign, as the multiplicity pools do but in the opposite direction: median $-0.192$, only $0.296$ of the pools placed too high. The one loop-induced
+pool, $gg\to ZH$ ($16$ loop-induced training pools), carries offset $1.817$ and floor $1.42$, above every virtual median.
+What goes with it, over the $27$ virtual pools (rank correlations): the offset with the matched class size $-0.41$, the
+largest (the thin classes of par.~\ref{par:v4_loop_levels}), with the multiplicity, the born's $\alpha$ and $\alpha_s$
+powers and the departure from the matched training level $0.14$, $-0.22$, $0.07$ and $-0.13$; the floor with the
+multiplicity $0.6$, the $\alpha_s$ power $0.32$, the massive legs $-0.36$ and its own offset $0.34$. By beam the
+$3$ $e^+e^-$ pools lead, median offset $1.133$ and floor $1.984$, against $0.215$ and $0.497$ on the $12$
+quark-antiquark pools. These are $27$ pools, and multiplicity and $\alpha_s$ power are not separated (the $2\to3$
+virtuals carry the higher powers). What it changes: the one-loop axis takes the second branch; the top mass is no
+part of its error, so training the top at $172.5$ in some processes would not reach it. Its level is placed too low,
+most in thin classes; its shape grows with multiplicity and is largest on the $e^+e^-$ beams. The next step designs a
+target or input change for it, checked first on these reads.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/loop_groups.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --loop-groups @ebf131bc
+  \caption{catalog\_v4's held-out pools in the four tree groups of Fig.~\ref{fig:v4_tree_newproc} and the held-out
+    one-loop pools (virtual, and the one loop-induced pool); none of the one-loop pools has a top. Left: per pool its
+    seed-mean absolute offset; right: its seed-mean floor, the variance of the zero-shot error over its validation
+    events; the bar is the group's median.}
+  \label{fig:v4_loop_groups}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
@@ -11458,12 +11553,6 @@ of the three share a test set.
     % src: python3 analysis/catalog_v4/pp_physics_rescore.py @1cdc1fe9
     % claim: train.agree.mse.v4_over_pp=0.66
     % allow: 13 797 70 30 140 350 6 3 172.5 because they are the beam energy, the class count, the proposed blend shares, the cost estimates of a run not made and the top mass, settings of a proposal
-  \item \textbf{The top's level on catalog\_v4 (withdrawn 2026-10-29).} The question put to the user, what removes
-    the tree level error that the particle content axis carries (par.~\ref{par:v4_tree_top}), is withdrawn: giving the
-    top processes neighbours at the top's mass in training would only turn them into the known-process case, and the
-    user agreed (2026-10-29, ``I agree, and I agree with your next step proposed''). What replaced it is the read of
-    whether the level error comes from a new process or a new mass (par.~\ref{par:v4_tree_newproc}); the three designs
-    proposed with the question are dropped.
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).

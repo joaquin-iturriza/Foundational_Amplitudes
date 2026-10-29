@@ -40,18 +40,7 @@ def run_segments(cmd):
     segs = cmdparse.all_segments(cmd)
     if segs is None:
         return None
-    out = []
-    for seg in segs:
-        kept, skip = [], False
-        for t in seg:
-            if skip:
-                skip = False
-            elif t and set(t) <= set("<>&"):
-                skip = True
-            else:
-                kept.append(t)
-        if kept:
-            out.append(kept)
+    out = [k for k in (cmdparse.strip_redirs(seg) for seg in segs) if k]
     return out
 
 

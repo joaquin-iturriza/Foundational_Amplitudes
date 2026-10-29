@@ -103,6 +103,25 @@ def segments(cmd):
     return out
 
 
+REDIR = re.compile(r"^[0-9]*(?:&>>?|>>?&?|<&|<>?|>\|)[0-9-]*$")
+
+
+def strip_redirs(seg):
+    """The segment without its redirections (N>&M, N>file, &>file, <file): the operator, its target and the fd digit
+    the tokenizer split off before it. A redirection is never an argument of the command."""
+    out, i = [], 0
+    while i < len(seg):
+        t = seg[i]
+        if REDIR.match(t) and any(c in t for c in "<>"):
+            if out and out[-1].isdigit() and t[0] in "<>":
+                out.pop()                              # the fd before the operator ('2' '>&' '1')
+            i += 1 if re.search(r"[0-9-]$", t) and not re.match(r"^[0-9]*[<>&|]+$", t) else 2
+            continue
+        out.append(t)
+        i += 1
+    return out
+
+
 def words(seg):
     """The command words of a segment: leading VAR=value assignments and wrappers dropped (a wrapper's own options too,
     timeout's duration included)."""

@@ -1,0 +1,203 @@
+#!/usr/bin/env python
+"""One-run part jobs of lhe_pp pools (mg5_pipeline_final "One-run part jobs", tools/lhe_parts.py): lhe.run_events in
+the runs and the identity, the parts assembled give the serial build's pools byte for byte, and the file queue run
+end to end (plan, two concurrent workers, assembly once, rerun is a no-op). CPU only: MadEvent, the LHE reader and
+the labels are replaced by deterministic fakes keyed by each run's iseed and event count.
+
+Run:  python tests/test_lhe_parts.py
+"""
+import argparse
+import json
+import multiprocessing as mp
+import os
+import sys
+import tempfile
+
+import numpy as np
+import yaml
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import datagen  # noqa: E402
+import mg5_pipeline_final as mg  # noqa: E402
+import lhe_parts  # noqa: E402
+
+NAME = "zz_parts_proc"
+K = 5   # 2 -> 3
+
+
+def _register(n_runs=3, run_events=400, parts=True):
+    lhe = {"cards_dir": "recipes/catalog_v4_pp", "run_card": "run_card.dat", "param_card": "param_card.dat",
+           "label_alphas": "running_sqrt_shat", "n_val": 100, "n_test": 100, "n_train": 800, "n_runs": n_runs}
+    if parts:
+        lhe["parts"] = True
+    if run_events:
+        lhe["run_events"] = run_events
+    mg.PROCESSES[NAME] = {"kind": "lhe_pp", "pdg_ids": [21] * K, "m_finals": [0.0] * 3, "nfinal": 3,
+                          "mg5_generate": ["generate g g > g g g"], "lhe": lhe}
+
+
+def _fakes(tmp):
+    """Replace MadEvent, the LHE reader, the labels and the physics check by deterministic fakes."""
+    def prepare(process, work_root, log_path, madevent=True, standalone=True):
+        ev = os.path.join(work_root, f"{process}_madevent") if madevent else None
+        if ev:
+            os.makedirs(ev, exist_ok=True)
+        return ev, os.path.join(tmp, "sa")
+
+    def run(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01", patches=None):
+        p = os.path.join(ev, f"{run_name}_{iseed}_{nevents}.fake")
+        open(p, "w").close()
+        return p, None
+
+    def read(path, pdg_ids):
+        _, iseed, n = os.path.basename(path)[:-5].rsplit("_", 2)
+        rng = np.random.default_rng(int(iseed))
+        n = int(n) - int(iseed) % 7            # a run returns a few events fewer than asked, as MadEvent can
+        sq = rng.uniform(100, 1000, n)
+        P = np.concatenate([mg._beams(sq, np.array([21] * K), {}), mg._rambo_massless_batch(sq, K - 2, rng)], axis=1)
+        return P, rng.uniform(0.1, 0.12, n), sq
+    mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp = prepare, run, read
+    mg.label_lhe_pp = lambda process, m, a, sa=None: 1.0 + np.abs(m[:, 2, 3]) * a
+    mg.lhe_parent_physics_check = lambda process: None
+
+
+def _items(seed=42):
+    out = []
+    for role, n in (("val", 100), ("test", 100), ("train", 800)):
+        rec = mg.variable_energy_recipe(NAME, 13000, 13000, n, role=role, seed=seed)
+        out.append((rec, mg.recipe_output_path(rec, datagen.dest_for_role(role))))
+    return out
+
+
+def test_runs_and_identity():
+    _register(n_runs=3, run_events=400)
+    runs = mg.lhe_runs(NAME, 100, 1020)
+    assert [r[1] for r in runs] == [400] * 3 and [r[0] for r in runs] == [(100 + 7919 * j - 1) % 30000 + 1
+                                                                          for j in range(3)]
+    rec = mg.variable_energy_recipe(NAME, 13000, 13000, 800, role="train", seed=42)
+    assert rec["lhe"]["run_events"] == 400 and rec["lhe"]["n_runs"] == 3
+    assert rec["lhe"]["build"] == "parts"
+    _register(n_runs=3, run_events=None, parts=False)   # without run_events: every run asks n_req, as before
+    assert [r[1] for r in mg.lhe_runs(NAME, 100, 1020)] == [1020] * 3
+    r0 = mg.variable_energy_recipe(NAME, 13000, 13000, 800, role="train", seed=42)
+    assert "run_events" not in r0["lhe"] and "build" not in r0["lhe"]
+    print("[runs+identity] ok")
+
+
+def test_parts_equal_serial():
+    _register()
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d)
+            res = {}
+            for mode in ("serial", "parts"):
+                _register(parts=mode == "parts")
+                datagen.dest_for_role = lambda role, m=mode: os.path.join(d, m, role)
+                os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+                items = _items()
+                if mode == "serial":
+                    try:
+                        _register(parts=True)
+                        mg.build_lhe_pp(NAME, items, work_root=os.path.join(d, "w0"), write_sidecars=False)
+                        raise AssertionError("a parts entry built in series")
+                    except RuntimeError:
+                        _register(parts=False)
+                    out = mg.build_lhe_pp(NAME, items, work_root=os.path.join(d, "w1"), write_sidecars=False)
+                else:
+                    paths = mg.lhe_part_paths(NAME, items)
+                    assert len(paths) == 3 and len({p for p, _ in paths}) == 3
+                    for k in (2, 0, 1):                           # any order of the part jobs
+                        mg.lhe_build_part(NAME, items, k, work_root=os.path.join(d, "w2"))
+                    try:
+                        mg.lhe_assemble(NAME, [(r, p) for r, p in items], write_sidecars=False)
+                    except RuntimeError:
+                        raise AssertionError("assembly with every part present failed")
+                    out = mg.lhe_assemble(NAME, items, write_sidecars=False, work_root=os.path.join(d, "w2"))
+                res[mode] = [(np.load(p), mg.recipe_id(full)) for p, full in out]
+            # the same events in code (the fakes are directory-independent); distinct identities, since real MadEvent
+            # in a fresh directory per run is not shown to match the serial build's reused one
+            for (a, ia), (b, ib) in zip(res["serial"], res["parts"]):
+                assert ia != ib and np.array_equal(a, b)
+            # a part made under another card is not taken for this one
+            p0 = mg.lhe_part_paths(NAME, _items())[0][0]
+            mg.PROCESSES[NAME]["lhe"]["run_card"] = "../catalog_v4_ee/run_card.dat"
+            assert mg.lhe_part_paths(NAME, _items())[0][0] != p0
+            mg.PROCESSES[NAME]["lhe"]["run_card"] = "run_card.dat"
+            # a missing part refuses the assembly
+            datagen.dest_for_role = lambda role: os.path.join(d, "x", role)
+            os.remove(mg.lhe_part_paths(NAME, _items())[1][0])
+            try:
+                mg.lhe_assemble(NAME, _items(), write_sidecars=False)
+                raise AssertionError("assembly with a part missing accepted")
+            except RuntimeError:
+                pass
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role) = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        del mg.PROCESSES[NAME]
+    print("[parts == serial] ok")
+
+
+def _worker(q, out):
+    try:
+        lhe_parts.cmd_work(argparse.Namespace(queue=q, workers=2, hours=1.0))
+    except SystemExit as e:
+        out.put(e.code)
+
+
+def test_queue_end_to_end():
+    _register()
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, lhe_parts.ASSEMBLE_S)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d)
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
+            lhe_parts.ASSEMBLE_S = 0
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            q = os.path.join(d, "queue")
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            plan = lambda: lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates,
+                                                                 cores=[f"{NAME}=1"]))
+            plan()
+            assert len(os.listdir(os.path.join(q, "todo"))) == 3
+            plan()                                                      # rerun: nothing queued twice
+            assert len(os.listdir(os.path.join(q, "todo"))) == 3
+            ctx = mp.get_context("fork")
+            res = ctx.Queue()
+            ps = [ctx.Process(target=_worker, args=(q, res)) for _ in range(2)]
+            for p in ps:
+                p.start()
+            for p in ps:
+                p.join(120)
+            codes = [res.get(timeout=5) for _ in ps]
+            assert codes == [0, 0], codes
+            assert len(os.listdir(os.path.join(q, "done"))) == 3 and not os.listdir(os.path.join(q, "todo"))
+            assert os.listdir(os.path.join(q, "assembled")) == [NAME] and not os.listdir(os.path.join(q, "locks"))
+            for rec, path in _items():
+                assert datagen._is_cached(path, mg.recipe_id(rec)), path
+            plan()                                                      # built: nothing left to queue
+            assert not os.listdir(os.path.join(q, "todo"))
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, lhe_parts.ASSEMBLE_S) = saved
+        for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
+            os.environ.pop(v, None)
+        del mg.PROCESSES[NAME]
+    print("[queue end to end] ok")
+
+
+if __name__ == "__main__":
+    test_runs_and_identity()
+    test_parts_equal_serial()
+    test_queue_end_to_end()

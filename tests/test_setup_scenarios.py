@@ -2486,7 +2486,10 @@ def command_reading():
             ("echo $'it\\'s'; git commit %s -m x" % k, 2),      # valid bash shlex cannot parse
             ("python3 - <<'EOF'\nprint('it''s')\nEOF\ngit commit -n -m y", 2),
             ("bash <<'EOF'\ngit commit -n -m y\nEOF", 2),
-            ("git -c core.hooksPath=/dev/null commit -m x && echo it's", 2)):
+            ("git -c core.hooksPath=/dev/null commit -m x && echo it's", 2),
+            ("git cherry-pick HEAD 2>&1 | tail -3", 0),          # a redirection is not a commit range
+            ("git cherry-pick HEAD~2..HEAD 2>&1 >/dev/null", 2),
+            ("git commit -n -m y 2>&1 &>log <in", 2)):
         rc, out = hook(GUARD_GIT, {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": ROOT})
         scenario("git verify: `%s` is %s" % (c.replace("\n", " / ")[:70], "refused" if want else "allowed"),
                  rc == want, out)
