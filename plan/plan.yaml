@@ -1881,14 +1881,20 @@ entries:
   - D167
   - D169
   - D174
-  next: 'Collect the pp13v4 regeneration once its jobs end. State at 16:45 UTC+1 on 2026-10-29: 937 of the 992 pp13v4 entries
-    built in all 3 roles. The 304 entries left by the first pass were resubmitted after the fix at e7a1775d as one 8-core
-    htc job each, under recipes/catalog_v4_pp_rest/ (264 COMPLETED, 0 failed). Still running: about 40 of those jobs, mostly
-    the 27 entries with large own margins, and 14 high-margin entries in the 8 original part jobs (FA-ccin2p3-ce932f17 ...).
-    Any entry that comes back short again: rerun it with lhe.n_runs instead of a larger margin (catalog_v3_pp_runs precedent).
-    Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio to catalog_v4''s
-    standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density check''s error correlation)
-    on recipes/catalog_v4_pp_test.yaml'
+  next:
+    1: 'Collect the pp13v4 regeneration once its jobs end. State at 16:45 UTC+1 on 2026-10-29: 937 of the 992 pp13v4 entries
+      built in all 3 roles. The 304 entries left by the first pass were resubmitted after the fix at e7a1775d as one 8-core
+      htc job each, under recipes/catalog_v4_pp_rest/ (264 COMPLETED, 0 failed). Still running: about 40 of those jobs, mostly
+      the 27 entries with large own margins, and 14 high-margin entries in the 8 original part jobs (FA-ccin2p3-ce932f17 ...).
+      Any entry that comes back short again: rerun it with lhe.n_runs instead of a larger margin (catalog_v3_pp_runs precedent).
+      Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio to catalog_v4''s
+      standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density check''s error correlation)
+      on recipes/catalog_v4_pp_test.yaml'
+    6: 'Default-sampled share in catalog_v4''s tree pools: ask the user the calls the design leaves open (the default fraction
+      arms 0.50 and 0.25, the e+e- collider energies and run-card cuts, a default share for the one-loop pools and for the
+      heavy-quark, cut and alpha_s variants), and in parallel implement the default share in the mixture builder (recipe field
+      and identity, lhe path per entry, e+e- run card and lhe kind, the e+e- default-sampled test read), tested locally on
+      CPU; no job before the user''s answers'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -2743,6 +2749,13 @@ entries:
       if:
       - 'all 992 built and every ratio is 0: redo the pp comparisons on catalog_v4_pp_test.yaml'
       - 'an entry short again or a nonzero ratio: list it with its cause, fix it, and rerun only that entry'
+    6:
+      feeds: whether catalog_v4's final mixture includes a default-sampled (MadEvent unweighted) share, and at which fraction
+      if:
+      - 'the user confirms the arms and energies and the implementation passes its local tests: build arm B''s training pools
+        on CC (about 500 core-hours) and run the A/B short pretrainings (about 7 to 10 GPU-h)'
+      - 'the user changes the fractions, the energies or the scope (loops, variants): redo the design with their words before
+        any generation'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
