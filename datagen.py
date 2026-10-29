@@ -393,6 +393,10 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     tmp  = final + ".tmp.npy"
     np.save(tmp, data)
     os.replace(tmp, final)
+    # a one-loop pool's Born per event (tools/nlo_virtual_pipeline.born_path), kept when every chunk wrote one
+    borns = [p[:-len(".npy")] + ".born.npy" for p in ordered_chunk_paths]
+    if is_virt(process) and all(os.path.exists(b) for b in borns):
+        np.save(final[:-len(".npy")] + ".born.npy", np.concatenate([np.load(b) for b in borns]))
     full = dict(rec)
     full["effective_seed"] = seed + mg.ROLE_SEED_OFFSET.get(role, 0)
     full["chunked"]        = True

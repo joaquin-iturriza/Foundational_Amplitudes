@@ -531,36 +531,20 @@ def pole_certify(process, n=100, seed=7):
     return passed
 
 
-def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
-                          seed=42, mass_shift=True, alphas_mz=0.118,
-                          alphas_prefactor=False):
-    """Sample phase space, evaluate the virtual, apply the heavy-quark mass
-    shift, and write a 21-col virt dataset (momenta in [e-,e+,finals] order).
-
-    By default the stored target is virt_e4 = (c0+shift)*born — the α_s-STRIPPED
-    finite coefficient (α_s/2π divided out), so it is α_s-independent. With
-    ``alphas_prefactor=True`` the physical α_s weighting is restored per event,
-    target = virt_e4 * α_s(√s; alphas_mz)/(2π), using the running coupling at the
-    reference ``alphas_mz`` — exactly like the LO path. This makes the NLO target
-    DEPEND on the strong coupling, so a per-dataset α_s(M_Z) scan is meaningful.
-    (c0 is α_s-independent by construction, so the α_s handed to MadLoop cancels;
-    only this explicit prefactor carries the dependence.)"""
+def virt_evaluator(process, mass_shift=True, alphas_mz=0.118, alphas_prefactor=False):
+    """The one-loop point evaluator generate_virt_dataset stores its target with, shared with born_of_pool so a pool's
+    events are re-evaluated by the same code. Loads the process's MadLoop module (chdir into its P0 directory).
+    Returns (evaluate_point, balanced, last, info): evaluate_point(mom_rows, sqrts) -> (stored value, usable) for one
+    event in the stored row order; balanced(mom) the massive-beam four-momentum balance applied before evaluation;
+    last the dict evaluate_point fills with MadLoop's Born |M0|^2 (at the alpha_s it was called with; 0 for a
+    loop-induced entry, no Born), c0 (nan where MadLoop gives none) and the mass-scheme shift of the point it just
+    evaluated; info the settings the summary line prints."""
     import nlo_madloop as ML
     cfg = VIRT_PROCESSES[process]
     pdg = cfg["pdg_ids"]
     m_finals = cfg["m_finals"]
-    nfinal = len(m_finals)
-    npart = nfinal + 2
 
-    rng = np.random.default_rng(seed)
-    # Same fiducial cuts as the LO path so phase-space coverage is consistent across
-    # the perturbative-order axis (and matches the fiducial_cuts recorded in recipe_id).
-    # catalog_v4: the entry's own cuts, sqrt(s) measure and beam masses (absent: the global ones, uniform, BEAM_MASS)
-    cuts = (cfg.get("fiducial_cuts") or mg.FIDUCIAL_CUTS) if mg.FIDUCIAL_CUTS_ENABLED else None
-    measure, bm = cfg.get("sqrts_measure", "uniform"), beam_masses(cfg)
-    events, sqrts = mg.sample_nbody_phase_space(
-        n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts, sqrts_measure=measure,
-        beam_mass=cfg.get("beam_masses"))
+    bm = beam_masses(cfg)
     # heavy final quarks (for the mass-scheme shift): unique nonzero masses
     heavy_m = next((m for m in m_finals if m and m > 0), 0.0)
     # catalog_v3 (_v3): no shift; the pools store MadLoop's own finite part (the user, 2026-10-24: "Just do whatever is
@@ -575,8 +559,6 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     get_me_full = ML.load(p0)   # chdir into p0
     swap = mg.row_to_slot_perm(pdg, cfg["mg5"])   # stored rows -> MadGraph slots
 
-    mom_store = np.empty((n_events, npart * 4))
-    amp = np.empty(n_events)
     loopind = bool(cfg.get("loopind"))
     ew = bool(cfg.get("ew"))
     a_ew = ALPHA_EW / (2.0 * np.pi)
@@ -584,6 +566,8 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     # the double-pole guard's relative tolerance: 1e-3, or an entry's c2_rel_tol where a physical width moves the
     # pole (v3_bg_bwpwm: an internal top on shell, 4.4e-3 with the top width, 1e-5 with it zeroed; pole_width_diag.py)
     c2_tol = float(cfg.get("c2_rel_tol", 1e-3))
+
+    last = {}
 
     def evaluate_point(mom, sq):
         """(value, usable). MadLoop's return code hundreds digit 4 marks an
@@ -593,12 +577,14 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             # |M_1|^2 directly, at the running coupling like a tree (exact in alpha_s);
             # no born, no stripping, no mass-scheme shift.
             r = ML.evaluate(get_me_full, mom[swap], alphas=mg.compute_alphas(sq, alphas_mz=alphas_mz))
+            last.update(born=0.0, c0=float("nan"), shift=0.0)
             # a non-positive |M_1|^2 is a MadLoop failure, not a value
             return r["fin"], (r["rc"] // 100 != 4) and (r["fin"] > 0.0)
         if ew:
             # alpha-stripped electroweak finite part at mu^2 = s; a point whose double pole is not the universal QED
             # one, or that MadLoop flags unstable, is redrawn
             r = ML.evaluate(get_me_full, mom[swap])
+            last.update(born=r["born"], c0=float("nan"), shift=0.0)
             if r["rc"] // 100 == 4 or not r["born"] or \
                     abs(r["e2"] / r["born"] / a_ew - c2_pred) > 1e-3 * max(abs(c2_pred), 1.0):
                 return 0.0, False
@@ -611,6 +597,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
         asrun = mg.compute_alphas(sq, alphas_mz=alphas_mz) if alphas_prefactor else alphas_mz
         r = ML.evaluate(get_me_full, mom[swap], alphas=asrun)
         born, c0, s = r["born"], r.get("c0"), r["s"]
+        last.update(born=born, c0=float("nan") if c0 is None else c0, shift=0.0)
         if c0 is None or r["rc"] // 100 == 4:
             return 0.0, False
         # Per-event pole guard: the double pole is universal (-sum C_i over the massless
@@ -625,6 +612,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             shift = 0.0
         else:
             shift = C.heavy_quark_scheme_shift(s, heavy_m)
+        last["shift"] = shift
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
         if alphas_prefactor:
             # restore the loop's physical α_s weighting (born already ran above)
@@ -643,6 +631,45 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             mom = np.array(mom, dtype=float, copy=True)
             mom[-1] = mom[0] + mom[1] - mom[2:-1].sum(0)
         return mom
+
+    info = {"v3": v3, "heavy_m": heavy_m, "ew": ew, "loopind": loopind}
+    return evaluate_point, balanced, last, info
+
+
+def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
+                          seed=42, mass_shift=True, alphas_mz=0.118,
+                          alphas_prefactor=False):
+    """Sample phase space, evaluate the virtual, apply the heavy-quark mass
+    shift, and write a 21-col virt dataset (momenta in [e-,e+,finals] order).
+
+    By default the stored target is virt_e4 = (c0+shift)*born — the α_s-STRIPPED
+    finite coefficient (α_s/2π divided out), so it is α_s-independent. With
+    ``alphas_prefactor=True`` the physical α_s weighting is restored per event,
+    target = virt_e4 * α_s(√s; alphas_mz)/(2π), using the running coupling at the
+    reference ``alphas_mz`` — exactly like the LO path. This makes the NLO target
+    DEPEND on the strong coupling, so a per-dataset α_s(M_Z) scan is meaningful.
+    (c0 is α_s-independent by construction, so the α_s handed to MadLoop cancels;
+    only this explicit prefactor carries the dependence.)"""
+    cfg = VIRT_PROCESSES[process]
+    pdg = cfg["pdg_ids"]
+    m_finals = cfg["m_finals"]
+    nfinal = len(m_finals)
+    npart = nfinal + 2
+
+    rng = np.random.default_rng(seed)
+    # Same fiducial cuts as the LO path so phase-space coverage is consistent across
+    # the perturbative-order axis (and matches the fiducial_cuts recorded in recipe_id).
+    # catalog_v4: the entry's own cuts, sqrt(s) measure and beam masses (absent: the global ones, uniform, BEAM_MASS)
+    cuts = (cfg.get("fiducial_cuts") or mg.FIDUCIAL_CUTS) if mg.FIDUCIAL_CUTS_ENABLED else None
+    measure, bm = cfg.get("sqrts_measure", "uniform"), beam_masses(cfg)
+    events, sqrts = mg.sample_nbody_phase_space(
+        n_events, sqrts_min, sqrts_max, m_finals, pdg, rng=rng, cuts=cuts, sqrts_measure=measure,
+        beam_mass=cfg.get("beam_masses"))
+    evaluate_point, balanced, last, info = virt_evaluator(process, mass_shift, alphas_mz, alphas_prefactor)
+    v3, heavy_m, ew = info["v3"], info["heavy_m"], info["ew"]
+    mom_store = np.empty((n_events, npart * 4))
+    amp = np.empty(n_events)
+    born_store = np.empty(n_events)
 
     bad = 0
     for i, (mom, _) in enumerate(events):
@@ -663,6 +690,7 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
             raise PoleGuardError(f"{process}: {bad} of the first {i+1} MadLoop points redrawn "
                                  f"(exceptional or wrong double pole): the module is not trustworthy")
         amp[i] = value
+        born_store[i] = last["born"]
         mom_store[i] = mom.flatten()            # store [e-,e+,finals] order
         if (i + 1) % 50_000 == 0:
             print(f"  [AMP] {i+1:,}/{n_events:,}", flush=True)
@@ -674,10 +702,63 @@ def generate_virt_dataset(process, sqrts_min, sqrts_max, n_events, out_file,
     arr = np.concatenate([mom_store, pdg_block, amp[:, None]], axis=1)
     os.makedirs(os.path.dirname(out_file) or ".", exist_ok=True)
     np.save(out_file, arr)
+    # the Born |M0|^2 MadLoop returned with each stored event, row-aligned, beside the pool (born_path); the pool file
+    # and its recipe_id are unchanged by it
+    np.save(born_path(out_file), born_store)
     print(f"[DATA] {process}: saved {arr.shape} -> {out_file}  "
           f"virt_e4 in [{amp.min():.3e},{amp.max():.3e}]  redrawn(exceptional/wrong pole)={bad}  "
           f"mass_shift={'off (catalog_v3)' if v3 else ('on(m=%.1f)'%heavy_m if (mass_shift and heavy_m and not ew) else 'off')}")
     return out_file
+
+
+def born_path(pool_file):
+    """The Born sidecar of a one-loop pool: <pool>.born.npy, one float per row, MadLoop's Born |M0|^2 at the alpha_s the
+    pool's virtual was evaluated with (0 for a loop-induced pool, which has none)."""
+    return pool_file[:-len(".npy")] + ".born.npy" if pool_file.endswith(".npy") else pool_file + ".born.npy"
+
+
+def born_of_pool(process, pool_file, n_events=None, seed=0, out=None, alphas_mz=0.118, alphas_prefactor=False,
+                 mass_shift=True):
+    """Re-evaluate an existing one-loop pool's events with the evaluator that generated it (virt_evaluator) and return
+    per event MadLoop's Born, c0 and the mass-scheme shift, with the stored target recomputed from them, so the
+    Born-relative target log|c0 + shift| (par:v4_loop_born) is available on pools generated before the Born was kept.
+    The events: all rows, or n_events of them drawn without replacement (seed), in row order. The check: the recomputed
+    target against the stored column, relative difference per event (MadLoop is deterministic on the same momenta; a
+    point its stability rescue treats differently shows here). Writes an npz (out) with idx, born, c0, shift, value,
+    stored, rc_ok; with every row evaluated, also the row-aligned sidecar born_path(pool_file). The pool is not
+    modified. alphas_mz / alphas_prefactor / mass_shift as the pool was generated (datagen passes the first two only
+    with a prefactor; the default is the stripped virtual at 0.118 with the shift rule of the entry)."""
+    cfg = VIRT_PROCESSES[process]
+    npart = len(cfg["pdg_ids"])
+    d = np.load(pool_file, mmap_mode="r")
+    n = d.shape[0]
+    idx = np.arange(n) if (n_events is None or n_events >= n) else \
+        np.sort(np.random.default_rng(seed).choice(n, n_events, replace=False))
+    pool_file = os.path.abspath(pool_file)
+    evaluate_point, balanced, last, info = virt_evaluator(process, mass_shift, alphas_mz, alphas_prefactor)
+    rec = {k: np.empty(len(idx)) for k in ("born", "c0", "shift", "value", "stored")}
+    ok = np.zeros(len(idx), bool)
+    for j, i in enumerate(idx):
+        row = np.asarray(d[i], dtype=np.float64)
+        mom = row[:npart * 4].reshape(npart, 4)
+        q = mom[0] + mom[1]
+        sq = float(np.sqrt(q[0] ** 2 - (q[1:] ** 2).sum()))
+        value, ok[j] = evaluate_point(balanced(mom), sq)
+        rec["value"][j], rec["stored"][j] = value, row[-1]
+        for k in ("born", "c0", "shift"):
+            rec[k][j] = last[k]
+    rel = np.abs(rec["value"] - rec["stored"]) / np.maximum(np.abs(rec["stored"]), 1e-300)
+    summary = {"process": process, "pool": os.path.basename(pool_file), "n_rows": int(n), "n_evaluated": int(len(idx)),
+               "n_unusable": int((~ok).sum()), "max_rel": float(rel[ok].max()) if ok.any() else None,
+               "median_rel": float(np.median(rel[ok])) if ok.any() else None,
+               "n_rel_above_1e-6": int((rel[ok] > 1e-6).sum()), **{k: v for k, v in info.items()}}
+    if out:
+        os.makedirs(os.path.dirname(os.path.abspath(out)) or ".", exist_ok=True)
+        np.savez(out, idx=idx, rc_ok=ok, **rec)
+    if len(idx) == n and ok.all() and summary["n_rel_above_1e-6"] == 0:
+        np.save(born_path(pool_file), rec["born"])
+        summary["sidecar"] = born_path(pool_file)
+    return summary
 
 
 def main():
@@ -699,8 +780,18 @@ def main():
     ap.add_argument("--alphas-prefactor", action="store_true",
                     help="store the physical α_s-weighted virtual (target depends "
                          "on α_s); default off keeps the legacy α_s-stripped virt_e4")
+    ap.add_argument("--born-of", default=None, metavar="POOL",
+                    help="re-evaluate an existing pool's events and write their Born (born_of_pool); --n events "
+                         "drawn from it with --seed (all rows when --n is at least its size), npz to --out")
     args = ap.parse_args()
 
+    if args.born_of:
+        import json
+        s = born_of_pool(args.process, args.born_of, n_events=args.n, seed=args.seed, out=args.out,
+                         alphas_mz=args.alphas_mz, alphas_prefactor=args.alphas_prefactor,
+                         mass_shift=not args.no_mass_shift)
+        print("BORN_OF_POOL " + json.dumps(s), flush=True)
+        return
     if args.build or args.force_build:
         build_virt_standalone(args.process, force=args.force_build)
     if args.certify:
