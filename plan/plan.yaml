@@ -283,6 +283,13 @@ entries:
       catalog_v4
     answered_at: '2026-10-26T22:04:27.536000+00:00'
     decision: D170
+  - ask: The main session does not operate on CC-IN2P3 while its login notice forbids generative AI tools, and catalog_v4's
+      pools exist only on CC. Will you ask CC for an exception, or start a copy of the project's data from CC to lxplus yourself?
+    at: '2026-10-29T05:50:54+00:00'
+    searched: D176 (ignore the notice) is the user's call, but the notice is the site operator's rule about AI tools, which
+      the user cannot waive for it; no decision covers an exception or a data move off CC
+    blocks: the submission of the built sign extension (one CPU job, two pretrainings, about 3.6 GPU-h); the build is committed
+      (f5949014)
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -755,6 +762,13 @@ entries:
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
+  ask: The main session does not operate on CC-IN2P3 while its login notice forbids generative AI tools, and catalog_v4's
+    pools exist only on CC. Will you ask CC for an exception, or start a copy of the project's data from CC to lxplus yourself?
+  waiting_since: '2026-10-29T05:50:54+00:00'
+  searched: D176 (ignore the notice) is the user's call, but the notice is the site operator's rule about AI tools, which
+    the user cannot waive for it; no decision covers an exception or a data move off CC
+  blocks: the submission of the built sign extension (one CPU job, two pretrainings, about 3.6 GPU-h); the build is committed
+    (f5949014)
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
