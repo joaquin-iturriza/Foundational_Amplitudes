@@ -80,7 +80,7 @@ elif a[0] == "item":
 
 class World:
     def __init__(self, entries, runs=(), decisions=(), items=(), events="  no open events", transcript=(),
-                 state=None, agents=()):
+                 state=None, agents=(), supervisor=True):
         self.d = tempfile.mkdtemp(prefix="plan_scen_")
         j = lambda x: os.path.join(self.d, x)
         self.plan, self.state, self.db, self.tr, self.ag = j("plan.yaml"), j(".state.json"), j("runs.db"), j("tr"), j("ag")
@@ -126,11 +126,16 @@ class World:
                     recs.append({"type": "user", "timestamp": ts, "message": {"role": "user", "content": [
                         {"type": "tool_result", "tool_use_id": "tu1", "content": "ok"}]}})
                 open(p, "w").write("".join(J(r) + "\n" for r in recs))
+        # a fake /proc for the stop check's supervisor test: a `site supervise --project FA` process unless told not
+        os.makedirs(j("proc/1")); open(j("proc/1/cmdline"), "wb").write(b"bash\0-c\0sleep 1\0")
+        if supervisor:
+            os.makedirs(j("proc/2")); open(j("proc/2/cmdline"), "wb").write(
+                b"/usr/bin/python3\0/home/u/.local/bin/site\0supervise\0--project\0FA\0")
         open(j("site"), "w").write(STUB)
         os.chmod(j("site"), 0o755)
         self.env = dict(os.environ, PLAN_TEST="1", PLAN_FILE=self.plan, PLAN_STATE=self.state, PLAN_RUNS_DB=self.db,
                         PLAN_TRANSCRIPTS=self.tr, PLAN_AGENTS=self.ag, PLAN_SITE=j("site"), PLAN_ROOT=self.d,
-                        PLAN_SITE_MODULE=shutil.which("site"), PLAN_SWEEP_SITES="",
+                        PLAN_SITE_MODULE=shutil.which("site"), PLAN_SWEEP_SITES="", PLAN_PROC=j("proc"),
                         PLAN_EVENTS_CMD="printf '%s\\n'" % events.replace("'", ""))
 
     def check(self):
@@ -2174,12 +2179,63 @@ def reviewer_resume():
              [r2.stderr, r3.stderr])
 
 
+CC_NOTICE = ("The main session does not operate on CC-IN2P3 while its login notice forbids generative AI tools, and "
+             "the regeneration waits on it: should I ask CC for an exception?")
+D176 = ("D176", "prefer", "CC-IN2P3's login notice on generative AI tools: ignored; work on CC continues unless the notice "
+        "changes or something is addressed to the user specifically", 1, ago(600),
+        "unless the notice changes, or there is something directed to me specifically, we don't care")
+
+
+def settled_questions():
+    """2026-10-29: a call the user had settled (D176, ignore CC-IN2P3's login notice) was asked again as a new plan
+    question, the supervisor was stopped, and every entry waited on its own question for 7 hours."""
+    w = World([E("pp_regen")], decisions=[D176])
+    rc, out = w.plan_cmd("ask", "pp_regen", "--ask", CC_NOTICE, "--searched", SEARCHED, "--holds-all",
+                         "the regeneration runs on CC-IN2P3 and nothing else in the entry can move")
+    scenario("plan ask refuses a question a decision in force covers (the CC-IN2P3 notice, D176)",
+             rc != 0 and "D176" in out and "not-settled-by" in out and not w.entries()["pp_regen"].get("ask"), out)
+    rc, out = w.plan_cmd("ask", "pp_regen", "--ask", CC_NOTICE, "--searched", SEARCHED,
+                         "--not-settled-by", "D176: short")
+    scenario("--not-settled-by with no reason is refused", rc != 0 and "at least" in out, out)
+    rc, out = w.plan_cmd("ask", "pp_regen", "--ask", CC_NOTICE, "--searched", SEARCHED, "--not-settled-by",
+                         "D176: whether CC itself, not its notice, has now written to the user about this account")
+    e = w.entries()["pp_regen"]
+    scenario("--not-settled-by naming the decision and what it leaves open lets it go, recorded with the question",
+             rc == 0 and e["not_settled_by"][0].startswith("D176:") and e["asks"][-1]["not_settled_by"] ==
+             e["not_settled_by"], out)
+    w = World([E("lowd")], decisions=[D176])
+    rc, out = w.plan_cmd("ask", "lowd", "--ask", "Should the small study also run the frozen lower blocks at every "
+                         "rung?", "--searched", SEARCHED)
+    scenario("an unrelated question passes", rc == 0, out)
+    rc, out = World([], decisions=[D176]).plan_cmd(
+        "add", "ccx", "--title", "t", "--question", "q", "--next", "n", "--match", "ccx*", "--ask", CC_NOTICE,
+        "--searched", SEARCHED)
+    scenario("plan add --ask is held to the same rule", rc != 0 and "D176" in out, out)
+    held = lambda eid: E(eid, status="waiting_user", ask=CC_NOTICE, waiting_since=ago(20), holds_all="x" * 40)
+    sent = [(ago(19), "assistant", "Joaquin, " + CC_NOTICE)]
+    w = World([held("a"), held("b")], transcript=sent, supervisor=False)
+    rc, err = w.check()
+    scenario("the stop check blocks when every entry waits on the user and no supervisor runs",
+             rc == 2 and "site supervise" in err and "every live entry waits on the user" in err, err)
+    rc, err = World([held("a"), held("b")], transcript=sent).check()
+    scenario("with the supervisor running it passes", rc == 0, err)
+    part = E("c", ask=CC_NOTICE, waiting_since=ago(20), next="regenerate the pp pools on CC-IN2P3",
+             blocks="regenerate the pp pools on CC-IN2P3")
+    w = World([held("a"), part], transcript=sent, state={"c": step(1)}, supervisor=False)
+    rc, err = w.check()
+    scenario("a running entry whose question blocks all its next steps counts as waiting",
+             rc == 2 and "every live entry waits" in err, err)
+    w = World([held("a"), E("d")], transcript=sent, state={"d": step(1)}, supervisor=False)
+    rc, err = w.check()
+    scenario("one entry that can move keeps the turn free of that block", "every live entry waits" not in err, err)
+
+
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, parallel_steps, sent_figures, the_suite_itself]
+          designs, design_prior, prompt_cap, parallel_steps, sent_figures, settled_questions, the_suite_itself]
 
 
 def main():

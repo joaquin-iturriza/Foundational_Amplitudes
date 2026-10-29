@@ -20,6 +20,9 @@ ledger_guard, plan_guard, continuous_guard and slurm_waiter_guard. The turn cann
   - numbers committed to docs/results.tex on trunk since the last verified commit fail tools/verify_claims.py (the
     gate on the numbers, a check of state; the git hooks only catch a problem earlier);
   - a site event is open;
+  - every live entry waits on the user (waiting_user with holds_all, or running with an open question whose `blocks`
+    names every next step) while no `site supervise` process for FA runs (/proc, as the turn ends): nothing would
+    move until the user came back (2026-10-29, 7 hours idle after the supervisor was stopped);
   - a sweep on a site, live or just submitted, that no entry records and that fits several running entries (one that
     fits a single entry is recorded on it here, with a note: plan.reconcile_sweeps).
 An item check that cannot reach its site counts as in flight and is reported as a note, never as a block.
@@ -47,6 +50,37 @@ QUOTED = re.compile(r"\u201c[^\u201d]*\u201d|\"[^\"\n]*\"|`[^`\n]*`|^\s*>.*$", r
 def own_questions(text):
     """The sentences a message itself asks: quoted text (a question cited in a status message) is left out."""
     return [q.strip() for q in re.findall(r"[^.!?\n]*[.!?]?", QUOTED.sub(" ", text)) if q.strip().endswith("?")]
+
+
+def supervisor_running():
+    """A live `site supervise` process for FA (or for every project): /proc/<pid>/cmdline, argv split on NUL. Tests
+    point PLAN_PROC at a fake /proc."""
+    import plan, glob
+    for f in glob.glob(os.path.join(plan.ENV.get("PLAN_PROC", "/proc"), "[0-9]*", "cmdline")):
+        try:
+            argv = [x for x in open(f, "rb").read().decode(errors="replace").split("\0") if x]
+        except OSError:
+            continue
+        i = next((i for i, x in enumerate(argv) if os.path.basename(x) == "site"), None)
+        if i is None or "supervise" not in argv[i + 1:]:
+            continue
+        rest = argv[i + 1:]
+        proj = next((rest[j + 1] for j, x in enumerate(rest[:-1]) if x == "--project"), None) or \
+            next((x.split("=", 1)[1] for x in rest if x.startswith("--project=")), None)
+        if proj in (None, plan.PROJECT):
+            return True
+    return False
+
+
+def waits_on_user(e):
+    """The entry cannot move without the user: waiting_user (holds_all), or running with an open question whose
+    `blocks` names every one of its next steps."""
+    import plan
+    if e.get("status") == "waiting_user":
+        return True
+    if e.get("status") != "running" or not plan.open_question(e) or not e.get("blocks"):
+        return False
+    return all(plan.overlap(plan.step_text(e, k), e["blocks"]) for k in plan.step_keys(e))
 
 
 def problems():
@@ -102,6 +136,12 @@ def problems():
     for e, why in plan.done_problems(d, st):
         plan.NOTES.append("%s is marked done but %s: plan reopen %s --why ..., or fix it (see plan next)" % (
             e["id"], why, e["id"]))
+    live = [e for e in d["entries"] if e.get("status") in ("running", "waiting_user")]
+    if live and all(waits_on_user(e) for e in live) and not supervisor_running():
+        out.append("every live entry waits on the user (%s) and `site supervise` is not running: nothing moves until "
+                   "they answer. Start it in the background (`site supervise --project FA`), and take what does not "
+                   "need the answer: a question a decision in force settles is withdrawn (plan withdraw), a part that "
+                   "can move is a next step of its own (plan add-next)" % ", ".join(e["id"] for e in live))
     out += plan.claims_problems()
     # an event on an entry whose step agent is still working is that agent's to ack: blocking on it only bounces the
     # main session while the agent reads the logs (2026-10-26, eight failed regeneration parts)
