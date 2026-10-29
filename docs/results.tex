@@ -1842,7 +1842,8 @@ offsets, and the property is the top at its mass, not a class's coverage: the ne
 well when it has seen that process with a heavier or lighter top, and poorly otherwise. The level fix to examine is
 the top's treatment, its mass scale in the emission-scale target or the coverage of top processes at the top's mass;
 the layer siblings are a selected set, so this is a reading, not a
-test of either fix.
+test of either fix. The two fixes as designs, each with what it does to the particle content axis, are in the hand-off
+(Sec.~\ref{sec:ladder-open}, the top's level on catalog\_v4).
 \begin{figure}[t]
   \centering
   \includegraphics{../analysis/catalog_v4/figs/tree_levels_top.pdf}
@@ -11216,6 +11217,75 @@ of the three share a test set.
     % src: python3 analysis/catalog_v4/pp_physics_rescore.py @1cdc1fe9
     % claim: train.agree.mse.v4_over_pp=0.66
     % allow: 13 797 70 30 140 350 6 3 172.5 because they are the beam energy, the class count, the proposed blend shares, the cost estimates of a run not made and the top mass, settings of a proposal
+  \item \textbf{The top's level on catalog\_v4 (proposed 2026-10-29, the user's call).} The question: what removes the
+    tree level error that the particle content axis carries (par.~\ref{par:v4_tree_top}), serving the user's order of
+    2026-10-29 (the zero-shot bias first, then the shape; zero-shot and low data; the hard cases) [D178]. The reading in
+    hand, no fit: every particle content pool has an external top, the top at $172.5$\,GeV is in no training tree pool
+    (the training trees' only tops are the $105$ heavy-quark layer pools at $50$, $300$, $600$\,GeV), and the top pools
+    hold all six largest tree offsets and $0.786$ of the summed squared offset; the $35$ whose own process is in the
+    layer have a median absolute offset of $0.063$, the others $0.437$ (the new combinations, no top: $0.096$). The
+    network interpolates a process's level in the top mass; it does not carry the level to a new process with a top
+    it has not seen at that mass. The level is about a quarter of the axis's error (level share $0.26$ / $0.22$ of a
+    zero-shot MSE of $0.83$ / $0.87$, par.~\ref{par:v4_kshot_level}), the shape the rest, so a level fix acts on that
+    quarter. By the catalog design the particle content axis \emph{is} the top at $172.5$\,GeV, bracketed by the layer,
+    with the never-seen particle in the removal twin ($\tau$, $\nu_\tau$; the user's catalog design approval, D98, D100,
+    \code{recipes/select\_catalog\_v4.py}); the parameter axis's top-mass point is the same pools.
+    % src: python3 analysis/catalog_v4/loop_levels.py --trees @725457f8
+    % claim: top.train_top_heavy_layer=105
+    % claim: top.top_share_sq_offset=0.786
+    % claim: top.H3.n_sibling=35
+    % claim: top.H3.median_abs_off_sibling=0.063
+    % claim: top.H3.median_abs_off_no_sibling=0.437
+    % claim: top.H1.median_abs_off_no_top=0.096
+    % src: python3 analysis/catalog_v4/kshot_level.py @9f64f323
+    % claim: v4_dimensionless_muon.H3.zero=0.83
+    % claim: v4_dimensionless_muon_seed2.H3.zero=0.87
+    % claim: v4_dimensionless_muon.H3.level_share=0.26
+    % claim: v4_dimensionless_muon_seed2.H3.level_share=0.22
+    % allow: 172.5 50 300 600 42 43 4264 0.05 1.8 3.6 3.2 6.8 3 2 1 because they are the top and heavy-quark masses in GeV, the seeds, the step count, the test's level, the designs' numbers and the cost estimates of runs not made, settings of a proposal
+    Every design runs against the existing control pair (the emission-scale target with dimensionless inputs, Muon at
+    the search's best, seeds $42$ and $43$, $4264$ steps, not rerun), at the same steps, two seeds, read at the best
+    checkpoint on every own axis. Decision statistic for all: per held-out top pool the seed-mean absolute offset, arm
+    against control, a one-sided sign test over pools (yes at $p<0.05$ with the seed-mean median lower and each seed
+    lower on most pools); secondary, the zero-shot MSE of $\log|\mathcal M|^2$ per probe on every axis as the arm over
+    control ratio against the control's seed spread, and the shape part on the top pools. A run costs about $1.8$
+    GPU-hours (an estimate from the control's runs and catalog\_v3's extension arm), so a pair about $3.6$.
+    (1) \emph{The top mass in the target.} The emission-scale target sees a massive leg's mass only as the $m^2$ floor
+        of its own emission step, and a $2\to2$ core not at all; the twin on Daniel's catalog read the never-seen tops as
+        a target that does not know where a $2m_t$ threshold sits (par.~\ref{par:dimless_qperp}). Candidates fixed before
+        any look: the current scale; the floor removed; every massive leg at $\hat s$ (prior: worse on Daniel's $43$ new,
+        par.~\ref{par:dimless_qperp}, kept as the reference); one threshold factor $\log(1-(\sum_f m_f)^2/\hat s)$ per
+        event. By the user's 2026-10-22 rule each acts on every massive particle alike (W, Z, H, the layer, BSM), never on
+        the top alone. Existing read that tests it, CPU only: on the $35$ layer classes, the levels at $50$, $172.5$,
+        $300$, $600$\,GeV under each candidate (the per-pool train means, as \code{loop\_levels.py --dump}; about $1$ to
+        $2$ core-hours on CC, an estimate); a candidate goes to the GPU only if it halves the spread over classes of the
+        level's change across the masses and does not raise the composition proxy's level error on the training classes
+        without a top. GPU: one pair, about $3.6$ GPU-hours. Yes: the rule above on the top pools without a layer
+        sibling; no (no candidate passes the proxy, or the pair is not lower): the top's level is not a target matter.
+        Cost to other comparisons: a new target, so $\mathrm{val\_loss\_no\_reg}$ is no longer comparable with any
+        emission-scale run (the zero-shot $\log|\mathcal M|^2$ reads are); it moves the level of every training class
+        with a massive boson, where the massive legs at $\hat s$ lost; the particle content axis is unchanged.
+    (2) \emph{Top processes at $172.5$\,GeV in training.} All of them would leave no top held out: the axis and the
+        parameter axis's top-mass point go, nothing would test the fix, and the zero-shot claim of a new particle would
+        rest on the removal twin alone (never run on catalog\_v4; its recipe \code{recipes/catalog\_v4\_twin\_train.yaml}
+        exists, a pair about $3.2$ GPU-hours; catalog\_v3's twin read its $\tau$ processes mostly as shape,
+        Tab.~\ref{tab:v3_short}). The testable form moves part: a random half, by class and stratified by multiplicity
+        and beam, of the top classes without a layer sibling enters training at $172.5$\,GeV (pools exist at full size,
+        no generation); the other half and the $35$ layer classes stay held out. The claim on that half becomes a new
+        process with a particle seen at its mass in other processes (a new-combination claim), and on the $35$ a known
+        process at a mass seen elsewhere; the new particle claim moves to the twin. GPU: one pair, about $3.6$ (with
+        the twin, about $6.8$). Yes: the rule above on the held-out half; no: coverage at the mass does not carry the
+        level and the top's level is the process's structure. Cost: the axis is halved for every later run and every
+        existing read against the control pair is on the old split; at the same steps each pool gets fewer epochs (on
+        catalog\_v3 more training pools at the same steps cost the $2\to5$ axis, par.~\ref{par:v3_prep_signed}).
+    (3) \emph{The alternative that keeps the axis: the layer widened.} The same random half gets its heavy-quark
+        layer pools at $50$, $300$, $600$\,GeV (three tree pools per class at the catalog sizes, generated on CC, a few
+        tens of core-hours, an estimate; disk on CC to be checked first), the top at $172.5$\,GeV still in no training
+        pool. The particle content claim is unchanged (the top's mass never seen), and the reading becomes a test: the
+        half is drawn at random, so the siblings are no longer a selected set. GPU: one pair, about $3.6$. Yes: the
+        rule above on the widened half against the other half and the control; no: the reading was the selection.
+        Cost: as the partial move, without losing any held-out pool.
+    No job before the user's call on which, if any (the catalog's held-out axes are their design, D98, D100).
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).

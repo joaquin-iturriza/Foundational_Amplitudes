@@ -1387,6 +1387,7 @@ processes:
     parent: v4_bbx_abbxz
   pp13v4_bbx_abtxwp:
     lhe:
+      n_runs: 9
       margin: 4.81
     kind: lhe_pp
     folder: pp13v4_bbx_abtxwp
@@ -19013,6 +19014,7 @@ processes:
     parent: v4_ub_bdwp
   pp13v4_ub_bdwpz:
     lhe:
+      n_runs: 4
       margin: 0.6
     kind: lhe_pp
     folder: pp13v4_ub_bdwpz
@@ -23505,6 +23507,7 @@ processes:
     parent: v4_udx_ddxwp
   pp13v4_udx_ddxwpz:
     lhe:
+      n_runs: 7
       margin: 1.92
     kind: lhe_pp
     folder: pp13v4_udx_ddxwpz
