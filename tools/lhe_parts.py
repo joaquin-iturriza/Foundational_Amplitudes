@@ -433,7 +433,8 @@ def cmd_gc(a):
 
 def cmd_status(a):
     D = _dirs(a.queue)
-    c = {k: len([f for f in os.listdir(D[k]) if not f.endswith(".err")]) for k in ("todo", "claimed", "done", "failed")}
+    c = {k: len([f for f in os.listdir(D[k]) if ".json" in f and not f.endswith(".err")])     # tasks, not subdirs
+         for k in ("todo", "claimed", "done", "failed")}
     c["assembled"] = len(os.listdir(D["assembled"]))
     c["processes"] = len(os.listdir(D["specs"]))
     print(json.dumps(c))
