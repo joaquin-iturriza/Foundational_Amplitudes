@@ -28,13 +28,15 @@ NAME = "zz_parts_proc"
 K = 5   # 2 -> 3
 
 
-def _register(n_runs=3, run_events=400, parts=True):
+def _register(n_runs=3, run_events=400, parts=True, accept_short=False):
     lhe = {"cards_dir": "recipes/catalog_v4_pp", "run_card": "run_card.dat", "param_card": "param_card.dat",
            "label_alphas": "running_sqrt_shat", "n_val": 100, "n_test": 100, "n_train": 800, "n_runs": n_runs}
     if parts:
         lhe["parts"] = True
     if run_events:
         lhe["run_events"] = run_events
+    if accept_short:
+        lhe["accept_short"] = True
     mg.PROCESSES[NAME] = {"kind": "lhe_pp", "pdg_ids": [21] * K, "m_finals": [0.0] * 3, "nfinal": 3,
                           "mg5_generate": ["generate g g > g g g"], "lhe": lhe}
 
@@ -205,6 +207,45 @@ def test_queue_stall_layout_short_parts():
     test_queue_end_to_end(run_events=None, short=True)
 
 
+def test_accept_short_and_adopt():
+    """A pool whose runs come back short at random (lhe.accept_short): any part counts, and raising its n_runs keeps
+    the parts already made (plan links them to the new identity's names, run k < old n_runs is the same run)."""
+    saved = (datagen.dest_for_role,)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            q = os.path.join(d, "queue")
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            plan = lambda: lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates,
+                                                                 cores=[]))
+            _register(n_runs=2, run_events=400, accept_short=True)
+            run0 = mg.lhe_runs(NAME, 100, 1020)[0]
+            assert lhe_parts.part_need(NAME, run0) is None
+            plan()
+            old = [p for p, _ in mg.lhe_part_paths(NAME, _items())]
+            for p in old:
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                np.savez(p, mom=np.zeros((37, K, 4)))
+            _register(n_runs=3, run_events=400, accept_short=True)
+            new = mg.lhe_part_paths(NAME, _items())
+            assert [os.path.basename(p) for p in old] != [os.path.basename(p) for p, _ in new[:2]]
+            plan()
+            assert all(os.path.samefile(a, b) for a, (b, _) in zip(old, new[:2])) and not os.path.exists(new[2][0])
+            assert len(os.listdir(os.path.join(q, "todo"))) == 3      # the third run queued, the two first kept
+            _register(n_runs=3, run_events=400)                       # without accept_short a short part fails
+            assert lhe_parts.part_need(NAME, run0) == 400
+    finally:
+        (datagen.dest_for_role,) = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[accept_short + adopt] ok")
+
+
 def test_tidy_and_gc():
     """A worker deletes a saved run's directory (its removals in its gc/ manifest first, nothing deleted when that
     write fails) and reduces a failed or short one to its logs, the short one not done; gc does the same for runs left
@@ -359,4 +400,5 @@ if __name__ == "__main__":
     test_parts_equal_serial()
     test_queue_end_to_end()
     test_queue_stall_layout_short_parts()
+    test_accept_short_and_adopt()
     test_tidy_and_gc()

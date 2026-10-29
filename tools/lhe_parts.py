@@ -13,6 +13,8 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             pools (a lock per standalone directory, so no two jobs label or compile the same backend at once).
             Claims of jobs no longer in the queue (squeue) are put back first. Exits when nothing fits or is left.
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
+    yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
+            (recipes/gen_catalog_v4_default.py sizes those pools' n_runs from it; plan then links their parts, _adopt)
     gc      --queue Q [--dry-run]
             the MadEvent working directories ($SCRATCH/lhe_work/parts/<process>__<run>) of the queue's runs that are
             not running: a run whose part file holds its events loses the whole directory, any other (failed, killed,
@@ -87,7 +89,9 @@ def cmd_plan(a):
     # tasks queued or claimed (a done one is known by its part file; a failed one is queued again: plan retries it)
     known = {f.split("__", 1)[1].split(".json")[0] for d in ("todo", "claimed") for f in os.listdir(D[d])}
     n_new = n_have = 0
+    n_adopt = 0
     for name, its in sorted(items.items()):
+        n_adopt += _adopt(D, name, its)
         with open(os.path.join(D["specs"], name + ".json"), "w") as f:
             json.dump({"seed": a.seed, "items": [[r, p] for r, p in its]}, f)
         rate, src = _rate(name, rates, med)
@@ -105,12 +109,37 @@ def cmd_plan(a):
             n_new += 1
     # an estimate: the measured core-seconds per event of the class's pool (or its multiplicity's median) times the
     # events asked, one-core time taken as cores x wall of the measured multicore run (no parallel loss)
-    print(json.dumps({"processes": len(items), "tasks_new": n_new, "tasks_present": n_have,
+    print(json.dumps({"processes": len(items), "tasks_new": n_new, "tasks_present": n_have, "parts_adopted": n_adopt,
                       "est_core_h": round(sum(v[1] for v in src_cost.values()), 1),
                       "est_by_rate_source": {k: {"tasks": v[0], "core_h": round(v[1], 1)} for k, v in src_cost.items()},
                       "est_longest_task_wall_h": round(max([json.load(open(f))["est_s"] for f in
                                                         glob.glob(os.path.join(D["todo"], "*.json"))] or [0]) / 3600,
                                                    2)}))
+
+
+def _adopt(D, name, its):
+    """Hard-link the part files of a process's previous plan (Q/specs) to its new names when the new layout only adds
+    runs (lhe.n_runs raised, nothing else of the recipes changed, no lhe.energies): run k < the old n_runs has the same
+    run name, iseed and events, so the same MadEvent run. Nothing is deleted. Returns the parts linked."""
+    sf = os.path.join(D["specs"], name + ".json")
+    if not os.path.exists(sf):
+        return 0
+    old = [r for r, _ in _spec(D, name)]
+    new = [r for r, _ in its]
+    strip = lambda r: {**r, "lhe": {k: v for k, v in r["lhe"].items() if k != "n_runs"}}
+    if len(old) != len(new) or any(strip(a) != strip(b) for a, b in zip(old, new)) or new[0]["lhe"].get("energies"):
+        return 0
+    o_n, n_n = int(old[0]["lhe"].get("n_runs", 1)), int(new[0]["lhe"].get("n_runs", 1))
+    o_id, n_id = mg._lhe_events_id(old[0]), mg._lhe_events_id(new[0])
+    if o_id == n_id or n_n <= o_n:
+        return 0
+    n = 0
+    for k, (part, run) in enumerate(mg.lhe_part_paths(name, its)[:o_n]):
+        src = os.path.join(os.path.dirname(part), os.path.basename(part).replace(f"{name}_{n_id}_", f"{name}_{o_id}_", 1))
+        if os.path.exists(src) and not os.path.exists(part):
+            os.link(src, part)
+            n += 1
+    return n
 
 
 def _my_jobs():
@@ -203,7 +232,10 @@ def part_need(name, run):
     """Events run `run` of `name` must return for its part to count as done: all it asked when the pool is split into
     runs sized to return their events (lhe.run_events), else any (runs that each ask the whole pool and stall at a few
     thousand, lhe.n_runs sized from what one run returned: short by design, the assembly checks their sum)."""
-    return run[1] if mg.PROCESSES[name]["lhe"].get("run_events") else None
+    l = mg.PROCESSES[name]["lhe"]
+    # lhe.accept_short: a pool whose runs come back short at random (MadEvent "fail to reach target"), n_runs sized
+    # from the events its runs returned (recipes/gen_catalog_v4_default.py SHORT_YIELDS): any part counts
+    return run[1] if l.get("run_events") and not l.get("accept_short") else None
 
 
 def _du(path):
@@ -485,6 +517,25 @@ def cmd_status(a):
     print(json.dumps(c))
 
 
+def cmd_yields(a):
+    """process -> {asked, got} per run (got null: no part file) for every process of the queue with a short part."""
+    D = _dirs(a.queue)
+    out = {}
+    for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
+        name = os.path.basename(sf)[:-5]
+        asked, got = [], []
+        for part, run in mg.lhe_part_paths(name, _spec(D, name)):
+            asked.append(int(run[1]))
+            try:
+                with np.load(part) as z:
+                    got.append(int(len(z["mom"])))
+            except (FileNotFoundError, OSError, KeyError, ValueError):
+                got.append(None)
+        if any(g is not None and g < q for g, q in zip(got, asked)):
+            out[name] = {"asked": asked, "got": got}
+    print(json.dumps(out, sort_keys=True))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -497,8 +548,9 @@ def main():
     w.add_argument("--hours", type=float, default=1.0)
     s = sub.add_parser("status"); s.add_argument("--queue", required=True)
     g = sub.add_parser("gc"); g.add_argument("--queue", required=True); g.add_argument("--dry-run", action="store_true")
+    y = sub.add_parser("yields"); y.add_argument("--queue", required=True)
     a = ap.parse_args()
-    {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc}[a.cmd](a)
+    {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields}[a.cmd](a)
 
 
 if __name__ == "__main__":
