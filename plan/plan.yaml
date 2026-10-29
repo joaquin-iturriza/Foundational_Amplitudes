@@ -351,6 +351,11 @@ entries:
       user''s call on which. None settles the choice.'
     blocks: 'only next step 2 (the top''s level designs on catalog_v4): which design, if any, gets recorded with plan design
       and reviewed; next step 1 and the rest of the exploration continue'
+    answered_at: '2026-10-29T16:33:54+00:00'
+    decision: D178
+    withdrawn_at: '2026-10-29T16:33:54+00:00'
+    withdrawn_why: 'the main session withdrew its recommendation: giving the 244 top processes mass neighbours would only
+      turn them into the known-process case; the real target is the new-process bias, this step'
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -957,24 +962,6 @@ entries:
         on every axis; look for what in the process predicts it, then design a fix in the target or inputs for that property'
       - 'new-combination pools sit near the 35 and well below the 244: the bias comes from the untrained top mass, a catalog-design
         effect of holding the 172.5 top out entirely; record it and move to the shape'
-  ask: 'On catalog_v4''s top level (the particle content axis carries the largest tree level errors; processes seen at another
-    heavy-quark mass are placed well, median |offset| 0.063 vs 0.437): which of the three designs do you want run, if any?
-    (1) the top mass in the emission-scale target: a CPU proxy over four fixed candidates on the 35 heavy-quark layer classes,
-    then one two-seed pair (~3.6 GPU-h), held-out axis unchanged, but a new target (val_loss_no_reg no longer comparable,
-    every massive particle''s level moves); (2) a random half of the top processes without a layer sibling moved into training
-    at 172.5 GeV (~3.6 GPU-h, no generation): halves the particle content axis, its claim on that half becomes a new combination,
-    the new-particle zero-shot claim moves to the removal twin (tau never seen; ~3.2 GPU-h more to run it on catalog_v4);
-    (3) keep the axis: give that random half heavy-quark layer pools at 50/300/600 GeV (a few tens of CPU core-h of generation
-    on CC plus ~3.6 GPU-h), the top at 172.5 still never trained, which turns the reading into a randomized test. Or none:
-    the top''s level stays a reading.'
-  waiting_since: '2026-10-29T16:09:29+00:00'
-  searched: 'CLAUDE.md (0b scope, GPU budget 30 GPU-h, A/B protocol), site decisions --project FA: D98/D100 fix the held-out
-    axes (H3 = the top at 172.5 bracketed by the heavy-quark layer, the new particle in the removal twin), so moving top processes
-    into training or changing the axis is the user''s design; D178 sets priorities (bias first) but picks no design; D161
-    (match steps) and D155 (Muon) fix settings, not the choice; the entry''s next step itself says no job before the user''s
-    call on which. None settles the choice.'
-  blocks: 'only next step 2 (the top''s level designs on catalog_v4): which design, if any, gets recorded with plan design
-    and reviewed; next step 1 and the rest of the exploration continue'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
