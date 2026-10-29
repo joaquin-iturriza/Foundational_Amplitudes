@@ -181,6 +181,10 @@ def _write_atomic(path, text):
 def transaction(write=True):
     """The plan under its lock. Nothing is created where no plan exists (the main checkout before the switch-over):
     an untracked plan/ there makes `site sync` refuse every launch (2026-10-25, four pp launches)."""
+    if write and re.search(r"/worktrees/zz_[^/]*/", HERE + "/"):
+        # a test worktree (zz_*, ~/work/CLAUDE.md) shares the live plan through git's common dir: replays of old step
+        # agents in the ponytail test rewrote two live entries' next steps (2026-10-29)
+        sys.exit("plan: refused: this is a test worktree (%s); it never writes the live plan" % HERE)
     if not os.path.exists(PLAN_FILE):
         if write:
             sys.exit("plan: no plan at %s (it is created by tools/plan_migrate.py at the switch-over)" % PLAN_FILE)
