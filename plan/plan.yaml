@@ -119,12 +119,14 @@ entries:
   - D165
   - D170
   - D175
-  next: 'Design the next preprocessing iteration on catalog_v4 (the pretraining catalog since the user''s switch, 2026-10-26):
-    start from what the catalog_v3 exploration found (par:v3_prep_* in docs/results.tex: the hybrid reference scale, the emission-scale
-    blends, the sign study''s more signed pools) and from the held entries'' catalog_v4 adaptations (catalog_norm, qperp_soft,
-    f24 and f24net carry ''Adapted to catalog_v4'' next steps but stay held under the user''s hold D114; this entry must not
-    run their jobs); record the design with --prior and get it through the design reviewer; a job under the GPU budget then
-    goes ahead'
+  next: 'Implement the passed design''s tooling (none exists yet): a catalog_v4 sign extension generation recipe (the one-loop
+    QCD virtual of each coloured 2->3 catalog_v4 training tree class outside its one-loop layer, 123 classes, class-level
+    check against recipes/catalog_v4_roles.json, catalog_v4''s strings/models/cuts/measure/widths, 1e4/1e3/1e3), its audit
+    and a train-recipe builder keeping only pools whose training split holds both signes (as recipes/make_catalog_v3_train_signext.py),
+    the job arms v4_dimensionless_muon_more_signed and _seed2 in scripts/job_catalog_v3_short.sh (control''s settings, only
+    TRAIN changed, sidecar check over the whole recipe), and a CPU generation + sidecar job; then site pick FA --jobs 3, submit
+    the CPU generation and the two GPU pretrainings chained after it with --item v3_prep_explore, recorded with plan run (design
+    passed 2026-10-29; cost about 3.6 GPU-h)'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
