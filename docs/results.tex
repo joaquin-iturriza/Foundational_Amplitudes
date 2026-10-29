@@ -1463,6 +1463,185 @@ they are $0.35$ to $0.42$ outside the coverage, $0.56$ to $0.63$ on whole pools,
   \label{fig:v4_vs_v3_pp}
 \end{figure}
 
+\paragraph{What a few labelled events fix on catalog\_v4 (2026-10-29).}\label{par:v4_kshot_level} The question: on
+catalog\_v4's pretraining default, how much of each held-out axis's zero-shot error is one number per process (a level,
+which a handful of labelled events removes) and how much is shape; and in particular whether the one-loop axis, its
+weakest against catalog\_v3 (par.~\ref{par:v4_vs_v3}), is behind by its level. No new run: the saved zero-shot reads of
+the control pair of the sign extension (the emission-scale target with dimensionless inputs, Muon at the search's best,
+seeds $42$ and $43$, $4264$ steps; best checkpoint, $2000$ validation events per pool, every probe of the eight own axes
+read) are split as on Daniel's catalog (par.~\ref{par:kshot_level}, \code{analysis/catalog\_v4/kshot\_level.py},
+Fig.~\ref{fig:v4_kshot_level}): per probe the zero-shot MSE of $\log|\mathcal M|^2$, its level $(\overline{q-t})^2$ and
+its floor $\mathrm{var}(q-t)$, what any constant per process reaches; the plain offset (the mean error on $K$ events
+drawn at random, subtracted, scored on the others, $200$ draws) and the shrunk offset (pulled toward the other probes'
+offsets on the axis, leave-one-probe-out, by precision). On the last three axes most probes are training
+processes at a held-out $\alpha_s$, energy or cut, so zero-shot there means a setting never trained on, not a process.
+Each entry is the median over the axis's probes of the MSE of $\log|\mathcal M|^2$ (the level share: of the level over
+that MSE), seed $42$ / $43$:
+% src: python3 analysis/catalog_v4/kshot_level.py @9f64f323
+% claim: v4_dimensionless_muon.H1.zero=0.24
+% claim: v4_dimensionless_muon_seed2.H1.zero=0.26
+% claim: v4_dimensionless_muon.H1.level_share=0.041
+% claim: v4_dimensionless_muon_seed2.H1.level_share=0.034
+% claim: v4_dimensionless_muon.H1.floor=0.24
+% claim: v4_dimensionless_muon_seed2.H1.floor=0.25
+% claim: v4_dimensionless_muon.H1.off1=0.48
+% claim: v4_dimensionless_muon_seed2.H1.off1=0.51
+% claim: v4_dimensionless_muon.H1.shr1=0.25
+% claim: v4_dimensionless_muon_seed2.H1.shr1=0.27
+% claim: v4_dimensionless_muon.H1.off16=0.25
+% claim: v4_dimensionless_muon_seed2.H1.off16=0.27
+% claim: v4_dimensionless_muon.H1.n=62
+% claim: v4_dimensionless_muon.H2.zero=0.46
+% claim: v4_dimensionless_muon_seed2.H2.zero=0.48
+% claim: v4_dimensionless_muon.H2.level_share=0.14
+% claim: v4_dimensionless_muon_seed2.H2.level_share=0.13
+% claim: v4_dimensionless_muon.H2.floor=0.38
+% claim: v4_dimensionless_muon_seed2.H2.floor=0.39
+% claim: v4_dimensionless_muon.H2.off1=0.77
+% claim: v4_dimensionless_muon_seed2.H2.off1=0.78
+% claim: v4_dimensionless_muon.H2.shr1=0.47
+% claim: v4_dimensionless_muon_seed2.H2.shr1=0.47
+% claim: v4_dimensionless_muon.H2.off16=0.41
+% claim: v4_dimensionless_muon_seed2.H2.off16=0.42
+% claim: v4_dimensionless_muon.H2.n=218
+% claim: v4_dimensionless_muon.H2p5.zero=0.70
+% claim: v4_dimensionless_muon_seed2.H2p5.zero=0.75
+% claim: v4_dimensionless_muon.H2p5.level_share=0.13
+% claim: v4_dimensionless_muon_seed2.H2p5.level_share=0.13
+% claim: v4_dimensionless_muon.H2p5.floor=0.54
+% claim: v4_dimensionless_muon_seed2.H2p5.floor=0.60
+% claim: v4_dimensionless_muon.H2p5.off1=1.02
+% claim: v4_dimensionless_muon_seed2.H2p5.off1=1.19
+% claim: v4_dimensionless_muon.H2p5.shr1=0.60
+% claim: v4_dimensionless_muon_seed2.H2p5.shr1=0.69
+% claim: v4_dimensionless_muon.H2p5.off16=0.58
+% claim: v4_dimensionless_muon_seed2.H2p5.off16=0.64
+% claim: v4_dimensionless_muon.H2p5.n=38
+% claim: v4_dimensionless_muon.H3.zero=0.83
+% claim: v4_dimensionless_muon_seed2.H3.zero=0.87
+% claim: v4_dimensionless_muon.H3.level_share=0.26
+% claim: v4_dimensionless_muon_seed2.H3.level_share=0.22
+% claim: v4_dimensionless_muon.H3.floor=0.56
+% claim: v4_dimensionless_muon_seed2.H3.floor=0.55
+% claim: v4_dimensionless_muon.H3.off1=1.10
+% claim: v4_dimensionless_muon_seed2.H3.off1=1.14
+% claim: v4_dimensionless_muon.H3.shr1=0.79
+% claim: v4_dimensionless_muon_seed2.H3.shr1=0.85
+% claim: v4_dimensionless_muon.H3.off16=0.60
+% claim: v4_dimensionless_muon_seed2.H3.off16=0.59
+% claim: v4_dimensionless_muon.H3.n=279
+% claim: v4_dimensionless_muon.H5.zero=0.80
+% claim: v4_dimensionless_muon_seed2.H5.zero=0.99
+% claim: v4_dimensionless_muon.H5.level_share=0.37
+% claim: v4_dimensionless_muon_seed2.H5.level_share=0.35
+% claim: v4_dimensionless_muon.H5.floor=0.47
+% claim: v4_dimensionless_muon_seed2.H5.floor=0.48
+% claim: v4_dimensionless_muon.H5.off1=0.96
+% claim: v4_dimensionless_muon_seed2.H5.off1=1.02
+% claim: v4_dimensionless_muon.H5.shr1=0.72
+% claim: v4_dimensionless_muon_seed2.H5.shr1=0.77
+% claim: v4_dimensionless_muon.H5.off16=0.50
+% claim: v4_dimensionless_muon_seed2.H5.off16=0.51
+% claim: v4_dimensionless_muon.H5.n=28
+% claim: v4_dimensionless_muon.H6.zero=0.023
+% claim: v4_dimensionless_muon_seed2.H6.zero=0.031
+% claim: v4_dimensionless_muon.H6.level_share=0.013
+% claim: v4_dimensionless_muon_seed2.H6.level_share=0.020
+% claim: v4_dimensionless_muon.H6.floor=0.022
+% claim: v4_dimensionless_muon_seed2.H6.floor=0.030
+% claim: v4_dimensionless_muon.H6.off1=0.049
+% claim: v4_dimensionless_muon_seed2.H6.off1=0.066
+% claim: v4_dimensionless_muon.H6.shr1=0.024
+% claim: v4_dimensionless_muon_seed2.H6.shr1=0.030
+% claim: v4_dimensionless_muon.H6.off16=0.024
+% claim: v4_dimensionless_muon_seed2.H6.off16=0.032
+% claim: v4_dimensionless_muon.H6.n=8
+% claim: v4_dimensionless_muon.H7E.zero=0.37
+% claim: v4_dimensionless_muon_seed2.H7E.zero=0.36
+% claim: v4_dimensionless_muon.H7E.level_share=0.037
+% claim: v4_dimensionless_muon_seed2.H7E.level_share=0.033
+% claim: v4_dimensionless_muon.H7E.floor=0.31
+% claim: v4_dimensionless_muon_seed2.H7E.floor=0.31
+% claim: v4_dimensionless_muon.H7E.off1=0.63
+% claim: v4_dimensionless_muon_seed2.H7E.off1=0.64
+% claim: v4_dimensionless_muon.H7E.shr1=0.35
+% claim: v4_dimensionless_muon_seed2.H7E.shr1=0.33
+% claim: v4_dimensionless_muon.H7E.off16=0.33
+% claim: v4_dimensionless_muon_seed2.H7E.off16=0.33
+% claim: v4_dimensionless_muon.H7E.n=34
+% claim: v4_dimensionless_muon.H7c.zero=0.16
+% claim: v4_dimensionless_muon_seed2.H7c.zero=0.19
+% claim: v4_dimensionless_muon.H7c.level_share=0.007
+% claim: v4_dimensionless_muon_seed2.H7c.level_share=0.010
+% claim: v4_dimensionless_muon.H7c.floor=0.16
+% claim: v4_dimensionless_muon_seed2.H7c.floor=0.18
+% claim: v4_dimensionless_muon.H7c.off1=0.30
+% claim: v4_dimensionless_muon_seed2.H7c.off1=0.36
+% claim: v4_dimensionless_muon.H7c.shr1=0.16
+% claim: v4_dimensionless_muon_seed2.H7c.shr1=0.20
+% claim: v4_dimensionless_muon.H7c.off16=0.17
+% claim: v4_dimensionless_muon_seed2.H7c.off16=0.19
+% claim: v4_dimensionless_muon.H7c.n=34
+% allow: 2\to4 2\to5
+% allow: 4264 200 because they are the runs' step count and the draws per K, settings
+% allow: 0.13 6 20 30 1 16 because they are the axes' settings (alpha_s, the energy window in TeV, the pT cut in GeV) and the K of each column
+\begin{center}
+\small
+\begin{tabular}{lrcccccc}
+\hline
+held-out axis & probes & zero-shot & level share & floor & offset, $K=1$ & shrunk, $K=1$ & offset, $K=16$ \\
+\hline
+new combinations & $62$ & $0.24$ / $0.26$ & $0.041$ / $0.034$ & $0.24$ / $0.25$ & $0.48$ / $0.51$ & $0.25$ / $0.27$ & $0.25$ / $0.27$ \\
+$2\to4$ & $218$ & $0.46$ / $0.48$ & $0.14$ / $0.13$ & $0.38$ / $0.39$ & $0.77$ / $0.78$ & $0.47$ / $0.47$ & $0.41$ / $0.42$ \\
+$2\to5$ & $38$ & $0.70$ / $0.75$ & $0.13$ / $0.13$ & $0.54$ / $0.60$ & $1.02$ / $1.19$ & $0.60$ / $0.69$ & $0.58$ / $0.64$ \\
+the top & $279$ & $0.83$ / $0.87$ & $0.26$ / $0.22$ & $0.56$ / $0.55$ & $1.10$ / $1.14$ & $0.79$ / $0.85$ & $0.60$ / $0.59$ \\
+one loop & $28$ & $0.80$ / $0.99$ & $0.37$ / $0.35$ & $0.47$ / $0.48$ & $0.96$ / $1.02$ & $0.72$ / $0.77$ & $0.50$ / $0.51$ \\
+$\alpha_s=0.13$ & $8$ & $0.023$ / $0.031$ & $0.013$ / $0.020$ & $0.022$ / $0.030$ & $0.049$ / $0.066$ & $0.024$ / $0.030$ & $0.024$ / $0.032$ \\
+$6$ to $20$\,TeV & $34$ & $0.37$ / $0.36$ & $0.037$ / $0.033$ & $0.31$ / $0.31$ & $0.63$ / $0.64$ & $0.35$ / $0.33$ & $0.33$ / $0.33$ \\
+$p_T\geq30$\,GeV & $34$ & $0.16$ / $0.19$ & $0.007$ / $0.010$ & $0.16$ / $0.18$ & $0.30$ / $0.36$ & $0.16$ / $0.20$ & $0.17$ / $0.19$ \\
+\hline
+\end{tabular}
+\end{center}
+% src: python3 analysis/catalog_v4/kshot_level.py @9f64f323
+% claim: v4_dimensionless_muon.H5.offset_mean=-0.10
+% claim: v4_dimensionless_muon_seed2.H5.offset_mean=-0.12
+% claim: v4_dimensionless_muon.H5.offset_sd=0.88
+% claim: v4_dimensionless_muon_seed2.H5.offset_sd=0.83
+% claim: v4_dimensionless_muon.H3.offset_sd=0.83
+% claim: v4_dimensionless_muon_seed2.H3.offset_sd=0.85
+% claim: v4_dimensionless_muon.H5.shr0=0.75
+% claim: v4_dimensionless_muon_seed2.H5.shr0=0.88
+% claim: v4_dimensionless_muon.H3.shr0=0.88
+% claim: v4_dimensionless_muon_seed2.H3.shr0=0.89
+% claim: v4_dimensionless_muon.H5.loop_offset.v4_gg_zh_loop=1.9
+% claim: v4_dimensionless_muon_seed2.H5.loop_offset.v4_gg_zh_loop=1.7
+% claim: loop_factor=10.1
+% allow: 16 2 because they are labelled-event counts and the square in (16 pi^2)^2, settings
+The level share is the median over probes of the level over the zero-shot MSE. On six of the eight axes the error is
+shape: the level is at most a seventh of it, a plain offset from one event doubles the error (it adds that event's own
+error, about the floor), the shrunk offset from one event changes nothing, and sixteen events reach the floor. The level
+matters on the top (a quarter) and on one loop (a third), and there it is one number per pool, not per axis: the
+one-loop pools' offsets average $-0.10$ / $-0.12$ with a spread of $0.88$ / $0.83$ (the top's spread $0.83$ / $0.85$),
+so the axis mean alone, the shrunk offset with no event, does little ($0.75$ / $0.88$ on one loop, $0.88$ / $0.89$ on the
+top), nor does one event, and sixteen take one loop to its floor. The two seeds' one-loop difference ($0.80$ against
+$0.99$) is all level: their floors agree, and so do their errors after sixteen events. The largest one-loop levels are
+$e^+e^-\to b\bar b$ at one loop, almost all level in both seeds, $b\bar b\to c\bar cH$, and the one loop-induced pool,
+$gg\to ZH$ ($+1.9$ / $+1.7$): far from the $\log\big((16\pi^2)^2\big)=10.1$ Daniel's catalog's loop-induced pools
+missed, since catalog\_v4 trains on loop-induced pools. So a third of catalog\_v4's one-loop zero-shot error is a
+per-process normalisation the network does not carry to new one-loop processes, and the seed-to-seed spread on that
+axis sits in that level. A comparison on the one-loop axis (the sign extension's secondary read) is read on the floor
+beside the MSE, or the spread of the level hides the shape.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/kshot_level.pdf}
+  % src: python3 analysis/catalog_v4/kshot_level.py @9f64f323
+  % allow: 42 43 1 16 because they are the seeds and the labelled-event counts, settings
+  \caption{catalog\_v4's pretraining default on its own held-out axes, zero-shot: per axis the median over probes of the
+    MSE of $\log|\mathcal M|^2$ at no labelled event, after the shrunk offset from $1$ event and the plain offset from
+    $16$, and the floor, the variance of the zero-shot error. Seed $42$ circles, $43$ squares.}
+  \label{fig:v4_kshot_level}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
@@ -4358,7 +4537,7 @@ $13$\,TeV with $p_T\geq10$ and $30$\,GeV and at $100$\,TeV.}
 \label{fig:dimless_round}
 \end{figure}
 
-\paragraph{What a few labelled events fix, and where the level errors come from (2026-10-23).} The user's question: one
+\paragraph{What a few labelled events fix, and where the level errors come from (2026-10-23).}\label{par:kshot_level} The user's question: one
 event of a process is cheap next to its dataset, and should already fix most of a zero-shot error. Measured on the saved
 reads of the dimensionless round, no new run (\code{analysis/catalog\_daniel/kshot\_level.py}, Fig.~\ref{fig:kshot_level}):
 per process, $K$ validation events drawn at random, the offset taken as the mean error on them and subtracted, the MSE of
