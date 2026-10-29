@@ -127,6 +127,11 @@ entries:
       per held-out tree pool the MSE left after removing its offset (kshot_level.json, the floor and the level share), in
       the same four groups as par:v4_tree_newproc (new combinations, multiplicity, top processes trained at another top mass,
       top processes at none) and the same cells of multiplicity and initial state'
+    3: 'Read the multiplicity axis''s signed level bias on catalog_v4''s trees (CPU, existing reads, extend analysis/catalog_v4/loop_levels.py):
+      par:v4_tree_newproc found its offset median +0.12 with 0.642 of the 218 pools positive (the network places a six particle
+      level too high), largest on gluon-gluon (0.586) and e+e- (0.311) beams; per initial state and born orders, the signed
+      offset against the departure of the pool''s level from the matched five particle training pools, and whether the sign
+      follows the level''s step from five to six particles in training'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -966,6 +971,15 @@ entries:
       - 'the new combinations carry a shape error near the no-mass group''s: the new process has a shape effect of its own;
         read what in the process predicts it (initial state, multiplicity, born orders) and design a fix in the target or
         inputs for that property'
+    3:
+      feeds: 'the zero-shot bias, the user''s first priority (D178): whether the multiplicity axis''s positive bias is a systematic
+        under-extrapolation of the level''s fall with multiplicity, which a multiplicity-aware target scale would address'
+      if:
+      - 'the signed offset tracks the training level''s step with multiplicity (positive where the level falls most from five
+        to six): the bias is an under-extrapolation in multiplicity; design a target or input change for the level''s multiplicity
+        dependence, checked first on these reads'
+      - 'no relation to the multiplicity step: the bias is beam-specific (gluon-gluon, e+e-); read those pools'' training
+        coverage at five particles and record it'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
