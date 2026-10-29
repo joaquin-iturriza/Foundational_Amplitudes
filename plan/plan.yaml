@@ -1904,6 +1904,7 @@ entries:
     - FA-ccin2p3-66920c4c
     - FA-ccin2p3-6bd04ec8
     - FA-ccin2p3-718253fe
+    - FA-ccin2p3-7666a2b3
     - FA-ccin2p3-76ba6018
     - FA-ccin2p3-790fac19
     - FA-ccin2p3-7f2fb49d
@@ -1921,7 +1922,7 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: 6ffc041e
+    commit: e7a1775d
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1973,6 +1974,8 @@ entries:
     - recipes/catalog_v4_heldout_H7E.yaml
     - recipes/catalog_v4_loops.yaml
     - recipes/catalog_v4_pp/param_card.dat
+    - recipes/catalog_v4_pp_margins.json
+    - recipes/catalog_v4_pp_rest
     - recipes/catalog_v4_pp_test.yaml
     - recipes/catalog_v4_roles.json
     - recipes/catalog_v4_shared_heldout.yaml
