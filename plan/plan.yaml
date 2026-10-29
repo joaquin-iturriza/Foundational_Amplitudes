@@ -622,6 +622,113 @@ entries:
       the 3 GPU-h per run is padded. The controls ran about 1.6 h each (339ec100 / 380842ed, 16:10 to 17:47), and catalog_v3''s
       extension arm about 1.9 h against its baseline''s 1.7 h, so the search''s 27 GPU-h is nearer 16; state the measured
       number (CLAUDE.md: sized, never padded).'
+  - at: '2026-10-29T05:39:16+00:00'
+    question: 'Does the one change that carried the one-loop amplitude sign to held-out processes on catalog_v3, more sign-changing
+      one-loop pools in training, carry it on catalog_v4 with the pretraining default there (the emission-scale target with
+      dimensionless inputs, Muon at the search best)? catalog_v4''s one-loop axis is its weakest against catalog_v3 (own-axis
+      MSE 0.80 and 1.00 against 0.49 and 0.45, par:v4_vs_v3) and its training recipe has 108 one-loop pools against catalog_v3''s
+      137 (232 in the extension arm). New arm: the catalog_v4 training recipe plus the one-loop QCD virtual of every coloured
+      2->3 training tree class of catalog_v4 outside its one-loop layer (123 classes by catalog_v3''s rule, applied at class
+      level: no class of any catalog_v4 one-loop pool, train or held out), generated on catalog_v4''s strings, models, cuts,
+      measure and widths (full coupling orders, massless b, WT 1.4915) at 1e4/1e3/1e3 as catalog_v3''s extension, and of those
+      only the pools whose training split holds both signs enter (as recipes/make_catalog_v3_train_signext.py).'
+    prior: 'Searched docs/results.tex (par:v3_prep_signed, par:v3_prep_sampling, par:v3_shape_proxy, the hybrid and blend
+      paragraphs, par:v4_vs_v3), plan show v3_prep_explore / catalog_coverage / catalog_norm / qperp_soft / f24 / f24net,
+      site decisions (D114, D155, D161, D165, D166, D167, D175). Found: (1) catalog_v3, baseline target (one shared standardization
+      of log|M|^2 with the sign head), AdamW at the baseline HPs: 95 added sign-changing one-loop pools (recipes/catalog_v3_train_signext.yaml,
+      runs FA-ccin2p3-ecc413f9 and -878d6b9a, controls -37a95d76 and baseline seed 42) gave less wrong sign on 14 of the 17
+      held-out sign-changing pools and more on 1 at two-seed means, no zero-shot MSE cost overall at two seeds (seed-mean
+      per-probe MSE ratio 0.97, above 1 on 289 probes; read on the seed-43 rerun FA-ccin2p3-5a8c8fde after the first seed-43
+      run blew up), but a cost on 2->5 stays at both seeds: 1.17 and 2.15 (mean 1.58), beyond the baseline''s seed spread
+      of 1.17 there; the 1 to 10 TeV axis at 1.36 and 2.34 (mean 1.79) is inside the run-to-run spread (the two seed-43 runs
+      alone move it by 3.41) (par:v3_prep_signed); the pair sign head and the near-zero weighting were dropped. (1b) The same
+      catalog_v3 arm with Muon (closest to this design): at lr 5e-3, warmup 0.158, weight decay 0.0217 (FA-ccin2p3-0a9d3d4c)
+      it ran clean (best validation 1.11e-3) with a held-out wrong-sign median of 3.8%; the 20-trial sign head search on that
+      arm (sweep sign_head_search, single fidelity, 4264 steps, lr [1.667e-3, 1.5e-2]) had 4 blow-ups, all at lr >= 8.959e-3
+      (4 of the 7 trials there), and its objective could not see the sign: 1.18 to 1.25 times the magnitude loss in every
+      trial, rank correlation -0.89 with the lr over the 16 calm trials, and the training pools'' wrong-sign median 1 to 3
+      events of 200 in every calm trial (data/sign_head_search_signlog.txt); the pair test''s controls, that arm with Muon
+      at lr 1.246e-2, warmup 0.081 (FA-ccin2p3-19971006 seed 42 clean to 1.25e-3, FA-ccin2p3-36586b54 seed 43 blew up at steps
+      680 to 765, read at step 595), so at that rate a run blows up by chance with or without a head. For this design: Muon
+      with the extension is stable at the control''s 5e-3, unstable from about 9e-3, and a search ranked on val_loss_no_reg
+      ranks by magnitude and lr, not by sign; the no branch''s search is built on that (window capped below 9e-3, the sign
+      read as the decision, blow-ups handled as stated). (2) The hybrid reference scale was the best target inside catalog_v3''s
+      range and the 0.25 blend gained only outside it: carrying those to catalog_v4 is in the held catalog_norm entry''s adaptation
+      (its baseline and s-hat arms, the hybrid as an option for the user), so not designed here; the soft minimum is qperp_soft''s,
+      the factorised 2->4 is f24/f24net''s: all held under D114, none duplicated. (3) catalog_v4''s emission-scale arm with
+      Muon at the search best exists, seeds 42 and 43 (FA-ccin2p3-339ec100, -380842ed @1d9d6a29): reused as the control, not
+      rerun. (4) Checked today on those reads (CPU, no job): whether catalog_v4''s mixed-order pools (Borns that are sums
+      of alpha_s/alpha monomials, the target divided by the highest power) carry more zero-shot error than single-order ones:
+      no (seed 42 / 43 medians on mixed against pure, H1 0.24/0.28 vs 0.23/0.25, H2 0.45/0.43 vs 0.42/0.43, H3 0.92/0.92 vs
+      0.81/1.06, H2p5 and H5 lower on mixed), so that treatment is not the next lead. Differences from (1): catalog_v4 (forward
+      events, 6 TeV, full coupling orders, massless b), the emission-scale target instead of the baseline, Muon at the search
+      best instead of AdamW, and the extension re-derived on catalog_v4''s classes.'
+    measure: 'Zero-shot wrong-sign share at the best checkpoint (lowest aggregate val_loss_no_reg) on catalog_v4''s held-out
+      one-loop pools the scorer reads as sign-changing (21 in the controls'' H5 reads, 2000 validation events each, scored
+      as the controls by scripts/job_catalog_v3_short.sh''s H5 signed read, H5_signed.txt). Decision statistic: the paired
+      per-pool count, per pool the mean over the two seeds of each arm, the number of pools (ties excluded) where the arm
+      is lower, as a one-sided sign test over pools; also the seed-mean median over pools. Secondary, reported not decided
+      on: zero-shot MSE of log|M|^2 per probe on every catalog_v4 held-out axis (H1, H2, H2p5, H3, H5, H6, H7E, H7c) as the
+      arm-over-control ratio per probe (median, with the gap against the seed spread, compare_v3.py convention), the magnitude
+      MSE on the sign-changing pools, val_loss_no_reg, sign accuracy on the sign-changing training pools, every blow-up with
+      its step.'
+    check: 'On existing data the measure moved with this change and the null is measured: catalog_v3''s arm with 95 more sign-changing
+      pools against its baseline was lower on 14 of the 17 held-out sign-changing pools and higher on 1 at two-seed means
+      (par:v3_prep_signed, analysis/catalog_v3/data/prep_signed.json, seeds m2); the null on catalog_v4 itself, the control''s
+      seed 43 against seed 42 on the same 21 pools: 11 lower, 10 higher, median absolute per-pool difference 2.2 points, medians
+      5.6% and 8.55%, seed-mean median 6.5% (analysis/catalog_v3/data/short_reads/v4_dimensionless_muon*/H5_signed.txt). So
+      a 14-of-17-sized effect would show as about 17 of 21 against a measured 11/10 null.'
+    fixed: 'Everything of the control arm v4_dimensionless_muon (scripts/job_catalog_v3_short.sh): the emission-scale target
+      with dimensionless inputs and coupling orders, mixed-order pools divided by their highest power, the sign head, MuonAdamW
+      at the search best (lr 4.997e-3, muon weight decay 0.0217, trial_1860''s other HPs), batch 16384, 4264 steps (the same
+      compute, D161 ''Match steps.''; the added pools lower the epochs per pool, as in catalog_v3''s arm, and that is stated
+      with the result), the same reads on catalog_v4''s own axes. The only change: the training recipe recipes/catalog_v4_train.yaml
+      plus the extension''s sign-changing pools. Extension pools: training classes only, never a class of any held-out pool
+      (class-level check against recipes/catalog_v4_roles.json); their diagram sidecars built before training; entries whose
+      MadLoop certification fails are dropped and listed (none fixed by hand), and if more than a fifth of the 123 fail the
+      design comes back before training. The arm runs at the current commit; the code differences from the control''s 1d9d6a29
+      are listed with the result, and the job''s smoke checks the control''s setup reproduces (same recipe hash for the base
+      pools).'
+    control: 'The existing control pair v4_dimensionless_muon seed 42 (FA-ccin2p3-339ec100) and seed 43 (FA-ccin2p3-380842ed),
+      identical but for the added pools; not rerun (A/B rule 1). Same HPs in both arms (A/B rule 3: the cheap shortcut at
+      the control''s HPs; a sweep only if this is not better, A/B rule 4, as the outcome says). The cross reads of catalog_v3''s
+      pools (XV3) are not part of the comparison (those pools are deleted under D167).'
+    seeds: 'Two, 42 and 43, matching the control''s. Measured spread at these settings: seed 43 against 42 on the 21 pools
+      splits 11/10, median absolute per-pool difference 2.2 points, the median moves 3 points (5.6% to 8.55%).'
+    outcome: 'Yes (more sign-changing pools carry the sign on catalog_v4): the seed-mean per-pool share lower for the arm
+      on enough pools for a one-sided sign test p below 0.05 (15 or more of 21 if none tie), the seed-mean median lower, and
+      each seed alone lower on most pools; the write-up then proposes the extension for catalog_v4''s pretraining recipe to
+      the user (a change to the catalog''s training set is their call), with the zero-shot MSE cost or gain per axis beside
+      it, the 2->5 axis first: catalog_v3''s extension cost 1.58 there (1.17 and 2.15 at the two seeds, beyond the seed spread),
+      so the proposal states whether that cost recurs on catalog_v4''s 2->5 probes against the control''s seed spread there,
+      and a recurring cost is put to the user beside the sign gain, not netted away. No at the control''s HPs (the arm not
+      lower on the seed-mean median, or higher on most pools): not a drop yet. Under the A/B protocol (rule 4) the arm gets
+      its own HP search before it can be dropped: a single-fidelity Muon DyHPO search of the extension arm at 4264 steps as
+      the stage-2 Muon search that produced trial_1860 (8 trials, 3 random then the GP, seed 42, Muon''s decoupled weight
+      decay in [1e-3, 0.3], warmup, minimum lr and EMA at trial_1860''s, sweep_manager in three waves), with one change: the
+      lr window is [1.667e-3, 9e-3], half a decade below the control''s 5e-3 and capped under 8.959e-3, where this arm with
+      Muon blew up on catalog_v3 (4 of 7 trials at or above it, and the control at 1.246e-2 at seed 43); the control''s 5e-3
+      sits inside. Why its best is chosen on val_loss_no_reg: rule 4 asks for the feature at its own best HPs, and a data-only
+      change''s HPs are its fit''s; the sign cannot rank trials on the training pools (catalog_v3: 1 to 3 wrong of 200 in
+      every calm trial), so the search picks the best fit and the decision is the held-out sign read on it, not the objective.
+      To keep that pick from being an lr artefact, the top three calm trials by objective are each read zero-shot on the 21
+      pools (eval mode, no training) and all three reported; the decision trial is the best by objective. Blow-ups (a validation
+      over 10 times its running minimum, the notes'' rule): every trial is reported at its best checkpoint with where it blew
+      up; the decision trial is the best calm trial (a blown-up trial is listed, not chosen); it is rerun at seed 43, and
+      if that run blows up it is reported at its best checkpoint and the comparison is inconclusive, no other trial substituted.
+      Cost, measured: the controls ran about 1.6 h each on one GPU (FA-ccin2p3-339ec100 / -380842ed), catalog_v3''s extension
+      arm 1.9 h against its baseline''s 1.7 h, so about 1.8 GPU-h per run here: the search about 14 GPU-h, the seed-43 rerun
+      about 2, about 16 GPU-h in all, under the GPU budget of 30, run inside this approved entry without coming to the user.
+      Then best against best, by the same yes rule, with the control pair at trial_1860''s HPs. The control''s HPs come from
+      catalog_v3''s search, not one on catalog_v4; if the arm''s best wins and its lr or weight decay differ from the control''s
+      beyond the search''s resolution, the same search of the control on catalog_v4 (about 15 GPU-h; with the arm''s about
+      31 for the two searches, over the 30) goes to the user as a question, not run. Only if the arm''s best is still not
+      better is the catalog_v3 finding written up as not carrying to catalog_v4 with the emission-scale target and the extension
+      dropped. Inconclusive at the control''s HPs (lower on the median or on most pools but short of the yes rule, or a blow-up
+      of either arm''s run): written up as below what two seeds resolve, with the measured spread; a third and fourth seed
+      of both arms (about 7 GPU-h, four runs) go to the user as a question, not run, and the search is not run on an inconclusive
+      read (it answers a no, not a near-tie). In every case the result goes in docs/results.tex beside par:v3_prep_signed,
+      under catalog_v4.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
