@@ -1719,13 +1719,13 @@ entries:
   - D167
   - D169
   - D174
-  next: 'The comparison with the pp-trained arm is written (docs/results.tex par:v4_vs_v3, 57d732e4: directly catalog_v4 with
-    Muon is level with the AdamW pp-trained arm, 1.31 on classes trained in both, 0.79 held out; against its own optimizer''s
-    catalog_v3 arm it recovers 0.15 to 0.23 of pp training''s gain, none inside catalog_v3''s coverage). Waiting on the user:
-    (1) run the clean comparison, a pp-trained arm with Muon at catalog_v4''s runs'' settings (search best, 4264 steps), 2
-    seeds, ~3 GPU-h, design through the design gate first; (2) the switch to catalog_v4 or not. If switch: the held Daniel''s-catalog
-    studies adapted to catalog_v4, and catalog_v3''s deletion (D163, only once confirmed). If not: say what catalog_v3 keeps
-    and what of catalog_v4 is kept.'
+  next: 'Written (docs/results.tex par:v4_vs_v3, catalog_v4 against training on pp, 912f1786): against the pp-trained AdamW
+    arm catalog_v4 (Muon) is 1.31 on the classes trained in both, 0.79 held out (the top 0.41); relative to their own catalog_v3
+    window arms it recovers a share 0.15 / 0.23 of the pp-training gain, 0.30 / 0.35 outside catalog_v3''s coverage, none
+    inside. Waiting on the user: (1) run the clean comparison, the pp-trained arm with Muon at the catalog_v4 runs'' settings,
+    2 seeds, about 3 GPU-h (design through the design gate first); (2) switch pretraining to catalog_v4 or not. If yes to
+    (2): the held Daniel''s-catalog studies adapted to catalog_v4, and catalog_v3''s deletion (D163, only once the switch
+    is confirmed). If no: say what catalog_v3 keeps and what of catalog_v4 is kept.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
