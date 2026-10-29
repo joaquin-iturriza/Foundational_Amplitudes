@@ -769,7 +769,7 @@ entries:
     the user cannot waive for it; no decision covers an exception or a data move off CC
   blocks: the submission of the built sign extension (one CPU job, two pretrainings, about 3.6 GPU-h); the build is committed
     (f5949014)
-  checked_until: '2026-10-29T06:34:33+00:00'
+  checked_until: '2026-10-29T06:34:39+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
