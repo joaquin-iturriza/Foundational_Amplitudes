@@ -531,6 +531,15 @@ def pole_certify(process, n=100, seed=7):
     return passed
 
 
+def scheme_shift_mass(cfg):
+    """The heavy mass m of the mass-scheme shift C_F(3 ln(s/m^2) + 5) that virt_evaluator's evaluate_point adds to c0
+    for this VIRT_PROCESSES entry (with mass_shift on), 0 where it adds none: catalog_v3 (_v3), loop-induced and
+    electroweak entries never shift; otherwise m is the first massive final of any kind (a W, Z, H or tau too)."""
+    if cfg.get("_v3") or cfg.get("loopind") or cfg.get("ew"):
+        return 0.0
+    return next((m for m in cfg["m_finals"] if m and m > 0), 0.0)
+
+
 def virt_evaluator(process, mass_shift=True, alphas_mz=0.118, alphas_prefactor=False):
     """The one-loop point evaluator generate_virt_dataset stores its target with, shared with born_of_pool so a pool's
     events are re-evaluated by the same code. Loads the process's MadLoop module (chdir into its P0 directory).
@@ -551,6 +560,7 @@ def virt_evaluator(process, mass_shift=True, alphas_mz=0.118, alphas_prefactor=F
     # correct and simpler"). The line above takes the first massive final of any kind (a W, Z, H or tau too); it
     # shaped catalog_v2's one-loop pools.
     v3 = bool(cfg.get("_v3"))
+    m_shift = scheme_shift_mass(cfg)   # the shift's m (0 for _v3: no shift)
 
     sa = virt_standalone_dir(process)
     restore_stale_card(os.path.join(sa, "Cards", "param_card.dat"))
@@ -606,12 +616,7 @@ def virt_evaluator(process, mass_shift=True, alphas_mz=0.118, alphas_prefactor=F
         # points flagged stable). Costs nothing: the coefficient comes with every call.
         if abs(r["c2"] - c2_pred) > c2_tol * max(abs(c2_pred), 1.0):
             return 0.0, False
-        if not mass_shift:
-            shift = 0.0
-        elif v3:
-            shift = 0.0
-        else:
-            shift = C.heavy_quark_scheme_shift(s, heavy_m)
+        shift = C.heavy_quark_scheme_shift(s, m_shift) if mass_shift else 0.0
         last["shift"] = shift
         virt_e4 = (c0 + shift) * born           # α_s-stripped finite coefficient
         if alphas_prefactor:

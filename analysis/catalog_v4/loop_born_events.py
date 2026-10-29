@@ -150,22 +150,31 @@ def read():
 
 
 def shift_census():
-    """catalog_v4's one-loop entries (the _nlo entries of its training and held-out recipes) by the mass-scheme shift
-    generate_virt_dataset gives them: the rule of virt_evaluator (no _v3 flag, not loop-induced or electroweak: shift
-    with m the first massive final), counted by role and by that final's mass."""
+    """catalog_v4's one-loop entries (the _nlo entries of its training recipe and of every held-out recipe,
+    recipes/catalog_v4_heldout_*.yaml, each entry counted once) by the mass-scheme shift generate_virt_dataset gives
+    them (the removal twin's axes H3p and H4 excepted: they train in catalog_v4_train.yaml): virt_evaluator's own rule (nlo_virtual_pipeline.scheme_shift_mass), counted by role and by the shift's mass."""
     import mg5_pipeline_final as mg
     import nlo_virtual_pipeline as nv
-    out = {"shifted_train": 0, "shifted_heldout": 0, "none_train": 0, "none_heldout": 0, "by_mass": {}}
-    for f, role in (("catalog_v4_train.yaml", "train"), ("catalog_v4_heldout_H5.yaml", "heldout")):
+    names = {"train": set(), "heldout": set()}
+    # the removal twin's axes (H3p, H4) are held out of the twin's recipe only: their classes train in
+    # catalog_v4_train.yaml (recipes/gen_catalog_v4.py, the same exclusion), so they count as training here
+    twin_axes = ("catalog_v4_heldout_H3p.yaml", "catalog_v4_heldout_H4.yaml")
+    files = [("catalog_v4_train.yaml", "train")] + [
+        (os.path.basename(f), "heldout") for f in sorted(glob.glob(os.path.join(ROOT, "recipes", "catalog_v4_heldout_*.yaml")))
+        if os.path.basename(f) not in twin_axes]
+    for f, role in files:
         for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f)))["processes"]:
-            if not p["name"].endswith("_nlo"):
-                continue
-            cfg = nv.VIRT_PROCESSES[mg.PROCESSES[p["name"]]["virt_base"]]
-            m = 0.0 if (cfg.get("_v3") or cfg.get("loopind") or cfg.get("ew")) else \
-                next((x for x in cfg["m_finals"] if x and x > 0), 0.0)
+            if p["name"].endswith("_nlo"):
+                names[role].add(p["name"])
+    assert not names["train"] & names["heldout"], names["train"] & names["heldout"]
+    out = {"shifted_train": 0, "shifted_heldout": 0, "none_train": 0, "none_heldout": 0, "by_mass": {}}
+    for role, ns in names.items():
+        for n in sorted(ns):
+            m = nv.scheme_shift_mass(nv.VIRT_PROCESSES[mg.PROCESSES[n]["virt_base"]])
             out[("shifted_" if m else "none_") + role] += 1
             if m:
-                out["by_mass"][f"{m:g}"] = out["by_mass"].get(f"{m:g}", 0) + 1
+                k = f"{m:g}_{role}"
+                out["by_mass"][k] = out["by_mass"].get(k, 0) + 1
     return out
 
 
