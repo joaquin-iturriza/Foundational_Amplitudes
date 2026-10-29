@@ -123,13 +123,12 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Continuous CPU exploration (the user''s ''Keep iterating.''), no new run: the largest tree level offsets sit in covered
-      classes, H3''s top pools first (par:v4_tree_levels). Read, from data/tree_levels.json and kshot_level.json (both seeds),
-      whether an external top carries the tree level error: per tree held-out axis the seed-mean |offset| of pools with and
-      without an external top, the six largest''s top count against the top share, and for top pools whether their level departs
-      from the matched training pools that also have an external top (a property read beside the one match rule, as par:v4_loop_levels
-      read born orders and initial state, never a re-match); extend analysis/catalog_v4/loop_levels.py, no free fits; write
-      up with provenance'
+    2: 'Write up for the user, beside the one-loop thin-class result (par:v4_loop_levels), the level fix to examine on trees:
+      the top''s treatment. Particle content pools (all with an external top; the top at 172.5 GeV is in no training tree
+      pool) hold the six largest tree offsets of 559 and 0.786 of the summed squared offset; the 35 whose process is in training''s
+      heavy-quark layer have median |offset| 0.063 against 0.437 (par:v4_tree_top). Propose the two candidate fixes as concrete
+      designs (the top mass in the emission-scale target''s scale; top processes at 172.5 GeV in training coverage), each
+      with the existing reads that would test it, no job before the user''s call on which'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -934,13 +933,10 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     2:
-      feeds: what the tree level error follows (the coverage-or-target question of par:v4_loop_levels, the fix to propose
-        for the level)
+      feeds: the fix to propose for the tree level (the coverage-or-target question of par:v4_loop_levels)
       if:
-      - 'top pools carry most of the large tree offsets: the level fix to examine is the top''s treatment (its mass scale
-        in the emission-scale target or its coverage), written up for the user beside the one-loop thin-class result'
-      - 'no property separates them: the tree level error is diffuse and small beside the shape on H1 and H2; record it and
-        move the exploration queue on'
+      - 'the user picks one of the two: record its design (plan design) and run its design reviewer'
+      - 'the user declines both: record the tree level as a top-mass reading and move the exploration queue on'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
