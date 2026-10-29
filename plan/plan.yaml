@@ -123,11 +123,10 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Separate new process from new mass in catalog_v4''s zero-shot level (CPU, existing reads, no run): compare the seed-mean
-      absolute offsets of the new-combinations axis (new processes, every particle trained at its mass) with the 244 particle-content
-      pools whose process is in no training pool at any mass, and with the 35 that are (par:v4_tree_top), at matched multiplicity
-      and initial state; then read what in a new process predicts its offset (born orders, multiplicity, initial state, number
-      of massive legs, nearest trained process''s offset)'
+    2: 'Read the shape part of catalog_v4''s tree zero-shot error (CPU, existing reads only, extend analysis/catalog_v4/loop_levels.py):
+      per held-out tree pool the MSE left after removing its offset (kshot_level.json, the floor and the level share), in
+      the same four groups as par:v4_tree_newproc (new combinations, multiplicity, top processes trained at another top mass,
+      top processes at none) and the same cells of multiplicity and initial state'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -956,13 +955,17 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     2:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): whether the level error of a new process comes from it
-        being a new process or from an untrained particle mass, which decides the fix to look for'
+      feeds: 'the zero-shot bias, the user''s first priority (D178): par:v4_tree_newproc found the large tree level offsets
+        are the untrained top mass (new combinations median 0.096, nearer the other-mass group on 46 of 60 pools), so whether
+        the shape error splits the same way decides whether the untrained mass is the whole tree zero-shot error or the new
+        process carries a shape error of its own'
       if:
-      - 'new-combination pools with matched multiplicity carry offsets close to the 244: the bias is a new-process effect
-        on every axis; look for what in the process predicts it, then design a fix in the target or inputs for that property'
-      - 'new-combination pools sit near the 35 and well below the 244: the bias comes from the untrained top mass, a catalog-design
-        effect of holding the 172.5 top out entirely; record it and move to the shape'
+      - 'the shape error splits as the level (top at no mass largest, new combinations near the other-mass group): on trees
+        the zero-shot error is the held-out top mass, a property of the axis design; write it up and move to the multiplicity
+        axis''s signed bias and the one-loop axis'
+      - 'the new combinations carry a shape error near the no-mass group''s: the new process has a shape effect of its own;
+        read what in the process predicts it (initial state, multiplicity, born orders) and design a fix in the target or
+        inputs for that property'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
