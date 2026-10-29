@@ -154,6 +154,7 @@ entries:
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-36586b54
     - FA-ccin2p3-37a95d76
+    - FA-ccin2p3-4ecff34d
     - FA-ccin2p3-5a8c8fde
     - FA-ccin2p3-61c09ed7
     - FA-ccin2p3-6d35589c
@@ -172,7 +173,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 05adede8
+    commit: 086cd929
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -221,6 +222,7 @@ entries:
     - analysis/catalog_v4/figs/tree_levels_shape.png
     - analysis/catalog_v4/figs/tree_levels_top.png
     - analysis/catalog_v4/kshot_level.py
+    - analysis/catalog_v4/loop_born_events.py
     - analysis/catalog_v4/loop_levels.py
     - docs/results.tex
     - recipes/catalog_v3_gen_signext.yaml
@@ -230,11 +232,14 @@ entries:
     - recipes/make_catalog_v4_train_signext.py
     - scripts/job_catalog_v3_short.sh
     - scripts/job_catalog_v4_signext.sh
+    - scripts/job_v4_loop_born.sh
     - sweep/sweep_config_ccin2p3_sign_head_search.yaml
+    - tests/test_born_sidecar.py
     - tests/test_hybrid_blend.py
     - tests/test_v4_signext.py
     - tests/test_val_total.py
     - tools/collect_run.py
+    - tools/nlo_virtual_pipeline.py
   dead_ends:
   - tried: hybrid short pretraining FA-ccin2p3-9b88e434
     why: CC disk full at 20:36; log stops mid-run, job failed; not a result
