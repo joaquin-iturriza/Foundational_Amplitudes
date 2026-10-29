@@ -2020,6 +2020,84 @@ the one-loop axis.
   \label{fig:v4_tree_shape}
 \end{figure}
 
+% src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
+% claim: mb.median_signed_off_all=0.12
+% claim: mb.positive_share_all=0.642
+% claim: mb.n_heldout=218
+% claim: mb.n_read=151
+% claim: mb.n_no_parent=62
+% claim: mb.n_no_class=5
+% claim: mb.n_train_children=438
+% claim: mb.n_classes_with_step=30
+% claim: mb.rho_own_step=-0.34
+% claim: mb.rho_own_step.p=2e-05
+% claim: mb.rho_own_step.seed42=-0.33
+% claim: mb.rho_own_step.seed43=-0.32
+% claim: mb.rho_class_step=-0.37
+% claim: mb.rho_class_step.p=2.5e-06
+% claim: mb.rho_class_step.seed42=-0.35
+% claim: mb.rho_class_step.seed43=-0.36
+% claim: mb.n_within_class=146
+% claim: mb.rho_within_class=-0.19
+% claim: mb.rho_within_class.p=0.025
+% claim: mb.n_falls=68
+% claim: mb.n_rises=83
+% claim: mb.positive_share_falls=0.75
+% claim: mb.positive_share_rises=0.542
+% claim: mb.median_off_falls=0.15
+% claim: mb.median_off_rises=0.041
+% claim: mb.rho_departure=-0.07
+% claim: mb.rho_departure.p=0.38
+% claim: mb.initial.ee.n=17
+% claim: mb.initial.ee.median_own_step=1.059
+% claim: mb.initial.ee.median_off=-0.141
+% claim: mb.initial.ee.positive_share=0.294
+% claim: mb.initial.gg.n=8
+% claim: mb.initial.gg.median_own_step=-1.212
+% claim: mb.initial.gg.median_off=0.139
+% claim: mb.median_abs_resid_zero=0.164
+% claim: mb.median_abs_resid_parent_step=0.769
+% claim: mb.median_abs_resid_match_mean=2.042
+% allow: 42 43 because they are the seeds
+\paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
+par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
+tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
+places a six particle level too high). Is that an under-extrapolation of how the level changes when a particle is
+added, which a target scale aware of multiplicity would address? No new run: the same two pretrainings (seeds $42$
+and $43$) and seed-mean offsets $\overline{q-t}$ as the paragraph above (\code{analysis/catalog\_v4/loop\_levels.py
+--multiplicity}, Fig.~\ref{fig:v4_mult_bias}). Each multiplicity pool is a $2\to4$ child of a family whose $2\to3$
+parent stays in training (the parent rule of \code{recipes/select\_catalog\_v4.py}, on the processes' recorded
+origin). Per pool its own step $\bar t_6-\bar t_5$, its level less the mean level of its five particle training
+parents; per class of the one match rule (initial state and born orders at six particles) the training step, the median
+of the same step over the class's six particle training pools with a five particle training parent ($438$ pools in
+$30$ classes). $151$ pools are read; $62$ have no five particle parent (a pair added to a $2\to2$) and $5$ no class
+step. No fit, no threshold: rank correlations, per seed and on the seed mean. The offset follows the step: against the
+own step $\rho=-0.34$ ($p=2\times10^{-5}$; seeds $-0.33$, $-0.32$), against the class's training step $-0.37$
+($p=2.5\times10^{-6}$; $-0.35$, $-0.36$), and within class (offset and own step less their class medians, $146$ pools)
+$-0.19$ ($p=0.025$), so it is not only that some classes fall more. Where the level falls from five to six particles
+($68$ pools) $0.75$ are positive, median offset $0.15$; where it rises ($83$) $0.542$ and $0.041$. The departure from the
+matched class mean, the one-loop paragraph's reading, does not predict it ($-0.07$, $p=0.38$). The two beams with the
+largest offsets are the same effect with opposite signs: the $17$ $e^+e^-$ pools rise (median own step $1.059$) and sit
+too low (median offset $-0.141$, $0.294$ positive), the $8$ gluon-gluon pools fall ($-1.212$) and sit too high
+($0.139$). The network carries most of the step: the median absolute offset is $0.164$, while a network that put
+the parent's level plus the class's training step would be off by $0.769$, and one that put the matched class mean
+would be off by $2.042$ (Fig.~\ref{fig:v4_mult_bias}, right). So the bias is a partial under-extrapolation in multiplicity: the
+predicted level moves less than the true one from the five particle parent, in the direction of the step, by a small
+part of it. What it changes: the multiplicity bias is a property of the level's multiplicity dependence, seen across
+initial states, not a beam effect; the next step is a target or input change for that dependence, checked first
+on these reads.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/tree_levels_mult.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
+  \caption{catalog\_v4's multiplicity held-out pools ($2\to4$ children of a training $2\to3$ parent), seed-mean
+    zero-shot offset. Left: against the pool's own step from its five particle parents (bars: half the seed
+    difference) and, crosses, against its class's training step. Right: the offset against two predictions with no free
+    parameter, the matched class mean and the parent's level plus the class's training step; dashed, offset equal to
+    prediction.}
+  \label{fig:v4_mult_bias}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
