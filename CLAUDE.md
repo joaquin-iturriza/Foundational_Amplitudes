@@ -38,6 +38,8 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    a prevention that needs a permission I hold (a hook registration, a setting) is proposed to me as a concrete diff.
    A claim about current state (a setting's level, a job's status, what an agent runs on) is read from its live
    source in the same turn, never inferred from a default, a config file or memory; unread, it says "not checked".
+   A fix is reported by what it changed and what it was tested on: the named hooks, files or cases, never a category
+   ("the hooks are fixed"); failure modes the tests did not run are listed as not fixed.
    A number I state says what it counts and how it was selected; it comes from a committed tool or a script shown
    with it, never a throwaway one-liner. A proxy (one quantity standing for another) is checked on a few cases
    before it is reported, and an estimate says it is one, with its assumption.
@@ -721,6 +723,7 @@ in only one of `.png`/`.pdf` (ignore-list `.claude/figure_pair_ignore.txt`).
 per-task shell variable — because HP search goes through DyHPO (allowlist
 `.claude/hpo_grid_allowlist.txt`). Arrays over **non-HP** axes (loss type, data
 tag, warm-start ckpt, ablation flags, seeds) stay allowed.
+Every `Stop` hook runs through `.claude/hooks/stop_once.py`: when the turn is already continuing after a Stop refusal, all pass, so none refuses twice in a row.
 
 ### Batched pillar review (`review_backlog.sh` + three reviewer subagents)
 
