@@ -24,6 +24,8 @@ Two modes.
 The last line printed is the JSON of the numbers docs/results.tex quotes.
 
 Top read (in --trees): does an external top carry the tree level error; see top_read.
+New process or new mass (in --trees): is a new process's level error a new-process effect or the untrained top mass;
+see new_process_read.
 
 Tree mode (--trees, both steps): does the thin-class reading above (the largest one-loop offsets on pools with two
 matched training pools or fewer) hold on catalog_v4's tree held-out axes H1 (new combinations), H2 (multiplicity), H3
@@ -285,10 +287,12 @@ def analyse_trees():
             flat[f"{a}.match_n.{n}"] = R[n]["n_match"]
     flat["n_train"], flat["train_level_sd"] = s["n_train"], round(s["train_level_sd"], 2)
     s["top"] = top_read(res, T, P, flat)
+    s["new_process"] = new_process_read(res, flat)
     json.dump({"summary": s, "heldout": res, "train": {m: {"level": T[m][0], **P[m]} for m in T},
                "train_missing": miss_tr}, open(os.path.join(HERE, "data", "tree_levels.json"), "w"), indent=1)
     plot_trees(res)
     plot_top(res, T)
+    plot_new_process(res)
     print(json.dumps(flat))
 
 
@@ -371,6 +375,144 @@ def top_read(res, T, P, flat):
         for k, v in out[a].items():
             flat[f"top.{a}.{k}"] = round(v, 3) if isinstance(v, float) else v
     return out
+
+
+def massive_legs(name):
+    """External legs with a mass in catalog_v4: the property table's massive species (W, Z, H, t, tau, the BSM
+    states), the b counted massless (catalog_v4 generates it massless)."""
+    import mg5_pipeline_final as mg
+    from particle_ids import BSM_PARTICLE_PROPERTIES
+    ids = [abs(int(x)) for x in mg.PROCESSES[BASE.get(name, name)]["pdg_ids"]]
+    return int(sum(x != 5 and (mg._table_mass(x) > 0 or x in BSM_PARTICLE_PROPERTIES) for x in ids))
+
+
+NP_GROUPS = (("new combinations", "H1", lambda r: True), ("multiplicity", "H2", lambda r: True),
+             ("top, process at another top mass", "H3", lambda r: r.get("n_sibling", 0) > 0),
+             ("top, process at no top mass", "H3", lambda r: not r.get("n_sibling", 0)))
+
+
+def new_process_read(res, flat):
+    """New process or new mass (v3_prep_explore, the user's first priority D178: the zero-shot bias). The new
+    combinations (H1) and multiplicity (H2) pools are new processes made of particles trained at their masses; the
+    particle content pools (H3, all with a top at 172.5 GeV, a mass no training tree has) split by top_read into the
+    35 whose process is in the heavy-quark layer at another top mass and the 244 whose process is at none. No fit, no
+    new threshold: in each cell of multiplicity and initial state that holds the new-process pool and both top groups,
+    the pool's seed-mean |offset| against the two top groups' cell medians, read as which it is nearer in log; the
+    count over pools and the median log ratio to each. Then over the new-process pools (H1 and H2) the rank
+    correlation (Spearman) of |offset| with multiplicity, the born's alpha_s and alpha powers, the massive legs, the
+    matched class size and the departure from it, and the median |offset| by initial state; the signed offset's
+    median and its positive share per group."""
+    from scipy.stats import spearmanr
+    G = {}
+    for lab, a, sel in NP_GROUPS:
+        G[lab] = {n: r for n, r in res[a].items() if not r.get("missing") and sel(r)}
+    for g in G.values():
+        for n, r in g.items():
+            r["massive_legs"] = massive_legs(n)
+    cell = lambda r: (r["n"], r["initial"])
+    sib, nos = G["top, process at another top mass"], G["top, process at no top mass"]
+    med = lambda rs: float(np.median([r["abs_off"] for r in rs]))
+    out = {"groups": {}}
+    for lab, g in G.items():
+        so = [float(np.mean(r["offset"])) for r in g.values()]
+        out["groups"][lab] = {"n": len(g), "median_abs_off": med(g.values()), "median_signed_off": float(np.median(so)),
+                              "positive_share": float(np.mean(np.array(so) > 0)),
+                              "median_massive_legs": float(np.median([r["massive_legs"] for r in g.values()]))}
+    for lab in ("new combinations", "multiplicity"):
+        g, O = G[lab], {"cells": {}}
+        lr_nos, lr_sib, near_nos, used = [], [], 0, []
+        for c in sorted({cell(r) for r in g.values()}):
+            A = [r for r in g.values() if cell(r) == c]
+            B = [r for r in nos.values() if cell(r) == c]
+            C = [r for r in sib.values() if cell(r) == c]
+            O["cells"][f"{c[0]}{c[1]}"] = {"n": len(A), "median": med(A), "n_no_mass": len(B),
+                                          "median_no_mass": med(B) if B else None, "n_other_mass": len(C),
+                                          "median_other_mass": med(C) if C else None}
+            if not (B and C):
+                continue
+            mb, mc = med(B), med(C)
+            for r in A:
+                x, y = np.log10(r["abs_off"] / mb), np.log10(r["abs_off"] / mc)
+                lr_nos.append(x); lr_sib.append(y); near_nos += abs(x) < abs(y); used.append(r)
+        O.update({"n_compared": len(used), "n_cells_compared": int(sum(
+                      v["n_no_mass"] > 0 and v["n_other_mass"] > 0 for v in O["cells"].values())),
+                  "n_nearer_no_mass": int(near_nos),
+                  "median_log_ratio_no_mass": float(np.median(lr_nos)) if used else None,
+                  "median_log_ratio_other_mass": float(np.median(lr_sib)) if used else None,
+                  "median_abs_off_compared": med(used) if used else None})
+        out[lab] = O
+    newp = list(G["new combinations"].values()) + list(G["multiplicity"].values())
+    y = [r["abs_off"] for r in newp]
+    pred = {"particles": [r["n"] for r in newp], "alpha_s power": [r["order"][2] for r in newp],
+            "alpha power": [r["order"][3] for r in newp], "massive legs": [r["massive_legs"] for r in newp],
+            "matched class size": [r["n_match"] for r in newp]}
+    rho = {k: float(spearmanr(v, y)[0]) for k, v in pred.items()}
+    mt = [r for r in newp if r["n_match"]]
+    rho["departure from the matched class"] = float(spearmanr([abs(r["departure"]) for r in mt],
+                                                              [r["abs_off"] for r in mt])[0])
+    out["predictors"] = {"n": len(newp), "n_matched": len(mt), "spearman": rho,
+                         "by_initial": {i: {"n": int(sum(r["initial"] == i for r in newp)),
+                                            "median_abs_off": med([r for r in newp if r["initial"] == i])}
+                                        for i in sorted({r["initial"] for r in newp})},
+                         "by_massive_legs": {int(k): {"n": int(sum(r["massive_legs"] == k for r in newp)),
+                                                      "median_abs_off": med([r for r in newp if r["massive_legs"] == k])}
+                                             for k in sorted({r["massive_legs"] for r in newp})}}
+    print("new process or new mass:")
+    for lab, v in out["groups"].items():
+        print(f"  {lab:34s} {v}")
+    for lab in ("new combinations", "multiplicity"):
+        O = out[lab]
+        print(f"  {lab}: compared {O['n_compared']} pools in {O['n_cells_compared']} cells; nearer the no-mass group "
+              f"{O['n_nearer_no_mass']}; median log10 ratio to no-mass {O['median_log_ratio_no_mass']}, to other-mass "
+              f"{O['median_log_ratio_other_mass']}")
+        for c, v in O["cells"].items():
+            print(f"    {c}: {v}")
+    print(f"  predictors over {len(newp)} new-process pools: {rho}")
+    print(f"  by initial {out['predictors']['by_initial']}")
+    print(f"  by massive legs {out['predictors']['by_massive_legs']}")
+    key = {"new combinations": "H1", "multiplicity": "H2", "top, process at another top mass": "other_mass",
+           "top, process at no top mass": "no_mass"}
+    for lab, v in out["groups"].items():
+        for k, x in v.items():
+            flat[f"np.{key[lab]}.{k}"] = round(x, 3) if isinstance(x, float) else x
+    for lab in ("new combinations", "multiplicity"):
+        for k, x in out[lab].items():
+            if k != "cells":
+                flat[f"np.{key[lab]}.{k}"] = round(x, 3) if isinstance(x, float) else x
+    for k, x in rho.items():
+        flat["np.rho." + k.replace(" ", "_")] = round(x, 2)
+    for i, v in out["predictors"]["by_initial"].items():
+        flat[f"np.initial.{i}.n"], flat[f"np.initial.{i}.median_abs_off"] = v["n"], round(v["median_abs_off"], 3)
+    for k, v in out["predictors"]["by_massive_legs"].items():
+        flat[f"np.massive{k}.n"], flat[f"np.massive{k}.median_abs_off"] = v["n"], round(v["median_abs_off"], 3)
+    return out
+
+
+def plot_new_process(res):
+    import plot_style as ps
+    fig, (a, b) = ps.figure(ncols=2)
+    rng = np.random.default_rng(0)
+    cols = (ps.C.blue, ps.C.green, ps.C.vermillion, ps.C.grey)
+    G = [(lab, [r for r in res[ax].values() if not r.get("missing") and sel(r)]) for lab, ax, sel in NP_GROUPS]
+    for i, ((lab, rs), c) in enumerate(zip(G, cols)):
+        a.plot(i + rng.uniform(-0.2, 0.2, len(rs)), [r["abs_off"] for r in rs], ".", color=c, alpha=0.6)
+        a.plot([i - 0.3, i + 0.3], [np.median([r["abs_off"] for r in rs])] * 2, "-", color="k")
+    a.set_xticks(range(4), ["new\ncombi-\nnations\n(%d)" % len(G[0][1]), "multi-\nplicity\n(%d)" % len(G[1][1]),
+                            "top,\nother\nmass\n(%d)" % len(G[2][1]), "top,\nno\nmass\n(%d)" % len(G[3][1])],
+                  fontsize=8)
+    a.set_yscale("log"); a.set_ylabel(r"$|\overline{q-t}|$")  # no legend: the groups are the ticks
+    for (lab, rs), c in zip(G, cols):
+        rs = [r for r in rs if r["n"] == 6]
+        ks = sorted({r["initial"] for r in rs})
+        x = {k: j for j, k in enumerate(("qq", "qg", "gg", "bq", "bg", "bb", "ee"))}
+        off = {0: -0.24, 1: -0.08, 2: 0.08, 3: 0.24}[[g[0] for g in G].index(lab)]
+        for k in ks:
+            v = [r["abs_off"] for r in rs if r["initial"] == k]
+            b.plot(x[k] + off, np.median(v), "o", color=c, label=lab if k == ks[0] else None)
+    b.set_xticks(range(7), ["qq", "qg", "gg", "bq", "bg", "bb", "ee"])
+    b.set_yscale("log"); b.set_xlabel(r"initial state, $N=6$"); b.set_ylabel(r"median $|\overline{q-t}|$")
+    ps.legend(b, "upper right"); ps.make_room(b)
+    ps.save(fig, os.path.join(HERE, "figs", "tree_levels_newproc"))
 
 
 AXIS_NAME = {"H1": "new combinations", "H2": "multiplicity", "H3": "particle content"}
