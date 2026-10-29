@@ -185,6 +185,16 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/reviewer_resume.py\""
           }
         ]
+      },
+      {
+        "matcher": "SendUserFile",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/send_check.py\"",
+            "timeout": 60
+          }
+        ]
       }
     ],
     "PostToolUse": [
