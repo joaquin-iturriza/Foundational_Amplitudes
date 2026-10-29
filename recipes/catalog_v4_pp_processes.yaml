@@ -21786,6 +21786,8 @@ processes:
     test_group: 'pp 13 TeV v4: train'
     parent: v4_ud_depemu
   pp13v4_ud_dggu:
+    lhe:
+      n_runs: 32
     kind: lhe_pp
     folder: pp13v4_ud_dggu
     mg5_generate:
@@ -25554,6 +25556,8 @@ processes:
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_aduwp
   pp13v4_uu_aguu:
+    lhe:
+      n_runs: 9
     kind: lhe_pp
     folder: pp13v4_uu_aguu
     mg5_generate:
