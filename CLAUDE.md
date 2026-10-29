@@ -744,7 +744,7 @@ takes a pillar's lock and `advance <name>` releases it on a pass (`begin` is als
 human override). **Never run `advance` on a reviewer's behalf.** A blocking review
 leaves its lock held on purpose, so the fixes it demanded can be applied; the re-check of those fixes continues the
 same reviewer (SendMessage to it, naming the fix commits), never a fresh one, which would pay the start-up and re-read
-the code again. Watermarks:
+the code again (enforced by `reviewer_resume.py`). Watermarks:
 `.claude/.review_state/` (gitignored, per-checkout).
 
 **Branches**
