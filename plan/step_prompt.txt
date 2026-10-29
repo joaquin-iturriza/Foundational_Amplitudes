@@ -32,6 +32,10 @@ The step
    `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id> --next {n}`; a sweep submitted
    through sweep_manager with `site run ... --item {id}` is recorded with
    `python3 tools/plan.py run {id} --sweep <site>:<name> --next {n}`).
+   Run `site pick FA --jobs N ...` right before every `site submit <site>` (CPU jobs too): placement_guard refuses a named submission with no plan unit left.
+   CPU work (generation, prebuilds, dumps) is split into as many jobs as the free slots `site pick` shows allow, one per
+   process or finer: wall time comes from the layout, not the core-hours. A planned wall time over 1 h says why it cannot
+   be split further.
    Before a job, record its design with `python3 tools/plan.py design {id} --question --prior --measure --check
    --fixed --control --seeds --outcome` (--prior: the work already done on this question, found by searching
    docs/results.tex, `plan show {id}` (evidence, dead ends) and `site decisions --project FA` for the process, arm,
