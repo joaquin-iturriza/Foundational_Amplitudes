@@ -1882,7 +1882,9 @@ def _load_catalog_2to4():
     for path in sorted(_glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
                                                "catalog_2to4*_processes.yaml"))
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
-                                                "catalog_v3_pp_processes.yaml"))):
+                                                "catalog_v3_pp_processes.yaml"))
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_pp_processes.yaml"))):
         with open(path) as f:
             d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
         lhe = dict(d.get("lhe") or {})
