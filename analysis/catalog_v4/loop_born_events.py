@@ -138,8 +138,57 @@ def read():
               f"per event {f['dep_born_event']:+.2f}  narrower: {f['narrow_proxy']} / {f['narrow_event']}")
     flat = {"lbe.n_pools": len(rows), "lbe.n_errors": len(bad), "lbe.median_abs_diff": round(med, 3),
             "lbe.n_full": len(full), "lbe.n_flips": len(flips), "lbe.proxy_holds": holds,
+            "lbe.n_shifted": len(sh := [r for r in rows.values() if r["shift"] > 0]),
+            "lbe.median_shift": round(float(np.median([r["shift"] for r in sh])), 1) if sh else None,
+            "lbe.median_shift_gain": round(float(np.median([r["per_event"] - r["log_c0"] for r in sh])), 2) if sh else None,
             "lbe.max_rel": float(f"{max(r['max_rel'] for r in rows.values()):.2g}") if rows else None}
+    plot(rows)
+    cen = shift_census()
+    flat.update({f"lbe.census.{k}": v for k, v in cen.items() if k != "by_mass"})
+    flat.update({f"lbe.census.m{k}": v for k, v in cen["by_mass"].items()})
     print(json.dumps(flat))
+
+
+def shift_census():
+    """catalog_v4's one-loop entries (the _nlo entries of its training and held-out recipes) by the mass-scheme shift
+    generate_virt_dataset gives them: the rule of virt_evaluator (no _v3 flag, not loop-induced or electroweak: shift
+    with m the first massive final), counted by role and by that final's mass."""
+    import mg5_pipeline_final as mg
+    import nlo_virtual_pipeline as nv
+    out = {"shifted_train": 0, "shifted_heldout": 0, "none_train": 0, "none_heldout": 0, "by_mass": {}}
+    for f, role in (("catalog_v4_train.yaml", "train"), ("catalog_v4_heldout_H5.yaml", "heldout")):
+        for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f)))["processes"]:
+            if not p["name"].endswith("_nlo"):
+                continue
+            cfg = nv.VIRT_PROCESSES[mg.PROCESSES[p["name"]]["virt_base"]]
+            m = 0.0 if (cfg.get("_v3") or cfg.get("loopind") or cfg.get("ew")) else \
+                next((x for x in cfg["m_finals"] if x and x > 0), 0.0)
+            out[("shifted_" if m else "none_") + role] += 1
+            if m:
+                out["by_mass"][f"{m:g}"] = out["by_mass"].get(f"{m:g}", 0) + 1
+    return out
+
+
+def plot(rows):
+    """Fig. v4_loop_born_events: left, per checked pool its per-event mean of log|c0+shift| against the pool-level
+    step of par:v4_loop_born; right, per pool the per-event mean of log|c0| (no shift) against that of log|c0+shift|,
+    pools with a massive final (the shift applied) apart."""
+    import plot_style as ps
+    fig, (a, b) = ps.figure(ncols=2)
+    for held, c, lab in ((False, ps.C.blue, "training"), (True, ps.C.vermillion, "held out")):
+        rs = [r for r in rows.values() if r["heldout"] == held]
+        a.plot([r["step"] for r in rs], [r["per_event"] for r in rs], "o", color=c, label=lab)
+    for shifted, c, lab in ((False, ps.C.grey, r"$\delta=0$"), (True, ps.C.green, r"$\delta>0$")):
+        rs = [r for r in rows.values() if (r["shift"] > 0) == shifted]
+        b.plot([r["log_c0"] for r in rs], [r["per_event"] for r in rs], "o", color=c, label=lab)
+    for ax in (a, b):
+        lo, hi = -3, 5
+        ax.plot([lo, hi], [lo, hi], "-", color="k", lw=0.8)
+        ax.set_xlim(lo, hi); ax.set_ylim(lo, hi)
+    a.set_xlabel(r"$\overline{t}-\overline{t}_{\mathrm{Born}}$"); a.set_ylabel(r"$\langle\log|c_0+\delta|\rangle$")
+    b.set_xlabel(r"$\langle\log|c_0|\rangle$"); b.set_ylabel(r"$\langle\log|c_0+\delta|\rangle$")
+    ps.legend(a, "lower right"); ps.legend(b, "lower right")
+    ps.save(fig, os.path.join(HERE, "figs", "loop_born_events"))
 
 
 if __name__ == "__main__":
