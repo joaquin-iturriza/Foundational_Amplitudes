@@ -1770,7 +1770,7 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: 1cffe26d
+    commit: 0f8018e0
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1796,6 +1796,7 @@ entries:
     - analysis/catalog_v4/data/compare_v3.json
     - analysis/catalog_v4/data/density_check.json
     - analysis/catalog_v4/data/mixed_order_audit.json
+    - analysis/catalog_v4/data/pp_trained_compare.json
     - analysis/catalog_v4/data/validation.json
     - analysis/catalog_v4/figs/census_diagrams.png
     - analysis/catalog_v4/figs/classes_roles.png
@@ -1806,6 +1807,7 @@ entries:
     - analysis/catalog_v4/figs/density_check.png
     - analysis/catalog_v4/figs/mixed_order_fraction.png
     - analysis/catalog_v4/figs/pool_sqrts_forward.png
+    - analysis/catalog_v4/figs/pp_trained_compare.png
     - analysis/catalog_v4/mixed_order_fig.py
     - analysis/catalog_v4/read_validation.py
     - analysis/catalog_v4/v3_delete_manifest.py
