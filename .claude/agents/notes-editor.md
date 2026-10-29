@@ -205,3 +205,6 @@ final step:
 
 Run it **after** your last edit. If there is a blocking problem you cannot fix mechanically,
 do **not** run it: return the findings and leave the backlog standing.
+
+## Reading costs
+Every tool call re-reads your whole context, so calls, not lines, are what is expensive. Read in few calls: one `git diff` of the whole backlog, one `grep -n` over all the files that may hold what you need, then whole functions or paragraphs, several files in one Bash call; never a file in many small slices.

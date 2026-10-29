@@ -176,3 +176,6 @@ is `clean` or `nits only`, run as your final step:
 
 If your verdict is `fix first`, do **not** run it: return the findings so they get fixed, and
 you will be re-run on the corrected backlog.
+
+## Reading costs
+Every tool call re-reads your whole context, so calls, not lines, are what is expensive. Read in few calls: one `git diff` of the whole backlog, one `grep -n` over all the files that may hold what you need, then whole functions or paragraphs, several files in one Bash call; never a file in many small slices.

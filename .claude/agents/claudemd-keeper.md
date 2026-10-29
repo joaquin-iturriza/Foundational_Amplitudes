@@ -114,3 +114,6 @@ as your final step:
 
 If the backlog adds bloat or results that should be cut or moved first, do **not** run it:
 return the fixes and leave the backlog standing until they are applied.
+
+## Reading costs
+Every tool call re-reads your whole context, so calls, not lines, are what is expensive. Read in few calls: one `git diff` of the whole backlog, one `grep -n` over all the files that may hold what you need, then whole functions or paragraphs, several files in one Bash call; never a file in many small slices.
