@@ -1809,6 +1809,18 @@ entries:
       standalone is 0 to float precision (mean square below 1e-12); then the pp comparisons are redone on catalog_v4_pp_test.yaml.
       No: a class whose physics check refuses or whose ratio is not 0 is listed with its cause and fixed before any comparison
       uses it; processes that come back short are rerun at their own margin like the pp study''s 40, never dropped.'
+    passed_at: '2026-10-29T05:16:34+00:00'
+    reviewer: 'Data generation job (no A/B): one change, catalog_v4''s physics (model sm-no_b_mass, v4 card, QED<=b strings)
+      against the existing pp13 pools, run card, sizes, alpha_s rule and pipeline fixed. Check 2 confirmed in analysis/catalog_v4/data/pp_physics_check.json:
+      mean squared log ratio max 4.3e-25 on the 544 matching classes vs median 0.0095 (max 5.1) on 253 electroweak and 0.015
+      (max 45.6) on 566 b classes, so the eval separates the two functions by >20 decades; 8 part recipes hold 124 entries
+      each = 992 (819 changed + 173 new), catalog_v4_pp_test.yaml reuses 433 pp13 pools; the 33 b-Higgs classes are dropped
+      per the user''s ''Drop the b to higgs events''; pp13 pools are in keep_pp of the catalog_v3 delete manifest. Check 3:
+      deterministic generation, no seed spread applies. Note for the validation step: pp_physics_check.py reads pp13_ names
+      from catalog_v3_pp_test.yaml and reshells b momenta, so it must be extended to the pp13v4 names (no reshelling) before
+      the outcome can be read. Searched: pp13v4, catalog_v4_pp, pp-trained, pp pools, massless b pp, regeneration, gen_daniel_catalog
+      in results.tex, plan show, site runs, site decisions (D117, D119, D136, D161, D162, D163, D167): no earlier v4-physics
+      pp generation.'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
