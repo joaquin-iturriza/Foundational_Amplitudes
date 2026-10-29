@@ -199,6 +199,13 @@ def part_ok(path, n_asked=None):
     return n > 0 and (n_asked is None or n >= int(n_asked))
 
 
+def part_need(name, run):
+    """Events run `run` of `name` must return for its part to count as done: all it asked when the pool is split into
+    runs sized to return their events (lhe.run_events), else any (runs that each ask the whole pool and stall at a few
+    thousand, lhe.n_runs sized from what one run returned: short by design, the assembly checks their sum)."""
+    return run[1] if mg.PROCESSES[name]["lhe"].get("run_events") else None
+
+
 def _du(path):
     n = 0
     for dp, _, fs in os.walk(path):
@@ -280,7 +287,7 @@ def tidy_run(name, items, k, q):
             return None
         root = parts_work_root()
         _under(root, wd)
-        saved = part_ok(part, run[1])
+        saved = part_ok(part, part_need(name, run))
         rm, _ = _removals(wd, saved)
         os.makedirs(os.path.join(q, "gc"), exist_ok=True)
         man = os.path.join(q, "gc", f"worker_{os.environ.get('SLURM_JOB_ID', f'local{os.getpid()}')}.jsonl")
@@ -312,7 +319,7 @@ def _run_task(q, t):
         try:
             mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
             part, run = mg.lhe_part_paths(name, items)[t["k"]]
-            if not part_ok(part, run[1]):        # a short part (MadEvent stopped early) is a failed run, not a done one
+            if not part_ok(part, part_need(name, run)):   # a short part of a run_events pool is a failed run
                 raise RuntimeError(f"{name}: part {t['k']} written but holds fewer events than the {run[1]} asked: "
                                    f"{part}")
         finally:
@@ -440,7 +447,7 @@ def cmd_gc(a):
                 stats["running_skipped"] += 1
                 continue
             _under(root, wd)
-            saved = part_ok(part, run[1])            # all the events it asked; a short part keeps its logs
+            saved = part_ok(part, part_need(name, run))   # a short part of a run_events pool keeps its logs
             if not saved and part_ok(part):
                 stats["short_parts"] += 1
             n, kept = tidy_plan(wd, saved)
