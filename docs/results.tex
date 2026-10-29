@@ -10809,7 +10809,7 @@ of the three share a test set.
     from CC, or a copy of the project's data from CC to lxplus, which the pp regeneration (designed, passed review,
     $8$ CPU jobs, \code{recipes/gen\_catalog\_v4\_pp.py}) and the preprocessing entry's sign extension on catalog\_v4
     (built, design passed until 2026-10-30 05:39) both need. In progress: lxplus being deployed for the pp
-    regeneration; the second round of the ponytail test (analysis tasks, two runs per arm). The preprocessing
+    regeneration. The preprocessing
     exploration is continuous (\code{plan continuous}, the user's ``Keep iterating.''); it closes only on their word.
     % allow: 2026 10 29 07 40 152 8 30 05 39 because they are dates, clock times, a disk size and a job count, not results
   \item \textbf{The pp blend (proposed 2026-10-26, on hold).} Proposed from par.~\ref{par:v4_density}: each hadronic
@@ -11919,6 +11919,159 @@ gave smaller changes with half the tests and no visible change in errors; whethe
 the plugin-on lookups run had one more error, and whether any of the gaps exceed what a second run of the same arm would
 give, n = 1 per cell cannot say. The test used 20.8 million re-read tokens (runs and reviews; the hooks' own model
 checks and the orchestrating session not counted).
+
+% allow: 4 2 16 because they are the numbers of tasks, runs per arm and runs, the design
+% allow: 2026 10 29 because it is a date
+\paragraph{Second round: analysis tasks, two runs per arm.} The first round's tasks were hook and tool code with little
+for a change to reuse, and one run per cell could not separate the plugin from the run-to-run spread (the user,
+2026-10-29: ``I'm surprised the reusing didn't show up that much, but maybe the task didn't allow for it. Maybe try more
+examples''). The second round replays 4 finished analysis tasks whose inputs and readers were already in the repo at
+the parent commit: the few-shot calibration of the held-out predictions on Daniel's catalog, the split of the hybrid
+target's level error on catalog\_v3, catalog\_v4 against the pp-trained arm on the pp pools, and why small-$D$
+fine-tunes lose to scratch. Each ran 2 times with the plugin on and 2 times off (16 runs, the arm drawn at random within
+each pair), as in the first round otherwise: fresh headless session, own worktree at the parent commit with the task's
+gitignored inputs copied in, same model, effort, hooks and settings, only the plugin switch differing. The blind
+reviewer, given the diff, the task and the base commit but not the arm, also counted each function or block that
+reimplements code the repo had at the base commit, naming the original (four reviews kept only their counts, the two
+fine-tune ones whose reviewer ended without a report were rerun). Per task and arm the table gives the mean of the two
+runs and, in brackets, their spread (the absolute difference); a gap between the arms counts only where it exceeds the
+larger of the two spreads. The replays' writes to the plan (\code{tools/plan.py}) reached the live plan, in both arms
+alike, until commit \code{e5cb1500} made a test worktree refuse them; they do not enter any measure here.
+
+% src: python3 analysis/ponytail_ab/ponytail_ab2.py @c98c1611
+% claim: dfew.on.lines_added=150
+% claim: dfew.on_spread.lines_added=8
+% claim: dfew.on.tool_calls=18
+% claim: dfew.on_spread.tool_calls=2
+% claim: dfew.on.reread_M=1.27
+% claim: dfew.on_spread.reread_M=0.17
+% claim: dfew.on.reimpl=3.5
+% claim: dfew.on_spread.reimpl=1
+% claim: dfew.on.blocking=1.5
+% claim: dfew.on_spread.blocking=3
+% claim: dfew.off.lines_added=203.5
+% claim: dfew.off_spread.lines_added=13
+% claim: dfew.off.tool_calls=21
+% claim: dfew.off_spread.tool_calls=6
+% claim: dfew.off.reread_M=1.54
+% claim: dfew.off_spread.reread_M=0.55
+% claim: dfew.off.reimpl=4
+% claim: dfew.off_spread.reimpl=2
+% claim: dfew.off.blocking=2.5
+% claim: dfew.off_spread.blocking=1
+% claim: hsplit.on.lines_added=64
+% claim: hsplit.on_spread.lines_added=20
+% claim: hsplit.on.tool_calls=22.5
+% claim: hsplit.on_spread.tool_calls=11
+% claim: hsplit.on.reread_M=2.05
+% claim: hsplit.on_spread.reread_M=1.57
+% claim: hsplit.on.reimpl=4
+% claim: hsplit.on_spread.reimpl=0
+% claim: hsplit.on.blocking=1.5
+% claim: hsplit.on_spread.blocking=1
+% claim: hsplit.off.lines_added=101
+% claim: hsplit.off_spread.lines_added=32
+% claim: hsplit.off.tool_calls=23
+% claim: hsplit.off_spread.tool_calls=2
+% claim: hsplit.off.reread_M=1.93
+% claim: hsplit.off_spread.reread_M=0.15
+% claim: hsplit.off.reimpl=4
+% claim: hsplit.off_spread.reimpl=0
+% claim: hsplit.off.blocking=1
+% claim: hsplit.off_spread.blocking=2
+% claim: v4pp.on.lines_added=269
+% claim: v4pp.on_spread.lines_added=50
+% claim: v4pp.on.tool_calls=38
+% claim: v4pp.on_spread.tool_calls=20
+% claim: v4pp.on.reread_M=5.66
+% claim: v4pp.on_spread.reread_M=4.66
+% claim: v4pp.on.reimpl=5
+% claim: v4pp.on_spread.reimpl=2
+% claim: v4pp.on.blocking=1.5
+% claim: v4pp.on_spread.blocking=1
+% claim: v4pp.off.lines_added=323
+% claim: v4pp.off_spread.lines_added=0
+% claim: v4pp.off.tool_calls=44.5
+% claim: v4pp.off_spread.tool_calls=3
+% claim: v4pp.off.reread_M=6.22
+% claim: v4pp.off_spread.reread_M=2.5
+% claim: v4pp.off.reimpl=5
+% claim: v4pp.off_spread.reimpl=2
+% claim: v4pp.off.blocking=1
+% claim: v4pp.off_spread.blocking=0
+% claim: ftharm.on.lines_added=321.5
+% claim: ftharm.on_spread.lines_added=43
+% claim: ftharm.on.tool_calls=49.5
+% claim: ftharm.on_spread.tool_calls=3
+% claim: ftharm.on.reread_M=6.57
+% claim: ftharm.on_spread.reread_M=0.96
+% claim: ftharm.on.reimpl=5
+% claim: ftharm.on_spread.reimpl=2
+% claim: ftharm.on.blocking=2.5
+% claim: ftharm.on_spread.blocking=3
+% claim: ftharm.off.lines_added=342
+% claim: ftharm.off_spread.lines_added=44
+% claim: ftharm.off.tool_calls=49
+% claim: ftharm.off_spread.tool_calls=8
+% claim: ftharm.off.reread_M=5.51
+% claim: ftharm.off_spread.reread_M=1.3
+% claim: ftharm.off.reimpl=5
+% claim: ftharm.off_spread.reimpl=4
+% claim: ftharm.off.blocking=2
+% claim: ftharm.off_spread.blocking=0
+\begin{table}[H]
+\centering
+\begin{tabular}{llrrrrr}
+task & plugin & lines added & tool calls & re-read (M tokens) & reimplementations & blocking \\
+\hline
+held-out calibration & on & 150 (8) & 18 (2) & 1.27 (0.17) & 3.5 (1) & 1.5 (3) \\
+ & off & 203.5 (13) & 21 (6) & 1.54 (0.55) & 4 (2) & 2.5 (1) \\
+hybrid level split & on & 64 (20) & 22.5 (11) & 2.05 (1.57) & 4 (0) & 1.5 (1) \\
+ & off & 101 (32) & 23 (2) & 1.93 (0.15) & 4 (0) & 1 (2) \\
+v4 against pp-trained & on & 269 (50) & 38 (20) & 5.66 (4.66) & 5 (2) & 1.5 (1) \\
+ & off & 323 (0) & 44.5 (3) & 6.22 (2.5) & 5 (2) & 1 (0) \\
+fine-tune harm & on & 321.5 (43) & 49.5 (3) & 6.57 (0.96) & 5 (2) & 2.5 (3) \\
+ & off & 342 (44) & 49 (8) & 5.51 (1.3) & 5 (4) & 2 (0) \\
+\end{tabular}
+\caption{The second round: four analysis tasks, two runs per plugin setting; each cell is the mean of the two runs and,
+in brackets, their absolute difference. Lines added: non-blank added lines of the run's whole diff against the parent
+commit, JSON excluded; reimplementations: functions or blocks the blind reviewer found duplicating code the repo had at
+the parent commit; blocking: the reviewer's blocking findings.}
+\label{tab:ponytail_ab2}
+\end{table}
+
+% src: python3 analysis/ponytail_ab/ponytail_ab2.py @c98c1611
+% allow: 4 16 because they are the numbers of tasks and runs, the design
+% claim: summary.lines_added.on_lower=4
+% claim: summary.lines_added.beyond_spread=3
+% claim: summary.lines_added.on_sum=804.5
+% claim: summary.lines_added.off_sum=969.5
+% claim: summary.tool_calls.beyond_spread=0
+% claim: summary.tool_calls.on_sum=128
+% claim: summary.tool_calls.off_sum=137.5
+% claim: summary.reread_M.beyond_spread=0
+% claim: summary.reread_M.on_sum=15.55
+% claim: summary.reread_M.off_sum=15.2
+% claim: summary.reimpl.beyond_spread=0
+% claim: summary.reimpl.on_sum=17.5
+% claim: summary.reimpl.off_sum=18
+% claim: summary.blocking.beyond_spread=0
+% claim: summary.blocking.on_sum=7
+% claim: summary.blocking.off_sum=6.5
+% claim: total.reread_M=61.5
+% claim: total.review_reread_M=8.2
+% claim: total.all_reread_M=69.7
+\paragraph{Second round, result.} Only the size of the change separates the arms beyond the spread: with the plugin on
+the mean change was smaller in all 4 tasks (804.5 hand-written lines summed over the per-task means against 969.5) and
+the gap exceeds the spread in 3 of them, not in the fine-tune task. Reuse did not move: the reviewer found about as many
+reimplementations of existing code in both arms (17.5 against 18 summed over the means; beyond the spread in 0 of 4),
+the same loaders, best-trial pickers and curve statistics rewritten in both, and no more blocking errors (7 against
+6.5; beyond the spread in 0 of 4). Tool calls (128 against 137.5) and re-read tokens (15.55 against 15.2 million) are
+inside the spread in every task (0 of 4 each). So on analysis tasks where reuse was possible the plugin trims what is
+written but does not make the agent find and call the existing readers; the round-one gaps in tests and tokens do not
+reappear beyond the run-to-run spread. The round used 69.7 million re-read tokens (61.5 million for the 16 runs, 8.2
+million for the reviews; the two reviews that ended without a report, the hooks' own model checks and the
+orchestrating session not counted).
 
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
