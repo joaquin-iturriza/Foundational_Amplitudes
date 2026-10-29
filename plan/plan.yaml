@@ -119,7 +119,12 @@ entries:
   - D165
   - D170
   - D175
-  next: null
+  next: 'Design the next preprocessing iteration on catalog_v4 (the pretraining catalog since the user''s switch, 2026-10-26):
+    start from what the catalog_v3 exploration found (par:v3_prep_* in docs/results.tex: the hybrid reference scale, the emission-scale
+    blends, the sign study''s more signed pools) and from the held entries'' catalog_v4 adaptations (catalog_norm, qperp_soft,
+    f24 and f24net carry ''Adapted to catalog_v4'' next steps but stay held under the user''s hold D114; this entry must not
+    run their jobs); record the design with --prior and get it through the design reviewer; a job under the GPU budget then
+    goes ahead'
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
