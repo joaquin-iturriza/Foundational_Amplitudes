@@ -238,7 +238,7 @@ PY
     AXES=(H1 H5 "${CROSS[@]}")
 fi
 if [ "$MODE" != eval ]; then
-    if [ ! -e "$OUT/models/model_run0_best.pt" ]; then
+    if [ ! -e "$OUT/models/model_run0_best.pt" ] && [ ! -e "$OUT/models/model_run0_best.pt.gz" ]; then
         test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
         python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
             base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
