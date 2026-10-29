@@ -1857,6 +1857,88 @@ test of either fix. The two fixes as designs, each with what it does to the part
   \label{fig:v4_tree_top}
 \end{figure}
 
+\paragraph{New process or new mass in catalog\_v4's tree level error (2026-10-29).}\label{par:v4_tree_newproc} The
+question, from the paragraph above and the user's first priority, the zero-shot bias: is the level error of a held-out
+tree process an effect of the process being new, or of a particle mass the training never saw, the top at
+$172.5$\,GeV, which no training tree has. The answer decides the fix to look for: one in the target or inputs for a
+property of new processes, or a catalog design question about the top. No new run: the same two pretrainings (seeds
+$42$ and $43$) and seed-mean offsets as the two paragraphs above (\code{analysis/catalog\_v4/loop\_levels.py
+--trees}, Fig.~\ref{fig:v4_tree_newproc}). Four groups: the new combinations and multiplicity pools, new processes
+made only of particles trained at their masses, and the particle content pools split as above into those whose
+process the heavy-quark layer trains at another top mass and those whose process is at no top mass. Each new-process
+pool is set against the two top groups' median absolute offsets in its own cell of multiplicity and initial state,
+and read as nearer one or the other in log; no fit, no new threshold. Then, over the new-process pools, the rank
+correlation of the absolute offset with the properties that could predict it.
+% src: python3 analysis/catalog_v4/loop_levels.py --trees @2bf5fcd6
+% claim: np.H1.n=62
+% claim: np.H2.n=218
+% claim: np.other_mass.n=35
+% claim: np.no_mass.n=244
+% claim: np.H1.median_abs_off=0.096
+% claim: np.H2.median_abs_off=0.197
+% claim: np.other_mass.median_abs_off=0.063
+% claim: np.no_mass.median_abs_off=0.437
+% claim: np.H1.n_compared=60
+% claim: np.H1.n_cells_compared=9
+% claim: np.H1.n_nearer_no_mass=14
+% claim: np.H1.median_log_ratio_no_mass=-0.749
+% claim: np.H1.median_log_ratio_other_mass=0.145
+% claim: np.H2.n_compared=218
+% claim: np.H2.n_cells_compared=7
+% claim: np.H2.n_nearer_no_mass=120
+% claim: np.H2.median_log_ratio_no_mass=-0.399
+% claim: np.H2.median_log_ratio_other_mass=0.572
+% claim: np.H1.median_signed_off=-0.004
+% claim: np.H1.positive_share=0.484
+% claim: np.H2.median_signed_off=0.12
+% claim: np.H2.positive_share=0.642
+% claim: np.no_mass.median_signed_off=-0.063
+% claim: np.no_mass.positive_share=0.434
+% claim: np.rho.particles=0.15
+% claim: np.rho.alpha_s_power=0.03
+% claim: np.rho.alpha_power=0.13
+% claim: np.rho.massive_legs=-0.13
+% claim: np.rho.matched_class_size=0.05
+% claim: np.rho.departure_from_the_matched_class=0.14
+% claim: np.initial.gg.n=17
+% claim: np.initial.gg.median_abs_off=0.586
+% claim: np.initial.ee.n=27
+% claim: np.initial.ee.median_abs_off=0.311
+% claim: np.initial.qq.n=145
+% claim: np.initial.qq.median_abs_off=0.151
+% claim: np.massive0.median_abs_off=0.273
+% claim: np.massive3.median_abs_off=0.076
+% allow: 42 43 172.5 6 because they are the seeds, the top's mass in GeV and the multiplicity of the figure's right panel, settings
+The new combinations sit with the top processes trained at another mass, not with the top processes at none: median
+absolute offset $0.096$ over $62$ pools, against $0.063$ ($35$ pools) and $0.437$ ($244$). Cell by cell the same holds:
+of the $60$ pools in the $9$ cells holding both top groups, $14$ are nearer the no-mass group; the median log$_{10}$
+ratio of a pool's offset to its cell's no-mass median is $-0.749$, to its other-mass median $0.145$. So a new process
+whose particles were all trained at their masses is placed about as well as a known process at a new top mass, and
+the large top offsets are the untrained top mass, not the new process. The multiplicity pools lie between: median
+$0.197$ over $218$, $120$ of them nearer the no-mass group in $7$ cells, log ratios $-0.399$ and $0.572$; and they are
+the one group whose offset has a sign, median $0.12$ with $0.642$ of the pools positive (the network places a six
+particle level too high), against $-0.004$ and $0.484$ for the new combinations and $-0.063$ and $0.434$ for the top
+pools at no mass. Within the new processes (both groups) no listed property predicts the offset: the rank correlations
+with multiplicity, the born's $\alpha_s$ and $\alpha$ powers, the massive legs, the matched class size and the departure
+from it are $0.15$, $0.03$, $0.13$, $-0.13$, $0.05$ and $0.14$, and the median by massive legs is not monotone ($0.273$
+with none, $0.076$ with three). The initial state separates the most: $0.586$ on the $17$ gluon-gluon pools and $0.311$
+on the $27$ $e^+e^-$ ones, mostly multiplicity pools, against $0.151$ on the $145$ quark-antiquark ones.
+The nearest training process's own offset, also asked, is not in these reads (they hold zero-shot offsets of held-out
+pools only). The 35 other-mass pools are a selected set (the heavy-quark layer's processes, mostly short), so the
+cell comparison is a reading, not a test. What it changes: on the tree axes the zero-shot bias of a new process is
+small where its particles are trained; the large one is the top held out at its mass, a catalog design effect, and
+the multiplicity axis carries a positive bias of its own, largest from gluon-gluon and $e^+e^-$ beams.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/tree_levels_newproc.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --trees @2bf5fcd6
+  \caption{catalog\_v4's tree held-out pools in four groups: the new combinations and multiplicity pools (new
+    processes, every particle trained at its mass), and the particle content pools whose process is trained at another
+    top mass or at none. Left: per pool its seed-mean absolute zero-shot offset, the bar the group's median. Right: the
+    group's median per initial state at six particles.}
+  \label{fig:v4_tree_newproc}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
