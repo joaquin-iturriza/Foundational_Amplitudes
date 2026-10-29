@@ -11721,7 +11721,10 @@ taken from the reviewer's report and counted once when a later run re-reported i
 decision of the user's covers) counts with the defects, 24 of the 278 findings. Left out:
 17 findings in code the backlog did not change, and 10 in files outside the code paths. The trigger was the line count in 62
 reviews (2 of them also past 30 commits), never the commit count alone, and 44 reviews started below both thresholds by a
-count rebuilt from the committed history (asked for after a change, or run next to another review); where the
+count rebuilt from the committed history; none was asked for by the user: 25 were launched by the main session and 19
+by step agents, most of them when the hook reported the pillar due by its own count, which includes uncommitted
+changes the committed history does not hold; where the
+% allow: 25 19 because they are counts of who launched each review, read from the Agent launch records ( below-threshold review, read from the Agent launch records of the session transcript and its subagents, 2026-10-29)
 hook printed its own backlog (three reviews) the commit counts agree and the line counts are within a factor of two. 79 of the 106 reviews found at least one blocking error.
 The line count is a poor measure of work: of the 953 thousand changed lines, 885 thousand are sweep configs and recipe
 files written in bulk by generators, with 17 findings. The other 67.6 thousand hand-written lines carry 261 findings,
