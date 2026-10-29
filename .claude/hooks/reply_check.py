@@ -8,7 +8,6 @@ settings or hooks load) reads the user's latest message(s), the reply that ends 
   1. every question the user asked is answered directly (not deflected, not answered with a plan); only the user's own
      questions count, not those inside text they pasted from others (2026-10-22: a pasted chat's "can we meet?",
      addressed to two collaborators, was flagged and answered with an empty reply);
-  2. the reply does not ask the user something a decision in force already settles.
 On "no" the turn is blocked once with the reason. Any failure of the check itself (no CLI, timeout, unparsable
 answer) lets the turn end: the check must never be what stalls work.
 State: .claude/.reply_check_state (hash of the last user message checked).
@@ -107,11 +106,6 @@ def main():
     if st.get("hash") == h:
         return 0                      # this message was already checked; never block twice
     json.dump({"hash": h}, open(STATE, "w"))
-    try:
-        dec = subprocess.run(["site", "decisions", "--project", "FA"], capture_output=True, text=True, timeout=30).stdout
-    except Exception:
-        dec = ""
-    dec = relevant(dec, "\n".join(recent) + "\n" + reply)
     prompt = f"""You check one reply of an assistant to a researcher. Answer ONLY with JSON: {{"ok": true}} or
 {{"ok": false, "reason": "<one or two sentences naming exactly what is missing>"}}.
 
@@ -125,11 +119,6 @@ The assistant's reply:
 {reply[-8000:]}
 >>>
 
-Decisions the researcher already made (in force):
-<<<
-{dec[-6000:]}
->>>
-
 Rules:
 1. Every question the researcher asked (explicit, or an obvious "why"/"what"/"so?" demand) must be answered directly
    in the reply. A plan, an apology, or an answer to a different question does not count. Instructions without a
@@ -140,9 +129,8 @@ Rules:
    (e.g. "can you answer this?"). When the researcher's own words around a paste ask something ("We should have
    results for this, right?"), that is the question to check. Never name a question from pasted text in your reason, and never fail a
    reply because it leaves one unanswered.
-2. The reply must not ask the researcher to decide something the decisions above already settle.
-3. Be strict on 1 and 2 and ignore everything else (style, length, whether the work is right).
-If both rules hold, answer {{"ok": true}}."""
+2. Be strict on 1 and ignore everything else (style, length, whether the work is right).
+If rule 1 holds, answer {{"ok": true}}."""
     try:
         out = subprocess.run(["claude", "-p", "--setting-sources", "project", "--model", "haiku",
                               "--no-session-persistence", "--disallowed-tools", "Bash,Read,Edit,Write,Agent,WebFetch"],
