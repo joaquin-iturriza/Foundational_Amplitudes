@@ -176,7 +176,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 496295d8
+    commit: 710ec651
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -213,6 +213,7 @@ entries:
     - analysis/catalog_v4/data/tree_levels.json
     - analysis/catalog_v4/data/tree_levels_cc.json
     - analysis/catalog_v4/data/tree_levels_mult.json
+    - analysis/catalog_v4/data/tree_levels_mult_cand.json
     - analysis/catalog_v4/figs/kshot_level.png
     - analysis/catalog_v4/figs/loop_groups.png
     - analysis/catalog_v4/figs/loop_levels.png
