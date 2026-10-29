@@ -1280,6 +1280,8 @@ entries:
         difficulty; the shape lever is capacity and training length, recorded for the full pretraining''s design'
       - 'e and the log-log residual disagree on a group''s side of 0.3: report that group as unresolved with both numbers,
         no decision'
+  step_waits:
+    '5': CC's /sps/lpnhe disk to have 50G free (the parts cleanup is freeing about 340G)
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
