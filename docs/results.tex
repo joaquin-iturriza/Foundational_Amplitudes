@@ -1786,6 +1786,76 @@ one-loop reading (thin classes carry the largest offsets) does not carry to tree
   \label{fig:v4_tree_levels}
 \end{figure}
 
+\paragraph{Does an external top carry catalog\_v4's tree level error (2026-10-29).}\label{par:v4_tree_top} The
+question, from the paragraph above: the largest tree offsets sit in covered classes, largest on the particle content
+axis's top pools; is the external top the property that carries the tree level error, which would make the top's
+treatment (its mass scale in the emission-scale target, or its coverage) the level fix to examine. No new run: the same
+two pretrainings (seeds $42$ and $43$), offsets and levels as the paragraph above, and three reads with no fit and no
+new threshold (\code{analysis/catalog\_v4/loop\_levels.py --trees}, Fig.~\ref{fig:v4_tree_top}): the seed-mean
+absolute offset of held-out pools with an external top against those without; the top count among the six largest
+offsets against the top share; and, beside the single match rule (never a re-match), a top pool's level against the
+matched training pools that also have an external top, and against its own process in the heavy-quark layer when that
+is in training.
+% src: python3 analysis/catalog_v4/loop_levels.py --trees @725457f8
+% claim: top.train_top=105
+% claim: top.train_top_heavy_layer=105
+% claim: top.n_top=279
+% claim: top.top_share=0.499
+% claim: top.largest_top=6
+% claim: top.largest_top_seed42=6
+% claim: top.largest_top_seed43=6
+% claim: top.top_share_sq_offset=0.786
+% claim: top.H1.n_top=0
+% claim: top.H2.n_top=0
+% claim: top.H3.n_top=279
+% claim: top.H1.median_abs_off_no_top=0.096
+% claim: top.H2.median_abs_off_no_top=0.197
+% claim: top.H3.median_abs_off_top=0.375
+% claim: top.H3.n_match_top=167
+% claim: top.H3.median_abs_off_match_top=0.326
+% claim: top.H3.median_abs_off_no_match_top=0.411
+% claim: top.H3.median_abs_departure_top=1.731
+% claim: top.H3.median_abs_departure_all=1.719
+% claim: top.H3.n_departure_top_smaller=81
+% claim: top.H3.n_sibling=35
+% claim: top.H3.n_inside_sibling_range=31
+% claim: top.H3.median_abs_off_sibling=0.063
+% claim: top.H3.median_abs_off_no_sibling=0.437
+% claim: top.H3.median_abs_off_sibling_N5=0.018
+% claim: top.H3.median_abs_off_no_sibling_N5=0.309
+% claim: top.H3.median_abs_off_sibling_N6=0.105
+% claim: top.H3.median_abs_off_no_sibling_N6=0.462
+% allow: 42 43 50 300 600 172.5 because they are the seeds and the heavy-quark layer's and the top's masses in GeV, settings
+The split by top is the split by axis: every one of the $279$ particle content pools has an external top and none of
+the new combinations or multiplicity pools does, and the training tree pools' only external tops are the $105$
+heavy-quark layer pools ($m_Q=50$, $300$, $600$\,GeV); the top at $172.5$\,GeV is in no training tree pool. So the
+first read cannot separate the top from its axis: the median absolute offset is $0.375$ with a top against $0.096$ and
+$0.197$ on the two axes without. Pooled over the three axes the top pools are half the held-out pools (share $0.499$)
+and hold all six largest offsets (in each seed alone too) and $0.786$ of the summed squared offset. Inside the top
+pools, a matched class that holds heavy-quark layer pools does not move the comparison: the median absolute departure
+from those pools' mean is $1.731$ against $1.719$ from the whole class (smaller on $81$ of $167$), and the median
+offset $0.326$ against $0.411$ without such pools. What does separate them is the pool's own process at another top
+mass: the $35$ top pools whose process is in the heavy-quark layer have their level inside their siblings' range on
+$31$ and a median absolute offset of $0.063$, against $0.437$ for the other top pools; at fixed multiplicity, $0.018$
+against $0.309$ at five particles and $0.105$ against $0.462$ at six. So the top pools carry most of the large tree
+offsets, and the property is the top at its mass, not a class's coverage: the network places a top process's level
+well when it has seen that process with a heavier or lighter top, and poorly otherwise. The level fix to examine is
+the top's treatment, its mass scale in the emission-scale target or the coverage of top processes at the top's mass;
+the layer siblings are a selected set, so this is a reading, not a
+test of either fix.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/tree_levels_top.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --trees @725457f8
+  \caption{catalog\_v4's particle content axis, every pool with an external top. Left: per matched held-out pool its
+    zero-shot offset (seed mean) against its departure from the matched training pools' mean level, filled for the
+    whole class, open for the class's heavy-quark layer pools only, grey for a class without one; the dashed line is
+    the offset of a network that predicts that mean. Right: per pool its seed-mean absolute offset, for pools whose
+    process has no heavy-quark layer sibling in training, and for those whose level lies inside or outside their
+    siblings' range.}
+  \label{fig:v4_tree_top}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
