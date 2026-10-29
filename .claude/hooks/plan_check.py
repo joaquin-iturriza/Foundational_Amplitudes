@@ -175,7 +175,30 @@ def main():
     if bad:
         if plan.NOTES:                            # notes go to plan next, never to the user's screen with a block
             plan._set_state("_stop_notes", list(plan.NOTES))
-        sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in bad) + "\n")
+        # A refusal identical to the previous one, within 30 min, passes: nothing the main session did in between
+        # cleared it, so blocking again only re-pastes it (2026-10-29: the same ~15k-token refusal, 89 events of one
+        # disk-full batch and steps waiting on the user's disk call, returned some twenty times). Long run lists are
+        # cut to a count so a refusal stays short.
+        import hashlib, json, re, time
+        key = hashlib.sha1("\n".join(bad).encode()).hexdigest()
+        try:
+            last = json.load(open(plan.STATE_FILE)).get("_last_block") or {}
+        except Exception:
+            last = {}
+        if last.get("key") == key and time.time() - last.get("t", 0) < 1800:
+            return 0
+        plan._set_state("_last_block", {"key": key, "t": time.time()})
+        def short(b):
+            m = re.search(r"runs ended: ((?:FA-\S+, )+FA-\S+?);", b)
+            if m and m.group(1).count(",") >= 3:
+                runs = m.group(1).split(", ")
+                b = b.replace(m.group(1), ", ".join(runs[:3]) + ", and %d more" % (len(runs) - 3))
+            return b if len(b) <= 400 else b[:400] + "..."
+        ev = [b for b in bad if b.startswith("open event:")]
+        shown = [short(b) for b in bad if not b.startswith("open event:")] + ev[:5]
+        if len(ev) > 5:
+            shown.append("open event: ... and %d more (site events --project FA)" % (len(ev) - 5))
+        sys.stderr.write("PLAN CHECK: the turn cannot end yet.\n" + "\n".join("  " + b for b in shown) + "\n")
         return 2
     # Notes never reach the user: a passing check prints nothing (a systemMessage is shown on their screen; the user,
     # 2026-10-25 and 2026-10-26: "Why are you back again with this?"). They are kept for `plan next`, which prints them
