@@ -2762,6 +2762,38 @@ entries:
       per entry, labelled by its standalone, shuffled into every role), an e+e- run card and lhe kind, the e+e- default-sampled
       test read; and the user''s calls on the e+e- energies, on a default share for the one-loop pools and for the variants
       (heavy-quark masses, cut and alpha_s points; the 6-20 TeV energy probes have no collider default).'
+    fix_at: '2026-10-29T16:08:02+00:00'
+    fix: '(1) Matched control and the pure-default reference. The ''pure-default reference'' is the catalog_v3 pp-trained
+      arm (AdamW, one seed, catalog_v3 physics labels): par:v4_vs_pp itself says that comparison carries an optimizer factor
+      of about four (Muon over AdamW 0.26 and 0.28 on the same pp pools) and is scored on another function on 238 classes,
+      and that separating catalog from optimizer ''would need the pp-trained arm with Muon at the catalog_v4 runs'' settings
+      ... about 3 GPU-hours; not run''. The recipe for it already exists (recipes/catalog_v4_pp_mixed_train.yaml, every hadronic
+      tree class on its pp13v4 events) and its pools are the ones being collected now. Fix: make that arm (Muon, the v4 short
+      runs'' HPs, batch and 4264 steps, seeds 42 and 43, read on the same pp13v4 test rows and on the smart test pools) the
+      f=1 endpoint of the tradeoff, stating its 1e4 vs 1e5 pool size; it is also the comparison the user named on 2026-10-26
+      (''how training on catalog 4 compares to training on pp collisions on the datasets generated like pp collisions'') and
+      the one the on-hold pp blend item asked for. Run it first: at about 3 GPU-h and no generation it bounds what any default
+      share can gain on measure (a) before the 500 core-hours of generation. (2) The baseline reuse condition names only the
+      mixed-order fix (1d9d6a29). The arms will be built on today''s pools; the control must train on exactly the same files
+      for everything that is not the tree bulk (one-loop, heavy-quark, BSM, loop-induced HH/HHH as rebuilt at the corrected
+      widths under the user''s 2026-10-26 call), checked by recipe ids / pool hashes, else rerun; state which. (3) Check:
+      the response cited is catalog_v3''s (window cuts that left out about 40% of pp events; pp-trained over window 0.19 to
+      0.26). On catalog_v4 the existing evidence is weaker: on matching labels catalog_v4 is already ahead of the pp-trained
+      arm (0.66 on 417 trained, 0.58 on 103 held out), it recovers a share 0.38 to 0.43 of pp training''s gain and none inside
+      catalog_v3''s coverage, and its density gap follows the per-class ratio only at rank correlation 0.19 (par:v4_vs_pp,
+      par:v4_density). State the effect expected on catalog_v4 from these numbers (with its assumption about the Muon factor),
+      or measure it with the arm of (1), and keep the 0.8 threshold only if it stands above that expectation''s uncertainty.
+      (4) Dilution: measure (a) pools 1301 hadronic and 175 e+e- classes; no existing data shows (a) moving for e+e- fixed-energy
+      default sampling (the genmix sweeps used RAMBO in a sqrt(s) window). Report e+e- as its own group with its own yes/no,
+      so the hadronic effect cannot hide it or the reverse. (5) Outcome under the A/B protocol: every arm runs at the catalog_v3
+      Muon search''s HPs; say what a ''no'' at those HPs means (protocol step 4: the same sweep for both arms) or why a sweep
+      is not needed here. (6) State the gate: measure (a) is read only after the pp13v4 validation (log ratio 0 to catalog_v4''s
+      standalone on every class, next step 1) passes; ''by construction'' is not yet shown. Prior-work search redone (results.tex:
+      pp-trained, trained on pp, blend, MadEvent, default sampl, unweighted, genmix, v4_vs_pp, v4_density, prep_sampling,
+      pp13v4; plan show; site decisions D17, D116, D117, D119, D126, D130, D145, D155, D161, D178): the design''s list is
+      right except that it omits par:v4_vs_pp''s named Muon pp-trained arm, the existing catalog_v4_pp_mixed_train.yaml, and
+      the pp blend item''s condition (on hold until the pp pools are regenerated with catalog_v4''s physics and the comparison
+      reread).'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
