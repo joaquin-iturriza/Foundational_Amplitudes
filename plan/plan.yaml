@@ -128,23 +128,8 @@ entries:
   - D175
   - D182
   next:
-    1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
-      says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
-      median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Design and, once CC-IN2P3''s /sps/lpnhe project disk has space (full, 512G of 512G, on 2026-10-29), submit the per-event
-      Born re-evaluation over every read catalog_v4 one-loop pool (the 85 training and 21 held-out virtual pools of par:v4_loop_born,
-      analysis/catalog_v4/loop_born_events.py extended to them, tools/nlo_virtual_pipeline.py --born-of, split one CPU job
-      per pool or finer as site pick allows): plan design with prior par:v4_loop_born and par:v4_loop_born_events, design-reviewer,
-      then submit; it yields both the per-event Born-relative read and, exactly, the target without the mass-scheme shift
-      (stored - shift*Born)'
-    4: 'When CC''s /sps/lpnhe disk has space again (it was 512G of 512G when FA-ccin2p3-5f368c52 and -c8411ffc died at the
-      task epilog, ''No space left on device''): resubmit the two TR reads of the control pair under the passed shape-gap
-      design (REREAD of FA-ccin2p3-339ec100 seed 42 and -380842ed seed 43, scripts/job_catalog_v3_short.sh mode eval V3_AXES=TR,
-      as c8411ffc and 5f368c52 were); when they end, collect them (tools/collect_run.py --axes TR into analysis/catalog_v3/data/short_reads/v4_dimensionless_muon[_seed2]/TR),
-      rerun python3 analysis/catalog_v4/loop_levels.py --shape-gap and decide per group by the design (median e = d - p >=
-      0.3 on both seeds = transfer gap; the log-log fit residual on the other side = unresolved); fill the scorer column of
-      tab:v4_shape_gap and the decision in par:v4_shape_gap. Free-read lower bounds already in hand: e multiplicity 0.389
-      / 0.358, new combinations 0.301 / 0.278, proxy p near 0 (-0.047, -0.013)'
+    5: Wait for the CC cleanup (about 340G being freed by another agent); /sps/lpnhe had 0 bytes free on 2026-10-29 (512G/512G).
+      Once df -h /sps/lpnhe shows >= 50G free, run step 1 as written.
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1271,25 +1256,11 @@ entries:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
   step_why:
-    2:
-      feeds: 'the zero-shot bias (D178): whether a Born-relative one-loop target narrows the held-out one-loop departures
-        on per-event values, the pool-level proxy having failed its check'
+    5:
+      feeds: whether v3_prep_explore step 1 can run on CC now
       if:
-      - 'the per-event read narrows held-out departures and class spreads by the par:v4_loop_born sign tests: design the short
-        pretraining arm with the Born-relative target against the control pair v4_dimensionless_muon seeds 42 and 43, on the
-        shift the user chooses'
-      - 'it does not narrow: record the Born-relative target as a dead end and return the one-loop level question to par:v4_loop_groups'
-    4:
-      feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
-        gap beyond intrinsic difficulty or the network''s floor at this compute, which decides whether shape work targets
-        transfer or capacity'
-      if:
-      - 'a new-process group''s median e >= 0.3 on both seeds: a transfer gap; design target or input priors aimed at it,
-        starting with the cells where e is largest (gluon-gluon, e+e-)'
-      - 'median e < 0.3 on either seed for both groups: the shape error is the fit''s floor at this compute plus intrinsic
-        difficulty; the shape lever is capacity and training length, recorded for the full pretraining''s design'
-      - 'e and the log-log residual disagree on a group''s side of 0.3: report that group as unresolved with both numbers,
-        no decision'
+      - 'df shows >= 50G free on /sps/lpnhe: run step 1 as written'
+      - 'still < 50G free after the cleanup ends: report to the main session that CC space is the blocker and stop'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
