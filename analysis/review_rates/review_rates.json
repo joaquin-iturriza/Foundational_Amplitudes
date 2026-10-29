@@ -1,0 +1,4492 @@
+{
+ "n_runs": 138,
+ "n_runs_by_session": {
+  "71602535-0955-42ad-a58f-23dc320798dc": 138
+ },
+ "n_episodes": 106,
+ "fired": {
+  "lines": 60,
+  "commits": 0,
+  "both": 2,
+  "neither": 44
+ },
+ "episodes_with_blocking": 79,
+ "episodes_with_code_defect": 78,
+ "lines": 952903,
+ "commits": 1108,
+ "median_lines": 2075,
+ "commits_hand": 1044,
+ "overall": {
+  "n": 278,
+  "lines": 952903,
+  "per_kline": 0.2917400826736824,
+  "per_kline_68": [
+   0.23190018658739475,
+   0.3837797115557
+  ],
+  "per_kline_poisson68": [
+   0.27434626211345564,
+   0.3102069383741533
+  ],
+  "commits": 1108,
+  "per_commit": 0.2509025270758123,
+  "per_commit_68": [
+   0.21811981292411517,
+   0.2863077476727498
+  ]
+ },
+ "overall_code_only": {
+  "n": 254,
+  "lines": 952903,
+  "per_kline": 0.2665538884860264,
+  "per_kline_68": [
+   0.2107678388298952,
+   0.35238039577438124
+  ],
+  "per_kline_poisson68": [
+   0.24992860197789998,
+   0.28425365935072405
+  ],
+  "commits": 1108,
+  "per_commit": 0.2292418772563177,
+  "per_commit_68": [
+   0.19911015659955256,
+   0.2620537338692617
+  ]
+ },
+ "hand_written": {
+  "n": 261,
+  "lines": 67644,
+  "per_kline": 3.858435337945716,
+  "per_kline_68": [
+   3.2648585333142073,
+   4.488902297725397
+  ],
+  "per_kline_poisson68": [
+   3.621025737079775,
+   4.110974986650721
+  ],
+  "commits": 1044,
+  "per_commit": 0.25,
+  "per_commit_68": [
+   0.21571785761284382,
+   0.2871521033039411
+  ]
+ },
+ "hand_written_code_only": {
+  "n": 240,
+  "lines": 67644,
+  "per_kline": 3.547986517651233,
+  "per_kline_68": [
+   3.0070212744904645,
+   4.124392287139141
+  ],
+  "per_kline_poisson68": [
+   3.3203387054005473,
+   3.790783922027449
+  ]
+ },
+ "findings_per_episode": 2.6226415094339623,
+ "by_area": {
+  "tooling": {
+   "n": 43,
+   "lines": 8106,
+   "per_kline": 5.304712558598569,
+   "per_kline_68": [
+    1.696125068069549,
+    10.843873489714577
+   ],
+   "per_kline_poisson68": [
+    4.502927909033655,
+    6.23833316284877
+   ]
+  },
+  "analysis": {
+   "n": 84,
+   "lines": 30051,
+   "per_kline": 2.795248078266946,
+   "per_kline_68": [
+    2.3080318338701673,
+    3.348079246369693
+   ],
+   "per_kline_poisson68": [
+    2.4924352581203175,
+    3.132901987196688
+   ]
+  },
+  "training": {
+   "n": 39,
+   "lines": 9689,
+   "per_kline": 4.025183197440397,
+   "per_kline_68": [
+    2.8262466771381884,
+    5.610451010023985
+   ],
+   "per_kline_poisson68": [
+    3.386596148910822,
+    4.774459546506715
+   ]
+  },
+  "jobs": {
+   "n": 52,
+   "lines": 8575,
+   "per_kline": 6.0641399416909625,
+   "per_kline_68": [
+    5.087357775327272,
+    7.07766226778473
+   ],
+   "per_kline_poisson68": [
+    5.230129724604866,
+    7.021971101848039
+   ]
+  },
+  "generation": {
+   "n": 43,
+   "lines": 10712,
+   "per_kline": 4.014189693801344,
+   "per_kline_68": [
+    3.060176227314399,
+    5.426096929839066
+   ],
+   "per_kline_poisson68": [
+    3.4074620640988433,
+    4.720680416173649
+   ]
+  },
+  "configs": {
+   "n": 17,
+   "lines": 885259,
+   "per_kline": 0.01920341956421793,
+   "per_kline_68": [
+    0.013067708530396571,
+    0.028031487957359436
+   ],
+   "per_kline_poisson68": [
+    0.014613625871395383,
+    0.02505106048189831
+   ]
+  },
+  "other": {
+   "n": 0,
+   "lines": 511,
+   "per_kline": 0.0,
+   "per_kline_68": [
+    0.0,
+    0.0
+   ],
+   "per_kline_poisson68": [
+    0.0,
+    3.586265095397867
+   ]
+  }
+ },
+ "by_kind": {
+  "new file": {
+   "n": 141,
+   "lines": 45880,
+   "per_kline": 3.073234524847428,
+   "per_kline_68": [
+    2.358933260315787,
+    3.8526025102985404
+   ],
+   "per_kline_poisson68": [
+    2.8160815749017583,
+    3.352937342956005
+   ]
+  },
+  "edit": {
+   "n": 120,
+   "lines": 21152,
+   "per_kline": 5.673222390317701,
+   "per_kline_68": [
+    4.825931208219403,
+    6.603902764222347
+   ],
+   "per_kline_poisson68": [
+    5.1587462121188485,
+    6.236777441184975
+   ]
+  },
+  "deletion": {
+   "n": 0,
+   "lines": 612,
+   "per_kline": 0.0,
+   "per_kline_68": [
+    0.0,
+    0.0
+   ],
+   "per_kline_poisson68": [
+    0.0,
+    2.994414156451487
+   ]
+  }
+ },
+ "excluded": {
+  "pre": 17,
+  "outside": 10,
+  "x": 1
+ },
+ "expected_per_review": {
+  "hook_lines": {
+   "600": 0.18,
+   "1500": 0.44
+  },
+  "hand_written_lines": {
+   "600": 2.32,
+   "1500": 5.79
+  }
+ },
+ "median_lines_hand": 413,
+ "fired_rows": {
+  "n": 62,
+  "with_blocking": 49,
+  "rate": {
+   "n": 170,
+   "lines": 727063,
+   "per_kline": 0.23381742710054013,
+   "per_kline_68": [
+    0.17254322923205812,
+    0.3302627092809844
+   ],
+   "per_kline_poisson68": [
+    0.21599634832733705,
+    0.25305631585326266
+   ]
+  }
+ },
+ "episodes": [
+  {
+   "start": "cab49408a8",
+   "end": "186e16541c",
+   "runs": [
+    "a6987af1f"
+   ],
+   "first_verdict": "pass",
+   "lines": 5758,
+   "commits": 24,
+   "n_files": 92,
+   "commits_hand": 22,
+   "trigger_lines": 5758,
+   "trigger_commits": 24,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 1046
+  },
+  {
+   "start": "186e16541c",
+   "end": "5fb3b454a7",
+   "runs": [
+    "a15940777"
+   ],
+   "first_verdict": "fix first",
+   "lines": 5165,
+   "commits": 8,
+   "n_files": 68,
+   "commits_hand": 8,
+   "trigger_lines": 5146,
+   "trigger_commits": 7,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a15940777",
+     "file": "sweep/generate_sweep.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a15940777",
+     "file": "sweep/generate_sweep.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 305
+  },
+  {
+   "start": "5fb3b454a7",
+   "end": "ca938994e8",
+   "runs": [
+    "acd62e7b4"
+   ],
+   "first_verdict": "fix first",
+   "lines": 6825,
+   "commits": 9,
+   "n_files": 81,
+   "commits_hand": 8,
+   "trigger_lines": 6806,
+   "trigger_commits": 8,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "acd62e7b4",
+     "file": "analysis/catalog_v2/steps_tuned.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "acd62e7b4",
+     "file": "analysis/catalog_v2/steps_tuned.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 201
+  },
+  {
+   "start": "ca938994e8",
+   "end": "4aa7d43a21",
+   "runs": [
+    "afd051fb3",
+    "a943e2ecd"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1904,
+   "commits": 22,
+   "n_files": 33,
+   "commits_hand": 21,
+   "trigger_lines": 1604,
+   "trigger_commits": 17,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "afd051fb3",
+     "file": "analysis/catalog_v2/steps_tuned.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afd051fb3",
+     "file": "analysis/catalog_v2/steps_tuned.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afd051fb3",
+     "file": "analysis/catalog_v2/solo_b1k.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "afd051fb3",
+     "file": "sweep/generate_pretraining_scaling_sweeps.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afd051fb3",
+     "file": "config/model/lloca.yaml",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afd051fb3",
+     "file": "scripts/job_catalog_short_ab.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afd051fb3",
+     "file": "analysis/catalog_v2/unweight_excess.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 7,
+   "lines_hand": 774
+  },
+  {
+   "start": "4aa7d43a21",
+   "end": "0aa6a63bdc",
+   "runs": [
+    "acc8d0fe3",
+    "aaf2a0181"
+   ],
+   "first_verdict": "fix first",
+   "lines": 243,
+   "commits": 8,
+   "n_files": 8,
+   "commits_hand": 8,
+   "trigger_lines": 137,
+   "trigger_commits": 6,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "acc8d0fe3",
+     "file": "sweep/compare_finetune_methods.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acc8d0fe3",
+     "file": "sweep/fit_scaling_law.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acc8d0fe3",
+     "file": "scripts/rebuild_figures.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acc8d0fe3",
+     "file": "analysis/hpo_optima/make_fig.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 243
+  },
+  {
+   "start": "0aa6a63bdc",
+   "end": "24eeb0c6e0",
+   "runs": [
+    "adfd67c73"
+   ],
+   "first_verdict": "pass",
+   "lines": 3887,
+   "commits": 8,
+   "n_files": 57,
+   "commits_hand": 8,
+   "trigger_lines": 3887,
+   "trigger_commits": 8,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 191
+  },
+  {
+   "start": "24eeb0c6e0",
+   "end": "9aadea09f0",
+   "runs": [
+    "a0f67b18b"
+   ],
+   "first_verdict": "pass",
+   "lines": 2860,
+   "commits": 4,
+   "n_files": 39,
+   "commits_hand": 4,
+   "trigger_lines": 2860,
+   "trigger_commits": 4,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 88
+  },
+  {
+   "start": "9aadea09f0",
+   "end": "2c573f9514",
+   "runs": [
+    "a7de931dc"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2279,
+   "commits": 4,
+   "n_files": 35,
+   "commits_hand": 4,
+   "trigger_lines": 2273,
+   "trigger_commits": 3,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a7de931dc",
+     "file": "analysis/catalog_v2/solo_old_new.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 99
+  },
+  {
+   "start": "2c573f9514",
+   "end": "f5fbde73d4",
+   "runs": [
+    "a92bf6cc8"
+   ],
+   "first_verdict": "fix first",
+   "lines": 722,
+   "commits": 17,
+   "n_files": 13,
+   "commits_hand": 17,
+   "trigger_lines": 722,
+   "trigger_commits": 16,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a92bf6cc8",
+     "file": "sweep/trial_job.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a92bf6cc8",
+     "file": "sweep/sweep_config_drivetest_ee_aa.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 646
+  },
+  {
+   "start": "f5fbde73d4",
+   "end": "f8a96a1ee0",
+   "runs": [
+    "af5a6c16d"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2388,
+   "commits": 15,
+   "n_files": 38,
+   "commits_hand": 15,
+   "trigger_lines": 2339,
+   "trigger_commits": 14,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "af5a6c16d",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "af5a6c16d",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "af5a6c16d",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 593
+  },
+  {
+   "start": "f8a96a1ee0",
+   "end": "d448d1bfb5",
+   "runs": [
+    "a9e37c971"
+   ],
+   "first_verdict": "fix first",
+   "lines": 8851,
+   "commits": 13,
+   "n_files": 127,
+   "commits_hand": 13,
+   "trigger_lines": 8803,
+   "trigger_commits": 12,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a9e37c971",
+     "file": "scripts/job_transfer_calib.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 345
+  },
+  {
+   "start": "d448d1bfb5",
+   "end": "1ff9032920",
+   "runs": [
+    "ac43132d8"
+   ],
+   "first_verdict": "fix first",
+   "lines": 13109,
+   "commits": 9,
+   "n_files": 142,
+   "commits_hand": 8,
+   "trigger_lines": 12994,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "ac43132d8",
+     "file": "scripts/job_transfer_calib.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ac43132d8",
+     "file": "sweep/sweep_manager.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ac43132d8",
+     "file": "analysis/transfer/collect_calib.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ac43132d8",
+     "file": "analysis/transfer/collect_calib.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 418
+  },
+  {
+   "start": "1ff9032920",
+   "end": "b99e1b2b3e",
+   "runs": [
+    "a93a02b7a"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1267,
+   "commits": 8,
+   "n_files": 135,
+   "commits_hand": 8,
+   "trigger_lines": 1166,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a93a02b7a",
+     "file": "analysis/transfer/seeded_ab.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a93a02b7a",
+     "file": "analysis/transfer/seeded_ab.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a93a02b7a",
+     "file": "analysis/transfer/residual_map.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a93a02b7a",
+     "file": "analysis/transfer/transfer_ch1.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 234
+  },
+  {
+   "start": "b99e1b2b3e",
+   "end": "4a15c7efd6",
+   "runs": [
+    "a4a1b8d46"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1094,
+   "commits": 5,
+   "n_files": 21,
+   "commits_hand": 5,
+   "trigger_lines": 273,
+   "trigger_commits": 3,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a4a1b8d46",
+     "file": "tools/steer_pool.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a4a1b8d46",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a4a1b8d46",
+     "file": "sweep/sweep_config_tps_scr_ee_WW_d*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a4a1b8d46",
+     "file": "tools/steer_pool.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a4a1b8d46",
+     "file": "tools/steer_pool.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 413
+  },
+  {
+   "start": "4a15c7efd6",
+   "end": "a81d22781d",
+   "runs": [
+    "a0354809a"
+   ],
+   "first_verdict": "fix first",
+   "lines": 3627,
+   "commits": 8,
+   "n_files": 51,
+   "commits_hand": 6,
+   "trigger_lines": 3443,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a0354809a",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 140
+  },
+  {
+   "start": "a81d22781d",
+   "end": "faf2a5c156",
+   "runs": [
+    "afea6a384"
+   ],
+   "first_verdict": "pass",
+   "lines": 2075,
+   "commits": 9,
+   "n_files": 26,
+   "commits_hand": 9,
+   "trigger_lines": 2075,
+   "trigger_commits": 9,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 239
+  },
+  {
+   "start": "faf2a5c156",
+   "end": "4b9ed92b73",
+   "runs": [
+    "aea6268e1"
+   ],
+   "first_verdict": "pass",
+   "lines": 9884,
+   "commits": 2,
+   "n_files": 100,
+   "commits_hand": 2,
+   "trigger_lines": 9884,
+   "trigger_commits": 2,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 53
+  },
+  {
+   "start": "4b9ed92b73",
+   "end": "deff2ffc8b",
+   "runs": [
+    "a38741f7b"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1006,
+   "commits": 7,
+   "n_files": 17,
+   "commits_hand": 6,
+   "trigger_lines": 1001,
+   "trigger_commits": 6,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a38741f7b",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a38741f7b",
+     "file": "tools/rebuild_run.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a38741f7b",
+     "file": "experiment.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 160
+  },
+  {
+   "start": "deff2ffc8b",
+   "end": "d7a3399158",
+   "runs": [
+    "a97fcee5b"
+   ],
+   "first_verdict": "fix first",
+   "lines": 14828,
+   "commits": 17,
+   "n_files": 153,
+   "commits_hand": 16,
+   "trigger_lines": 14823,
+   "trigger_commits": 15,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a97fcee5b",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a97fcee5b",
+     "file": "analysis/transfer/transfer_all.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a97fcee5b",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a97fcee5b",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a97fcee5b",
+     "file": "analysis/transfer/transfer_all.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 325
+  },
+  {
+   "start": "d7a3399158",
+   "end": "8cad2792c7",
+   "runs": [
+    "ae4ccb81d"
+   ],
+   "first_verdict": "pass",
+   "lines": 9940,
+   "commits": 2,
+   "n_files": 98,
+   "commits_hand": 2,
+   "trigger_lines": 9940,
+   "trigger_commits": 2,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 52
+  },
+  {
+   "start": "8cad2792c7",
+   "end": "3b0f0508fe",
+   "runs": [
+    "a910e5ae3"
+   ],
+   "first_verdict": "fix first",
+   "lines": 34505,
+   "commits": 18,
+   "n_files": 402,
+   "commits_hand": 17,
+   "trigger_lines": 34433,
+   "trigger_commits": 15,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a910e5ae3",
+     "file": "analysis/transfer/collect_ladder.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 697
+  },
+  {
+   "start": "3b0f0508fe",
+   "end": "4f92f687a1",
+   "runs": [
+    "a9334aa16"
+   ],
+   "first_verdict": "fix first",
+   "lines": 12053,
+   "commits": 5,
+   "n_files": 132,
+   "commits_hand": 3,
+   "trigger_lines": 12010,
+   "trigger_commits": 4,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a9334aa16",
+     "file": "sweep/sweep_config_tp3_uufte_*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9334aa16",
+     "file": "scripts/archive_runs.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 72
+  },
+  {
+   "start": "4f92f687a1",
+   "end": "90b6479aa7",
+   "runs": [
+    "afa22ef23"
+   ],
+   "first_verdict": "pass",
+   "lines": 42056,
+   "commits": 5,
+   "n_files": 422,
+   "commits_hand": 3,
+   "trigger_lines": 42056,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 56
+  },
+  {
+   "start": "90b6479aa7",
+   "end": "bc30ecafe0",
+   "runs": [
+    "aafd86097"
+   ],
+   "first_verdict": "fix first",
+   "lines": 13307,
+   "commits": 12,
+   "n_files": 133,
+   "commits_hand": 10,
+   "trigger_lines": 13269,
+   "trigger_commits": 11,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "aafd86097",
+     "file": "sweep/rebalance.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aafd86097",
+     "file": "sweep/rebalance.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aafd86097",
+     "file": "sweep/rebalance.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aafd86097",
+     "file": "analysis/transfer/rung_focus.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 466
+  },
+  {
+   "start": "bc30ecafe0",
+   "end": "e0dd7099db",
+   "runs": [
+    "ae3470054"
+   ],
+   "first_verdict": "fix first",
+   "lines": 18400,
+   "commits": 9,
+   "n_files": 188,
+   "commits_hand": 8,
+   "trigger_lines": 18391,
+   "trigger_commits": 7,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "ae3470054",
+     "file": "sweep/sweep_config_tp3_scr32k_*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ae3470054",
+     "file": "sweep/refill.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ae3470054",
+     "file": "sweep/rebalance.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ae3470054",
+     "file": "sweep/refill.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 120
+  },
+  {
+   "start": "e0dd7099db",
+   "end": "71bac8ea0b",
+   "runs": [
+    "af2efedee"
+   ],
+   "first_verdict": "fix first",
+   "lines": 3314,
+   "commits": 15,
+   "n_files": 45,
+   "commits_hand": 14,
+   "trigger_lines": 3308,
+   "trigger_commits": 14,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "af2efedee",
+     "file": "analysis/transfer/pretrain_hp.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 350
+  },
+  {
+   "start": "71bac8ea0b",
+   "end": "8d51ff5b03",
+   "runs": [
+    "a98c71584"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2983,
+   "commits": 6,
+   "n_files": 30,
+   "commits_hand": 5,
+   "trigger_lines": 2919,
+   "trigger_commits": 3,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a98c71584",
+     "file": "analysis/transfer/finetune_hp.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a98c71584",
+     "file": "analysis/transfer/finetune_hp.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 183
+  },
+  {
+   "start": "8d51ff5b03",
+   "end": "85c909a1d2",
+   "runs": [
+    "a322eb9f9"
+   ],
+   "first_verdict": "fix first",
+   "lines": 21738,
+   "commits": 13,
+   "n_files": 224,
+   "commits_hand": 11,
+   "trigger_lines": 19854,
+   "trigger_commits": 10,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a322eb9f9",
+     "file": "analysis/transfer/cells.py",
+     "tag": "s",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a322eb9f9",
+     "file": "analysis/transfer/cells.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a322eb9f9",
+     "file": "analysis/transfer/star_arms.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a322eb9f9",
+     "file": "analysis/transfer/horizon32k.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a322eb9f9",
+     "file": "analysis/transfer/rung_grid.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 348
+  },
+  {
+   "start": "85c909a1d2",
+   "end": "2fcddf6a6b",
+   "runs": [
+    "a4cf7ea3f",
+    "a76f41a4f"
+   ],
+   "first_verdict": "fix first",
+   "lines": 151798,
+   "commits": 28,
+   "n_files": 1527,
+   "commits_hand": 26,
+   "trigger_lines": 150674,
+   "trigger_commits": 23,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a4cf7ea3f",
+     "file": "sweep/run_trial.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a4cf7ea3f",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a76f41a4f",
+     "file": "tools/synthetic_amplitudes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a76f41a4f",
+     "file": "tools/synthetic_amplitudes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a76f41a4f",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 1617
+  },
+  {
+   "start": "2fcddf6a6b",
+   "end": "94c03004ad",
+   "runs": [
+    "a5d63d760"
+   ],
+   "first_verdict": "fix first",
+   "lines": 35009,
+   "commits": 47,
+   "n_files": 491,
+   "commits_hand": 40,
+   "trigger_lines": 34931,
+   "trigger_commits": 44,
+   "fired": "both",
+   "findings": [
+    {
+     "reviewer": "a5d63d760",
+     "file": "tools/zero_shot_ft.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 1310
+  },
+  {
+   "start": "94c03004ad",
+   "end": "aae52c352f",
+   "runs": [
+    "a7cbd14ab"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1597,
+   "commits": 12,
+   "n_files": 17,
+   "commits_hand": 12,
+   "trigger_lines": 1589,
+   "trigger_commits": 10,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a7cbd14ab",
+     "file": "scripts/job_config_smoke.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 1494
+  },
+  {
+   "start": "aae52c352f",
+   "end": "c12f7b0858",
+   "runs": [
+    "a6ae99aba"
+   ],
+   "first_verdict": "fix first",
+   "lines": 7509,
+   "commits": 3,
+   "n_files": 75,
+   "commits_hand": 1,
+   "trigger_lines": 129,
+   "trigger_commits": 2,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a6ae99aba",
+     "file": "sweep/sweep_config_tp3_accrr*.yaml",
+     "tag": "x",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a6ae99aba",
+     "file": "sweep/sweep_config_tp3_accrr*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 30
+  },
+  {
+   "start": "c12f7b0858",
+   "end": "cb513f47c2",
+   "runs": [
+    "a9d814495"
+   ],
+   "first_verdict": "fix first",
+   "lines": 416,
+   "commits": 12,
+   "n_files": 13,
+   "commits_hand": 10,
+   "trigger_lines": 416,
+   "trigger_commits": 12,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a9d814495",
+     "file": "sweep/prune.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9d814495",
+     "file": "sweep/prune.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9d814495",
+     "file": "sweep/prune.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9d814495",
+     "file": "sweep/prune.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9d814495",
+     "file": "sweep/sweep_config_tp3_wadd_*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9d814495",
+     "file": "sweep/sweep_config_tp3_wadd_*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 6,
+   "lines_hand": 409
+  },
+  {
+   "start": "cb513f47c2",
+   "end": "451ae3d183",
+   "runs": [
+    "a53367123"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2334,
+   "commits": 8,
+   "n_files": 38,
+   "commits_hand": 6,
+   "trigger_lines": 2334,
+   "trigger_commits": 8,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a53367123",
+     "file": "sweep/gen_highmult.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a53367123",
+     "file": "analysis/transfer/expect_tp3.json",
+     "tag": "outside",
+     "area": "analysis",
+     "kind": "none"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 355
+  },
+  {
+   "start": "451ae3d183",
+   "end": "329a45be99",
+   "runs": [
+    "aede3c40f"
+   ],
+   "first_verdict": "pass",
+   "lines": 6884,
+   "commits": 9,
+   "n_files": 74,
+   "commits_hand": 8,
+   "trigger_lines": 6884,
+   "trigger_commits": 9,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "aede3c40f",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "aede3c40f",
+     "file": "sweep/sweep_config_tp3_waddm_*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aede3c40f",
+     "file": "base_experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 228
+  },
+  {
+   "start": "329a45be99",
+   "end": "0e80789e7a",
+   "runs": [
+    "a4bf90155"
+   ],
+   "first_verdict": "fix first",
+   "lines": 691,
+   "commits": 1,
+   "n_files": 9,
+   "commits_hand": 1,
+   "trigger_lines": 691,
+   "trigger_commits": 1,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a4bf90155",
+     "file": "sweep/sweep_config_tp3_waddm_frz*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 40
+  },
+  {
+   "start": "0e80789e7a",
+   "end": "df242561f2",
+   "runs": [
+    "a67b99cf8"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2204,
+   "commits": 19,
+   "n_files": 33,
+   "commits_hand": 19,
+   "trigger_lines": 2204,
+   "trigger_commits": 19,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a67b99cf8",
+     "file": "analysis/transfer/waddm_tradeoff.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 628
+  },
+  {
+   "start": "df242561f2",
+   "end": "160e88a347",
+   "runs": [
+    "a7248e31f"
+   ],
+   "first_verdict": "fix first",
+   "lines": 729,
+   "commits": 5,
+   "n_files": 10,
+   "commits_hand": 4,
+   "trigger_lines": 729,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a7248e31f",
+     "file": "sweep/sweep_config_tp3_waddr_*.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a7248e31f",
+     "file": "analysis/transfer/highmult.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a7248e31f",
+     "file": "sweep/refill.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 129
+  },
+  {
+   "start": "160e88a347",
+   "end": "8cafed64f7",
+   "runs": [
+    "a43d545b2",
+    "a7a1d32e6"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2949,
+   "commits": 6,
+   "n_files": 28,
+   "commits_hand": 4,
+   "trigger_lines": 1732,
+   "trigger_commits": 2,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a43d545b2",
+     "file": "tools/synthetic_amplitudes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a43d545b2",
+     "file": "tools/synthetic_amplitudes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 1060
+  },
+  {
+   "start": "8cafed64f7",
+   "end": "63b5486a72",
+   "runs": [
+    "ad11e6b4a"
+   ],
+   "first_verdict": "pass",
+   "lines": 406,
+   "commits": 3,
+   "n_files": 16,
+   "commits_hand": 2,
+   "trigger_lines": 406,
+   "trigger_commits": 3,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 6
+  },
+  {
+   "start": "63b5486a72",
+   "end": "2740954406",
+   "runs": [
+    "aa272a42f"
+   ],
+   "first_verdict": "fix first",
+   "lines": 8068,
+   "commits": 10,
+   "n_files": 75,
+   "commits_hand": 9,
+   "trigger_lines": 6578,
+   "trigger_commits": 2,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "aa272a42f",
+     "file": "tools/synthetic_amplitudes.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 1262
+  },
+  {
+   "start": "2740954406",
+   "end": "db8798842b",
+   "runs": [
+    "aa139b654",
+    "a47e1681d"
+   ],
+   "first_verdict": "pass",
+   "lines": 381,
+   "commits": 1,
+   "n_files": 5,
+   "commits_hand": 1,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 1
+  },
+  {
+   "start": "db8798842b",
+   "end": "dec240c4af",
+   "runs": [
+    "a3c5524b0"
+   ],
+   "first_verdict": "pass",
+   "lines": 267,
+   "commits": 3,
+   "n_files": 1,
+   "commits_hand": 3,
+   "trigger_lines": 267,
+   "trigger_commits": 3,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 267
+  },
+  {
+   "start": "dec240c4af",
+   "end": "d83c6a3a6a",
+   "runs": [
+    "a16af8610"
+   ],
+   "first_verdict": "pass",
+   "lines": 54,
+   "commits": 2,
+   "n_files": 2,
+   "commits_hand": 2,
+   "trigger_lines": 54,
+   "trigger_commits": 2,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 54
+  },
+  {
+   "start": "d83c6a3a6a",
+   "end": "5060bffbf1",
+   "runs": [
+    "a3d2a9d15",
+    "a98dbc0f8"
+   ],
+   "first_verdict": "fix first",
+   "lines": 3260,
+   "commits": 25,
+   "n_files": 43,
+   "commits_hand": 23,
+   "trigger_lines": 3250,
+   "trigger_commits": 24,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a3d2a9d15",
+     "file": "analysis/transfer/delta_plots.py",
+     "tag": "s",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3d2a9d15",
+     "file": "analysis/transfer/delta_plots.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3d2a9d15",
+     "file": "scripts/hand_place.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 741
+  },
+  {
+   "start": "5060bffbf1",
+   "end": "c0b017bb63",
+   "runs": [
+    "a94cca42c",
+    "a93b64039",
+    "a3f2d54c8"
+   ],
+   "first_verdict": "fix first",
+   "lines": 27187,
+   "commits": 12,
+   "n_files": 45,
+   "commits_hand": 11,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a94cca42c",
+     "file": "recipes/gen_catalog_daniel.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a94cca42c",
+     "file": "recipes/gen_catalog_daniel.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a94cca42c",
+     "file": "experiment.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 4292
+  },
+  {
+   "start": "c0b017bb63",
+   "end": "e0eb52a9be",
+   "runs": [
+    "a7bdf0beb",
+    "a6ed962df",
+    "a3945263e",
+    "a57daaf1e"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1368,
+   "commits": 22,
+   "n_files": 27,
+   "commits_hand": 18,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a7bdf0beb",
+     "file": "models/lloca.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a7bdf0beb",
+     "file": "models/lloca.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a7bdf0beb",
+     "file": "tools/multiplicity_extrap.py",
+     "tag": "outside",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a7bdf0beb",
+     "file": "config/default.yaml",
+     "tag": "s",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a3945263e",
+     "file": "recipes/gen_catalog_daniel.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a3945263e",
+     "file": "recipes/gen_catalog_daniel.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a3945263e",
+     "file": "scripts/publish_main.sh",
+     "tag": "pre",
+     "area": "jobs",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a57daaf1e",
+     "file": "analysis/transfer/het_sweep.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 1262
+  },
+  {
+   "start": "e0eb52a9be",
+   "end": "551a61def1",
+   "runs": [
+    "ab0632855"
+   ],
+   "first_verdict": "pass",
+   "lines": 377,
+   "commits": 4,
+   "n_files": 4,
+   "commits_hand": 4,
+   "trigger_lines": 377,
+   "trigger_commits": 4,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 377
+  },
+  {
+   "start": "551a61def1",
+   "end": "29c51b8df9",
+   "runs": [
+    "ab4e212bf"
+   ],
+   "first_verdict": "pass",
+   "lines": 1443,
+   "commits": 9,
+   "n_files": 10,
+   "commits_hand": 9,
+   "trigger_lines": 1443,
+   "trigger_commits": 9,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 1443
+  },
+  {
+   "start": "29c51b8df9",
+   "end": "8503ddebca",
+   "runs": [
+    "ab3551ca1",
+    "ae9b06af2",
+    "abd3d065b"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2382,
+   "commits": 1,
+   "n_files": 22,
+   "commits_hand": 1,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "ab3551ca1",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ab3551ca1",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ab3551ca1",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ab3551ca1",
+     "file": "config/default.yaml",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "analysis/transfer/het_long.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "base_experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "data_mmap.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "none"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "data_mmap.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "none"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "tools/synthetic_loops.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ae9b06af2",
+     "file": "data_mmap.py",
+     "tag": "pre",
+     "area": "training",
+     "kind": "none"
+    },
+    {
+     "reviewer": "abd3d065b",
+     "file": "sweep/sweep_config_tp_nonsm_*.yaml",
+     "tag": "outside",
+     "area": "configs",
+     "kind": "none"
+    },
+    {
+     "reviewer": "abd3d065b",
+     "file": "tests/test_particle_encoding.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 9,
+   "lines_hand": 788
+  },
+  {
+   "start": "8503ddebca",
+   "end": "968fda679d",
+   "runs": [
+    "afa298df1",
+    "a9969ec01"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1746,
+   "commits": 37,
+   "n_files": 46,
+   "commits_hand": 35,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "afa298df1",
+     "file": "analysis/transfer/het_ab.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afa298df1",
+     "file": "analysis/transfer/het_long.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "afa298df1",
+     "file": "analysis/transfer/delta_plots.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "afa298df1",
+     "file": "analysis/transfer/zero_shot_jcaus.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a9969ec01",
+     "file": "analysis/transfer/het_delta_summary.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9969ec01",
+     "file": "analysis/transfer/het_delta_summary.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9969ec01",
+     "file": "analysis/catalog_daniel/make_heldout_twins.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9969ec01",
+     "file": "sweep/gen_het23_sweeps.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9969ec01",
+     "file": "analysis/catalog_daniel/dancat_het_pre.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a9969ec01",
+     "file": "scripts/launch_het_delta.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 10,
+   "lines_hand": 1455
+  },
+  {
+   "start": "968fda679d",
+   "end": "89d10d114c",
+   "runs": [
+    "acb38e238"
+   ],
+   "first_verdict": "fix first",
+   "lines": 4562,
+   "commits": 76,
+   "n_files": 67,
+   "commits_hand": 75,
+   "trigger_lines": 4403,
+   "trigger_commits": 75,
+   "fired": "both",
+   "findings": [
+    {
+     "reviewer": "acb38e238",
+     "file": "scripts/job_catalog_norm.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "acb38e238",
+     "file": "data_mmap.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acb38e238",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acb38e238",
+     "file": "docs/results.tex",
+     "tag": "outside",
+     "area": "other",
+     "kind": "none"
+    },
+    {
+     "reviewer": "acb38e238",
+     "file": "base_experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 3707
+  },
+  {
+   "start": "89d10d114c",
+   "end": "7ee92e3e1e",
+   "runs": [
+    "a95715bd8"
+   ],
+   "first_verdict": "pass",
+   "lines": 1793,
+   "commits": 7,
+   "n_files": 14,
+   "commits_hand": 7,
+   "trigger_lines": 217,
+   "trigger_commits": 5,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a95715bd8",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a95715bd8",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a95715bd8",
+     "file": "recipes/gen_catalog_2to4.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a95715bd8",
+     "file": "experiment.py",
+     "tag": "s",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 379
+  },
+  {
+   "start": "7ee92e3e1e",
+   "end": "394594e075",
+   "runs": [
+    "abf4ba54a"
+   ],
+   "first_verdict": "pass",
+   "lines": 21,
+   "commits": 2,
+   "n_files": 2,
+   "commits_hand": 2,
+   "trigger_lines": 21,
+   "trigger_commits": 2,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 21
+  },
+  {
+   "start": "394594e075",
+   "end": "d3ba08dda9",
+   "runs": [
+    "a8f14fe6a"
+   ],
+   "first_verdict": "pass",
+   "lines": 961,
+   "commits": 4,
+   "n_files": 13,
+   "commits_hand": 4,
+   "trigger_lines": 961,
+   "trigger_commits": 4,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 105
+  },
+  {
+   "start": "d3ba08dda9",
+   "end": "f5139995bf",
+   "runs": [
+    "a31eb18ec"
+   ],
+   "first_verdict": "pass",
+   "lines": 4186,
+   "commits": 4,
+   "n_files": 25,
+   "commits_hand": 4,
+   "trigger_lines": 2277,
+   "trigger_commits": 3,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a31eb18ec",
+     "file": "models/diagram_encoder_llm4lhc.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31eb18ec",
+     "file": "models/diagram_encoder_llm4lhc.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31eb18ec",
+     "file": "scripts/job_catalog_norm.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31eb18ec",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31eb18ec",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31eb18ec",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31eb18ec",
+     "file": "recipes/gen_catalog_2to4.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 7,
+   "lines_hand": 870
+  },
+  {
+   "start": "f5139995bf",
+   "end": "edc89c5aa5",
+   "runs": [
+    "a6e2bf0a1"
+   ],
+   "first_verdict": "fix first",
+   "lines": 3675,
+   "commits": 10,
+   "n_files": 32,
+   "commits_hand": 9,
+   "trigger_lines": 3675,
+   "trigger_commits": 10,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a6e2bf0a1",
+     "file": "sweep/gen_finale_het_sweeps.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a6e2bf0a1",
+     "file": "sweep/gen_finale_het_sweeps.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a6e2bf0a1",
+     "file": "scripts/job_het_*.sh",
+     "tag": "pre",
+     "area": "jobs",
+     "kind": "none"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 402
+  },
+  {
+   "start": "edc89c5aa5",
+   "end": "9997a16f9e",
+   "runs": [
+    "a073c0f55"
+   ],
+   "first_verdict": "fix first",
+   "lines": 14612,
+   "commits": 19,
+   "n_files": 60,
+   "commits_hand": 19,
+   "trigger_lines": 4589,
+   "trigger_commits": 18,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a073c0f55",
+     "file": "tools/prune_copies.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a073c0f55",
+     "file": "analysis/transfer/het_mumse22_summary.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a073c0f55",
+     "file": "tools/prune_copies.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 806
+  },
+  {
+   "start": "9997a16f9e",
+   "end": "34f5784db6",
+   "runs": [
+    "acfd7e951"
+   ],
+   "first_verdict": "fix first",
+   "lines": 873,
+   "commits": 4,
+   "n_files": 7,
+   "commits_hand": 4,
+   "trigger_lines": 2,
+   "trigger_commits": 2,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "acfd7e951",
+     "file": "tools/item_checks.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acfd7e951",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acfd7e951",
+     "file": "tools/write_own_alphas.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "acfd7e951",
+     "file": "recipes/catalog_*order*.yaml",
+     "tag": "s",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "acfd7e951",
+     "file": "scripts/job_loop_probes_prep.sh",
+     "tag": "s",
+     "area": "jobs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 171
+  },
+  {
+   "start": "34f5784db6",
+   "end": "6c84f564c6",
+   "runs": [
+    "a42f13239"
+   ],
+   "first_verdict": "fix first",
+   "lines": 601,
+   "commits": 8,
+   "n_files": 15,
+   "commits_hand": 8,
+   "trigger_lines": 601,
+   "trigger_commits": 8,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a42f13239",
+     "file": "recipes/catalog_loop_signed.yaml",
+     "tag": "s",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a42f13239",
+     "file": "recipes/catalog_loop_signed.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a42f13239",
+     "file": "tools/zero_shot_parent.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 268
+  },
+  {
+   "start": "6c84f564c6",
+   "end": "2d79de94b3",
+   "runs": [
+    "a3ef68c2d"
+   ],
+   "first_verdict": "fix first",
+   "lines": 42573,
+   "commits": 16,
+   "n_files": 25,
+   "commits_hand": 16,
+   "trigger_lines": 1744,
+   "trigger_commits": 14,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a3ef68c2d",
+     "file": "tools/item_checks.py",
+     "tag": "s",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a3ef68c2d",
+     "file": "analysis/catalog_daniel/level_range.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3ef68c2d",
+     "file": "data_mmap.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a3ef68c2d",
+     "file": "recipes/gen_catalog_v3.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 1122
+  },
+  {
+   "start": "2d79de94b3",
+   "end": "9b9f62d421",
+   "runs": [
+    "ace557ba2"
+   ],
+   "first_verdict": "fix first",
+   "lines": 43320,
+   "commits": 10,
+   "n_files": 10,
+   "commits_hand": 10,
+   "trigger_lines": 444,
+   "trigger_commits": 8,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "ace557ba2",
+     "file": "recipes/select_catalog_v3.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ace557ba2",
+     "file": "recipes/gen_catalog_v3.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 479
+  },
+  {
+   "start": "9b9f62d421",
+   "end": "31954d7056",
+   "runs": [
+    "acf8c4fac"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2160,
+   "commits": 5,
+   "n_files": 11,
+   "commits_hand": 5,
+   "trigger_lines": 209,
+   "trigger_commits": 3,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "acf8c4fac",
+     "file": "recipes/select_catalog_v3.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acf8c4fac",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acf8c4fac",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acf8c4fac",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acf8c4fac",
+     "file": "tests/test_beam_order.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "acf8c4fac",
+     "file": "analysis/catalog_v3/pool_precision.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "acf8c4fac",
+     "file": ".claude/hooks/continuous_list_guard.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 7,
+   "lines_hand": 453
+  },
+  {
+   "start": "31954d7056",
+   "end": "8efdbe8fbe",
+   "runs": [
+    "a885dac3f"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1616,
+   "commits": 14,
+   "n_files": 18,
+   "commits_hand": 13,
+   "trigger_lines": 421,
+   "trigger_commits": 12,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a885dac3f",
+     "file": "data_mmap.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a885dac3f",
+     "file": "analysis/catalog_daniel/shape_learn.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 430
+  },
+  {
+   "start": "8efdbe8fbe",
+   "end": "fc65a545c3",
+   "runs": [
+    "a01601dd5"
+   ],
+   "first_verdict": "fix first",
+   "lines": 5736,
+   "commits": 1,
+   "n_files": 4,
+   "commits_hand": 1,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a01601dd5",
+     "file": "recipes/gen_catalog_v3.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a01601dd5",
+     "file": "recipes/gen_catalog_v3.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a01601dd5",
+     "file": "recipes/catalog_v3_loops.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 104
+  },
+  {
+   "start": "fc65a545c3",
+   "end": "0d440d9d6a",
+   "runs": [
+    "abf3fa721"
+   ],
+   "first_verdict": "fix first",
+   "lines": 191,
+   "commits": 3,
+   "n_files": 4,
+   "commits_hand": 2,
+   "trigger_lines": 2,
+   "trigger_commits": 1,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "abf3fa721",
+     "file": "recipes/select_catalog_v3.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "abf3fa721",
+     "file": "tools/nlo_pole_check.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 23
+  },
+  {
+   "start": "0d440d9d6a",
+   "end": "02e6e60247",
+   "runs": [
+    "a49b5bd73"
+   ],
+   "first_verdict": "fix first",
+   "lines": 859,
+   "commits": 10,
+   "n_files": 7,
+   "commits_hand": 5,
+   "trigger_lines": 746,
+   "trigger_commits": 8,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a49b5bd73",
+     "file": "tools/nlo_pole_check.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 0,
+   "lines_hand": 84
+  },
+  {
+   "start": "02e6e60247",
+   "end": "6f13824333",
+   "runs": [
+    "aac7c1218",
+    "acb2a5366"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2754,
+   "commits": 12,
+   "n_files": 34,
+   "commits_hand": 12,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "aac7c1218",
+     "file": "recipes/catalog_v3_gen_stage2.yaml",
+     "tag": "pre",
+     "area": "configs",
+     "kind": "none"
+    },
+    {
+     "reviewer": "aac7c1218",
+     "file": "tools/nlo_virtual_pipeline.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "aac7c1218",
+     "file": "tools/nlo_virtual_pipeline.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "aac7c1218",
+     "file": "tools/nlo_virtual_pipeline.py",
+     "tag": "pre",
+     "area": "generation",
+     "kind": "none"
+    },
+    {
+     "reviewer": "acb2a5366",
+     "file": "analysis/transfer/nogain_fig.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "acb2a5366",
+     "file": "analysis/transfer/expect_tp3.json",
+     "tag": "outside",
+     "area": "analysis",
+     "kind": "none"
+    },
+    {
+     "reviewer": "acb2a5366",
+     "file": "sweep/sweep_config_tp3_*ftelo*.yaml",
+     "tag": "s",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 694
+  },
+  {
+   "start": "6f13824333",
+   "end": "ef6b3c6f2c",
+   "runs": [
+    "a65d9c470"
+   ],
+   "first_verdict": "fix first",
+   "lines": 864,
+   "commits": 5,
+   "n_files": 16,
+   "commits_hand": 5,
+   "trigger_lines": 632,
+   "trigger_commits": 3,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a65d9c470",
+     "file": "wrappers.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a65d9c470",
+     "file": "tools/kshot_context.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 796
+  },
+  {
+   "start": "ef6b3c6f2c",
+   "end": "f388bd999d",
+   "runs": [
+    "ab9d9d6e0"
+   ],
+   "first_verdict": "fix first",
+   "lines": 25877,
+   "commits": 27,
+   "n_files": 35,
+   "commits_hand": 26,
+   "trigger_lines": 923,
+   "trigger_commits": 23,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "scripts/job_catalog_v3_short.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "docs/results.tex",
+     "tag": "outside",
+     "area": "other",
+     "kind": "none"
+    },
+    {
+     "reviewer": "ab9d9d6e0",
+     "file": "analysis/catalog_daniel/kshot_context_cmp.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 7,
+   "lines_hand": 965
+  },
+  {
+   "start": "f388bd999d",
+   "end": "8973d2d276",
+   "runs": [
+    "a710a3cdd"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1611,
+   "commits": 5,
+   "n_files": 9,
+   "commits_hand": 5,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a710a3cdd",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a710a3cdd",
+     "file": "recipes/make_catalog_v3_recipes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a710a3cdd",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a710a3cdd",
+     "file": "scripts/job_catalog_v3_short.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a710a3cdd",
+     "file": "scripts/job_catalog_v3_short.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 79
+  },
+  {
+   "start": "8973d2d276",
+   "end": "268e259e91",
+   "runs": [
+    "a8c6e01f8"
+   ],
+   "first_verdict": "pass",
+   "lines": 76388,
+   "commits": 16,
+   "n_files": 29,
+   "commits_hand": 16,
+   "trigger_lines": 55,
+   "trigger_commits": 2,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a8c6e01f8",
+     "file": "recipes/gen_catalog_v3_pp.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a8c6e01f8",
+     "file": "recipes/gen_catalog_v3_pp.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a8c6e01f8",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a8c6e01f8",
+     "file": "tools/factorised_2to4.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a8c6e01f8",
+     "file": "analysis/catalog_v3/short_reads.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 733
+  },
+  {
+   "start": "268e259e91",
+   "end": "964df00039",
+   "runs": [
+    "ab95446ad"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1011,
+   "commits": 26,
+   "n_files": 26,
+   "commits_hand": 26,
+   "trigger_lines": 947,
+   "trigger_commits": 23,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "ab95446ad",
+     "file": "scripts/job_factorised_2to5_net_v3.sh",
+     "tag": "s",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab95446ad",
+     "file": "analysis/catalog_v3/kshot_context.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 632
+  },
+  {
+   "start": "964df00039",
+   "end": "b231dac078",
+   "runs": [
+    "a3690edb5",
+    "a50158cd1",
+    "a44fb18c2",
+    "aa6fc3446",
+    "ad1f0034c",
+    "ad795b8d4",
+    "a1495e04b"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1380,
+   "commits": 32,
+   "n_files": 39,
+   "commits_hand": 29,
+   "trigger_lines": 1098,
+   "trigger_commits": 19,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": ".claude/hooks/plan_check.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": ".claude/hooks/plan_check.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "plan/migrate.py",
+     "tag": "outside",
+     "area": "tooling",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a3690edb5",
+     "file": "sweep/gen_lowd_*.py",
+     "tag": "s",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a50158cd1",
+     "file": ".claude/hooks/claims_guard.py",
+     "tag": "outside",
+     "area": "tooling",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a50158cd1",
+     "file": "tools/verify_claims.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a50158cd1",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a50158cd1",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a50158cd1",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a50158cd1",
+     "file": "sweep/gen_lowd_*.py",
+     "tag": "s",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": ".githooks/pre-commit",
+     "tag": "outside",
+     "area": "tooling",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "tools/verify_claims.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "sweep/gen_lowd_dyhpo.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "analysis/transfer/expect_tp3.json",
+     "tag": "outside",
+     "area": "analysis",
+     "kind": "none"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a44fb18c2",
+     "file": "tools/plan.py",
+     "tag": "s",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aa6fc3446",
+     "file": "tools/verify_claims.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aa6fc3446",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aa6fc3446",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aa6fc3446",
+     "file": ".claude/hooks/git_verify_guard.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aa6fc3446",
+     "file": "tools/switch_over.sh",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ad1f0034c",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ad1f0034c",
+     "file": ".claude/hooks/plan_check.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ad1f0034c",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ad795b8d4",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ad795b8d4",
+     "file": "tools/verify_claims.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a1495e04b",
+     "file": "sweep/gen_transfer_pilot.py",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 33,
+   "lines_hand": 1278
+  },
+  {
+   "start": "b231dac078",
+   "end": "afac9b1993",
+   "runs": [
+    "ae502ad7f"
+   ],
+   "first_verdict": "fix first",
+   "lines": 3979,
+   "commits": 17,
+   "n_files": 18,
+   "commits_hand": 17,
+   "trigger_lines": 3748,
+   "trigger_commits": 12,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "ae502ad7f",
+     "file": "analysis/catalog_v3/pp_compare.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ae502ad7f",
+     "file": "analysis/catalog_v3/prep_level.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ae502ad7f",
+     "file": "analysis/catalog_v3/prep_level.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 3979
+  },
+  {
+   "start": "afac9b1993",
+   "end": "ca5108ea03",
+   "runs": [
+    "a40c942e8"
+   ],
+   "first_verdict": "fix first",
+   "lines": 147181,
+   "commits": 28,
+   "n_files": 53,
+   "commits_hand": 28,
+   "trigger_lines": 1700,
+   "trigger_commits": 16,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a40c942e8",
+     "file": "analysis/catalog_v3/coverage_check.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": "analysis/catalog_v3/coverage_check.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": ".claude/hooks/review_backlog.sh",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": "tools/verify_claims.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a40c942e8",
+     "file": "recipes/gen_catalog_v4.py",
+     "tag": "s",
+     "area": "generation",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 8,
+   "lines_hand": 3250
+  },
+  {
+   "start": "ca5108ea03",
+   "end": "08301b4a1f",
+   "runs": [
+    "ae8f0d464"
+   ],
+   "first_verdict": "pass",
+   "lines": 522,
+   "commits": 8,
+   "n_files": 9,
+   "commits_hand": 8,
+   "trigger_lines": 522,
+   "trigger_commits": 8,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 522
+  },
+  {
+   "start": "08301b4a1f",
+   "end": "0490f0a214",
+   "runs": [
+    "acf50c188"
+   ],
+   "first_verdict": "pass",
+   "lines": 907,
+   "commits": 8,
+   "n_files": 9,
+   "commits_hand": 8,
+   "trigger_lines": 762,
+   "trigger_commits": 7,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 907
+  },
+  {
+   "start": "0490f0a214",
+   "end": "283868e516",
+   "runs": [
+    "ae360bb92"
+   ],
+   "first_verdict": "fix first",
+   "lines": 436,
+   "commits": 5,
+   "n_files": 10,
+   "commits_hand": 5,
+   "trigger_lines": 436,
+   "trigger_commits": 5,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "ae360bb92",
+     "file": "analysis/storage/free_space.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 436
+  },
+  {
+   "start": "283868e516",
+   "end": "061929e208",
+   "runs": [
+    "a82e3868a"
+   ],
+   "first_verdict": "pass",
+   "lines": 2774,
+   "commits": 4,
+   "n_files": 23,
+   "commits_hand": 4,
+   "trigger_lines": 2774,
+   "trigger_commits": 4,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 118
+  },
+  {
+   "start": "061929e208",
+   "end": "22830cca54",
+   "runs": [
+    "a1f6bef38"
+   ],
+   "first_verdict": "fix first",
+   "lines": 763,
+   "commits": 3,
+   "n_files": 21,
+   "commits_hand": 3,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a1f6bef38",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a1f6bef38",
+     "file": "tests/test_setup_scenarios.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a1f6bef38",
+     "file": ".claude/hooks/review_backlog.sh",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 118
+  },
+  {
+   "start": "22830cca54",
+   "end": "e7cddfce68",
+   "runs": [
+    "a483146da"
+   ],
+   "first_verdict": "fix first",
+   "lines": 209,
+   "commits": 3,
+   "n_files": 6,
+   "commits_hand": 3,
+   "trigger_lines": 151,
+   "trigger_commits": 1,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a483146da",
+     "file": "tests/test_setup_scenarios.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a483146da",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 209
+  },
+  {
+   "start": "e7cddfce68",
+   "end": "abd3ee7979",
+   "runs": [
+    "ac7614f63"
+   ],
+   "first_verdict": "pass",
+   "lines": 121,
+   "commits": 3,
+   "n_files": 5,
+   "commits_hand": 3,
+   "trigger_lines": 121,
+   "trigger_commits": 3,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 121
+  },
+  {
+   "start": "abd3ee7979",
+   "end": "39886d3a8b",
+   "runs": [
+    "a76c9cfa0",
+    "a288f1e9b"
+   ],
+   "first_verdict": "fix first",
+   "lines": 773,
+   "commits": 6,
+   "n_files": 8,
+   "commits_hand": 6,
+   "trigger_lines": 579,
+   "trigger_commits": 1,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a76c9cfa0",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a76c9cfa0",
+     "file": "prebuild_recipes.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 773
+  },
+  {
+   "start": "39886d3a8b",
+   "end": "5a3454f87a",
+   "runs": [
+    "a1fa13a24",
+    "ac7556d1d",
+    "a45ab36a9"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1265,
+   "commits": 22,
+   "n_files": 24,
+   "commits_hand": 22,
+   "trigger_lines": 758,
+   "trigger_commits": 9,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a1fa13a24",
+     "file": "mg5_pipeline_final.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a1fa13a24",
+     "file": "analysis/catalog_v3/prep_sampling_pools.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a1fa13a24",
+     "file": "analysis/catalog_v3/prep_sampling_pools.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a1fa13a24",
+     "file": "analysis/catalog_v3/prep_signed*.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 1191
+  },
+  {
+   "start": "5a3454f87a",
+   "end": "3ba9df355a",
+   "runs": [
+    "a29d098b7"
+   ],
+   "first_verdict": "pass",
+   "lines": 212,
+   "commits": 1,
+   "n_files": 2,
+   "commits_hand": 1,
+   "trigger_lines": 212,
+   "trigger_commits": 1,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 212
+  },
+  {
+   "start": "3ba9df355a",
+   "end": "97bc941939",
+   "runs": [
+    "a46a7ebc4"
+   ],
+   "first_verdict": "fix first",
+   "lines": 5856,
+   "commits": 2,
+   "n_files": 15,
+   "commits_hand": 2,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a46a7ebc4",
+     "file": "tools/mixed_order_virt_check.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 774
+  },
+  {
+   "start": "97bc941939",
+   "end": "d56497364d",
+   "runs": [
+    "a0a8d0011"
+   ],
+   "first_verdict": "pass",
+   "lines": 600,
+   "commits": 7,
+   "n_files": 4,
+   "commits_hand": 7,
+   "trigger_lines": 600,
+   "trigger_commits": 7,
+   "fired": "lines",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 600
+  },
+  {
+   "start": "d56497364d",
+   "end": "76b8f68999",
+   "runs": [
+    "a01f2ee05",
+    "a96789955"
+   ],
+   "first_verdict": "fix first",
+   "lines": 246,
+   "commits": 3,
+   "n_files": 10,
+   "commits_hand": 3,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a01f2ee05",
+     "file": "analysis/transfer/nogain_readout_za.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a01f2ee05",
+     "file": "tools/pole_guard_diag.py",
+     "tag": "b",
+     "area": "generation",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a96789955",
+     "file": "scripts/job_catalog_v3_short.sh",
+     "tag": "b",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a96789955",
+     "file": "wrappers.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a96789955",
+     "file": "wrappers.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 5,
+   "lines_hand": 246
+  },
+  {
+   "start": "76b8f68999",
+   "end": "46841b697b",
+   "runs": [
+    "a8e68cc68"
+   ],
+   "first_verdict": "pass",
+   "lines": 5598,
+   "commits": 1,
+   "n_files": 8,
+   "commits_hand": 1,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 84
+  },
+  {
+   "start": "46841b697b",
+   "end": "bb0632cc3b",
+   "runs": [
+    "a98f917ed"
+   ],
+   "first_verdict": "pass",
+   "lines": 314,
+   "commits": 4,
+   "n_files": 8,
+   "commits_hand": 4,
+   "trigger_lines": 314,
+   "trigger_commits": 4,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 227
+  },
+  {
+   "start": "bb0632cc3b",
+   "end": "dfa596242d",
+   "runs": [
+    "a7d6b1d78"
+   ],
+   "first_verdict": "pass",
+   "lines": 11167,
+   "commits": 1,
+   "n_files": 3,
+   "commits_hand": 1,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 41
+  },
+  {
+   "start": "dfa596242d",
+   "end": "886e51c6c2",
+   "runs": [
+    "ab79ab9cb"
+   ],
+   "first_verdict": "fix first",
+   "lines": 592,
+   "commits": 7,
+   "n_files": 13,
+   "commits_hand": 7,
+   "trigger_lines": 592,
+   "trigger_commits": 7,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "ab79ab9cb",
+     "file": "analysis/transfer/ema_start_audit.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab79ab9cb",
+     "file": "analysis/transfer/ema_start_audit.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab79ab9cb",
+     "file": "analysis/transfer/ema_start_audit.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab79ab9cb",
+     "file": "analysis/transfer/ema_start_audit.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab79ab9cb",
+     "file": "analysis/transfer/ema_start_audit.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ab79ab9cb",
+     "file": "analysis/transfer/ema_start_audit.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 6,
+   "lines_hand": 592
+  },
+  {
+   "start": "886e51c6c2",
+   "end": "1239fb0df0",
+   "runs": [
+    "a0e3f283e"
+   ],
+   "first_verdict": "fix first",
+   "lines": 854,
+   "commits": 15,
+   "n_files": 7,
+   "commits_hand": 15,
+   "trigger_lines": 854,
+   "trigger_commits": 15,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a0e3f283e",
+     "file": "analysis/catalog_v3/muon_compare.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 854
+  },
+  {
+   "start": "1239fb0df0",
+   "end": "1e3414069e",
+   "runs": [
+    "a48d20fe6"
+   ],
+   "first_verdict": "fix first",
+   "lines": 732,
+   "commits": 5,
+   "n_files": 12,
+   "commits_hand": 5,
+   "trigger_lines": 732,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a48d20fe6",
+     "file": "tests/test_per_process_accumulation.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 732
+  },
+  {
+   "start": "1e3414069e",
+   "end": "a677e971ba",
+   "runs": [
+    "a8327e648"
+   ],
+   "first_verdict": "pass",
+   "lines": 0,
+   "commits": 0,
+   "n_files": 0,
+   "commits_hand": 0,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 0
+  },
+  {
+   "start": "a677e971ba",
+   "end": "4968a1dc34",
+   "runs": [
+    "a673c6a88"
+   ],
+   "first_verdict": "pass",
+   "lines": 83,
+   "commits": 1,
+   "n_files": 4,
+   "commits_hand": 1,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [],
+   "n_blocking": 0,
+   "lines_hand": 75
+  },
+  {
+   "start": "4968a1dc34",
+   "end": "1901dfec4d",
+   "runs": [
+    "a7b008ece"
+   ],
+   "first_verdict": "fix first",
+   "lines": 223,
+   "commits": 6,
+   "n_files": 13,
+   "commits_hand": 6,
+   "trigger_lines": 0,
+   "trigger_commits": 0,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a7b008ece",
+     "file": "analysis/catalog_v4/validate_v4.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 223
+  },
+  {
+   "start": "1901dfec4d",
+   "end": "f9223ba6a3",
+   "runs": [
+    "a7067849c"
+   ],
+   "first_verdict": "fix first",
+   "lines": 656,
+   "commits": 6,
+   "n_files": 18,
+   "commits_hand": 6,
+   "trigger_lines": 656,
+   "trigger_commits": 6,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a7067849c",
+     "file": "analysis/catalog_v3/pair_head_blowup.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a7067849c",
+     "file": "analysis/catalog_v3/pair_head_blowup.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 463
+  },
+  {
+   "start": "f9223ba6a3",
+   "end": "9144fb16b5",
+   "runs": [
+    "ae234e93d"
+   ],
+   "first_verdict": "fix first",
+   "lines": 8309,
+   "commits": 3,
+   "n_files": 23,
+   "commits_hand": 3,
+   "trigger_lines": 181,
+   "trigger_commits": 1,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "ae234e93d",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    }
+   ],
+   "n_blocking": 1,
+   "lines_hand": 583
+  },
+  {
+   "start": "9144fb16b5",
+   "end": "5e7fa801ec",
+   "runs": [
+    "ac2e48370",
+    "aa16f42d2"
+   ],
+   "first_verdict": "fix first",
+   "lines": 8628,
+   "commits": 4,
+   "n_files": 13,
+   "commits_hand": 4,
+   "trigger_lines": 291,
+   "trigger_commits": 2,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "ac2e48370",
+     "file": "scripts/job_catalog_v3_short.sh",
+     "tag": "s",
+     "area": "jobs",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ac2e48370",
+     "file": "base_experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "ac2e48370",
+     "file": "sweep/sweep_config_ccin2p3_sign_head_search.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "ac2e48370",
+     "file": "sweep/sweep_config_ccin2p3_sign_head_search.yaml",
+     "tag": "b",
+     "area": "configs",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 456
+  },
+  {
+   "start": "5e7fa801ec",
+   "end": "5cd8c2b345",
+   "runs": [
+    "a4ddbbde7",
+    "a84f775a4"
+   ],
+   "first_verdict": "fix first",
+   "lines": 1105,
+   "commits": 13,
+   "n_files": 11,
+   "commits_hand": 13,
+   "trigger_lines": 580,
+   "trigger_commits": 9,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "a4ddbbde7",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a4ddbbde7",
+     "file": "experiment.py",
+     "tag": "s",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a4ddbbde7",
+     "file": "experiment.py",
+     "tag": "b",
+     "area": "training",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a4ddbbde7",
+     "file": "analysis/catalog_v3/muon_hp_ft.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 1105
+  },
+  {
+   "start": "5cd8c2b345",
+   "end": "1886d7fe35",
+   "runs": [
+    "aac268be6"
+   ],
+   "first_verdict": "fix first",
+   "lines": 790,
+   "commits": 12,
+   "n_files": 7,
+   "commits_hand": 12,
+   "trigger_lines": 435,
+   "trigger_commits": 9,
+   "fired": "neither",
+   "findings": [
+    {
+     "reviewer": "aac268be6",
+     "file": "analysis/catalog_v4/compare_v3.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aac268be6",
+     "file": "analysis/catalog_v4/compare_v3.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "aac268be6",
+     "file": "analysis/catalog_v4/compare_v3.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 790
+  },
+  {
+   "start": "1886d7fe35",
+   "end": "6e34f573f3",
+   "runs": [
+    "a7c8e72a9"
+   ],
+   "first_verdict": "fix first",
+   "lines": 997,
+   "commits": 5,
+   "n_files": 9,
+   "commits_hand": 5,
+   "trigger_lines": 997,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a7c8e72a9",
+     "file": "analysis/catalog_v4/compare_pp_trained.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a7c8e72a9",
+     "file": "analysis/catalog_v4/compare_pp_trained.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 2,
+   "lines_hand": 997
+  },
+  {
+   "start": "6e34f573f3",
+   "end": "c3fb4f6b12",
+   "runs": [
+    "ad8653270",
+    "abfd23009",
+    "a31553fb5",
+    "a07daf8c2"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2057,
+   "commits": 19,
+   "n_files": 12,
+   "commits_hand": 19,
+   "trigger_lines": 828,
+   "trigger_commits": 7,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "ad8653270",
+     "file": "tools/plan.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "edit"
+    },
+    {
+     "reviewer": "a31553fb5",
+     "file": "analysis/catalog_v4/density_check.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a31553fb5",
+     "file": "analysis/catalog_v4/density_check.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a31553fb5",
+     "file": "analysis/catalog_v4/density_check.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 4,
+   "lines_hand": 2057
+  },
+  {
+   "start": "c3fb4f6b12",
+   "end": "80367b7d17",
+   "runs": [
+    "a1ed4d0d6",
+    "a3d7629c2"
+   ],
+   "first_verdict": "fix first",
+   "lines": 2203,
+   "commits": 9,
+   "n_files": 14,
+   "commits_hand": 9,
+   "trigger_lines": 1444,
+   "trigger_commits": 5,
+   "fired": "lines",
+   "findings": [
+    {
+     "reviewer": "a1ed4d0d6",
+     "file": ".claude/hooks/send_check.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a1ed4d0d6",
+     "file": "talks/progress_oct2026b/make_figs.py",
+     "tag": "b",
+     "area": "analysis",
+     "kind": "new file"
+    },
+    {
+     "reviewer": "a3d7629c2",
+     "file": ".claude/hooks/send_check.py",
+     "tag": "b",
+     "area": "tooling",
+     "kind": "new file"
+    }
+   ],
+   "n_blocking": 3,
+   "lines_hand": 2203
+  }
+ ],
+ "summary": {
+  "n_runs": 138,
+  "n_episodes": 106,
+  "fired_lines": 62,
+  "fired_both": 2,
+  "fired_commits_only": 0,
+  "fired_neither": 44,
+  "ep_blocking": 79,
+  "n_find": 278,
+  "n_code": 254,
+  "n_scope": 24,
+  "n_hand": 261,
+  "n_configs": 17,
+  "hand_klines": 67.6,
+  "all_klines": 953,
+  "configs_klines": 885,
+  "commits": 1108,
+  "per_ep": 2.62,
+  "median_hand": 413,
+  "rate": 3.86,
+  "rate_lo": 3.26,
+  "rate_hi": 4.49,
+  "rate_code": 3.55,
+  "per_commit": 0.25,
+  "rate_hook": 0.29,
+  "rate_configs": 0.019,
+  "exp600": 2.32,
+  "exp1500": 5.79,
+  "exp600_hook": 0.18,
+  "exp1500_hook": 0.44,
+  "n_pre": 17,
+  "n_outside": 10,
+  "tooling_top_review": 29,
+  "commits_hand": 1044,
+  "rate_p_lo": 3.62,
+  "rate_p_hi": 4.11,
+  "tooling_n": 43,
+  "tooling_klines": 8.11,
+  "tooling_rate": 5.3,
+  "tooling_lo": 1.7,
+  "tooling_hi": 10.84,
+  "analysis_n": 84,
+  "analysis_klines": 30.05,
+  "analysis_rate": 2.8,
+  "analysis_lo": 2.31,
+  "analysis_hi": 3.35,
+  "training_n": 39,
+  "training_klines": 9.69,
+  "training_rate": 4.03,
+  "training_lo": 2.83,
+  "training_hi": 5.61,
+  "jobs_n": 52,
+  "jobs_klines": 8.57,
+  "jobs_rate": 6.06,
+  "jobs_lo": 5.09,
+  "jobs_hi": 7.08,
+  "generation_n": 43,
+  "generation_klines": 10.71,
+  "generation_rate": 4.01,
+  "generation_lo": 3.06,
+  "generation_hi": 5.43,
+  "new_n": 141,
+  "new_klines": 45.88,
+  "new_rate": 3.07,
+  "new_lo": 2.36,
+  "new_hi": 3.85,
+  "edit_n": 120,
+  "edit_klines": 21.15,
+  "edit_rate": 5.67,
+  "edit_lo": 4.83,
+  "edit_hi": 6.6
+ }
+}
