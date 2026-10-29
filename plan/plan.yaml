@@ -1926,11 +1926,11 @@ entries:
       Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio to catalog_v4''s
       standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density check''s error correlation)
       on recipes/catalog_v4_pp_test.yaml'
-    6: 'Default-sampled share in catalog_v4''s tree pools: ask the user the calls the design leaves open (the default fraction
-      arms 0.50 and 0.25, the e+e- collider energies and run-card cuts, a default share for the one-loop pools and for the
-      heavy-quark, cut and alpha_s variants), and in parallel implement the default share in the mixture builder (recipe field
-      and identity, lhe path per entry, e+e- run card and lhe kind, the e+e- default-sampled test read), tested locally on
-      CPU; no job before the user''s answers'
+    6: 'Run the pure-default bound (design passed 2026-10-29): the Muon short pretraining on recipes/catalog_v4_pp_mixed_train.yaml
+      (466 hadronic tree training classes on their 13 TeV pp events, the rest catalog_v4''s own pools), seeds 42 and 43, at
+      catalog_v4''s Muon short-run settings (4264 steps), about 3.5 GPU-h; first check by recipe id that the control''s non-swapped
+      pools match (else rerun the control, about 3 GPU-h more); submit only once the pp13v4 validation (step 1) has passed;
+      read on pp13v4 test rows and the smart test pools'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -2914,12 +2914,14 @@ entries:
       - 'all 992 built and every ratio is 0: redo the pp comparisons on catalog_v4_pp_test.yaml'
       - 'an entry short again or a nonzero ratio: list it with its cause, fix it, and rerun only that entry'
     6:
-      feeds: whether catalog_v4's final mixture includes a default-sampled (MadEvent unweighted) share, and at which fraction
+      feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
+        mixture A/B the user asked for (2026-10-29)
       if:
-      - 'the user confirms the arms and energies and the implementation passes its local tests: build arm B''s training pools
-        on CC (about 500 core-hours) and run the A/B short pretrainings (about 7 to 10 GPU-h)'
-      - 'the user changes the fractions, the energies or the scope (loops, variants): redo the design with their words before
-        any generation'
+      - 'the pp arm is below catalog_v4 on default-sampled events beyond the seed spread (per-class ratio below 0.8, lower
+        in both seeds on most classes): design the mixture A/B (default share 0.50 and 0.25, e+e- at fixed collider energies
+        as its own group), asking the user the fractions, energies, loops and variants first'
+      - 'within the spread or above catalog_v4: report to the user with the 1e4-vs-1e5 pool-size caveat and propose dropping
+        the hadronic default share, their call; ask the e+e- question separately'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
