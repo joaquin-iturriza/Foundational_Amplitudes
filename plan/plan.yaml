@@ -2081,14 +2081,14 @@ entries:
       smart-mixture pools by the arm and both controls (an axis the job script lacks; not needed to submit). Control reused:
       catalog_v4''s Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29) read exactly the 1068 pools (356 entries
       x 3 roles) the mixed recipe keeps (analysis/catalog_v4/control_pool_check.py @c809ca44: 1068 same).'
-    7: 'Default-share generation layout (implementation done at c865826b; nothing submitted): the dsh pools hold 48.8M new
-      MadEvent events over 912 training classes (recipes/catalog_v4_default_lhe.yaml, 0.50 arm with a 0.10 acceptance margin;
-      the 0.25 arm reads a prefix) plus 340k e+e- test events (catalog_v4_ee_test.yaml). One job per class does not fit CC''s
-      submit cap (site pick: 77 slots left of 100 on 2026-10-29) and a 2->4 class''s 6e4 events take hours in one MadEvent
-      sequence, so ''under an hour'' needs the dsh pools split into per-run sub-entries (one MadEvent run per job, the runs''
-      events concatenated in run order at read time) and a feeder within the cap; implement and test that, then submit only
-      once the passed design''s order allows it (the pure-default bound first) or the user''s words say otherwise. Rerun recipes/gen_catalog_v4_default.py
-      after the staged pp n_runs change lands'
+    7: 'Collect the default-share generation: the parts queues $SCRATCH/lhe_queue/catalog_v4_default (4243 one-run MadEvent
+      tasks: 912 dsh pools and 170 e+e- test pools, estimated 1000 core-h, 150 workers of 16 cores, 2 h limit) and $SCRATCH/lhe_queue/pp13v4_ud_dggu
+      (32 runs at 8 cores, 16 workers, 3 h limit), read with site run ... python tools/lhe_parts.py status --queue Q and the
+      workers'' logs; failed tasks: read failed/*.err, fix, replan (plan requeues them) and resubmit workers; a stalled run
+      returning fewer events than asked shows up as an assembly refusing short blocks: lower its run_events in recipes/gen_catalog_v4_default.py.
+      Then, once every pool is assembled and the pp13v4 validation (step 1) has passed, design and run the mixture A/B pretrainings
+      (default share 0.50 and 0.25, recipes/catalog_v4_default{50,25}_train.yaml) at catalog_v4''s Muon short-run settings,
+      sized by the pure-default bound (step 6)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3260,10 +3260,9 @@ entries:
     7:
       feeds: whether catalog_v4's final mixture includes a default-sampled share, and at which fraction
       if:
-      - 'the per-run split and feeder pass their local tests and the bound shows room (or the user asks for the generation
-        now): submit the dsh generation on CC under catalog_coverage, wall time planned from site pick and the measured per-run
-        times'
-      - 'the bound shows no room for a hadronic share: generate only the e+e- share and test pools, and report to the user'
+      - 'every pool assembled and the pp validation passed: design the A/B pretrainings (default share 0.50 and 0.25 against
+        catalog_v4), with the user''s calls on fractions and e+e- energies asked first if still open'
+      - 'tasks failed or pools short: list them with their cause, fix and requeue only those, then collect again'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
