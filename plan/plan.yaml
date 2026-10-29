@@ -510,6 +510,9 @@ entries:
       from H5_signed.txt); 15 of 21 gives one-sided p=0.039; searched signext, more_signed, more sign-changing, sign-changing
       pools, v4 sign, signed_ab, loop_signed, and catalog_norm, qperp_soft, f24, f24net, catalog_coverage: no catalog_v4 run
       of the extension exists.'
+  continuous:
+    quote: Keep iterating.
+    at: '2026-10-29T05:33:23+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
