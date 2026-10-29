@@ -2253,6 +2253,89 @@ target or input change for it, checked first on these reads.
   \label{fig:v4_loop_groups}
 \end{figure}
 
+% src: python3 analysis/catalog_v4/loop_levels.py --loop-born @9c9f2b06
+% claim: lb.n_train=85
+% claim: lb.n_heldout=21
+% claim: lb.n_loop_induced=17
+% claim: lb.n_no_born_read=13
+% claim: lb.n_signed_train=56
+% claim: lb.n_signed_heldout=15
+% claim: lb.n_heldout_matched=16
+% claim: lb.n_classes_multi=12
+% claim: lb.none.median_abs_departure=1.24
+% claim: lb.none.median_class_sd=2.55
+% claim: lb.none.train_sd=2.88
+% claim: lb.none.departure_in_train_sd=0.429
+% claim: lb.none.class_sd_in_train_sd=0.885
+% claim: lb.born_rel.median_abs_departure=0.851
+% claim: lb.born_rel.median_class_sd=1.01
+% claim: lb.born_rel.train_sd=1.45
+% claim: lb.born_rel.departure_in_train_sd=0.586
+% claim: lb.born_rel.class_sd_in_train_sd=0.694
+% claim: lb.born_rel.n_dep_narrowed=12
+% claim: lb.born_rel.p_dep=0.0384
+% claim: lb.born_rel.n_sd_narrowed=12
+% claim: lb.born_rel.p_sd=0.000244
+% claim: lb.born_rel_pole.median_abs_departure=0.903
+% claim: lb.born_rel_pole.median_class_sd=1.06
+% claim: lb.born_rel_pole.n_dep_narrowed=11
+% claim: lb.born_rel_pole.p_dep=0.105
+% claim: lb.rho_offset_step.seed42=-0.02
+% claim: lb.p_offset_step.seed42=0.924
+% claim: lb.rho_offset_step.seed43=-0.3
+% claim: lb.p_offset_step.seed43=0.188
+% claim: lb.rho_offset_step.mean=-0.21
+% claim: lb.rho_offset_departure.none=0.1
+% claim: lb.rho_offset_departure.born_rel=-0.28
+% allow: 0.05 because it is the entry's significance convention for a one-sided sign test
+% allow: 0.34 0.37 because they are quoted from par:v4_mult_bias
+% allow: 2 42 43 because they are the class-size floor of a spread and the seeds, settings
+\paragraph{The one-loop target relative to its Born (2026-10-29).}\label{par:v4_loop_born} The question, from
+par.~\ref{par:v4_loop_groups} and the user's first priority (the zero-shot bias): the one-loop axis's level error has a
+source of its own, placed low and largest in thin classes; does a target change that takes out what a one-loop pool's
+level shares with its Born narrow, on the existing reads, the held-out one-loop pools' departures from their matched
+training pools and the spread of the training levels within a class? The stored one-loop QCD virtual is the
+$\alpha_s$-stripped $(c_0+\delta)|\mathcal M_0|^2$, and a virtual and its Born tree carry the same $F$ (the same legs,
+the Born's coupling powers), so event by event $t_{\mathrm{virt}}-t_{\mathrm{Born}}=\log|c_0+\delta|$: the Born's level
+drops out. The Born is not stored per event, so it is read at the pool level, $\overline t-\overline t_{\mathrm{Born}}$,
+$\overline t_{\mathrm{Born}}$ the level of the entry's Born tree pool in the tree dump of par.~\ref{par:v4_tree_levels}.
+That is a proxy, not checked per event: the tree pools are sampled with the mixture and the one-loop pools are never
+shaped, so the two means are over different measures. Two candidates, fixed before their numbers were read and named
+from the target's definition, no fitted scale: the Born removed, and the Born and the universal double pole removed
+($\overline t-\overline t_{\mathrm{Born}}-\log|c_2|$, $c_2=-\sum_i C_i$ over the massless coloured legs, the generator's
+own pole check). The pools: the $85$ training and $21$ held-out virtual pools whose Born tree pool is read ($17$
+loop-induced pools have no Born, $13$ have no read one: the pure-QCD-born entries and Borns outside the tree catalog);
+$56$ and $15$ of them signed. $16$ held-out pools have matched training pools (the one rule: multiplicity, initial
+state, born orders), $12$ training classes hold two pools or more. Each candidate is counted as narrowing on a
+one-sided sign test over pools (classes) at $p<0.05$ (\code{analysis/catalog\_v4/loop\_levels.py --loop-born},
+Fig.~\ref{fig:v4_loop_born}).
+With the Born removed the median held-out departure falls from $1.24$ to $0.851$, narrower on $12$ of the $16$
+($p=0.0384$), and the median spread within a class from $2.55$ to $1.01$, narrower in $12$ of $12$ ($p=0.000244$). The
+overall training spread halves as well ($2.88$ to $1.45$): in units of it the within-class spread still narrows
+($0.885$ to $0.694$) but the departures widen ($0.429$ to $0.586$). So the gain is in absolute units, which is what the
+network has to place if the Born is known at each event, and in the class structure; it is not a held-out pool placed
+nearer its class relative to the scale of the levels. Taking out the double pole as well does not add to it: $0.903$,
+narrower on $11$ of $16$ ($p=0.105$), spread $1.06$. The read folded in from the multiplicity axis (there the signed
+offset follows the five-to-six step, $-0.34$ and $-0.37$): the held-out virtual pools' signed offset against their step
+from the Born tree, $\overline t-\overline t_{\mathrm{Born}}$, has rank correlation $-0.02$ ($p=0.924$) and $-0.30$
+($p=0.188$) seed by seed, $-0.21$ on the seed mean; on $21$ pools the offset does not follow the step. The offset
+against the departure: $0.10$ as trained, $-0.28$ with the Born removed. What it changes: the candidate with the Born
+removed passes the check, so the next step designs a short pretraining arm with the one-loop target taken relative to
+its Born event by event, against the control pair, measured on the one-loop axis's signed offset, floor and zero-shot
+MSE. It needs the Born at every one-loop event, which MadLoop returns with every point and the pipeline discards; the
+design has to add it (re-evaluated on the pools' events) and check the pool-level proxy on a few pools first.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/loop_born.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --loop-born @9c9f2b06
+  \caption{catalog\_v4's held-out one-loop virtual pools against their Born tree pools. Left: per matched held-out pool
+    its absolute departure from the mean level of its matched training pools, the target as trained against each
+    candidate (the Born's level removed; the Born's level and the log of the double-pole coefficient removed); the line
+    is equality. Right: per held-out pool its seed-mean signed offset against its level's step from its Born tree
+    pool.}
+  \label{fig:v4_loop_born}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
