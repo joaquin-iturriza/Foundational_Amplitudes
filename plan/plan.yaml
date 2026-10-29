@@ -1719,15 +1719,13 @@ entries:
   - D167
   - D169
   - D174
-  next:
-    5: 'Submit the 13 TeV pp regeneration with catalog_v4''s physics (design passed 2026-10-29; recipes committed 1cffe26d:
-      992 entries pp13v4_ in recipes/catalog_v4_pp_part0..7.yaml, 124 each, of which 124 are merged members no recipe reads;
-      433 reused pp13 pools checked present on CC (866 val/test files with sidecars) and pp13_gg_ttx, pp13_uux_wpwm reproduce
-      catalog_v4''s |M|^2 exactly on 200 events): blocked on placement, waiting for the user: site pick puts CC on AVOID (site
-      env fails: the anaconda/3.11 module is now denied on CC) and CC''s login notice now forbids generative AI tools on IN2P3
-      machines, non-interactive commands included; lxplus is the plan but its verify timed out and MadGraph there is unverified.
-      On the user''s answer: job_probe on the chosen site, then scripts/job_gen_daniel_catalog.sh x8 with --env DANIEL_SPEC=recipes/catalog_v4_pp_part<k>.yaml
-      --env DANIEL_PREFIX=pp13v4_ --item catalog_coverage, plan run each with --next 5'
+  next: 'The comparison with the pp-trained arm is written (docs/results.tex par:v4_vs_pp, 0f8018e0): catalog_v4 with Muon
+    trails the pp-trained AdamW arm on classes trained in both (1.31) and leads on held out (0.79); it recovers 0.15 to 0.35
+    of the pp-training gain in log, none inside catalog_v3''s coverage. Waiting on the user: (1) whether to run the clean
+    version, the pp-trained arm with Muon at catalog_v4''s runs'' settings, 2 seeds, about 3 GPU-h on CC (on yes: plan design,
+    design reviewer, site pick FA --jobs 2, submit with --item catalog_coverage); (2) switch pretraining to catalog_v4 or
+    not. If yes: the held Daniel''s-catalog studies adapted to catalog_v4, and catalog_v3''s deletion (D163, only once the
+    switch is confirmed). If no: say what catalog_v3 keeps and what of catalog_v4 is kept.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
