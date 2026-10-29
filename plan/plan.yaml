@@ -119,23 +119,17 @@ entries:
   - D165
   - D170
   - D175
-  next: 'Design, waiting for the user. Part 1 done on the laptop (analysis/catalog_v3/prep_hybrid_split.py @b17bf4bc, from
-    the saved reads): each probe''s hybrid mean error splits exactly into (a) the constant on the predicted events minus the
-    constant handed (from the arms'' per-event factors) and (b) the hybrid network''s error on the class mean both targets
-    share. (a) is 0.017 to 0.039 (median abs) on every axis; with it set to zero the level ratios to the emission scales stay
-    (top 1.31, pT >= 30 GeV 9.88, 2->5 4.46), so the whole gap is (b), the network. pT >= 30 GeV: the hybrid''s mean error
-    follows the cut''s shift of the constant (default-cut constant minus the cut one, median -0.36, 37 of 40 probes not 2->2):
-    slope 0.96, correlation 0.81; read with the default-cut constant its level is 0.006, 0.53 of the emission scales'' 0.011.
-    The network supplies the constant it learned at the training cuts; the emission target''s per-event term follows the cut
-    through the momenta. Top: the hybrid underpredicts (median -0.57 against +0.02): -0.29 with one top (143), -0.82 with
-    two (92), -1.40 with four (2), about zero at 2->2 (0.01, 7) where the constant is zero; across probes its error does not
-    scale with the constant (slope -0.09, correlation -0.15; 2->5: -0.04, -0.08), so the network supplies most of the constant
-    and the miss is not a fixed fraction of it; the top mechanism is not established. Part 2 (the user''s call): the mix target,
-    hybrid + lambda (Lq - (N-4) log s_hat - c_p), class mean the emission scales'' for every lambda (0 hybrid, 1 emission
-    scales). First the CPU shape proxy (prep_shape.py with the mix target at lambda 0.25, 0.5, 0.75; a 32-CPU job on CC, about
-    3 h, needs the pools), then one short-pretraining arm on catalog_v3 at the largest lambda whose 2->4 and 2->5 proxy stays
-    at the hybrid''s, read zero-shot on every axis against the existing hybrid and emission-scales arms (about 2 GPU-h): it
-    answers the question if its 2->5 level comes down toward 0.10 while its shape stays at the hybrid''s.'
+  next: 'Submit catalog_v4''s one-loop sign extension (built at f5949014; the design passed 2026-10-29 05:39 unlocks submission
+    until 2026-10-30 05:39): site sync, site pick FA --jobs 3, then scripts/job_catalog_v4_signext.sh (CPU: build, certify,
+    generate the 123 one-loop pools, audit, train recipe at $SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml, alpha_s
+    and sidecars; refuses with exit 3 when over a fifth fail certification) and the two pretrainings scripts/job_catalog_v3_short.sh
+    v4_dimensionless_muon_more_signed and v4_dimensionless_muon_more_signed_seed2 (--hdr=--mem=48G, about 1.8 GPU-h each)
+    chained afterok on it, each with --item v3_prep_explore, recorded with plan run. Not submitted 2026-10-29: the main session
+    operates on no CC-IN2P3 command while its login notice forbids generative AI tools, Jean Zay is not asked for by the user,
+    and lxplus is not deployed (site pick: setup incomplete, no .venv); the catalog_v4 training and held-out pools exist only
+    on CC, so a site other than CC also needs them copied there first. Expected certification failures to name in the write-up:
+    one-loop entries with an internal top that can go on shell (e.g. v4_udx_bbxwp, v4_bbx_awpwm, v4_ub_bdwp) get no width
+    tolerance or zero-width override. If the 24 h window lapses, the design is re-recorded and re-reviewed before submission.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
