@@ -18,6 +18,9 @@ tree classes, and every class of the held-out axes H1, H2, H2p5, H3, H6, H7c, H7
 the signed check is apart). Pools with a non-positive |M|^2 or fewer events are listed as skipped, with the reason.
     python analysis/catalog_v3/prep_shape.py [--workers 32] [--n-fit 7500 --n-score 2500] [--tag ""]
                                               (a CPU job on CC: scripts/job_prep_shape_v3.sh)
+--catalog v4 (the zero-shot shape gap, v3_prep_explore): every tree pool of catalog_v4_train.yaml (no draw) and the
+tree held-out axes H1, H2, H3, the intrinsic-difficulty control of analysis/catalog_v4/loop_levels.py --shape-gap;
+--targets restricts the targets (qperp is the control pretraining's).
 Output: $SCRATCH/zz_v3_prep/prep_shape<tag>.json and one SHAPE line per class.
 """
 import argparse, glob, json, os, sys
@@ -41,7 +44,7 @@ pool = functools.partial(find_pool, any_window=True)   # (name, sq) -> the valid
 
 
 def one(args):
-    setname, name, sq, n_fit, n_score = args
+    setname, name, sq, n_fit, n_score, targets = args
     from sklearn.neural_network import MLPRegressor
     f = pool(name, sq)
     if f is None:
@@ -66,7 +69,9 @@ def one(args):
     X = (X - X[:n_fit].mean(0)) / (X[:n_fit].std(0) + 1e-12)
     y0 = np.log(amp)
     Lq = qperp_logs(P)
-    tg = {"raw": y0, "dless": y0 + (N - 4) * Ls, "qperp": y0 + Lq, "soft": y0 + qperp_logs(P, soft=0.3)}
+    tg = {"raw": lambda: y0, "dless": lambda: y0 + (N - 4) * Ls, "qperp": lambda: y0 + Lq,
+          "soft": lambda: y0 + qperp_logs(P, soft=0.3)}
+    tg = {k: tg[k]() for k in targets}
     out = {"N": int(N), "pdg": [int(c) for c in x[0, 4 * N: 5 * N]]}
     for k, y in tg.items():
         mu, sd = y[:n_fit].mean(), y[:n_fit].std()
@@ -80,21 +85,27 @@ def one(args):
 
 
 def main():
+    global TARGETS
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=32)
     ap.add_argument("--n-fit", type=int, default=7500)
     ap.add_argument("--n-score", type=int, default=2500)
     ap.add_argument("--n-train-classes", type=int, default=200)
     ap.add_argument("--tag", default="")
+    ap.add_argument("--catalog", default="v3", choices=("v3", "v4"))
+    ap.add_argument("--targets", default=",".join(TARGETS))
     a = ap.parse_args()
+    TARGETS = tuple(a.targets.split(","))
     jobs = []
-    tr = [p for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_train.yaml")))["processes"]
-          if p["name"].startswith("v3_") and "_nlo" not in p["name"] and "_loop" not in p["name"]]
-    pick = np.random.default_rng(0).permutation(len(tr))[: a.n_train_classes]
-    jobs += [("train", tr[i]["name"], tr[i].get("sqrts"), a.n_fit, a.n_score) for i in sorted(pick)]
-    for ax in AXES:
-        for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v3_heldout_{ax}.yaml")))["processes"]:
-            jobs.append((ax, p["name"], p.get("sqrts"), a.n_fit, a.n_score))
+    cat = a.catalog
+    tr = [p for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_{cat}_train.yaml")))["processes"]
+          if p["name"].startswith(f"{cat}_") and "_nlo" not in p["name"] and "_loop" not in p["name"]]
+    pick = (np.random.default_rng(0).permutation(len(tr))[: a.n_train_classes] if cat == "v3"
+            else np.arange(len(tr)))
+    jobs += [("train", tr[i]["name"], tr[i].get("sqrts"), a.n_fit, a.n_score, TARGETS) for i in sorted(pick)]
+    for ax in (AXES if cat == "v3" else ("H1", "H2", "H3")):
+        for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_{cat}_heldout_{ax}.yaml")))["processes"]:
+            jobs.append((ax, p["name"], p.get("sqrts"), a.n_fit, a.n_score, TARGETS))
     res, skipped = {}, []
     with Pool(a.workers) as pl:
         for s, n, r in pl.imap_unordered(one, jobs, chunksize=1):
@@ -103,7 +114,7 @@ def main():
                 continue
             res.setdefault(s, {})[n] = r
             print("SHAPE", s, n, json.dumps({k: round(r[k]["mse"], 4) for k in TARGETS}), flush=True)
-    od = os.path.join(os.environ.get("SCRATCH", "/tmp"), "zz_v3_prep"); os.makedirs(od, exist_ok=True)
+    od = os.path.join(os.environ.get("SCRATCH", "/tmp"), f"zz_{cat}_prep"); os.makedirs(od, exist_ok=True)
     res["skipped"] = skipped
     json.dump(res, open(os.path.join(od, f"prep_shape{a.tag}.json"), "w"))
     print("SKIPPED", len(skipped), skipped[:20])

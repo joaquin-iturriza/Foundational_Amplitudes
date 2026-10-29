@@ -1049,6 +1049,266 @@ def plot_mult(rows, dm, predA, predB):
     ps.save(fig, os.path.join(HERE, "figs", "tree_levels_mult"))
 
 
+LOOP_BORN_CANDIDATES = ("none", "born_rel", "born_rel_pole")
+
+
+def born_pole(name):
+    """|c2|, the universal 1/eps^2 coefficient of a one-loop QCD virtual normalised to its Born (alpha_s/2pi units):
+    sum of C_i over the massless coloured legs (tools/nlo_pole_check.double_pole, the generator's own pole check), a
+    property of the leg set alone; None when it is 0 (no massless coloured leg)."""
+    import mg5_pipeline_final as mg
+    import nlo_pole_check as PC
+    c = mg.PROCESSES[name]
+    bm = c.get("beam_masses") or {}
+    if c.get("beam_masses") is None:
+        bm = mg.BEAM_MASS
+    m = [bm.get(abs(int(p)), 0.0) for p in c["pdg_ids"][:2]] + list(c["m_finals"])
+    v = abs(PC.double_pole(c["pdg_ids"], m))
+    return v if v > 0 else None
+
+
+def loop_born_read():
+    """A target change for the one-loop axis (v3_prep_explore, the user's first priority D178, the zero-shot bias;
+    par:v4_loop_groups: the one-loop axis's error has a source of its own, its level placed low, most in thin classes).
+    The stored one-loop QCD virtual is the alpha_s-stripped (c0 + shift) x Born (tools/nlo_virtual_pipeline.py), and the
+    target t = log(|M|^2 F) of a virtual and of its Born tree carry the same F (the same legs, the Born's coupling
+    powers, mg5_pipeline_final.order_vector), so per event t_virt - t_Born = log|c0 + shift|: the Born's level drops
+    out. The Born is not stored per event, so on the existing reads the candidate is read at the pool level: each
+    virtual pool's level (data/loop_levels_cc.json) minus its Born tree pool's level (the entry's virt_base, read in
+    data/tree_levels_cc.json); a proxy, since the tree pools are sampled with the mixture and the one-loop pools never
+    shaped (mg5_pipeline_final, "One-loop (MadLoop) entries are never shaped"), so the two means are over different
+    measures. Candidates, fixed before their numbers were read, each from the target's definition, no fitted scale:
+      none           the pretraining's target, the reference;
+      born_rel       the virtual's level relative to its Born's, L - L_Born (the log of the finite coefficient);
+      born_rel_pole  that coefficient in units of its own universal double pole, L - L_Born - log|c2| (born_pole).
+    Pools: the virtual (not loop-induced) training and held-out one-loop pools whose Born tree pool is read; the
+    loop-induced ones have no Born, the pure-QCD-born ones (virt_base *_qcdborn) no read Born, both listed.
+    Measures, per candidate, on the same pools: (1) the held-out pools' departure from the mean level of their
+    matched training pools (match_key, the one match rule, among the read ones), median |departure| and the count of
+    pools narrowed against none, a one-sided sign test (p < 0.05, the entry's convention); (2) the within-class spread
+    of the training levels, per class of two or more read training pools the standard deviation, median over classes
+    and the count narrowed, the same test; beside them the overall training spread, so a candidate that only shrinks
+    every level is seen. And the read the main session folded in: do the held-out virtual pools' signed offsets follow
+    the step from their Born tree (L - L_Born), Spearman per seed, as par:v4_mult_bias read the five-to-six step.
+        python3 analysis/catalog_v4/loop_levels.py --loop-born -> data/loop_born.json, figs/loop_born.{png,pdf}"""
+    import mg5_pipeline_final as mg
+    from scipy.stats import spearmanr, binomtest
+    cc = json.load(open(os.path.join(HERE, "data", "loop_levels_cc.json")))
+    tc = json.load(open(os.path.join(HERE, "data", "tree_levels_cc.json")))
+    kl = json.load(open(os.path.join(HERE, "data", "kshot_level.json")))["probes"]
+    tr, ho = entries()
+    trn, hon = [p["name"] for p in tr if p["name"] in cc], [p["name"] for p in ho if p["name"] in cc]
+    excl, rows = {"loop_induced": [], "no_born_read": []}, {}
+    for n in trn + hon:
+        c = mg.PROCESSES[n]
+        if c.get("loopind"):
+            excl["loop_induced"].append(n); continue
+        b = c["virt_base"]
+        if b not in tc:
+            excl["no_born_read"].append(n); continue
+        pole = born_pole(n)
+        L, B = cc[n][0], tc[b][0]
+        rows[n] = {**props(n), "heldout": n in hon, "born_pool": b, "level": L, "born_level": B, "step": L - B,
+                   "pole": pole, "transform": cc[n][2], "born_transform": tc[b][2],
+                   "cand": {"none": L, "born_rel": L - B, "born_rel_pole": (L - B - np.log(pole)) if pole else None}}
+    nopole = [n for n, r in rows.items() if r["pole"] is None]
+    R = {n: r for n, r in rows.items() if r["pole"] is not None}
+    T = {n: r for n, r in R.items() if not r["heldout"]}
+    H = {n: r for n, r in R.items() if r["heldout"]}
+    P = {n: r for n, r in R.items()}
+    cls = {}
+    for m in T:
+        cls.setdefault(match_key(P, m), []).append(m)
+    out = {"n_train": len(T), "n_heldout": len(H), "excluded": excl, "no_pole": nopole, "cand": {}}
+    flat = {"lb.n_train": len(T), "lb.n_heldout": len(H), "lb.n_loop_induced": len(excl["loop_induced"]),
+            "lb.n_no_born_read": len(excl["no_born_read"]), "lb.n_no_pole": len(nopole)}
+    hm = [n for n in H if cls.get(match_key(P, n))]
+    flat["lb.n_signed_train"] = int(sum(T[m]["transform"] != "log" for m in T))
+    flat["lb.n_signed_heldout"] = int(sum(H[n]["transform"] != "log" for n in H))
+    flat["lb.n_heldout_matched"] = len(hm)
+    multi = [k for k, v in cls.items() if len(v) >= 2]
+    flat["lb.n_classes_multi"] = len(multi)
+    dep, sd = {}, {}
+    for c in LOOP_BORN_CANDIDATES:
+        dep[c] = {n: H[n]["cand"][c] - float(np.mean([T[m]["cand"][c] for m in cls[match_key(P, n)]])) for n in hm}
+        sd[c] = {k: float(np.std([T[m]["cand"][c] for m in cls[k]])) for k in multi}
+        g = float(np.std([T[m]["cand"][c] for m in T]))
+        o = {"median_abs_departure": float(np.median(np.abs(list(dep[c].values())))),
+             "median_class_sd": float(np.median(list(sd[c].values()))), "train_sd": g}
+        # the same in units of the candidate's own overall training spread (a candidate that only shrinks every level
+        # leaves these unchanged)
+        o["departure_in_train_sd"] = o["median_abs_departure"] / g
+        o["class_sd_in_train_sd"] = o["median_class_sd"] / g
+        if c != "none":
+            nd = sum(abs(dep[c][n]) < abs(dep["none"][n]) for n in hm)
+            ns = sum(sd[c][k] < sd["none"][k] for k in multi)
+            o.update({"n_dep_narrowed": int(nd), "p_dep": float(binomtest(nd, len(hm), 0.5, "greater").pvalue),
+                      "n_sd_narrowed": int(ns), "p_sd": float(binomtest(ns, len(multi), 0.5, "greater").pvalue)})
+            o["works"] = bool(o["p_dep"] < 0.05 and o["p_sd"] < 0.05)
+        out["cand"][c] = o
+        for k, v in o.items():
+            flat[f"lb.{c}.{k}"] = float(f"{v:.3g}") if isinstance(v, float) else v
+        print(f"{c:14s} " + "  ".join(f"{k} {v:.3g}" if isinstance(v, float) else f"{k} {v}" for k, v in o.items()))
+    # the folded-in read: the held-out virtual pools' signed offset against their step from the Born tree
+    hs = [n for n in H]
+    st = np.array([H[n]["step"] for n in hs])
+    for i, run in enumerate(RUNS):
+        off = np.array([kl[run]["H5"][n]["offset"] for n in hs])
+        rho, p = spearmanr(st, off)
+        out[f"rho_offset_step.seed{i}"] = [float(rho), float(p)]
+        flat[f"lb.rho_offset_step.seed{42 + i}"] = round(float(rho), 2)
+        flat[f"lb.p_offset_step.seed{42 + i}"] = round(float(p), 3)
+    om = np.array([np.mean([kl[r]["H5"][n]["offset"] for r in RUNS]) for n in hs])
+    rho, p = spearmanr(st, om)
+    flat["lb.rho_offset_step.mean"], flat["lb.p_offset_step.mean"] = round(float(rho), 2), round(float(p), 3)
+    # and against the Born-relative departure (does the network place the matched class's Born-relative mean)
+    omm = np.array([np.mean([kl[r]["H5"][n]["offset"] for r in RUNS]) for n in hm])
+    for c in ("none", "born_rel"):
+        rho, p = spearmanr([dep[c][n] for n in hm], omm)
+        flat[f"lb.rho_offset_departure.{c}"] = round(float(rho), 2)
+    print(f"held-out signed offset vs step from the Born tree: seeds {out['rho_offset_step.seed0']}, "
+          f"{out['rho_offset_step.seed1']}; seed mean rho {flat['lb.rho_offset_step.mean']}")
+    for n in sorted(hs, key=lambda n: H[n]["step"]):
+        r = H[n]
+        d = {c: dep[c].get(n) for c in LOOP_BORN_CANDIDATES}
+        ds = "  ".join(f"{c} {v:+6.2f}" if v is not None else f"{c}   --  " for c, v in d.items())
+        print(f"  {n:26s} {r['initial']:3s} N={r['n']} step {r['step']:+6.2f} offset {om[hs.index(n)]:+5.2f}  "
+              f"departure {ds}")
+    out["rows"] = rows
+    out["departure"], out["class_sd"] = dep, {c: {str(k): v for k, v in s.items()} for c, s in sd.items()}
+    json.dump(out, open(os.path.join(HERE, "data", "loop_born.json"), "w"), indent=1)
+    plot_loop_born(H, T, dep, hm, hs, st, om)
+    print(json.dumps(flat))
+
+
+def plot_loop_born(H, T, dep, hm, hs, st, om):
+    """Fig. v4_loop_born: left, per matched held-out virtual pool its |departure| from the matched training mean,
+    the pretraining's target against the level relative to the Born tree, with the diagonal; right, per held-out
+    virtual pool its seed-mean signed offset against its step from the Born tree."""
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    a = axs[0]
+    x = np.abs([dep["none"][n] for n in hm]); y = np.abs([dep["born_rel"][n] for n in hm])
+    a.plot(x, y, ".", color=ps.C.blue, label="Born removed")
+    y2 = np.abs([dep["born_rel_pole"][n] for n in hm])
+    a.plot(x, y2, "x", color=ps.C.vermillion, ms=4, label="Born and double pole removed")
+    lo, hi = 0.8 * min(x.min(), y.min(), y2.min()), 1.25 * max(x.max(), y.max(), y2.max())
+    a.plot([lo, hi], [lo, hi], "-", color=ps.C.grey, lw=0.8)
+    a.set_xscale("log"); a.set_yscale("log")
+    a.set_xlabel(r"$|\Delta\overline{t}|$, target as trained"); a.set_ylabel(r"$|\Delta\overline{t}|$, candidate")
+    a.legend(fontsize=7)
+    b = axs[1]
+    b.plot(st, om, ".", color=ps.C.blue)
+    b.axhline(0, color=ps.C.grey, lw=0.8)
+    b.set_xlabel(r"$\overline{t}-\overline{t}_{\mathrm{Born}}$"); b.set_ylabel(r"$\overline{q-t}$")
+    ps.save(fig, os.path.join(HERE, "figs", "loop_born"))
+
+
+def shape_gap():
+    """The zero-shot shape gap (v3_prep_explore, next step after par:v4_tree_shape): is a held-out tree pool's floor
+    var(q - t) above the in-distribution floor of the training pools in the same cell of multiplicity and initial
+    state by more than the pools' intrinsic difficulty explains. Three reads per cell, each optional but the first:
+      net_free  the training pools' result.json per-process validation loss at the best checkpoint times the shared
+                standardization's sigma^2 (analysis/catalog_v3/data/train_levels.json, the conversion of
+                par:v3_factorised: 0.50 against the scorer's 0.51 on 40 catalog_v3 parents); 200 validation events
+                per pool, the MSE with the offset in it, so an upper bound on the training floor
+      net_tr    the same scorer as the held-out reads on the training pools' test split (short_reads/<run>/TR, mode
+                eval V3_AXES=TR), floor = var(q - t)
+      proxy     the shape proxy (analysis/catalog_v3/prep_shape.py --catalog v4, data/prep_shape_v4.json, target
+                qperp = the control's target): one small regressor per pool, its held-out MSE
+    Per cell: the seed-mean medians over training pools and over the held-out pools of H1, H2, H3, and the log10
+    ratio held out over training; the network's excess is its log10 ratio minus the proxy's. The seed spread: the
+    per-pool |log10(floor seed 42 / floor seed 43)| of the held-out reads (median), and of the cell medians.
+        python3 analysis/catalog_v4/loop_levels.py --shape-gap -> data/shape_gap.json; last line the flat JSON"""
+    tl = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
+    tv = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "train_levels.json")))
+    T = tl["train"]
+    cell = lambda r: f"{r['n']}{r['initial']}"
+    free = {m: float(np.mean([tv[r]["mse"][m] for r in RUNS])) for m in T if all(m in tv[r]["mse"] for r in RUNS)}
+    free_s = {m: [tv[r]["mse"][m] for r in RUNS] for m in free}
+    tr_dir = [os.path.join(SR, r, "TR") for r in RUNS]
+    net_tr = {}
+    if all(os.path.isdir(d) for d in tr_dir):
+        for m in T:
+            fl = []
+            for d in tr_dir:
+                f = os.path.join(d, m + ".npz")
+                if not os.path.exists(f):
+                    break
+                z = np.load(f)
+                fl.append(float((z["q"].astype(float) - z["t"].astype(float)).var()))
+            if len(fl) == len(RUNS):
+                net_tr[m] = fl
+    pf = os.path.join(HERE, "data", "prep_shape_v4.json")
+    prox = json.load(open(pf)) if os.path.exists(pf) else {}
+    pmse = {n: r["qperp"]["mse"] for s_, d in prox.items() if s_ != "skipped" for n, r in d.items()}
+    H = {n: r for a in TREE_AXES for n, r in tl["heldout"][a].items() if not r.get("missing")}
+    hax = {n: a for a in TREE_AXES for n in tl["heldout"][a]}
+    med = lambda v: float(np.median(v)) if len(v) else None
+    l10 = lambda a, b: float(np.log10(a / b)) if a and b else None
+    cells, flat = {}, {}
+    for c in sorted({cell(r) for r in H.values()}):
+        tr = [m for m in T if cell(T[m]) == c]
+        ho = [n for n in H if cell(H[n]) == c]
+        C = {"n_train": len(tr), "n_heldout": len(ho), "n_heldout_by_axis": {a: sum(hax[n] == a for n in ho) for a in TREE_AXES},
+             "heldout_floor": med([H[n]["shape"] for n in ho]),
+             "heldout_floor_per_seed": [med([H[n]["floor"][i] for n in ho]) for i in range(len(RUNS))],
+             "train_free": med([free[m] for m in tr if m in free]),
+             "train_free_per_seed": [med([free_s[m][i] for m in tr if m in free]) for i in range(len(RUNS))]}
+        C["log_ratio_free"] = l10(C["heldout_floor"], C["train_free"])
+        C["log_ratio_free_per_seed"] = [l10(a, b) for a, b in zip(C["heldout_floor_per_seed"], C["train_free_per_seed"])]
+        if net_tr:
+            C["train_tr"] = med([float(np.mean(net_tr[m])) for m in tr if m in net_tr])
+            C["train_tr_per_seed"] = [med([net_tr[m][i] for m in tr if m in net_tr]) for i in range(len(RUNS))]
+            C["log_ratio_tr"] = l10(C["heldout_floor"], C["train_tr"])
+        if pmse:
+            C["n_proxy"] = [sum(m in pmse for m in tr), sum(n in pmse for n in ho)]
+            C["proxy_train"] = med([pmse[m] for m in tr if m in pmse])
+            C["proxy_heldout"] = med([pmse[n] for n in ho if n in pmse])
+            C["log_ratio_proxy"] = l10(C["proxy_heldout"], C["proxy_train"])
+            for k in ("free", "tr"):
+                if C.get(f"log_ratio_{k}") is not None and C["log_ratio_proxy"] is not None:
+                    C[f"excess_{k}"] = C[f"log_ratio_{k}"] - C["log_ratio_proxy"]
+        cells[c] = C
+    seed_pool = [abs(np.log10(H[n]["floor"][0] / H[n]["floor"][1])) for n in H]
+    S = {"n_train": len(T), "n_train_free": len(free), "n_train_tr": len(net_tr), "n_proxy": len(pmse),
+         "n_heldout": len(H), "median_seed_spread_pool": med(seed_pool),
+         "median_seed_spread_cell_ratio": med([abs(v["log_ratio_free_per_seed"][0] - v["log_ratio_free_per_seed"][1])
+                                                for v in cells.values() if v["n_train"] and None not in v["log_ratio_free_per_seed"]]),
+         "train_free_all": med(list(free.values())), "heldout_floor_all": med([H[n]["shape"] for n in H])}
+    used = {c: v for c, v in cells.items() if v["n_train"] and v["log_ratio_free"] is not None}
+    S["n_cells"] = len(used)
+    S["n_heldout_in_cells"] = int(sum(v["n_heldout"] for v in used.values()))
+    S["median_log_ratio_free"] = med([v["log_ratio_free"] for v in used.values()])
+    S["n_cells_free_above"] = int(sum(v["log_ratio_free"] > 0 for v in used.values()))
+    # pool-weighted: each held-out pool against its cell's training median (seed mean)
+    pl = [np.log10(H[n]["shape"] / used[cell(H[n])]["train_free"]) for n in H if cell(H[n]) in used]
+    S["median_pool_log_ratio_free"] = med(pl)
+    print(f"shape gap: {len(T)} training tree pools ({len(free)} in result.json, {len(net_tr)} TR reads, {len(pmse)} "
+          f"proxy), {len(H)} held out; all-pool medians: training result.json MSE {S['train_free_all']:.3f}, held-out floor "
+          f"{S['heldout_floor_all']:.3f}; per-pool seed spread |log10| {S['median_seed_spread_pool']:.3f}")
+    print(f"{'cell':6s} {'n_tr':>4s} {'n_ho':>4s} {'tr_free':>8s} {'ho_floor':>8s} {'log10':>6s} {'seeds':>13s}"
+          + ("  prox_tr prox_ho log10p excess" if pmse else ""))
+    for c, v in cells.items():
+        f3 = lambda x: f"{x:8.3f}" if x is not None else "       -"
+        ps_ = "/".join(f"{x:+.2f}" if x is not None else "-" for x in v["log_ratio_free_per_seed"])
+        line = (f"{c:6s} {v['n_train']:4d} {v['n_heldout']:4d} {f3(v['train_free'])} {f3(v['heldout_floor'])} "
+                f"{(v['log_ratio_free'] if v['log_ratio_free'] is not None else float('nan')):+6.2f} {ps_:>13s}")
+        if pmse:
+            line += f" {f3(v.get('proxy_train'))} {f3(v.get('proxy_heldout'))} {v.get('log_ratio_proxy') or float('nan'):+6.2f} {v.get('excess_free', float('nan')):+6.2f}"
+        print(line)
+        for k in ("n_train", "n_heldout"):
+            flat[f"sg.{c}.{k}"] = v[k]
+        for k in ("train_free", "heldout_floor", "log_ratio_free", "proxy_train", "proxy_heldout", "log_ratio_proxy",
+                  "excess_free", "train_tr", "log_ratio_tr", "excess_tr"):
+            if v.get(k) is not None:
+                flat[f"sg.{c}.{k}"] = round(v[k], 3)
+    for k, x in S.items():
+        flat[f"sg.{k}"] = round(x, 3) if isinstance(x, float) else x
+    json.dump({"summary": S, "cells": cells}, open(os.path.join(HERE, "data", "shape_gap.json"), "w"), indent=1)
+    print(json.dumps(flat))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--dump", action="store_true")
@@ -1057,6 +1317,9 @@ if __name__ == "__main__":
     ap.add_argument("--mult-candidates", action="store_true",
                     help="candidate target or input changes for the multiplicity step (multiplicity_candidates)")
     ap.add_argument("--loop-groups", action="store_true", help="the one-loop axis by the tree reads (loop_group_read)")
+    ap.add_argument("--loop-born", action="store_true",
+                    help="the one-loop target relative to its Born tree (loop_born_read)")
+    ap.add_argument("--shape-gap", action="store_true", help="the held-out floor against the training pools' (shape_gap)")
     ap.add_argument("--chunk", type=int, default=0)
     ap.add_argument("--nchunks", type=int, default=1)
     A = ap.parse_args()
@@ -1066,6 +1329,10 @@ if __name__ == "__main__":
         multiplicity_candidates()
     elif A.multiplicity:
         multiplicity_read()
+    elif A.loop_born:
+        loop_born_read()
+    elif A.shape_gap:
+        shape_gap()
     elif A.loop_groups:
         loop_group_read()
     else:
