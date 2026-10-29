@@ -11788,6 +11788,124 @@ $68\%$ Poisson intervals; dashed: all hand-written code. hooks: \code{.claude/},
 \label{fig:review_rates}
 \end{figure}
 
+\subsection{Does the ponytail plugin change what an agent writes?}\label{sec:ponytail-ab}
+
+% allow: 4 8 because they are the numbers of tasks and runs, the design
+% allow: 60 because it is the turn cap of each run, a setting
+% allow: 1 because it is one run per cell, the design
+\paragraph{Design.} The question (the user, 2026-10-29: ``we can run our own tests on our work to decide if it works for
+us or not'') is whether the ponytail plugin, which tells an agent to write the smallest complete change and reuse what
+the codebase has, makes our agents write less code, reuse more and spend fewer tokens without more errors. Four finished
+tasks whose prompt is in the session transcript were replayed: the review gate's double review on commit, the step
+agents' how-to lookups (plan help strings, the git guard's command parsing, the review lock's printout), the required
+prior-work field of a design, and the check of sent figures for internal codes. Each task ran twice, from its original
+prompt, in a fresh headless session in its own worktree at the task's parent commit, once with the plugin on and once
+off: same model and effort, same hooks and settings in both arms (the parent commit's \code{.claude/}, since every task
+edits it), only the plugin switch differing; a fixed note in both arms said the clusters, subagents and pushing were
+unavailable, each run capped at 60 turns (none reached it). Measured from each run's transcript and diff: tool calls,
+tokens re-read (input, cache read and cache write summed over the distinct API responses), hand-written lines added (JSON
+excluded), test scenarios added, the existing functions the run calls that the original solution also called, and the
+blocking findings of the code reviewer, run on each diff with the same prompt and blind to the arm. This is 8 runs, 1
+per cell: it shows what each arm did on these tasks, not how much of a difference is the plugin and how much the
+run-to-run spread of one agent on one prompt, which no cell here measures.
+
+% src: python3 analysis/ponytail_ab/ponytail_ab.py @cf3af8f5
+% claim: gate.on.lines_added=47
+% claim: gate.off.lines_added=86
+% claim: lookups.on.lines_added=123
+% claim: lookups.off.lines_added=209
+% claim: prior.on.lines_added=96
+% claim: prior.off.lines_added=125
+% claim: sendcheck.on.lines_added=154
+% claim: sendcheck.off.lines_added=281
+% claim: gate.on.tool_calls=22
+% claim: gate.off.tool_calls=16
+% claim: lookups.on.tool_calls=46
+% claim: lookups.off.tool_calls=48
+% claim: prior.on.tool_calls=20
+% claim: prior.off.tool_calls=32
+% claim: sendcheck.on.tool_calls=26
+% claim: sendcheck.off.tool_calls=28
+% claim: gate.on.reread_M=1.27
+% claim: gate.off.reread_M=1.17
+% claim: lookups.on.reread_M=3.33
+% claim: lookups.off.reread_M=4.37
+% claim: prior.on.reread_M=1.59
+% claim: prior.off.reread_M=2.2
+% claim: sendcheck.on.reread_M=2.31
+% claim: sendcheck.off.reread_M=2.36
+% claim: gate.on.tests_added=2
+% claim: gate.off.tests_added=5
+% claim: lookups.on.tests_added=0
+% claim: lookups.off.tests_added=5
+% claim: prior.on.tests_added=6
+% claim: prior.off.tests_added=7
+% claim: sendcheck.on.tests_added=6
+% claim: sendcheck.off.tests_added=12
+% claim: gate.on.n_like_original=3
+% claim: gate.off.n_like_original=3
+% claim: gate.on.n_original_reused=3
+% claim: lookups.on.n_like_original=5
+% claim: lookups.off.n_like_original=7
+% claim: lookups.on.n_original_reused=7
+% claim: prior.on.n_like_original=4
+% claim: prior.off.n_like_original=4
+% claim: prior.on.n_original_reused=5
+% claim: sendcheck.on.n_like_original=1
+% claim: sendcheck.off.n_like_original=1
+% claim: sendcheck.on.n_original_reused=1
+% claim: gate.on.blocking=0
+% claim: gate.off.blocking=0
+% claim: lookups.on.blocking=2
+% claim: lookups.off.blocking=1
+% claim: prior.on.blocking=0
+% claim: prior.off.blocking=0
+% claim: sendcheck.on.blocking=1
+% claim: sendcheck.off.blocking=1
+\begin{table}[H]
+\centering
+\begin{tabular}{llrrrrrr}
+task & plugin & lines added & tool calls & re-read (M tokens) & tests added & original's helpers reused & blocking \\
+\hline
+review gate & on & 47 & 22 & 1.27 & 2 & 3 of 3 & 0 \\
+ & off & 86 & 16 & 1.17 & 5 & 3 of 3 & 0 \\
+how-to lookups & on & 123 & 46 & 3.33 & 0 & 5 of 7 & 2 \\
+ & off & 209 & 48 & 4.37 & 5 & 7 of 7 & 1 \\
+prior-work field & on & 96 & 20 & 1.59 & 6 & 4 of 5 & 0 \\
+ & off & 125 & 32 & 2.2 & 7 & 4 of 5 & 0 \\
+figure code check & on & 154 & 26 & 2.31 & 6 & 1 of 1 & 1 \\
+ & off & 281 & 28 & 2.36 & 12 & 1 of 1 & 1 \\
+\end{tabular}
+\caption{The four replayed tasks, one run per plugin setting. Lines added: non-blank added lines of the run's whole
+diff against the parent commit, JSON excluded; tests added: new scenarios; helpers: the existing functions the original
+solution called in its added lines, and how many of them the run calls too.}
+\label{tab:ponytail_ab}
+\end{table}
+
+% src: python3 analysis/ponytail_ab/ponytail_ab.py @cf3af8f5
+% claim: sum.on.lines_added=420
+% claim: sum.off.lines_added=701
+% claim: sum.on.tests_added=14
+% claim: sum.off.tests_added=29
+% claim: sum.on.reread_M=8.5
+% claim: sum.off.reread_M=10.1
+% claim: sum.on.blocking=3
+% claim: sum.off.blocking=2
+% claim: total_runs.all_reread_M=20.8
+% allow: 1 because it is one run per cell, the design
+\paragraph{Result.} With the plugin on, every task's change was smaller (420 hand-written lines over the four against
+701), with about half the test scenarios (14 against 29) and fewer re-read tokens in three of the four (8.5 against 10.1
+million in all); reuse of what the original solution reused was the same or lower (one task: the plugin-on run of the
+lookups task does not call two of the git guard's existing parsing helpers in its added lines; it edited one of them).
+The reviewer found 3
+blocking errors in the plugin-on diffs against 2 off, all in the same two tasks in both arms: both git guard rewrites
+let through a commit that skips its hooks (the plugin-on one in two ways), and both glossaries of the figure check
+were wrong on the held-out axes (one merged two axes, one let the bare codes through). So on these four tasks the plugin
+gave smaller changes with half the tests and no visible change in errors; whether the cut tests are why
+the plugin-on lookups run had one more error, and whether any of the gaps exceed what a second run of the same arm would
+give, n = 1 per cell cannot say. The test used 20.8 million re-read tokens (runs and reviews; the hooks' own model
+checks and the orchestrating session not counted).
+
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
 % ==========================================================================
