@@ -162,7 +162,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: ef28625a
+    commit: a6412f43
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -195,9 +195,13 @@ entries:
     - analysis/catalog_v4/data/kshot_level.json
     - analysis/catalog_v4/data/loop_levels.json
     - analysis/catalog_v4/data/signext_classes.json
+    - analysis/catalog_v4/data/tree_levels.json
+    - analysis/catalog_v4/data/tree_levels_cc.json
     - analysis/catalog_v4/figs/kshot_level.png
     - analysis/catalog_v4/figs/loop_levels.png
+    - analysis/catalog_v4/figs/tree_levels.png
     - analysis/catalog_v4/kshot_level.py
+    - analysis/catalog_v4/loop_levels.py
     - docs/results.tex
     - recipes/catalog_v3_gen_signext.yaml
     - recipes/catalog_v3_train_signext.yaml
