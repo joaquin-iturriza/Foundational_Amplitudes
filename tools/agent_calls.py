@@ -36,7 +36,14 @@ in the agent's context (launch prompt, earlier inputs and results; lines of 25+ 
 A fork's inherited context is not in its transcript, so for forks it is a lower bound.
 
 --show prints each call of the named agents (from call --from, --n of them) with its class, reason, context and the
-share of its result already in context, for checking the classifier by hand."""
+share of its result already in context, for checking the classifier by hand.
+
+--refusals [--windows A..B,C..D] [--sample 5] [--texts] breaks the refused calls down by source: the hook (named from
+its refusal text, with its mode: review_backlog.sh gate), Claude Code's own refusals (permission: auto-mode
+classifier, worktree isolation, ...; harness: sleep block) and tool errors by kind; per source and window the calls,
+their context and the refusal text's size. For each hook, a sample of up to --sample of its refusals (evenly spaced
+in time over all windows) is listed with the hand verdict recorded for it in analysis/agent_calls/refusal_verdicts.json
+(tool_use id -> {"wrong": true when the call was legitimate, "why"}); --texts prints each sampled call and refusal."""
 import glob, json, os, re, shlex, statistics as st, sys
 from collections import Counter, defaultdict
 
@@ -309,15 +316,54 @@ def classify_bash(ag, cmd, cwd, shown=True):
     return "productive", "neutral"
 
 
+HOOK = re.compile(r"hook error: \[([^\]]*)\]")
+PERMISSIONS = (("auto mode classifier", "permission: auto-mode classifier"),
+               ("isolated in the worktree", "permission: worktree isolation"),
+               ("Only the auto-mode classifier can allow", "permission: not in auto mode"),
+               ("built-in Claude Code safety check", "permission: built-in safety check"),
+               ("doesn't want to proceed", "permission: user rejected"),
+               ("Permission for this tool use was denied", "permission: denied"),
+               ("Blocked: sleep", "harness: sleep block"))
+TOOL_ERRORS = (("No such tool available", "unknown tool"), ("InputValidationError", "bad tool input"),
+               ("Missing required parameter", "bad tool input"), ("has not been read yet", "edit before read"),
+               ("String to replace not found", "edit string not found"), ("exceeds maximum allowed tokens", "read too large"),
+               ("File does not exist", "missing file"), ("API Error", "API error"))
+
+
+def source(res, call):
+    """Where an is_error result came from: 'hook <script> [mode]' named from the refusal text, 'permission: ...' or
+    'harness: ...' (Claude Code itself), or 'tool error: <kind>'."""
+    txt = text_of(res.get("content")) if not isinstance(res.get("content"), str) else res["content"]
+    m = HOOK.search(txt)
+    if m:
+        toks = m.group(1).replace('"', "").split()
+        k = next((i for i, t in enumerate(toks) if t.endswith((".sh", ".py"))), len(toks) - 1)
+        return "hook " + " ".join([os.path.basename(toks[k])] + toks[k + 1:k + 2])
+    for key, name in PERMISSIONS:
+        if key in txt:
+            return name
+    for key, name in TOOL_ERRORS:
+        if key in txt:
+            return "tool error: " + name
+    if re.match(r"Exit code \d+", txt):
+        body = txt.split("\n", 1)[1] if "\n" in txt else ""
+        for key, name in (("Traceback", "python exception"), ("command not found", "command not found"),
+                          ("No such file", "missing file"), ("cannot access", "missing file"),
+                          ("cannot open", "missing file"), ("Terminated", "killed or timed out"),
+                          ("usage:", "usage error")):
+            if key in body:
+                return "tool error: exit, " + name
+        return "tool error: exit, nonzero status" if body.strip() else "tool error: exit, no output"
+    return "tool error: other"
+
+
 def refused(res, call):
     if not res.get("is_error"):
         return None
     txt = json.dumps(res.get("content"))
     if call["name"] == "Bash" and re.match(r'"Exit code 1(\\n)?"$', txt) and "grep" in call["input"].get("command", ""):
         return None                     # grep with no match
-    if "hook error" in txt or "denied" in txt or "Blocked" in txt or "classifier" in txt:
-        return "hook/permission refusal"
-    return "tool error"
+    return "tool error" if source(res, call).startswith("tool error") else "hook/permission refusal"
 
 
 def launches(sid):
@@ -433,7 +479,7 @@ def analyse(f):
         nch, dup = sum(len(l) for l in rl), sum(len(l) for l in rl if l in known)
         known.update(rl)
         known.update(lines_of("\n".join(str(v) for v in inp.values())))
-        out.append((x, cls, why, ctxs, ts, nch, dup))
+        out.append((x, cls, why, ctxs, ts, nch, dup, res))
     return out, first
 
 
@@ -448,18 +494,113 @@ def kind_of(why):
     return "other"
 
 
+VERDICTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "analysis", "agent_calls",
+                        "refusal_verdicts.json")
+
+
+def refusal_rows(sid, after, before):
+    """[(timestamp, agent id, call, source, context share, result)] of the refused calls of the agents launched in
+    the window (the same selection as the class tables)."""
+    launch, out = launches(sid), []
+    for meta in glob.glob(os.path.join(PROJ, sid, "subagents", "agent-*.meta.json")):
+        m = json.load(open(meta))
+        f = meta[:-10] + ".jsonl"
+        if not os.path.exists(f):
+            continue
+        ts = launch.get(m.get("toolUseId"), ("", "", ""))[2]
+        if not ts:
+            with open(f) as fh:
+                ts = next((t for t in (json.loads(l).get("timestamp") for l in fh) if t), "")
+        if not (after <= ts < before):
+            continue
+        rows, _ = analyse(f)
+        aid = os.path.basename(f)[6:-6]
+        out += [(t or "", aid, x, source(res, x), ctx, res) for x, cls, why, ctx, t, nch, dup, res in rows
+                if cls == "refused"]
+    return sorted(out, key=lambda r: r[0])
+
+
+def refusals(sid, windows, sample, show):
+    """Refusals and errors per source and window; for each hook, the hand verdicts (VERDICTS: tool_use id ->
+    {wrong: bool, why}) on a sample of up to `sample` of its refusals, evenly spaced in time over all windows."""
+    verdicts = json.load(open(VERDICTS)) if os.path.exists(VERDICTS) else {}
+    per = {w: refusal_rows(sid, *w) for w in windows}
+    srcs = Counter()
+    for rows in per.values():
+        for r in rows:
+            srcs[r[3]] += 1
+    hooks = defaultdict(list)
+    for rows in per.values():
+        for r in rows:
+            if r[3].startswith("hook "):
+                hooks[r[3]].append(r)
+    picked = {}
+    for h, rs in hooks.items():
+        rs = sorted({r[2]["id"]: r for r in rs}.values(), key=lambda r: r[0])
+        k = min(sample, len(rs))
+        picked[h] = [rs[round(i * (len(rs) - 1) / max(k - 1, 1))] for i in range(k)] if k > 1 else rs[:k]
+    print("session %s; agents launched in each window (UTC); context = the input context of the response that issued"
+          " the call, M tokens; result = the refusal text, k characters" % sid)
+    size = lambda r: len(text_of(r[5].get("content")) if not isinstance(r[5].get("content"), str) else r[5]["content"])
+    for w, rows in per.items():
+        c, ctx, ch = Counter(), Counter(), Counter()
+        for r in rows:
+            c[r[3]] += 1; ctx[r[3]] += r[4]; ch[r[3]] += size(r)
+        print("\nwindow %s .. %s: %d refused calls, %.1fM context" % (w[0], w[1], len(rows), sum(ctx.values()) / 1e6))
+        print("%-46s %6s %8s %8s" % ("source", "calls", "ctx M", "result k"))
+        for src in sorted(c, key=lambda k: (-ctx[k], k)):
+            print("%-46s %6d %8.2f %8.1f" % (src, c[src], ctx[src] / 1e6, ch[src] / 1e3))
+    print("\nhooks over all windows: calls, context, and the hand sample (wrong = the call was legitimate)")
+    print("%-36s %6s %8s %8s %6s" % ("hook", "calls", "ctx M", "sampled", "wrong"))
+    for h in sorted(hooks, key=lambda h: -sum(r[4] for r in hooks[h])):
+        ids = [r[2]["id"] for r in picked[h]]
+        done = [i for i in ids if i in verdicts]
+        print("%-36s %6d %8.2f %8d %6d%s" % (h, len(hooks[h]), sum(r[4] for r in hooks[h]) / 1e6, len(done),
+                                             sum(verdicts[i]["wrong"] for i in done),
+                                             "  (%d without verdict)" % (len(ids) - len(done)) if len(done) < len(ids)
+                                             else ""))
+    print("\nhooks' stated reasons over all windows (the refusal's first line, numbers as N)")
+    for h in sorted(hooks, key=lambda h: -len(hooks[h])):
+        why = Counter()
+        for r in hooks[h]:
+            t = r[5].get("content"); t = t if isinstance(t, str) else text_of(t)
+            t = t.split("]: ", 1)[-1].split("\n")[0]
+            why[re.sub(r"\d+", "N", re.sub(r"/tmp/\S+|'[^']*'", "X", t))[:110]] += 1
+        for k, v in why.most_common():
+            print("%-36s %4d  %s" % (h, v, k))
+    print("\nhand verdicts (sample over all windows)")
+    for h in sorted(picked, key=lambda h: -len(hooks[h])):
+        for r in picked[h]:
+            i = r[2]["id"]; v = verdicts.get(i)
+            print("%-36s %s %s %s" % (h, i, "WRONG" if v and v["wrong"] else ("ok" if v else "?"),
+                                      (v or {}).get("why", "")))
+            if show:
+                inp = r[2].get("input") or {}
+                c = (inp.get("command") or json.dumps(inp)).replace("\n", " | ")
+                print("    call:", c if len(c) <= 700 else c[:250] + " [...] " + c[-450:])
+                res = r[5].get("content")
+                print("    refusal:", (res if isinstance(res, str) else text_of(res))[:500].replace("\n", " | "))
+
+
 def main(argv):
     opt = {}
-    for flag in ("--after", "--before", "--show", "--n", "--from"):
+    for flag in ("--after", "--before", "--show", "--n", "--from", "--windows", "--sample"):
         if flag in argv:
             i = argv.index(flag); opt[flag] = argv[i + 1]; argv = argv[:i] + argv[i + 2:]
+    modes = {a for a in argv if a in ("--refusals", "--texts")}
+    argv = [a for a in argv if a not in modes]
     sid = argv[1] if len(argv) > 1 else os.path.basename(max(glob.glob(PROJ + "/*.jsonl"), key=os.path.getmtime))[:-6]
+    if "--refusals" in modes:
+        wins = [tuple(w.split("..")) for w in opt["--windows"].split(",")] if "--windows" in opt else \
+            [(opt.get("--after", ""), opt.get("--before", "9999"))]
+        refusals(sid, wins, int(opt.get("--sample", 5)), "--texts" in modes)
+        return
     if "--show" in opt:
         n, lo = int(opt.get("--n", 10)), int(opt.get("--from", 0))
         for aid in opt["--show"].split(","):
             rows, _ = analyse(os.path.join(PROJ, sid, "subagents", "agent-%s.jsonl" % aid))
             print("== agent %s: %d calls" % (aid, len(rows)))
-            for k, (x, cls, why, ctx, ts, nch, dup) in enumerate(rows[lo:lo + n], lo):
+            for k, (x, cls, why, ctx, ts, nch, dup, _) in enumerate(rows[lo:lo + n], lo):
                 inp = x.get("input") or {}
                 s = inp.get("command") or inp.get("file_path") or json.dumps(inp)
                 if x["name"] == "Read" and (inp.get("offset") or inp.get("limit")):
@@ -491,7 +632,7 @@ def main(argv):
         rows, _ = analyse(f)
         g = groups[(typ, eff)]
         g["n"] += 1
-        for x, cls, why, ctx, _, nch, dup in rows:
+        for x, cls, why, ctx, _, nch, dup, _ in rows:
             g["calls"][cls] += 1; g["ctx"][cls] += ctx; g["ch"][cls] += nch; g["dup"][cls] += dup
             if cls == "refused":
                 g["why"][why] += 1
