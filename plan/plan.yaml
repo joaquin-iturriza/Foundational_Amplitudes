@@ -1357,12 +1357,6 @@ entries:
   - D169
   - D174
   next:
-    4: 'Delete catalog_v3''s pools on CC (manifest ''pools'' group, 19329 files, 71.70 GB): ready and dry-run checked 2026-10-26
-      (re-listing matched the manifest on every file''s size and mtime, 0 refused, no job running or queued); the apply was
-      refused by the session''s permission classifier (irreversible deletion), so it needs the user to allow it or run it:
-      re-run the dry run, then site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/v3_delete_pools.py
-      --apply --shard 0/2 (and 1/2), commit the DELETED log under analysis/catalog_v4/data/, report bytes freed and df of
-      /sps/lpnhe (81% used, 105.3 GB free before)'
     5: 'Regenerate the 13 TeV pp pools with catalog_v4''s physics (approved): the 819 classes whose physics differs (566 with
       a b: massless b in a 5-flavour proton; 253 that gain electroweak diagrams under QED<=b), plus the 173 catalog_v4 classes
       with no pp pool; Daniel''s run card, catalog_v4''s model and cards (top 172.5 / 1.4915), 1e4/2e3/2e3 events as the existing
