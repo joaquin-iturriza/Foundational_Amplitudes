@@ -1127,6 +1127,8 @@ processes:
     test_group: 'pp 13 TeV v4: train'
     parent: v4_bbx_aataptam
   pp13v4_bbx_aattx:
+    lhe:
+      n_runs: 10
     kind: lhe_pp
     folder: pp13v4_bbx_aattx
     mg5_generate:
@@ -11330,6 +11332,8 @@ processes:
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_dtxwp
   pp13v4_dbx_dtxwpz:
+    lhe:
+      n_runs: 4
     kind: lhe_pp
     folder: pp13v4_dbx_dtxwpz
     mg5_generate:
@@ -11699,6 +11703,8 @@ processes:
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_dbx_txuz
   pp13v4_dbx_txuzz:
+    lhe:
+      n_runs: 5
     kind: lhe_pp
     folder: pp13v4_dbx_txuzz
     mg5_generate:
@@ -20413,6 +20419,8 @@ processes:
     test_group: 'pp 13 TeV v4: H3'
     parent: v4_ubx_gtxuwp
   pp13v4_ubx_htxuwp:
+    lhe:
+      n_runs: 4
     kind: lhe_pp
     folder: pp13v4_ubx_htxuwp
     mg5_generate:

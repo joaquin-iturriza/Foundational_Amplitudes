@@ -27,7 +27,10 @@ Writes
 A process whose catalog_v3 pp run came back short or stalled starts at that run's margin or run count
 (catalog_v3_pp_margins.json, catalog_v3_pp_runs.json, read by the pp13 name); a pp13v4 process whose own first run came
 back short takes its margin from catalog_v4_pp_margins.json (read by the pp13v4 name, it wins): 1.25 x the events asked
-x the events needed / the events returned (the 1.25 is open, unsourced).
+x the events needed / the events returned (the 1.25 is open, unsourced). A pp13v4 process whose MadEvent run stalls
+(refine "fail to reach target": a fixed few thousand events whatever is asked) runs lhe.n_runs times instead
+(catalog_v4_pp_runs.json, read by the pp13v4 name, its margin kept): ceil(1.25 x the events needed / the events one
+run returned).
 Every entry carries its parent's beam_masses (catalog_v4: {}, massless b beams), so the b's particle-table row and the
 pipeline's physics check see the massless b the sm-no_b_mass standalone generates; without it a b beam defaulted to
 the pipeline's 4.7 GeV shell and the check refused all 277 b-beam entries. beam_masses is not in an lhe_pp pool's
@@ -64,13 +67,16 @@ def main():
     margins = json.load(open(os.path.join(HERE, "catalog_v3_pp_margins.json")))
     runs = json.load(open(os.path.join(HERE, "catalog_v3_pp_runs.json")))
     own_margins = json.load(open(os.path.join(HERE, "catalog_v4_pp_margins.json")))
+    own_runs = json.load(open(os.path.join(HERE, "catalog_v4_pp_runs.json")))
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
     procs = {}
     for n in regen:
         c = mg.PROCESSES[n]
         own = {}
         old = pp3.get(n)
-        if pp(n) in own_margins:
+        if pp(n) in own_runs:
+            own = {"lhe": {"n_runs": own_runs[pp(n)], **({"margin": own_margins[pp(n)]} if pp(n) in own_margins else {})}}
+        elif pp(n) in own_margins:
             own = {"lhe": {"margin": own_margins[pp(n)]}}
         elif old in runs:
             own = {"lhe": {"n_runs": runs[old]}}
