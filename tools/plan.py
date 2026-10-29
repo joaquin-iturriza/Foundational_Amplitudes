@@ -23,7 +23,7 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
   plan answer <id> --kind K --quote Q [--set title|question|next=V]   the user's words: typed after the entry's last
                                           ask or step (after the hold, for a release), then `site decide`, then the
                                           entry; all or nothing
-  plan ask <id> --ask Q --searched S [--blocks B | --holds-all WHY]   an open question on the entry: it stays running
+  plan ask <id> --ask Q --searched S [--blocks B --blocks-steps N,N | --holds-all WHY]   an open question on the entry: it stays running
                                           and routed, its step prompt names the question and what waits on it (B);
                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
                                           it can move without the answer)
@@ -998,21 +998,35 @@ def open_question(e):
     return bool(e.get("ask") and e.get("waiting_since") and e.get("status") in ("running", "waiting_user"))
 
 
+STEP_LIST = r"\d+(?:\s*(?:-|–|,|&|,?\s*(?:and|or|to))\s*\d+)*"
+
+
+def parse_step_numbers(b):
+    """The step numbers a free-text `blocks` names: "step 1", "steps 1, 6 and 7", "steps 1-3", "steps 1 to 3",
+    "step 2 or 4", "step 4's ...". Only for questions recorded before plan ask took --blocks-steps."""
+    nums = set()
+    for m in re.finditer(r"(?i)\bsteps?\s+(" + STEP_LIST + r")", b or ""):
+        g = m.group(1)
+        for lo, hi in re.findall(r"(\d+)\s*(?:-|–|to)\s*(\d+)", g):
+            nums |= set(range(int(lo), int(hi) + 1))
+        nums |= {int(x) for x in re.findall(r"\d+", g)}
+    return nums
+
+
 def blocked_steps(e):
-    """The next steps the entry's open question holds: `blocks_steps` (plan ask --blocks-steps) when recorded, else the
-    step numbers the `blocks` text names ("step 1", "steps 1, 6 and 7", "step 4's ..."), else the steps whose text the
-    `blocks` text overlaps. A held step waits on the user: plan next and the stop check note it, never demand it (the
-    user, 2026-10-29: "if it's not possible to do in any way, then it shouldn't be a hook, or at least not a hook that
-    prevents the end of the turn")."""
+    """The next steps the entry's open question holds: `blocks_steps` (plan ask --blocks-steps, required since
+    2026-10-29 whenever the entry has more than one next step). A question recorded before that has none: then, as a
+    fallback, the step numbers its `blocks` text names (parse_step_numbers), else the steps whose text it overlaps. A
+    held step waits on the user: plan next and the stop check note it, never demand it (the user, 2026-10-29: "if it's
+    not possible to do in any way, then it shouldn't be a hook, or at least not a hook that prevents the end of the
+    turn")."""
     if not open_question(e):
         return set()
     keys = set(step_keys(e))
-    if e.get("blocks_steps"):
-        return keys & {int(x) for x in e["blocks_steps"]}
+    if "blocks_steps" in e:
+        return keys & {int(x) for x in e["blocks_steps"] or []}
     b = e.get("blocks") or ""
-    nums = set()
-    for m in re.finditer(r"(?i)\bsteps?\s+(\d+(?:(?:\s*,\s*|\s*,?\s+and\s+|\s*&\s*)\d+)*)", b):
-        nums |= {int(x) for x in re.findall(r"\d+", m.group(1))}
+    nums = parse_step_numbers(b)
     if nums:
         return keys & nums
     return {k for k in keys if b and overlap(step_text(e, k), b)}
@@ -1850,6 +1864,11 @@ def cmd_ask(a):
         t = now().isoformat()
         for k in ("checked_until", "blocks", "blocks_steps", "holds_all"):
             e.pop(k, None)
+        if a.holds_all is None and not bsteps and len(step_keys(e)) > 1:
+            sys.exit("plan: %s has %d next steps (%s): pass --blocks-steps N,N naming the ones the answer holds" % (
+                a.id, len(step_keys(e)), ", ".join(str(k) for k in step_keys(e))))
+        if a.holds_all is None and bsteps is None:
+            bsteps = []   # a lone next step not named: it keeps moving, its prompt names what waits (--blocks)
         if bsteps and set(bsteps) - set(step_keys(e)):
             sys.exit("plan: %s has no next step %s (it has %s)" % (a.id, ", ".join(
                 str(k) for k in sorted(set(bsteps) - set(step_keys(e)))), ", ".join(str(k) for k in step_keys(e))))
@@ -1862,14 +1881,16 @@ def cmd_ask(a):
             e["status"] = "running"
             if a.blocks:
                 e["blocks"] = rec["blocks"] = a.blocks
-            if bsteps:
-                e["blocks_steps"] = rec["blocks_steps"] = bsteps
+            e["blocks_steps"] = rec["blocks_steps"] = bsteps
         e.setdefault("asks", []).append(rec)
     if e["status"] == "waiting_user":
         print("plan: %s waits on the user from %s (everything: %s)" % (a.id, t, a.holds_all))
     else:
         print("plan: %s keeps running; question open from %s, waiting on it: %s" % (
             a.id, t, a.blocks or "not recorded"))
+        held = e.get("blocks_steps") or []
+        for k in step_keys(e):
+            print("  step %d %s: %s" % (k, "HELD" if k in held else "moves", (step_text(e, k) or "")[:160]))
 
 
 def cmd_unanswered(a):
@@ -2322,8 +2343,8 @@ def main(argv=None):
         A("--searched", required=True, help="what was read before asking (CLAUDE.md rules, site decisions) and why "
           "none settles it"),
         A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
-        A("--blocks-steps", metavar="N,N", help="the next steps (numbers) the answer holds; parsed from --blocks "
-          "(\"steps 1, 6 and 7\") when not given"),
+        A("--blocks-steps", metavar="N,N", help="the next steps (numbers) the answer holds; required when the entry has "
+          "more than one next step"),
         A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
     cmd("design", cmd_design, "record the design of the entry's next job (needed, and passed by the design reviewer, "
         "before any submission)", ID,

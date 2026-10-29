@@ -2633,13 +2633,49 @@ def command_reading():
              "refuses a named submission with no plan unit left." in tpl)
 
 
+def structured_blocks():
+    """The steps an open question holds are recorded, not guessed (review of 2026-10-29): plan ask takes
+    --blocks-steps, required when the entry has more than one next step, and prints what it holds; blocked_steps reads
+    only that field, the free-text parse (ranges, "or") kept for questions recorded before it."""
+    three = {1: "analyse the density gap", 2: "submit the pp-trained Muon arm", 3: "collect the default share"}
+    q = "Should the default share use the forward rotation on the e+e- pools as well?"
+    w = World([E("blk", next=dict(three))])
+    rc, out = w.plan_cmd("ask", "blk", "--ask", q, "--searched", SEARCHED, "--blocks", "steps 1 and 3")
+    scenario("structured blocks: an ask on a three-step entry without --blocks-steps is refused, nothing recorded",
+             rc != 0 and "--blocks-steps" in out and "ask" not in w.entries()["blk"], out)
+    rc, out = w.plan_cmd("ask", "blk", "--ask", q, "--searched", SEARCHED, "--blocks", "the rotation",
+                         "--blocks-steps", "1,3")
+    e = w.entries()["blk"]
+    nx = w.plan_cmd("next")[1]
+    scenario("structured blocks: --blocks-steps 1,3 is recorded, printed back, and only step 2 is listed",
+             rc == 0 and e["blocks_steps"] == [1, 3] and "step 1 HELD" in out and "step 2 moves" in out
+             and "step 3 HELD" in out and "NEXT blk step 2 of 3" in nx and "step 1 of 3" not in nx
+             and "step 3 of 3" not in nx, out + nx)
+    w = World([E("blk", next=dict(three))])
+    rc, out = w.plan_cmd("ask", "blk", "--ask", q, "--searched", SEARCHED, "--blocks-steps", "4")
+    scenario("structured blocks: a step the entry does not have is refused", rc != 0 and "no next step 4" in out, out)
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    import plan as P
+    cases = {"steps 1-3": {1, 2, 3}, "steps 1 to 3": {1, 2, 3}, "step 1 or 3": {1, 3}, "steps 1, 2 and 3": {1, 2, 3},
+             "step 2's design": {2}}
+    got = {}
+    for text, want in cases.items():
+        legacy = E("old", next=dict(three), ask=q, waiting_since=ago(20), blocks=text)
+        got[text] = P.blocked_steps(legacy)
+    scenario("structured blocks: a question recorded before the field falls back to the text, ranges and 'or' "
+             "included", all(got[t] == w_ for t, w_ in cases.items()), got)
+    rec = E("new", next=dict(three), ask=q, waiting_since=ago(20), blocks="steps 1-3", blocks_steps=[2])
+    scenario("structured blocks: a recorded field wins over the text", P.blocked_steps(rec) == {2},
+             P.blocked_steps(rec))
+
+
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
           designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself, main_session_work,
-          duplicate_check, command_reading]
+          duplicate_check, command_reading, structured_blocks]
 
 
 def main():
