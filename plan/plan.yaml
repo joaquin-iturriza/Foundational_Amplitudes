@@ -123,13 +123,13 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Continuous CPU exploration while the sign extension runs (the user''s ''Keep iterating.''): what sets catalog_v4''s
-      one-loop pools'' level, the third of the one-loop zero-shot error that is one number per pool (par:v4_kshot_level, analysis/catalog_v4/data/kshot_level.json:
-      offsets spread 0.88/0.83, largest on e+e- -> b b~ at one loop, b b~ -> c c~ H, g g -> Z H): read each held-out one-loop
-      pool''s offset against the training one-loop pools'' levels (their target''s mean on the train split, on CC through
-      site run, CPU) and the pool''s properties (born coupling orders, pure-QCD born or full order, multiplicity, initial
-      state, loop-induced or virtual), as level_range.py did on Daniel''s catalog: is the held-out level outside the range
-      the training pools span, or inside it and mispredicted; write it up with provenance; never wait on the GPU runs'
+    2: 'Continuous CPU exploration while the sign extension runs (the user''s ''Keep iterating.''): does the thin-class reading
+      of the one-loop level (par:v4_loop_levels: held-out levels inside the training range, the largest offsets on pools whose
+      property class has one training pool or none) hold on the tree axes: for catalog_v4''s held-out tree axes H1, H2, H3
+      (kshot_level.json offsets, both seeds) dump the training trees'' train-split levels on CC through site run (extend analysis/catalog_v4/loop_levels.py
+      with a tree mode, same one match rule), and read each held-out pool''s absolute offset against its matched class size;
+      if the level error falls with class size on trees too, the fix to propose is coverage of the thin classes, not a target
+      change; write it up with provenance; never wait on the GPU runs'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
