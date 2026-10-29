@@ -1,0 +1,1240 @@
+{
+ "reviews": {
+  "n_reviews": 16,
+  "reviewer_total": 71,
+  "itemised_lines": 52,
+  "reviews_with_lines": 12,
+  "count_only_reviews": [
+   "dfew_c",
+   "hsplit_c",
+   "v4pp_c",
+   "v4pp_d"
+  ],
+  "per_diff": {
+   "dfew_a": {
+    "reviewer_count": 3,
+    "itemised": 3
+   },
+   "dfew_b": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "dfew_c": {
+    "reviewer_count": 3,
+    "itemised": 0
+   },
+   "dfew_d": {
+    "reviewer_count": 5,
+    "itemised": 5
+   },
+   "ftharm_a": {
+    "reviewer_count": 7,
+    "itemised": 7
+   },
+   "ftharm_b": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "ftharm_c": {
+    "reviewer_count": 6,
+    "itemised": 6
+   },
+   "ftharm_d": {
+    "reviewer_count": 3,
+    "itemised": 3
+   },
+   "hsplit_a": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "hsplit_b": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "hsplit_c": {
+    "reviewer_count": 4,
+    "itemised": 0
+   },
+   "hsplit_d": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "v4pp_a": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "v4pp_b": {
+    "reviewer_count": 4,
+    "itemised": 4
+   },
+   "v4pp_c": {
+    "reviewer_count": 6,
+    "itemised": 0
+   },
+   "v4pp_d": {
+    "reviewer_count": 6,
+    "itemised": 0
+   }
+  },
+  "targets": [
+   {
+    "target": "analysis/catalog_daniel/catalog_norm_heldout.py:main",
+    "lines": 9,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/transfer/lowd_ft.py:load",
+    "lines": 7,
+    "diffs": 4
+   },
+   {
+    "target": "analysis/transfer/cells.py:best",
+    "lines": 4,
+    "diffs": 4
+   },
+   {
+    "target": "analysis/transfer/lowd_dyhpo.py:main",
+    "lines": 4,
+    "diffs": 4
+   },
+   {
+    "target": "analysis/catalog_daniel/heldout_delta.py:main",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_v3/prep_hybrid.py:main",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_v3/short_reads.py:read",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/transfer/nogain.py:main",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/transfer/nogain_start.py:stats",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_v3/pp_compare.py:pp_vs",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/catalog_v3/prep_level.py:one",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/catalog_v3/short_reads.py:main",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/catalog_v4/compare_v3.py:compare",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/transfer/rung_grid.py:fam",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "tools/zero_shot_parent.py",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/catalog_v4/compare_v3.py:pp",
+    "lines": 2,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_daniel/norm_explore4.py:main",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_v3/hybrid_check.py:main",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_v3/pp_compare.py:read",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_v3/prep_level.py:comp",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_v3/prep_level.py:main",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_v4/compare_v3.py:gmean",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/transfer/lowd_ft.py:TRAINED",
+    "lines": 1,
+    "diffs": 1
+   }
+  ],
+  "files": [
+   {
+    "target": "analysis/catalog_daniel/catalog_norm_heldout.py",
+    "lines": 9,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/transfer/lowd_ft.py",
+    "lines": 8,
+    "diffs": 4
+   },
+   {
+    "target": "analysis/catalog_v3/short_reads.py",
+    "lines": 5,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_v4/compare_v3.py",
+    "lines": 5,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/transfer/cells.py",
+    "lines": 4,
+    "diffs": 4
+   },
+   {
+    "target": "analysis/transfer/lowd_dyhpo.py",
+    "lines": 4,
+    "diffs": 4
+   },
+   {
+    "target": "analysis/catalog_v3/prep_level.py",
+    "lines": 4,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_daniel/heldout_delta.py",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_v3/prep_hybrid.py",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/transfer/nogain.py",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/transfer/nogain_start.py",
+    "lines": 3,
+    "diffs": 3
+   },
+   {
+    "target": "analysis/catalog_v3/pp_compare.py",
+    "lines": 3,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/transfer/rung_grid.py",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "tools/zero_shot_parent.py",
+    "lines": 2,
+    "diffs": 2
+   },
+   {
+    "target": "analysis/catalog_daniel/norm_explore4.py",
+    "lines": 1,
+    "diffs": 1
+   },
+   {
+    "target": "analysis/catalog_v3/hybrid_check.py",
+    "lines": 1,
+    "diffs": 1
+   }
+  ],
+  "lines": [
+   {
+    "diff": "dfew_a",
+    "new": "norm_explore5.py:main ~77-79 (z58 q from stats_net phys_gbr)",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main",
+     "analysis/catalog_daniel/heldout_delta.py:main"
+    ],
+    "why": "hp58 read with g's predicted mean and std"
+   },
+   {
+    "diff": "dfew_a",
+    "new": "norm_explore5.py:main.mse (~94)",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main"
+    ],
+    "why": "per-process MSE(log"
+   },
+   {
+    "diff": "dfew_a",
+    "new": "norm_explore5.py:main oracle affine (~100-106)",
+    "existing": [
+     "tools/zero_shot_parent.py"
+    ],
+    "why": "the oracle affine, refitted instead of read from q_aff"
+   },
+   {
+    "diff": "dfew_b",
+    "new": "norm_explore5.py:main (hp58 prediction mu + exp(lsd) h block)",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main",
+     "analysis/catalog_daniel/heldout_delta.py:main"
+    ],
+    "why": "hp58's prediction on a new process from g's statistics"
+   },
+   {
+    "diff": "dfew_b",
+    "new": "norm_explore5.py:main (loading meta, twins, heldout_preds.npz, catalog_norm_{A,B}.npz, stats_net.json)",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main"
+    ],
+    "why": "reads the same files into the same dicts"
+   },
+   {
+    "diff": "dfew_b",
+    "new": "norm_explore5.py:main (oracle affine on all events)",
+    "existing": [
+     "tools/zero_shot_parent.py"
+    ],
+    "why": "the oracle affine the npz already holds as q_aff"
+   },
+   {
+    "diff": "dfew_b",
+    "new": "norm_explore5.py:main (per-group n / median / p90 dict)",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main"
+    ],
+    "why": "the same per-process MSE summary over 43 new and 96 relabels"
+   },
+   {
+    "diff": "dfew_d",
+    "new": "norm_explore5.py:load_models",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main",
+     "analysis/catalog_daniel/heldout_delta.py:main"
+    ],
+    "why": "reader of heldout_preds.npz, stats_net.json[G] and the A/B npz, copied instead of imported"
+   },
+   {
+    "diff": "dfew_d",
+    "new": "norm_explore5.py:main lines 81-86 (meta, twins, probes, 43 new / 96 relabels)",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main"
+    ],
+    "why": "the same class-table and group reader"
+   },
+   {
+    "diff": "dfew_d",
+    "new": "norm_explore5.py:summ",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main"
+    ],
+    "why": "the same per-group statistic"
+   },
+   {
+    "diff": "dfew_d",
+    "new": "norm_explore5.py first-k level",
+    "existing": [
+     "analysis/catalog_daniel/norm_explore4.py:main"
+    ],
+    "why": "the first-k level calibration"
+   },
+   {
+    "diff": "dfew_d",
+    "new": "norm_explore5.py oracle affine",
+    "existing": [
+     "analysis/catalog_daniel/catalog_norm_heldout.py:main"
+    ],
+    "why": "the in-sample rescale and shift, recomputed"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:fam",
+    "existing": [
+     "analysis/transfer/rung_grid.py:fam"
+    ],
+    "why": "identical rung-to-family mapping"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:gather grid block",
+    "existing": [
+     "analysis/transfer/cells.py:best"
+    ],
+    "why": "a sweep's best trial in MSE of log"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:gather round2 block",
+    "existing": [
+     "analysis/transfer/lowd_dyhpo.py:main"
+    ],
+    "why": "per-cell per-method best trial of the DyHPO round"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:METHODS/LABEL and figure() col",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:TRAINED"
+    ],
+    "why": "method list, labels and colours"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:starts (lowd_ft_readout.jsonl)",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "reads the same read-out file per cell"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:collect (lowd_ft_runs.jsonl)",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "reads the same first-round runs file"
+   },
+   {
+    "diff": "ftharm_a",
+    "new": "ft_harm.py:run_row",
+    "existing": [
+     "analysis/transfer/nogain_start.py:stats",
+     "analysis/transfer/nogain.py:main"
+    ],
+    "why": "the same curve statistics"
+   },
+   {
+    "diff": "ftharm_b",
+    "new": "ft_harm.py:readouts",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "reads the same READOUT records from a gitignored copy; the committed data/lowd_ft_readout.jsonl holds them"
+   },
+   {
+    "diff": "ftharm_b",
+    "new": "ft_harm.py main, DyHPO block (best trial per cell)",
+    "existing": [
+     "analysis/transfer/lowd_dyhpo.py:main",
+     "analysis/transfer/cells.py:best"
+    ],
+    "why": "picks each method's best trial per cell"
+   },
+   {
+    "diff": "ftharm_b",
+    "new": "ft_harm.py main, first-round block (per-method best value per cell)",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "per-method per-cell MSE of log"
+   },
+   {
+    "diff": "ftharm_b",
+    "new": "ft_harm.py:row (climb, best_frac)",
+    "existing": [
+     "analysis/transfer/nogain.py:main"
+    ],
+    "why": "the curve-shape statistics"
+   },
+   {
+    "diff": "ftharm_c",
+    "new": "ft_harm.py:fam",
+    "existing": [
+     "analysis/transfer/rung_grid.py:fam"
+    ],
+    "why": "identical rung-to-family mapping redefined instead of imported"
+   },
+   {
+    "diff": "ftharm_c",
+    "new": "ft_harm.py:grid (tr = S.get(name)+S.get(name+\"_002\"), min(val_loss*prepd_std**2))",
+    "existing": [
+     "analysis/transfer/cells.py:best"
+    ],
+    "why": "best trial over name and name_002 sweeps at the best checkpoint; skips cells.py's unconverted-trial reporting"
+   },
+   {
+    "diff": "ftharm_c",
+    "new": "ft_harm.py:dyhpo (tr filter and best-trial pick)",
+    "existing": [
+     "analysis/transfer/lowd_dyhpo.py:main"
+    ],
+    "why": "per-method, per-cell best-trial selection on lowd_dyhpo_sweeps.json"
+   },
+   {
+    "diff": "ftharm_c",
+    "new": "ft_harm.py:pack (readout/*.json loop)",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "re-reads the same 60 read-outs from run dirs instead of the committed file"
+   },
+   {
+    "diff": "ftharm_c",
+    "new": "ft_harm.py:pack (data/lowd_ft_runs.jsonl by method, probe, rung, k)",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "same first-round run-record reader"
+   },
+   {
+    "diff": "ftharm_c",
+    "new": "ft_harm.py:one/summarise (first=v[0], climb=log10(last/best), best_frac)",
+    "existing": [
+     "analysis/transfer/nogain_start.py:stats",
+     "analysis/transfer/nogain.py:main"
+    ],
+    "why": "first validation vs best, last-over-best ratio, where the best sits"
+   },
+   {
+    "diff": "ftharm_d",
+    "new": "ft_harm.py:readouts (lines 34-52)",
+    "existing": [
+     "analysis/transfer/lowd_ft.py:load"
+    ],
+    "why": "reads the 60 cells' linear_readout records from a gitignored copy instead of committed data/lowd_ft_readout.jsonl"
+   },
+   {
+    "diff": "ftharm_d",
+    "new": "ft_harm.py:main DyHPO best-trial lines (tr = [...]; b = min(tr, key=val_loss*prepd_std**2))",
+    "existing": [
+     "analysis/transfer/lowd_dyhpo.py:main",
+     "analysis/transfer/cells.py:best"
+    ],
+    "why": "best trial per lowd sweep in MSE of log"
+   },
+   {
+    "diff": "ftharm_d",
+    "new": "ft_harm.py:describe",
+    "existing": [
+     "analysis/transfer/nogain_start.py:stats"
+    ],
+    "why": "first validation and minimum of a val_curve"
+   },
+   {
+    "diff": "hsplit_a",
+    "new": "prep_hybrid_level.py:KIND, KINDS, feat",
+    "existing": [
+     "analysis/catalog_v3/prep_level.py:comp"
+    ],
+    "why": "composition counts, copied instead of imported"
+   },
+   {
+    "diff": "hsplit_a",
+    "new": "prep_hybrid_level.py:main np.linalg.solve ridge",
+    "existing": [
+     "analysis/catalog_v3/prep_level.py:main"
+    ],
+    "why": "the composition fit, here also penalising the intercept"
+   },
+   {
+    "diff": "hsplit_a",
+    "new": "prep_hybrid_level.py:load, probes and level medians",
+    "existing": [
+     "analysis/catalog_v3/short_reads.py:read",
+     "analysis/catalog_v3/short_reads.py:main"
+    ],
+    "why": "per-probe level mean(q - t) from the same npz, already in short_reads.json"
+   },
+   {
+    "diff": "hsplit_a",
+    "new": "prep_hybrid_level.py:main ratio_hq",
+    "existing": [
+     "analysis/catalog_v3/prep_hybrid.py:main"
+    ],
+    "why": "median per-probe hybrid/emission-scale level ratio"
+   },
+   {
+    "diff": "hsplit_b",
+    "new": "prep_hybrid_split.py:main 25-30",
+    "existing": [
+     "analysis/catalog_v3/short_reads.py:read"
+    ],
+    "why": "same loader of the same npz and the same per-probe level, already in short_reads.json"
+   },
+   {
+    "diff": "hsplit_b",
+    "new": "prep_hybrid_split.py:main level_ratio",
+    "existing": [
+     "analysis/catalog_v3/prep_hybrid.py:main"
+    ],
+    "why": "the same per-probe median level ratio"
+   },
+   {
+    "diff": "hsplit_b",
+    "new": "prep_hybrid_split.py:main c_val",
+    "existing": [
+     "analysis/catalog_v3/prep_level.py:one"
+    ],
+    "why": "the per-process constant on the same validation events"
+   },
+   {
+    "diff": "hsplit_b",
+    "new": "prep_hybrid_split.py:main dc",
+    "existing": [
+     "analysis/catalog_v3/hybrid_check.py:main"
+    ],
+    "why": "the train-minus-validation constant gap (there for 10 pools only)"
+   },
+   {
+    "diff": "hsplit_d",
+    "new": "prep_hybrid_split.py:probe and the per-axis glob",
+    "existing": [
+     "analysis/catalog_v3/short_reads.py:read"
+    ],
+    "why": "the same npz reader and mean(q - t), without read()'s guard"
+   },
+   {
+    "diff": "hsplit_d",
+    "new": "prep_hybrid_split.py:main level_h / level_q",
+    "existing": [
+     "analysis/catalog_v3/short_reads.py:main"
+    ],
+    "why": "per-axis median level, recomputed"
+   },
+   {
+    "diff": "hsplit_d",
+    "new": "prep_hybrid_split.py:main level_ratio",
+    "existing": [
+     "analysis/catalog_v3/prep_hybrid.py:main"
+    ],
+    "why": "the same per-probe level-ratio median, already in prep_hybrid.json"
+   },
+   {
+    "diff": "hsplit_d",
+    "new": "prep_hybrid_split.py:probe cp_val",
+    "existing": [
+     "analysis/catalog_v3/prep_level.py:one"
+    ],
+    "why": "the per-process constant, already loaded as cp_prep_level"
+   },
+   {
+    "diff": "v4pp_a",
+    "new": "pp_trained_compare.py:rows (57-68)",
+    "existing": [
+     "analysis/catalog_v4/compare_v3.py:pp"
+    ],
+    "why": "the same reduction of the same short_reads PP npz with the same site mask; weaker match check"
+   },
+   {
+    "diff": "v4pp_a",
+    "new": "pp_trained_compare.py:main 83-94, 115-118",
+    "existing": [
+     "analysis/catalog_v4/compare_v3.py:pp"
+    ],
+    "why": "the class-role table through class_changes, copied line for line"
+   },
+   {
+    "diff": "v4pp_a",
+    "new": "pp_trained_compare.py:ratio and main 103-111",
+    "existing": [
+     "analysis/catalog_v4/compare_v3.py:compare"
+    ],
+    "why": "the per-class v4-over-v3 ratio statistic; v4_gain already in compare_v3.json"
+   },
+   {
+    "diff": "v4pp_a",
+    "new": "pp_trained_compare.py:main 111",
+    "existing": [
+     "analysis/catalog_v3/pp_compare.py:pp_vs"
+    ],
+    "why": "the per-class median ratio of pp-trained over window-trained arm"
+   },
+   {
+    "diff": "v4pp_b",
+    "new": "compare_pp_trained.py:stats + main 114-119",
+    "existing": [
+     "analysis/catalog_v4/compare_v3.py:compare"
+    ],
+    "why": "the same per-class ratio statistics, compare() hard-wired to the v3/v4 pair"
+   },
+   {
+    "diff": "v4pp_b",
+    "new": "compare_pp_trained.py:main 120, 131",
+    "existing": [
+     "analysis/catalog_v3/pp_compare.py:pp_vs"
+    ],
+    "why": "per-class median ratio over the window-trained arm"
+   },
+   {
+    "diff": "v4pp_b",
+    "new": "compare_pp_trained.py:main 98-100",
+    "existing": [
+     "analysis/catalog_v3/pp_compare.py:read"
+    ],
+    "why": "the reader of pp_rows.json, without its no_prediction list"
+   },
+   {
+    "diff": "v4pp_b",
+    "new": "compare_pp_trained.py:main 101 gm lambda",
+    "existing": [
+     "analysis/catalog_v4/compare_v3.py:gmean"
+    ],
+    "why": "geometric mean of two seeds"
+   }
+  ]
+ },
+ "scan": {
+  "rev": "2deabf7d",
+  "functions_compared": 829,
+  "pairs": 50,
+  "functions_in_a_pair": 53,
+  "clusters": [
+   {
+    "size": 6,
+    "names": [
+     "cls"
+    ],
+    "files": 6,
+    "min_similarity": 0.957,
+    "members": [
+     "analysis/catalog_v2/arms_compare.py:cls",
+     "analysis/catalog_v2/census.py:groups.cls",
+     "analysis/catalog_v2/excess_ratio.py:cls",
+     "analysis/catalog_v2/joint_vs_solo.py:cls",
+     "analysis/catalog_v2/seed_arms.py:cls",
+     "analysis/catalog_v2/steps_agg.py:cls"
+    ]
+   },
+   {
+    "size": 4,
+    "names": [
+     "divisor"
+    ],
+    "files": 4,
+    "min_similarity": 0.87,
+    "members": [
+     "analysis/scaling_compute/build_compute_scan_plot.py:divisor",
+     "analysis/scaling_compute/build_compute_scan_plot_big.py:divisor",
+     "analysis/scaling_compute/build_compute_scan_walltime.py:divisor",
+     "analysis/scaling_compute/build_fair_scaling.py:divisor"
+    ]
+   },
+   {
+    "size": 3,
+    "names": [
+     "plot"
+    ],
+    "files": 3,
+    "min_similarity": 0.899,
+    "members": [
+     "analysis/catalog_v3/prep_hybrid.py:plot",
+     "analysis/catalog_v3/prep_shat.py:plot",
+     "analysis/catalog_v3/short_reads.py:plot"
+    ]
+   },
+   {
+    "size": 3,
+    "names": [
+     "load"
+    ],
+    "files": 3,
+    "min_similarity": 1.0,
+    "members": [
+     "analysis/divergences/plot_l2_uugg.py:load",
+     "analysis/divergences/plot_l2_uugg_abs.py:load",
+     "analysis/divergences/plot_l2_uugg_gamma.py:load"
+    ]
+   },
+   {
+    "size": 3,
+    "names": [
+     "curve"
+    ],
+    "files": 3,
+    "min_similarity": 1.0,
+    "members": [
+     "analysis/scaling_compute/build_compute_scan_plot.py:curve",
+     "analysis/scaling_compute/build_compute_scan_plot_big.py:curve",
+     "analysis/scaling_compute/build_compute_scan_walltime.py:curve"
+    ]
+   },
+   {
+    "size": 3,
+    "names": [
+     "solo_alpha",
+     "solo_fit",
+     "solo_points"
+    ],
+    "files": 3,
+    "min_similarity": 0.816,
+    "members": [
+     "tools/make_solo_alpha.py:solo_alpha",
+     "tools/make_solo_scaling.py:solo_fit",
+     "tools/plot_vs_solo.py:solo_points"
+    ]
+   },
+   {
+    "size": 3,
+    "names": [
+     "get_by_bs",
+     "get_by_n",
+     "get_by_nh"
+    ],
+    "files": 1,
+    "min_similarity": 1.0,
+    "members": [
+     "tools/plot_iteration_time.py:get_by_bs",
+     "tools/plot_iteration_time.py:get_by_n",
+     "tools/plot_iteration_time.py:get_by_nh"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "plot"
+    ],
+    "files": 2,
+    "min_similarity": 0.906,
+    "members": [
+     "analysis/catalog_daniel/kshot_context_cmp.py:plot",
+     "analysis/catalog_v3/kshot_context.py:plot"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "orders"
+    ],
+    "files": 2,
+    "min_similarity": 1.0,
+    "members": [
+     "analysis/catalog_daniel/norm_blend.py:main.orders",
+     "analysis/catalog_daniel/norm_targets.py:main.orders"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "one"
+    ],
+    "files": 2,
+    "min_similarity": 0.893,
+    "members": [
+     "analysis/catalog_daniel/shape_learn.py:one",
+     "analysis/catalog_v3/prep_shape.py:one"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "load",
+     "runs"
+    ],
+    "files": 2,
+    "min_similarity": 0.889,
+    "members": [
+     "analysis/catalog_v2/joint_vs_solo.py:runs",
+     "analysis/catalog_v2/seed_arms.py:load"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "main"
+    ],
+    "files": 2,
+    "min_similarity": 0.882,
+    "members": [
+     "analysis/divergences/make_3d.py:main",
+     "analysis/divergences/make_plots.py:main"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "start_time"
+    ],
+    "files": 2,
+    "min_similarity": 0.879,
+    "members": [
+     "analysis/scaling_compute/hpo_concurrency.py:start_time",
+     "analysis/scaling_compute/hpo_diagnose.py:start_time"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "protected",
+     "referenced"
+    ],
+    "files": 2,
+    "min_similarity": 0.862,
+    "members": [
+     "analysis/storage/free_space.py:protected",
+     "tools/prune_copies.py:referenced"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "_dump_virt_process",
+     "dump_process"
+    ],
+    "files": 1,
+    "min_similarity": 0.836,
+    "members": [
+     "tools/dump_diagrams.py:_dump_virt_process",
+     "tools/dump_diagrams.py:dump_process"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "_rollup",
+     "_status"
+    ],
+    "files": 1,
+    "min_similarity": 0.907,
+    "members": [
+     "tools/mem_profile_data.py:_rollup",
+     "tools/mem_profile_data.py:_status"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "_load_catalog_v3_virt",
+     "_load_catalog_v4_virt"
+    ],
+    "files": 1,
+    "min_similarity": 0.99,
+    "members": [
+     "tools/nlo_virtual_pipeline.py:_load_catalog_v3_virt",
+     "tools/nlo_virtual_pipeline.py:_load_catalog_v4_virt"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "certify_ew",
+     "certify_loop_induced"
+    ],
+    "files": 1,
+    "min_similarity": 0.835,
+    "members": [
+     "tools/nlo_virtual_pipeline.py:certify_ew",
+     "tools/nlo_virtual_pipeline.py:certify_loop_induced"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "cmd_design_fix",
+     "cmd_design_pass"
+    ],
+    "files": 1,
+    "min_similarity": 0.956,
+    "members": [
+     "tools/plan.py:cmd_design_fix",
+     "tools/plan.py:cmd_design_pass"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "_draw_legs",
+     "_draw_legs_vk"
+    ],
+    "files": 1,
+    "min_similarity": 0.947,
+    "members": [
+     "tools/synthetic_amplitudes.py:_draw_legs",
+     "tools/synthetic_amplitudes.py:_draw_legs_vk"
+    ]
+   },
+   {
+    "size": 2,
+    "names": [
+     "main"
+    ],
+    "files": 2,
+    "min_similarity": 1.0,
+    "members": [
+     "tools/zs_hist.py:main",
+     "tools/zs_scatter.py:main"
+    ]
+   }
+  ],
+  "pair_list": [
+   {
+    "a": "analysis/catalog_daniel/kshot_context_cmp.py:plot",
+    "b": "analysis/catalog_v3/kshot_context.py:plot",
+    "similarity": 0.906
+   },
+   {
+    "a": "analysis/catalog_daniel/norm_blend.py:main.orders",
+    "b": "analysis/catalog_daniel/norm_targets.py:main.orders",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_daniel/shape_learn.py:one",
+    "b": "analysis/catalog_v3/prep_shape.py:one",
+    "similarity": 0.893
+   },
+   {
+    "a": "analysis/catalog_v2/arms_compare.py:cls",
+    "b": "analysis/catalog_v2/census.py:groups.cls",
+    "similarity": 0.957
+   },
+   {
+    "a": "analysis/catalog_v2/arms_compare.py:cls",
+    "b": "analysis/catalog_v2/excess_ratio.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/arms_compare.py:cls",
+    "b": "analysis/catalog_v2/joint_vs_solo.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/arms_compare.py:cls",
+    "b": "analysis/catalog_v2/seed_arms.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/arms_compare.py:cls",
+    "b": "analysis/catalog_v2/steps_agg.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/census.py:groups.cls",
+    "b": "analysis/catalog_v2/excess_ratio.py:cls",
+    "similarity": 0.957
+   },
+   {
+    "a": "analysis/catalog_v2/census.py:groups.cls",
+    "b": "analysis/catalog_v2/joint_vs_solo.py:cls",
+    "similarity": 0.957
+   },
+   {
+    "a": "analysis/catalog_v2/census.py:groups.cls",
+    "b": "analysis/catalog_v2/seed_arms.py:cls",
+    "similarity": 0.957
+   },
+   {
+    "a": "analysis/catalog_v2/census.py:groups.cls",
+    "b": "analysis/catalog_v2/steps_agg.py:cls",
+    "similarity": 0.957
+   },
+   {
+    "a": "analysis/catalog_v2/excess_ratio.py:cls",
+    "b": "analysis/catalog_v2/joint_vs_solo.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/excess_ratio.py:cls",
+    "b": "analysis/catalog_v2/seed_arms.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/excess_ratio.py:cls",
+    "b": "analysis/catalog_v2/steps_agg.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/joint_vs_solo.py:cls",
+    "b": "analysis/catalog_v2/seed_arms.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/joint_vs_solo.py:cls",
+    "b": "analysis/catalog_v2/steps_agg.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v2/joint_vs_solo.py:runs",
+    "b": "analysis/catalog_v2/seed_arms.py:load",
+    "similarity": 0.889
+   },
+   {
+    "a": "analysis/catalog_v2/seed_arms.py:cls",
+    "b": "analysis/catalog_v2/steps_agg.py:cls",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/catalog_v3/prep_hybrid.py:plot",
+    "b": "analysis/catalog_v3/prep_shat.py:plot",
+    "similarity": 0.977
+   },
+   {
+    "a": "analysis/catalog_v3/prep_hybrid.py:plot",
+    "b": "analysis/catalog_v3/short_reads.py:plot",
+    "similarity": 0.904
+   },
+   {
+    "a": "analysis/catalog_v3/prep_shat.py:plot",
+    "b": "analysis/catalog_v3/short_reads.py:plot",
+    "similarity": 0.899
+   },
+   {
+    "a": "analysis/divergences/make_3d.py:main",
+    "b": "analysis/divergences/make_plots.py:main",
+    "similarity": 0.882
+   },
+   {
+    "a": "analysis/divergences/plot_l2_uugg.py:load",
+    "b": "analysis/divergences/plot_l2_uugg_abs.py:load",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/divergences/plot_l2_uugg.py:load",
+    "b": "analysis/divergences/plot_l2_uugg_gamma.py:load",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/divergences/plot_l2_uugg_abs.py:load",
+    "b": "analysis/divergences/plot_l2_uugg_gamma.py:load",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot.py:divisor",
+    "b": "analysis/scaling_compute/build_compute_scan_plot_big.py:divisor",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot.py:divisor",
+    "b": "analysis/scaling_compute/build_compute_scan_walltime.py:divisor",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot.py:divisor",
+    "b": "analysis/scaling_compute/build_fair_scaling.py:divisor",
+    "similarity": 0.87
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot.py:curve",
+    "b": "analysis/scaling_compute/build_compute_scan_plot_big.py:curve",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot.py:curve",
+    "b": "analysis/scaling_compute/build_compute_scan_walltime.py:curve",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot_big.py:divisor",
+    "b": "analysis/scaling_compute/build_compute_scan_walltime.py:divisor",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot_big.py:divisor",
+    "b": "analysis/scaling_compute/build_fair_scaling.py:divisor",
+    "similarity": 0.87
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_plot_big.py:curve",
+    "b": "analysis/scaling_compute/build_compute_scan_walltime.py:curve",
+    "similarity": 1.0
+   },
+   {
+    "a": "analysis/scaling_compute/build_compute_scan_walltime.py:divisor",
+    "b": "analysis/scaling_compute/build_fair_scaling.py:divisor",
+    "similarity": 0.87
+   },
+   {
+    "a": "analysis/scaling_compute/hpo_concurrency.py:start_time",
+    "b": "analysis/scaling_compute/hpo_diagnose.py:start_time",
+    "similarity": 0.879
+   },
+   {
+    "a": "analysis/storage/free_space.py:protected",
+    "b": "tools/prune_copies.py:referenced",
+    "similarity": 0.862
+   },
+   {
+    "a": "tools/dump_diagrams.py:_dump_virt_process",
+    "b": "tools/dump_diagrams.py:dump_process",
+    "similarity": 0.836
+   },
+   {
+    "a": "tools/make_solo_alpha.py:solo_alpha",
+    "b": "tools/make_solo_scaling.py:solo_fit",
+    "similarity": 0.975
+   },
+   {
+    "a": "tools/make_solo_alpha.py:solo_alpha",
+    "b": "tools/plot_vs_solo.py:solo_points",
+    "similarity": 0.816
+   },
+   {
+    "a": "tools/make_solo_scaling.py:solo_fit",
+    "b": "tools/plot_vs_solo.py:solo_points",
+    "similarity": 0.837
+   },
+   {
+    "a": "tools/mem_profile_data.py:_status",
+    "b": "tools/mem_profile_data.py:_rollup",
+    "similarity": 0.907
+   },
+   {
+    "a": "tools/nlo_virtual_pipeline.py:_load_catalog_v3_virt",
+    "b": "tools/nlo_virtual_pipeline.py:_load_catalog_v4_virt",
+    "similarity": 0.99
+   },
+   {
+    "a": "tools/nlo_virtual_pipeline.py:certify_loop_induced",
+    "b": "tools/nlo_virtual_pipeline.py:certify_ew",
+    "similarity": 0.835
+   },
+   {
+    "a": "tools/plan.py:cmd_design_pass",
+    "b": "tools/plan.py:cmd_design_fix",
+    "similarity": 0.956
+   },
+   {
+    "a": "tools/plot_iteration_time.py:get_by_bs",
+    "b": "tools/plot_iteration_time.py:get_by_n",
+    "similarity": 1.0
+   },
+   {
+    "a": "tools/plot_iteration_time.py:get_by_bs",
+    "b": "tools/plot_iteration_time.py:get_by_nh",
+    "similarity": 1.0
+   },
+   {
+    "a": "tools/plot_iteration_time.py:get_by_n",
+    "b": "tools/plot_iteration_time.py:get_by_nh",
+    "similarity": 1.0
+   },
+   {
+    "a": "tools/synthetic_amplitudes.py:_draw_legs",
+    "b": "tools/synthetic_amplitudes.py:_draw_legs_vk",
+    "similarity": 0.947
+   },
+   {
+    "a": "tools/zs_hist.py:main",
+    "b": "tools/zs_scatter.py:main",
+    "similarity": 1.0
+   }
+  ]
+ }
+}

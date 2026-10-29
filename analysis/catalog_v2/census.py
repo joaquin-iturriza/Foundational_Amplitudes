@@ -17,6 +17,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, ROOT)
 NEEDLE = ["ee_mumu", "ee_tautau", "ee_uu", "ee_ddbar", "ee_bbbar", "ee_numu", "ee_nnbar"]
 TWINS = ["uu_uu", "ud_ud", "us_us", "dd_dd_nlo", "ds_ds_nlo", "cs_cs_nlo", "uu_uu_nlo",
          "ud_ud_nlo", "us_us_nlo"]
@@ -36,20 +37,8 @@ def signed_classes():
     return s27, all50
 
 
-def metrics(path):
-    """The run's per_process_metrics.json (the last one under `path`, i.e. the run's own)."""
-    js = sorted(glob.glob(os.path.join(path, "**", "per_process_metrics.json"), recursive=True))
-    if not js:
-        raise SystemExit(f"no per_process_metrics.json under {path}")
-    return json.load(open(js[-1]))
-
-
-def at_best(d):
-    """(index, combined val_loss_no_reg, {process: val_loss_no_reg}) at the run's best checkpoint:
-    the validation with the lowest aggregate val_loss_no_reg, every process at that same step
-    (the checkpoint selection, experiment._result_extra; CLAUDE.md "Reported values")."""
-    i = int(np.argmin(d["val_loss_no_reg"]))
-    return i, float(d["val_loss_no_reg"][i]), {n: float(v[i]) for n, v in d["proc_val_losses_no_reg"].items() if len(v) > i}
+# the run's metrics file and its best checkpoint: analysis/common (one rule for every script)
+from analysis.common.readers import run_metrics as metrics, best_checkpoint as at_best  # noqa: E402
 
 
 def best_not_last(d):

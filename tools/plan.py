@@ -975,6 +975,16 @@ def entry_quotes(e):
     return "\n".join('  "%s" (%s)' % (t, (w or "")[:16]) for t, w in qs)
 
 
+def readers_index():
+    """analysis/common's index (tools/readers_index.py) for the step prompt; a line saying why when it cannot be read."""
+    try:
+        sys.path.insert(0, os.path.join(HERE, "tools"))
+        import readers_index as ri
+        return "\n".join("  " + x for x in ri.index(HERE)) or "  (analysis/common holds no function)"
+    except Exception as x:                               # the prompt still goes out; the agent sees what failed
+        return "  (python3 tools/readers_index.py failed: %s)" % x
+
+
 def step_prompt(e, reason, key=None):
     """The step agent's prompt for the entry's step `key` (default its first): {next} is that step, {others} the
     entry's other next steps, which other step agents take in parallel."""
@@ -1003,7 +1013,7 @@ def step_prompt(e, reason, key=None):
                       next=step_text(e, key), n=key, others=others, done_when=e.get("done_when"),
                       quotes=q or "  none", dead_ends=de,
                       evidence=evidence, open_question=oq,
-                      design=design_text(last_design(e)))
+                      design=design_text(last_design(e)), readers=readers_index())
 
 
 # ---------------------------------------------------------------- site writes

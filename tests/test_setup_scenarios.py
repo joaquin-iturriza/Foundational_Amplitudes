@@ -2302,12 +2302,103 @@ def main_session_work():
     scenario("main session budget: a subagent's call passes whatever the main session used", rc == 0, out)
 
 
+def duplicate_check():
+    """The commit check of near-duplicate functions (tools/dupcheck.py in .githooks/pre-commit, the user's 2026-10-29
+    call on one-use scripts): a staged copy of an existing loader (variables renamed, other paths) is refused naming
+    the original; a new distinct function, and a copy with `# dup-ok: <reason>` on its def line, pass; editing one of
+    a pair that was already duplicated is not refused for that old pair. The step prompt carries analysis/common's
+    index and the line on reuse."""
+    repo = tempfile.mkdtemp(prefix="dup_")
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q")
+    for d in ("analysis", "tools", ".githooks"):
+        os.makedirs(os.path.join(repo, d))
+    for f in ("tools/dupcheck.py", "tools/verify_claims.py", ".githooks/pre-commit"):
+        shutil.copy(os.path.join(ROOT, f), os.path.join(repo, f))
+    g("config", "core.hooksPath", ".githooks")
+    loader = ("import glob, json, os\n\n\ndef load_runs(path):\n"
+              "    out = {}\n"
+              "    for f in sorted(glob.glob(os.path.join(path, \"results\", \"*.json\"))):\n"
+              "        r = json.load(open(f))\n"
+              "        if r.get(\"val_loss\") is None:\n"
+              "            continue\n"
+              "        key = os.path.basename(f)[:-5]\n"
+              "        out[key] = r[\"val_loss\"] * r[\"prepd_std\"] ** 2\n"
+              "    return out\n")
+    open(os.path.join(repo, "analysis", "a.py"), "w").write(loader)
+    g("add", "."); g("commit", "-qm", "base", "--no-verify")
+
+    def commit(name, text):
+        open(os.path.join(repo, "analysis", name), "w").write(text)
+        g("add", "analysis/" + name)
+        r = g("commit", "-qm", "add " + name)
+        if r.returncode:
+            g("reset", "-q", "analysis/" + name); os.remove(os.path.join(repo, "analysis", name))
+        return r.returncode, r.stdout + r.stderr
+    copy = (loader.replace("load_runs(path)", "read_sweep(d)").replace("(path,", "(d,").replace("out", "res")
+            .replace("\"results\"", "\"res_dir\"").replace("key", "k"))
+    rc, out = commit("b.py", copy)
+    scenario("dupcheck: a copied loader (renamed variables, another path) is refused, naming the original",
+             rc != 0 and "analysis/b.py:read_sweep" in out and "analysis/a.py:load_runs" in out, out)
+    distinct = ("import numpy as np\n\n\ndef stats(curves):\n"
+                "    if not curves:\n        return None\n"
+                "    f = np.log10([c[0] for c in curves])\n    b = np.log10([min(c) for c in curves])\n"
+                "    lo, hi = np.quantile(f - b, [0.1, 0.9])\n"
+                "    turned = [c[-1] / min(c) for c in curves]\n"
+                "    return {\"first\": float(np.median(f)), \"improve\": float(np.median(f - b)), \"q\": [lo, hi],\n"
+                "            \"turn\": float(np.median(turned))}\n")
+    rc, out = commit("c.py", distinct)
+    scenario("dupcheck: a new distinct function passes", rc == 0, out)
+    rc, out = commit("d.py", copy.replace("def read_sweep(d):", "def read_sweep(d):  # dup-ok: a test of the override"))
+    scenario("dupcheck: a copy with `# dup-ok: <reason>` on its def line passes", rc == 0, out)
+    p = os.path.join(repo, "analysis", "d.py")
+    text = open(p).read().replace("  # dup-ok: a test of the override", "").replace(
+        "        k = os.path.basename(f)[:-5]\n", "        k = os.path.basename(f)[:-5].lower()\n")
+    open(p, "w").write(text)
+    g("add", "analysis/d.py")
+    r = g("commit", "-qm", "edit d")
+    scenario("dupcheck: editing one of an already duplicated pair is not refused for that old pair",
+             r.returncode == 0, r.stdout + r.stderr)
+    os.makedirs(os.path.join(repo, "analysis", "common"))
+    open(os.path.join(repo, "analysis", "common", "readers.py"), "w").write(
+        "import numpy as np\n\n\ndef best_checkpoint(d):\n    i = int(np.argmin(d[\"val_loss_no_reg\"]))\n"
+        "    return i, float(d[\"val_loss_no_reg\"][i])\n")
+    g("add", "."); g("commit", "-qm", "common", "--no-verify")
+    rc, out = commit("e.py", "import numpy as np\n\n\ndef at_best(m):\n    j = int(np.argmin(m[\"val_loss_no_reg\"]))\n"
+                     "    return j, float(m[\"val_loss_no_reg\"][j])\n")
+    scenario("dupcheck: a short copy of an analysis/common function is refused, naming it",
+             rc != 0 and "analysis/common/readers.py:best_checkpoint" in out, out)
+    g("mv", "analysis/d.py", "analysis/moved d.py")
+    r = g("commit", "-qm", "move d")
+    scenario("dupcheck: moving a file (to a path with a space) is not writing its functions anew",
+             r.returncode == 0, r.stdout + r.stderr)
+    # an old pair, committed past the check: a small edit of one of them keeps it >= 0.8 similar and is not refused
+    open(os.path.join(repo, "analysis", "old_dup.py"), "w").write(loader.replace("load_runs", "g"))
+    g("add", "."); g("commit", "-qm", "old pair", "--no-verify")
+    p = os.path.join(repo, "analysis", "a.py")
+    text = open(p).read().replace("        key = os.path.basename(f)[:-5]\n", "        key = os.path.basename(f)[:-5].lower()\n")
+    open(p, "w").write(text)
+    still = subprocess.run([sys.executable, os.path.join(repo, "tools", "dupcheck.py"), "--root", repo, p],
+                           capture_output=True, text=True).stdout
+    g("add", "analysis/a.py")
+    r = g("commit", "-qm", "edit a")
+    scenario("dupcheck: a small edit of one of a committed duplicate pair (still a near copy) is not refused",
+             r.returncode == 0 and "analysis/a.py:load_runs  " in still and "no match" not in still,
+             r.stdout + r.stderr + still)
+    w = World([E("cov")])
+    pr = w.plan_cmd("next", "--prompts")[1]
+    scenario("the step prompt carries analysis/common's index and the line on reuse",
+             "best_trial(trials" in pr and "Before writing a loader, picker or statistic, use analysis/common" in pr
+             and "readers_index.py failed" not in pr, pr[-2500:])
+
+
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself, main_session_work]
+          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself, main_session_work,
+          duplicate_check]
 
 
 def main():

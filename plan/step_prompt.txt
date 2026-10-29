@@ -73,6 +73,11 @@ Reading costs: every tool call re-reads your whole context, so calls, not lines,
   each whole function or paragraph you need, several files in one Bash call; never a file in many small slices.
 - Start from the files and paths the evidence and the design name; read other code only for what they do not cover.
 - docs/results.tex: read only the paragraphs the evidence or the design names (grep their labels), never whole sections.
+Existing code (analysis/common; `python3 tools/readers_index.py`):
+{readers}
+Before writing a loader, picker or statistic, use analysis/common (index above); a family of similar figures is one script with arguments, each figure's % src line naming the script and its arguments.
+A commit that adds or changes a function in analysis/ or tools/ into a near copy of an existing one is refused, naming
+that function (tools/dupcheck.py, .githooks/pre-commit): import it or extend it with an argument.
 How to:
 - read an entry only with `python3 tools/plan.py show <id>` (grep, awk or python on plan/plan.yaml is refused);
   every plan subcommand takes --help.

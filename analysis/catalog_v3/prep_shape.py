@@ -35,11 +35,9 @@ AXES = ("H1", "H2", "H2p5", "H3", "H6", "H7c", "H7E")
 TARGETS = ("raw", "dless", "qperp", "soft")
 
 
-def pool(name, sq):
-    d = os.environ["DATA_DIR"]
-    g = sorted(glob.glob(os.path.join(d, f"{name}_{sq[0]}-{sq[1]}GeV_val_*amplitudes.npy"))) if sq else []
-    g = g or sorted(glob.glob(os.path.join(d, f"{name}_*_val_*amplitudes.npy")))
-    return g[0] if g else None
+import functools  # noqa: E402
+from analysis.common.readers import find_pool  # noqa: E402
+pool = functools.partial(find_pool, any_window=True)   # (name, sq) -> the validation pool path, any window if absent
 
 
 def one(args):

@@ -1,7 +1,13 @@
 #!/bin/sh
-# git pre-commit (core.hooksPath = .githooks; setup redesign, D121): a commit whose index changes docs/results.tex
-# must state only numbers the analysis scripts reproduce (tools/verify_claims.py on the real index). It runs for every
-# way of committing (add then commit, commit -a, commit --all, a worktree) since git calls it on the index itself.
+# git pre-commit (core.hooksPath = .githooks; setup redesign, D121). Two checks of the index itself, so they run for
+# every way of committing (add then commit, commit -a, commit --all, a worktree):
+#  - a staged .py under analysis/ or tools/ may not add or change a function into a near duplicate of an existing one
+#    (tools/dupcheck.py --staged; override `# dup-ok: <reason>` on the def line);
+#  - a commit whose index changes docs/results.tex must state only numbers the analysis scripts reproduce
+#    (tools/verify_claims.py on the real index).
 top=$(git rev-parse --show-toplevel) || exit 1
+if [ -f "$top/tools/dupcheck.py" ] && git diff --cached --name-only --diff-filter=AMR | grep -qE '^(analysis|tools)/.*\.py$'; then
+    python3 "$top/tools/dupcheck.py" --root "$top" --staged || exit 1
+fi
 git diff --cached --name-only | grep -qx 'docs/results.tex' || exit 0
 exec python3 "$top/tools/verify_claims.py" --root "$top" --staged
