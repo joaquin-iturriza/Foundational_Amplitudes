@@ -1216,6 +1216,19 @@ entries:
       not decided. Written up beside par:v4_tree_shape with the per-group and per-cell table (free read, TR read, proxy).
       Cost: two eval-only GPU jobs, 1153 probes at about 1.1 s each plus setup, about 0.5 GPU-h each, 1 GPU-h in all (budget
       30); one CPU job, 32 cores, up to 3 h (the proxy on 1604 pools, two targets).'
+    passed_at: '2026-10-29T17:09:20+00:00'
+    reviewer: 'Second redesign checked against analysis/catalog_v4/data/shape_gap.json @14436c13. The decision is now made
+      per held-out group, on the new combinations (62) and the multiplicity pools (218) only; the two top groups (35 at another
+      trained mass, 244 at none) are reported beside it, which fixes the earlier mixing of the untrained top mass. Measure:
+      free-read median d per group is +0.201 (seeds 0.226 / 0.178) and +0.334 (0.351 / 0.319), with the top groups at +0.215
+      and +0.696, so d separates groups nearer to and farther from training. The proxy separated training from held-out classes
+      on catalog_v3 (0.059 vs 0.077) and tracks the network (rank 0.68 to 0.80). Seeds: threshold 0.3 against seed differences
+      of the group medians of 0.049 and 0.032 and per-pool spreads of 0.064 and 0.054. Every pool is in a cell with at least
+      5 training pools. Yes, no and unresolved (the log-log residual and e on different sides of 0.3) are stated per group.
+      Searched results.tex for in-distribution, generalisation gap, shape gap, train_levels, training floor, own training,
+      training classes, v4_tree_shape and shape proxy, plus the plan''s dead ends and decisions D178 and D179: the prior is
+      complete, and the GPU read''s difference from the free read is stated (test split, 2000 events, var(q - t) by the held-out
+      scorer). No decision names a comparison that is left out.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
