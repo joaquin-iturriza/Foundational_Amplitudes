@@ -1939,6 +1939,87 @@ the multiplicity axis carries a positive bias of its own, largest from gluon-glu
   \label{fig:v4_tree_newproc}
 \end{figure}
 
+\paragraph{The shape part of catalog\_v4's tree zero-shot error (2026-10-29).}\label{par:v4_tree_shape} The question,
+from the paragraph above and the user's priorities (the zero-shot bias first, then the shape on unseen processes): once
+each held-out tree pool's own offset is removed, does the error left, its shape, split across the four groups as the
+offset does (largest on the top processes at no trained top mass, the new combinations with the top processes at
+another mass), or does a new process carry a shape error of its own. If it splits as the offset, the tree zero-shot
+error is the untrained top mass in both parts; if not, the new process needs a fix in the target or inputs for what
+predicts its shape. No new run: the same two pretrainings (seeds $42$ and $43$), the same four groups and cells of
+multiplicity and initial state and the same reading as par.~\ref{par:v4_tree_newproc}, with the seed-mean floor
+$\mathrm{var}(q-t)$ over the pool's validation events (the MSE left once its own offset is removed, par.~\ref{par:v4_kshot_level})
+in place of the absolute offset (\code{analysis/catalog\_v4/loop\_levels.py --trees}, one reader for both quantities,
+Fig.~\ref{fig:v4_tree_shape}); no fit, no new threshold.
+% src: python3 analysis/catalog_v4/loop_levels.py --trees @54f62347
+% claim: sh.H1.n=62
+% claim: sh.H2.n=218
+% claim: sh.other_mass.n=35
+% claim: sh.no_mass.n=244
+% claim: sh.H1.median_shape=0.24
+% claim: sh.H2.median_shape=0.392
+% claim: sh.other_mass.median_shape=0.155
+% claim: sh.no_mass.median_shape=0.626
+% claim: sh.H1.median_level_share=0.04
+% claim: sh.H2.median_level_share=0.139
+% claim: sh.other_mass.median_level_share=0.039
+% claim: sh.no_mass.median_level_share=0.266
+% claim: sh.H1.n_compared=60
+% claim: sh.H1.n_cells_compared=9
+% claim: sh.H1.n_nearer_no_mass=25
+% claim: sh.H1.median_log_ratio_no_mass=-0.357
+% claim: sh.H1.median_log_ratio_other_mass=0.151
+% claim: sh.H2.n_compared=218
+% claim: sh.H2.n_cells_compared=7
+% claim: sh.H2.n_nearer_no_mass=123
+% claim: sh.H2.median_log_ratio_no_mass=-0.197
+% claim: sh.H2.median_log_ratio_other_mass=0.345
+% claim: sh.rho.abs_offset=0.53
+% claim: sh.rho.abs_offset_all_groups=0.56
+% claim: sh.rho.particles=0.26
+% claim: sh.rho.alpha_s_power=-0.07
+% claim: sh.rho.alpha_power=0.36
+% claim: sh.rho.massive_legs=-0.15
+% claim: sh.rho.matched_class_size=0.27
+% claim: sh.initial.gg.median_shape=0.652
+% claim: sh.initial.ee.median_shape=0.445
+% claim: sh.initial.qq.median_shape=0.347
+% claim: np.H1.n_nearer_no_mass=14
+% claim: np.H1.median_log_ratio_no_mass=-0.749
+% claim: np.H1.median_log_ratio_other_mass=0.145
+% allow: 42 43 because they are the seeds, settings
+% allow: 2 because it is the square of the offset, notation
+The shape is most of the tree zero-shot error in every group: the median level share ($\overline{q-t}^{\,2}$ over the
+zero-shot MSE) is $0.04$ on the new combinations, $0.139$ on the multiplicity pools, $0.039$ on the top processes at
+another mass and $0.266$ on those at none. It splits as the offset does: median floor $0.24$ on the $62$ new
+combinations, $0.392$ on the $218$ multiplicity pools, $0.155$ on the $35$ top processes at another mass and $0.626$ on
+the $244$ at none. Cell by cell the new combinations stay nearer the other-mass group, though less clearly than their
+offsets: $25$ of the $60$ pools in the $9$ cells are nearer the no-mass group (offsets: $14$), the median log$_{10}$
+ratio to the no-mass cell median $-0.357$ (offsets: $-0.749$) and to the other-mass one $0.151$ (offsets: $0.145$).
+The ratio to the other-mass group is unchanged; what narrows is the gap between the two top groups, so the untrained
+top mass costs less in shape than in level. The multiplicity pools again lie between, $123$ of $218$ nearer the no-mass
+group in $7$ cells, log ratios $-0.197$ and $0.345$. A pool's shape and offset go together: rank correlation $0.53$
+over the new-process pools, $0.56$ over all four groups. Over the new processes the floor's rank correlations with the
+born's $\alpha$ power, the matched class size and the multiplicity are $0.36$, $0.27$ and $0.26$ (with the $\alpha_s$
+power and the massive legs $-0.07$ and $-0.15$), none as large as with the offset; the multiplicity and $\alpha$ power
+are not separated here (the multiplicity pools are the longer ones). By initial state the gluon-gluon and $e^+e^-$ pools
+again lead, median $0.652$ and $0.445$ against $0.347$ on quark-antiquark, the same beams as the largest offsets. The
+training pools' own in-distribution floor in the same cells is not in these reads (they hold held-out pools only), so
+how much of a new process's floor is the pool's intrinsic difficulty, at the network's in-distribution accuracy, is not
+separated; the $35$ other-mass pools are a selected set, so the cell comparison is a reading, not a test. What it
+changes: the shape takes the first branch of the step, as the level did; on trees the zero-shot error, level and shape,
+is largest where the top is held out at its mass, a property of the axis design, and of the listed properties of a
+new process none goes with its floor as closely as its own offset does (no partial correlation was computed). The next reads are the multiplicity axis's signed bias and
+the one-loop axis.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/tree_levels_shape.pdf}
+  % src: python3 analysis/catalog_v4/loop_levels.py --trees @54f62347
+  \caption{catalog\_v4's tree held-out pools in the four groups of Fig.~\ref{fig:v4_tree_newproc}. Left: per pool its
+    seed-mean floor, the variance of the zero-shot error over its validation events, against its seed-mean absolute
+    offset. Right: the floor per group, the bar the group's median.}
+  \label{fig:v4_tree_shape}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
