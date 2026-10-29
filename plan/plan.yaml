@@ -128,8 +128,11 @@ entries:
   - D175
   - D182
   next:
-    5: Wait for the CC cleanup (about 340G being freed by another agent); /sps/lpnhe had 0 bytes free on 2026-10-29 (512G/512G).
-      Once df -h /sps/lpnhe shows >= 50G free, run step 1 as written.
+    5: When the held-out reads of the two sign-extension pretrainings end (FA-ccin2p3-84b85010 seed 42, FA-ccin2p3-019b939c
+      seed 43, eval-only rereads of FA-ccin2p3-a8cd68ce and -6681cae1, whose training completed and whose reads died on the
+      full CC disk), read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design says (wrong-sign
+      share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean median; the
+      zero-shot MSE per axis, 2->5 first; blow-ups listed)
     6: 'Waits on the CC-IN2P3 /sps/lpnhe cleanup (df 2026-10-29: 512G used of 512G, 0 available; another agent is freeing
       about 340G). Once at least 50G is free: resubmit unchanged, as eval-only re-reads, the two TR reads of the control pair
       under the passed shape-gap design (REREAD=FA-ccin2p3-339ec100 seed 42 and REREAD=FA-ccin2p3-380842ed seed 43, scripts/job_catalog_v3_short.sh
@@ -1265,10 +1268,11 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     5:
-      feeds: whether v3_prep_explore step 1 can run on CC now
+      feeds: whether training on more sign-changing one-loop pools lowers the held-out wrong-sign share at equal compute
       if:
-      - 'df shows >= 50G free on /sps/lpnhe: run step 1 as written'
-      - 'still < 50G free after the cleanup ends: report to the main session that CC space is the blocker and stop'
+      - 'the wrong-sign share drops on both seeds by the design''s sign test: adopt the sign extension for the full pretraining''s
+        recipe'
+      - 'no drop on either seed: record the sign extension as a dead end for the wrong-sign share'
     6:
       feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
         gap beyond intrinsic difficulty or the network''s floor at this compute, which decides whether shape work targets
