@@ -1931,6 +1931,14 @@ entries:
       catalog_v4''s Muon short-run settings (4264 steps), about 3.5 GPU-h; first check by recipe id that the control''s non-swapped
       pools match (else rerun the control, about 3 GPU-h more); submit only once the pp13v4 validation (step 1) has passed;
       read on pp13v4 test rows and the smart test pools'
+    7: 'Default-share generation layout (implementation done at c865826b; nothing submitted): the dsh pools hold 48.8M new
+      MadEvent events over 912 training classes (recipes/catalog_v4_default_lhe.yaml, 0.50 arm with a 0.10 acceptance margin;
+      the 0.25 arm reads a prefix) plus 340k e+e- test events (catalog_v4_ee_test.yaml). One job per class does not fit CC''s
+      submit cap (site pick: 77 slots left of 100 on 2026-10-29) and a 2->4 class''s 6e4 events take hours in one MadEvent
+      sequence, so ''under an hour'' needs the dsh pools split into per-run sub-entries (one MadEvent run per job, the runs''
+      events concatenated in run order at read time) and a feeder within the cap; implement and test that, then submit only
+      once the passed design''s order allows it (the pure-default bound first) or the user''s words say otherwise. Rerun recipes/gen_catalog_v4_default.py
+      after the staged pp n_runs change lands'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3001,6 +3009,13 @@ entries:
         as its own group), asking the user the fractions, energies, loops and variants first'
       - 'within the spread or above catalog_v4: report to the user with the 1e4-vs-1e5 pool-size caveat and propose dropping
         the hadronic default share, their call; ask the e+e- question separately'
+    7:
+      feeds: whether catalog_v4's final mixture includes a default-sampled share, and at which fraction
+      if:
+      - 'the per-run split and feeder pass their local tests and the bound shows room (or the user asks for the generation
+        now): submit the dsh generation on CC under catalog_coverage, wall time planned from site pick and the measured per-run
+        times'
+      - 'the bound shows no room for a hadronic share: generate only the e+e- share and test pools, and report to the user'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
