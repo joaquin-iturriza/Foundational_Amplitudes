@@ -874,6 +874,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.637
+      accept_short: true
     parent: v4_epem_agttx
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2013,6 +2015,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.342
+      accept_short: true
     parent: v4_epem_bbxttx
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2262,6 +2266,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.849
+      accept_short: true
     parent: v4_epem_bhtxwp
     split: heldout
     test_group: 'e+e- v4: H3'

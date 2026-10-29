@@ -341,8 +341,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 11.07
-      n_runs: 20
+      n_runs: 29
       run_events: 31774
+      accept_short: true
       parts: true
     parent: v4_bb_bbgg
     reuse: pp13v4_bb_bbgg
@@ -3465,8 +3466,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 2.28
-      n_runs: 17
+      n_runs: 43
       run_events: 10571
+      accept_short: true
       parts: true
     parent: v4_bbx_bbxwpwm
     reuse: pp13v4_bbx_bbxwpwm
@@ -9040,8 +9042,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
-      n_runs: 2
+      n_runs: 3
       run_events: 39931
+      accept_short: true
       parts: true
     parent: v4_db_buwmz
     reuse: pp13v4_db_buwmz
@@ -9215,8 +9218,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 6.32
-      n_runs: 15
+      n_runs: 34
       run_events: 25774
+      accept_short: true
       parts: true
     parent: v4_dbx_abxuwm
     reuse: pp13v4_dbx_abxuwm
@@ -9738,8 +9742,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
-      n_runs: 2
+      n_runs: 4
       run_events: 34518
+      accept_short: true
       parts: true
     parent: v4_dbx_bxhuwm
     reuse: pp13v4_dbx_bxhuwm
@@ -9825,8 +9830,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 363.29
-      n_runs: 187
+      n_runs: 249
       run_events: 101838
+      accept_short: true
       parts: true
     parent: v4_dbx_bxuwmz
     reuse: pp13v4_dbx_bxuwmz
@@ -10092,8 +10098,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
-      n_runs: 8
+      n_runs: 14
       run_events: 7056
+      accept_short: true
       parts: true
     parent: v4_dd_duwmz
     reuse: pp13v4_dd_duwmz
@@ -10608,8 +10615,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 135.5
-      n_runs: 305
+      n_runs: 1008
       run_events: 23312
+      accept_short: true
       parts: true
     parent: v4_ddx_awpwmz
     reuse: pp13_ddx_awpwmz
@@ -14809,6 +14817,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.578
+      accept_short: true
     parent: v4_epem_aaccx
     reuse: ee4_epem_aaccx
     split: train
@@ -14909,6 +14919,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.617
+      accept_short: true
     parent: v4_epem_aamupmum
     reuse: ee4_epem_aamupmum
     split: train
@@ -14959,6 +14971,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.884
+      accept_short: true
     parent: v4_epem_aataptam
     reuse: ee4_epem_aataptam
     split: train
@@ -15253,6 +15267,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.69
+      accept_short: true
     parent: v4_epem_accxg
     reuse: ee4_epem_accxg
     split: train
@@ -15351,6 +15367,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.984
+      accept_short: true
     parent: v4_epem_accxz
     reuse: ee4_epem_accxz
     split: train
@@ -15741,6 +15759,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.584
+      accept_short: true
     parent: v4_epem_amupmumz
     reuse: ee4_epem_amupmumz
     split: train
@@ -15790,6 +15810,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.565
+      accept_short: true
     parent: v4_epem_amupvmwm
     reuse: ee4_epem_amupvmwm
     split: train
@@ -15887,6 +15909,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.663
+      accept_short: true
     parent: v4_epem_ataptamz
     reuse: ee4_epem_ataptamz
     split: train
@@ -15936,6 +15960,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.345
+      accept_short: true
     parent: v4_epem_atapvtwm
     reuse: ee4_epem_atapvtwm
     split: train
@@ -16961,6 +16987,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.377
+      accept_short: true
     parent: v4_epem_ccxgg
     reuse: ee4_epem_ccxgg
     split: train
@@ -17059,6 +17087,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.465
+      accept_short: true
     parent: v4_epem_ccxgz
     reuse: ee4_epem_ccxgz
     split: train
@@ -17447,6 +17477,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.422
+      accept_short: true
     parent: v4_epem_ddxuux
     reuse: ee4_epem_ddxuux
     split: train
@@ -18464,6 +18496,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.557
+      accept_short: true
     parent: v4_epem_htaptamz
     reuse: ee4_epem_htaptamz
     split: train
@@ -18991,6 +19025,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.681
+      accept_short: true
     parent: v4_epem_mupmumzz
     reuse: ee4_epem_mupmumzz
     split: train
@@ -19379,6 +19415,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.558
+      accept_short: true
     parent: v4_epem_taptamzz
     reuse: ee4_epem_taptamzz
     split: train
@@ -21150,8 +21188,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 0.6
-      n_runs: 30
+      n_runs: 40
       run_events: 2800
+      accept_short: true
       parts: true
     parent: v4_ub_bdwpz
     reuse: pp13v4_ub_bdwpz
@@ -25259,6 +25298,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 53042
+      accept_short: true
       parts: true
     parent: v4_udx_adxhu
     reuse: pp13_udx_adxhu
