@@ -2897,6 +2897,16 @@ entries:
       a sweep of the pp arm would be owed only if it loses on (a) by less than the spread and the user wants it settled. Cost:
       2 short pretrainings, about 1.5 GPU-h each (estimate from par:v4_vs_pp''s 3 GPU-h), plus about 0.5 GPU-h of reads, 3.5
       GPU-h (6.5 with the control rerun), under the 30 GPU-h budget.'
+    passed_at: '2026-10-29T16:09:31+00:00'
+    reviewer: 'Re-checked the revised design (Muon pp-trained arm on catalog_v4_pp_mixed_train.yaml vs catalog_v4''s two Muon
+      short runs, the 466 hadronic training classes swapped, the rest checked by recipe id, 1e4 vs 1e5 size stated). Check
+      2: pp-trained over window 0.19-0.26 on pp events, 1.94-2.05 on window pools (catalog_v3); on catalog_v4 matching labels
+      0.66/0.58 with Muon-over-AdamW 0.26-0.28, so the expected 0.4-ish ratio sits well below the 0.8 threshold. Check 3:
+      catalog_v4 seed spread median abs log10 0.10/0.14 (par:v4_vs_pp), threshold 0.8 plus lower-in-both-seeds on more than
+      half the classes. Note for the reader: the No branch is weakened by the ten-times-smaller pp pools and should say so
+      when it goes to the user. Searched: pp-trained, pp arm, trained on pp, blend, MadEvent, default sampl, unweighted, genmix,
+      v4_vs_pp, v4_density, prep_sampling, pp13v4, catalog_v4_pp_mixed_train; plan show; site decisions D17, D116, D117, D119,
+      D126, D130, D145, D155, D161, D178.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
