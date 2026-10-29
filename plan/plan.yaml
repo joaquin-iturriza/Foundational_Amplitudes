@@ -1070,6 +1070,59 @@ entries:
       whose val split selected the checkpoint; use it for the training pools (same distribution as their val) or state why
       val is kept. Checks 2, 6, 7 hold: the floor moves 0.155 vs 0.626 between the other-mass and no-mass top groups (par:v4_tree_shape,
       confirmed), the design answers next step 4 and D178''s shape priority, no decision names a comparison it leaves out.'
+  - at: '2026-10-29T17:05:11+00:00'
+    question: 'Is the shape error of catalog_v4''s held-out tree processes (seed-mean floor var(q - t), median 0.24 on the
+      62 new combinations, 0.392 on the 218 multiplicity pools, par:v4_tree_shape) a generalisation gap, i.e. above the in-distribution
+      floor of the training pools in the same cell of multiplicity and initial state by more than the pools'' intrinsic difficulty
+      explains, or the network''s floor at this compute plus intrinsic difficulty? Feeds the user''s shape priority (D178):
+      shape work aimed at transfer (target or input priors) or at capacity and training length. Redesign after the FIX of
+      2026-10-29 16:58 (intrinsic-difficulty control added, effect size stated, prior work cited, test split).'
+    prior: 'Searched docs/results.tex (par:v4_tree_shape, par:v4_kshot_level, par:v3_shape_proxy, par:v3_factorised near line
+      2672, ''in-distribution'', ''floor'', ''sigma^2''), plan show v3_prep_explore (the FIXed design of 16:55), site decisions
+      (D178). Found: (i) par:v4_tree_shape: held-out floors per group and initial state, in-distribution floor missing. (ii)
+      par:v3_factorised: result.json per-process val_loss_no_reg times the shared standardization''s sigma^2 matches the zero-shot
+      scorer (0.50 vs 0.51 on 40 catalog_v3 parents); analysis/catalog_v3/data/train_levels.json already holds it for both
+      controls. Used here as the FREE READ, done (analysis/catalog_v4/loop_levels.py --shape-gap @9c9f2b06, data/shape_gap.json):
+      over the 1045 training tree pools median MSE 0.126 against the 559 held-out pools'' median floor 0.447; in 19 of 20
+      cells held out is above training, median per-cell log10 ratio 0.61 (pool-weighted 0.475), e.g. 6qq 0.30 (351 train /
+      193 held out), 6ee 0.44, 6bb 0.57, 6bg 0.70, 6gg 0.90, 5-particle cells 0.56 to 1.25; seed spread of a cell''s log10
+      ratio 0.081 (median), per pool 0.062. Why the GPU read is still needed: the free read is 200 validation events per pool,
+      the split that selected the checkpoint, and the MSE with the offset in (an upper bound on the floor), not var(q - t)
+      on 2000 test events by the held-out reads'' scorer. (iii) par:v3_shape_proxy (analysis/catalog_v3/prep_shape.py): per-class
+      regressor MSE 0.059 on 200 training classes vs 0.077 held out on catalog_v3 2->4 (1.3x, log10 0.11), rank 0.68 to 0.80
+      with the network''s zero-shot shape: the intrinsic-difficulty control, extended to catalog_v4 (--catalog v4 @9c9f2b06,
+      every training tree pool and H1/H2/H3) and run here as a CPU job.'
+    measure: 'Per cell c (particle count, initial state; 20 cells with both training and held-out pools): R_net(c) = log10(median
+      held-out floor / median training floor), the training floor from the TR read (var(q - t) over each training pool''s
+      2000 test events, tools/zero_shot_parent.py --signed-magnitude, best checkpoint, EMA weights), each seed and the seed
+      mean; R_proxy(c) = log10(median proxy MSE held out / median proxy MSE training) from prep_shape --catalog v4 on target
+      qperp (the control''s target) and raw; the excess E(c) = R_net(c) - R_proxy(c). Decision statistic: the median of E
+      over the held-out pools (each pool carrying its cell''s E; cells with >= 5 training and >= 5 held-out pools, which hold
+      most of the 559), on each seed. Secondary: per pool log10(network floor / proxy MSE), held out against training (Mann-Whitney
+      shift of medians); the free read''s R beside the TR read''s as a check of the conversion; the training pools'' offsets
+      (near 0 confirms in-distribution); the gluon-gluon and e+e- cells first.'
+    check: 'The free read on existing data already moves with what the test changes (trained or not): R_free is 0.30 to 1.25
+      in the large cells against a seed spread of 0.081 per cell, and the held-out floor itself separates groups nearer and
+      farther from training by a factor 4 (0.155 on the 35 top pools at another trained mass, 0.626 on the 244 at none, par:v4_tree_shape).
+      The proxy separates training from held-out classes on catalog_v3 (1.3x) and tracks the network''s zero-shot shape (rank
+      0.68 to 0.80), so it is sensitive to the intrinsic part it is meant to remove.'
+    fixed: The two control checkpoints FA-ccin2p3-339ec100 (seed 42) and -380842ed (seed 43) at their best aggregate val_loss_no_reg
+      step, EMA weights; the scorer and scripts/job_catalog_v3_short.sh mode eval path unchanged (V3_AXES=TR reads the arm's
+      training recipe catalog_v4_train.yaml on its test split, commits 94a18ed5 and d4700d3b); the held-out reads short_reads/v4_dimensionless_muon[_seed2]/H1,H2,H3
+      as they are; the proxy's regressor, inputs and 7500/2500 events per pool as on catalog_v3, only the pool list changed;
+      the cells as par:v4_tree_shape's (props in loop_levels.py).
+    control: 'Matched: the same network, same scorer, same cells, training pools against held-out pools; intrinsic difficulty
+      controlled by the proxy on exactly those pools. Nothing retrained (A/B rule 1).'
+    seeds: The control pair's two, 42 and 43; every number a seed mean with both seeds shown; the proxy is deterministic (seed
+      0).
+    outcome: 'Smallest gap worth acting on: median excess E >= 0.3 in log10 (the held-out floor at least twice what the proxy''s
+      intrinsic ratio predicts), about four times the seed spread of a cell''s log ratio (0.081) and five times the per-pool
+      one (0.062). Transfer gap (yes): E >= 0.3 on both seeds; then design target or input priors aimed at it, starting with
+      the cells where E is largest (gluon-gluon, e+e-). Floor (no): E < 0.3 on either seed: the held-out shape error is the
+      network''s fit floor at this compute plus intrinsic difficulty, the shape lever is capacity and training length, recorded
+      for the full pretraining''s design. Either way written up beside par:v4_tree_shape with the per-cell table (free read,
+      TR read, proxy). Cost: two eval-only GPU jobs, 1153 probes at about 1.1 s each plus setup, about 0.5 GPU-h each, 1 GPU-h
+      in all (budget 30); one CPU job, 32 cores, up to 3 h (the proxy on 1604 pools, two targets).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
