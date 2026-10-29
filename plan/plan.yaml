@@ -255,6 +255,17 @@ entries:
       log; 9d6b050f and 8d79da6f had started (pp13v4 tree pools compiled and checked ok vs parent) when cancelled; no results
       kept'
     at: '2026-10-29T13:38:30+00:00'
+  - tried: the one-loop sign extension with every one of its 123 entries on the tree's full-order born (commit f5949014),
+      submitted on CC-IN2P3 as the generation job FA-ccin2p3-d634e7d6 with the two pretrainings FA-ccin2p3-9d6b050f and FA-ccin2p3-8d79da6f
+      chained afterok; all three cancelled 2026-10-29 14:36 (the generation had run 10 min and written 67 of 369 pool files
+      to the train cache, left in place; the pretrainings never started)
+    why: 'the code reviewer blocked it: the 47 entries whose tree mixes QCD and electroweak powers (by the trees'' diagrams,
+      analysis/catalog_v4/data/mixed_order_audit.json; the earlier QED-bound heuristic also flagged the three b-Higgs trees,
+      pure electroweak with a massless b) take [virt=QCD] on a mixed born, which fails MadLoop''s pole check; per the user''s
+      call on mixed borns (D142) they now take the pure-QCD born (the tree string without its QED bound) under v4_<x>_qcdborn_nlo
+      names, the order vector carrying the lower electroweak maximum; the 123 entries are kept, none dropped; the design passed
+      2026-10-29 05:39 named 123 entries at full order and is amended by this'
+    at: '2026-10-29T13:40:33+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
