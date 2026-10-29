@@ -17,8 +17,9 @@ Two modes.
   (analysis/catalog_v4/kshot_level.py), checks the held-out levels against the saved reads' own train mean (mu_sd[0]
   of each short_reads npz, the same estimator), and per held-out pool: its level against the training range overall
   and at its multiplicity, the distance to the nearest training level in units of the training spread, its predicted
-  level (level + offset), and the matched training pools (same multiplicity, initial state and born orders; failing
-  that, same multiplicity and initial state): the departure of its level from their mean, against its offset.
+  level (level + offset), and the matched training pools (one rule: same multiplicity, initial state and born orders;
+  a pool with none is listed as unmatched): the departure of its level from their mean, against its offset, compared
+  with offset = -departure (a network that predicts the matched pools' mean level).
     python3 analysis/catalog_v4/loop_levels.py   -> data/loop_levels.json, figs/loop_levels.{png,pdf}
 The last line printed is the JSON of the numbers docs/results.tex quotes.
 """
@@ -85,7 +86,7 @@ def props(name):
     o = mg.order_vector(c)
     ini = sorted(abs(x) for x in c["pdg_ids"][:2])
     st = ("ee" if ini[0] == 11 else "gg" if ini == [21, 21] else
-          ("bg" if 5 in ini else "qg") if 21 in ini else "bb" if ini == [5, 5] else "b q" if 5 in ini else "qq")
+          ("bg" if 5 in ini else "qg") if 21 in ini else "bb" if ini == [5, 5] else "bq" if 5 in ini else "qq")
     return {"n": len(c["pdg_ids"]), "initial": st, "born": f"as{o[2]} a{o[3]}",
             "qcd_born": "_qcdborn" in name, "loop_induced": bool(c.get("loopind")), "order": o}
 
@@ -107,34 +108,30 @@ def analyse():
         z = np.load(os.path.join(SR, RUNS[0], "H5", n + ".npz"))
         check.append(abs(L - float(z["mu_sd"][0])))
         atN = np.array([T[m][0] for m in T if P[m]["n"] == pr["n"]])
-        key = lambda m, full: (P[m]["n"], P[m]["initial"]) + ((P[m]["born"],) if full else ())
-        match = [m for m in T if key(m, True) == key(n, True)]
-        how = "n, initial state, born orders"
-        if len(match) < 2:
-            match = [m for m in T if key(m, False) == key(n, False)]; how = "n, initial state"
-        if len(match) < 2:
-            match = [m for m in T if P[m]["n"] == pr["n"]]; how = "n"
-        mm = float(np.mean([T[m][0] for m in match]))
+        # one match rule: the training one-loop pools of the same multiplicity, initial state and born orders; a pool
+        # with none is listed as unmatched, never re-matched under a looser key
+        key = lambda m: (P[m]["n"], P[m]["initial"], P[m]["born"])
+        match = [m for m in T if key(m) == key(n)]
         offs = [kl[r]["H5"][n]["offset"] for r in RUNS]
         r = {**pr, "level": L, "train_min": float(lv.min()), "train_max": float(lv.max()),
              "outside_all": bool(L < lv.min() or L > lv.max()),
              "atN_range": [float(atN.min()), float(atN.max())] if len(atN) else None,
              "outside_atN": bool(len(atN) and (L < atN.min() or L > atN.max())),
              "nearest_in_sd": float(np.min(np.abs(lv - L)) / sd_all),
-             "match_by": how, "n_match": len(match), "match_mean": mm, "departure": L - mm,
-             "offset": offs, "pred_level": [L + o for o in offs]}
+             "matched": match, "n_match": len(match), "offset": offs, "pred_level": [L + o for o in offs]}
+        if match:
+            mm = float(np.mean([T[m][0] for m in match]))
+            r.update({"match_mean": mm, "departure": L - mm})
         res[n] = r
     names = [n for n in res if not res[n].get("missing")]
-    dep = np.array([res[n]["departure"] for n in names]); om = np.array([np.mean(res[n]["offset"]) for n in names])
-    slope = float(np.polyfit(dep, om, 1)[0]); corr = float(np.corrcoef(dep, om)[0, 1])
-    # the predicted level against the matched training mean: what the network places, if it places the class level
-    pdev = np.array([np.mean(res[n]["pred_level"]) - res[n]["match_mean"] for n in names])
-    # per seed, and without the pool of largest departure (one point can carry a slope)
-    per_seed = [float(np.polyfit(dep, [res[n]["offset"][i] for n in names], 1)[0]) for i in range(len(RUNS))]
-    keep = np.abs(dep) < np.abs(dep).max()
-    slope_trim = float(np.polyfit(dep[keep], om[keep], 1)[0]); corr_trim = float(np.corrcoef(dep[keep], om[keep])[0, 1])
-    lvl = np.array([res[n]["level"] for n in names])
-    corr_level = float(np.corrcoef(lvl - np.median(lv), om)[0, 1])
+    mt = [n for n in names if res[n]["n_match"]]
+    unmatched = [n for n in names if not res[n]["n_match"]]
+    dep = np.array([res[n]["departure"] for n in mt]); om = np.array([np.mean(res[n]["offset"]) for n in mt])
+    corr = float(np.corrcoef(dep, om)[0, 1])
+    # the comparison the figure draws: offset = -departure is a network that predicts the matched pools' mean level;
+    # a pool whose offset is smaller in size than its departure has its level placed closer than that mean
+    closer = [n for n in mt if abs(np.mean(res[n]["offset"])) < abs(res[n]["departure"])]
+    closer_seed = [int(sum(abs(res[n]["offset"][i]) < abs(res[n]["departure"]) for n in mt)) for i in range(len(RUNS))]
     ee = [n for n in names if res[n]["initial"] == "ee"]
     big = sorted(names, key=lambda n: -abs(np.mean(res[n]["offset"])))[:6]
     s = {"n_train": len(T), "n_train_missing": len(miss_tr), "n_heldout": len(names),
@@ -142,48 +139,48 @@ def analyse():
          "outside_all": int(sum(res[n]["outside_all"] for n in names)),
          "outside_atN": int(sum(res[n]["outside_atN"] for n in names)),
          "median_nearest_in_sd": float(np.median([res[n]["nearest_in_sd"] for n in names])),
-         "corr_departure_offset": corr, "slope_offset_on_departure": slope,
-         "sd_departure": float(dep.std()), "sd_offset": float(om.std()), "sd_pred_minus_match": float(pdev.std()),
+         "n_matched": len(mt), "unmatched": unmatched, "corr_departure_offset": corr,
+         "median_abs_departure": float(np.median(np.abs(dep))), "median_abs_offset_matched": float(np.median(np.abs(om))),
+         "n_closer_than_match": len(closer), "n_closer_per_seed": closer_seed,
          "level_check_maxabs": float(max(check)), "largest": big,
-         "slope_per_seed": per_seed, "slope_trim": slope_trim, "corr_trim": corr_trim, "corr_level_offset": corr_level,
-         "n_train_ee": int(sum(P[m]["initial"] == "ee" for m in T)), "ee_heldout": {n: [res[n]["departure"],
-         float(np.mean(res[n]["offset"]))] for n in ee},
+         "n_train_ee": int(sum(P[m]["initial"] == "ee" for m in T)),
          "outside_names": [n for n in names if res[n]["outside_all"]]}
     print(f"training one-loop pools {len(T)} (missing {len(miss_tr)}), levels [{lv.min():.2f}, {np.median(lv):.2f}, "
           f"{lv.max():.2f}] sd {sd_all:.2f}; held-out {len(names)}: outside overall {s['outside_all']}, at their N "
           f"{s['outside_atN']}; nearest training level median {s['median_nearest_in_sd']:.3f} sd; level check max "
-          f"{s['level_check_maxabs']:.2g}")
-    print(f"departure from matched training mean vs seed-mean offset: corr {corr:+.2f}, slope {slope:+.2f}; sd departure "
-          f"{dep.std():.2f}, sd offset {om.std():.2f}, sd (predicted level - matched mean) {pdev.std():.2f}")
-    print(f"slope per seed {per_seed[0]:+.2f} / {per_seed[1]:+.2f}; without the largest departure {slope_trim:+.2f} "
-          f"(corr {corr_trim:+.2f}); corr(level - training median, offset) {corr_level:+.2f}; e+e- training pools "
-          f"{s['n_train_ee']}, held out {len(ee)}; outside {s['outside_names']}")
+          f"{s['level_check_maxabs']:.2g}; outside {s['outside_names']}")
+    print(f"matched (same N, initial state, born orders) {len(mt)}, unmatched {unmatched}; departure vs seed-mean offset "
+          f"corr {corr:+.2f}; median |departure| {s['median_abs_departure']:.2f}, median |offset| "
+          f"{s['median_abs_offset_matched']:.2f}; offset smaller than departure on {len(closer)} (per seed {closer_seed}); "
+          f"e+e- training pools {s['n_train_ee']}, held out {len(ee)}")
     for n in sorted(names, key=lambda n: -abs(np.mean(res[n]["offset"]))):
         r = res[n]
+        m = (f"matched {r['n_match']} {r['match_mean']:+7.2f} departure {r['departure']:+6.2f}" if r["n_match"]
+             else "unmatched")
         print(f"  {n:28s} N={r['n']} {r['initial']:3s} {r['born']:7s}{' qcdborn' if r['qcd_born'] else ''}"
               f"{' loop-induced' if r['loop_induced'] else ''}  level {r['level']:+7.2f}  offset {r['offset'][0]:+.2f}/"
-              f"{r['offset'][1]:+.2f}  matched ({r['match_by']}, {r['n_match']}) {r['match_mean']:+7.2f} departure "
-              f"{r['departure']:+6.2f}{'  OUTSIDE at N' if r['outside_atN'] else ''}")
+              f"{r['offset'][1]:+.2f}  {m}{'  OUTSIDE at N' if r['outside_atN'] else ''}")
     json.dump({"summary": s, "heldout": res, "train": {m: {"level": T[m][0], **P[m]} for m in T},
                "train_missing": miss_tr}, open(os.path.join(HERE, "data", "loop_levels.json"), "w"), indent=1)
-    for k in ("n_train", "n_heldout", "outside_all", "outside_atN"):
+    for k in ("n_train", "n_heldout", "outside_all", "outside_atN", "n_matched", "n_closer_than_match", "n_train_ee"):
         flat[k] = s[k]
-    for k in ("median_nearest_in_sd", "corr_departure_offset", "slope_offset_on_departure", "sd_departure", "sd_offset",
-              "sd_pred_minus_match", "train_level_sd", "slope_trim", "corr_trim", "corr_level_offset"):
+    for k in ("median_nearest_in_sd", "corr_departure_offset", "median_abs_departure", "median_abs_offset_matched",
+              "train_level_sd"):
         flat[k] = round(s[k], 2)
-    flat["slope_seed42"], flat["slope_seed43"] = round(per_seed[0], 2), round(per_seed[1], 2)
-    flat["n_train_ee"] = s["n_train_ee"]
+    flat["n_closer_seed42"], flat["n_closer_seed43"] = closer_seed
+    flat["n_unmatched"] = len(unmatched)
     flat["train_level_min"], flat["train_level_max"] = round(float(lv.min()), 2), round(float(lv.max()), 2)
     flat["level_check_maxabs"] = round(s["level_check_maxabs"], 3)
     for n in big:
         flat[f"level.{n}"] = round(res[n]["level"], 2)
-        flat[f"departure.{n}"] = round(res[n]["departure"], 2)
         flat[f"match_n.{n}"] = res[n]["n_match"]
-    plot(res, names, T, P)
+        if res[n]["n_match"]:
+            flat[f"departure.{n}"] = round(res[n]["departure"], 2)
+    plot(res, mt, names, T, P)
     print(json.dumps(flat))
 
 
-def plot(res, names, T, P):
+def plot(res, mt, names, T, P):
     import plot_style as ps
     fig, (a, b) = ps.figure(ncols=2)
     rng = np.random.default_rng(0)
@@ -197,9 +194,9 @@ def plot(res, names, T, P):
     a.xaxis.set_major_locator(MaxNLocator(integer=True))
     a.set_xlabel(r"particles $N$"); a.set_ylabel(r"$\overline{t}$")
     ps.legend(a, "upper right"); ps.make_room(a)
-    dep = [res[n]["departure"] for n in names]
-    b.errorbar(dep, [np.mean(res[n]["offset"]) for n in names],
-               yerr=[abs(res[n]["offset"][0] - res[n]["offset"][1]) / 2 for n in names], fmt="o", color=ps.C.blue,
+    dep = [res[n]["departure"] for n in mt]
+    b.errorbar(dep, [np.mean(res[n]["offset"]) for n in mt],
+               yerr=[abs(res[n]["offset"][0] - res[n]["offset"][1]) / 2 for n in mt], fmt="o", color=ps.C.blue,
                label="held-out pool, seed mean")
     lo, hi = min(dep), max(dep)
     b.plot([lo, hi], [-lo, -hi], "--", color=ps.C.grey, label="offset $=-$departure")
