@@ -1768,7 +1768,7 @@ entries:
     - FA-ccin2p3-ec84e913
     - FA-ccin2p3-efc4c352
     - FA-ccin2p3-f5a04d70
-    commit: 0f8018e0
+    commit: 57d732e4
     paths:
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
@@ -1799,6 +1799,7 @@ entries:
     - analysis/catalog_v4/figs/census_diagrams.png
     - analysis/catalog_v4/figs/classes_roles.png
     - analysis/catalog_v4/figs/compare_pp_trained.png
+    - analysis/catalog_v4/figs/compare_pp_trained_a.png
     - analysis/catalog_v4/figs/compare_pp_trained_scatter.png
     - analysis/catalog_v4/figs/compare_v3_pp.png
     - analysis/catalog_v4/figs/compare_v3_shared.png
