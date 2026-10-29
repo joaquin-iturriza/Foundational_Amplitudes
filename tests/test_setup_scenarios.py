@@ -636,6 +636,7 @@ def claims():
 GUARD_FILES = os.path.join(ROOT, ".claude", "hooks", "plan_files_guard.py")
 GUARD_GIT = os.path.join(ROOT, ".claude", "hooks", "git_verify_guard.py")
 CTX = os.path.join(ROOT, ".claude", "hooks", "context_guard.py")
+MAIN_GUARD = os.path.join(ROOT, ".claude", "hooks", "main_session_guard.py")
 SWITCH = os.path.join(ROOT, "tools", "switch_settings.py")
 
 
@@ -2205,12 +2206,43 @@ def idle_wait():
     scenario("one entry that can move keeps the turn free of that block", "every live entry waits" not in err, err)
 
 
+def main_session_work():
+    """The main session works no entry itself (0i): its work calls are refused, a subagent's pass (main_session_guard).
+    The subagent marker is agent_id/agent_type, as in the hook inputs lock_guard logs."""
+    sub = {"agent_id": "a1b2", "agent_type": "general-purpose"}
+    scratch = "/tmp/claude-1000/x/scratchpad"
+    for who, tool, ti, want in (
+            ("main", "Bash", {"command": "site submit ccin2p3 FA scripts/job_probe.sh --item lowd"}, 2),
+            ("sub", "Bash", {"command": "site submit ccin2p3 FA scripts/job_probe.sh --item lowd"}, 0),
+            ("main", "Bash", {"command": "site poll"}, 0),
+            ("main", "Edit", {"file_path": "/home/joaquin/work/FA/tools/plan.py"}, 2),
+            ("main", "Edit", {"file_path": "/home/joaquin/work/FA/CLAUDE.md"}, 0),
+            ("sub", "Edit", {"file_path": "/home/joaquin/work/FA/tools/plan.py"}, 0),
+            ("main", "Write", {"file_path": scratch + "/note.txt"}, 0),
+            ("main", "Bash", {"command": "NOSYNC=1 site sync ccin2p3 FA && site runs"}, 2),
+            ("main", "Bash", {"command": "cd /home/joaquin/work/FA && sbatch x.sh"}, 2),
+            ("main", "Bash", {"command": ".venv-cpu/bin/pytest tests/"}, 2),
+            ("main", "Bash", {"command": "python3 tools/plan.py next --prompts"}, 0),
+            ("main", "Bash", {"command": "python3 tools/agent_costs.py"}, 0),
+            ("main", "Bash", {"command": "bash -c 'site run ccin2p3 FA -- ls'"}, 2),
+            ("main", "Bash", {"command": "sed -i s/a/b/ tools/plan.py"}, 2),
+            ("main", "Bash", {"command": "echo x > tools/plan.py"}, 2),
+            ("main", "Bash", {"command": "git commit -m \"$(cat <<'EOF'\nno site submit here > x\nEOF\n)\" && git push"}, 0),
+            ("main", "Bash", {"command": "git log --oneline -3 2>&1 | head; grep -n site tools/plan.py > /dev/null"}, 0),
+            ("main", "Bash", {"command": "bash .claude/hooks/review_backlog.sh status"}, 0),
+            ("main", "Bash", {"command": "site events --wait --project FA"}, 0)):
+        inp = dict(sub if who == "sub" else {}, tool_name=tool, tool_input=ti, scratchpad_dir=scratch)
+        rc, out = hook(MAIN_GUARD, inp)
+        scenario("main session guard: %s %s `%s` is %s" % (who, tool, list(ti.values())[0][:50].replace("\n", " "),
+                 "refused" if want else "allowed"), rc == want and (not want or "step agent's work" in out), out)
+
+
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself]
+          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself, main_session_work]
 
 
 def main():
