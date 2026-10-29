@@ -397,18 +397,21 @@ NP_GROUPS = (("new combinations", "H1", lambda r: True), ("multiplicity", "H2", 
 
 
 NP_KEY = {"new combinations": "H1", "multiplicity": "H2", "top, process at another top mass": "other_mass",
-          "top, process at no top mass": "no_mass"}
+          "top, process at no top mass": "no_mass", "one-loop, virtual": "loop_virtual",
+          "one-loop, loop-induced": "loop_induced"}
+NEWP = ("new combinations", "multiplicity")
+REFS = ("top, process at another top mass", "top, process at no top mass")
 
 
-def cell_compare(G, key):
-    """Per new-process group, in each cell of multiplicity and initial state holding both top groups, each pool's
+def cell_compare(G, key, labs=NEWP, refs=REFS):
+    """Per group in `labs`, in each cell of multiplicity and initial state holding both top groups, each pool's
     per-pool quantity `key` against the two top groups' cell medians, read as nearer one or the other in log10; the
     count and the median log10 ratios."""
     cell = lambda r: (r["n"], r["initial"])
-    sib, nos = G["top, process at another top mass"], G["top, process at no top mass"]
+    sib, nos = G[refs[0]], G[refs[1]]
     med = lambda rs: float(np.median([r[key] for r in rs]))
     out = {}
-    for lab in ("new combinations", "multiplicity"):
+    for lab in labs:
         g, O = G[lab], {"cells": {}}
         lr_nos, lr_sib, near_nos, used = [], [], 0, []
         for c in sorted({cell(r) for r in g.values()}):
@@ -434,7 +437,7 @@ def cell_compare(G, key):
     return out
 
 
-def group_read(res, flat, key, prefix, label):
+def group_read(res, flat, key, prefix, label, groups=NP_GROUPS, newp_labs=NEWP):
     """New process or new mass, for one per-pool quantity `key` (v3_prep_explore, the user's priorities D178: the
     zero-shot bias first, then the shape on unseen processes). The new combinations (H1) and multiplicity (H2) pools
     are new processes made of particles trained at their masses; the particle content pools (H3, all with a top at
@@ -448,7 +451,7 @@ def group_read(res, flat, key, prefix, label):
     the seed-mean floor var(q - t), the MSE left once the pool's own offset is removed (with the level share
     offset^2 / zero-shot MSE per group, and the correlation with |offset|, over the new-process pools and over all)."""
     from scipy.stats import spearmanr
-    G = {lab: {n: r for n, r in res[a].items() if not r.get("missing") and sel(r)} for lab, a, sel in NP_GROUPS}
+    G = {lab: {n: r for n, r in res[a].items() if not r.get("missing") and sel(r)} for lab, a, sel in groups}
     for g in G.values():
         for n, r in g.items():
             r.setdefault("massive_legs", massive_legs(n))
@@ -464,8 +467,8 @@ def group_read(res, flat, key, prefix, label):
             v["median_level_share"] = float(np.median([np.mean([o ** 2 / (o ** 2 + f) for o, f in
                                                                 zip(r["offset"], r["floor"])]) for r in g.values()]))
         out["groups"][lab] = v
-    out.update(cell_compare(G, key))
-    newp = list(G["new combinations"].values()) + list(G["multiplicity"].values())
+    out.update(cell_compare(G, key, newp_labs))
+    newp = [r for lab in newp_labs for r in G[lab].values()]
     y = [r[key] for r in newp]
     pred = {"particles": [r["n"] for r in newp], "alpha_s power": [r["order"][2] for r in newp],
             "alpha power": [r["order"][3] for r in newp], "massive legs": [r["massive_legs"] for r in newp],
@@ -490,7 +493,7 @@ def group_read(res, flat, key, prefix, label):
     print(label + ":")
     for lab, v in out["groups"].items():
         print(f"  {lab:34s} {v}")
-    for lab in ("new combinations", "multiplicity"):
+    for lab in newp_labs:
         O = out[lab]
         print(f"  {lab}: compared {O['n_compared']} pools in {O['n_cells_compared']} cells; nearer the no-mass group "
               f"{O['n_nearer_no_mass']}; median log10 ratio to no-mass {O['median_log_ratio_no_mass']}, to other-mass "
@@ -504,7 +507,7 @@ def group_read(res, flat, key, prefix, label):
     for lab, v in out["groups"].items():
         for k, x in v.items():
             flat[f"{prefix}.{NP_KEY[lab]}.{k}"] = rnd(x)
-    for lab in ("new combinations", "multiplicity"):
+    for lab in newp_labs:
         for k, x in out[lab].items():
             if k != "cells":
                 flat[f"{prefix}.{NP_KEY[lab]}.{k}"] = rnd(x)
@@ -515,6 +518,83 @@ def group_read(res, flat, key, prefix, label):
     for k, v in out["predictors"]["by_massive_legs"].items():
         flat[f"{prefix}.massive{k}.n"], flat[f"{prefix}.massive{k}.median_{key}"] = v["n"], rnd(v[f"median_{key}"])
     return out
+
+
+LOOP_GROUPS = NP_GROUPS + (("one-loop, virtual", "H5", lambda r: not r["loop_induced"]),
+                           ("one-loop, loop-induced", "H5", lambda r: r["loop_induced"]))
+
+
+def loop_group_read():
+    """The one-loop axis (H5) by the tree reads' method (v3_prep_explore, the user's priorities D178: the zero-shot
+    bias first, then the shape). On trees both the level and the shape are largest where the top is held out at its
+    mass (par:v4_tree_newproc, par:v4_tree_shape); is the one-loop axis's error the same source? Reads
+    data/tree_levels.json (analyse_trees), data/loop_levels.json (analyse) and data/kshot_level.json, no new dump.
+    First the counts the split needs: held-out and training one-loop pools with an external top, and training one-loop
+    pools of the heavy-quark layer. Then group_read for both quantities (the seed-mean |offset| and the seed-mean floor
+    var(q - t)) with the tree read's four groups plus the one-loop pools, virtual and loop-induced apart: the
+    group medians, each one-loop pool against the tree top groups' cell medians in its cell of multiplicity and
+    initial state (cell_compare), and over the virtual one-loop pools the rank correlations with the listed properties
+    and the departure from the matched training level (par:v4_loop_levels). One-loop and tree pools have different
+    targets (each its own t = log(|M|^2 F)); both quantities are in the same units of t. No fit, no new threshold.
+        python3 analysis/catalog_v4/loop_levels.py --loop-groups -> data/loop_groups.json, figs/loop_groups.{png,pdf}"""
+    tree = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
+    loop = json.load(open(os.path.join(HERE, "data", "loop_levels.json")))
+    kl = json.load(open(os.path.join(HERE, "data", "kshot_level.json")))["probes"]
+    res = {a: tree["heldout"][a] for a in TREE_AXES}
+    H5 = {}
+    for n, r in loop["heldout"].items():
+        if r.get("missing"):
+            H5[n] = r; continue
+        offs = [kl[x]["H5"][n]["offset"] for x in RUNS]
+        fl = [kl[x]["H5"][n]["floor"] for x in RUNS]
+        H5[n] = {**r, **props(n), "offset": offs, "abs_off": float(abs(np.mean(offs))), "floor": fl,
+                 "shape": float(np.mean(fl))}
+    res["H5"] = H5
+    tr = {m: props(m) for m in loop["train"]}
+    R = {n: r for n, r in H5.items() if not r.get("missing")}
+    cnt = {"n_heldout": len(R), "n_heldout_top": int(sum(r["top"] for r in R.values())),
+           "n_heldout_loop_induced": int(sum(r["loop_induced"] for r in R.values())),
+           "n_train": len(tr), "n_train_top": int(sum(p["top"] for p in tr.values())),
+           "n_train_heavy_layer": int(sum(p["heavy_layer"] for p in tr.values())),
+           "n_train_loop_induced": int(sum(p["loop_induced"] for p in tr.values()))}
+    print(f"one-loop counts: {cnt}")
+    flat = {f"lg.{k}": v for k, v in cnt.items()}
+    out = {"counts": cnt,
+           "level": group_read(res, flat, "abs_off", "lgo", "one-loop level (|offset|)", LOOP_GROUPS,
+                               ("one-loop, virtual",)),
+           "shape": group_read(res, flat, "shape", "lgs", "one-loop shape (floor = var(q - t))", LOOP_GROUPS,
+                               ("one-loop, virtual",))}
+    for q in ("abs_off", "shape"):  # the one-loop virtual group's median over the tree top-at-no-mass group's
+        g = out["level" if q == "abs_off" else "shape"]["groups"]
+        flat[f"lg.ratio_virtual_to_no_mass.{q}"] = round(g["one-loop, virtual"][f"median_{q}"]
+                                                         / g["top, process at no top mass"][f"median_{q}"], 3)
+    li = [n for n, r in R.items() if r["loop_induced"]]
+    for n in li:
+        flat[f"lg.loop_induced.{n}.abs_off"] = round(R[n]["abs_off"], 3)
+        flat[f"lg.loop_induced.{n}.shape"] = round(R[n]["shape"], 3)
+    json.dump(out, open(os.path.join(HERE, "data", "loop_groups.json"), "w"), indent=1)
+    plot_loop_groups(res)
+    print(json.dumps(flat))
+
+
+def plot_loop_groups(res):
+    """Fig. v4_loop_groups: per group, the tree read's four and the one-loop virtual pools (the loop-induced pool
+    drawn apart), left the seed-mean |offset|, right the seed-mean floor; the bar the group's median."""
+    import plot_style as ps
+    fig, axs = ps.figure(ncols=2)
+    rng = np.random.default_rng(0)
+    cols = (ps.C.blue, ps.C.green, ps.C.vermillion, ps.C.grey, ps.C.purple, ps.C.orange)
+    G = [(lab, [r for r in res[ax].values() if not r.get("missing") and sel(r)]) for lab, ax, sel in LOOP_GROUPS]
+    ticks = ["new\ncombi-\nnations", "multi-\nplicity", "top,\nother\nmass", "top,\nno\nmass", "one-\nloop,\nvirtual",
+             "loop-\ninduced"]
+    for a, key, yl in zip(axs, ("abs_off", "shape"), (r"$|\overline{q-t}|$", r"$\mathrm{var}(q-t)$")):
+        for i, ((lab, rs), c) in enumerate(zip(G, cols)):
+            a.plot(i + rng.uniform(-0.2, 0.2, len(rs)), [r[key] for r in rs], ".", color=c, alpha=0.6)
+            if len(rs) > 1:
+                a.plot([i - 0.3, i + 0.3], [np.median([r[key] for r in rs])] * 2, "-", color="k")
+        a.set_xticks(range(len(G)), [f"{t}\n({len(rs)})" for t, (lab, rs) in zip(ticks, G)], fontsize=7)
+        a.set_yscale("log"); a.set_ylabel(yl)
+    ps.save(fig, os.path.join(HERE, "figs", "loop_groups"))
 
 
 def plot_shape(res):
@@ -808,6 +888,7 @@ if __name__ == "__main__":
     ap.add_argument("--dump", action="store_true")
     ap.add_argument("--trees", action="store_true", help="the tree held-out axes H1, H2, H3")
     ap.add_argument("--multiplicity", action="store_true", help="the multiplicity axis's signed bias (multiplicity_read)")
+    ap.add_argument("--loop-groups", action="store_true", help="the one-loop axis by the tree reads (loop_group_read)")
     ap.add_argument("--chunk", type=int, default=0)
     ap.add_argument("--nchunks", type=int, default=1)
     A = ap.parse_args()
@@ -815,5 +896,7 @@ if __name__ == "__main__":
         dump(A.trees, A.chunk, A.nchunks)
     elif A.multiplicity:
         multiplicity_read()
+    elif A.loop_groups:
+        loop_group_read()
     else:
         (analyse_trees if A.trees else analyse)()
