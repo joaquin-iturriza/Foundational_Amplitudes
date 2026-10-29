@@ -507,6 +507,8 @@ def done():
              ("a write-up that does not name it", dict(title="other", notes_ref="par:readout2"), [], {}, "names"),
              ("continuous work the user has not closed", dict(title="the readout on every rung (keep iterating)"),
               [], {}, "continuous work"),
+             ("an entry marked continuous", dict(continuous={"quote": "Keep iterating.", "at": "2026-10-24"}),
+              [], {}, "continuous work"),
              ("a write-up older than the last step", {}, [], {"rd": {"steps": [{"agent": "s", "at":
                  dt.datetime.fromtimestamp(ct + 60, dt.timezone.utc).isoformat()}]}}, "before the entry's last step"))
     for name, kw, rr, st, why in cases:

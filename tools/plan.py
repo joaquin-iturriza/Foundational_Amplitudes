@@ -1171,6 +1171,17 @@ def cmd_recheck(a):
     return 1 if bad else 0
 
 
+def cmd_continuous(a):
+    """Mark the entry continuous with the user's words that ask for it (2026-10-29: the old continuous-task guard was
+    retired in the setup redesign of 2026-10-25 without its rule moving into the plan, so the preprocessing
+    exploration, "Keep iterating", was closed as done). A continuous entry never closes without a decision of the
+    user's covering '<entry> closed'."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        e["continuous"] = {"quote": a.quote, "at": now().isoformat()}
+    print("plan: %s is continuous (%r)" % (a.id, a.quote))
+
+
 def cmd_kind(a):
     """setup: the entry is about the setup (its record may be CLAUDE.md or a tool, plan done --record); work: the
     default, written up in docs/results.tex."""
@@ -2024,12 +2035,13 @@ def cmd_done(a):
             if unread and not a.override_runs:
                 why.append("sweeps whose site could not be read: %s (pass --override-runs with the reason)"
                            % ", ".join(unread))
-        cont = CONTINUOUS.search("%s %s" % (entry_quotes(e), e.get("title") or ""))
+        cont = e.get("continuous") or CONTINUOUS.search("%s %s" % (entry_quotes(e), e.get("title") or ""))
+        cont = (cont["quote"] if isinstance(cont, dict) else cont.group(0)) if cont else None
         if cont and not closure_decided(a.id):
             # 2026-10-29: a step agent closed the preprocessing exploration, whose mandate was "Keep iterating",
             # because its check (one sub-study's paragraph) passed; work the user asked to continue ends on their word
             why.append("the user's words on it ask for continuous work (%r): it closes only when they say so (a "
-                       "decision covering '%s closed'); give it its next step instead" % (cont.group(0), a.id))
+                       "decision covering '%s closed'); give it its next step instead" % (cont, a.id))
         if why:
             sys.exit("plan: %s is not done:\n  " % a.id + "\n  ".join(why))
         e["status"], e["writeup"] = "done", a.writeup
@@ -2163,6 +2175,8 @@ def main(argv=None):
         A("n", type=int, help="the step's number"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
         A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
+    cmd("continuous", cmd_continuous, "mark the entry continuous, with the user's words asking for it", ID,
+        A("--quote", required=True, help="the user's words"))
     cmd("next", cmd_next, "what can move now (exit 1 while a listed step is not launched)",
         A("--prompts", action="store_true", help="print each step agent's exact prompt"))
     cmd("done", cmd_done, "close the entry: done_when passes and the write-up is committed", ID,
