@@ -2525,6 +2525,59 @@ design has to add it (re-evaluated on the pools' events) and check the pool-leve
   \label{fig:v4_loop_born}
 \end{figure}
 
+% src: python3 analysis/catalog_v4/loop_born_events.py @5fab390b
+% claim: lbe.n_pools=17
+% claim: lbe.n_errors=0
+% claim: lbe.max_rel=1.4e-11
+% claim: lbe.median_abs_diff=1.446
+% claim: lbe.n_full=5
+% claim: lbe.n_flips=0
+% claim: lbe.n_shifted=10
+% claim: lbe.median_shift=24.9
+% claim: lbe.median_shift_gain=1.95
+% claim: lbe.census.shifted_train=58
+% claim: lbe.census.shifted_heldout=16
+% claim: lbe.census.none_train=34
+% claim: lbe.census.none_heldout=11
+% allow: 2000 0.2 0.851 because they are the events per pool, the check's threshold fixed before reading and the median departure it was set from
+% allow: 3 2 because they are constants of the shift formula and an exponent
+\paragraph{The Born per event: the pool-level proxy checked (2026-10-29).}\label{par:v4_loop_born_events} The question,
+from par.~\ref{par:v4_loop_born}: can its pool-level read of the Born-relative one-loop target, $\overline
+t-\overline t_{\mathrm{Born}}$ over two pools sampled on different measures, stand in for the per-event
+$\log|c_0+\delta|$ the arm would train on? Design, fixed in the script before any number was read: MadLoop's Born
+re-evaluated on $2000$ training events of $17$ one-loop pools (the five held-out pools with their whole matched classes,
+two more held-out pools and one training pool), the stored target recomputed from it and compared with the stored
+column; the proxy holds if the median over pools of $|\langle\log|c_0+\delta|\rangle-(\overline t-\overline
+t_{\mathrm{Born}})|$ is below $0.2$ (a quarter of the median departure, $0.851$) and none of the five held-out pools
+changes its narrower-or-not verdict. The stored target reproduces on every pool ($17$ of $17$, largest relative
+difference $1.4\times10^{-11}$). The proxy fails: the median gap is $1.446$, seven times the threshold, with large gaps on
+pools that carry no shift as well; the verdicts do not change ($0$ of $5$ flip), so par.~\ref{par:v4_loop_born}'s
+narrowing survives as a direction but its numbers are not per-event numbers (Fig.~\ref{fig:v4_loop_born_events}, left).
+The read also measures the stored mass-scheme shift $\delta=C_F(3\ln(s/m^2)+5)$. catalog\_v4's one-loop entries carry no
+catalog\_v3 flag, so the generator applies it with $m$ the first massive final of any kind; the shift is the
+heavy-quark pair's conversion from the on-shell scheme (checked on $e^+e^-\to t\bar t$), and no catalog\_v4 one-loop pool
+that gets it has a heavy quark among its finals: it is applied on $58$ training and $16$ held-out pools for a $W$, $Z$,
+$H$ or $\tau$ final, and on $34$ and $11$ it is zero. Where it is applied it dominates: on the $10$ checked pools with it,
+the median $\delta$ is $24.9$ against $|c_0|$ of a few, and it raises $\langle\log|c_0+\delta|\rangle$ over
+$\langle\log|c_0|\rangle$ by a median $1.95$ (Fig.~\ref{fig:v4_loop_born_events}, right). So on those pools the
+stored one-loop target is mostly $\delta|\mathcal M_0|^2$, a multiple of the Born set by $s/m^2$ rather than the loop.
+What it changes: the result took two branches of the step. The proxy failed, so the Born-relative read is redone on
+per-event values for every read one-loop pool (the Born re-evaluation over all of them, a CPU job) before any arm is
+designed; and the shift dominates on the $W$, $Z$, $H$ and $\tau$ pools, which is a question on catalog\_v4's one-loop
+target for the user, the arm waiting on it. The same per-event Born that the redo produces gives the target without
+the shift exactly, $\mathrm{stored}-\delta|\mathcal M_0|^2$, with no regeneration. The CPU job waits for space on the
+cluster's project disk, which is full.
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/loop_born_events.pdf}
+  % src: python3 analysis/catalog_v4/loop_born_events.py @5fab390b
+  \caption{The Born re-evaluated on $2000$ training events of $17$ catalog\_v4 one-loop pools. Left: per pool the
+    per-event mean of the Born-relative target against par.~\ref{par:v4_loop_born}'s pool-level step; the line is
+    equality, the proxy's claim. Right: per pool the per-event mean of $\log|c_0|$ against that of $\log|c_0+\delta|$,
+    pools where the generator applied the mass-scheme shift apart.}
+  \label{fig:v4_loop_born_events}
+\end{figure}
+
 % src: python3 analysis/catalog_v4/compare_pp_trained.py @c184e6d5
 % claim: n_classes=1396
 % allow: 42 43 2000 13 4.7 because they are the seeds, the events per read, the beam energy in TeV and the b mass in GeV, settings
