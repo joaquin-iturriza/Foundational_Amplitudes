@@ -1871,18 +1871,14 @@ entries:
   - D167
   - D169
   - D174
-  next: 'Submit the pp13v4 regeneration (992 entries in recipes/catalog_v4_pp_part0..7.yaml, scripts/job_gen_daniel_catalog.sh
-    with DANIEL_SPEC and DANIEL_PREFIX=pp13v4_, --item catalog_coverage, plan run each with --next 1). Blocked on placement:
-    CC-IN2P3 not to be operated while its login notice forbids generative AI tools; lxplus env runs (2026-10-29) but is not
-    ready for this job: site pick lists it AVOID because sites/setup.sh --verify checks catalog_v3_train.yaml pools (catalog_v3
-    deleted, none on lxplus); its MadGraph is 3.6.7 against CC''s 3.7.0 (the design fixes the pipeline; setup.sh says pools
-    are not generated off CC because the recipe id does not record the version; 3.7.0 exists only as the GitHub tag v3.7.0);
-    its nodes have 8 cores against the parts'' 48. For lxplus: install MadGraph 3.7.0 from the GitHub tag beside 3.6.7 (never
-    replacing it) and point the lxplus env at it, make the verify accept a generation-only site (check_site_data default to
-    the catalog in use, or a tools-only verify), re-split the 992 processes into 8-core parts at the same wall time; the main
-    session decides whether that, or waiting for CC, is the route. Afterwards: validate with pp_physics_check.py taught the
-    pp13v4_ names and without its b reshelling; the 433 reused pp13 pools stay on CC, so the comparison needs them and the
-    new pools on one site (site copy)'
+  next: 'Collect the pp13v4 regeneration once its jobs end. State at 16:45 UTC+1 on 2026-10-29: 937 of the 992 pp13v4 entries
+    built in all 3 roles. The 304 entries left by the first pass were resubmitted after the fix at e7a1775d as one 8-core
+    htc job each, under recipes/catalog_v4_pp_rest/ (264 COMPLETED, 0 failed). Still running: about 40 of those jobs, mostly
+    the 27 entries with large own margins, and 14 high-margin entries in the 8 original part jobs (FA-ccin2p3-ce932f17 ...).
+    Any entry that comes back short again: rerun it with lhe.n_runs instead of a larger margin (catalog_v3_pp_runs precedent).
+    Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio to catalog_v4''s
+    standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density check''s error correlation)
+    on recipes/catalog_v4_pp_test.yaml'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -2386,6 +2382,12 @@ entries:
       the outcome can be read. Searched: pp13v4, catalog_v4_pp, pp-trained, pp pools, massless b pp, regeneration, gen_daniel_catalog
       in results.tex, plan show, site runs, site decisions (D117, D119, D136, D161, D162, D163, D167): no earlier v4-physics
       pp generation.'
+  step_why:
+    1:
+      feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
+      if:
+      - 'all 992 built and every ratio is 0: redo the pp comparisons on catalog_v4_pp_test.yaml'
+      - 'an entry short again or a nonzero ratio: list it with its cause, fix it, and rerun only that entry'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
