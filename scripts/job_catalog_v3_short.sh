@@ -193,7 +193,7 @@ axis_recipe() { case "$1" in
     XV3) echo recipes/catalog_v3_shared_heldout.yaml ;; XV4) echo recipes/catalog_v4_shared_heldout.yaml ;;
     PP) echo recipes/catalog_v3_pp_test.yaml ;; PP4) echo recipes/catalog_v4_pp_test.yaml ;;
     TR) echo "$TRAIN" ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
-# TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their validation
+# TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their test
 # split, the in-distribution reference of the held-out reads (v3_prep_explore, the shape gap, par:v4_tree_shape)
 [ -n "$OUT_FIXED" ] && [ "$MODE" != eval ] && { echo "$ARM is a sweep trial: mode eval only"; exit 1; }
 # 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
