@@ -129,9 +129,9 @@ entries:
       top processes at none) and the same cells of multiplicity and initial state'
     3: 'Read the multiplicity axis''s signed level bias on catalog_v4''s trees (CPU, existing reads, extend analysis/catalog_v4/loop_levels.py):
       par:v4_tree_newproc found its offset median +0.12 with 0.642 of the 218 pools positive (the network places a six particle
-      level too high), largest on gluon-gluon (0.586) and e+e- (0.311) beams; per initial state and born orders, the signed
-      offset against the departure of the pool''s level from the matched five particle training pools, and whether the sign
-      follows the level''s step from five to six particles in training'
+      level too high), and the largest absolute offsets of the new processes on gluon-gluon (median 0.586) and e+e- (0.311)
+      beams; per initial state and born orders, the signed offset against the departure of the pool''s level from the matched
+      training pools, and whether the sign follows the level''s step from five to six particles in training'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
