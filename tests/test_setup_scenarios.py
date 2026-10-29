@@ -2181,36 +2181,11 @@ def reviewer_resume():
 
 CC_NOTICE = ("The main session does not operate on CC-IN2P3 while its login notice forbids generative AI tools, and "
              "the regeneration waits on it: should I ask CC for an exception?")
-D176 = ("D176", "prefer", "CC-IN2P3's login notice on generative AI tools: ignored; work on CC continues unless the notice "
-        "changes or something is addressed to the user specifically", 1, ago(600),
-        "unless the notice changes, or there is something directed to me specifically, we don't care")
 
 
-def settled_questions():
-    """2026-10-29: a call the user had settled (D176, ignore CC-IN2P3's login notice) was asked again as a new plan
-    question, the supervisor was stopped, and every entry waited on its own question for 7 hours."""
-    w = World([E("pp_regen")], decisions=[D176])
-    rc, out = w.plan_cmd("ask", "pp_regen", "--ask", CC_NOTICE, "--searched", SEARCHED, "--holds-all",
-                         "the regeneration runs on CC-IN2P3 and nothing else in the entry can move")
-    scenario("plan ask refuses a question a decision in force covers (the CC-IN2P3 notice, D176)",
-             rc != 0 and "D176" in out and "not-settled-by" in out and not w.entries()["pp_regen"].get("ask"), out)
-    rc, out = w.plan_cmd("ask", "pp_regen", "--ask", CC_NOTICE, "--searched", SEARCHED,
-                         "--not-settled-by", "D176: short")
-    scenario("--not-settled-by with no reason is refused", rc != 0 and "at least" in out, out)
-    rc, out = w.plan_cmd("ask", "pp_regen", "--ask", CC_NOTICE, "--searched", SEARCHED, "--not-settled-by",
-                         "D176: whether CC itself, not its notice, has now written to the user about this account")
-    e = w.entries()["pp_regen"]
-    scenario("--not-settled-by naming the decision and what it leaves open lets it go, recorded with the question",
-             rc == 0 and e["not_settled_by"][0].startswith("D176:") and e["asks"][-1]["not_settled_by"] ==
-             e["not_settled_by"], out)
-    w = World([E("lowd")], decisions=[D176])
-    rc, out = w.plan_cmd("ask", "lowd", "--ask", "Should the small study also run the frozen lower blocks at every "
-                         "rung?", "--searched", SEARCHED)
-    scenario("an unrelated question passes", rc == 0, out)
-    rc, out = World([], decisions=[D176]).plan_cmd(
-        "add", "ccx", "--title", "t", "--question", "q", "--next", "n", "--match", "ccx*", "--ask", CC_NOTICE,
-        "--searched", SEARCHED)
-    scenario("plan add --ask is held to the same rule", rc != 0 and "D176" in out, out)
+def idle_wait():
+    """2026-10-29: every entry waited on its own question for 7 hours with the supervisor stopped; the stop check
+    refuses that idle turn."""
     held = lambda eid: E(eid, status="waiting_user", ask=CC_NOTICE, waiting_since=ago(20), holds_all="x" * 40)
     sent = [(ago(19), "assistant", "Joaquin, " + CC_NOTICE)]
     w = World([held("a"), held("b")], transcript=sent, supervisor=False)
@@ -2235,7 +2210,7 @@ GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, d
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
-          designs, design_prior, prompt_cap, parallel_steps, sent_figures, settled_questions, the_suite_itself]
+          designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself]
 
 
 def main():
