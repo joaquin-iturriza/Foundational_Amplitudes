@@ -7,6 +7,7 @@ the labels are replaced by deterministic fakes keyed by each run's iseed and eve
 Run:  python tests/test_lhe_parts.py
 """
 import argparse
+import glob
 import json
 import multiprocessing as mp
 import os
@@ -197,7 +198,109 @@ def test_queue_end_to_end():
     print("[queue end to end] ok")
 
 
+def test_tidy_and_gc():
+    """A worker deletes a saved run's directory and reduces a failed one to its logs; gc does the same for runs left
+    behind (killed, failed before the change), skips runs a live job holds, writes its manifest first, and never
+    deletes outside $SCRATCH/lhe_work/parts."""
+    _register()
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts._my_jobs)
+    env0 = {v: os.environ.get(v) for v in ("SCRATCH", "AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR")}
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d)
+            prep, run0 = mg.lhe_prepare, mg.lhe_run_madevent
+
+            def prepare(process, work_root, log_path, madevent=True, standalone=True):
+                ev, sa = prep(process, work_root, log_path, madevent, standalone)
+                os.makedirs(os.path.join(ev, "SubProcesses", "P1"), exist_ok=True)
+                open(os.path.join(ev, "SubProcesses", "P1", "madevent"), "wb").write(b"x" * 10000)
+                open(os.path.join(ev, "ME5_debug"), "w").write("debug")
+                os.makedirs(os.path.join(ev, "Events", "run"), exist_ok=True)
+                open(os.path.join(ev, "Events", "run", "run_tag_1_debug.log"), "w").write("log")
+                return ev, sa
+
+            fail_seed = mg.lhe_runs(NAME, mg._lhe_check_recipes(NAME, _items())[1], 1)[1][0]
+
+            def run(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01", patches=None):
+                if iseed == fail_seed:
+                    raise RuntimeError("No space left on device (fake)")
+                return run0(process, ev, nevents, iseed, log_path, mg_cores, run_name, patches)
+            mg.lhe_prepare, mg.lhe_run_madevent = prepare, run
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["SCRATCH"] = d
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "lhe_parts")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "lhe_work")
+            lhe_parts.ASSEMBLE_S = 0
+            lhe_parts._my_jobs = lambda: {"777"}
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            q = os.path.join(d, "queue")
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates, cores=[]))
+            try:
+                lhe_parts.cmd_work(argparse.Namespace(queue=q, workers=1, hours=1.0))
+            except SystemExit as e:
+                assert e.code == 1                                       # the one failed run
+            root = os.path.join(d, "lhe_work", "parts")
+            wds = {k: lhe_parts.run_workdir(NAME, r) for k, (_, r) in enumerate(mg.lhe_part_paths(NAME, _items()))}
+            assert not os.path.exists(wds[0]) and not os.path.exists(wds[2]), "a saved run's directory survived"
+            left = sorted(os.path.relpath(os.path.join(dp, f), wds[1]) for dp, _, fs in os.walk(wds[1]) for f in fs)
+            assert left == sorted([f"{NAME}.mg5.log", f"{NAME}_madevent/ME5_debug",
+                                   f"{NAME}_madevent/Events/run/run_tag_1_debug.log"]), left
+            # runs left behind as before the change: run 0 saved with its directory, run 2 killed (no part) and
+            # claimed by a dead job, run 1 claimed by a live job
+            for k in (0, 1, 2):
+                os.makedirs(os.path.join(wds[k], "junk"), exist_ok=True)
+                open(os.path.join(wds[k], "junk", "big"), "wb").write(b"y" * 5000)
+                open(os.path.join(wds[k], "a.log"), "w").write("l")
+            os.remove(mg.lhe_part_paths(NAME, _items())[2][0])
+            tasks = {json.load(open(os.path.join(q, "done", f)))["k"]: f for f in os.listdir(os.path.join(q, "done"))}
+            os.rename(os.path.join(q, "done", tasks[2]), os.path.join(q, "claimed", tasks[2] + ".666"))
+            f1 = [f for f in os.listdir(os.path.join(q, "failed")) if f.endswith(".json")][0]
+            os.rename(os.path.join(q, "failed", f1), os.path.join(q, "claimed", f1 + ".777"))
+            outside = os.path.join(d, "keep_me")
+            os.makedirs(outside)
+            os.symlink(outside, os.path.join(root, f"{NAME}__run_09"))     # never followed (not a run of the spec)
+            lhe_parts.cmd_gc(argparse.Namespace(queue=q, dry_run=True))
+            assert os.path.exists(os.path.join(wds[0], "junk", "big"))      # a dry run deletes nothing
+            lhe_parts.cmd_gc(argparse.Namespace(queue=q, dry_run=False))
+            mans = sorted(glob.glob(os.path.join(q, "gc", "manifest_*.json")))
+            man = json.load(open([m for m in mans if not m.endswith("_dry.json")][0]))
+            got = {e["path"]: e for e in man["entries"]}
+            assert set(got) == {wds[0], wds[2]}, got                       # run 1 is live: untouched
+            assert got[wds[0]]["removed"] == "all" and got[wds[0]]["bytes"] >= 5000
+            assert got[wds[2]]["removed"] != "all" and got[wds[2]]["kept"] == [os.path.join(wds[2], "a.log")]
+            assert not os.path.exists(wds[0])
+            assert os.listdir(wds[2]) == ["a.log"]
+            assert os.path.exists(os.path.join(wds[1], "junk", "big"))
+            assert os.path.isdir(outside)
+            # the guard: a work tree outside $SCRATCH/lhe_work/parts is refused, and so is a path out of the tree
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "elsewhere")
+            for f in (lambda: lhe_parts.parts_work_root(),
+                      lambda: lhe_parts._under(os.path.realpath(root), outside),
+                      lambda: lhe_parts._under(os.path.realpath(root), os.path.join(root, f"{NAME}__run_09"))):
+                try:
+                    f()
+                    raise AssertionError("a delete outside the work tree allowed")
+                except RuntimeError:
+                    pass
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts._my_jobs) = saved
+        for k, v in env0.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+        del mg.PROCESSES[NAME]
+    print("[tidy + gc] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
     test_queue_end_to_end()
+    test_tidy_and_gc()
