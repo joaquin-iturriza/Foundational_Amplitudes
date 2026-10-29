@@ -62,6 +62,13 @@ REPO="$(git rev-parse --show-toplevel 2>/dev/null)" || REPO="$FALLBACK_REPO"
 [ -z "$REPO" ] && REPO="$FALLBACK_REPO"
 cd "$REPO" 2>/dev/null || exit 0
 git rev-parse --verify -q HEAD >/dev/null 2>&1 || exit 0
+# The watermarks and locks are one per repository: inside a git worktree (agent worktrees under .claude/worktrees,
+# worktrees/wt-*) they are read from the main checkout (git rev-parse --git-common-dir), never from a stale copy of
+# its own (a worktree once carried a watermark 1477 commits old and the gate refused every edit there). The
+# fingerprints of bashpre/bashpost stay per checkout: they compare that checkout's own files.
+STATE_ROOT="$REPO"
+_common=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+case "$_common" in */.git) [ -d "${_common%/.git}" ] && STATE_ROOT="${_common%/.git}" ;; esac
 
 # Count changed CONTENT lines in a diff blob (not the +++/--- file headers).
 # NB: `grep -c` already prints 0 on no match and exits 1 — a `|| echo 0` here would emit
@@ -110,7 +117,7 @@ reviewed_hash() {
 }
 
 # state file: "<sha> <baseline_lines> <baseline_commits> [<reviewed_hash>]"
-state_file() { echo "$REPO/$STATE_REL/$1"; }
+state_file() { echo "$STATE_ROOT/$STATE_REL/$1"; }
 
 read_state() {                       # $1=reviewer -> echoes "sha lines commits"
   local f; f=$(state_file "$1")
@@ -118,11 +125,11 @@ read_state() {                       # $1=reviewer -> echoes "sha lines commits"
 }
 
 write_state() {                      # $1=reviewer $2=sha $3=lines $4=commits $5=reviewed_hash
-  mkdir -p "$REPO/$STATE_REL"
+  mkdir -p "$STATE_ROOT/$STATE_REL"
   printf '%s %s %s %s\n' "$2" "$3" "$4" "${5:-}" > "$(state_file "$1")"
 }
 
-lock_file() { echo "$REPO/$STATE_REL/$1.lock"; }
+lock_file() { echo "$STATE_ROOT/$STATE_REL/$1.lock"; }
 
 # A lock exempts its pillar from `gate` only while fresh. A reviewer whose `advance` never ran (it was refused by the
 # permission check on 2026-10-06) left both locks in place for two days, and the gate stood down the whole time.
@@ -181,7 +188,7 @@ case "$mode" in
     who="${2:-}"
     [ -z "$who" ] && { echo "usage: review_backlog.sh begin <reviewer>" >&2; exit 2; }
     pillar_field "$who" 1 | grep -q . || { echo "unknown reviewer '$who'" >&2; exit 2; }
-    mkdir -p "$REPO/$STATE_REL"; : > "$(lock_file "$who")"
+    mkdir -p "$STATE_ROOT/$STATE_REL"; : > "$(lock_file "$who")"
     echo "[review-backlog] $who holds the lock — edits to its pillar are allowed until 'advance'"
     # the backlog to read, as commands: reviewers otherwise cat the state files and read this script to find it
     read -r bl bc <<< "$(backlog_for "$who")"
@@ -267,7 +274,9 @@ except Exception: print("")' 2>/dev/null)
              echo "applies its fixes and, on a pass, runs 'review_backlog.sh advance $2' itself." >&2; }
     if [ "$mode" = bashpre ]; then
       for who in $(pillar_names); do fingerprint "$who" > "$REPO/$STATE_REL/.fp_$who"; done
-      if printf '%s' "$cmd" | grep -qE '(^|[;&|(]|\s)git(\s+-C\s+\S+)?\s+commit(\s|$)'; then
+      # the code only (cmdparse.py): a heredoc or a quoted string that names a git commit runs none
+      scan=$(printf '%s' "$cmd" | python3 "$(dirname "${BASH_SOURCE[0]}")/cmdparse.py" scan 2>/dev/null) || scan="$cmd"
+      if printf '%s' "${scan:-$cmd}" | grep -qE '(^|[;&|(]|\s)git(\s+-C\s+\S+)?\s+commit(\s|$)'; then
         for who in $overdue; do
           paths=$(pillar_field "$who" 4)
           if [ -n "$(git status --porcelain -- $paths 2>/dev/null)" ]; then

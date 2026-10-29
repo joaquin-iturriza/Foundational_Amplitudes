@@ -7,39 +7,51 @@ tools/verify_claims.py over every trunk commit since the last verified one (`pla
   - git -c core.hooksPath=..., --config-env for it, git config of core.hooksPath (set, unset, any scope), any GIT_CONFIG_*
     variable (they inject config), and Edit/Write of .git/config or .git/hooks;
   - git pull (fetch, then merge: the merge is checked);
-  - the same inside sh -c, bash -c or eval;
+  - the same inside sh -c, bash -c, eval or a heredoc fed to a shell;
   - git merge <ref> and git cherry-pick <commit> whose incoming change to docs/results.tex fails
     tools/verify_claims.py (a fast-forward merge runs no hook, so the range is checked here, ff or not).
+The command is read through cmdparse.py (shared by the Bash guards): heredoc bodies fed to python, cat, git ... are
+data and quoted strings are values, so a body or a message that only names these forms is not refused. A command that
+cannot be parsed is refused only when a risky form appears outside quotes and heredocs.
 A merge's range check gets CHECK_S seconds; past that the merge is let through (the state check catches it later).
 Installed with the switch-over (tools/switch_over.sh), which sets core.hooksPath once, before this guard exists."""
-import json, os, re, shlex, subprocess, sys
+import json, os, re, subprocess, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cmdparse  # noqa: E402
 
 WRAPPERS = {"command", "env", "sudo", "nice", "time", "nohup", "exec", "then", "do", "else", "elif", "if", "while",
             "until", "!", "{", "xargs"}
-# git in command position, for a command shlex cannot parse (a heredoc with an apostrophe, $'...'): only then is it
-# refused as unparseable; a python -c or sed that merely names git is not a git command
-GIT_AT_CMD = re.compile(r"(?:^|[;&|()`\n{!]|\$\(|-c\s+['\"]|\b(?:then|do|else|elif|if|while|until|xargs)\s)\s*"
-                        r"(?:[A-Za-z_]\w*=\S*\s+)*(?:(?:command|env|sudo|nice|time|nohup|exec)\s+(?:-\S+\s+)*)*"
-                        r"(?:\S*/)?git(?=\s|$|[;&|)])")
+# for a command cmdparse cannot parse (an unbalanced quote outside any heredoc, $'...'): refused only when one of the
+# risky forms appears in its code, outside heredoc bodies and quoted strings (scan_text); a heredoc with an apostrophe
+# before an ordinary git add/commit parses once its body is taken out
+RISKY = re.compile(r"core\.hookspath|--no-ve|\bGIT_CONFIG|\bcommit\b[^;&|\n]*\s-(?!-)[A-Za-z]*n|"
+                   r"\bgit\b[^;&|\n]*\s(?:pull|merge|cherry-pick)\b", re.I)
+RISKY_C = re.compile(r"\bgit\b[^;&|\n]*\s-c\s*['\"]?core\.", re.I)      # on the code with its quotes kept
 READ_OPTS = {"--get", "--get-all", "--show-origin", "--show-scope", "--local", "--global", "--system", "--worktree"}
 GLOBAL_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env", "--exec-path"}
 COMMIT_ARG = set("mFCct")                      # git commit short options that take a value
 CHECK_S = 90             # seconds for the claims check of a merge's range; registered with a 120 s hook timeout
 
 
-def segments(cmd):
-    lx = shlex.shlex(cmd, posix=True, punctuation_chars=";&|<>()")
-    lx.whitespace_split = True
-    out, cur = [], []
-    for t in lx:
-        if t and set(t) <= set(";&|()<>"):
-            if cur:
-                out.append(cur)
-            cur = []
-        else:
-            cur.append(t)
-    if cur:
-        out.append(cur)
+def run_segments(cmd):
+    """Every simple command bash would run (cmdparse.all_segments: sh -c / bash -lc / eval inner commands and command
+    substitutions included), with redirections (2>&1, > f, < f) dropped; None when the text cannot be parsed."""
+    segs = cmdparse.all_segments(cmd)
+    if segs is None:
+        return None
+    out = []
+    for seg in segs:
+        kept, skip = [], False
+        for t in seg:
+            if skip:
+                skip = False
+            elif t and set(t) <= set("<>&"):
+                skip = True
+            else:
+                kept.append(t)
+        if kept:
+            out.append(kept)
     return out
 
 
@@ -132,18 +144,18 @@ def git(repo, *a):
 
 
 def refusal(cmd, cwd, depth=0):
-    if re.search(r"\bGIT_CONFIG\w*", cmd):
+    code, scan = cmdparse.code_text(cmd), cmdparse.scan_text(cmd)
+    if re.search(r"\bGIT_CONFIG\w*", code):     # quotes kept: env "GIT_CONFIG_COUNT=1" git ... injects too
         return "a GIT_CONFIG_* variable (it injects git config, core.hooksPath included)"
-    hp = re.search(r"core\.hookspath", cmd, re.I)
-    if not hp and "git" not in cmd:
+    hp = re.search(r"core\.hookspath", scan, re.I)
+    if not hp and "git" not in code:
         return None
-    try:
-        segs = segments(cmd.replace("\n", ";"))
-    except ValueError:
-        if hp:
-            return "core.hooksPath named in a command that cannot be parsed"
-        return "a git command that cannot be parsed" if GIT_AT_CMD.search(cmd) else None
-    for seg in segs:
+    segs = run_segments(cmd)                  # all_segments takes the heredocs out itself
+    if segs is None:
+        m = RISKY.search(scan) or RISKY_C.search(code)
+        return "a command that cannot be parsed, with %r outside quotes and heredocs (run it on its own)" % (
+            m.group(0)[:40]) if m else None
+    for seg in segs if hp else ():
         if any(re.search(r"core\.hookspath", t, re.I) for t in seg):
             g = git_call(seg)
             words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
@@ -154,12 +166,7 @@ def refusal(cmd, cwd, depth=0):
     for seg in segs:
         words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
         prog = os.path.basename(words[0]) if words else ""
-        inner = None
-        if prog in ("sh", "bash", "zsh", "dash") and "-c" in words:
-            k = words.index("-c") + 1
-            inner = words[k] if k < len(words) else ""
-        elif prog == "eval":
-            inner = " ".join(words[1:])
+        inner = (cmdparse.inner_commands(seg) or [None])[0]
         if inner is not None:
             why = refusal(inner, cwd, depth + 1) if depth < 4 else "nested shells"
             if why:
@@ -210,7 +217,8 @@ def main():
             why = "%s of %s" % (tool, p)
     elif tool == "Bash":
         cmd = ti.get("command") or ""
-        if re.search(r"\.git/(?:config\b|hooks/)", cmd) and re.search(r">|\btee\b|\bsed\b.*-i|\bcp\b|\bmv\b|\brm\b|\bln\b", cmd):
+        code = cmdparse.code_text(cmd)         # a heredoc body that only names .git/hooks writes nothing there
+        if re.search(r"\.git/(?:config\b|hooks/)", code) and re.search(r">|\btee\b|\bsed\b.*-i|\bcp\b|\bmv\b|\brm\b|\bln\b", code):
             why = "a write to .git/config or .git/hooks"
         else:
             why = refusal(cmd, inp.get("cwd") or os.getcwd())

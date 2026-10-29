@@ -841,13 +841,14 @@ def lower():
     # always from a temporary worktree: run from the main checkout on trunk the script would really merge
     tmp_wt = os.path.join(tempfile.mkdtemp(prefix="switch_wt_"), "wt")
     subprocess.run(["git", "-C", ROOT, "worktree", "add", "-q", "--detach", tmp_wt, "HEAD"], capture_output=True)
+    # the worktree's own HEAD before the run: trunk's may move meanwhile (plan commits of a live session)
+    head = subprocess.run(["git", "-C", tmp_wt, "rev-parse", "HEAD"], capture_output=True, text=True).stdout
     try:
         r = subprocess.run(["sh", os.path.join(tmp_wt, "tools", "switch_over.sh"), "some-branch"], cwd=tmp_wt,
                            capture_output=True, text=True)
         head_after = subprocess.run(["git", "-C", tmp_wt, "rev-parse", "HEAD"], capture_output=True, text=True).stdout
     finally:
         subprocess.run(["git", "-C", ROOT, "worktree", "remove", "--force", tmp_wt], capture_output=True)
-    head = subprocess.run(["git", "-C", ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout
     scenario("lower: the switch-over refuses to run from a worktree (run in a temporary one, nothing merged)",
              r.returncode != 0 and "main checkout" in r.stdout and head_after == head, r.stdout + r.stderr)
 
@@ -2438,13 +2439,204 @@ def duplicate_check():
              and "readers_index.py failed" not in pr, pr[-2500:])
 
 
+
+HOOKS = os.path.join(ROOT, ".claude", "hooks")
+
+
+def sh_hook(name, inp, env=None, cwd=None):
+    r = subprocess.run(["bash", os.path.join(HOOKS, name)],
+                       input=json.dumps(inp), capture_output=True, text=True, env=env or os.environ, cwd=cwd)
+    return r.returncode, r.stderr + r.stdout
+
+
+def command_reading():
+    """The measured false refusals (tools/agent_calls.py --refusals, analysis/agent_calls/refusal_verdicts.json): the
+    Bash guards read the raw text, so a heredoc body, a quoted string or a grep pattern that only named a refused form
+    was refused. They now read the command through .claude/hooks/cmdparse.py: each measured false refusal passes, and
+    the refusal it stands next to still fires."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("cmdparse", os.path.join(HOOKS, "cmdparse.py"))
+    cp = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cp)
+    shared = all("import cmdparse" in open(os.path.join(HOOKS, f)).read() or "from cmdparse import" in
+                 open(os.path.join(HOOKS, f)).read() or "cmdparse.py" in open(os.path.join(HOOKS, f)).read()
+                 for f in ("git_verify_guard.py", "plan_files_guard.py", "lock_guard.py", "design_guard.py",
+                           "placement_guard.sh", "plot_guard.sh", "review_backlog.sh"))
+    own = [f for f in ("git_verify_guard.py", "plan_files_guard.py", "design_guard.py")
+           if "def heredocs(" in open(os.path.join(HOOKS, f)).read() or "def segments(cmd):" in
+           open(os.path.join(HOOKS, f)).read()]
+    scenario("cmdparse: every Bash guard reads the command through the one helper, none keeps its own copy",
+             shared and not own, own)
+    scenario("cmdparse: a python heredoc is data, a bash heredoc and sh -c are code, quotes are blanked",
+             cp.commands("python3 - <<'EOF'\nprint('sbatch it''s')\nEOF\nbash -c 'sbatch x.sh'") ==
+             [["python3", "-", "<<", "EOF"], ["bash", "-c", "sbatch x.sh"], ["sbatch", "x.sh"]]
+             and "sbatch y" in cp.scan_text("bash <<'EOF'\nsbatch y\nEOF")
+             and "sbatch" not in cp.scan_text("echo 'sbatch q' # it's sbatch"),
+             cp.commands("python3 - <<'EOF'\nprint('x')\nEOF\nbash -c 'sbatch x.sh'"))
+
+    # 1. git_verify_guard
+    k = "--no-" + "verify"
+    for c, want in (
+            ("python3 - <<'EOF'\ns = '''it's'''\nprint(\"don't\")\nEOF\ngit add x && git commit -m 'edit'", 0),
+            ("cat > f.py <<'EOF'\nrun(['git', 'config', 'core.hooksPath', '/dev/null'])  # it's a test\nEOF\n"
+             "git diff --stat", 0),
+            ("git diff --stat && echo it's", 0),
+            ("git commit -m 'never pass %s here'" % k, 0),
+            ("git commit %s -m x" % k, 2),
+            ("echo $'it\\'s'; git commit %s -m x" % k, 2),      # valid bash shlex cannot parse
+            ("python3 - <<'EOF'\nprint('it''s')\nEOF\ngit commit -n -m y", 2),
+            ("bash <<'EOF'\ngit commit -n -m y\nEOF", 2),
+            ("git -c core.hooksPath=/dev/null commit -m x && echo it's", 2)):
+        rc, out = hook(GUARD_GIT, {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": ROOT})
+        scenario("git verify: `%s` is %s" % (c.replace("\n", " / ")[:70], "refused" if want else "allowed"),
+                 rc == want, out)
+
+    # 2. plan_files_guard
+    pv = "PLAN_" + "FILE"
+    for c, want in (
+            ("grep -i lowd plan/plan.yaml", 0), ("grep -in status plan/plan.yaml | head", 0),
+            ("awk '/id:/{print $2}' plan/plan.yaml", 0), ("awk '$1==\"id:\" || $1==\"x\"' plan/plan.yaml", 0),
+            ("grep -n %s tools/plan.py tests/test_setup_scenarios.py" % pv, 0),
+            ("python3 - <<'EOF'\nopen('tests/t.py', 'a').write('env %s=/tmp/p.yaml')\nEOF" % pv, 0),
+            ("sed -i s/held/running/ plan/plan.yaml", 2), ("perl -pi -e s/a/b/ plan/plan.yaml", 2),
+            ("awk '{print > \"plan/plan.yaml\"}' /tmp/x", 2), ("awk -i inplace '{print}' plan/plan.yaml", 2),
+            ("%s=/tmp/p.yaml python3 tools/plan.py show" % pv, 2), ("export %s=/tmp/p.yaml" % pv, 2)):
+        rc, out = hook(GUARD_FILES, {"tool_name": "Bash", "tool_input": {"command": c}})
+        scenario("plan files: `%s` is %s" % (c.replace("\n", " / ")[:70], "refused" if want else "allowed"),
+                 rc == want, out)
+
+    # 3. placement_guard (a temporary HOME: no placement file is read or spent)
+    env = dict(os.environ, HOME=tempfile.mkdtemp(prefix="home_"))
+    sb = "sb" + "atch"
+    for c, want in (
+            ("python3 - <<'EOF'\nopen('tests/t.py', 'a').write('%s job.sh\\n')\nEOF" % sb, 0),
+            ("cat > tests/t.txt <<'EOF'\n%s job.sh\nEOF" % sb, 0), ("echo '%s job.sh'" % sb, 0),
+            ("%s job.sh" % sb, 2), ("bash -c '%s job.sh'" % sb, 2), ("ssh cc <<'EOF'\n%s j.sh\nEOF" % sb, 2),
+            ("site submit ccin2p3 FA scripts/job_probe.sh --item x", 2)):
+        rc, out = sh_hook("placement_guard.sh", {"tool_name": "Bash", "tool_input": {"command": c}}, env=env)
+        scenario("placement: `%s` is %s" % (c.replace("\n", " / ")[:70], "refused" if want else "allowed"),
+                 rc == want, out)
+
+    # 4. lock_guard and design_guard: a call is a command word, not a mention
+    lock = os.path.join(HOOKS, "lock_guard.py")
+    lenv = dict(os.environ, CLAUDE_PROJECT_DIR=tempfile.mkdtemp(prefix="lock_"))
+    rb = "review_backlog.sh"
+    for c, caller, want in (
+            ("git commit -m 'notes: the reviewer ran %s begin notes-editor'" % rb, "", 0),
+            ("cat > a.py <<'EOF'\nsubprocess.run(['bash', '%s', 'advance', 'x'])\nEOF" % rb, "", 0),
+            ("python3 - <<'EOF'\nimport json\njson.dump({'k': '%s begin in a clone'}, open('/tmp/v.json', 'w'))\nEOF" % rb,
+             "", 0),
+            ("bash .claude/hooks/%s advance repo-reviewer" % rb, "", 2),
+            ("cd /x && bash .claude/hooks/%s advance repo-reviewer" % rb, "general-purpose", 2),
+            ("bash .claude/hooks/%s advance repo-reviewer" % rb, "repo-reviewer", 0)):
+        inp = {"tool_name": "Bash", "tool_input": {"command": c}}
+        if caller:
+            inp["agent_type"] = caller
+        rc, out = hook(lock, inp, env=lenv)
+        scenario("lock: `%s` from %s is %s" % (c.replace("\n", " / ")[:60], caller or "the main session",
+                                               "refused" if want else "allowed"), rc == want, out)
+    dg = os.path.join(HOOKS, "design_guard.py")
+    dp = "design-" + "pass"
+    for c, want in (("cat > .claude/agents/x.md <<'EOF'\nthen run python3 tools/plan.py %s <entry>\nEOF" % dp, 0),
+                    ("grep -n 'tools/plan.py %s' .claude/agents/design-reviewer.md" % dp, 0),
+                    ("echo site submit auto FA j.sh --item nosuchentry", 0),
+                    ("python3 tools/plan.py %s lowd" % dp, 2)):
+        rc, out = hook(dg, {"tool_name": "Bash", "tool_input": {"command": c}})
+        scenario("design: `%s` from the main session is %s" % (c.replace("\n", " / ")[:60],
+                                                             "refused" if want else "allowed"), rc == want, out)
+
+    # the review of this fix: what bash runs inside double quotes, combined shell flags, interpreter programs, quoted
+    # verbs and assignments are still code (each was refused by the raw reading and let through by the first rewrite)
+    rb_adv = "bash .claude/hooks/%s advance repo-reviewer" % rb
+    nv = "--no-" + "verify"
+    for path, c, extra, want in (
+            (os.path.join(HOOKS, "placement_guard.sh"), 'jid="$(%s --parsable job.sh)"' % sb, None, 2),
+            (os.path.join(HOOKS, "placement_guard.sh"), "bash -lc 'cd x; %s job.sh'" % sb, None, 2),
+            (os.path.join(HOOKS, "placement_guard.sh"), "python3 -c \"import os; os.system('cd x; %s job.sh')\"" % sb,
+             None, 2),
+            (os.path.join(HOOKS, "placement_guard.sh"), 'echo "id `%s job.sh`"' % sb, None, 2),
+            (os.path.join(HOOKS, "placement_guard.sh"), "cat > t.txt <<EOF\n$(%s job.sh)\nEOF" % sb, None, 2),
+            (lock, 'x="$(%s)"' % rb_adv, None, 2), (lock, "bash -lc '%s'" % rb_adv, None, 2),
+            (lock, "python3 -c \"import os; os.system('%s')\"" % rb_adv, None, 2),
+            (lock, "echo '%s' > /tmp/a.sh; bash /tmp/a.sh" % rb_adv, None, 2),
+            (dg, 'python3 tools/plan.py "%s" foo' % dp, None, 2),
+            (GUARD_GIT, 'env "GIT_CONFIG_COUNT=1" git commit -m x', None, 2),
+            (GUARD_GIT, "bash -lc 'git commit %s -m x'" % nv, None, 2),
+            (GUARD_GIT, 'x="$(git commit %s -m x)"' % nv, None, 2),
+            (GUARD_FILES, 'env "PLAN_ROOT=/tmp" "PLAN_TEST=1" python3 tools/plan.py next', None, 2),
+            (GUARD_FILES, "perl -e 'open my $f, \">\", shift; print $f 1' plan/plan.yaml", None, 2),
+            (GUARD_FILES, "ruby -e 'File.write(ARGV[0], \"x\")' plan/plan.yaml", None, 2),
+            (GUARD_FILES, "sed -f s.sed plan/plan.yaml", None, 2)):
+        inp = {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": ROOT}
+        if path.endswith(".sh"):
+            rc, out = sh_hook(os.path.basename(path), inp, env=env)
+        else:
+            rc, out = hook(path, inp, env=lenv if path == lock else None)
+        scenario("still refused (%s): `%s`" % (os.path.basename(path), c.replace("\n", " / ")[:60]), rc == want, out)
+    scenario("cmdparse: a git commit inside \"$(...)\" is code for the commit gate (review_backlog.sh bashpre)",
+             "git commit -m y" in cp.scan_text('x="$(git commit -m y)"'), cp.scan_text('x="$(git commit -m y)"'))
+
+    # 5. plot_guard: reading a script is no submission
+    d = tempfile.mkdtemp(prefix="plot_")
+    bad = os.path.join(d, "bad.sh")
+    off = "plot" + "=" + "false"
+    open(bad, "w").write("#!/bin/bash\npython run.py exp_name=x %s\n" % off)
+    for c, want in (("grep -rn plot %s/*.sh" % d, 0), ("cat %s" % bad, 0), ("head -3 %s && ls %s" % (bad, d), 0),
+                    ("sed -n 1,5p %s" % bad, 0), ("grep -n '%s' run.py" % off, 0),
+                    ("%s %s" % (sb, bad), 2), ("site submit auto FA %s --item x" % bad, 2),
+                    ("python run.py exp_name=y %s" % off, 2)):
+        rc, out = sh_hook("plot_guard.sh", {"tool_name": "Bash", "tool_input": {"command": c}})
+        scenario("plot: `%s` is %s" % (c.replace(d, "<tmp>")[:60], "refused" if want else "allowed"), rc == want, out)
+
+    # 6. review_backlog gate inside a worktree reads the main checkout's watermarks
+    repo = tempfile.mkdtemp(prefix="wtgate_")
+    g = lambda *a, cwd=repo: subprocess.run(["git", "-C", cwd] + list(a), capture_output=True, text=True, env=GIT_ENV)
+    g("init", "-q")
+    os.makedirs(os.path.join(repo, ".claude", "hooks"))
+    shutil.copy(os.path.join(HOOKS, "review_backlog.sh"), os.path.join(repo, ".claude", "hooks"))
+    open(os.path.join(repo, ".gitignore"), "w").write(".claude/.review_state/\nwt/\n")
+    open(os.path.join(repo, "a.py"), "w").write("x = 1\n")
+    g("add", "."); g("commit", "-qm", "base")
+    old = g("rev-parse", "HEAD").stdout.strip()
+    open(os.path.join(repo, "a.py"), "a").write("".join("y%d = %d\n" % (i, i) for i in range(700)))
+    g("commit", "-qam", "big")
+    new = g("rev-parse", "HEAD").stdout.strip()
+    st = os.path.join(repo, ".claude", ".review_state")
+    os.makedirs(st)
+    for name in ("repo-reviewer", "notes-editor", "claudemd-keeper"):
+        open(os.path.join(st, name), "w").write("%s 0 0\n" % new)
+    wt = os.path.join(repo, "wt")
+    g("worktree", "add", "-q", "-b", "feat", wt)
+    os.makedirs(os.path.join(wt, ".claude", ".review_state"))
+    for name in ("repo-reviewer", "notes-editor", "claudemd-keeper"):     # the worktree's stale copy
+        open(os.path.join(wt, ".claude", ".review_state", name), "w").write("%s 0 0\n" % old)
+    genv = {k: v for k, v in os.environ.items() if k != "CLAUDE_PROJECT_DIR"}
+    gate = lambda root: subprocess.run(["bash", os.path.join(root, ".claude", "hooks", "review_backlog.sh"), "gate"],
+                                       input=json.dumps({"tool_input": {"file_path": os.path.join(root, "a.py")}}),
+                                       capture_output=True, text=True, cwd=root, env=genv)
+    r1 = gate(wt)
+    scenario("review gate: an edit in a worktree is judged on the main checkout's watermark, not its stale copy",
+             r1.returncode == 0, r1.stdout + r1.stderr)
+    for name in ("repo-reviewer",):
+        open(os.path.join(st, name), "w").write("%s 0 0\n" % old)
+    r2, r3 = gate(wt), gate(repo)
+    scenario("review gate: a real backlog of 700 lines still refuses the edit, in the worktree and the main checkout",
+             r2.returncode == 2 and r3.returncode == 2 and "repo-reviewer" in r2.stderr, r2.stdout + r2.stderr)
+
+    # 7. the step prompt asks for a placement before every named submission
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    scenario("step prompt: site pick right before every named site submit, CPU jobs too",
+             "Run `site pick FA --jobs N ...` right before every `site submit <site>` (CPU jobs too): placement_guard "
+             "refuses a named submission with no plan unit left." in tpl)
+
+
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
           decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
           designs, design_prior, prompt_cap, parallel_steps, sent_figures, idle_wait, the_suite_itself, main_session_work,
-          duplicate_check]
+          duplicate_check, command_reading]
 
 
 def main():

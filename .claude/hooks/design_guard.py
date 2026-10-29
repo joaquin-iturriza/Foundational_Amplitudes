@@ -19,33 +19,17 @@ and the entry's latest design passed review, whatever its age. What the re-read 
 (the hook input's agent_type), so no step agent or main session passes its own design. `--item '*'` (upkeep) and items that are no plan entry
 pass, as does every command that is not a submission. It fails closed like plan_check: an error while checking a
 submission refuses it; a command that is no submission is never refused, whatever happens.
+A command is read through cmdparse.py (shared by the Bash guards): its command words only, so a heredoc body, a
+quoted string or a grep pattern that names a submission or a verdict submits nothing.
 Env for tests: the PLAN_* variables of tools/plan.py."""
-import json, os, re, shlex, sys
+import json, os, re, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cmdparse  # noqa: E402
 
 HERE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SEP = set(";&|()")
 SUBMITS = re.compile(r"sweep_manager\.py\s+submit\b|\bsbatch\b|\bcondor_submit(?:_dag)?\b")
 GENERATOR = re.compile(r"generate_\w*sweeps?\w*\.py")
-
-
-def segments(cmd):
-    try:
-        lx = shlex.shlex(cmd, posix=True, punctuation_chars=";&|<>()")
-        lx.whitespace_split = True
-        toks = list(lx)
-    except ValueError:
-        return None
-    out, cur = [], []
-    for t in toks:
-        if t and set(t) <= SEP:
-            if cur:
-                out.append(cur)
-            cur = []
-        else:
-            cur.append(t)
-    if cur:
-        out.append(cur)
-    return out
 
 
 def items_of(toks):
@@ -66,34 +50,53 @@ def remote_submits(text):
 
 def submissions(cmd):
     """The item ids each submission in the command names ([] for a submission with none: site refuses it itself)."""
-    segs = segments(cmd)
-    if segs is None:                           # unparsable: read the raw text
-        if re.search(r"\bsite\s+(?:submit|launch\s+add)\b", cmd) or (
-                re.search(r"\bsite\s+run\b", cmd) and remote_submits(cmd)):
-            return [re.findall(r"--item[=\s]+['\"]?([^\s'\";&|]+)", cmd)]
-        m = re.search(r"scripts/launch_\w+\.sh\s+['\"]?([^\s'\";&|]+)", cmd)
+    segs = cmdparse.commands(cmd)              # command words of the code: heredoc data and quotes run nothing
+    if segs is None:                           # unparsable: read its code with quotes blanked
+        text = cmdparse.scan_text(cmd)
+        if re.search(r"\bsite\s+(?:submit|launch\s+add)\b", text) or (
+                re.search(r"\bsite\s+run\b", text) and remote_submits(text)):
+            return [re.findall(r"--item[=\s]+['\"]?([^\s'\";&|]+)", cmdparse.code_text(cmd))]
+        m = re.search(r"scripts/launch_\w+\.sh\s+['\"]?([^\s'\";&|]+)", text)
         return [[m.group(1)]] if m else []
     out = []
     for toks in segs:
-        for i, t in enumerate(toks):
-            if os.path.basename(t) == "site" and i + 1 < len(toks):
-                rest, verb = toks[i + 1:], toks[i + 1]
-                if verb == "submit" or (verb == "launch" and "add" in rest[:2]):
-                    out.append(items_of(rest))
-                elif verb == "run" and "--" in rest:
-                    k = rest.index("--")
-                    if remote_submits(" ".join(rest[k + 1:])):
-                        out.append(items_of(rest[:k]))
-                break
-            if re.search(r"(?:^|/)scripts/launch_\w+\.sh$", t):
-                runs = all(re.match(r"\w+=", x) for x in toks[:i]) or toks[i - 1] in ("bash", "sh")
-                if runs and i + 1 < len(toks):
-                    out.append([toks[i + 1]])
-                break
+        if not toks:
+            continue
+        if os.path.basename(toks[0]) == "site" and len(toks) > 1:
+            rest, verb = toks[1:], toks[1]
+            if verb == "submit" or (verb == "launch" and "add" in rest[:2]):
+                out.append(items_of(rest))
+            elif verb == "run" and "--" in rest:
+                k = rest.index("--")
+                if remote_submits(" ".join(rest[k + 1:])):
+                    out.append(items_of(rest[:k]))
+            continue
+        i = 1 if os.path.basename(toks[0]) in ("bash", "sh") else 0
+        if i < len(toks) and re.search(r"(?:^|/)scripts/launch_\w+\.sh$", toks[i]) and i + 1 < len(toks):
+            out.append([toks[i + 1]])
     return out
 
 
 VERDICT = re.compile(r"tools/plan\.py\b[^;&|\n]*\bdesign-(?:pass|fix)\b")
+
+
+def gives_verdict(cmd):
+    """A command that runs tools/plan.py design-pass|design-fix: in the parsed words of every command bash would run
+    (quoted or not), or in the program of a python -c / perl -e; the raw text when the command cannot be parsed. A
+    heredoc body written by cat, or a grep pattern, that names it runs nothing."""
+    segs = cmdparse.all_segments(cmd)
+    if segs is None:
+        return bool(VERDICT.search(cmd))
+    for seg in segs:
+        ws = cmdparse.words(seg)
+        if cmdparse.prog(ws) in cmdparse.READERS:
+            continue
+        k = next((i for i, w in enumerate(ws) if re.search(r"(?:^|/)plan\.py$", w)), None)
+        if k is not None and any(w in ("design-pass", "design-fix") for w in ws[k + 1:]):
+            return True
+        if any(VERDICT.search(x) for x in cmdparse.inline_programs(seg)):
+            return True
+    return False
 
 
 REREAD = re.compile(r"(?:^|[\s;&|(])REREAD=['\"]?([A-Za-z0-9_.:-]+)")
@@ -113,7 +116,7 @@ def problems(subs, cmd=""):
     d, st = plan.load()
     ids = {e["id"]: e for e in d["entries"]}
     bad = []
-    rereads = REREAD.findall(cmd)
+    rereads = REREAD.findall(cmdparse.code_text(cmd))
     for x in sorted({x for s in subs for x in s if x != "*"}):
         if x in ids and not plan.design_fresh(ids[x]) and not reread_ok(plan, ids[x], st, rereads):
             last = plan.last_design(ids[x])
@@ -133,7 +136,7 @@ def main():
         subs = submissions(cmd)
     except Exception:
         return 0                                   # not readable as a submission: never refused
-    if VERDICT.search(cmd) and inp.get("agent_type") != "design-reviewer":
+    if gives_verdict(cmd) and inp.get("agent_type") != "design-reviewer":
         print("BLOCKED by design_guard: plan design-pass and design-fix are the design reviewer's verdict; only the "
               "design-reviewer subagent runs them (this call comes from %s). Launch it (Agent tool, subagent_type "
               "design-reviewer) on the entry." % (

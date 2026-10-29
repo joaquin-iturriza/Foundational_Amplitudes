@@ -23,8 +23,13 @@ try:
 except Exception:
     print("")' 2>/dev/null)
 [ -z "$cmd" ] && exit 0
+# The code only (cmdparse.py, shared by the Bash guards): heredoc bodies fed to python, cat, tee ... and quoted strings
+# taken out, the bodies fed to a shell and the inner commands of sh -c / eval kept. A test file written by a heredoc
+# that names sbatch submits nothing. If the helper fails, the raw command is read (fail closed).
+scan=$(printf '%s' "$cmd" | python3 "$(dirname "${BASH_SOURCE[0]}")/cmdparse.py" scan 2>/dev/null) || scan="$cmd"
+[ -z "$scan" ] && scan="$cmd"
 
-if printf '%s' "$cmd" | grep -qE '(^|[;&|(]|\$\()[[:space:]]*(sbatch|condor_submit|condor_submit_dag)([^[:alnum:]_]|$)'; then
+if printf '%s' "$scan" | grep -qE '(^|[;&|(]|\$\()[[:space:]]*(sbatch|condor_submit|condor_submit_dag)([^[:alnum:]_]|$)'; then
   {
     echo "BLOCKED by placement_guard: raw sbatch/condor_submit. Submit through the site tool so the"
     echo "run is registered and placed:   site pick <project> --jobs N [--groups G --mem 8G]   then   site submit auto <project> <script> [-- args]"
@@ -66,10 +71,10 @@ if [ -n "$bulk" ]; then
   exit 2
 fi
 
-subs=$( { printf '%s' "$cmd" | grep -oE '(^|[;&|(]|\$\()[[:space:]]*site[[:space:]]+submit[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+' \
+subs=$( { printf '%s' "$scan" | grep -oE '(^|[;&|(]|\$\()[[:space:]]*site[[:space:]]+submit[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+' \
            | sed -E 's/.*site[[:space:]]+submit[[:space:]]+//';
-         if printf '%s' "$cmd" | grep -qE 'sweep_manager\.py[[:space:]]+submit|generate_sweep\.py[^;|&]*--submit|condor_submit|sbatch'; then
-           printf '%s' "$cmd" | grep -oE '(^|[;&|(]|\$\()[[:space:]]*site[[:space:]]+run[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+' \
+         if printf '%s' "$scan" | grep -qE 'sweep_manager\.py[[:space:]]+submit|generate_sweep\.py[^;|&]*--submit|condor_submit|sbatch'; then
+           printf '%s' "$scan" | grep -oE '(^|[;&|(]|\$\()[[:space:]]*site[[:space:]]+run[[:space:]]+[^[:space:]]+[[:space:]]+[^[:space:]]+' \
              | sed -E 's/.*site[[:space:]]+run[[:space:]]+//';
          fi; } | sort -u )
 [ -z "$subs" ] && exit 0

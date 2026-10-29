@@ -83,13 +83,28 @@ except Exception: print("")' 2>/dev/null)
 [ -z "$cmd" ] && exit 0
 allowlisted "$cmd" && exit 0
 
-if printf '%s' "$cmd" | grep -q "run\.py"; then
-  hit=$(printf '%s' "$cmd" | grep -oE "$OFF_RE" | head -3 || true)
+# Command words only (cmdparse.py, shared by the Bash guards): a command that runs run.py (readers of it excluded), and
+# the .sh arguments of an sbatch / site submit command. A grep, cat, ls, head or sed -n over scripts/*.sh reads them,
+# it submits none. A command cmdparse cannot parse falls back to the raw reading below.
+CP="$(dirname "${BASH_SOURCE[0]}")/cmdparse.py"
+if runpy=$(printf '%s' "$cmd" | python3 "$CP" runpy 2>/dev/null) \
+   && scripts=$(printf '%s' "$cmd" | python3 "$CP" submitted-scripts 2>/dev/null); then
+  :
+else
+  runpy=$(printf '%s' "$cmd" | grep "run\.py" || true)
+  scripts=""
+  if printf '%s' "$cmd" | grep -qE '(^|[;&|(]|\$\()[[:space:]]*(sbatch|site +submit)([^[:alnum:]_]|$)'; then
+    scripts=$(printf '%s' "$cmd" | tr ' \t\n' '\n\n\n' | grep -E '\.sh$' || true)
+  fi
+fi
+
+if [ -n "$runpy" ]; then
+  hit=$(printf '%s' "$runpy" | grep -oE "$OFF_RE" | head -3 || true)
   [ -n "$hit" ] && emit "run.py invocation" "$hit"
 fi
 
-if printf '%s' "$cmd" | grep -qE '(^|[;&|(]|\$\()[[:space:]]*(sbatch|site +submit)([^[:alnum:]_]|$)'; then
-  for s in $(printf '%s' "$cmd" | tr ' \t\n' '\n\n\n' | grep -E '\.sh$' || true); do
+if [ -n "$scripts" ]; then
+  for s in $scripts; do
     path="$s"; [ -f "$path" ] || path="$REPO/$s"
     [ -f "$path" ] || continue
     allowlisted "$path" && continue

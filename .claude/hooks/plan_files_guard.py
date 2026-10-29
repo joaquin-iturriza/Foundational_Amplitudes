@@ -4,65 +4,69 @@ records (the user's words, real step agents, machine checks). Refused:
   - Edit, Write, MultiEdit or NotebookEdit of plan/plan.yaml, plan/.state.json, plan/.check_cache.json or the lock;
   - a Bash command that names one of those files (with or without plan/, so a cd into plan/ counts) and is not a run
     of tools/plan.py or tools/plan_migrate.py, unless it only reads it (cat, head, tail, less, grep, wc, diff, git
-    diff/log/show/status/blame).
-Heredoc bodies are taken out before the command is read: a body fed to an interpreter (python, perl, ...) is refused
+    diff/log/show/status/blame; sed without an in-place flag or -f and with the file outside its script; awk whose
+    program has no redirection, pipe or system());
+  - a PLAN_* variable set (an assignment or export, outside quotes and data heredocs).
+The command is read through cmdparse.py, shared by the Bash guards. Heredoc bodies are taken out before it is read: a body fed to an interpreter (python, perl, ...) is refused
 only when a line of it writes and names a plan file (itself, or a variable set to its path); a shell's body is read
 as a command; any other body (a commit message, cat's text) is data.
 plan/step_prompt.txt is code (the step agent's template), edited like any file. A write the command text cannot show
 (a script that opens the file) is not caught here: plan_check re-validates every recorded step and quote on read."""
-import json, os, re, shlex, sys
+import json, os, re, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from cmdparse import SHELLS, all_segments, code_text, feeder, heredocs, prog as prog_of, segments, words as cmd_words  # noqa: E402
 
 DATA = r"(?:plan/)?(?:plan\.yaml(?:\.lock)?|\.state\.json|\.check_cache\.json|\.plan_tmp_\w*)"
 READERS = {"cat", "head", "tail", "less", "more", "grep", "rg", "wc", "diff", "file", "stat", "ls", "md5sum",
            "sha256sum"}
 GIT_READ = {"diff", "log", "show", "status", "blame", "ls-files", "cat-file"}
 TOOLS = re.compile(r"(?:^|/)tools/plan(?:_migrate)?\.py$")
+# a PLAN_* variable set: an assignment before the program (env included: env "PLAN_ROOT=/x" ...) or an export, read from
+# the parsed tokens of every command bash would run (quotes removed by the parser, data heredocs out); a PLAN_ROOT
+# inside a grep pattern or a heredoc that writes a test is no assignment. PLAN_SET is the fallback for an unparsable
+# command, on its code with quotes kept.
+DECLARE = {"export", "declare", "typeset", "readonly", "local"}
+PLAN_SET = re.compile(r"(?:^|[\s;&|(`])(?:PLAN_[A-Z_]+=|export\s+(?:-\w+\s+)*(?:[A-Za-z_]\w*(?:=\S*)?\s+)*PLAN_[A-Z_]+)")
+INPLACE = re.compile(r"^(?:-[a-zA-Z]*i|--in-place)")
+AWK = {"awk", "gawk", "mawk", "nawk"}
 
 
-def segments(cmd):
-    """The simple commands of a shell line (split at ; && || | & and newlines), each as tokens, or None when the
-    line cannot be parsed (then any mention of a plan file is refused)."""
-    try:
-        lx = shlex.shlex(cmd, posix=True, punctuation_chars=";&|<>()")
-        lx.whitespace_split = True
-        toks = list(lx)
-    except ValueError:
-        return None
-    out, cur = [], []
-    for t in toks:
-        if t and set(t) <= set(";&|()"):
-            if cur:
-                out.append(cur)
-            cur = []
-        else:
-            cur.append(t)
-    if cur:
-        out.append(cur)
-    return out
+def plan_var_set(cmd):
+    segs = all_segments(cmd)
+    if segs is None:
+        return bool(PLAN_SET.search(code_text(cmd)))
+    for seg in segs:
+        ws = cmd_words(seg)
+        start = len(seg) - len(ws)                 # assignments and wrappers (env ...) before the program
+        for k, t in enumerate(seg):
+            if re.match(r"^PLAN_[A-Z_]+(?:=|$)", t) and (k < start or prog_of(ws) in DECLARE):
+                return True
+    return False
 
 
-HEREDOC = re.compile(r"(?<!<)<<(?!<)(-?)\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
+def editor_read(prog, words):
+    """sed or awk only reading: no in-place flag, no -f program file, and the plan file is no part of the program
+    (sed's w); an awk program with no >, no pipe and no system(), never -i inplace. perl and ruby are never readers
+    here: their program can write to a file given as an argument (open my $f, ">", shift)."""
+    opts = [w for w in words[1:] if w.startswith("-")]
+    if prog in AWK:
+        if "-f" in words or any(w == "-i" or w.startswith("--include") for w in opts):
+            return False
+        rest, k = words[1:], 0
+        while k < len(rest) and rest[k].startswith("-"):
+            k += 2 if rest[k] in ("-v", "-F") else 1
+        script = rest[k] if k < len(rest) else ""
+        return not re.search(r">|(?<!\|)\|(?!\|)|\bsystem\s*\(", script)
+    if prog != "sed" or any(INPLACE.match(w) or re.fullmatch(r"-[a-zA-Z]*f|--file(?:=.*)?", w) for w in opts):
+        return False
+    script = next((w for w in words[1:] if not w.startswith("-")), "")
+    return not re.search(DATA, script)
+
+
 INTERP = re.compile(r"^(?:python[0-9.]*|perl|ruby|node)$")
-SHELLS = {"bash", "sh", "zsh", "dash"}
 WRITE = re.compile(r"""open\([^)\n]*,\s*(?:mode\s*=\s*)?['"][^'"]*[wax+]|\.write_(?:text|bytes)\(|"""
                    r"""\bos\.(?:replace|rename|remove|unlink)\(|\bshutil\.|\.(?:unlink|rename|replace)\(|>\s*\$?\w""")
-
-
-def heredocs(cmd):
-    """(the command with its heredoc bodies taken out, [(the line that feeds a body, the body)])."""
-    lines, out, bodies, i = cmd.split("\n"), [], [], 0
-    while i < len(lines):
-        line = lines[i]
-        out.append(line)
-        i += 1
-        for m in HEREDOC.finditer(line):
-            tabs, word, body = m.group(1), m.group(3), []
-            while i < len(lines) and (lines[i].lstrip("\t") if tabs else lines[i]) != word:
-                body.append(lines[i])
-                i += 1
-            i += 1                                     # the closing word
-            bodies.append((line, "\n".join(body)))
-    return "\n".join(out), bodies
 
 
 def writes_plan(body):
@@ -82,9 +86,7 @@ def heredoc_refusal(line, body):
     script that would be refused as a command. Any other body (a commit message, cat's text) is data."""
     if not re.search(DATA, body):
         return None
-    segs = segments(HEREDOC.split(line)[0]) or [[]]
-    words = [t for t in (segs[-1] if segs else []) if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]
-    prog = os.path.basename(words[0]) if words else ""
+    prog = feeder(line)
     if INTERP.match(prog):
         w = writes_plan(body)
         return "a %s script fed by a heredoc that writes a plan file (%s)" % (prog, w[:80]) if w else None
@@ -94,7 +96,7 @@ def heredoc_refusal(line, body):
 
 
 def bash_refusal(cmd):
-    if re.search(r"\bPLAN_[A-Z_]+", cmd):
+    if plan_var_set(cmd):
         return "a PLAN_* variable (they point tools/plan.py at a test world, honoured only with PLAN_TEST=1 in tests)"
     cmd, bodies = heredocs(cmd)
     for line, body in bodies:
@@ -126,15 +128,10 @@ def bash_refusal(cmd):
             if TOOLS.search(script) and "-c" not in words[1:words.index(script)]:
                 continue
             return "python on a plan file other than tools/plan.py"
-        if prog in READERS and "-i" not in words and not any(w.startswith("--in-place") for w in words):
+        if prog in READERS:                        # none of them writes (grep -i is ignore-case)
             continue
-        if prog == "sed" and not any(w == "-i" or re.match(r"-[a-zA-Z]*i", w) or w.startswith("--in-place")
-                                     for w in words[1:]):
-            # a read (sed -n 1,9p FILE): the plan file may only be an input, after the script, never in the script
-            # (sed's w command writes)
-            script = next((w for w in words[1:] if not w.startswith("-")), "")
-            if not re.search(DATA, script):
-                continue
+        if (prog == "sed" or prog in AWK) and editor_read(prog, words):
+            continue
         if prog == "git" and len(words) > 1:
             sub = next((w for w in words[1:] if not w.startswith("-")), "")
             if sub in GIT_READ:
