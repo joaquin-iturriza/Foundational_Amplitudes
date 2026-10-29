@@ -1600,7 +1600,7 @@ entries:
   title: 'the catalog''s coverage: analysis-level acceptance with the hard regions oversampled'
   question: The catalog's fiducial cuts (|cos theta|<0.9, i.e. |eta|<1.47) were an unsourced regulator and leave out about
     40% of 13 TeV pp events; replace them by analysis-level acceptance and oversample the forward and collinear regions
-  status: waiting_user
+  status: running
   quotes:
   - said_at: '2026-10-25T19:28:44.743000+00:00'
     text: Okay, yes to 1 to 3, yes to electroweak production and the smaller fixes, no to the decayed final states
@@ -2169,6 +2169,11 @@ entries:
     searched: 'D167 approves the regeneration, D176 the notice; none settles a pipeline version change or a new batch layout
       (CLAUDE.md 0c: a changed layout goes to the user before submission)'
     holds_all: the entry's only next step is this submission; nothing else in it can move without a site
+    answered_at: '2026-10-29T13:08:12+00:00'
+    decision: D176
+    withdrawn_at: '2026-10-29T13:08:12+00:00'
+    withdrawn_why: 'the user''s call stands: CC''s notice is ignored; the regeneration runs on CC as designed, after CC''s
+      environment is repaired (its anaconda 3.11 module is refused)'
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -2217,14 +2222,6 @@ entries:
       the outcome can be read. Searched: pp13v4, catalog_v4_pp, pp-trained, pp pools, massless b pp, regeneration, gen_daniel_catalog
       in results.tex, plan show, site runs, site decisions (D117, D119, D136, D161, D162, D163, D167): no earlier v4-physics
       pp generation.'
-  ask: 'The pp regeneration cannot go as designed: the main session does not operate on CC-IN2P3, and on lxplus it needs MadGraph
-    3.7.0 installed beside its 3.6.7 (CC generated every pool with 3.7.0), the site check taught a generation-only site, and
-    the 8 parts re-split into 8-core jobs with the same 12 h wall time. Wait for CC (an exception or a data move), or take
-    the lxplus route with those three changes?'
-  waiting_since: '2026-10-29T06:35:08+00:00'
-  searched: 'D167 approves the regeneration, D176 the notice; none settles a pipeline version change or a new batch layout
-    (CLAUDE.md 0c: a changed layout goes to the user before submission)'
-  holds_all: the entry's only next step is this submission; nothing else in it can move without a site
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
