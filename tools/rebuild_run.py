@@ -60,6 +60,17 @@ def load_best_weights(model, run_dir):
     return True
 
 
+def scored_split(exp, split, name):
+    """What a probe read scores on one held-out role of a built experiment: its loader, the pool file the physics
+    check reads and the event indices of that role (for the per-event target factor). split is "val" (the
+    zero-shot reads' default since they began) or "test" (a pool no run selects a checkpoint on: for a process the
+    parent trained on, its val pool was the parent's own checkpoint-selection pool)."""
+    assert split in ("val", "test"), f"split {split!r}: val or test"
+    loader = exp.val_loader if split == "val" else exp.test_loader
+    pool = (getattr(exp, "_pool_paths", None) or {}).get(split, {}).get(name)
+    return loader, pool, exp._split_indices[split]
+
+
 def _build(cfg, swap, path, name):
     """The experiment built through init_model, with the `swap` role's pool read from `path` (None: none)."""
     real = datagen.ensure_split_set

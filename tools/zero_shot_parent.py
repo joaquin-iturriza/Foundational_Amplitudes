@@ -9,12 +9,13 @@ data_stats.json: data.affine_multiplicity_std, mu_N = a + b N at the probe's par
 mu_n = a + n b, Sec. "Extrapolating to more legs"); data.shared_standardization, the pooled (mu, sigma); a
 per-process parent has no prediction for a new process (only val_loss_affine). The truth: the probe's log|M|^2,
 mu_p + sigma_p z, with the probe's own statistics fitted on its train split (fine_tune.target_stats=own; a
-representation only, inverted exactly). Scored on the probe's validation split. Prints one ZERO_SHOT JSON line
+representation only, inverted exactly). Scored on the probe's validation split (--split test: its test split, a pool no
+run selected a checkpoint on; the first --eval-subsample rows of either). Prints one ZERO_SHOT JSON line
 and one ZERO_SHOT_HIST line per probe. Needs a GPU.
 --twins: a JSON {probe: training process} for a per-process parent: a probe that relabels a training process is scored
 in log|M|^2 with that process's statistics (prepd_mean/std at its index in the parent's recipe), parent_stats "twin".
 --save-dir: per probe <probe>.npz with the truth t, the affine-mapped prediction q_aff, q_own (the output in the probe's
-own standardized units) and, when there is one, the prediction q, all in log|M|^2 on the validation split (the Delta plots and per-process MSEs are built from these).
+own standardized units) and, when there is one, the prediction q, all in log|M|^2 on the scored split (--split; the Delta plots and per-process MSEs are built from these).
 Physics check (tools/pool_physics.py): before a probe is scored, its pool's physics block (model with restriction, MB,
 ymb, MT, ymt, WT, WZ, WW, WH as its backend read them, coupling-order clause, order vector, alpha_s rule) and the b's
 particle-table row are compared with the parent's training catalog (data.processes_file): its entry for the same
@@ -35,7 +36,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
 import pool_physics  # noqa: E402
-from rebuild_run import _build, load_best_weights  # noqa: E402
+from rebuild_run import _build, load_best_weights, scored_split  # noqa: E402
 from multiplicity_extrap import parent_target_standardization  # noqa: E402
 
 ap = argparse.ArgumentParser()
@@ -44,7 +45,10 @@ ap.add_argument("--train-subsample", type=int, default=10000,
                 help="probe train events read for its own target statistics (a representation, inverted exactly)")
 ap.add_argument("--twins", default=None, help="JSON {probe: training process it relabels} (per-process parent)")
 ap.add_argument("--save-dir", default=None, help="write <probe>.npz (t, q_aff, q) here")
-ap.add_argument("--eval-subsample", type=int, default=2000, help="held-out val events per probe")
+ap.add_argument("--eval-subsample", type=int, default=2000, help="held-out events per probe (the first rows of --split)")
+ap.add_argument("--split", choices=("val", "test"), default="val",
+                help="the probe pool's role scored: val (default, every read so far) or test (for a process the parent "
+                     "trained on, its val pool was the parent's checkpoint-selection pool)")
 ap.add_argument("--window-names", action="store_true",
                 help="save <probe>_<lo>-<hi>GeV.npz (the recipe's sqrt(s) window), for a probe set with several windows of one process")
 ap.add_argument("--signed-magnitude", action="store_true",
@@ -105,7 +109,7 @@ for recipe in a.recipes:
     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
     # the physics check, before anything is scored
     _spec = exp._recipe_specs[0]
-    _pool = (getattr(exp, "_pool_paths", None) or {}).get("val", {}).get(_spec["name"])
+    loader, _pool, split_idx = scored_split(exp, a.split, _spec["name"])
     import mg5_pipeline_final as _mg
     physics_chk = pool_physics.check_probe(_spec["name"], _spec.get("physics"), _pool, physics_ref,
                                            cfg=_mg.PROCESSES.get(_spec["name"]) or _mg.PROCESSES[_spec["base"]])
@@ -127,7 +131,7 @@ for recipe in a.recipes:
     exp._init_regularization()
     with torch.no_grad():
         hs, zs, ss = [], [], []
-        for data in exp.val_loader:
+        for data in loader:
             y_pred, y, _, sig, _ = exp._forward_lloca(data)
             hs.append(y_pred.reshape(-1).double().cpu()); zs.append(y.reshape(-1).double().cpu())
             if sig is not None:                       # HETEROSC: the per-event sigma, in the parent's standardized units
@@ -154,8 +158,9 @@ for recipe in a.recipes:
         mu_c, sd_c, kind = float(pstats["prepd_mean"][i]), float(pstats["prepd_std"][i]), "twin"
     else:
         mu_c = sd_c = None; kind = "per_process"
-    rec = {"probe": probe, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
-           "n_val": int(len(z)), "var_logm2": float(np.var(t)), "val_loss_affine": affine,
+    rec = {"probe": probe, "split": a.split, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
+           "n_val": int(len(z)),   # the events scored, of --split (key kept for the readers)
+           "var_logm2": float(np.var(t)), "val_loss_affine": affine,
            "affine_ab": [float(c) for c in coef], "twin": twins.get(probe), "transform": str(tr[0]),
            "physics": pool_physics.record(physics_chk)}
     # abslog: the truth is clipped at log s (s the probe's 1% quantile of |x| on its train split, data.signedlog_quantile),
@@ -186,7 +191,7 @@ for recipe in a.recipes:
     F = getattr(exp, "all_amp_factor", None)
     logF = np.zeros(0, np.float32)
     if F is not None:
-        Fv = np.asarray(F)[exp._split_indices["val"]].reshape(-1)
+        Fv = np.asarray(F)[split_idx].reshape(-1)
         if len(Fv) == len(z):
             logF = np.log(Fv).astype(np.float32)
     if a.save_dir:
@@ -200,7 +205,7 @@ for recipe in a.recipes:
         np.savez_compressed(os.path.join(a.save_dir, stem + ".npz"), t=t.astype(np.float32),
                             q_aff=(mu_p + sd_p * (A @ coef)).astype(np.float32),
                             q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
-                            mu_sd=np.array([mu_p, sd_p]), logF=logF, at_floor=at_floor,
+                            mu_sd=np.array([mu_p, sd_p]), logF=logF, at_floor=at_floor, split=np.array(a.split),
                             sig=sig.astype(np.float32),     # raw, the parent's standardized units
                             s=(sd_c * sig if (mu_c is not None and len(sig) == len(h)) else np.zeros(0)).astype(np.float32),
                             q=(q if mu_c is not None else np.zeros(0)).astype(np.float32),

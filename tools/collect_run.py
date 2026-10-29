@@ -42,7 +42,9 @@ sys.path.insert(0, os.path.join(HERE, "tools"))
 import pool_physics  # noqa: E402  (standard library only at import)
 SITE = shlex.split(os.environ.get("PLAN_SITE", "site"))
 PLAN = [sys.executable, os.path.join(HERE, "tools", "plan.py")]
-CROSS_PREFIX = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_"}
+CROSS_PREFIX = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_")}  # the job's rule
+# the role each axis is scored on, as scripts/job_catalog_v3_short.sh sets SPLIT (test on PP4 and TR, val elsewhere)
+AXIS_SPLIT = {"PP4": "test", "TR": "test"}
 FINISHED = {"COMPLETED", "FAILED", "TIMEOUT", "CANCELLED", "OUT_OF_MEMORY", "NODE_FAIL", "DONE", "REMOVED"}
 
 
@@ -60,6 +62,10 @@ def axis_recipe(axis, cat):
         return "recipes/catalog_v4_shared_heldout.yaml"
     if axis == "PP":
         return "recipes/catalog_v3_pp_test.yaml"
+    if axis == "PP4":
+        return "recipes/catalog_v4_pp_test.yaml"
+    if axis == "TR":   # the in-distribution read of the job's axis TR: the controls' training recipe (other arms' differ)
+        return "recipes/catalog_%s_train.yaml" % cat
     return "recipes/catalog_%s_heldout_%s.yaml" % (cat, axis)
 
 
@@ -89,6 +95,8 @@ def parse_log(text):
             except ValueError:
                 continue
             ax = p["zs"].setdefault(m.group(1), {"ok": set(), "err": {}, "nonfinite": set()})
+            if "error" not in rec:   # the role scored (records before --split were all val)
+                ax.setdefault("splits", set()).add(rec.get("split", "val"))
             name = rec.get("probe") or os.path.basename(str(rec.get("recipe", "")))[:-len(".yaml")]
             p["parent"] = p["parent"] or rec.get("parent")
             st = pool_physics.zs_status(rec)
@@ -136,7 +144,10 @@ def fetch(site, item, pred, files_by_axis, signed_axes, result_json):
     else:
         parts.append("echo null")
     if files_by_axis or signed_axes:
-        globs = " ".join("%s/%s*.npz" % (shlex.quote(a), shlex.quote(pfx)) for a, pfx in files_by_axis)
+        # a tuple prefix (PP4: pp13v4_ or pp13_) globs on its common stem; the kept set is still the recipe's names
+        globs = " ".join("%s/%s*.npz" % (shlex.quote(a), shlex.quote(pfx if isinstance(pfx, str) else
+                                                                     os.path.commonprefix(list(pfx))))
+                         for a, pfx in files_by_axis)
         signed = " ".join("%s_signed.txt" % shlex.quote(a) for a in signed_axes)
         parts.append('cd "%s" && echo __B64__ && { shopt -s nullglob; ls -d %s %s 2>/dev/null; } | '
                      "tar czf - -T - | base64 -w0; echo" % (pred, globs, signed))
@@ -207,6 +218,9 @@ def collect(run, a):
             off.append("%s: no recipe %s" % (ax, axis_recipe(ax, cat)))
             continue
         miss = sorted(set(exp) - z["ok"])
+        want = AXIS_SPLIT.get(ax, "val")
+        if z.get("splits") and z["splits"] != {want}:
+            off.append("%s: scored on %s, the axis is read on %s" % (ax, "+".join(sorted(z["splits"])), want))
         lines.append("%s %d/%d%s%s" % (ax, len(set(exp) & z["ok"]), len(exp),
                                        " err %d" % len(z["err"]) if z["err"] else "",
                                        " nonfinite %d" % len(z["nonfinite"]) if z["nonfinite"] else ""))

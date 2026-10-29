@@ -35,7 +35,8 @@
 #   v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2   the pure-default bound: v4_dimensionless_muon[_seed2] with
 #                          every hadronic tree training class on its 13 TeV MadEvent pp events
 #                          (recipes/catalog_v4_pp_mixed_train.yaml), read besides on every hadronic catalog_v4 class's pp
-#                          pool (PP4, recipes/catalog_v4_pp_test.yaml); the controls read PP4 with mode eval, V3_AXES=PP4
+#                          pool (PP4, recipes/catalog_v4_pp_test.yaml, scored on its TEST split, 2000 events); the
+#                          controls read PP4 with mode eval, V3_AXES=PP4
 # Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py;
 # catalog_v3 arms only).
 #   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
@@ -190,7 +191,10 @@ OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/
 # an axis's recipe: the arm's catalog's held-out axis, or one of the cross reads
 axis_recipe() { case "$1" in
     XV3) echo recipes/catalog_v3_shared_heldout.yaml ;; XV4) echo recipes/catalog_v4_shared_heldout.yaml ;;
-    PP) echo recipes/catalog_v3_pp_test.yaml ;; PP4) echo recipes/catalog_v4_pp_test.yaml ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
+    PP) echo recipes/catalog_v3_pp_test.yaml ;; PP4) echo recipes/catalog_v4_pp_test.yaml ;;
+    TR) echo "$TRAIN" ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
+# TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their validation
+# split, the in-distribution reference of the held-out reads (v3_prep_explore, the shape gap, par:v4_tree_shape)
 [ -n "$OUT_FIXED" ] && [ "$MODE" != eval ] && { echo "$ARM is a sweep trial: mode eval only"; exit 1; }
 # 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
 ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")}
@@ -249,6 +253,10 @@ ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoi
 R="$SCRATCH/zz_${CAT}_heldout_recipes_${ARM}_${SLURM_JOB_ID:-$$}"
 mkdir "$R" || { echo "V3_RECIPES $R exists: refusing to read from a folder this job did not make"; exit 1; }
 for A in "${AXES[@]}"; do
+    # TR is the catalog's training recipe only (what tools/collect_run.py counts it against): an arm trained on another
+    # recipe (the sign extension, the pp-mixed set) is refused, not read on a set the collector would not match
+    if [ "$A" = TR ] && [ "$TRAIN" != "$PROJECT_DIR/recipes/catalog_${CAT}_train.yaml" ]; then
+        echo "V3_RECIPE_CHECK FAIL TR: $ARM trains on $TRAIN, not recipes/catalog_${CAT}_train.yaml"; exit 1; fi
     AR=$(axis_recipe "$A")   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
     mkdir "$R/$A" || exit 1
     # an earlier job's predictions for this arm and axis are moved aside (never deleted): the folder then holds this
@@ -263,10 +271,14 @@ for p in r["processes"]:
     yaml.safe_dump({**top, "processes": [p]}, open(f"{sys.argv[1]}/{p['name']}.yaml", "w"))
 PY
     # an axis whose pools are not generated yet (H7, stage 4) is skipped and listed, its read left for mode eval
+    # the role scored: the test pool on PP4 (the pp-trained arm's training classes selected their checkpoint on
+    # their pp13v4 val pools; catalog_coverage's design reads test) and on TR (the arm's own training pools, whose val
+    # split selected its checkpoint), val on every other axis (every read so far); tools/collect_run.py AXIS_SPLIT
+    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ]; } && SPLIT=test
     miss=$(python -c "
 import glob, os, sys, yaml
-print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_val_*amplitudes.npy\"))
-          for p in yaml.safe_load(open(sys.argv[1]))['processes']))" "$AR")
+print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_{sys.argv[2]}_*amplitudes.npy\"))
+          for p in yaml.safe_load(open(sys.argv[1]))['processes']))" "$AR" "$SPLIT")
     if [ "$miss" != 0 ]; then echo "V3_AXIS_SKIPPED $A: $miss pools not generated"; continue; fi
     P=("$R/$A"/*.yaml)
     # smoke: two probes per axis; on H5 one that changes sign and one that does not, so both scorings are exercised
@@ -296,10 +308,11 @@ PY
     # every axis on log max(|M|^2, floor) for a sign-changing pool (the one-loop pools of H5, and the twin's tau
     # one-loop pools of H3p); a positive pool's target is log|M|^2 either way
     SM=(--signed-magnitude)
-    python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
+    python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" --split "$SPLIT" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
-    if grep -qE "name: .*_(nlo|loop)$" "$AR"; then
+    # (not on TR: signed_ab_score reads the val split, the checkpoint-selection pool of a training process)
+    if [ "$A" != TR ] && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
         # the sign head's scoring on every H5 pool: signed_ab_score.py scores those the run resolves as sign-changing
         # (any role non-positive, its abslog transform) and lists the others as skipped
         python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/${A}_signed.txt"
