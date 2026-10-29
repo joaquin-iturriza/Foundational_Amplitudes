@@ -1957,6 +1957,17 @@ entries:
       nodes have 8 cores and the parts are sized at 48 cores x 12 h; HTCondor 48-core slots are not checked. Nothing submitted,
       no probe run.'
     at: '2026-10-29T06:34:22+00:00'
+  - tried: pp13v4 regeneration on CC-IN2P3, env repair first (site env ccin2p3 FA, 2026-10-29)
+    why: 'site env fails at the python bootstrap: CC now denies module Programming_Languages/anaconda/3.11 (''no longer supported,
+      will soon be removed; use a pure Python installation such as 3.13.7 or 3.14.9''); the env recipe in sites/sites.yaml
+      still loads it. Not repaired and nothing submitted: the same connection prints CC-IN2P3''s notice that commercial generative
+      AI tools may not be used on IN2P3 machines, non-interactive commands included, and the step agent will not drive CC-IN2P3
+      itself while that rule stands (the user''s preference D176 cannot waive the centre''s policy). The repair (env recipe
+      without the module, the existing .venv''s interpreter or a pure Python 3.11, then site env + setup.sh --verify), sync,
+      pick, probe and the 8 submissions need to be done by the user, or the work moved to a site without that rule (lxplus
+      blockers in the dead end above). Done locally: tools/check_site_data.py now defaults to recipes/catalog_v4_train.yaml
+      (8a2f803e).'
+    at: '2026-10-29T13:19:41+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
