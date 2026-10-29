@@ -123,15 +123,20 @@ entries:
     1: when the two pretrainings end, read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design
       says (wrong-sign share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean
       median; the zero-shot MSE per axis, 2->5 first; blow-ups listed)
-    2: 'Read the shape part of catalog_v4''s tree zero-shot error (CPU, existing reads only, extend analysis/catalog_v4/loop_levels.py):
-      per held-out tree pool the MSE left after removing its offset (kshot_level.json, the floor and the level share), in
-      the same four groups as par:v4_tree_newproc (new combinations, multiplicity, top processes trained at another top mass,
-      top processes at none) and the same cells of multiplicity and initial state'
-    3: 'Read the multiplicity axis''s signed level bias on catalog_v4''s trees (CPU, existing reads, extend analysis/catalog_v4/loop_levels.py):
-      par:v4_tree_newproc found its offset median +0.12 with 0.642 of the 218 pools positive (the network places a six particle
-      level too high), and the largest absolute offsets of the new processes on gluon-gluon (median 0.586) and e+e- (0.311)
-      beams; per initial state and born orders, the signed offset against the departure of the pool''s level from the matched
-      training pools, and whether the sign follows the level''s step from five to six particles in training'
+    2: 'Read catalog_v4''s one-loop axis (H5) zero-shot error in level and shape as the tree reads did (CPU, existing reads
+      only, extend analysis/catalog_v4/loop_levels.py''s group_read, never copy): per held-out one-loop pool its seed-mean
+      absolute offset and floor var(q - t) (kshot_level.json), grouped by whether it has an external top and, for those, whether
+      its process is trained at another top mass (the heavy-quark layer''s one-loop pools, if any; count them first) or at
+      none, against the pools without a top, in cells of multiplicity and initial state; loop-induced and virtual pools read
+      apart'
+    3: 'Design and check on existing reads (CPU, no run; extend analysis/catalog_v4/loop_levels.py) a target or input change
+      for the tree level''s dependence on multiplicity: par:v4_mult_bias found the multiplicity pools'' signed offset follows
+      their level''s step from the five particle training parent (rank correlation -0.34 with the own step, -0.37 with the
+      class''s training step, -0.19 within class; positive on 0.75 of the pools whose level falls, 0.542 where it rises; e+e-
+      rise and sit low, gluon-gluon fall and sit high). On tree_levels_cc.json, per candidate (e.g. a per-particle term in
+      the emission-scale target, or the parent level as an input scale), whether it shrinks the steps from five to six particles
+      of the training and held-out multiplicity pools (median abs own step, its spread across classes), since the offset tracks
+      that step; no fit of a free scale without a source, the candidate''s form named from the target''s definition'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -963,26 +968,28 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     2:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): par:v4_tree_newproc found the large tree level offsets
-        are the untrained top mass (new combinations median 0.096, nearer the other-mass group on 46 of 60 pools), so whether
-        the shape error splits the same way decides whether the untrained mass is the whole tree zero-shot error or the new
-        process carries a shape error of its own'
+      feeds: 'the zero-shot bias, the user''s first priority (D178), then the shape: on trees both the level (par:v4_tree_newproc)
+        and the shape (par:v4_tree_shape: floor medians 0.24 new combinations, 0.155 top at another mass, 0.626 top at none)
+        are largest where the top is held out at its mass; whether the one-loop axis, catalog_v4''s weakest against catalog_v3
+        (par:v4_vs_v3), has the same source decides whether the top mass coverage is the one catalog design question for the
+        zero-shot error or the one-loop axis needs its own fix'
       if:
-      - 'the shape error splits as the level (top at no mass largest, new combinations near the other-mass group): on trees
-        the zero-shot error is the held-out top mass, a property of the axis design; write it up and move to the multiplicity
-        axis''s signed bias and the one-loop axis'
-      - 'the new combinations carry a shape error near the no-mass group''s: the new process has a shape effect of its own;
-        read what in the process predicts it (initial state, multiplicity, born orders) and design a fix in the target or
-        inputs for that property'
+      - 'the one-loop top pools at no trained top mass carry the largest offset and floor, the others near the pools without
+        a top: the held-out top mass is the zero-shot error on both trees and one loops; write it up and put to the user,
+        as a catalog design question (their call), training the top at 172.5 GeV in some processes, with the measured share
+        of the tree and one-loop error it would address'
+      - 'the one-loop error is large without a top (pools without a top near or above the top pools): the one-loop axis has
+        a source of its own; read what in the pool predicts it (loop-induced or virtual, born orders, multiplicity, initial
+        state, the departure from the matched training level of par:v4_loop_levels) and design a target or input fix for it'
     3:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): whether the multiplicity axis''s positive bias is a systematic
-        under-extrapolation of the level''s fall with multiplicity, which a multiplicity-aware target scale would address'
+      feeds: 'the zero-shot bias, the user''s first priority (D178): whether a multiplicity-aware target removes the multiplicity
+        axis''s signed bias, found to be a partial under-extrapolation of the level''s step with multiplicity'
       if:
-      - 'the signed offset tracks the training level''s step with multiplicity (positive where the level falls most from five
-        to six): the bias is an under-extrapolation in multiplicity; design a target or input change for the level''s multiplicity
-        dependence, checked first on these reads'
-      - 'no relation to the multiplicity step: the bias is beam-specific (gluon-gluon, e+e-); read those pools'' training
-        coverage at five particles and record it'
+      - 'a candidate shrinks the steps from five to six particles across classes (training and held out) on the existing reads:
+        record a design for a short pretraining arm with it against the control pair v4_dimensionless_muon seeds 42 and 43,
+        measured on the multiplicity axis''s signed offset and positive share'
+      - 'no candidate shrinks the steps without widening the level spread elsewhere: record it as a dead end with the candidates''
+        numbers and move to the one-loop axis''s level bias'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
