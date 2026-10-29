@@ -337,6 +337,12 @@ entries:
       ''echo: write error: No space left on device'' in the task epilog; no TR reads written; to be resubmitted unchanged
       once disk is freed (next step 4)'
     at: '2026-10-29T18:16:43+00:00'
+  - tried: the pool-level read of the Born-relative one-loop target (par:v4_loop_born, one-loop pool level minus its Born
+      tree pool's level) as a proxy for the per-event log|c0+shift|
+    why: 'checked per event on 17 pools by FA-ccin2p3-4ecff34d (par:v4_loop_born_events @027f3dda): median gap 1.446 against
+      the fixed threshold 0.2, large on shift-free pools too; the five held-out verdicts do not flip, but its numbers are
+      not per-event numbers'
+    at: '2026-10-29T18:19:17+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
