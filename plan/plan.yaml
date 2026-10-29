@@ -895,6 +895,18 @@ entries:
       of both arms (about 7 GPU-h, four runs) go to the user as a question, not run, and the search is not run on an inconclusive
       read (it answers a no, not a near-tie). In every case the result goes in docs/results.tex beside par:v3_prep_signed,
       under catalog_v4.'
+    passed_at: '2026-10-29T13:46:16+00:00'
+    reviewer: 'Amendment only (47 mixed-order borns on the pure-QCD born per D142, 76 at full order, 123 kept; d17e7b3f):
+      tests/test_v4_signext.py passes (3), order vector [1,0,k,n-k] for the qcdborn entries and the diagram sidecar built
+      from the same qcdborn string (dump_diagrams reads VIRT_PROCESSES), so the difference is encoded as D142 requires; class
+      exclusion of held-out one-loop pools (incl. v4''s own two held-out qcdborn pools) holds via the one-loop-class filter.
+      Checks 1-4 unchanged from the 05:39 pass and re-read: catalog_v3 effect 14 lower / 1 higher of 17 at two-seed means
+      (prep_signed.json seeds.m2); catalog_v4 control null recomputed from both H5_signed.txt: 21 pools, 11/10, median abs
+      diff 2.2 points, medians 5.6% and 8.55%, seed-mean 6.5%; arms v4_dimensionless_muon_more_signed[_seed2] exist in job_catalog_v3_short.sh;
+      >1/5 certification failures sends the design back. Searched: qcdborn, pure-QCD born, more_signed, sign extension, signext,
+      sign-changing, mixed order in docs/results.tex; plan show v3_prep_explore and catalog_coverage dead ends (mixed-order
+      one-loop certification failures); site decisions (D142, D161, D165, D175): no repeat; the full-order version is the
+      recorded dead end this replaces.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
