@@ -2794,6 +2794,73 @@ entries:
       right except that it omits par:v4_vs_pp''s named Muon pp-trained arm, the existing catalog_v4_pp_mixed_train.yaml, and
       the pp blend item''s condition (on hold until the pp pools are regenerated with catalog_v4''s physics and the comparison
       reread).'
+  - at: '2026-10-29T16:09:00+00:00'
+    question: 'Before building a default-sampled share into catalog_v4 (the user''s call of 2026-10-29: mix the generator''s
+      default sampling, how most users sample, with the smart choices on every beam), how much can a default share gain at
+      all? Today no catalog_v4 training or held-out pool holds a MadEvent event: every tree pool is 0.50 RAMBO bulk (sqrt(s_hat)
+      log-uniform in [threshold, 6 TeV]), 0.35 flat in log|M|^2 (6x oversampled, half the multi-leg candidates from the IR-democratic
+      splitter, a third turned forward, adaptive sqrt(s_hat) pass), 0.15 forward; one-loop pools are RAMBO, never shaped;
+      the 992 pp13v4 pools (MadEvent unweighted, 13 TeV, nn23lo1, pT>10 GeV, abs(eta)<5, 1e4/2e3/2e3) are only a test measure.
+      This first job is the pure-default bound, the one comparison par:v4_vs_pp names as missing: the pp-trained arm with
+      Muon at catalog_v4''s short-run settings (recipes/catalog_v4_pp_mixed_train.yaml: the 466 hadronic tree training classes
+      on their pp13v4 events, the other 356 training pools catalog_v4''s own), two seeds, about 3 GPU-h, no generation. It
+      also answers the user''s question of 2026-10-26 (how training on catalog_v4 compares to training on pp collisions on
+      pp-generated data) with the optimizer matched. The mixture A/B (default share 0.50 or 0.25 of each tree pool, about
+      500 core-hours of MadEvent) is designed only after it, sized by its result.'
+    prior: 'Searched docs/results.tex (genmix, fraction sweep, div-sampling, smix, sampling policy, pp-trained, trained on
+      pp, blend, MadEvent, unweighted, default sampl, v4_vs_pp, v4_density, prep_sampling, pp13v4), plan show catalog_coverage,
+      site decisions --project FA (D17, D116, D117, D119, D126, D130, D145, D155, D161, D178). (1) Z-resonance generated fraction
+      sweep (fig:eeuu_genmix_fraction_sweep, ee->uu, one seed): flat share f with the rest uniform-sqrt(s) RAMBO, log-flat
+      metric 1.0e-3, 3.5e-5, 1.5e-5, 7.9e-5, 1.1e-4 at f=0, .25, .5, .75, 1 (mix beats pure RAMBO 30-70x, pure flat 4-7x;
+      event-weighted optimum 0.25); uug antenna sweep basin [0.25, 0.75]. Their default was RAMBO in a window, never MadEvent.
+      (2) catalog_v2 smix (tab:catv2_short_smix): same measure in every role. (3) catalog_v3 pp-trained arm (AdamW, one seed):
+      on pp test events 0.19-0.26 of the window-trained arm, but 1.94-2.05 on the window pools; catalog_v3''s cuts left out
+      about 40% of pp events. (4) par:v4_vs_pp on matching labels: catalog_v4 (Muon) over pp-trained (AdamW) 0.66 on 417 trained
+      classes (58% lower in both seeds), 0.58 on 103 held out (69%); Muon over AdamW alone 0.26-0.28 on the same pools, so
+      the comparison carries an optimizer factor of about four; catalog_v4 recovers a share 0.38-0.43 of pp training''s gain,
+      -0.01 inside catalog_v3''s coverage; it names the Muon pp-trained arm at catalog_v4''s settings (4264 steps, seeds 42,
+      43, about 3 GPU-h) as not run. (5) par:v4_density: catalog_v4''s density at a pp event 0.22 of pp''s, KL 1.38, rank
+      correlation with the error gap 0.19 on matching classes. (6) The pp blend (hand-off, on hold, never run): 30% MadEvent
+      on 797 hadronic training classes, unsourced fraction, held until the pp pools carry catalog_v4''s physics and the comparison
+      is reread: this design is that reread''s arm. Decisions: D17 ''no PDF sampling'' superseded for the catalog by D117,
+      D130 and D178. No prior run trains catalog_v4 with MadEvent events.'
+    measure: 'Per class, MSE of ln|M|^2 at the best checkpoint (lowest val_loss_no_reg on the run''s own validation pools),
+      on (a) the first 2000 rows of each class''s pp13v4 test pool (default-sampled; hadronic tree classes, training and held
+      out) and (b) each class''s catalog_v4 smart-mixture test pool. Groups: training classes, held-out classes per axis,
+      b classes and the electroweak-diagram classes apart, the inside/outside split of compare_pp_trained. Per group: median
+      over classes, median per-class ratio pp-trained/catalog_v4 (geometric mean of seeds per arm), share lower in both seeds,
+      the two-seed spread. Read only after the pp13v4 validation passes (log ratio 0 to catalog_v4''s standalone on every
+      class, the other next step); a class failing it is left out and listed.'
+    check: 'The measure moved with this exact change on catalog_v3 (pp-trained over window-trained 0.19-0.26 on pp events,
+      1.94-2.05 on window pools), and on catalog_v4 the matching-label reread separates catalog_v4 from the AdamW pp arm (0.66,
+      0.58) with per-class scatter (median abs log10 0.50, 0.36) above catalog_v4''s seed spread (0.10, 0.14). The expected
+      effect on catalog_v4 is smaller than catalog_v3''s (it already recovers 0.38-0.43 of the gain and none inside the old
+      coverage): if Muon''s factor of about four carried over, the Muon pp arm would read about 0.66 x 4 ~ 2.6 times below
+      catalog_v4 on (a)... stated as an estimate under that assumption; if it reads within the seed spread, a default share
+      has little to gain on (a). That is why this arm runs before any generation.'
+    fixed: 'Everything of catalog_v4''s Muon short runs: the dimensionless arm, Muon at the search best, their HPs, batch,
+      4264 steps, seeds; every non-pp pool of catalog_v4_pp_mixed_train.yaml is the same file (recipe id) as the baseline''s,
+      checked by recipe id against the baseline runs'' config before submission; the only change is the 466 hadronic tree
+      training classes'' pools (pp13v4: 1e4/2e3/2e3 MadEvent events against catalog_v4''s 1e5/1e4/1e4 mixture: ten times fewer
+      events, stated with every number, a size confound inherent to the existing pools). Same mixture in every role of every
+      pool.'
+    control: catalog_v4's two Muon short runs (seeds 42, 43), reused only if every pool they trained on other than the 466
+      swapped classes has the recipe id of the mixed recipe's entries (one-loop, heavy-quark, BSM, loop-induced HH/HHH rebuilt
+      at corrected widths, mixed-order and sidecar-order fixes 1d9d6a29); else both rerun at the arm's commit (about 3 GPU-h
+      more). The AdamW pp-trained arm stays as the old reference only.
+    seeds: Training seeds 42 and 43 for the arm (and the control if rerun), as catalog_v4's short runs; pp13v4 events as built
+      (iseed from process name).
+    outcome: 'Yes, a default share has room: the Muon pp arm is below catalog_v4 on (a) beyond the spread (median per-class
+      ratio below 0.8, lower in both seeds on more than half the classes) on training or held-out classes: then the mixture
+      A/B is designed (default share 0.50 and 0.25 of each tree pool, e+e- at fixed collider energies with their own group
+      and yes/no, about 500 core-hours CPU, 7-10 GPU-h), with this arm''s (b) cost setting its tolerance, and the user''s
+      calls on fractions, e+e- energies, loops and variants asked first. No: within the spread or above catalog_v4 on (a):
+      catalog_v4''s smart mixture already covers default-sampled events at this horizon; the result goes to the user with
+      the proposal to stop the default share for hadronic beams (their call, since D178 asked for it) and the e+e- question
+      asked on its own. Since both arms run at catalog_v4''s HPs, a no means ''not at shared HPs''; under the A/B protocol
+      a sweep of the pp arm would be owed only if it loses on (a) by less than the spread and the user wants it settled. Cost:
+      2 short pretrainings, about 1.5 GPU-h each (estimate from par:v4_vs_pp''s 3 GPU-h), plus about 0.5 GPU-h of reads, 3.5
+      GPU-h (6.5 with the control rerun), under the 30 GPU-h budget.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
