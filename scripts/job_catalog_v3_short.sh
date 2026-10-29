@@ -32,13 +32,17 @@
 #                          the pools and their order unchanged)
 #   v4_dimensionless_muon, v4_dimensionless_muon_seed2, dimensionless_muon_best_seed2, dimensionless_muon_best   catalog_v4 against catalog_v3 with
 #                          Muon at its search's best (catalog_coverage; runs/catalog_v4_short/<arm>, $SCRATCH/zz_v4_short_<arm>)
+#   v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2   the pure-default bound: v4_dimensionless_muon[_seed2] with
+#                          every hadronic tree training class on its 13 TeV MadEvent pp events
+#                          (recipes/catalog_v4_pp_mixed_train.yaml), read besides on every hadronic catalog_v4 class's pp
+#                          pool (PP4, recipes/catalog_v4_pp_test.yaml); the controls read PP4 with mode eval, V3_AXES=PP4
 # Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py;
 # catalog_v3 arms only).
 #   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -102,6 +106,15 @@ case "$ARM" in
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
     v4_dimensionless_muon_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP)
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+    # the pure-default bound (catalog_coverage, the design of 2026-10-29): the control v4_dimensionless_muon[_seed2]
+    # with only the training recipe changed, catalog_v4_train.yaml with its 797 hadronic tree training classes on their
+    # pp pools (466 pp13v4_, 331 reused pp13_; 1e4/2e3/2e3 events against 1e5/1e4/1e4); the other 356 entries are the
+    # control's pools (analysis/catalog_v4/control_pool_check.py: 1068 of 1068 the same files and recipe ids); the same
+    # 4264 steps
+    v4_dimensionless_muon_pp)       CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP PP4)
+                                    TRAIN="$PROJECT_DIR/recipes/catalog_v4_pp_mixed_train.yaml"; ITERS_FIXED=4264 ;;
+    v4_dimensionless_muon_pp_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP PP4)
+                                    TRAIN="$PROJECT_DIR/recipes/catalog_v4_pp_mixed_train.yaml"; ITERS_FIXED=4264 ;;
     # catalog_v4 with more sign-changing one-loop pools (plan v3_prep_explore, the design of 2026-10-29): the control
     # v4_dimensionless_muon[_seed2] with only the training recipe changed, catalog_v4_train.yaml plus the extension's
     # pools whose train split holds both signs ($SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml, written by
@@ -177,7 +190,7 @@ OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/
 # an axis's recipe: the arm's catalog's held-out axis, or one of the cross reads
 axis_recipe() { case "$1" in
     XV3) echo recipes/catalog_v3_shared_heldout.yaml ;; XV4) echo recipes/catalog_v4_shared_heldout.yaml ;;
-    PP) echo recipes/catalog_v3_pp_test.yaml ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
+    PP) echo recipes/catalog_v3_pp_test.yaml ;; PP4) echo recipes/catalog_v4_pp_test.yaml ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
 [ -n "$OUT_FIXED" ] && [ "$MODE" != eval ] && { echo "$ARM is a sweep trial: mode eval only"; exit 1; }
 # 5 epochs of 1e4 events per process at batch 16384, from the recipe in use (1397 pools: 4264 steps; the twin's 1246: 3803)
 ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(yaml.safe_load(open(sys.argv[1]))['processes']) * 1e4 / 16384 * 5))" "$TRAIN")}
@@ -270,7 +283,7 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
     python - "$CAT" "$A" "$AR" "$MODE" "${P[@]}" <<'PY' || exit 1
 import os, sys, yaml
 cat, axis, ar, mode, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
-pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_"}.get(axis, f"{cat}_")
+pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_")}.get(axis, f"{cat}_")
 names = {p["name"] for p in yaml.safe_load(open(ar))["processes"]}
 got = [os.path.basename(f)[:-len(".yaml")] for f in files]
 bad = sorted(n for n in got if n not in names or not n.startswith(pfx))
