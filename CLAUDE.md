@@ -37,6 +37,9 @@ Core research threads: joint (multi-process) pretraining, **scaling laws**,
    a prevention that needs a permission I hold (a hook registration, a setting) is proposed to me as a concrete diff.
    A claim about current state (a setting's level, a job's status, what an agent runs on) is read from its live
    source in the same turn, never inferred from a default, a config file or memory; unread, it says "not checked".
+   A number I state says what it counts and how it was selected; it comes from a committed tool or a script shown
+   with it, never a throwaway one-liner. A proxy (one quantity standing for another) is checked on a few cases
+   before it is reported, and an estimate says it is one, with its assumption.
    A message saying work is running, or not submitted, reads it in that turn from `site runs` and, for sweep trials
    (submitted by `sweep_manager`, absent from `site runs`), from `site status <site>` or the item's check.
 
