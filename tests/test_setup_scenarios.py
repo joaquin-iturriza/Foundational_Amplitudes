@@ -2151,11 +2151,30 @@ def the_suite_itself():
     scenario("a failing scenario makes the suite exit 1", r.returncode == 1, r.stdout + r.stderr)
 
 
+def reviewer_resume():
+    """reviewer_resume.py: a blocking review's re-check continues the same reviewer; a fresh one goes after release."""
+    d = tempfile.mkdtemp(prefix="resume_"); st = os.path.join(d, ".claude", ".review_state"); os.makedirs(st)
+    hook = os.path.join(ROOT, ".claude", "hooks", "reviewer_resume.py")
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=d)
+    run = lambda ev: subprocess.run(["python3", hook], input=json.dumps(ev), capture_output=True, text=True, env=env)
+    launch = {"tool_name": "Agent", "tool_input": {"subagent_type": "repo-reviewer", "prompt": "review"}}
+    run(dict(launch, hook_event_name="PostToolUse", tool_response={"content": "agentId: abc123 (internal)"}))
+    open(os.path.join(st, "repo-reviewer.lock"), "w").close()
+    r = run(dict(launch, hook_event_name="PreToolUse"))
+    scenario("a fresh reviewer is refused while the pillar's lock is held, naming the one to continue",
+             r.returncode == 2 and "abc123" in r.stderr, r.stderr)
+    os.remove(os.path.join(st, "repo-reviewer.lock"))
+    r2 = run(dict(launch, hook_event_name="PreToolUse"))
+    r3 = run({"tool_name": "Agent", "hook_event_name": "PreToolUse", "tool_input": {"subagent_type": "general-purpose"}})
+    scenario("after release a fresh reviewer goes; other agents are never touched", r2.returncode == 0 and r3.returncode == 0,
+             [r2.stderr, r3.stderr])
+
+
 GROUPS = [liveness, event_ownership, files, answers, adding, questions, holds, done, migration, claims, searched_first, seventh_lower,
           hold_without_item, sed_reads, hold_release, reask_once, reopen, commit_retry, claims_budget, added_only,
           worktree_then_merge, plan_commits, test_switch, claims_state, fourth_lower, direct_writes,
           one_agent_per_step, git_bypass, parsing, checks_and_sites, no_plan_yet, lower, setup_records,
-          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewed_content, sweeps, open_questions,
+          decision_quotes, plan_commits_and_launches, slow_done_checks, tooling_fixes, reviewer_resume, reviewed_content, sweeps, open_questions,
           designs, design_prior, prompt_cap, parallel_steps, sent_figures, the_suite_itself]
 
 
