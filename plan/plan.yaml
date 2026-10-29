@@ -2652,6 +2652,88 @@ entries:
       the outcome can be read. Searched: pp13v4, catalog_v4_pp, pp-trained, pp pools, massless b pp, regeneration, gen_daniel_catalog
       in results.tex, plan show, site runs, site decisions (D117, D119, D136, D161, D162, D163, D167): no earlier v4-physics
       pp generation.'
+  - at: '2026-10-29T16:04:46+00:00'
+    question: 'Does catalog_v4 become a better general-use pretraining (the user''s call of 2026-10-29: good on data sampled
+      the way most people sample it) when each tree pool mixes a default-sampled share, the generator''s own unweighted events
+      as a user produces them (MadEvent with standard cuts: 13 TeV pp with PDFs for the hadronic classes, fixed collider energies
+      for e+e-), with the smart components it has now (flat in log|M|^2 with the splitter, the forward component)? Today no
+      catalog_v4 training or held-out pool holds a single MadEvent event: every tree pool is 0.50 RAMBO bulk with sqrt(s_hat)
+      log-uniform in [threshold, 6 TeV], 0.35 flat in log|M|^2 (6x oversampled candidates, half from the IR-democratic splitter,
+      a third turned forward, adaptive sqrt(s_hat) pass), 0.15 forward component; the one-loop pools are RAMBO, uniform sqrt(s_hat),
+      never shaped; the 992 pp13v4 pools (MadEvent unweighted, 13 TeV, nn23lo1, pT>10 GeV, abs(eta)<5, 1e4/2e3/2e3) are only
+      a test measure and the pp-trained arm''s data, with no smart share. The first job is an A/B on short pretrainings, the
+      full regeneration follows only on yes.'
+    prior: 'Searched docs/results.tex (genmix, fraction sweep, div-sampling, smix, sampling policy, pp-trained, v4_vs_pp,
+      v4_density, pp blend, prep_sampling), plan show catalog_coverage, site decisions --project FA. (1) Z-resonance generated
+      fraction sweep (fig:eeuu_genmix_fraction_sweep, ee->uu, base22, N=400k, one seed): f = share flat in log|M|^2, rest
+      uniform sqrt(s) RAMBO; log-flat metric (mean of per-sqrt(s)-bin MSE) 1.0e-3, 3.5e-5, 1.5e-5, 7.9e-5, 1.1e-4 at f=0,
+      .25, .5, .75, 1: the mix beats pure RAMBO 30-70x and pure flat 4-7x; the event-weighted metric bottoms at f=0.25. (2)
+      uug antenna sweep (fig:deep_sampling_fraction_sweep): basin f in [0.25, 0.75], f=0 ~200x worse, f=1 ~2x worse. These
+      are the ''mixing beats either'' results; their ''default'' was RAMBO in a sqrt(s) window, never MadEvent. Source of
+      f_flat 0.35. (3) catalog_v2 smix (tab:catv2_short_smix): moving val/test onto the training measure made the census read
+      harder (median 0.095 vs 0.059), basis of the same-measure-in-every-role rule. (4) The pp-trained arm (catalog_v3, par.
+      The pp-trained arm, FA-ccin2p3-e786bd74, one seed): hadronic training classes trained on pure MadEvent 13 TeV pp instead
+      of the window mixture; on pp test events ratio to the window-trained arm 0.19 on training classes (963/986 lower), 0.23
+      new combinations, 0.26 2->4, 0.88 top; inside the window''s coverage 0.59-0.66, outside 0.13-0.20; but on the window
+      pools 2.05 and 1.94 (worse ~2x): pure default wins on default events and loses on the smart measure, the trade-off a
+      mixture targets. (5) catalog_v4 vs pp-trained (par:v4_vs_pp, Muon vs AdamW, mismatched labels): 0.86 vs 0.47 on 578
+      trained classes, 0.94 vs 0.92 on 180 held out; on the 417 classes with matching labels catalog_v4 ahead, 0.66. (6) Density
+      check (par:v4_density): catalog_v4''s density at a scored pp event 0.22 of pp''s (v3 0.12), KL 1.38 (v3 2.29), 0.35
+      of v4''s events where pp never reaches, thin at low sqrt(s_hat). (7) Sampling sensitivity on catalog_v3 (par:v3_prep_sampling):
+      reweighting does not reorder arms; a reweight, not a regeneration. (8) The pp blend proposal (hand-off, 2026-10-26,
+      on hold, never run): 70% current + 30% MadEvent pp on the 797 hadronic training classes, 140-350 core-hours, 6 GPU-h
+      test; the 30% was unsourced. Decisions: D17 (2026-10-08, ''our sampler and beams as now ... no PDF sampling'') superseded
+      for the catalog by D117 (pp study), D126/D130 (coverage design, approved) and D178 (2026-10-29: mix default generator
+      sampling with the smart choices on every beam); D132 float64; D161 match steps. No prior run mixes MadEvent events with
+      the smart components; this design is the first.'
+    measure: 'Per class, MSE of ln|M|^2 at each run''s best checkpoint (val_loss_no_reg on its own mixture validation, the
+      checkpoint rule), on two test measures: (a) the headline, default-sampled test events: the first 2000 rows of each hadronic
+      class''s pp13v4 test pool (1301 classes, existing) and of a new e+e- MadEvent test pool per e+e- class (175 classes);
+      (b) the class''s catalog_v4 smart-mixture test pool as built now. Reported per group (training classes, each held-out
+      axis, b classes apart): median over classes, median per-class ratio arm/baseline, share of classes lower in both seeds,
+      and the two-seed spread; the forward and low-sqrt(s_hat) regions split as compare_pp_trained does.'
+    check: 'Both measures moved with exactly this change on existing data: the pp-trained arm (pure MadEvent on the hadronic
+      training classes) against the window-trained one read 0.19 to 0.26 on pp test events and 1.94 to 2.05 on the window
+      pools (catalog_v3, par. The pp-trained arm), so (a) and (b) separate a default-heavy from a smart-heavy pool by factors
+      2 to 5 in opposite directions, well above catalog_v4''s two-seed spread (median abs log10 0.10 and 0.14, par:v4_vs_pp).
+      The pp13v4 test pools carry catalog_v4''s function by construction (design passed 2026-10-29, check of ratio 0 pending
+      on its collection), so (a) is read on the right labels.'
+    fixed: 'Everything of catalog_v4 except the bulk share of the tree pools: classes and roles, pool sizes (1e5/1e4/1e4 trees),
+      physics (sm-no_b_mass, card, QED<=b), cuts (V4_CUTS), f_flat 0.35 with its splitter and adaptive pass, f_fwd 0.15, one-loop
+      pools unchanged (RAMBO; their default share is a question for the user), the dimensionless arm with Muon at the search
+      best, short horizon and HPs of the existing catalog_v4 short pretrainings, the same mixture in train, val and test (no
+      train/eval measure split). The pp share: Daniel''s 13 TeV run card as the pp13v4 pools, labels by the entry''s standalone
+      with alpha_s(sqrt(s_hat)) one-loop from 0.118; pp13v4 events reused as the first part of each class''s default share.
+      The e+e- share: MadEvent lpp=0, no ISR, run-card cuts equal to V4_CUTS e+e- (abs(cos theta)<0.99, pT>10 GeV, dR>0.4,
+      pair mass>10 GeV), at a set of fixed energies (proposed 91.1876 where above threshold, 240, 365, 500, 1000, 3000 GeV,
+      equal shares; needs the user''s call).'
+    control: 'catalog_v4 as it is (0.50 RAMBO bulk / 0.35 flat / 0.15 forward), the dimensionless arm with Muon, two seeds:
+      the existing catalog_v4 short pretrainings are reused if they ran at a commit with the mixed-order and sidecar-order
+      fixes (1d9d6a29), else rerun at the arms'' commit with the arms'' seeds (A/B rule 1). Arms: B, the default share replaces
+      the RAMBO bulk (0.50 MadEvent / 0.35 flat / 0.15 forward); C, half of it (0.25 MadEvent / 0.25 RAMBO log-uniform / 0.35
+      / 0.15). The 0.50 and 0.25 are not sourced (the measured basin is for the flat share against a base, 0.25-0.5, kept
+      at 0.35); C is built from B''s events by subsampling, so no extra generation. Also read: the pp-trained arm on (a),
+      as the pure-default reference.'
+    seeds: Two training seeds per arm (42, 43), matching catalog_v4's two Muon short runs; MadEvent iseed from (process name,
+      run index) as the pp13v4 pools, extra runs at new run indices so they never repeat pp13v4's events; the smart components'
+      seeds as now.
+    outcome: 'Yes: arm B or C lowers the median per-class MSE on default-sampled held-out events (a) below the baseline in
+      both seeds by more than the seed spread (median per-class ratio below 0.8, lower in both seeds on more than half the
+      classes), and on the smart measure (b) stays within the seed spread of the baseline (ratio at most 1.25); then the best
+      such arm''s mixture is the catalog: the full regeneration of every tree pool (training and held out, every role) and
+      the redo of the results that read catalog_v4 pools, the fractions confirmed by the user. No: neither arm beats the baseline
+      on (a) beyond the spread, or the gain on (a) costs more than 1.25 on (b): catalog_v4''s mixture stays, the tradeoff
+      curve (both arms against both measures) goes to the user with the cost of each point, and a finer default fraction is
+      proposed only on their word. Cost (estimates from the pp13 generation, 238 core-hours for 19.5M events, about 12 core-hours
+      per million, assuming that rate): the A/B''s training pools, about 924 tree classes x 55k events less the 12k pp13v4
+      already built, about 41M events, about 500 core-hours CPU on CC''s htc, about one day of wall with the long processes
+      split by lhe.n_runs; the full catalog adds about 23M events for the held-out classes, about 280 core-hours; GPU: four
+      new short pretrainings (two arms x two seeds) at about 1.5 GPU-h each from the 2026-10-26 pp-blend estimate, 6 GPU-h,
+      plus 2 baseline reruns if needed (3 GPU-h) and the reads (about 1 GPU-h): 7 to 10 GPU-h, under the 30 GPU-h budget.
+      Needs implementation before any job: a default share in the mixture builder (recipe field, identity, the lhe path called
+      per entry, labelled by its standalone, shuffled into every role), an e+e- run card and lhe kind, the e+e- default-sampled
+      test read; and the user''s calls on the e+e- energies, on a default share for the one-loop pools and for the variants
+      (heavy-quark masses, cut and alpha_s points; the 6-20 TeV energy probes have no collider default).'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
