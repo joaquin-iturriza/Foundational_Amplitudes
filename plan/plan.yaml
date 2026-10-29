@@ -1284,7 +1284,8 @@ entries:
         difficulty; the shape lever is capacity and training length, recorded for the full pretraining''s design'
       - 'e and the log-log residual disagree on a group''s side of 0.3: report that group as unresolved with both numbers,
         no decision'
-  step_waits: {}
+  step_waits:
+    '6': the user's stop on all work (2026-10-29); the two TR reads completed and wait to be collected
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
