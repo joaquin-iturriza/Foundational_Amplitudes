@@ -1021,6 +1021,30 @@ entries:
       pretraining''s design. Both are written up beside par:v4_tree_shape with the per-cell table. Cost: two eval-only GPU
       jobs (one per seed, mode eval, V3_AXES=TR), about 1153 probes at the 1.1 s per probe of the controls'' PP read (474
       in 9 min) plus setup: about 0.5 GPU-h each, 1 GPU-h in all, under the budget of 30.'
+    fix_at: '2026-10-29T16:58:05+00:00'
+    fix: '1 and 4 (matched control, outcome any result confirms): held-out against the training median of the same cell differs
+      in two things, trained-or-not and which process, and the yes branch reads any excess as a transfer gap. The entry''s
+      own par:v4_tree_shape says the open part is the pool''s intrinsic difficulty, and the catalog_v3 shape proxy (par:v3_shape_proxy,
+      analysis/catalog_v3/prep_shape.py, data/prep_shape.json) measured that held-out classes are intrinsically harder than
+      training ones: per-class regressor MSE on log|M|^2 0.059 on the 200 training classes vs 0.077 on the 168 held-out 2->4
+      classes (1.3x), 0.124 on 2->5; it also tracks the network''s zero-shot shape (rank 0.68 to 0.80). So ''held-out above
+      its cell''s training median'' is expected with no transfer gap at all. Fix: add an intrinsic-difficulty control on the
+      same pools (the shape proxy, CPU, run on catalog_v4''s training and held-out pools in the same cells) and make the decision
+      statistic the network''s held-out/training floor ratio per cell against the proxy''s held-out/training ratio in that
+      cell (or the network floor over the proxy MSE per pool, held-out vs training); yes only if the network''s excess is
+      above the proxy''s by more than the seed spread. 3 (effect against spread): with about 280 held-out pools a one-sided
+      sign test reaches p<0.05 at about 55% above, and the seed difference of a median over hundreds of pools is tiny, so
+      the yes bar is no effect size; state the smallest gap worth acting on (in log10 floor ratio, beyond the proxy''s intrinsic
+      ratio) and quote the per-pool seed-to-seed spread of the floor already in the held-out reads (short_reads v4_dimensionless_muon
+      vs _seed2, H1/H2). 5 (prior work omitted): the prior dismisses result.json''s per-process losses as standardized units,
+      but results.tex (par. on the factorised head, around line 2610) already converted them (per-process loss at the best
+      checkpoint times the shared standardization''s sigma^2) and showed they match this scorer''s read on training classes
+      (0.50 vs 0.51 on 40 catalog_v3 parents); and it omits the shape proxy above. Cite both and say why the GPU read is still
+      needed (the short runs validate on 200 events per pool and result.json is the MSE with the offset in it, not var(q-t)
+      on 2000), or use result.json x sigma^2 as the first, free read. Also: the scorer has --split test exactly for a pool
+      whose val split selected the checkpoint; use it for the training pools (same distribution as their val) or state why
+      val is kept. Checks 2, 6, 7 hold: the floor moves 0.155 vs 0.626 between the other-mass and no-mass top groups (par:v4_tree_shape,
+      confirmed), the design answers next step 4 and D178''s shape priority, no decision names a comparison it leaves out.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
