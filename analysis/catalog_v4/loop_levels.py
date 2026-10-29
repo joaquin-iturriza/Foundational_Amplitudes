@@ -25,7 +25,9 @@ The last line printed is the JSON of the numbers docs/results.tex quotes.
 
 Top read (in --trees): does an external top carry the tree level error; see top_read.
 New process or new mass (in --trees): is a new process's level error a new-process effect or the untrained top mass;
-see new_process_read.
+see group_read (key abs_off).
+Shape read (in --trees): the floor var(q - t) left after each pool's offset, in the same groups and cells; see
+group_read (key shape), figs/tree_levels_shape.{png,pdf}.
 
 Tree mode (--trees, both steps): does the thin-class reading above (the largest one-loop offsets on pools with two
 matched training pools or fewer) hold on catalog_v4's tree held-out axes H1 (new combinations), H2 (multiplicity), H3
@@ -234,9 +236,10 @@ def analyse_trees():
             check.append(abs(L - float(z["mu_sd"][0])))
             match = byk.get(match_key({n: pr}, n), [])
             offs = [kl[r][a][n]["offset"] for r in RUNS]
+            fl = [kl[r][a][n]["floor"] for r in RUNS]
             r = {**pr, "level": L, "outside_all": bool(L < lv.min() or L > lv.max()),
                  "nearest_in_sd": float(np.min(np.abs(lv - L)) / lv.std()), "matched": match, "n_match": len(match),
-                 "offset": offs, "abs_off": float(abs(np.mean(offs)))}
+                 "offset": offs, "abs_off": float(abs(np.mean(offs))), "floor": fl, "shape": float(np.mean(fl))}
             if match:
                 mm = float(np.mean([T[m][0] for m in match]))
                 r.update({"match_mean": mm, "departure": L - mm})
@@ -287,12 +290,14 @@ def analyse_trees():
             flat[f"{a}.match_n.{n}"] = R[n]["n_match"]
     flat["n_train"], flat["train_level_sd"] = s["n_train"], round(s["train_level_sd"], 2)
     s["top"] = top_read(res, T, P, flat)
-    s["new_process"] = new_process_read(res, flat)
+    s["new_process"] = group_read(res, flat, "abs_off", "np", "new process or new mass")
+    s["shape"] = group_read(res, flat, "shape", "sh", "shape (floor = var(q - t))")
     json.dump({"summary": s, "heldout": res, "train": {m: {"level": T[m][0], **P[m]} for m in T},
                "train_missing": miss_tr}, open(os.path.join(HERE, "data", "tree_levels.json"), "w"), indent=1)
     plot_trees(res)
     plot_top(res, T)
     plot_new_process(res)
+    plot_shape(res)
     print(json.dumps(flat))
 
 
@@ -391,33 +396,18 @@ NP_GROUPS = (("new combinations", "H1", lambda r: True), ("multiplicity", "H2", 
              ("top, process at no top mass", "H3", lambda r: not r.get("n_sibling", 0)))
 
 
-def new_process_read(res, flat):
-    """New process or new mass (v3_prep_explore, the user's first priority D178: the zero-shot bias). The new
-    combinations (H1) and multiplicity (H2) pools are new processes made of particles trained at their masses; the
-    particle content pools (H3, all with a top at 172.5 GeV, a mass no training tree has) split by top_read into the
-    35 whose process is in the heavy-quark layer at another top mass and the 244 whose process is at none. No fit, no
-    new threshold: in each cell of multiplicity and initial state that holds the new-process pool and both top groups,
-    the pool's seed-mean |offset| against the two top groups' cell medians, read as which it is nearer in log; the
-    count over pools and the median log ratio to each. Then over the new-process pools (H1 and H2) the rank
-    correlation (Spearman) of |offset| with multiplicity, the born's alpha_s and alpha powers, the massive legs, the
-    matched class size and the departure from it, and the median |offset| by initial state; the signed offset's
-    median and its positive share per group."""
-    from scipy.stats import spearmanr
-    G = {}
-    for lab, a, sel in NP_GROUPS:
-        G[lab] = {n: r for n, r in res[a].items() if not r.get("missing") and sel(r)}
-    for g in G.values():
-        for n, r in g.items():
-            r["massive_legs"] = massive_legs(n)
+NP_KEY = {"new combinations": "H1", "multiplicity": "H2", "top, process at another top mass": "other_mass",
+          "top, process at no top mass": "no_mass"}
+
+
+def cell_compare(G, key):
+    """Per new-process group, in each cell of multiplicity and initial state holding both top groups, each pool's
+    per-pool quantity `key` against the two top groups' cell medians, read as nearer one or the other in log10; the
+    count and the median log10 ratios."""
     cell = lambda r: (r["n"], r["initial"])
     sib, nos = G["top, process at another top mass"], G["top, process at no top mass"]
-    med = lambda rs: float(np.median([r["abs_off"] for r in rs]))
-    out = {"groups": {}}
-    for lab, g in G.items():
-        so = [float(np.mean(r["offset"])) for r in g.values()]
-        out["groups"][lab] = {"n": len(g), "median_abs_off": med(g.values()), "median_signed_off": float(np.median(so)),
-                              "positive_share": float(np.mean(np.array(so) > 0)),
-                              "median_massive_legs": float(np.median([r["massive_legs"] for r in g.values()]))}
+    med = lambda rs: float(np.median([r[key] for r in rs]))
+    out = {}
     for lab in ("new combinations", "multiplicity"):
         g, O = G[lab], {"cells": {}}
         lr_nos, lr_sib, near_nos, used = [], [], 0, []
@@ -432,32 +422,72 @@ def new_process_read(res, flat):
                 continue
             mb, mc = med(B), med(C)
             for r in A:
-                x, y = np.log10(r["abs_off"] / mb), np.log10(r["abs_off"] / mc)
+                x, y = np.log10(r[key] / mb), np.log10(r[key] / mc)
                 lr_nos.append(x); lr_sib.append(y); near_nos += abs(x) < abs(y); used.append(r)
         O.update({"n_compared": len(used), "n_cells_compared": int(sum(
                       v["n_no_mass"] > 0 and v["n_other_mass"] > 0 for v in O["cells"].values())),
                   "n_nearer_no_mass": int(near_nos),
                   "median_log_ratio_no_mass": float(np.median(lr_nos)) if used else None,
                   "median_log_ratio_other_mass": float(np.median(lr_sib)) if used else None,
-                  "median_abs_off_compared": med(used) if used else None})
+                  f"median_{key}_compared": med(used) if used else None})
         out[lab] = O
+    return out
+
+
+def group_read(res, flat, key, prefix, label):
+    """New process or new mass, for one per-pool quantity `key` (v3_prep_explore, the user's priorities D178: the
+    zero-shot bias first, then the shape on unseen processes). The new combinations (H1) and multiplicity (H2) pools
+    are new processes made of particles trained at their masses; the particle content pools (H3, all with a top at
+    172.5 GeV, a mass no training tree has) split by top_read into the 35 whose process is in the heavy-quark layer at
+    another top mass and the 244 whose process is at none. No fit, no new threshold: per group the median; in each
+    cell of multiplicity and initial state that holds the new-process pool and both top groups, the pool's value
+    against the two top groups' cell medians (cell_compare); over the new-process pools the rank correlation
+    (Spearman) with multiplicity, the born's alpha_s and alpha powers, the massive legs and the matched class size, and
+    the median by initial state and by massive legs. key "abs_off": the seed-mean |offset| (with the signed offset's
+    median and positive share per group, and the correlation with the departure from the matched class); key "shape":
+    the seed-mean floor var(q - t), the MSE left once the pool's own offset is removed (with the level share
+    offset^2 / zero-shot MSE per group, and the correlation with |offset|, over the new-process pools and over all)."""
+    from scipy.stats import spearmanr
+    G = {lab: {n: r for n, r in res[a].items() if not r.get("missing") and sel(r)} for lab, a, sel in NP_GROUPS}
+    for g in G.values():
+        for n, r in g.items():
+            r.setdefault("massive_legs", massive_legs(n))
+    med = lambda rs: float(np.median([r[key] for r in rs]))
+    out = {"groups": {}}
+    for lab, g in G.items():
+        v = {"n": len(g), f"median_{key}": med(g.values())}
+        if key == "abs_off":
+            so = [float(np.mean(r["offset"])) for r in g.values()]
+            v.update({"median_signed_off": float(np.median(so)), "positive_share": float(np.mean(np.array(so) > 0)),
+                      "median_massive_legs": float(np.median([r["massive_legs"] for r in g.values()]))})
+        else:
+            v["median_level_share"] = float(np.median([np.mean([o ** 2 / (o ** 2 + f) for o, f in
+                                                                zip(r["offset"], r["floor"])]) for r in g.values()]))
+        out["groups"][lab] = v
+    out.update(cell_compare(G, key))
     newp = list(G["new combinations"].values()) + list(G["multiplicity"].values())
-    y = [r["abs_off"] for r in newp]
+    y = [r[key] for r in newp]
     pred = {"particles": [r["n"] for r in newp], "alpha_s power": [r["order"][2] for r in newp],
             "alpha power": [r["order"][3] for r in newp], "massive legs": [r["massive_legs"] for r in newp],
             "matched class size": [r["n_match"] for r in newp]}
+    if key == "shape":
+        pred["abs offset"] = [r["abs_off"] for r in newp]
     rho = {k: float(spearmanr(v, y)[0]) for k, v in pred.items()}
-    mt = [r for r in newp if r["n_match"]]
-    rho["departure from the matched class"] = float(spearmanr([abs(r["departure"]) for r in mt],
-                                                              [r["abs_off"] for r in mt])[0])
-    out["predictors"] = {"n": len(newp), "n_matched": len(mt), "spearman": rho,
+    if key == "abs_off":
+        mt = [r for r in newp if r["n_match"]]
+        rho["departure from the matched class"] = float(spearmanr([abs(r["departure"]) for r in mt],
+                                                                  [r["abs_off"] for r in mt])[0])
+    else:
+        allr = [r for g in G.values() for r in g.values()]
+        rho["abs offset, all groups"] = float(spearmanr([r["abs_off"] for r in allr], [r["shape"] for r in allr])[0])
+    out["predictors"] = {"n": len(newp), "spearman": rho,
                          "by_initial": {i: {"n": int(sum(r["initial"] == i for r in newp)),
-                                            "median_abs_off": med([r for r in newp if r["initial"] == i])}
+                                            f"median_{key}": med([r for r in newp if r["initial"] == i])}
                                         for i in sorted({r["initial"] for r in newp})},
                          "by_massive_legs": {int(k): {"n": int(sum(r["massive_legs"] == k for r in newp)),
-                                                      "median_abs_off": med([r for r in newp if r["massive_legs"] == k])}
+                                                      f"median_{key}": med([r for r in newp if r["massive_legs"] == k])}
                                              for k in sorted({r["massive_legs"] for r in newp})}}
-    print("new process or new mass:")
+    print(label + ":")
     for lab, v in out["groups"].items():
         print(f"  {lab:34s} {v}")
     for lab in ("new combinations", "multiplicity"):
@@ -470,22 +500,43 @@ def new_process_read(res, flat):
     print(f"  predictors over {len(newp)} new-process pools: {rho}")
     print(f"  by initial {out['predictors']['by_initial']}")
     print(f"  by massive legs {out['predictors']['by_massive_legs']}")
-    key = {"new combinations": "H1", "multiplicity": "H2", "top, process at another top mass": "other_mass",
-           "top, process at no top mass": "no_mass"}
+    rnd = lambda x: round(x, 3) if isinstance(x, float) else x
     for lab, v in out["groups"].items():
         for k, x in v.items():
-            flat[f"np.{key[lab]}.{k}"] = round(x, 3) if isinstance(x, float) else x
+            flat[f"{prefix}.{NP_KEY[lab]}.{k}"] = rnd(x)
     for lab in ("new combinations", "multiplicity"):
         for k, x in out[lab].items():
             if k != "cells":
-                flat[f"np.{key[lab]}.{k}"] = round(x, 3) if isinstance(x, float) else x
+                flat[f"{prefix}.{NP_KEY[lab]}.{k}"] = rnd(x)
     for k, x in rho.items():
-        flat["np.rho." + k.replace(" ", "_")] = round(x, 2)
+        flat[f"{prefix}.rho." + k.replace(", ", "_").replace(" ", "_")] = round(x, 2)
     for i, v in out["predictors"]["by_initial"].items():
-        flat[f"np.initial.{i}.n"], flat[f"np.initial.{i}.median_abs_off"] = v["n"], round(v["median_abs_off"], 3)
+        flat[f"{prefix}.initial.{i}.n"], flat[f"{prefix}.initial.{i}.median_{key}"] = v["n"], rnd(v[f"median_{key}"])
     for k, v in out["predictors"]["by_massive_legs"].items():
-        flat[f"np.massive{k}.n"], flat[f"np.massive{k}.median_abs_off"] = v["n"], round(v["median_abs_off"], 3)
+        flat[f"{prefix}.massive{k}.n"], flat[f"{prefix}.massive{k}.median_{key}"] = v["n"], rnd(v[f"median_{key}"])
     return out
+
+
+def plot_shape(res):
+    """Fig. v4_tree_shape: left, per pool its seed-mean floor against its seed-mean |offset|, coloured by group;
+    right, the four groups' floors, the bar the median (as tree_levels_newproc's left panel)."""
+    import plot_style as ps
+    fig, (a, b) = ps.figure(ncols=2)
+    rng = np.random.default_rng(0)
+    cols = (ps.C.blue, ps.C.green, ps.C.vermillion, ps.C.grey)
+    G = [(lab, [r for r in res[ax].values() if not r.get("missing") and sel(r)]) for lab, ax, sel in NP_GROUPS]
+    for (lab, rs), c in zip(G[::-1], cols[::-1]):
+        a.plot([r["abs_off"] for r in rs], [r["shape"] for r in rs], ".", color=c, alpha=0.6, label=lab)
+    a.set_xscale("log"); a.set_yscale("log")
+    a.set_xlabel(r"$|\overline{q-t}|$"); a.set_ylabel(r"$\mathrm{var}(q-t)$")
+    ps.legend(a, "lower right")
+    for i, ((lab, rs), c) in enumerate(zip(G, cols)):
+        b.plot(i + rng.uniform(-0.2, 0.2, len(rs)), [r["shape"] for r in rs], ".", color=c, alpha=0.6)
+        b.plot([i - 0.3, i + 0.3], [np.median([r["shape"] for r in rs])] * 2, "-", color="k")
+    b.set_xticks(range(4), ["new\ncombi-\nnations", "multi-\nplicity", "top,\nother\nmass", "top,\nno\nmass"],
+                 fontsize=8)
+    b.set_yscale("log"); b.set_ylabel(r"$\mathrm{var}(q-t)$")
+    ps.save(fig, os.path.join(HERE, "figs", "tree_levels_shape"))
 
 
 def plot_new_process(res):
