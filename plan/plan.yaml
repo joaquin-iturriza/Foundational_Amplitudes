@@ -127,14 +127,11 @@ entries:
       per held-out tree pool the MSE left after removing its offset (kshot_level.json, the floor and the level share), in
       the same four groups as par:v4_tree_newproc (new combinations, multiplicity, top processes trained at another top mass,
       top processes at none) and the same cells of multiplicity and initial state'
-    3: 'Design and check on existing reads (CPU, no run; extend analysis/catalog_v4/loop_levels.py) a target or input change
-      for the tree level''s dependence on multiplicity: par:v4_mult_bias found the multiplicity pools'' signed offset follows
-      their level''s step from the five particle training parent (rank correlation -0.34 with the own step, -0.37 with the
-      class''s training step, -0.19 within class; positive on 0.75 of the pools whose level falls, 0.542 where it rises; e+e-
-      rise and sit low, gluon-gluon fall and sit high). On tree_levels_cc.json, per candidate (e.g. a per-particle term in
-      the emission-scale target, or the parent level as an input scale), whether it shrinks the steps from five to six particles
-      of the training and held-out multiplicity pools (median abs own step, its spread across classes), since the offset tracks
-      that step; no fit of a free scale without a source, the candidate''s form named from the target''s definition'
+    3: 'Read the multiplicity axis''s signed level bias on catalog_v4''s trees (CPU, existing reads, extend analysis/catalog_v4/loop_levels.py):
+      par:v4_tree_newproc found its offset median +0.12 with 0.642 of the 218 pools positive (the network places a six particle
+      level too high), and the largest absolute offsets of the new processes on gluon-gluon (median 0.586) and e+e- (0.311)
+      beams; per initial state and born orders, the signed offset against the departure of the pool''s level from the matched
+      training pools, and whether the sign follows the level''s step from five to six particles in training'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -978,14 +975,14 @@ entries:
         read what in the process predicts it (initial state, multiplicity, born orders) and design a fix in the target or
         inputs for that property'
     3:
-      feeds: 'the zero-shot bias, the user''s first priority (D178): whether a multiplicity-aware target removes the multiplicity
-        axis''s signed bias, found to be a partial under-extrapolation of the level''s step with multiplicity'
+      feeds: 'the zero-shot bias, the user''s first priority (D178): whether the multiplicity axis''s positive bias is a systematic
+        under-extrapolation of the level''s fall with multiplicity, which a multiplicity-aware target scale would address'
       if:
-      - 'a candidate shrinks the steps from five to six particles across classes (training and held out) on the existing reads:
-        record a design for a short pretraining arm with it against the control pair v4_dimensionless_muon seeds 42 and 43,
-        measured on the multiplicity axis''s signed offset and positive share'
-      - 'no candidate shrinks the steps without widening the level spread elsewhere: record it as a dead end with the candidates''
-        numbers and move to the one-loop axis''s level bias'
+      - 'the signed offset tracks the training level''s step with multiplicity (positive where the level falls most from five
+        to six): the bias is an under-extrapolation in multiplicity; design a target or input change for the level''s multiplicity
+        dependence, checked first on these reads'
+      - 'no relation to the multiplicity step: the bias is beam-specific (gluon-gluon, e+e-); read those pools'' training
+        coverage at five particles and record it'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
