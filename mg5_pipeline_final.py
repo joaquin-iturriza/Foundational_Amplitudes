@@ -4345,9 +4345,10 @@ def lhe_part_paths(process, items):
     return [(os.path.join(d, f"{process}_{eid}_{r[3]}_seed{r[0]}_ev{r[1]}.npz"), r) for r in runs]
 
 
-def lhe_build_part(process, items, k, mg_cores=1, work_root=None):
+def lhe_build_part(process, items, k, mg_cores=1, work_root=None, keep_dir=False):
     """Run the k-th MadEvent run of the pools `items` and write its part file (atomic). Returns its path; an existing
-    part is kept (a rerun does nothing)."""
+    part is kept (a rerun does nothing). Its run directory is deleted once the part holds every event asked, unless
+    keep_dir (the queue worker, whose tidy_run deletes it with a manifest)."""
     cfg = PROCESSES[process]
     if not cfg["lhe"].get("parts"):
         raise RuntimeError(f"{process}: no lhe.parts, its pools are built in series (build_lhe_pp)")
@@ -4369,7 +4370,8 @@ def lhe_build_part(process, items, k, mg_cores=1, work_root=None):
     np.savez(tmp, mom=m_k, aqcd=a_k, seconds=np.array([t_out, t_me]), mg_cores=np.array(int(mg_cores)),
              banner=np.array(open(banner).read() if banner else ""))
     os.replace(tmp, path)
-    shutil.rmtree(work_root, ignore_errors=True)
+    if len(m_k) >= n_k and not keep_dir:     # a short run keeps its directory (its logs)
+        shutil.rmtree(work_root, ignore_errors=True)
     print(f"[LHE PART] {process} {name_k}: {len(m_k)} events (asked {n_k}, iseed {iseed_k}) in {t_me:.0f}s "
           f"-> {path}", flush=True)
     return path

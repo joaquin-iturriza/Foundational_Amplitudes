@@ -214,23 +214,30 @@ def _keep(fname):
     return fname.endswith(".log") or fname in LOG_NAMES
 
 
+def _removals(wd, saved):
+    """([(path, bytes)] of the files tidying wd removes, [files kept]): every file when its events are saved, else all
+    but its log files."""
+    rm, kept = [], []
+    for dp, _, fs in os.walk(wd):
+        for f in fs:
+            fp = os.path.join(dp, f)
+            if not saved and _keep(f) and not os.path.islink(fp):
+                kept.append(fp)
+                continue
+            try:
+                rm.append((fp, os.lstat(fp).st_size))
+            except OSError:
+                pass
+    return rm, kept
+
+
 def tidy_plan(wd, saved):
     """(bytes removed, files kept) of tidying the run directory wd: everything when its events are saved, else all but
     its log files."""
     if saved:
         return _du(wd), []
-    kept, n = [], 0
-    for dp, _, fs in os.walk(wd):
-        for f in fs:
-            fp = os.path.join(dp, f)
-            if _keep(f) and not os.path.islink(fp):
-                kept.append(fp)
-            else:
-                try:
-                    n += os.lstat(fp).st_size
-                except OSError:
-                    pass
-    return n, kept
+    rm, kept = _removals(wd, saved)
+    return sum(b for _, b in rm), kept
 
 
 def tidy_apply(root, wd, saved):
@@ -262,16 +269,28 @@ def run_workdir(name, run):
     return os.path.join(mg.lhe_work_dir(), "parts", f"{name}__{run[3]}")
 
 
-def tidy_run(name, items, k):
-    """A worker's end of run k: its directory deleted once its part holds its events, else reduced to its logs.
-    Returns 'saved', 'logs' or None (nothing there). Never raises: tidying never fails a task."""
+def tidy_run(name, items, k, q):
+    """A worker's end of run k: its directory deleted once its part holds all the events it asked, else reduced to its
+    logs. Each path removed and its size are appended first to Q/gc/worker_<job>.jsonl; when that write fails nothing
+    is deleted. Returns 'saved', 'logs' or None (nothing deleted). Never raises: tidying never fails a task."""
     try:
         part, run = mg.lhe_part_paths(name, items)[k]
         wd = run_workdir(name, run)
         if not os.path.isdir(wd):
             return None
-        saved = part_ok(part)
-        tidy_apply(parts_work_root(), wd, saved)
+        root = parts_work_root()
+        _under(root, wd)
+        saved = part_ok(part, run[1])
+        rm, _ = _removals(wd, saved)
+        os.makedirs(os.path.join(q, "gc"), exist_ok=True)
+        man = os.path.join(q, "gc", f"worker_{os.environ.get('SLURM_JOB_ID', f'local{os.getpid()}')}.jsonl")
+        with open(man, "a") as f:
+            for fp, b in rm:
+                f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "run": f"{name}__{k:03d}",
+                                    "saved": saved, "path": fp, "bytes": b}) + "\n")
+            f.flush()
+            os.fsync(f.fileno())
+        tidy_apply(root, wd, saved)
         return "saved" if saved else "logs"
     except Exception as e:
         print(f"  [TIDY] {name} part {k}: not tidied ({type(e).__name__}: {e})", flush=True)
@@ -291,13 +310,14 @@ def _run_task(q, t):
     try:
         items = _spec(D, name)
         try:
-            mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)))
-            part = mg.lhe_part_paths(name, items)[t["k"]][0]
-            if not part_ok(part):
-                raise RuntimeError(f"{name}: part {t['k']} written but holds no events: {part}")
+            mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
+            part, run = mg.lhe_part_paths(name, items)[t["k"]]
+            if not part_ok(part, run[1]):        # a short part (MadEvent stopped early) is a failed run, not a done one
+                raise RuntimeError(f"{name}: part {t['k']} written but holds fewer events than the {run[1]} asked: "
+                                   f"{part}")
         finally:
             if "_file" in t:                     # a queued run (not the assembly-only call of _assemble_pending)
-                tidy_run(name, items, t["k"])
+                tidy_run(name, items, t["k"], q)
         msg = f"part {t['k']} in {time.time() - t0:.0f}s"
         parts = mg.lhe_part_paths(name, items)
         if all(os.path.exists(p) for p, _ in parts) and not os.path.exists(os.path.join(D["assembled"], name)):
@@ -389,11 +409,22 @@ def cmd_gc(a):
     live = _my_jobs()
     if live is None:
         raise SystemExit("squeue unavailable: cannot tell running claims, nothing deleted")
-    running = set()                              # <process>__<k> of the claims a live job holds
-    for f in os.listdir(D["claimed"]):
-        job = f.rsplit(".", 1)[-1]
-        if not job.isdigit() or job in live:     # a hand-run worker (local<pid>) counts as running
-            running.add(f.rsplit(".", 1)[0].split("__", 1)[1][:-len(".json")])
+    live = {"jobs": live}
+
+    def claimed_now(tag):
+        """Whether a live job (or a hand-run worker, local<pid>) holds run tag (<process>__<k>) at this moment:
+        claimed/ read again, squeue asked again for a claim by a job not in the last answer."""
+        for f in os.listdir(D["claimed"]):
+            if f.rsplit(".", 1)[0].split("__", 1)[1][:-len(".json")] != tag:
+                continue
+            job = f.rsplit(".", 1)[-1]
+            if not job.isdigit() or job in live["jobs"]:
+                return True
+            live["jobs"] = _my_jobs()
+            if live["jobs"] is None or job in live["jobs"]:   # squeue unavailable: counted as running
+                live["jobs"] = live["jobs"] or set()
+                return True
+        return False
     todo = []
     stats = {"saved": [0, 0], "logs": [0, 0], "running_skipped": 0, "absent": 0, "short_parts": 0}
     for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
@@ -404,31 +435,38 @@ def cmd_gc(a):
             if not os.path.isdir(wd):
                 stats["absent"] += 1
                 continue
-            if f"{name}__{k:03d}" in running:
+            tag = f"{name}__{k:03d}"
+            if claimed_now(tag):
                 stats["running_skipped"] += 1
                 continue
             _under(root, wd)
-            saved = part_ok(part)
-            if saved and not part_ok(part, run[1]):
+            saved = part_ok(part, run[1])            # all the events it asked; a short part keeps its logs
+            if not saved and part_ok(part):
                 stats["short_parts"] += 1
             n, kept = tidy_plan(wd, saved)
             kind = "saved" if saved else "logs"
             stats[kind][0] += 1; stats[kind][1] += n
-            todo.append({"path": wd, "bytes": n, "removed": "all" if saved else "all but the kept logs",
+            todo.append({"path": wd, "run": tag, "bytes": n, "removed": "all" if saved else "all but the kept logs",
                          "kept": kept})
     os.makedirs(os.path.join(a.queue, "gc"), exist_ok=True)
     man = os.path.join(a.queue, "gc", f"manifest_{time.strftime('%Y%m%d_%H%M%S')}{'_dry' if a.dry_run else ''}.json")
     with open(man, "w") as f:
         json.dump({"root": root, "dry_run": a.dry_run, "entries": todo}, f)
+    skipped = []                                 # claimed between the plan and its delete (a gc runs for hours)
     if not a.dry_run:
         for e in todo:
+            if claimed_now(e["run"]):
+                skipped.append(e["path"])
+                continue
             tidy_apply(root, e["path"], e["removed"] == "all")
+        with open(man[:-len(".json")] + "_skipped.json", "w") as f:
+            json.dump({"skipped_claimed_at_delete": skipped}, f)
     print(json.dumps({"manifest": man, "dry_run": a.dry_run, "dirs": len(todo),
                       "gb": round(sum(e["bytes"] for e in todo) / 1e9, 2),
                       "saved_dirs": stats["saved"][0], "saved_gb": round(stats["saved"][1] / 1e9, 2),
                       "logs_only_dirs": stats["logs"][0], "logs_only_gb": round(stats["logs"][1] / 1e9, 2),
-                      "running_skipped": stats["running_skipped"], "no_dir": stats["absent"],
-                      "saved_parts_with_fewer_events_than_asked": stats["short_parts"]}))
+                      "running_skipped": stats["running_skipped"], "claimed_at_delete_skipped": len(skipped),
+                      "no_dir": stats["absent"], "short_parts_kept_logs": stats["short_parts"]}))
 
 
 def cmd_status(a):

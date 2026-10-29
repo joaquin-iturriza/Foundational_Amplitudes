@@ -11,12 +11,12 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-df -B1G /sps/lpnhe "$SCRATCH" | tail -1
+df -B1G "$SCRATCH" | tail -1
 rc=0
 for q in ${LHE_QUEUES:?LHE_QUEUES (queue names under \$SCRATCH/lhe_queue) not set}; do
     python tools/lhe_parts.py gc --queue "$SCRATCH/lhe_queue/$q" || rc=1
 done
-df -B1G /sps/lpnhe "$SCRATCH" | tail -1
+df -B1G "$SCRATCH" | tail -1
 du -sh "$SCRATCH/lhe_work/parts"
 echo "RUN_SUMMARY lhe_gc rc=$rc"
 exit $rc

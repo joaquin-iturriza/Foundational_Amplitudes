@@ -39,8 +39,9 @@ def _register(n_runs=3, run_events=400, parts=True):
                           "mg5_generate": ["generate g g > g g g"], "lhe": lhe}
 
 
-def _fakes(tmp):
-    """Replace MadEvent, the LHE reader, the labels and the physics check by deterministic fakes."""
+def _fakes(tmp, short=True):
+    """Replace MadEvent, the LHE reader, the labels and the physics check by deterministic fakes. short: each run
+    returns a few events fewer than asked (the serial build's margin); the queue's workers fail such a part."""
     def prepare(process, work_root, log_path, madevent=True, standalone=True):
         ev = os.path.join(work_root, f"{process}_madevent") if madevent else None
         if ev:
@@ -55,7 +56,7 @@ def _fakes(tmp):
     def read(path, pdg_ids):
         _, iseed, n = os.path.basename(path)[:-5].rsplit("_", 2)
         rng = np.random.default_rng(int(iseed))
-        n = int(n) - int(iseed) % 7            # a run returns a few events fewer than asked, as MadEvent can
+        n = int(n) - (int(iseed) % 7 if short else 0)    # a run returning a few events fewer than asked
         sq = rng.uniform(100, 1000, n)
         P = np.concatenate([mg._beams(sq, np.array([21] * K), {}), mg._rambo_massless_batch(sq, K - 2, rng)], axis=1)
         return P, rng.uniform(0.1, 0.12, n), sq
@@ -157,7 +158,7 @@ def test_queue_end_to_end():
              datagen.dest_for_role, lhe_parts.ASSEMBLE_S)
     try:
         with tempfile.TemporaryDirectory() as d:
-            _fakes(d)
+            _fakes(d, short=False)
             datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
             os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
             os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
@@ -199,16 +200,17 @@ def test_queue_end_to_end():
 
 
 def test_tidy_and_gc():
-    """A worker deletes a saved run's directory and reduces a failed one to its logs; gc does the same for runs left
-    behind (killed, failed before the change), skips runs a live job holds, writes its manifest first, and never
-    deletes outside $SCRATCH/lhe_work/parts."""
-    _register()
+    """A worker deletes a saved run's directory (its removals in its gc/ manifest first, nothing deleted when that
+    write fails) and reduces a failed or short one to its logs, the short one not done; gc does the same for runs left
+    behind (killed, failed before the change), skips runs a live job holds, and one claimed while it runs, writes its
+    manifest first, and never deletes outside $SCRATCH/lhe_work/parts."""
+    _register(n_runs=4)
     saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
              datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts._my_jobs)
     env0 = {v: os.environ.get(v) for v in ("SCRATCH", "AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR")}
     try:
         with tempfile.TemporaryDirectory() as d:
-            _fakes(d)
+            _fakes(d, short=False)
             prep, run0 = mg.lhe_prepare, mg.lhe_run_madevent
 
             def prepare(process, work_root, log_path, madevent=True, standalone=True):
@@ -220,11 +222,14 @@ def test_tidy_and_gc():
                 open(os.path.join(ev, "Events", "run", "run_tag_1_debug.log"), "w").write("log")
                 return ev, sa
 
-            fail_seed = mg.lhe_runs(NAME, mg._lhe_check_recipes(NAME, _items())[1], 1)[1][0]
+            seeds = [r[0] for r in mg.lhe_runs(NAME, mg._lhe_check_recipes(NAME, _items())[1], 1)]
+            fail_seed, short_seed = seeds[1], seeds[3]
 
             def run(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01", patches=None):
                 if iseed == fail_seed:
                     raise RuntimeError("No space left on device (fake)")
+                if iseed == short_seed:                                  # MadEvent stopping at half the events
+                    return run0(process, ev, nevents // 2, iseed, log_path, mg_cores, run_name, patches)
                 return run0(process, ev, nevents, iseed, log_path, mg_cores, run_name, patches)
             mg.lhe_prepare, mg.lhe_run_madevent = prepare, run
             datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
@@ -232,7 +237,8 @@ def test_tidy_and_gc():
             os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "lhe_parts")
             os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "lhe_work")
             lhe_parts.ASSEMBLE_S = 0
-            lhe_parts._my_jobs = lambda: {"777"}
+            jobs = {"777"}
+            lhe_parts._my_jobs = lambda: set(jobs)
             spec = os.path.join(d, "spec.yaml")
             yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
                                            "n_test": 100}]}, open(spec, "w"))
@@ -243,39 +249,82 @@ def test_tidy_and_gc():
             try:
                 lhe_parts.cmd_work(argparse.Namespace(queue=q, workers=1, hours=1.0))
             except SystemExit as e:
-                assert e.code == 1                                       # the one failed run
+                assert e.code == 1                                       # the failed and the short run
             root = os.path.join(d, "lhe_work", "parts")
             wds = {k: lhe_parts.run_workdir(NAME, r) for k, (_, r) in enumerate(mg.lhe_part_paths(NAME, _items()))}
             assert not os.path.exists(wds[0]) and not os.path.exists(wds[2]), "a saved run's directory survived"
-            left = sorted(os.path.relpath(os.path.join(dp, f), wds[1]) for dp, _, fs in os.walk(wds[1]) for f in fs)
-            assert left == sorted([f"{NAME}.mg5.log", f"{NAME}_madevent/ME5_debug",
-                                   f"{NAME}_madevent/Events/run/run_tag_1_debug.log"]), left
+            for k in (1, 3):                                             # failed, short: their logs only
+                left = sorted(os.path.relpath(os.path.join(dp, f), wds[k]) for dp, _, fs in os.walk(wds[k])
+                              for f in fs)
+                assert left == sorted([f"{NAME}.mg5.log", f"{NAME}_madevent/ME5_debug",
+                                       f"{NAME}_madevent/Events/run/run_tag_1_debug.log"]), (k, left)
+            # the short part: its file there with half the events, its task failed, not done
+            p3, r3 = mg.lhe_part_paths(NAME, _items())[3]
+            assert lhe_parts.part_ok(p3) and not lhe_parts.part_ok(p3, r3[1])
+            ks = lambda st: sorted(json.load(open(os.path.join(q, st, f)))["k"]
+                                   for f in os.listdir(os.path.join(q, st)) if f.endswith(".json"))
+            assert ks("done") == [0, 2] and ks("failed") == [1, 3], (ks("done"), ks("failed"))
+            assert "fewer events" in open(glob.glob(os.path.join(q, "failed", "*__003.json.err"))[0]).read()
+            # the worker's manifest: every file it removed, with its size, and none of the kept logs
+            wm = [json.loads(l) for m in glob.glob(os.path.join(q, "gc", "worker_*.jsonl")) for l in open(m)]
+            by_run = {}
+            for e in wm:
+                by_run.setdefault(e["run"], []).append(e)
+            assert {e["saved"] for e in by_run[f"{NAME}__000"]} == {True}
+            assert any(e["path"].endswith("SubProcesses/P1/madevent") and e["bytes"] == 10000
+                       for e in by_run[f"{NAME}__000"])
+            assert {e["saved"] for e in by_run[f"{NAME}__003"]} == {False}
+            assert not any(e["path"].endswith((".log", "ME5_debug")) for e in by_run[f"{NAME}__003"])
+            # a manifest that cannot be written: nothing deleted
+            os.makedirs(os.path.join(wds[0], "x"))
+            open(os.path.join(wds[0], "x", "f"), "w").write("z")
+            q_bad = os.path.join(d, "q_bad")
+            os.makedirs(q_bad)
+            open(os.path.join(q_bad, "gc"), "w").close()                  # gc/ is a file: the append fails
+            assert lhe_parts.tidy_run(NAME, _items(), 0, q_bad) is None
+            assert os.path.exists(os.path.join(wds[0], "x", "f"))
             # runs left behind as before the change: run 0 saved with its directory, run 2 killed (no part) and
             # claimed by a dead job, run 1 claimed by a live job
-            for k in (0, 1, 2):
+            for k in (0, 1, 2, 3):
                 os.makedirs(os.path.join(wds[k], "junk"), exist_ok=True)
                 open(os.path.join(wds[k], "junk", "big"), "wb").write(b"y" * 5000)
                 open(os.path.join(wds[k], "a.log"), "w").write("l")
             os.remove(mg.lhe_part_paths(NAME, _items())[2][0])
             tasks = {json.load(open(os.path.join(q, "done", f)))["k"]: f for f in os.listdir(os.path.join(q, "done"))}
             os.rename(os.path.join(q, "done", tasks[2]), os.path.join(q, "claimed", tasks[2] + ".666"))
-            f1 = [f for f in os.listdir(os.path.join(q, "failed")) if f.endswith(".json")][0]
-            os.rename(os.path.join(q, "failed", f1), os.path.join(q, "claimed", f1 + ".777"))
+            failed = {json.load(open(os.path.join(q, "failed", f)))["k"]: f
+                      for f in os.listdir(os.path.join(q, "failed")) if f.endswith(".json")}
+            os.rename(os.path.join(q, "failed", failed[1]), os.path.join(q, "claimed", failed[1] + ".777"))
             outside = os.path.join(d, "keep_me")
             os.makedirs(outside)
             os.symlink(outside, os.path.join(root, f"{NAME}__run_09"))     # never followed (not a run of the spec)
             lhe_parts.cmd_gc(argparse.Namespace(queue=q, dry_run=True))
             assert os.path.exists(os.path.join(wds[0], "junk", "big"))      # a dry run deletes nothing
-            lhe_parts.cmd_gc(argparse.Namespace(queue=q, dry_run=False))
+            # run 3 is claimed by a job started after gc read squeue, between gc's plan and its delete
+            plan0 = lhe_parts.tidy_plan
+
+            def plan_then_claim(wd, saved):
+                if wd == wds[3]:
+                    jobs.add("888")
+                    os.rename(os.path.join(q, "failed", failed[3]), os.path.join(q, "claimed", failed[3] + ".888"))
+                return plan0(wd, saved)
+            lhe_parts.tidy_plan = plan_then_claim
+            try:
+                lhe_parts.cmd_gc(argparse.Namespace(queue=q, dry_run=False))
+            finally:
+                lhe_parts.tidy_plan = plan0
             mans = sorted(glob.glob(os.path.join(q, "gc", "manifest_*.json")))
-            man = json.load(open([m for m in mans if not m.endswith("_dry.json")][0]))
+            man = json.load(open([m for m in mans if not m.endswith(("_dry.json", "_skipped.json"))][0]))
             got = {e["path"]: e for e in man["entries"]}
-            assert set(got) == {wds[0], wds[2]}, got                       # run 1 is live: untouched
+            assert set(got) == {wds[0], wds[2], wds[3]}, got               # run 1 is live: untouched
             assert got[wds[0]]["removed"] == "all" and got[wds[0]]["bytes"] >= 5000
             assert got[wds[2]]["removed"] != "all" and got[wds[2]]["kept"] == [os.path.join(wds[2], "a.log")]
             assert not os.path.exists(wds[0])
             assert os.listdir(wds[2]) == ["a.log"]
             assert os.path.exists(os.path.join(wds[1], "junk", "big"))
+            assert os.path.exists(os.path.join(wds[3], "junk", "big")), "a run claimed mid-gc was tidied"
+            sk = [m for m in glob.glob(os.path.join(q, "gc", "manifest_*_skipped.json"))]
+            assert json.load(open(sk[0]))["skipped_claimed_at_delete"] == [wds[3]]
             assert os.path.isdir(outside)
             # the guard: a work tree outside $SCRATCH/lhe_work/parts is refused, and so is a path out of the tree
             os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "elsewhere")
