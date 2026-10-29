@@ -119,23 +119,23 @@ entries:
   - D165
   - D170
   - D175
-  next: 'Design, waiting for the user (CPU split done: python3 analysis/catalog_v3/prep_hybrid_level.py @16d68d20, on the
-    saved zero-shot reads). (1) The constant the hybrid is handed is exact (handed minus the events'' own c_p, squared, 3e-4
-    to 1.5e-3 on every axis), so its level gap is the network''s own class-mean error: 0.88 against the emission scales''
-    0.52 on the top, 0.084 against 0.011 at pT >= 30, 0.46 against 0.10 on 2->5. At pT >= 30 the network recalls the training
-    process''s default-cut constant: the hybrid''s signed level follows c_p(default cuts) - c_p(pT >= 30) (median abs 0.35,
-    correlation 0.77, slope 1.08), and with that shift removed the level is 0.0074, below the emission scales'' 0.011. On
-    the top its class-mean error beyond s_hat alone''s (0.63) is the size of a composition fit of c_p from the training classes
-    (0.65; the emission scales'' 0.24): for an unseen class the constant is guessed from the particle content, where the emission
-    scales hand its momentum-dependent part event by event. (2) The blend y_hybrid + lam (D - c_p), D = Lq - (N-4) log s_hat
-    per event, = (1-lam) hybrid + lam emission scales, class mean kept; if the recalled part shrinks as (1-lam), the pT >=
-    30 level would be 0.031, 0.015, 0.004 at lam 0.25, 0.5, 0.75. What would answer it: CPU first, the shape proxy (analysis/catalog_v3/prep_shape.py)
-    on the blend at lam 0.25, 0.5, 0.75 (one 32-CPU job, about 3 h), taking the largest lam whose in-range shape proxy stays
-    within 10% of the hybrid''s; then one short-pretraining arm dimensionless_hybrid_blend at that lam (new option data.target_physics_hybrid_blend,
-    the control''s settings, one seed like the other arms, about 2 GPU-h), read on the 8 axes against the hybrid and the emission
-    scales: the gap is closed if the 2->5 median level is <= 0.15 with the per-probe shape ratio against the hybrid <= 1.1
-    on the in-range axes (H1, H2, H3, H6, H7c). Asked: the CPU proxy plus one blend arm (about 2 GPU-h), or two lam arms (about
-    4 GPU-h)?'
+  next: 'Design, waiting for the user. Part 1 (done on the laptop, analysis/catalog_v3/prep_hybrid_split.py @ad8de9a4, from
+    the saved reads): per probe the hybrid''s mean error minus the emission scales'' is split exactly into (a) the handed
+    constant minus the constant on the predicted events and (b) the two networks'' class means of the same target. (a) is
+    0.02 to 0.04 (median) on every axis, and with it set to zero the level ratios stay the same (top 1.31, pT >= 30 GeV 9.88),
+    so the whole gap is (b), the network. At pT >= 30 GeV the hybrid''s mean error follows the cut''s shift of the constant
+    (default-cut constant minus the cut one, median -0.35): slope 1.09, correlation 0.76; read with the default-cut constant
+    its level would be 0.006, 0.48 of the emission scales''. So the network supplies the constant it learned at the training
+    cuts, while the emission scales'' per-event term follows the cut through the momenta. Top: the hybrid underpredicts (median
+    -0.57 against +0.02), -0.29 with one top, -0.82 with two, -1.40 with four, and does not underpredict at 2->2, where the
+    constant is zero; a linear composition model of the constant does not reproduce it per probe (correlation 0.36), so the
+    mechanism there is not established. Part 2 (the user''s call): the mix target, hybrid + lambda (Lq - (N-4) log s_hat -
+    c_p), whose class mean is the emission scales'' for every lambda (0 = hybrid, 1 = emission scales). First the CPU shape
+    proxy (prep_shape.py with a mix target at lambda 0.25, 0.5, 0.75; a 32-CPU job on CC of about 3 h, which needs the pools),
+    then one short-pretraining arm on catalog_v3 at the lambda the proxy picks (the largest whose 2->4 and 2->5 proxy stays
+    at the hybrid''s), against the existing hybrid and emission-scale arms with no new baselines: answered if its 2->5 level
+    is near 0.10 and its new-combination and 2->4 shapes stay at the hybrid''s. One seed, about 2 GPU-h. Blocked anyway: site
+    pick has CC on AVOID (site env fails).'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
