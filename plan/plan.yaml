@@ -156,6 +156,7 @@ entries:
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-36586b54
     - FA-ccin2p3-37a95d76
+    - FA-ccin2p3-45d20a1f
     - FA-ccin2p3-4ecff34d
     - FA-ccin2p3-5a8c8fde
     - FA-ccin2p3-61c09ed7
@@ -175,7 +176,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 086cd929
+    commit: 209c942b
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -209,6 +210,8 @@ entries:
     - analysis/catalog_v4/data/loop_born.json
     - analysis/catalog_v4/data/loop_groups.json
     - analysis/catalog_v4/data/loop_levels.json
+    - analysis/catalog_v4/data/prep_shape_v4.json
+    - analysis/catalog_v4/data/shape_gap.json
     - analysis/catalog_v4/data/signext_classes.json
     - analysis/catalog_v4/data/tree_levels.json
     - analysis/catalog_v4/data/tree_levels_cc.json
