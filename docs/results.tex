@@ -1678,6 +1678,12 @@ offset equal to minus the departure is what a network that predicts that mean wo
 % claim: departure.v4_bbx_ccxh_nlo=-11.02
 % claim: departure.v4_gg_zh_loop=-1.48
 % claim: departure.v4_bg_ab_nlo=-3.67
+% claim: match_n.v4_epem_bbx_nlo=1
+% claim: match_n.v4_bbx_ccxh_nlo=2
+% claim: match_n.v4_gg_zh_loop=5
+% claim: match_n.v4_epem_ccxg_nlo=0
+% claim: match_n.v4_bg_bgg_nlo=0
+% claim: match_n.v4_bg_ab_nlo=1
 % allow: 2 because it is the count of the seeds, a setting
 The $108$ training one-loop pools span $\overline t\in[-9.20,6.79]$ (spread $3.94$); of the $28$ held-out pools one lies
 outside, $b\bar b\to c\bar cH$ at one loop ($-9.27$, just below the lowest), and the median held-out pool sits $0.01$
@@ -1691,10 +1697,11 @@ both signs. Two kinds of pool carry the largest. $b\bar b\to c\bar cH$ departs $
 its orders (its Higgs couples to the charm, not the beam) and the network recovers most of that, not all; $bg\to\gamma b$
 departs $-3.67$ from its one match. And pools whose level is near their class but placed away from it: $e^+e^-\to b\bar
 b$ departs only $-0.61$ from its one match, yet carries one of the axis's two largest offsets in both seeds, and $gg\to ZH$, the
-loop-induced pool, $-1.48$ from the $gg$ pools of its orders with a larger offset. These sit in thin classes ($4$
+loop-induced pool, $-1.48$ from the $gg$ pools of its orders with a larger offset. The $e^+e^-$ pools sit in a thin class ($4$
 training $e^+e^-$ one-loop pools in all, each held-out $e^+e^-$ pool matched to at most one), so the level the network
-gives them is not its class mean but whatever its inputs map to from far-off classes. The one-loop level error is thus
-an interpolation error, largest where the pool's class has one or two training pools or none.
+gives them is not a class mean but whatever its inputs map to from other classes; $gg\to ZH$ has five matches, so a thin
+class is not the whole story. The one-loop level error is thus an interpolation error, and five of its six largest
+offsets are on pools with two matched training pools or fewer.
 \begin{figure}[t]
   \centering
   \includegraphics{../analysis/catalog_v4/figs/loop_levels.pdf}
