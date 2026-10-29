@@ -322,6 +322,13 @@ entries:
       be read: all 240 five particle training pools are exhaustive, with no four particle parent. Untested: the weight per
       event from each event''s own dipoles (needs the pools'' momenta).'
     at: '2026-10-29T16:59:54+00:00'
+  - tried: 'design of 2026-10-29 17:55 for the shape gap: an eval of the control pair on catalog_v4''s training pools, held-out
+      floor against the cell''s training median by a sign test'
+    why: 'design review FIX: training pools in a cell are other processes, so intrinsic difficulty is not controlled (catalog_v3''s
+      shape proxy measured 1.3x between training and held-out classes); a sign test over about 280 pools sets no effect size;
+      the result.json times sigma^2 conversion and the shape proxy were missed as prior work; validation split was the checkpoint-selection
+      pool (now test)'
+    at: '2026-10-29T17:00:32+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
