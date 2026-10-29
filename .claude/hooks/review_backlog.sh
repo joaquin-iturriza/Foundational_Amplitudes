@@ -53,7 +53,7 @@ STATE_REL=".claude/.review_state"
 # logs, run/sweep output), which would otherwise swamp the line count with data churn.
 PILLARS='claudemd-keeper|1|1|CLAUDE.md
 notes-editor|200|20|docs/*.tex
-repo-reviewer|600|30|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep :(exclude)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/*'
+repo-reviewer|520|100000|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep :(exclude)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/*'
 
 pillar_field() { printf '%s\n' "$PILLARS" | awk -F'|' -v n="$1" -v f="$2" '$1==n{print $f}'; }
 pillar_names() { printf '%s\n' "$PILLARS" | awk -F'|' '{print $1}'; }
@@ -81,6 +81,15 @@ pillar_lines() {
     local w; w=$(wc -l < "$f" 2>/dev/null); u=$(( u + ${w:-0} ))
   done < <(git ls-files --others --exclude-standard -- $paths 2>/dev/null)
   echo $(( n + u ))
+}
+
+# The code pillar's size is weighted (tools/review_weight.py): each hand-written line by its area's and kind's measured
+# rate of blocking errors, a generated config family once; 520 = about two blocking errors waiting, the user's call of
+# 2026-10-29 [D171]. The commit count never fired the review alone, so its threshold is off (100000).
+pillar_size() {
+  if [ "$1" = repo-reviewer ]; then
+    python3 "$REPO/tools/review_weight.py" "$2" $3 2>/dev/null || pillar_lines "$2" "$3"
+  else pillar_lines "$2" "$3"; fi
 }
 
 pillar_commits() { git rev-list --count "$1"..HEAD -- $2 2>/dev/null || echo 0; }
@@ -138,7 +147,7 @@ reset_pillar() {
   local who="$1" paths sha lines
   paths=$(pillar_field "$who" 4)
   sha=$(git rev-parse HEAD)
-  lines=$(pillar_lines "$sha" "$paths")     # the uncommitted remainder just reviewed
+  lines=$(pillar_size "$who" "$sha" "$paths")     # the uncommitted remainder just reviewed
   write_state "$who" "$sha" "$lines" 0 "$(reviewed_hash "$sha" "$paths")"
 }
 
@@ -153,7 +162,7 @@ backlog_for() {
   base_c=$(echo "$st" | awk '{print $3+0}')
   # watermark commit gone (rebase/gc) -> re-baseline rather than diff against nothing
   git cat-file -e "$sha^{commit}" 2>/dev/null || { reset_pillar "$who"; echo "0 0"; return; }
-  tl=$(pillar_lines "$sha" "$paths")
+  tl=$(pillar_size "$who" "$sha" "$paths")
   tc=$(pillar_commits "$sha" "$paths")
   # nothing owed while the pillar's content is what the reviewer passed, whatever commits sit in between (committing a
   # reviewed but uncommitted diff counted as a new commit and asked for a second review of identical content)

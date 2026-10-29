@@ -1452,7 +1452,24 @@ def tooling_fixes():
                         text=True).stdout
     row = next((l.split() for l in st.splitlines() if l.startswith("repo-reviewer")), [])
     scenario("review backlog: a .py change two directories down counts toward the repo-reviewer (lines and commits)",
-             row[1:3] == ["10/600", "1/30"], st)
+             row[1:3] == ["10/520", "1/100000"], st)
+    # the weighted count (tools/review_weight.py, D171): an analysis-script edit weighs its area's and kind's rates
+    for rel in ("tools/review_weight.py", "analysis/review_rates/review_rates.py", "analysis/review_rates/review_rates.json"):
+        os.makedirs(os.path.dirname(os.path.join(repo, rel)), exist_ok=True)
+        shutil.copy(os.path.join(ROOT, rel), os.path.join(repo, rel))
+    g("add", "."); g("commit", "-qm", "weigher")
+    open(os.path.join(repo, ".claude", ".review_state", "repo-reviewer"), "w").write("%s 0 0\n" % g("rev-parse", "HEAD").stdout.strip())
+    os.makedirs(os.path.join(repo, "sweep"), exist_ok=True)
+    for i in range(5):
+        open(os.path.join(repo, "sweep", "sweep_config_fam_p%d.yaml" % i), "w").write("a: 1\n" * 40)
+    open(os.path.join(repo, "analysis", "deep", "fit.py"), "a").write("".join("w%d = %d\n" % (i, i) for i in range(100)))
+    g("add", "sweep"); g("commit", "-qam", "family and edit")
+    st = subprocess.run(["bash", ".claude/hooks/review_backlog.sh", "status"], cwd=repo, capture_output=True,
+                        text=True).stdout
+    row = next((l.split() for l in st.splitlines() if l.startswith("repo-reviewer")), [])
+    n = int(row[1].split("/")[0]) if row else -1
+    scenario("review backlog: a generated config family counts once and an analysis edit by its weight", 
+             100 < n < 40 + 100 * 1.5 and n != 300, st)
     repo2, g2, tex, base2 = repo_with_script()
     open(tex, "a").write("\n%% src: python3 analysis/s.py @%s\n%% claim: h3.shape=0.80\nThe rerun FA-ccin2p3-60b47206 "
                          "gives $0.80$.\n" % base2)
