@@ -33,6 +33,8 @@ The step
    through sweep_manager with `site run ... --item {id}` is recorded with
    `python3 tools/plan.py run {id} --sweep <site>:<name> --next {n}`).
    Run `site pick FA --jobs N ...` right before every `site submit <site>` (CPU jobs too): placement_guard refuses a named submission with no plan unit left.
+   Commit only your own files, named: `git commit -m "..." -- <your paths>` (other agents share this checkout and its
+   index; a bare `git commit` sweeps their staged files into your commit).
    CPU work (generation, prebuilds, dumps) is split into as many jobs as the free slots `site pick` shows allow, one per
    process or finer: wall time comes from the layout, not the core-hours. A planned wall time over 1 h says why it cannot
    be split further.
