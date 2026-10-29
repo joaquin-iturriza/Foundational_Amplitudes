@@ -1,0 +1,24 @@
+Verdict: fix first. Classification logic is sound (EMA mechanism checked against BASE: base_experiment.init_model builds ExponentialMovingAverage before experiment.init_model calls _load_pretrained_weights; `best` is the curve minimum = best checkpoint; gain assertion ties grid cells to nogain.json). Blocking: two unsourced cuts that shape reported counts, one mis-described number, an input file missing from the change.
+
+BLOCKING
+1. analysis/transfer/ft_harm.py:25,40-52 (FIRST, pack): every claim of par:ft_harm depends on analysis/transfer/data/ft_harm_first_round.json, absent from the diff; its source runs/zz_lowd_curves/first_round is under gitignored runs/, so verify_claims cannot rerun the % src line from committed inputs (unverified: holds only if the packed file was committed separately).
+2. analysis/transfer/ft_harm.py:84 (one): the 0.75 split between "best in the last quarter" and "earlier" is unsourced and produces the reported 133/131; nogain.py at BASE uses 0.25*T for "early".
+3. analysis/transfer/ft_harm.py:204 (main, ema_left_first < 1e-3): unsourced threshold filtering the linear-probe-then-fine-tune statistics (102/78/94, 0.13/0.02).
+4. docs/results.tex par:ft_harm ("the other 131 ... 0.00 to 0.09"): summarise computes climb over all losing cells incl. late-best ones (last ~ best), so the median understates the rise of the 131 early-best curves.
+
+REIMPL: ft_harm.py:fam | analysis/transfer/rung_grid.py:fam | identical rung-to-family mapping redefined instead of imported
+REIMPL: ft_harm.py:grid (tr = S.get(name)+S.get(name+"_002"), min(val_loss*prepd_std**2)) | analysis/transfer/cells.py:best | best trial over name and name_002 sweeps at the best checkpoint; skips cells.py's unconverted-trial reporting
+REIMPL: ft_harm.py:dyhpo (tr filter and best-trial pick) | analysis/transfer/lowd_dyhpo.py:main | per-method, per-cell best-trial selection on lowd_dyhpo_sweeps.json
+REIMPL: ft_harm.py:pack (readout/*.json loop) | analysis/transfer/lowd_ft.py:load (data/lowd_ft_readout.jsonl) | re-reads the same 60 read-outs from run dirs instead of the committed file
+REIMPL: ft_harm.py:pack (data/lowd_ft_runs.jsonl by method, probe, rung, k) | analysis/transfer/lowd_ft.py:load | same first-round run-record reader
+REIMPL: ft_harm.py:one/summarise (first=v[0], climb=log10(last/best), best_frac) | analysis/transfer/nogain_start.py:stats and analysis/transfer/nogain.py:main (turn, early) | first validation vs best, last-over-best ratio, where the best sits
+
+Non-blocking:
+- ft_harm.py:228 figure path relative to cwd while other paths use HERE.
+- 115 of 142 grid cells use the stand-in start (zero_shot.json at D=1e4), checked only on 60 first-round cells (median gap 0.03 decades, max 0.49); worth stating.
+- Two statements without claim keys ("no default ... run ends above its start; 5 linear-probe runs", "the one best checkpoint it reaches" / ema_best_touched not claimed).
+- EMA shadow starting at random init in every EMA fine-tune is a training-code bug; deserves its own item.
+- dyhpo computes trials_below_start, never reported.
+
+REIMPLEMENTED: 6
+BLOCKING: 4

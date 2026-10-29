@@ -1,0 +1,11 @@
+Reviewer R4 (repo-reviewer, blind), diff dfew_a against 6cc61e63.
+Verdict: fix first. hp58, A, B with level, affine and affine+L at k = 3, 10, 30, 100, 5 random draws, median and 90% on 43 new and 96 relabels, smallest / largest / first-k s_hat selections; data checked (same 2000 events in all three npz).
+BLOCKING 1. analysis/catalog_daniel/norm_explore5.py:~111-119, ~192-205: the figure plots only an empirical-Bayes shrinkage fit whose prior comes from the other held-out processes' full test truth, labelled "affine"; not asked for, constants unsourced.
+BLOCKING 2. norm_explore5.py:~117-119 with fit():~57: 2->2 processes under affine+L|eb get the 2->3 affine+L prior instead of the affine one.
+BLOCKING 3. norm_explore5.py:3-4, ~77-79: provenance claim false: catalog_norm_heldout.py reads relabels with g's statistics, the diff keeps the twin's.
+REIMPL: norm_explore5.py:main ~77-79 (z58 q from stats_net phys_gbr) | analysis/catalog_daniel/catalog_norm_heldout.py:main and heldout_delta.py:main | hp58 read with g's predicted mean and std
+REIMPL: norm_explore5.py:main.mse (~94) | analysis/catalog_daniel/catalog_norm_heldout.py:main (mse lambda) | per-process MSE(log|M|^2) of q against t
+REIMPL: norm_explore5.py:main oracle affine (~100-106) | tools/zero_shot_parent.py (q_aff) | the oracle affine, refitted instead of read from q_aff
+Non-blocking: figure bypasses ps.figure and ps.shared_legend (only ps.save, ps.C used), text inside axes; "2->3" labels; crude eb noise at k = 3; same draws across models (good).
+REIMPLEMENTED: 3
+BLOCKING: 3

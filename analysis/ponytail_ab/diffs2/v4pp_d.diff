@@ -1,0 +1,2143 @@
+diff --git a/analysis/catalog_v4/compare_pp_trained.py b/analysis/catalog_v4/compare_pp_trained.py
+new file mode 100644
+index 00000000..b355bd76
+--- /dev/null
++++ b/analysis/catalog_v4/compare_pp_trained.py
+@@ -0,0 +1,176 @@
++"""catalog_v4 against training on pp, on the 13 TeV pp pools (catalog_coverage; the user, 2026-10-26: what mattered most
++was catalog_v4 against training on pp collisions on the data generated like pp collisions). No new compute: the reads
++of analysis/catalog_v4/compare_v3.py (catalog_v3 and catalog_v4, the dimensionless arm with Muon, seeds 42 and 43) and
++of analysis/catalog_v3/pp_compare.py (data/pp_rows.json: the pp-trained arm dimensionless_pp, FA-ccin2p3-e786bd74 and
++its rerun 982b5a14, and the window-trained dimensionless arm it differs from only in how the hadronic classes are
++sampled, FA-ccin2p3-1c960b22; both AdamW, one seed). Same pp events in both reads: the per-probe share inside
++catalog_v3's coverage is identical in the two collects on every probe, and each probe's target variance agrees (checked
++below, asserted). The pp pools carry catalog_v3's |M|^2 functions (MadGraph's minimal QED order, b at 4.7 GeV), which
++catalog_v4's are only where its full coupling orders add no diagram: a class whose catalog_v4 entry (its class's
++representative, data/class_changes.json) has a single amplitude QCD order in its diagrams
++(data/mixed_order_audit.json, tools/mixed_order_audit.py) has the minimal-order diagrams only ("same"); a mixed one
++("ew") is a different function there, and catalog_v4 is scored on a function it never trained. Per group (the class's
++roles in both catalogs, compare_v3.PP_GROUPS; no_b = no_b_same + no_b_ew; b classes apart) and measure (whole pool,
++inside and outside catalog_v3's coverage), on the classes every run has:
++  direct     catalog_v4 (seed-geometric mean) over the pp-trained arm, per class; median, share of classes lower with
++             catalog_v4 in both seeds and lower with the pp-trained arm than both; the gap (median |log10 ratio|) against
++             the Muon runs' seed spreads (the pp-trained arm has one seed). Optimizers differ: Muon against AdamW.
++  relative   each against its own optimizer's window-trained catalog_v3 arm: catalog_v4 / catalog_v3 (Muon) and
++             pp-trained / window-trained (AdamW); recovered = log(median of the first) / log(median of the second),
++             the share of the pp-trained arm's gain over catalog_v3's windows that catalog_v4 recovers (only where the
++             pp-trained arm gains); and the optimizer's own factor on pp, catalog_v3 Muon over catalog_v3 AdamW.
++    python3 analysis/catalog_v4/compare_pp_trained.py   -> data/compare_pp_trained.json, figs/compare_pp_trained.{png,pdf}
++The last line printed is the JSON of the numbers docs/results.tex quotes.
++"""
++import json, os, sys
++
++import numpy as np
++
++HERE = os.path.dirname(os.path.abspath(__file__))
++ROOT = os.path.dirname(os.path.dirname(HERE))
++sys.path.insert(0, HERE)
++import compare_v3 as c3
++
++MEAS = ("mse", "mse_inside", "mse_outside")
++ADAMW = {"pp": "dimensionless_pp", "win": "dimensionless"}
++
++
++def same_events(site, R):
++    """the two collects saw the same events and split them the same way"""
++    fd = max(abs(R[a]["pp"][p]["frac_inside"] - s["inside"].count("1") / len(s["inside"]))
++             for p, s in site["pp"].items() for a in ADAMW.values())
++    vd = max(abs(np.var(np.load(os.path.join(c3.SR, r, "PP", p + ".npz"))["t"].astype(float)) /
++                 R[ADAMW["pp"]]["pp"][p]["var_t"] - 1) for p in site["pp"] for r in (c3.RUNS["v3"][0], c3.RUNS["v4"][0]))
++    assert fd == 0 and vd < 1e-3, (fd, vd)
++    return {"max_frac_inside_diff": fd, "max_rel_var_t_diff": vd}
++
++
++def ew_added(names):
++    """pp13_<x> -> True where catalog_v4's |M|^2 of the class has more than the minimal-order diagrams (mixed), None
++    where catalog_v4 has no entry for it (the b-Higgs classes it dropped)"""
++    E = json.load(open(os.path.join(HERE, "data", "mixed_order_audit.json")))["entries"]
++    cc = json.load(open(os.path.join(HERE, "data", "class_changes.json")))
++    rep = {}
++    for g in cc["merges"]:
++        for x in g["members"]:
++            rep.setdefault(x, g["v4_class"])
++    for sp in cc["splits"]:
++        for k, v in sp["v4_classes"].items():
++            for x in v["members"]:
++                rep.setdefault(x, k)
++    out = {}
++    for n in names:
++        x = "v4_" + n[len("pp13_"):]
++        y = x if x in E else rep.get(x)
++        out[n] = E[y]["mixed"] if y in E else None
++    return out
++
++
++def lmed(x):
++    return float(10 ** np.median(np.log10(x)))
++
++
++def spread(a, b):
++    return float(np.median(np.abs(np.log10(b / a))))
++
++
++def compare(rows, probes):
++    v = lambda r: np.array([rows[r][p] for p in probes])
++    ps_ = [p for p in probes if all(p in rows[r] for r in rows)]
++    if not ps_:
++        return None
++    probes = ps_
++    v3, v4 = [v(r) for r in c3.RUNS["v3"]], [v(r) for r in c3.RUNS["v4"]]
++    pp, win = v(ADAMW["pp"]), v(ADAMW["win"])
++    g3, g4 = np.sqrt(v3[0] * v3[1]), np.sqrt(v4[0] * v4[1])
++    e = {"n": len(probes), "med": {"pp_trained": float(np.median(pp)), "v3_adamw": float(np.median(win)),
++                                   "v3_muon": [float(np.median(x)) for x in v3], "v4_muon": [float(np.median(x)) for x in v4]}}
++    d = g4 / pp
++    e["direct"] = {"ratio": lmed(d), "q10_q90": [float(x) for x in np.quantile(d, [0.1, 0.9])],
++                   "v4_lower_both_pct": float(100 * np.mean((v4[0] < pp) & (v4[1] < pp))),
++                   "pp_lower_both_pct": float(100 * np.mean((pp < v4[0]) & (pp < v4[1]))),
++                   "gap": float(np.median(np.abs(np.log10(d)))),
++                   "spread_v4": spread(*v4), "spread_v3": spread(*v3)}
++    e["direct"]["exceeds_seed_spread"] = bool(e["direct"]["gap"] > max(e["direct"]["spread_v4"], e["direct"]["spread_v3"]))
++    r4, rpp, mu = lmed(g4 / g3), lmed(pp / win), lmed(g3 / win)
++    e["relative"] = {"v4_over_v3_muon": r4, "pp_over_v3_adamw": rpp, "muon_over_adamw_v3": mu,
++                     "recovered": float(np.log10(r4) / np.log10(rpp)) if rpp < 1 else None}
++    return e
++
++
++def main():
++    site = json.load(open(os.path.join(HERE, "data", "compare_v3_site.json")))
++    R = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "pp_rows.json")))
++    chk = same_events(site, R)
++    p = c3.pp(site)
++    rows = {k: dict(p["_rows"][k]) for k in MEAS}
++    for k in MEAS:
++        for a in ADAMW.values():
++            rows[k][a] = {n: x[k] for n, x in R[a]["pp"].items() if x.get(k) is not None}
++    role, b = p["_role"], p["_b"]
++    ew = ew_added(role)
++    out = {"check": chk}
++    for bk, bsel in (("no_b", lambda n: not b[n]), ("no_b_same", lambda n: not b[n] and ew[n] is False),
++                     ("no_b_ew", lambda n: not b[n] and ew[n] is True), ("b", lambda n: b[n])):
++        for g, gsel in c3.PP_GROUPS.items():
++            pr = [n for n in role if bsel(n) and gsel(role[n])]
++            if not pr:
++                continue
++            e = out.setdefault(bk, {}).setdefault(g, {k: compare(rows[k], pr) for k in MEAS})
++            if g == "heldout":
++                for a in ("H1", "H2", "H3"):
++                    pa = [n for n in pr if role[n]["axis3"] == a]
++                    if pa:
++                        e[a] = compare(rows["mse"], pa)
++    json.dump(out, open(os.path.join(HERE, "data", "compare_pp_trained.json"), "w"), indent=1)
++    plot(out)
++    print("same events", chk)
++    claims = {}
++    for bk in ("no_b", "no_b_same", "no_b_ew", "b"):
++        for g, e in out[bk].items():
++            for k, v in e.items():
++                if not v:
++                    continue
++                print(f"{bk:4s} {g:13s} {k:11s} n={v['n']:4d} pp {v['med']['pp_trained']:.3g} v3adamw {v['med']['v3_adamw']:.3g} "
++                      f"v3muon {v['med']['v3_muon'][0]:.3g}/{v['med']['v3_muon'][1]:.3g} v4muon {v['med']['v4_muon'][0]:.3g}/{v['med']['v4_muon'][1]:.3g} | "
++                      f"v4/pp {v['direct']['ratio']:.3g} (v4 lower both {v['direct']['v4_lower_both_pct']:.0f}%, pp lower {v['direct']['pp_lower_both_pct']:.0f}%, "
++                      f"gap {v['direct']['gap']:.2f} spreads {v['direct']['spread_v4']:.2f}/{v['direct']['spread_v3']:.2f}) | "
++                      f"v4/v3 {v['relative']['v4_over_v3_muon']:.3g} pp/win {v['relative']['pp_over_v3_adamw']:.3g} "
++                      f"recovered {v['relative']['recovered']} muon/adamw {v['relative']['muon_over_adamw_v3']:.3g}")
++                c = claims.setdefault(bk, {}).setdefault(g, {})[k] = {"n": v["n"], "pp_med": v["med"]["pp_trained"],
++                                                                      "v3_adamw_med": v["med"]["v3_adamw"],
++                                                                      "v4_lo": min(v["med"]["v4_muon"]), "v4_hi": max(v["med"]["v4_muon"])}
++                c.update(v["direct"])
++                c.update(v["relative"])
++    claims["check"] = chk
++    print(json.dumps(claims))
++
++
++def plot(out):
++    """per group (trained in both, held out in both; no b, catalog_v4's function the pp pool's), each run's median MSE on the whole pp pool and on its events
++    inside and outside catalog_v3's coverage"""
++    import plot_style as ps
++    fig, axs = ps.figure(ncols=2)
++    ser = (("pp-trained, AdamW", ps.C.green, "D", -0.21, lambda m: [m["pp_trained"]]),
++           ("catalog v3, AdamW", ps.C.grey, "^", -0.07, lambda m: [m["v3_adamw"]]),
++           ("catalog v3, Muon", ps.C.blue, "o", 0.07, lambda m: m["v3_muon"]),
++           ("catalog v4, Muon", ps.C.vermillion, "s", 0.21, lambda m: m["v4_muon"]))
++    for ax, g, lab in zip(axs, ("train", "heldout"), ("trained in both", "held out in both")):
++        x = np.arange(len(MEAS))
++        for name, col, mk, dx, get in ser:
++            for j in range(len(get(out["no_b_same"][g]["mse"]["med"]))):
++                y = [get(out["no_b_same"][g][k]["med"])[j] for k in MEAS]
++                ax.plot(x + dx, y, mk, color=col, mfc=col if j == 0 else "none",
++                        label=name + (f", seed {42 + j}" if name.endswith("Muon") else ""))
++        ax.set_xticks(x)
++        ax.set_xticklabels(["whole pool", "inside", "outside"])
++        ax.set_yscale("log")
++        ax.set_ylabel("median MSE, 13 TeV pp")
++        ax.set_ylim(0.08, 12)                            # one range for both panels
++        ax.set_xlabel(f"classes {lab}")
++    ps.shared_legend(fig, axs[0], ncol=3)                # six entries fit in no panel
++    ps.save(fig, os.path.join(HERE, "figs", "compare_pp_trained"))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/analysis/catalog_v4/compare_v3.py b/analysis/catalog_v4/compare_v3.py
+index e117ccf9..047e3191 100644
+--- a/analysis/catalog_v4/compare_v3.py
++++ b/analysis/catalog_v4/compare_v3.py
+@@ -47,6 +47,11 @@ RUN_DIRS = {"dimensionless_muon_best": "runs/catalog_v3_short/dimensionless_muon
+ AXES = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
+ NAMES = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$", "H3": "the top", "H5": "one loop",
+          "H6": r"$\alpha_s=0.13$", "H7E": "energy", "H7c": r"$p_T\geq30$ GeV"}
++# a pp class's group by its role in the two catalogs (pp(): role[n] = {"v3", "v4", "axis3"})
++PP_GROUPS = {"train": lambda r: r["v3"] == "train" and r["v4"] == "train",
++             "heldout": lambda r: r["v3"] == "heldout" and r["v4"] == "heldout",
++             "role_changed": lambda r: r["v3"] != r["v4"] and r["v4"] != "absent",
++             "dropped_in_v4": lambda r: r["v4"] == "absent"}
+ CHECK = 40                                    # every 50th of the 2000 sorted log|M|^2, to check the event match
+ 
+ 
+@@ -228,18 +233,15 @@ def pp(site):
+     xmax = max(float(np.max(np.abs(a - v[0]))) for v in srt.values() for a in v[1:])
+     assert xmax < 1e-3, f"the runs' reads of a pp probe are not the same events (max {xmax})"
+     b = {n: has_b(n) for n in names}
+-    groups = {"train": lambda n: role[n]["v3"] == "train" and role[n]["v4"] == "train",
+-              "heldout": lambda n: role[n]["v3"] == "heldout" and role[n]["v4"] == "heldout",
+-              "role_changed": lambda n: role[n]["v3"] != role[n]["v4"] and role[n]["v4"] != "absent",
+-              "dropped_in_v4": lambda n: role[n]["v4"] == "absent"}
+     out = {"n": len(names), "max_event_mismatch": xmax, "no_prediction": {r: v for r, v in bad.items() if v}, "n_b": sum(b.values()),
+            "roles": {}, "frac_inside": float(np.median(list(frac.values()))) if frac else None}
++    out.update({"_rows": rows, "_role": role, "_b": b})   # per probe, for compare_pp_trained.py
+     for n in names:
+         k = f"{role[n]['v3']}/{role[n]['v4']}" + ("/b" if b[n] else "")
+         out["roles"][k] = out["roles"].get(k, 0) + 1
+     for bk, bsel in (("no_b", lambda n: not b[n]), ("b", lambda n: b[n])):
+-        for g, gsel in groups.items():
+-            pr = [n for n in names if bsel(n) and gsel(n)]
++        for g, gsel in PP_GROUPS.items():
++            pr = [n for n in names if bsel(n) and gsel(role[n])]
+             if not pr:
+                 continue
+             e = out.setdefault(bk, {}).setdefault(g, {})
+diff --git a/analysis/catalog_v4/data/compare_pp_trained.json b/analysis/catalog_v4/data/compare_pp_trained.json
+new file mode 100644
+index 00000000..c3b08382
+--- /dev/null
++++ b/analysis/catalog_v4/data/compare_pp_trained.json
+@@ -0,0 +1,1774 @@
++{
++ "check": {
++  "max_frac_inside_diff": 0.0,
++  "max_rel_var_t_diff": 0.00026652891649803223
++ },
++ "no_b": {
++  "train": {
++   "mse": {
++    "n": 578,
++    "med": {
++     "pp_trained": 0.46972385568481245,
++     "v3_adamw": 5.230864611823257,
++     "v3_muon": [
++      1.2672199717582577,
++      1.7394737864934533
++     ],
++     "v4_muon": [
++      0.7383838487159147,
++      1.0033769284433578
++     ]
++    },
++    "direct": {
++     "ratio": 1.3104076025078772,
++     "q10_q90": [
++      0.2346025168923197,
++      13.199419940120327
++     ],
++     "v4_lower_both_pct": 42.04152249134948,
++     "pp_lower_both_pct": 51.73010380622838,
++     "gap": 0.5021540609147725,
++     "spread_v4": 0.1015427438617198,
++     "spread_v3": 0.10595480091017817,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.7543521178061806,
++     "pp_over_v3_adamw": 0.1503246070399681,
++     "muon_over_adamw_v3": 0.2588331805280332,
++     "recovered": 0.1487610697252058
++    }
++   },
++   "mse_inside": {
++    "n": 578,
++    "med": {
++     "pp_trained": 0.40659163156432887,
++     "v3_adamw": 0.5476334308642572,
++     "v3_muon": [
++      0.12721965469495392,
++      0.12471163988100302
++     ],
++     "v4_muon": [
++      0.5751542849695681,
++      0.6297795065129361
++     ]
++    },
++    "direct": {
++     "ratio": 1.1459856439544904,
++     "q10_q90": [
++      0.20170235785370955,
++      7.977068424606009
++     ],
++     "v4_lower_both_pct": 46.19377162629758,
++     "pp_lower_both_pct": 48.78892733564014,
++     "gap": 0.48623635306285556,
++     "spread_v4": 0.0999515587231819,
++     "spread_v3": 0.06244734550820236,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.1951605855498553,
++     "pp_over_v3_adamw": 0.5969009846709316,
++     "muon_over_adamw_v3": 0.22498949901355464,
++     "recovered": -0.34550225533801654
++    }
++   },
++   "mse_outside": {
++    "n": 577,
++    "med": {
++     "pp_trained": 0.532721717148174,
++     "v3_adamw": 7.726793555988795,
++     "v3_muon": [
++      1.7008332172754637,
++      2.48751942085411
++     ],
++     "v4_muon": [
++      0.826807862101845,
++      1.0745096222145794
++     ]
++    },
++    "direct": {
++     "ratio": 1.2839022698494216,
++     "q10_q90": [
++      0.22749525337215026,
++      12.921828860545494
++     ],
++     "v4_lower_both_pct": 41.94107452339688,
++     "pp_lower_both_pct": 51.64644714038128,
++     "gap": 0.47809624657849176,
++     "spread_v4": 0.10549110289402847,
++     "spread_v3": 0.12572418116937129,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.5044383544739532,
++     "pp_over_v3_adamw": 0.1019605632513882,
++     "muon_over_adamw_v3": 0.27668691614989616,
++     "recovered": 0.2997191996994402
++    }
++   }
++  },
++  "heldout": {
++   "mse": {
++    "n": 180,
++    "med": {
++     "pp_trained": 0.9233145316953535,
++     "v3_adamw": 3.790388497206911,
++     "v3_muon": [
++      1.017869639144485,
++      1.355063330704382
++     ],
++     "v4_muon": [
++      0.8958879278354304,
++      0.9816327039587145
++     ]
++    },
++    "direct": {
++     "ratio": 0.7859729358920979,
++     "q10_q90": [
++      0.18606137907106032,
++      3.8830339307726804
++     ],
++     "v4_lower_both_pct": 53.888888888888886,
++     "pp_lower_both_pct": 35.55555555555556,
++     "gap": 0.35773976248545636,
++     "spread_v4": 0.14044380879591778,
++     "spread_v3": 0.1430466053092464,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.776968506188574,
++     "pp_over_v3_adamw": 0.33468084591209835,
++     "muon_over_adamw_v3": 0.2755202493496523,
++     "recovered": 0.23055048160959876
++    }
++   },
++   "mse_inside": {
++    "n": 180,
++    "med": {
++     "pp_trained": 0.7939448222693218,
++     "v3_adamw": 1.0122169191150079,
++     "v3_muon": [
++      0.35842630993272523,
++      0.344823353149167
++     ],
++     "v4_muon": [
++      0.6801637345647735,
++      0.708169213401695
++     ]
++    },
++    "direct": {
++     "ratio": 0.7972919134637206,
++     "q10_q90": [
++      0.1862992021837949,
++      3.155689698195643
++     ],
++     "v4_lower_both_pct": 53.888888888888886,
++     "pp_lower_both_pct": 33.88888888888889,
++     "gap": 0.3336297268548579,
++     "spread_v4": 0.14105211185205857,
++     "spread_v3": 0.12393360879276048,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.2092376027418856,
++     "pp_over_v3_adamw": 0.6831667331756943,
++     "muon_over_adamw_v3": 0.30921017046803567,
++     "recovered": -0.4986402563652433
++    }
++   },
++   "mse_outside": {
++    "n": 180,
++    "med": {
++     "pp_trained": 1.1241916681174893,
++     "v3_adamw": 5.276769748968758,
++     "v3_muon": [
++      1.3152032740506239,
++      1.7589398105536087
++     ],
++     "v4_muon": [
++      0.9962600777257248,
++      1.0152360042118258
++     ]
++    },
++    "direct": {
++     "ratio": 0.7540606658751488,
++     "q10_q90": [
++      0.17307764650085364,
++      3.759154004165291
++     ],
++     "v4_lower_both_pct": 54.44444444444444,
++     "pp_lower_both_pct": 35.0,
++     "gap": 0.3721125335517309,
++     "spread_v4": 0.14570462634692244,
++     "spread_v3": 0.15090279747166802,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.6276650945657982,
++     "pp_over_v3_adamw": 0.2624937126905553,
++     "muon_over_adamw_v3": 0.2709678173927467,
++     "recovered": 0.3482158817044082
++    }
++   },
++   "H1": {
++    "n": 31,
++    "med": {
++     "pp_trained": 0.7726686222774418,
++     "v3_adamw": 3.982025405023926,
++     "v3_muon": [
++      0.7206489701795737,
++      1.1248473149725238
++     ],
++     "v4_muon": [
++      0.8993884709729166,
++      1.064957927711882
++     ]
++    },
++    "direct": {
++     "ratio": 1.0887663175476687,
++     "q10_q90": [
++      0.18637124811488437,
++      3.7684157434809205
++     ],
++     "v4_lower_both_pct": 41.935483870967744,
++     "pp_lower_both_pct": 35.483870967741936,
++     "gap": 0.32061815518584363,
++     "spread_v4": 0.1389115210000442,
++     "spread_v3": 0.11278313475789258,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.9378650646949739,
++     "pp_over_v3_adamw": 0.20274990691281272,
++     "muon_over_adamw_v3": 0.22202937385847027,
++     "recovered": 0.04019922068321708
++    }
++   },
++   "H2": {
++    "n": 104,
++    "med": {
++     "pp_trained": 0.8759158924569916,
++     "v3_adamw": 5.42557013623998,
++     "v3_muon": [
++      1.3633576099136953,
++      1.937953166709005
++     ],
++     "v4_muon": [
++      0.9740925225231412,
++      1.486262131358076
++     ]
++    },
++    "direct": {
++     "ratio": 1.030563979381025,
++     "q10_q90": [
++      0.2721103312099906,
++      4.235836830254604
++     ],
++     "v4_lower_both_pct": 46.15384615384615,
++     "pp_lower_both_pct": 48.07692307692308,
++     "gap": 0.35773976248545636,
++     "spread_v4": 0.13805394936848345,
++     "spread_v3": 0.1325293358697615,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.722671506951963,
++     "pp_over_v3_adamw": 0.21738687008142038,
++     "muon_over_adamw_v3": 0.25725089268184154,
++     "recovered": 0.21283367147838836
++    }
++   },
++   "H3": {
++    "n": 45,
++    "med": {
++     "pp_trained": 1.6689291786809213,
++     "v3_adamw": 1.9583066691964086,
++     "v3_muon": [
++      0.6451909080013174,
++      1.0194513162025463
++     ],
++     "v4_muon": [
++      0.7169947730803915,
++      0.6650417306337905
++     ]
++    },
++    "direct": {
++     "ratio": 0.41298685975595384,
++     "q10_q90": [
++      0.1026678793943343,
++      0.9769954894143369
++     ],
++     "v4_lower_both_pct": 80.0,
++     "pp_lower_both_pct": 6.666666666666667,
++     "gap": 0.38499106097354957,
++     "spread_v4": 0.19016153314394452,
++     "spread_v3": 0.22910471369899585,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.7569088362514468,
++     "pp_over_v3_adamw": 0.8906327798231287,
++     "muon_over_adamw_v3": 0.4055832872582105,
++     "recovered": 2.4046369660732445
++    }
++   }
++  },
++  "role_changed": {
++   "mse": {
++    "n": 39,
++    "med": {
++     "pp_trained": 0.4326206954443769,
++     "v3_adamw": 3.7491759966891176,
++     "v3_muon": [
++      0.5475915131869173,
++      1.0020243586444113
++     ],
++     "v4_muon": [
++      1.448000232141272,
++      1.7561418398337592
++     ]
++    },
++    "direct": {
++     "ratio": 2.977879313516841,
++     "q10_q90": [
++      0.9914071374744393,
++      8.610577898190645
++     ],
++     "v4_lower_both_pct": 7.6923076923076925,
++     "pp_lower_both_pct": 84.61538461538461,
++     "gap": 0.47390709283329646,
++     "spread_v4": 0.1373624253855004,
++     "spread_v3": 0.12298200368891436,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.7389514253821428,
++     "pp_over_v3_adamw": 0.1671435868919748,
++     "muon_over_adamw_v3": 0.20039484377921904,
++     "recovered": -0.30928597088799287
++    }
++   },
++   "mse_inside": {
++    "n": 39,
++    "med": {
++     "pp_trained": 0.36655546796847976,
++     "v3_adamw": 0.49729296487231117,
++     "v3_muon": [
++      0.09530746846319291,
++      0.104643438729337
++     ],
++     "v4_muon": [
++      1.1071109286053065,
++      1.1451373285744308
++     ]
++    },
++    "direct": {
++     "ratio": 2.8220690860052624,
++     "q10_q90": [
++      0.9885393801130623,
++      7.813444515010953
++     ],
++     "v4_lower_both_pct": 7.6923076923076925,
++     "pp_lower_both_pct": 79.48717948717949,
++     "gap": 0.4537445995061845,
++     "spread_v4": 0.17032699577898908,
++     "spread_v3": 0.06415689394077218,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 9.09743790537164,
++     "pp_over_v3_adamw": 0.6602639588072537,
++     "muon_over_adamw_v3": 0.20558016674563812,
++     "recovered": -5.318983188629797
++    }
++   },
++   "mse_outside": {
++    "n": 39,
++    "med": {
++     "pp_trained": 0.5019069263640538,
++     "v3_adamw": 5.247568127945218,
++     "v3_muon": [
++      0.7805004745911395,
++      1.4630351708751568
++     ],
++     "v4_muon": [
++      1.4696582604607,
++      2.2264704493384464
++     ]
++    },
++    "direct": {
++     "ratio": 2.648551827833593,
++     "q10_q90": [
++      0.6407267693417048,
++      9.470444076105853
++     ],
++     "v4_lower_both_pct": 12.82051282051282,
++     "pp_lower_both_pct": 76.92307692307693,
++     "gap": 0.4799513239780281,
++     "spread_v4": 0.12898752011279144,
++     "spread_v3": 0.160577074999142,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.237487687717058,
++     "pp_over_v3_adamw": 0.11615894031436283,
++     "muon_over_adamw_v3": 0.19548489085670878,
++     "recovered": -0.09897978298022508
++    }
++   }
++  }
++ },
++ "no_b_same": {
++  "train": {
++   "mse": {
++    "n": 417,
++    "med": {
++     "pp_trained": 0.4327026319533356,
++     "v3_adamw": 3.049394426838501,
++     "v3_muon": [
++      0.917711731967242,
++      0.9319705111242829
++     ],
++     "v4_muon": [
++      0.2429430749752993,
++      0.29860343303773607
++     ]
++    },
++    "direct": {
++     "ratio": 0.6643305296218249,
++     "q10_q90": [
++      0.20954452406942128,
++      5.982304203446014
++     ],
++     "v4_lower_both_pct": 58.27338129496403,
++     "pp_lower_both_pct": 33.81294964028777,
++     "gap": 0.41484462320393223,
++     "spread_v4": 0.07892222072913133,
++     "spread_v3": 0.08789943939137337,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.555227716933186,
++     "pp_over_v3_adamw": 0.20916602402244316,
++     "muon_over_adamw_v3": 0.2726663675977935,
++     "recovered": 0.3760493461020596
++    }
++   },
++   "mse_inside": {
++    "n": 417,
++    "med": {
++     "pp_trained": 0.4018081181730872,
++     "v3_adamw": 0.6689389710815485,
++     "v3_muon": [
++      0.15091533365646403,
++      0.149288678153142
++     ],
++     "v4_muon": [
++      0.1831615308899071,
++      0.24180662764127747
++     ]
++    },
++    "direct": {
++     "ratio": 0.557169988524458,
++     "q10_q90": [
++      0.18060905200905922,
++      5.8681439626710805
++     ],
++     "v4_lower_both_pct": 63.06954436450839,
++     "pp_lower_both_pct": 32.13429256594724,
++     "gap": 0.4854668536071066,
++     "spread_v4": 0.08605578177794503,
++     "spread_v3": 0.059094336677386984,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.008828638935598,
++     "pp_over_v3_adamw": 0.5212292384754427,
++     "muon_over_adamw_v3": 0.23143524354418488,
++     "recovered": -0.013490426637036864
++    }
++   },
++   "mse_outside": {
++    "n": 416,
++    "med": {
++     "pp_trained": 0.5075200925928081,
++     "v3_adamw": 4.550280893518396,
++     "v3_muon": [
++      1.3753001170158783,
++      1.5196434220524901
++     ],
++     "v4_muon": [
++      0.2713224137149328,
++      0.3061200039010271
++     ]
++    },
++    "direct": {
++     "ratio": 0.654038522149024,
++     "q10_q90": [
++      0.19836955544312684,
++      4.41590950144243
++     ],
++     "v4_lower_both_pct": 58.17307692307693,
++     "pp_lower_both_pct": 33.65384615384615,
++     "gap": 0.4109463438439994,
++     "spread_v4": 0.08811259241954472,
++     "spread_v3": 0.11307659423302996,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.35238999776878843,
++     "pp_over_v3_adamw": 0.13603560986801855,
++     "muon_over_adamw_v3": 0.30066341564292215,
++     "recovered": 0.5228577257299564
++    }
++   }
++  },
++  "heldout": {
++   "mse": {
++    "n": 103,
++    "med": {
++     "pp_trained": 0.8658776698004119,
++     "v3_adamw": 2.239496949254821,
++     "v3_muon": [
++      0.6386787081432163,
++      1.0549340759654482
++     ],
++     "v4_muon": [
++      0.494162313325859,
++      0.47509765092187367
++     ]
++    },
++    "direct": {
++     "ratio": 0.5839689826059304,
++     "q10_q90": [
++      0.1667817846320089,
++      2.539596439810556
++     ],
++     "v4_lower_both_pct": 68.93203883495146,
++     "pp_lower_both_pct": 22.330097087378643,
++     "gap": 0.37340732680106276,
++     "spread_v4": 0.09952273858931063,
++     "spread_v3": 0.11278313475789258,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.6304408046664839,
++     "pp_over_v3_adamw": 0.34125149060442866,
++     "muon_over_adamw_v3": 0.2892080421946659,
++     "recovered": 0.42909566903512125
++    }
++   },
++   "mse_inside": {
++    "n": 103,
++    "med": {
++     "pp_trained": 0.741885261982091,
++     "v3_adamw": 0.9875271704520431,
++     "v3_muon": [
++      0.3546283232173721,
++      0.353393837846274
++     ],
++     "v4_muon": [
++      0.30772566887004194,
++      0.417226047660545
++     ]
++    },
++    "direct": {
++     "ratio": 0.5326695842936024,
++     "q10_q90": [
++      0.17364799936346895,
++      2.3899375260255113
++     ],
++     "v4_lower_both_pct": 68.93203883495146,
++     "pp_lower_both_pct": 23.300970873786408,
++     "gap": 0.44938619890175036,
++     "spread_v4": 0.11766942016721084,
++     "spread_v3": 0.09474913383269408,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.9157934739245038,
++     "pp_over_v3_adamw": 0.6604677967068694,
++     "muon_over_adamw_v3": 0.3006662144754209,
++     "recovered": 0.21206108746624605
++    }
++   },
++   "mse_outside": {
++    "n": 103,
++    "med": {
++     "pp_trained": 1.0057585627526344,
++     "v3_adamw": 3.5297699803034526,
++     "v3_muon": [
++      0.8585350966259588,
++      1.5621405284201397
++     ],
++     "v4_muon": [
++      0.5772686262862409,
++      0.5911090826459909
++     ]
++    },
++    "direct": {
++     "ratio": 0.525314464109695,
++     "q10_q90": [
++      0.16114463944385904,
++      2.36173519556372
++     ],
++     "v4_lower_both_pct": 68.93203883495146,
++     "pp_lower_both_pct": 25.24271844660194,
++     "gap": 0.39588990409486796,
++     "spread_v4": 0.11020317386066318,
++     "spread_v3": 0.13732080363138194,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.42147011975174076,
++     "pp_over_v3_adamw": 0.2583415313779707,
++     "muon_over_adamw_v3": 0.2733174719159024,
++     "recovered": 0.6383625821599159
++    }
++   },
++   "H1": {
++    "n": 19,
++    "med": {
++     "pp_trained": 0.8073552801930564,
++     "v3_adamw": 3.982025405023926,
++     "v3_muon": [
++      0.8575871506558832,
++      2.0146700891113283
++     ],
++     "v4_muon": [
++      0.42608574735713795,
++      0.39438614705253733
++     ]
++    },
++    "direct": {
++     "ratio": 0.5305940148128184,
++     "q10_q90": [
++      0.16234122903663792,
++      1.6608928557531681
++     ],
++     "v4_lower_both_pct": 68.42105263157895,
++     "pp_lower_both_pct": 15.789473684210526,
++     "gap": 0.3709902210969872,
++     "spread_v4": 0.0845784635367658,
++     "spread_v3": 0.09568309744375143,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.4111034894349039,
++     "pp_over_v3_adamw": 0.14848716375766696,
++     "muon_over_adamw_v3": 0.30012346183330857,
++     "recovered": 0.46606745034734764
++    }
++   },
++   "H2": {
++    "n": 67,
++    "med": {
++     "pp_trained": 0.8119031621761703,
++     "v3_adamw": 2.652093184288163,
++     "v3_muon": [
++      0.611037753831334,
++      1.0638551426182263
++     ],
++     "v4_muon": [
++      0.6267372893835468,
++      0.5030299040686358
++     ]
++    },
++    "direct": {
++     "ratio": 0.728087591127301,
++     "q10_q90": [
++      0.22424132995923157,
++      3.0694590545822296
++     ],
++     "v4_lower_both_pct": 64.17910447761194,
++     "pp_lower_both_pct": 29.850746268656714,
++     "gap": 0.3616109105175521,
++     "spread_v4": 0.09477974944187391,
++     "spread_v3": 0.09242247954330851,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.6887007447264581,
++     "pp_over_v3_adamw": 0.2665045742340948,
++     "muon_over_adamw_v3": 0.27064073141351647,
++     "recovered": 0.282031627710064
++    }
++   },
++   "H3": {
++    "n": 17,
++    "med": {
++     "pp_trained": 1.8367683958132877,
++     "v3_adamw": 1.9583066691964086,
++     "v3_muon": [
++      0.5560554807166238,
++      0.5206472875535264
++     ],
++     "v4_muon": [
++      0.4165225391521285,
++      0.45104667202286713
++     ]
++    },
++    "direct": {
++     "ratio": 0.20467685288281492,
++     "q10_q90": [
++      0.095639887952721,
++      0.7989138102265717
++     ],
++     "v4_lower_both_pct": 88.23529411764706,
++     "pp_lower_both_pct": 0.0,
++     "gap": 0.6889312693730448,
++     "spread_v4": 0.2891444709427224,
++     "spread_v3": 0.18538183053917417,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.6862213340361187,
++     "pp_over_v3_adamw": 0.6694408232339041,
++     "muon_over_adamw_v3": 0.2936569510566433,
++     "recovered": 0.9383088045433091
++    }
++   }
++  },
++  "role_changed": {
++   "mse": {
++    "n": 18,
++    "med": {
++     "pp_trained": 0.36147888271028084,
++     "v3_adamw": 1.3715170691600953,
++     "v3_muon": [
++      0.3203923153286685,
++      0.3319480681187805
++     ],
++     "v4_muon": [
++      0.5833814221483361,
++      0.7617839247297677
++     ]
++    },
++    "direct": {
++     "ratio": 1.4626111436667495,
++     "q10_q90": [
++      0.6914693829760585,
++      6.3387104191118855
++     ],
++     "v4_lower_both_pct": 16.666666666666664,
++     "pp_lower_both_pct": 66.66666666666666,
++     "gap": 0.25661784720575276,
++     "spread_v4": 0.1438711514520618,
++     "spread_v3": 0.0760097628585526,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 2.236041996667337,
++     "pp_over_v3_adamw": 0.3299614826026397,
++     "muon_over_adamw_v3": 0.19578792983739096,
++     "recovered": -0.7257596713409752
++    }
++   },
++   "mse_inside": {
++    "n": 18,
++    "med": {
++     "pp_trained": 0.32027379606383877,
++     "v3_adamw": 0.4087568304842896,
++     "v3_muon": [
++      0.09682335268014608,
++      0.10047595566171158
++     ],
++     "v4_muon": [
++      0.5872496758392691,
++      0.6837649831270144
++     ]
++    },
++    "direct": {
++     "ratio": 1.6166270187374672,
++     "q10_q90": [
++      0.9132149388381655,
++      7.075672241427906
++     ],
++     "v4_lower_both_pct": 11.11111111111111,
++     "pp_lower_both_pct": 66.66666666666666,
++     "gap": 0.2826744497128435,
++     "spread_v4": 0.17340825306015856,
++     "spread_v3": 0.06716550435237681,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 4.525339996635426,
++     "pp_over_v3_adamw": 0.6166813680209418,
++     "muon_over_adamw_v3": 0.21954925437058542,
++     "recovered": -3.123053240514076
++    }
++   },
++   "mse_outside": {
++    "n": 18,
++    "med": {
++     "pp_trained": 0.4991488989182177,
++     "v3_adamw": 2.509549458699069,
++     "v3_muon": [
++      0.4672233504057179,
++      0.5053734879280968
++     ],
++     "v4_muon": [
++      0.6231448719437706,
++      0.8077350963135926
++     ]
++    },
++    "direct": {
++     "ratio": 1.443335291115221,
++     "q10_q90": [
++      0.4232529817862093,
++      5.38201950256249
++     ],
++     "v4_lower_both_pct": 27.77777777777778,
++     "pp_lower_both_pct": 55.55555555555556,
++     "gap": 0.32305378999701856,
++     "spread_v4": 0.08322701178030203,
++     "spread_v3": 0.08488974563560503,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.2532763032112793,
++     "pp_over_v3_adamw": 0.24046859354269778,
++     "muon_over_adamw_v3": 0.1923245785106833,
++     "recovered": -0.1584104580227987
++    }
++   }
++  }
++ },
++ "no_b_ew": {
++  "train": {
++   "mse": {
++    "n": 161,
++    "med": {
++     "pp_trained": 0.5240507802834927,
++     "v3_adamw": 9.372127512707419,
++     "v3_muon": [
++      1.8445205238543587,
++      2.969780624901786
++     ],
++     "v4_muon": [
++      1.68231903634338,
++      5.004112881216226
++     ]
++    },
++    "direct": {
++     "ratio": 5.981541599995907,
++     "q10_q90": [
++      1.8867441592580318,
++      23.000076761839082
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 98.13664596273291,
++     "gap": 0.7768131274815859,
++     "spread_v4": 0.23179421306493128,
++     "spread_v3": 0.15727402287814918,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.4655419547133732,
++     "pp_over_v3_adamw": 0.047226154827027834,
++     "muon_over_adamw_v3": 0.22650248308150586,
++     "recovered": -0.12520446179932057
++    }
++   },
++   "mse_inside": {
++    "n": 161,
++    "med": {
++     "pp_trained": 0.42572787676908114,
++     "v3_adamw": 0.45449434751597156,
++     "v3_muon": [
++      0.10083728757690788,
++      0.09932774612914126
++     ],
++     "v4_muon": [
++      1.2709586950275231,
++      1.3677668529810136
++     ]
++    },
++    "direct": {
++     "ratio": 3.1606099532762064,
++     "q10_q90": [
++      1.488789414618559,
++      15.062638432902135
++     ],
++     "v4_lower_both_pct": 2.484472049689441,
++     "pp_lower_both_pct": 91.92546583850931,
++     "gap": 0.49977090343470343,
++     "spread_v4": 0.1711716490239795,
++     "spread_v3": 0.07031667763370884,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 12.789767363118512,
++     "pp_over_v3_adamw": 0.8128832299154278,
++     "muon_over_adamw_v3": 0.21125953646461204,
++     "recovered": -12.302323639289805
++    }
++   },
++   "mse_outside": {
++    "n": 161,
++    "med": {
++     "pp_trained": 0.5560680419977398,
++     "v3_adamw": 12.255080106686453,
++     "v3_muon": [
++      2.2321547046737926,
++      3.801434744477887
++     ],
++     "v4_muon": [
++      1.7682607607196057,
++      6.071326686868282
++     ]
++    },
++    "direct": {
++     "ratio": 6.854866374648169,
++     "q10_q90": [
++      1.8459975851555392,
++      24.290226995771313
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 98.13664596273291,
++     "gap": 0.8359989932876657,
++     "spread_v4": 0.24287472810594135,
++     "spread_v3": 0.16574149596082752,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.2807794493258147,
++     "pp_over_v3_adamw": 0.03701650243662697,
++     "muon_over_adamw_v3": 0.22766091261804286,
++     "recovered": -0.07507264863448539
++    }
++   }
++  },
++  "heldout": {
++   "mse": {
++    "n": 77,
++    "med": {
++     "pp_trained": 1.0250618298982723,
++     "v3_adamw": 5.880391843173398,
++     "v3_muon": [
++      1.20116829736758,
++      1.751968261672478
++     ],
++     "v4_muon": [
++      1.2435554218415836,
++      1.6702816338708486
++     ]
++    },
++    "direct": {
++     "ratio": 1.274346683907984,
++     "q10_q90": [
++      0.3769327969624435,
++      6.0110816633956805
++     ],
++     "v4_lower_both_pct": 33.76623376623377,
++     "pp_lower_both_pct": 53.246753246753244,
++     "gap": 0.3184486775067825,
++     "spread_v4": 0.2351930849838233,
++     "spread_v3": 0.18595769534452644,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.0670589227158178,
++     "pp_over_v3_adamw": 0.3342481160275292,
++     "muon_over_adamw_v3": 0.26876232439213726,
++     "recovered": -0.059227912918474165
++    }
++   },
++   "mse_inside": {
++    "n": 77,
++    "med": {
++     "pp_trained": 0.7944013123486255,
++     "v3_adamw": 1.0318600712765469,
++     "v3_muon": [
++      0.3713695552518244,
++      0.3435896047468029
++     ],
++     "v4_muon": [
++      0.9842320808023481,
++      0.8905471750231821
++     ]
++    },
++    "direct": {
++     "ratio": 1.1660880847618869,
++     "q10_q90": [
++      0.39713220065502225,
++      3.773953381658967
++     ],
++     "v4_lower_both_pct": 33.76623376623377,
++     "pp_lower_both_pct": 48.05194805194805,
++     "gap": 0.24784226534973564,
++     "spread_v4": 0.1646677257312997,
++     "spread_v3": 0.15007034361187013,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 3.21530722974322,
++     "pp_over_v3_adamw": 0.7363520240007192,
++     "muon_over_adamw_v3": 0.316490082883318,
++     "recovered": -3.8161556444737275
++    }
++   },
++   "mse_outside": {
++    "n": 77,
++    "med": {
++     "pp_trained": 1.324149504667152,
++     "v3_adamw": 8.179596747079382,
++     "v3_muon": [
++      1.52611515133931,
++      2.1330188714852123
++     ],
++     "v4_muon": [
++      1.332202523384507,
++      1.965203856258574
++     ]
++    },
++    "direct": {
++     "ratio": 1.3790895826225695,
++     "q10_q90": [
++      0.2747876623592385,
++      6.587912853363952
++     ],
++     "v4_lower_both_pct": 35.064935064935064,
++     "pp_lower_both_pct": 48.05194805194805,
++     "gap": 0.3204897866613649,
++     "spread_v4": 0.2516037326204224,
++     "spread_v3": 0.18182949639817833,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.8769121254203276,
++     "pp_over_v3_adamw": 0.2852066596507679,
++     "muon_over_adamw_v3": 0.265608076120236,
++     "recovered": 0.10469842402688388
++    }
++   },
++   "H1": {
++    "n": 12,
++    "med": {
++     "pp_trained": 0.7407592553260909,
++     "v3_adamw": 4.638100044534344,
++     "v3_muon": [
++      0.590900393971182,
++      0.5858833222319787
++     ],
++     "v4_muon": [
++      1.218499036257752,
++      1.845746473859418
++     ]
++    },
++    "direct": {
++     "ratio": 1.813259486846521,
++     "q10_q90": [
++      1.1137558764678754,
++      3.857160711544088
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 66.66666666666666,
++     "gap": 0.2584599583380121,
++     "spread_v4": 0.23692769942630842,
++     "spread_v3": 0.1449933006235703,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 2.497755869718789,
++     "pp_over_v3_adamw": 0.270270212332121,
++     "muon_over_adamw_v3": 0.20952907209496446,
++     "recovered": -0.699663352393659
++    }
++   },
++   "H2": {
++    "n": 37,
++    "med": {
++     "pp_trained": 0.9669450581982342,
++     "v3_adamw": 7.978211254281119,
++     "v3_muon": [
++      1.6929036440411533,
++      3.040718903530285
++     ],
++     "v4_muon": [
++      1.2435554218415836,
++      3.032477792163811
++     ]
++    },
++    "direct": {
++     "ratio": 2.1095245524197135,
++     "q10_q90": [
++      0.708599897941849,
++      8.985724779491049
++     ],
++     "v4_lower_both_pct": 13.513513513513514,
++     "pp_lower_both_pct": 81.08108108108108,
++     "gap": 0.3442528070334976,
++     "spread_v4": 0.25675464866808473,
++     "spread_v3": 0.18595769534452644,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.9406795251662338,
++     "pp_over_v3_adamw": 0.13554047270935962,
++     "muon_over_adamw_v3": 0.24628014906928536,
++     "recovered": 0.03059956218103869
++    }
++   },
++   "H3": {
++    "n": 28,
++    "med": {
++     "pp_trained": 1.658483435966855,
++     "v3_adamw": 1.87043918746028,
++     "v3_muon": [
++      0.8464799508638037,
++      1.0704426153922992
++     ],
++     "v4_muon": [
++      1.1203532362300952,
++      0.8265314477197814
++     ]
++    },
++    "direct": {
++     "ratio": 0.5199175680225405,
++     "q10_q90": [
++      0.19397873517722058,
++      1.0356373808071078
++     ],
++     "v4_lower_both_pct": 75.0,
++     "pp_lower_both_pct": 10.714285714285714,
++     "gap": 0.2889017174055236,
++     "spread_v4": 0.17026821106423606,
++     "spread_v3": 0.23372852025774027,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 0.8790558750526792,
++     "pp_over_v3_adamw": 0.9234073093386708,
++     "muon_over_adamw_v3": 0.5493645048024886,
++     "recovered": 1.6177079009286626
++    }
++   }
++  },
++  "role_changed": {
++   "mse": {
++    "n": 11,
++    "med": {
++     "pp_trained": 0.4060654221201576,
++     "v3_adamw": 13.89381381324464,
++     "v3_muon": [
++      1.1866338250811572,
++      3.332604044923113
++     ],
++     "v4_muon": [
++      2.6386687310768364,
++      3.9688963659143743
++     ]
++    },
++    "direct": {
++     "ratio": 5.838366095298426,
++     "q10_q90": [
++      1.9488932981791611,
++      19.19160762193896
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 100.0,
++     "gap": 0.766291323982419,
++     "spread_v4": 0.0953113827241486,
++     "spread_v3": 0.3696019330050652,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.333345650923931,
++     "pp_over_v3_adamw": 0.028071550440705417,
++     "muon_over_adamw_v3": 0.16046964344572462,
++     "recovered": -0.0805181692896023
++    }
++   },
++   "mse_inside": {
++    "n": 11,
++    "med": {
++     "pp_trained": 0.38637394952498866,
++     "v3_adamw": 0.5054316739456737,
++     "v3_muon": [
++      0.08216054978538061,
++      0.10136053180356958
++     ],
++     "v4_muon": [
++      1.3450051392679885,
++      1.1451373285744308
++     ]
++    },
++    "direct": {
++     "ratio": 3.3085682083238384,
++     "q10_q90": [
++      1.0950654792732435,
++      9.107583558305764
++     ],
++     "v4_lower_both_pct": 9.090909090909092,
++     "pp_lower_both_pct": 81.81818181818183,
++     "gap": 0.5196400923401454,
++     "spread_v4": 0.16578736922986356,
++     "spread_v3": 0.10935344327866937,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 13.472078880367949,
++     "pp_over_v3_adamw": 0.7946048745267423,
++     "muon_over_adamw_v3": 0.19764489068764232,
++     "recovered": -11.311451904060576
++    }
++   },
++   "mse_outside": {
++    "n": 11,
++    "med": {
++     "pp_trained": 0.42517557798580585,
++     "v3_adamw": 16.72029722983432,
++     "v3_muon": [
++      1.3005270782014198,
++      4.0126155609734075
++     ],
++     "v4_muon": [
++      3.2034983992923105,
++      4.4814339734739885
++     ]
++    },
++    "direct": {
++     "ratio": 6.599419723473264,
++     "q10_q90": [
++      1.759100923469533,
++      20.478881437632392
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 100.0,
++     "gap": 0.8195057503944938,
++     "spread_v4": 0.10944847182057846,
++     "spread_v3": 0.38431019922234805,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.0798027962670513,
++     "pp_over_v3_adamw": 0.025473374295954684,
++     "muon_over_adamw_v3": 0.160200262272219,
++     "recovered": -0.020919860022827905
++    }
++   }
++  }
++ },
++ "b": {
++  "train": {
++   "mse": {
++    "n": 284,
++    "med": {
++     "pp_trained": 0.35371004343791934,
++     "v3_adamw": 1.2395238618814677,
++     "v3_muon": [
++      0.2946208328852687,
++      0.3016171288883841
++     ],
++     "v4_muon": [
++      1.2354715427080185,
++      2.2926566342505486
++     ]
++    },
++    "direct": {
++     "ratio": 4.9680681983693535,
++     "q10_q90": [
++      0.9719509751807427,
++      30.67196443305977
++     ],
++     "v4_lower_both_pct": 4.929577464788732,
++     "pp_lower_both_pct": 82.04225352112677,
++     "gap": 0.6961875489181604,
++     "spread_v4": 0.23731676228327817,
++     "spread_v3": 0.09839431033909105,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 4.864186038113088,
++     "pp_over_v3_adamw": 0.24697543181010914,
++     "muon_over_adamw_v3": 0.22359913451513672,
++     "recovered": -1.1311672389492493
++    }
++   },
++   "mse_inside": {
++    "n": 284,
++    "med": {
++     "pp_trained": 0.30903056253615935,
++     "v3_adamw": 0.5035937485259883,
++     "v3_muon": [
++      0.13206135838638258,
++      0.13516207784786755
++     ],
++     "v4_muon": [
++      1.082294308029362,
++      1.826540241133031
++     ]
++    },
++    "direct": {
++     "ratio": 4.361345898413751,
++     "q10_q90": [
++      1.052797773283792,
++      27.00284464238479
++     ],
++     "v4_lower_both_pct": 4.577464788732395,
++     "pp_lower_both_pct": 82.74647887323944,
++     "gap": 0.6396205319417567,
++     "spread_v4": 0.2271607730844447,
++     "spread_v3": 0.07740518066632103,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 9.816773519253713,
++     "pp_over_v3_adamw": 0.5236258697235896,
++     "muon_over_adamw_v3": 0.2234790310195578,
++     "recovered": -3.5304030051439734
++    }
++   },
++   "mse_outside": {
++    "n": 282,
++    "med": {
++     "pp_trained": 0.466712923235534,
++     "v3_adamw": 2.6402632562686676,
++     "v3_muon": [
++      0.5835479904772254,
++      0.6962192846473194
++     ],
++     "v4_muon": [
++      1.4503261307945856,
++      2.4637707205410413
++     ]
++    },
++    "direct": {
++     "ratio": 4.628117637113833,
++     "q10_q90": [
++      0.6918275738532274,
++      31.859788846211764
++     ],
++     "v4_lower_both_pct": 10.28368794326241,
++     "pp_lower_both_pct": 75.53191489361703,
++     "gap": 0.6755591911648288,
++     "spread_v4": 0.2864835700821692,
++     "spread_v3": 0.12856970239501458,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 3.1617451301923905,
++     "pp_over_v3_adamw": 0.16943964510250523,
++     "muon_over_adamw_v3": 0.23449562438811436,
++     "recovered": -0.6484262077647753
++    }
++   }
++  },
++  "heldout": {
++   "mse": {
++    "n": 225,
++    "med": {
++     "pp_trained": 2.914794945362174,
++     "v3_adamw": 3.441490656383263,
++     "v3_muon": [
++      1.3444886825313973,
++      1.6667174970140564
++     ],
++     "v4_muon": [
++      1.7537005744580032,
++      2.6928084099915397
++     ]
++    },
++    "direct": {
++     "ratio": 0.9070139697941697,
++     "q10_q90": [
++      0.154846180817254,
++      6.487833886521374
++     ],
++     "v4_lower_both_pct": 46.666666666666664,
++     "pp_lower_both_pct": 42.22222222222222,
++     "gap": 0.49822876279721773,
++     "spread_v4": 0.22056212908697312,
++     "spread_v3": 0.15205849376614786,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.4756048605021583,
++     "pp_over_v3_adamw": 0.7614262823227355,
++     "muon_over_adamw_v3": 0.36654571667720043,
++     "recovered": -1.4274480625534582
++    }
++   },
++   "mse_inside": {
++    "n": 225,
++    "med": {
++     "pp_trained": 1.9233926516142221,
++     "v3_adamw": 1.6262148180596496,
++     "v3_muon": [
++      0.6451710286936119,
++      0.6712276334721425
++     ],
++     "v4_muon": [
++      1.4189959211758134,
++      1.9712234796681039
++     ]
++    },
++    "direct": {
++     "ratio": 0.9717355917775782,
++     "q10_q90": [
++      0.16596922754293417,
++      6.199970906372702
++     ],
++     "v4_lower_both_pct": 44.44444444444444,
++     "pp_lower_both_pct": 42.66666666666667,
++     "gap": 0.4011527580572071,
++     "spread_v4": 0.20941666847168483,
++     "spread_v3": 0.12899474630925725,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 2.0041609857673546,
++     "pp_over_v3_adamw": 0.9946406362392946,
++     "muon_over_adamw_v3": 0.3740110501331805,
++     "recovered": -129.37372632725993
++    }
++   },
++   "mse_outside": {
++    "n": 225,
++    "med": {
++     "pp_trained": 3.273743316067252,
++     "v3_adamw": 4.211051184435406,
++     "v3_muon": [
++      1.9227807949126243,
++      2.048279591287446
++     ],
++     "v4_muon": [
++      2.1564665550086364,
++      2.9359705876254787
++     ]
++    },
++    "direct": {
++     "ratio": 0.8501995388138679,
++     "q10_q90": [
++      0.14912919879676875,
++      6.349525946377281
++     ],
++     "v4_lower_both_pct": 49.333333333333336,
++     "pp_lower_both_pct": 38.22222222222222,
++     "gap": 0.509738552635661,
++     "spread_v4": 0.21852861596300657,
++     "spread_v3": 0.15671317545874067,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.1583231099779612,
++     "pp_over_v3_adamw": 0.6975308384610179,
++     "muon_over_adamw_v3": 0.3736317392064969,
++     "recovered": -0.40802297168494045
++    }
++   },
++   "H1": {
++    "n": 15,
++    "med": {
++     "pp_trained": 0.6935676639255062,
++     "v3_adamw": 2.341510063941697,
++     "v3_muon": [
++      0.6801301971893083,
++      0.7618833645285581
++     ],
++     "v4_muon": [
++      4.85589634705155,
++      6.566708788770169
++     ]
++    },
++    "direct": {
++     "ratio": 3.2805201049926147,
++     "q10_q90": [
++      1.354949817151938,
++      14.30572921277361
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 80.0,
++     "gap": 0.5159427037182521,
++     "spread_v4": 0.17873493425939785,
++     "spread_v3": 0.16051672907318387,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 2.0062834177926434,
++     "pp_over_v3_adamw": 0.26065166339501084,
++     "muon_over_adamw_v3": 0.31236141806563217,
++     "recovered": -0.5178486539752832
++    }
++   },
++   "H2": {
++    "n": 46,
++    "med": {
++     "pp_trained": 0.7966355524675832,
++     "v3_adamw": 1.913840454152772,
++     "v3_muon": [
++      0.4556519230608317,
++      0.4588187798572121
++     ],
++     "v4_muon": [
++      1.4177703789451324,
++      1.5974091602613323
++     ]
++    },
++    "direct": {
++     "ratio": 1.7357569546648322,
++     "q10_q90": [
++      0.7253206127253635,
++      6.591850564891992
++     ],
++     "v4_lower_both_pct": 10.869565217391305,
++     "pp_lower_both_pct": 76.08695652173914,
++     "gap": 0.26130452301172113,
++     "spread_v4": 0.17190553148382345,
++     "spread_v3": 0.13869968851384215,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 3.408252204120134,
++     "pp_over_v3_adamw": 0.4777912989651765,
++     "muon_over_adamw_v3": 0.2454167423792631,
++     "recovered": -1.6602094917623376
++    }
++   },
++   "H3": {
++    "n": 164,
++    "med": {
++     "pp_trained": 4.734528984146348,
++     "v3_adamw": 4.179471991596021,
++     "v3_muon": [
++      2.342479802830809,
++      2.303642376280319
++     ],
++     "v4_muon": [
++      1.9200039931100907,
++      3.110643980906365
++     ]
++    },
++    "direct": {
++     "ratio": 0.4759275323203001,
++     "q10_q90": [
++      0.13333619302476551,
++      4.519454498429868
++     ],
++     "v4_lower_both_pct": 60.97560975609756,
++     "pp_lower_both_pct": 29.268292682926827,
++     "gap": 0.5555371279722556,
++     "spread_v4": 0.2378842174115682,
++     "spread_v3": 0.15293154428373423,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 1.119675143707079,
++     "pp_over_v3_adamw": 0.848097613905854,
++     "muon_over_adamw_v3": 0.40515248239214374,
++     "recovered": -0.6860822360031777
++    }
++   }
++  },
++  "role_changed": {
++   "mse": {
++    "n": 57,
++    "med": {
++     "pp_trained": 0.5233718451514194,
++     "v3_adamw": 1.9610864440772124,
++     "v3_muon": [
++      0.4755013795489694,
++      0.5678534840530683
++     ],
++     "v4_muon": [
++      2.4083262194856165,
++      2.8432473471308786
++     ]
++    },
++    "direct": {
++     "ratio": 5.412660057537692,
++     "q10_q90": [
++      1.6050209911864188,
++      47.03374927234694
++     ],
++     "v4_lower_both_pct": 1.7543859649122806,
++     "pp_lower_both_pct": 94.73684210526315,
++     "gap": 0.7334107520547478,
++     "spread_v4": 0.24006031881250087,
++     "spread_v3": 0.08597730943442689,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 5.380682292023461,
++     "pp_over_v3_adamw": 0.2772612243348389,
++     "muon_over_adamw_v3": 0.22037331618634842,
++     "recovered": -1.3118346769765783
++    }
++   },
++   "mse_inside": {
++    "n": 57,
++    "med": {
++     "pp_trained": 0.43597249969318247,
++     "v3_adamw": 0.6536009089109452,
++     "v3_muon": [
++      0.17552551486707121,
++      0.174153559917611
++     ],
++     "v4_muon": [
++      1.4990620620035433,
++      2.5990621454325815
++     ]
++    },
++    "direct": {
++     "ratio": 4.614730183407822,
++     "q10_q90": [
++      1.57766069525966,
++      17.488490641501162
++     ],
++     "v4_lower_both_pct": 3.508771929824561,
++     "pp_lower_both_pct": 92.98245614035088,
++     "gap": 0.6641463135346913,
++     "spread_v4": 0.2616688542180713,
++     "spread_v3": 0.06254083975283914,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 13.435562586873692,
++     "pp_over_v3_adamw": 0.656685749226689,
++     "muon_over_adamw_v3": 0.23130506229291603,
++     "recovered": -6.177403523678089
++    }
++   },
++   "mse_outside": {
++    "n": 57,
++    "med": {
++     "pp_trained": 0.6656472741034726,
++     "v3_adamw": 4.421222807610404,
++     "v3_muon": [
++      0.7921515665916771,
++      1.0763154931909387
++     ],
++     "v4_muon": [
++      2.460703534675058,
++      3.2769776054370103
++     ]
++    },
++    "direct": {
++     "ratio": 3.8841066129850135,
++     "q10_q90": [
++      1.0510767548946762,
++      37.003728374578415
++     ],
++     "v4_lower_both_pct": 5.263157894736842,
++     "pp_lower_both_pct": 89.47368421052632,
++     "gap": 0.5892911421411248,
++     "spread_v4": 0.22490452753552712,
++     "spread_v3": 0.12329595137789796,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 4.224279821397166,
++     "pp_over_v3_adamw": 0.21360874168778948,
++     "muon_over_adamw_v3": 0.20308156775580008,
++     "recovered": -0.933428451787504
++    }
++   }
++  },
++  "dropped_in_v4": {
++   "mse": {
++    "n": 33,
++    "med": {
++     "pp_trained": 0.235876779302451,
++     "v3_adamw": 0.31842218155419016,
++     "v3_muon": [
++      0.062439175779703204,
++      0.08588626947483112
++     ],
++     "v4_muon": [
++      6.386271439471853,
++      6.498209966078168
++     ]
++    },
++    "direct": {
++     "ratio": 24.330091472839722,
++     "q10_q90": [
++      12.270750341184007,
++      92.22901816478235
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 100.0,
++     "gap": 1.3861437417329088,
++     "spread_v4": 0.17354387991436784,
++     "spread_v3": 0.1718767563033563,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 51.06938984653774,
++     "pp_over_v3_adamw": 0.4987355214510043,
++     "muon_over_adamw_v3": 0.24365483761477172,
++     "recovered": -5.653733066538053
++    }
++   },
++   "mse_inside": {
++    "n": 33,
++    "med": {
++     "pp_trained": 0.19542093656819298,
++     "v3_adamw": 0.18633374210086598,
++     "v3_muon": [
++      0.038762144769344906,
++      0.051446209811903405
++     ],
++     "v4_muon": [
++      7.3030585753137025,
++      7.02790013835022
++     ]
++    },
++    "direct": {
++     "ratio": 34.593172422086305,
++     "q10_q90": [
++      22.739971923006824,
++      102.78874040371967
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 100.0,
++     "gap": 1.5389903915092829,
++     "spread_v4": 0.18069335747209436,
++     "spread_v3": 0.09110995488097738,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 122.25477054626379,
++     "pp_over_v3_adamw": 0.7246182553272358,
++     "muon_over_adamw_v3": 0.24704053422293165,
++     "recovered": -14.92068724093349
++    }
++   },
++   "mse_outside": {
++    "n": 32,
++    "med": {
++     "pp_trained": 0.34134918473226195,
++     "v3_adamw": 0.7061565007145113,
++     "v3_muon": [
++      0.14084839818514316,
++      0.13479595661353894
++     ],
++     "v4_muon": [
++      4.7745118336311885,
++      4.393357148427201
++     ]
++    },
++    "direct": {
++     "ratio": 12.012452222547479,
++     "q10_q90": [
++      4.766135898845048,
++      53.58861947828299
++     ],
++     "v4_lower_both_pct": 0.0,
++     "pp_lower_both_pct": 100.0,
++     "gap": 1.0796316733487972,
++     "spread_v4": 0.1753786443034024,
++     "spread_v3": 0.17716397157056174,
++     "exceeds_seed_spread": true
++    },
++    "relative": {
++     "v4_over_v3_muon": 21.34380124610313,
++     "pp_over_v3_adamw": 0.4284852692109118,
++     "muon_over_adamw_v3": 0.23754772093061524,
++     "recovered": -3.611522432365478
++    }
++   }
++  }
++ }
++}
+\ No newline at end of file
+diff --git a/docs/results.tex b/docs/results.tex
+index cb2d77f1..45dd670e 100644
+--- a/docs/results.tex
++++ b/docs/results.tex
+@@ -1372,6 +1372,137 @@ catalog\_v3's narrower region, more on its one-loop pools, plus everything that
+ in-region cost is the same steps spread over a larger phase space (and so shrinks with a longer run) is not checked
+ here. Two seeds per catalog, short pretrainings.
+ 
++% src: python3 analysis/catalog_v4/compare_pp_trained.py @e8b9aa3e
++% claim: check.max_frac_inside_diff=0
++% claim: check.max_rel_var_t_diff=3e-4
++% claim: no_b_same.train.mse.n=417
++% claim: no_b_same.heldout.mse.n=103
++% claim: no_b_ew.train.mse.n=161
++% claim: no_b_ew.heldout.mse.n=77
++% allow: 13 2000 1396 because they are the beam energy in TeV, the events per read and the pp classes, stated above
++% allow: 3.3 because it is quoted from par. v3_muon
++% allow: 4.7 because it is the b mass in GeV, a setting
++% allow: M|^2
++\emph{catalog\_v4 against training on pp (2026-10-29).} The comparison the user put first (2026-10-26: what mattered
++most was training on catalog\_v4 against training on pp collisions, on the data generated like pp collisions), at no
++new compute. Arms: catalog\_v4's two Muon runs above; the pp-trained arm (par.\ The pp-trained arm,
++\code{FA-ccin2p3-e786bd74}, its read completed by \code{FA-ccin2p3-982b5a14}) and the window-trained dimensionless arm
++it differs from only in how the hadronic classes are sampled (\code{FA-ccin2p3-1c960b22}), both AdamW and one seed;
++catalog\_v3's two Muon runs above. The pp events and their split are one for all of them: in the two collects
++(catalog\_v4's runs and the AdamW arms) each class's share of events inside catalog\_v3's coverage differs by $0$ on
++all $1396$ classes and each class's target variance agrees to $3\times10^{-4}$ (relative), so the $2000$ events per
++class and the inside/outside split are the same (\code{analysis/catalog\_v4/compare\_pp\_trained.py},
++Fig.~\ref{fig:v4_vs_pp_trained}). The pp pools carry catalog\_v3's $|\mathcal M|^2$ (MadGraph's minimal QED order,
++$b$ at $4.7$\,GeV), which is catalog\_v4's only where its full coupling orders add no diagram: of the classes with no
++$b$ trained in both catalogs, $417$ have a catalog\_v4 entry with a single amplitude QCD order in its diagrams (the same
++diagrams, \code{data/mixed\_order\_audit.json}) and $161$ have electroweak diagrams added, a different function on
++which catalog\_v4 is scored without ever having trained it; of those held out in both, $103$ and $77$. The comparison is
++read on the matching classes. The pp-trained arm trained the classes trained in both on pp events of this
++distribution and is read on its own validation pool; the two arms also differ in optimizer: Muon cut catalog\_v3's
++zero-shot error by $3.3$ (par.~\ref{par:v3_muon}). Per group: the medians, the median per-class ratio, the share of
++classes lower in each, the gap against the Muon runs' seed spreads (the pp-trained arm's seed spread is not measured).
++\begin{itemize}
++  \item \emph{Directly.} The $417$ matching classes trained in both: pp-trained $0.43$, catalog\_v4 $0.24$ and
++    % src: python3 analysis/catalog_v4/compare_pp_trained.py @e8b9aa3e
++    % claim: no_b_same.train.mse.n=417
++    % claim: no_b_same.train.mse.pp_med=0.43
++    % claim: no_b_same.train.mse.v4_lo=0.24
++    % claim: no_b_same.train.mse.v4_hi=0.30
++    % claim: no_b_same.train.mse.ratio=0.66
++    % claim: no_b_same.train.mse.v4_lower_both_pct=58
++    % claim: no_b_same.train.mse.pp_lower_both_pct=34
++    % claim: no_b_same.train.mse.gap=0.41
++    % claim: no_b_same.train.mse.spread_v4=0.08
++    % claim: no_b_same.train.mse.spread_v3=0.09
++    % claim: no_b_same.train.mse_inside.ratio=0.56
++    % claim: no_b_same.train.mse_outside.ratio=0.65
++    % claim: no_b_same.heldout.mse.n=103
++    % claim: no_b_same.heldout.mse.pp_med=0.87
++    % claim: no_b_same.heldout.mse.v4_lo=0.48
++    % claim: no_b_same.heldout.mse.v4_hi=0.49
++    % claim: no_b_same.heldout.mse.ratio=0.58
++    % claim: no_b_same.heldout.mse.v4_lower_both_pct=69
++    % claim: no_b_same.heldout.mse.pp_lower_both_pct=22
++    % claim: no_b_same.heldout.mse.gap=0.37
++    % claim: no_b_same.heldout.mse.spread_v4=0.10
++    % claim: no_b_same.heldout.mse.spread_v3=0.11
++    % claim: no_b_same.heldout.mse_inside.ratio=0.53
++    % claim: no_b_same.heldout.mse_outside.ratio=0.53
++    % claim: no_b_same.heldout.H3.ratio=0.20
++    $0.30$; ratio $0.66$, catalog\_v4 lower in both seeds on $58\%$, the pp-trained arm lower than both on $34\%$, gap
++    $0.41$ against seed spreads $0.08$ and $0.09$; inside catalog\_v3's coverage $0.56$, outside $0.65$. The $103$
++    held out in both: $0.87$ against $0.48$ and $0.49$; ratio $0.58$, $69\%$ against $22\%$, gap $0.37$ against
++    $0.10$ and $0.11$; inside $0.53$, outside $0.53$; the top $0.20$.
++  \item \emph{The optimizer's share.} On the same classes catalog\_v3's Muon runs over its AdamW window arm are $0.27$
++    % src: python3 analysis/catalog_v4/compare_pp_trained.py @e8b9aa3e
++    % claim: no_b_same.train.mse.muon_over_adamw_v3=0.27
++    % claim: no_b_same.heldout.mse.muon_over_adamw_v3=0.29
++    and $0.29$: the direct reading sets about a factor three to four of optimizer, in catalog\_v4's favour, against
++    the sampling.
++  \item \emph{Each against its own optimizer's catalog\_v3 window arm.} Training on pp over catalog\_v3's windows
++    % src: python3 analysis/catalog_v4/compare_pp_trained.py @e8b9aa3e
++    % claim: no_b_same.train.mse.pp_over_v3_adamw=0.21
++    % claim: no_b_same.heldout.mse.pp_over_v3_adamw=0.34
++    % claim: no_b_same.train.mse.v4_over_v3_muon=0.56
++    % claim: no_b_same.heldout.mse.v4_over_v3_muon=0.63
++    % claim: no_b_same.train.mse.recovered=0.38
++    % claim: no_b_same.heldout.mse.recovered=0.43
++    % claim: no_b_same.train.mse_outside.pp_over_v3_adamw=0.14
++    % claim: no_b_same.heldout.mse_outside.pp_over_v3_adamw=0.26
++    % claim: no_b_same.train.mse_outside.v4_over_v3_muon=0.35
++    % claim: no_b_same.heldout.mse_outside.v4_over_v3_muon=0.42
++    % claim: no_b_same.train.mse_outside.recovered=0.52
++    % claim: no_b_same.heldout.mse_outside.recovered=0.64
++    % claim: no_b_same.train.mse_inside.pp_over_v3_adamw=0.52
++    % claim: no_b_same.heldout.mse_inside.pp_over_v3_adamw=0.66
++    % claim: no_b_same.train.mse_inside.v4_over_v3_muon=1.01
++    % claim: no_b_same.heldout.mse_inside.v4_over_v3_muon=0.92
++    % claim: no_b_same.heldout.mse_inside.recovered=0.21
++    (AdamW, median per-class ratio) is $0.21$ on the matching classes trained in both and $0.34$ on those held out;
++    catalog\_v4 over catalog\_v3 (Muon) $0.56$ and $0.63$. On a log scale catalog\_v4 recovers a share $0.38$ and
++    $0.43$ of what training on pp gains; outside catalog\_v3's coverage ($0.14$ and $0.26$ against $0.35$ and $0.42$) a
++    share $0.52$ and $0.64$; inside it almost none ($0.52$ and $0.66$ against $1.01$ and $0.92$, a share $0.21$ on the
++    held-out classes).
++  \item \emph{Where catalog\_v4's function is not the pool's} (electroweak diagrams added) it reads $5.98$ times the
++    % src: python3 analysis/catalog_v4/compare_pp_trained.py @e8b9aa3e
++    % claim: no_b_ew.train.mse.ratio=5.98
++    % claim: no_b_ew.heldout.mse.ratio=1.27
++    % claim: no_b_ew.train.mse.v4_over_v3_muon=1.47
++    % claim: no_b.train.mse.ratio=1.31
++    % claim: no_b.heldout.mse.ratio=0.79
++    % claim: b.train.mse.ratio=4.97
++    % claim: b.heldout.mse.ratio=0.91
++    % claim: b.dropped_in_v4.mse.n=33
++    % claim: b.dropped_in_v4.mse.ratio=24.3
++    pp-trained arm on the classes trained in both and $1.27$ on those held out ($1.47$ times catalog\_v3 trained in both);
++    over all classes with no $b$ the ratios are $1.31$ and $0.79$. The pp reading of catalog\_v4 against catalog\_v3
++    above is on all of them, so its training-class and inside-coverage ratios carry this mismatch too. On the $b$
++    classes (the pools' $4.7$\,GeV $b$, which the pp-trained arm trained and catalog\_v4 never saw): $4.97$ trained in
++    both, $0.91$ held out, $24.3$ on the $33$ $b$-Higgs classes catalog\_v4 dropped.
++\end{itemize}
++% allow: 2 3 because they are the proposed arm's seeds and its GPU hours, settings
++So on the classes where the two compute the same function, catalog\_v4 with Muon reads below the pp-trained arm with
++AdamW, on the classes both trained and more so on held-out ones (the top most); but the optimizer alone is worth a
++factor three to four on these pools, and relative to their own baselines catalog\_v4 recovers about two fifths of what
++training on pp gains, about half to two thirds outside catalog\_v3's coverage and almost none inside it. Neither
++reading is clean, since they rest on different optimizers and one AdamW seed: the clean comparison is the pp-trained
++arm with Muon at catalog\_v4's runs' settings, two seeds, about $3$\,GPU-h, proposed to the user and not run. Short
++pretrainings.
++
++\begin{figure}[t]
++  \centering
++  \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_pp_trained.pdf}}
++  % src: python3 analysis/catalog_v4/compare_pp_trained.py @e8b9aa3e
++  % allow: 13 42 43 because they are the beam energy in TeV and the seeds, settings
++  \caption{catalog\_v4 against training on pp, on the $13$\,TeV pp pools, the classes with no $b$ where catalog\_v4's
++    $|\mathcal M|^2$ is the pool's (no electroweak diagram added): each run's median MSE of $\log|\mathcal M|^2$ over
++    the classes trained in both catalogs (left) and held out in both (right), on the whole pool and on its events
++    inside and outside catalog\_v3's coverage. The pp-trained arm and catalog\_v3's window arm it differs from use
++    AdamW (one seed each), catalog\_v3's and catalog\_v4's runs Muon (seed $42$ filled, $43$ open).}
++  % allow: M|^2
++  \label{fig:v4_vs_pp_trained}
++\end{figure}
++
+ \begin{figure}[t]
+   \centering
+   \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_v3_shared.pdf}}

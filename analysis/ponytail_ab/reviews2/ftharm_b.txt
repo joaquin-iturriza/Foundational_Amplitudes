@@ -1,0 +1,10 @@
+Reviewer R7 (repo-reviewer, blind), diff ftharm_b against 0686d9b8.
+Verdict: fix first. Classification sound; units (readout already MSE of log|M|^2), starts (linear probe head = ridge read-out; reset_output_head false), best-checkpoint values, DyHPO curves all checked.
+BLOCKING 1. analysis/transfer/ft_harm.py main (late_best: best_frac >= 0.9; climbs2: climb >= 2) and the matching par:ft_harm claims: two unsourced thresholds; par:nogain (nogain.py) uses a different convention (median last/best, fraction best in first quarter).
+REIMPL: ft_harm.py:readouts | analysis/transfer/lowd_ft.py:load | reads the same READOUT records from a gitignored copy; the committed data/lowd_ft_readout.jsonl holds them
+REIMPL: ft_harm.py main, DyHPO block (best trial per cell) | analysis/transfer/lowd_dyhpo.py:main and analysis/transfer/cells.py:best | picks each method's best trial per cell
+REIMPL: ft_harm.py main, first-round block (per-method best value per cell) | analysis/transfer/lowd_ft.py:load | per-method per-cell MSE of log|M|^2, recomputed with no check against mse_logM2
+REIMPL: ft_harm.py:row (climb, best_frac) | analysis/transfer/nogain.py:main (turn, early) | the curve-shape statistics
+Non-blocking: inputs read from runs/ (gitignored, claims reproducible only in this checkout); docstring claims an assertion the script does not make; 8k grid at D 10^3.5 and 10^4 not the study's final horizon; one sentence of the paragraph neither printed nor claimed; srcl dict duplicated, hard-coded ylim; a silent skip that never fires.
+REIMPLEMENTED: 4
+BLOCKING: 1

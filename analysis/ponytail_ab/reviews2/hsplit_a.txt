@@ -1,0 +1,11 @@
+Reviewer R14 (repo-reviewer, blind), diff hsplit_a against 2731c705.
+Verdict: fix first. The decomposition algebra is right on identical events.
+BLOCKING 1. analysis/catalog_v3/prep_hybrid_level.py:83-89: the blend is evaluated on pT >= 30 (H7c) instead of the 2->5 gap the task names, and its expected level assumes a linear fall with lam (grid unsourced) instead of measuring it.
+BLOCKING 2. analysis/catalog_v3/prep_hybrid_level.py:43-48: the split needs the three arms' npz to hold the same events; nothing checks it.
+REIMPL: prep_hybrid_level.py:KIND, KINDS, feat | analysis/catalog_v3/prep_level.py:comp | composition counts, copied instead of imported
+REIMPL: prep_hybrid_level.py:main np.linalg.solve ridge | analysis/catalog_v3/prep_level.py:main (Ridge alpha 1e-2 on comp) | the composition fit, here also penalising the intercept
+REIMPL: prep_hybrid_level.py:load, probes and level medians | analysis/catalog_v3/short_reads.py:read, main | per-probe level mean(q - t) from the same npz, already in short_reads.json
+REIMPL: prep_hybrid_level.py:main ratio_hq | analysis/catalog_v3/prep_hybrid.py:main vs_dimensionless.level_ratio | median per-probe hybrid/emission-scale level ratio
+Non-blocking: StopIteration on an axis with no reads; skipped probes not listed; the shift reading is an upper reading; data/short_reads gitignored.
+REIMPLEMENTED: 4
+BLOCKING: 2

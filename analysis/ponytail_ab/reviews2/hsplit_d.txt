@@ -1,0 +1,9 @@
+Reviewer R6 (repo-reviewer, blind), diff hsplit_d against 2731c705.
+Verdict: nits only. prep_hybrid_split.py splits each probe's level error into the handed constant and the network's class-mean error; factors checked in experiment.py, network output independent of c_p (tools/zero_shot_parent.py:119-130), all 40 pT >= 30 bases in training, level_ratio the same statistic as prep_hybrid.py; only numerical tolerances hard-coded; H5 left out with reason.
+REIMPL: prep_hybrid_split.py:probe and the per-axis glob | analysis/catalog_v3/short_reads.py:read | the same npz reader and mean(q - t), without read()'s guard
+REIMPL: prep_hybrid_split.py:main level_h / level_q | analysis/catalog_v3/short_reads.py:main | per-axis median level, recomputed
+REIMPL: prep_hybrid_split.py:main level_ratio | analysis/catalog_v3/prep_hybrid.py:main | the same per-probe level-ratio median, already in prep_hybrid.json
+REIMPL: prep_hybrid_split.py:probe cp_val | analysis/catalog_v3/prep_level.py:one (physics_scales.hybrid_cp) | the per-process constant, already loaded as cp_prep_level
+Non-blocking: cp_check_max reported, not asserted; probes missing from an arm dropped silently; no empty-q guard; cp_default on validation not train events; short_reads gitignored; the second part rightly design only.
+REIMPLEMENTED: 4
+BLOCKING: 0

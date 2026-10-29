@@ -1,0 +1,862 @@
+{
+ "dfew": {
+  "runs": {
+   "on": [
+    {
+     "label": "b",
+     "api_calls": 18,
+     "tool_calls": 17,
+     "input": 36,
+     "cache_read": 1108198,
+     "cache_write": 76397,
+     "output": 18194,
+     "reread": 1184631,
+     "lines_added": 154,
+     "lines_code": 154,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 1.18,
+     "project_uses": 1,
+     "project_used": [
+      "heldout_delta.G"
+     ],
+     "reimpl": 4,
+     "blocking": 0,
+     "reimpl_list": [
+      "norm_explore5.py:main (hp58 prediction mu + exp(lsd) h block) | analysis/catalog_daniel/catalog_norm_heldout.py:main (also heldout_delta.py:main) | hp58's prediction on a new process from g's statistics",
+      "norm_explore5.py:main (loading meta, twins, heldout_preds.npz, catalog_norm_{A,B}.npz, stats_net.json) | analysis/catalog_daniel/catalog_norm_heldout.py:main / load | reads the same files into the same dicts",
+      "norm_explore5.py:main (oracle affine on all events) | tools/zero_shot_parent.py (q_aff, line 146) | the oracle affine the npz already holds as q_aff",
+      "norm_explore5.py:main (per-group n / median / p90 dict) | analysis/catalog_daniel/catalog_norm_heldout.py:main | the same per-process MSE summary over 43 new and 96 relabels"
+     ],
+     "review_reread": 411053,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "c",
+     "api_calls": 19,
+     "tool_calls": 19,
+     "input": 38,
+     "cache_read": 1269702,
+     "cache_write": 77576,
+     "output": 17191,
+     "reread": 1347316,
+     "lines_added": 146,
+     "lines_code": 146,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 1.35,
+     "project_uses": 6,
+     "project_used": [
+      "heldout_delta.G",
+      "plot_style.C",
+      "plot_style.legend",
+      "plot_style.panels",
+      "plot_style.save_panels",
+      "plot_style.use"
+     ],
+     "reimpl": 3,
+     "blocking": 3,
+     "reimpl_list": [],
+     "review_reread": 464758,
+     "hit_turn_cap": false
+    }
+   ],
+   "off": [
+    {
+     "label": "a",
+     "api_calls": 23,
+     "tool_calls": 24,
+     "input": 46,
+     "cache_read": 1711382,
+     "cache_write": 95246,
+     "output": 23448,
+     "reread": 1806674,
+     "lines_added": 197,
+     "lines_code": 197,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 1.81,
+     "project_uses": 2,
+     "project_used": [
+      "plot_style.C",
+      "plot_style.save"
+     ],
+     "reimpl": 3,
+     "blocking": 3,
+     "reimpl_list": [
+      "norm_explore5.py:main ~77-79 (z58 q from stats_net phys_gbr) | analysis/catalog_daniel/catalog_norm_heldout.py:main and heldout_delta.py:main | hp58 read with g's predicted mean and std",
+      "norm_explore5.py:main.mse (~94) | analysis/catalog_daniel/catalog_norm_heldout.py:main (mse lambda) | per-process MSE(log|M|^2) of q against t",
+      "norm_explore5.py:main oracle affine (~100-106) | tools/zero_shot_parent.py (q_aff) | the oracle affine, refitted instead of read from q_aff"
+     ],
+     "review_reread": 423475,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "d",
+     "api_calls": 19,
+     "tool_calls": 18,
+     "input": 38,
+     "cache_read": 1177722,
+     "cache_write": 79385,
+     "output": 20481,
+     "reread": 1257145,
+     "lines_added": 210,
+     "lines_code": 210,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 1.26,
+     "project_uses": 6,
+     "project_used": [
+      "heldout_delta.G",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.process_label",
+      "plot_style.save",
+      "plot_style.shared_legend"
+     ],
+     "reimpl": 5,
+     "blocking": 2,
+     "reimpl_list": [
+      "norm_explore5.py:load_models | analysis/catalog_daniel/catalog_norm_heldout.py:main (load), heldout_delta.py:main | reader of heldout_preds.npz, stats_net.json[G] and the A/B npz, copied instead of imported",
+      "norm_explore5.py:main lines 81-86 (meta, twins, probes, 43 new / 96 relabels) | analysis/catalog_daniel/catalog_norm_heldout.py:main | the same class-table and group reader",
+      "norm_explore5.py:summ | analysis/catalog_daniel/catalog_norm_heldout.py:main (res dict) | the same per-group statistic",
+      "norm_explore5.py first-k level | analysis/catalog_daniel/norm_explore4.py:main | the first-k level calibration",
+      "norm_explore5.py oracle affine | __q_aff in the npz (catalog_norm_heldout.py:main) | the in-sample rescale and shift, recomputed"
+     ],
+     "review_reread": 274658,
+     "hit_turn_cap": false
+    }
+   ]
+  },
+  "on": {
+   "tool_calls": 18.0,
+   "reread_M": 1.27,
+   "lines_added": 150.0,
+   "lines_code": 150.0,
+   "lines_tests": 0.0,
+   "lines_text": 0.0,
+   "tests_added": 0.0,
+   "project_uses": 3.5,
+   "reimpl": 3.5,
+   "blocking": 1.5
+  },
+  "on_spread": {
+   "tool_calls": 2,
+   "reread_M": 0.17,
+   "lines_added": 8,
+   "lines_code": 8,
+   "lines_tests": 0,
+   "lines_text": 0,
+   "tests_added": 0,
+   "project_uses": 5,
+   "reimpl": 1,
+   "blocking": 3
+  },
+  "off": {
+   "tool_calls": 21.0,
+   "reread_M": 1.54,
+   "lines_added": 203.5,
+   "lines_code": 203.5,
+   "lines_tests": 0.0,
+   "lines_text": 0.0,
+   "tests_added": 0.0,
+   "project_uses": 4.0,
+   "reimpl": 4.0,
+   "blocking": 2.5
+  },
+  "off_spread": {
+   "tool_calls": 6,
+   "reread_M": 0.55,
+   "lines_added": 13,
+   "lines_code": 13,
+   "lines_tests": 0,
+   "lines_text": 0,
+   "tests_added": 0,
+   "project_uses": 4,
+   "reimpl": 2,
+   "blocking": 1
+  },
+  "beyond_spread": {
+   "tool_calls": false,
+   "reread_M": false,
+   "lines_added": true,
+   "lines_code": true,
+   "lines_tests": false,
+   "lines_text": false,
+   "tests_added": false,
+   "project_uses": false,
+   "reimpl": false,
+   "blocking": false
+  }
+ },
+ "hsplit": {
+  "runs": {
+   "on": [
+    {
+     "label": "b",
+     "api_calls": 30,
+     "tool_calls": 28,
+     "input": 64,
+     "cache_read": 2730448,
+     "cache_write": 107242,
+     "output": 25907,
+     "reread": 2837754,
+     "lines_added": 54,
+     "lines_code": 54,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 2.84,
+     "project_uses": 0,
+     "project_used": [],
+     "reimpl": 4,
+     "blocking": 1,
+     "reimpl_list": [
+      "prep_hybrid_split.py:main 25-30 | analysis/catalog_v3/short_reads.py:read | same loader of the same npz and the same per-probe level, already in short_reads.json",
+      "prep_hybrid_split.py:main level_ratio | analysis/catalog_v3/prep_hybrid.py:main (vs_dimensionless level_ratio) | the same per-probe median level ratio",
+      "prep_hybrid_split.py:main c_val | analysis/catalog_v3/prep_level.py:one (c_p in prep_level.json, already loaded) | the per-process constant on the same validation events",
+      "prep_hybrid_split.py:main dc | analysis/catalog_v3/hybrid_check.py:main (cp_train_minus_val) | the train-minus-validation constant gap (there for 10 pools only)"
+     ],
+     "review_reread": 451275,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "c",
+     "api_calls": 16,
+     "tool_calls": 17,
+     "input": 32,
+     "cache_read": 1181920,
+     "cache_write": 87524,
+     "output": 13664,
+     "reread": 1269476,
+     "lines_added": 74,
+     "lines_code": 74,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 1.27,
+     "project_uses": 0,
+     "project_used": [],
+     "reimpl": 4,
+     "blocking": 2,
+     "reimpl_list": [],
+     "review_reread": 456204,
+     "hit_turn_cap": false
+    }
+   ],
+   "off": [
+    {
+     "label": "a",
+     "api_calls": 24,
+     "tool_calls": 22,
+     "input": 52,
+     "cache_read": 1909079,
+     "cache_write": 95305,
+     "output": 24336,
+     "reread": 2004436,
+     "lines_added": 85,
+     "lines_code": 85,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 2.0,
+     "project_uses": 0,
+     "project_used": [],
+     "reimpl": 4,
+     "blocking": 2,
+     "reimpl_list": [
+      "prep_hybrid_level.py:KIND, KINDS, feat | analysis/catalog_v3/prep_level.py:comp | composition counts, copied instead of imported",
+      "prep_hybrid_level.py:main np.linalg.solve ridge | analysis/catalog_v3/prep_level.py:main (Ridge alpha 1e-2 on comp) | the composition fit, here also penalising the intercept",
+      "prep_hybrid_level.py:load, probes and level medians | analysis/catalog_v3/short_reads.py:read, main | per-probe level mean(q - t) from the same npz, already in short_reads.json",
+      "prep_hybrid_level.py:main ratio_hq | analysis/catalog_v3/prep_hybrid.py:main vs_dimensionless.level_ratio | median per-probe hybrid/emission-scale level ratio"
+     ],
+     "review_reread": 368774,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "d",
+     "api_calls": 24,
+     "tool_calls": 24,
+     "input": 48,
+     "cache_read": 1764614,
+     "cache_write": 89031,
+     "output": 19143,
+     "reread": 1853693,
+     "lines_added": 117,
+     "lines_code": 117,
+     "lines_tests": 0,
+     "lines_text": 0,
+     "tests_added": 0,
+     "reread_M": 1.85,
+     "project_uses": 0,
+     "project_used": [],
+     "reimpl": 4,
+     "blocking": 0,
+     "reimpl_list": [
+      "prep_hybrid_split.py:probe and the per-axis glob | analysis/catalog_v3/short_reads.py:read | the same npz reader and mean(q - t), without read()'s guard",
+      "prep_hybrid_split.py:main level_h / level_q | analysis/catalog_v3/short_reads.py:main | per-axis median level, recomputed",
+      "prep_hybrid_split.py:main level_ratio | analysis/catalog_v3/prep_hybrid.py:main | the same per-probe level-ratio median, already in prep_hybrid.json",
+      "prep_hybrid_split.py:probe cp_val | analysis/catalog_v3/prep_level.py:one (physics_scales.hybrid_cp) | the per-process constant, already loaded as cp_prep_level"
+     ],
+     "review_reread": 410227,
+     "hit_turn_cap": false
+    }
+   ]
+  },
+  "on": {
+   "tool_calls": 22.5,
+   "reread_M": 2.05,
+   "lines_added": 64.0,
+   "lines_code": 64.0,
+   "lines_tests": 0.0,
+   "lines_text": 0.0,
+   "tests_added": 0.0,
+   "project_uses": 0.0,
+   "reimpl": 4.0,
+   "blocking": 1.5
+  },
+  "on_spread": {
+   "tool_calls": 11,
+   "reread_M": 1.57,
+   "lines_added": 20,
+   "lines_code": 20,
+   "lines_tests": 0,
+   "lines_text": 0,
+   "tests_added": 0,
+   "project_uses": 0,
+   "reimpl": 0,
+   "blocking": 1
+  },
+  "off": {
+   "tool_calls": 23.0,
+   "reread_M": 1.93,
+   "lines_added": 101.0,
+   "lines_code": 101.0,
+   "lines_tests": 0.0,
+   "lines_text": 0.0,
+   "tests_added": 0.0,
+   "project_uses": 0.0,
+   "reimpl": 4.0,
+   "blocking": 1.0
+  },
+  "off_spread": {
+   "tool_calls": 2,
+   "reread_M": 0.15,
+   "lines_added": 32,
+   "lines_code": 32,
+   "lines_tests": 0,
+   "lines_text": 0,
+   "tests_added": 0,
+   "project_uses": 0,
+   "reimpl": 0,
+   "blocking": 2
+  },
+  "beyond_spread": {
+   "tool_calls": false,
+   "reread_M": false,
+   "lines_added": true,
+   "lines_code": true,
+   "lines_tests": false,
+   "lines_text": false,
+   "tests_added": false,
+   "project_uses": false,
+   "reimpl": false,
+   "blocking": false
+  }
+ },
+ "v4pp": {
+  "runs": {
+   "on": [
+    {
+     "label": "a",
+     "api_calls": 28,
+     "tool_calls": 28,
+     "input": 56,
+     "cache_read": 3194466,
+     "cache_write": 134583,
+     "output": 24195,
+     "reread": 3329105,
+     "lines_added": 244,
+     "lines_code": 149,
+     "lines_tests": 0,
+     "lines_text": 95,
+     "tests_added": 0,
+     "reread_M": 3.33,
+     "project_uses": 8,
+     "project_used": [
+      "compare_v3.CHECK",
+      "compare_v3.RUNS",
+      "compare_v3.SR",
+      "compare_v3.has_b",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.legend",
+      "plot_style.save"
+     ],
+     "reimpl": 4,
+     "blocking": 2,
+     "reimpl_list": [
+      "pp_trained_compare.py:rows (57-68) | analysis/catalog_v4/compare_v3.py:pp (197-225) | the same reduction of the same short_reads PP npz with the same site mask; weaker match check",
+      "pp_trained_compare.py:main 83-94, 115-118 | analysis/catalog_v4/compare_v3.py:pp (172-189, 237-239) | the class-role table through class_changes, copied line for line",
+      "pp_trained_compare.py:ratio and main 103-111 | analysis/catalog_v4/compare_v3.py:compare | the per-class v4-over-v3 ratio statistic; v4_gain already in compare_v3.json",
+      "pp_trained_compare.py:main 111 | analysis/catalog_v3/pp_compare.py:pp_vs | the per-class median ratio of pp-trained over window-trained arm"
+     ],
+     "review_reread": 320000,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "d",
+     "api_calls": 55,
+     "tool_calls": 48,
+     "input": 126,
+     "cache_read": 7794161,
+     "cache_write": 192849,
+     "output": 49772,
+     "reread": 7987136,
+     "lines_added": 294,
+     "lines_code": 165,
+     "lines_tests": 0,
+     "lines_text": 129,
+     "tests_added": 0,
+     "reread_M": 7.99,
+     "project_uses": 8,
+     "project_used": [
+      "compare_v3.PP_GROUPS",
+      "compare_v3.RUNS",
+      "compare_v3.SR",
+      "compare_v3.pp",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.save",
+      "plot_style.shared_legend"
+     ],
+     "reimpl": 6,
+     "blocking": 1,
+     "reimpl_list": [],
+     "review_reread": 483393,
+     "hit_turn_cap": false
+    }
+   ],
+   "off": [
+    {
+     "label": "b",
+     "api_calls": 38,
+     "tool_calls": 43,
+     "input": 76,
+     "cache_read": 4813262,
+     "cache_write": 158793,
+     "output": 35936,
+     "reread": 4972131,
+     "lines_added": 323,
+     "lines_code": 204,
+     "lines_tests": 0,
+     "lines_text": 119,
+     "tests_added": 0,
+     "reread_M": 4.97,
+     "project_uses": 9,
+     "project_used": [
+      "compare_v3.RUNS",
+      "compare_v3.SR",
+      "compare_v3.has_b",
+      "compare_v3.pp_reads",
+      "plot_style.C",
+      "plot_style.legend",
+      "plot_style.make_room",
+      "plot_style.panels",
+      "plot_style.save_panels"
+     ],
+     "reimpl": 4,
+     "blocking": 1,
+     "reimpl_list": [
+      "compare_pp_trained.py:stats + main 114-119 | analysis/catalog_v4/compare_v3.py:compare | the same per-class ratio statistics, compare() hard-wired to the v3/v4 pair",
+      "compare_pp_trained.py:main 120, 131 | analysis/catalog_v3/pp_compare.py:pp_vs | per-class median ratio over the window-trained arm",
+      "compare_pp_trained.py:main 98-100 | analysis/catalog_v3/pp_compare.py:read | the reader of pp_rows.json, without its no_prediction list",
+      "compare_pp_trained.py:main 101 gm lambda | analysis/catalog_v4/compare_v3.py:gmean | geometric mean of two seeds"
+     ],
+     "review_reread": 560016,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "c",
+     "api_calls": 54,
+     "tool_calls": 46,
+     "input": 124,
+     "cache_read": 7294795,
+     "cache_write": 173903,
+     "output": 41558,
+     "reread": 7468822,
+     "lines_added": 323,
+     "lines_code": 212,
+     "lines_tests": 0,
+     "lines_text": 111,
+     "tests_added": 0,
+     "reread_M": 7.47,
+     "project_uses": 9,
+     "project_used": [
+      "compare_v3.RUNS",
+      "compare_v3.SR",
+      "compare_v3.has_b",
+      "compare_v3.pp_reads",
+      "compare_v3.pp_roles",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.save",
+      "plot_style.shared_legend"
+     ],
+     "reimpl": 6,
+     "blocking": 1,
+     "reimpl_list": [],
+     "review_reread": 776408,
+     "hit_turn_cap": false
+    }
+   ]
+  },
+  "on": {
+   "tool_calls": 38.0,
+   "reread_M": 5.66,
+   "lines_added": 269.0,
+   "lines_code": 157.0,
+   "lines_tests": 0.0,
+   "lines_text": 112.0,
+   "tests_added": 0.0,
+   "project_uses": 8.0,
+   "reimpl": 5.0,
+   "blocking": 1.5
+  },
+  "on_spread": {
+   "tool_calls": 20,
+   "reread_M": 4.66,
+   "lines_added": 50,
+   "lines_code": 16,
+   "lines_tests": 0,
+   "lines_text": 34,
+   "tests_added": 0,
+   "project_uses": 0,
+   "reimpl": 2,
+   "blocking": 1
+  },
+  "off": {
+   "tool_calls": 44.5,
+   "reread_M": 6.22,
+   "lines_added": 323.0,
+   "lines_code": 208.0,
+   "lines_tests": 0.0,
+   "lines_text": 115.0,
+   "tests_added": 0.0,
+   "project_uses": 9.0,
+   "reimpl": 5.0,
+   "blocking": 1.0
+  },
+  "off_spread": {
+   "tool_calls": 3,
+   "reread_M": 2.5,
+   "lines_added": 0,
+   "lines_code": 8,
+   "lines_tests": 0,
+   "lines_text": 8,
+   "tests_added": 0,
+   "project_uses": 0,
+   "reimpl": 2,
+   "blocking": 0
+  },
+  "beyond_spread": {
+   "tool_calls": false,
+   "reread_M": false,
+   "lines_added": true,
+   "lines_code": true,
+   "lines_tests": false,
+   "lines_text": false,
+   "tests_added": false,
+   "project_uses": true,
+   "reimpl": false,
+   "blocking": false
+  }
+ },
+ "ftharm": {
+  "runs": {
+   "on": [
+    {
+     "label": "b",
+     "api_calls": 49,
+     "tool_calls": 51,
+     "input": 98,
+     "cache_read": 5934569,
+     "cache_write": 156097,
+     "output": 45300,
+     "reread": 6090764,
+     "lines_added": 300,
+     "lines_code": 200,
+     "lines_tests": 0,
+     "lines_text": 100,
+     "tests_added": 0,
+     "reread_M": 6.09,
+     "project_uses": 7,
+     "project_used": [
+      "cells.best",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.legend",
+      "plot_style.make_room",
+      "plot_style.save",
+      "rung_grid.fam"
+     ],
+     "reimpl": 4,
+     "blocking": 1,
+     "reimpl_list": [
+      "ft_harm.py:readouts | analysis/transfer/lowd_ft.py:load | reads the same READOUT records from a gitignored copy; the committed data/lowd_ft_readout.jsonl holds them",
+      "ft_harm.py main, DyHPO block (best trial per cell) | analysis/transfer/lowd_dyhpo.py:main and analysis/transfer/cells.py:best | picks each method's best trial per cell",
+      "ft_harm.py main, first-round block (per-method best value per cell) | analysis/transfer/lowd_ft.py:load | per-method per-cell MSE of log|M|^2, recomputed with no check against mse_logM2",
+      "ft_harm.py:row (climb, best_frac) | analysis/transfer/nogain.py:main (turn, early) | the curve-shape statistics"
+     ],
+     "review_reread": 679919,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "c",
+     "api_calls": 54,
+     "tool_calls": 48,
+     "input": 128,
+     "cache_read": 6867213,
+     "cache_write": 178618,
+     "output": 53260,
+     "reread": 7045959,
+     "lines_added": 343,
+     "lines_code": 251,
+     "lines_tests": 0,
+     "lines_text": 92,
+     "tests_added": 0,
+     "reread_M": 7.05,
+     "project_uses": 5,
+     "project_used": [
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.legend",
+      "plot_style.make_room",
+      "plot_style.save"
+     ],
+     "reimpl": 6,
+     "blocking": 4,
+     "reimpl_list": [
+      "ft_harm.py:fam | analysis/transfer/rung_grid.py:fam | identical rung-to-family mapping redefined instead of imported",
+      "ft_harm.py:grid (tr = S.get(name)+S.get(name+\"_002\"), min(val_loss*prepd_std**2)) | analysis/transfer/cells.py:best | best trial over name and name_002 sweeps at the best checkpoint; skips cells.py's unconverted-trial reporting",
+      "ft_harm.py:dyhpo (tr filter and best-trial pick) | analysis/transfer/lowd_dyhpo.py:main | per-method, per-cell best-trial selection on lowd_dyhpo_sweeps.json",
+      "ft_harm.py:pack (readout/*.json loop) | analysis/transfer/lowd_ft.py:load (data/lowd_ft_readout.jsonl) | re-reads the same 60 read-outs from run dirs instead of the committed file",
+      "ft_harm.py:pack (data/lowd_ft_runs.jsonl by method, probe, rung, k) | analysis/transfer/lowd_ft.py:load | same first-round run-record reader",
+      "ft_harm.py:one/summarise (first=v[0], climb=log10(last/best), best_frac) | analysis/transfer/nogain_start.py:stats and analysis/transfer/nogain.py:main (turn, early) | first validation vs best, last-over-best ratio, where the best sits"
+     ],
+     "review_reread": 358308,
+     "hit_turn_cap": false
+    }
+   ],
+   "off": [
+    {
+     "label": "a",
+     "api_calls": 50,
+     "tool_calls": 53,
+     "input": 100,
+     "cache_read": 6000507,
+     "cache_write": 161314,
+     "output": 52417,
+     "reread": 6161921,
+     "lines_added": 364,
+     "lines_code": 261,
+     "lines_tests": 0,
+     "lines_text": 103,
+     "tests_added": 0,
+     "reread_M": 6.16,
+     "project_uses": 5,
+     "project_used": [
+      "cells.S",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.save",
+      "plot_style.shared_legend"
+     ],
+     "reimpl": 7,
+     "blocking": 2,
+     "reimpl_list": [
+      "ft_harm.py:fam | analysis/transfer/rung_grid.py:fam | identical rung-to-family mapping",
+      "ft_harm.py:gather grid block | analysis/transfer/cells.py:best | a sweep's best trial in MSE of log|M|^2 with the _002 continuation",
+      "ft_harm.py:gather round2 block | analysis/transfer/lowd_dyhpo.py:main | per-cell per-method best trial of the DyHPO round",
+      "ft_harm.py:METHODS/LABEL and figure() col | analysis/transfer/lowd_ft.py:TRAINED/LABEL and plot() cols | method list, labels and colours",
+      "ft_harm.py:starts (lowd_ft_readout.jsonl) | analysis/transfer/lowd_ft.py:load | reads the same read-out file per cell",
+      "ft_harm.py:collect (lowd_ft_runs.jsonl) | analysis/transfer/lowd_ft.py:load | reads the same first-round runs file",
+      "ft_harm.py:run_row | analysis/transfer/nogain_start.py:stats and analysis/transfer/nogain.py:main | the same curve statistics"
+     ],
+     "review_reread": 1150824,
+     "hit_turn_cap": false
+    },
+    {
+     "label": "d",
+     "api_calls": 43,
+     "tool_calls": 45,
+     "input": 86,
+     "cache_read": 4712214,
+     "cache_write": 147786,
+     "output": 47073,
+     "reread": 4860086,
+     "lines_added": 320,
+     "lines_code": 231,
+     "lines_tests": 0,
+     "lines_text": 89,
+     "tests_added": 0,
+     "reread_M": 4.86,
+     "project_uses": 9,
+     "project_used": [
+      "cells.S",
+      "cells.best",
+      "plot_style.C",
+      "plot_style.figure",
+      "plot_style.legend",
+      "plot_style.make_room",
+      "plot_style.save",
+      "plot_style.sequence",
+      "rung_grid.fam"
+     ],
+     "reimpl": 3,
+     "blocking": 2,
+     "reimpl_list": [
+      "ft_harm.py:readouts (lines 34-52) | analysis/transfer/lowd_ft.py:load | reads the 60 cells' linear_readout records from a gitignored copy instead of committed data/lowd_ft_readout.jsonl",
+      "ft_harm.py:main DyHPO best-trial lines (tr = [...]; b = min(tr, key=val_loss*prepd_std**2)) | analysis/transfer/lowd_dyhpo.py:main (same rule as cells.py:best) | best trial per lowd sweep in MSE of log|M|^2",
+      "ft_harm.py:describe | analysis/transfer/nogain_start.py:stats | first validation and minimum of a val_curve"
+     ],
+     "review_reread": 609468,
+     "hit_turn_cap": false
+    }
+   ]
+  },
+  "on": {
+   "tool_calls": 49.5,
+   "reread_M": 6.57,
+   "lines_added": 321.5,
+   "lines_code": 225.5,
+   "lines_tests": 0.0,
+   "lines_text": 96.0,
+   "tests_added": 0.0,
+   "project_uses": 6.0,
+   "reimpl": 5.0,
+   "blocking": 2.5
+  },
+  "on_spread": {
+   "tool_calls": 3,
+   "reread_M": 0.96,
+   "lines_added": 43,
+   "lines_code": 51,
+   "lines_tests": 0,
+   "lines_text": 8,
+   "tests_added": 0,
+   "project_uses": 2,
+   "reimpl": 2,
+   "blocking": 3
+  },
+  "off": {
+   "tool_calls": 49.0,
+   "reread_M": 5.51,
+   "lines_added": 342.0,
+   "lines_code": 246.0,
+   "lines_tests": 0.0,
+   "lines_text": 96.0,
+   "tests_added": 0.0,
+   "project_uses": 7.0,
+   "reimpl": 5.0,
+   "blocking": 2.0
+  },
+  "off_spread": {
+   "tool_calls": 8,
+   "reread_M": 1.3,
+   "lines_added": 44,
+   "lines_code": 30,
+   "lines_tests": 0,
+   "lines_text": 14,
+   "tests_added": 0,
+   "project_uses": 4,
+   "reimpl": 4,
+   "blocking": 0
+  },
+  "beyond_spread": {
+   "tool_calls": false,
+   "reread_M": false,
+   "lines_added": false,
+   "lines_code": false,
+   "lines_tests": false,
+   "lines_text": false,
+   "tests_added": false,
+   "project_uses": false,
+   "reimpl": false,
+   "blocking": false
+  }
+ },
+ "summary": {
+  "tool_calls": {
+   "on_lower": 3,
+   "beyond_spread": 0,
+   "on_sum": 128.0,
+   "off_sum": 137.5
+  },
+  "reread_M": {
+   "on_lower": 2,
+   "beyond_spread": 0,
+   "on_sum": 15.55,
+   "off_sum": 15.2
+  },
+  "lines_added": {
+   "on_lower": 4,
+   "beyond_spread": 3,
+   "on_sum": 804.5,
+   "off_sum": 969.5
+  },
+  "lines_code": {
+   "on_lower": 4,
+   "beyond_spread": 3,
+   "on_sum": 596.5,
+   "off_sum": 758.5
+  },
+  "lines_tests": {
+   "on_lower": 0,
+   "beyond_spread": 0,
+   "on_sum": 0.0,
+   "off_sum": 0.0
+  },
+  "lines_text": {
+   "on_lower": 1,
+   "beyond_spread": 0,
+   "on_sum": 208.0,
+   "off_sum": 211.0
+  },
+  "tests_added": {
+   "on_lower": 0,
+   "beyond_spread": 0,
+   "on_sum": 0.0,
+   "off_sum": 0.0
+  },
+  "project_uses": {
+   "on_lower": 3,
+   "beyond_spread": 1,
+   "on_sum": 17.5,
+   "off_sum": 20.0
+  },
+  "reimpl": {
+   "on_lower": 1,
+   "beyond_spread": 0,
+   "on_sum": 17.5,
+   "off_sum": 18.0
+  },
+  "blocking": {
+   "on_lower": 1,
+   "beyond_spread": 0,
+   "on_sum": 7.0,
+   "off_sum": 6.5
+  }
+ },
+ "total": {
+  "reread": 61477049,
+  "review_reread": 8198760,
+  "reread_M": 61.5,
+  "review_reread_M": 8.2,
+  "all_reread_M": 69.7
+ }
+}

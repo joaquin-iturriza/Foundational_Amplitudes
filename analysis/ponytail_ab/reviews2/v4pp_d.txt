@@ -1,0 +1,3 @@
+Reviewer R1 (repo-reviewer, blind), diff v4pp_d. Its full report reached the orchestrating session, which relayed only its two final counts; the findings are not listed here.
+REIMPLEMENTED: 6
+BLOCKING: 1

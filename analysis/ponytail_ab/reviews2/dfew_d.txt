@@ -1,0 +1,12 @@
+Reviewer R10 (repo-reviewer, blind), diff dfew_d against 6cc61e63.
+Verdict: fix first. Does what the task asked otherwise (hp58, A, B; level, affine, affine + invariant; k = 3, 10, 30, 100; 5 draws; median and 90%; random against smallest, largest, spread s_hat).
+BLOCKING 1. norm_explore5.py:88-90 (linv, has_s): 2->1 processes counted as having s_hat; logF is constant there, so the s_hat-ordered samplings are arbitrary on 10 processes.
+BLOCKING 2. norm_explore5.py:46-48, 197-228: B reported as plain "B" though it blew up; CLAUDE.md Reported values; catalog_norm_heldout.py's BLOWUP mark dropped.
+REIMPL: norm_explore5.py:load_models | analysis/catalog_daniel/catalog_norm_heldout.py:main (load), heldout_delta.py:main | reader of heldout_preds.npz, stats_net.json[G] and the A/B npz, copied instead of imported
+REIMPL: norm_explore5.py:main lines 81-86 (meta, twins, probes, 43 new / 96 relabels) | analysis/catalog_daniel/catalog_norm_heldout.py:main | the same class-table and group reader
+REIMPL: norm_explore5.py:summ | analysis/catalog_daniel/catalog_norm_heldout.py:main (res dict) | the same per-group statistic
+REIMPL: norm_explore5.py first-k level | analysis/catalog_daniel/norm_explore4.py:main | the first-k level calibration
+REIMPL: norm_explore5.py oracle affine | __q_aff in the npz (catalog_norm_heldout.py:main) | the in-sample rescale and shift, recomputed
+Non-blocking: ridge grid LAMS unsourced exploration; docstring's shrinkage statement approximate; a comment names ridge for OLS values; a dead conditional; same draws for every process; affine+inv at k = 3 interpolates; A's affine units not checked; s key available through collect_heldout_preds.py. Figure through plot_style (ps.figure, ps.process_label, ps.shared_legend, ps.save).
+REIMPLEMENTED: 5
+BLOCKING: 2

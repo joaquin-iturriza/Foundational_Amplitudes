@@ -1,0 +1,11 @@
+Reviewer R13 (repo-reviewer, blind), diff v4pp_a against 6e34f573.
+Verdict: fix first. Muon reads matched event by event to pp_compare.collect's support mask; inside share asserted per class; best checkpoint; groups follow compare_v3.pp.
+BLOCKING 1. docs/results.tex:1409: broken sentence, the \ref to the pp study's paragraph dropped ("of par. The pp-trained arm").
+BLOCKING 2. docs/results.tex:1436-1440, 1460-1462, pp_trained_compare.py:106-114: directional conclusions (trails at 1.31, leads at 0.79, recovers 0.15 to 0.35) with no seed-spread check, against compare_v3.py:compare's convention; the script computes no spread although the Muon side has two seeds.
+REIMPL: pp_trained_compare.py:rows (57-68) | analysis/catalog_v4/compare_v3.py:pp (197-225) | the same reduction of the same short_reads PP npz with the same site mask; weaker match check
+REIMPL: pp_trained_compare.py:main 83-94, 115-118 | analysis/catalog_v4/compare_v3.py:pp (172-189, 237-239) | the class-role table through class_changes, copied line for line
+REIMPL: pp_trained_compare.py:ratio and main 103-111 | analysis/catalog_v4/compare_v3.py:compare | the per-class v4-over-v3 ratio statistic; v4_gain already in compare_v3.json
+REIMPL: pp_trained_compare.py:main 111 | analysis/catalog_v3/pp_compare.py:pp_vs | the per-class median ratio of pp-trained over window-trained arm
+Non-blocking: "recovered" is a ratio of medians, undefined near pp gain 1; Muon-over-AdamW 0.26/0.28 cited to par:v3_muon but computed here; "no pp pool was rebuilt in between" unchecked; window arm checked only through frac_inside; new paragraph par:v4_vs_pp instead of inside par:v4_vs_v3 (acceptable).
+REIMPLEMENTED: 4
+BLOCKING: 2

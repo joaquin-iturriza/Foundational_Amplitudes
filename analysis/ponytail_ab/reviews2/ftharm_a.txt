@@ -1,0 +1,15 @@
+Reviewer R16 (repo-reviewer, blind), diff ftharm_a against 0686d9b8.
+Verdict: fix first.
+BLOCKING 1. analysis/transfer/ft_harm.py starts(): takes nogain_readout_za.json / nogain_readout.json read-outs that nogain_readout.py:27 and nogain_readout_za.py:39 scale by prepd_std^2 twice (tools/linear_readout.py already applies it), mixing two scales in the R column behind the za / R / probe claims.
+BLOCKING 2. ft_harm.py main(): still_falling (best_frac >= 0.9) and turned (best_frac < 0.5 and climb > 1.5) on unsourced constants; nogain.py defines early as best step < 0.25 T.
+(Dropped, an artifact of this study: the reviewer's third finding was that data/lowd_ft_curves.json and data/ft_harm.json are not in the diff; JSON files are removed from every review copy, and the reviewer itself said the finding drops if so.)
+REIMPL: ft_harm.py:fam | analysis/transfer/rung_grid.py:fam | identical rung-to-family mapping
+REIMPL: ft_harm.py:gather grid block | analysis/transfer/cells.py:best | a sweep's best trial in MSE of log|M|^2 with the _002 continuation
+REIMPL: ft_harm.py:gather round2 block | analysis/transfer/lowd_dyhpo.py:main | per-cell per-method best trial of the DyHPO round
+REIMPL: ft_harm.py:METHODS/LABEL and figure() col | analysis/transfer/lowd_ft.py:TRAINED/LABEL and plot() cols | method list, labels and colours
+REIMPL: ft_harm.py:starts (lowd_ft_readout.jsonl) | analysis/transfer/lowd_ft.py:load | reads the same read-out file per cell
+REIMPL: ft_harm.py:collect (lowd_ft_runs.jsonl) | analysis/transfer/lowd_ft.py:load | reads the same first-round runs file
+REIMPL: ft_harm.py:run_row | analysis/transfer/nogain_start.py:stats and analysis/transfer/nogain.py:main | the same curve statistics
+Non-blocking: grid starts below D = 10^4 on other target statistics (stated, bounded); no round-2 guard of min(val_curve) against val_loss; "mostly keep improving" wording; first-step jump mechanism not checked (flagged).
+REIMPLEMENTED: 7
+BLOCKING: 2

@@ -1,0 +1,1713 @@
+diff --git a/analysis/catalog_v4/compare_pp_trained.py b/analysis/catalog_v4/compare_pp_trained.py
+new file mode 100644
+index 00000000..22877c55
+--- /dev/null
++++ b/analysis/catalog_v4/compare_pp_trained.py
+@@ -0,0 +1,207 @@
++"""catalog_v4 against training on pp, on the 13 TeV pp pools (catalog_coverage; the user, 2026-10-26: what mattered most
++was how training on catalog_v4 compares to training on pp collisions on data generated like pp collisions; D117, D119).
++No new compute: the reads already home.
++  catalog_v4     v4_dimensionless_muon, _seed2: the dimensionless arm on catalog_v4, Muon at its search's best, 4264
++                 steps (reads: analysis/catalog_v3/data/short_reads/<run>/PP, analysis/catalog_v4/compare_v3.py)
++  catalog_v3     dimensionless_muon_best, _seed2: the same on catalog_v3's windows (Muon's window-trained reference)
++  pp-trained     dimensionless_pp (FA-ccin2p3-e786bd74, its read completed by 982b5a14): the dimensionless arm with
++                 every hadronic training tree class of catalog_v3 trained on its 13 TeV pp events, AdamW at the
++                 per-process sweep's best (lr 8.94e-3), one seed (rows: analysis/catalog_v3/data/pp_rows.json)
++  AdamW window   dimensionless: the arm the pp-trained one differs from only in how the hadronic classes are sampled
++                 (AdamW's window-trained reference), one seed
++Checks first: every run read the same 2000 events of each pp pool and split them by the same definition of catalog_v3's
++coverage (pp_compare.support_masks, the sqrt(s_hat) window and catalog_v3's fiducial cuts in the partonic frame): the
++share of a probe's events inside, from the site's mask of the catalog_v4 comparison, against the share each AdamW arm's
++collect recorded, and the variance of the target over the events, the Muon runs' saved reads against the AdamW rows.
++Groups, b classes apart (the pp pools carry catalog_v3's 4.7 GeV b, which catalog_v4 never saw): classes trained in both
++catalogs (the pp-trained arm trained them on pp events, catalog_v4 on its own pools), held out in both (zero-shot for
++every run), and the classes catalog_v3 trains and catalog_v4 holds out. Measures per class: the MSE of log|M|^2 on the
++whole pp pool and on its events inside and outside catalog_v3's coverage.
++  (a) direct     per class catalog_v4 (the geometric mean of its two seeds) over the pp-trained arm: the median ratio,
++                 the shares where both catalog_v4 seeds are lower and where both are higher, the gap (median
++                 |log10 ratio|) against catalog_v4's seed spread; the optimizers differ (Muon against AdamW)
++  (b) relative   each against its own optimizer's window-trained catalog_v3 arm: r_v4 = catalog_v4 / catalog_v3 (Muon),
++                 r_pp = pp-trained / AdamW window; the share of the pp-training gain catalog_v4 recovers,
++                 log median r_v4 / log median r_pp, and per class r_v4 / r_pp (above 1: catalog_v4 recovers less than
++                 the pp-trained arm gained). This assumes the optimizer moves a pp-trained run by the same factor as a
++                 window-trained one, which nothing measures
++  optimizer      catalog_v3 Muon over AdamW window on pp, per class: what Muon alone changes on these pools
++    python3 analysis/catalog_v4/compare_pp_trained.py   -> data/compare_pp_trained.json, figs/compare_pp_trained_{a..d}
++The last line printed is the JSON of the numbers docs/results.tex quotes.
++"""
++import json, os, sys
++
++import numpy as np
++
++HERE = os.path.dirname(os.path.abspath(__file__))
++ROOT = os.path.dirname(os.path.dirname(HERE))
++sys.path.insert(0, ROOT)
++sys.path.insert(0, HERE)
++import compare_v3 as cv  # noqa: E402
++
++SR = cv.SR
++MUON = {"v3": cv.RUNS["v3"], "v4": cv.RUNS["v4"]}
++KEYS = ("mse", "mse_inside", "mse_outside")
++KNAME = {"mse": "whole pool", "mse_inside": "inside", "mse_outside": "outside"}
++GROUPS = {"train": ("train", "train"), "heldout": ("heldout", "heldout"), "role_changed": ("train", "heldout")}
++
++
++def checks(site, rows_adamw):
++    """the same events and the same coverage split for every run: the inside share per probe (site mask against each
++    AdamW arm's collect) and the target's variance (each Muon run's saved read against the AdamW rows of the same
++    target, the dimensionless arm's)"""
++    fd, nmiss = [], 0
++    for n, s in site["pp"].items():
++        f = s["inside"].count("1") / len(s["inside"])
++        for a in rows_adamw:
++            r = rows_adamw[a]["pp"].get(n)
++            if r is None or "frac_inside" not in r or r["n"] != len(s["inside"]):
++                nmiss += 1
++                continue
++            fd.append(abs(r["frac_inside"] - f))
++    vd = {}
++    for c in MUON:
++        for run in MUON[c]:
++            x = []
++            for n in site["pp"]:
++                t = np.load(os.path.join(SR, run, "PP", n + ".npz"))["t"].astype(float)
++                v = rows_adamw["dimensionless_pp"]["pp"][n]["var_t"]
++                x.append(abs(np.var(t) - v) / v)
++            vd[run] = {"median": float(np.median(x)), "max": float(np.max(x)), "n_above_1e-3": int(np.sum(np.array(x) > 1e-3))}
++    return {"n_probes": len(site["pp"]), "frac_inside_max_diff": float(max(fd)), "frac_inside_compared": len(fd),
++            "frac_inside_unmatched": nmiss, "var_t_rel_diff": vd}
++
++
++def stats(num, den, probes):
++    """per class num/den over `probes`: median ratio, 10%/90%, share below 1, gap (median |log10|)"""
++    r = np.array([num[p] / den[p] for p in probes])
++    return {"n": len(probes), "ratio": float(np.median(r)), "ratio_q10_q90": [float(x) for x in np.quantile(r, [0.1, 0.9])],
++            "lower_pct": float(100 * np.mean(r < 1)), "gap": float(np.median(np.abs(np.log10(r))))}
++
++
++def main():
++    site = json.load(open(os.path.join(HERE, "data", "compare_v3_site.json")))
++    ra = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "pp_rows.json")))
++    chk = checks(site, ra)
++    assert chk["frac_inside_unmatched"] == 0 and chk["frac_inside_max_diff"] == 0.0, chk
++    assert all(v["n_above_1e-3"] == 0 for v in chk["var_t_rel_diff"].values()), chk
++    R = cv.pp_reads(site)
++    names, role, rows = R["names"], R["role"], R["rows"]
++    assert not any(R["bad"].values()), R["bad"]
++    b = {n: cv.has_b(n) for n in names}
++    for arm in ("dimensionless_pp", "dimensionless"):           # AdamW rows, the same three measures
++        for k in KEYS:
++            rows[k][arm] = {n: v[k] for n, v in ra[arm]["pp"].items() if v.get(k) is not None}
++    gm = lambda k, c, n: float(np.sqrt(rows[k][MUON[c][0]][n] * rows[k][MUON[c][1]][n]))
++    out = {"checks": chk, "groups": {}}
++    for bk, bsel in (("no_b", lambda n: not b[n]), ("b", lambda n: b[n])):
++        for g, (r3, r4) in GROUPS.items():
++            pr = [n for n in names if bsel(n) and role[n]["v3"] == r3 and role[n]["v4"] == r4]
++            if not pr:
++                continue
++            e = out["groups"].setdefault(bk, {}).setdefault(g, {"n": len(pr)})
++            for k in KEYS:
++                ps_ = [n for n in pr if all(n in rows[k][r] for r in MUON["v3"] + MUON["v4"] + ("dimensionless_pp", "dimensionless"))]
++                v4 = {n: gm(k, "v4", n) for n in ps_}
++                v3 = {n: gm(k, "v3", n) for n in ps_}
++                pt, aw = rows[k]["dimensionless_pp"], rows[k]["dimensionless"]
++                d = stats(v4, pt, ps_)
++                both_lo = np.mean([all(rows[k][r][n] < pt[n] for r in MUON["v4"]) for n in ps_])
++                both_hi = np.mean([all(rows[k][r][n] > pt[n] for r in MUON["v4"]) for n in ps_])
++                d.update({"v4_lower_both_pct": float(100 * both_lo), "v4_higher_both_pct": float(100 * both_hi),
++                          "spread_v4": float(np.median([abs(np.log10(rows[k][MUON["v4"][1]][n] / rows[k][MUON["v4"][0]][n])) for n in ps_])),
++                          "spread_v3": float(np.median([abs(np.log10(rows[k][MUON["v3"][1]][n] / rows[k][MUON["v3"][0]][n])) for n in ps_]))})
++                rv4, rpp = stats(v4, v3, ps_), stats(pt, aw, ps_)
++                rel = {n: (v4[n] / v3[n]) / (pt[n] / aw[n]) for n in ps_}
++                rr = stats(rel, {n: 1.0 for n in ps_}, ps_)
++                rec = (float(np.log10(rv4["ratio"]) / np.log10(rpp["ratio"]))
++                       if abs(np.log10(rpp["ratio"])) > 0.05 else None)      # no gain to recover below ~12%
++                e[k] = {"n": len(ps_),
++                        "median": {"pp_trained": float(np.median([pt[n] for n in ps_])),
++                                   "adamw_window": float(np.median([aw[n] for n in ps_])),
++                                   "v4": [float(np.median([rows[k][r][n] for n in ps_])) for r in MUON["v4"]],
++                                   "v3_muon": [float(np.median([rows[k][r][n] for n in ps_])) for r in MUON["v3"]]},
++                        "direct": d, "r_v4": rv4, "r_pp": rpp, "relative": rr, "recovered": rec,
++                        "optimizer": stats(v3, aw, ps_)}
++    json.dump(out, open(os.path.join(HERE, "data", "compare_pp_trained.json"), "w"), indent=1)
++    plot(out)
++    print("checks", json.dumps(chk))
++    for bk, G in out["groups"].items():
++        for g, e in G.items():
++            for k in KEYS:
++                x = e[k]
++                print(f"{bk:4s} {g:12s} {KNAME[k]:10s} n={x['n']:3d} medians pp-trained {x['median']['pp_trained']:.3g} "
++                      f"v4 {x['median']['v4'][0]:.3g}/{x['median']['v4'][1]:.3g} v3 Muon {x['median']['v3_muon'][0]:.3g}/"
++                      f"{x['median']['v3_muon'][1]:.3g} AdamW window {x['median']['adamw_window']:.3g} | direct v4/pp "
++                      f"{x['direct']['ratio']:.3g} [{x['direct']['ratio_q10_q90'][0]:.2g},{x['direct']['ratio_q10_q90'][1]:.2g}] "
++                      f"v4 lower both {x['direct']['v4_lower_both_pct']:.0f}% higher both {x['direct']['v4_higher_both_pct']:.0f}% "
++                      f"gap {x['direct']['gap']:.2f} spread v4 {x['direct']['spread_v4']:.2f} | r_v4 {x['r_v4']['ratio']:.3g} "
++                      f"r_pp {x['r_pp']['ratio']:.3g} recovered {x['recovered'] if x['recovered'] is None else round(x['recovered'], 2)} "
++                      f"rel {x['relative']['ratio']:.3g} ({x['relative']['lower_pct']:.0f}% below 1) | Muon/AdamW window "
++                      f"{x['optimizer']['ratio']:.3g}")
++    claims = {"n_probes": chk["n_probes"], "frac_inside_max_diff": chk["frac_inside_max_diff"],
++              "var_t_rel_diff_max": max(v["max"] for v in chk["var_t_rel_diff"].values())}
++    r2 = lambda v: None if v is None else float(f"{v:.4g}")
++    for bk, G in out["groups"].items():
++        for g, e in G.items():
++            c = claims.setdefault(bk, {}).setdefault(g, {"n": e["n"]})
++            for k in KEYS:
++                x = e[k]
++                c[k] = {"n": x["n"], "pp_trained": r2(x["median"]["pp_trained"]),
++                        "v4_lo": r2(min(x["median"]["v4"])), "v4_hi": r2(max(x["median"]["v4"])),
++                        "direct": r2(x["direct"]["ratio"]), "v4_lower_both_pct": round(x["direct"]["v4_lower_both_pct"]),
++                        "v4_higher_both_pct": round(x["direct"]["v4_higher_both_pct"]), "gap": r2(x["direct"]["gap"]),
++                        "spread_v4": r2(x["direct"]["spread_v4"]), "r_v4": r2(x["r_v4"]["ratio"]),
++                        "r_pp": r2(x["r_pp"]["ratio"]), "recovered": r2(x["recovered"]),
++                        "relative": r2(x["relative"]["ratio"]),
++                        "relative_below1_pct": round(x["relative"]["lower_pct"]), "optimizer": r2(x["optimizer"]["ratio"])}
++    print(json.dumps(claims))
++
++
++def plot(out):
++    """(a, b) per measure, each run's median MSE over the classes trained in both and held out in both (no b);
++    (c, d) the per-class median ratios: catalog_v4 over the pp-trained arm (direct), catalog_v4 over catalog_v3 with
++    Muon, the pp-trained arm over the AdamW window arm"""
++    import plot_style as ps
++    figs = ps.panels(4)
++    G = out["groups"]["no_b"]
++    x = np.arange(len(KEYS))
++    for (fig, ax), g, lab in zip(figs[:2], ("train", "heldout"), ("trained in both", "held out in both")):
++        e = G[g]
++        ser = [("pp-trained, AdamW", ps.C.green, "D", lambda k: [e[k]["median"]["pp_trained"]]),
++               ("catalog v3, AdamW", ps.C.grey, "v", lambda k: [e[k]["median"]["adamw_window"]]),
++               ("catalog v3, Muon", ps.C.blue, "o", lambda k: e[k]["median"]["v3_muon"]),
++               ("catalog v4, Muon", ps.C.vermillion, "s", lambda k: e[k]["median"]["v4"])]
++        for j, (name, col, mk, f) in enumerate(ser):
++            for s_, k in enumerate(KEYS):
++                for i, y in enumerate(f(k)):
++                    ax.plot(x[s_] + (j - 1.5) * 0.16, y, mk, color=col, mfc=col if i == 0 else "none",
++                            label=name if (s_ == 0 and i == 0) else None)
++        ax.set_xticks(x)
++        ax.set_xticklabels([KNAME[k] for k in KEYS])
++        ax.set_yscale("log")
++        ax.set_ylim(0.1, 100)                            # one range for both panels, room for the legend
++        ax.set_ylabel("median MSE, 13 TeV pp")
++        ax.set_xlabel(f"classes {lab}")
++    ps.legend(figs[0][1], "upper left")
++    ps.make_room(figs[0][1])
++    for (fig, ax), g, lab in zip(figs[2:], ("train", "heldout"), ("trained in both", "held out in both")):
++        e = G[g]
++        for j, (key, name, col) in enumerate([("direct", "v4 / pp-trained", ps.C.vermillion),
++                                              ("r_v4", "v4 / v3 (Muon)", ps.C.blue),
++                                              ("r_pp", "pp-trained / v3 (AdamW)", ps.C.green)]):
++            ax.bar(x + (j - 1) * 0.27, [e[k][key]["ratio"] for k in KEYS], 0.27, color=col, label=name)
++        ax.axhline(1, ls="--", color="k")
++        ax.set_xticks(x)
++        ax.set_xticklabels([KNAME[k] for k in KEYS])
++        ax.set_yscale("log")
++        ax.set_ylim(0.05, 20)                            # one range for both panels, room for the legend
++        ax.set_ylabel("median per-class MSE ratio")
++        ax.set_xlabel(f"classes {lab}")
++    ps.legend(figs[2][1], "upper left")
++    ps.make_room(figs[2][1])
++    ps.save_panels(figs, os.path.join(HERE, "figs", "compare_pp_trained"))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/analysis/catalog_v4/compare_v3.py b/analysis/catalog_v4/compare_v3.py
+index e117ccf9..34f8b5ff 100644
+--- a/analysis/catalog_v4/compare_v3.py
++++ b/analysis/catalog_v4/compare_v3.py
+@@ -167,8 +167,10 @@ def shared():
+     return out
+ 
+ 
+-def pp(site):
+-    import pp_compare
++def pp_reads(site, runs=RUNS):
++    """the pp probes' roles in both catalogs and, per run of `runs`, each probe's MSE on the whole pp pool and on its
++    events inside and outside catalog_v3's coverage (site: the coverage masks from collect), each read's events
++    checked against the site's sorted log|M|^2 sample and against the other runs' reads"""
+     R3 = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"]
+     R4 = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_roles.json")))["trees"]
+     names = [e["name"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml")))["processes"]]
+@@ -189,8 +191,8 @@ def pp(site):
+         role[n] = {"v3": r3, "v4": r4, "axis3": R3["v3_" + x].get("axis")}
+     rows = {k: {} for k in ("mse", "mse_inside", "mse_outside")}
+     bad, frac, srt = {}, {}, {}
+-    for c in RUNS:
+-        for r in RUNS[c]:
++    for c in runs:
++        for r in runs[c]:
+             for k in rows:
+                 rows[k][r] = {}
+             bad[r] = []
+@@ -227,6 +229,12 @@ def pp(site):
+     # each other on all 2000 sorted events (the same events, whatever their order)
+     xmax = max(float(np.max(np.abs(a - v[0]))) for v in srt.values() for a in v[1:])
+     assert xmax < 1e-3, f"the runs' reads of a pp probe are not the same events (max {xmax})"
++    return {"names": names, "role": role, "rows": rows, "bad": bad, "frac": frac, "xmax": xmax}
++
++
++def pp(site):
++    R = pp_reads(site)
++    names, role, rows, bad, frac, xmax = (R[k] for k in ("names", "role", "rows", "bad", "frac", "xmax"))
+     b = {n: has_b(n) for n in names}
+     groups = {"train": lambda n: role[n]["v3"] == "train" and role[n]["v4"] == "train",
+               "heldout": lambda n: role[n]["v3"] == "heldout" and role[n]["v4"] == "heldout",
+diff --git a/analysis/catalog_v4/data/compare_pp_trained.json b/analysis/catalog_v4/data/compare_pp_trained.json
+new file mode 100644
+index 00000000..3a0c1f23
+--- /dev/null
++++ b/analysis/catalog_v4/data/compare_pp_trained.json
+@@ -0,0 +1,1314 @@
++{
++ "checks": {
++  "n_probes": 1396,
++  "frac_inside_max_diff": 0.0,
++  "frac_inside_compared": 6980,
++  "frac_inside_unmatched": 0,
++  "var_t_rel_diff": {
++   "dimensionless_muon_best": {
++    "median": 4.713499999486204e-07,
++    "max": 9.130867349132446e-05,
++    "n_above_1e-3": 0
++   },
++   "dimensionless_muon_best_seed2": {
++    "median": 7.628846740900567e-07,
++    "max": 7.663697516937991e-05,
++    "n_above_1e-3": 0
++   },
++   "v4_dimensionless_muon": {
++    "median": 4.297568604708489e-07,
++    "max": 0.0002665289164979417,
++    "n_above_1e-3": 0
++   },
++   "v4_dimensionless_muon_seed2": {
++    "median": 8.198849082524229e-07,
++    "max": 0.0002662434013798432,
++    "n_above_1e-3": 0
++   }
++  }
++ },
++ "groups": {
++  "no_b": {
++   "train": {
++    "n": 578,
++    "mse": {
++     "n": 578,
++     "median": {
++      "pp_trained": 0.46972385568481245,
++      "adamw_window": 5.230864611823257,
++      "v4": [
++       0.7383838487159147,
++       1.0033769284433578
++      ],
++      "v3_muon": [
++       1.2672199717582577,
++       1.7394737864934533
++      ]
++     },
++     "direct": {
++      "n": 578,
++      "ratio": 1.3104076652601861,
++      "ratio_q10_q90": [
++       0.2346025168923197,
++       13.199419940120327
++      ],
++      "lower_pct": 45.32871972318339,
++      "gap": 0.5021540609147725,
++      "v4_lower_both_pct": 42.04152249134948,
++      "v4_higher_both_pct": 51.73010380622838,
++      "spread_v4": 0.1015427438617198,
++      "spread_v3": 0.10595480091017817
++     },
++     "r_v4": {
++      "n": 578,
++      "ratio": 0.7543524132263716,
++      "ratio_q10_q90": [
++       0.09961604877739325,
++       3.658073055018685
++      ],
++      "lower_pct": 67.1280276816609,
++      "gap": 0.328017817826728
++     },
++     "r_pp": {
++      "n": 578,
++      "ratio": 0.15032571216012164,
++      "ratio_q10_q90": [
++       0.02111128977550961,
++       0.5430241093299905
++      ],
++      "lower_pct": 98.6159169550173,
++      "gap": 0.8229699227600054
++     },
++     "relative": {
++      "n": 578,
++      "ratio": 4.0796426871753075,
++      "ratio_q10_q90": [
++       0.8513174933512355,
++       46.570788969984534
++      ],
++      "lower_pct": 12.629757785467127,
++      "gap": 0.6189510536439103
++     },
++     "recovered": 0.14876144018371487,
++     "optimizer": {
++      "n": 578,
++      "ratio": 0.2588332907653782,
++      "ratio_q10_q90": [
++       0.13549999809612276,
++       0.622641333297226
++      ],
++      "lower_pct": 97.40484429065745,
++      "gap": 0.5869800510460119
++     }
++    },
++    "mse_inside": {
++     "n": 578,
++     "median": {
++      "pp_trained": 0.40659163156432887,
++      "adamw_window": 0.5476334308642572,
++      "v4": [
++       0.5751542849695681,
++       0.6297795065129361
++      ],
++      "v3_muon": [
++       0.12721965469495392,
++       0.12471163988100302
++      ]
++     },
++     "direct": {
++      "n": 578,
++      "ratio": 1.1461174976089952,
++      "ratio_q10_q90": [
++       0.20170235785370955,
++       7.977068424606009
++      ],
++      "lower_pct": 48.78892733564014,
++      "gap": 0.48623635306285556,
++      "v4_lower_both_pct": 46.19377162629758,
++      "v4_higher_both_pct": 48.78892733564014,
++      "spread_v4": 0.0999515587231819,
++      "spread_v3": 0.06244734550820236
++     },
++     "r_v4": {
++      "n": 578,
++      "ratio": 1.195160587075183,
++      "ratio_q10_q90": [
++       0.7305607865656841,
++       19.005993433296695
++      ],
++      "lower_pct": 34.602076124567475,
++      "gap": 0.1782029678043629
++     },
++     "r_pp": {
++      "n": 578,
++      "ratio": 0.5969009973509187,
++      "ratio_q10_q90": [
++       0.1740699194205307,
++       1.2140581181707357
++      ],
++      "lower_pct": 80.62283737024222,
++      "gap": 0.2341426630759851
++     },
++     "relative": {
++      "n": 578,
++      "ratio": 4.001780143898062,
++      "ratio_q10_q90": [
++       0.9385483522576187,
++       29.321914028112907
++      ],
++      "lower_pct": 11.76470588235294,
++      "gap": 0.6195779419273937
++     },
++     "recovered": -0.3455022720351133,
++     "optimizer": {
++      "n": 578,
++      "ratio": 0.2249895240534651,
++      "ratio_q10_q90": [
++       0.12547969876370807,
++       0.7149869501275364
++      ],
++      "lower_pct": 96.88581314878893,
++      "gap": 0.6482125186966738
++     }
++    },
++    "mse_outside": {
++     "n": 577,
++     "median": {
++      "pp_trained": 0.532721717148174,
++      "adamw_window": 7.726793555988795,
++      "v4": [
++       0.826807862101845,
++       1.0745096222145794
++      ],
++      "v3_muon": [
++       1.7008332172754637,
++       2.48751942085411
++      ]
++     },
++     "direct": {
++      "n": 577,
++      "ratio": 1.2839022698494216,
++      "ratio_q10_q90": [
++       0.22749525337215026,
++       12.921828860545494
++      ],
++      "lower_pct": 44.54072790294627,
++      "gap": 0.47809624657849176,
++      "v4_lower_both_pct": 41.94107452339688,
++      "v4_higher_both_pct": 51.64644714038128,
++      "spread_v4": 0.10549110289402847,
++      "spread_v3": 0.12572418116937129
++     },
++     "r_v4": {
++      "n": 577,
++      "ratio": 0.5044383544739532,
++      "ratio_q10_q90": [
++       0.08097714471409702,
++       2.6236117835829043
++      ],
++      "lower_pct": 74.87001733102254,
++      "gap": 0.4329772813860634
++     },
++     "r_pp": {
++      "n": 577,
++      "ratio": 0.1019605632513882,
++      "ratio_q10_q90": [
++       0.01821087919579819,
++       0.4468078792225033
++      ],
++      "lower_pct": 99.13344887348353,
++      "gap": 0.9931607484892989
++     },
++     "relative": {
++      "n": 577,
++      "ratio": 4.196977198716881,
++      "ratio_q10_q90": [
++       0.8064797327206552,
++       51.95979782731747
++      ],
++      "lower_pct": 13.864818024263432,
++      "gap": 0.6360656244212853
++     },
++     "recovered": 0.2997191996994402,
++     "optimizer": {
++      "n": 577,
++      "ratio": 0.27668691614989616,
++      "ratio_q10_q90": [
++       0.12857674593663126,
++       0.5755435961073102
++      ],
++      "lower_pct": 98.09358752166378,
++      "gap": 0.5580113771013674
++     }
++    }
++   },
++   "heldout": {
++    "n": 180,
++    "mse": {
++     "n": 180,
++     "median": {
++      "pp_trained": 0.9233145316953535,
++      "adamw_window": 3.790388497206911,
++      "v4": [
++       0.8958879278354304,
++       0.9816327039587145
++      ],
++      "v3_muon": [
++       1.017869639144485,
++       1.355063330704382
++      ]
++     },
++     "direct": {
++      "n": 180,
++      "ratio": 0.7859770104173069,
++      "ratio_q10_q90": [
++       0.18606137907106032,
++       3.8830339307726804
++      ],
++      "lower_pct": 59.44444444444444,
++      "gap": 0.35773976248545636,
++      "v4_lower_both_pct": 53.888888888888886,
++      "v4_higher_both_pct": 35.55555555555556,
++      "spread_v4": 0.14044380879591778,
++      "spread_v3": 0.1430466053092464
++     },
++     "r_v4": {
++      "n": 180,
++      "ratio": 0.7769843362352582,
++      "ratio_q10_q90": [
++       0.19199168464652763,
++       3.0903602053231767
++      ],
++      "lower_pct": 62.22222222222222,
++      "gap": 0.304470614219844
++     },
++     "r_pp": {
++      "n": 180,
++      "ratio": 0.33468112602609756,
++      "ratio_q10_q90": [
++       0.048323840754877945,
++       1.1952541929596479
++      ],
++      "lower_pct": 85.55555555555556,
++      "gap": 0.5211226728638915
++     },
++     "relative": {
++      "n": 180,
++      "ratio": 2.811051202554781,
++      "ratio_q10_q90": [
++       0.4289673188838723,
++       14.620659592335869
++      ],
++      "lower_pct": 23.88888888888889,
++      "gap": 0.530749640123392
++     },
++     "recovered": 0.23053204439920588,
++     "optimizer": {
++      "n": 180,
++      "ratio": 0.27555529032255255,
++      "ratio_q10_q90": [
++       0.15194766979321697,
++       0.7777077105052246
++      ],
++      "lower_pct": 94.44444444444444,
++      "gap": 0.5598464771837235
++     }
++    },
++    "mse_inside": {
++     "n": 180,
++     "median": {
++      "pp_trained": 0.7939448222693218,
++      "adamw_window": 1.0122169191150079,
++      "v4": [
++       0.6801637345647735,
++       0.708169213401695
++      ],
++      "v3_muon": [
++       0.35842630993272523,
++       0.344823353149167
++      ]
++     },
++     "direct": {
++      "n": 180,
++      "ratio": 0.7973256440014389,
++      "ratio_q10_q90": [
++       0.1862992021837949,
++       3.155689698195643
++      ],
++      "lower_pct": 58.88888888888889,
++      "gap": 0.3336297268548579,
++      "v4_lower_both_pct": 53.888888888888886,
++      "v4_higher_both_pct": 33.88888888888889,
++      "spread_v4": 0.14105211185205857,
++      "spread_v3": 0.12393360879276048
++     },
++     "r_v4": {
++      "n": 180,
++      "ratio": 1.2093063985117616,
++      "ratio_q10_q90": [
++       0.39689416735116456,
++       6.44578628631095
++      ],
++      "lower_pct": 40.0,
++      "gap": 0.2928132876933124
++     },
++     "r_pp": {
++      "n": 180,
++      "ratio": 0.6831668567323886,
++      "ratio_q10_q90": [
++       0.23178405729584328,
++       1.9274924278383117
++      ],
++      "lower_pct": 72.77777777777777,
++      "gap": 0.25190371355818775
++     },
++     "relative": {
++      "n": 180,
++      "ratio": 2.3284797999542546,
++      "ratio_q10_q90": [
++       0.43124042956883046,
++       10.60430707566578
++      ],
++      "lower_pct": 25.0,
++      "gap": 0.45228280826108247
++     },
++     "recovered": -0.49878980493386327,
++     "optimizer": {
++      "n": 180,
++      "ratio": 0.30921807423337755,
++      "ratio_q10_q90": [
++       0.16023370962177497,
++       0.769033664139579
++      ],
++      "lower_pct": 93.88888888888889,
++      "gap": 0.5167985296693549
++     }
++    },
++    "mse_outside": {
++     "n": 180,
++     "median": {
++      "pp_trained": 1.1241916681174893,
++      "adamw_window": 5.276769748968758,
++      "v4": [
++       0.9962600777257248,
++       1.0152360042118258
++      ],
++      "v3_muon": [
++       1.3152032740506239,
++       1.7589398105536087
++      ]
++     },
++     "direct": {
++      "n": 180,
++      "ratio": 0.7540606832620733,
++      "ratio_q10_q90": [
++       0.17307764650085364,
++       3.759154004165291
++      ],
++      "lower_pct": 58.88888888888889,
++      "gap": 0.3721125335517309,
++      "v4_lower_both_pct": 54.44444444444444,
++      "v4_higher_both_pct": 35.0,
++      "spread_v4": 0.14570462634692244,
++      "spread_v3": 0.15090279747166802
++     },
++     "r_v4": {
++      "n": 180,
++      "ratio": 0.6276705318039726,
++      "ratio_q10_q90": [
++       0.15148622428418262,
++       2.7324560867265477
++      ],
++      "lower_pct": 70.0,
++      "gap": 0.37709083075140515
++     },
++     "r_pp": {
++      "n": 180,
++      "ratio": 0.2624980419951691,
++      "ratio_q10_q90": [
++       0.044770878588956044,
++       1.1890085622877247
++      ],
++      "lower_pct": 86.66666666666667,
++      "gap": 0.5866858075695311
++     },
++     "relative": {
++      "n": 180,
++      "ratio": 2.847219254246588,
++      "ratio_q10_q90": [
++       0.3997450598222273,
++       17.427852953650024
++      ],
++      "lower_pct": 25.555555555555554,
++      "gap": 0.5437879786565513
++     },
++     "recovered": 0.3482136988949284,
++     "optimizer": {
++      "n": 180,
++      "ratio": 0.27097127164159596,
++      "ratio_q10_q90": [
++       0.1355214202726453,
++       0.8227801215617507
++      ],
++      "lower_pct": 93.88888888888889,
++      "gap": 0.5670822868330199
++     }
++    }
++   },
++   "role_changed": {
++    "n": 39,
++    "mse": {
++     "n": 39,
++     "median": {
++      "pp_trained": 0.4326206954443769,
++      "adamw_window": 3.7491759966891176,
++      "v4": [
++       1.448000232141272,
++       1.7561418398337592
++      ],
++      "v3_muon": [
++       0.5475915131869173,
++       1.0020243586444113
++      ]
++     },
++     "direct": {
++      "n": 39,
++      "ratio": 2.9778793135168407,
++      "ratio_q10_q90": [
++       0.9914071374744393,
++       8.610577898190645
++      ],
++      "lower_pct": 10.256410256410255,
++      "gap": 0.47390709283329646,
++      "v4_lower_both_pct": 7.6923076923076925,
++      "v4_higher_both_pct": 84.61538461538461,
++      "spread_v4": 0.1373624253855004,
++      "spread_v3": 0.12298200368891436
++     },
++     "r_v4": {
++      "n": 39,
++      "ratio": 1.7389514253821428,
++      "ratio_q10_q90": [
++       0.5806462081292222,
++       7.7506597788883145
++      ],
++      "lower_pct": 23.076923076923077,
++      "gap": 0.3138571389273521
++     },
++     "r_pp": {
++      "n": 39,
++      "ratio": 0.1671435868919748,
++      "ratio_q10_q90": [
++       0.01985935433797359,
++       0.48398436775402415
++      ],
++      "lower_pct": 97.43589743589743,
++      "gap": 0.7769102821336833
++     },
++     "relative": {
++      "n": 39,
++      "ratio": 15.535065140901766,
++      "ratio_q10_q90": [
++       3.601439558454388,
++       56.373533136694654
++      ],
++      "lower_pct": 0.0,
++      "gap": 1.1913130786579305
++     },
++     "recovered": -0.30928597088799287,
++     "optimizer": {
++      "n": 39,
++      "ratio": 0.20039484377921904,
++      "ratio_q10_q90": [
++       0.1140013498587319,
++       0.34410491826321105
++      ],
++      "lower_pct": 100.0,
++      "gap": 0.6981134571912269
++     }
++    },
++    "mse_inside": {
++     "n": 39,
++     "median": {
++      "pp_trained": 0.36655546796847976,
++      "adamw_window": 0.49729296487231117,
++      "v4": [
++       1.1071109286053065,
++       1.1451373285744308
++      ],
++      "v3_muon": [
++       0.09530746846319291,
++       0.104643438729337
++      ]
++     },
++     "direct": {
++      "n": 39,
++      "ratio": 2.8220690860052624,
++      "ratio_q10_q90": [
++       0.9885393801130623,
++       7.813444515010953
++      ],
++      "lower_pct": 10.256410256410255,
++      "gap": 0.4537445995061845,
++      "v4_lower_both_pct": 7.6923076923076925,
++      "v4_higher_both_pct": 79.48717948717949,
++      "spread_v4": 0.17032699577898908,
++      "spread_v3": 0.06415689394077218
++     },
++     "r_v4": {
++      "n": 39,
++      "ratio": 9.09743790537164,
++      "ratio_q10_q90": [
++       2.6924834926798384,
++       37.04288648672333
++      ],
++      "lower_pct": 0.0,
++      "gap": 0.9589190999882554
++     },
++     "r_pp": {
++      "n": 39,
++      "ratio": 0.6602639588072537,
++      "ratio_q10_q90": [
++       0.33602705935620447,
++       1.2341760434130669
++      ],
++      "lower_pct": 74.35897435897436,
++      "gap": 0.1802824084945602
++     },
++     "relative": {
++      "n": 39,
++      "ratio": 12.027654136063974,
++      "ratio_q10_q90": [
++       4.795595372696521,
++       41.968294130860244
++      ],
++      "lower_pct": 0.0,
++      "gap": 1.0801809311545743
++     },
++     "recovered": -5.318983188629797,
++     "optimizer": {
++      "n": 39,
++      "ratio": 0.2055801667456381,
++      "ratio_q10_q90": [
++       0.1545223404243947,
++       0.2890895819372333
++      ],
++      "lower_pct": 100.0,
++      "gap": 0.6870187860211425
++     }
++    },
++    "mse_outside": {
++     "n": 39,
++     "median": {
++      "pp_trained": 0.5019069263640538,
++      "adamw_window": 5.247568127945218,
++      "v4": [
++       1.4696582604607,
++       2.2264704493384464
++      ],
++      "v3_muon": [
++       0.7805004745911395,
++       1.4630351708751568
++      ]
++     },
++     "direct": {
++      "n": 39,
++      "ratio": 2.648551827833593,
++      "ratio_q10_q90": [
++       0.6407267693417048,
++       9.470444076105853
++      ],
++      "lower_pct": 15.384615384615385,
++      "gap": 0.4799513239780281,
++      "v4_lower_both_pct": 12.82051282051282,
++      "v4_higher_both_pct": 76.92307692307693,
++      "spread_v4": 0.12898752011279144,
++      "spread_v3": 0.160577074999142
++     },
++     "r_v4": {
++      "n": 39,
++      "ratio": 1.237487687717058,
++      "ratio_q10_q90": [
++       0.4313097974567917,
++       5.973211015604082
++      ],
++      "lower_pct": 33.33333333333333,
++      "gap": 0.29040527206470945
++     },
++     "r_pp": {
++      "n": 39,
++      "ratio": 0.11615894031436282,
++      "ratio_q10_q90": [
++       0.017724554898646966,
++       0.3714620028707364
++      ],
++      "lower_pct": 97.43589743589743,
++      "gap": 0.9349473585734235
++     },
++     "relative": {
++      "n": 39,
++      "ratio": 16.28963059153474,
++      "ratio_q10_q90": [
++       2.9669175166010495,
++       62.81751828838174
++      ],
++      "lower_pct": 2.564102564102564,
++      "gap": 1.2119112356972683
++     },
++     "recovered": -0.09897978298022508,
++     "optimizer": {
++      "n": 39,
++      "ratio": 0.1954848908567088,
++      "ratio_q10_q90": [
++       0.11358454390103734,
++       0.35114354788344454
++      ],
++      "lower_pct": 100.0,
++      "gap": 0.7088868038493651
++     }
++    }
++   }
++  },
++  "b": {
++   "train": {
++    "n": 284,
++    "mse": {
++     "n": 284,
++     "median": {
++      "pp_trained": 0.35371004343791934,
++      "adamw_window": 1.2395238618814677,
++      "v4": [
++       1.2354715427080185,
++       2.2926566342505486
++      ],
++      "v3_muon": [
++       0.2946208328852687,
++       0.3016171288883841
++      ]
++     },
++     "direct": {
++      "n": 284,
++      "ratio": 4.968157593202202,
++      "ratio_q10_q90": [
++       0.9719509751807427,
++       30.67196443305977
++      ],
++      "lower_pct": 11.619718309859154,
++      "gap": 0.6961875489181604,
++      "v4_lower_both_pct": 4.929577464788732,
++      "v4_higher_both_pct": 82.04225352112677,
++      "spread_v4": 0.23731676228327817,
++      "spread_v3": 0.09839431033909105
++     },
++     "r_v4": {
++      "n": 284,
++      "ratio": 4.864423201803595,
++      "ratio_q10_q90": [
++       1.366144280014161,
++       31.2046335788881
++      ],
++      "lower_pct": 4.225352112676056,
++      "gap": 0.6984476376086683
++     },
++     "r_pp": {
++      "n": 284,
++      "ratio": 0.2470039083388369,
++      "ratio_q10_q90": [
++       0.054116366457204974,
++       0.7879692249654966
++      ],
++      "lower_pct": 97.1830985915493,
++      "gap": 0.6073462465783086
++     },
++     "relative": {
++      "n": 284,
++      "ratio": 22.068761390625717,
++      "ratio_q10_q90": [
++       4.295203653417422,
++       153.50399603785354
++      ],
++      "lower_pct": 0.7042253521126761,
++      "gap": 1.343669853930952
++     },
++     "recovered": -1.1312953707096454,
++     "optimizer": {
++      "n": 284,
++      "ratio": 0.22360072393041447,
++      "ratio_q10_q90": [
++       0.11837730992181088,
++       0.4740249230191944
++      ],
++      "lower_pct": 97.53521126760563,
++      "gap": 0.6505298818054164
++     }
++    },
++    "mse_inside": {
++     "n": 284,
++     "median": {
++      "pp_trained": 0.30903056253615935,
++      "adamw_window": 0.5035937485259883,
++      "v4": [
++       1.082294308029362,
++       1.826540241133031
++      ],
++      "v3_muon": [
++       0.13206135838638258,
++       0.13516207784786755
++      ]
++     },
++     "direct": {
++      "n": 284,
++      "ratio": 4.361351039713255,
++      "ratio_q10_q90": [
++       1.052797773283792,
++       27.00284464238479
++      ],
++      "lower_pct": 9.15492957746479,
++      "gap": 0.6396205319417567,
++      "v4_lower_both_pct": 4.577464788732395,
++      "v4_higher_both_pct": 82.74647887323944,
++      "spread_v4": 0.2271607730844447,
++      "spread_v3": 0.07740518066632103
++     },
++     "r_v4": {
++      "n": 284,
++      "ratio": 9.81678408744105,
++      "ratio_q10_q90": [
++       2.2807018307275757,
++       50.04559694291854
++      ],
++      "lower_pct": 0.7042253521126761,
++      "gap": 0.991968771592223
++     },
++     "r_pp": {
++      "n": 284,
++      "ratio": 0.5236260500674066,
++      "ratio_q10_q90": [
++       0.14617587944343324,
++       1.1770030780856848
++      ],
++      "lower_pct": 83.45070422535211,
++      "gap": 0.3001307616169562
++     },
++     "relative": {
++      "n": 284,
++      "ratio": 20.06282264475018,
++      "ratio_q10_q90": [
++       4.967461506721022,
++       120.73693930334639
++      ],
++      "lower_pct": 0.35211267605633806,
++      "gap": 1.3023903860576893
++     },
++     "recovered": -3.5304065484844216,
++     "optimizer": {
++      "n": 284,
++      "ratio": 0.2234792190648815,
++      "ratio_q10_q90": [
++       0.12639431019305591,
++       0.49840241271263064
++      ],
++      "lower_pct": 98.59154929577466,
++      "gap": 0.6507632203607878
++     }
++    },
++    "mse_outside": {
++     "n": 282,
++     "median": {
++      "pp_trained": 0.466712923235534,
++      "adamw_window": 2.6402632562686676,
++      "v4": [
++       1.4503261307945856,
++       2.4637707205410413
++      ],
++      "v3_muon": [
++       0.5835479904772254,
++       0.6962192846473194
++      ]
++     },
++     "direct": {
++      "n": 282,
++      "ratio": 4.628119756161473,
++      "ratio_q10_q90": [
++       0.6918275738532274,
++       31.859788846211764
++      ],
++      "lower_pct": 17.02127659574468,
++      "gap": 0.6755591911648288,
++      "v4_lower_both_pct": 10.28368794326241,
++      "v4_higher_both_pct": 75.53191489361703,
++      "spread_v4": 0.2864835700821692,
++      "spread_v3": 0.12856970239501458
++     },
++     "r_v4": {
++      "n": 282,
++      "ratio": 3.161798463575072,
++      "ratio_q10_q90": [
++       0.9185387877210023,
++       17.7353371632335
++      ],
++      "lower_pct": 12.056737588652481,
++      "gap": 0.5309690759964831
++     },
++     "r_pp": {
++      "n": 282,
++      "ratio": 0.16943987830198898,
++      "ratio_q10_q90": [
++       0.03112867932977089,
++       0.6447058099308676
++      ],
++      "lower_pct": 97.51773049645391,
++      "gap": 0.7767887280283428
++     },
++     "relative": {
++      "n": 282,
++      "ratio": 19.816483564677867,
++      "ratio_q10_q90": [
++       2.6403233837950406,
++       168.7664324968152
++      ],
++      "lower_pct": 1.4184397163120568,
++      "gap": 1.2968960178360203
++     },
++     "recovered": -0.6484362122998402,
++     "optimizer": {
++      "n": 282,
++      "ratio": 0.23449604183151998,
++      "ratio_q10_q90": [
++       0.09770067968217955,
++       0.5098391268693833
++      ],
++      "lower_pct": 98.58156028368793,
++      "gap": 0.6298652566667073
++     }
++    }
++   },
++   "heldout": {
++    "n": 225,
++    "mse": {
++     "n": 225,
++     "median": {
++      "pp_trained": 2.914794945362174,
++      "adamw_window": 3.441490656383263,
++      "v4": [
++       1.7537005744580032,
++       2.6928084099915397
++      ],
++      "v3_muon": [
++       1.3444886825313973,
++       1.6667174970140564
++      ]
++     },
++     "direct": {
++      "n": 225,
++      "ratio": 0.9070139697941697,
++      "ratio_q10_q90": [
++       0.154846180817254,
++       6.487833886521374
++      ],
++      "lower_pct": 53.333333333333336,
++      "gap": 0.49822876279721773,
++      "v4_lower_both_pct": 46.666666666666664,
++      "v4_higher_both_pct": 42.22222222222222,
++      "spread_v4": 0.22056212908697312,
++      "spread_v3": 0.15205849376614786
++     },
++     "r_v4": {
++      "n": 225,
++      "ratio": 1.4756048605021583,
++      "ratio_q10_q90": [
++       0.4596383629379524,
++       7.937869030250409
++      ],
++      "lower_pct": 37.333333333333336,
++      "gap": 0.35482808693278506
++     },
++     "r_pp": {
++      "n": 225,
++      "ratio": 0.7614262823227355,
++      "ratio_q10_q90": [
++       0.2100310537532231,
++       2.1918884469640862
++      ],
++      "lower_pct": 62.66666666666667,
++      "gap": 0.27250324711518087
++     },
++     "relative": {
++      "n": 225,
++      "ratio": 1.983358808006153,
++      "ratio_q10_q90": [
++       0.3635579782370333,
++       17.345486702057343
++      ],
++      "lower_pct": 32.0,
++      "gap": 0.5031227346577496
++     },
++     "recovered": -1.4274480625534582,
++     "optimizer": {
++      "n": 225,
++      "ratio": 0.36654571667720043,
++      "ratio_q10_q90": [
++       0.15251246977982771,
++       0.9894056400377113
++      ],
++      "lower_pct": 90.66666666666666,
++      "gap": 0.44243444651119834
++     }
++    },
++    "mse_inside": {
++     "n": 225,
++     "median": {
++      "pp_trained": 1.9233926516142221,
++      "adamw_window": 1.6262148180596496,
++      "v4": [
++       1.4189959211758134,
++       1.9712234796681039
++      ],
++      "v3_muon": [
++       0.6451710286936119,
++       0.6712276334721425
++      ]
++     },
++     "direct": {
++      "n": 225,
++      "ratio": 0.9717355917775782,
++      "ratio_q10_q90": [
++       0.16596922754293417,
++       6.199970906372702
++      ],
++      "lower_pct": 50.66666666666667,
++      "gap": 0.4011527580572071,
++      "v4_lower_both_pct": 44.44444444444444,
++      "v4_higher_both_pct": 42.66666666666667,
++      "spread_v4": 0.20941666847168483,
++      "spread_v3": 0.12899474630925725
++     },
++     "r_v4": {
++      "n": 225,
++      "ratio": 2.0041609857673546,
++      "ratio_q10_q90": [
++       0.7543457478832684,
++       11.47415253959882
++      ],
++      "lower_pct": 22.22222222222222,
++      "gap": 0.38742264795082354
++     },
++     "r_pp": {
++      "n": 225,
++      "ratio": 0.9946406362392946,
++      "ratio_q10_q90": [
++       0.3675187501051377,
++       2.7338584164686375
++      ],
++      "lower_pct": 50.22222222222222,
++      "gap": 0.2112004763770609
++     },
++     "relative": {
++      "n": 225,
++      "ratio": 2.096666952524848,
++      "ratio_q10_q90": [
++       0.4561658773749638,
++       15.471073598004988
++      ],
++      "lower_pct": 29.777777777777775,
++      "gap": 0.4727544957426487
++     },
++     "recovered": null,
++     "optimizer": {
++      "n": 225,
++      "ratio": 0.3740110501331805,
++      "ratio_q10_q90": [
++       0.142341535446099,
++       1.105222266882429
++      ],
++      "lower_pct": 88.88888888888889,
++      "gap": 0.44690807071813565
++     }
++    },
++    "mse_outside": {
++     "n": 225,
++     "median": {
++      "pp_trained": 3.273743316067252,
++      "adamw_window": 4.211051184435406,
++      "v4": [
++       2.1564665550086364,
++       2.9359705876254787
++      ],
++      "v3_muon": [
++       1.9227807949126243,
++       2.048279591287446
++      ]
++     },
++     "direct": {
++      "n": 225,
++      "ratio": 0.8501995388138679,
++      "ratio_q10_q90": [
++       0.14912919879676875,
++       6.349525946377281
++      ],
++      "lower_pct": 53.77777777777778,
++      "gap": 0.509738552635661,
++      "v4_lower_both_pct": 49.333333333333336,
++      "v4_higher_both_pct": 38.22222222222222,
++      "spread_v4": 0.21852861596300657,
++      "spread_v3": 0.15671317545874067
++     },
++     "r_v4": {
++      "n": 225,
++      "ratio": 1.1583231099779612,
++      "ratio_q10_q90": [
++       0.41042966842669376,
++       6.181793761676753
++      ],
++      "lower_pct": 44.44444444444444,
++      "gap": 0.3284129762897406
++     },
++     "r_pp": {
++      "n": 225,
++      "ratio": 0.6975308384610179,
++      "ratio_q10_q90": [
++       0.1596390124040515,
++       2.255435276850145
++      ],
++      "lower_pct": 67.11111111111111,
++      "gap": 0.2752485916489185
++     },
++     "relative": {
++      "n": 225,
++      "ratio": 1.70367024034375,
++      "ratio_q10_q90": [
++       0.3348161014103903,
++       16.764196655430286
++      ],
++      "lower_pct": 34.66666666666667,
++      "gap": 0.4723705430215462
++     },
++     "recovered": -0.40802297168494045,
++     "optimizer": {
++      "n": 225,
++      "ratio": 0.3736317392064969,
++      "ratio_q10_q90": [
++       0.1570562866959996,
++       1.0755127886469955
++      ],
++      "lower_pct": 88.88888888888889,
++      "gap": 0.4427551255136558
++     }
++    }
++   },
++   "role_changed": {
++    "n": 57,
++    "mse": {
++     "n": 57,
++     "median": {
++      "pp_trained": 0.5233718451514194,
++      "adamw_window": 1.9610864440772124,
++      "v4": [
++       2.4083262194856165,
++       2.8432473471308786
++      ],
++      "v3_muon": [
++       0.4755013795489694,
++       0.5678534840530683
++      ]
++     },
++     "direct": {
++      "n": 57,
++      "ratio": 5.412660057537692,
++      "ratio_q10_q90": [
++       1.6050209911864188,
++       47.03374927234694
++      ],
++      "lower_pct": 5.263157894736842,
++      "gap": 0.7334107520547478,
++      "v4_lower_both_pct": 1.7543859649122806,
++      "v4_higher_both_pct": 94.73684210526315,
++      "spread_v4": 0.24006031881250087,
++      "spread_v3": 0.08597730943442689
++     },
++     "r_v4": {
++      "n": 57,
++      "ratio": 5.380682292023461,
++      "ratio_q10_q90": [
++       1.3439025922326793,
++       39.33637675899135
++      ],
++      "lower_pct": 3.508771929824561,
++      "gap": 0.7308373494346115
++     },
++     "r_pp": {
++      "n": 57,
++      "ratio": 0.2772612243348389,
++      "ratio_q10_q90": [
++       0.04318220351964114,
++       0.7707617105024064
++      ],
++      "lower_pct": 96.49122807017544,
++      "gap": 0.5571108633284436
++     },
++     "relative": {
++      "n": 57,
++      "ratio": 25.840583026451945,
++      "ratio_q10_q90": [
++       4.826373477827438,
++       175.56254647864495
++      ],
++      "lower_pct": 0.0,
++      "gap": 1.412302308174223
++     },
++     "recovered": -1.3118346769765783,
++     "optimizer": {
++      "n": 57,
++      "ratio": 0.2203733161863484,
++      "ratio_q10_q90": [
++       0.1357276521465772,
++       0.45725652481156437
++      ],
++      "lower_pct": 98.24561403508771,
++      "gap": 0.6568409930080891
++     }
++    },
++    "mse_inside": {
++     "n": 57,
++     "median": {
++      "pp_trained": 0.43597249969318247,
++      "adamw_window": 0.6536009089109452,
++      "v4": [
++       1.4990620620035433,
++       2.5990621454325815
++      ],
++      "v3_muon": [
++       0.17552551486707121,
++       0.174153559917611
++      ]
++     },
++     "direct": {
++      "n": 57,
++      "ratio": 4.614730183407822,
++      "ratio_q10_q90": [
++       1.57766069525966,
++       17.488490641501162
++      ],
++      "lower_pct": 7.017543859649122,
++      "gap": 0.6641463135346913,
++      "v4_lower_both_pct": 3.508771929824561,
++      "v4_higher_both_pct": 92.98245614035088,
++      "spread_v4": 0.2616688542180713,
++      "spread_v3": 0.06254083975283914
++     },
++     "r_v4": {
++      "n": 57,
++      "ratio": 13.435562586873688,
++      "ratio_q10_q90": [
++       2.6822244122487797,
++       68.41097799702364
++      ],
++      "lower_pct": 1.7543859649122806,
++      "gap": 1.1282558563485983
++     },
++     "r_pp": {
++      "n": 57,
++      "ratio": 0.656685749226689,
++      "ratio_q10_q90": [
++       0.24931730228990154,
++       1.1668607829956519
++      ],
++      "lower_pct": 87.71929824561403,
++      "gap": 0.20790144505726404
++     },
++     "relative": {
++      "n": 57,
++      "ratio": 17.715057029091973,
++      "ratio_q10_q90": [
++       5.3183686499316,
++       88.99257942817786
++      ],
++      "lower_pct": 0.0,
++      "gap": 1.2483425547713742
++     },
++     "recovered": -6.177403523678089,
++     "optimizer": {
++      "n": 57,
++      "ratio": 0.23130506229291603,
++      "ratio_q10_q90": [
++       0.15275821264060338,
++       0.4331149627362374
++      ],
++      "lower_pct": 98.24561403508771,
++      "gap": 0.6358148622496106
++     }
++    },
++    "mse_outside": {
++     "n": 57,
++     "median": {
++      "pp_trained": 0.6656472741034726,
++      "adamw_window": 4.421222807610404,
++      "v4": [
++       2.460703534675058,
++       3.2769776054370103
++      ],
++      "v3_muon": [
++       0.7921515665916771,
++       1.0763154931909387
++      ]
++     },
++     "direct": {
++      "n": 57,
++      "ratio": 3.884106612985013,
++      "ratio_q10_q90": [
++       1.0510767548946762,
++       37.003728374578415
++      ],
++      "lower_pct": 10.526315789473683,
++      "gap": 0.5892911421411248,
++      "v4_lower_both_pct": 5.263157894736842,
++      "v4_higher_both_pct": 89.47368421052632,
++      "spread_v4": 0.22490452753552712,
++      "spread_v3": 0.12329595137789796
++     },
++     "r_v4": {
++      "n": 57,
++      "ratio": 4.224279821397166,
++      "ratio_q10_q90": [
++       1.0234587824506147,
++       21.244613200871637
++      ],
++      "lower_pct": 10.526315789473683,
++      "gap": 0.6257526786696103
++     },
++     "r_pp": {
++      "n": 57,
++      "ratio": 0.21360874168778946,
++      "ratio_q10_q90": [
++       0.029751857785771968,
++       0.6724433983236286
++      ],
++      "lower_pct": 100.0,
++      "gap": 0.6703809782863396
++     },
++     "relative": {
++      "n": 57,
++      "ratio": 21.805839607003033,
++      "ratio_q10_q90": [
++       3.9818539759132325,
++       165.29516194448072
++      ],
++      "lower_pct": 0.0,
++      "gap": 1.338572813305632
++     },
++     "recovered": -0.933428451787504,
++     "optimizer": {
++      "n": 57,
++      "ratio": 0.20308156775580008,
++      "ratio_q10_q90": [
++       0.1290600295056249,
++       0.46297390140879013
++      ],
++      "lower_pct": 100.0,
++      "gap": 0.6923294925735934
++     }
++    }
++   }
++  }
++ }
++}
+\ No newline at end of file
+diff --git a/docs/results.tex b/docs/results.tex
+index cb2d77f1..70642743 100644
+--- a/docs/results.tex
++++ b/docs/results.tex
+@@ -1372,6 +1372,111 @@ catalog\_v3's narrower region, more on its one-loop pools, plus everything that
+ in-region cost is the same steps spread over a larger phase space (and so shrinks with a longer run) is not checked
+ here. Two seeds per catalog, short pretrainings.
+ 
++% src: python3 analysis/catalog_v4/compare_pp_trained.py @d03f0dcd
++% claim: n_probes=1396
++% claim: frac_inside_max_diff=0
++% claim: var_t_rel_diff_max=3e-4
++% claim: no_b.train.mse.optimizer=0.26
++% claim: no_b.heldout.mse.optimizer=0.28
++% allow: 2000 because it is the events per read, a setting
++% allow: 13 because it is the beam energy in TeV, a setting
++\emph{catalog\_v4 against training on pp (2026-10-29).} The question the switch turns on (the user, 2026-10-26: what
++mattered most is how training on catalog\_v4 compares with training on pp collisions, on data generated like pp
++collisions): catalog\_v4's two runs above against the pp-trained arm (par.\ The pp-trained arm,
++\code{FA-ccin2p3-e786bd74}, its read completed by \code{FA-ccin2p3-982b5a14}), on the same $13$\,TeV pp pools, at no
++new compute (\code{analysis/catalog\_v4/compare\_pp\_trained.py}, \code{data/compare\_pp\_trained.json},
++Fig.~\ref{fig:v4_vs_pp_trained}). Checked first that every run read the same events and split them by one definition
++of catalog\_v3's coverage: on all $1396$ pools the share of the $2000$ scored events inside agrees between the masks of
++this comparison and those recorded with each AdamW arm's read (largest difference $0$), and the target's variance over
++the events between catalog\_v4's and catalog\_v3's Muon reads and the pp-trained arm's within $3\times10^{-4}$
++(relative). The two sides differ in more than the data: catalog\_v4's runs use Muon at its search's best, two seeds; the
++pp-trained arm uses AdamW at the settings transferred from Daniel's catalog, one seed. On these pp pools Muon alone,
++catalog\_v3's window-trained Muon runs against the window-trained AdamW arm, reads $0.26$ times AdamW's error on the
++classes trained in both catalogs and $0.28$ on those held out in both (median per class; Muon's zero-shot lead on
++catalog\_v3's own axes, par.~\ref{par:v3_muon}). Hence two readings, $b$ classes apart as above.
++\begin{itemize}
++  \item \emph{Directly}, catalog\_v4 (each class the geometric mean of its two seeds) over the pp-trained arm.
++% src: python3 analysis/catalog_v4/compare_pp_trained.py @d03f0dcd
++% claim: no_b.train.n=578
++% claim: no_b.train.mse.v4_lo=0.74
++% claim: no_b.train.mse.v4_hi=1.00
++% claim: no_b.train.mse.pp_trained=0.47
++% claim: no_b.train.mse.direct=1.31
++% claim: no_b.train.mse.v4_lower_both_pct=42
++% claim: no_b.train.mse.v4_higher_both_pct=52
++% claim: no_b.train.mse.gap=0.50
++% claim: no_b.train.mse.spread_v4=0.10
++% claim: no_b.train.mse_inside.direct=1.15
++% claim: no_b.train.mse_outside.direct=1.28
++% claim: no_b.heldout.n=180
++% claim: no_b.heldout.mse.v4_lo=0.90
++% claim: no_b.heldout.mse.v4_hi=0.98
++% claim: no_b.heldout.mse.pp_trained=0.92
++% claim: no_b.heldout.mse.direct=0.79
++% claim: no_b.heldout.mse.v4_lower_both_pct=54
++% claim: no_b.heldout.mse.v4_higher_both_pct=36
++% claim: no_b.heldout.mse.gap=0.36
++% claim: no_b.heldout.mse.spread_v4=0.14
++% claim: no_b.heldout.mse_inside.direct=0.80
++% claim: no_b.heldout.mse_outside.direct=0.75
++% claim: no_b.role_changed.n=39
++% claim: no_b.role_changed.mse.direct=2.98
++    The $578$ classes trained in both (the pp-trained arm trained them on their pp events, catalog\_v4 on its own
++    pools): median MSE $0.74$ and $1.00$ against $0.47$, per-class ratio $1.31$, catalog\_v4 lower in both seeds on
++    $42\%$ and higher in both on $52\%$, gap $0.50$ against catalog\_v4's seed spread $0.10$; $1.15$ inside catalog\_v3's
++    coverage, $1.28$ outside. The $180$ held out in both, zero-shot for every run: $0.90$ and $0.98$ against $0.92$,
++    ratio $0.79$ ($54\%$ lower in both seeds, $36\%$ higher; gap $0.36$, spread $0.14$), $0.80$ inside and $0.75$
++    outside. The $39$ that catalog\_v3 trains and catalog\_v4 holds out (so the pp-trained arm trained them): $2.98$.
++    The pp-trained arm's own seed spread is not measured (one seed).
++  \item \emph{Each against its own optimizer's window-trained catalog\_v3 arm}: catalog\_v4 over catalog\_v3 with
++% src: python3 analysis/catalog_v4/compare_pp_trained.py @d03f0dcd
++% claim: no_b.train.mse.r_pp=0.15
++% claim: no_b.train.mse_inside.r_pp=0.60
++% claim: no_b.train.mse_outside.r_pp=0.10
++% claim: no_b.heldout.mse.r_pp=0.33
++% claim: no_b.heldout.mse_inside.r_pp=0.68
++% claim: no_b.heldout.mse_outside.r_pp=0.26
++% claim: no_b.train.mse.r_v4=0.75
++% claim: no_b.train.mse_inside.r_v4=1.20
++% claim: no_b.train.mse_outside.r_v4=0.50
++% claim: no_b.heldout.mse.r_v4=0.78
++% claim: no_b.heldout.mse_inside.r_v4=1.21
++% claim: no_b.heldout.mse_outside.r_v4=0.63
++% claim: no_b.train.mse.recovered=0.15
++% claim: no_b.heldout.mse.recovered=0.23
++% claim: no_b.train.mse_outside.recovered=0.30
++% claim: no_b.heldout.mse_outside.recovered=0.35
++% claim: no_b.train.mse.relative=4.1
++% claim: no_b.heldout.mse.relative=2.8
++% claim: no_b.train.mse.relative_below1_pct=13
++% claim: no_b.heldout.mse.relative_below1_pct=24
++    Muon, the pp-trained arm over the window-trained AdamW arm, per class on the same classes. Training on pp cuts
++    AdamW's error by a factor $0.15$ on the classes trained in both ($0.60$ inside the coverage, $0.10$ outside) and
++    $0.33$ on those held out in both ($0.68$, $0.26$); catalog\_v4 changes Muon's by $0.75$ ($1.20$ inside, $0.50$
++    outside) and $0.78$ ($1.21$, $0.63$). On a log scale catalog\_v4 recovers $0.15$ of the pp-trained arm's gain on the
++    trained classes and $0.23$ on the held-out ones, $0.30$ and $0.35$ outside the coverage, and none inside it, where it
++    loses while pp training gains. Per class the two factors' ratio (catalog\_v4's over the pp-trained arm's) is $4.1$
++    and $2.8$, below one on $13\%$ and $24\%$ of the classes: were a pp-trained run moved by Muon as much as a
++    window-trained one is, it would read about four and three times below catalog\_v4. That premise is not measured.
++\end{itemize}
++% src: python3 analysis/catalog_v4/compare_pp_trained.py @d03f0dcd
++% claim: b.train.mse.direct=4.97
++% claim: b.heldout.mse.direct=0.91
++% claim: no_b.train.mse.direct=1.31
++% claim: no_b.heldout.mse.direct=0.79
++% claim: no_b.train.mse.recovered=0.15
++% claim: no_b.heldout.mse.recovered=0.23
++% allow: 4264 because it is the step count, a setting
++% allow: 3 because it is the proposed run's cost in GPU-hours, a setting
++On the $b$ classes catalog\_v4 is $4.97$ times the pp-trained arm on the trained ones (a massive $b$ it never saw) and
++$0.91$ on the held-out ones. So directly catalog\_v4 with Muon is about level with the pp-trained arm with AdamW,
++behind on the classes trained in both ($1.31$) and ahead on those held out in both ($0.79$), both gaps larger than
++catalog\_v4's seed spread; but that parity comes from the optimizer, which alone is worth about a factor four on these
++pools, and against its own baseline catalog\_v4 recovers $0.15$ to $0.23$ of what pp training gains (none of it inside
++catalog\_v3's coverage). The clean answer needs a pp-trained arm with Muon at catalog\_v4's runs' settings (the search's
++best, $4264$ steps), two seeds, about $3$ GPU-h, read on the same pools; proposed, not run. The pp-trained and the
++window-trained AdamW arms predate the coupling-power fix of two BSM pools with a gluon (above).
++
+ \begin{figure}[t]
+   \centering
+   \widerow{\includegraphics{../analysis/catalog_v4/figs/compare_v3_shared.pdf}}
+@@ -1393,6 +1498,21 @@ here. Two seeds per catalog, short pretrainings.
+     catalog\_v3's window pools cover. Seed $42$ filled, $43$ open.}
+   \label{fig:v4_vs_v3_pp}
+ \end{figure}
++\begin{figure}[t]
++  \centering
++  \widerow{\pnl{../analysis/catalog_v4/figs/compare_pp_trained_a.pdf}\hfill\pnl{../analysis/catalog_v4/figs/compare_pp_trained_b.pdf}} \\[1ex]
++  \widerow{\pnl{../analysis/catalog_v4/figs/compare_pp_trained_c.pdf}\hfill\pnl{../analysis/catalog_v4/figs/compare_pp_trained_d.pdf}}
++  % src: python3 analysis/catalog_v4/compare_pp_trained.py @d03f0dcd
++  % allow: 13 42 43 because they are the beam energy in TeV and the seeds, settings
++  \caption{catalog\_v4 against the pp-trained arm on the $13$\,TeV pp pools, no $b$. (a, b) Each run's median MSE of
++    $\log|\mathcal M|^2$ over the classes trained in both catalogs (a) and held out in both (b), on the whole pool and
++    on its events inside and outside catalog\_v3's coverage: the pp-trained arm and catalog\_v3's window-trained arm
++    with AdamW (one seed each), catalog\_v3 and catalog\_v4 with Muon (seed $42$ filled, $43$ open). (c, d) The median
++    per-class MSE ratios on the same classes: catalog\_v4 over the pp-trained arm, catalog\_v4 over catalog\_v3 with
++    Muon, the pp-trained arm over catalog\_v3 with AdamW.}
++  % allow: M|^2
++  \label{fig:v4_vs_pp_trained}
++\end{figure}
+ 
+ 
+ \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$

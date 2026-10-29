@@ -1,0 +1,10 @@
+Reviewer R9 (repo-reviewer, blind), diff v4pp_b against 6e34f573.
+Verdict: fix first. Both comparisons run, same events and one coverage split checked first, clean Muon pp-trained arm proposed; best-checkpoint reads; compare_v3.py refactor into pp_reads() keeps pp().
+BLOCKING 1. analysis/catalog_v4/compare_pp_trained.py:123-124: recovered set to None when abs(log10(median r_pp)) <= 0.05, an unsourced cut-off.
+REIMPL: compare_pp_trained.py:stats + main 114-119 | analysis/catalog_v4/compare_v3.py:compare | the same per-class ratio statistics, compare() hard-wired to the v3/v4 pair
+REIMPL: compare_pp_trained.py:main 120, 131 | analysis/catalog_v3/pp_compare.py:pp_vs | per-class median ratio over the window-trained arm
+REIMPL: compare_pp_trained.py:main 98-100 | analysis/catalog_v3/pp_compare.py:read | the reader of pp_rows.json, without its no_prediction list
+REIMPL: compare_pp_trained.py:main 101 gm lambda | analysis/catalog_v4/compare_v3.py:gmean | geometric mean of two seeds
+Non-blocking: docstring's lr provenance wrong; checks() reloads the npz reads; inside-share check compares two outputs of one function; variance check only against dimensionless_pp; role_changed group narrower than compare_v3's under the same name. Reuses compare_v3.pp_reads, has_b, plot_style.panels/save_panels.
+REIMPLEMENTED: 4
+BLOCKING: 1

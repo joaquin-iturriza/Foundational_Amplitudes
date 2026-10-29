@@ -1,0 +1,3 @@
+Reviewer R5 (repo-reviewer, blind), diff hsplit_c. Its full report reached the orchestrating session, which relayed only its two final counts; the findings are not listed here.
+REIMPLEMENTED: 4
+BLOCKING: 2

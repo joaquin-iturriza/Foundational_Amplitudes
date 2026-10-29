@@ -1,0 +1,709 @@
+diff --git a/analysis/catalog_v4/data/pp_trained_compare.json b/analysis/catalog_v4/data/pp_trained_compare.json
+new file mode 100644
+index 00000000..06e9379c
+--- /dev/null
++++ b/analysis/catalog_v4/data/pp_trained_compare.json
+@@ -0,0 +1,426 @@
++{
++ "n": 1396,
++ "max_var_t_dev": 0.00026652891649803223,
++ "no_b": {
++  "train": {
++   "n": 578,
++   "mse": {
++    "direct": {
++     "n": 578,
++     "ratio": 1.3104076025078772,
++     "lower_pct": 45.32871972318339,
++     "num_med": 0.8816397359651471,
++     "den_med": 0.46972385568481245,
++     "v4_lower_both_pct": 42.04152249134948,
++     "pp_lower_both_pct": 51.73010380622838
++    },
++    "pp_gain": {
++     "n": 578,
++     "ratio": 0.1503246070399681,
++     "lower_pct": 98.6159169550173,
++     "num_med": 0.46972385568481245,
++     "den_med": 5.230864611823257
++    },
++    "v4_gain": {
++     "n": 578,
++     "ratio": 0.7543521178061806,
++     "lower_pct": 67.1280276816609,
++     "num_med": 0.8816397359651471,
++     "den_med": 1.5491176674080926
++    },
++    "recovered": 0.1487610697252058,
++    "muon_on_windows": {
++     "n": 578,
++     "ratio": 0.2588331805280332,
++     "lower_pct": 97.40484429065745,
++     "num_med": 1.5491176674080926,
++     "den_med": 5.230864611823257
++    }
++   },
++   "mse_inside": {
++    "direct": {
++     "n": 578,
++     "ratio": 1.1459856439544904,
++     "lower_pct": 48.78892733564014,
++     "num_med": 0.6138937249005023,
++     "den_med": 0.40659163156432887,
++     "v4_lower_both_pct": 46.19377162629758,
++     "pp_lower_both_pct": 48.78892733564014
++    },
++    "pp_gain": {
++     "n": 578,
++     "ratio": 0.5969009846709316,
++     "lower_pct": 80.62283737024222,
++     "num_med": 0.40659163156432887,
++     "den_med": 0.5476334308642572
++    },
++    "v4_gain": {
++     "n": 578,
++     "ratio": 1.1951605855498553,
++     "lower_pct": 34.602076124567475,
++     "num_med": 0.6138937249005023,
++     "den_med": 0.12709643138223506
++    },
++    "recovered": -0.34550225533801654,
++    "muon_on_windows": {
++     "n": 578,
++     "ratio": 0.22498949901355464,
++     "lower_pct": 96.88581314878893,
++     "num_med": 0.12709643138223506,
++     "den_med": 0.5476334308642572
++    }
++   },
++   "mse_outside": {
++    "direct": {
++     "n": 577,
++     "ratio": 1.2839022698494216,
++     "lower_pct": 44.54072790294627,
++     "num_med": 1.0006241521613017,
++     "den_med": 0.532721717148174,
++     "v4_lower_both_pct": 41.94107452339688,
++     "pp_lower_both_pct": 51.64644714038128
++    },
++    "pp_gain": {
++     "n": 577,
++     "ratio": 0.1019605632513882,
++     "lower_pct": 99.13344887348353,
++     "num_med": 0.532721717148174,
++     "den_med": 7.726793555988795
++    },
++    "v4_gain": {
++     "n": 577,
++     "ratio": 0.5044383544739532,
++     "lower_pct": 74.87001733102254,
++     "num_med": 1.0006241521613017,
++     "den_med": 2.1448173801305885
++    },
++    "recovered": 0.2997191996994402,
++    "muon_on_windows": {
++     "n": 577,
++     "ratio": 0.27668691614989616,
++     "lower_pct": 98.09358752166378,
++     "num_med": 2.1448173801305885,
++     "den_med": 7.726793555988795
++    }
++   }
++  },
++  "heldout": {
++   "n": 180,
++   "mse": {
++    "direct": {
++     "n": 180,
++     "ratio": 0.7859729358920979,
++     "lower_pct": 59.44444444444444,
++     "num_med": 1.0043820346793237,
++     "den_med": 0.9233145316953535,
++     "v4_lower_both_pct": 53.888888888888886,
++     "pp_lower_both_pct": 35.55555555555556
++    },
++    "pp_gain": {
++     "n": 180,
++     "ratio": 0.33468084591209835,
++     "lower_pct": 85.55555555555556,
++     "num_med": 0.9233145316953535,
++     "den_med": 3.790388497206911
++    },
++    "v4_gain": {
++     "n": 180,
++     "ratio": 0.776968506188574,
++     "lower_pct": 62.22222222222222,
++     "num_med": 1.0043820346793237,
++     "den_med": 1.218604957106718
++    },
++    "recovered": 0.23055048160959873,
++    "muon_on_windows": {
++     "n": 180,
++     "ratio": 0.2755202493496523,
++     "lower_pct": 94.44444444444444,
++     "num_med": 1.218604957106718,
++     "den_med": 3.790388497206911
++    }
++   },
++   "mse_inside": {
++    "direct": {
++     "n": 180,
++     "ratio": 0.7972919134637206,
++     "lower_pct": 58.88888888888889,
++     "num_med": 0.6469406712624013,
++     "den_med": 0.7939448222693218,
++     "v4_lower_both_pct": 53.888888888888886,
++     "pp_lower_both_pct": 33.88888888888889
++    },
++    "pp_gain": {
++     "n": 180,
++     "ratio": 0.6831667331756943,
++     "lower_pct": 72.77777777777777,
++     "num_med": 0.7939448222693218,
++     "den_med": 1.0122169191150079
++    },
++    "v4_gain": {
++     "n": 180,
++     "ratio": 1.2092376027418856,
++     "lower_pct": 40.0,
++     "num_med": 0.6469406712624013,
++     "den_med": 0.3535765487807083
++    },
++    "recovered": -0.4986402563652433,
++    "muon_on_windows": {
++     "n": 180,
++     "ratio": 0.30921017046803567,
++     "lower_pct": 93.88888888888889,
++     "num_med": 0.3535765487807083,
++     "den_med": 1.0122169191150079
++    }
++   },
++   "mse_outside": {
++    "direct": {
++     "n": 180,
++     "ratio": 0.7540606658751488,
++     "lower_pct": 58.88888888888889,
++     "num_med": 1.0376674392611678,
++     "den_med": 1.1241916681174893,
++     "v4_lower_both_pct": 54.44444444444444,
++     "pp_lower_both_pct": 35.0
++    },
++    "pp_gain": {
++     "n": 180,
++     "ratio": 0.2624937126905553,
++     "lower_pct": 86.66666666666667,
++     "num_med": 1.1241916681174893,
++     "den_med": 5.276769748968758
++    },
++    "v4_gain": {
++     "n": 180,
++     "ratio": 0.6276650945657982,
++     "lower_pct": 70.0,
++     "num_med": 1.0376674392611678,
++     "den_med": 1.4719237646838976
++    },
++    "recovered": 0.3482158817044082,
++    "muon_on_windows": {
++     "n": 180,
++     "ratio": 0.2709678173927467,
++     "lower_pct": 93.88888888888889,
++     "num_med": 1.4719237646838976,
++     "den_med": 5.276769748968758
++    }
++   }
++  }
++ },
++ "b": {
++  "train": {
++   "n": 284,
++   "mse": {
++    "direct": {
++     "n": 284,
++     "ratio": 4.9680681983693535,
++     "lower_pct": 11.619718309859154,
++     "num_med": 1.740640777010942,
++     "den_med": 0.35371004343791934,
++     "v4_lower_both_pct": 4.929577464788732,
++     "pp_lower_both_pct": 82.04225352112677
++    },
++    "pp_gain": {
++     "n": 284,
++     "ratio": 0.24697543181010914,
++     "lower_pct": 97.1830985915493,
++     "num_med": 0.35371004343791934,
++     "den_med": 1.2395238618814677
++    },
++    "v4_gain": {
++     "n": 284,
++     "ratio": 4.864186038113088,
++     "lower_pct": 4.225352112676056,
++     "num_med": 1.740640777010942,
++     "den_med": 0.3026132661072635
++    },
++    "recovered": -1.1311672389492495,
++    "muon_on_windows": {
++     "n": 284,
++     "ratio": 0.22359913451513672,
++     "lower_pct": 97.53521126760563,
++     "num_med": 0.3026132661072635,
++     "den_med": 1.2395238618814677
++    }
++   },
++   "mse_inside": {
++    "direct": {
++     "n": 284,
++     "ratio": 4.361345898413751,
++     "lower_pct": 9.15492957746479,
++     "num_med": 1.4001622710693395,
++     "den_med": 0.30903056253615935,
++     "v4_lower_both_pct": 4.577464788732395,
++     "pp_lower_both_pct": 82.74647887323944
++    },
++    "pp_gain": {
++     "n": 284,
++     "ratio": 0.5236258697235896,
++     "lower_pct": 83.45070422535211,
++     "num_med": 0.30903056253615935,
++     "den_med": 0.5035937485259883
++    },
++    "v4_gain": {
++     "n": 284,
++     "ratio": 9.816773519253713,
++     "lower_pct": 0.7042253521126761,
++     "num_med": 1.4001622710693395,
++     "den_med": 0.13515488964363992
++    },
++    "recovered": -3.5304030051439734,
++    "muon_on_windows": {
++     "n": 284,
++     "ratio": 0.2234790310195578,
++     "lower_pct": 98.59154929577466,
++     "num_med": 0.13515488964363992,
++     "den_med": 0.5035937485259883
++    }
++   },
++   "mse_outside": {
++    "direct": {
++     "n": 282,
++     "ratio": 4.628117637113833,
++     "lower_pct": 17.02127659574468,
++     "num_med": 1.9068382346300772,
++     "den_med": 0.466712923235534,
++     "v4_lower_both_pct": 10.28368794326241,
++     "pp_lower_both_pct": 75.53191489361703
++    },
++    "pp_gain": {
++     "n": 282,
++     "ratio": 0.16943964510250523,
++     "lower_pct": 97.51773049645391,
++     "num_med": 0.466712923235534,
++     "den_med": 2.6402632562686676
++    },
++    "v4_gain": {
++     "n": 282,
++     "ratio": 3.1617451301923905,
++     "lower_pct": 12.056737588652481,
++     "num_med": 1.9068382346300772,
++     "den_med": 0.6766780740996907
++    },
++    "recovered": -0.6484262077647753,
++    "muon_on_windows": {
++     "n": 282,
++     "ratio": 0.23449562438811436,
++     "lower_pct": 98.58156028368793,
++     "num_med": 0.6766780740996907,
++     "den_med": 2.6402632562686676
++    }
++   }
++  },
++  "heldout": {
++   "n": 225,
++   "mse": {
++    "direct": {
++     "n": 225,
++     "ratio": 0.9070139697941697,
++     "lower_pct": 53.333333333333336,
++     "num_med": 2.14385742063079,
++     "den_med": 2.914794945362174,
++     "v4_lower_both_pct": 46.666666666666664,
++     "pp_lower_both_pct": 42.22222222222222
++    },
++    "pp_gain": {
++     "n": 225,
++     "ratio": 0.7614262823227355,
++     "lower_pct": 62.66666666666667,
++     "num_med": 2.914794945362174,
++     "den_med": 3.441490656383263
++    },
++    "v4_gain": {
++     "n": 225,
++     "ratio": 1.4756048605021583,
++     "lower_pct": 37.333333333333336,
++     "num_med": 2.14385742063079,
++     "den_med": 1.4710020397398467
++    },
++    "recovered": -1.4274480625534585,
++    "muon_on_windows": {
++     "n": 225,
++     "ratio": 0.36654571667720043,
++     "lower_pct": 90.66666666666666,
++     "num_med": 1.4710020397398467,
++     "den_med": 3.441490656383263
++    }
++   },
++   "mse_inside": {
++    "direct": {
++     "n": 225,
++     "ratio": 0.9717355917775782,
++     "lower_pct": 50.66666666666667,
++     "num_med": 1.5911893367656744,
++     "den_med": 1.9233926516142221,
++     "v4_lower_both_pct": 44.44444444444444,
++     "pp_lower_both_pct": 42.66666666666667
++    },
++    "pp_gain": {
++     "n": 225,
++     "ratio": 0.9946406362392946,
++     "lower_pct": 50.22222222222222,
++     "num_med": 1.9233926516142221,
++     "den_med": 1.6262148180596496
++    },
++    "v4_gain": {
++     "n": 225,
++     "ratio": 2.0041609857673546,
++     "lower_pct": 22.22222222222222,
++     "num_med": 1.5911893367656744,
++     "den_med": 0.6853584814104136
++    },
++    "recovered": -129.37372632725993,
++    "muon_on_windows": {
++     "n": 225,
++     "ratio": 0.3740110501331805,
++     "lower_pct": 88.88888888888889,
++     "num_med": 0.6853584814104136,
++     "den_med": 1.6262148180596496
++    }
++   },
++   "mse_outside": {
++    "direct": {
++     "n": 225,
++     "ratio": 0.8501995388138679,
++     "lower_pct": 53.77777777777778,
++     "num_med": 2.4827061932940224,
++     "den_med": 3.273743316067252,
++     "v4_lower_both_pct": 49.333333333333336,
++     "pp_lower_both_pct": 38.22222222222222
++    },
++    "pp_gain": {
++     "n": 225,
++     "ratio": 0.6975308384610179,
++     "lower_pct": 67.11111111111111,
++     "num_med": 3.273743316067252,
++     "den_med": 4.211051184435406
++    },
++    "v4_gain": {
++     "n": 225,
++     "ratio": 1.1583231099779612,
++     "lower_pct": 44.44444444444444,
++     "num_med": 2.4827061932940224,
++     "den_med": 2.0971034438728537
++    },
++    "recovered": -0.40802297168494045,
++    "muon_on_windows": {
++     "n": 225,
++     "ratio": 0.3736317392064969,
++     "lower_pct": 88.88888888888889,
++     "num_med": 2.0971034438728537,
++     "den_med": 4.211051184435406
++    }
++   }
++  }
++ },
++ "roles": {
++  "heldout/heldout/b": 225,
++  "train/heldout/b": 57,
++  "train/train/b": 284,
++  "train/absent/b": 28,
++  "heldout/absent/b": 5,
++  "train/heldout": 39,
++  "heldout/heldout": 180,
++  "train/train": 578
++ }
++}
+\ No newline at end of file
+diff --git a/analysis/catalog_v4/pp_trained_compare.py b/analysis/catalog_v4/pp_trained_compare.py
+new file mode 100644
+index 00000000..e457386e
+--- /dev/null
++++ b/analysis/catalog_v4/pp_trained_compare.py
+@@ -0,0 +1,162 @@
++"""catalog_v4 against training on pp, on pp events (catalog_coverage; the user, 2026-10-26: what mattered most was how
++training on catalog_v4 compares to training on pp collisions on the data generated like pp collisions). At no compute,
++from reads that exist:
++  pp-trained       dimensionless_pp (FA-ccin2p3-e786bd74, read completed by 982b5a14): catalog_v3's dimensionless arm
++                   with every hadronic training tree class trained on its 13 TeV pp events, AdamW, one seed
++  window, AdamW    dimensionless: the same arm on catalog_v3's windows, AdamW, one seed (its matched control)
++  catalog_v3 Muon  dimensionless_muon_best, _seed2: the dimensionless arm on catalog_v3's windows, Muon at the search best
++  catalog_v4 Muon  v4_dimensionless_muon, _seed2: the same on catalog_v4
++All six at 4264 steps, read zero-shot (in distribution for the pp-trained arm's training classes) at the best checkpoint
++on the first 2000 validation events of each class's 13 TeV pp pool (recipes/catalog_v3_pp_test.yaml, 1396 classes).
++The AdamW rows are analysis/catalog_v3/data/pp_rows.json (pp_compare.py collect), the Muon reads the .npz of
++analysis/catalog_v3/data/short_reads/<run>/PP with the inside masks of data/compare_v3_site.json (compare_v3.py collect).
++Two checks first, asserted: the reads are the same events (per class the variance of the target of every Muon read
++equals the pp-trained arm's within 1e-3 relative; the pools were not rebuilt in between, tools/width_regen.py touches
++no pp13 pool) and the split into the events inside catalog_v3's window coverage is one definition (both come from
++pp_compare.support_masks; per class the share inside agrees exactly).
++Groups as compare_v3.pp: the class's role in catalog_v3 and catalog_v4 (trained in both, held out in both), b classes
++apart (the pp pools carry catalog_v3's 4.7 GeV b, which the pp-trained arm trained on and catalog_v4 never saw).
++Per group and measure (whole pool, inside, outside), each a median over classes of the per-class ratio:
++  direct     catalog_v4 Muon (geometric mean of its seeds) over pp-trained AdamW; optimizers differ
++  pp gain    pp-trained over window AdamW (one optimizer, one seed each)
++  v4 gain    catalog_v4 over catalog_v3 Muon (one optimizer, two seeds each)
++  recovered  log(v4 gain) / log(pp gain): the share of the pp-training gain, in log, that catalog_v4 gets with Muon
++    python3 analysis/catalog_v4/pp_trained_compare.py   -> data/pp_trained_compare.json, figs/pp_trained_compare.{png,pdf}
++The last line printed is the JSON of the numbers docs/results.tex quotes.
++"""
++import json, os, sys
++
++import numpy as np
++
++HERE = os.path.dirname(os.path.abspath(__file__))
++ROOT = os.path.dirname(os.path.dirname(HERE))
++sys.path.insert(0, ROOT)
++sys.path.insert(0, HERE)
++import compare_v3 as cv
++
++V3, V4 = cv.RUNS["v3"], cv.RUNS["v4"]
++KEYS = ("mse", "mse_inside", "mse_outside")
++
++
++def rows():
++    """class -> {arm: {measure: mse}} for the two AdamW arms and the four Muon runs, with the two checks"""
++    ad = json.load(open(os.path.join(ROOT, "analysis", "catalog_v3", "data", "pp_rows.json")))
++    site = json.load(open(os.path.join(HERE, "data", "compare_v3_site.json")))["pp"]
++    out, var_dev = {}, 0.0
++    for n, p in ad["dimensionless_pp"]["pp"].items():
++        w = ad["dimensionless"]["pp"][n]
++        ins = np.frombuffer(site[n]["inside"].encode(), dtype=np.uint8) == ord("1")
++        assert ins.mean() == p["frac_inside"] == w["frac_inside"], n          # one split definition
++        out[n] = {"pp": {k: p[k] for k in KEYS}, "win": {k: w[k] for k in KEYS}}
++        for r in V3 + V4:
++            z = np.load(os.path.join(cv.SR, r, "PP", n + ".npz"))
++            t, d = z["t"].astype(float), z["q"].astype(float) - z["t"].astype(float)
++            var_dev = max(var_dev, abs(np.var(t) / p["var_t"] - 1))
++            la = t - z["logF"].astype(float)
++            o = np.argsort(la, kind="stable")                                  # matched to the mask as compare_v3.pp
++            assert np.max(np.abs(la[o][::2000 // cv.CHECK] - np.array(site[n]["check"]))) < 1e-3, (r, n)
++            m = np.empty(len(d), bool)
++            m[o] = ins
++            out[n][r] = {"mse": float(np.mean(d ** 2)),
++                         "mse_inside": float(np.mean(d[m] ** 2)) if m.any() else None,
++                         "mse_outside": float(np.mean(d[~m] ** 2)) if (~m).any() else None}
++    assert var_dev < 1e-3, f"the pp reads are not the same events (variance of the target off by {var_dev})"
++    return out, var_dev
++
++
++def ratio(num, den):
++    num, den = np.array(num), np.array(den)
++    lr = np.log10(num / den)
++    return {"n": len(lr), "ratio": float(10 ** np.median(lr)), "lower_pct": float(100 * np.mean(lr < 0)),
++            "num_med": float(np.median(num)), "den_med": float(np.median(den))}
++
++
++def main():
++    R, var_dev = rows()
++    # the class roles as compare_v3.pp gives them (catalog_v4 roles through merges and splits)
++    R3 = json.load(open(os.path.join(ROOT, "recipes", "catalog_v3_roles.json")))["trees"]
++    R4 = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_roles.json")))["trees"]
++    cc = json.load(open(os.path.join(HERE, "data", "class_changes.json")))
++    m4 = {k: v["role"] for k, v in R4.items()}
++    for g in cc["merges"]:
++        for x in g["members"]:
++            m4.setdefault(x, g["role"][0])
++    for sp in cc["splits"]:
++        for v in sp["v4_classes"].values():
++            for x in v["members"]:
++                m4.setdefault(x, v["role"][0])
++    role = {n: (R3["v3_" + n[5:]]["role"], m4.get("v4_" + n[5:], "absent")) for n in R}
++    groups = {"train": ("train", "train"), "heldout": ("heldout", "heldout")}
++    out = {"n": len(R), "max_var_t_dev": var_dev}
++    for bk in ("no_b", "b"):
++        for g, want in groups.items():
++            pr = [n for n in R if role[n] == want and cv.has_b(n) == (bk == "b")]
++            e = out.setdefault(bk, {}).setdefault(g, {"n": len(pr)})
++            for k in KEYS:
++                ps_ = [n for n in pr if all(R[n][a][k] is not None for a in ("pp", "win") + V3 + V4)]
++                g4 = [np.sqrt(R[n][V4[0]][k] * R[n][V4[1]][k]) for n in ps_]
++                g3 = [np.sqrt(R[n][V3[0]][k] * R[n][V3[1]][k]) for n in ps_]
++                pp, win = [R[n]["pp"][k] for n in ps_], [R[n]["win"][k] for n in ps_]
++                d = ratio(g4, pp)
++                d["v4_lower_both_pct"] = float(100 * np.mean([R[n][V4[0]][k] < R[n]["pp"][k] and
++                                                              R[n][V4[1]][k] < R[n]["pp"][k] for n in ps_]))
++                d["pp_lower_both_pct"] = float(100 * np.mean([R[n][V4[0]][k] > R[n]["pp"][k] and
++                                                              R[n][V4[1]][k] > R[n]["pp"][k] for n in ps_]))
++                gp, gv = ratio(pp, win), ratio(g4, g3)
++                e[k] = {"direct": d, "pp_gain": gp, "v4_gain": gv,
++                        "recovered": float(np.log(gv["ratio"]) / np.log(gp["ratio"])),
++                        "muon_on_windows": ratio(g3, win)}
++    out["roles"] = {}
++    for n in R:
++        k = "/".join(role[n]) + ("/b" if cv.has_b(n) else "")
++        out["roles"][k] = out["roles"].get(k, 0) + 1
++    json.dump(out, open(os.path.join(HERE, "data", "pp_trained_compare.json"), "w"), indent=1)
++    plot(out)
++    for bk in ("no_b", "b"):
++        for g in groups:
++            for k in KEYS:
++                e = out[bk][g][k]
++                print(f"{bk:4s} {g:7s} {k:11s} n={e['direct']['n']:4d} v4/pp {e['direct']['ratio']:.3g} "
++                      f"(v4 lower both {e['direct']['v4_lower_both_pct']:.0f}%, pp lower both {e['direct']['pp_lower_both_pct']:.0f}%; "
++                      f"medians v4 {e['direct']['num_med']:.3g} pp {e['direct']['den_med']:.3g}) | pp gain {e['pp_gain']['ratio']:.3g} "
++                      f"v4 gain {e['v4_gain']['ratio']:.3g} recovered {e['recovered']:.2f} | Muon/AdamW on windows "
++                      f"{e['muon_on_windows']['ratio']:.3g}")
++    claims = {"n": out["n"], "max_var_t_dev": var_dev}
++    for bk in ("no_b", "b"):
++        for g in groups:
++            c = claims.setdefault(bk, {}).setdefault(g, {"n": out[bk][g]["n"]})
++            for k in KEYS:
++                e = out[bk][g][k]
++                c[k] = {"n": e["direct"]["n"], "v4_over_pp": e["direct"]["ratio"],
++                        "v4_lower_both_pct": e["direct"]["v4_lower_both_pct"],
++                        "pp_lower_both_pct": e["direct"]["pp_lower_both_pct"],
++                        "v4_med": e["direct"]["num_med"], "pp_med": e["direct"]["den_med"],
++                        "pp_gain": e["pp_gain"]["ratio"], "v4_gain": e["v4_gain"]["ratio"], "recovered": e["recovered"],
++                        "muon_on_windows": e["muon_on_windows"]["ratio"]}
++    print(json.dumps(claims))
++
++
++def plot(out):
++    """per group (no b), per measure: the pp-training gain (AdamW), catalog_v4's gain over catalog_v3 (Muon) and
++    catalog_v4 against the pp-trained arm directly, each the median per-class MSE ratio"""
++    import plot_style as ps
++    fig, axs = ps.figure(ncols=2)
++    ser = (("pp_gain", "pp / windows, AdamW", ps.C.green, "o"), ("v4_gain", "v4 / v3, Muon", ps.C.vermillion, "s"),
++           ("direct", "v4 Muon / pp AdamW", ps.C.blue, "D"))
++    for ax, g, lab in zip(axs, ("train", "heldout"), ("trained in both", "held out in both")):
++        x = np.arange(len(KEYS))
++        for j, (key, name, col, mk) in enumerate(ser):
++            ax.plot(x + (j - 1) * 0.15, [out["no_b"][g][k][key]["ratio"] for k in KEYS], mk, color=col, label=name)
++        ax.axhline(1, ls="--", color="k", label="equal")
++        ax.set_xticks(x)
++        ax.set_xticklabels(["whole pool", "inside", "outside"])
++        ax.set_yscale("log")
++        ax.set_ylim(0.05, 20)                            # one range for both panels, room for the legend
++        ax.set_ylabel("median MSE ratio")
++        ax.set_xlabel(f"classes {lab}")
++    ps.legend(axs[0], "upper left")
++    ps.save(fig, os.path.join(HERE, "figs", "pp_trained_compare"))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/docs/results.tex b/docs/results.tex
+index cb2d77f1..6794b5a4 100644
+--- a/docs/results.tex
++++ b/docs/results.tex
+@@ -1394,6 +1394,103 @@ here. Two seeds per catalog, short pretrainings.
+   \label{fig:v4_vs_v3_pp}
+ \end{figure}
+ 
++% src: python3 analysis/catalog_v4/pp_trained_compare.py @1f77df2e
++% claim: n=1396
++% claim: no_b.train.n=578
++% claim: no_b.heldout.n=180
++% claim: no_b.train.mse.muon_on_windows=0.26
++% claim: no_b.heldout.mse.muon_on_windows=0.28
++% allow: 13 2000 4264 4.7 because they are the beam energy in TeV, the events per read, the step count and the b mass in GeV, settings
++% allow: 10^{-3}
++% allow: M|^2
++\paragraph{catalog\_v4 against the pp-trained arm on pp events (2026-10-29).}\label{par:v4_vs_pp} The question the
++pp study was opened for (the user, 2026-10-26: what mattered most was how training on catalog\_v4 compares to training
++on pp collisions, on data generated like pp collisions): does catalog\_v4 serve pp events as well as training on them?
++No new run: the two catalog\_v4 Muon runs of par.~\ref{par:v4_vs_v3} against the pp-trained arm of par.\ The
++pp-trained arm (\code{FA-ccin2p3-e786bd74}, its read completed by \code{FA-ccin2p3-982b5a14}), on the same $13$\,TeV pp
++pools of the $1396$ hadronic tree classes, the same $2000$ validation events per class, all at $4264$ steps and their
++best checkpoint (\code{analysis/catalog\_v4/pp\_trained\_compare.py}, Fig.~\ref{fig:v4_vs_pp}). Two checks pass on
++every class: the reads score the same events (the variance of each catalog\_v4 and catalog\_v3 Muon read's target
++equals the pp-trained arm's within $10^{-3}$ relative, the sorted events match the pool's, and no pp pool was rebuilt
++in between), and the split into the events inside and outside catalog\_v3's window coverage is one definition (both
++come from the same mask; the share inside agrees exactly). Groups as in par.~\ref{par:v4_vs_v3}: the $578$ classes
++trained in both catalogs and the $180$ held out in both, no $b$ (the pp pools have catalog\_v3's $4.7$\,GeV $b$, on
++which the pp-trained arm trained and catalog\_v4 never did). Every number is the median over classes of a per-class MSE
++ratio of $\log|\mathcal M|^2$, catalog\_v4 as the geometric mean of its two seeds. The two sides do not share an
++optimizer: the pp-trained arm and its window-trained control are AdamW, one seed each; catalog\_v4's runs are Muon,
++which on these pp pools reads catalog\_v3's windows at $0.26$ (trained classes) and $0.28$ (held out) of AdamW's error
++(par.~\ref{par:v3_muon}). Two readings follow.
++\begin{itemize}
++  \item \emph{Directly, catalog\_v4 with Muon against the pp-trained arm with AdamW.} On the classes trained in both,
++    % src: python3 analysis/catalog_v4/pp_trained_compare.py @1f77df2e
++    % claim: no_b.train.mse.v4_over_pp=1.31
++    % claim: no_b.train.mse.pp_lower_both_pct=52
++    % claim: no_b.train.mse.v4_lower_both_pct=42
++    % claim: no_b.train.mse_inside.v4_over_pp=1.15
++    % claim: no_b.train.mse_outside.v4_over_pp=1.28
++    % claim: no_b.heldout.mse.v4_over_pp=0.79
++    % claim: no_b.heldout.mse.v4_lower_both_pct=54
++    % claim: no_b.heldout.mse.pp_lower_both_pct=36
++    % claim: no_b.heldout.mse_inside.v4_over_pp=0.80
++    % claim: no_b.heldout.mse_outside.v4_over_pp=0.75
++    which the pp-trained arm trained on pp events: $1.31$, the pp-trained arm lower than both seeds on $52\%$, catalog\_v4
++    on $42\%$; $1.15$ inside the coverage, $1.28$ outside. On the classes held out in both: $0.79$, catalog\_v4 lower in
++    both seeds on $54\%$, the pp-trained arm on $36\%$; $0.80$ inside, $0.75$ outside. So with a factor of about four
++    from its optimizer in hand, catalog\_v4 still trails the pp-trained arm on the classes that arm trained on pp, and
++    leads it by about a fifth on the held-out ones.
++  \item \emph{Each against its own optimizer's window-trained catalog\_v3 arm} (pp-trained over the window-trained
++    % src: python3 analysis/catalog_v4/pp_trained_compare.py @1f77df2e
++    % claim: no_b.train.mse.pp_gain=0.15
++    % claim: no_b.train.mse.v4_gain=0.75
++    % claim: no_b.train.mse.recovered=0.15
++    % claim: no_b.heldout.mse.pp_gain=0.33
++    % claim: no_b.heldout.mse.v4_gain=0.78
++    % claim: no_b.heldout.mse.recovered=0.23
++    % claim: no_b.train.mse_outside.pp_gain=0.10
++    % claim: no_b.train.mse_outside.v4_gain=0.50
++    % claim: no_b.train.mse_outside.recovered=0.30
++    % claim: no_b.heldout.mse_outside.pp_gain=0.26
++    % claim: no_b.heldout.mse_outside.v4_gain=0.63
++    % claim: no_b.heldout.mse_outside.recovered=0.35
++    % claim: no_b.train.mse_inside.pp_gain=0.60
++    % claim: no_b.train.mse_inside.v4_gain=1.20
++    % claim: no_b.heldout.mse_inside.pp_gain=0.68
++    % claim: no_b.heldout.mse_inside.v4_gain=1.21
++    dimensionless arm, AdamW; catalog\_v4 over catalog\_v3, Muon): how much of what pp training gains catalog\_v4
++    recovers, as the share of the log of the gain. Trained classes: pp training $0.15$, catalog\_v4 $0.75$, a share
++    of $0.15$; held out: $0.33$ and $0.78$, a share of $0.23$. Outside catalog\_v3's coverage, where catalog\_v4's
++    acceptance aims: $0.10$ and $0.50$ (share $0.30$), $0.26$ and $0.63$ (share $0.35$). Inside it pp training gains
++    ($0.60$, $0.68$) and catalog\_v4 loses ($1.20$, $1.21$).
++\end{itemize}
++% src: python3 analysis/catalog_v4/pp_trained_compare.py @1f77df2e
++% claim: no_b.train.mse.recovered=0.15
++% claim: no_b.heldout.mse_outside.recovered=0.35
++% claim: b.train.mse.v4_over_pp=5.0
++% claim: b.heldout.mse.v4_over_pp=0.91
++% allow: 3 4264 because they are the GPU-hours and the step count of the proposed run, settings
++So catalog\_v4's wider acceptance recovers a fraction of what training on pp gives on pp events, $0.15$ to $0.35$ of
++it in log over the groups and regions, and nothing inside catalog\_v3's coverage, where pp training reweights the same
++support and catalog\_v4 spreads the same steps wider. The direct numbers lean on Muon: if Muon helped the pp-trained arm
++as it helps the window arms, catalog\_v4 would trail it on held-out classes too; that is not measured. The $b$ classes
++go with the $b$ mass ($5.0$ on the trained ones, $0.91$ held out). One seed for both AdamW arms, so their seed spread on
++pp is unknown; short pretrainings. What a clean answer needs: the pp-trained arm rerun with Muon at catalog\_v4's runs'
++settings (the same search-best HPs, batch and $4264$ steps), two seeds, read on the same pp pools and split the same
++way, about $3$ GPU-h, proposed to the user, its design through the design gate before it runs.
++
++\begin{figure}[t]
++  \centering
++  \widerow{\includegraphics{../analysis/catalog_v4/figs/pp_trained_compare.pdf}}
++  % src: python3 analysis/catalog_v4/pp_trained_compare.py @1f77df2e
++  % allow: 13 because it is the beam energy in TeV, a setting
++  % allow: M|^2
++  \caption{On the $13$\,TeV pp pools, no $b$: the median per-class ratio of the MSE of $\log|\mathcal M|^2$ of the
++    pp-trained arm to the window-trained catalog\_v3 arm, both AdamW (circles), of catalog\_v4 to catalog\_v3, both
++    Muon (squares), and of catalog\_v4 with Muon to the pp-trained arm with AdamW (diamonds); on the whole pool and on
++    its events inside and outside catalog\_v3's window coverage. Left the classes trained in both catalogs, right
++    those held out in both.}
++  \label{fig:v4_vs_pp}
++\end{figure}
++
+ 
+ \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
+ probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built

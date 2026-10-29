@@ -1,0 +1,20 @@
+Verdict: fix first. Core mechanics checked against BASE 0686d9b8: LP-FT start = readout_val_mse (fine_tune.py:_linear_probe_fit writes tools/linear_readout.py:ridge_loo's head); keep-head start = head_raw_val_mse (reset_output_head default false); val_curve is val_loss_no_reg (base_experiment.py:1219), so values are best checkpoints; grid losing cells follow nogain.json's best(fam); no trial or grid best lacks its curve. Classes (i)/(ii)/(iii) are the task's; D <= 10^2.5 within scope; 13 of 101 losing grid cells with known start stated.
+
+BLOCKING
+1. docs/results.tex par:ft_harm ("from the same D events, steps and five-trial search, scratch's random initialization ends below the pretrained one"): search budgets differ: scratch's best comes from 8-trial searches (tp2_scr/tp3_scr) plus window extensions (tp3_scrh 8, tp3_scrh10 8-12), fine-tunes 5 trials (55 of 60 cells; 4 have 7, 1 has 6); the script docstring (ft_harm.py:4) says "eight-trial search". The conclusion is drawn from an unequal-budget comparison; correct it and state the confound.
+2. analysis/transfer/ft_harm.py:29,34-40,85: every claim depends on runs/zz_lowd_curves/first_round/ (gitignored, absent on trunk); verify_claims' rerun crashes on os.listdir. Commit the curves as data/*.json and take the readouts from committed data/lowd_ft_readout.jsonl.
+
+REIMPL: ft_harm.py:readouts (lines 34-52) | analysis/transfer/lowd_ft.py:load | reads the 60 cells' linear_readout records from a gitignored copy instead of committed data/lowd_ft_readout.jsonl
+REIMPL: ft_harm.py:main DyHPO best-trial lines (tr = [...]; b = min(tr, key=val_loss*prepd_std**2)) | analysis/transfer/lowd_dyhpo.py:main (same rule as cells.py:best) | best trial per lowd sweep in MSE of log|M|^2
+REIMPL: ft_harm.py:describe | analysis/transfer/nogain_start.py:stats | first validation and minimum of a val_curve
+
+Non-blocking:
+- ii_dyhpo_loses has no % claim line; that sentence is unverified.
+- ee->Z gamma count in the read-out tally (1) has no claim line.
+- describe() has unused parameter T and unused field best_frac.
+- ii[0] assumes exactly one (ii) run.
+- DyHPO min(tr, ...) raises on a sweep with no finished trial instead of listing it.
+- Keep-head runs fall into (i) or (iii) by construction (raw head ~0.5 of target variance); the "131 of 136" headline mostly counts that.
+
+REIMPLEMENTED: 3
+BLOCKING: 2

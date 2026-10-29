@@ -1,0 +1,160 @@
+{
+ "dfew": {
+  "base": "6cc61e63",
+  "original_agent": "a18293015232ca311",
+  "why_reuse": "few-shot calibration of the held-out predictions on Daniel's catalog (analysis/catalog_daniel, the queue's first item of the original prompt, the only one on local data); the per-process MSE, the hp58 prediction from g's statistics and the oracle affine were already in catalog_norm_heldout.py, heldout_delta.py and the npz files' q_aff",
+  "arms": {
+   "a": {
+    "ponytail": false,
+    "session": "5a768f0b-0ba5-4e07-9202-63348411d9b1",
+    "reviewer": "ac77b489014361dc7",
+    "review_label": "R4",
+    "hit_turn_cap": false,
+    "num_turns": 25
+   },
+   "b": {
+    "ponytail": true,
+    "session": "267ab49e-8eb0-4921-8626-080e0321e5e8",
+    "reviewer": "a0afc83a411c47c4e",
+    "review_label": "R15",
+    "hit_turn_cap": false,
+    "num_turns": 18
+   },
+   "c": {
+    "ponytail": true,
+    "session": "495d2318-59e2-4605-9a92-bd62573822da",
+    "reviewer": "a8f2733988859bc4f",
+    "review_label": "R8",
+    "hit_turn_cap": false,
+    "num_turns": 20
+   },
+   "d": {
+    "ponytail": false,
+    "session": "9c83c49a-0016-43b9-96cc-bd7717a43bcb",
+    "reviewer": "ac188f318b0da3819",
+    "review_label": "R10",
+    "hit_turn_cap": false,
+    "num_turns": 19
+   }
+  }
+ },
+ "hsplit": {
+  "base": "2731c705",
+  "original_agent": "a8d0b44082578224d",
+  "why_reuse": "split of the hybrid target's level error on catalog_v3 (analysis/catalog_v3); the per-probe level reader was short_reads.py, the level ratio prep_hybrid.py, the class constants and composition fit prep_level.py",
+  "arms": {
+   "a": {
+    "ponytail": false,
+    "session": "a32f82e7-97e5-4f9d-b98c-7205c700d2fa",
+    "reviewer": "adfdbc690a8509a4e",
+    "review_label": "R14",
+    "hit_turn_cap": false,
+    "num_turns": 25
+   },
+   "b": {
+    "ponytail": true,
+    "session": "b42a9b6d-2ef6-4b7d-826e-dd025f2cc12e",
+    "reviewer": "ad6ef47e9280bb5c2",
+    "review_label": "R12",
+    "hit_turn_cap": false,
+    "num_turns": 31
+   },
+   "c": {
+    "ponytail": true,
+    "session": "1d9b722b-9fd5-4c03-bddd-ba029a508ead",
+    "reviewer": "a79b8bf686669a9c8",
+    "review_label": "R5",
+    "hit_turn_cap": false,
+    "num_turns": 18
+   },
+   "d": {
+    "ponytail": false,
+    "session": "fbce2e55-5795-4e05-8ca0-e670e1a9d52d",
+    "reviewer": "a23e96524b79acb66",
+    "review_label": "R6",
+    "hit_turn_cap": false,
+    "num_turns": 25
+   }
+  }
+ },
+ "v4pp": {
+  "base": "6e34f573",
+  "original_agent": "a09e9d9c41ca65abc",
+  "why_reuse": "catalog_v4 against the pp-trained arm on the 13 TeV pp pools (analysis/catalog_v4); the pp reads, coverage masks and per-class ratios were in compare_v3.py and analysis/catalog_v3/pp_compare.py",
+  "arms": {
+   "a": {
+    "ponytail": true,
+    "session": "60a6ad38-25c9-4c07-9929-43166d719c26",
+    "reviewer": "a7860005cb9a32337",
+    "review_label": "R13",
+    "hit_turn_cap": false,
+    "num_turns": 29
+   },
+   "b": {
+    "ponytail": false,
+    "session": "0977bb60-a88a-4b33-ab4a-cd1ad8671388",
+    "reviewer": "a11c1e42186e46dad",
+    "review_label": "R9",
+    "hit_turn_cap": false,
+    "num_turns": 44
+   },
+   "c": {
+    "ponytail": false,
+    "session": "49ebcb9f-f22c-4b3c-8d5c-46cf88eaf6c8",
+    "reviewer": "af968b2388e31014c",
+    "review_label": "R2",
+    "hit_turn_cap": false,
+    "num_turns": 57
+   },
+   "d": {
+    "ponytail": true,
+    "session": "e277c3fc-c61a-45cf-8f97-2787a1af6a4b",
+    "reviewer": "ab2095a9eaa09f6b2",
+    "review_label": "R1",
+    "hit_turn_cap": false,
+    "num_turns": 58
+   }
+  }
+ },
+ "ftharm": {
+  "base": "0686d9b8",
+  "original_agent": "ac50c5c08f0145665",
+  "why_reuse": "why small-D fine-tunes lose to scratch (analysis/transfer); best trials per cell were in cells.py and lowd_dyhpo.py, the read-outs and runs in lowd_ft.py, the curve statistics in nogain.py",
+  "arms": {
+   "a": {
+    "ponytail": false,
+    "session": "dde63be6-8e71-491e-8416-d2505b843b3a",
+    "reviewer": "af0bf44b2d9e3cfc6",
+    "review_label": "R16",
+    "hit_turn_cap": false,
+    "num_turns": 55
+   },
+   "b": {
+    "ponytail": true,
+    "session": "731e0443-efc8-4d25-906b-4fceef5728b7",
+    "reviewer": "a4a43c0ac68eaa2ec",
+    "review_label": "R7",
+    "hit_turn_cap": false,
+    "num_turns": 53
+   },
+   "c": {
+    "ponytail": true,
+    "session": "4c43e045-d7b6-4490-9e56-921a2ce2f249",
+    "reviewer": "acb58739c8650161d",
+    "review_label": "R3",
+    "hit_turn_cap": false,
+    "num_turns": 60,
+    "review_rerun_of": "ad7230516d203b26c (no final report)"
+   },
+   "d": {
+    "ponytail": false,
+    "session": "ed3cab40-77d0-45e8-98e4-7fd9d158eb4f",
+    "reviewer": "ad78661d21f532c40",
+    "review_label": "R11",
+    "hit_turn_cap": false,
+    "num_turns": 47,
+    "review_rerun_of": "a53d598fb42215e41 (no final report)"
+   }
+  }
+ }
+}

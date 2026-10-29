@@ -1,0 +1,10 @@
+Reviewer R12 (repo-reviewer, blind), diff hsplit_b against 2731c705.
+Verdict: fix first. Split arithmetic right; the three arms' saved truths asserted equal; H7c counterfactual sign right; no probes dropped on the reads on disk.
+BLOCKING 1. analysis/catalog_v3/prep_hybrid_split.py:18, :27-28: H5 left out of AXES unstated, and probes with no prediction or factor dropped silently (no n_expected, no missing list), against short_reads.py's "recorded, never dropped".
+REIMPL: prep_hybrid_split.py:main 25-30 | analysis/catalog_v3/short_reads.py:read | same loader of the same npz and the same per-probe level, already in short_reads.json
+REIMPL: prep_hybrid_split.py:main level_ratio | analysis/catalog_v3/prep_hybrid.py:main (vs_dimensionless level_ratio) | the same per-probe median level ratio
+REIMPL: prep_hybrid_split.py:main c_val | analysis/catalog_v3/prep_level.py:one (c_p in prep_level.json, already loaded) | the per-process constant on the same validation events
+REIMPL: prep_hybrid_split.py:main dc | analysis/catalog_v3/hybrid_check.py:main (cp_train_minus_val) | the train-minus-validation constant gap (there for 10 pools only)
+Non-blocking: docstring's description of net; comparison only with the emission-scale arm; inputs gitignored; extra diagnostics (polyfit, top count) to be named as such; os.listdir without a filter; the second question only in the set-next text.
+REIMPLEMENTED: 4
+BLOCKING: 1

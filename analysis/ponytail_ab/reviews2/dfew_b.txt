@@ -1,0 +1,9 @@
+Reviewer R15 (repo-reviewer, blind), diff dfew_b against 6cc61e63.
+Verdict: nits only. One new file analysis/catalog_daniel/norm_explore5.py covering hp58, A, B with level-only, affine, affine + log s_hat correction, k = 3, 10, 30, 100, 5 random draws, first / smallest / largest s_hat sampling, median and 90% on 43 new and 96 relabels; math checked.
+REIMPL: norm_explore5.py:main (hp58 prediction mu + exp(lsd) h block) | analysis/catalog_daniel/catalog_norm_heldout.py:main (also heldout_delta.py:main) | hp58's prediction on a new process from g's statistics
+REIMPL: norm_explore5.py:main (loading meta, twins, heldout_preds.npz, catalog_norm_{A,B}.npz, stats_net.json) | analysis/catalog_daniel/catalog_norm_heldout.py:main / load | reads the same files into the same dicts
+REIMPL: norm_explore5.py:main (oracle affine on all events) | tools/zero_shot_parent.py (q_aff, line 146) | the oracle affine the npz already holds as q_aff
+REIMPL: norm_explore5.py:main (per-group n / median / p90 dict) | analysis/catalog_daniel/catalog_norm_heldout.py:main | the same per-process MSE summary over 43 new and 96 relabels
+Non-blocking: hp58 relabels read with twin statistics, not g's as in catalog_norm_heldout; ridge strengths (1, 3, 10) untraced; level+inv_rN keys cover 42/79 processes silently; data/norm_explore5.json not committed; random draws reuse the same positions in every process.
+REIMPLEMENTED: 4
+BLOCKING: 0

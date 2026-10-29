@@ -1,0 +1,238 @@
+diff --git a/analysis/catalog_v3/data/prep_hybrid_level.json b/analysis/catalog_v3/data/prep_hybrid_level.json
+new file mode 100644
+index 00000000..5d8f8853
+--- /dev/null
++++ b/analysis/catalog_v3/data/prep_hybrid_level.json
+@@ -0,0 +1,128 @@
++{
++ "H1": {
++  "n": 54.0,
++  "level_h": 0.08748971316621922,
++  "level_q": 0.05644343741608519,
++  "level_s": 0.14177440011205017,
++  "net_h": 0.0942102910152847,
++  "const_h": 0.0006087861861548461,
++  "max_cp_sd": 1.291064762255782e-06,
++  "ratio_hq": 1.2875145071592258,
++  "ratio_net_q": 1.5509717654014186,
++  "extra_h": 0.08502377003627533,
++  "extra_q": 0.02550880747526329,
++  "comp_cp": 0.07931413956004219,
++  "corr_extra_comp": 0.3645841379140437
++ },
++ "H2": {
++  "n": 168.0,
++  "level_h": 0.1391253347216687,
++  "level_q": 0.11301527727606692,
++  "level_s": 0.12354299796334924,
++  "net_h": 0.14732300375367852,
++  "const_h": 0.0007206046130934206,
++  "max_cp_sd": 1.3513127591112697e-06,
++  "ratio_hq": 1.3818784243544726,
++  "ratio_net_q": 1.3158037500084623,
++  "extra_h": 0.13081298279602724,
++  "extra_q": 0.11869051998121138,
++  "comp_cp": 0.09718091747522864,
++  "corr_extra_comp": 0.26845960616491077
++ },
++ "H2p5": {
++  "n": 40.0,
++  "level_h": 0.4456541089007474,
++  "level_q": 0.10137158030655531,
++  "level_s": 13.633147178702036,
++  "net_h": 0.45579092189499104,
++  "const_h": 0.0008508142699635888,
++  "max_cp_sd": 1.8011663840504294e-06,
++  "ratio_hq": 4.5148935310212295,
++  "ratio_net_q": 4.45549920110058,
++  "extra_h": 16.689086039761495,
++  "extra_q": 12.163539129755941,
++  "comp_cp": 0.7547601294576269,
++  "corr_extra_comp": 0.14501499683139085
++ },
++ "H3": {
++  "n": 237.0,
++  "level_h": 0.8240288945599862,
++  "level_q": 0.5205188401415151,
++  "level_s": 0.4154016524556396,
++  "net_h": 0.875498267784145,
++  "const_h": 0.0003285713553220139,
++  "max_cp_sd": 1.372176618886789e-06,
++  "ratio_hq": 1.2942335908060985,
++  "ratio_net_q": 1.3118290868504914,
++  "extra_h": 0.6310542064746054,
++  "extra_q": 0.24278432225954913,
++  "comp_cp": 0.6457932759754348,
++  "corr_extra_comp": 0.26564708864585845
++ },
++ "H5": {
++  "n": 30.0,
++  "level_h": 0.28549907658344426,
++  "level_q": 0.24798694512265892,
++  "level_s": 0.2565845426487653,
++  "net_h": 0.3021110150744682,
++  "const_h": 0.00010267193348739427,
++  "max_cp_sd": 7.691013826313158e-07,
++  "ratio_hq": 1.2618974857719039,
++  "ratio_net_q": 1.2618974857719036,
++  "extra_h": 0.22660370112101602,
++  "extra_q": 0.22298847492455892
++ },
++ "H6": {
++  "n": 8.0,
++  "level_h": 0.0015042302365716718,
++  "level_q": 0.0066086482857202564,
++  "level_s": 0.0555395593436946,
++  "net_h": 0.0031074647585373526,
++  "const_h": 0.000335370986345828,
++  "max_cp_sd": 6.044098608501696e-07,
++  "ratio_hq": 1.0026584370970952,
++  "ratio_net_q": 1.0015079669128937,
++  "extra_h": 0.053641153580512635,
++  "extra_q": 0.03909270407219902,
++  "comp_cp": 0.093429404267298,
++  "corr_extra_comp": -0.2808772316599192
++ },
++ "H7E": {
++  "n": 40.0,
++  "level_h": 0.2517495222746061,
++  "level_q": 0.33672279154570495,
++  "level_s": 0.27470813869666555,
++  "net_h": 0.19849781075719827,
++  "const_h": 0.0015288117016453674,
++  "max_cp_sd": 1.4049160258771396e-06,
++  "ratio_hq": 2.018036295482914,
++  "ratio_net_q": 1.787783358319451,
++  "extra_h": 0.7480220772261581,
++  "extra_q": 0.0675714026371648,
++  "comp_cp": 0.887640527054837,
++  "corr_extra_comp": 0.7976521467005128
++ },
++ "H7c": {
++  "n": 40.0,
++  "level_h": 0.07428901904542756,
++  "level_q": 0.011367025786924945,
++  "level_s": 0.008691179711749378,
++  "net_h": 0.08355343942860202,
++  "const_h": 0.00029883624569360925,
++  "max_cp_sd": 1.3390606246397349e-06,
++  "ratio_hq": 9.799007688339696,
++  "ratio_net_q": 9.883088102312971,
++  "extra_h": 0.18500460731455634,
++  "extra_q": 0.010305766457302027,
++  "comp_cp": 0.2520376402513923,
++  "corr_extra_comp": -0.21423921992453185,
++  "shift": 0.12513608835551143,
++  "abs_shift": 0.35371190612406167,
++  "corr_shift": 0.771422844009628,
++  "slope_shift": 1.0824824345036128,
++  "level_h_minus_shift": 0.0073832284989200185,
++  "blend_0.25": 0.031508897568047145,
++  "blend_0.5": 0.014893310156143192,
++  "blend_0.75": 0.003899420421946731
++ }
++}
+\ No newline at end of file
+diff --git a/analysis/catalog_v3/prep_hybrid_level.py b/analysis/catalog_v3/prep_hybrid_level.py
+new file mode 100644
+index 00000000..36a3ca83
+--- /dev/null
++++ b/analysis/catalog_v3/prep_hybrid_level.py
+@@ -0,0 +1,97 @@
++"""Where the hybrid's level error comes from (the preprocessing exploration on catalog_v3, v3_prep_explore): on the saved
++zero-shot reads (data/short_reads/<arm>/<axis>/<probe>.npz: t and q in the arm's target space, logF its per-event
++factor), per probe, the signed level b = mean(q - t) of three arms, the hybrid (h), the emission scales (q) and s_hat
++alone (s), and the hybrid's split
++    b_h = (mean q_h - mean t_q) - (c_p handed - c_p of these events)
++the first term the network's error on the class mean it has to predict (the emission-scale target's, which the hybrid
++target shares by construction), the second the constant it was handed: c_p handed = mean(logF_h - logF_s), c_p of
++these events = mean(logF_q - logF_s).
++Two readings of the network's term:
++  pT >= 30   against the shift of the constant with the cut, c_p of the same process at the default cuts (its
++             training classes', data/prep_level.json) minus the probe's: the network recalling the training constant
++  every axis against a composition fit of c_p (ridge on prep_level's particle counts, fitted on the training classes):
++             the network guessing the constant from the particle content
++and, for the blend y_h + lam (D - c_p) (D = Lq - (N - 4) log s_hat per event; class mean kept), the pT >= 30 level
++expected if the recalled part shrinks to (1 - lam) of the shift.
++    python3 analysis/catalog_v3/prep_hybrid_level.py   -> data/prep_hybrid_level.json, one flat JSON line last
++"""
++import glob, json, os
++
++import numpy as np
++import yaml
++
++HERE = os.path.dirname(os.path.abspath(__file__))
++ROOT = os.path.dirname(os.path.dirname(HERE))
++RD = os.path.join(HERE, "data", "short_reads")
++AXES = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
++KIND = {21: "g", 22: "a", 23: "Z", 24: "W", 25: "H", 6: "t", 5: "b", 1: "q", 2: "q", 3: "q", 4: "q",
++        11: "l", 13: "l", 15: "l", 12: "v", 14: "v", 16: "v"}
++KINDS = sorted(set(KIND.values())) + ["x"]                # as prep_level.py; x: a BSM particle
++
++
++def load(arm, ax, p):
++    z = np.load(os.path.join(RD, arm, ax, p + ".npz"))
++    return {k: z[k].astype(float) for k in ("t", "q", "logF")}
++
++
++def probes(ax):
++    out = {}
++    for f in sorted(glob.glob(os.path.join(RD, "dimensionless_hybrid", ax, "*.npz"))):
++        p = os.path.basename(f)[:-4]
++        try:
++            h, q, s = (load(a, ax, p) for a in ("dimensionless_hybrid", "dimensionless", "dimensionless_shat"))
++        except FileNotFoundError:
++            continue
++        if min(len(h["q"]), len(q["q"]), len(s["q"]), len(h["logF"])) == 0:
++            continue
++        cp_h, cp = np.mean(h["logF"] - s["logF"]), np.mean(q["logF"] - s["logF"])
++        out[p] = {"bh": np.mean(h["q"] - h["t"]), "bq": np.mean(q["q"] - q["t"]), "bs": np.mean(s["q"] - s["t"]),
++                  "net": np.mean(h["q"]) - np.mean(q["t"]), "dcp": cp_h - cp, "cp": cp,
++                  "cp_sd": float(np.std(h["logF"] - s["logF"]))}
++    return out
++
++
++def feat(c):
++    f = [c["N"]]
++    for side in (c["pdg"][:2], c["pdg"][2:]):
++        n = dict.fromkeys(KINDS, 0)
++        for p in side:
++            n[KIND.get(abs(p), "x")] += 1
++        f += [n[k] for k in KINDS]
++    return f + [1]
++
++
++def main():
++    pl = json.load(open(os.path.join(HERE, "data", "prep_level.json")))["classes"]
++    X = np.array([feat(c) for c in pl["train"].values()], float)
++    w = np.linalg.solve(X.T @ X + 1e-2 * np.eye(X.shape[1]), X.T @ np.array([c["c_p"] for c in pl["train"].values()]))
++    out, flat = {}, {}
++    for ax in AXES:
++        r = probes(ax)
++        a = {k: np.array([v[k] for v in r.values()]) for k in next(iter(r.values()))}
++        comp = np.array([np.array(feat(pl[ax][p])) @ w - r[p]["cp"] if p in pl.get(ax, {}) else np.nan for p in r])
++        o = {"n": len(r), "level_h": np.median(a["bh"] ** 2), "level_q": np.median(a["bq"] ** 2),
++             "level_s": np.median(a["bs"] ** 2), "net_h": np.median(a["net"] ** 2), "const_h": np.median(a["dcp"] ** 2),
++             "max_cp_sd": a["cp_sd"].max(), "ratio_hq": np.median(a["bh"] ** 2 / a["bq"] ** 2),
++             "ratio_net_q": np.median(a["net"] ** 2 / a["bq"] ** 2),
++             "extra_h": np.median((a["bh"] - a["bs"]) ** 2), "extra_q": np.median((a["bq"] - a["bs"]) ** 2)}
++        if ax != "H5":                                    # prep_level reads trees only
++            ok = ~np.isnan(comp)
++            o.update(comp_cp=np.nanmedian(comp ** 2), corr_extra_comp=np.corrcoef((a["bh"] - a["bs"])[ok], comp[ok])[0, 1])
++        if ax == "H7c":
++            base = {e["name"]: e["base"] for e in
++                    yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_heldout_H7c.yaml")))["processes"]}
++            sh = np.array([pl["train"][base[p]]["c_p"] - r[p]["cp"] for p in r])
++            o.update(shift=np.median(sh ** 2), abs_shift=np.median(np.abs(sh)), corr_shift=np.corrcoef(sh, a["bh"])[0, 1],
++                     slope_shift=np.polyfit(sh, a["bh"], 1)[0], level_h_minus_shift=np.median((a["bh"] - sh) ** 2))
++            for lam in (0.25, 0.5, 0.75):
++                o[f"blend_{lam}"] = np.median((a["bh"] - lam * sh) ** 2)
++        out[ax] = {k: float(v) for k, v in o.items()}
++        print(ax, json.dumps({k: float(f"{v:.3g}") for k, v in out[ax].items()}))
++        flat.update({f"{ax}_{k}": float(f"{v:.3g}") for k, v in out[ax].items()})
++    json.dump(out, open(os.path.join(HERE, "data", "prep_hybrid_level.json"), "w"), indent=1)
++    print(json.dumps(flat))
++
++
++if __name__ == "__main__":
++    main()
