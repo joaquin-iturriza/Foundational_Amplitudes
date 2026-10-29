@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: held
+- status: running
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -106,12 +106,19 @@ entries:
     answers_after: '2026-10-26T21:37:13+00:00'
     covers:
     - v3_prep_explore
+  - said_at: '2026-10-29T05:07:20.128000+00:00'
+    text: you can resume work on all items we paused before almost running out of weekly tokens
+    decision: D175
+    answers_after: '2026-10-26T22:04:37.936000+00:00'
+    covers:
+    - v3_prep_explore
   decisions:
   - D83
   - D129
   - D135
   - D165
   - D170
+  - D175
   next: null
   done_when: 'test -f analysis/catalog_v3/prep_signed.py && test -f analysis/catalog_v3/data/prep_signed.json && grep -q ''label{par:v3_prep_signed}''
     docs/results.tex && grep -q ''% src: python3 analysis/catalog_v3/prep_signed.py'' docs/results.tex'
@@ -405,7 +412,6 @@ entries:
       to the user with the 6 to 8 seed cost. Reading of an overlap in the outcome rules: per the design, the paired per-pool
       count is the decision statistic, so a seed-mean median not lower while the count is lower on most pools is reported
       as inconclusive, not no; no = count not lower on most pools (or higher on most). Not a repeat; within D165.'
-  hold_decision: D170
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
