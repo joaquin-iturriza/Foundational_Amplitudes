@@ -60,7 +60,9 @@ SHORT = {"input_tokens": "in", "cache_read_input_tokens": "read", "cache_creatio
 ROUTING = re.compile(r"plan\.py (next|step|run|ask|answer|evidence|set-next|add-next|done|dead-end)\b|"
                      r"\bsite (ack|events|digest)\b|plan_check|review_backlog\.sh")
 STATE = re.compile(r"\bsite (poll|runs|status|logs|where|items|decisions)\b|git (status|log|diff)\b|plan\.py show")
-SUBMIT = re.compile(r"\bsite submit\b|sweep_manager\.py submit|launch_cc_only\.sh")
+SUBMIT = re.compile(r"(^|[;&|(]\s*|\n\s*|\bdo\s+)(\w+=\S*\s+)*(timeout \S+\s+)?"   # a command segment that submits,
+                    r"(site (--\S+ \S+ )*(submit\b|run .*sweep_manager\.py submit)|(bash )?\S*launch_cc_only\.sh)")
+#                                                                                   not a mention inside a grep or script
 
 
 def utc(ts):
