@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "600000"
+  },
   "permissions": {
     "allow": [
       "Bash(git add:*)",
@@ -259,7 +262,7 @@
       }
     ]
   },
-  "env": {
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "600000"
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true
   }
 }
