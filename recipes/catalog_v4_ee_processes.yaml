@@ -338,6 +338,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.304
+      accept_short: true
     parent: v4_epem_aawpwm
     split: train
     test_group: 'e+e- v4: train'
@@ -410,6 +412,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.55
+      accept_short: true
     parent: v4_epem_abbxg
     split: heldout
     test_group: 'e+e- v4: H2'
@@ -517,6 +521,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.567
+      accept_short: true
     parent: v4_epem_abtxwp
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -552,6 +558,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.415
+      accept_short: true
     parent: v4_epem_accx
     split: train
     test_group: 'e+e- v4: train'
@@ -589,6 +597,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.447
+      accept_short: true
     parent: v4_epem_accxg
     split: train
     test_group: 'e+e- v4: train'
@@ -1653,6 +1663,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.487
+      accept_short: true
     parent: v4_epem_bbbxbx
     split: train
     test_group: 'e+e- v4: train'
@@ -1908,6 +1920,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.49
+      accept_short: true
     parent: v4_epem_bbxgz
     split: train
     test_group: 'e+e- v4: train'
@@ -2127,6 +2141,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.484
+      accept_short: true
     parent: v4_epem_bbxwpwm
     split: train
     test_group: 'e+e- v4: train'
@@ -2232,6 +2248,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.635
+      accept_short: true
     parent: v4_epem_bgtxwp
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2301,6 +2319,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.607
+      accept_short: true
     parent: v4_epem_btxwp
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2336,6 +2356,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.36
+      accept_short: true
     parent: v4_epem_btxwpz
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2550,6 +2572,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.97
+      accept_short: true
     parent: v4_epem_ccxgz
     split: train
     test_group: 'e+e- v4: train'
@@ -2763,6 +2787,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.405
+      accept_short: true
     parent: v4_epem_ccxz
     split: train
     test_group: 'e+e- v4: train'
@@ -2835,6 +2861,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.545
+      accept_short: true
     parent: v4_epem_cgsxwm
     split: heldout
     test_group: 'e+e- v4: H2'
@@ -3049,6 +3077,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.458
+      accept_short: true
     parent: v4_epem_ddxuux
     split: train
     test_group: 'e+e- v4: train'
@@ -4837,6 +4867,8 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      margin: 0.364
+      accept_short: true
     parent: v4_epem_mupvmwm
     split: train
     test_group: 'e+e- v4: train'
