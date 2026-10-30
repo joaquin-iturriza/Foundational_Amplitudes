@@ -1480,6 +1480,12 @@ entries:
     units: null
     start: '2026-10-30T17:23:24+00:00'
     at: '2026-10-30T17:23:24+00:00'
+  - batch: dipole_residual
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-10-30T22:28:25+00:00'
+    at: '2026-10-30T22:28:25+00:00'
   ask: 'At four seeds the one-loop sign extension passes the design''s rule on catalog_v4: wrong-sign share lower on 18 of
     21 held-out sign-changing pools (p=0.001), median 6.69% -> 2.91%. It costs zero-shot MSE on the tree axes (H1 1.23x, H2
     1.15x, H7E 1.19x, H7c 1.22x; H3 and H2p5 near 1). Add the extension''s one-loop pools to the full pretraining''s training
