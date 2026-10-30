@@ -666,10 +666,51 @@ def cmd_runlevel(a):
                             s2 = ks_2samp(np.concatenate(fa), c)
                             t["vs_reuse_complete_rows"] = {"n": int(len(c)), "ks": round(float(s2.statistic), 4),
                                                            "p": float(s2.pvalue)}
+                if a.null and len(fa) >= 2 * a.null:
+                    # calibration on a known null: the dsh pool's first --null runs against its others
+                    x0, x1 = fa[:a.null], fa[a.null:]
+                    rp0 = run_perm(x0, x1, nperm=a.nperm)
+                    t["null_dsh_split"] = {"p_event": float(ks_2samp(np.concatenate(x0), np.concatenate(x1)).pvalue),
+                                           "p_runs": rp0["p_runs"] if rp0 else None}
                 r[f] = t
             out[name] = r
             print(f"[runlevel] {name}: " + json.dumps(r, separators=(",", ":"))[:600], flush=True)
     print("RUNLEVEL_JSON " + json.dumps(out), flush=True)
+
+
+def cmd_runlevel_summary(a):
+    """One JSON line from runlevel's RUNLEVEL_JSON (saved as a file): per reference kind (pp13v4 reuse pool, same
+    generation as the dsh pool; or a catalog_v3 pp13 pool, other model, QED order and cards), the pools, the
+    reconstruction check, the reuse runs short, the event-level tests under 0.05 (and expected), the dsh side's
+    Kruskal-Wallis across runs under 0.05, and every run-level test (reuse pools of 2+ runs) with its p."""
+    d = json.load(open(a.json))
+    F = ("sqrt_shat", "max_abs_eta", "max_pt")
+    out = {}
+    for kind, sel in (("pp13v4", lambda r: r["reuse"].startswith("pp13v4_")),
+                      ("catalog_v3_pp13", lambda r: not r["reuse"].startswith("pp13v4_"))):
+        g = {n: r for n, r in d.items() if sel(r)}
+        pe = [r[f]["p_event"] for r in g.values() for f in F]
+        kd = [r[f]["kw_p_dsh"] for r in g.values() for f in F if r[f].get("kw_p_dsh") is not None]
+        kr = [r[f]["kw_p_reuse"] for r in g.values() for f in F if r[f].get("kw_p_reuse") is not None]
+        runs = {}
+        for n, r in g.items():
+            k = r["reuse_sidecar"]["runs"]
+            runs[k] = runs.get(k, 0) + 1
+        out[kind] = {"pools": len(g),
+                     "recon_min": min((r.get("recon_check") or {}).get("in_their_run", 0) for r in g.values()),
+                     "reuse_pools_by_runs": runs,
+                     "reuse_runs_short": sum(r["reuse_sidecar"]["runs_short"] for r in g.values()),
+                     "event_tests": len(pe), "event_p_lt_05": sum(p < 0.05 for p in pe),
+                     "event_expected": round(0.05 * len(pe), 2), "event_p_min": min(pe),
+                     "event_bonferroni": round(0.05 / len(pe), 6),
+                     "kw_dsh_tests": len(kd), "kw_dsh_lt_05": sum(p < 0.05 for p in kd),
+                     "kw_reuse_tests": len(kr), "kw_reuse_lt_05": sum(p < 0.05 for p in kr),
+                     "run_level": {n: {f: [r[f]["run_level"]["p_runs"], r[f]["p_event"]] for f in F
+                                       if r[f].get("run_level")} for n, r in g.items()
+                                   if any(r[f].get("run_level") for f in F)},
+                     "reuse_events_per_run": {n: r["reuse_sidecar"]["events_per_run"] for n, r in g.items()
+                                              if r["reuse_sidecar"]["runs"]}}
+    print("RUNLEVEL_SUMMARY " + json.dumps(out), flush=True)
 
 
 def cmd_runsize(a):
@@ -778,13 +819,15 @@ def main():
     s = sub.add_parser("runlevel"); s.add_argument("--queue", nargs="+", required=True)
     s.add_argument("--max-run", type=int, default=2000); s.add_argument("--min-events", type=int, default=5000)
     s.add_argument("--match", default=None); s.add_argument("--nperm", type=int, default=2000)
+    s.add_argument("--null", type=int, default=0, help="calibrate: the dsh pool's first N runs against its others")
+    s = sub.add_parser("runlevel-summary"); s.add_argument("--json", required=True)
     s = sub.add_parser("summary"); s.add_argument("logs", nargs="+")
     s = sub.add_parser("kept"); s.add_argument("logs", nargs="+"); s.add_argument("--out", required=True)
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     s.add_argument("--by-energy-out", default=None, help="a gridpack pool's yield and complete-run share per energy")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "runlevel-summary": cmd_runlevel_summary, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
 
 if __name__ == "__main__":
