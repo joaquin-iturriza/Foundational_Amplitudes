@@ -249,6 +249,12 @@ def main():
         import plan
         if os.path.exists(plan.PLAN_FILE):
             bad += report_once(st, once)
+        if not (inp.get("agent_id") or inp.get("agent_type")):     # the main session only
+            d_, st_ = plan.load()
+            for eid, state, text in plan.entry_status(d_, st_, plan.events_by_item(strict=True)):
+                if state == "STALLED":
+                    bad.append("%s is STALLED (%s): resume its owner (SendMessage) or launch one (plan brief %s, then "
+                               "plan owner %s --agent <id>)" % (eid, text, eid, eid))
         OPENER_STATE.update(st.get("_opener") or {})
         more, notes = stop_conditions(inp, bad)
         bad += more

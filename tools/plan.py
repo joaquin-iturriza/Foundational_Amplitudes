@@ -1701,6 +1701,54 @@ def cmd_where(a):
     print("plan file %s\nstate     %s\nregistry  %s" % (PLAN_FILE, STATE_FILE, RUNS_DB))
 
 
+def entry_status(d, st, events=None):
+    """[(entry id, 'MOVING'|'WAITING ON YOU'|'STALLED', text)] for each running or waiting_user entry, in exactly one
+    state, from live sources only: the run registry (job states), the owner's transcript, the entry's open ask and the
+    open events. Never from a step's free-text note (a step_waits text is read only for the run ids it names)."""
+    events = events_by_item() if events is None else events
+    out = []
+    for e in d["entries"]:
+        if e.get("status") not in ("running", "waiting_user"):
+            continue
+        eid = e["id"]
+        if e.get("status") == "waiting_user" or (open_question(e) and set(step_keys(e)) <= blocked_steps(e)):
+            out.append((eid, "WAITING ON YOU", 'asked: "%s"' % (e.get("ask") or "").strip()))
+            continue
+        jobs = {}
+        for rid, state, _f in runs_of(e, st):
+            if live(state):
+                key = (state.split()[0], rid.split("-")[1] if rid.count("-") > 1 else "?")
+                jobs[key] = jobs.get(key, 0) + 1
+        o, os_ = owner_of(e), owner_state(e)
+        parts = ["%d %s on %s" % (n, s_, site) for (s_, site), n in sorted(jobs.items())]
+        if os_ == "working":
+            parts.append("agent %s working" % o["agent"])
+        if parts:
+            out.append((eid, "MOVING", "; ".join(parts)))
+            continue
+        evs = events.get(eid) or []
+        why = []
+        if evs:
+            why.append("open events %s with no owner working (%s)" % (", ".join(x[0] for x in evs[:5]),
+                       "owner %s stopped, not resumed" % o["agent"] if o else "no owner launched"))
+        ended = [(k, w) for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
+                 if waited_runs_ended(w)]
+        if ended:
+            ids = sorted({r for _k, w in ended for r in re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))})
+            why.append("steps %s wait on runs that ended (%s)" % (", ".join(str(k) for k, _w in ended), ", ".join(ids)))
+        if not why:
+            why.append("no step has a job" if not (e.get("step_waits") or {}) else
+                       "its waits name no live run, and nothing is working")
+        out.append((eid, "STALLED", "%s; owner %s" % ("; ".join(why), "%s %s" % (o["agent"], os_) if o else "none")))
+    return out
+
+
+def cmd_status(a):
+    d, st = load()
+    for eid, state, text in entry_status(d, st):
+        print("%-28s %-15s %s" % (eid, state, text))
+
+
 def cmd_show(a):
     d, st = load()
     if a.id and not any(e["id"] == a.id for e in d["entries"]):
@@ -2757,6 +2805,8 @@ def main(argv=None):
         s.set_defaults(f=f)
     ID = A("id", help="the plan entry's id")
     cmd("where", cmd_where, "print the paths of the plan file, the state file and the run registry")
+    cmd("status", cmd_status, "one line per running or waiting entry: MOVING (live jobs, working agent), WAITING ON YOU "
+        "(the open ask) or STALLED (nothing live, no owner working, no ask), from live sources only")
     cmd("show", cmd_show, "print the entries; with an id, that one entry in full (read an entry this way, never by "
         "grepping plan/plan.yaml)",
         A("id", nargs="?", help="one entry, with its whole evidence, dead ends, quotes and design"),
