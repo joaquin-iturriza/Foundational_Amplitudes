@@ -2992,10 +2992,52 @@ run that stops short is not. What it changes: a pool is to be assembled only fro
 complete. The $56$ pools laid out so are the $52$ catalog\_v4 pools found assembled from short runs
 (\code{tools/lhe\_parts.py shortbuilt}), the three held out of the wave and the default share of $u d\to H u u W^-$,
 whose runs stop short even at a thousand events; the pools they replace are moved aside, not deleted. Not settled
-here: whether complete runs of a few hundred to a thousand events give the events complete runs of many give (the
-size control above has too few small runs to see an effect of this size; a run-level measurement at the rebuild's run
-sizes is running, and the rebuild waits on it), and whether the reused catalog\_v3 pp pools carry the bias (most of
-their sidecars do not record events per run).
+here: whether the reused catalog\_v3 pp pools carry the bias (most of their sidecars do not record events per run).
+
+The size control above had too few small runs to see an effect of the short runs' size, and the rebuild would have
+changed the run size as well as completeness, so before it a run-size probe asked: do complete runs at the rebuild's
+sizes give the events complete runs of many give? Design: complete runs of $150$ and $1000$ events on $b b\to b b g g$,
+$d g\to d g u\bar u$ and $u b\to b d W^+ Z$ and of $200$ on $e^+e^-\to\gamma\mu^+\nu_\mu W^-$ at $1$\,TeV, cards and
+one-core run as the part jobs run them, each against the complete runs of the largest size its group holds at least two
+of, same banner physics, with the run-level test above on the same two variables (the size ladder,
+Fig.~\ref{fig:v4_run_size}). Every probe run completed; two $e^+e^-$ probe seeds hashed to one MadEvent seed, so that
+group has $39$ runs. Of the $16$ run-level tests $7$ fall below $0.05/16$. Runs of a thousand events are not runs of
+many: on $d g\to d g u\bar u$ against $33$ runs of $40282$, KS distance $0.021$ in $\sqrt{\hat s}$ and $0.023$ in
+$\cos\theta^*$ ($p$ from relabelling runs under $10^{-3}$); on $b b\to b b g g$ against runs of $31774$, $0.013$
+($p=0.004$) and $0.011$ ($p=0.026$). Runs of $150$ are further off ($0.029$ and $0.039$; $0.027$ and $0.022$), and the
+$e^+e^-$ runs of $200$ differ from runs of $13057$ by $0.018$ in the angle ($p=0.0025$). On $u b\to b d W^+ Z$ the
+largest runs held twice are of $2800$ events, and runs of $150$ and $1000$ agree with them ($0.005$ to $0.008$, $p$
+from $0.06$ to $0.46$). So the distance shrinks with the run's size and is still there at a thousand events, as large
+as the short-run bias it was to remove: a pool rebuilt in complete runs of a thousand trades one bias for another of the
+same size. No probed size agrees with the large runs, and the pools on the rebuild list are on it because their large
+runs stop short, so the rebuild as laid out is not submitted and the three held pools stay held; what replaces it is
+open (catalog hand-off). Not checked: whether the large runs' core count differs from the probes' (not in the banner).
+% src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_size.json @44b2eeb3
+% allow: 150 1000 200 1 0.05 10^{-3} 33 because they are the probe's asked sizes, the beam energy, the test level, the bound on the relabelling p (2000 relabellings) and the reference run count of dg_dguux
+% claim: ladder.tests_runs=16
+% claim: ladder.n_bonf=7
+% claim: ladder_detail.dg_dguux.1000/sqrt_shat.ks=0.021
+% claim: ladder_detail.dg_dguux.1000/cos_theta_star.ks=0.023
+% claim: ladder_detail.dg_dguux.1000/sqrt_shat.ref=40282
+% claim: ladder_detail.dg_dguux.1000/sqrt_shat.ref_runs=33
+% claim: ladder_detail.dg_dguux.150/sqrt_shat.ks=0.029
+% claim: ladder_detail.dg_dguux.150/cos_theta_star.ks=0.039
+% claim: ladder_detail.bb_bbgg.1000/sqrt_shat.ks=0.013
+% claim: ladder_detail.bb_bbgg.1000/sqrt_shat.p=0.004
+% claim: ladder_detail.bb_bbgg.1000/cos_theta_star.ks=0.011
+% claim: ladder_detail.bb_bbgg.1000/cos_theta_star.p=0.026
+% claim: ladder_detail.bb_bbgg.1000/sqrt_shat.ref=31774
+% claim: ladder_detail.bb_bbgg.150/sqrt_shat.ks=0.027
+% claim: ladder_detail.bb_bbgg.150/cos_theta_star.ks=0.022
+% claim: ladder_detail.epem_amupvmwm.200/cos_theta_star.ks=0.018
+% claim: ladder_detail.epem_amupvmwm.200/cos_theta_star.p=0.0025
+% claim: ladder_detail.epem_amupvmwm.200/cos_theta_star.runs=39
+% claim: ladder_detail.epem_amupvmwm.200/cos_theta_star.ref=13057
+% claim: ladder_detail.ub_bdwpz.1000/sqrt_shat.ref=2800
+% claim: ladder_detail.ub_bdwpz.1000/sqrt_shat.ks=0.005
+% claim: ladder_detail.ub_bdwpz.150/sqrt_shat.ks=0.008
+% claim: ladder_detail.ub_bdwpz.150/sqrt_shat.p=0.06
+% claim: ladder_detail.ub_bdwpz.1000/sqrt_shat.p=0.46
 
 \begin{figure}[t]
   \centering
@@ -3007,6 +3049,22 @@ their sidecars do not record events per run).
     Right: the stopped-short runs' density over the complete runs' in $\sqrt{\hat s}$, in quantile bins of the
     complete runs, for the three pp groups with the lowest $p$.}
   \label{fig:v4_short_runs}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/short_run_bias_size.pdf}
+  \caption{Complete MadEvent runs of few events against complete runs of many, same process and cards: the run-level
+    KS distance (pooled binned distributions) of the runs of each probed size to the runs of the largest size the
+    group holds at least twice ($31774$, $40282$, $13057$ and $2800$ events), in $\sqrt{\hat s}$ and in $\cos\theta^*$
+    of the first final; filled where the $p$ from relabelling runs is under the Bonferroni level over the $16$ tests.}
+  % src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_size.json @44b2eeb3
+  % claim: ladder.tests_runs=16
+  % claim: ladder_detail.bb_bbgg.1000/sqrt_shat.ref=31774
+  % claim: ladder_detail.dg_dguux.1000/sqrt_shat.ref=40282
+  % claim: ladder_detail.epem_amupvmwm.200/cos_theta_star.ref=13057
+  % claim: ladder_detail.ub_bdwpz.1000/sqrt_shat.ref=2800
+  \label{fig:v4_run_size}
 \end{figure}
 
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
