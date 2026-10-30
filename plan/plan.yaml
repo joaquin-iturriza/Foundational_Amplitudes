@@ -2267,6 +2267,10 @@ entries:
       recipes/catalog_v4_ee_test.yaml recipes/catalog_v4_pp_parts.yaml --queue catalog_v4_complete --skip-claimed catalog_v4_w3
       catalog_v4_default catalog_v4_w2 pp13v4_rest pp13v4_ddxgg (only the 56 complete_runs.json pools should be new; check
       it), site pick, workers sized to about 1 h (2541 runs, mostly survey-bound at 4 to 13 min each)'
+    8: 'After the catalog_v4_w3, catalog_v4_default, pp13v4_rest and pp13v4_ddxgg workers end (about 06:05 to 06:50): python
+      tools/lhe_parts.py shortbuilt on CC; every catalog_v4 pool (dsh_, ee4_, pp13v4_) w3 or the old workers assembled from
+      a run short of its ask goes into complete_runs.json and the complete-run layout (recipes regenerated), planned in the
+      same complete-runs queue; then the usual collection (status, failed tasks, mixcheck)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3629,6 +3633,12 @@ entries:
       - 'a small size differs from complete large runs: that size is not used; lay the pools out in the smallest size that
         agrees (edit complete_runs.json, regenerate the recipes), hold dsh_ud_huuwm (its runs of 1000 do not complete) and
         report it'
+    8:
+      feeds: whether any catalog_v4 MadEvent pool is left built from short runs
+      if:
+      - 'none listed: catalog_v4''s MadEvent pools carry no short-run bias; go on with lhe_probe mixcheck and step 6'
+      - 'pools listed: add them to complete_runs.json with their run size from the run-size result and plan them in the complete-runs
+        queue'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
 - id: muon_test
