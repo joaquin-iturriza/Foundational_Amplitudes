@@ -144,11 +144,6 @@ entries:
   - D195
   - D199
   next:
-    5: 'The one-loop sign extension on catalog_v4 at four seeds (42 to 45; par:v4_signext @f163966f): yes by the passed design''s
-      rule (seed means lower on 18 of 21 held-out sign-changing pools, higher on 3, sign test p=0.001; median wrong-sign 6.69%
-      -> 2.91%; each seed lower on 15, 16, 18, 17 of 21; no blow-ups). Cost on zero-shot MSE, arm over control: H1 1.234,
-      H2 1.154, H7E 1.188, H7c 1.217 (beyond the control''s seed spread), H2p5 1.046, H3 1.029; H5 magnitude 0.612. Waits
-      on the user: whether to add the extension to the full pretraining''s training set, with that cost beside the sign gain'
     6: 'Dipole read (design passed 2026-10-30 22:28, CPU only): FA-ccin2p3-464da136 running on CC (scripts/job_v4_dipole_residual.sh
       @036a8b19, analysis/catalog_v4/dipole_residual.py @a1cc783e; target 1 h). When it ends: read its DIPOLE_RESIDUAL lines
       and outputs under $SCRATCH/zz_v4_dipole_<job>, group per cell (5ee, 5bb, 5qg first) with the refused count per group
@@ -1467,11 +1462,6 @@ entries:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
   step_why:
-    5:
-      feeds: whether training on more sign-changing one-loop pools lowers the held-out wrong-sign share at equal compute
-      if:
-      - 'user adopts: the extension''s one-loop pools join the full pretraining''s recipe'
-      - 'user declines for the tree-axis cost: recorded, the full pretraining keeps catalog_v4_train.yaml'
     6:
       feeds: 'the user''s shape priority (D178): whether an input prior from the per-event dipole factor is aimed at the multiplicity
         gap'
