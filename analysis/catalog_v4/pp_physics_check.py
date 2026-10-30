@@ -42,6 +42,7 @@ CARD_KEYS = {("MASS", 5): "MB", ("MASS", 6): "MT", ("YUKAWA", 5): "ymb", ("YUKAW
              ("DECAY", 6): "WT", ("DECAY", 23): "WZ", ("DECAY", 24): "WW", ("DECAY", 25): "WH"}
 
 
+FP_V4 = 1e-9  # float64 rounding of a separately compiled standalone, see summary
 SET = "v3"     # --set v4: the pp13v4_* pools (recipes/catalog_v4_pp_test.yaml), built with catalog_v4's physics
 PREFIX = {"v3": "pp13_", "v4": "pp13v4_"}
 RECIPE = {"v3": "catalog_v3_pp_test.yaml", "v4": "catalog_v4_pp_test.yaml"}
@@ -77,7 +78,7 @@ def classify():
     ck = {c["name"]: c for c in json.load(open(os.path.join(HERE, "data", "checked.json")))}
     out = {}
     for n in pp_names():
-        x = n[len(PREFIX[SET]):]
+        x = n.split("_", 1)[1]          # pp13_<x> or pp13v4_<x> (catalog_v4_pp_test reuses pp13_ pools)
         v4 = "v4_" + x
         pdg = [abs(int(p)) for p in mg.PROCESSES[n]["pdg_ids"]]
         if v4 not in mg.PROCESSES:
@@ -264,10 +265,13 @@ def summary(evals=None, out=None):
         ev = [n for n in C if C[n]["v4"]]
         # the same function: catalog_v4's standalone gives the label back as exactly as the pool's own standalone does
         # (its round trip, the pipeline's precision), on every row
+        # or within float64 rounding of a separately compiled standalone (FP_V4: the pp13v4 pools' own reads gave at
+        # most 1.6e-12 on 868 classes, the pool's standalone exactly 0; the smallest physics difference seen here, the
+        # checker's W mass, is 2e-6)
         ok = lambda e: (e.get("v4") and e.get("pp") and e["v4"].get("maxabs") is not None and e["pp"].get("maxabs")
-                        is not None and e["v4"]["maxabs"] <= e["pp"]["maxabs"] and e["v4"]["n_ok"] == e["n"])
+                        is not None and e["v4"]["maxabs"] <= max(e["pp"]["maxabs"], FP_V4) and e["v4"]["n_ok"] == e["n"])
         off = sorted(n for n in ev if not ok(E.get(n, {})))
-        res["v4_same_function"] = {"rule": "max|ln(v4/label)| <= max|ln(own standalone/label)|, every row",
+        res["v4_same_function"] = {"rule": f"max|ln(v4/label)| <= max(max|ln(own standalone/label)|, {FP_V4}), every row",
                                    "classes": len(ev), "pass": len(ev) - len(off),
                                    "v4_maxabs_max": max((E[n]["v4"]["maxabs"] for n in ev if ok(E.get(n, {}))), default=None),
                                    "fail": {n: (E.get(n, {}).get("v4") or E.get(n, {}).get("error")) for n in off}}
