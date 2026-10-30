@@ -1,0 +1,8 @@
+#!/bin/sh
+# git commit-msg (core.hooksPath = .githooks; agent redesign B7, CLAUDE.md rule 4): commits carry no attribution to an
+# assistant. Refused: a Co-Authored-By trailer naming Claude or an anthropic.com address, "Generated with Claude Code",
+# a Claude-Session line. A real collaborator's Co-authored-by passes. The pattern is tools/attribution.py's, shared with
+# git_verify_guard.py (which refuses the same in a `git commit -m` before it runs).
+top=$(git rev-parse --show-toplevel) || exit 1
+[ -f "$top/tools/attribution.py" ] || exit 0
+exec python3 "$top/tools/attribution.py" check-file "$1"

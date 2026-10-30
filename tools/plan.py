@@ -2327,6 +2327,25 @@ def closure_decided(eid):
     return re.search(r"covers:[^\n]*\b%s closed\b" % re.escape(eid), out) is not None
 
 
+def unreviewed_commits(e, writeup):
+    """Review before a close (agent redesign B6): the write-up and evidence commits of the entry whose pillar files no
+    reviewer has passed (tools/review_state.py)."""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    try:
+        import review_state
+    except ImportError:
+        return []
+    out = []
+    for c in [writeup, (e.get("evidence") or {}).get("commit")]:
+        if not c or subprocess.run(["git", "-C", ROOT, "cat-file", "-e", "%s^{commit}" % c],
+                                   capture_output=True).returncode != 0:
+            continue
+        for name, w in review_state.unreviewed(c, ROOT):
+            out.append("commit %s changes %s files no reviewer has passed (watermark %s): run the %s on its "
+                       "backlog first" % (c[:10], name, (w or "none")[:10], name))
+    return out
+
+
 def cmd_done(a):
     with transaction() as (d, st):
         e = entry(d, a.id)
@@ -2345,6 +2364,7 @@ def cmd_done(a):
             # because its check (one sub-study's paragraph) passed; work the user asked to continue ends on their word
             why.append("the user's words on it ask for continuous work (%r): it closes only when they say so (a "
                        "decision covering '%s closed'); give it its next step instead" % (cont, a.id))
+        why += unreviewed_commits(e, a.writeup)
         if why:
             sys.exit("plan: %s is not done:\n  " % a.id + "\n  ".join(why))
         e["status"], e["writeup"] = "done", a.writeup

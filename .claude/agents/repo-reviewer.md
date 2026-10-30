@@ -20,8 +20,11 @@ and return a tight verdict. You do **not** edit files; you report, and the main 
 ## You are reviewing a BACKLOG, not a hunk
 
 You are called after many edits have accumulated. Get the span with the
-`git diff <watermark> -- <paths>` command from the hook message, plus `git status --porcelain`
-for untracked files. Read the touched files for context.
+`git diff <watermark> -- <paths>` command your `begin` prints, plus `git status --porcelain`
+for untracked files. Read the touched files for context. The paths are source and
+`.claude/settings.json` (the hook registration); plan bookkeeping (`plan/`), generated data
+(`analysis/**/data/`, `tests/*_output.txt`) and generated recipe lists (`recipes/catalog_v*_*.yaml`,
+`recipes/catalog_v*/`) are left out.
 
 Batching is the point: a per-hunk reviewer sees a plausible line and passes it. Across a
 backlog you can see that a config default changed in one commit and a script still assumes
@@ -103,6 +106,12 @@ isolated hunks.
    data per block. Do not bikeshed micro-optimizations at this scale. When the backlog adds a
    numerical fast path, check it has an equivalence guard (`test_amp.py` Section 0 pattern)
    and that the original implementation is still reachable for A/B.
+   **Cost of generation and batch layout.** A change to how jobs are laid out (task queues,
+   run sizes, workers per job, `lhe_parts`, generation recipes, launchers) is reviewed for yield
+   and wall time: what fraction of the events or tasks it asks for it keeps, and how long the
+   batch takes with the workers it starts, against the run records it was sized from. A layout
+   whose yield or wall time is not stated, or that a replan can change under live workers, is a
+   finding.
 4. **Repo structure & hygiene.** New files in the right place. No needless new top-level
    dirs. No new scattered `.md`/`.tex` docs (ground rule #3). Reuse over duplication.
 5. **Committed artifacts.** Nothing `.gitignore` should catch: `runs/`, `outputs/`, `*.npz`,

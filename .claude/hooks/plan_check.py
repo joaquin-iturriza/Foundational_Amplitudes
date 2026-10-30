@@ -152,9 +152,53 @@ def problems():
     # an event on an entry whose step agent is still working is that agent's to ack: blocking on it only bounces the
     # main session while the agent reads the logs (2026-10-26, eight failed regeneration parts)
     working = {e["id"] for e in d["entries"] if plan.step_working(st, e["id"], plan.now())}
-    out += ["open event: " + ev for ev in open_events()
-            if not (len(ev.split()) > 5 and ev.split()[5] in working)]
+    refuse, wait = split_events(open_events(), working)
+    out += refuse
+    plan.NOTES.extend(wait)
     return out, once, st
+
+
+def split_events(lines, working):
+    """(refusals, notes) of the open events (lines of `site events`): an event of an entry whose step agent is
+    launched and working is that agent's to ack, a note (waits on the agent); any other open event is the turn's."""
+    refuse, wait = [], []
+    for ev in lines:
+        w = ev.split()
+        if len(w) > 5 and w[5] in working:
+            wait.append("event %s is the working step agent's of %s to ack (a note, never a refusal)" % (w[0], w[5]))
+        else:
+            refuse.append("open event: " + ev)
+    return refuse, wait
+
+
+def stop_conditions(inp, refused):
+    """(refusals, notes) of the Stop conditions taken over from the standalone hooks (stop_conditions.py); each is
+    skipped while its own hook is still registered for Stop (before switch-over B), so nothing is asked twice. The
+    reply check (a model call) runs only when nothing else refuses the turn."""
+    import plan
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import stop_conditions as sc
+    repo = plan.ENV.get("PLAN_ROOT") if plan.ENV.get("PLAN_TEST") == "1" else sc.REPO
+    bad, notes = [], []
+    parts = [("figure_pair_guard.sh", lambda: sc.figure_pairs(repo)),
+             ("context_guard.py", lambda: sc.context(inp, repo)),
+             (None, lambda: sc.ledger(repo, plan.SITE) if (plan.ENV.get("PLAN_TEST") == "1" or sc.ledger_deferred())
+              else ([], [])),                       # LEDGER_MARK: ledger: site guard --stop
+             (None, lambda: sc.opener(inp, OPENER_STATE)),
+             (None, lambda: sc.incidents(os.path.join(repo, ".claude", "hooks")))]
+    for hook, f in parts:
+        if hook and sc.registered_at_stop(hook, repo):
+            continue
+        b, n = f()
+        bad += b
+        notes += n
+    if not refused and not bad and not sc.registered_at_stop("reply_check.py", repo):
+        b, n = sc.reply(inp)
+        bad += b
+    return bad, notes
+
+
+OPENER_STATE = {}
 
 
 def report_once(st, once):
@@ -169,11 +213,21 @@ def report_once(st, once):
 
 def main():
     try:
-        sys.stdin.read()
+        try:
+            inp = json.loads(sys.stdin.read() or "{}")
+        except ValueError:
+            inp = {}
+        inp = inp if isinstance(inp, dict) else {}
         bad, once, st = problems()
         import plan
         if os.path.exists(plan.PLAN_FILE):
             bad += report_once(st, once)
+        OPENER_STATE.update(st.get("_opener") or {})
+        more, notes = stop_conditions(inp, bad)
+        bad += more
+        plan.NOTES.extend(notes)
+        if OPENER_STATE:
+            plan._set_state("_opener", dict(OPENER_STATE))
     except Exception as ex:                       # fail closed: a guard that errors is a guard that is off
         sys.stderr.write("plan check failed (%r); fix it before ending the turn\n" % ex)
         return 2

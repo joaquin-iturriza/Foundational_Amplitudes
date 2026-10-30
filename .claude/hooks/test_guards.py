@@ -47,6 +47,44 @@ def write(fp, content):
     return {"tool_name": "Write", "tool_input": {"file_path": fp, "content": content}}
 
 
+def agents_on_opus(d):
+    """one result per agent definition: its front matter says `model: opus` (agent redesign B8)."""
+    out = []
+    for f in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        if not f.endswith(".md"):
+            continue
+        head = open(os.path.join(d, f)).read().split("---")
+        front = head[1] if len(head) > 2 else ""
+        good = any(l.strip() == "model: opus" for l in front.splitlines())
+        print(f"  [{'PASS' if good else 'FAIL'}] {f}: model {'opus' if good else 'NOT opus'}")
+        out.append(good)
+    return out
+
+
+# a clean line of each form the project's jobs print (2026-10-30: the gridpack probes' two-word name was sorted broke)
+CLEAN_SUMMARIES = ("RUN_SUMMARY lhe_probe gridpack rc=0", "RUN_SUMMARY lhe_parts rc=0")
+
+
+def end_markers():
+    """`site supervise` sorts a COMPLETED run clean only on an end marker of projects.toml; each clean RUN_SUMMARY
+    form must match one (none may be broken by a k=v line), and a failed one (rc=1) must match none."""
+    import re, tomllib
+    try:
+        pr = tomllib.load(open(os.path.expanduser("~/.config/ccorch/projects.toml"), "rb"))["projects"]["FA"]
+    except (OSError, KeyError) as e:
+        print(f"  [FAIL] projects.toml unreadable: {e}")
+        return [False]
+    marks = (pr.get("run_ends") or {}).get("end_markers") or []
+    out = []
+    for line in CLEAN_SUMMARIES:
+        good = any(re.search(m, line) for m in marks)
+        print(f"  [{'PASS' if good else 'FAIL'}] clean: {line}")
+        out.append(good)
+    bad = not any(re.search(m, "RUN_SUMMARY lhe_probe gridpack rc=1") for m in marks if "RUN_SUMMARY" in m)
+    print(f"  [{'PASS' if bad else 'FAIL'}] rc=1 is no end marker")
+    return out + [bad]
+
+
 def main():
     d = tempfile.mkdtemp()
     bad, good = os.path.join(d, "bad.sh"), os.path.join(d, "good.sh")
@@ -76,6 +114,16 @@ def main():
     ok.append(check("array over training.loss (ablation)", "hpo_guard.sh", bash(f"sbatch {abl}"), False))
     ok.append(check("sweep_manager submit", "hpo_guard.sh",
                     bash("python sweep/sweep_manager.py submit sweeps/x"), False))
+
+    print("\nmd_guard — must BLOCK a memory file (no persistent memory, CLAUDE.md rule 3):")
+    ok.append(check("Write ~/.claude/projects/x/memory/MEMORY.md", "md_guard.sh",
+                    write(os.path.expanduser("~/.claude/projects/x/memory/MEMORY.md"), "remember this\n"), True))
+
+    print("\nagents — every .claude/agents/*.md runs on opus:")
+    ok += agents_on_opus(os.path.join(REPO, ".claude", "agents"))
+
+    print("\nrun ends — FA's end markers take the RUN_SUMMARY forms its jobs print:")
+    ok += end_markers()
 
     print(f"\n{sum(ok)}/{len(ok)} passed")
     raise SystemExit(0 if all(ok) else 1)

@@ -13,16 +13,14 @@
 # the backlog is worth a pass. The reviewer then sees the WHOLE backlog at once, which is
 # also a better review: it can judge a section, not a hunk.
 #
-# WHERE THE TEETH ARE. A Stop hook can only ever NUDGE: the harness sets stop_hook_active on
-# the next stop so a hook cannot block a turn twice, otherwise it would loop forever. So
-# `check` is a reminder that can be walked past indefinitely by just ending the turn again.
-# The actual gate is `gate`, a PreToolUse(Edit|Write) hook: while a pillar is over threshold,
+# WHERE THE TEETH ARE. No Stop nudge (removed, agent redesign B4): the gate is `gate`, a
+# PreToolUse(Edit|Write) hook: while a pillar is over threshold,
 # EDITS TO THAT PILLAR'S FILES ARE DENIED. Passing the turn then buys nothing, because the
 # next edit to the overdue file is refused until its reviewer has run. Commits, and work on
 # every other pillar, stay unblocked.
 #
 # Modes:
-#   check                 (Stop hook, default) nudge once if any pillar is over threshold
+#   check, bashpost       removed (no-ops until unregistered, agent redesign B4)
 #   gate                  (PreToolUse(Edit|Write)) DENY edits to an over-threshold pillar
 #   begin <reviewer>      reviewer takes the lock: lifts `gate` so it can apply its own fixes
 #   advance <reviewer>    reviewer PASSED; resets its watermark and drops the lock
@@ -51,9 +49,13 @@ STATE_REL=".claude/.review_state"
 # git, so they already cover analysis/, compare_models/, etc. without listing them; the
 # :(exclude) terms drop the generated companions that share those trees (result JSONs, job
 # logs, run/sweep output), which would otherwise swamp the line count with data churn.
-PILLARS='claudemd-keeper|1|1|CLAUDE.md
+# Plan bookkeeping, generated data and generated recipe lists are not code (agent redesign B5): plan/, analysis/**/data/,
+# tests/*_output.txt, the catalog recipe lists and their per-class directories. .claude/settings.json (the hook
+# registration) is: the JSON exclusion skips paths under dot-directories, so it stays in. .claude/context/ is rules
+# text, the CLAUDE.md keeper's.
+PILLARS='claudemd-keeper|1|1|CLAUDE.md .claude/context
 notes-editor|200|20|docs/*.tex
-repo-reviewer|520|100000|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep :(exclude)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/*'
+repo-reviewer|520|100000|*.py *.sh config recipes models sweep tools tests scripts IntrinsicDimDeep .claude/settings.json :(exclude,glob)[!.]*/**/*.json :(exclude,glob)*.json :(exclude)*.log :(exclude)*.out :(exclude)*.err :(exclude)runs/* :(exclude)sweeps/* :(exclude)plan/* :(exclude,glob)analysis/**/data/** :(exclude)tests/*_output.txt :(exclude)recipes/catalog_v*_*.yaml :(exclude,glob)recipes/catalog_v*/**'
 
 pillar_field() { printf '%s\n' "$PILLARS" | awk -F'|' -v n="$1" -v f="$2" '$1==n{print $f}'; }
 pillar_names() { printf '%s\n' "$PILLARS" | awk -F'|' '{print $1}'; }
@@ -64,8 +66,7 @@ cd "$REPO" 2>/dev/null || exit 0
 git rev-parse --verify -q HEAD >/dev/null 2>&1 || exit 0
 # The watermarks and locks are one per repository: inside a git worktree (agent worktrees under .claude/worktrees,
 # worktrees/wt-*) they are read from the main checkout (git rev-parse --git-common-dir), never from a stale copy of
-# its own (a worktree once carried a watermark 1477 commits old and the gate refused every edit there). The
-# fingerprints of bashpre/bashpost stay per checkout: they compare that checkout's own files.
+# its own (a worktree once carried a watermark 1477 commits old and the gate refused every edit there).
 STATE_ROOT="$REPO"
 _common=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
 case "$_common" in */.git) [ -d "${_common%/.git}" ] && STATE_ROOT="${_common%/.git}" ;; esac
@@ -181,7 +182,7 @@ backlog_for() {
   echo "$(( tl > base_l ? tl - base_l : 0 )) $(( tc > base_c ? tc - base_c : 0 ))"
 }
 
-mode="${1:-check}"
+mode="${1:-status}"
 case "$mode" in
 
   begin)
@@ -245,12 +246,9 @@ except Exception: print("")' 2>/dev/null)
     ;;
 
   # `gate` sees only the Edit/Write tools; a file rewritten by a shell command passed it unseen (2026-10-06/08,
-  # most of docs/results.tex). These two modes cover every Bash command, whatever it writes with:
-  #   bashpre  (PreToolUse(Bash)): refuses a `git commit` while an overdue, unlocked pillar has changes not yet
-  #            committed, and records a fingerprint of every pillar's uncommitted state;
-  #   bashpost (PostToolUse(Bash)): if the command changed the files of an overdue, unlocked pillar, blocks with the
-  #            reviewer instruction. The change stays on disk (nothing is reverted), but it cannot be committed.
-  bashpre|bashpost)
+  # most of docs/results.tex). bashpre (PreToolUse(Bash)) refuses a `git commit` while an overdue, unlocked pillar has
+  # changes not yet committed, whatever wrote them.
+  bashpre)
     input="$(cat 2>/dev/null || true)"
     cmd=$(printf '%s' "$input" | python3 -c 'import sys,json
 try: print(json.load(sys.stdin).get("tool_input",{}).get("command",""))
@@ -263,45 +261,20 @@ except Exception: print("")' 2>/dev/null)
       set -- $(backlog_for "$who")
       { [ "${1:-0}" -ge "$lt" ] || [ "${2:-0}" -ge "$ct" ]; } && overdue="$overdue $who"
     done
-    fingerprint() {   # uncommitted state of a pillar: tracked diff against HEAD plus its untracked files' contents
-      local paths; paths=$(pillar_field "$1" 4)
-      { git diff HEAD -- $paths 2>/dev/null
-        git ls-files --others --exclude-standard -- $paths 2>/dev/null | while IFS= read -r f; do
-          echo "== $f"; cat "$f" 2>/dev/null; done; } | cksum | awk '{print $1"-"$2}'
-    }
     deny() { echo "BLOCKED by review-backlog: $1" >&2
              echo "Run the $2 subagent on its whole backlog now; it takes the lock ('review_backlog.sh begin $2')," >&2
              echo "applies its fixes and, on a pass, runs 'review_backlog.sh advance $2' itself." >&2; }
-    if [ "$mode" = bashpre ]; then
-      for who in $(pillar_names); do fingerprint "$who" > "$REPO/$STATE_REL/.fp_$who"; done
-      # the code only (cmdparse.py): a heredoc or a quoted string that names a git commit runs none
-      scan=$(printf '%s' "$cmd" | python3 "$(dirname "${BASH_SOURCE[0]}")/cmdparse.py" scan 2>/dev/null) || scan="$cmd"
-      if printf '%s' "${scan:-$cmd}" | grep -qE '(^|[;&|(]|\s)git(\s+-C\s+\S+)?\s+commit(\s|$)'; then
-        for who in $overdue; do
-          paths=$(pillar_field "$who" 4)
-          if [ -n "$(git status --porcelain -- $paths 2>/dev/null)" ]; then
-            deny "a commit while the $who pillar is overdue and has uncommitted changes ($(git status --porcelain -- $paths | wc -l) file(s))." "$who"
-            exit 2
-          fi
-        done
-      fi
-      exit 0
+    # the code only (cmdparse.py): a heredoc or a quoted string that names a git commit runs none
+    scan=$(printf '%s' "$cmd" | python3 "$(dirname "${BASH_SOURCE[0]}")/cmdparse.py" scan 2>/dev/null) || scan="$cmd"
+    if printf '%s' "${scan:-$cmd}" | grep -qE '(^|[;&|(]|\s)git(\s+-C\s+\S+)?\s+commit(\s|$)'; then
+      for who in $overdue; do
+        paths=$(pillar_field "$who" 4)
+        if [ -n "$(git status --porcelain -- $paths 2>/dev/null)" ]; then
+          deny "a commit while the $who pillar is overdue and has uncommitted changes ($(git status --porcelain -- $paths | wc -l) file(s))." "$who"
+          exit 2
+        fi
+      done
     fi
-    # bashpost
-    for who in $overdue; do
-      # no fingerprint from bashpre in this checkout (the command moved the shell into another worktree): nothing to
-      # compare, record one now; the commit gate still covers that checkout
-      [ -f "$REPO/$STATE_REL/.fp_$who" ] || { fingerprint "$who" > "$REPO/$STATE_REL/.fp_$who"; continue; }
-      before=$(cat "$REPO/$STATE_REL/.fp_$who")
-      [ "$(fingerprint "$who")" = "$before" ] && continue
-      msg="BLOCKED by review-backlog: that command changed files of the $who pillar, which is past its review"
-      msg="$msg threshold (any write counts, editor or shell). The change is on disk but cannot be committed until"
-      msg="$msg the $who subagent has reviewed the whole backlog: run it now; it takes the lock with 'begin', applies"
-      msg="$msg its fixes and on a pass runs 'advance' itself."
-      esc=$(printf '%s' "$msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
-      printf '{"decision":"block","reason":"%s"}\n' "$esc"
-      exit 0
-    done
     exit 0
     ;;
 
@@ -324,61 +297,14 @@ except Exception: print("")' 2>/dev/null)
     exit 0
     ;;
 
-  check)
-    input="$(cat 2>/dev/null || true)"
-    # Already nudged in this stop sequence -> let it through (no infinite loop; also the
-    # deliberate-pause escape). The watermark is untouched, so it fires again next turn.
-    # Under /goal nearly every stop carries stop_hook_active, so this nudge can stay silent for days (2026-10-05 to
-    # 2026-10-08). It is only a reminder: the enforcement is `gate`, `bashpre`/`bashpost` and the commit gate.
-    case "$input" in *'"stop_hook_active"'*true*) exit 0 ;; esac
-
-    br="$(git symbolic-ref --quiet --short HEAD 2>/dev/null)" || exit 0
-    [ -z "$br" ] && exit 0
-    [ "$br" = "main" ] && exit 0        # generated artifact, never authored here
-
-    due=""
-    for who in $(pillar_names); do
-      # a held lock (taken within LOCK_TTL_MIN) is a reviewer at work or a verdict waiting on its fixes: either way a
-      # reviewer exists, so asking for one is wrong (2026-10-29: the same request at every turn while the reviewer held
-      # its lock for fixes). Only a stale lock, or none, asks again
-      lock_fresh "$who" && continue
-      lt=$(pillar_field "$who" 2); ct=$(pillar_field "$who" 3)
-      set -- $(backlog_for "$who")
-      l="${1:-0}"; c="${2:-0}"
-      if [ "$l" -ge "$lt" ] || [ "$c" -ge "$ct" ]; then
-        due="$due|$who:$l:$c"
-      fi
-    done
-    [ -z "$due" ] && exit 0
-
-    msg="BATCHED REVIEW DUE. Accumulated unreviewed changes have crossed the threshold for the"
-    msg="$msg pillar(s) below. Run each subagent now; each reviews its ENTIRE backlog at once (not"
-    msg="$msg just the last edit), and on a pass calls \`review_backlog.sh advance <name>\` itself to"
-    msg="$msg clear it. Backlog and scope per reviewer:"
-    IFS='|' read -ra items <<< "${due#|}"
-    for it in "${items[@]}"; do
-      [ -z "$it" ] && continue
-      who="${it%%:*}"; rest="${it#*:}"; l="${rest%%:*}"; c="${rest##*:}"
-      st=$(read_state "$who"); sha=$(echo "$st" | awk '{print $1}')
-      short=$(git rev-parse --short "$sha" 2>/dev/null || echo "$sha")
-      case "$who" in
-        claudemd-keeper) what="CLAUDE.md stays an operating manual — no results, no session log, no bloat" ;;
-        notes-editor)    what="docs/results.tex — author voice, figures earning their place, claims sound" ;;
-        repo-reviewer)   what="code correctness, repo structure, committed artifacts" ;;
-        *)               what="pillar review" ;;
-      esac
-      msg="$msg  * $who — ~$l changed lines over $c commit(s) since $short; $what. Its backlog:"
-      msg="$msg \`git diff $short -- $(pillar_field "$who" 4)\`."
-    done
-    msg="$msg  RUN THEM NOW, in this turn, without asking the user first — a hook cannot spawn a"
-    msg="$msg subagent, so this message IS the automation and you are the part that executes it."
-    msg="$msg Ending the turn instead is not a pause: the PreToolUse gate will refuse your next edit"
-    msg="$msg to these files until the reviewer has run. \`review_backlog.sh status\` lists all backlogs."
-
-    esc=$(printf '%s' "$msg" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g')
-    printf '{"decision":"block","reason":"%s"}\n' "$esc"
+  # The Stop nudge (`check`) and the PostToolUse write check (`bashpost`) were removed (agent redesign B4: one Stop
+  # gate, plan_check.py; an overdue pillar is held by `gate`, `bashpre` and the review before a merge). Both stay
+  # no-ops until their registrations leave .claude/settings.json with switch-over B, so a registered call never
+  # refuses.
+  check|bashpost)
+    cat >/dev/null 2>&1 || true
     exit 0
     ;;
 
-  *) echo "usage: review_backlog.sh {check|gate|bashpre|bashpost|begin <reviewer>|advance <reviewer>|status|init}" >&2; exit 2 ;;
+  *) echo "usage: review_backlog.sh {gate|bashpre|begin <reviewer>|advance <reviewer>|status|init}" >&2; exit 2 ;;
 esac
