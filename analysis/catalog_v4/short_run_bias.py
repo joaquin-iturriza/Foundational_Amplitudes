@@ -468,8 +468,10 @@ def summary(d, alpha=0.05):
         out["gridpack_pair_n_below"] = sum(x.get("pair", {}).get("p", 1) < alpha / max(1, n)
                                            for v in gp.values() for x in v.values())
         # pp groups: the gridpack distances, the large runs' own halves, and the tests under alpha uncorrected
-        out["gridpack_pp_ks_range"] = [round(min(x["ks"] for x in pp), 3), round(max(x["ks"] for x in pp), 3)]
-        out["top_halves_pp_ks_range"] = [round(min(th), 3), round(max(th), 3)] if th else None
+        out["gridpack_pp_ks_min"], out["gridpack_pp_ks_max"] = (round(min(x["ks"] for x in pp), 3),
+                                                                round(max(x["ks"] for x in pp), 3))
+        if th:
+            out["top_halves_pp_ks_min"], out["top_halves_pp_ks_max"] = round(min(th), 3), round(max(th), 3)
         out["gridpack_pp_tests"] = len(pp)
         out["gridpack_pp_below_alpha"] = sum(x["p"] < alpha for x in pp)
         out["gridpack_pair_below_level"] = sorted(f"{c}:{f}" for c, v in gp.items() for f, x in v.items()
