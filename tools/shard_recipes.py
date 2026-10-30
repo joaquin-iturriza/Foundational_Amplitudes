@@ -17,7 +17,8 @@ The recipes must share one recipe-level `sampling` block (it is written into eve
 had without the skip (a part rerun with a skip builds the same pools as the others expect, minus the named ones).
 A name that is not in the shard is an error; each skipped name is printed as `SHARD_SKIP <name>`.
 `--only a,b` keeps just the named entries (with their backend-group mates) before sharding, for a job that builds a
-few entries (use --n 1 --k 0); a name in no recipe is an error.
+few entries (use --n 1 --k 0); a name in no recipe is an error. `--only-default-share` adds every entry with a
+default-sampled share (sampling.f_default > 0) to that list (the mixture arms' pools; the rest are catalog_v4's own).
 """
 import argparse, os, sys
 import yaml
@@ -98,9 +99,15 @@ def main():
     ap.add_argument("--plan", action="store_true")
     ap.add_argument("--skip", default="", help="comma-separated entry names left out of shard k (after sharding)")
     ap.add_argument("--only", default="", help="comma-separated entry names kept, with their backend groups (before sharding)")
+    ap.add_argument("--only-default-share", action="store_true",
+                    help="keep the entries with a default-sampled share (sampling.f_default > 0), with their backend groups")
     a = ap.parse_args()
     procs, sampling = load(a.recipes)
     only = [s for s in a.only.split(",") if s]
+    if a.only_default_share:
+        only += [e["name"] for e in procs if float((e.get("sampling") or {}).get("f_default", 0)) > 0]
+        if not only:
+            sys.exit("--only-default-share: no entry with sampling.f_default > 0")
     if only:
         missing = [s for s in only if s not in {e["name"] for e in procs}]
         if missing:
