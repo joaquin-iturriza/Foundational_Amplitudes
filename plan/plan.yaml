@@ -2636,7 +2636,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: bb88c44a
+    commit: '39914802'
     paths:
     - 'HAND-OFF (2026-10-30, short-run bias step). (1) Result: a MadEvent run that stops short of its target biases its events.
       analysis/catalog_v4/short_run_bias.py @a73a07af on 4807 part files + 364 pools, 23 groups of one class and banner physics,
@@ -2705,6 +2705,13 @@ entries:
       Q/logs), ack the old and wave workers'' end events; once the old workers have ended, plan a new queue for what is short
       or failed (refresh pp yields with lhe_parts yields, rerun the generators, plan --skip-claimed the w3 queue); then lhe_probe
       mixcheck over all assembled dsh pools; the three held pools wait on Joaquin.'
+    - 'REFERENCE CHECK (2026-10-30, short_run_bias.py measure @39914802, control_top_halves, the largest complete runs split
+      in two by seed): dg_dguux 17 vs 16 runs of 40282 KS 0.0055 (p 0.72) sqrt_shat, 0.0037 (p 0.98) cos; bb_bbgg 15 vs 15
+      runs of 31774 KS 0.0041 (p 0.93), 0.0038 (p 0.97); e+e- amupvmwm 8 vs 8 runs of 13057 KS 0.005 (p 0.77). Independent
+      large runs agree with each other, well under the small-run distances (0.011-0.039): the reference is self-consistent
+      (not a proof of convergence to the exact density). Gridpack implementation 7bdc5729 (lhe_make_gridpack, lhe_run_gridpack,
+      lhe_probe.py gridpack, tests/test_lhe_gridpack.py), measure 39914802; design passed after one FIX (more runs per gridpack,
+      pooled primary test, direct test).'
     - 'RUN-SIZE PROBE RESULT (2026-10-30): all 310 probe runs completed (one e+e- iseed collision, 39 distinct). Size ladder
       (short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_size.json @44b2eeb3): 7 of 16 run-level tests
       below 0.05/16. dg_dguux runs of 1000 vs 33 runs of 40282: KS 0.021 sqrt_shat, 0.023 cos, p<5e-4; of 150: 0.029, 0.039.
