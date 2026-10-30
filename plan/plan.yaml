@@ -4183,6 +4183,13 @@ entries:
     since: '2026-10-30T11:33:41+00:00'
     context: 118530
     context_at: '2026-10-30T12:48:21+00:00'
+  findings:
+  - at: '2026-10-30T12:48:57+00:00'
+    text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
+      UTC: 0.94 h against its 1 h target; median worker 16.5 min, slow tail 31.7, 31.8, 43.5 and 55.6 min (FA-ccin2p3-6cd6dc9e
+      longest); 4315 tasks done, 0 failed, 12/12 assembled. The ALERT''s 2.1 h is the time from queue start to the alert at
+      12:47 UTC, not to the last task''s end (the queue had ended about an hour before): the supervisor''s overrun clock does
+      not stop at the batch''s end. Not a generation overrun.'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
