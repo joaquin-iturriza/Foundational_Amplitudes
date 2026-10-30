@@ -290,11 +290,14 @@ def design(cmd, inp, subs):
     if not bad:
         return []
     return ["design: a job for a plan entry needs its design recorded within %d h and passed by the design reviewer; "
-            "missing for %s. If the design is recorded, run the design-reviewer subagent on it (it runs plan "
-            "design-pass on PASS); an eval-only re-read of a run of the entry under its passed design carries "
-            "REREAD=<run id>. Otherwise record it first: python3 tools/plan.py design <entry> --question ... --measure "
-            "... --check ... --fixed ... --control ... --seeds ... --outcome ..., then submit again."
-            % (hours, ", ".join(bad))]
+            "missing for %s.\nIf the design is recorded, run the design-reviewer subagent on it (Agent tool, "
+            "subagent_type design-reviewer, naming the entry); it runs plan design-pass on PASS. An eval-only re-read "
+            "of a run of the entry under its passed design carries REREAD=<run id>. Otherwise record it first, every "
+            "field (the check says how it was verified, on existing data, that the measure moves with the tested "
+            "change; a design whose check fails is not run):\n  python3 tools/plan.py design <entry> --question "
+            "\"<what the job answers>\" --measure \"<the number that answers it>\" --check \"<how it was seen to move "
+            "with the change, on which data>\" --fixed \"<what is held fixed>\" --control \"<the matched control>\" "
+            "--seeds \"<seeds>\" --outcome \"<what yes and what no look like>\"\nthen submit again." % (hours, ", ".join(bad))]
 
 
 # ------------------------------------------------------------------ budget (new)
@@ -308,7 +311,7 @@ def site_submits(segs):
     for toks in segs or []:
         if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["submit"]:
             continue
-        rest = toks[2:]
+        rest = cmdparse.strip_redirs(toks[2:])
         if "--" in rest:
             rest = rest[:rest.index("--")]
         pos, opts, k = [], {}, 0
@@ -325,7 +328,7 @@ def site_submits(segs):
             else:
                 pos.append(t)
             k += 1
-        if len(pos) < 3 or "--check" in opts:
+        if len(pos) < 3 or "--check" in opts or "--help" in opts or "-h" in opts:
             continue
         est = None
         if "--est-gpu-hours" in opts:

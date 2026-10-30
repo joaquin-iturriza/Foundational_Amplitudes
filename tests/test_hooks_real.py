@@ -955,13 +955,52 @@ def guards_selftest():
              r.returncode == 0 and "MEMORY.md" in r.stdout and "model opus" in r.stdout, r.stdout[-600:])
 
 
+def _site_modules():
+    import importlib.machinery, importlib.util
+    loader = importlib.machinery.SourceFileLoader("site_tool", os.path.expanduser("~/.local/bin/site"))
+    spec = importlib.util.spec_from_loader("site_tool", loader)
+    m = importlib.util.module_from_spec(spec)
+    loader.exec_module(m)
+    return m, m._rx()
+
+
+def run_end_markers():
+    """The supervisor's misfires on the six gridpack probe jobs (their logs: tests/fixtures/hooks_20261029/
+    gridpack_probe_logs.json, read with `site logs`): the end marker `RUN_SUMMARY \\S+ rc=0` missed the two-word
+    `RUN_SUMMARY lhe_probe gridpack rc=0` (clean jobs sorted broke), and the RUN_SUMMARY reader took only the JSON form
+    (false "no RUN_SUMMARY" alerts). Both against FA's live rules and the live site tool."""
+    m, rx = _site_modules()
+    logs = json.load(open(os.path.join(HF.DEFAULT_OUT, "gridpack_probe_logs.json")))
+    import tomllib
+    pr = tomllib.load(open(os.path.expanduser("~/.config/ccorch/projects.toml"), "rb"))["projects"]["FA"]
+    rules = rx.rules_of(pr)
+    old = dict(rules, end_markers=[r"RUN_SUMMARY \S+ rc=0\b" if p.startswith("RUN_SUMMARY") else p
+                                   for p in rules["end_markers"]])
+    now = {r: rx.sort_run_end(v["state"], v["job"], {"head": "", "tail": v["log_tail"]}, rules)[0]
+           for r, v in logs.items()}
+    then = {r: rx.sort_run_end(v["state"], v["job"], {"head": "", "tail": v["log_tail"]}, old)[0]
+            for r, v in logs.items()}
+    scenario("run ends: the six gridpack probe jobs (COMPLETED, `RUN_SUMMARY lhe_probe gridpack rc=0`) are sorted clean "
+             "by FA's end markers; the old one-word marker sorted them broke",
+             len(now) == 6 and set(now.values()) == {"clean"} and set(then.values()) == {"broke"}, (now, then))
+    got = {}
+    for r, v in logs.items():
+        m.run_ssh = lambda sc, inner, timeout=90, _t=v["log_tail"]: (0, _t)
+        got[r] = m._summary_line({"scheduler": "slurm"}, "FA", "/x", r.split("-")[-1])
+    m.run_ssh = lambda sc, inner, timeout=90: (0, 'x\nRUN_SUMMARY {"rc": 0, "steps": 8000}\n')
+    js = m._summary_line({"scheduler": "slurm"}, "FA", "/x", "1")
+    scenario("run ends: the RUN_SUMMARY reader takes the k=v form of the six (rc=0 read, so no false 'no RUN_SUMMARY' "
+             "alert) and still the JSON form", all(x and str(x.get("rc")) == "0" for x in got.values())
+             and js == {"rc": 0, "steps": 8000}, (got, js))
+
+
 GROUPS = {"fixtures": fixtures, "incident_tool": incident_tool, "dispatcher": dispatcher,
           "switch_a": switch_a, "scenarios_via_dispatch": scenarios_via_dispatch,
           "stop_events_replay": stop_events_replay, "stop_acked_runs": stop_acked_runs,
           "stop_conditions": stop_conditions, "stop_opener": stop_opener, "submit_replay": submit_replay,
           "submit_budget": submit_budget, "submit_scenarios": submit_scenarios, "review_merged": review_merged,
           "review_modes": review_modes, "review_paths": review_paths, "review_before_merge": review_before_merge,
-          "attribution": attribution, "guards_selftest": guards_selftest}
+          "attribution": attribution, "guards_selftest": guards_selftest, "run_end_markers": run_end_markers}
 
 
 def main(argv):
