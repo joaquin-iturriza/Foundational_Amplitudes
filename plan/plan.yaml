@@ -3940,11 +3940,11 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
   targets:
   - batch: gridpool_probe
-    wall_h: 3.5
-    jobs: 24
+    wall_h: 1.5
+    jobs: 12
     units: null
-    start: '2026-10-30T05:49:05+00:00'
-    at: '2026-10-30T05:49:05+00:00'
+    start: '2026-10-30T05:52:35+00:00'
+    at: '2026-10-30T05:52:35+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
