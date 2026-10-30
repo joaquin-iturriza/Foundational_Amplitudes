@@ -211,7 +211,6 @@ def stop_conditions(inp, refused):
              ("context_guard.py", lambda: sc.context(inp, repo)),
              (None, lambda: sc.ledger(repo, plan.SITE) if (plan.ENV.get("PLAN_TEST") == "1" or sc.ledger_deferred())
               else ([], [])),                       # LEDGER_MARK: ledger: site guard --stop
-             (None, lambda: sc.opener(inp, OPENER_STATE)),
              (None, lambda: sc.incidents(os.path.join(repo, ".claude", "hooks")))]
     for hook, f in parts:
         if hook and sc.registered_at_stop(hook, repo):

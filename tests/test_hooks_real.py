@@ -703,6 +703,9 @@ def stop_opener():
     b, _ = sc.opener({"agent_id": "a1"}, {}, records=[{"type": "assistant", "message": {"content": [
         {"type": "text", "text": "done"}]}}])
     scenario("B1: the opener is never asked of a subagent", not b, b)
+    gate = open(os.path.join(ROOT, ".claude", "hooks", "plan_check.py")).read()
+    scenario("B1: the opener is not registered in the Stop gate (2026-10-31: it is Joaquin's drift signal)",
+             "sc.opener(" not in gate, "sc.opener( found in plan_check.py")
 
 
 NIGHT_SUBMIT = re.compile(r"site\s+submit|sweep_manager\.py\s+submit|launch_\w+\.sh|\bsbatch\b|condor_submit|"

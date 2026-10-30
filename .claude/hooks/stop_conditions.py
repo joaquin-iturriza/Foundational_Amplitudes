@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The Stop conditions plan_check.py takes over (agent redesign, step B1), each returning (refusals, notes):
 a refusal is what the turn can clear (save the pdf, flush the notes, answer the question, start the supervisor or the
-waiter, write the opener); a note waits on the outside (an agent, a job, a cluster, Joaquin) and never blocks.
+waiter); a note waits on the outside (an agent, a job, a cluster, Joaquin) and never blocks.
 
   figure_pairs     figure_pair_guard.sh ported: a .png or .pdf changed since the last passing check without its
                    counterpart (same pruned trees, same marker .claude/.figpair_last, same ignore list)
@@ -10,7 +10,7 @@ waiter, write the opener); a note waits on the outside (an agent, a job, a clust
                    cannot run)
   ledger           `site guard --stop`: for a plan_check project, the supervisor and the armed waiter (its open events
                    are plan_check's own); ~/.claude/hooks/ledger_guard.sh stop defers to this (LEDGER_MARK)
-  opener           a main-session turn that ends with text not starting with "Joaquin" is refused once per user message
+  opener           (not registered, 2026-10-31: the opener is Joaquin's drift signal; forcing it hides the drift)
   incidents        a hook disabled by the dispatcher (.claude/hooks/disabled.json): a note
 While a standalone hook is still registered for Stop in the project's settings (before switch-over B), plan_check
 skips its condition here, so nothing is asked twice: registered_at_stop()."""
