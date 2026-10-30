@@ -4619,7 +4619,6 @@ entries:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '11': runs FA-ccin2p3-26d1ad63 FA-ccin2p3-ac229894 and the launch catalog_coverage_step11_pp_seed2 (fires 19:11 UTC)
-    '13': run FA-ccin2p3-44201039 (the time-matched re-read)
     '14': runs FA-ccin2p3-cfae8890 FA-ccin2p3-db4afd3f and the launch catalog_coverage_step14_rest (4 arms, fires 19:11 UTC)
   targets:
   - batch: gridpool_probe
