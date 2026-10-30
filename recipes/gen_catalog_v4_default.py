@@ -208,8 +208,8 @@ GRID_MIN = {"pp": 31774, "ee": 13057}
 
 # A pool marked "size_from_probe" in COMPLETE takes its runs per energy from its gridpack probe's complete share there
 # (tools/lhe_probe.py kept --by-energy-out), where that share is under COMPLETE_SHARE; an energy that would need more
-# than MAX_ASK_FACTOR x the runs its events need is refused (CLAUDE.md: a margin above 2x is a finding to fix, never
-# absorbed with more runs). "grid_events" in COMPLETE raises the pool's gridpack precision above the floor.
+# than MAX_ASK_FACTOR x the runs its events need is refused (the generation rule, fa-generation 3 [D186]: a factor
+# above 2x is fixed, never absorbed with more runs). "grid_events" in COMPLETE raises the pool's gridpack precision above the floor.
 BY_ENERGY = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_by_energy.json")
 MAX_ASK_FACTOR = 2.0
 RUN_SAFETY = 1.25           # fa-generation: events asked = needed / measured share, times at most 1.25
@@ -229,7 +229,9 @@ def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=No
     lhe.update(parts=True, complete_runs=True, run_events=int(run_events), n_runs=n_runs)
     if shares:
         keys = [f"{float(E):g}" for E in lhe["energies"]] if lhe.get("energies") else ["all"]
-        sh = [float(shares[k]) if k in shares else 1.0 for k in keys]
+        if any(k not in shares for k in keys):
+            raise SystemExit(f"{name}: no probe share at {[k for k in keys if k not in shares]}: probe every energy first")
+        sh = [float(shares[k]) for k in keys]
         bad = {k: x for k, x in zip(keys, sh) if x <= 0 or 1.0 / x > MAX_ASK_FACTOR}
         if bad:
             raise SystemExit(f"{name}: complete share under 1/{MAX_ASK_FACTOR:g} at {bad}: fix the runs (a larger "

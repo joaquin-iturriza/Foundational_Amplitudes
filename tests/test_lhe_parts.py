@@ -1071,10 +1071,10 @@ def test_kept_by_energy_and_sizing():
     l1 = g.complete_layout(dict(base), 200, True, shares={"500": 0.94, "3000": 0.6}, grid_events=52228)
     assert l1["energy_runs"] == [3, 5] and l1["gridpack"] == 52228          # ceil(400 / (0.6 / 1.25 x 200)) = 5
     assert g.complete_layout(dict(base), 200, True, shares={"500": 1.0, "3000": 1.0}) == l0    # 1.0 / 1.25: unchanged
-    l2 = g.complete_layout({**base, "n_test": 668}, 200, True, shares={"3000": 0.6875})       # ee4_epem_abbxg
+    l2 = g.complete_layout({**base, "n_test": 668}, 200, True, shares={"500": 1.0, "3000": 0.6875})  # ee4_epem_abbxg
     assert l2["n_runs"] == 3 and l2["energy_runs"] == [3, 4], l2      # 334 an energy: ceil(334 / (0.55 x 200)) = 4
     try:
-        g.complete_layout(dict(base), 200, True, shares={"3000": b["ee4_x"]["3000"]["complete"]}, name="ee4_x")
+        g.complete_layout(dict(base), 200, True, shares={"500": 1.0, "3000": b["ee4_x"]["3000"]["complete"]}, name="ee4_x")
         raise AssertionError("a complete share of 0.4375 (2.3x the runs) was absorbed")
     except SystemExit as e:
         assert "3000" in str(e)
