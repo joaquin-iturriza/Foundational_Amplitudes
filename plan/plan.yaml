@@ -5084,3 +5084,19 @@ entries:
     since: '2026-10-30T18:20:30+00:00'
     context: 90131
     context_at: '2026-10-30T18:27:48+00:00'
+  designs:
+  - at: '2026-10-30T19:52:22+00:00'
+    question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
+      run, and DATA_DIR resolve to the copied catalog_v4 pools?'
+    prior: 'the 2026-10-29 dead end on lxplus (env ran on the login node; verify refused for missing catalog_v4 pools; no
+      GPU probe run); site decisions searched for lxplus: none on GPU use there'
+    measure: 'the probe log''s lines: python/torch version, cuda=True with a GPU name, ''xformers ... attention ok'', data=
+      path; plus the wall time from submission to start (queue wait)'
+    check: 'the same probe script on CC-IN2P3 printed these lines on working nodes and failed on a broken kernel (its comment:
+      a GPU without kernels fails at the xformers line), so the lines move with whether the site can run a job'
+    fixed: scripts/job_probe.sh unchanged, one GPU, 10 min limit, the synced trunk commit 5866e762
+    control: the same probe's output on CC-IN2P3, where FA training runs
+    seeds: none (deterministic infrastructure check, one job)
+    outcome: 'yes: all four lines present, cuda True, attention ok -> lxplus usable for the queued pretrainings and reads,
+      start estimate from site pick; no: the failing line names the gap (env, driver/kernel, data path), fixed before any
+      training job goes there'
