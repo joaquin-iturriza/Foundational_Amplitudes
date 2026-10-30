@@ -2277,6 +2277,14 @@ entries:
       -380842ed)'
     13: 'Re-read par:v4_short_runs'' run-level tests with the fixed run_perm (cdcae2cd): short_run_bias measure, sizecheck
       and the gridpack check rerun on their saved inputs (CPU, CC), the numbers and verdicts compared with the written ones'
+    14: 'The catalog''s sampling mixture (Joaquin''s priority 1, D178: catalog_v4 mixes the default generator sampling with
+      the smart choices, flat in log|M|^2, splitter, forward, on every beam): design and run the mixture A/B on the 112 assembled
+      rebuilt pools: default share 0.50 and 0.25 of each tree pool, taken out of the RAMBO bulk, with the 0.35 flat and 0.15
+      forward shares kept (recipes/catalog_v4_default{50,25}_train.yaml), two seeds per arm at catalog_v4''s Muon short-run
+      settings, against the current catalog_v4 control pair (FA-ccin2p3-339ec100, -380842ed); read on default-sampled test
+      events (the pp pools'' test split and the e+e- default test pools) and on the smart test pools; sized by the pure-default
+      bound (step 11). Lost from the plan on 2026-10-30 05:15, when it was folded into a collection step''s branch that was
+      later dropped; restored here as its own step'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -4422,6 +4430,13 @@ entries:
       if:
       - 'every verdict unchanged: note the re-read, numbers updated with their src lines'
       - 'a verdict changes: rewrite the paragraph and its hand-off item, and say which later decision leaned on it'
+    14:
+      feeds: which default share catalog_v4's final pools carry (D178 priority 1)
+      if:
+      - 'a share wins on default-sampled events without losing on the smart pools: it becomes catalog_v4''s mixture, pools
+        rebuilt at it'
+      - 'neither beats the control on default-sampled events: report both reads to Joaquin with the pure-default bound beside
+        them'
   owner:
     agent: adac60c8238bd084e
     state: working
