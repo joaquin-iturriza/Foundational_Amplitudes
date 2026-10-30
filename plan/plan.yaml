@@ -4829,6 +4829,13 @@ entries:
       65169e03, 3011d40d, 55d12648, 26fa7524; control reads cfae8890 (running), db4afd3f. Resubmitted at a2bd74ae: smoke 445e33a3
       (1 h), arms afterok on it at 2.5 h: pp afc96598, pp_seed2 d26f13aa, default50 c6d1c5ff, default50_seed2 27e731b4, default25
       560f6685, default25_seed2 c3ab6791; control reads at 1 h 04253ff7, e7e32847. 18 GPU-h.'
+  - at: '2026-10-30T22:17:56+00:00'
+    text: 'E3072: FA-ccin2p3-c6d1c5ff (v4_dimensionless_muon_default50) FAILED in init_data: ''require_cache: dataset for
+      (v4_bb_abbh, train, 100000 ev) not prebuilt at .../amp_data_cache/v4_bb_abbh_155-6000GeV_train_smixd50_amplitudes.npy
+      (recipe_id=e3441205a9b40c83)''. Cause: the mixture pools (smixd50, smixd25) were never built: 0 smixd50 and 0 smixd25
+      files in CC''s amp_data_cache; the step-14 design assumed them. Cancelled the three siblings that would fail identically:
+      27e731b4 (default50_seed2), 560f6685 (default25), c3ab6791 (default25_seed2). Step 11 unaffected: smoke 445e33a3 COMPLETED,
+      pp_seed2 d26f13aa RUNNING, pp afc96598 pending; control reads 04253ff7, e7e32847 RUNNING.'
   handoff:
     state: 'Step 10 PASSED (FA-ccin2p3-f8d114ce: v4_same_function 1301/1301 classes, max |ln v4/label| 8.3e-12; ee4_ sidecars
       170 ok; the only ee4 test pool missing is ee4_epem_cgsxwm, dropped by D193 and left out by the EE4 axis; the 341 ''not
