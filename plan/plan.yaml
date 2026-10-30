@@ -3514,6 +3514,36 @@ entries:
       pools are then listed with shortbuilt and any built from short runs re-laid the same way. No (a pool''s complete runs
       do not fill its blocks, e.g. dsh_ud_huuwm at 150 events): its assembly refuses before moving anything; the next step
       raises its n_runs (parts adopted) or lowers its run size from the measured completion rate.'
+    fix_at: '2026-10-30T04:35:40+00:00'
+    fix: '1) One change at a time / measure shown (checks 1-2): the rebuild changes two things, completeness AND run size
+      (pools laid out at up to 14280-168980 events per run go to 1000, 621, 200 and 150), and only the first is shown harmless.
+      short_run_bias.json''s run-size control (control_complete_small_vs_large) has 0 run-level tests (the step''s own commit
+      says a run''s events are not independent, so event-level is not the valid test) and 15 event-level ones whose small
+      side is at asks >= 2800 for pp (n 2702-5714 events, 5% KS critical ~0.018-0.026, ks_over_crit5 0.26-1.0, bbx_bbxwpwm
+      cos theta* p 0.0498) and one run of 340-408 events for e+e- (critical ~0.07). The effect being corrected is KS 0.015-0.029
+      (uu_aguu sqrt(s_hat) 0.029, ub_bdwpz 0.015-0.018), so the control cannot exclude a run-size effect of the same size,
+      and runs of 1000, 621, 200, 150 were never tested at all. In uu_aguu the ''complete'' reference is itself the 1244-event
+      runs, so that headline test cannot tell which side is biased (the hand-off said so). Fix: before the 2541-run queue,
+      measure complete small runs against complete large runs of the same banner physics at the layouts'' actual sizes, run
+      as the unit: e.g. 20-40 runs each of 1000 and 150 events on two or three pp groups whose large runs complete (ub_bdwpz
+      22400, dg_dguux 367500, bb_bbgg 168980) and 200-event runs on an e+e- group with complete large runs (epem_amupvmwm
+      13057), with the complete-halves control alongside; state the smallest KS it can detect and require it below ~0.015.
+      2) The user''s held question (checks 5 and 7): complete_runs.json itself gives the three held pools (pp13v4_uu_gguu,
+      dsh_uu_gguu, dsh_uu_aguu) the reason ''held out of the wave pending the call on runs of few events'', the hand-off says
+      they wait on Joaquin''s call ''do runs of few events change the distribution?'', and site decisions has no answer (searched:
+      short, few events, run size, madevent, gguu, aguu, complete run, lhe). The design releases them and moves every other
+      pool to small runs without that call or the measurement that answers it. Fix: run the measurement in 1 and report it
+      to the user as the answer to that question, or keep the three held and the run-size change out until he answers. 3)
+      Seeds against spread (check 3): no spread is given for the run-size comparison; the complete-halves control gives it
+      per group (run-level p 0.75-0.999), so state per tested group the number of small runs needed for a KS of ~0.015 to
+      stand above it. 4) Outcome (check 4): add the branch where small complete runs differ from large complete runs (then
+      what layout, e.g. larger runs with n_runs to absorb stopping short, or the user''s call), so the no-outcome is not only
+      ''blocks do not fill''. 5) Provenance: the check cites short_run_bias.py @8f3e5bff, but the working tree has uncommitted
+      changes to it (92 lines) and short_run_bias.json, complete_runs.json and short_built_pools.json are untracked; commit
+      them so the cited numbers are reproducible. What passes as is: the short-vs-complete evidence itself (ub_bdwpz short
+      runs vs pooled complete runs dominated by 22400-event runs, run-level p 5e-4 and 1.5e-3; 4 of 32 run-level tests below
+      Bonferroni against 0 of 31 in the complete-halves control) and the assembly mechanics (test_complete_runs, the 56-pool
+      list).'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
