@@ -5093,6 +5093,15 @@ entries:
       reader takes the probe''s statistics without a train pool, e.g. from the parent, which only changes q_own''s representation,
       or the ee4 entries get train pools); the four mixture arms queued now will log the same EE4 errors and keep their PP4
       reads; their EE4 then comes from an eval-only re-read (REREAD) after the repair, as the controls'' does.'
+  - at: '2026-10-30T23:36:33+00:00'
+    text: '/sps/lpnhe audit (2026-10-31, read-only du on CC, nothing deleted): 152 GB free on 2026-10-29 05:12 -> 21 GB now.
+      Generation leftovers: $SCRATCH/lhe_work 60.3 GB (parts/ 47.2 GB of MadEvent run directories written up to 2026-10-30
+      07:06, before part runs moved to node-local TMPDIR; 13.1 GB of pp13v4_*_madevent process dirs from 2026-10-29), $SCRATCH/lhe_parts
+      37.8 GB (part .npz of the dsh_/pp13v4 pools, 1104 processes, last 2026-10-30 12:28), probe outputs lhe_probe_keep* 2.1
+      GB, zz_v4_certify_all 5.5, zz_mixed_order_virt 4.3, zz_width_regen 16.6, zz_probe_card_read 1.1. Mixture pools 52.9
+      GB train + 12.6 GB val/test (queued arms read them). catalog_v4 _smix_ pools 58.5 GB train + 14.9 GB val/test are the
+      control''s (not duplicates). zz_archive_lxera 29.2 GB (the tars Joaquin keeps). runs 52.0, runs_from_lxplus 24.2, mg5amcnlo
+      53.1 GB.'
   handoff:
     state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
       their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
