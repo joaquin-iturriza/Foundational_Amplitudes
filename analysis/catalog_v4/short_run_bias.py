@@ -43,6 +43,8 @@ DEEP = 0.3                  # deep-short: under this fraction of the ask (the ha
 
 SIZE_SMALL, SIZE_LARGE = 1500, 5000   # run-size test: complete runs asking at most / at least this many (open)
 CAP = 200000                # events per side at most (a seeded subsample beyond)
+NPERM = 2000                # run-level relabellings (--nperm)
+SCALED = True               # run-level p from the scaled KS distance (cdcae2cd); --unscaled re-reads the old test
 NBIN = 20                   # quantile bins of the complete side, for the figure
 
 
@@ -256,7 +258,7 @@ def _binned_ks(H, a, b, scaled=False):
     return d
 
 
-def run_perm(units_x, units_y, nperm=2000, nbin=50):
+def run_perm(units_x, units_y, nperm=None, nbin=50):
     """Run-level permutation test: a run's events are not independent draws (MadEvent fixes each channel's share of a
     run's events from that run's own integration), so the unit is the run. KS distance of the pooled binned
     distributions (nbin quantile bins of all events) of the x runs against the y runs; p from relabelling runs
@@ -274,7 +276,8 @@ def run_perm(units_x, units_y, nperm=2000, nbin=50):
     obs = _binned_ks(H, idx[:nx], idx[nx:])
     # the p compares scaled distances: with the raw distance, a relabelling that hands the side of fewer events more
     # events (units of unequal size) has a narrower null, and p comes out too small (catalog_coverage 2026-10-30)
-    obs_s = _binned_ks(H, idx[:nx], idx[nx:], scaled=True)
+    nperm = nperm or NPERM
+    obs_s = _binned_ks(H, idx[:nx], idx[nx:], scaled=SCALED)
     total = math.comb(nx + ny, nx)
     if total <= nperm:
         sets = [np.array(c) for c in itertools.combinations(idx, nx)]
@@ -284,7 +287,7 @@ def run_perm(units_x, units_y, nperm=2000, nbin=50):
     ge = 0
     for a in sets:
         m = np.zeros(nx + ny, bool); m[a] = True
-        ge += _binned_ks(H, idx[m], idx[~m], scaled=True) >= obs_s - 1e-9
+        ge += _binned_ks(H, idx[m], idx[~m], scaled=SCALED) >= obs_s - 1e-9
     return {"ks_binned": round(obs, 5), "p_runs": ge / len(sets), "runs_x": nx, "runs_y": ny,
             "relabellings": len(sets), "p_min": 1.0 / len(sets)}
 
@@ -437,6 +440,17 @@ def cmd_measure(a):
     print("SHORTBIAS_JSON " + json.dumps({"inventory": inv, "groups": len(res), "out": a.out}), flush=True)
 
 
+def _cp(v, conf=0.95):
+    """Clopper-Pearson interval of a relabelling p (p_runs over its relabellings); None without one."""
+    from scipy.stats import beta
+    if not isinstance(v, dict) or v.get("p_runs") is None or not v.get("relabellings"):
+        return None
+    n = int(v["relabellings"]); k = int(round(v["p_runs"] * n)); a = (1 - conf) / 2
+    lo = 0.0 if k == 0 else float(beta.ppf(a, k, n - k + 1))
+    hi = 1.0 if k == n else float(beta.ppf(1 - a, k + 1, n - k))
+    return [round(lo, 5), round(hi, 5)]
+
+
 def cmd_reread(a):
     """An earlier measurement (--old) against its re-read (--new, same files, a changed test): every test present in
     both (a dict with an event-level "ks"), keyed by its path; whether the event-level KS reproduces (the check that the
@@ -451,7 +465,8 @@ def cmd_reread(a):
                 ok = abs(float(x["ks"]) - float(y["ks"])) < 1e-9
                 same += ok; diff += not ok
                 if "p_runs" in x or "p_runs" in y:
-                    rows[path] = {"ks_event_same": ok, "p_runs_old": x.get("p_runs"), "p_runs_new": y.get("p_runs")}
+                    rows[path] = {"ks_event_same": ok, "p_runs_old": x.get("p_runs"), "p_runs_new": y.get("p_runs"),
+                                  "ci_old": _cp(x), "ci_new": _cp(y)}
                 return
             for k in x:
                 if k in y and k != "hist":
@@ -908,6 +923,7 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     m = sub.add_parser("measure"); m.add_argument("--out", default=OUT)
+    m.add_argument("--nperm", type=int, default=2000); m.add_argument("--unscaled", action="store_true")
     m.add_argument("--before", default=None, help="ISO time: only files last written before it (re-read an earlier "
                    "measurement on the files it saw; checked by its event-level numbers reproducing)")
     m.add_argument("--min-events", type=int, default=2000)
@@ -915,6 +931,7 @@ def main():
     s = sub.add_parser("summary"); s.add_argument("--json", default=OUT)
     z = sub.add_parser("figsize"); z.add_argument("--json", default=OUT)
     k = sub.add_parser("sizecheck"); k.add_argument("--process", required=True)
+    k.add_argument("--nperm", type=int, default=2000); k.add_argument("--unscaled", action="store_true")
     k.add_argument("--energy", type=float, required=True); k.add_argument("--ref-ask", type=int, default=None)
     k.add_argument("--keep", default=None); k.add_argument("--parts", action="store_true")
     k.add_argument("--eid", default=None, help="with --parts: the events' identity of the layout whose parts to test")
@@ -925,6 +942,9 @@ def main():
     r = sub.add_parser("reread"); r.add_argument("--old", required=True); r.add_argument("--new", required=True)
     q = sub.add_parser("sizesummary"); q.add_argument("--json", required=True)
     a = ap.parse_args()
+    global NPERM, SCALED
+    NPERM = getattr(a, "nperm", None) or NPERM
+    SCALED = not getattr(a, "unscaled", False)
     if a.cmd == "sizesummary":
         print(json.dumps(sizesummary(json.load(open(a.json)))))
         return

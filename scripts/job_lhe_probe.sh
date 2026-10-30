@@ -21,17 +21,22 @@ if [ "${PROBE_SHARD:?}" = parts ]; then
     echo "RUN_SUMMARY lhe_probe parts rc=$?"; exit 0
 fi
 if [ "$PROBE_SHARD" = reread ]; then
-    # par:v4_short_runs re-read with the scaled run-level test (catalog_coverage): each committed measurement re-run on
-    # the files it saw (--before its commit time), in parallel, then old against new (event KS must reproduce)
-    R="$SCRATCH/reread"; mkdir -p "$R"; D=analysis/catalog_v4/data
-    python analysis/catalog_v4/short_run_bias.py measure --before 2026-10-30T05:38:03+01:00 --out "$R/short_run_bias.json" > "$R/m1.log" 2>&1 &
-    python analysis/catalog_v4/short_run_bias.py measure --before 2026-10-30T05:59:00+01:00 --out "$R/short_run_bias_size.json" > "$R/m2.log" 2>&1 &
-    python analysis/catalog_v4/short_run_bias.py measure --before 2026-10-30T06:30:34+01:00 --out "$R/short_run_bias_gpack.json" > "$R/m3.log" 2>&1 &
-    python analysis/catalog_v4/short_run_bias.py sizecheck --process ee4_epem_cgsxwm --energy 3000 --keep "$SCRATCH/lhe_probe_keep_runsize" --ref-ask 200 --out "$R/cgsxwm_sizecheck.json" > "$R/m4.log" 2>&1 &
+    # par:v4_short_runs re-read (catalog_coverage): each committed measurement re-run on the files it saw (--before its
+    # commit time) at 20000 relabellings, with the old unscaled run-level test and the scaled one (same relabellings, so
+    # paired), all in parallel; then committed against unscaled (event KS must reproduce) and unscaled against scaled
+    R="$SCRATCH/reread"; mkdir -p "$R"; D=analysis/catalog_v4/data; P=analysis/catalog_v4/short_run_bias.py; N=20000
+    for v in unscaled scaled; do
+        F=; [ $v = unscaled ] && F=--unscaled
+        python $P measure --nperm $N $F --before 2026-10-30T05:38:03+01:00 --out "$R/$v/short_run_bias.json" > "$R/$v.m1.log" 2>&1 &
+        python $P measure --nperm $N $F --before 2026-10-30T05:59:00+01:00 --out "$R/$v/short_run_bias_size.json" > "$R/$v.m2.log" 2>&1 &
+        python $P measure --nperm $N $F --before 2026-10-30T06:30:34+01:00 --out "$R/$v/short_run_bias_gpack.json" > "$R/$v.m3.log" 2>&1 &
+        python $P sizecheck --nperm $N $F --process ee4_epem_cgsxwm --energy 3000 --keep "$SCRATCH/lhe_probe_keep_runsize" --ref-ask 200 --out "$R/$v/cgsxwm_sizecheck.json" > "$R/$v.m4.log" 2>&1 &
+    done
     wait
+    tail -n 3 "$R"/*.log
     for f in short_run_bias short_run_bias_size short_run_bias_gpack cgsxwm_sizecheck; do
-        echo "== $f"; tail -2 "$R/${f}.json" > /dev/null 2>&1 || echo "MISSING $f"
-        python analysis/catalog_v4/short_run_bias.py reread --old "$D/$f.json" --new "$R/$f.json"
+        echo "== $f committed vs unscaled"; python $P reread --old "$D/$f.json" --new "$R/unscaled/$f.json"
+        echo "== $f unscaled vs scaled"; python $P reread --old "$R/unscaled/$f.json" --new "$R/scaled/$f.json"
     done
     echo "RUN_SUMMARY lhe_probe reread rc=$?"; exit 0
 fi
