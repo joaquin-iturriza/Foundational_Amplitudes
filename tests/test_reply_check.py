@@ -153,10 +153,15 @@ def stubbed():
     scenario("an explicit request to explain refuses without a \"?\"",
              not RC.verdict(V("please explain why the run stopped"), ["please explain why the run stopped."])[0])
     for reason in ("Actually, the reply does answer why", "so this should be ok", "the reply answers both parts",
-                   "no question needed answering"):
+                   "no question needed answering",
+                   "The researcher asked where the project's context went, when it gets fed, and why it wouldn't "
+                   "always be fed; the reply answers all three, but the opening line 'I'll check in the drafts where "
+                   "the project's description went' is a promise rather than the answer"):
         scenario("reason %r is discarded" % reason, RC.verdict(V("why 20 minutes", reason), m)[0])
     for reason in ("the reply never answers it directly", "it does not answer this", "the reply doesn't answer it",
-                   "The reply answers the first part, but never answers why"):
+                   "The reply answers the first part, but never answers why",
+                   "The reply did address the timeline but not why 20 minutes",
+                   "the answer is fine on X but skips Y"):
         scenario("reason %r is kept" % reason, RC.verdict(V("why 20 minutes", reason), m)[0] is False)
     scenario("a refusal without ok: false passes", RC.verdict({"reason": "x", "question": "why 20 minutes"}, m)[0])
     scenario("a failing model lets the turn end", run(73434, lambda p: None)[0] == 0)

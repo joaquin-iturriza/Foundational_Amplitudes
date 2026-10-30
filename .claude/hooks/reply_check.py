@@ -224,8 +224,14 @@ def self_ok(reason):
     reply never answers it" is a refusal, "the reply answers all three" is not)"""
     for m in SELF_OK.finditer(reason):
         before = reason[max(0, m.start() - 30):m.start()].lower()
-        if not re.search(r"\b(never|not|no|neither|nor|hardly|barely)\b|n't\b", before.split(",")[-1]):
-            return True
+        near = " ".join(re.split(r"[,;.:]", before)[-1].split()[-3:])     # the same clause, three words back
+        if re.search(r"\b(never|not|no|neither|nor|hardly|barely)\b|n't\b", near):
+            continue
+        after = reason[m.end():]
+        if re.search(r"\b(but|yet|though|however|except)\b,?\s+(\S+\s+){0,4}?(not|never|doesn't|does not|didn't|did not|"
+                     r"skips|misses|leaves|omits|ignores|fails|without|no)\b", after, re.I):
+            continue          # "addresses X but not Y": the reason names a gap after granting a part
+        return True
     return False
 
 
