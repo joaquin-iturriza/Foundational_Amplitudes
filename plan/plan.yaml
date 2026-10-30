@@ -4796,8 +4796,6 @@ entries:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '11': runs FA-ccin2p3-445e33a3 FA-ccin2p3-afc96598 FA-ccin2p3-d26f13aa
-    '14': runs FA-ccin2p3-04253ff7 FA-ccin2p3-e7e32847; the four mixture arms wait on the smixd50/smixd25 prebuild (not yet
-      probed or submitted)
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
