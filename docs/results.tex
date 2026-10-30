@@ -2980,7 +2980,7 @@ the complete runs split in two by run, and complete runs of the group's smallest
 % claim: rebuild.short_built=52
 The answer is yes, stopping short biases. Of the $32$ run-level tests of short against complete runs, $4$ fall below
 $0.05$ after a Bonferroni correction ($u u\to\gamma g u u$ in $\sqrt{\hat s}$, $u b\to b d W^+ Z$ in both variables,
-$e^+e^-\to\gamma\mu^+\nu_\mu W^-$ in the angle) and $10$ below $0.05$; for the runs that returned under $0.3$ of their
+$e^+e^-\to\gamma\mu^+\nu_\mu W^-$ in the angle) and $10$ below $0.05$ (re-read with the scaled test below); for the runs that returned under $0.3$ of their
 ask, $6$ and $13$ of $30$. The control finds nothing: $0$ of $31$ after the correction and $1$ below $0.05$, about the
 rate chance gives. Complete runs of different sizes agree ($0$ of $15$ event-level tests after the correction, a test
 that counts events as independent and so errs towards finding a difference). The bias sits in the tails: the like for
@@ -2997,12 +2997,12 @@ here: whether the reused catalog\_v3 pp pools carry the bias (most of their side
 Re-read with the corrected run-level test. The relabelling $p$ above came out too small when the two sides' runs differ
 in size; the test now scales the KS distance by $\sqrt{n_a n_b/(n_a+n_b)}$, the two sides' events. The same groups,
 measured again on the files as they stood when this measurement was taken (every event-level KS reproduces exactly),
-with $20000$ relabellings: of the $32$ tests of short against complete runs, $1$ falls below $0.05$ after the
-correction ($u u\to\gamma g u u$ in $\sqrt{\hat s}$) and $7$ below $0.05$; for the runs under $0.3$ of their ask, $2$
+with at most $20000$ relabellings (all of them where fewer exist): of the $32$ tests of short against complete runs, $1$ falls below $0.05$ after the
+Bonferroni correction ($u u\to\gamma g u u$ in $\sqrt{\hat s}$) and $7$ below $0.05$; for the runs under $0.3$ of their ask, $2$
 and $10$ of $30$; the control stays at $0$ and $1$ of $31$. $u b\to b d W^+ Z$ and $e^+e^-\to\gamma\mu^+\nu_\mu W^-$
-no longer pass the correction, each new $p$ clear of the threshold by more than its relabelling interval. The answer
-stands on fewer tests ($7$ of $32$ below $0.05$ where chance gives about $1.6$), and so does the rebuild in complete
-runs. The run-size and gridpack measurements below could not be re-read so: the files of $d\bar b\to\bar b H u W^-$,
+no longer pass the Bonferroni correction, each new $p$ clear of the threshold by more than its relabelling interval. The answer
+stands on fewer tests ($7$ of $32$ below $0.05$ where chance gives at most about $1.6$), and so does the rebuild in complete
+runs. The run-size and gridpack measurements below could not be re-read this way: the files of $d\bar b\to\bar b H u W^-$,
 $d\bar b\to\bar b u W^- Z$ and $u u\to d u W^+ Z$ changed after them and match at no earlier time.
 % src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_reread.json @f57e1659
 % allow: 20000 0.05 0.3 1.6 because they are the relabellings, the test level, the deep-short threshold and 32 x 0.05
@@ -3023,7 +3023,7 @@ $d g\to d g u\bar u$ and $u b\to b d W^+ Z$ and of $200$ on $e^+e^-\to\gamma\mu^
 one-core run as the part jobs run them, each against the complete runs of the largest size its group holds at least two
 of, same banner physics, with the run-level test above on the same two variables (the size ladder,
 Fig.~\ref{fig:v4_run_size}). Every probe run completed; two $e^+e^-$ probe seeds hashed to one MadEvent seed, so that
-group has $39$ runs. Of the $16$ run-level tests $7$ fall below $0.05/16$. Runs of a thousand events are not runs of
+group has $39$ runs. Of the $16$ run-level tests $7$ fall below $0.05/16$. These $p$ come from the unscaled run-level test, which gives too small $p$ when the two sides' runs differ in size (par.~\ref{par:v4_short_runs}), so the counts below threshold here are upper bounds. Runs of a thousand events are not runs of
 many: on $d g\to d g u\bar u$ against $33$ runs of $40282$, KS distance $0.021$ in $\sqrt{\hat s}$ and $0.023$ in
 $\cos\theta^*$ ($p$ from relabelling runs under $10^{-3}$); on $b b\to b b g g$ against runs of $31774$, $0.013$
 ($p=0.004$) and $0.011$ ($p=0.026$). Runs of $150$ are further off ($0.029$ and $0.039$; $0.027$ and $0.022$), and the
@@ -3069,7 +3069,7 @@ two gridpacks pooled against the same large complete runs with the same run-leve
 $5$ tests); the pooled runs against the per-run-integrated complete runs of the same size (direct); the two gridpacks
 against each other (pair); everything else as the ladder (\code{tools/lhe\_probe.py gridpack}, six CPU jobs). Every
 gridpack built (none stopped short); the pp runs all completed, $393$ of the $400$ $e^+e^-$ runs did. Of the $5$
-primary tests $0$ fall below $0.05/5$, and of the pair tests $0$: the two gridpacks agree in every group, and the gridpack runs give the large
+primary tests $0$ fall below $0.05/5$, and of the pair tests $0$ (unscaled run-level test, as in the ladder: its $p$ are too small where run sizes differ, par.~\ref{par:v4_short_runs}, so these counts are upper bounds): the two gridpacks agree in every group, and the gridpack runs give the large
 runs' events within this probe's power. On $d g\to d g u\bar u$ the distance drops from $0.0208$ and $0.0232$ (per-run integration, recomputed
 on the same runs) to $0.0081$ ($p=0.028$) and $0.0085$ ($p=0.0135$), on $b b\to b b g g$ from $0.0131$ and $0.0112$ to $0.0079$ ($p=0.022$) and
 $0.0058$ ($p=0.223$), and on $e^+e^-\to\gamma\mu^+\nu_\mu W^-$ from $0.0180$ to $0.0042$ ($p=0.995$), against
