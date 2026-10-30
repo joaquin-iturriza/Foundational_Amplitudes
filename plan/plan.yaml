@@ -4177,6 +4177,10 @@ entries:
       if:
       - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
       - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
+  owner:
+    agent: a5b71194556cf7e47
+    state: working
+    since: '2026-10-30T11:33:41+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
