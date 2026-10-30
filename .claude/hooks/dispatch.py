@@ -15,7 +15,9 @@ stderr and exit code through unchanged, except:
 A refusal is exit 2, or a JSON stdout with "decision": "block" or a PreToolUse permissionDecision "deny". "No other tool
 call in between" is read from the transcript (the subagent's own when the input names one) from where it ended at the
 previous refusal: every tool call written since must be the refused call itself. Without session_id or
-transcript_path no loop is ever declared. A crash of the dispatcher exits 1, which Claude Code treats as non-blocking.
+transcript_path no loop is ever declared. A crash of the dispatcher before the hook ran exits 1, which Claude Code treats as non-blocking; once the hook
+has refused, an error of the loop bookkeeping is caught and the refusal goes through unchanged. Output is passed
+through byte for byte.
 
 The incident record lives here too, so the user-level copy (~/.claude/hooks/dispatch.py, the same file) needs nothing
 from a project: disable(), resolve(), incidents(). tools/hook_incident.py is its command line.
@@ -274,26 +276,38 @@ def main(argv):
         sys.stderr.write("dispatch: no hook %s in %s; not run\n" % (name, HERE))
         return 0
     r = subprocess.run(command_for(path, args), input=raw, capture_output=True)
-    out, err = r.stdout.decode("utf-8", "replace"), r.stderr.decode("utf-8", "replace")
-    msg = refusal(r.returncode, out, err)
-    if msg is not None:
+    if refusal(r.returncode, r.stdout.decode("utf-8", "replace"), r.stderr.decode("utf-8", "replace")) is not None:
+        # the hook has refused: from here an error of the dispatcher's own bookkeeping must never turn the refusal into
+        # a pass, so it is caught and the hook's verdict goes through unchanged
         try:
-            inp = json.loads(raw or b"{}")
-        except ValueError:
-            inp = {}
-        state = os.environ.get("DISPATCH_STATE") or os.path.join(HERE, ".dispatch_state.json")
-        cwd = inp.get("cwd") or os.getcwd()
-        if isinstance(inp, dict) and check_loop(spec, inp, msg, state, cwd):
-            why = "the same refusal twice with nothing done between: " + re.sub(r"\s+", " ", msg)[:400]
-            disable(spec, why, HERE, session=inp.get("session_id"), last_refusal=msg[:2000],
-                    project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or cwd)
-            sys.stderr.write("dispatch: %s refused the same thing twice with nothing done between; it is disabled "
-                             "and an incident is open (python3 tools/hook_incident.py --list)\n" % spec)
-            return 0
-    sys.stdout.write(out)
-    sys.stderr.write(err)
+            if loop_through(spec, raw, r):
+                return 0
+        except Exception as e:
+            sys.stderr.buffer.write(("dispatch: loop check failed (%r); the hook's verdict stands\n" % (e,)).encode())
+    sys.stdout.buffer.write(r.stdout)                                  # byte for byte
+    sys.stderr.buffer.write(r.stderr)
     return r.returncode
 
+
+def loop_through(spec, raw, r):
+    """True when this refusal repeats the previous one (check_loop): the hook is disabled and the call goes through."""
+    msg = refusal(r.returncode, r.stdout.decode("utf-8", "replace"), r.stderr.decode("utf-8", "replace"))
+    try:
+        inp = json.loads(raw or b"{}")
+    except ValueError:
+        return False
+    if not isinstance(inp, dict):
+        return False
+    state = os.environ.get("DISPATCH_STATE") or os.path.join(HERE, ".dispatch_state.json")
+    cwd = inp.get("cwd") or os.getcwd()
+    if not check_loop(spec, inp, msg, state, cwd):
+        return False
+    why = "the same refusal twice with nothing done between: " + re.sub(r"\s+", " ", msg)[:400]
+    disable(spec, why, HERE, session=inp.get("session_id"), last_refusal=msg[:2000],
+            project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or cwd)
+    sys.stderr.write("dispatch: %s refused the same thing twice with nothing done between; it is disabled and an "
+                     "incident is open (python3 tools/hook_incident.py --list)\n" % spec)
+    return True
 
 if __name__ == "__main__":
     try:

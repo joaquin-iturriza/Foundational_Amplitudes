@@ -200,8 +200,8 @@ def dispatcher():
         b.append(between)
         rc2, out2 = b.run()
         inc = b.incidents()
-        scenario("A3: the acked-runs demand (%s, %s): plan_check disabled at the second identical refusal, incident "
-                 "opened, the turn ends" % (t1[11:19], t2[11:19]),
+        scenario("A3: the acked-runs demand (%s, %s): plan_check disabled at the second identical refusal, an incident "
+                 "and one ALERT opened, plan_check's refusal let through (exit 0)" % (t1[11:19], t2[11:19]),
                  rc1 == 2 and rc2 == 0 and "plan_check.py" in b.disabled() and len(inc) == 1
                  and inc[0]["session"] == "s1" and inc[0]["last_refusal"].startswith(msg[:200])
                  and len(b.site_calls()) == 1, (rc1, rc2, out2, inc))
@@ -278,8 +278,22 @@ def dispatcher():
     r = subprocess.run([sys.executable, os.path.join(b.hooks, "dispatch.py"), "plan_check.py"],
                        input=J({"session_id": "s", "transcript_path": b.tr, "cwd": b.repo}), capture_output=True,
                        text=True, env=env)
-    scenario("A3: a crash of the dispatcher exits 1 (non-blocking)", r.returncode == 1 and "internal error" in r.stderr,
+    scenario("A3: the loop bookkeeping fails after the hook refused: the refusal stands (exit 2, its message)",
+             r.returncode == 2 and "PLAN CHECK: x" in r.stderr and "loop check failed" in r.stderr,
              (r.returncode, r.stderr))
+    r = subprocess.run([sys.executable, os.path.join(b.hooks, "dispatch.py"), "plan_check.py"], input="[1]",
+                       capture_output=True, text=True, env=b.env)
+    scenario("A3: a hook input that is no JSON object: the refusal stands", r.returncode == 2, (r.returncode, r.stderr))
+    b = Box()
+    raw = "BLOCKED \u2265 \u2014 ok\n".encode() + b"\xff\xfe not utf-8\n"
+    open(os.path.join(b.hooks, "bytes_guard.sh"), "w").write(
+        "cat >/dev/null; printf '%s' '{\"x\": 1}'; printf '" + "".join("\\%03o" % c for c in raw) + "' >&2; exit 2\n")
+    r = subprocess.run([sys.executable, os.path.join(b.hooks, "dispatch.py"), "bytes_guard.sh"], input=b"{}",
+                       capture_output=True, env=dict(b.env, PYTHONIOENCODING="ascii", LC_ALL="C"))
+    direct = subprocess.run(["bash", os.path.join(b.hooks, "bytes_guard.sh")], input=b"{}", capture_output=True)
+    scenario("A3: stdout, stderr and exit code pass through byte for byte (non-UTF-8 bytes, an ASCII locale)",
+             (r.returncode, r.stdout, r.stderr) == (direct.returncode, direct.stdout, direct.stderr) == (2, b'{"x": 1}', raw),
+             (r.returncode, r.stdout, r.stderr))
     b = Box()
     open(os.path.join(b.hooks, "json_block.sh"), "w").write(
         "cat >/dev/null; echo '{\"decision\":\"block\",\"reason\":\"BATCHED REVIEW DUE\"}'\n")
