@@ -4271,9 +4271,12 @@ entries:
     - agent_redesign
   decisions:
   - D186
-  next: Switch-overs A and B are applied (11:55); read B9's live checks (the main session's background run, scratchpad live_checks.txt),
-    then start switch-over D (owners and hand-offs in the plan, sections pushed by hook, CLAUDE.md v2 and keeper v2, the supervisor's
-    known-cause rule) with a compact agent
+  next:
+    1: Switch-overs A and B are applied (11:55); read B9's live checks (the main session's background run, scratchpad live_checks.txt),
+      then start switch-over D (owners and hand-offs in the plan, sections pushed by hook, CLAUDE.md v2 and keeper v2, the
+      supervisor's known-cause rule) with a compact agent
+    3: 'Fix the reply check''s false refusals: a verbatim quoted user question required, self-contradicting refusals discarded,
+      sonnet instead of haiku; tested on today''s false refusals and on real catches'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -4291,4 +4294,9 @@ entries:
       if:
       - 'the live checks pass: launch switch-over D'
       - 'a check fails: revert with the preAB copies in the scratchpad and fix'
+    3:
+      feeds: whether the reply check stops interrupting with invented questions
+      if:
+      - 'false cases pass and real catches still refuse: merge'
+      - 'a real catch is lost: keep the old check and report'
   step_waits: {}
