@@ -5148,3 +5148,10 @@ entries:
       plan.yaml dead ends and site decisions: prior now names the 2026-10-29 dead end (catalog_v3 default), the October lxplus
       GPU history, MIG OOM and the TF32 rescoring gap. Check 6: placement under agent_redesign (site upkeep) is the main session''s
       call, noted; the probe moves no training job.'
+  targets:
+  - batch: lxplus_probe
+    wall_h: 0.17
+    jobs: 1
+    units: null
+    start: '2026-10-30T19:54:23+00:00'
+    at: '2026-10-30T19:54:23+00:00'
