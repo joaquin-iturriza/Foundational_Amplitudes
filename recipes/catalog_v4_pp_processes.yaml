@@ -12061,8 +12061,11 @@ processes:
       its pp13 pool carries catalog_v3's physics
   pp13v4_dd_ddgg:
     lhe:
-      margin: 128.82
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_dd_ddgg
     mg5_generate:
@@ -14242,9 +14245,11 @@ processes:
       its pp13 pool carries catalog_v3's physics
   pp13v4_ddx_ddxgg:
     lhe:
-      n_runs: 4
       parts: true
-      accept_short: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ddx_ddxgg
     mg5_generate:
@@ -28136,8 +28141,11 @@ processes:
     parent: v4_uux_ggttx
   pp13v4_uux_gguux:
     lhe:
-      margin: 68.73
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_uux_gguux
     mg5_generate:
