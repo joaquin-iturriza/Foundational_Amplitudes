@@ -13,13 +13,15 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             pools (a lock per standalone directory, so no two jobs label or compile the same backend at once).
             Claims of jobs no longer in the queue (squeue) are put back first. Exits when nothing fits or is left.
     layout  --queue Q        one JSON line: current (every spec's layout is the recipes' now, not parked, no plan in
-                             progress), why not, and the task counts (read by the supervisor before it resubmits workers)
+                             progress), why not, and the task counts with claimed_dead (claims of workers gone from
+                             the scheduler; read by the supervisor before it resubmits workers)
     plan refuses (agent_redesign C5): a replan of a queue whose claims live workers hold unless it is parked first; a
             process missing from --probe (default analysis/catalog_v4/data/lhe_probe_yields.json) or asking more than
             2x the events it keeps there, unless --exclude'd or accepted (lhe_yield_accepted.json, written by accept-yield)
     accept-yield NAME=D<n>...   (laptop) record the user's decision accepting a low-yield process, checked against
                              the decision ledger: in force, and its quote or covers name the process
-    park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold)
+    park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold); parked
+                             (Q/parked/.active) until a plan of the queue completes
     plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again; --exclude NAME... held processes
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
     yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
@@ -111,7 +113,7 @@ def cmd_accept_yield(a):
                       (did,)).fetchone()
         if not r or r[0] not in ACCEPT_KINDS:
             bad.append("%s: %s is not an FA decision in force (%s)" % (name, did, "/".join(ACCEPT_KINDS)))
-        elif name not in (r[1] or "") and name not in (r[2] or ""):
+        elif not any(re.search(r"(?<![\w])%s(?![\w])" % re.escape(name), t or "") for t in (r[1], r[2])):
             bad.append("%s: %s neither quotes nor covers it" % (name, did))
         else:
             acc[name] = {"decision": did, "quote": r[1], "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
@@ -137,10 +139,13 @@ def live_claims(q):
     return out
 
 
+PARK_MARK = os.path.join("parked", ".active")    # written by park, removed by the next plan that completes
+
+
 def parked(q):
-    """A queue is parked when `park` moved its tasks aside and nothing was queued since (its live workers only finish
-    what they hold)."""
-    return bool(glob.glob(os.path.join(q, "parked", "*", "*.json"))) and not os.listdir(os.path.join(q, "todo"))
+    """A queue is parked from `park` until a plan of it completes (its live workers only finish what they hold);
+    tasks parked earlier and then replanned do not make it parked again."""
+    return os.path.exists(os.path.join(q, PARK_MARK))
 
 
 def plan_refusals(a, items):
@@ -180,10 +185,13 @@ def plan_refusals(a, items):
 def cmd_layout(a):
     """One JSON line for the supervisor: is the queue's layout the one workers submitted now would build?
     current = every spec's events identity equals the recipes' now (layout_current), the queue is not parked and no
-    plan is in progress (Q/.planning). With the counts of `status`."""
+    plan is in progress (Q/.planning). With the counts of `status`, and claimed_dead: claims of workers no longer in
+    the scheduler (a worker that died at its limit), work still to do that only a worker started now puts back (0
+    when squeue cannot be read)."""
     D = _dirs(a.queue)
-    c = {k: len([f for f in os.listdir(D[k]) if ".json" in f and not f.endswith(".err")])
-         for k in ("todo", "claimed", "done", "failed") if os.path.isdir(D[k])}
+    c = {k: len([f for f in os.listdir(D[k]) if ".json" in f and not f.endswith(".err")]) if os.path.isdir(D[k]) else 0
+         for k in ("todo", "claimed", "done", "failed")}
+    c["claimed_dead"] = max(0, c["claimed"] - len(live_claims(a.queue)))
     out = dict(c, queue=os.path.basename(os.path.normpath(a.queue)), current=True, why="")
     stale = []
     for f in sorted(os.listdir(D["specs"])) if os.path.isdir(D["specs"]) else []:
@@ -218,6 +226,8 @@ def cmd_plan(a):
         _plan(a, D, items_pre)
     finally:
         os.remove(mark)
+    if os.path.exists(os.path.join(a.queue, PARK_MARK)):    # planned again: no longer parked
+        os.remove(os.path.join(a.queue, PARK_MARK))
 
 
 def _plan(a, D, items):
@@ -740,6 +750,7 @@ def cmd_park(a):
     D = _dirs(a.queue)
     dst = os.path.join(a.queue, "parked", time.strftime("%Y%m%d_%H%M%S"))
     os.makedirs(dst, exist_ok=True)
+    open(os.path.join(a.queue, PARK_MARK), "w").write(time.strftime("%Y-%m-%dT%H:%M:%S"))
     n = 0
     for f in os.listdir(D["todo"]):
         try:
