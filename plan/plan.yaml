@@ -1433,6 +1433,19 @@ entries:
       Gate passes, main read no (below 0.05 or not above training or a placebo): the network already uses D or the gap is
       elsewhere: dead end for this route. Between: reported, no GPU arm. Cost: one CPU job on CC-IN2P3 (4 cores, under 1 h,
       about 2800 probe reads with their pool rows); no GPU.'
+    passed_at: '2026-10-30T22:28:15+00:00'
+    reviewer: 'Revised design is CPU-only on existing reads (no GPU). Check 1: held-out multiplicity pools against training
+      pools of the same cells, same control pair, scorer and 2000 events, plus two placebos (summed energy and the emission-scale
+      factor logF). Check 2: the measure''s response is gated inside the same read: r^2 of the control''s target t - logF
+      (raw t beside) on log D, below 0.1 ends the route before the residual is read. The cited numbers are now stated correctly:
+      eikonal alone r^2 <= 0.21, 0.50 only with propagators, 81-96% on Z+ng/W+ng. Check 3: each margin must exceed both the
+      seed 42/43 difference and the bootstrap half-range (1000 draws over pools); the per-pool seed spread of e is 0.054.
+      Check 4: gate-fail, yes, no and between are each stated with thresholds. Script dipole_residual.py @a1cc783e: exact
+      alignment or a one-to-one permutation, otherwise the probe is refused and counted. Check 5 terms searched: eikonal,
+      dipole, antenna, soft factor, surrogate, Parke, qperp, emission scales, zero-shot fix, shape gap, mult_cand. Decisions
+      read: D86, D113/D114 (qperp_soft), D178, D179. The prior now names par:dimless_qperp, D86 and the alignment dead ends.
+      Checks 6/7: within D178 and step 6, largest cells first. Note: H2 is read on val and TR on test; neither is the control''s
+      checkpoint-selection set for those pools. Report the refused count per group beside each median.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
