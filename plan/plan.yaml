@@ -2404,6 +2404,7 @@ entries:
     - FA-ccin2p3-584998ad
     - FA-ccin2p3-59ceb9d5
     - FA-ccin2p3-5aae573c
+    - FA-ccin2p3-5b39316d
     - FA-ccin2p3-5b56187f
     - FA-ccin2p3-5bae4e18
     - FA-ccin2p3-5be45e44
@@ -2473,6 +2474,7 @@ entries:
     - FA-ccin2p3-7f2fb49d
     - FA-ccin2p3-7f999f6b
     - FA-ccin2p3-8099a208
+    - FA-ccin2p3-80b598d9
     - FA-ccin2p3-816f6bb2
     - FA-ccin2p3-8207f8e1
     - FA-ccin2p3-82c7b33c
@@ -2512,10 +2514,12 @@ entries:
     - FA-ccin2p3-9f7511b2
     - FA-ccin2p3-a004c524
     - FA-ccin2p3-a22a1770
+    - FA-ccin2p3-a30c4ec3
     - FA-ccin2p3-a387df71
     - FA-ccin2p3-a39b869e
     - FA-ccin2p3-a5662880
     - FA-ccin2p3-a6d4fa4b
+    - FA-ccin2p3-a8e18d29
     - FA-ccin2p3-a93b7480
     - FA-ccin2p3-abada5c1
     - FA-ccin2p3-abdba695
@@ -2615,6 +2619,7 @@ entries:
     - FA-ccin2p3-ef0cdbc6
     - FA-ccin2p3-ef330d6c
     - FA-ccin2p3-efc4c352
+    - FA-ccin2p3-f0ed9631
     - FA-ccin2p3-f221c0cf
     - FA-ccin2p3-f23df4d2
     - FA-ccin2p3-f27d9e03
@@ -2622,6 +2627,7 @@ entries:
     - FA-ccin2p3-f2cc5d0b
     - FA-ccin2p3-f4b97b93
     - FA-ccin2p3-f5121432
+    - FA-ccin2p3-f51db377
     - FA-ccin2p3-f5a04d70
     - FA-ccin2p3-f6c22652
     - FA-ccin2p3-f77008eb
@@ -2636,8 +2642,31 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: '39914802'
+    commit: 0e9dda71
     paths:
+    - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
+      commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
+      --probe/accept-yield/layout). Done: lhe.gridpack=G in lhe_pp_recipe identity; mg.lhe_gridpacks (one per energy, grid
+      iseed = seed_k at k=runs+j), lhe_gridpack_of_run, lhe_gridpack_paths (<parts>/<proc>/<proc>_<eid>_gridJJ_seed<g>_ev<G>_gridpack.tar.gz),
+      lhe_build_gridpack; lhe_build_part draws a gridpack pool''s run with lhe_run_gridpack, banner = lhe_gridpack_header;
+      lhe_parts plan: gridpack task 00000000__<proc>__gJJ.json (kind gridpack, --grid-cores default 8), run tasks carry needs/needs_task,
+      _claim skips until the tar exists, cmd_work sleeps POLL_S=60 while a run waits on a gridpack claimed by a live job,
+      _tidy helper, gc covers gridpack dirs; gen_catalog_v4_default.complete_layout(lhe, run_events, gridpack) sets lhe.gridpack=max(per-energy
+      need, GRID_MIN=13057), and skips resize_short for pools in complete_runs.json (it crashed on trunk too: dsh_dbx_bxuwmz
+      yields at 101838/run vs 621). NOT YET COMMITTED in the worktree: complete_runs.json (all 56 gridpack:true, pp run_events
+      1000, e+e- kept 1000 dsh / 200 ee4), lhe_assembled.json refreshed from all queues'' assembled markers on CC (885 ->
+      1042), regenerated catalog_v4_{default,ee,pp}_processes.yaml (side effect: dsh_ub_abdwp, dsh_ud_bbxdu, dsh_uu_duwpz
+      lose margin, run size 101838 -> 621; they are unassembled w3 pools). TODO: tests in tests/test_lhe_parts.py (identity,
+      gridpack task first, runs blocked until tar, end-to-end with fakes), check the upstream plan_refusals (probe-yield file,
+      live claims) accept gridpack pools, repo-reviewer, merge. (2) W3 FAILURES (E2501-E2513 acked): 13 catalog_v4_w3 workers
+      rc=1, all one cause: runs of run_events pools returning fewer events than asked; queue 1323 done, 193 failed, 151/203
+      assembled, 342 claims by 61 live workers. 52 unassembled w3 pools (dsh_bb_bbgg ... ee4_epem_accxg, pp13v4_dd_ddgg, pp13v4_uux_gguux)
+      cannot finish; shortbuilt on CC: 8 catalog_v4 pools assembled from short runs not on the list (dsh_epem_aaccx, dsh_epem_accxg,
+      dsh_epem_accxz, dsh_epem_hwpwmz, dsh_udx_aaawp, dsh_ug_guuux, ee4_epem_btxwp, pp13v4_ddx_ddxgg); the 53 catalog_v4 layout_unknown
+      are all on the list. Proposal: both sets join the gridpack rebuild on a yes. (3) PROBE: all six ended. e+e- dsh_epem_amupvmwm
+      1000 GeV: gridpacks built in 45/43 s, 6.3 MB, runs of 200: 197 and 196 of 200 complete, run median 12 s. Coordinator:
+      dsh_bb_bbgg 100/100 complete. NEXT: site run measure -> analysis/catalog_v4/data/short_run_bias_gpack.json, read per
+      step 7, write par:v4_short_runs + figure, then branch.'
     - 'HAND-OFF (2026-10-30, gridpack step). (1) CODE: commit 7bdc5729 (+39914802 measure). mg5_pipeline_final.py: lhe_make_gridpack(process,
       ev, nevents, iseed, log, mg_cores, patches, run_name=''grid'') runs lhe_run_madevent with run-card gridpack=True (lhe_run_madevent
       now returns lhe=None for a gridpack run instead of raising) and returns <ev>/grid_gridpack.tar.gz; lhe_run_gridpack(tar,
