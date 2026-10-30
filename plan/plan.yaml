@@ -4393,11 +4393,11 @@ entries:
     start: '2026-10-30T13:10:15+00:00'
     at: '2026-10-30T13:10:15+00:00'
   - batch: short_runs_reread
-    wall_h: 1.5
+    wall_h: 3.0
     jobs: 1
     units: null
-    start: '2026-10-30T13:35:43+00:00'
-    at: '2026-10-30T13:35:43+00:00'
+    start: '2026-10-30T13:37:59+00:00'
+    at: '2026-10-30T13:37:59+00:00'
   step_why:
     10:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
