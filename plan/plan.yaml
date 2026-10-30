@@ -4435,6 +4435,54 @@ entries:
       reads the test split, separate from the pp train events; the PP read has moved with the training density before (catalog_v3
       pp-trained against window-trained 0.19, 0.59 inside coverage; catalog_v4 against pp-trained 0.66 against a seed spread
       of 0.10); the bound arm covers the user''s catalog_v4-against-pp-training comparison (2026-10-26).'
+  - at: '2026-10-30T17:14:03+00:00'
+    question: 'Step 11 only (revised after FIX): the pure-default bound. How much lower is the error on default-sampled (MadEvent
+      unweighted) 13 TeV pp events when every hadronic tree training class is trained on its pp pool instead of catalog_v4''s
+      smart pool (v4_dimensionless_muon_pp[_seed2], recipes/catalog_v4_pp_mixed_train.yaml: 797 classes swapped, 466 to pp13v4_
+      and 331 to reused pp13_ pools with 0 b and 0 changed diagram counts; the other 356 entries the control''s files), and
+      what does it cost on the smart held-out pools? It bounds what any default share can gain (D178 priority 1). Step 14
+      (the share arms) waits on Joaquin''s shares: D178 fixes only that default and smart sampling are mixed, no decision
+      names a share; its arms are out of the job script and of this design. Goes only after the pp13v4 validation (step 10)
+      passes.'
+    prior: 'pp-trained arm (catalog_v3, FA-ccin2p3-e786bd74, results.tex par. The pp-trained arm): on the training classes''
+      pp events MSE 0.43 vs 2.86 window-trained (0.19), inside the window coverage 0.38 vs 0.53 (0.59, 802 of 986 lower),
+      pp_compare.py @d1dec67. catalog_v4 against the pp-trained arm on matching labels: 0.66 against a seed spread (median
+      |log10| per class) of 0.10 trained, 0.14 held out (par v4_vs_pp, compare_pp_trained). The density check (par v4_density):
+      median KL of the pp density to catalog_v4''s 1.38, falling to 1.01, 0.61, 0.37 for a pp mixture share f = 0.1, 0.3,
+      0.5; rank correlation of KL with the error gap 0.19. The pp blend (results.tex ladder-open, The pp blend, ~line 12209,
+      2026-10-26: 70/30 and 50/50 blends against catalog_v4 and against pp-only, Muon, two seeds; on hold until the pp pools
+      carry catalog_v4''s physics) and the ask D167 answered (a blend at 10% and 30% against catalog_v4 and pp-only; answered
+      ''Yes. delete catalog 3 and do the regeneration''): this pair is their pp-only end, now on pp13v4 pools with catalog_v4''s
+      physics; the blends themselves are step 14, pending the shares.'
+    measure: 'Per class, MSE of ln|M|^2 at the best checkpoint (lowest aggregate val_loss_no_reg) from tools/zero_shot_parent.py.
+      Statistic: R = median over classes of the per-class ratio arm/control, each side the geometric mean of its two seeds.
+      PP4: recipes/catalog_v4_pp_test.yaml (868 pp13v4_ + 433 pp13_ pools, b-free reused ones), TEST split, first 2000 rows;
+      split into the 797 trained-on-pp classes and the held-out pp classes. Smart: catalog_v4''s held-out axes H1..H7c and
+      XV3 (val split). The controls'' old PP reads (catalog_v3_pp_test, 852 pools with a 4.7 GeV b) are not used: the controls
+      are re-read on PP4 in mode eval. Interval: class bootstrap (10000 resamples) 95% interval of R, widened on each side
+      by |ln R_seed| where R_seed = median over classes of control seed 43 over seed 42 on the same axis (the seed shift of
+      the median itself).'
+    check: 'The PP read moves with the training density on existing data: catalog_v3 pp-trained over window-trained 0.19,
+      0.59 inside coverage (802 of 986 lower); catalog_v4 over pp-trained 0.66 against a seed spread of 0.10. Noise of R:
+      per-class |log10| spread 0.10-0.14 over about 800 classes gives a median noise of about 0.0065 in log10 (1.5%), so an
+      effect of 10% is about 7 standard errors.'
+    fixed: 'mu-P LLoCa, dimensionless target, Muon at the search best (lr 0.004997423, muon wd 0.02171863), 4264 steps, batch
+      16384, 1e4 train events per process, seeds 42 and 43, scripts/job_catalog_v3_short.sh, --hdr=--mem=48G, CC-IN2P3; only
+      the training recipe differs; reads on the same events with the same scorer. Data draws: the arm trains on new pool draws
+      for 797 classes while the control''s seed pair holds data fixed; the class bootstrap carries the per-class draw variation
+      (each class is its own draw of 1e4 events) and the widening by R_seed carries the seed shift; nothing further added.'
+    control: v4_dimensionless_muon (FA-ccin2p3-339ec100) and _seed2 (FA-ccin2p3-380842ed), reused (same code path at 1d9d6a29
+      settings), re-read in mode eval on PP4 (V3_AXES=PP4); their held-out and XV3 reads exist.
+    seeds: '2 per side (42, 43). Cost: smoke 0.2 GPU-h, two trainings about 1.5 GPU-h each, two control PP4 reads about 0.3
+      GPU-h each: about 3.8 GPU-h, under 30.'
+    outcome: 'Smallest effect worth acting on: R = 0.90 on PP4 trained classes (10% lower error on default-sampled events;
+      a third of catalog_v4''s 0.66 lead over the pp-trained arm would be 0.87). YES (default sampling has room): R <= 0.90
+      and the widened interval''s upper end < 1.0 -> step 14''s share arms are worth running; the bound is reported to Joaquin
+      with the share question. NO: R >= 0.97 or the widened interval contains 1.0 -> catalog_v4''s smart pools already cover
+      default-sampled events at this horizon; reported to Joaquin with the bound beside the open share question (not closed
+      by this). Between (0.90 < R < 0.97 with the interval below 1): a small gain, reported as such with its interval. Smart
+      axes: the bound''s cost reported as R per axis with its interval; a cost (R >= 1.10, interval above 1.0) is expected
+      for a pure-default arm and sizes how much smart share a mixture must keep. Thresholds fixed now, before any arm is read.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
