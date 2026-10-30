@@ -382,13 +382,16 @@ def submit_multipliers(cmd):
         if t in (";", "\n", "&", "&&", "|", "||", "(", ")"):
             start = True
             continue
-        if start and t == "for" and k + 2 < len(toks) and toks[k + 2] == "in":
-            words = []
-            for w in toks[k + 3:]:
-                if w in (";", "\n", "do"):
-                    break
-                words.append(w)
-            stack.append(_words_count(words))
+        if start and t == "for":
+            if k + 2 < len(toks) and toks[k + 2] == "in":
+                words = []
+                for w in toks[k + 3:]:
+                    if w in (";", "\n", "do"):
+                        break
+                    words.append(w)
+                stack.append(_words_count(words))
+            else:                                   # for ((...)), or `for x` over "$@": a count it cannot read
+                stack.append(None)
         elif start and t in ("while", "until"):
             stack.append(None)
         elif start and t == "done" and stack:
@@ -443,7 +446,7 @@ def budget(cmd, segs):
     subs = site_submits(segs)
     if len(mults) != len(subs):          # a submit the plain reading cannot place (inside sh -c, a substitution)
         loopy = re.search(r"(?:^|[;&|(\s])(?:for|while|until)\s|\bxargs\b|\bparallel\b",
-                          cmdparse.blank_quotes(cmdparse.code_text(cmd)))
+                          cmdparse.scan_text(cmd))          # the inner programs of sh -c / eval included
         mults = [None if loopy else 1] * len(subs)
     for (site, project, script, item, est, allow_jz), n in zip(subs, mults):
         if not asks_gpu(script):

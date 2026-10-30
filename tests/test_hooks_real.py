@@ -720,6 +720,13 @@ def submit_budget():
                                                           "--item jz --est-gpu-hours 12; done" % gpu, 0),
             ("seq 3 | xargs of 6 GPU-h (18)", "seq 3 | xargs -I{} site submit auto FA %s --item jz --est-gpu-hours 6"
              % gpu, 0),
+            ("a C-style for loop of 6 (count unreadable)", "for ((i=0;i<6;i++)); do site submit auto FA %s --item jz "
+                                                          "--est-gpu-hours 6; done" % gpu, 2),
+            ("a C-style loop around a loop of 2", "for ((i=0;i<6;i++)); do for j in 1 2; do site submit auto FA %s "
+                                                  "--item jz --est-gpu-hours 1; done; done" % gpu, 2),
+            ("a loop of 6 inside bash -c", "bash -c \"for i in 1 2 3 4 5 6; do site submit auto FA %s --item jz "
+                                           "--est-gpu-hours 6; done\"" % gpu, 2),
+            ("one submit inside bash -c", "bash -c \"site submit auto FA %s --item jz --est-gpu-hours 6\"" % gpu, 0),
             ("a GPU submit inside xargs sh -c (count unreadable)", "seq 40 | xargs -I{} sh -c 'site submit auto FA %s "
                                                                   "--item jz --est-gpu-hours 1'" % gpu, 2)):
         rc = sub(cmd)
