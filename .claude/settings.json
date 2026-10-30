@@ -189,6 +189,15 @@
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.py\" context_push.py pre"
           }
         ]
+      },
+      {
+        "matcher": "Monitor|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.py\" wait_guard.py"
+          }
+        ]
       }
     ],
     "PostToolUse": [
