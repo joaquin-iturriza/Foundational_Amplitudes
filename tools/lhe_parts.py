@@ -38,6 +38,10 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             not running: a run whose part file holds its events loses the whole directory, any other (failed, killed,
             not started) keeps only its log files. A manifest of every path removed, with its size, is written under
             Q/gc/ before anything is deleted. A worker does the same for each run it ends (tidy_run).
+    workdirs [--min-age H] [--apply]   every MadEvent working directory left on $SCRATCH/lhe_work, of any queue or
+            layout (parts/<process>__<run>) or of a failed series build (<process>_madevent): sizes, ages, saved parts,
+            any .npz inside checked against its lhe_parts copy; --apply deletes those older than H hours whose .npz all
+            have copies (manifest under $SCRATCH/lhe_work/gc first)
 
 The queue holds  todo/<prio>__<process>__<k>.json (a gridpack task: 00000000__<process>__g<j>.json)  claimed/<same>.<jobid>  done/  failed/  assembled/<process>.
 Every pool is the one prebuild_recipes.py would build for the same spec and seed (same recipe ids).
@@ -831,6 +835,104 @@ def cmd_gc(a):
                       "no_dir": stats["absent"], "short_parts_kept_logs": stats["short_parts"]}))
 
 
+def _newest_mtime(path):
+    t = os.lstat(path).st_mtime
+    for dp, ds, fs in os.walk(path):
+        for f in ds + fs:
+            try:
+                t = max(t, os.lstat(os.path.join(dp, f)).st_mtime)
+            except OSError:
+                pass
+    return t
+
+
+def _run_card(wd):
+    """(iseed, nevents) read from the run card of the MadEvent directory under the run directory wd, None each when
+    absent."""
+    out = {"iseed": None, "nevents": None}
+    for c in glob.glob(os.path.join(wd, "*_madevent", "Cards", "run_card.dat")):
+        for line in open(c, errors="replace"):
+            m = re.match(r"\s*(\d+)\s*=\s*(iseed|nevents)\b", line.split("!")[0])
+            if m:
+                out[m.group(2)] = int(m.group(1))
+    return out["iseed"], out["nevents"]
+
+
+def workdir_audit(min_age_h=12.0):
+    """Every MadEvent working directory left on the shared disk, whatever queue or layout made it: the run
+    directories $SCRATCH/lhe_work/parts/<process>__<run> (a queue's gc reaches only the runs of its current layout, so
+    a run of a replanned layout or of no queue is never tidied) and the series builds' $SCRATCH/lhe_work/<process>_madevent
+    (build_lhe_pp left them when a build failed). Per directory: bytes, age, the part files it would have made, and every
+    .npz inside it with whether lhe_parts holds an identical-size copy that loads. A directory is deletable when it is
+    older than min_age_h (no job writes it) and holds no .npz without its copy."""
+    s = os.environ.get("SCRATCH")
+    if not s:
+        raise SystemExit("SCRATCH not set: nothing audited")
+    work = os.path.realpath(os.path.join(s, "lhe_work"))
+    pdir = mg.lhe_parts_dir()
+    now = time.time()
+    dirs = [(os.path.join(work, "parts", x), "run") for x in sorted(os.listdir(os.path.join(work, "parts")))
+            if os.path.isdir(os.path.join(work, "parts", x))] if os.path.isdir(os.path.join(work, "parts")) else []
+    dirs += [(os.path.join(work, x), "series") for x in sorted(os.listdir(work))
+             if x.endswith("_madevent") and os.path.isdir(os.path.join(work, x))] if os.path.isdir(work) else []
+    out = []
+    for wd, kind in dirs:
+        base = os.path.basename(wd)
+        process, run = (base.split("__", 1) + [None])[:2] if kind == "run" else (base[:-len("_madevent")], None)
+        iseed, nev = _run_card(wd)
+        npz = []
+        for dp, _, fs in os.walk(wd):
+            for f in fs:
+                if f.endswith(".npz"):
+                    fp = os.path.join(dp, f)
+                    cp = os.path.join(pdir, process, f)
+                    ok = (os.path.exists(cp) and os.path.getsize(cp) == os.path.getsize(fp) and part_ok(cp))
+                    npz.append({"path": fp, "copy": cp, "copied": ok})
+        parts = []
+        if run:
+            parts = glob.glob(os.path.join(pdir, process, f"{process}_*_{run}_seed{iseed if iseed else '*'}_ev*.npz"))
+            parts += glob.glob(os.path.join(pdir, process, f"{process}_*_{run}_seed*_gridpack.tar.gz"))
+        events = bool(glob.glob(os.path.join(wd, "**", "*.lhe*"), recursive=True))
+        age_h = (now - _newest_mtime(wd)) / 3600
+        out.append({"path": wd, "kind": kind, "process": process, "run": run, "bytes": _du(wd),
+                    "age_h": round(age_h, 1), "iseed": iseed, "nevents": nev, "events_in_dir": events,
+                    "part_saved": any(part_ok(p) or p.endswith(".tar.gz") for p in parts),
+                    "npz": npz, "deletable": age_h >= min_age_h and all(n["copied"] for n in npz)})
+    return work, out
+
+
+def cmd_workdirs(a):
+    """workdirs [--min-age H] [--apply]: workdir_audit over the shared tree, a manifest of every directory and its
+    size under $SCRATCH/lhe_work/gc/ first; with --apply each deletable directory is removed (re-checked just before)."""
+    work, out = workdir_audit(a.min_age)
+    os.makedirs(os.path.join(work, "gc"), exist_ok=True)
+    man = os.path.join(work, "gc", f"workdirs_{time.strftime('%Y%m%d_%H%M%S')}{'' if a.apply else '_dry'}.json")
+    with open(man, "w") as f:
+        json.dump({"root": work, "apply": a.apply, "min_age_h": a.min_age, "dirs": out}, f)
+    freed = 0
+    if a.apply:
+        for e in out:
+            if not e["deletable"]:
+                continue
+            _under(work, e["path"])
+            if (time.time() - _newest_mtime(e["path"])) / 3600 < a.min_age:
+                continue                                   # written since the audit
+            shutil.rmtree(e["path"], ignore_errors=True)
+            freed += 0 if os.path.exists(e["path"]) else e["bytes"]
+    gb = lambda xs: round(sum(e["bytes"] for e in xs) / 1e9, 2)
+    by = lambda k: [e for e in out if e["kind"] == k]
+    npz = [n for e in out for n in e["npz"]]
+    print(json.dumps({"manifest": man, "apply": a.apply, "dirs": len(out), "gb": gb(out),
+                      "run_dirs": len(by("run")), "run_gb": gb(by("run")),
+                      "series_dirs": len(by("series")), "series_gb": gb(by("series")),
+                      "deletable_dirs": sum(e["deletable"] for e in out), "deletable_gb": gb([e for e in out if e["deletable"]]),
+                      "npz_inside": len(npz), "npz_without_copy": [n["path"] for n in npz if not n["copied"]],
+                      "run_dirs_with_part_saved": sum(e["part_saved"] for e in by("run")),
+                      "run_dirs_events_no_part": sum(e["events_in_dir"] and not e["part_saved"] for e in by("run")),
+                      "younger_than_min_age": sum(e["age_h"] < a.min_age for e in out),
+                      "freed_gb": round(freed / 1e9, 2)}))
+
+
 def cmd_park(a):
     """Move a queue's unclaimed tasks (todo/) to parked/<time>/, so its live workers claim nothing more and end with the
     runs they hold; nothing deleted. Their work is planned in another queue (plan --skip-claimed this queue)."""
@@ -1068,6 +1170,8 @@ def main():
     w.add_argument("--hours", type=float, default=1.0)
     s = sub.add_parser("status"); s.add_argument("--queue", required=True)
     g = sub.add_parser("gc"); g.add_argument("--queue", required=True); g.add_argument("--dry-run", action="store_true")
+    wdp = sub.add_parser("workdirs"); wdp.add_argument("--min-age", type=float, default=12.0)
+    wdp.add_argument("--apply", action="store_true")
     y = sub.add_parser("yields"); y.add_argument("--queue", required=True)
     sh = sub.add_parser("shares"); sh.add_argument("--queue", required=True); sh.add_argument("--requeue", action="store_true")
     rq = sub.add_parser("requeue"); rq.add_argument("--queue", required=True)
@@ -1075,7 +1179,7 @@ def main():
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     sb = sub.add_parser("shortbuilt"); sb.add_argument("--out", required=True); sb.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
-    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "workdirs": cmd_workdirs, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 

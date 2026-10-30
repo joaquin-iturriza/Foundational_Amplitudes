@@ -1081,6 +1081,131 @@ def test_kept_by_energy_and_sizing():
     print("[kept by energy and sizing] ok")
 
 
+def test_failed_builds_and_workdirs():
+    """A failed series build (build_lhe_pp refused by the physics check after MG5 wrote its MadEvent directory, or a
+    MadEvent run that raised) keeps only its logs; a part run outside a queue (keep_dir False) that fails or comes back
+    short keeps only its logs. workdirs sees every directory left on $SCRATCH/lhe_work (run directories of no queue's
+    current layout, series directories), checks each .npz inside against its lhe_parts copy, and with --apply deletes
+    only those older than --min-age whose .npz all have copies, after writing its manifest."""
+    _register(n_runs=3)
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role)
+    env0 = {v: os.environ.get(v) for v in ("SCRATCH", "AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR")}
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d, short=False)
+            prep = mg.lhe_prepare
+
+            def prepare(process, work_root, log_path, madevent=True, standalone=True):
+                ev, sa = prep(process, work_root, log_path, madevent, standalone)
+                os.makedirs(os.path.join(ev, "SubProcesses", "P1"), exist_ok=True)
+                open(os.path.join(ev, "SubProcesses", "P1", "madevent"), "wb").write(b"x" * 10000)
+                open(os.path.join(ev, "MG5_debug"), "w").write("debug")
+                return ev, sa
+            mg.lhe_prepare = prepare
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["SCRATCH"] = d
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "lhe_parts")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "lhe_work")
+            files = lambda w: sorted(os.path.relpath(os.path.join(dp, f), w) for dp, _, fs in os.walk(w) for f in fs)
+            # series build refused by the physics check (the 277 pp13v4 b-beam refusals of 2026-10-29)
+            mg.PROCESSES[NAME]["lhe"].pop("parts")
+
+            def refuse(process):
+                raise RuntimeError("b mass differs from the parent (fake)")
+            mg.lhe_parent_physics_check = refuse
+            ev = os.path.join(d, "lhe_work", f"{NAME}_madevent")
+            try:
+                mg.build_lhe_pp(NAME, _items())
+                raise AssertionError("the refused build returned")
+            except RuntimeError as e:
+                assert "fake" in str(e)
+            assert files(ev) == ["MG5_debug"], files(ev)
+            # series build whose MadEvent run raised
+            mg.lhe_parent_physics_check = lambda process: None
+            run0 = mg.lhe_run_madevent
+
+            def boom(*a, **k):
+                raise RuntimeError("MadEvent died (fake)")
+            mg.lhe_run_madevent = boom
+            try:
+                mg.build_lhe_pp(NAME, _items())
+                raise AssertionError("the failed build returned")
+            except RuntimeError:
+                pass
+            assert files(ev) == ["MG5_debug"], files(ev)
+            # a successful series build leaves nothing
+            mg.lhe_run_madevent = run0
+            mg.build_lhe_pp(NAME, _items())
+            assert not os.path.exists(ev)
+            # part runs outside a queue: a failed one keeps its logs only, a saved one nothing
+            mg.PROCESSES[NAME]["lhe"]["parts"] = True
+            mg.lhe_run_madevent = boom
+            try:
+                mg.lhe_build_part(NAME, _items(), 0)
+            except RuntimeError:
+                pass
+            wd0 = lhe_parts.run_workdir(NAME, mg.lhe_part_paths(NAME, _items())[0][1])
+            assert files(wd0) == [f"{NAME}.mg5.log", f"{NAME}_madevent/MG5_debug"], files(wd0)
+            mg.lhe_run_madevent = run0
+            p1 = mg.lhe_build_part(NAME, _items(), 1)
+            assert not os.path.exists(lhe_parts.run_workdir(NAME, mg.lhe_part_paths(NAME, _items())[1][1]))
+
+            # workdirs: a tree as found on CC on 2026-10-31
+            work = os.path.join(d, "lhe_work")
+            mk = lambda path, n=1000: (os.makedirs(os.path.dirname(path), exist_ok=True),
+                                       open(path, "wb").write(b"x" * n))
+            old = time.time() - 48 * 3600
+            orphan = os.path.join(work, "parts", f"{NAME}__run_07")                # a replanned layout's run
+            mk(os.path.join(orphan, f"{NAME}_madevent", "Events", "run_07", "unweighted_events.lhe.gz"), 5000)
+            copied = os.path.join(work, "parts", f"{NAME}__run_08")                # an .npz inside, its copy there
+            os.makedirs(copied)
+            import shutil
+            shutil.copy2(p1, os.path.join(copied, os.path.basename(p1)))
+            lost = os.path.join(work, "parts", f"{NAME}__run_09")                  # an .npz inside, no copy
+            os.makedirs(lost)
+            np.savez(os.path.join(lost, "zz_only_here.npz"), mom=np.zeros((3, K, 4)))
+            young = os.path.join(work, "parts", f"{NAME}__run_10")                 # a run being written now
+            mk(os.path.join(young, "x.dat"))
+            series = os.path.join(work, "pp13v4_zz_madevent")
+            mk(os.path.join(series, "SubProcesses", "madevent"), 7000)
+            outside = os.path.join(d, "keep_me")                                   # not under lhe_work
+            mk(os.path.join(outside, "y_madevent", "z"))
+            for root in (orphan, copied, lost, series, wd0):
+                for dp, ds, fs in os.walk(root):
+                    for f in ds + fs:
+                        os.utime(os.path.join(dp, f), (old, old))
+                os.utime(root, (old, old))
+            run = lambda apply: json.loads(_capture(lambda: lhe_parts.cmd_workdirs(
+                argparse.Namespace(min_age=12.0, apply=apply))))
+            r = run(False)
+            assert r["run_dirs"] == 5 and r["series_dirs"] == 1, r                  # wd0 + 4 made; series one
+            assert r["npz_inside"] == 2 and r["npz_without_copy"] == [os.path.join(lost, "zz_only_here.npz")], r
+            assert r["deletable_dirs"] == 4 and r["younger_than_min_age"] == 1, r  # not lost, not young
+            assert all(os.path.exists(x) for x in (orphan, copied, lost, young, series)), "a dry run deleted"
+            man = json.load(open(r["manifest"]))
+            assert {e["path"] for e in man["dirs"] if e["deletable"]} == {orphan, copied, series, wd0}
+            r = run(True)
+            assert not any(os.path.exists(x) for x in (orphan, copied, series, wd0)), r
+            assert os.path.exists(lost) and os.path.exists(young) and os.path.exists(outside), r
+            assert r["freed_gb"] >= 0 and os.path.exists(p1)                        # the part itself is untouched
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role) = saved
+        for v, x in env0.items():
+            os.environ.pop(v, None) if x is None else os.environ.__setitem__(v, x)
+        mg.PROCESSES.pop(NAME, None)
+    print("[failed builds and workdirs] ok")
+
+
+def _capture(fn):
+    import contextlib, io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        fn()
+    return buf.getvalue().strip().splitlines()[-1]
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -1097,3 +1222,4 @@ if __name__ == "__main__":
     test_gridpack_queue()
     test_gridpool_probe()
     test_kept_by_energy_and_sizing()
+    test_failed_builds_and_workdirs()

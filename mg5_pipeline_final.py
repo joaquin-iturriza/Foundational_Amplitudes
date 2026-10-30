@@ -4370,25 +4370,55 @@ def build_lhe_pp(process, items, work_root=None, mg_cores=1, write_sidecars=True
     log_path = os.path.join(work_root, f"{process}.mg5.log")
     open(log_path, "w").close()
     secs, t0 = {}, time.time()
-    ev, sa = lhe_prepare(process, work_root, log_path)
-    lhe_parent_physics_check(process)            # before MadEvent: a pool labelled with other physics is refused cheaply
-    secs["output"] = time.time() - t0; t0 = time.time()
-    # a process whose MadEvent run returns a fixed few thousand events however many are asked (its unweighting stalls)
-    # runs n_runs times with seeds iseed + 7919 k (lhe.n_runs, in its pool identity), the unweighted events concatenated
-    runs = lhe_runs(process, iseed, n_req)
-    n_runs = len(runs)
-    moms, aqcds = [], []
-    for k, (iseed_k, n_k, patches_k, name_k) in enumerate(runs):
-        lhe, b = lhe_run_madevent(process, ev, n_k, iseed_k, log_path, mg_cores, run_name=name_k, patches=patches_k)
-        banner = banner if k else b
-        m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
-        moms.append(m_k); aqcds.append(a_k)
-    secs["madevent"] = time.time() - t0; t0 = time.time()
-    out = _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed, iseed, n_req, mg_cores,
-                      write_sidecars)
+    ev = os.path.join(work_root, f"{process}_madevent")
+    try:
+        ev, sa = lhe_prepare(process, work_root, log_path)
+        lhe_parent_physics_check(process)        # before MadEvent: a pool labelled with other physics is refused cheaply
+        secs["output"] = time.time() - t0; t0 = time.time()
+        # a process whose MadEvent run returns a fixed few thousand events however many are asked (its unweighting
+        # stalls) runs n_runs times with seeds iseed + 7919 k (lhe.n_runs, in its pool identity), the events concatenated
+        runs = lhe_runs(process, iseed, n_req)
+        moms, aqcds = [], []
+        for k, (iseed_k, n_k, patches_k, name_k) in enumerate(runs):
+            lhe, b = lhe_run_madevent(process, ev, n_k, iseed_k, log_path, mg_cores, run_name=name_k,
+                                      patches=patches_k)
+            banner = banner if k else b
+            m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+            moms.append(m_k); aqcds.append(a_k)
+        secs["madevent"] = time.time() - t0; t0 = time.time()
+        out = _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed, iseed, n_req, mg_cores,
+                          write_sidecars)
+    except BaseException:
+        if not keep_dir:                         # a failed build (refused, short, killed) keeps only its logs
+            lhe_reduce_to_logs(ev)
+        raise
     if not keep_dir:
         shutil.rmtree(ev, ignore_errors=True)
     return out
+
+
+LHE_LOG_NAMES = ("ME5_debug", "MG5_debug")       # with every *.log file, what a failed MadEvent directory keeps
+
+
+def lhe_reduce_to_logs(d):
+    """Delete every file of the MadEvent directory d but its logs (*.log, ME5_debug, MG5_debug), and the directories
+    left empty. Never raises."""
+    if not d or not os.path.isdir(d):
+        return
+    for dp, ds, fs in os.walk(d, topdown=False):
+        for f in fs:
+            fp = os.path.join(dp, f)
+            if os.path.islink(fp) or not (f.endswith(".log") or f in LHE_LOG_NAMES):
+                try:
+                    os.unlink(fp)
+                except OSError:
+                    pass
+        for x in ds:
+            xp = os.path.join(dp, x)
+            try:
+                os.unlink(xp) if os.path.islink(xp) else os.rmdir(xp)
+            except OSError:
+                pass
 
 
 def _lhe_check_recipes(process, items):
@@ -4592,6 +4622,17 @@ def lhe_build_part(process, items, k, mg_cores=1, work_root=None, keep_dir=False
     log_path = os.path.join(work_root, f"{process}.mg5.log")
     open(log_path, "w").close()
     t0 = time.time()
+    try:
+        return _lhe_build_part_run(process, items, cfg, path, iseed_k, n_k, patches_k, name_k, work_root, log_path,
+                                   mg_cores, keep_dir, t0)
+    except BaseException:
+        if not keep_dir:                         # a failed run (no part) keeps only its logs
+            lhe_reduce_to_logs(work_root)
+        raise
+
+
+def _lhe_build_part_run(process, items, cfg, path, iseed_k, n_k, patches_k, name_k, work_root, log_path, mg_cores,
+                        keep_dir, t0):
     if cfg["lhe"].get("gridpack"):
         # lhe.gridpack: the run is drawn from its energy's gridpack (lhe_build_gridpack, made first) with the run's
         # seed and events; its banner is the LHE header, the gridpack integration's cards
@@ -4618,8 +4659,8 @@ def lhe_build_part(process, items, k, mg_cores=1, work_root=None, keep_dir=False
              second_refine=np.array(lhe_second_refine() if lhe_second_refine() is not None else np.nan),
              banner=np.array(banner_txt))
     os.replace(tmp, path)
-    if len(m_k) >= n_k and not keep_dir:     # a short run keeps its directory (its logs)
-        shutil.rmtree(work_root, ignore_errors=True)
+    if not keep_dir:                         # a short run keeps only its logs
+        shutil.rmtree(work_root, ignore_errors=True) if len(m_k) >= n_k else lhe_reduce_to_logs(work_root)
     print(f"[LHE PART] {process} {name_k}: {len(m_k)} events (asked {n_k}, iseed {iseed_k}) in {t_me:.0f}s "
           f"-> {path}", flush=True)
     return path
