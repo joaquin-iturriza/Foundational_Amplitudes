@@ -5080,6 +5080,12 @@ entries:
       8 jobs FA-ccin2p3-29d2a19a, 703d8e47, 3f316013, 2b510f7b, 396a8953, 9b7c4fc1, 5d69bf3f, 320cc292 (both recipes, pools
       cached, alpha_s about 2 GB in all); arms resubmitted afterok on them at 2.5 h: default50 b316582a, default50_seed2 7cc6fe94,
       default25 28465181, default25_seed2 e456e33d.'
+  - at: '2026-10-30T23:24:11+00:00'
+    text: 'E3121-E3128: the first alpha_s repair (29d2a19a..320cc292) failed: tools/write_own_alphas.py globbed the pool by
+      class name and found _smix_, _smixd50_ and _smixd25_ side by side. Fixed 5250ef5b (exact recipe path). Repair rerun
+      FA-ccin2p3-4e53ebe5..f553eb93 all COMPLETED; check_site_data --alphas passes on both mixture recipes. The stale arms
+      b316582a, 7cc6fe94, 28465181, e456e33d were cancelled before starting; the four arms resubmitted with nothing to wait
+      on, 2.5 h: default50 6c246603, default50_seed2 1d46b938, default25 11ad944a, default25_seed2 9c6fc7ab.'
   handoff:
     state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
       their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
