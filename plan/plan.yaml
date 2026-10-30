@@ -2313,6 +2313,7 @@ entries:
     - FA-ccin2p3-1917bf24
     - FA-ccin2p3-1aae6ecc
     - FA-ccin2p3-1b27db1b
+    - FA-ccin2p3-1b592055
     - FA-ccin2p3-1bb79f75
     - FA-ccin2p3-1bc24e50
     - FA-ccin2p3-1e3a5ffa
@@ -2328,6 +2329,7 @@ entries:
     - FA-ccin2p3-23c90bb5
     - FA-ccin2p3-23fe1dcb
     - FA-ccin2p3-2424a38f
+    - FA-ccin2p3-25b12000
     - FA-ccin2p3-262a1404
     - FA-ccin2p3-263c862e
     - FA-ccin2p3-26468736
@@ -2353,9 +2355,11 @@ entries:
     - FA-ccin2p3-37b4f377
     - FA-ccin2p3-37e06bc5
     - FA-ccin2p3-380842ed
+    - FA-ccin2p3-38813a02
     - FA-ccin2p3-38bdc087
     - FA-ccin2p3-39056856
     - FA-ccin2p3-3923388b
+    - FA-ccin2p3-39fcdce6
     - FA-ccin2p3-3a3e268c
     - FA-ccin2p3-3a7c2e0f
     - FA-ccin2p3-3a8971c6
@@ -2363,12 +2367,14 @@ entries:
     - FA-ccin2p3-3b5043a3
     - FA-ccin2p3-3b847ba3
     - FA-ccin2p3-3d47889b
+    - FA-ccin2p3-3dc6cec1
     - FA-ccin2p3-3defa89a
     - FA-ccin2p3-3fa4c09b
     - FA-ccin2p3-413baa66
     - FA-ccin2p3-43e12f9b
     - FA-ccin2p3-44e6a15b
     - FA-ccin2p3-45c43646
+    - FA-ccin2p3-4691cfd0
     - FA-ccin2p3-47266125
     - FA-ccin2p3-48bfbe08
     - FA-ccin2p3-49724d4b
@@ -2384,6 +2390,7 @@ entries:
     - FA-ccin2p3-4f945be2
     - FA-ccin2p3-50e87538
     - FA-ccin2p3-513cf7dd
+    - FA-ccin2p3-51dd9597
     - FA-ccin2p3-5209e83c
     - FA-ccin2p3-529a4334
     - FA-ccin2p3-543dff52
@@ -2442,6 +2449,7 @@ entries:
     - FA-ccin2p3-6d8bf4c9
     - FA-ccin2p3-7072b80f
     - FA-ccin2p3-718253fe
+    - FA-ccin2p3-73d6cebe
     - FA-ccin2p3-73f73ee3
     - FA-ccin2p3-7431eac6
     - FA-ccin2p3-74770365
@@ -2458,6 +2466,7 @@ entries:
     - FA-ccin2p3-79989476
     - FA-ccin2p3-7a07eb55
     - FA-ccin2p3-7b5eb87e
+    - FA-ccin2p3-7d5a7664
     - FA-ccin2p3-7ee6ab6f
     - FA-ccin2p3-7f07d4fe
     - FA-ccin2p3-7f2fb49d
@@ -2479,13 +2488,16 @@ entries:
     - FA-ccin2p3-8d5f5f67
     - FA-ccin2p3-8ee26e71
     - FA-ccin2p3-8eeb8f3d
+    - FA-ccin2p3-8f35d8b4
     - FA-ccin2p3-8f973e1e
     - FA-ccin2p3-900cdb21
     - FA-ccin2p3-9014278b
     - FA-ccin2p3-91a6c7fd
     - FA-ccin2p3-9208a3d3
     - FA-ccin2p3-9370fea8
+    - FA-ccin2p3-94c731cf
     - FA-ccin2p3-97002cf9
+    - FA-ccin2p3-975bedec
     - FA-ccin2p3-982e826d
     - FA-ccin2p3-983fa949
     - FA-ccin2p3-995f0813
@@ -2494,6 +2506,7 @@ entries:
     - FA-ccin2p3-9bc995f1
     - FA-ccin2p3-9bebf612
     - FA-ccin2p3-9cb9c425
+    - FA-ccin2p3-9defb27c
     - FA-ccin2p3-9e0cc140
     - FA-ccin2p3-9f7511b2
     - FA-ccin2p3-a004c524
@@ -2519,6 +2532,7 @@ entries:
     - FA-ccin2p3-b0923628
     - FA-ccin2p3-b137ec13
     - FA-ccin2p3-b24ed2e9
+    - FA-ccin2p3-b252f61f
     - FA-ccin2p3-b293f475
     - FA-ccin2p3-b41671a9
     - FA-ccin2p3-b49a566b
@@ -2548,6 +2562,7 @@ entries:
     - FA-ccin2p3-c4e3547a
     - FA-ccin2p3-c6a1c9d2
     - FA-ccin2p3-c7029c71
+    - FA-ccin2p3-c77c1d5d
     - FA-ccin2p3-c9aa9439
     - FA-ccin2p3-c9e65631
     - FA-ccin2p3-caedaac1
@@ -2565,6 +2580,7 @@ entries:
     - FA-ccin2p3-d273bbf2
     - FA-ccin2p3-d3a9b7e6
     - FA-ccin2p3-d4e2caa6
+    - FA-ccin2p3-d626c4a9
     - FA-ccin2p3-d6379000
     - FA-ccin2p3-d8b51095
     - FA-ccin2p3-dbca642d
@@ -2575,12 +2591,15 @@ entries:
     - FA-ccin2p3-df7cc3db
     - FA-ccin2p3-dfcae74f
     - FA-ccin2p3-e09b3670
+    - FA-ccin2p3-e1279579
     - FA-ccin2p3-e1bd8668
     - FA-ccin2p3-e1ce3cb1
+    - FA-ccin2p3-e22b3c86
     - FA-ccin2p3-e3d6e947
     - FA-ccin2p3-e4c00db2
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-e61073d0
+    - FA-ccin2p3-e7b3b340
     - FA-ccin2p3-e8268953
     - FA-ccin2p3-e8e9f776
     - FA-ccin2p3-e957351b
@@ -2608,6 +2627,7 @@ entries:
     - FA-ccin2p3-f7f97c28
     - FA-ccin2p3-f848899c
     - FA-ccin2p3-f9b9846d
+    - FA-ccin2p3-fbf2bd41
     - FA-ccin2p3-fcdb5ced
     - FA-ccin2p3-fd5c761e
     - FA-ccin2p3-fe1ccd2a
@@ -2615,7 +2635,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 3261281d
+    commit: bb88c44a
     paths:
     - 'HAND-OFF (2026-10-30, short-run bias step). (1) Result: a MadEvent run that stops short of its target biases its events.
       analysis/catalog_v4/short_run_bias.py @a73a07af on 4807 part files + 364 pools, 23 groups of one class and banner physics,
@@ -2684,6 +2704,14 @@ entries:
       Q/logs), ack the old and wave workers'' end events; once the old workers have ended, plan a new queue for what is short
       or failed (refresh pp yields with lhe_parts yields, rerun the generators, plan --skip-claimed the w3 queue); then lhe_probe
       mixcheck over all assembled dsh pools; the three held pools wait on Joaquin.'
+    - 'RUN-SIZE PROBE RESULT (2026-10-30): all 310 probe runs completed (one e+e- iseed collision, 39 distinct). Size ladder
+      (short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_size.json @44b2eeb3): 7 of 16 run-level tests
+      below 0.05/16. dg_dguux runs of 1000 vs 33 runs of 40282: KS 0.021 sqrt_shat, 0.023 cos, p<5e-4; of 150: 0.029, 0.039.
+      bb_bbgg 1000 vs 31774: 0.013 (p 0.004), 0.011 (p 0.026); 150: 0.027, 0.022 (p<5e-4). e+e- amupvmwm 200 vs 13057: 0.018
+      p 0.0025. ub_bdwpz 150 and 1000 vs runs of 2800: agree (0.005-0.008, p 0.06-0.46). Distance shrinks with run size and
+      is still 0.011-0.023 at 1000, same size as the short-run bias (0.015-0.029). Design branch No, but no probed size agrees
+      and the 56 pools'' large runs stop short (yields mostly 0.1-0.35), so the rebuild at a73a07af is NOT submitted and the
+      three held pools stay held. Written up par:v4_short_runs, fig:v4_run_size (bb88c44a).'
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
     - analysis/catalog_v3/data/short_reads/dimensionless_muon_best
@@ -2714,6 +2742,7 @@ entries:
     - analysis/catalog_v4/data/pp_trained_compare.json
     - analysis/catalog_v4/data/short_built_pools.json
     - analysis/catalog_v4/data/short_run_bias.json
+    - analysis/catalog_v4/data/short_run_bias_size.json
     - analysis/catalog_v4/data/validation.json
     - analysis/catalog_v4/figs/census_diagrams.png
     - analysis/catalog_v4/figs/classes_roles.png
@@ -2728,6 +2757,7 @@ entries:
     - analysis/catalog_v4/figs/pp_trained_compare.png
     - analysis/catalog_v4/figs/short_run_bias_a.png
     - analysis/catalog_v4/figs/short_run_bias_b.png
+    - analysis/catalog_v4/figs/short_run_bias_size.png
     - analysis/catalog_v4/mixed_order_fig.py
     - analysis/catalog_v4/pp_trained_compare.py
     - analysis/catalog_v4/read_validation.py
