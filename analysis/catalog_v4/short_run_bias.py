@@ -488,7 +488,13 @@ def summary(d, alpha=0.05):
                           "ratio_top2": round(sum(h["ratio"][-2:]) / 2, 2), "edge_top2": round(h["edges"][-3])}
     if os.path.exists(COMPLETE):
         c = json.load(open(COMPLETE))
-        out["rebuild"] = {"pools": len(c), "short_built": sum("stopped short" in v["reason"] for v in c.values())}
+        out["rebuild"] = {"pools": len(c), "short_built": sum("stopped short" in v["reason"] for v in c.values()),
+                          "gridpack": sum(bool(v.get("gridpack")) for v in c.values()),
+                          "after_w3_short_built": sum("after catalog_v4_w3" in v["reason"] for v in c.values()),
+                          "w3_unassembled": sum(v["reason"].startswith("not assembled in catalog_v4_w3")
+                                                for v in c.values())}
+        out["rebuild"]["design"] = (out["rebuild"]["pools"] - out["rebuild"]["after_w3_short_built"]
+                                    - out["rebuild"]["w3_unassembled"])
     return out
 
 
