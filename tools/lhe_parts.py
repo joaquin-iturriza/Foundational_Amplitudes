@@ -15,6 +15,8 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
     yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
             (recipes/gen_catalog_v4_default.py sizes those pools' n_runs from it; plan then links their parts, _adopt)
+    shares  --queue Q [--requeue]   e+e- processes: events per energy in their parts against the equal share; --requeue
+            moves the assembled marker of an assembled one whose shares are off aside, so its rebuild is assembled
     gc      --queue Q [--dry-run]
             the MadEvent working directories ($SCRATCH/lhe_work/parts/<process>__<run>) of the queue's runs that are
             not running: a run whose part file holds its events loses the whole directory, any other (failed, killed,
@@ -24,7 +26,7 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
 The queue holds  todo/<prio>__<process>__<k>.json  claimed/<same>.<jobid>  done/  failed/  assembled/<process>.
 Every pool is the one prebuild_recipes.py would build for the same spec and seed (same recipe ids).
 """
-import argparse, glob, json, os, shutil, socket, statistics, subprocess, sys, time, traceback
+import argparse, glob, json, math, os, shutil, socket, statistics, subprocess, sys, time, traceback
 from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -234,7 +236,16 @@ def part_need(name, run):
     thousand, lhe.n_runs sized from what one run returned: short by design, the assembly checks their sum)."""
     l = mg.PROCESSES[name]["lhe"]
     # lhe.accept_short: a pool whose runs come back short at random (MadEvent "fail to reach target"), n_runs sized
-    # from the events its runs returned (recipes/gen_catalog_v4_default.py SHORT_YIELDS): any part counts
+    # from the events its runs returned (recipes/gen_catalog_v4_default.py SHORT_YIELDS): any pp part counts; an e+e-
+    # part (lhe.energies) counts when it holds its run's part of its energy's equal share of the blocks
+    if l.get("accept_short") and l.get("energies"):
+        need = sum(int(l.get(k, 0)) for k in ("n_val", "n_test", "n_train"))
+        share = int(math.ceil(need / len(l["energies"])))
+        runs_e = int(l.get("n_runs", 1))
+        if l.get("energy_runs"):
+            j = [float(e) for e in l["energies"]].index(2.0 * float(run[2]["ebeam1"]))
+            runs_e = int(l["energy_runs"][j])
+        return int(math.ceil(share / runs_e))
     return run[1] if l.get("run_events") and not l.get("accept_short") else None
 
 
@@ -536,6 +547,43 @@ def cmd_yields(a):
     print(json.dumps(out, sort_keys=True))
 
 
+def cmd_shares(a):
+    """Every e+e- process of the queue (lhe.energies): events per energy in its part files against the equal share of
+    its blocks, ceil(need / energies); one JSON line {process: {assembled, counts, share, ok}}. --requeue moves the
+    assembled marker of each assembled process whose shares are off to Q/assembled_superseded/<process>.<time> (its
+    pools are rebuilt when its layout changes; nothing deleted)."""
+    D = _dirs(a.queue)
+    out = {}
+    for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
+        name = os.path.basename(sf)[:-5]
+        items = _spec(D, name)
+        parts = mg.lhe_part_paths(name, items)
+        E = mg.lhe_energy_of_runs([r for _, r in parts])
+        if not E or E[0] is None:
+            continue
+        cnt = dict.fromkeys(E, 0)
+        for (part, _), e in zip(parts, E):
+            try:
+                with np.load(part) as z:
+                    cnt[e] += int(len(z["mom"]))
+            except (FileNotFoundError, OSError, KeyError, ValueError):
+                pass
+        need = max(r["lhe"]["block"][1] for r, _ in items)
+        share = int(math.ceil(need / len(cnt)))
+        out[name] = {"assembled": os.path.exists(os.path.join(D["assembled"], name)),
+                     "counts": {f"{e:g}": c for e, c in cnt.items()}, "share": share,
+                     "ok": min(cnt.values()) >= share}
+    if a.requeue:
+        sup = os.path.join(a.queue, "assembled_superseded")
+        os.makedirs(sup, exist_ok=True)
+        for name, r in out.items():
+            if r["assembled"] and not r["ok"]:
+                os.rename(os.path.join(D["assembled"], name),
+                          os.path.join(sup, f"{name}.{time.strftime('%Y%m%d_%H%M%S')}"))
+                r["requeued"] = True
+    print(json.dumps(out, sort_keys=True))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -550,7 +598,9 @@ def main():
     g = sub.add_parser("gc"); g.add_argument("--queue", required=True); g.add_argument("--dry-run", action="store_true")
     y = sub.add_parser("yields"); y.add_argument("--queue", required=True)
     a = ap.parse_args()
-    {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields}[a.cmd](a)
+    sh = sub.add_parser("shares"); sh.add_argument("--queue", required=True); sh.add_argument("--requeue", action="store_true")
+    {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+     "shares": cmd_shares}[a.cmd](a)
 
 
 if __name__ == "__main__":

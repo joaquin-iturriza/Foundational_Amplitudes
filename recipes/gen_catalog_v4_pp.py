@@ -24,6 +24,7 @@ Writes
   catalog_v4_pp_train.yaml       every hadronic catalog_v4 training class, the same names
   catalog_v4_pp_mixed_train.yaml catalog_v4_train.yaml with every hadronic tree class swapped for its pp version
   catalog_v4_pp_part<k>.yaml     the regenerated entries in 8 parts, one CPU generation job each
+  catalog_v4_pp_parts.yaml       the entries built as one-run part jobs (lhe.parts), tools/lhe_parts.py plan's spec
 A process whose catalog_v3 pp run came back short or stalled starts at that run's margin or run count
 (catalog_v3_pp_margins.json, catalog_v3_pp_runs.json, read by the pp13 name); a pp13v4 process whose own first run came
 back short takes its margin from catalog_v4_pp_margins.json (read by the pp13v4 name, it wins): 1.25 x the events asked
@@ -71,7 +72,12 @@ def main():
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
     # built as parallel one-run part jobs (lhe.parts, tools/lhe_parts.py; catalog_coverage step 7): the main session's
     # call of 2026-10-29 for pp13v4_ud_dggu, whose 32 stalling runs took 13 to 24 h in series in one job
-    parts = {"pp13v4_ud_dggu"}
+    # and the 13 entries still missing after the part jobs and the one-entry jobs (2026-10-30: five stalled short again
+    # in their lhe.n_runs jobs or died on the full /sps disk, two more died with it, uux_gguux's run returned no event in
+    # 242 min, five were never reached by the two part jobs that timed out); one queue for all, catalog_v4_pp_parts.yaml
+    parts = {"pp13v4_ud_dggu", "pp13v4_bbx_aattx", "pp13v4_bbx_abtxwp", "pp13v4_dd_ddgg", "pp13v4_ddx_ddxgg",
+             "pp13v4_ub_abdwp", "pp13v4_ub_bdwpz", "pp13v4_ud_bbxdu", "pp13v4_udx_ddxwpz", "pp13v4_udx_uuxwpz",
+             "pp13v4_uu_aguu", "pp13v4_uu_gguu", "pp13v4_uu_guuz", "pp13v4_uux_gguux"}
     procs = {}
     for n in regen:
         c = mg.PROCESSES[n]
@@ -126,6 +132,11 @@ def main():
     with open(os.path.join(HERE, "catalog_v4_pp_mixed_train.yaml"), "w") as f:
         f.write(hdr)
         yaml.safe_dump({**{k: v for k, v in base.items() if k != "processes"}, "processes": mixed}, f, sort_keys=False)
+    # the one-run part jobs' spec (tools/lhe_parts.py plan; built pools are skipped there)
+    with open(os.path.join(HERE, "catalog_v4_pp_parts.yaml"), "w") as f:
+        f.write(hdr)
+        yaml.safe_dump({"processes": [{"name": p, "sqrts": [13000, 13000], **sz} for p in sorted(parts)]}, f,
+                       sort_keys=False)
     # the generation in PARTS CPU jobs (CLAUDE.md 0c): every regenerated process once, dealt round-robin by multiplicity
     # so each part carries its share of the slow 2->4 MadEvent runs
     gen = sorted(({"name": p, "sqrts": [13000, 13000], **sz} for p in procs),

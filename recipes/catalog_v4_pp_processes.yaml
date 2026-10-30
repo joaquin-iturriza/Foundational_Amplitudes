@@ -1129,6 +1129,7 @@ processes:
   pp13v4_bbx_aattx:
     lhe:
       n_runs: 10
+      parts: true
     kind: lhe_pp
     folder: pp13v4_bbx_aattx
     mg5_generate:
@@ -1389,6 +1390,7 @@ processes:
     lhe:
       n_runs: 9
       margin: 4.81
+      parts: true
     kind: lhe_pp
     folder: pp13v4_bbx_abtxwp
     mg5_generate:
@@ -12037,6 +12039,7 @@ processes:
   pp13v4_dd_ddgg:
     lhe:
       margin: 128.82
+      parts: true
     kind: lhe_pp
     folder: pp13v4_dd_ddgg
     mg5_generate:
@@ -14217,6 +14220,7 @@ processes:
   pp13v4_ddx_ddxgg:
     lhe:
       n_runs: 3
+      parts: true
     kind: lhe_pp
     folder: pp13v4_ddx_ddxgg
     mg5_generate:
@@ -18551,6 +18555,7 @@ processes:
   pp13v4_ub_abdwp:
     lhe:
       margin: 158.38
+      parts: true
     kind: lhe_pp
     folder: pp13v4_ub_abdwp
     mg5_generate:
@@ -19016,6 +19021,7 @@ processes:
     lhe:
       n_runs: 4
       margin: 0.6
+      parts: true
     kind: lhe_pp
     folder: pp13v4_ub_bdwpz
     mg5_generate:
@@ -21581,6 +21587,7 @@ processes:
   pp13v4_ud_bbxdu:
     lhe:
       margin: 164.28
+      parts: true
     kind: lhe_pp
     folder: pp13v4_ud_bbxdu
     mg5_generate:
@@ -23512,6 +23519,7 @@ processes:
     lhe:
       n_runs: 7
       margin: 1.92
+      parts: true
     kind: lhe_pp
     folder: pp13v4_udx_ddxwpz
     mg5_generate:
@@ -24142,6 +24150,7 @@ processes:
   pp13v4_udx_uuxwpz:
     lhe:
       margin: 38.92
+      parts: true
     kind: lhe_pp
     folder: pp13v4_udx_uuxwpz
     mg5_generate:
@@ -25559,6 +25568,7 @@ processes:
   pp13v4_uu_aguu:
     lhe:
       n_runs: 9
+      parts: true
     kind: lhe_pp
     folder: pp13v4_uu_aguu
     mg5_generate:
@@ -25791,6 +25801,8 @@ processes:
     test_group: 'pp 13 TeV v4: train'
     parent: v4_uu_epemuu
   pp13v4_uu_gguu:
+    lhe:
+      parts: true
     kind: lhe_pp
     folder: pp13v4_uu_gguu
     mg5_generate:
@@ -25849,6 +25861,7 @@ processes:
   pp13v4_uu_guuz:
     lhe:
       margin: 21.98
+      parts: true
     kind: lhe_pp
     folder: pp13v4_uu_guuz
     mg5_generate:
@@ -28064,6 +28077,7 @@ processes:
   pp13v4_uux_gguux:
     lhe:
       margin: 68.73
+      parts: true
     kind: lhe_pp
     folder: pp13v4_uux_gguux
     mg5_generate:

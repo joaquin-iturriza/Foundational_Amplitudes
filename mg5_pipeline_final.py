@@ -3969,6 +3969,8 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             # an e+e- entry's fixed collider energies (lhe.energies), one MadEvent run each; absent for pp
             **({"energies": [float(e) for e in cfg["lhe"]["energies"]]} if cfg["lhe"].get("energies") else {}),
             **({"iseed_salt": int(cfg["lhe"]["iseed_salt"])} if cfg["lhe"].get("iseed_salt") else {}),
+            **({"energy_runs": [int(x) for x in cfg["lhe"]["energy_runs"]]} if cfg["lhe"].get("energy_runs")
+               else {}),
         },
     }
 
@@ -3986,8 +3988,47 @@ def lhe_runs(process, iseed, n_req):
     if not energies:
         return [(seed_k(k), r_ev or n_req, {}, f"run_{k + 1:02d}") for k in range(n_runs)]
     n_e = r_ev or int(math.ceil(n_req / len(energies)))
+    # lhe.energy_runs (a pool whose runs came back short at some energies): energy j gets energy_runs[j] runs of n_e,
+    # sized from that energy's measured yield (recipes/gen_catalog_v4_default.py), so each energy still returns its
+    # equal share; runs numbered and seeded in sequence over the energies. _lhe_finish refuses a pool where one does not
+    if l.get("energy_runs"):
+        nrs = [int(x) for x in l["energy_runs"]]
+        if len(nrs) != len(energies):
+            raise ValueError(f"{process}: lhe.energy_runs has {len(nrs)} values for {len(energies)} energies")
+        i0 = [sum(nrs[:j]) for j in range(len(nrs))]
+        return [(seed_k(i0[j] + k), n_e, {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{i0[j] + k + 1:02d}")
+                for j, E in enumerate(energies) for k in range(nrs[j])]
     return [(seed_k(j * n_runs + k), n_e, {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{j * n_runs + k + 1:02d}")
             for j, E in enumerate(energies) for k in range(n_runs)]
+
+
+def lhe_energy_of_runs(runs):
+    """The collider energy of each run of lhe_runs (2 x its ebeam1 patch), None for a pp run."""
+    return [2.0 * float(r[2]["ebeam1"]) if r[2].get("ebeam1") is not None else None for r in runs]
+
+
+def lhe_equal_shares(process, moms, aqcds, runs, need):
+    """An e+e- pool's runs' events cut to equal counts per energy (lhe.energies: equal shares of the events): each
+    energy keeps the first q events of its runs in run order, q the fewest any energy returned, so a pool whose every
+    run returned what it asked is unchanged. Refuses when q x the energies is below the blocks' need."""
+    E = lhe_energy_of_runs(runs)
+    if not E or E[0] is None:
+        return moms, aqcds
+    Es = list(dict.fromkeys(E))
+    cnt = {e: sum(len(m) for m, x in zip(moms, E) if x == e) for e in Es}
+    q = min(cnt.values())
+    share = int(math.ceil(need / len(Es)))
+    if q < share:
+        short = {f"{e:g}": c for e, c in cnt.items() if c < share}
+        raise RuntimeError(f"{process}: energies short of their equal share ({share} each, the blocks need {need}): "
+                           f"{short} of {len(Es)} energies; raise lhe.energy_runs at those energies")
+    left = dict.fromkeys(Es, q)
+    m_out, a_out = [], []
+    for m, a, e in zip(moms, aqcds, E):
+        k = min(len(m), left[e])
+        left[e] -= k
+        m_out.append(m[:k]); a_out.append(a[:k])
+    return m_out, a_out
 
 
 def lhe_work_dir():
@@ -4243,10 +4284,12 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
     cfg = PROCESSES[process]
     n_runs = len(runs)
     t0 = time.time()
+    need = max(r["lhe"]["block"][1] for r in recs)
+    per_run = [len(m_k) for m_k in moms]            # as returned, before the per-energy cut
+    moms, aqcds = lhe_equal_shares(process, moms, aqcds, runs, need)
     mom, aqcd = np.concatenate(moms), np.concatenate(aqcds)
     secs["parse"] = time.time() - t0; t0 = time.time()
     n_lhe = len(mom)
-    need = max(r["lhe"]["block"][1] for r in recs)
     if n_lhe < need:
         raise RuntimeError(f"{process}: MadEvent returned {n_lhe} events, the blocks need {need} "
                            f"(asked {n_req} in {n_runs} run(s)); raise lhe.margin, or lhe.n_runs if a larger "
@@ -4293,7 +4336,7 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
         full["backend"] = "cpp"
         full["lhe_run"] = {"n_lhe_events": n_lhe, "xsec_pb": xsec, "mg5_version": version,
                            "iseeds": [r[0] for r in runs],
-                           "events_per_run": [len(m_k) for m_k in moms],
+                           "events_per_run": per_run,
                            "banner": bcopy, "mg_cores": int(mg_cores),
                            "alphas_range": [float(a.min()), float(a.max())],
                            "amp_range": [float(amps.min()), float(amps.max())],

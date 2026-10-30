@@ -395,6 +395,41 @@ def test_tidy_and_gc():
     print("[tidy + gc] ok")
 
 
+def test_ee_energy_runs_and_equal_shares():
+    """An e+e- pool (lhe.energies) with lhe.energy_runs: energy j gets its own number of runs, numbered and seeded in
+    sequence; an accept_short part counts only with its run's part of its energy's equal share; the assembly cuts the
+    energies to equal counts (unchanged when every run returned what it asked) and refuses an energy short of its
+    share."""
+    _register(n_runs=1, run_events=None, accept_short=True)
+    l = mg.PROCESSES[NAME]["lhe"]
+    l["energies"] = [91.1876, 500.0, 3000.0]
+    r0 = mg.lhe_runs(NAME, 100, 1020)
+    assert [r[1] for r in r0] == [340] * 3 and [r[3] for r in r0] == ["run_01", "run_02", "run_03"]
+    rec0 = mg.variable_energy_recipe(NAME, 13000, 13000, 800, role="train", seed=42)
+    l["energy_runs"] = [1, 1, 4]
+    runs = mg.lhe_runs(NAME, 100, 1020)
+    assert [r[1] for r in runs] == [340] * 6 and [r[3] for r in runs][-1] == "run_06"
+    assert [2 * r[2]["ebeam1"] for r in runs] == [91.1876, 500.0] + [3000.0] * 4
+    assert len({r[0] for r in runs}) == 6 and runs[:2] == r0[:2]
+    rec = mg.variable_energy_recipe(NAME, 13000, 13000, 800, role="train", seed=42)
+    assert rec["lhe"]["energy_runs"] == [1, 1, 4] and mg.recipe_id(rec) != mg.recipe_id(rec0)
+    # the share is ceil(1000 / 3) = 334 per energy: 334 for a one-run energy, ceil(334 / 4) = 84 per run at 3 TeV
+    assert [lhe_parts.part_need(NAME, r) for r in runs] == [334, 334, 84, 84, 84, 84]
+    ev = lambda n: np.arange(n, dtype=float)[:, None, None] * np.ones((1, K, 4))
+    full = [ev(340), ev(340), ev(90), ev(90), ev(90), ev(90)]
+    m, a = mg.lhe_equal_shares(NAME, full, [x[:, 0, 0] for x in full], runs, 1000)
+    assert [len(x) for x in m] == [340, 340, 90, 90, 90, 70]          # each energy cut to 340
+    m, _ = mg.lhe_equal_shares(NAME, [ev(340)] * 3, [ev(340)[:, 0, 0]] * 3, r0, 1000)
+    assert [len(x) for x in m] == [340] * 3                            # nothing short: unchanged
+    try:
+        mg.lhe_equal_shares(NAME, [ev(340), ev(340), ev(80)] + [ev(80)] * 3, [ev(1)[:, 0, 0]] * 6, runs, 1000)
+        raise AssertionError("an energy short of its share was assembled")
+    except RuntimeError as e:
+        assert "3000" in str(e) and "334" in str(e), e
+    mg.PROCESSES.pop(NAME, None)
+    print("[e+e- energy runs + equal shares] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -402,3 +437,4 @@ if __name__ == "__main__":
     test_queue_stall_layout_short_parts()
     test_accept_short_and_adopt()
     test_tidy_and_gc()
+    test_ee_energy_runs_and_equal_shares()
