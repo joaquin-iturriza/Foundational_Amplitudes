@@ -2939,6 +2939,76 @@ the all-class gap.
 \end{figure}
 
 
+\paragraph{MadEvent runs that stop short of their target (2026-10-30).}\label{par:v4_short_runs} The question, from the
+catalog\_v4 generation (the default-sampled share and the $13$\,TeV pp pools): a MadEvent run skips its second refine
+when the cross section looks stable and then often returns fewer unweighted events than it asked (``fail to reach
+target''), the more so the more events it asks. Do the events of such a run follow the density of a run that
+completes? It decides whether the pools assembled from short runs are kept or rebuilt. Design
+(\code{analysis/catalog\_v4/short\_run\_bias.py}, Fig.~\ref{fig:v4_short_runs}): every MadEvent part file of the
+generation queues and every serially built pp pool on CC ($4807$ runs and $364$ pools), grouped by class and by the
+physics read from the run's banner (generate line, model, run card without its event count and seed, parameter card),
+so that inside a group only the run's size and its stop differ; $23$ groups hold at least $2000$ events on both sides
+(a floor of the check's own, open, as are the deep-short threshold of $0.3$ of the ask, the subsample of at most
+$200000$ events a side and the $50$ quantile bins of the run-level test).
+In each, the events of the runs that stopped short against those of the runs that completed, on $\sqrt{\hat s}$ (pp
+only) and on $\cos\theta^*$ of the first final in the partonic rest frame. A run's events are not independent draws
+(MadEvent fixes each channel's share of a run from that run's own integration), so the test takes the run as the unit:
+the KS distance of the pooled binned distributions, with $p$ from relabelling runs. Two controls in the same groups:
+the complete runs split in two by run, and complete runs of the group's smallest ask against its largest.
+% src: python3 analysis/catalog_v4/short_run_bias.py summary @a73a07af
+% allow: 13 2000 0.3 0.05 200000 50 14280 1244 because they are the beam energy, the check's settings (event floor, deep-short threshold, test level, subsample, bins) and the two layouts' events per run
+% claim: inventory.parts=4807
+% claim: inventory.pools=364
+% claim: groups=23
+% claim: short_vs_complete.tests_runs=32
+% claim: short_vs_complete.n_bonf=4
+% claim: short_vs_complete.n_alpha=10
+% claim: deep_vs_complete.tests_runs=30
+% claim: deep_vs_complete.n_bonf=6
+% claim: deep_vs_complete.n_alpha=13
+% claim: control_complete_halves.tests_runs=31
+% claim: control_complete_halves.n_bonf=0
+% claim: control_complete_halves.n_alpha=1
+% claim: control_complete_small_vs_large.tests_events=15
+% claim: control_complete_small_vs_large.n_event_bonf=0
+% claim: uu_aguu.ks=0.029
+% claim: uu_aguu.short_runs=10
+% claim: uu_aguu.complete_runs=42
+% claim: uu_aguu.ratio_top2=1.16
+% claim: uu_aguu.edge_top2=1462
+% claim: rebuild.pools=56
+% claim: rebuild.short_built=52
+The answer is yes, stopping short biases. Of the $32$ run-level tests of short against complete runs, $4$ fall below
+$0.05$ after a Bonferroni correction ($u u\to\gamma g u u$ in $\sqrt{\hat s}$, $u b\to b d W^+ Z$ in both variables,
+$e^+e^-\to\gamma\mu^+\nu_\mu W^-$ in the angle) and $10$ below $0.05$; for the runs that returned under $0.3$ of their
+ask, $6$ and $13$ of $30$. The control finds nothing: $0$ of $31$ after the correction and $1$ below $0.05$, about the
+rate chance gives. Complete runs of different sizes agree ($0$ of $15$ event-level tests after the correction, a test
+that counts events as independent and so errs towards finding a difference). The bias sits in the tails: the like for
+like comparison $u u\to\gamma g u u$ ($10$ runs of $14280$ events that stopped short against $42$ complete runs of
+$1244$, KS distance $0.029$) has $1.16$ times the complete runs' density above $\sqrt{\hat s}=1462$\,GeV
+(Fig.~\ref{fig:v4_short_runs}, right). So a run that completes is an unbiased unweighted sample whatever its size, and a
+run that stops short is not. What it changes: a pool is to be assembled only from runs that returned every event they asked
+(\code{lhe.complete\_runs}, in the pool's identity; a short run is made but not used), in runs small enough to
+complete. The $56$ pools laid out so are the $52$ catalog\_v4 pools found assembled from short runs
+(\code{tools/lhe\_parts.py shortbuilt}), the three held out of the wave and the default share of $u d\to H u u W^-$,
+whose runs stop short even at a thousand events; the pools they replace are moved aside, not deleted. Not settled
+here: whether complete runs of a few hundred to a thousand events give the events complete runs of many give (the
+size control above has too few small runs to see an effect of this size; a run-level measurement at the rebuild's run
+sizes is running, and the rebuild waits on it), and whether the reused catalog\_v3 pp pools carry the bias (most of
+their sidecars do not record events per run).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics{../analysis/catalog_v4/figs/short_run_bias_a.pdf}\hfill
+  \includegraphics{../analysis/catalog_v4/figs/short_run_bias_b.pdf}
+  \caption{MadEvent runs that stop short of their target against runs that complete, same process and cards. Left: the
+    run-level $p$ of every test against the $p$ its rank would have with no difference (dashed), for the runs that
+    stopped short, those that returned under a third of their ask, and the control (complete runs split in two).
+    Right: the stopped-short runs' density over the complete runs' in $\sqrt{\hat s}$, in quantile bins of the
+    complete runs, for the three pp groups with the lowest $p$.}
+  \label{fig:v4_short_runs}
+\end{figure}
+
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
 probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
 as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
