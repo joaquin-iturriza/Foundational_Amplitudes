@@ -225,6 +225,15 @@ def complete_set():
     return json.load(open(COMPLETE)) if os.path.exists(COMPLETE) else {}
 
 
+# pools found with the same problem after the catalog_v4_w3 wave, waiting on the user's call to join the rebuild
+# (analysis/catalog_v4/data/complete_runs_pending.json): both generators leave their layout as it is meanwhile
+PENDING = os.path.join(ROOT, "analysis", "catalog_v4", "data", "complete_runs_pending.json")
+
+
+def pending_set():
+    return json.load(open(PENDING)) if os.path.exists(PENDING) else {}
+
+
 def prefix_runs(y, need):
     """The fewest leading runs whose parts (all made) hold `need` events, or None."""
     s = 0
@@ -296,6 +305,7 @@ def main():
     mixfail = set(json.load(open(MIXFAIL))) if os.path.exists(MIXFAIL) else set()
     resized = {}
     complete = complete_set()
+    pending = pending_set()
     _pf = os.path.join(HERE, "catalog_v4_default_processes.yaml")
     prev = (yaml.safe_load(open(_pf)) or {}).get("processes", {}) if os.path.exists(_pf) else {}
 
@@ -415,6 +425,8 @@ def main():
             e["standalone_of"] = reuse
         if name in assembled and name not in mixfail and name in prev:
             e = prev[name]                 # an assembled pool keeps the layout it was built with
+        if name in pending and name in prev:
+            e = prev[name]                 # waiting on the user's call to be rebuilt: its layout left as it is
         if name in complete:
             e = {**e, "lhe": complete_layout(dict(e["lhe"]), complete[name]["run_events"],
                                              complete[name].get("gridpack", False))}

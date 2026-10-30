@@ -14242,8 +14242,9 @@ processes:
       its pp13 pool carries catalog_v3's physics
   pp13v4_ddx_ddxgg:
     lhe:
-      n_runs: 9
+      n_runs: 4
       parts: true
+      accept_short: true
     kind: lhe_pp
     folder: pp13v4_ddx_ddxgg
     mg5_generate:

@@ -71,13 +71,17 @@ def main():
     own_runs = json.load(open(os.path.join(HERE, "catalog_v4_pp_runs.json")))
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
     from gen_catalog_v4_default import (resize_short, _yield_ratio, YIELDS, ASSEMBLED, PROBE_YIELDS, complete_layout,
-                                        complete_set)
+                                        complete_set, pending_set)
     complete = complete_set()
     yields = json.load(open(YIELDS))
     assembled = set(json.load(open(ASSEMBLED))) if os.path.exists(ASSEMBLED) else set()
     probe_yield = json.load(open(PROBE_YIELDS)) if os.path.exists(PROBE_YIELDS) else {}
     resized = {}
     sz_pp = {"n_train": 10000, "n_val": 2000, "n_test": 2000}
+    # an assembled pool keeps the layout it was built with (as gen_catalog_v4_default does), unless it is rebuilt in
+    # complete runs: its recipe id stays that of the pool on disk
+    _pf = os.path.join(HERE, "catalog_v4_pp_processes.yaml")
+    prev = (yaml.safe_load(open(_pf)) or {}).get("processes", {}) if os.path.exists(_pf) else {}
     # built as parallel one-run part jobs (lhe.parts, tools/lhe_parts.py; catalog_coverage step 7): the main session's
     # call of 2026-10-29 for pp13v4_ud_dggu, whose 32 stalling runs took 13 to 24 h in series in one job
     # and the 13 entries still missing after the part jobs and the one-entry jobs (2026-10-30: five stalled short again
@@ -111,6 +115,8 @@ def main():
             own = {**own, "lhe": complete_layout({**sz_pp, **own.get("lhe", {})}, complete[pp(n)]["run_events"],
                                                     complete[pp(n)].get("gridpack", False))}
             own["lhe"] = {k: v for k, v in own["lhe"].items() if k not in sz_pp}
+        if (pp(n) in assembled or pp(n) in pending_set()) and pp(n) not in complete and "lhe" in prev.get(pp(n), {}):
+            own = {**own, "lhe": prev[pp(n)]["lhe"]}
         split = T[n]["role"] if n in T else mg.PROCESSES[old].get("split")
         procs[pp(n)] = {**own,
             "kind": "lhe_pp", "folder": pp(n), "mg5_generate": list(c["mg5_generate"]),

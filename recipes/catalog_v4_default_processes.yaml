@@ -20937,8 +20937,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
-      n_runs: 86
-      run_events: 621
+      margin: 158.38
+      n_runs: 82
+      run_events: 101838
       parts: true
     parent: v4_ub_abdwp
     reuse: pp13v4_ub_abdwp
@@ -23972,8 +23973,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
-      n_runs: 86
-      run_events: 621
+      margin: 164.28
+      n_runs: 85
+      run_events: 101838
       parts: true
     parent: v4_ud_bbxdu
     reuse: pp13v4_ud_bbxdu
@@ -33803,7 +33805,8 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
-      n_runs: 7
+      margin: 11.85
+      n_runs: 85
       run_events: 7923
       parts: true
     parent: v4_uu_duwpz
