@@ -4181,6 +4181,8 @@ entries:
     agent: a5b71194556cf7e47
     state: working
     since: '2026-10-30T11:33:41+00:00'
+    context: 104300
+    context_at: '2026-10-30T11:53:10+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
