@@ -19,6 +19,7 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             multiplicity): runs, timeouts, median and minimum yield, median kept
                                             fraction, median seconds per kept event, median MG5 output seconds, peak
                                             run-directory size (median, max); variants (--patch) apart
+    kept LOG... --out F.json                the default-share runs' kept fractions per process and e+e- energy
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
 import argparse, glob, json, os, re, shutil, signal, socket, subprocess, sys, time
@@ -247,6 +248,32 @@ def cmd_summary(a):
     print(json.dumps(out, indent=1))
 
 
+def cmd_kept(a):
+    """{process: {kept, by_energy: {E: kept}}} of the default-share (dsh_) runs in probe logs: the fraction of a run's
+    events its pool keeps, per e+e- collider energy (2 x ebeam1 of the run's patches), the mean over the runs of one
+    energy; read by recipes/gen_catalog_v4_default.py (accept_margin)."""
+    acc = {}
+    for f in a.logs:
+        for line in open(f):
+            if "PROBE_JSON " not in line:
+                continue
+            r = json.loads(line.split("PROBE_JSON ", 1)[1])
+            if not r["process"].startswith("dsh_") or r.get("kept") is None or r.get("extra_patches"):
+                continue
+            E = 2.0 * float(r["patches"]["ebeam1"]) if "ebeam1" in (r.get("patches") or {}) else None
+            acc.setdefault(r["process"], {}).setdefault(E, []).append(float(r["kept"]))
+    out = {}
+    for n, by in sorted(acc.items()):
+        e = {f"{E:g}": round(sum(v) / len(v), 4) for E, v in by.items() if E is not None}
+        allk = [x for v in by.values() for x in v]
+        out[n] = {"kept": round(sum(e.values()) / len(e), 4) if e else round(sum(allk) / len(allk), 4),
+                  **({"by_energy": e} if e else {})}
+    with open(a.out, "w") as f:
+        json.dump(out, f, indent=1, sort_keys=True)
+    low = {n: v["kept"] for n, v in out.items() if v["kept"] < 1.0 / 1.1}
+    print(json.dumps({"processes": len(out), "kept_below_1_over_1.1": low}))
+
+
 def cmd_node(a):
     out = {"host": socket.gethostname(), "nproc": os.cpu_count(), "TMPDIR": os.environ.get("TMPDIR")}
     for k, p in (("tmpdir", os.environ.get("TMPDIR")), ("tmp", "/tmp"), ("scratch", os.environ.get("SCRATCH"))):
@@ -275,8 +302,9 @@ def main():
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     sub.add_parser("node")
     s = sub.add_parser("summary"); s.add_argument("logs", nargs="+")
+    s = sub.add_parser("kept"); s.add_argument("logs", nargs="+"); s.add_argument("--out", required=True)
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept}[a.cmd](a)
 
 
 if __name__ == "__main__":

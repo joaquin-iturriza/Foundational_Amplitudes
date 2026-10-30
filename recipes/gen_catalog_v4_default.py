@@ -41,6 +41,12 @@ from gen_catalog_v3_pp import PARTONS
 ARMS = (0.50, 0.25)                                    # the design's arms B and C (open: the user's call)
 F_MAX = max(ARMS)
 ACCEPT_MARGIN = 0.10      # extra default events per role for those outside the pool's window or cuts (open, unsourced)
+# a class whose pool keeps less than 1 / (1 + ACCEPT_MARGIN) of its MadEvent events (e+e- with photons or leptons at the
+# Z pole: the cuts on pairs of different kinds, which an e+e- run card cannot apply, remove up to 0.38 there) is sized
+# from its measured kept fraction instead: KEPT_SAFETY / kept - 1 (analysis/catalog_v4/data/dsh_kept.json, tools/lhe_probe.py
+# over one MadEvent run of 1000 events per energy; KEPT_SAFETY open, unsourced)
+KEPT = os.path.join(ROOT, "analysis", "catalog_v4", "data", "dsh_kept.json")
+KEPT_SAFETY = 1.03
 EE_ENERGIES = (91.1876, 240.0, 365.0, 500.0, 1000.0, 3000.0)   # GeV (open: the user's call)
 EE_CARDS = "recipes/catalog_v4_ee"
 PP_CARDS = "recipes/catalog_v4_pp"
@@ -80,6 +86,22 @@ def ee_energies(mg, e, n=None):
     survey found empty (EE_ZERO_SURVEY)."""
     lo = mg.v4_sqrts_lo(e["pdg_ids"], e["m_finals"], e.get("fiducial_cuts"))
     return [E for E in EE_ENERGIES if E > lo and E not in EE_ZERO_SURVEY.get(n, ())]
+
+
+def accept_margin(kept, name, energies=None):
+    """The default share's margin of a dsh pool: ACCEPT_MARGIN, or KEPT_SAFETY / kept - 1 where the pool keeps less.
+    An e+e- pool takes equal shares of its energies, so it keeps the mean of each energy's fraction (an energy with no
+    measurement counted at the lowest measured one, an assumption)."""
+    k = kept.get(name)
+    if not k:
+        return ACCEPT_MARGIN
+    by = k.get("by_energy") or {}
+    if energies and by:
+        lo = min(by.values())
+        f = sum(by.get(f"{float(E):g}", lo) for E in energies) / len(energies)
+    else:
+        f = float(k["kept"])
+    return max(ACCEPT_MARGIN, round(KEPT_SAFETY / f - 1.0, 3)) if f > 0 else ACCEPT_MARGIN
 
 
 def lhe_entry(mg, n, c, model, lhe=None):
@@ -182,6 +204,7 @@ def main():
     med = {k: statistics.median(v) for k, v in by_nf.items()}
     yields = json.load(open(YIELDS))
     shares = json.load(open(EE_SHARES)) if os.path.exists(EE_SHARES) else {}
+    kept = json.load(open(KEPT)) if os.path.exists(KEPT) else {}
 
     def ee_short(mg, lhe, name, energies_then):
         """Equal shares kept: short_margin for a pool assembled with them (identity unchanged), else energy_runs."""
@@ -246,7 +269,9 @@ def main():
             continue
         reuse = pp_of.get(n) or ee_of[n]
         rl = mg.lhe_layout(P[reuse])
-        need = {r: int(math.ceil(F_MAX * SIZES[k] * (1.0 + ACCEPT_MARGIN))) for r, k in (("train", "n_train"), ("val", "n_val"),
+        name = "dsh_" + n[len("v4_"):]
+        am = accept_margin(kept, name, P[reuse]["lhe"].get("energies"))
+        need = {r: int(math.ceil(F_MAX * SIZES[k] * (1.0 + am))) for r, k in (("train", "n_train"), ("val", "n_val"),
                                                                  ("test", "n_test"))}
         new = {r: max(0, need[r] - (rl[r][1] - rl[r][0])) for r in need}
         r_meas = rates.get(reuse)
@@ -265,7 +290,6 @@ def main():
         else:
             lhe = {**ee_lhe, "energies": list(P[reuse]["lhe"]["energies"]),
                    "n_val": new["val"], "n_test": new["test"], "n_train": new["train"]}
-        name = "dsh_" + n[len("v4_"):]
         if lhe.get("energies"):
             ee_short(mg, lhe, name, ee_then(n, name))
         elif name in yields and _yield_ratio(yields[name]) is None:
