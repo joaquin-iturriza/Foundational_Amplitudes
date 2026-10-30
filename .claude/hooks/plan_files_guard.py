@@ -95,6 +95,23 @@ def heredoc_refusal(line, body):
     return None
 
 
+KEYWORDS = {"do", "then", "else", "elif", "if", "while", "until", "!", "{", "}", "done", "fi", "time"}
+
+
+def named(t):
+    """A token that is the plan file itself or a path to it (git show c:plan/plan.yaml): no whitespace, so a quoted
+    message that merely mentions it is not one."""
+    return bool(re.search(DATA, t)) and not re.search(r"\s", t)
+
+
+def c_writes(seg):
+    """An interpreter run with -c whose program text writes a plan file."""
+    ws = cmd_words(seg)
+    if not ws or not INTERP.match(os.path.basename(ws[0])):
+        return False
+    return any(writes_plan(w) for i, w in enumerate(ws[1:], 1) if ws[i - 1] in ("-c", "-e"))
+
+
 def bash_refusal(cmd):
     if plan_var_set(cmd):
         return "a PLAN_* variable (they point tools/plan.py at a test world, honoured only with PLAN_TEST=1 in tests)"
@@ -109,7 +126,9 @@ def bash_refusal(cmd):
     if segs is None:
         return "a command naming a plan file that cannot be parsed"
     for seg in segs:
-        if not any(re.search(DATA, t) for t in seg):
+        while seg and seg[0] in KEYWORDS:           # a loop's or conditional's keyword is no command
+            seg = seg[1:]
+        if not any(named(t) for t in seg) and not c_writes(seg):
             continue
         targets = [seg[i + 1] for i, t in enumerate(seg[:-1]) if re.fullmatch(r"\d?(?:>|>>|>\||<>)", t)]
         targets += [t.lstrip("0123456789>|") for t in seg if re.match(r"\d?>", t) and len(t.lstrip("0123456789>|"))]
@@ -117,14 +136,18 @@ def bash_refusal(cmd):
             return "a redirection into a plan file"
         seg = [t for i, t in enumerate(seg) if not re.fullmatch(r"\d?(?:>|>>|>\||<>|<)", t)
                and not (i and re.fullmatch(r"\d?(?:>|>>|>\||<>|<)", seg[i - 1]))]
-        if not any(re.search(DATA, t) for t in seg):
+        if not any(named(t) for t in seg) and not c_writes(seg):
             continue
         words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]   # drop VAR=value prefixes
         if not words:
             continue
         prog = os.path.basename(words[0])
         if prog.startswith("python"):
+            if c_writes(words):
+                return "python -c writing a plan file"
             script = next((w for w in words[1:] if not w.startswith("-")), "")
+            if not any(named(t) for t in words[1:]):
+                continue                           # the plan file is only inside a quoted string (a message)
             if TOOLS.search(script) and "-c" not in words[1:words.index(script)]:
                 continue
             return "python on a plan file other than tools/plan.py"
