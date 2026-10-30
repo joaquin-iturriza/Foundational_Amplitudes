@@ -40,8 +40,13 @@ def fixtures():
 
 # ------------------------------------------------------------------ A2, A3: a sandbox for the dispatcher
 STUB_SITE = r'''#!/usr/bin/env python3
-import os, sys
-open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "site_calls.log"), "a").write(repr(sys.argv[1:]) + "\n")
+import os, sqlite3, sys
+d = os.path.dirname(os.path.abspath(__file__))
+open(os.path.join(d, "site_calls.log"), "a").write(repr(sys.argv[1:]) + "\n")
+if sys.argv[1:2] == ["event"]:       # as the real site: the ALERT is an open event (it changes the dispatcher's state)
+    c = sqlite3.connect(os.path.join(d, "runs.db"))
+    c.execute("INSERT INTO events (ts, project, kind, key, msg) VALUES (1, 'FA', 'ALERT', 'k', 'm')")
+    c.commit()
 print("  E9001 FA ALERT: stub")
 '''
 STUB_HOOK = r'''#!/usr/bin/env python3
@@ -245,12 +250,12 @@ def dispatcher():
     shutil.copy(os.path.join(HOOKS, "md_guard.sh"), b.hooks)
     write = ("Write", {"file_path": os.path.join(b.repo, "NOTES_NEW.md"), "content": "x"})
     rcs = []
-    for _ in range(3):
+    for _ in range(5):
         b.tool_use(*write)
         rcs.append(b.run("md_guard.sh", "PreToolUse", write)[0])
     inc = b.incidents()
-    scenario("A3: a retried md_guard refusal stays refused (three times), is never disabled, and opens one incident "
-             "with one ALERT", rcs == [2, 2, 2] and not b.disabled() and len(inc) == 1 and inc[0].get("kept")
+    scenario("A3: a retried md_guard refusal stays refused (five times), is never disabled, and opens one incident "
+             "with one ALERT", rcs == [2] * 5 and not b.disabled() and len(inc) == 1 and inc[0].get("kept")
              and inc[0]["hook"] == "md_guard.sh" and len(b.site_calls()) == 1 and "hook-repeat:md_guard.sh"
              in b.site_calls()[0], (rcs, b.disabled(), inc, b.site_calls()))
     b = Box()

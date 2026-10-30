@@ -265,8 +265,10 @@ def check_loop(hook, inp, msg, state_path, cwd):
             end, calls = (os.path.getsize(tpath) if os.path.exists(tpath) else 0), []
         loop = bool(prev and prev["fp"] == fp and prev["world"] == w
                     and all(tool is not None and tuple(c) == tool for c in calls))
-        seen = bool(loop and prev.get("reported"))
-        st[key] = {"fp": fp, "offset": end, "world": w, "time": _now(), "reported": loop}
+        # once reported, a repeat of the same refusal stays reported while its fingerprint holds, even when the state
+        # moved between (the ALERT the report opens is itself a change of the open events)
+        seen = bool(prev and prev["fp"] == fp and prev.get("reported"))
+        st[key] = {"fp": fp, "offset": end, "world": w, "time": _now(), "reported": loop or seen}
         if len(st) > 500:                                        # keep the newest
             for k in sorted(st, key=lambda k: st[k].get("time", ""))[:len(st) - 500]:
                 st.pop(k)
