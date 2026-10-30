@@ -5044,6 +5044,14 @@ entries:
     runs: []
     commit: 84a15232
     paths:
+    - 'main-session state at the 2026-10-30 ~19:30 compaction: token pilot (Joaquin: cap 40% of the 5 h window, from 5%):
+      baseline 16:55 UTC, scratchpad tokens_since.py and token_cap.json, weighted (in 1, out 5, cache write 1.25, read 0.1),
+      0.536M per percent, stop at 15M; used 11.8M. Pending for Joaquin: CLAUDE.md owner close 300k->150k diff (proposed, unanswered);
+      /compact. Fixed today: supervisor summary/rc/retired-queue/finished-batch checks, site decide short quotes and list
+      lines (D190-D191), wait_guard (D192, then narrowed to waits only 9091f3c2), site_gate cancelled-unstarted (id and time
+      match), plan next resumes owners when waited runs end (8f7aeda1), tools/detach.py (07a611ed, long-run detachment untested),
+      compaction 400k/notes 350k (c534526a, next session). Owners: catalog_coverage a48477264f6500ec0 (resubmitting steps
+      11+14 at real limits), v3_prep_explore a208e44d49598bdaf (stopped; 6 GPU jobs pending on CC).'
     - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
       projects.toml and site_runends.py)
     - 'switch-over D built on branch redesign-d (worktrees/wt-redesign-d, commits 1bb22b6c..e23611f1): tests/test_redesign_d.py
