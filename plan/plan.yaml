@@ -4545,6 +4545,26 @@ entries:
       the winner becomes catalog_v4''s mixture, pools rebuilt at it. If neither wins: verdict ''keep the current mixture'',
       both reads reported to Joaquin with the bound beside them; if a share gains on default-sampled events but loses on a
       smart axis, verdict ''trade-off'', the numbers to Joaquin.'
+    fix_at: '2026-10-30T17:24:02+00:00'
+    fix: 'Step 11 is unchanged from the design passed at 17:14 and still holds. Step 14 holds on checks 1, 2, 5, 6 and 7.
+      Recipes checked: catalog_v4_default50 and default25 differ from catalog_v4_train.yaml only by f_default and default_source
+      on 912 tree entries, the other 241 identical, top-level keys equal; D194 covers the shares; PP4 and EE4 are read on
+      test splits separate from the training events. Two defects in step 14''s no-loss rule on the smart axes. (1) Seeds against
+      the spread (no-loss rule): ''on every smart axis group R < 1.05 or its widened interval contains 1'' is applied per
+      held-out axis, and the axes are small: H6 8 classes, H5 28, H7E 34, H7c 34, H2p5 38, H1 62, H2 218, H3 279. With the
+      held-out per-class seed spread of 0.14 (median |log10|, about 0.21 sigma; an estimate assuming a normal log ratio),
+      the noise of the median is about 4% on H2 and about 24% on H6, before the 95% interval and the R_seed widening. So a
+      share that costs 10% on H2 still passes as no loss, and on the small axes any result passes. That is an outcome every
+      result confirms, on the leg that decides whether the catalog is rebuilt at a share. Fix: state the smallest loss worth
+      acting on (for example 5%). Apply the rule to the pooled held-out classes (H1..H7c together, about 700), where the median''s
+      noise is about 1.5% to 2%, and report each axis as information. Or show per axis that the widened interval can exclude
+      that loss, and leave out the axes where it cannot. (2) XV3 as a smart read: catalog_v3''s pools on CC were deleted (results.tex
+      ~line 12200, ''all manifest files gone''). The shared held-out validation pools that XV3 reads (recipes/catalog_v3_shared_heldout.yaml,
+      555 probes) were listed as optional to keep. If they are gone, the arms'' XV3 read is silently skipped (job_catalog_v3_short.sh:
+      V3_AXIS_SKIPPED when a pool is missing) and cannot be compared with the control''s existing XV3 reads. Not checked on
+      CC here. Fix: confirm the pools are present (a read-only listing), or drop XV3 from the smart reads and from the rule.
+      Everything else (the statistic R, the bootstrap with the R_seed widening, the PP4 and EE4 win rule at 0.90, the verdict
+      rule for mixture_ab.json) can stay as written.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
