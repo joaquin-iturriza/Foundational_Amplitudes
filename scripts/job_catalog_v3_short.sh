@@ -192,6 +192,7 @@ OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/
 axis_recipe() { case "$1" in
     XV3) echo recipes/catalog_v3_shared_heldout.yaml ;; XV4) echo recipes/catalog_v4_shared_heldout.yaml ;;
     PP) echo recipes/catalog_v3_pp_test.yaml ;; PP4) echo recipes/catalog_v4_pp_test.yaml ;;
+    EE4) echo recipes/catalog_v4_ee_test.yaml ;;
     TR) echo "$TRAIN" ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
 # TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their test
 # split, the in-distribution reference of the held-out reads (v3_prep_explore, the shape gap, par:v4_tree_shape)
@@ -258,6 +259,19 @@ for A in "${AXES[@]}"; do
     if [ "$A" = TR ] && [ "$TRAIN" != "$PROJECT_DIR/recipes/catalog_${CAT}_train.yaml" ]; then
         echo "V3_RECIPE_CHECK FAIL TR: $ARM trains on $TRAIN, not recipes/catalog_${CAT}_train.yaml"; exit 1; fi
     AR=$(axis_recipe "$A")   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
+    # EE4: an entry without its test pool (ee4_epem_cgsxwm, its 3 TeV block dropped by D193) is left out and listed
+    if [ "$A" = EE4 ]; then
+        python - "$AR" "$R/EE4_present.yaml" <<'PY' || exit 1
+import glob, os, sys, yaml
+r = yaml.safe_load(open(sys.argv[1]))
+have = lambda n: glob.glob(os.path.join(os.environ["DATA_DIR"], f"{n}_*_test_*amplitudes.npy"))
+keep = [p for p in r["processes"] if have(p["name"])]
+print(f"V3_AXIS_PARTIAL EE4: {len(keep)} of {len(r['processes'])} read, without a test pool: "
+      f"{sorted(p['name'] for p in r['processes'] if not have(p['name']))}")
+yaml.safe_dump({**{k: v for k, v in r.items() if k != "processes"}, "processes": keep}, open(sys.argv[2], "w"))
+PY
+        AR="$R/EE4_present.yaml"
+    fi
     mkdir "$R/$A" || exit 1
     # an earlier job's predictions for this arm and axis are moved aside (never deleted): the folder then holds this
     # job's reads only, so a probe this job fails cannot be answered by a stale prediction
@@ -274,7 +288,7 @@ PY
     # the role scored: the test pool on PP4 (the pp-trained arm's training classes selected their checkpoint on
     # their pp13v4 val pools; catalog_coverage's design reads test) and on TR (the arm's own training pools, whose val
     # split selected its checkpoint), val on every other axis (every read so far); tools/collect_run.py AXIS_SPLIT
-    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ]; } && SPLIT=test
+    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ] || [ "$A" = EE4 ]; } && SPLIT=test
     miss=$(python -c "
 import glob, os, sys, yaml
 print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_{sys.argv[2]}_*amplitudes.npy\"))
@@ -295,7 +309,7 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
     python - "$CAT" "$A" "$AR" "$MODE" "${P[@]}" <<'PY' || exit 1
 import os, sys, yaml
 cat, axis, ar, mode, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
-pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_")}.get(axis, f"{cat}_")
+pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_"}.get(axis, f"{cat}_")
 names = {p["name"] for p in yaml.safe_load(open(ar))["processes"]}
 got = [os.path.basename(f)[:-len(".yaml")] for f in files]
 bad = sorted(n for n in got if n not in names or not n.startswith(pfx))

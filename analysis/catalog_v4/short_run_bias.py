@@ -27,7 +27,7 @@ against those of its largest when 3x apart (whether a run that completes depends
 shares: not measured; each pool is one partonic subprocess (fixed beam flavours) and neither the part files nor the
 pools keep MadEvent's integration channel of an event.
 """
-import argparse, glob, hashlib, json, math, os, re, sys
+import argparse, glob, hashlib, json, math, os, re, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -130,18 +130,44 @@ def _ratio(short, comp):
 
 
 def _samples(before=None):
-    """[{process, class, key, asked, got, status, path, kind}] of every part file and serial pool; with `before` (epoch
-    seconds) only the files last written before it, so an earlier measurement is re-read on the files it saw."""
+    """[{process, class, key, asked, got, status, path, kind, mtime}] of every part file and serial pool; with `before`
+    (epoch seconds) the files as they were then (_select), so an earlier measurement is re-read on the files it saw."""
+    S = _samples_all()
+    if before is None:                                     # today's files: the pools at their paths
+        return _select([s for s in S if s.get("current", True)], float("inf"),
+                       {os.path.basename(d) for d in glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_parts", "*"))})
+    return _select(S, before)
+
+
+def _select(S, t, have_parts=None):
+    """The samples on disk at time t: parts written by then; per serial pool the version that sat at its path then (the
+    latest written by t, the current file or one set aside later by lhe_set_aside), and none for a process whose parts
+    had started by then (it was then built from parts, not in series) or whose class had no part yet (parts of
+    lhe_parts only, not the probes' kept runs). have_parts (today's files): the process dirs under lhe_parts, the rule
+    the measurements were made with. A set-aside version left its path at its set_aside stamp ("until")."""
+    parts = [s for s in S if s["kind"] == "part" and s["mtime"] <= t]
+    own = [s for s in parts if not s.get("probe") and not s.get("gridpack")]
+    procs = have_parts if have_parts is not None else {s["process"] for s in own}
+    classes = {s["class"] for s in own}
+    best = {}
+    for s in S:
+        if s["kind"] == "pool" and s["mtime"] <= t < s.get("until", float("inf")) and s["process"] not in procs \
+                and s["class"] in classes:
+            if s["process"] not in best or s["mtime"] > best[s["process"]]["mtime"]:
+                best[s["process"]] = s
+    return parts + sorted(best.values(), key=lambda s: s["process"])
+
+
+def _samples_all():
+    """Every part file and every version of every serial pool (the file at its path, "current", and the copies
+    lhe_set_aside moved to <pool dir>/set_aside/), each with its mtime (shutil.move keeps it)."""
     import numpy as np
-    late = lambda f: before is not None and os.path.getmtime(f) > before
     sys.path.insert(0, ROOT)
     out = []
     pdir = os.path.join(os.environ["SCRATCH"], "lhe_parts")
     classes = set()
     for d in sorted(glob.glob(os.path.join(pdir, "*"))):
         for f in sorted(glob.glob(os.path.join(d, "*.npz"))):
-            if late(f):
-                continue
             m = PART_RE.match(os.path.basename(f))
             if not m:
                 continue
@@ -153,14 +179,13 @@ def _samples(before=None):
                 continue
             asked = int(m["ev"])
             out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": asked, "got": got,
-                        "seed": int(m["seed"]), "path": f, "kind": "part"})
+                        "seed": int(m["seed"]), "path": f, "kind": "part", "mtime": os.path.getmtime(f)})
             classes.add(cls(m["proc"]))
     # complete runs kept by the run-size probe (tools/lhe_probe.py run --keep: <process>_probe_seed<iseed>_ev<n>.npz)
+    # and runs drawn from one gridpack (tools/lhe_probe.py gridpack --keep: <process>_gpack<grid iseed>_seed<s>_ev<n>.npz)
     for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_probe_keep", "*", "*.npz"))):
-        if late(f):
-            continue
-        m = PROBE_RE.match(os.path.basename(f))
-        if not m:
+        m, g = PROBE_RE.match(os.path.basename(f)), GPACK_RE.match(os.path.basename(f))
+        if not (m or g):
             continue
         try:
             got = _npz_len(f)
@@ -168,51 +193,55 @@ def _samples(before=None):
                 key = physics_key(str(z["banner"]))
         except Exception:
             continue
-        out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": int(m["ev"]), "got": got,
-                    "seed": int(m["seed"]), "path": f, "kind": "part", "probe": True})
-    # runs drawn from one gridpack (tools/lhe_probe.py gridpack --keep: <process>_gpack<grid iseed>_seed<s>_ev<n>.npz)
-    for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_probe_keep", "*", "*.npz"))):
-        if late(f):
-            continue
-        m = GPACK_RE.match(os.path.basename(f))
-        if not m:
-            continue
-        try:
-            got = _npz_len(f)
-            with np.load(f) as z:
-                key = physics_key(str(z["banner"]))
-        except Exception:
-            continue
-        out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": int(m["ev"]), "got": got,
-                    "seed": int(m["seed"]), "path": f, "kind": "part", "gridpack": int(m["grid"])})
-    # serial pp13v4 pools of the classes that have parts (their events are in the train pool, shuffled over runs)
+        x = m or g
+        s = {"process": x["proc"], "class": cls(x["proc"]), "key": key, "asked": int(x["ev"]), "got": got,
+             "seed": int(x["seed"]), "path": f, "kind": "part", "mtime": os.path.getmtime(f)}
+        s.update({"probe": True} if m else {"gridpack": int(g["grid"])})
+        out.append(s)
+    # serial pp13v4 pools of the classes that have parts (their events are in the train pool, shuffled over runs);
+    # a version's runs asked from its own sidecar's lhe section (run_events, else n_requested: pp runs all ask one size)
     import mg5_pipeline_final as mg
     import datagen
-    have_parts = {os.path.basename(d) for d in glob.glob(os.path.join(pdir, "*"))}
     for name, cfg in sorted(mg.PROCESSES.items()):
-        if not name.startswith("pp13v4_") or name in have_parts or cls(name) not in classes or not mg.is_lhe_pp(name):
+        if not name.startswith("pp13v4_") or not mg.is_lhe_pp(name):
             continue
         try:
             lo, hi = mg.lhe_layout(cfg)["train"]
             rec = mg.lhe_pp_recipe(name, 13000, 13000, hi - lo, role="train", seed=42)
             path = mg.recipe_output_path(rec, datagen.dest_for_role("train"))
-            side = json.load(open(path + ".recipe.json"))
-            if late(path):
-                continue
+            runs = mg.lhe_runs(name, mg.lhe_iseed(name, 42), mg.lhe_n_requested(cfg))
         except Exception:
             continue
-        lr = side.get("lhe_run") or {}
-        per = lr.get("events_per_run") or []
-        runs = mg.lhe_runs(name, mg.lhe_iseed(name, 42), mg.lhe_n_requested(cfg))
-        asked = [int(r[1]) for r in runs]
-        if not per or len(per) != len(asked):
-            continue
-        b = lr.get("banner")
-        key = physics_key(open(b).read()) if b and os.path.exists(b) else None
-        out.append({"process": name, "class": cls(name), "key": key, "asked": sum(asked), "got": sum(per),
-                    "runs_asked": asked, "runs_got": per, "seed": 0, "path": path, "kind": "pool",
-                    "short_any": any(g < a for g, a in zip(per, asked)),
-                    "deep_any": any(g < DEEP * a for g, a in zip(per, asked))})
+        ask_of = {int(r[0]): int(r[1]) for r in runs}
+        aside = glob.glob(os.path.join(os.path.dirname(path), "set_aside", f"{name}_*", os.path.basename(path)))
+        for v in [path] + sorted(aside):
+            try:
+                side = json.load(open(v + ".recipe.json"))
+            except Exception:
+                continue
+            lr, lv = side.get("lhe_run") or {}, side.get("lhe") or {}
+            per, seeds = lr.get("events_per_run") or [], lr.get("iseeds") or []
+            own_ask = lv.get("run_events") or lv.get("n_requested")
+            if not per or len(per) != len(seeds) or (not own_ask and (v != path or any(int(i) not in ask_of
+                                                                                       for i in seeds))):
+                continue
+            asked = [int(own_ask) if own_ask else ask_of[int(i)] for i in seeds]
+            b = lr.get("banner")
+            if b and v != path:                            # a set-aside version: its own banner copy, moved with it
+                b = os.path.join(os.path.dirname(v), os.path.basename(b))
+            key = physics_key(open(b).read()) if b and os.path.exists(b) else None
+            until = float("inf")
+            if v != path:                                  # <process>_<%Y%m%dT%H%M%S, the cluster's local time>
+                try:
+                    until = time.mktime(time.strptime(os.path.basename(os.path.dirname(v)).rsplit("_", 1)[1],
+                                                      "%Y%m%dT%H%M%S"))
+                except (ValueError, IndexError):
+                    continue
+            out.append({"process": name, "class": cls(name), "key": key, "asked": sum(asked), "got": sum(per),
+                        "runs_asked": asked, "runs_got": per, "seed": 0, "path": v, "kind": "pool",
+                        "mtime": os.path.getmtime(v), "current": v == path, "until": until,
+                        "short_any": any(g < a for g, a in zip(per, asked)),
+                        "deep_any": any(g < DEEP * a for g, a in zip(per, asked))})
     for s in out:
         if s["kind"] == "part":
             s["status"] = "complete" if s["got"] >= s["asked"] else ("deep" if s["got"] < DEEP * s["asked"] else "short")
@@ -220,6 +249,61 @@ def _samples(before=None):
             s["status"] = "deep" if s["deep_any"] else ("short" if s["short_any"] else "complete")
     return out
 
+
+def _side_counts(S):
+    """Per (class, physics key): the counts a measured group records (complete, short, deep runs and events; the
+    processes), from the samples alone, so a time at which the files match a measurement can be found (cutoff)."""
+    g = {}
+    for s in S:
+        if not s["key"] or s.get("gridpack"):
+            continue
+        e = g.setdefault((s["class"], s["key"]), {"complete": [0, 0], "short": [0, 0], "deep": [0, 0], "processes": set()})
+        e["processes"].add(s["process"])
+        e["complete" if s["status"] == "complete" else "short"][0] += 1
+        e["complete" if s["status"] == "complete" else "short"][1] += s["got"]
+        if s["status"] == "deep":
+            e["deep"][0] += 1; e["deep"][1] += s["got"]
+    return g
+
+
+def cmd_cutoff(a):
+    """The time at which the files on disk matched an earlier measurement (--old): every distinct file time in the
+    --hours before --before is tried, each measured group's complete, short and deep runs and events and its processes
+    compared with what the files at that time give; the earliest time matching the most groups, and the groups
+    matching at none. One JSON line (CUTOFF_JSON)."""
+    S = _samples_all()
+    for old, before in zip(a.old, a.before):
+        _cutoff_one(S, old, before, a.hours)
+
+
+def _cutoff_one(S, old, before, hours):
+    import datetime
+    o = json.load(open(old))["groups"]
+    want = {(n.split("#")[0], r["key"]): (n, r) for n, r in o.items()}
+    hi = _epoch(before); lo = hi - 3600 * hours
+    ts = sorted({s["mtime"] for s in S if lo <= s["mtime"] <= hi} | {lo, hi})
+    def score(t):
+        g = _side_counts(_select(S, t))
+        ok = []
+        for (c, key), (n, r) in want.items():
+            e = g.get((c, key))
+            if e and all(e[k] == [r[k]["runs"], r[k]["events"]] for k in ("complete", "short", "deep")) \
+                    and sorted(e["processes"]) == r["processes"]:
+                ok.append(n)
+        return ok
+    best, bt, ever = [], None, set()
+    for t in ts:
+        ok = score(t)
+        ever |= set(ok)
+        if len(ok) > len(best):
+            best, bt = ok, t
+    iso = lambda t: datetime.datetime.fromtimestamp(t, datetime.timezone.utc).isoformat()
+    print("CUTOFF_JSON " + json.dumps({"old": old, "groups": len(want), "times_tried": len(ts),
+                                       "best_time": iso(bt) if bt else None, "matched": len(best),
+                                       "unmatched_at_best": sorted(set(n for n, _ in want.values()) - set(best)),
+                                       "never_matched": sorted(set(n for n, _ in want.values()) - ever),
+                                       "set_aside_versions": sum(s["kind"] == "pool" and not s.get("current", True)
+                                                                 for s in S)}), flush=True)
 
 def _load_one(s, cap):
     """Momenta of one sample (a run's part, or a serial pool), a seeded subsample of at most `cap` events."""
@@ -956,6 +1040,9 @@ def main():
     k.add_argument("--ref-keep", default=None, help="the reference runs' keep dir: --keep is then one probe arm "
                    "compared with them (_armcheck)")
     r = sub.add_parser("reread"); r.add_argument("--old", required=True); r.add_argument("--new", required=True)
+    c = sub.add_parser("cutoff"); c.add_argument("--old", nargs="+", required=True)
+    c.add_argument("--before", nargs="+", required=True, help="per --old, the latest time it can have been measured")
+    c.add_argument("--hours", type=float, default=12.0)
     q = sub.add_parser("sizesummary"); q.add_argument("--json", required=True)
     a = ap.parse_args()
     global NPERM, SCALED
@@ -970,7 +1057,7 @@ def main():
     if a.cmd == "summary":
         print(json.dumps(summary(json.load(open(a.json)))))
         return
-    {"measure": cmd_measure, "reread": cmd_reread, "fig": cmd_fig, "figsize": cmd_figsize}[a.cmd](a)
+    {"measure": cmd_measure, "reread": cmd_reread, "cutoff": cmd_cutoff, "fig": cmd_fig, "figsize": cmd_figsize}[a.cmd](a)
 
 
 if __name__ == "__main__":

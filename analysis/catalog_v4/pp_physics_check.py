@@ -42,8 +42,34 @@ CARD_KEYS = {("MASS", 5): "MB", ("MASS", 6): "MT", ("YUKAWA", 5): "ymb", ("YUKAW
              ("DECAY", 6): "WT", ("DECAY", 23): "WZ", ("DECAY", 24): "WW", ("DECAY", 25): "WH"}
 
 
+SET = "v3"     # --set v4: the pp13v4_* pools (recipes/catalog_v4_pp_test.yaml), built with catalog_v4's physics
+PREFIX = {"v3": "pp13_", "v4": "pp13v4_"}
+RECIPE = {"v3": "catalog_v3_pp_test.yaml", "v4": "catalog_v4_pp_test.yaml"}
+
+
 def pp_names():
-    return [e["name"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml")))["processes"]]
+    return [e["name"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", RECIPE[SET])))["processes"]]
+
+
+def built():
+    """--set v4: per pp entry, which of its train, val and test pools are on disk (with their recipe sidecar)."""
+    import mg5_pipeline_final as mg
+    import datagen
+    out = {}
+    for n in pp_names():
+        cfg = mg.PROCESSES.get(n)
+        r = {}
+        for role in ("train", "val", "test"):
+            try:
+                lo, hi = mg.lhe_layout(cfg)[role]
+                path = mg.recipe_output_path(mg.lhe_pp_recipe(n, 13000, 13000, hi - lo, role=role, seed=42),
+                                             datagen.dest_for_role(role))
+                r[role] = os.path.exists(path) and os.path.exists(path + ".recipe.json")
+            except Exception as ex:
+                r[role] = repr(ex)[:120]
+        out[n] = r
+    missing = {n: r for n, r in out.items() if not all(v is True for v in r.values())}
+    json.dump({"entries": len(out), "all_roles": len(out) - len(missing), "missing": missing}, sys.stdout)
 
 
 def classify():
@@ -51,11 +77,16 @@ def classify():
     ck = {c["name"]: c for c in json.load(open(os.path.join(HERE, "data", "checked.json")))}
     out = {}
     for n in pp_names():
-        x = n[len("pp13_"):]
+        x = n[len(PREFIX[SET]):]
         v4 = "v4_" + x
         pdg = [abs(int(p)) for p in mg.PROCESSES[n]["pdg_ids"]]
         if v4 not in mg.PROCESSES:
             out[n] = {"v4": None, "cls": "dropped", "b": 5 in pdg}
+            continue
+        if SET == "v4":         # same physics by construction: no reshelling (the pools' b is massless), no v3 count
+            b = 5 in pdg
+            out[n] = {"v4": v4, "b": b, "b_beam": 5 in pdg[:2], "ew": False, "itop": False, "reshell": False,
+                      "nfinal": len(pdg) - 2, "cls": "b" if b else "none"}
             continue
         k = ck[v4]
         b, ew, itop = 5 in pdg, k["diagrams"] != k["diagrams_v3"], 5 in pdg and 24 in pdg and 6 not in pdg
@@ -137,7 +168,7 @@ def evaluate(n_ev, part, parts, only=None):
                 if drv is None:
                     r[tag] = None
                     continue
-                M, xi = (massless_b(P, cfg["pdg_ids"]) if tag == "v4" and e["b"] else (P, None))
+                M, xi = (massless_b(P, cfg["pdg_ids"]) if tag == "v4" and e.get("reshell", e["b"]) else (P, None))
                 perm = mg.row_to_slot_perm(cfg["pdg_ids"], cfg["mg5_generate"])
                 with mg.CppDriverPipe(drv, sa) as pipe:
                     amp = pipe.compute([(m, None) for m in M], perm=perm, alphas=al)
@@ -180,7 +211,7 @@ def cost():
 def summary():
     C = classify()
     E = {}
-    for f in sorted(glob.glob(os.path.join(HERE, "data", "pp_physics_eval_*.json"))):
+    for f in sorted(glob.glob(os.path.join(HERE, "data", f"{'pp13v4' if SET == 'v4' else 'pp'}_physics_eval_*.json"))):
         E.update(json.load(open(f)))
     res = {"counts": dict(Counter(c["cls"] for c in C.values())),
            "counts_detail": dict(Counter(f"{c['cls']}{'/ew' if c.get('ew') and c['cls'] == 'b' else ''}"
@@ -214,20 +245,36 @@ def summary():
                   "worst": sorted(((round(float(E[n]["v4"]["ms"]), 4), n) for n in ps_), reverse=True)[:5]}
     agree = {n: (E[n]["v4"]["ms"] if E.get(n, {}).get("v4") and "ms" in E[n]["v4"] else None) for n in C if C[n]["v4"]}
     json.dump({"classes": C, "eval": E, "ms_v4_vs_label": agree},
-              open(os.path.join(HERE, "data", "pp_physics_check.json"), "w"), indent=0)
+              open(os.path.join(HERE, "data", "pp13v4_physics_check.json" if SET == "v4" else "pp_physics_check.json"), "w"),
+              indent=0)
+    if SET == "v4":
+        ev = [n for n in C if C[n]["v4"]]
+        # the same function: catalog_v4's standalone gives the label back as exactly as the pool's own standalone does
+        # (its round trip, the pipeline's precision), on every row
+        ok = lambda e: (e.get("v4") and e.get("pp") and e["v4"].get("maxabs") is not None and e["pp"].get("maxabs")
+                        is not None and e["v4"]["maxabs"] <= e["pp"]["maxabs"] and e["v4"]["n_ok"] == e["n"])
+        off = sorted(n for n in ev if not ok(E.get(n, {})))
+        res["v4_same_function"] = {"rule": "max|ln(v4/label)| <= max|ln(own standalone/label)|, every row",
+                                   "classes": len(ev), "pass": len(ev) - len(off),
+                                   "v4_maxabs_max": max((E[n]["v4"]["maxabs"] for n in ev if ok(E.get(n, {}))), default=None),
+                                   "fail": {n: (E.get(n, {}).get("v4") or E.get(n, {}).get("error")) for n in off}}
     print(json.dumps(res))
 
 
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=("classify", "eval", "summary", "cost"))
+    ap.add_argument("mode", choices=("classify", "eval", "summary", "cost", "built"))
+    ap.add_argument("--set", choices=("v3", "v4"), default="v3")
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--part", type=int, default=0)
     ap.add_argument("--parts", type=int, default=1)
     ap.add_argument("--only", nargs="*")
     a = ap.parse_args()
-    if a.mode == "classify":
+    SET = a.set
+    if a.mode == "built":
+        built()
+    elif a.mode == "classify":
         C = classify()
         print(json.dumps(Counter(c["cls"] for c in C.values())))
     elif a.mode == "eval":
