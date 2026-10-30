@@ -53,10 +53,12 @@ def alphas_of(path, rec, cfg):
 
 
 def main():
+    import datagen
     import mg5_pipeline_final as mg
     ap = argparse.ArgumentParser()
     ap.add_argument("spec")
     ap.add_argument("--roles", nargs="+", default=["train", "val", "test"])
+    ap.add_argument("--seed", type=int, default=42, help="data.seed of the runs (the pool's recipe id)")
     a = ap.parse_args()
     # val and test frozen in $DATA_DIR, train in the $SCRATCH cache (as tools/recover_alphas.py)
     dirs = {"val": os.environ["DATA_DIR"], "test": os.environ["DATA_DIR"],
@@ -70,9 +72,11 @@ def main():
     for p in spec["processes"]:
         lo, hi = p["sqrts"]
         for role in a.roles:
-            # a shaped pool carries the sampling tag in its name (catalog_v3: _smix_)
-            fs = glob.glob(os.path.join(dirs[role], f"{p['name']}_{lo}-{hi}GeV_{role}_*amplitudes.npy"))
-            assert len(fs) == 1, (p["name"], role, fs)
+            # the pool this recipe entry trains on, by its exact path (a shaped pool carries its sampling tag in its
+            # name, and several shapings of one class can sit side by side: _smix_, _smixd50_, _smixd25_)
+            rec0 = mg.variable_energy_recipe(p["name"], float(lo), float(hi), int(p["n_" + role]), role=role, seed=a.seed)
+            fs = [mg.recipe_output_path(rec0, datagen.dest_for_role(role))]
+            assert os.path.exists(fs[0]), (p["name"], role, fs[0])
             out = fs[0][:-len(".npy")] + ".alphas.npy"
             if os.path.exists(out):
                 continue
