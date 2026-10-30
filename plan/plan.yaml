@@ -2607,7 +2607,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: c9b5c8f0
+    commit: 3261281d
     paths:
     - 'HAND-OFF generation agent 2026-10-30 05:20. QUEUES ($SCRATCH/lhe_queue on CC): catalog_v4_w3 = the wave, 1885 one-run
       MadEvent tasks of 203 processes, planned from recipes/catalog_v4_default_lhe.yaml + catalog_v4_ee_test.yaml + catalog_v4_pp_parts.yaml
@@ -2668,10 +2668,13 @@ entries:
     - analysis/catalog_v4/data/class_changes.json
     - analysis/catalog_v4/data/compare_pp_trained.json
     - analysis/catalog_v4/data/compare_v3.json
+    - analysis/catalog_v4/data/complete_runs.json
     - analysis/catalog_v4/data/control_pool_ids_1d9d6a29.json
     - analysis/catalog_v4/data/density_check.json
     - analysis/catalog_v4/data/mixed_order_audit.json
     - analysis/catalog_v4/data/pp_trained_compare.json
+    - analysis/catalog_v4/data/short_built_pools.json
+    - analysis/catalog_v4/data/short_run_bias.json
     - analysis/catalog_v4/data/validation.json
     - analysis/catalog_v4/figs/census_diagrams.png
     - analysis/catalog_v4/figs/classes_roles.png
@@ -2684,6 +2687,8 @@ entries:
     - analysis/catalog_v4/figs/mixed_order_fraction.png
     - analysis/catalog_v4/figs/pool_sqrts_forward.png
     - analysis/catalog_v4/figs/pp_trained_compare.png
+    - analysis/catalog_v4/figs/short_run_bias_a.png
+    - analysis/catalog_v4/figs/short_run_bias_b.png
     - analysis/catalog_v4/mixed_order_fig.py
     - analysis/catalog_v4/pp_trained_compare.py
     - analysis/catalog_v4/read_validation.py
