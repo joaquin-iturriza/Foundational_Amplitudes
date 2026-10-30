@@ -5138,3 +5138,13 @@ entries:
       a 12 GB MIG slice means the set_gpu_mem.py floor applies and the jobs'' memory fit at batch 16384 is checked separately
       before any move (not claimed here); no: the failing line names the gap (env, driver/kernel, data) and it is fixed before
       any training job goes there'
+    passed_at: '2026-10-30T19:54:06+00:00'
+    reviewer: 'Re-check of the 19:53 design: infrastructure probe (job_probe.sh, 1 GPU, 10 min) plus setup.sh --verify on
+      lxplus against CC. Check 2: verify_cache.json shows the verify moving with data on the same recipe (lxplus rc=1, catalog_v4_train.yaml
+      3459 pools not prebuilt; CC rc=0, pools prebuilt, sidecars present); the probe''s own lines are stated as not yet observed
+      on any site (site runs: none), acceptable for a pass/fail infrastructure check. Check 3: one deterministic job, justified.
+      Check 4: yes branch only offers the site with GPU type and memory and defers memory fit at batch 16384 (set_gpu_mem
+      floor); no branch names the gap. Check 5 searched lxplus, HTCondor, job_probe, probe, MIG, set_gpu_mem in docs/results.tex,
+      plan.yaml dead ends and site decisions: prior now names the 2026-10-29 dead end (catalog_v3 default), the October lxplus
+      GPU history, MIG OOM and the TF32 rescoring gap. Check 6: placement under agent_redesign (site upkeep) is the main session''s
+      call, noted; the probe moves no training job.'
