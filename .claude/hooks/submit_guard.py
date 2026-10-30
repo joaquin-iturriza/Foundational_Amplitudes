@@ -18,6 +18,8 @@ A command is refused (exit 2, every reason found) when
              estimate plus the item's GPU submissions of the last 60 min (registry runs.est_gpu_hours) passes 30 GPU-h,
              or 10 on Jean Zay (a submission there, or `auto --allow-jeanzay`), unless the item's recorded cost
              (items.est_gpu_hours, set from the decision that approved it) covers that total (CLAUDE.md rule 2).
+             The early warning only: the budget is enforced at the site's submission gate (site_gate.py beside the
+             site tool), which every sbatch / condor_submit passes, launch scripts and sweep_manager included.
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
 through both). It fails closed on a submission like design_guard did; a command that submits nothing is never refused.
 Env for tests: the PLAN_* variables of tools/plan.py; SUBMIT_RUNS_DB (default the site registry); HOME (placement)."""
@@ -435,7 +437,8 @@ def budget(cmd, segs):
     """Everything the command submits counts together with the item's last 60 min: several `site submit` in one
     command are summed, and one inside a loop counts once per pass (`seq N` / {A..B}; a loop whose count cannot be
     read is refused unless the item's recorded cost covers a pass on top of the window... it cannot, so it is refused
-    with the reason). Not seen: submissions made inside a script (scripts/launch_*.sh) or by sweep_manager on a site."""
+    with the reason). Not seen here: submissions made inside a script (scripts/launch_*.sh) or by sweep_manager on a
+    site; the site's submission gate counts those (site_gate.py)."""
     out = []
     if segs is None:
         if re.search(r"\bsite\s+submit\b", cmdparse.scan_text(cmd)):

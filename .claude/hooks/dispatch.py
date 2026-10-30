@@ -14,8 +14,13 @@ stderr and exit code through unchanged, except:
     an ALERT event) with why = the repeated message, and the turn ends (exit 0);
   - a tool-call guard (PreToolUse, PostToolUse...) refusing the identical call twice in a row the same way is the guard
     doing its job, not a loop (the agent can do something else; letting it through would make every guard
-    bypassable by asking twice): the first repeat is recorded as an incident with one ALERT, so a misfiring guard
-    reaches the user, the guard stays on and the refusal stands.
+    bypassable by asking twice): the first repeat is recorded as an incident with one ALERT, the guard stays on and
+    the refusal stands.
+An incident's ALERT is for the main session, never addressed to the user: it carries what a fix needs (the hook, the
+event, the tool call refused, the refusal's text, how many times in a row, the session and agent) and says what to
+do: fix the hook at once when the fix is obvious and test it on the recorded refusal (`tools/hook_incident.py --replay
+<id>` runs the hook again on the recorded input), or ack saying the guard was right; it reaches the user only through
+`site ack E<n> --needs-user "<what>"` (a call that is the user's, or a fix that is not obvious).
 A refusal is exit 2, or a JSON stdout with "decision": "block" or a PreToolUse permissionDecision "deny". "No other tool
 call in between" is read from the transcript (the subagent's own when the input names one) from where it ended at the
 previous refusal: every tool call written since must be the refused call itself. Without session_id or
@@ -24,7 +29,7 @@ has refused, an error of the loop bookkeeping is caught and the refusal goes thr
 through byte for byte.
 
 The incident record lives here too, so the user-level copy (~/.claude/hooks/dispatch.py, the same file) needs nothing
-from a project: disable(), resolve(), incidents(). tools/hook_incident.py is its command line.
+from a project: disable(), report(), resolve(), incidents(), last_refusal(). tools/hook_incident.py is its command line.
 State: <hooks dir>/.dispatch_state.json (gitignored), DISPATCH_STATE overrides the path (tests)."""
 import datetime as dt, fcntl, hashlib, json, os, re, sqlite3, subprocess, sys
 
@@ -92,7 +97,7 @@ def disabled(hooks_dir=HERE):
     return _load(os.path.join(hooks_dir, "disabled.json"), {})
 
 
-def _alert(hook, msg, key, project_dir):
+def _alert(msg, key, project_dir):
     proj = project_name(project_dir or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
     if not proj:
         return None
@@ -105,35 +110,89 @@ def _alert(hook, msg, key, project_dir):
         return "site event failed: %s" % e
 
 
-def disable(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_dir=None):
-    """hook into disabled.json, one line into incidents.jsonl, one ALERT event. A hook already disabled: nothing new
-    (no second event), returns False."""
+def _one_line(x, n):
+    x = re.sub(r"\s+", " ", str(x or "")).strip()
+    return x if len(x) <= n else x[:n - 3] + "..."
+
+
+def _call_of(inp):
+    """the tool call a guard refused, as (name, input), from the hook input; None for a Stop."""
+    if isinstance(inp, dict) and inp.get("tool_name"):
+        return inp.get("tool_name"), inp.get("tool_input")
+    return None
+
+
+def incident_msg(rec, user_level=False):
+    """the ALERT's text: everything the main session needs to fix the hook, and what to do with it."""
+    call = rec.get("call")
+    tool = ("%s %s" % (call[0], _one_line(json.dumps(call[1], sort_keys=True), 600))) if call else \
+        "none (a %s refusal: the turn could not end)" % (rec.get("event") or "manual")
+    state = "disabled, the call went through" if rec.get("disabled") else "still on, still refusing"
+    tool_flag = " --user" if user_level else ""
+    return ("HOOK INCIDENT %s, for the main session to fix (not addressed to the user): %s [%s], %s; refused %s "
+            "time(s) in a row in session %s%s. Why: %s. Call refused: %s. Refusal: %s. "
+            "Do: if the fix is obvious, fix the hook now, test it on this refusal (python3 tools/hook_incident.py%s "
+            "--replay %s), commit%s, and ack with what changed and the replay's verdict; if the guard was right, ack "
+            "saying so and correct the caller. Only a call that is the user's or a fix that is not obvious: "
+            "site ack E<n> --needs-user \"<what he must decide>\". Full record: python3 tools/hook_incident.py%s "
+            "--show %s" % (
+                rec["id"], rec["hook"], rec.get("event") or "manual", state,
+                rec.get("count") if rec.get("count") is not None else "?", rec.get("session") or "?",
+                (" agent %s" % rec["agent"]) if rec.get("agent") else "", _one_line(rec.get("why"), 300), tool,
+                _one_line(rec.get("last_refusal") or "not recorded", 800), tool_flag, rec["id"],
+                (", then --resolve '%s'" % rec["hook"]) if rec.get("disabled") else "", tool_flag, rec["id"]))
+
+
+def _record(hook, why, hooks_dir, session, last_refusal, project_dir, inp, count, disabled_now):
+    inp = inp if isinstance(inp, dict) else None
+    try:                                         # bounded as in the state: a huge Write is kept by its call, not input
+        if inp is not None and len(json.dumps(inp)) > 20000:
+            inp = dict(inp, tool_input={"truncated": True, "text": json.dumps(inp.get("tool_input"))[:20000]})
+    except (TypeError, ValueError):
+        inp = None
+    t = _now()
+    rec = {"id": "I-" + _sha("%s|%s|%s|%s" % (hook, t, session, os.getpid()))[:8], "hook": hook, "why": why,
+           "time": t, "session": session, "agent": (inp or {}).get("agent_id"),
+           "event": (inp or {}).get("hook_event_name"), "call": _call_of(inp), "last_refusal": last_refusal,
+           "count": count, "disabled": disabled_now, "kept": not disabled_now, "input": inp,
+           "project_dir": project_dir}
+    rec["event_id"] = _alert(incident_msg(rec, os.path.realpath(hooks_dir) == os.path.realpath(
+        os.path.expanduser("~/.claude/hooks"))), "hook-incident:" + rec["id"], project_dir)
+    with open(os.path.join(hooks_dir, "incidents.jsonl"), "a") as f:
+        f.write(json.dumps(rec, sort_keys=True) + "\n")
+    return rec
+
+
+def disable(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_dir=None, inp=None, count=None):
+    """hook into disabled.json, one line into incidents.jsonl, one ALERT event for the main session. A hook already
+    disabled: nothing new (no second event), returns False."""
     path = os.path.join(hooks_dir, "disabled.json")
     with _Lock(path):
         d = disabled(hooks_dir)
         if hook in d:
             return False
-        rec = {"hook": hook, "why": why, "time": _now(), "session": session, "last_refusal": last_refusal}
-        rec["event"] = _alert(hook, "hook %s disabled: %s (resolve: python3 tools/hook_incident.py --resolve '%s')"
-                              % (hook, why[:300], hook), "hook:" + hook, project_dir)
-        d[hook] = {"why": why, "time": rec["time"], "session": session}
+        rec = _record(hook, why, hooks_dir, session, last_refusal, project_dir, inp, count, True)
+        d[hook] = {"why": why, "time": rec["time"], "session": session, "incident": rec["id"]}
         _save(path, d)
-        with open(os.path.join(hooks_dir, "incidents.jsonl"), "a") as f:
-            f.write(json.dumps(rec, sort_keys=True) + "\n")
-        return True
+        return rec
 
 
-def report(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_dir=None):
-    """a tool-call guard that refused the same call twice: one line into incidents.jsonl and one ALERT (a misfiring
-    guard reaches the user), the guard stays on and keeps refusing."""
-    path = os.path.join(hooks_dir, "disabled.json")
-    with _Lock(path):
-        rec = {"hook": hook, "why": why, "time": _now(), "session": session, "last_refusal": last_refusal,
-               "kept": True}
-        rec["event"] = _alert(hook, "hook %s refused the same call twice (it stays on): %s" % (hook, why[:300]),
-                              "hook-repeat:" + hook, project_dir)
-        with open(os.path.join(hooks_dir, "incidents.jsonl"), "a") as f:
-            f.write(json.dumps(rec, sort_keys=True) + "\n")
+def report(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_dir=None, inp=None, count=None):
+    """a tool-call guard that refused the same call twice: one line into incidents.jsonl and one ALERT for the main
+    session; the guard stays on and keeps refusing."""
+    with _Lock(os.path.join(hooks_dir, "disabled.json")):
+        return _record(hook, why, hooks_dir, session, last_refusal, project_dir, inp, count, False)
+
+
+def last_refusal(hook, state_path=None, hooks_dir=HERE):
+    """the newest refusal of this hook the dispatcher recorded (any session): {msg, input, count, session, time}, or
+    None. A hand-opened incident (hook_incident.py --why) carries it, so its ALERT has the call and the text too."""
+    st = _load(state_path or os.environ.get("DISPATCH_STATE") or os.path.join(hooks_dir, ".dispatch_state.json"), {})
+    best = None
+    for k, v in st.items():
+        if k.split("|", 2)[-1] == hook and v.get("msg") is not None and (best is None or v["time"] > best["time"]):
+            best = dict(v, session=k.split("|", 1)[0])
+    return best
 
 
 def resolve(hook, hooks_dir=HERE, note=None):
@@ -246,11 +305,13 @@ def world(cwd):
 
 
 def check_loop(hook, inp, msg, state_path, cwd):
-    """record this refusal; "new" when it repeats the previous one of the same hook in the same session or agent for
-    the first time, "again" for a further repeat, False otherwise."""
+    """record this refusal; (verdict, count): verdict "new" when it repeats the previous one of the same hook in the
+    same session or agent for the first time, "again" for a further repeat, False otherwise; count: how many times in
+    a row this hook refused the same thing in this session or agent (the refused call and input are kept in the state
+    for a hand-opened incident)."""
     sess, tpath = inp.get("session_id"), transcript_of(inp)
     if not sess or not tpath:
-        return False
+        return False, None
     event = inp.get("hook_event_name") or ""
     tool = (inp.get("tool_name"), _sha(json.dumps(inp.get("tool_input"), sort_keys=True))) if inp.get("tool_name") else None
     fp = _sha(json.dumps([hook, event, _sha(msg), tool]))
@@ -268,12 +329,18 @@ def check_loop(hook, inp, msg, state_path, cwd):
         # once reported, a repeat of the same refusal stays reported while its fingerprint holds, even when the state
         # moved between (the ALERT the report opens is itself a change of the open events)
         seen = bool(prev and prev["fp"] == fp and prev.get("reported"))
-        st[key] = {"fp": fp, "offset": end, "world": w, "time": _now(), "reported": loop or seen}
+        count = (prev.get("count") or 1) + 1 if prev and prev["fp"] == fp else 1
+        try:
+            raw = json.dumps(inp, sort_keys=True)
+        except (TypeError, ValueError):
+            raw = None
+        st[key] = {"fp": fp, "offset": end, "world": w, "time": _now(), "reported": loop or seen, "count": count,
+                   "msg": msg[:4000], "input": inp if raw is not None and len(raw) <= 20000 else None}
         if len(st) > 500:                                        # keep the newest
             for k in sorted(st, key=lambda k: st[k].get("time", ""))[:len(st) - 500]:
                 st.pop(k)
         _save(state_path, st)
-    return ("again" if seen else "new") if loop else False
+    return (("again" if seen else "new"), count) if loop else (False, count)
 
 
 def command_for(path, args):
@@ -329,19 +396,19 @@ def loop_through(spec, raw, r):
         return False
     state = os.environ.get("DISPATCH_STATE") or os.path.join(HERE, ".dispatch_state.json")
     cwd = inp.get("cwd") or os.getcwd()
-    loop = check_loop(spec, inp, msg, state, cwd)
+    loop, count = check_loop(spec, inp, msg, state, cwd)
     if not loop:
         return False
     why = "the same refusal twice with nothing done between: " + re.sub(r"\s+", " ", msg)[:400]
-    kw = dict(session=inp.get("session_id"), last_refusal=msg[:2000],
-              project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or cwd)
+    kw = dict(session=inp.get("session_id"), last_refusal=msg[:4000],
+              project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or cwd, inp=inp, count=count)
     if (inp.get("hook_event_name") or "") not in STOP_EVENTS:
         if loop == "new":
             report(spec, why, HERE, **kw)
         return False
     disable(spec, why, HERE, **kw)
     sys.stderr.write("dispatch: %s refused the same thing twice with nothing done between; it is disabled and an "
-                     "incident is open (python3 tools/hook_incident.py --list)\n" % spec)
+                     "incident is open for the main session to fix (python3 tools/hook_incident.py --list)\n" % spec)
     return True
 
 if __name__ == "__main__":
