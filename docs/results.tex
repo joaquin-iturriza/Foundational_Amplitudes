@@ -4569,6 +4569,48 @@ held-out probes of every axis, the distribution of $\log_{10}$ of $y$'s MSE on $
 \label{fig:v3_prep_signed_seeds}
 \end{figure}
 
+\paragraph{The one-loop sign extension on catalog\_v4 (2026-10-30).}\label{par:v4_signext} Does training on more
+sign-changing one-loop pools lower the zero-shot wrong-sign share on catalog\_v4's held-out one-loop pools, as it did
+on catalog\_v3 (par.~\ref{par:v3_prep_signed})? The control pair is the dimensionless target with Muon at the Muon search's best
+HPs, seeds $42$ and $43$; the arm is the same with the sign extension's one-loop training pools
+(\texttt{recipes/catalog\_v4\_train\_signext.yaml}), same seeds, HPs and step count. Both arms are read at their best
+checkpoint on the $21$ held-out one-loop pools the scorer reads as sign-changing ($2000$ validation events each); no
+run blew up. On the seed means per pool the arm is lower on $14$ pools, higher on $6$, one tie: one-sided sign test
+$p=0.058$, short of the design's $p<0.05$. The seed-mean median falls from $6.48\%$ to $3.08\%$, and each seed alone is
+lower on most pools ($15$ at seed $42$, $16$ at seed $43$). By the design's rule this is inconclusive: lower on the
+median and on most pools, below what two seeds resolve. The zero-shot MSE on $\log|\mathcal M|^2$ costs on every tree
+axis, beyond the control's own seed-$43$-over-$42$ median ratio: arm over control (seed means, median over probes)
+$1.365$ on H1 (seed spread $1.108$), $1.248$ on H2 ($1.071$), $1.134$ on H2p5 ($1.1$), $1.147$ on H3 ($1.059$),
+$1.319$ on H7E ($0.983$), $1.311$ on H7c ($1.18$); on the one-loop axis H5 the magnitude's MSE falls ($0.615$). A
+third and fourth seed of both arms (four runs) would settle the sign; the design puts them to the user, not run.
+% src: python3 analysis/catalog_v4/signext_compare.py @600ccc19
+% claim: pools=21
+% claim: seed_mean.ext_lower=14
+% claim: seed_mean.ext_higher=6
+% claim: seed_mean.ties=1
+% claim: seed_mean.p_one_sided=0.058
+% claim: seed_mean.median_ctrl_pct=6.48
+% claim: seed_mean.median_ext_pct=3.08
+% claim: per_seed.42.ext_lower=15
+% claim: per_seed.43.ext_lower=16
+% claim: mse_ratio.H1.median_ext_over_ctrl=1.365
+% claim: mse_ratio.H1.ctrl_seed43_over_42=1.108
+% claim: mse_ratio.H2.median_ext_over_ctrl=1.248
+% claim: mse_ratio.H2.ctrl_seed43_over_42=1.071
+% claim: mse_ratio.H2p5.median_ext_over_ctrl=1.134
+% claim: mse_ratio.H2p5.ctrl_seed43_over_42=1.1
+% claim: mse_ratio.H3.median_ext_over_ctrl=1.147
+% claim: mse_ratio.H3.ctrl_seed43_over_42=1.059
+% claim: mse_ratio.H7E.median_ext_over_ctrl=1.319
+% claim: mse_ratio.H7E.ctrl_seed43_over_42=0.983
+% claim: mse_ratio.H7c.median_ext_over_ctrl=1.311
+% claim: mse_ratio.H7c.ctrl_seed43_over_42=1.18
+% claim: mse_ratio.H5.median_ext_over_ctrl=0.615
+% allow: 42 43 because they are the seeds, settings
+% allow: 2000 because it is the event count the reads are set to, a setting
+% allow: 0.05 because it is the design's threshold, a setting
+% allow: 2 because it is in the axis names H2, H2p5, labels
+
 \paragraph{The sampling sensitivity on catalog\_v3 (2026-10-26).}\label{par:v3_prep_sampling} How much of what a target
 and a trained network show depends on how the pool drew its events? Two reweightings of each pool's events: flat in
 $\log\hat s$ (equal weight per bin of $\log\hat s$, catalog\_v4's measure inside catalog\_v3's window), and toward the
