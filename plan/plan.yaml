@@ -2635,7 +2635,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 814c19f3
+    commit: 584592e2
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -2732,6 +2732,20 @@ entries:
       (4) catalog_v4_gridpack_57 (39/39), _probed (6/6), _fix (1/1) ended with 0 failed, removed from site queue. Assembled:
       100 of 113; 112 when this queue ends. NEXT: on its end, lhe_parts status (12 assembled, 0 failed), site queue rm FA
       catalog_v4_gridpack_last; mixcheck over all 113 once cgsxwm is settled.'
+    - 'HAND-OFF (2026-10-30 ~12:25, cgsxwm run-size probe). (1) CODE merged to trunk 584592e2 (repo-reviewer PASS, watermark
+      ce9fd31f): lhe_probe gridpool --events/--energy/--seed-base/--keep; short_run_bias.py sizecheck (shares from probe logs,
+      errored runs counted; one physics key; --parts needs --eid; short runs vs reference); lhe.energy_run_events, lhe.grid_seed_runs,
+      lhe.gridpack_eid (opt-in, in identity); complete_layout sizes/pin from complete_runs.json. (2) DESIGN passed after one
+      FIX on power. PROBE: 30 jobs job_lhe_probe.sh PROBE_SHARD=gridpool GP_ENERGY=3000 on the existing grid04 (iseed 12576,
+      52228; reuse confirmed in FA-ccin2p3-3c830baa log), keep $SCRATCH/lhe_probe_keep_runsize: 200 x 768 (seeds 20001-20768),
+      100 x 512 (21001-21512), 50 x 768 (22001-22768), 25 x 1536 (23001-24536); runs FA-ccin2p3-3c830baa .. 8b00d59e; target
+      1.25 h / 30 jobs. (3) catalog_v4_gridpack_last at 12:19: 4313/4315 done, 0 failed, 10/12 assembled. NEXT: on the probe''s
+      end, sizecheck --process ee4_epem_cgsxwm --energy 3000 --keep $SCRATCH/lhe_probe_keep_runsize --logs <the 30 probe logs
+      only> --out analysis/catalog_v4/data/cgsxwm_sizecheck.json; PASS (share>=0.9, p_runs not < 0.05/3, floor<=0.013) ->
+      complete_runs.json energy_run_events {3000: [size, share]}, grid_seed_runs 15, gridpack_eid = current layout''s eid;
+      state runs/yield/wall in that commit; regenerate recipes; small queue; assemble; sizecheck --parts --eid <new>; results.tex
+      short-runs paragraph line. gridpack_last end: lhe_parts status, site queue rm. Then mixcheck over 113. Worktree wt-cgsxwm-runsize
+      merged, to remove with scripts/remove_worktree.sh.'
     - 'HAND-OFF (2026-10-30, gridpack step). (1) CODE: commit 7bdc5729 (+39914802 measure). mg5_pipeline_final.py: lhe_make_gridpack(process,
       ev, nevents, iseed, log, mg_cores, patches, run_name=''grid'') runs lhe_run_madevent with run-card gridpack=True (lhe_run_madevent
       now returns lhe=None for a gridpack run instead of raising) and returns <ev>/grid_gridpack.tar.gz; lhe_run_gridpack(tar,
