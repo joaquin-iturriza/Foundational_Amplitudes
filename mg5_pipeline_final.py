@@ -4194,12 +4194,40 @@ def lhe_gridpack_header(lhe_path):
     return "".join(out)
 
 
-def lhe_run_gridpack(gridpack, work, nevents, seed, log_path, timeout=None):
+GRIDPACK_XIMPROVE = ("max_iter", "min_iter", "max_event_in_iter", "min_event_in_iter", "gen_events_security")
+
+
+def lhe_patch_ximprove(work, values):
+    """In an unpacked gridpack under `work`, set class attributes of MadEvent's gen_ximprove_gridpack (the event
+    generation of a gridpack run: per channel at most max_iter iterations, the points of each between min_event_in_iter
+    and max_event_in_iter; madevent/bin/internal/gen_ximprove.py) to `values`, the integration grids untouched.
+    Refused for a key outside GRIDPACK_XIMPROVE or not found in that class."""
+    f = os.path.join(work, "madevent", "bin", "internal", "gen_ximprove.py")
+    src = open(f).read()
+    i = src.index("class gen_ximprove_gridpack(")
+    j = src.find("\nclass ", i + 1)
+    j = len(src) if j < 0 else j
+    body = src[i:j]
+    for k, v in values.items():
+        if k not in GRIDPACK_XIMPROVE:
+            raise ValueError(f"gridpack ximprove key {k!r} not in {GRIDPACK_XIMPROVE}")
+        body, n = re.subn(rf"(?m)^(\s+{k}\s*=\s*)[^#\n]+", lambda m: m.group(1) + repr(v), body, count=1)
+        if n != 1:
+            raise ValueError(f"gridpack ximprove key {k!r} not found in gen_ximprove_gridpack of {f}")
+    open(f, "w").write(src[:i] + body + src[j:])
+    for c in glob.glob(os.path.join(os.path.dirname(f), "__pycache__", "gen_ximprove*.pyc")):
+        os.remove(c)
+
+
+def lhe_run_gridpack(gridpack, work, nevents, seed, log_path, timeout=None, ximprove=None):
     """`nevents` unweighted events drawn from a gridpack (lhe_make_gridpack) with random seed `seed`, in a fresh
-    unpacked copy under `work` (one copy per run, so runs of one gridpack go in parallel). Returns the LHE path."""
+    unpacked copy under `work` (one copy per run, so runs of one gridpack go in parallel). ximprove: the copy's
+    gridpack event-generation limits changed first (lhe_patch_ximprove). Returns the LHE path."""
     os.makedirs(work, exist_ok=True)
     with tarfile.open(gridpack) as t:
         t.extractall(work)
+    if ximprove:
+        lhe_patch_ximprove(work, ximprove)
     with open(log_path, "a") as log:
         r = subprocess.run(["bash", "./run.sh", str(int(nevents)), str(int(seed))], cwd=work, stdout=log,
                            stderr=subprocess.STDOUT, env=dict(os.environ, OMP_NUM_THREADS="1"), timeout=timeout)
