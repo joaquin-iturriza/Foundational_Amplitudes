@@ -3915,7 +3915,9 @@ def lhe_cards(cfg):
 def lhe_iseed(process, seed):
     """MadEvent iseed of a process, deterministic in (process, seed) and kept small: MadEvent derives
     its per-channel ranmar seeds from it."""
-    return int(hashlib.sha256(f"{process}|{seed}".encode()).hexdigest(), 16) % 20000 + 1
+    salt = (PROCESSES.get(process, {}).get("lhe") or {}).get("iseed_salt")
+    key = f"{process}|{seed}" + (f"|{salt}" if salt else "")    # lhe.iseed_salt: a pool reseeded (its runs gave no event)
+    return int(hashlib.sha256(key.encode()).hexdigest(), 16) % 20000 + 1
 
 
 def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None):
@@ -3966,6 +3968,7 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             **({"build": "parts"} if cfg["lhe"].get("parts") else {}),
             # an e+e- entry's fixed collider energies (lhe.energies), one MadEvent run each; absent for pp
             **({"energies": [float(e) for e in cfg["lhe"]["energies"]]} if cfg["lhe"].get("energies") else {}),
+            **({"iseed_salt": int(cfg["lhe"]["iseed_salt"])} if cfg["lhe"].get("iseed_salt") else {}),
         },
     }
 

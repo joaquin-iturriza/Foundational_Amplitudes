@@ -10572,6 +10572,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      iseed_salt: 1
+      accept_short: true
+      n_runs: 5
+      run_events: 11424
       parts: true
     parent: v4_ddx_awpwm
     reuse: pp13_ddx_awpwm

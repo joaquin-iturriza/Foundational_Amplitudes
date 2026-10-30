@@ -5352,7 +5352,6 @@ processes:
     beam_masses: {}
     lhe:
       energies:
-      - 365.0
       - 500.0
       - 1000.0
       - 3000.0
