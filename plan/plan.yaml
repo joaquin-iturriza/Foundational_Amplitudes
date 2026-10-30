@@ -3778,6 +3778,19 @@ entries:
       differ): report to Joaquin with the numbers; the choice between rebuilding in complete runs of 1000 and keeping the
       short-run pools is his. If the reference''s own halves differ (control_top_halves below 0.05), the large runs are not
       a converged reference: reported, and the test is read against that spread.'
+    passed_at: '2026-10-30T05:08:43+00:00'
+    reviewer: 'Revised design re-checked against short_run_bias_size.json and the measure at 39914802. Check 2: the run-level
+      KS test separated per-run-integrated runs from large ones (dg_dguux 1000 vs 33x40282 KS 0.021/0.023 p<5e-4; bb_bbgg
+      0.0137 p 0.004, 0.0117 p 0.026; e+e- 200 0.0187 p 0.0025); complete-halves control 0 of 37 below 0.05. Check 3: pooled
+      200 runs of 1000 (n 200k, at the cap) against about 46k-53k reference events gives event-level detectable KS 0.0070
+      at 5%, about 0.0085 at the corrected 0.01; e+e- 400 runs of 200 (80k) against 46368 gives 0.0079 / about 0.0095; both
+      under the smallest bias being removed (bb 0.0117, e+e- 0.0187), recomputed by me; the direct test against the same-ask
+      per-run-integrated runs and the gridpack pair test added; a group without power reported untested. Caveats for the write-up:
+      the event-level detectable KS is a floor (e+e- reference has only 16 runs for the run-level test), and summary()''s
+      Bonferroni count over the ''gridpack'' kind mixes the pooled and per-gridpack tests, so read the primary tests at the
+      design''s 5-test level. Checks 1, 4, 6, 7 hold. Check 5 searched: gridpack, set_gridpack, run size, short run, complete
+      run, madevent in docs/results.tex, the entry''s evidence and dead ends, site decisions --project FA: only par:v4_short_runs
+      / fig:v4_run_size and the rebuild dead end, both cited.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
