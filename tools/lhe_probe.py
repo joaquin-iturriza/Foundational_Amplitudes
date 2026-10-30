@@ -148,6 +148,72 @@ def _du(path):
         return None
 
 
+def _keep(keep, name, fname, m, aq, banner):
+    """Save one run's events and banner as KEEP/<process>/<fname> (atomic rename); returns the path."""
+    d = os.path.join(keep, name)
+    os.makedirs(d, exist_ok=True)
+    kp = os.path.join(d, fname)
+    np.savez(kp + ".tmp.npz", mom=m, aqcd=aq, banner=np.array(banner))
+    os.replace(kp + ".tmp.npz", kp)
+    return kp
+
+
+def cmd_gridpack(a):
+    """One gridpack of a process at the precision of a run of --grid-events (mg.lhe_make_gridpack, on --cores cores),
+    then --runs runs of --events events drawn from it with seeds seed_base+1.., --cores at a time, each kept as
+    KEEP/<process>/<process>_gpack<grid iseed>_seed<s>_ev<n>.npz with the LHE header as its banner. Cards and patches as
+    the part jobs run them (the pool's first run's patches, --energy for an e+e- run). One GRIDPACK_JSON line per run."""
+    from concurrent.futures import ThreadPoolExecutor
+    name = a.process
+    cfg = mg.PROCESSES[name]
+    base = a.work or os.environ.get("TMPDIR") or "/tmp"
+    wd = os.path.join(base, f"lhe_gpack_{name}_{os.getpid()}")
+    os.makedirs(wd, exist_ok=True)
+    log = os.path.join(wd, f"{name}.mg5.log")
+    head = {"process": name, "host": socket.gethostname(), "grid_events": a.grid_events, "events_asked": a.events}
+    try:
+        t0 = time.time()
+        ev, _ = mg.lhe_prepare(name, wd, log, madevent=True, standalone=False)
+        runs = mg.lhe_runs(name, mg.lhe_iseed(name, 42), mg.lhe_n_requested(cfg))
+        patches = dict(runs[0][2])
+        if a.energy:
+            patches.update({"ebeam1": a.energy / 2.0, "ebeam2": a.energy / 2.0})
+        giseed = mg.lhe_iseed(name, 7777 + a.seed_base)
+        tar = mg.lhe_make_gridpack(name, ev, a.grid_events, giseed, log, mg_cores=a.cores, patches=patches)
+        head.update(grid_iseed=giseed, s_gridpack=round(time.time() - t0, 1), patches=patches,
+                    gridpack_bytes=os.path.getsize(tar))
+        txt = open(log).read()
+        head["grid_fail_to_reach_target"] = "fail to reach target" in txt
+        print("GRIDPACK_JSON " + json.dumps(dict(head, stage="grid")), flush=True)
+
+        def one(s):
+            r = dict(head, seed=s)
+            rw = os.path.join(wd, f"run_{s}")
+            t1 = time.time()
+            try:
+                lhe = mg.lhe_run_gridpack(tar, rw, a.events, s, os.path.join(wd, f"run_{s}.log"), timeout=a.timeout)
+                m, aq, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
+                r.update(events_returned=len(m), s_run=round(time.time() - t1, 1))
+                if a.keep:
+                    r["kept_events_file"] = _keep(a.keep, name, f"{name}_gpack{giseed}_seed{s}_ev{int(a.events)}.npz",
+                                                  m, aq, mg.lhe_gridpack_header(lhe))
+            except Exception as e:
+                r["error"] = f"{type(e).__name__}: {e}"
+            finally:
+                shutil.rmtree(rw, ignore_errors=True)
+            print("GRIDPACK_JSON " + json.dumps(r), flush=True)
+            return r
+        with ThreadPoolExecutor(max(1, a.cores)) as ex:
+            out = list(ex.map(one, range(a.seed_base + 1, a.seed_base + 1 + a.runs)))
+        print("GRIDPACK_SUMMARY " + json.dumps({"process": name, "runs": len(out),
+                                                "complete": sum(r.get("events_returned") == a.events for r in out),
+                                                "errors": sum("error" in r for r in out)}), flush=True)
+    except Exception as e:
+        print("GRIDPACK_JSON " + json.dumps(dict(head, stage="grid", error=f"{type(e).__name__}: {e}")), flush=True)
+    finally:
+        shutil.rmtree(wd, ignore_errors=True)
+
+
 def cmd_run(a):
     name = a.process
     cfg = mg.PROCESSES[name]
@@ -199,12 +265,8 @@ def cmd_run(a):
             res["events_returned"] = len(m)
             if a.keep:          # the run's events and banner kept (analysis/catalog_v4/short_run_bias.py run sizes)
                 bs = sorted(glob.glob(f"{ev}/Events/probe/*_banner.txt"))
-                d = os.path.join(a.keep, name)
-                os.makedirs(d, exist_ok=True)
-                kp = os.path.join(d, f"{name}_probe_seed{iseed}_ev{int(a.events)}.npz")
-                np.savez(kp + ".tmp.npz", mom=m, aqcd=aq, banner=np.array(open(bs[0]).read() if bs else ""))
-                os.replace(kp + ".tmp.npz", kp)
-                res["kept_events_file"] = kp
+                res["kept_events_file"] = _keep(a.keep, name, f"{name}_probe_seed{iseed}_ev{int(a.events)}.npz",
+                                                m, aq, open(bs[0]).read() if bs else "")
             res["yield"] = len(m) / a.events
             res.update(kept(m, accept_of(name)))
             k = res.get("kept") or 0.0
@@ -403,6 +465,12 @@ def main():
     s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     s.add_argument("--keep", default=None, help="save the run's events and banner under KEEP/<process>/")
+    s = sub.add_parser("gridpack"); s.add_argument("--process", required=True)
+    s.add_argument("--grid-events", type=int, required=True, help="events of the run whose precision the grid has")
+    s.add_argument("--runs", type=int, required=True); s.add_argument("--events", type=int, default=1000)
+    s.add_argument("--seed-base", type=int, default=0); s.add_argument("--cores", type=int, default=1)
+    s.add_argument("--energy", type=float, default=None); s.add_argument("--keep", default=None)
+    s.add_argument("--work", default=None); s.add_argument("--timeout", type=float, default=1800.0)
     sub.add_parser("node")
     s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)
@@ -412,7 +480,7 @@ def main():
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack}[a.cmd](a)
 
 
 if __name__ == "__main__":

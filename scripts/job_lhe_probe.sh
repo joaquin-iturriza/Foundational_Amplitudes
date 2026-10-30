@@ -25,6 +25,14 @@ if [ "$PROBE_SHARD" = mixcheck ]; then
     python tools/lhe_probe.py runsize --queue ${PROBE_QUEUES:?}
     echo "RUN_SUMMARY lhe_probe mixcheck rc=$?"; exit 0
 fi
+if [ "$PROBE_SHARD" = gridpack ]; then
+    # one gridpack of GP_PROCESS at the precision of a run of GP_GRID events (all cores), then GP_RUNS runs of GP_EVENTS
+    # drawn from it with seeds GP_SEED_BASE+1.. (GP_ENERGY: an e+e- collider energy), kept under PROBE_KEEP/<process>/
+    python tools/lhe_probe.py gridpack --process "${GP_PROCESS:?}" --grid-events "${GP_GRID:?}" --runs "${GP_RUNS:?}" \
+        --events "${GP_EVENTS:?}" --seed-base "${GP_SEED_BASE:-0}" --cores "${SLURM_CPUS_PER_TASK:-1}" \
+        ${GP_ENERGY:+--energy $GP_ENERGY} ${PROBE_KEEP:+--keep $PROBE_KEEP}
+    echo "RUN_SUMMARY lhe_probe gridpack rc=$?"; exit 0
+fi
 if [ "$PROBE_SHARD" = list ]; then
     # explicit runs PROBE_LIST: "process,events,seed[,key=value...]" separated by spaces (a seed written s@E: the
     # e+e- collider energy E) (a run-card variant against

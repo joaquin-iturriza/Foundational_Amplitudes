@@ -35,6 +35,7 @@ COMPLETE = os.path.join(HERE, "data", "complete_runs.json")
 FIG = os.path.join(HERE, "figs", "short_run_bias")
 PART_RE = re.compile(r"^(?P<proc>.+)_(?P<eid>[0-9a-f]{16})_(?P<run>run_\d+)_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
 PROBE_RE = re.compile(r"^(?P<proc>.+)_probe_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
+GPACK_RE = re.compile(r"^(?P<proc>.+)_gpack(?P<grid>\d+)_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
 PREFIXES = ("pp13v4_", "dsh_", "ee4_", "pp13_")
 DEEP = 0.3                  # deep-short: under this fraction of the ask (the hand-off's threshold, open)
 
@@ -67,7 +68,7 @@ def physics_key(banner):
         l = l.split("!")[0].strip()
         if not l or l.startswith("#"):
             continue
-        if re.search(r"=\s*(nevents|iseed|run_tag|second_refine_treshold)\b", l):
+        if re.search(r"=\s*(nevents|iseed|run_tag|second_refine_treshold|gridpack)\b", l):
             continue
         run.append(" ".join(l.split()))
     param = [" ".join(l.split("#")[0].split()) for l in _section(banner, "slha").splitlines()]
@@ -159,6 +160,19 @@ def _samples():
             continue
         out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": int(m["ev"]), "got": got,
                     "seed": int(m["seed"]), "path": f, "kind": "part", "probe": True})
+    # runs drawn from one gridpack (tools/lhe_probe.py gridpack --keep: <process>_gpack<grid iseed>_seed<s>_ev<n>.npz)
+    for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_probe_keep", "*", "*.npz"))):
+        m = GPACK_RE.match(os.path.basename(f))
+        if not m:
+            continue
+        try:
+            got = _npz_len(f)
+            with np.load(f) as z:
+                key = physics_key(str(z["banner"]))
+        except Exception:
+            continue
+        out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": int(m["ev"]), "got": got,
+                    "seed": int(m["seed"]), "path": f, "kind": "part", "gridpack": int(m["grid"])})
     # serial pp13v4 pools of the classes that have parts (their events are in the train pool, shuffled over runs)
     import mg5_pipeline_final as mg
     import datagen
@@ -285,6 +299,8 @@ def cmd_measure(a):
            "pools_short": sum(s["kind"] == "pool" and s["status"] != "complete" for s in S)}
     res = {}
     for (c, key), ss in sorted(groups.items()):
+        gp = [s for s in ss if s.get("gridpack") and s["status"] == "complete"]    # compared only in the ladder below
+        ss = [s for s in ss if not s.get("gridpack")]
         comp = [s for s in ss if s["status"] == "complete"]
         short = [s for s in ss if s["status"] != "complete"]
         deep = [s for s in ss if s["status"] == "deep"]
@@ -342,6 +358,28 @@ def cmd_measure(a):
                                                  detectable_ks_5pct=_detectable(by[ask], by[top]))
             if lad:
                 r["ladder"] = lad
+            # the reference itself: the largest runs split in two by seed (do independent large runs agree?)
+            ts = [F for _, F in sorted(((s["seed"], F) for F, s in zip(Fc, comp) if s["asked"] == top),
+                                       key=lambda t: t[0])]
+            if len(ts) >= 4:
+                r["control_top_halves"] = _compare(ts[0::2], ts[1::2], feats)
+            # runs drawn from one gridpack, per (gridpack, ask), against the same largest runs, and split in two
+            gl, gh = {}, {}
+            for (g, ask) in sorted({(s["gridpack"], s["asked"]) for s in gp}):
+                G = sorted([s for s in gp if s["gridpack"] == g and s["asked"] == ask], key=lambda s: s["seed"])
+                if len(G) < 2:
+                    continue
+                FG = _feats_of(G, per)
+                for f, v in _compare(FG, by[top], feats).items():
+                    gl[f"{ask}/{f}"] = dict(v, ask=ask, gridpack=g, ask_large=top, runs_small=len(G),
+                                            runs_large=len(by[top]), detectable_ks_5pct=_detectable(FG, by[top]))
+                if len(G) >= 4:
+                    for f, v in _compare(FG[0::2], FG[1::2], feats).items():
+                        gh[f"{ask}/{f}"] = v
+            if gl:
+                r["gridpack"] = gl
+            if gh:
+                r["control_gridpack_halves"] = gh
         res[c if c not in res else f"{c}#{key[:6]}"] = r
         print(f"[short_run_bias] {c}: short {n_s} ({len(short)} runs) vs complete {n_c} ({len(comp)} runs): "
               + ", ".join(f"{f} KS {v['ks']} p {v['p']:.2g} p_runs {v.get('p_runs')}"
@@ -366,7 +404,8 @@ def summary(d, alpha=0.05):
     out = {"groups": len(d["groups"])}
     sizes = sorted({k for r in d["groups"].values() for k in r if k.startswith("size_")})
     for kind in ("short_vs_complete", "deep_vs_complete", "control_complete_halves",
-                 "control_complete_small_vs_large", *sizes, "ladder"):
+                 "control_complete_small_vs_large", *sizes, "ladder", "control_top_halves", "gridpack",
+                 "control_gridpack_halves"):
         T = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get(kind) or {}).items() if isinstance(v, dict)]
         R = [(c, f, v) for c, f, v in T if "p_runs" in v]
         out[kind] = {"tests_events": len(T),

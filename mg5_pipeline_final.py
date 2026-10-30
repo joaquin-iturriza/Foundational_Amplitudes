@@ -33,6 +33,7 @@ import math
 import re
 import sys
 import gzip
+import tarfile
 import json
 import time
 import shutil
@@ -4137,10 +4138,55 @@ def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name
         r = subprocess.run([f"{ev}/bin/generate_events", run_name, "-f"], cwd=ev, stdout=log,
                            stderr=subprocess.STDOUT, env=dict(os.environ, OMP_NUM_THREADS="1"))
     lhe = f"{ev}/Events/{run_name}/unweighted_events.lhe.gz"
-    if r.returncode != 0 or not os.path.exists(lhe):
+    gridpack = str((patches or {}).get("gridpack", "")).lower() in ("true", ".true.", "t")
+    if r.returncode != 0 or not (gridpack or os.path.exists(lhe)):
         raise RuntimeError(f"{process}: generate_events exited {r.returncode}, no {lhe}; log {log_path}")
+    if gridpack:                # a gridpack run writes the packed grids, not events (lhe_make_gridpack)
+        lhe = None
     banners = sorted(glob.glob(f"{ev}/Events/{run_name}/*_banner.txt"))
     return lhe, (banners[0] if banners else None)
+
+
+def lhe_make_gridpack(process, ev, nevents, iseed, log_path, mg_cores=1, patches=None, run_name="grid"):
+    """One MadEvent integration of `process` in `ev`, packed as a gridpack (run card gridpack = True): the survey and
+    refine run at the precision of a run of `nevents` events (MadEvent sizes its refine from nevents), once. Small runs
+    are then drawn from it (lhe_run_gridpack), each from the same grids, instead of each small run integrating
+    afresh: complete runs of 150 to 1000 events that integrate on their own differ from complete runs of many
+    (catalog_coverage, docs/results.tex par:v4_short_runs). Returns the gridpack's .tar.gz path."""
+    lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=mg_cores, run_name=run_name,
+                     patches={"gridpack": "True", **(patches or {})})
+    tars = sorted(glob.glob(f"{ev}/{run_name}_gridpack.tar.gz") + glob.glob(f"{ev}/*_gridpack.tar.gz"))
+    if not tars:
+        raise RuntimeError(f"{process}: no gridpack written under {ev}; log {log_path}")
+    return tars[0]
+
+
+def lhe_gridpack_header(lhe_path):
+    """The LHE file's header (everything before the first <event>): the banner of the gridpack's integration, with its
+    process, run and parameter cards (analysis/catalog_v4/short_run_bias.py physics_key)."""
+    opener = gzip.open if str(lhe_path).endswith(".gz") else open
+    out = []
+    with opener(lhe_path, "rt") as f:
+        for line in f:
+            if line.lstrip().startswith("<event"):
+                break
+            out.append(line)
+    return "".join(out)
+
+
+def lhe_run_gridpack(gridpack, work, nevents, seed, log_path, timeout=None):
+    """`nevents` unweighted events drawn from a gridpack (lhe_make_gridpack) with random seed `seed`, in a fresh
+    unpacked copy under `work` (one copy per run, so runs of one gridpack go in parallel). Returns the LHE path."""
+    os.makedirs(work, exist_ok=True)
+    with tarfile.open(gridpack) as t:
+        t.extractall(work)
+    with open(log_path, "a") as log:
+        r = subprocess.run(["bash", "./run.sh", str(int(nevents)), str(int(seed))], cwd=work, stdout=log,
+                           stderr=subprocess.STDOUT, env=dict(os.environ, OMP_NUM_THREADS="1"), timeout=timeout)
+    lhe = os.path.join(work, "events.lhe.gz")
+    if r.returncode != 0 or not os.path.exists(lhe):
+        raise RuntimeError(f"gridpack run.sh {nevents} {seed} exited {r.returncode}, no {lhe}; log {log_path}")
+    return lhe
 
 
 def _lhe_rows(parts, pdg_ids, n_in=2):
