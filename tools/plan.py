@@ -389,6 +389,21 @@ def acked_runs(ids):
     return out
 
 
+def unsorted_runs(ids):
+    """The runs among `ids` the supervisor has not sorted yet (no RUN event), when its run-end sorting is on."""
+    try:
+        import tomllib
+        cfg = tomllib.load(open(os.path.expanduser("~/.config/ccorch/projects.toml"), "rb"))
+        on = ((cfg.get("projects") or {}).get(PROJECT) or {}).get("run_ends", {}).get("enabled")
+    except Exception:
+        on = False
+    c = db()
+    if not on or c is None or not ids:
+        return set()
+    seen = {(k or "").split(":")[0] for (k,) in c.execute("select key from events where kind='RUN'")}
+    return {r for r in ids if r not in seen}
+
+
 def runs_of(e, st):
     """(id, state, finished) of every run of the entry: its recorded runs, its evidence runs and every run filed under
     item == id, read from the whole registry (no row limit)."""
@@ -942,6 +957,10 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
         # a run whose end event was acked with a note naming it was read and handled (by the main session or an
         # agent): demanding a step agent for it again asks for nothing the turn has left to do (2026-10-29)
         handled = acked_runs([r for r, _ in ended])
+        # with the supervisor sorting run ends (switch-over C), a run with no RUN event yet is still being sorted: it
+        # becomes either an ack (clean, planned limit) or an open event (broke), which is the signal; the stop check
+        # separately refuses while the supervisor is not running (2026-10-30)
+        handled |= unsorted_runs([r for r, _ in ended])
         ended = [(r, fin) for r, fin in ended if r not in handled]
         if sweeps is None:
             sweeps = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps_of(st, e["id"]) else {}
