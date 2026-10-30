@@ -2227,6 +2227,12 @@ entries:
     answers_after: '2026-10-30T05:54:44+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-30T11:04:42.181000+00:00'
+    text: I really don't see what's the question here
+    decision: D189
+    answers_after: '2026-10-30T10:50:16+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -2246,37 +2252,10 @@ entries:
   - D174
   - D181
   - D188
-  next:
-    1: 'WAITS ON THE CC CLEANUP: at 20:xx on 2026-10-29 /sps/lpnhe had 0 bytes free (512G of 512G used, df -h via site run);
-      another agent is freeing about 340G. Start only once df shows at least 50G free. Then: collect the pp13v4 regeneration
-      (937 of 992 entries built in all 3 roles at 16:45; read the runs that ended: FA-ccin2p3-8a202730, cbb64480, aa58c232,
-      cc7338ff, 2f4c9828, 708d51d6, 8a6c8b9e, plus the rest of recipes/catalog_v4_pp_rest/ and the 14 high-margin entries
-      in the 8 original part jobs; a full disk may have made any of them fail, so read each log). Any entry short or failed:
-      rerun it with lhe.n_runs instead of a larger margin (catalog_v3_pp_runs precedent), split across the free slots site
-      pick shows. Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio
-      to catalog_v4''s standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density
-      check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
-    6: 'Submit the pure-default bound pair once step 1''s validation passes (every pp13v4 entry built, pp_physics_check ratio
-      0 on every class; at 2026-10-29 step 1 was still collecting the pp13v4 regeneration and pp_physics_check had not been
-      rerun on pp13v4 since 2026-10-26) and the amended design (797 swapped hadronic training classes: 466 pp13v4_ plus 331
-      reused pp13_; PP4 scored on the pp pools'' test split) has passed review: sync once, then scripts/job_catalog_v3_short.sh
-      v4_dimensionless_muon_pp smoke, and v4_dimensionless_muon_pp and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G,
-      --item catalog_coverage, about 1.5 GPU-h each), plus the controls'' read of the pp pools in mode eval (v4_dimensionless_muon
-      and _seed2, V3_AXES=PP4, a fraction of a GPU-h). Still owed before (b) is reported for training classes: a test-split
-      read of the 797 swapped classes'' catalog_v4 smart-mixture pools by the arm and both controls. Control reused: catalog_v4''s
-      Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29), 1068 pools same (control_pool_check.py @c809ca44).'
-    8: 'After the catalog_v4_w3, catalog_v4_default, pp13v4_rest and pp13v4_ddxgg workers end (about 06:05 to 06:50): python
-      tools/lhe_parts.py shortbuilt on CC; every catalog_v4 pool (dsh_, ee4_, pp13v4_) w3 or the old workers assembled from
-      a run short of its ask goes into complete_runs.json and the complete-run layout (recipes regenerated), planned in the
-      same complete-runs queue; then the usual collection (status, failed tasks, mixcheck)'
-    9: 'Gridpack rebuild of the 56 pools (probe result 2026-10-30: yes in all three groups, par:v4_short_runs at commit 044238df
-      on branch gridpack-queue): after repo-reviewer PASS, merge gridpack-queue, site sync ccin2p3 FA, then the generation
-      rule''s probe of the 56 (lhe_probe gridpool-plan --jobs 24: 24 CPU jobs of 16 cores, scripts/job_lhe_probe.sh PROBE_SHARD=gridpool
-      GP_POOLS=<the job''s pools>; it builds every gridpack at its path, which the wave reuses), target recorded before submission;
-      then lhe_probe kept --yields-out over its logs -> analysis/catalog_v4/data/lhe_probe_yields.json (merged with the existing),
-      lhe_parts plan recipes/catalog_v4_default_lhe.yaml recipes/catalog_v4_ee_test.yaml recipes/catalog_v4_pp_parts.yaml
-      --queue $SCRATCH/lhe_queue/catalog_v4_gridpack (new queue, no --skip-claimed: the gridpack layout''s parts have their
-      own names), site queue add, site pick --gpus 0, one wave with its target'
+  - D189
+  next: 'ee4_epem_cgsxwm at 3 TeV: generate its 3 TeV block in smaller runs from the same gridpack, checked against its complete
+    3 TeV runs first (the user: no question; the option that keeps every energy). Also collect catalog_v4_gridpack_last (12
+    pools), remove finished queues, then the mixcheck over all 113'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3440,8 +3419,10 @@ entries:
     searched: the generation rule (2x limit) blocks more runs; the gridpack design fixed the run sizes (200 e+e-), and dropping
       an energy changes the catalog's energy rule [D130]; D187 covers rebuilding the pool, not which of these two
     blocks: ee4_epem_cgsxwm only; the other 112 pools and the mixcheck of those proceed
-    blocks_steps: &id001
+    blocks_steps:
     - 9
+    answered_at: '2026-10-30T11:04:42.112000+00:00'
+    decision: D189
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -4004,32 +3985,6 @@ entries:
       design''s 5-test level. Checks 1, 4, 6, 7 hold. Check 5 searched: gridpack, set_gridpack, run size, short run, complete
       run, madevent in docs/results.tex, the entry''s evidence and dead ends, site decisions --project FA: only par:v4_short_runs
       / fig:v4_run_size and the rebuild dead end, both cited.'
-  step_why:
-    1:
-      feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
-      if:
-      - 'all 992 built and every ratio is 0: redo the pp comparisons on catalog_v4_pp_test.yaml'
-      - 'an entry short again, failed on the full disk, or a nonzero ratio: list it with its cause, fix it, and rerun only
-        that entry'
-    6:
-      feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
-        mixture A/B the user asked for (2026-10-29); waits on step 1's pp13v4 validation
-      if:
-      - 'step 1 validation passed (all 992 built, every ratio 0): submit the smoke and the two seeds afterok on it, plus the
-        controls'' PP4 mode-eval reads'
-      - 'step 1 not yet passed or a class fails it: keep waiting on step 1; a failing class is left out of the arm''s scoring
-        and listed'
-    8:
-      feeds: whether any catalog_v4 MadEvent pool is left built from short runs
-      if:
-      - 'none listed: catalog_v4''s MadEvent pools carry no short-run bias; go on with lhe_probe mixcheck and step 6'
-      - 'pools listed: add them to complete_runs.json with their run size from the run-size result and plan them in the complete-runs
-        queue'
-    9:
-      feeds: how the 56 catalog_v4 pools are rebuilt
-      if:
-      - 'probe yields at least 0.5 on every pool and gridpacks build: plan and submit the wave'
-      - 'a pool''s gridpack fails or yields under 0.5: list it with its log, fix or hold it, wave the rest'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
@@ -4079,14 +4034,6 @@ entries:
     units: null
     start: '2026-10-30T10:44:15+00:00'
     at: '2026-10-30T10:44:15+00:00'
-  ask: 'e+e- -> c sbar g W- (ee4_epem_cgsxwm) at 3 TeV: from one gridpack, even at four times the precision, only 7 of 16
-    runs of 200 events complete; the short ones return 9 to 55 events. Generate its 3 TeV block in smaller runs from the same
-    gridpack (checked against its complete runs first), or drop this pool''s 3 TeV energy?'
-  waiting_since: '2026-10-30T10:50:16+00:00'
-  searched: the generation rule (2x limit) blocks more runs; the gridpack design fixed the run sizes (200 e+e-), and dropping
-    an energy changes the catalog's energy rule [D130]; D187 covers rebuilding the pool, not which of these two
-  blocks: ee4_epem_cgsxwm only; the other 112 pools and the mixcheck of those proceed
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
