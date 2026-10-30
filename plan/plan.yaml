@@ -4566,6 +4566,49 @@ entries:
       CC here. Fix: confirm the pools are present (a read-only listing), or drop XV3 from the smart reads and from the rule.
       Everything else (the statistic R, the bootstrap with the R_seed widening, the PP4 and EE4 win rule at 0.90, the verdict
       rule for mixture_ab.json) can stay as written.'
+  - at: '2026-10-30T17:29:09+00:00'
+    question: 'Steps 11 and 14 (revised after FIX at 17:22: smart-axis rule pooled, XV3 dropped). Step 11: the pure-default
+      bound, v4_dimensionless_muon_pp[_seed2] (recipes/catalog_v4_pp_mixed_train.yaml: 797 hadronic tree classes on pp pools,
+      466 pp13v4_ + 331 reused pp13_ with 0 b and 0 changed diagram counts; the other 356 entries the control''s files). Step
+      14 (D178 priority 1; shares D194 ''Okay, yes to both.''): v4_dimensionless_muon_default50[_seed2] and _default25[_seed2],
+      each tree pool with 0.50 or 0.25 MadEvent unweighted events from the RAMBO bulk, 0.35 flat and 0.15 forward kept (recipes/catalog_v4_default{50,25}_train.yaml,
+      differing from catalog_v4_train.yaml only by f_default and default_source on 912 tree entries). All after the pp13v4
+      validation (step 10) passes.'
+    prior: 'pp-trained arm (catalog_v3) 0.19 on pp events, 0.59 inside coverage (802 of 986 lower), pp_compare.py @d1dec67;
+      catalog_v4 over pp-trained 0.66 against a seed spread of 0.10 trained / 0.14 held out (par v4_vs_pp); density check
+      mixture KL 1.38 -> 1.01, 0.61, 0.37 at f = 0.1, 0.3, 0.5, rank correlation 0.19 (par v4_density); the pp blend proposal
+      (results.tex ~12209, 70/30, 50/50, on hold until the pp pools carried catalog_v4''s physics) and the D167 ask (10%/30%):
+      step 14 is that blend with default sampling on every beam at the shares of D194. No mixture run before.'
+    measure: 'Per class MSE of ln|M|^2 at the best checkpoint (lowest aggregate val_loss_no_reg), tools/zero_shot_parent.py.
+      R = median over classes of arm/control per-class ratio, each side the geometric mean of its two seeds; 95% class-bootstrap
+      interval (10000 resamples) widened on each side by |ln R_seed|, R_seed = control seed 43 over seed 42 median on the
+      same read. Default-sampled reads: PP4 (catalog_v4_pp_test.yaml, test split, 2000 rows, 1301 pools present with sidecars
+      on CC; trained and held-out pp classes apart) and EE4 (catalog_v4_ee_test.yaml, test split, 2000 rows, 169 pools; ee4_epem_cgsxwm
+      out per D193; its diagram sidecars built in the validation job FA before any read). Smart read: catalog_v4''s held-out
+      classes H1..H7c pooled (about 700 classes, val split), each axis also reported as information. XV3 dropped: catalog_v3''s
+      shared held-out pools are deleted on CC (check_site_data: 1665 of 1665 not present). Results and verdict in analysis/catalog_v4/data/mixture_ab.json.'
+    check: 'The PP read moves with the training density on existing data: catalog_v3 pp-trained over window-trained 0.19,
+      0.59 inside coverage; catalog_v4 over pp-trained 0.66 against seed spread 0.10. Noise of R (estimate, normal log ratio):
+      about 1.5% on PP4 (about 800 classes, per-class spread 0.10-0.14 |log10|), 3.3% on EE4 (170), 1.5-2% on the pooled held-out
+      classes (about 700, spread 0.14); a single small axis (H6 8 classes, about 24%) cannot carry a rule.'
+    fixed: 'mu-P LLoCa, dimensionless target, Muon at the search best (lr 0.004997423, muon wd 0.02171863), 4264 steps, batch
+      16384, 1e4 train events per process, seeds 42 and 43, scripts/job_catalog_v3_short.sh at one commit, --hdr=--mem=48G,
+      CC-IN2P3; only the training recipe differs; reads on the same events with the same scorer. Arms train on new pool draws
+      while the control''s seed pair holds data fixed: the class bootstrap carries per-class draw variation, the R_seed widening
+      the seed shift.'
+    control: v4_dimensionless_muon (FA-ccin2p3-339ec100) and _seed2 (FA-ccin2p3-380842ed), reused, re-read in mode eval on
+      PP4 and EE4 (V3_AXES='PP4 EE4'); their held-out reads exist.
+    seeds: '2 per arm (42, 43). Cost: one smoke 0.2 GPU-h; 6 trainings about 1.5 GPU-h each = 9; two control eval reads about
+      0.3 each: about 10 GPU-h, under 30 (D194 covers step 14''s 6).'
+    outcome: 'Fixed before any read. Smallest gain worth acting on: 10% on default-sampled events (R = 0.90); smallest loss
+      worth acting on: 5% on the smart held-out classes (R = 1.05). Step 11 (bound), PP4 trained classes: YES R <= 0.90 with
+      the widened interval below 1; NO R >= 0.97 or interval contains 1; between = small gain with its interval; held-out
+      cost reported (expected). Step 14 per share: GAIN when R <= 0.90 with the widened interval below 1 on PP4 and on EE4;
+      NO LOSS when the pooled held-out widened interval''s upper end is below 1.05; LOSS when the pooled R >= 1.05 with the
+      widened interval above 1; otherwise the cost is undecided. A share WINS on GAIN and NO LOSS. Verdict in mixture_ab.json:
+      one winner -> it; both -> 0.25 unless 0.50''s PP4 and EE4 intervals both lie below 0.25''s R (then 0.50); the winner
+      becomes catalog_v4''s mixture, pools rebuilt at it. No winner: ''keep the current mixture'' if no share has GAIN; ''trade-off''
+      if a share has GAIN with LOSS or an undecided cost, numbers to Joaquin with the bound beside them.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
