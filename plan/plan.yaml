@@ -4807,6 +4807,18 @@ entries:
       were set aside (moved, nothing deleted) and so dropped; the replacement''s banner shadowed the set-aside one. Fixed
       in b9a2ceb8 (samples as at a time, set-aside versions with their own asks, banner and stamp; cutoff search per measurement);
       re-read rerun as FA-ccin2p3-44201039.'
+  - at: '2026-10-30T18:21:24+00:00'
+    text: 'Steps 11+14 resubmission (18:19 UTC): the three afterok arms FA-ccin2p3-667d0fab (pp), be23ef63 (pp_seed2), b76e1941
+      (default50) were cancelled unstarted (scancel 62884394/98/401) because they were submitted at the job script''s default
+      8 h limit (24 GPU-h in the site gate''s 60-min window against a real need of 2.5 h each); resubmitted at --hdr=--time=02:30:00,
+      afterok on the smoke FA-ccin2p3-26d1ad63 (slurm 62884376, its own limit 1 h, left as is): v4_dimensionless_muon_pp FA-ccin2p3-ac229894;
+      controls'' PP4+EE4 mode-eval reads at 1 h: v4_dimensionless_muon FA-ccin2p3-cfae8890, _seed2 FA-ccin2p3-db4afd3f. Refused
+      by the site gate (31-32 GPU-h in the last 60 min, limit 30): pp_seed2, default50, default50_seed2, default25, default25_seed2.
+      Cause: the gate''s unstarted_at reads ''sacct -S <start>'', which on CC-IN2P3 omits jobs cancelled while pending (they
+      appear only with ''-E now -s CA''), so the cancelled 8 h arms still count until 19:10 UTC; the gate fix (~/.local/bin/site_gate.py)
+      was refused to this agent by the permission classifier. The five refused go through the launch queue (site launch catalog_coverage_step11_pp_seed2
+      under D127, catalog_coverage_step14_rest under D194), ready at 19:11:20 UTC, same flags, afterok 62884376. Batch target
+      steps11_14_arms_resubmit: 2.5 h, 8 jobs.'
   handoff:
     state: 'Step 10 PASSED (FA-ccin2p3-f8d114ce: v4_same_function 1301/1301 classes, max |ln v4/label| 8.3e-12; ee4_ sidecars
       170 ok; the only ee4 test pool missing is ee4_epem_cgsxwm, dropped by D193 and left out by the EE4 axis; the 341 ''not
