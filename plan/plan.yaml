@@ -3458,7 +3458,6 @@ entries:
       - 'tasks failed or pools short: list them with their cause, fix and requeue only those, then collect again'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
-    '1': the user's stop on all work (2026-10-29)
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
