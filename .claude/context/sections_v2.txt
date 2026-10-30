@@ -78,6 +78,10 @@ site digest --project P            since the user last looked: calls for them, f
 - New work: the user's words, `site decide`, `site item add`, then submit. On the site, sbatch and condor_submit refuse
   without an item; a project's own submitters (FA: `siteconf.work_gate`) refuse anything outside the named items'
   globs or inside a held one.
+- The GPU budget lives in the same site-side gate, so every GPU job counts whatever submits it (`site submit`, launch
+  scripts, sweep_manager, generators): wall time × GPUs × jobs, summed over the named items' jobs of the last 60 min
+  on every site, is refused above 30 GPU-h (10 on Jean Zay) unless the item's recorded estimate (`site item set
+  --est-gpu-hours`, from the user's words) covers it. The laptop's submit_guard is the early warning.
 
 The supervisor does the mechanical work, with no model, every 20 min:
 - runs the project's `maintain` commands (FA: the CC feeder, the rebalancer over `tp3_`, the disk watch), each active

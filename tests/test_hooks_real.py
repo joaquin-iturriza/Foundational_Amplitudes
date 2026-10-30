@@ -1107,13 +1107,273 @@ def run_end_markers():
              and js == {"rc": 0, "steps": 8000}, (got, js))
 
 
+# ------------------------------------------------------------------ (b) the GPU budget at the site's submission gate
+SHIM = r'''#!/usr/bin/env python3
+"""`site` for the tests: the live ~/.local/bin/site with its ssh replaced by a local bash in a scratch HOME (the
+"site" is a directory of this machine), sync a no-op and `pick` a fixed plan. Everything else is the real code."""
+import importlib.machinery, importlib.util, os, subprocess, sys
+loader = importlib.machinery.SourceFileLoader("site_tool", "SITE_PATH")
+spec = importlib.util.spec_from_loader("site_tool", loader)
+m = importlib.util.module_from_spec(spec)
+loader.exec_module(m)
+FAKEBIN = os.environ["BUDGET_FAKEBIN"]
+def run_ssh(sc, inner, timeout=120, **k):
+    env = dict(os.environ, PATH=FAKEBIN + ":" + os.environ["PATH"])
+    p = subprocess.run(["bash", "-c", inner], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
+                       timeout=timeout)
+    return p.returncode, p.stdout.decode("utf-8", "replace")
+m.run_ssh = run_ssh
+m.cmd_sync = lambda a: None
+if sys.argv[1:2] == ["pick"]:
+    only = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else "ccin2p3"
+    n = sys.argv[sys.argv.index("--jobs") + 1] if "--jobs" in sys.argv else "1"
+    print("    %s %s jobs  (test plan)" % (only, n))
+    sys.exit(0)
+sys.argv[0] = "site"
+m.main()
+'''
+FAKE_SBATCH = r'''#!/bin/sh
+d=$(dirname "$0"); n=$(( $(cat "$d/n" 2>/dev/null || echo 1000) + 1 )); echo $n > "$d/n"
+echo "sbatch $*" >> "$d/submitted.log"; echo "$n"
+'''
+FAKE_CONDOR = r'''#!/bin/sh
+d=$(dirname "$0"); n=$(( $(cat "$d/n" 2>/dev/null || echo 1000) + 1 )); echo $n > "$d/n"
+echo "condor_submit $*" >> "$d/submitted.log"; echo "Submitting job(s)."; echo "1 job(s) submitted to cluster $n."
+'''
+
+
+# the site tool under test: the live one, or a staged copy before it is applied (SITE_TOOL=...)
+SITE_TOOL = os.environ.get("SITE_TOOL") or os.path.expanduser("~/.local/bin/site")
+
+
+class SiteBox:
+    """a scratch HOME with the ledger, FA registered, the three sites as local directories (each a view of this
+    checkout), fake schedulers that only log, and the `site` shim first on PATH."""
+
+    def __init__(self):
+        self.d = tempfile.mkdtemp(prefix="budget_")
+        j = lambda *x: os.path.join(self.d, *x)
+        self.home, self.bin, self.fake = j("home"), j("bin"), j("fakebin")
+        for x in (self.bin, self.fake, os.path.join(self.home, ".config", "ccorch"),
+                  os.path.join(self.home, ".local", "share", "ccorch", "launch", "FA")):
+            os.makedirs(x)
+        import tomllib
+        real = tomllib.load(open(os.path.expanduser("~/.config/ccorch/sites.toml"), "rb"))
+        txt = open(os.path.expanduser("~/.config/ccorch/sites.toml")).read()
+        for name, sc in real["sites"].items():
+            root = j("remote", name)
+            os.makedirs(root)
+            view = os.path.join(root, "Foundational_Amplitudes")
+            os.makedirs(os.path.join(view, ".venv", "bin"))
+            for e in os.listdir(ROOT):
+                if e not in (".venv", ".venv-cpu"):
+                    os.symlink(os.path.join(ROOT, e), os.path.join(view, e))
+            open(os.path.join(view, ".venv", "bin", "activate"), "w").write(
+                'export PATH="%s:$PATH"\n' % os.path.dirname(sys.executable))
+            txt = txt.replace('root         = "%s"' % sc["root"], 'root         = "%s"' % root)
+            if sc.get("submit_root"):
+                os.makedirs(j("afs", name))
+                txt = txt.replace('submit_root  = "%s"' % sc["submit_root"], 'submit_root  = "%s"' % j("afs", name))
+        open(os.path.join(self.home, ".config", "ccorch", "sites.toml"), "w").write(txt)
+        open(os.path.join(self.home, ".config", "ccorch", "projects.toml"), "w").write(
+            '[projects.FA]\nlocal = "%s"\nbranch = "trunk"\nremote_name = "Foundational_Amplitudes"\nledger = true\n'
+            % ROOT)
+        open(os.path.join(self.bin, "site"), "w").write(SHIM.replace("#!/usr/bin/env python3", "#!" + sys.executable)
+                                                .replace("SITE_PATH", SITE_TOOL))
+        for name, body in (("sbatch", FAKE_SBATCH), ("condor_submit", FAKE_CONDOR), ("squeue", "#!/bin/sh\n"),
+                           ("scontrol", "#!/bin/sh\n"), ("sacct", "#!/bin/sh\n")):
+            open(os.path.join(self.fake, name), "w").write(body)
+        for p in [os.path.join(self.bin, "site")] + [os.path.join(self.fake, x) for x in os.listdir(self.fake)]:
+            os.chmod(p, 0o755)
+        self.env = dict(os.environ, HOME=self.home, BUDGET_FAKEBIN=self.fake,
+                        PATH=self.bin + ":" + os.environ["PATH"])
+        self.env.pop("CCORCH_WORK", None)
+        self.site("items")                                     # creates the ledger's tables
+
+    def site(self, *a, env=None):
+        return subprocess.run(["site"] + list(a), capture_output=True, text=True, env=dict(self.env, **(env or {})),
+                              cwd=ROOT, timeout=600)
+
+    def item(self, iid, est=None, match="*"):
+        c = sqlite3.connect(os.path.join(self.home, ".local", "share", "ccorch", "runs.db"))
+        c.execute("INSERT INTO items (project,id,title,decision,scope,est_gpu_hours,match,status,created,updated) "
+                  "VALUES ('FA',?,?,'D1','test',?,?,'active',1,1)", (iid, iid, est, match))
+        c.commit()
+
+    def submitted(self):
+        p = os.path.join(self.fake, "submitted.log")
+        return open(p).read().splitlines() if os.path.exists(p) else []
+
+    def window(self, site=None):
+        c = sqlite3.connect(os.path.join(self.home, ".local", "share", "ccorch", "runs.db"))
+        return [dict(zip(("site", "items", "gpu_h"), r)) for r in
+                c.execute("SELECT site, items, gpu_h FROM gpu_window ORDER BY rowid")]
+
+    def site_window(self):
+        p = os.path.join(self.home, ".ccorch", "gpu_window.jsonl")
+        return [json.loads(l) for l in open(p)] if os.path.exists(p) else []
+
+
+def budget_gate_reading():
+    """the gate's reading of a job's GPU-hours (site_gate.py, wall time x GPUs x jobs), on the forms our scripts and
+    the schedulers use."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("site_gate", os.path.join(os.path.dirname(os.path.realpath(
+        os.path.expanduser("~/.local/bin/site"))), "site_gate.py"))
+    g = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(g)
+    d = tempfile.mkdtemp(prefix="gate_")
+    sc = os.path.join(d, "job.sh")
+    open(sc, "w").write("#!/bin/bash\n#SBATCH --time=02:00:00\n#SBATCH --gres=gpu:1\necho x\n#SBATCH --gres=gpu:8\n")
+    sub = os.path.join(d, "j.sub")
+    cases = [
+        ("sbatch script header (2 h, gres gpu:1; a #SBATCH after the first command is ignored)", "sbatch", [sc], 2.0),
+        ("command line beats the header (--time=30, --gpus=2)", "sbatch", ["--time=30", "--gpus=2", sc], 1.0),
+        ("array 0-15%4", "sbatch", ["--array=0-15%4", sc], 32.0),
+        ("array 1,3,5-9:2 -t 1-00:00:00", "sbatch", ["-a", "1,3,5-9:2", "-t", "1-00:00:00", sc], 24.0 * 5),
+        ("--gpus-per-node=4 --nodes=2 --time=1:00:00", "sbatch", ["--gpus-per-node=4", "--nodes=2", "--time=1:00:00",
+                                                                  "--wrap", "x"], 8.0),
+        ("typed gres gpu:a100:2 with --nice and --dependency", "sbatch", ["--nice=100", "--dependency=afterok:1",
+                                                                         "--gres=gpu:a100:2", sc], 4.0),
+        ("--test-only submits nothing", "sbatch", ["--test-only", sc], 0.0),
+        ("CPU job", "sbatch", ["--time=10:00:00", "--wrap", "true"], 0.0),
+    ]
+    for name, cmd, args, want in cases:
+        got = g.gpu_hours(cmd, args, {})[0]
+        scenario("(b) gate reading: %s -> %g GPU-h" % (name, want), abs(got - want) < 1e-6, got)
+    for name, text, want in [
+            ("queue 5, workday", 'request_gpus = 1\n+JobFlavour = "workday"\nqueue 5\n', 40.0),
+            ("queue in (a, b, c), +MaxRuntime 7200, 2 GPUs", "request_gpus = 2\n+MaxRuntime = 7200\nqueue x in (a, b, c)\n",
+             12.0),
+            ("queue x from ( three lines ), espresso default", "request_gpus = 1\nqueue x from (\n a\n b\n c\n)\n", 1.0),
+            ("no request_gpus", "request_cpus = 4\nqueue 100\n", 0.0)]:
+        open(sub, "w").write(text)
+        got = g.gpu_hours("condor_submit", [sub], {})[0]
+        scenario("(b) gate reading, condor: %s -> %g GPU-h" % (name, want), abs(got - want) < 1e-6, got)
+    try:
+        g.gpu_hours("sbatch", ["--time=UNLIMITED", "--gpus=1", "--wrap", "x"], {})
+        ok = False
+    except g.Unreadable:
+        ok = True
+    scenario("(b) gate reading: an unreadable GPU job's time raises (the gate then refuses it)", ok)
+
+
+def budget_gate():
+    """Joaquin 2026-10-30 ("I see no reason to keep doing this wrongly"): the GPU budget at the site's submission gate,
+    which every sbatch / condor_submit of a `site run` or `site submit` passes, so launch scripts, sweep_manager and
+    generators count too. Live site tool and gate (~/.local/bin/site, site_gate.py); the sites are local directories,
+    the schedulers fakes that only log."""
+    # 1. a launch script submitting 8 jobs: scripts/launch_het_shared.sh (8 cells, job_het_delta.sh: 1 GPU, 3 h)
+    b = SiteBox()
+    b.item("het_test")
+    jobs = os.path.join(b.d, "jobs8.txt")
+    open(jobs, "w").write("".join("3 cellA%d cellB%d\n" % (k, k) for k in range(8)))
+    r = subprocess.run(["bash", os.path.join(ROOT, "scripts", "launch_het_shared.sh")], capture_output=True, text=True,
+                       env=dict(b.env, JOBS=jobs, ITEM="het_test"), cwd=ROOT, timeout=900)
+    sub, win = b.submitted(), b.window()
+    scenario("(b) a launch script submitting 8 jobs (launch_het_shared.sh, 8 x 1 GPU x 3 h = 24 GPU-h): all 8 pass the "
+             "gate and each is counted (site-side window and the laptop's gpu_window)",
+             r.returncode == 0 and "submitted 8, left 0" in r.stdout and len(sub) == 8
+             and len(win) == 8 and abs(sum(w["gpu_h"] for w in win) - 24) < 1e-6 and len(b.site_window()) == 8,
+             (r.returncode, r.stdout[-1500:], r.stderr[-800:], sub, win))
+    jobs2 = os.path.join(b.d, "jobs8b.txt")
+    open(jobs2, "w").write("".join("3 cellC%d cellD%d\n" % (k, k) for k in range(8)))
+    r = subprocess.run(["bash", os.path.join(ROOT, "scripts", "launch_het_shared.sh")], capture_output=True, text=True,
+                       env=dict(b.env, JOBS=jobs2, ITEM="het_test"), cwd=ROOT, timeout=900)
+    scenario("(b) the same launch script again within the hour (8 more): 2 pass (30 GPU-h), the 3rd is refused at 33 "
+             "GPU-h by the site's gate, the script keeps the 6 for a later pass (exit 75)",
+             r.returncode == 75 and "submitted 2, left 6" in r.stdout and len(b.submitted()) == 10
+             and "site gate: sbatch refused" in r.stdout + r.stderr and "33.0 GPU-h for het_test" in r.stdout + r.stderr,
+             (r.returncode, r.stdout[-2000:], r.stderr[-800:]))
+
+    # 2. a sweep_manager submission through `site run`: 10 trials x 1 GPU x 4 h
+    def sweep(name, n=10, time_="04:00:00"):
+        d = os.path.join(b.d, "sweeps", name, "jobs")
+        os.makedirs(d)
+        for k in range(n):
+            open(os.path.join(d, "trial_%04d.sh" % k), "w").write(
+                "#!/bin/bash\n#SBATCH --job-name=%s_%d\n#SBATCH --time=%s\n#SBATCH --gres=gpu:1\n"
+                "#SBATCH --cpus-per-task=4\necho train\n" % (name, k, time_))
+        return os.path.dirname(d)
+    b = SiteBox()
+    b.item("hpo_test", match="hpo_test")
+    sd = sweep("hpo_test")
+    r = b.site("run", "--item", "hpo_test", "ccin2p3", "FA", "--", "python", "sweep/sweep_manager.py", "submit", sd,
+               "--seq-batches", "1")
+    sub = b.submitted()
+    scenario("(b) a sweep_manager submission (`site run --item ... sweep_manager.py submit`, 10 trials x 1 GPU x 4 h = "
+             "40 GPU-h, no estimate recorded): 7 go in (28 GPU-h), the 8th is refused by the gate (32 > 30), and the "
+             "laptop's ledger records the 7", len(sub) == 7 and "site gate: sbatch refused" in r.stdout
+             and "32.0 GPU-h for hpo_test" in r.stdout and len(b.window()) == 7 and r.returncode != 0,
+             (r.returncode, r.stdout[-2500:], r.stderr[-800:], sub))
+    b.item("hpo_cov", est=45, match="hpo_cov")
+    sd = sweep("hpo_cov")
+    r = b.site("run", "--item", "hpo_cov", "ccin2p3", "FA", "--", "python", "sweep/sweep_manager.py", "submit", sd,
+               "--seq-batches", "1")
+    scenario("(b) the same sweep under an item whose recorded estimate is 45 GPU-h: all 10 trials go in (40 GPU-h, "
+             "over 30 but covered)", r.returncode == 0 and len(b.submitted()) == 17 and "refused" not in r.stdout,
+             (r.returncode, r.stdout[-2000:], r.stderr[-800:]))
+
+    # 3. a single small job: scripts/job_probe.sh (1 GPU, 10 min)
+    b = SiteBox()
+    b.item("probe_test")
+    r = b.site("submit", "ccin2p3", "FA", "scripts/job_probe.sh", "--item", "probe_test", "--est-gpu-hours", "0.2")
+    win = b.window()
+    scenario("(b) a single small job (`site submit` of job_probe.sh, 1 GPU x 10 min): passes the gate, its run is "
+             "registered, 0.17 GPU-h counted", r.returncode == 0 and "run FA-ccin2p3-" in r.stdout and len(win) == 1
+             and abs(win[0]["gpu_h"] - 1 / 6.0) < 1e-3, (r.returncode, r.stdout[-1500:], r.stderr[-800:], win))
+    r = b.site("run", "--item", "probe_test", "ccin2p3", "FA", "--", "sbatch", "--parsable", "--partition=cpu",
+               "--time=10:00:00", "--wrap", "true")
+    scenario("(b) a CPU job (sbatch --wrap with no GPU, 10 h) passes and counts 0", r.returncode == 0
+             and len(b.window()) == 1, (r.returncode, r.stdout[-800:]))
+    r = b.site("run", "ccin2p3", "FA", "--", "true")
+    os.makedirs(os.path.join(b.home, ".ccorch", "bin"), exist_ok=True)
+    r = subprocess.run(["bash", "-c", "export PATH=$HOME/.ccorch/bin:%s:$PATH; sbatch --gres=gpu:1 x.sh" % b.fake],
+                       capture_output=True, text=True, env=b.env)
+    scenario("(b) a submission on the site with no work item named is still refused by the wrapper",
+             r.returncode != 0 and "no work item named" in r.stderr, (r.returncode, r.stderr))
+
+    # 4. over the limit, covered by the item's estimate; and the same without one, Jean Zay, another site
+    b = SiteBox()
+    b.item("big_est", est=40)
+    b.item("big_none")
+    rcs = {}
+    for iid in ("big_est", "big_none"):
+        rcs[iid] = [b.site("submit", "ccin2p3", "FA", "scripts/job_het_delta.sh", "--item", iid, "--est-gpu-hours",
+                           "12", "--hdr=--time=12:00:00").returncode for _ in range(3)]
+    scenario("(b) over the limit, covered by the item's estimate: 3 x 12 GPU-h = 36 for an item recorded at 40 all go "
+             "in; for an item with no estimate the third (36 > 30) is refused",
+             rcs["big_est"] == [0, 0, 0] and rcs["big_none"][:2] == [0, 0] and rcs["big_none"][2] != 0, rcs)
+    b = SiteBox()
+    b.item("jz_test")
+    r = [b.site("submit", "jeanzay", "FA", "scripts/job_het_delta.sh", "--item", "jz_test", "--est-gpu-hours", "3")
+         for _ in range(4)]
+    scenario("(b) Jean Zay: 4 x 3 GPU-h, the 4th (12 > 10 there) is refused", [x.returncode for x in r][:3] == [0, 0, 0] and r[3].returncode != 0
+             and "limit 10 there" in r[3].stdout + r[3].stderr, [(x.returncode, x.stdout[-400:], x.stderr[-400:]) for x in r])
+    b = SiteBox()
+    b.item("x_site")
+    for _ in range(8):
+        b.site("submit", "ccin2p3", "FA", "scripts/job_het_delta.sh", "--item", "x_site", "--est-gpu-hours", "3")
+    r = b.site("submit", "lxplus", "FA", "scripts/job_het_delta.sh", "--item", "x_site", "--est-gpu-hours", "8")
+    scenario("(b) the window spans sites: 24 GPU-h on CC-IN2P3, then a condor job on lxplus (1 GPU, workday = 8 h) is "
+             "refused at 32 (24 elsewhere)", r.returncode != 0 and "24.0 elsewhere" in r.stdout + r.stderr
+             and len(b.submitted()) == 8, (r.returncode, r.stdout[-1200:], b.submitted()[-2:]))
+    b = SiteBox()
+    b.item("x_lx")
+    r = b.site("submit", "lxplus", "FA", "scripts/job_het_delta.sh", "--item", "x_lx", "--est-gpu-hours", "8")
+    scenario("(b) condor on lxplus: the gate reads the submit file (request_gpus 1, +JobFlavour workday: 8 GPU-h)",
+             r.returncode == 0 and [w["gpu_h"] for w in b.window()] == [8.0], (r.returncode, r.stdout[-1200:],
+                                                                                b.window()))
+
+
 GROUPS = {"fixtures": fixtures, "incident_tool": incident_tool, "dispatcher": dispatcher,
           "switch_a": switch_a, "scenarios_via_dispatch": scenarios_via_dispatch,
           "stop_events_replay": stop_events_replay, "stop_acked_runs": stop_acked_runs,
           "stop_conditions": stop_conditions, "stop_opener": stop_opener, "submit_replay": submit_replay,
           "submit_budget": submit_budget, "submit_scenarios": submit_scenarios, "review_merged": review_merged,
           "review_modes": review_modes, "review_paths": review_paths, "review_before_merge": review_before_merge,
-          "attribution": attribution, "guards_selftest": guards_selftest, "run_end_markers": run_end_markers}
+          "attribution": attribution, "guards_selftest": guards_selftest, "run_end_markers": run_end_markers,
+          "budget_gate_reading": budget_gate_reading, "budget_gate": budget_gate}
 
 
 def main(argv):
