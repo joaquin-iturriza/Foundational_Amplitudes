@@ -2870,6 +2870,11 @@ entries:
       checked: recipe ids match the sidecars at seed 42), own margins of 1.25 x the shortfall, and a local b-mass check against
       the parent in gen_catalog_v4_pp.py'
     at: '2026-10-29T15:43:36+00:00'
+  - tried: 'rebuild design of 2026-10-30: 56 pools straight into runs of 1000/621/200/150 events with only complete runs assembled'
+    why: 'design review FIX: it changes the run size as well as completeness, and the run-size effect was untested (the size
+      control had too few small runs, detectable KS 0.018 to 0.07 against effects of 0.015 to 0.029); the three held pools
+      wait on exactly that question. Replaced by the run-size measurement (20 probe jobs) before any rebuild'
+    at: '2026-10-30T04:43:25+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
