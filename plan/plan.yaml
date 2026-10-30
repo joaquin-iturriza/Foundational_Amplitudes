@@ -4706,6 +4706,12 @@ entries:
     units: null
     start: '2026-10-30T18:17:54+00:00'
     at: '2026-10-30T18:17:54+00:00'
+  - batch: steps11_14_after_E3058
+    wall_h: 2.5
+    jobs: 9
+    units: null
+    start: '2026-10-30T21:59:41+00:00'
+    at: '2026-10-30T21:59:41+00:00'
   step_why:
     11:
       feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
