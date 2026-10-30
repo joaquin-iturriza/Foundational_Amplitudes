@@ -326,13 +326,13 @@ def cmd_measure(a):
             if lg and len(sm) >= 2:
                 r[f"size_{ask}"] = dict(_compare(sm, lg, feats), runs_small=len(sm), runs_large=len(lg),
                                         detectable_ks_5pct=_detectable(sm, lg))
-        # size ladder: complete runs of each ask against those of the group's largest ask (2+ runs a side), so a size
+        # size ladder: complete runs of each ask against those of the group's largest ask that has 2+ runs, so a size
         # is tested against the largest runs alone rather than a mix of large sizes; keyed "<ask>/<feature>"
         by = {}
         for F, s in zip(Fc, comp):
             by.setdefault(s["asked"], []).append(F)
-        top = max(by) if by else None
-        if top and len(by[top]) >= 2:
+        top = max((a for a in by if len(by[a]) >= 2), default=None)   # the largest ask with 2+ runs
+        if top:
             lad = {}
             for ask in sorted(by):
                 if ask < top and len(by[ask]) >= 2:
