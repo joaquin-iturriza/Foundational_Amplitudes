@@ -2272,6 +2272,14 @@ entries:
       tools/lhe_parts.py shortbuilt on CC; every catalog_v4 pool (dsh_, ee4_, pp13v4_) w3 or the old workers assembled from
       a run short of its ask goes into complete_runs.json and the complete-run layout (recipes regenerated), planned in the
       same complete-runs queue; then the usual collection (status, failed tasks, mixcheck)'
+    9: 'Gridpack rebuild of the 56 pools (probe result 2026-10-30: yes in all three groups, par:v4_short_runs at commit 044238df
+      on branch gridpack-queue): after repo-reviewer PASS, merge gridpack-queue, site sync ccin2p3 FA, then the generation
+      rule''s probe of the 56 (lhe_probe gridpool-plan --jobs 24: 24 CPU jobs of 16 cores, scripts/job_lhe_probe.sh PROBE_SHARD=gridpool
+      GP_POOLS=<the job''s pools>; it builds every gridpack at its path, which the wave reuses), target recorded before submission;
+      then lhe_probe kept --yields-out over its logs -> analysis/catalog_v4/data/lhe_probe_yields.json (merged with the existing),
+      lhe_parts plan recipes/catalog_v4_default_lhe.yaml recipes/catalog_v4_ee_test.yaml recipes/catalog_v4_pp_parts.yaml
+      --queue $SCRATCH/lhe_queue/catalog_v4_gridpack (new queue, no --skip-claimed: the gridpack layout''s parts have their
+      own names), site queue add, site pick --gpus 0, one wave with its target'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3916,6 +3924,11 @@ entries:
       - 'none listed: catalog_v4''s MadEvent pools carry no short-run bias; go on with lhe_probe mixcheck and step 6'
       - 'pools listed: add them to complete_runs.json with their run size from the run-size result and plan them in the complete-runs
         queue'
+    9:
+      feeds: how the 56 catalog_v4 pools are rebuilt
+      if:
+      - 'probe yields at least 0.5 on every pool and gridpacks build: plan and submit the wave'
+      - 'a pool''s gridpack fails or yields under 0.5: list it with its log, fix or hold it, wave the rest'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
