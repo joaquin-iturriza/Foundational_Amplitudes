@@ -4232,6 +4232,32 @@ entries:
       Searched results.tex, the plan and site decisions for ximprove, max_iter, max_event_in_iter, gridrun, sde_strategy,
       hard_survey, cgsxwm, gridpack: no earlier probe of these limits. D187-D189 (keep every energy, regenerate correctly)
       are answered.'
+  - at: '2026-10-30T13:33:38+00:00'
+    question: Do the run-level verdicts of par:v4_short_runs (short runs biased; per-run-integrated complete runs of 1000/150/200
+      differ from runs of many; gridpack runs agree with large runs; cgsxwm 3 TeV smaller runs differ from runs of 200) stand
+      when the run-level permutation p holds its level with units of unequal size (run_perm fix cdcae2cd)? Eval-only re-read
+      of committed measurements, CPU only, 0 GPU-h.
+    prior: 'par:v4_short_runs in docs/results.tex: short vs complete 4 of 32 run-level tests under Bonferroni, 10 under 0.05
+      (short_run_bias.json @a73a07af); ladder 7 of 16 under 0.05/16 (short_run_bias_size.json @44b2eeb3); gridpack 0 of 5
+      primary (short_run_bias_gpack.json @c2e4f0f1); cgsxwm sizecheck no size passes (cgsxwm_sizecheck.json @070e10c8). Finding
+      2026-10-30 (this entry): run_perm''s p too small with unequal unit sizes. No prior re-read.'
+    measure: 'Per committed test: run-level p_runs before (committed JSON) and after (re-run, scaled statistic), and each
+      verdict count (short_run_bias.py summary / sizesummary on old and new); short_run_bias.py reread lists them.'
+    check: 'On iid events, 66 runs of 1000 vs 18 of 555: old test 0.19 of 150 under 0.05, scaled 0.04 (tests/test_run_perm_calibration.py);
+      on the 8 multi-run default-share pools the old p sat below the event p in 24 of 24, scaled in 15 of 24, with equal-size
+      null splits unchanged; cgsxwm sizecheck re-run on the login node (runs of 100 vs 200: p 0.028 -> 0.0375), so the measure
+      moves with the change.'
+    fixed: Same files (measure --before the commit time of each committed JSON; the re-read is valid only where every event-level
+      KS reproduces exactly), same groups, caps (200000), bins (50), 2000 relabellings with seed 0, same features; code differs
+      only in run_perm's scaling and the --before filter.
+    control: The event-level KS of every test must reproduce bit for bit (reread event_ks_differ = 0); the complete-halves
+      controls (equal-size units) must keep their p; the scaled test's calibration on iid events.
+    seeds: 'Deterministic: the subsample seeds and the relabelling seed (0) of the committed measurements; no new seeds.'
+    outcome: 'YES (verdicts stand): every count of the paragraph (32/4/10, 30/6/13, 16/7, gridpack 0/5, cgsxwm no size passing)
+      unchanged or moved within the same verdict -> note the re-read in the paragraph with the new numbers. NO: a verdict
+      flips (e.g. short-vs-complete no longer significant, or the ladder at 1000 agrees) -> rewrite the paragraph and its
+      hand-off, and state whether the 113-pool gridpack rebuild was needed. INVALID: event KS not reproduced for a file ->
+      that file''s re-read is reported as not done, with which files changed since.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
