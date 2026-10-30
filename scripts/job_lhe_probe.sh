@@ -35,8 +35,11 @@ if [ "$PROBE_SHARD" = gridpack ]; then
 fi
 if [ "$PROBE_SHARD" = gridpool ]; then
     # lhe.gridpack pools GP_POOLS (space separated), one after the other: each gridpack built at its path as the queue
-    # builds it (all cores), then GP_RUNS probe runs of the pool's run size drawn from it, all cores at a time
-    python tools/lhe_probe.py gridpool --process ${GP_POOLS:?} --runs "${GP_RUNS:-16}" --cores "${SLURM_CPUS_PER_TASK:-1}"
+    # builds it (all cores), then GP_RUNS probe runs of the pool's run size drawn from it, all cores at a time; a run-size
+    # probe sets GP_EVENTS (run size), GP_ENERGY (one e+e- energy), GP_SEED_BASE and PROBE_KEEP (runs kept for sizecheck)
+    python tools/lhe_probe.py gridpool --process ${GP_POOLS:?} --runs "${GP_RUNS:-16}" --cores "${SLURM_CPUS_PER_TASK:-1}" \
+        ${GP_EVENTS:+--events $GP_EVENTS} ${GP_ENERGY:+--energy $GP_ENERGY} ${GP_SEED_BASE:+--seed-base $GP_SEED_BASE} \
+        ${PROBE_KEEP:+--keep $PROBE_KEEP}
     echo "RUN_SUMMARY lhe_probe gridpool rc=$?"; exit 0
 fi
 if [ "$PROBE_SHARD" = list ]; then
