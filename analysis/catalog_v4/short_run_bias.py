@@ -233,11 +233,17 @@ def _detectable(X, Y):
     return round(1.358 * ((n + m) / (n * m)) ** 0.5, 4)
 
 
-def _binned_ks(H, a, b):
-    """KS distance of the pooled bin counts of units `a` against units `b` (H: units x bins)."""
+def _binned_ks(H, a, b, scaled=False):
+    """KS distance of the pooled bin counts of units `a` against units `b` (H: units x bins); scaled: times
+    sqrt(n_a n_b / (n_a + n_b)), the event counts of the two sides, so that relabellings that move events between
+    sides (units of unequal size) are compared on the scale of their own sampling noise."""
     import numpy as np
     ca, cb = H[a].sum(0), H[b].sum(0)
-    return float(np.abs(np.cumsum(ca) / ca.sum() - np.cumsum(cb) / cb.sum()).max())
+    d = float(np.abs(np.cumsum(ca) / ca.sum() - np.cumsum(cb) / cb.sum()).max())
+    if scaled:
+        na, nb = float(ca.sum()), float(cb.sum())
+        d *= (na * nb / (na + nb)) ** 0.5
+    return d
 
 
 def run_perm(units_x, units_y, nperm=2000, nbin=50):
@@ -256,6 +262,9 @@ def run_perm(units_x, units_y, nperm=2000, nbin=50):
     H = np.array([np.histogram(u, edges)[0] for u in units_x + units_y], dtype=np.float64)
     idx = np.arange(nx + ny)
     obs = _binned_ks(H, idx[:nx], idx[nx:])
+    # the p compares scaled distances: with the raw distance, a relabelling that hands the side of fewer events more
+    # events (units of unequal size) has a narrower null, and p comes out too small (catalog_coverage 2026-10-30)
+    obs_s = _binned_ks(H, idx[:nx], idx[nx:], scaled=True)
     total = math.comb(nx + ny, nx)
     if total <= nperm:
         sets = [np.array(c) for c in itertools.combinations(idx, nx)]
@@ -265,7 +274,7 @@ def run_perm(units_x, units_y, nperm=2000, nbin=50):
     ge = 0
     for a in sets:
         m = np.zeros(nx + ny, bool); m[a] = True
-        ge += _binned_ks(H, idx[m], idx[~m]) >= obs - 1e-12
+        ge += _binned_ks(H, idx[m], idx[~m], scaled=True) >= obs_s - 1e-9
     return {"ks_binned": round(obs, 5), "p_runs": ge / len(sets), "runs_x": nx, "runs_y": ny,
             "relabellings": len(sets), "p_min": 1.0 / len(sets)}
 
