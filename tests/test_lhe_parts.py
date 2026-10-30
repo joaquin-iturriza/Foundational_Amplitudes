@@ -983,6 +983,56 @@ def test_gridpack_queue():
     print("[gridpack queue] ok")
 
 
+def test_gridpool_probe():
+    """lhe_probe gridpool: each gridpack of a gridpack pool built at its path (the queue reuses it, not rebuilt), probe
+    runs of the pool's run size at probe seeds, one PROBE_JSON line per run that `kept --yields-out` reads at any
+    energy."""
+    import contextlib, io
+    import lhe_probe
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, mg.lhe_make_gridpack, mg.lhe_run_gridpack, mg.lhe_gridpack_header,
+             lhe_probe.kept, lhe_probe.accept_of)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d, short=False)
+            made = []
+            _gridpack_fakes(made)
+            lhe_probe.accept_of = lambda name: None
+            lhe_probe.kept = lambda m, acc: {"kept": 1.0}
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            _register(n_runs=3, run_events=200, complete_runs=True)
+            mg.PROCESSES[NAME]["lhe"].update(energies=[500.0, 3000.0], gridpack=13057)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                lhe_probe.cmd_gridpool(argparse.Namespace(process=[NAME], runs=3, cores=2, work=d, timeout=60))
+            lines = out.getvalue().splitlines()
+            runs = [json.loads(l.split("PROBE_JSON ", 1)[1]) for l in lines if l.startswith("PROBE_JSON ")]
+            grids = [json.loads(l.split("GRIDPACK_JSON ", 1)[1]) for l in lines if l.startswith("GRIDPACK_JSON ")]
+            assert len(runs) == 6 and all(r["yield"] == 1.0 and r["gridpack"] and r["events_asked"] == 200 for r in runs)
+            assert len(grids) == 2 and not any(g["reused"] for g in grids) and len(made) == 2
+            assert all(os.path.exists(t) for t, _ in mg.lhe_gridpack_paths(NAME, _items()))
+            pool_seeds = {r[0] for _, r in mg.lhe_part_paths(NAME, _items())}
+            assert pool_seeds.isdisjoint({r["seed"] for r in runs})
+            log = os.path.join(d, "probe.log")
+            open(log, "w").write(out.getvalue())
+            ys = os.path.join(d, "yields.json")
+            with contextlib.redirect_stdout(io.StringIO()):
+                lhe_probe.cmd_kept(argparse.Namespace(logs=[log], out=os.path.join(d, "kept.json"), yields_out=ys,
+                                                      small_run=1000))
+            assert json.load(open(ys)) == {NAME: 1.0}
+            with contextlib.redirect_stdout(io.StringIO()):          # a second probe reuses the stored gridpacks
+                lhe_probe.cmd_gridpool(argparse.Namespace(process=[NAME], runs=1, cores=1, work=d, timeout=60))
+            assert len(made) == 2
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, mg.lhe_make_gridpack, mg.lhe_run_gridpack, mg.lhe_gridpack_header,
+         lhe_probe.kept, lhe_probe.accept_of) = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[gridpool probe] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -997,3 +1047,4 @@ if __name__ == "__main__":
     test_generation_rule()
     test_layout_dead_claims_park_marker_accept_boundary()
     test_gridpack_queue()
+    test_gridpool_probe()
