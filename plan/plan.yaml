@@ -4341,6 +4341,52 @@ entries:
       site decisions for short, re-read, permutation, run-level: no prior re-read. Note for the run: the script''s 20 min
       time limit needs --hdr=--time sized to 10x the relabellings and 8 parallel measures, with its wall-time target recorded;
       a test whose 20000 interval still straddles its threshold is reported as undecided, not as standing.'
+  - at: '2026-10-30T17:07:23+00:00'
+    question: 'Steps 11 and 14, one design (same control, settings and reads). Does a default-sampled (MadEvent unweighted)
+      share in catalog_v4''s training pools lower the error on default-sampled events without raising it on the smart pools,
+      and at which share (D178 priority 1)? Arms: (11) the pure-default bound: v4_dimensionless_muon_pp[_seed2], every hadronic
+      tree training class on its 13 TeV pp pool (recipes/catalog_v4_pp_mixed_train.yaml, 797 classes: 466 pp13v4_, 331 pp13_);
+      (14) the mixture: v4_dimensionless_muon_default50[_seed2] and _default25[_seed2], each tree pool with 0.50 or 0.25 default-sampled
+      share taken out of the RAMBO bulk, 0.35 flat and 0.15 forward kept (recipes/catalog_v4_default{50,25}_train.yaml, 1153
+      pools, on the 112 assembled rebuilt pools plus those assembled before; cgsxwm 3 TeV dropped, D193). Step 11 goes only
+      after the pp13v4 validation (step 10) passes; step 14 does not depend on it.'
+    prior: 'results.tex par. The pp-trained arm (catalog_v3, FA-ccin2p3-e786bd74): on pp events of the training classes MSE
+      0.43 pp-trained vs 2.86 window-trained (ratio 0.19, 963 of 986 lower), inside the window coverage 0.38 vs 0.53 (0.59,
+      802 lower), pp_compare.py @d1dec67; compare_pp_trained (par v4 vs pp-trained): catalog_v4 ahead of the pp-trained arm
+      on the 417 matching no-b classes (0.66) but scored on another function on 238 EW classes (pp13 pools carry catalog_v3
+      physics) -> the pp13v4 pools and this design. Pure-default design of 2026-10-29 (this entry, step 11; amended: 797 swapped
+      classes, PP4 on the test split). Mixture A/B: step 14 of this entry, lost 2026-10-30 05:15 and restored; no run made.
+      Searched results.tex (pp-trained, default share, f_default, mixture), plan show catalog_coverage, site decisions (D178,
+      D193, mixture, default).'
+    measure: 'Per class, MSE of ln|M|^2 at the best checkpoint (lowest aggregate val_loss_no_reg, es_load_best_model) from
+      tools/zero_shot_parent.py: (a) default-sampled events: PP4 (catalog_v4_pp_test.yaml, the pp pools'' TEST split, 2000
+      events per class) and EE4 (catalog_v4_ee_test.yaml, the e+e- default test pools, 2000 events; entries without a pool
+      listed); (b) smart pools: catalog_v4''s held-out axes (H1..H7c, val split) and the shared XV3 read. Per arm: median
+      over classes of the per-class ratio arm/control (geometric mean of the two seeds each side), with the count of classes
+      lower, per axis group, b classes apart; each run''s aggregate val_loss_no_reg listed (blow-ups listed apart with where).'
+    check: 'On existing data the default-sampled read moves with the training density: catalog_v3''s pp-trained arm against
+      the window-trained one on the training classes'' pp events 0.43 vs 2.86 (ratio 0.19), and inside the windows'' coverage,
+      where only the density differs, 0.38 vs 0.53 (0.59, 802 of 986 lower) (pp_compare.py @d1dec67). Seed noise on the same
+      reads: catalog_v4''s two Muon seeds (FA-ccin2p3-339ec100, -380842ed) give the per-class seed-to-seed ratio spread that
+      fixes the threshold below (read from their existing PP reads before any arm is read).'
+    fixed: Model mu-P LLoCa, dimensionless target, Muon at the search best (lr 0.004997423, muon wd 0.02171863), 4264 steps,
+      batch 16384, 1e4 train events per process, validate_frac 0.02, seeds 42 and 43, scripts/job_catalog_v3_short.sh at one
+      commit, --hdr=--mem=48G, CC-IN2P3; only the training recipe differs from the control; reads on the same events (first
+      2000 rows of each test pool) with the same scorer.
+    control: catalog_v4's Muon short runs v4_dimensionless_muon (FA-ccin2p3-339ec100) and _seed2 (FA-ccin2p3-380842ed), reused
+      (same code path, recipe catalog_v4_train.yaml), read with mode eval on PP4 and EE4 (V3_AXES='PP4 EE4'); their held-out
+      and XV3 reads exist.
+    seeds: '2 per arm (42, 43), as the control; 3 arms x 2 = 6 trainings, about 1.5 GPU-h each (catalog_v4 short Muon runs''
+      wall time), plus a smoke of one arm (0.2 GPU-h) and the 2 control eval reads (about 0.3 GPU-h each): about 10 GPU-h
+      in all, under the 30 GPU-h budget.'
+    outcome: 'A share wins when on PP4 and EE4 its median per-class ratio to the control is below the seed-to-seed spread''s
+      lower 5% (from the control''s two seeds) with more than half the classes lower in both seeds, and on the smart axes
+      its median ratio is not above the spread''s upper 95%. YES (a share wins): the smaller winning share if both win within
+      each other''s seed spread, else the better one, becomes catalog_v4''s mixture (pools rebuilt at it), mixture_ab.json
+      verdict = that share. NO (neither wins on default-sampled events, or both lose on the smart axes): mixture_ab.json verdict
+      = keep the current mixture, both reads reported with the pure-default bound beside them; the bound arm sizes the most
+      a default share can gain on PP4 (if the bound itself does not beat the control on PP4, the default-sampled events are
+      already covered and the question is closed).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
