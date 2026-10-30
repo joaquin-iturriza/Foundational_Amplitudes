@@ -4408,7 +4408,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 2c7741c0
+    commit: 84a15232
     paths:
     - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
       projects.toml and site_runends.py)
@@ -4422,6 +4422,8 @@ entries:
       a Stop while its jobs run gives a note, the first subagent touching sweep/ gets fa-sweeps-and-hpo once); site digest
       count line unexercised; user-level push registration absent; the template''s multi-fidelity t_steps is Joaquin''s call;
       known_causes live in projects.toml, supervisor pickup not checked'
+    - switch-overs A, B, D applied and committed (merge 2c7741c0, settings 84a15232); reply check fixed (d2c15a58); worktree
+      removal script (d39af33d, 978b7179); supervisor summary-check fixes in ~/.local/bin/site, supervisor restarted 12:55
   dead_ends: []
   asks: []
   step_why:
