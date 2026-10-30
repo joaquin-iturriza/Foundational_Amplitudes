@@ -4624,7 +4624,7 @@ entries:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '10': run FA-ccin2p3-f8d114ce (the pp13v4 label check rerun)
-    '11': step 10's pp13v4 validation passing
+    '11': step 10's label check passing
     '13': run FA-ccin2p3-44201039 (the time-matched re-read)
   targets:
   - batch: gridpool_probe
