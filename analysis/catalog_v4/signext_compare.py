@@ -1,11 +1,11 @@
 """The one-loop sign extension on catalog_v4 against its control, as the passed design of v3_prep_explore reads it.
 
-Arms (scripts/job_catalog_v3_short.sh, both at trial_1860's HPs with Muon, seeds 42 and 43):
-  control    v4_dimensionless_muon, v4_dimensionless_muon_seed2
-  extension  v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2 (more sign-changing one-loop
+Arms (scripts/job_catalog_v3_short.sh, both at trial_1860's HPs with Muon, seeds 42 to 45):
+  control    v4_dimensionless_muon, v4_dimensionless_muon_seed2, _seed3, _seed4
+  extension  v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, _seed3, _seed4 (more sign-changing one-loop
              training pools, recipes/catalog_v4_train_signext.yaml)
 Decision measure: the zero-shot wrong-sign share on the held-out one-loop pools the scorer reads as sign-changing
-(H5_signed.txt, 2000 validation events each, best checkpoint); per pool the mean over the two seeds of each arm; the
+(H5_signed.txt, 2000 validation events each, best checkpoint); per pool the mean over the seeds of each arm; the
 number of pools (ties excluded) where the extension is lower, with the one-sided sign test p; the seed-mean medians;
 each seed alone. Secondary: zero-shot MSE of log|M|^2 per probe (mean (q - t)^2 of the saved .npz) on every held-out
 axis, the per-probe ratio extension over control (seed means), its median, and the control's own seed-43-over-42
@@ -21,8 +21,10 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 READS = os.path.join(os.path.dirname(HERE), "catalog_v3", "data", "short_reads")
-CTRL = ("v4_dimensionless_muon", "v4_dimensionless_muon_seed2")
-EXT = ("v4_dimensionless_muon_more_signed", "v4_dimensionless_muon_more_signed_seed2")
+SEEDS = (42, 43, 44, 45)  # seeds 44 and 45 by D195 (the user 2026-10-30: "Okay, yes to both")
+CTRL = ("v4_dimensionless_muon", "v4_dimensionless_muon_seed2", "v4_dimensionless_muon_seed3", "v4_dimensionless_muon_seed4")
+EXT = ("v4_dimensionless_muon_more_signed", "v4_dimensionless_muon_more_signed_seed2",
+       "v4_dimensionless_muon_more_signed_seed3", "v4_dimensionless_muon_more_signed_seed4")
 AXES = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
 
 
@@ -65,7 +67,7 @@ def main():
            "per_seed": {str(sd): {"ext_lower": int((e[i] < c[i]).sum()), "ext_higher": int((e[i] > c[i]).sum()),
                                   "median_ctrl_pct": round(100 * float(np.median(c[i])), 2),
                                   "median_ext_pct": round(100 * float(np.median(e[i])), 2)}
-                        for i, sd in enumerate((42, 43))},
+                        for i, sd in enumerate(SEEDS)},
            "per_pool_pct": {p: {"ctrl": [round(100 * x, 2) for x in c[:, j]], "ext": [round(100 * x, 2) for x in e[:, j]]}
                             for j, p in enumerate(pools)},
            "mse_ratio": {}}
@@ -80,7 +82,7 @@ def main():
         res["mse_ratio"][ax] = {"probes": len(probes),
                                 "median_ext_over_ctrl": round(float(np.median(emse / cmse)), 3),
                                 "per_seed": [round(float(np.median(np.array([m[EXT[i]][p] / m[CTRL[i]][p] for p in probes]))), 3)
-                                             for i in range(2)],
+                                             for i in range(len(SEEDS))],
                                 "ctrl_seed43_over_42": round(float(np.median(seed)), 3),
                                 "median_mse_ctrl": round(float(np.median(cmse)), 4),
                                 "median_mse_ext": round(float(np.median(emse)), 4)}

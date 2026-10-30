@@ -3,16 +3,20 @@
  "sign_changing_per_arm": {
   "v4_dimensionless_muon": 21,
   "v4_dimensionless_muon_seed2": 21,
+  "v4_dimensionless_muon_seed3": 21,
+  "v4_dimensionless_muon_seed4": 21,
   "v4_dimensionless_muon_more_signed": 21,
-  "v4_dimensionless_muon_more_signed_seed2": 21
+  "v4_dimensionless_muon_more_signed_seed2": 21,
+  "v4_dimensionless_muon_more_signed_seed3": 21,
+  "v4_dimensionless_muon_more_signed_seed4": 21
  },
  "seed_mean": {
-  "ext_lower": 14,
-  "ext_higher": 6,
-  "ties": 1,
-  "p_one_sided": 0.058,
-  "median_ctrl_pct": 6.48,
-  "median_ext_pct": 3.08
+  "ext_lower": 18,
+  "ext_higher": 3,
+  "ties": 0,
+  "p_one_sided": 0.001,
+  "median_ctrl_pct": 6.69,
+  "median_ext_pct": 2.91
  },
  "per_seed": {
   "42": {
@@ -26,115 +30,171 @@
    "ext_higher": 5,
    "median_ctrl_pct": 8.55,
    "median_ext_pct": 2.45
+  },
+  "44": {
+   "ext_lower": 18,
+   "ext_higher": 3,
+   "median_ctrl_pct": 6.9,
+   "median_ext_pct": 1.9
+  },
+  "45": {
+   "ext_lower": 17,
+   "ext_higher": 4,
+   "median_ctrl_pct": 7.05,
+   "median_ext_pct": 2.65
   }
  },
  "per_pool_pct": {
   "v4_bbx_avevex_nlo_20-6000GeV": {
    "ctrl": [
     19.7,
-    16.8
+    16.8,
+    26.1,
+    35.6
    ],
    "ext": [
     3.3,
-    3.65
+    3.65,
+    2.7,
+    2.35
    ]
   },
   "v4_bbx_ccxh_nlo_145-6000GeV": {
    "ctrl": [
     3.1,
-    3.05
+    3.05,
+    4.6,
+    2.1
    ],
    "ext": [
     5.1,
-    2.3
+    2.3,
+    2.9,
+    16.45
    ]
   },
   "v4_bbx_gg_nlo_20-6000GeV": {
    "ctrl": [
     1.25,
-    10.65
+    10.65,
+    6.85,
+    2.95
    ],
    "ext": [
     8.0,
-    5.75
+    5.75,
+    3.4,
+    4.25
    ]
   },
   "v4_bg_ab_nlo_20-6000GeV": {
    "ctrl": [
     0.95,
-    10.8
+    10.8,
+    5.6,
+    4.95
    ],
    "ext": [
     3.7,
-    2.45
+    2.45,
+    29.35,
+    3.45
    ]
   },
   "v4_bg_bgg_nlo_30-6000GeV": {
    "ctrl": [
     26.55,
-    23.55
+    23.55,
+    25.65,
+    24.8
    ],
    "ext": [
     13.2,
-    16.35
+    16.35,
+    16.35,
+    18.05
    ]
   },
   "v4_db_bdz_nlo_112-6000GeV": {
    "ctrl": [
     1.6,
-    1.55
+    1.55,
+    1.35,
+    1.65
    ],
    "ext": [
     1.55,
-    1.6
+    1.6,
+    1.3,
+    1.5
    ]
   },
   "v4_dd_add_nlo_30-6000GeV": {
    "ctrl": [
     1.55,
-    1.7
+    1.7,
+    2.1,
+    1.75
    ],
    "ext": [
     1.45,
-    1.45
+    1.45,
+    1.45,
+    1.25
    ]
   },
   "v4_ddx_aaa_nlo_30-6000GeV": {
    "ctrl": [
     16.0,
-    11.35
+    11.35,
+    53.8,
+    22.95
    ],
    "ext": [
     13.9,
-    4.5
+    4.5,
+    0.35,
+    0.35
    ]
   },
   "v4_ddx_ag_nlo_20-6000GeV": {
    "ctrl": [
     48.7,
-    37.85
+    37.85,
+    52.95,
+    53.65
    ],
    "ext": [
     49.8,
-    66.95
+    66.95,
+    28.8,
+    43.95
    ]
   },
   "v4_ddx_bbxz_qcdborn_nlo_112-6000GeV": {
    "ctrl": [
     11.3,
-    8.55
+    8.55,
+    11.65,
+    12.55
    ],
    "ext": [
     1.85,
-    1.55
+    1.55,
+    1.6,
+    1.6
    ]
   },
   "v4_ddx_epvewm_nlo_92-6000GeV": {
    "ctrl": [
     5.6,
-    7.35
+    7.35,
+    5.05,
+    4.9
    ],
    "ext": [
+    0.0,
+    0.0,
     0.0,
     0.0
    ]
@@ -142,192 +202,248 @@
   "v4_dg_dgz_nlo_112-6000GeV": {
    "ctrl": [
     5.15,
-    7.65
+    7.65,
+    6.9,
+    7.05
    ],
    "ext": [
     3.15,
-    3.3
+    3.3,
+    2.55,
+    2.65
    ]
   },
   "v4_dg_uwm_nlo_92-6000GeV": {
    "ctrl": [
     0.25,
+    0.1,
+    0.1,
     0.1
    ],
    "ext": [
     0.4,
-    0.2
+    0.2,
+    0.55,
+    0.6
    ]
   },
   "v4_epem_ccxg_nlo_30-6000GeV": {
    "ctrl": [
     68.45,
-    69.05
+    69.05,
+    70.2,
+    70.45
    ],
    "ext": [
     14.8,
-    5.15
+    5.15,
+    8.0,
+    5.6
    ]
   },
   "v4_epem_ddxz_nlo_112-6000GeV": {
    "ctrl": [
     30.95,
-    39.0
+    39.0,
+    26.1,
+    28.35
    ],
    "ext": [
     2.0,
-    2.25
+    2.25,
+    1.7,
+    2.9
    ]
   },
   "v4_gg_bbxg_nlo_30-6000GeV": {
    "ctrl": [
     15.8,
-    18.05
+    18.05,
+    21.05,
+    13.7
    ],
    "ext": [
     15.7,
-    22.5
+    22.5,
+    15.9,
+    14.3
    ]
   },
   "v4_uc_cuz_nlo_112-6000GeV": {
    "ctrl": [
     1.05,
-    0.95
+    0.95,
+    1.05,
+    1.0
    ],
    "ext": [
     1.0,
-    1.05
+    1.05,
+    0.95,
+    0.85
    ]
   },
   "v4_ucx_cxhu_nlo_145-6000GeV": {
    "ctrl": [
     19.15,
-    17.65
+    17.65,
+    19.1,
+    14.45
    ],
    "ext": [
     1.5,
-    0.75
+    0.75,
+    1.0,
+    1.95
    ]
   },
   "v4_udx_agwp_nlo_101-6000GeV": {
    "ctrl": [
     3.25,
-    3.4
+    3.4,
+    3.05,
+    3.15
    ],
    "ext": [
     3.25,
-    2.95
+    2.95,
+    3.3,
+    2.9
    ]
   },
   "v4_udx_ccxwp_nlo_101-6000GeV": {
    "ctrl": [
     4.1,
-    4.4
+    4.4,
+    4.9,
+    4.3
    ],
    "ext": [
     2.5,
-    2.95
+    2.95,
+    1.9,
+    3.5
    ]
   },
   "v4_uux_ccxz_qcdborn_nlo_112-6000GeV": {
    "ctrl": [
     9.25,
-    4.85
+    4.85,
+    9.45,
+    8.55
    ],
    "ext": [
     1.7,
-    1.5
+    1.5,
+    1.3,
+    1.75
    ]
   }
  },
  "mse_ratio": {
   "H1": {
    "probes": 62,
-   "median_ext_over_ctrl": 1.365,
+   "median_ext_over_ctrl": 1.234,
    "per_seed": [
     1.32,
-    1.34
+    1.34,
+    1.055,
+    1.048
    ],
    "ctrl_seed43_over_42": 1.108,
-   "median_mse_ctrl": 0.2499,
-   "median_mse_ext": 0.3746
+   "median_mse_ctrl": 0.2768,
+   "median_mse_ext": 0.3447
   },
   "H2": {
    "probes": 218,
-   "median_ext_over_ctrl": 1.248,
+   "median_ext_over_ctrl": 1.154,
    "per_seed": [
     1.176,
-    1.314
+    1.314,
+    1.046,
+    1.047
    ],
    "ctrl_seed43_over_42": 1.071,
-   "median_mse_ctrl": 0.4934,
-   "median_mse_ext": 0.6141
+   "median_mse_ctrl": 0.4721,
+   "median_mse_ext": 0.5395
   },
   "H2p5": {
    "probes": 38,
-   "median_ext_over_ctrl": 1.134,
+   "median_ext_over_ctrl": 1.046,
    "per_seed": [
     1.22,
-    1.071
+    1.071,
+    0.925,
+    0.962
    ],
    "ctrl_seed43_over_42": 1.1,
-   "median_mse_ctrl": 0.7898,
-   "median_mse_ext": 0.916
+   "median_mse_ctrl": 0.7841,
+   "median_mse_ext": 0.8638
   },
   "H3": {
    "probes": 279,
-   "median_ext_over_ctrl": 1.147,
+   "median_ext_over_ctrl": 1.029,
    "per_seed": [
     1.189,
-    1.095
+    1.095,
+    0.991,
+    0.917
    ],
    "ctrl_seed43_over_42": 1.059,
-   "median_mse_ctrl": 0.8685,
-   "median_mse_ext": 0.9741
+   "median_mse_ctrl": 0.9507,
+   "median_mse_ext": 0.923
   },
   "H5": {
    "probes": 28,
-   "median_ext_over_ctrl": 0.615,
+   "median_ext_over_ctrl": 0.612,
    "per_seed": [
     0.604,
-    0.55
+    0.55,
+    0.552,
+    0.549
    ],
    "ctrl_seed43_over_42": 0.982,
-   "median_mse_ctrl": 0.8285,
-   "median_mse_ext": 0.3735
+   "median_mse_ctrl": 0.9116,
+   "median_mse_ext": 0.3896
   },
   "H6": {
    "probes": 8,
-   "median_ext_over_ctrl": 1.37,
+   "median_ext_over_ctrl": 1.247,
    "per_seed": [
     1.477,
-    1.245
+    1.245,
+    1.025,
+    1.235
    ],
    "ctrl_seed43_over_42": 1.184,
-   "median_mse_ctrl": 0.0278,
-   "median_mse_ext": 0.0332
+   "median_mse_ctrl": 0.0261,
+   "median_mse_ext": 0.0309
   },
   "H7E": {
    "probes": 34,
-   "median_ext_over_ctrl": 1.319,
+   "median_ext_over_ctrl": 1.188,
    "per_seed": [
     1.268,
-    1.277
+    1.277,
+    1.022,
+    1.129
    ],
    "ctrl_seed43_over_42": 0.983,
-   "median_mse_ctrl": 0.3478,
-   "median_mse_ext": 0.4492
+   "median_mse_ctrl": 0.369,
+   "median_mse_ext": 0.4261
   },
   "H7c": {
    "probes": 34,
-   "median_ext_over_ctrl": 1.311,
+   "median_ext_over_ctrl": 1.217,
    "per_seed": [
     1.411,
-    1.167
+    1.167,
+    1.076,
+    1.126
    ],
    "ctrl_seed43_over_42": 1.18,
-   "median_mse_ctrl": 0.1778,
-   "median_mse_ext": 0.2436
+   "median_mse_ctrl": 0.1817,
+   "median_mse_ext": 0.2274
   }
  }
 }
