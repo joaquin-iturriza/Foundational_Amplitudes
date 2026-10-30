@@ -2042,6 +2042,82 @@ def cmd_evidence(a):
             ev["commit"] = a.commit
 
 
+TARGET_JOBS = 4          # a batch of this many jobs or more needs a wall-time target (agent_redesign C4)
+TARGET_FRESH_H = 24      # ... recorded within this many hours
+
+
+def cmd_target(a):
+    """A batch's wall-time target: the supervisor predicts the batch's end from its progress and raises an ALERT once
+    the prediction passes 2x this (site supervise, run_ends). A batch is a queue (its name) or the entry's item check
+    units matching --units."""
+    if a.wall <= 0 or a.jobs <= 0:
+        sys.exit("plan: --wall and --jobs must be positive")
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        ts = [t for t in (e.get("targets") or []) if t.get("batch") != a.batch]
+        ts.append({"batch": a.batch, "wall_h": float(a.wall), "jobs": int(a.jobs), "units": a.units,
+                   "start": (a.start or now().isoformat()), "at": now().isoformat()})
+        e["targets"] = ts
+    print("plan: target of %s on %s: %g h for %d jobs" % (a.batch, a.id, a.wall, a.jobs))
+
+
+def targets_of(d):
+    return [dict(t, entry=e["id"]) for e in d["entries"] if not terminal(e.get("status"))
+            for t in (e.get("targets") or [])]
+
+
+def cmd_targets(a):
+    d, _ = load()
+    out = targets_of(d)
+    for t in out:
+        t["start_ts"] = parse(t["start"]).timestamp()
+    if a.json:
+        print(json.dumps(out))
+    else:
+        for t in out:
+            print("  %-22s %-24s %6.1f h  %4d jobs  since %s%s" % (t["entry"], t["batch"], t["wall_h"], t["jobs"],
+                                                                  t["start"], "  units " + t["units"] if t["units"] else ""))
+
+
+def cmd_target_check(a):
+    """Exit 0 when a batch of --jobs may go for the entry: fewer than TARGET_JOBS jobs, or a target recorded in the
+    last TARGET_FRESH_H hours (for the submission guard)."""
+    if a.jobs < TARGET_JOBS:
+        return 0
+    d, _ = load()
+    e = entry(d, a.id)
+    fresh = [t for t in (e.get("targets") or []) if (now() - parse(t["at"])).total_seconds() < 3600 * TARGET_FRESH_H]
+    if fresh:
+        print("plan: %s has a wall-time target: %s" % (a.id, ", ".join("%s %g h" % (t["batch"], t["wall_h"])
+                                                                         for t in fresh)))
+        return 0
+    print("plan: refused: a batch of %d jobs of %s needs a wall-time target recorded in the last %d h: "
+          "python3 tools/plan.py target %s --batch <name> --wall <hours> --jobs %d" % (
+              a.jobs, a.id, TARGET_FRESH_H, a.id, a.jobs))
+    return 1
+
+
+def cmd_collection(a):
+    """The entry's collection: the supervisor runs tools/collect_run.py on each of its runs that finishes cleanly and
+    whose job matches --job; anything collect_run reports off stays an event."""
+    if not a.off and not a.job:
+        sys.exit("plan: --job GLOB (or --off)")
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        if a.off:
+            e.pop("collection", None)
+        else:
+            e["collection"] = {"job": a.job, "args": a.args or "", "at": now().isoformat()}
+    print("plan: collection of %s %s" % (a.id, "removed" if a.off else "for %s" % a.job))
+
+
+def cmd_collections(a):
+    d, _ = load()
+    out = [dict(e["collection"], entry=e["id"]) for e in d["entries"]
+           if e.get("collection") and not terminal(e.get("status"))]
+    print(json.dumps(out) if a.json else "\n".join("  %-22s %s %s" % (c["entry"], c["job"], c["args"]) for c in out))
+
+
 def used_keys(e, st):
     """Every step number the entry holds or its state still names (step agents, runs, sweeps): a new step never
     takes a number an old record points at."""
@@ -2418,6 +2494,22 @@ def main(argv=None):
         A("--commit", help="the commit that holds the evidence"),
         A("--path", action="append", help="a repo path (repeatable)"),
         A("--drop", action="append", help="a path no longer evidence (pruned, moved)"))
+    cmd("target", cmd_target, "record a batch's wall-time target (the supervisor alerts past 2x it)", ID,
+        A("--batch", required=True, help="the batch: a queue's name, or a name for the entry's units matching --units"),
+        A("--wall", type=float, required=True, help="the hours the batch should take, start to end"),
+        A("--jobs", type=int, required=True, help="the jobs (workers) it runs on"),
+        A("--units", help="glob of the item check's units that are this batch (default: a queue of that name)"),
+        A("--start", help="ISO time the batch started (default now)"))
+    cmd("targets", cmd_targets, "the wall-time targets of the open entries",
+        A("--json", action="store_true", help="one JSON list (for the supervisor)"))
+    cmd("target-check", cmd_target_check, "exit 0 when a batch of --jobs may go (a target recorded, or few jobs)", ID,
+        A("--jobs", type=int, required=True, help="the batch's job count"))
+    cmd("collection", cmd_collection, "record how the supervisor collects the entry's cleanly finished runs", ID,
+        A("--job", help="glob of the job scripts whose runs are collected (e.g. scripts/job_catalog_v3_short.sh)"),
+        A("--args", help="extra arguments of tools/collect_run.py (e.g. '--dest ... --axes TR')"),
+        A("--off", action="store_true", help="remove it"))
+    cmd("collections", cmd_collections, "the recorded collections of the open entries",
+        A("--json", action="store_true", help="one JSON list (for the supervisor)"))
     cmd("set-next", cmd_set_next, "set the entry's next steps: independent pieces of work are separate steps (--also), "
         "never chained with 'then'; each step names the decision it feeds and what each result leads to",
         ID, A("text", help="the next step"),

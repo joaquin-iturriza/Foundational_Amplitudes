@@ -13,6 +13,7 @@ import multiprocessing as mp
 import os
 import sys
 import tempfile
+import time
 
 import numpy as np
 import yaml
@@ -678,6 +679,176 @@ def test_park_and_skip_claimed():
     print("[park + skip-claimed] ok")
 
 
+def test_generation_rule():
+    """agent_redesign C5 on the replan under live workers (2026-10-29: the catalog_v4 default share replanned while
+    workers of the old layout held claims; they failed 908 tasks with IndexError): the replan as it happened is refused,
+    with park first it passes; `layout` says stale under changed recipes and parked after park; the probe file of that
+    night refuses its processes that keep under half the events they ask, a process absent from it is refused, and an
+    accepted one (the user's decision named) passes."""
+    _register(n_runs=4)
+    saved = lhe_parts._my_jobs
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            q = os.path.join(d, "q")
+            ns = lambda **k: argparse.Namespace(**dict(dict(specs=[spec], queue=q, seed=42, rates=rates, cores=[]), **k))
+            lhe_parts._my_jobs = lambda: {"555"}
+            lhe_parts.cmd_plan(ns())
+            lay = lambda: json.loads(_out(lambda: lhe_parts.cmd_layout(argparse.Namespace(queue=q))))
+            assert lay()["current"] and lay()["todo"] == 4, lay()
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            os.rename(os.path.join(q, "todo", todo[0]), os.path.join(q, "claimed", todo[0] + ".555"))
+            mg.PROCESSES[NAME]["lhe"]["n_runs"] = 3                  # the recipes change under the live worker
+            L = lay()
+            assert not L["current"] and "laid out otherwise" in L["why"], L
+            try:
+                lhe_parts.cmd_plan(ns())                             # the replan as it happened: refused
+                raise AssertionError("replan under a live claim was not refused")
+            except SystemExit as e:
+                assert "live workers hold 1 claims" in str(e.code), e.code
+            lhe_parts._my_jobs = lambda: set()                       # the worker ended: its claim is no longer live
+            assert not lhe_parts.live_claims(q)
+            lhe_parts._my_jobs = lambda: {"555"}
+            lhe_parts.cmd_park(argparse.Namespace(queue=q))
+            assert not lay()["current"]
+            lhe_parts.cmd_plan(ns())                                 # with park first: passes
+            assert lay()["current"], lay()
+            # the probe file of that night (committed): its low-yield processes refuse a plan of them
+            probe = lhe_parts.PROBE_YIELDS
+            y = json.load(open(probe))
+            items = {n: [] for n in y}
+            why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe), items)
+            assert len(why) == 1 and "ask more than 2x" in why[0], why
+            print("  probe file of 2026-10-30: refused for keeping under half the events they ask:", why[0][:400])
+            acc_file = os.path.join(d, "accepted.json")
+            fresh = lambda **k: argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe, accepted=acc_file, **k)
+            assert len(lhe_parts.plan_refusals(fresh(), items)) == 1
+            # accepting needs a decision in force that names the process (a scratch ledger)
+            import sqlite3
+            led = os.path.join(d, "ledger.db")
+            c = sqlite3.connect(led)
+            c.execute("CREATE TABLE decisions (id TEXT, project TEXT, kind TEXT, quote TEXT, covers TEXT, in_force INT)")
+            lows = [n for n in y if y[n] <= 0 or 1.0 / y[n] > lhe_parts.YIELD_FACTOR]
+            c.execute("INSERT INTO decisions VALUES ('D7','FA','approve','go','%s',1)" % ",".join(lows))
+            c.execute("INSERT INTO decisions VALUES ('D8','FA','approve','the redesign','agent_redesign',1)")
+            c.execute("INSERT INTO decisions VALUES ('D9','FA','approve','go','%s',0)" % ",".join(lows))
+            c.commit(); c.close()
+            acc = lambda *names: lhe_parts.cmd_accept_yield(argparse.Namespace(names=list(names), ledger=led,
+                                                                               accepted=acc_file))
+            for bad in ("D8", "D9", "D99"):                          # names nothing / withdrawn / absent
+                try:
+                    acc(*["%s=%s" % (n, bad) for n in lows])
+                    raise AssertionError("accepted under %s" % bad)
+                except SystemExit as e:
+                    assert "refused" in str(e.code) and not os.path.exists(acc_file), e.code
+            acc(*["%s=D7" % n for n in lows])
+            assert sorted(json.load(open(acc_file))) == sorted(lows)
+            assert not lhe_parts.plan_refusals(fresh(), items)
+            why = lhe_parts.plan_refusals(fresh(), dict(items, zz_absent=[]))
+            assert len(why) == 1 and "missing from the probe file" in why[0] and "zz_absent" in why[0], why
+    finally:
+        lhe_parts._my_jobs = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[generation rule] ok")
+
+
+def test_layout_dead_claims_park_marker_accept_boundary():
+    """repo-reviewer findings on C5: (1) after a last wave dies at its limit, layout counts its claims as claimed_dead
+    and the supervisor's queue_plan sends workers for them (todo 0); (2) a parked-then-replanned queue drained to
+    todo 0 is not parked again; (3) accept-yield matches the process name on name boundaries, not as a substring;
+    and layout reads a queue with no todo/ directory."""
+    sys.path.insert(0, os.path.expanduser("~/.local/bin"))
+    import site_runends as S
+    _register(n_runs=3)
+    saved = lhe_parts._my_jobs
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            q = os.path.join(d, "q")
+            ns = lambda **k: argparse.Namespace(**dict(dict(specs=[spec], queue=q, seed=42, rates=rates, cores=[]), **k))
+            lay = lambda qq=q: json.loads(_out(lambda: lhe_parts.cmd_layout(argparse.Namespace(queue=qq))))
+            lhe_parts._my_jobs = lambda: {"555"}
+            lhe_parts.cmd_plan(ns())
+            # (1) the last wave claims all three tasks; one worker (556) dies at TIMEOUT, 555 still runs
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            for f, job in zip(todo, ("555", "556", "556")):
+                os.rename(os.path.join(q, "todo", f), os.path.join(q, "claimed", f + "." + job))
+            L = lay()
+            assert L["current"] and L["todo"] == 0 and L["claimed"] == 3 and L["claimed_dead"] == 2, L
+            reg = {"queue": "q", "max_workers": 10, "wall_h": 2.0, "total_hours": 100.0, "submitted_hours": 0}
+            n, why, _ = S.queue_plan(reg, 1, L, time.time())
+            assert n == 2, (n, why)                                   # before: 0, "nothing to do"
+            lhe_parts._my_jobs = lambda: None                         # squeue unreadable: no claim counted dead
+            assert lay()["claimed_dead"] == 0
+            lhe_parts._my_jobs = lambda: {"555", "556"}
+            assert lay()["claimed_dead"] == 0 and S.queue_plan(reg, 2, lay(), time.time())[0] == 0
+            # (2) parked, replanned, then drained: current again, and the replan guard holds under live claims
+            for f in os.listdir(os.path.join(q, "claimed")):
+                os.rename(os.path.join(q, "claimed", f), os.path.join(q, "todo", f.rsplit(".", 1)[0]))
+            lhe_parts.cmd_park(argparse.Namespace(queue=q))
+            assert lay()["why"] == "parked" and lhe_parts.parked(q)
+            lhe_parts.cmd_plan(ns())
+            assert not lhe_parts.parked(q) and lay()["current"], lay()
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            for f in todo:                                            # drained: every task claimed by a live worker
+                os.rename(os.path.join(q, "todo", f), os.path.join(q, "claimed", f + ".555"))
+            assert not os.listdir(os.path.join(q, "todo")) and glob.glob(os.path.join(q, "parked", "*", "*.json"))
+            L = lay()
+            assert L["current"] and L["why"] == "", L                 # before: "parked"
+            try:
+                lhe_parts.cmd_plan(ns())
+                raise AssertionError("replan under live claims of a once-parked queue was not refused")
+            except SystemExit as e:
+                assert "live workers hold 3 claims" in str(e.code), e.code
+            # a queue with no todo/ directory
+            bare = os.path.join(d, "bare")
+            os.makedirs(os.path.join(bare, "claimed"))
+            L = lay(bare)
+            assert L["todo"] == 0 and L["claimed_dead"] == 0 and L["current"], L
+            # (3) accept-yield: a decision naming qq_ttbarj does not accept qq_ttbar, nor ttbar; qq_ttbar named is
+            import sqlite3
+            led, acc_file = os.path.join(d, "ledger.db"), os.path.join(d, "accepted.json")
+            c = sqlite3.connect(led)
+            c.execute("CREATE TABLE decisions (id TEXT, project TEXT, kind TEXT, quote TEXT, covers TEXT, in_force INT)")
+            c.execute("INSERT INTO decisions VALUES ('D1','FA','approve','accept pp_qq_ttbarj','gen',1)")
+            c.execute("INSERT INTO decisions VALUES ('D2','FA','approve','go','gen, pp_qq_ttbar',1)")
+            c.commit(); c.close()
+            acc = lambda *names: lhe_parts.cmd_accept_yield(argparse.Namespace(names=list(names), ledger=led,
+                                                                               accepted=acc_file))
+            for bad in ("pp_qq_ttbar=D1", "qq_ttbar=D1", "ttbarj=D1", "qq_ttbar=D2"):
+                try:
+                    acc(bad)
+                    raise AssertionError("accepted %s" % bad)
+                except SystemExit as e:
+                    assert "neither quotes nor covers" in str(e.code) and not os.path.exists(acc_file), e.code
+            acc("pp_qq_ttbarj=D1", "pp_qq_ttbar=D2")
+            assert sorted(json.load(open(acc_file))) == ["pp_qq_ttbar", "pp_qq_ttbarj"]
+    finally:
+        lhe_parts._my_jobs = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[dead claims + park marker + accept boundary] ok")
+
+
+def _out(f):
+    import io, contextlib
+    b = io.StringIO()
+    with contextlib.redirect_stdout(b):
+        f()
+    return b.getvalue().strip().splitlines()[-1]
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -689,3 +860,5 @@ if __name__ == "__main__":
     test_ee_energy_runs_and_equal_shares()
     test_stale_worker_returns_tasks()
     test_park_and_skip_claimed()
+    test_generation_rule()
+    test_layout_dead_claims_park_marker_accept_boundary()

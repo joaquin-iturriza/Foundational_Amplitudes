@@ -12,7 +12,16 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             so any number of jobs drain one queue), runs it, and the job whose part completes a process assembles its
             pools (a lock per standalone directory, so no two jobs label or compile the same backend at once).
             Claims of jobs no longer in the queue (squeue) are put back first. Exits when nothing fits or is left.
-    park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold)
+    layout  --queue Q        one JSON line: current (every spec's layout is the recipes' now, not parked, no plan in
+                             progress), why not, and the task counts with claimed_dead (claims of workers gone from
+                             the scheduler; read by the supervisor before it resubmits workers)
+    plan refuses (agent_redesign C5): a replan of a queue whose claims live workers hold unless it is parked first; a
+            process missing from --probe (default analysis/catalog_v4/data/lhe_probe_yields.json) or asking more than
+            2x the events it keeps there, unless --exclude'd or accepted (lhe_yield_accepted.json, written by accept-yield)
+    accept-yield NAME=D<n>...   (laptop) record the user's decision accepting a low-yield process, checked against
+                             the decision ledger: in force, and its quote or covers name the process
+    park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold); parked
+                             (Q/parked/.active) until a plan of the queue completes
     plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again; --exclude NAME... held processes
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
     yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
@@ -78,17 +87,157 @@ def _dirs(q):
     return {k: os.path.join(q, k) for k in ("todo", "claimed", "done", "failed", "assembled", "locks", "specs")}
 
 
+PROBE_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields.json")
+YIELD_FACTOR = 2.0        # events asked over events kept above this refuses the plan (agent_redesign C5)
+# low-yield processes the user accepted, each with the decision checked against the ledger when it was recorded
+# (accept-yield runs on the laptop, where the ledger is; plan reads this committed file on the site)
+ACCEPTED_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_yield_accepted.json")
+LEDGER = os.path.expanduser("~/.local/share/ccorch/runs.db")
+ACCEPT_KINDS = ("approve", "scope", "prefer", "release")
+
+
+def cmd_accept_yield(a):
+    """NAME=D<n>...: record that the user's decision D<n> accepts a process that keeps under 1/YIELD_FACTOR of the
+    events it asks. Refused unless D<n> is an FA decision in force (approve/scope/prefer/release) whose quote or covers
+    name the process. Writes ACCEPTED_YIELDS (commit it; plan reads it on the site)."""
+    import sqlite3
+    if not os.path.exists(a.ledger):
+        sys.exit("lhe_parts accept-yield: no decision ledger at %s (run it on the laptop)" % a.ledger)
+    c = sqlite3.connect("file:%s?mode=ro" % a.ledger, uri=True)
+    path = a.accepted or ACCEPTED_YIELDS
+    acc = json.load(open(path)) if os.path.exists(path) else {}
+    bad = []
+    for x in a.names:
+        name, _, did = x.partition("=")
+        r = c.execute("SELECT kind, quote, covers FROM decisions WHERE id=? AND project='FA' AND in_force=1",
+                      (did,)).fetchone()
+        if not r or r[0] not in ACCEPT_KINDS:
+            bad.append("%s: %s is not an FA decision in force (%s)" % (name, did, "/".join(ACCEPT_KINDS)))
+        elif not any(re.search(r"(?<![\w])%s(?![\w])" % re.escape(name), t or "") for t in (r[1], r[2])):
+            bad.append("%s: %s neither quotes nor covers it" % (name, did))
+        else:
+            acc[name] = {"decision": did, "quote": r[1], "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    if bad:
+        sys.exit("lhe_parts accept-yield: refused, nothing recorded:\n  " + "\n  ".join(bad))
+    with open(path, "w") as f:
+        json.dump(acc, f, indent=1, sort_keys=True)
+    print(json.dumps({"accepted": sorted(acc)}))
+
+
+def live_claims(q):
+    """Claims in queue q held by jobs still in the scheduler (a claim of a job unknown to squeue counts as live when
+    squeue cannot be read: the replan guard errs on the side of refusing)."""
+    D = os.path.join(q, "claimed")
+    if not os.path.isdir(D):
+        return []
+    live = _my_jobs()
+    out = []
+    for f in os.listdir(D):
+        job = f.rsplit(".", 1)[-1]
+        if live is None or job in live or not job.isdigit():
+            out.append(f)
+    return out
+
+
+PARK_MARK = os.path.join("parked", ".active")    # written by park, removed by the next plan that completes
+
+
+def parked(q):
+    """A queue is parked from `park` until a plan of it completes (its live workers only finish what they hold);
+    tasks parked earlier and then replanned do not make it parked again."""
+    return os.path.exists(os.path.join(q, PARK_MARK))
+
+
+def plan_refusals(a, items):
+    """The generation rule's checks before a plan writes anything (C5). Returns the reasons to refuse ([] = go).
+      - a queue already planned whose claims live workers hold is replanned only once parked (`park`): workers started
+        under the old layout failed 908 tasks with IndexError after the 2026-10-29 replan (85e93d0f)
+      - with --probe: every process is in the probe file (kept fraction of events per process, tools/lhe_probe.py
+        summary), and none asks more than YIELD_FACTOR x the events it keeps, unless it is excluded or accepted in
+        ACCEPTED_YIELDS (accept-yield, which checks the decision against the ledger)"""
+    why = []
+    if os.path.isdir(os.path.join(a.queue, "specs")) and os.listdir(os.path.join(a.queue, "specs")):
+        held = live_claims(a.queue)
+        if held and not parked(a.queue):
+            why.append("queue %s is being replanned while live workers hold %d claims (e.g. %s): park it first "
+                       "(lhe_parts park --queue %s), or plan a new queue with --skip-claimed %s"
+                       % (a.queue, len(held), held[0], a.queue, a.queue))
+    probe = getattr(a, "probe", None)
+    if probe:
+        y = json.load(open(probe))
+        accfile = getattr(a, "accepted", None) or ACCEPTED_YIELDS
+        accept = json.load(open(accfile)) if os.path.exists(accfile) else {}
+        names = [n for n in sorted(items) if n not in (getattr(a, "exclude", None) or [])]
+        missing = [n for n in names if n not in y]
+        if missing:
+            why.append("%d process(es) missing from the probe file %s (probe them first): %s"
+                       % (len(missing), probe, ", ".join(missing[:20]) + (" ..." if len(missing) > 20 else "")))
+        low = [(n, y[n]) for n in names if n in y and (y[n] <= 0 or 1.0 / y[n] > YIELD_FACTOR) and n not in accept]
+        if low:
+            why.append("%d process(es) ask more than %gx the events they keep (kept fraction in %s): %s; fix their "
+                       "layout, exclude them, or record the user's decision accepting them (on the laptop: "
+                       "python3 tools/lhe_parts.py accept-yield NAME=D<n>..., then commit and sync)"
+                       % (len(low), YIELD_FACTOR, probe, ", ".join("%s (kept %.3f, asked/kept %s)" % (
+                           n, v, "inf" if v <= 0 else "%.1f" % (1.0 / v)) for n, v in low)))
+    return why
+
+
+def cmd_layout(a):
+    """One JSON line for the supervisor: is the queue's layout the one workers submitted now would build?
+    current = every spec's events identity equals the recipes' now (layout_current), the queue is not parked and no
+    plan is in progress (Q/.planning). With the counts of `status`, and claimed_dead: claims of workers no longer in
+    the scheduler (a worker that died at its limit), work still to do that only a worker started now puts back (0
+    when squeue cannot be read)."""
+    D = _dirs(a.queue)
+    c = {k: len([f for f in os.listdir(D[k]) if ".json" in f and not f.endswith(".err")]) if os.path.isdir(D[k]) else 0
+         for k in ("todo", "claimed", "done", "failed")}
+    c["claimed_dead"] = max(0, c["claimed"] - len(live_claims(a.queue)))
+    out = dict(c, queue=os.path.basename(os.path.normpath(a.queue)), current=True, why="")
+    stale = []
+    for f in sorted(os.listdir(D["specs"])) if os.path.isdir(D["specs"]) else []:
+        name = f[:-5]
+        try:
+            layout_current(name, _spec(D, name))
+        except StaleLayout:
+            stale.append(name)
+        except Exception as e:                     # a process the recipes no longer have
+            stale.append("%s (%s)" % (name, type(e).__name__))
+    if stale:
+        out.update(current=False, why="%d process(es) laid out otherwise in the recipes now, e.g. %s"
+                   % (len(stale), stale[0]), stale=stale[:50])
+    elif parked(a.queue):
+        out.update(current=False, why="parked")
+    elif os.path.exists(os.path.join(a.queue, ".planning")):
+        out.update(current=False, why="a plan is in progress")
+    print(json.dumps(out))
+
+
 def cmd_plan(a):
+    items_pre = _items(a.specs, a.seed)
+    why = plan_refusals(a, items_pre)
+    if why:
+        sys.exit("lhe_parts plan: refused:\n  " + "\n  ".join(why))
     D = _dirs(a.queue)
     for d in D.values():
         os.makedirs(d, exist_ok=True)
+    mark = os.path.join(a.queue, ".planning")
+    open(mark, "w").write(str(os.getpid()))
+    try:
+        _plan(a, D, items_pre)
+    finally:
+        os.remove(mark)
+    if os.path.exists(os.path.join(a.queue, PARK_MARK)):    # planned again: no longer parked
+        os.remove(os.path.join(a.queue, PARK_MARK))
+
+
+def _plan(a, D, items):
     rates = json.load(open(a.rates))          # tools/lhe_rates.py; no invented fallback rates
     by = {}
     for r in rates.values():
         by.setdefault(int(r["nfinal"]), []).append(r["core_s_per_event"])
     med = {k: statistics.median(v) for k, v in by.items()}
     src_cost = {}
-    items = _items(a.specs, a.seed)
+    # items: read once by cmd_plan, before its checks
     cores = {k: int(v) for k, v in (c.split("=") for c in a.cores)}
     # the spec of each process (one per process: the assembly rebuilds its items from it)
     # tasks queued or claimed (a done one is known by its part file; a failed one is queued again: plan retries it)
@@ -601,6 +750,7 @@ def cmd_park(a):
     D = _dirs(a.queue)
     dst = os.path.join(a.queue, "parked", time.strftime("%Y%m%d_%H%M%S"))
     os.makedirs(dst, exist_ok=True)
+    open(os.path.join(a.queue, PARK_MARK), "w").write(time.strftime("%Y-%m-%dT%H:%M:%S"))
     n = 0
     for f in os.listdir(D["todo"]):
         try:
@@ -817,6 +967,11 @@ def main():
     p.add_argument("--cores", nargs="*", default=[], help="NAME=C: that process's runs on C cores each")
     p.add_argument("--skip-claimed", nargs="*", default=[], help="queues whose claimed runs are not planned again")
     p.add_argument("--exclude", nargs="*", default=[], help="processes not planned in this queue (held)")
+    p.add_argument("--probe", default=PROBE_YIELDS, help="kept fraction per process (tools/lhe_probe.py summary); every "
+                   "planned process must be in it and keep at least 1/%g of the events it asks" % YIELD_FACTOR)
+    ay = sub.add_parser("accept-yield"); ay.add_argument("names", nargs="+", metavar="NAME=D<n>")
+    ay.add_argument("--ledger", default=LEDGER); ay.add_argument("--accepted")
+    ly = sub.add_parser("layout"); ly.add_argument("--queue", required=True)
     pk = sub.add_parser("park"); pk.add_argument("--queue", required=True)
     p.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     w = sub.add_parser("work"); w.add_argument("--queue", required=True)
@@ -831,7 +986,7 @@ def main():
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     sb = sub.add_parser("shortbuilt"); sb.add_argument("--out", required=True); sb.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
-    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 
