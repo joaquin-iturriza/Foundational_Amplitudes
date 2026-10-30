@@ -4701,6 +4701,12 @@ entries:
     units: null
     start: '2026-10-30T17:38:44+00:00'
     at: '2026-10-30T17:38:44+00:00'
+  - batch: mixture_ab_steps11_14
+    wall_h: 2.5
+    jobs: 7
+    units: null
+    start: '2026-10-30T18:14:12+00:00'
+    at: '2026-10-30T18:14:12+00:00'
   step_why:
     10:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
