@@ -3972,6 +3972,12 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             **({"iseed_salt": int(cfg["lhe"]["iseed_salt"])} if cfg["lhe"].get("iseed_salt") else {}),
             **({"energy_runs": [int(x) for x in cfg["lhe"]["energy_runs"]]} if cfg["lhe"].get("energy_runs")
                else {}),
+            # lhe.energy_run_events: an e+e- pool whose runs of run_events stop short at one energy takes smaller runs
+            # there (one value per energy), drawn from the gridpacks the probe measured (lhe.grid_seed_runs: the run
+            # count their iseeds were set from; lhe.gridpack_eid: the identity they were built and are kept under)
+            **({"energy_run_events": [int(x) for x in cfg["lhe"]["energy_run_events"]]}
+               if cfg["lhe"].get("energy_run_events") else {}),
+            **({k: cfg["lhe"][k] for k in ("grid_seed_runs", "gridpack_eid") if cfg["lhe"].get(k)}),
             # lhe.complete_runs: only the runs that returned every event they asked are assembled (lhe_assemble). A run
             # that stops short of its target ("fail to reach target") returns a biased sample (catalog_coverage,
             # analysis/catalog_v4/short_run_bias.py); a run that completes does not, whatever its size. In the
@@ -3999,6 +4005,15 @@ def lhe_runs(process, iseed, n_req):
     if not energies:
         return [(seed_k(k), r_ev or n_req, {}, f"run_{k + 1:02d}") for k in range(n_runs)]
     n_e = r_ev or int(math.ceil(n_req / len(energies)))
+    # lhe.energy_run_events: energy j's runs ask sizes[j] events (smaller runs where runs of n_e stop short)
+    sizes = [int(x) for x in l["energy_run_events"]] if l.get("energy_run_events") else [n_e] * len(energies)
+    if len(sizes) != len(energies):
+        raise ValueError(f"{process}: lhe.energy_run_events has {len(sizes)} values for {len(energies)} energies")
+    # lhe.grid_seed_runs = G pins the gridpacks' iseeds (lhe_gridpacks continues the sequence past G runs): runs from G
+    # on skip the len(energies) seeds the gridpacks hold, so no run shares a gridpack's iseed
+    G = l.get("grid_seed_runs")
+    if G:
+        seed_k = lambda k, s0=seed_k: s0(k if k < int(G) else k + len(energies))
     # lhe.energy_runs (a pool whose runs came back short at some energies): energy j gets energy_runs[j] runs of n_e,
     # sized from that energy's measured yield (recipes/gen_catalog_v4_default.py), so each energy still returns its
     # equal share; runs numbered and seeded in sequence over the energies. _lhe_finish refuses a pool where one does not
@@ -4007,9 +4022,9 @@ def lhe_runs(process, iseed, n_req):
         if len(nrs) != len(energies):
             raise ValueError(f"{process}: lhe.energy_runs has {len(nrs)} values for {len(energies)} energies")
         i0 = [sum(nrs[:j]) for j in range(len(nrs))]
-        return [(seed_k(i0[j] + k), n_e, {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{i0[j] + k + 1:02d}")
+        return [(seed_k(i0[j] + k), sizes[j], {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{i0[j] + k + 1:02d}")
                 for j, E in enumerate(energies) for k in range(nrs[j])]
-    return [(seed_k(j * n_runs + k), n_e, {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{j * n_runs + k + 1:02d}")
+    return [(seed_k(j * n_runs + k), sizes[j], {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{j * n_runs + k + 1:02d}")
             for j, E in enumerate(energies) for k in range(n_runs)]
 
 
@@ -4481,7 +4496,8 @@ def lhe_gridpacks(process, iseed, n_req):
         return []
     runs = lhe_runs(process, iseed, n_req)
     pats = list({json.dumps(r[2], sort_keys=True): r[2] for r in runs}.values())    # in run order, one per energy
-    return [((iseed + 7919 * (len(runs) + j) - 1) % 30000 + 1, int(l["gridpack"]), dict(p), f"grid{j:02d}")
+    base = int(l.get("grid_seed_runs") or len(runs))       # pinned: the gridpacks of the layout the probe measured
+    return [((iseed + 7919 * (base + j) - 1) % 30000 + 1, int(l["gridpack"]), dict(p), f"grid{j:02d}")
             for j, p in enumerate(pats)]
 
 
@@ -4497,7 +4513,9 @@ def lhe_gridpack_paths(process, items):
     grids = lhe_gridpacks(process, iseed, n_req)
     if not grids:
         return []
-    eid = _lhe_events_id(items[0][0])
+    # lhe.gridpack_eid: the gridpacks are those built under that identity (a layout that differs only in its run sizes,
+    # tests/test_lhe_gridpack.py checks it), so the runs are drawn from the very gridpacks the run-size probe measured
+    eid = PROCESSES[process]["lhe"].get("gridpack_eid") or _lhe_events_id(items[0][0])
     d = os.path.join(lhe_parts_dir(), process)
     return [(os.path.join(d, f"{process}_{eid}_{g[3]}_seed{g[0]}_ev{g[1]}_gridpack.tar.gz"), g) for g in grids]
 

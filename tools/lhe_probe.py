@@ -222,7 +222,10 @@ def cmd_gridpool(a):
     runs of the pool's run size drawn from it at probe seeds (lhe_iseed(process, 9999 + s), not the pool's), --cores at
     a time. One PROBE_JSON line per run, read by `summary` and `kept --yields-out` like a MadEvent probe run's (yield,
     kept fraction, seconds per kept event; "gridpack": true, the energy in its patches); one GRIDPACK_JSON line per
-    gridpack (stage grid: seconds, bytes)."""
+    gridpack (stage grid: seconds, bytes). --events asks runs of that size instead of the pool's run size (a run-size probe
+    on the pool's own gridpacks), --energy keeps only that energy's gridpack, --seed-base offsets the probe seeds
+    (lhe_iseed(process, 9999 + seed_base + s)) so probes of several sizes never share a seed, and --keep saves each run's
+    events as KEEP/<process>/<process>_gpack<grid iseed>_seed<iseed>_ev<n>.npz (short_run_bias.py sizecheck)."""
     import datagen
     from concurrent.futures import ThreadPoolExecutor
     for name in a.process:
@@ -239,9 +242,11 @@ def cmd_gridpool(a):
         base = a.work or os.environ.get("TMPDIR") or "/tmp"
         wd = os.path.join(base, f"lhe_gridpool_{name}_{os.getpid()}")
         os.makedirs(wd, exist_ok=True)
-        run_ev = int(cfg["lhe"]["run_events"])
+        run_ev = int(a.events or cfg["lhe"]["run_events"])
         try:
             for j, (tar, g) in enumerate(mg.lhe_gridpack_paths(name, items)):
+                if a.energy and abs(2.0 * float(g[2].get("ebeam1", 0.0)) - a.energy) > 1e-6:
+                    continue
                 head = {"process": name, "host": socket.gethostname(), "grid": g[3], "grid_iseed": g[0],
                         "grid_events": g[1], "patches": g[2]}
                 t0 = time.time()
@@ -257,7 +262,7 @@ def cmd_gridpool(a):
                     continue
 
                 def one(s, tar=tar, g=g):
-                    seed = mg.lhe_iseed(name, 9999 + s)
+                    seed = mg.lhe_iseed(name, 9999 + a.seed_base + s)
                     r = {"process": name, "seed": seed, "events_asked": run_ev, "patches": g[2], "gridpack": True,
                          "grid": g[3], "host": socket.gethostname()}
                     rw = os.path.join(wd, f"run_{g[3]}_{s}")
@@ -265,8 +270,11 @@ def cmd_gridpool(a):
                     try:
                         lhe = mg.lhe_run_gridpack(tar, rw, run_ev, seed, os.path.join(wd, f"run_{g[3]}_{s}.log"),
                                                   timeout=a.timeout)
-                        m, _, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
+                        m, aq, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
                         r["s_generate"] = round(time.time() - t1, 1)
+                        if a.keep:
+                            r["kept_events_file"] = _keep(a.keep, name, f"{name}_gpack{g[0]}_seed{seed}_ev{run_ev}.npz",
+                                                          m, aq, mg.lhe_gridpack_header(lhe))
                         r["events_returned"] = len(m)
                         r["yield"] = len(m) / run_ev
                         r.update(kept(m, accept_of(name)))
@@ -598,6 +606,10 @@ def main():
     s.add_argument("--runs", type=int, default=16, help="probe runs per gridpack at the pool's run size")
     s.add_argument("--cores", type=int, default=1); s.add_argument("--work", default=None)
     s.add_argument("--timeout", type=float, default=1800.0)
+    s.add_argument("--events", type=int, default=None, help="run size (default: the pool's lhe.run_events)")
+    s.add_argument("--energy", type=float, default=None, help="e+e-: only the gridpack of this collider energy")
+    s.add_argument("--seed-base", type=int, default=0, help="probe seeds lhe_iseed(process, 9999 + this + s)")
+    s.add_argument("--keep", default=None, help="save each run's events and banner under KEEP/<process>/")
     s = sub.add_parser("gridpool-plan"); s.add_argument("--jobs", type=int, required=True)
     s.add_argument("--cores", type=int, default=16); s.add_argument("--runs", type=int, default=16)
     s.add_argument("--complete", default=os.path.join(ROOT, "analysis/catalog_v4/data/complete_runs.json"))

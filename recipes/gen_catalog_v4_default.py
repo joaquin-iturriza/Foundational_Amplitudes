@@ -215,14 +215,18 @@ MAX_ASK_FACTOR = 2.0
 RUN_SAFETY = 1.25           # fa-generation: events asked = needed / measured share, times at most 1.25
 
 
-def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=None, name="?"):
+def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=None, name="?", sizes=None, pin=None):
     """lhe (in place, a copy's): runs of run_events, as many as the blocks need at COMPLETE_SHARE of them complete (per
     energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped. gridpack: the runs
     drawn from one gridpack per energy of max(the energy's need, GRID_MIN of its beams, grid_events) events' precision
     (lhe.gridpack). shares ({energy as f"{E:g}", or "all" for pp: complete share measured}): an energy measured under
-    COMPLETE_SHARE x RUN_SAFETY takes ceil(need / (share / RUN_SAFETY x run_events)) runs (lhe.energy_runs for e+e-)."""
+    COMPLETE_SHARE x RUN_SAFETY takes ceil(need / (share / RUN_SAFETY x run_events)) runs (lhe.energy_runs for e+e-).
+    sizes ({energy: [run size, complete share measured at that size]}, e+e-): those energies take runs of that size
+    instead (lhe.energy_run_events), as many as the share needs; pin ({"grid_seed_runs", "gridpack_eid"}): their runs
+    drawn from the gridpacks the run-size probe measured (mg5_pipeline_final.lhe_gridpacks, lhe_gridpack_paths)."""
     need = sum(int(lhe[k]) for k in ("n_val", "n_test", "n_train"))
-    for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt", "gridpack"):
+    for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt", "gridpack",
+              "energy_run_events", "grid_seed_runs", "gridpack_eid"):
         lhe.pop(k, None)
     per = int(math.ceil(need / len(lhe["energies"]))) if lhe.get("energies") else need
     n_runs = int(math.ceil(per / (COMPLETE_SHARE * int(run_events))))
@@ -242,6 +246,23 @@ def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=No
                 lhe["energy_runs"] = runs
         else:
             lhe["n_runs"] = runs[0]
+    if sizes:
+        keys = [f"{float(E):g}" for E in lhe["energies"]]
+        if any(k not in keys for k in sizes):
+            raise SystemExit(f"{name}: run sizes at energies it does not have: {sorted(set(sizes) - set(keys))}")
+        runs = list(lhe.get("energy_runs") or [lhe["n_runs"]] * len(keys))
+        ev = [int(run_events)] * len(keys)
+        for k, (size, x) in sizes.items():
+            if x <= 0 or 1.0 / x > MAX_ASK_FACTOR:
+                raise SystemExit(f"{name}: complete share {x} at {k} in runs of {size}: under 1/{MAX_ASK_FACTOR:g}")
+            j = keys.index(k)
+            ev[j] = int(size)
+            runs[j] = int(math.ceil(per / (min(COMPLETE_SHARE, x / RUN_SAFETY) * int(size))))
+        lhe["energy_run_events"] = ev
+        lhe["energy_runs"] = runs
+    if pin:
+        lhe["grid_seed_runs"] = int(pin["grid_seed_runs"])
+        lhe["gridpack_eid"] = str(pin["gridpack_eid"])
     if gridpack:
         lhe["gridpack"] = max(per, GRID_MIN["ee" if lhe.get("energies") else "pp"], int(grid_events or 0))
     return lhe
@@ -253,7 +274,10 @@ def complete_args(c, name):
     sh = {E: v["complete"] for E, v in by.get(name, {}).items()} if c.get("size_from_probe") else None
     if c.get("size_from_probe") and not sh:
         raise SystemExit(f"{name}: size_from_probe set but no per-energy probe result in {BY_ENERGY}")
-    return dict(gridpack=c.get("gridpack", False), shares=sh, grid_events=c.get("grid_events"), name=name)
+    sizes = {E: tuple(v) for E, v in c["energy_run_events"].items()} if c.get("energy_run_events") else None
+    pin = {k: c[k] for k in ("grid_seed_runs", "gridpack_eid")} if c.get("gridpack_eid") else None
+    return dict(gridpack=c.get("gridpack", False), shares=sh, grid_events=c.get("grid_events"), name=name,
+                sizes=sizes, pin=pin)
 
 
 def complete_set():

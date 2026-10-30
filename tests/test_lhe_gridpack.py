@@ -102,7 +102,52 @@ def test_gpack_file_name():
     assert not srb.PROBE_RE.match("dsh_dg_dguux_gpack1234_seed17_ev1000.npz")
 
 
+def _gridpack_paths(name):
+    import datagen
+    items = []
+    for role, (lo, hi) in mg.lhe_layout(mg.PROCESSES[name]).items():
+        if hi > lo:
+            rec = mg.variable_energy_recipe(name, 13000, 13000, hi - lo, role=role, seed=42)
+            items.append((rec, mg.recipe_output_path(rec, datagen.dest_for_role(role))))
+    return mg.lhe_gridpack_paths(name, items), mg._lhe_events_id(items[0][0])
+
+
+def test_energy_run_events_on_pinned_gridpacks():
+    """Smaller runs at one energy of an e+e- gridpack pool (ee4_epem_cgsxwm at 3000 GeV): that energy's runs ask the
+    new size, the other energies keep their runs (sizes and seeds), the gridpacks keep their iseeds and paths (the
+    ones the run-size probe drew from), no run shares a gridpack's iseed, and the events' identity changes."""
+    import copy
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    import gen_catalog_v4_default as gd
+    name = "ee4_epem_cgsxwm"
+    if name not in mg.PROCESSES:
+        print("skip: no", name)
+        return
+    saved = copy.deepcopy(mg.PROCESSES[name])
+    try:
+        l0 = mg.PROCESSES[name]["lhe"]
+        iseed, n_req = mg.lhe_iseed(name, 42), mg.lhe_n_requested(mg.PROCESSES[name])
+        runs0, grids0 = mg.lhe_runs(name, iseed, n_req), mg.lhe_gridpacks(name, iseed, n_req)
+        paths0, eid0 = _gridpack_paths(name)
+        l1 = gd.complete_layout(dict(l0), 200, gridpack=True, grid_events=52228, name=name,
+                                sizes={"3000": (50, 0.9)}, pin={"grid_seed_runs": len(runs0), "gridpack_eid": eid0})
+        mg.PROCESSES[name]["lhe"] = l1
+        runs1, grids1 = mg.lhe_runs(name, iseed, n_req), mg.lhe_gridpacks(name, iseed, n_req)
+        paths1, eid1 = _gridpack_paths(name)
+        E1 = mg.lhe_energy_of_runs(runs1)
+        assert all(r[1] == (50 if e == 3000.0 else 200) for r, e in zip(runs1, E1))
+        assert sum(e == 3000.0 for e in E1) == 12          # ceil(400 / (min(0.8, 0.9 / 1.25) x 50))
+        keep = [r for r in runs0 if 2 * r[2]["ebeam1"] != 3000.0]
+        assert [r for r in runs1 if 2 * r[2]["ebeam1"] != 3000.0] == keep
+        assert grids1 == grids0 and paths1 == paths0 and eid1 != eid0
+        seeds = [r[0] for r in runs1]
+        assert len(set(seeds)) == len(seeds) and not set(seeds) & {g[0] for g in grids1}
+    finally:
+        mg.PROCESSES[name] = saved
+
+
 if __name__ == "__main__":
-    for f in (test_gridpack_roundtrip, test_physics_key_ignores_gridpack, test_gpack_file_name):
+    for f in (test_gridpack_roundtrip, test_physics_key_ignores_gridpack, test_gpack_file_name,
+              test_energy_run_events_on_pinned_gridpacks):
         f()
         print("ok", f.__name__)
