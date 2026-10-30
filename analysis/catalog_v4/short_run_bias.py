@@ -644,7 +644,7 @@ def cmd_sizecheck(a):
     those reference runs split in two by seed. One physics key required (same cards and energy)."""
     import numpy as np
     sys.path.insert(0, ROOT)
-    keep = a.keep or os.path.join(os.environ["SCRATCH"], "lhe_probe_keep")
+    keep = os.path.expandvars(a.keep) if a.keep else os.path.join(os.environ["SCRATCH"], "lhe_probe_keep")
     S = []
     for f in sorted(glob.glob(os.path.join(keep, a.process, "*.npz"))):
         m = GPACK_RE.match(os.path.basename(f))

@@ -152,7 +152,7 @@ def _du(path):
 
 def _keep(keep, name, fname, m, aq, banner):
     """Save one run's events and banner as KEEP/<process>/<fname> (atomic rename); returns the path."""
-    d = os.path.join(keep, name)
+    d = os.path.join(os.path.expandvars(keep), name)      # KEEP may name $SCRATCH (a job's --env holds it literally)
     os.makedirs(d, exist_ok=True)
     kp = os.path.join(d, fname)
     np.savez(kp + ".tmp.npz", mom=m, aqcd=aq, banner=np.array(banner))
