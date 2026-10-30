@@ -146,8 +146,34 @@ def test_energy_run_events_on_pinned_gridpacks():
         mg.PROCESSES[name] = saved
 
 
+XI_SRC = ("class gen_ximprove_v4(object):\n    max_iter = 5\n    max_event_in_iter = 99\n\n"
+          "class gen_ximprove_gridpack(gen_ximprove_v4):\n    min_iter = 1    \n    max_iter = 13\n"
+          "    max_request_event = 1e12         # split\n    max_event_in_iter = 4000\n    min_event_in_iter = 500\n"
+          "\n    def f(self):\n        pass\n\nclass other(object):\n    max_iter = 7\n")
+
+
+def test_patch_ximprove():
+    """Only gen_ximprove_gridpack's attributes change, its compiled copy goes, a key outside the list is refused."""
+    with tempfile.TemporaryDirectory() as d:
+        b = os.path.join(d, "madevent", "bin", "internal")
+        os.makedirs(os.path.join(b, "__pycache__"))
+        open(os.path.join(b, "gen_ximprove.py"), "w").write(XI_SRC)
+        pyc = os.path.join(b, "__pycache__", "gen_ximprove.cpython-311.opt-1.pyc")
+        open(pyc, "w").close()
+        mg.lhe_patch_ximprove(d, {"max_event_in_iter": 40000, "max_iter": 16})
+        out = open(os.path.join(b, "gen_ximprove.py")).read()
+        assert out == XI_SRC.replace("max_iter = 13", "max_iter = 16").replace("in_iter = 4000", "in_iter = 40000")
+        assert not os.path.exists(pyc)
+        for bad in ({"max_request_event": 1}, {"nhel": 0}):
+            try:
+                mg.lhe_patch_ximprove(d, bad)
+                raise AssertionError(f"{bad} accepted")
+            except ValueError:
+                pass
+
+
 if __name__ == "__main__":
     for f in (test_gridpack_roundtrip, test_physics_key_ignores_gridpack, test_gpack_file_name,
-              test_energy_run_events_on_pinned_gridpacks):
+              test_energy_run_events_on_pinned_gridpacks, test_patch_ximprove):
         f()
         print("ok", f.__name__)

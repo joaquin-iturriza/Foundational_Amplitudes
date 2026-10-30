@@ -216,6 +216,27 @@ def cmd_gridpack(a):
         shutil.rmtree(wd, ignore_errors=True)
 
 
+def _kv(x):
+    k, v = x.split("=", 1)
+    return k, (float(v) if "." in v else int(v))
+
+
+def _keep_logs(keep, name, stem, rw, run_log):
+    """A gridpack run's logs saved as KEEP/<process>/<stem>.logs.tar.gz: its run.sh output and, per integration
+    channel, results.dat and log.txt (the iterations, points and unweighted events of the run's event generation)."""
+    import tarfile
+    d = os.path.join(os.path.expandvars(keep), name)
+    os.makedirs(d, exist_ok=True)
+    out = os.path.join(d, stem + ".logs.tar.gz")
+    with tarfile.open(out, "w:gz") as t:
+        if os.path.exists(run_log):
+            t.add(run_log, arcname="run.log")
+        for f in sorted(glob.glob(os.path.join(rw, "madevent", "SubProcesses", "P*", "G*", "*"))):
+            if os.path.basename(f) in ("results.dat", "log.txt") or os.path.basename(f).startswith("log"):
+                t.add(f, arcname=os.path.relpath(f, rw))
+    return out
+
+
 def cmd_gridpool(a):
     """The generation rule's probe of lhe.gridpack pools (catalog_coverage step 7): for each --process, each of its
     gridpacks built as the queue builds it (mg.lhe_build_gridpack, at its path: the queue then reuses it), then --runs
@@ -244,6 +265,7 @@ def cmd_gridpool(a):
         wd = os.path.join(base, f"lhe_gridpool_{name}_{os.getpid()}")
         os.makedirs(wd, exist_ok=True)
         run_ev = int(a.events or cfg["lhe"]["run_events"])
+        xi = dict(_kv(x) for x in (a.ximprove or []))
         try:
             for j, (tar, g) in enumerate(mg.lhe_gridpack_paths(name, items)):
                 if a.energy and abs(2.0 * float(g[2].get("ebeam1", 0.0)) - a.energy) > 1e-6:
@@ -270,7 +292,7 @@ def cmd_gridpool(a):
                     t1 = time.time()
                     try:
                         lhe = mg.lhe_run_gridpack(tar, rw, run_ev, seed, os.path.join(wd, f"run_{g[3]}_{s}.log"),
-                                                  timeout=a.timeout)
+                                                  timeout=a.timeout, ximprove=xi)
                         m, aq, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
                         r["s_generate"] = round(time.time() - t1, 1)
                         if a.keep:
@@ -284,6 +306,9 @@ def cmd_gridpool(a):
                     except Exception as e:
                         r["error"] = f"{type(e).__name__}: {e}"
                     finally:
+                        if a.keep_logs:
+                            r["logs_file"] = _keep_logs(a.keep_logs, name, f"{name}_gpack{g[0]}_seed{seed}_ev{run_ev}",
+                                                        rw, os.path.join(wd, f"run_{g[3]}_{s}.log"))
                         shutil.rmtree(rw, ignore_errors=True)
                     print("PROBE_JSON " + json.dumps(r), flush=True)
                     return r
@@ -611,6 +636,9 @@ def main():
     s.add_argument("--energy", type=float, default=None, help="e+e-: only the gridpack of this collider energy")
     s.add_argument("--seed-base", type=int, default=0, help="run seeds this+1, this+2, .. (default: hashed probe seeds)")
     s.add_argument("--keep", default=None, help="save each run's events and banner under KEEP/<process>/")
+    s.add_argument("--keep-logs", default=None, help="save each run's logs under KEEP_LOGS/<process>/ (_keep_logs)")
+    s.add_argument("--ximprove", nargs="*", default=None,
+                   help="key=value: the gridpack event-generation limits of each run (mg.lhe_patch_ximprove)")
     s = sub.add_parser("gridpool-plan"); s.add_argument("--jobs", type=int, required=True)
     s.add_argument("--cores", type=int, default=16); s.add_argument("--runs", type=int, default=16)
     s.add_argument("--complete", default=os.path.join(ROOT, "analysis/catalog_v4/data/complete_runs.json"))

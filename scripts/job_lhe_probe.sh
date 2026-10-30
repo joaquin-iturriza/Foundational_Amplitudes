@@ -39,7 +39,8 @@ if [ "$PROBE_SHARD" = gridpool ]; then
     # probe sets GP_EVENTS (run size), GP_ENERGY (one e+e- energy), GP_SEED_BASE and PROBE_KEEP (runs kept for sizecheck)
     python tools/lhe_probe.py gridpool --process ${GP_POOLS:?} --runs "${GP_RUNS:-16}" --cores "${SLURM_CPUS_PER_TASK:-1}" \
         ${GP_EVENTS:+--events $GP_EVENTS} ${GP_ENERGY:+--energy $GP_ENERGY} ${GP_SEED_BASE:+--seed-base $GP_SEED_BASE} \
-        ${PROBE_KEEP:+--keep $PROBE_KEEP}
+        ${PROBE_KEEP:+--keep $PROBE_KEEP} ${GP_KEEP_LOGS:+--keep-logs $GP_KEEP_LOGS} ${GP_TIMEOUT:+--timeout $GP_TIMEOUT} \
+        ${GP_XIMPROVE:+--ximprove $GP_XIMPROVE}
     echo "RUN_SUMMARY lhe_probe gridpool rc=$?"; exit 0
 fi
 if [ "$PROBE_SHARD" = list ]; then
