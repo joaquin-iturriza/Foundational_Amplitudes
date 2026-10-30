@@ -1320,6 +1320,12 @@ entries:
     units: null
     start: '2026-10-30T17:00:28+00:00'
     at: '2026-10-30T17:00:28+00:00'
+  - batch: signext_seeds_44_45
+    wall_h: 3.5
+    jobs: 4
+    units: null
+    start: '2026-10-30T17:23:24+00:00'
+    at: '2026-10-30T17:23:24+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
