@@ -208,11 +208,24 @@ def cost():
     json.dump(out, sys.stdout)
 
 
-def summary():
+def _last_json(path):
+    """The eval's JSON object: the last line of the file that parses (the C++ driver's own lines can precede it on
+    stdout, and the object can follow one of them on the same line)."""
+    for line in reversed(open(path).read().splitlines()):
+        i = line.find('{"')
+        if i >= 0:
+            try:
+                return json.loads(line[i:])
+            except ValueError:
+                continue
+    raise ValueError(f"{path}: no eval JSON")
+
+
+def summary(evals=None, out=None):
     C = classify()
     E = {}
-    for f in sorted(glob.glob(os.path.join(HERE, "data", f"{'pp13v4' if SET == 'v4' else 'pp'}_physics_eval_*.json"))):
-        E.update(json.load(open(f)))
+    for f in sorted(glob.glob(evals or os.path.join(HERE, "data", f"{'pp13v4' if SET == 'v4' else 'pp'}_physics_eval_*.json"))):
+        E.update(_last_json(f))
     res = {"counts": dict(Counter(c["cls"] for c in C.values())),
            "counts_detail": dict(Counter(f"{c['cls']}{'/ew' if c.get('ew') and c['cls'] == 'b' else ''}"
                                          f"{'/itop' if c.get('itop') else ''}" for c in C.values())),
@@ -245,7 +258,7 @@ def summary():
                   "worst": sorted(((round(float(E[n]["v4"]["ms"]), 4), n) for n in ps_), reverse=True)[:5]}
     agree = {n: (E[n]["v4"]["ms"] if E.get(n, {}).get("v4") and "ms" in E[n]["v4"] else None) for n in C if C[n]["v4"]}
     json.dump({"classes": C, "eval": E, "ms_v4_vs_label": agree},
-              open(os.path.join(HERE, "data", "pp13v4_physics_check.json" if SET == "v4" else "pp_physics_check.json"), "w"),
+              open(out or os.path.join(HERE, "data", "pp13v4_physics_check.json" if SET == "v4" else "pp_physics_check.json"), "w"),
               indent=0)
     if SET == "v4":
         ev = [n for n in C if C[n]["v4"]]
@@ -266,6 +279,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("mode", choices=("classify", "eval", "summary", "cost", "built"))
     ap.add_argument("--set", choices=("v3", "v4"), default="v3")
+    ap.add_argument("--evals", default=None, help="summary: glob of the eval outputs (default data/<set>_physics_eval_*.json)")
+    ap.add_argument("--out", default=None, help="summary: where the full JSON goes (default data/)")
     ap.add_argument("--n", type=int, default=200)
     ap.add_argument("--part", type=int, default=0)
     ap.add_argument("--parts", type=int, default=1)
@@ -282,4 +297,4 @@ if __name__ == "__main__":
     elif a.mode == "cost":
         cost()
     else:
-        summary()
+        summary(a.evals, a.out)

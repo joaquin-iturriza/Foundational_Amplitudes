@@ -72,14 +72,7 @@ if [ "$PROBE_SHARD" = ppcheck4 ]; then
     python $P built --set v4 | tee "$R/built.json"; echo
     for k in $(seq 0 15); do python $P eval --set v4 --n 200 --part $k --parts 16 > "$R/eval_$k.json" 2> "$R/eval_$k.log" & done
     wait
-    python - "$R" <<'PY'
-import glob, json, sys
-E = {}
-for f in sorted(glob.glob(sys.argv[1] + "/eval_*.json")):
-    E.update(json.load(open(f)))
-json.dump(E, open(sys.argv[1] + "/pp13v4_physics_eval_all.json", "w"))
-print("PPCHECK4_EVAL", len(E), "classes,", sum("error" in e for e in E.values()), "errors")
-PY
+    python $P summary --set v4 --evals "$R/eval_*.json" --out "$R/pp13v4_physics_check.json" | sed 's/^/PPCHECK4_SUMMARY /'
     echo "RUN_SUMMARY lhe_probe ppcheck4 rc=$?"; exit 0
 fi
 if [ "$PROBE_SHARD" = mixcheck ]; then
