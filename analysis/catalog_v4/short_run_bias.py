@@ -127,15 +127,19 @@ def _ratio(short, comp):
             "err": [float(e) if o else None for e, o in zip(np.sqrt(np.maximum(hs, 1)) / np.where(ok, exp, 1), ok)]}
 
 
-def _samples():
-    """[{process, class, key, asked, got, status, path, kind}] of every part file and serial pool."""
+def _samples(before=None):
+    """[{process, class, key, asked, got, status, path, kind}] of every part file and serial pool; with `before` (epoch
+    seconds) only the files last written before it, so an earlier measurement is re-read on the files it saw."""
     import numpy as np
+    late = lambda f: before is not None and os.path.getmtime(f) > before
     sys.path.insert(0, ROOT)
     out = []
     pdir = os.path.join(os.environ["SCRATCH"], "lhe_parts")
     classes = set()
     for d in sorted(glob.glob(os.path.join(pdir, "*"))):
         for f in sorted(glob.glob(os.path.join(d, "*.npz"))):
+            if late(f):
+                continue
             m = PART_RE.match(os.path.basename(f))
             if not m:
                 continue
@@ -151,6 +155,8 @@ def _samples():
             classes.add(cls(m["proc"]))
     # complete runs kept by the run-size probe (tools/lhe_probe.py run --keep: <process>_probe_seed<iseed>_ev<n>.npz)
     for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_probe_keep", "*", "*.npz"))):
+        if late(f):
+            continue
         m = PROBE_RE.match(os.path.basename(f))
         if not m:
             continue
@@ -164,6 +170,8 @@ def _samples():
                     "seed": int(m["seed"]), "path": f, "kind": "part", "probe": True})
     # runs drawn from one gridpack (tools/lhe_probe.py gridpack --keep: <process>_gpack<grid iseed>_seed<s>_ev<n>.npz)
     for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_probe_keep", "*", "*.npz"))):
+        if late(f):
+            continue
         m = GPACK_RE.match(os.path.basename(f))
         if not m:
             continue
@@ -187,6 +195,8 @@ def _samples():
             rec = mg.lhe_pp_recipe(name, 13000, 13000, hi - lo, role="train", seed=42)
             path = mg.recipe_output_path(rec, datagen.dest_for_role("train"))
             side = json.load(open(path + ".recipe.json"))
+            if late(path):
+                continue
         except Exception:
             continue
         lr = side.get("lhe_run") or {}
@@ -296,9 +306,15 @@ def _compare(X, Y, feats):
     return out
 
 
+def _epoch(t):
+    """ISO time (with its offset) -> epoch seconds; None stays None."""
+    import datetime
+    return None if not t else datetime.datetime.fromisoformat(t).timestamp()
+
+
 def cmd_measure(a):
     import numpy as np
-    S = _samples()
+    S = _samples(_epoch(a.before))
     groups = {}
     for s in S:
         if s["key"]:
@@ -419,6 +435,29 @@ def cmd_measure(a):
     with open(a.out, "w") as f:
         json.dump(out, f, indent=0, sort_keys=True)
     print("SHORTBIAS_JSON " + json.dumps({"inventory": inv, "groups": len(res), "out": a.out}), flush=True)
+
+
+def cmd_reread(a):
+    """An earlier measurement (--old) against its re-read (--new, same files, a changed test): every test present in
+    both (a dict with an event-level "ks"), keyed by its path; whether the event-level KS reproduces (the check that the
+    re-read saw the same events) and the run-level p before and after. One JSON line."""
+    o, n = json.load(open(a.old)), json.load(open(a.new))
+    rows, same, diff = {}, 0, 0
+
+    def walk(x, y, path):
+        nonlocal same, diff
+        if isinstance(x, dict) and isinstance(y, dict):
+            if "ks" in x and "ks" in y and not isinstance(x["ks"], dict):
+                ok = abs(float(x["ks"]) - float(y["ks"])) < 1e-9
+                same += ok; diff += not ok
+                if "p_runs" in x or "p_runs" in y:
+                    rows[path] = {"ks_event_same": ok, "p_runs_old": x.get("p_runs"), "p_runs_new": y.get("p_runs")}
+                return
+            for k in x:
+                if k in y and k != "hist":
+                    walk(x[k], y[k], f"{path}/{k}" if path else k)
+    walk(o.get("groups", o), n.get("groups", n), "")
+    print("REREAD_JSON " + json.dumps({"event_ks_same": same, "event_ks_differ": diff, "tests": rows}), flush=True)
 
 
 def summary(d, alpha=0.05):
@@ -869,6 +908,8 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     m = sub.add_parser("measure"); m.add_argument("--out", default=OUT)
+    m.add_argument("--before", default=None, help="ISO time: only files last written before it (re-read an earlier "
+                   "measurement on the files it saw; checked by its event-level numbers reproducing)")
     m.add_argument("--min-events", type=int, default=2000)
     f = sub.add_parser("fig"); f.add_argument("--json", default=OUT)
     s = sub.add_parser("summary"); s.add_argument("--json", default=OUT)
@@ -881,6 +922,7 @@ def main():
     k.add_argument("--out", default=None)
     k.add_argument("--ref-keep", default=None, help="the reference runs' keep dir: --keep is then one probe arm "
                    "compared with them (_armcheck)")
+    r = sub.add_parser("reread"); r.add_argument("--old", required=True); r.add_argument("--new", required=True)
     q = sub.add_parser("sizesummary"); q.add_argument("--json", required=True)
     a = ap.parse_args()
     if a.cmd == "sizesummary":
@@ -892,7 +934,7 @@ def main():
     if a.cmd == "summary":
         print(json.dumps(summary(json.load(open(a.json)))))
         return
-    {"measure": cmd_measure, "fig": cmd_fig, "figsize": cmd_figsize}[a.cmd](a)
+    {"measure": cmd_measure, "reread": cmd_reread, "fig": cmd_fig, "figsize": cmd_figsize}[a.cmd](a)
 
 
 if __name__ == "__main__":
