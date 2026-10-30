@@ -160,6 +160,7 @@ entries:
     - FA-ccin2p3-36586b54
     - FA-ccin2p3-37a95d76
     - FA-ccin2p3-3d74160d
+    - FA-ccin2p3-3fe9f0b1
     - FA-ccin2p3-45d20a1f
     - FA-ccin2p3-4ecff34d
     - FA-ccin2p3-5a8c8fde
@@ -196,6 +197,7 @@ entries:
     - analysis/catalog_v3/data/short_reads/sign_off_best
     - analysis/catalog_v3/data/short_reads/sign_pair_best
     - analysis/catalog_v3/data/short_reads/v4_dimensionless_muon
+    - analysis/catalog_v3/data/short_reads/v4_dimensionless_muon_seed2
     - analysis/catalog_v3/data/sign_head_search.json
     - analysis/catalog_v3/data/sign_head_search_signlog.txt
     - analysis/catalog_v3/data/sign_head_search_trials.json
