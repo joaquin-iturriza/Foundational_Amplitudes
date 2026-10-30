@@ -190,6 +190,32 @@ SMALL_RUN = 1000
 Y_KEEP = 0.3
 
 
+# Pools laid out in runs that complete (lhe.complete_runs; catalog_coverage, 2026-10-30): a MadEvent run that stops short
+# of its target returns a biased sample, one that completes does not, whatever its size
+# (analysis/catalog_v4/short_run_bias.py). COMPLETE lists each pool rebuilt so, with its run size: the pools assembled
+# from short runs (tools/lhe_parts.py shortbuilt), the three held out of the wave and dsh_ud_huuwm. The assembly uses
+# only the runs that returned all they asked; COMPLETE_SHARE of the runs are expected to (166 of 169 probe runs of 1000
+# events did; open).
+COMPLETE = os.path.join(ROOT, "analysis", "catalog_v4", "data", "complete_runs.json")
+COMPLETE_SHARE = 0.8
+
+
+def complete_layout(lhe, run_events):
+    """lhe (in place, a copy's): runs of run_events, as many as the blocks need at COMPLETE_SHARE of them complete (per
+    energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped."""
+    need = sum(int(lhe[k]) for k in ("n_val", "n_test", "n_train"))
+    for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt"):
+        lhe.pop(k, None)
+    per = int(math.ceil(need / len(lhe["energies"]))) if lhe.get("energies") else need
+    lhe.update(parts=True, complete_runs=True, run_events=int(run_events),
+               n_runs=int(math.ceil(per / (COMPLETE_SHARE * int(run_events)))))
+    return lhe
+
+
+def complete_set():
+    return json.load(open(COMPLETE)) if os.path.exists(COMPLETE) else {}
+
+
 def prefix_runs(y, need):
     """The fewest leading runs whose parts (all made) hold `need` events, or None."""
     s = 0
@@ -260,6 +286,7 @@ def main():
     probe_yield = json.load(open(PROBE_YIELDS)) if os.path.exists(PROBE_YIELDS) else {}
     mixfail = set(json.load(open(MIXFAIL))) if os.path.exists(MIXFAIL) else set()
     resized = {}
+    complete = complete_set()
     _pf = os.path.join(HERE, "catalog_v4_default_processes.yaml")
     prev = (yaml.safe_load(open(_pf)) or {}).get("processes", {}) if os.path.exists(_pf) else {}
 
@@ -305,6 +332,9 @@ def main():
         l4 = ee_short(mg, {"energies": Es}, k4, ee_then(n, k4))
         if "_then" in l4:
             energy_runs(l4, yields.get(k4), l4.pop("_then"))
+        if k4 in complete:
+            l4 = complete_layout({**ee_lhe, **l4}, complete[k4]["run_events"])
+            l4 = {k: v for k, v in l4.items() if k not in ee_lhe or ee_lhe[k] != v}
         ee[k4] = {**lhe_entry(mg, n, P[n], mg.V4_MODEL, l4 or None),
                                        "parent": n,
                                        "split": T[n]["role"], "test_group": f"e+e- v4: {T[n].get('axis') or 'train'}"}
@@ -374,6 +404,8 @@ def main():
             e["standalone_of"] = reuse
         if name in assembled and name not in mixfail and name in prev:
             e = prev[name]                 # an assembled pool keeps the layout it was built with
+        if name in complete:
+            e = {**e, "lhe": complete_layout(dict(e["lhe"]), complete[name]["run_events"])}
         dsh[name] = e
         src_of[n] = name
         # the default share never repeats an event of the pool it follows: no MadEvent iseed in common (run seeds wrap

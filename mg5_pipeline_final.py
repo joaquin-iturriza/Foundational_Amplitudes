@@ -3971,6 +3971,11 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             **({"iseed_salt": int(cfg["lhe"]["iseed_salt"])} if cfg["lhe"].get("iseed_salt") else {}),
             **({"energy_runs": [int(x) for x in cfg["lhe"]["energy_runs"]]} if cfg["lhe"].get("energy_runs")
                else {}),
+            # lhe.complete_runs: only the runs that returned every event they asked are assembled (lhe_assemble). A run
+            # that stops short of its target ("fail to reach target") returns a biased sample (catalog_coverage,
+            # analysis/catalog_v4/short_run_bias.py); a run that completes does not, whatever its size. In the
+            # identity: a pool once assembled from short runs never passes for one of complete runs
+            **({"runs": "complete"} if cfg["lhe"].get("complete_runs") else {}),
         },
     }
 
@@ -4467,19 +4472,68 @@ def lhe_assemble(process, items, mg_cores=1, write_sidecars=True, work_root=None
     secs = {"output": time.time() - t0, "madevent": 0.0}
     if not PROCESSES[process]["lhe"].get("parts"):
         raise RuntimeError(f"{process}: no lhe.parts, its pools are built in series (build_lhe_pp)")
-    moms, aqcds, banner = [], [], None
-    for k, (p, _) in enumerate(parts):
+    complete = bool(PROCESSES[process]["lhe"].get("complete_runs"))
+    moms, aqcds, banner, used, dropped = [], [], None, [], []
+    for k, (p, run) in enumerate(parts):
         z = np.load(p)
-        moms.append(np.asarray(z["mom"])); aqcds.append(np.asarray(z["aqcd"]))
-        mg_cores = max(int(mg_cores), int(z["mg_cores"]))     # recorded: the most cores a part ran on
+        m_k = np.asarray(z["mom"])
         secs["output"] += float(z["seconds"][0]); secs["madevent"] += float(z["seconds"][1])
-        if k == 0 and str(z["banner"]):
+        if complete and len(m_k) < int(run[1]):            # a run short of its ask: not used (lhe.complete_runs)
+            dropped.append({"run": run[3], "iseed": int(run[0]), "asked": int(run[1]), "got": int(len(m_k))})
+            continue
+        moms.append(m_k); aqcds.append(np.asarray(z["aqcd"])); used.append(run)
+        mg_cores = max(int(mg_cores), int(z["mg_cores"]))     # recorded: the most cores a part ran on
+        if banner is None and str(z["banner"]):
             banner = p[:-len(".npz")] + ".banner.txt"
             with open(banner, "w") as f:
                 f.write(str(z["banner"]))
+    if complete:
+        need = max(r["lhe"]["block"][1] for r, _ in items)
+        if sum(len(m) for m in moms) < need:              # checked before anything is set aside
+            raise RuntimeError(f"{process}: its {len(moms)} complete runs hold {sum(len(m) for m in moms)} events, the "
+                               f"blocks need {need} ({len(dropped)} runs stopped short); raise lhe.n_runs")
+        try:                                               # an e+e- pool: each energy's equal share, also before
+            lhe_equal_shares(process, moms, aqcds, used, need)
+        except RuntimeError as e:
+            raise RuntimeError(f"{e} (complete runs only, {len(dropped)} stopped short: raise lhe.n_runs)") from None
+        lhe_set_aside(process, items)
     # secs["madevent"]: summed over the part jobs (each run's wall time, not this job's)
-    return _lhe_finish(process, [r for r, _ in items], items, moms, aqcds, [r for _, r in parts], banner, secs, sa,
-                       seed, iseed, n_req, mg_cores, write_sidecars)
+    out = _lhe_finish(process, [r for r, _ in items], items, moms, aqcds, used, banner, secs, sa,
+                      seed, iseed, n_req, mg_cores, False)
+    for path, full in out:
+        if complete:
+            full["lhe_run"]["runs_dropped_short"] = dropped
+        if write_sidecars:
+            write_recipe(path, full)
+    return out
+
+
+def lhe_set_aside(process, items):
+    """Pools of `items` on disk under another identity (e.g. assembled from runs that stopped short) moved, with their
+    sidecars and banner copy, to <pool dir>/set_aside/<process>_<time>/ before a pool of complete runs takes their
+    path. Nothing is deleted; a pool with the identity asked is left in place. Returns the paths moved."""
+    import datagen
+    moved = []
+    stamp = time.strftime("%Y%m%dT%H%M%S")
+    for rec, path in items:
+        if not os.path.exists(path) or datagen._is_cached(path, recipe_id(rec)):
+            continue
+        dest = os.path.join(os.path.dirname(path), "set_aside", f"{process}_{stamp}")
+        os.makedirs(dest, exist_ok=True)
+        stem = path[:-len(".npy")]
+        side = {}
+        try:
+            side = json.load(open(path + ".recipe.json"))
+        except (OSError, ValueError):
+            pass
+        b = (side.get("lhe_run") or {}).get("banner")
+        for f in [path, path + ".recipe.json", stem + ".alphas.npy", stem + ".aqcdup.npy"] + ([b] if b else []):
+            if f and os.path.exists(f):
+                shutil.move(f, os.path.join(dest, os.path.basename(f)))
+                moved.append(f)
+    if moved:
+        print(f"[LHE] {process}: {len(moved)} files under another identity set aside", flush=True)
+    return moved
 
 
 # =============================================================================

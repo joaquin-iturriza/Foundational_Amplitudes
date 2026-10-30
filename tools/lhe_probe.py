@@ -195,8 +195,16 @@ def cmd_run(a):
         res["du_peak"] = peak
         lhe = f"{ev}/Events/probe/unweighted_events.lhe.gz"
         if os.path.exists(lhe):
-            m, _, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
+            m, aq, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
             res["events_returned"] = len(m)
+            if a.keep:          # the run's events and banner kept (analysis/catalog_v4/short_run_bias.py run sizes)
+                bs = sorted(glob.glob(f"{ev}/Events/probe/*_banner.txt"))
+                d = os.path.join(a.keep, name)
+                os.makedirs(d, exist_ok=True)
+                kp = os.path.join(d, f"{name}_probe_seed{iseed}_ev{int(a.events)}.npz")
+                np.savez(kp + ".tmp.npz", mom=m, aqcd=aq, banner=np.array(open(bs[0]).read() if bs else ""))
+                os.replace(kp + ".tmp.npz", kp)
+                res["kept_events_file"] = kp
             res["yield"] = len(m) / a.events
             res.update(kept(m, accept_of(name)))
             k = res.get("kept") or 0.0
@@ -394,6 +402,7 @@ def main():
     s.add_argument("--energy", type=float, default=None, help="e+e-: the collider energy (default: the first run's)")
     s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
+    s.add_argument("--keep", default=None, help="save the run's events and banner under KEEP/<process>/")
     sub.add_parser("node")
     s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)

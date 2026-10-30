@@ -70,7 +70,9 @@ def main():
     own_margins = json.load(open(os.path.join(HERE, "catalog_v4_pp_margins.json")))
     own_runs = json.load(open(os.path.join(HERE, "catalog_v4_pp_runs.json")))
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
-    from gen_catalog_v4_default import (resize_short, _yield_ratio, YIELDS, ASSEMBLED, PROBE_YIELDS)
+    from gen_catalog_v4_default import (resize_short, _yield_ratio, YIELDS, ASSEMBLED, PROBE_YIELDS, complete_layout,
+                                        complete_set)
+    complete = complete_set()
     yields = json.load(open(YIELDS))
     assembled = set(json.load(open(ASSEMBLED))) if os.path.exists(ASSEMBLED) else set()
     probe_yield = json.load(open(PROBE_YIELDS)) if os.path.exists(PROBE_YIELDS) else {}
@@ -104,6 +106,10 @@ def main():
             if pp(n) in yields and pp(n) not in assembled and _yield_ratio(yields[pp(n)]) is not None:
                 resized[pp(n)] = resize_short(own["lhe"], yields[pp(n)], sum(sz_pp.values()),
                                               probe_yield.get(pp(n), 1.0))
+        if pp(n) in complete:          # rebuilt in runs that complete (gen_catalog_v4_default COMPLETE)
+            parts.add(pp(n))
+            own = {**own, "lhe": complete_layout({**sz_pp, **own.get("lhe", {})}, complete[pp(n)]["run_events"])}
+            own["lhe"] = {k: v for k, v in own["lhe"].items() if k not in sz_pp}
         split = T[n]["role"] if n in T else mg.PROCESSES[old].get("split")
         procs[pp(n)] = {**own,
             "kind": "lhe_pp", "folder": pp(n), "mg5_generate": list(c["mg5_generate"]),

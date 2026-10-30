@@ -1128,8 +1128,10 @@ processes:
     parent: v4_bbx_aataptam
   pp13v4_bbx_aattx:
     lhe:
-      n_runs: 10
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_bbx_aattx
     mg5_generate:
@@ -1388,9 +1390,10 @@ processes:
     parent: v4_bbx_abbxz
   pp13v4_bbx_abtxwp:
     lhe:
-      n_runs: 9
-      margin: 4.81
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_bbx_abtxwp
     mg5_generate:
@@ -11134,6 +11137,11 @@ processes:
     test_group: 'pp 13 TeV v4: train'
     parent: v4_dbx_bxguwm
   pp13v4_dbx_bxhuwm:
+    lhe:
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_dbx_bxhuwm
     mg5_generate:
@@ -11191,7 +11199,10 @@ processes:
     parent: v4_dbx_bxuwm
   pp13v4_dbx_bxuwmz:
     lhe:
-      margin: 363.29
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_dbx_bxuwmz
     mg5_generate:
@@ -11336,7 +11347,10 @@ processes:
     parent: v4_dbx_dtxwp
   pp13v4_dbx_dtxwpz:
     lhe:
-      n_runs: 4
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_dbx_dtxwpz
     mg5_generate:
@@ -11707,7 +11721,10 @@ processes:
     parent: v4_dbx_txuz
   pp13v4_dbx_txuzz:
     lhe:
-      n_runs: 5
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_dbx_txuzz
     mg5_generate:
@@ -18555,8 +18572,10 @@ processes:
     parent: v4_ub_aadt
   pp13v4_ub_abdwp:
     lhe:
-      margin: 158.38
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ub_abdwp
     mg5_generate:
@@ -19020,9 +19039,10 @@ processes:
     parent: v4_ub_bdwp
   pp13v4_ub_bdwpz:
     lhe:
-      n_runs: 4
-      margin: 0.6
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ub_bdwpz
     mg5_generate:
@@ -19082,7 +19102,10 @@ processes:
     parent: v4_ub_bepemu
   pp13v4_ub_bggu:
     lhe:
-      margin: 4.21
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ub_bggu
     mg5_generate:
@@ -19540,7 +19563,10 @@ processes:
     parent: v4_ub_dht
   pp13v4_ub_dhtz:
     lhe:
-      margin: 280.27
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ub_dhtz
     mg5_generate:
@@ -20429,7 +20455,10 @@ processes:
     parent: v4_ubx_gtxuwp
   pp13v4_ubx_htxuwp:
     lhe:
-      n_runs: 4
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ubx_htxuwp
     mg5_generate:
@@ -21587,8 +21616,10 @@ processes:
     parent: v4_ud_auuwm
   pp13v4_ud_bbxdu:
     lhe:
-      margin: 164.28
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ud_bbxdu
     mg5_generate:
@@ -21795,8 +21826,10 @@ processes:
     parent: v4_ud_depemu
   pp13v4_ud_dggu:
     lhe:
-      n_runs: 32
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_ud_dggu
     mg5_generate:
@@ -23518,9 +23551,10 @@ processes:
     parent: v4_udx_ddxwp
   pp13v4_udx_ddxwpz:
     lhe:
-      n_runs: 7
-      margin: 1.92
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_udx_ddxwpz
     mg5_generate:
@@ -25568,8 +25602,10 @@ processes:
     parent: v4_uu_aduwp
   pp13v4_uu_aguu:
     lhe:
-      n_runs: 9
       parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_uu_aguu
     mg5_generate:
@@ -25743,7 +25779,10 @@ processes:
     parent: v4_uu_dhuwp
   pp13v4_uu_duwpz:
     lhe:
-      margin: 11.85
+      parts: true
+      complete_runs: true
+      run_events: 1000
+      n_runs: 18
     kind: lhe_pp
     folder: pp13v4_uu_duwpz
     mg5_generate:
@@ -25804,7 +25843,7 @@ processes:
   pp13v4_uu_gguu:
     lhe:
       parts: true
-      accept_short: true
+      complete_runs: true
       run_events: 1000
       n_runs: 18
     kind: lhe_pp

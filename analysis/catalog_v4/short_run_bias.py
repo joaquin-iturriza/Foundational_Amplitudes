@@ -31,11 +31,14 @@ import argparse, glob, hashlib, json, os, re, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(HERE, "data", "short_run_bias.json")
+COMPLETE = os.path.join(HERE, "data", "complete_runs.json")
 FIG = os.path.join(HERE, "figs", "short_run_bias")
 PART_RE = re.compile(r"^(?P<proc>.+)_(?P<eid>[0-9a-f]{16})_(?P<run>run_\d+)_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
+PROBE_RE = re.compile(r"^(?P<proc>.+)_probe_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
 PREFIXES = ("pp13v4_", "dsh_", "ee4_", "pp13_")
 DEEP = 0.3                  # deep-short: under this fraction of the ask (the hand-off's threshold, open)
 
+SIZE_SMALL, SIZE_LARGE = 1500, 5000   # run-size test: complete runs asking at most / at least this many (open)
 CAP = 200000                # events per side at most (a seeded subsample beyond)
 NBIN = 20                   # quantile bins of the complete side, for the figure
 
@@ -143,6 +146,19 @@ def _samples():
             out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": asked, "got": got,
                         "seed": int(m["seed"]), "path": f, "kind": "part"})
             classes.add(cls(m["proc"]))
+    # complete runs kept by the run-size probe (tools/lhe_probe.py run --keep: <process>_probe_seed<iseed>_ev<n>.npz)
+    for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_probe_keep", "*", "*.npz"))):
+        m = PROBE_RE.match(os.path.basename(f))
+        if not m:
+            continue
+        try:
+            got = _npz_len(f)
+            with np.load(f) as z:
+                key = physics_key(str(z["banner"]))
+        except Exception:
+            continue
+        out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": int(m["ev"]), "got": got,
+                    "seed": int(m["seed"]), "path": f, "kind": "part", "probe": True})
     # serial pp13v4 pools of the classes that have parts (their events are in the train pool, shuffled over runs)
     import mg5_pipeline_final as mg
     import datagen
@@ -192,6 +208,13 @@ def _load_one(s, cap):
     if len(P) > cap:
         P = P[np.sort(np.random.default_rng(s["seed"]).choice(len(P), cap, replace=False))]
     return P
+
+
+def _detectable(X, Y):
+    """The KS distance an event-level two-sample test detects at 5 percent for the pooled sizes (a floor: the run-level
+    test, with runs as units, needs at least this)."""
+    n, m = sum(len(next(iter(x.values()))) for x in X), sum(len(next(iter(y.values()))) for y in Y)
+    return round(1.358 * ((n + m) / (n * m)) ** 0.5, 4)
 
 
 def _binned_ks(H, a, b):
@@ -295,7 +318,15 @@ def cmd_measure(a):
             sm = [F for F, s in zip(Fc, comp) if s["asked"] == asks[0]]
             lg = [F for F, s in zip(Fc, comp) if s["asked"] == asks[-1]]
             r["control_complete_small_vs_large"] = dict(_compare(lg, sm, feats), asks=[asks[0], asks[-1]])
-        res[c] = r
+        # run size: complete runs of each small ask (at most SIZE_SMALL events) against every complete run of at least
+        # SIZE_LARGE, and the complete-halves control of the small runs themselves
+        lg = [F for F, s in zip(Fc, comp) if s["asked"] >= SIZE_LARGE]
+        for ask in sorted({s["asked"] for s in comp if s["asked"] <= SIZE_SMALL}):
+            sm = [F for F, s in zip(Fc, comp) if s["asked"] == ask]
+            if lg and len(sm) >= 2:
+                r[f"size_{ask}"] = dict(_compare(sm, lg, feats), runs_small=len(sm), runs_large=len(lg),
+                                        detectable_ks_5pct=_detectable(sm, lg))
+        res[c if c not in res else f"{c}#{key[:6]}"] = r
         print(f"[short_run_bias] {c}: short {n_s} ({len(short)} runs) vs complete {n_c} ({len(comp)} runs): "
               + ", ".join(f"{f} KS {v['ks']} p {v['p']:.2g} p_runs {v.get('p_runs')}"
                           for f, v in r["short_vs_complete"].items()), flush=True)
@@ -317,7 +348,9 @@ def summary(d, alpha=0.05):
     groups whose run-level p is under alpha after a Bonferroni correction over that kind's tests, and the event-level
     (pooled KS, events taken as independent) count for contrast."""
     out = {"groups": len(d["groups"])}
-    for kind in ("short_vs_complete", "deep_vs_complete", "control_complete_halves", "control_complete_small_vs_large"):
+    sizes = sorted({k for r in d["groups"].values() for k in r if k.startswith("size_")})
+    for kind in ("short_vs_complete", "deep_vs_complete", "control_complete_halves",
+                 "control_complete_small_vs_large", *sizes):
         T = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get(kind) or {}).items() if isinstance(v, dict)]
         R = [(c, f, v) for c, f, v in T if "p_runs" in v]
         out[kind] = {"tests_events": len(T),
@@ -325,53 +358,90 @@ def summary(d, alpha=0.05):
                      "tests_runs": len(R),
                      "run_level_p_below_bonf": sorted(f"{c}:{f}" for c, f, v in R if v["p_runs"] < alpha / max(1, len(R))),
                      "run_level_p_below_alpha": sorted(f"{c}:{f}" for c, f, v in R if v["p_runs"] < alpha)}
+        o = out[kind]
+        o.update(n_bonf=len(o["run_level_p_below_bonf"]), n_alpha=len(o["run_level_p_below_alpha"]),
+                 n_event_bonf=len(o["event_level_p_below_bonf"]))
+    out["inventory"] = d["inventory"]
+    g = d["groups"].get("uu_aguu")
+    if g:
+        h = g["hist"]["sqrt_shat"]
+        out["uu_aguu"] = {"ks": round(g["short_vs_complete"]["sqrt_shat"]["ks"], 3),
+                          "short_runs": g["short"]["runs"], "complete_runs": g["complete"]["runs"],
+                          "ratio_top2": round(sum(h["ratio"][-2:]) / 2, 2), "edge_top2": round(h["edges"][-3])}
+    if os.path.exists(COMPLETE):
+        c = json.load(open(COMPLETE))
+        out["rebuild"] = {"pools": len(c), "short_built": sum("stopped short" in v["reason"] for v in c.values())}
     return out
 
 
+_TOK = [("wp", "W^+"), ("wm", "W^-"), ("tap", r"\tau^+"), ("tam", r"\tau^-"), ("mup", r"\mu^+"), ("mum", r"\mu^-"),
+        ("ep", "e^+"), ("em", "e^-"), ("ux", r"\bar u"), ("dx", r"\bar d"), ("bx", r"\bar b"), ("cx", r"\bar c"),
+        ("sx", r"\bar s"), ("tx", r"\bar t"), ("vt", r"\nu_\tau"), ("vm", r"\nu_\mu"), ("ve", r"\nu_e"),
+        ("a", r"\gamma"), ("z", "Z"), ("h", "H")] + [(q, q) for q in "udscbtg"]
+
+
+def proc_label(c):
+    """A class name (uu_aguu) as its process in math ($uu\\to\\gamma guu$)."""
+    def toks(x):
+        out = []
+        while x:
+            t = next(((k, v) for k, v in _TOK if x.startswith(k)), (x[0], x[0]))
+            out.append(t[1]); x = x[len(t[0]):]
+        return " ".join(out)
+    if c.startswith("epem_"):
+        return "$e^+e^-\\to " + toks(c[5:]) + "$"
+    b, f = c.split("_", 1)
+    return "$" + toks(b) + "\\to " + toks(f) + "$"
+
+
+def _pvals(G, kind):
+    import numpy as np
+    return np.sort([v["p_runs"] for r in G.values() for v in (r.get(kind) or {}).values()
+                    if isinstance(v, dict) and "p_runs" in v])
+
+
 def cmd_fig(a):
+    """(a) run-level p of every test against its rank's expectation under no difference (uniform p): stopped-short
+    runs against complete runs, deep-short ones, and the control (complete runs split in two). (b) The density of
+    stopped-short over complete runs' events in sqrt(s_hat), in quantile bins of the complete ones, for the groups
+    whose run-level p is lowest. Both png and pdf (plot_style.save)."""
     import numpy as np
     sys.path.insert(0, ROOT)
     import plot_style as ps
-    import matplotlib.pyplot as plt
     d = json.load(open(a.json))
     ps.use()
     G = d["groups"]
-    fig, axes = ps.figure(ncols=2, nrows=1)
-    axes = np.atleast_1d(axes).ravel()
-    # (a) KS of short against complete over the 5% critical value, per group and feature, against the control
-    ax = axes[0]
-    names = sorted(G, key=lambda c: -max(v["ks_over_crit5"] for v in G[c]["short_vs_complete"].values()))
-    y = np.arange(len(names))
-    for j, (f, mk) in enumerate((("sqrt_shat", "o"), ("cos_theta_star", "s"))):
-        xs = [G[c]["short_vs_complete"].get(f, {}).get("ks_over_crit5", np.nan) for c in names]
-        ax.plot(xs, y + 0.15 * (j - 0.5), mk, color=ps.CYCLE[j], ms=3.5, ls="none",
-                label=r"$\sqrt{\hat s}$, stopped short" if f == "sqrt_shat" else r"$\cos\theta^*$, stopped short")
-        xc = [(G[c].get("control_complete_halves") or {}).get(f, {}).get("ks_over_crit5", np.nan) for c in names]
-        ax.plot(xc, y + 0.15 * (j - 0.5), mk, mfc="none", color=ps.C.grey, ms=3.5, ls="none",
-                label="complete halves" if j == 0 else None)
-    ax.axvline(1.0, color="k", lw=0.6, ls="--")
-    ax.set_yticks(y, [c.replace("_", " ") for c in names], fontsize=6)
-    ax.set_xscale("log")
-    ax.set_xlabel(r"$D_{\rm KS} / D_{5\%}$")
-    ax.legend(fontsize=6, loc="lower right")
-    # (b) density ratio short / complete in sqrt(s_hat) for the groups with the largest effect
-    ax = axes[1]
-    top = [c for c in names if G[c]["hist"].get("sqrt_shat")][:4]
-    for i, c in enumerate(top):
+    (fa, ax), (fb, bx) = ps.panels(2)
+    for kind, lab, col, mk in (("short_vs_complete", "stopped short", ps.C.vermillion, "o"),
+                               ("deep_vs_complete", r"returned $<0.3$ of ask", ps.C.orange, "^"),
+                               ("control_complete_halves", "complete halves", ps.C.grey, "s")):
+        p = np.maximum(_pvals(G, kind), 2.5e-4)
+        if not len(p):
+            continue
+        q = (np.arange(1, len(p) + 1) - 0.5) / len(p)
+        ax.plot(-np.log10(q), -np.log10(p), mk, color=col, ms=3, ls="none", label=lab)
+    lim = 3.8
+    ax.plot([0, lim], [0, lim], color="k", lw=0.6, ls="--")
+    ax.set_xlim(0, 2.2); ax.set_ylim(0, lim)
+    ax.set_xlabel(r"$-\log_{10} p$ expected")
+    ax.set_ylabel(r"$-\log_{10} p$, run level")
+    ax.legend(loc="upper left")
+    best = sorted((v["p_runs"], c) for c, r in G.items() if r["beam"] == "pp"
+                  for f, v in r["short_vs_complete"].items() if f == "sqrt_shat" and "p_runs" in v)[:3]
+    for i, (_, c) in enumerate(best):
         h = G[c]["hist"]["sqrt_shat"]
-        e = np.asarray(h["edges"]); mid = np.sqrt(e[:-1] * e[1:]) if e[0] > 0 else 0.5 * (e[:-1] + e[1:])
+        e = np.asarray(h["edges"]); mid = np.sqrt(e[:-1] * e[1:])
         r = np.array([np.nan if v is None else v for v in h["ratio"]])
         er = np.array([np.nan if v is None else v for v in h["err"]])
-        ax.errorbar(mid, r, er, color=ps.CYCLE[i], lw=0.8, ms=2.5, marker="o", label=c.replace("_", " "))
-    ax.axhline(1.0, color="k", lw=0.6, ls="--")
-    ax.set_xscale("log")
-    ax.set_xlabel(r"$\sqrt{\hat s}$ [GeV]")
-    ax.set_ylabel("stopped short / complete")
-    ax.legend(fontsize=6)
-    ps.layout(fig)
-    os.makedirs(os.path.dirname(FIG), exist_ok=True)
-    fig.savefig(FIG + ".png", dpi=200); fig.savefig(FIG + ".pdf")
-    print(json.dumps({"fig": FIG + ".png", **summary(d)}))
+        bx.errorbar(mid, r, er, color=ps.CYCLE[i], lw=0.8, ms=2.5, marker="o", capsize=0,
+                    label=proc_label(c))
+    bx.axhline(1.0, color="k", lw=0.6, ls="--")
+    bx.set_xscale("log")
+    bx.set_xlabel(r"$\sqrt{\hat s}$ [GeV]")
+    bx.set_ylabel("stopped short / complete")
+    bx.legend(loc="upper left")
+    ps.save_panels([fa, fb], FIG)
+    print(json.dumps({"fig": [FIG + "_a.png", FIG + "_b.png"], "panel_b": [c for _, c in best], **summary(d)}))
 
 
 def main():
@@ -383,7 +453,7 @@ def main():
     s = sub.add_parser("summary"); s.add_argument("--json", default=OUT)
     a = ap.parse_args()
     if a.cmd == "summary":
-        print(json.dumps(summary(json.load(open(a.json))), indent=1))
+        print(json.dumps(summary(json.load(open(a.json)))))
         return
     {"measure": cmd_measure, "fig": cmd_fig}[a.cmd](a)
 

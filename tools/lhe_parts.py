@@ -144,6 +144,8 @@ def _adopt(D, name, its, other_specs=()):
     # events each run asks are fixed by it, so n_requested (margin) may change too; anything else is another layout
     fixed_ev = bool(new[0]["lhe"].get("run_events")) and new[0]["lhe"].get("run_events") == old[0]["lhe"].get("run_events")
     drop = ("n_runs", "n_requested") if fixed_ev else ("n_runs",)
+    # lhe.complete_runs (identity "runs": "complete") changes which runs the assembly uses, not a run's events
+    drop += ("runs",)
     strip = lambda r: {**r, "lhe": {k: v for k, v in r["lhe"].items() if k not in drop and k != "block"}}
     if len(old) != len(new) or any(strip(a) != strip(b) for a, b in zip(old, new)) or new[0]["lhe"].get("energies"):
         return 0
@@ -265,6 +267,10 @@ def part_need(name, run):
     runs sized to return their events (lhe.run_events), else any (runs that each ask the whole pool and stall at a few
     thousand, lhe.n_runs sized from what one run returned: short by design, the assembly checks their sum)."""
     l = mg.PROCESSES[name]["lhe"]
+    # lhe.complete_runs: any part counts as a run made (a short one is not retried: its iseed would stop short again);
+    # the assembly uses only the runs that returned every event they asked
+    if l.get("complete_runs"):
+        return None
     # lhe.accept_short: a pool whose runs come back short at random (MadEvent "fail to reach target"), n_runs sized
     # from the events its runs returned (recipes/gen_catalog_v4_default.py SHORT_YIELDS): any pp part counts; an e+e-
     # part (lhe.energies) counts when it holds its run's part of its energy's equal share of the blocks
@@ -783,6 +789,9 @@ def cmd_shortbuilt(a):
         except Exception as e:
             out[name] = {"layout_unknown": f"{type(e).__name__}: {e}"[:200], "pool": path}
             continue
+        if sl.get("runs") == "complete":                  # lhe.complete_runs: the sidecar lists only the runs used
+            gone = {int(x["iseed"]) for x in lr.get("runs_dropped_short") or []}
+            runs = [r for r in runs if int(r[0]) not in gone]
         if [r[0] for r in runs] != [int(x) for x in lr.get("iseeds") or []] or len(runs) != len(got):
             out[name] = {"layout_unknown": "the layout's run seeds differ from the sidecar's", "pool": path,
                          "events_per_run": got}

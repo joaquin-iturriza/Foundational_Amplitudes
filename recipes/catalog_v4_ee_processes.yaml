@@ -338,13 +338,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 2
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_aawpwm
     split: train
     test_group: 'e+e- v4: train'
@@ -417,14 +413,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 2
-      - 33
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_abbxg
     split: heldout
     test_group: 'e+e- v4: H2'
@@ -532,12 +523,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 5
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 4
     parent: v4_epem_abtxwp
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -573,14 +561,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 1
-      - 4
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_accx
     split: train
     test_group: 'e+e- v4: train'
@@ -618,14 +601,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 5
-      - 1
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_accxg
     split: train
     test_group: 'e+e- v4: train'
@@ -911,11 +889,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 17
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 5
     parent: v4_epem_agttx
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -1693,14 +1669,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 1
-      - 9
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_bbbxbx
     split: train
     test_group: 'e+e- v4: train'
@@ -1956,13 +1927,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 5
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_bbxgz
     split: train
     test_group: 'e+e- v4: train'
@@ -2070,11 +2037,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 3
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 5
     parent: v4_epem_bbxttx
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2185,13 +2150,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 5
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_bbxwpwm
     split: train
     test_group: 'e+e- v4: train'
@@ -2297,12 +2258,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 11
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 4
     parent: v4_epem_bgtxwp
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2337,11 +2295,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 39
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 5
     parent: v4_epem_bhtxwp
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2416,12 +2372,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 2
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 4
     parent: v4_epem_btxwpz
     split: heldout
     test_group: 'e+e- v4: H3'
@@ -2636,13 +2589,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 9
-      - 15
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_ccxgz
     split: train
     test_group: 'e+e- v4: train'
@@ -2856,13 +2805,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 3
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_ccxz
     split: train
     test_group: 'e+e- v4: train'
@@ -2935,13 +2880,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 10
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_cgsxwm
     split: heldout
     test_group: 'e+e- v4: H2'
@@ -3156,14 +3097,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 1
-      - 6
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_ddxuux
     split: train
     test_group: 'e+e- v4: train'
@@ -4952,13 +4888,9 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 1
-      - 2
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 3
     parent: v4_epem_mupvmwm
     split: train
     test_group: 'e+e- v4: train'

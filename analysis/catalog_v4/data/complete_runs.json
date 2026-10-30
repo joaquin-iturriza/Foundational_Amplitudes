@@ -1,0 +1,226 @@
+{
+ "dsh_bbx_bbxwpwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_db_buwmz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_dbx_abxuwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_dbx_bxhuwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_dd_duwmz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_ddx_awpwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_dg_dguux": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_aamupmum": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_aataptam": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_amupmumz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_amupvmwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_ataptamz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_atapvtwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_ddxuux": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_epemtaptam": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_epem_htaptamz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_ub_bdwpz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_ud_huuwm": {
+  "reason": "its runs of 1000 events returned 33 to 47 percent (probe FA-ccin2p3-bdd2af1f); laid out at 19154 per run in catalog_v4_w3, which fails them",
+  "run_events": 150
+ },
+ "dsh_udx_adxhu": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "dsh_uu_aguu": {
+  "reason": "held out of the wave pending the call on runs of few events",
+  "run_events": 1244
+ },
+ "dsh_uu_gguu": {
+  "reason": "held out of the wave pending the call on runs of few events",
+  "run_events": 621
+ },
+ "ee4_epem_aawpwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_abbxg": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_abtxwp": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_accx": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_accxg": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_agttx": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_bbbxbx": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_bbxgz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_bbxttx": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_bbxwpwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_bgtxwp": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_bhtxwp": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_btxwpz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_ccxgz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_ccxz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_cgsxwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_ddxuux": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "ee4_epem_mupvmwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 200
+ },
+ "pp13v4_bbx_aattx": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_bbx_abtxwp": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_dbx_bxhuwm": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_dbx_bxuwmz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_dbx_dtxwpz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_dbx_txuzz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ub_abdwp": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ub_bdwpz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ub_bggu": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ub_dhtz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ubx_htxuwp": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ud_bbxdu": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_ud_dggu": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_udx_ddxwpz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_uu_aguu": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_uu_duwpz": {
+  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
+  "run_events": 1000
+ },
+ "pp13v4_uu_gguu": {
+  "reason": "held out of the wave pending the call on runs of few events",
+  "run_events": 1000
+ }
+}

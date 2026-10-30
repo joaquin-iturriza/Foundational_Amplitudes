@@ -28,7 +28,7 @@ NAME = "zz_parts_proc"
 K = 5   # 2 -> 3
 
 
-def _register(n_runs=3, run_events=400, parts=True, accept_short=False):
+def _register(n_runs=3, run_events=400, parts=True, accept_short=False, complete_runs=False):
     lhe = {"cards_dir": "recipes/catalog_v4_pp", "run_card": "run_card.dat", "param_card": "param_card.dat",
            "label_alphas": "running_sqrt_shat", "n_val": 100, "n_test": 100, "n_train": 800, "n_runs": n_runs}
     if parts:
@@ -37,6 +37,8 @@ def _register(n_runs=3, run_events=400, parts=True, accept_short=False):
         lhe["run_events"] = run_events
     if accept_short:
         lhe["accept_short"] = True
+    if complete_runs:
+        lhe["complete_runs"] = True
     mg.PROCESSES[NAME] = {"kind": "lhe_pp", "pdg_ids": [21] * K, "m_finals": [0.0] * 3, "nfinal": 3,
                           "mg5_generate": ["generate g g > g g g"], "lhe": lhe}
 
@@ -244,6 +246,104 @@ def test_accept_short_and_adopt():
         os.environ.pop("AMP_LHE_PARTS_DIR", None)
         mg.PROCESSES.pop(NAME, None)
     print("[accept_short + adopt] ok")
+
+
+def test_complete_runs():
+    """lhe.complete_runs: in the identity; any part counts as made; the assembly uses only the runs that returned all
+    they asked (a short run's events never reach the pool, recorded as runs_dropped_short), refuses before touching
+    anything when the complete runs do not hold the blocks, and sets aside a pool of another identity at its path
+    (moved, not deleted); parts of the same runs made without the flag are adopted."""
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d)
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
+            _register(n_runs=4, run_events=400)
+            plain = _items()
+            _register(n_runs=4, run_events=400, complete_runs=True)
+            its = _items()
+            assert its[0][0]["lhe"]["runs"] == "complete" and "runs" not in plain[0][0]["lhe"]
+            assert mg.recipe_id(its[0][0]) != mg.recipe_id(plain[0][0])
+            parts = mg.lhe_part_paths(NAME, its)
+            assert lhe_parts.part_need(NAME, parts[0][1]) is None
+            rng = np.random.default_rng(0)
+
+            def write(got):
+                for (p, run), n in zip(parts, got):
+                    os.makedirs(os.path.dirname(p), exist_ok=True)
+                    sq = rng.uniform(100, 1000, n)
+                    P = np.concatenate([mg._beams(sq, np.array([21] * K), {}),
+                                        mg._rambo_massless_batch(sq, K - 2, rng)], axis=1)
+                    if n < run[1]:
+                        P[:, 2:, 0] = 7777.0                       # a short run's events, recognisable
+                    np.savez(p, mom=P, aqcd=np.full(n, 0.11), seconds=np.array([1.0, 2.0]), mg_cores=np.array(1),
+                             second_refine=np.array(np.nan), banner=np.array(""))
+            write([400, 400, 100, 120])                            # 800 complete events, the blocks need 1000
+            # a pool of the plain identity already at the train path (as assembled from short runs)
+            tr_rec, tr_path = its[2]
+            os.makedirs(os.path.dirname(tr_path), exist_ok=True)
+            np.save(tr_path, np.zeros((3, 3)))
+            json.dump({"recipe_id": mg.recipe_id(plain[2][0]), "lhe_run": {}}, open(tr_path + ".recipe.json", "w"))
+            try:
+                mg.lhe_assemble(NAME, its)
+                raise AssertionError("assembled from too few complete runs")
+            except RuntimeError as e:
+                assert "complete runs hold 800" in str(e), e
+            assert os.path.exists(tr_path) and not os.path.exists(os.path.join(os.path.dirname(tr_path), "set_aside"))
+            write([400, 400, 100, 400])
+            out = mg.lhe_assemble(NAME, its)
+            aside = glob.glob(os.path.join(os.path.dirname(tr_path), "set_aside", "*", os.path.basename(tr_path)))
+            assert len(aside) == 1 and np.load(aside[0]).shape == (3, 3)
+            for (path, full), (rec, _) in zip(out, its):
+                assert datagen._is_cached(path, mg.recipe_id(rec)), path
+                x = np.load(path)
+                assert not (x[:, 4 * 2] == 7777.0).any()               # no event of the short run
+                assert full["lhe_run"]["runs_dropped_short"] == [{"run": parts[2][1][3], "iseed": int(parts[2][1][0]),
+                                                                   "asked": 400, "got": 100}]
+                assert full["lhe_run"]["events_per_run"] == [400, 400, 400]
+            # the same runs planned before without the flag: adopted under the complete identity's names
+            for p, _ in parts:
+                os.remove(p)
+            _register(n_runs=4, run_events=400)
+            old = [p for p, _ in mg.lhe_part_paths(NAME, plain)]
+            for p in old:
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                np.savez(p, mom=np.zeros((400, K, 4)))
+            D = lhe_parts._dirs(os.path.join(d, "q"))
+            for v in D.values():
+                os.makedirs(v, exist_ok=True)
+            json.dump({"seed": 42, "items": [[r, p] for r, p in plain]}, open(os.path.join(D["specs"], NAME + ".json"), "w"))
+            _register(n_runs=4, run_events=400, complete_runs=True)
+            assert lhe_parts._adopt(D, NAME, its) == 4
+            assert all(os.path.samefile(a, b) for a, (b, _) in zip(old, parts))
+            # e+e-: the totals fill the blocks but one energy's complete runs miss its equal share: refused, the pool
+            # at the path left where it is
+            _register(n_runs=3, run_events=300, complete_runs=True)
+            mg.PROCESSES[NAME]["lhe"]["energies"] = [500.0, 3000.0]
+            its = _items()
+            parts = mg.lhe_part_paths(NAME, its)
+            write([300, 300, 300, 300, 100, 100])                    # 1200 complete, 300 of them at 3000 GeV
+            tr_path = its[2][1]
+            np.save(tr_path, np.zeros((3, 3)))
+            json.dump({"recipe_id": "other", "lhe_run": {}}, open(tr_path + ".recipe.json", "w"))
+            n_aside = len(glob.glob(os.path.join(os.path.dirname(tr_path), "set_aside", "*", "*")))
+            try:
+                mg.lhe_assemble(NAME, its)
+                raise AssertionError("assembled with an energy short of its share")
+            except RuntimeError as e:
+                assert "raise lhe.n_runs" in str(e), e
+            assert np.load(tr_path).shape == (3, 3)
+            assert len(glob.glob(os.path.join(os.path.dirname(tr_path), "set_aside", "*", "*"))) == n_aside
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role) = saved
+        for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
+            os.environ.pop(v, None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[complete_runs] ok")
 
 
 def test_tidy_and_gc():
@@ -584,6 +684,7 @@ if __name__ == "__main__":
     test_queue_end_to_end()
     test_queue_stall_layout_short_parts()
     test_accept_short_and_adopt()
+    test_complete_runs()
     test_tidy_and_gc()
     test_ee_energy_runs_and_equal_shares()
     test_stale_worker_returns_tasks()

@@ -28,10 +28,10 @@ fi
 if [ "$PROBE_SHARD" = list ]; then
     # explicit runs PROBE_LIST: "process,events,seed[,key=value...]" separated by spaces (a seed written s@E: the
     # e+e- collider energy E) (a run-card variant against
-    # its control), each at most PROBE_TIMEOUT s
+    # its control), each at most PROBE_TIMEOUT s; PROBE_KEEP=DIR keeps each run's events under DIR/<process>/
     T="${PROBE_TIMEOUT:-1500}"
     echo ${PROBE_LIST:?} | tr ' ' '\n' | tr ',' ' ' | xargs -L1 -P "${SLURM_CPUS_PER_TASK:-1}" sh -c \
-        'p=$1 n=$2 s=${3%@*}; e=; case $3 in *@*) e="--energy ${3#*@}";; esac; shift 3; timeout '"$T"' python tools/lhe_probe.py run --process "$p" --events "$n" --seed "$s" $e --timeout '"$((T - 60))"' ${1:+--patch "$@"}' _
+        'p=$1 n=$2 s=${3%@*}; e=; case $3 in *@*) e="--energy ${3#*@}";; esac; shift 3; timeout '"$T"' python tools/lhe_probe.py run --process "$p" --events "$n" --seed "$s" $e --timeout '"$((T - 60))"' '"${PROBE_KEEP:+--keep $PROBE_KEEP}"' ${1:+--patch "$@"}' _
     echo "RUN_SUMMARY lhe_probe list rc=$?"; exit 0
 fi
 python tools/lhe_probe.py list --queue ${PROBE_QUEUES:?} | awk -v k="$PROBE_SHARD" -v n="${PROBE_NSHARDS:?}" 'NR % n == k' \

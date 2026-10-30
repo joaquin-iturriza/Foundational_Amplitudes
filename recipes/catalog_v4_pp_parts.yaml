@@ -14,6 +14,34 @@ processes:
   n_train: 10000
   n_val: 2000
   n_test: 2000
+- name: pp13v4_dbx_bxhuwm
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_dbx_bxuwmz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_dbx_dtxwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_dbx_txuzz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
 - name: pp13v4_dd_ddgg
   sqrts:
   - 13000
@@ -36,6 +64,27 @@ processes:
   n_val: 2000
   n_test: 2000
 - name: pp13v4_ub_bdwpz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_ub_bggu
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_ub_dhtz
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_ubx_htxuwp
   sqrts:
   - 13000
   - 13000
@@ -71,6 +120,13 @@ processes:
   n_val: 2000
   n_test: 2000
 - name: pp13v4_uu_aguu
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 10000
+  n_val: 2000
+  n_test: 2000
+- name: pp13v4_uu_duwpz
   sqrts:
   - 13000
   - 13000
