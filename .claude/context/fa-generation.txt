@@ -9,8 +9,7 @@ Before a full queue
 2. Generate at the pool's cuts wherever MadGraph's run card can express them (pT, η, ΔR, pair mass), so the kept
    fraction is near 1; only what the card cannot express is cut afterwards, by rejection.
 3. Events asked = events needed / measured kept fraction, times at most 1.25 (`KEPT_SAFETY`). A process whose factor
-   exceeds 2× is listed by `lhe_parts plan` and fixed (cuts matched, its sampling changed) before the queue goes,
-   never absorbed with more runs.
+   exceeds 2× is listed by `lhe_parts plan` (cuts matched, its sampling changed).
 4. Run size from the probe's time per event, so a run fits its wall limit with room; workers = the width
    `site pick FA --jobs N --cpus C --hours H` offers, so the whole queue finishes in one wave; the wall-time target is
    recorded (`plan target`) before submission.

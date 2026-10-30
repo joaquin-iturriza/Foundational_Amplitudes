@@ -28,7 +28,6 @@ Output of a run lives under `runs/<exp_name>/...` (models, tokenizer, plots).
 - **Warm start / fidelity:** `warm_start_idx` + `training.increment_steps` drive
   resumption from a previous fidelity checkpoint; don't hand-edit these — they're
   set by `run_trial.py`.
-- Always keep `plot: true` in sweep/experiment configs.
 - **Fine-tuning** reuses the pretrained run's tokenizer; LoRA/EWC/layer-decay/
   freezing are all in the `fine_tune` config block.
 - Best-checkpoint selection is `experiment._result_extra` (definition: `docs/results.tex` `def:metric`).

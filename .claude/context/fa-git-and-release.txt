@@ -11,7 +11,7 @@ cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
   `trunk → main`.
 - Retired `ccin2p3`, `jeanzay`: still on GitHub, no commits `trunk` lacks.
 - Worktrees: `git worktree add worktrees/wt-<feat> -b <feat> trunk`, implement and verify there, merge into `trunk`,
-  then `bash scripts/remove_worktree.sh <wt>`, never `git worktree remove` by hand. Merging brings back code only:
+  then remove it with its script. Merging brings back code only:
   results, run dirs, eval `.npz`, satlogs, datasets and figures are gitignored and die with the worktree; the script
   folds them into the trunk (`scripts/fold_worktree.sh`), removes the worktree only when every untracked file has an
   identical trunk copy, and deletes the merged branch. Quick standalone edits on trunk are fine.

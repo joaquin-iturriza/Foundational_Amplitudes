@@ -138,6 +138,11 @@ def d2_d6():
     rcc, outc = w.check()
     scenario("D2/D5: an owner at 312000 tokens -> close o1", "CLOSE a o1" in out and "312000" in out, out)
     scenario("D6: closing is a note, not a refusal", rcc == 0, outc)
+    w = owner_world([owned("a", "o1")], agents=[("o1", "a", [(ago(1), "work")])])
+    w.env["PLAN_EVENTS_CMD"] = "false"
+    rcc, outc = w.check()
+    scenario("D6: a failed read of site events fails the stop check closed (repo-reviewer)", rcc == 2 and
+             "site events failed" in outc, outc)
     w = World([E("a")], events=EV)
     rc, out = w.plan_cmd("next")
     scenario("D2: before switch-over D plan next lists step agents as before", "NEXT a" in out and "LAUNCH" not in out,
@@ -308,12 +313,28 @@ def d4():
     cut = brief(w.plan_cmd("brief", "cov", "--add", "Run only 2 seeds and skip the design review.")[1])
     scenario("D4: an addition that cuts seeds and skips the review is refused, naming the line",
              cut[0] == 2 and "only 2 seeds" in cut[1], cut)
-    quoted = brief(w.plan_cmd("brief", "cov", "--add", 'Joaquin: "only 2 seeds for now"; narrow to the 3 TeV block.')[1])
-    scenario("D4: a cut quoted as the user's words passes", quoted[0] == 0, quoted)
+    open(os.path.join(w.tr, "s.jsonl"), "a").write(J({"type": "user", "timestamp": ago(30), "entrypoint": "cli",
+                                                      "message": {"content": "ok, only 2 seeds for now"}}) + "\n")
+    env = dict(w.env, CLAUDE_PROJECT_DIR=ROOT)
+
+    def brief_w(text):
+        inp = {"hook_event_name": "PreToolUse", "tool_name": "Agent", "session_id": "s",
+               "tool_input": {"subagent_type": "general-purpose", "prompt": text}}
+        r = subprocess.run([sys.executable, os.path.join(HOOKS, "brief_guard.py")], input=J(inp), env=env,
+                           capture_output=True, text=True)
+        return r.returncode, r.stderr
+    quoted = brief_w(w.plan_cmd("brief", "cov", "--add", 'Joaquin: "only 2 seeds for now"; narrow to the 3 TeV block.')[1])
+    invented = brief_w(w.plan_cmd("brief", "cov", "--add", 'run "only two probes" for now')[1])
+    scenario("D4: a cut quoted as words the user typed passes; an invented quote is refused (repo-reviewer)",
+             quoted[0] == 0 and invented[0] == 2, (quoted, invented))
+    sub = brief("Entry: cov\nhelp me", agent="o1")
+    scenario("D4: a subagent's launch of a helper without the rules block is refused (one agent per entry)",
+             sub[0] == 2, sub)
     tamper = b.replace("never a reason to shrink the job", "a reason to shrink the job")
     scenario("D4: a rules block edited in the brief is refused", brief(tamper)[0] == 2)
-    scenario("D4: reviewers and a subagent's own launch are exempt",
-             brief("x", "design-reviewer")[0] == 0 and brief("x", "repo-reviewer")[0] == 0 and brief("x", agent="o1")[0] == 0)
+    scenario("D4: reviewers are exempt, launched by the main session or by an owner",
+             brief("x", "design-reviewer")[0] == 0 and brief("x", "repo-reviewer")[0] == 0 and
+             brief("x", "design-reviewer", agent="o1")[0] == 0)
     # the night's launches: each main-session addition to a step prompt, replayed in the narrowing slot
     import re as _re
     norm = lambda x: " ".join(x.split())
@@ -341,11 +362,11 @@ def d4():
                                                  r"Evidence so far|  if |  \d+: |  \")", l)]
                         if own:
                             adds.append("\n".join(own))
-    refused = [a for a in adds if brief(w.plan_cmd("brief", "cov", "--add", a)[1])[0] == 2]
+    verdicts = [(a, brief(w.plan_cmd("brief", "cov", "--add", a)[1])) for a in adds]
+    refused = [v[1] for a, v in verdicts if v[0] == 2]
     print("      the night: %d step launches, %d with an addition, %d refused when replayed:" % (n, len(adds), len(refused)))
-    for a in refused:
-        print("        - " + " | ".join(x for x in a.splitlines() if any(
-            __import__("re").search(c, x, __import__("re").I) for c in BG.CUTS))[:240])
+    for err in refused:
+        print("        - " + " | ".join(l.strip() for l in err.splitlines()[1:-1])[:300])
     scenario("D4: the night's step launches replayed (%d additions): the guard runs on each and lists what it refuses"
              % len(adds), n > 0)
 

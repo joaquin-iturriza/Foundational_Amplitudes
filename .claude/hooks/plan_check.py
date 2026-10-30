@@ -172,7 +172,7 @@ def owner_problems(d, st, msgs):
     an owner past the context threshold are notes."""
     import plan
     out = []
-    for e, act, agent, why in plan.owner_actions(d, st, msgs=msgs):
+    for e, act, agent, why in plan.owner_actions(d, st, msgs=msgs, events=plan.events_by_item(strict=True)):
         if act == "close":
             plan.NOTES.append("%s: close its owner %s: %s" % (e["id"], agent, why))
         elif act == "resume":

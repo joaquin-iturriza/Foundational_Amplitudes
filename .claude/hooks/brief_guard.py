@@ -7,10 +7,11 @@
   - its added text (the narrowing slot, and anything outside the template) cuts the work: fewer or only N jobs, seeds,
     arms, workers, trials, probes, parents or pools; another horizon or pool; a subset; skipping, or going without or
     instead of, the design, its review or `site pick`.
-Exempt: a subagent's own launches (agent_id set: an owner launches its design reviewer), the reviewers with their own
-definitions (design-reviewer, repo-reviewer, notes-editor, claudemd-keeper), read-only search and planning agents
+Subagents' launches are checked too (an owner is never split into more agents for its entry; repo-reviewer
+2026-10-30). Exempt: the reviewers with their own definitions (design-reviewer, repo-reviewer, notes-editor, claudemd-keeper), read-only search and planning agents
 (Explore, Plan) and the harness's helpers (claude-code-guide, statusline-setup), and a resumed agent (SendMessage is
-another tool). A cut the user asked for is quoted in the brief as his words in double quotes, which are not read.
+another tool). A cut the user asked for is quoted in the brief as his words in double quotes: a quote he typed
+(tools/plan.py typed_at) is not read, an invented one is.
 Python on purpose: a crash exits 1, which blocks nothing."""
 import json, os, re, sys
 
@@ -62,8 +63,20 @@ def added_text(prompt, tpl):
     return "\n".join(out)
 
 
+def users_words(q):
+    """A quoted span is exempt only when the user typed it (tools/plan.py typed_at: site's own search, the one
+    `site decide` uses). An invented quote is read like any other text (repo-reviewer, 2026-10-30)."""
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        import plan
+        return bool(plan.typed_at(q))
+    except BaseException:        # site's search exits on a quote too short to identify a message: not his words
+        return False
+
+
 def cuts(text):
-    text = re.sub(r"\"[^\"\n]*\"|“[^”]*”", " ", text)      # the user's own words, quoted
+    text = re.sub(r"\"([^\"\n]*)\"|“([^”]*)”",
+                  lambda m: " " if users_words(m.group(1) or m.group(2)) else m.group(0), text)
     bad = []
     for line in text.splitlines():
         if any(re.search(p, line, re.I) for p in CUTS) and line.strip().lower() != "none":
@@ -76,7 +89,7 @@ def main():
         inp = json.loads(sys.stdin.read() or "{}")
     except ValueError:
         return 0
-    if not isinstance(inp, dict) or inp.get("agent_id") or inp.get("tool_name") not in (None, "Agent"):
+    if not isinstance(inp, dict) or inp.get("tool_name") not in (None, "Agent"):
         return 0
     ti = inp.get("tool_input") or {}
     if ti.get("subagent_type") in EXEMPT:

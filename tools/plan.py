@@ -1263,12 +1263,17 @@ def owner_state(e, t=None):
     return "working" if not handed and (t - last).total_seconds() / 60 <= STEP_MIN else "stopped"
 
 
-def events_by_item():
-    """{item: [(event id, time, line)]} of the open events of the project (`site events`)."""
+def events_by_item(strict=False):
+    """{item: [(event id, time, line)]} of the open events of the project (`site events`). strict (the stop check):
+    a failed read raises, so the check fails closed instead of dropping the events (repo-reviewer, 2026-10-30)."""
     try:
         r = subprocess.run(shlex.split(ENV.get("PLAN_EVENTS_CMD", "site events --project " + PROJECT)),
                            capture_output=True, text=True, timeout=60)
+        if r.returncode != 0:
+            raise OSError("exit %d: %s" % (r.returncode, (r.stderr or r.stdout)[-200:]))
     except (OSError, subprocess.TimeoutExpired) as x:
+        if strict:
+            raise RuntimeError("site events failed: %s" % x)
         note("site events could not be read (%s): open events are not counted" % x)
         return {}
     out, year = {}, now().year
