@@ -4091,6 +4091,11 @@ def lhe_prepare(process, work_root, log_path, madevent=True, standalone=True):
     return ev, sa
 
 
+def lhe_second_refine():
+    v = os.environ.get("AMP_LHE_SECOND_REFINE")
+    return float(v) if v else None
+
+
 def add_card_params(card_path, values):
     """Append `value = key` lines for keys a run card does not have (MadGraph's hidden parameters, e.g.
     second_refine_treshold, are read from any line of the card); keys already there are left to patch_card."""
@@ -4110,6 +4115,15 @@ def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name
     shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
     shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
     patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(nevents), "iseed": int(iseed), **(patches or {})})
+    # AMP_LHE_SECOND_REFINE=T: MadEvent's hidden second_refine_treshold (default 0.9). It runs its second refine unless
+    # the first refine's cross section is within T of the survey's; above 1 it always does, so a run whose maximum
+    # weight is poorly known no longer stops short of the events it asks ("fail to reach target"). An execution
+    # setting like the cores (how MadEvent iterates, not which density it unweights): recorded in the part, not in the
+    # pool's identity
+    sr = lhe_second_refine()
+    if sr is not None:
+        add_card_params(f"{ev}/Cards/run_card.dat", {"second_refine_treshold": sr})
+        patch_card(f"{ev}/Cards/run_card.dat", {"second_refine_treshold": sr})
     mg_cores = max(1, int(mg_cores))
     _set_me5_config(f"{ev}/Cards/me5_configuration.txt",
                     {"run_mode": 0 if mg_cores == 1 else 2, "nb_core": mg_cores,
@@ -4425,6 +4439,7 @@ def lhe_build_part(process, items, k, mg_cores=1, work_root=None, keep_dir=False
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path[:-len(".npz")] + f".tmp{os.getpid()}.npz"
     np.savez(tmp, mom=m_k, aqcd=a_k, seconds=np.array([t_out, t_me]), mg_cores=np.array(int(mg_cores)),
+             second_refine=np.array(lhe_second_refine() if lhe_second_refine() is not None else np.nan),
              banner=np.array(open(banner).read() if banner else ""))
     os.replace(tmp, path)
     if len(m_k) >= n_k and not keep_dir:     # a short run keeps its directory (its logs)

@@ -13,7 +13,7 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             pools (a lock per standalone directory, so no two jobs label or compile the same backend at once).
             Claims of jobs no longer in the queue (squeue) are put back first. Exits when nothing fits or is left.
     park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold)
-    plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again
+    plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again; --exclude NAME... held processes
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
     yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
             (recipes/gen_catalog_v4_default.py sizes those pools' n_runs from it; plan then links their parts, _adopt)
@@ -100,6 +100,8 @@ def cmd_plan(a):
     n_new = n_have = 0
     n_adopt = 0
     for name, its in sorted(items.items()):
+        if name in (getattr(a, "exclude", None) or []):
+            continue                                  # held out of this queue (plan --exclude)
         n_adopt += _adopt(D, name, its)
         with open(os.path.join(D["specs"], name + ".json"), "w") as f:
             json.dump({"seed": a.seed, "items": [[r, p] for r, p in its]}, f)
@@ -752,6 +754,7 @@ def main():
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--cores", nargs="*", default=[], help="NAME=C: that process's runs on C cores each")
     p.add_argument("--skip-claimed", nargs="*", default=[], help="queues whose claimed runs are not planned again")
+    p.add_argument("--exclude", nargs="*", default=[], help="processes not planned in this queue (held)")
     pk = sub.add_parser("park"); pk.add_argument("--queue", required=True)
     p.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     w = sub.add_parser("work"); w.add_argument("--queue", required=True)

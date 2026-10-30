@@ -341,7 +341,7 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 11.07
-      n_runs: 29
+      n_runs: 2
       run_events: 31774
       accept_short: true
       parts: true
@@ -9830,7 +9830,7 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 363.29
-      n_runs: 249
+      n_runs: 1
       run_events: 101838
       accept_short: true
       parts: true
@@ -10619,7 +10619,7 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 135.5
-      n_runs: 1008
+      n_runs: 5
       run_events: 23312
       accept_short: true
       parts: true
@@ -10964,8 +10964,9 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       margin: 3.43
-      n_runs: 10
+      n_runs: 3
       run_events: 24451
+      accept_short: true
       parts: true
     parent: v4_ddx_duxwpz
     reuse: pp13v4_ddx_duxwpz
@@ -14807,9 +14808,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5500
-      n_test: 3500
-      n_train: 55001
+      n_val: 5515
+      n_test: 3515
+      n_train: 55150
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, an e+e- run card with catalog_v4's e+e-
@@ -14865,9 +14866,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5500
-      n_test: 3500
-      n_train: 55001
+      n_val: 5650
+      n_test: 3650
+      n_train: 56500
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, an e+e- run card with catalog_v4's e+e-
@@ -14915,9 +14916,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5500
-      n_test: 3500
-      n_train: 55001
+      n_val: 5541
+      n_test: 3541
+      n_train: 55401
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, an e+e- run card with catalog_v4's e+e-
@@ -33556,6 +33557,7 @@ processes:
         run card
       n_runs: 43
       run_events: 1244
+      accept_short: true
       parts: true
     parent: v4_uu_aguu
     reuse: pp13v4_uu_aguu
@@ -33912,6 +33914,8 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 86
+      run_events: 621
       parts: true
     parent: v4_uu_gguu
     reuse: pp13v4_uu_gguu
