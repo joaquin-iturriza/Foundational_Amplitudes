@@ -1132,7 +1132,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_bbx_aattx
     mg5_generate:
@@ -1395,7 +1395,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_bbx_abtxwp
     mg5_generate:
@@ -11144,7 +11144,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_dbx_bxhuwm
     mg5_generate:
@@ -11206,7 +11206,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_dbx_bxuwmz
     mg5_generate:
@@ -11355,7 +11355,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_dbx_dtxwpz
     mg5_generate:
@@ -11730,7 +11730,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_dbx_txuzz
     mg5_generate:
@@ -12061,11 +12061,8 @@ processes:
       its pp13 pool carries catalog_v3's physics
   pp13v4_dd_ddgg:
     lhe:
+      margin: 128.82
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 18
-      gridpack: 14000
     kind: lhe_pp
     folder: pp13v4_dd_ddgg
     mg5_generate:
@@ -14245,11 +14242,8 @@ processes:
       its pp13 pool carries catalog_v3's physics
   pp13v4_ddx_ddxgg:
     lhe:
+      n_runs: 9
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 18
-      gridpack: 14000
     kind: lhe_pp
     folder: pp13v4_ddx_ddxgg
     mg5_generate:
@@ -18587,7 +18581,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ub_abdwp
     mg5_generate:
@@ -19055,7 +19049,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ub_bdwpz
     mg5_generate:
@@ -19119,7 +19113,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ub_bggu
     mg5_generate:
@@ -19581,7 +19575,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ub_dhtz
     mg5_generate:
@@ -20474,7 +20468,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ubx_htxuwp
     mg5_generate:
@@ -21636,7 +21630,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ud_bbxdu
     mg5_generate:
@@ -21847,7 +21841,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_ud_dggu
     mg5_generate:
@@ -23573,7 +23567,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_udx_ddxwpz
     mg5_generate:
@@ -25625,7 +25619,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_uu_aguu
     mg5_generate:
@@ -25803,7 +25797,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_uu_duwpz
     mg5_generate:
@@ -25867,7 +25861,7 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 18
-      gridpack: 14000
+      gridpack: 31774
     kind: lhe_pp
     folder: pp13v4_uu_gguu
     mg5_generate:
@@ -28141,11 +28135,8 @@ processes:
     parent: v4_uux_ggttx
   pp13v4_uux_gguux:
     lhe:
+      margin: 68.73
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 18
-      gridpack: 14000
     kind: lhe_pp
     folder: pp13v4_uux_gguux
     mg5_generate:

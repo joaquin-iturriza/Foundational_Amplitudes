@@ -3058,7 +3058,8 @@ is where the old bias was smallest. Caveat: the pp gridpack distances ($0.006$ t
 own halves ($0.004$ to $0.005$) and their $p$ are under $0.05$ uncorrected in $3$ of the $4$ pp tests, so a residual
 of under half the old bias is not excluded. By the design's outcome the $56$ pools on the
 rebuild list are laid out as gridpack runs (one gridpack per pool and energy, at the energy's whole need and at least
-$13057$ events' precision, runs of $1000$ pp and $1000$ or $200$ $e^+e^-$, only complete runs assembled).
+the precision of the smallest gridpack probed for its beams, $31774$ events pp and $13057$ $e^+e^-$, runs of the probed
+sizes, $1000$ pp and $200$ $e^+e^-$, only complete runs assembled).
 % src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_gpack.json @3c34fe81
 % allow: 16 100 1000 200 393 400 0.05 5 10^{-3} 56 13057 because they are the probe's cores, run counts and sizes, the e+e- runs that completed (GRIDPACK_SUMMARY in the logs of FA-ccin2p3-f0ed9631 and a8e18d29: 197 and 196 of 200), the test level and test count, the relabelling bound, the rebuild list's size and the gridpack floor (GRID_MIN in recipes/gen_catalog_v4_default.py)
 % claim: gridpack_primary_tests=5

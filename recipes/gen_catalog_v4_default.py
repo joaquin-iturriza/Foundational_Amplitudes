@@ -200,15 +200,16 @@ COMPLETE = os.path.join(ROOT, "analysis", "catalog_v4", "data", "complete_runs.j
 COMPLETE_SHARE = 0.8
 # A pool with "gridpack": true in COMPLETE draws its runs from one gridpack per energy (lhe.gridpack, tools/lhe_parts.py)
 # integrated at the precision of one run asking the energy's whole need, the run that integrates on its own and
-# completes being the reference (docs/results.tex par:v4_short_runs); never below GRID_MIN events, the smallest gridpack
-# of the gridpack probe (dsh_epem_amupvmwm at 1000 GeV, 13057; catalog_coverage, 2026-10-30). The floor is open.
-GRID_MIN = 13057
+# completes being the reference (docs/results.tex par:v4_short_runs); never below the smallest gridpack the gridpack
+# probe validated for its beams (catalog_coverage, 2026-10-30): pp 31774 (dsh_bb_bbgg), e+e- 13057 (dsh_epem_amupvmwm
+# at 1000 GeV).
+GRID_MIN = {"pp": 31774, "ee": 13057}
 
 
 def complete_layout(lhe, run_events, gridpack=False):
     """lhe (in place, a copy's): runs of run_events, as many as the blocks need at COMPLETE_SHARE of them complete (per
     energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped. gridpack: the runs
-    drawn from one gridpack per energy of max(the energy's need, GRID_MIN) events' precision (lhe.gridpack)."""
+    drawn from one gridpack per energy of max(the energy's need, GRID_MIN of its beams) events' precision (lhe.gridpack)."""
     need = sum(int(lhe[k]) for k in ("n_val", "n_test", "n_train"))
     for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt", "gridpack"):
         lhe.pop(k, None)
@@ -216,7 +217,7 @@ def complete_layout(lhe, run_events, gridpack=False):
     lhe.update(parts=True, complete_runs=True, run_events=int(run_events),
                n_runs=int(math.ceil(per / (COMPLETE_SHARE * int(run_events)))))
     if gridpack:
-        lhe["gridpack"] = max(per, GRID_MIN)
+        lhe["gridpack"] = max(per, GRID_MIN["ee" if lhe.get("energies") else "pp"])
     return lhe
 
 

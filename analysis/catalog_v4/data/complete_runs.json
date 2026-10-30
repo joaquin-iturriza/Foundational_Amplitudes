@@ -1,9 +1,4 @@
 {
- "dsh_bb_bbgg": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
  "dsh_bbx_bbxwpwm": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
   "run_events": 1000,
@@ -34,193 +29,58 @@
   "run_events": 1000,
   "gridpack": true
  },
- "dsh_ddx_awpwmz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ddx_duxwpz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
  "dsh_dg_dguux": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
   "run_events": 1000,
   "gridpack": true
  },
- "dsh_epem_aaccx": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 1000,
-  "gridpack": true
- },
  "dsh_epem_aamupmum": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_aataptam": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_aawpwm": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_accxg": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_accxz": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_amupmumz": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_amupvmwm": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_ataptamz": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_atapvtwm": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_awpwmz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_bbxgz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_bbxwpwm": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_ccxgz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_ddxuux": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_epemhz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_epemtaptam": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_epemwpwm": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_epemzz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_epem_htaptamz": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_hwpwmz": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_wpwmzz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_epem_wpwpwmwm": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_gg_gggg": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ub_abdwp": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ub_abgu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ub_bdhwp": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
+  "run_events": 200,
   "gridpack": true
  },
  "dsh_ub_bdwpz": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ucx_cxggu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ucx_dsxzz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ud_adgu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ud_bbxdu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ud_dddxu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ud_ddwpz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ud_duuux": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
   "run_events": 1000,
   "gridpack": true
  },
@@ -229,68 +89,8 @@
   "run_events": 1000,
   "gridpack": true
  },
- "dsh_ud_uuwmz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_aaawp": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_aawpz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
  "dsh_udx_adxhu": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_agwpz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_awpwpwm": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_ddxgwp": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_dxggu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_gwpwpwm": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_htaptamwp": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_udx_wpwpwmz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ug_ccxgu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_ug_guuux": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
   "run_events": 1000,
   "gridpack": true
  },
@@ -299,73 +99,8 @@
   "run_events": 1000,
   "gridpack": true
  },
- "dsh_uu_ddxuu": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uu_duwpz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
  "dsh_uu_gguu": {
   "reason": "held out of the wave pending the call on runs of few events",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uu_guuz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uu_uuuux": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_aaddx": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_addxz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_aguux": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_awpwmz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_bbxzz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_ddxzz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_gguux": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_guuxz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "dsh_uux_wpwmzz": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
   "run_events": 1000,
   "gridpack": true
  },
@@ -429,11 +164,6 @@
   "run_events": 200,
   "gridpack": true
  },
- "ee4_epem_btxwp": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 200,
-  "gridpack": true
- },
  "ee4_epem_btxwpz": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
   "run_events": 200,
@@ -494,16 +224,6 @@
   "run_events": 1000,
   "gridpack": true
  },
- "pp13v4_dd_ddgg": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
-  "run_events": 1000,
-  "gridpack": true
- },
- "pp13v4_ddx_ddxgg": {
-  "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt on CC, 2026-10-30 06:20, after catalog_v4_w3)",
-  "run_events": 1000,
-  "gridpack": true
- },
  "pp13v4_ub_abdwp": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
   "run_events": 1000,
@@ -556,11 +276,6 @@
  },
  "pp13v4_uu_gguu": {
   "reason": "held out of the wave pending the call on runs of few events",
-  "run_events": 1000,
-  "gridpack": true
- },
- "pp13v4_uux_gguux": {
-  "reason": "not assembled in catalog_v4_w3: its runs stop short of their ask (the queue's failed tasks and refused assemblies, 2026-10-30 06:16)",
   "run_events": 1000,
   "gridpack": true
  }

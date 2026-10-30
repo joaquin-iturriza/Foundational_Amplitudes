@@ -27,7 +27,7 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             max pT
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
-import argparse, glob, json, os, re, shutil, signal, socket, subprocess, sys, time
+import argparse, glob, json, math, os, re, shutil, signal, socket, subprocess, sys, time
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, ROOT)
@@ -280,6 +280,37 @@ def cmd_gridpool(a):
                     list(ex.map(one, range(1, a.runs + 1)))
         finally:
             shutil.rmtree(wd, ignore_errors=True)
+
+
+GRID_TIME_FACTOR = 4.3    # measured gridpack seconds over the rate estimate: the gridpack probe, 2026-10-30 (1.5 to 4.3)
+
+
+def cmd_gridpool_plan(a):
+    """The gridpool probe's batch: the lhe.gridpack pools of --complete (analysis/catalog_v4/data/complete_runs.json)
+    dealt longest first to --jobs jobs of --cores cores (each pool's estimate: per gridpack, the class's core-seconds per
+    event (lhe_parts._rate) times its grid events over the cores, times GRID_TIME_FACTOR, plus --runs runs of its run
+    size at --cores at a time). One JSON line: the jobs' pools and estimated hours (an estimate)."""
+    import statistics
+    rates = json.load(open(a.rates))
+    by = {}
+    for r in rates.values():
+        by.setdefault(int(r["nfinal"]), []).append(r["core_s_per_event"])
+    med = {k: statistics.median(v) for k, v in by.items()}
+    est = {}
+    for n in json.load(open(a.complete)):
+        l = mg.PROCESSES[n]["lhe"]
+        r, _ = lp._rate(n, rates, med)
+        E = len(l.get("energies") or [1])
+        est[n] = E * (GRID_TIME_FACTOR * r * int(l["gridpack"]) / a.cores
+                      + math.ceil(a.runs / a.cores) * r * int(l["run_events"]))
+    jobs = [[0.0, []] for _ in range(a.jobs)]
+    for n in sorted(est, key=lambda x: -est[x]):
+        j = min(jobs, key=lambda x: x[0])
+        j[0] += est[n]; j[1].append(n)
+    jobs = [j for j in jobs if j[1]]
+    print(json.dumps({"pools": len(est), "jobs": [{"h": round(t / 3600, 2), "pools": ps} for t, ps in jobs],
+                      "est_total_job_h": round(sum(t for t, _ in jobs) / 3600, 1),
+                      "est_longest_job_h": round(max(t for t, _ in jobs) / 3600, 2)}))
 
 
 def cmd_run(a):
@@ -546,6 +577,10 @@ def main():
     s.add_argument("--runs", type=int, default=16, help="probe runs per gridpack at the pool's run size")
     s.add_argument("--cores", type=int, default=1); s.add_argument("--work", default=None)
     s.add_argument("--timeout", type=float, default=1800.0)
+    s = sub.add_parser("gridpool-plan"); s.add_argument("--jobs", type=int, required=True)
+    s.add_argument("--cores", type=int, default=16); s.add_argument("--runs", type=int, default=16)
+    s.add_argument("--complete", default=os.path.join(ROOT, "analysis/catalog_v4/data/complete_runs.json"))
+    s.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     sub.add_parser("node")
     s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)
@@ -555,7 +590,7 @@ def main():
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
 
 if __name__ == "__main__":

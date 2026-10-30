@@ -679,8 +679,12 @@ POLL_S = 60               # how often a worker with runs waiting on a gridpack m
 
 
 def _waiting_on_gridpack(D):
-    """Whether a run task in todo/ waits on a gridpack that a job is making now (its gridpack task in claimed/). A
-    gridpack task still in todo/ is not waited for: this job would have claimed it had it fit."""
+    """Whether a run task in todo/ waits on a gridpack that a live job is making now (its gridpack task in claimed/;
+    claims of jobs gone from squeue are put back to todo/ first). A gridpack task still in todo/ is not waited for:
+    this job would have claimed it had it fit."""
+    # a claim of a job gone from the scheduler (killed while making the gridpack) goes back to todo first, so this
+    # worker claims the gridpack itself instead of waiting on it
+    _requeue_stale(D)
     claimed = {f.rsplit(".", 1)[0] for f in os.listdir(D["claimed"])}
     for f in os.listdir(D["todo"]):
         if not f.endswith(".json"):
