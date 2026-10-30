@@ -317,8 +317,11 @@ def _sqrt_shat(P):
 def cmd_runsize(a):
     """Whether MadEvent runs of few events give the events runs of many give: for each default-share pp pool whose runs
     ask at most --max-run events and whose parts hold at least --min-events, its parts' events against its reuse pool's
-    (pp13v4 / pp13, the same generate line, model and cards, runs of 10k+ events): two-sample Kolmogorov-Smirnov on
-    sqrt(s_hat), on the largest |eta| of the finals and on the largest final pT, all in the lab frame as generated."""
+    (runs of 10k+ events): two-sample Kolmogorov-Smirnov on sqrt(s_hat), on the largest |eta| of the finals and on the
+    largest final pT, all in the lab frame as generated. same_physics says whether the reuse pool has the same generate
+    line, model and cards (a pp13v4 pool does; a reused catalog_v3 pp13 pool has the minimal QED order, the sm model and
+    catalog_v3's cards, so a difference there is not the run size's). Neither side is known to be the unbiased one: the
+    large runs are the ones that stop short of their target."""
     from scipy.stats import ks_2samp
     import datagen
     out = {}
@@ -353,7 +356,11 @@ def cmd_runsize(a):
                     "max_abs_eta": lambda P: np.abs(np.arcsinh(P[:, 2:, 3] / np.clip(np.hypot(P[:, 2:, 1], P[:, 2:, 2]),
                                                                                     1e-9, None))).max(1),
                     "max_pt": lambda P: np.hypot(P[:, 2:, 1], P[:, 2:, 2]).max(1)}
-            r = {"run_events": per, "n_small": len(A), "reuse": reuse, "n_reuse": len(B)}
+            rc = mg.PROCESSES[reuse]
+            same = (list(cfg["mg5_generate"]) == list(rc["mg5_generate"])
+                    and cfg["lhe"].get("model") == rc["lhe"].get("model")
+                    and [mg._file_sha256(c) for c in mg.lhe_cards(cfg)] == [mg._file_sha256(c) for c in mg.lhe_cards(rc)])
+            r = {"run_events": per, "n_small": len(A), "reuse": reuse, "n_reuse": len(B), "same_physics": same}
             for f, fn in feat.items():
                 t = ks_2samp(fn(A), fn(B))
                 r[f] = {"ks": round(float(t.statistic), 4), "p": float(t.pvalue)}
