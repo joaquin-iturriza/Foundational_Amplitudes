@@ -5113,7 +5113,7 @@ entries:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
     agent: a9e5ce33720085e0f
-    state: working
+    state: stopped
     since: '2026-10-30T22:13:32+00:00'
     context: 129620
     context_at: '2026-10-30T22:17:21+00:00'
