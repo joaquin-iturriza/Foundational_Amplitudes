@@ -4415,7 +4415,7 @@ entries:
       - 'a verdict changes: rewrite the paragraph and its hand-off item, and say which later decision leaned on it'
   owner:
     agent: a3cbd2e82774954b6
-    state: working
+    state: closed
     since: '2026-10-30T13:17:36+00:00'
     context: 206830
     context_at: '2026-10-30T16:55:42+00:00'
@@ -4474,38 +4474,33 @@ entries:
       probe) dropped; its 12 jobs had already completed (arms A-C, logs under $SCRATCH/lhe_probe_keep_ximprove_{A,B,C}), not
       read out, nothing to cancel.'
   handoff:
-    state: '112 of 113 rebuilt pools assembled (catalog_v4_gridpack_last 12/12, 0 failed, queue removed); mixture check over
-      the 112 passed (FA-ccin2p3-82e8c54a: 0 failing). ee4_epem_cgsxwm 3 TeV: the run-size probe passed no size (shares 0.49/0.79/0.89/0.91
-      at 200/100/50/25; complete runs of 50 and 25 differ from complete runs of 200, 0.0165 and 0.031, p<1e-3; short runs
-      of 200 differ from complete ones, 0.0225: completion selects), written up in results.tex par:v4_short_runs (merge 1cdd4191)
-      with a hand-off item in sec:catalog-open. Now probing why runs stop short: gridpack event generation per channel is
-      capped at max_iter=13 iterations from at most max_event_in_iter=4000 points, doubling (dsample.f), about 3.3e7 points;
-      short runs end at 650-830 s. Design passed 13:08 (3 arms x 64 runs of 200 on grid04: A defaults with logs, B max_event_in_iter
-      40000, C max_iter 16; works = share >= 0.95, median <= 1 h, halves p >= 0.05 and KS <= 0.0225 to both the complete and
-      the short reference runs of 200 under $SCRATCH/lhe_probe_keep_runsize).'
-    decisions: 'No run size is laid out (design''s no-PASS branch). The coordinator directed the technical path before any
-      question to Joaquin: make the runs complete rather than select them; Joaquin is asked only if no MadEvent setting works,
-      with what was tried. The 51 default-share pp pools with runsize differences are gridpack-built already, so no rebuild;
-      recorded as an open finding (candidate causes: serial pp13v4 reference with short runs, event-level test on correlated
-      events, gridpack residual).'
-    ruled_out: 'Smaller runs of 25/50/100 from the 52228 gridpack (DIFFERS or share under 0.9). A 4x gridpack (52228 vs 13057):
-      same 0.49 share. Copying the 4x gridpack factor to other pools (repo-reviewer condition; only cgsxwm has grid_events).'
-    running: '12 CPU jobs, submitted 13:1x UTC, SUBMITTED at last read: arm A FA-ccin2p3-2ad84485 19b6560a c24635dc b52e5bea
-      (seeds 30001-30064), arm B c115cfc9 ff758d2c cd2dd017 a93055fe (31001-31064), arm C bca8f341 29c16b00 ca46478e 5a365ea7
-      (32001-32064); keep and logs under $SCRATCH/lhe_probe_keep_ximprove_{A,B,C}/ee4_epem_cgsxwm/; target 2.5 h. On their
-      end: each arm''s share from its own 4 job logs (lhe_probe_<slurm>.out in the CC checkout; slurm ids in the registry),
-      arm A''s *.logs.tar.gz read for which channel ends short and at which iteration, then for an arm at share >= 0.95: python
-      analysis/catalog_v4/short_run_bias.py sizecheck --process ee4_epem_cgsxwm --energy 3000 --keep ''$SCRATCH/lhe_probe_keep_ximprove_<arm>''
-      --ref-keep ''$SCRATCH/lhe_probe_keep_runsize'' --ref-ask 200 --logs <that arm''s 4 logs> --out <outside the checkout,
-      e.g. $SCRATCH/...>; apply the blocking rule on ks_binned (run-level). WORKS: add a pool key carrying the limit (lhe,
-      in the identity; complete_runs.json energy entry), regenerate recipes, small queue, assemble, sizecheck --parts, mixcheck
-      over 113.'
-    files: analysis/catalog_v4/short_run_bias.py (sizecheck, --ref-keep, sizesummary), analysis/catalog_v4/data/cgsxwm_sizecheck.json,
-      tools/lhe_probe.py (gridpool --ximprove --keep-logs), mg5_pipeline_final.py (lhe_patch_ximprove, lhe_run_gridpack),
-      scripts/job_lhe_probe.sh, tests/test_lhe_gridpack.py, analysis/catalog_v4/data/complete_runs.json, recipes/gen_catalog_v4_default.py,
-      docs/results.tex par:v4_short_runs and sec:catalog-open; MadGraph source /home/joaquin/mg5amcnlo (gen_ximprove.py gen_ximprove_gridpack,
-      Template/LO/Source/dsample.f).
-    written: '2026-10-30T13:16:15+00:00'
+    state: 'D193: cgsxwm 3 TeV dropped, catalog goes ahead on the 112 assembled rebuilt pools (mixcheck over 112 passed, FA-ccin2p3-82e8c54a).
+      Default-share pp runsize flags explained (finding: 14 of 51 compared against catalog_v3 pp13 references of other physics
+      carry the strongest; 37 against pp13v4 at chance, no short reuse runs, no within-run correlation). run_perm defect fixed
+      (cdcae2cd: p from the KS scaled by sqrt(nm/(n+m)); calibration test). Step 13 re-read job FA-ccin2p3-ef33d010 COMPLETED
+      (log in site logs; outputs $SCRATCH/reread/{unscaled,scaled}/*.json, 20000 relabellings, paired): cgsxwm sizecheck VALID
+      (8 of 8 event KS reproduced; verdict unchanged: 25 and 50 differ p<1e-3, 100 low share; 2000-relabelling login run gave
+      100: 0.028->0.0375, short of 100 0.054->0.59, short of 25/50 <1e-3 -> ~0.04). The three measure re-reads are INVALID
+      under the design''s rule: event KS not reproduced in 32 of 125 (short_run_bias), 43 of 204 (size), 42 of 374 (gpack)
+      committed tests; the --before mtime filter does not recover the files the measurements saw (more tests than committed:
+      files added or rewritten before the cutoffs, or later rewrites of older files). Unscaled vs scaled on today''s files
+      is paired and valid (0 event-KS differences) but answers a different question. Next: per test, use the committed vs
+      unscaled reread rows: tests whose event KS reproduced are valid re-reads (read their scaled p and the verdict counts
+      on that subset with Clopper-Pearson intervals); for the rest, say not re-read and why; then write the before/after per
+      verdict and rewrite par:v4_short_runs where a verdict changes (notes-editor review), and state whether the rebuild was
+      needed.'
+    decisions: cgsxwm dropped by Joaquin (D193); arm A-C probe jobs completed and were not read out (moot). Coordinator made
+      step 13 the priority. Re-read design passed after one FIX (20000 relabellings, paired unscaled/scaled, intervals, a
+      flip only when the interval clears the threshold, undecided otherwise). The supervisor re-raises the catalog_v4_gridpack
+      2x alert from a removed queue's last snapshot (site_runends.target_pass); the one-line skip of removed queues was refused
+      to the owner as a shared-tool edit and went to the coordinator as a diff for Joaquin.
+    ruled_out: Short reuse runs and within-run correlation as causes of the default-share runsize flags. run_perm's unscaled
+      p as a valid test with unequal units (0.19 under 0.05 on iid events).
+    running: none
+    files: analysis/catalog_v4/short_run_bias.py (run_perm scaled, measure --before/--nperm/--unscaled, reread with CP intervals);
+      tools/lhe_probe.py (runlevel, runlevel-summary); analysis/catalog_v4/data/runlevel.json; tests/test_run_perm_calibration.py;
+      scripts/job_lhe_probe.sh (PROBE_SHARD=reread); docs/results.tex par:v4_short_runs
+    written: '2026-10-30T16:56:54+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
