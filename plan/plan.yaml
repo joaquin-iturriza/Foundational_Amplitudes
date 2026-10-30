@@ -4318,7 +4318,7 @@ entries:
         next; Joaquin only if none works'
   owner:
     agent: a5b71194556cf7e47
-    state: working
+    state: stopped
     since: '2026-10-30T11:33:41+00:00'
     context: 161792
     context_at: '2026-10-30T12:54:27+00:00'
