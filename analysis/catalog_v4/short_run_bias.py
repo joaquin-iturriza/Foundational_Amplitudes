@@ -18,9 +18,11 @@ card. Two samples are compared only inside one such group, so a run size or a st
 
 Measures, per group with enough events on both sides: two-sample Kolmogorov-Smirnov of short against complete on
 sqrt(s_hat) (pp; the e+e- beams fix it) and on cos(theta*) of the first final-state particle in the partonic rest frame,
-and the same for deep-short against complete. Two controls in the same group: complete runs split in two by run
-(alternate runs by seed), which calibrates the statistic under no bias, and complete runs of at least 5000 events
-against complete runs of at most 2000 (whether a run that completes depends on its size). Per-channel (subprocess)
+and the same for deep-short against complete; twice: over events (pooled, as if independent) and with the run as the
+unit (run_perm: a run's events are not independent draws, its channels' shares come from its own integration, so
+complete runs differ from each other by more than the event count allows; p from relabelling runs). Two controls in the same group: complete runs split in two by run
+(alternate runs by seed), which calibrates the statistic under no bias, and complete runs of the group's smallest ask
+against those of its largest when 3x apart (whether a run that completes depends on its size). Per-channel (subprocess)
 shares: not measured; each pool is one partonic subprocess (fixed beam flavours) and neither the part files nor the
 pools keep MadEvent's integration channel of an event.
 """
@@ -33,7 +35,7 @@ FIG = os.path.join(HERE, "figs", "short_run_bias")
 PART_RE = re.compile(r"^(?P<proc>.+)_(?P<eid>[0-9a-f]{16})_(?P<run>run_\d+)_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
 PREFIXES = ("pp13v4_", "dsh_", "ee4_", "pp13_")
 DEEP = 0.3                  # deep-short: under this fraction of the ask (the hand-off's threshold, open)
-SMALL, LARGE = 2000, 5000   # the run-size control: complete runs of at most SMALL against at least LARGE events
+
 CAP = 200000                # events per side at most (a seeded subsample beyond)
 NBIN = 20                   # quantile bins of the complete side, for the figure
 
@@ -175,23 +177,75 @@ def _samples():
     return out
 
 
-def _load(samples):
+def _load_one(s, cap):
+    """Momenta of one sample (a run's part, or a serial pool), a seeded subsample of at most `cap` events."""
     import numpy as np
     sys.path.insert(0, ROOT)
     import mg5_pipeline_final as mg
-    Ps = []
-    for s in samples:
-        if s["kind"] == "part":
-            with np.load(s["path"]) as z:
-                Ps.append(np.asarray(z["mom"], dtype=np.float64))
-        else:
-            x = np.load(s["path"], mmap_mode="r")
-            k = int(mg.PROCESSES[s["process"]]["nfinal"]) + 2
-            Ps.append(np.asarray(x[:, :4 * k], dtype=np.float64).reshape(len(x), k, 4))
-    P = np.concatenate(Ps) if Ps else None
-    if P is not None and len(P) > CAP:
-        P = P[np.random.default_rng(0).choice(len(P), CAP, replace=False)]
+    if s["kind"] == "part":
+        with np.load(s["path"]) as z:
+            P = np.asarray(z["mom"], dtype=np.float64)
+    else:
+        x = np.load(s["path"], mmap_mode="r")
+        k = int(mg.PROCESSES[s["process"]]["nfinal"]) + 2
+        P = np.asarray(x[:, :4 * k], dtype=np.float64).reshape(len(x), k, 4)
+    if len(P) > cap:
+        P = P[np.sort(np.random.default_rng(s["seed"]).choice(len(P), cap, replace=False))]
     return P
+
+
+def _binned_ks(H, a, b):
+    """KS distance of the pooled bin counts of units `a` against units `b` (H: units x bins)."""
+    import numpy as np
+    ca, cb = H[a].sum(0), H[b].sum(0)
+    return float(np.abs(np.cumsum(ca) / ca.sum() - np.cumsum(cb) / cb.sum()).max())
+
+
+def run_perm(units_x, units_y, nperm=2000, nbin=50):
+    """Run-level permutation test: a run's events are not independent draws (MadEvent fixes each channel's share of a
+    run's events from that run's own integration), so the unit is the run. KS distance of the pooled binned
+    distributions (nbin quantile bins of all events) of the x runs against the y runs; p from relabelling runs
+    (every relabelling when there are fewer than nperm). None when either side has fewer than 2 runs."""
+    import itertools, math
+    import numpy as np
+    nx, ny = len(units_x), len(units_y)
+    if nx < 2 or ny < 2:
+        return None
+    allv = np.concatenate(units_x + units_y)
+    edges = np.unique(np.quantile(allv, np.linspace(0, 1, nbin + 1)))
+    edges[0], edges[-1] = -np.inf, np.inf
+    H = np.array([np.histogram(u, edges)[0] for u in units_x + units_y], dtype=np.float64)
+    idx = np.arange(nx + ny)
+    obs = _binned_ks(H, idx[:nx], idx[nx:])
+    total = math.comb(nx + ny, nx)
+    if total <= nperm:
+        sets = [np.array(c) for c in itertools.combinations(idx, nx)]
+    else:
+        rng = np.random.default_rng(0)
+        sets = [rng.permutation(idx)[:nx] for _ in range(nperm)]
+    ge = 0
+    for a in sets:
+        m = np.zeros(nx + ny, bool); m[a] = True
+        ge += _binned_ks(H, idx[m], idx[~m]) >= obs - 1e-12
+    return {"ks_binned": round(obs, 5), "p_runs": ge / len(sets), "runs_x": nx, "runs_y": ny,
+            "relabellings": len(sets), "p_min": 1.0 / len(sets)}
+
+
+def _feats_of(samples, per):
+    return [features(_load_one(s, per)) for s in samples]
+
+
+def _compare(X, Y, feats):
+    """Pooled event KS and the run-level permutation test of feature arrays per run X against Y."""
+    import numpy as np
+    out = {}
+    for f in feats:
+        r = _ks(np.concatenate([x[f] for x in X]), np.concatenate([y[f] for y in Y]))
+        rp = run_perm([x[f] for x in X], [y[f] for y in Y])
+        if rp:
+            r.update(rp)
+        out[f] = r
+    return out
 
 
 def cmd_measure(a):
@@ -220,36 +274,38 @@ def cmd_measure(a):
                        "yield": round(n_s / max(1, sum(s["asked"] for s in short)), 4),
                        "from_pools": sorted(s["process"] for s in short if s["kind"] == "pool")},
              "deep": {"runs": len(deep), "events": sum(s["got"] for s in deep)}}
-        Pc, Ps = _load(comp), _load(short)
-        Fc, Fs = features(Pc), features(Ps)
-        pp = float(np.std(Fc["sqrt_shat"])) > 1e-6 * float(np.mean(Fc["sqrt_shat"]))
+        per = max(500, CAP // max(1, len(comp) + len(short)))
+        Fc, Fs = _feats_of(comp, per), _feats_of(short, per)
+        sq = np.concatenate([x["sqrt_shat"] for x in Fc])
+        pp = float(np.std(sq)) > 1e-6 * float(np.mean(sq))
         feats = [f for f in ("sqrt_shat", "cos_theta_star") if f != "sqrt_shat" or pp]
         r["beam"] = "pp" if pp else "e+e-"
-        r["short_vs_complete"] = {f: _ks(Fs[f], Fc[f]) for f in feats}
-        r["hist"] = {f: _ratio(Fs[f], Fc[f]) for f in feats}
+        r["short_vs_complete"] = _compare(Fs, Fc, feats)
+        r["hist"] = {f: _ratio(np.concatenate([x[f] for x in Fs]), np.concatenate([x[f] for x in Fc])) for f in feats}
         if sum(s["got"] for s in deep) >= a.min_events // 2:
-            Fd = features(_load(deep))
-            r["deep_vs_complete"] = {f: _ks(Fd[f], Fc[f]) for f in feats}
-        cs = sorted([s for s in comp if s["kind"] == "part"], key=lambda s: s["seed"])
-        A, B = cs[0::2], cs[1::2]
-        if sum(s["got"] for s in A) >= a.min_events // 2 and sum(s["got"] for s in B) >= a.min_events // 2:
-            FA, FB = features(_load(A)), features(_load(B))
-            r["control_complete_halves"] = {f: _ks(FA[f], FB[f]) for f in feats}
-        sm = [s for s in comp if s["asked"] <= SMALL]
-        lg = [s for s in comp if s["asked"] >= LARGE]
-        if sum(s["got"] for s in sm) >= a.min_events // 2 and sum(s["got"] for s in lg) >= a.min_events // 2:
-            Fsm, Flg = features(_load(sm)), features(_load(lg))
-            r["control_complete_small_vs_large"] = {f: _ks(Flg[f], Fsm[f]) for f in feats}
+            r["deep_vs_complete"] = _compare([F for F, s in zip(Fs, short) if s["status"] == "deep"], Fc, feats)
+        # control 1: complete runs split in two by run (alternate runs by seed)
+        order = sorted(range(len(comp)), key=lambda i: comp[i]["seed"])
+        A, B = [Fc[i] for i in order[0::2]], [Fc[i] for i in order[1::2]]
+        if A and B:
+            r["control_complete_halves"] = _compare(A, B, feats)
+        # control 2: complete runs of the smallest ask against those of the largest (when 3x apart)
+        asks = sorted({s["asked"] for s in comp})
+        if len(asks) > 1 and asks[-1] >= 3 * asks[0]:
+            sm = [F for F, s in zip(Fc, comp) if s["asked"] == asks[0]]
+            lg = [F for F, s in zip(Fc, comp) if s["asked"] == asks[-1]]
+            r["control_complete_small_vs_large"] = dict(_compare(lg, sm, feats), asks=[asks[0], asks[-1]])
         res[c] = r
         print(f"[short_run_bias] {c}: short {n_s} ({len(short)} runs) vs complete {n_c} ({len(comp)} runs): "
-              + ", ".join(f"{f} KS {v['ks']} p {v['p']:.2g}" for f, v in r["short_vs_complete"].items()), flush=True)
+              + ", ".join(f"{f} KS {v['ks']} p {v['p']:.2g} p_runs {v.get('p_runs')}"
+                          for f, v in r["short_vs_complete"].items()), flush=True)
     # every short source, compared or not (step 2's list): process -> runs short of their ask
     short_by_proc = {}
     for s in S:
         if s["status"] != "complete":
             short_by_proc.setdefault(s["process"], []).append([s["asked"], s["got"]])
     out = {"inventory": inv, "groups": res, "short_sources": short_by_proc,
-           "settings": {"deep": DEEP, "small": SMALL, "large": LARGE, "cap": CAP, "min_events": a.min_events}}
+           "settings": {"deep": DEEP, "cap": CAP, "min_events": a.min_events}}
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     with open(a.out, "w") as f:
         json.dump(out, f, indent=0, sort_keys=True)
@@ -257,18 +313,19 @@ def cmd_measure(a):
 
 
 def summary(d, alpha=0.05):
-    """Per group and feature: short vs complete, its control; the count of groups where short differs at alpha after a
-    Bonferroni correction over every test made, and where the complete halves do."""
-    tests = [(c, f, v) for c, r in d["groups"].items() for f, v in r["short_vs_complete"].items()]
-    ctl = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get("control_complete_halves") or {}).items()]
-    size = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get("control_complete_small_vs_large") or {}).items()]
-    n = max(1, len(tests))
-    sig = sorted({c for c, f, v in tests if v["p"] < alpha / n})
-    return {"groups": len(d["groups"]), "tests": len(tests),
-            "groups_short_differs_bonferroni": sig,
-            "control_halves_tests": len(ctl), "control_halves_p_below_alpha": sum(v["p"] < alpha for _, _, v in ctl),
-            "control_size_tests": len(size), "control_size_p_below_bonf": sum(v["p"] < alpha / max(1, len(size))
-                                                                              for _, _, v in size)}
+    """Per comparison kind, over the groups and features where the run-level test can be made (2+ runs a side): the
+    groups whose run-level p is under alpha after a Bonferroni correction over that kind's tests, and the event-level
+    (pooled KS, events taken as independent) count for contrast."""
+    out = {"groups": len(d["groups"])}
+    for kind in ("short_vs_complete", "deep_vs_complete", "control_complete_halves", "control_complete_small_vs_large"):
+        T = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get(kind) or {}).items() if isinstance(v, dict)]
+        R = [(c, f, v) for c, f, v in T if "p_runs" in v]
+        out[kind] = {"tests_events": len(T),
+                     "event_level_p_below_bonf": sorted(f"{c}:{f}" for c, f, v in T if v["p"] < alpha / max(1, len(T))),
+                     "tests_runs": len(R),
+                     "run_level_p_below_bonf": sorted(f"{c}:{f}" for c, f, v in R if v["p_runs"] < alpha / max(1, len(R))),
+                     "run_level_p_below_alpha": sorted(f"{c}:{f}" for c, f, v in R if v["p_runs"] < alpha)}
+    return out
 
 
 def cmd_fig(a):
