@@ -4931,7 +4931,7 @@ entries:
         them'
   owner:
     agent: aaf418a63a4ebed0b
-    state: stopped
+    state: working
     since: '2026-10-30T22:19:16+00:00'
     context: 178550
     context_at: '2026-10-30T23:11:10+00:00'
