@@ -14,6 +14,11 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             DIR (default $TMPDIR): seconds of the MG5 output and of generate_events,
                                             events returned, the fraction kept (as above), the run directory's largest
                                             size while it ran; one JSON line. The directory is deleted afterwards.
+    summary LOG...                          the PROBE_JSON lines of probe job logs (site logs <run> -n 100000) per class
+                                            (beam: pp or e+e-; pool: default share, pp13v4 or ee4; final-state
+                                            multiplicity): runs, timeouts, median and minimum yield, median kept
+                                            fraction, median seconds per kept event, median MG5 output seconds, peak
+                                            run-directory size (median, max); variants (--patch) apart
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
 import argparse, glob, json, os, shutil, signal, socket, subprocess, sys, time
@@ -191,6 +196,46 @@ def cmd_run(a):
     print("PROBE_JSON " + json.dumps(res), flush=True)
 
 
+def _class(name):
+    cfg = mg.PROCESSES[name]
+    beam = "e+e-" if abs(int(cfg["pdg_ids"][0])) in (11, 13) else "pp"
+    pool = name.split("_", 1)[0]
+    return f"{beam} {pool} 2->{int(cfg['nfinal'])}"
+
+
+def cmd_summary(a):
+    import statistics as st
+    rows = []
+    for f in a.logs:
+        for line in open(f):
+            if "PROBE_JSON " in line:
+                rows.append(json.loads(line.split("PROBE_JSON ", 1)[1]))
+    by = {}
+    for r in rows:
+        key = _class(r["process"]) + ("  " + " ".join(r.get("extra_patches") or []) if r.get("extra_patches") else "")
+        by.setdefault(key, []).append(r)
+    med = lambda xs: round(st.median(xs), 4) if xs else None
+    out = {}
+    for k, rs in sorted(by.items()):
+        ok = [r for r in rs if not r.get("timeout") and "error" not in r]
+        out[k] = {"runs": len(rs), "timeouts": sum(bool(r.get("timeout")) for r in rs),
+                  "errors": sum("error" in r for r in rs),
+                  "yield_median": med([r["yield"] for r in ok if "yield" in r]),
+                  "yield_min": min([r["yield"] for r in ok if "yield" in r], default=None),
+                  "short_runs": sum(r.get("yield", 0) < 1 for r in ok),
+                  "kept_median": med([r["kept"] for r in ok if r.get("kept") is not None]),
+                  "kept_min": min([r["kept"] for r in ok if r.get("kept") is not None], default=None),
+                  "s_per_kept_event_median": med([r["s_per_kept_event"] for r in ok if r.get("s_per_kept_event")]),
+                  "s_generate_median": med([r["s_generate"] for r in ok if "s_generate" in r]),
+                  "s_output_median": med([r["s_output"] for r in rs if "s_output" in r]),
+                  "du_peak_mb_median": med([r["du_peak"] / 1e6 for r in rs if r.get("du_peak")]),
+                  "du_peak_mb_max": round(max([r["du_peak"] / 1e6 for r in rs if r.get("du_peak")], default=0), 1)}
+    out["_all"] = {"runs": len(rows), "processes": len({r["process"] for r in rows}),
+                   "timeouts": sorted(r["process"] for r in rows if r.get("timeout")),
+                   "errors": sorted(f"{r['process']}: {r['error'][:80]}" for r in rows if "error" in r)}
+    print(json.dumps(out, indent=1))
+
+
 def cmd_node(a):
     out = {"host": socket.gethostname(), "nproc": os.cpu_count(), "TMPDIR": os.environ.get("TMPDIR")}
     for k, p in (("tmpdir", os.environ.get("TMPDIR")), ("tmp", "/tmp"), ("scratch", os.environ.get("SCRATCH"))):
@@ -216,8 +261,9 @@ def main():
     s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     sub.add_parser("node")
+    s = sub.add_parser("summary"); s.add_argument("logs", nargs="+")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary}[a.cmd](a)
 
 
 if __name__ == "__main__":

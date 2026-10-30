@@ -12,6 +12,8 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             so any number of jobs drain one queue), runs it, and the job whose part completes a process assembles its
             pools (a lock per standalone directory, so no two jobs label or compile the same backend at once).
             Claims of jobs no longer in the queue (squeue) are put back first. Exits when nothing fits or is left.
+    park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold)
+    plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
     yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
             (recipes/gen_catalog_v4_default.py sizes those pools' n_runs from it; plan then links their parts, _adopt)
@@ -91,6 +93,10 @@ def cmd_plan(a):
     # the spec of each process (one per process: the assembly rebuilds its items from it)
     # tasks queued or claimed (a done one is known by its part file; a failed one is queued again: plan retries it)
     known = {f.split("__", 1)[1].split(".json")[0] for d in ("todo", "claimed") for f in os.listdir(D[d])}
+    # runs another queue's live workers hold (--skip-claimed Q2...: a queue being drained while this one takes over its
+    # work), so no run is made twice; a part the old worker leaves short or failed is planned again on a later plan
+    for q2 in getattr(a, "skip_claimed", None) or []:
+        known |= {f.split("__", 1)[1].split(".json")[0] for f in os.listdir(os.path.join(q2, "claimed"))}
     n_new = n_have = 0
     n_adopt = 0
     for name, its in sorted(items.items()):
@@ -574,6 +580,22 @@ def cmd_gc(a):
                       "no_dir": stats["absent"], "short_parts_kept_logs": stats["short_parts"]}))
 
 
+def cmd_park(a):
+    """Move a queue's unclaimed tasks (todo/) to parked/<time>/, so its live workers claim nothing more and end with the
+    runs they hold; nothing deleted. Their work is planned in another queue (plan --skip-claimed this queue)."""
+    D = _dirs(a.queue)
+    dst = os.path.join(a.queue, "parked", time.strftime("%Y%m%d_%H%M%S"))
+    os.makedirs(dst, exist_ok=True)
+    n = 0
+    for f in os.listdir(D["todo"]):
+        try:
+            os.rename(os.path.join(D["todo"], f), os.path.join(dst, f))
+            n += 1
+        except OSError:
+            pass                                  # claimed this instant
+    print(json.dumps({"parked": n, "to": dst, "claimed_left": len(os.listdir(D["claimed"]))}))
+
+
 def cmd_status(a):
     D = _dirs(a.queue)
     c = {k: len([f for f in os.listdir(D[k]) if ".json" in f and not f.endswith(".err")])     # tasks, not subdirs
@@ -724,6 +746,8 @@ def main():
     p = sub.add_parser("plan"); p.add_argument("specs", nargs="+"); p.add_argument("--queue", required=True)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--cores", nargs="*", default=[], help="NAME=C: that process's runs on C cores each")
+    p.add_argument("--skip-claimed", nargs="*", default=[], help="queues whose claimed runs are not planned again")
+    pk = sub.add_parser("park"); pk.add_argument("--queue", required=True)
     p.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     w = sub.add_parser("work"); w.add_argument("--queue", required=True)
     w.add_argument("--workers", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 1)))
@@ -736,7 +760,7 @@ def main():
     rq.add_argument("--match", default=None, help="regex on a failed task's error (first line); none: no failed task")
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     a = ap.parse_args()
-    {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+    {"plan": cmd_plan, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 

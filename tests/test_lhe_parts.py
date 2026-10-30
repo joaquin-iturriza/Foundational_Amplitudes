@@ -537,6 +537,36 @@ def test_stale_worker_returns_tasks():
     print("[stale worker + requeue] ok")
 
 
+def test_park_and_skip_claimed():
+    """park moves a queue's unclaimed tasks aside (nothing deleted) so its workers end with what they hold; a new queue
+    planned with --skip-claimed on it plans every run but the ones held there."""
+    _register(n_runs=4)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            q1, q2 = os.path.join(d, "q1"), os.path.join(d, "q2")
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q1, seed=42, rates=rates, cores=[]))
+            todo = sorted(os.listdir(os.path.join(q1, "todo")))
+            assert len(todo) == 4
+            os.rename(os.path.join(q1, "todo", todo[0]), os.path.join(q1, "claimed", todo[0] + ".12345"))
+            lhe_parts.cmd_park(argparse.Namespace(queue=q1))
+            assert not os.listdir(os.path.join(q1, "todo"))
+            parked = glob.glob(os.path.join(q1, "parked", "*", "*.json"))
+            assert len(parked) == 3
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q2, seed=42, rates=rates, cores=[],
+                                                  skip_claimed=[q1]))
+            assert sorted(os.listdir(os.path.join(q2, "todo"))) == todo[1:]
+    finally:
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        del mg.PROCESSES[NAME]
+    print("[park + skip-claimed] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -546,3 +576,4 @@ if __name__ == "__main__":
     test_tidy_and_gc()
     test_ee_energy_runs_and_equal_shares()
     test_stale_worker_returns_tasks()
+    test_park_and_skip_claimed()
