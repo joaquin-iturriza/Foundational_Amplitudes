@@ -2285,7 +2285,8 @@ entries:
       events (the pp pools'' test split and the e+e- default test pools) and on the smart test pools; sized by the pure-default
       bound (step 11). Lost from the plan on 2026-10-30 05:15, when it was folded into a collection step''s branch that was
       later dropped; restored here as its own step'
-  done_when: null
+  done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
+    sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
   match: zz_cov_*,cov_*
   evidence:
