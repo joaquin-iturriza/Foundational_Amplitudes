@@ -4734,7 +4734,7 @@ entries:
         them'
   owner:
     agent: ab9ca0db20df22225
-    state: working
+    state: closed
     since: '2026-10-30T17:35:25+00:00'
     context: 81468
     context_at: '2026-10-30T17:41:25+00:00'
@@ -4802,33 +4802,26 @@ entries:
       in b9a2ceb8 (samples as at a time, set-aside versions with their own asks, banner and stamp; cutoff search per measurement);
       re-read rerun as FA-ccin2p3-44201039.'
   handoff:
-    state: 'Step 13: the re-read failed on its inputs (commit-time cutoffs later than the measurements, set-aside serial pools
-      dropped, banner shadowed), finding recorded; fixed b9a2ceb8; rerun FA-ccin2p3-44201039 (reread2 shard: cutoff search
-      per measurement, then measure unscaled+scaled at 20000 at those times and reread vs committed). Next: read its log (CUTOFF_JSON:
-      matched groups, never_matched; REREAD_JSON event_ks_differ must be 0 per file, else that file''s re-read is INVALID
-      as designed), then per verdict before/after under the passed rule (flip only when the 20000 interval clears the threshold),
-      rewrite par:v4_short_runs where a verdict changes (% src/% claim, notes-editor), say whether the 113-pool gridpack rebuild
-      was needed. Step 10: first label check FA-ccin2p3-d36d4a4d evals were fine (868 pp13v4 classes, max |ln v4/label| 1.6e-12)
-      but the merge broke and pp13_ reused pools were skipped (E3033 acked); rerun FA-ccin2p3-f8d114ce also builds the ee4_
-      diagram sidecars (EE4 read). Pass = PPCHECK4_SUMMARY v4_same_function fail empty over 1301 classes and EE4_DATA line
-      showing sidecars present. Then steps 11+14 under the design passed 17:29: site pick FA --jobs 7; site sync once; smoke
-      v4_dimensionless_muon_pp smoke (scripts/job_catalog_v3_short.sh, --hdr=--mem=48G), then afterok on it v4_dimensionless_muon_pp,
-      _pp_seed2, _default50, _default50_seed2, _default25, _default25_seed2, plus the controls'' eval reads (v4_dimensionless_muon[_seed2]
-      eval with V3_AXES=''PP4 EE4''); record plan target and plan run; ~10 GPU-h. Then the readout tool writing analysis/catalog_v4/data/mixture_ab.json
-      with the verdict rule of the design.'
-    decisions: 'D193 cgsxwm dropped; D194 (''Okay, yes to both.'') fixes step 14''s shares 0.50/0.25; repo reviewer passed
-      the arms after D194 (watermark 467bbe03). Design of 17:29 passed (steps 11+14): R = median arm/control per class (seed
-      geometric means), class bootstrap widened by control seed shift; gain 0.90 on PP4 and EE4, no loss = pooled held-out
-      H1..H7c upper end < 1.05; XV3 dropped (catalog_v3 shared held-out pools absent on CC). pp_physics_check v4 rule: same
-      function within float64 rounding (1e-9; observed 1.6e-12).'
-    ruled_out: XV3 as a smart read (pools deleted). The controls' old PP reads (4.7 GeV b pools) for any comparison. Per-axis
-      smart no-loss rules (axes too small).
-    running: FA-ccin2p3-44201039 (reread2, CPU, target 1.5 h); FA-ccin2p3-f8d114ce (ppcheck4 rerun with ee4 sidecars, CPU,
-      target 1 h)
-    files: analysis/catalog_v4/short_run_bias.py (_samples_all/_select/cutoff, reread sides); analysis/catalog_v4/pp_physics_check.py
-      (--set v4, built, summary --evals/--out); scripts/job_lhe_probe.sh (reread2, ppcheck4); scripts/job_catalog_v3_short.sh
-      (default50/25 arms, EE4 axis); tools/collect_run.py (EE4)
-    written: '2026-10-30T17:30:42+00:00'
+    state: 'Step 10 PASSED (FA-ccin2p3-f8d114ce: v4_same_function 1301/1301 classes, max |ln v4/label| 8.3e-12; ee4_ sidecars
+      170 ok; the only ee4 test pool missing is ee4_epem_cgsxwm, dropped by D193 and left out by the EE4 axis; the 341 ''not
+      prebuilt'' are 340 n=0 train/val roles + cgsxwm). Step 13 DONE (FA-ccin2p3-37ebce98 after fix 61bd4acb, the pre-7bdc5729
+      physics key): short_run_bias re-read VALID (23/23 groups matched at 04:24 UTC, event KS 125/125 reproduced): short vs
+      complete 32/4/10 -> 32/1/7 (Bonferroni/0.05), deep 30/6/13 -> 30/2/10, control 31/0/1 unchanged; ub_bdwpz (both) and
+      epem_amupvmwm angle leave Bonferroni with 20000-relabelling intervals clearing it; verdict ''short runs biased'' and
+      the complete-runs rebuild stand (YES branch). short_run_bias_size and _gpack INVALID as designed (event KS differs only
+      in the never-matched groups dbx_bxhuwm, dbx_bxuwmz, uu_duwpz, whose files changed after). Written in par:v4_short_runs
+      cabd2a61 (data 2b9-reread json); notes-editor review of that paragraph pending in the batched backlog. Steps 11+14:
+      smoke FA-ccin2p3-26d1ad63 (slurm 62884376, 1 h limit) and afterok arms v4_dimensionless_muon_pp 667d0fab, _pp_seed2
+      be23ef63, _default50 b76e1941 submitted (8 h script limit, --allow-unfit: 48G fits no node now, queue ~8 h). NOT YET
+      SUBMITTED (site gate: 33 GPU-h of 8 h wall limits in 60 min > 30): v4_dimensionless_muon_default50_seed2, _default25,
+      _default25_seed2 (each: --hdr=--mem=48G --hdr=--time=02:30:00 --hdr=--dependency=afterok:62884376 --allow-unfit --allow-dirty,
+      NOSYNC=1) and the controls'' reads v4_dimensionless_muon and _seed2 ''eval'' with --env ''V3_AXES=PP4 EE4'' --hdr=--time=01:00:00.
+      Submit these on the next wake (gate window 60 min from 19:05 UTC). Then the readout writing analysis/catalog_v4/data/mixture_ab.json
+      under the 17:29 rule.'
+    running: FA-ccin2p3-26d1ad63 (smoke), FA-ccin2p3-667d0fab, FA-ccin2p3-be23ef63, FA-ccin2p3-b76e1941 (afterok on smoke)
+    files: analysis/catalog_v4/short_run_bias.py (--key-v1); scripts/job_lhe_probe.sh (reread2); analysis/catalog_v4/data/short_run_bias_reread.json;
+      docs/results.tex par:v4_short_runs
+    written: '2026-10-30T18:14:26+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
