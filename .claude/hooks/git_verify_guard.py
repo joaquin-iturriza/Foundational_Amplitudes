@@ -9,7 +9,10 @@ tools/verify_claims.py over every trunk commit since the last verified one (`pla
   - git pull (fetch, then merge: the merge is checked);
   - the same inside sh -c, bash -c, eval or a heredoc fed to a shell;
   - git merge <ref> and git cherry-pick <commit> whose incoming change to docs/results.tex fails
-    tools/verify_claims.py (a fast-forward merge runs no hook, so the range is checked here, ff or not).
+    tools/verify_claims.py (a fast-forward merge runs no hook, so the range is checked here, ff or not);
+  - git merge <ref> into trunk while the range changes a pillar's files its reviewer has not passed
+    (tools/review_state.py; agent redesign B6);
+  - a git commit whose -m message attributes the work to an assistant (tools/attribution.py; B7).
 The command is read through cmdparse.py (shared by the Bash guards): heredoc bodies fed to python, cat, git ... are
 data and quoted strings are values, so a body or a message that only names these forms is not refused. A command that
 cannot be parsed is refused only when a risky form appears outside quotes and heredocs.
@@ -106,6 +109,44 @@ def refs(args, with_value=("-m", "-s", "-X", "--strategy", "--strategy-option", 
     return out
 
 
+def attributed(repo, args):
+    """a `git commit -m/--message` whose message attributes the work to an assistant (tools/attribution.py, the
+    pattern .githooks/commit-msg applies to every commit)."""
+    msgs, k = [], 0
+    while k < len(args):
+        t = args[k]
+        if t in ("-m", "--message") and k + 1 < len(args):
+            msgs.append(args[k + 1])
+            k += 2
+            continue
+        if t.startswith("--message="):
+            msgs.append(t.split("=", 1)[1])
+        elif t.startswith("-m") and len(t) > 2 and not t.startswith("--"):
+            msgs.append(t[2:])
+        k += 1
+    if not msgs:
+        return None
+    top = git(repo, "rev-parse", "--show-toplevel").stdout.strip() or repo
+    sys.path.insert(0, os.path.join(top, "tools"))
+    try:
+        import attribution
+    except ImportError:
+        return None
+    bad = attribution.offending("\n\n".join(msgs))
+    return ("a commit message attributing the work to an assistant (CLAUDE.md rule 4): %s" % "; ".join(bad)) if bad else None
+
+
+def heredoc_attributed(cmd, cwd):
+    """a commit message given as a heredoc (`git commit -F - <<'EOF'`) that attributes the work to an assistant."""
+    _, bodies = cmdparse.heredocs(cmd)
+    for line, body in bodies:
+        if cmdparse.feeder(line) == "git" and re.search(r"\bcommit\b", line):
+            why = attributed(cwd, ["-m", body])
+            if why:
+                return why
+    return None
+
+
 def reads_hookspath(sub, args):
     """`git config [--get|--show-origin|scope...] core.hooksPath` or `git config get core.hooksPath`: a read."""
     a = [x.lower() for x in args]
@@ -126,6 +167,24 @@ def check_range(repo, rng):
                          "trunk afterwards)\n" % (rng, CHECK_S))
         return None
     return None if r.returncode == 0 else (r.stdout + r.stderr).strip()[-1500:]
+
+
+def unreviewed_merge(repo, base, ref):
+    """Review before a merge (agent redesign B6): a merge into trunk (fast-forward or not) of a range that changes a
+    pillar's files the pillar's reviewer has not passed (tools/review_state.py) is refused; the threshold gate stays
+    the frequency, this is the floor."""
+    if git(repo, "symbolic-ref", "--quiet", "--short", "HEAD").stdout.strip() != "trunk":
+        return None
+    top = git(repo, "rev-parse", "--show-toplevel").stdout.strip()
+    rs = os.path.join(top, "tools", "review_state.py")
+    if not os.path.exists(rs):
+        return None
+    r = subprocess.run([sys.executable, rs, "unreviewed", "%s..%s" % (base, ref), "--root", top], capture_output=True,
+                       text=True, timeout=60)
+    if r.returncode == 0:
+        return None
+    return ("merging %s into trunk brings changes no reviewer has passed (%s): run the pillar's reviewer on its "
+            "backlog (it advances its watermark on a pass), then merge" % (ref, "; ".join(r.stdout.split("\n")[:3]).strip()))
 
 
 def git(repo, *a):
@@ -172,6 +231,10 @@ def refusal(cmd, cwd, depth=0):
             return "git config core.hooksPath (set once by tools/switch_over.sh)"
         if sub == "commit" and commit_skips(args):
             return "git commit -n / --no-verify (it skips the claims check)"
+        if sub == "commit":
+            why = attributed(repo, args)
+            if why:
+                return why
         if sub == "merge" and any(no_verify(a) for a in args):
             return "git merge --no-verify"
         if sub == "pull":
@@ -183,6 +246,9 @@ def refusal(cmd, cwd, depth=0):
                     why = check_range(repo, "%s..%s" % (base, ref))
                     if why:
                         return "merging %s brings numbers the claims check refuses:\n%s" % (ref, why)
+                    why = unreviewed_merge(repo, base, ref)
+                    if why:
+                        return why
         if sub == "cherry-pick" and not any(a in ("--abort", "--continue", "--quit", "--skip") for a in args):
             for ref in refs(args, with_value=("-m", "--mainline", "-X", "--strategy", "--strategy-option")):
                 if ".." in ref:
@@ -210,7 +276,7 @@ def main():
         if re.search(r"\.git/(?:config\b|hooks/)", code) and re.search(r">|\btee\b|\bsed\b.*-i|\bcp\b|\bmv\b|\brm\b|\bln\b", code):
             why = "a write to .git/config or .git/hooks"
         else:
-            why = refusal(cmd, inp.get("cwd") or os.getcwd())
+            why = refusal(cmd, inp.get("cwd") or os.getcwd()) or heredoc_attributed(cmd, inp.get("cwd") or os.getcwd())
     if why:
         sys.stderr.write("git verify guard: refused (%s).\n" % why)
         return 2
