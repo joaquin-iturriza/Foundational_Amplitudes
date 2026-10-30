@@ -4219,6 +4219,16 @@ entries:
       stays near 0.49 in both: the budget is not the limit; arm A''s logs say which channel and why; the integration-side
       settings (sde_strategy 2, hard_survey 1, a new gridpack) are probed next. Only if none works does the question go to
       Joaquin, with what was tried.'
+    passed_at: '2026-10-30T13:08:51+00:00'
+    reviewer: 'Revised design re-checked. Arms B and C each change one gen_ximprove_gridpack limit against arm A (same gridpack
+      grid04, size 200, cards, code 225009a8). The measure, the share of complete runs, moved 0.49/0.79/0.89/0.91 with run
+      size on this gridpack (cgsxwm_sizecheck.json @070e10c8). Spread: binomial 0.06 at 0.49 and 0.03 at 0.95 over 64 runs.
+      The bias test now uses the 768 kept runs of 200 from the run-size probe (378 complete, 75600 events; 390 short), detectable
+      1.36*sqrt(1/12800+1/75600)=0.013, below the measured short-versus-complete gap of 0.0225. Blocking rule stated (halves
+      p>=0.05, KS to each reference <=0.0225, otherwise nothing laid out). WORKS, BLOCKED, PARTIAL and NO EFFECT all stated.
+      Searched results.tex, the plan and site decisions for ximprove, max_iter, max_event_in_iter, gridrun, sde_strategy,
+      hard_survey, cgsxwm, gridpack: no earlier probe of these limits. D187-D189 (keep every energy, regenerate correctly)
+      are answered.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
