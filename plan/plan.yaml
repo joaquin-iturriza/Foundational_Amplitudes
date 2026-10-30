@@ -3732,6 +3732,52 @@ entries:
       outcome stated for yes, no and an unconverged reference, not a repeat (searched gridpack, run size, short run, complete
       run, madevent, set_gridpack in docs/results.tex, the entry''s evidence and dead ends, site decisions: only par:v4_short_runs
       / fig:v4_run_size and the rebuild dead end, both cited), answers step 7 and no user-named comparison is left out.'
+  - at: '2026-10-30T05:08:12+00:00'
+    question: 'Do small runs drawn from one MadEvent integration made at large-run precision (a gridpack) give the events
+      of complete runs of many? The run-size probe (par:v4_short_runs, fig:v4_run_size, bb88c44a) found complete runs of 1000/150
+      (pp) and 200 (e+e-) that each integrate on their own differ from complete large runs (7 of 16 run-level tests below
+      Bonferroni, KS 0.011 to 0.039), so the 56-pool rebuild in small runs is not submitted; if gridpack runs of the rebuild''s
+      sizes agree, the rebuild is laid out as gridpack runs. Also checks the reference: do independent large complete runs
+      agree with each other?'
+    prior: 'Searched docs/results.tex (gridpack: none; short, run size: par:v4_short_runs), plan show catalog_coverage (the
+      run-size probe of 2026-10-30, 310 complete runs, size ladder: dg_dguux 1000 vs 33 runs of 40282 KS 0.021/0.023 p<5e-4;
+      bb_bbgg 1000 vs runs of 31774 KS 0.013 p 0.004 / 0.011 p 0.026; e+e- amupvmwm 200 vs 13057 KS 0.018 p 0.0025; ub_bdwpz
+      agrees only with runs of 2800), site decisions --project FA (gridpack, run size, madevent: none). Revised after the
+      design review FIX (too few runs per gridpack to see the bias being removed on bb_bbgg and e+e-; no direct test against
+      the per-run-integrated runs). This design differs from the run-size probe in one thing: the small runs share one integration
+      made at a large run''s precision.'
+    measure: 'short_run_bias.py measure (commit 39914802), per group and ask: (1) primary, the runs of the group''s two gridpacks
+      pooled against the complete runs of the largest ask held at least twice (dg_dguux 33 runs of 40282, bb_bbgg 30 of 31774,
+      e+e- amupvmwm 16 of 13057), run-level permutation test of the binned KS on sqrt(s_hat) (pp) and cos theta* of the first
+      final, Bonferroni over the primary tests (5 tests, level 0.01); (2) direct, the pooled gridpack runs against the per-run-integrated
+      complete runs of the same ask from the run-size probe (5 tests, level 0.01), which measures the change itself; (3) the
+      two gridpacks against each other and each alone against the large runs, as consistency checks. Reference check: control_top_halves,
+      the largest runs split in two by seed.'
+    check: 'The same measure on existing data separates the per-run-integrated small runs from the large ones (dg_dguux 1000:
+      KS 0.021, p<5e-4; bb_bbgg 0.013 p 0.004 and 0.011 p 0.026; e+e- 200: 0.018, p 0.0025) while its complete-halves control
+      finds nothing (0 of 37 below 0.05). Power of the revised layout (event-level detectable KS at the corrected level 0.01,
+      factor 1.63/1.36 on the 5% value): pp pooled 200 runs of 1000 against the reference subsampled to about 1500 events
+      a run (dg 33 runs, bb 30 runs, about 46k to 53k events): about 0.0085; e+e- 400 runs of 200 against 16 runs of about
+      2900: about 0.009. So the bias being removed (0.011 to 0.023 in every one of the five tests) sits above the detection
+      limit in every group. The gridpack''s banner gives the large runs'' physics key (physics_key ignores gridpack, nevents,
+      iseed; tests/test_lhe_gridpack.py).'
+    fixed: Process cards, generate lines, model, the pool's run-card patches (e+e- at 1000 GeV as the reference group), physics
+      key equal to the reference runs'; the gridpack integrated at the reference's run size (dg_dguux 40282, bb_bbgg 31774,
+      e+e- 13057 events) on 16 cores (run_mode 2, an execution setting); small runs of the rebuild's sizes (1000 pp, 200 e+e-).
+    control: The reference large runs (same as the run-size probe) and their own halves (control_top_halves); the per-run-integrated
+      complete runs of the same size (the direct test); each gridpack's runs split in two (control_gridpack_halves); the two
+      gridpacks of a group against each other.
+    seeds: Two independent gridpacks per group (grid iseed lhe_iseed(process, 7777 + seed base), seed bases 0 and 1000), each
+      with 100 runs of 1000 (pp) or 200 runs of 200 (e+e-) at run seeds base+1..; 6 CPU jobs of 16 cores, about 1 h each.
+    outcome: 'Yes, per group: no primary test below the corrected level, the measured KS under the per-run-integrated runs''
+      at the same size, the stated detectable KS under that group''s bias being removed (else the group has no power and is
+      reported as untested), and the two gridpacks agreeing (pair test above 0.05/5); the direct test should then sit below
+      the corrected level wherever the old bias exceeded the detectable KS. Yes in all three groups: lay the 56 pools out
+      as gridpack runs (one gridpack per pool and energy, runs of 1000 / 200), plan the catalog_v4_complete queue, release
+      the three held pools, submit one wave. No (a group''s gridpack runs differ from the large runs, or its two gridpacks
+      differ): report to Joaquin with the numbers; the choice between rebuilding in complete runs of 1000 and keeping the
+      short-run pools is his. If the reference''s own halves differ (control_top_halves below 0.05), the large runs are not
+      a converged reference: reported, and the test is read against that spread.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
