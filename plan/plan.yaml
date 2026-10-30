@@ -5474,6 +5474,58 @@ entries:
       plan.yaml dead ends and site decisions: prior now names the 2026-10-29 dead end (catalog_v3 default), the October lxplus
       GPU history, MIG OOM and the TF32 rescoring gap. Check 6: placement under agent_redesign (site upkeep) is the main session''s
       call, noted; the probe moves no training job.'
+  - at: '2026-10-30T23:52:27+00:00'
+    question: 'Measured correctly from the transcripts: (B) how much of the 5-hour usage window the old setup (main alone
+      to 2026-10-25 17:02 UTC; step agents to 2026-10-30 11:35) and the redesign (after) used per window, per model; (D) whether
+      Sonnet/Haiku agent tasks stood (no correction) as often as Opus ones of the same type and size, counting rework cost;
+      (C) where an agent''s context per call comes from. Feeds Joaquin''s calls on the agent setup and on letting small models
+      take small tasks.'
+    prior: 'tools/usage_report.py @5b14ab22 (analysis/agent_redesign/usage_report.json): tokens per result about the same
+      before and after; counted -home-joaquin-work-FA only, old weighting, no per-model cost, no meter check. Main-session
+      pilot (scratchpad tokens_since.py, token_cap.json): this session + its subagents only, weighting in 1/out 5/cache write
+      1.25/read 0.1, gave 0.536M per percent from the 7% reading and 0.638M from the 28% one (19% apart, never reconciled).
+      Previous agent a626d9f46d266d842 (ran on sonnet, stopped) left untracked tools/token_windows.py, tools/context_breakdown.py
+      and JSONs: not reviewed, discarded unless re-read and checked. docs/results.tex: none found (searched 5-hour, token
+      usage, weighted tokens, usage_report). site decisions: none on models, tokens or usage windows.'
+    measure: 'One committed tool (tools/usage_windows.py) reads every transcript folder under ~/.claude/projects (*/*.jsonl
+      and */*/subagents/agent-*.jsonl; inventory per folder with sessions, subagent files, date range, and what usage_report.py
+      missed). Per API response, deduplicated by message.id: time, model, input, output, cache write split 5m/1h (usage.cache_creation),
+      cache read. Cost per call = list prices per MTok from the claude-api skill''s model table (cached 2026-10-06, cited
+      in the output): Opus 5.5 in 4, out 20, read 0.20; Sonnet 5.5 2/10/0.20; Opus 4.x 5/25/0.50; Haiku 5.5 0.10/0.50/0.01;
+      cache write 1.25x input (5m) and 2x (1h), shared/prompt-caching.md; unknown models listed apart. Windows: 5-hour blocks
+      reconstructed over all calls of the account (a block starts at the first call at least 5 h after the previous block''s
+      start), cost per block split by period, model and source (this session, its subagents, other FA sessions, other projects,
+      claude -p test sessions). Percent per block = cost / calibrated cost-per-percent. Limits listed before any number: the
+      subscription meter''s formula is not published and may not be proportional to list price; the meter shows integers (the
+      2% step is +-25%); a reading''s time is the time his message was sent; usage outside Claude Code transcripts (claude.ai
+      chats, other machines) is invisible; deleted transcripts are invisible. (D) unit = one agent (Agent launch plus resumes,
+      its subagent file), with model, type (review: reviewer subagent types; owner: brief opens with ''You own one entry'';
+      tool fix: edits only tools/, .claude/, scripts/, ~/.local/bin; analysis: the rest), size band (calls and cost terciles);
+      success = no correction within 48 h: a later SendMessage to it pointing at an error, a reviewer FIX naming its commits,
+      a later commit by another agent or session reverting or fixing its files, a user message calling it wrong; the correcting
+      calls'' cost is charged to it; classifier hand-checked on 5 successes and 5 failures; Sonnet/Haiku vs Opus per type
+      x size cell with n; a cell under about 10 tasks is called undecidable and a matched trial is proposed with its cost.
+      (C) per call context split into system prompt + CLAUDE.md + agent definition, brief, hook additionalContext, tool results
+      by family (plan, site, file reads, grep, git, other), own text and tool inputs, SendMessage/hand-back, at first, median
+      and last call, chars/4 checked against the usage fields on three agents; figure of stacked bars per period.'
+    check: 'Calibration on Joaquin''s three readings, message timestamps from the main transcript: 5% at 2026-10-30T16:54:25Z,
+      7% at 16:59:04Z, 28% at 19:37:53Z (not 23:00 as relayed). Cost-per-percent from the 23% step (16:54:25 to 19:37:53)
+      and from the 2% step must agree within about 20% (the 2% step carries +-25% from integer rounding, so the check uses
+      its interval), and the 5% at 16:54:25 must follow from cost since that block''s start; done under two scopes, (i) this
+      session and its subagents, (ii) every call of the account in the window (the likelihoods project and test sessions ran
+      then too). The pilot''s old weighting already disagrees by 19% on scope (i), so the measure is shown to move with what
+      is counted; the scope that passes is used; if neither passes, cost is not used to state percent and that is the result
+      reported.'
+    fixed: Transcripts as they are at run time; price table cached 2026-10-06; dedup by message.id keeping the last line;
+      period boundaries 2026-10-25T17:02Z and 2026-10-30T11:35Z; 5-hour block rule above.
+    control: The old weighting (in 1, out 5, cache write 1.25, read 0.1) through the same pipeline and the same calibration,
+      side by side; for (D), Opus tasks of the same type and size band; for (C), the before-redesign agents against after.
+    seeds: none (deterministic reads of existing transcripts)
+    outcome: 'Yes (cost reproduces the readings within ~20% under a stated scope): a table of percent per 5-hour block per
+      period and model, with the old-setup blocks that pass 100% listed against his memory of two windows a day filled early;
+      (D) success and rework-inclusive cost per model per cell, or undecidable with a matched-trial proposal; (C) the source
+      table and the largest cuts. No: cost does not reproduce the meter; the gap per scope is reported and no percent per
+      window is claimed; (B) then reports cost per block in dollars only.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
