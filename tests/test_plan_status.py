@@ -41,3 +41,39 @@ def test_status_stalled_and_gate(tmp_path):
     r = subprocess.run([sys.executable, gate], input=json.dumps({"agent_id": "x"}), env=env, capture_output=True,
                        text=True)
     assert "STALLED" not in r.stderr
+
+
+def test_supervisor_stalled_event(tmp_path):
+    """site_runends.stalled_pass: an event on the stalled scratch plan, none on the live plan, cleared on recovery."""
+    import importlib.machinery, importlib.util
+    env = world(tmp_path)
+    bindir = os.path.expanduser("~/.local/bin")
+    sys.path.insert(0, bindir)
+    def load(name, path):
+        ld = importlib.machinery.SourceFileLoader(name, path)
+        mod = importlib.util.module_from_spec(importlib.util.spec_from_loader(name, ld))
+        ld.exec_module(mod)
+        return mod
+    m = load("site_tool", os.path.join(bindir, "site"))
+    import site_runends as R
+    db = tmp_path / "ev.db"
+    c = sqlite3.connect(db)
+    c.executescript(sqlite3.connect(os.path.expanduser("~/.local/share/ccorch/runs.db")).execute(
+        "select sql from sqlite_master where name='events'").fetchone()[0])
+    pr = {"local": REPO, "run_ends": {}}
+    old = dict(os.environ)
+    try:
+        os.environ.update(env)
+        R.stalled_pass(m, c, "FA", pr)
+        assert c.execute("select count(*) from events where item='catalog_coverage'").fetchone()[0] == 1
+        row = c.execute("select item,kind,key,msg from events where acked is null").fetchone()
+        assert row[:3] == ("catalog_coverage", "STALLED", "stalled:catalog_coverage"), row
+        assert R.stalled_pass(m, c, "FA", pr) == 0              # one open event per key
+        for k in list(os.environ):
+            if k.startswith("PLAN_"):
+                del os.environ[k]
+        assert R.stalled_pass(m, c, "FA", pr) == 0              # live plan: nothing stalled, the event clears
+        assert c.execute("select count(*) from events where acked is null").fetchone()[0] == 0
+    finally:
+        os.environ.clear()
+        os.environ.update(old)

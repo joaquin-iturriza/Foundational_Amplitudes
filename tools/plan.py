@@ -1745,7 +1745,11 @@ def entry_status(d, st, events=None):
 
 def cmd_status(a):
     d, st = load()
-    for eid, state, text in entry_status(d, st):
+    rows = entry_status(d, st)
+    if a.json:
+        print(json.dumps([{"entry": e, "state": s_, "why": t} for e, s_, t in rows]))
+        return
+    for eid, state, text in rows:
         print("%-28s %-15s %s" % (eid, state, text))
 
 
@@ -2806,7 +2810,8 @@ def main(argv=None):
     ID = A("id", help="the plan entry's id")
     cmd("where", cmd_where, "print the paths of the plan file, the state file and the run registry")
     cmd("status", cmd_status, "one line per running or waiting entry: MOVING (live jobs, working agent), WAITING ON YOU "
-        "(the open ask) or STALLED (nothing live, no owner working, no ask), from live sources only")
+        "(the open ask) or STALLED (nothing live, no owner working, no ask), from live sources only",
+        A("--json", action="store_true", help="a JSON list of {entry, state, why} (the supervisor's pass reads it)"))
     cmd("show", cmd_show, "print the entries; with an id, that one entry in full (read an entry this way, never by "
         "grepping plan/plan.yaml)",
         A("id", nargs="?", help="one entry, with its whole evidence, dead ends, quotes and design"),
