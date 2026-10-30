@@ -14821,7 +14821,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.578
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 2
+      - 53
+      - 53
       accept_short: true
     parent: v4_epem_aaccx
     reuse: ee4_epem_aaccx
@@ -14923,7 +14929,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.617
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 1
+      - 87
+      - 3
       accept_short: true
     parent: v4_epem_aamupmum
     reuse: ee4_epem_aamupmum
@@ -14975,7 +14987,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.884
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 1
+      - 117
+      - 5
       accept_short: true
     parent: v4_epem_aataptam
     reuse: ee4_epem_aataptam
@@ -15271,7 +15289,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.69
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 74
+      - 74
+      - 74
       accept_short: true
     parent: v4_epem_accxg
     reuse: ee4_epem_accxg
@@ -15371,7 +15395,12 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.984
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 21
+      - 21
       accept_short: true
     parent: v4_epem_accxz
     reuse: ee4_epem_accxz
@@ -15763,7 +15792,12 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.584
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 1
+      - 51
       accept_short: true
     parent: v4_epem_amupmumz
     reuse: ee4_epem_amupmumz
@@ -15814,7 +15848,12 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.565
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 27
+      - 1
       accept_short: true
     parent: v4_epem_amupvmwm
     reuse: ee4_epem_amupvmwm
@@ -15913,7 +15952,12 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.663
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 24
+      - 24
       accept_short: true
     parent: v4_epem_ataptamz
     reuse: ee4_epem_ataptamz
@@ -17091,7 +17135,12 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.465
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 3
+      - 3
       accept_short: true
     parent: v4_epem_ccxgz
     reuse: ee4_epem_ccxgz
@@ -17481,7 +17530,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.422
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 1
+      - 1
+      - 8
       accept_short: true
     parent: v4_epem_ddxuux
     reuse: ee4_epem_ddxuux
@@ -17822,6 +17877,14 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 1
+      - 2
+      - 1
+      accept_short: true
     parent: v4_epem_epemtaptam
     reuse: ee4_epem_epemtaptam
     split: train
@@ -18500,7 +18563,12 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.557
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 1
+      - 23
       accept_short: true
     parent: v4_epem_htaptamz
     reuse: ee4_epem_htaptamz
@@ -18740,7 +18808,10 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      margin: 0.559
+      energy_runs:
+      - 1
+      - 1
+      - 3
       accept_short: true
     parent: v4_epem_hwpwmz
     reuse: ee4_epem_hwpwmz
