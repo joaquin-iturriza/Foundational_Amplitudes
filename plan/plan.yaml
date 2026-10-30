@@ -5562,6 +5562,65 @@ entries:
       explain the ''CLAUDE.md cut did not lower tokens per task'' puzzle (yes) and what would not (no). Passing: check 1 (old
       weighting side by side through the same pipeline is a matched control), readings and their timestamps confirmed in the
       main transcript (16:54:24.965Z 5%, 16:59:04Z 7%, 19:37:53Z 28%).'
+  - at: '2026-10-30T23:59:09+00:00'
+    question: 'Measured correctly from the transcripts: (B) how much of the 5-hour usage window the old setup (main alone
+      to 2026-10-25 17:02 UTC; step agents to 2026-10-30 11:35) and the redesign used per window, per model, and per completed
+      result with useless calls re-counted; (D) whether Sonnet/Haiku agent tasks stood (no correction) as often as Opus ones
+      of the same type and pre-task size, rework included, against Opus at low effort for mechanical steps (D138); (C) where
+      an agent''s context per call comes from, and whether that explains context per call staying ~106k after CLAUDE.md went
+      from ~30k to ~3k tokens. Feeds Joaquin''s calls on the agent setup and on small models for small tasks.'
+    prior: 'D138 (2026-10-26, ''for mechanical steps we can manage with opus but at low reasoning''): Opus low effort is the
+      reference for mechanical steps. D173-D175 (2026-10-29): the old setup nearly ran out of weekly usage. docs/results.tex
+      ~l.13288-13405: plugin token test (run-to-run spread of re-read tokens), named as prior; this design measures cost per
+      window, not re-reads. tools/usage_report.py @5b14ab22: tokens and wasted calls per result about the same before/after;
+      -home-joaquin-work-FA only, old weighting, no model prices, no meter check. Main-session pilot tokens_since.py: this
+      session only, old weighting, 0.536M vs 0.638M per percent from the 7% and 28% readings. Previous agent a626d9f46d266d842
+      (sonnet, stopped): untracked tools/token_windows.py, context_breakdown.py; context_breakdown.py re-read and reused only
+      after its checks pass here. Searched: token, 5-hour, five hour, usage window, sonnet, haiku, small model, context breakdown,
+      usage meter, effort, in results.tex, plan show, site decisions.'
+    measure: 'tools/usage_windows.py: every transcript folder (*/*.jsonl, */*/subagents/agent-*.jsonl; per-folder inventory
+      and what usage_report.py missed), one record per API response deduplicated by message id. Cost per call at list price
+      per MTok for every model present (claude-api skill model table cached 2026-10-06; cache write 1.25x input 5m, 2x 1h;
+      read per model): Opus 5.5 4/20/0.20; Opus 5 and 4.x 5/25/0.50; Sonnet 5.5 and 5 2/10/0.20; Sonnet 4.x 3/15/0.30; Haiku
+      5.5 0.10/0.50/0.01; Haiku 4.5 1/5/0.10; Fable 5.1 10/50/0.25; any unpriced call counted and listed per window. Windows:
+      two conventions computed, (a) a window starts at its first call and lasts 5 h, (b) start floored to the hour; the account''s
+      429 ''You''ve hit your 5-hour limit, resets <time>'' events and ''Usage limit reached'' notices give the true window
+      ends and 100% points; the convention whose ends match the reset times is used. Percent per window = cost / cost-per-percent.
+      Old weighting (in 1, out 5, cw 1.25, read 0.1) side by side. Per period: cost per completed result and useless calls
+      with usage_report.py''s definitions, re-run over all folders and priced. Limits stated before numbers. (D) tools/agent_tasks.py:
+      unit one agent (launch + resumes) with model of its calls, effort from its launch call''s effort field (else ''session
+      default, not recorded''), type (review, owner, tool fix, analysis), pre-task size from brief length terciles within
+      type (not calls or cost); success = no correction within 48 h (SendMessage pointing at its error, not the sender fixing
+      its own brief; reviewer FIX/BLOCK from the reviewer''s plan design-fix call or first verdict word, on a reviewer it
+      launched or its commits; a later commit by someone else removing lines it added, with fix/revert/bug in the subject;
+      Joaquin''s message within 3 h of its result, before any other result, with error words and naming an agent/reviewer/owner/step);
+      rework cost charged. Only tasks ending before 2026-10-29T00:00Z are scored (48 h of follow-up); later ones reported
+      apart. Haiku (8 agents) undecidable up front. Cells n<10 undecidable, matched trial proposed with cost. (C) context
+      split at first/median/last call (system+CLAUDE.md+definition as first-call residual, brief, hook pushes, tool results
+      by family, own text and inputs, messages), chars/4 checked against the usage fields on three agents.'
+    check: 'Window ends: the 429 events carry their reset times (seen: ''resets 7:30am'', ''7pm'', ''11:40pm'' Europe/Paris);
+      convention (a) vs (b) is decided by which reproduces them, and the reviewer''s own reconstruction shows the two give
+      different windows for the 28% reading, so the choice moves the result. Calibration: the 23% step (16:54:25 to 19:37:53Z,
+      +-1 point, about +-4%) sets cost per percent; tested on (i) the 5% at 16:54:25 from its window start, (ii) each 100%
+      hit (the 429 times on 2026-10-25, 10-29 x2 and the reset-notice windows) predicting 100% +-20%, (iii) the 2% step only
+      as a +-50% sanity bound. Two scopes (this session + its agents; every call of the account). The pilot''s old weighting
+      already disagrees 19% on scope (i), so the measure moves with what is counted. Pass: (i) and every (ii) within 20%;
+      else cost is not used for percent and that is reported. Classifier (D): hand-checked on 5 stood and 5 failed tasks;
+      usable when at least 4 of 5 in each group match a hand reading of the transcripts; already run once on a draft: 3 of
+      5 failures true, fixed (self-corrections, verdict parsing) and rechecked.'
+    fixed: Transcripts at run time; the price table above; dedup by message id; periods 2026-10-25T17:02Z and 2026-10-30T11:35Z;
+      48 h follow-up horizon; size terciles of brief length per type.
+    control: Old weighting through the same pipeline and calibration; (D) Opus tasks of the same type and size, and Opus-at-low-effort
+      tasks for tool fix and analysis (D138); (C) the step-agent period against the redesign.
+    seeds: none (deterministic reads); hand-check sample seed 1
+    outcome: '(B) yes (calibration passes): percent per window per period and model; old-setup windows passing 100% listed
+      against his ''filled 2 five-hour sessions consistently''; cost per completed result and useless calls per period. No:
+      dollars per window only, the gap per scope reported. (D) small models take a type when, in a decidable cell, their stood
+      rate is at most 0.10 below Opus''s and the 95% interval of the gap excludes a 0.25 shortfall, and their cost per task
+      with rework is at most 0.6x Opus''s; otherwise Opus stays; undecidable cells get a matched-trial proposal. (C) explained
+      if the fixed part fell by roughly the CLAUDE.md cut and other sources (tool results, hook pushes, messages) grew by
+      about as much, or if the cut never reached the agents'' fixed part; not explained if the fixed part fell and nothing
+      grew yet context stayed the same (then the context figure is wrong and is re-measured).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
