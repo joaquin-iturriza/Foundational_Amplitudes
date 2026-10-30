@@ -2640,7 +2640,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: f961e983
+    commit: 2c8b2233
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -2726,6 +2726,19 @@ entries:
       catalog_v4_w2 pp13v4_rest pp13v4_ddxgg (check only the 56 are new), site pick FA --gpus 0, workers sized ~1 h, never
       replan under running workers. (6) NEXT: step 7 collects the probe (recorded); in parallel a fresh agent builds (4) so
       a yes goes straight to one wave.'
+    - 'HAND-OFF (2026-10-30, gridpack wave). (1) PROBE READ: the 12 gridpool probe jobs (slurm 62792280-62792291) all RUN_SUMMARY
+      rc=0; 164 gridpacks built, none failed; lhe_probe kept --yields-out over the 12 logs gives yields for all 56 pools,
+      min 0.9033 (ee4_epem_cgsxwm), then ee4_epem_bgtxwp 0.9662, ee4_epem_abbxg 0.9791, ee4_epem_bhtxwp 0.98, the rest 0.99-1.0;
+      merged into analysis/catalog_v4/data/lhe_probe_yields.json (commit 2c8b2233; dsh_ud_huuwm''s old 0.029 replaced by 1.0).
+      No pool held. Finding: e+e- gridpack runs of 200 have a slow tail (abbxg, accxg, bbxgz, bbxwpwm, bgtxwp, bhtxwp, cgsxwm:
+      single runs of 600-1800 s against medians of 8-16 s; 2 of 96 abbxg runs hit the 1800 s timeout). (2) QUEUE: catalog_v4_gridpack
+      planned on CC (lhe_parts plan of the 3 specs, --grid-cores 16, --exclude of the 40 unbuilt non-56 items): 56 processes,
+      5025 run tasks, 0 gridpack tasks (all reuse the probe''s gridpacks); probe-measured cost 30 core-h. Registered: site
+      queue add under D167, 197 workers of 1 h, 250 worker-h, until 2026-10-30T18:00. (3) WAVE: plan target catalog_v4_gridpack
+      1 h / 197 jobs; site pick FA --gpus 0 --cpus 16 offered 197 (201 at the second pick); 197 workers scripts/job_lhe_parts.sh
+      LHE_QUEUE=catalog_v4_gridpack --time 01:00:00 submitted (slurm 62809932-62810618, runs recorded). Status at the end
+      of submission: 5019 done, 6 claimed, 0 failed, 53 of 56 assembled. NEXT: on the workers'' end, lhe_parts status (all
+      56 assembled, 0 failed), then mixcheck; the 57 pools in complete_runs_pending.json still wait on Joaquin.'
     - 'HAND-OFF (2026-10-30, short-run bias step). (1) Result: a MadEvent run that stops short of its target biases its events.
       analysis/catalog_v4/short_run_bias.py @a73a07af on 4807 part files + 364 pools, 23 groups of one class and banner physics,
       run-level permutation test (binned KS on sqrt(s_hat) and cos theta* of the first final): short vs complete 4 of 32 tests
@@ -2834,6 +2847,7 @@ entries:
     - analysis/catalog_v4/data/complete_runs.json
     - analysis/catalog_v4/data/control_pool_ids_1d9d6a29.json
     - analysis/catalog_v4/data/density_check.json
+    - analysis/catalog_v4/data/lhe_probe_yields.json
     - analysis/catalog_v4/data/mixed_order_audit.json
     - analysis/catalog_v4/data/pp_trained_compare.json
     - analysis/catalog_v4/data/short_built_pools.json
