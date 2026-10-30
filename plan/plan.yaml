@@ -2262,6 +2262,13 @@ entries:
       v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
       each), plus the controls'' PP4 mode-eval reads; control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100,
       -380842ed)'
+    12: 'ee4_epem_cgsxwm 3 TeV, make runs of 200 complete instead of selecting them: gridpack event-generation budget probe
+      running (design passed 13:08; 12 CPU jobs, 3 arms x 64 runs on grid04: A defaults with logs FA-ccin2p3-2ad84485 19b6560a
+      c24635dc b52e5bea, B max_event_in_iter 40000 c115cfc9 ff758d2c cd2dd017 a93055fe, C max_iter 16 bca8f341 29c16b00 ca46478e
+      5a365ea7; keep $SCRATCH/lhe_probe_keep_ximprove_{A,B,C}, logs alongside; target 2.5 h). On their end: shares per arm
+      from the 12 logs, arm A''s channel logs read, then sizecheck --ref-keep $SCRATCH/lhe_probe_keep_runsize --ref-ask 200
+      per passing arm (code branch cgsxwm-armcheck 2dfda6be, merge on repo-reviewer PASS). The mixcheck over the 112 assembled
+      passed (0 failing).'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -4301,6 +4308,14 @@ entries:
       if:
       - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
       - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
+    12:
+      feeds: how ee4_epem_cgsxwm's 3 TeV block is generated so every energy is kept (D189), and the mixcheck over all 113
+      if:
+      - 'WORKS (share >= 0.95, median <= 1 h, bias rule passes): lay out the 3 TeV runs with that limit, assemble, sizecheck
+        --parts, mixcheck over 113'
+      - 'PARTIAL: one more probe with the larger budget'
+      - 'NO EFFECT or BLOCKED: arm A logs say why; integration-side settings (sde_strategy 2, hard_survey 1, a new gridpack)
+        next; Joaquin only if none works'
   owner:
     agent: a5b71194556cf7e47
     state: working
