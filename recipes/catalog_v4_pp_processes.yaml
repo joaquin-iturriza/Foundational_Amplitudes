@@ -14219,7 +14219,7 @@ processes:
       its pp13 pool carries catalog_v3's physics
   pp13v4_ddx_ddxgg:
     lhe:
-      n_runs: 3
+      n_runs: 9
       parts: true
     kind: lhe_pp
     folder: pp13v4_ddx_ddxgg
