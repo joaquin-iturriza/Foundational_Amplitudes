@@ -849,6 +849,140 @@ def _out(f):
     return b.getvalue().strip().splitlines()[-1]
 
 
+def _gridpack_fakes(made):
+    """Gridpack fakes on top of _fakes: a gridpack is a tar holding its iseed (each build recorded in `made`); a run
+    drawn from it gives the events the fake reader keys by (grid iseed + run seed, events asked)."""
+    import tarfile
+
+    def make(process, ev, nevents, iseed, log_path, mg_cores=1, patches=None, run_name="grid"):
+        made.append((process, int(iseed), int(nevents), dict(patches or {})))
+        src = os.path.join(ev, "grid_iseed.txt")
+        open(src, "w").write(str(int(iseed)))
+        tar = os.path.join(ev, f"{run_name}_gridpack.tar.gz")
+        with tarfile.open(tar, "w:gz") as t:
+            t.add(src, arcname="grid_iseed.txt")
+        return tar
+
+    def run(gridpack, work, nevents, seed, log_path, timeout=None):
+        os.makedirs(work, exist_ok=True)
+        with tarfile.open(gridpack) as t:
+            g = int(t.extractfile("grid_iseed.txt").read())
+        p = os.path.join(work, f"gp_{g + int(seed)}_{int(nevents)}.fake")
+        open(p, "w").close()
+        return p
+    mg.lhe_make_gridpack, mg.lhe_run_gridpack = make, run
+    mg.lhe_gridpack_header = lambda lhe: "<header>fake gridpack</header>"
+
+
+def test_gridpack_queue():
+    """lhe.gridpack: in the identity (a gridpack pool never passes for a per-run one, nor one of another G); one
+    gridpack per e+e- energy with an iseed no run has; plan queues the gridpack tasks first and a run is claimed only
+    once its gridpack exists; two workers drain the queue (each gridpack built once, runs drawn from their energy's
+    gridpack, the pools assembled once from the same part files the per-run build writes)."""
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts.POLL_S, mg.lhe_make_gridpack, mg.lhe_run_gridpack,
+             mg.lhe_gridpack_header)
+    scratch = os.environ.get("SCRATCH")
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d, short=False)
+            made = []
+            _gridpack_fakes(made)
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            os.environ["SCRATCH"] = d                              # the tree tidy may delete in: $SCRATCH/lhe_work
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "lhe_work")
+            lhe_parts.ASSEMBLE_S, lhe_parts.POLL_S = 0, 0.2
+            # identity
+            _register(n_runs=3, run_events=200, complete_runs=True)
+            mg.PROCESSES[NAME]["lhe"]["energies"] = [500.0, 3000.0]
+            plain = _items()
+            assert mg.lhe_gridpacks(NAME, 100, 1020) == [] and mg.lhe_gridpack_paths(NAME, plain) == []
+            mg.PROCESSES[NAME]["lhe"]["gridpack"] = 13057
+            its = _items()
+            assert its[0][0]["lhe"]["gridpack"] == 13057 and "gridpack" not in plain[0][0]["lhe"]
+            assert mg.recipe_id(its[0][0]) != mg.recipe_id(plain[0][0])
+            parts = mg.lhe_part_paths(NAME, its)
+            assert {os.path.basename(p) for p, _ in parts}.isdisjoint({os.path.basename(p) for p, _ in
+                                                                        mg.lhe_part_paths(NAME, plain)})
+            mg.PROCESSES[NAME]["lhe"]["gridpack"] = 20000
+            assert mg.recipe_id(_items()[0][0]) != mg.recipe_id(its[0][0])
+            mg.PROCESSES[NAME]["lhe"]["gridpack"] = 13057
+            # one gridpack per energy, at its runs' patches, with an iseed none of the runs has
+            seed, iseed, n_req = mg._lhe_check_recipes(NAME, its)
+            grids = mg.lhe_gridpacks(NAME, iseed, n_req)
+            assert len(grids) == 2 and [g[1] for g in grids] == [13057, 13057]
+            assert [g[2]["ebeam1"] for g in grids] == [250.0, 1500.0]
+            assert {g[0] for g in grids}.isdisjoint({r[0] for _, r in parts}) and len({g[0] for g in grids}) == 2
+            assert [mg.lhe_gridpack_of_run(r, grids) for _, r in parts] == [0, 0, 0, 1, 1, 1]
+            # plan: gridpack tasks first, runs need them
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            q = os.path.join(d, "queue")
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            plan = lambda: lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates, cores=[],
+                                                                 grid_cores=2))
+            plan()
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            assert len(todo) == 8 and todo[:2] == [f"00000000__{NAME}__g00.json", f"00000000__{NAME}__g01.json"]
+            ts = [json.load(open(os.path.join(q, "todo", f))) for f in todo]
+            assert [t.get("kind") for t in ts[:2]] == ["gridpack"] * 2 and all(t["cores"] == 2 for t in ts[:2])
+            assert all(t["needs"].endswith("_gridpack.tar.gz") for t in ts[2:])
+            plan()                                                    # rerun: nothing queued twice
+            assert len(os.listdir(os.path.join(q, "todo"))) == 8
+            D = lhe_parts._dirs(q)
+            # one free core: no gridpack (2 cores) fits and no run may start before its gridpack
+            assert lhe_parts._claim(D, 3600, free=1) is None
+            t = lhe_parts._claim(D, 3600, free=2)
+            assert t["kind"] == "gridpack"
+            os.rename(t["_claimed"], os.path.join(D["todo"], t["_file"]))   # put back
+            # a run whose gridpack another live worker is making makes a worker wait
+            os.rename(os.path.join(D["todo"], todo[0]), os.path.join(D["claimed"], todo[0] + ".local1"))
+            assert lhe_parts._waiting_on_gridpack(D)
+            os.rename(os.path.join(D["claimed"], todo[0] + ".local1"), os.path.join(D["todo"], todo[0]))
+            assert not lhe_parts._waiting_on_gridpack(D)
+            # two workers drain it
+            ctx = mp.get_context("fork")
+            res = ctx.Queue()
+            ps = [ctx.Process(target=_worker, args=(q, res)) for _ in range(2)]
+            for p in ps:
+                p.start()
+            for p in ps:
+                p.join(120)
+            codes = [res.get(timeout=5) for _ in ps]
+            assert codes == [0, 0], codes
+            assert len(os.listdir(os.path.join(q, "done"))) == 8 and not os.listdir(os.path.join(q, "todo"))
+            assert os.listdir(os.path.join(q, "assembled")) == [NAME]
+            assert all(os.path.exists(tar) for tar, _ in mg.lhe_gridpack_paths(NAME, its))
+            for rec, path in _items():
+                assert datagen._is_cached(path, mg.recipe_id(rec)), path
+            # each part drawn from its energy's gridpack with the run's seed; its banner the gridpack's header
+            for (p, r) in parts:
+                g = grids[mg.lhe_gridpack_of_run(r, grids)]
+                with np.load(p) as z:
+                    assert len(z["mom"]) == r[1] and str(z["banner"]) == "<header>fake gridpack</header>"
+                ref, _, _ = mg.read_lhe_pp(f"gp_{g[0] + r[0]}_{r[1]}.fake", [21] * K)
+                assert np.array_equal(np.load(p)["mom"], ref)
+            # no work directory left (gridpack and run directories tidied)
+            assert not glob.glob(os.path.join(d, "lhe_work", "parts", "*"))
+            plan()
+            assert not os.listdir(os.path.join(q, "todo"))
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts.POLL_S, mg.lhe_make_gridpack, mg.lhe_run_gridpack,
+         mg.lhe_gridpack_header) = saved
+        for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
+            os.environ.pop(v, None)
+        if scratch is None:
+            os.environ.pop("SCRATCH", None)
+        else:
+            os.environ["SCRATCH"] = scratch
+        mg.PROCESSES.pop(NAME, None)
+    print("[gridpack queue] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -862,3 +996,4 @@ if __name__ == "__main__":
     test_park_and_skip_claimed()
     test_generation_rule()
     test_layout_dead_claims_park_marker_accept_boundary()
+    test_gridpack_queue()
