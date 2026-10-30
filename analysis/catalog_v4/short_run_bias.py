@@ -638,12 +638,21 @@ def cmd_sizecheck(a):
     """Run size on one gridpack (the run-size probe of a pool whose runs stop short at one energy; catalog_coverage,
     ee4_epem_cgsxwm at 3000 GeV). Runs of --process kept by `lhe_probe.py gridpool --keep` (KEEP/<process>/
     <process>_gpack<grid>_seed<s>_ev<n>.npz) at collider energy --energy, and with --parts the queue's part files of
-    that energy ($SCRATCH/lhe_parts/<process>/, tagged "parts"): per ask, the complete share (runs that returned every
-    event asked over runs kept; a run that errored keeps no file, its count is in the probe log), and the run-level test
+    that energy whose name holds the events' identity --eid ($SCRATCH/lhe_parts/<process>/, tagged "parts"): per ask,
+    the complete share read from the probe logs --logs (PROBE_JSON lines: a run that errored keeps no file but counts as
+    a run that returned nothing, as `lhe_probe.py kept` counts it; without logs no share is given), and the run-level test
     (run_perm, as `measure`) of its complete runs against the complete runs of --ref-ask from the probe; the control is
-    those reference runs split in two by seed. One physics key required (same cards and energy)."""
+    those reference runs split in two by seed. One physics key required (same cards and energy): refused otherwise.
+    --ref-ask defaults to the pool's run_events in complete_runs.json."""
     import numpy as np
     sys.path.insert(0, ROOT)
+    if a.ref_ask is None:
+        c = json.load(open(COMPLETE)).get(a.process, {})
+        if not c.get("run_events"):
+            raise SystemExit(f"{a.process}: no run_events in {COMPLETE}; give --ref-ask")
+        a.ref_ask = int(c["run_events"])
+    if a.parts and not a.eid:
+        raise SystemExit("--parts needs --eid: the queue's parts of the current layout only")
     keep = os.path.expandvars(a.keep) if a.keep else os.path.join(os.environ["SCRATCH"], "lhe_probe_keep")
     S = []
     for f in sorted(glob.glob(os.path.join(keep, a.process, "*.npz"))):
@@ -653,7 +662,7 @@ def cmd_sizecheck(a):
     if a.parts:
         for f in sorted(glob.glob(os.path.join(os.environ["SCRATCH"], "lhe_parts", a.process, "*.npz"))):
             m = PART_RE.match(os.path.basename(f))
-            if m and m["proc"] == a.process:
+            if m and m["proc"] == a.process and m["eid"] == a.eid:
                 S.append({"path": f, "asked": int(m["ev"]), "seed": int(m["seed"]), "src": "parts", "kind": "part"})
     rows, keys = [], set()
     for s in S:
@@ -665,6 +674,24 @@ def cmd_sizecheck(a):
         s["got"], s["key"] = _npz_len(s["path"]), physics_key(b)
         keys.add(s["key"])
         rows.append(s)
+    if len(keys) != 1:
+        raise SystemExit(f"{a.process} at {a.energy:g} GeV: {len(keys)} physics keys {sorted(map(str, keys))}: "
+                         "runs of other cards mixed in")
+    # complete share per ask from the probe logs, errored runs included (asked, returned 0)
+    logged = {}
+    for lp in a.logs or []:
+        for line in open(lp, errors="replace"):
+            if not line.startswith("PROBE_JSON "):
+                continue
+            r = json.loads(line[len("PROBE_JSON "):])
+            e = 2.0 * float((r.get("patches") or {}).get("ebeam1", 0.0))
+            if r.get("process") != a.process or abs(e - a.energy) > 1e-6:
+                continue
+            ask = int(r["events_asked"])
+            d = logged.setdefault(ask, {"runs": 0, "complete": 0, "errors": 0})
+            d["runs"] += 1
+            d["complete"] += int((r.get("events_returned") or 0) >= ask)
+            d["errors"] += int("error" in r)
     ref = sorted([s for s in rows if s["asked"] == a.ref_ask and s["got"] >= s["asked"] and s["src"] != "parts"],
                  key=lambda s: s["seed"])
     # a queue run that shares a reference run's seed draws the same events from the same gridpack: that reference run
@@ -680,15 +707,23 @@ def cmd_sizecheck(a):
         for ask in sorted({s["asked"] for s in rows if s["src"] == src}):
             ss = [s for s in rows if s["src"] == src and s["asked"] == ask]
             comp = [s for s in ss if s["got"] >= ask]
-            r = {"runs": len(ss), "complete": len(comp), "complete_share": round(len(comp) / len(ss), 4),
-                 "events_complete": sum(s["got"] for s in comp),
+            lg = logged.get(ask) if src != "parts" else None
+            r = {"runs_kept": len(ss), "complete": len(comp), "events_complete": sum(s["got"] for s in comp),
+                 **({"logged": lg, "complete_share": round(lg["complete"] / lg["runs"], 4)} if lg else {}),
                  "short_returned": sorted(s["got"] for s in ss if s["got"] < ask)}
             if ask != a.ref_ask or src == "parts":
                 Fc = _feats_of(comp, CAP)
                 if len(Fc) >= 2 and len(Fr) >= 2:
                     r["vs_ref"] = dict(_compare(Fc, Fr, feats)["cos_theta_star"], detectable_ks_5pct=_detectable(Fc, Fr))
+            # the short runs of this ask against the same reference (is the complete-run reference itself a selected
+            # sample? short and complete runs of one gridpack should then differ)
+            short = [s for s in ss if 0 < s["got"] < ask]
+            Fs = _feats_of(short, CAP) if len(short) >= 2 and len(Fr) >= 2 else []
+            if Fs:
+                r["short_vs_ref"] = dict(_compare(Fs, Fr, feats)["cos_theta_star"], runs_short=len(Fs),
+                                         detectable_ks_5pct=_detectable(Fs, Fr))
             out["asks"][f"{src}/{ask}"] = r
-            print(f"[sizecheck] {src} ask {ask}: {len(comp)}/{len(ss)} complete"
+            print(f"[sizecheck] {src} ask {ask}: {len(comp)} complete of {len(ss)} kept, share {r.get('complete_share')}"
                   + (f", vs ref {a.ref_ask}: KS {r['vs_ref']['ks_binned']} p_runs {r['vs_ref']['p_runs']}"
                      if r.get("vs_ref", {}).get("ks_binned") is not None else ""), flush=True)
     if a.out:
@@ -707,8 +742,10 @@ def main():
     s = sub.add_parser("summary"); s.add_argument("--json", default=OUT)
     z = sub.add_parser("figsize"); z.add_argument("--json", default=OUT)
     k = sub.add_parser("sizecheck"); k.add_argument("--process", required=True)
-    k.add_argument("--energy", type=float, required=True); k.add_argument("--ref-ask", type=int, default=200)
+    k.add_argument("--energy", type=float, required=True); k.add_argument("--ref-ask", type=int, default=None)
     k.add_argument("--keep", default=None); k.add_argument("--parts", action="store_true")
+    k.add_argument("--eid", default=None, help="with --parts: the events' identity of the layout whose parts to test")
+    k.add_argument("--logs", nargs="*", default=[], help="the probe jobs' logs (PROBE_JSON lines) for the shares")
     k.add_argument("--out", default=None)
     a = ap.parse_args()
     if a.cmd == "sizecheck":

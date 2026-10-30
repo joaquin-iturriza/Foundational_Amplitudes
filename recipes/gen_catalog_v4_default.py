@@ -247,6 +247,8 @@ def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=No
         else:
             lhe["n_runs"] = runs[0]
     if sizes:
+        if not lhe.get("energies"):
+            raise SystemExit(f"{name}: per-energy run sizes need an e+e- pool (lhe.energies)")
         keys = [f"{float(E):g}" for E in lhe["energies"]]
         if any(k not in keys for k in sizes):
             raise SystemExit(f"{name}: run sizes at energies it does not have: {sorted(set(sizes) - set(keys))}")
