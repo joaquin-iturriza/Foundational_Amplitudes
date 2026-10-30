@@ -4174,6 +4174,51 @@ entries:
       allows at most 13*40000 = 520k points per channel and arm C 16*4000 = 64k, so a correct budget hypothesis could still
       come back PARTIAL. Size the arms from this figure, or say why the gridpack run''s efficiency is higher (49% of runs
       already complete at 52k points).'
+  - at: '2026-10-30T13:08:34+00:00'
+    question: 'ee4_epem_cgsxwm at 3000 GeV, gridpack grid04 (52228 events'' precision, iseed 12576): do its runs of 200 stop
+      short because MadEvent''s gridpack event generation runs out of its per-channel budget (gen_ximprove_gridpack: at most
+      max_iter=13 iterations starting at most max_event_in_iter=4000 points, doubling each iteration, dsample.f ''events =
+      2 * events''), and does raising that budget make nearly every run of 200 complete (share near 1, so no run is selected)?'
+    prior: 'docs/results.tex par:v4_short_runs (cgsxwm paragraph, merge 1cdd4191): complete share 0.49/0.79/0.89/0.91 at 200/100/50/25
+      on this gridpack; complete runs of 50 and 25 differ from complete runs of 200 (0.0165, 0.031, p<1e-3); short runs of
+      200 differ from complete ones (0.0225, p<1e-3): completion selects. Short runs of 200 end after 650-830 s, not at the
+      1800 s timeout. Gridpack channel results.dat: 510009 survey points per channel, 4 to 1069 unweighted. No earlier probe
+      changed the gridpack generation limits (searched results.tex, plan, site decisions for ximprove, max_iter, max_event_in_iter,
+      gridrun, sde_strategy, hard_survey, cgsxwm, gridpack). Revised after design FIX (power of the bias test, blocking rule,
+      budget arithmetic).'
+    measure: 'Per arm: complete share of runs of 200 (errored runs count as returning nothing) and seconds per run (PROBE_JSON).
+      Arm A''s kept logs: per channel, iterations used against max_iter, points, unweighted events against its request, which
+      channels end short. For an arm with share >= 0.95, the run-level test on cos theta* (50 bins, 2000 relabellings) of
+      its runs against the 768 runs of 200 the run-size probe kept from this gridpack (seeds 20001-20768: 378 complete, 75600
+      events; 390 short), against the complete and the short ones separately, plus its own halves by seed (short_run_bias.py
+      sizecheck with a reference read from that keep directory, --ref-keep, added and reviewed before the read). Event-level
+      detectable distance at 5% against the complete reference: 1.36 sqrt(1/12800 + 1/75600) = 0.013.'
+    check: 'The complete share moves with the events asked on this gridpack: 0.49 at 200, 0.79 at 100, 0.89 at 50, 0.91 at
+      25 (cgsxwm_sizecheck.json @070e10c8), as a per-channel budget predicts. Budget arithmetic: arm A allows 4000 (2^13 -
+      1) = 3.3e7 points per channel, B (max_event_in_iter 40000) 3.3e8, C (max_iter 16) 2.6e8. The survey efficiency of the
+      largest channel G17 (14 of 510009, 0.62 of the cross section) needs about 4.5e6 points for its 124 events, inside A''s
+      budget, so whether the budget binds, and in which channel, is what arm A''s logs show; B and C raise it about 10x and
+      8x. The patch (mg.lhe_patch_ximprove, test_patch_ximprove, repo-reviewer PASS 5ba5c7b2) changes only gen_ximprove_gridpack''s
+      class limits in the run''s unpacked copy, read by get_job_for_event (refine4grid keeps the class values).'
+    fixed: The gridpack file (grid04 under identity 2b84d6b36cd318eb, nothing re-integrated), the 3000 GeV cards, run size
+      200, 16-core CPU jobs of 16 parallel runs, MadGraph 3.7.0 on CC, code 225009a8.
+    control: 'Arm A: MadGraph''s limits, same gridpack and size, logs kept: reproduces the 0.49 share and gives the diagnosis.
+      Reference for the bias test: the run-size probe''s 768 kept runs of 200 (378 complete, 390 short). Each arm''s runs
+      split by seed as halves control.'
+    seeds: 'Arm A defaults: 64 runs, seeds 30001-30064. Arm B max_event_in_iter 40000: 64 runs, 31001-31064. Arm C max_iter
+      16: 64 runs, 32001-32064. 4 jobs of 16 runs per arm (12 jobs of 16 cores, one round each), run timeout 3 h, job limit
+      4 h (A 1.5 h). Worst case about 600 core-h CPU, 0 GPU-h. Wall-time target 2.5 h. Share: binomial error 0.03 at 0.95
+      over 64 runs; 0.95 means at least 61 complete.'
+    outcome: 'WORKS: an arm with share >= 0.95 and median run time <= 1 h, whose events pass the bias rule: its halves agree
+      (p >= 0.05) and it is no farther from the complete reference than the short runs are (KS <= 0.0225) and no farther from
+      the short reference than the complete reference is (KS <= 0.0225), i.e. it sits between them as an unselected sample
+      must. Then the queue''s 3000 GeV runs of 200 are laid out with that limit (a pool key carrying it, in the identity),
+      assembled, sizecheck --parts against that arm, and the mixcheck over all 113. BLOCKED: share passes but the bias rule
+      fails: nothing laid out; the arm''s distances and its halves reported, the logs read for why. PARTIAL: share rises but
+      under 0.95: one more probe of the same shape with the larger budget (both changes, or the next 10x). NO EFFECT: share
+      stays near 0.49 in both: the budget is not the limit; arm A''s logs say which channel and why; the integration-side
+      settings (sde_strategy 2, hard_survey 1, a new gridpack) are probed next. Only if none works does the question go to
+      Joaquin, with what was tried.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
