@@ -2617,6 +2617,37 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     commit: 3261281d
     paths:
+    - 'HAND-OFF (2026-10-30, short-run bias step). (1) Result: a MadEvent run that stops short of its target biases its events.
+      analysis/catalog_v4/short_run_bias.py @a73a07af on 4807 part files + 364 pools, 23 groups of one class and banner physics,
+      run-level permutation test (binned KS on sqrt(s_hat) and cos theta* of the first final): short vs complete 4 of 32 tests
+      below Bonferroni (uu_aguu sqrt_shat, ub_bdwpz both, epem_amupvmwm angle), 10 of 32 below 0.05; deep-short (<0.3 of ask)
+      6 and 13 of 30; complete-halves control 0 of 31, 1 below 0.05. uu_aguu: KS 0.029, short/complete density 1.16 above
+      1462 GeV. Written up: docs/results.tex par:v4_short_runs, fig:v4_short_runs (commit 3261281d), figs analysis/catalog_v4/figs/short_run_bias_{a,b}.png/.pdf,
+      data analysis/catalog_v4/data/short_run_bias.json. (2) Run-size probe (design passed 2026-10-30): 20 CPU jobs FA-ccin2p3-39fcdce6
+      and the other 19 of 05:41 (job_lhe_probe.sh PROBE_SHARD=list), complete runs of 1000 and 150 events on dsh_ub_bdwpz,
+      dsh_dg_dguux, dsh_bb_bbgg (30 and 60 runs each) and 200 on dsh_epem_amupvmwm at 1000 GeV (40 runs); events kept in /sps/lpnhe/jiturrizaramirez01/tmp/lhe_probe_keep/<process>/<process>_probe_seed<iseed>_ev<n>.npz.
+      Jobs ended, events acked. Analyse: site run --item catalog_coverage ccin2p3 FA -- ''python analysis/catalog_v4/short_run_bias.py
+      measure --out $SCRATCH/short_run_bias.json'' then copy it home (site run ccin2p3 FA -- ''cat $SCRATCH/short_run_bias.json''
+      | sed -n ''/^{/,$p'' > analysis/catalog_v4/data/short_run_bias.json) and run python3 analysis/catalog_v4/short_run_bias.py
+      summary: read the size_1000, size_150 and size_200 kinds (run-level p, Bonferroni over the size tests, detectable_ks_5pct),
+      then the fig subcommand, and add the result to par:v4_short_runs. Also read the probe logs: a small run that stops short
+      is itself a finding. (3) Rebuild, committed @a73a07af, not planned: 56 pools in analysis/catalog_v4/data/complete_runs.json
+      (52 catalog_v4 pools assembled from short runs per tools/lhe_parts.py shortbuilt, i.e. 18 dsh_, 18 ee4_, 16 pp13v4_;
+      the three held; dsh_ud_huuwm), lhe.complete_runs (only runs that returned all they asked are assembled, runs: complete
+      in the identity, the old pool moved to set_aside/), runs of 1000 (dsh_uu_aguu 1244, dsh_uu_gguu 621, ee4_ 200, dsh_ud_huuwm
+      150), about 2541 runs. Plan, if there is no size effect: on CC, python tools/lhe_parts.py plan recipes/catalog_v4_default_lhe.yaml
+      recipes/catalog_v4_ee_test.yaml recipes/catalog_v4_pp_parts.yaml --queue $SCRATCH/lhe_queue/catalog_v4_complete --skip-claimed
+      <the old queues'' paths: catalog_v4_w3 catalog_v4_default catalog_v4_w2 pp13v4_rest pp13v4_ddxgg>, then check that only
+      the 56 pools are new, then site pick FA --gpus 0 and job_lhe_parts.sh workers sized for about 1 h. If a size differs:
+      edit the run sizes in complete_runs.json and rerun recipes/gen_catalog_v4_default.py and gen_catalog_v4_pp.py. (4) The
+      held pools (pp13v4_uu_gguu, dsh_uu_gguu, dsh_uu_aguu) are still held. They are released only by the run-size result,
+      which goes to Joaquin as the answer to his question (no answer from him is on record). dsh_ud_huuwm: its runs of 1000
+      return 33 to 47 percent (47 of 1000 with second_refine_treshold 2), and its catalog_v4_w3 runs of 19154 fail without
+      building a pool. The 150-event layout is untested: if those runs do not complete, hold it and report. (5) Slip: a recording
+      loop passed about 21 older run ids (earlier probe runs) to plan run catalog_coverage --next 7, so the entry''s run list
+      holds them besides the 20 new ones. (6) Next: step 7 (above); the add-next step: after the w3 and old workers end, run
+      shortbuilt again and put any pool they assembled from short runs into complete_runs.json. Not covered: 5 reused catalog_v3
+      pp13_ pools are built from short runs, and 1391 pp13_ pools cannot be checked (no events per run in their sidecars).'
     - 'HAND-OFF generation agent 2026-10-30 05:20. QUEUES ($SCRATCH/lhe_queue on CC): catalog_v4_w3 = the wave, 1885 one-run
       MadEvent tasks of 203 processes, planned from recipes/catalog_v4_default_lhe.yaml + catalog_v4_ee_test.yaml + catalog_v4_pp_parts.yaml
       with --skip-claimed on the old queues, --exclude pp13v4_uu_gguu dsh_uu_gguu dsh_uu_aguu, --cores 16 for dsh_udx_dxuuux
