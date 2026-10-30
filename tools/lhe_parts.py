@@ -597,8 +597,8 @@ def main():
     s = sub.add_parser("status"); s.add_argument("--queue", required=True)
     g = sub.add_parser("gc"); g.add_argument("--queue", required=True); g.add_argument("--dry-run", action="store_true")
     y = sub.add_parser("yields"); y.add_argument("--queue", required=True)
-    a = ap.parse_args()
     sh = sub.add_parser("shares"); sh.add_argument("--queue", required=True); sh.add_argument("--requeue", action="store_true")
+    a = ap.parse_args()
     {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
      "shares": cmd_shares}[a.cmd](a)
 

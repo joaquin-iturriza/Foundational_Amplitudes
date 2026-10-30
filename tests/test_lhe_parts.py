@@ -426,8 +426,31 @@ def test_ee_energy_runs_and_equal_shares():
         raise AssertionError("an energy short of its share was assembled")
     except RuntimeError as e:
         assert "3000" in str(e) and "334" in str(e), e
-    mg.PROCESSES.pop(NAME, None)
-    print("[e+e- energy runs + equal shares] ok")
+    # lhe_parts shares through its command line: one energy short in its parts, the pool's assembled marker moved aside
+    saved = (datagen.dest_for_role, sys.argv)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            q = os.path.join(d, "queue")
+            D = lhe_parts._dirs(q)
+            for x in D.values():
+                os.makedirs(x, exist_ok=True)
+            its = _items()
+            json.dump({"seed": 42, "items": [[r, p] for r, p in its]}, open(os.path.join(D["specs"], NAME + ".json"), "w"))
+            for (p, r), n in zip(mg.lhe_part_paths(NAME, its), [340, 340, 90, 90, 90, 40]):
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                np.savez(p, mom=np.zeros((n, K, 4)))
+            open(os.path.join(D["assembled"], NAME), "w").close()
+            sys.argv = ["lhe_parts.py", "shares", "--queue", q, "--requeue"]
+            lhe_parts.main()
+            assert not os.listdir(D["assembled"])
+            assert os.listdir(os.path.join(q, "assembled_superseded"))[0].startswith(NAME + ".")
+    finally:
+        datagen.dest_for_role, sys.argv = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[e+e- energy runs + equal shares + shares CLI] ok")
 
 
 if __name__ == "__main__":
