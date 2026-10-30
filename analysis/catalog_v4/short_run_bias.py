@@ -461,6 +461,17 @@ def summary(d, alpha=0.05):
         out["gridpack_level"] = round(alpha / max(1, n), 5)
         out["gridpack_below_level"] = sorted(f"{c}:{f}" for c, v in gp.items() for f, x in v.items()
                                              if x["p"] < alpha / max(1, n))
+        pp = [x for c, v in gp.items() if not c.startswith("epem_") for x in v.values()]
+        th = [w["ks_binned"] for c in gp if not c.startswith("epem_")
+              for w in (d["groups"][c].get("control_top_halves") or {}).values() if isinstance(w, dict)]
+        out["gridpack_n_below"] = sum(x["p"] < alpha / max(1, n) for v in gp.values() for x in v.values())
+        out["gridpack_pair_n_below"] = sum(x.get("pair", {}).get("p", 1) < alpha / max(1, n)
+                                           for v in gp.values() for x in v.values())
+        # pp groups: the gridpack distances, the large runs' own halves, and the tests under alpha uncorrected
+        out["gridpack_pp_ks_range"] = [round(min(x["ks"] for x in pp), 3), round(max(x["ks"] for x in pp), 3)]
+        out["top_halves_pp_ks_range"] = [round(min(th), 3), round(max(th), 3)] if th else None
+        out["gridpack_pp_tests"] = len(pp)
+        out["gridpack_pp_below_alpha"] = sum(x["p"] < alpha for x in pp)
         out["gridpack_pair_below_level"] = sorted(f"{c}:{f}" for c, v in gp.items() for f, x in v.items()
                                                   if x.get("pair", {}).get("p", 1) < alpha / max(1, n))
     if lad:
