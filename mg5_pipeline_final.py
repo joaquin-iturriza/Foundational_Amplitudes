@@ -4091,6 +4091,17 @@ def lhe_prepare(process, work_root, log_path, madevent=True, standalone=True):
     return ev, sa
 
 
+def add_card_params(card_path, values):
+    """Append `value = key` lines for keys a run card does not have (MadGraph's hidden parameters, e.g.
+    second_refine_treshold, are read from any line of the card); keys already there are left to patch_card."""
+    have = set(re.findall(r"=\s*(\w+)", "\n".join(l.split("!")[0] for l in open(card_path)
+                                                 if l.strip() and not l.lstrip().startswith("#"))))
+    new = {k: v for k, v in values.items() if k not in have}
+    if new:
+        with open(card_path, "a") as f:
+            f.writelines(f"  {v} = {k}\n" for k, v in new.items())
+
+
 def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01", patches=None):
     """generate_events in `ev` with the catalog's cards (nevents and iseed set). run_mode 0 (one core)
     unless mg_cores > 1. Returns (lhe_path, banner_path)."""

@@ -9,7 +9,7 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             keeps (mg5_pipeline_final.default_share_momenta's accept: the class's
                                             sqrt(s_hat) window and fiducial cuts in the partonic frame) and what each
                                             part of that accept removes alone
-    run    --process P [--events N] [--timeout S] [--work DIR]
+    run    --process P [--events N] [--timeout S] [--work DIR] [--patch K=V ...]
                                             one MadEvent run of P (its first run's card and patches, a probe iseed) in
                                             DIR (default $TMPDIR): seconds of the MG5 output and of generate_events,
                                             events returned, the fraction kept (as above), the run directory's largest
@@ -135,19 +135,22 @@ def cmd_run(a):
     wd = os.path.join(base, f"lhe_probe_{name}_{os.getpid()}")
     os.makedirs(wd, exist_ok=True)
     log = os.path.join(wd, f"{name}.mg5.log")
-    res = {"process": name, "host": socket.gethostname(), "work": wd, "events_asked": a.events}
+    res = {"process": name, "seed": a.seed, "extra_patches": a.patch, "host": socket.gethostname(), "work": wd, "events_asked": a.events}
     t0 = time.time()
     try:
         ev, _ = mg.lhe_prepare(name, wd, log, madevent=True, standalone=False)
         res["s_output"] = round(time.time() - t0, 1)
         res["du_after_output"] = _du(ev)
-        iseed = mg.lhe_iseed(name, 9999)                       # a probe seed, not one of the pool's runs
+        iseed = mg.lhe_iseed(name, 9999 + a.seed)              # a probe seed, not one of the pool's runs
         runs = mg.lhe_runs(name, mg.lhe_iseed(name, 42), mg.lhe_n_requested(cfg))
         patches = dict(runs[0][2])
         run_card, param_card = mg.lhe_cards(cfg)
         shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
         shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
+        extra = dict(kv.split("=", 1) for kv in a.patch)              # --patch k=v: a run-card value on top
+        patches.update(extra)
         mg.patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(a.events), "iseed": int(iseed), **patches})
+        mg.add_card_params(f"{ev}/Cards/run_card.dat", extra)
         mg._set_me5_config(f"{ev}/Cards/me5_configuration.txt",
                            {"run_mode": 0, "nb_core": 1, "automatic_html_opening": "False"})
         res["patches"] = patches
@@ -210,6 +213,8 @@ def main():
     s = sub.add_parser("parts"); s.add_argument("--queue", nargs="+", required=True); s.add_argument("--out", required=True)
     s = sub.add_parser("run"); s.add_argument("--process", required=True); s.add_argument("--events", type=int, default=1000)
     s.add_argument("--timeout", type=float, default=720.0); s.add_argument("--work", default=None)
+    s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
+    s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     sub.add_parser("node")
     a = ap.parse_args()
     {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node}[a.cmd](a)

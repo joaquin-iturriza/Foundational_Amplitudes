@@ -20,6 +20,14 @@ if [ "${PROBE_SHARD:?}" = parts ]; then
     python tools/lhe_probe.py parts --queue ${PROBE_QUEUES:?} --out "$SCRATCH/lhe_probe/parts_${SLURM_JOB_ID}.json"
     echo "RUN_SUMMARY lhe_probe parts rc=$?"; exit 0
 fi
+if [ "$PROBE_SHARD" = list ]; then
+    # explicit runs PROBE_LIST: "process,events,seed[,key=value...]" separated by spaces (a run-card variant against
+    # its control), each at most PROBE_TIMEOUT s
+    T="${PROBE_TIMEOUT:-1500}"
+    echo ${PROBE_LIST:?} | tr ' ' '\n' | tr ',' ' ' | xargs -L1 -P "${SLURM_CPUS_PER_TASK:-1}" sh -c \
+        'p=$1 n=$2 s=$3; shift 3; timeout '"$T"' python tools/lhe_probe.py run --process "$p" --events "$n" --seed "$s" --timeout '"$((T - 60))"' ${1:+--patch "$@"}' _
+    echo "RUN_SUMMARY lhe_probe list rc=$?"; exit 0
+fi
 python tools/lhe_probe.py list --queue ${PROBE_QUEUES:?} | awk -v k="$PROBE_SHARD" -v n="${PROBE_NSHARDS:?}" 'NR % n == k' \
     | xargs -P "${SLURM_CPUS_PER_TASK:-1}" -I{} timeout 840 python tools/lhe_probe.py run --process {} \
         --events "${PROBE_EVENTS:-1000}" --timeout 780
