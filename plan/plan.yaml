@@ -2262,12 +2262,6 @@ entries:
       v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
       each), plus the controls'' PP4 mode-eval reads; control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100,
       -380842ed)'
-    12: 'ee4_epem_cgsxwm 3 TeV: the run-size probe (30 CPU jobs, 3584 runs from the 52228 gridpack) passed no size (shares
-      0.49/0.79/0.89/0.91 at 200/100/50/25; complete runs of 50 and 25 differ from complete runs of 200 by 0.0165 and 0.031,
-      p<1e-3; short runs of 200 differ from complete ones by 0.0225, so the complete-run reference is selected). Nothing laid
-      out; Joaquin''s call on how the 3 TeV block is made. 112 of 113 assembled (catalog_v4_gridpack_last 12/12, 0 failed,
-      queue removed); the mixcheck over all 113 waits on cgsxwm. Merge branch cgsxwm-sizesum (5d6d3283, be3a5c28) on its reviewers''
-      PASS.'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -4307,12 +4301,6 @@ entries:
       if:
       - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
       - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
-    12:
-      feeds: how ee4_epem_cgsxwm's 3 TeV block is generated so every energy is kept (D189), and the mixcheck over all 113
-        rebuilt pools
-      if:
-      - 'Joaquin picks a way to make the 3 TeV block: design and probe it, then assemble and run the mixcheck over 113'
-      - 'Joaquin accepts leaving it out or reusing the old pool: mixcheck over the 112 and record the exception'
   owner:
     agent: a5b71194556cf7e47
     state: working
