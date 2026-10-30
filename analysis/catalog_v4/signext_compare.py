@@ -59,7 +59,7 @@ def main():
     res = {"pools": len(pools),
            "sign_changing_per_arm": {a: len(v) for a, v in s.items()},
            "seed_mean": {"ext_lower": lower, "ext_higher": higher, "ties": len(pools) - lower - higher,
-                         "p_one_sided": sign_p(lower, lower + higher),
+                         "p_one_sided": round(sign_p(lower, lower + higher), 3),
                          "median_ctrl_pct": round(100 * float(np.median(cm)), 2),
                          "median_ext_pct": round(100 * float(np.median(em)), 2)},
            "per_seed": {str(sd): {"ext_lower": int((e[i] < c[i]).sum()), "ext_higher": int((e[i] > c[i]).sum()),
