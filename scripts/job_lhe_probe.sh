@@ -40,6 +40,31 @@ if [ "$PROBE_SHARD" = reread ]; then
     done
     echo "RUN_SUMMARY lhe_probe reread rc=$?"; exit 0
 fi
+if [ "$PROBE_SHARD" = reread2 ]; then
+    # the re-read again on the files each measurement saw (catalog_coverage step 13): the commit times of reread were
+    # later than the measurements and set-aside pools were missed; cutoff finds, per measurement, the earliest file time
+    # within 12 h before its commit at which the most groups' runs and events match, then measure there (unscaled and
+    # scaled, 20000 relabellings, paired) and reread against the committed numbers
+    R="$SCRATCH/reread2"; mkdir -p "$R"; D=analysis/catalog_v4/data; P=analysis/catalog_v4/short_run_bias.py; N=20000
+    M=(short_run_bias short_run_bias_size short_run_bias_gpack)
+    python $P cutoff --old $D/short_run_bias.json $D/short_run_bias_size.json $D/short_run_bias_gpack.json \
+        --before 2026-10-30T05:38:03+01:00 2026-10-30T05:59:00+01:00 2026-10-30T06:30:34+01:00 --hours 12 | tee "$R/cutoff.log"
+    mapfile -t T < <(python -c "import json,sys; [print(json.loads(l[12:])['best_time']) for l in open(sys.argv[1]) if l.startswith('CUTOFF_JSON ')]" "$R/cutoff.log")
+    [ "${#T[@]}" = 3 ] || { echo "RUN_SUMMARY lhe_probe reread2 rc=1 (cutoff gave ${#T[@]} times)"; exit 1; }
+    for v in unscaled scaled; do
+        F=; [ $v = unscaled ] && F=--unscaled
+        for i in 0 1 2; do
+            python $P measure --nperm $N $F --before "${T[$i]}" --out "$R/$v/${M[$i]}.json" > "$R/$v.${M[$i]}.log" 2>&1 &
+        done
+    done
+    wait
+    tail -n 1 "$R"/*.log
+    for f in "${M[@]}"; do
+        echo "== $f committed vs unscaled"; python $P reread --old "$D/$f.json" --new "$R/unscaled/$f.json"
+        echo "== $f unscaled vs scaled"; python $P reread --old "$R/unscaled/$f.json" --new "$R/scaled/$f.json"
+    done
+    echo "RUN_SUMMARY lhe_probe reread2 rc=$?"; exit 0
+fi
 if [ "$PROBE_SHARD" = mixcheck ]; then
     python tools/lhe_probe.py mixcheck --queue ${PROBE_QUEUES:?}
     python tools/lhe_probe.py runsize --queue ${PROBE_QUEUES:?}
