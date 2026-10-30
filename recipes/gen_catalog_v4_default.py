@@ -212,6 +212,7 @@ GRID_MIN = {"pp": 31774, "ee": 13057}
 # absorbed with more runs). "grid_events" in COMPLETE raises the pool's gridpack precision above the floor.
 BY_ENERGY = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_by_energy.json")
 MAX_ASK_FACTOR = 2.0
+RUN_SAFETY = 1.25           # fa-generation: events asked = needed / measured share, times at most 1.25
 
 
 def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=None, name="?"):
@@ -219,7 +220,7 @@ def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=No
     energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped. gridpack: the runs
     drawn from one gridpack per energy of max(the energy's need, GRID_MIN of its beams, grid_events) events' precision
     (lhe.gridpack). shares ({energy as f"{E:g}", or "all" for pp: complete share measured}): an energy measured under
-    COMPLETE_SHARE takes ceil(need / (share x run_events)) runs (lhe.energy_runs for e+e-)."""
+    COMPLETE_SHARE x RUN_SAFETY takes ceil(need / (share / RUN_SAFETY x run_events)) runs (lhe.energy_runs for e+e-)."""
     need = sum(int(lhe[k]) for k in ("n_val", "n_test", "n_train"))
     for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt", "gridpack"):
         lhe.pop(k, None)
@@ -228,12 +229,12 @@ def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=No
     lhe.update(parts=True, complete_runs=True, run_events=int(run_events), n_runs=n_runs)
     if shares:
         keys = [f"{float(E):g}" for E in lhe["energies"]] if lhe.get("energies") else ["all"]
-        sh = [min(COMPLETE_SHARE, float(shares[k])) if k in shares else COMPLETE_SHARE for k in keys]
+        sh = [float(shares[k]) if k in shares else 1.0 for k in keys]
         bad = {k: x for k, x in zip(keys, sh) if x <= 0 or 1.0 / x > MAX_ASK_FACTOR}
         if bad:
             raise SystemExit(f"{name}: complete share under 1/{MAX_ASK_FACTOR:g} at {bad}: fix the runs (a larger "
                              f"gridpack, grid_events in complete_runs.json), never more of them")
-        runs = [int(math.ceil(per / (x * int(run_events)))) for x in sh]
+        runs = [int(math.ceil(per / (min(COMPLETE_SHARE, x / RUN_SAFETY) * int(run_events)))) for x in sh]
         if lhe.get("energies"):
             if any(r != n_runs for r in runs):
                 lhe["energy_runs"] = runs

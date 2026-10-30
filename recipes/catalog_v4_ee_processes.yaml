@@ -417,6 +417,13 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 3
+      energy_runs:
+      - 3
+      - 3
+      - 3
+      - 3
+      - 3
+      - 4
       gridpack: 13057
     parent: v4_epem_abbxg
     split: heldout
@@ -2896,7 +2903,7 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 3
-      gridpack: 13057
+      gridpack: 52228
     parent: v4_epem_cgsxwm
     split: heldout
     test_group: 'e+e- v4: H2'

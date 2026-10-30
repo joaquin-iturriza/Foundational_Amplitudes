@@ -377,7 +377,8 @@
  "ee4_epem_abbxg": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
   "run_events": 200,
-  "gridpack": true
+  "gridpack": true,
+  "size_from_probe": true
  },
  "ee4_epem_abtxwp": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
@@ -452,7 +453,8 @@
  "ee4_epem_cgsxwm": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
   "run_events": 200,
-  "gridpack": true
+  "gridpack": true,
+  "grid_events": 52228
  },
  "ee4_epem_ddxuux": {
   "reason": "assembled from runs that stopped short of their ask (lhe_parts shortbuilt)",
