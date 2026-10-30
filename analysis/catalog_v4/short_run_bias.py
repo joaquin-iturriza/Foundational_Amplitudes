@@ -495,6 +495,7 @@ def summary(d, alpha=0.05):
                                                 for v in c.values())}
         out["rebuild"]["design"] = (out["rebuild"]["pools"] - out["rebuild"]["after_w3_short_built"]
                                     - out["rebuild"]["w3_unassembled"])
+        out["rebuild"]["added_after_w3"] = out["rebuild"]["pools"] - out["rebuild"]["design"]
     return out
 
 
