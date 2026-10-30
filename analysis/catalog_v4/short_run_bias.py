@@ -32,6 +32,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(HERE, "data", "short_run_bias.json")
 COMPLETE = os.path.join(HERE, "data", "complete_runs.json")
+PENDING = os.path.join(HERE, "data", "complete_runs_pending.json")
 FIG = os.path.join(HERE, "figs", "short_run_bias")
 PART_RE = re.compile(r"^(?P<proc>.+)_(?P<eid>[0-9a-f]{16})_(?P<run>run_\d+)_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
 PROBE_RE = re.compile(r"^(?P<proc>.+)_probe_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
@@ -435,6 +436,47 @@ def summary(d, alpha=0.05):
             if "p_runs" in v:
                 lad.setdefault(c, {})[k] = {"ks": round(v["ks_binned"], 3), "p": v["p_runs"], "runs": v["runs_small"],
                                             "ref": v["ask_large"], "ref_runs": v["runs_large"]}
+    # the gridpack probe (catalog_coverage step 7): per group, the runs of its gridpacks pooled against the largest
+    # complete runs (primary, Bonferroni over the primary tests only: GPACK_PRIMARY), the direct test against the
+    # per-run-integrated runs of the same ask, the two gridpacks against each other
+    gp = {}
+    for c, r in d["groups"].items():
+        for k, v in (r.get("gridpack") or {}).items():
+            if k.startswith("all/") and "p_runs" in v:
+                f = k.split("/")[-1]
+                e = gp.setdefault(c, {})
+                e[f] = {"ks": round(v["ks_binned"], 4), "p": v["p_runs"], "detectable": v["detectable_ks_5pct"],
+                        "ask": v["ask"],
+                        "runs": v["runs_small"], "ref": v["ask_large"], "ref_runs": v["runs_large"]}
+                for kind, key in (("direct", "gridpack_vs_own_runs"), ("pair", "gridpack_pair")):
+                    w = (r.get(key) or {}).get(k[len("all/"):])
+                    if w and "p_runs" in w:
+                        e[f][kind] = {"ks": round(w["ks_binned"], 4), "p": w["p_runs"]}
+                w = (r.get("ladder") or {}).get(k[len("all/"):])
+                if w and "p_runs" in w:
+                    e[f]["per_run"] = {"ks": round(w["ks_binned"], 4), "p": w["p_runs"]}
+    if gp:
+        n = sum(len(v) for v in gp.values())
+        out["gridpack_detail"] = gp
+        out["gridpack_primary_tests"] = n
+        out["gridpack_level"] = round(alpha / max(1, n), 5)
+        out["gridpack_below_level"] = sorted(f"{c}:{f}" for c, v in gp.items() for f, x in v.items()
+                                             if x["p"] < alpha / max(1, n))
+        pp = [x for c, v in gp.items() if not c.startswith("epem_") for x in v.values()]
+        th = [w["ks_binned"] for c in gp if not c.startswith("epem_")
+              for w in (d["groups"][c].get("control_top_halves") or {}).values() if isinstance(w, dict)]
+        out["gridpack_n_below"] = sum(x["p"] < alpha / max(1, n) for v in gp.values() for x in v.values())
+        out["gridpack_pair_n_below"] = sum(x.get("pair", {}).get("p", 1) < alpha / max(1, n)
+                                           for v in gp.values() for x in v.values())
+        # pp groups: the gridpack distances, the large runs' own halves, and the tests under alpha uncorrected
+        out["gridpack_pp_ks_min"], out["gridpack_pp_ks_max"] = (round(min(x["ks"] for x in pp), 3),
+                                                                round(max(x["ks"] for x in pp), 3))
+        if th:
+            out["top_halves_pp_ks_min"], out["top_halves_pp_ks_max"] = round(min(th), 3), round(max(th), 3)
+        out["gridpack_pp_tests"] = len(pp)
+        out["gridpack_pp_below_alpha"] = sum(x["p"] < alpha for x in pp)
+        out["gridpack_pair_below_level"] = sorted(f"{c}:{f}" for c, v in gp.items() for f, x in v.items()
+                                                  if x.get("pair", {}).get("p", 1) < alpha / max(1, n))
     if lad:
         out["ladder_detail"] = lad
         out["ladder_bonf"] = round(alpha / max(1, out["ladder"]["tests_runs"]), 5)
@@ -447,7 +489,20 @@ def summary(d, alpha=0.05):
                           "ratio_top2": round(sum(h["ratio"][-2:]) / 2, 2), "edge_top2": round(h["edges"][-3])}
     if os.path.exists(COMPLETE):
         c = json.load(open(COMPLETE))
-        out["rebuild"] = {"pools": len(c), "short_built": sum("stopped short" in v["reason"] for v in c.values())}
+        out["rebuild"] = {"pools": len(c), "short_built": sum("stopped short" in v["reason"] for v in c.values()),
+                          "gridpack": sum(bool(v.get("gridpack")) for v in c.values()),
+                          "after_w3_short_built": sum("after catalog_v4_w3" in v["reason"] for v in c.values()),
+                          "w3_unassembled": sum(v["reason"].startswith("not assembled in catalog_v4_w3")
+                                                for v in c.values())}
+        out["rebuild"]["design"] = (out["rebuild"]["pools"] - out["rebuild"]["after_w3_short_built"]
+                                    - out["rebuild"]["w3_unassembled"])
+        # pools found after catalog_v4_w3 with the same problem, waiting on the user's call (complete_runs_pending.json)
+        pend = json.load(open(PENDING)) if os.path.exists(PENDING) else {}
+        out["rebuild"]["after_w3_short_built"] += sum("after catalog_v4_w3" in v["reason"] for v in pend.values())
+        out["rebuild"]["w3_unassembled"] += sum(v["reason"].startswith("not assembled in catalog_v4_w3")
+                                                for v in pend.values())
+        out["rebuild"]["added_after_w3"] = len(pend)
+        out["rebuild"]["with_pending"] = len(c) + len(pend)
     return out
 
 
@@ -548,18 +603,26 @@ def cmd_figsize(a):
                 continue
             mk = "o" if k.endswith("sqrt_shat") else "^"
             ax.plot([v["ask"]], [v["ks_binned"]], mk, color=col, mfc=col if v["p_runs"] < bonf else "none", ls="none")
+        # runs of the same ask drawn from one gridpack (pooled over the group's two), just right of their ask
+        for f, v in (sm.get("gridpack_detail") or {}).get(c, {}).items():
+            mk = "s" if f == "sqrt_shat" else "D"
+            ax.plot([v["ask"] * 1.12], [v["ks"]], mk, color=col, mfc=col if v["p"] < sm["gridpack_level"] else "none",
+                    ls="none")
         handles.append(Patch(color=col, label=proc_label(c)))
     nt = sm["ladder"]["tests_runs"]
     handles += [Line2D([], [], color="k", marker="o", mfc="none", ls="none", label=r"$\sqrt{\hat s}$"),
                 Line2D([], [], color="k", marker="^", mfc="none", ls="none", label=r"$\cos\theta^*$"),
                 Line2D([], [], color=ps.C.grey, marker="o", ls="none", label=rf"$p_{{\rm runs}}<0.05/{nt}$")]
+    if sm.get("gridpack_detail"):
+        handles += [Line2D([], [], color="k", marker="s", mfc="none", ls="none", label=r"$\sqrt{\hat s}$, gridpack"),
+                    Line2D([], [], color="k", marker="D", mfc="none", ls="none", label=r"$\cos\theta^*$, gridpack")]
     ax.set_xscale("log")
     ax.set_xticks(list(PROBED)); ax.set_xticklabels([str(x) for x in PROBED])
     ax.xaxis.set_minor_formatter(plt.NullFormatter())
     ax.set_xlabel("events per run")
     ax.set_ylabel(r"KS distance to the largest runs")
     ax.set_ylim(0, None)
-    ps.legend(ax, "upper right", handles=handles)
+    ps.legend(ax, "upper right", handles=handles, ncol=2)
     ps.make_room(ax)
     ps.save(fig, FIG + "_size")
     print(json.dumps({"fig": FIG + "_size.png", "groups": groups, **sm}))

@@ -27,7 +27,7 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             max pT
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
-import argparse, glob, json, os, re, shutil, signal, socket, subprocess, sys, time
+import argparse, glob, json, math, os, re, shutil, signal, socket, subprocess, sys, time
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, ROOT)
@@ -214,6 +214,105 @@ def cmd_gridpack(a):
         shutil.rmtree(wd, ignore_errors=True)
 
 
+def cmd_gridpool(a):
+    """The generation rule's probe of lhe.gridpack pools (catalog_coverage step 7): for each --process, each of its
+    gridpacks built as the queue builds it (mg.lhe_build_gridpack, at its path: the queue then reuses it), then --runs
+    runs of the pool's run size drawn from it at probe seeds (lhe_iseed(process, 9999 + s), not the pool's), --cores at
+    a time. One PROBE_JSON line per run, read by `summary` and `kept --yields-out` like a MadEvent probe run's (yield,
+    kept fraction, seconds per kept event; "gridpack": true, the energy in its patches); one GRIDPACK_JSON line per
+    gridpack (stage grid: seconds, bytes)."""
+    import datagen
+    from concurrent.futures import ThreadPoolExecutor
+    for name in a.process:
+        cfg = mg.PROCESSES[name]
+        if not cfg["lhe"].get("gridpack"):
+            print("GRIDPACK_JSON " + json.dumps({"process": name, "stage": "grid", "error": "no lhe.gridpack"}),
+                  flush=True)
+            continue
+        items = []
+        for role, (lo, hi) in mg.lhe_layout(cfg).items():
+            if hi > lo:
+                rec = mg.variable_energy_recipe(name, 13000, 13000, hi - lo, role=role, seed=42)
+                items.append((rec, mg.recipe_output_path(rec, datagen.dest_for_role(role))))
+        base = a.work or os.environ.get("TMPDIR") or "/tmp"
+        wd = os.path.join(base, f"lhe_gridpool_{name}_{os.getpid()}")
+        os.makedirs(wd, exist_ok=True)
+        run_ev = int(cfg["lhe"]["run_events"])
+        try:
+            for j, (tar, g) in enumerate(mg.lhe_gridpack_paths(name, items)):
+                head = {"process": name, "host": socket.gethostname(), "grid": g[3], "grid_iseed": g[0],
+                        "grid_events": g[1], "patches": g[2]}
+                t0 = time.time()
+                try:
+                    had = os.path.exists(tar)
+                    mg.lhe_build_gridpack(name, items, j, mg_cores=a.cores, work_root=wd)
+                    print("GRIDPACK_JSON " + json.dumps(dict(head, stage="grid", reused=had,
+                                                             s_gridpack=round(time.time() - t0, 1),
+                                                             gridpack_bytes=os.path.getsize(tar))), flush=True)
+                except Exception as e:
+                    print("GRIDPACK_JSON " + json.dumps(dict(head, stage="grid", error=f"{type(e).__name__}: {e}")),
+                          flush=True)
+                    continue
+
+                def one(s, tar=tar, g=g):
+                    seed = mg.lhe_iseed(name, 9999 + s)
+                    r = {"process": name, "seed": seed, "events_asked": run_ev, "patches": g[2], "gridpack": True,
+                         "grid": g[3], "host": socket.gethostname()}
+                    rw = os.path.join(wd, f"run_{g[3]}_{s}")
+                    t1 = time.time()
+                    try:
+                        lhe = mg.lhe_run_gridpack(tar, rw, run_ev, seed, os.path.join(wd, f"run_{g[3]}_{s}.log"),
+                                                  timeout=a.timeout)
+                        m, _, _ = mg.read_lhe_pp(lhe, cfg["pdg_ids"])
+                        r["s_generate"] = round(time.time() - t1, 1)
+                        r["events_returned"] = len(m)
+                        r["yield"] = len(m) / run_ev
+                        r.update(kept(m, accept_of(name)))
+                        k = r.get("kept") or 0.0
+                        r["s_per_kept_event"] = round(r["s_generate"] / (len(m) * k), 4) if len(m) and k else None
+                    except Exception as e:
+                        r["error"] = f"{type(e).__name__}: {e}"
+                    finally:
+                        shutil.rmtree(rw, ignore_errors=True)
+                    print("PROBE_JSON " + json.dumps(r), flush=True)
+                    return r
+                with ThreadPoolExecutor(max(1, a.cores)) as ex:
+                    list(ex.map(one, range(1, a.runs + 1)))
+        finally:
+            shutil.rmtree(wd, ignore_errors=True)
+
+
+GRID_TIME_FACTOR = 4.3    # measured gridpack seconds over the rate estimate: the gridpack probe, 2026-10-30 (1.5 to 4.3)
+
+
+def cmd_gridpool_plan(a):
+    """The gridpool probe's batch: the lhe.gridpack pools of --complete (analysis/catalog_v4/data/complete_runs.json)
+    dealt longest first to --jobs jobs of --cores cores (each pool's estimate: per gridpack, the class's core-seconds per
+    event (lhe_parts._rate) times its grid events over the cores, times GRID_TIME_FACTOR, plus --runs runs of its run
+    size at --cores at a time). One JSON line: the jobs' pools and estimated hours (an estimate)."""
+    import statistics
+    rates = json.load(open(a.rates))
+    by = {}
+    for r in rates.values():
+        by.setdefault(int(r["nfinal"]), []).append(r["core_s_per_event"])
+    med = {k: statistics.median(v) for k, v in by.items()}
+    est = {}
+    for n in json.load(open(a.complete)):
+        l = mg.PROCESSES[n]["lhe"]
+        r, _ = lp._rate(n, rates, med)
+        E = len(l.get("energies") or [1])
+        est[n] = E * (GRID_TIME_FACTOR * r * int(l["gridpack"]) / a.cores
+                      + math.ceil(a.runs / a.cores) * r * int(l["run_events"]))
+    jobs = [[0.0, []] for _ in range(a.jobs)]
+    for n in sorted(est, key=lambda x: -est[x]):
+        j = min(jobs, key=lambda x: x[0])
+        j[0] += est[n]; j[1].append(n)
+    jobs = [j for j in jobs if j[1]]
+    print(json.dumps({"pools": len(est), "jobs": [{"h": round(t / 3600, 2), "pools": ps} for t, ps in jobs],
+                      "est_total_job_h": round(sum(t for t, _ in jobs) / 3600, 1),
+                      "est_longest_job_h": round(max(t for t, _ in jobs) / 3600, 2)}))
+
+
 def cmd_run(a):
     name = a.process
     cfg = mg.PROCESSES[name]
@@ -335,7 +434,10 @@ def cmd_kept(a):
             r = json.loads(line.split("PROBE_JSON ", 1)[1])
             # the yield at SMALL_RUN events per run (recipes/gen_catalog_v4_default.py reads it as that); a run that
             # returned nothing is left out (read as no measurement)
-            if (r.get("yield") and int(r.get("events_asked", 0)) == a.small_run and not r.get("extra_patches")
+            # a gridpack pool's runs (gridpool): its yield at its own run size, every energy
+            if r.get("yield") and r.get("gridpack") and not r.get("error"):
+                ys.setdefault(r["process"], []).append(float(r["yield"]))
+            elif (r.get("yield") and int(r.get("events_asked", 0)) == a.small_run and not r.get("extra_patches")
                     and not r.get("timeout") and "ebeam1" not in (r.get("patches") or {})):
                 ys.setdefault(r["process"], []).append(float(r["yield"]))
             if not r["process"].startswith("dsh_") or r.get("kept") is None or r.get("extra_patches"):
@@ -471,6 +573,14 @@ def main():
     s.add_argument("--seed-base", type=int, default=0); s.add_argument("--cores", type=int, default=1)
     s.add_argument("--energy", type=float, default=None); s.add_argument("--keep", default=None)
     s.add_argument("--work", default=None); s.add_argument("--timeout", type=float, default=1800.0)
+    s = sub.add_parser("gridpool"); s.add_argument("--process", nargs="+", required=True)
+    s.add_argument("--runs", type=int, default=16, help="probe runs per gridpack at the pool's run size")
+    s.add_argument("--cores", type=int, default=1); s.add_argument("--work", default=None)
+    s.add_argument("--timeout", type=float, default=1800.0)
+    s = sub.add_parser("gridpool-plan"); s.add_argument("--jobs", type=int, required=True)
+    s.add_argument("--cores", type=int, default=16); s.add_argument("--runs", type=int, default=16)
+    s.add_argument("--complete", default=os.path.join(ROOT, "analysis/catalog_v4/data/complete_runs.json"))
+    s.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     sub.add_parser("node")
     s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)
@@ -480,7 +590,7 @@ def main():
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
 
 if __name__ == "__main__":
