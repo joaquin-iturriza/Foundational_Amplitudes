@@ -5100,3 +5100,20 @@ entries:
     outcome: 'yes: all four lines present, cuda True, attention ok -> lxplus usable for the queued pretrainings and reads,
       start estimate from site pick; no: the failing line names the gap (env, driver/kernel, data path), fixed before any
       training job goes there'
+    fix_at: '2026-10-30T19:53:07+00:00'
+    fix: '(1) Wrong entry (answers the entry''s question): agent_redesign asks whether the hooks/supervisor/owner redesign
+      holds in live use; an lxplus GPU probe does not answer it. Record the design on the entry whose queued GPU jobs need
+      lxplus (catalog_coverage step 14 mixture comparison, v3_prep_explore), or a new infrastructure entry with its own item,
+      and submit under that item. (2) Prior incomplete and partly wrong (not a repeat): the 2026-10-29 dead end says the verify
+      refused for missing catalog_v3 pools, not catalog_v4; and the prior omits that lxplus already ran FA GPU training through
+      October (docs/results.tex: tp3_star trials 6-7.7 h on lxplus V100, highmult/synth32k/replaylowd cells collected from
+      CC and lxplus, Z+5g at batch 16384 out of memory on the 12 GB MIG slices with sweep/set_gpu_mem.py''s memory floor,
+      the lxplus-trained checkpoint rescoring gap in sec:tf32-eval). Name these and say what is different now (env rebuilt
+      2026-10-29, catalog_v4 data copied). (3) Measure does not reach part of the question: the ''data='' line only echoes
+      DATA_DIR and cannot show the catalog_v4 pools are present and complete; add tools/check_site_data.py (default recipes/catalog_v4_train.yaml
+      since 8a2f803e) or sites/setup.sh --verify on lxplus to the measure. The check claims CC printed these lines and failed
+      on a broken kernel, but site runs lists no scripts/job_probe.sh run; point to the run and log, or state it as the script''s
+      intent (commit 22da17a8) rather than observed data. (4) Outcome overreaches: ''yes -> usable for the queued pretrainings''
+      cannot follow from one 64x8x16 attention call, which cannot see the 12 GB MIG memory limit already hit there; the yes
+      branch should record GPU type and memory and say which queued jobs fit (or apply the set_gpu_mem.py floor), with the
+      memory fit of the actual jobs checked separately.'
