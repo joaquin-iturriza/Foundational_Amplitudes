@@ -20,6 +20,21 @@ if [ "${PROBE_SHARD:?}" = parts ]; then
     python tools/lhe_probe.py parts --queue ${PROBE_QUEUES:?} --out "$SCRATCH/lhe_probe/parts_${SLURM_JOB_ID}.json" ${PROBE_MATCH:+--match "$PROBE_MATCH"}
     echo "RUN_SUMMARY lhe_probe parts rc=$?"; exit 0
 fi
+if [ "$PROBE_SHARD" = reread ]; then
+    # par:v4_short_runs re-read with the scaled run-level test (catalog_coverage): each committed measurement re-run on
+    # the files it saw (--before its commit time), in parallel, then old against new (event KS must reproduce)
+    R="$SCRATCH/reread"; mkdir -p "$R"; D=analysis/catalog_v4/data
+    python analysis/catalog_v4/short_run_bias.py measure --before 2026-10-30T05:38:03+01:00 --out "$R/short_run_bias.json" > "$R/m1.log" 2>&1 &
+    python analysis/catalog_v4/short_run_bias.py measure --before 2026-10-30T05:59:00+01:00 --out "$R/short_run_bias_size.json" > "$R/m2.log" 2>&1 &
+    python analysis/catalog_v4/short_run_bias.py measure --before 2026-10-30T06:30:34+01:00 --out "$R/short_run_bias_gpack.json" > "$R/m3.log" 2>&1 &
+    python analysis/catalog_v4/short_run_bias.py sizecheck --process ee4_epem_cgsxwm --energy 3000 --keep "$SCRATCH/lhe_probe_keep_runsize" --ref-ask 200 --out "$R/cgsxwm_sizecheck.json" > "$R/m4.log" 2>&1 &
+    wait
+    for f in short_run_bias short_run_bias_size short_run_bias_gpack cgsxwm_sizecheck; do
+        echo "== $f"; tail -2 "$R/${f}.json" > /dev/null 2>&1 || echo "MISSING $f"
+        python analysis/catalog_v4/short_run_bias.py reread --old "$D/$f.json" --new "$R/$f.json"
+    done
+    echo "RUN_SUMMARY lhe_probe reread rc=$?"; exit 0
+fi
 if [ "$PROBE_SHARD" = mixcheck ]; then
     python tools/lhe_probe.py mixcheck --queue ${PROBE_QUEUES:?}
     python tools/lhe_probe.py runsize --queue ${PROBE_QUEUES:?}
