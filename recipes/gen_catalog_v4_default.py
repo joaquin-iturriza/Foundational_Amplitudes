@@ -206,19 +206,51 @@ COMPLETE_SHARE = 0.8
 GRID_MIN = {"pp": 31774, "ee": 13057}
 
 
-def complete_layout(lhe, run_events, gridpack=False):
+# A pool marked "size_from_probe" in COMPLETE takes its runs per energy from its gridpack probe's complete share there
+# (tools/lhe_probe.py kept --by-energy-out), where that share is under COMPLETE_SHARE; an energy that would need more
+# than MAX_ASK_FACTOR x the runs its events need is refused (CLAUDE.md: a margin above 2x is a finding to fix, never
+# absorbed with more runs). "grid_events" in COMPLETE raises the pool's gridpack precision above the floor.
+BY_ENERGY = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_by_energy.json")
+MAX_ASK_FACTOR = 2.0
+
+
+def complete_layout(lhe, run_events, gridpack=False, shares=None, grid_events=None, name="?"):
     """lhe (in place, a copy's): runs of run_events, as many as the blocks need at COMPLETE_SHARE of them complete (per
     energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped. gridpack: the runs
-    drawn from one gridpack per energy of max(the energy's need, GRID_MIN of its beams) events' precision (lhe.gridpack)."""
+    drawn from one gridpack per energy of max(the energy's need, GRID_MIN of its beams, grid_events) events' precision
+    (lhe.gridpack). shares ({energy as f"{E:g}", or "all" for pp: complete share measured}): an energy measured under
+    COMPLETE_SHARE takes ceil(need / (share x run_events)) runs (lhe.energy_runs for e+e-)."""
     need = sum(int(lhe[k]) for k in ("n_val", "n_test", "n_train"))
     for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt", "gridpack"):
         lhe.pop(k, None)
     per = int(math.ceil(need / len(lhe["energies"]))) if lhe.get("energies") else need
-    lhe.update(parts=True, complete_runs=True, run_events=int(run_events),
-               n_runs=int(math.ceil(per / (COMPLETE_SHARE * int(run_events)))))
+    n_runs = int(math.ceil(per / (COMPLETE_SHARE * int(run_events))))
+    lhe.update(parts=True, complete_runs=True, run_events=int(run_events), n_runs=n_runs)
+    if shares:
+        keys = [f"{float(E):g}" for E in lhe["energies"]] if lhe.get("energies") else ["all"]
+        sh = [min(COMPLETE_SHARE, float(shares[k])) if k in shares else COMPLETE_SHARE for k in keys]
+        bad = {k: x for k, x in zip(keys, sh) if x <= 0 or 1.0 / x > MAX_ASK_FACTOR}
+        if bad:
+            raise SystemExit(f"{name}: complete share under 1/{MAX_ASK_FACTOR:g} at {bad}: fix the runs (a larger "
+                             f"gridpack, grid_events in complete_runs.json), never more of them")
+        runs = [int(math.ceil(per / (x * int(run_events)))) for x in sh]
+        if lhe.get("energies"):
+            if any(r != n_runs for r in runs):
+                lhe["energy_runs"] = runs
+        else:
+            lhe["n_runs"] = runs[0]
     if gridpack:
-        lhe["gridpack"] = max(per, GRID_MIN["ee" if lhe.get("energies") else "pp"])
+        lhe["gridpack"] = max(per, GRID_MIN["ee" if lhe.get("energies") else "pp"], int(grid_events or 0))
     return lhe
+
+
+def complete_args(c, name):
+    """complete_layout's keyword arguments for pool `name` of COMPLETE (c: its entry)."""
+    by = json.load(open(BY_ENERGY)) if c.get("size_from_probe") and os.path.exists(BY_ENERGY) else {}
+    sh = {E: v["complete"] for E, v in by.get(name, {}).items()} if c.get("size_from_probe") else None
+    if c.get("size_from_probe") and not sh:
+        raise SystemExit(f"{name}: size_from_probe set but no per-energy probe result in {BY_ENERGY}")
+    return dict(gridpack=c.get("gridpack", False), shares=sh, grid_events=c.get("grid_events"), name=name)
 
 
 def complete_set():
@@ -352,7 +384,7 @@ def main():
         if "_then" in l4:
             energy_runs(l4, yields.get(k4), l4.pop("_then"))
         if k4 in complete:
-            l4 = complete_layout({**ee_lhe, **l4}, complete[k4]["run_events"], complete[k4].get("gridpack", False))
+            l4 = complete_layout({**ee_lhe, **l4}, complete[k4]["run_events"], **complete_args(complete[k4], k4))
             l4 = {k: v for k, v in l4.items() if k not in ee_lhe or ee_lhe[k] != v}
         ee[k4] = {**lhe_entry(mg, n, P[n], mg.V4_MODEL, l4 or None),
                                        "parent": n,
@@ -429,7 +461,7 @@ def main():
             e = prev[name]                 # waiting on the user's call to be rebuilt: its layout left as it is
         if name in complete:
             e = {**e, "lhe": complete_layout(dict(e["lhe"]), complete[name]["run_events"],
-                                             complete[name].get("gridpack", False))}
+                                             **complete_args(complete[name], name))}
         dsh[name] = e
         src_of[n] = name
         # the default share never repeats an event of the pool it follows: no MadEvent iseed in common (run seeds wrap

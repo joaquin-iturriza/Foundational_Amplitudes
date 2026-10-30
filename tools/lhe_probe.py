@@ -19,8 +19,10 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             multiplicity): runs, timeouts, median and minimum yield, median kept
                                             fraction, median seconds per kept event, median MG5 output seconds, peak
                                             run-directory size (median, max); variants (--patch) apart
-    kept LOG... --out F.json [--yields-out Y.json]   the default-share runs' kept fractions per process and e+e-
-                                            energy; with --yields-out each probed process's yield too
+    kept LOG... --out F.json [--yields-out Y.json] [--by-energy-out B.json]
+                                            the default-share runs' kept fractions per process and e+e- energy; with
+                                            --yields-out each probed process's yield too (a gridpack pool's worst
+                                            energy's), with --by-energy-out its yield and complete share per energy
     mixcheck --queue Q...                   every assembled default-share pool read as the arms' mixture reads it
     runsize --queue Q... [--max-run N] [--min-events M]   default-share pp parts from runs of at most N events
                                             against the reuse pool's events (runs of 10k+), KS on sqrt(s_hat), max |eta|,
@@ -426,7 +428,7 @@ def cmd_kept(a):
     """{process: {kept, by_energy: {E: kept}}} of the default-share (dsh_) runs in probe logs: the fraction of a run's
     events its pool keeps, per e+e- collider energy (2 x ebeam1 of the run's patches), the mean over the runs of one
     energy; read by recipes/gen_catalog_v4_default.py (accept_margin)."""
-    acc, ys = {}, {}
+    acc, ys, by_e = {}, {}, {}
     for f in a.logs:
         for line in open(f):
             if "PROBE_JSON " not in line:
@@ -437,6 +439,15 @@ def cmd_kept(a):
             # a gridpack pool's runs (gridpool): its yield at its own run size, every energy
             if r.get("yield") and r.get("gridpack") and not r.get("error"):
                 ys.setdefault(r["process"], []).append(float(r["yield"]))
+            # a gridpack pool's runs per collider energy (2 x ebeam1; "all" for pp): yield and the share of runs that
+            # returned all they asked (the assembly keeps only those); a run that errored counts as returning nothing
+            if r.get("gridpack"):
+                pe = r.get("patches") or {}
+                E = f"{2.0 * float(pe['ebeam1']):g}" if "ebeam1" in pe else "all"
+                got = 0 if r.get("error") else int(r.get("events_returned") or 0)
+                asked = int(r.get("events_asked") or 0)
+                be = by_e.setdefault(r["process"], {}).setdefault(E, [0, 0, 0, 0])
+                be[0] += got; be[1] += asked; be[2] += 1; be[3] += int(asked > 0 and got >= asked)
             elif (r.get("yield") and int(r.get("events_asked", 0)) == a.small_run and not r.get("extra_patches")
                     and not r.get("timeout") and "ebeam1" not in (r.get("patches") or {})):
                 ys.setdefault(r["process"], []).append(float(r["yield"]))
@@ -452,9 +463,19 @@ def cmd_kept(a):
                   **({"by_energy": e} if e else {})}
     with open(a.out, "w") as f:
         json.dump(out, f, indent=1, sort_keys=True)
-    if a.yields_out:          # the events a probe run returned over those it asked, per process (mean over its runs)
+    # per pool and energy: yield (events returned over asked, errored runs as 0) and complete share
+    energy = {n: {E: {"yield": round(v[0] / v[1], 4) if v[1] else 0.0, "complete": round(v[3] / v[2], 4), "runs": v[2]}
+                  for E, v in sorted(by.items())} for n, by in sorted(by_e.items())}
+    if a.yields_out:          # the events a probe run returned over those it asked, per process (mean over its runs);
+        # a gridpack pool's yield is its worst energy's, so the plan's check and the run sizing see the energy that
+        # falls short, not the pool's average (ee4_epem_cgsxwm: 0.90 on average, 0.52 at 3000 GeV)
+        y = {n: round(sum(v) / len(v), 4) for n, v in sorted(ys.items())}
+        y.update({n: min(e["yield"] for e in by.values()) for n, by in energy.items()})
         with open(a.yields_out, "w") as f:
-            json.dump({n: round(sum(v) / len(v), 4) for n, v in sorted(ys.items())}, f, indent=1)
+            json.dump(dict(sorted(y.items())), f, indent=1)
+    if getattr(a, "by_energy_out", None):
+        with open(a.by_energy_out, "w") as f:
+            json.dump(energy, f, indent=1)
     low = {n: v["kept"] for n, v in out.items() if v["kept"] < 1.0 / 1.1}
     print(json.dumps({"processes": len(out), "kept_below_1_over_1.1": low}))
 
@@ -589,6 +610,7 @@ def main():
     s = sub.add_parser("kept"); s.add_argument("logs", nargs="+"); s.add_argument("--out", required=True)
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
+    s.add_argument("--by-energy-out", default=None, help="a gridpack pool's yield and complete-run share per energy")
     a = ap.parse_args()
     {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 

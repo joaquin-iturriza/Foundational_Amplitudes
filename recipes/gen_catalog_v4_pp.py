@@ -71,7 +71,7 @@ def main():
     own_runs = json.load(open(os.path.join(HERE, "catalog_v4_pp_runs.json")))
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
     from gen_catalog_v4_default import (resize_short, _yield_ratio, YIELDS, ASSEMBLED, PROBE_YIELDS, complete_layout,
-                                        complete_set, pending_set)
+                                        complete_args, complete_set, pending_set)
     complete = complete_set()
     yields = json.load(open(YIELDS))
     assembled = set(json.load(open(ASSEMBLED))) if os.path.exists(ASSEMBLED) else set()
@@ -113,7 +113,7 @@ def main():
         if pp(n) in complete:          # rebuilt in runs that complete (gen_catalog_v4_default COMPLETE)
             parts.add(pp(n))
             own = {**own, "lhe": complete_layout({**sz_pp, **own.get("lhe", {})}, complete[pp(n)]["run_events"],
-                                                    complete[pp(n)].get("gridpack", False))}
+                                                    **complete_args(complete[pp(n)], pp(n)))}
             own["lhe"] = {k: v for k, v in own["lhe"].items() if k not in sz_pp}
         if (pp(n) in assembled or pp(n) in pending_set()) and pp(n) not in complete and "lhe" in prev.get(pp(n), {}):
             own = {**own, "lhe": prev[pp(n)]["lhe"]}

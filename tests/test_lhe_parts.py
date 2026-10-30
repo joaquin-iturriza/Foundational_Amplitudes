@@ -1033,6 +1033,52 @@ def test_gridpool_probe():
     print("[gridpool probe] ok")
 
 
+def test_kept_by_energy_and_sizing():
+    """kept --yields-out gives a gridpack pool its worst energy's yield (not the average over energies), --by-energy-out
+    each energy's yield and complete share (an errored run counts as nothing returned); complete_layout sizes an energy
+    measured under COMPLETE_SHARE from that share (lhe.energy_runs) and refuses one needing over 2x its runs. The
+    numbers are ee4_epem_cgsxwm's probe at 3000 GeV (2026-10-30): 7 of 16 runs complete, yield 0.5162."""
+    import contextlib, io, importlib.util
+    import lhe_probe
+    got3000 = [200] * 6 + [9, 200, 55, 23, 37, 15, 21, 11, 26, 55]
+    lines = []
+    for E, got in ((500.0, [200] * 16), (3000.0, got3000)):
+        for k, g in enumerate(got):
+            lines.append("PROBE_JSON " + json.dumps({"process": "ee4_x", "seed": k, "events_asked": 200,
+                         "patches": {"ebeam1": E / 2, "ebeam2": E / 2}, "gridpack": True, "events_returned": g,
+                         "yield": g / 200, "kept": 1.0}))
+    lines.append("PROBE_JSON " + json.dumps({"process": "ee4_x", "seed": 99, "events_asked": 200,
+                 "patches": {"ebeam1": 250.0, "ebeam2": 250.0}, "gridpack": True, "error": "TimeoutExpired"}))
+    lines.append("PROBE_JSON " + json.dumps({"process": "pp_x", "seed": 1, "events_asked": 1000, "patches": {},
+                 "gridpack": True, "events_returned": 1000, "yield": 1.0, "kept": 1.0}))
+    with tempfile.TemporaryDirectory() as d:
+        log = os.path.join(d, "probe.log")
+        open(log, "w").write("\n".join(lines) + "\n")
+        ys, be = os.path.join(d, "y.json"), os.path.join(d, "be.json")
+        with contextlib.redirect_stdout(io.StringIO()):
+            lhe_probe.cmd_kept(argparse.Namespace(logs=[log], out=os.path.join(d, "k.json"), yields_out=ys,
+                                                  by_energy_out=be, small_run=1000))
+        y, b = json.load(open(ys)), json.load(open(be))
+    assert y["ee4_x"] == round(sum(got3000) / 3200, 4) == 0.5162, y
+    assert y["pp_x"] == 1.0 and b["pp_x"] == {"all": {"yield": 1.0, "complete": 1.0, "runs": 1}}
+    assert b["ee4_x"]["3000"] == {"yield": 0.5162, "complete": 0.4375, "runs": 16}
+    assert b["ee4_x"]["500"] == {"yield": round(3200 / 3400, 4), "complete": round(16 / 17, 4), "runs": 17}
+    spec = importlib.util.spec_from_file_location("gdef", os.path.join(ROOT, "recipes", "gen_catalog_v4_default.py"))
+    g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+    base = {"energies": [500.0, 3000.0], "n_val": 0, "n_test": 800, "n_train": 0}
+    l0 = g.complete_layout(dict(base), 200, True)
+    assert l0["n_runs"] == 3 and "energy_runs" not in l0 and l0["gridpack"] == 13057
+    l1 = g.complete_layout(dict(base), 200, True, shares={"500": 0.94, "3000": 0.6}, grid_events=52228)
+    assert l1["energy_runs"] == [3, 4] and l1["gridpack"] == 52228          # ceil(400 / (0.6 x 200)) = 4
+    assert g.complete_layout(dict(base), 200, True, shares={"500": 0.9, "3000": 0.85}) == l0   # above 0.8: unchanged
+    try:
+        g.complete_layout(dict(base), 200, True, shares={"3000": b["ee4_x"]["3000"]["complete"]}, name="ee4_x")
+        raise AssertionError("a complete share of 0.4375 (2.3x the runs) was absorbed")
+    except SystemExit as e:
+        assert "3000" in str(e)
+    print("[kept by energy and sizing] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -1048,3 +1094,4 @@ if __name__ == "__main__":
     test_layout_dead_claims_park_marker_accept_boundary()
     test_gridpack_queue()
     test_gridpool_probe()
+    test_kept_by_energy_and_sizing()
