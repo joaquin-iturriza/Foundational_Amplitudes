@@ -3960,6 +3960,12 @@ entries:
     units: null
     start: '2026-10-30T05:52:35+00:00'
     at: '2026-10-30T05:52:35+00:00'
+  - batch: catalog_v4_gridpack
+    wall_h: 1.0
+    jobs: 197
+    units: null
+    start: '2026-10-30T09:28:52+00:00'
+    at: '2026-10-30T09:28:52+00:00'
   ask: 57 more catalog_v4 pools have the stopped-short problem the gridpack rebuild fixes (8 assembled from stopped-short
     runs in the last wave, 49 that could not be assembled for the same reason; list in analysis/catalog_v4/data/complete_runs_pending.json).
     Add them to the gridpack rebuild (a second CPU-only probe and wave), or keep them out?
