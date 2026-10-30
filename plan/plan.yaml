@@ -142,12 +142,11 @@ entries:
       44 and 45, via NOSYNC=1 SYNC_FIRST=1 TIME=04:00:00 bash scripts/launch_cc_only.sh v3_prep_explore 2.0 ''<note>'' scripts/job_catalog_v3_short.sh
       v4_dimensionless_muon_more_signed_seed3 (and _seed4). When all four end: collect, extend analysis/catalog_v4/signext_compare.py
       to four seeds, read by the passed design''s rule'
-    6: 'The TR reads of the control pair for the shape gap were resubmitted 2026-10-30 on CC-IN2P3 (72G free on /sps/lpnhe)
-      as FA-ccin2p3-84f8e70b (seed 42, REREAD=FA-ccin2p3-339ec100) and FA-ccin2p3-3d74160d (seed 43, REREAD=FA-ccin2p3-380842ed),
-      target 1.5 h. When they end: collect them (tools/collect_run.py --axes TR into analysis/catalog_v3/data/short_reads/v4_dimensionless_muon[_seed2]/TR),
-      rerun python3 analysis/catalog_v4/loop_levels.py --shape-gap, decide per group by the design, fill the scorer column
-      of tab:v4_shape_gap and the decision in par:v4_shape_gap. Free-read lower bounds in hand: e multiplicity 0.389 / 0.358,
-      new combinations 0.301 / 0.278'
+    6: 'TR reads of the control pair for the shape gap: seed 42 submitted as FA-ccin2p3-e37d7ec2 (REREAD=FA-ccin2p3-339ec100,
+      time limit 1.5 h); seed 43 still to submit (gate window), via NOSYNC=1 SYNC_FIRST=1 TIME=01:30:00 V3_AXES=TR RESUBMIT=1
+      REREAD=FA-ccin2p3-380842ed bash scripts/launch_cc_only.sh v3_prep_explore 0.5 ''<note>'' scripts/job_catalog_v3_short.sh
+      v4_dimensionless_muon_seed2 eval. When both end: collect (tools/collect_run.py --axes TR), rerun python3 analysis/catalog_v4/loop_levels.py
+      --shape-gap, decide per group by the design, fill tab:v4_shape_gap and par:v4_shape_gap'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1303,14 +1302,11 @@ entries:
       - 'still short of the rule or median not lower: the sign extension recorded as not resolved at this compute and dropped
         from the recipe'
     6:
-      feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
-        gap beyond intrinsic difficulty or the network''s floor at this compute'
+      feeds: 'the user''s shape priority (D178): transfer gap or the network''s floor at this compute'
       if:
-      - 'a new-process group''s median e >= 0.3 on both seeds: a transfer gap; design target or input priors aimed at it,
-        starting with the cells where e is largest'
-      - 'median e < 0.3 on either seed for both groups: the shape lever is capacity and training length, recorded for the
-        full pretraining''s design'
-      - 'e and the log-log residual disagree on a group''s side of 0.3: that group unresolved, both numbers reported'
+      - 'a new-process group''s median e >= 0.3 on both seeds: transfer gap; design target or input priors aimed at it'
+      - 'median e < 0.3 on either seed for both groups: shape lever is capacity and training length'
+      - 'e and the log-log residual disagree on a group''s side of 0.3: that group unresolved'
   step_waits: {}
   owner:
     agent: a208e44d49598bdaf
