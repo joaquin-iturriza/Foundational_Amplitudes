@@ -724,15 +724,32 @@ def test_generation_rule():
             why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe), items)
             assert len(why) == 1 and "ask more than 2x" in why[0], why
             print("  probe file of 2026-10-30: refused for keeping under half the events they ask:", why[0][:400])
-            acc = ["%s=D186" % n for n in y if 0 < y[n] < 0.5 or y[n] <= 0]
-            assert not lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe,
-                                                                  accept_yield=acc), items)
-            why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe,
-                                                             accept_yield=acc), dict(items, zz_absent=[]))
+            acc_file = os.path.join(d, "accepted.json")
+            fresh = lambda **k: argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe, accepted=acc_file, **k)
+            assert len(lhe_parts.plan_refusals(fresh(), items)) == 1
+            # accepting needs a decision in force that names the process (a scratch ledger)
+            import sqlite3
+            led = os.path.join(d, "ledger.db")
+            c = sqlite3.connect(led)
+            c.execute("CREATE TABLE decisions (id TEXT, project TEXT, kind TEXT, quote TEXT, covers TEXT, in_force INT)")
+            lows = [n for n in y if y[n] <= 0 or 1.0 / y[n] > lhe_parts.YIELD_FACTOR]
+            c.execute("INSERT INTO decisions VALUES ('D7','FA','approve','go','%s',1)" % ",".join(lows))
+            c.execute("INSERT INTO decisions VALUES ('D8','FA','approve','the redesign','agent_redesign',1)")
+            c.execute("INSERT INTO decisions VALUES ('D9','FA','approve','go','%s',0)" % ",".join(lows))
+            c.commit(); c.close()
+            acc = lambda *names: lhe_parts.cmd_accept_yield(argparse.Namespace(names=list(names), ledger=led,
+                                                                               accepted=acc_file))
+            for bad in ("D8", "D9", "D99"):                          # names nothing / withdrawn / absent
+                try:
+                    acc(*["%s=%s" % (n, bad) for n in lows])
+                    raise AssertionError("accepted under %s" % bad)
+                except SystemExit as e:
+                    assert "refused" in str(e.code) and not os.path.exists(acc_file), e.code
+            acc(*["%s=D7" % n for n in lows])
+            assert sorted(json.load(open(acc_file))) == sorted(lows)
+            assert not lhe_parts.plan_refusals(fresh(), items)
+            why = lhe_parts.plan_refusals(fresh(), dict(items, zz_absent=[]))
             assert len(why) == 1 and "missing from the probe file" in why[0] and "zz_absent" in why[0], why
-            why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe,
-                                                             accept_yield=["x=yes"]), {})
-            assert why and "NAME=D<n>" in why[0], why
     finally:
         lhe_parts._my_jobs = saved
         os.environ.pop("AMP_LHE_PARTS_DIR", None)

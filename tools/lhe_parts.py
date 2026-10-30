@@ -16,7 +16,9 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
                              progress), why not, and the task counts (read by the supervisor before it resubmits workers)
     plan refuses (agent_redesign C5): a replan of a queue whose claims live workers hold unless it is parked first; a
             process missing from --probe (default analysis/catalog_v4/data/lhe_probe_yields.json) or asking more than
-            2x the events it keeps there, unless --exclude'd or accepted by the user's decision (--accept-yield NAME=D<n>)
+            2x the events it keeps there, unless --exclude'd or accepted (lhe_yield_accepted.json, written by accept-yield)
+    accept-yield NAME=D<n>...   (laptop) record the user's decision accepting a low-yield process, checked against
+                             the decision ledger: in force, and its quote or covers name the process
     park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold)
     plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again; --exclude NAME... held processes
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
@@ -85,6 +87,39 @@ def _dirs(q):
 
 PROBE_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields.json")
 YIELD_FACTOR = 2.0        # events asked over events kept above this refuses the plan (agent_redesign C5)
+# low-yield processes the user accepted, each with the decision checked against the ledger when it was recorded
+# (accept-yield runs on the laptop, where the ledger is; plan reads this committed file on the site)
+ACCEPTED_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_yield_accepted.json")
+LEDGER = os.path.expanduser("~/.local/share/ccorch/runs.db")
+ACCEPT_KINDS = ("approve", "scope", "prefer", "release")
+
+
+def cmd_accept_yield(a):
+    """NAME=D<n>...: record that the user's decision D<n> accepts a process that keeps under 1/YIELD_FACTOR of the
+    events it asks. Refused unless D<n> is an FA decision in force (approve/scope/prefer/release) whose quote or covers
+    name the process. Writes ACCEPTED_YIELDS (commit it; plan reads it on the site)."""
+    import sqlite3
+    if not os.path.exists(a.ledger):
+        sys.exit("lhe_parts accept-yield: no decision ledger at %s (run it on the laptop)" % a.ledger)
+    c = sqlite3.connect("file:%s?mode=ro" % a.ledger, uri=True)
+    path = a.accepted or ACCEPTED_YIELDS
+    acc = json.load(open(path)) if os.path.exists(path) else {}
+    bad = []
+    for x in a.names:
+        name, _, did = x.partition("=")
+        r = c.execute("SELECT kind, quote, covers FROM decisions WHERE id=? AND project='FA' AND in_force=1",
+                      (did,)).fetchone()
+        if not r or r[0] not in ACCEPT_KINDS:
+            bad.append("%s: %s is not an FA decision in force (%s)" % (name, did, "/".join(ACCEPT_KINDS)))
+        elif name not in (r[1] or "") and name not in (r[2] or ""):
+            bad.append("%s: %s neither quotes nor covers it" % (name, did))
+        else:
+            acc[name] = {"decision": did, "quote": r[1], "at": time.strftime("%Y-%m-%dT%H:%M:%S")}
+    if bad:
+        sys.exit("lhe_parts accept-yield: refused, nothing recorded:\n  " + "\n  ".join(bad))
+    with open(path, "w") as f:
+        json.dump(acc, f, indent=1, sort_keys=True)
+    print(json.dumps({"accepted": sorted(acc)}))
 
 
 def live_claims(q):
@@ -113,8 +148,8 @@ def plan_refusals(a, items):
       - a queue already planned whose claims live workers hold is replanned only once parked (`park`): workers started
         under the old layout failed 908 tasks with IndexError after the 2026-10-29 replan (85e93d0f)
       - with --probe: every process is in the probe file (kept fraction of events per process, tools/lhe_probe.py
-        summary), and none asks more than YIELD_FACTOR x the events it keeps, unless --accept-yield NAME=D<n> names
-        the user's decision that accepts it, or the process is excluded"""
+        summary), and none asks more than YIELD_FACTOR x the events it keeps, unless it is excluded or accepted in
+        ACCEPTED_YIELDS (accept-yield, which checks the decision against the ledger)"""
     why = []
     if os.path.isdir(os.path.join(a.queue, "specs")) and os.listdir(os.path.join(a.queue, "specs")):
         held = live_claims(a.queue)
@@ -125,10 +160,8 @@ def plan_refusals(a, items):
     probe = getattr(a, "probe", None)
     if probe:
         y = json.load(open(probe))
-        accept = dict(x.split("=", 1) for x in (getattr(a, "accept_yield", None) or []))
-        bad_acc = [k for k, v in accept.items() if not re.fullmatch(r"D\d+", v)]
-        if bad_acc:
-            why.append("--accept-yield takes NAME=D<n> (the user's decision): %s" % ", ".join(bad_acc))
+        accfile = getattr(a, "accepted", None) or ACCEPTED_YIELDS
+        accept = json.load(open(accfile)) if os.path.exists(accfile) else {}
         names = [n for n in sorted(items) if n not in (getattr(a, "exclude", None) or [])]
         missing = [n for n in names if n not in y]
         if missing:
@@ -137,7 +170,8 @@ def plan_refusals(a, items):
         low = [(n, y[n]) for n in names if n in y and (y[n] <= 0 or 1.0 / y[n] > YIELD_FACTOR) and n not in accept]
         if low:
             why.append("%d process(es) ask more than %gx the events they keep (kept fraction in %s): %s; fix their "
-                       "layout, exclude them, or --accept-yield NAME=D<n> with the user's decision"
+                       "layout, exclude them, or record the user's decision accepting them (on the laptop: "
+                       "python3 tools/lhe_parts.py accept-yield NAME=D<n>..., then commit and sync)"
                        % (len(low), YIELD_FACTOR, probe, ", ".join("%s (kept %.3f, asked/kept %s)" % (
                            n, v, "inf" if v <= 0 else "%.1f" % (1.0 / v)) for n, v in low)))
     return why
@@ -924,8 +958,8 @@ def main():
     p.add_argument("--exclude", nargs="*", default=[], help="processes not planned in this queue (held)")
     p.add_argument("--probe", default=PROBE_YIELDS, help="kept fraction per process (tools/lhe_probe.py summary); every "
                    "planned process must be in it and keep at least 1/%g of the events it asks" % YIELD_FACTOR)
-    p.add_argument("--accept-yield", nargs="*", default=[], metavar="NAME=D<n>",
-                   help="a low-yield process the user's decision D<n> accepts")
+    ay = sub.add_parser("accept-yield"); ay.add_argument("names", nargs="+", metavar="NAME=D<n>")
+    ay.add_argument("--ledger", default=LEDGER); ay.add_argument("--accepted")
     ly = sub.add_parser("layout"); ly.add_argument("--queue", required=True)
     pk = sub.add_parser("park"); pk.add_argument("--queue", required=True)
     p.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
@@ -941,7 +975,7 @@ def main():
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     sb = sub.add_parser("shortbuilt"); sb.add_argument("--out", required=True); sb.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
-    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 

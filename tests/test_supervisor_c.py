@@ -269,6 +269,14 @@ def test_c4_target():
         if t1 <= p[0] < t1 + hit[0] * 3600 and (p[1] - base[1]) / p[2] >= S.MIN_FRACTION:
             assert (S.predict_end(base, p, t1) or 0) <= 8.0
     assert S.overrun(s, t0, 100.0) is None                                   # a generous target: no alert
+    # history starting after the batch's start (the target recorded with --start 3 h back, the supervisor's first
+    # pass then): a batch exactly on pace for 4 h raises nothing (the rate is measured over the history only)
+    h = 3600
+    on_pace = [(3 * h, 75, 100), (3 * h + 1200, 80, 100), (3.5 * h, 87.5, 100), (4 * h - 60, 99, 100)]
+    assert S.overrun(on_pace, 0, 4.0) is None
+    assert abs(S.predict_end((3 * h, 75), (3.5 * h, 87.5, 100), 0) - 4.0) < 1e-9
+    slow = [(3 * h, 75, 100), (4.5 * h, 80, 100)]                             # 5 units in 1.5 h: 7.5 h left
+    assert S.overrun(slow, 0, 4.0)[1] > 8.0
     assert S.overrun([(0, 0, 10), (9 * 3600, 0, 10)], 0, 4.0) == (9.0, None)  # past 2x with nothing done
 
 
