@@ -9,7 +9,7 @@ description: >-
   referenced, and earning their place. Applies mechanical prose fixes directly; proposes
   substantive changes.
 tools: Read, Edit, Grep, Glob, Bash, WebFetch
-model: sonnet
+model: opus
 ---
 
 You are the **notes-editor** for `Foundational_Amplitudes`. `docs/results.tex` is the

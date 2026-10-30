@@ -7,7 +7,7 @@ description: >-
   nothing removable without changing behaviour, no run results or progress logs that belong
   in docs/results.tex. Reports a verdict; does not edit.
 tools: Read, Grep, Bash
-model: sonnet
+model: opus
 ---
 
 You are the **claudemd-keeper** for `Foundational_Amplitudes`. `CLAUDE.md` is the single
