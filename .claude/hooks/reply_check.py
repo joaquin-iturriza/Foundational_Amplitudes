@@ -45,7 +45,8 @@ def midturn(r):
     misfiring?": the check judged the reply against reply_check.py's source)."""
     if r.get("type") == "attachment":
         a = r.get("attachment") or {}
-        if a.get("type") == "queued_command" and (a.get("origin") or {}).get("kind") == "human":
+        o = a.get("origin")
+        if a.get("type") == "queued_command" and isinstance(o, dict) and o.get("kind") == "human":
             p = a.get("prompt")
             p = "\n".join(texts(p)) if not isinstance(p, str) else p
             return [p.strip()] if p and p.strip() else []
@@ -77,6 +78,8 @@ def scan(path):
                 if part not in msgs:
                     msgs.append(part)
         elif r.get("type") == "user":
+            if r.get("isMeta") or r.get("isCompactSummary"):
+                continue
             mid = midturn(r)
             for part in mid:
                 if part not in msgs:
@@ -119,7 +122,15 @@ def relevant(dec, text, keep=12):
 
 def check(inp, ask=None):
     """(2, the reason) when the reply leaves the user's question unanswered, else (0, ""). Imported by plan_check.py
-    (agent redesign B1); the standalone hook runs it through main(). `ask` stands in for the model in tests."""
+    (agent redesign B1); the standalone hook runs it through main(). `ask` stands in for the model in tests. Any
+    exception passes the turn: plan_check fails closed, so an error here would block it."""
+    try:
+        return _check(inp, ask)
+    except Exception:
+        return 0, ""
+
+
+def _check(inp, ask):
     path = inp.get("transcript_path")
     if not path or not os.path.exists(path):
         return 0, ""

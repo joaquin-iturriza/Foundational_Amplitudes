@@ -160,6 +160,22 @@ def stubbed():
         scenario("reason %r is kept" % reason, RC.verdict(V("why 20 minutes", reason), m)[0] is False)
     scenario("a refusal without ok: false passes", RC.verdict({"reason": "x", "question": "why 20 minutes"}, m)[0])
     scenario("a failing model lets the turn end", run(73434, lambda p: None)[0] == 0)
+    with tempfile.TemporaryDirectory() as d:
+        RC.STATE = os.path.join(d, "state")
+        t = os.path.join(d, "t.jsonl")
+        good = open(path(73434)).read()
+        for name, extra in (("a line that does not parse", '{"type": "assistant", "mess\n'),
+                            ("an attachment whose origin is a string",
+                             json.dumps({"type": "attachment", "attachment": {"type": "queued_command",
+                                         "prompt": "x?", "origin": "human"}}) + "\n")):
+            open(t, "w").write(good + extra)
+            rc = RC.check({"transcript_path": t}, ask=lambda p: REAL[73434][1])[0]
+            scenario("%s does not crash the check" % name, rc in (0, 2), rc)
+        def boom(p):
+            raise RuntimeError("model blew up")
+        os.remove(RC.STATE)
+        scenario("an exception inside the check lets the turn end",
+                 RC.check({"transcript_path": path(73434)}, ask=boom)[0] == 0)
 
     # once per message
     with tempfile.TemporaryDirectory() as d:
