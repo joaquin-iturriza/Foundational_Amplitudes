@@ -2294,8 +2294,6 @@ entries:
       v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
       each), plus the controls'' PP4 mode-eval reads; control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100,
       -380842ed)'
-    13: 'Re-read par:v4_short_runs'' run-level tests with the fixed run_perm (cdcae2cd): short_run_bias measure, sizecheck
-      and the gridpack check rerun on their saved inputs (CPU, CC), the numbers and verdicts compared with the written ones'
     14: 'The catalog''s sampling mixture (Joaquin''s priority 1, D178: catalog_v4 mixes the default generator sampling with
       the smart choices, flat in log|M|^2, splitter, forward, on every beam): design and run the mixture A/B on the 112 assembled
       rebuilt pools: default share 0.50 and 0.25 of each tree pool, taken out of the RAMBO bulk, with the 0.35 flat and 0.15
@@ -4715,12 +4713,6 @@ entries:
       if:
       - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
       - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
-    13:
-      feeds: whether the written short-run and run-size verdicts (stopping short biases; runs of 1000 differ from runs of
-        many) stand under a level-holding run-level test
-      if:
-      - 'every verdict unchanged: note the re-read, numbers updated with their src lines'
-      - 'a verdict changes: rewrite the paragraph and its hand-off item, and say which later decision leaned on it'
     14:
       feeds: which default share catalog_v4's final pools carry (D178 priority 1)
       if:
