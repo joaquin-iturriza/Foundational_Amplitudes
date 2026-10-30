@@ -2450,6 +2450,7 @@ entries:
     - FA-ccin2p3-76eb4dfe
     - FA-ccin2p3-77407360
     - FA-ccin2p3-790fac19
+    - FA-ccin2p3-79989476
     - FA-ccin2p3-7a07eb55
     - FA-ccin2p3-7b5eb87e
     - FA-ccin2p3-7ee6ab6f
@@ -2664,6 +2665,10 @@ entries:
       building pp13v4_dd_ddgg: 83 pools done; 3 short MadEvent runs (pp13v4_ub_bggu 3428, pp13v4_dg_dguux 680, pp13v4_uu_aauu
       7566 of 14000; all three built since by their one-entry jobs); 36 b-beam entries refused by the old physics check (b_row
       4.7 vs massless, fixed by e7a1775d, built since). Not a default-share parts worker.'
+    - 'pp13v4 generation part 5 of 8 (commit c7ca7d55, before the beam_masses fix e7a1775d), TIMEOUT 2026-10-30 02:26 while
+      building pp13v4_ddx_ddxgg / pp13v4_uu_guuz: 83 pools done; 4 short MadEvent runs (pp13v4_bbx_abtxwp 3072, pp13v4_ud_duzz
+      1470, pp13v4_uu_aguu 2145 of 14000, pp13v4_bbx_abtxwp and pp13v4_uu_aguu still missing, pp13v4_ud_duzz built since);
+      37 b-beam entries refused by the old physics check (fixed by e7a1775d, built since). Not a default-share parts worker.'
     - recipes/catalog_v4_heldout_H7E.yaml
     - recipes/catalog_v4_loops.yaml
     - recipes/catalog_v4_pp/param_card.dat
