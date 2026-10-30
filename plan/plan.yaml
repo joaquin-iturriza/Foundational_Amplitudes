@@ -3995,6 +3995,12 @@ entries:
     units: none_gridpool_probe_57
     start: '2026-10-30T09:40:31+00:00'
     at: '2026-10-30T09:40:31+00:00'
+  - batch: catalog_v4_gridpack_57
+    wall_h: 2.5
+    jobs: 60
+    units: null
+    start: '2026-10-30T09:41:35+00:00'
+    at: '2026-10-30T09:41:35+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
