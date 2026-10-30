@@ -4314,6 +4314,18 @@ entries:
       NO: a verdict changes by the interval rule (e.g. short vs complete no longer significant, the ladder at 1000 agreeing)
       -> rewrite the paragraph and its hand-off, and state whether the 113-pool gridpack rebuild was needed. INVALID: event
       KS not reproduced for a file -> that re-read reported as not done, with what changed.'
+    passed_at: '2026-10-30T13:37:36+00:00'
+    reviewer: 'Re-check after FIX (c7ad253f): one change, scaled vs unscaled run-level statistic on the same files (--before),
+      same relabellings (seed 0, 20000, paired), validity by exact event-KS reproduction, committed 2000-relabelling p must
+      be reproduced by the unscaled 20000 re-run within intervals. Measure moves: tests/test_run_perm_calibration.py re-run
+      here gives 0.04 under 0.05 at 1000 vs 555 (0.033 equal units); runlevel.json pre-fix 6 of 24 under 0.05, 2 after per
+      the finding; cgsxwm 25-event p 0.0 -> 0.037. Spread: Clopper-Pearson per p; at 20000 a p near the 0.00156 Bonferroni
+      level carries about +-0.0005, enough for the near-threshold tests (ub_bdwpz 0.0015, epem 200 at 0.0025 vs 0.0031, gridpack
+      0.0135 vs 0.01); a flip counts only when the 20000 interval clears the threshold. Halves control restated as rate near
+      chance. Searched results.tex for re-read, reread, run_perm, scaled, unequal, short_run_bias; plan show catalog_coverage;
+      site decisions for short, re-read, permutation, run-level: no prior re-read. Note for the run: the script''s 20 min
+      time limit needs --hdr=--time sized to 10x the relabellings and 8 parallel measures, with its wall-time target recorded;
+      a test whose 20000 interval still straddles its threshold is reported as undecided, not as standing.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
