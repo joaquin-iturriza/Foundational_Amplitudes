@@ -4114,8 +4114,6 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '1': the cgsxwm 3 TeV run-size probe (30 CPU jobs FA-ccin2p3-3c830baa to 8b00d59e, target 1.25 h) and the last 2 pools
-      of catalog_v4_gridpack_last; a fresh owner takes it from the hand-off (584592e2) when they end
     '10': the 113 rebuilt pools assembled (step 1's owner)
     '11': step 10's pp13v4 validation passing
   targets:
