@@ -172,8 +172,63 @@ def test_patch_ximprove():
                 pass
 
 
+def _arm_npz(d, name, seed, ask, got, banner, shift=0.0):
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    P = np.zeros((got, 6, 4))
+    P[:, 0] = [1500, 0, 0, 1500]; P[:, 1] = [1500, 0, 0, -1500]
+    c = np.clip(rng.uniform(-1, 1, got) + shift, -1, 1)
+    P[:, 2, 0] = 500; P[:, 2, 3] = 500 * c; P[:, 2, 1] = 500 * np.sqrt(1 - c ** 2)
+    os.makedirs(os.path.join(d, name), exist_ok=True)
+    np.savez(os.path.join(d, name, f"{name}_gpack12576_seed{seed}_ev{ask}.npz"), mom=P, aqcd=np.zeros(got),
+             banner=np.array(banner))
+
+
+def test_armcheck():
+    """sizecheck --ref-keep: shares from the arm's logs, the arm against the reference's complete and short runs,
+    refusals for shared seeds and other physics."""
+    import argparse, contextlib, io, json as js
+    ban = "<MGRunCard>\n 1500.0 = ebeam1\n</MGRunCard>\n<MGProcCard>\ngenerate e+ e- > c g s~ w-\n</MGProcCard>"
+    ban += "\n<slha>\nBLOCK MASS\n 6 172.5\n</slha>"
+    name = "ee4_zz_arm"
+    with tempfile.TemporaryDirectory() as d:
+        ref, arm = os.path.join(d, "ref"), os.path.join(d, "arm")
+        for s in range(1, 9):
+            _arm_npz(ref, name, s, 200, 200 if s % 2 else 120, ban)
+        for s in range(101, 109):
+            _arm_npz(arm, name, s, 200, 200, ban)
+        log = os.path.join(d, "arm.log")
+        with open(log, "w") as f:
+            for s in range(101, 110):
+                r = {"process": name, "events_asked": 200, "patches": {"ebeam1": 1500.0},
+                     **({"events_returned": 200} if s < 109 else {"error": "timeout"})}
+                f.write("PROBE_JSON " + js.dumps(r) + "\n")
+        a = argparse.Namespace(process=name, energy=3000.0, ref_ask=200, keep=arm, ref_keep=ref, parts=False,
+                               eid=None, logs=[log], out=os.path.join(d, "o.json"))
+        with contextlib.redirect_stdout(io.StringIO()):
+            srb.cmd_sizecheck(a)
+        o = js.load(open(a.out))
+        r = o["asks"]["200"]
+        assert o["ref"] == {"complete_runs": 4, "short_runs": 4, "events_complete": 800}
+        assert r["complete"] == 8 and r["complete_share"] == round(8 / 9, 4) and r["logged"]["errors"] == 1
+        assert "vs_ref" in r and "vs_ref_short" in r and "control_arm_halves" in r and "ref_short_vs_complete" in o
+        _arm_npz(arm, name, 3, 200, 200, ban)                       # a reference seed in the arm
+        try:
+            srb.cmd_sizecheck(a)
+            raise AssertionError("shared seeds accepted")
+        except SystemExit:
+            pass
+        os.remove(os.path.join(arm, name, f"{name}_gpack12576_seed3_ev200.npz"))
+        _arm_npz(arm, name, 120, 200, 200, ban.replace("c g s~", "c g c~"))   # other physics
+        try:
+            srb.cmd_sizecheck(a)
+            raise AssertionError("other physics accepted")
+        except SystemExit:
+            pass
+
+
 if __name__ == "__main__":
     for f in (test_gridpack_roundtrip, test_physics_key_ignores_gridpack, test_gpack_file_name,
-              test_energy_run_events_on_pinned_gridpacks, test_patch_ximprove):
+              test_energy_run_events_on_pinned_gridpacks, test_patch_ximprove, test_armcheck):
         f()
         print("ok", f.__name__)

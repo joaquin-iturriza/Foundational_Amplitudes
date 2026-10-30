@@ -635,6 +635,96 @@ def _ebeam(banner):
     return float(m.group(1)) if m else None
 
 
+def _gpack_rows(keep, process, energy):
+    """The runs `lhe_probe.py gridpool --keep` saved under KEEP/<process>/ at collider energy `energy`: path, ask, seed,
+    gridpack, events returned and physics key (one per run)."""
+    import numpy as np
+    rows = []
+    for f in sorted(glob.glob(os.path.join(os.path.expandvars(keep), process, "*.npz"))):
+        m = GPACK_RE.match(os.path.basename(f))
+        if not (m and m["proc"] == process):
+            continue
+        with np.load(f) as z:
+            b = str(z["banner"])
+        e = _ebeam(b)
+        if e is None or abs(2.0 * e - energy) > 1e-6:
+            continue
+        rows.append({"path": f, "asked": int(m["ev"]), "seed": int(m["seed"]), "src": f"g{m['grid']}", "kind": "part",
+                     "got": _npz_len(f), "key": physics_key(b)})
+    return rows
+
+
+def _armcheck(a):
+    """sizecheck --ref-keep: the runs under --keep (one arm of a probe, e.g. other gridpack generation limits) against
+    the runs of --ref-ask under --ref-keep from the same gridpack and cards: the arm's complete share per ask from its
+    logs, its runs (all of them, and its complete ones) against the reference's complete runs (vs_ref) and against the
+    reference's short runs (vs_ref_short), and its runs split in two by seed (control_arm_halves). Refused when the two
+    directories hold other physics or other gridpacks."""
+    A, R = _gpack_rows(a.keep, a.process, a.energy), _gpack_rows(a.ref_keep, a.process, a.energy)
+    keys, srcs = {s["key"] for s in A + R}, {s["src"] for s in A + R}
+    if len(keys) != 1 or len(srcs) != 1:
+        raise SystemExit(f"{a.process} at {a.energy:g} GeV: {len(keys)} physics keys, gridpacks {sorted(srcs)}: "
+                         "the arm and the reference must share both")
+    ref = [s for s in R if s["asked"] == a.ref_ask]
+    rc = sorted([s for s in ref if s["got"] >= s["asked"]], key=lambda s: s["seed"])
+    rs = sorted([s for s in ref if 0 < s["got"] < s["asked"]], key=lambda s: s["seed"])
+    if {s["seed"] for s in A} & {s["seed"] for s in ref}:
+        raise SystemExit("the arm and the reference share seeds: the same events would be compared with themselves")
+    feats = ["cos_theta_star"]
+    Fc, Fs = _feats_of(rc, CAP), _feats_of(rs, CAP)
+    logged = _logged(a.logs, a.process, a.energy)
+    out = {"process": a.process, "energy": a.energy, "ref_ask": a.ref_ask, "physics_keys": sorted(map(str, keys)),
+           "gridpack": sorted(srcs)[0], "ref": {"complete_runs": len(rc), "short_runs": len(rs),
+                                                "events_complete": sum(s["got"] for s in rc)}, "asks": {}}
+    for ask in sorted({s["asked"] for s in A}):
+        ss = sorted([s for s in A if s["asked"] == ask], key=lambda s: s["seed"])
+        comp = [s for s in ss if s["got"] >= ask]
+        lg = logged.get(ask)
+        r = {"runs_kept": len(ss), "complete": len(comp), "events": sum(s["got"] for s in ss),
+             **({"logged": lg, "complete_share": round(lg["complete"] / lg["runs"], 4)} if lg else {}),
+             "short_returned": sorted(s["got"] for s in ss if s["got"] < ask)}
+        Fa = _feats_of([s for s in ss if s["got"] > 0], CAP)
+        if len(Fa) >= 2:
+            for k, Fy in (("vs_ref", Fc), ("vs_ref_short", Fs)):
+                if len(Fy) >= 2:
+                    r[k] = dict(_compare(Fa, Fy, feats)["cos_theta_star"], detectable_ks_5pct=_detectable(Fa, Fy))
+            if len(Fa) >= 4:
+                r["control_arm_halves"] = _compare(Fa[0::2], Fa[1::2], feats)["cos_theta_star"]
+        out["asks"][str(ask)] = r
+        print(f"[armcheck] ask {ask}: {len(comp)} complete of {len(ss)} kept, share {r.get('complete_share')}, "
+              f"vs ref KS {r.get('vs_ref', {}).get('ks_binned')} p {r.get('vs_ref', {}).get('p_runs')}, "
+              f"vs short KS {r.get('vs_ref_short', {}).get('ks_binned')}", flush=True)
+    if len(Fc) >= 4:
+        out["control_ref_halves"] = _compare(Fc[0::2], Fc[1::2], feats)["cos_theta_star"]
+    if len(Fc) >= 2 and len(Fs) >= 2:
+        out["ref_short_vs_complete"] = _compare(Fs, Fc, feats)["cos_theta_star"]
+    if a.out:
+        os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
+        with open(a.out, "w") as f:
+            json.dump(out, f, indent=1, sort_keys=True)
+    print("ARMCHECK_JSON " + json.dumps(out), flush=True)
+
+
+def _logged(logs, process, energy):
+    """Per ask, runs, complete runs and errors from the probe logs' PROBE_JSON lines at that energy (an errored run
+    counts as a run that returned nothing)."""
+    logged = {}
+    for lp in logs or []:
+        for line in open(lp, errors="replace"):
+            if not line.startswith("PROBE_JSON "):
+                continue
+            r = json.loads(line[len("PROBE_JSON "):])
+            e = 2.0 * float((r.get("patches") or {}).get("ebeam1", 0.0))
+            if r.get("process") != process or abs(e - energy) > 1e-6:
+                continue
+            ask = int(r["events_asked"])
+            d = logged.setdefault(ask, {"runs": 0, "complete": 0, "errors": 0})
+            d["runs"] += 1
+            d["complete"] += int((r.get("events_returned") or 0) >= ask)
+            d["errors"] += int("error" in r)
+    return logged
+
+
 def cmd_sizecheck(a):
     """Run size on one gridpack (the run-size probe of a pool whose runs stop short at one energy; catalog_coverage,
     ee4_epem_cgsxwm at 3000 GeV). Runs of --process kept by `lhe_probe.py gridpool --keep` (KEEP/<process>/
@@ -652,6 +742,11 @@ def cmd_sizecheck(a):
         if not c.get("run_events"):
             raise SystemExit(f"{a.process}: no run_events in {COMPLETE}; give --ref-ask")
         a.ref_ask = int(c["run_events"])
+    if a.ref_keep:
+        if a.parts:
+            raise SystemExit("--ref-keep compares a probe arm with a probe reference; --parts is the queue's check")
+        a.keep = a.keep or os.path.join(os.environ["SCRATCH"], "lhe_probe_keep")
+        return _armcheck(a)
     if a.parts and not a.eid:
         raise SystemExit("--parts needs --eid: the queue's parts of the current layout only")
     keep = os.path.expandvars(a.keep) if a.keep else os.path.join(os.environ["SCRATCH"], "lhe_probe_keep")
@@ -679,20 +774,7 @@ def cmd_sizecheck(a):
         raise SystemExit(f"{a.process} at {a.energy:g} GeV: {len(keys)} physics keys {sorted(map(str, keys))}: "
                          "runs of other cards mixed in")
     # complete share per ask from the probe logs, errored runs included (asked, returned 0)
-    logged = {}
-    for lp in a.logs or []:
-        for line in open(lp, errors="replace"):
-            if not line.startswith("PROBE_JSON "):
-                continue
-            r = json.loads(line[len("PROBE_JSON "):])
-            e = 2.0 * float((r.get("patches") or {}).get("ebeam1", 0.0))
-            if r.get("process") != a.process or abs(e - a.energy) > 1e-6:
-                continue
-            ask = int(r["events_asked"])
-            d = logged.setdefault(ask, {"runs": 0, "complete": 0, "errors": 0})
-            d["runs"] += 1
-            d["complete"] += int((r.get("events_returned") or 0) >= ask)
-            d["errors"] += int("error" in r)
+    logged = _logged(a.logs, a.process, a.energy)
     ref = sorted([s for s in rows if s["asked"] == a.ref_ask and s["got"] >= s["asked"] and s["src"] != "parts"],
                  key=lambda s: s["seed"])
     # a queue run that shares a reference run's seed draws the same events from the same gridpack: that reference run
@@ -788,6 +870,8 @@ def main():
     k.add_argument("--eid", default=None, help="with --parts: the events' identity of the layout whose parts to test")
     k.add_argument("--logs", nargs="*", default=[], help="the probe jobs' logs (PROBE_JSON lines) for the shares")
     k.add_argument("--out", default=None)
+    k.add_argument("--ref-keep", default=None, help="the reference runs' keep dir: --keep is then one probe arm "
+                   "compared with them (_armcheck)")
     q = sub.add_parser("sizesummary"); q.add_argument("--json", required=True)
     a = ap.parse_args()
     if a.cmd == "sizesummary":
