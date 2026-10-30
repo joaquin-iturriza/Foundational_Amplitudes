@@ -212,5 +212,11 @@ for recipe in a.recipes:
                             # the physics check of this probe (tools/pool_physics.py); a mismatch read on purpose
                             # carries its reason here and in physics_reason
                             physics_check=np.array(json.dumps(physics_chk, default=str)),
-                            physics_reason=np.array(physics_chk.get("reason") or ""))
+                            physics_reason=np.array(physics_chk.get("reason") or ""),
+                            # the scored events' indices in the split's pool, in scoring order, and that pool's path:
+                            # a per-event read from the pool's momenta (v3_prep_explore, the dipole residual) aligns on
+                            # these, never by matching log|M|^2 (the sampling-sensitivity dead ends)
+                            idx=(np.asarray(split_idx).reshape(-1) if len(np.asarray(split_idx).reshape(-1)) == len(t)
+                                 else np.zeros(0, np.int64)),
+                            pool=np.array(str(_pool or "")))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)
