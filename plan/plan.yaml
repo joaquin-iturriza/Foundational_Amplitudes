@@ -2258,11 +2258,15 @@ entries:
       and _seed2, V3_AXES=PP4, a fraction of a GPU-h). Still owed before (b) is reported for training classes: a test-split
       read of the 797 swapped classes'' catalog_v4 smart-mixture pools by the arm and both controls. Control reused: catalog_v4''s
       Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29), 1068 pools same (control_pool_check.py @c809ca44).'
-    7: 'Collect the catalog_v4 generation wave: queue $SCRATCH/lhe_queue/catalog_v4_w3 (1885 one-run MadEvent tasks of 203
-      processes, 70 workers of 32 cores on node-local disk, started 05:15, target about 1.5 h). Read lhe_parts status and
-      the workers'' logs; then plan once more into a new queue (--skip-claimed none once the old catalog_v4_default, pp13v4_rest,
-      pp13v4_ddxgg workers have ended) for runs they left short or failed and anything w3 left; three pools are held out pending
-      Joaquin''s call on runs of few events (pp13v4_uu_gguu, dsh_uu_gguu, dsh_uu_aguu)'
+    7: 'Collect the run-size probe (20 jobs FA-ccin2p3-39fcdce6 ..., recorded on the entry, 05:41, about 40 min): complete
+      runs of 1000 and 150 events on dsh_ub_bdwpz, dsh_dg_dguux, dsh_bb_bbgg and of 200 on dsh_epem_amupvmwm at 1000 GeV,
+      kept under $SCRATCH/lhe_probe_keep. Read the logs (yields: a small run that stops short is itself a finding), rerun
+      site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/short_run_bias.py measure, copy the JSON home,
+      read the size_<ask> comparisons (run level, Bonferroni over the size tests, detectable KS) against the complete-halves
+      control; redraw the figure, add the run-size result to par:v4_short_runs. Then the rebuild queue: lhe_parts plan recipes/catalog_v4_default_lhe.yaml
+      recipes/catalog_v4_ee_test.yaml recipes/catalog_v4_pp_parts.yaml --queue catalog_v4_complete --skip-claimed catalog_v4_w3
+      catalog_v4_default catalog_v4_w2 pp13v4_rest pp13v4_ddxgg (only the 56 complete_runs.json pools should be new; check
+      it), site pick, workers sized to about 1 h (2541 runs, mostly survey-bound at 4 to 13 min each)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3616,11 +3620,15 @@ entries:
       - 'step 1 not yet passed or a class fails it: keep waiting on step 1; a failing class is left out of the arm''s scoring
         and listed'
     7:
-      feeds: whether every catalog_v4 default-sampled and pp13v4 pool is assembled
+      feeds: whether the 56 catalog_v4 pools (52 assembled from runs that stopped short, the three held, dsh_ud_huuwm) are
+        rebuilt in complete small runs, and the answer to Joaquin's question whether runs of few events change the distribution
       if:
-      - 'every pool assembled but the three held: run lhe_probe mixcheck on all, then step 6 and the A/B design'
-      - 'tasks failed or pools short: list them with cause, re-size from their yields (gen_catalog_v4_default resize_short)
-        and plan a new queue'
+      - 'no size effect (every size test above the Bonferroni level, KS under the short-run effects 0.015 to 0.029): plan
+        and submit the catalog_v4_complete queue as committed @a73a07af, release the three held pools in it, report to Joaquin
+        as the answer to his question'
+      - 'a small size differs from complete large runs: that size is not used; lay the pools out in the smallest size that
+        agrees (edit complete_runs.json, regenerate the recipes), hold dsh_ud_huuwm (its runs of 1000 do not complete) and
+        report it'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
 - id: muon_test
