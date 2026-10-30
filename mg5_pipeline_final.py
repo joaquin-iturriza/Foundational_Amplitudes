@@ -557,7 +557,9 @@ def order_vector_from_diagrams(cfg, born_orders, o=None):
     without diagrams keeps `o`. Only the model's order features and the target read this: the pools' recipe_id leaves
     amp_orders out and keys on alphas_power, which stays the catalog's, so no stored pool or recipe id changes."""
     o = list(order_vector(cfg) if o is None else o)
-    if cfg.get("order") is not None or not born_orders:
+    # an lhe_pp pool (pp13_, pp13v4_, ee4_, dc_, dsh_, dE100_: MadEvent events of a catalog tree) carries its tree's
+    # table order explicitly but is that tree: it reads its diagrams like the tree (E3058)
+    if (cfg.get("order") is not None and cfg.get("kind") != "lhe_pp") or not born_orders:
         return o
     pref = 1 if (cfg.get("kind") == "virt" and cfg.get("alphas_prefactor")) else 0
     return [int(o[0]), int(o[1]), max(a for a, _ in born_orders) + pref, max(b for _, b in born_orders)]

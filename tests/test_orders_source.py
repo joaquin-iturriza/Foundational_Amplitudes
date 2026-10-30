@@ -121,6 +121,36 @@ def test_mixed_entry():
     print("[mixed] refused with the switch off (as before), alpha_s^2 alpha^0 with it on")
 
 
+def test_lhe_pp_entry_reads_its_sidecar():
+    """E3058: a pp13v4_ pool (kind lhe_pp, its tree's table order explicit) is that tree: its target and order
+    features come from its sidecar exactly as for its v4_ tree, where it was refused as mixed before."""
+    name, tree = "pp13v4_udx_adxgu", "v4_udx_adxgu"
+    assert mg.PROCESSES[name].get("kind") == "lhe_pp" and mg.PROCESSES[name].get("order") is not None
+    mom, als = _events(4, seed=2)
+    with tempfile.TemporaryDirectory() as d:
+        for n in (name, tree):
+            _sidecar(d, n, [(1, 3), (3, 1)])
+        pp = _stub(AmplitudeExperiment, name, d, True)
+        v4 = _stub(AmplitudeExperiment, tree, d, True)
+        assert np.array_equal(pp._physics_logF(name, mom, als), v4._physics_logF(tree, mom, als))
+        o = mg.order_vector(mg.PROCESSES[name])
+        assert pp._orders_from_diagrams([name], [o]) == v4._orders_from_diagrams([tree], [o])
+    print("[lhe_pp] pp13v4_udx_adxgu reads its sidecar: target and order features equal v4_udx_adxgu's")
+    # a table that the diagrams correct (massless-b Higgs: purely electroweak): features and target follow the tree
+    name, tree = "pp13v4_bb_bbh", "v4_bb_bbh"
+    mom, als = _events(3, seed=3)
+    with tempfile.TemporaryDirectory() as d:
+        for n in (name, tree):
+            _sidecar(d, n, [(0, 3)])
+        pp = _stub(AmplitudeExperiment, name, d, True)
+        v4 = _stub(AmplitudeExperiment, tree, d, True)
+        o = mg.order_vector(mg.PROCESSES[name])
+        f_pp, f_v4 = pp._orders_from_diagrams([name], [o]), v4._orders_from_diagrams([tree], [o])
+        assert f_pp == f_v4 and f_pp[0][2:] == [0, 3], (f_pp, f_v4)
+        assert np.array_equal(pp._physics_logF(name, mom, als), v4._physics_logF(tree, mom, als))
+    print("[lhe_pp] pp13v4_bb_bbh: features [.,.,0,3] and target equal v4_bb_bbh's where the table says", o)
+
+
 def test_frozen_stats_record_and_check():
     exp = AmplitudeExperiment.__new__(AmplitudeExperiment)
     exp.mom_mean, exp.mom_std, exp._amp_trafos_pp = [0.0], [1.0], None

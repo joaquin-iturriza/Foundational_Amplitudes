@@ -2441,7 +2441,10 @@ class AmplitudeExperiment(BaseExperiment):
             # before the diagrams were read (a mixed entry refused); recorded in the frozen stats
             # (_target_orders_source), so a run reusing a parent's statistics cannot switch it silently
             _from_diag = self._target_orders_source() != "table"
-            if _from_diag and pc.get("order") is None:
+            # an lhe_pp pool (pp13_, pp13v4_, ee4_, dc_, dsh_, dE100_: MadEvent events of a catalog tree) carries its tree's table order
+            # explicitly, but is that tree: its powers come from its sidecar like the tree's (catalog_coverage, E3058:
+            # the smoke refused pp13v4_udx_adxgu, mixed [0,0,3,3], whose sidecar was there but never read)
+            if _from_diag and (pc.get("order") is None or pc.get("kind") == "lhe_pp"):
                 bo = self._diagram_born_orders(name)
                 if bo is not None:
                     q, e = mg.target_monomial_from_diagrams(pc, bo)
@@ -2597,7 +2600,8 @@ class AmplitudeExperiment(BaseExperiment):
         for name, o in zip(names, orders):
             o = [int(x) for x in o]
             pc = mg.PROCESSES.get(name) or mg.PROCESSES.get(base.get(name, "")) or catalog_cfg_for_dataset(name)
-            if pc is None or pc.get("order") is not None or "nfinal" not in pc or len(o) != 4:
+            if pc is None or (pc.get("order") is not None and pc.get("kind") != "lhe_pp") or "nfinal" not in pc \
+                    or len(o) != 4:
                 out.append(o)
                 continue
             qd = self._diagram_born_orders(name)
