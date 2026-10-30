@@ -4345,6 +4345,21 @@ entries:
       correlated within runs, which overstates significance; (c) the gridpack residual the gridpack probe could not exclude
       (under half the old bias, par:v4_short_runs). Next check, CPU-cheap: per pool, whether its pp13v4 reuse pool''s sidecar
       shows short runs, and a run-level test where runs are known; dsh_udx_gwpwpwm first.'
+  - at: '2026-10-30T13:27:53+00:00'
+    text: 'Default-share pp run-size differences, per pool (tools/lhe_probe.py runlevel @d8c209e2 and runlevel-summary @f537f0e0
+      on analysis/catalog_v4/data/runlevel.json; run-level re-read @cdcae2cd): of the 51 pools, 14 are compared against catalog_v3
+      pp13_* reuse pools (other model, minimal QED order, catalog_v3 cards: same_physics false in the runsize pass; their
+      sidecars hold no per-run record), not pp13v4. Those 14 carry 9 of 42 tests under 0.05 (2.1 expected) and the three strongest:
+      dsh_udx_gwpwpwm sqrt(s_hat) p 3e-4, dsh_ddx_awpwm max|eta| 4e-4, dsh_gg_gggg sqrt(s_hat) 7e-4; the difference there
+      is the reference''s physics, not the run size. The 37 against pp13v4_* reuse pools: no reuse run short (29 pools from
+      one run of 14280 to 999601 events, 8 from 18 runs of 1000), so cause (a) is out; 9 of 111 event tests under 0.05 (5.55
+      expected, binomial tail 0.10), min p 0.0049, none under 0.05/111. Within-run correlation, cause (b), is out: Kruskal-Wallis
+      across runs under 0.05 in 7 of 111 on the dsh side and 0 of 24 on the multi-run reuse side, and on a known null (a dsh
+      pool''s first 18 runs against its other 48) the run-level p tracks the event p. Run-level test on the 8 multi-run reuse
+      pools: 2 of 24 under 0.05, both dsh_uu_duwpz (max|eta| 0.018, max pT 0.0045; reuse from 18 per-run-integrated runs of
+      1000). Row-to-run reconstruction from the pool shuffle checked on every dsh pool''s own train block: 500 of 500 rows
+      in their run''s part. Reading: the runsize flags are the catalog_v3 references'' physics plus chance; dsh_uu_duwpz alone
+      is consistent across features, at a level 111 tests give by chance about once. No rebuild follows.'
   handoff:
     state: '112 of 113 rebuilt pools assembled (catalog_v4_gridpack_last 12/12, 0 failed, queue removed); mixture check over
       the 112 passed (FA-ccin2p3-82e8c54a: 0 failing). ee4_epem_cgsxwm 3 TeV: the run-size probe passed no size (shares 0.49/0.79/0.89/0.91
