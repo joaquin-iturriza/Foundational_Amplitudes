@@ -4404,10 +4404,13 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: e384cbc6
+    commit: e23611f1
     paths:
     - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
       projects.toml and site_runends.py)
+    - 'switch-over D built on branch redesign-d (worktrees/wt-redesign-d, commits 1bb22b6c..e23611f1): tests/test_redesign_d.py
+      48/48; repo-reviewer passed the branch, its trunk backlog still blocks on ee4_epem_cgsxwm''s 4x gridpack; claudemd-keeper
+      v2 passed CLAUDE.md v2; the sitting: scratchpad D/sitting_D.sh with D.settings.diff'
   dead_ends: []
   asks: []
   step_why:
