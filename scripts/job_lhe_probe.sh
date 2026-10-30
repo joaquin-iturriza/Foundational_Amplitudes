@@ -70,9 +70,12 @@ if [ "$PROBE_SHARD" = ppcheck4 ]; then
     # standalone on the first 200 rows of each val pool against the stored label, 16 parts in parallel, and the summary
     R="$SCRATCH/ppcheck4"; mkdir -p "$R"; P=analysis/catalog_v4/pp_physics_check.py
     python $P built --set v4 | tee "$R/built.json"; echo
+    # the e+e- default test pools' diagram sidecars (the EE4 read's order features; none built yet), alongside
+    python tools/dump_diagrams.py --prefix ee4_ --skip-existing --workers 16 > "$R/ee4_diagrams.log" 2>&1 &
     for k in $(seq 0 15); do python $P eval --set v4 --n 200 --part $k --parts 16 > "$R/eval_$k.json" 2> "$R/eval_$k.log" & done
     wait
     python $P summary --set v4 --evals "$R/eval_*.json" --out "$R/pp13v4_physics_check.json" | sed 's/^/PPCHECK4_SUMMARY /'
+    tail -n 2 "$R/ee4_diagrams.log"; python tools/check_site_data.py recipes/catalog_v4_ee_test.yaml | sed 's/^/EE4_DATA /'
     echo "RUN_SUMMARY lhe_probe ppcheck4 rc=$?"; exit 0
 fi
 if [ "$PROBE_SHARD" = mixcheck ]; then
