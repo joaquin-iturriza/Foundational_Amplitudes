@@ -1702,7 +1702,7 @@ def cmd_where(a):
 
 
 def entry_status(d, st, events=None):
-    """[(entry id, 'MOVING'|'WAITING ON YOU'|'STALLED', text)] for each running or waiting_user entry, in exactly one
+    """[(entry id, 'MOVING'|'WAITING'|'WAITING ON YOU'|'STALLED', text)] for each running or waiting_user entry, in exactly one
     state, from live sources only: the run registry (job states), the owner's transcript, the entry's open ask and the
     open events. Never from a step's free-text note (a step_waits text is read only for the run ids it names)."""
     events = events_by_item() if events is None else events
@@ -1736,6 +1736,11 @@ def entry_status(d, st, events=None):
         if ended:
             ids = sorted({r for _k, w in ended for r in re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))})
             why.append("steps %s wait on runs that ended (%s)" % (", ".join(str(k) for k, _w in ended), ", ".join(ids)))
+        timed = [str(w) for _k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
+                 if w and not re.search(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))]
+        if timed and not evs and not ended:       # a wait that names no run (a day of clean running): not a stall
+            out.append((eid, "WAITING", "; ".join(timed)))
+            continue
         if not why:
             why.append("no step has a job" if not (e.get("step_waits") or {}) else
                        "its waits name no live run, and nothing is working")

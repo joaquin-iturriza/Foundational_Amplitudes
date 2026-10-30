@@ -77,3 +77,16 @@ def test_supervisor_stalled_event(tmp_path):
     finally:
         os.environ.clear()
         os.environ.update(old)
+
+
+def test_timed_wait_is_waiting(tmp_path):
+    """agent_redesign's step waits on a day of clean running (names no run), its owner reads as stopped in the scratch
+    world: WAITING, not STALLED; the supervisor and the gate ignore it."""
+    env = world(tmp_path)
+    out = subprocess.run([sys.executable, os.path.join(REPO, "tools", "plan.py"), "status"], env=env,
+                         capture_output=True, text=True).stdout
+    line = next(l for l in out.splitlines() if l.startswith("agent_redesign"))
+    assert " WAITING " in line and "STALLED" not in line, out
+    r = subprocess.run([sys.executable, os.path.join(REPO, ".claude", "hooks", "plan_check.py")], input="{}", env=env,
+                       capture_output=True, text=True)
+    assert "agent_redesign is STALLED" not in r.stderr
