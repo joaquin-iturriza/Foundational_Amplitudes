@@ -2289,9 +2289,6 @@ entries:
   - D188
   - D189
   next:
-    10: 'Validate the pp13v4 pools once the rebuild is assembled: every pp13v4 entry built in all 3 roles, pp_physics_check.py
-      taught the pp13v4_ names and without its b reshelling (the log ratio to catalog_v4''s standalone must be 0 on every
-      class); then redo the pp comparisons (compare_pp_trained, the density check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
     11: 'Submit the pure-default bound pair once the pp13v4 validation passes and the amended design has passed review (797
       swapped hadronic training classes, PP4 scored on the pp pools'' test split): sync once, scripts/job_catalog_v3_short.sh
       v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
@@ -4712,11 +4709,6 @@ entries:
     start: '2026-10-30T18:17:54+00:00'
     at: '2026-10-30T18:17:54+00:00'
   step_why:
-    10:
-      feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
-      if:
-      - 'all built and every ratio 0: redo the pp comparisons'
-      - 'an entry short, failed or a nonzero ratio: list it with its cause, fix it, rerun only that entry'
     11:
       feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
         mixture A/B the user asked for (2026-10-29)
