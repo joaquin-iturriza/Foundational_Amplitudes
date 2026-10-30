@@ -3478,6 +3478,42 @@ entries:
       pp, pp_mixed_train (only par:v4_vs_pp''s line naming this arm as not run); site decisions of 2026-10-29 (D171-D179:
       none bears on this comparison). Implementation note: tests/test_zero_shot_split.py does not exist yet and the diff is
       uncommitted; both must land before the submission.'
+  - at: '2026-10-30T04:33:52+00:00'
+    question: 'Rebuild every catalog_v4 MadEvent pool assembled from runs that stopped short of their target (they return
+      a biased sample) in runs that complete, release the three held pools (pp13v4_uu_gguu, dsh_uu_gguu, dsh_uu_aguu) the
+      same way, and re-lay dsh_ud_huuwm (its catalog_v4_w3 runs of 19154 events cannot complete): one CPU queue catalog_v4_complete,
+      56 pools, 2541 MadEvent runs of 150 to 1244 events (ee4 200), only runs that return every event they ask assembled (lhe.complete_runs,
+      in the pool identity); the biased pools are moved aside at assembly, nothing deleted.'
+    prior: 'Searched docs/results.tex (short, stop short, fail to reach target: none on MadEvent), plan show catalog_coverage
+      (evidence: lhe_probe runsize dsh_uu_aguu vs pp13v4_uu_aguu sqrt(s_hat) KS 0.022 p 7e-4; probe runs: pp13v4_uu_gguu 1000
+      of 1000 at 1000 events, 137 of 14280 at 14280; 166 of 169 pp default-share probe runs of 1000 complete; dsh_ud_huuwm
+      326, 468, 468 of 1000 and 47 of 1000 with second_refine_treshold 2, FA-ccin2p3-bdd2af1f), site decisions --project FA
+      (madevent, short, few events: none). This step''s own measurement (analysis/catalog_v4/short_run_bias.py @8f3e5bff on
+      4807 part files and 364 pools, 23 like-for-like groups, same banner physics): run-level permutation test short vs complete,
+      4 of 32 tests below Bonferroni (uu_aguu sqrt(s_hat), ub_bdwpz both variables, epem_amupvmwm cos theta*), 10 of 32 below
+      0.05; control complete halves 0 of 31 below Bonferroni, 1 of 31 below 0.05; complete runs of different sizes 0 of 15
+      event-level tests below Bonferroni. So stopping short biases; differs from prior work in that it replaces accept_short
+      layouts rather than sizing them.'
+    measure: 'Per pool: assembled with every block filled from complete runs only (sidecar lhe_run.runs_dropped_short lists
+      what was not used; recipe id carries runs: complete); tools/lhe_parts.py shortbuilt then lists none of the 56; short_run_bias.py
+      rerun with the new complete parts as reference for the deep-short groups.'
+    check: 'On existing data: short_run_bias.py separates short from complete runs where the control (complete halves of the
+      same group) does not (uu_aguu sqrt(s_hat) run-level p < 5e-4, its control p 0.96); the shortbuilt listing reads each
+      pool''s sidecar events per run against its layout''s asks and found 52 catalog_v4 pools from short runs; tests/test_lhe_parts.py
+      test_complete_runs: a short run''s events never reach the pool, a too-short set refuses before anything is moved, the
+      old pool is moved aside, earlier parts of the same runs adopted.'
+    fixed: Cards, generate lines, model, seeds (catalog seed 42, iseed rule), block sizes, labels, the e+e- energies; runs
+      of 1000 events (the probe-validated layout) except dsh_uu_aguu 1244 and dsh_uu_gguu 621 (their existing small layouts,
+      parts adopted), ee4 200 (their runs of 340 to 1233 stopped short at some energies), dsh_ud_huuwm 150 (its runs of 1000
+      return 33 to 47 percent).
+    control: The same pools' complete runs already made (adopted where the run size is unchanged); the complete-runs control
+      groups of short_run_bias.py.
+    seeds: The catalog's seed 42; each run's MadEvent iseed from lhe_runs (iseed + 7919 k); no seed changes except what the
+      layout's run count adds.
+    outcome: 'Yes (every pool assembles from complete runs): catalog_v4''s MadEvent pools carry no short-run bias; the w3
+      pools are then listed with shortbuilt and any built from short runs re-laid the same way. No (a pool''s complete runs
+      do not fill its blocks, e.g. dsh_ud_huuwm at 150 events): its assembly refuses before moving anything; the next step
+      raises its n_runs (parts adopted) or lowers its run size from the measured completion rate.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
