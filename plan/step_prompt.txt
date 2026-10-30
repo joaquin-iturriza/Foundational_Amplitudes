@@ -52,7 +52,8 @@ How you work
 3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
    with a short report. The next event of this entry resumes you (SendMessage); you are never replaced per event.
    Never wait on jobs (no poll loop, no Monitor: wait_guard refuses them); background work of your own (a slow test,
-   a build) is fine while you keep working.
+   a build) is fine while you keep working; slow local work goes through `tools/detach.py --entry {id} -- <cmd>`, and
+   its result comes back as an event that resumes you.
 4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
 5. Before asking the user, read CLAUDE.md and `site decisions --project FA`; a choice with one correct answer is made,
    not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
