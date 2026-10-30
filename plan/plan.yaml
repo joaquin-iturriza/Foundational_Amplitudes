@@ -5526,6 +5526,42 @@ entries:
       (D) success and rework-inclusive cost per model per cell, or undecidable with a matched-trial proposal; (C) the source
       table and the largest cuts. No: cost does not reproduce the meter; the gap per scope is reported and no percent per
       window is claimed; (B) then reports cost per block in dollars only.'
+    fix_at: '2026-10-30T23:57:14+00:00'
+    fix: '(2, calibration cannot discriminate as written) (a) The 2% step 5%->7% has an integer-rounding interval of [1,3]
+      points, i.e. -50%/+50%, not +-25%; an agreement test against it passes almost any cost-per-percent. The only constraining
+      checks are the 23% step (which defines the calibration) and the 5% since block start (+-10%). Fix: search every transcript
+      for every meter reading Joaquin typed (all sessions, not just the three on 10-30) and, if still under three independent
+      constraints, propose collecting a few more readings within one block (state how many and when) before any percent is
+      claimed. (b) The 5-hour block rule is asserted, not checked. Reconstructing over all calls on 10-30 with the exact-first-call
+      rule gives block starts 09:50:57, 14:50:58, 19:51:24 UTC; with the start floored to the hour they are 09:00, 14:00,
+      19:00, and then the 28% reading at 19:37:53 falls in a new block with about 40 min of calls, flipping the calibration.
+      Fix: compute both conventions and let the readings choose; say which reading pairs lie in the same block under each.
+      (c) Models present without a price in the table: claude-sonnet-5 (810 calls in this session''s subagents alone; 28 agent
+      files), claude-opus-5 (17 agent files), claude-haiku-4-5 (3). Listing them apart drops them from per-window cost; price
+      them (the same skill table''s legacy rows) or bound their share per block. (3/4, small-model comparison) Size bands
+      from calls and dollar cost terciles are outcome-dependent and confounded by model price (Sonnet at half Opus price falls
+      in lower bands); define size from what is known before the task (type, brief length, entry kind) or at least tokens,
+      not dollars. ''No correction within 48 h'' is censored for agents of 10-30/31 (the run is at most ~1 day later): exclude
+      tasks with under 48 h of follow-up or report them apart. State the decision rule before the run: the success-rate gap
+      and rework-inclusive cost ratio that mean ''let small models take this type'', with the binomial interval at the n per
+      cell (at n=10, p=0.8 the sd is ~0.13), and the hand-check agreement (of 10) under which the classifier is not used.
+      Counts I read: agent files by dominant model across ~/.claude/projects: Opus 5.5 591, Sonnet 5.5 120, Sonnet 5 28, Opus
+      5 17, Haiku 5.5 5, Haiku 4.5 3, so Haiku is undecidable from the start, say so. (5, prior) ''site decisions: none on
+      models, tokens or usage windows'' is wrong: D138 (2026-10-26, ''I believe for mechanical steps we can manage with opus
+      but at low reasoning'') is the standing decision on agent models, and D173-D175 record the old setup almost running
+      out of weekly tokens (evidence for the old-setup window fill). docs/results.tex also has the ponytail token test (around
+      line 13294) with re-read-token run-to-run spread, name it. Terms I searched: token, 5-hour/five hour, usage window,
+      sonnet, haiku, small model, context breakdown, usage meter, effort, in results.tex, plan show and site decisions. (7,
+      comparison named by a decision) D138 names Opus at low effort as the arm for mechanical steps; the small-model comparison
+      must include Opus-low-effort tasks as the reference for mechanical types (say how effort is read per agent) or say why
+      not. (6, scope) Joaquin''s 23:09 and 23:36 messages ask for useless calls and tokens per completed task compared across
+      main-alone, old step agents and redesign, and say the existing numbers do not add up (same useless calls and tokens
+      per task despite CLAUDE.md 30k->3k). The design drops useless calls entirely and the per-window measure does not normalise
+      by work done. Either re-measure wasted calls and cost per completed result under the new pipeline (all transcript folders,
+      per-model cost), or state why usage_report.json''s counts stand; and state for the context breakdown what result would
+      explain the ''CLAUDE.md cut did not lower tokens per task'' puzzle (yes) and what would not (no). Passing: check 1 (old
+      weighting side by side through the same pipeline is a matched control), readings and their timestamps confirmed in the
+      main transcript (16:54:24.965Z 5%, 16:59:04Z 7%, 19:37:53Z 28%).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
