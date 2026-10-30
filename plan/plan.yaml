@@ -135,12 +135,9 @@ entries:
   - D182
   - D195
   next:
-    5: 'Third and fourth seeds (44, 45) of the sign extension and its control on catalog_v4 (D195, ''Okay, yes to both'';
-      arms v4_dimensionless_muon_seed3/_seed4, v4_dimensionless_muon_more_signed_seed3/_seed4, commit 0e0cf15e; target 3.5
-      h for 4 jobs). Submitted: control seed 44 FA-ccin2p3-67ca3313, control seed 45 FA-ccin2p3-e3506d57. Still to submit
-      (the site gate''s 60-min GPU-h window refused them, counting the two cancelled TR jobs'' 8 h limits): the arm at seeds
-      44 and 45, via NOSYNC=1 SYNC_FIRST=1 TIME=04:00:00 bash scripts/launch_cc_only.sh v3_prep_explore 2.0 ''<note>'' scripts/job_catalog_v3_short.sh
-      v4_dimensionless_muon_more_signed_seed3 (and _seed4). When all four end: collect, extend analysis/catalog_v4/signext_compare.py
+    5: 'Third and fourth seeds (44, 45) of the sign extension and its control on catalog_v4 (D195; commit 0e0cf15e; target
+      3.5 h for 4 jobs), all running on CC: control seed 44 FA-ccin2p3-67ca3313, seed 45 FA-ccin2p3-e3506d57; extension seed
+      44 FA-ccin2p3-99259cd1, seed 45 FA-ccin2p3-30990343. When all four end: collect, extend analysis/catalog_v4/signext_compare.py
       to four seeds, read by the passed design''s rule'
     6: 'TR reads of the control pair for the shape gap running on CC: seed 42 FA-ccin2p3-e37d7ec2 (REREAD=FA-ccin2p3-339ec100),
       seed 43 FA-ccin2p3-3fe9f0b1 (REREAD=FA-ccin2p3-380842ed), 1.5 h limits. When both end: collect (tools/collect_run.py
@@ -1298,8 +1295,7 @@ entries:
       if:
       - 'four-seed sign test p<0.05, median lower and each seed lower on most pools: propose the sign extension for the full
         pretraining''s recipe with its tree-axis MSE cost beside it'
-      - 'still short of the rule or median not lower: the sign extension recorded as not resolved at this compute and dropped
-        from the recipe'
+      - 'still short of the rule or median not lower: recorded as not resolved at this compute and dropped from the recipe'
     6:
       feeds: 'the user''s shape priority (D178): transfer gap or the network''s floor at this compute'
       if:
