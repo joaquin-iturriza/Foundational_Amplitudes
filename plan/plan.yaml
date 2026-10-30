@@ -4088,6 +4088,15 @@ entries:
       PASS size: nothing laid out; reported to Joaquin with each size''s share, distance and floor (DIFFERS: the small runs
       give other events; UNDERPOWERED: more runs or the size''s distance stated as bounded). If the short runs of 200 differ
       from the reference, that is reported alongside (the reference is a selected sample).'
+    passed_at: '2026-10-30T11:16:05+00:00'
+    reviewer: 'Re-check after FIX. One change: run size on the one fixed gridpack (grid04), disjoint seed ranges, same cards,
+      cores and timeout. Measure: the run-level test on cos theta* moved 0.018 with run size on e+e- (short_run_bias_size.json
+      ladder/200: ks_binned 0.01797, p_runs 0.0025; halves control 0.0079, p 0.19). Power: reference 768 runs of 200 at a
+      share of 0.44 is about 68000 events; event-level floor at 0.05/3 is 0.0099 to 0.0114 for 25600 to 38400 events per size,
+      below the 0.018 effect. Outcome: PASS, DIFFERS and UNDERPOWERED stated per size, with the layout action and the no-PASS
+      report. Selection check of short runs against the reference included (code 94729faf, short_vs_ref and shares from logs).
+      Searched: cgsxwm, run size, gridpack, smaller runs, runs of 200 in results.tex, the entry and site decisions D187-D189;
+      no earlier run-size probe on a fixed gridpack. CPU only, 0 GPU-h.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
