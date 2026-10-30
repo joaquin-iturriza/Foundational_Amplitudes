@@ -3544,6 +3544,39 @@ entries:
       runs vs pooled complete runs dominated by 22400-event runs, run-level p 5e-4 and 1.5e-3; 4 of 32 run-level tests below
       Bonferroni against 0 of 31 in the complete-halves control) and the assembly mechanics (test_complete_runs, the 56-pool
       list).'
+  - at: '2026-10-30T04:38:32+00:00'
+    question: 'Before any pool is rebuilt in small runs: does a MadEvent run that completes give the same events at the small
+      run sizes the rebuild would use (1000, 150 per run pp; 200 e+e-) as complete runs of many events? This answers the open
+      question the three held pools wait on (do runs of few events change the distribution) and checks the second change the
+      rebuild makes; the first (runs that stop short bias their events) is measured (analysis/catalog_v4/short_run_bias.py
+      @a73a07af: short vs complete, run level, 4 of 32 tests below Bonferroni, ub_bdwpz against complete 22400-event runs
+      p 5e-4 and 1.5e-3; complete-halves control 0 of 31).'
+    prior: 'Searched docs/results.tex (short, run size, few events, MadEvent: none), plan show catalog_coverage (lhe_probe
+      runsize: dsh_uu_aguu runs of 1244 vs pp13v4_uu_aguu runs of 14280 that stopped short, KS 0.022 p 7e-4: confounds size
+      with stopping; the probe: 166 of 169 pp runs of 1000 complete, dsh_ud_huuwm 33 to 47 percent at 1000), site decisions
+      --project FA (none). short_run_bias.py''s own size control had 15 event-level tests with 0 below Bonferroni but its
+      small side was 2800+ pp events or one e+e- run of 340 to 408, detectable KS 0.018 to 0.07, too coarse (design review
+      FIX of 2026-10-30). This design adds complete runs at the exact small sizes on groups whose large runs complete.'
+    measure: 'short_run_bias.py measure: for each group, complete runs of ask s (s in 1000, 150 pp; 200 e+e-) against every
+      complete run of at least 5000 events of the same physics (banner key), run-level permutation test of the binned KS distance
+      on sqrt(s_hat) and cos theta* of the first final, with the event-level detectable KS stated (target below 0.015); the
+      complete-halves control alongside.'
+    check: 'On existing data the same measure separates stopped-short from complete runs where its control does not (ub_bdwpz
+      sqrt(s_hat): run-level p 1.5e-3 short vs complete 22400-event runs, its complete halves p 0.9995), so it sees a KS of
+      0.015 at these run counts; the probe runs'' banners give the same physics key as the parts'' (run card less nevents,
+      iseed, run_tag; tested on the existing groups, where dsh_ and pp13v4_ runs of one class share a key).'
+    fixed: 'Cards, generate lines, model, process; the probe''s one-core run as the part jobs run it (same card patches),
+      seeds distinct per run (lhe_iseed of 9999 + seed); groups: ub_bdwpz (66 complete runs of 2800 to 22400), dg_dguux (34
+      complete, 40282 and 367500), bb_bbgg (31 complete, 31774 and 168980), e+e- amupvmwm at 1000 GeV.'
+    control: The complete large runs already made in those groups; the complete-halves split of the small runs.
+    seeds: Per pp group 30 runs of 1000 and 60 runs of 150 (30000 and 9000 events, event-level detectable KS about 0.009 and
+      0.015); e+e- 40 runs of 200 (8000 events); 310 runs, probe seeds 1 to 60.
+    outcome: 'Yes (no size effect: run-level p above the Bonferroni level on every size test, and the small runs'' KS to the
+      large under the short-vs-complete effects 0.015 to 0.029): the rebuild queue of the 56 complete-run pools (recipes committed
+      @a73a07af) goes, and the three held pools are released in it, reported to Joaquin as the answer to his question. No
+      (a small size differs from complete large runs): that size is not used; pools go in the smallest size that agrees (1000
+      if only 150 or 200 differ), dsh_ud_huuwm, whose runs of 1000 do not complete, is held with the measurement reported,
+      and the e+e- pools take runs of the agreeing size.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
