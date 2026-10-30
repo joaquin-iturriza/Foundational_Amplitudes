@@ -598,7 +598,7 @@ def _built_by(site, recipe, deps):
 def _site_data_ok(site, recipe):
     """(ok, what the site said): tools/check_site_data.py <recipe> on the site; passes are remembered DATA_OK_S."""
     import subprocess
-    key = "%s:%s" % (site, recipe)
+    key = "%s:%s:alphas" % (site, recipe)
     try:
         cache = json.load(open(DATA_CACHE))
     except (OSError, ValueError):
@@ -606,7 +606,7 @@ def _site_data_ok(site, recipe):
     if time.time() - cache.get(key, 0) < DATA_OK_S:
         return True, "passed within %d h" % (DATA_OK_S // 3600)
     try:
-        p = subprocess.run(["site", "run", site, "FA", "--", "python", "tools/check_site_data.py", recipe],
+        p = subprocess.run(["site", "run", site, "FA", "--", "python", "tools/check_site_data.py", "--alphas", recipe],
                            capture_output=True, text=True, timeout=100)
     except (OSError, subprocess.TimeoutExpired) as e:
         return False, "the read on %s did not finish (%s)" % (site, type(e).__name__)

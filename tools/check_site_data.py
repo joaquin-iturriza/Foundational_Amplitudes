@@ -8,6 +8,8 @@ those features are silently off for that process). Also that the env has the pac
 a run and a sweep trial import. Prints one line per recipe and exits non-zero if anything is missing.
     python tools/check_site_data.py [--list] [recipes/<spec>.yaml ...]     (default: the catalog recipe)
 --list prints every pool not prebuilt, one `MISSING <process>/<role>` line each, after the recipe's line.
+--alphas also requires each pool whose recipe says per_event_alphas true to carry <pool>.alphas.npy (what a run with
+data.target_physics_orders reads; submit_guard passes it), and lists the ones without (`NOALPHAS <process>/<role>`).
 --paths prints every pool's files instead (the .npy and its .recipe.json, `POOL <path>`, prebuilt or not), and
 every sidecar found (`SIDECAR <path>`), deduplicated over the recipes, for sizing and `site copy`.
 Used by sites/setup.sh --verify, so `site pick` only picks a site that can run the catalog."""
@@ -20,8 +22,9 @@ SEED = 42                      # data.seed of every catalog run
 
 ok = True
 LIST = "--list" in sys.argv[1:]
+ALPHAS = "--alphas" in sys.argv[1:]
 PATHS = "--paths" in sys.argv[1:]
-ARGS = [a for a in sys.argv[1:] if a not in ("--list", "--paths")]
+ARGS = [a for a in sys.argv[1:] if a not in ("--list", "--paths", "--alphas")]
 seen = set()
 # what a training run imports, and what every DyHPO sweep's run_trial imports on top; lloca.mup exists only
 # in the mup-parametrization build (requirements.txt), not in the PyPI release
@@ -38,7 +41,7 @@ for spec in ARGS or DEFAULT:
     # entry (both are part of a pool's recipe id)
     mg.register_recipe_processes(procs, default_sampling=doc.get("sampling") if isinstance(doc, dict) else None)
     n_key = {"train": "n_train", "val": "n_val", "test": "n_test"}
-    uncached, nosidecar = [], []
+    uncached, nosidecar, noalphas = [], [], []
     for p in procs:
         for role in ("train", "val", "test"):
             rec = mg.variable_energy_recipe(p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]),
@@ -50,6 +53,8 @@ for spec in ARGS or DEFAULT:
                         seen.add(f); print(f"POOL {f}")
             if not datagen._is_cached(path, mg.recipe_id(rec)):
                 uncached.append(f"{p['name']}/{role}")
+            elif ALPHAS and rec.get("per_event_alphas") is True and not os.path.exists(path[:-len(".npy")] + ".alphas.npy"):
+                noalphas.append(f"{p['name']}/{role}")
         cars = [f for f in (os.path.join(ROOT, "data", "diagrams", f"{c}.diagrams.json")
                             for c in (p["name"], p.get("base")) if c) if os.path.exists(f)]
         if PATHS:
@@ -61,12 +66,16 @@ for spec in ARGS or DEFAULT:
     line = f"{os.path.basename(spec)}: {len(procs)} processes"
     if uncached:
         line += f", {len(uncached)} pools not prebuilt (e.g. {', '.join(uncached[:3])})"; ok = False
+    if noalphas:
+        line += f", {len(noalphas)} pools without per-event alpha_s (e.g. {', '.join(noalphas[:3])})"; ok = False
     if nosidecar:
         line += f", {len(nosidecar)} without a diagram sidecar (e.g. {', '.join(nosidecar[:3])})"; ok = False
-    print(line + ("" if (uncached or nosidecar) else ", pools prebuilt, sidecars present"))
+    print(line + ("" if (uncached or nosidecar or noalphas) else ", pools prebuilt, sidecars present"))
     if LIST:
         for u in uncached:
             print(f"MISSING {u}")
+        for u in noalphas:
+            print(f"NOALPHAS {u}")
 if PATHS:   # what is on this site of the listed files: count and bytes
     have = [f for f in seen if os.path.exists(f)]
     print(f"PRESENT {len(have)} of {len(seen)} files, {sum(os.path.getsize(f) for f in have) / 1e9:.2f} GB")

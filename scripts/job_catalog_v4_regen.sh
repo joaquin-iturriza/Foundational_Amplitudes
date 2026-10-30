@@ -56,6 +56,9 @@ build() {   # build(<tag> <recipe>...): shard k of the recipes, then prebuild it
     rm -f "$CERTF"
     python prebuild_recipes.py "$SPEC" --workers "$W" --skip-cert-failed "$CERTF"
     local R=$?
+    # each tree pool's per-event alpha_s (<pool>.alphas.npy), which a run with data.target_physics_orders reads; the
+    # prebuild does not write it (E3099: the mixture arms failed in init_data on the smixd50/25 pools without it)
+    if [ $R -eq 0 ]; then python tools/write_own_alphas.py "$SPEC" | grep -E "refused|DONE" || R=1; fi
     echo "V4REGEN_PART_WALL_S $(( $(date +%s) - T1 )) $*"
     if [ -s "$CERTF" ]; then
         echo "V4REGEN_CERT_SKIPPED $(grep -vc "^#" "$CERTF") entries (#quarantined lines: pools of theirs moved aside):"
