@@ -3950,6 +3950,9 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
+    '1': 'the gridpack rebuild (step 9: pp13v4_uu_gguu is in its 56) and Joaquin''s answer on the 57 further pools (pp13v4_dd_ddgg,
+      pp13v4_ddx_ddxgg, pp13v4_uux_gguux are among them); the CC disk has had 87G or more free since the morning, so the cleanup
+      wait itself is over'
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
