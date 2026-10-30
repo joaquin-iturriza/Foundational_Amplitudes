@@ -26,7 +26,7 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
 The queue holds  todo/<prio>__<process>__<k>.json  claimed/<same>.<jobid>  done/  failed/  assembled/<process>.
 Every pool is the one prebuild_recipes.py would build for the same spec and seed (same recipe ids).
 """
-import argparse, glob, json, math, os, shutil, socket, statistics, subprocess, sys, time, traceback
+import argparse, glob, json, math, os, re, shutil, socket, statistics, subprocess, sys, time, traceback
 from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -352,6 +352,26 @@ def _spec(D, name):
     return [(r, p) for r, p in s["items"]]
 
 
+class StaleLayout(RuntimeError):
+    """The worker's process table (mg.PROCESSES, read from the recipes when it started) gives another run layout than
+    the queue's spec: the queue was planned again under newer recipes while this worker ran."""
+
+
+STALE = "StaleLayout"
+
+
+def layout_current(name, items):
+    """Refuses (StaleLayout) when the recipes this process would write now differ from the spec's in their events'
+    identity (lhe.n_runs, energy_runs, run_events, cards...): lhe_part_paths takes its identity from the spec and its
+    runs from mg.PROCESSES, so a worker started before a replan would build or assemble the old layout's run k under
+    the new name (another energy at the same path, or an index past the old runs)."""
+    r = items[0][0]
+    now = mg.lhe_pp_recipe(name, r["sqrts_min"], r["sqrts_max"], r["n_events"], role=r["role"], seed=r["seed"])
+    if mg._lhe_events_id(now) != mg._lhe_events_id(r):
+        raise StaleLayout(f"{name}: this worker's recipes give another layout than the queue's spec (planned again "
+                          f"since it started); task returned to todo")
+
+
 def _run_task(q, t):
     """Pool worker: the part, then the assembly if this part completed the process. Never raises."""
     D = _dirs(q)
@@ -359,6 +379,7 @@ def _run_task(q, t):
     t0 = time.time()
     try:
         items = _spec(D, name)
+        layout_current(name, items)
         try:
             mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
             part, run = mg.lhe_part_paths(name, items)[t["k"]]
@@ -415,7 +436,7 @@ def cmd_work(a):
     end = time.time() + a.hours * 3600
     print(f"host {socket.gethostname()} job {os.environ.get('SLURM_JOB_ID')} workers {a.workers} "
           f"requeued {_requeue_stale(D)} stale claims", flush=True)
-    n_ok = n_fail = 0
+    n_ok = n_fail = n_stale = 0
     with ProcessPoolExecutor(max_workers=a.workers) as ex:
         live = {}
         while True:
@@ -431,6 +452,16 @@ def cmd_work(a):
             for fut in done:
                 t = live.pop(fut)
                 _, msg, err = fut.result()
+                if err is not None and err.startswith(STALE):
+                    # planned again under newer recipes: the task goes back, this worker claims nothing more
+                    try:
+                        os.rename(t["_claimed"], os.path.join(D["todo"], t["_file"]))
+                    except OSError:
+                        pass
+                    n_stale += 1
+                    end = 0.0
+                    print(f"  [STALE] {t['process']} part {t['k']}: {err.splitlines()[0]}", flush=True)
+                    continue
                 dst = D["done"] if err is None else D["failed"]
                 try:
                     os.rename(t["_claimed"], os.path.join(dst, t["_file"]))
@@ -445,11 +476,11 @@ def cmd_work(a):
                         f.write(err)
                     print(f"  [FAIL] {t['process']} part {t['k']}: {err.splitlines()[0]}", flush=True)
         # assemblies nobody did (their lock holder died or the last part ran in a job that lost the lock race)
-        for name in (_assemble_pending(D, a.queue) if end - time.time() > ASSEMBLE_S else []):
+        for name in (_assemble_pending(D, a.queue) if end - time.time() > ASSEMBLE_S and not n_stale else []):
             t, msg, err = _run_task(a.queue, {"process": name, "k": 0})
             print(f"  [ASSEMBLE] {name}: {msg or err.splitlines()[0]}", flush=True)
-    print(f"LHE_PARTS_DONE ok {n_ok} failed {n_fail} left {len(os.listdir(D['todo']))}", flush=True)
-    sys.exit(1 if n_fail else 0)
+    print(f"LHE_PARTS_DONE ok {n_ok} failed {n_fail} stale {n_stale} left {len(os.listdir(D['todo']))}", flush=True)
+    sys.exit(1 if n_fail or n_stale else 0)
 
 
 def cmd_gc(a):
@@ -584,6 +615,85 @@ def cmd_shares(a):
     print(json.dumps(out, sort_keys=True))
 
 
+def part_energy_ok(path, run):
+    """An e+e- part (its run has ebeam1) holds events at its run's energy: the beams' energies sum to 2 x ebeam1."""
+    if "ebeam1" not in run[2]:
+        return True
+    with np.load(path) as z:
+        m = z["mom"]
+    want = 2.0 * float(run[2]["ebeam1"])
+    return len(m) == 0 or abs(float(np.median(m[:, 0, 0] + m[:, 1, 0])) - want) <= 1e-6 * want
+
+
+def cmd_requeue(a):
+    """Tasks a stale worker lost (StaleLayout): for every process not assembled, each run whose part file is missing
+    and has no task in todo/ or claimed/ gets its latest task from failed/ (only when its error's first line matches
+    --match) or done/ (done but its part missing: built under another layout) moved back to todo/, its .err moved to
+    failed_requeued/. --energies: an e+e- part at another energy than its run's is moved to
+    <parts>/<process>/wrong_energy/, its pool's assembled marker to assembled_superseded/, and its run requeued.
+    Nothing deleted; prints what it does, does it with --apply."""
+    D = _dirs(a.queue)
+    pat = re.compile(a.match) if a.match else None
+    live = {f.split("__", 1)[1].split(".json")[0] for d in ("todo", "claimed") for f in os.listdir(D[d])}
+    tasks = {}
+    for d in ("done", "failed"):
+        for f in os.listdir(D[d]):
+            if f.endswith(".json") and f.count("__") == 2:
+                tag = f.split("__", 1)[1][:-5]
+                p = os.path.join(D[d], f)
+                if tag not in tasks or os.path.getmtime(p) > os.path.getmtime(tasks[tag]):
+                    tasks[tag] = p
+    stamp = time.strftime("%Y%m%d_%H%M%S")
+    out = {"requeued_failed": 0, "requeued_done": 0, "wrong_energy": [], "unassembled": [], "no_task": 0,
+           "failed_not_matching": 0}
+    moves = []
+    for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
+        name = os.path.basename(sf)[:-5]
+        parts = mg.lhe_part_paths(name, _spec(D, name))
+        wrong = []
+        if a.energies:
+            for k, (part, run) in enumerate(parts):
+                if os.path.exists(part) and not part_energy_ok(part, run):
+                    wrong.append(k)
+                    dst = os.path.join(os.path.dirname(part), "wrong_energy", f"{os.path.basename(part)}.{stamp}")
+                    moves.append((part, dst))
+                    out["wrong_energy"].append(os.path.basename(part))
+        marker = os.path.join(D["assembled"], name)
+        if wrong and os.path.exists(marker):
+            moves.append((marker, os.path.join(a.queue, "assembled_superseded", f"{name}.{stamp}")))
+            out["unassembled"].append(name)
+        elif os.path.exists(marker):
+            continue
+        for k, (part, _) in enumerate(parts):
+            tag = f"{name}__{k:03d}"
+            if (os.path.exists(part) and k not in wrong) or tag in live:
+                continue
+            src = tasks.get(tag)
+            if src is None:
+                out["no_task"] += 1
+                continue
+            if os.path.basename(os.path.dirname(src)) == "failed":
+                try:
+                    first = (open(src + ".err").read().splitlines() or [""])[0]
+                except OSError:
+                    first = ""
+                if pat is None or not pat.search(first):
+                    out["failed_not_matching"] += 1
+                    continue
+                if os.path.exists(src + ".err"):
+                    moves.append((src + ".err", os.path.join(a.queue, "failed_requeued", os.path.basename(src) + f".err.{stamp}")))
+                out["requeued_failed"] += 1
+            else:
+                out["requeued_done"] += 1
+            moves.append((src, os.path.join(D["todo"], os.path.basename(src))))
+    if a.apply:
+        for s, d in moves:
+            os.makedirs(os.path.dirname(d), exist_ok=True)
+            os.rename(s, d)
+    out["applied"] = bool(a.apply)
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -598,9 +708,12 @@ def main():
     g = sub.add_parser("gc"); g.add_argument("--queue", required=True); g.add_argument("--dry-run", action="store_true")
     y = sub.add_parser("yields"); y.add_argument("--queue", required=True)
     sh = sub.add_parser("shares"); sh.add_argument("--queue", required=True); sh.add_argument("--requeue", action="store_true")
+    rq = sub.add_parser("requeue"); rq.add_argument("--queue", required=True)
+    rq.add_argument("--match", default=None, help="regex on a failed task's error (first line); none: no failed task")
+    rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     a = ap.parse_args()
     {"plan": cmd_plan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
-     "shares": cmd_shares}[a.cmd](a)
+     "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 
 if __name__ == "__main__":

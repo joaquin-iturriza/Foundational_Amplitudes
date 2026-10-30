@@ -453,6 +453,75 @@ def test_ee_energy_runs_and_equal_shares():
     print("[e+e- energy runs + equal shares + shares CLI] ok")
 
 
+def test_stale_worker_returns_tasks():
+    """A worker started under an older layout than the queue's plan (the recipes changed and the queue was planned
+    again while it ran) builds nothing: each task it claims goes back to todo (never failed), it claims no more and
+    assembles nothing; a worker on the current layout then builds them. requeue moves a task a stale worker failed
+    (by --match) or a done one whose part is missing back to todo, and an e+e- part at another energy aside."""
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, lhe_parts.ASSEMBLE_S, sys.argv)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d, short=False)
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
+            lhe_parts.ASSEMBLE_S = 0
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            q = os.path.join(d, "queue")
+            D = lhe_parts._dirs(q)
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            _register(n_runs=3, run_events=400)
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates, cores=[]))
+            assert len(os.listdir(D["todo"])) == 3
+            _register(n_runs=2, run_events=400)               # this worker's recipes: the layout before the replan
+            try:
+                lhe_parts.cmd_work(argparse.Namespace(queue=q, workers=1, hours=1.0))
+            except SystemExit as e:
+                assert e.code == 1, e.code
+            assert len(os.listdir(D["todo"])) == 3 and not os.listdir(D["failed"]) and not os.listdir(D["done"])
+            assert not os.listdir(D["assembled"])
+            assert not any(os.path.exists(p) for p, _ in mg.lhe_part_paths(NAME, lhe_parts._spec(D, NAME)))
+            # requeue: a task failed by a stale worker before this guard (IndexError), one done with its part missing
+            _register(n_runs=3, run_events=400)
+            fs = sorted(os.listdir(D["todo"]))
+            os.rename(os.path.join(D["todo"], fs[0]), os.path.join(D["failed"], fs[0]))
+            open(os.path.join(D["failed"], fs[0] + ".err"), "w").write("IndexError: list index out of range\n")
+            os.rename(os.path.join(D["todo"], fs[1]), os.path.join(D["done"], fs[1]))
+            sys.argv = ["lhe_parts.py", "requeue", "--queue", q, "--match", "^IndexError"]
+            lhe_parts.main()                                  # dry run: nothing moved
+            assert len(os.listdir(D["todo"])) == 1
+            sys.argv += ["--apply"]
+            lhe_parts.main()
+            assert len(os.listdir(D["todo"])) == 3 and not os.listdir(D["failed"]) and not os.listdir(D["done"])
+            assert os.listdir(os.path.join(q, "failed_requeued"))
+            try:
+                lhe_parts.cmd_work(argparse.Namespace(queue=q, workers=2, hours=1.0))
+            except SystemExit as e:
+                assert e.code == 0, e.code
+            assert len(os.listdir(D["done"])) == 3 and os.listdir(D["assembled"]) == [NAME]
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, lhe_parts.ASSEMBLE_S, sys.argv) = saved
+        for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
+            os.environ.pop(v, None)
+        mg.PROCESSES.pop(NAME, None)
+    # an e+e- part at another energy than its run's
+    _register(n_runs=1, run_events=None, accept_short=True)
+    mg.PROCESSES[NAME]["lhe"]["energies"] = [91.1876, 500.0, 3000.0]
+    runs = mg.lhe_runs(NAME, 100, 1020)
+    with tempfile.TemporaryDirectory() as d:
+        p = os.path.join(d, "x.npz")
+        m = np.zeros((5, K, 4)); m[:, 0, 0] = m[:, 1, 0] = 250.0
+        np.savez(p, mom=m)
+        assert lhe_parts.part_energy_ok(p, runs[1]) and not lhe_parts.part_energy_ok(p, runs[2])
+    mg.PROCESSES.pop(NAME, None)
+    print("[stale worker + requeue] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -461,3 +530,4 @@ if __name__ == "__main__":
     test_accept_short_and_adopt()
     test_tidy_and_gc()
     test_ee_energy_runs_and_equal_shares()
+    test_stale_worker_returns_tasks()
