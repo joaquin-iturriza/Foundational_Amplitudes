@@ -2269,6 +2269,8 @@ entries:
       from the 12 logs, arm A''s channel logs read, then sizecheck --ref-keep $SCRATCH/lhe_probe_keep_runsize --ref-ask 200
       per passing arm (code branch cgsxwm-armcheck 2dfda6be, merge on repo-reviewer PASS). The mixcheck over the 112 assembled
       passed (0 failing).'
+    13: 'Re-read par:v4_short_runs'' run-level tests with the fixed run_perm (cdcae2cd): short_run_bias measure, sizecheck
+      and the gridpack check rerun on their saved inputs (CPU, CC), the numbers and verdicts compared with the written ones'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -4316,6 +4318,12 @@ entries:
       - 'PARTIAL: one more probe with the larger budget'
       - 'NO EFFECT or BLOCKED: arm A logs say why; integration-side settings (sde_strategy 2, hard_survey 1, a new gridpack)
         next; Joaquin only if none works'
+    13:
+      feeds: whether the written short-run and run-size verdicts (stopping short biases; runs of 1000 differ from runs of
+        many) stand under a level-holding run-level test
+      if:
+      - 'every verdict unchanged: note the re-read, numbers updated with their src lines'
+      - 'a verdict changes: rewrite the paragraph and its hand-off item, and say which later decision leaned on it'
   owner:
     agent: a3cbd2e82774954b6
     state: working
