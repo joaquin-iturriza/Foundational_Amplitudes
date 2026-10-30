@@ -3577,6 +3577,19 @@ entries:
       (a small size differs from complete large runs): that size is not used; pools go in the smallest size that agrees (1000
       if only 150 or 200 differ), dsh_ud_huuwm, whose runs of 1000 do not complete, is held with the measurement reported,
       and the e+e- pools take runs of the agreeing size.'
+    passed_at: '2026-10-30T04:39:32+00:00'
+    reviewer: 'Run-size measurement only (complete runs of 1000 and 150 events on ub_bdwpz, dg_dguux, bb_bbgg; 200 events
+      on e+e- amupvmwm; against complete runs of at least 5000 events of the same banner key, run-level permutation, complete-halves
+      control), the 56-pool queue and the three held pools wait on it. One change: run size only, same cards, physics key,
+      probe as the part jobs run it. Measure shown: short_run_bias.json ub_bdwpz sqrt(s_hat) short (8 runs, 7278 events) vs
+      complete 22400-event runs KS 0.0146 run-level p 1.5e-3, its complete halves p 0.9995; the planned 30x1000 / 60x150 /
+      40x200 runs give event-level detectable KS about 0.009 / 0.015 against short-vs-complete effects of 0.015-0.029, and
+      the Bonferroni level over about 13 tests (~0.004) sits above the 1.5e-3 seen at fewer runs. Outcome stated for both
+      branches, including small sizes that differ. Files committed at a73a07af. Searched: short, stop short, short run, few
+      events, run size, runsize, madevent, complete_runs, accept_short, gguu, aguu, lhe in docs/results.tex, plan show and
+      site decisions: only the confounded lhe_probe runsize comparison, which the design names. Before submitting: confirm
+      the e+e- reference runs (7 complete runs of 13057 in key 97a0b0d5) are at the 1000 GeV the probes use, and that no probe
+      iseed (lhe_iseed(name, 9999+s), hashed into 20000) equals a reference run''s iseed.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
