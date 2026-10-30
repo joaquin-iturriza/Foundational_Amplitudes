@@ -5117,3 +5117,24 @@ entries:
       cannot follow from one 64x8x16 attention call, which cannot see the 12 GB MIG memory limit already hit there; the yes
       branch should record GPU type and memory and say which queued jobs fit (or apply the set_gpu_mem.py floor), with the
       memory fit of the actual jobs checked separately.'
+  - at: '2026-10-30T19:53:33+00:00'
+    question: 'Can lxplus''s HTCondor GPU nodes take the queued catalog_coverage/v3_prep_explore pretrainings and reads now
+      that catalog_v4 data is copied there: does the env activate on a GPU node, which GPU (type, memory) is given, does the
+      xformers attention kernel run, and does the site data check pass?'
+    prior: 'plan dead end 2026-10-29: env rebuilt on lxplus but verify refused for missing pools (then catalog_v3 default;
+      default moved to catalog_v4_train.yaml in 8a2f803e); docs/results.tex: lxplus ran FA GPU training through October (tp3_star
+      trials 6-7.7 h on its V100, highmult/synth32k/replaylowd cells, Z+5g OOM on 12 GB MIG slices -> sweep/set_gpu_mem.py
+      memory floor, TF32 rescoring gap of lxplus-trained checkpoints); no decision on lxplus GPU use. New now: catalog_v4
+      pools, sidecars and the two control checkpoints copied from CC (5866e762 --paths sizing)'
+    measure: '(a) sites/setup.sh --verify on lxplus (tools/check_site_data.py on catalog_v4_train.yaml) exits 0; (b) the probe
+      log: torch version, cuda=True, the GPU name (MIG profile gives memory), ''xformers ... attention ok''; (c) queue wait
+      from submission to start'
+    check: 'no run of this probe has been seen on any site (site runs lists none); the verify was seen to move with data:
+      it reported 3459 pools not prebuilt on lxplus today and ''pools prebuilt'' on CC for the same recipe'
+    fixed: scripts/job_probe.sh unchanged, one GPU, 10 min limit, trunk 5866e762
+    control: CC-IN2P3, where the same verify passes and the queued jobs are
+    seeds: none (one deterministic infrastructure job)
+    outcome: 'yes: verify exits 0, cuda True, attention ok -> lxplus is offered to the owners with its GPU type and memory;
+      a 12 GB MIG slice means the set_gpu_mem.py floor applies and the jobs'' memory fit at batch 16384 is checked separately
+      before any move (not claimed here); no: the failing line names the gap (env, driver/kernel, data) and it is fixed before
+      any training job goes there'
