@@ -3433,6 +3433,15 @@ entries:
     - 8
     answered_at: '2026-10-30T09:35:57.217000+00:00'
     decision: D188
+  - ask: 'e+e- -> c sbar g W- (ee4_epem_cgsxwm) at 3 TeV: from one gridpack, even at four times the precision, only 7 of 16
+      runs of 200 events complete; the short ones return 9 to 55 events. Generate its 3 TeV block in smaller runs from the
+      same gridpack (checked against its complete runs first), or drop this pool''s 3 TeV energy?'
+    at: '2026-10-30T10:50:16+00:00'
+    searched: the generation rule (2x limit) blocks more runs; the gridpack design fixed the run sizes (200 e+e-), and dropping
+      an energy changes the catalog's energy rule [D130]; D187 covers rebuilding the pool, not which of these two
+    blocks: ee4_epem_cgsxwm only; the other 112 pools and the mixcheck of those proceed
+    blocks_steps: &id001
+    - 9
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -4070,6 +4079,14 @@ entries:
     units: null
     start: '2026-10-30T10:44:15+00:00'
     at: '2026-10-30T10:44:15+00:00'
+  ask: 'e+e- -> c sbar g W- (ee4_epem_cgsxwm) at 3 TeV: from one gridpack, even at four times the precision, only 7 of 16
+    runs of 200 events complete; the short ones return 9 to 55 events. Generate its 3 TeV block in smaller runs from the same
+    gridpack (checked against its complete runs first), or drop this pool''s 3 TeV energy?'
+  waiting_since: '2026-10-30T10:50:16+00:00'
+  searched: the generation rule (2x limit) blocks more runs; the gridpack design fixed the run sizes (200 e+e-), and dropping
+    an energy changes the catalog's energy rule [D130]; D187 covers rebuilding the pool, not which of these two
+  blocks: ee4_epem_cgsxwm only; the other 112 pools and the mixcheck of those proceed
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
