@@ -239,27 +239,42 @@ def dispatcher():
     # PreToolUse: the identical command refused twice in a row (its own tool call in the transcript between) is a loop;
     # another call between is not; another session is not the same loop
     cmd = ("Bash", {"command": "bash .claude/hooks/review_backlog.sh advance repo-reviewer"})
+    # a tool-call guard refusing the identical retry is doing its job: it stays on, the refusal stands, and the first
+    # repeat opens one incident (the real md_guard.sh, a Write of a new .md file)
+    b = Box()
+    shutil.copy(os.path.join(HOOKS, "md_guard.sh"), b.hooks)
+    write = ("Write", {"file_path": os.path.join(b.repo, "NOTES_NEW.md"), "content": "x"})
+    rcs = []
+    for _ in range(3):
+        b.tool_use(*write)
+        rcs.append(b.run("md_guard.sh", "PreToolUse", write)[0])
+    inc = b.incidents()
+    scenario("A3: a retried md_guard refusal stays refused (three times), is never disabled, and opens one incident "
+             "with one ALERT", rcs == [2, 2, 2] and not b.disabled() and len(inc) == 1 and inc[0].get("kept")
+             and inc[0]["hook"] == "md_guard.sh" and len(b.site_calls()) == 1 and "hook-repeat:md_guard.sh"
+             in b.site_calls()[0], (rcs, b.disabled(), inc, b.site_calls()))
     b = Box()
     b.say("lock guard: only repo-reviewer advances its pillar")
     b.tool_use(*cmd)
     rc1, _ = b.run("lock_guard.py", "PreToolUse", cmd)
     b.tool_use(*cmd)
     rc2, out2 = b.run("lock_guard.py", "PreToolUse", cmd)
-    scenario("A3: a PreToolUse refusal repeated on the identical command twice in a row: disabled, the call goes "
-             "through", rc1 == 2 and rc2 == 0 and "lock_guard.py" in b.disabled(), (rc1, rc2, out2))
+    scenario("A3: the same for lock_guard: the identical retry is refused again, the guard stays on",
+             rc1 == 2 and rc2 == 2 and not b.disabled() and len(b.incidents()) == 1, (rc1, rc2, out2))
     b = Box()
     b.say("lock guard: refused")
     b.run("lock_guard.py", "PreToolUse", cmd)
     b.tool_use("Read", {"file_path": "/x"})
     b.tool_use(*cmd)
     rc2, _ = b.run("lock_guard.py", "PreToolUse", cmd)
-    scenario("A3: the same PreToolUse refusal with another tool call between is no loop", rc2 == 2 and not b.disabled(),
-             b.disabled())
+    scenario("A3: the same PreToolUse refusal with another tool call between is no repeat (no incident)",
+             rc2 == 2 and not b.disabled() and not b.incidents(), b.incidents())
     b = Box()
     b.say("lock guard: refused")
     b.run("lock_guard.py", "PreToolUse", cmd)
     rc2, _ = b.run("lock_guard.py", "PreToolUse", ("Bash", {"command": "other"}))
-    scenario("A3: a PreToolUse refusal of a different command is no loop", rc2 == 2 and not b.disabled(), b.disabled())
+    scenario("A3: a PreToolUse refusal of a different command is no repeat (no incident)",
+             rc2 == 2 and not b.disabled() and not b.incidents(), b.incidents())
     b = Box()
     b.say("PLAN CHECK: same")
     b.run(session="s1")

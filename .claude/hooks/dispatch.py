@@ -8,10 +8,14 @@ stderr and exit code through unchanged, except:
   - a hook listed in <hooks dir>/disabled.json (by its name, or its name with these arguments) is not run: exit 0 and
     a one-line note on stderr;
   - a hook script that does not exist: exit 0 and a note (a missing guard never blocks a turn);
-  - a loop: the same refusal (hook, event, sha1 of its message, and for a tool call the same tool and input) twice in a
-    row in one session or subagent, with no other tool call in between and the same state (git HEAD, sha1 of
-    plan/plan.yaml, the project's open event ids). The hook is disabled through the incident record (disabled.json,
-    incidents.jsonl, an ALERT event) with why = the repeated message, and the call goes through (exit 0).
+  - a loop: the same Stop (or SubagentStop) refusal (hook, sha1 of its message) twice in a row in one session or
+    subagent, with no tool call in between and the same state (git HEAD, sha1 of plan/plan.yaml, the project's open
+    event ids): the turn cannot end. The hook is disabled through the incident record (disabled.json, incidents.jsonl,
+    an ALERT event) with why = the repeated message, and the turn ends (exit 0);
+  - a tool-call guard (PreToolUse, PostToolUse...) refusing the identical call twice in a row the same way is the guard
+    doing its job, not a loop (the agent can do something else; letting it through would make every guard
+    bypassable by asking twice): the first repeat is recorded as an incident with one ALERT, so a misfiring guard
+    reaches the user, the guard stays on and the refusal stands.
 A refusal is exit 2, or a JSON stdout with "decision": "block" or a PreToolUse permissionDecision "deny". "No other tool
 call in between" is read from the transcript (the subagent's own when the input names one) from where it ended at the
 previous refusal: every tool call written since must be the refused call itself. Without session_id or
@@ -88,6 +92,19 @@ def disabled(hooks_dir=HERE):
     return _load(os.path.join(hooks_dir, "disabled.json"), {})
 
 
+def _alert(hook, msg, key, project_dir):
+    proj = project_name(project_dir or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
+    if not proj:
+        return None
+    try:
+        r = subprocess.run([SITE, "event", "--project", proj, "--kind", "ALERT", "--key", key, "--msg", msg],
+                           capture_output=True, text=True, timeout=60)
+        return (r.stdout.strip() or r.stderr.strip())[:200] if r.returncode == 0 else \
+            "site event failed (exit %d): %s" % (r.returncode, (r.stderr or r.stdout).strip()[:200])
+    except Exception as e:
+        return "site event failed: %s" % e
+
+
 def disable(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_dir=None):
     """hook into disabled.json, one line into incidents.jsonl, one ALERT event. A hook already disabled: nothing new
     (no second event), returns False."""
@@ -97,23 +114,26 @@ def disable(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_
         if hook in d:
             return False
         rec = {"hook": hook, "why": why, "time": _now(), "session": session, "last_refusal": last_refusal}
-        proj = project_name(project_dir or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
-        msg = "hook %s disabled: %s (resolve: python3 tools/hook_incident.py --resolve '%s')" % (hook, why[:300], hook)
-        ev = None
-        if proj:
-            try:
-                r = subprocess.run([SITE, "event", "--project", proj, "--kind", "ALERT", "--key", "hook:" + hook,
-                                    "--msg", msg], capture_output=True, text=True, timeout=60)
-                ev = (r.stdout.strip() or r.stderr.strip())[:200] if r.returncode == 0 else \
-                    "site event failed (exit %d): %s" % (r.returncode, (r.stderr or r.stdout).strip()[:200])
-            except Exception as e:
-                ev = "site event failed: %s" % e
-        rec["event"] = ev
+        rec["event"] = _alert(hook, "hook %s disabled: %s (resolve: python3 tools/hook_incident.py --resolve '%s')"
+                              % (hook, why[:300], hook), "hook:" + hook, project_dir)
         d[hook] = {"why": why, "time": rec["time"], "session": session}
         _save(path, d)
         with open(os.path.join(hooks_dir, "incidents.jsonl"), "a") as f:
             f.write(json.dumps(rec, sort_keys=True) + "\n")
         return True
+
+
+def report(hook, why, hooks_dir=HERE, session=None, last_refusal=None, project_dir=None):
+    """a tool-call guard that refused the same call twice: one line into incidents.jsonl and one ALERT (a misfiring
+    guard reaches the user), the guard stays on and keeps refusing."""
+    path = os.path.join(hooks_dir, "disabled.json")
+    with _Lock(path):
+        rec = {"hook": hook, "why": why, "time": _now(), "session": session, "last_refusal": last_refusal,
+               "kept": True}
+        rec["event"] = _alert(hook, "hook %s refused the same call twice (it stays on): %s" % (hook, why[:300]),
+                              "hook-repeat:" + hook, project_dir)
+        with open(os.path.join(hooks_dir, "incidents.jsonl"), "a") as f:
+            f.write(json.dumps(rec, sort_keys=True) + "\n")
 
 
 def resolve(hook, hooks_dir=HERE, note=None):
@@ -226,7 +246,8 @@ def world(cwd):
 
 
 def check_loop(hook, inp, msg, state_path, cwd):
-    """record this refusal; True when it repeats the previous one of the same hook in the same session or agent."""
+    """record this refusal; "new" when it repeats the previous one of the same hook in the same session or agent for
+    the first time, "again" for a further repeat, False otherwise."""
     sess, tpath = inp.get("session_id"), transcript_of(inp)
     if not sess or not tpath:
         return False
@@ -244,12 +265,13 @@ def check_loop(hook, inp, msg, state_path, cwd):
             end, calls = (os.path.getsize(tpath) if os.path.exists(tpath) else 0), []
         loop = bool(prev and prev["fp"] == fp and prev["world"] == w
                     and all(tool is not None and tuple(c) == tool for c in calls))
-        st[key] = {"fp": fp, "offset": end, "world": w, "time": _now()}
+        seen = bool(loop and prev.get("reported"))
+        st[key] = {"fp": fp, "offset": end, "world": w, "time": _now(), "reported": loop}
         if len(st) > 500:                                        # keep the newest
             for k in sorted(st, key=lambda k: st[k].get("time", ""))[:len(st) - 500]:
                 st.pop(k)
         _save(state_path, st)
-    return loop
+    return ("again" if seen else "new") if loop else False
 
 
 def command_for(path, args):
@@ -289,8 +311,13 @@ def main(argv):
     return r.returncode
 
 
+STOP_EVENTS = ("Stop", "SubagentStop")
+
+
 def loop_through(spec, raw, r):
-    """True when this refusal repeats the previous one (check_loop): the hook is disabled and the call goes through."""
+    """True when the call goes through: a Stop (or SubagentStop) refusal that repeats the previous one (check_loop) is
+    a turn that cannot end, so the hook is disabled and the turn ends. A tool-call guard's repeat is the guard doing
+    its job (the agent can do something else): it is recorded once as an incident and the refusal stands."""
     msg = refusal(r.returncode, r.stdout.decode("utf-8", "replace"), r.stderr.decode("utf-8", "replace"))
     try:
         inp = json.loads(raw or b"{}")
@@ -300,11 +327,17 @@ def loop_through(spec, raw, r):
         return False
     state = os.environ.get("DISPATCH_STATE") or os.path.join(HERE, ".dispatch_state.json")
     cwd = inp.get("cwd") or os.getcwd()
-    if not check_loop(spec, inp, msg, state, cwd):
+    loop = check_loop(spec, inp, msg, state, cwd)
+    if not loop:
         return False
     why = "the same refusal twice with nothing done between: " + re.sub(r"\s+", " ", msg)[:400]
-    disable(spec, why, HERE, session=inp.get("session_id"), last_refusal=msg[:2000],
-            project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or cwd)
+    kw = dict(session=inp.get("session_id"), last_refusal=msg[:2000],
+              project_dir=os.environ.get("CLAUDE_PROJECT_DIR") or cwd)
+    if (inp.get("hook_event_name") or "") not in STOP_EVENTS:
+        if loop == "new":
+            report(spec, why, HERE, **kw)
+        return False
+    disable(spec, why, HERE, **kw)
     sys.stderr.write("dispatch: %s refused the same thing twice with nothing done between; it is disabled and an "
                      "incident is open (python3 tools/hook_incident.py --list)\n" % spec)
     return True
