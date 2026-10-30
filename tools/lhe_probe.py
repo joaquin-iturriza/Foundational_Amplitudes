@@ -19,7 +19,12 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             multiplicity): runs, timeouts, median and minimum yield, median kept
                                             fraction, median seconds per kept event, median MG5 output seconds, peak
                                             run-directory size (median, max); variants (--patch) apart
-    kept LOG... --out F.json                the default-share runs' kept fractions per process and e+e- energy
+    kept LOG... --out F.json [--yields-out Y.json]   the default-share runs' kept fractions per process and e+e-
+                                            energy; with --yields-out each probed process's yield too
+    mixcheck --queue Q...                   every assembled default-share pool read as the arms' mixture reads it
+    runsize --queue Q... [--max-run N] [--min-events M]   default-share pp parts from runs of at most N events
+                                            against the reuse pool's events (runs of 10k+), KS on sqrt(s_hat), max |eta|,
+                                            max pT
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
 import argparse, glob, json, os, re, shutil, signal, socket, subprocess, sys, time
@@ -252,12 +257,17 @@ def cmd_kept(a):
     """{process: {kept, by_energy: {E: kept}}} of the default-share (dsh_) runs in probe logs: the fraction of a run's
     events its pool keeps, per e+e- collider energy (2 x ebeam1 of the run's patches), the mean over the runs of one
     energy; read by recipes/gen_catalog_v4_default.py (accept_margin)."""
-    acc = {}
+    acc, ys = {}, {}
     for f in a.logs:
         for line in open(f):
             if "PROBE_JSON " not in line:
                 continue
             r = json.loads(line.split("PROBE_JSON ", 1)[1])
+            # the yield at SMALL_RUN events per run (recipes/gen_catalog_v4_default.py reads it as that); a run that
+            # returned nothing is left out (read as no measurement)
+            if (r.get("yield") and int(r.get("events_asked", 0)) == a.small_run and not r.get("extra_patches")
+                    and not r.get("timeout") and "ebeam1" not in (r.get("patches") or {})):
+                ys.setdefault(r["process"], []).append(float(r["yield"]))
             if not r["process"].startswith("dsh_") or r.get("kept") is None or r.get("extra_patches"):
                 continue
             E = 2.0 * float(r["patches"]["ebeam1"]) if "ebeam1" in (r.get("patches") or {}) else None
@@ -270,8 +280,85 @@ def cmd_kept(a):
                   **({"by_energy": e} if e else {})}
     with open(a.out, "w") as f:
         json.dump(out, f, indent=1, sort_keys=True)
+    if a.yields_out:          # the events a probe run returned over those it asked, per process (mean over its runs)
+        with open(a.yields_out, "w") as f:
+            json.dump({n: round(sum(v) / len(v), 4) for n, v in sorted(ys.items())}, f, indent=1)
     low = {n: v["kept"] for n, v in out.items() if v["kept"] < 1.0 / 1.1}
     print(json.dumps({"processes": len(out), "kept_below_1_over_1.1": low}))
+
+
+def cmd_mixcheck(a):
+    """Every assembled default-share pool of the queues read as the arms' mixture reads it (default_share_momenta, the
+    largest arm's rows of each role, the class's window and cuts): ok, or the rows it is short. One JSON object."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("gdef", os.path.join(ROOT, "recipes", "gen_catalog_v4_default.py"))
+    g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+    out = {}
+    for q in _queues(a.queue):
+        D = lp._dirs(q)
+        for name in sorted(os.listdir(D["assembled"])):
+            if not name.startswith("dsh_"):
+                continue
+            acc = accept_of(name)
+            for role, k in (("train", "n_train"), ("val", "n_val"), ("test", "n_test")):
+                need = int(round(g.F_MAX * g.SIZES[k]))
+                try:
+                    mg.default_share_momenta(name, role, g.SEED, (0, need), accept=acc)
+                except Exception as e:
+                    out.setdefault(name, {})[role] = str(e)[:240]
+    print("MIXCHECK_JSON " + json.dumps({"failing": out, "n_failing": len(out)}), flush=True)
+
+
+def _sqrt_shat(P):
+    q = P[:, 0] + P[:, 1]
+    return np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None))
+
+
+def cmd_runsize(a):
+    """Whether MadEvent runs of few events give the events runs of many give: for each default-share pp pool whose runs
+    ask at most --max-run events and whose parts hold at least --min-events, its parts' events against its reuse pool's
+    (pp13v4 / pp13, the same generate line, model and cards, runs of 10k+ events): two-sample Kolmogorov-Smirnov on
+    sqrt(s_hat), on the largest |eta| of the finals and on the largest final pT, all in the lab frame as generated."""
+    from scipy.stats import ks_2samp
+    import datagen
+    out = {}
+    for q in _queues(a.queue):
+        D = lp._dirs(q)
+        for sf in sorted(glob.glob(os.path.join(D["specs"], "dsh_*.json"))):
+            name = os.path.basename(sf)[:-5]
+            cfg = mg.PROCESSES[name]
+            per = int(cfg["lhe"].get("run_events") or 0)
+            if not per or per > a.max_run or cfg["lhe"].get("energies"):
+                continue
+            ms = []
+            for p, _ in mg.lhe_part_paths(name, lp._spec(D, name)):
+                try:
+                    with np.load(p) as z:
+                        ms.append(np.asarray(z["mom"]))
+                except (FileNotFoundError, OSError, KeyError, ValueError):
+                    pass
+            if not ms or sum(len(m) for m in ms) < a.min_events:
+                continue
+            reuse = cfg.get("reuse")
+            refs = []
+            for nm, rec, path in mg.default_share_pools(name, "train", 42)[:1]:
+                if nm == reuse and os.path.exists(path):
+                    x = np.load(path, mmap_mode="r")
+                    k = int(mg.PROCESSES[nm]["nfinal"]) + 2
+                    refs.append(np.asarray(x[:, :4 * k], dtype=np.float64).reshape(len(x), k, 4))
+            if not refs:
+                continue
+            A, B = np.concatenate(ms), refs[0]
+            feat = {"sqrt_shat": _sqrt_shat,
+                    "max_abs_eta": lambda P: np.abs(np.arcsinh(P[:, 2:, 3] / np.clip(np.hypot(P[:, 2:, 1], P[:, 2:, 2]),
+                                                                                    1e-9, None))).max(1),
+                    "max_pt": lambda P: np.hypot(P[:, 2:, 1], P[:, 2:, 2]).max(1)}
+            r = {"run_events": per, "n_small": len(A), "reuse": reuse, "n_reuse": len(B)}
+            for f, fn in feat.items():
+                t = ks_2samp(fn(A), fn(B))
+                r[f] = {"ks": round(float(t.statistic), 4), "p": float(t.pvalue)}
+            out[name] = r
+    print("RUNSIZE_JSON " + json.dumps(out), flush=True)
 
 
 def cmd_node(a):
@@ -301,10 +388,15 @@ def main():
     s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     sub.add_parser("node")
+    s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
+    s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)
+    s.add_argument("--max-run", type=int, default=2000); s.add_argument("--min-events", type=int, default=5000)
     s = sub.add_parser("summary"); s.add_argument("logs", nargs="+")
     s = sub.add_parser("kept"); s.add_argument("logs", nargs="+"); s.add_argument("--out", required=True)
+    s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
+    s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize}[a.cmd](a)
 
 
 if __name__ == "__main__":

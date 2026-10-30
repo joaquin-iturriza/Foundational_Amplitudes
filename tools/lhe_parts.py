@@ -127,23 +127,28 @@ def cmd_plan(a):
 
 
 def _adopt(D, name, its):
-    """Hard-link the part files of a process's previous plan (Q/specs) to its new names when the new layout only adds
-    runs (lhe.n_runs raised, nothing else of the recipes changed, no lhe.energies): run k < the old n_runs has the same
-    run name, iseed and events, so the same MadEvent run. Nothing is deleted. Returns the parts linked."""
+    """Hard-link the part files of a process's previous plan (Q/specs) to its new names when the new layout changes only
+    the number of runs (lhe.n_runs raised or cut; with lhe.run_events unchanged, also the margin; no lhe.energies): run
+    k below both counts has the same run name, iseed and events, so the same MadEvent run. Nothing is deleted. Returns
+    the parts linked."""
     sf = os.path.join(D["specs"], name + ".json")
     if not os.path.exists(sf):
         return 0
     old = [r for r, _ in _spec(D, name)]
     new = [r for r, _ in its]
-    strip = lambda r: {**r, "lhe": {k: v for k, v in r["lhe"].items() if k != "n_runs"}}
+    # n_runs may go up (more runs) or down (the leading runs made already hold the blocks); with lhe.run_events the
+    # events each run asks are fixed by it, so n_requested (margin) may change too; anything else is another layout
+    fixed_ev = bool(new[0]["lhe"].get("run_events")) and new[0]["lhe"].get("run_events") == old[0]["lhe"].get("run_events")
+    drop = ("n_runs", "n_requested") if fixed_ev else ("n_runs",)
+    strip = lambda r: {**r, "lhe": {k: v for k, v in r["lhe"].items() if k not in drop and k != "block"}}
     if len(old) != len(new) or any(strip(a) != strip(b) for a, b in zip(old, new)) or new[0]["lhe"].get("energies"):
         return 0
     o_n, n_n = int(old[0]["lhe"].get("n_runs", 1)), int(new[0]["lhe"].get("n_runs", 1))
     o_id, n_id = mg._lhe_events_id(old[0]), mg._lhe_events_id(new[0])
-    if o_id == n_id or n_n <= o_n:
+    if o_id == n_id or n_n == o_n and not fixed_ev:
         return 0
     n = 0
-    for k, (part, run) in enumerate(mg.lhe_part_paths(name, its)[:o_n]):
+    for k, (part, run) in enumerate(mg.lhe_part_paths(name, its)[:min(o_n, n_n)]):
         src = os.path.join(os.path.dirname(part), os.path.basename(part).replace(f"{name}_{n_id}_", f"{name}_{o_id}_", 1))
         if os.path.exists(src) and not os.path.exists(part):
             os.link(src, part)

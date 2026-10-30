@@ -20,6 +20,11 @@ if [ "${PROBE_SHARD:?}" = parts ]; then
     python tools/lhe_probe.py parts --queue ${PROBE_QUEUES:?} --out "$SCRATCH/lhe_probe/parts_${SLURM_JOB_ID}.json" ${PROBE_MATCH:+--match "$PROBE_MATCH"}
     echo "RUN_SUMMARY lhe_probe parts rc=$?"; exit 0
 fi
+if [ "$PROBE_SHARD" = mixcheck ]; then
+    python tools/lhe_probe.py mixcheck --queue ${PROBE_QUEUES:?}
+    python tools/lhe_probe.py runsize --queue ${PROBE_QUEUES:?}
+    echo "RUN_SUMMARY lhe_probe mixcheck rc=$?"; exit 0
+fi
 if [ "$PROBE_SHARD" = list ]; then
     # explicit runs PROBE_LIST: "process,events,seed[,key=value...]" separated by spaces (a seed written s@E: the
     # e+e- collider energy E) (a run-card variant against

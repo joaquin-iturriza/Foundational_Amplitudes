@@ -47,6 +47,9 @@ ACCEPT_MARGIN = 0.10      # extra default events per role for those outside the 
 # over one MadEvent run of 1000 events per energy; KEPT_SAFETY open, unsourced)
 KEPT = os.path.join(ROOT, "analysis", "catalog_v4", "data", "dsh_kept.json")
 KEPT_SAFETY = 1.03
+ASSEMBLED = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_assembled.json")
+MIXFAIL = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_mixcheck_failing.json")
+PROBE_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields.json")
 EE_ENERGIES = (91.1876, 240.0, 365.0, 500.0, 1000.0, 3000.0)   # GeV (open: the user's call)
 EE_CARDS = "recipes/catalog_v4_ee"
 PP_CARDS = "recipes/catalog_v4_pp"
@@ -178,6 +181,52 @@ def energy_runs(lhe, y, energies_then):
     return lhe
 
 
+# A pool whose runs return under Y_KEEP of the events they ask at its run size: MadEvent skips its second refine when the
+# cross section is stable and then stops short of the target ("fail to reach target"), the more so the more events a
+# run asks; at SMALL_RUN events a run returned all it asked in the probe (tools/lhe_probe.py, 2026-10-30: 166 of 169 pp
+# default-share runs of 1000 events, pp13v4_uu_gguu 1000 of 1000 in 751 s against 137 of 14280 in 3684 s), so such a
+# pool is laid out again in runs of SMALL_RUN events, its earlier parts not used. Both values open, unsourced.
+SMALL_RUN = 1000
+Y_KEEP = 0.3
+
+
+def prefix_runs(y, need):
+    """The fewest leading runs whose parts (all made) hold `need` events, or None."""
+    s = 0
+    for k, g in enumerate(y["got"]):
+        if g is None:
+            return None
+        s += g
+        if s >= need:
+            return k + 1
+    return None
+
+
+def resize_short(lhe, y, need, y_small=1.0):
+    """A pp pool not yet assembled whose runs came back short (in place; y: events asked and returned per run, in run
+    order): its runs' events counted against the blocks' need. When the leading runs already made hold them, n_runs is
+    cut to those (lhe_parts plan links their parts to the new names); else, at a mean yield of at least Y_KEEP, more runs
+    of the same size for what is missing (STALL_SHARE of the mean per run), the parts made kept; below it, runs of
+    SMALL_RUN events at the yield y_small measured at that size. Returns 'covered', 'more' or 'small'."""
+    per = int(y["asked"][0])
+    now = int(lhe.get("run_events") or 0)
+    assert not now or now == per, f"yields measured at {per} events per run, the layout asks {now}"
+    n = prefix_runs(y, need)
+    lhe["accept_short"] = True
+    if n:
+        lhe["n_runs"] = n
+        return "covered"
+    r = _yield_ratio(y)
+    if r and r >= Y_KEEP:
+        k0 = next((k for k, g in enumerate(y["got"]) if g is None), len(y["got"]))
+        have = sum(y["got"][:k0])
+        lhe["n_runs"] = k0 + int(math.ceil((need - have) / (STALL_SHARE * r * per)))
+        return "more"
+    lhe["run_events"] = SMALL_RUN
+    lhe["n_runs"] = int(math.ceil(need / (STALL_SHARE * y_small * SMALL_RUN)))
+    return "small"
+
+
 def short_runs(mg, lhe, y):
     """pp pool with short runs (in place, after run_layout): runs of the size asked before, as many as STALL_SHARE of
     the measured mean per run needs for the events asked, never fewer than before."""
@@ -205,6 +254,14 @@ def main():
     yields = json.load(open(YIELDS))
     shares = json.load(open(EE_SHARES)) if os.path.exists(EE_SHARES) else {}
     kept = json.load(open(KEPT)) if os.path.exists(KEPT) else {}
+    # pools assembled (tools/lhe_parts.py status): their layout is never changed (ASSEMBLED, from the queues); the
+    # yield at SMALL_RUN events per process from the probe (PROBE_YIELDS, tools/lhe_probe.py summary of its runs)
+    assembled = set(json.load(open(ASSEMBLED))) if os.path.exists(ASSEMBLED) else set()
+    probe_yield = json.load(open(PROBE_YIELDS)) if os.path.exists(PROBE_YIELDS) else {}
+    mixfail = set(json.load(open(MIXFAIL))) if os.path.exists(MIXFAIL) else set()
+    resized = {}
+    _pf = os.path.join(HERE, "catalog_v4_default_processes.yaml")
+    prev = (yaml.safe_load(open(_pf)) or {}).get("processes", {}) if os.path.exists(_pf) else {}
 
     def ee_short(mg, lhe, name, energies_then):
         """Equal shares kept: short_margin for a pool assembled with them (identity unchanged), else energy_runs."""
@@ -270,7 +327,9 @@ def main():
         reuse = pp_of.get(n) or ee_of[n]
         rl = mg.lhe_layout(P[reuse])
         name = "dsh_" + n[len("v4_"):]
-        am = accept_margin(kept, name, P[reuse]["lhe"].get("energies"))
+        # an assembled pool keeps its sizes unless the mixture cannot read it (MIXFAIL: tools/lhe_probe.py mixcheck)
+        am = (accept_margin(kept, name, P[reuse]["lhe"].get("energies"))
+              if name not in assembled or name in mixfail else ACCEPT_MARGIN)
         need = {r: int(math.ceil(F_MAX * SIZES[k] * (1.0 + am))) for r, k in (("train", "n_train"), ("val", "n_val"),
                                                                  ("test", "n_test"))}
         new = {r: max(0, need[r] - (rl[r][1] - rl[r][0])) for r in need}
@@ -302,13 +361,19 @@ def main():
         if "_then" in lhe:
             energy_runs(lhe, yields.get(name), lhe.pop("_then"))
         if not lhe.get("energies"):
-            short_runs(mg, lhe, yields.get(name))
+            if name in assembled or name not in yields or _yield_ratio(yields[name]) is None:
+                short_runs(mg, lhe, yields.get(name))
+            else:
+                resized[name] = resize_short(lhe, yields[name], sum(int(lhe[k]) for k in SIZES),
+                                             probe_yield.get(name, 1.0))
         lhe["parts"] = True        # one-run part jobs (tools/lhe_parts.py), in the pool identity
         e = lhe_entry(mg, n, P[n], mg.V4_MODEL, None)
         e.update(lhe=lhe, parent=n, reuse=reuse, split="train", test_group="catalog_v4 default share")
         # pp13v4 standalones carry the class's generate line, model and card: reuse their compiled backend
         if reuse.startswith(("pp13v4_", "ee4_")):
             e["standalone_of"] = reuse
+        if name in assembled and name not in mixfail and name in prev:
+            e = prev[name]                 # an assembled pool keeps the layout it was built with
         dsh[name] = e
         src_of[n] = name
         # the default share never repeats an event of the pool it follows: no MadEvent iseed in common (run seeds wrap
@@ -347,7 +412,9 @@ def main():
                                       for e in dsh.values()),
                       "ee_runs": sum(sum(e["lhe"]["energy_runs"]) if e["lhe"].get("energy_runs") else
                                      len(e["lhe"]["energies"]) for e in ee.values()),
-                      "ee_test_events": EE_TEST * len(ee)}))
+                      "ee_test_events": EE_TEST * len(ee),
+                      "resized_short": {k: sorted(n for n, v in resized.items() if v == k)
+                                        for k in ("covered", "more", "small")}}))
 
 
 if __name__ == "__main__":

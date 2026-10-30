@@ -70,6 +70,12 @@ def main():
     own_margins = json.load(open(os.path.join(HERE, "catalog_v4_pp_margins.json")))
     own_runs = json.load(open(os.path.join(HERE, "catalog_v4_pp_runs.json")))
     pp = lambda n: "pp13v4_" + n[len("v4_"):]
+    from gen_catalog_v4_default import (resize_short, _yield_ratio, YIELDS, ASSEMBLED, PROBE_YIELDS)
+    yields = json.load(open(YIELDS))
+    assembled = set(json.load(open(ASSEMBLED))) if os.path.exists(ASSEMBLED) else set()
+    probe_yield = json.load(open(PROBE_YIELDS)) if os.path.exists(PROBE_YIELDS) else {}
+    resized = {}
+    sz_pp = {"n_train": 10000, "n_val": 2000, "n_test": 2000}
     # built as parallel one-run part jobs (lhe.parts, tools/lhe_parts.py; catalog_coverage step 7): the main session's
     # call of 2026-10-29 for pp13v4_ud_dggu, whose 32 stalling runs took 13 to 24 h in series in one job
     # and the 13 entries still missing after the part jobs and the one-entry jobs (2026-10-30: five stalled short again
@@ -93,6 +99,11 @@ def main():
             own = {"lhe": {"margin": margins[old]}}
         if pp(n) in parts:
             own = {**own, "lhe": {**own.get("lhe", {}), "parts": True}}
+            # a parts pool not yet assembled whose runs came back short: laid out from its runs' yields as the default
+            # share's (gen_catalog_v4_default.resize_short: the leading runs made, more of them, or runs of SMALL_RUN)
+            if pp(n) in yields and pp(n) not in assembled and _yield_ratio(yields[pp(n)]) is not None:
+                resized[pp(n)] = resize_short(own["lhe"], yields[pp(n)], sum(sz_pp.values()),
+                                              probe_yield.get(pp(n), 1.0))
         split = T[n]["role"] if n in T else mg.PROCESSES[old].get("split")
         procs[pp(n)] = {**own,
             "kind": "lhe_pp", "folder": pp(n), "mg5_generate": list(c["mg5_generate"]),
@@ -150,7 +161,8 @@ def main():
                       "reused_in_test": sum(e["name"].startswith("pp13_") for e in test), "test": len(test),
                       "train": len(tr), "mixed_pp": sum(e["name"].startswith("pp13") for e in mixed),
                       "mixed": len(mixed), "with_margin": sum("margin" in (e.get("lhe") or {}) for e in procs.values()),
-                      "with_runs": sum("n_runs" in (e.get("lhe") or {}) for e in procs.values())}))
+                      "with_runs": sum("n_runs" in (e.get("lhe") or {}) for e in procs.values()),
+                      "resized_short": resized}))
 
 
 if __name__ == "__main__":
