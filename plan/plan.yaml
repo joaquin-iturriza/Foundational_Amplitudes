@@ -5120,6 +5120,7 @@ entries:
       - 'fails: fix the cause from its log and resubmit the probe'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
+    '4': run FA-lxplus-ed084f25 (the lxplus GPU probe)
   owner:
     agent: a9e5ce33720085e0f
     state: stopped
