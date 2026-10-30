@@ -119,6 +119,12 @@ entries:
     answers_after: '2026-10-29T18:38:52+00:00'
     covers:
     - v3_prep_explore
+  - said_at: '2026-10-30T17:21:34.599000+00:00'
+    text: Okay, yes to both
+    decision: D195
+    answers_after: '2026-10-30T17:07:28+00:00'
+    covers:
+    - v3_prep_explore
   decisions:
   - D83
   - D129
@@ -127,6 +133,7 @@ entries:
   - D170
   - D175
   - D182
+  - D195
   next:
     5: 'The one-loop sign extension on catalog_v4 read 2026-10-30 (par:v4_signext @54a922b6, analysis/catalog_v4/signext_compare.py):
       inconclusive by the design''s rule (seed means lower on 14 of 21 held-out sign-changing pools, higher on 6, 1 tie, sign
@@ -451,8 +458,10 @@ entries:
     searched: CLAUDE.md (GPU budget under 30 GPU-h would allow it) and site decisions --project FA; the passed design itself
       says the extra seeds go to the user as a question, not run, so no rule settles it
     blocks: step 5 only
-    blocks_steps: &id001
+    blocks_steps:
     - 5
+    answered_at: '2026-10-30T17:21:34.551000+00:00'
+    decision: D195
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -1311,14 +1320,6 @@ entries:
     units: null
     start: '2026-10-30T17:00:28+00:00'
     at: '2026-10-30T17:00:28+00:00'
-  ask: The one-loop sign extension on catalog_v4 is inconclusive at two seeds (wrong-sign lower on 14 of 21 held-out pools,
-    p=0.058; median 6.48% -> 3.08%; tree-axis zero-shot MSE 1.13-1.37x). Run a third and fourth seed of both arms (four runs,
-    about 7 GPU-h) to settle it?
-  waiting_since: '2026-10-30T17:07:28+00:00'
-  searched: CLAUDE.md (GPU budget under 30 GPU-h would allow it) and site decisions --project FA; the passed design itself
-    says the extra seeds go to the user as a question, not run, so no rule settles it
-  blocks: step 5 only
-  blocks_steps: *id001
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
