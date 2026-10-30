@@ -5084,3 +5084,7 @@ entries:
       - 'a misfire: fix it first, restart the day'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
+  owner:
+    agent: ab16f2cbe0401f7f3
+    state: working
+    since: '2026-10-30T18:20:30+00:00'
