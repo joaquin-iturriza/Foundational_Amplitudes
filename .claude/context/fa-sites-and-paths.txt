@@ -1,0 +1,36 @@
+paths: sites/**, siteconf.py, scripts/*.sh, sweep/trial_job.sh
+cmds: \bsite\s+(submit|run|env|sync|copy)\b.*\bFA\b, \bscontrol\b
+---
+| What | Path |
+|------|------|
+| Working copy (where you edit) | `~/work/FA`, branch `trunk` |
+| Checkout on CC-IN2P3 | `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` — `.venv/` (python 3.11, torch 2.1.2+cu118, numpy pinned 1.26.4, xformers, lloca) |
+| Checkout on Jean Zay | `/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes` — conda env `foundational` (same torch stack) |
+| Checkout on lxplus | `/eos/user/j/joiturri/Foundational_Amplitudes` — `.venv/` (python 3.11) on EOS; sweeps and Condor submission under `/afs/cern.ch/user/j/joiturri/Foundational_Amplitudes` |
+| Site facts | `sites/sites.yaml` — per site: `project_dir`, `sweep_dir`, `scratch`, `data_dir`, the env recipe, and the `cluster` block (scheduler, partition, account, qos, gpu flag, mem, CPU ceiling). The only file, with `sites/activate.sh`, that names a cluster |
+| Env activation | `sites/activate.sh` — resolves the site (`CCORCH_SITE`, exported by `site submit`, else sniffed from its own path), activates that site's env, exports `PROJECT_DIR`, `WORK`, `SCRATCH`, `DATA_DIR`, `SUBMIT_DIR` |
+| Tier-0 mirror | `~/.local/share/ccorch/artifacts/FA/<run>/` (`site fetch`) |
+
+- Jean Zay: A100 through `itg@a100`/`gpu_p5` (`-C a100`, QOS `qos_gpu_a100-t3`); `itg@v100` is in over-consumption. A
+  pending job moved by `scontrol` needs Account, Partition, Features and QOS, else it sits on `InvalidQOS`.
+- lxplus: HTCondor, code on EOS, submission from AFS; its ssh master needs a 2FA code only Joaquin can enter.
+- CC-IN2P3 (`sites/sites.yaml`): `account: lpnhe`, `partition: gpu_v100,gpu_h100` (whichever starts first), `qos: gpu`,
+  one GPU through `--gpus=1`, template `mem: 32G`; CPU jobs go to `htc` with `--mem-per-cpu`. `gpu_h100` (3 nodes of 4
+  H100 NVL) runs FA; `allow_tf32` is a no-op on V100, active on H100.
+
+Python asks `siteconf` for paths: `siteconf.PROJECT_DIR`, `siteconf.SWEEP_DIR`, `siteconf.DATA_DIR`;
+`siteconf.resolve(cfg)` fills the site-owned half of a sweep config (paths, `cluster` directives, `${PROJECT_DIR}` /
+`${SWEEP_DIR}` / `${DATA_DIR}` / `${SCRATCH}` expansion, re-rooting a config generated on another site);
+`siteconf.slurm_header(cluster, job_name, out, err)` renders the `#SBATCH` block for the site it runs on,
+`siteconf.cpu_header(...)` the CPU-partition one. Recipe runs read `$WORK/datasets` and the cache under `$SCRATCH`;
+`DATA_DIR` is the same `datasets` dir on every site. The old `data_path: data/` default is per-checkout and empty on
+the clusters: use recipes. Every job script starts with
+
+```bash
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
+cd "$PROJECT_DIR"
+```
+
+(SLURM runs a copy of the script from its spool, so `$0` cannot locate the checkout; `site submit` exports
+`CCORCH_SITE` and `CCORCH_PROJECT_DIR`.)

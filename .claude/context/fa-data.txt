@@ -1,0 +1,52 @@
+paths: dataset.py, experiment.py, recipes/*.yaml, data/**, tools/equal_processes.py, analysis/process_equality/**, runs/*/config.yaml
+cmds: \bprocesses_file\b
+---
+- **Which datasets a run actually trained on: the recipe wins, `data.dataset` lies.**
+  `config/amplitudes.yaml` hardcodes an 8-entry `data.dataset` default, and every run
+  config dumps it verbatim whether or not a recipe overrode it. So in a run's
+  `config.yaml`:
+  - `data.processes_file` set (equivalently `data.source: recipes`) ⇒ **the recipe at
+    that path is the only authority**. `data.dataset` is stale inherited default;
+    ignore it completely. E.g. `runs/dvirt_time` lists 8 datasets and actually
+    trained on the 25 in `recipes/pretrain25_short.yaml`.
+  - `data.processes_file: null` and no recipe source ⇒ **then** `data.dataset` is
+    authoritative.
+  Never state which processes a run saw from `data.dataset` without checking
+  `processes_file` first: it decides what "zero-shot", "held-out" and "never seen" mean.
+- **Processes equal up to relabelling are one dataset.** `tools/equal_processes.py` (CPU, CC) finds
+  the catalog trees whose |M|² is a constant multiple of another's up to a leg relabelling (18 classes,
+  `analysis/process_equality/equal_processes.json`: massless flavour relabels, `ee_X = uubar_X` for
+  colourless bosons, ...). A held-out process is held out with its whole class.
+- Every role of a process samples the same distribution. A recipe entry's `sampling` policy (catalog_v2: the mixture)
+  shapes train, val and test alike; the shaped pools carry `_smix` in their file names. Never reintroduce a train/eval
+  measure split: a finite-sample fit's error follows the training density, so validation estimates the trained risk
+  only from the same measure. The uniform-√s window is a dataset convention, not a "physical measure".
+- Datasets are `.npy` files in `data/`, named like
+  `ee_ttbar_346-1000GeV_amplitudes.npy`. Each row: flat 4-momenta
+  (`n_particles*4`) + PDG ids (`n_particles`) + amplitude (last col).
+- `init_data` (in `experiment.py`) loads each dataset, for LLoCa boosts events
+  to COM and applies a random Lorentz transform (data augmentation / locality),
+  standardizes momenta, preprocesses amplitudes globally (`amp_trafos: [log,
+  standardization]`), concatenates all processes, shuffles (seed 42), and builds
+  flat contiguous arrays.
+- `dataset.py`:
+  - `AmplitudeDataset` — sparse variable-length events backed by a flat
+    `(N_particles,4)` array + `offsets`; O(1) `__getitem__`.
+  - `collate_variable_length` — concatenates events into a flat batch + `ptr`
+    (event boundaries) consumed by the model's attention mask.
+  - `ProcessBalancedSampler`: draws each process's share per batch with dynamically updatable weights
+    (deficit-to-solo plateau-aware). Not the default (`training.use_balanced_sampler: false`): the equal/uniform
+    sampler won best-vs-best at 8 datasets, the benefit diluting with many datasets. Opt-in for mixtures of few, very
+    unbalanced datasets.
+  - **Loss aggregation is `geometric_mean` by default** (`config/default.yaml`;
+    used in essentially every run): a log-space mean over per-process MSEs, so a 10%
+    relative gain on a 1e-6 process counts equally with a 10% gain on a 1e-2 one —
+    processes of different final-state dimensionality (hence very different MSE
+    scale) all keep scaling instead of the high-MSE ones dominating the gradient.
+    **Caveat:** the same `1/MSE` weighting starves a process stuck far above the bulk
+    (a resonance needle); the arithmetic mean recovers it at a cost elsewhere, and the
+    τ-floor `loss_aggregation_tau` is an HP for the wave's DyHPO, not a fix with a natural
+    value (`docs/results.tex` `tab:agg_ab` and the catalog hand-off). `loss_aggregation`
+    and `loss_aggregation_tau` shape the **gradient only**; the validation aggregate
+    (`val_loss_no_reg`, checkpoint selection, HPO objective) is fixed by
+    `training.val_aggregation` (geometric mean) and never follows a training-side knob.

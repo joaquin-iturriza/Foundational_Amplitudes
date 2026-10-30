@@ -230,8 +230,8 @@ After
 
 === SECTION fa-catalog-reference
 file: ~/work/FA/.claude/context/fa-catalog-reference.txt
-paths: mg5_pipeline_final.py, recipes/gen_catalog_*.py, recipes/select_catalog_*.py, recipes/catalog_v*/**, tools/width_regen.py, analysis/catalog_v4/**
-cmds: \b(gen|select)_catalog_v\d, \bmg5_pipeline_final\b
+paths: mg5_pipeline_final.py, recipes/gen_catalog_*.py, recipes/select_catalog_*.py, recipes/catalog_v*/**, tools/width_regen.py, tools/lhe_*.py, scripts/job_lhe_*.sh, analysis/catalog_v4/**
+cmds: \b(gen|select)_catalog_v\d, \bmg5_pipeline_final\b, \blhe_(parts|probe|rates)\b
 ---
 Catalog_v3: what the pools contain and how they are sampled. Files: `mg5_pipeline_final.py` (unprefixed line numbers),
 `recipes/gen_catalog_v3.py`, `recipes/select_catalog_v3.py`. [open] = chosen with no decision of Joaquin's behind it;
@@ -704,7 +704,7 @@ tools: SendUserFile
 
 === SECTION fa-git-and-release
 file: ~/work/FA/.claude/context/fa-git-and-release.txt
-paths: scripts/publish_main.sh, scripts/fold_worktree.sh, worktrees/**
+paths: scripts/publish_main.sh, scripts/fold_worktree.sh, scripts/remove_worktree.sh, worktrees/**
 cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
 ---
 - `trunk` is the development trunk and what every site checks out (`site sync <site> FA` pushes it and fast-forwards
@@ -773,9 +773,10 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
   wall-time target), `git_verify_guard.py` (claims check bypasses, attribution in a commit message), `review_guard.py`
   (reviewer locks, one reviewer per backlog), `brief_guard.py` (briefs), `plan_files_guard.py`, `md_guard.sh`,
   `plot_guard.sh` (config writes), `worktree_guard.sh` (advisory), `worktree_fold_guard.sh`, `review_backlog.sh
-  gate|bashpre`, `hook_syntax_guard.py`, `main_session_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the
-  user-level `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context
-  after a hand-back), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
+  gate|bashpre`, `hook_syntax_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the user-level
+  `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context after a
+  hand-back), `delegation_note.py` (a note, never a refusal, when the main session edits code, runs an analysis or
+  tests, or submits; counted in `site digest`), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
   `context_guard.py`, `context_push.py`, the user-level `ledger_guard.sh session-start`. `.githooks/commit-msg` refuses
   attribution lines in every commit.
 - Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good

@@ -1,0 +1,40 @@
+paths: models/transformer_lloca_mup.py, models/attention_lloca_mup.py, experiment.py, wrappers.py, base_experiment.py, config/local/**, bench_*.sh, optim/**
+cmds: \bLLOCA_[A-Z_]+=, \bbench_workers_ab\.sh\b
+---
+- **Per-step LLoCa hot-path vectorizations** — `LLOCA_*` env toggles (default =
+  fast path; original impls kept for A/B). Attention mask built once/forward not
+  per-block (`models/transformer_lloca_mup.py`, `LLOCA_ATTN_MASK`); per-process
+  loss segment-mean (`experiment.py` `_aggregate_per_process_loss`,
+  `LLOCA_PROC_LOSS`); L2/L1 reg via `_foreach` (`experiment.py`
+  `_init_regularization`, `LLOCA_REG`); per-event mean pool (`wrappers.py`,
+  `LLOCA_POOL`); per-particle frames broadcast over heads instead of replicated
+  (`models/attention_lloca_mup.py`, `LLOCA_FRAMES`, default `broadcast`; set
+  `repeat` for the original — broadcast only applies for `attn_reps` with max
+  order ≤ 1, else auto-falls-back to repeat). Equivalence guards: `test_amp.py`
+  Section 0. Read the code for details.
+- **Per-step host↔device syncs** — `LLOCA_SYNC` env toggle (default `deferred`,
+  `blocking` = original for A/B). `deferred` fuses the per-step syncs into one and
+  catches NaN via the synced grad-norm (skip-step instead of crash); NaN no longer
+  raises. Mechanism and measured gain: `docs/results.tex` § throughput.
+- **Dataloading is the per-step bottleneck — keep `num_workers: 2`.** It is the
+  default in `config/local/none.yaml`; `nw=4` is no better and `nw=6` oversubscribes
+  (`cpus-per-task=8`) and hangs. Profile with `LLOCA_PROFILE_STEP=1` (data-vs-compute
+  split at the end of `train()`); bench with `bench_workers_ab.sh` (needs a GPU via
+  sbatch). Numbers: `docs/results.tex` § throughput.
+- Compute knobs (default on, A/B via config): `training.allow_tf32` (default true) sets `matmul/cudnn.allow_tf32` in
+  `_init_backend`: a no-op on V100, faster matmul on A100 at ~1e-3 precision; A/B'd on A100, on and off agree within
+  the run-to-run spread, so it stays on. `training.fused_optimizer` (default true, CUDA only) passes `fused=True` to
+  Adam/AdamW, through `MuAdam/MuAdamW`.
+- **NOT done (deliberately):**
+  - L2-reg → decoupled `weight_decay`: would remove a model-sized backward term, but
+    the L2 reg is added into the tracked loss (`loss_no_reg`, `val_loss_no_reg`,
+    checkpoint selection, HPO objective) and `regularization_lambda` is a tuned sweep
+    HP — converting it would silently break continuity with existing sweep results.
+  - `torch.compile`: the compute is dominated by the framesnet (torch_geometric
+    message passing) and xformers attention, neither of which compiles — heavy graph
+    breaks for ~no gain. Also `torch.compile(self.model)` prefixes `state_dict` keys
+    with `_orig_mod.`, which would break warm-start/fine-tune reloads. Skipped.
+- **Activation-memory knob:** `model.net.checkpoint_blocks` (config, not an env
+  toggle; default false) gradient-checkpoints the transformer blocks — large
+  activation-memory saving for ~one extra forward of compute. Use when memory-bound
+  at large width / batch size.

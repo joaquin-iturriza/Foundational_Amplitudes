@@ -1,0 +1,34 @@
+paths: run.py, experiment.py, base_experiment.py, config/**
+cmds: \brun\.py\b
+---
+- `run.py` — Hydra entrypoint. Builds `AmplitudeExperiment(cfg)`, sets default
+  dtype, calls `exp()`. Config root: `config/`, default config: `amplitudes`.
+  Params are overridden CLI-style: `python run.py training.lr=1e-4 model=lloca ...`.
+- `experiment.py` — `AmplitudeExperiment(BaseExperiment)`: amplitude-specific
+  physics, data, model wiring, loss, eval, plots.
+- `base_experiment.py` — `BaseExperiment`: generic train loop, optimizer/
+  scheduler, MuP setup, warm-start, checkpoint/save, MLflow, FLOP counting.
+- A run executes `full_run()` → `init_physics → init_data → init_model →
+  train → evaluate → plot`.
+Output of a run lives under `runs/<exp_name>/...` (models, tokenizer, plots).
+
+- `config/amplitudes.yaml` — main experiment config (dataset list, amp_orders,
+  training defaults). `defaults:` pulls in `model: lloca`, `default`, `local: none`.
+- `config/default.yaml` — full default tree: training/optimizer/scheduler,
+  DyHPO multi-fidelity fields (`is_dyhpo_run`, `increment_steps`), fine-tune
+  block (`fine_tune.lr_scale`, `layer_decay`, `freeze_blocks`, `reset_output_head`,
+  `lora.*`, `ewc.*`).
+- `config/model/lloca.yaml` — the only model config that matters here.
+- `config/local/none.yaml` — Linux/cluster local overrides (`num_workers: 2`,
+  in-memory dataset).
+- `config/hydra.yaml` — disables Hydra's dir-changing/logging hijack.
+
+- **dtype:** set via `training.dtype` (`float16/32/64`); `run.py` sets the torch
+  default dtype before building the experiment.
+- **Warm start / fidelity:** `warm_start_idx` + `training.increment_steps` drive
+  resumption from a previous fidelity checkpoint; don't hand-edit these — they're
+  set by `run_trial.py`.
+- Always keep `plot: true` in sweep/experiment configs.
+- **Fine-tuning** reuses the pretrained run's tokenizer; LoRA/EWC/layer-decay/
+  freezing are all in the `fine_tune` config block.
+- Best-checkpoint selection is `experiment._result_extra` (definition: `docs/results.tex` `def:metric`).

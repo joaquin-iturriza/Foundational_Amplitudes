@@ -1,0 +1,33 @@
+paths: .claude/hooks/**, .claude/settings*.json, ~/.claude/hooks/**, ~/.claude/settings.json
+cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
+---
+- A hook refuses the end of a turn only for an omission the turn itself can clear; what waits on an agent, a job, a
+  cluster or the user is a note in its output.
+- Every registered hook runs through `.claude/hooks/dispatch.py <hook>`: it skips a hook listed in
+  `.claude/hooks/disabled.json`; it detects a loop (the same refusal fingerprint twice with nothing changed in between:
+  no tool call, the same HEAD, plan and open events), then disables that hook, opens an incident and lets the call
+  through.
+- A misfiring hook is the main session's to fix, never sent straight to Joaquin. An obvious fix is made at once;
+  otherwise `tools/hook_incident.py <hook> --why "<why>"` (or the dispatcher's loop detector) disables the hook,
+  appends the incident to `.claude/hooks/incidents.jsonl` and opens an ALERT for the main session. A fix is tested on
+  the recorded refusal (`hook_incident.py --replay <id>`; `--show <id>` prints the record) before `--resolve <hook>`
+  re-enables it; a guard that was right is acked as such. Only a call that is his, or a fix that is not obvious,
+  reaches him: `site ack E<n> --needs-user "<what>"`.
+- The set. Stop: `plan_check.py`, the single gate (plan and owners, events, supervisor and waiter, questions sent,
+  claims, figure pairs, context flush, reply answers, the "Joaquin" opener), and `auto_push.sh` (pushes, never
+  refuses). PreToolUse: `submit_guard.py` (placement, design, HP grids, plotting off in a submitted script, GPU budget,
+  wall-time target), `git_verify_guard.py` (claims check bypasses, attribution in a commit message), `review_guard.py`
+  (reviewer locks, one reviewer per backlog), `brief_guard.py` (briefs), `plan_files_guard.py`, `md_guard.sh`,
+  `plot_guard.sh` (config writes), `worktree_guard.sh` (advisory), `worktree_fold_guard.sh`, `review_backlog.sh
+  gate|bashpre`, `hook_syntax_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the user-level
+  `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context after a
+  hand-back), `delegation_note.py` (a note, never a refusal, when the main session edits code, runs an analysis or
+  tests, or submits; counted in `site digest`), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
+  `context_guard.py`, `context_push.py`, the user-level `ledger_guard.sh session-start`. `.githooks/commit-msg` refuses
+  attribution lines in every commit.
+- Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good
+  copy after one.
+- Tests: `tests/test_setup_scenarios.py` and `tests/test_hooks_real.py` over the recorded states in
+  `tests/fixtures/hooks_20261029/`. A registration change goes to the user as the diff `tools/switch_settings.py` prints.
+- A new doc Joaquin approved goes in `.claude/md_allowlist.txt`; a single-format figure he accepts goes in
+  `.claude/figure_pair_ignore.txt`.
