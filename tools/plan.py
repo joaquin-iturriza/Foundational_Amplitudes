@@ -872,7 +872,8 @@ def step_problem(st, eid, s):
         return "no subagent %s in this project's transcripts" % s.get("agent")
     if abs((r[0] - parse(s.get("at"))).total_seconds()) > 1:
         return "recorded at %s, but subagent %s started %s" % (s.get("at"), s["agent"], r[0].isoformat())
-    uses = [k for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == s["agent"]]
+    # one agent may own several steps of one entry (D186); recorded on two entries it is no step agent of either
+    uses = sorted({k for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == s["agent"]})
     if len(uses) > 1:
         return "subagent %s is recorded as %d steps (%s)" % (s["agent"], len(uses), ", ".join(uses))
     return None
@@ -1943,6 +1944,9 @@ def cmd_step(a):
         elif key not in step_keys(e):
             sys.exit("plan: %s has no next step %d (it has %s)" % (a.id, key, ", ".join(str(k) for k in step_keys(e))))
         used = [(k, x) for k, v in entries_state(st) for x in v.get("steps") or [] if x.get("agent") == a.agent]
+        # one agent owns a piece of work across its steps (the redesign, D186): recording it on another step of the
+        # same entry is allowed; only the exact step already recorded is a no-op
+        used = [(k, x) for k, x in used if k != a.id or x.get("next") == key]
         if used:
             print("plan: note: subagent %s is already recorded (%s); nothing to add" % (a.agent, ", ".join(
                 "%s step %s" % (k, x.get("next")) for k, x in used)))
