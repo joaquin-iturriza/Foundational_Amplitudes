@@ -4609,6 +4609,17 @@ entries:
       one winner -> it; both -> 0.25 unless 0.50''s PP4 and EE4 intervals both lie below 0.25''s R (then 0.50); the winner
       becomes catalog_v4''s mixture, pools rebuilt at it. No winner: ''keep the current mixture'' if no share has GAIN; ''trade-off''
       if a share has GAIN with LOSS or an undecided cost, numbers to Joaquin with the bound beside them.'
+    passed_at: '2026-10-30T17:29:27+00:00'
+    reviewer: 'Re-check after the 17:22 FIX, steps 11 and 14. Step 11 as passed at 17:14. Step 14: the default50 and default25
+      recipes differ from catalog_v4_train.yaml only by f_default and default_source on 912 tree entries (241 identical, top-level
+      equal); same HPs, 4264 steps, seeds 42 and 43; D194 sets the shares. Measure moves: PP read 0.19 (catalog_v3 pp-trained
+      against window-trained), catalog_v4 over pp-trained 0.66 against seed spread 0.10. Spread: R medians, PP4 noise about
+      1.5% and EE4 (169) about 3.3% against the 0.90 gain threshold; the no-loss rule is now on the pooled held-out H1..H7c
+      (701 classes, median noise about 2.3% from the 0.14 held-out spread) with the widened upper end below 1.05; undecided
+      costs go to Joaquin as a trade-off, never as a win. XV3 dropped (catalog_v3 shared held-out pools absent on CC, 1665
+      of 1665). Outcomes fixed for GAIN, NO LOSS, LOSS and undecided, with the mixture_ab.json verdict rule. Searched results.tex
+      (pp-trained, default share, f_default, mixture, blend, pp blend, seed spread), plan show catalog_coverage with its asks,
+      site decisions D166, D167, D178, D187-D194.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
