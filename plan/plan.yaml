@@ -2647,7 +2647,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 06bbe8e3
+    commit: 814c19f3
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -2728,6 +2728,22 @@ entries:
       size_from_probe, under 0.5 -> hold and report; the rest into a new queue. Check every queue ends with all pools assembled;
       remove finished queues from site queue. Worktree worktrees/wt-energy-yields left in place (its removal was refused by
       the permission check); branch merged.'
+    - 'HAND-OFF (2026-10-30 ~12:00, last 13 pools). (1) READ per energy (lhe_probe kept --by-energy-out over the 18 gridpool
+      probe logs FA-ccin2p3-010931ab..4c712c3e and cgsxwm''s re-probe FA-ccin2p3-67ba0a36; merged into lhe_probe_by_energy.json
+      and lhe_probe_yields.json, commit 814c19f3): 12 new pools pass, worst complete share per energy: dsh_epem_bbxgz 0.8125
+      (3000 GeV), dsh_epem_bbxwpwm 0.8125 (1000), dsh_epem_epemwpwm 0.875 (1000), aawpwm/accxg/awpwmz/ccxgz/epemzz/wpwmzz
+      0.9375, wpwpwmwm/dsh_gg_gggg/dsh_uu_uuuux 1.0. (2) FAIL ee4_epem_cgsxwm: the 4x gridpack (grid04, 52228 events) did
+      not help: 3000 GeV yield 0.5162, complete 7 of 16 (0.4375), same as at 13057; the 9 short runs return 9-55 of 200 after
+      650-830 s (not the 1800 s timeout); other energies 1.0. More runs would need 1/0.4375 = 2.29x > the 2x rule, so complete_layout
+      refuses it; held, report to Joaquin (options: smaller runs at 3000 GeV, a change to the passed run-size design; or drop/replace
+      that energy). (3) QUEUE catalog_v4_gridpack_last: the 12 flagged size_from_probe in complete_runs.json (energy_runs
+      up to 99 vs 81, factor <= 1.22), recipes regenerated (only those 12 changed); planned on CC from a 12-pool spec $SCRATCH/lhe_queue/specs_in/catalog_v4_gridpack_last.yaml,
+      --grid-cores 16: 4271 runs + 44 gridpacks, est 27.7 core-h; site queue add under D187 (64 workers of 1.5 h, 110 worker-h,
+      until 20:00); plan target 1 h / 64 jobs; site pick FA --gpus 0 --cpus 16 --jobs 64: ccin2p3 64; 64 workers job_lhe_parts.sh
+      (--time 01:30:00, 32G) FA-ccin2p3-c7df8e75 .. 0abf3613 recorded on step 9; minutes after submission 2110 done, 0 failed.
+      (4) catalog_v4_gridpack_57 (39/39), _probed (6/6), _fix (1/1) ended with 0 failed, removed from site queue. Assembled:
+      100 of 113; 112 when this queue ends. NEXT: on its end, lhe_parts status (12 assembled, 0 failed), site queue rm FA
+      catalog_v4_gridpack_last; mixcheck over all 113 once cgsxwm is settled.'
     - 'HAND-OFF (2026-10-30, gridpack step). (1) CODE: commit 7bdc5729 (+39914802 measure). mg5_pipeline_final.py: lhe_make_gridpack(process,
       ev, nevents, iseed, log, mg_cores, patches, run_name=''grid'') runs lhe_run_madevent with run-card gridpack=True (lhe_run_madevent
       now returns lhe=None for a gridpack run instead of raising) and returns <ev>/grid_gridpack.tar.gz; lhe_run_gridpack(tar,
