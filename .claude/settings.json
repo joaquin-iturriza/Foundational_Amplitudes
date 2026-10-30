@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "600000"
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "400000"
   },
   "permissions": {
     "allow": [

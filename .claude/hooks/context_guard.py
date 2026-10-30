@@ -41,6 +41,37 @@ def plan_text():
         return "THE PLAN could not be printed (%r): run python3 tools/plan.py show now." % e
 
 
+def notes_at():
+    """Context size at which the notes are asked for: 50k below the auto-compaction window (Joaquin, 2026-10-30:
+    "Reduce the threshold of compaction to 400k, and the notes updating a bit lower")."""
+    try:
+        return int(os.environ.get("CLAUDE_CODE_AUTO_COMPACT_WINDOW") or 400000) - 50000
+    except ValueError:
+        return 350000
+
+
+def context_tokens(path):
+    """The session's current context: the last assistant call's input, cache read and cache write, from the
+    transcript's tail. Unreadable: 0."""
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(0, f.tell() - (1 << 20)))
+            lines = f.read().split(b"\n")
+    except (OSError, TypeError):
+        return 0
+    for line in reversed(lines):
+        if b'"usage"' not in line:
+            continue
+        try:
+            u = json.loads(line)["message"]["usage"]
+        except (ValueError, KeyError, TypeError):
+            continue
+        return (u.get("input_tokens", 0) + u.get("cache_read_input_tokens", 0)
+                + u.get("cache_creation_input_tokens", 0))
+    return 0
+
+
 def _clear(path):
     try:
         os.unlink(path)
@@ -68,6 +99,9 @@ def main():
             ctx = AFTER + "\n\n" + ctx
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ctx}}))
         return 0
+    if not os.path.exists(WANTED) and not os.path.exists(FLUSHED) and not inp.get("agent_id") \
+            and context_tokens(inp.get("transcript_path")) >= notes_at():
+        open(WANTED, "w").close()          # the notes are asked for before compaction, not only when it fires
     if not os.path.exists(WANTED) or os.path.exists(FLUSHED):
         return 0
     if ev == "Stop":
