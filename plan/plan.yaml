@@ -4918,6 +4918,12 @@ entries:
     units: null
     start: '2026-10-30T22:45:46+00:00'
     at: '2026-10-30T22:45:46+00:00'
+  - batch: mixture_alphas_repair
+    wall_h: 0.25
+    jobs: 8
+    units: null
+    start: '2026-10-30T23:13:55+00:00'
+    at: '2026-10-30T23:13:55+00:00'
   step_why:
     11:
       feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
