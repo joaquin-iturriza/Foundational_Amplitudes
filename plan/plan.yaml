@@ -4258,6 +4258,29 @@ entries:
       flips (e.g. short-vs-complete no longer significant, or the ladder at 1000 agrees) -> rewrite the paragraph and its
       hand-off, and state whether the 113-pool gridpack rebuild was needed. INVALID: event KS not reproduced for a file ->
       that file''s re-read is reported as not done, with which files changed since.'
+    fix_at: '2026-10-30T13:35:45+00:00'
+    fix: 'Seeds against spread (check 3) and outcome (check 4): the only spread in this measure is the Monte Carlo error of
+      the relabelling p at 2000 relabellings, binomial sqrt(p(1-p)/2000), and the design does not state it. Several verdicts
+      the outcome turns on sit within one to two of those errors of their thresholds in the committed JSONs: short-vs-complete
+      ub_bdwpz sqrt(s_hat) p=0.0015 against 0.05/32=0.00156 (SE 0.0009; it is one of the 4 Bonferroni hits); ladder epem_amupvmwm
+      200 cos_theta_star p=0.0025 and bb_bbgg 1000 sqrt(s_hat) p=0.004 against 0.05/16=0.0031 (SE 0.0011-0.0014); gridpack
+      primary p=0.0135, 0.022, 0.028 against 0.05/5=0.01 (SE 0.0026), and that primary verdict is what the outcome ties to
+      whether the 113-pool gridpack rebuild was needed. Fixing relabelling seed 0 pairs old and new, but a crossing of a threshold
+      by one or two relabellings would be read as a flip. Fix: report each p_runs with its binomial (Clopper-Pearson) interval
+      in reread; for every test whose old or new interval contains its threshold, re-run that test at 20000 or more relabellings
+      (scaled, and unscaled for the paired comparison) before calling a verdict; write the rule into the outcome (a flip counts
+      only when the interval at the larger relabelling count clears the threshold). Control (check 1 detail): ''the complete-halves
+      controls must keep their p'' holds only where the halves have equal events; halves split by run with runs of different
+      asks will legitimately move under the scaled statistic. State it as: the control''s rate under 0.05 stays near chance
+      (old 1 of 31), not unchanged p. Suggested, not a failure: a login-node inventory under each --before (parts 4807 and
+      pools 364 for the first; the ladder''s and gridpack''s inventories from their JSONs) before submitting, since pools
+      moved aside by the rebuild and parts pruned under D181 would make tests INVALID. Checks that hold: one change (run_perm
+      scaling, same files, bins, caps, relabelling seed); the measure moves (tests/test_run_perm_calibration.py rerun here:
+      0.04 under 0.05 at 1000 vs 555, 0.033 at equal units; committed analysis/catalog_v4/data/runlevel.json had 6 of 24 run-level
+      p under 0.05 before the fix, the finding reports 2 after); not a repeat (searched docs/results.tex for re-read, reread,
+      run_perm, scaled, unequal, short_run_bias; plan show catalog_coverage; site decisions for short, re-read, permutation,
+      run-level: no prior re-read; next 13 of the entry asks for exactly this); answers next 13; no user decision names a
+      comparison for it.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
