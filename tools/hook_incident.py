@@ -4,6 +4,7 @@
     python3 tools/hook_incident.py <hook> --why "<why>" [--user]   disable it: the dispatcher skips it from now on
     python3 tools/hook_incident.py --show <id> [--user]           the whole record of one incident
     python3 tools/hook_incident.py --replay <id> [--user]         run the hook again on the refusal it recorded
+                                                                  (for real: a hook with side effects acts again)
     python3 tools/hook_incident.py --resolve <hook> [--note N] [--user]   enable it again
     python3 tools/hook_incident.py --list [--user]                disabled hooks and the incident log
 

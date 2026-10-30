@@ -1219,7 +1219,7 @@ def budget_gate_reading():
     the schedulers use."""
     import importlib.util
     spec = importlib.util.spec_from_file_location("site_gate", os.path.join(os.path.dirname(os.path.realpath(
-        os.path.expanduser("~/.local/bin/site"))), "site_gate.py"))
+        SITE_TOOL)), "site_gate.py"))
     g = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(g)
     d = tempfile.mkdtemp(prefix="gate_")
@@ -1250,6 +1250,30 @@ def budget_gate_reading():
         open(sub, "w").write(text)
         got = g.gpu_hours("condor_submit", [sub], {})[0]
         scenario("(b) gate reading, condor: %s -> %g GPU-h" % (name, want), abs(got - want) < 1e-6, got)
+    open(sc, "w").write("#!/bin/bash\n#SBATCH --tres-per-task=gres/gpu:1\n#SBATCH --time=10:00:00\n")
+    got = g.gpu_hours("sbatch", [sc], {})[0]
+    scenario("(b) gate reading: --tres-per-task=gres/gpu:1, 10 h -> 10 GPU-h (review finding 4)", got == 10.0, got)
+    open(sc, "w").write("#!/bin/bash\n#SBATCH --gpus-per-socket=1\n#SBATCH --time=10:00:00\n")
+    try:
+        g.gpu_hours("sbatch", [sc], {})
+        ok = False
+    except g.Unreadable:
+        ok = True
+    scenario("(b) gate reading: a GPU asked in a form not counted (--gpus-per-socket) raises, never 0", ok)
+    # a DAG as generate_sweep.write_dag writes it for a chained lxplus sweep: JOB lines over per-trial submit files
+    for k in range(4):
+        open(os.path.join(d, "t%d.sub" % k), "w").write('request_gpus = 1\n+JobFlavour = "longlunch"\nqueue 1\n')
+    dag = os.path.join(d, "sweep_0000.dag")
+    open(dag, "w").write("".join("JOB t%d t%d.sub\n" % (k, k) for k in range(4)) + "PARENT t0 CHILD t1\n")
+    got = g.gpu_hours("condor_submit_dag", ["-batch-name", "s_0000", dag], {})[0]
+    scenario("(b) gate reading: condor_submit_dag of 4 nodes x 1 GPU x longlunch -> 8 GPU-h (review finding 1)",
+             got == 8.0, got)
+    names = g.job_names("sbatch", ["--nice=5", os.path.join(d, "sweeps", "tp3_x", "jobs", "trial_0001.sh")])
+    scenario("(b) gate attribution: under --item '*' a sweep's trial counts for the item whose glob matches its sweep; "
+             "no match counts for all; one item named counts for it",
+             g.counted_items(["a", "tp3"], {"a": ["het*"], "tp3": ["tp3_*"]}, names) == ["tp3"]
+             and g.counted_items(["a", "tp3"], {"a": ["het*"], "tp3": ["tp3_*"]}, ["other"]) == ["a", "tp3"]
+             and g.counted_items(["a"], {}, names) == ["a"], names)
     try:
         g.gpu_hours("sbatch", ["--time=UNLIMITED", "--gpus=1", "--wrap", "x"], {})
         ok = False
@@ -1358,6 +1382,28 @@ def budget_gate():
     scenario("(b) the window spans sites: 24 GPU-h on CC-IN2P3, then a condor job on lxplus (1 GPU, workday = 8 h) is "
              "refused at 32 (24 elsewhere)", r.returncode != 0 and "24.0 elsewhere" in r.stdout + r.stderr
              and len(b.submitted()) == 8, (r.returncode, r.stdout[-1200:], b.submitted()[-2:]))
+    # review finding 2: the CC feeder's upkeep (`site run --item '*'`) counts its trials for the sweep's own item only
+    b = SiteBox()
+    b.item("tp3", match="tp3_*")
+    b.item("other", match="het_*")
+    sd = sweep("tp3_feed", n=8, time_="04:00:00")
+    r = b.site("run", "--item", "*", "ccin2p3", "FA", "--", "python", "sweep/sweep_manager.py", "submit", sd,
+               "--seq-batches", "1")
+    r2 = b.site("submit", "ccin2p3", "FA", "scripts/job_het_delta.sh", "--item", "other", "--est-gpu-hours", "3")
+    win = b.window()
+    scenario("(b) upkeep under --item '*': a sweep's trials count for its own item (tp3, 7 of 8 in at 28 GPU-h), and "
+             "a submission of another item in the same hour is not charged with them", len(b.submitted()) == 8
+             and r2.returncode == 0 and all(json.loads(w["items"]) == ["tp3"] for w in win[:7])
+             and json.loads(win[-1]["items"]) == ["other"], (r.stdout[-800:], r2.stdout[-400:], r2.stderr[-400:], win))
+    # review finding 3: a work command whose gate cannot be installed submits nothing, whatever its words
+    b = SiteBox()
+    b.item("w")
+    open(os.path.join(b.home, ".ccorch"), "w").write("not a directory")
+    mark = os.path.join(b.d, "ran")
+    r = b.site("run", "--item", "w", "ccin2p3", "FA", "--", "touch", mark)
+    scenario("(b) a `site run --item` whose gate cannot be written (HOME/.ccorch unwritable) is refused before the "
+             "command runs, even with no submit word in it", r.returncode != 0 and not os.path.exists(mark)
+             and "could not be installed" in r.stdout + r.stderr, (r.returncode, r.stdout[-600:], r.stderr[-300:]))
     b = SiteBox()
     b.item("x_lx")
     r = b.site("submit", "lxplus", "FA", "scripts/job_het_delta.sh", "--item", "x_lx", "--est-gpu-hours", "8")

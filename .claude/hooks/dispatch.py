@@ -145,6 +145,11 @@ def incident_msg(rec, user_level=False):
 
 def _record(hook, why, hooks_dir, session, last_refusal, project_dir, inp, count, disabled_now):
     inp = inp if isinstance(inp, dict) else None
+    try:                                         # bounded as in the state: a huge Write is kept by its call, not input
+        if inp is not None and len(json.dumps(inp)) > 20000:
+            inp = dict(inp, tool_input={"truncated": True, "text": json.dumps(inp.get("tool_input"))[:20000]})
+    except (TypeError, ValueError):
+        inp = None
     t = _now()
     rec = {"id": "I-" + _sha("%s|%s|%s|%s" % (hook, t, session, os.getpid()))[:8], "hook": hook, "why": why,
            "time": t, "session": session, "agent": (inp or {}).get("agent_id"),
