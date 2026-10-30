@@ -2607,8 +2607,44 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 94a18ed5
+    commit: c9b5c8f0
     paths:
+    - 'HAND-OFF generation agent 2026-10-30 05:20. QUEUES ($SCRATCH/lhe_queue on CC): catalog_v4_w3 = the wave, 1885 one-run
+      MadEvent tasks of 203 processes, planned from recipes/catalog_v4_default_lhe.yaml + catalog_v4_ee_test.yaml + catalog_v4_pp_parts.yaml
+      with --skip-claimed on the old queues, --exclude pp13v4_uu_gguu dsh_uu_gguu dsh_uu_aguu, --cores 16 for dsh_udx_dxuuux
+      pp13v4_ud_bbxdu dsh_gg_gggg dsh_uu_uuuux pp13v4_uu_guuz and 8 for pp13v4_uux_gguux dsh_ddx_wpwpwmwm dsh_ud_ddhwp dsh_uu_bbxuu
+      dsh_ug_guuux dsh_udx_wpwpwmz; 12 parts adopted; at 05:16 1884 claimed. Old queues catalog_v4_default (1869 todo parked
+      to parked/20261030_051038, ~256 claimed by old workers), pp13v4_rest and pp13v4_ddxgg (2 claimed each) parked; catalog_v4_w2
+      is a first plan that adopted nothing, parked whole (parked/20261030_051204), unused. RUNNING: 70 wave workers (scripts/job_lhe_parts.sh,
+      32 cores, 64G, 2 h, LHE_QUEUE=catalog_v4_w3, node-local TMPDIR), recorded with plan run --next 7 (e.g. FA-ccin2p3-04f767a3);
+      about 20 old lhe_parts workers (SLURM 62783855-72 and others) finishing their claims, 2 h limit ending about 06:05;
+      scancel was refused by the permission system (no site cancel verb), so they were not cancelled. DECISIONS: run dirs
+      on node-local /tmp (1 TB, 64 cores per node; peak run dir 35-156 MB); new work in new queues only (lhe_parts park, plan
+      --skip-claimed, adoption reads the taken-over queue''s specs); pp pools not assembled with short runs re-laid out from
+      their parts (gen_catalog_v4_default.resize_short: dsh_ddx_awpwmz 1008->5 runs, dsh_dbx_bxuwmz 249->1, dsh_bb_bbgg 29->2,
+      dsh_ddx_duxwpz 10->3, pp13v4_ddx_ddxgg 9->4); assembled pools keep their layout (lhe_assembled.json, 885) except dsh_epem_aaepem,
+      which fails the mixture read (49902 of 50000 train rows) and is rebuilt at a margin from its measured kept fraction
+      (dsh_kept.json; aaccx and aamupmum also slightly larger). RULED OUT: (a) generation cuts were not the cause of short
+      runs: pools keep >=0.984 of pp default-share events (card already has pT, eta and MadGraph''s default Delta R 0.4);
+      e+e- loses up to 0.38 at 91 GeV only to the mixed-kind pair-mass cut, which no run card can apply; partonic-frame |eta|
+      cannot go on a pp card; the 135.5 margins were inherited pp13v4 stall margins. The cause is MadEvent stopping short
+      of its target, worse the more events a run asks (pp13v4_uu_gguu 1000/1000 at 1000 asked vs 137/14280). Forced second
+      refine (AMP_LHE_SECOND_REFINE, off): at 14k events both arms timed out; at 1000 events forced returned 47 and 383 where
+      normal returned 326 and 1000 (dsh_ud_huuwm, dsh_ud_ddhwp): not a fix. HELD: pp13v4_uu_gguu (generator gives 18 runs
+      of 1000), dsh_uu_gguu (86 runs of 621) and dsh_uu_aguu (43 runs of 1244, all parts made, not assembled), pending Joaquin''s
+      call: do runs of few events change the distribution? Only like-for-like comparison (lhe_probe runsize): dsh_uu_aguu
+      small runs vs pp13v4_uu_aguu large runs, sqrt(s_hat) KS 0.022 p 7e-4 (max |eta| p 0.009); which side is biased is unknown
+      (large runs are the ones stopping short); affects the 4 pp default-share pools with runs <= 2000 events. Watch: dsh_ud_huuwm
+      returns 33-47% at 1000 events and runs 3 x 19154 without accept_short, expect failed tasks. FILES: tools/lhe_parts.py,
+      tools/lhe_probe.py, scripts/job_lhe_parts.sh, scripts/job_lhe_probe.sh, tests/test_lhe_parts.py, mg5_pipeline_final.py
+      (add_card_params, AMP_LHE_SECOND_REFINE), recipes/gen_catalog_v4_default.py, recipes/gen_catalog_v4_pp.py, generated
+      recipes catalog_v4_default_processes/lhe.yaml and catalog_v4_pp_processes.yaml, analysis/catalog_v4/data/{lhe_assembled,dsh_kept,lhe_probe_yields,lhe_mixcheck_failing,lhe_run_yields}.json,
+      CLAUDE.md (catalog_v4 table row, sizing knobs open). COMMITS 4fbd9e6f 8e273d6a 485d3382 2d915af7 7c78c2dc 194f723d 6220a189
+      1289d610 96d8ca7b c5aeb772 c9b5c8f0 (repo-reviewer passed). Probe logs: runs recorded under next 7 (FA-ccin2p3-0a328481...,
+      c70aaf30 mixcheck, bdd2af1f refine). NEXT: step 7 as set: collect catalog_v4_w3 (lhe_parts status, worker logs, failed/*.err,
+      Q/logs), ack the old and wave workers'' end events; once the old workers have ended, plan a new queue for what is short
+      or failed (refresh pp yields with lhe_parts yields, rerun the generators, plan --skip-claimed the w3 queue); then lhe_probe
+      mixcheck over all assembled dsh pools; the three held pools wait on Joaquin.'
     - analysis/catalog_v3/coverage_check.py
     - analysis/catalog_v3/data/coverage_check.json
     - analysis/catalog_v3/data/short_reads/dimensionless_muon_best
