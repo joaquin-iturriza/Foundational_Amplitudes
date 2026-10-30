@@ -102,7 +102,7 @@ def cmd_plan(a):
     for name, its in sorted(items.items()):
         if name in (getattr(a, "exclude", None) or []):
             continue                                  # held out of this queue (plan --exclude)
-        n_adopt += _adopt(D, name, its)
+        n_adopt += _adopt(D, name, its, [os.path.join(q2, "specs") for q2 in getattr(a, "skip_claimed", None) or []])
         with open(os.path.join(D["specs"], name + ".json"), "w") as f:
             json.dump({"seed": a.seed, "items": [[r, p] for r, p in its]}, f)
         rate, src = _rate(name, rates, med)
@@ -128,15 +128,17 @@ def cmd_plan(a):
                                                    2)}))
 
 
-def _adopt(D, name, its):
+def _adopt(D, name, its, other_specs=()):
     """Hard-link the part files of a process's previous plan (Q/specs) to its new names when the new layout changes only
     the number of runs (lhe.n_runs raised or cut; with lhe.run_events unchanged, also the margin; no lhe.energies): run
     k below both counts has the same run name, iseed and events, so the same MadEvent run. Nothing is deleted. Returns
     the parts linked."""
-    sf = os.path.join(D["specs"], name + ".json")
-    if not os.path.exists(sf):
+    # the process's previous plan: this queue's spec, else that of a queue it takes over (--skip-claimed)
+    sf = next((f for f in [os.path.join(D["specs"], name + ".json")] +
+               [os.path.join(d, name + ".json") for d in other_specs] if os.path.exists(f)), None)
+    if sf is None:
         return 0
-    old = [r for r, _ in _spec(D, name)]
+    old = [r for r, _ in json.load(open(sf))["items"]]
     new = [r for r, _ in its]
     # n_runs may go up (more runs) or down (the leading runs made already hold the blocks); with lhe.run_events the
     # events each run asks are fixed by it, so n_requested (margin) may change too; anything else is another layout

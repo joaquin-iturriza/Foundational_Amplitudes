@@ -561,6 +561,17 @@ def test_park_and_skip_claimed():
             lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q2, seed=42, rates=rates, cores=[],
                                                   skip_claimed=[q1]))
             assert sorted(os.listdir(os.path.join(q2, "todo"))) == todo[1:]
+            # a layout with fewer runs, planned in a third queue taking over q1: the leading runs' parts made under q1's
+            # layout are linked to the new names (the previous plan read from q1's specs), not planned again
+            for part, _ in mg.lhe_part_paths(NAME, _items())[:2]:
+                os.makedirs(os.path.dirname(part), exist_ok=True)
+                np.savez(part, mom=np.zeros((5, 5, 4)), aqcd=np.zeros(5))
+            mg.PROCESSES[NAME]["lhe"]["n_runs"] = 3
+            q3 = os.path.join(d, "q3")
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q3, seed=42, rates=rates, cores=[],
+                                                  skip_claimed=[q1]))
+            new = mg.lhe_part_paths(NAME, _items())
+            assert all(os.path.exists(p) for p, _ in new[:2]) and len(os.listdir(os.path.join(q3, "todo"))) == 1
     finally:
         os.environ.pop("AMP_LHE_PARTS_DIR", None)
         del mg.PROCESSES[NAME]
