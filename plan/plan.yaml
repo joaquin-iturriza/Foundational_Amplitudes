@@ -4328,6 +4328,8 @@ entries:
     agent: a3cbd2e82774954b6
     state: working
     since: '2026-10-30T13:17:36+00:00'
+    context: 120482
+    context_at: '2026-10-30T13:28:41+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
