@@ -140,12 +140,11 @@ entries:
       -> 2.91%; each seed lower on 15, 16, 18, 17 of 21; no blow-ups). Cost on zero-shot MSE, arm over control: H1 1.234,
       H2 1.154, H7E 1.188, H7c 1.217 (beyond the control''s seed spread), H2p5 1.046, H3 1.029; H5 magnitude 0.612. Waits
       on the user: whether to add the extension to the full pretraining''s training set, with that cost beside the sign gain'
-    6: 'Shape gap read with the TR reads (analysis/catalog_v4/data/shape_gap.json @c26f3fef, loop_levels.py --shape-gap):
-      by the passed design, multiplicity pools: transfer gap (median e by the TR read 0.383 / 0.356 at seeds 42 / 43, >= 0.3
-      on both; log-log residual 0.313 agrees); new combinations: floor (e 0.297 / 0.270, < 0.3; residual 0.174 agrees). Beside,
-      not decided: top at another trained mass e 0.278, top at no trained mass 0.907. To do: fill the scorer column of tab:v4_shape_gap
-      and the decision in par:v4_shape_gap with these, then design target or input priors aimed at the multiplicity gap, starting
-      with the cells of largest e (per-cell excess by TR: 5ee 1.48, 5bb 1.44, 5qg 1.25, 5bg 1.16)'
+    6: 'Dipole read (design passed 2026-10-30 22:28, CPU only): FA-ccin2p3-464da136 running on CC (scripts/job_v4_dipole_residual.sh
+      @036a8b19, analysis/catalog_v4/dipole_residual.py @a1cc783e; target 1 h). When it ends: read its DIPOLE_RESIDUAL lines
+      and outputs under $SCRATCH/zz_v4_dipole_<job>, group per cell (5ee, 5bb, 5qg first) with the refused count per group
+      beside each median, apply the gate then the main rule. Shape-gap write-up done (par:v4_shape_gap @30b8fde9, notes-editor
+      passed)'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1456,10 +1455,13 @@ entries:
       - 'user adopts: the extension''s one-loop pools join the full pretraining''s recipe'
       - 'user declines for the tree-axis cost: recorded, the full pretraining keeps catalog_v4_train.yaml'
     6:
-      feeds: 'the user''s shape priority (D178): transfer gap or the network''s floor at this compute'
+      feeds: 'the user''s shape priority (D178): whether an input prior from the per-event dipole factor is aimed at the multiplicity
+        gap'
       if:
-      - 'the write-up committed: design priors for the multiplicity gap (a new design, reviewed)'
-      - 'a per-cell look shows the gap held by a few cells only: report those cells and design for them alone'
+      - 'gate fails (median r^2 of t - logF on log D < 0.1): dead end for the dipole route; design the next candidate (the
+        propagator-product factor)'
+      - 'gate passes and main read yes: design the GPU arm with log D as a per-event input'
+      - 'gate passes, main read no: dead end for this route'
   step_waits: {}
   owner:
     agent: a208e44d49598bdaf
