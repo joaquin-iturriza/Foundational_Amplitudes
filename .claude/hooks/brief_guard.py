@@ -10,7 +10,10 @@
 Subagents' launches are checked too (an owner is never split into more agents for its entry; repo-reviewer
 2026-10-30). Exempt: the reviewers with their own definitions (design-reviewer, repo-reviewer, notes-editor, claudemd-keeper), read-only search and planning agents
 (Explore, Plan) and the harness's helpers (claude-code-guide, statusline-setup), and a resumed agent (SendMessage is
-another tool). A cut the user asked for is quoted in the brief as his words in double quotes: a quote he typed
+another tool). A launch whose `model` differs from its subagent_type definition's `model:` (.claude/agents/<type>.md,
+then ~/.claude/agents/) is refused for every type, the exempt ones included: the definition is the decided model (three
+owners went out on sonnet on 2026-10-30 against definitions saying opus; nobody decided it). No `model` given passes.
+A cut the user asked for is quoted in the brief as his words in double quotes: a quote he typed
 (tools/plan.py typed_at) is not read, an invented one is.
 Python on purpose: a crash exits 1, which blocks nothing."""
 import json, os, re, sys
@@ -84,6 +87,30 @@ def cuts(text):
     return bad
 
 
+def definition_model(agent_type):
+    """The `model:` of an agent type's definition frontmatter (project first, then user level); None without one."""
+    if not agent_type or not re.fullmatch(r"[A-Za-z0-9_.-]+", agent_type):
+        return None
+    for d in (os.path.join(ROOT, ".claude", "agents"), os.path.expanduser("~/.claude/agents")):
+        try:
+            text = open(os.path.join(d, agent_type + ".md")).read()
+        except OSError:
+            continue
+        m = re.match(r"---\n(.*?)\n---", text, re.S)
+        mm = re.search(r"^model:\s*(\S+)\s*$", m.group(1), re.M) if m else None
+        return mm.group(1) if mm else None
+    return None
+
+
+def model_mismatch(ti):
+    want, given = definition_model(ti.get("subagent_type")), ti.get("model")
+    if want and given and given != want:
+        return ("brief_guard: model %r differs from the %s definition's model %r (.claude/agents/%s.md). Leave `model` "
+                "out (the definition's model is used) or pass %r; another model is Joaquin's call.\n"
+                % (given, ti.get("subagent_type"), want, ti.get("subagent_type"), want))
+    return None
+
+
 def main():
     try:
         inp = json.loads(sys.stdin.read() or "{}")
@@ -92,6 +119,10 @@ def main():
     if not isinstance(inp, dict) or inp.get("tool_name") not in (None, "Agent"):
         return 0
     ti = inp.get("tool_input") or {}
+    bad_model = model_mismatch(ti)
+    if bad_model:
+        sys.stderr.write(bad_model)
+        return 2
     if ti.get("subagent_type") in EXEMPT:
         return 0
     prompt, b = ti.get("prompt") or "", block()

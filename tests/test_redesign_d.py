@@ -287,9 +287,11 @@ def d3():
 
 
 # ---------------------------------------------------------------- D4: the owner's brief and its guard
-def brief(prompt, typ="general-purpose", agent=None):
+def brief(prompt, typ="general-purpose", agent=None, model=None):
     inp = {"hook_event_name": "PreToolUse", "tool_name": "Agent", "session_id": "s",
            "tool_input": {"subagent_type": typ, "prompt": prompt, "description": "x"}}
+    if model:
+        inp["tool_input"]["model"] = model
     if agent:
         inp["agent_id"] = agent
     r = subprocess.run([sys.executable, os.path.join(HOOKS, "brief_guard.py")], input=J(inp),
@@ -335,6 +337,12 @@ def d4():
     scenario("D4: reviewers are exempt, launched by the main session or by an owner",
              brief("x", "design-reviewer")[0] == 0 and brief("x", "repo-reviewer")[0] == 0 and
              brief("x", "design-reviewer", agent="o1")[0] == 0)
+    # 2026-10-30: three owners launched as compact-worker with model sonnet, against the definition's opus
+    son, dflt, rev = brief(b, "compact-worker", model="sonnet"), brief(b, "compact-worker"), \
+        brief("x", "design-reviewer", model="opus")
+    scenario("D4: a launch whose model differs from its definition's is refused (compact-worker + sonnet); no model, or "
+             "the definition's own (design-reviewer + opus), passes",
+             son[0] == 2 and "sonnet" in son[1] and dflt[0] == 0 and rev[0] == 0, (son, dflt, rev))
     # the night's launches: each main-session addition to a step prompt, replayed in the narrowing slot
     import re as _re
     norm = lambda x: " ".join(x.split())
