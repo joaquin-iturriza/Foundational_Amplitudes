@@ -4169,8 +4169,10 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: e384cbc6
+    paths:
+    - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
+      projects.toml and site_runends.py)
   dead_ends: []
   asks: []
   step_why:
