@@ -1358,6 +1358,29 @@ entries:
       with both numbers per cell, no GPU arm. Cost: four eval-only GPU jobs (H2 and TR per seed), about 0.5 GPU-h each, 2
       GPU-h in all (budget 30), wall-time target 1.5 h; one CPU analysis on the laptop from the saved indices and pool momenta
       on CC (a CPU job, 4 cores, under 1 h).'
+    fix_at: '2026-10-30T22:26:05+00:00'
+    fix: 'Check 2 (measure shown to respond) fails: the check cites the surrogates'' r^2 0.50, which is the eikonal PLUS the
+      propagator product with raw log|M|^2 on catalog_v3 training processes, and 81-96% on the Z+ng / W+ng families; the same
+      paragraph (results.tex ~5644) says the eikonal alone has r^2 <= 0.21 on the catalog, and par:v4_mult_cand says catalog_v4
+      events sit at the cuts (pT>10 GeV, dR>0.4), not at the soft end, so D may vary little within a pool. More importantly
+      the control''s target is the emission-scale target (par:dimless_qperp: log|M|^2 over the product of the event''s emission
+      scales), which already divides out a per-event soft scale; no number shows that log D carries per-event variance of
+      THAT target in the multiplicity cells. Fix: before any GPU read, a CPU job on the pools'' momenta and labels (no network):
+      per pool, r^2 of the control''s target t (and of raw log|M|^2 beside) on log D, for the 5ee, 5bb, 5qg cells and all
+      multiplicity cells, held-out and training; state the level that makes the residual read worth running (e.g. median r^2(t,
+      log D) >= 0.1, else D cannot carry a 0.38 gap and the design stops there as a dead end). Check 5 (prior) misses: (a)
+      par:dimless_qperp and its follow-ups: the control''s target already uses the per-event emission scales (2->4 +g MSE
+      52 -> 2.2), the existing per-event soft prior a log-D input would sit beside; name it and add the log product of the
+      emission scales as a second placebo/comparator factor, so a residual correlation with log D is shown to be beyond what
+      the target''s own soft scale captures; (b) D86 (''the zero shot fix (a) eikonal/dipole ... revisited once we settle
+      on the preprocessing''): say how this design stands to it (it is inside the preprocessing study, D178 asks for physics
+      priors and input-side conditioning); (c) the eikonal-alone r^2 <= 0.21 above. Check 3 (seeds): two seeds with both-must-hold
+      is acceptable, but no spread of the median residual r^2 is measured; report its seed-to-seed difference and a bootstrap
+      over pools per group, and require the yes margin (held-out minus training, held-out minus placebo) to exceed it. Checks
+      1, 4, 6, 7 hold: same network/scorer/split, training pools of the same cells as control, energy placebo; yes/no/between
+      stated with thresholds and consequences; within D178 and step 6, largest cells first. Terms searched: eikonal, dipole,
+      antenna, soft factor, surrogate, Parke, qperp, emission scales, zero-shot fix, shape gap, mult_cand, site decisions
+      (D86, D113/D114 qperp_soft, D178, D179).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
