@@ -4243,6 +4243,13 @@ entries:
       longest); 4315 tasks done, 0 failed, 12/12 assembled. The ALERT''s 2.1 h is the time from queue start to the alert at
       12:47 UTC, not to the last task''s end (the queue had ended about an hour before): the supervisor''s overrun clock does
       not stop at the batch''s end. Not a generation overrun.'
+  - at: '2026-10-30T13:04:08+00:00'
+    text: 'Mixture check over the 112 assembled rebuilt pools (FA-ccin2p3-82e8c54a, code 628b4edf, queues catalog_v4_gridpack,
+      _57, _fix, _last, _probed): MIXCHECK n_failing 0 (every assembled default-share pool reads at the arms'' largest size
+      in every role). Its runsize pass (default-share pp pools in runs of at most 2000 against their reuse pools of 10000,
+      event-level KS on sqrt(s_hat), max |eta|, max pT): 51 pools, 153 tests, 1 under 0.05/153 (dsh_udx_gwpwpwm sqrt(s_hat),
+      KS 0.0225, p 3e-4), 18 under 0.05 (7.7 expected by chance; event-level, errs towards finding differences). cgsxwm (the
+      113th) not assembled.'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
