@@ -4657,6 +4657,15 @@ entries:
       112 assembled rebuilt pools (mixcheck over the 112 passed, FA-ccin2p3-82e8c54a). Next step 12 (cgsxwm gridpack budget
       probe) dropped; its 12 jobs had already completed (arms A-C, logs under $SCRATCH/lhe_probe_keep_ximprove_{A,B,C}), not
       read out, nothing to cancel.'
+  - at: '2026-10-30T17:18:44+00:00'
+    text: 'Step 13 re-read was invalid because of its inputs, not the test: every non-reproducing group belongs to a class
+      whose pools the gridpack rebuild touched, and per group the re-read saw other runs (short_run_bias: e.g. dbx_bxuwmz
+      short 43 runs/2.99M events committed vs 42/1.99M re-read, its serial pp13v4 pool gone; size: bb_bbgg short 9 vs 10 runs;
+      gpack: uu_duwpz complete 39 vs 40, short 26 vs 28). Causes: the --before cutoffs were the JSONs'' commit times, later
+      than the measurements, so parts written in between came in; serial pp13v4 pools replaced by complete-run assemblies
+      were set aside (moved, nothing deleted) and so dropped; the replacement''s banner shadowed the set-aside one. Fixed
+      in b9a2ceb8 (samples as at a time, set-aside versions with their own asks, banner and stamp; cutoff search per measurement);
+      re-read rerun as FA-ccin2p3-44201039.'
   handoff:
     state: 'D193: cgsxwm 3 TeV dropped, catalog goes ahead on the 112 assembled rebuilt pools (mixcheck over 112 passed, FA-ccin2p3-82e8c54a).
       Default-share pp runsize flags explained (finding: 14 of 51 compared against catalog_v3 pp13 references of other physics
