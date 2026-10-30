@@ -963,8 +963,8 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
         handled |= unsorted_runs([r for r, _ in ended])
         # ...but a batch whose runs have ALL ended (none live) is the step's own signal to move, acked or not: hiding
         # acked ends left a finished probe batch with nobody to read it (2026-10-30, 12 probes idle for hours)
-        live = [r for r, state, fin in rows if not terminal(state)]
-        if not (ended and not live and all(r in handled for r, _ in ended)):
+        still_live = [r for r, state, fin in rows if not terminal(state)]
+        if not (ended and not still_live and all(r in handled for r, _ in ended)):
             ended = [(r, fin) for r, fin in ended if r not in handled]
         if sweeps is None:
             sweeps = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps_of(st, e["id"]) else {}
