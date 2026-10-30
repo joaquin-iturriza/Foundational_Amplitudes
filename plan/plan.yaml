@@ -4281,6 +4281,39 @@ entries:
       run_perm, scaled, unequal, short_run_bias; plan show catalog_coverage; site decisions for short, re-read, permutation,
       run-level: no prior re-read; next 13 of the entry asks for exactly this); answers next 13; no user decision names a
       comparison for it.'
+  - at: '2026-10-30T13:37:07+00:00'
+    question: Do the run-level verdicts of par:v4_short_runs (short runs biased; per-run-integrated complete runs of 1000/150/200
+      differ from runs of many; gridpack runs agree with large runs; cgsxwm 3 TeV smaller runs differ from runs of 200) stand
+      when the run-level permutation p holds its level with units of unequal size (run_perm fix cdcae2cd)? Eval-only re-read
+      of committed measurements, CPU only, 0 GPU-h. Revised after FIX (relabelling error).
+    prior: 'par:v4_short_runs in docs/results.tex: short vs complete 4 of 32 run-level tests under Bonferroni, 10 under 0.05
+      (short_run_bias.json @a73a07af); ladder 7 of 16 under 0.05/16 (short_run_bias_size.json @44b2eeb3); gridpack 0 of 5
+      primary (short_run_bias_gpack.json @c2e4f0f1); cgsxwm sizecheck no size passes (cgsxwm_sizecheck.json @070e10c8). Finding
+      2026-10-30 (this entry): run_perm''s p too small with unequal unit sizes. No prior re-read (reviewer searched results.tex,
+      plan, site decisions).'
+    measure: 'Each committed measurement re-run on the files it saw at 20000 relabellings twice, with the old unscaled statistic
+      and the scaled one (same seed 0, same relabellings: paired). Per test: p_runs old-test vs new-test with Clopper-Pearson
+      95% intervals (short_run_bias.py reread, c7ad253f); per verdict the counts of summary / sizesummary on both. A verdict
+      counts as changed only when the new test''s 20000-relabelling interval clears the threshold on the other side from the
+      old test''s.'
+    check: 'On iid events, 66 runs of 1000 vs 18 of 555: old test 0.19 of 150 under 0.05, scaled 0.04 (tests/test_run_perm_calibration.py);
+      on the 8 multi-run default-share pools old p below event p in 24 of 24, scaled 15 of 24; cgsxwm sizecheck re-run on
+      the login node at 2000 relabellings with the scaled test: event KS reproduced 8 of 8, short runs of 25 vs reference
+      p 0.0 -> 0.037, of 100 0.054 -> 0.59: the measure moves with the change.'
+    fixed: 'Same files (measure --before the commit time of each committed JSON), groups, cap 200000, 50 bins, relabelling
+      seed 0, features; old and new differ only in the scaling of the statistic. Validity: every event-level KS of the re-run
+      reproduces the committed one exactly (reread event_ks_differ = 0), else that file''s re-read is INVALID (files changed
+      since).'
+    control: Event-level KS reproduction (above); the unscaled 20000 re-run reproduces the committed 2000-relabelling p within
+      their intervals; the complete-halves and top-halves controls' rate under 0.05 stays near chance under the scaled test
+      (1 of 31 before); the scaled test's calibration on iid events.
+    seeds: 'Deterministic: the committed subsample seeds and relabelling seed 0; 20000 relabellings so a p near 0.0015 carries
+      an interval of about +-0.0005.'
+    outcome: 'YES (verdicts stand): each count of the paragraph (32/4/10, 30/6/13, ladder 16/7, gridpack 0 of 5, cgsxwm no
+      passing size) keeps its verdict under the scaled test at 20000 -> the paragraph notes the re-read with the new numbers.
+      NO: a verdict changes by the interval rule (e.g. short vs complete no longer significant, the ladder at 1000 agreeing)
+      -> rewrite the paragraph and its hand-off, and state whether the 113-pool gridpack rebuild was needed. INVALID: event
+      KS not reproduced for a file -> that re-read reported as not done, with what changed.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
