@@ -2638,6 +2638,45 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     commit: '39914802'
     paths:
+    - 'HAND-OFF (2026-10-30, gridpack step). (1) CODE: commit 7bdc5729 (+39914802 measure). mg5_pipeline_final.py: lhe_make_gridpack(process,
+      ev, nevents, iseed, log, mg_cores, patches, run_name=''grid'') runs lhe_run_madevent with run-card gridpack=True (lhe_run_madevent
+      now returns lhe=None for a gridpack run instead of raising) and returns <ev>/grid_gridpack.tar.gz; lhe_run_gridpack(tar,
+      work, nevents, seed, log, timeout) unpacks into a fresh dir and runs ''bash ./run.sh N seed'' -> events.lhe.gz; lhe_gridpack_header(lhe)
+      = the LHE header (banner for physics_key). tools/lhe_probe.py gridpack (--process --grid-events --runs --events --seed-base
+      --cores --energy --keep): one gridpack (grid iseed lhe_iseed(process, 7777+seed_base)) then runs seed_base+1.. in a
+      thread pool, kept as <proc>_gpack<iseed>_seed<s>_ev<n>.npz, GRIDPACK_JSON per run + GRIDPACK_SUMMARY. scripts/job_lhe_probe.sh
+      PROBE_SHARD=gridpack (GP_PROCESS GP_GRID GP_RUNS GP_EVENTS GP_SEED_BASE GP_ENERGY PROBE_KEEP). analysis/catalog_v4/short_run_bias.py:
+      physics_key ignores gridpack; GPACK_RE samples kept out of every other comparison; per group: ladder, control_top_halves,
+      gridpack (''all/<ask>/<f>'' pooled primary, ''g<iseed>/<ask>/<f>'' each), gridpack_vs_own_runs (direct), gridpack_pair,
+      control_gridpack_halves. Tests: tests/test_lhe_gridpack.py (fake generate_events/run.sh: card gets gridpack True, nevents,
+      iseed; runs give events and header; key ignores gridpack; file-name regex) passes; tests/test_lhe_parts.py still passes.
+      Not tested on real MG5 3.7.0: the probe jobs are the first real gridpacks. (2) REFERENCE CHECK: largest complete runs
+      split in two agree (dg 0.0055/0.0037 p 0.72/0.98; bb 0.0041/0.0038 p 0.93/0.97; e+e- 0.005 p 0.77): self-consistent.
+      (3) PROBE: design passed (after one FIX) 2026-10-30; 6 CPU jobs FA-ccin2p3-f0ed9631 f51db377 5b39316d a8e18d29 a30c4ec3
+      80b598d9 (16 cores, 32G, limit 2 h, target ~1.5 h): dsh_dg_dguux grid 40282 and dsh_bb_bbgg grid 31774, 100 runs of
+      1000 per gridpack; dsh_epem_amupvmwm at 1000 GeV grid 13057, 200 runs of 200; seed bases 0 and 1000. Analysis: site
+      run --item catalog_coverage ccin2p3 FA -- ''python analysis/catalog_v4/short_run_bias.py measure --out $SCRATCH/short_run_bias_gpack.json'';
+      copy home to analysis/catalog_v4/data/short_run_bias_gpack.json; read gridpack ''all/...'' at level 0.05/5=0.01 (NOT
+      summary()''s Bonferroni over all gridpack keys), gridpack_pair above 0.05/5, detectable_ks_5pct vs the old bias (dg
+      0.021/0.023, bb 0.0137/0.0117, e+e- 0.0187), gridpack_vs_own_runs. YES (all three groups): rebuild as gridpack runs.
+      NO (a group differs, its two gridpacks differ, or no gridpack builds): report to Joaquin; rebuild in complete runs of
+      1000 (KS up to 0.023) vs keep short-run pools (up to 0.029) is his call. Write-up: par:v4_short_runs + extend short_run_bias.py
+      figsize with gridpack points. (4) WHAT tools/lhe_parts.py NEEDS: today a task is one run k of a pool (_run_task -> mg.lhe_build_part(name,
+      items, k) -> part file named by _lhe_events_id + run, lhe_part_paths; lhe_assemble concatenates parts in run order,
+      lhe.complete_runs keeps only complete ones). For gridpacks: an lhe.gridpack field in the entry and in lhe_pp_recipe''s
+      identity (so a gridpack pool never passes for a per-run one); per pool (and per e+e- energy) a gridpack task first (lhe_make_gridpack
+      at lhe.gridpack_events, the reference-like run size, many cores; tar stored under lhe_parts_dir()/<process>/ named by
+      the events id + energy), then run tasks that depend on it (lhe_run_gridpack with the run''s seed from lhe_runs, read_lhe_pp,
+      written as the same part file lhe_build_part writes, banner = lhe_gridpack_header), claimed only once the tar exists
+      (cmd_plan/_claim need a dependency, or a two-phase queue); lhe_assemble unchanged. complete_runs.json gets gridpack
+      + run sizes; recipes/gen_catalog_v4_default.py and gen_catalog_v4_pp.py regenerated from it. Tests: extend tests/test_lhe_parts.py
+      fakes. (5) POOLS: 56 in analysis/catalog_v4/data/complete_runs.json (52 assembled from short runs: 18 dsh_, 18 ee4_,
+      16 pp13v4_; the three held pp13v4_uu_gguu, dsh_uu_gguu, dsh_uu_aguu, still held; dsh_ud_huuwm whose runs stop short
+      even at 1000). Rebuild queue to plan with lhe_parts plan recipes/catalog_v4_default_lhe.yaml recipes/catalog_v4_ee_test.yaml
+      recipes/catalog_v4_pp_parts.yaml --queue $SCRATCH/lhe_queue/catalog_v4_complete --skip-claimed catalog_v4_w3 catalog_v4_default
+      catalog_v4_w2 pp13v4_rest pp13v4_ddxgg (check only the 56 are new), site pick FA --gpus 0, workers sized ~1 h, never
+      replan under running workers. (6) NEXT: step 7 collects the probe (recorded); in parallel a fresh agent builds (4) so
+      a yes goes straight to one wave.'
     - 'HAND-OFF (2026-10-30, short-run bias step). (1) Result: a MadEvent run that stops short of its target biases its events.
       analysis/catalog_v4/short_run_bias.py @a73a07af on 4807 part files + 364 pools, 23 groups of one class and banner physics,
       run-level permutation test (binned KS on sqrt(s_hat) and cos theta* of the first final): short vs complete 4 of 32 tests
