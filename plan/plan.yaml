@@ -4429,4 +4429,5 @@ entries:
       if:
       - 'a day passes with no misfire of a new hook: clean up and close'
       - 'a misfire: fix it first, restart the day'
-  step_waits: {}
+  step_waits:
+    '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
