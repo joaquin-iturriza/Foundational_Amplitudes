@@ -1496,6 +1496,12 @@ entries:
     units: null
     start: '2026-10-30T22:28:25+00:00'
     at: '2026-10-30T22:28:25+00:00'
+  - batch: dipole_rereads
+    wall_h: 1.5
+    jobs: 2
+    units: null
+    start: '2026-10-30T23:13:41+00:00'
+    at: '2026-10-30T23:13:41+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
