@@ -2258,16 +2258,6 @@ entries:
       and _seed2, V3_AXES=PP4, a fraction of a GPU-h). Still owed before (b) is reported for training classes: a test-split
       read of the 797 swapped classes'' catalog_v4 smart-mixture pools by the arm and both controls. Control reused: catalog_v4''s
       Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29), 1068 pools same (control_pool_check.py @c809ca44).'
-    7: 'Collect the gridpack probe (6 CPU jobs submitted 2026-10-30, FA-ccin2p3-f0ed9631 f51db377 5b39316d a8e18d29 a30c4ec3
-      80b598d9; wall-time target about 1.5 h, limit 2 h; design passed, commit 39914802): two gridpacks each of dsh_dg_dguux
-      (grid 40282 events) and dsh_bb_bbgg (31774), 100 runs of 1000 each, and of dsh_epem_amupvmwm at 1000 GeV (13057), 200
-      runs of 200 each, kept under $SCRATCH/lhe_probe_keep as <process>_gpack<iseed>_seed<s>_ev<n>.npz. Read each log (GRIDPACK_JSON
-      grid stage: s_gridpack, grid_fail_to_reach_target; GRIDPACK_SUMMARY complete/errors), then site run --item catalog_coverage
-      ccin2p3 FA -- ''python analysis/catalog_v4/short_run_bias.py measure --out $SCRATCH/short_run_bias_gpack.json'', copy
-      home as analysis/catalog_v4/data/short_run_bias_gpack.json, read per group: gridpack ''all/<ask>/<f>'' (primary, 5 tests,
-      level 0.01, NOT summary()''s Bonferroni over all gridpack keys), gridpack_vs_own_runs (direct), gridpack_pair, control_top_halves
-      (reference convergence), detectable_ks_5pct against the group''s old bias (dg 0.021/0.023, bb 0.0137/0.0117, e+e- 0.0187).
-      Write up in par:v4_short_runs with figure (extend figsize with the gridpack points).'
     8: 'After the catalog_v4_w3, catalog_v4_default, pp13v4_rest and pp13v4_ddxgg workers end (about 06:05 to 06:50): python
       tools/lhe_parts.py shortbuilt on CC; every catalog_v4 pool (dsh_, ee4_, pp13v4_) w3 or the old workers assembled from
       a run short of its ask goes into complete_runs.json and the complete-run layout (recipes regenerated), planned in the
@@ -3946,16 +3936,6 @@ entries:
         controls'' PP4 mode-eval reads'
       - 'step 1 not yet passed or a class fails it: keep waiting on step 1; a failing class is left out of the arm''s scoring
         and listed'
-    7:
-      feeds: 'how the 56 catalog_v4 pools assembled from short runs (and the three held) are rebuilt: whether gridpack runs
-        give the events of complete runs of many'
-      if:
-      - 'every group yes (primary above 0.01, pair agrees, power stated): lay the 56 pools out as gridpack runs (lhe.gridpack
-        in complete_runs.json and the identity, one gridpack per pool and energy, runs of 1000 / 200; lhe_parts plan/worker
-        built on lhe_make_gridpack + lhe_run_gridpack), plan the catalog_v4_complete queue, release pp13v4_uu_gguu, dsh_uu_gguu,
-        dsh_uu_aguu, submit one wave with its wall-time target'
-      - 'a group differs, its gridpacks disagree, or a gridpack fails to build: report to Joaquin with the numbers; rebuild
-        in complete runs of 1000 vs keeping the short-run pools is his call'
     8:
       feeds: whether any catalog_v4 MadEvent pool is left built from short runs
       if:
