@@ -2343,12 +2343,10 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      energy_runs:
-      - 1
-      - 1
-      - 1
-      - 8
-      accept_short: true
+      complete_runs: true
+      run_events: 200
+      n_runs: 4
+      gridpack: 13057
     parent: v4_epem_btxwp
     split: heldout
     test_group: 'e+e- v4: H3'

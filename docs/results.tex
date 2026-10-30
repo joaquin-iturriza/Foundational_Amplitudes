@@ -3047,8 +3047,8 @@ two gridpacks pooled against the same large complete runs with the same run-leve
 $5$ tests); the pooled runs against the per-run-integrated complete runs of the same size (direct); the two gridpacks
 against each other (pair); everything else as the ladder (\code{tools/lhe\_probe.py gridpack}, six CPU jobs). Every
 gridpack built (none stopped short); the pp runs all completed, $393$ of the $400$ $e^+e^-$ runs did. Of the $5$
-primary tests $0$ fall below $0.05/5$, and of the pair tests $0$: the two gridpacks agree in every group, so the gridpack runs give the large
-runs' events within this probe's power: on $d g\to d g u\bar u$ the distance drops from $0.0208$ and $0.0232$ (per-run integration, recomputed
+primary tests $0$ fall below $0.05/5$, and of the pair tests $0$: the two gridpacks agree in every group, and the gridpack runs give the large
+runs' events within this probe's power. On $d g\to d g u\bar u$ the distance drops from $0.0208$ and $0.0232$ (per-run integration, recomputed
 on the same runs) to $0.0081$ ($p=0.028$) and $0.0085$ ($p=0.0135$), on $b b\to b b g g$ from $0.0131$ and $0.0112$ to $0.0079$ ($p=0.022$) and
 $0.0058$ ($p=0.223$), and on $e^+e^-\to\gamma\mu^+\nu_\mu W^-$ from $0.0180$ to $0.0042$ ($p=0.995$), against
 event-level detectable distances of $0.0066$, $0.0071$ and $0.008$ at $5\%$ (Fig.~\ref{fig:v4_run_size}, open
@@ -3056,11 +3056,13 @@ squares and diamonds). The direct test separates the gridpack runs from the per-
 tests (on $d g\to d g u\bar u$ by $0.013$ and $0.0152$, $p<10^{-3}$); the fifth, $b b\to b b g g$ in $\cos\theta^*$,
 is where the old bias was smallest. Caveat: the pp gridpack distances ($0.006$ to $0.009$) sit above the large runs'
 own halves ($0.004$ to $0.005$) and their $p$ are under $0.05$ uncorrected in $3$ of the $4$ pp tests, so a residual
-of under half the old bias is not excluded. By the design's outcome the $56$ pools on the
-rebuild list are laid out as gridpack runs (one gridpack per pool and energy, at the energy's whole need and at least
+of under half the old bias is not excluded. As the design set for this outcome, the $56$ pools on the
+rebuild list are laid out as gridpack runs, and with them $57$ more that the catalog\_v4\_w3 wave showed carry the same
+problem ($8$ found assembled from runs that stopped short, $49$ it could not assemble because their runs stop short),
+$113$ pools in all (one gridpack per pool and energy, at the energy's whole need and at least
 the precision of the smallest gridpack probed for its beams, $31774$ events pp and $13057$ $e^+e^-$, runs of the probed
 sizes, $1000$ pp and $200$ $e^+e^-$, only complete runs assembled).
-% src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_gpack.json @3c34fe81
+% src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_gpack.json @b6a0480f
 % allow: 16 100 1000 200 393 400 0.05 5 10^{-3} 56 13057 because they are the probe's cores, run counts and sizes, the e+e- runs that completed (GRIDPACK_SUMMARY in the logs of FA-ccin2p3-f0ed9631 and a8e18d29: 197 and 196 of 200), the test level and test count, the relabelling bound, the rebuild list's size and the gridpack floor (GRID_MIN in recipes/gen_catalog_v4_default.py)
 % claim: gridpack_primary_tests=5
 % claim: gridpack_n_below=0
@@ -3095,6 +3097,11 @@ sizes, $1000$ pp and $200$ $e^+e^-$, only complete runs assembled).
 % claim: gridpack_detail.epem_amupvmwm.cos_theta_star.per_run.ks=0.018
 % claim: gridpack_detail.dg_dguux.cos_theta_star.direct.ks=0.0152
 % claim: gridpack_vs_own_runs.n_bonf=4
+% claim: rebuild.design=56
+% claim: rebuild.added_after_w3=57
+% claim: rebuild.after_w3_short_built=8
+% claim: rebuild.w3_unassembled=49
+% claim: rebuild.pools=113
 
 \begin{figure}[t]
   \centering
