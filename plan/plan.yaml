@@ -1287,6 +1287,10 @@ entries:
   step_waits:
     '6': the user's stop on all work (2026-10-29); the two TR reads completed and wait to be collected
     '5': the user's stop on all work (2026-10-29); both reads completed and wait to be collected
+  owner:
+    agent: a208e44d49598bdaf
+    state: working
+    since: '2026-10-30T16:56:05+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
