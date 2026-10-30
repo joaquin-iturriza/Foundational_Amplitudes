@@ -1381,6 +1381,58 @@ entries:
       stated with thresholds and consequences; within D178 and step 6, largest cells first. Terms searched: eikonal, dipole,
       antenna, soft factor, surrogate, Parke, qperp, emission scales, zero-shot fix, shape gap, mult_cand, site decisions
       (D86, D113/D114 qperp_soft, D178, D179).'
+  - at: '2026-10-30T22:27:52+00:00'
+    question: 'Does the per-event soft-dipole factor carry the shape gap of catalog_v4''s held-out multiplicity pools (par:v4_shape_gap:
+      median e 0.383 / 0.356, a transfer gap; the new combinations at the floor)? Revised after the review''s FIX: a CPU-only
+      read on existing data (no network run, no GPU): first a gate, whether log D still carries per-event variance of the
+      control''s own target in the multiplicity cells; only past the gate, whether the control''s zero-shot residual tracks
+      log D on held-out multiplicity pools beyond the training pools of the same cells and beyond two placebos. A yes is the
+      precondition for an input prior (log D per event fed to the network, a later GPU design); a no ends this route. Feeds
+      D178 and step 6 (largest cells first: 5ee, 5bb, 5qg).'
+    prior: 'Searched docs/results.tex (par:v4_mult_cand, par:v4_mult_bias, par:v4_tree_shape, par:v4_shape_gap, the surrogates
+      paragraph near line 5629, par:dimless_qperp near 5981; terms eikonal, dipole, antenna, soft factor, surrogate, Parke,
+      qperp, emission scales, zero-shot fix), plan show v3_prep_explore and site decisions (D36, D38, D86, D113, D114, D178,
+      D179). Found: (i) par:dimless_qperp: the control''s target is already log|M|^2 over the product of the event''s emission
+      scales, a per-event soft prior (2->4 with an extra gluon: median MSE 52 -> 2.2); what D could add is the part of the
+      soft structure the emission scales do not hold (the pair antenna''s angular dependence), which the gate measures directly.
+      (ii) the surrogates: the eikonal alone has r^2 <= 0.21 with log|M|^2 on the catalog (constant where there is no final
+      gluon or photon or at 2->2); 0.50 only with the propagator product; 81 to 96% within Z+ng / W+ng. (iii) par:v4_mult_cand:
+      catalog_v4''s events sit at the cuts (pT > 10 GeV, Delta R > 0.4), not at the soft end, so D may vary little within
+      a pool; the per-process colour weight overshot; the per-event form untested. (iv) D86 (the user: the zero-shot fix ''(a)
+      eikonal/dipole ... revisited once we settle on the preprocessing''): this read is that revisit, as a diagnostic on existing
+      reads, made now because the shape gap (D178) points at it; it changes no preprocessing. (v) the sampling-sensitivity
+      dead ends on event alignment: here the read''s events are the first rows of the pool''s split; the script checks every
+      event''s log|M|^2 against the pool row (in order, or a one-to-one permutation when values are unique) and refuses a
+      probe otherwise.'
+    measure: 'Per probe with a final gluon or photon, on the reads already home (H2 held-out multiplicity pools, val split;
+      TR training pools, test split; 2000 events each; control pair seeds 42 and 43), with momenta from the pool rows (analysis/catalog_v4/dipole_residual.py
+      @a1cc783e): log D (D = sum over final gluons/photons j of the colour-blind antenna sum over pairs of other coloured/charged
+      legs, s_ab/(s_aj s_bj)). Gate (no network): r^2 of the control''s target t - logF on log D, and of raw t beside, median
+      per group (held-out multiplicity pools; training pools of the same cells), per cell for 5ee, 5bb, 5qg, then all five-
+      and six-particle cells. Main (only past the gate): r^2 of the residual u = (q - t) - mean on log D; placebos: E = log
+      of the summed energy of the same legs, and logF, the event''s emission-scale factor; per group the median r^2 per seed,
+      its seed-to-seed difference, and the 16-84% bootstrap range of the median over pools.'
+    check: 'The gate is the check the review asked for and is part of this read: it measures, with no network, whether log
+      D carries variance of the target the control trains on in these cells; the raw-t r^2 beside it shows how much of D''s
+      variance the emission scales already removed. The surrogates'' r^2 (0.21 eikonal alone, 0.50 with propagators) on raw
+      log|M|^2 bound what the gate can show on raw t.'
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected (short_reads/v4_dimensionless_muon[_seed2]/H2
+      and TR); the pools' frozen val and test rows; D, E and logF as defined, no tuning; cells as loop_levels.py --shape-gap;
+      the bootstrap 1000 draws, seed 0.
+    control: Held-out multiplicity pools against the training pools of the same cells, same network, scorer and events per
+      pool; two placebos (summed-energy scale; the emission-scale factor the target already divides out), so a residual correlation
+      with log D counts only beyond a generic energy trend and beyond the target's own soft scale.
+    seeds: Seeds 42 and 43 of the control; each margin must exceed both the seed difference of the group median and the bootstrap
+      half-range.
+    outcome: 'Gate fails (median r^2 of t - logF on log D below 0.1 in the held-out multiplicity pools of 5ee, 5bb and 5qg
+      and over all multiplicity cells): the emission-scale target already holds what D carries at these cuts; the dipole input
+      route is a dead end, recorded, no further read; the next candidate for the multiplicity gap is designed. Gate passes,
+      main read yes: on both seeds the held-out pools'' median residual r^2 on log D is at least 0.1, at least twice the training
+      pools'', above both placebos, each margin beyond the seed difference and the bootstrap half-range: a GPU arm is designed
+      (log D per event as an input, the control''s short pretraining, two seeds, read on H2 and TR by the shape-gap rule).
+      Gate passes, main read no (below 0.05 or not above training or a placebo): the network already uses D or the gap is
+      elsewhere: dead end for this route. Between: reported, no GPU arm. Cost: one CPU job on CC-IN2P3 (4 cores, under 1 h,
+      about 2800 probe reads with their pool rows); no GPU.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
