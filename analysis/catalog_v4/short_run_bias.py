@@ -60,9 +60,11 @@ def _section(text, tag):
     return m.group(1) if m else ""
 
 
-def physics_key(banner):
+def physics_key(banner, v1=False):
     """sha256 of what fixes the events' density: process card less its output line, run card less nevents, iseed,
-    run_tag and second_refine_treshold, the parameter card."""
+    run_tag, second_refine_treshold and gridpack, the parameter card. v1: the key as computed before 7bdc5729 (the
+    gridpack line kept), which the measurements committed before it (short_run_bias.json, short_run_bias_size.json)
+    carry."""
     if not banner:
         return None
     proc = [l.split("#")[0].strip() for l in _section(banner, "MGProcCard").splitlines()]
@@ -72,7 +74,7 @@ def physics_key(banner):
         l = l.split("!")[0].strip()
         if not l or l.startswith("#"):
             continue
-        if re.search(r"=\s*(nevents|iseed|run_tag|second_refine_treshold|gridpack)\b", l):
+        if re.search(r"=\s*(nevents|iseed|run_tag|second_refine_treshold" + ("" if v1 else "|gridpack") + r")\b", l):
             continue
         run.append(" ".join(l.split()))
     param = [" ".join(l.split("#")[0].split()) for l in _section(banner, "slha").splitlines()]
@@ -174,11 +176,11 @@ def _samples_all():
             try:
                 got = _npz_len(f)
                 with np.load(f) as z:
-                    key = physics_key(str(z["banner"]))
+                    key, key1 = physics_key(str(z["banner"])), physics_key(str(z["banner"]), v1=True)
             except Exception:
                 continue
             asked = int(m["ev"])
-            out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "asked": asked, "got": got,
+            out.append({"process": m["proc"], "class": cls(m["proc"]), "key": key, "key_v1": key1, "asked": asked, "got": got,
                         "seed": int(m["seed"]), "path": f, "kind": "part", "mtime": os.path.getmtime(f)})
             classes.add(cls(m["proc"]))
     # complete runs kept by the run-size probe (tools/lhe_probe.py run --keep: <process>_probe_seed<iseed>_ev<n>.npz)
@@ -190,11 +192,11 @@ def _samples_all():
         try:
             got = _npz_len(f)
             with np.load(f) as z:
-                key = physics_key(str(z["banner"]))
+                key, key1 = physics_key(str(z["banner"])), physics_key(str(z["banner"]), v1=True)
         except Exception:
             continue
         x = m or g
-        s = {"process": x["proc"], "class": cls(x["proc"]), "key": key, "asked": int(x["ev"]), "got": got,
+        s = {"process": x["proc"], "class": cls(x["proc"]), "key": key, "key_v1": key1, "asked": int(x["ev"]), "got": got,
              "seed": int(x["seed"]), "path": f, "kind": "part", "mtime": os.path.getmtime(f)}
         s.update({"probe": True} if m else {"gridpack": int(g["grid"])})
         out.append(s)
@@ -229,7 +231,8 @@ def _samples_all():
             b = lr.get("banner")
             if b and v != path:                            # a set-aside version: its own banner copy, moved with it
                 b = os.path.join(os.path.dirname(v), os.path.basename(b))
-            key = physics_key(open(b).read()) if b and os.path.exists(b) else None
+            bt = open(b).read() if b and os.path.exists(b) else None
+            key, key1 = (physics_key(bt), physics_key(bt, v1=True)) if bt else (None, None)
             until = float("inf")
             if v != path:                                  # <process>_<%Y%m%dT%H%M%S, the cluster's local time>
                 try:
@@ -237,7 +240,7 @@ def _samples_all():
                                                       "%Y%m%dT%H%M%S"))
                 except (ValueError, IndexError):
                     continue
-            out.append({"process": name, "class": cls(name), "key": key, "asked": sum(asked), "got": sum(per),
+            out.append({"process": name, "class": cls(name), "key": key, "key_v1": key1, "asked": sum(asked), "got": sum(per),
                         "runs_asked": asked, "runs_got": per, "seed": 0, "path": v, "kind": "pool",
                         "mtime": os.path.getmtime(v), "current": v == path, "until": until,
                         "short_any": any(g < a for g, a in zip(per, asked)),
@@ -272,8 +275,9 @@ def cmd_cutoff(a):
     compared with what the files at that time give; the earliest time matching the most groups, and the groups
     matching at none. One JSON line (CUTOFF_JSON)."""
     S = _samples_all()
+    S1 = [dict(s, key=s["key_v1"]) for s in S]
     for old, before in zip(a.old, a.before):
-        _cutoff_one(S, old, before, a.hours)
+        _cutoff_one(S1 if old in a.key_v1 else S, old, before, a.hours)
 
 
 def _cutoff_one(S, old, before, hours):
@@ -402,6 +406,8 @@ def _epoch(t):
 def cmd_measure(a):
     import numpy as np
     S = _samples(_epoch(a.before))
+    if a.key_v1:
+        S = [dict(s, key=s["key_v1"]) for s in S]
     groups = {}
     for s in S:
         if s["key"]:
@@ -1027,6 +1033,8 @@ def main():
     m.add_argument("--before", default=None, help="ISO time: only files last written before it (re-read an earlier "
                    "measurement on the files it saw; checked by its event-level numbers reproducing)")
     m.add_argument("--min-events", type=int, default=2000)
+    m.add_argument("--key-v1", action="store_true", help="group by the physics key as before 7bdc5729 (gridpack line "
+                   "kept), to re-read a measurement committed before it")
     f = sub.add_parser("fig"); f.add_argument("--json", default=OUT)
     s = sub.add_parser("summary"); s.add_argument("--json", default=OUT)
     z = sub.add_parser("figsize"); z.add_argument("--json", default=OUT)
@@ -1043,6 +1051,8 @@ def main():
     c = sub.add_parser("cutoff"); c.add_argument("--old", nargs="+", required=True)
     c.add_argument("--before", nargs="+", required=True, help="per --old, the latest time it can have been measured")
     c.add_argument("--hours", type=float, default=12.0)
+    c.add_argument("--key-v1", nargs="*", default=[], help="the --old files measured before 7bdc5729, matched on the "
+                   "physics key as it was then")
     q = sub.add_parser("sizesummary"); q.add_argument("--json", required=True)
     a = ap.parse_args()
     global NPERM, SCALED

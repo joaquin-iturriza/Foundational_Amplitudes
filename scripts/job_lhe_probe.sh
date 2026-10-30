@@ -48,13 +48,16 @@ if [ "$PROBE_SHARD" = reread2 ]; then
     R="$SCRATCH/reread2"; mkdir -p "$R"; D=analysis/catalog_v4/data; P=analysis/catalog_v4/short_run_bias.py; N=20000
     M=(short_run_bias short_run_bias_size short_run_bias_gpack)
     python $P cutoff --old $D/short_run_bias.json $D/short_run_bias_size.json $D/short_run_bias_gpack.json \
-        --before 2026-10-30T05:38:03+01:00 2026-10-30T05:59:00+01:00 2026-10-30T06:30:34+01:00 --hours 12 | tee "$R/cutoff.log"
+        --before 2026-10-30T05:38:03+01:00 2026-10-30T05:59:00+01:00 2026-10-30T06:30:34+01:00 --hours 12 \
+        --key-v1 $D/short_run_bias.json $D/short_run_bias_size.json | tee "$R/cutoff.log"
     mapfile -t T < <(python -c "import json,sys; [print(json.loads(l[12:])['best_time']) for l in open(sys.argv[1]) if l.startswith('CUTOFF_JSON ')]" "$R/cutoff.log")
     [ "${#T[@]}" = 3 ] || { echo "RUN_SUMMARY lhe_probe reread2 rc=1 (cutoff gave ${#T[@]} times)"; exit 1; }
+    for t in "${T[@]}"; do [ "$t" != None ] || { echo "RUN_SUMMARY lhe_probe reread2 rc=1 (a measurement matched at no time)"; exit 1; }; done
+    K=(--key-v1 --key-v1 "")    # short_run_bias and _size were measured before 7bdc5729 changed the physics key
     for v in unscaled scaled; do
         F=; [ $v = unscaled ] && F=--unscaled
         for i in 0 1 2; do
-            python $P measure --nperm $N $F --before "${T[$i]}" --out "$R/$v/${M[$i]}.json" > "$R/$v.${M[$i]}.log" 2>&1 &
+            python $P measure --nperm $N $F ${K[$i]} --before "${T[$i]}" --out "$R/$v/${M[$i]}.json" > "$R/$v.${M[$i]}.log" 2>&1 &
         done
     done
     wait
