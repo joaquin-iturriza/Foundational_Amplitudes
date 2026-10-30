@@ -1307,6 +1307,57 @@ entries:
       training classes, v4_tree_shape and shape proxy, plus the plan''s dead ends and decisions D178 and D179: the prior is
       complete, and the GPU read''s difference from the free read is stated (test split, 2000 events, var(q - t) by the held-out
       scorer). No decision names a comparison that is left out.'
+  - at: '2026-10-30T22:24:33+00:00'
+    question: 'Does the per-event soft-dipole factor carry the shape gap of catalog_v4''s held-out multiplicity pools (par:v4_shape_gap:
+      median e by the scorer 0.383 / 0.356, a transfer gap; the new combinations at the floor)? A yes is the precondition
+      for the input prior aimed at it (a per-event log dipole sum fed to the network); a no moves the prior elsewhere before
+      any training run is spent. Feeds the user''s shape priority (D178) and step 6''s ''design target or input priors aimed
+      at the multiplicity gap, largest cells first (5ee, 5bb, 5qg)''.'
+    prior: 'Searched docs/results.tex (par:v4_mult_cand, par:v4_mult_bias, par:v4_tree_shape, par:v4_shape_gap, the surrogates
+      paragraph near line 5640, ''eikonal'', ''dipole'', ''soft factor'', ''antenna''), plan show v3_prep_explore (dead ends)
+      and site decisions (D20, D36, D38, D178, D179). Found: (i) par:v4_mult_cand: the soft limit''s colour or charge weight
+      as a per-process constant in the target cuts the class spread of the 5->6 level step (1.026 -> 0.927 training, 1.432
+      -> 1.094 held out) but overshoots the step (median |step| 2.788 / 2.914) because events sit at the cuts; the per-event
+      weight from each event''s own dipoles was named the untested form (needs the pools'' momenta). (ii) surrogates (norm_surrogate*.py):
+      within a process an eikonal factor over the coloured massless legs plus the propagator product reaches r 0.70 (r^2 0.50)
+      with log|M|^2 on training processes; in the Z+ng and W+ng families the eikonal and Parke-Taylor surrogates explain 81
+      to 96% of each process''s spread, rising with n. (iii) dead ends of the sampling-sensitivity reruns: aligning saved
+      zero-shot events to pool events by log|M|^2 failed (shuffled order, near ties); so this design saves the scored events''
+      pool indices (split_idx, already used for logF) instead of matching. D36/D38 tested soft/collinear factorisation only
+      as a synthetic-data generator, not as an input. Nothing found reads the network''s residual against a per-event dipole
+      factor.'
+    measure: 'Per probe, on the test split''s 2000 scored events (pool indices saved with the read): r^2 of the network''s
+      residual u = (q - t) - mean(q - t) on log D, D = sum over each final gluon or photon j of the colour-blind antenna sum
+      over pairs (a, b) of the other coloured (for a photon: charged) legs, s_ab / (s_aj s_bj) in GeV^-2, a function of the
+      event''s momenta alone (no fit, the same for every process); probes with no final gluon or photon carry no D and are
+      listed apart. Per group: the median r^2 over held-out multiplicity pools with a final gluon or photon, and over the
+      training pools of the same cells (particle count, initial state), per seed; per cell for 5ee, 5bb, 5qg first, then all.
+      Beside: the share of var(q - t) that log D explains on held-out against training pools (r^2 times var), i.e. how much
+      of the gap e a perfect use of D could remove.'
+    check: 'On existing data, the factor moves with what this tests: the surrogates measured r^2 0.50 of an eikonal-plus-propagator
+      factor with log|M|^2 within training processes, and 81 to 96% of the spread within the Z+ng / W+ng families, rising
+      with multiplicity, so D carries per-event shape where the gap is (more particles). Whether the network already uses
+      it (residual r^2 near zero on training pools) is exactly what the read separates: a residual correlation on held-out
+      pools above the training pools'' is the gap living in D. Not checkable on the existing reads: they saved no event indices
+      (the dead ends above), which is why the reread is needed.'
+    fixed: The control pair FA-ccin2p3-339ec100 (seed 42) and -380842ed (seed 43) at their best aggregate val_loss_no_reg
+      checkpoint, EMA weights; the scorer tools/zero_shot_parent.py --signed-magnitude unchanged except that each .npz also
+      saves the scored events' pool indices and the pool path; split test, 2000 events per probe; scripts/job_catalog_v3_short.sh
+      mode eval with V3_AXES=H2,TR; the groups and cells as loop_levels.py --shape-gap; D as defined, colour-blind, no tuning.
+    control: 'Matched: the same network, scorer, split and events per pool, the training pools of the same cells (TR read)
+      against the held-out multiplicity pools (H2 read); the residual r^2 of training pools is the level at which the network
+      already uses D in distribution. Also a placebo factor: log of the sum of the same legs'' energies (a per-event scale
+      with no soft structure), r^2 reported beside D''s so a generic energy trend is not read as dipole structure.'
+    seeds: The control pair's two, 42 and 43; every number per seed and as a seed mean.
+    outcome: 'Yes (the gap lives in the dipole factor): on both seeds the held-out multiplicity pools'' median residual r^2
+      on log D is at least 0.1 and at least twice the same cells'' training pools'', and above the placebo''s; then a GPU
+      arm is designed: the control with log D per event as an input (the same short pretraining, two seeds, read on H2 and
+      TR by the shape-gap rule), starting from the cells where the r^2 gap is largest. No: median r^2 below 0.05 on either
+      seed, or not above training or the placebo: the per-event dipole factor does not carry the gap; recorded as a dead end
+      and the next candidate (the propagator-product factor of the surrogates, the same read) designed. Between: reported
+      with both numbers per cell, no GPU arm. Cost: four eval-only GPU jobs (H2 and TR per seed), about 0.5 GPU-h each, 2
+      GPU-h in all (budget 30), wall-time target 1.5 h; one CPU analysis on the laptop from the saved indices and pool momenta
+      on CC (a CPU job, 4 cores, under 1 h).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
