@@ -3950,8 +3950,6 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '9': the gridpool probe of the 56 (12 CPU jobs, target 1.5 h, submitted about 07:00); a fresh owner takes it from the
-      hand-off when they end
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
