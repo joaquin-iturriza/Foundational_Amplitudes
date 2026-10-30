@@ -5258,11 +5258,9 @@ entries:
     - agent_redesign
   decisions:
   - D186
-  next:
-    1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
-      reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
-      write-up of what changed and what was measured'
-    4: 'Read the lxplus GPU probe FA-lxplus-ed084f25 (site logs): cuda=True and attention ok on a whole H100/H200 slot'
+  next: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
+    reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
+    write-up of what changed and what was measured'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -5300,14 +5298,8 @@ entries:
       if:
       - 'a day passes with no misfire of a new hook: clean up and close'
       - 'a misfire: fix it first, restart the day'
-    4:
-      feeds: whether lxplus can take FA's GPU jobs when CC's queue is long
-      if:
-      - 'passes: tell the catalog_coverage and v3_prep_explore owners lxplus is usable for their queued jobs'
-      - 'fails: fix the cause from its log and resubmit the probe'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
-    '4': run FA-lxplus-ed084f25 (the lxplus GPU probe)
   owner:
     agent: a9e5ce33720085e0f
     state: stopped
