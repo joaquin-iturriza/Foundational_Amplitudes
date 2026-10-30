@@ -4360,6 +4360,14 @@ entries:
       1000). Row-to-run reconstruction from the pool shuffle checked on every dsh pool''s own train block: 500 of 500 rows
       in their run''s part. Reading: the runsize flags are the catalog_v3 references'' physics plus chance; dsh_uu_duwpz alone
       is consistent across features, at a level 111 tests give by chance about once. No rebuild follows.'
+  - at: '2026-10-30T13:27:54+00:00'
+    text: 'Defect fixed in short_run_bias.run_perm (cdcae2cd): the run-level permutation p was computed on the raw binned
+      KS distance; with units of unequal size (short runs, or 1000 against 555 events) a relabelling hands the smaller side
+      more events, its null is narrower and p comes out too small. On iid events, 66 runs of 1000 against 18 of 555: 0.19
+      of 150 draws under 0.05 before, 0.04 after (p from the distance scaled by sqrt(n_a n_b/(n_a+n_b))); equal units unchanged
+      (0.067); tests/test_run_perm_calibration.py. Not yet re-read: the run-level numbers of par:v4_short_runs (short against
+      complete runs, the size ladder, the gridpack check) came from the unscaled test, so those with unequal units may be
+      overstated; the cgsxwm arm readout will use the fixed test.'
   handoff:
     state: '112 of 113 rebuilt pools assembled (catalog_v4_gridpack_last 12/12, 0 failed, queue removed); mixture check over
       the 112 passed (FA-ccin2p3-82e8c54a: 0 failing). ee4_epem_cgsxwm 3 TeV: the run-size probe passed no size (shares 0.49/0.79/0.89/0.91
