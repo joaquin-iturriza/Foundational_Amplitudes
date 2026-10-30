@@ -2254,9 +2254,6 @@ entries:
   - D188
   - D189
   next:
-    1: 'ee4_epem_cgsxwm at 3 TeV: generate its 3 TeV block in smaller runs from the same gridpack, checked against its complete
-      3 TeV runs first (the user: no question; the option that keeps every energy). Also collect catalog_v4_gridpack_last
-      (12 pools), remove finished queues, then the mixcheck over all 113'
     10: 'Validate the pp13v4 pools once the rebuild is assembled: every pp13v4 entry built in all 3 roles, pp_physics_check.py
       taught the pp13v4_ names and without its b reshelling (the log ratio to catalog_v4''s standalone must be 0 on every
       class); then redo the pp comparisons (compare_pp_trained, the density check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
