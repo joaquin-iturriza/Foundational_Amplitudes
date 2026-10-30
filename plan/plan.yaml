@@ -5024,6 +5024,18 @@ entries:
       files in CC''s amp_data_cache; the step-14 design assumed them. Cancelled the three siblings that would fail identically:
       27e731b4 (default50_seed2), 560f6685 (default25), c3ab6791 (default25_seed2). Step 11 unaffected: smoke 445e33a3 COMPLETED,
       pp_seed2 d26f13aa RUNNING, pp afc96598 pending; control reads 04253ff7, e7e32847 RUNNING.'
+  - at: '2026-10-30T22:41:18+00:00'
+    text: 'Step 14 mixture prebuild (2026-10-30): probe FA-ccin2p3-39269ddb (5 default50 pools, 8 cores, 262 s wall): per
+      pool (train+val+test, 1.2e5 events) v4_bb_bb 26 core-s, v4_uux_wpwmz 72, v4_epem_aaepem 120, v4_uux_zzzz 385, v4_gg_gggg
+      1399; disk 28 MB per pool on average (2->4 train 29 MB), so about 26-30 GB per recipe (912 default-share tree entries:
+      41 2->2, 224 2->3, 647 2->4), estimate about 90 core-h per recipe (probe rates per multiplicity, gluon-rich 2->4 at
+      the gg_gggg rate). default50 prebuild: 16 shards x 16 cores on htc (FA-ccin2p3-0ce6a1d1 ... e895495b, slurm 62889799-62889823),
+      target 0.75 h, limit 1.5 h; arms default50 FA-ccin2p3-19f6edf7 and default50_seed2 FA-ccin2p3-3fb26ef0 afterok on all
+      16, 2.5 h. default25 NOT submitted: /sps/lpnhe (512 GB group volume) has 71 GB free with a 15.4 GB floor (prebuild_recipes:
+      max(3%, 15 GB)); both recipes need about 55-60 GB, so default25''s prebuild would hit the floor once default50 lands.
+      Needs space freed on /sps/lpnhe (sweep/prune.py under D19; its dry run was refused to this agent by the permission classifier)
+      before the default25 prebuild (same job script, V4REGEN_RECIPES=recipes/catalog_v4_default25_train.yaml V4REGEN_DEFAULT_SHARE=1,
+      16 shards) and its two arms.'
   handoff:
     state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
       their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
