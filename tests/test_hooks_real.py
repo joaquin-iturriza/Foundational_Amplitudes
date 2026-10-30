@@ -488,8 +488,9 @@ def switch_a():
         old, new = cmds(before[f]), cmds(json.load(open(f)))
         # the old command ends with "/.claude/hooks/<hook>[ args]" (a closing quote dropped); the new one is the
         # dispatcher followed by exactly that "<hook>[ args]"
-        same = len(old) == len(new) and all(o[0] == n[0] and o[1] == n[1] and o[3] == n[3] and n[2].startswith(prefix)
-                                            and o[2].replace('"', "").endswith("/.claude/hooks/" + n[2][len(prefix):])
+        done = all(o[2].startswith(prefix) for o in old)      # settings already switched over: apply is a no-op
+        same = len(old) == len(new) and (old == new if done else True) and all(o[0] == n[0] and o[1] == n[1] and o[3] == n[3] and n[2].startswith(prefix)
+                                            and (done or o[2].replace('"', "").endswith("/.claude/hooks/" + n[2][len(prefix):]))
                                             for o, n in zip(old, new))
         scenario("A4: %s: all %d registrations run through the dispatcher, same events, matchers and timeouts"
                  % ("project" if f == proj else "user", len(new)), r.returncode == 0 and same,
@@ -673,7 +674,7 @@ def stop_conditions():
     after = [sc.registered_at_stop(h, d) for h in names]
     scenario("B1: each taken-over condition runs only once its standalone hook is no longer registered for Stop "
              "(registered now: %s; after switch-over B: %s)" % (before, after),
-             before == [True, True, True] and after == [False, False, False], (before, after))
+             before in ([True] * 3, [False] * 3) and after == [False, False, False], (before, after))   # live settings may already be switched
 
 
 def stop_opener():
