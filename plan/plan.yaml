@@ -5381,7 +5381,7 @@ entries:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
     agent: a9e5ce33720085e0f
-    state: stopped
+    state: closed
     since: '2026-10-30T22:13:32+00:00'
     context: 232442
     context_at: '2026-10-30T23:38:16+00:00'
@@ -5467,3 +5467,23 @@ entries:
       0 free slots (93 matching slots all claimed) and kept out every H100/H200, which were the free whole GPUs (3 H100 NVL
       and 2 H200 slots unclaimed), while still admitting A100 MIG slices against its own comment. Fixed: CONDOR_GPU_REQ =
       whole A100/V100/T4/H100/H200, no MIG, used in the submit file and in site pick''s slot count; probe resubmitted as FA-lxplus-ed084f25.'
+  handoff:
+    state: 'Done this owner run (2026-10-30/31): lxplus made a data-ready GPU site (catalog_v4 pools, sidecars, control checkpoints
+      copied CC->lxplus; verify passes; HTCondor GPU requirement fixed to whole A100/V100/T4/H100/H200, no MIG); probe FA-lxplus-ed084f25
+      submitted (IDLE at last look, 3 willing slots) - read its log before any job moves to lxplus. Supervisor: COMPLETED
+      judged by exit code for scripts that print no end marker, banner lines never the last line; one RUN_DONE per entry per
+      pass for clean recorded runs, muted while the owner works; the waiter returns only for ALERT/STALLED/MAINTAIN/REFUSED
+      or an entry with no or a stopped owner (66b4cfd1, tests/test_run_done_waiter.py). Usage report tools/usage_report.py
+      (5b14ab22, evidence). Opener unregistered from the Stop gate (29a1d82f). wait_guard: an agent''s run_in_background must
+      be tools/detach.py (3f52b93c); live test: a detached 120 s site run on lxplus ended as site event E3144, no task notice
+      reached the main session, the waiter returned it with the owner stopped.'
+    decisions: 'Copied whole datasets/amp_data_cache dirs (139 GB, ~2x need) because site copy had no file lists; added site
+      copy --from-file for exact lists next time. Muted RUN_DONE while the owner works, as asked: runs that end then never
+      raise RUN_DONE later.'
+    ruled_out: 'Moving to a separate entry for the lxplus probe: the reviewer passed it under agent_redesign.'
+    running: FA-lxplus-ed084f25 (lxplus GPU probe, design passed)
+    files: ~/.local/bin/site (CONDOR_GPU_REQ, copy --from-file, RUN_DONE glue, quiet waiter; backups site.bak_20261030, site.bak_20261031),
+      ~/.local/bin/site_runends.py (marker_producers, _last_line, run_done_events, waiter_wants; backups .bak_20261031, .bak_20261031b),
+      tools/check_site_data.py --paths, tools/plan.py owners, tools/usage_report.py, tests/test_run_done_waiter.py, .claude/hooks/wait_guard.py,
+      plan/step_prompt.txt
+    written: '2026-10-30T23:38:41+00:00'
