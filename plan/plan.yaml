@@ -3706,6 +3706,32 @@ entries:
       each other): report to Joaquin with the numbers; the choice between rebuilding in complete runs of 1000 and keeping
       the short-run pools is his. If the reference''s own halves differ (control_top_halves below Bonferroni), the large runs
       are not a converged reference: reported, and the test is read against that spread.'
+    fix_at: '2026-10-30T05:06:57+00:00'
+    fix: 'Check 3 (runs against the measured spread) fails for two of the three groups, and with it the yes outcome (check
+      4) is reachable with the bias unchanged. In short_run_bias_size.json the bias being removed is, for bb_bbgg runs of
+      1000 against 30 runs of 31774, KS 0.0137 (p over runs 0.004) in sqrt(s_hat) and 0.0117 (p 0.026) in cos theta*, with
+      the event-level detectable KS at 30 runs of 1000 already 0.0101 at a single 5 percent test; for e+e- amupvmwm runs of
+      200, KS 0.0187 (p 0.0025) against a detectable 0.0166 at 39 runs. The design tests each gridpack alone at the same 30
+      runs of 1000 / 40 runs of 200 under a Bonferroni over its about 10 gridpack tests (level about 0.005, which raises the
+      detectable KS by about 1.27x, to about 0.013 for bb_bbgg and 0.021 for e+e-). So a gridpack that carries the per-run-integrated
+      bias unchanged would pass ''no test below Bonferroni'' on bb_bbgg cos theta* (p 0.026) and is at the edge on e+e- (0.0025
+      vs 0.005) and on bb_bbgg sqrt(s_hat) (0.004); only dg_dguux (0.021 to 0.023 against detectable 0.0098) has the power.
+      The second yes condition, a KS point estimate under 0.011 to 0.023, does not repair it: the KS of a null comparison
+      at these sizes is itself about 0.006 to 0.01. Fix: size the gridpack runs so the smallest effect worth acting on (the
+      bb_bbgg 0.011 and the e+e- 0.018 being removed) stands above the Bonferroni-level detectable KS: e.g. about 100 runs
+      of 1000 per pp gridpack (n 1e5 against the reference''s 46140: detectable about 0.0076 at 5 percent, about 0.0097 at
+      the corrected level) and about 150 to 200 runs of 200 per e+e- gridpack (n 3e4 to 4e4 against 46368: about 0.010 to
+      0.012 corrected), these runs being cheap CPU; or pool the two gridpacks of a group in one test and keep the per-gridpack
+      tests only for the gridpack-to-gridpack check; and state the yes in terms of power, e.g. no test below the corrected
+      level AND, per group, the per-run-integrated runs'' KS at that size above the corrected detectable KS (so a yes excludes
+      the old bias), and say what a group without that power means for the 56 pools. Add the direct contrast that is now only
+      named as a control: gridpack runs against the per-run-integrated runs of the same size in the same group (run-level
+      test), which measures the change itself. Checks that hold: one change (shared integration vs per-run integration; the
+      16-core integration is stated), the measure was seen to move (dg_dguux 1000 vs 40282 KS 0.021/0.023, p over runs under
+      5e-4; the complete-halves control 0 of 37 below 0.05 by run-level p in short_run_bias_size.json, the design says 35),
+      outcome stated for yes, no and an unconverged reference, not a repeat (searched gridpack, run size, short run, complete
+      run, madevent, set_gridpack in docs/results.tex, the entry''s evidence and dead ends, site decisions: only par:v4_short_runs
+      / fig:v4_run_size and the rebuild dead end, both cited), answers step 7 and no user-named comparison is left out.'
   step_why:
     1:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
