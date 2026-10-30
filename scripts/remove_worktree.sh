@@ -1,6 +1,6 @@
 #!/bin/bash
-# Remove a finished worktree the one safe way: fold its untracked results into the trunk, then remove it (never
-# --force), then delete its branch if it is merged. The steps cannot be skipped or reordered by the caller.
+# Remove a finished worktree the one safe way: fold its untracked results into the trunk, then remove it (--force only
+# after every untracked file is checked), then delete its branch if it is merged. The steps cannot be skipped or reordered by the caller.
 #     bash scripts/remove_worktree.sh worktrees/wt-<feat>
 set -euo pipefail
 WT="${1:?usage: remove_worktree.sh worktrees/wt-<feat>}"
@@ -14,8 +14,10 @@ fi
 bash scripts/fold_worktree.sh "$WT" --apply
 # git refuses to remove a worktree holding untracked files; --force is used only once every untracked file has an
 # identical copy at the same path in the trunk (the fold put the results there); anything else is listed and kept
+# regenerable bytecode (__pycache__/ dirs, *.pyc) never counts: it is never a result
 left=()
 while IFS= read -r f; do
+    case "$f" in */__pycache__/*|__pycache__/*|*.pyc) continue ;; esac
     cmp -s "$WT/$f" "$REPO/$f" || left+=("$f")
 done < <(git -C "$WT" ls-files --others; git -C "$WT" ls-files --others --ignored --exclude-standard)
 if [ ${#left[@]} -gt 0 ]; then
