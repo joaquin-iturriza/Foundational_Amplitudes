@@ -1758,6 +1758,20 @@ def cmd_status(a):
         print("%-28s %-15s %s" % (eid, state, text))
 
 
+def cmd_owners(a):
+    """Per entry not done: its owner, the owner's state and the runs recorded on it (`plan run`), for the supervisor
+    (one RUN_DONE event per entry per pass, muted while the owner works) and the waiter (quiet for a working owner)."""
+    d, st = load()
+    rows = []
+    for e in d["entries"]:
+        if e.get("status") == "done":
+            continue
+        o = owner_of(e)
+        rows.append({"entry": e["id"], "status": e.get("status"), "owner": o and o["agent"],
+                     "owner_state": owner_state(e), "runs": sorted((st.get(e["id"]) or {}).get("runs", []))})
+    print(json.dumps(rows))
+
+
 def cmd_show(a):
     d, st = load()
     if a.id and not any(e["id"] == a.id for e in d["entries"]):
@@ -2817,6 +2831,8 @@ def main(argv=None):
     cmd("status", cmd_status, "one line per running or waiting entry: MOVING (live jobs, working agent), WAITING ON YOU "
         "(the open ask) or STALLED (nothing live, no owner working, no ask), from live sources only",
         A("--json", action="store_true", help="a JSON list of {entry, state, why} (the supervisor's pass reads it)"))
+    cmd("owners", cmd_owners, "a JSON list of {entry, status, owner, owner_state, runs} for every entry not done "
+        "(the supervisor's RUN_DONE events and the waiter read it)")
     cmd("show", cmd_show, "print the entries; with an id, that one entry in full (read an entry this way, never by "
         "grepping plan/plan.yaml)",
         A("id", nargs="?", help="one entry, with its whole evidence, dead ends, quotes and design"),
