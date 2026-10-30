@@ -3305,6 +3305,24 @@ entries:
     blocks: 'steps 1, 6 and 7: every resubmission and new job on CC'
     answered_at: '2026-10-29T19:06:22.262000+00:00'
     decision: D181
+  - ask: 'The gridpack rebuild covers the 56 pools of its design. 57 more catalog_v4 pools have the same problem and are not
+      in it: 8 found assembled from runs that stopped short after the catalog_v4_w3 wave (dsh_epem_aaccx, dsh_epem_accxg,
+      dsh_epem_accxz, dsh_epem_hwpwmz, dsh_udx_aaawp, dsh_ug_guuux, ee4_epem_btxwp, pp13v4_ddx_ddxgg) and 49 that w3 cannot
+      assemble because their runs stop short (all of w3''s 200+ failed tasks have that one cause). Add all 57 to the gridpack
+      rebuild (one more wave of the same kind, CPU only), or keep them out? Full list: dsh_bb_bbgg, dsh_ddx_awpwmz, dsh_ddx_duxwpz,
+      dsh_epem_aaccx, dsh_epem_aawpwm, dsh_epem_accxg, dsh_epem_accxz, dsh_epem_awpwmz, dsh_epem_bbxgz, dsh_epem_bbxwpwm,
+      dsh_epem_ccxgz, dsh_epem_epemhz, dsh_epem_epemwpwm, dsh_epem_epemzz, dsh_epem_hwpwmz, dsh_epem_wpwmzz, dsh_epem_wpwpwmwm,
+      dsh_gg_gggg, dsh_ub_abdwp, dsh_ub_abgu, dsh_ub_bdhwp, dsh_ucx_cxggu, dsh_ucx_dsxzz, dsh_ud_adgu, dsh_ud_bbxdu, dsh_ud_dddxu,
+      dsh_ud_ddwpz, dsh_ud_duuux, dsh_ud_uuwmz, dsh_udx_aaawp, dsh_udx_aawpz, dsh_udx_agwpz, dsh_udx_awpwpwm, dsh_udx_ddxgwp,
+      dsh_udx_dxggu, dsh_udx_gwpwpwm, dsh_udx_htaptamwp, dsh_udx_wpwpwmz, dsh_ug_ccxgu, dsh_ug_guuux, dsh_uu_ddxuu, dsh_uu_duwpz,
+      dsh_uu_guuz, dsh_uu_uuuux, dsh_uux_aaddx, dsh_uux_addxz, dsh_uux_aguux, dsh_uux_awpwmz, dsh_uux_bbxzz, dsh_uux_ddxzz,
+      dsh_uux_gguux, dsh_uux_guuxz, dsh_uux_wpwmzz, ee4_epem_btxwp, pp13v4_dd_ddgg, pp13v4_ddx_ddxgg, pp13v4_uux_gguux'
+    at: '2026-10-30T05:44:18+00:00'
+    searched: 'site decisions --project FA (gridpack, rebuild, short, complete runs: none names these pools); the design of
+      step 7 names the 56; the rules (scope is the user''s call) say a wider wave is asked first'
+    blocks: adding the 57 pools to complete_runs.json and their wave; the 56-pool gridpack probe and wave go ahead
+    blocks_steps: &id001
+    - 7
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -3901,6 +3919,23 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
+  ask: 'The gridpack rebuild covers the 56 pools of its design. 57 more catalog_v4 pools have the same problem and are not
+    in it: 8 found assembled from runs that stopped short after the catalog_v4_w3 wave (dsh_epem_aaccx, dsh_epem_accxg, dsh_epem_accxz,
+    dsh_epem_hwpwmz, dsh_udx_aaawp, dsh_ug_guuux, ee4_epem_btxwp, pp13v4_ddx_ddxgg) and 49 that w3 cannot assemble because
+    their runs stop short (all of w3''s 200+ failed tasks have that one cause). Add all 57 to the gridpack rebuild (one more
+    wave of the same kind, CPU only), or keep them out? Full list: dsh_bb_bbgg, dsh_ddx_awpwmz, dsh_ddx_duxwpz, dsh_epem_aaccx,
+    dsh_epem_aawpwm, dsh_epem_accxg, dsh_epem_accxz, dsh_epem_awpwmz, dsh_epem_bbxgz, dsh_epem_bbxwpwm, dsh_epem_ccxgz, dsh_epem_epemhz,
+    dsh_epem_epemwpwm, dsh_epem_epemzz, dsh_epem_hwpwmz, dsh_epem_wpwmzz, dsh_epem_wpwpwmwm, dsh_gg_gggg, dsh_ub_abdwp, dsh_ub_abgu,
+    dsh_ub_bdhwp, dsh_ucx_cxggu, dsh_ucx_dsxzz, dsh_ud_adgu, dsh_ud_bbxdu, dsh_ud_dddxu, dsh_ud_ddwpz, dsh_ud_duuux, dsh_ud_uuwmz,
+    dsh_udx_aaawp, dsh_udx_aawpz, dsh_udx_agwpz, dsh_udx_awpwpwm, dsh_udx_ddxgwp, dsh_udx_dxggu, dsh_udx_gwpwpwm, dsh_udx_htaptamwp,
+    dsh_udx_wpwpwmz, dsh_ug_ccxgu, dsh_ug_guuux, dsh_uu_ddxuu, dsh_uu_duwpz, dsh_uu_guuz, dsh_uu_uuuux, dsh_uux_aaddx, dsh_uux_addxz,
+    dsh_uux_aguux, dsh_uux_awpwmz, dsh_uux_bbxzz, dsh_uux_ddxzz, dsh_uux_gguux, dsh_uux_guuxz, dsh_uux_wpwmzz, ee4_epem_btxwp,
+    pp13v4_dd_ddgg, pp13v4_ddx_ddxgg, pp13v4_uux_gguux'
+  waiting_since: '2026-10-30T05:44:18+00:00'
+  searched: 'site decisions --project FA (gridpack, rebuild, short, complete runs: none names these pools); the design of
+    step 7 names the 56; the rules (scope is the user''s call) say a wider wave is asked first'
+  blocks: adding the 57 pools to complete_runs.json and their wave; the 56-pool gridpack probe and wave go ahead
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
