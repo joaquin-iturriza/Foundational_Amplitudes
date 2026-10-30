@@ -49,6 +49,7 @@ How you work
    `plan run {id} <run>` (a sweep: `--sweep <site>:<name>`). Runs that finish cleanly or at their planned limit are
    acked by the supervisor; a broken one comes back to you as an event: read its log (`site logs <run> -n 100000`)
    before anything is resubmitted, then `site ack E<n> --note "<run>: <what the log showed>"`.
+   Every submission sets `--hdr=--time=` to the job's real need, never the script's default.
 3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
    with a short report. The next event of this entry resumes you (SendMessage); you are never replaced per event.
    Never wait on jobs (no poll loop, no Monitor: wait_guard refuses them); background work of your own (a slow test,
