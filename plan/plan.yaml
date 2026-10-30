@@ -5049,6 +5049,16 @@ entries:
       Needs space freed on /sps/lpnhe (sweep/prune.py under D19; its dry run was refused to this agent by the permission classifier)
       before the default25 prebuild (same job script, V4REGEN_RECIPES=recipes/catalog_v4_default25_train.yaml V4REGEN_DEFAULT_SHARE=1,
       16 shards) and its two arms.'
+  - at: '2026-10-30T22:46:11+00:00'
+    text: 'Correction to the previous finding: the default50 prebuild finished (16 shards COMPLETED, longest 325 s at 16 cores
+      against the 0.75 h target) using about 22.5 GB (/sps/lpnhe free 71 -> 48.5 GB), so default25 fits above the 15.4 GB
+      floor and went out the same evening: prebuild FA-ccin2p3-03a61a73 ... c4807e0b (slurm 62889952-62889976, target 0.25
+      h, limit 45 min), arms default25 FA-ccin2p3-3e97499e and default25_seed2 FA-ccin2p3-1c137e75 afterok on all 16, 2.5
+      h. All four mixture arms are queued; default50 FA-ccin2p3-19f6edf7, -3fb26ef0. New submit-time check (submit_guard data,
+      dd62596a): a FA arm whose training recipe''s pools are not prebuilt on the named site is refused (tools/check_site_data.py
+      via site run), unless chained afterok on a prebuild run of that recipe; tested live on CC: before the prebuild default50
+      and default25 refused (2736 pools missing each), control recipe passed; after it default50_seed2 passed and default25
+      still refused.'
   handoff:
     state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
       their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
