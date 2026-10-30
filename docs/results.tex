@@ -3039,6 +3039,62 @@ open (catalog hand-off). Not checked: whether the large runs' core count differs
 % claim: ladder_detail.ub_bdwpz.150/sqrt_shat.p=0.06
 % claim: ladder_detail.ub_bdwpz.1000/sqrt_shat.p=0.46
 
+What replaces it was tested next: do small runs drawn from one MadEvent integration made at a large run's precision (a
+gridpack) give the events of complete runs of many? Design: on the three groups where the ladder found the bias, two
+independent gridpacks each (integrated at the reference's run size on $16$ cores: $40282$, $31774$ and $13057$ events),
+$100$ runs of $1000$ events from each pp gridpack and $200$ runs of $200$ from each $e^+e^-$ one, the runs of a group's
+two gridpacks pooled against the same large complete runs with the same run-level test (primary, Bonferroni over its
+$5$ tests); the pooled runs against the per-run-integrated complete runs of the same size (direct); the two gridpacks
+against each other (pair); everything else as the ladder (\code{tools/lhe\_probe.py gridpack}, six CPU jobs). Every
+gridpack built (none stopped short); the pp runs all completed, $393$ of the $400$ $e^+e^-$ runs did. Of the $5$
+primary tests $0$ fall below $0.05/5$, and of the pair tests $0$: the two gridpacks agree in every group, so the gridpack runs give the large
+runs' events within this probe's power: on $d g\to d g u\bar u$ the distance drops from $0.0208$ and $0.0232$ (per-run integration, recomputed
+on the same runs) to $0.0081$ ($p=0.028$) and $0.0085$ ($p=0.0135$), on $b b\to b b g g$ from $0.0131$ and $0.0112$ to $0.0079$ ($p=0.022$) and
+$0.0058$ ($p=0.223$), and on $e^+e^-\to\gamma\mu^+\nu_\mu W^-$ from $0.0180$ to $0.0042$ ($p=0.995$), against
+event-level detectable distances of $0.0066$, $0.0071$ and $0.008$ at $5\%$ (Fig.~\ref{fig:v4_run_size}, open
+squares and diamonds). The direct test separates the gridpack runs from the per-run-integrated ones in $4$ of $5$
+tests (on $d g\to d g u\bar u$ by $0.013$ and $0.0152$, $p<10^{-3}$); the fifth, $b b\to b b g g$ in $\cos\theta^*$,
+is where the old bias was smallest. Caveat: the pp gridpack distances ($0.006$ to $0.009$) sit above the large runs'
+own halves ($0.004$ to $0.005$) and their $p$ are under $0.05$ uncorrected in $3$ of the $4$ pp tests, so a residual
+of under half the old bias is not excluded. By the design's outcome the $56$ pools on the
+rebuild list are laid out as gridpack runs (one gridpack per pool and energy, at the energy's whole need and at least
+$13057$ events' precision, runs of $1000$ pp and $1000$ or $200$ $e^+e^-$, only complete runs assembled).
+% src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_gpack.json @3c34fe81
+% allow: 16 100 1000 200 393 400 0.05 5 10^{-3} 56 13057 because they are the probe's cores, run counts and sizes, the e+e- runs that completed (GRIDPACK_SUMMARY in the logs of FA-ccin2p3-f0ed9631 and a8e18d29: 197 and 196 of 200), the test level and test count, the relabelling bound, the rebuild list's size and the gridpack floor (GRID_MIN in recipes/gen_catalog_v4_default.py)
+% claim: gridpack_primary_tests=5
+% claim: gridpack_n_below=0
+% claim: gridpack_pair_n_below=0
+% claim: gridpack_pp_ks_min=0.006
+% claim: gridpack_pp_ks_max=0.009
+% claim: top_halves_pp_ks_min=0.004
+% claim: top_halves_pp_ks_max=0.005
+% claim: gridpack_pp_tests=4
+% claim: gridpack_pp_below_alpha=3
+% claim: gridpack_detail.dg_dguux.sqrt_shat.ref=40282
+% claim: gridpack_detail.bb_bbgg.sqrt_shat.ref=31774
+% claim: gridpack_detail.epem_amupvmwm.cos_theta_star.ref=13057
+% claim: gridpack_detail.dg_dguux.sqrt_shat.ks=0.0081
+% claim: gridpack_detail.dg_dguux.sqrt_shat.p=0.028
+% claim: gridpack_detail.dg_dguux.cos_theta_star.ks=0.0085
+% claim: gridpack_detail.dg_dguux.cos_theta_star.p=0.0135
+% claim: gridpack_detail.bb_bbgg.sqrt_shat.ks=0.0079
+% claim: gridpack_detail.bb_bbgg.sqrt_shat.p=0.022
+% claim: gridpack_detail.bb_bbgg.cos_theta_star.ks=0.0058
+% claim: gridpack_detail.bb_bbgg.cos_theta_star.p=0.223
+% claim: gridpack_detail.epem_amupvmwm.cos_theta_star.ks=0.0042
+% claim: gridpack_detail.epem_amupvmwm.cos_theta_star.p=0.995
+% claim: gridpack_detail.dg_dguux.sqrt_shat.detectable=0.0066
+% claim: gridpack_detail.bb_bbgg.sqrt_shat.detectable=0.0071
+% claim: gridpack_detail.epem_amupvmwm.cos_theta_star.detectable=0.008
+% claim: gridpack_detail.dg_dguux.sqrt_shat.direct.ks=0.013
+% claim: gridpack_detail.dg_dguux.sqrt_shat.per_run.ks=0.0208
+% claim: gridpack_detail.dg_dguux.cos_theta_star.per_run.ks=0.0232
+% claim: gridpack_detail.bb_bbgg.sqrt_shat.per_run.ks=0.0131
+% claim: gridpack_detail.bb_bbgg.cos_theta_star.per_run.ks=0.0112
+% claim: gridpack_detail.epem_amupvmwm.cos_theta_star.per_run.ks=0.018
+% claim: gridpack_detail.dg_dguux.cos_theta_star.direct.ks=0.0152
+% claim: gridpack_vs_own_runs.n_bonf=4
+
 \begin{figure}[t]
   \centering
   \includegraphics{../analysis/catalog_v4/figs/short_run_bias_a.pdf}\hfill
@@ -3057,7 +3113,11 @@ open (catalog hand-off). Not checked: whether the large runs' core count differs
   \caption{Complete MadEvent runs of few events against complete runs of many, same process and cards: the run-level
     KS distance (pooled binned distributions) of the runs of each probed size to the runs of the largest size the
     group holds at least twice ($31774$, $40282$, $13057$ and $2800$ events), in $\sqrt{\hat s}$ and in $\cos\theta^*$
-    of the first final; filled where the $p$ from relabelling runs is under the Bonferroni level over the $16$ tests.}
+    of the first final; filled where the $p$ from relabelling runs is under the Bonferroni level over the $16$ tests.
+    Squares ($\sqrt{\hat s}$) and diamonds ($\cos\theta^*$) just right of their size: runs drawn from one gridpack
+    (two gridpacks pooled), against the same large runs, filled under $0.05/5$. Replaces the version without them,
+    whose per-run points are recomputed here on the same runs.}
+  % allow: 0.05 5 because they are the test level and the number of primary gridpack tests
   % src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_size.json @44b2eeb3
   % claim: ladder.tests_runs=16
   % claim: ladder_detail.bb_bbgg.1000/sqrt_shat.ref=31774
