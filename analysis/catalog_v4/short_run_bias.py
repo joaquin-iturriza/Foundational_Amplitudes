@@ -32,6 +32,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(HERE, "data", "short_run_bias.json")
 COMPLETE = os.path.join(HERE, "data", "complete_runs.json")
+PENDING = os.path.join(HERE, "data", "complete_runs_pending.json")
 FIG = os.path.join(HERE, "figs", "short_run_bias")
 PART_RE = re.compile(r"^(?P<proc>.+)_(?P<eid>[0-9a-f]{16})_(?P<run>run_\d+)_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
 PROBE_RE = re.compile(r"^(?P<proc>.+)_probe_seed(?P<seed>\d+)_ev(?P<ev>\d+)\.npz$")
@@ -495,7 +496,13 @@ def summary(d, alpha=0.05):
                                                 for v in c.values())}
         out["rebuild"]["design"] = (out["rebuild"]["pools"] - out["rebuild"]["after_w3_short_built"]
                                     - out["rebuild"]["w3_unassembled"])
-        out["rebuild"]["added_after_w3"] = out["rebuild"]["pools"] - out["rebuild"]["design"]
+        # pools found after catalog_v4_w3 with the same problem, waiting on the user's call (complete_runs_pending.json)
+        pend = json.load(open(PENDING)) if os.path.exists(PENDING) else {}
+        out["rebuild"]["after_w3_short_built"] += sum("after catalog_v4_w3" in v["reason"] for v in pend.values())
+        out["rebuild"]["w3_unassembled"] += sum(v["reason"].startswith("not assembled in catalog_v4_w3")
+                                                for v in pend.values())
+        out["rebuild"]["added_after_w3"] = len(pend)
+        out["rebuild"]["with_pending"] = len(c) + len(pend)
     return out
 
 
