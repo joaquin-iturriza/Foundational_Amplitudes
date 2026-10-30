@@ -168,7 +168,8 @@ Rules:
 1. A question is a sentence of the researcher's own that ends with "?", or an explicit request to explain ("explain
    why ...", "tell me what ..."). A statement, a complaint, an instruction or a remark is not a question, even when it
    sounds dissatisfied ("I don't see what the question is", "you didn't answer"): do not turn it into one.
-2. Every such question must be answered directly somewhere in the reply (the reply may be several messages; an answer
+2. A message may hold several questions, even within one sentence ("What is X? And why Y, are you saying Z?"): each
+   is a question of its own. Every such question must be answered directly somewhere in the reply (the reply may be several messages; an answer
    in an early one counts). A plan, an apology, or an answer to a different question does not count. Read the whole
    reply before deciding; if the reply does answer, the verdict is {{"ok": true}}.
 3. Only the researcher's OWN questions count. Text they pasted or quoted from other people (a chat thread with names
@@ -201,10 +202,20 @@ def norm(s):
 
 EXPLAIN = re.compile(r"\b(explain|tell me (why|what|how|where|when|which|who|whether|if)|"
                      r"(want|like|need|wanna) to know|let me know (why|what|how|where|when|which|whether|if))\b", re.I)
-SELF_OK = re.compile(r"\b(the reply|it|this) (does|did) (answer|address)|\breply answers (it|this|that|the|both|all)|"
+SELF_OK = re.compile(r"\b(the reply|it|this) (does|did) (answer|address)|\breply answers (it|this|that|both|all)\b|"
                      r"\banswers (it|this|that|both|all)\b|\b(should|would) be (ok|okay|fine)\b|"
                      r"\b(reply|answer|it|this) (is|seems|looks) (ok|okay|fine)\b|\bno question\b|\basked nothing\b|"
                      r"\bno (direct )?question (was|is) asked\b|\bcheck passes\b", re.I)
+
+
+def self_ok(reason):
+    """the reason says the reply answers or is fine: a SELF_OK phrase not negated by the few words before it ("the
+    reply never answers it" is a refusal, "the reply answers all three" is not)"""
+    for m in SELF_OK.finditer(reason):
+        before = reason[max(0, m.start() - 30):m.start()].lower()
+        if not re.search(r"\b(never|not|no|neither|nor|hardly|barely)\b|n't\b", before.split(",")[-1]):
+            return True
+    return False
 
 
 def verdict(v, recent):
@@ -216,7 +227,7 @@ def verdict(v, recent):
     "...the reply answers all three")."""
     if v.get("ok") is not False:
         return True, ""
-    if SELF_OK.search(str(v.get("reason", ""))):
+    if self_ok(str(v.get("reason", ""))):
         return True, ""
     q = re.sub(r"\s+", " ", norm(str(v.get("question", "")))).strip(" \"'")
     if len(q) < 4:

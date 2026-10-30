@@ -45,6 +45,24 @@ REAL = {
     130834: ("\"What do you mean adding a user pause\" left unexplained (29 Oct; the next reply explained it)",
              {"ok": False, "question": "What do you mean adding a user pause to the stop hooks?",
               "reason": "the reply never explains what that pause was"}),
+    83830: ("\"What do you mean 'if we ever trim a finished chapter'?\" left unexplained (23 Oct)",
+            {"ok": False, "question": "What do you mean \"if we ever trim a finished chapter\"?",
+             "reason": "the reply never explains that phrase"}),
+    93102: ("\"Isn't /goal supposed to do this exactly? What do you mean?\" not addressed (24 Oct)",
+            {"ok": False, "question": "Isn't /goal supposed to do this exactly?",
+             "reason": "the reply never addresses /goal"}),
+    96475: ("\"Why would we invent something if it's a settled convention?\" not answered (24 Oct)",
+            {"ok": False, "question": "Why would we invent something if it's a settled convention?",
+             "reason": "the reply never answers it directly"}),
+    116802: ("\"why would you do it again?\" about the pretraining sweep, not answered (26 Oct)",
+             {"ok": False, "question": "But you already swept a pretraining, why would you do it again?",
+              "reason": "the reply never says whether the pretraining is rerun"}),
+    121663: ("\"why is this stated like this rather than shown?\" about slide 5, not answered (27 Oct)",
+             {"ok": False, "question": "why is this stated like this rather than shown?",
+              "reason": "the reply only commits to changing it to a plot"}),
+    122296: ("\"how many times did it find something?\" given no count (29 Oct)",
+             {"ok": False, "question": "out of the times it triggered, how many times did it find something?",
+              "reason": "the reply gives no count"}),
 }
 # the live misfire of 30 Oct 11:07: the main session had read reply_check.py's source with sed, and the source's
 # MIDTURN constant made that tool output a "message of the user's"; the answer the main session meant sat in a
@@ -137,6 +155,9 @@ def stubbed():
     for reason in ("Actually, the reply does answer why", "so this should be ok", "the reply answers both parts",
                    "no question needed answering"):
         scenario("reason %r is discarded" % reason, RC.verdict(V("why 20 minutes", reason), m)[0])
+    for reason in ("the reply never answers it directly", "it does not answer this", "the reply doesn't answer it",
+                   "The reply answers the first part, but never answers why"):
+        scenario("reason %r is kept" % reason, RC.verdict(V("why 20 minutes", reason), m)[0] is False)
     scenario("a refusal without ok: false passes", RC.verdict({"reason": "x", "question": "why 20 minutes"}, m)[0])
     scenario("a failing model lets the turn end", run(73434, lambda p: None)[0] == 0)
 
