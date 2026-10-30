@@ -4404,13 +4404,20 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: e23611f1
+    commit: 2c7741c0
     paths:
     - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
       projects.toml and site_runends.py)
     - 'switch-over D built on branch redesign-d (worktrees/wt-redesign-d, commits 1bb22b6c..e23611f1): tests/test_redesign_d.py
       48/48; repo-reviewer passed the branch, its trunk backlog still blocks on ee4_epem_cgsxwm''s 4x gridpack; claudemd-keeper
       v2 passed CLAUDE.md v2; the sitting: scratchpad D/sitting_D.sh with D.settings.diff'
+    - 'switch-over D live (merge 2c7741c0; CLAUDE.md v2 both files, baseline, D settings). Live: context_push delivered working-on-the-plan
+      on a SendMessage via PreToolUse additionalContext (so that path is supported). Repo-reviewer passed and advanced (watermark
+      baa86009); claudemd-keeper re-check of the files in place requested. Open: worktree wt-redesign-d not removed (remove_worktree.sh
+      tripped on __pycache__, being fixed); D9 post-switch checks not run (an event resumes the generation owner via SendMessage,
+      a Stop while its jobs run gives a note, the first subagent touching sweep/ gets fa-sweeps-and-hpo once); site digest
+      count line unexercised; user-level push registration absent; the template''s multi-fidelity t_steps is Joaquin''s call;
+      known_causes live in projects.toml, supervisor pickup not checked'
   dead_ends: []
   asks: []
   step_why:
