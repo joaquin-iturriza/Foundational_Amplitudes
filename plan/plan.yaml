@@ -135,10 +135,11 @@ entries:
   - D182
   - D195
   next:
-    5: 'Third and fourth seeds (44, 45) of the sign extension and its control on catalog_v4 (D195; commit 0e0cf15e; target
-      3.5 h for 4 jobs), all running on CC: control seed 44 FA-ccin2p3-67ca3313, seed 45 FA-ccin2p3-e3506d57; extension seed
-      44 FA-ccin2p3-99259cd1, seed 45 FA-ccin2p3-30990343. When all four end: collect, extend analysis/catalog_v4/signext_compare.py
-      to four seeds, read by the passed design''s rule'
+    5: 'The one-loop sign extension on catalog_v4 at four seeds (42 to 45; par:v4_signext @f163966f): yes by the passed design''s
+      rule (seed means lower on 18 of 21 held-out sign-changing pools, higher on 3, sign test p=0.001; median wrong-sign 6.69%
+      -> 2.91%; each seed lower on 15, 16, 18, 17 of 21; no blow-ups). Cost on zero-shot MSE, arm over control: H1 1.234,
+      H2 1.154, H7E 1.188, H7c 1.217 (beyond the control''s seed spread), H2p5 1.046, H3 1.029; H5 magnitude 0.612. Waits
+      on the user: whether to add the extension to the full pretraining''s training set, with that cost beside the sign gain'
     6: 'TR reads of the control pair for the shape gap running on CC: seed 42 FA-ccin2p3-e37d7ec2 (REREAD=FA-ccin2p3-339ec100),
       seed 43 FA-ccin2p3-3fe9f0b1 (REREAD=FA-ccin2p3-380842ed), 1.5 h limits. When both end: collect (tools/collect_run.py
       --axes TR), rerun python3 analysis/catalog_v4/loop_levels.py --shape-gap, decide per group by the design, fill tab:v4_shape_gap
@@ -1295,9 +1296,8 @@ entries:
     5:
       feeds: whether training on more sign-changing one-loop pools lowers the held-out wrong-sign share at equal compute
       if:
-      - 'four-seed sign test p<0.05, median lower and each seed lower on most pools: propose the sign extension for the full
-        pretraining''s recipe with its tree-axis MSE cost beside it'
-      - 'still short of the rule or median not lower: recorded as not resolved at this compute and dropped from the recipe'
+      - 'user adopts: the extension''s one-loop pools join the full pretraining''s recipe'
+      - 'user declines for the tree-axis cost: recorded, the full pretraining keeps catalog_v4_train.yaml'
     6:
       feeds: 'the user''s shape priority (D178): transfer gap or the network''s floor at this compute'
       if:
