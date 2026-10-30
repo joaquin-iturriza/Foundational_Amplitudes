@@ -4467,6 +4467,12 @@ entries:
       (0.067); tests/test_run_perm_calibration.py. Not yet re-read: the run-level numbers of par:v4_short_runs (short against
       complete runs, the size ladder, the gridpack check) came from the unscaled test, so those with unequal units may be
       overstated; the cgsxwm arm readout will use the fixed test.'
+  - at: '2026-10-30T16:56:16+00:00'
+    text: 'D193 (Joaquin): ''I think there is no point holding back everything just for this random loop process that is still
+      not generated, so we might as well drop it.'' ee4_epem_cgsxwm''s 3 TeV block is dropped; the catalog goes ahead on the
+      112 assembled rebuilt pools (mixcheck over the 112 passed, FA-ccin2p3-82e8c54a). Next step 12 (cgsxwm gridpack budget
+      probe) dropped; its 12 jobs had already completed (arms A-C, logs under $SCRATCH/lhe_probe_keep_ximprove_{A,B,C}), not
+      read out, nothing to cancel.'
   handoff:
     state: '112 of 113 rebuilt pools assembled (catalog_v4_gridpack_last 12/12, 0 failed, queue removed); mixture check over
       the 112 passed (FA-ccin2p3-82e8c54a: 0 failing). ee4_epem_cgsxwm 3 TeV: the run-size probe passed no size (shares 0.49/0.79/0.89/0.91
