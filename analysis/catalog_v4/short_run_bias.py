@@ -377,6 +377,15 @@ def summary(d, alpha=0.05):
         o = out[kind]
         o.update(n_bonf=len(o["run_level_p_below_bonf"]), n_alpha=len(o["run_level_p_below_alpha"]),
                  n_event_bonf=len(o["event_level_p_below_bonf"]))
+    lad = {}
+    for c, r in d["groups"].items():
+        for k, v in (r.get("ladder") or {}).items():
+            if "p_runs" in v:
+                lad.setdefault(c, {})[k] = {"ks": round(v["ks_binned"], 3), "p": v["p_runs"], "runs": v["runs_small"],
+                                            "ref": v["ask_large"], "ref_runs": v["runs_large"]}
+    if lad:
+        out["ladder_detail"] = lad
+        out["ladder_bonf"] = round(alpha / max(1, out["ladder"]["tests_runs"]), 5)
     out["inventory"] = d["inventory"]
     g = d["groups"].get("uu_aguu")
     if g:
@@ -460,6 +469,50 @@ def cmd_fig(a):
     print(json.dumps({"fig": [FIG + "_a.png", FIG + "_b.png"], "panel_b": [c for _, c in best], **summary(d)}))
 
 
+PROBED = (150, 200, 1000)   # the run-size probe's asks
+
+
+def cmd_figsize(a):
+    """Run size: the run-level binned KS distance of complete runs of each probed size against the complete runs of the
+    group's largest ask with two or more runs (the ladder), per group and variable; filled where the run-level p is under
+    the Bonferroni level over every ladder test. png and pdf (plot_style.save)."""
+    import numpy as np
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    import matplotlib.pyplot as plt
+    d = json.load(open(a.json))
+    sm = summary(d)
+    bonf = sm["ladder_bonf"]
+    ps.use()
+    fig, ax = ps.figure()
+    groups = [c for c, r in d["groups"].items() if any(v["ask"] in PROBED for v in (r.get("ladder") or {}).values())]
+    handles = []
+    for i, c in enumerate(sorted(groups)):
+        col = ps.CYCLE[i]
+        for k, v in d["groups"][c]["ladder"].items():
+            if "p_runs" not in v:
+                continue
+            mk = "o" if k.endswith("sqrt_shat") else "^"
+            ax.plot([v["ask"]], [v["ks_binned"]], mk, color=col, mfc=col if v["p_runs"] < bonf else "none", ls="none")
+        handles.append(Patch(color=col, label=proc_label(c)))
+    nt = sm["ladder"]["tests_runs"]
+    handles += [Line2D([], [], color="k", marker="o", mfc="none", ls="none", label=r"$\sqrt{\hat s}$"),
+                Line2D([], [], color="k", marker="^", mfc="none", ls="none", label=r"$\cos\theta^*$"),
+                Line2D([], [], color=ps.C.grey, marker="o", ls="none", label=rf"$p_{{\rm runs}}<0.05/{nt}$")]
+    ax.set_xscale("log")
+    ax.set_xticks(list(PROBED)); ax.set_xticklabels([str(x) for x in PROBED])
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
+    ax.set_xlabel("events per run")
+    ax.set_ylabel(r"KS distance to the largest runs")
+    ax.set_ylim(0, None)
+    ps.legend(ax, "upper right", handles=handles)
+    ps.make_room(ax)
+    ps.save(fig, FIG + "_size")
+    print(json.dumps({"fig": FIG + "_size.png", "groups": groups, **sm}))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -467,11 +520,12 @@ def main():
     m.add_argument("--min-events", type=int, default=2000)
     f = sub.add_parser("fig"); f.add_argument("--json", default=OUT)
     s = sub.add_parser("summary"); s.add_argument("--json", default=OUT)
+    z = sub.add_parser("figsize"); z.add_argument("--json", default=OUT)
     a = ap.parse_args()
     if a.cmd == "summary":
         print(json.dumps(summary(json.load(open(a.json)))))
         return
-    {"measure": cmd_measure, "fig": cmd_fig}[a.cmd](a)
+    {"measure": cmd_measure, "fig": cmd_fig, "figsize": cmd_figsize}[a.cmd](a)
 
 
 if __name__ == "__main__":
