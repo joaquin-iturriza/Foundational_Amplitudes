@@ -3856,8 +3856,11 @@ entries:
     - agent_redesign
   decisions:
   - D186
-  next: 'Switch-over A (safety net): fixtures of tonight''s states, tools/hook_incident.py with a site event verb, the hook
-    dispatcher with loop detection, per impl_order.txt'
+  next:
+    1: 'Switch-over A (safety net): fixtures of tonight''s states, tools/hook_incident.py with a site event verb, the hook
+      dispatcher with loop detection, per impl_order.txt'
+    2: 'Switch-over C (supervisor): run ends sorted and routine ones acked with their log line, workers resubmitted only for
+      approved queues on a current layout, finished runs collected, wall-time targets with the 2x alert, per impl_order.txt'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -3867,3 +3870,9 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+  step_why:
+    2:
+      feeds: whether the supervisor takes the mechanical work off the agents
+      if:
+      - 'its tests pass on tonight''s 227 events: enable it in the supervisor''s config'
+      - 'a test fails: fix before enabling'
