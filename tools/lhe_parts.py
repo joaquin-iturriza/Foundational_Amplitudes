@@ -12,6 +12,11 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             so any number of jobs drain one queue), runs it, and the job whose part completes a process assembles its
             pools (a lock per standalone directory, so no two jobs label or compile the same backend at once).
             Claims of jobs no longer in the queue (squeue) are put back first. Exits when nothing fits or is left.
+    layout  --queue Q        one JSON line: current (every spec's layout is the recipes' now, not parked, no plan in
+                             progress), why not, and the task counts (read by the supervisor before it resubmits workers)
+    plan refuses (agent_redesign C5): a replan of a queue whose claims live workers hold unless it is parked first; a
+            process missing from --probe (default analysis/catalog_v4/data/lhe_probe_yields.json) or asking more than
+            2x the events it keeps there, unless --exclude'd or accepted by the user's decision (--accept-yield NAME=D<n>)
     park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold)
     plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again; --exclude NAME... held processes
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
@@ -78,17 +83,117 @@ def _dirs(q):
     return {k: os.path.join(q, k) for k in ("todo", "claimed", "done", "failed", "assembled", "locks", "specs")}
 
 
+PROBE_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields.json")
+YIELD_FACTOR = 2.0        # events asked over events kept above this refuses the plan (agent_redesign C5)
+
+
+def live_claims(q):
+    """Claims in queue q held by jobs still in the scheduler (a claim of a job unknown to squeue counts as live when
+    squeue cannot be read: the replan guard errs on the side of refusing)."""
+    D = os.path.join(q, "claimed")
+    if not os.path.isdir(D):
+        return []
+    live = _my_jobs()
+    out = []
+    for f in os.listdir(D):
+        job = f.rsplit(".", 1)[-1]
+        if live is None or job in live or not job.isdigit():
+            out.append(f)
+    return out
+
+
+def parked(q):
+    """A queue is parked when `park` moved its tasks aside and nothing was queued since (its live workers only finish
+    what they hold)."""
+    return bool(glob.glob(os.path.join(q, "parked", "*", "*.json"))) and not os.listdir(os.path.join(q, "todo"))
+
+
+def plan_refusals(a, items):
+    """The generation rule's checks before a plan writes anything (C5). Returns the reasons to refuse ([] = go).
+      - a queue already planned whose claims live workers hold is replanned only once parked (`park`): workers started
+        under the old layout failed 908 tasks with IndexError after the 2026-10-29 replan (85e93d0f)
+      - with --probe: every process is in the probe file (kept fraction of events per process, tools/lhe_probe.py
+        summary), and none asks more than YIELD_FACTOR x the events it keeps, unless --accept-yield NAME=D<n> names
+        the user's decision that accepts it, or the process is excluded"""
+    why = []
+    if os.path.isdir(os.path.join(a.queue, "specs")) and os.listdir(os.path.join(a.queue, "specs")):
+        held = live_claims(a.queue)
+        if held and not parked(a.queue):
+            why.append("queue %s is being replanned while live workers hold %d claims (e.g. %s): park it first "
+                       "(lhe_parts park --queue %s), or plan a new queue with --skip-claimed %s"
+                       % (a.queue, len(held), held[0], a.queue, a.queue))
+    probe = getattr(a, "probe", None)
+    if probe:
+        y = json.load(open(probe))
+        accept = dict(x.split("=", 1) for x in (getattr(a, "accept_yield", None) or []))
+        bad_acc = [k for k, v in accept.items() if not re.fullmatch(r"D\d+", v)]
+        if bad_acc:
+            why.append("--accept-yield takes NAME=D<n> (the user's decision): %s" % ", ".join(bad_acc))
+        names = [n for n in sorted(items) if n not in (getattr(a, "exclude", None) or [])]
+        missing = [n for n in names if n not in y]
+        if missing:
+            why.append("%d process(es) missing from the probe file %s (probe them first): %s"
+                       % (len(missing), probe, ", ".join(missing[:20]) + (" ..." if len(missing) > 20 else "")))
+        low = [(n, y[n]) for n in names if n in y and (y[n] <= 0 or 1.0 / y[n] > YIELD_FACTOR) and n not in accept]
+        if low:
+            why.append("%d process(es) ask more than %gx the events they keep (kept fraction in %s): %s; fix their "
+                       "layout, exclude them, or --accept-yield NAME=D<n> with the user's decision"
+                       % (len(low), YIELD_FACTOR, probe, ", ".join("%s (kept %.3f, asked/kept %s)" % (
+                           n, v, "inf" if v <= 0 else "%.1f" % (1.0 / v)) for n, v in low)))
+    return why
+
+
+def cmd_layout(a):
+    """One JSON line for the supervisor: is the queue's layout the one workers submitted now would build?
+    current = every spec's events identity equals the recipes' now (layout_current), the queue is not parked and no
+    plan is in progress (Q/.planning). With the counts of `status`."""
+    D = _dirs(a.queue)
+    c = {k: len([f for f in os.listdir(D[k]) if ".json" in f and not f.endswith(".err")])
+         for k in ("todo", "claimed", "done", "failed") if os.path.isdir(D[k])}
+    out = dict(c, queue=os.path.basename(os.path.normpath(a.queue)), current=True, why="")
+    stale = []
+    for f in sorted(os.listdir(D["specs"])) if os.path.isdir(D["specs"]) else []:
+        name = f[:-5]
+        try:
+            layout_current(name, _spec(D, name))
+        except StaleLayout:
+            stale.append(name)
+        except Exception as e:                     # a process the recipes no longer have
+            stale.append("%s (%s)" % (name, type(e).__name__))
+    if stale:
+        out.update(current=False, why="%d process(es) laid out otherwise in the recipes now, e.g. %s"
+                   % (len(stale), stale[0]), stale=stale[:50])
+    elif parked(a.queue):
+        out.update(current=False, why="parked")
+    elif os.path.exists(os.path.join(a.queue, ".planning")):
+        out.update(current=False, why="a plan is in progress")
+    print(json.dumps(out))
+
+
 def cmd_plan(a):
+    items_pre = _items(a.specs, a.seed)
+    why = plan_refusals(a, items_pre)
+    if why:
+        sys.exit("lhe_parts plan: refused:\n  " + "\n  ".join(why))
     D = _dirs(a.queue)
     for d in D.values():
         os.makedirs(d, exist_ok=True)
+    mark = os.path.join(a.queue, ".planning")
+    open(mark, "w").write(str(os.getpid()))
+    try:
+        _plan(a, D, items_pre)
+    finally:
+        os.remove(mark)
+
+
+def _plan(a, D, items):
     rates = json.load(open(a.rates))          # tools/lhe_rates.py; no invented fallback rates
     by = {}
     for r in rates.values():
         by.setdefault(int(r["nfinal"]), []).append(r["core_s_per_event"])
     med = {k: statistics.median(v) for k, v in by.items()}
     src_cost = {}
-    items = _items(a.specs, a.seed)
+    # items: read once by cmd_plan, before its checks
     cores = {k: int(v) for k, v in (c.split("=") for c in a.cores)}
     # the spec of each process (one per process: the assembly rebuilds its items from it)
     # tasks queued or claimed (a done one is known by its part file; a failed one is queued again: plan retries it)
@@ -817,6 +922,11 @@ def main():
     p.add_argument("--cores", nargs="*", default=[], help="NAME=C: that process's runs on C cores each")
     p.add_argument("--skip-claimed", nargs="*", default=[], help="queues whose claimed runs are not planned again")
     p.add_argument("--exclude", nargs="*", default=[], help="processes not planned in this queue (held)")
+    p.add_argument("--probe", default=PROBE_YIELDS, help="kept fraction per process (tools/lhe_probe.py summary); every "
+                   "planned process must be in it and keep at least 1/%g of the events it asks" % YIELD_FACTOR)
+    p.add_argument("--accept-yield", nargs="*", default=[], metavar="NAME=D<n>",
+                   help="a low-yield process the user's decision D<n> accepts")
+    ly = sub.add_parser("layout"); ly.add_argument("--queue", required=True)
     pk = sub.add_parser("park"); pk.add_argument("--queue", required=True)
     p.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     w = sub.add_parser("work"); w.add_argument("--queue", required=True)
@@ -831,7 +941,7 @@ def main():
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     sb = sub.add_parser("shortbuilt"); sb.add_argument("--out", required=True); sb.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
-    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 

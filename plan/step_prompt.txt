@@ -38,6 +38,17 @@ The step
    CPU work (generation, prebuilds, dumps) is split into as many jobs as the free slots `site pick` shows allow, one per
    process or finer: wall time comes from the layout, not the core-hours. A planned wall time over 1 h says why it cannot
    be split further.
+   A batch of 4 jobs or more gets its wall-time target before it goes: `python3 tools/plan.py target {id} --batch
+   <queue or name> --wall <hours> --jobs <N> [--units <glob of the item check's units>]`, the hours the layout gives
+   (the ones you tell the user); `python3 tools/plan.py target-check {id} --jobs N` says whether the batch may go, and
+   the supervisor raises an ALERT once the batch's progress predicts more than 2x its target. A queue of workers the
+   user approved is recorded once, `site queue add FA <queue> --decision D<n> --item {id} --site <site> --job <script>
+   --max-workers N --wall H --total-hours T`: the supervisor then resubmits its workers within those limits while the
+   queue's layout is current (`tools/lhe_parts.py layout`); a failed task is never resubmitted, it comes back to the
+   entry as an event. An entry whose finished runs tools/collect_run.py collects records it once,
+   `python3 tools/plan.py collection {id} --job <script glob> [--args "..."]`, and the supervisor collects each run that
+   finishes cleanly (runs that finish cleanly or at their planned limit are acked by the supervisor; only broken ones
+   reach you as events).
    Before a job, record its design with `python3 tools/plan.py design {id} --question --prior --measure --check
    --fixed --control --seeds --outcome` (--prior: the work already done on this question, found by searching
    docs/results.tex, `plan show {id}` (evidence, dead ends) and `site decisions --project FA` for the process, arm,

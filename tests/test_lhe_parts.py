@@ -678,6 +678,76 @@ def test_park_and_skip_claimed():
     print("[park + skip-claimed] ok")
 
 
+def test_generation_rule():
+    """agent_redesign C5 on the replan under live workers (2026-10-29: the catalog_v4 default share replanned while
+    workers of the old layout held claims; they failed 908 tasks with IndexError): the replan as it happened is refused,
+    with park first it passes; `layout` says stale under changed recipes and parked after park; the probe file of that
+    night refuses its processes that keep under half the events they ask, a process absent from it is refused, and an
+    accepted one (the user's decision named) passes."""
+    _register(n_runs=4)
+    saved = lhe_parts._my_jobs
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            q = os.path.join(d, "q")
+            ns = lambda **k: argparse.Namespace(**dict(dict(specs=[spec], queue=q, seed=42, rates=rates, cores=[]), **k))
+            lhe_parts._my_jobs = lambda: {"555"}
+            lhe_parts.cmd_plan(ns())
+            lay = lambda: json.loads(_out(lambda: lhe_parts.cmd_layout(argparse.Namespace(queue=q))))
+            assert lay()["current"] and lay()["todo"] == 4, lay()
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            os.rename(os.path.join(q, "todo", todo[0]), os.path.join(q, "claimed", todo[0] + ".555"))
+            mg.PROCESSES[NAME]["lhe"]["n_runs"] = 3                  # the recipes change under the live worker
+            L = lay()
+            assert not L["current"] and "laid out otherwise" in L["why"], L
+            try:
+                lhe_parts.cmd_plan(ns())                             # the replan as it happened: refused
+                raise AssertionError("replan under a live claim was not refused")
+            except SystemExit as e:
+                assert "live workers hold 1 claims" in str(e.code), e.code
+            lhe_parts._my_jobs = lambda: set()                       # the worker ended: its claim is no longer live
+            assert not lhe_parts.live_claims(q)
+            lhe_parts._my_jobs = lambda: {"555"}
+            lhe_parts.cmd_park(argparse.Namespace(queue=q))
+            assert not lay()["current"]
+            lhe_parts.cmd_plan(ns())                                 # with park first: passes
+            assert lay()["current"], lay()
+            # the probe file of that night (committed): its low-yield processes refuse a plan of them
+            probe = lhe_parts.PROBE_YIELDS
+            y = json.load(open(probe))
+            items = {n: [] for n in y}
+            why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe), items)
+            assert len(why) == 1 and "ask more than 2x" in why[0], why
+            print("  probe file of 2026-10-30: refused for keeping under half the events they ask:", why[0][:400])
+            acc = ["%s=D186" % n for n in y if 0 < y[n] < 0.5 or y[n] <= 0]
+            assert not lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe,
+                                                                  accept_yield=acc), items)
+            why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe,
+                                                             accept_yield=acc), dict(items, zz_absent=[]))
+            assert len(why) == 1 and "missing from the probe file" in why[0] and "zz_absent" in why[0], why
+            why = lhe_parts.plan_refusals(argparse.Namespace(queue=os.path.join(d, "fresh"), probe=probe,
+                                                             accept_yield=["x=yes"]), {})
+            assert why and "NAME=D<n>" in why[0], why
+    finally:
+        lhe_parts._my_jobs = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[generation rule] ok")
+
+
+def _out(f):
+    import io, contextlib
+    b = io.StringIO()
+    with contextlib.redirect_stdout(b):
+        f()
+    return b.getvalue().strip().splitlines()[-1]
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -689,3 +759,4 @@ if __name__ == "__main__":
     test_ee_energy_runs_and_equal_shares()
     test_stale_worker_returns_tasks()
     test_park_and_skip_claimed()
+    test_generation_rule()
