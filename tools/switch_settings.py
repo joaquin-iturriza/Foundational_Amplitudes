@@ -11,7 +11,8 @@ Everything else (the correctness guards, review_backlog, reply_check, auto_push.
 The agent redesign's switch-overs (impl_order.txt), each from the previous one's registration:
   A   every registration runs through the dispatcher: `X args` becomes `python3 "<dir>/.claude/hooks/dispatch.py" X
       args`, in the project file and in ~/.claude/settings.json (with "$HOME"), nothing added or removed
-  B   the hook set: Stop figure_pair_guard.sh, review_backlog.sh check and reply_check.py, PreToolUse(Bash)
+  B   the hook set: Stop figure_pair_guard.sh, review_backlog.sh check, reply_check.py and context_guard.py (its Stop
+      branch is plan_check's; its other events stay), PreToolUse(Bash)
       hpo_guard.sh, plot_guard.sh, placement_guard.sh, lock_guard.py, design_guard.py, Pre/PostToolUse(Agent)
       reviewer_resume.py and PostToolUse(Bash) review_backlog.sh bashpost leave; PreToolUse(Bash) submit_guard.py
       (timeout 120) and review_guard.py, Pre/PostToolUse(Agent) review_guard.py come in (project file only)
@@ -87,7 +88,8 @@ def hook_set_b(s):
     for ev, groups in H.items():
         for g in groups:
             g["hooks"] = [h for h in g["hooks"] if not any(h["command"] == DISPATCH_P + n for n in B_OUT)
-                          and not (g.get("matcher") == "Bash" and h["command"] == DISPATCH_P + "plot_guard.sh")]
+                          and not (g.get("matcher") == "Bash" and h["command"] == DISPATCH_P + "plot_guard.sh")
+                          and not (ev == "Stop" and h["command"] == DISPATCH_P + "context_guard.py")]
         H[ev] = [g for g in groups if g["hooks"]]
     for ev, matcher, cmd, timeout in (("PreToolUse", "Bash", "submit_guard.py", 120),
                                       ("PreToolUse", "Bash", "review_guard.py", None),

@@ -411,8 +411,539 @@ def switch_a():
              os.path.exists(u) and open(u).read() == open(os.path.join(HOOKS, "dispatch.py")).read(), u)
 
 
+# ================================================================== B: the hook set
+SUBAGENTS = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA/%s/subagents" % MAIN)
+STATE_HEAD = os.path.join(HF.DEFAULT_OUT, "plan_head", "." + "state.json")
+
+
+def _load_hook(name):
+    import importlib.util
+    sys.path.insert(0, HOOKS)
+    spec = importlib.util.spec_from_file_location(name[:-3], os.path.join(HOOKS, name))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def _iso(t):
+    import datetime as dt
+    return dt.datetime.fromisoformat(t.replace("Z", "+00:00")).timestamp()
+
+
+def agent_spans(state):
+    """{entry: [(start, end)]}: each recorded step agent's first to last transcript record, read from the night's
+    subagent transcripts (in place)."""
+    out = {}
+    for eid, v in state.items():
+        if eid.startswith("_") or not isinstance(v, dict):
+            continue
+        for x in v.get("steps") or []:
+            f = os.path.join(SUBAGENTS, "agent-%s.jsonl" % x.get("agent"))
+            if not os.path.exists(f):
+                continue
+            ts = [_iso(m.group(1)) for line in open(f, errors="replace")
+                  for m in [re.search(r'"timestamp":"([^"]+)"', line)] if m]
+            if ts:
+                out.setdefault(eid, []).append((min(ts), max(ts)))
+    return out
+
+
+def stop_events_replay():
+    """B1: the 227 events replayed event by event through plan_check's event split: at each event's time, every event
+    open then (not yet acked) is a refusal unless a step agent of its entry was working at that time (a note)."""
+    pc = _load_hook("plan_check.py")
+    led = HF.load()
+    spans = agent_spans(json.load(open(STATE_HEAD)))
+    ev = [e for e in led["events"] if e["project"] == "FA"]
+    refusals = notes = moments = 0
+    wrong = []
+    for e in ev:
+        t = e["ts"]
+        open_ = [x for x in ev if x["ts"] <= t and (x["acked"] is None or x["acked"] > t)]
+        working = {k for k, sp in spans.items() if any(a <= t <= b for a, b in sp)}
+        lines = ["E%d  10-29 00:00 FA       %-9s %-24s %s" % (x["id"], x["kind"], x["item"] or "-", x["msg"] or "")
+                 for x in open_]
+        r, n = pc.split_events(lines, working)
+        moments += 1
+        refusals += len(r)
+        notes += len(n)
+        want_r = {x["id"] for x in open_ if (x["item"] or "-") not in working}
+        got_r = {int(l.split()[2][1:]) for l in r}
+        if want_r != got_r:
+            wrong.append((e["id"], sorted(want_r ^ got_r)[:5]))
+    scenario("B1: the 227 events replayed: at %d event times, %d open-event refusals (no working agent) and %d notes "
+             "(a step agent of the entry working)" % (moments, refusals, notes), moments == 227 and not wrong,
+             wrong[:5])
+    r, n = pc.split_events(["E1  10-29 20:52 FA       RUN       catalog_coverage         x ended FAILED"],
+                           {"catalog_coverage"})
+    scenario("B1: an open event of an entry whose agent is still working is a note, not a refusal",
+             not r and len(n) == 1, (r, n))
+
+
+def stop_acked_runs():
+    """B1: the acked-runs demand. Every RUN event of the night was acked with a note naming its run: plan.acked_runs
+    counts all of them handled, so no step is demanded for those run ends."""
+    d = tempfile.mkdtemp(prefix="acked_")
+    led = HF.load()
+    c = sqlite3.connect(os.path.join(d, "runs.db"))
+    for t in ("events", "runs"):
+        rows = led[t]
+        cols = sorted({k for r in rows for k in r})
+        c.execute("CREATE TABLE %s (%s)" % (t, ",".join(cols)))
+        c.executemany("INSERT INTO %s (%s) VALUES (%s)" % (t, ",".join(cols), ",".join("?" * len(cols))),
+                      [[r.get(k) for k in cols] for r in rows])
+    c.commit()
+    runs = sorted({re.search(r"\b(FA-[a-z0-9]+-[0-9a-f]{8})\b", e["msg"]).group(1) for e in led["events"]
+                   if e["kind"] == "RUN"})
+    code = ("import json, sys; sys.path.insert(0, %r); import plan; print(json.dumps(sorted(plan.acked_runs(set(%r)))))"
+            % (os.path.join(ROOT, "tools"), runs))
+    shutil.copy(os.path.join(HF.DEFAULT_OUT, "plan_before", "plan.yaml"), d)
+    env = dict(os.environ, PLAN_TEST="1", PLAN_ROOT=d, PLAN_FILE=os.path.join(d, "plan.yaml"),
+               PLAN_RUNS_DB=os.path.join(d, "runs.db"))
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, env=env, cwd=d)
+    got = json.loads(r.stdout or "[]")
+    scenario("B1: the acked-runs demand: of the %d runs whose end events were acked, %d count as handled (a note "
+             "naming them), so none is demanded" % (len(runs), len(got)), got == runs and len(runs) > 200,
+             (r.stderr[-500:], sorted(set(runs) - set(got))[:5]))
+
+
+def stop_conditions():
+    """B1: the conditions plan_check takes over, each on its own."""
+    sc = _load_hook("stop_conditions.py")
+    d = tempfile.mkdtemp(prefix="stopc_")
+    os.makedirs(os.path.join(d, ".claude"))
+    import time as _t
+    b, _ = sc.figure_pairs(d)                                    # first run: the baseline
+    os.utime(os.path.join(d, ".claude", ".figpair_last"), (_t.time() - 10, _t.time() - 10))
+    os.makedirs(os.path.join(d, "analysis"))
+    open(os.path.join(d, "analysis", "f.png"), "w").write("x")
+    b1, _ = sc.figure_pairs(d)
+    open(os.path.join(d, "analysis", "f.pdf"), "w").write("x")
+    b2, _ = sc.figure_pairs(d)
+    os.makedirs(os.path.join(d, "runs"))
+    open(os.path.join(d, "runs", "g.png"), "w").write("x")
+    b3, _ = sc.figure_pairs(d)
+    scenario("B1: a .png saved without its .pdf is a refusal; with it, or under runs/ (pruned), it passes",
+             not b and len(b1) == 1 and "analysis/f.pdf" in b1[0] and not b2 and not b3, (b1, b2, b3))
+    open(os.path.join(d, ".claude", ".compact_wanted"), "w").close()
+    c1, _ = sc.context({}, d)
+    c2, _ = sc.context({"stop_hook_active": True}, d)
+    open(os.path.join(d, ".claude", ".notes_flushed"), "w").close()
+    c3, _ = sc.context({}, d)
+    scenario("B1: a wanted compaction with the notes not flushed is a refusal (context_guard's Stop branch)",
+             len(c1) == 1 and not c2 and not c3, (c1, c2, c3))
+    for code, err, want, what in (
+            (0, "", 0, "passes"),
+            (2, "site ledger: this turn cannot end yet.\nFA has active work items and the supervisor is not running "
+                "(last pass never): start it", 1, "supervisor down"),
+            (2, "site ledger: this turn cannot end yet.\nno waiter is armed: run `site events --wait --project FA` in "
+                "the background", 1, "waiter not armed"),
+            (1, "Traceback", 1, "guard broken")):
+        stub = os.path.join(d, "site_%d_%d" % (code, len(err)))
+        open(stub, "w").write("#!/bin/sh\ncat >&2 <<'EOF'\n%s\nEOF\nexit %d\n" % (err, code))
+        os.chmod(stub, 0o755)
+        r, n = sc.ledger(d, [stub])
+        scenario("B1: ledger (`site guard --stop`) %s: %s" % (what, "a refusal" if want else "no refusal"),
+                 len(r) == want and (not want or err.splitlines()[-1][:20] in r[0]), r)
+    lg = os.path.join(d, "ledger_guard.sh")
+    open(lg, "w").write("#!/bin/sh\nexit 0\n")
+    no = sc.ledger_deferred(lg)
+    open(lg, "a").write("# grep -qF 'LEDGER_MARK: ledger: site guard --stop' plan_check.py\n")
+    scenario("B1: plan_check asks the ledger only once ledger_guard.sh defers to it (never both)",
+             not no and sc.ledger_deferred(lg), no)
+    hd = os.path.join(d, "hooks")
+    os.makedirs(hd)
+    r, n = sc.incidents(hd)
+    json.dump({"plan_check.py": {"why": "loop", "time": "2026-10-30T05:00"}}, open(os.path.join(hd, "disabled.json"), "w"))
+    r2, n2 = sc.incidents(hd)
+    scenario("B1: an open incident is a note, never a refusal", not r and not n and not r2 and len(n2) == 1, (r2, n2))
+    tr = os.path.join(d, "t.jsonl")
+    with open(tr, "w") as f:
+        f.write(J({"type": "user", "message": {"content": "why is the queue empty?"}}) + "\n")
+        f.write(J({"type": "assistant", "message": {"content": [{"type": "text", "text": "Joaquin, it is not."}]}}) + "\n")
+    code = ("import sys, json; sys.path.insert(0, %r); import stop_conditions as sc; print(json.dumps(sc.reply(%r)))"
+            % (HOOKS, {"transcript_path": tr}))
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True,
+                       env=dict(os.environ, PATH="/usr/bin:/bin", CLAUDE_PROJECT_DIR=d))
+    scenario("B1: the reply check with no `claude` CLI on PATH passes",
+             r.returncode == 0 and json.loads(r.stdout or "[[1]]")[0] == [], r.stdout + r.stderr)
+    proj = os.path.join(d, ".claude", "settings.json")
+    shutil.copy(os.path.join(ROOT, ".claude", "settings.json"), proj)
+    names = ("figure_pair_guard.sh", "reply_check.py", "context_guard.py")
+    before = [sc.registered_at_stop(h, d) for h in names]
+    open(os.path.join(d, "u.json"), "w").write('{"hooks": {}}\n')
+    subprocess.run([sys.executable, os.path.join(ROOT, "tools", "switch_settings.py"), "--settings", proj,
+                    "--user-settings", os.path.join(d, "u.json"), "--switch", "B", "--apply"], capture_output=True)
+    after = [sc.registered_at_stop(h, d) for h in names]
+    scenario("B1: each taken-over condition runs only once its standalone hook is no longer registered for Stop "
+             "(registered now: %s; after switch-over B: %s)" % (before, after),
+             before == [True, True, True] and after == [False, False, False], (before, after))
+
+
+def stop_opener():
+    """B1: the opener on the night's main-session transcript: each turn whose closing text lacks "Joaquin" is refused
+    once at its first stop, never twice for one user message; a turn that has it is never refused."""
+    sc = _load_hook("stop_conditions.py")
+    recs, state = [], {}
+    refused, per_prompt, lacking, stops, wrong = 0, {}, 0, 0, 0
+    for _, r in HF.transcript_records(name=MAIN):
+        if r.get("subtype") == "stop_hook_summary":
+            stops += 1
+            prompt, last = sc.turn_of(recs[-400:])
+            b, _ = sc.opener({}, state, records=recs[-400:])
+            lacks = bool(last) and not sc.starts_with_opener(last)
+            lacking += lacks
+            if b:
+                refused += 1
+                per_prompt[prompt] = per_prompt.get(prompt, 0) + 1
+                wrong += not lacks
+            continue
+        recs.append(r)
+    twice = [k for k, v in per_prompt.items() if v > 1]
+    scenario("B1: the night's main-session stops (%d): %d ended with text lacking the opener, %d refused, none twice "
+             "for one user message, none that had it" % (stops, lacking, refused),
+             stops > 50 and refused >= 1 and not twice and not wrong and refused <= lacking, (twice, wrong))
+    b, _ = sc.opener({"agent_id": "a1"}, {}, records=[{"type": "assistant", "message": {"content": [
+        {"type": "text", "text": "done"}]}}])
+    scenario("B1: the opener is never asked of a subagent", not b, b)
+
+
+NIGHT_SUBMIT = re.compile(r"site\s+submit|sweep_manager\.py\s+submit|launch_\w+\.sh|\bsbatch\b|condor_submit|"
+                          r"site\s+launch\s+add|site\s+run\b")
+
+
+def _night_commands():
+    out = []
+    for _, r in HF.transcript_records():
+        if r.get("type") != "assistant":
+            continue
+        for b in (r.get("message") or {}).get("content") or []:
+            if isinstance(b, dict) and b.get("type") == "tool_use" and b.get("name") == "Bash":
+                c = (b.get("input") or {}).get("command", "")
+                if NIGHT_SUBMIT.search(c):
+                    out.append(c)
+    return list(dict.fromkeys(out))
+
+
+def _guard_env(d):
+    home = os.path.join(d, "home")
+    pl = os.path.join(home, ".local", "share", "ccorch", "placement")
+    os.makedirs(pl, exist_ok=True)
+    import time as _t
+    json.dump({"ts": int(_t.time()), "quota": {"ccin2p3": 1000, "lxplus": 1000}},
+              open(os.path.join(pl, "FA.json"), "w"))
+    return dict(os.environ, HOME=home, SUBMIT_TEST="1", CLAUDE_PROJECT_DIR=ROOT,
+                SUBMIT_RUNS_DB=os.path.join(d, "none.db"), PATH=os.environ["PATH"])
+
+
+def _rc(argv, inp, env):
+    return subprocess.run(argv, input=J(inp), capture_output=True, text=True, env=env, cwd=ROOT).returncode
+
+
+def submit_replay():
+    """B2: every submission-like command of the night's transcripts through the four old guards and through
+    submit_guard: the same verdict per check and overall (the budget is new and reported apart)."""
+    cmds = _night_commands()
+    old = {"placement": ["bash", os.path.join(HOOKS, "placement_guard.sh")],
+           "design": [sys.executable, os.path.join(HOOKS, "design_guard.py")],
+           "hpo": ["bash", os.path.join(HOOKS, "hpo_guard.sh")],
+           "plot": ["bash", os.path.join(HOOKS, "plot_guard.sh")]}
+    diff, refused, budget_refused = [], 0, []
+    for c in cmds:
+        inp = {"tool_name": "Bash", "tool_input": {"command": c}, "cwd": ROOT}
+        verdicts = {}
+        for name, argv in old.items():
+            d = tempfile.mkdtemp(prefix="sub_")
+            o = _rc(argv, inp, _guard_env(d))
+            d = tempfile.mkdtemp(prefix="sub_")
+            n = _rc([sys.executable, os.path.join(HOOKS, "submit_guard.py")], inp,
+                    dict(_guard_env(d), SUBMIT_ONLY=name))
+            verdicts[name] = (o, n)
+            if (o == 2) != (n == 2):
+                diff.append((name, o, n, c[:160]))
+        refused += any(o == 2 for o, _ in verdicts.values())
+        d = tempfile.mkdtemp(prefix="sub_")
+        if _rc([sys.executable, os.path.join(HOOKS, "submit_guard.py")], inp,
+               dict(_guard_env(d), SUBMIT_ONLY="budget")) == 2:
+            budget_refused.append(c[:120])
+    scenario("B2: the night's %d submission commands: submit_guard's verdict equals the old guard's for each of "
+             "placement, design, hpo and plot (%d refused by the old guards)" % (len(cmds), refused),
+             len(cmds) >= 20 and not diff, diff[:5])
+    scenario("B2: the budget on the night's commands: %d refused (they are CPU workers or carry --est-gpu-hours)"
+             % len(budget_refused), not budget_refused, budget_refused[:3])
+
+
+def submit_budget():
+    """B2: the GPU budget cases."""
+    d = tempfile.mkdtemp(prefix="budget_")
+    gpu, cpu = os.path.join(d, "gpu.sh"), os.path.join(d, "cpu.sh")
+    open(gpu, "w").write("#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --time=10:00:00\npython run.py\n")
+    open(cpu, "w").write("#!/bin/bash\n#SBATCH --cpus-per-task=16\npython tools/lhe_parts.py work\n")
+    db = os.path.join(d, "runs.db")
+    c = sqlite3.connect(db)
+    c.execute("CREATE TABLE runs (id TEXT, project TEXT, site TEXT, item TEXT, est_gpu_hours REAL, submitted INTEGER)")
+    c.execute("CREATE TABLE items (project TEXT, id TEXT, est_gpu_hours REAL)")
+    import time as _t
+    c.executemany("INSERT INTO items VALUES ('FA', ?, ?)", [("small", 20), ("approved", 35), ("split", None),
+                                                           ("jz", None), ("cpu", None)])
+    c.execute("INSERT INTO runs VALUES ('FA-ccin2p3-00000001', 'FA', 'ccin2p3', 'split', 20, ?)", (int(_t.time()) - 1800,))
+    c.commit()
+    env = dict(_guard_env(d), SUBMIT_ONLY="budget", SUBMIT_RUNS_DB=db)
+    sub = lambda cmd: _rc([sys.executable, os.path.join(HOOKS, "submit_guard.py")],
+                          {"tool_name": "Bash", "tool_input": {"command": cmd}}, env)
+    for what, cmd, want in (
+            ("35 GPU-h for an item recorded at 20", "site submit auto FA %s --item small --est-gpu-hours 35" % gpu, 2),
+            ("12 GPU-h on Jean Zay without approval", "site submit jeanzay FA %s --item jz --est-gpu-hours 12" % gpu, 2),
+            ("12 GPU-h through auto --allow-jeanzay", "site submit auto FA %s --item jz --allow-jeanzay "
+                                                     "--est-gpu-hours 12" % gpu, 2),
+            ("the second of two 20 GPU-h submissions 30 min apart", "site submit auto FA %s --item split "
+                                                                    "--est-gpu-hours 20" % gpu, 2),
+            ("a GPU job without --est-gpu-hours", "site submit auto FA %s --item small" % gpu, 2),
+            ("CPU generation workers without an estimate", "site submit ccin2p3 FA %s --item cpu --env Q=x" % cpu, 0),
+            ("35 GPU-h for an item recorded at 35", "site submit auto FA %s --item approved --est-gpu-hours 35" % gpu, 0),
+            ("10 GPU-h for an unrecorded item", "site submit auto FA %s --item jz --est-gpu-hours 10" % gpu, 0),
+            ("a --check dry run", "site submit auto FA %s --item small --check" % gpu, 0)):
+        rc = sub(cmd)
+        scenario("B2: budget: %s is %s" % (what, "refused" if want else "allowed"), rc == want, (rc, cmd))
+
+
+SCEN_MAP_PATCH = r'''
+import json, os, runpy, subprocess, sys
+HOOKS = os.path.join(%(root)r, ".claude", "hooks")
+MAP = json.loads(os.environ["SCEN_MAP"])
+_run, _popen = subprocess.run, subprocess.Popen
+def _wrap(argv, kw):
+    if not isinstance(argv, (list, tuple)):
+        return argv
+    argv = list(argv)
+    for k in (0, 1):
+        if k < len(argv) and isinstance(argv[k], str) and os.path.dirname(os.path.abspath(argv[k])) == HOOKS \
+                and os.path.basename(argv[k]) in MAP:
+            new, only = MAP[os.path.basename(argv[k])]
+            if only:
+                env = dict(kw.get("env") or os.environ, SUBMIT_TEST="1", SUBMIT_ONLY=only)
+                kw["env"] = env
+            return [sys.executable, os.path.join(HOOKS, new)] + argv[k + 1:]
+    return argv
+def run(args, *a, **k):
+    return _run(_wrap(args, k), *a, **k)
+class Popen(_popen):
+    def __init__(self, args, *a, **k):
+        super().__init__(_wrap(args, k), *a, **k)
+subprocess.run, subprocess.Popen = run, Popen
+sys.argv = [%(scen)r]
+import importlib.util
+spec = importlib.util.spec_from_file_location("scen", %(scen)r)
+t = importlib.util.module_from_spec(spec); spec.loader.exec_module(t)
+names = os.environ.get("SCEN_GROUPS", "").split(",")
+t.GROUPS[:] = [g for g in t.GROUPS if g.__name__ in names]
+sys.exit(t.main())
+'''
+
+
+def scenarios_mapped(mapping, groups):
+    """the named groups of test_setup_scenarios.py run with the old hooks and with each mapped to its replacement:
+    [(direct line, mapped line)] that differ, and the number of results."""
+    scen = os.path.join(ROOT, "tests", "test_setup_scenarios.py")
+    res = {}
+    for mode in ("direct", "mapped"):
+        env = dict(os.environ, SCEN_MAP=json.dumps(mapping if mode == "mapped" else {}), SCEN_GROUPS=",".join(groups))
+        r = subprocess.run([sys.executable, "-c", SCEN_MAP_PATCH % {"root": ROOT, "scen": scen}], capture_output=True,
+                           text=True, env=env, cwd=ROOT, timeout=1800)
+        res[mode] = [l for l in r.stdout.splitlines() if l.startswith(("PASS  ", "FAIL  "))]
+    return [(a, b_) for a, b_ in zip(res["direct"], res["mapped"]) if a != b_], len(res["direct"]), \
+        len(res["direct"]) == len(res["mapped"])
+
+
+def submit_scenarios():
+    """B2: the placement and design scenarios of test_setup_scenarios.py (command_reading, designs, design_prior) give
+    the same results with placement_guard.sh and design_guard.py replaced by submit_guard.py (that check only)."""
+    diff, n, same_n = scenarios_mapped({"placement_guard.sh": ["submit_guard.py", "placement"],
+                                        "design_guard.py": ["submit_guard.py", "design"]},
+                                       ["command_reading", "designs", "design_prior"])
+    scenario("B2: %d scenarios of placement and design: the same results through submit_guard" % n,
+             n > 20 and same_n and not diff, diff[:5])
+
+
+def review_merged():
+    """B3: lock_guard's and reviewer_resume's scenarios against review_guard.py; one reviewer per backlog."""
+    diff, n, same_n = scenarios_mapped({"lock_guard.py": ["review_guard.py", ""],
+                                        "reviewer_resume.py": ["review_guard.py", ""]},
+                                       ["command_reading", "reviewer_resume"])
+    scenario("B3: %d scenarios of lock_guard and reviewer_resume: the same results against review_guard.py" % n,
+             n > 10 and same_n and not diff, diff[:5])
+    d = tempfile.mkdtemp(prefix="rg_")
+    st = os.path.join(d, ".claude", ".review_state")
+    os.makedirs(st)
+    env = dict(os.environ, CLAUDE_PROJECT_DIR=d)
+    rg = lambda ev: subprocess.run([sys.executable, os.path.join(HOOKS, "review_guard.py")], input=J(ev),
+                                   capture_output=True, text=True, env=env)
+    launch = {"tool_name": "Agent", "tool_input": {"subagent_type": "claudemd-keeper", "prompt": "review"}}
+    rg(dict(launch, hook_event_name="PostToolUse", tool_response={"content": "agentId: keeper1 (internal)"}))
+    open(os.path.join(st, "claudemd-keeper.lock"), "w").close()
+    r = rg(dict(launch, hook_event_name="PreToolUse"))
+    scenario("B3: a second claudemd-keeper launch while the first holds the lock is refused, naming it",
+             r.returncode == 2 and "keeper1" in r.stderr, r.stderr)
+    import time as _t
+    old = _t.time() - 181 * 60
+    os.utime(os.path.join(st, "claudemd-keeper.lock"), (old, old))
+    r = rg(dict(launch, hook_event_name="PreToolUse"))
+    scenario("B3: with the lock stale (181 min) a fresh launch passes", r.returncode == 0, r.stderr)
+    r = rg({"tool_name": "Bash", "tool_input": {"command": "bash .claude/hooks/review_backlog.sh advance claudemd-keeper"}})
+    r2 = rg({"tool_name": "Bash", "agent_type": "claudemd-keeper",
+             "tool_input": {"command": "bash .claude/hooks/review_backlog.sh advance claudemd-keeper"}})
+    scenario("B3: advance from the main session is refused, from the pillar's own reviewer it passes and is logged",
+             r.returncode == 2 and r2.returncode == 0 and "caller=claudemd-keeper" in open(os.path.join(
+                 st, "lock_calls.log")).read(), (r.stderr, r2.stderr))
+
+
+def _repo_with_backlog(prefix):
+    repo = tempfile.mkdtemp(prefix=prefix)
+    g = lambda *a: subprocess.run(["git", "-C", repo] + list(a), capture_output=True, text=True,
+                                  env=dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t",
+                                           GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t"))
+    g("init", "-q", "-b", "trunk")
+    os.makedirs(os.path.join(repo, ".claude", "hooks"))
+    os.makedirs(os.path.join(repo, "tools"))
+    for f in ("review_backlog.sh",):
+        shutil.copy(os.path.join(HOOKS, f), os.path.join(repo, ".claude", "hooks"))
+    for f in ("review_state.py", "attribution.py", "review_weight.py"):
+        shutil.copy(os.path.join(ROOT, "tools", f), os.path.join(repo, "tools"))
+    open(os.path.join(repo, ".gitignore"), "w").write(".claude/.review_state/\n")
+    open(os.path.join(repo, "a.py"), "w").write("x = 1\n")
+    g("add", "."); g("commit", "-qm", "base")
+    rb = lambda *a, stdin="": subprocess.run(["bash", ".claude/hooks/review_backlog.sh"] + list(a), cwd=repo,
+                                             input=stdin, capture_output=True, text=True)
+    rb("init")
+    return repo, g, rb
+
+
+def review_modes():
+    """B4: the Stop nudge and bashpost are gone: still registered until switch-over B, they are no-ops (exit 0, no
+    output); gate and bashpre still refuse an overdue pillar."""
+    repo, g, rb = _repo_with_backlog("rb4_")
+    open(os.path.join(repo, "a.py"), "a").write("".join("y%d = %d\n" % (i, i) for i in range(600)))
+    commit = J({"tool_name": "Bash", "tool_input": {"command": "git commit -qam x"}})
+    edit = J({"tool_name": "Edit", "tool_input": {"file_path": os.path.join(repo, "a.py")}})
+    c, bp = rb("check", stdin="{}"), rb("bashpost", stdin=commit)
+    pre, gate = rb("bashpre", stdin=commit), rb("gate", stdin=edit)
+    scenario("B4: an overdue pillar: check and bashpost say nothing (exit 0), bashpre refuses its commit, gate its edit",
+             (c.returncode, c.stdout, bp.returncode, bp.stdout) == (0, "", 0, "") and pre.returncode == 2
+             and gate.returncode == 2, (c.stdout[:200], bp.stdout[:200], pre.returncode, gate.returncode))
+
+
+def review_paths():
+    """B5: the code backlog leaves out plan bookkeeping and generated data and recipe lists, keeps the generation code,
+    and counts .claude/settings.json. On the night's generation commits (5bb09c87^..6220a189)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("review_state", os.path.join(ROOT, "tools", "review_state.py"))
+    rs = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rs)
+    new_paths = rs.pillars(ROOT)["repo-reviewer"]
+    d = tempfile.mkdtemp(prefix="rb5_")
+    os.makedirs(os.path.join(d, ".claude", "hooks"))
+    open(os.path.join(d, ".claude", "hooks", "review_backlog.sh"), "w").write(
+        subprocess.run(["git", "-C", ROOT, "show", "61c4d6a0:.claude/hooks/review_backlog.sh"], capture_output=True,
+                       text=True).stdout)
+    old_paths = rs.pillars(d)["repo-reviewer"]
+    names = lambda paths: set(subprocess.run(["git", "-C", ROOT, "-c", "core.quotePath=false", "diff", "--name-only",
+                                              "5bb09c87^", "6220a189", "--"] + paths, capture_output=True,
+                                             text=True).stdout.split())
+    o, n = names(old_paths), names(new_paths)
+    gone = sorted(o - n)
+    keep = {"tools/lhe_probe.py", "tools/lhe_parts.py", "recipes/gen_catalog_v4_default.py"}
+    scenario("B5: on the night's generation range the code backlog drops %d generated files (%s...) and keeps the "
+             "generation code" % (len(gone), ", ".join(gone[:3])),
+             "recipes/catalog_v4_pp_processes.yaml" in gone and keep <= n and not any(
+                 x.endswith(".py") for x in gone), (gone[:8], keep - n))
+    s = subprocess.run(["git", "-C", ROOT, "log", "--format=%h", "-1", "--", ".claude/settings.json"],
+                       capture_output=True, text=True).stdout.strip()
+    scenario("B5: a .claude/settings.json edit now counts toward the code backlog",
+             ".claude/settings.json" in names_of(s, new_paths) and ".claude/settings.json" not in names_of(s, old_paths),
+             (s, new_paths))
+
+
+def names_of(sha, paths):
+    return set(subprocess.run(["git", "-C", ROOT, "diff", "--name-only", sha + "^", sha, "--"] + paths,
+                              capture_output=True, text=True).stdout.split())
+
+
+def review_before_merge():
+    """B6: a merge into trunk of unreviewed code is refused (fast-forward or not), and passes after the reviewer's
+    advance; `plan done` refuses an entry whose write-up commit is outside a passed backlog."""
+    repo, g, rb = _repo_with_backlog("rb6_")
+    g("checkout", "-qb", "feat")
+    open(os.path.join(repo, "a.py"), "a").write("z = 2\n")
+    g("commit", "-qam", "feature")
+    g("checkout", "-q", "trunk")
+    guard = lambda cmd: subprocess.run([sys.executable, os.path.join(HOOKS, "git_verify_guard.py")],
+                                       input=J({"tool_name": "Bash", "tool_input": {"command": cmd}, "cwd": repo}),
+                                       capture_output=True, text=True)
+    r1, r1ff = guard("git merge --no-ff feat"), guard("git merge feat")
+    g("checkout", "-q", "feat")
+    rb("advance", "repo-reviewer")
+    g("checkout", "-q", "trunk")
+    r2 = guard("git merge --no-ff feat")
+    scenario("B6: merging unreviewed code into trunk is refused (--no-ff and fast-forward), after the reviewer's "
+             "advance it passes", r1.returncode == 2 and r1ff.returncode == 2 and "no reviewer has passed" in r1.stderr
+             and r2.returncode == 0, (r1.stderr[-300:], r1ff.returncode, r2.stderr[-300:]))
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("review_state", os.path.join(repo, "tools", "review_state.py"))
+    rs = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rs)
+    open(os.path.join(repo, "a.py"), "a").write("w = 3\n")
+    g("commit", "-qam", "unreviewed write-up")
+    head = g("rev-parse", "HEAD").stdout.strip()
+    scenario("B6: a commit past the watermark is unreviewed (what plan done refuses), the reviewed one is not",
+             rs.unreviewed(head, repo) and not rs.unreviewed(g("rev-parse", "feat").stdout.strip(), repo),
+             rs.unreviewed(head, repo))
+
+
+def attribution():
+    """B7: no attribution in a commit."""
+    repo, g, rb = _repo_with_backlog("rb7_")
+    os.makedirs(os.path.join(repo, ".githooks"))
+    shutil.copy(os.path.join(ROOT, ".githooks", "commit-msg"), os.path.join(repo, ".githooks"))
+    g("config", "core.hooksPath", ".githooks")
+    lines = ("Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+             "Claude-Session: https://claude.ai/code/session_x")
+    for ln in lines:
+        msg = os.path.join(repo, "msg.txt")
+        open(msg, "w").write("a change\n\n%s\n" % ln)
+        open(os.path.join(repo, "a.py"), "a").write("#\n")
+        r = g("commit", "-qa", "-F", msg)
+        scenario("B7: `git commit -F msg.txt` with `%s` is refused by commit-msg" % ln.split(":")[0],
+                 r.returncode != 0 and "attributes the work" in r.stderr, r.stderr)
+        r = subprocess.run([sys.executable, os.path.join(HOOKS, "git_verify_guard.py")], input=J({
+            "tool_name": "Bash", "tool_input": {"command": "git commit -m 'a change\n\n%s'" % ln}, "cwd": repo}),
+            capture_output=True, text=True)
+        scenario("B7: `git commit -m` with `%s` is refused before it runs" % ln.split(":")[0],
+                 r.returncode == 2 and "rule 4" in r.stderr, r.stderr)
+    open(msg, "w").write("a change\n\nCo-authored-by: Daniel Maitre <daniel@durham.ac.uk>\n")
+    r = g("commit", "-qa", "-F", msg)
+    scenario("B7: a real collaborator's Co-authored-by passes", r.returncode == 0, r.stderr)
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "attribution.py"), "scan", "--since", "2026-10-01"],
+                       capture_output=True, text=True, cwd=ROOT)
+    scenario("B7: the history since 1 Oct scanned with the same pattern: %s" % r.stdout.strip().splitlines()[-1],
+             r.returncode in (0, 1), r.stdout[-300:])
+
+
+def guards_selftest():
+    """B8: .claude/hooks/test_guards.py (the project's `site selftest`): a memory file is refused, every agent is on
+    opus."""
+    r = subprocess.run([sys.executable, os.path.join(HOOKS, "test_guards.py")], capture_output=True, text=True,
+                       env=dict(os.environ, CLAUDE_PROJECT_DIR=ROOT))
+    scenario("B8: test_guards.py passes, its memory-file and agent-model cases included",
+             r.returncode == 0 and "MEMORY.md" in r.stdout and "model opus" in r.stdout, r.stdout[-600:])
+
+
 GROUPS = {"fixtures": fixtures, "incident_tool": incident_tool, "dispatcher": dispatcher,
-          "switch_a": switch_a, "scenarios_via_dispatch": scenarios_via_dispatch}
+          "switch_a": switch_a, "scenarios_via_dispatch": scenarios_via_dispatch,
+          "stop_events_replay": stop_events_replay, "stop_acked_runs": stop_acked_runs,
+          "stop_conditions": stop_conditions, "stop_opener": stop_opener, "submit_replay": submit_replay,
+          "submit_budget": submit_budget, "submit_scenarios": submit_scenarios, "review_merged": review_merged,
+          "review_modes": review_modes, "review_paths": review_paths, "review_before_merge": review_before_merge,
+          "attribution": attribution, "guards_selftest": guards_selftest}
 
 
 def main(argv):
