@@ -5084,6 +5084,15 @@ entries:
       FA-ccin2p3-4e53ebe5..f553eb93 all COMPLETED; check_site_data --alphas passes on both mixture recipes. The stale arms
       b316582a, 7cc6fe94, 28465181, e456e33d were cancelled before starting; the four arms resubmitted with nothing to wait
       on, 2.5 h: default50 6c246603, default50_seed2 1d46b938, default25 11ad944a, default25_seed2 9c6fc7ab.'
+  - at: '2026-10-30T23:26:19+00:00'
+    text: 'Control reads for step 14 (FA-ccin2p3-04253ff7 seed 42, e7e32847 seed 43, both COMPLETED): PP4 read on 931 classes
+      each, test split, all finite (mse_logm2_real). EE4: 170 of 170 probes refused on both: tools/zero_shot_parent.py builds
+      each probe with its train pool (the probe''s own target statistics come from its train split, fine_tune.target_stats=own),
+      and the ee4_ entries of recipes/catalog_v4_ee_test.yaml have n_train 0, so require_cache fails (''dataset for (ee4_epem_aabbx,
+      train, 0 ev) not prebuilt''). The EE4 half of the step-14 GAIN rule cannot be read until this is repaired (either the
+      reader takes the probe''s statistics without a train pool, e.g. from the parent, which only changes q_own''s representation,
+      or the ee4 entries get train pools); the four mixture arms queued now will log the same EE4 errors and keep their PP4
+      reads; their EE4 then comes from an eval-only re-read (REREAD) after the repair, as the controls'' does.'
   handoff:
     state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
       their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
