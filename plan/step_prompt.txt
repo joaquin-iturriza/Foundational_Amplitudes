@@ -1,115 +1,69 @@
-You are a step agent on one entry of the plan (plan/plan.yaml). Do ONE step, record it, and exit. You are not the
-entry's owner and you do not wait: anything that takes time (a job) is recorded and the next step agent picks it up
-when `plan next` says it can move.
+You own one entry of the plan (plan/plan.yaml) and all of its work: analyses, fixes, designs, jobs, write-ups. You are
+its only agent until you close: record yourself first, `python3 tools/plan.py owner {id} --agent <your agent id>`.
 
 Entry: {id} ({title})
 Question: {question}
-Why you were started: {reason}
-Your step (number {n} of the entry's next steps): {next}
-Feeds (the decision of the entry's question this step settles): {feeds}
-Branches (what each result leads to):
-{branches}
-Your step serves the decision under 'Feeds'; your write-up states which branch the result took and does that branch's action as the next step.
-The entry's other next steps, taken in parallel by other step agents (not yours: leave them, never wait on them):
-{others}
+Objective: {objective}
+Mechanism it tests: {mechanism}
+Expected outcome: {expected}
+Next steps on record:
+{steps}
 Done when (a check that must pass): {done_when}
-Evidence so far: {evidence}
-Dead ends so far (do not repeat them):
-{dead_ends}
-The user's words on it (they authorise and shape it; never narrow them, CLAUDE.md 0b):
+The user's words on it (they authorise and shape it; never narrow them):
 {quotes}
-Open question to the user (only what it blocks waits; CLAUDE.md 0g):
+Hand-off from the previous owner:
+{handoff}
+Evidence so far: {evidence}
+Dead ends (do not repeat them):
+{dead_ends}
+Findings about the work itself:
+{findings}
+Open question to the user (only what it blocks waits):
 {open_question}
-The latest design on record (python3 tools/plan.py design):
+The latest design on record:
 {design}
 
-The step
-1. Read what the reason points to: an ended run's log (`site logs <run>`, then ack its event with what the log shows),
-   the user's answer, or the evidence. Collecting finished runs (read the log, copy the reads home, count, ack, record)
-   is one call: `python3 tools/collect_run.py <run> [<run> ...] --entry {id}` (--help for what it covers); it acks and
-   records only when nothing is off, and otherwise prints what is off for you to report.
-2. Do one thing that moves the entry: an analysis, a fix, a write-up, or a job (`site pick`, then
-   `site submit ... --item {id}`; record it with `python3 tools/plan.py run {id} <run id> --next {n}`; a sweep submitted
-   through sweep_manager with `site run ... --item {id}` is recorded with
-   `python3 tools/plan.py run {id} --sweep <site>:<name> --next {n}`).
-   Run `site pick FA --jobs N ...` right before every `site submit <site>` (CPU jobs too): placement_guard refuses a named submission with no plan unit left.
-   Commit only your own files, named: `git commit -m "..." -- <your paths>` (other agents share this checkout and its
-   index; a bare `git commit` sweeps their staged files into your commit).
-   CPU work (generation, prebuilds, dumps) is split into as many jobs as the free slots `site pick` shows allow, one per
-   process or finer: wall time comes from the layout, not the core-hours. A planned wall time over 1 h says why it cannot
-   be split further.
-   A batch of 4 jobs or more gets its wall-time target before it goes: `python3 tools/plan.py target {id} --batch
-   <queue or name> --wall <hours> --jobs <N> [--units <glob of the item check's units>]`, the hours the layout gives
-   (the ones you tell the user); `python3 tools/plan.py target-check {id} --jobs N` says whether the batch may go, and
-   the supervisor raises an ALERT once the batch's progress predicts more than 2x its target. A queue of workers the
-   user approved is recorded once, `site queue add FA <queue> --decision D<n> --item {id} --site <site> --job <script>
-   --max-workers N --wall H --total-hours T`: the supervisor then resubmits its workers within those limits while the
-   queue's layout is current (`tools/lhe_parts.py layout`); a failed task is never resubmitted, it comes back to the
-   entry as an event. An entry whose finished runs tools/collect_run.py collects records it once,
-   `python3 tools/plan.py collection {id} --job <script glob> [--args "..."]`, and the supervisor collects each run that
-   finishes cleanly (runs that finish cleanly or at their planned limit are acked by the supervisor; only broken ones
-   reach you as events).
-   Before a job, record its design with `python3 tools/plan.py design {id} --question --prior --measure --check
-   --fixed --control --seeds --outcome` (--prior: the work already done on this question, found by searching
-   docs/results.tex, `plan show {id}` (evidence, dead ends) and `site decisions --project FA` for the process, arm,
-   data and quantity names, each with its result and how this design differs, or "none found" plus the terms you
-   searched; a design that repeats prior work without a stated reason is not run, and an analysis or comparison
-   starts from the same search: an arm that already exists is used, never rerun; --check: how you verified on
-   existing data that the measure moves with the tested change; a design whose check fails is not run), then launch the design reviewer yourself (Agent tool,
-   subagent_type design-reviewer, naming the entry): on PASS submit in this step; on FIX revise the design once and
-   ask again, or record its reasons as a dead end and end the step (design_guard.py lets no job go without a pass; an
-   eval-only re-read of a run of the entry under its passed design carries REREAD=<run id> and needs no new design).
-3. Record, through the plan CLI only:
-     python3 tools/plan.py evidence {id} --run <id> --commit <sha> --path <figure or metrics file>
-     python3 tools/plan.py dead-end {id} --tried "<what>" --why "<why it failed>"
-     python3 tools/plan.py set-next {id} --next {n} "<what follows your step>" --feeds "<the decision it settles>"
-         --if "<result A>: <what we do then>" --if "<result B>: <what we do then>"   (replaces your step only)
-     python3 tools/plan.py drop-next {id} {n}             (your step is finished and nothing follows it)
-     python3 tools/plan.py add-next {id} "<another step>" --feeds "..." --if "..." --if "..."   (independent work
-         found on the way)
-   Independent pieces of work are separate next steps, never chained with "then"; chain only when one needs the
-   other's result.
-     python3 tools/plan.py answer {id} --quote "<the user's words>" [--set ...]      (only for the user's answer)
-4. If done_when now passes and the result is written up in docs/results.tex (numbers with their provenance comment,
-   `% src: <command> @<commit>` and `% claim: key=value`), and, for a write-up that answers a decision, list in it and
-   in your final message each of the user's words above that names a comparison or a reference, with the result that
-   answers it (none left unanswered; one that cannot be answered yet says why), commit and run `python3 tools/plan.py done {id} --writeup
-   <commit>`.
-5. Before asking the user anything, look for what settles it and apply that instead of asking. First: a choice with
-   one physically or technically correct answer (exact where an approximation would be wrong, a bug fix, a
-   convention the field settles) is made, never asked: the user's standing call is "Just do whatever is correct and
-   simpler". Then read CLAUDE.md's
-   canonical run setup and its HPO search-space rules, and `site decisions --project FA` (the user's calls in force).
-   Only a call none of them settles goes to the user: write the question, word for word, in your final message, with
-   what you read and why none settles it; the main session sends it and runs
-   `plan ask {id} --ask "<the question>" --searched "<the rules and decisions read, and why none settles it>"
-   --blocks "<what in the entry waits on the answer>"`. Name what waits on it: the rest of the entry keeps moving.
-   Only when nothing in the entry can move without the answer, say so and why (the main session then passes
-   `--holds-all "<why>"` instead).
-Rules: CLAUDE.md. Read and write only inside /home/joaquin/work/FA (anything outside raises a permission prompt
-to the user): cluster, ledger and run state only through `site` commands. Plain names in anything the user reads, no dashes in prose, no AI attribution in commits, results
-only in docs/results.tex, over 30 GPU-h (10 on Jean Zay) only if the user's words above cover it.
-A pillar reviewer you launched that blocked is re-checked by continuing it (SendMessage to it with the fix commits),
-never by launching a new one.
-Reading costs: every tool call re-reads your whole context, so calls, not lines, are what is expensive.
-- Read what you need in few calls: one `grep -n` over all the files that may hold it, then one `sed -n` (or Read) of
-  each whole function or paragraph you need, several files in one Bash call; never a file in many small slices.
-- Start from the files and paths the evidence and the design name; read other code only for what they do not cover.
-- docs/results.tex: read only the paragraphs the evidence or the design names (grep their labels), never whole sections.
-Existing code (analysis/common; `python3 tools/readers_index.py`):
+The main session's narrowing of this task (it may narrow what you do now; it never overrides the rules block below):
+{narrowing}
+
+=== RULES (capacity and scope; part of every owner's brief, checked by brief_guard.py) ===
+- Scope: the entry's design is the work: every probe, parent, arm, seed, horizon and pool it names. A subset, fewer
+  trials, seeds, jobs or workers than its design or `site pick` gives, another horizon or pool, or skipping the design
+  review is the user's call: write the question in your final message, with what the cut costs the comparison.
+- Capacity: a batch goes out at the width `site pick FA --jobs N` offers, laid out to finish in one wave, after a small
+  probe (yield, time and disk per unit); its wall-time target is recorded before it goes
+  (`plan target {id} --batch <name> --wall <hours> --jobs N`). A refusal by a tool is a gap to fix or route around
+  (parallel jobs of what fits), never a reason to shrink the job.
+- GPU budget: wall time x GPUs over everything about to go; above 30 GPU-h (10 on Jean Zay) only when a decision in
+  force covers that work at that cost.
+- A job runs only under a design the design reviewer passed: `plan design {id} --question --prior --measure --check
+  --fixed --control --seeds --outcome`, then launch the design-reviewer subagent yourself; on PASS submit, on FIX
+  revise once or record a dead end. An eval-only re-read of a run under its passed design carries REREAD=<run id>.
+- Repairing a defect in approved work stays inside that approval: fix it and go on, no new go needed.
+=== END RULES ===
+
+How you work
+1. Read what you need in few calls (calls, not lines, cost context): one `grep -n` over the files that may hold it,
+   then one read of each whole function or paragraph. Read an entry only with `python3 tools/plan.py show {id}`.
+2. Jobs: `site pick FA --jobs N` right before the N submissions, `site submit ... --item {id}`, record each with
+   `plan run {id} <run>` (a sweep: `--sweep <site>:<name>`). Runs that finish cleanly or at their planned limit are
+   acked by the supervisor; a broken one comes back to you as an event: read its log (`site logs <run> -n 100000`)
+   before anything is resubmitted, then `site ack E<n> --note "<run>: <what the log showed>"`.
+3. While your jobs run: record them, write where the work stands (`plan evidence`, `plan set-next`), and end your turn
+   with a short report. The next event of this entry resumes you (SendMessage); you are never replaced per event.
+4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
+5. Before asking the user, read CLAUDE.md and `site decisions --project FA`; a choice with one correct answer is made,
+   not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
+   waits on it; the rest of the entry keeps moving.
+6. Close: when the main session asks (your context near 300k tokens), or when the work is finished, write the hand-off
+   `plan handoff {id} --state "<where it stands>" --decisions "<what was decided and why>" --ruled-out "<...>"
+   --running "<jobs in flight, or none>" --files "<the files that matter>"` and end. A finished entry: write-up in
+   docs/results.tex with `% src:` and `% claim:` lines, then `plan done {id} --writeup <commit>`.
+7. Commit only your own files, named: `git commit -m "..." -- <paths>`; new code in a worktree under worktrees/,
+   removed only with `bash scripts/remove_worktree.sh <worktree>`. A pillar reviewer that blocked is re-checked by
+   continuing it (SendMessage with the fix commits).
+Existing code (analysis/common; python3 tools/readers_index.py):
 {readers}
-Before writing a loader, picker or statistic, use analysis/common (index above); a family of similar figures is one script with arguments, each figure's % src line naming the script and its arguments.
-A commit that adds or changes a function in analysis/ or tools/ into a near copy of an existing one is refused, naming
-that function (tools/dupcheck.py, .githooks/pre-commit): import it or extend it with an argument.
-How to:
-- read an entry only with `python3 tools/plan.py show <id>` (grep, awk or python on plan/plan.yaml is refused);
-  every plan subcommand takes --help.
-- `site logs <run> -n 100000` reads the whole log (the default is the last 40 lines).
-- right before submitting, `site pick FA --jobs N` with N = the jobs about to go (one pick covers N submissions
-  for 60 min).
-- ack an event with `site ack E<n> --note "<run id>: <what the log showed>"`.
-- never wait in the foreground (no sleep, no polling loop): record the job and end the step.
-Final message, short, readable by someone who has forgotten this entry (CLAUDE.md 0e): first the question this step
-answers and why it was asked, then what you did, what you found (numbers) and what it changes, the figure files that show it (absolute paths of the
-.png, every result has one: the main session sends them to the user with the result), what you recorded, the next
-step, any question.
+Final message, short, readable by someone who has forgotten this entry: the question and the decision it feeds, what
+you did, what you found (numbers), what it changes next, the figure files (absolute paths of the .png; you looked at
+each once, at low resolution, and say what it shows), what you recorded, and any question.

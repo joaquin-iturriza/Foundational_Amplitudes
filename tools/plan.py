@@ -960,12 +960,16 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
         # with the supervisor sorting run ends (switch-over C), a run with no RUN event yet is still being sorted: it
         # becomes either an ack (clean, planned limit) or an open event (broke), which is the signal; the stop check
         # separately refuses while the supervisor is not running (2026-10-30)
-        handled |= unsorted_runs([r for r, _ in ended])
-        # ...but a batch whose runs have ALL ended (none live) is the step's own signal to move, acked or not: hiding
-        # acked ends left a finished probe batch with nobody to read it (2026-10-30, 12 probes idle for hours)
+        sorting = unsorted_runs([r for r, _ in ended])
+        # ...but a batch whose runs have ALL ended (none live) and been acked is the step's own signal to move: hiding
+        # acked ends left a finished probe batch with nobody to read it (2026-10-30, 12 probes idle for hours). A run
+        # still being sorted stays hidden either way (repo-reviewer 2026-10-30: the all-ended case let it through,
+        # the race 0cd88cf0 removed). In owner mode an acked end is handled: the owner is resumed when nothing of
+        # its work is in flight (owner_actions).
         still_live = [r for r, state, fin in rows if not terminal(state)]
-        if not (ended and not still_live and all(r in handled for r, _ in ended)):
-            ended = [(r, fin) for r, fin in ended if r not in handled]
+        all_acked = ended and not still_live and not sorting and all(r in handled for r, _ in ended)
+        if owner_mode() or not all_acked:
+            ended = [(r, fin) for r, fin in ended if r not in handled and r not in sorting]
         if sweeps is None:
             sweeps = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps_of(st, e["id"]) else {}
         sw_end, sw_live, sw_unread = sweep_status(e["id"], st, sweeps, mine)
@@ -1156,7 +1160,7 @@ def readers_index():
 def step_prompt(e, reason, key=None):
     """The step agent's prompt for the entry's step `key` (default its first): {next} is that step, {others} the
     entry's other next steps, which other step agents take in parallel."""
-    tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
+    tpl = open(os.path.join(HERE, "plan", "step_prompt_legacy.txt")).read()
     key = step_of(e, key)
     others = "\n".join("  %d: %s" % (k, x) for k, x in nexts(e) if k != key) or "  none"
     q = entry_quotes(e)
@@ -1184,6 +1188,267 @@ def step_prompt(e, reason, key=None):
                       quotes=q or "  none", dead_ends=de,
                       evidence=evidence, open_question=oq,
                       design=design_text(last_design(e)), readers=readers_index())
+
+
+# ---------------------------------------------------------------- owners and hand-offs (agent redesign D1, D2, D5)
+# One agent owns an entry in progress and covers all of it (CLAUDE.md; Joaquin, D186). Owner mode is switched on with
+# the hooks of switch-over D (owner_context.py registered in .claude/settings.json), so the plan, its check and the
+# hooks change in one sitting; before it, plan next lists step agents as it did.
+CONTEXT_CLOSE = 300000        # tokens of an owner's context at which plan next says close (Joaquin, 2026-10-30)
+OWNER_STATES = ("working", "stopped", "closed")
+HANDOFF_FIELDS = ("state", "decisions", "ruled_out", "running", "files")
+DESCRIBE_FIELDS = ("objective", "mechanism", "expected")
+
+
+def owner_mode():
+    if "PLAN_OWNER_MODE" in ENV:
+        return ENV["PLAN_OWNER_MODE"] == "1"
+    try:
+        return "owner_context.py" in open(os.path.join(ROOT, ".claude", "settings.json")).read()
+    except OSError:
+        return False
+
+
+def agent_file(agent_id):
+    base = ENV.get("PLAN" + "_AGENTS")
+    pat = os.path.join(base, "agent-%s.jsonl" % agent_id) if base else \
+        os.path.join(S().TRANSCRIPTS, slug() + "*", "*", "subagents", "agent-%s.jsonl" % agent_id)
+    fs = glob.glob(pat) if re.fullmatch(r"[A-Za-z0-9_-]+", agent_id or "") else []
+    return fs[0] if fs else None
+
+
+def agent_context(agent_id, path=None):
+    """{tokens, at, compactions}: the context of a subagent at its last model call (input + cache read + cache
+    creation tokens of its last usage record) and the times of the compaction boundaries in its transcript; None
+    with no transcript. Only subagent transcripts are read: the main session is never an owner."""
+    f = path or agent_file(agent_id)
+    if not f:
+        return None
+    tokens, at, comp = None, None, []
+    for line in open(f, errors="replace"):
+        try:
+            m = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(m, dict):
+            continue
+        if m.get("type") == "system" and m.get("subtype") == "compact_boundary":
+            comp.append(m.get("timestamp"))
+        u = (m.get("message") or {}).get("usage") if m.get("type") == "assistant" else None
+        if isinstance(u, dict):
+            tokens = sum(int(u.get(k) or 0) for k in ("input_tokens", "cache_read_input_tokens",
+                                                       "cache_creation_input_tokens"))
+            at = m.get("timestamp")
+    return {"tokens": tokens, "at": at, "compactions": comp}
+
+
+def owner_of(e):
+    o = e.get("owner") or {}
+    return o if o.get("agent") else None
+
+
+def owner_state(e, t=None):
+    """'working' (writing, not handed back), 'stopped' (handed back, or quiet past STEP_MIN), 'closed' (wrote its
+    hand-off, or recorded closed), or None (no owner)."""
+    o = owner_of(e)
+    if not o:
+        return None
+    if o.get("state") == "closed":
+        return "closed"
+    a = subagent_activity(o["agent"])
+    if a is None:
+        return "stopped"
+    last, handed = a
+    t = t or now()
+    return "working" if not handed and (t - last).total_seconds() / 60 <= STEP_MIN else "stopped"
+
+
+def events_by_item():
+    """{item: [(event id, time, line)]} of the open events of the project (`site events`)."""
+    try:
+        r = subprocess.run(shlex.split(ENV.get("PLAN_EVENTS_CMD", "site events --project " + PROJECT)),
+                           capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.TimeoutExpired) as x:
+        note("site events could not be read (%s): open events are not counted" % x)
+        return {}
+    out, year = {}, now().year
+    for ln in r.stdout.splitlines():
+        w = ln.split()
+        if len(w) > 5 and re.fullmatch(r"E\d+", w[0]):
+            try:
+                ts = dt.datetime.strptime("%d-%s %s" % (year, w[1], w[2]), "%Y-%m-%d %H:%M").astimezone(dt.timezone.utc)
+            except ValueError:
+                ts = None
+            out.setdefault(w[5], []).append((w[0], ts, ln.strip()))
+    return out
+
+
+def entry_reason(e, st, msgs, t, d, checks, sweeps):
+    """(reason, since) of the first next step of a running entry that can move (waits and held steps left out)."""
+    held = blocked_steps(e)
+    for k in step_keys(e):
+        if k in held or k in (e.get("step_waits") or {}) or str(k) in (e.get("step_waits") or {}):
+            continue
+        r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
+        if r:
+            return r
+    return None
+
+
+def owner_actions(d, st, t=None, msgs=None, events=None):
+    """[(entry, action, agent, reason)] per running entry, one action at most: 'resume' (an open event of its work,
+    or a reason to move, with its owner stopped), 'launch' (something to do and no live owner: a fresh owner from the
+    hand-off), 'close' (the owner's context at CONTEXT_CLOSE or more), or 'review' (a design left without a verdict).
+    A working owner has nothing listed (a note). The per-step and per-run listing of step agents is gone."""
+    t = t or now()
+    msgs = messages(oldest_open(d, st)) if msgs is None else msgs
+    running = [e["id"] for e in d["entries"] if e.get("status") == "running"]
+    checks = item_checks(running)
+    sweeps = site_sweeps(want_of(st, running), all_sites=False)
+    events = events_by_item() if events is None else events
+    out = []
+    for e in d["entries"]:
+        if e.get("status") != "running":
+            continue
+        o, os_ = owner_of(e), owner_state(e, t)
+        if design_pending(e) and (t - parse(last_design(e)["at"])).total_seconds() / 60 > REVIEW_FALLBACK_MIN \
+                and os_ != "working":
+            launched, why = review_launched(st, e, t)
+            if not launched:
+                out.append((e, "review", None, "the design recorded %s has no verdict%s; launch the design reviewer" % (
+                    (last_design(e).get("at") or "")[:16], why)))
+                continue
+        evs = events.get(e["id"]) or []
+        if os_ in ("working", "stopped"):
+            c = agent_context(o["agent"]) or {}
+            if (c.get("tokens") or 0) >= CONTEXT_CLOSE:
+                out.append((e, "close", o["agent"], "its context is %d tokens (close at %d): ask it to write its "
+                            "hand-off (plan handoff %s ...) and end" % (c["tokens"], CONTEXT_CLOSE, e["id"])))
+                continue
+        if os_ == "working":
+            note("%s: its owner %s is working%s" % (e["id"], o["agent"], " (open events %s are its to ack)" % ", ".join(
+                x[0] for x in evs) if evs else ""))
+            continue
+        a = subagent_activity(o["agent"]) if os_ == "stopped" else None
+        last = a[0] if a else None
+        r = entry_reason(e, st, msgs, t, d, checks, sweeps)
+        if os_ == "stopped":
+            if not evs and not r:
+                note("%s: its owner %s is stopped while its work is in flight" % (e["id"], o["agent"]))
+            if evs:
+                out.append((e, "resume", o["agent"], "open events %s: SendMessage to %s carrying them" % (
+                    ", ".join(x[2] for x in evs[:5]) + (" and %d more" % (len(evs) - 5) if len(evs) > 5 else ""),
+                    o["agent"])))
+            elif r and not (last and r[1] and r[1] <= last):
+                out.append((e, "resume", o["agent"], r[0]))
+            continue
+        if evs or r:
+            src = "the hand-off of %s" % (e.get("handoff") or {}).get("written", "")[:16] if e.get("handoff") else \
+                "the entry (no hand-off yet)"
+            out.append((e, "launch", None, "%s; a fresh owner from %s: plan brief %s, then plan owner %s --agent <id>"
+                        % ("open events " + ", ".join(x[0] for x in evs) if evs else r[0], src, e["id"], e["id"])))
+    return out
+
+
+def owner_brief(e, add=None):
+    """The owner's brief: plan/step_prompt.txt filled with the entry; the main session's addition goes in the
+    narrowing slot, before the rules block, which it never overrides (brief_guard.py)."""
+    tpl = open(os.path.join(HERE, "plan", "step_prompt.txt")).read()
+    dl = e.get("dead_ends") or []
+    de = "\n".join("  %s: %s" % (x["tried"], x["why"]) for x in dl[-PROMPT_TAIL:]) or "  none"
+    if len(dl) > PROMPT_TAIL:
+        de = "  (%d earlier dead ends: plan show %s)\n" % (len(dl) - PROMPT_TAIL, e["id"]) + de
+    ev = dict(e.get("evidence") or {})
+    for k in ("runs", "paths"):
+        ev[k] = (ev.get(k) or [])[-PROMPT_TAIL:]
+    h = e.get("handoff") or {}
+    ho = "\n".join("  %s: %s" % (k, h.get(k)) for k in HANDOFF_FIELDS + ("written",) if h.get(k)) or "  none (first owner)"
+    oq = "  none"
+    if open_question(e):
+        oq = '  asked %s: "%s"; waits on it: %s' % ((e.get("waiting_since") or "")[:16], e["ask"], e.get("blocks") or
+                                                     "only what the question decides")
+    return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"),
+                      objective=e.get("objective") or e.get("question"), mechanism=e.get("mechanism") or "not recorded",
+                      expected=e.get("expected") or "not recorded",
+                      steps="\n".join("  %d: %s" % (k, x) for k, x in nexts(e)) or "  none",
+                      done_when=e.get("done_when"), quotes=entry_quotes(e) or "  none", handoff=ho,
+                      evidence=json.dumps(ev), dead_ends=de, open_question=oq,
+                      findings="\n".join("  %s: %s" % (x.get("at", "")[:16], x.get("text")) for x in
+                                         (e.get("findings") or [])[-PROMPT_TAIL:]) or "  none",
+                      design=design_text(last_design(e)), readers=readers_index(),
+                      narrowing=(add or "").strip() or "none")
+
+
+def cmd_owner(a):
+    """Record the entry's owner (a real subagent), its state, or its context."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        o = owner_of(e)
+        if a.agent and (not o or o["agent"] != a.agent):
+            if e.get("status") != "running":
+                sys.exit("plan: %s is %s; only a running entry gets an owner" % (a.id, e.get("status")))
+            if subagent(a.agent) is None:
+                sys.exit("plan: no subagent %s in this project's transcripts" % a.agent)
+            if o and owner_state(e) == "working":
+                sys.exit("plan: %s's owner %s is working; one agent per piece of work: resume it (SendMessage), or "
+                         "close it with its hand-off first" % (a.id, o["agent"]))
+            if o and owner_state(e) != "closed":
+                print("plan: note: the previous owner %s left no hand-off; the new one starts from the entry" % o["agent"])
+            e["owner"] = {"agent": a.agent, "state": "working", "since": now().isoformat()}
+            print("plan: %s is owned by %s" % (a.id, a.agent))
+        elif not o:
+            sys.exit("plan: %s has no owner: plan owner %s --agent <id>" % (a.id, a.id))
+        o = e["owner"]
+        if a.state:
+            o["state"] = a.state
+        if a.context is not None:
+            o["context"], o["context_at"] = a.context, now().isoformat()
+        print("plan: %s owner %s, %s%s" % (a.id, o["agent"], o["state"],
+                                          ", context %s" % o["context"] if o.get("context") else ""))
+
+
+def cmd_handoff(a):
+    """The owner's hand-off: what the next owner needs, written before it closes (near CONTEXT_CLOSE)."""
+    if not (a.state or "").strip() or not (a.running or "").strip():
+        sys.exit("plan: a hand-off needs --state (where the work stands) and --running (what is in flight, or 'none')")
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        e["handoff"] = {k: v for k, v in (("state", a.state), ("decisions", a.decisions), ("ruled_out", a.ruled_out),
+                                          ("running", a.running), ("files", a.files)) if v}
+        e["handoff"]["written"] = now().isoformat()
+        if owner_of(e):
+            e["owner"]["state"] = "closed"
+    print("plan: hand-off of %s written; its owner is closed, the next owner starts from it" % a.id)
+
+
+def cmd_finding(a):
+    """A finding about the work itself (a compaction inside an owner's turn: the brief or scope was too large)."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        x = {"at": now().isoformat(), "text": a.text}
+        if any(f.get("text") == a.text for f in e.get("findings") or []):
+            print("plan: note: already recorded")
+            return
+        e.setdefault("findings", []).append(x)
+    print("plan: finding recorded on %s" % a.id)
+
+
+def cmd_describe(a):
+    """The entry's objective, the mechanism it tests and the expected outcome."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        for k in DESCRIBE_FIELDS:
+            if getattr(a, k):
+                e[k] = getattr(a, k)
+    print("plan: %s described" % a.id)
+
+
+def cmd_brief(a):
+    d, st = load()
+    e = entry(d, a.id)
+    if e.get("status") != "running":
+        sys.exit("plan: %s is %s; only a running entry gets an owner" % (a.id, e.get("status")))
+    print(owner_brief(e, a.add))
 
 
 # ---------------------------------------------------------------- site writes
@@ -1442,7 +1707,12 @@ def cmd_show(a):
         elif s == "held":
             extra = "held by %s" % e.get("hold_decision")
         print("- [%s] %s (%s): %s" % (s, e.get("title"), e["id"], extra))
-        for k in (("next",) if a.compact else ("question", "next", "done_when", "notes_ref")):
+        if owner_of(e):
+            o = e["owner"]
+            print("    owner: %s (%s%s)" % (o["agent"], owner_state(e) if s == "running" else o.get("state"),
+                                        ", context %s" % o["context"] if o.get("context") else ""))
+        for k in (("next",) if a.compact else ("question", "objective", "mechanism", "expected", "next", "done_when",
+                                                "notes_ref")):
             if k == "next" and len(nexts(e)) > 1:
                 for n, x in nexts(e):
                     print("    next %d: %s" % (n, x))
@@ -1460,6 +1730,10 @@ def cmd_show(a):
                 print("    evidence: " + json.dumps(e["evidence"]))
             if last_design(e):
                 print("    design:\n" + design_text(last_design(e), "      "))
+            if e.get("handoff"):
+                print("    hand-off: " + json.dumps(e["handoff"]))
+            for x in e.get("findings") or []:
+                print("    finding %s: %s" % ((x.get("at") or "")[:16], x.get("text")))
 
 
 SEARCHED_MIN = 40             # characters: what was looked for before asking, named, not a token
@@ -1990,6 +2264,9 @@ def cmd_step(a):
         if notes:
             x["note"] = "; ".join(notes)
         st.setdefault(a.id, {}).setdefault("steps", []).append(x)
+        if owner_mode() and not (owner_of(e) and owner_state(e) == "working"):
+            e["owner"] = {"agent": a.agent, "state": "working", "since": now().isoformat()}
+            notes.append("recorded as %s's owner (one agent per piece of work)" % a.id)
     for n in notes:
         print("plan: note: " + n)
     print("plan: step %d on %s recorded (%s, started %s)" % (key, a.id, a.agent, started.isoformat()[:16]))
@@ -2253,10 +2530,21 @@ def cmd_next(a):
     probs = reconcile_sweeps()
     d, st = load()
     msgs = messages(oldest_open(d, st))
-    todo = [(e, why, k) for e, why, launched, k in next_steps_keyed(d, st, msgs=msgs) if not launched]
     for p in probs:
         print("UNRECORDED " + p)
-    for e, why, k in todo:
+    if owner_mode():
+        todo = owner_actions(d, st, msgs=msgs)
+        for e, act, agent, why in todo:
+            print("%s %s%s: %s" % (act.upper(), e["id"], " " + agent if agent else "", why))
+            if a.prompts and act == "launch":
+                print(owner_brief(e))
+                print("-" * 60)
+            elif a.prompts and act == "review":
+                print(review_prompt(e))
+                print("-" * 60)
+    else:
+        todo = [(e, why, k) for e, why, launched, k in next_steps_keyed(d, st, msgs=msgs) if not launched]
+    for e, why, k in ([] if owner_mode() else todo):
         if k is None:
             print("NEXT %s: %s" % (e["id"], why))
         else:
@@ -2280,7 +2568,7 @@ def cmd_next(a):
             print("note: " + n)
     if stop_notes:
         _set_state("_stop_notes", [])
-    print("plan: %d step(s) to launch" % len(todo))
+    print("plan: %d %s" % (len(todo), "owner action(s)" if owner_mode() else "step(s) to launch"))
     return 1 if todo or probs else 0
 
 
@@ -2551,6 +2839,20 @@ def main(argv=None):
         *WHY_ARGS)
     cmd("drop-next", cmd_drop_next, "remove next step N (finished, nothing follows it)", ID,
         A("n", type=int, help="the step's number"))
+    cmd("owner", cmd_owner, "record the entry's owner (one agent for all its work), its state or its context", ID,
+        A("--agent", help="the owner subagent's id (a new owner only when the previous one is not working)"),
+        A("--state", choices=OWNER_STATES, help="working | stopped | closed"),
+        A("--context", type=int, help="the owner's context in tokens (tools/agent_context.py)"))
+    cmd("handoff", cmd_handoff, "the owner's hand-off before it closes (the next owner starts from it)", ID,
+        A("--state", help="where the work stands (required)"), A("--decisions", help="what was decided, and why"),
+        A("--ruled-out", help="what was ruled out"), A("--running", help="what is in flight, or 'none' (required)"),
+        A("--files", help="the files that matter"))
+    cmd("finding", cmd_finding, "a finding about the work itself (a compaction inside an owner's turn)", ID,
+        A("--text", required=True, help="the finding"))
+    cmd("describe", cmd_describe, "the entry's objective, the mechanism it tests and the expected outcome", ID,
+        A("--objective"), A("--mechanism"), A("--expected"))
+    cmd("brief", cmd_brief, "the owner's brief of the entry (plan/step_prompt.txt filled)", ID,
+        A("--add", help="the main session's narrowing (it never overrides the rules block)"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
         A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
     cmd("continuous", cmd_continuous, "mark the entry continuous, with the user's words asking for it", ID,
