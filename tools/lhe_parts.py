@@ -749,6 +749,57 @@ def cmd_requeue(a):
     print(json.dumps(out))
 
 
+def cmd_shortbuilt(a):
+    """Every lhe_pp pool on disk built from a MadEvent run that stopped short of its ask (catalog_coverage: such a run
+    biases its events, analysis/catalog_v4/short_run_bias.py): per process, its sidecar's events per run against the
+    events each run of its layout asked (mg.lhe_runs at the sidecar's iseed and n_requested; a layout whose run seeds no
+    longer match the sidecar's is listed as layout_unknown). One JSON object {process: {...}} to --out."""
+    import datagen
+    out, n_seen = {}, 0
+    for name in sorted(mg.PROCESSES):
+        if not mg.is_lhe_pp(name):
+            continue
+        cfg = mg.PROCESSES[name]
+        side = path = None
+        for role in ("train", "test", "val"):
+            lo, hi = mg.lhe_layout(cfg)[role]
+            if hi - lo <= 0:
+                continue
+            rec = mg.lhe_pp_recipe(name, 13000, 13000, hi - lo, role=role, seed=a.seed)
+            path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
+            try:
+                side = json.load(open(path + ".recipe.json"))
+                if side.get("lhe_run"):
+                    break
+            except (FileNotFoundError, ValueError):
+                side = None
+        if not side or not side.get("lhe_run"):
+            continue
+        n_seen += 1
+        lr, sl = side["lhe_run"], side.get("lhe") or {}
+        got = [int(x) for x in lr.get("events_per_run") or []]
+        try:
+            runs = mg.lhe_runs(name, int(sl["iseed"]), int(sl["n_requested"]))
+        except Exception as e:
+            out[name] = {"layout_unknown": f"{type(e).__name__}: {e}"[:200], "pool": path}
+            continue
+        if [r[0] for r in runs] != [int(x) for x in lr.get("iseeds") or []] or len(runs) != len(got):
+            out[name] = {"layout_unknown": "the layout's run seeds differ from the sidecar's", "pool": path,
+                         "events_per_run": got}
+            continue
+        asked = [int(r[1]) for r in runs]
+        short = [k for k, (g, q) in enumerate(zip(got, asked)) if g < q]
+        if short:
+            out[name] = {"built": sl.get("build", "serial"), "runs": len(got), "short_runs": len(short),
+                         "events_short": sum(got[k] for k in short), "events": sum(got),
+                         "asked_per_run": sorted(set(asked)), "pool": path,
+                         "recipe_current": side.get("recipe_id") == mg.recipe_id(rec)}
+    with open(a.out, "w") as f:
+        json.dump(out, f, indent=0, sort_keys=True)
+    print(json.dumps({"pools_with_sidecar": n_seen, "built_from_short_runs": sum("short_runs" in v for v in out.values()),
+                      "layout_unknown": sorted(k for k, v in out.items() if "layout_unknown" in v), "out": a.out}))
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -769,8 +820,9 @@ def main():
     rq = sub.add_parser("requeue"); rq.add_argument("--queue", required=True)
     rq.add_argument("--match", default=None, help="regex on a failed task's error (first line); none: no failed task")
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
+    sb = sub.add_parser("shortbuilt"); sb.add_argument("--out", required=True); sb.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
-    {"plan": cmd_plan, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
+    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 
