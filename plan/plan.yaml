@@ -4321,5 +4321,4 @@ entries:
       if:
       - 'the live checks pass: launch switch-over D'
       - 'a check fails: revert with the preAB copies in the scratchpad and fix'
-  step_waits:
-    '1': the live checks of A and B running in the background (bt5gxd0a9)
+  step_waits: {}
