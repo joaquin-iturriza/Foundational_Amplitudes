@@ -3359,6 +3359,16 @@ entries:
     withdrawn_why: 'D180 (''just do the generation right and efficiently'') covers it: every catalog_v4 pool built from, or
       blocked by, runs that stop short carries the same measured bias, so rebuilding all of them in the gridpack layout is
       the generation done right, CPU only, not a change of scope; the 57 join the gridpack rebuild'
+  - ask: 57 more catalog_v4 pools have the stopped-short problem the gridpack rebuild fixes (8 assembled from stopped-short
+      runs in the last wave, 49 that could not be assembled for the same reason; list in analysis/catalog_v4/data/complete_runs_pending.json).
+      Add them to the gridpack rebuild (a second CPU-only probe and wave), or keep them out?
+    at: '2026-10-30T05:54:44+00:00'
+    searched: 'site decisions --project FA: D180 to D182 record only the deletion of MadEvent working dirs (the recorded quote
+      stops before ''just do the generation right and efficiently''); the gridpack design names 56 pools; CLAUDE.md 0b makes
+      a wider scope the user''s call, and the code and notes reviewers both blocked the 113-pool rebuild without his words'
+    blocks: the 57 pools' rebuild only; the 56-pool probe and wave go ahead
+    blocks_steps: &id001
+    - 8
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -3967,6 +3977,15 @@ entries:
     units: null
     start: '2026-10-30T05:52:35+00:00'
     at: '2026-10-30T05:52:35+00:00'
+  ask: 57 more catalog_v4 pools have the stopped-short problem the gridpack rebuild fixes (8 assembled from stopped-short
+    runs in the last wave, 49 that could not be assembled for the same reason; list in analysis/catalog_v4/data/complete_runs_pending.json).
+    Add them to the gridpack rebuild (a second CPU-only probe and wave), or keep them out?
+  waiting_since: '2026-10-30T05:54:44+00:00'
+  searched: 'site decisions --project FA: D180 to D182 record only the deletion of MadEvent working dirs (the recorded quote
+    stops before ''just do the generation right and efficiently''); the gridpack design names 56 pools; CLAUDE.md 0b makes
+    a wider scope the user''s call, and the code and notes reviewers both blocked the 113-pool rebuild without his words'
+  blocks: the 57 pools' rebuild only; the 56-pool probe and wave go ahead
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
