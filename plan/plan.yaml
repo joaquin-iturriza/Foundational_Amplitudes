@@ -4179,3 +4179,5 @@ entries:
       if:
       - 'the live checks pass: start switch-over D (owners and hand-offs, sections pushed, CLAUDE.md v2 and keeper v2)'
       - 'a live check fails: revert with the .preA/.preB copies and fix'
+  step_waits:
+    '1': Joaquin's go on switch-overs A and B (he is asleep; asked when he is back)
