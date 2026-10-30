@@ -5108,6 +5108,19 @@ entries:
       GB train + 12.6 GB val/test (queued arms read them). catalog_v4 _smix_ pools 58.5 GB train + 14.9 GB val/test are the
       control''s (not duplicates). zz_archive_lxera 29.2 GB (the tars Joaquin keeps). runs 52.0, runs_from_lxplus 24.2, mg5amcnlo
       53.1 GB.'
+  - at: '2026-10-30T23:51:38+00:00'
+    text: 'Disk (2026-10-31): why the 10-29 auto-delete left $SCRATCH/lhe_work: (1) build_lhe_pp (series builds, the pp13v4
+      first pass) deleted its <process>_madevent only after a successful build; a build refused by the physics check (277
+      b-beam entries, after MG5 had written the directory), a short run (27) or a killed job left the whole directory; (2)
+      the queue tidy (5bb09c87) reaches only the run directories of a queue''s current layout (gc walks lhe_part_paths of
+      the current spec), so runs of replanned layouts, of parked queues and of workers killed before tidy_run stayed, and
+      gc ran only when someone submitted job_lhe_gc.sh by hand. Fix 28242339: failed series builds and failed or short part
+      runs outside a queue keep only their logs (mg.lhe_reduce_to_logs); tools/lhe_parts.py workdirs [--apply] tidies every
+      directory on $SCRATCH/lhe_work older than 12 h whose .npz all have their lhe_parts copy, of any queue or layout, manifest
+      first; job_lhe_gc.sh runs it; test_failed_builds_and_workdirs. EE4 reader repair 9702a254 (rebuild_run.stand_in_split_set:
+      a probe without a train or val pool reads its test pool for those roles; t, q, mse_logm2_real independent of it; test_zero_shot_split).
+      Control EE4 re-reads submitted: FA-ccin2p3-c1863adf (REREAD 339ec100), FA-ccin2p3-def11c5c (REREAD 380842ed), 1 h each;
+      placed on CC by the design (pick offered lxplus, which holds neither the parents nor the EE4 pools).'
   handoff:
     state: 'Step 14: mixture pools prebuilt on CC (default50 and default25, 912 default-share tree entries each, ~22.5 GB
       each) with per-event alpha_s written (check_site_data --alphas passes both); the four arms resubmitted at 2.5 h with
