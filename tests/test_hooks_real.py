@@ -702,9 +702,27 @@ def submit_budget():
             ("CPU generation workers without an estimate", "site submit ccin2p3 FA %s --item cpu --env Q=x" % cpu, 0),
             ("35 GPU-h for an item recorded at 35", "site submit auto FA %s --item approved --est-gpu-hours 35" % gpu, 0),
             ("10 GPU-h for an unrecorded item", "site submit auto FA %s --item jz --est-gpu-hours 10" % gpu, 0),
-            ("a --check dry run", "site submit auto FA %s --item small --check" % gpu, 0)):
+            ("a --check dry run", "site submit auto FA %s --item small --check" % gpu, 0),
+            ("two 20 GPU-h submissions in one command", "site submit auto FA %s --item jz --est-gpu-hours 20; "
+                                                        "site submit auto FA %s --item jz --est-gpu-hours 20" % (gpu, gpu), 2),
+            ("a 4 GPU-h submission in a loop of 10 (seq 10)", "for i in $(seq 10); do site submit auto FA %s --item jz "
+                                                             "--est-gpu-hours 4; done" % gpu, 2),
+            ("a 4 GPU-h submission in a loop of 5 ({1..5})", "for i in {1..5}; do site submit auto FA %s --item jz "
+                                                            "--est-gpu-hours 4; done" % gpu, 0),
+            ("a GPU submission in a loop whose count is not readable", "for f in $(ls cfg); do site submit auto FA %s "
+                                                                      "--item jz --est-gpu-hours 1; done" % gpu, 2),
+            ("CPU workers in a loop of 30", "for i in $(seq 30); do site submit ccin2p3 FA %s --item cpu; done" % cpu, 0)):
         rc = sub(cmd)
         scenario("B2: budget: %s is %s" % (what, "refused" if want else "allowed"), rc == want, (rc, cmd))
+    code = ("import sys; sys.path.insert(0, %r); import submit_guard as g\n"
+            "def boom(*a): raise RuntimeError('x')\n"
+            "g.hpo = boom\n"
+            "print(len(g.problems({'tool_input': {'command': sys.argv[1]}})))" % HOOKS)
+    crash = lambda cmd: subprocess.run([sys.executable, "-c", code, cmd], capture_output=True, text=True,
+                                       env=dict(env, SUBMIT_ONLY="")).stdout.strip()
+    scenario("B2: a check that crashes refuses a command that submits and passes one that does not (the others still run)",
+             crash("site submit auto FA j.sh --item x") != "0" and crash("ls -la") == "0",
+             (crash("site submit auto FA j.sh --item x"), crash("ls -la")))
 
 
 SCEN_MAP_PATCH = r'''
