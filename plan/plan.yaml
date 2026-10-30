@@ -5183,3 +5183,14 @@ entries:
     units: null
     start: '2026-10-30T19:54:23+00:00'
     at: '2026-10-30T19:54:23+00:00'
+  findings:
+  - at: '2026-10-30T22:13:12+00:00'
+    text: 'lxplus repair, 2026-10-30. (1) Copy margin about 2x: the queued jobs need 26668 frozen-pool files, 13334 train-cache
+      files and 4657 sidecars (tools/check_site_data.py --paths at 5866e762 over the 16 recipes the queued arms read), but
+      site copy could only carry whole directories, so datasets (53G, 60017 entries) and amp_data_cache (83G, 25310 entries)
+      went whole. Fixed: site copy --from-file <list> carries an exact list relative to one root (tar -T, chunks of 500),
+      tested CC->lxplus on 3 zz_probe files (one with a space, one in a subdir, one unlisted left behind); backup ~/.local/bin/site.bak_20261030.
+      (2) The probe FA-lxplus-3440343b sat IDLE over 2 h: the site tool''s HTCondor requirement regexp(A100|V100|T4) matched
+      0 free slots (93 matching slots all claimed) and kept out every H100/H200, which were the free whole GPUs (3 H100 NVL
+      and 2 H200 slots unclaimed), while still admitting A100 MIG slices against its own comment. Fixed: CONDOR_GPU_REQ =
+      whole A100/V100/T4/H100/H200, no MIG, used in the submit file and in site pick''s slot count; probe resubmitted as FA-lxplus-ed084f25.'
