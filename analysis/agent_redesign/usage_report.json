@@ -1,0 +1,376 @@
+{
+ "periods": {
+  "main_alone": {
+   "from": null,
+   "to": "2026-10-25T17:02:21+00:00"
+  },
+  "step_agents": {
+   "from": "2026-10-25T17:02:21+00:00",
+   "to": "2026-10-30T11:35:10+00:00"
+  },
+  "redesign": {
+   "from": "2026-10-30T11:35:10+00:00",
+   "to": null
+  }
+ },
+ "boundary_evidence": {
+  "main_alone|step_agents": "653aed00 2026-10-25T18:02:21+01:00 setup redesign (D121): the plan file and its CLI, ... the switch-over",
+  "step_agents|redesign": "84a15232 2026-10-30T12:35:10+01:00 settings: register the hooks of the agent redesign's switch-overs A, B and D"
+ },
+ "weights": {
+  "input_tokens": 1.0,
+  "output_tokens": 5.0,
+  "cache_creation_input_tokens": 1.25,
+  "cache_read_input_tokens": 0.1
+ },
+ "by_period": {
+  "main_alone": {
+   "main": {
+    "transcripts": 5,
+    "api_messages": 14375,
+    "calls": 13690,
+    "weighted_tokens_M": 559.97,
+    "raw_tokens_M": {
+     "input_tokens": 0.03,
+     "output_tokens": 8.65,
+     "cache_creation_input_tokens": 46.61,
+     "cache_read_input_tokens": 4584.04
+    },
+    "runs_submitted": 349,
+    "results": 368,
+    "commits": 1154,
+    "weighted_tokens_M_per_run": 1.604,
+    "weighted_tokens_M_per_result": 1.522,
+    "weighted_tokens_M_per_commit": 0.485,
+    "wasted_calls": {
+     "hook": {
+      "count": 95,
+      "share": 0.0069
+     },
+     "denial": {
+      "count": 70,
+      "share": 0.0051
+     },
+     "repeat": {
+      "count": 224,
+      "share": 0.0164
+     },
+     "wait": {
+      "count": 763,
+      "share": 0.0557
+     },
+     "reread": {
+      "count": 131,
+      "share": 0.0096
+     },
+     "nothing_new": {
+      "count": 192,
+      "turns": 1848,
+      "wake_turns": 947,
+      "share_of_turns": 0.1039
+     }
+    },
+    "wasted_share": 0.0937,
+    "context_median_k": 313.1,
+    "context_max_k": 704.5,
+    "stall_min": {
+     "n": 315,
+     "median": 0.8,
+     "p90": 10.6
+    }
+   },
+   "agents": {
+    "transcripts": 196,
+    "api_messages": 7102,
+    "calls": 7382,
+    "weighted_tokens_M": 147.14,
+    "raw_tokens_M": {
+     "input_tokens": 0.01,
+     "output_tokens": 0.22,
+     "cache_creation_input_tokens": 40.09,
+     "cache_read_input_tokens": 959.01
+    },
+    "runs_submitted": 19,
+    "results": 16,
+    "commits": 91,
+    "weighted_tokens_M_per_run": 7.744,
+    "weighted_tokens_M_per_result": 9.197,
+    "weighted_tokens_M_per_commit": 1.617,
+    "wasted_calls": {
+     "hook": {
+      "count": 33,
+      "share": 0.0045
+     },
+     "denial": {
+      "count": 11,
+      "share": 0.0015
+     },
+     "repeat": {
+      "count": 8,
+      "share": 0.0011
+     },
+     "wait": {
+      "count": 98,
+      "share": 0.0133
+     },
+     "reread": {
+      "count": 5,
+      "share": 0.0007
+     }
+    },
+    "wasted_share": 0.021,
+    "context_median_k": 104.1,
+    "context_max_k": 564.7,
+    "stall_min": {
+     "n": 14,
+     "median": 0.2,
+     "p90": 128.8
+    }
+   },
+   "total": {
+    "weighted_tokens_M": 707.11,
+    "weighted_tokens_M_per_result": 1.841,
+    "wasted_share": 0.0682,
+    "registry_runs_submitted": 1462,
+    "stall_min": {
+     "n": 329,
+     "median": 0.8,
+     "p90": 11.4,
+     "runs_with_no_action_72h": 1122
+    }
+   }
+  },
+  "step_agents": {
+   "main": {
+    "transcripts": 1,
+    "api_messages": 3094,
+    "calls": 2533,
+    "weighted_tokens_M": 126.02,
+    "raw_tokens_M": {
+     "input_tokens": 0.01,
+     "output_tokens": 1.38,
+     "cache_creation_input_tokens": 6.96,
+     "cache_read_input_tokens": 1103.99
+    },
+    "runs_submitted": 1,
+    "results": 25,
+    "commits": 86,
+    "weighted_tokens_M_per_run": 126.017,
+    "weighted_tokens_M_per_result": 5.041,
+    "weighted_tokens_M_per_commit": 1.465,
+    "wasted_calls": {
+     "hook": {
+      "count": 31,
+      "share": 0.0122
+     },
+     "denial": {
+      "count": 17,
+      "share": 0.0067
+     },
+     "repeat": {
+      "count": 28,
+      "share": 0.0111
+     },
+     "wait": {
+      "count": 43,
+      "share": 0.017
+     },
+     "reread": {
+      "count": 2,
+      "share": 0.0008
+     },
+     "nothing_new": {
+      "count": 142,
+      "turns": 592,
+      "wake_turns": 327,
+      "share_of_turns": 0.2399
+     }
+    },
+    "wasted_share": 0.0478,
+    "context_median_k": 360.8,
+    "context_max_k": 566.9,
+    "stall_min": {
+     "n": 139,
+     "median": 0.9,
+     "p90": 3.4
+    }
+   },
+   "agents": {
+    "transcripts": 506,
+    "api_messages": 14051,
+    "calls": 14508,
+    "weighted_tokens_M": 272.48,
+    "raw_tokens_M": {
+     "input_tokens": 0.03,
+     "output_tokens": 4.65,
+     "cache_creation_input_tokens": 61.6,
+     "cache_read_input_tokens": 1721.89
+    },
+    "runs_submitted": 191,
+    "results": 357,
+    "commits": 486,
+    "weighted_tokens_M_per_run": 1.427,
+    "weighted_tokens_M_per_result": 0.763,
+    "weighted_tokens_M_per_commit": 0.561,
+    "wasted_calls": {
+     "hook": {
+      "count": 254,
+      "share": 0.0175
+     },
+     "denial": {
+      "count": 20,
+      "share": 0.0014
+     },
+     "repeat": {
+      "count": 85,
+      "share": 0.0059
+     },
+     "wait": {
+      "count": 227,
+      "share": 0.0156
+     },
+     "reread": {
+      "count": 44,
+      "share": 0.003
+     }
+    },
+    "wasted_share": 0.0434,
+    "context_median_k": 106.2,
+    "context_max_k": 566.5,
+    "stall_min": {
+     "n": 81,
+     "median": 3.5,
+     "p90": 44.4
+    }
+   },
+   "total": {
+    "weighted_tokens_M": 398.5,
+    "weighted_tokens_M_per_result": 1.043,
+    "wasted_share": 0.0441,
+    "registry_runs_submitted": 1317,
+    "stall_min": {
+     "n": 220,
+     "median": 1.0,
+     "p90": 13.9,
+     "runs_with_no_action_72h": 1089
+    }
+   }
+  },
+  "redesign": {
+   "main": {
+    "transcripts": 1,
+    "api_messages": 342,
+    "calls": 277,
+    "weighted_tokens_M": 10.71,
+    "raw_tokens_M": {
+     "input_tokens": 0.0,
+     "output_tokens": 0.17,
+     "cache_creation_input_tokens": 0.75,
+     "cache_read_input_tokens": 89.15
+    },
+    "runs_submitted": 4,
+    "results": 2,
+    "commits": 7,
+    "weighted_tokens_M_per_run": 2.677,
+    "weighted_tokens_M_per_result": 5.355,
+    "weighted_tokens_M_per_commit": 1.53,
+    "wasted_calls": {
+     "hook": {
+      "count": 6,
+      "share": 0.0217
+     },
+     "denial": {
+      "count": 1,
+      "share": 0.0036
+     },
+     "repeat": {
+      "count": 2,
+      "share": 0.0072
+     },
+     "wait": {
+      "count": 8,
+      "share": 0.0289
+     },
+     "reread": {
+      "count": 0,
+      "share": 0.0
+     },
+     "nothing_new": {
+      "count": 24,
+      "turns": 76,
+      "wake_turns": 46,
+      "share_of_turns": 0.3158
+     }
+    },
+    "wasted_share": 0.0614,
+    "context_median_k": 238.2,
+    "context_max_k": 567.1,
+    "stall_min": {
+     "n": 10,
+     "median": 2.0,
+     "p90": 186.3
+    }
+   },
+   "agents": {
+    "transcripts": 26,
+    "api_messages": 1309,
+    "calls": 1295,
+    "weighted_tokens_M": 24.64,
+    "raw_tokens_M": {
+     "input_tokens": 0.0,
+     "output_tokens": 0.75,
+     "cache_creation_input_tokens": 5.03,
+     "cache_read_input_tokens": 146.17
+    },
+    "runs_submitted": 93,
+    "results": 41,
+    "commits": 60,
+    "weighted_tokens_M_per_run": 0.265,
+    "weighted_tokens_M_per_result": 0.601,
+    "weighted_tokens_M_per_commit": 0.411,
+    "wasted_calls": {
+     "hook": {
+      "count": 28,
+      "share": 0.0216
+     },
+     "denial": {
+      "count": 4,
+      "share": 0.0031
+     },
+     "repeat": {
+      "count": 2,
+      "share": 0.0015
+     },
+     "wait": {
+      "count": 33,
+      "share": 0.0255
+     },
+     "reread": {
+      "count": 1,
+      "share": 0.0008
+     }
+    },
+    "wasted_share": 0.0525,
+    "context_median_k": 106.1,
+    "context_max_k": 262.8,
+    "stall_min": {
+     "n": 19,
+     "median": 4.8,
+     "p90": 155.0
+    }
+   },
+   "total": {
+    "weighted_tokens_M": 35.35,
+    "weighted_tokens_M_per_result": 0.822,
+    "wasted_share": 0.0541,
+    "registry_runs_submitted": 98,
+    "stall_min": {
+     "n": 29,
+     "median": 4.8,
+     "p90": 155.0,
+     "runs_with_no_action_72h": 75
+    }
+   }
+  }
+ }
+}
