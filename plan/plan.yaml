@@ -5071,6 +5071,15 @@ entries:
       via site run), unless chained afterok on a prebuild run of that recipe; tested live on CC: before the prebuild default50
       and default25 refused (2736 pools missing each), control recipe passed; after it default50_seed2 passed and default25
       still refused.'
+  - at: '2026-10-30T23:18:20+00:00'
+    text: 'E3099/E3100/E3119/E3120: the four mixture arms (19f6edf7, 3fb26ef0, 3e97499e, 1c137e75) FAILED in init_data: data.target_physics_orders
+      found no per-event alpha_s (<pool>.alphas.npy) for the smixd pools. job_catalog_v4_regen.sh only built pools; catalog_v4''s
+      alpha_s files had been written separately by tools/write_own_alphas.py. The new pools check (check_site_data) looked
+      at pools and diagram sidecars only. Fix 77859d92: the build job writes each pool''s alpha_s after its prebuild; check_site_data
+      --alphas (passed by submit_guard) requires it (on CC: control 0 missing, default50 and default25 2736 each). Repair:
+      8 jobs FA-ccin2p3-29d2a19a, 703d8e47, 3f316013, 2b510f7b, 396a8953, 9b7c4fc1, 5d69bf3f, 320cc292 (both recipes, pools
+      cached, alpha_s about 2 GB in all); arms resubmitted afterok on them at 2.5 h: default50 b316582a, default50_seed2 7cc6fe94,
+      default25 28465181, default25_seed2 e456e33d.'
   handoff:
     state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
       their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
