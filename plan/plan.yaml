@@ -465,6 +465,16 @@ entries:
     - 5
     answered_at: '2026-10-30T17:21:34.551000+00:00'
     decision: D195
+  - ask: 'At four seeds the one-loop sign extension passes the design''s rule on catalog_v4: wrong-sign share lower on 18
+      of 21 held-out sign-changing pools (p=0.001), median 6.69% -> 2.91%. It costs zero-shot MSE on the tree axes (H1 1.23x,
+      H2 1.15x, H7E 1.19x, H7c 1.22x; H3 and H2p5 near 1). Add the extension''s one-loop pools to the full pretraining''s
+      training set?'
+    at: '2026-10-30T22:21:46+00:00'
+    searched: 'CLAUDE.md and site decisions --project FA: the passed design names a change to the catalog''s training set
+      as the user''s call; no decision covers it'
+    blocks: step 5 only
+    blocks_steps: &id001
+    - 5
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -1324,6 +1334,15 @@ entries:
     units: null
     start: '2026-10-30T17:23:24+00:00'
     at: '2026-10-30T17:23:24+00:00'
+  ask: 'At four seeds the one-loop sign extension passes the design''s rule on catalog_v4: wrong-sign share lower on 18 of
+    21 held-out sign-changing pools (p=0.001), median 6.69% -> 2.91%. It costs zero-shot MSE on the tree axes (H1 1.23x, H2
+    1.15x, H7E 1.19x, H7c 1.22x; H3 and H2p5 near 1). Add the extension''s one-loop pools to the full pretraining''s training
+    set?'
+  waiting_since: '2026-10-30T22:21:46+00:00'
+  searched: 'CLAUDE.md and site decisions --project FA: the passed design names a change to the catalog''s training set as
+    the user''s call; no decision covers it'
+  blocks: step 5 only
+  blocks_steps: *id001
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
