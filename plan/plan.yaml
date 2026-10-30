@@ -4406,6 +4406,35 @@ entries:
       = keep the current mixture, both reads reported with the pure-default bound beside them; the bound arm sizes the most
       a default share can gain on PP4 (if the bound itself does not beat the control on PP4, the default-sampled events are
       already covered and the question is closed).'
+    fix_at: '2026-10-30T17:11:43+00:00'
+    fix: 'Seeds against the spread, and the yes/no outcome. The win rule compares the arm''s median per-class ratio (arm over
+      control, geometric mean of 2 seeds each side, about 800 classes) with the 5% quantile of the per-class seed-to-seed
+      ratio. These are two different statistics. The measured per-class seed spread on catalog_v4''s pp reads is a median
+      |log10| of 0.10 (trained classes) and 0.14 (held out) (results.tex par v4_vs_pp, compare_pp_trained no_b.*.v4_seed_spread).
+      That puts the per-class 5% quantile near a ratio of 0.57; this is an estimate that assumes a normal log ratio with sigma
+      0.148. The median over about 800 classes has noise of about 0.0065 in log10, roughly 1.5%. So the rule is about 37 times
+      stricter than the statistic''s own noise: a bound arm 25% better on PP4 (median 0.75) would read NO, and the outcome
+      would then close the mixture question wrongly. The smart-axes guard (not above the per-class 95% quantile, about 1.75)
+      is equally loose in the other direction. Fix: (a) state the smallest effect worth acting on, from the measured spread
+      and from the existing evidence that catalog_v4 is already at 0.66 against the pp-trained arm on matching labels (pp_physics_rescore);
+      (b) build the null for the statistic you test: the median over classes of seed 43 over seed 42 of the control on PP4
+      and EE4 (re-read in mode eval, as you plan), or a class bootstrap of the median ratio, taken as the median''s interval,
+      not a per-class quantile; (c) give numeric yes and no thresholds for PP4, EE4 and the smart axes before any arm is read;
+      (d) note that the arms are new pool draws while the control''s seed spread holds the data fixed, and either widen the
+      null for that or say why it is negligible. Not a repeat: the prior field leaves out the pp blend (results.tex sec ladder-open,
+      The pp blend, line ~12209, proposed 2026-10-26: 70/30 and 50/50 blends of catalog_v4 with 13 TeV pp events against catalog_v4
+      as it is and against the pp-trained arm, Muon, two seeds; on hold until the pp pools carry catalog_v4''s physics). It
+      also leaves out the ask that D167 answered (blend at 10% and 30% against catalog_v4 and pp-only, answered by ''Yes.
+      delete catalog 3 and do the regeneration''), and the density check''s mixture KL (median KL 1.38 to 1.01, 0.61 and 0.37
+      at f=0.1, 0.3, 0.5; catalog_v4 ahead of pp-trained at 0.66; density rank correlation only 0.19; results.tex par v4_density).
+      Name them, with their results and why this design is their continuation. Step 14 scope: per the owner, the 0.50 and
+      0.25 share arms are out of the job script until Joaquin fixes the shares (D178 does not fix them); the revised design
+      should say that step 14 waits on his answer, and either drop its arms from this design or keep them marked as pending.
+      Checks 1, 2, 6 and 7 hold for step 11: only the training recipe differs (control_pool_check: the other 356 entries are
+      the same 1068 files); steps are matched at 4264; orders are taken from the diagrams by default as in the control; PP4
+      reads the test split, separate from the pp train events; the PP read has moved with the training density before (catalog_v3
+      pp-trained against window-trained 0.19, 0.59 inside coverage; catalog_v4 against pp-trained 0.66 against a seed spread
+      of 0.10); the bound arm covers the user''s catalog_v4-against-pp-training comparison (2026-10-26).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
