@@ -112,6 +112,14 @@ def c_writes(seg):
     return any(writes_plan(w) for i, w in enumerate(ws[1:], 1) if ws[i - 1] in ("-c", "-e"))
 
 
+def mentions(seg):
+    """The segment names a plan file: as a path argument, in an -c program that writes it, or in an awk or sed program."""
+    if any(named(t) for t in seg) or c_writes(seg):
+        return True
+    p = prog_of(cmd_words(seg))
+    return (p == "sed" or p in AWK) and any(re.search(DATA, t) for t in seg)
+
+
 def bash_refusal(cmd):
     if plan_var_set(cmd):
         return "a PLAN_* variable (they point tools/plan.py at a test world, honoured only with PLAN_TEST=1 in tests)"
@@ -128,7 +136,7 @@ def bash_refusal(cmd):
     for seg in segs:
         while seg and seg[0] in KEYWORDS:           # a loop's or conditional's keyword is no command
             seg = seg[1:]
-        if not any(named(t) for t in seg) and not c_writes(seg):
+        if not mentions(seg):
             continue
         targets = [seg[i + 1] for i, t in enumerate(seg[:-1]) if re.fullmatch(r"\d?(?:>|>>|>\||<>)", t)]
         targets += [t.lstrip("0123456789>|") for t in seg if re.match(r"\d?>", t) and len(t.lstrip("0123456789>|"))]
@@ -136,7 +144,7 @@ def bash_refusal(cmd):
             return "a redirection into a plan file"
         seg = [t for i, t in enumerate(seg) if not re.fullmatch(r"\d?(?:>|>>|>\||<>|<)", t)
                and not (i and re.fullmatch(r"\d?(?:>|>>|>\||<>|<)", seg[i - 1]))]
-        if not any(named(t) for t in seg) and not c_writes(seg):
+        if not mentions(seg):
             continue
         words = [t for t in seg if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t)]   # drop VAR=value prefixes
         if not words:
