@@ -4115,6 +4115,42 @@ entries:
       report. Selection check of short runs against the reference included (code 94729faf, short_vs_ref and shares from logs).
       Searched: cgsxwm, run size, gridpack, smaller runs, runs of 200 in results.tex, the entry and site decisions D187-D189;
       no earlier run-size probe on a fixed gridpack. CPU only, 0 GPU-h.'
+  - at: '2026-10-30T13:03:18+00:00'
+    question: 'ee4_epem_cgsxwm at 3000 GeV, gridpack grid04 (52228 events'' precision, iseed 12576): do its runs of 200 stop
+      short because MadEvent''s gridpack event generation runs out of its per-channel point budget (gen_ximprove_gridpack:
+      at most max_iter=13 iterations of at most max_event_in_iter=4000 points), and does raising that budget make nearly every
+      run of 200 complete (share near 1, so no run is selected)?'
+    prior: 'docs/results.tex par:v4_short_runs (cgsxwm paragraph, merge 1cdd4191): run-size probe on the same gridpack, complete
+      share 0.49/0.79/0.89/0.91 at 200/100/50/25; complete runs of 50 and 25 differ from complete runs of 200 (0.0165, 0.031,
+      p<1e-3); short runs of 200 differ from complete ones (0.0225, p<1e-3), so completion selects. Short runs of 200 end
+      after 650-830 s, not at the 1800 s timeout. The gridpack''s channel results.dat: 510009 points per channel, 4 to 1069
+      unweighted (efficiency 1e-5 to 4e-2); G17 holds 0.0026 of 0.0042 pb with 14 unweighted. No earlier probe changed MadEvent''s
+      gridpack generation limits (searched results.tex, plan, site decisions for ximprove, max_iter, max_event_in_iter, sde_strategy,
+      hard_survey, gridpack refine).'
+    measure: 'Per arm: complete share of runs of 200 (runs returning 200 over runs, errored runs counted as returning nothing)
+      and seconds per run, from the PROBE_JSON lines; for arm A, from the kept logs (run.log, per-channel results.dat and
+      log.txt), which channels fall short and whether they used all their iterations. For an arm with share >= 0.95: short_run_bias.py
+      sizecheck run-level test (cos theta*, 50 bins, 2000 relabellings) of its runs against arm A''s complete runs and against
+      arm A''s short runs, and its own halves by seed as control.'
+    check: 'The complete share moves with the events a run asks on this gridpack: 0.49 at 200, 0.79 at 100, 0.89 at 50, 0.91
+      at 25 (cgsxwm_sizecheck.json @070e10c8), as a fixed per-channel point budget predicts; the patch (mg.lhe_patch_ximprove,
+      tests/test_lhe_gridpack.py test_patch_ximprove) changes only gen_ximprove_gridpack''s limits in the run''s unpacked
+      copy, the grids untouched.'
+    fixed: The gridpack file itself (grid04 under identity 2b84d6b36cd318eb, nothing re-integrated), the 3000 GeV cards, run
+      size 200, 16-core CPU jobs of 16 parallel runs, MadGraph 3.7.0 on CC, code 5ba5c7b2.
+    control: 'Arm A: MadGraph''s limits (max_iter 13, max_event_in_iter 4000), same gridpack and size, logs kept: reproduces
+      the 0.49 share and gives the diagnosis. Each arm''s runs split by seed as halves control.'
+    seeds: 'Arm A defaults: 64 runs, seeds 30001-30064. Arm B max_event_in_iter 40000: 64 runs, 31001-31064. Arm C max_iter
+      16: 64 runs, 32001-32064. 4 jobs of 16 runs per arm (12 jobs, 16 cores, one round each), run timeout 3 h (B and C may
+      take up to 10x the 650-830 s of a short run), job limit 4 h (A: 1.5 h). About 600 core-h CPU worst case, 0 GPU-h. Wall-time
+      target 2.5 h. Share resolution at 64 runs: 0.95 means at least 61 complete.'
+    outcome: 'WORKS: an arm with share >= 0.95 and median run time <= 1 h: its runs against A''s complete and short runs and
+      its halves (expected: halves agree; distance from A''s complete runs in the direction of A''s short runs); then the
+      queue''s 3000 GeV runs of 200 laid out with that limit (lhe pool key carrying it, in the identity), assembled, sizecheck
+      --parts against the arm, and the mixcheck over all 113. PARTIAL: share rises but under 0.95: the larger budget (both
+      changes, or 10x more) next, one more probe of the same shape. NO EFFECT: share stays near 0.49 under both: the budget
+      is not the limit; arm A''s logs say which channel and why; the integration-side settings (sde_strategy 2, hard_survey
+      1, a new gridpack) are probed next, and only if none works does the question go to Joaquin with what was tried.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
