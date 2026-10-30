@@ -373,6 +373,13 @@ entries:
     why: job_catalog_v3_short.sh takes the arm and mode as positional arguments, not env; cancelled while pending, resubmitted
       through scripts/launch_cc_only.sh with the arguments (seed 42 as FA-ccin2p3-e37d7ec2)
     at: '2026-10-30T17:25:56+00:00'
+  - tried: dipole read FA-ccin2p3-464da136 (CPU, dipole_residual.py @a1cc783e) on the control pair's existing H2 and TR reads
+    why: 'no probe was read, so the gate has no number: the reads'' t is the control''s target, not log|M|^2 (mean -3.7 against
+      the pool''s -25.6), and the scored events are neither the pool''s first rows nor matchable exactly by value (t - logF
+      is log|M|^2 only up to a constant; 27 of 200 events within 1e-3); 218 v4 probes refused for alignment, 168 old v3_ reads
+      in the same dir had no pool. Fixed @HEAD: alignment on the event indices zero_shot_parent saves since 902b96c5 (correlation
+      check), t as the target; the reads redone eval-only'
+    at: '2026-10-30T23:13:04+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
