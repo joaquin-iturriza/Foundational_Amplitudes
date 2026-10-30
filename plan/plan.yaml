@@ -2227,6 +2227,12 @@ entries:
     answers_after: '2026-10-30T05:54:44+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-30T11:04:42.181000+00:00'
+    text: I really don't see what's the question here
+    decision: D189
+    answers_after: '2026-10-30T10:50:16+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -2246,37 +2252,19 @@ entries:
   - D174
   - D181
   - D188
+  - D189
   next:
-    1: 'WAITS ON THE CC CLEANUP: at 20:xx on 2026-10-29 /sps/lpnhe had 0 bytes free (512G of 512G used, df -h via site run);
-      another agent is freeing about 340G. Start only once df shows at least 50G free. Then: collect the pp13v4 regeneration
-      (937 of 992 entries built in all 3 roles at 16:45; read the runs that ended: FA-ccin2p3-8a202730, cbb64480, aa58c232,
-      cc7338ff, 2f4c9828, 708d51d6, 8a6c8b9e, plus the rest of recipes/catalog_v4_pp_rest/ and the 14 high-margin entries
-      in the 8 original part jobs; a full disk may have made any of them fail, so read each log). Any entry short or failed:
-      rerun it with lhe.n_runs instead of a larger margin (catalog_v3_pp_runs precedent), split across the free slots site
-      pick shows. Then validate with pp_physics_check.py, taught the pp13v4_ names and without its b reshelling: the log ratio
-      to catalog_v4''s standalone must be 0 on every class. Then redo the pp comparisons (compare_pp_trained, the density
-      check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
-    6: 'Submit the pure-default bound pair once step 1''s validation passes (every pp13v4 entry built, pp_physics_check ratio
-      0 on every class; at 2026-10-29 step 1 was still collecting the pp13v4 regeneration and pp_physics_check had not been
-      rerun on pp13v4 since 2026-10-26) and the amended design (797 swapped hadronic training classes: 466 pp13v4_ plus 331
-      reused pp13_; PP4 scored on the pp pools'' test split) has passed review: sync once, then scripts/job_catalog_v3_short.sh
-      v4_dimensionless_muon_pp smoke, and v4_dimensionless_muon_pp and v4_dimensionless_muon_pp_seed2 afterok on it (--hdr=--mem=48G,
-      --item catalog_coverage, about 1.5 GPU-h each), plus the controls'' read of the pp pools in mode eval (v4_dimensionless_muon
-      and _seed2, V3_AXES=PP4, a fraction of a GPU-h). Still owed before (b) is reported for training classes: a test-split
-      read of the 797 swapped classes'' catalog_v4 smart-mixture pools by the arm and both controls. Control reused: catalog_v4''s
-      Muon short runs (FA-ccin2p3-339ec100, -380842ed, commit 1d9d6a29), 1068 pools same (control_pool_check.py @c809ca44).'
-    8: 'After the catalog_v4_w3, catalog_v4_default, pp13v4_rest and pp13v4_ddxgg workers end (about 06:05 to 06:50): python
-      tools/lhe_parts.py shortbuilt on CC; every catalog_v4 pool (dsh_, ee4_, pp13v4_) w3 or the old workers assembled from
-      a run short of its ask goes into complete_runs.json and the complete-run layout (recipes regenerated), planned in the
-      same complete-runs queue; then the usual collection (status, failed tasks, mixcheck)'
-    9: 'Gridpack rebuild of the 56 pools (probe result 2026-10-30: yes in all three groups, par:v4_short_runs at commit 044238df
-      on branch gridpack-queue): after repo-reviewer PASS, merge gridpack-queue, site sync ccin2p3 FA, then the generation
-      rule''s probe of the 56 (lhe_probe gridpool-plan --jobs 24: 24 CPU jobs of 16 cores, scripts/job_lhe_probe.sh PROBE_SHARD=gridpool
-      GP_POOLS=<the job''s pools>; it builds every gridpack at its path, which the wave reuses), target recorded before submission;
-      then lhe_probe kept --yields-out over its logs -> analysis/catalog_v4/data/lhe_probe_yields.json (merged with the existing),
-      lhe_parts plan recipes/catalog_v4_default_lhe.yaml recipes/catalog_v4_ee_test.yaml recipes/catalog_v4_pp_parts.yaml
-      --queue $SCRATCH/lhe_queue/catalog_v4_gridpack (new queue, no --skip-claimed: the gridpack layout''s parts have their
-      own names), site queue add, site pick --gpus 0, one wave with its target'
+    1: 'ee4_epem_cgsxwm at 3 TeV: generate its 3 TeV block in smaller runs from the same gridpack, checked against its complete
+      3 TeV runs first (the user: no question; the option that keeps every energy). Also collect catalog_v4_gridpack_last
+      (12 pools), remove finished queues, then the mixcheck over all 113'
+    10: 'Validate the pp13v4 pools once the rebuild is assembled: every pp13v4 entry built in all 3 roles, pp_physics_check.py
+      taught the pp13v4_ names and without its b reshelling (the log ratio to catalog_v4''s standalone must be 0 on every
+      class); then redo the pp comparisons (compare_pp_trained, the density check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
+    11: 'Submit the pure-default bound pair once the pp13v4 validation passes and the amended design has passed review (797
+      swapped hadronic training classes, PP4 scored on the pp pools'' test split): sync once, scripts/job_catalog_v3_short.sh
+      v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
+      each), plus the controls'' PP4 mode-eval reads; control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100,
+      -380842ed)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -3440,8 +3428,10 @@ entries:
     searched: the generation rule (2x limit) blocks more runs; the gridpack design fixed the run sizes (200 e+e-), and dropping
       an energy changes the catalog's energy rule [D130]; D187 covers rebuilding the pool, not which of these two
     blocks: ee4_epem_cgsxwm only; the other 112 pools and the mixcheck of those proceed
-    blocks_steps: &id001
+    blocks_steps:
     - 9
+    answered_at: '2026-10-30T11:04:42.112000+00:00'
+    decision: D189
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -4004,38 +3994,117 @@ entries:
       design''s 5-test level. Checks 1, 4, 6, 7 hold. Check 5 searched: gridpack, set_gridpack, run size, short run, complete
       run, madevent in docs/results.tex, the entry''s evidence and dead ends, site decisions --project FA: only par:v4_short_runs
       / fig:v4_run_size and the rebuild dead end, both cited.'
-  step_why:
-    1:
-      feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
-      if:
-      - 'all 992 built and every ratio is 0: redo the pp comparisons on catalog_v4_pp_test.yaml'
-      - 'an entry short again, failed on the full disk, or a nonzero ratio: list it with its cause, fix it, and rerun only
-        that entry'
-    6:
-      feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
-        mixture A/B the user asked for (2026-10-29); waits on step 1's pp13v4 validation
-      if:
-      - 'step 1 validation passed (all 992 built, every ratio 0): submit the smoke and the two seeds afterok on it, plus the
-        controls'' PP4 mode-eval reads'
-      - 'step 1 not yet passed or a class fails it: keep waiting on step 1; a failing class is left out of the arm''s scoring
-        and listed'
-    8:
-      feeds: whether any catalog_v4 MadEvent pool is left built from short runs
-      if:
-      - 'none listed: catalog_v4''s MadEvent pools carry no short-run bias; go on with lhe_probe mixcheck and step 6'
-      - 'pools listed: add them to complete_runs.json with their run size from the run-size result and plan them in the complete-runs
-        queue'
-    9:
-      feeds: how the 56 catalog_v4 pools are rebuilt
-      if:
-      - 'probe yields at least 0.5 on every pool and gridpacks build: plan and submit the wave'
-      - 'a pool''s gridpack fails or yields under 0.5: list it with its log, fix or hold it, wave the rest'
+  - at: '2026-10-30T11:12:27+00:00'
+    question: 'ee4_epem_cgsxwm at 3000 GeV (D189, keep every energy): at which run size do runs drawn from its 3000 GeV gridpack
+      (52228 events'' precision, grid04, iseed 12576, the very file the re-probe FA-ccin2p3-67ba0a36 drew from) nearly all
+      complete, and do the complete runs of that size give the events of complete runs of the design''s 200?'
+    prior: 'docs/results.tex par:v4_short_runs: short runs biased (4 of 32 run-level tests under Bonferroni); complete per-run-integrated
+      runs differ by size (ladder, e+e- amupvmwm 200 vs 13057 KS 0.018 p 0.0025); gridpack runs of 200 agree with runs of
+      13057 on e+e- amupvmwm (KS 0.0042 p 0.995), so the e+e- gridpack layout uses runs of 200. plan show catalog_coverage:
+      cgsxwm 3000 GeV complete 7 of 16 at 200 on both the 13057 and 52228 gridpacks, short runs return 9-55 of 200 after 650-830
+      s; other energies 16/16. Searched ''cgsxwm'', ''run size'', ''gridpack'', ''smaller runs'' in results.tex, plan, site
+      decisions (D187-D189). No run-size probe on a gridpack exists: this design varies the run size on one fixed gridpack.'
+    measure: 'short_run_bias.py sizecheck --process ee4_epem_cgsxwm --energy 3000 --ref-ask 200 (worktree wt-cgsxwm-runsize):
+      per size 25, 50, 100, the complete share (runs that returned every event asked over runs kept) and the run-level permutation
+      test (run_perm, 50 quantile bins, 2000 relabellings) of its complete runs against the complete runs of 200 from the
+      same gridpack, on cos theta* of the first final in the rest frame (sqrt(s) fixed at e+e-); Bonferroni over the 3 sizes;
+      detectable KS stated per size.'
+    check: The same run-level test on cos theta* separated per-run-integrated e+e- runs of 200 from runs of 13057 (KS 0.018,
+      p 0.0025, short_run_bias_size.json @44b2eeb3) while its complete-halves control found 0 of 37 below 0.05; and sizecheck
+      reproduced on synthetic files the complete share and test wiring (local run, worktree).
+    fixed: The pool's cards, generate line, model, the 3000 GeV run-card patches, the gridpack file itself (grid04 at its
+      path under the current layout's identity; gridpool reuses it, nothing re-integrated), 16-core CPU jobs, run timeout
+      1800 s, MadGraph 3.7.0 on CC.
+    control: 'Reference: complete runs of 200 from the same gridpack (the design''s size, which the gridpack test passed on
+      e+e-), split in two by seed (control_ref_halves) to calibrate the statistic.'
+    seeds: 'Literal run seeds on disjoint ranges: 200: 128 runs (seeds 20001-20128, 2 jobs); 100: 128 runs (20201-20328, 2
+      jobs); 50: 192 runs (20401-20592, 2 jobs); 25: 384 runs (20601-20984, 3 jobs). 9 jobs of 16 cores, limit 2 h (worst
+      case all short at 750 s: 128 x 750 / 16 = 1.7 h), expected well under 1 h.'
+    outcome: 'Yes: the largest size with complete share >= 0.9 whose run-level test is not below 0.05/3 and whose detectable
+      KS is under 0.018 (the e+e- size bias): its 3000 GeV block is laid out in runs of that size from the same gridpack (energy_run_events,
+      grid_seed_runs 15, gridpack_eid of the current layout), as many as ceil(400 / (min(0.8, share/1.25) x size)), other
+      energies unchanged; assembled, then its queue parts checked with sizecheck --parts against the same reference. No (no
+      size reaches 0.9, or the passing sizes differ from 200): no layout; reported to Joaquin with the shares and distances.'
+    fix_at: '2026-10-30T11:14:10+00:00'
+    fix: 'Check 3 (seeds against spread) fails, and with it the yes branch of check 4. The outcome asks for a detectable KS
+      under 0.018 at each size, but the run counts cannot give it. Reference: 128 runs of 200 at the measured 3000 GeV complete
+      share of 0.4375 (7 of 16) is about 56 complete runs, about 11200 events. Tested sizes: about 7500 to 9600 complete events
+      each (100: 128 runs; 50: 192; 25: 384). With short_run_bias.py _detectable (1.358 x sqrt((n+m)/(n m))) that is 0.019
+      to 0.020 at 5 percent, and about 0.022 to 0.023 at the design''s Bonferroni level of 0.05/3. These are event-level floors;
+      the run-level test needs more. So no size can meet the yes criterion, and the probe would end in No because it lacks
+      power, not because of anything in the physics. The size bias the check cites was itself seen only just above its floor:
+      amupvmwm runs of 200 against runs of 13057 gave KS 0.018 with a detectable 0.0166, using 7800 and 46368 events (short_run_bias_size.json).
+      Fix: size the reference and each tested ask from the measured shares so that the floor at 0.05/3 is about 0.012 or less.
+      With equal sides that needs about 2 x (1.55/0.012)^2, roughly 33000 events a side, or a larger reference with fewer
+      events per size. For example, about 400 runs of 200 (at 0.44 share, about 35000 events), and for each smaller ask enough
+      runs for about 25000 complete events, with that ask''s share assumed pessimistically. State the resulting core-hours.
+      Check 4 (outcome) also fails: no branch covers the result being underpowered (a size passes the share and the p-value
+      but its detectable KS stays above 0.018), and ''the passing sizes differ from 200'' does not read as a defined result.
+      Fix: write the three cases (pass, a measured difference, underpowered) and what each does to the 3000 GeV layout. Recommended,
+      not a failure on its own: the reference is the 44 percent of runs of 200 that complete, so it is a selected sample that
+      no earlier test validated for this pool and energy. The probe already keeps the short runs (got < ask), so add a short-against-complete
+      run-level test at 200 (and at 100) from the same files at no extra cost. It says whether completion selects events,
+      and so whether agreeing with complete runs of 200 means agreeing with the density. Checks that hold: one change (run
+      size on one fixed gridpack, disjoint seeds, same cards, cores and timeout); the measure (the run-level test on cos theta*
+      moved 0.018 with run size on e+e-, confirmed in short_run_bias_size.json ladder/200: ks_binned 0.01797, p_runs 0.0025,
+      halves control 0.0079, p_runs 0.19); prior (searched cgsxwm, run size, gridpack, smaller runs, runs of 200 in results.tex,
+      the entry and site decisions D187-D189: par:v4_short_runs is cited correctly, no earlier run-size probe on a gridpack
+      exists); scope and the step''s ''checked against its complete 3 TeV runs first'' are covered.'
+  - at: '2026-10-30T11:15:34+00:00'
+    question: 'ee4_epem_cgsxwm at 3000 GeV (D189, keep every energy): at which run size do runs drawn from its 3000 GeV gridpack
+      (52228 events'' precision, grid04, iseed 12576, the very file the re-probe FA-ccin2p3-67ba0a36 drew from) nearly all
+      complete, and do the complete runs of that size give the events of complete runs of the design''s 200?'
+    prior: 'docs/results.tex par:v4_short_runs: short runs biased (4 of 32 run-level tests under Bonferroni); complete per-run-integrated
+      runs differ by size (ladder, e+e- amupvmwm 200 vs 13057 KS 0.018 p 0.0025); gridpack runs of 200 agree with runs of
+      13057 on e+e- amupvmwm (KS 0.0042 p 0.995), so the e+e- gridpack layout uses runs of 200. plan show catalog_coverage:
+      cgsxwm 3000 GeV complete 7 of 16 at 200 on both the 13057 and 52228 gridpacks, short runs return 9-55 of 200 after 650-830
+      s; other energies 16/16. Searched ''cgsxwm'', ''run size'', ''gridpack'', ''smaller runs'' in results.tex, plan, site
+      decisions (D187-D189). No run-size probe on a fixed gridpack exists. Revised after design FIX (power, outcome cases,
+      selected reference).'
+    measure: 'short_run_bias.py sizecheck --process ee4_epem_cgsxwm --energy 3000 --logs <the probe logs> (branch cgsxwm-runsize
+      @94729faf; reference size 200 read from complete_runs.json): per size 25, 50, 100 the complete share from the probe
+      logs (errored runs counted as returning nothing) and the run-level permutation test (run_perm, 50 quantile bins, 2000
+      relabellings) of its complete runs against the complete runs of 200 from the same gridpack, on cos theta* (sqrt(s) fixed
+      at e+e-), Bonferroni over the 3 sizes, event-level detectable KS stated; plus, at 200 and 100, the short runs against
+      the same reference (is the complete-run reference a selected sample?).'
+    check: The same run-level test on cos theta* separated per-run-integrated e+e- runs of 200 from runs of 13057 (KS 0.01797,
+      p_runs 0.0025, halves control 0.0079 p 0.19; short_run_bias_size.json @44b2eeb3); sizecheck tested on synthetic files
+      (shares from logs with an errored run, physics-key refusal, eid filter).
+    fixed: The pool's cards, generate line, model, the 3000 GeV run-card patches, the gridpack file itself (grid04 at its
+      path under the current layout's identity; gridpool reuses it, nothing re-integrated), 16-core CPU jobs, run timeout
+      1800 s, MadGraph 3.7.0 on CC.
+    control: 'Reference: complete runs of 200 from the same gridpack, split in two by seed (control_ref_halves); the short
+      runs of 200 and 100 against it (selection check).'
+    seeds: 'Sized for an event-level floor of about 0.012 at 0.05/3 (about 33000 events a side): 200: 768 runs (seeds 20001-20768;
+      ~340 complete at 0.44, ~68000 events), 8 jobs of 96; 100: 512 runs (21001-21512), 4 jobs of 128; 50: 768 runs (22001-22768),
+      6 jobs of 128; 25: 1536 runs (23001-24536), 12 jobs of 128. 30 jobs of 16 cores, limit 2 h; worst case (56% of runs
+      short at 750 s): 96 or 128 runs x 0.56 x 750 s / 16 = 0.9-1.0 h per job, about 480 core-h CPU in all, 0 GPU-h; expected
+      far less if small runs complete in seconds. Wall-time target 1.25 h.'
+    outcome: 'Per size, three cases. PASS: complete share >= 0.9, run-level p not below 0.05/3 and event-level floor <= 0.013.
+      DIFFERS: p below 0.05/3. UNDERPOWERED: share >= 0.9, p above, floor > 0.013. The 3000 GeV block is laid out in runs
+      of the largest PASS size from the same gridpack (energy_run_events, grid_seed_runs 15, gridpack_eid of the current layout;
+      ceil(400 / (min(0.8, share/1.25) x size)) runs, other energies'' runs of 200 rebuilt under the new identity from their
+      same gridpacks), assembled, then its queue parts checked with sizecheck --parts --eid against the same reference. No
+      PASS size: nothing laid out; reported to Joaquin with each size''s share, distance and floor (DIFFERS: the small runs
+      give other events; UNDERPOWERED: more runs or the size''s distance stated as bounded). If the short runs of 200 differ
+      from the reference, that is reported alongside (the reference is a selected sample).'
+    passed_at: '2026-10-30T11:16:05+00:00'
+    reviewer: 'Re-check after FIX. One change: run size on the one fixed gridpack (grid04), disjoint seed ranges, same cards,
+      cores and timeout. Measure: the run-level test on cos theta* moved 0.018 with run size on e+e- (short_run_bias_size.json
+      ladder/200: ks_binned 0.01797, p_runs 0.0025; halves control 0.0079, p 0.19). Power: reference 768 runs of 200 at a
+      share of 0.44 is about 68000 events; event-level floor at 0.05/3 is 0.0099 to 0.0114 for 25600 to 38400 events per size,
+      below the 0.018 effect. Outcome: PASS, DIFFERS and UNDERPOWERED stated per size, with the layout action and the no-PASS
+      report. Selection check of short runs against the reference included (code 94729faf, short_vs_ref and shares from logs).
+      Searched: cgsxwm, run size, gridpack, smaller runs, runs of 200 in results.tex, the entry and site decisions D187-D189;
+      no earlier run-size probe on a fixed gridpack. CPU only, 0 GPU-h.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '1': 'the gridpack rebuild (step 9: pp13v4_uu_gguu is in its 56) and Joaquin''s answer on the 57 further pools (pp13v4_dd_ddgg,
       pp13v4_ddx_ddxgg, pp13v4_uux_gguux are among them); the CC disk has had 87G or more free since the morning, so the cleanup
       wait itself is over'
+    '10': the 113 rebuilt pools assembled (step 1's owner)
+    '11': step 10's pp13v4 validation passing
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -4079,14 +4148,24 @@ entries:
     units: null
     start: '2026-10-30T10:44:15+00:00'
     at: '2026-10-30T10:44:15+00:00'
-  ask: 'e+e- -> c sbar g W- (ee4_epem_cgsxwm) at 3 TeV: from one gridpack, even at four times the precision, only 7 of 16
-    runs of 200 events complete; the short ones return 9 to 55 events. Generate its 3 TeV block in smaller runs from the same
-    gridpack (checked against its complete runs first), or drop this pool''s 3 TeV energy?'
-  waiting_since: '2026-10-30T10:50:16+00:00'
-  searched: the generation rule (2x limit) blocks more runs; the gridpack design fixed the run sizes (200 e+e-), and dropping
-    an energy changes the catalog's energy rule [D130]; D187 covers rebuilding the pool, not which of these two
-  blocks: ee4_epem_cgsxwm only; the other 112 pools and the mixcheck of those proceed
-  blocks_steps: *id001
+  - batch: cgsxwm_runsize_probe
+    wall_h: 1.25
+    jobs: 30
+    units: null
+    start: '2026-10-30T11:17:21+00:00'
+    at: '2026-10-30T11:17:21+00:00'
+  step_why:
+    10:
+      feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
+      if:
+      - 'all built and every ratio 0: redo the pp comparisons'
+      - 'an entry short, failed or a nonzero ratio: list it with its cause, fix it, rerun only that entry'
+    11:
+      feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
+        mixture A/B the user asked for (2026-10-29)
+      if:
+      - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
+      - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -4301,9 +4380,12 @@ entries:
     - agent_redesign
   decisions:
   - D186
-  next: Switch-overs A and B are applied (11:55); read B9's live checks (the main session's background run, scratchpad live_checks.txt),
-    then start switch-over D (owners and hand-offs in the plan, sections pushed by hook, CLAUDE.md v2 and keeper v2, the supervisor's
-    known-cause rule) with a compact agent
+  next:
+    1: Switch-overs A and B are applied (11:55); read B9's live checks (the main session's background run, scratchpad live_checks.txt),
+      then start switch-over D (owners and hand-offs in the plan, sections pushed by hook, CLAUDE.md v2 and keeper v2, the
+      supervisor's known-cause rule) with a compact agent
+    3: 'Fix the reply check''s false refusals: a verbatim quoted user question required, self-contradicting refusals discarded,
+      sonnet instead of haiku; tested on today''s false refusals and on real catches'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -4321,4 +4403,9 @@ entries:
       if:
       - 'the live checks pass: launch switch-over D'
       - 'a check fails: revert with the preAB copies in the scratchpad and fix'
+    3:
+      feeds: whether the reply check stops interrupting with invented questions
+      if:
+      - 'false cases pass and real catches still refuse: merge'
+      - 'a real catch is lost: keep the old check and report'
   step_waits: {}
