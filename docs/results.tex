@@ -2032,8 +2032,8 @@ catalog\_v4 tree pools, target as the control's), $e=d-p$; per group the median 
 least $0.3$ on both, the network's floor when it is below on either, unresolved when a fit of $\log$ floor on $\log$
 proxy over the training pools puts the group on the other side. The decision is taken on the new combinations and the
 multiplicity pools; the two top groups are reported beside. The training floor was to come from the control pair's own
-scorer on the training pools' test split; both of those reads failed (the cluster's project disk was full) and wait to
-be rerun. What is read here is the free training floor, each training pool's result.json validation loss at the best
+scorer on the training pools' test split; both of those reads failed at first (the cluster's project disk was full)
+and were rerun for the second read below. The first read (2026-10-29) uses the free training floor, each training pool's result.json validation loss at the best
 checkpoint times the shared $\sigma^2$ (the conversion that matched the zero-shot scorer on catalog\_v3's
 parents): it keeps the offset and is read on the
 checkpoint-selection events, so it lies above the true training floor and every $d$ and $e$ below is a lower bound.
@@ -2071,14 +2071,14 @@ against the rule these lower bounds would say the network's floor on seed $43$, 
 $e$ only, and the true training floor can only move $e$ up, so the free read cannot decide this group. Beside, the top processes at another trained mass give $0.299$ and $0.274$,
 the $244$ at no trained mass $0.938$ and $0.892$. Table~\ref{tab:v4_shape_gap} gives the cells: every one but four
 particles from $e^+e^-$ has the held-out floor above the training floor, and the proxy's ratio is near zero or negative
-in every cell of five and six particles. What it changes: nothing is decided yet. The lower bounds point at a transfer
-gap on the multiplicity pools and leave the new combinations at the threshold; the decision, and the fit's residual
-that could make a group unresolved, wait for the two training reads.
+in every cell of five and six particles. What it changed then: nothing was decided. The lower bounds pointed at a transfer
+gap on the multiplicity pools and left the new combinations at the threshold; the decision, and the fit's residual
+that could make a group unresolved, waited for the two training reads.
 \emph{Second read (2026-10-30), the decision.} The two training reads were rerun (runs FA-ccin2p3-e37d7ec2 and FA-ccin2p3-3fe9f0b1,
-$1153$ training pools each) and give the training floor by the held-out scorer. With it, $e$ on the
-multiplicity pools is $0.383$ and $0.356$ (seeds $42$ and $43$), at least $0.3$ on both seeds, and the fit of $\log$
+$1153$ training pools each, the $1045$ tree training pools among them used here) and give the training floor from the
+same scorer as the held-out reads. With it, the median $e$ on the multiplicity pools is $0.383$ and $0.356$ (seeds $42$ and $43$), at least $0.3$ on both seeds, and the fit of $\log$
 floor on $\log$ proxy over the training pools leaves them a median residual of $0.313$, on the same side: a transfer
-gap. On the new combinations $e$ is $0.297$ and $0.270$, below $0.3$ on both seeds, residual $0.174$: the network's
+gap. On the new combinations the median $e$ is $0.297$ and $0.270$, below $0.3$ on both seeds, residual $0.174$: the network's
 floor at this compute plus intrinsic difficulty. Beside, not decided: the top processes at another trained mass
 $0.244$ and $0.257$, at no trained mass $0.922$ and $0.889$. By the design's rule the shape work on new processes is
 aimed at transfer for the multiplicity pools (a target or input prior for the step to more particles, starting with
