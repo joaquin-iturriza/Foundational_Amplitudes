@@ -16,6 +16,9 @@ The agent redesign's switch-overs (impl_order.txt), each from the previous one's
       hpo_guard.sh, plot_guard.sh, placement_guard.sh, lock_guard.py, design_guard.py, Pre/PostToolUse(Agent)
       reviewer_resume.py and PostToolUse(Bash) review_backlog.sh bashpost leave; PreToolUse(Bash) submit_guard.py
       (timeout 120) and review_guard.py, Pre/PostToolUse(Agent) review_guard.py come in (project file only)
+  D   the owners: PreToolUse(Agent) brief_guard.py; context_push.py pre (acts), post (reads and acts) and session
+      (SessionStart); PostToolUse(Agent|SendMessage) owner_context.py (timeout 60), which also switches the plan to
+      owners; PostToolUse(Bash|Edit|Write|MultiEdit|NotebookEdit) delegation_note.py (project file only)
     python3 tools/switch_settings.py --switch A|B [--patch FILE]     the diff of both files (a patch: patch -d / -p1)
     python3 tools/switch_settings.py --switch A|B --apply            each changed file saved as <file>.pre<A|B> first
     python3 tools/switch_settings.py --revert A|B                    the .pre<A|B> files put back"""
@@ -105,6 +108,32 @@ def hook_set_b(s):
     return s
 
 
+D_IN = (("PreToolUse", "Agent", "brief_guard.py", None),
+        ("PreToolUse", "Bash|Edit|Write|MultiEdit|NotebookEdit|Agent|SendMessage|SendUserFile", "context_push.py pre", None),
+        ("PostToolUse", "Agent|SendMessage", "owner_context.py", 60),
+        ("PostToolUse", "Read|Grep|Glob|Bash|Edit|Write|MultiEdit|NotebookEdit", "context_push.py post", None),
+        ("PostToolUse", "Bash|Edit|Write|MultiEdit|NotebookEdit", "delegation_note.py", None),
+        ("SessionStart", None, "context_push.py session", None))
+
+
+def hook_set_d(s):
+    """D, from B's project file: the owner's brief guard, the pushed sections, the owner context and the note-only
+    delegation hook (main_session_guard.py stays unregistered, D185). owner_context.py being registered is also what
+    switches tools/plan.py and plan_check.py to owners (plan.owner_mode)."""
+    s = copy.deepcopy(s)
+    H = s.setdefault("hooks", {})
+    for ev, matcher, cmd, timeout in D_IN:
+        if any(h["command"] == DISPATCH_P + cmd for g in H.get(ev, []) if g.get("matcher") == matcher
+               for h in g["hooks"]):
+            continue
+        h = {"type": "command", "command": DISPATCH_P + cmd}
+        if timeout:
+            h["timeout"] = timeout
+        g = {"matcher": matcher, "hooks": [h]} if matcher else {"hooks": [h]}
+        H.setdefault(ev, []).append(g)
+    return s
+
+
 def _text(obj, path):
     """the file's own JSON style (the user file is ASCII-escaped, the project file is not)."""
     cur = open(path).read()
@@ -122,13 +151,15 @@ def switch_over(which, project, user):
         out.append((user, _text(through_dispatch(json.load(open(user)), user=True), user)))
     elif which == "B":
         out.append((project, _text(hook_set_b(through_dispatch(p)), project)))
+    elif which == "D":
+        out.append((project, _text(hook_set_d(hook_set_b(through_dispatch(p))), project)))
     return [(f, t) for f, t in out if t != open(f).read()]
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--switch", choices=("A", "B"))
-    ap.add_argument("--revert", choices=("A", "B"))
+    ap.add_argument("--switch", choices=("A", "B", "D"))
+    ap.add_argument("--revert", choices=("A", "B", "D"))
     ap.add_argument("--patch", help="--switch: write the diff here as a patch (apply: patch -d / -p1 < FILE)")
     ap.add_argument("--user-settings", default=USER_SETTINGS)
     ap.add_argument("--settings", default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),

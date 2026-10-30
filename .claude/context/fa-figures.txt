@@ -1,0 +1,9 @@
+paths: analysis/**/*.py, tools/plot_*.py, **/plot*.py, **/make_fig*.py, talks/**
+cmds: \bsavefig\b, \bplot\w*\.py\b, \bmake_fig\w*\.py\b
+tools: SendUserFile
+---
+- Save both in the same call (`fig.savefig(base+'.png'); fig.savefig(base+'.pdf')`), same basename and dir;
+  plotting scripts emit both by default. Both are gitignored (on disk, not committed). Single-format exceptions go in
+  `.claude/figure_pair_ignore.txt`.
+- Style: the figure-style skill.
+- A figure carries short labels; its explanation goes in the caption or the talk, never inside the plot.

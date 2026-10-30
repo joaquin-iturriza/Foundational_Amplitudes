@@ -1,0 +1,14 @@
+paths: docs/*.tex, tools/verify_claims.py, analysis/common/**
+cmds: \bverify_claims\.py\b, tools/plan\.py\s+done\b
+---
+- Every number added to `docs/results.tex` carries `% src: python3 <script> <args> @<commit>` and `% claim: key=value`;
+  `tools/verify_claims.py` reruns the script, a commit or merge whose numbers it does not reproduce is refused
+  (`.githooks`), and trunk is pushed only up to its last verified commit.
+- A finished finding goes in its results section, its entry is closed with `plan done <entry> --writeup <commit>` and
+  its hand-off item is deleted; the hand-off holds only open work. A write-up says which branch of the design's
+  outcomes the result took.
+- Before writing a loader, picker or statistic, use `analysis/common` (`python3 tools/readers_index.py`); a family of
+  similar figures is one script with arguments, each figure's `% src` line naming them; a near copy of an existing
+  function in `analysis/` or `tools/` is refused at commit (`tools/dupcheck.py`): import or extend it.
+- A post-training evaluation is the best checkpoint only when `training.es_load_best_model` is true: say which it is.
+  The selection itself is `experiment._result_extra` (`docs/results.tex` `def:metric`).

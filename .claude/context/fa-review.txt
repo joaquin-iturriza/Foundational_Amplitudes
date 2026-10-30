@@ -1,0 +1,22 @@
+paths: .claude/agents/**, .claude/.review_state/**
+cmds: review_backlog\.sh, /review-now, \bgit\s+merge\b
+---
+- Pillars: `CLAUDE.md`, `~/work/CLAUDE.md` and `.claude/context/**` → claudemd-keeper; `docs/*.tex` → notes-editor;
+  source → repo-reviewer (`*.py`, `*.sh`, `config`, `recipes` code, `models`, `sweep`, `tools`, `tests`, `scripts`,
+  `.claude/hooks/**`, `.claude/settings.json`). Not counted in any backlog: plan bookkeeping (`plan/**`) and data
+  files (`*.json`, `*.log`, `*.out`, `*.err`, `analysis/**/data/**`, `tests/*_output.txt`, generated recipe lists
+  `recipes/catalog_v*_*.yaml` and `recipes/catalog_v*/**`), `runs/`, `sweeps/`.
+- A backlog is everything since its pillar's watermark. Thresholds: any change for the CLAUDE.md pillar; 200 changed
+  lines or 20 commits for `.tex`; for code 520 lines weighted by area and kind (`tools/review_weight.py`, about two
+  blocking errors waiting [D171]). Past its threshold, edits to the pillar's files and commits carrying its
+  uncommitted changes are refused until its reviewer runs.
+- Whatever the threshold, a merge into `trunk` and `plan done` need the commits merged or closed to sit inside a
+  passed backlog.
+- One reviewer per backlog: a launch while that pillar's reviewer holds its lock is refused and names the agent to
+  continue with SendMessage. A blocking review keeps its lock so its fixes can be applied; the re-check continues the
+  same reviewer, naming the fix commits. A lock expires after 180 min.
+- `review_backlog.sh status` lists backlogs; `/review-now` runs reviewers on demand; `begin <name>` and
+  `advance <name>` are the reviewer's own (the user's override is a `!` command). Watermarks: `.claude/.review_state/`.
+- All four reviewers (claudemd-keeper, notes-editor, repo-reviewer, design-reviewer) run on opus.
+- The code reviewer reviews cost: a change to generation or to how a batch is laid out is checked for yield and wall
+  time (the probe's numbers, the margin, run size against its limit, the number of waves).

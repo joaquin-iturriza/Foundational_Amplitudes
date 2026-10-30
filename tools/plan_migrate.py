@@ -55,11 +55,39 @@ def slug(t):
     return re.sub(r"[^a-z0-9]+", "_", t.lower()).strip("_")[:40]
 
 
+def owners(d, when):
+    """Switch-over D (agent redesign D1): each running entry gets the owner fields, its owner empty, and a hand-off
+    built from its latest evidence and next steps; its objective is its question until one is described. Every old
+    field is kept, so the step-agent plan check still reads the plan. Idempotent: an entry with a hand-off is left."""
+    for e in d.get("entries") or []:
+        if e.get("status") != "running":
+            continue
+        e.setdefault("objective", e.get("question"))
+        if e.get("handoff"):
+            continue
+        ev = e.get("evidence") or {}
+        e["handoff"] = {"state": "; ".join("step %d: %s" % (k, x) for k, x in plan.nexts(e)) or "no next step recorded",
+                        "running": ", ".join((ev.get("runs") or [])[-8:]) or "none recorded",
+                        "files": ", ".join((ev.get("paths") or [])[-8:]) or "none recorded",
+                        "written": when}
+        e.setdefault("findings", [])
+    return d
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--root", default=plan.ROOT, help="the checkout whose hand-off is read (default: the main one)")
+    ap.add_argument("--owners", metavar="PLAN", help="switch-over D: add the owner and hand-off fields to PLAN's "
+                    "running entries and write it to --out (never the live plan)")
     a = ap.parse_args()
+    if a.owners:
+        import yaml
+        if os.path.realpath(a.out) == os.path.realpath(plan.PLAN_FILE):
+            sys.exit("plan_migrate: --out is the live plan; it changes only through tools/plan.py")
+        d = owners(yaml.safe_load(open(a.owners)), plan.now().isoformat())
+        open(a.out, "w").write(yaml.safe_dump(d, sort_keys=False, allow_unicode=True, width=120))
+        return 0
     ROOT[0] = a.root
     c = sqlite3.connect(plan.RUNS_DB)
     items = {r[0]: dict(zip(("id", "title", "decision", "scope", "status", "match"), r)) for r in c.execute(

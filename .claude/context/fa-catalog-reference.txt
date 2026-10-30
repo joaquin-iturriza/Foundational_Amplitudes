@@ -1,0 +1,48 @@
+paths: mg5_pipeline_final.py, recipes/gen_catalog_*.py, recipes/select_catalog_*.py, recipes/catalog_v*/**, tools/width_regen.py, tools/lhe_*.py, scripts/job_lhe_*.sh, analysis/catalog_v4/**
+cmds: \b(gen|select)_catalog_v\d, \bmg5_pipeline_final\b, \blhe_(parts|probe|rates)\b
+---
+Catalog_v3: what the pools contain and how they are sampled. Files: `mg5_pipeline_final.py` (unprefixed line numbers),
+`recipes/gen_catalog_v3.py`, `recipes/select_catalog_v3.py`. [open] = chosen with no decision of Joaquin's behind it;
+changing any row needs his decision. How a batch is generated: section fa-generation.
+
+| Knob | Value |
+|---|---|
+| fiducial cuts `FIDUCIAL_CUTS` (:2664) | pT > 10 GeV, abs(cos θ) < 0.9, ΔR > 0.4, pair mass > 10 GeV; partonic c.o.m. frame, by rejection with top-up (:2738-2790) [open] |
+| which finals are cut (:2752) | only m_final == 0 and not a neutrino: b (4.7) and τ (1.777) never cut, nor W/Z/t/H [open] |
+| √ŝ window (`gen_catalog_v3.py:245`, `select_catalog_v3.py:162`) | [max(25 GeV, 1.05 × Σ m_final), 1000 GeV]; [threshold, 1 TeV] [D17]; the 1.05 and the 25 GeV floor [open] |
+| heavy-quark pool window (`select_catalog_v3.py:179`) | [lo, max(1000, lo + 500)] [open] |
+| √ŝ draw (:2848, :2967, :3214) | uniform in the window (bulk, all roles); a dataset convention [open] |
+| mixture `f_flat` (:2999) | 0.35 of a pool flat in log abs(M)² |
+| mixture `oversample` (:3000) | 6 candidates per flat event [open] |
+| mixture `democratic` (:3001) | 0.5 of multi-leg candidates from the splitter, rest RAMBO |
+| mixture `y_lo` (:3002) | 1e-6 (deepest invariant / s; measured at lowered cuts, not the catalog's) |
+| adaptive √ŝ pass (:3003, :3124) | on, ≤ 200 bins, ≥ 50 candidates per bin [open] |
+| phase space shape (:3167, :3097) | 2→2 isotropic; the splitter is final-final only (no initial-state collinear corner) [open] |
+| one-loop pools (:3015) | never shaped (uniform √ŝ, RAMBO) whatever the recipe says [open] |
+| α_s (:74, :3318, :3400) | α_s(M_Z) = 0.118, one-loop running, n_f = 5, μ = √ŝ per event, trees and one-loop (one-loop: `tools/nlo_conventions.py:39-41`; trees [open]) |
+| α_s points (`recipes/catalog_v3_gen_stage3.yaml`) | 0.09, 0.15 trained, 0.13 held out [D102] |
+| coupling orders (`gen_catalog_v3.py:111`, :192) | none in the generate strings: MadGraph's minimal QED order, so no VBF/VBS topologies |
+| external W, Z, t, H | stable, on-shell, unpolarised |
+| masses and widths | MadGraph `sm` card (G_μ scheme); MT = ymt = 172.5 (`tools/nlo_conventions.py`, the collaborators' reference) only when a top is external (:464, `gen_catalog_v3.py:240`; external-only patch [open]), 173.0 when internal; WT 1.4915. A width is read only from a DECAY line in column 1; catalog_v3's six loop-induced HH/HHH pools (`loop_qcd_qed_sm`) have the model's Z 2.48883 and W 2.08465, not 2.441404 / 2.0476 (`analysis/catalog_v4/data/card_width_audit.json`), not regenerated [open] |
+| heavy-quark layer (`select_catalog_v3.py:135`) | the top's quantum numbers at m_Q ∈ {50, 300, 600} GeV [D98, D100], width scaled from 1.4915 at LO (0, 8.7956, 71.3498) [width rule open]; pools at 1.4915 being rebuilt at the scaled widths (`tools/width_regen.py`) [D145] |
+| b beams (:2796) | on their 4.7 GeV shell [open] |
+| BSM points `NONSM_POINT` (:1649-1662) | Z′ MY1 500 GeV (gVl 0.3, gAl 0.1, gVq 0.25 model default, dark matter decoupled), WY1 18.64129; 2HDM H± 200, h2 250, h3 300 GeV, second-doublet Yukawas zero, h1 width 6.382e-3; WZ/WW/WH aligned to the `sm` card (`_SM_ALIGN`), WT 1.4915 [layer D98; points open]. Pools with the UFO default widths (WY1 10.0, 2HDM h1 1.0, WT 1.508336, WZ 2.4952, WW 2.085, Z′ model WH 0.00407) being rebuilt at these (`tools/width_regen.py`) [D145] |
+| pool storage | float64 momenta, IDs and amplitudes; never propose float32 again (float32 momenta shift the target's physics factors by up to 0.022, and single-process precision studies reuse the pools) [D132] |
+| pool sizes | trees 1e5 / 1e4 / 1e4 (train / val / test), one-loop 5e4 / 5e3 / 5e3 [D102] |
+| pp pool sizes (`recipes/gen_catalog_v3_pp.py:88`) | 1e4 / 2e3 / 2e3 [open] |
+| pp pools' cards (`recipes/catalog_v3_pp/`) | Daniel's 13 TeV run card as is (nn23lo1, pT > 10 GeV, abs(η) < 5); catalog_v3's param card [D117, D119] |
+
+Catalog_v4 [D130]. Files: `mg5_pipeline_final.py` (`V4_*`, :2664-2730), `recipes/gen_catalog_v4.py` (entries and
+recipes from catalog_v3's, names `v4_*`), check `analysis/catalog_v4/validate_v4.py`. Catalog_v3's pools, recipes and
+recipe ids are unchanged (the v4 fields are absent from its entries). Rows not listed are catalog_v3's.
+
+| Knob | Value |
+|---|---|
+| acceptance `V4_CUTS` | hadronic beams: pT > 10 GeV, abs(η) < 5, ΔR > 0.4, no pair-mass cut; e+e-: abs(cos θ) < 0.99, the rest as v3; b and τ cut like the other legs (`cut_pdgs`) |
+| √ŝ window and draw (`v4_sqrts_lo`) | [the least √ŝ the masses and the pT cut allow, 6 TeV], log-uniform (`sqrts_measure`); the adaptive pass bins in log √ŝ; the 10 GeV edge of the 22 trees with neither a cut leg nor a mass [open] |
+| forward component (`rotate_forward`, `V4_SAMPLING`) | 0.15 of each pool, and a third of the flat part's candidates, turned so one final is uniform in log(1/(1 − abs(cos θ))) up to the cut edge; splitter, f_flat 0.35, same mixture in every role [0.15 and 1/3 open] |
+| coupling orders | `QED<=b` on every tree, b = n − (external gluons) when a quark is external (0 all-gluon, n colourless): every tree diagram (VBF, VBS, EW-QCD interference); QCD unbounded; BSM strings as v3 |
+| top | MT = ymt = 172.5 in every entry, internal and one-loop tops too; WT 1.4915 (`V4_WT`) in every entry [D145] but one: the one-loop b b~ > h w+ w- (`v4_bbx_hwpwm_nlo`, `WIDTH_OVERRIDE` in `recipes/gen_catalog_v4.py`) has WT 0, exact there (t-channel top only; the fixed width broke its pole) [D154]. The SM tree and `loop_sm` pools have 1.4915; the BSM pools (1.508336) and the six loop-induced HH/HHH pools (`loop_qcd_qed_sm`, 1.36728 with Z 2.48883, W 2.08465) are being rebuilt at WT 1.4915 (the loop-induced ones with Z 2.441404, W 2.0476), the others migrated (`tools/width_regen.py`). The heavy-quark layer takes the LO width at its mass (`top_width_lo`: 0, 8.729709, 70.81529; LO, massless b, V_tb = 1 [open]); its 1.4915 pools being rebuilt |
+| b | massless in beams and finals: `sm-no_b_mass` (`loop_sm-no_b_mass` for MadLoop); `particle_ids.py` gives it a massless species row (±5000000, `b_mass_of_process`); catalog_v3's b stays 4.7 |
+| classes, roles, sizes | v4's own (`recipes/select_catalog_v4.py`: the equality step's exact classes joined with near pairs, the rule that reproduces catalog_v3's 1586): splits keep their v3 class's role; a merge with a held-out class is held out whole; changes in `analysis/catalog_v4/data/class_changes.json`; sizes as catalog_v3's; the energy axis is the 6 to 20 TeV probes [D137] |
+| MadEvent runs of the default-sampled pools (`recipes/gen_catalog_v4_default.py`, `tools/lhe_parts.py`) | one-run part jobs of at most 1800 core-s, at least 1000 events; a pool whose runs return under 0.3 of the events they ask (MadEvent stops short of its target) is laid out in runs of 1000; run counts sized at 0.8 of the measured mean yield; the default share generated with a margin of 0.10, or 1.03 / (the measured kept fraction) − 1 where the pool keeps less [source: **open (unsourced)**] |

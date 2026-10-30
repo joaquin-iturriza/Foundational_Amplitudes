@@ -1,0 +1,67 @@
+session: main (SessionStart, every source)
+tools: Agent, SendMessage
+paths: plan/**, tools/plan.py
+cmds: tools/plan\.py
+---
+The plan
+- `plan/plan.yaml`, one entry per piece of work: question, objective, the user's authorising words, the mechanism it
+  tests and the expected outcome, status (`running`, `waiting_user`, `held`, `done`), owner, hand-off, the wall-time
+  targets of its batches, evidence, dead ends and `done_when` (a shell check that passes only when the entry is
+  finished). Read an entry with `python3 tools/plan.py show <id>`; write only through `tools/plan.py` (each
+  subcommand takes --help). Where hand-off prose in `docs/results.tex` disagrees, the plan wins.
+
+Roles
+- On every wake (the user's message, an event of an entry, an
+  agent's hand-back) the main session runs `plan next`, which says per entry what moves: `resume <agent>` (SendMessage carrying the
+  event), `launch` (a fresh owner from the entry's hand-off), `close <agent>` (context past the threshold), or nothing.
+  Routine events never reach it: the supervisor acks them.
+- An owner is one background agent per entry in progress (Agent tool, `run_in_background`), its brief rendered by
+  `plan brief <entry>` from `plan/step_prompt.txt`, recorded with `plan owner <entry> --agent <id>`. It covers all of
+  the entry (analyses, fixes, designs, jobs, write-ups) and is never split into more agents for the same entry.
+- While its jobs run, the owner records them, writes its state on the entry and ends its turn (stopped); the next
+  event of its entry resumes it with SendMessage. It is never replaced by a fresh agent per event.
+- After each hand-back the main session reads the owner's context from its transcript (`tools/agent_context.py
+  <agent>`). Near the threshold it asks the owner to close: the owner writes its hand-off on the entry (`plan handoff
+  <entry> --state --decisions "<what and why>" --ruled-out --running --files`) and ends; a fresh owner starts from
+  that hand-off.
+- A compaction inside an owner's turn is a finding (its brief or scope was too large): `plan finding <entry>`, and the
+  next brief is narrowed.
+- Delegated work goes to a fresh agent with a written brief, never a fork.
+
+Briefs
+- `plan brief <entry>` fills `plan/step_prompt.txt` with the entry; the main session's addition goes in its narrowing
+  slot only; brief_guard.py refuses a launch without the rules block or whose addition cuts the design.
+
+Questions
+- Before a question reaches the user, CLAUDE.md and `site decisions --project FA` are searched; only a call none of
+  them settles is asked, in the main session's message, and recorded with `plan ask <entry> --ask "<question>"
+  --searched "<what was read, why none settles it>" --blocks "<what waits>"`; only what it blocks waits. The answer:
+  `plan answer <entry> --kind K --quote "<the user's words>"` records the decision and changes the entry in one step.
+- Work held at its design: the "stop at the design" hold [D66]; the larger catalogs' "consult with me on the design"
+  [D10].
+
+Designs
+- `plan design <entry> --question --prior --measure --check --fixed --control --seeds --outcome`. `--prior` names the
+  prior work found in `docs/results.tex`, `plan show` and `site decisions` with its result, or "none found" with the
+  terms searched; `--check` says how the measure was shown, on existing data, to move with the tested change. The
+  owner launches the design-reviewer subagent itself: on PASS it submits, on FIX it revises once or records a dead end.
+  An eval-only re-read of a run under its passed design carries `REREAD=<run id>`.
+
+Jobs
+- `site pick FA --jobs N` right before the N submissions; `site submit ... --item <entry>`; record with `plan run
+  <entry> <run>` (a sweep: `--sweep <site>:<name>`) and the batch's wall-time target with `plan target <entry> --batch
+  <name> --wall <hours> --jobs N`. A batch goes out in parallel: `site sync <site> FA` once, then every launch with
+  `NOSYNC=1` (`scripts/launch_cc_only.sh`). New sweep families go into `analysis/transfer/expect_tp3.json` so the
+  item's check counts them.
+
+Done
+- `plan done <entry> --writeup <commit>` passes only when `done_when` passes, the write-up is committed and the
+  entry's commits are inside a passed review. A write-up answering a decision lists each of the user's words that names
+  a comparison or a reference, with the result that answers it.
+
+The Stop gate refuses only what the turn can clear: a running entry with something to do and no owner; an open event
+of an entry whose owner was neither resumed nor launched; a `waiting_user` question in no message to the user; a
+running entry with no approval in force or a held one with no hold; trunk numbers failing the claims check; a figure
+without its pair; a context flush wanted; a reply that leaves the user's question unanswered (once per message); a
+main-session reply not opening with "Joaquin"; the supervisor down or no armed waiter. A job running, an agent
+working, a cluster's state and the user's answer are notes.

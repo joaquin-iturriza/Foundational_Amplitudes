@@ -1223,7 +1223,7 @@ def searched_first():
              r3[0] == 0 and e["searched"] == SEARCHED and e["asks"][-1]["searched"] == SEARCHED
              and "Searched first: CLAUDE.md HPO rule 2" in view and "searched first: CLAUDE.md HPO rule 2" in show,
              r3[1] + view[-400:] + show[-400:])
-    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt_legacy.txt")).read()
     scenario("the step prompt has a step agent read CLAUDE.md's setup and HPO rules and the decisions before asking",
              "HPO search-space rules" in tpl and "site decisions --project FA" in tpl and "--searched" in tpl)
 
@@ -1939,7 +1939,7 @@ def design_prior():
     scenario("design prior: the prior work is shown by plan show and carried by the step prompt",
              rc == 0 and "prior: the sign head search at one seed" in show
              and "prior: the sign head search at one seed" in pr, show + pr[-2000:])
-    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt_legacy.txt")).read()
     rev = open(os.path.join(ROOT, ".claude", "agents", "design-reviewer.md")).read()
     scenario("design prior: the step prompt asks for --prior and, in a write-up answering a decision, each quote's "
              "result; the reviewer searches on its own and checks every quoted comparison",
@@ -1977,7 +1977,7 @@ def prompt_cap():
     show = w.plan_cmd("show", "cov")[1]
     scenario("plan show <id> prints that entry's every dead end and its whole evidence",
              "tried 00" in show and "FA-ccin2p3-r00" in show and "FA-ccin2p3-r19" in show, show[-1500:])
-    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt_legacy.txt")).read()
     scenario("the step prompt sends a mechanical collect step to tools/collect_run.py",
              "tools/collect_run.py" in tpl and os.path.exists(os.path.join(ROOT, "tools", "collect_run.py")))
 
@@ -2627,7 +2627,7 @@ def command_reading():
              r2.returncode == 2 and r3.returncode == 2 and "repo-reviewer" in r2.stderr, r2.stdout + r2.stderr)
 
     # 7. the step prompt asks for a placement before every named submission
-    tpl = open(os.path.join(ROOT, "plan", "step_prompt.txt")).read()
+    tpl = open(os.path.join(ROOT, "plan", "step_prompt_legacy.txt")).read()
     scenario("step prompt: site pick right before every named site submit, CPU jobs too",
              "Run `site pick FA --jobs N ...` right before every `site submit <site>` (CPU jobs too): placement_guard "
              "refuses a named submission with no plan unit left." in tpl)

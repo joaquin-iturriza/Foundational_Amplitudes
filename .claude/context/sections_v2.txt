@@ -80,12 +80,12 @@ site digest --project P            since the user last looked: calls for them, f
   globs or inside a held one.
 - The GPU budget lives in the same site-side gate, so every GPU job counts whatever submits it (`site submit`, launch
   scripts, sweep_manager, generators): wall time × GPUs × jobs, summed over the named items' jobs of the last 60 min
-  on every site, is refused above 30 GPU-h (10 on Jean Zay) unless the item's recorded estimate (`site item set
+  on every site, is refused above the project's budget (its CLAUDE.md) unless the item's recorded estimate (`site item set
   --est-gpu-hours`, from the user's words) covers it. The laptop's submit_guard is the early warning.
 
 The supervisor does the mechanical work, with no model, every 20 min:
 - runs the project's `maintain` commands (FA: the CC feeder, the rebalancer over `tp3_`, the disk watch), each active
-  item's check (FA: `watchdog.py --units`), and the overrun check of queued runs (with the scheduler's reason);
+  item's check (FA: `sweep/watchdog.py --units`), and the overrun check of queued runs (with the scheduler's reason);
 - sorts every run end into one of three:
   finished clean: COMPLETED, its end marker in the log, no error pattern;
   hit its planned limit: TIMEOUT of a worker whose queue still has tasks and whose wall limit is the one its queue
@@ -136,8 +136,8 @@ The plan
   subcommand takes --help). Where hand-off prose in `docs/results.tex` disagrees, the plan wins.
 
 Roles
-- The main session talks to the user and directs agents. On every wake (the user's message, an event of an entry, an
-  agent's hand-back) it runs `plan next`, which says per entry what moves: `resume <agent>` (SendMessage carrying the
+- On every wake (the user's message, an event of an entry, an
+  agent's hand-back) the main session runs `plan next`, which says per entry what moves: `resume <agent>` (SendMessage carrying the
   event), `launch` (a fresh owner from the entry's hand-off), `close <agent>` (context past the threshold), or nothing.
   Routine events never reach it: the supervisor acks them.
 - An owner is one background agent per entry in progress (Agent tool, `run_in_background`), its brief rendered by
@@ -146,7 +146,7 @@ Roles
 - While its jobs run, the owner records them, writes its state on the entry and ends its turn (stopped); the next
   event of its entry resumes it with SendMessage. It is never replaced by a fresh agent per event.
 - After each hand-back the main session reads the owner's context from its transcript (`tools/agent_context.py
-  <agent>`). Near 300k tokens it asks the owner to close: the owner writes its hand-off on the entry (`plan handoff
+  <agent>`). Near the threshold it asks the owner to close: the owner writes its hand-off on the entry (`plan handoff
   <entry> --state --decisions "<what and why>" --ruled-out --running --files`) and ends; a fresh owner starts from
   that hand-off.
 - A compaction inside an owner's turn is a finding (its brief or scope was too large): `plan finding <entry>`, and the
@@ -155,8 +155,7 @@ Roles
 
 Briefs
 - `plan brief <entry>` fills `plan/step_prompt.txt` with the entry; the main session's addition goes in its narrowing
-  slot only. It may narrow the task; it never overrides the capacity and scope rules, and a launch whose brief does is
-  refused.
+  slot only; brief_guard.py refuses a launch without the rules block or whose addition cuts the design.
 
 Questions
 - Before a question reaches the user, CLAUDE.md and `site decisions --project FA` are searched; only a call none of
@@ -205,8 +204,7 @@ Before a full queue
 2. Generate at the pool's cuts wherever MadGraph's run card can express them (pT, η, ΔR, pair mass), so the kept
    fraction is near 1; only what the card cannot express is cut afterwards, by rejection.
 3. Events asked = events needed / measured kept fraction, times at most 1.25 (`KEPT_SAFETY`). A process whose factor
-   exceeds 2× is listed by `lhe_parts plan` and fixed (cuts matched, its sampling changed) before the queue goes,
-   never absorbed with more runs.
+   exceeds 2× is listed by `lhe_parts plan` (cuts matched, its sampling changed).
 4. Run size from the probe's time per event, so a run fits its wall limit with room; workers = the width
    `site pick FA --jobs N --cpus C --hours H` offers, so the whole queue finishes in one wave; the wall-time target is
    recorded (`plan target`) before submission.
@@ -230,8 +228,8 @@ After
 
 === SECTION fa-catalog-reference
 file: ~/work/FA/.claude/context/fa-catalog-reference.txt
-paths: mg5_pipeline_final.py, recipes/gen_catalog_*.py, recipes/select_catalog_*.py, recipes/catalog_v*/**, tools/width_regen.py, analysis/catalog_v4/**
-cmds: \b(gen|select)_catalog_v\d, \bmg5_pipeline_final\b
+paths: mg5_pipeline_final.py, recipes/gen_catalog_*.py, recipes/select_catalog_*.py, recipes/catalog_v*/**, tools/width_regen.py, tools/lhe_*.py, scripts/job_lhe_*.sh, analysis/catalog_v4/**
+cmds: \b(gen|select)_catalog_v\d, \bmg5_pipeline_final\b, \blhe_(parts|probe|rates)\b
 ---
 Catalog_v3: what the pools contain and how they are sampled. Files: `mg5_pipeline_final.py` (unprefixed line numbers),
 `recipes/gen_catalog_v3.py`, `recipes/select_catalog_v3.py`. [open] = chosen with no decision of Joaquin's behind it;
@@ -458,6 +456,7 @@ keeps that state on the laptop and sends stateless trials wherever `site pick` s
 - The driver runs on the laptop in `.venv-driver` (CPU torch + scikit-learn); it builds it
   itself on first use via `sweep/driver_env.sh`.
 Use the classic path only for a sweep that must stay on one site (multi-fidelity warm starts).
+- FA's pruning tool on a cluster is `sweep/prune.py`, under Joaquin's recorded decision [D19].
 
 === SECTION fa-data
 file: ~/work/FA/.claude/context/fa-data.txt
@@ -585,7 +584,6 @@ Output of a run lives under `runs/<exp_name>/...` (models, tokenizer, plots).
 - **Warm start / fidelity:** `warm_start_idx` + `training.increment_steps` drive
   resumption from a previous fidelity checkpoint; don't hand-edit these — they're
   set by `run_trial.py`.
-- Always keep `plot: true` in sweep/experiment configs.
 - **Fine-tuning** reuses the pretrained run's tokenizer; LoRA/EWC/layer-decay/
   freezing are all in the `fine_tune` config block.
 - Best-checkpoint selection is `experiment._result_extra` (definition: `docs/results.tex` `def:metric`).
@@ -695,16 +693,15 @@ paths: analysis/**/*.py, tools/plot_*.py, **/plot*.py, **/make_fig*.py, talks/**
 cmds: \bsavefig\b, \bplot\w*\.py\b, \bmake_fig\w*\.py\b
 tools: SendUserFile
 ---
-- Every figure ships as both `.png` and `.pdf` (same basename, same dir), no exceptions: save both in the same call
-  (`fig.savefig(base+'.png'); fig.savefig(base+'.pdf')`) and make plotting scripts emit both by default. Both are
-  gitignored: "both" means on disk as deliverables, not committed. Genuine single-format exceptions go in
+- Save both in the same call (`fig.savefig(base+'.png'); fig.savefig(base+'.pdf')`), same basename and dir;
+  plotting scripts emit both by default. Both are gitignored (on disk, not committed). Single-format exceptions go in
   `.claude/figure_pair_ignore.txt`.
 - Style: the figure-style skill.
 - A figure carries short labels; its explanation goes in the caption or the talk, never inside the plot.
 
 === SECTION fa-git-and-release
 file: ~/work/FA/.claude/context/fa-git-and-release.txt
-paths: scripts/publish_main.sh, scripts/fold_worktree.sh, worktrees/**
+paths: scripts/publish_main.sh, scripts/fold_worktree.sh, scripts/remove_worktree.sh, worktrees/**
 cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
 ---
 - `trunk` is the development trunk and what every site checks out (`site sync <site> FA` pushes it and fast-forwards
@@ -717,7 +714,7 @@ cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
   `trunk → main`.
 - Retired `ccin2p3`, `jeanzay`: still on GitHub, no commits `trunk` lacks.
 - Worktrees: `git worktree add worktrees/wt-<feat> -b <feat> trunk`, implement and verify there, merge into `trunk`,
-  then `bash scripts/remove_worktree.sh <wt>`, never `git worktree remove` by hand. Merging brings back code only:
+  then remove it with its script. Merging brings back code only:
   results, run dirs, eval `.npz`, satlogs, datasets and figures are gitignored and die with the worktree; the script
   folds them into the trunk (`scripts/fold_worktree.sh`), removes the worktree only when every untracked file has an
   identical trunk copy, and deletes the merged branch. Quick standalone edits on trunk are fine.
@@ -773,9 +770,10 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
   wall-time target), `git_verify_guard.py` (claims check bypasses, attribution in a commit message), `review_guard.py`
   (reviewer locks, one reviewer per backlog), `brief_guard.py` (briefs), `plan_files_guard.py`, `md_guard.sh`,
   `plot_guard.sh` (config writes), `worktree_guard.sh` (advisory), `worktree_fold_guard.sh`, `review_backlog.sh
-  gate|bashpre`, `hook_syntax_guard.py`, `main_session_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the
-  user-level `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context
-  after a hand-back), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
+  gate|bashpre`, `hook_syntax_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the user-level
+  `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context after a
+  hand-back), `delegation_note.py` (a note, never a refusal, when the main session edits code, runs an analysis or
+  tests, or submits; counted in `site digest`), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
   `context_guard.py`, `context_push.py`, the user-level `ledger_guard.sh session-start`. `.githooks/commit-msg` refuses
   attribution lines in every commit.
 - Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good

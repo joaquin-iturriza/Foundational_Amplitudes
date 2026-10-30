@@ -96,8 +96,10 @@ def problems():
     d, st = plan.load()
     msgs = plan.messages(plan.oldest_open(d, st))     # from the oldest open question, or the previous re-ask scan
     out, once = list(unrecorded), []
+    if plan.owner_mode():                             # switch-over D: one owner per entry, no demand per step or run
+        out += owner_problems(d, st, msgs)
     # each unlaunched next step counts on its own: an entry with independent next steps lists every free one
-    for e, why, launched, k in plan.next_steps_keyed(d, st, msgs=msgs):
+    for e, why, launched, k in ([] if plan.owner_mode() else plan.next_steps_keyed(d, st, msgs=msgs)):
         if launched or e.get("status") == "waiting_user":     # the user wrote after a question: plan next only
             continue
         if why.startswith("design to review"):
@@ -151,11 +153,36 @@ def problems():
     out += plan.claims_problems()
     # an event on an entry whose step agent is still working is that agent's to ack: blocking on it only bounces the
     # main session while the agent reads the logs (2026-10-26, eight failed regeneration parts)
-    working = {e["id"] for e in d["entries"] if plan.step_working(st, e["id"], plan.now())}
-    refuse, wait = split_events(open_events(), working)
+    if plan.owner_mode():                             # a running entry's events are its owner's (owner_problems)
+        working = {e["id"] for e in d["entries"] if e.get("status") == "running"}
+        refuse, wait = split_events(open_events(), working)
+        wait = []
+    else:
+        working = {e["id"] for e in d["entries"] if plan.step_working(st, e["id"], plan.now())}
+        refuse, wait = split_events(open_events(), working)
     out += refuse
     plan.NOTES.extend(wait)
     return out, once, st
+
+
+def owner_problems(d, st, msgs):
+    """Switch-over D (agent redesign D6): a running entry with something to do and no live or stopped owner is a
+    refusal (launch); an open event of an entry whose owner is stopped, neither resumed nor launched this turn, is a
+    refusal (resume); a design without a verdict, as before. A working owner, an owner stopped while its jobs run and
+    an owner past the context threshold are notes."""
+    import plan
+    out = []
+    for e, act, agent, why in plan.owner_actions(d, st, msgs=msgs, events=plan.events_by_item(strict=True)):
+        if act == "close":
+            plan.NOTES.append("%s: close its owner %s: %s" % (e["id"], agent, why))
+        elif act == "resume":
+            out.append("%s: resume its owner %s (SendMessage): %s" % (e["id"], agent, why))
+        elif act == "launch":
+            out.append("%s: no live owner: %s" % (e["id"], why))
+        else:
+            out.append("%s: %s (plan next --prompts gives its prompt; subagent_type design-reviewer, then plan review "
+                       "%s --agent <subagent id>)" % (e["id"], why, e["id"]))
+    return out
 
 
 def split_events(lines, working):

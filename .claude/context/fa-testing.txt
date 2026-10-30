@@ -1,0 +1,8 @@
+paths: tests/**
+cmds: \bpytest\b, \.venv-cpu/
+---
+- A stray generated `py.py` at the root shadows the `py` module and breaks `pytest`
+  in the venv; test modules carry a `__main__` runner (`python tests/<file>.py`).
+- On the laptop, `.venv-cpu/bin/pytest --testmon --continue-on-collection-errors tests/` runs only the tests a change
+  touches; `bash scripts/cpu_env.sh` builds `.venv-cpu` (the CC env on CPU, no xformers). CPU dry-runs of the sweep
+  generators run there too.
