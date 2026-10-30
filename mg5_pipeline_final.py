@@ -3977,6 +3977,11 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             # analysis/catalog_v4/short_run_bias.py); a run that completes does not, whatever its size. In the
             # identity: a pool once assembled from short runs never passes for one of complete runs
             **({"runs": "complete"} if cfg["lhe"].get("complete_runs") else {}),
+            # lhe.gridpack = G: every run is drawn from one MadEvent integration made at the precision of a run of G
+            # events (one gridpack per energy, lhe_gridpacks), not integrated on its own: a small run that integrates
+            # on its own differs from a large complete run (docs/results.tex par:v4_short_runs). In the identity: a
+            # pool of gridpack runs never passes for one of runs integrated each on their own, nor one of another G
+            **({"gridpack": int(cfg["lhe"]["gridpack"])} if cfg["lhe"].get("gridpack") else {}),
         },
     }
 
@@ -4467,6 +4472,63 @@ def lhe_part_paths(process, items):
     return [(os.path.join(d, f"{process}_{eid}_{r[3]}_seed{r[0]}_ev{r[1]}.npz"), r) for r in runs]
 
 
+def lhe_gridpacks(process, iseed, n_req):
+    """[(grid iseed, grid events, run-card patches, name)] of an lhe.gridpack entry's gridpacks: one per energy of an
+    e+e- entry (the patches of that energy's runs), one for pp. A gridpack's iseed continues the run seeds' sequence
+    past its runs (seed_k with k = runs + j; 7919 and 30000 coprime, so no run and no other gridpack shares it)."""
+    l = PROCESSES[process]["lhe"]
+    if not l.get("gridpack"):
+        return []
+    runs = lhe_runs(process, iseed, n_req)
+    pats = list({json.dumps(r[2], sort_keys=True): r[2] for r in runs}.values())    # in run order, one per energy
+    return [((iseed + 7919 * (len(runs) + j) - 1) % 30000 + 1, int(l["gridpack"]), dict(p), f"grid{j:02d}")
+            for j, p in enumerate(pats)]
+
+
+def lhe_gridpack_of_run(run, grids):
+    """Index in `grids` (lhe_gridpacks) of the gridpack run `run` (of lhe_runs) is drawn from: the one of its patches."""
+    return [g[2] for g in grids].index(run[2])
+
+
+def lhe_gridpack_paths(process, items):
+    """[(gridpack .tar.gz path, gridpack)] of the pools `items`, named like their parts (the events' identity, which
+    holds lhe.gridpack, and the gridpack's name, iseed and events), so a gridpack of another layout is never used."""
+    seed, iseed, n_req = _lhe_check_recipes(process, items)
+    grids = lhe_gridpacks(process, iseed, n_req)
+    if not grids:
+        return []
+    eid = _lhe_events_id(items[0][0])
+    d = os.path.join(lhe_parts_dir(), process)
+    return [(os.path.join(d, f"{process}_{eid}_{g[3]}_seed{g[0]}_ev{g[1]}_gridpack.tar.gz"), g) for g in grids]
+
+
+def lhe_build_gridpack(process, items, j, mg_cores=1, work_root=None, keep_dir=False):
+    """Make the j-th gridpack of the pools `items` (lhe_make_gridpack at its iseed, events and patches, in a fresh
+    MadEvent directory) and copy it to its path (atomic). Returns the path; an existing gridpack is kept. Its work
+    directory is deleted afterwards unless keep_dir (the queue worker, whose tidy deletes it with a manifest)."""
+    if not PROCESSES[process]["lhe"].get("parts"):
+        raise RuntimeError(f"{process}: no lhe.parts, its pools are built in series (build_lhe_pp)")
+    path, (giseed, gev, patches, gname) = lhe_gridpack_paths(process, items)[j]
+    if os.path.exists(path):
+        return path
+    work_root = os.path.join(work_root or lhe_work_dir(), "parts", f"{process}__{gname}")
+    os.makedirs(work_root, exist_ok=True)
+    log_path = os.path.join(work_root, f"{process}.mg5.log")
+    open(log_path, "w").close()
+    t0 = time.time()
+    ev, _ = lhe_prepare(process, work_root, log_path, madevent=True, standalone=False)
+    tar = lhe_make_gridpack(process, ev, gev, giseed, log_path, mg_cores=mg_cores, patches=patches)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path[:-len(".tar.gz")] + f".tmp{os.getpid()}.tar.gz"
+    shutil.copy2(tar, tmp)
+    os.replace(tmp, path)
+    if not keep_dir:
+        shutil.rmtree(work_root, ignore_errors=True)
+    print(f"[LHE GRIDPACK] {process} {gname}: {gev} events' precision, iseed {giseed}, {os.path.getsize(path)} bytes "
+          f"in {time.time() - t0:.0f}s -> {path}", flush=True)
+    return path
+
+
 def lhe_build_part(process, items, k, mg_cores=1, work_root=None, keep_dir=False):
     """Run the k-th MadEvent run of the pools `items` and write its part file (atomic). Returns its path; an existing
     part is kept (a rerun does nothing). Its run directory is deleted once the part holds every event asked, unless
@@ -4482,16 +4544,31 @@ def lhe_build_part(process, items, k, mg_cores=1, work_root=None, keep_dir=False
     log_path = os.path.join(work_root, f"{process}.mg5.log")
     open(log_path, "w").close()
     t0 = time.time()
-    ev, _ = lhe_prepare(process, work_root, log_path, madevent=True, standalone=False)
-    t_out = time.time() - t0; t0 = time.time()
-    lhe, banner = lhe_run_madevent(process, ev, n_k, iseed_k, log_path, mg_cores, run_name=name_k, patches=patches_k)
-    t_me = time.time() - t0
-    m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+    if cfg["lhe"].get("gridpack"):
+        # lhe.gridpack: the run is drawn from its energy's gridpack (lhe_build_gridpack, made first) with the run's
+        # seed and events; its banner is the LHE header, the gridpack integration's cards
+        grids = lhe_gridpack_paths(process, items)
+        tar = grids[lhe_gridpack_of_run((iseed_k, n_k, patches_k, name_k), [g for _, g in grids])][0]
+        if not os.path.exists(tar):
+            raise RuntimeError(f"{process} {name_k}: its gridpack {tar} is not made yet")
+        t_out = 0.0
+        lhe = lhe_run_gridpack(tar, os.path.join(work_root, "gridpack_run"), n_k, iseed_k, log_path)
+        t_me = time.time() - t0
+        m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+        banner_txt = lhe_gridpack_header(lhe)
+    else:
+        ev, _ = lhe_prepare(process, work_root, log_path, madevent=True, standalone=False)
+        t_out = time.time() - t0; t0 = time.time()
+        lhe, banner = lhe_run_madevent(process, ev, n_k, iseed_k, log_path, mg_cores, run_name=name_k,
+                                       patches=patches_k)
+        t_me = time.time() - t0
+        m_k, a_k, _ = read_lhe_pp(lhe, cfg["pdg_ids"])
+        banner_txt = open(banner).read() if banner else ""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path[:-len(".npz")] + f".tmp{os.getpid()}.npz"
     np.savez(tmp, mom=m_k, aqcd=a_k, seconds=np.array([t_out, t_me]), mg_cores=np.array(int(mg_cores)),
              second_refine=np.array(lhe_second_refine() if lhe_second_refine() is not None else np.nan),
-             banner=np.array(open(banner).read() if banner else ""))
+             banner=np.array(banner_txt))
     os.replace(tmp, path)
     if len(m_k) >= n_k and not keep_dir:     # a short run keeps its directory (its logs)
         shutil.rmtree(work_root, ignore_errors=True)

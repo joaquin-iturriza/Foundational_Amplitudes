@@ -198,17 +198,25 @@ Y_KEEP = 0.3
 # events did; open).
 COMPLETE = os.path.join(ROOT, "analysis", "catalog_v4", "data", "complete_runs.json")
 COMPLETE_SHARE = 0.8
+# A pool with "gridpack": true in COMPLETE draws its runs from one gridpack per energy (lhe.gridpack, tools/lhe_parts.py)
+# integrated at the precision of one run asking the energy's whole need, the run that integrates on its own and
+# completes being the reference (docs/results.tex par:v4_short_runs); never below GRID_MIN events, the smallest gridpack
+# of the gridpack probe (dsh_epem_amupvmwm at 1000 GeV, 13057; catalog_coverage, 2026-10-30). The floor is open.
+GRID_MIN = 13057
 
 
-def complete_layout(lhe, run_events):
+def complete_layout(lhe, run_events, gridpack=False):
     """lhe (in place, a copy's): runs of run_events, as many as the blocks need at COMPLETE_SHARE of them complete (per
-    energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped."""
+    energy for an e+e- pool), only complete runs assembled; the short-run layout's keys dropped. gridpack: the runs
+    drawn from one gridpack per energy of max(the energy's need, GRID_MIN) events' precision (lhe.gridpack)."""
     need = sum(int(lhe[k]) for k in ("n_val", "n_test", "n_train"))
-    for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt"):
+    for k in ("accept_short", "energy_runs", "margin", "n_runs", "run_events", "iseed_salt", "gridpack"):
         lhe.pop(k, None)
     per = int(math.ceil(need / len(lhe["energies"]))) if lhe.get("energies") else need
     lhe.update(parts=True, complete_runs=True, run_events=int(run_events),
                n_runs=int(math.ceil(per / (COMPLETE_SHARE * int(run_events)))))
+    if gridpack:
+        lhe["gridpack"] = max(per, GRID_MIN)
     return lhe
 
 
@@ -333,7 +341,7 @@ def main():
         if "_then" in l4:
             energy_runs(l4, yields.get(k4), l4.pop("_then"))
         if k4 in complete:
-            l4 = complete_layout({**ee_lhe, **l4}, complete[k4]["run_events"])
+            l4 = complete_layout({**ee_lhe, **l4}, complete[k4]["run_events"], complete[k4].get("gridpack", False))
             l4 = {k: v for k, v in l4.items() if k not in ee_lhe or ee_lhe[k] != v}
         ee[k4] = {**lhe_entry(mg, n, P[n], mg.V4_MODEL, l4 or None),
                                        "parent": n,
@@ -390,7 +398,9 @@ def main():
         run_layout(mg, lhe, rate, stall)
         if "_then" in lhe:
             energy_runs(lhe, yields.get(name), lhe.pop("_then"))
-        if not lhe.get("energies"):
+        # a pool laid out in complete runs (COMPLETE) takes complete_layout below, which drops the short-run layout's
+        # keys: its short-run yields are not read (they were measured at another run size)
+        if not lhe.get("energies") and name not in complete:
             if name in assembled or name not in yields or _yield_ratio(yields[name]) is None:
                 short_runs(mg, lhe, yields.get(name))
             else:
@@ -405,7 +415,8 @@ def main():
         if name in assembled and name not in mixfail and name in prev:
             e = prev[name]                 # an assembled pool keeps the layout it was built with
         if name in complete:
-            e = {**e, "lhe": complete_layout(dict(e["lhe"]), complete[name]["run_events"])}
+            e = {**e, "lhe": complete_layout(dict(e["lhe"]), complete[name]["run_events"],
+                                             complete[name].get("gridpack", False))}
         dsh[name] = e
         src_of[n] = name
         # the default share never repeats an event of the pool it follows: no MadEvent iseed in common (run seeds wrap

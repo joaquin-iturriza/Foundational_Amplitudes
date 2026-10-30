@@ -23,6 +23,10 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
     park    --queue Q        its unclaimed tasks moved to Q/parked/<time> (its workers end with what they hold); parked
                              (Q/parked/.active) until a plan of the queue completes
     plan ... --skip-claimed Q2...   runs claimed in Q2 are not planned again; --exclude NAME... held processes
+    plan ... --grid-cores C   an lhe.gridpack pool: first one gridpack task per energy (mg.lhe_build_gridpack, on C
+            cores, at the head of the queue), then its runs, each claimed only once its energy's gridpack is stored
+            ("needs"; a worker whose only runs left wait on a gridpack another job is making looks again every POLL_S)
+            and drawn from it (mg.lhe_build_part), written as the same part files; the assembly is unchanged
     status  --queue Q        counts per state, and the processes assembled, as one JSON line
     yields  --queue Q        events asked and returned per run of every process with a short part, as one JSON line
             (recipes/gen_catalog_v4_default.py sizes those pools' n_runs from it; plan then links their parts, _adopt)
@@ -35,7 +39,7 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             not started) keeps only its log files. A manifest of every path removed, with its size, is written under
             Q/gc/ before anything is deleted. A worker does the same for each run it ends (tidy_run).
 
-The queue holds  todo/<prio>__<process>__<k>.json  claimed/<same>.<jobid>  done/  failed/  assembled/<process>.
+The queue holds  todo/<prio>__<process>__<k>.json (a gridpack task: 00000000__<process>__g<j>.json)  claimed/<same>.<jobid>  done/  failed/  assembled/<process>.
 Every pool is the one prebuild_recipes.py would build for the same spec and seed (same recipe ids).
 """
 import argparse, glob, json, math, os, re, shutil, socket, statistics, subprocess, sys, time, traceback
@@ -246,7 +250,7 @@ def _plan(a, D, items):
     # work), so no run is made twice; a part the old worker leaves short or failed is planned again on a later plan
     for q2 in getattr(a, "skip_claimed", None) or []:
         known |= {f.split("__", 1)[1].split(".json")[0] for f in os.listdir(os.path.join(q2, "claimed"))}
-    n_new = n_have = 0
+    n_new = n_have = n_grid = 0
     n_adopt = 0
     for name, its in sorted(items.items()):
         if name in (getattr(a, "exclude", None) or []):
@@ -256,7 +260,24 @@ def _plan(a, D, items):
             json.dump({"seed": a.seed, "items": [[r, p] for r, p in its]}, f)
         rate, src = _rate(name, rates, med)
         c = cores.get(name, 1)
-        for k, (part, run) in enumerate(mg.lhe_part_paths(name, its)):
+        parts = mg.lhe_part_paths(name, its)
+        # lhe.gridpack: a gridpack task per energy first (on grid_cores cores, queued at the head: prio 0), its runs
+        # claimed only once its gridpack exists ("needs"); a gridpack whose runs are all made is not queued again
+        grids = mg.lhe_gridpack_paths(name, its)
+        gc_ = int(getattr(a, "grid_cores", 1) or 1)
+        for j, (tar, g) in enumerate(grids):
+            tag = f"{name}__g{j:02d}"
+            mine = [p for p, r in parts if mg.lhe_gridpack_of_run(r, [x for _, x in grids]) == j]
+            if os.path.exists(tar) or tag in known or all(os.path.exists(p) for p in mine):
+                continue
+            # an estimate: the class's core-seconds per event times the grid's events, on gc_ cores
+            est = rate * g[1] / gc_
+            sc = src_cost.setdefault(src, [0, 0.0]); sc[0] += 1; sc[1] += est * gc_ / 3600
+            with open(os.path.join(D["todo"], f"{0:08d}__{tag}.json"), "w") as f:
+                json.dump({"process": name, "kind": "gridpack", "j": j, "est_s": est, "events": g[1],
+                           "gridpack": tar, "cores": gc_}, f)
+            n_grid += 1
+        for k, (part, run) in enumerate(parts):
             est = rate * run[1] / c
             sc = src_cost.setdefault(src, [0, 0.0]); sc[0] += 1; sc[1] += est * c / 3600
             tag = f"{name}__{k:03d}"
@@ -264,12 +285,16 @@ def _plan(a, D, items):
                 n_have += 1
                 continue
             prio = max(0, 99999999 - int(est))
+            t = {"process": name, "k": k, "est_s": est, "events": run[1], "part": part, "cores": c}
+            if grids:
+                j = mg.lhe_gridpack_of_run(run, [x for _, x in grids])
+                t["needs"], t["needs_task"] = grids[j][0], f"{0:08d}__{name}__g{j:02d}.json"
             with open(os.path.join(D["todo"], f"{prio:08d}__{tag}.json"), "w") as f:
-                json.dump({"process": name, "k": k, "est_s": est, "events": run[1], "part": part, "cores": c}, f)
+                json.dump(t, f)
             n_new += 1
     # an estimate: the measured core-seconds per event of the class's pool (or its multiplicity's median) times the
     # events asked, one-core time taken as cores x wall of the measured multicore run (no parallel loss)
-    print(json.dumps({"processes": len(items), "tasks_new": n_new, "tasks_present": n_have, "parts_adopted": n_adopt,
+    print(json.dumps({"processes": len(items), "tasks_new": n_new, "gridpack_tasks_new": n_grid, "tasks_present": n_have, "parts_adopted": n_adopt,
                       "est_core_h": round(sum(v[1] for v in src_cost.values()), 1),
                       "est_by_rate_source": {k: {"tasks": v[0], "core_h": round(v[1], 1)} for k, v in src_cost.items()},
                       "est_longest_task_wall_h": round(max([json.load(open(f))["est_s"] for f in
@@ -355,6 +380,8 @@ def _claim(D, left_s, free=1):
             continue
         if 1.5 * t["est_s"] + ASSEMBLE_S > left_s or int(t.get("cores", 1)) > free:
             continue
+        if t.get("needs") and not os.path.exists(t["needs"]):
+            continue                     # a gridpack run whose gridpack is not made yet
         dst = os.path.join(D["claimed"], f"{f}.{me}")
         try:
             os.rename(os.path.join(D["todo"], f), dst)
@@ -510,25 +537,33 @@ def tidy_run(name, items, k, q):
     is deleted. Returns 'saved', 'logs' or None (nothing deleted). Never raises: tidying never fails a task."""
     try:
         part, run = mg.lhe_part_paths(name, items)[k]
-        wd = run_workdir(name, run)
+        return _tidy(run_workdir(name, run), part_ok(part, part_need(name, run)), f"{name}__{k:03d}", q)
+    except Exception as e:
+        print(f"  [TIDY] {name} part {k}: not tidied ({type(e).__name__}: {e})", flush=True)
+        return None
+
+
+def _tidy(wd, saved, tag, q):
+    """tidy_run's work on the directory wd of task tag: deleted when saved, else reduced to its logs; each removal in
+    Q/gc/worker_<job>.jsonl first. Returns 'saved', 'logs' or None. Never raises."""
+    try:
         if not os.path.isdir(wd):
             return None
         root = parts_work_root()
         _under(root, wd)
-        saved = part_ok(part, part_need(name, run))
         rm, _ = _removals(wd, saved)
         os.makedirs(os.path.join(q, "gc"), exist_ok=True)
         man = os.path.join(q, "gc", f"worker_{os.environ.get('SLURM_JOB_ID', f'local{os.getpid()}')}.jsonl")
         with open(man, "a") as f:
             for fp, b in rm:
-                f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "run": f"{name}__{k:03d}",
+                f.write(json.dumps({"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "run": tag,
                                     "saved": saved, "path": fp, "bytes": b}) + "\n")
             f.flush()
             os.fsync(f.fileno())
         if is_local(root) and not saved:
             # a node-local directory vanishes with the job: its logs go to Q/logs/<run> on the shared disk, the rest
             # is deleted with it
-            dst = os.path.join(q, "logs", f"{name}__{k:03d}")
+            dst = os.path.join(q, "logs", tag)
             os.makedirs(dst, exist_ok=True)
             for fp in _removals(wd, False)[1]:
                 shutil.copy2(fp, os.path.join(dst, os.path.relpath(fp, wd).replace(os.sep, "__")))
@@ -537,7 +572,7 @@ def tidy_run(name, items, k, q):
         tidy_apply(root, wd, saved)
         return "saved" if saved else "logs"
     except Exception as e:
-        print(f"  [TIDY] {name} part {k}: not tidied ({type(e).__name__}: {e})", flush=True)
+        print(f"  [TIDY] {tag}: not tidied ({type(e).__name__}: {e})", flush=True)
         return None
 
 
@@ -566,6 +601,19 @@ def layout_current(name, items):
                           f"since it started); task returned to todo")
 
 
+def _run_gridpack_task(q, t, items):
+    """A gridpack task: the j-th gridpack of the process made and stored (mg.lhe_build_gridpack); its work directory
+    tidied as a run's (deleted once the gridpack is stored, else reduced to its logs, Q/logs on node-local disk)."""
+    name, j = t["process"], int(t["j"])
+    tar, g = mg.lhe_gridpack_paths(name, items)[j]
+    try:
+        mg.lhe_build_gridpack(name, items, j, mg_cores=int(t.get("cores", 1)), keep_dir=True)
+    finally:
+        _tidy(os.path.join(mg.lhe_work_dir(), "parts", f"{name}__{g[3]}"), os.path.exists(tar),
+              f"{name}__g{j:02d}", q)
+    return f"gridpack {g[3]} made"
+
+
 def _run_task(q, t):
     """Pool worker: the part, then the assembly if this part completed the process. Never raises."""
     D = _dirs(q)
@@ -574,6 +622,8 @@ def _run_task(q, t):
     try:
         items = _spec(D, name)
         layout_current(name, items)
+        if t.get("kind") == "gridpack":
+            return t, _run_gridpack_task(q, t, items) + f" in {time.time() - t0:.0f}s", None
         try:
             mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
             part, run = mg.lhe_part_paths(name, items)[t["k"]]
@@ -625,6 +675,29 @@ def _assemble_pending(D, q):
     return out
 
 
+POLL_S = 60               # how often a worker with runs waiting on a gridpack made elsewhere looks again
+
+
+def _waiting_on_gridpack(D):
+    """Whether a run task in todo/ waits on a gridpack that a job is making now (its gridpack task in claimed/). A
+    gridpack task still in todo/ is not waited for: this job would have claimed it had it fit."""
+    claimed = {f.rsplit(".", 1)[0] for f in os.listdir(D["claimed"])}
+    for f in os.listdir(D["todo"]):
+        if not f.endswith(".json"):
+            continue
+        try:
+            t = json.load(open(os.path.join(D["todo"], f)))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if t.get("needs") and not os.path.exists(t["needs"]) and t.get("needs_task") in claimed:
+            return True
+    return False
+
+
+def _label(t):
+    return f"gridpack {t['j']}" if t.get("kind") == "gridpack" else f"part {t['k']}"
+
+
 def cmd_work(a):
     D = _dirs(a.queue)
     end = time.time() + a.hours * 3600
@@ -640,9 +713,13 @@ def cmd_work(a):
                 if t is None:
                     break
                 live[ex.submit(_run_task, a.queue, t)] = t
+            blocked = _waiting_on_gridpack(D)
             if not live:
+                if blocked and end - time.time() > ASSEMBLE_S:
+                    time.sleep(POLL_S)       # runs whose gridpack another job is making: claimed once it is stored
+                    continue
                 break
-            done, _ = wait(list(live), return_when=FIRST_COMPLETED)
+            done, _ = wait(list(live), timeout=POLL_S if blocked else None, return_when=FIRST_COMPLETED)
             for fut in done:
                 t = live.pop(fut)
                 _, msg, err = fut.result()
@@ -654,7 +731,7 @@ def cmd_work(a):
                         pass
                     n_stale += 1
                     end = 0.0
-                    print(f"  [STALE] {t['process']} part {t['k']}: {err.splitlines()[0]}", flush=True)
+                    print(f"  [STALE] {t['process']} {_label(t)}: {err.splitlines()[0]}", flush=True)
                     continue
                 dst = D["done"] if err is None else D["failed"]
                 try:
@@ -668,7 +745,7 @@ def cmd_work(a):
                     n_fail += 1
                     with open(os.path.join(D["failed"], t["_file"] + ".err"), "w") as f:
                         f.write(err)
-                    print(f"  [FAIL] {t['process']} part {t['k']}: {err.splitlines()[0]}", flush=True)
+                    print(f"  [FAIL] {t['process']} {_label(t)}: {err.splitlines()[0]}", flush=True)
         # assemblies nobody did (their lock holder died or the last part ran in a job that lost the lock race)
         for name in (_assemble_pending(D, a.queue) if end - time.time() > ASSEMBLE_S and not n_stale else []):
             t, msg, err = _run_task(a.queue, {"process": name, "k": 0})
@@ -705,19 +782,25 @@ def cmd_gc(a):
     for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
         name = os.path.basename(sf)[:-5]
         items = _spec(D, name)
-        for k, (part, run) in enumerate(mg.lhe_part_paths(name, items)):
-            wd = run_workdir(name, run)
+        # each run's directory (saved: its part holds its events), and each gridpack's (saved: the gridpack is stored)
+        dirs = [(run_workdir(name, run), f"{name}__{k:03d}", part, run)
+                for k, (part, run) in enumerate(mg.lhe_part_paths(name, items))]
+        dirs += [(os.path.join(mg.lhe_work_dir(), "parts", f"{name}__{g[3]}"), f"{name}__g{j:02d}", tar, None)
+                 for j, (tar, g) in enumerate(mg.lhe_gridpack_paths(name, items))]
+        for wd, tag, part, run in dirs:
             if not os.path.isdir(wd):
                 stats["absent"] += 1
                 continue
-            tag = f"{name}__{k:03d}"
             if claimed_now(tag):
                 stats["running_skipped"] += 1
                 continue
             _under(root, wd)
-            saved = part_ok(part, part_need(name, run))   # a short part of a run_events pool keeps its logs
-            if not saved and part_ok(part):
-                stats["short_parts"] += 1
+            if run is None:
+                saved = os.path.exists(part)
+            else:
+                saved = part_ok(part, part_need(name, run))   # a short part of a run_events pool keeps its logs
+                if not saved and part_ok(part):
+                    stats["short_parts"] += 1
             n, kept = tidy_plan(wd, saved)
             kind = "saved" if saved else "logs"
             stats[kind][0] += 1; stats[kind][1] += n
@@ -967,6 +1050,8 @@ def main():
     p.add_argument("--cores", nargs="*", default=[], help="NAME=C: that process's runs on C cores each")
     p.add_argument("--skip-claimed", nargs="*", default=[], help="queues whose claimed runs are not planned again")
     p.add_argument("--exclude", nargs="*", default=[], help="processes not planned in this queue (held)")
+    p.add_argument("--grid-cores", type=int, default=8,
+                   help="cores of each gridpack task (lhe.gridpack pools; MadEvent multicore integration)")
     p.add_argument("--probe", default=PROBE_YIELDS, help="kept fraction per process (tools/lhe_probe.py summary); every "
                    "planned process must be in it and keep at least 1/%g of the events it asks" % YIELD_FACTOR)
     ay = sub.add_parser("accept-yield"); ay.add_argument("names", nargs="+", metavar="NAME=D<n>")

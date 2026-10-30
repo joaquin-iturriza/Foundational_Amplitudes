@@ -108,7 +108,8 @@ def main():
                                               probe_yield.get(pp(n), 1.0))
         if pp(n) in complete:          # rebuilt in runs that complete (gen_catalog_v4_default COMPLETE)
             parts.add(pp(n))
-            own = {**own, "lhe": complete_layout({**sz_pp, **own.get("lhe", {})}, complete[pp(n)]["run_events"])}
+            own = {**own, "lhe": complete_layout({**sz_pp, **own.get("lhe", {})}, complete[pp(n)]["run_events"],
+                                                    complete[pp(n)].get("gridpack", False))}
             own["lhe"] = {k: v for k, v in own["lhe"].items() if k not in sz_pp}
         split = T[n]["role"] if n in T else mg.PROCESSES[old].get("split")
         procs[pp(n)] = {**own,
