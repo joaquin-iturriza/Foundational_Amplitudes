@@ -4048,6 +4048,12 @@ entries:
     units: null
     start: '2026-10-30T09:55:50+00:00'
     at: '2026-10-30T09:55:50+00:00'
+  - batch: catalog_v4_gridpack_last
+    wall_h: 1.0
+    jobs: 64
+    units: null
+    start: '2026-10-30T10:44:15+00:00'
+    at: '2026-10-30T10:44:15+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
