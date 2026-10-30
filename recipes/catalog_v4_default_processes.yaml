@@ -340,11 +340,11 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 11.07
+      n_runs: 2
+      run_events: 31774
+      accept_short: true
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_bb_bbgg
     reuse: pp13v4_bb_bbgg
     split: train
@@ -10621,11 +10621,11 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 135.5
+      n_runs: 5
+      run_events: 23312
+      accept_short: true
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ddx_awpwmz
     reuse: pp13_ddx_awpwmz
     split: train
@@ -10966,11 +10966,11 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 3.43
+      n_runs: 3
+      run_events: 24451
+      accept_short: true
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ddx_duxwpz
     reuse: pp13v4_ddx_duxwpz
     split: train
@@ -14826,10 +14826,14 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 67
-      gridpack: 13057
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 2
+      - 53
+      - 53
+      accept_short: true
     parent: v4_epem_aaccx
     reuse: ee4_epem_aaccx
     split: train
@@ -15087,10 +15091,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
     parent: v4_epem_aawpwm
     reuse: ee4_epem_aawpwm
     split: train
@@ -15286,10 +15286,14 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 67
-      gridpack: 13057
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 74
+      - 74
+      - 74
+      accept_short: true
     parent: v4_epem_accxg
     reuse: ee4_epem_accxg
     split: train
@@ -15388,10 +15392,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 21
+      - 21
+      accept_short: true
     parent: v4_epem_accxz
     reuse: ee4_epem_accxz
     split: train
@@ -16282,10 +16289,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 101
-      gridpack: 16001
     parent: v4_epem_awpwmz
     reuse: ee4_epem_awpwmz
     split: train
@@ -16631,10 +16634,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
     parent: v4_epem_bbxgz
     reuse: ee4_epem_bbxgz
     split: train
@@ -16784,10 +16783,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
     parent: v4_epem_bbxwpwm
     reuse: ee4_epem_bbxwpwm
     split: train
@@ -17130,10 +17125,13 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
+      energy_runs:
+      - 1
+      - 1
+      - 1
+      - 3
+      - 3
+      accept_short: true
     parent: v4_epem_ccxgz
     reuse: ee4_epem_ccxgz
     split: train
@@ -17815,10 +17813,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
     parent: v4_epem_epemhz
     reuse: ee4_epem_epemhz
     split: train
@@ -18022,10 +18016,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
     parent: v4_epem_epemwpwm
     reuse: ee4_epem_epemwpwm
     split: train
@@ -18122,10 +18112,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 81
-      gridpack: 13057
     parent: v4_epem_epemzz
     reuse: ee4_epem_epemzz
     split: train
@@ -18801,10 +18787,11 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 134
-      gridpack: 21334
+      energy_runs:
+      - 1
+      - 1
+      - 3
+      accept_short: true
     parent: v4_epem_hwpwmz
     reuse: ee4_epem_hwpwmz
     split: train
@@ -20304,10 +20291,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 101
-      gridpack: 16001
     parent: v4_epem_wpwmzz
     reuse: ee4_epem_wpwmzz
     split: train
@@ -20356,10 +20339,6 @@ processes:
       - 500.0
       - 1000.0
       - 3000.0
-      complete_runs: true
-      run_events: 200
-      n_runs: 101
-      gridpack: 16001
     parent: v4_epem_wpwpwmwm
     reuse: ee4_epem_wpwpwmwm
     split: train
@@ -20869,11 +20848,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 23
+      run_events: 2329
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_gg_gggg
     reuse: pp13_gg_gggg
     split: train
@@ -20960,11 +20937,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 86
+      run_events: 621
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ub_abdwp
     reuse: pp13v4_ub_abdwp
     split: train
@@ -21007,11 +20982,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 3
+      run_events: 22966
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ub_abgu
     reuse: pp13v4_ub_abgu
     split: train
@@ -21183,11 +21156,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 38398
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ub_bdhwp
     reuse: pp13v4_ub_bdhwp
     split: train
@@ -23181,11 +23152,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 30.1
+      n_runs: 65
+      run_events: 24959
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ucx_cxggu
     reuse: pp13v4_ucx_cxggu
     split: train
@@ -23736,11 +23706,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 38.67
+      n_runs: 13
+      run_events: 163416
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ucx_dsxzz
     reuse: pp13_ucx_dsxzz
     split: train
@@ -23872,11 +23841,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 4
+      run_events: 13352
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ud_adgu
     reuse: pp13v4_ud_adgu
     split: train
@@ -24005,11 +23972,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 86
+      run_events: 621
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ud_bbxdu
     reuse: pp13v4_ud_bbxdu
     split: train
@@ -24052,11 +24017,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 6
+      run_events: 10521
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ud_dddxu
     reuse: pp13v4_ud_dddxu
     split: train
@@ -24230,11 +24193,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 14.71
+      n_runs: 42
+      run_events: 19671
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ud_ddwpz
     reuse: pp13v4_ud_ddwpz
     split: train
@@ -24527,11 +24489,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 5
+      run_events: 10873
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ud_duuux
     reuse: pp13v4_ud_duuux
     split: train
@@ -24705,11 +24665,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 7
+      run_events: 7757
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ud_uuwmz
     reuse: pp13v4_ud_uuwmz
     split: train
@@ -24752,11 +24710,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 3.92
+      n_runs: 10
+      run_events: 26624
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_aaawp
     reuse: pp13_udx_aaawp
     split: train
@@ -25053,11 +25010,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 2.14
+      n_runs: 6
+      run_events: 31078
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_aawpz
     reuse: pp13_udx_aawpz
     split: train
@@ -25826,11 +25782,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 35864
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_agwpz
     reuse: pp13_udx_agwpz
     split: train
@@ -26247,11 +26201,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 14.28
+      n_runs: 41
+      run_events: 19400
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_awpwpwm
     reuse: pp13_udx_awpwpwm
     split: train
@@ -27390,11 +27343,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 33093
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_ddxgwp
     reuse: pp13v4_udx_ddxgwp
     split: train
@@ -27609,11 +27560,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 13
+      run_events: 4140
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_dxggu
     reuse: pp13v4_udx_dxggu
     split: train
@@ -29288,11 +29237,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 4
+      run_events: 16440
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_gwpwpwm
     reuse: pp13_udx_gwpwpwm
     split: train
@@ -29584,10 +29531,6 @@ processes:
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_htaptamwp
     reuse: pp13_udx_htaptamwp
     split: train
@@ -30334,11 +30277,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 4
+      run_events: 14620
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_udx_wpwpwmz
     reuse: pp13_udx_wpwpwmz
     split: train
@@ -31099,11 +31040,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 4
+      run_events: 13537
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ug_ccxgu
     reuse: pp13v4_ug_ccxgu
     split: train
@@ -31859,11 +31798,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 6
+      run_events: 9726
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_ug_guuux
     reuse: pp13v4_ug_guuux
     split: train
@@ -33776,11 +33713,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 11
+      run_events: 5184
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uu_ddxuu
     reuse: pp13v4_uu_ddxuu
     split: train
@@ -33868,11 +33803,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 7
+      run_events: 7923
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uu_duwpz
     reuse: pp13v4_uu_duwpz
     split: train
@@ -34090,11 +34023,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 21.98
+      n_runs: 12
+      run_events: 101838
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uu_guuz
     reuse: pp13v4_uu_guuz
     split: train
@@ -34261,11 +34193,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 11
+      run_events: 5052
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uu_uuuux
     reuse: pp13v4_uu_uuuux
     split: train
@@ -34482,11 +34412,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 45047
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_aaddx
     reuse: pp13v4_uux_aaddx
     split: train
@@ -35039,11 +34967,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 30154
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_addxz
     reuse: pp13v4_uux_addxz
     split: train
@@ -35382,11 +35308,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 70.4
+      n_runs: 37
+      run_events: 101838
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_aguux
     reuse: pp13v4_uux_aguux
     split: train
@@ -35971,11 +35896,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 3.09
+      n_runs: 12
+      run_events: 18829
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_awpwmz
     reuse: pp13_uux_awpwmz
     split: train
@@ -36230,11 +36154,9 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      n_runs: 2
+      run_events: 51010
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_bbxzz
     reuse: pp13v4_uux_bbxzz
     split: train
@@ -36788,11 +36710,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 3.46
+      n_runs: 15
+      run_events: 15808
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_ddxzz
     reuse: pp13v4_uux_ddxzz
     split: train
@@ -37595,11 +37516,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 68.73
+      n_runs: 36
+      run_events: 101838
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_gguux
     reuse: pp13v4_uux_gguux
     split: train
@@ -37977,11 +37897,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 13.37
+      n_runs: 28
+      run_events: 26727
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_guuxz
     reuse: pp13v4_uux_guuxz
     split: train
@@ -39525,11 +39444,10 @@ processes:
       label_alphas: running_sqrt_shat
       source: catalog_v4's parameter card (a v4 tree standalone's), Daniel's 13 TeV
         run card
+      margin: 3.24
+      n_runs: 13
+      run_events: 17108
       parts: true
-      complete_runs: true
-      run_events: 1000
-      n_runs: 66
-      gridpack: 52001
     parent: v4_uux_wpwmzz
     reuse: pp13_uux_wpwmzz
     split: train
