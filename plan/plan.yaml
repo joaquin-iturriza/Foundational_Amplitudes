@@ -4148,6 +4148,12 @@ entries:
     units: null
     start: '2026-10-30T10:44:15+00:00'
     at: '2026-10-30T10:44:15+00:00'
+  - batch: cgsxwm_runsize_probe
+    wall_h: 1.25
+    jobs: 30
+    units: null
+    start: '2026-10-30T11:17:21+00:00'
+    at: '2026-10-30T11:17:21+00:00'
   step_why:
     10:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
