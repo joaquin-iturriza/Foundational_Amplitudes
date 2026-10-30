@@ -4025,6 +4025,31 @@ entries:
       grid_seed_runs 15, gridpack_eid of the current layout), as many as ceil(400 / (min(0.8, share/1.25) x size)), other
       energies unchanged; assembled, then its queue parts checked with sizecheck --parts against the same reference. No (no
       size reaches 0.9, or the passing sizes differ from 200): no layout; reported to Joaquin with the shares and distances.'
+    fix_at: '2026-10-30T11:14:10+00:00'
+    fix: 'Check 3 (seeds against spread) fails, and with it the yes branch of check 4. The outcome asks for a detectable KS
+      under 0.018 at each size, but the run counts cannot give it. Reference: 128 runs of 200 at the measured 3000 GeV complete
+      share of 0.4375 (7 of 16) is about 56 complete runs, about 11200 events. Tested sizes: about 7500 to 9600 complete events
+      each (100: 128 runs; 50: 192; 25: 384). With short_run_bias.py _detectable (1.358 x sqrt((n+m)/(n m))) that is 0.019
+      to 0.020 at 5 percent, and about 0.022 to 0.023 at the design''s Bonferroni level of 0.05/3. These are event-level floors;
+      the run-level test needs more. So no size can meet the yes criterion, and the probe would end in No because it lacks
+      power, not because of anything in the physics. The size bias the check cites was itself seen only just above its floor:
+      amupvmwm runs of 200 against runs of 13057 gave KS 0.018 with a detectable 0.0166, using 7800 and 46368 events (short_run_bias_size.json).
+      Fix: size the reference and each tested ask from the measured shares so that the floor at 0.05/3 is about 0.012 or less.
+      With equal sides that needs about 2 x (1.55/0.012)^2, roughly 33000 events a side, or a larger reference with fewer
+      events per size. For example, about 400 runs of 200 (at 0.44 share, about 35000 events), and for each smaller ask enough
+      runs for about 25000 complete events, with that ask''s share assumed pessimistically. State the resulting core-hours.
+      Check 4 (outcome) also fails: no branch covers the result being underpowered (a size passes the share and the p-value
+      but its detectable KS stays above 0.018), and ''the passing sizes differ from 200'' does not read as a defined result.
+      Fix: write the three cases (pass, a measured difference, underpowered) and what each does to the 3000 GeV layout. Recommended,
+      not a failure on its own: the reference is the 44 percent of runs of 200 that complete, so it is a selected sample that
+      no earlier test validated for this pool and energy. The probe already keeps the short runs (got < ask), so add a short-against-complete
+      run-level test at 200 (and at 100) from the same files at no extra cost. It says whether completion selects events,
+      and so whether agreeing with complete runs of 200 means agreeing with the density. Checks that hold: one change (run
+      size on one fixed gridpack, disjoint seeds, same cards, cores and timeout); the measure (the run-level test on cos theta*
+      moved 0.018 with run size on e+e-, confirmed in short_run_bias_size.json ladder/200: ks_binned 0.01797, p_runs 0.0025,
+      halves control 0.0079, p_runs 0.19); prior (searched cgsxwm, run size, gridpack, smaller runs, runs of 200 in results.tex,
+      the entry and site decisions D187-D189: par:v4_short_runs is cited correctly, no earlier run-size probe on a gridpack
+      exists); scope and the step''s ''checked against its complete 3 TeV runs first'' are covered.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
