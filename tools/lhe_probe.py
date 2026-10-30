@@ -3,13 +3,13 @@
 returns, how much of it its pool keeps, what it costs in time and disk, and what disk a CPU node has.
 
     list   --queue Q...                     the processes of the queues not assembled, one per line
-    parts  --queue Q... --out F.json        from the part files already made: per process (assembled or not) the runs
+    parts  --queue Q... --out F.json [--match RE]   from the part files already made: per process (assembled or not) the runs
                                             with a part, their events asked and returned, MadEvent seconds and cores;
                                             for a default-share pool (dsh_) the fraction of its events the mixture
                                             keeps (mg5_pipeline_final.default_share_momenta's accept: the class's
                                             sqrt(s_hat) window and fiducial cuts in the partonic frame) and what each
-                                            part of that accept removes alone
-    run    --process P [--events N] [--timeout S] [--work DIR] [--patch K=V ...]
+                                            part of that accept removes alone; an e+e- pool's kept fraction per energy
+    run    --process P [--events N] [--timeout S] [--work DIR] [--patch K=V ...] [--energy E]
                                             one MadEvent run of P (its first run's card and patches, a probe iseed) in
                                             DIR (default $TMPDIR): seconds of the MG5 output and of generate_events,
                                             events returned, the fraction kept (as above), the run directory's largest
@@ -21,7 +21,7 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             run-directory size (median, max); variants (--patch) apart
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
-import argparse, glob, json, os, shutil, signal, socket, subprocess, sys, time
+import argparse, glob, json, os, re, shutil, signal, socket, subprocess, sys, time
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 sys.path.insert(0, ROOT)
@@ -101,7 +101,10 @@ def cmd_parts(a):
             except Exception as e:                       # a layout this checkout no longer gives
                 out[name] = {"queue": os.path.basename(q), "error": f"{type(e).__name__}: {e}"}
                 continue
+            if a.match and not re.search(a.match, name):
+                continue
             asked, got, secs, cores, Ps = [], [], [], [], []
+            byE = {}                                     # e+e-: up to 5 parts per collider energy
             for p, run in parts:
                 try:
                     with np.load(p) as z:
@@ -110,6 +113,8 @@ def cmd_parts(a):
                         asked.append(int(run[1]))
                         if len(Ps) < 20:
                             Ps.append(m)
+                        if run[2].get("ebeam1") is not None and len(byE.setdefault(2 * float(run[2]["ebeam1"]), [])) < 5:
+                            byE[2 * float(run[2]["ebeam1"])].append(m)
                 except (FileNotFoundError, OSError, KeyError, ValueError):
                     continue
             acc = accept_of(name)
@@ -120,6 +125,10 @@ def cmd_parts(a):
                  "run_events": parts[0][1][1], "nfinal": int(mg.PROCESSES[name]["nfinal"])}
             if Ps:
                 r.update(kept(np.concatenate(Ps), acc))
+            if byE and acc is not None:
+                # the pool takes equal shares of the energies, so what it keeps is the mean over them of each one's
+                r["kept_by_energy"] = {f"{E:g}": kept(np.concatenate(ms), acc)["kept"] for E, ms in sorted(byE.items())}
+                r["energies"] = [float(e) for e in mg.PROCESSES[name]["lhe"]["energies"]]
             out[name] = r
     with open(a.out, "w") as f:
         json.dump(out, f, indent=0, sort_keys=True)
@@ -149,6 +158,8 @@ def cmd_run(a):
         iseed = mg.lhe_iseed(name, 9999 + a.seed)              # a probe seed, not one of the pool's runs
         runs = mg.lhe_runs(name, mg.lhe_iseed(name, 42), mg.lhe_n_requested(cfg))
         patches = dict(runs[0][2])
+        if a.energy:                                               # an e+e- pool's run at another of its energies
+            patches.update({"ebeam1": a.energy / 2.0, "ebeam2": a.energy / 2.0})
         run_card, param_card = mg.lhe_cards(cfg)
         shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
         shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
@@ -256,8 +267,10 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("list"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("parts"); s.add_argument("--queue", nargs="+", required=True); s.add_argument("--out", required=True)
+    s.add_argument("--match", default=None, help="only the processes whose name matches this regex")
     s = sub.add_parser("run"); s.add_argument("--process", required=True); s.add_argument("--events", type=int, default=1000)
     s.add_argument("--timeout", type=float, default=720.0); s.add_argument("--work", default=None)
+    s.add_argument("--energy", type=float, default=None, help="e+e-: the collider energy (default: the first run's)")
     s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     sub.add_parser("node")
