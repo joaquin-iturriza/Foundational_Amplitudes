@@ -3843,3 +3843,27 @@ entries:
   dead_ends: []
   asks: []
   writeup: 14fec1ef
+- id: agent_redesign
+  title: the redesign of how agents work on this project
+  question: Does the implemented redesign (hooks, review, supervisor, owners and hand-offs, rules-only CLAUDE.md with pushed
+    sections) hold on tonight's real states and in live use?
+  status: running
+  quotes:
+  - said_at: '2026-10-30T04:46:16.657000+00:00'
+    text: everything else I believe looks good I believe, you can start
+    decision: D186
+    covers:
+    - agent_redesign
+  decisions:
+  - D186
+  next: 'Switch-over A (safety net): fixtures of tonight''s states, tools/hook_incident.py with a site event verb, the hook
+    dispatcher with loop detection, per impl_order.txt'
+  done_when: null
+  notes_ref: null
+  match: zz_redesign_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
