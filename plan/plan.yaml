@@ -4730,6 +4730,8 @@ entries:
     agent: ab9ca0db20df22225
     state: working
     since: '2026-10-30T17:35:25+00:00'
+    context: 81468
+    context_at: '2026-10-30T17:41:25+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
