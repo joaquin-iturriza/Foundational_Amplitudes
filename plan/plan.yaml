@@ -2647,7 +2647,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 123d1f23
+    commit: 06bbe8e3
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -2710,6 +2710,24 @@ entries:
       energy too), merge yields, plan the passing ones in a third queue (catalog_v4_gridpack_57 has live workers) or after
       it drains; cgsxwm: its 3000 GeV layout resized from the measured complete share (more runs, or a larger gridpack at
       that energy), then rebuilt.'
+    - 'HAND-OFF (2026-10-30 ~11:00, per-energy fix). (1) CODE merged to trunk b08f0c73 (repo-reviewer PASS): lhe_probe kept
+      --by-energy-out (yield and complete share per pool and energy), --yields-out = a gridpack pool''s worst energy; complete_layout
+      sizes energies of a pool flagged size_from_probe in complete_runs.json at ceil(need/(min(0.8, share/1.25) x run_events)),
+      refuses a share under 1/2 (generation rule: fix, never absorb), grid_events raises gridpack precision; test_kept_by_energy_and_sizing.
+      Real cgsxwm logs: 3000 GeV yield 0.5162, complete 0.4375. (2) FIRST QUEUE catalog_v4_gridpack ended: 54 of 56 assembled;
+      ee4_epem_abbxg (3000 GeV: 200 of 334, complete share 0.6875) and ee4_epem_cgsxwm failed; bbxwpwm, bgtxwp, bhtxwp assembled
+      (assembly enforces equal per-energy share). Queue removed from site queue (E2790 acked by coordinator); stale-layout
+      guard: _run_task calls layout_current before any build or assembly, and no claims are left. (3) abbxg rebuilt with energy_runs
+      [3,3,3,3,3,4] in queue catalog_v4_gridpack_fix (6 gridpacks + 19 runs, 2 workers FA-ccin2p3-b5003864, 50d5019a, target
+      1 h). cgsxwm: gridpack 52228 (4x floor), re-probe FA-ccin2p3-67ba0a36 (limit 2 h); NOT queued yet. (4) 18-pool probe:
+      6 done (dsh_epem_aaccx, accxz, epemhz, hwpwmz, dsh_udx_gwpwpwm 1.0 (was 0.413), ee4_epem_btxwp; worst complete share
+      >= 0.9375), queued in catalog_v4_gridpack_probed (1696 runs, 16 workers 62812638-62812896, target 1 h); 12 still running
+      (slurm 62811185-62811231). (5) catalog_v4_gridpack_57: 39 pools, 60 workers, was at 1872+ done, 0 failed. NEXT: when
+      cgsxwm''s probe ends, kept --by-energy-out on its log: 3000 GeV share >= 0.5 -> set size_from_probe, regenerate, plan
+      it in a small queue; under 0.5 -> report. When the 12 probes end: kept --by-energy-out, any energy share under 0.8 ->
+      size_from_probe, under 0.5 -> hold and report; the rest into a new queue. Check every queue ends with all pools assembled;
+      remove finished queues from site queue. Worktree worktrees/wt-energy-yields left in place (its removal was refused by
+      the permission check); branch merged.'
     - 'HAND-OFF (2026-10-30, gridpack step). (1) CODE: commit 7bdc5729 (+39914802 measure). mg5_pipeline_final.py: lhe_make_gridpack(process,
       ev, nevents, iseed, log, mg_cores, patches, run_name=''grid'') runs lhe_run_madevent with run-card gridpack=True (lhe_run_madevent
       now returns lhe=None for a gridpack run instead of raising) and returns <ev>/grid_gridpack.tar.gz; lhe_run_gridpack(tar,
@@ -2870,6 +2888,7 @@ entries:
     - analysis/catalog_v4/data/complete_runs.json
     - analysis/catalog_v4/data/control_pool_ids_1d9d6a29.json
     - analysis/catalog_v4/data/density_check.json
+    - analysis/catalog_v4/data/lhe_probe_by_energy.json
     - analysis/catalog_v4/data/lhe_probe_yields.json
     - analysis/catalog_v4/data/mixed_order_audit.json
     - analysis/catalog_v4/data/pp_trained_compare.json
