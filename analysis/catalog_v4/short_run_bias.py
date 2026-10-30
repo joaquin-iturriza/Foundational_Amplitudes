@@ -326,6 +326,22 @@ def cmd_measure(a):
             if lg and len(sm) >= 2:
                 r[f"size_{ask}"] = dict(_compare(sm, lg, feats), runs_small=len(sm), runs_large=len(lg),
                                         detectable_ks_5pct=_detectable(sm, lg))
+        # size ladder: complete runs of each ask against those of the group's largest ask (2+ runs a side), so a size
+        # is tested against the largest runs alone rather than a mix of large sizes; keyed "<ask>/<feature>"
+        by = {}
+        for F, s in zip(Fc, comp):
+            by.setdefault(s["asked"], []).append(F)
+        top = max(by) if by else None
+        if top and len(by[top]) >= 2:
+            lad = {}
+            for ask in sorted(by):
+                if ask < top and len(by[ask]) >= 2:
+                    for f, v in _compare(by[ask], by[top], feats).items():
+                        lad[f"{ask}/{f}"] = dict(v, ask=ask, ask_large=top, runs_small=len(by[ask]),
+                                                 runs_large=len(by[top]),
+                                                 detectable_ks_5pct=_detectable(by[ask], by[top]))
+            if lad:
+                r["ladder"] = lad
         res[c if c not in res else f"{c}#{key[:6]}"] = r
         print(f"[short_run_bias] {c}: short {n_s} ({len(short)} runs) vs complete {n_c} ({len(comp)} runs): "
               + ", ".join(f"{f} KS {v['ks']} p {v['p']:.2g} p_runs {v.get('p_runs')}"
@@ -350,7 +366,7 @@ def summary(d, alpha=0.05):
     out = {"groups": len(d["groups"])}
     sizes = sorted({k for r in d["groups"].values() for k in r if k.startswith("size_")})
     for kind in ("short_vs_complete", "deep_vs_complete", "control_complete_halves",
-                 "control_complete_small_vs_large", *sizes):
+                 "control_complete_small_vs_large", *sizes, "ladder"):
         T = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get(kind) or {}).items() if isinstance(v, dict)]
         R = [(c, f, v) for c, f, v in T if "p_runs" in v]
         out[kind] = {"tests_events": len(T),
