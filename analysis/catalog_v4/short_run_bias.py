@@ -472,7 +472,23 @@ def cmd_reread(a):
                 if k in y and k != "hist":
                     walk(x[k], y[k], f"{path}/{k}" if path else k)
     walk(o.get("groups", o), n.get("groups", n), "")
-    print("REREAD_JSON " + json.dumps({"event_ks_same": same, "event_ks_differ": diff, "tests": rows}), flush=True)
+    # why a test did not reproduce: per group of the old measurement, its sides' runs and events against the re-read's
+    # (a group gone from the re-read, or a side of other runs or events, means the files it saw are not those on disk)
+    sides = {}
+    og, ng = o.get("groups") or {}, n.get("groups") or {}
+    bad = {p.split("/")[0] for p, r in rows.items() if not r["ks_event_same"]}
+    for g, r in og.items():
+        if g not in ng:
+            sides[g] = "missing in re-read"
+            continue
+        if g not in bad:
+            continue
+        sides[g] = {s: {k: [r[s].get(k), ng[g].get(s, {}).get(k)] for k in ("runs", "events", "asked")
+                        if r[s].get(k) != ng[g].get(s, {}).get(k)}
+                    for s in ("complete", "short", "deep") if isinstance(r.get(s), dict)}
+        sides[g]["processes"] = [r.get("processes"), ng[g].get("processes")]
+    print("REREAD_JSON " + json.dumps({"event_ks_same": same, "event_ks_differ": diff, "tests": rows,
+                                       "groups_new_only": sorted(set(ng) - set(og)), "sides": sides}), flush=True)
 
 
 def summary(d, alpha=0.05):
