@@ -4801,6 +4801,15 @@ entries:
       was refused to this agent by the permission classifier. The five refused go through the launch queue (site launch catalog_coverage_step11_pp_seed2
       under D127, catalog_coverage_step14_rest under D194), ready at 19:11:20 UTC, same flags, afterok 62884376. Batch target
       steps11_14_arms_resubmit: 2.5 h, 8 jobs.'
+  - at: '2026-10-30T21:55:52+00:00'
+    text: 'pp13v4 validation tolerance (repo-reviewer, analysis/catalog_v4/pp_physics_check.py at 1f9ba825): the ''same function''
+      rule passes a pp13v4_ class when max |ln v4/label| <= max(its own standalone read, 1e-9). Evidence: own reads at most
+      1.6e-12, the smallest physics difference seen 2e-6, so 1e-9 sits three decades above the numerical floor and three below
+      any physics change; step 10 passed at max 8.3e-12 on 1301/1301 classes, so the result holds at any tolerance between
+      1e-11 and 1e-6. lhe_pp audit (tools/lhe_pp_orders_audit.py on CC, run before commit through stdin): with sidecars read,
+      0 lhe_pp entries of any prefix (pp13_ 1396, pp13v4_ 992, dc_ 1491, dE100_ 40, ee4_ 170, d4*_ 122) change their order
+      features or their target monomial; only the table-mixed entries, refused before (pp13v4_ 712, ee4_ 10), now get a target;
+      dsh_ 912 have no sidecar (not used by these runs).'
   handoff:
     state: 'Step 10 PASSED (FA-ccin2p3-f8d114ce: v4_same_function 1301/1301 classes, max |ln v4/label| 8.3e-12; ee4_ sidecars
       170 ok; the only ee4 test pool missing is ee4_epem_cgsxwm, dropped by D193 and left out by the EE4 axis; the 341 ''not
