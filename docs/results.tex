@@ -3057,11 +3057,12 @@ tests (on $d g\to d g u\bar u$ by $0.013$ and $0.0152$, $p<10^{-3}$); the fifth,
 is where the old bias was smallest. Caveat: the pp gridpack distances ($0.006$ to $0.009$) sit above the large runs'
 own halves ($0.004$ to $0.005$) and their $p$ are under $0.05$ uncorrected in $3$ of the $4$ pp tests, so a residual
 of under half the old bias is not excluded. As the design set for this outcome, the $56$ pools on the
-rebuild list are laid out as gridpack runs, and with them $57$ more that the catalog\_v4\_w3 wave showed carry the same
-problem ($8$ found assembled from runs that stopped short, $49$ it could not assemble because their runs stop short),
-$113$ pools in all (one gridpack per pool and energy, at the energy's whole need and at least
-the precision of the smallest gridpack probed for its beams, $31774$ events pp and $13057$ $e^+e^-$, runs of the probed
-sizes, $1000$ pp and $200$ $e^+e^-$, only complete runs assembled).
+rebuild list are laid out as gridpack runs. The catalog\_v4\_w3 wave found $57$ more with the same problem ($8$
+assembled from runs that stopped short, $49$ it could not assemble because their runs stop short); they are laid out the
+same way, $113$ pools in all, on the coordinating session's call, which waits on Joaquin's confirmation. The layout:
+one gridpack per pool and energy, at the energy's whole need and at least the precision of the smallest gridpack probed
+for its beams ($31774$ events pp, $13057$ $e^+e^-$), runs of the probed sizes ($1000$ pp, $200$ $e^+e^-$), only complete
+runs assembled.
 % src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_gpack.json @b6a0480f
 % allow: 16 100 1000 200 393 400 0.05 5 10^{-3} 56 13057 because they are the probe's cores, run counts and sizes, the e+e- runs that completed (GRIDPACK_SUMMARY in the logs of FA-ccin2p3-f0ed9631 and a8e18d29: 197 and 196 of 200), the test level and test count, the relabelling bound, the rebuild list's size and the gridpack floor (GRID_MIN in recipes/gen_catalog_v4_default.py)
 % claim: gridpack_primary_tests=5
