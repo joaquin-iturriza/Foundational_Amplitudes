@@ -779,22 +779,15 @@ the code again (enforced by `reviewer_resume.py`). Watermarks:
 1. **Do work on `trunk`** (or a feature branch off it).
 2. **Open a worktree for new work, always under this repo:**
    `git worktree add worktrees/wt-<feat> -b <feat> trunk`, implement and verify
-   there, then merge back into `trunk` and `git worktree remove` it. Never
+   there, then merge back into `trunk` and remove it with `bash scripts/remove_worktree.sh worktrees/wt-<feat>`. Never
    `../wt-<feat>` or any path outside the project root — keep them in `worktrees/`
    (gitignored) so parallel experiments don't clobber the trunk checkout.
    `worktree_guard.sh` nudges when I edit trunk code without one; for quick standalone
    edits it's fine to proceed on the trunk.
-   **Merging brings back the CODE and nothing else.** Sweep results, run dirs, eval
-   `.npz`, satlogs, generated datasets and figures are gitignored, so they live only
-   inside the worktree and `git worktree remove` destroys them. Before removing any
-   worktree, fold its results into the trunk:
-   ```bash
-   bash scripts/fold_worktree.sh worktrees/wt-<feat>            # what would be copied
-   bash scripts/fold_worktree.sh worktrees/wt-<feat> --apply    # copy it
-   ```
-   It copies untracked result files only (tracked ones return via the merge), never
-   deletes, and is safe to re-run. `worktree_fold_guard.sh` (`PreToolUse(Bash)`) blocks
-   the removal until this has run.
+   **Merging brings back the code only**: gitignored results (run dirs, eval `.npz`, satlogs, datasets, figures) die
+   with the worktree, so the script folds them into the trunk first (`scripts/fold_worktree.sh`), removes the worktree
+   only when every untracked file has an identical trunk copy, and deletes the merged branch;
+   `worktree_fold_guard.sh` blocks a hand removal.
 3. **Commit small and often; pushing is automatic.** Small, frequent, readable
    commits over big dumps. The `Stop` hook pushes already-committed work, so never
    ask permission to push; to push mid-turn just run `git push` (allowlisted).

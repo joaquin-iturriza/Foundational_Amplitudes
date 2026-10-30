@@ -69,12 +69,11 @@ for n in $names; do
     echo "exist NOWHERE ELSE. Merging the branch does not move them -- they are gitignored,"
     echo "so removing the worktree destroys them permanently."
     echo
-    echo "Fold them into the trunk first:"
-    echo "  bash scripts/fold_worktree.sh worktrees/$n              # see what would be copied"
-    echo "  bash scripts/fold_worktree.sh worktrees/$n --apply      # copy them"
+    echo "Remove it with the one command that folds them first, then removes it and its merged branch:"
+    echo "  bash scripts/remove_worktree.sh worktrees/$n"
     echo
     echo "First still-missing file: $pending"
-    echo "Then retry the removal. (This already cost the l2_poly_uugg sweep once.)"
+    echo "Then run that command. (This already cost the l2_poly_uugg sweep once.)"
   } >&2
   exit 2
 done
