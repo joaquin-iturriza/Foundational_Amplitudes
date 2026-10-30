@@ -27,7 +27,7 @@ against those of its largest when 3x apart (whether a run that completes depends
 shares: not measured; each pool is one partonic subprocess (fixed beam flavours) and neither the part files nor the
 pools keep MadEvent's integration channel of an event.
 """
-import argparse, glob, hashlib, json, os, re, sys
+import argparse, glob, hashlib, json, math, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
@@ -737,12 +737,18 @@ def cmd_sizecheck(a):
 def sizesummary(d, alpha=0.05, share_min=0.9, floor_max=0.013):
     """The run-size probe's outcome per size (catalog_coverage, design of 2026-10-30 11:15): PASS when the complete share
     is at least share_min, the run-level p is not under alpha / (the sizes tested) and the event-level detectable
-    distance at 5% is at most floor_max; DIFFERS when the p is under it; UNDERPOWERED when share and p pass but the floor
+    distance at that level is at most floor_max; DIFFERS when the p is under it; UNDERPOWERED when share and p pass but the floor
     does not; LOW_SHARE when the share alone fails. The largest PASS size is the layout's (none: nothing laid out). Also
     the reference halves control and the short runs against the reference (whether the reference is a selected sample)."""
+    srcs = {k.split("/")[0] for k in d["asks"] if not k.startswith("parts")}
+    if len(srcs) != 1:
+        raise SystemExit(f"sizesummary: probe runs from {len(srcs)} gridpacks {sorted(srcs)}; one gridpack per check")
     A = {k.split("/")[-1]: v for k, v in d["asks"].items() if not k.startswith("parts")}
     tested = [k for k, v in A.items() if "vs_ref" in v]
     lvl = alpha / max(1, len(tested))
+    # the event-level detectable distance at the Bonferroni level (the design's floor), from the one at 5 percent that
+    # sizecheck stores: the KS critical coefficient sqrt(-ln(level / 2) / 2) over its value at 5 percent, 1.358
+    at_lvl = math.sqrt(-math.log(lvl / 2.0) / 2.0) / 1.358
     out = {"process": d["process"], "energy": d["energy"], "ref_ask": d["ref_ask"], "ref_runs": d["ref"]["runs"],
            "ref_events": d["ref"]["events"], "level": round(lvl, 5), "sizes": {}}
     c = (d.get("control_ref_halves") or {}).get("cos_theta_star")
@@ -754,10 +760,10 @@ def sizesummary(d, alpha=0.05, share_min=0.9, floor_max=0.013):
              "share": v.get("complete_share")}
         if "vs_ref" in v:
             w = v["vs_ref"]
-            e.update(ks=round(w["ks_binned"], 4), p=w["p_runs"], floor=w["detectable_ks_5pct"])
+            e.update(ks=round(w["ks_binned"], 4), p=w["p_runs"], floor=round(w["detectable_ks_5pct"] * at_lvl, 4))
             ok_share = e["share"] is not None and e["share"] >= share_min
             e["outcome"] = ("DIFFERS" if w["p_runs"] < lvl else "LOW_SHARE" if not ok_share else
-                            "UNDERPOWERED" if w["detectable_ks_5pct"] > floor_max else "PASS")
+                            "UNDERPOWERED" if e["floor"] > floor_max else "PASS")
         if "short_vs_ref" in v:
             w = v["short_vs_ref"]
             e["short"] = {"runs": w["runs_short"], "ks": round(w["ks_binned"], 4), "p": w["p_runs"]}
