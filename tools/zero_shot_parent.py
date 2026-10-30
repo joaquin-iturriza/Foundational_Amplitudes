@@ -77,8 +77,20 @@ _pcfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
 _train_recipe = _pcfg.data.get("processes_file", None)
 physics_ref = (pool_physics.TrainingReference(siteconf._expand_str(str(_train_recipe)))
                if _train_recipe and str(_train_recipe) != "None" else None)
+
+# a role a probe has no pool of is read from one it has (rebuild_run.stand_in_split_set; EE4: the test pool only); the
+# role its own target statistics came from is recorded (own_stats_role): q_own and val_loss_affine are in its units,
+# t, q and mse_logm2_real do not depend on it
+import datagen  # noqa: E402
+from rebuild_run import recipe_role_counts, stand_in_role, stand_in_split_set  # noqa: E402
+_ensure_split_set = datagen.ensure_split_set
+
 for recipe in a.recipes:
     recipe = os.path.abspath(siteconf._expand_str(recipe))
+    _counts = recipe_role_counts(recipe)
+    datagen.ensure_split_set = stand_in_split_set(_ensure_split_set, _counts, a.split)
+    _roles = sorted({stand_in_role(_counts, n, "train", a.split)[0] for n in _counts})
+    own_stats_role = _roles[0] if len(_roles) == 1 else _roles
     cfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
@@ -159,6 +171,7 @@ for recipe in a.recipes:
     else:
         mu_c = sd_c = None; kind = "per_process"
     rec = {"probe": probe, "split": a.split, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
+           "own_stats_role": own_stats_role,
            "n_val": int(len(z)),   # the events scored, of --split (key kept for the readers)
            "var_logm2": float(np.var(t)), "val_loss_affine": affine,
            "affine_ab": [float(c) for c in coef], "twin": twins.get(probe), "transform": str(tr[0]),

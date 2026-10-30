@@ -71,6 +71,37 @@ def scored_split(exp, split, name):
     return loader, pool, exp._split_indices[split]
 
 
+def recipe_role_counts(recipe):
+    """{process: {role: events}} of a recipe file."""
+    r = yaml.safe_load(open(recipe))
+    return {e["name"]: {"train": int(e.get("n_train", 0) or 0), "val": int(e.get("n_val", 0) or 0),
+                        "test": int(e.get("n_test", 0) or 0)} for e in (r.get("processes", r) if isinstance(r, dict) else r)}
+
+
+def stand_in_role(counts, name, role, scored):
+    """(role, events) a probe's `role` is read from: its own when it has events, else the first role it has of the
+    scored split, test, val, train; (role, 0) when it has none."""
+    c = counts.get(name) or {}
+    if c.get(role):
+        return role, c[role]
+    return next(((r, c[r]) for r in [scored] + [x for x in ("test", "val", "train") if x != scored] if c.get(r)),
+                (role, 0))
+
+
+def stand_in_split_set(real, counts, scored):
+    """datagen.ensure_split_set for a probe read: a role a probe has no pool of (an EE4 probe of
+    recipes/catalog_v4_ee_test.yaml: n_train 0 and n_val 0, its test pool only) is read from a role it has (stand_in_role).
+    Its train role gives only the probe's own target statistics (fine_tune.target_stats=own), a representation
+    inverted exactly: the truth t = mu_p + sd_p z, the prediction q and mse_logm2_real do not depend on it."""
+    def split(specs, role, seed, dest_dir=None, require_cache=False):
+        out = {}
+        for s in specs:
+            r, n = (role, s["n_events"]) if int(s["n_events"]) > 0 else stand_in_role(counts, s["process"], role, scored)
+            out.update(real([dict(s, n_events=n)], role=r, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
+        return out
+    return split
+
+
 def _build(cfg, swap, path, name):
     """The experiment built through init_model, with the `swap` role's pool read from `path` (None: none)."""
     real = datagen.ensure_split_set
