@@ -4284,9 +4284,9 @@ entries:
     - agent_redesign
   decisions:
   - D186
-  next: 'Apply switch-overs A and B once Joaquin gives his go (A.settings.diff then B.settings.diff in the scratchpad, patch
-    -d / -p1), then run B9''s live checks; tell him first: A''s loop rule departs from his text (guards keep refusing and
-    open an incident), the GPU budget does not see launch scripts or sweep_manager, B also unregisters context_guard''s Stop'
+  next: Switch-overs A and B are applied (11:55); read B9's live checks (the main session's background run, scratchpad live_checks.txt),
+    then start switch-over D (owners and hand-offs in the plan, sections pushed by hook, CLAUDE.md v2 and keeper v2, the supervisor's
+    known-cause rule) with a compact agent
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -4300,8 +4300,8 @@ entries:
   asks: []
   step_why:
     1:
-      feeds: whether the new hook set holds live
+      feeds: whether the new hook set holds live, and the last switch-over
       if:
-      - 'the live checks pass: start switch-over D (owners and hand-offs, sections pushed, CLAUDE.md v2 and keeper v2)'
-      - 'a live check fails: revert with the .preA/.preB copies and fix'
+      - 'the live checks pass: launch switch-over D'
+      - 'a check fails: revert with the preAB copies in the scratchpad and fix'
   step_waits: {}
