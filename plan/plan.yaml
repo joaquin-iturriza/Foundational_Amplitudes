@@ -4626,6 +4626,7 @@ entries:
     '10': run FA-ccin2p3-f8d114ce (the pp13v4 label check rerun)
     '11': step 10's label check passing
     '13': run FA-ccin2p3-44201039 (the time-matched re-read)
+    '14': step 10's label check passing
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
