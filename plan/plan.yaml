@@ -3641,6 +3641,7 @@ entries:
         queue'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
+    '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
