@@ -27,17 +27,13 @@ def main():
     cmd = ti.get("command") or ""
     if tool == "Monitor":
         what = "a Monitor"
-    elif tool == "Bash" and ti.get("run_in_background") and agent:
-        # an agent's background command outlives its turn and wakes the main session at every stop (2026-10-30)
-        what = "a background command"
     elif tool == "Bash" and ti.get("run_in_background") and not WATCH.match(cmd) \
             and (POLL.search(cmd) or LOOP.search(cmd)):
         what = "a background command that polls or loops"
     else:
         return 0
     print("wait_guard: %s is refused: nobody waits on jobs. %s" % (what,
-          "Run it in the foreground with a Bash timeout up to 600000 ms, or as a site job; never leave a command "
-          "running behind you. Jobs: record them (plan run), write where the work stands and end your turn; the "
+          "Jobs: record them (plan run), write where the work stands and end your turn; the "
           "supervisor's event resumes you with SendMessage." if agent else "The watch is `site supervise` and one "
           "`site events --wait` in the background; an event wakes you, nothing else waits."), file=sys.stderr)
     return 2
