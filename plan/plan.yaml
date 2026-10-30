@@ -4189,7 +4189,7 @@ entries:
       - 'Joaquin accepts leaving it out or reusing the old pool: mixcheck over the 112 and record the exception'
   owner:
     agent: a5b71194556cf7e47
-    state: working
+    state: stopped
     since: '2026-10-30T11:33:41+00:00'
     context: 118530
     context_at: '2026-10-30T12:48:21+00:00'
