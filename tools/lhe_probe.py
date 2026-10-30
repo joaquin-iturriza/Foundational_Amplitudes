@@ -27,6 +27,8 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
     runsize --queue Q... [--max-run N] [--min-events M]   default-share pp parts from runs of at most N events
                                             against the reuse pool's events (runs of 10k+), KS on sqrt(s_hat), max |eta|,
                                             max pT
+    runlevel --queue Q... [--match RE]     the runsize pass with the run as the unit: reuse pools' short runs, rows'
+                                            runs from the shuffle, within-run correlation, run-level permutation test
     node                                    the node's disks (TMPDIR, /tmp, SCRATCH), cores and memory, one JSON line
 """
 import argparse, glob, json, math, os, re, shutil, signal, socket, subprocess, sys, time
@@ -541,6 +543,135 @@ def _sqrt_shat(P):
     return np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None))
 
 
+def _runsize_feats():
+    """The run-size test's features of momenta P (n, k, 4), lab frame as generated."""
+    return {"sqrt_shat": _sqrt_shat,
+            "max_abs_eta": lambda P: np.abs(np.arcsinh(P[:, 2:, 3] / np.clip(np.hypot(P[:, 2:, 1], P[:, 2:, 2]),
+                                                                            1e-9, None))).max(1),
+            "max_pt": lambda P: np.hypot(P[:, 2:, 1], P[:, 2:, 2]).max(1)}
+
+
+def _pool_row_runs(name, path):
+    """(sidecar, run index of each row of the pool at `path`, runs asked, runs got) of a serially built or assembled
+    pp pool: _lhe_finish concatenates its runs in order (events_per_run) and shuffles with SeedSequence([seed, iseed]),
+    so a row's run is recoverable. Rows' runs None when the sidecar lacks what that needs."""
+    side = json.load(open(path + ".recipe.json"))
+    lr, lh = side.get("lhe_run") or {}, side.get("lhe") or {}
+    per = [int(x) for x in lr.get("events_per_run") or []]
+    asked = None
+    if lh.get("iseed") is not None and lh.get("n_requested"):
+        runs = mg.lhe_runs(name, int(lh["iseed"]), int(lh["n_requested"]))
+        by_seed = {int(r[0]): int(r[1]) for r in runs}
+        asked = [by_seed.get(int(i)) for i in lr.get("iseeds") or []]
+    n_lhe = int(lr.get("n_lhe_events") or 0)
+    blk = lh.get("block")
+    if not per or n_lhe != sum(per) or not blk or side.get("seed") is None:
+        return side, None, asked, per
+    order = np.random.default_rng(np.random.SeedSequence([int(side["seed"]), int(lh["iseed"])])).permutation(n_lhe)
+    run_of = np.repeat(np.arange(len(per)), per)
+    return side, run_of[order[int(blk[0]):int(blk[1])]], asked, per
+
+
+def cmd_runlevel(a):
+    """The run-size pass's differences with the run as the unit (catalog_coverage, 2026-10-30): per default-share pp
+    pool the runsize pass compares, (1) its reuse pool's runs from the sidecar (asked against returned: short, deep
+    under 0.3 of the ask); (2) the reconstruction of each pool row's run (_pool_row_runs) checked on the dsh pool's own
+    train block against its parts (share of rows found in the part of their reconstructed run); (3) per feature,
+    within-run correlation on each side (Kruskal-Wallis across runs: p small = runs differ beyond their events'
+    scatter, so an event-level test overstates significance); (4) the run-level permutation test of the dsh runs
+    against the reuse pool's runs (short_run_bias.run_perm, binned KS); (5) with short reuse runs, the event KS of the
+    dsh events against the reuse pool's complete-run rows only."""
+    from scipy.stats import ks_2samp, kruskal
+    sys.path.insert(0, os.path.join(ROOT, "analysis", "catalog_v4"))
+    from short_run_bias import run_perm
+    rx = re.compile(a.match) if a.match else None
+    feats = _runsize_feats()
+    out = {}
+    for q in _queues(a.queue):
+        D = lp._dirs(q)
+        for sf in sorted(glob.glob(os.path.join(D["specs"], "dsh_*.json"))):
+            name = os.path.basename(sf)[:-5]
+            if rx and not rx.search(name):
+                continue
+            cfg = mg.PROCESSES[name]
+            per_ask = int(cfg["lhe"].get("run_events") or 0)
+            if not per_ask or per_ask > a.max_run or cfg["lhe"].get("energies") or name in out:
+                continue
+            units, ids = [], []
+            for p, r in mg.lhe_part_paths(name, lp._spec(D, name)):
+                try:
+                    with np.load(p) as z:
+                        units.append(np.asarray(z["mom"], dtype=np.float64)); ids.append(int(r[0]))
+                except (FileNotFoundError, OSError, KeyError, ValueError):
+                    pass
+            if not units or sum(len(u) for u in units) < a.min_events:
+                continue
+            reuse = cfg.get("reuse")
+            pools = mg.default_share_pools(name, "train", 42)
+            ref = [(nm, path) for nm, _, path in pools if nm == reuse and os.path.exists(path)]
+            if not ref:
+                continue
+            r = {"reuse": reuse, "dsh_runs": len(units), "dsh_events": int(sum(len(u) for u in units)),
+                 "dsh_runs_short": int(sum(len(u) < per_ask for u in units))}
+            # (2) the row-run reconstruction, checked on the dsh pool's own train block against its parts
+            own = [path for nm, _, path in pools if nm == name and os.path.exists(path)]
+            if own:
+                try:
+                    side, rr, _, per = _pool_row_runs(name, own[0])
+                    used = [int(i) for i in (side.get("lhe_run") or {}).get("iseeds") or []]
+                    if rr is not None and len(used) == len(per):
+                        x = np.load(own[0], mmap_mode="r")
+                        k = int(cfg["nfinal"]) + 2
+                        sel = np.random.default_rng(0).choice(len(x), min(500, len(x)), replace=False)
+                        key = lambda m: tuple(np.round(np.asarray(m[:8], dtype=np.float64), 3))
+                        sets = {i: {key(m.reshape(-1)) for m in u} for i, u in zip(ids, units)}
+                        hit = sum(key(np.asarray(x[j, :4 * k], dtype=np.float64)) in sets.get(used[rr[j]], ())
+                                  for j in sel)
+                        r["recon_check"] = {"rows": int(len(sel)), "in_their_run": round(hit / len(sel), 4)}
+                except (OSError, ValueError, KeyError) as e:
+                    r["recon_check"] = {"error": str(e)[:200]}
+            nm, path = ref[0]
+            x = np.load(path, mmap_mode="r")
+            k = int(mg.PROCESSES[nm]["nfinal"]) + 2
+            B = np.asarray(x[:, :4 * k], dtype=np.float64).reshape(len(x), k, 4)
+            try:
+                side, rr, asked, per = _pool_row_runs(nm, path)
+            except (OSError, ValueError, KeyError) as e:
+                side, rr, asked, per = {}, None, None, []
+                r["reuse_sidecar_error"] = str(e)[:200]
+            short = [i for i, (g, s) in enumerate(zip(per, asked or [])) if s is not None and g < s]
+            r["reuse_sidecar"] = {"runs": len(per), "events_per_run": per, "asked_per_run": asked,
+                                  "runs_short": len(short),
+                                  "runs_deep": sum(1 for i in short if per[i] < 0.3 * asked[i]),
+                                  "rows_known_run": rr is not None and len(rr) == len(B)}
+            if rr is not None and len(rr) == len(B):
+                r["reuse_runs_in_block"] = int(len(np.unique(rr)))
+                if short:
+                    r["reuse_rows_from_short_runs"] = int(np.isin(rr, short).sum())
+            for f, fn in feats.items():
+                fa = [fn(u) for u in units]
+                fb = fn(B)
+                t = {"ks_event": round(float(ks_2samp(np.concatenate(fa), fb).statistic), 4),
+                     "p_event": float(ks_2samp(np.concatenate(fa), fb).pvalue),
+                     "kw_p_dsh": float(kruskal(*fa).pvalue) if len(fa) > 1 else None}
+                if rr is not None and len(rr) == len(B):
+                    ub = [fb[rr == i] for i in np.unique(rr) if (rr == i).sum() > 0]
+                    t["kw_p_reuse"] = float(kruskal(*ub).pvalue) if len(ub) > 1 else None
+                    rp = run_perm(fa, ub, nperm=a.nperm)
+                    if rp:
+                        t["run_level"] = rp
+                    if short:
+                        c = fb[~np.isin(rr, short)]
+                        if len(c) >= 1000:
+                            s2 = ks_2samp(np.concatenate(fa), c)
+                            t["vs_reuse_complete_rows"] = {"n": int(len(c)), "ks": round(float(s2.statistic), 4),
+                                                           "p": float(s2.pvalue)}
+                r[f] = t
+            out[name] = r
+            print(f"[runlevel] {name}: " + json.dumps(r, separators=(",", ":"))[:600], flush=True)
+    print("RUNLEVEL_JSON " + json.dumps(out), flush=True)
+
+
 def cmd_runsize(a):
     """Whether MadEvent runs of few events give the events runs of many give: for each default-share pp pool whose runs
     ask at most --max-run events and whose parts hold at least --min-events, its parts' events against its reuse pool's
@@ -579,10 +710,7 @@ def cmd_runsize(a):
             if not refs:
                 continue
             A, B = np.concatenate(ms), refs[0]
-            feat = {"sqrt_shat": _sqrt_shat,
-                    "max_abs_eta": lambda P: np.abs(np.arcsinh(P[:, 2:, 3] / np.clip(np.hypot(P[:, 2:, 1], P[:, 2:, 2]),
-                                                                                    1e-9, None))).max(1),
-                    "max_pt": lambda P: np.hypot(P[:, 2:, 1], P[:, 2:, 2]).max(1)}
+            feat = _runsize_feats()
             rc = mg.PROCESSES[reuse]
             same = (list(cfg["mg5_generate"]) == list(rc["mg5_generate"])
                     and cfg["lhe"].get("model") == rc["lhe"].get("model")
@@ -647,13 +775,16 @@ def main():
     s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)
     s.add_argument("--max-run", type=int, default=2000); s.add_argument("--min-events", type=int, default=5000)
+    s = sub.add_parser("runlevel"); s.add_argument("--queue", nargs="+", required=True)
+    s.add_argument("--max-run", type=int, default=2000); s.add_argument("--min-events", type=int, default=5000)
+    s.add_argument("--match", default=None); s.add_argument("--nperm", type=int, default=2000)
     s = sub.add_parser("summary"); s.add_argument("logs", nargs="+")
     s = sub.add_parser("kept"); s.add_argument("logs", nargs="+"); s.add_argument("--out", required=True)
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     s.add_argument("--by-energy-out", default=None, help="a gridpack pool's yield and complete-run share per energy")
     a = ap.parse_args()
-    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
+    {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
 
 if __name__ == "__main__":
