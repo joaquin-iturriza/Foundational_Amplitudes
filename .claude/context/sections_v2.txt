@@ -1,0 +1,790 @@
+# Reference sections (v2). One section per kind of work; rules stay in the two CLAUDE.md files.
+# Header: `=== SECTION <name>`, `file:` where it lives, then its triggers: `paths:` globs (relative to the project, or ~/),
+# `cmds:` Python regexes over a Bash command with quoted strings and data heredoc bodies blanked, `tools:` tool names,
+# `session:` a push at session start. The push hook (impl_order.txt step D3; design in hook_push.draft.txt, kept) sends a
+# section once per agent when any trigger matches: after a read, before an act (a write to a trigger path, a state-changing
+# command). FA sections: ~/work/FA/.claude/context/; cross-project ones: ~/.claude/context/.
+# Reused from sections.draft.txt with edits: site-tool, site-facts, fa-sites-and-paths, fa-run-and-config, fa-data,
+# fa-performance, fa-figures, fa-git-and-release, fa-sweeps-and-hpo (rule 6 marked as the why of a CLAUDE.md rule),
+# fa-canonical-setup (+ quick tests), fa-catalog-reference (was fa-catalog-generation), fa-model (the project
+# description moved to the orientation), fa-testing (+ the .venv-cpu runner). New: ledger (the supervisor's sorting),
+# working-on-the-plan, fa-generation, fa-review, fa-hooks, fa-results-notes.
+
+=== SECTION site-tool
+file: ~/.claude/context/site-tool.txt
+paths: ~/.config/ccorch/**, ~/.local/share/ccorch/**
+cmds: (^|[;&|]\s*)site\s
+---
+```
+site list                          sites and whether they are up
+site pick <project> [--jobs N --groups G --mem M]   where a job or a batch should go, per-site finish times
+site copy <project> <src> <dst> <paths...> [--to D --overwrite]   data between two sites (site to site, never via the laptop)
+site env <site> <project>          make the project runnable there: checkout + Python env +
+                                   sites/setup.sh (MadGraph, staged datasets, caches...), idempotent.
+                                   `site pick` treats a site as deployed only if
+                                   `sites/setup.sh --verify` passes there.
+site sync <site> <project>         push local commits, fast-forward the site checkout
+site submit <site|auto> <project> <job.sh> [--est-gpu-hours H] [--note ..]
+site run <site> <project> -- <cmd>   one command on the site's login node, in the checkout,
+                                   env activated: sweep generators, sweep_manager submit,
+                                   CPU dry-runs. Not for training, not for a shell loop.
+site poll [run ...]                refresh states from the schedulers
+site logs <run>                    tail the job's log
+site fetch <run>                   pull tier-0 results (metrics, small plots, configs) home
+site where <run>                   where a run's outputs live (local mirror + remote path)
+site runs [--project P] [--site S] the registry (~/.local/share/ccorch/runs.db)
+site status <site>                 queue view
+```
+
+`site pick` plans a batch so it finishes earliest: per site it measures free GPUs this request fits (host memory,
+CPUs), your running and queued jobs, the per-user submit cap, everyone else pending, and what your jobs there really
+waited and ran, and prints per site "N sweeps, done in ~X h". A sweep's trials share one filesystem, so a group never
+splits. Each named submission (`site submit <site>`, `site run ... sweep_manager.py submit`) spends one unit of the plan
+for 60 min. `site pick` treats a site as deployed only if `sites/setup.sh --verify` passes there.
+
+`site submit --hdr=--time=HH:MM:SS` overrides the script's time limit (passed to `sbatch` as a flag).
+
+Inside a job, `source "$_CCORCH_ROOT/sites/activate.sh"` resolves the site and exports `PROJECT_DIR`, `DATA_DIR`,
+`SCRATCH`, `SUBMIT_DIR`; Python uses `siteconf` (`siteconf.PROJECT_DIR`, `siteconf.slurm_header(...)`,
+`siteconf.resolve(cfg)`). Site-owned directives come from `sites/sites.yaml` + `~/.config/ccorch/sites.toml`.
+
+Where results are: `site fetch` mirrors tier-0 (metrics, summary, config, small plots) to
+`~/.local/share/ccorch/artifacts/<project>/<run>/`. Heavy artefacts stay on the site; `site where <run>` prints both
+locations. The registry (`~/.local/share/ccorch/runs.db`) records the deployed commit of every run, so a result can
+always be tied to code.
+
+=== SECTION ledger
+file: ~/.claude/context/ledger.txt
+paths: ~/.local/share/ccorch/runs.db
+cmds: \bsite\s+(decide|decisions|item|items|supervise|events|ack|digest)\b
+---
+Enforced where `~/.config/ccorch/projects.toml` has `ledger = true` (FA does).
+
+```
+site decide <project> --kind approve|hold|release|forbid|prefer|scope --quote "<the user's exact words>" --covers ...
+site decisions [--project P]       the calls in force; also printed into every new or compacted session
+site item add <project> <id> --decision D<n> --scope "what runs, how many, how long" --match 'glob,...'
+          [--check "<cmd printing {units:{name:{expected,done,active}},alerts:[]}>"] [--notes docs/results.tex]
+site items [-v]                    active and held work, with progress
+site supervise --project P         the background supervisor (below)
+site events [--wait]               open events; `--wait` is the waiter that wakes the main session on the next one
+site ack E<n> --note "what was done" [--needs-user WHAT]
+site digest --project P            since the user last looked: calls for them, findings, routine handling as
+                                   counts, item progress, whether the watch is alive
+```
+
+- `site decide` searches the transcripts (mid-turn messages and slash-command arguments included) and refuses a quote
+  the user never typed; a hold or release prints the items it covers.
+- New work: the user's words, `site decide`, `site item add`, then submit. On the site, sbatch and condor_submit refuse
+  without an item; a project's own submitters (FA: `siteconf.work_gate`) refuse anything outside the named items'
+  globs or inside a held one.
+
+The supervisor does the mechanical work, with no model, every 20 min:
+- runs the project's `maintain` commands (FA: the CC feeder, the rebalancer over `tp3_`, the disk watch), each active
+  item's check (FA: `watchdog.py --units`), and the overrun check of queued runs (with the scheduler's reason);
+- sorts every run end into one of three:
+  finished clean: COMPLETED, its end marker in the log, no error pattern;
+  hit its planned limit: TIMEOUT of a worker whose queue still has tasks and whose wall limit is the one its queue
+  states (the worker ends by design and the queue continues);
+  broke: anything else (FAILED, OUT_OF_MEMORY, NODE_FAIL, a TIMEOUT that was not a planned limit, an error pattern).
+  It acks the first two itself, the note naming the run, its class and the log line that decided it, and opens the
+  third as an event for the agent that owns the work;
+- resubmits workers only for queues the user approved (the item's decision names the queue and its limits: workers,
+  wall time per worker, total hours), within those limits, and only while the queue's layout is current (its spec
+  hash equals the recipes' and no replan is pending); otherwise it raises an ALERT;
+- collects finished runs (FA: `tools/collect_run.py`) when nothing is off; anything off is an event for the owner;
+- never resubmits a failed task;
+- raises an ALERT when a batch's progress predicts its end beyond 2× its recorded wall-time target.
+
+Events that reach an agent: RUN (a run that broke), GAP (expected results missing with nothing queued to produce
+them), OVERRUN, ALERT, READY (a comparison became possible: analyse it, write it up in the item's notes, commit, show
+the user, then ack; it closes only once its write-up is committed). `--needs-user` marks a call only the user can make.
+
+=== SECTION site-facts
+file: ~/.claude/context/site-facts.txt
+paths: sites/**, ~/.config/ccorch/sites.toml
+cmds: \bsite\s+\S+\s+(ccin2p3|jeanzay|lxplus)\b, \b(sbatch|scontrol|squeue|condor_\w+|cluster_up)\b
+---
+- CC-IN2P3: `--gpus=N` (typed `--gres` breaks its Lua plugin), `--mem` mandatory, 5 CPUs per V100 max. Compute nodes
+  have internet. It prints a login notice before every command's output; `site` strips it (`strip_banner`: each remote
+  command starts with a marker and what precedes it is dropped, plus the notice's frame anywhere; `site sync` sends a
+  bundle, as git's ssh protocol breaks on it). A parser reading raw ssh output from its first line breaks on it (it
+  once routed GPU jobs to the CPU partition: "Requested node configuration is not available").
+- Jean Zay: no `--qos`, no `--mem`; compute nodes have NO internet (stage data first); inode quota nearly full (no new
+  conda/venv with its own torch).
+- lxplus: HTCondor submits only from AFS (`SUBMIT_DIR`), code and data on EOS; 2FA: the ssh master is opened by the
+  user (`cluster_up lxplus`). `site` runs `kinit -R; aklog` before every command there so /afs stays writable. If
+  verify still says "AFS token?", the ticket's renew window ended and only the user can relogin
+  (`ssh -O exit lxplus && ssh -fN lxplus`); never ask for it while `kinit -R` still works.
+
+=== SECTION working-on-the-plan
+file: ~/work/FA/.claude/context/working-on-the-plan.txt
+session: main (SessionStart, every source)
+tools: Agent, SendMessage
+paths: plan/**, tools/plan.py
+cmds: tools/plan\.py
+---
+The plan
+- `plan/plan.yaml`, one entry per piece of work: question, objective, the user's authorising words, the mechanism it
+  tests and the expected outcome, status (`running`, `waiting_user`, `held`, `done`), owner, hand-off, the wall-time
+  targets of its batches, evidence, dead ends and `done_when` (a shell check that passes only when the entry is
+  finished). Read an entry with `python3 tools/plan.py show <id>`; write only through `tools/plan.py` (each
+  subcommand takes --help). Where hand-off prose in `docs/results.tex` disagrees, the plan wins.
+
+Roles
+- The main session talks to the user and directs agents. On every wake (the user's message, an event of an entry, an
+  agent's hand-back) it runs `plan next`, which says per entry what moves: `resume <agent>` (SendMessage carrying the
+  event), `launch` (a fresh owner from the entry's hand-off), `close <agent>` (context past the threshold), or nothing.
+  Routine events never reach it: the supervisor acks them.
+- An owner is one background agent per entry in progress (Agent tool, `run_in_background`), its brief rendered by
+  `plan brief <entry>` from `plan/step_prompt.txt`, recorded with `plan owner <entry> --agent <id>`. It covers all of
+  the entry (analyses, fixes, designs, jobs, write-ups) and is never split into more agents for the same entry.
+- While its jobs run, the owner records them, writes its state on the entry and ends its turn (stopped); the next
+  event of its entry resumes it with SendMessage. It is never replaced by a fresh agent per event.
+- After each hand-back the main session reads the owner's context from its transcript (`tools/agent_context.py
+  <agent>`). Near 300k tokens it asks the owner to close: the owner writes its hand-off on the entry (`plan handoff
+  <entry> --state --decisions "<what and why>" --ruled-out --running --files`) and ends; a fresh owner starts from
+  that hand-off.
+- A compaction inside an owner's turn is a finding (its brief or scope was too large): `plan finding <entry>`, and the
+  next brief is narrowed.
+- Delegated work goes to a fresh agent with a written brief, never a fork.
+
+Briefs
+- `plan brief <entry>` fills `plan/step_prompt.txt` with the entry; the main session's addition goes in its narrowing
+  slot only. It may narrow the task; it never overrides the capacity and scope rules, and a launch whose brief does is
+  refused.
+
+Questions
+- Before a question reaches the user, CLAUDE.md and `site decisions --project FA` are searched; only a call none of
+  them settles is asked, in the main session's message, and recorded with `plan ask <entry> --ask "<question>"
+  --searched "<what was read, why none settles it>" --blocks "<what waits>"`; only what it blocks waits. The answer:
+  `plan answer <entry> --kind K --quote "<the user's words>"` records the decision and changes the entry in one step.
+- Work held at its design: the "stop at the design" hold [D66]; the larger catalogs' "consult with me on the design"
+  [D10].
+
+Designs
+- `plan design <entry> --question --prior --measure --check --fixed --control --seeds --outcome`. `--prior` names the
+  prior work found in `docs/results.tex`, `plan show` and `site decisions` with its result, or "none found" with the
+  terms searched; `--check` says how the measure was shown, on existing data, to move with the tested change. The
+  owner launches the design-reviewer subagent itself: on PASS it submits, on FIX it revises once or records a dead end.
+  An eval-only re-read of a run under its passed design carries `REREAD=<run id>`.
+
+Jobs
+- `site pick FA --jobs N` right before the N submissions; `site submit ... --item <entry>`; record with `plan run
+  <entry> <run>` (a sweep: `--sweep <site>:<name>`) and the batch's wall-time target with `plan target <entry> --batch
+  <name> --wall <hours> --jobs N`. A batch goes out in parallel: `site sync <site> FA` once, then every launch with
+  `NOSYNC=1` (`scripts/launch_cc_only.sh`). New sweep families go into `analysis/transfer/expect_tp3.json` so the
+  item's check counts them.
+
+Done
+- `plan done <entry> --writeup <commit>` passes only when `done_when` passes, the write-up is committed and the
+  entry's commits are inside a passed review. A write-up answering a decision lists each of the user's words that names
+  a comparison or a reference, with the result that answers it.
+
+The Stop gate refuses only what the turn can clear: a running entry with something to do and no owner; an open event
+of an entry whose owner was neither resumed nor launched; a `waiting_user` question in no message to the user; a
+running entry with no approval in force or a held one with no hold; trunk numbers failing the claims check; a figure
+without its pair; a context flush wanted; a reply that leaves the user's question unanswered (once per message); a
+main-session reply not opening with "Joaquin"; the supervisor down or no armed waiter. A job running, an agent
+working, a cluster's state and the user's answer are notes.
+
+=== SECTION fa-generation
+file: ~/work/FA/.claude/context/fa-generation.txt
+paths: tools/lhe_*.py, scripts/job_lhe_*.sh, recipes/gen_catalog_*.py, mg5_pipeline_final.py, analysis/catalog_v4/data/lhe_*.json
+cmds: \blhe_(parts|probe|rates)\b, \bgen_catalog_v\d, \bmg5_pipeline_final\b
+---
+Before a full queue
+1. Probe every process (each energy of an e+e- pool) with a short run: `scripts/job_lhe_probe.sh` running
+   `tools/lhe_probe.py run`; it measures the kept fraction after the pool's cuts, wall time per event and disk per
+   run; `lhe_probe kept --yields-out` writes `analysis/catalog_v4/data/lhe_probe_yields.json`. `lhe_parts plan`
+   refuses a queue with a process the probe file lacks.
+2. Generate at the pool's cuts wherever MadGraph's run card can express them (pT, η, ΔR, pair mass), so the kept
+   fraction is near 1; only what the card cannot express is cut afterwards, by rejection.
+3. Events asked = events needed / measured kept fraction, times at most 1.25 (`KEPT_SAFETY`). A process whose factor
+   exceeds 2× is listed by `lhe_parts plan` and fixed (cuts matched, its sampling changed) before the queue goes,
+   never absorbed with more runs.
+4. Run size from the probe's time per event, so a run fits its wall limit with room; workers = the width
+   `site pick FA --jobs N --cpus C --hours H` offers, so the whole queue finishes in one wave; the wall-time target is
+   recorded (`plan target`) before submission.
+5. MadEvent working directories on node-local disk (`$TMPDIR`), copied back as parts; a saved run's directory is
+   deleted, a failed or short one trimmed to its logs [D180, D183].
+
+While it runs
+- The supervisor resubmits workers of an approved queue within its limits, and only while its layout is current; it
+  acks a worker that hit its planned limit; a failed task goes to the owner, never back in the queue on its own.
+- Never replan under live workers: `lhe_parts park Q` first (unclaimed tasks moved aside, workers end with the runs
+  they hold), then plan the new queue with `--skip-claimed Q`. A worker started under an older layout returns its task
+  (StaleLayout) instead of building a run of the old layout under the new name; `lhe_parts requeue` moves such tasks
+  back, nothing deleted.
+- Past 2× the target the supervisor raises an ALERT: read where the time goes (yields, run time, queue wait) from
+  `lhe_parts yields --queue Q` and the run records before changing anything.
+
+After
+- Assembly reads the mixture as training reads it (`lhe_probe mixcheck`) and checks short runs against the reuse pool
+  (`lhe_probe runsize`); a pool short at assembly is resized from its measured yield (`resize_short`), never padded
+  blindly.
+
+=== SECTION fa-catalog-reference
+file: ~/work/FA/.claude/context/fa-catalog-reference.txt
+paths: mg5_pipeline_final.py, recipes/gen_catalog_*.py, recipes/select_catalog_*.py, recipes/catalog_v*/**, tools/width_regen.py, analysis/catalog_v4/**
+cmds: \b(gen|select)_catalog_v\d, \bmg5_pipeline_final\b
+---
+Catalog_v3: what the pools contain and how they are sampled. Files: `mg5_pipeline_final.py` (unprefixed line numbers),
+`recipes/gen_catalog_v3.py`, `recipes/select_catalog_v3.py`. [open] = chosen with no decision of Joaquin's behind it;
+changing any row needs his decision. How a batch is generated: section fa-generation.
+
+| Knob | Value |
+|---|---|
+| fiducial cuts `FIDUCIAL_CUTS` (:2664) | pT > 10 GeV, abs(cos θ) < 0.9, ΔR > 0.4, pair mass > 10 GeV; partonic c.o.m. frame, by rejection with top-up (:2738-2790) [open] |
+| which finals are cut (:2752) | only m_final == 0 and not a neutrino: b (4.7) and τ (1.777) never cut, nor W/Z/t/H [open] |
+| √ŝ window (`gen_catalog_v3.py:245`, `select_catalog_v3.py:162`) | [max(25 GeV, 1.05 × Σ m_final), 1000 GeV]; [threshold, 1 TeV] [D17]; the 1.05 and the 25 GeV floor [open] |
+| heavy-quark pool window (`select_catalog_v3.py:179`) | [lo, max(1000, lo + 500)] [open] |
+| √ŝ draw (:2848, :2967, :3214) | uniform in the window (bulk, all roles); a dataset convention [open] |
+| mixture `f_flat` (:2999) | 0.35 of a pool flat in log abs(M)² |
+| mixture `oversample` (:3000) | 6 candidates per flat event [open] |
+| mixture `democratic` (:3001) | 0.5 of multi-leg candidates from the splitter, rest RAMBO |
+| mixture `y_lo` (:3002) | 1e-6 (deepest invariant / s; measured at lowered cuts, not the catalog's) |
+| adaptive √ŝ pass (:3003, :3124) | on, ≤ 200 bins, ≥ 50 candidates per bin [open] |
+| phase space shape (:3167, :3097) | 2→2 isotropic; the splitter is final-final only (no initial-state collinear corner) [open] |
+| one-loop pools (:3015) | never shaped (uniform √ŝ, RAMBO) whatever the recipe says [open] |
+| α_s (:74, :3318, :3400) | α_s(M_Z) = 0.118, one-loop running, n_f = 5, μ = √ŝ per event, trees and one-loop (one-loop: `tools/nlo_conventions.py:39-41`; trees [open]) |
+| α_s points (`recipes/catalog_v3_gen_stage3.yaml`) | 0.09, 0.15 trained, 0.13 held out [D102] |
+| coupling orders (`gen_catalog_v3.py:111`, :192) | none in the generate strings: MadGraph's minimal QED order, so no VBF/VBS topologies |
+| external W, Z, t, H | stable, on-shell, unpolarised |
+| masses and widths | MadGraph `sm` card (G_μ scheme); MT = ymt = 172.5 (`tools/nlo_conventions.py`, the collaborators' reference) only when a top is external (:464, `gen_catalog_v3.py:240`; external-only patch [open]), 173.0 when internal; WT 1.4915. A width is read only from a DECAY line in column 1; catalog_v3's six loop-induced HH/HHH pools (`loop_qcd_qed_sm`) have the model's Z 2.48883 and W 2.08465, not 2.441404 / 2.0476 (`analysis/catalog_v4/data/card_width_audit.json`), not regenerated [open] |
+| heavy-quark layer (`select_catalog_v3.py:135`) | the top's quantum numbers at m_Q ∈ {50, 300, 600} GeV [D98, D100], width scaled from 1.4915 at LO (0, 8.7956, 71.3498) [width rule open]; pools at 1.4915 being rebuilt at the scaled widths (`tools/width_regen.py`) [D145] |
+| b beams (:2796) | on their 4.7 GeV shell [open] |
+| BSM points `NONSM_POINT` (:1649-1662) | Z′ MY1 500 GeV (gVl 0.3, gAl 0.1, gVq 0.25 model default, dark matter decoupled), WY1 18.64129; 2HDM H± 200, h2 250, h3 300 GeV, second-doublet Yukawas zero, h1 width 6.382e-3; WZ/WW/WH aligned to the `sm` card (`_SM_ALIGN`), WT 1.4915 [layer D98; points open]. Pools with the UFO default widths (WY1 10.0, 2HDM h1 1.0, WT 1.508336, WZ 2.4952, WW 2.085, Z′ model WH 0.00407) being rebuilt at these (`tools/width_regen.py`) [D145] |
+| pool storage | float64 momenta, IDs and amplitudes; never propose float32 again (float32 momenta shift the target's physics factors by up to 0.022, and single-process precision studies reuse the pools) [D132] |
+| pool sizes | trees 1e5 / 1e4 / 1e4 (train / val / test), one-loop 5e4 / 5e3 / 5e3 [D102] |
+| pp pool sizes (`recipes/gen_catalog_v3_pp.py:88`) | 1e4 / 2e3 / 2e3 [open] |
+| pp pools' cards (`recipes/catalog_v3_pp/`) | Daniel's 13 TeV run card as is (nn23lo1, pT > 10 GeV, abs(η) < 5); catalog_v3's param card [D117, D119] |
+
+Catalog_v4 [D130]. Files: `mg5_pipeline_final.py` (`V4_*`, :2664-2730), `recipes/gen_catalog_v4.py` (entries and
+recipes from catalog_v3's, names `v4_*`), check `analysis/catalog_v4/validate_v4.py`. Catalog_v3's pools, recipes and
+recipe ids are unchanged (the v4 fields are absent from its entries). Rows not listed are catalog_v3's.
+
+| Knob | Value |
+|---|---|
+| acceptance `V4_CUTS` | hadronic beams: pT > 10 GeV, abs(η) < 5, ΔR > 0.4, no pair-mass cut; e+e-: abs(cos θ) < 0.99, the rest as v3; b and τ cut like the other legs (`cut_pdgs`) |
+| √ŝ window and draw (`v4_sqrts_lo`) | [the least √ŝ the masses and the pT cut allow, 6 TeV], log-uniform (`sqrts_measure`); the adaptive pass bins in log √ŝ; the 10 GeV edge of the 22 trees with neither a cut leg nor a mass [open] |
+| forward component (`rotate_forward`, `V4_SAMPLING`) | 0.15 of each pool, and a third of the flat part's candidates, turned so one final is uniform in log(1/(1 − abs(cos θ))) up to the cut edge; splitter, f_flat 0.35, same mixture in every role [0.15 and 1/3 open] |
+| coupling orders | `QED<=b` on every tree, b = n − (external gluons) when a quark is external (0 all-gluon, n colourless): every tree diagram (VBF, VBS, EW-QCD interference); QCD unbounded; BSM strings as v3 |
+| top | MT = ymt = 172.5 in every entry, internal and one-loop tops too; WT 1.4915 (`V4_WT`) in every entry [D145] but one: the one-loop b b~ > h w+ w- (`v4_bbx_hwpwm_nlo`, `WIDTH_OVERRIDE` in `recipes/gen_catalog_v4.py`) has WT 0, exact there (t-channel top only; the fixed width broke its pole) [D154]. The SM tree and `loop_sm` pools have 1.4915; the BSM pools (1.508336) and the six loop-induced HH/HHH pools (`loop_qcd_qed_sm`, 1.36728 with Z 2.48883, W 2.08465) are being rebuilt at WT 1.4915 (the loop-induced ones with Z 2.441404, W 2.0476), the others migrated (`tools/width_regen.py`). The heavy-quark layer takes the LO width at its mass (`top_width_lo`: 0, 8.729709, 70.81529; LO, massless b, V_tb = 1 [open]); its 1.4915 pools being rebuilt |
+| b | massless in beams and finals: `sm-no_b_mass` (`loop_sm-no_b_mass` for MadLoop); `particle_ids.py` gives it a massless species row (±5000000, `b_mass_of_process`); catalog_v3's b stays 4.7 |
+| classes, roles, sizes | v4's own (`recipes/select_catalog_v4.py`: the equality step's exact classes joined with near pairs, the rule that reproduces catalog_v3's 1586): splits keep their v3 class's role; a merge with a held-out class is held out whole; changes in `analysis/catalog_v4/data/class_changes.json`; sizes as catalog_v3's; the energy axis is the 6 to 20 TeV probes [D137] |
+| MadEvent runs of the default-sampled pools (`recipes/gen_catalog_v4_default.py`, `tools/lhe_parts.py`) | one-run part jobs of at most 1800 core-s, at least 1000 events; a pool whose runs return under 0.3 of the events they ask (MadEvent stops short of its target) is laid out in runs of 1000; run counts sized at 0.8 of the measured mean yield; the default share generated with a margin of 0.10, or 1.03 / (the measured kept fraction) − 1 where the pool keeps less [source: **open (unsourced)**] |
+
+=== SECTION fa-canonical-setup
+file: ~/work/FA/.claude/context/fa-canonical-setup.txt
+paths: sweep/sweep_config*.yaml, config/default.yaml, config/amplitudes.yaml, config/model/lloca.yaml, sweep/generate_*.py
+cmds: \b(generate_sweep|generate_scaling_sweep|generate_pretraining_scaling_sweeps|drive)\.py\b, \bsite\s+submit\b.*\bFA\b, \brun\.py\b
+---
+The decided-best defaults. For a new run or sweep copy ONLY `sweep/sweep_config_jeanzay_template.yaml`, never values
+from an old run config (`scan_ab_*`, `pretrain25*`, ...: several carry stale values such as `batchsize: 1024`). Where a
+run config disagrees with this table, the table wins.
+
+| Knob | Value | Kind |
+|---|---|---|
+| `model` / `net.num_blocks` / `net.attn_reps` | `lloca` / `8` / `8x0n+2x1n` | fixed |
+| `net.num_heads` (μP width axis) | run-design (default 8); tune lr once, reuse across width | per-run |
+| `particle_encoder_hidden` (MLP embed) | `0` (off, linear embed; `docs/results.tex` `tab:bigrun_arms`) | fixed |
+| `use_diagrams` / `d_diag` | `false` (`tab:bigrun_arms`; revisit after the catalog pretraining, catalog hand-off) / `32` | fixed |
+| `use_PIDs` | `false` | fixed |
+| `spin_onehot`/`color_onehot`/`generation_onehot`/`prop_is_massless`/`standardize_props` | all `true` | fixed |
+| physics levers `coupling_scalars`/`internal_mass_scalars`/`offshell_per_event` | `true` for the production joint run (`internal_mass_scalars` carries the off-shellness columns); `internal_mass_pdgs=[23,6,25]`; `mass_from_momenta` stays `false` (redundant, `tab:levers`). Off-shellness needs the diagram sidecars `data/diagrams/<process>.diagrams.json` (gitignored; `tools/dump_diagrams.py --all`, CPU); the run log line `offshell_per_event: built propagator masks for N/P processes` must show N = P, else the flag is silently a no-op | per-run (need recipe+sidecars) |
+| `preprocess_per_dataset` + `amp_trafos` | `true`; `[log, standardization]` resolved **per-dataset** (positive→log, negative→signedlog) | fixed |
+| target-side levers `data.target_propagators` (+`target_propagator_tchannel`, `_max_final: 2`) / `training.sign_head` | adopted at the catalog working point (catalog census, three seeds each; off by default, switch on for the full-horizon catalog sweep). Not for single-process runs: in the transfer study (`sec:ladder`) the t-channel factor sets a loss floor and the Breit-Wigner factor loses in all seeded cells, so it runs both off (`tp3_`; `tp2_` = t-channel off only). They change the target, so their `val_loss_no_reg` is not comparable to runs without them (`analysis/catalog_v2/signed_compare.py` re-bases the signed pools); frozen stats record `target_propagators` and a mismatch asserts | per-run |
+| `use_balanced_sampler` | `false` (equal/uniform sampler) | fixed |
+| `loss` / `loss_aggregation` / `regularization` | `MSE` / `geometric_mean` (default) / `L2` | `MSE`, `L2` fixed; the aggregation is **open at catalog scale**: the arithmetic mean wins there (`tab:agg_ab`, `tab:catv2_short_smix`, catalog hand-off) |
+| **`training.batchsize`** | **`16384`** (biggest that fits; ~36 events/dataset/batch over 448 sets) | fixed |
+| **`evaluation.batchsize`** | **`16384`** (eval forward-only → match train BS) | fixed |
+| `num_workers` | `2` | fixed |
+| `dtype` / `allow_tf32` / `fused_optimizer` | `float32` / `true` (no-op V100) / `true` | fixed |
+| optimizer / betas / eps / weight_decay | `MuonAdamW` (`optim/muon.py`; Muon on μP hidden matrices, AdamW `[0.9,0.999]` / `1e-8` / `0` on the rest) for pretraining and fine-tuning, set in the template's `fixed_params` (`training.optimizer`) [D155, D158]. HPO rules 2 and 4 were measured with AdamW: a Muon sweep centres on its own search, not on them | optimizer fixed; `muon_weight_decay` swept |
+| `scheduler` / `clip_grad_norm` | `CosineAnnealingLR` / `5` | fixed |
+| `training.lr` | run-design: centre on `lr*(t,D)` surface at your (t,D), sweep ±½ decade (see rule #2) | per-run |
+| EMA (`ema` top-level flag) | swept `{false,true}` × `ema_decay∈[0.9,0.999]`; not settled (the big-run DyHPO and the catalog quick sweeps chose it on, the catalog wave's best had it off) | open |
+| fine-tune | full retrain + layer-decay; `lr_scale∈[0.1,10]@1`, `layer_decay∈[0.75,1.0]` | fixed |
+
+Sweep search ranges: HPO rule 3 (section fa-sweeps-and-hpo). Quick tests pass `evaluation.train_subsample=2000` (the
+post-training train-split pass otherwise runs the whole pool).
+
+=== SECTION fa-sweeps-and-hpo
+file: ~/work/FA/.claude/context/fa-sweeps-and-hpo.txt
+paths: sweep/**, analysis/hpo_optima/**
+cmds: \b(sweep_manager|generate_sweep|generate_scaling_sweep|generate_pretraining_scaling_sweeps|rebalance|drive|run_trial|extend_sweep|prune)\.py\b, \bsbatch\b.*--array
+---
+Multi-fidelity HPO over training-step budgets, sharing a DyHPO surrogate across
+all jobs of a sweep via a lock file on the shared FS.
+Key files:
+- `generate_sweep.py` — initializes the sweep: samples HP candidates, writes the
+  DyHPO state (`dyhpo_state.pkl`), and emits one SLURM script per trial into
+  `<sweep_dir>/<sweep_name>/jobs/trial_XXXX.sh`. Flags: `--config`, `--n-trials`,
+  `--extend` (add trials, reuse state), `--dry-run`.
+- `run_trial.py` — per-job entrypoint each SLURM job runs. It: locks state →
+  `sampler.suggest()` for `(hp_config, fidelity=t_steps)` → checkpoint-index
+  lookup to warm-start from a lower fidelity → runs `run.py` → locks state →
+  `sampler.observe(...)`. A SIGTERM handler reports the in-flight trial as failed
+  so DyHPO can reuse the slot.
+- `dyhpo_sampler.py`, `dyhpo/hpo_method.py`, `checkpoint_index.py` — the sampler,
+  surrogate, and warm-start checkpoint index.
+- Config template: `sweep/sweep_config_jeanzay_template.yaml` (cluster block,
+  paths, `fidelity_schedule.t_steps`, `fixed_params`, `search_space`,
+  `dyhpo.*`). The HPO objective can be a transfer-ratio geometric mean vs a
+  fitted scaling law (`compute_hpo_objective` in `run_trial.py`).
+- Scaling-sweep generators/analysis: `generate_pretraining_scaling_sweeps.py`,
+  `generate_scaling_sweep.py`, `fit_scaling_law.py`, `analyze_*_scaling*.py`.
+- Resubmission helpers: `resubmit_timed_out.py`, `resubmit_scaling_jobs.py`.
+
+Submitting a sweep (GPU budget applies): through `sweep_manager.py`, so trials interleave round-robin across sweeps;
+never hand-loop `sbatch` over `jobs/*.sh`. The generators render the `#SBATCH` block for the site they run on
+(`siteconf.slurm_header`) and submit through `sweep_manager.py`, so they run on that site's login node through
+`site run <site> FA -- python sweep/generate_sweep.py --config sweep/<my_config>.yaml`; locally they are dry-runs only.
+```bash
+# generate; it then prompts to submit (or set cluster.auto_submit / pass --auto-submit)
+python sweep/generate_sweep.py --config sweep/<my_config>.yaml
+# scaling generators submit all their cells interleaved in one batch:
+python sweep/generate_scaling_sweep.py --config sweep/<scaling_config>.yaml
+python sweep/generate_pretraining_scaling_sweeps.py --phase both --auto-submit
+# submit manually later (interleaves with whatever is already queued):
+python sweep/sweep_manager.py submit <sweep_dir>/<sweepA> <sweep_dir>/<sweepB>
+```
+
+**Known coupling issue (relevant to job ordering):** jobs share DyHPO state, but
+they only inform each other if earlier trials `observe()` before later trials
+`suggest()`. If all trials of one sweep start at once (which happens on Jean Zay
+when many GPUs free up), they all `suggest()` against an empty/stale surrogate.
+When running several sweeps at once, interleave submissions across sweeps
+(round-robin) and/or use SLURM priorities so each sweep stays partly serialized.
+**Fallback when interleaving can't help (a lone sweep, or abundant GPUs):**
+`sweep_manager submit` now defaults to **3 sequential waves** (`--seq-batches 3`)
+for a single-sweep submission — the trials are split into 3 groups chained by
+SLURM `afterany` dependencies, so wave *k+1* only starts after wave *k* has
+`observe()`d and the (single-fidelity) Bayesian optimiser actually has data to fit.
+Multi-sweep submissions default to `--seq-batches 1` (rely on interleaving); pass
+`--seq-batches N` to force, `1` to disable.
+**Chained submission (opt-in, `sweep_manager submit --chain [--capacity N]`).** Holds guided trials until the
+preceding trials have observed; use it when free GPUs would start a whole sweep blind. `--weight`/`boost` do not
+apply to chained jobs. On HTCondor the chain is the DAG (`cluster.chain_width`). Details: the script's docstring.
+**Cross-sweep submitter — `sweep/sweep_manager.py`**. Submits
+trials interleaved across sweeps and stamps each job with a SLURM `nice` value =
+`round × gap`, where a sweep's `j`-th pending trial has `round = j // weight`.
+Same round ⇒ same nice ⇒ runs together (fills GPUs); higher round ⇒ runs later;
+`weight>1` ⇒ that sweep advances faster. Uses only user-level `nice` (no operator
+rights). Commands: `submit <sweepdir>…`, `rebalance` (re-interleave all pending,
+e.g. after adding a sweep), `boost <sweep> --weight N`, `status`, `cancel`.
+Add `--dry-run` to preview. Registry: `~/.sweep_manager/registry.json`.
+**Rebalancing across sites — `sweep/rebalance.py PREFIX... [--apply] [--allow-jeanzay]`.** `site pick` places a
+batch once; this moves trials that have not started from the latest-finishing site to the earliest (by backlog and
+achieved rate), deletes nothing (the source is cancelled and marked `MOVED_TO`), and copies a fine-tune parent's
+whole run directory if missing. Run by the supervisor over `tp3_`; without `--apply` it prints the plan. Placement
+follows `site pick` and this tool, never a hand pick and never a question for me.
+
+HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs/results.tex` § optimization laws):
+
+1. **`training.lr` transfers across width (μP) — never re-sweep it per width.**
+   Tune HPs once at the smallest width and reuse for all larger widths (up to a
+   5× cut on a width-scaling grid). Re-sweeping lr per width is pure waste.
+2. **lr follows an inverted-U in *training length*, peaking at an absolute
+   optimizer scale `t* ≈ 3000` steps** (independent of dataset size):
+   `lr_c(t) ≈ 1e-2 · min[(t/3000)^+0.5, (t/3000)^-0.55]`. The peak is an optimizer
+   timescale (Adam β₂ EMA + warmup + weight EMA), **not** a convergence point — so
+   it is not a monotone "more iters ⇒ lower lr": below `t*` the optimum *rises*,
+   past `t*` it falls as `t^-0.55`. **The procedure is fixed, not a judgment call:
+   evaluate the measured 2D surface `lr*(t,D)` at YOUR `(t,D)` and sweep ±½ decade**
+   around it (`[c/3, 3c]`), never a flat 4-decade prior nor the t-only `lr_c(t)`.
+   Both axes are set by the run design, so both are known inputs, not uncertainty:
+   - **`t`-axis (horizon):** every real run sits past the peak (`t ≫ t*=3000`), so
+     `lr*` is on the `t^-0.55`-ish decay — a **longer run takes a lower center**.
+   - **`D`-axis (training events summed over the sweep's 8 processes):** measured `lr* ∝ D^{~0.17}`, **saturating**
+     (~2.2× from D=700→70k at t=3162, most of it by D~2k). A large-`D` run sits at
+     the **high-D asymptote → center ABOVE the D-pooled value**; read it off the
+     grid's high-D row at your `t`. Do NOT collapse `D` into "a nudge the window
+     absorbs" — that discards a measured axis. (The "is the loss floored?" rule of
+     thumb is also dropped — never a measured axis; only `t` and `D` were.)
+   - **The (high-`D`, high-`t`) corner is OFF the measured grid** (high-D rows stop
+     at `t≈1.8e4`; every large-`t` pooled point comes from small `D≤7k`, which
+     over-trains and decays steeply — not representative of a large-`D` run). So
+     for a big foundation run (per-proc `D`≈30–100k) the center is an
+     **extrapolation of the high-D row's decay**: ~2e-3 @30k, ~1.4e-3 @50k, ~9e-4
+     @100k steps. The ±½-decade sweep then both centers the search AND *measures*
+     that off-grid corner. Surface + numbers: `analysis/hpo_optima/`
+     (`make_fig_2d.py`, `hpo_optima.json`). Template default window `[1e-3, 3e-2]`.
+3. **lr is the dominant knob; narrow the rest, don't blindly fix them.** Optima:
+   `regularization_lambda ∈ [1e-10, 1e-6]` (cap high at 1e-6; was 9 decades),
+   `cosanneal_warmup_frac ∈ [0.05, 0.2]` (median 0.15), `cosanneal_eta_min`
+   fix ~1e-8 (or `[1e-10, 1e-7]`, weakest knob), `ema_decay ∈ [0.9, 0.999]`.
+   Keep `sampler_alpha_ema ∈ [0.3, 0.95]` (2nd most important). **Drop the exotic
+   sampler variants** (`sampler_sig_k`, `sampler_deficit_*`, … |ρ|≈0.1 = noise).
+4. **Finetune:** `fine_tune.lr_scale ∈ [0.1, 10]` centered at **1** (best finetune
+   lr ≈ pretrain lr), `fine_tune.layer_decay ∈ [0.75, 1.0]`; same reg/warmup rules.
+5. **Net effect:** ~10–100× smaller search volume ⇒ halve the trial budget
+   (e.g. 300→150 candidates, ~15→~8 obs) at equal resolution, or explore far
+   denser at equal budget. Seed new cells from `lr_center(t)`, not a flat prior.
+   The `sweep_config*template.yaml` defaults already encode these ranges.
+6. **Why HP questions go through DyHPO, single-fidelity** (the rule is in CLAUDE.md) (`fidelity_schedule.t_steps:
+   [T]`, one value; the multi-fidelity ladder is unused here) — never a hand-rolled
+   grid, whatever the question is called. "Is `clip_grad_norm` the culprit?" and
+   "does it work at any `lr`?" are HP searches, not diagnostics. The reason is
+   substantive, not stylistic: HPs **interact**, so a 1-D grid at fixed
+   everything-else answers only "best `lr` *given those* values", cannot reach a joint
+   optimum (one needing `lr` *and* `beta` together), and comes back flat —
+   manufacturing a **false** "it doesn't work at any `lr`". Sweep the coupled space.
+   Job arrays stay right for **non-HP** ablations (loss type, data tag, warm-start
+   checkpoint, ablation flags, seeds).
+
+Sweeps across sites (`sweep/drive.py`):
+A sweep no longer has to live on one cluster. `generate_sweep` + `sweep_manager` keep the
+DyHPO state in a file that every trial locks on one site's filesystem; `sweep/drive.py`
+keeps that state on the laptop and sends stateless trials wherever `site pick` says:
+    python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] \
+        [--n-trials N] [--parallel P] [--mem 8G] [--cpus 4] [--hours 0.5] \
+        [--sites ccin2p3 lxplus] [--allow-jeanzay] [--poll 60]
+- State and results: `sweeps_local/<sweep_name>/` (dyhpo_state.pkl, driver_state.json,
+  results/*.json, summary.txt). Resumable: run the same command again.
+- Placement per trial through `site pick` (fitting free GPUs, submit caps, expected waits);
+  `--sites` restricts, Jean Zay only with `--allow-jeanzay`.
+- Trials run `sweep/trial_job.sh` via `site submit` with `--detached --hp-idx --t-steps --hp k=v`
+  (`run_trial.py --detached`): no shared state, result returned as one RESULT_JSON log line.
+- Pools: before the first trial on a site the recipe's datasets are checked there and, if
+  missing, built by `scripts/prebuild_recipes.sh` as a CPU job on that site (SLURM or HTCondor).
+- Detached trials cold-start (no cross-fidelity warm start); fine for single-fidelity sweeps.
+- Code must be committed: the driver syncs each site once at start and submits with --no-sync.
+- The driver runs on the laptop in `.venv-driver` (CPU torch + scikit-learn); it builds it
+  itself on first use via `sweep/driver_env.sh`.
+Use the classic path only for a sweep that must stay on one site (multi-fidelity warm starts).
+
+=== SECTION fa-data
+file: ~/work/FA/.claude/context/fa-data.txt
+paths: dataset.py, experiment.py, recipes/*.yaml, data/**, tools/equal_processes.py, analysis/process_equality/**, runs/*/config.yaml
+cmds: \bprocesses_file\b
+---
+- **Which datasets a run actually trained on: the recipe wins, `data.dataset` lies.**
+  `config/amplitudes.yaml` hardcodes an 8-entry `data.dataset` default, and every run
+  config dumps it verbatim whether or not a recipe overrode it. So in a run's
+  `config.yaml`:
+  - `data.processes_file` set (equivalently `data.source: recipes`) ⇒ **the recipe at
+    that path is the only authority**. `data.dataset` is stale inherited default;
+    ignore it completely. E.g. `runs/dvirt_time` lists 8 datasets and actually
+    trained on the 25 in `recipes/pretrain25_short.yaml`.
+  - `data.processes_file: null` and no recipe source ⇒ **then** `data.dataset` is
+    authoritative.
+  Never state which processes a run saw from `data.dataset` without checking
+  `processes_file` first: it decides what "zero-shot", "held-out" and "never seen" mean.
+- **Processes equal up to relabelling are one dataset.** `tools/equal_processes.py` (CPU, CC) finds
+  the catalog trees whose |M|² is a constant multiple of another's up to a leg relabelling (18 classes,
+  `analysis/process_equality/equal_processes.json`: massless flavour relabels, `ee_X = uubar_X` for
+  colourless bosons, ...). A held-out process is held out with its whole class.
+- Every role of a process samples the same distribution. A recipe entry's `sampling` policy (catalog_v2: the mixture)
+  shapes train, val and test alike; the shaped pools carry `_smix` in their file names. Never reintroduce a train/eval
+  measure split: a finite-sample fit's error follows the training density, so validation estimates the trained risk
+  only from the same measure. The uniform-√s window is a dataset convention, not a "physical measure".
+- Datasets are `.npy` files in `data/`, named like
+  `ee_ttbar_346-1000GeV_amplitudes.npy`. Each row: flat 4-momenta
+  (`n_particles*4`) + PDG ids (`n_particles`) + amplitude (last col).
+- `init_data` (in `experiment.py`) loads each dataset, for LLoCa boosts events
+  to COM and applies a random Lorentz transform (data augmentation / locality),
+  standardizes momenta, preprocesses amplitudes globally (`amp_trafos: [log,
+  standardization]`), concatenates all processes, shuffles (seed 42), and builds
+  flat contiguous arrays.
+- `dataset.py`:
+  - `AmplitudeDataset` — sparse variable-length events backed by a flat
+    `(N_particles,4)` array + `offsets`; O(1) `__getitem__`.
+  - `collate_variable_length` — concatenates events into a flat batch + `ptr`
+    (event boundaries) consumed by the model's attention mask.
+  - `ProcessBalancedSampler`: draws each process's share per batch with dynamically updatable weights
+    (deficit-to-solo plateau-aware). Not the default (`training.use_balanced_sampler: false`): the equal/uniform
+    sampler won best-vs-best at 8 datasets, the benefit diluting with many datasets. Opt-in for mixtures of few, very
+    unbalanced datasets.
+  - **Loss aggregation is `geometric_mean` by default** (`config/default.yaml`;
+    used in essentially every run): a log-space mean over per-process MSEs, so a 10%
+    relative gain on a 1e-6 process counts equally with a 10% gain on a 1e-2 one —
+    processes of different final-state dimensionality (hence very different MSE
+    scale) all keep scaling instead of the high-MSE ones dominating the gradient.
+    **Caveat:** the same `1/MSE` weighting starves a process stuck far above the bulk
+    (a resonance needle); the arithmetic mean recovers it at a cost elsewhere, and the
+    τ-floor `loss_aggregation_tau` is an HP for the wave's DyHPO, not a fix with a natural
+    value (`docs/results.tex` `tab:agg_ab` and the catalog hand-off). `loss_aggregation`
+    and `loss_aggregation_tau` shape the **gradient only**; the validation aggregate
+    (`val_loss_no_reg`, checkpoint selection, HPO objective) is fixed by
+    `training.val_aggregation` (geometric mean) and never follows a training-side knob.
+
+=== SECTION fa-model
+file: ~/work/FA/.claude/context/fa-model.txt
+paths: models/**, wrappers.py, particle_ids.py, config/model/**
+---
+Maintained wrappers: LLoCa `wrappers.AmplitudeLLoCaWrapper` → `models.lloca.LLOCAMuPTransformer`; L-GATr
+`wrappers.AmplitudeLGATrMuPWrapper` → `models.lgatr_mup.MuPLGATr`; L-GATr slim `wrappers.AmplitudeLGATrSlimMuPWrapper`
+→ `models.lgatr_slim_mup.MuPLGATrSlim`.
+
+Config `config/model/lloca.yaml`:
+- Wrapper: `wrappers.AmplitudeLLoCaWrapper` → net `models.lloca.LLOCAMuPTransformer`.
+- The net: `LearnedPDFrames` framesnet (equivariant local frames via `EquiMLP`)
+  + `MuPTransformer` backbone (`models/transformer_lloca_mup.py`), with a
+  block-diagonal attention mask built from `ptr` so particles attend only within
+  their own event.
+- Defaults: `num_blocks=8`, `num_heads=8`, `attn_reps="8x0n+2x1n"`,
+  `hidden_channels_mlp=128`. Width axis for MuP is **`num_heads`**
+  (base=2, delta=8); `attn_reps` must stay fixed between base/delta.
+### Particle encoding (important design choice)
+Two modes, selected by `data.use_PIDs`:
+- **`use_PIDs: false` (default, preferred)** — each PDG id maps via a fixed
+  global table `GLOBAL_PROPERTY_MATRIX` (in `particle_ids.py`) to a 9-D physical
+  property vector (charge, spin, log-mass, T3, B, L, colour charge, Casimir,
+  generation), then a learned `Linear(n_features → d_particle_hidden=16)`. The
+  table's masses are the **generator's** (u, d, s, c, e, μ massless; b 4.7, t 172.5),
+  never PDG values, and the generation column is what tells d from s and u from c.
+  `in_channels` depends only on `d_particle_hidden`, **not** on the vocabulary,
+  so adding a new particle/feature never forces retraining the transformer.
+- **`use_PIDs: true` (legacy)** — one-hot token index from `ParticleTokenizer`.
+### Coupling order
+`data.amp_orders` is a per-dataset vector `[L_QCD, L_EW, alpha_s_max, alpha_ew_max]`
+of the stored target (`mg5_pipeline_final.order_vector`; LO `ee→uū`=`[0,0,0,2]`,
+`+g`=`[0,0,1,2]`, mixed four-quark `[0,0,2,2]`, stripped QCD-virt `[1,0,0,2]`; legacy
+2-vectors are widened). It's broadcast to every particle as
+extra scalar features, so mixing perturbative orders needs **no model change**.
+### MuP
+Models with `*MuP*` in `_target_` get μP base shapes (`base_shapes.bsh` in the
+run dir). Fresh init → `rescale_params=True`; warm start → `False`. See
+`base_experiment.init_model`.
+
+=== SECTION fa-run-and-config
+file: ~/work/FA/.claude/context/fa-run-and-config.txt
+paths: run.py, experiment.py, base_experiment.py, config/**
+cmds: \brun\.py\b
+---
+- `run.py` — Hydra entrypoint. Builds `AmplitudeExperiment(cfg)`, sets default
+  dtype, calls `exp()`. Config root: `config/`, default config: `amplitudes`.
+  Params are overridden CLI-style: `python run.py training.lr=1e-4 model=lloca ...`.
+- `experiment.py` — `AmplitudeExperiment(BaseExperiment)`: amplitude-specific
+  physics, data, model wiring, loss, eval, plots.
+- `base_experiment.py` — `BaseExperiment`: generic train loop, optimizer/
+  scheduler, MuP setup, warm-start, checkpoint/save, MLflow, FLOP counting.
+- A run executes `full_run()` → `init_physics → init_data → init_model →
+  train → evaluate → plot`.
+Output of a run lives under `runs/<exp_name>/...` (models, tokenizer, plots).
+
+- `config/amplitudes.yaml` — main experiment config (dataset list, amp_orders,
+  training defaults). `defaults:` pulls in `model: lloca`, `default`, `local: none`.
+- `config/default.yaml` — full default tree: training/optimizer/scheduler,
+  DyHPO multi-fidelity fields (`is_dyhpo_run`, `increment_steps`), fine-tune
+  block (`fine_tune.lr_scale`, `layer_decay`, `freeze_blocks`, `reset_output_head`,
+  `lora.*`, `ewc.*`).
+- `config/model/lloca.yaml` — the only model config that matters here.
+- `config/local/none.yaml` — Linux/cluster local overrides (`num_workers: 2`,
+  in-memory dataset).
+- `config/hydra.yaml` — disables Hydra's dir-changing/logging hijack.
+
+- **dtype:** set via `training.dtype` (`float16/32/64`); `run.py` sets the torch
+  default dtype before building the experiment.
+- **Warm start / fidelity:** `warm_start_idx` + `training.increment_steps` drive
+  resumption from a previous fidelity checkpoint; don't hand-edit these — they're
+  set by `run_trial.py`.
+- Always keep `plot: true` in sweep/experiment configs.
+- **Fine-tuning** reuses the pretrained run's tokenizer; LoRA/EWC/layer-decay/
+  freezing are all in the `fine_tune` config block.
+- Best-checkpoint selection is `experiment._result_extra` (definition: `docs/results.tex` `def:metric`).
+
+=== SECTION fa-performance
+file: ~/work/FA/.claude/context/fa-performance.txt
+paths: models/transformer_lloca_mup.py, models/attention_lloca_mup.py, experiment.py, wrappers.py, base_experiment.py, config/local/**, bench_*.sh, optim/**
+cmds: \bLLOCA_[A-Z_]+=, \bbench_workers_ab\.sh\b
+---
+- **Per-step LLoCa hot-path vectorizations** — `LLOCA_*` env toggles (default =
+  fast path; original impls kept for A/B). Attention mask built once/forward not
+  per-block (`models/transformer_lloca_mup.py`, `LLOCA_ATTN_MASK`); per-process
+  loss segment-mean (`experiment.py` `_aggregate_per_process_loss`,
+  `LLOCA_PROC_LOSS`); L2/L1 reg via `_foreach` (`experiment.py`
+  `_init_regularization`, `LLOCA_REG`); per-event mean pool (`wrappers.py`,
+  `LLOCA_POOL`); per-particle frames broadcast over heads instead of replicated
+  (`models/attention_lloca_mup.py`, `LLOCA_FRAMES`, default `broadcast`; set
+  `repeat` for the original — broadcast only applies for `attn_reps` with max
+  order ≤ 1, else auto-falls-back to repeat). Equivalence guards: `test_amp.py`
+  Section 0. Read the code for details.
+- **Per-step host↔device syncs** — `LLOCA_SYNC` env toggle (default `deferred`,
+  `blocking` = original for A/B). `deferred` fuses the per-step syncs into one and
+  catches NaN via the synced grad-norm (skip-step instead of crash); NaN no longer
+  raises. Mechanism and measured gain: `docs/results.tex` § throughput.
+- **Dataloading is the per-step bottleneck — keep `num_workers: 2`.** It is the
+  default in `config/local/none.yaml`; `nw=4` is no better and `nw=6` oversubscribes
+  (`cpus-per-task=8`) and hangs. Profile with `LLOCA_PROFILE_STEP=1` (data-vs-compute
+  split at the end of `train()`); bench with `bench_workers_ab.sh` (needs a GPU via
+  sbatch). Numbers: `docs/results.tex` § throughput.
+- Compute knobs (default on, A/B via config): `training.allow_tf32` (default true) sets `matmul/cudnn.allow_tf32` in
+  `_init_backend`: a no-op on V100, faster matmul on A100 at ~1e-3 precision; A/B'd on A100, on and off agree within
+  the run-to-run spread, so it stays on. `training.fused_optimizer` (default true, CUDA only) passes `fused=True` to
+  Adam/AdamW, through `MuAdam/MuAdamW`.
+- **NOT done (deliberately):**
+  - L2-reg → decoupled `weight_decay`: would remove a model-sized backward term, but
+    the L2 reg is added into the tracked loss (`loss_no_reg`, `val_loss_no_reg`,
+    checkpoint selection, HPO objective) and `regularization_lambda` is a tuned sweep
+    HP — converting it would silently break continuity with existing sweep results.
+  - `torch.compile`: the compute is dominated by the framesnet (torch_geometric
+    message passing) and xformers attention, neither of which compiles — heavy graph
+    breaks for ~no gain. Also `torch.compile(self.model)` prefixes `state_dict` keys
+    with `_orig_mod.`, which would break warm-start/fine-tune reloads. Skipped.
+- **Activation-memory knob:** `model.net.checkpoint_blocks` (config, not an env
+  toggle; default false) gradient-checkpoints the transformer blocks — large
+  activation-memory saving for ~one extra forward of compute. Use when memory-bound
+  at large width / batch size.
+
+=== SECTION fa-sites-and-paths
+file: ~/work/FA/.claude/context/fa-sites-and-paths.txt
+paths: sites/**, siteconf.py, scripts/*.sh, sweep/trial_job.sh
+cmds: \bsite\s+(submit|run|env|sync|copy)\b.*\bFA\b, \bscontrol\b
+---
+| What | Path |
+|------|------|
+| Working copy (where you edit) | `~/work/FA`, branch `trunk` |
+| Checkout on CC-IN2P3 | `/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes` — `.venv/` (python 3.11, torch 2.1.2+cu118, numpy pinned 1.26.4, xformers, lloca) |
+| Checkout on Jean Zay | `/lustre/fswork/projects/rech/itg/ulm49ia/Foundational_Amplitudes` — conda env `foundational` (same torch stack) |
+| Checkout on lxplus | `/eos/user/j/joiturri/Foundational_Amplitudes` — `.venv/` (python 3.11) on EOS; sweeps and Condor submission under `/afs/cern.ch/user/j/joiturri/Foundational_Amplitudes` |
+| Site facts | `sites/sites.yaml` — per site: `project_dir`, `sweep_dir`, `scratch`, `data_dir`, the env recipe, and the `cluster` block (scheduler, partition, account, qos, gpu flag, mem, CPU ceiling). The only file, with `sites/activate.sh`, that names a cluster |
+| Env activation | `sites/activate.sh` — resolves the site (`CCORCH_SITE`, exported by `site submit`, else sniffed from its own path), activates that site's env, exports `PROJECT_DIR`, `WORK`, `SCRATCH`, `DATA_DIR`, `SUBMIT_DIR` |
+| Tier-0 mirror | `~/.local/share/ccorch/artifacts/FA/<run>/` (`site fetch`) |
+
+- Jean Zay: A100 through `itg@a100`/`gpu_p5` (`-C a100`, QOS `qos_gpu_a100-t3`); `itg@v100` is in over-consumption. A
+  pending job moved by `scontrol` needs Account, Partition, Features and QOS, else it sits on `InvalidQOS`.
+- lxplus: HTCondor, code on EOS, submission from AFS; its ssh master needs a 2FA code only Joaquin can enter.
+- CC-IN2P3 (`sites/sites.yaml`): `account: lpnhe`, `partition: gpu_v100,gpu_h100` (whichever starts first), `qos: gpu`,
+  one GPU through `--gpus=1`, template `mem: 32G`; CPU jobs go to `htc` with `--mem-per-cpu`. `gpu_h100` (3 nodes of 4
+  H100 NVL) runs FA; `allow_tf32` is a no-op on V100, active on H100.
+
+Python asks `siteconf` for paths: `siteconf.PROJECT_DIR`, `siteconf.SWEEP_DIR`, `siteconf.DATA_DIR`;
+`siteconf.resolve(cfg)` fills the site-owned half of a sweep config (paths, `cluster` directives, `${PROJECT_DIR}` /
+`${SWEEP_DIR}` / `${DATA_DIR}` / `${SCRATCH}` expansion, re-rooting a config generated on another site);
+`siteconf.slurm_header(cluster, job_name, out, err)` renders the `#SBATCH` block for the site it runs on,
+`siteconf.cpu_header(...)` the CPU-partition one. Recipe runs read `$WORK/datasets` and the cache under `$SCRATCH`;
+`DATA_DIR` is the same `datasets` dir on every site. The old `data_path: data/` default is per-checkout and empty on
+the clusters: use recipes. Every job script starts with
+
+```bash
+_CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
+source "$_CCORCH_ROOT/sites/activate.sh"
+cd "$PROJECT_DIR"
+```
+
+(SLURM runs a copy of the script from its spool, so `$0` cannot locate the checkout; `site submit` exports
+`CCORCH_SITE` and `CCORCH_PROJECT_DIR`.)
+
+=== SECTION fa-results-notes
+file: ~/work/FA/.claude/context/fa-results-notes.txt
+paths: docs/*.tex, tools/verify_claims.py, analysis/common/**
+cmds: \bverify_claims\.py\b, tools/plan\.py\s+done\b
+---
+- Every number added to `docs/results.tex` carries `% src: python3 <script> <args> @<commit>` and `% claim: key=value`;
+  `tools/verify_claims.py` reruns the script, a commit or merge whose numbers it does not reproduce is refused
+  (`.githooks`), and trunk is pushed only up to its last verified commit.
+- A finished finding goes in its results section, its entry is closed with `plan done <entry> --writeup <commit>` and
+  its hand-off item is deleted; the hand-off holds only open work. A write-up says which branch of the design's
+  outcomes the result took.
+- Before writing a loader, picker or statistic, use `analysis/common` (`python3 tools/readers_index.py`); a family of
+  similar figures is one script with arguments, each figure's `% src` line naming them; a near copy of an existing
+  function in `analysis/` or `tools/` is refused at commit (`tools/dupcheck.py`): import or extend it.
+- A post-training evaluation is the best checkpoint only when `training.es_load_best_model` is true: say which it is.
+  The selection itself is `experiment._result_extra` (`docs/results.tex` `def:metric`).
+
+=== SECTION fa-figures
+file: ~/work/FA/.claude/context/fa-figures.txt
+paths: analysis/**/*.py, tools/plot_*.py, **/plot*.py, **/make_fig*.py, talks/**
+cmds: \bsavefig\b, \bplot\w*\.py\b, \bmake_fig\w*\.py\b
+tools: SendUserFile
+---
+- Every figure ships as both `.png` and `.pdf` (same basename, same dir), no exceptions: save both in the same call
+  (`fig.savefig(base+'.png'); fig.savefig(base+'.pdf')`) and make plotting scripts emit both by default. Both are
+  gitignored: "both" means on disk as deliverables, not committed. Genuine single-format exceptions go in
+  `.claude/figure_pair_ignore.txt`.
+- Style: the figure-style skill.
+- A figure carries short labels; its explanation goes in the caption or the talk, never inside the plot.
+
+=== SECTION fa-git-and-release
+file: ~/work/FA/.claude/context/fa-git-and-release.txt
+paths: scripts/publish_main.sh, scripts/fold_worktree.sh, worktrees/**
+cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
+---
+- `trunk` is the development trunk and what every site checks out (`site sync <site> FA` pushes it and fast-forwards
+  the site's copy); everything lives there: core code plus `tools/`, `tests/`, `sweep/`, `scripts/`, `attribution/`,
+  `data/` scripts, `notes/`, `CLAUDE.md`, recipes, `sites/`. No per-site branches: a site's differences live in
+  `sites/sites.yaml`. `git push` mid-turn is allowlisted; already-committed work is pushed at the end of every turn.
+- `main` is the public, stripped-down core, a build artifact of `trunk` regenerated by `scripts/publish_main.sh` from
+  the `PUBLIC_PATHS` allowlist (core run path + `config/` + `models/` + `IntrinsicDimDeep/` + example `recipes/` +
+  README); `--no-push` to review first. To change what is public, edit the allowlist and re-publish; never merge
+  `trunk → main`.
+- Retired `ccin2p3`, `jeanzay`: still on GitHub, no commits `trunk` lacks.
+- Worktrees: `git worktree add worktrees/wt-<feat> -b <feat> trunk`, implement and verify there, merge into `trunk`,
+  then `git worktree remove`. Merging brings back code only: sweep results, run dirs, eval `.npz`, satlogs, generated
+  datasets and figures are gitignored and die with the worktree, so `bash scripts/fold_worktree.sh <wt>` (preview) and
+  `--apply` (copy) first; it copies untracked result files only, never deletes, and is safe to re-run. Quick
+  standalone edits on trunk are fine.
+- Visibility: one GitHub repo, so all branches share visibility; making it public exposes `trunk` and the retired
+  branches too (only `main`'s tree is stripped). A truly private dev branch would need a separate repo.
+- `.fuse_hidden*` and `._*` files are filesystem leftovers: ignore them.
+
+=== SECTION fa-review
+file: ~/work/FA/.claude/context/fa-review.txt
+paths: .claude/agents/**, .claude/.review_state/**
+cmds: review_backlog\.sh, /review-now, \bgit\s+merge\b
+---
+- Pillars: `CLAUDE.md`, `~/work/CLAUDE.md` and `.claude/context/**` → claudemd-keeper; `docs/*.tex` → notes-editor;
+  source → repo-reviewer (`*.py`, `*.sh`, `config`, `recipes` code, `models`, `sweep`, `tools`, `tests`, `scripts`,
+  `.claude/hooks/**`, `.claude/settings.json`). Not counted in any backlog: plan bookkeeping (`plan/**`) and data
+  files (`*.json`, `*.log`, `*.out`, `*.err`, `analysis/**/data/**`, `tests/*_output.txt`, generated recipe lists
+  `recipes/catalog_v*_*.yaml` and `recipes/catalog_v*/**`), `runs/`, `sweeps/`.
+- A backlog is everything since its pillar's watermark. Thresholds: any change for the CLAUDE.md pillar; 200 changed
+  lines or 20 commits for `.tex`; for code 520 lines weighted by area and kind (`tools/review_weight.py`, about two
+  blocking errors waiting [D171]). Past its threshold, edits to the pillar's files and commits carrying its
+  uncommitted changes are refused until its reviewer runs.
+- Whatever the threshold, a merge into `trunk` and `plan done` need the commits merged or closed to sit inside a
+  passed backlog.
+- One reviewer per backlog: a launch while that pillar's reviewer holds its lock is refused and names the agent to
+  continue with SendMessage. A blocking review keeps its lock so its fixes can be applied; the re-check continues the
+  same reviewer, naming the fix commits. A lock expires after 180 min.
+- `review_backlog.sh status` lists backlogs; `/review-now` runs reviewers on demand; `begin <name>` and
+  `advance <name>` are the reviewer's own (the user's override is a `!` command). Watermarks: `.claude/.review_state/`.
+- All four reviewers (claudemd-keeper, notes-editor, repo-reviewer, design-reviewer) run on opus.
+- The code reviewer reviews cost: a change to generation or to how a batch is laid out is checked for yield and wall
+  time (the probe's numbers, the margin, run size against its limit, the number of waves).
+
+=== SECTION fa-hooks
+file: ~/work/FA/.claude/context/fa-hooks.txt
+paths: .claude/hooks/**, .claude/settings*.json, ~/.claude/hooks/**, ~/.claude/settings.json
+cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
+---
+- A hook refuses the end of a turn only for an omission the turn itself can clear; what waits on an agent, a job, a
+  cluster or the user is a note in its output.
+- Every registered hook runs through `.claude/hooks/dispatch.py <hook>`: it skips a hook listed in
+  `.claude/hooks/disabled.json`; it detects a loop (the same refusal fingerprint twice with nothing changed in between:
+  no tool call, the same HEAD, plan and open events), then disables that hook, opens an incident and lets the call
+  through.
+- A misfiring hook is fixed at once when the fix is obvious; otherwise `tools/hook_incident.py <hook> --why "<why>"`
+  disables it, appends the incident to `.claude/hooks/incidents.jsonl` and opens an ALERT event for the main session;
+  `--resolve <hook>` re-enables it once its fix is tested.
+- The set. Stop: `plan_check.py`, the single gate (plan and owners, events, supervisor and waiter, questions sent,
+  claims, figure pairs, context flush, reply answers, the "Joaquin" opener), and `auto_push.sh` (pushes, never
+  refuses). PreToolUse: `submit_guard.py` (placement, design, HP grids, plotting off in a submitted script, GPU budget,
+  wall-time target), `git_verify_guard.py` (claims check bypasses, attribution in a commit message), `review_guard.py`
+  (reviewer locks, one reviewer per backlog), `brief_guard.py` (briefs), `plan_files_guard.py`, `md_guard.sh`,
+  `plot_guard.sh` (config writes), `worktree_guard.sh` (advisory), `worktree_fold_guard.sh`, `review_backlog.sh
+  gate|bashpre`, `hook_syntax_guard.py`, `main_session_guard.py`, `no_blocking_question.sh`, `send_check.py`, and the
+  user-level `sleep_guard.sh`. PostToolUse: `review_guard.py` (records reviewer ids), `owner_context.py` (context
+  after a hand-back), `context_push.py`, `context_guard.py`, `hook_syntax_guard.py`. SessionStart and PreCompact:
+  `context_guard.py`, `context_push.py`, the user-level `ledger_guard.sh session-start`. `.githooks/commit-msg` refuses
+  attribution lines in every commit.
+- Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good
+  copy after one.
+- Tests: `tests/test_setup_scenarios.py` and `tests/test_hooks_real.py` over the recorded states in
+  `tests/fixtures/hooks_20261029/`. A registration change goes to the user as the diff `tools/switch_settings.py` prints.
+- A new doc Joaquin approved goes in `.claude/md_allowlist.txt`; a single-format figure he accepts goes in
+  `.claude/figure_pair_ignore.txt`.
+
+=== SECTION fa-testing
+file: ~/work/FA/.claude/context/fa-testing.txt
+paths: tests/**
+cmds: \bpytest\b, \.venv-cpu/
+---
+- A stray generated `py.py` at the root shadows the `py` module and breaks `pytest`
+  in the venv; test modules carry a `__main__` runner (`python tests/<file>.py`).
+- On the laptop, `.venv-cpu/bin/pytest --testmon --continue-on-collection-errors tests/` runs only the tests a change
+  touches; `bash scripts/cpu_env.sh` builds `.venv-cpu` (the CC env on CPU, no xformers). CPU dry-runs of the sweep
+  generators run there too.
