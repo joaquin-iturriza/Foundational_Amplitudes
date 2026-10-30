@@ -4152,6 +4152,28 @@ entries:
       changes, or 10x more) next, one more probe of the same shape. NO EFFECT: share stays near 0.49 under both: the budget
       is not the limit; arm A''s logs say which channel and why; the integration-side settings (sde_strategy 2, hard_survey
       1, a new gridpack) are probed next, and only if none works does the question go to Joaquin with what was tried.'
+    fix_at: '2026-10-30T13:07:15+00:00'
+    fix: 'Checks 1, 2, 5, 6 and 7 hold: arms B (max_event_in_iter 40000) and C (max_iter 16) each change one limit of gen_ximprove_gridpack
+      from arm A on the same gridpack, size and seeds scheme; the complete share is the quantity in question and moved 0.49/0.79/0.89/0.91
+      with run size on this gridpack (cgsxwm_sizecheck.json @070e10c8); I found no earlier work on MadEvent''s gridpack generation
+      limits (searched results.tex, the plan and site decisions for ximprove, max_iter, max_event_in_iter, gridrun, sde_strategy,
+      hard_survey, cgsxwm, gridpack); re-running arm A is justified because its per-channel logs are new; D187 to D189 (keep
+      every energy, regenerate correctly) are answered. Two things fail. (1) Check 3, the power of the bias test: an arm that
+      passes is tested only against arm A''s complete runs, about 31 of 64 runs, so about 6300 events. 12800 events against
+      6300 gives a detectable distance at 5% of about 1.36*sqrt(1/12800+1/6300) = 0.021. That is as large as the whole short-versus-complete
+      gap the earlier probe measured (0.0225), and an unselected arm should sit closer than that to the complete runs. The
+      test cannot see the effect it is there to check. Fix: use the 768 runs of 200 from the run-size probe that already exist
+      and are kept (same gridpack grid04, iseed 12576, 3000 GeV, disjoint seeds; 378 complete, 75600 events, plus 390 short)
+      as the reference for complete and for short runs. The detectable distance then drops to about 0.013. Arm A''s runs serve
+      only for the diagnosis and the share. If more power is needed, add runs to the winning arm. (2) Check 4, no outcome
+      for the bias test: WORKS goes to the lay-out on share >= 0.95 and median time <= 1 h, and the test result only has an
+      ''expected''. State the numbers that block the lay-out, for example the arm''s halves p < 0.05, or the arm farther from
+      the reference complete runs than the short runs are (0.0225), or not between them in the direction stated, and what
+      happens then. Not required, but worth stating: G17 holds 0.62 of the cross section at a survey efficiency of 14/510009
+      = 2.7e-5. If that efficiency held in the gridpack run, about 124 events from G17 would need about 4.5M points. Arm B
+      allows at most 13*40000 = 520k points per channel and arm C 16*4000 = 64k, so a correct budget hypothesis could still
+      come back PARTIAL. Size the arms from this figure, or say why the gridpack run''s efficiency is higher (49% of runs
+      already complete at 52k points).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
