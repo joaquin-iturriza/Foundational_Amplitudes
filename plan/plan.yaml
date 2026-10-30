@@ -2260,6 +2260,11 @@ entries:
     10: 'Validate the pp13v4 pools once the rebuild is assembled: every pp13v4 entry built in all 3 roles, pp_physics_check.py
       taught the pp13v4_ names and without its b reshelling (the log ratio to catalog_v4''s standalone must be 0 on every
       class); then redo the pp comparisons (compare_pp_trained, the density check''s error correlation) on recipes/catalog_v4_pp_test.yaml'
+    11: 'Submit the pure-default bound pair once the pp13v4 validation passes and the amended design has passed review (797
+      swapped hadronic training classes, PP4 scored on the pp pools'' test split): sync once, scripts/job_catalog_v3_short.sh
+      v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
+      each), plus the controls'' PP4 mode-eval reads; control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100,
+      -380842ed)'
   done_when: null
   notes_ref: null
   match: zz_cov_*,cov_*
@@ -4044,6 +4049,12 @@ entries:
       if:
       - 'all built and every ratio 0: redo the pp comparisons'
       - 'an entry short, failed or a nonzero ratio: list it with its cause, fix it, rerun only that entry'
+    11:
+      feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
+        mixture A/B the user asked for (2026-10-29)
+      if:
+      - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
+      - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
