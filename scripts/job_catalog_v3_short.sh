@@ -43,7 +43,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -107,6 +107,11 @@ case "$ARM" in
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
     v4_dimensionless_muon_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP)
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+    # third and fourth seeds (44, 45) of the control and of the sign extension (v3_prep_explore, the user 2026-10-30:
+    # "Okay, yes to both"), everything else as the first two
+    v4_dimensionless_muon_seed3|v4_dimensionless_muon_seed4) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP)
+                            case "$ARM" in *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
     # the pure-default bound (catalog_coverage, the design of 2026-10-29): the control v4_dimensionless_muon[_seed2]
     # with only the training recipe changed, catalog_v4_train.yaml with its 797 hadronic tree training classes on their
     # pp pools (466 pp13v4_, 331 reused pp13_; 1e4/2e3/2e3 events against 1e5/1e4/1e4); the other 356 entries are the
@@ -114,6 +119,15 @@ case "$ARM" in
     # 4264 steps
     v4_dimensionless_muon_pp)       CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP PP4)
                                     TRAIN="$PROJECT_DIR/recipes/catalog_v4_pp_mixed_train.yaml"; ITERS_FIXED=4264 ;;
+    # the mixture A/B (catalog_coverage step 14, D178; the shares D194): v4_dimensionless_muon[_seed2] with only the training recipe
+    # changed, catalog_v4_train.yaml with a default-sampled (MadEvent) share of 0.50 or 0.25 of each tree pool taken out
+    # of the RAMBO bulk, the 0.35 flat and 0.15 forward shares kept (recipes/catalog_v4_default{50,25}_train.yaml);
+    # read besides on the pp pools' test split (PP4) and the e+e- default test pools (EE4)
+    v4_dimensionless_muon_default50|v4_dimensionless_muon_default50_seed2|v4_dimensionless_muon_default25|v4_dimensionless_muon_default25_seed2)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP PP4 EE4)
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            SH=${ARM#v4_dimensionless_muon_default}; SH=${SH%_seed2}
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_default${SH}_train.yaml"; ITERS_FIXED=4264 ;;
     v4_dimensionless_muon_pp_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP PP4)
                                     TRAIN="$PROJECT_DIR/recipes/catalog_v4_pp_mixed_train.yaml"; ITERS_FIXED=4264 ;;
     # catalog_v4 with more sign-changing one-loop pools (plan v3_prep_explore, the design of 2026-10-29): the control
@@ -121,9 +135,9 @@ case "$ARM" in
     # pools whose train split holds both signs ($SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml, written by
     # scripts/job_catalog_v4_signext.sh, which builds their sidecars); the same 4264 steps. No XV3 read: catalog_v3's
     # pools are deleted (D167)
-    v4_dimensionless_muon_more_signed|v4_dimensionless_muon_more_signed_seed2)
+    v4_dimensionless_muon_more_signed|v4_dimensionless_muon_more_signed_seed2|v4_dimensionless_muon_more_signed_seed3|v4_dimensionless_muon_more_signed_seed4)
                             CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP)
-                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
                             TRAIN="$SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml"; ITERS_FIXED=4264
                             # the control's pools, in its order, then only one-loop extension pools
                             python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_train.yaml" <<'PY' || exit 1
