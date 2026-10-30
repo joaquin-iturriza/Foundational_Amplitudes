@@ -3994,6 +3994,37 @@ entries:
       design''s 5-test level. Checks 1, 4, 6, 7 hold. Check 5 searched: gridpack, set_gridpack, run size, short run, complete
       run, madevent in docs/results.tex, the entry''s evidence and dead ends, site decisions --project FA: only par:v4_short_runs
       / fig:v4_run_size and the rebuild dead end, both cited.'
+  - at: '2026-10-30T11:12:27+00:00'
+    question: 'ee4_epem_cgsxwm at 3000 GeV (D189, keep every energy): at which run size do runs drawn from its 3000 GeV gridpack
+      (52228 events'' precision, grid04, iseed 12576, the very file the re-probe FA-ccin2p3-67ba0a36 drew from) nearly all
+      complete, and do the complete runs of that size give the events of complete runs of the design''s 200?'
+    prior: 'docs/results.tex par:v4_short_runs: short runs biased (4 of 32 run-level tests under Bonferroni); complete per-run-integrated
+      runs differ by size (ladder, e+e- amupvmwm 200 vs 13057 KS 0.018 p 0.0025); gridpack runs of 200 agree with runs of
+      13057 on e+e- amupvmwm (KS 0.0042 p 0.995), so the e+e- gridpack layout uses runs of 200. plan show catalog_coverage:
+      cgsxwm 3000 GeV complete 7 of 16 at 200 on both the 13057 and 52228 gridpacks, short runs return 9-55 of 200 after 650-830
+      s; other energies 16/16. Searched ''cgsxwm'', ''run size'', ''gridpack'', ''smaller runs'' in results.tex, plan, site
+      decisions (D187-D189). No run-size probe on a gridpack exists: this design varies the run size on one fixed gridpack.'
+    measure: 'short_run_bias.py sizecheck --process ee4_epem_cgsxwm --energy 3000 --ref-ask 200 (worktree wt-cgsxwm-runsize):
+      per size 25, 50, 100, the complete share (runs that returned every event asked over runs kept) and the run-level permutation
+      test (run_perm, 50 quantile bins, 2000 relabellings) of its complete runs against the complete runs of 200 from the
+      same gridpack, on cos theta* of the first final in the rest frame (sqrt(s) fixed at e+e-); Bonferroni over the 3 sizes;
+      detectable KS stated per size.'
+    check: The same run-level test on cos theta* separated per-run-integrated e+e- runs of 200 from runs of 13057 (KS 0.018,
+      p 0.0025, short_run_bias_size.json @44b2eeb3) while its complete-halves control found 0 of 37 below 0.05; and sizecheck
+      reproduced on synthetic files the complete share and test wiring (local run, worktree).
+    fixed: The pool's cards, generate line, model, the 3000 GeV run-card patches, the gridpack file itself (grid04 at its
+      path under the current layout's identity; gridpool reuses it, nothing re-integrated), 16-core CPU jobs, run timeout
+      1800 s, MadGraph 3.7.0 on CC.
+    control: 'Reference: complete runs of 200 from the same gridpack (the design''s size, which the gridpack test passed on
+      e+e-), split in two by seed (control_ref_halves) to calibrate the statistic.'
+    seeds: 'Literal run seeds on disjoint ranges: 200: 128 runs (seeds 20001-20128, 2 jobs); 100: 128 runs (20201-20328, 2
+      jobs); 50: 192 runs (20401-20592, 2 jobs); 25: 384 runs (20601-20984, 3 jobs). 9 jobs of 16 cores, limit 2 h (worst
+      case all short at 750 s: 128 x 750 / 16 = 1.7 h), expected well under 1 h.'
+    outcome: 'Yes: the largest size with complete share >= 0.9 whose run-level test is not below 0.05/3 and whose detectable
+      KS is under 0.018 (the e+e- size bias): its 3000 GeV block is laid out in runs of that size from the same gridpack (energy_run_events,
+      grid_seed_runs 15, gridpack_eid of the current layout), as many as ceil(400 / (min(0.8, share/1.25) x size)), other
+      energies unchanged; assembled, then its queue parts checked with sizecheck --parts against the same reference. No (no
+      size reaches 0.9, or the passing sizes differ from 200): no layout; reported to Joaquin with the shares and distances.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
