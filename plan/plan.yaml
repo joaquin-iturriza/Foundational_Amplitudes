@@ -2650,7 +2650,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 0e9dda71
+    commit: f961e983
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -2675,6 +2675,28 @@ entries:
       1000 GeV: gridpacks built in 45/43 s, 6.3 MB, runs of 200: 197 and 196 of 200 complete, run median 12 s. Coordinator:
       dsh_bb_bbgg 100/100 complete. NEXT: site run measure -> analysis/catalog_v4/data/short_run_bias_gpack.json, read per
       step 7, write par:v4_short_runs + figure, then branch.'
+    - 'HAND-OFF (2026-10-30 06:55, gridpack rebuild). (1) PROBE RESULT (step 7, yes branch): gridpack runs agree with complete
+      runs of many in all three groups; 0 of 5 primary tests below 0.05/5, pair 0 of 5; dg_dguux 0.0208/0.0232 -> 0.0081 (p
+      0.028)/0.0085 (p 0.0135); bb_bbgg 0.0131/0.0112 -> 0.0079 (p 0.022)/0.0058 (p 0.223); e+e- 0.0180 -> 0.0042 (p 0.995);
+      caveat: pp residual 0.006-0.009 above own halves 0.004-0.005, under half the old bias not excluded. Written up in par:v4_short_runs,
+      fig:v4_run_size (analysis/catalog_v4/figs/short_run_bias_size.png/.pdf), data analysis/catalog_v4/data/short_run_bias_gpack.json,
+      src short_run_bias.py summary. (2) CODE merged to trunk f961e983 (repo-reviewer and notes-editor PASS): lhe.gridpack
+      identity, lhe_parts gridpack tasks first + needs, lhe_probe gridpool / gridpool-plan, job_lhe_probe.sh PROBE_SHARD=gridpool,
+      GRID_MIN pp 31774 / e+e- 13057, runs 1000 pp / 200 e+e-, 56 pools in complete_runs.json (21 dsh, 18 ee4, 17 pp13v4);
+      the 57 found after catalog_v4_w3 (8 shortbuilt, 49 w3 cannot assemble) in complete_runs_pending.json, layouts untouched,
+      waiting on Joaquin (coordinator answered it citing D180, which is about work dirs; both reviewers blocked the 113 without
+      his words). (3) SUBMITTED: gridpool probe, 12 CPU jobs x 16 cores, limit 3 h, target 1.5 h (plan target gridpool_probe),
+      longest estimate 1.06 h (dsh_dd_duwmz): FA-ccin2p3-a336c863 3589b722 db444b3b 1938fe02 34bccbc4 66cccf26 94b9585b b7eb044e
+      62629f2a 019c0386 729a124c c5cbaed4. Each builds its pools'' real gridpacks at their queue paths (the wave reuses them)
+      and 16 probe runs per gridpack. (4) NEXT when they end: read each log (GRIDPACK_JSON stage grid errors, PROBE_JSON yields);
+      site run ''python tools/lhe_probe.py kept <the 12 logs> --out $SCRATCH/gridpool_kept.json --yields-out $SCRATCH/gridpool_yields.json''
+      (logs under the checkout as lhe_probe_<jobid>.out), merge the yields into analysis/catalog_v4/data/lhe_probe_yields.json
+      (commit), then on CC: python tools/lhe_parts.py plan recipes/catalog_v4_default_lhe.yaml recipes/catalog_v4_ee_test.yaml
+      recipes/catalog_v4_pp_parts.yaml --queue $SCRATCH/lhe_queue/catalog_v4_gridpack --grid-cores 16 (new queue; no --skip-claimed
+      needed, gridpack parts have their own names; check that only the 56 are planned: the specs hold other unbuilt pools,
+      use --exclude or a spec of the 56), site queue add, plan target, site pick FA --gpus 0, submit one wave (scripts/job_lhe_parts.sh).
+      Runs: 1000-event pp runs took ~40 s and e+e- 200 ~12 s in the probe. (5) w3 events E2501-E2513, E2526-E2531 acked: all
+      one cause, runs stopping short.'
     - 'HAND-OFF (2026-10-30, gridpack step). (1) CODE: commit 7bdc5729 (+39914802 measure). mg5_pipeline_final.py: lhe_make_gridpack(process,
       ev, nevents, iseed, log, mg_cores, patches, run_name=''grid'') runs lhe_run_madevent with run-card gridpack=True (lhe_run_madevent
       now returns lhe=None for a gridpack run instead of raising) and returns <ev>/grid_gridpack.tar.gz; lhe_run_gridpack(tar,
