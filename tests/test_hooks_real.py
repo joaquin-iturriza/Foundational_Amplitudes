@@ -711,7 +711,17 @@ def submit_budget():
                                                             "--est-gpu-hours 4; done" % gpu, 0),
             ("a GPU submission in a loop whose count is not readable", "for f in $(ls cfg); do site submit auto FA %s "
                                                                       "--item jz --est-gpu-hours 1; done" % gpu, 2),
-            ("CPU workers in a loop of 30", "for i in $(seq 30); do site submit ccin2p3 FA %s --item cpu; done" % cpu, 0)):
+            ("CPU workers in a loop of 30", "for i in $(seq 30); do site submit ccin2p3 FA %s --item cpu; done" % cpu, 0),
+            ("one GPU submit whose --note says 'for the parallel test'",
+             "site submit auto FA %s --item jz --est-gpu-hours 1 --note \"probe for the parallel test\"" % gpu, 0),
+            ("6 GPU-h in nested loops of 3 x 2 (36 GPU-h)", "for i in 1 2 3; do for j in $(seq 2); do site submit auto "
+                                                           "FA %s --item jz --est-gpu-hours 6; done; done" % gpu, 2),
+            ("an unrelated seq 100 before a loop of one", "seq 100 >/dev/null; for i in 1; do site submit auto FA %s "
+                                                          "--item jz --est-gpu-hours 12; done" % gpu, 0),
+            ("seq 3 | xargs of 6 GPU-h (18)", "seq 3 | xargs -I{} site submit auto FA %s --item jz --est-gpu-hours 6"
+             % gpu, 0),
+            ("a GPU submit inside xargs sh -c (count unreadable)", "seq 40 | xargs -I{} sh -c 'site submit auto FA %s "
+                                                                  "--item jz --est-gpu-hours 1'" % gpu, 2)):
         rc = sub(cmd)
         scenario("B2: budget: %s is %s" % (what, "refused" if want else "allowed"), rc == want, (rc, cmd))
     code = ("import sys; sys.path.insert(0, %r); import submit_guard as g\n"

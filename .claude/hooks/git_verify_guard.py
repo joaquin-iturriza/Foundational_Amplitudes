@@ -115,7 +115,7 @@ def attributed(repo, args):
     msgs, k = [], 0
     while k < len(args):
         t = args[k]
-        if t in ("-m", "--message") and k + 1 < len(args):
+        if (t in ("-m", "--message") or re.match(r"^-[A-Za-z]*m$", t)) and k + 1 < len(args):
             msgs.append(args[k + 1])
             k += 2
             continue

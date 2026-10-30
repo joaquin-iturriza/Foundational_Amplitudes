@@ -349,18 +349,65 @@ def asks_gpu(script):
         return True                 # unreadable here: counted as a GPU job (the site refuses a missing script anyway)
 
 
-LOOP = re.compile(r"(?:^|[;&|(\s])(?:for|while|until)\s|\bxargs\b|\bparallel\b")
-REPEAT = re.compile(r"\bseq\s+(?:(\d+)\s+)?(\d+)\b|\{(\d+)\.\.(\d+)\}")
+REPEAT = re.compile(r"^SEQ:(\d+):(\d+)$|^\{(\d+)\.\.(\d+)\}$")
+SEQ_PIPE = re.compile(r"\bseq\s+(?:(\d+)\s+)?(\d+)\s*\|\s*(?:xargs|parallel)\b")
 
 
-def repeats(cmd):
-    """how many times a loop in the command runs, when it reads `seq N`, `seq A B` or {A..B}; None otherwise."""
-    m = REPEAT.search(cmdparse.code_text(cmd))
-    if not m:
-        return None
-    if m.group(2):
-        return int(m.group(2)) - int(m.group(1) or 1) + 1
-    return int(m.group(4)) - int(m.group(3)) + 1
+def _words_count(words):
+    """passes of a `for x in WORDS` list: literal words count one each, `$(seq N)`, `$(seq A B)` and {A..B} their
+    range; anything else (a variable, a glob, another substitution) cannot be read: None."""
+    n = 0
+    for w in words:
+        m = REPEAT.match(w)
+        if m:
+            n += (int(m.group(2)) - int(m.group(1)) + 1) if m.group(2) else int(m.group(4)) - int(m.group(3)) + 1
+        elif re.search(r"[$*?`\[]", w) or w.startswith("{"):
+            return None
+        else:
+            n += 1
+    return n
+
+
+def submit_multipliers(cmd):
+    """[passes] for each `site submit` of the command, in order: the product of the loops that enclose it (for over a
+    word list, $(seq ...), {A..B}; `seq N | xargs/parallel`); None when an enclosing loop's count cannot be read
+    (while, until, a variable list, xargs over anything else). Read on the code with quoted strings blanked, so a
+    --note that says "for" or "parallel" is no loop."""
+    text = cmdparse.blank_quotes(cmdparse.strip_comments(cmdparse.code_text(cmd)))
+    text = re.sub(r"\$\(\s*seq\s+(\d+)(?:\s+(\d+))?\s*\)",
+                  lambda m: "SEQ:%s:%s" % ((m.group(1), m.group(2)) if m.group(2) else ("1", m.group(1))), text)
+    toks = [t for t in re.split(r"[ \t]+", re.sub(r"([;\n|&()])", r" \1 ", text)) if t]
+    stack, mults, start = [], [], True
+    for k, t in enumerate(toks):
+        if t in (";", "\n", "&", "&&", "|", "||", "(", ")"):
+            start = True
+            continue
+        if start and t == "for" and k + 2 < len(toks) and toks[k + 2] == "in":
+            words = []
+            for w in toks[k + 3:]:
+                if w in (";", "\n", "do"):
+                    break
+                words.append(w)
+            stack.append(_words_count(words))
+        elif start and t in ("while", "until"):
+            stack.append(None)
+        elif start and t == "done" and stack:
+            stack.pop()
+        elif t == "site" and toks[k + 1:k + 2] == ["submit"]:
+            seg = " ".join(toks[max(0, k - 12):k])
+            piped = None
+            if re.search(r"\b(?:xargs|parallel)\b", seg):
+                m = SEQ_PIPE.search(" ".join(toks[:k]))
+                piped = (int(m.group(2)) - int(m.group(1) or 1) + 1) if m else None
+                stack_here = stack + [piped]
+            else:
+                stack_here = stack
+            m = 1
+            for c in stack_here:
+                m = None if (m is None or c is None) else m * c
+            mults.append(m)
+        start = t in ("do", "then", "else", "{") or (start and re.match(r"^[A-Za-z_]\w*=", t) is not None)
+    return mults
 
 
 def _registry(project, item):
@@ -391,17 +438,21 @@ def budget(cmd, segs):
         if re.search(r"\bsite\s+submit\b", cmdparse.scan_text(cmd)):
             return ["budget: a `site submit` in a command that cannot be read; run it on its own line"]
         return []
-    loop = bool(LOOP.search(cmdparse.code_text(cmd)))
-    n = repeats(cmd) if loop else 1
+    mults = submit_multipliers(cmd)
     totals = {}                                         # (project, item) -> [GPU-h, on Jean Zay]
-    for site, project, script, item, est, allow_jz in site_submits(segs):
+    subs = site_submits(segs)
+    if len(mults) != len(subs):          # a submit the plain reading cannot place (inside sh -c, a substitution)
+        loopy = re.search(r"(?:^|[;&|(\s])(?:for|while|until)\s|\bxargs\b|\bparallel\b",
+                          cmdparse.blank_quotes(cmdparse.code_text(cmd)))
+        mults = [None if loopy else 1] * len(subs)
+    for (site, project, script, item, est, allow_jz), n in zip(subs, mults):
         if not asks_gpu(script):
             continue
         if est is None or est < 0:
             out.append("budget: `site submit %s %s %s` asks for a GPU: pass --est-gpu-hours H (wall time x GPUs; "
                        "CLAUDE.md rule 2)" % (site, project, script))
             continue
-        if loop and n is None:
+        if n is None:
             out.append("budget: a GPU `site submit` inside a loop whose count is not readable (seq N or {A..B}): "
                        "the total cannot be summed; write the count out")
             continue
