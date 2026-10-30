@@ -223,8 +223,9 @@ def cmd_gridpool(a):
     a time. One PROBE_JSON line per run, read by `summary` and `kept --yields-out` like a MadEvent probe run's (yield,
     kept fraction, seconds per kept event; "gridpack": true, the energy in its patches); one GRIDPACK_JSON line per
     gridpack (stage grid: seconds, bytes). --events asks runs of that size instead of the pool's run size (a run-size probe
-    on the pool's own gridpacks), --energy keeps only that energy's gridpack, --seed-base offsets the probe seeds
-    (lhe_iseed(process, 9999 + seed_base + s)) so probes of several sizes never share a seed, and --keep saves each run's
+    on the pool's own gridpacks), --energy keeps only that energy's gridpack, --seed-base B takes run seeds B+1, B+2, ..
+    instead of the hashed probe seeds (which collide: lhe_iseed is mod 20000), so probes of several sizes laid out on
+    disjoint ranges never share a seed, and --keep saves each run's
     events as KEEP/<process>/<process>_gpack<grid iseed>_seed<iseed>_ev<n>.npz (short_run_bias.py sizecheck)."""
     import datagen
     from concurrent.futures import ThreadPoolExecutor
@@ -262,7 +263,7 @@ def cmd_gridpool(a):
                     continue
 
                 def one(s, tar=tar, g=g):
-                    seed = mg.lhe_iseed(name, 9999 + a.seed_base + s)
+                    seed = a.seed_base + s if a.seed_base else mg.lhe_iseed(name, 9999 + s)
                     r = {"process": name, "seed": seed, "events_asked": run_ev, "patches": g[2], "gridpack": True,
                          "grid": g[3], "host": socket.gethostname()}
                     rw = os.path.join(wd, f"run_{g[3]}_{s}")
@@ -608,7 +609,7 @@ def main():
     s.add_argument("--timeout", type=float, default=1800.0)
     s.add_argument("--events", type=int, default=None, help="run size (default: the pool's lhe.run_events)")
     s.add_argument("--energy", type=float, default=None, help="e+e-: only the gridpack of this collider energy")
-    s.add_argument("--seed-base", type=int, default=0, help="probe seeds lhe_iseed(process, 9999 + this + s)")
+    s.add_argument("--seed-base", type=int, default=0, help="run seeds this+1, this+2, .. (default: hashed probe seeds)")
     s.add_argument("--keep", default=None, help="save each run's events and banner under KEEP/<process>/")
     s = sub.add_parser("gridpool-plan"); s.add_argument("--jobs", type=int, required=True)
     s.add_argument("--cores", type=int, default=16); s.add_argument("--runs", type=int, default=16)

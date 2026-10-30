@@ -667,6 +667,9 @@ def cmd_sizecheck(a):
         rows.append(s)
     ref = sorted([s for s in rows if s["asked"] == a.ref_ask and s["got"] >= s["asked"] and s["src"] != "parts"],
                  key=lambda s: s["seed"])
+    # a queue run that shares a reference run's seed draws the same events from the same gridpack: that reference run
+    # is left out, so the test never compares a run with itself
+    ref = [s for s in ref if s["seed"] not in {t["seed"] for t in rows if t["src"] == "parts"}]
     feats = ["cos_theta_star"]
     Fr = _feats_of(ref, CAP)
     out = {"process": a.process, "energy": a.energy, "ref_ask": a.ref_ask, "physics_keys": sorted(map(str, keys)),
