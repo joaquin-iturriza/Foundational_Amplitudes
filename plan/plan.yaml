@@ -128,11 +128,12 @@ entries:
   - D175
   - D182
   next:
-    5: When the held-out reads of the two sign-extension pretrainings end (FA-ccin2p3-84b85010 seed 42, FA-ccin2p3-019b939c
-      seed 43, eval-only rereads of FA-ccin2p3-a8cd68ce and -6681cae1, whose training completed and whose reads died on the
-      full CC disk), read them against the control pair v4_dimensionless_muon seeds 42 and 43 as the design says (wrong-sign
-      share on the 21 held-out sign-changing pools at the best checkpoint, the per-pool sign test, the seed-mean median; the
-      zero-shot MSE per axis, 2->5 first; blow-ups listed)
+    5: 'The one-loop sign extension on catalog_v4 read 2026-10-30 (par:v4_signext @54a922b6, analysis/catalog_v4/signext_compare.py):
+      inconclusive by the design''s rule (seed means lower on 14 of 21 held-out sign-changing pools, higher on 6, 1 tie, sign
+      test p=0.058 against p<0.05; median wrong-sign 6.48% -> 3.08%; seed 42 lower on 15, seed 43 on 16; zero-shot MSE cost
+      on every tree axis, 1.13 to 1.37 against control seed spreads 0.98 to 1.18; H5 magnitude MSE 0.615x; no blow-ups). Waits
+      on the user: a third and fourth seed of both arms (four runs, about 7 GPU-h), the design''s question; on yes submit
+      them (ARM v4_dimensionless_muon[_more_signed] with seeds 44, 45) and rerun signext_compare.py over four seeds'
     6: 'Waits on the CC-IN2P3 /sps/lpnhe cleanup (df 2026-10-29: 512G used of 512G, 0 available; another agent is freeing
       about 340G). Once at least 50G is free: resubmit unchanged, as eval-only re-reads, the two TR reads of the control pair
       under the passed shape-gap design (REREAD=FA-ccin2p3-339ec100 seed 42 and REREAD=FA-ccin2p3-380842ed seed 43, scripts/job_catalog_v3_short.sh
@@ -1276,9 +1277,10 @@ entries:
     5:
       feeds: whether training on more sign-changing one-loop pools lowers the held-out wrong-sign share at equal compute
       if:
-      - 'the wrong-sign share drops on both seeds by the design''s sign test: adopt the sign extension for the full pretraining''s
-        recipe'
-      - 'no drop on either seed: record the sign extension as a dead end for the wrong-sign share'
+      - 'four-seed sign test p<0.05 and the median lower: propose the sign extension for the full pretraining''s recipe to
+        the user with its tree-axis MSE cost beside it'
+      - 'still short of the rule or the median not lower: record the sign extension as not resolved at this compute and drop
+        it from the recipe'
     6:
       feeds: 'the user''s shape priority (D178): whether the shape error of new processes with known particles is a generalisation
         gap beyond intrinsic difficulty or the network''s floor at this compute, which decides whether shape work targets
@@ -1292,7 +1294,6 @@ entries:
         no decision'
   step_waits:
     '6': the user's stop on all work (2026-10-29); the two TR reads completed and wait to be collected
-    '5': the user's stop on all work (2026-10-29); both reads completed and wait to be collected
   owner:
     agent: a208e44d49598bdaf
     state: working
