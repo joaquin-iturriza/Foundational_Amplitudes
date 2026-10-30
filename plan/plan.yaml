@@ -4483,6 +4483,17 @@ entries:
       by this). Between (0.90 < R < 0.97 with the interval below 1): a small gain, reported as such with its interval. Smart
       axes: the bound''s cost reported as R per axis with its interval; a cost (R >= 1.10, interval above 1.0) is expected
       for a pure-default arm and sizes how much smart share a mixture must keep. Thresholds fixed now, before any arm is read.'
+    passed_at: '2026-10-30T17:14:20+00:00'
+    reviewer: 'Re-check after FIX, step 11 only (step 14 waits on Joaquin''s shares and is out of this design). One change:
+      only the training recipe differs (797 hadronic classes on pp pools: 466 pp13v4, 331 reused pp13 with no b and no changed
+      diagram count; the other 356 entries are the control''s files; 4264 steps; same HPs; controls re-read on PP4 test).
+      Measure moves: catalog_v3 pp-trained over window-trained 0.19 (0.59 inside coverage, 802/986 lower), catalog_v4 over
+      pp-trained 0.66 against a seed spread of 0.10. Spread: statistic R is the median over about 800 classes, noise about
+      0.0065 in log10, so the smallest effect 0.90 is about 7 standard errors; class-bootstrap interval widened by the control''s
+      own seed-43/seed-42 median shift. Outcome numeric for YES (R<=0.90, interval below 1), NO (R>=0.97 or interval contains
+      1) and between, fixed before reads; smart-axes cost reported per axis. Prior now names the pp blend, D167 and the density-check
+      mixture KL. Searched results.tex (pp-trained, default share, f_default, mixture, blend, pp blend, seed spread), plan
+      show catalog_coverage with its asks, site decisions D166, D167, D178, D187-D193.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
