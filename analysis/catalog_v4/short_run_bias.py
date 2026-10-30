@@ -363,23 +363,36 @@ def cmd_measure(a):
                                        key=lambda t: t[0])]
             if len(ts) >= 4:
                 r["control_top_halves"] = _compare(ts[0::2], ts[1::2], feats)
-            # runs drawn from one gridpack, per (gridpack, ask), against the same largest runs, and split in two
-            gl, gh = {}, {}
-            for (g, ask) in sorted({(s["gridpack"], s["asked"]) for s in gp}):
-                G = sorted([s for s in gp if s["gridpack"] == g and s["asked"] == ask], key=lambda s: s["seed"])
-                if len(G) < 2:
-                    continue
-                FG = _feats_of(G, per)
-                for f, v in _compare(FG, by[top], feats).items():
-                    gl[f"{ask}/{f}"] = dict(v, ask=ask, gridpack=g, ask_large=top, runs_small=len(G),
-                                            runs_large=len(by[top]), detectable_ks_5pct=_detectable(FG, by[top]))
-                if len(G) >= 4:
-                    for f, v in _compare(FG[0::2], FG[1::2], feats).items():
-                        gh[f"{ask}/{f}"] = v
-            if gl:
-                r["gridpack"] = gl
-            if gh:
-                r["control_gridpack_halves"] = gh
+            # runs drawn from gridpacks: per ask, all the group's gridpacks pooled against the same largest runs ("all")
+            # and against the per-run-integrated complete runs of the same ask (the change itself), each gridpack alone
+            # against the largest runs ("g<iseed>"), the two first gridpacks against each other, and each split in two
+            gl, gv, gpair, gh = {}, {}, {}, {}
+            for ask in sorted({s["asked"] for s in gp}):
+                grids = sorted({s["gridpack"] for s in gp if s["asked"] == ask})
+                FG = {g: _feats_of(sorted([s for s in gp if s["gridpack"] == g and s["asked"] == ask],
+                                          key=lambda s: s["seed"]), per) for g in grids}
+                allg = [F for g in grids for F in FG[g]]
+                meta = lambda X, Y: dict(ask=ask, runs_small=len(X), runs_large=len(Y), detectable_ks_5pct=_detectable(X, Y))
+                for tag, X in [("all", allg)] + [(f"g{g}", FG[g]) for g in grids]:
+                    if len(X) < 2 or (tag != "all" and len(grids) < 2):
+                        continue
+                    for f, v in _compare(X, by[top], feats).items():
+                        gl[f"{tag}/{ask}/{f}"] = dict(v, ask_large=top, **meta(X, by[top]))
+                own = by.get(ask, [])
+                if len(allg) >= 2 and len(own) >= 2:
+                    for f, v in _compare(allg, own, feats).items():
+                        gv[f"{ask}/{f}"] = dict(v, **meta(allg, own))
+                if len(grids) >= 2 and min(len(FG[g]) for g in grids[:2]) >= 2:
+                    for f, v in _compare(FG[grids[0]], FG[grids[1]], feats).items():
+                        gpair[f"{ask}/{f}"] = dict(v, **meta(FG[grids[0]], FG[grids[1]]))
+                for g in grids:
+                    if len(FG[g]) >= 4:
+                        for f, v in _compare(FG[g][0::2], FG[g][1::2], feats).items():
+                            gh[f"g{g}/{ask}/{f}"] = v
+            for k, v in (("gridpack", gl), ("gridpack_vs_own_runs", gv), ("gridpack_pair", gpair),
+                         ("control_gridpack_halves", gh)):
+                if v:
+                    r[k] = v
         res[c if c not in res else f"{c}#{key[:6]}"] = r
         print(f"[short_run_bias] {c}: short {n_s} ({len(short)} runs) vs complete {n_c} ({len(comp)} runs): "
               + ", ".join(f"{f} KS {v['ks']} p {v['p']:.2g} p_runs {v.get('p_runs')}"
@@ -405,7 +418,7 @@ def summary(d, alpha=0.05):
     sizes = sorted({k for r in d["groups"].values() for k in r if k.startswith("size_")})
     for kind in ("short_vs_complete", "deep_vs_complete", "control_complete_halves",
                  "control_complete_small_vs_large", *sizes, "ladder", "control_top_halves", "gridpack",
-                 "control_gridpack_halves"):
+                 "gridpack_vs_own_runs", "gridpack_pair", "control_gridpack_halves"):
         T = [(c, f, v) for c, r in d["groups"].items() for f, v in (r.get(kind) or {}).items() if isinstance(v, dict)]
         R = [(c, f, v) for c, f, v in T if "p_runs" in v]
         out[kind] = {"tests_events": len(T),
