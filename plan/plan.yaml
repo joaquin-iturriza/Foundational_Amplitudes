@@ -4939,7 +4939,7 @@ entries:
         them'
   owner:
     agent: aaf418a63a4ebed0b
-    state: stopped
+    state: closed
     since: '2026-10-30T22:19:16+00:00'
     context: 253895
     context_at: '2026-10-30T23:38:15+00:00'
@@ -5103,25 +5103,31 @@ entries:
       control''s (not duplicates). zz_archive_lxera 29.2 GB (the tars Joaquin keeps). runs 52.0, runs_from_lxplus 24.2, mg5amcnlo
       53.1 GB.'
   handoff:
-    state: 'Step 11: smoke FA-ccin2p3-445e33a3 COMPLETED at a2bd74ae (E3058 fix: lhe_pp pools read their sidecar orders like
-      their trees; audit /sps/lpnhe/jiturrizaramirez01/tmp/lhe_pp_orders_audit_a2bd74ae.json: no earlier target changes);
-      arms v4_dimensionless_muon_pp FA-ccin2p3-afc96598 (pending) and _pp_seed2 FA-ccin2p3-d26f13aa (running), 2.5 h. Controls''
-      PP4+EE4 mode-eval reads FA-ccin2p3-04253ff7 and FA-ccin2p3-e7e32847 running (1 h). Step 14 BLOCKED (E3072): the mixture
-      pools were never prebuilt (0 smixd50 and 0 smixd25 files in CC''s amp_data_cache); default50 c6d1c5ff FAILED in require_cache,
-      its siblings 27e731b4, 560f6685, c3ab6791 cancelled. Next: probe scripts/prebuild_recipes.sh on a few entries of recipes/catalog_v4_default50_train.yaml
-      (time and disk per pool, 3 roles), record the batch target, site pick, prebuild default50 and default25 (CPU, prepost/htc),
-      then resubmit the four arms (v4_dimensionless_muon_default50[_seed2], _default25[_seed2]) with --hdr=--mem=48G --hdr=--time=02:30:00
-      --allow-unfit --no-sync, afterok on the prebuilds; no new smoke needed unless the code changes. Then the readout writing
-      analysis/catalog_v4/data/mixture_ab.json under the 17:29 rule.'
-    decisions: E3058 fixed in code (a2bd74ae, repo-reviewer passed the change) rather than re-chaining, so every run carries
-      the fixed commit; all dependents of the failed smoke and the table-order control reads cancelled and resubmitted. CC
-      kept (the design fixes the site); lxplus probe FA-lxplus-ed084f25 IDLE, no site change requested.
-    ruled_out: 'Raising the item''s GPU estimate to get past the gate''s phantom cancelled hours (not the user''s approval);
-      editing ~/.local/bin/site_gate.py (refused by the permission classifier: needs Joaquin)'
-    running: FA-ccin2p3-afc96598, FA-ccin2p3-d26f13aa, FA-ccin2p3-04253ff7, FA-ccin2p3-e7e32847
-    files: experiment.py, mg5_pipeline_final.py, tests/test_orders_source.py, tools/lhe_pp_orders_audit.py (a2bd74ae); plan/step_prompt.txt
-      (295bac0c); docs/results.tex par:v4_short_runs (898b2674)
-    written: '2026-10-30T22:18:10+00:00'
+    state: 'Step 14: mixture pools prebuilt on CC (default50 and default25, 912 default-share tree entries each, ~22.5 GB
+      each) with per-event alpha_s written (check_site_data --alphas passes both); the four arms resubmitted at 2.5 h with
+      no dependency: default50 FA-ccin2p3-6c246603, default50_seed2 1d46b938, default25 11ad944a, default25_seed2 9c6fc7ab
+      (queued). Control mode-eval reads 04253ff7/e7e32847 COMPLETED: PP4 931 classes each fine; EE4 170/170 refused on both
+      (zero_shot_parent builds the probe''s train pool; ee4_ entries have n_train 0), so the arms'' EE4 reads will fail the
+      same way. Step 14 unwaited. /sps/lpnhe at 96% (21 GB free); audit in findings (nothing deleted). NEXT, in order: (1)
+      Disk, under Joaquin''s 2026-10-29 words ''Yes, of course delete those working dirs, and make the change so that they
+      get deleted once they are not needed anymore'': check that every $SCRATCH/lhe_work/parts .npz has its copy in $SCRATCH/lhe_parts;
+      then delete $SCRATCH/lhe_work/parts (47.2 GB) and the $SCRATCH/lhe_work/pp13v4_*_madevent directories (13.1 GB), plus
+      the zz_probe_* outputs; find why the auto-delete asked for on 10-29 did not remove these, and fix it. (2) The EE4 reader
+      repair: probe statistics without a train pool (tools/zero_shot_parent.py / experiment._init_data_recipes for a role
+      with 0 events); then REREAD EE4 on the controls (v4_dimensionless_muon, _seed2) and the four arms; then the readout
+      writing analysis/catalog_v4/data/mixture_ab.json under the 17:29 rule.'
+    decisions: Prebuild in 16 shards per recipe with the existing job script (V4REGEN_RECIPES, --only-default-share) rather
+      than a new script; arms chained on prebuilds, then submitted directly once check_site_data --alphas passed. submit_guard
+      data check added (refuses a FA arm whose recipe pools or per-event alpha_s are not on the site unless chained afterok
+      on a prebuild run whose --note names the recipe); pick units spent only when a command passes. Prune --caches dry run
+      (D19/D200) found 0 GB to free, so not applied.
+    ruled_out: 'Building default25 later for disk: measured default50 use (22.5 GB) left room above the 15.4 GB floor. Globbing
+      pools by class name in write_own_alphas (several shapings side by side).'
+    running: FA-ccin2p3-6c246603, FA-ccin2p3-1d46b938, FA-ccin2p3-11ad944a, FA-ccin2p3-9c6fc7ab (queued, 2.5 h each); step
+      11 arms afc96598, d26f13aa (not mine to touch)
+    files: scripts/job_catalog_v4_regen.sh, tools/shard_recipes.py (b2437fcf); .claude/hooks/submit_guard.py, tests/test_submit_data_check.py
+      (dd62596a); tools/check_site_data.py, write_own_alphas in job (77859d92); tools/write_own_alphas.py (5250ef5b)
+    written: '2026-10-30T23:38:45+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
