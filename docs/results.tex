@@ -2994,6 +2994,28 @@ complete. The $56$ pools laid out so are the $52$ catalog\_v4 pools found assemb
 whose runs stop short even at a thousand events; the pools they replace are moved aside, not deleted. Not settled
 here: whether the reused catalog\_v3 pp pools carry the bias (most of their sidecars do not record events per run).
 
+Re-read with the corrected run-level test. The relabelling $p$ above came out too small when the two sides' runs differ
+in size; the test now scales the KS distance by $\sqrt{n_a n_b/(n_a+n_b)}$, the two sides' events. The same groups,
+measured again on the files as they stood when this measurement was taken (every event-level KS reproduces exactly),
+with $20000$ relabellings: of the $32$ tests of short against complete runs, $1$ falls below $0.05$ after the
+correction ($u u\to\gamma g u u$ in $\sqrt{\hat s}$) and $7$ below $0.05$; for the runs under $0.3$ of their ask, $2$
+and $10$ of $30$; the control stays at $0$ and $1$ of $31$. $u b\to b d W^+ Z$ and $e^+e^-\to\gamma\mu^+\nu_\mu W^-$
+no longer pass the correction, each new $p$ clear of the threshold by more than its relabelling interval. The answer
+stands on fewer tests ($7$ of $32$ below $0.05$ where chance gives about $1.6$), and so does the rebuild in complete
+runs. The run-size and gridpack measurements below could not be re-read so: the files of $d\bar b\to\bar b H u W^-$,
+$d\bar b\to\bar b u W^- Z$ and $u u\to d u W^+ Z$ changed after them and match at no earlier time.
+% src: python3 analysis/catalog_v4/short_run_bias.py summary --json analysis/catalog_v4/data/short_run_bias_reread.json @f57e1659
+% allow: 20000 0.05 0.3 1.6 because they are the relabellings, the test level, the deep-short threshold and 32 x 0.05
+% claim: short_vs_complete.tests_runs=32
+% claim: short_vs_complete.n_bonf=1
+% claim: short_vs_complete.n_alpha=7
+% claim: deep_vs_complete.tests_runs=30
+% claim: deep_vs_complete.n_bonf=2
+% claim: deep_vs_complete.n_alpha=10
+% claim: control_complete_halves.tests_runs=31
+% claim: control_complete_halves.n_bonf=0
+% claim: control_complete_halves.n_alpha=1
+
 The size control above had too few small runs to see an effect of the short runs' size, and the rebuild would have
 changed the run size as well as completeness, so before it a run-size probe asked: do complete runs at the rebuild's
 sizes give the events complete runs of many give? Design: complete runs of $150$ and $1000$ events on $b b\to b b g g$,
