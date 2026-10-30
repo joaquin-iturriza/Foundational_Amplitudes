@@ -142,11 +142,10 @@ entries:
       44 and 45, via NOSYNC=1 SYNC_FIRST=1 TIME=04:00:00 bash scripts/launch_cc_only.sh v3_prep_explore 2.0 ''<note>'' scripts/job_catalog_v3_short.sh
       v4_dimensionless_muon_more_signed_seed3 (and _seed4). When all four end: collect, extend analysis/catalog_v4/signext_compare.py
       to four seeds, read by the passed design''s rule'
-    6: 'TR reads of the control pair for the shape gap: seed 42 submitted as FA-ccin2p3-e37d7ec2 (REREAD=FA-ccin2p3-339ec100,
-      time limit 1.5 h); seed 43 still to submit (gate window), via NOSYNC=1 SYNC_FIRST=1 TIME=01:30:00 V3_AXES=TR RESUBMIT=1
-      REREAD=FA-ccin2p3-380842ed bash scripts/launch_cc_only.sh v3_prep_explore 0.5 ''<note>'' scripts/job_catalog_v3_short.sh
-      v4_dimensionless_muon_seed2 eval. When both end: collect (tools/collect_run.py --axes TR), rerun python3 analysis/catalog_v4/loop_levels.py
-      --shape-gap, decide per group by the design, fill tab:v4_shape_gap and par:v4_shape_gap'
+    6: 'TR reads of the control pair for the shape gap running on CC: seed 42 FA-ccin2p3-e37d7ec2 (REREAD=FA-ccin2p3-339ec100),
+      seed 43 FA-ccin2p3-3fe9f0b1 (REREAD=FA-ccin2p3-380842ed), 1.5 h limits. When both end: collect (tools/collect_run.py
+      --axes TR), rerun python3 analysis/catalog_v4/loop_levels.py --shape-gap, decide per group by the design, fill tab:v4_shape_gap
+      and par:v4_shape_gap'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
