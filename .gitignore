@@ -174,3 +174,7 @@ plan/.claims_cache.json
 /.disk_watch_cache.json.tmp
 /.disk_full
 talks/progress_oct2026b/data/
+# hook dispatcher and incident record (per checkout, live state)
+.claude/hooks/.dispatch_state.json*
+.claude/hooks/disabled.json*
+.claude/hooks/incidents.jsonl

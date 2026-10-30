@@ -1,0 +1,59 @@
+{
+ "built": "2026-10-30T05:51:55+01:00",
+ "counts": {
+  "COMPLETED": 34,
+  "FAILED": 31,
+  "IndexError": 908,
+  "MAINTAIN": 3,
+  "RUN": 224,
+  "TIMEOUT": 159,
+  "acked": 227,
+  "events": 227
+ },
+ "plan": {
+  "demand_commit_time": 1793314439,
+  "plan_before": "0a7fb8366c994c31255033d368043513f4e65856",
+  "plan_head": "d011464f8d697a6d9e38997f098f9a3dd1474159"
+ },
+ "transcripts": [
+  "71602535-0955-42ad-a58f-23dc320798dc",
+  "71602535__agent-a114e6cc724f48cbb",
+  "71602535__agent-a18da8384410342db",
+  "71602535__agent-a18f93e377194fc6f",
+  "71602535__agent-a196833f732179d8c",
+  "71602535__agent-a1e22577017b64fe8",
+  "71602535__agent-a22cf79c142aa8740",
+  "71602535__agent-a2418ea62dce3feeb",
+  "71602535__agent-a25df1bb2648ccb22",
+  "71602535__agent-a3ab8150ea07564ce",
+  "71602535__agent-a445e185e6734e119",
+  "71602535__agent-a465c6fd3d3a57674",
+  "71602535__agent-a557b6b516a95ab4c",
+  "71602535__agent-a58083628478d6d3e",
+  "71602535__agent-a5b93400ff860293a",
+  "71602535__agent-a6cc73dadca98309a",
+  "71602535__agent-a78190606790e6beb",
+  "71602535__agent-a8798a104b9beeae2",
+  "71602535__agent-a87ed288659960000",
+  "71602535__agent-a9258fff4c4eab1e0",
+  "71602535__agent-a95ca675809ee954e",
+  "71602535__agent-aaf53d43b973a058d",
+  "71602535__agent-ab51b32e6bab9f3f6",
+  "71602535__agent-abc08fe5f13ea59da",
+  "71602535__agent-ac113e17c939e8360",
+  "71602535__agent-ac731df3ba4582956",
+  "71602535__agent-ac8f255d3b6b4ec6c",
+  "71602535__agent-acec06bc9188bbd17",
+  "71602535__agent-ad0a226b66255fec6",
+  "71602535__agent-ad0bb3149b3a0eabb",
+  "71602535__agent-ad9db3e9bcb62d307",
+  "71602535__agent-ae0cb29531a9313dd",
+  "71602535__agent-af70760f8565b452a",
+  "71602535__agent-afaed2ff91732bf3a",
+  "71602535__agent-aff478098e0a1996d"
+ ],
+ "window": [
+  "2026-10-29T20:00:00+01:00",
+  "2026-10-30T03:56:37+01:00"
+ ]
+}
