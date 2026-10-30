@@ -2443,6 +2443,7 @@ entries:
     - FA-ccin2p3-7504f022
     - FA-ccin2p3-75150ab6
     - FA-ccin2p3-75b124e6
+    - FA-ccin2p3-7619b7c0
     - FA-ccin2p3-765b671b
     - FA-ccin2p3-7666a2b3
     - FA-ccin2p3-76ba6018
@@ -2659,6 +2660,10 @@ entries:
     - analysis/storage/free_manifest_2026-10-26.tsv
     - analysis/storage/free_space.py
     - particle_ids.py
+    - 'pp13v4 generation part 3 of 8 (commit c7ca7d55, before the beam_masses fix e7a1775d), TIMEOUT 2026-10-30 02:26 while
+      building pp13v4_dd_ddgg: 83 pools done; 3 short MadEvent runs (pp13v4_ub_bggu 3428, pp13v4_dg_dguux 680, pp13v4_uu_aauu
+      7566 of 14000; all three built since by their one-entry jobs); 36 b-beam entries refused by the old physics check (b_row
+      4.7 vs massless, fixed by e7a1775d, built since). Not a default-share parts worker.'
     - recipes/catalog_v4_heldout_H7E.yaml
     - recipes/catalog_v4_loops.yaml
     - recipes/catalog_v4_pp/param_card.dat
