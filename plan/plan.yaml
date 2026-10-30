@@ -4289,6 +4289,12 @@ entries:
     units: null
     start: '2026-10-30T12:56:37+00:00'
     at: '2026-10-30T12:56:37+00:00'
+  - batch: cgsxwm_ximprove_probe
+    wall_h: 2.5
+    jobs: 12
+    units: null
+    start: '2026-10-30T13:10:15+00:00'
+    at: '2026-10-30T13:10:15+00:00'
   step_why:
     10:
       feeds: whether catalog_v4's pp pools are final and carry catalog_v4's function
