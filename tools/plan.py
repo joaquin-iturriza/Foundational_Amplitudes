@@ -1288,10 +1288,30 @@ def events_by_item(strict=False):
     return out
 
 
+def waited_runs_ended(text):
+    """True when a plan-wait text names registry run ids (FA-<site>-<8 hex>) and every one has ended (state read
+    from the run registry); a text without run ids, or an id the registry does not know, is not ended."""
+    ids = re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(text))
+    if not ids:
+        return False
+    try:
+        c = sqlite3.connect("file:%s?mode=ro" % os.path.expanduser("~/.local/share/ccorch/runs.db"), uri=True)
+        q = "SELECT id, state FROM runs WHERE id IN (%s)" % ",".join("?" * len(ids))
+        got = dict(c.execute(q, ids).fetchall())
+        c.close()
+    except sqlite3.Error:
+        return False
+    return len(got) == len(set(ids)) and all(v in ("COMPLETED", "FAILED", "TIMEOUT", "CANCELLED", "OUT_OF_MEMORY",
+                                                    "NODE_FAIL") for v in got.values())
+
+
 def entry_reason(e, st, msgs, t, d, checks, sweeps):
     """(reason, since) of the first next step of a running entry that can move (waits and held steps left out)."""
     held = blocked_steps(e)
     for k in step_keys(e):
+        w = (e.get("step_waits") or {}).get(k) or (e.get("step_waits") or {}).get(str(k))
+        if w and k not in held and waited_runs_ended(w):
+            return ("step %s waited on %s: those runs have ended (plan unwait it once read)" % (k, w[:120]), None)
         if k in held or k in (e.get("step_waits") or {}) or str(k) in (e.get("step_waits") or {}):
             continue
         r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
