@@ -20,6 +20,8 @@ A command is refused (exit 2, every reason found) when
              (items.est_gpu_hours, set from the decision that approved it) covers that total (CLAUDE.md rule 2).
              The early warning only: the budget is enforced at the site's submission gate (site_gate.py beside the
              site tool), which every sbatch / condor_submit passes, launch scripts and sweep_manager included.
+  data       a FA training job whose recipe's pools are not prebuilt on the named site (tools/check_site_data.py run
+             there), unless it is chained afterok on that site's prebuild run of the recipe (see data()).
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
 through both). It fails closed on a submission like design_guard did; a command that submits nothing is never refused.
 Env for tests: the PLAN_* variables of tools/plan.py; SUBMIT_RUNS_DB (default the site registry); HOME (placement)."""
@@ -101,7 +103,7 @@ def placement(cmd, scan):
     for site, project in named_submissions(scan):
         if site == "auto" or site.startswith("-"):
             continue
-        verdict = spend_unit(project, site)
+        verdict = spend_unit(project, site, dry=True)     # spent in problems() once no check refuses the command
         if verdict != "ok":
             return ["placement: submission to '%s' for '%s' — %s. Placement is not the agent's call, and a batch is "
                     "spread over sites by headroom. Run:   site pick %s --jobs <trials> --groups <sweeps> --mem <G>   "
@@ -110,7 +112,7 @@ def placement(cmd, scan):
     return []
 
 
-def spend_unit(project, site):
+def spend_unit(project, site, dry=False):
     f = os.path.join(os.path.expanduser("~/.local/share/ccorch/placement"), "%s.json" % project)
     if not os.path.exists(f):
         return "no placement recorded for this project"
@@ -126,6 +128,8 @@ def spend_unit(project, site):
     if left <= 0:
         have = ", ".join("%s %d" % kv for kv in quota.items() if kv[1] > 0) or "nothing"
         return "no quota left for %r in the last plan (left: %s)" % (site, have)
+    if dry:
+        return "ok"
     quota[site] = left - 1
     d["quota"] = quota
     json.dump(d, open(f, "w"))
@@ -484,6 +488,182 @@ def budget(cmd, segs):
     return out
 
 
+# ------------------------------------------------------------------ data (new, E3072)
+# A training arm whose recipe's pools are not on the site fails in init_data (require_cache) after its queue wait; the
+# mixture arms of 2026-10-30 went out so (FA-ccin2p3-c6d1c5ff). Every `site submit <site> FA <script> -- <arm> ...` of a
+# script that picks its training recipe by arm (`TRAIN=` set before and inside a `case "$ARM" in`), and every recipe
+# named in the job's arguments, is checked on that site with tools/check_site_data.py (pools prebuilt, sidecars) before
+# it goes; a pass is remembered DATA_OK_S. A submission chained after the job that builds the pools passes without the
+# read: --hdr=--dependency=afterok:<id>[:<id>] naming a registry run of a prebuild script (job_catalog_v4_regen.sh,
+# prebuild_*.sh) on that site, not failed or cancelled, whose --note names the recipe's file name.
+DATA_OK_S = 6 * 3600
+DATA_CACHE = os.environ.get("SUBMIT_DATA_CACHE") or os.path.expanduser("~/.local/share/ccorch/placement/site_data_ok.json")
+PREBUILD_JOB = re.compile(r"(?:^|/)(?:job_catalog_v4_regen|prebuild_\w+)\.sh$")
+PARAM_ASSIGN = re.compile(r"(?:^|[\s;])([A-Z_][A-Z0-9_]*)=(\$\{[A-Za-z_][A-Za-z0-9_]*[#%]{1,2}[^}$`()]*\})(?=[\s;]|$)")
+
+
+def _submit_parts(toks):
+    """(script, job args after `--`, the --hdr values) of one `site submit` segment."""
+    rest = cmdparse.strip_redirs(toks[2:])
+    args = rest[rest.index("--") + 1:] if "--" in rest else []
+    head = rest[:rest.index("--")] if "--" in rest else rest
+    hdr, pos, k = [], [], 0
+    while k < len(head):
+        t = head[k]
+        name, eq, val = t.partition("=")
+        if t.startswith("--") and name in SUBMIT_VALUED:
+            if not eq:
+                val = head[k + 1] if k + 1 < len(head) else ""
+                k += 1
+            if name == "--hdr":
+                hdr.append(val)
+        elif not t.startswith("-"):
+            pos.append(t)
+        k += 1
+    return (pos[2] if len(pos) > 2 else None), args, hdr
+
+
+def arm_recipe(script_text, arm):
+    """The training recipe a job script picks for `arm`: the last TRAIN= of the `case "$ARM" in` branch whose patterns
+    match it, else the TRAIN= set before the case; $PROJECT_DIR read as the repo, parameter expansions of the branch
+    (SH=${ARM#...}) evaluated; None when the script picks no recipe by arm."""
+    import fnmatch, subprocess
+    lines = script_text.splitlines()
+    start = next((i for i, l in enumerate(lines) if re.match(r'^case "\$ARM" in\s*$', l)), None)
+    if start is None:
+        return None
+    default = None
+    for l in lines[:start]:
+        m = re.match(r'^TRAIN="([^"]+)"', l)
+        if m:
+            default = m.group(1)
+    branch, inside = [], False
+    for l in lines[start + 1:]:
+        if re.match(r"^esac\b", l):
+            break
+        m = re.match(r"^    ([^\s()#][^()]*)\)", l)         # a top-level pattern line (4-space indent)
+        if m:
+            pats = [p.strip() for p in m.group(1).split("|")]
+            if inside:
+                break
+            inside = any(fnmatch.fnmatchcase(arm, p) for p in pats)
+        if inside:
+            branch.append(l)
+    text = "\n".join(branch)
+    trains = re.findall(r'\bTRAIN="([^"]+)"', text)
+    train = trains[-1] if trains else default
+    if not train:
+        return None
+    assigns = PARAM_ASSIGN.findall(text)
+    env = {"ARM": arm}
+    if assigns and re.search(r"\$\{?(%s)\b" % "|".join(n for n, _ in assigns), train):
+        prog = "; ".join("%s=%s" % (n, v) for n, v in assigns) + "; " + "; ".join(
+            'printf "%%s=%%s\\n" %s "$%s"' % (n, n) for n, _ in assigns)
+        out = subprocess.run(["bash", "--norc", "--noprofile", "-c", prog], env={"ARM": arm, "PATH": "/usr/bin:/bin"},
+                             capture_output=True, text=True, timeout=10).stdout
+        env.update(dict(l.split("=", 1) for l in out.splitlines() if "=" in l))
+    for n, v in sorted(env.items(), key=lambda kv: -len(kv[0])):
+        train = train.replace("${%s}" % n, v).replace("$%s" % n, v)
+    for root in ("${PROJECT_DIR}/", "$PROJECT_DIR/"):
+        if train.startswith(root):
+            train = train[len(root):]
+    return train
+
+
+def _dependency_ids(hdr):
+    out = []
+    for h in hdr:
+        m = re.match(r"^--dependency=(?:afterok|afterany):([0-9:]+)$", h)
+        if m:
+            out += [x for x in m.group(1).split(":") if x]
+    return out
+
+
+def _built_by(site, recipe, deps):
+    """a dependency is a registry prebuild run on `site`, not failed or cancelled, whose note names the recipe file."""
+    if not deps:
+        return False
+    try:
+        c = sqlite3.connect("file:%s?mode=ro" % RUNS_DB, uri=True, timeout=10)
+        rows = c.execute("SELECT job, state, note FROM runs WHERE project='FA' AND site=? AND sched_id IN (%s)"
+                         % ",".join("?" * len(deps)), [site] + deps).fetchall()
+        c.close()
+    except sqlite3.Error:
+        return False
+    name = os.path.basename(recipe)
+    return any(PREBUILD_JOB.search(job or "") and (state or "") not in ("FAILED", "CANCELLED", "TIMEOUT")
+               and name in (note or "") for job, state, note in rows)
+
+
+def _site_data_ok(site, recipe):
+    """(ok, what the site said): tools/check_site_data.py <recipe> on the site; passes are remembered DATA_OK_S."""
+    import subprocess
+    key = "%s:%s" % (site, recipe)
+    try:
+        cache = json.load(open(DATA_CACHE))
+    except (OSError, ValueError):
+        cache = {}
+    if time.time() - cache.get(key, 0) < DATA_OK_S:
+        return True, "passed within %d h" % (DATA_OK_S // 3600)
+    try:
+        p = subprocess.run(["site", "run", site, "FA", "--", "python", "tools/check_site_data.py", recipe],
+                           capture_output=True, text=True, timeout=100)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return False, "the read on %s did not finish (%s)" % (site, type(e).__name__)
+    said = [l.strip() for l in (p.stdout + p.stderr).splitlines()
+            if l.strip().startswith((os.path.basename(recipe) + ":", "env:"))]
+    if p.returncode == 0:
+        cache[key] = time.time()
+        try:
+            os.makedirs(os.path.dirname(DATA_CACHE), exist_ok=True)
+            json.dump(cache, open(DATA_CACHE, "w"))
+        except OSError:
+            pass
+        return True, " ".join(said)
+    return False, " ".join(said) or (p.stdout + p.stderr).strip()[-300:]
+
+
+def data(segs):
+    if os.environ.get("SUBMIT_TEST") == "1" and "data" not in (os.environ.get("SUBMIT_ONLY") or "").split(","):
+        return []                       # the replay tests never read a site (tests/test_submit_data_check.py covers it)
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["submit"]:
+            continue
+        rest = toks[2:]
+        if "--check" in rest or "--help" in rest or "-h" in rest:
+            continue
+        script, args, hdr = _submit_parts(toks)
+        pos = [t for t in cmdparse.strip_redirs(rest[:rest.index("--")] if "--" in rest else rest)
+               if not t.startswith("-")]
+        if not script or len(pos) < 2 or pos[1] != "FA":
+            continue
+        site = pos[0]
+        recipes = [a for a in args if re.match(r"^(?:\$PROJECT_DIR/)?recipes/[\w./-]+\.ya?ml$", a)]
+        try:
+            text = open(_path(script), errors="replace").read()
+        except OSError:
+            text = ""
+        if args and re.search(r"^TRAIN=", text, re.M):
+            r = arm_recipe(text, args[0])
+            if r:
+                recipes.append(r)
+        for r in dict.fromkeys(recipes):
+            if site == "auto":
+                out.append("data: `site submit auto` of a job that trains on %s: name the site `site pick` gave, so "
+                           "its pools can be checked there" % r)
+                continue
+            if _built_by(site, r, _dependency_ids(hdr)):
+                continue
+            ok, said = _site_data_ok(site, r)
+            if not ok:
+                out.append("data: %s trains on %s, whose pools are not all on %s (tools/check_site_data.py: %s). "
+                           "Prebuild them first and chain the job on that build: --hdr=--dependency=afterok:<slurm id> "
+                           "of a prebuild run (scripts/job_catalog_v4_regen.sh, prebuild_*.sh) on %s whose --note "
+                           "names %s." % (args[0] if args else script, r, site, said, site, os.path.basename(r)))
+    return out
+
+
 SUBMITTING = re.compile(r"\bsite\s+(?:submit|run|launch)\b|(^|[;&|(]|\$\()\s*(sbatch|condor_submit)", re.M)
 
 
@@ -512,7 +692,7 @@ def problems(inp):
         return design(cmd, inp, subs)
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
-              ("design", design_check), ("budget", lambda: budget(cmd, segs)))
+              ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)))
     out = []
     for name, f in checks:
         if only and name not in only:
@@ -523,6 +703,15 @@ def problems(inp):
             if SUBMITTING.search(scan):
                 out.append("%s: the check failed (%s: %s) on a command that submits; refused until it can be read"
                            % (name, type(e).__name__, e))
+    if not out and (not only or "placement" in only):
+        # a unit of the last `site pick` is spent only by a command that goes: one refused by another check (data,
+        # budget...) once spent it and left the plan short for the corrected resubmission (2026-10-30)
+        try:
+            for site, project in named_submissions(scan):
+                if site != "auto" and not site.startswith("-"):
+                    spend_unit(project, site)
+        except Exception:
+            pass
     return out
 
 
