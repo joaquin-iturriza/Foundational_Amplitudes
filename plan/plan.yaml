@@ -4336,6 +4336,17 @@ entries:
       event-level KS on sqrt(s_hat), max |eta|, max pT): 51 pools, 153 tests, 1 under 0.05/153 (dsh_udx_gwpwpwm sqrt(s_hat),
       KS 0.0225, p 3e-4), 18 under 0.05 (7.7 expected by chance; event-level, errs towards finding differences). cgsxwm (the
       113th) not assembled.'
+  - at: '2026-10-30T13:15:54+00:00'
+    text: 'Open (from the mixture-check job FA-ccin2p3-82e8c54a''s runsize pass): the 51 default-share pp pools it compared
+      are all gridpack-built already (lhe.gridpack set, complete_runs true, runs of 1000; all 51 in complete_runs.json; checked
+      in mg5_pipeline_final.PROCESSES at trunk 4ff9da86), so they are not the per-run-integrated small runs the size ladder
+      found biased, and no rebuild follows. Still 18 of 153 event-level tests are under 0.05 (7.7 expected) and dsh_udx_gwpwpwm
+      sqrt(s_hat) KS 0.0225 p 3e-4. Candidate causes, unchecked: (a) the reference is the serially built pp13v4_* reuse pool
+      (per-run integrated, runs of many, some possibly short: short_run_bias measure counted serial pools with any short run
+      as short), so the reference may carry the short-run bias; (b) the test is event-level and the reuse pool''s events are
+      correlated within runs, which overstates significance; (c) the gridpack residual the gridpack probe could not exclude
+      (under half the old bias, par:v4_short_runs). Next check, CPU-cheap: per pool, whether its pp13v4 reuse pool''s sidecar
+      shows short runs, and a run-level test where runs are known; dsh_udx_gwpwpwm first.'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
