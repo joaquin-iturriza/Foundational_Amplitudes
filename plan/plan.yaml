@@ -4001,6 +4001,7 @@ entries:
       pp13v4_ddx_ddxgg, pp13v4_uux_gguux are among them); the CC disk has had 87G or more free since the morning, so the cleanup
       wait itself is over'
     '10': the 113 rebuilt pools assembled (step 1's owner)
+    '11': step 10's pp13v4 validation passing
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
