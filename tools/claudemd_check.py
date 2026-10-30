@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Composition of the CLAUDE.md rules files: how much of the text is rule, reference, provenance or duplicate.
+"""Composition of the CLAUDE.md rules files: how much of the text is rule, orientation, index, reference, provenance
+or duplicate.
 
     python3 tools/claudemd_check.py [FILE ...] [--list] [--json] [--save-baseline P] [--baseline P [--tol 1.0]]
+                                    [--orientation-max 500]
 
 Default files: this repo's CLAUDE.md and ~/work/CLAUDE.md (the two every agent call loads). Size is counted in
 characters of whitespace-normalised text; tokens are estimated as characters / 4.
@@ -39,9 +41,16 @@ The classification is by the explicit rules below, applied in order, so the same
    `dyhpo.`) or an `LLOCA_` toggle. It stays in the rule share and is reported apart ("topic-bound"): such a rule
    has a file trigger and belongs in that topic's pushed section unless it is one of the rules kept on purpose.
 
-The shares reported are of the counted characters (everything but HEAD). `--list` prints every non-rule unit (and every topic-bound rule) with
+8. ORIENTATION and INDEX: the units between the marker lines `<!-- orientation -->` and `<!-- /orientation -->`
+   (resp. `<!-- index -->` and `<!-- /index -->`) take that class instead of 5 and 6; rules 3 and 4 still apply inside
+   them (provenance is provenance and a repeat is a duplicate wherever it stands). The marker lines are HEAD. An index
+   unit longer than one line or 220 characters is listed as "index_long" (an index entry is one line). The orientation
+   block's estimated tokens above `--orientation-max` (default 500) make the script exit 1.
+
+The on-design share is rule + orientation + index: what a rules file may hold. The shares reported are of the counted characters (everything but HEAD). `--list` prints every non-rule unit (and every topic-bound rule) with
 its file:line, class and first words, so each one can be found and moved. `--save-baseline P` writes the shares as
-JSON; `--baseline P` exits 1 when the rule share falls more than `--tol` points below the saved one.
+JSON; `--baseline P` exits 1 when the on-design share falls more than `--tol` points below the saved one (a baseline
+saved before the orientation and index classes existed, without "on_design", is compared on its "rule" share).
 """
 import argparse
 import json
@@ -77,6 +86,7 @@ DEFINITION = re.compile(r"^\s*(?:[-*]|\d+[a-z]?\.)?\s*(?:\*\*)?`[^`]+`(?:\*\*)?[
 TOPIC = re.compile(r"`[^`]*(?:\b(?:sweep|models|config|recipes|analysis|data|optim|sites)/|mg5_pipeline|experiment\.py|"
                    r"dataset\.py|wrappers\.py|\brun\.py|particle_ids|\b(?:training|data|evaluation|model|net|fine_tune|"
                    r"cluster|dyhpo)\.\w|LLOCA_)[^`]*`")
+MARK = re.compile(r"^\s*<!--\s*(/?)(orientation|index)\s*-->\s*$")
 STOP = set("the a an of to in on at for and or is are be by it its as with from that this than then into".split())
 
 
@@ -90,6 +100,12 @@ def blocks(text):
             if s.startswith("```"):
                 out.append((start, "\n".join(cur)))
                 cur, fence = [], False
+            continue
+        if MARK.match(line):
+            if cur:
+                out.append((start, "\n".join(cur)))
+            out.append((n, line))
+            cur = []
             continue
         if s.startswith("```"):
             if cur:
@@ -190,14 +206,35 @@ def classify_sentence(s):
     return "reference"
 
 
+def regions(text):
+    """Line number -> 'orientation' / 'index' for the lines inside a marked block (rule 8); marker lines -> 'mark'."""
+    out, cur = {}, None
+    for n, line in enumerate(text.split("\n"), 1):
+        m = MARK.match(line)
+        if m:
+            out[n] = "mark"
+            cur = None if m.group(1) else m.group(2)
+        elif cur:
+            out[n] = cur
+    return out
+
+
 def analyse(paths):
     doc = Doc()
     for path in paths:
         text = open(os.path.expanduser(path), encoding="utf-8").read()
+        region = regions(text)
         table_source_col = None
         for line, raw in blocks(text):
             b = norm(raw)
             s = raw.strip()
+            zone = region.get(line)
+            if zone == "mark":
+                doc.add(path, "head", len(b), line, b)
+                continue
+            if zone == "index" and ("\n" in raw.strip() or len(b) > 220):
+                doc.add(path, "index_long", len(b), line, b)
+                continue
             if s.startswith("#") and not s.startswith("```") or re.fullmatch(r"-{3,}", s):
                 doc.add(path, "head", len(b), line, b)
                 continue
@@ -214,6 +251,9 @@ def analyse(paths):
                     table_source_col = None
                     doc.add(path, "head", len(b), line, b)
                     continue
+                if zone:
+                    doc.add(path, zone, len(b), line, b)
+                    continue
                 src = 0
                 if table_source_col is not None and table_source_col < len(cells):
                     src = len(cells[table_source_col])
@@ -224,7 +264,7 @@ def analyse(paths):
                 continue
             table_source_col = None if not s.startswith("|") else table_source_col
             if s.startswith("```"):
-                doc.add(path, "duplicate" if HOOK.search(b) else "reference", len(b), line, b)
+                doc.add(path, "duplicate" if HOOK.search(b) else (zone or "reference"), len(b), line, b)
                 continue
             mask = prov_mask(b)
             pos = 0
@@ -242,6 +282,8 @@ def analyse(paths):
                 elif rep:
                     cls = "duplicate"
                     sent = "[repeats %s] %s" % (rep, sent)
+                elif zone:
+                    cls = zone
                 elif definition:
                     cls = "reference"
                 else:
@@ -253,11 +295,11 @@ def analyse(paths):
     return doc
 
 
-CLASSES = ("rule", "reference", "provenance", "duplicate")
+CLASSES = ("rule", "orientation", "index", "reference", "provenance", "duplicate")
 
 
 def cls_of(c):
-    return "rule" if c == "rule_topic" else c
+    return {"rule_topic": "rule", "index_long": "index"}.get(c, c)
 
 
 def summary(doc, paths):
@@ -267,10 +309,12 @@ def summary(doc, paths):
         counted = sum(u[3] for u in units if u[2] != "head")
         d = {c: sum(u[3] for u in units if cls_of(u[2]) == c) for c in CLASSES}
         d["rule_topic"] = sum(u[3] for u in units if u[2] == "rule_topic")
+        d["on_design"] = d["rule"] + d["orientation"] + d["index"]
+        d["orientation_tokens"] = round(d["orientation"] / 4)
         d["head"] = sum(u[3] for u in units if u[2] == "head")
         d["counted_chars"] = counted
         d["tokens_est"] = round((counted + d["head"]) / 4)
-        d["shares"] = {c: round(100.0 * d[c] / counted, 1) if counted else 0.0 for c in CLASSES + ("rule_topic",)}
+        d["shares"] = {c: round(100.0 * d[c] / counted, 1) if counted else 0.0 for c in CLASSES + ("rule_topic", "on_design")}
         if path is None:
             res["total"] = d
         else:
@@ -290,6 +334,7 @@ def main():
     ap.add_argument("--save-baseline")
     ap.add_argument("--baseline")
     ap.add_argument("--tol", type=float, default=1.0)
+    ap.add_argument("--orientation-max", type=int, default=500, help="orientation block's token ceiling")
     a = ap.parse_args()
     paths = a.files or [p for p in DEFAULT_FILES if os.path.exists(p)]
     doc = analyse(paths)
@@ -299,25 +344,33 @@ def main():
     else:
         for path, d in list(res["files"].items()) + [("TOTAL", res["total"])]:
             sh = d["shares"]
-            print("%-34s ~%5d tok  rule %5.1f%% (topic-bound %4.1f%%)  reference %5.1f%%  provenance %4.1f%%  "
-                  "duplicate %4.1f%%" % (label(path), d["tokens_est"], sh["rule"], sh["rule_topic"],
-                                         sh["reference"], sh["provenance"], sh["duplicate"]))
+            print("%-34s ~%5d tok  on-design %5.1f%% = rule %5.1f%% (topic-bound %4.1f%%) + orientation %4.1f%% "
+                  "(~%d tok) + index %4.1f%%  |  reference %4.1f%%  provenance %4.1f%%  duplicate %4.1f%%"
+                  % (label(path), d["tokens_est"], sh["on_design"], sh["rule"], sh["rule_topic"], sh["orientation"],
+                     d["orientation_tokens"], sh["index"], sh["reference"], sh["provenance"], sh["duplicate"]))
     if a.list:
         for f, line, cls, chars, text in doc.units:
-            if cls in ("rule", "head"):
+            if cls in ("rule", "head", "orientation", "index"):
                 continue
             print("%s:%d\t%s\t%d\t%s" % (label(f), line, cls, chars, text[:90]))
     if a.save_baseline:
         with open(a.save_baseline, "w") as fh:
             json.dump(res["total"]["shares"], fh)
+    rc = 0
+    for path, d in res["files"].items():
+        if d["orientation_tokens"] > a.orientation_max:
+            print("%s: orientation ~%d tokens, above %d" % (label(path), d["orientation_tokens"], a.orientation_max),
+                  file=sys.stderr)
+            rc = 1
     if a.baseline:
         base = json.load(open(a.baseline))
-        now = res["total"]["shares"]["rule"]
-        if now < base["rule"] - a.tol:
-            print("rule share %.1f%% fell below the baseline %.1f%% (tolerance %.1f points)"
-                  % (now, base["rule"], a.tol), file=sys.stderr)
-            return 1
-    return 0
+        key = "on_design" if "on_design" in base else "rule"
+        now = res["total"]["shares"][key]
+        if now < base[key] - a.tol:
+            print("%s share %.1f%% fell below the baseline %.1f%% (tolerance %.1f points)"
+                  % (key.replace("_", "-"), now, base[key], a.tol), file=sys.stderr)
+            rc = 1
+    return rc
 
 
 if __name__ == "__main__":
