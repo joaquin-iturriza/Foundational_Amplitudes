@@ -1295,7 +1295,7 @@ def waited_runs_ended(text):
     if not ids:
         return False
     try:
-        c = sqlite3.connect("file:%s?mode=ro" % os.path.expanduser("~/.local/share/ccorch/runs.db"), uri=True)
+        c = sqlite3.connect("file:%s?mode=ro" % RUNS_DB, uri=True)
         q = "SELECT id, state FROM runs WHERE id IN (%s)" % ",".join("?" * len(ids))
         got = dict(c.execute(q, ids).fetchall())
         c.close()
