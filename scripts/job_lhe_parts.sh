@@ -15,7 +15,15 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
 Q="$SCRATCH/lhe_queue/${LHE_QUEUE:?LHE_QUEUE (the queue name under \$SCRATCH/lhe_queue) not set}"
-export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"
+# MadEvent run directories (100 to 150 MB each) on the node's local disk ($TMPDIR), never the shared /sps: only part
+# files, pools and a failed run's logs (Q/logs) go there; the job's local tree is deleted when it ends
+if [ -n "$TMPDIR" ] && [ -d "$TMPDIR" ]; then
+    export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$TMPDIR/lhe_work_${SLURM_JOB_ID:-$$}}"
+    case "$AMP_LHE_WORK_DIR" in "$TMPDIR"/*) trap 'rm -rf "$AMP_LHE_WORK_DIR"' EXIT ;; esac
+    df -h "$TMPDIR" | tail -1
+else
+    export AMP_LHE_WORK_DIR="${AMP_LHE_WORK_DIR:-$SCRATCH/lhe_work}"
+fi
 # the time limit less 5 min (claims stop when the longest remaining fit is past it)
 H="${LHE_HOURS:-$(squeue -h -j "$SLURM_JOB_ID" -o %l | awk -F'[-:]' '{ if (NF==4) s=$1*86400+$2*3600+$3*60+$4; else if (NF==3) s=$1*3600+$2*60+$3; else s=$1*60+$2; printf "%.3f", (s-300)/3600 }')}"
 echo "queue $Q  cores ${SLURM_CPUS_PER_TASK:-1}  hours $H"

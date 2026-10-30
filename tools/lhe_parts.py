@@ -18,7 +18,8 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
     shares  --queue Q [--requeue]   e+e- processes: events per energy in their parts against the equal share; --requeue
             moves the assembled marker of an assembled one whose shares are off aside, so its rebuild is assembled
     gc      --queue Q [--dry-run]
-            the MadEvent working directories ($SCRATCH/lhe_work/parts/<process>__<run>) of the queue's runs that are
+            the MadEvent working directories ($SCRATCH/lhe_work/parts/<process>__<run>; a worker on node-local $TMPDIR
+            deletes its own, a failed run's logs copied to Q/logs/<process>__<k> first) of the queue's runs that are
             not running: a run whose part file holds its events loses the whole directory, any other (failed, killed,
             not started) keeps only its log files. A manifest of every path removed, with its size, is written under
             Q/gc/ before anything is deleted. A worker does the same for each run it ends (tidy_run).
@@ -201,16 +202,30 @@ def _claim(D, left_s, free=1):
 LOG_NAMES = ("ME5_debug", "MG5_debug")    # MadEvent's and MG5's crash logs; with every *.log file, what a failed run keeps
 
 
+def _local_root():
+    """The node-local scratch ($TMPDIR) when the job has one, else None."""
+    t = os.environ.get("TMPDIR")
+    return os.path.realpath(t) if t and os.path.isdir(t) else None
+
+
 def parts_work_root():
-    """$SCRATCH/lhe_work/parts, the only tree tidy_run deletes in; refuses when the work dir is set elsewhere."""
-    s = os.environ.get("SCRATCH")
-    if not s:
-        raise RuntimeError("SCRATCH not set: no work tree to tidy")
-    want = os.path.realpath(os.path.join(s, "lhe_work", "parts"))
+    """The MadEvent work tree of part runs, the only tree tidy_run deletes in: $SCRATCH/lhe_work/parts, or a tree
+    under the node-local $TMPDIR (scripts/job_lhe_parts.sh puts the run directories there, so the shared disk holds
+    only part files and logs). Refuses any other place."""
     got = os.path.realpath(os.path.join(mg.lhe_work_dir(), "parts"))
-    if got != want:
-        raise RuntimeError(f"the MadEvent work tree {got} is not {want}: nothing deleted")
-    return want
+    s = os.environ.get("SCRATCH")
+    if s and got == os.path.realpath(os.path.join(s, "lhe_work", "parts")):
+        return got
+    loc = _local_root()
+    if loc and got.startswith(loc + os.sep):
+        return got
+    raise RuntimeError(f"the MadEvent work tree {got} is neither $SCRATCH/lhe_work/parts nor under $TMPDIR: "
+                       f"nothing deleted")
+
+
+def is_local(root):
+    loc = _local_root()
+    return bool(loc) and os.path.realpath(root).startswith(loc + os.sep)
 
 
 def _under(root, path):
@@ -340,6 +355,15 @@ def tidy_run(name, items, k, q):
                                     "saved": saved, "path": fp, "bytes": b}) + "\n")
             f.flush()
             os.fsync(f.fileno())
+        if is_local(root) and not saved:
+            # a node-local directory vanishes with the job: its logs go to Q/logs/<run> on the shared disk, the rest
+            # is deleted with it
+            dst = os.path.join(q, "logs", f"{name}__{k:03d}")
+            os.makedirs(dst, exist_ok=True)
+            for fp in _removals(wd, False)[1]:
+                shutil.copy2(fp, os.path.join(dst, os.path.relpath(fp, wd).replace(os.sep, "__")))
+            tidy_apply(root, wd, True)
+            return "logs"
         tidy_apply(root, wd, saved)
         return "saved" if saved else "logs"
     except Exception as e:

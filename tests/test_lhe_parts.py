@@ -254,7 +254,7 @@ def test_tidy_and_gc():
     _register(n_runs=4)
     saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
              datagen.dest_for_role, lhe_parts.ASSEMBLE_S, lhe_parts._my_jobs)
-    env0 = {v: os.environ.get(v) for v in ("SCRATCH", "AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR")}
+    env0 = {v: os.environ.get(v) for v in ("SCRATCH", "AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR", "TMPDIR")}
     try:
         with tempfile.TemporaryDirectory() as d:
             _fakes(d, short=False)
@@ -373,7 +373,22 @@ def test_tidy_and_gc():
             sk = [m for m in glob.glob(os.path.join(q, "gc", "manifest_*_skipped.json"))]
             assert json.load(open(sk[0]))["skipped_claimed_at_delete"] == [wds[3]]
             assert os.path.isdir(outside)
-            # the guard: a work tree outside $SCRATCH/lhe_work/parts is refused, and so is a path out of the tree
+            # node-local work tree (TMPDIR): accepted; a failed run's logs copied to Q/logs/<run>, its directory gone
+            node = os.path.join(d, "node")
+            os.makedirs(node)
+            os.environ["TMPDIR"] = node
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(node, "lhe_work")
+            lwd = lhe_parts.run_workdir(NAME, mg.lhe_part_paths(NAME, _items())[1][1])
+            os.makedirs(os.path.join(lwd, "junk"))
+            open(os.path.join(lwd, "a.log"), "w").write("why it failed")
+            open(os.path.join(lwd, "junk", "big"), "wb").write(b"x" * 5000)
+            assert lhe_parts.parts_work_root().startswith(os.path.realpath(node) + os.sep)
+            assert lhe_parts.tidy_run(NAME, _items(), 1, q) == "logs"
+            assert not os.path.exists(lwd), "a node-local run directory left behind"
+            assert open(os.path.join(q, "logs", f"{NAME}__001", "a.log")).read() == "why it failed"
+            # the guard: a work tree outside $SCRATCH/lhe_work/parts (and outside TMPDIR) is refused, and so is a path
+            # out of the tree
+            os.environ.pop("TMPDIR", None)
             os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "elsewhere")
             for f in (lambda: lhe_parts.parts_work_root(),
                       lambda: lhe_parts._under(os.path.realpath(root), outside),
