@@ -174,6 +174,96 @@ def incident_tool():
              r4.stdout)
     r5 = cli("no_such_hook.py", "--why", "x")
     scenario("A2: a hook that does not exist is refused", r5.returncode != 0, r5.stderr)
+    # (a): an incident opened by hand carries the hook's last refusal the dispatcher saw
+    b = Box()
+    b.say("lock guard: only repo-reviewer advances its pillar")
+    cmd = ("Bash", {"command": "bash .claude/hooks/review_backlog.sh advance repo-reviewer"})
+    b.tool_use(*cmd)
+    b.run("lock_guard.py", "PreToolUse", cmd)
+    r = _incident_cli(b, "lock_guard.py", "--why", "refuses the reviewer's own advance")
+    inc = b.incidents()
+    msg = (b.site_calls() or [""])[-1]
+    scenario("(a) an incident opened by hand (hook_incident.py --why) carries the last refusal: the call, its text, "
+             "the session; its ALERT is for the main session", r.returncode == 0 and len(inc) == 1
+             and inc[0]["call"] == list(cmd) and inc[0]["last_refusal"].startswith("lock guard: only")
+             and inc[0]["session"] == "s1" and "review_backlog.sh advance" in msg and "lock guard: only" in msg
+             and "for the main session to fix" in msg and "--replay " + inc[0]["id"] in r.stdout, (r.stdout, inc, msg))
+
+
+def _incident_cli(b, *a):
+    return subprocess.run([sys.executable, os.path.join(ROOT, "tools", "hook_incident.py"), "--hooks-dir", b.hooks]
+                          + list(a), capture_output=True, text=True, env=b.env, cwd=b.repo)
+
+
+def incident_for_main_session(b, rec, call, hook, refusal_head, fixed_by, still_on):
+    """Joaquin 2026-10-30 ("why would it directly reach me intead of trying to fix it first if the fix is obvious?"):
+    an incident is an ALERT the main session acts on, carrying what a fix needs (hook, event, call refused, refusal
+    text, count, session); it reaches the user only through `site ack --needs-user`; the fix is tested on the recorded
+    refusal with --replay."""
+    alert = [c for c in b.site_calls() if "'event'" in c]
+    msg = alert[-1] if alert else ""
+    need = ["HOOK INCIDENT " + rec["id"], "for the main session to fix (not addressed to the user)", hook,
+            "%s time(s) in a row" % rec.get("count"), "session s1", re.sub(r"\s+", " ", refusal_head)[:40], "--replay " + rec["id"],
+            "--needs-user", "'--kind', 'ALERT'"]
+    if call:
+        need += [call[0], call[1]["file_path"]]
+    else:
+        need += ["the turn could not end", "--resolve"]
+    scenario("(a) %s: the incident's ALERT is for the main session and carries the hook, the call refused, the refusal "
+             "text, the count (%s) and the session, with the fix-first route and --needs-user as the only way to the "
+             "user" % (hook, rec.get("count")), alert and all(x in msg for x in need) and "reaches the user" not in msg
+             and rec.get("count") == 2 and rec.get("session") == "s1" and (rec.get("call") == list(call) if call
+                                                                            else rec.get("call") is None),
+             ([x for x in need if x not in msg], msg[:1500]))
+    r = _incident_cli(b, "--show", rec["id"])
+    scenario("(a) %s: --show prints the whole record (its recorded hook input included)" % hook,
+             r.returncode == 0 and json.loads(r.stdout).get("input", {}).get("hook_event_name"), r.stdout[:400])
+    r = _incident_cli(b, "--replay", rec["id"])
+    scenario("(a) %s: --replay before a fix: the recorded refusal is still refused, the same text (exit 2)" % hook,
+             r.returncode == 2 and "still refused (the same text)" in r.stdout, (r.returncode, r.stdout[:600]))
+    fixed_by()
+    r = _incident_cli(b, "--replay", rec["id"])
+    scenario("(a) %s: --replay after the fix: the recorded call passes (exit 0)" % hook,
+             r.returncode == 0 and "passes now" in r.stdout, (r.returncode, r.stdout[:600]))
+    if still_on:
+        incident_reaches_user_only_by_needs_user(msg)
+    if not still_on:
+        r = _incident_cli(b, "--resolve", hook)
+        rc, _ = b.run(hook)
+        scenario("(a) %s: --resolve once the replay passes, and it runs again" % hook,
+                 r.returncode == 0 and rc == 0 and hook not in b.disabled(), (r.stdout, rc))
+
+
+def temp_site_home():
+    """a HOME for the live site tool with an empty ledger: its own runs.db, FA registered with the ledger on, the real
+    sites.toml. Nothing live is touched."""
+    h = tempfile.mkdtemp(prefix="sitehome_")
+    os.makedirs(os.path.join(h, ".config", "ccorch"))
+    open(os.path.join(h, ".config", "ccorch", "projects.toml"), "w").write(
+        '[projects.FA]\nlocal = "%s"\nledger = true\n' % ROOT)
+    shutil.copy(os.path.expanduser("~/.config/ccorch/sites.toml"), os.path.join(h, ".config", "ccorch"))
+    env = dict(os.environ, HOME=h)
+    return h, (lambda *a: subprocess.run(["site"] + list(a), capture_output=True, text=True, env=env, cwd=h))
+
+
+def incident_reaches_user_only_by_needs_user(alert_call):
+    """the incident's ALERT, opened through the live site tool in a scratch ledger: acked with what was fixed it is
+    routine in `site digest` (not shown to the user as a call); only `site ack --needs-user` puts it under Needs you."""
+    m = re.search(r"'--msg', '(.*)'\]$", alert_call)
+    msg = m.group(1) if m else "HOOK INCIDENT"
+    _, site = temp_site_home()
+    site("event", "--project", "FA", "--kind", "ALERT", "--key", "hook-incident:fixed", "--msg", msg)
+    site("event", "--project", "FA", "--kind", "ALERT", "--key", "hook-incident:needs", "--msg", msg)
+    open_ = site("events", "--project", "FA").stdout
+    a1 = site("ack", "E1", "--note", "md_guard was right (a new .md); told the agent to write into docs/results.tex")
+    a2 = site("ack", "E2", "--note", "the fix is not obvious", "--needs-user", "whether md_guard should allow it")
+    dig = site("digest", "--project", "FA").stdout
+    need = dig.split("Needs you:", 1)[-1].split("Findings:", 1)[0]
+    scenario("(a) the md_guard incident's ALERT in a scratch ledger: while open it waits for the main session; acked "
+             "with the fix it is routine (not a call for the user); only the --needs-user ack is listed under Needs you",
+             a1.returncode == 0 and a2.returncode == 0 and "HOOK INCIDENT" in open_ and "E1" not in need
+             and "E2" in need and "NEEDS YOU: whether md_guard should allow it" in need
+             and "ALERT x1" in dig, (a1.stderr, a2.stderr, dig))
 
 
 def dispatcher():
@@ -212,6 +302,9 @@ def dispatcher():
                  and len(b.site_calls()) == 1, (rc1, rc2, out2, inc))
         rc3, out3 = b.run()
         scenario("A3: the next Stop skips it", rc3 == 0 and "disabled" in out3 and len(b.ran()) == 2, (rc3, b.ran()))
+        if inc:
+            incident_for_main_session(b, inc[0], None, "plan_check.py", msg.strip()[:60], fixed_by=lambda: b.say(None),
+                                      still_on=False)
     if busy:
         (t1, msg, _), (t2, _, between) = busy[0]
         b = Box()
@@ -256,8 +349,11 @@ def dispatcher():
     inc = b.incidents()
     scenario("A3: a retried md_guard refusal stays refused (five times), is never disabled, and opens one incident "
              "with one ALERT", rcs == [2] * 5 and not b.disabled() and len(inc) == 1 and inc[0].get("kept")
-             and inc[0]["hook"] == "md_guard.sh" and len(b.site_calls()) == 1 and "hook-repeat:md_guard.sh"
+             and inc[0]["hook"] == "md_guard.sh" and len(b.site_calls()) == 1 and "hook-incident:" + inc[0]["id"]
              in b.site_calls()[0], (rcs, b.disabled(), inc, b.site_calls()))
+    incident_for_main_session(b, inc[0], write, "md_guard.sh", "BLOCKED by md_guard", fixed_by=lambda: (os.makedirs(
+        os.path.join(b.repo, ".claude"), exist_ok=True), open(os.path.join(b.repo, ".claude", "md_allowlist.txt"), "w")
+        .write("NOTES_NEW.md\n")), still_on=True)
     b = Box()
     b.say("lock guard: only repo-reviewer advances its pillar")
     b.tool_use(*cmd)
