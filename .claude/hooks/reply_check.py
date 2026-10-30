@@ -85,18 +85,16 @@ def relevant(dec, text, keep=12):
     return "\n".join(b for _, b in sorted(scored, key=lambda x: -x[0])[:keep])
 
 
-def main():
-    try:
-        inp = json.load(sys.stdin)
-    except ValueError:
-        return 0
+def check(inp):
+    """(2, the reason) when the reply leaves the user's question unanswered, else (0, ""). Imported by plan_check.py
+    (agent redesign B1); the standalone hook runs it through main()."""
     path = inp.get("transcript_path")
     if not path or not os.path.exists(path):
-        return 0
+        return 0, ""
     msgs, reply = scan(path)
     reply = reply or inp.get("last_assistant_message") or ""
     if not msgs or not reply:
-        return 0
+        return 0, ""
     recent = msgs[-3:]
     h = hashlib.sha1(recent[-1].encode()).hexdigest()
     try:
@@ -104,7 +102,7 @@ def main():
     except (OSError, ValueError):
         st = {}
     if st.get("hash") == h:
-        return 0                      # this message was already checked; never block twice
+        return 0, ""                  # this message was already checked; never block twice
     json.dump({"hash": h}, open(STATE, "w"))
     prompt = f"""You check one reply of an assistant to a researcher. Answer ONLY with JSON: {{"ok": true}} or
 {{"ok": false, "reason": "<one or two sentences naming exactly what is missing>"}}.
@@ -137,15 +135,25 @@ If rule 1 holds, answer {{"ok": true}}."""
                              input=prompt, capture_output=True, text=True, timeout=90, cwd="/tmp").stdout
         v = json.loads(re.search(r"\{.*\}", out, re.S).group(0))
     except Exception:
-        return 0
+        return 0, ""
     if v.get("ok"):
-        return 0
-    print("REPLY CHECK: " + str(v.get("reason", "the reply does not answer the user's question")) +
+        return 0, ""
+    return 2, ("REPLY CHECK: " + str(v.get("reason", "the reply does not answer the user's question")) +
           " Answer that directly in a revised reply (this check runs once per user message). If the check is wrong"
           " (the question was not the researcher's, e.g. it sits in text they pasted from someone else, or the reply"
           " does answer it), do not manufacture an answer: end the turn with one line to the user naming this check, what it"
-          " flagged and why that is wrong (CLAUDE.md 0g).", file=sys.stderr)
-    return 2
+          " flagged and why that is wrong (CLAUDE.md 0g).")
+
+
+def main():
+    try:
+        inp = json.load(sys.stdin)
+    except ValueError:
+        return 0
+    rc, msg = check(inp)
+    if rc:
+        print(msg, file=sys.stderr)
+    return rc
 
 
 if __name__ == "__main__":
