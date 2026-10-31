@@ -6506,6 +6506,9 @@ entries:
   - at: '2026-10-31T04:52:58+00:00'
     text: 'a compaction inside the turn of owner aadc46d99c71df5e6 at 2026-10-31T04:50:53.390Z: its brief or scope was too
       large; narrow the next brief'
+  - at: '2026-10-31T04:55:08+00:00'
+    text: '2026-10-31: design-reviewer check 10 (test events sampled as the question asks) sent to a mechanical worker; diff
+      to Joaquin when committed.'
   handoff:
     state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
       @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
