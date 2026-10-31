@@ -3454,12 +3454,6 @@ entries:
       test pools, H5 28/28 already'
     22: 'Wall-time table from logs: catalog MSE/het arms vs 2-3 standard short trainings of 4264 steps (loading, steps, validations,
       final evaluation), with the one-line cause; to Joaquin (his 2026-10-31 objection to 3.6 h / 5.6 h)'
-    23: 'Bound arm on the default-sampled held-out classes (Joaquin 21:3x: he took the control for the default-trained network):
-      eval-only re-reads FA-ccin2p3-f8ec724f (REREAD afc96598, seed 42) and FA-ccin2p3-049b863e (REREAD d26f13aa, seed 43)
-      on EE4, HD4, HD5 (PP4 already read: a152d7d0, a01ad665), 0.25 h each, 0.5 GPU-h; when they end: read each log whole,
-      mixture_ab.py extract, then R of the bound arm against the same control on the 700 default-sampled held-out classes,
-      pooled and per axis, beside shares 0.50 and 0.25, and the trained-class R (bound 0.388 vs 0.549 / 0.650), to Joaquin;
-      no change to catalog_v4_train.yaml and no long-run design until he has seen it'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6525,13 +6519,6 @@ entries:
       if:
       - 'the arms'' extra time is a defect (loading, composition, evaluation layout): fix it before any re-read or new arm'
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
-    23:
-      feeds: 'next 14: Joaquin''s share choice (none, 0.25, 0.50)'
-      if:
-      - 'bound arm''s held-out R below the shares'': pure default sampling generalises at least as well; Joaquin weighs it
-        against the shares'
-      - 'bound arm''s held-out R above the shares'': the catalog''s own sampling carries part of the held-out gain, reported
-        per axis'
   owner:
     agent: a9ed84e84b4c49f4b
     state: working
