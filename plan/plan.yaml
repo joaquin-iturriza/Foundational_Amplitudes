@@ -3449,16 +3449,12 @@ entries:
       EE4 HD4'', REREAD=<arm run>, 1584 probes, --hdr=--time=01:45:00 (1584 x 2.46 s + 15 min startup, x1.25 = 1.67 h; short_wall
       --eval says 01:30:00 at 1.6 s/probe, too short), 4 x 1.75 = 7.0 GPU-h; het batch total 6 x 3.75 + 7.0 = 29.5 GPU-h,
       under 30. Also fix short_wall S_PROBE to the measured het rate before submitting.'
-    21: 'Step 18 queue after gridpool pass 2: pass 1 (16 jobs, 3-8 pools in series each) finished 67 of 114 hd_ pools (110
-      of 180 gridpacks on disk at the queue''s paths, yield 1.0 and kept 1.0 on every returned run); pass 2 hd_gridpool_probe2
-      = the other 47 pools, one per job (16 cores, htc, GP_RUNS=2, GP_TIMEOUT=5400; 16 jobs at --time 03:00:00 (the 5-body
-      pools with no measurement and hd_ddx_dhuxwp__E20), 31 at 01:30:00; target 2.0 h; site pick width 1268, one wave; gridpool-plan
-      --logs est longest 1.51 h; run list scratchpad gp2_runs.txt). When it ends: read every log (GRIDPACK_PROGRESS on any
-      cut job says survey/refine/generation), then lhe_probe kept --yields-out analysis/catalog_v4/data/lhe_probe_yields_hd.json
-      over all pass 1 and pass 2 logs, lhe_parts plan recipes/catalog_v4_heldout_default_processes.yaml --probe that file
-      --queue <hd queue>; a pool whose run of 1000 events takes over 1800 s (hd_ddx_dhuxwp__E20 timed out at 1800 s in pass
-      1, hd_epem_aaccx__E20 1787 s) gets a smaller run size in the queue layout; workers at site pick''s width in one wave,
-      plan target, submit'
+    21: 'Step 18 last pools: 106 hd_ test pools built (hd_test_measured); queues running: hd_test_e20_small_runs (3 pools
+      at 20 TeV, workers FA-ccin2p3-62f8cc25 FA-ccin2p3-22ea52de), hd_test_5body (d b~ -> b~ d d d~ g, u d~ -> a d~ g g u,
+      u u~ -> a d d~ g z; workers FA-ccin2p3-51155c99 FA-ccin2p3-f8e6c322 FA-ccin2p3-4d19f701, target 0.5 h). Left: hd_ug_ddxguz
+      (gridpack from 518be432; queue it once 765bdd9c ends, yields in lhe_probe_yields_hd_5body.json) and hd_udx_dxguzz (gridpack
+      1e7f2159 building; lhe_probe kept on its log, append to the 5body yields, plan a queue with --exclude of the rest).
+      Then check_site_data on catalog_v4_heldout_default_test.yaml: 114/114'
     22: 'Wall-time table from logs: catalog MSE/het arms vs 2-3 standard short trainings of 4264 steps (loading, steps, validations,
       final evaluation), with the one-line cause; to Joaquin (his 2026-10-31 objection to 3.6 h / 5.6 h)'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
@@ -6223,7 +6219,6 @@ entries:
       FA-ccin2p3-6806e7fb FA-ccin2p3-e33bdf97 FA-ccin2p3-19841ddf FA-ccin2p3-5d44bb36 FA-ccin2p3-8e315db7 FA-ccin2p3-e1ab2a78
       FA-ccin2p3-42a3ad1e FA-ccin2p3-6f249c33 FA-ccin2p3-38f5d7f9 FA-ccin2p3-eb3ee34b FA-ccin2p3-cdcb6aa4 FA-ccin2p3-b4743bfd
       FA-ccin2p3-aab40f7f FA-ccin2p3-efd8fa86 FA-ccin2p3-403a58b3 FA-ccin2p3-60a1fb92 '
-    '21': FA-ccin2p3-62f8cc25 FA-ccin2p3-22ea52de FA-ccin2p3-585d8d94
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -6509,9 +6504,8 @@ entries:
     21:
       feeds: 'next 18: the default-sampled held-out pools'
       if:
-      - 'every pool''s gridpack built and yield >= 0.5: plan the hd queue and submit workers'
-      - 'a pool cut again or yield < 0.5: read its GRIDPACK_PROGRESS/PROBE_JSON lines and fix its layout (cores, run size)
-        before the queue'
+      - 'all 114 hd_ test pools present: the HD4 rereads (next 20) once H5 is assembled'
+      - 'a pool fails or assembles short: read its log and fix its layout before any reread'
     22:
       feeds: whether the catalog arms' wall time is a defect to fix before the eval-only re-read and the next arms
       if:
