@@ -267,8 +267,8 @@ def brief(task, arm):
             "The defect, as it was seen:\n%s\n\nWhat the check that will judge the fix calls (keep these names, "
             "signatures and lines exactly):\n%s\n\n"
             "Fix it in the code (the smallest correct change), add or update a test of it if the repository has a "
-            "test file for that code, run the tests you touched with %s -m pytest -q <file> from inside the "
-            "worktree, then commit everything you changed on the worktree's branch: git -C %s commit -am "
+            "test file for that code, run the tests you touched from inside the worktree with %s <file> when the "
+            "file has a __main__ runner, else with that python -m pytest -q <file>, then commit everything you changed on the worktree's branch: git -C %s commit -am "
             "\"<what you changed>\" (git add new files first). End with a short report: the cause, the change, the "
             "test run's result." % (wt(task, arm), defect, INTERFACE[task], PY, wt(task, arm)))
 
