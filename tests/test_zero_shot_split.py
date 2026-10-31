@@ -80,6 +80,27 @@ def test_probe_without_train_pool_reads_a_role_it_has(tmp_path=None):
     assert len(c4) == 170 and all(stand_in_role(c4, n, r, "test")[0] == "test" for n in c4 for r in ("train", "val"))
 
 
+def test_pool_rows_follow_the_role_shuffle():
+    """dipole_residual.pool_rows: idx positions in train|val|test map to pool rows through default_rng(42)'s permutations
+    drawn for train, val, test in turn; a saved pool_row wins."""
+    import numpy as np
+    sys.path.insert(0, ROOT)
+    from analysis.catalog_v4.dipole_residual import pool_rows
+    rng = np.random.default_rng(seed=42)
+    p = {r: rng.permutation(n) for r, n in (("train", 7), ("val", 5), ("test", 4))}
+    import io
+    def mk(**kw):
+        b = io.BytesIO(); np.savez(b, **kw); b.seek(0); return np.load(b)
+    z = mk(idx=np.arange(7, 12), split=np.array("val"))
+    assert (pool_rows(z) == p["val"]).all()
+    z = mk(idx=np.array([8, 10]), split=np.array("val"), role_counts=np.array([7, 5, 4]))
+    assert (pool_rows(z) == p["val"][[1, 3]]).all()
+    z = mk(idx=np.arange(12, 16), split=np.array("test"), role_counts=np.array([7, 5, 4]))
+    assert (pool_rows(z) == p["test"]).all()
+    z = mk(idx=np.arange(7, 12), split=np.array("val"), pool_row=np.arange(5) + 100)
+    assert (pool_rows(z) == np.arange(5) + 100).all()
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):

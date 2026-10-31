@@ -77,6 +77,36 @@ def r2(u, x):
     return float(np.corrcoef(u, x)[0, 1] ** 2)
 
 
+def pool_rows(z):
+    """The pool-file rows of a saved read's events. A saved z['pool_row'] wins. Else z['idx'] are positions in the
+    role-contiguous train|val|test array and z['split'] the role; each role was shuffled by one default_rng(42)
+    drawing rng.permutation(n) for train, val, test in turn (experiment._init_data), so position i of a role holds
+    pool row perm[i]. The role sizes come from z['role_counts'] when saved, else from the idx: the scored role is whole
+    (n = len(idx)) and starts after the earlier roles (idx.min()); a test read with earlier roles of unknown split
+    is refused."""
+    if "pool_row" in z.files and len(z["pool_row"]):
+        return np.asarray(z["pool_row"]).astype(np.int64)
+    idx = np.asarray(z["idx"]).astype(np.int64).reshape(-1)
+    role = str(z["split"])
+    order = ("train", "val", "test")
+    if "role_counts" in z.files and len(z["role_counts"]) == 3:
+        cnt = dict(zip(order, (int(c) for c in z["role_counts"])))
+    else:
+        lo = int(idx.min()) if len(idx) else 0
+        if role == "val":
+            cnt = {"train": lo, "val": len(idx), "test": 0}
+        elif role == "test" and lo == 0:
+            cnt = {"train": 0, "val": 0, "test": len(idx)}
+        elif role == "train" and lo == 0:
+            cnt = {"train": len(idx), "val": 0, "test": 0}
+        else:
+            raise ValueError("test/train sizes of the earlier roles are not in the read (no role_counts)")
+    rng = np.random.default_rng(seed=42)
+    perms = {r: rng.permutation(cnt[r]) for r in order}
+    start = sum(cnt[r] for r in order[:order.index(role)])
+    return perms[role][idx - start]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dirs", nargs="+", help="read directories; restrict to cells with --probes")
@@ -95,12 +125,12 @@ def main():
             if len(z["q"]) != len(t) or len(z["logF"]) != len(t):
                 rows.append({"dir": d, "probe": name, "error": "no q or no logF in the read"})
                 continue
-            if "idx" not in z.files or len(z["idx"]) != len(t) or not str(z["pool"]):
+            if ("idx" not in z.files and "pool_row" not in z.files) or len(z["idx"] if "idx" in z.files else z["pool_row"]) != len(t) or not str(z["pool"]):
                 rows.append({"dir": d, "probe": name, "error": "no event indices in the read (a read before @902b96c5)"})
                 continue
             pr = np.load(str(z["pool"]), mmap_mode="r")
             n = (pr.shape[1] - 1) // 5
-            mom, pdg, amp = split_pool(np.asarray(pr[np.asarray(z["idx"])]), n)
+            mom, pdg, amp = split_pool(np.asarray(pr[pool_rows(z)]), n)
             raw = t - z["logF"].astype(np.float64)
             diff = np.log(np.abs(amp)) - raw
             if np.corrcoef(np.log(np.abs(amp)), raw)[0, 1] < 0.999 or np.median(np.abs(diff - np.median(diff))) >= 0.05:

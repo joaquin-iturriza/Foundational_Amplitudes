@@ -231,5 +231,10 @@ for recipe in a.recipes:
                             # these, never by matching log|M|^2 (the sampling-sensitivity dead ends)
                             idx=(np.asarray(split_idx).reshape(-1) if len(np.asarray(split_idx).reshape(-1)) == len(t)
                                  else np.zeros(0, np.int64)),
-                            pool=np.array(str(_pool or "")))
+                            pool=np.array(str(_pool or "")),
+                            # idx's rows in the pool file (the role's shuffle, experiment._role_perm), and the role sizes
+                            pool_row=(np.asarray(exp._role_perm[a.split])[np.asarray(split_idx).reshape(-1) - sum(
+                                      exp._role_counts[:("train", "val", "test").index(a.split)])]
+                                      if len(np.asarray(split_idx).reshape(-1)) == len(t) else np.zeros(0, np.int64)),
+                            role_counts=np.asarray(exp._role_counts, np.int64))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)
