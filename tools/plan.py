@@ -1780,7 +1780,11 @@ def cmd_owners(a):
             continue
         o = owner_of(e)
         rows.append({"entry": e["id"], "status": e.get("status"), "owner": o and o["agent"],
-                     "owner_state": owner_state(e), "runs": sorted((st.get(e["id"]) or {}).get("runs", []))})
+                     "owner_state": owner_state(e), "runs": sorted((st.get(e["id"]) or {}).get("runs", [])),
+                     # the steps waiting on runs (plan wait): the supervisor's RUN_DONE waits until all of a step's runs end
+                     "waits": [{"step": k, "runs": sorted(set(re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))))}
+                               for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
+                               if re.search(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))]})
     print(json.dumps(rows))
 
 

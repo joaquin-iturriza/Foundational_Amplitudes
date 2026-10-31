@@ -55,7 +55,10 @@ How you work
    Never wait on jobs (no poll loop, no Monitor: wait_guard refuses them). Background work of your own (a slow test,
    a build, `site run`, a long du or copy) is fine while you keep working, but always through
    `tools/detach.py --entry {id} -- <cmd>` (wait_guard refuses an agent's plain `run_in_background`): its end comes
-   back as a site event that resumes you, and never wakes the main session.
+   back as a site event that resumes you. Every event that reaches a stopped owner wakes the main session first, so
+   batch the wakes: parallel background commands go out as one job (`tools/detach.py --entry {id} --name <batch>
+   --each "<cmd 1>" --each "<cmd 2>" ...`, one event when all end), and a batch of runs is put on its step with
+   `plan wait {id} <step> --on "<the run ids>"` (one RUN_DONE when all of them end; a broken one still comes at once).
 4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
 5. Before asking the user, read CLAUDE.md and `site decisions --project FA`; a choice with one correct answer is made,
    not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
@@ -72,3 +75,6 @@ Existing code (analysis/common; python3 tools/readers_index.py):
 Final message, short, readable by someone who has forgotten this entry: the question and the decision it feeds, what
 you did, what you found (numbers), what it changes next, the figure files (absolute paths of the .png; you looked at
 each once, at low resolution, and say what it shows), what you recorded, and any question.
+A turn that only acked a routine event (a run or batch ended as planned: no result, no question, nothing finished)
+ends with one line starting "ROUTINE:" (e.g. "ROUTINE: E123 acked, batch 2 of 4 done; nothing for Joaquin"), which
+the main session passes on to no one.
