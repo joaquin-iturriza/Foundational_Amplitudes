@@ -5867,6 +5867,19 @@ entries:
       0 free slots (93 matching slots all claimed) and kept out every H100/H200, which were the free whole GPUs (3 H100 NVL
       and 2 H200 slots unclaimed), while still admitting A100 MIG slices against its own comment. Fixed: CONDOR_GPU_REQ =
       whole A100/V100/T4/H100/H200, no MIG, used in the submit file and in site pick''s slot count; probe resubmitted as FA-lxplus-ed084f25.'
+  - at: '2026-10-31T00:22:29+00:00'
+    text: 'main-session state at the 2026-10-31 ~00:35 UTC compaction: token count restarted 2026-10-30 23:10 UTC; usage per
+      window in dollars (tools/usage_windows.py @f3624f9c): old setup 3 limit hits in 14 windows, redesign about a third of
+      the hit level. Waiting on Joaquin: (1) syncClaudeAiSkills false in ~/.claude/settings.json, (2) brief_guard TRIAL=model
+      exemption (scratchpad brief_guard_trial.diff) for the matched trial D203, (3) CLAUDE.md line ''Lookup agents (Explore,
+      claude-code-guide) run at low effort'', (4) CC disk check-and-delete zz_width_regen 17 GB, runs_from_lxplus 24 GB, losing
+      mixture share after its verdict. Done tonight: opener check removed 29a1d82f; detach enforced for agents 3f52b93c (live-tested);
+      RUN_DONE events and quiet waiter 66b4cfd1; no-marker misclass fixed; model-override guard 0eff43b9; push-hook truncation
+      fix and cuts 85064616 (regression: test_redesign_d 46/49, two D3 push scenarios newly fail: generate_sweep no longer
+      pushes fa-sweeps-and-hpo/fa-canonical-setup before it runs, lhe_parts no longer pushes fa-generation/fa-catalog-reference);
+      auto-delete of failed-build workdirs 28242339; 33 GB freed on /sps (90%). Owners: catalog_coverage a95e29b40c3a46e59
+      (EE4 rereads c1863adf, def11c5c; mixture arms 6c246603 1d46b938 11ad944a 9c6fc7ab), v3_prep_explore aaa8b1f043eaa6ee9
+      (dipole CPU read 3a2a388b).'
   handoff:
     state: 'Step 5 cut 1 (hook pushes) applied 2026-10-31 under a passed design (FIX then PASS): (c) repair 0d2ddf73: a hook
       output over 10,000 chars reached agents as a 2,178-char preview, sections lost while marked delivered (17 of 32 redesign
