@@ -6387,7 +6387,7 @@ entries:
     agent: afa86296e4947978a
     state: working
     since: '2026-10-31T14:04:11+00:00'
-    state_at: '2026-10-31T14:04:11+00:00'
+    state_at: '2026-10-31T14:11:31.012000+00:00'
     context: 134991
     context_at: '2026-10-31T14:11:33+00:00'
   findings:
