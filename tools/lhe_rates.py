@@ -4,7 +4,9 @@
 Run on the site where the pools are (through `site run`); prints one JSON object {entry: {...}} and, with --out,
 writes it. Each entry: n_lhe (events MadEvent returned over its runs), madevent_s (wall seconds of the MadEvent runs),
 mg_cores (cores MadEvent ran on), core_s_per_event = madevent_s * mg_cores / n_lhe (an upper bound of the one-core
-cost: it assumes no loss to parallel inefficiency), events_per_run, n_req (events asked of each run), nfinal.
+cost: it assumes no loss to parallel inefficiency), events_per_run, n_req (events asked of each run), nfinal,
+output_s (wall seconds of MadGraph's output and compile of the MadEvent and standalone directories, summed over the
+runs' part jobs for a pool built in parts).
 The default-share layout (recipes/gen_catalog_v4_default.py) sizes its per-run sub-entries from it.
 
     python tools/lhe_rates.py [--prefix pp13v4_ pp13_ ee4_] [--seed 42] [--out analysis/catalog_v4/data/lhe_rates.json]
@@ -49,7 +51,7 @@ def main():
         out[name] = {"n_lhe": int(n), "madevent_s": float(s), "mg_cores": c,
                      "core_s_per_event": float(s) * c / int(n), "events_per_run": r.get("events_per_run"),
                      "n_req": rec["lhe"]["n_requested"], "n_runs": int(cfg["lhe"].get("n_runs", 1)),
-                     "nfinal": int(cfg["nfinal"])}
+                     "nfinal": int(cfg["nfinal"]), "output_s": (r.get("seconds") or {}).get("output")}
     print(json.dumps({"n": len(out), "missing_or_stale": missing}), file=sys.stderr)
     txt = json.dumps(out, indent=1, sort_keys=True)
     if a.out:
