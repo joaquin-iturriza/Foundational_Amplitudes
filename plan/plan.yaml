@@ -6212,14 +6212,11 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '18': FA-ccin2p3-765bdd9c FA-ccin2p3-5d4e6872 FA-ccin2p3-1e7f2159 FA-ccin2p3-49120869 FA-ccin2p3-926b4f19
     '20': FA-ccin2p3-bfec5501
-    '19': FA-ccin2p3-0e34042c FA-ccin2p3-1713c01c FA-ccin2p3-20034f07 FA-ccin2p3-297bee83 FA-ccin2p3-3138e3da FA-ccin2p3-34d05aa4
-      FA-ccin2p3-35160c75 FA-ccin2p3-3c03fcc9 FA-ccin2p3-3ed3d4a8 FA-ccin2p3-4cb6d12c FA-ccin2p3-5225f86c FA-ccin2p3-5c906caf
-      FA-ccin2p3-62998c13 FA-ccin2p3-67087f6a FA-ccin2p3-71492b28 FA-ccin2p3-717588b3 FA-ccin2p3-74b908c7 FA-ccin2p3-7595dc6d
-      FA-ccin2p3-76a37add FA-ccin2p3-84dec28a FA-ccin2p3-869c2bb1 FA-ccin2p3-974e18fa FA-ccin2p3-9bea1cb9 FA-ccin2p3-a2d63f00
-      FA-ccin2p3-a617824c FA-ccin2p3-a703e428 FA-ccin2p3-a82278d8 FA-ccin2p3-b69b2122 FA-ccin2p3-bbf7325a FA-ccin2p3-bdb2f5fe
-      FA-ccin2p3-bf84b289 FA-ccin2p3-c5a33200 FA-ccin2p3-cb12116f FA-ccin2p3-d2e47fc9 FA-ccin2p3-d480f84f FA-ccin2p3-d5bb9c8c
-      FA-ccin2p3-d87fc777 FA-ccin2p3-d9a8defb FA-ccin2p3-f6efc6db FA-ccin2p3-f8acb10f FA-ccin2p3-f8ad9c1b FA-ccin2p3-fe17805a
-      FA-ccin2p3-fe49a907
+    '19': 'FA-ccin2p3-ff4a512f FA-ccin2p3-e8239785 FA-ccin2p3-485cc0e1 FA-ccin2p3-047392e8 FA-ccin2p3-35f2e959 FA-ccin2p3-56a2086f
+      FA-ccin2p3-ab29272c FA-ccin2p3-3c935fc5 FA-ccin2p3-8110ec97 FA-ccin2p3-c4210bb8 FA-ccin2p3-e4b99c54 FA-ccin2p3-fbd0bc2a
+      FA-ccin2p3-6806e7fb FA-ccin2p3-e33bdf97 FA-ccin2p3-19841ddf FA-ccin2p3-5d44bb36 FA-ccin2p3-8e315db7 FA-ccin2p3-e1ab2a78
+      FA-ccin2p3-42a3ad1e FA-ccin2p3-6f249c33 FA-ccin2p3-38f5d7f9 FA-ccin2p3-eb3ee34b FA-ccin2p3-cdcb6aa4 FA-ccin2p3-b4743bfd
+      FA-ccin2p3-aab40f7f FA-ccin2p3-efd8fa86 FA-ccin2p3-403a58b3 FA-ccin2p3-60a1fb92 '
     '21': FA-ccin2p3-62f8cc25 FA-ccin2p3-22ea52de FA-ccin2p3-585d8d94
   targets:
   - batch: gridpool_probe
