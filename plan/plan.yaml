@@ -6238,6 +6238,20 @@ entries:
       gives such a name every standalone its definitions name, all kept; CC scan: unmapped [], standalones_needed ee_uug_standalone
       and ee_uug__as130_standalone. Resubmit (site submit ccin2p3 FA scripts/job_standalones.sh --hdr=--time=01:30:00 --env
       STANDALONES_MODE=apply) refused by this agent''s permission classifier.'
+  - at: '2026-10-31T04:19:11+00:00'
+    text: '2026-10-31: Step 14 verdict TRADE-OFF (mixture_ab.json, mixture_ab.py @4973581b, design passed 2026-10-30T17:29;
+      reads 8e1cc529, 7a6a1967, 897aa5d4 extracted PP4 1301/1301, EE4 169/169, 0 excluded). Share 0.50: PP4 R 0.682 widened
+      [0.594,0.775] (trained 797: 0.549 [0.489,0.625]; not trained 504: 0.921 [0.802,1.089]); EE4 0.401 [0.314,0.520]; held-out
+      pooled 701: 1.271 [1.145,1.418], 0.19 of classes lower: GAIN + LOSS. Share 0.25: PP4 0.755 [0.667,0.850] (trained 0.650,
+      not trained 0.932); EE4 0.413 [0.337,0.535]; held 1.225 [1.106,1.356]: GAIN + LOSS. Bound (step 11) 0.388 on trained.
+      Written up par:v4_pp_bound, par:v4_mixture (614d512c). Step 15: pre-delete check (mix_compose_check, v4_bb_abbh, v4_epem_ccxzz,
+      v4_uux_zzzz x both recipes x train/test): every composed default row found in the stored pool (max rel |M|^2 2.3e-7),
+      KS p>=0.14; stored _smixd50_/_smixd25_ pools deleted under D207 by tools/prune_mixture_pools.py (7510a057): 5472 pools,
+      16416 files, 53.11 GB, manifest /sps/lpnhe/jiturrizaramirez01/tmp/amp_amp_data_cache/.prune_manifests/mixture_pools_20261031_051555.json;
+      after: check_site_data --alphas both recipes 1153 processes ok; mix_compose_check --load (ensure_dataset require_cache)
+      composes all 18 pools at load, shares exact, physics block, finite. Step 16: prune FA-ccin2p3-93625c9d (D216): 9404
+      standalones, 9403 deletable, 2 kept, 16.42 GB freed, manifest standalones_20261031_044141.json; /sps 422 -> 404 GB of
+      512; after the mixture prune 355 GB used (70%).'
   handoff:
     state: 'Step 11 DONE (pp bound YES, R 0.388 widened [0.338, 0.446], data/pp_bound.json; dropped from next). All PP4+EE4
       re-reads COMPLETED (8e1cc529 default50 s42, 7a6a1967 default25 s42, 897aa5d4 default25 s43 = REREAD 9c6fc7ab; 52efacaf
