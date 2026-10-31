@@ -6737,6 +6737,13 @@ entries:
       fixes 647cfada: the 142-class pool estimate now uses each class''s own multiplicity: 20.19 core-h (was 20.8; 38 five-body
       classes a lower bound); heldout_default refuses a missing read. Six het arms submitted at ff37971e: control 87ea24d0/321a3de2,
       default50 466656b2/9897833d, default25 f0156d88/df858d33, 3.75 h each, 22.5 GPU-h.'
+  - at: '2026-10-31T05:29:21+00:00'
+    text: 'Step 18 design passed on re-check (reviewer a71d6cc5dbe922bef) after a FIX (seed resolution, outcome branches,
+      H5/H6 scope, estimates). H6 added: lhe.label_alphas_mz (labels run from alpha_s(M_Z) 0.13) @5d4c0e9c, tests/test_label_alphas_mz.py
+      passes; 114 hd_ pools (H2p5 38, H6 8, H7E 34, H7c 34), 19.19 core-h estimate. Job axis HD4 @1acddbff. H5 is next 19
+      (one-loop label rule on Born events). Probe batch hd_probe: 6 CPU jobs (180 runs of 1000 events) FA-ccin2p3-fd7cf028
+      231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf at 11297eec, target 1.2 h. Side note: tests/test_default_share.py::test_lhe_runs
+      fails already at 1ede6016, before this work.'
   handoff:
     state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
       reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
