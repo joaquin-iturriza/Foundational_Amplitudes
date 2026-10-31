@@ -6387,7 +6387,7 @@ entries:
     agent: a5d0c97d9d3e9a7dc
     state: working
     since: '2026-10-31T14:18:06+00:00'
-    state_at: '2026-10-31T14:18:06+00:00'
+    state_at: '2026-10-31T14:22:44.048000+00:00'
     context: 89910
     context_at: '2026-10-31T14:22:46+00:00'
   findings:
