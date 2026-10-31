@@ -1964,6 +1964,42 @@ entries:
       own fit), so that sanity should be reported, not taken as a bug. Terms searched: leave-one, leave-class, leave one,
       GroupKFold, gradient, HistGradient, boosted, cross-process, extrapolat, shared across, per-event structure, joint read,
       event features; site decisions D81, D178.'
+  - at: '2026-10-31T02:25:18+00:00'
+    question: Does the leave-class-out map still close part of the held-out multiplicity gap when the scored event's own target
+      t is removed from its features? par:v4_lco (FA-ccin2p3-7ad4b5e3) read f between (0.147/0.125 of the gap, ceilings 0.271/0.316)
+      with t among the features; t is the label (u = q - t), so a map using it is not a prior, and nothing transferred without
+      the factor group that holds t. Repair of the passed design's feature set, eval-only on the same reads. REREAD=FA-ccin2p3-7ad4b5e3.
+      Feeds D178.
+    prior: 'par:v4_lco @a767b36a (this read with t: between; factors only 0.089/0.084; without the factor group 0.002/0.004;
+      leave-one-cell-out 0.060/0.032; training-pool map 0.063/0.093); par:v4_prop (log P between, eta^2 0.042); par:v4_dipole
+      (log D dead end); the 2->4 factorised-onto-parent result near line 6194 (a leave-one-probe-out correction on splitting
+      variables, which hold no label). Searched docs/results.tex and the plan for t as a feature: the ceilings of par:v4_prop
+      (eta^2 of u on t) also used t, as a ceiling only.'
+    measure: 'As the passed design of par:v4_lco, with t dropped everywhere: features 37 (the sorted log s_ij/s_hat, sorted
+      final log E/sqrt(s_hat) and |cos theta|, log s_hat, species counts, logF, log P, log D; logF, log P, log D are functions
+      of the momenta, species and couplings, known at prediction time). The own-label ceiling without t at K = 1600 of the
+      2000 read events (stage 1 rerun on the held-out pools only: two CPU jobs, one per seed), so the ceiling keeps the passed
+      rule''s event count; the maps (leave-class-out over the same 10 class-grouped folds, factors only = logF, log P, log
+      D, drop-group, leave-one-cell-out, training-pool map) on the existing 500-event dumps with the t column excluded (stage
+      2, one job). f as before: median removed over median gap against each cell''s training floor; bootstrap 1000 draws,
+      seed 0, paired across reads.'
+    check: The with-t read moved f from 0.002 (no factors) to 0.147 (all), so the measure responds to the factor group; dropping
+      t isolates whether the label carried it. The same dumps and folds make the two reads paired; the with-t numbers are
+      the reference.
+    fixed: Everything of the passed design (reads of the control pair FA-ccin2p3-339ec100 / -380842ed, the 500-event dumps,
+      folds, model settings, cells, floors, bootstrap); only the t column is removed, and the ceiling is refitted without
+      it at K = 1600.
+    control: The with-t read of par:v4_lco on the same dumps and folds; the t-free own-label ceiling; seeds 42 and 43 separately.
+    seeds: Seeds 42 and 43, each decided on its own, a branch holding on both with the margin max(seed difference, bootstrap
+      half-range) as before.
+    outcome: 'The passed rule on the t-free numbers: f_ceil < 0.1 on both seeds: route ends; yes when f_lco - margin >= 0.5
+      f_ceil and >= 0.1; no when f_lco + margin < 0.25 f_ceil or < 0.05; else between. No: the shared part of par:v4_lco was
+      t read back, no event-level prior shared across held-out processes; the route ends and goes to the user with the alternatives
+      (capacity, training length, data); par:v4_lco is amended. Between: reported, no GPU arm; par:v4_lco amended with the
+      t-free numbers. Yes: the arm is designed from which t-free map holds f (log P in the target via data.target_propagators
+      if factors-only holds half of f, else the named group), its own design and review before any GPU job. Cost: CPU only
+      on CC: two stage-1 jobs (held-out pools, 4 cores, about 1 h, limit 2 h), one stage-2 job (8 cores, limit 2 h); no GPU;
+      disk about 40 MB for the new held-out dumps.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
