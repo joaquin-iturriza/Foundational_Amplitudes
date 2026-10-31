@@ -20,7 +20,7 @@ node), about 93 min for the 912 of catalog_v4_default50_train.yaml; the step-15 
 3.75 h without it. Eval-only jobs (--eval) start in 1.5 min, not 15: the step-20 re-reads (catalog_coverage,
 2026-10-31, 14 eval-only jobs, logs read whole) took 15-31 s (MSE) and 20-82 s (het) from job start to their first
 probe, the slowest kept. A het arm (--het) reads at 1.45 s per probe, its sigma head scored beside the mean: the step-20
-het re-reads ran 1.25-1.31 s per probe on the 142 HD4+HD5 probes and 1.33-1.45 s on PP4+EE4's 1612 (span over the
+het re-reads (on the per-probe deep copy, before the shared-tensor default) ran 1.25-1.31 s per probe on the 142 HD4+HD5 probes and 1.33-1.45 s on PP4+EE4's 1612 (span over the
 probes, start-up excluded), the slowest kept; the MSE re-reads 0.58-0.65 s, under S_PROBE."""
 import argparse, json, math, os, sys
 
@@ -28,7 +28,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # S_PROBE: the zero-shot reader with the parent config parsed once and the parent checkpoint's tensors shared (1
 # worker): 42 s for 62 H1 probes of the MSE control on a V100, start-up included (A/B FA-ccin2p3-30cc8928, path D),
 # 0.68 s per probe; was 0.71 with the checkpoint deep-copied per probe (bfec5501), 1.6 with the per-probe load
-S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 0.68, 15.0, 1.0, 1.25
+# 0.40 s per probe and 0.4 min per axis on that default path: the step-23 eval-only re-reads FA-ccin2p3-f8ec724f and
+# 049b863e (V100, 311 probes each over EE4, HD4, HD5; logs read whole) ran 0.33-0.40 s per probe within an axis
+# (EE4 55 and 63 s for 169, HD4 46 and 47 s for 114, HD5 11 and 12 s for 28) and 17-24 s between axes, the slowest
+# kept; the jobs took 198 and 218 s against the 10 min the former 0.68 s and 1 min per axis planned (2.8x)
+S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 0.40, 15.0, 0.4, 1.25
 SIGMA_STAGE_MIN = 20.0
 STARTUP_EVAL_MIN, S_PROBE_HET = 1.5, 1.45
 S_COMPOSE = 6.1
