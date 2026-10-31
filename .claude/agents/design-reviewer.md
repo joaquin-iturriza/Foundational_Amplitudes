@@ -68,7 +68,7 @@ rules). You do not edit files and you do not submit anything. Reading state is f
    elsewhere. A comparison the user asked for and the design leaves out fails.
 8. **No label in a map's inputs.** No feature of a map or prior is the scored event's label, or a
    function of it unavailable at prediction time.
-9. **The training loss matches the decisions in force.** Read the design's training loss from the run configs it names and match it against `site decisions --project FA` (D52: het loss for catalog trainings). A mismatch, with no stated reason for the other loss, is FIX.
+9. **The training loss matches the decisions in force.** Read the design's training loss from the run configs it names and match it against `site decisions --project FA` (HETEROSC is the decided default, D71 2026-10-16 under D52). A mismatch, with no stated reason for the other loss, is FIX.
 
 ## The verdict
 

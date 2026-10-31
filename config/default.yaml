@@ -139,7 +139,7 @@ training:
                          # precision -> A/B the loss on A100 before trusting it.
  fused_optimizer: true   # fused=True for Adam/AdamW (CUDA only); flows through MuAdam/MuAdamW.
 
- loss: MSE
+ loss: HETEROSC   # decided default: het loss beat MSE and the main results were rerun with it (D52, D71, 2026-10-16); MSE only with a stated reason
  track_train_eval: false   # also score the training split with the validation weights (EMA when on) at every validation step
  heterosc_select: nll      # checkpoint selection and DyHPO objective for HETEROSC: nll (the user's loss: the plain
                            # Gaussian NLL, proper at heterosc_beta=0; D62), or mu_mse
