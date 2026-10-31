@@ -21,6 +21,10 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
                                     (never dropped), the verdict only when nothing is missing; beside it het_over_mse,
                                     the het control pair over the MSE control pair on each read (what the het loss
                                     costs mu, information)
+  bound_default                     the pure-default bound arm (step 11) on the same default-sampled reads as the
+                                    shares (Joaquin 2026-10-31 21:3x): PP4 and EE4 (all, trained, not trained) and
+                                    the 700 held-out classes (H1-H3's PP4/EE4 probes, HD4, HD5), pooled and per axis,
+                                    against the same MSE control, the two shares' rows beside -> data/bound_default.json
   heldout_default [--het]           with --het the het runs, missing reads listed -> data/mixture_heldout_default_het.json
 
 The measure (the design's): per probe the MSE of log|M|^2 at the best checkpoint (tools/zero_shot_parent.py,
@@ -95,6 +99,9 @@ HD4_MSE = {"default50": ("FA-ccin2p3-58631ca5", "FA-ccin2p3-698c1a0b"),
            "default25": ("FA-ccin2p3-4dca09e5", "FA-ccin2p3-926dea24"),
            "control": ("FA-ccin2p3-9512cac2", "FA-ccin2p3-783892e6")}
 HD5_MSE = dict(HD4_MSE, control=("FA-ccin2p3-c37a4b26", "FA-ccin2p3-a1ea15aa"))
+# the bound arm's EE4, HD4 and HD5: eval-only REREADs of afc96598 (seed 42) and d26f13aa (seed 43), plan step 23
+BOUND_DEFAULT = {"PP4": BOUND["arm"], "EE4": ("FA-ccin2p3-f8ec724f", "FA-ccin2p3-049b863e"),
+                 "HD": ("FA-ccin2p3-f8ec724f", "FA-ccin2p3-049b863e")}
 DEFAULT_EXTRA = {False: {"HD4": HD4_MSE, "HD5": HD5_MSE}, True: {"HD4": HD4_HET, "HD5": HD5_HET}}
 # The blow-up check (CLAUDE.md: a run that blows up is listed apart with where it blew up, never dropped). Every read
 # above is made at its training run's best checkpoint; an eval-only REREAD reads its parent's, so the check is on the
@@ -113,6 +120,7 @@ BLOWUP_FACTOR = 10      # the repo's blow-up factor (analysis/catalog_v3/pair_he
 REF_STEP = 500          # the passed step-15 design's outcome rule (val_loss_no_reg NaN or above 10x its step-500 value)
 HET_RISE = 0.5 * math.log(BLOWUP_FACTOR)
 TRAINED_BY = {"FA-ccin2p3-a152d7d0": "FA-ccin2p3-afc96598", "FA-ccin2p3-a01ad665": "FA-ccin2p3-d26f13aa",
+              "FA-ccin2p3-f8ec724f": "FA-ccin2p3-afc96598", "FA-ccin2p3-049b863e": "FA-ccin2p3-d26f13aa",
               "FA-ccin2p3-8e1cc529": "FA-ccin2p3-6c246603", "FA-ccin2p3-52efacaf": "FA-ccin2p3-1d46b938",
               "FA-ccin2p3-7a6a1967": "FA-ccin2p3-11ad944a", "FA-ccin2p3-897aa5d4": "FA-ccin2p3-9c6fc7ab",
               "FA-ccin2p3-04253ff7": "FA-ccin2p3-339ec100", "FA-ccin2p3-e7e32847": "FA-ccin2p3-380842ed",
@@ -537,6 +545,41 @@ def _held_default(reads, a, cls, ax_of, extra):
     return res, keys
 
 
+def bound_default():
+    """The bound arm beside the shares, every read on default-sampled events, the same control pair and measure as
+    mixture (MSE runs); the rule's verdict is not applied (the bound is a reference, not a candidate share)"""
+    cls = class_of()
+    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
+    table = {"bound": {"PP4": BOUND_DEFAULT["PP4"], "EE4": BOUND_DEFAULT["EE4"]},
+             **{a: {r: MIX[a][r] for r in ("PP4", "EE4")} for a in ("default50", "default25", "control")}}
+    reads, missing = _reads(table)
+    extra = {ax: dict(tab, bound=BOUND_DEFAULT["HD"]) for ax, tab in DEFAULT_EXTRA[False].items()}
+    if missing:
+        sys.exit("bound_default: reads missing: " + "; ".join(missing))
+    c = reads["control"]
+    out = {"design": "plan catalog_coverage step 11 (passed 2026-10-30T17:29), eval-only REREADs (step 23)",
+           "runs": {**table, "HD4": {a: extra["HD4"][a] for a in ("bound", "default50", "default25", "control")},
+                    "HD5": {a: extra["HD5"][a] for a in ("bound", "default50", "default25", "control")}},
+           "arms": {}}
+    ax_of = _held_axes(cls)
+    for a in ("bound", "default50", "default25"):
+        res = {}
+        for r in ("PP4", "EE4"):
+            arm, ctl = side(reads[a][r]), side(c[r])
+            keys = sorted(set(arm) & set(ctl), key=str)
+            parts = {"all": keys, "trained": [k for k in keys if cls(probe_name(k)) in trained],
+                     "not_trained": [k for k in keys if cls(probe_name(k)) not in trained]}
+            res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
+            res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
+        res["held_default"], _ = _held_default(reads, a, cls, ax_of, extra)
+        out["arms"][a] = res
+    runs = [run for v in table.values() for pair in v.values() for run in pair] + \
+        [run for tab in extra.values() for pair in tab.values() for run in pair]
+    out["blowups"] = blowups(runs)
+    json.dump(out, open(os.path.join(DATA, "bound_default.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
 def heldout_default(het=False):
     """The held-out classes read on default-sampled events (Joaquin, 2026-10-31: the check is against data generated
     the default way): the PP4 and EE4 probes (MadEvent default, test split) whose class is in a held-out axis
@@ -589,6 +632,7 @@ def main():
     v = sub.add_parser("val")
     v.add_argument("run"); v.add_argument("log")
     sub.add_parser("bound")
+    sub.add_parser("bound_default")
     hd = sub.add_parser("heldout_default")
     hd.add_argument("--het", action="store_true")
     m = sub.add_parser("mixture")
@@ -601,6 +645,8 @@ def main():
         val(a.run, a.log)
     elif a.cmd == "mixture":
         mixture(a.partial, a.het)
+    elif a.cmd == "bound_default":
+        bound_default()
     elif a.cmd == "heldout_default":
         heldout_default(a.het)
     else:
