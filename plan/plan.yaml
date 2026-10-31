@@ -3435,8 +3435,11 @@ entries:
       with intervals across 1'
     15: 'Het-loss uncertainty read (D220): where the network is uncertain on the mixture arms vs control; first check whether
       an existing het-loss run can be re-read; GPU-h stated before any run'
-    16: 'Once the share is chosen (catalog final): longer and wider muP pretrainings (D219); grid of lengths x widths x seeds
-      with GPU-h, wall time and token cost goes to Joaquin before launch'
+    16: 'Long muP runs on the 0.25 catalog (D219, D229, D231): design of 2026-10-31 ~22:40 (revised after a design-reviewer
+      FIX: het loss, staged widths, lr DyHPO first). Cost estimate (short_wall rates, het, V100, s/step assumed proportional
+      to num_heads, 1.25 margin): S1 = 1x widths 16/32 x 2 seeds + 8-trial lr DyHPO at 4x width 8 = 81 GPU-h; S2 all 4x/16x
+      cells = 466 GPU-h (16x width 32 is 100 h per run: chained jobs), width-8-only S2 = 76 GPU-h; width probe 0.5 GPU-h.
+      Goes to Joaquin for his go on the GPU-h before anything launches'
     17: 'Held-out read on default-sampled pools (Joaquin 2026-10-31 ''I have nothing to say about the mixture until I see
       the right numbers''): build MadEvent-default test pools for H1-H7c, re-read the MSE arms and control pair on them (REREAD),
       then the same comparison under the het loss (arms at both shares and control, seeds 42/43) folded into the het design;
@@ -6612,8 +6615,8 @@ entries:
     16:
       feeds: 'D219: scaling and whether the network is big enough'
       if:
-      - 'Joaquin approves the grid: launch'
-      - 'he cuts it: launch his version'
+      - 'Joaquin approves (all or a cut): width probe, then S1, then S2 by the go rules'
+      - 'Joaquin cuts it: his version, re-costed'
     17:
       feeds: next 14, the share choice
       if:
