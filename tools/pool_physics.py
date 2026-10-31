@@ -421,16 +421,59 @@ def load_recipe_specs(path):
     procs = d.get("processes", d) if isinstance(d, dict) else d
     if isinstance(procs, dict):
         procs = [dict(v, name=k) for k, v in procs.items()]
-    return [{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics")} for p in procs], d
+    return [{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
+             **{k: p[k] for k in ("sqrts", "n_train", "n_val", "n_test") if k in p}} for p in procs], d
+
+
+def stored_block(name, spec, seed=42):
+    """(block, pool) of the entry's stored pool from its sidecar: the train, val and test pools in turn, the first built
+    one (pool present, sidecar recipe id the entry's) whose sidecar carries a physics block without error; an entry with
+    a default share (sampling.f_default > 0) reads its catalog_v4 control pool's, which mix_compose copies into the
+    composed pool (the same backend labelled both). (None, None) when there is none."""
+    mg = _mg()
+    import datagen
+    if "sqrts" not in spec:
+        return None, None
+    lo, hi = (float(x) for x in spec["sqrts"])
+    cfg = mg.PROCESSES.get(name)
+    swap = None
+    if cfg is not None and float((cfg.get("sampling") or {}).get("f_default", 0) or 0) > 0:
+        import mix_compose
+        swap = mix_compose._Swap(name, mix_compose.control_config(name))
+    if swap:
+        swap.__enter__()
+    try:
+        for role in ("train", "val", "test"):
+            n = int(spec.get(f"n_{role}", 0) or 0)
+            if n <= 0:
+                continue
+            rec = mg.variable_energy_recipe(name, lo, hi, n, role=role, seed=seed)
+            path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
+            if not (os.path.exists(path) and datagen._is_cached(path, mg.recipe_id(rec))):
+                continue
+            try:
+                blk = json.load(open(path + ".recipe.json")).get("physics")
+            except ValueError:
+                continue
+            if blk and "error" not in blk:
+                return dict(blk), path
+    finally:
+        if swap:
+            swap.__exit__()
+    return None, None
 
 
 class TrainingReference:
-    """the training catalog's blocks, from its recipe (a parent run's data.processes_file): each entry's block computed
-    from its entry and backend (the pools need not exist), indexed by process and by (model family, loop kind)"""
+    """the training catalog's blocks, from its recipe (a parent run's data.processes_file): each entry's block from its
+    stored pool's sidecar (stored_block), else computed from its entry and backend card while the standalone exists;
+    an entry with neither is listed in `unreadable`, never a reference. `sources` counts where the blocks came from.
+    Indexed by process and by (model family, loop kind)"""
 
-    def __init__(self, recipe_path, blocks=None):
+    def __init__(self, recipe_path, blocks=None, seed=42):
         mg = _mg()
         self.recipe = recipe_path
+        self.sources = {}
+        self.unreadable = []
         specs, d = load_recipe_specs(recipe_path)
         mg.register_recipe_processes(specs, default_sampling=(d.get("default_sampling") if isinstance(d, dict) else None))
         self.entries = []
@@ -439,12 +482,23 @@ class TrainingReference:
             cfg = mg.PROCESSES.get(name) or mg.PROCESSES.get(s["base"])
             if cfg is None:
                 continue
+            proc = name if name in mg.PROCESSES else s["base"]
             try:
-                blk = (blocks or {}).get(name) or physics_block(name if name in mg.PROCESSES else s["base"],
-                                                                spec_physics=s["physics"], cfg=cfg)
+                blk, src = (blocks or {}).get(name), "given"
+                if blk is None:
+                    blk, _ = stored_block(proc, s, seed)
+                    src = "sidecar"
+                    if blk is not None:     # the b row the encoding reads is the particle table's now, as for a probe
+                        blk["b_row"] = b_row([int(p) for p in cfg["pdg_ids"]], cfg, s["physics"])
+                if blk is None:
+                    be = backend_dir(proc, cfg)
+                    if not be or not os.path.exists(os.path.join(be, "Cards", "param_card.dat")):
+                        raise RuntimeError("no sidecar physics block and no backend card")
+                    blk, src = physics_block(proc, spec_physics=s["physics"], cfg=cfg), "backend card"
             except Exception as e:                   # listed, never a reference
-                self.unreadable = getattr(self, "unreadable", []) + [(name, repr(e)[:120])]
+                self.unreadable.append((name, repr(e)[:120]))
                 continue
+            self.sources[src] = self.sources.get(src, 0) + 1
             self.entries.append({"name": name, "scan": bool(s["physics"]), "declared": declared_fields(s["physics"]),
                                  "pdg": [int(p) for p in cfg["pdg_ids"]],
                                  "loop": is_loop(cfg), "family": model_family(blk.get("model")), "block": blk})
@@ -512,6 +566,12 @@ def check_probe(name, spec_physics, pool_path, reference, cfg=None):
     else:
         src = "computed at read" + ("" if side else " (no sidecar)")
         blk = physics_block(name, recipe=side, spec_physics=spec_physics, cfg=cfg)
+        if blk.get("backend") and blk.get("card") is None:     # nothing to read the physics from: refused
+            return {"probe": name, "pool": pool_path, "block_source": src, "status": "mismatch",
+                    "reference": {"kind": "none"},
+                    "mismatches": [{"field": "physics block", "probe": None,
+                                    "reference": "the pool's sidecar has no physics block and its backend card "
+                                                 f"{blk['backend']}/Cards/param_card.dat is absent"}]}
     # the b row the encoding reads is a property of this read (the particle table now), never of the sidecar
     try:
         blk["b_row"] = b_row(pdg, cfg, spec_physics)
@@ -606,6 +666,73 @@ def val_pool_path(name, spec, recipe_doc, seed=42):
     return mg.recipe_output_path(rec, datagen.dest_for_role("val"))
 
 
+def sidecar_scan(dirs):
+    """Every pool sidecar (*.npy.recipe.json) under `dirs`: (n sidecars, [{sidecar, process, backend, reason}] of those
+    without a usable physics block). `backend` is the standalone that labelled the pool (backend_dir of its process),
+    None when the process is not in the pipeline's table."""
+    mg = _mg()
+    n, out = 0, []
+    for d in dirs:
+        for dp, _, fs in os.walk(d):
+            for f in fs:
+                if not f.endswith(".npy.recipe.json"):
+                    continue
+                n += 1
+                fp = os.path.join(dp, f)
+                try:
+                    side = json.load(open(fp))
+                except ValueError:
+                    side = {}
+                blk = side.get("physics")
+                if blk and "error" not in blk:
+                    continue
+                proc = side.get("process")
+                try:
+                    be = backend_dir(proc) if proc in mg.PROCESSES else None
+                except Exception:
+                    be = None
+                out.append({"sidecar": fp, "process": proc, "backend": be,
+                            "reason": "physics error" if blk else "no physics block"})
+    return n, out
+
+
+def standalone_dirs(work_dir):
+    """The compiled process outputs directly under the MadGraph install `work_dir`: <name>_standalone directories
+    holding Cards/proc_card_mg5.dat (a MadGraph output; the install's own directories never end so)."""
+    return sorted(os.path.join(work_dir, x) for x in os.listdir(work_dir)
+                  if x.endswith("_standalone") and os.path.isfile(os.path.join(work_dir, x, "Cards", "proc_card_mg5.dat"))
+                  and not os.path.islink(os.path.join(work_dir, x)))
+
+
+def prune_standalones(work_dir, keep, apply=False, manifest_dir=None):
+    """The standalones of standalone_dirs(work_dir) not in `keep` (the backends of pools without a sidecar physics
+    block), each deleted with --apply after a manifest of every path and size [D208]. The install itself is never
+    touched: only <name>_standalone outputs directly under it."""
+    import shutil, time
+    keep = {os.path.realpath(k) for k in keep if k}
+    cand = [d for d in standalone_dirs(work_dir) if os.path.realpath(d) not in keep]
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lhe_parts import _du as du
+    ent = [{"path": d, "bytes": du(d)} for d in cand]
+    mdir = manifest_dir or os.path.join(work_dir, ".prune_manifests")
+    os.makedirs(mdir, exist_ok=True)
+    man = os.path.join(mdir, f"standalones_{time.strftime('%Y%m%d_%H%M%S')}{'' if apply else '_dry'}.json")
+    with open(man, "w") as f:
+        json.dump({"work_dir": work_dir, "apply": apply, "kept": sorted(keep), "entries": ent}, f)
+    freed = 0
+    if apply:
+        root = os.path.realpath(work_dir)
+        for e in ent:
+            r = os.path.realpath(e["path"])
+            if os.path.dirname(r) != root or not r.endswith("_standalone"):
+                raise RuntimeError(f"{e['path']}: not a standalone directly under {root}; nothing more deleted")
+            shutil.rmtree(r)
+            freed += e["bytes"]
+    return {"manifest": man, "apply": apply, "standalones": len(standalone_dirs(work_dir)) + (len(ent) if apply else 0),
+            "deletable": len(ent), "kept": len(keep), "gb": round(sum(e["bytes"] for e in ent) / 1e9, 2),
+            "freed_gb": round(freed / 1e9, 2)}
+
+
 def main(argv=None):
     """python tools/pool_physics.py check --train <training recipe> <probe recipe> [...]: every probe's check, without a
     model (what tools/zero_shot_parent.py would refuse); one PHYSICS_CHECK line each, the counts as the last line.
@@ -621,8 +748,31 @@ def main(argv=None):
     b = sub.add_parser("block")
     b.add_argument("process")
     b.add_argument("pool", nargs="?")
+    sc = sub.add_parser("sidecars", help="pools whose sidecar has no physics block, with the standalones they need")
+    sc.add_argument("--out")
+    pr = sub.add_parser("prune-standalones", help="delete the standalones no pool needs (manifest first) [D208]")
+    pr.add_argument("--apply", action="store_true")
     a = ap.parse_args(argv)
     mg = _mg()
+    if a.mode in ("sidecars", "prune-standalones"):
+        import datagen
+        dirs = sorted({os.path.realpath(datagen.frozen_dir()), os.path.realpath(datagen.train_cache_dir())})
+        n, bad = sidecar_scan(dirs)
+        keep = sorted({e["backend"] for e in bad if e["backend"]})
+        unmapped = sorted({str(e["process"]) for e in bad if not e["backend"]})
+        if a.mode == "sidecars":
+            out = {"dirs": dirs, "sidecars": n, "without_block": len(bad), "standalones_needed": keep,
+                   "unmapped_processes": unmapped, "pools": bad}
+            if a.out:
+                json.dump(out, open(a.out, "w"), indent=1)
+            print(json.dumps({k: v for k, v in out.items() if k != "pools"}))
+            return
+        if unmapped and a.apply:
+            raise SystemExit(f"{len(unmapped)} processes of pools without a physics block are not in the pipeline's "
+                             f"table (their standalone is unknown), e.g. {unmapped[:5]}: nothing deleted")
+        print(json.dumps(dict(prune_standalones(mg.WORK_DIR, keep, a.apply), sidecars=n, without_block=len(bad),
+                              unmapped_processes=len(unmapped))))
+        return
     if a.mode == "block":
         out = {"entry": physics_block(a.process)}
         if a.pool and os.path.exists(a.pool + ".recipe.json"):

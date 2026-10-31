@@ -11,6 +11,7 @@ import glob
 import json
 import multiprocessing as mp
 import os
+import shutil
 import sys
 import tempfile
 import time
@@ -863,7 +864,7 @@ def _gridpack_fakes(made):
             t.add(src, arcname="grid_iseed.txt")
         return tar
 
-    def run(gridpack, work, nevents, seed, log_path, timeout=None):
+    def run(gridpack, work, nevents, seed, log_path, timeout=None, ximprove=None):
         os.makedirs(work, exist_ok=True)
         with tarfile.open(gridpack) as t:
             g = int(t.extractfile("grid_iseed.txt").read())
@@ -1005,7 +1006,7 @@ def test_gridpool_probe():
             mg.PROCESSES[NAME]["lhe"].update(energies=[500.0, 3000.0], gridpack=13057)
             out = io.StringIO()
             with contextlib.redirect_stdout(out):
-                lhe_probe.cmd_gridpool(argparse.Namespace(process=[NAME], runs=3, cores=2, work=d, timeout=60))
+                lhe_probe.cmd_gridpool(argparse.Namespace(process=[NAME], runs=3, cores=2, work=d, timeout=60, events=None, energy=None, seed_base=0, keep=None, keep_logs=None, ximprove=None))
             lines = out.getvalue().splitlines()
             runs = [json.loads(l.split("PROBE_JSON ", 1)[1]) for l in lines if l.startswith("PROBE_JSON ")]
             grids = [json.loads(l.split("GRIDPACK_JSON ", 1)[1]) for l in lines if l.startswith("GRIDPACK_JSON ")]
@@ -1022,7 +1023,7 @@ def test_gridpool_probe():
                                                       small_run=1000))
             assert json.load(open(ys)) == {NAME: 1.0}
             with contextlib.redirect_stdout(io.StringIO()):          # a second probe reuses the stored gridpacks
-                lhe_probe.cmd_gridpool(argparse.Namespace(process=[NAME], runs=1, cores=1, work=d, timeout=60))
+                lhe_probe.cmd_gridpool(argparse.Namespace(process=[NAME], runs=1, cores=1, work=d, timeout=60, events=None, energy=None, seed_base=0, keep=None, keep_logs=None, ximprove=None))
             assert len(made) == 2
     finally:
         (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
@@ -1198,6 +1199,76 @@ def test_failed_builds_and_workdirs():
     print("[failed builds and workdirs] ok")
 
 
+def test_gc_parts():
+    """gc --parts [D208]: after the queue assembled and its pools are built, the dry run writes its manifest and
+    deletes nothing; a sibling queue holding the process unassembled keeps every file; without it the part files go,
+    with lhe_parts/<process>, and the pools stay cache hits. A queue not assembled loses nothing."""
+    _register()
+    saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+             datagen.dest_for_role, lhe_parts.ASSEMBLE_S)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            _fakes(d, short=False)
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
+            lhe_parts.ASSEMBLE_S = 0
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            qs = os.path.join(d, "queues")
+            q, q2 = os.path.join(qs, "q"), os.path.join(qs, "q_sibling")
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            for qq in (q, q2):
+                lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=qq, seed=42, rates=rates,
+                                                      cores=[f"{NAME}=1"]))
+            gc = lambda dry: json.loads(_capture(lambda: lhe_parts.cmd_gc(
+                argparse.Namespace(queue=q, dry_run=dry, parts=True))))
+            assert gc(False)["files"] == 0                              # nothing assembled yet
+            ctx = mp.get_context("fork")
+            res = ctx.Queue()
+            ps = [ctx.Process(target=_worker, args=(q, res)) for _ in range(2)]
+            for p in ps:
+                p.start()
+            for p in ps:
+                p.join(120)
+            assert [res.get(timeout=5) for _ in ps] == [0, 0]
+            parts = [p for p, _ in mg.lhe_part_paths(NAME, _items())]
+            assert len(parts) == 3 and all(os.path.exists(p) for p in parts)
+            # the sibling queue's spec is of the same pools, not assembled there: its pools are built, so it does not
+            # need the parts; a sibling whose pools are not built does
+            r = gc(True)
+            assert r["files"] == 3 and r["freed_gb"] == 0 and all(os.path.exists(p) for p in parts), r
+            for rec, path in _items():
+                os.rename(path, path + ".aside")
+            assert gc(False)["files"] == 0 and all(os.path.exists(p) for p in parts)   # own pools not built
+            for rec, path in _items():
+                os.rename(path + ".aside", path)
+            sib = os.path.join(q2, "specs", NAME + ".json")
+            s2 = json.load(open(sib))
+            s2["items"] = [[{**r, "seed": 43}, p + ".seed43"] for r, p in s2["items"]]
+            json.dump(s2, open(sib, "w"))
+            r = gc(False)
+            assert r["files"] == 0 and r["held_by_other_queue"] == 1 and all(os.path.exists(p) for p in parts), r
+            shutil.rmtree(q2)
+            r = gc(False)
+            assert r["files"] == 3 and r["processes"] == 1, r
+            assert not any(os.path.exists(p) for p in parts)
+            assert not os.path.exists(os.path.join(d, "parts_store", NAME))
+            man = json.load(open(r["manifest"]))
+            assert sorted(man["entries"][0]["paths"]) == sorted(parts)
+            for rec, path in _items():
+                assert datagen._is_cached(path, mg.recipe_id(rec)), path
+    finally:
+        (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
+         datagen.dest_for_role, lhe_parts.ASSEMBLE_S) = saved
+        for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
+            os.environ.pop(v, None)
+        del mg.PROCESSES[NAME]
+    print("[gc parts] ok")
+
+
 def _capture(fn):
     import contextlib, io
     buf = io.StringIO()
@@ -1223,3 +1294,4 @@ if __name__ == "__main__":
     test_gridpool_probe()
     test_kept_by_energy_and_sizing()
     test_failed_builds_and_workdirs()
+    test_gc_parts()

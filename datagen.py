@@ -551,6 +551,21 @@ def build_lhe_pp_job(job):
         return process, [], f"{type(e).__name__}: {e}\n{traceback.format_exc()[-1500:]}", time.time() - t0
 
 
+def composed_record(paths):
+    """{role: {process: derived_from}} of the pools in `paths` ({role: {process: npy}}) that were composed at load
+    (mix_compose.ensure_composed: the stored pool's recipe id, the control pool and its recipe id, the shares)."""
+    out = {}
+    for role, by in paths.items():
+        for name, pth in by.items():
+            try:
+                der = json.load(open(pth + ".recipe.json")).get("derived_from") or {}
+            except (OSError, ValueError):
+                continue
+            if der.get("composed_at_load"):
+                out.setdefault(role, {})[name] = der
+    return out
+
+
 def ensure_split_set(specs, role, seed, dest_dir=None, require_cache=False):
     """Materialize a list of process specs for one role.
 

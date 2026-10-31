@@ -1506,6 +1506,15 @@ class AmplitudeExperiment(BaseExperiment):
             paths[role] = datagen.ensure_split_set(
                 role_specs, role=role, seed=seed, require_cache=require_cache)
         self._pool_paths = paths     # {role: {name: npy}}: what a probe read checks the physics of (tools/pool_physics.py)
+        # a pool composed at load (mix_compose.py) carries its stored pool's recipe id, its sidecar sits in the job's
+        # $TMPDIR: which pools were composed, from which control pool, is written into the run's own record
+        composed = datagen.composed_record(paths)
+        if composed and self.cfg.get("run_dir"):
+            os.makedirs(self.cfg.run_dir, exist_ok=True)
+            with open(os.path.join(self.cfg.run_dir, "composed_pools.json"), "w") as fh:
+                json.dump(composed, fh, indent=1, sort_keys=True)
+            LOGGER.info(f"composed at load: {sum(len(v) for v in composed.values())} pools "
+                        f"({ {r: len(v) for r, v in composed.items()} }), recorded in composed_pools.json")
 
         # --- frozen normalization stats (all GLOBAL scalars, train-only) ---
         # Source of truth, in priority order:

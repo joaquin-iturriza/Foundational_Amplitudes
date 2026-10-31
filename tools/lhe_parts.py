@@ -38,6 +38,10 @@ default-sampled share; mg5_pipeline_final "One-run part jobs").
             not running: a run whose part file holds its events loses the whole directory, any other (failed, killed,
             not started) keeps only its log files. A manifest of every path removed, with its size, is written under
             Q/gc/ before anything is deleted. A worker does the same for each run it ends (tidy_run).
+    gc      --queue Q --parts [--dry-run]   the part files and gridpacks in lhe_parts of the queue's assembled
+            processes whose pools are all built (nothing reads them after the assembly [D208]); a process another
+            queue in the same parent directory still needs (its spec's pools not built) is left whole; manifest
+            under Q/gc/ first
     workdirs [--min-age H] [--apply]   every MadEvent working directory left on $SCRATCH/lhe_work, of any queue or
             layout (parts/<process>__<run>) or of a failed series build (<process>_madevent): sizes, ages, saved parts,
             any .npz inside checked against its lhe_parts copy; --apply deletes those older than H hours whose .npz all
@@ -762,8 +766,64 @@ def cmd_work(a):
     sys.exit(1 if n_fail or n_stale else 0)
 
 
+def parts_plan(q):
+    """The part files and gridpacks in lhe_parts of the queue's assembled processes whose pools are all built (every
+    spec item a cache hit), which nothing reads after the assembly [D208]: [{process, paths, bytes}]. A process is left
+    whole while another queue next to this one (same parent directory) holds a spec of it whose pools are not built,
+    since a queue planned with --skip-claimed or a run-size probe (lhe.gridpack_eid) may read the same files."""
+    D = _dirs(q)
+    parent = os.path.dirname(os.path.abspath(q))
+
+    def built(items):
+        return all(os.path.exists(p) and datagen._is_cached(p, mg.recipe_id(r)) for r, p in items)
+    out, held = [], []
+    for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
+        name = os.path.basename(sf)[:-5]
+        items = _spec(D, name)
+        if not os.path.exists(os.path.join(D["assembled"], name)) or not built(items):
+            continue
+        other = [o for o in glob.glob(os.path.join(parent, "*", "specs", name + ".json"))
+                 if os.path.realpath(o) != os.path.realpath(sf)]
+        if any(not built([(r, p) for r, p in json.load(open(o))["items"]]) for o in other):
+            held.append(name)
+            continue
+        paths = [p for p, _ in mg.lhe_part_paths(name, items)] + [t for t, _ in mg.lhe_gridpack_paths(name, items)]
+        paths = [p for p in paths if os.path.exists(p)]
+        if paths:
+            out.append({"process": name, "paths": paths, "bytes": sum(os.lstat(p).st_size for p in paths)})
+    return out, held
+
+
+def cmd_gc_parts(a):
+    """gc --parts: parts_plan's files deleted (manifest under Q/gc/ first; with --dry-run only the manifest), then
+    each emptied lhe_parts/<process> directory."""
+    todo, held = parts_plan(a.queue)
+    pdir = os.path.realpath(mg.lhe_parts_dir())
+    os.makedirs(os.path.join(a.queue, "gc"), exist_ok=True)
+    man = os.path.join(a.queue, "gc", f"parts_{time.strftime('%Y%m%d_%H%M%S')}{'_dry' if a.dry_run else ''}.json")
+    with open(man, "w") as f:
+        json.dump({"root": pdir, "dry_run": a.dry_run, "held_by_other_queue": held, "entries": todo}, f)
+    freed = 0
+    if not a.dry_run:
+        for e in todo:
+            for p in e["paths"]:
+                _under(pdir, p)
+                n = os.lstat(p).st_size
+                os.remove(p)
+                freed += n
+            d = os.path.join(pdir, e["process"])
+            if os.path.isdir(d) and not os.listdir(d):
+                os.rmdir(d)
+    print(json.dumps({"manifest": man, "dry_run": a.dry_run, "processes": len(todo),
+                      "files": sum(len(e["paths"]) for e in todo), "gb": round(sum(e["bytes"] for e in todo) / 1e9, 2),
+                      "held_by_other_queue": len(held), "freed_gb": round(freed / 1e9, 2)}))
+
+
 def cmd_gc(a):
-    """Tidy the work directories of the queue's runs that no live job is running (tidy_plan), manifest first."""
+    """Tidy the work directories of the queue's runs that no live job is running (tidy_plan), manifest first; with
+    --parts instead the part files of its built pools (cmd_gc_parts)."""
+    if getattr(a, "parts", False):
+        return cmd_gc_parts(a)
     D = _dirs(a.queue)
     root = parts_work_root()
     live = _my_jobs()
@@ -1170,6 +1230,7 @@ def main():
     w.add_argument("--hours", type=float, default=1.0)
     s = sub.add_parser("status"); s.add_argument("--queue", required=True)
     g = sub.add_parser("gc"); g.add_argument("--queue", required=True); g.add_argument("--dry-run", action="store_true")
+    g.add_argument("--parts", action="store_true")
     wdp = sub.add_parser("workdirs"); wdp.add_argument("--min-age", type=float, default=12.0)
     wdp.add_argument("--apply", action="store_true")
     y = sub.add_parser("yields"); y.add_argument("--queue", required=True)

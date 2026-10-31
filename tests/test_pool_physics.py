@@ -279,12 +279,85 @@ def test_reads():
     print("ok reads")
 
 
+def test_reference_from_sidecars():
+    """the check without the standalones [D208]: the training reference reads each entry's block from its stored pool's
+    sidecar, the probe its own; with the backends moved away the scenario's verdicts are unchanged, a sidecar edited to
+    a wrong top mass is refused, a pool with neither a sidecar block nor a backend card is refused, and
+    prune_standalones deletes only the standalones no pool without a block needs, manifest first"""
+    import datagen
+    train = yaml.safe_load(open(TRAIN))["processes"]
+    with contextlib.redirect_stdout(io.StringIO()):
+        for p in train:
+            for role in ("train", "val"):
+                r = mg.variable_energy_recipe(p["name"], *p["sqrts"], p[f"n_{role}"], role=role, seed=42)
+                out = mg.recipe_output_path(r, datagen.dest_for_role(role))
+                np.save(out, np.zeros((1, 1)))
+                mg.write_recipe(out, r)
+        probes = {}
+        for n in ("pp13_bbx_bbxgg", "pp13_ddx_aag", "pp13_gg_ttx", "v4_gg_ttx"):
+            r = mg.variable_energy_recipe(n, 100, 6000, 10, role="val", seed=7)
+            out = mg.recipe_output_path(r, datagen.dest_for_role("val"))
+            np.save(out, np.zeros((1, 1)))
+            mg.write_recipe(out, r)
+            probes[n] = out
+    nosc = os.path.join(TMP, "datasets", "zz_noblock_val.npy")       # an old pool: sidecar without a block
+    np.save(nosc, np.zeros((1, 1)))
+    json.dump({"process": "pp13_ddx_aag", "recipe_id": "x"}, open(nosc + ".recipe.json", "w"))
+    n, bad = pp.sidecar_scan([os.environ["AMP_FROZEN_DIR"], os.environ["AMP_TRAIN_CACHE_DIR"]])
+    assert [b["sidecar"] for b in bad] == [nosc + ".recipe.json"], bad
+    keep = [b["backend"] for b in bad]
+    assert keep == [os.path.join(mg.WORK_DIR, "pp13_ddx_aag_standalone")], keep
+    with_be = {c["probe"]: c["status"] for c in
+               (pp.check_probe(n, None, f, pp.TrainingReference(TRAIN)) for n, f in probes.items())}
+    # the dry run lists every standalone but the kept one and deletes nothing
+    all_sa = pp.standalone_dirs(mg.WORK_DIR)
+    r = pp.prune_standalones(mg.WORK_DIR, keep, apply=False)
+    assert r["deletable"] == len(all_sa) - 1 and pp.standalone_dirs(mg.WORK_DIR) == all_sa, r
+    open(os.path.join(mg.WORK_DIR, "VERSION"), "w").write("3.7.0")      # the install's own files stay
+    os.makedirs(os.path.join(mg.WORK_DIR, "madgraph"), exist_ok=True)
+    saved = TMP + "_backends"
+    shutil.copytree(mg.WORK_DIR, saved)
+    try:
+        r = pp.prune_standalones(mg.WORK_DIR, keep, apply=True)
+        assert pp.standalone_dirs(mg.WORK_DIR) == keep and r["freed_gb"] >= 0, r
+        assert os.path.exists(os.path.join(mg.WORK_DIR, "VERSION")) and os.path.isdir(os.path.join(mg.WORK_DIR, "madgraph"))
+        assert json.load(open(r["manifest"]))["entries"], r
+        pp._CARD_CACHE.clear()
+        ref = pp.TrainingReference(TRAIN)
+        assert ref.sources == {"sidecar": len(train)} and not ref.unreadable, (ref.sources, ref.unreadable)
+        without = {n: pp.check_probe(n, None, f, ref) for n, f in probes.items()}
+        assert {n: c["status"] for n, c in without.items()} == with_be, (with_be, without)
+        assert all(c["block_source"] == "sidecar" for c in without.values())
+        assert with_be["pp13_bbx_bbxgg"] == "mismatch" and with_be["pp13_ddx_aag"] == "ok" and with_be["v4_gg_ttx"] == "ok"
+        # a sidecar edited to a wrong top mass is refused
+        side = json.load(open(probes["v4_gg_ttx"] + ".recipe.json"))
+        side["physics"]["MT"] = side["physics"]["ymt"] = 173.0
+        json.dump(side, open(probes["v4_gg_ttx"] + ".recipe.json", "w"))
+        c = pp.check_probe("v4_gg_ttx", None, probes["v4_gg_ttx"], ref)
+        assert c["status"] == "mismatch" and {"MT", "ymt"} <= {m["field"] for m in c["mismatches"]}, c
+        # a probe whose sidecar has no block and whose standalone is gone is refused, not passed unchecked
+        c = pp.check_probe("pp13_gg_ttx", None, nosc, ref)
+        assert c["status"] == "mismatch" and c["mismatches"][0]["field"] == "physics block", c
+        # a training entry with neither: listed, never a reference
+        os.remove(mg.recipe_output_path(mg.variable_energy_recipe("v4_ddx_aag", 100, 6000, 10, role="train", seed=42),
+                                        datagen.dest_for_role("train")))
+        os.remove(mg.recipe_output_path(mg.variable_energy_recipe("v4_ddx_aag", 100, 6000, 10, role="val", seed=42),
+                                        datagen.dest_for_role("val")))
+        ref = pp.TrainingReference(TRAIN)
+        assert [u[0] for u in ref.unreadable] == ["v4_ddx_aag"], ref.unreadable
+    finally:
+        shutil.rmtree(mg.WORK_DIR)
+        shutil.move(saved, mg.WORK_DIR)
+        pp._CARD_CACHE.clear()
+    print("ok reference from sidecars")
+
+
 if __name__ == "__main__":
     try:
         setup_rec = setup()
         TRAIN = setup_rec
         for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_sidecar_block_used,
-                  test_lhe_parent_check, test_backfill, test_reads):
+                  test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars):
             t()
         print("all pool physics tests passed")
     finally:

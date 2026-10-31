@@ -97,8 +97,8 @@ def pool_rows(z):
 
 
 # catalog_v4's masses and widths (fa-catalog-reference: MT 172.5, WT 1.4915; the loop-induced pools' corrected Z, W;
-# b massless in v4, so a b line is a massless propagator); alpha at the G_mu scheme's 1/132.5, alpha_s(M_Z) 0.118
-MW = {23: (91.188, 2.441404), 24: (80.419, 2.0476), 25: (125.0, 0.00407), 6: (172.5, 1.4915)}
+# b massless in v4, so a b line is a massless propagator; WH the sm card's 6.382339e-03); alpha at the G_mu scheme's 1/132.5, alpha_s(M_Z) 0.118
+MW = {23: (91.188, 2.441404), 24: (80.419, 2.0476), 25: (125.0, 6.382339e-03), 6: (172.5, 1.4915)}
 LOG_G2 = {"QCD": np.log(4 * np.pi * 0.118), "QED": np.log(4 * np.pi / 132.5)}
 
 
