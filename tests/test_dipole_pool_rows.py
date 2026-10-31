@@ -26,3 +26,12 @@ def test_saved_pool_row_wins():
     z = {"idx": np.array([50]), "split": np.array("val"), "role_counts": np.array([50, 13, 7]),
          "pool_row": np.array([3])}
     assert pool_rows(z).tolist() == [3]
+
+
+def test_old_read_without_role_counts():
+    n = (50, 13, 13)
+    arr = _shuffle(n)
+    for role, start, code in (("val", 50, 1), ("test", 63, 2)):
+        idx = np.arange(start, start + 13)
+        rows = pool_rows({"idx": idx, "split": np.array(role)})
+        assert np.array_equal(arr[idx], rows * 10 + code)

@@ -85,7 +85,15 @@ def pool_rows(z, role_counts=None):
     files = getattr(z, "files", z.keys())
     if "pool_row" in files and len(z["pool_row"]):
         return np.asarray(z["pool_row"], dtype=np.int64)
-    n = [int(c) for c in (role_counts if role_counts is not None else z["role_counts"])]
+    if role_counts is None and "role_counts" in files and len(z["role_counts"]) == 3:
+        role_counts = z["role_counts"]
+    if role_counts is None:
+        # a read saved before role_counts: it scores its whole role in loader order (idx = start .. start + n - 1),
+        # and the catalog's held-out roles are equal in size (n_val = n_test, fa-catalog-reference pool sizes)
+        idx = np.asarray(z["idx"], dtype=np.int64)
+        start, k = int(idx.min()), len(idx)
+        role_counts = {"val": (start, k, k), "test": (start - k, k, k), "train": (k, 0, 0)}[str(z["split"])]
+    n = [int(c) for c in role_counts]
     rng = np.random.default_rng(seed=42)
     perms = {r: rng.permutation(k) for r, k in zip(("train", "val", "test"), n)}
     role = str(z["split"])
