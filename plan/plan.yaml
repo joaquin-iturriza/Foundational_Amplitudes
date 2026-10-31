@@ -144,11 +144,13 @@ entries:
   - D195
   - D199
   next:
-    6: 'Leave-class-out read of the held-out multiplicity gap (design passed 2026-10-31 after one FIX): code on branch v3_lco
-      (604cb718, a97b1efc; dipole_residual.py --prop --dump, lco_map.py, job modes lcodump and lco), under repo review; after
-      it passes and merges: 5-probe dry run of stage 1 (analysis/catalog_v4/data/lco_dry_probes.txt) and stage 2 on it on
-      CC, then stage 1 as four CPU jobs (two seeds x H2/TR) at the dry run''s measured limit and stage 2 as one 8-core job;
-      f_ceil first, thresholds as shares of it.'
+    6: 'Leave-class-out read of the held-out multiplicity gap (design passed 2026-10-31 after one FIX; code merged at b44479ae
+      after the repo review passed): stage-1 dry run FA-ccin2p3-74da4075 in flight (6 probes: 3 H2, 3 TR, both seeds; dump
+      to SCRATCH/zz_v4_lco_dry). When it ends: read time and size per probe in its log, run stage 2 on it (launch_cc_only.sh
+      ... job_v4_dipole_residual.sh lco zz_v4_lco_dry), then record the batch target (plan target --batch lco_stage1 --wall
+      <from the dry run> --jobs 4) and submit stage 1 as four jobs (lcodump, one arm and one axis each, GPUS=0 CPUS=4, TIME
+      from the dry run), then stage 2 (lco, 8 cores, 2 h). f_ceil first; verdict() in lco_map.py applies the design''s rule
+      (its 0.02 cutoff on the training map''s TR score is the tool''s choice; the emitter comparison only names the next arm).'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1962,8 +1964,7 @@ entries:
       feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap'
       if:
       - 'f_ceil < 0.1 both seeds: route ends, reported with capacity, training length, data'
-      - 'f_lco >= 0.5 f_ceil and >= 0.1: GPU arm designed from which map holds f (target_propagators, parent-factorised target,
-        or the named group)'
+      - 'f_lco >= 0.5 f_ceil and >= 0.1: GPU arm designed from which map holds f'
       - 'f_lco < 0.25 f_ceil or < 0.05: no shared event-level prior; route ends'
   step_waits: {}
   owner:
