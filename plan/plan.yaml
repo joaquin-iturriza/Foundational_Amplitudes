@@ -6281,6 +6281,10 @@ entries:
   - at: '2026-10-31T04:19:18+00:00'
     text: 'Correction to the previous finding: the mixture prune manifest is /sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/.prune_manifests/mixture_pools_20261031_051555.json.
       The --load check left 18 composed pools (about 0.2 GB) under the CC login node''s /tmp/amp_mix_compose.'
+  - at: '2026-10-31T04:38:42+00:00'
+    text: '2026-10-31: the main session told Joaquin the mixture arms and control already predict a per-event variance (het
+      loss); the closing owner reports they trained with plain MSE. The claim was relayed from session memory, not read from
+      the run configs; the new owner reads the six configs first.'
   handoff:
     state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
       @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
