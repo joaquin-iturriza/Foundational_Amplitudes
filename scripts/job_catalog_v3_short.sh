@@ -218,6 +218,16 @@ EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=fals
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
 [ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"
+# the time limit must hold the training AND every zero-shot read (tools/short_wall.py; the step-11 and step-14 arms of
+# catalog_coverage were cut by TIMEOUT in their PP4/EE4 reads at a 2.5 h limit that counted training only): checked
+# before any GPU time is spent; submit with --hdr=--time=<its slurm_time>
+if [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ]; then
+    LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
+    WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
+           $([ "$MODE" = eval ] && echo --eval) ${ITERS_FIXED:+--iters $ITERS_FIXED} ${LIM:+--limit "$LIM"}) \
+        || { case "$WALL" in *'"ok": false'*) echo "V3_WALL_SHORT $WALL" ;; *) echo "V3_WALL_ERROR tools/short_wall.py failed: $WALL" ;; esac; exit 1; }
+    echo "V3_WALL $WALL"
+fi
 # every process of the arm's whole training recipe needs its diagram sidecar (the parent's diagram encoder refuses a
 # missing one, the off-shellness silently skips it); checked here before any training, in every mode, so a smoke on
 # its 19-pool subset fails on what the full run would (baseline_more_signed's full run died on 95 missing sidecars
