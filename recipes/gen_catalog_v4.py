@@ -293,7 +293,7 @@ def signext_trees(P=None, roles=None):
     members = json.load(open(os.path.join(ROOT, "analysis", "catalog_v4", "census_classes.json")))["classes"]
     loop_trees = {v["tree"] for v in roles["loops"].values()}
     # (the removal twin's axes H3p and H4 are held out of the twin's recipe only; their classes train in
-    # catalog_v4_train.yaml, which is the arm's base, and are listed under twin_out below)
+    # catalog_v4_base_train.yaml, which is the arm's base, and are listed under twin_out below)
     held = set()
     for f in sorted(os.listdir(HERE)):
         if f.startswith("catalog_v4_heldout_") and f.endswith(".yaml") and f not in ("catalog_v4_heldout_H3p.yaml",
@@ -309,7 +309,7 @@ def signext_trees(P=None, roles=None):
            "h7_classes": sorted(set(roles["h7_classes"]) & set(trees)),
            "heavy_quark_heldout": sorted({v["tree"] for v in roles["heavy_quark"].values() if v["role"] != "train"}
                                          & set(trees)),
-           # the removal twin's held-out classes: the arm builds on catalog_v4_train.yaml only, never the twin's recipe
+           # the removal twin's held-out classes: the arm builds on catalog_v4_base_train.yaml only, never the twin's recipe
            "twin_out": sorted(set(roles["twin_out"]) & set(trees)),
            "held_out_families_parents": sorted(set(roles["held_out_families"]) & set(trees))}
     audit = {"n": len(trees), "by_beams": dict(Counter(n.split("_")[1] for n in trees)),

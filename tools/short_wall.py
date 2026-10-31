@@ -20,7 +20,7 @@ node), about 93 min for the 912 of catalog_v4_default50_train.yaml; the step-15 
 3.75 h without it. Eval-only jobs (--eval) start in 1.5 min, not 15: the step-20 re-reads (catalog_coverage,
 2026-10-31, 14 eval-only jobs, logs read whole) took 15-31 s (MSE) and 20-82 s (het) from job start to their first
 probe, the slowest kept. A het arm (--het) reads at 1.45 s per probe, its sigma head scored beside the mean: the step-20
-het re-reads (on the per-probe deep copy, before the shared-tensor default) ran 1.25-1.31 s per probe on the 142 HD4+HD5 probes and 1.33-1.45 s on PP4+EE4's 1612 (span over the
+het re-reads (on the per-probe deep copy, before the shared-tensor default) ran 1.25-1.31 s per probe on the 142 HD4+HD5 probes and 1.33-1.45 s on PP4+EE4+HD4+HD5's 1612 (span over the
 probes, start-up excluded), the slowest kept; the MSE re-reads 0.58-0.65 s, under S_PROBE."""
 import argparse, json, math, os, sys
 
