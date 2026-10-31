@@ -6516,6 +6516,8 @@ entries:
     state: stopped
     since: '2026-10-31T17:12:02+00:00'
     state_at: '2026-10-31T17:26:54+00:00'
+    context: 117966
+    context_at: '2026-10-31T17:31:10+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
