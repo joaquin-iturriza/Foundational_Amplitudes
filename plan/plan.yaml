@@ -6636,7 +6636,7 @@ entries:
       (asked 2026-10-31 ~00:30)'
   owner:
     agent: aa7670a7d3cbd2cba
-    state: stopped
+    state: working
     since: '2026-10-31T03:33:44+00:00'
     context: 196170
     context_at: '2026-10-31T03:49:22+00:00'
