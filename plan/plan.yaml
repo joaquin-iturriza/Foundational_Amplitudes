@@ -5835,6 +5835,12 @@ entries:
       on CC (pick offered lxplus, which holds neither the parents nor the EE4 pools). The default25 arms 11ad944a and 9c6fc7ab
       had already started (best checkpoints saved at 02:48 and 02:56) at the same 2.5 h limit; a running job''s limit cannot
       be raised, so they will be cut the same way; their PP4+EE4 re-reads follow when they end.'
+  - at: '2026-10-31T02:22:19+00:00'
+    text: 'Step 11, E3193: PP4 re-read FA-ccin2p3-a152d7d0 (REREAD afc96598, the pure-default bound arm v4_dimensionless_muon_pp,
+      seed 42) COMPLETED: 1301 of 1301 PP4 probes (catalog_v4_pp_test.yaml, test split, 2000 events) scored, 0 errors, mse_logm2_real
+      finite on all 1301, physics check ok on all 1301 (counts from the job''s PP4 ZERO_SHOT records). The comparison against
+      the controls'' PP4 reads (04253ff7, e7e32847) waits on the seed-2 twin a01ad665 (REREAD d26f13aa); the per-probe MSE
+      medians come then from a committed reader, not recorded here.'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
