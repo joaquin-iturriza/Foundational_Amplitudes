@@ -5723,7 +5723,6 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '16': the standalone prune FA-ccin2p3-93625c9d
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
