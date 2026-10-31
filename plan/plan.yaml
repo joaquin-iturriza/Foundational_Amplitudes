@@ -6389,10 +6389,8 @@ entries:
   owner:
     agent: a5d0c97d9d3e9a7dc
     state: stopped
-    since: '2026-10-31T14:18:06+00:00'
-    state_at: '2026-10-31T14:27:37+00:00'
-    context: 89910
-    context_at: '2026-10-31T14:22:46+00:00'
+    since: '2026-10-31T14:18:03.498000+00:00'
+    state_at: '2026-10-31T14:28:02.824000+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
