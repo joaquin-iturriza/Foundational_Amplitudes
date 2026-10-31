@@ -144,13 +144,14 @@ entries:
   - D195
   - D199
   next:
-    6: 'Leave-class-out read of the held-out multiplicity gap (design passed 2026-10-31 after one FIX; code merged at b44479ae
-      after the repo review passed): stage-1 dry run FA-ccin2p3-74da4075 in flight (6 probes: 3 H2, 3 TR, both seeds; dump
-      to SCRATCH/zz_v4_lco_dry). When it ends: read time and size per probe in its log, run stage 2 on it (launch_cc_only.sh
-      ... job_v4_dipole_residual.sh lco zz_v4_lco_dry), then record the batch target (plan target --batch lco_stage1 --wall
-      <from the dry run> --jobs 4) and submit stage 1 as four jobs (lcodump, one arm and one axis each, GPUS=0 CPUS=4, TIME
-      from the dry run), then stage 2 (lco, 8 cores, 2 h). f_ceil first; verdict() in lco_map.py applies the design''s rule
-      (its 0.02 cutoff on the training map''s TR score is the tool''s choice; the emitter comparison only names the next arm).'
+    6: 'Leave-class-out read (design passed 2026-10-31; code b44479ae, jobs at dfd738bf): stage-1 dry run FA-ccin2p3-74da4075
+      clean (12 probe reads, 6 with the own-label ceiling, 46 s; 82 KB per probe, full dump about 225 MB, 1.7x the design''s
+      130 MB estimate). Running: stage 1 as four CPU jobs (target 1 h, limit 2 h; FA-ccin2p3-e772de8c seed 42 H2, -5b90e4f8
+      seed 42 TR, -d42685fe seed 43 H2, -74276bdb seed 43 TR), the stage-2 dry run FA-ccin2p3-95b02e2a on the 6-probe dump,
+      and stage 2 FA-ccin2p3-7ad4b5e3 (8 cores, 2 h, afterok on the four). When stage 2 ends: read LCO_CEIL, LCO_MAP and LCO_VERDICT
+      in its log and lco_map.json, apply the design''s rule (verdict() in lco_map.py; its 0.02 cutoff on the training-pool
+      map''s TR score is the tool''s choice, the emitter comparison only names the next arm; f_lco > f_ceil is reported, not
+      a bug), write the result in docs/results.tex.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
