@@ -6504,7 +6504,7 @@ entries:
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
   owner:
     agent: a5de9e558f015ddb6
-    state: working
+    state: closed
     since: '2026-10-31T16:34:07+00:00'
     state_at: '2026-10-31T17:09:54.543000+00:00'
     context: 271340
@@ -7116,31 +7116,41 @@ entries:
       (each H5 class''s 200 catalog test rows relabelled through the rule, compared with stored labels, MadLoop s/point) and
       42 gridpool probes (one per pool and e+e- energy, GP_RUNS 2, 1.5 h limit, target 1.5 h).'
   handoff:
-    state: 'Step 18: queue hd_test_measured (106 pools) almost done at 17:32 (346/348 tasks, 105/106 assembled). Running:
-      five 250-event run-size probes for the three slow 20 TeV pools (f0b9c35e 0da42a47 5f5ef310 fffbc4e3 f719bbff), five
-      64-core gridpack jobs for the 5-body pools (765bdd9c 5d4e6872 1e7f2159 49120869 926b4f19), the old 16-core gridpack
-      jobs (518be432 9c2ef90a 3dad72b1 c1461694 219e0935) reaching their cut at about 17:45. Zero-shot reader: timing read
-      3b557e69 measured the per-probe experiment build at 1.39 s of 1.51 s (forward 0.046 s); profile read 6f8f6e98 (cProfile
-      of 10 probes) not yet read; reviewer a8a308817be9d886d blocked 8e212f9f under its per-unit-rebuild rule, lock held for
-      the batching follow-up.'
-    decisions: Queue planned without the 8 unmeasured pools so they do not hold it; the two 20 TeV e+e- pools re-laid out
-      as runs of 250 (generator RUN_SIZES @9f171e58), queued only after their 250-event probes since plan's yield check refuses
-      them (the yields are timeouts of runs of 1000); 5-body gridpacks moved to 64 cores with live progress (@9b33d461) instead
-      of waiting; the old jobs left to their cut for the stage line.
-    ruled_out: 'Reusing one model object across probes (the model''s setup depends on each probe''s data: diagram sets, context
-      rows, pair-bias specs); comparing the timing read with 339ec100''s read as an identity test (H100 TF32 against V100
-      FP32).'
-    running: FA-ccin2p3-f0b9c35e 0da42a47 5f5ef310 fffbc4e3 f719bbff (run-size probes), 765bdd9c 5d4e6872 1e7f2159 49120869
-      926b4f19 (64-core gridpacks), 518be432 9c2ef90a 3dad72b1 c1461694 219e0935 (old gridpacks), hd_test_measured workers
-      bcdf1ed2 ff97ca6e 7837db59 e12f32ea 302d51a3 629d42d7 a8f8ca28 cea67932 04a17ad0 e94ac6f6 777e082e 073c608f 4e5faf25
-      844c88ba fdff7829 7f8ee367 a49c16aa 99899bc2 658008f5 c3a70eb2 a7965f44 c9956c4a, 6f8f6e98 (zero-shot profile).
-    files: 'tools/lhe_probe.py (kept --rates-out), analysis/catalog_v4/data/lhe_probe_yields_hd.json, lhe_rates_hd.json, recipes/gen_catalog_v4_heldout_default.py
-      (RUN_SIZES), scripts/job_lhe_probe.sh (live progress), scripts/job_zero_shot_timing.sh, tools/zero_shot_parent.py, tools/rebuild_run.py,
-      tools/probe_stage_split.py. Step 19 not started; label rule ''virt'' in mg5_pipeline_final._lhe_finish needs: virt_evaluator
-      (tools/nlo_virtual_pipeline.py) in a subprocess per chunk, signed labels allowed, a rule for MadLoop-unusable points
-      (dropped with a run margin, or the pool refused), the stripped-virtual alpha_s convention of the catalog''s _nlo pools,
-      the .born.npy sidecar; 28 classes in recipes/catalog_v4_heldout_H5.yaml.'
-    written: '2026-10-31T16:33:03+00:00'
+    state: 'Step 18: queue hd_test_measured done (348/348 tasks, 106/106 pools assembled, test pools on ccin2p3). Queue hd_test_e20_small_runs
+      (the three 20 TeV pools: e+e- photon photon c cbar, e+e- c cbar d dbar, pp d dbar -> d h ubar W+; 35 tasks, est 0.9
+      core-h) running on 3 workers 62f8cc25 22ea52de 585d8d94, target 0.5 h (wait on step 21). 5-body pools: old 16-core jobs
+      cut (E3379-E3382 acked; 518be432 hd_ug_ddxguz actually COMPLETED rc=0 with its gridpack and probe runs of 1000 returning
+      1000), 64-core jobs 765bdd9c 5d4e6872 1e7f2159 49120869 926b4f19 in gridpack integration (wait on step 18). hd_ entries
+      now read their tree''s diagram sidecar (diagrams_of, 35d4deab); before it the HD4 reads would have run with off-shellness/order
+      features off. Step 19 (H5, 28 one-loop classes): label rule ''virt'' in mg5_pipeline_final (77312c3f), H5 pools recipes/catalog_v4_heldout_default_H5_processes.yaml
+      (42 gridpacks, 92 runs), design passed 2026-10-31 18:0x (reviewer: H5 widened half-width is 0.12-0.18 in ln R, not 0.4
+      as written; H5 alone resolves R >1.2 or <0.85); label check a82278d8 and 42 gridpool probes running (wait on step 19,
+      target 1.5 h). Zero-shot reader: config parsed once (a142d81e) took 62 H1 probes 106 s -> 47 s; forked workers failed
+      (CUDA in fork), now spawned subprocesses (b9441370); B vs A differ 7e-6..1.1e-4 in h, A2 control pending in A/B rerun
+      bfec5501 (wait on step 20); repo-reviewer a8a308817be9d886d to be re-checked with the fix commits a142d81e b9441370
+      once the A/B reads.'
+    decisions: 'MadLoop-unusable points on MadEvent events: replaced by the next same-energy spare and the pool refused above
+      2%, the rule of nlo_virtual_pipeline.generate_virt_dataset (redraw, 2% refusal), not asked. Stripped virtual labelled
+      at alpha_s(M_Z) 0.118 with the entry''s mass shift, alpha_s sidecar the constant (write_own_alphas convention), as the
+      catalog''s _nlo pools. H5 Born events from the class''s MadLoop generate string minus [virt=QCD] (the exact Born), loop-induced
+      g g > z h as [noborn=QCD] with loop_sm-no_b_mass. E20 yields read from the run-size probe logs alone (the old runs of
+      1000 timed out under another layout). Zero-shot workers spawned, not forked.'
+    ruled_out: Forked zero-shot workers (CUDA cannot re-initialise in a forked child, e2da5118 path C); planning the E20 queue
+      with the pass-1/2 yields (timeouts of runs of 1000); a recipe 'base' for the H5 sidecar (base also redirects generation).
+    running: 'FA-ccin2p3-62f8cc25 22ea52de 585d8d94 (E20 queue workers); 765bdd9c 5d4e6872 1e7f2159 49120869 926b4f19 (64-core
+      5-body gridpacks); a82278d8 (virt label check) and the 42 H5 gridpool probes recorded on the entry (list: scratchpad
+      h5_runs.txt); bfec5501 (zero-shot A/B 2).'
+    files: 'tools/zero_shot_parent.py, scripts/job_zero_shot_timing.sh (AB=1), mg5_pipeline_final.py (lhe_label_virt, _lhe_virt_block),
+      tools/nlo_virtual_pipeline.py (label_events), tools/virt_label_check.py, scripts/job_virt_label_check.sh, recipes/gen_catalog_v4_heldout_default.py
+      (--h5, PP_RUN_SIZES, diagrams_of), recipes/catalog_v4_heldout_default_H5_{processes,test}.yaml, experiment.py (_resolve_diagram_path),
+      tools/check_site_data.py, tests/test_lhe_virt_label.py, analysis/catalog_v4/data/lhe_probe_yields_hd_e20.json, lhe_rates_hd_e20.json.
+      Next: (a) bfec5501 ends: A2 vs A decides whether B''s 1e-5 differences are the GPU''s own, set S_PROBE in short_wall
+      from C, SendMessage the reviewer a8a308817be9d886d; (b) 5-body gridpacks end: lhe_probe kept over their logs (+518be432)
+      -> yields, plan their queue with --probe, workers at site pick width, target, submit; (c) H5 probes + label check end:
+      read unusable share and s/point, kept --yields-out for H5, plan H5 queue (recipes/catalog_v4_heldout_default_H5_test.yaml),
+      workers sized so MadLoop labels fit the assembly; (d) when all 142 hd_ pools exist: HD4/HD5 eval-only rereads of the
+      12 arms (step 20).'
+    written: '2026-10-31T17:11:22+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
