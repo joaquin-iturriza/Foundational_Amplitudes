@@ -6796,6 +6796,14 @@ entries:
       as evidence (model_trial.json @096b5fe4) and as the routing dead end (verdict No, ratio 0.654 vs 0.6 rule); 21 zz_trial
       worktrees removed with remove_worktree.sh (it now skips .pytest_cache, 202fb3a1), 20 zz_trial_* branches deleted. Waiting
       on Joaquin: whether to add analysis tasks to the trial; steps 1, 5, 6 left.'
+  - at: '2026-10-31T02:51:21+00:00'
+    text: '2026-10-31: model trial extension (D212) stopped by Joaquin''s D213 (''Already having the same error rate on 10
+      runs is enough, we will switch to sonnet for easy tasks''). Before it stopped: harness fixed (0c6e3224: checks outside
+      worktrees/zz_*, per-scenario scoring), revalidation partial (29 valid seen), no trial agent ran, scratch check worktrees
+      removed. Switch done: .claude/agents/mechanical-worker.md (model sonnet), routing line in working-on-the-plan, live
+      check agent_tasks.py --mechanical in the supervisor''s maintain (ALERT mechanical_revert at 5 failures among the first
+      30; tests/test_mechanical_watch.py). The routing dead end recorded earlier (verdict No under the 0.6 rule) is superseded
+      by D213.'
   handoff:
     state: 'Step 4 matched model trial (D203) run and scored, write-up and cleanup left. Design: FIX (interfaces, source asserts,
       alt fix, analyses) then PASS by the design reviewer 2026-10-31. Ran 20 compact-worker agents on 10 past repo fixes (tools/model_trial.py,
