@@ -6971,6 +6971,16 @@ entries:
       H100 with allow_tf32 (RUN_SUMMARY of 339ec100), this one on a V100, so it does not test 8e212f9f; the identity test
       is an A/B of the reader''s two paths on one GPU in one job. E3349 (no RUN_SUMMARY line) fixed in c54c1709. Profile of
       the build: FA-ccin2p3-6f8f6e98 (10 probes under cProfile).'
+  - at: '2026-10-31T16:21:21+00:00'
+    text: 'Tool repair (D228, upkeep): why five of step 18''s six CPU probes (231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf,
+      COMPLETED 07:01) raised no event until STALLED E3240 at 13:18. Cause: step 18''s plan wait named them as bare 8-hex
+      suffixes after one full id; plan owners read waits with the regex FA-<site>-<8hex> only, so the supervisor (site_runends.run_done_events)
+      saw step 18 waiting on fd7cf028 alone, raised E3232 for it, and acked the other five clean ends as routine RUN events
+      with no RUN_DONE. Fix (eef56ad4, plus ~/.local/bin/site_runends.py and site, outside git): plan.py wait_run_ids resolves
+      bare suffixes that match exactly one registry run; plan wait prints the runs the supervisor will read; RUN_DONE is raised
+      per batch (the wait''s runs of one job script) once the batch has ended, naming its clean runs even when its last run
+      broke. Replay tests/test_wait_short_ids.py: 07:01 pass gives one RUN_DONE naming all six probes; 10:06 pass names the
+      two clean het arms. Supervisor needs a restart to load it.'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
