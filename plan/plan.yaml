@@ -459,6 +459,11 @@ entries:
       seeds: route ends; the leave-class-out map 0.022/0.019, factors only 0.004/0.001; par:v4_lco''s f 0.147/0.125 was t
       read back. The gap is level and spread, not per-event shape'
     at: '2026-10-31T03:33:10+00:00'
+  - tried: multext census check FA-ccin2p3-a67f2066 and -648fed16 (2026-10-31)
+    why: 'both cancelled within a minute: the first ran at a commit without CENSUS_ARGS (site sync had refused the dirty tree;
+      it would have re-checked the whole v3 census), the second passed $SCRATCH unexpanded (job script fixed @51933b4e to
+      eval it); the second left an empty ./$SCRATCH/zz_v4_multext in the CC checkout, not deleted; rerun as FA-ccin2p3-52345dd6'
+    at: '2026-10-31T03:54:14+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
