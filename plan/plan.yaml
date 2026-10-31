@@ -161,6 +161,8 @@ entries:
       0.84 vs fit 1.25, did not reach the floor).'
     7: '(a) capacity and training length for the held-out multiplicity gap: wanted by the user (D216), held by D78 inside
       the full catalog pretraining''s design; not started.'
+    8: '(b) more 6-particle training pools in the held-out multiplicity cells (D216): design, review, generation probe, generation,
+      GPU arm against the control pair, seeds 42/43; GPU-h stated before submission.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -2110,6 +2112,12 @@ entries:
       - 'the full pretraining''s design is released by the user: the gap read at its capacity and length against the control
         pair'
       - 'still held: nothing run'
+    8:
+      feeds: 'D178/D216: does more same-multiplicity training data close the held-out multiplicity gap'
+      if:
+      - 'the gap (median e of par:v4_shape_gap on the H2 pools) shrinks beyond the margin on both seeds: data is the lever,
+        the catalog gains these pools'
+      - 'it does not: the gap is capacity or training length, (a) inside the full pretraining'
   step_waits: {}
   owner:
     agent: aa0e9372a78e34830
