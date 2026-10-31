@@ -2047,7 +2047,7 @@ entries:
   step_waits: {}
   owner:
     agent: a884f79261a86aff9
-    state: working
+    state: closed
     since: '2026-10-31T01:12:50+00:00'
     context: 236082
     context_at: '2026-10-31T03:33:39+00:00'
@@ -2095,36 +2095,25 @@ entries:
     start: '2026-10-31T02:39:36+00:00'
     at: '2026-10-31T02:39:36+00:00'
   handoff:
-    state: 'Done this owner: the dipole read repaired (pool rows rebuilt from the role shuffle, b5173fa7; zero_shot_parent
-      saves pool_row) and read: dead end, gate 0.094 (par:v4_dipole). The propagator-product read FA-ccin2p3-71a96ca2: between
-      by its rule, no GPU arm (gate 0.106; ceiling eta^2 0.122/0.119 held out vs 0.036/0.041 training; eta^2(u|log P) 0.042
-      vs 0.015 training, above the placebos, under half the ceiling; size read 0.005/0.006), Higgs width check r^2 >= 0.9999996
-      so no re-run (par:v4_prop @5f15e75b). Open, step 6: the cross-pool joint read. Its design (revised once after a FIX:
-      the first version fitted each held-out pool on its own labels, a K-shot fit) is recorded and the design reviewer is
-      re-checking it. On PASS: implement stage 1 (a mode of dipole_residual.py dumping per probe 500 events, seed 0, of the
-      leg-order-free features and u to a small npz under SCRATCH) and stage 2 (one script: HistGradientBoostingRegressor 300
-      iterations fitted on all training pools, grouped 5-fold by pool for the training score, applied to held-out pools; f
-      = (median var_ho - median var(u - u_hat)_ho) / (median var_ho - median var_tr); beside it the factors-only map and the
-      per-pool own-label ceiling); dry-run 5 probes on CC; submit stage 1 as four jobs (arm x axis, scripts/job_v4_dipole_residual.sh
-      takes MODE ARMS AXES), then stage 2. On a second FIX: record a dead end (one revision allowed).'
-    decisions: 'Verdict for the propagator read taken from 71a96ca2: every read is an r^2, eta^2 or decile share and log P
-      at the two Higgs widths agrees to r^2 >= 0.9999996 on the 253 pools with an internal Higgs line (prop_width_check.py).
-      The decision is over all multiplicity cells; per-cell results are diagnostics (the design''s rule). The control already
-      gets offshell_per_event, internal_mass_scalars, coupling_scalars and the diagrams (use_diagrams) but target_propagators
-      false (config read on CC), so any propagator yes goes into the target, not as an input. The joint read''s deciding map
-      uses no held-out labels (review FIX: a per-pool fit is a K-shot correction, not a prior). The step agent''s own Higgs
-      width matters only for log P: MW in dipole_residual.py now holds the card''s 6.382339e-3 (97c43af9).'
-    ruled_out: The soft-dipole factor as a prior for the multiplicity gap (par:v4_dipole); the propagator product alone (par:v4_prop,
-      between); a per-pool out-of-fold fit as the deciding measure (review FIX 2026-10-31); log P as an input (repeats the
-      off-shellness input the control has); lxplus for these jobs (no checkpoints, no catalog_v4 data).
-    running: none (FA-ccin2p3-71a96ca2 ended and read; the design reviewer is re-checking the cross-pool joint design)
-    files: 'analysis/catalog_v4/dipole_residual.py (pool_rows, log_prop, eta2, tail_share, joint_features and joint_r2: the
-      per-pool joint fit, to be replaced by the cross-pool stages), analysis/catalog_v4/dipole_gate.py (--prop: per cell and
-      the design rule), analysis/catalog_v4/prop_width_check.py, analysis/catalog_v4/data/{dipole_residual,prop_residual}/,
-      analysis/catalog_v4/data/{dipole_gate,prop_gate}.json, scripts/job_v4_dipole_residual.sh (MODE dipole|prop|joint, ARMS,
-      AXES), tests/test_dipole_pool_rows.py, tools/zero_shot_parent.py (pool_row), docs/results.tex (par:v4_dipole, par:v4_prop).
-      Commits b5173fa7..6abdc895 not yet reviewed by the repo-reviewer.'
-    written: '2026-10-31T01:12:20+00:00'
+    state: 'Done this owner: the leave-class-out read of the held-out multiplicity gap (design passed after one FIX; par:v4_lco
+      @a767b36a: f 0.147/0.125 of the gap, ceiling 0.271/0.316, between) and its t-free re-read (t, the scored event''s target,
+      was among the map''s features: label leakage; par:v4_lco_not @ed39613e: own-label ceiling without t 0.016/0.019 < 0.1,
+      route ends; leave-class-out 0.022/0.019, factors only 0.004/0.001). With par:v4_dipole and par:v4_prop the event-level
+      prior route for par:v4_shape_gap''s transfer gap is closed. Open: the user''s choice among capacity and training length,
+      data, or a K-shot spread correction (step 6).'
+    decisions: Verdicts by the passed rules, computed by lco_map.py verdict() and read with lco_map.py --read data/lco_map{,_not}.json.
+      The t-free ceiling refitted at K = 1600 (reviewer confirmed), dumps paired with the first read by --same-as. Leakage
+      recorded as a finding; the design reviewer's check 8 (no label in a map's inputs) committed a8f1af26.
+    ruled_out: 'Every event-level input or target prior for the held-out multiplicity gap: log D (par:v4_dipole), log P (par:v4_prop),
+      any shared map of the event''s kinematics, species and factors (par:v4_lco_not); par:v4_lco''s f as evidence (t read
+      back).'
+    running: none
+    files: 'analysis/catalog_v4/lco_map.py (stage 2, verdict, --exclude, --same-as, --read), analysis/catalog_v4/dipole_residual.py
+      (--dump, --ceiling, --exclude, lof_features, own_ceiling), scripts/job_v4_dipole_residual.sh (modes lcodump, lco, lcodump_not,
+      lco_not), analysis/catalog_v4/data/lco_map.json, lco_map_not.json, lco_dry_probes.txt, tests/test_dipole_pool_rows.py,
+      docs/results.tex (par:v4_lco, par:v4_lco_not), .claude/agents/design-reviewer.md (check 8). Scratch on CC: zz_v4_lco_dump,
+      zz_v4_lco_dump_not, zz_v4_lco_dry (about 250 MB).'
+    written: '2026-10-31T03:33:40+00:00'
   findings:
   - at: '2026-10-31T02:25:32+00:00'
     text: 'Label leakage passed review: the leave-class-out design (passed 2026-10-31) fed the scored event''s own target
