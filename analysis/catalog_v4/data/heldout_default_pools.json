@@ -32,8 +32,8 @@
    "classes": 28,
    "with_default_pool": 0,
    "missing": 28,
-   "core_h_missing": 1.39,
-   "max_core_s": 523.2
+   "core_h_missing": 1.0,
+   "max_core_s": 368.9
   },
   "H6": {
    "classes": 8,
@@ -46,14 +46,14 @@
    "classes": 34,
    "with_default_pool": 0,
    "missing": 34,
-   "core_h_missing": 7.71,
+   "core_h_missing": 7.62,
    "max_core_s": 3104.4
   },
   "H7c": {
    "classes": 34,
    "with_default_pool": 0,
    "missing": 34,
-   "core_h_missing": 7.71,
+   "core_h_missing": 7.62,
    "max_core_s": 3104.4
   }
  },
@@ -61,192 +61,192 @@
   "v4_epem_ccxgvevex": {
    "axis": "H2p5",
    "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "from": "median ee nfinal 4, lower bound (nfinal 5)"
   },
   "v4_epem_avevexzz": {
    "axis": "H2p5",
    "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "from": "median ee nfinal 4, lower bound (nfinal 5)"
   },
   "v4_epem_ddxggg": {
    "axis": "H2p5",
    "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "from": "median ee nfinal 4, lower bound (nfinal 5)"
   },
   "v4_epem_aaavmvmx": {
    "axis": "H2p5",
    "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "from": "median ee nfinal 4, lower bound (nfinal 5)"
   },
   "v4_epem_bbxggh": {
    "axis": "H2p5",
    "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "from": "median ee nfinal 4, lower bound (nfinal 5)"
   },
   "v4_gg_dddxdxg": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_dg_cxghsu": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_dg_adgzz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ug_ghtaptamu": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ug_agtaptamu": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ug_ddxguz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bg_bguuxz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_uux_aepgvewm": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_udx_adxggu": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_uux_epemggh": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_dbx_bxdddxg": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_dsx_cxguuux": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_dbx_bxdepemg": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bbx_ggtaptamz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ddx_gtaptaptamtam": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_uux_ghzzz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_dbx_bxgguwm": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ubx_bxghuz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bbx_ggzzz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bbx_ddxgwpwm": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ucx_dggsxz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_uux_addxgz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bbx_ghhwpwm": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_udx_acggsx": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_us_acdgh": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_uc_cgghu": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ddx_bbxghh": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_us_cdghz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_uux_ggtaptamz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_ds_dghhs": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bbx_bbxgvevex": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bbx_gghwpwm": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_udx_dxguzz": {
    "axis": "H2p5",
    "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "from": "median pp nfinal 4, lower bound (nfinal 5)"
   },
   "v4_bb_bb_nlo": {
    "axis": "H5",
@@ -310,8 +310,8 @@
   },
   "v4_ddx_bbxz_qcdborn_nlo": {
    "axis": "H5",
-   "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "core_s": 96.2,
+   "from": "median pp nfinal 3"
   },
   "v4_ddx_epvewm_nlo": {
    "axis": "H5",
@@ -330,8 +330,8 @@
   },
   "v4_epem_bbx_nlo": {
    "axis": "H5",
-   "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "core_s": 146.6,
+   "from": "median ee nfinal 2"
   },
   "v4_epem_ccxg_nlo": {
    "axis": "H5",
@@ -340,8 +340,8 @@
   },
   "v4_epem_ddxz_nlo": {
    "axis": "H5",
-   "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "core_s": 185.1,
+   "from": "median ee nfinal 3"
   },
   "v4_gg_bbxg_nlo": {
    "axis": "H5",
@@ -350,8 +350,8 @@
   },
   "v4_gg_zh_loop": {
    "axis": "H5",
-   "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "core_s": 41.4,
+   "from": "median pp nfinal 2"
   },
   "v4_uc_cuz_nlo": {
    "axis": "H5",
@@ -375,8 +375,8 @@
   },
   "v4_uux_ccxz_qcdborn_nlo": {
    "axis": "H5",
-   "core_s": 313.3,
-   "from": "median pp nfinal 4"
+   "core_s": 96.2,
+   "from": "median pp nfinal 3"
   },
   "v4_uux_epemz_nlo": {
    "axis": "H5",
@@ -515,8 +515,8 @@
   },
   "v4_epem_ddxg__E20": {
    "axis": "H7E",
-   "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "core_s": 185.1,
+   "from": "median ee nfinal 3"
   },
   "v4_epem_epemz__E20": {
    "axis": "H7E",
@@ -685,8 +685,8 @@
   },
   "v4_epem_ddxg__c30": {
    "axis": "H7c",
-   "core_s": 523.2,
-   "from": "median ee nfinal 4"
+   "core_s": 185.1,
+   "from": "median ee nfinal 3"
   },
   "v4_epem_epemz__c30": {
    "axis": "H7c",
@@ -773,6 +773,6 @@
   "classes": 701,
   "with_default_pool": 559,
   "missing": 142,
-  "core_h": 20.77
+  "core_h": 20.19
  }
 }

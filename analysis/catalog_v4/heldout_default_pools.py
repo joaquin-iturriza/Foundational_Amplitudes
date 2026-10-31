@@ -5,17 +5,22 @@
 Estimate (an estimate, not a probe): a missing class costs the MadEvent core-seconds of its base class's pool scaled to
 2000 events times 1.25 (KEPT_SAFETY), core_s_per_event from analysis/catalog_v4/data/lhe_rates.json and
 lhe_rates_dsh_ee4.json, floored at the base pool's whole MadEvent time divided by its runs (the integration is paid once
-per run); a class with no base pool takes the median of the pools of its beam and final-state multiplicity (e+e- 5-body:
-the largest e+e- multiplicity measured, so it is a lower bound). Labels (one-loop, alpha_s 0.13) are not counted.
+per run); a class with no base pool takes the median of the pools of its beam and its own final-state multiplicity
+(mg5_pipeline_final.PROCESSES' nfinal); above the largest multiplicity measured for its beam, or with no catalog entry,
+the largest measured one, labelled a lower bound. Labels (one-loop, alpha_s 0.13) are not counted.
     python3 analysis/catalog_v4/heldout_default_pools.py  -> data/heldout_default_pools.json
 """
 import json, os, statistics
+
+import sys
 
 import yaml
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 DATA = os.path.join(HERE, "data")
+sys.path.insert(0, ROOT)
+import mg5_pipeline_final as mg  # noqa: E402
 HELD = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
 N_TEST, SAFETY = 2000, 1.25
 
@@ -53,8 +58,15 @@ def main():
                 c, how = max(cost(r) for r in by_base[base]), "base pool"
             else:
                 ee = base.startswith("epem")
-                nf = len(base.split("_")[1]) and max(n for e, n in med if e == ee)
-                c, how = statistics.median(med[(ee, nf)]), f"median {'ee' if ee else 'pp'} nfinal {nf}"
+                top = max(n for e, n in med if e == ee)
+                entry = mg.PROCESSES.get(p["name"]) or mg.PROCESSES.get(p.get("base", p["name"]))
+                own = int(entry["nfinal"]) if entry and entry.get("nfinal") is not None else None
+                if own is not None and (ee, own) in med:
+                    c, how = statistics.median(med[(ee, own)]), f"median {'ee' if ee else 'pp'} nfinal {own}"
+                else:       # above the largest measured multiplicity, or no catalog entry: a lower bound
+                    c = statistics.median(med[(ee, top)])
+                    how = (f"median {'ee' if ee else 'pp'} nfinal {top}, lower bound "
+                           f"({'nfinal ' + str(own) if own is not None else 'no catalog entry'})")
             cs.append(c)
             out["missing"][p["name"]] = {"axis": ax, "core_s": round(c, 1), "from": how}
         out["axes"][ax] = {"classes": len(procs), "with_default_pool": len(procs) - len(miss), "missing": len(miss),

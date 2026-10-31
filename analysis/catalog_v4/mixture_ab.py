@@ -271,6 +271,11 @@ def heldout_default():
             if p["name"].startswith("v4_"):
                 ax_of[cls(p["name"])] = ax
     reads = {a: {r: tuple(read_of(run, r) for run in runs) for r, runs in v.items()} for a, v in MIX.items()}
+    # every seed of every read this uses, as mixture() without --partial: a missing seed would leave R on one seed
+    missing = sorted(f"{a} {r} {MIX[a][r][i]}" for a, v in reads.items() for r, pair in v.items()
+                     for i, x in enumerate(pair) if x is None)
+    if missing:
+        sys.exit("heldout_default: reads missing (extract them first): " + "; ".join(missing))
     tag = lambda r, d: {(r, k): x for k, x in d.items()}
     out = {"design": "plan catalog_coverage step 14, REREAD on default-sampled held-out events", "shares": {}}
     for a in ("default50", "default25"):
