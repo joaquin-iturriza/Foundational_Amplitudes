@@ -8,6 +8,7 @@ networks? CPU only, on the saved step-15/20 zero-shot reads; no new run.
     site run ... aggregate --run <arm> > A_<arm>;  ... gbt --run <arm> --target T > G_<arm>_T;  ... excluded > X
                                                                        (login node, CPU; each under site run's limit)
     python3 analysis/catalog_v4/error_correlates.py combine X A_* G_*   -> data/error_correlates_reads.json.gz
+    python3 analysis/catalog_v4/error_correlates.py claims    (the write-up's numbers)
     python3 analysis/catalog_v4/error_correlates.py summary   -> data/error_correlates.json, figs/error_correlates_{rank,profile}.{png,pdf}
 
 The reads: per probe <probe>.npz of tools/zero_shot_parent.py --save-dir in $SCRATCH/zz_v4_short_<arm>/<axis>/, with
@@ -725,6 +726,49 @@ def figures(raw):
     ps.save(fig, os.path.join(FIGS, "error_correlates_profile"))
 
 
+def claims(path=None):
+    """the numbers the write-up quotes (docs/results.tex par:v4_error_correlates), from the combined read; every
+    read pooled ("all") unless named; s42/s43 the seeds; rho the median over probes of the within-probe Spearman"""
+    raw = load(path)
+    A = lambda a: raw["per_run"][a]["all"]
+    H = ("v4_het_control", "v4_het_control_seed2")
+    M25 = ("v4_dimensionless_muon_default25", "v4_dimensionless_muon_default25_seed2")
+    shares = [a for a, v in RUNS.items() if v[0] == "het" and v[1] != "control"]
+    w = lambda a, f, t: A(a)["within"][f][t]["rho_med"]
+    r2 = lambda a, t: round(float(np.mean(raw["gbt"][a][t]["r2_heldout_classes"])), 2)
+    out = {"n_probes": A(H[0])["n_probes"], "n_classes": A(H[0])["n_classes"],
+           "mse_ctl_probes": A("v4_dimensionless_muon")["n_probes"],
+           "mse_ctl_excluded": len(raw["excluded"].get("v4_dimensionless_muon", {}))}
+    for i, sd in enumerate(("s42", "s43")):
+        for f in ("y_min", "t_level", "eta_max", "u_fwd"):
+            out[f"het_ae_{f}_{sd}"] = round(w(H[i], f, "ae"), 2)
+        for f in ("y_ff", "y_if", "e_min", "sqrt_shat", "eta_max"):
+            out[f"het_s_{f}_{sd}"] = round(w(H[i], f, "s"), 2)
+        out[f"mse25_ae_t_level_{sd}"] = round(w(M25[i], "t_level", "ae"), 2)
+        out[f"mse25_ae_y_min_{sd}"] = round(w(M25[i], "y_min", "ae"), 2)
+    out["het_ae_y_min_fracneg_s42"] = round(1 - A(H[0])["within"]["y_min"]["ae"]["frac_pos"], 2)
+    tl = [w(a, "t_level", "ae") for a in shares]
+    out["share_het_ae_t_level_min"], out["share_het_ae_t_level_max"] = round(min(tl), 2), round(max(tl), 2)
+    out["mse_ctl_ae_t_level_s42"] = round(w("v4_dimensionless_muon", "t_level", "ae"), 2)
+    x = A(H[0])
+    out["het_s_ae_within"] = round(x["rho_s_ae_within"], 2)
+    out["het_s_ae_pooled"] = round(x["pooled_s_ae"]["rho_raw"], 2)
+    out["het_s_ae_classes"] = round(x["classes_s_rmse"], 2)
+    for f in ("t_std", "loc_var", "n_nu", "n_lepton", "res_min", "aew_pow", "n_final"):
+        out[f"class_ae_{f}"] = round(x["classes"][f]["rmse"], 2)
+    out["class_ae_t_std_mse_ctl"] = round(A("v4_dimensionless_muon")["classes"]["t_std"]["rmse"], 2)
+    out["class_s_res_min"] = round(x["classes"]["res_min"]["med_s"], 2)
+    out["prof_t_level_top_ae"] = round(x["profile"]["t_level"]["rms_ae_n"][-1], 2)
+    out["prof_y_ff_first_ae"] = round(x["profile"]["y_ff"]["rms_ae_n"][0], 2)
+    out["prof_y_ff_first_s"] = round(x["profile"]["y_ff"]["med_s_n"][0], 2)
+    for i, sd in enumerate(("s42", "s43")):
+        for t in ("log_ae", "log_ae_n", "log_s", "log_s_n"):
+            out[f"gbt_het_{t}_{sd}"] = r2(H[i], t)
+        for t in ("log_ae", "log_ae_n"):
+            out[f"gbt_mse25_{t}_{sd}"] = r2(M25[i], t)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd")
@@ -741,6 +785,7 @@ def main():
     sub.add_parser("excluded")
     c = sub.add_parser("combine")
     c.add_argument("paths", nargs="+")
+    sub.add_parser("claims")
     sm = sub.add_parser("summary")
     sm.add_argument("--reads", default=None)
     a = ap.parse_args()
@@ -754,11 +799,13 @@ def main():
         gbt_cmd(a.run, a.target)
     elif a.cmd == "excluded":
         excluded_cmd()
+    elif a.cmd == "claims":
+        print(json.dumps(claims()))
     elif a.cmd == "combine":
         combine_cmd(a.paths)
     else:
         out = summary(getattr(a, "reads", None))
-        print(json.dumps({k: out[k] for k in ("n_tasks", "excluded_counts", "gbt")})[:6000])
+        print(json.dumps({k: out[k] for k in ("n_tasks", "excluded_counts")}))
 
 
 if __name__ == "__main__":
