@@ -8041,6 +8041,14 @@ entries:
     text: '2026-10-31: wait_guard.py refused a legitimate ''cd ~/work/FA && site events --wait ...'' (WATCH regex lacks the
       optional cd prefix DETACH has); waiter re-armed without the prefix. Asked Joaquin: fix now (one regex) or after the
       weekend hold (D225)? Unanswered.'
+  - at: '2026-10-31T15:31:55+00:00'
+    text: 'Double wake fix built (0b8ca005): .claude/hooks/handback_guard.py refuses SubagentHandback for calls carrying agent_id
+      (exit 2, tells the agent to end with its report as final plain text); main session and other tools pass. Tested through
+      dispatch.py: recorded handback of agent a009d9dc527c68700 refused, main-session handback, subagent Bash, main Bash pass,
+      bad input exit 1. plan.py subagent_activity now also reads a final assistant record with stop_reason end_turn as handed
+      back (acc18380b00739f5c True, a live mid-turn agent False; test_redesign_d d2_d6 15/15). Not live: no PreToolUse matcher
+      reaches SubagentHandback; needs a settings registration (matcher SubagentHandback -> dispatch.py handback_guard.py),
+      diff given to the main session. Not verified live.'
   handoff:
     state: 'Held by D220 except next 10, which is done (2cc96941, D224): .claude/hooks/owner_handoff.py, PostToolUse on every
       tool, tells a not-closed owner agent whose own context is >= CONTEXT_CLOSE (170k) to commit, record, plan handoff and
