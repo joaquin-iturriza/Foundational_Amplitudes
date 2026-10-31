@@ -8678,7 +8678,9 @@ entries:
   - D233
   next: 'Step 1 read done (369eaff9; data/error_correlates.json): write-up in docs/results.tex once the notes-editor backlog
     passes (coordinator, 2026-10-31), then plan done'
-  done_when: null
+  done_when: grep -q 'label{par:v4_error_correlates}' docs/results.tex && test -s analysis/catalog_v4/data/error_correlates.json
+    && git merge-base --is-ancestor 4d64bea8 $(cut -d' ' -f1 .claude/.review_state/notes-editor) && git merge-base --is-ancestor
+    369eaff9 $(cut -d' ' -f1 .claude/.review_state/repo-reviewer)
   notes_ref: par:v4_error_correlates
   match: zz_never_*
   evidence:
