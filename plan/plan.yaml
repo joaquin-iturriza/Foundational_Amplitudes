@@ -1970,7 +1970,7 @@ entries:
   step_waits: {}
   owner:
     agent: a884f79261a86aff9
-    state: working
+    state: stopped
     since: '2026-10-31T01:12:50+00:00'
     context: 168808
     context_at: '2026-10-31T01:53:27+00:00'
