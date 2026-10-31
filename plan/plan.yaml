@@ -382,6 +382,12 @@ entries:
       in the same dir had no pool. Fixed @HEAD: alignment on the event indices zero_shot_parent saves since 902b96c5 (correlation
       check), t as the target; the reads redone eval-only'
     at: '2026-10-30T23:13:04+00:00'
+  - tried: dipole CPU read FA-ccin2p3-3a2a388b (dipole_residual.py @99ec191c)
+    why: 'FAILED at its first probe: IndexError idx 10000 in a 10000-row pool; the reads'' idx are positions in the experiment''s
+      role-contiguous train|val|test array (val 10000-11999, test 12000-13999), each role shuffled by rng(42), not pool rows.
+      Repaired @b5173fa7: rows rebuilt from the role shuffle (alignment check passes on 5 of 5 probes tested on CC, 0 refused),
+      and zero_shot_parent now saves pool_row; redone as FA-ccin2p3-18269717'
+    at: '2026-10-31T00:30:27+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
