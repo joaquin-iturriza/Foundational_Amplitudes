@@ -1,0 +1,582 @@
+{
+ "periods": {
+  "main_alone": {
+   "from": null,
+   "to": "2026-10-25T17:02:21+00:00"
+  },
+  "step_agents": {
+   "from": "2026-10-25T17:02:21+00:00",
+   "to": "2026-10-30T11:35:10+00:00"
+  },
+  "redesign": {
+   "from": "2026-10-30T11:35:10+00:00",
+   "to": null
+  }
+ },
+ "boundary_evidence": {
+  "main_alone|step_agents": "653aed00 2026-10-25T18:02:21+01:00 setup redesign (D121): the plan file and its CLI, ... the switch-over",
+  "step_agents|redesign": "84a15232 2026-10-30T12:35:10+01:00 settings: register the hooks of the agent redesign's switch-overs A, B and D"
+ },
+ "weights": {
+  "input_tokens": 1.0,
+  "output_tokens": 5.0,
+  "cache_creation_input_tokens": 1.25,
+  "cache_read_input_tokens": 0.1
+ },
+ "by_period": {
+  "main_alone": {
+   "main": {
+    "transcripts": 5,
+    "api_messages": 14375,
+    "calls": 13690,
+    "weighted_tokens_M": 559.97,
+    "usd_list_price": 1464.09,
+    "usd_by_model": {
+     "claude-opus-5-5": 1460.62,
+     "claude-opus-5": 3.47,
+     "<synthetic>": 0.0
+    },
+    "usd_per_result": 3.98,
+    "usd_per_commit": 1.27,
+    "raw_tokens_M": {
+     "input_tokens": 0.03,
+     "output_tokens": 8.65,
+     "cache_creation_input_tokens": 46.61,
+     "cache_read_input_tokens": 4584.04
+    },
+    "runs_submitted": 349,
+    "results": 368,
+    "commits": 1154,
+    "weighted_tokens_M_per_run": 1.604,
+    "weighted_tokens_M_per_result": 1.522,
+    "weighted_tokens_M_per_commit": 0.485,
+    "wasted_calls": {
+     "hook": {
+      "count": 95,
+      "share": 0.0069
+     },
+     "denial": {
+      "count": 70,
+      "share": 0.0051
+     },
+     "repeat": {
+      "count": 224,
+      "share": 0.0164
+     },
+     "wait": {
+      "count": 763,
+      "share": 0.0557
+     },
+     "reread": {
+      "count": 131,
+      "share": 0.0096
+     },
+     "nothing_new": {
+      "count": 192,
+      "turns": 1848,
+      "wake_turns": 947,
+      "share_of_turns": 0.1039
+     }
+    },
+    "wasted_share": 0.0937,
+    "context_median_k": 313.1,
+    "context_max_k": 704.5,
+    "stall_min": {
+     "n": 315,
+     "median": 0.8,
+     "p90": 10.6
+    }
+   },
+   "agents": {
+    "transcripts": 196,
+    "api_messages": 7086,
+    "calls": 7382,
+    "weighted_tokens_M": 146.47,
+    "usd_list_price": 385.76,
+    "usd_by_model": {
+     "claude-opus-5-5": 366.0,
+     "claude-sonnet-5": 11.75,
+     "claude-sonnet-5-5": 7.55,
+     "claude-haiku-4-5-20251001": 0.45,
+     "claude-haiku-5-5": 0.01,
+     "<synthetic>": 0.0
+    },
+    "usd_per_result": 24.11,
+    "usd_per_commit": 4.24,
+    "raw_tokens_M": {
+     "input_tokens": 0.01,
+     "output_tokens": 0.19,
+     "cache_creation_input_tokens": 40.06,
+     "cache_read_input_tokens": 954.23
+    },
+    "runs_submitted": 19,
+    "results": 16,
+    "commits": 91,
+    "weighted_tokens_M_per_run": 7.709,
+    "weighted_tokens_M_per_result": 9.154,
+    "weighted_tokens_M_per_commit": 1.61,
+    "wasted_calls": {
+     "hook": {
+      "count": 33,
+      "share": 0.0045
+     },
+     "denial": {
+      "count": 11,
+      "share": 0.0015
+     },
+     "repeat": {
+      "count": 8,
+      "share": 0.0011
+     },
+     "wait": {
+      "count": 98,
+      "share": 0.0133
+     },
+     "reread": {
+      "count": 5,
+      "share": 0.0007
+     }
+    },
+    "wasted_share": 0.021,
+    "context_median_k": 103.8,
+    "context_max_k": 564.7,
+    "stall_min": {
+     "n": 14,
+     "median": 0.2,
+     "p90": 128.8
+    }
+   },
+   "trials": {
+    "transcripts": 0,
+    "api_messages": 0,
+    "calls": 0,
+    "weighted_tokens_M": 0.0,
+    "usd_list_price": 0.0,
+    "usd_by_model": {},
+    "usd_per_result": 0,
+    "usd_per_commit": 0,
+    "raw_tokens_M": {},
+    "runs_submitted": 0,
+    "results": 0,
+    "commits": 0,
+    "weighted_tokens_M_per_run": 0,
+    "weighted_tokens_M_per_result": 0,
+    "weighted_tokens_M_per_commit": 0,
+    "wasted_calls": {
+     "hook": {
+      "count": 0,
+      "share": 0.0
+     },
+     "denial": {
+      "count": 0,
+      "share": 0.0
+     },
+     "repeat": {
+      "count": 0,
+      "share": 0.0
+     },
+     "wait": {
+      "count": 0,
+      "share": 0.0
+     },
+     "reread": {
+      "count": 0,
+      "share": 0.0
+     }
+    },
+    "wasted_share": 0.0,
+    "context_median_k": null,
+    "context_max_k": null,
+    "stall_min": {
+     "n": 0,
+     "median": [],
+     "p90": []
+    }
+   },
+   "total": {
+    "weighted_tokens_M": 706.43,
+    "usd_list_price": 1849.85,
+    "usd_per_result": 4.82,
+    "weighted_tokens_M_per_result": 1.84,
+    "wasted_share": 0.0682,
+    "results": 384,
+    "registry_runs_submitted": 1462,
+    "stall_min": {
+     "n": 329,
+     "median": 0.8,
+     "p90": 11.4,
+     "runs_with_no_action_72h": 1122
+    }
+   }
+  },
+  "step_agents": {
+   "main": {
+    "transcripts": 1,
+    "api_messages": 3094,
+    "calls": 2533,
+    "weighted_tokens_M": 126.02,
+    "usd_list_price": 304.16,
+    "usd_by_model": {
+     "claude-opus-5-5": 304.16,
+     "<synthetic>": 0.0
+    },
+    "usd_per_result": 12.17,
+    "usd_per_commit": 3.54,
+    "raw_tokens_M": {
+     "input_tokens": 0.01,
+     "output_tokens": 1.38,
+     "cache_creation_input_tokens": 6.96,
+     "cache_read_input_tokens": 1103.99
+    },
+    "runs_submitted": 1,
+    "results": 25,
+    "commits": 86,
+    "weighted_tokens_M_per_run": 126.017,
+    "weighted_tokens_M_per_result": 5.041,
+    "weighted_tokens_M_per_commit": 1.465,
+    "wasted_calls": {
+     "hook": {
+      "count": 31,
+      "share": 0.0122
+     },
+     "denial": {
+      "count": 17,
+      "share": 0.0067
+     },
+     "repeat": {
+      "count": 28,
+      "share": 0.0111
+     },
+     "wait": {
+      "count": 43,
+      "share": 0.017
+     },
+     "reread": {
+      "count": 2,
+      "share": 0.0008
+     },
+     "nothing_new": {
+      "count": 142,
+      "turns": 592,
+      "wake_turns": 327,
+      "share_of_turns": 0.2399
+     }
+    },
+    "wasted_share": 0.0478,
+    "context_median_k": 360.8,
+    "context_max_k": 566.9,
+    "stall_min": {
+     "n": 139,
+     "median": 0.9,
+     "p90": 3.4
+    }
+   },
+   "agents": {
+    "transcripts": 506,
+    "api_messages": 14051,
+    "calls": 14508,
+    "weighted_tokens_M": 272.48,
+    "usd_list_price": 732.16,
+    "usd_by_model": {
+     "claude-opus-5-5": 715.27,
+     "claude-sonnet-5-5": 16.83,
+     "claude-haiku-5-5": 0.06,
+     "<synthetic>": 0.0
+    },
+    "usd_per_result": 2.05,
+    "usd_per_commit": 1.51,
+    "raw_tokens_M": {
+     "input_tokens": 0.03,
+     "output_tokens": 4.65,
+     "cache_creation_input_tokens": 61.6,
+     "cache_read_input_tokens": 1721.89
+    },
+    "runs_submitted": 191,
+    "results": 357,
+    "commits": 486,
+    "weighted_tokens_M_per_run": 1.427,
+    "weighted_tokens_M_per_result": 0.763,
+    "weighted_tokens_M_per_commit": 0.561,
+    "wasted_calls": {
+     "hook": {
+      "count": 254,
+      "share": 0.0175
+     },
+     "denial": {
+      "count": 20,
+      "share": 0.0014
+     },
+     "repeat": {
+      "count": 85,
+      "share": 0.0059
+     },
+     "wait": {
+      "count": 227,
+      "share": 0.0156
+     },
+     "reread": {
+      "count": 44,
+      "share": 0.003
+     }
+    },
+    "wasted_share": 0.0434,
+    "context_median_k": 106.2,
+    "context_max_k": 566.5,
+    "stall_min": {
+     "n": 81,
+     "median": 3.5,
+     "p90": 44.4
+    }
+   },
+   "trials": {
+    "transcripts": 26,
+    "api_messages": 748,
+    "calls": 769,
+    "weighted_tokens_M": 14.72,
+    "usd_list_price": 52.01,
+    "usd_by_model": {
+     "claude-opus-5-5": 52.01
+    },
+    "usd_per_result": 3.47,
+    "usd_per_commit": 1.33,
+    "raw_tokens_M": {
+     "input_tokens": 0.0,
+     "output_tokens": 0.68,
+     "cache_creation_input_tokens": 2.86,
+     "cache_read_input_tokens": 77.32
+    },
+    "runs_submitted": 0,
+    "results": 15,
+    "commits": 39,
+    "weighted_tokens_M_per_run": 0,
+    "weighted_tokens_M_per_result": 0.981,
+    "weighted_tokens_M_per_commit": 0.377,
+    "wasted_calls": {
+     "hook": {
+      "count": 23,
+      "share": 0.0299
+     },
+     "denial": {
+      "count": 0,
+      "share": 0.0
+     },
+     "repeat": {
+      "count": 10,
+      "share": 0.013
+     },
+     "wait": {
+      "count": 2,
+      "share": 0.0026
+     },
+     "reread": {
+      "count": 10,
+      "share": 0.013
+     }
+    },
+    "wasted_share": 0.0585,
+    "context_median_k": 101.3,
+    "context_max_k": 203.3,
+    "stall_min": {
+     "n": 0,
+     "median": [],
+     "p90": []
+    }
+   },
+   "total": {
+    "weighted_tokens_M": 413.22,
+    "usd_list_price": 1088.34,
+    "usd_per_result": 2.85,
+    "weighted_tokens_M_per_result": 1.082,
+    "wasted_share": 0.0447,
+    "results": 382,
+    "registry_runs_submitted": 1317,
+    "stall_min": {
+     "n": 220,
+     "median": 1.0,
+     "p90": 13.9,
+     "runs_with_no_action_72h": 1089
+    }
+   }
+  },
+  "redesign": {
+   "main": {
+    "transcripts": 1,
+    "api_messages": 670,
+    "calls": 549,
+    "weighted_tokens_M": 19.82,
+    "usd_list_price": 49.29,
+    "usd_by_model": {
+     "claude-opus-5-5": 49.29
+    },
+    "usd_per_result": 8.21,
+    "usd_per_commit": 3.79,
+    "raw_tokens_M": {
+     "input_tokens": 0.0,
+     "output_tokens": 0.32,
+     "cache_creation_input_tokens": 1.17,
+     "cache_read_input_tokens": 167.54
+    },
+    "runs_submitted": 5,
+    "results": 6,
+    "commits": 13,
+    "weighted_tokens_M_per_run": 3.964,
+    "weighted_tokens_M_per_result": 3.303,
+    "weighted_tokens_M_per_commit": 1.524,
+    "wasted_calls": {
+     "hook": {
+      "count": 8,
+      "share": 0.0146
+     },
+     "denial": {
+      "count": 3,
+      "share": 0.0055
+     },
+     "repeat": {
+      "count": 9,
+      "share": 0.0164
+     },
+     "wait": {
+      "count": 9,
+      "share": 0.0164
+     },
+     "reread": {
+      "count": 0,
+      "share": 0.0
+     },
+     "nothing_new": {
+      "count": 39,
+      "turns": 145,
+      "wake_turns": 84,
+      "share_of_turns": 0.269
+     }
+    },
+    "wasted_share": 0.0528,
+    "context_median_k": 243.1,
+    "context_max_k": 567.1,
+    "stall_min": {
+     "n": 24,
+     "median": 2.0,
+     "p90": 173.7
+    }
+   },
+   "agents": {
+    "transcripts": 72,
+    "api_messages": 3127,
+    "calls": 3156,
+    "weighted_tokens_M": 64.7,
+    "usd_list_price": 178.6,
+    "usd_by_model": {
+     "claude-opus-5-5": 173.31,
+     "claude-sonnet-5-5": 5.29,
+     "claude-haiku-5-5": 0.01
+    },
+    "usd_per_result": 1.92,
+    "usd_per_commit": 1.08,
+    "raw_tokens_M": {
+     "input_tokens": 0.01,
+     "output_tokens": 1.93,
+     "cache_creation_input_tokens": 13.27,
+     "cache_read_input_tokens": 384.38
+    },
+    "runs_submitted": 136,
+    "results": 93,
+    "commits": 165,
+    "weighted_tokens_M_per_run": 0.476,
+    "weighted_tokens_M_per_result": 0.696,
+    "weighted_tokens_M_per_commit": 0.392,
+    "wasted_calls": {
+     "hook": {
+      "count": 74,
+      "share": 0.0234
+     },
+     "denial": {
+      "count": 9,
+      "share": 0.0029
+     },
+     "repeat": {
+      "count": 35,
+      "share": 0.0111
+     },
+     "wait": {
+      "count": 51,
+      "share": 0.0162
+     },
+     "reread": {
+      "count": 3,
+      "share": 0.001
+     }
+    },
+    "wasted_share": 0.0545,
+    "context_median_k": 117.1,
+    "context_max_k": 333.9,
+    "stall_min": {
+     "n": 51,
+     "median": 2.7,
+     "p90": 66.2
+    }
+   },
+   "trials": {
+    "transcripts": 0,
+    "api_messages": 0,
+    "calls": 0,
+    "weighted_tokens_M": 0.0,
+    "usd_list_price": 0.0,
+    "usd_by_model": {},
+    "usd_per_result": 0,
+    "usd_per_commit": 0,
+    "raw_tokens_M": {},
+    "runs_submitted": 0,
+    "results": 0,
+    "commits": 0,
+    "weighted_tokens_M_per_run": 0,
+    "weighted_tokens_M_per_result": 0,
+    "weighted_tokens_M_per_commit": 0,
+    "wasted_calls": {
+     "hook": {
+      "count": 0,
+      "share": 0.0
+     },
+     "denial": {
+      "count": 0,
+      "share": 0.0
+     },
+     "repeat": {
+      "count": 0,
+      "share": 0.0
+     },
+     "wait": {
+      "count": 0,
+      "share": 0.0
+     },
+     "reread": {
+      "count": 0,
+      "share": 0.0
+     }
+    },
+    "wasted_share": 0.0,
+    "context_median_k": null,
+    "context_max_k": null,
+    "stall_min": {
+     "n": 0,
+     "median": [],
+     "p90": []
+    }
+   },
+   "total": {
+    "weighted_tokens_M": 84.52,
+    "usd_list_price": 227.89,
+    "usd_per_result": 2.3,
+    "weighted_tokens_M_per_result": 0.854,
+    "wasted_share": 0.0543,
+    "results": 99,
+    "registry_runs_submitted": 142,
+    "stall_min": {
+     "n": 75,
+     "median": 2.6,
+     "p90": 146.2,
+     "runs_with_no_action_72h": 83
+    }
+   }
+  }
+ }
+}

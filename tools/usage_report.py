@@ -45,6 +45,9 @@ SEEN_ALL = set()               # message ids over all transcripts: a subagent's 
 W = {"input_tokens": 1.0, "output_tokens": 5.0, "cache_creation_input_tokens": 1.25, "cache_read_input_tokens": 0.1}
 
 
+TRIAL_DIR = "-worktrees-zz-ab"   # A/B replay folders (main sessions and their agents run as trials, not project work)
+
+
 def ts(s):
     return datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
 
@@ -73,6 +76,7 @@ WAITER = re.compile(r"site events\b.*--wait")
 WAKE = re.compile(r"<task-notification>|\[SYSTEM NOTIFICATION|<agent-message|<cross-session-message|"
                   r"background command .* completed|sent a message while you were working", re.I)
 RUN_LINE = re.compile(r"\brun (FA-[a-z0-9]+-[0-9a-f]{8})\s+\(")
+ROLES = ("main", "agents", "trials")
 RUN_ID = re.compile(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b")
 
 
@@ -224,8 +228,8 @@ def pct(xs, q):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="analysis/agent_redesign/usage_report.json")
-    ap.add_argument("--fig", default="analysis/agent_redesign/figs/usage")
+    ap.add_argument("--out", default="analysis/agent_redesign/usage_report_v3.json")
+    ap.add_argument("--fig", default="analysis/agent_redesign/figs/usage_v3")
     ap.add_argument("--all-fa-folders", action="store_true",
                     help="also read the FA worktree and replay folders (-home-joaquin-work-FA-*), not only -home-joaquin-work-FA")
     ap.add_argument("--samples", help="print 5 cases, spread over time, of each listed classifier (comma list: (hook, nothing_new, denial, wait, repeat, reread)")
@@ -236,9 +240,9 @@ def main():
     mains = sorted(p for r in roots for p in glob.glob(os.path.join(r, "*.jsonl")))
     agents = sorted(p for r in roots for p in glob.glob(os.path.join(r, "*", "subagents", "**", "*.jsonl"), recursive=True))
     for p in mains:
-        scan(p, "main", S, samples, actions)
+        scan(p, "trials" if TRIAL_DIR in p else "main", S, samples, actions)
     for p in agents:
-        scan(p, "agents", S, samples, actions)
+        scan(p, "trials" if TRIAL_DIR in p else "agents", S, samples, actions)
     for k in (a.samples or "").split(","):
         if k:
             xs = samples[k]
@@ -266,7 +270,7 @@ def main():
               "boundary_evidence": PERIOD_EVIDENCE, "weights": W, "by_period": {}}
     for n, _, _ in PERIODS:
         P = {}
-        for role in ("main", "agents"):
+        for role in ROLES:
             st = S[n][role]
             calls = st["calls"] or 1
             waste = {k: {"count": st["waste"][k], "share": round(st["waste"][k] / calls, 4)}
@@ -293,16 +297,17 @@ def main():
                        "context_max_k": round(max(st["contexts"]) / 1e3, 1) if st["contexts"] else None,
                        "stall_min": {"n": len(stall[n][role]), "median": stall[n][role] and round(pct(stall[n][role], .5), 1),
                                      "p90": stall[n][role] and round(pct(stall[n][role], .9), 1)}}
-        tot_tok = (S[n]["main"]["tokens"] + S[n]["agents"]["tokens"]) / 1e6
-        tot_res = S[n]["main"]["results"] + S[n]["agents"]["results"]
-        allst = stall[n]["main"] + stall[n]["agents"]
-        tot_usd = S[n]["main"]["usd"] + S[n]["agents"]["usd"]
+        tot_tok = sum(S[n][r]["tokens"] for r in ROLES) / 1e6
+        tot_res = S[n]["main"]["results"] + S[n]["agents"]["results"]   # trial replays are not project results
+        allst = sum((stall[n][r] for r in ROLES), [])
+        tot_usd = sum(S[n][r]["usd"] for r in ROLES)
         P["total"] = {"weighted_tokens_M": round(tot_tok, 2), "usd_list_price": round(tot_usd, 2),
                       "usd_per_result": tot_res and round(tot_usd / tot_res, 2),
                       "weighted_tokens_M_per_result": tot_res and round(tot_tok / tot_res, 3),
-                      "wasted_share": round(sum(S[n][r]["waste"][k] for r in ("main", "agents")
+                      "wasted_share": round(sum(S[n][r]["waste"][k] for r in ROLES
                                                 for k in ("hook", "denial", "repeat", "wait", "reread"))
-                                            / max(1, S[n]["main"]["calls"] + S[n]["agents"]["calls"]), 4),
+                                            / max(1, sum(S[n][r]["calls"] for r in ROLES)), 4),
+                      "results": tot_res,
                       "registry_runs_submitted": reg_sub[n],
                       "stall_min": {"n": len(allst), "median": allst and round(pct(allst, .5), 1),
                                     "p90": allst and round(pct(allst, .9), 1), "runs_with_no_action_72h": unseen[n]}}
@@ -315,23 +320,38 @@ def main():
 
 
 def figure(report, base):
+    """One denominator per era: each role's weighted tokens (left) and list-price $ (right) divided by the era's
+    results of all roles together, stacked by role, so a bar's height is the era's total per result and a segment is
+    that role's share of it; the number in a segment is that role's era total (M weighted tokens, or $)."""
     sys.path.insert(0, ROOT)
     import plot_style as ps
     import numpy as np
     names = [n for n, _, _ in PERIODS]
     x = np.arange(len(names))
     fig, (axL, axR) = ps.figure(ncols=2)
-    for i, (role, col) in enumerate((("main", ps.C.blue), ("agents", ps.C.vermillion))):
-        axL.bar(x + (i - .5) * .38, [100 * report["by_period"][n][role]["wasted_share"] for n in names], .38,
-                color=col, label=role)
-        axR.bar(x + (i - .5) * .38, [report["by_period"][n][role]["weighted_tokens_M_per_result"] or 0 for n in names],
-                .38, color=col, label=role)
-    for ax in (axL, axR):
+    cols = {"main": ps.C.blue, "agents": ps.C.vermillion, "trials": ps.C.grey}
+    labels = {"main": "main session", "agents": "subagents", "trials": "A/B trial sessions"}
+    for ax, key, scale, fmt in ((axL, "weighted_tokens_M", 1.0, "{:.0f}M"), (axR, "usd_list_price", 1.0, "${:.0f}")):
+        bottom = np.zeros(len(names))
+        for role in ROLES:
+            tot = np.array([report["by_period"][n][role][key] for n in names])
+            res = np.array([max(1, report["by_period"][n]["total"]["results"]) for n in names])
+            h = tot / res
+            ax.bar(x, h, .6, bottom=bottom, color=cols[role], label=labels[role])
+            top = max((bottom + h).max(), 1e-9)
+            for k in range(len(names)):
+                if h[k] > 0.06 * top:
+                    ax.text(x[k], bottom[k] + h[k] / 2, fmt.format(tot[k]), ha="center", va="center", fontsize=7,
+                            color="white")
+            bottom += h
+        ax.set_ylim(0, 1.12 * bottom.max())
         ax.set_xticks(x)
-        ax.set_xticklabels(["main\nalone", "step\nagents", "redesign"])
-    axL.set_ylabel("wasted calls [% of calls]")
-    axR.set_ylabel("weighted tokens per result [M]")
-    ps.legend(axL)
+        ax.set_xticklabels(["main alone\n%d res." % report["by_period"]["main_alone"]["total"]["results"],
+                            "step agents\n%d res." % report["by_period"]["step_agents"]["total"]["results"],
+                            "redesign\n%d res." % report["by_period"]["redesign"]["total"]["results"]])
+    axL.set_ylabel("weighted tokens per result [M]")
+    axR.set_ylabel("list-price \\$ per result")
+    ps.legend(axL, loc="upper right")
     os.makedirs(os.path.dirname(base), exist_ok=True)
     ps.save(fig, base)
 
