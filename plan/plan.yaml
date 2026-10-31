@@ -5363,8 +5363,15 @@ entries:
     decision: D186
     covers:
     - agent_redesign
+  - said_at: '2026-10-31T00:16:02.569000+00:00'
+    text: Great, yes, run that matched trial.
+    decision: D203
+    answers_after: '2026-10-31T00:08:51+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
+  - D203
   next:
     1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
       reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
@@ -5417,8 +5424,10 @@ entries:
     searched: 'CLAUDE.md and site decisions --project FA: model choice is fixed by the agent definitions (opus); no decision
       covers a trial of other models'
     blocks: the small-model trial only
-    blocks_steps: &id001
+    blocks_steps:
     - 4
+    answered_at: '2026-10-31T00:16:02.497000+00:00'
+    decision: D203
   step_why:
     1:
       feeds: whether the redesign is finished
@@ -5776,10 +5785,3 @@ entries:
       figs/context_breakdown.png (gitignored); untracked superseded tools/token_windows.py and analysis/agent_redesign/token_windows.json
       from the stopped sonnet agent
     written: '2026-10-31T00:07:11+00:00'
-  ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
-    effort, same briefs, scored by tools/agent_tasks.py plus a hand read, about $30 at list price?'
-  waiting_since: '2026-10-31T00:08:51+00:00'
-  searched: 'CLAUDE.md and site decisions --project FA: model choice is fixed by the agent definitions (opus); no decision
-    covers a trial of other models'
-  blocks: the small-model trial only
-  blocks_steps: *id001
