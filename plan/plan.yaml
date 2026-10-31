@@ -6837,6 +6837,9 @@ entries:
       by a serial layout (16 jobs at a width of 1238). Fix 009a1949: gridpool-plan --logs/--order (finished pools dropped,
       built gridpacks free, measured per-multiplicity factor, a cut pool floored at its elapsed time), one pool per job, run
       timeout 5400 s; the job script stops 5 min before its limit and prints the MadEvent log tail (GRIDPACK_PROGRESS).'
+  - at: '2026-10-31T14:17:40+00:00'
+    text: '2026-10-31: owner afa86296 reached the 170k close line inside one step (het analysis code + 3 review rounds), before
+      running anything; next briefs: run only, no new code.'
   handoff:
     state: 'Step 15 analysis code written, not yet committed: the commit hook blocks until the repo-reviewer passes its overdue
       backlog. analysis/catalog_v4/mixture_ab.py (working tree, uncommitted) adds MIX_HET (the six het runs), HD4_HET (empty
