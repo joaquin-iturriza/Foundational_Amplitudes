@@ -13,7 +13,7 @@
 # probe and one ZS_COMPARE summary line. Every ZERO_SHOT record carries s_stages (seconds per stage of that probe).
 #   REREAD=<run id> site submit <site> FA scripts/job_zero_shot_timing.sh --env ARM=v4_dimensionless_muon --env AXIS=H1 --env N=50
 # ARM, CAT (v4), AXIS (H1), N (50), SPLIT (val; the axis loop's split for the axis), PROFILE (K: the first K probes
-# again under cProfile, ZS_PROF lines), AB (1: the A/B of the reader's paths below). Ends with one RUN_SUMMARY line (rc, probes, wall seconds).
+# again under cProfile, ZS_PROF lines), AB (1: the A/B of the reader's paths below; AB_PATHS picks them). Ends with one RUN_SUMMARY line (rc, probes, wall seconds).
 
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -40,21 +40,25 @@ if [ -n "$AB" ]; then
     # A2 A again (the GPU forward's own run-to-run difference), B the config parsed once (one process), C B with
     # ZS_WORKERS (default 4) processes; each prediction of A2, B and C compared array by array with A's (ZS_AB_SAME /
     # ZS_AB_DIFF, one ZS_AB summary per path, with the largest difference per array)
-    for P in "A load 1" "A2 load 1" "B cached 1" "C cached ${ZS_WORKERS:-4}"; do
+    # AB_PATHS: the paths, each "name build workers parent_copy" (parent_copy deep: the parent checkpoint deep-copied
+    # per probe as before 2026-10-31; shared: its containers copied, its tensors shared); the first is the reference
+    AB_PATHS=${AB_PATHS:-"A load 1 deep;A2 load 1 deep;B cached 1 deep;C cached ${ZS_WORKERS:-4} deep"}
+    IFS=';' read -ra PATHS <<< "$AB_PATHS"; REF=$(echo "${PATHS[0]}" | awk '{print $1}')
+    for P in "${PATHS[@]}"; do
         set -- $P; mkdir "$R/pred_$1" || exit 1; T1=$(date +%s)
-        python tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred_$1" --split "$SPLIT" --signed-magnitude \
+        ZS_PARENT_COPY=$4 python tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred_$1" --split "$SPLIT" --signed-magnitude \
             --build "$2" --workers "$3" "$R"/recipes/*.yaml > "$R/read_$1.log" 2>&1
-        rc=$?; echo "ZS_AB_WALL path=$1 build=$2 workers=$3 rc=$rc wall_s=$(( $(date +%s) - T1 ))"
+        rc=$?; echo "ZS_AB_WALL path=$1 build=$2 workers=$3 parent_copy=$4 rc=$rc wall_s=$(( $(date +%s) - T1 ))"
         grep -E "^(ZS_WORKERS|ZERO_SHOT \{)" "$R/read_$1.log" | sed "s/^/$1 /"
         [ "$rc" = 0 ] || { tail -40 "$R/read_$1.log"; echo "RUN_SUMMARY zero_shot_timing rc=$rc stage=read_$1"; exit "$rc"; }
     done
-    python - "$R" <<'PY'
+    python - "$R" "$REF" "${PATHS[@]}" <<'PY'
 import glob, os, sys
 import numpy as np
-R = sys.argv[1]
-for path in ("A2", "B", "C"):
+R, ref = sys.argv[1], sys.argv[2]
+for path in [p.split()[0] for p in sys.argv[3:]][1:]:
     same = diff = 0; mx = {}
-    for f in sorted(glob.glob(os.path.join(R, "pred_A", "*.npz"))):
+    for f in sorted(glob.glob(os.path.join(R, f"pred_{ref}", "*.npz"))):
         name = os.path.basename(f); g = os.path.join(R, f"pred_{path}", name)
         a = np.load(f); b = np.load(g) if os.path.exists(g) else None
         bad = {k: "missing" for k in (["npz"] if b is None else [k for k in a.files if k not in b.files])}
@@ -68,9 +72,9 @@ for path in ("A2", "B", "C"):
             diff += 1; print(f"ZS_AB_DIFF {path} {name[:-4]} {bad}")
         else:
             same += 1
-    print(f"ZS_AB path={path} vs=A same={same} diff={diff} max={ {k: max(v) for k, v in mx.items()} }")
+    print(f"ZS_AB path={path} vs={ref} same={same} diff={diff} max={ {k: max(v) for k, v in mx.items()} }")
 PY
-    echo "RUN_SUMMARY zero_shot_timing rc=0 probes=$(ls "$R"/pred_A/*.npz | wc -l) wall_s=$(( $(date +%s) - T0 ))"
+    echo "RUN_SUMMARY zero_shot_timing rc=0 probes=$(ls "$R"/pred_"$REF"/*.npz | wc -l) wall_s=$(( $(date +%s) - T0 ))"
     exit 0
 fi
 python tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred" --split "$SPLIT" --signed-magnitude "$R"/recipes/*.yaml

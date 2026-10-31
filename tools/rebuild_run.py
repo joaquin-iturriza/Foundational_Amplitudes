@@ -29,10 +29,29 @@ def _load_best_ckpt(run_dir):
         return torch.load(io.BytesIO(f.read()), map_location="cpu", weights_only=False)
 
 
+def container_copy(x):
+    """x with every dict, list and plain tuple copied and every other value (tensors, numbers, strings) shared; a dict
+    subclass keeps its type and its attributes (a state dict's _metadata, which load_state_dict reads)"""
+    if isinstance(x, dict):
+        y = type(x)((k, container_copy(v)) for k, v in x.items())
+        if getattr(x, "__dict__", None):
+            y.__dict__.update(container_copy(dict(vars(x))))
+        return y
+    if isinstance(x, list):
+        return [container_copy(v) for v in x]
+    if type(x) is tuple:
+        return tuple(container_copy(v) for v in x)
+    return x
+
+
 def cached_parent_loads(models_dir):
     """Read each checkpoint under models_dir once per call: base_experiment._torch_load (init_model's fine-tune load)
-    and _load_best_ckpt (load_best_weights) then return a deep copy of the first read, so a probe that edits
-    its state dict (a HETEROSC child's sigma row) leaves the next probe's unchanged. Any other path loads as before."""
+    and _load_best_ckpt (load_best_weights) then return a copy of the first read's containers (container_copy), so a
+    probe that edits its state dict (a HETEROSC child's sigma row, assigned as a new tensor) leaves the next probe's
+    unchanged. The tensors are shared, not cloned: their consumers only read them (load_state_dict and the EMA shadow
+    copy_ into the model; _ckpt_scored_state, _merge_lora_state and the sigma row build new tensors), and the deep copy
+    of every tensor, the optimizer state's included, was about 0.1 s of each probe (cProfile FA-ccin2p3-eaf96d1c).
+    Any other path loads as before."""
     models_dir = os.path.realpath(models_dir)
     cache = {}
 
@@ -44,7 +63,8 @@ def cached_parent_loads(models_dir):
             key = (tag, p, str(kw.get("map_location")))
             if key not in cache:
                 cache[key] = load(path, *args, **kw)
-            return copy.deepcopy(cache[key])
+            # ZS_PARENT_COPY=deep: the earlier deep copy of every tensor, kept for the A/B
+            return copy.deepcopy(cache[key]) if os.environ.get("ZS_PARENT_COPY") == "deep" else container_copy(cache[key])
         return f
     import base_experiment
     base_experiment._torch_load = wrap(base_experiment._torch_load, "torch_load")
