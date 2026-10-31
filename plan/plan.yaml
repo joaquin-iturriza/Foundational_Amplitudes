@@ -6450,6 +6450,12 @@ entries:
     units: null
     start: '2026-10-31T17:06:43+00:00'
     at: '2026-10-31T17:06:43+00:00'
+  - batch: hd_test_h5
+    wall_h: 0.5
+    jobs: 28
+    units: null
+    start: '2026-10-31T17:19:58+00:00'
+    at: '2026-10-31T17:19:58+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
