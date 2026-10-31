@@ -2365,7 +2365,33 @@ leaving a whole cell out drops it to $0.060$ and $0.032$, so the shared part is 
 fitted on the training pools takes $0.063$ and $0.093$ (its own out-of-fold score there $0.039$ and $0.052$). Caveat:
 the factors include $t$, the scored event's own target, which no prior has at prediction time; since nothing transfers
 without the factor group, part of $f$ may be the network's compression of $t$ read back from $t$ itself rather than
-structure a prior could carry. A re-read without $t$ (the same dumps, CPU) comes before any arm is designed.
+structure a prior could carry. The re-read without $t$ (par.~\ref{par:v4_lco_not}) settles it: $f$ was $t$ read back.
+
+% src: python3 analysis/catalog_v4/lco_map.py --read analysis/catalog_v4/data/lco_map_not.json @955f326f
+% claim: s42.median_ceiling_own_K1600=0.011
+% claim: s43.median_ceiling_own_K1600=0.010
+% claim: s42.f_ceil=0.016
+% claim: s43.f_ceil=0.019
+% claim: s42.f_lco=0.022
+% claim: s43.f_lco=0.019
+% claim: s42.f_lco_factors=0.004
+% claim: s43.f_lco_factors=0.001
+% claim: s42.f_loco_cell=-0.017
+% claim: s43.f_loco_cell=-0.033
+% allow: 0.1 42 43 because they are the design's bar and the seeds, settings
+\paragraph{The same map without the event's own target (2026-10-31).}\label{par:v4_lco_not} The map of
+par.~\ref{par:v4_lco} had $t$ among its inputs while predicting $u=q-t$: the scored event's label, which no prior has.
+Re-read eval-only (design passed review; the same reads, events, folds and floors, $t$ removed from every map and from
+the own-label ceiling, refitted on the pools' own events, \code{lco\_map.py --exclude t}). Without $t$ a pool's own
+labels explain a median $0.011$ and $0.010$ of its residual (seeds $42$, $43$), and the ceiling's share of the gap is
+$f_{\rm ceil}=0.016$ and $0.019$, under the bar of $0.1$ on both seeds: by the design's rule the route ends. The
+leave-class-out map takes $0.022$ and $0.019$, the factors $\log F$, $\log P$, $\log D$ alone $0.004$ and $0.001$,
+leaving a whole cell out $-0.017$ and $-0.033$. Everything par.~\ref{par:v4_lco} read as shared structure was $t$
+read back: the network compresses the held-out pools' target range, and given $t$ a map undoes that, but nothing known
+at prediction time predicts the residual event by event. The held-out multiplicity pools' gap is in the level and
+spread of the residual, not in a per-event shape an event-level input or target prior could carry; with
+par.~\ref{par:v4_dipole} and par.~\ref{par:v4_prop}, the event-level prior route for par.~\ref{par:v4_shape_gap}'s
+transfer gap ends here.
 
 % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
 % claim: mb.median_signed_off_all=0.12
