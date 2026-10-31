@@ -323,32 +323,99 @@ def cmd_gridpool(a):
 GRID_TIME_FACTOR = 4.3    # measured gridpack seconds over the rate estimate: the gridpack probe, 2026-10-30 (1.5 to 4.3)
 
 
+def _gridpool_measured(logs):
+    """From gridpool job logs: per pool its built gridpacks' seconds ({grid: s}), its probe runs (s or None for an
+    error), and, for a job cut by its time limit, the pool it was on and the seconds it had spent there (a lower bound
+    on that pool: start of the job plus what the log's finished pools took, to the cancel line)."""
+    import datetime as dt
+    m = {}
+    for f in logs:
+        start = end = None; spent = 0.0; last = None
+        for l in open(f, errors="replace"):
+            if l.startswith("GRIDPACK_JSON ") or l.startswith("PROBE_JSON "):
+                d = json.loads(l.split(" ", 1)[1]); q = m.setdefault(d["process"], {"grid": {}, "runs": []})
+                last = d["process"]
+                if l.startswith("GRIDPACK_JSON") and "s_gridpack" in d:
+                    q["grid"][d["grid"] + json.dumps(d.get("patches"), sort_keys=True)] = d["s_gridpack"]
+                    spent += d["s_gridpack"]
+                elif l.startswith("PROBE_JSON"):
+                    q["runs"].append(d.get("s_generate"))
+            k = re.search(r"\* Date:\s+(.*CET \d{4})", l)
+            if k and start is None:
+                start = dt.datetime.strptime(k.group(1).replace(" CET", ""), "%a %b %d %I:%M:%S %p %Y")
+            k = re.search(r"\[(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)[.\d]*\] error: .*DUE TO TIME LIMIT", l)
+            if k:
+                end = dt.datetime.fromisoformat(k.group(1))
+        if end and start:
+            m.setdefault("__cut__", []).append({"log": f, "after": last, "s_job": (end - start).total_seconds()})
+    return m
+
+
 def cmd_gridpool_plan(a):
-    """The gridpool probe's batch: the lhe.gridpack pools of --complete (analysis/catalog_v4/data/complete_runs.json)
-    dealt longest first to --jobs jobs of --cores cores (each pool's estimate: per gridpack, the class's core-seconds per
-    event (lhe_parts._rate) times its grid events over the cores, times GRID_TIME_FACTOR, plus --runs runs of its run
-    size at --cores at a time). One JSON line: the jobs' pools and estimated hours (an estimate)."""
+    """The gridpool probe's batch: the lhe.gridpack pools of --complete (a JSON list, default
+    analysis/catalog_v4/data/complete_runs.json) dealt longest first to --jobs jobs of --cores cores (each pool's
+    estimate: per gridpack, the class's core-seconds per event (lhe_parts._rate) times its grid events over the cores,
+    times GRID_TIME_FACTOR, plus --runs runs of its run size at --cores at a time). One JSON line: the jobs' pools and
+    estimated hours (an estimate).
+    --logs (gridpool logs of an earlier pass): a pool with every gridpack built and every probe run returned is done
+    and left out; a built gridpack costs nothing; a run that errored (its timeout) costs --timeout; an unbuilt
+    gridpack's estimate is scaled by the largest measured ratio (gridpack seconds over the rate estimate) of its
+    final-state multiplicity instead of GRID_TIME_FACTOR (the first gridpool pass measured 0.1 to 18.4 against 4.3:
+    the multiplicity-median rate does not predict a 5-body gridpack); a pool a time limit cut is at least the seconds
+    it had run ("floor_h"). Jobs >= pools gives one pool per job, so no pool waits behind another's estimate error."""
     import statistics
     rates = json.load(open(a.rates))
     by = {}
     for r in rates.values():
         by.setdefault(int(r["nfinal"]), []).append(r["core_s_per_event"])
     med = {k: statistics.median(v) for k, v in by.items()}
-    est = {}
-    for n in json.load(open(a.complete)):
+    meas = _gridpool_measured(a.logs) if a.logs else {}
+    pools = json.load(open(a.complete))
+    per_grid, nf = {}, {}
+    for n in pools:
         l = mg.PROCESSES[n]["lhe"]
         r, _ = lp._rate(n, rates, med)
+        per_grid[n] = (r * int(l["gridpack"]) / a.cores, math.ceil(a.runs / a.cores) * r * int(l["run_events"]))
+        nf[n] = int(mg.PROCESSES[n]["nfinal"])
+    factor = {}
+    for n, q in meas.items():
+        if n in per_grid and q["grid"]:
+            g = max(q["grid"].values())
+            factor[nf[n]] = max(factor.get(nf[n], 0.0), g / per_grid[n][0])
+    est, done, floors = {}, [], {}
+    for n in pools:
+        l = mg.PROCESSES[n]["lhe"]
         E = len(l.get("energies") or [1])
-        est[n] = E * (GRID_TIME_FACTOR * r * int(l["gridpack"]) / a.cores
-                      + math.ceil(a.runs / a.cores) * r * int(l["run_events"]))
+        q = meas.get(n, {"grid": {}, "runs": []})
+        if len(q["grid"]) >= E and len(q["runs"]) >= a.runs * E and all(x is not None for x in q["runs"]):
+            done.append(n); continue
+        g1, r1 = per_grid[n]
+        f = factor.get(nf[n], GRID_TIME_FACTOR) if meas else GRID_TIME_FACTOR
+        bad = sum(1 for x in q["runs"] if x is None)
+        est[n] = (E - len(q["grid"])) * f * g1 + (E * r1 if (len(q["runs"]) < a.runs * E or bad) else 0.0) \
+            + (a.timeout if bad else 0.0)
+    for c in meas.get("__cut__", []):
+        # pools run in the order given and their runs in parallel: the job's finished wall is each named pool's
+        # gridpacks plus its longest run; the pool cut is the last named one if it is unfinished, else the next
+        order = (a.order or {}).get(c["log"]) or []
+        named = [n for n in order if n in meas]
+        spent = sum(sum(meas[n]["grid"].values()) + max([x or 0.0 for x in meas[n]["runs"]] or [0.0]) for n in named)
+        cut = c["after"] if c["after"] not in done else (order[len(named)] if len(named) < len(order) else None)
+        if cut:
+            floors[cut] = round((c["s_job"] - spent) / 3600, 2)
+    for n, h in floors.items():
+        if n in est:
+            est[n] = max(est[n], h * 3600)
     jobs = [[0.0, []] for _ in range(a.jobs)]
     for n in sorted(est, key=lambda x: -est[x]):
         j = min(jobs, key=lambda x: x[0])
         j[0] += est[n]; j[1].append(n)
     jobs = [j for j in jobs if j[1]]
-    print(json.dumps({"pools": len(est), "jobs": [{"h": round(t / 3600, 2), "pools": ps} for t, ps in jobs],
+    print(json.dumps({"pools": len(est), "done": len(done), "factor_by_nfinal": {k: round(v, 1) for k, v in factor.items()},
+                      "floor_h": floors,
+                      "jobs": [{"h": round(t / 3600, 2), "pools": ps} for t, ps in jobs],
                       "est_total_job_h": round(sum(t for t, _ in jobs) / 3600, 1),
-                      "est_longest_job_h": round(max(t for t, _ in jobs) / 3600, 2)}))
+                      "est_longest_job_h": round(max(t for t, _ in jobs) / 3600, 2) if jobs else 0.0}))
 
 
 def cmd_run(a):
@@ -812,6 +879,10 @@ def main():
     s.add_argument("--cores", type=int, default=16); s.add_argument("--runs", type=int, default=16)
     s.add_argument("--complete", default=os.path.join(ROOT, "analysis/catalog_v4/data/complete_runs.json"))
     s.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
+    s.add_argument("--logs", nargs="*", default=None, help="gridpool logs of an earlier pass (_gridpool_measured)")
+    s.add_argument("--order", type=lambda f: json.load(open(f)), default=None,
+                   help="JSON {log path: [pools in the order that job ran them]}: names the pool a time limit cut")
+    s.add_argument("--timeout", type=float, default=1800.0, help="a probe run's timeout (gridpool --timeout)")
     sub.add_parser("node")
     s = sub.add_parser("mixcheck"); s.add_argument("--queue", nargs="+", required=True)
     s = sub.add_parser("runsize"); s.add_argument("--queue", nargs="+", required=True)

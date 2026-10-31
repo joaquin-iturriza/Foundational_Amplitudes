@@ -98,11 +98,21 @@ if [ "$PROBE_SHARD" = gridpool ]; then
     # lhe.gridpack pools GP_POOLS (space separated), one after the other: each gridpack built at its path as the queue
     # builds it (all cores), then GP_RUNS probe runs of the pool's run size drawn from it, all cores at a time; a run-size
     # probe sets GP_EVENTS (run size), GP_ENERGY (one e+e- energy), GP_SEED_BASE and PROBE_KEEP (runs kept for sizecheck)
+    # It stops itself 5 min before the job's limit and prints the tail of each MadEvent log still in its work directory
+    # (GRIDPACK_PROGRESS: survey, refine or event generation of the pool it was on), so a cut job says where its time went.
+    left=$(squeue -h -j "$SLURM_JOB_ID" -o %L 2>/dev/null | awk -F'[-:]' '{n=NF; s=$n+60*$(n-1); if(n>2) s+=3600*$(n-2); if(n>3) s+=86400*$(n-3); print s}')
+    timeout --signal=KILL "$(( ${left:-999999} > 600 ? ${left:-999999} - 300 : ${left:-999999} ))" \
     python tools/lhe_probe.py gridpool --process ${GP_POOLS:?} --runs "${GP_RUNS:-16}" --cores "${SLURM_CPUS_PER_TASK:-1}" \
         ${GP_EVENTS:+--events $GP_EVENTS} ${GP_ENERGY:+--energy $GP_ENERGY} ${GP_SEED_BASE:+--seed-base $GP_SEED_BASE} \
         ${PROBE_KEEP:+--keep $PROBE_KEEP} ${GP_KEEP_LOGS:+--keep-logs $GP_KEEP_LOGS} ${GP_TIMEOUT:+--timeout $GP_TIMEOUT} \
         ${GP_XIMPROVE:+--ximprove $GP_XIMPROVE}
-    echo "RUN_SUMMARY lhe_probe gridpool rc=$?"; exit 0
+    rc=$?
+    if [ "$rc" = 137 ]; then
+        for f in $(find "${TMPDIR:-/tmp}" -maxdepth 4 -path '*lhe_gridpool_*' -name '*.mg5.log' 2>/dev/null); do
+            echo "GRIDPACK_PROGRESS $f"; grep -E 'survey|refine|Combining|Idle:|Running:|Completed:|cross-section|Error' "$f" | tail -n 30
+        done
+    fi
+    echo "RUN_SUMMARY lhe_probe gridpool rc=$rc"; exit 0
 fi
 if [ "$PROBE_SHARD" = list ]; then
     # explicit runs PROBE_LIST: "process,events,seed[,key=value...]" separated by spaces (a seed written s@E: the
