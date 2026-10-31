@@ -2051,6 +2051,46 @@ entries:
       without t, label leak, leakage, own target, re-read without, leave-class, lco in results.tex (only par:v4_lco''s caveat
       line 2366, which this design answers), plan dead ends, site decisions (D178; no other comparison named). CPU only, about
       6 core-h.'
+  - at: '2026-10-31T03:38:34+00:00'
+    question: 'Option (c) of step 6 (D178): does a per-process level and spread correction fitted on K labelled events of
+      a held-out multiplicity pool close part of its gap to the training floor? par:v4_lco_not found nothing at prediction
+      time predicts the residual u = q - t event by event, and read par:v4_lco''s with-t f as the network compressing the
+      held-out pools'' target range; a compression is a process-wide spread error (t ~ a + b q, b != 1) that K events could
+      fit. Feeds D178/D216: whether few-shot calibration is a usable answer for new multiplicity processes beside (b) more
+      6-particle pools.'
+    prior: 'par:v4_kshot_level (H2: zero-shot 0.46/0.48, floor var(q-t) 0.38/0.39, plain offset K=16 0.41/0.42: the offset
+      removes the level, the floor stays); catalog_v3 context-vector K-shot fits (2->4: floor 0.84, offset 0.89, context fit
+      1.25, worse than offset: free per-process parameters at K<=16 chase noise); par:kshot_level on Daniel''s catalog (an
+      affine offset+scale needs K>=8 to beat the offset and lowered the floor 10-50% there); par:v4_lco_not (own-label kinematic
+      ceiling without t 0.016/0.019 of the gap). Searched results.tex for affine, K-shot, context vector, spread; plan dead
+      ends; site decisions (D178, D216).'
+    measure: 'analysis/catalog_v4/kshot_spread.py @aa5aff19 on the control pair''s local reads (2000 val events per pool,
+      q and t): 218 H2 pools, 716 TR pools of the same 7 cells (floor_c = median var(u) over the cell''s TR pools). Per pool
+      and K in {4,16,64,256}, 200 draws of K events (seeded per pool, shared by all methods): plain offset, OLS affine t =
+      a + b q, affine with b shrunk to the cell''s training-pool slope prior (lam = s2/tau2 from the TR pools only; primary,
+      deployable), and to the other held-out classes'' slopes (leave-class-out, precedent of the shrunk offset). Fit on the
+      K drawn events and the prior pools only; scored on the other 2000-K events (asserted disjoint: reviewer check 8). f_m
+      = median_p[var(u)_p - mse_m,p] / median_p[var(u)_p - floor_c] (par:v4_lco''s f; var(u) is the exact offset, so f is
+      what spread adds beyond level). Ceiling first: the affine fitted on 1600 of the pool''s events, scored on the other
+      400 (5 folds); diagnostic a cubic in q the same way.'
+    check: 'Run already (--check, @aa5aff19): median gap 0.210/0.192 (matches par:v4_lco''s 0.207/0.189 on the 500-event dumps),
+      affine ceiling f_ceil 0.012/0.017 (bootstrap 0.010-0.016 / 0.012-0.021), cubic-in-q ceiling 0.023/0.037; median slope
+      of t on q 1.008/1.006 on H2 against 0.998/0.999 on TR (62%/57% of H2 pools above 1, 37%/44% of TR). The measure moves
+      (median var ratio after the affine 0.992 on H2, 1.001 on TR) but the ceiling is already under the end bar: the check
+      predicts the ''ends'' branch; the K reads are run to report it at the prior''s K and the shrinkage, not to search for
+      a pass.'
+    fixed: The control pair's existing reads (v4_dimensionless_muon / _seed2, best checkpoint, 2000 events per pool), cells,
+      floors (as par:v4_lco), draws (200, seed 0 per pool), bootstrap (1000, seed 0, lco_map.boot). No new run, no GPU, laptop
+      CPU about 10 min.
+    control: 'The same corrections on the 716 TR pools (median mse/var(u)): a correction that helps every pool alike is told
+      from one that closes the held-out gap; the plain offset at the same K and draws; the ceiling at K=1600.'
+    seeds: Seeds 42 and 43 decided separately; margin max(seed difference, bootstrap half-range).
+    outcome: 'Primary: shrunk affine (training-pool prior) at K=16. Ends when f_ceil < 0.1 on both seeds: no per-process affine
+      carries the gap; it is per-event error neither level, spread nor kinematics predicts, so it goes to (b) more 6-particle
+      pools (D216) and (a) capacity (held, D78); par:v4_lco_not''s ''level and spread'' sentence is corrected. Yes when f
+      - margin >= 0.5 f_ceil and >= 0.1: the K=16 calibration is reported as the few-shot protocol for new multiplicity processes.
+      No when f + margin < 0.25 f_ceil or < 0.05: K=16 too few, the K where it reaches half the ceiling reported. Else between,
+      reported.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
