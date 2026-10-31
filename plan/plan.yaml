@@ -8664,7 +8664,7 @@ entries:
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
     correlate most strongly with the per-event error and the het sigma of the catalog_v4 networks?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-10-31T20:42:57.510000+00:00'
     text: Seems like the error is concentrated in very particular places, though it would be nice if we can study not only
@@ -8720,3 +8720,4 @@ entries:
     files: analysis/catalog_v4/error_correlates.py, analysis/catalog_v4/data/error_correlates.json, analysis/catalog_v4/data/error_correlates_reads.json.gz,
       docs/results.tex par:v4_error_correlates, analysis/catalog_v4/figs/error_correlates_{rank,rank_legend,profile}.{png,pdf}
     written: '2026-10-31T22:59:16+00:00'
+  writeup: 4d64bea8
