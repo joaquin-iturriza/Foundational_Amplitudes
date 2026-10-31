@@ -159,6 +159,8 @@ entries:
       the sign-changing pools); (c) a per-process level and spread correction from K labelled events (par:v4_kshot_level:
       an offset removes the level, the floor var(q - t) stays; the context vector''s K-shot fits on catalog_v3, K = 16, floor
       0.84 vs fit 1.25, did not reach the floor).'
+    7: '(a) capacity and training length for the held-out multiplicity gap: wanted by the user (D216), held by D78 inside
+      the full catalog pretraining''s design; not started.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -2102,6 +2104,12 @@ entries:
       - 'user picks (b): design a data arm (added 6-particle training pools) on the control''s short pretraining, reviewed
         before any GPU job'
       - 'user picks (c): design a K-shot spread correction read on the existing dumps (CPU)'
+    7:
+      feeds: 'D178/D216: what closes the held-out multiplicity gap'
+      if:
+      - 'the full pretraining''s design is released by the user: the gap read at its capacity and length against the control
+        pair'
+      - 'still held: nothing run'
   step_waits: {}
   owner:
     agent: aa0e9372a78e34830
