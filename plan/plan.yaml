@@ -7227,6 +7227,16 @@ entries:
       a deep copy there (the reader never trains, ema off); the default switch is a separate commit for review with the A/B
       FA-ccin2p3-30cc8928. The 7 test_pool_physics failures it saw under pytest were the file''s harness (setup only in __main__);
       fixed in the commit after e906ef74, 13/13 pass under pytest and the runner.'
+  - at: '2026-10-31T19:48:03+00:00'
+    text: 'Step 23 A/B (FA-ccin2p3-30cc8928, V100, 62 H1 probes of v4_dimensionless_muon, code e0f7a54a): wall B (old, deep
+      copy) 62 s, B2 (old repeated) 48 s, D (shared tensors, orders source once) 42 s; per-probe records median 0.465 s B2
+      vs 0.375 s D (build 0.338 -> 0.280, weights 0.039 -> 0.009, forward 0.050 both); predictions D vs B max |dh| 8.3e-3,
+      |dq| 4.0e-2, below B2 vs B (1.1e-2, 5.4e-2): GPU noise, t identical. Made default (02554283), ZS_PARENT_COPY=deep keeps
+      the old path; short_wall S_PROBE 0.71 -> 0.68 (42 s / 62, start-up included). Per probe still about 7x the forward:
+      model instantiation (about 0.12 s profiled, probe data in its setup) and the probe''s own data preparation remain. Step
+      20: all 14 runs COMPLETED, no TIMEOUT, no skipped axis, no traceback; HD4 114/114 on all 12 arms, HD5 28/28 on 10 arms
+      plus the two control HD5 re-reads (c37a4b26, a1ea15aa); the four het share arms also PP4 1301/1301 and EE4 169/169 in
+      about 36-39 min each.'
   handoff:
     state: 'Step 18 and 19 generation done: all 142 default-sampled held-out test pools on ccin2p3 (114 trees: H2p5 38, H6
       8, H7E 34, H7c 34; 28 one-loop H5, MadEvent Born events labelled by the class''s MadLoop, lhe label rule virt). Step
