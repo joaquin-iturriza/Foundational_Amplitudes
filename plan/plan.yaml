@@ -6391,6 +6391,20 @@ entries:
       high, at the last step with the loss still falling too low, either reported to Joaquin with the cell, not refit. Width
       yes at 16x (32 over 8 interval below 1): the network is too small, the wider cell becomes the candidate; width no: width
       8 is big enough at this data. The H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore).'
+    passed_at: '2026-10-31T22:34:09+00:00'
+    reviewer: 'Step 16 second revision (22:33): het loss (D226) with the matched het share-0.25 control f0156d88/df858d33
+      (job_catalog_v3_short.sh v4_het_default25; catalog_v4_train.yaml identical to the control''s catalog_v4_default25_train.yaml);
+      length named steps-and-data scaling; lr measured by a het DyHPO at 4x width 8, with the 1x lr''s untuned-for-het origin
+      stated as a caveat on every length R; width cells gated only on the lr-transfer read at 1x width 32 (a failure sends
+      them to a DyHPO, not a cut), the width-8-only S2 offered to Joaquin as his cut. Check 2: length confirmed on data (ee->ttbar
+      het 2.9e-8 -> 1.2e-8 -> 5.1e-9 at 8k/16k/32k, results.tex par. het trained longer; share-0.25 runs best at 4250-4264
+      of 4264 in mixture_ab.json, still improving); width has no prior catalog-scale data and is measured in S1 (the very
+      assumption D219 asks to challenge), its 1x R reported, not used as a gate. Check 3: seeds 42/43 against the measured
+      widened intervals of the share A/B (share 0.25 PP4 R 0.450 [0.360,0.556], held-out 0.638); expected length effect about
+      2.5x per 4x, well above that. Outcomes yes/no for length and width with what each changes; H2 multiplicity-gap read
+      added (v3_prep_explore next 7, D216). Test events: default-sampled pools (D227). Searched: scaling, width, num_heads,
+      horizon, long, longer, wider, capacity, bigrun, muP, inverted-U, full pretraining in docs/results.tex, the plan, site
+      decisions: no catalog-scale length or width scan.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
