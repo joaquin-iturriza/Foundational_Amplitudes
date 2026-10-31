@@ -273,15 +273,20 @@ for A in "${AXES[@]}"; do
     if [ "$A" = TR ] && [ "$TRAIN" != "$PROJECT_DIR/recipes/catalog_${CAT}_train.yaml" ]; then
         echo "V3_RECIPE_CHECK FAIL TR: $ARM trains on $TRAIN, not recipes/catalog_${CAT}_train.yaml"; exit 1; fi
     AR=$(axis_recipe "$A")   # one recipe per process, keeping the axis file's top-level keys (sampling: mixture)
-    # EE4: an entry without its test pool (ee4_epem_cgsxwm, its 3 TeV block dropped by D193) is left out and listed
+    # EE4: an entry excluded by decision (tools/pool_physics.DROPPED: ee4_epem_cgsxwm, its 3 TeV block dropped by D193;
+    # a stale test pool of it is on disk) and any entry without its test pool are left out and listed
     if [ "$A" = EE4 ]; then
         python - "$AR" "$R/EE4_present.yaml" <<'PY' || exit 1
 import glob, os, sys, yaml
+sys.path.insert(0, os.path.join(os.environ["PROJECT_DIR"], "tools"))
+from pool_physics import DROPPED
 r = yaml.safe_load(open(sys.argv[1]))
 have = lambda n: glob.glob(os.path.join(os.environ["DATA_DIR"], f"{n}_*_test_*amplitudes.npy"))
-keep = [p for p in r["processes"] if have(p["name"])]
-print(f"V3_AXIS_PARTIAL EE4: {len(keep)} of {len(r['processes'])} read, without a test pool: "
-      f"{sorted(p['name'] for p in r['processes'] if not have(p['name']))}")
+cand = [p for p in r["processes"] if p["name"] not in DROPPED]
+keep = [p for p in cand if have(p["name"])]
+print(f"V3_AXIS_PARTIAL EE4: {len(keep)} of {len(r['processes'])} read, excluded by decision: "
+      f"{ {p['name']: DROPPED[p['name']] for p in r['processes'] if p['name'] in DROPPED} }, without a test pool: "
+      f"{sorted(p['name'] for p in cand if not have(p['name']))}")
 yaml.safe_dump({**{k: v for k, v in r.items() if k != "processes"}, "processes": keep}, open(sys.argv[2], "w"))
 PY
         AR="$R/EE4_present.yaml"

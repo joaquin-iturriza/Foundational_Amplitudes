@@ -23,6 +23,7 @@ else
     mkdir -p "$SCRATCH/standalones"
     python tools/pool_physics.py sidecars --out "$SCRATCH/standalones/sidecars_${SLURM_JOB_ID:-local}.json" || rc=1
     python tools/pool_physics.py prune-standalones || rc=1
+    [ "${STANDALONES_CENSUS:-1}" = 1 ] && { python tools/pool_physics.py standalones-census || rc=1; }
     for c in ${STANDALONES_CHECKS//+/ }; do
         IFS=: read -r train role probe <<< "$c"
         echo "CHECK $train $role $probe"

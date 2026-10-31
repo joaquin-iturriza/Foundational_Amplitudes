@@ -357,12 +357,57 @@ def test_reference_from_sidecars():
     print("ok reference from sidecars")
 
 
+def test_real_recipe_shape():
+    """the check on recipes shaped like the real ones (2026-10-31: the sidecar-only audit FA-ccin2p3-aab94b13 refused
+    every probe of H1..H4, H6, H7 and read the training reference from 108 of 1153 entries, while the fixtures above
+    passed): catalog_v4's training recipe and its held-out recipes set the mixture with a top-level `sampling:` key, so
+    every tree pool's name carries `_smix_`; the check registered the recipes under another key and looked for unshaped
+    pools that do not exist. Here: a training recipe and an H6-shaped probe recipe (an alpha_s point of a trained
+    process) with top-level sampling, their pools built under the shaped names, the CLI's sidecar-only check reads the
+    reference from every entry and passes the probe from its own sidecar; a probe dropped by decision is excluded, not
+    refused"""
+    import datagen
+    samp = {"mode": "mixture", "f_fwd": 0.15, "fwd_cand": 1 / 3}
+    tr = [{"name": n, "sqrts": [100, 6000], "n_train": 10, "n_val": 10, "n_test": 10} for n in ("v4_ddx_aag", "v4_gg_ttx")]
+    pr = [{"name": "v4_ddx_aag__as130", "base": "v4_ddx_aag", "physics": {"alpha_s": 0.13}, "sqrts": [100, 6000],
+           "n_train": 10, "n_val": 10, "n_test": 10},
+          {"name": "ee4_epem_cgsxwm", "sqrts": [13000, 13000], "n_train": 0, "n_val": 0, "n_test": 10}]
+    train, probe = os.path.join(TMP, "train_shaped.yaml"), os.path.join(TMP, "H6_shaped.yaml")
+    yaml.safe_dump({"sampling": samp, "processes": tr}, open(train, "w"))
+    yaml.safe_dump({"sampling": samp, "processes": pr}, open(probe, "w"))
+    with contextlib.redirect_stdout(io.StringIO()):
+        mg.register_recipe_processes(tr + pr[:1], default_sampling=samp)
+        paths = []
+        for p in tr + pr[:1]:
+            for role in ("train", "val"):
+                r = mg.variable_energy_recipe(p["name"], *p["sqrts"], p[f"n_{role}"], role=role, seed=42)
+                out = mg.recipe_output_path(r, datagen.dest_for_role(role))
+                np.save(out, np.zeros((1, 1)))
+                mg.write_recipe(out, r)
+                paths.append(out)
+    assert all("_smix_" in os.path.basename(x) for x in paths), paths
+    for n in ("v4_ddx_aag", "v4_ddx_aag__as130", "v4_gg_ttx"):      # what the registration on load must restore
+        mg.PROCESSES[n].pop("sampling", None)
+    ref = pp.TrainingReference(train, backend=False)
+    assert ref.sources == {"sidecar": 2} and not ref.unreadable, (ref.sources, ref.unreadable)
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        pp.main(["check", "--sidecar-only", "--train", train, probe])
+    lines = buf.getvalue().strip().splitlines()
+    rep = json.loads(lines[-1])
+    chk = [json.loads(l.split(" ", 1)[1]) for l in lines if l.startswith("PHYSICS_CHECK ")]
+    assert rep["reference_unreadable"] == 0 and rep["status"] == {"ok": 1, "excluded": 1}, rep
+    assert rep["excluded"] == {"ee4_epem_cgsxwm": pp.DROPPED["ee4_epem_cgsxwm"]}, rep
+    assert [c["block_source"] for c in chk] == ["sidecar"] and "_smix_" in chk[0]["pool"], chk
+    print("ok real recipe shape")
+
+
 if __name__ == "__main__":
     try:
         setup_rec = setup()
         TRAIN = setup_rec
         for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_sidecar_block_used,
-                  test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars):
+                  test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars, test_real_recipe_shape):
             t()
         print("all pool physics tests passed")
     finally:
