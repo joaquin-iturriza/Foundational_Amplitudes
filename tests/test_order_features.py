@@ -160,7 +160,32 @@ def test_site():
         print(f"[site] {os.path.basename(rf)}: {3 * len(hit)} affected pools are cache hits (keys unchanged)")
 
 
+def test_frozen_orders_source():
+    """A reload refuses frozen stats whose target monomial came from another orders source."""
+    from types import SimpleNamespace
+    from omegaconf import OmegaConf
+    from experiment import AmplitudeExperiment
+    chk = AmplitudeExperiment._check_frozen_orders_source
+    def ex(**d):
+        e = SimpleNamespace(cfg=OmegaConf.create({"data": d}))
+        e._orders_source = lambda: AmplitudeExperiment._orders_source(e)
+        return e
+    on_t, on_f, off = ex(target_physics_orders=True), ex(target_physics_orders=True, orders_from_diagrams=False), ex()
+    chk(on_t, {"target_physics_orders_source": "diagrams_highest_alphas"})
+    chk(on_f, {})  # no key: table
+    chk(off, {"target_physics_orders_source": "table"})
+    for e, st in ((on_t, {}), (on_f, {"target_physics_orders_source": "diagrams_highest_alphas"})):
+        try:
+            chk(e, st)
+        except AssertionError as err:
+            assert "target_physics_orders_source" in str(err)
+        else:
+            raise AssertionError("mismatch not refused")
+    print("[frozen orders source] ok")
+
+
 if __name__ == "__main__":
+    test_frozen_orders_source()
     test_from_diagrams()
     test_recipe_id_ignores_orders()
     if os.environ.get("FA_TEST_SITE"):
