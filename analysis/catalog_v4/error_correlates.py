@@ -261,6 +261,15 @@ def process_features(ids, masses, ov, axis, trained, t):
             "t_mean": float(np.mean(t)), "trained": float(trained)}
 
 
+ALIGN_MIN = 0.99     # rows aligned: the pool's amplitude ranks as the saved truth (a shuffle gives about 0)
+
+
+def align_rho(amp, r):
+    """Spearman over the probe's events, off the abslog floor, of the pool's amplitude column against t - logF"""
+    m = ~r["floor"] & np.isfinite(amp)
+    return spearman(amp[m], (r["t"] - r["logF"])[m]) if m.sum() > 10 else None
+
+
 def read_task(task):
     """one (axis, probe): the event features once per distinct event set (pool and rows) of the runs kept, then each
     run's targets and per-probe measures"""
@@ -275,6 +284,8 @@ def read_task(task):
             chk = (json.loads(str(d["physics_check"])) or {}) if "physics_check" in d.files else {}
             rows = np.asarray(d["pool_row"]) if "pool_row" in d.files else np.zeros(0, np.int64)
             pool = str(d["pool"]) if "pool" in d.files else ""
+            logF = np.asarray(d["logF"], np.float64) if "logF" in d.files else np.zeros(0)
+            floor = np.asarray(d["at_floor"], bool) if "at_floor" in d.files else np.zeros(0, bool)
         except Exception as e:
             excluded[arm] = f"unreadable: {type(e).__name__}: {e}"
             continue
@@ -289,7 +300,9 @@ def read_task(task):
         elif len(rows) != len(t):
             excluded[arm] = "no pool rows saved (a read older than the pool_row field)"
         else:
-            runs[arm] = dict(t=t, q=q, s=s, pool=pool, rows=rows, chk=chk)
+            runs[arm] = dict(t=t, q=q, s=s, pool=pool, rows=rows, chk=chk,
+                             logF=logF if len(logF) == len(t) else np.zeros(len(t)),
+                             floor=floor if len(floor) == len(t) else np.zeros(len(t), bool))
     if not runs:
         return axis, probe, None, excluded
     feats, sets = {}, {}       # one feature set per distinct (pool, rows): the runs' reads draw their own events
@@ -302,7 +315,6 @@ def read_task(task):
                 assert 5 * k + 1 == a.shape[1], a.shape
                 rows = np.asarray(a[r["rows"]])
                 P = rows[:, :4 * k].astype(np.float64).reshape(-1, k, 4)
-                assert np.allclose(rows[:, -1] * 0 + 1, 1)
                 masses = np.sqrt(np.clip(np.median(mdot(P, P), axis=0), 0, None))[2:]
                 sets[key] = (event_features(P, r["t"]),
                              process_features(rows[0, 4 * k:5 * k], masses, order_of(probe),
@@ -310,6 +322,13 @@ def read_task(task):
             except Exception as e:
                 excluded[arm] = f"features: {type(e).__name__}: {e}"
                 continue
+        # the saved pool rows must point at the scored events: the pool's amplitude column against t - logF
+        # (log|M|^2; floor events left out) over the probe's events, a Spearman under ALIGN_MIN excludes the run
+        rho = align_rho(np.abs(np.asarray(np.load(r["pool"], mmap_mode="r")[r["rows"], -1], np.float64)), r)
+        r["align_rho"] = rho
+        if rho is None or rho < ALIGN_MIN:
+            excluded[arm] = f"misaligned pool rows: Spearman(pool amplitude, t - logF) = {rho}"
+            continue
         feats[arm] = sets[key]
     if not feats:
         return axis, probe, None, excluded
@@ -321,7 +340,7 @@ def read_task(task):
         sub = np.sort(rng.choice(n, size=min(SUB, n), replace=False))
         ae = np.abs(q - t)
         rmse = float(np.sqrt(np.mean((q - t) ** 2)))
-        x = {"n": n, "pr": pr, "rmse": rmse, "bias": float(np.mean(q - t)),
+        x = {"n": n, "pr": pr, "rmse": rmse, "align_rho": r["align_rho"], "bias": float(np.mean(q - t)),
              "ev_sub": {k_: v[sub].astype(np.float32) for k_, v in ev.items()},
              "ev_med": {k_: float(np.nanmedian(v)) if np.isfinite(v).any() else None for k_, v in ev.items()},
              "ae_sub": (ae / max(rmse, 1e-300))[sub].astype(np.float32),
@@ -345,7 +364,7 @@ def tasks_of(S):
     from mixture_ab import class_of
     cls = class_of()
     trained = {cls(p["name"]) for p in
-               yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
+               yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
     by = {}
     for arm in RUNS:
         for ax in AXES:
@@ -618,6 +637,7 @@ def summary(path=None):
     raw = load(path)
     out = {"design": "plan error_correlates step 1 (CPU, existing reads)", "n_tasks": raw["n_tasks"],
            "n_probes": raw["n_probes"], "excluded_counts": {a: len(v) for a, v in raw["excluded"].items()},
+           "misaligned": {a: sorted(k for k, w in v.items() if w.startswith("misaligned")) for a, v in raw["excluded"].items()},
            "excluded": raw["excluded"], "tables": {}, "gbt": raw["gbt"]}
     # per read group and target: each feature's within-probe median Spearman, its MI, the pooled Spearman against the
     # normalised target and the class-level Spearman, per run (share_seed)
@@ -678,8 +698,8 @@ def ranking(raw):
 
 
 SHORT = {"t_level": r"$\log|\mathcal{M}|^2$", "y_ff": "final-final collinearity", "sqrt_shat": r"$\sqrt{\hat s}$"}
-PROFILE_FEATS = ("t_level", "y_ff", "sqrt_shat")
-N_RANK = 8           # the rank figure shows the strongest 8 (the box holds no more); the rest are in the JSON   # three distinct kinds (target, collinearity, energy), chosen after reading
+PROFILE_FEATS = ("t_level", "y_ff", "sqrt_shat")   # three distinct kinds (target, collinearity, energy), chosen after reading
+N_RANK = 8           # the rank figure shows the strongest 8 (the box holds no more); the rest are in the JSON
 
 
 def figures(raw):
