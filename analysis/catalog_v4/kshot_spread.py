@@ -208,7 +208,7 @@ def verdict(res):
     """The revised design's rule (2026-10-31). Option (c) itself is answered by the ceiling: f_ceil < 0.1 on both seeds
     means no per-process affine carries the gap. The K reads answer: does fitting a slope at K <= 16 cost or gain
     against the plain offset on the same draws? Per seed and K in (4, 8, 16), g = f_shr_tr<K> - f_off<K>, margin =
-    max(seed difference of g, half the larger bootstrap half-range of the two f): gain when g - margin > 0, cost when
+    max(seed difference of g, the larger bootstrap half-range of the two f): gain when g - margin > 0, cost when
     g + margin < 0, else neutral; a branch holds only on both seeds. Primary: K = 16."""
     V = {"ceiling": "ends: f_ceil < 0.1 on both seeds" if all(res[s]["f_ceil"] < 0.1 for s in ("s42", "s43"))
          else "f_ceil >= 0.1 on a seed", "slope_vs_offset": {}}
