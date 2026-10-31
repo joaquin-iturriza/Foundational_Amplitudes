@@ -340,8 +340,9 @@ def main():
                     Xf, names = lof_features(mom[ok], pdg[ok], t[ok], logF[ok], logP[ok],
                                              None if logD is None else logD[ok])
                     if a.ceiling:
-                        keep = [i for i, nm in enumerate(names) if nm not in a.exclude]
-                        rec["ceiling_own"] = own_ceiling(Xf[:, keep], uk)
+                        # not `keep`: that is the probe filter of this loop (the first t-free stage 1 read one probe)
+                        cols = [i for i, nm in enumerate(names) if nm not in a.exclude]
+                        rec["ceiling_own"] = own_ceiling(Xf[:, cols], uk)
                         rec["ceiling_K"] = int(len(uk) * 4 // 5)
                     pick = np.sort(np.random.default_rng(0).permutation(len(uk))[:500])
                     os.makedirs(a.dump, exist_ok=True)

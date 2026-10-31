@@ -28,7 +28,7 @@ MODE="${1:-dipole}"; FLAG=(); TAG=DIPOLE_RESIDUAL
 # excluded, its training pools from the first dump
 NOT=(); [ "$MODE" = lcodump_not ] && { MODE=lcodump; NOT=(--exclude t); DUMPNOT=1; }
 [ "$MODE" = lcodump ] && TAG=LCO_DUMP
-DUMP=zz_v4_lco_dump; [ -n "${4:-}" ] && DUMP=zz_v4_lco_dry; [ -n "${DUMPNOT:-}" ] && DUMP=zz_v4_lco_dump_not
+DUMP=zz_v4_lco_dump; [ -n "${DUMPNOT:-}" ] && DUMP=zz_v4_lco_dump_not; [ -n "${4:-}" ] && DUMP=zz_v4_lco_dry
 if [ "$MODE" = lco_not ]; then
     OUT="$SCRATCH/zz_v4_lco_not_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
     export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
