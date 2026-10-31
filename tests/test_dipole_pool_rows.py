@@ -107,3 +107,31 @@ def test_lco_scored_never_sees_the_scored_group():
     for p, (X, u, _) in pools.items():
         own_var = np.var(u - np.sin(2 * X[:, 0]))
         assert vr[p] > 0.5 * own_var       # its own slope is left in the residual
+
+
+def test_lco_map_end_to_end_on_a_synthetic_dump(tmp_path):
+    """Stage 2 runs on a small synthetic dump: a residual shared by every held-out pool gives f_lco near f_ceil."""
+    import json
+    import subprocess
+    import sys
+    from analysis.catalog_v4 import lco_map
+    tl = json.load(open(os.path.join(os.path.dirname(lco_map.__file__), "data", "tree_levels.json")))
+    ho = [p for ax in tl["heldout"].values() for p, v in ax.items() if f"{v['n']}{v['initial']}" == "6qq"][:12]
+    tr = [p for p, v in tl["train"].items() if f"{v['n']}{v['initial']}" == "6qq"][:6]
+    names = [f"sij{k}" for k in range(15)] + [f"lE{k}" for k in range(4)] + [f"cth{k}" for k in range(4)] + ["lshat"] \
+        + [f"n_{k}" for k in ("g", "a", "q", "b", "l", "nu", "W", "Z", "H", "t")] + ["t", "logF", "logP", "logD"]
+    r = np.random.default_rng(0)
+    for arm in ("A",):
+        for ax, ps in (("H2", ho), ("TR", tr)):
+            d = tmp_path / f"{arm}_{ax}"
+            d.mkdir()
+            for p in ps:
+                X = r.normal(size=(500, 38)).astype(np.float32)
+                u = (np.sin(2 * X[:, 0]) if ax == "H2" else 0) + 0.5 * r.normal(size=500)
+                np.savez(d / f"{p}.npz", X=X, u=u, names=np.array(names), var_u=np.var(u), n=2000, ceiling_own=0.6)
+    out = tmp_path / "o.json"
+    subprocess.run([sys.executable, lco_map.__file__, "--root", str(tmp_path), "--arms", "A", "--out", str(out)],
+                   check=False, capture_output=True, text=True)
+    R = json.load(open(out))["A"]
+    assert R["f_lco"] > 0.5 * R["f_ceil"] > 0.2
+    assert R["f_lco_factors"] < 0.2

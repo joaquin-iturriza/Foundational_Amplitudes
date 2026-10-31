@@ -6,11 +6,14 @@ and the control's zero-shot residual u. Here, per arm (seed) of the control pair
   deciding read   the H2 pools' classes (census_classes.json) in 10 folds grouped by class (GroupKFold over the sorted
                   pools); each fold's pools scored by a gradient-boosted map of u (HistGradientBoostingRegressor, 300
                   iterations, defaults, random_state 0) fitted on the other folds' H2 events only;
-                  f = (median var(u)_H2 - median var(u - u_hat)_H2) / (median var(u)_H2 - median var(u)_TR)
+                  f = median_p removed_p / median_p gap_p, gap_p = var(u)_p - floor of p's cell (median var(u) over
+                  the cell's TR pools), removed_p = var(u)_p - var(u - u_hat)_p (the shape-gap rule's per-cell floor)
+  first           f_ceil: removed_p = R2_own,p var(u)_p, the stage-1 own-label ceiling (K = 1600 of 2000 events); the
+                  design's thresholds are shares of it
   beside it       the same folds on the factors t, logF, log P, log D only, and without each feature group (drop-group)
   diagnostics     leave-one-cell-out (a cell's pools scored by the map of the other cells' H2 pools); the training-pool
                   map (fitted on every TR pool, applied to H2) and its TR score, 5 folds grouped by pool; the own-label
-                  ceiling of stage 1 (K = 1600); per cell medians
+                  pools with a final gluon or photon (log D column nonzero) against those without; per cell medians
   margins         the 16-84% range of f over H2 and TR pools resampled with replacement (1000 draws, seed 0)
 TR pools are those of the H2 pools' cells (as dipole_gate.py). Writes one JSON.
     python3 analysis/catalog_v4/lco_map.py --root <dump root> --out <json> [--arms a b]
@@ -53,6 +56,8 @@ def scored(pools, groups, cols):
     res = {}
     for g in sorted(set(groups.values())):
         tr = [p for p in pools if groups[p] != g]
+        if not tr:          # one group only (a dry run's single cell): nothing to fit on
+            return None
         m = fit(np.concatenate([pools[p][0][:, cols] for p in tr]), np.concatenate([pools[p][1] for p in tr]))
         for p in pools:
             if groups[p] == g:
@@ -60,16 +65,24 @@ def scored(pools, groups, cols):
     return res
 
 
-def f_of(vh, vr, vt):
-    return (np.median(vh) - np.median(vr)) / (np.median(vh) - np.median(vt))
+def f_of(vh, vr, floor):
+    """median removed over median gap, each H2 pool against its own cell's floor."""
+    vh, vr, floor = map(np.asarray, (vh, vr, floor))
+    return float(np.median(vh - vr) / np.median(vh - floor))
 
 
-def boot(vh, vr, vt, rng):
-    vh, vr, vt = map(np.asarray, (vh, vr, vt))
+def floors(vt_by_cell):
+    return {c: float(np.median(v)) for c, v in vt_by_cell.items()}
+
+
+def boot(vh, vr, cells, vt_by_cell, rng):
+    """16-84% of f over H2 pools and each cell's TR pools resampled with replacement, 1000 draws."""
+    vh, vr = np.asarray(vh), np.asarray(vr)
     fs = []
     for _ in range(1000):
-        i, j = rng.integers(len(vh), size=len(vh)), rng.integers(len(vt), size=len(vt))
-        fs.append(f_of(vh[i], vr[i], vt[j]))
+        i = rng.integers(len(vh), size=len(vh))
+        fl = floors({c: np.asarray(v)[rng.integers(len(v), size=len(v))] for c, v in vt_by_cell.items()})
+        fs.append(f_of(vh[i], vr[i], [fl[cells[k]] for k in i]))
     return [round(float(np.quantile(fs, 0.16)), 3), round(float(np.quantile(fs, 0.84)), 3)]
 
 
@@ -96,7 +109,15 @@ def main():
         T = {p: v for p, v in T.items() if cell(p) in cells}
         hp = sorted(H)
         vh = {p: float(np.var(H[p][1])) for p in hp}
-        vt = [float(np.var(v[1])) for v in T.values()]
+        vt_by_cell = {}
+        for p, v in T.items():
+            vt_by_cell.setdefault(cell(p), []).append(float(np.var(v[1])))
+        fl = floors(vt_by_cell)
+        hc = [cell(p) for p in hp]
+        v1 = [vh[p] for p in hp]
+        f1 = [fl[c] for c in hc]
+        iD = names.index("logD")
+        emit = np.array([bool(np.any(H[p][0][:, iD] != 0)) for p in hp])
         klass = [rep.get(p, p) for p in hp]
         fold = {}
         for k, (_, te) in enumerate(GroupKFold(min(10, len(set(klass)))).split(hp, groups=klass)):
@@ -107,21 +128,33 @@ def main():
         for g in GROUPS:
             reads[f"lco_drop_{g}"] = (fold, [i for i in allc if i not in cols_of(names, g)])
         reads["loco_cell"] = ({p: cell(p) for p in hp}, allc)
-        R = {"n_H2": len(hp), "n_TR": len(T), "n_classes": len(set(klass)), "median_var_H2": float(np.median(list(vh.values()))),
-             "median_var_TR": float(np.median(vt)), "median_ceiling_own_K1600": float(np.nanmedian([H[p][2] for p in hp]))}
+        R = {"n_H2": len(hp), "n_TR": len(T), "n_classes": len(set(klass)), "n_H2_emitter": int(emit.sum()),
+             "median_var_H2": float(np.median(v1)), "floor_TR_per_cell": fl,
+             "median_gap": float(np.median(np.array(v1) - np.array(f1))),
+             "median_ceiling_own_K1600": float(np.nanmedian([H[p][2] for p in hp]))}
+        vc = [vh[p] * (1 - H[p][2]) for p in hp]           # first: the own-label ceiling's f
+        R["f_ceil"] = round(f_of(v1, vc, f1), 4)
+        R["boot_ceil"] = boot(v1, vc, hc, vt_by_cell, rng)
+        print("LCO_CEIL", json.dumps({arm: R["f_ceil"]}), flush=True)
         per = {}
         for key, (grp, cols) in reads.items():
             vr = scored(H, grp, cols)
+            if vr is None:
+                R[f"f_{key}"] = None
+                continue
             per[key] = vr
-            v1 = [vh[p] for p in hp]
             v2 = [vr[p] for p in hp]
-            R[f"f_{key}"] = round(float(f_of(v1, v2, vt)), 4)
-            R[f"boot_{key}"] = boot(v1, v2, vt, rng)
+            R[f"f_{key}"] = round(f_of(v1, v2, f1), 4)
+            R[f"boot_{key}"] = boot(v1, v2, hc, vt_by_cell, rng)
+            if key == "lco":
+                for lab, m in (("emitter", emit), ("no_emitter", ~emit)):
+                    if m.any():
+                        R[f"f_lco_{lab}"] = round(f_of(np.array(v1)[m], np.array(v2)[m], np.array(f1)[m]), 4)
             R[f"median_r2_{key}"] = round(float(np.median([1 - vr[p] / vh[p] for p in hp])), 4)
         # the training-pool map: fitted on every TR pool, applied to H2; its own TR score grouped 5-fold by pool
         m = fit(np.concatenate([v[0] for v in T.values()]), np.concatenate([v[1] for v in T.values()]))
         vr = {p: float(np.var(H[p][1] - m.predict(H[p][0]))) for p in hp}
-        R["f_trainmap"] = round(float(f_of([vh[p] for p in hp], [vr[p] for p in hp], vt)), 4)
+        R["f_trainmap"] = round(f_of(v1, [vr[p] for p in hp], f1), 4)
         tp = sorted(T)
         tfold = {p: i % min(5, len(tp)) for i, p in enumerate(tp)}
         vtr = scored(T, tfold, allc)
