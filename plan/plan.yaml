@@ -1875,6 +1875,74 @@ entries:
       it answers the entry''s step 6 and D178; no decision names a comparison it omits. Each H2 pool is its own class in census_classes.json
       (218 distinct classes, 201 class siblings outside H2), so 10 class-grouped folds are leave-pool-out among H2, which
       is fine.'
+  - at: '2026-10-31T01:18:01+00:00'
+    question: 'Is the extra per-event residual of catalog_v4''s held-out multiplicity pools (par:v4_shape_gap; par:v4_prop:
+      single-scalar ceiling eta^2 0.122/0.119 held out against 0.036/0.041 training) a systematic extrapolation error shared
+      across held-out processes, so that one event-level prior could carry it? A CPU read on the control pair''s existing
+      zero-shot reads: a gradient-boosted map of u on leg-order-free event features, fitted on the held-out multiplicity pools
+      of the other classes, applied to each left-out class with none of its labels; its share of the gap, read against what
+      the pool''s own labels can reach (the own-label ceiling). Revised once after the review''s FIX of 2026-10-31 (prior
+      incomplete; thresholds not tied to the reachable ceiling; cells pooled). Feeds D178.'
+    prior: 'Searched docs/results.tex, the plan''s dead ends, site decisions D81, D86, D178; terms leave-one, leave-class,
+      GroupKFold, gradient, HistGradient, boosted, cross-process, extrapolat, shared across, per-event structure, joint read,
+      event features, kNN, ceiling, K-shot, context vector, stand-in. Found: (i) Design (ii) on the data, the 2->4 probes
+      factorised onto their parents (2026-10-25, near line 6194; tools/factorised_2to4.py): on Daniel''s catalog, log|M|^2
+      over the 2->3 parent''s at the Catani-Seymour-mapped event, plus a gradient-boosted correction on the splitting variables
+      learned leave-one-probe-out on the other 39 held-out 2->4 probes: spread 7.1/6.2 (+g/+gamma) to 2.5/3.1 by the parent,
+      to 0.73/1.11 with the correction, under the network''s zero-shot floor 1.34/1.37 on 17/20 and 14/20 probes. That is
+      the closest prior work and evidence that a correction learned across held-out processes of one multiplicity transfers;
+      it differs here: catalog_v4''s held-out pools, the control network''s residual u (not log|M|^2 over a parent''s), and
+      all 218 pools, of which only 94 have a final gluon or photon (the parent route needs one). (ii) The cross-fitted process-statistics
+      map (D81, near line 5548, pool_stats.py): ridge plus trees on physics features, level error 0.46/0.064 cross-fitted
+      by relabelling class, spread ratio 0.88-1.24: a pool-level map, the per-process level and spread, not the per-event
+      shape. (iii) The surrogates paragraph (near line 5776): a soft-collinear factor carries most per-event structure of
+      multi-gluon families, on the catalog the propagators; here log D (par:v4_dipole, dead end, gate 0.094) and log P (par:v4_prop,
+      between, eta^2 0.042) as single inputs were already read on these events. (iv) The joint read''s two designs (dead end
+      2026-10-31): per-pool own-label fit (K-shot) and the training-pool map (near-blind); here the first is the ceiling,
+      the second a diagnostic. (v) par:v4_kshot_level and the context K-shot fits use the scored process''s labels; this read
+      uses none.'
+    measure: 'Per probe (H2: the 218 held-out multiplicity pools, all 6-particle, cells 6bb 28, 6bg 6, 6bq 8, 6ee 21, 6gg
+      17, 6qg 28, 6qq 110; TR: the training pools of the same cells; seeds 42 and 43; rows by pool_rows(), alignment checked,
+      refused counted): the read''s 2000 events give the own-label ceiling, 500 of them (seed 0) the maps. Features, leg-order-free:
+      sorted log s_ij/s_hat over the 15 pairs, sorted final legs'' log E/sqrt(s_hat) and |cos theta|, log s_hat, final species
+      counts (g, gamma, light q, b, charged lepton, neutrino, W, Z, H, t), and t, logF, log P, log D (0 where none). u = (q
+      - t) minus the pool mean. Map: sklearn HistGradientBoostingRegressor (300 iterations, defaults, random_state 0). The
+      gap is measured per pool against its own cell''s floor, as the shape-gap rule: floor_c = median var(u) over the cell''s
+      TR pools; per H2 pool p, gap_p = var(u)_p - floor_c(p) and removed_p = var(u)_p - var(u - u_hat)_p; f = median_p removed_p
+      / median_p gap_p (each seed). Stage 2 computes first, before any map: the ceiling f_ceil, removed_p = R2_own,p x var(u)_p
+      with R2_own the per-pool own-label 5-fold out-of-fold fit (K = 1600 of the 2000 events, same features and model). Deciding
+      read, leave-class-out: classes from census_classes.json (each H2 pool its own class); 10 folds grouped by class over
+      the sorted pools; each fold scored by the map fitted on the other folds'' H2 events only; f_lco. Beside it, same folds:
+      factors only (t, logF, log P, log D); drop-group (without pairs, energies and angles, species, factors). Diagnostics:
+      leave-one-cell-out; the training-pool map applied to H2 and its TR out-of-fold score (5 folds by pool); f_lco on the
+      94 pools with a final gluon or photon against the 124 without; per cell. Margins: seed difference; 16-84% of f over
+      H2 and TR pools resampled (1000 draws, seed 0).'
+    check: 'On these events (par:v4_prop) the held-out residual has per-event structure (single scalars to eta^2 0.12, about
+      0.20/0.28 of the gap by the reviewer''s conversion), and the 2->4 factorised result (near line 6194) shows a correction
+      learned on other held-out processes of one multiplicity reducing spread 2.5 to 0.73 on Daniel''s catalog, so a shared,
+      transferable part is plausible; whether the yes bar is reachable is set by f_ceil, computed first, and every threshold
+      is a share of it, so neither branch is built in. Sanity: training-pool map''s TR score near 0; f_lco <= f_ceil. A 5-probe
+      dry run of stage 1 and a stage-2 fit on it on CC before the batch (time and size per pool).'
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected; pools' frozen rows; 500 events per pool (seed
+      0), 2000 for the ceiling; features, groups, model settings, the 10 class-grouped folds and the per-cell floor fixed
+      before reading; no tuning; cells as loop_levels.py --shape-gap; bootstrap 1000 draws, seed 0.
+    control: The same pools scored by maps that never saw the scored class's labels, against (a) the cell's training floor
+      (the gap) and (b) the pool's own-label ceiling (what any per-event map could reach with labels); the factors-only map;
+      the training-pool map; seeds 42 and 43 separately.
+    seeds: Seeds 42 and 43 of the control pair, each read and decided on its own; a branch holds only when it holds on both
+      seeds and f_lco's distance from each threshold exceeds the seed difference and the bootstrap half-range.
+    outcome: 'First f_ceil per seed. If f_ceil < 0.1 on both seeds: even the pool''s own labels leave the gap in level and
+      spread, not per-event shape; this route ends, reported with the alternatives (capacity, training length, data); the
+      maps are reported as diagnostics. Otherwise, decided on f_lco over all multiplicity cells, both seeds: yes when f_lco
+      >= 0.5 f_ceil and f_lco >= 0.1: the held-out excess is shared and transferable; if the factors-only map gives >= half
+      of f_lco, the next arm is data.target_propagators on the control''s short pretraining, two seeds, read by the shape-gap
+      rule; if f_lco is held mostly by the 94 pools with a final gluon or photon, the candidate arm is the parent-factorised
+      target of the 2->4 result; otherwise the group the drop-group read names, with the input or target term it implies;
+      any such arm is its own design, costed and reviewed before a GPU job. No when f_lco < 0.25 f_ceil or f_lco < 0.05: the
+      per-event part is pool-specific, not shared; no event-level prior; reported with the alternatives, this route ends.
+      Between: reported, no GPU arm. Leave-one-cell-out beside it; if under 0.25 f_ceil while f_lco says yes, the result is
+      called cell-local. Cost: CPU only on CC: stage 1 four jobs (seeds x H2/TR), 4 cores, limit set from the dry run (H2
+      jobs carry the ceiling fits); stage 2 one job, 8 cores, 2 h; no GPU; disk about 130 MB.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
