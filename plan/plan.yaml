@@ -6068,6 +6068,48 @@ entries:
       cut (H7c pT 30 matches pt_min 30 of catalog_v4_heldout_H7c.yaml; H7E pp at 20 TeV with sqrt(s_hat)>6 TeV, ee at 6/10/20
       TeV), labels at alpha_s(sqrt(s_hat)) as the catalog''s; het arms carry the decided HETEROSC loss; no prior default-sampled
       pools for these classes found.'
+  - at: '2026-10-31T05:24:11+00:00'
+    question: 'Step 18 (Joaquin 2026-10-31 [D227]: the held-out check is against data generated the default way; ''nothing
+      to say about the mixture until I see the right numbers''): do the MSE mixture arms (default share 0.50 / 0.25) and the
+      het arms cost or gain on the held-out classes of H2p5, H6, H7E and H7c when read on MadEvent default-sampled events,
+      and what is the pooled default-sampled R over all held-out classes with a default pool (H1-H3 558 plus these 114 = 672)
+      that step 14''s rule reads?'
+    prior: 'plan catalog_coverage finding 2026-10-31T04:56 (mixture_ab.py heldout_default @744fad42): H1-H3 on PP4/EE4 default
+      pools, MSE R 0.912 [0.802,1.068] / 0.921 [0.795,1.064] vs catalog-sampled 1.267 / 1.223 on the same classes; docs/results.tex
+      par:v4_mixture (catalog-sampled held-out read, LOSS rule). Searched docs/results.tex, plan.yaml, site decisions for
+      heldout_default, hd_, E20, c30, default-sampled held-out: nothing else. H5 (28) is a recorded follow-on step (next 19:
+      one-loop label rule on Born events), not dropped.'
+    measure: 'Per probe zero-shot MSE (tools/zero_shot_parent.py, test split, 2000 events) of each arm and control seed on
+      pools hd_<class> (recipes/catalog_v4_heldout_default_processes.yaml @5d4c0e9c, 114 pools: H2p5 pp 13 TeV catalog_v4_pp
+      cards / ee at EE4 energies above the class''s lower edge; H6 as H2p5''s settings with labels run from alpha_s(M_Z) 0.13
+      (lhe.label_alphas_mz, as physics.alpha_s for the catalog''s pools); H7E pp 20 TeV dsqrt_shat 6000 / ee 6, 10, 20 TeV;
+      H7c catalog_v4 cards with ptj ptb pta ptl 30), labels at alpha_s(sqrt(s_hat)); read as job axis HD4. R = arm/control
+      with the seed-spread-widened interval (mixture_ab.py heldout_default), reported three ways: pooled over the 672 default-sampled
+      classes (H1-H3 + HD4; the read step 14''s rule uses), pooled over the 114 new, and per axis.'
+    check: 'The same R on the 558 H1-H3 classes moved from 1.267 (catalog-sampled) to 0.912 (default-sampled) for the 0.50
+      arm, per axis H1 0.58 H2 0.70 H3 1.13, so the sampling of the test events moves R by more than the seed spread. Generation:
+      a per-pool probe (scripts/job_lhe_probe.sh list, 1000 events, every e+e- energy) measures kept fraction, time and disk
+      before the queue.'
+    fixed: 'Every trained run unchanged (eval-only REREAD of 6c246603 1d46b938 11ad944a 9c6fc7ab 339ec100 380842ed, and of
+      the six het arms 87ea24d0 321a3de2 466656b2 9897833d f0156d88 df858d33 once they end, they are in flight now); 2000
+      test events per class; label rule running_sqrt_shat as pp13v4_/ee4_; complete runs of 1000 events from one gridpack
+      per energy (par:v4_short_runs). Cost: generation 19.19 core-h CPU (H2p5 3.6, H6 0.35, H7E 7.62, H7c 7.62; heldout_default_pools.py
+      @647cfada, 38 five-body classes a lower bound); re-reads 12 eval-only jobs x 0.4 h (tools/short_wall.py --axes HD4 --eval:
+      114 probes, limit 00:30:00) = 4.8 GPU-h, 6 GPU-h at the limit, under 30.'
+    control: control pair v4_dimensionless_muon seeds 42/43 (MSE) and v4_het_control seeds 42/43 (het), read on the same pools
+    seeds: '42 and 43, the existing arms'' and controls'' (eval-only, no training). Spread measured on these classes catalog-sampled
+      (mixture_ab.json, share 0.50): H2p5 widened [1.024,1.497] seed ratio 1.10, H7E [1.352,1.566] 0.98, H7c [1.265,2.038]
+      1.18; the 143 classes without a default pool pooled [1.088,1.592] 1.12. Resolution: on the 114 new classes the widened
+      half-width is about 0.2 in ln R, so ''no cost'' needs R below about 0.85 and ''cost'' above about 1.25; on the pooled
+      672 (558 alone: [0.802,1.068] about 0.912, half-width about 0.14) ''no cost'' needs R below about 0.91 and ''cost''
+      above about 1.21; per axis wider still.'
+    outcome: 'Pooled 672 widened upper end below 1.05 at a share whose PP4/EE4 gain stands: that share is a clean win for
+      next 14, reported to Joaquin with the per-axis reads. Lower end above 1.05: a real generalisation cost, a trade-off
+      for Joaquin in next 14. Interval spanning 1.05: undecided, reported as such with its interval to Joaquin for the share
+      choice; two more seeds per arm and control offered with their GPU-h (training reruns, not eval), not run without his
+      choice. The new-114 and per-axis reads are reported beside the pooled one; an axis whose interval lies above 1.05 while
+      the pool does not is named as a localized cost. Het arms: the same three reads under HETEROSC against v4_het_control,
+      after the six het runs end; their agreement or not with the MSE reads is reported. H5 follows in next 19.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
