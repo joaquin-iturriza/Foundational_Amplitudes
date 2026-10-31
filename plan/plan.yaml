@@ -6282,6 +6282,47 @@ entries:
       evaluation; state the wall time per cell against the site''s limit and how a cell that does not fit is split (resume
       chain), before the cost goes to Joaquin. Checks that hold: seeds 42/43 against the share A/B''s widened intervals (share-0.25
       PP4 R 0.450 [0.360,0.556], held-out 0.638); reads on the default-sampled pools D227 asks; no label in inputs.'
+  - at: '2026-10-31T22:28:28+00:00'
+    question: 'Step 16 (D219, D229, D231), revised after the reviewer''s FIX: on catalog_v4 at share 0.25 with the het loss
+      (D226), how do the reads fall with training steps-and-data and with muP width, and is width 8 big enough at the longest
+      length? Grid lengths 4264 (1x), 17056 (4x), 68224 (16x) x num_heads 8, 16, 32 x seeds 42, 43 (the 1x width-8 cells exist:
+      het share-0.25 pair FA-ccin2p3-f0156d88, df858d33), in stages: S1 = 1x widths 16, 32 (4 runs) and a single-fidelity
+      DyHPO on lr at 4x width 8 (8 trials); S2 = 4x and 16x cells per the go rules below'
+    prior: 'As the 22:25 design: muP eta* flat over num_heads 2-32 and the inverted-U law, both measured with AdamW (Muon
+      not); ee->ttbar het 8k/16k/32k (2.9e-8, 1.2e-8, 5.1e-9, best at the last step); 32k at D=1e3 over-trains; sec:bigrun
+      one width. This grid is also plan v3_prep_explore next 7 (capacity and length for the multiplicity gap, D216), whose
+      read is added. No catalog-scale length or width scan found (scaling, width, num_heads, horizon, long, wider, capacity,
+      bigrun, muP, inverted-U, full pretraining).'
+    measure: 'Per run at its best checkpoint (the het arms'' rule: sigma_stage parent, mu at best val_loss_no_reg): R against
+      the 1x width-8 het pair (mixture_ab measure: median over classes, class bootstrap widened by |ln R_seed|) on PP4 (1301),
+      EE4 (169), the 700 default-sampled held-out classes (pooled, per axis), the catalog-sampled H1-H7c beside, and the multiplicity
+      gap: median e on the 218 H2 held-out pools (par:v4_shape_gap, eval-only on these runs). Scaling: L(C) = A C^-alpha +
+      L_inf on val_loss_no_reg, labelled steps-and-data scaling (events per process grow with steps, below), per width. Blow-ups
+      with mixture_ab''s het rule; a spike recovered (the het share arms spiked to 1e8-2e9 near step 2000) listed, a run whose
+      best checkpoint precedes its spike listed apart.'
+    check: 'Length: ee->ttbar het fell 2.9e-8 to 5.1e-9 from 8k to 32k, best at the last step; the share-0.25 runs are best
+      at step 4250-4264 of 4264 (mixture_ab blowups): still improving at 1x. Width has no catalog-scale data: S1''s 1x widths
+      16 and 32 are that check, and the 4x/16x width cells go only on its result (go rule).'
+    fixed: 'Recipe catalog_v4_train.yaml (share 0.25); the het share arm''s setup (job_catalog_v3_short.sh v4_het_default25:
+      HETEROSC, mean aggregation, sign head off, sigma-only end stage D70, clip 5 D72, MuonAdamW, muon_weight_decay 0.02171863,
+      batch 16384, cosine over the run, 8 blocks, 8x0n+2x1n); events per process scale with steps (1e4, 4e4, the whole pool
+      at 16x), about 6 epochs, 9.7 at 16x: named steps-and-data scaling, not steps alone; lr: 1x keeps 4.997e-3 at every width
+      (muP); 4x and 16x take S1''s DyHPO best at 4x width 8 (window [7.8e-4, 7.0e-3], ±1/2 decade around the law''s 2.34e-3),
+      16x that times 4^-0.55 (an extrapolation, read by its best-checkpoint position). Before S1: a 200-step probe per width
+      (s/step, memory, in-memory load at 1e5 events or memmap). Cells longer than the site''s job limit run as a chain of
+      resumed jobs (checkpoint resume), laid out after the probe.'
+    control: 'The 1x width-8 het share-0.25 pair FA-ccin2p3-f0156d88 (42) and df858d33 (43): same recipe, loss and setup;
+      a cell differs only in steps (with its events and lr by the rules above) and/or num_heads.'
+    seeds: 42 and 43 in every cell and for the DyHPO's best rerun at 4x.
+    outcome: 'Go rules: the 4x/16x width-16/32 cells go only if at 1x width 32''s best checkpoint is at its last 5% of steps
+      and not blown up (muP lr transfer under Muon holds) and width 32 over width 8 has R below 1 on the held-out pool or
+      PP4 (width moves the reads); else width stays 8 and the 16x width-8 cells go alone, reported. Length yes: 4x and 16x
+      width 8 R below 1 with interval below 1 on the held-out pool and PP4/EE4: L(C) gives L_inf, the longest width-8 run
+      becomes the foundation pretraining candidate, to Joaquin. Length no: 16x within the seed interval of 4x (or of 1x):
+      length is not the limit at this data; if the best checkpoint sits before 60% of steps the lr is too high, at the last
+      step with the loss still falling too low, either reported to Joaquin with the cell, not refit. Width yes at 16x (32
+      over 8 interval below 1): the network is too small, the wider cell becomes the candidate; width no: width 8 is big enough
+      at this data. The H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
