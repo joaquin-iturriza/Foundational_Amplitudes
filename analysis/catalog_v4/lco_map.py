@@ -136,6 +136,11 @@ def main():
     ap.add_argument("--read", help="print a stage-2 JSON (data/lco_map.json, FA-ccin2p3-7ad4b5e3) as one line, seeds "
                     "as s42 and s43, without refitting: the results line's provenance")
     ap.add_argument("--arms", nargs="+", default=list(ARMS))
+    ap.add_argument("--exclude", nargs="*", default=[], help="feature columns left out of every map (t: the scored "
+                    "event's own target, a label; the t-free re-read of 2026-10-31)")
+    ap.add_argument("--same-as", default="", help="a dump root whose held-out pools must hold the same events: every "
+                    "column but the excluded ones equal (the t-free re-read stays paired with the first read)")
+    ap.add_argument("--tr-root", default="", help="the training pools' dump root when it differs from --root")
     ap.add_argument("--out")
     a = ap.parse_args()
     if a.read:
@@ -154,10 +159,18 @@ def main():
     out = {}
     for arm in a.arms:
         H, names = load(os.path.join(a.root, f"{arm}_H2"))
-        T, _ = load(os.path.join(a.root, f"{arm}_TR"))
+        T, _ = load(os.path.join(a.tr_root or a.root, f"{arm}_TR"))
         cells = {cell(p) for p in H}
         T = {p: v for p, v in T.items() if cell(p) in cells}
         hp = sorted(H)
+        if a.same_as:
+            O, _ = load(os.path.join(a.same_as, f"{arm}_H2"))
+            keep = [i for i, n in enumerate(names) if n not in a.exclude]
+            bad = [p for p in hp if p not in O or not np.array_equal(O[p][0][:, keep], H[p][0][:, keep])
+                   or not np.array_equal(O[p][1], H[p][1])]
+            if bad or set(O) != set(H):
+                raise SystemExit(f"lco_map: dumps not paired with {a.same_as} ({arm}): {bad[:5]}, "
+                                 f"{len(set(O) ^ set(H))} pools in one only")
         vh = {p: float(np.var(H[p][1])) for p in hp}
         vt_by_cell = {}
         for p, v in T.items():
@@ -176,12 +189,12 @@ def main():
         for k, (_, te) in enumerate(GroupKFold(min(10, len(set(klass)))).split(hp, groups=klass)):
             for i in te:
                 fold[hp[i]] = k
-        allc = list(range(len(names)))
-        reads = {"lco": (fold, allc), "lco_factors": (fold, cols_of(names, "factors"))}
+        allc = [i for i, n in enumerate(names) if n not in a.exclude]
+        reads = {"lco": (fold, allc), "lco_factors": (fold, [i for i in cols_of(names, "factors") if i in allc])}
         for g in GROUPS:
             reads[f"lco_drop_{g}"] = (fold, [i for i in allc if i not in cols_of(names, g)])
         reads["loco_cell"] = ({p: cell(p) for p in hp}, allc)
-        R = {"n_H2": len(hp), "n_TR": len(T), "n_classes": len(set(klass)), "n_H2_emitter": int(emit.sum()),
+        R = {"excluded": list(a.exclude), "n_H2": len(hp), "n_TR": len(T), "n_classes": len(set(klass)), "n_H2_emitter": int(emit.sum()),
              "median_var_H2": float(np.median(v1)), "floor_TR_per_cell": fl,
              "median_gap": float(np.median(np.array(v1) - np.array(f1))),
              "median_ceiling_own_K1600": float(np.nanmedian([H[p][2] for p in hp]))}
@@ -205,8 +218,8 @@ def main():
                         R[f"f_lco_{lab}"] = round(f_of(np.array(v1)[m], np.array(v2)[m], np.array(f1)[m]), 4)
             R[f"median_r2_{key}"] = round(float(np.median([1 - vr[p] / vh[p] for p in hp])), 4)
         # the training-pool map: fitted on every TR pool, applied to H2; its own TR score grouped 5-fold by pool
-        m = fit(np.concatenate([v[0] for v in T.values()]), np.concatenate([v[1] for v in T.values()]))
-        vr = {p: float(np.var(H[p][1] - m.predict(H[p][0]))) for p in hp}
+        m = fit(np.concatenate([v[0][:, allc] for v in T.values()]), np.concatenate([v[1] for v in T.values()]))
+        vr = {p: float(np.var(H[p][1] - m.predict(H[p][0][:, allc]))) for p in hp}
         R["f_trainmap"] = round(f_of(v1, [vr[p] for p in hp], f1), 4)
         tp = sorted(T)
         tfold = {p: i % min(5, len(tp)) for i, p in enumerate(tp)}

@@ -277,6 +277,8 @@ def main():
     ap.add_argument("--dump", default="", help="with --prop: the leave-class-out read's stage 1: per probe, 500 events "
                     "(seed 0) of lof_features and u to <dump>/<probe>.npz")
     ap.add_argument("--ceiling", action="store_true", help="with --dump: the own-label ceiling on all the probe's events")
+    ap.add_argument("--exclude", nargs="*", default=[], help="with --ceiling: feature columns left out of the ceiling's "
+                    "fit (t: the scored event's own target, a label; the t-free re-read of 2026-10-31)")
     ap.add_argument("--sidecars", default="data/diagrams", help="the diagram sidecars' directory (--prop)")
     a = ap.parse_args()
     rows = []
@@ -338,7 +340,8 @@ def main():
                     Xf, names = lof_features(mom[ok], pdg[ok], t[ok], logF[ok], logP[ok],
                                              None if logD is None else logD[ok])
                     if a.ceiling:
-                        rec["ceiling_own"] = own_ceiling(Xf, uk)
+                        keep = [i for i, nm in enumerate(names) if nm not in a.exclude]
+                        rec["ceiling_own"] = own_ceiling(Xf[:, keep], uk)
                         rec["ceiling_K"] = int(len(uk) * 4 // 5)
                     pick = np.sort(np.random.default_rng(0).permutation(len(uk))[:500])
                     os.makedirs(a.dump, exist_ok=True)

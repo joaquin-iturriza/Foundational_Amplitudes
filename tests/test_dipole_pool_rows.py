@@ -139,3 +139,33 @@ def test_lco_map_end_to_end_on_a_synthetic_dump(tmp_path):
     assert R["f_lco_factors"] < 0.2
     V = json.load(open(out))["verdict"]
     assert V["per_seed"]["A"]["branch"] == "yes" and V["per_seed"]["A"]["next_arm"] == "the pairs group's term"
+
+
+def test_lco_map_exclude_drops_a_label_column(tmp_path):
+    """With --exclude t, a residual carried only by the t column is not recovered (the t-free re-read)."""
+    import json
+    import subprocess
+    import sys
+    from analysis.catalog_v4 import lco_map
+    tl = json.load(open(os.path.join(os.path.dirname(lco_map.__file__), "data", "tree_levels.json")))
+    ho = [p for ax in tl["heldout"].values() for p, v in ax.items() if f"{v['n']}{v['initial']}" == "6qq"][:12]
+    tr = [p for p, v in tl["train"].items() if f"{v['n']}{v['initial']}" == "6qq"][:6]
+    names = [f"sij{k}" for k in range(15)] + [f"lE{k}" for k in range(4)] + [f"cth{k}" for k in range(4)] + ["lshat"] \
+        + [f"n_{k}" for k in ("g", "a", "q", "b", "l", "nu", "W", "Z", "H", "t")] + ["t", "logF", "logP", "logD"]
+    it = names.index("t")
+    r = np.random.default_rng(0)
+    for ax, ps in (("H2", ho), ("TR", tr)):
+        d = tmp_path / f"A_{ax}"
+        d.mkdir()
+        for p in ps:
+            X = r.normal(size=(500, 38)).astype(np.float32)
+            X[:, 37] = 0
+            u = (-0.8 * X[:, it] if ax == "H2" else 0) + 0.5 * r.normal(size=500)
+            np.savez(d / f"{p}.npz", X=X, u=u, names=np.array(names), var_u=np.var(u), n=2000, ceiling_own=0.6)
+    for ex, big in (([], True), (["--exclude", "t"], False)):
+        out = tmp_path / f"o{len(ex)}.json"
+        run = subprocess.run([sys.executable, lco_map.__file__, "--root", str(tmp_path), "--arms", "A", "--out", str(out)]
+                             + ex, check=False, capture_output=True, text=True)
+        assert run.returncode == 0, run.stderr
+        f = json.load(open(out))["A"]["f_lco"]
+        assert (f > 0.5) if big else (f < 0.1), (ex, f)

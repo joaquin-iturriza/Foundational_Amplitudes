@@ -23,8 +23,19 @@ MODE="${1:-dipole}"; FLAG=(); TAG=DIPOLE_RESIDUAL
 # features and u to $SCRATCH/zz_v4_lco_dump/<arm>_<axis>, the own-label ceiling on H2; $1 = lco: its stage 2
 # (analysis/catalog_v4/lco_map.py over that dump, every arm). $4 = a probes file: the dry run, dumped to
 # $SCRATCH/zz_v4_lco_dry instead (stage 2 on it: $1 = lco, $2 = zz_v4_lco_dry)
+# $1 = lcodump_not / lco_not: the t-free re-read (2026-10-31; t, the scored event's own target, is a label): stage 1
+# on the held-out pools only, the ceiling refitted without t, dumped to $SCRATCH/zz_v4_lco_dump_not; stage 2 with t
+# excluded, its training pools from the first dump
+NOT=(); [ "$MODE" = lcodump_not ] && { MODE=lcodump; NOT=(--exclude t); DUMPNOT=1; }
 [ "$MODE" = lcodump ] && TAG=LCO_DUMP
-DUMP=zz_v4_lco_dump; [ -n "${4:-}" ] && DUMP=zz_v4_lco_dry
+DUMP=zz_v4_lco_dump; [ -n "${4:-}" ] && DUMP=zz_v4_lco_dry; [ -n "${DUMPNOT:-}" ] && DUMP=zz_v4_lco_dump_not
+if [ "$MODE" = lco_not ]; then
+    OUT="$SCRATCH/zz_v4_lco_not_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
+    export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
+    python analysis/catalog_v4/lco_map.py --root "$SCRATCH/zz_v4_lco_dump_not" --tr-root "$SCRATCH/zz_v4_lco_dump" --same-as "$SCRATCH/zz_v4_lco_dump" \
+        --exclude t --out "$OUT/lco_map_not.json" || exit 1
+    echo "V4_LCO_NOT_DONE $OUT"; exit 0
+fi
 if [ "$MODE" = lco ]; then
     OUT="$SCRATCH/zz_v4_lco_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
     export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
@@ -38,7 +49,7 @@ for arm in $ARMS; do
         d="$SCRATCH/zz_v4_short_$arm/$ax"
         [ -d "$d" ] || { echo "missing $d"; exit 1; }
         if [ "$MODE" = lcodump ]; then
-            FLAG=(--prop --dump "$SCRATCH/$DUMP/${arm}_$ax"); [ "$ax" = H2 ] && FLAG+=(--ceiling)
+            FLAG=(--prop --dump "$SCRATCH/$DUMP/${arm}_$ax"); [ "$ax" = H2 ] && FLAG+=(--ceiling "${NOT[@]}")
             [ -n "${4:-}" ] && FLAG+=(--probes "$4")
         fi
         s=$(python analysis/catalog_v4/dipole_residual.py "$d" "${FLAG[@]}" --out "$OUT/${arm}_$ax.json") || exit 1
