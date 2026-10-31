@@ -37,7 +37,8 @@ partonic frame being the beams' c.o.m. (a boost along z of the lab frame):
     loc_var      std of t over the 10 nearest events of the probe in the partonic-frame final momenta / sqrt(s_hat),
                  over the probe's std of t (the target's local variation)
 Per probe (constant inside a probe): n_final, n_massive, n_gluon, n_quark (b included), n_lepton (charged), n_nu,
-n_photon, n_heavy (W, Z, H, t), as_pow and aew_pow (the order vector's alpha_s and alpha_ew powers, physics check),
+n_photon, n_heavy (W, Z, H, t), as_pow and aew_pow (the alpha_s and alpha_ew powers of mg5_pipeline_final.order_vector of the
+probe's catalog entry, v4_<process>; nan when the table lacks it),
 loop (one-loop target), pp (hadronic beams), t_std and t_mean (the probe's spread and level of log|M|^2), trained.
 
 Targets per event: ae = |q - t|; s (het). Within a probe: ae_n = ae / probe RMSE, s_n = s / probe median s.
@@ -64,6 +65,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 DATA = os.path.join(HERE, "data")
 FIGS = os.path.join(HERE, "figs")
 sys.path.insert(0, HERE)
+sys.path.insert(1, ROOT)
 
 HELD = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")    # mixture_ab.HELD
 AXES = ("PP4", "EE4", "HD4", "HD5") + HELD
@@ -200,16 +202,14 @@ def event_features(P, t):
     return f
 
 
-def find_key(chk, key):
-    """a key anywhere in the physics-check record (its layout differs between versions)"""
-    if isinstance(chk, dict):
-        if isinstance(chk.get(key), list):
-            return chk[key]
-        for v in chk.values():
-            r = find_key(v, key)
-            if r is not None:
-                return r
-    return None
+def order_of(probe):
+    """mg5_pipeline_final.order_vector of the probe's catalog_v4 entry (the name mixture_ab.class_of reads)"""
+    try:
+        import mg5_pipeline_final as mg
+        c = mg.PROCESSES.get("v4_" + probe.split("_", 1)[1])
+        return [float(x) for x in mg.order_vector(c)] if c is not None else None
+    except Exception:
+        return None
 
 
 def process_features(ids, masses, ov, axis, trained, t):
@@ -227,8 +227,8 @@ def process_features(ids, masses, ov, axis, trained, t):
 
 
 def read_task(task):
-    """one (axis, probe): the event features once (from the first kept run's pool rows; a run with other rows gets its
-    own), then each run's targets and per-probe measures"""
+    """one (axis, probe): the event features once per distinct event set (pool and rows) of the runs kept, then each
+    run's targets and per-probe measures"""
     axis, probe, files, trained = task
     rng = np.random.default_rng(int(hashlib.md5(probe.encode()).hexdigest()[:8], 16))
     excluded, runs = {}, {}
@@ -237,8 +237,9 @@ def read_task(task):
             d = np.load(f)
             t, q = d["t"].astype(np.float64), d["q"].astype(np.float64)
             s = d["s"].astype(np.float64) if RUNS[arm][0] == "het" else None
-            chk = json.loads(str(d["physics_check"])) or {}
-            rows, pool = np.asarray(d["pool_row"]), str(d["pool"])
+            chk = (json.loads(str(d["physics_check"])) or {}) if "physics_check" in d.files else {}
+            rows = np.asarray(d["pool_row"]) if "pool_row" in d.files else np.zeros(0, np.int64)
+            pool = str(d["pool"]) if "pool" in d.files else ""
         except Exception as e:
             excluded[arm] = f"unreadable: {type(e).__name__}: {e}"
             continue
@@ -251,39 +252,44 @@ def read_task(task):
         elif not ok:
             excluded[arm] = f"physics {st}"
         elif len(rows) != len(t):
-            excluded[arm] = "no pool rows"
+            excluded[arm] = "no pool rows saved (a read older than the pool_row field)"
         else:
             runs[arm] = dict(t=t, q=q, s=s, pool=pool, rows=rows, chk=chk)
     if not runs:
         return axis, probe, None, excluded
-    ref = next(iter(runs.values()))
-    try:
-        a = np.load(ref["pool"], mmap_mode="r")
-        k = (a.shape[1] - 1) // 5
-        assert 5 * k + 1 == a.shape[1], a.shape
-        rows = np.asarray(a[ref["rows"]])
-        P = rows[:, :4 * k].astype(np.float64).reshape(-1, k, 4)
-        ids = rows[0, 4 * k:5 * k]
-        masses = np.sqrt(np.clip(np.median(mdot(P, P), axis=0), 0, None))[2:]
-        ev = event_features(P, ref["t"])
-        pr = process_features(ids, masses, find_key(ref["chk"], "order_vector"), axis, trained, ref["t"])
-    except Exception as e:
-        return axis, probe, None, {**{arm: f"features: {type(e).__name__}: {e}" for arm in runs}, **excluded}
-    n = len(ref["t"])
-    sub = np.sort(rng.choice(n, size=min(SUB, n), replace=False))
-    out = {"n": n, "pr": pr, "ev_sub": {k_: v[sub].astype(np.float32) for k_, v in ev.items()},
-           "ev_med": {k_: float(np.nanmedian(v)) if np.isfinite(v).any() else None for k_, v in ev.items()},
-           "runs": {}}
+    feats, sets = {}, {}       # one feature set per distinct (pool, rows): the runs' reads draw their own events
     for arm, r in runs.items():
-        same = len(r["rows"]) == n and np.array_equal(r["rows"], ref["rows"]) and r["pool"] == ref["pool"] \
-            and np.allclose(r["t"], ref["t"], atol=1e-4)
-        if not same:
-            excluded[arm] = "event set differs from the other runs' read of this probe"   # listed, not mixed in
-            continue
+        key = (r["pool"], hashlib.md5(r["rows"].tobytes()).hexdigest())
+        if key not in sets:
+            try:
+                a = np.load(r["pool"], mmap_mode="r")
+                k = (a.shape[1] - 1) // 5
+                assert 5 * k + 1 == a.shape[1], a.shape
+                rows = np.asarray(a[r["rows"]])
+                P = rows[:, :4 * k].astype(np.float64).reshape(-1, k, 4)
+                assert np.allclose(rows[:, -1] * 0 + 1, 1)
+                masses = np.sqrt(np.clip(np.median(mdot(P, P), axis=0), 0, None))[2:]
+                sets[key] = (event_features(P, r["t"]),
+                             process_features(rows[0, 4 * k:5 * k], masses, order_of(probe),
+                                              axis, trained, r["t"]))
+            except Exception as e:
+                excluded[arm] = f"features: {type(e).__name__}: {e}"
+                continue
+        feats[arm] = sets[key]
+    if not feats:
+        return axis, probe, None, excluded
+    out = {"pr": next(iter(feats.values()))[1], "runs": {}, "n_event_sets": len(sets)}
+    for arm, (ev, pr) in feats.items():
+        r = runs[arm]
         t, q, s = r["t"], r["q"], r["s"]
+        n = len(t)
+        sub = np.sort(rng.choice(n, size=min(SUB, n), replace=False))
         ae = np.abs(q - t)
         rmse = float(np.sqrt(np.mean((q - t) ** 2)))
-        x = {"rmse": rmse, "bias": float(np.mean(q - t)), "ae_sub": (ae / max(rmse, 1e-300))[sub].astype(np.float32),
+        x = {"n": n, "pr": pr, "rmse": rmse, "bias": float(np.mean(q - t)),
+             "ev_sub": {k_: v[sub].astype(np.float32) for k_, v in ev.items()},
+             "ev_med": {k_: float(np.nanmedian(v)) if np.isfinite(v).any() else None for k_, v in ev.items()},
+             "ae_sub": (ae / max(rmse, 1e-300))[sub].astype(np.float32),
              "ae_raw_sub": ae[sub].astype(np.float32), "rho_ae": {}, "mi_ae": {}}
         if s is not None:
             ms = float(np.median(s))
@@ -332,17 +338,13 @@ def probe_cmd():
             continue
         d = np.load(x[2][0][1])
         print(ax, x[1], sorted(d.files))
-        if "physics_check" in d.files:
-            c = json.loads(str(d["physics_check"])) or {}
-            flat = lambda z, pre="": sum([flat(v, pre + k + ".") if isinstance(v, dict) else [pre + k] for k, v in z.items()], [])
-            print("  physics_check keys", flat(c)[:80])
         t0 = time.time()
         o = read_task(x)
         print("  one probe", round(time.time() - t0, 2), "s; excluded", o[3])
         if o[2]:
             r0 = next(iter(o[2]["runs"].values()))
-            print("  event sets", o[2]["n_event_sets"], "ev_med", {k: round(v, 3) for k, v in r0["ev_med"].items() if v is not None},
-                  "\n  pr", o[2]["pr"],
+            print("  event sets", o[2]["n_event_sets"], "ev_med",
+                  {k: round(v, 3) for k, v in r0["ev_med"].items() if v is not None}, "\n  pr", o[2]["pr"],
                   "\n  rmse", {a: round(r["rmse"], 3) for a, r in o[2]["runs"].items()})
 
 
@@ -381,9 +383,10 @@ def stack(arm, ps, key):
     return np.concatenate([x[3]["runs"][arm][key] for x in ps]).astype(np.float64)
 
 
-def feat_matrix(ps):
-    ev = {f: np.concatenate([x[3]["ev_sub"][f] for x in ps]).astype(np.float64) for f in EV_FEATS}
-    pr = {f: np.concatenate([np.full(len(x[3]["ev_sub"]["t_level"]), x[3]["pr"][f]) for x in ps]) for f in PR_FEATS}
+def feat_matrix(arm, ps):
+    rr = [x[3]["runs"][arm] for x in ps]
+    ev = {f: np.concatenate([r["ev_sub"][f] for r in rr]).astype(np.float64) for f in EV_FEATS}
+    pr = {f: np.concatenate([np.full(len(r["ev_sub"]["t_level"]), r["pr"][f]) for r in rr]) for f in PR_FEATS}
     return {**ev, **pr}
 
 
@@ -411,7 +414,7 @@ def group_stats(arm, loss, ps, rng):
                       "frac_pos": r4(np.mean(v > 0)) if len(v) else None, "n": int(len(v)),
                       "mi_med": r4(np.median(mi)) if len(mi) else None}
         out["within"][fn] = w
-    F = feat_matrix(ps)
+    F = feat_matrix(arm, ps)
     T = {"ae_n": stack(arm, ps, "ae_sub"), "ae": stack(arm, ps, "ae_raw_sub")}
     if het:
         T.update(s_n=stack(arm, ps, "s_sub"), s=stack(arm, ps, "s_raw_sub"))
@@ -437,10 +440,11 @@ def group_stats(arm, loss, ps, rng):
     by = {}
     for x in ps:
         by.setdefault(x[2], []).append(x[3])
-    crm = np.array([math.sqrt(np.average([o["runs"][arm]["rmse"] ** 2 for o in os_], weights=[o["n"] for o in os_]))
+    crm = np.array([math.sqrt(np.average([o["runs"][arm]["rmse"] ** 2 for o in os_],
+                                         weights=[o["runs"][arm]["n"] for o in os_]))
                     for os_ in by.values()])
     cms = np.array([np.median([o["runs"][arm]["med_s"] for o in os_]) for os_ in by.values()]) if het else None
-    val = lambda o, fn: (o["ev_med"].get(fn) if fn in EV_FEATS else o["pr"][fn])
+    val = lambda o, fn: (o["runs"][arm]["ev_med"].get(fn) if fn in EV_FEATS else o["runs"][arm]["pr"][fn])
     for fn in EV_FEATS + PR_FEATS:
         cf = np.array([np.nanmedian([np.nan if val(o, fn) is None else val(o, fn) for o in os_])
                        if any(val(o, fn) is not None and np.isfinite(val(o, fn)) for o in os_) else np.nan
@@ -458,10 +462,10 @@ def gbt(arm, loss, ps, workers):
     except Exception as e:
         return {"error": f"no sklearn: {e}"}
     het = loss == "het"
-    F = feat_matrix(ps)
+    F = feat_matrix(arm, ps)
     names = list(F)
     X = np.stack([F[f] for f in names], 1)
-    half = np.concatenate([np.full(len(x[3]["ev_sub"]["t_level"]), int(hashlib.md5(x[2].encode()).hexdigest()[:8], 16) % 2)
+    half = np.concatenate([np.full(len(x[3]["runs"][arm]["ev_sub"]["t_level"]), int(hashlib.md5(x[2].encode()).hexdigest()[:8], 16) % 2)
                            for x in ps])
     T = {"log_ae": np.log10(np.clip(stack(arm, ps, "ae_raw_sub"), 1e-12, None)),
          "log_ae_n": np.log10(np.clip(stack(arm, ps, "ae_sub"), 1e-12, None))}
