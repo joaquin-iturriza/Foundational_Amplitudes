@@ -640,8 +640,38 @@ def summary(path=None):
                     rows[fn] = vals
                 tab[f"{loss}_{tgt}"] = rows
         out["tables"][g] = tab
+    out["ranking"] = ranking(raw)
     json.dump(out, open(os.path.join(DATA, "error_correlates.json"), "w"), indent=1)
     figures(raw)
+    return out
+
+
+def ranking(raw):
+    """per read group and target, the control's features ordered by the mean over its two seeds of |within-probe
+    median Spearman| (event features) and of |class-level Spearman| (every feature), with both seeds' values and the
+    four share arms' range"""
+    out = {}
+    pairs = {"het": ("v4_het_control", "v4_het_control_seed2"), "mse": ("v4_dimensionless_muon", "v4_dimensionless_muon_seed2")}
+    arms = {"het": [a for a, v in RUNS.items() if v[0] == "het" and v[1] != "control"],
+            "mse": [a for a, v in RUNS.items() if v[0] == "mse" and v[1] != "control"]}
+    for g in READ_GROUPS:
+        for loss, tgts in (("het", ("ae", "s")), ("mse", ("ae",))):
+            for tgt in tgts:
+                key = "rmse" if tgt == "ae" else "med_s"
+                st = lambda a: raw["per_run"].get(a, {}).get(g)
+                ctl = [st(a) for a in pairs[loss] if st(a)]
+                oth = [st(a) for a in arms[loss] if st(a)]
+                if not ctl:
+                    continue
+                w = {f: [x["within"][f][tgt]["rho_med"] for x in ctl] for f in EV_FEATS}
+                c = {f: [x["classes"][f][key] for x in ctl] for f in EV_FEATS + PR_FEATS}
+                score = lambda v: float(np.mean([abs(z) for z in v if z is not None])) if any(z is not None for z in v) else -1
+                out[f"{g} {loss} {tgt}"] = {
+                    "n_probes_control": [x["n_probes"] for x in ctl], "n_classes_control": [x["n_classes"] for x in ctl],
+                    "within": [(f, w[f], [min((x["within"][f][tgt]["rho_med"] for x in oth if x["within"][f][tgt]["rho_med"] is not None), default=None),
+                                          max((x["within"][f][tgt]["rho_med"] for x in oth if x["within"][f][tgt]["rho_med"] is not None), default=None)])
+                               for f in sorted(EV_FEATS, key=lambda f: -score(w[f]))],
+                    "classes": [(f, c[f]) for f in sorted(EV_FEATS + PR_FEATS, key=lambda f: -score(c[f]))][:12]}
     return out
 
 
