@@ -1536,6 +1536,7 @@ class AmplitudeExperiment(BaseExperiment):
         if stats_src is not None:
             with open(stats_src) as f:
                 stats = json.load(f)
+            self._check_frozen_orders_source(stats)
             _dms_frozen = stats.get("dimless_mass_stats")
             _cp_frozen = stats.get("target_physics_hybrid_cp")
             mom_div    = float(stats["mom_div"])
@@ -2435,12 +2436,18 @@ class AmplitudeExperiment(BaseExperiment):
             # sidecar also corrects the order vector's alpha_s power where it is wrong: v4's b-quark Higgs entries
             # (massless b, no Yukawa: purely electroweak) and the gluon of zp_uux_Y1g and thdm_uux_h2h3g; the order
             # features read the same sidecar (_orders_from_diagrams), so input and target agree
-            if pc.get("order") is None:
+            from_diag = bool(self.cfg.data.get("orders_from_diagrams", True))
+            if from_diag and pc.get("order") is None:
                 bo = self._diagram_born_orders(name)
                 if bo is not None:
                     q, e = mg.target_monomial_from_diagrams(pc, bo)
-            assert not (int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg), \
-                f"target_physics_orders: {name} is a mixed-order entry {o} with no diagram sidecar to read its powers"
+            _mixed = int(o[1]) == 0 and (int(o[0]) == 0 or virt) and q + e > deg
+            if from_diag:
+                assert not _mixed, \
+                    f"target_physics_orders: {name} is a mixed-order entry {o} with no diagram sidecar to read its powers"
+            else:
+                assert not _mixed, \
+                    f"target_physics_orders: {name} is a mixed-order entry {o} (data.orders_from_diagrams=false): coupling homogeneity is not exact"
             a_em = 1.0 / float(self.cfg.data.get("target_physics_alpha_inv", 132.507))
             lord = q * np.log(4 * np.pi * np.asarray(alphas, dtype=np.float64)) + e * np.log(4 * np.pi * a_em)
         n_eik, leik = 0, 0.0
@@ -2573,6 +2580,18 @@ class AmplitudeExperiment(BaseExperiment):
             n += 1
         return n, out
 
+    def _target_orders_source(self):
+        """Where the target's coupling monomial comes from: the diagrams' highest alpha_s power or the table."""
+        return "diagrams_highest_alphas" if bool(self.cfg.data.get("orders_from_diagrams", True)) else "table"
+
+    def _check_frozen_orders_source(self, stats):
+        """Refuse a reload of frozen stats whose target monomial came from the other source (stats without the key: table)."""
+        if not bool(self.cfg.data.get("target_physics_orders", False)):
+            return
+        a, b = stats.get("target_physics_orders_source", "table"), self._target_orders_source()
+        assert a == b, (f"frozen data stats were fitted with target_physics_orders_source={a}, "
+                        f"this run sets {b} (data.orders_from_diagrams)")
+
     def _save_data_stats(self, stats_path, mom_div, amp_trafos, per_dataset):
         """Write the frozen data statistics (data_stats.json) a resume / fine-tune / rebuild reloads."""
         with open(stats_path, "w") as f:
@@ -2593,6 +2612,7 @@ class AmplitudeExperiment(BaseExperiment):
                 "target_physics_dim_only": bool(self.cfg.data.get("target_physics_dim_only", False)),
                 "target_physics_eikonal": bool(self.cfg.data.get("target_physics_eikonal", False)),
                 "target_physics_orders": bool(self.cfg.data.get("target_physics_orders", False)),
+                "target_physics_orders_source": self._target_orders_source(),
                 "target_physics_hybrid": bool(self.cfg.data.get("target_physics_hybrid", False)),
                 "target_physics_hybrid_cp": getattr(self, "_phys_cp", None) or None,
                 "target_physics_hybrid_blend": float(self.cfg.data.get("target_physics_hybrid_blend", 0.0)),

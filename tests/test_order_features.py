@@ -160,7 +160,41 @@ def test_site():
         print(f"[site] {os.path.basename(rf)}: {3 * len(hit)} affected pools are cache hits (keys unchanged)")
 
 
+def test_frozen_orders_source():
+    """The frozen stats record where the target monomial came from; a reload under the other source is refused."""
+    from types import SimpleNamespace
+    from experiment import AmplitudeExperiment as E
+
+    def exp(**data):
+        e = SimpleNamespace(cfg=SimpleNamespace(data=data))
+        e.cfg.data = type("D", (dict,), {})(data)
+        e._target_orders_source = lambda: E._target_orders_source(e)
+        return e
+
+    def check(e, stats):
+        E._check_frozen_orders_source(e, stats)
+
+    def refused(e, stats):
+        try:
+            check(e, stats)
+        except AssertionError as err:
+            assert "target_physics_orders_source" in str(err)
+            return True
+        return False
+
+    on = dict(target_physics_orders=True)
+    assert E._target_orders_source(exp(**on)) == "diagrams_highest_alphas"          # unset counts as true
+    assert E._target_orders_source(exp(orders_from_diagrams=False, **on)) == "table"
+    assert refused(exp(**on), {})                                                    # no key = table, run reads diagrams
+    assert refused(exp(orders_from_diagrams=False, **on), {"target_physics_orders_source": "diagrams_highest_alphas"})
+    check(exp(orders_from_diagrams=False, **on), {})
+    check(exp(**on), {"target_physics_orders_source": "diagrams_highest_alphas"})
+    check(exp(), {})                                                                 # orders off: passes
+    print("frozen orders source ok")
+
+
 if __name__ == "__main__":
+    test_frozen_orders_source()
     test_from_diagrams()
     test_recipe_id_ignores_orders()
     if os.environ.get("FA_TEST_SITE"):
