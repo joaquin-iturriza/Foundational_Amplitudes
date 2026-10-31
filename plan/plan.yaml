@@ -6095,6 +6095,35 @@ entries:
       its hand-read OK count within one, and its $ per task with rework at most 0.6x Opus-low''s. No: keep Opus at low effort
       for mechanical steps (D138) and record the trial as a dead end for routing. Either way the per-task results go to Joaquin;
       a routing change is a CLAUDE.md line he approves.'
+    fix_at: '2026-10-31T00:54:22+00:00'
+    fix: 'Check 2 (measure responds to a correct fix, shown): 6 of the 10 checks test the fix author''s own new names, not
+      the behaviour, and the brief does not give them. At each parent none of these names exists: zsrole needs rebuild_run.stand_in_split_set,
+      stand_in_role and recipe_role_counts, and literal source strings in zero_shot_parent.py (''datagen.ensure_split_set
+      = stand_in_split_set('' and ''"own_stats_role": own_stats_role''); hybridcp needs physics_scales.hybrid_cp and hybrid_cps(names,
+      getter, frozen=) returning (cps, reused); poolrow needs analysis.catalog_v4.dipole_residual.pool_rows; loopenc needs
+      _LOOP_LINES and the labels in a fixed order; ftorders needs catalog_ft.parent_orders_flag and command(..., orders_from_diagrams=);
+      ordsrc needs _check_frozen_orders_source and the key target_physics_orders_source. A correct fix under other names fails
+      first_pass in both arms, so first_pass on these 6 measures guessing identifiers and is near-floor for both models. The
+      rework round then hands over the check output, which shows those names, so final_pass becomes ''implement the test''s
+      interface''. Validate only shows each test separates C^ from C. It does not show that the check accepts a different
+      correct fix. Also analysis/agent_redesign/model_trial_validate.json did not exist when I read it (the rerun was still
+      going), so the ten fail-at-parent and pass-at-fix numbers could not be confirmed. Fix: for each task either (a) put
+      in the brief the interface the test calls (function names, signatures, record keys; never the body), identical in both
+      arms, or (b) replace the test with one that goes only through entry points that exist at C^, or (c) drop the task and
+      pick another by the validate rule. Remove or rewrite source-string asserts like zsrole''s. Then show on at least one
+      task that a hand-written fix differing from C (other internals) passes. Commit the validate JSON and quote its numbers.
+      defshare, poolphys, skipclaim and stallshort call only names that exist at the parent (default_share_rows, check_probe,
+      cmd_plan), so they look fine. Check 6 and check 7 (the approved scope): next step 4, as D203 approved it, was 10 small
+      tool-fix and analysis tasks. The design has only tool fixes, yet its yes outcome routes ''small tool fixes and analyses''
+      to Sonnet. Fix: include analysis tasks as next 4 described (with a check that can see a wrong analysis), or limit the
+      yes outcome to tool fixes and say that analyses are untested, a narrowing that goes to Joaquin. Check 3, advisory: one
+      run per arm per task with 10 pairs gives a binomial spread of about 0.13 on a pass rate near 0.8, wider than the 0.1
+      rule. The design calls this indicative, which is acceptable at the approved size of 10. Keep the paired-discordance
+      reading, and also state the per-task cost ratio spread (sonnet/opus-low $ per pair, median and range) rather than only
+      the ratio of totals. Checks 1, 4 and 5 hold: the model-and-effort difference is the question as D203 states it; yes
+      and no are stated; for prior work I searched docs/results.tex for sonnet, haiku, opus, low effort, model trial and reasoning
+      effort (nothing), the decisions (D138, D203, D205, D206) and the entry''s evidence (agent_tasks.json), which match the
+      design''s prior field.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
