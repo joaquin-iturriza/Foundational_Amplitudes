@@ -6887,6 +6887,14 @@ entries:
       ran on an H100 (0.33 s/step) and read 3260 probes in 3751 s; total 1.57 h. Cause: the two pp read sets (1396 + 1301
       probes at about 2 s each, the model and data rebuilt for every probe) and, in the het arms, 70 min of composition at
       load.'
+  - at: '2026-10-31T15:27:09+00:00'
+    text: 'Step-18 gridpool probes FA-ccin2p3-1ba52b78 (e+e- -> photon photon c cbar, 20 TeV energy point) and fa070157 (e+e-
+      -> c cbar d dbar, same point), events E3344/E3345: COMPLETED with rc=137 from the job''s own early kill (timeout -s
+      KILL at limit-300 s, 85 min into a 1:30 limit), not memory. Each job runs three beam-energy grids (3, 5, 10 TeV beams)
+      serially, 2 runs of 1000 events per grid; run time grows with energy: photon photon c cbar 177/196 s, 340/1784 s, 1255
+      s (second 10 TeV run cut); c cbar d dbar 128/243 s, 3509/3524 s, none at 10 TeV. Yield 1.0 in every run. Layout defect:
+      next pass one job per pool and energy (GP_ENERGY), limits from these times; missing points: the second 10 TeV run of
+      the first pool and both 10 TeV runs of the second.'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
