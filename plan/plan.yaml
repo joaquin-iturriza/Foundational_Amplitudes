@@ -6426,6 +6426,9 @@ entries:
       no catalog_v4 training pools). Het arms added (9eaa04d6): v4_het_control/default50/default25[_seed2], only the loss
       changed (HETEROSC, the parent config''s het defaults, sign head off), reads from <run>/sigma_stage; design recorded,
       design reviewer launched.'
+  - at: '2026-10-31T04:49:56+00:00'
+    text: '2026-10-31: CLAUDE.md rule on absence claims (whole search, never truncated) sent to a mechanical worker; its diff
+      goes to Joaquin when committed.'
   handoff:
     state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
       @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
