@@ -3421,9 +3421,10 @@ entries:
   - D189
   - D227
   next:
-    14: 'Step 14 done, verdict trade-off (par:v4_mixture, mixture_ab.json): Joaquin chooses catalog_v4''s default share (none,
-      0.25 or 0.50, or a smaller share tested); the chosen recipe is composed at load (D207), no pools to build; then close
-      the entry after the backlog review'
+    14: 'Step 20 verdict WIN for both shares under MSE and het, default25 by the tie rule (par:v4_mixture, c70595af; mixture_ab.json,
+      mixture_ab_het.json): Joaquin chooses catalog_v4''s default share (none, 0.25 or 0.50); the chosen recipe is composed
+      at load (D207), no pools to build; catalog_v4_train.yaml unchanged until he chooses; H3 (top classes) open at MSE 1.133/1.082
+      with intervals across 1'
     15: 'Het-loss uncertainty read (D220): where the network is uncertain on the mixture arms vs control; first check whether
       an existing het-loss run can be re-read; GPU-h stated before any run'
     16: 'Once the share is chosen (catalog final): longer and wider muP pretrainings (D219); grid of lengths x widths x seeds
@@ -6463,8 +6464,8 @@ entries:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
       if:
       - 'Joaquin picks a share: catalog_v4_train.yaml takes that share''s f_default and default_source; check_site_data on
-        it'
-      - 'Joaquin keeps the current mixture: close the entry with the write-up 614d512c'
+        it; close after the backlog review'
+      - 'Joaquin keeps the current mixture: close the entry with the write-up c70595af'
     15:
       feeds: 'D220: the catalog_v4 default share'
       if:
