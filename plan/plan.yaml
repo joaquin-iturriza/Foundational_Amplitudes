@@ -6249,6 +6249,39 @@ entries:
       interval of width 8 at 16x (capacity not the limit at this data). A cell that blows up or ends before its best checkpoint
       is listed apart; the 16x lr is an extrapolation of the law past its measured high-D range, so a 16x width-8 run whose
       best checkpoint sits before 60% of its steps reads as lr too high, reported, not refit.'
+    fix_at: '2026-10-31T22:27:37+00:00'
+    fix: '(1) Training loss (check 9): the design trains every cell with the MSE loss and sign head (arm v4_dimensionless_muon_default25),
+      but the heteroscedastic loss is the default for every run (D226, 2026-10-31: ''We showed that het loss was better than
+      mse, we reran all our main results with het loss, and decided it was the default''; D52, D71) and no reason for MSE
+      is given. Fix: run the grid with HETEROSC (sigma-only end stage D70, clip 5 D72, checkpoint rule D62/D85 as the het
+      arms used), with the existing share-0.25 het pair as the 1x width-8 control (FA-ccin2p3-f0156d88, df858d33 in mixture_ab_het.json);
+      or state why MSE and get it past Joaquin. Note the het share arms spiked to 1e8-2e9 near step 2000-2100 (mixture_ab_het.json
+      blowups) before recovering: say how longer het runs are watched for that. (2) One change at a time / untuned arms (check
+      1): a length cell differs from the control in steps, in lr and in events per process (1e4, 4e4, full pool; 6, 6 and
+      9.7 epochs), so ''longer helps / does not help'' is length plus data plus an untested lr. The lr rule (inverted-U law,
+      t^-0.55) and the muP width transfer (eta* flat over num_heads 2-32) in results.tex were measured on AdamW sweeps (the
+      remark ties t*~3e3 to Adam''s second-moment EMA); the runs use MuonAdamW, for which neither horizon nor width transfer
+      is measured here, and results.tex itself says the high-D high-t corner is an extrapolation to sweep +-1/2 decade around,
+      not to set. An lr off at 4x/16x or at width 32 gives exactly the ''no'' outcomes (no length gain, width within seeds).
+      Fix: (a) state the length axis as steps-and-data scaling if data keeps growing with length (and fit L(C) knowing D changes
+      along C), or hold events per process fixed across lengths; (b) measure the lr before the grid with a short single-fidelity
+      DyHPO on lr at the 4x horizon width 8 (and a check that eta* transfers under Muon at width 32, e.g. the same sweep at
+      1x width 32), per CLAUDE.md''s HP rule; or justify skipping it with data, and then make the outcome''s ''no'' branches
+      conditional on the lr check (best checkpoint position both ways: early = lr too high, the 60% rule; last step with the
+      loss still falling = too low or too short). (3) Measure shown to move with width (check 2): the design concedes no width
+      data. The length check is confirmed (ee->ttbar het 2.9e-8 -> 1.2e-8 -> 5.1e-9 at 8k/16k/32k, results.tex par. het trained
+      longer; catalog share runs best at 4250-4264 of 4264 in mixture_ab.json). For width, either cite existing loss-vs-num_heads
+      data (the muP sweep trials hold val loss by width at matched horizon) or stage the grid: the 1x width-16/32 cells run
+      first, with a stated rule for whether the 4x/16x width cells go ahead. (4) Outcome (check 4): there is no ''no'' branch
+      for length (4x/16x within the seed interval of 1x, or worse) and no statement of what each answer changes for the entry
+      (which cell becomes the catalog_v4 foundation, whether a wider or longer next round is proposed, what goes to Joaquin).
+      Add both. (5) Prior work (check 5/7): the prior names next 7 of the preprocessing exploration (''(a) capacity and training
+      length for the held-out multiplicity gap'', D216 ''we eventually want to do a''), which this grid is; add its read (par:v4_shape_gap,
+      median e on the 218 H2 held-out multiplicity pools, eval-only) to the measures so (a) is answered from these runs, not
+      rerun later. Also, cost: at the design''s own scaling width 32 at 16x is about 68224 x 4.04 s = 77 h of steps before
+      evaluation; state the wall time per cell against the site''s limit and how a cell that does not fit is split (resume
+      chain), before the cost goes to Joaquin. Checks that hold: seeds 42/43 against the share A/B''s widened intervals (share-0.25
+      PP4 R 0.450 [0.360,0.556], held-out 0.638); reads on the default-sampled pools D227 asks; no label in inputs.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
