@@ -1790,6 +1790,64 @@ entries:
       is small (0.042 on both seeds), with bootstrap and seed margins. The prior now covers par:v4_kshot_level and the context
       vector''s K-shot fits. Terms searched before: kNN, gradient boosting, flexible fit, residual, ceiling, few-shot, K-shot,
       context vector, stand-in, par:v4_prop, par:v4_dipole. The read stays within D178.'
+  - at: '2026-10-31T01:14:25+00:00'
+    question: 'Is the extra per-event residual of catalog_v4''s held-out multiplicity pools (par:v4_shape_gap: var(u) held
+      out above training; par:v4_prop: single-scalar ceiling eta^2 0.122/0.119 held out against 0.036/0.041 training) a systematic
+      extrapolation error shared across held-out processes, so that one event-level prior could carry it? A CPU read on the
+      control pair''s existing zero-shot reads: a gradient-boosted map of u on leg-order-free event features, fitted on the
+      held-out multiplicity pools of the other classes and applied to each left-out class with none of its labels; the share
+      f of the gap it removes. New design after the joint read''s dead end (two FIX verdicts 2026-10-31: per-pool own-label
+      fit was K-shot; a training-pool map is near-blind because training residuals hold little per-event structure). Feeds
+      D178.'
+    prior: 'Searched docs/results.tex (par:v4_dipole, par:v4_prop, par:v4_shape_gap, par:v4_mult_cand, par:v4_kshot_level,
+      the context vector''s K-shot fits on catalog_v3, the surrogates and norm_explore6.py, catalog_v2''s residual profile),
+      the plan''s dead ends, site decisions D86, D178; terms leave-one-out, leave-class-out, cross-process, kNN, gradient
+      boosting, flexible fit, residual, ceiling, K-shot, context vector, stand-in. Found: (i) par:v4_dipole: log D dead end
+      (gate 0.094, residual r^2 0.005/0.007 level with placebos). (ii) par:v4_prop: log P between (eta^2 0.042 vs 0.015 training,
+      above placebos, under half the 0.12 ceiling). (iii) par:v4_kshot_level and the context K-shot fits use the scored process''s
+      labels; this read uses none of them. (iv) The joint read''s two designs (dead end 2026-10-31): the per-pool fit (K-shot)
+      and the training-pool map (near-blind); the latter kept here only as a diagnostic. No prior leave-class-out read of
+      the residual found.'
+    measure: 'Per probe (H2: the 218 held-out multiplicity pools, all 6-particle, cells 6bb 28, 6bg 6, 6bq 8, 6ee 21, 6gg
+      17, 6qg 28, 6qq 110; TR: the 647 training pools of the same cells; seeds 42 and 43; rows by pool_rows(), alignment checked,
+      refused counted): 500 events per pool drawn with seed 0, plus all 2000 read events for the ceiling. Features, leg-order-free:
+      the sorted log s_ij/s_hat over the 15 pairs, the sorted final legs'' log E/sqrt(s_hat) and |cos theta|, log s_hat, the
+      counts of final gluons, photons, light quarks, b, charged leptons, neutrinos, W, Z, H, t, and the factors t, logF, log
+      P, log D (0 where none). u = (q - t) minus the pool mean. Map: sklearn HistGradientBoostingRegressor (300 iterations,
+      defaults, random_state 0). Deciding read, leave-class-out: classes from analysis/catalog_v4/census_classes.json (each
+      of the 218 H2 pools is its own class there); the 218 classes split into 10 folds grouped by class (GroupKFold, fixed
+      order), each fold''s pools scored by a map fitted on the other nine folds'' held-out pools only (about 196 pools, 98k
+      events); a scored pool''s labels never enter its map. Per H2 pool var(u) and var(u - u_hat); f = (median var(u)_ho -
+      median var(u - u_hat)_ho) / (median var(u)_ho - median var(u)_tr), over all multiplicity cells, per seed. Beside it,
+      same folds: the factors-only map (t, logF, log P, log D); a drop-group read (f refitted without each group: pair invariants,
+      energies and angles, species counts, factors) naming which group holds f. Diagnostics: leave-one-cell-out (fit on the
+      other six cells'' H2 pools, the stricter transfer); the training-pool map (fitted on all TR pools, grouped 5-fold by
+      pool for TR''s own score) applied to H2; the per-pool own-label 5-fold ceiling labelled K = 1600 (on the 2000 events);
+      seed difference and the 16-84% bootstrap over pools (1000 draws, seed 0).'
+    check: 'On these events (par:v4_prop) the held-out residual carries per-event structure a scalar explains (eta^2 up to
+      0.12 against 0.04 on training), so a map fitted where that structure lives (other held-out processes) can see it if
+      it is shared; the K = 1600 own-label ceiling bounds f from above; the factors-only and drop-group reads show what holds
+      it. Sanity before deciding: the training-pool map''s grouped out-of-fold score on TR must be near 0 (that is the last
+      FIX''s point) and the leave-class-out f must not exceed the ceiling''s. A 5-probe dry run of stage 1 (features and u
+      dumped; time and size per pool) and a stage-2 fit on it run on CC before the batch.'
+    fixed: The control pair's reads FA-ccin2p3-339ec100 / -380842ed as collected; pools' frozen rows; 500 events per pool
+      (seed 0), 2000 for the ceiling; the feature list, groups, model settings and the 10 class-grouped folds fixed before
+      reading; no tuning; cells as loop_levels.py --shape-gap; bootstrap 1000 draws, seed 0.
+    control: A map that never saw the scored class's labels against the training pools' variance floor (the gap's denominator)
+      and the training-pool map (what the training processes' residual carries); the factors-only map; the per-pool own-label
+      ceiling; seeds 42 and 43 fitted and scored separately.
+    seeds: Seeds 42 and 43 of the control pair, each read and decided on its own; f must exceed both the seed difference and
+      the bootstrap half-range on both seeds.
+    outcome: 'Decided on the leave-class-out f over all multiplicity cells, both seeds. f >= 0.3: the held-out excess is a
+      shared, event-structured extrapolation error. If the factors-only map gives >= half that f, the yes arm is data.target_propagators
+      on, on the control''s short pretraining, two seeds, read on H2 and TR by the shape-gap rule, as its own design and cost
+      under review before any GPU job; if not, the group the drop-group read names (the largest loss of f) is reported with
+      the target or input term it implies, and that arm is designed and reviewed on its own (a map fitted on held-out labels
+      never enters training). f < 0.1: no event-level structure is shared across held-out processes; this route ends and goes
+      to the user with the other routes (capacity, training length, data). Between: reported, no GPU arm. Leave-one-cell-out
+      reported beside it; if it falls under 0.1 while leave-class-out is >= 0.3, the result is said to be cell-local. Cost:
+      CPU only on CC: stage 1 four jobs (seeds x H2/TR), 4 cores, 1 h each; stage 2 one job, 8 cores, 2 h (about 2 x (10 +
+      7 + 4 x 10) fits of about 100k events); no GPU; disk about 60 MB.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
