@@ -14,4 +14,5 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
 # CENSUS_ARGS: extra arguments through site submit --env (it passes no positional ones), e.g. the multiplicity
 # extension's candidates: CENSUS_ARGS="--cands recipes/catalog_v4_multext_candidates.json --out <path>"
-python recipes/gen_catalog_v3.py --check --workers "${SLURM_CPUS_PER_TASK:-16}" ${CENSUS_ARGS:-} "$@"
+CENSUS_ARGS="$(eval echo "${CENSUS_ARGS:-}")"     # expand $SCRATCH and the like, passed literally
+python recipes/gen_catalog_v3.py --check --workers "${SLURM_CPUS_PER_TASK:-16}" ${CENSUS_ARGS} "$@"
