@@ -69,8 +69,9 @@ def _shat(P):
 
 def match_rows(C, P, window=8):
     """For each event of C (m, k, 4) the index of the row of P (n, k, 4) equal to it within REL_TOL of its energy
-    scale, -1 when none: candidates are the rows nearest in sqrt(s_hat)."""
-    sp, sc = _shat(P), _shat(C)
+    scale, -1 when none: candidates are the rows nearest in the first outgoing particle's p_x (continuous; sqrt(s_hat)
+    is not: an e+e- pool sits at a few beam energies)."""
+    sp, sc = P[:, 2, 1], C[:, 2, 1]
     o = np.argsort(sp, kind="stable"); ss = sp[o]
     at = np.searchsorted(ss, sc)
     scale = np.maximum(np.abs(C).reshape(len(C), -1).max(1), 1.0)
