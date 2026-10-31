@@ -667,6 +667,26 @@ def data(segs):
 SUBMITTING = re.compile(r"\bsite\s+(?:submit|run|launch)\b|(^|[;&|(]|\$\()\s*(sbatch|condor_submit)", re.M)
 
 
+def expect(segs):
+    """--expect KEY=VALUE is compared with the run's RUN_SUMMARY: the JSON form's keys or the plain form's k=v pairs
+    (`RUN_SUMMARY lhe_probe gridpool rc=0` gives {"rc": "0"}), so a KEY with blanks never matches and every end of the
+    run raises an ALERT (2026-10-31: --expect "lhe_probe gridpool rc=0" on 47 gridpool jobs). Refused here."""
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["submit"]:
+            continue
+        rest = cmdparse.strip_redirs(toks[2:])
+        for k, t in enumerate(rest):
+            v = rest[k + 1] if t == "--expect" and k + 1 < len(rest) else (t[9:] if t.startswith("--expect=") else None)
+            if v is None:
+                continue
+            key = v.partition("=")[0]
+            if not key or any(c.isspace() for c in key):
+                out.append("expect: --expect %r: the key %r is not one RUN_SUMMARY gives (its k=v pairs or JSON keys; "
+                           "for `RUN_SUMMARY <name> rc=0` write --expect rc=0)" % (v, key))
+    return out
+
+
 def problems(inp):
     """every check runs on its own: an error in one never switches off another; it refuses a command that submits
     (fails closed) and passes any other."""
@@ -692,7 +712,8 @@ def problems(inp):
         return design(cmd, inp, subs)
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
-              ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)))
+              ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)),
+              ("expect", lambda: expect(segs)))
     out = []
     for name, f in checks:
         if only and name not in only:
