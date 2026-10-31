@@ -101,6 +101,55 @@ TASKS = {
                 "Zero-shot reads should save each event's pool row."),
 }
 
+# what each task's check calls, written from the check (never from the fix): names, signatures, returns, the strings
+# a source-level assertion of the check reads; given in the brief so a correct fix is not failed on a name
+INTERFACE = {
+    "defshare": "mg5_pipeline_final.default_share_rows(f_default, counts) gives each chunk's (start, stop) of the "
+                "default rows, and build_mixture_dataset(...) with a chunk's default rows must return exactly that "
+                "chunk's count; the chunks together read the default rows [0, round(f_default * N)) exactly once.",
+    "ftorders": "tools/catalog_ft.py: parent_orders_flag(parent_dir) -> (orders_from_diagrams flag for the fine-tune, "
+                "the parent's source, how it was read): the source from the parent's data_stats.json key "
+                "target_physics_orders_source, else AmplitudeExperiment._infer_orders_source(parent_dir); source "
+                "'table' -> False, 'diagrams_highest_alphas' -> True, any other (an alpha_s-only parent) raises "
+                "ValueError. command(..., orders_from_diagrams=flag) puts ++data.orders_from_diagrams=true|false on "
+                "the run.py command line.",
+    "poolphys": "tools/pool_physics.check_probe(...) on such a probe returns status 'ok' and lists the skipped field "
+                "(e.g. 'alphas_mz') in its result's not_compared.",
+    "skipclaim": "tools/lhe_parts.cmd_plan(args) with args.skip_claimed = [queue dirs]: parts already made under a "
+                 "taken-over queue's layout (mg5_pipeline_final.lhe_part_paths) are linked to the new layout's part "
+                 "paths and not put in the new queue's todo/.",
+    "stallshort": "the stall layout is a pool registered with lhe run_events None; through the queue (cmd_plan, "
+                  "the worker, assembly) its short parts are done, not failed, and the pool assembles from their sum.",
+    "zsrole": "tools/rebuild_run.py: recipe_role_counts(recipe_yaml) -> {process: {'train': n, 'val': n, 'test': n}}; "
+              "stand_in_role(counts, process, role, scored_split) -> (role read, n events): its own role when it has "
+              "events, else the scored split first, else another role it has, else its own (0); "
+              "stand_in_split_set(real_ensure_split_set, counts, scored_split) -> a function with real's signature "
+              "(specs, role, seed, dest_dir=None, require_cache=False) that reads each spec from its stand-in role. "
+              "tools/zero_shot_parent.py installs it with the line `datagen.ensure_split_set = stand_in_split_set(` "
+              "and records `\"own_stats_role\": own_stats_role` in its output.",
+    "ordsrc": "experiment.AmplitudeExperiment: with data.orders_from_diagrams false the target's monomial is the "
+              "table's (a table-mixed entry refused with an AssertionError saying 'coupling homogeneity is not exact'), "
+              "with it true the diagrams' highest alpha_s power; _save_data_stats writes target_physics_orders_source "
+              "('diagrams_highest_alphas' or 'table'); _check_frozen_orders_source(stats) raises AssertionError naming "
+              "target_physics_orders_source on a mismatch while data.target_physics_orders is on (stats without the "
+              "key count as 'table'; orders_from_diagrams unset counts as true), passes when it is off; init_data "
+              "calls `self._check_frozen_orders_source(stats)` on every reload of frozen stats.",
+    "hybridcp": "physics_scales.hybrid_cp(P) (the existing c_p fit of one process's momenta) and a new "
+                "physics_scales.hybrid_cps(names, events_of, frozen=None) -> (cps {name: c_p}, reused [names]): a name "
+                "in `frozen` keeps that value and its events are not read, any other is fitted with hybrid_cp. "
+                "experiment.py: `_cp_frozen = stats.get(\"target_physics_hybrid_cp\")` on the frozen-stats path, the fit "
+                "as `hybrid_cps(names, _cp_events, frozen=_cp_frozen)`, and _save_data_stats writes "
+                "`\"target_physics_hybrid_cp\": getattr(self, \"_phys_cp\", None)`.",
+    "loopenc": "models/diagram_encoder_llm4lhc.py: a module-level _LOOP_LINES (the one-loop ghost and Goldstone PDG "
+               "ids); the vocabulary is the 30 SM labels (0..29) then one label per _LOOP_LINES entry; "
+               "_label(pdg, vocab) maps -250 to vocab[250] and keeps 82 and -82 apart; an unknown PDG (9000099) still "
+               "raises KeyError in load_llm4lhc_diagram_set.",
+    "poolrow": "analysis/catalog_v4/dipole_residual.pool_rows(z) for a saved read z (z['idx'] positions in the "
+               "role-contiguous train|val|test array, z['split'] the role): the pool rows they came from, each role "
+               "shuffled by one numpy default_rng(seed=42) drawing rng.permutation(n) for train, val, test in turn as "
+               "experiment._init_data does; a saved z['pool_row'] wins.",
+}
+
 
 def git(*a, cwd=ROOT, check=True):
     return subprocess.run(["git", *a], cwd=cwd, capture_output=True, text=True, check=check).stdout
@@ -170,12 +219,13 @@ def brief(task, arm):
             "worktree. Do not read git history past the worktree's HEAD (no git log/show/diff of trunk or other "
             "branches): the task is to find the fix, not to look it up. No jobs, no site commands, no plan.py "
             "writes, no reviewers, no other agents.\n\n"
-            "The defect, as it was seen:\n%s\n\n"
+            "The defect, as it was seen:\n%s\n\nWhat the check that will judge the fix calls (keep these names, "
+            "signatures and lines exactly):\n%s\n\n"
             "Fix it in the code (the smallest correct change), add or update a test of it if the repository has a "
             "test file for that code, run the tests you touched with %s -m pytest -q <file> from inside the "
             "worktree, then commit everything you changed on the worktree's branch: git -C %s commit -am "
             "\"<what you changed>\" (git add new files first). End with a short report: the cause, the change, the "
-            "test run's result." % (wt(task, arm), defect, PY, wt(task, arm)))
+            "test run's result." % (wt(task, arm), defect, INTERFACE[task], PY, wt(task, arm)))
 
 
 def check(task, arm):
