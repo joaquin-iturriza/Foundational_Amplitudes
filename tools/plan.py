@@ -376,16 +376,28 @@ def db():
     return sqlite3.connect(RUNS_DB) if os.path.exists(RUNS_DB) else None
 
 
-def acked_runs(ids):
-    """The runs among `ids` whose RUN event is acked with a note that names the run."""
-    c = db()
-    if c is None or not ids:
+def acked_runs(ids, e=None):
+    """The runs among `ids` that were handled: an acked event of any kind naming the run (its id, or its 8-hex suffix)
+    in its message or ack note; a run the registry has as CANCELLED; or a cancel recorded on the entry `e` (a finding
+    or dead end naming it). (2026-10-31: five runs cancelled on purpose, recorded as findings and acked in one combined
+    event E3164 keyed by no run, were demanded again and again.)"""
+    if not ids:
         return set()
+    names = lambda r: {r, r.rsplit("-", 1)[-1]}
     out = set()
-    for key, note in c.execute("select key, ack_note from events where kind='RUN' and acked is not null"):
-        r = (key or "").split(":")[0]
-        if r in ids and r in (note or ""):
-            out.add(r)
+    c = db()
+    if c is not None:
+        rows = c.execute("select key, coalesce(msg, ''), coalesce(ack_note, '') from events where acked is not null")
+        texts = [(k or "").split(":")[0] + " " + m + " " + n for k, m, n in rows]
+        for r in ids:
+            if any(any(x in t for x in names(r)) for t in texts):
+                out.add(r)
+        q = ",".join("?" * len(ids))
+        out |= {r for r, in c.execute("select id from runs where state='CANCELLED' and id in (%s)" % q, list(ids))}
+    if e:
+        rec = [str(x) for x in (e.get("findings") or []) + (e.get("dead_ends") or [])]
+        rec = [t for t in rec if "cancel" in t.lower()]
+        out |= {r for r in ids if any(any(x in t for x in names(r)) for t in rec)}
     return out
 
 
@@ -956,7 +968,7 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
         ended = [(r, fin) for r, state, fin in rows if terminal(state) and fin and (not ls or fin > ls.timestamp())]
         # a run whose end event was acked with a note naming it was read and handled (by the main session or an
         # agent): demanding a step agent for it again asks for nothing the turn has left to do (2026-10-29)
-        handled = acked_runs([r for r, _ in ended])
+        handled = acked_runs([r for r, _ in ended], e)
         # with the supervisor sorting run ends (switch-over C), a run with no RUN event yet is still being sorted: it
         # becomes either an ack (clean, planned limit) or an open event (broke), which is the signal; the stop check
         # separately refuses while the supervisor is not running (2026-10-30)
