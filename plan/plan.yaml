@@ -6223,6 +6223,15 @@ entries:
     6: 'Cut 1 live check: after 10 subagents have run past 85064616, python3 tools/push_replay.py --since 2026-10-31T00:25:00Z
       --check (in-force hook reproduces recorded REFERENCE chars within 5 percent), matched saving per agent, hand read of
       every correction of them for a cause in a withheld section'
+    7: 'Usage attribution (Joaquin 2026-10-31 on figs/usage.png right panel: ''what is that about?'', ''Did this distinguish
+      things that were done by you instead of agents even during the agentic setup?''): design first (plan design + design
+      reviewer) on usage_windows.py, context_breakdown.py, agent_tasks.py. (1) main-session calls by trigger (user message,
+      agent hand-back, task-notification, waiter/event, harness nudge, Stop-hook feedback) x what the turn did (orchestration
+      only: SendMessage, plan bookkeeping, events; vs inline work: edits, commits, site submit/run, analyses): count, context
+      at call, weighted cost per class, and the cost of a ''nothing to say'' wake (e.g. ''Working.'' turns); (2) main-alone
+      era agent spend by kind (fork, fresh general-purpose, Explore, reviewers): context at launch and total, whether forks
+      inherited the full parent context; (3) which version of the figure Joaquin is viewing and which correction applies (the
+      1-of-362 folder bug or others). Report self-contained: question, design, numbers, what it changes.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -6311,6 +6320,12 @@ entries:
       if:
       - 'reproduced and no correction traced: keep, write up'
       - 'a correction traced to a withheld section: remove that header line, dead end'
+    7:
+      feeds: where the main session's and agents' tokens go, to pick the next cut (wake count x context, or brief size)
+      if:
+      - 'main-session cost is mostly wakes doing orchestration only: cut wakes (batching, debounce, ROUTINE) and main context
+        size'
+      - 'main-session cost is mostly inline work: move that work to agents per CLAUDE.md'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
