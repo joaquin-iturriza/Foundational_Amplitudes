@@ -1,0 +1,250 @@
+{
+ "design": "plan show agent_redesign (passed 2026-10-31)",
+ "tool": "tools/model_trial.py",
+ "runs": [
+  {
+   "task": "defshare",
+   "arm": "sonnet",
+   "agents": [
+    "a4622211aa9be4304"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "defshare",
+   "arm": "opuslow",
+   "agents": [
+    "a5788121f7ad2dd94"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "ftorders",
+   "arm": "sonnet",
+   "agents": [
+    "a6358f445e166bb09"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "ftorders",
+   "arm": "opuslow",
+   "agents": [
+    "a4fd88a111e24c55d"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "poolphys",
+   "arm": "sonnet",
+   "agents": [
+    "a155c877dc29a8731"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "poolphys",
+   "arm": "opuslow",
+   "agents": [
+    "ae4702d9d3a416834"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "skipclaim",
+   "arm": "sonnet",
+   "agents": [
+    "a0dd9ca68dd65efa7"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "skipclaim",
+   "arm": "opuslow",
+   "agents": [
+    "ad3d5bc6cfa1dbafe"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "stallshort",
+   "arm": "sonnet",
+   "agents": [
+    "a403148b08931d411"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "all three call sites; its test is a unit test of run_asked/part_ok only, said so"
+  },
+  {
+   "task": "stallshort",
+   "arm": "opuslow",
+   "agents": [
+    "a89dfc19f37e24a25"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": false,
+   "hand_read": "changed 2 of 3 short-part call sites (tidy_run still fails a stall-layout short part and trims its run directory to logs) and its report says it changed tidy; the check passed"
+  },
+  {
+   "task": "zsrole",
+   "arm": "sonnet",
+   "agents": [
+    "a5dcb3248dee8e586"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "zsrole",
+   "arm": "opuslow",
+   "agents": [
+    "a2ebb1faa0737a1c0"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "ordsrc",
+   "arm": "sonnet",
+   "agents": [
+    "a33ba3d6cc16dac26"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "ordsrc",
+   "arm": "opuslow",
+   "agents": [
+    "a0646dfb4c1df7099"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "hybridcp",
+   "arm": "sonnet",
+   "agents": [
+    "ab9c831113fba7314"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "no test added (no test file for that code); wiring correct"
+  },
+  {
+   "task": "hybridcp",
+   "arm": "opuslow",
+   "agents": [
+    "a110fea252391924c"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "no test added (no test file for that code); wiring correct"
+  },
+  {
+   "task": "loopenc",
+   "arm": "sonnet",
+   "agents": [
+    "aa5d337f62c800496"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": false,
+   "hand_read": "folds the EW antighosts (-9000001..-9000004) and G- (-251) onto their particles (one label for ghost and antighost, G+ and G-), and calls 9000001-4 R2/UV pseudo-particles; the check passed"
+  },
+  {
+   "task": "loopenc",
+   "arm": "opuslow",
+   "agents": [
+    "afa7f32a4074f0bd6"
+   ],
+   "first_pass": true,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "correct cause and change, test added, report accurate"
+  },
+  {
+   "task": "poolrow",
+   "arm": "sonnet",
+   "agents": [
+    "aceb85ef134996ffa"
+   ],
+   "first_pass": false,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "first check failed (old reads with idx only refused), rework passed; assumes n_val = n_test for old test reads, as the original fix"
+  },
+  {
+   "task": "poolrow",
+   "arm": "opuslow",
+   "agents": [
+    "a140674beef55abba"
+   ],
+   "first_pass": false,
+   "final_pass": true,
+   "hand_read_ok": true,
+   "hand_read": "first check failed (KeyError role_counts), rework passed; same n_val = n_test assumption; main() still refuses old reads"
+  }
+ ],
+ "summary": {
+  "sonnet": {
+   "tasks": 10,
+   "passed_first": 9,
+   "passed_with_rework": 10,
+   "hand_read_ok": 9,
+   "usd_total": 1.908,
+   "usd_per_task_with_rework": 0.191
+  },
+  "opuslow": {
+   "tasks": 10,
+   "passed_first": 9,
+   "passed_with_rework": 10,
+   "hand_read_ok": 9,
+   "usd_total": 2.881,
+   "usd_per_task_with_rework": 0.288
+  },
+  "cost_ratio_sonnet_over_opuslow": {
+   "n": 10,
+   "median": 0.654,
+   "min": 0.585,
+   "max": 0.782
+  }
+ }
+}
