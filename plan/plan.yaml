@@ -2326,10 +2326,11 @@ entries:
       it is released)'
   owner:
     agent: acd8bbf4e51c1e6d4
-    state: stopped
+    state: working
     since: '2026-10-31T03:56:15+00:00'
     context: 92454
     context_at: '2026-10-31T03:58:53+00:00'
+    state_at: '2026-10-31T04:03:07+00:00'
   targets:
   - batch: shape_gap_TR_reread
     wall_h: 1.5
