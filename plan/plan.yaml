@@ -6333,7 +6333,7 @@ entries:
       (asked 2026-10-31 ~00:30)'
   owner:
     agent: acaac64fe8fb17b42
-    state: working
+    state: closed
     since: '2026-10-31T01:06:27+00:00'
     context: 247850
     context_at: '2026-10-31T03:31:46+00:00'
@@ -6873,27 +6873,27 @@ entries:
       30; tests/test_mechanical_watch.py). The routing dead end recorded earlier (verdict No under the 0.6 rule) is superseded
       by D213.'
   handoff:
-    state: 'Step 4 matched model trial (D203) run and scored, write-up and cleanup left. Design: FIX (interfaces, source asserts,
-      alt fix, analyses) then PASS by the design reviewer 2026-10-31. Ran 20 compact-worker agents on 10 past repo fixes (tools/model_trial.py,
-      briefs identical but worktree path): Sonnet 5.5 default effort vs Opus 5.5 effort low. Results (analysis/agent_redesign/model_trial.json,
-      model_trial.py report at 096b5fe4): both arms passed 9/10 first and 10/10 after one rework (poolrow failed in both:
-      old reads with idx only; reworks passed); hand read OK 9/10 each (sonnet loopenc merges EW antighosts and G- onto their
-      particles; opuslow stallshort missed tidy_run, 1 of 3 call sites, and its report says otherwise); cost at list price
-      $1.91 sonnet vs $2.88 opus-low total, $0.19 vs $0.29 per task with rework, paired ratio median 0.654 (min 0.585, max
-      0.782). Pre-stated rule (yes needs <=0.6x total and median) not met (0.66x): verdict No, keep Opus low for mechanical
-      steps (D138), indicative (10 pairs); to report to Joaquin opening with: no analysis judged on its conclusions was in
-      the set, ask whether to add analysis tasks. Also done this run: context_push hold-until-delivered 9ba3ed6b (test_redesign_d
-      49/50, D6 close-note failure predates), brief_guard TRIAL=model test b5e09073 (exemption ded91c47 by Joaquin), plan
-      next cancelled-run fix e5cd7bb1 (a run counts handled when registry CANCELLED, a finding/dead end records its cancel,
-      or any acked event names it; tested on catalog_coverage''s five ids).'
-    decisions: Trial tasks chosen only by the validate rule (check fails at parent, passes at fix); check interfaces given
-      in briefs and source-level asserts stripped after reviewer FIX; poolrow rework sent to both arms with the same check
-      output; hand-read flaws recorded but do not change pass counts (equal in both arms).
-    ruled_out: 8 candidate tasks failed the validate rule (emaload, runperm, sizeprobe, ppsidecar, memmask, planwait, statusjson,
-      ggh)
-    running: none (all 20 trial agents done)
-    files: 'tools/model_trial.py, analysis/agent_redesign/model_trial.json, model_trial_agents.txt, model_trial_validate*.json,
-      model_trial_alt*, .claude/hooks/context_push.py, tools/push_replay.py, tools/plan.py, tests/test_plan_handled_runs.py;
-      to do: record the finding/dead end for routing, report to Joaquin, remove the 21 worktrees worktrees/zz_trial_* with
-      scripts/remove_worktree.sh (branches zz_trial_<task>_<arm> unmerged: delete after), then steps 1, 5, 6'
-    written: '2026-10-31T01:05:38+00:00'
+    state: 'Step 4 model trial closed: first trial (10 pairs) result, extension (D212) stopped by D213 (switch to Sonnet for
+      mechanical steps). Switch live in code: .claude/agents/mechanical-worker.md (model sonnet, scope only, loads live CLAUDE.md),
+      plan brief --mechanical with plan/mechanical_prompt.txt accepted by brief_guard for mechanical-worker only, routing
+      line in working-on-the-plan, live check agent_tasks.py --mechanical in the supervisor''s maintain (ALERT mechanical_revert
+      at 5 failures among the first 30). Wake reduction: RUN_DONE only when a step''s plan wait closes (site_runends.py),
+      plan run --intermediate for chain jobs, site events --wait --debounce SEC, detach.py --each, ROUTINE: hand-backs (step_prompt
+      + CLAUDE.md 3bd63a41); main session to restart supervisor and waiter with --debounce 600. Reviews: repo-reviewer passed
+      (watermark 3210dac1); claudemd-keeper passed my items but its pillar stays BLOCKED on catalog_coverage''s fa-generation
+      index line (needs Joaquin). NEW, not started: the usage-attribution measurement (next step ''Usage attribution''), design
+      first then design reviewer.'
+    decisions: D213 supersedes the routing dead end (verdict No under 0.6 rule) of the first trial; checks of the trial harness
+      run outside worktrees/zz_* and score per scenario (plan.py refuses writes in zz_* trees); a clean run end in no wait
+      wakes no one (owners must plan wait); revert rule N 30 K 5 (p 0.006 at Opus's 0.04 failure rate, 0.745 at 0.20).
+    ruled_out: Trial extension (stopped by D213); suppressing the parent's wake on a subagent hand-back (no hook found; untested).
+    running: none (revalidate batches killed; scratch check worktrees removed; refs/model_trial/* keep the first ten agent
+      commits)
+    files: 'tools/model_trial.py, analysis/agent_redesign/model_trial*.json, model_trial_baseline/, model_trial_first10_heads.txt,
+      tools/agent_tasks.py (--mechanical), tools/detach.py, tools/plan.py (owners waits/intermediate, brief --mechanical,
+      run --intermediate), plan/step_prompt.txt, plan/mechanical_prompt.txt, .claude/agents/mechanical-worker.md, .claude/hooks/brief_guard.py,
+      .claude/hooks/test_guards.py, ~/.local/bin/site (debounce; backup site.bak_20261031_debounce), ~/.local/bin/site_runends.py
+      (run_done_events; backups .bak_20261031, .bak_20261031b), ~/.config/ccorch/projects.toml (maintain; backup .bak_20261031),
+      tests/test_wake_batching.py, test_run_done_waiter.py, test_mechanical_watch.py, test_mechanical_brief.py; for the usage
+      step: tools/usage_windows.py, tools/context_breakdown.py, analysis/agent_redesign/figs/usage.png and its script'
+    written: '2026-10-31T03:32:10+00:00'
