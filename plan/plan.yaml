@@ -5914,11 +5914,11 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: a8f01a86034d7b73e
-    state: stopped
+    state: working
     since: '2026-10-31T02:59:56+00:00'
     context: 153206
     context_at: '2026-10-31T03:52:19+00:00'
-    state_at: '2026-10-31T03:50:32.852000+00:00'
+    state_at: '2026-10-31T04:05:02+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
