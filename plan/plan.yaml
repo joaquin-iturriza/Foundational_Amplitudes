@@ -5614,7 +5614,7 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: a0ab7c2280e0bb83a
-    state: stopped
+    state: working
     since: '2026-10-31T01:08:59+00:00'
     context: 239763
     context_at: '2026-10-31T02:52:35+00:00'
