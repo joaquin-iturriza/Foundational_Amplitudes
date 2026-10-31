@@ -111,7 +111,12 @@ isolated hunks.
    and wall time: what fraction of the events or tasks it asks for it keeps, and how long the
    batch takes with the workers it starts, against the run records it was sized from. A layout
    whose yield or wall time is not stated, or that a replan can change under live workers, is a
-   finding.
+   finding. A time limit raised, or a per-unit time measured on the job itself, justifies nothing:
+   each unit's time is compared with the work it does (a forward pass over its events, a pool's
+   rows), and a loop over hundreds of units that rebuilds an experiment, reloads weights or data,
+   or runs serially per unit where one batched pass would do is **blocking**, to be batched, never
+   absorbed into the limit (2026-10-31: the zero-shot reads at about 2 s per probe over about 2700
+   probes and the 70 min serial pool composition passed review inside a raised limit, 9510604e).
 4. **Repo structure & hygiene.** New files in the right place. No needless new top-level
    dirs. No new scattered `.md`/`.tex` docs (ground rule #3). Reuse over duplication.
 5. **Committed artifacts.** Nothing `.gitignore` should catch: `runs/`, `outputs/`, `*.npz`,
