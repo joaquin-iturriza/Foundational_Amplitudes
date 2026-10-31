@@ -7207,6 +7207,19 @@ entries:
       9512cac2''s records (114 HD4 probes): per probe mean 0.548 s, build median 0.318 s, weights 0.041, forward 0.052, physics
       check 0.001; the whole job ran 2 min against short_wall''s 0.39 h estimate (startup_min 15 assumed): a margin above
       2x in short_wall, to fix with the het rate (step 20).'
+  - at: '2026-10-31T19:27:59+00:00'
+    text: 'Step 23 profile (FA-ccin2p3-eaf96d1c, V100, 62 H1 probes of v4_dimensionless_muon at 311380bf, first 20 under cProfile):
+      unprofiled per probe build median 0.385 s, weights 0.041, forward 0.051, physics check 0.027, score 0.015; whole read
+      57 s for 62 probes. Under cProfile per probe (0.90 s): experiment build 0.53 = model init 0.28 (hydra instantiate with
+      random init 0.12, the parent checkpoint deep-copied for the fine-tune load 0.12) + data 0.24 (the probe''s own pool
+      prepared per role: physics factor logF 0.071, sizing 0.034, boost 0.026, off-shell masks 0.017, amp orders 0.016, parent
+      orders-source check 0.024 (git subprocess on the parent''s log)); load_best_weights'' second deep copy about 0.11. Probe-independent
+      and removed (a9775ded, e0f7a54a, opt-in ZS_PARENT_COPY=shared until the A/B and review pass): the checkpoint copies
+      (containers copied, tensors shared; tests/test_parent_load_cache.py) and the orders-source inference (once per job).
+      Probe-independent but not removed: the model instantiation (about 0.12 s profiled): its setup reads the probe''s data
+      (dimensionless mass stats, per-process context), and a deep-copied module drops the muP infshape attributes on its parameters
+      (torch Parameter.__deepcopy__), so a shared model is not exact without a rework. The rest is the probe''s own data.
+      A/B: FA-ccin2p3-30cc8928 (B, B2 old path, D new).'
   handoff:
     state: 'Step 18 and 19 generation done: all 142 default-sampled held-out test pools on ccin2p3 (114 trees: H2p5 38, H6
       8, H7E 34, H7c 34; 28 one-loop H5, MadEvent Born events labelled by the class''s MadLoop, lhe label rule virt). Step
