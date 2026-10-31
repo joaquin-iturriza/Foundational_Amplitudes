@@ -28,7 +28,7 @@ starts from the same tensors as before; s_stages in each ZERO_SHOT record gives 
     python tools/zero_shot_parent.py --parent <pretraining run dir> [--twins J] [--save-dir D]
         [--allow-physics-mismatch "<reason>"] <probe recipe.yaml> [...]
 """
-import argparse, json, os, sys, tempfile, time
+import argparse, copy, json, os, sys, tempfile, time
 
 import numpy as np
 import torch
@@ -60,6 +60,12 @@ ap.add_argument("--signed-magnitude", action="store_true",
                      "the magnitude a log|M|^2 model predicts; its sign, which such a model has no output for, is not scored")
 ap.add_argument("--allow-physics-mismatch", default=os.environ.get(pool_physics.ALLOW_ENV) or None, metavar="REASON",
                 help="score a probe whose pool's physics differs from the parent's training catalog; the reason is saved")
+ap.add_argument("--build", choices=("cached", "load"), default=os.environ.get("ZS_BUILD", "cached"),
+                help="the parent's config per probe: cached (parsed once at start-up) or load (re-read per probe, "
+                     "the original path, kept for A/B)")
+ap.add_argument("--workers", type=int, default=int(os.environ.get("ZS_WORKERS", "0")),
+                help="probes scored in parallel by this many processes forked after start-up, sharing the GPU "
+                     "(0: one per two CPUs of the job, at most 8 and at most one per probe)")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
 
@@ -90,15 +96,27 @@ physics_ref = (pool_physics.TrainingReference(siteconf._expand_str(str(_train_re
 import datagen  # noqa: E402
 from rebuild_run import recipe_role_counts, stand_in_role, stand_in_split_set  # noqa: E402
 _ensure_split_set = datagen.ensure_split_set
+# The parent's config parsed once: every probe swaps in its own recipe (data.source recipes), and the recipe path
+# rewrites data.dataset and data.amp_orders from it (experiment._resolve_recipe_config, the first step of
+# init_physics), so the parent's 1153-entry lists are dropped here instead of being re-wrapped per probe. Re-reading
+# the YAML per probe was most of the 1.39 s build (cProfile FA-ccin2p3-6f8f6e98: OmegaConf.load 25.3 s of 55.9 s
+# over 10 probes).
+_parent_cfg_base = OmegaConf.to_container(_pcfg, resolve=False)
+_parent_cfg_base["data"]["dataset"] = []
+_parent_cfg_base["data"]["amp_orders"] = []
 
-for recipe in a.recipes:
+def _read(recipe):
+    """Score one probe recipe (prints its ZERO_SHOT lines, writes its .npz)."""
     _t0 = time.perf_counter(); stages = {}
     recipe = os.path.abspath(siteconf._expand_str(recipe))
     _counts = recipe_role_counts(recipe)
     datagen.ensure_split_set = stand_in_split_set(_ensure_split_set, _counts, a.split)
     _roles = sorted({stand_in_role(_counts, n, "train", a.split)[0] for n in _counts})
     own_stats_role = _roles[0] if len(_roles) == 1 else _roles
-    cfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
+    # the parent's config, from the one parse at start-up (--build cached) or re-read per probe (--build load, the
+    # original path kept for A/B)
+    cfg = (OmegaConf.load(os.path.join(parent, "config.yaml")) if a.build == "load"
+           else OmegaConf.create(copy.deepcopy(_parent_cfg_base)))
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
         cfg.use_mlflow = False; cfg.count_flops = False; cfg.ema = False
@@ -128,7 +146,7 @@ for recipe in a.recipes:
         exp = _build(cfg, None, None, None)          # init_model loads the parent's weights, as a fine-tune does
     except Exception as e:                            # a missing pool or sidecar on this site: listed, not dropped
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "error": repr(e)[:300]}), flush=True)
-        continue
+        return
     stages["build"] = time.perf_counter() - _t0; _t = time.perf_counter()
     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
     # the physics check, before anything is scored
@@ -142,7 +160,7 @@ for recipe in a.recipes:
     if not _ok:
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "probe": _spec["name"],
                                          "error": "physics mismatch: " + pool_physics.summary(physics_chk)}), flush=True)
-        continue
+        return
     # the parent's recorded loss is its EMA weights' (docs/results.tex sec:ema-ckpt), so that is what is scored here,
     # as fine-tunes start from it since D63 (base_experiment._ckpt_scored_state)
     stages["physics_check"] = time.perf_counter() - _t; _t = time.perf_counter()
@@ -174,7 +192,7 @@ for recipe in a.recipes:
         # the other probes of the call still scored
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "probe": probe,
                                          "error": f"signed probe: transform {list(map(str, tr))}, no log|M|^2 target"}), flush=True)
-        continue
+        return
     mu_p, sd_p = float(exp.prepd_mean[0]), float(exp.prepd_std[0])
     t = mu_p + sd_p * z                                                   # the probe's log|M|^2 (abslog: log max(|M|^2, s))
     if pstats.get("affine_multiplicity") or pstats.get("shared_standardization"):
@@ -257,3 +275,43 @@ for recipe in a.recipes:
     stages["score_and_save"] = time.perf_counter() - _t
     rec["s_stages"] = {k: round(v, 4) for k, v in stages.items()}   # seconds per stage of this probe (timing only)
     print("ZERO_SHOT " + json.dumps(rec), flush=True)
+
+
+def _workers():
+    if a.workers > 0:
+        return min(a.workers, len(a.recipes))
+    cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
+    return max(1, min(8, cpus // 2, len(a.recipes)))
+
+
+# the probes are independent: W processes forked after the shared start-up (imports, the checkpoint read, the
+# training reference; no CUDA context yet, each child opens its own) score every W-th recipe. Each record is one
+# flushed line, so the children's lines do not interleave within a line; their order across probes is not kept.
+assert not torch.cuda.is_initialized(), "CUDA initialised before the fork"
+W = _workers()
+print(f"ZS_WORKERS {W} probes={len(a.recipes)} build={a.build}", flush=True)
+if W == 1:
+    for _r in a.recipes:
+        _read(_r)
+else:
+    sys.stdout.flush(); sys.stderr.flush()
+    kids = []
+    for w in range(W):
+        pid = os.fork()
+        if pid == 0:
+            rc = 0
+            try:
+                for _r in a.recipes[w::W]:
+                    _read(_r)
+            except BaseException:
+                import traceback
+                traceback.print_exc()
+                rc = 1
+            finally:
+                sys.stdout.flush(); sys.stderr.flush()
+                os._exit(rc)
+        kids.append(pid)
+    bad = [w for w, pid in enumerate(kids) if os.waitstatus_to_exitcode(os.waitpid(pid, 0)[1]) != 0]
+    if bad:
+        print(f"ZS_WORKERS failed workers {bad} of {W}", flush=True)
+        sys.exit(1)
