@@ -6720,7 +6720,7 @@ entries:
       (asked 2026-10-31 ~00:30)'
   owner:
     agent: adee1508af67be1ef
-    state: working
+    state: closed
     since: '2026-10-31T04:37:13+00:00'
     state_at: '2026-10-31T04:37:13+00:00'
     context: 62434
@@ -7413,21 +7413,19 @@ entries:
       both owners compacted mid-turn; keep 200k and move the hand-off to 170k (CLAUDE.md ''near 300k'' and plan.py CONTEXT_CLOSE),
       or restore 400k? No agent-only window exists in settings (checked).'
   handoff:
-    state: 'Held by D220 for the weekend. Committed 5708b248: (2) Stop-hook bookkeeping in plan_check (owners recorded resumed/launched/stopped
-      from the turn''s SendMessage, Agent launch and task-notification; waiter refusal says the hook cannot arm one; plan
-      owner --state counts via state_at) and (1) context_guard refuses an auto PreCompact while a question has no plan ask,
-      an answer no site decide, an ''I''ll do X'' no plan step (reply_check model call; on this session''s two windows it
-      found 3 and 3 such items, one false positive removed once hand-offs were visible). Tests: test_redesign_d 58/58 (bookkeeping
-      group 8, 5 fail on old code), test_hooks_real stop_conditions 12/12, test_guards 20/20; full test_hooks_real timed out
-      at 590 s in both new and base copies with the same 2 FAILs (A3, B2). Queued: double wake test (plain final text gives
-      one wake with the report whole: real case acc18380b00739f5c 01:05; the mechanical-worker test called SubagentHandback
-      anyway after its text because the harness reminder tells it to, so prompts alone do not stop the second wake; needs
-      a decision on a PreToolUse refusal of SubagentHandback); guard note leaking to owners (not started); repo-reviewer and
-      claudemd-keeper pass over 5708b248 and d14f4691 (a claudemd-keeper adfa2736b07a1628b was launched before the hold and
-      could not be stopped by me).'
-    decisions: Hook changes developed in a scratch copy and installed only after tests pass; real-transcript records never
-      copied into fixtures (synthetic only).
-    running: claudemd-keeper adfa2736b07a1628b (launched before D220; stop it if the hold forbids reviewers)
-    files: tools/plan.py .claude/hooks/plan_check.py .claude/hooks/context_guard.py .claude/hooks/stop_conditions.py tests/test_redesign_d.py
-      tests/test_hooks_real.py ~/.local/bin/site (waiter text; backup site.bak_20261030_waitertext)
-    written: '2026-10-31T04:24:26+00:00'
+    state: 'Held by D220 except next 10, which is done (2cc96941, D224): .claude/hooks/owner_handoff.py, PostToolUse on every
+      tool, tells a not-closed owner agent whose own context is >= CONTEXT_CLOSE (170k) to commit, record, plan handoff and
+      end; main session and non-owner agents never; tests/test_owner_handoff.py 11/11, replay of aa7670a7d3cbd2cba fires 29
+      calls before its first compaction, live-fired on owner adee1508af67be1ef via the per-agent override. Stale 300k -> 170k
+      fixed in plan/step_prompt.txt, compact-worker.md, owner_context.py. Earlier state stands: 5708b248 (Stop-hook bookkeeping,
+      context_guard PreCompact refusal) committed; queued under the hold: double-wake test (next 8, needs a decision on refusing
+      SubagentHandback), next 9 (note: context_guard''s PostToolUse branch already skips calls with agent_id at line 261,
+      so check whether the leak to a8f01a86034d7b73e came from another path before building), repo-reviewer and claudemd-keeper
+      over 5708b248, d14f4691 and 2cc96941; next 1, 5, 6, 7.'
+    decisions: Hook changes built in a scratch copy and installed only after tests pass; real transcripts read in place, never
+      copied into fixtures; the live-test override is per agent id so no other owner can be hit.
+    ruled_out: none new
+    running: none
+    files: .claude/hooks/owner_handoff.py tests/test_owner_handoff.py .claude/settings.json .gitignore plan/step_prompt.txt
+      .claude/agents/compact-worker.md .claude/hooks/owner_context.py
+    written: '2026-10-31T04:40:45+00:00'
