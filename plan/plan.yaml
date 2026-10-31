@@ -2095,6 +2095,31 @@ entries:
       - margin >= 0.5 f_ceil and >= 0.1: the K=16 calibration is reported as the few-shot protocol for new multiplicity processes.
       No when f + margin < 0.25 f_ceil or < 0.05: K=16 too few, the K where it reaches half the ceiling reported. Else between,
       reported.'
+    fix_at: '2026-10-31T03:40:07+00:00'
+    fix: 'Check 4 (outcome stated for yes and no): the verdict is already decided by the design''s own check, so the K reads
+      cannot change it. Re-run @aa5aff19 --check: affine ceiling f_ceil 0.0121 / 0.0168 (bootstrap 0.010-0.016 / 0.011-0.021),
+      cubic-in-q ceiling 0.023 / 0.037, against the end bar 0.1 on both seeds. verdict() returns ''ends'' before it reads
+      any f_shr_tr16, so every K result confirms the same branch. Fix: write up the ceiling as the answer to option (c) now
+      (no per-process affine or smooth function of q carries more than 4% of the held-out multiplicity gap; slope of t on
+      q 1.008 / 1.006 on held-out pools against 0.998 / 0.999 on training pools, so the prediction is calibrated, not compressed,
+      and par:v4_lco_not''s ''level and spread'' sentence is corrected). If the K reads are kept, give them their own question
+      whose answer is still open, with a yes and a no bar that a result can fail. Example: does fitting a slope at K = 4,
+      8 or 16 cost MSE against the plain offset on the same draws (shr_tr minus off, bar set beforehand), which is what a
+      few-shot protocol for new processes needs. Check 5 (prior work, searched independently): the prior omits results.tex''s
+      ''Few-shot calibration, and surrogates computed from momenta alone (2026-10-22, D83)''. That paragraph (norm_explore5/7
+      on Daniel''s catalog) ran a rescale and shift fitted on k = 3, 10, 100 events, with the slope shrunk toward 1, which
+      helped at k = 3 (0.22 to 0.14). It also omits the oracle ''best rescale and shift'' read of the per-process pretraining
+      (rescale-and-shift table, 0.080 on the 43 new processes against 1.27 on its own). Both are the same method this design
+      proposes and must be named with their numbers, and the shrink-toward-1 prior considered beside the training-slope prior.
+      Check 7 (the user''s comparison): D178 (3) says ''check that 8-16 points really remove it''. The K grid is 4, 16, 64,
+      256 and has no 8. Add K = 8, or say why 4 and 16 bracket it. Check 6 (scope, a note, not a failure on its own): D216
+      chose (b) for this entry (''Yes, do b), we eventually want to do a''), and step 6 said nothing runs until the user chooses.
+      The design must name D178 (3) as the decision that covers running (c), not only ''beside (b)''. Checks 1, 2, 3 and 8
+      hold: training-pool control and plain offset on the same draws; the measure moves (median var ratio 0.992 held out against
+      1.001 training, and par:kshot_level''s affine lowered the floor 10-50% on Daniel''s catalog); the bootstrap half-range
+      is about 0.003 against a bar of 0.1; the fit and score events are asserted disjoint (kshot_spread.py line 114), the
+      shr_tr prior uses only the cell''s training pools, shr_ho uses other classes'' held-out pools, the ceiling is out-of-fold,
+      and the floor comes from training pools.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
