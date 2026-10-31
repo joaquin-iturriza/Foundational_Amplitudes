@@ -7237,6 +7237,23 @@ entries:
       20: all 14 runs COMPLETED, no TIMEOUT, no skipped axis, no traceback; HD4 114/114 on all 12 arms, HD5 28/28 on 10 arms
       plus the two control HD5 re-reads (c37a4b26, a1ea15aa); the four het share arms also PP4 1301/1301 and EE4 169/169 in
       about 36-39 min each.'
+  - at: '2026-10-31T19:54:01+00:00'
+    text: 'Step 20 verdict (mixture_ab @19ccfe6e, data b51a4840): all 12 arms read on 700 default-sampled held-out classes
+      (H1-H3 PP4/EE4 probes 558, HD4 114, HD5 28), held-out cost now read on default-sampled events for MSE and het (D227).
+      R = median over classes of arm/control MSE ratio, 95% class bootstrap widened by |ln R_seed|. MSE: share 0.50 PP4 0.682
+      [0.594,0.775], EE4 0.401 [0.314,0.520], held-out default pooled 0.860 [0.745,0.983] -> GAIN, NO LOSS; share 0.25 PP4
+      0.754 [0.667,0.850], EE4 0.413 [0.337,0.535], held 0.871 [0.754,0.994] -> GAIN, NO LOSS; both win, tie rule -> default25.
+      Het: 0.50 PP4 0.505 [0.406,0.633], EE4 0.220 [0.166,0.280], held 0.722 [0.554,0.929]; 0.25 PP4 0.450 [0.360,0.556],
+      EE4 0.223 [0.173,0.301], held 0.638 [0.501,0.834]; both win -> default25. Per axis only H3 above 1 for MSE (0.50: 1.133
+      [0.970,1.300]; 0.25: 1.082 [0.943,1.231]); H5 0.987/0.977 MSE, 0.946/1.044 het, intervals spanning 1. Catalog-sampled
+      held-out beside: MSE 1.271/1.225, het 1.144/0.931. No run blew up; het spikes recovered listed. Het uncertainty (het_uncertainty,
+      complete 6 runs): rule A YES on PP4 and EE4 trained for all arms (rank_across 0.91-0.97); B held catalog-sampled not
+      calibrated weak ordering; B on HD4+HD5: not calibrated, orders the worst cells (HD4 rank_across 0.82-0.85); HD5 sigma
+      badly overconfident (median pull_std 12-28, cover68 0.03-0.08). Where-map PP4 trained control: per-probe normalised
+      sigma and error rise to the forward |eta| decile (1.19/1.30) and to the collinear decile (1/0.66, 1/0.59); with a share
+      the |eta| contrast flattens (0.99-1.08 / 1.04-1.10). Step-20 rates: eval start-up 15-31 s MSE, 20-82 s het; per probe
+      0.58-0.65 s MSE (span), het 1.25-1.31 (142 probes) and 1.33-1.45 (1612): short_wall''s 15 min start-up is a >2x margin
+      for eval-only jobs; het rate and eval start-up not yet set in short_wall (hand-off).'
   handoff:
     state: 'Step 18 and 19 generation done: all 142 default-sampled held-out test pools on ccin2p3 (114 trees: H2p5 38, H6
       8, H7E 34, H7c 34; 28 one-loop H5, MadEvent Born events labelled by the class''s MadLoop, lhe label rule virt). Step
