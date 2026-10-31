@@ -1943,6 +1943,19 @@ entries:
       Between: reported, no GPU arm. Leave-one-cell-out beside it; if under 0.25 f_ceil while f_lco says yes, the result is
       called cell-local. Cost: CPU only on CC: stage 1 four jobs (seeds x H2/TR), 4 cores, limit set from the dry run (H2
       jobs carry the ceiling fits); stage 2 one job, 8 cores, 2 h; no GPU; disk about 130 MB.'
+    passed_at: '2026-10-31T01:18:23+00:00'
+    reviewer: 'Re-check after FIX: prior now cites the 2->4 factorised-onto-parent leave-one-probe-out boosted correction
+      (spread 2.5/3.1 -> 0.73/1.11, under the floor 1.34/1.37), D81 statistics map and surrogates paragraph, with what differs;
+      check 2: held-out residual structure measured (scalar own-label eta^2 0.122/0.119 vs 0.036/0.041 training, about f 0.20/0.28
+      of the gap from prop_residual *_H2.json against cell floors in shape_gap.json), reachability now set by f_ceil computed
+      first and every threshold a share of it (yes >= 0.5 f_ceil and >= 0.1, no < 0.25 f_ceil or < 0.05, f_ceil < 0.1 on both
+      seeds ends the route), so neither branch is built in; gap per pool against its own cell''s training floor; check 3:
+      seeds 42/43 decided separately, branch must clear seed difference and 1000-draw pool bootstrap; check 1: maps with and
+      without the scored class''s labels on the same pools, everything fixed; 218 H2 pools are 218 singleton classes in census_classes.json
+      so 10 grouped folds are fine. Note: f_lco above f_ceil is possible (a map on about 98k events can beat a 1600-event
+      own fit), so that sanity should be reported, not taken as a bug. Terms searched: leave-one, leave-class, leave one,
+      GroupKFold, gradient, HistGradient, boosted, cross-process, extrapolat, shared across, per-event structure, joint read,
+      event features; site decisions D81, D178.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
