@@ -105,8 +105,19 @@ if [ "$PROBE_SHARD" = gridpool ]; then
     python tools/lhe_probe.py gridpool --process ${GP_POOLS:?} --runs "${GP_RUNS:-16}" --cores "${SLURM_CPUS_PER_TASK:-1}" \
         ${GP_EVENTS:+--events $GP_EVENTS} ${GP_ENERGY:+--energy $GP_ENERGY} ${GP_SEED_BASE:+--seed-base $GP_SEED_BASE} \
         ${PROBE_KEEP:+--keep $PROBE_KEEP} ${GP_KEEP_LOGS:+--keep-logs $GP_KEEP_LOGS} ${GP_TIMEOUT:+--timeout $GP_TIMEOUT} \
-        ${GP_XIMPROVE:+--ximprove $GP_XIMPROVE}
-    rc=$?
+        ${GP_XIMPROVE:+--ximprove $GP_XIMPROVE} &
+    gp=$!
+    # while it runs: every GP_PROGRESS_S seconds (600) the last lines of each MadEvent log in its work directory
+    # (GRIDPACK_PROGRESS_LIVE: survey, refine or generation, with the job's elapsed seconds), so a long gridpack build
+    # shows where it is instead of nothing until its end
+    while kill -0 "$gp" 2>/dev/null; do
+        for i in $(seq "${GP_PROGRESS_S:-600}"); do kill -0 "$gp" 2>/dev/null || break; sleep 1; done
+        kill -0 "$gp" 2>/dev/null || break
+        for f in $(find "${TMPDIR:-/tmp}" -maxdepth 4 -path '*lhe_gridpool_*' -name '*.mg5.log' 2>/dev/null); do
+            echo "GRIDPACK_PROGRESS_LIVE ${SECONDS}s $f: $(grep -E 'survey|refine|Combining|Idle:|Running:|Completed:|cross-section|Error' "$f" | tail -n 2 | tr '\n' ' ')"
+        done
+    done
+    wait "$gp"; rc=$?
     if [ "$rc" = 137 ]; then
         for f in $(find "${TMPDIR:-/tmp}" -maxdepth 4 -path '*lhe_gridpool_*' -name '*.mg5.log' 2>/dev/null); do
             echo "GRIDPACK_PROGRESS $f"; grep -E 'survey|refine|Combining|Idle:|Running:|Completed:|cross-section|Error' "$f" | tail -n 30
