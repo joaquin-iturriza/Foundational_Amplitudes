@@ -1,0 +1,29 @@
+{
+ "hd_ddx_dhuxwp__E20": {
+  "core_s_per_event": 1.064,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 8,
+  "runs_timed_out": 0,
+  "s_run_max": 266.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_aaccx__E20": {
+  "core_s_per_event": 0.6476,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 8,
+  "runs_timed_out": 0,
+  "s_run_max": 161.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ccxddx__E20": {
+  "core_s_per_event": 0.9616,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 7,
+  "runs_timed_out": 0,
+  "s_run_max": 240.4,
+  "source": "probe logs (lhe_probe kept)"
+ }
+}
