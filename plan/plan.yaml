@@ -6467,6 +6467,12 @@ entries:
     units: null
     start: '2026-10-31T17:50:24+00:00'
     at: '2026-10-31T17:50:24+00:00'
+  - batch: step20_hd_rereads
+    wall_h: 1.75
+    jobs: 12
+    units: null
+    start: '2026-10-31T18:20:53+00:00'
+    at: '2026-10-31T18:20:53+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
