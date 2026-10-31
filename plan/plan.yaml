@@ -5765,6 +5765,52 @@ entries:
       work on pushes in docs/results.tex or site decisions (searched context_push, push, REFERENCE, additionalContext, persisted,
       skill listing, hook output, reference section; plan show has no dead ends on it); corrections plan (hand read of every
       post-change correction, stood rate called undecidable under 10 tasks) is adequate.'
+  - at: '2026-10-31T00:17:49+00:00'
+    question: 'Step 5, cut 1 (context cuts for agents, hook pushes), revised after FIX: three separate changes to .claude/hooks/context_push.py,
+      each measured and revertible on its own: (c) defect repair, one hook output kept under 10,000 chars (the harness turns
+      a longer one into a ~2.2k preview and the sections in it are lost while marked delivered); (a) working-on-the-plan not
+      pushed to subagents; (b) seven sections about acting fire their path triggers only on writes. Do (a) and (b) each lower
+      push tokens per call against the repaired hook, with no rise in corrections? Feeds keep or revert per change (revert
+      = header line removed, recorded as a dead end). Cuts 2 (skill listing: a setting Joaquin holds) and 3 (effort) follow
+      under the same measure.'
+    prior: 'Previous owner run (hand-off 2026-10-31T00:07, context_breakdown.py f3624f9c): redesign-period hook pushes 7.1k
+      chars/4 at median call, 8.8k at last (x1.72 = 12-15k tokens); D138 (Opus low effort for mechanical steps); D202 (''Yes
+      please study the new agents'' context.''). Nothing on push trimming in docs/results.tex or site decisions (searched:
+      push, REFERENCE, context_push, additionalContext, persisted, skill listing, effort, hook output).'
+    measure: 'tools/push_replay.py: every recorded tool call of the 32 redesign-period subagent transcripts (first record
+      after 2026-10-30T11:35:10Z, >=5 calls) replayed in order through a given context_push.py''s respond() (hook file at
+      a git rev or live; section dirs given), with the settings.json registration (Pre on acts, Post on reads and acts) and
+      the harness''s preview (output over 10,000 chars arrives as 2,178 chars). Per agent token-calls = sum over pushes of
+      1.722*chars/4*(calls after the push); reported pooled tokens per call (sum token-calls / sum calls) and per-agent median.
+      Comparisons, all on the same calls: (c) repaired hook vs the live hook at cdd1f456 (respond() split, no behaviour change),
+      live sections; (a) repaired hook with ''agents: no'' on working-on-the-plan vs repaired hook; (b) repaired hook with
+      ''on: write'' on fa-hooks, fa-results-notes, fa-figures, fa-git-and-release, fa-testing, fa-sites-and-paths, fa-canonical-setup
+      vs repaired hook. Live check: each post-change agent''s own transcript replayed through the hook in force when it ran
+      must reproduce its recorded REFERENCE chars within 5 percent (the cut works live as replayed), and through the other
+      variants to give its matched saving; context_breakdown.py and usage_windows.py are reported context, not the pass test.
+      Corrections: agent_tasks.py stood rate (48 h) and a hand read of every correction of a post-change agent for a cause
+      in a section it did not get.'
+    check: 'Replay of the live hook (git cdd1f456) against the 32 transcripts'' recorded REFERENCE chars: 31 within 5 percent
+      (pooled ratio 0.995) once the preview is modeled; the one off (agent ...e33720085e0f, 42138 recorded vs 39127) got every
+      section 4 times and fa-hooks 8 times, re-pushes after section edits during its 175 calls (delivery keyed by hash), which
+      a replay on today''s texts cannot reproduce: listed apart. The preview moves the measure: agent ...5f1029a759 recorded
+      1927 chars, 17333 replayed without the preview. Replay results already computed on the 32 (pooled mean / per-agent median
+      tokens per call): live 10023/5931; (c) 11454/6808 (+14 percent: the lost sections now arrive, including fa-sweeps-and-hpo
+      at 10,855 chars, split into parts of at most 9,000 chars delivered on the agent''s next hook calls); (a) 9440/5160 (-17.6/-24
+      percent vs (c)); (b) 10473/5297 (-8.6/-22 percent vs (c)).'
+    fixed: Section texts unchanged (shortening content goes through claudemd-keeper, not this cut); cmds triggers unchanged;
+      the main session's pushes unchanged; the 32 transcripts; 1.722 tok per chars/4 (f3624f9c); the 10,000-char harness cap
+      and 2,178-char preview as recorded.
+    control: 'Matched: the same 32 transcripts (and each post-change agent''s own) through the repaired hook with live sections;
+      (c) itself against the live hook at cdd1f456.'
+    seeds: none (deterministic replay); hand read of every post-change correction
+    outcome: '(c) stays whatever its cost (it repairs lost sections; its +14 percent is reported apart as the price of delivering
+      what the design meant). (a) and (b) each kept if its replayed pooled saving vs (c) is at least 5 percent (both already
+      pass: 17.6 and 8.6), the first 10 post-change agents'' recorded pushes are reproduced by the in-force replay within
+      5 percent (else the mechanism is not what was measured: re-measure before judging), and no correction of a post-change
+      agent traces to the section it withheld; one such correction reverts that change and records a dead end. The stood rate
+      is reported; with fewer than 10 scored post-change tasks per side it is undecidable and said so (kept provisionally,
+      re-read at 10).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
