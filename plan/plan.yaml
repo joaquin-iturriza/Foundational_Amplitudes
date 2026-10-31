@@ -5918,6 +5918,16 @@ entries:
       classes and held-out uncertainty is read from rank_across only: >= 0.5 sigma still orders which held-out cells are worst
       (the cells to target with data), < 0.3 it does not and held-out uncertainty must come from errors. No share verdict.
       A run that blows up (val_loss_no_reg NaN or above 10x its step-500 value) is listed apart with where it blew up.'
+    passed_at: '2026-10-31T04:52:48+00:00'
+    reviewer: 'Het twin of the MSE control only (loss HETEROSC + sigma stage, sign head off, all else as 339ec100/380842ed;
+      mu cost information only); check 2 confirmed in analysis/catalog_daniel/data/catalog_sigma_heldout.json (7719c03f):
+      rank_across 0.734/0.552/0.813 relabels vs -0.010/0.375/0.416 new, rank_within 0.509 vs 0.131 (A), pull std 1.32 vs 13.29;
+      check 3: cuts 0.5/0.3 with a between band, both seeds required, about 800 trained PP4 classes (Spearman sampling SE
+      about 0.03) against the 0.18-0.26 model-to-model spread; outcome rules A (trained, where-map reported either way) and
+      B (held-out calibration, expected no, rank fallback) each with consequences; prior now cites sec:div-sampling and Daniel''s
+      held-out read; searched results.tex heterosc/het loss/sigma head/sigma stage/pull std/spearman/cover68/uncertain, plan.yaml
+      het_uncertainty/sigma map, site decisions sigma/uncertain/het (D52, D69-D71, D220); D220 asks the het-loss uncertainty
+      map, not het mixtures, so dropping the share arms narrows nothing the user named'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
