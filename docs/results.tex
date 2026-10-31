@@ -3480,6 +3480,131 @@ through the same PP4 probes).}\label{tab:v4_bound_shares}
 % allow: 13 0.50 0.25 1 because they are the beam energy, the shares and the reference ratio
 
 
+\paragraph{What the error and the het $\sigma$ follow (2026-10-31).}\label{par:v4_error_correlates} The user's question
+(plan entry error\_correlates): beyond the largest final $|\eta|$ and the collinearity (the smallest pair invariant over
+$\hat s$), which event and process quantities track the per-event error $|q-t|$ of catalog\_v4's short networks and the
+het loss's $\sigma$? No new run: the saved zero-shot reads (best checkpoint) of the twelve short runs of
+par.~\ref{par:v4_mixture} (MSE and het loss; control, shares $0.25$ and $0.50$; seeds 42 and 43) on PP4, EE4, the
+catalog-sampled held-out axes and the default-sampled HD4 and HD5, $2313$ probes of $1613$ classes, $2000$ events each.
+The MSE control's PP4 and catalog-sampled held-out reads were saved before the scored events' pool rows were, so their
+momenta are lost: $2002$ of its probes drop out, its $311$ on EE4, HD4 and HD5 stay, and the MSE side is read on the
+$0.25$-share pair, which has every read. Per event, from the pool's momenta: the largest $|\eta|$, the smallest
+$2|p_i\cdot p_j|/\hat s$ (all pairs but the beams', final-final and beam-final apart), $1/(1-|\cos\theta|_{\max})$ in the
+partonic frame, the smallest and largest $p_T$ and the smallest energy over $\sqrt{\hat s}$, $\Delta R_{\min}$,
+$\sqrt{\hat s}$, the distance to threshold, the boost, the nearest $Z$, $W$, $H$ or $t$ resonance of any pair or triple
+of finals in widths, $\log|\mathcal M|^2$ and its spread over the event's ten nearest neighbours; per process the
+multiplicity, the species counts, the coupling powers, loop, beams, the probe's spread and level of $\log|\mathcal M|^2$
+and whether the class is trained. Measures: the median over probes of the within-probe Spearman coefficient and binned
+mutual information, the same over the pooled events and over classes, and gradient-boosted trees fitted on half the
+classes and scored on the other half (held-out $R^2$, permutation importance). Script
+\code{analysis/catalog\_v4/error\_correlates.py}, data \code{analysis/catalog\_v4/data/error\_correlates.json}. Seed 42
+then 43, het control unless named:
+% src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
+% claim: n_probes=2313
+% claim: n_classes=1613
+% claim: mse_ctl_excluded=2002
+% claim: mse_ctl_probes=311
+% allow: 0.25 0.50 42 43 2000 2 1 because they are the shares, the seeds, the events per probe, exponents and the 2 and 1 of the invariants' formulas
+\begin{itemize}
+  \item \emph{Within a process the error is barely predictable.} The strongest within-probe correlates are the
+    collinearity ($-0.18$, $-0.21$; negative in $0.84$ of the probes) and the event's $\log|\mathcal M|^2$ ($0.16$,
+    $0.17$); the largest $|\eta|$ gives $0.07$, $0.08$ and the partonic $|\cos\theta|$ $0.10$, $0.12$. The trees
+    explain the per-probe normalised log error with held-out $R^2$ $0.16$, $0.16$ (the $0.25$-share MSE pair: $0.03$,
+    $0.04$).
+    % src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
+    % claim: het_ae_y_min_s42=-0.18
+    % claim: het_ae_y_min_s43=-0.21
+    % claim: het_ae_y_min_fracneg_s42=0.84
+    % claim: het_ae_t_level_s42=0.16
+    % claim: het_ae_t_level_s43=0.17
+    % claim: het_ae_eta_max_s42=0.07
+    % claim: het_ae_eta_max_s43=0.08
+    % claim: het_ae_u_fwd_s42=0.10
+    % claim: het_ae_u_fwd_s43=0.12
+    % claim: gbt_het_log_ae_n_s42=0.16
+    % claim: gbt_het_log_ae_n_s43=0.16
+    % claim: gbt_mse25_log_ae_n_s42=0.03
+    % claim: gbt_mse25_log_ae_n_s43=0.04
+    % allow: 0.25 2 because they are the share and exponents
+  \item \emph{The error is mostly the process's.} The log error itself has held-out $R^2$ $0.47$, $0.45$ ($0.25$-share
+    MSE: $0.25$, $0.25$), the process features ahead of the kinematic ones. Over classes the error follows the class's
+    spread of $\log|\mathcal M|^2$ ($0.40$; MSE control on its probes $0.53$), its local spread ($0.40$), the neutrinos
+    ($0.42$) and charged leptons ($0.36$) among the finals, the nearness of its events to a resonance ($-0.32$), the
+    electroweak power ($0.30$) and the multiplicity ($0.30$).
+    % src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
+    % claim: gbt_het_log_ae_s42=0.47
+    % claim: gbt_het_log_ae_s43=0.45
+    % claim: gbt_mse25_log_ae_s42=0.25
+    % claim: gbt_mse25_log_ae_s43=0.25
+    % claim: class_ae_t_std=0.40
+    % claim: class_ae_t_std_mse_ctl=0.53
+    % claim: class_ae_loc_var=0.40
+    % claim: class_ae_n_nu=0.42
+    % claim: class_ae_n_lepton=0.36
+    % claim: class_ae_res_min=-0.32
+    % claim: class_ae_aew_pow=0.30
+    % claim: class_ae_n_final=0.30
+    % allow: 0.25 2 because they are the share and exponents
+  \item \emph{The control errs on the large amplitudes; default-sampled training removes it.} The within-probe
+    coefficient of the error with $\log|\mathcal M|^2$ is $0.16$, $0.17$ for the het control and $0.26$ for the MSE
+    control's probes, but $-0.05$ to $0.00$ over the four het share arms and $-0.01$, $-0.02$ for the $0.25$-share MSE
+    pair; in the het control the top decile of $\log|\mathcal M|^2$ has $1.32$ times its probe's RMS error
+    (Fig.~\ref{fig:v4_error_correlates}, right).
+    % src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
+    % claim: mse_ctl_ae_t_level_s42=0.26
+    % claim: share_het_ae_t_level_min=-0.05
+    % claim: share_het_ae_t_level_max=0.00
+    % claim: mse25_ae_t_level_s42=-0.01
+    % claim: mse25_ae_t_level_s43=-0.02
+    % claim: prof_t_level_top_ae=1.32
+    % claim: het_ae_t_level_s42=0.16
+    % claim: het_ae_t_level_s43=0.17
+    % allow: 0.25 2 because they are the share and exponents
+  \item \emph{$\sigma$ follows the collinearity far more than the error does.} Within a probe $\sigma$ goes with the
+    final-final collinearity at $-0.51$, $-0.52$ (the error $-0.18$), the beam-final one at $-0.34$, $-0.38$, the
+    smallest energy at $-0.36$, $-0.34$ and $\sqrt{\hat s}$ at $0.26$, $0.30$; in the most collinear decile $\sigma$ is
+    $1.41$ times its probe's median, the error $1.32$ times its RMS. $\sigma$ against the error: $0.34$ within probes,
+    $0.58$ over the pooled events, $0.80$ over classes. The trees explain log $\sigma$ with held-out $R^2$ $0.78$, $0.76$
+    (multiplicity, final-final collinearity and the nearest resonance first).
+    % src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
+    % claim: het_s_y_ff_s42=-0.51
+    % claim: het_s_y_ff_s43=-0.52
+    % claim: het_s_y_if_s42=-0.34
+    % claim: het_s_y_if_s43=-0.38
+    % claim: het_s_e_min_s42=-0.36
+    % claim: het_s_e_min_s43=-0.34
+    % claim: het_s_sqrt_shat_s42=0.26
+    % claim: het_s_sqrt_shat_s43=0.30
+    % claim: prof_y_ff_first_s=1.41
+    % claim: prof_y_ff_first_ae=1.32
+    % claim: het_s_ae_within=0.34
+    % claim: het_s_ae_pooled=0.58
+    % claim: het_s_ae_classes=0.80
+    % claim: gbt_het_log_s_s42=0.78
+    % claim: gbt_het_log_s_s43=0.76
+    % claim: het_ae_y_min_s42=-0.18
+    % allow: 2 because it is an exponent
+\end{itemize}
+The outcome took the design's second branch: $|\eta|$ is weak, the collinearity stays the strongest event quantity for
+the error but weakly, and the error is mostly a class-level quantity, driven by the spread of the target, leptons and
+neutrinos and the resonances. The one new event-level correlate, the error growing with $\log|\mathcal M|^2$, is gone in
+every default-share arm, one more point for a default share.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.49\textwidth]{../analysis/catalog_v4/figs/error_correlates_rank.pdf}\hfill
+  \includegraphics[width=0.49\textwidth]{../analysis/catalog_v4/figs/error_correlates_profile.pdf}\\[1ex]
+  \includegraphics{../analysis/catalog_v4/figs/error_correlates_rank_legend.pdf}
+  % src: python3 analysis/catalog_v4/error_correlates.py summary @dbc30a14
+  % allow: 0.25 0.49 42 43 2 because they are the share, the width, the seeds and exponents
+  \caption{Left: per event quantity (the eight strongest), the median over probes of the within-probe Spearman
+    coefficient with the error (het control, green; the $0.25$-share MSE pair, blue) and with the het $\sigma$
+    (orange); filled seed 42, open seed 43; every read pooled. Right: het control seed 42, per decile of
+    $\log|\mathcal M|^2$, the final-final collinearity and $\sqrt{\hat s}$ over the pooled events, the RMS of the error
+    (solid) and the median $\sigma$ (dashed), each over its probe's.}
+  \label{fig:v4_error_correlates}
+\end{figure}
+
+
 \paragraph{MadEvent runs that stop short of their target (2026-10-30).}\label{par:v4_short_runs} The question, from the
 catalog\_v4 generation (the default-sampled share and the $13$\,TeV pp pools): a MadEvent run skips its second refine
 when the cross section looks stable and then often returns fewer unweighted events than it asked (``fail to reach
