@@ -180,3 +180,4 @@ talks/progress_oct2026b/data/
 .claude/hooks/incidents.jsonl
 .claude/.context_pushed/
 .claude/.main_work.jsonl
+analysis/agent_redesign/mechanical_watch.json
