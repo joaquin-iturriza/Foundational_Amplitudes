@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: running
+- status: held
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -139,6 +139,14 @@ entries:
     answers_after: '2026-10-31T03:34:14+00:00'
     covers:
     - v3_prep_explore
+  - said_at: '2026-10-31T04:23:28.836000+00:00'
+    text: 'So right now, we let things that are running finish, but nothing else gets done except two things: The catalog4
+      + pp beams mixtures, smart sampling arm, we see the results of the mixtures, we see using the het loss the places where
+      the network is uncertain, and decide what to do then, but nothing more than that.'
+    decision: D222
+    answers_after: '2026-10-31T03:34:14+00:00'
+    covers:
+    - v3_prep_explore
   decisions:
   - D83
   - D129
@@ -150,6 +158,7 @@ entries:
   - D195
   - D199
   - D216
+  - D222
   next:
     7: '(a) capacity and training length for the held-out multiplicity gap: wanted by the user (D216), held by D78 inside
       the full catalog pretraining''s design; not started.'
@@ -2422,6 +2431,7 @@ entries:
   - at: '2026-10-31T04:24:08+00:00'
     text: 'a compaction inside the turn of owner acd8bbf4e51c1e6d4 at 2026-10-31T04:22:08.879Z: its brief or scope was too
       large; narrow the next brief'
+  hold_decision: D222
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
