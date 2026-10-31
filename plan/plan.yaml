@@ -5693,6 +5693,7 @@ entries:
     - switch-overs A, B, D applied and committed (merge 2c7741c0, settings 84a15232); reply check fixed (d2c15a58); worktree
       removal script (d39af33d, 978b7179); supervisor summary-check fixes in ~/.local/bin/site, supervisor restarted 12:55
     - tests/test_context_push.py
+    - tools/model_trial.py
     - tools/push_replay.py
   dead_ends: []
   asks:
