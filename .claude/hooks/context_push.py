@@ -148,6 +148,25 @@ def deliver(session, who, found, reset=False):
     return new
 
 
+def respond(inp, mode="post"):
+    """The additionalContext text for one hook input (None when nothing is new), delivery recorded."""
+    secs = sections()
+    who = inp.get("agent_id") or "main"
+    ev = inp.get("hook_event_name") or {"pre": "PreToolUse", "post": "PostToolUse", "session": "SessionStart"}[mode]
+    if mode == "session" or ev == "SessionStart":
+        if inp.get("agent_id"):
+            return ev, None
+        found = [(n, b) for n, h, b in secs if "main" in " ".join(h.get("session") or [])]
+        new = deliver(inp.get("session_id"), "main", found, reset=inp.get("source") in ("compact", "clear"))
+        ev = "SessionStart"
+    else:
+        found = matches(inp.get("tool_name") or "", inp.get("tool_input") or {}, secs)
+        new = deliver(inp.get("session_id"), who, found) if found else []
+    if not new:
+        return ev, None
+    return ev, "\n\n".join("REFERENCE %s (pushed once; rules stay in CLAUDE.md)\n%s" % (n, b) for n, b in new)
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "post"
     try:
@@ -156,23 +175,10 @@ def main():
         return 0
     if not isinstance(inp, dict):
         return 0
-    secs = sections()
-    who = inp.get("agent_id") or "main"
-    ev = inp.get("hook_event_name") or {"pre": "PreToolUse", "post": "PostToolUse", "session": "SessionStart"}[mode]
-    if mode == "session" or ev == "SessionStart":
-        if inp.get("agent_id"):
-            return 0
-        found = [(n, b) for n, h, b in secs if "main" in " ".join(h.get("session") or [])]
-        new = deliver(inp.get("session_id"), "main", found, reset=inp.get("source") in ("compact", "clear"))
-        ev = "SessionStart"
-    else:
-        found = matches(inp.get("tool_name") or "", inp.get("tool_input") or {}, secs)
-        new = deliver(inp.get("session_id"), who, found) if found else []
-    if new:
-        text = "\n\n".join("REFERENCE %s (pushed once; rules stay in CLAUDE.md)\n%s" % (n, b) for n, b in new)
+    ev, text = respond(inp, mode)
+    if text:
         print(json.dumps({"hookSpecificOutput": {"hookEventName": ev, "additionalContext": text}}))
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
