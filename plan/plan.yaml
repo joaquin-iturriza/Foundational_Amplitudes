@@ -7099,6 +7099,20 @@ entries:
       1 on every W-th recipe); the A/B gains A2 (A repeated) as the control for the forward''s own difference. Rerun FA-ccin2p3-bfec5501
       (0.67 GPU-h; submitted on ccin2p3 though site pick offered lxplus: the parent checkpoint and the earlier reads exist
       only on ccin2p3, the data-locality gap of 15:50).'
+  - at: '2026-10-31T17:07:31+00:00'
+    text: '18:1x. Step 18: queue hd_test_measured done: 348/348 tasks, 106/106 pools assembled, 0 failed (lhe_parts status);
+      check_site_data on catalog_v4_heldout_default_test.yaml: the 106 test pools present, the 8 missing are the 5 five-body
+      pools (64-core gridpacks 765bdd9c 5d4e6872 1e7f2159 49120869 926b4f19 in survey/refine at 30 min) and the three 20 TeV
+      pools. Defect found and fixed (35d4deab): no hd_ pool had a diagram sidecar, so the HD4 reads would have run with the
+      off-shellness and order features silently off for every hd_ probe; the entries now read their tree''s sidecar (diagrams_of,
+      honoured by experiment._resolve_diagram_path and check_site_data), recipe ids unchanged; check_site_data now reports
+      no missing sidecar. Run-size probes f0b9c35e 0da42a47 5f5ef310 fffbc4e3 f719bbff: every run of 250 returned 250 (yield
+      1.0, 31 runs), slowest 266 s (pp d d~ -> d h u~ W+ at 20 TeV, now laid out in 10 runs of 250, 7d...), lhe_probe_yields_hd_e20.json
+      / lhe_rates_hd_e20.json; queue hd_test_e20_small_runs (3 pools, 35 tasks incl. 7 gridpack tasks, est 0.9 core-h, longest
+      task 0.06 h): 3 workers of 16 cores (one wave, site pick width 1124), 1 h limit, target 0.5 h: 62f8cc25 22ea52de 585d8d94.
+      Step 19: label rule ''virt'' (77312c3f) and H5 pools (28; 42 gridpacks, 92 runs); design passed; label check a82278d8
+      (each H5 class''s 200 catalog test rows relabelled through the rule, compared with stored labels, MadLoop s/point) and
+      42 gridpool probes (one per pool and e+e- energy, GP_RUNS 2, 1.5 h limit, target 1.5 h).'
   handoff:
     state: 'Step 18: queue hd_test_measured (106 pools) almost done at 17:32 (346/348 tasks, 105/106 assembled). Running:
       five 250-event run-size probes for the three slow 20 TeV pools (f0b9c35e 0da42a47 5f5ef310 fffbc4e3 f719bbff), five
