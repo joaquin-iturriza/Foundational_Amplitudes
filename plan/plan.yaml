@@ -6190,7 +6190,7 @@ entries:
       - 'above 1.05: a generalisation cost on those axes, a trade-off for Joaquin'
   owner:
     agent: aadc46d99c71df5e6
-    state: working
+    state: closed
     since: '2026-10-31T04:38:38+00:00'
     state_at: '2026-10-31T04:57:14.456000+00:00'
     context: 106801
@@ -6591,31 +6591,38 @@ entries:
       LOSS on catalog-sampled events. 142 held-out classes (H2p5 38, H5 28, H6 8, H7E 34, H7c 34) have no default pool: estimate
       20.8 core-h of MadEvent (heldout_default_pools.py @f15cd5bf), longest run about 3100 core-s, labels not counted.'
   handoff:
-    state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
-      @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
-      share 0.25 PP4 0.755, EE4 0.413, held 1.225; written up par:v4_pp_bound + par:v4_mixture (614d512c, claims verify).
-      Open question on the entry to Joaquin: which share catalog_v4 carries (none / 0.25 / 0.50 / test 0.10 first). Old steps
-      15/16 done: stored _smixd50/_smixd25 pools deleted under D207 (tools/prune_mixture_pools.py @7510a057, 5472 pools, 53.11
-      GB, manifest /sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/.prune_manifests/mixture_pools_20261031_051555.json);
-      check_site_data --alphas ok on both recipes; mix_compose_check --load composes at load (18 pools ok); standalones prune
-      93625c9d freed 16.42 GB; /sps now 355/512 GB. NEXT 15, het-loss uncertainty read (D220): the four mixture arms (6c246603,
-      1d46b938, 11ad944a, 9c6fc7ab) and the control pair (339ec100, 380842ed) were trained by scripts/job_catalog_v3_short.sh
-      with the MSE loss (its header, line 25: arithmetic-mean MSE, sign head not in the het loss), so they carry NO predicted
-      variance and cannot be re-read for sigma. The only het-loss (sigma head) runs found: Daniel''s catalog pretraining sweep
-      dancat_het_pre (sweep/sweep_config_dancat_het_pre.yaml, best runs/dancat_het_pre/trial_0058 under the CC sweep dir;
-      results.tex ~5724) and its sigma read on held-out processes (par ''The sigma head on the held-out processes'', ~6496:
-      tools/zero_shot_parent.py saves per-event sigma, analysis/catalog_daniel/catalog_sigma_heldout.py): a different catalog,
-      so it does not answer D220 on catalog_v4. Not checked: any other het run on catalog_v4 (grep plan/site runs for het/sigma
-      first). Likely needs het-loss twins of control and arm(s), GPU-h stated before any run, design then design-reviewer.'
-    decisions: Deleted the stored mixture pools under D207 ('no stored mixture pools'), not D209/D216 which cover standalones/v3_prep_explore;
-      pre-delete check showed composed default rows equal the stored ones (max rel 2.3e-7, KS p>=0.14). Trade-off sent to
-      Joaquin as the design requires, no winner chosen.
-    ruled_out: Re-reading the step-14 arms for sigma (MSE-trained, no sigma head).
-    running: none
-    files: analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/mixture_ab.json, analysis/catalog_v4/data/pp_bound.json,
-      analysis/catalog_v4/data/reads/, tools/prune_mixture_pools.py, tools/mix_compose_check.py, mix_compose.py, scripts/job_catalog_v3_short.sh,
-      tools/zero_shot_parent.py, analysis/catalog_daniel/catalog_sigma_heldout.py, docs/results.tex (par:v4_pp_bound, par:v4_mixture)
-    written: '2026-10-31T04:37:50+00:00'
+    state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
+      reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
+      with held-out read on default-sampled events, catalog-sampled beside; sigma rules A/B; <= 22.8 GPU-h). Smoke FA-ccin2p3-da21ae07
+      (slurm 62899632, CC, 1 h, code b6f61a7d30) submitted; step 15 waits on it. Held-out default-sampled read done for 558
+      classes (H1 62, H2 217, H3 279: PP4/EE4 probes), MSE R 0.912 [0.802,1.068] / 0.921 [0.795,1.064] vs catalog-sampled
+      1.267 / 1.223 on the same classes (mixture_ab.py heldout_default @744fad42). New step (recorded by coordinator): default-sampled
+      test pools for the 142 held-out classes without one (H2p5 38, H5 28, H6 8, H7E 34, H7c 34), estimate 20.8 core-h MadEvent
+      (heldout_default_pools.py @f15cd5bf), not started.'
+    decisions: 'Share arms back in the het design because Joaquin asked (via coordinator, 2026-10-31; reviewer notes these
+      asks are not in site decisions: main session to record his words). Held-out classes of H1-H3 read on PP4/EE4 probes
+      because those are MadEvent default test pools of the same classes (Joaquin: the check is against data generated the
+      default way). Het control in its own case branch in job_catalog_v3_short.sh (submit_guard''s arm_recipe reads the last
+      TRAIN= of a branch; the nested case made it read catalog_v4_control_train.yaml). Placement --only ccin2p3: the catalog_v4
+      training pools exist only on CC (site pick unrestricted chose lxplus).'
+    ruled_out: 'Re-reading an existing catalog_v4 het run: none exists (1525 HETEROSC configs on CC, none on catalog_v4).
+      The share ratio of sigma S: dropped (no evidence sigma moves with share).'
+    running: 'FA-ccin2p3-da21ae07: v4_het_control smoke. On its end: read the log (HETEROSC, Muon, sign head off, sigma stage
+      time, reads from sigma_stage with s non-empty); then site pick FA --jobs 6 --mem 48G --hours 3.75 --only ccin2p3, plan
+      target catalog_coverage --batch het_mixture --wall 3.75 --jobs 6, submit the six arms (v4_het_control[_seed2], v4_het_default50[_seed2],
+      v4_het_default25[_seed2]) with --allow-dirty --hdr=--mem=48G --hdr=--time=03:45:00 (adjust from the smoke''s sigma stage)
+      --est-gpu-hours 3.75 --item catalog_coverage, plan run each, plan wait 15. Then: mixture_ab.py gains MIX_HET and analysis/catalog_v4/het_uncertainty.py,
+      committed before reading. Generation step for the 142 classes: spec entries per class at its own settings (H7E: base
+      at sqrts 20 TeV window; H7c: pt_min 30 cut in the run card; H6: base kinematics, labels at alpha_s 0.13 (mg5_pipeline_final
+      lhe.label_alphas has aqcdup/running rules only: needs a fixed-value rule); H5: base Born MadEvent events with one-loop
+      labels (no lhe loop-label path found in mg5_pipeline_final: needs one); H2p5: e+e- 5-body ee4-style entries at catalog
+      energies), 2000 test events each; probe (scripts/job_lhe_probe.sh), lhe_parts plan queue, workers; then eval-only REREAD
+      of 6c246603 1d46b938 11ad944a 9c6fc7ab and 339ec100 380842ed (and the het arms) on the new pools, extend heldout_default
+      to them.'
+    files: scripts/job_catalog_v3_short.sh, tools/short_wall.py, tests/test_short_wall.py, analysis/catalog_v4/mixture_ab.py,
+      analysis/catalog_v4/data/mixture_heldout_default.json, analysis/catalog_v4/heldout_default_pools.py, analysis/catalog_v4/data/heldout_default_pools.json,
+      analysis/catalog_daniel/catalog_sigma_heldout.py, analysis/catalog_daniel/data/catalog_sigma_heldout.json
+    written: '2026-10-31T05:01:21+00:00'
   ask: Read the held-out bar on default-sampled events of the held-out processes (new test pools, sized by the owner), or
     judge the share on PP4 and EE4 alone and pick 0.50, 0.25 or none now?
   waiting_since: '2026-10-31T04:46:58+00:00'
