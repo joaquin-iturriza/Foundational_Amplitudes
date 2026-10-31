@@ -6521,6 +6521,7 @@ entries:
       per turn / 9% per call (edits of hooks, site, site_gate, settings, CLAUDE.md): proposals to Joaquin'
     8: 'Double wake per agent stop: test whether ending with plain final text (no SubagentHandback) gives one main-session
       wake carrying the report (Joaquin asked 2026-10-31)'
+    9: 'Context-guard flush note reaches owners (catalog owner closed at 153k): make it target only the main session'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -6636,6 +6637,11 @@ entries:
       if:
       - 'one wake with the report whole: change step_prompt, mechanical_prompt and agent definitions'
       - 'still two wakes or report lost: report what the transcript shows to Joaquin'
+    9:
+      feeds: owner lifetimes
+      if:
+      - 'the hook can tell main from agent: restrict it and test on an agent turn'
+      - 'it cannot: owners'' briefs say to ignore it'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
