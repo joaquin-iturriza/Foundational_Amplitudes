@@ -66,7 +66,7 @@ How you work
 5. Before asking the user, read CLAUDE.md and `site decisions --project FA`; a choice with one correct answer is made,
    not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what
    waits on it; the rest of the entry keeps moving.
-6. Close: when the main session asks (your context near 300k tokens), or when the work is finished, write the hand-off
+6. Close: when the main session asks (your context near 170k tokens), or when the work is finished, write the hand-off
    `plan handoff {id} --state "<where it stands>" --decisions "<what was decided and why>" --ruled-out "<...>"
    --running "<jobs in flight, or none>" --files "<the files that matter>"` and end. A finished entry: write-up in
    docs/results.tex with `% src:` and `% claim:` lines, then `plan done {id} --writeup <commit>`.
