@@ -6110,6 +6110,15 @@ entries:
       choice. The new-114 and per-axis reads are reported beside the pooled one; an axis whose interval lies above 1.05 while
       the pool does not is named as a localized cost. Het arms: the same three reads under HETEROSC against v4_het_control,
       after the six het runs end; their agreement or not with the MSE reads is reported. H5 follows in next 19.'
+    passed_at: '2026-10-31T05:24:48+00:00'
+    reviewer: 'Re-check after FIX: eval-only re-reads, same hd_ pools for arms and controls (MSE and het); measure moves:
+      558 H1-H3 classes R 1.267 catalog-sampled -> 0.912 default-sampled (mixture_heldout_default.json), per axis H1 0.58
+      H2 0.70 H3 1.13; spread stated from mixture_ab.json (H2p5 [1.024,1.497], H7E [1.352,1.566], H7c [1.265,2.038], 143-class
+      pool [1.088,1.592], seed ratio 0.98-1.18), resolution on pooled 672 about R<0.91 / >1.2, checked against 558-class [0.802,1.068];
+      outcome has yes/no/undecided with what each changes (undecided to Joaquin, more seeds offered not run); H6 added (5d4c0e9c,
+      test_label_alphas_mz passes, labels run from 0.13 as the catalog''s alpha_s 0.13 pools), H5 recorded as next 19; 19.19
+      core-h, 4.8-6 GPU-h; HD4 job-axis edits to be committed before any re-read. Searched heldout_default, hd_, E20, c30,
+      d4c30r, dsh_, default-sampled held-out in results.tex, plan.yaml, site decisions: only the cited 04:56 finding.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
