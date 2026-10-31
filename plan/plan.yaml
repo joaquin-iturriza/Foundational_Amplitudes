@@ -6744,6 +6744,9 @@ entries:
       (one-loop label rule on Born events). Probe batch hd_probe: 6 CPU jobs (180 runs of 1000 events) FA-ccin2p3-fd7cf028
       231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf at 11297eec, target 1.2 h. Side note: tests/test_default_share.py::test_lhe_runs
       fails already at 1ede6016, before this work.'
+  - at: '2026-10-31T05:30:22+00:00'
+    text: owner ae7bc0ff5c64982f0 compacted twice inside its turn (05:09, 05:22) doing the H6 label rule, the 114-pool design
+      and review, re-read tooling and probe submission in one turn; next resume carries one step only
   handoff:
     state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
       reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
