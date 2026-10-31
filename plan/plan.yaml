@@ -3432,9 +3432,14 @@ entries:
       the right numbers''): build MadEvent-default test pools for H1-H7c, re-read the MSE arms and control pair on them (REREAD),
       then the same comparison under the het loss (arms at both shares and control, seeds 42/43) folded into the het design;
       GPU-h stated, above 30 to Joaquin'
-    18: 'Default-sampled test pools for the 142 held-out classes without one (H2p5 38, H5 28, H6 8, H7E 34, H7c 34; about
-      20.8 core-h CPU, estimate from heldout_default_pools.py f15cd5bf): generation spec at their own energy, cuts and labels,
-      per-class probe, queue, then eval-only re-read of the MSE arms and control pair'
+    18: 'Default-sampled test pools for the 114 held-out classes of H2p5 38, H6 8, H7E 34, H7c 34 (recipes/catalog_v4_heldout_default_processes.yaml
+      @5d4c0e9c; 19.19 core-h CPU, estimate from heldout_default_pools.py @647cfada, 38 five-body classes costed at the largest
+      measured multiplicity as a lower bound): per-class probe, queue, then eval-only re-read (axis HD4) of the MSE arms and
+      control pair, and of the het arms and control once the six het runs end'
+    19: 'H5 (28 one-loop classes) default-sampled test pools: pipeline piece lhe label rule ''virt'' labelling MadEvent Born
+      events with the class''s MadLoop [virt=QCD] standalone (tools/nlo_virtual_pipeline.py, an isolated subprocess per chunk
+      as datagen''s kind virt), test on a small ee pool, then generation (about 1.0 core-h of MadEvent, the loop labels measured
+      in the probe) and the same HD4 re-read'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6255,8 +6260,16 @@ entries:
     18:
       feeds: next 14, the share choice
       if:
-      - 'the 142 classes read below 1.05 pooled: the held-out read is complete and no loss'
-      - 'above 1.05: a generalisation cost on those axes, a trade-off for Joaquin'
+      - 'pooled default-sampled R over H1-H3 plus these 114 (672 classes) with its widened upper end below 1.05: no generalisation
+        cost at that share'
+      - 'its widened lower end above 1.05: a generalisation cost, a trade-off for Joaquin'
+      - 'interval spanning 1.05: undecided, reported to Joaquin with the interval for the share choice; more seeds of the
+        existing arms offered with their GPU-h, not run'
+    19:
+      feeds: next 14, the share choice (the held-out read complete on all 142 classes)
+      if:
+      - 'H5 R within the pooled interval: the pooled read stands'
+      - 'H5 R outside it: reported per axis to Joaquin'
   owner:
     agent: ae7bc0ff5c64982f0
     state: working
