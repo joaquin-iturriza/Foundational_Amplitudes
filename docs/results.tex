@@ -3289,25 +3289,92 @@ wins on GAIN and NO LOSS, and a gain with a loss is a trade-off for the user.
     % claim: shares.default50.held.H5.R=0.97
     % claim: shares.default25.held.H5.R=0.97
     % allow: 1 0.50 0.25 because they are the reference ratio and the shares, settings
+  \item \emph{The held-out cost on default-sampled events, the rule's read.} The user's objection [D227]: the
+    generalisation cost is to be checked on events generated the default way, as PP4 and EE4 are, and the held-out read
+    above was on the catalog's own sampling. The same best checkpoints were read again, eval-only, on MadEvent
+    default-sampled test pools of every held-out class: the PP4 and EE4 probes of the H1 to H3 classes, and pools
+    generated for the rest (HD4, \code{recipes/catalog\_v4\_heldout\_default\_test.yaml}: the $114$ tree classes of
+    H2p5, H6, H7E and H7c; HD5, \code{recipes/catalog\_v4\_heldout\_default\_H5\_test.yaml}: the $28$ one-loop classes
+    of H5), $700$ classes pooled, against the same control pair. Share $0.50$: $R=0.860$ ($[0.745, 0.983]$), $0.61$ of
+    the classes lower; share $0.25$: $R=0.871$ ($[0.754, 0.994]$), $0.60$ lower. Both NO LOSS. By axis, every one is
+    below $1$ but H3, the classes that hold out the physical top ($279$ classes): $1.133$ ($[0.970, 1.300]$) at
+    $0.50$, $1.082$ ($[0.943, 1.231]$) at $0.25$, both intervals across $1$; H5 is at $0.987$ and $0.977$, H6 ($8$
+    classes) spans $[0.40, 2.23]$ and $[0.45, 2.08]$.
+    % src: python3 analysis/catalog_v4/mixture_ab.py mixture @19ccfe6e
+    % claim: shares.default50.held_default.pooled.n_classes=700
+    % claim: shares.default50.held_default.pooled.R=0.860
+    % claim: shares.default50.held_default.pooled.widened.0=0.745
+    % claim: shares.default50.held_default.pooled.widened.1=0.983
+    % claim: shares.default50.held_default.pooled.frac_classes_below_1=0.61
+    % claim: shares.default25.held_default.pooled.R=0.871
+    % claim: shares.default25.held_default.pooled.widened.0=0.754
+    % claim: shares.default25.held_default.pooled.widened.1=0.994
+    % claim: shares.default25.held_default.pooled.frac_classes_below_1=0.60
+    % claim: shares.default50.held_default.H3.n_probes=279
+    % claim: shares.default50.held_default.H3.R=1.133
+    % claim: shares.default50.held_default.H3.widened.0=0.970
+    % claim: shares.default50.held_default.H3.widened.1=1.300
+    % claim: shares.default25.held_default.H3.R=1.082
+    % claim: shares.default25.held_default.H3.widened.0=0.943
+    % claim: shares.default25.held_default.H3.widened.1=1.231
+    % claim: shares.default50.held_default.H5.R=0.987
+    % claim: shares.default25.held_default.H5.R=0.977
+    % claim: shares.default50.held_default.H6.n_probes=8
+    % claim: shares.default50.held_default.H6.widened.0=0.40
+    % claim: shares.default50.held_default.H6.widened.1=2.23
+    % claim: shares.default25.held_default.H6.widened.0=0.45
+    % claim: shares.default25.held_default.H6.widened.1=2.08
+    % allow: 114 28 0.50 0.25 1 because they are the recipes' class counts, the shares and the reference ratio
+  \item \emph{The same A/B under the het loss.} The design repeated with the per-event variance loss of the catalog
+    trainings [D52, D70] (two seeds per share, FA-ccin2p3-466656b2, FA-ccin2p3-9897833d at $0.50$, FA-ccin2p3-f0156d88,
+    FA-ccin2p3-df858d33 at $0.25$; control FA-ccin2p3-87ea24d0, FA-ccin2p3-321a3de2), read the same way. Share $0.50$:
+    PP4 $0.505$ ($[0.406, 0.633]$), EE4 $0.220$ ($[0.166, 0.280]$), held out on default-sampled events $0.722$
+    ($[0.554, 0.929]$); share $0.25$: PP4 $0.450$ ($[0.360, 0.556]$), EE4 $0.223$ ($[0.173, 0.301]$), held out $0.638$
+    ($[0.501, 0.834]$). Both win. H3 is at $0.959$ and $0.846$ (upper ends $1.238$ and $1.055$). On the catalog-sampled
+    held-out read the het shares sit at $1.144$ and $0.931$, intervals across $1$.
+    % src: python3 analysis/catalog_v4/mixture_ab.py mixture --het @19ccfe6e
+    % claim: shares.default50.PP4.all.R=0.505
+    % claim: shares.default50.PP4.all.widened.0=0.406
+    % claim: shares.default50.PP4.all.widened.1=0.633
+    % claim: shares.default50.EE4.all.R=0.220
+    % claim: shares.default50.EE4.all.widened.0=0.166
+    % claim: shares.default50.EE4.all.widened.1=0.280
+    % claim: shares.default50.held_default.pooled.R=0.722
+    % claim: shares.default50.held_default.pooled.widened.0=0.554
+    % claim: shares.default50.held_default.pooled.widened.1=0.929
+    % claim: shares.default25.PP4.all.R=0.450
+    % claim: shares.default25.PP4.all.widened.0=0.360
+    % claim: shares.default25.PP4.all.widened.1=0.556
+    % claim: shares.default25.EE4.all.R=0.223
+    % claim: shares.default25.EE4.all.widened.0=0.173
+    % claim: shares.default25.EE4.all.widened.1=0.301
+    % claim: shares.default25.held_default.pooled.R=0.638
+    % claim: shares.default25.held_default.pooled.widened.0=0.501
+    % claim: shares.default25.held_default.pooled.widened.1=0.834
+    % claim: shares.default50.held_default.H3.R=0.959
+    % claim: shares.default25.held_default.H3.R=0.846
+    % claim: shares.default50.held_default.H3.widened.1=1.238
+    % claim: shares.default25.held_default.H3.widened.1=1.055
+    % claim: shares.default50.held.pooled.R=1.144
+    % claim: shares.default25.held.pooled.R=0.931
+    % allow: 0.50 0.25 1 because they are the shares and the reference ratio
 \end{itemize}
-Both shares take the design's trade-off branch: each gains on every default-sampled read, far past the bar on EE4 and
-on PP4's trained classes, and each costs a fifth to a quarter on the held-out classes the catalog samples its own way,
-with about four in five of them worse. The larger share buys more on PP4 and costs a little more held out; its PP4
-interval overlaps the smaller share's estimate, so the two are not clearly apart there. Against the bound of
-par.~\ref{par:v4_pp_bound} ($0.388$ on the trained classes, all their training events default-sampled), half the
-events default-sampled brings the trained classes to $0.549$, most of the way. On PP4's classes catalog\_v4 does not
-train, the mixtures sit at $0.92$ and $0.93$ with intervals across $1$, the same unsettled reading the bound arm gave
-there. So the catalog's own sampling carries the held-out generalisation these notes measure, and default-sampled
-events carry the error on events drawn the way a generator draws them; neither share wins under the rule. The mixture
-stays as it is until the user weighs the two (the verdict in \code{analysis/catalog\_v4/data/mixture\_ab.json}); the
-mixtures are composed at load time from the stored pools [D207], so either share can be trained again without
-building pools.
-% src: python3 analysis/catalog_v4/mixture_ab.py mixture @4973581b
+Read as the rule asks, on default-sampled events everywhere [D227], both shares take the design's win branch under
+both losses: each gains on PP4 and EE4, far past the bar on EE4 and on PP4's trained classes, and the held-out classes
+are lower too ($R$ below $1$ pooled, the interval's upper end too, under MSE and het alike). The rule's tie-break (the larger share only
+when its PP4 and EE4 intervals end below the smaller share's estimates) does not separate them, so the verdict is
+share $0.25$ (\code{analysis/catalog\_v4/data/mixture\_ab.json}, \code{mixture\_ab\_het.json}). The cost the
+catalog-sampled read showed above, a fifth to a quarter, is a cost on events drawn the catalog's way, the way all of the
+control's training events are drawn; on events drawn the default way the held-out classes gain. Against the bound of
+par.~\ref{par:v4_pp_bound} ($0.388$ on the trained classes, all their training events default-sampled), half the events
+default-sampled brings the trained classes to $0.549$, most of the way. Open: H3, the one axis above $1$ under MSE at
+both shares, with intervals across $1$; whether a share costs the top classes is not settled on these two seeds. The
+share catalog\_v4 carries is the user's choice (none, $0.25$ or $0.50$); the mixtures are composed at load time from
+the stored pools [D207], so the chosen one is trained without building pools.
+% src: python3 analysis/catalog_v4/mixture_ab.py mixture @19ccfe6e
 % claim: bound.R=0.388
 % claim: shares.default50.PP4.trained.R=0.549
-% claim: shares.default50.PP4.not_trained.R=0.92
-% claim: shares.default25.PP4.not_trained.R=0.93
-% allow: 1 because it is the reference ratio
+% allow: 1 0.50 0.25 because they are the reference ratio and the shares
 
 
 \paragraph{MadEvent runs that stop short of their target (2026-10-30).}\label{par:v4_short_runs} The question, from the
