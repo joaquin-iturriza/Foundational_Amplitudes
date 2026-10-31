@@ -63,9 +63,10 @@ ap.add_argument("--allow-physics-mismatch", default=os.environ.get(pool_physics.
 ap.add_argument("--build", choices=("cached", "load"), default=os.environ.get("ZS_BUILD", "cached"),
                 help="the parent's config per probe: cached (parsed once at start-up) or load (re-read per probe, "
                      "the original path, kept for A/B)")
-ap.add_argument("--workers", type=int, default=int(os.environ.get("ZS_WORKERS", "0")),
-                help="probes scored in parallel by this many processes, sharing the GPU "
-                     "(0: one per two CPUs of the job, at most 8 and at most one per probe)")
+ap.add_argument("--workers", type=int, default=int(os.environ.get("ZS_WORKERS", "1")),
+                help="probes scored in parallel by this many processes, sharing the GPU (0: one per two CPUs of the "
+                     "job, at most 8 and at most one per probe). Default 1: in the A/B FA-ccin2p3-bfec5501 (V100, 62 H1 "
+                     "probes) 4 spawned workers took 155 s against 44 s for one, each worker paying its own start-up")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
 

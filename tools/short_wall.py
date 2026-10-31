@@ -21,7 +21,9 @@ node), about 93 min for the 912 of catalog_v4_default50_train.yaml; the step-15 
 import argparse, json, math, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 1.6, 15.0, 1.0, 1.25
+# S_PROBE: the zero-shot reader with the parent config parsed once (--build cached, 1 worker): 44 s for 62 H1 probes
+# of the MSE control on a V100, start-up included (A/B FA-ccin2p3-bfec5501), 0.71 s per probe; was 1.6 (per-probe load)
+S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 0.71, 15.0, 1.0, 1.25
 SIGMA_STAGE_MIN = 20.0
 S_COMPOSE = 6.1
 
