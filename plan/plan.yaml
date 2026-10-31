@@ -2326,7 +2326,7 @@ entries:
       it is released)'
   owner:
     agent: acd8bbf4e51c1e6d4
-    state: working
+    state: stopped
     since: '2026-10-31T03:56:15+00:00'
     context: 92454
     context_at: '2026-10-31T03:58:53+00:00'
