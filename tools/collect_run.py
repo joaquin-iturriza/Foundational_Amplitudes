@@ -42,13 +42,14 @@ sys.path.insert(0, os.path.join(HERE, "tools"))
 import pool_physics  # noqa: E402  (standard library only at import)
 SITE = shlex.split(os.environ.get("PLAN_SITE", "site"))
 PLAN = [sys.executable, os.path.join(HERE, "tools", "plan.py")]
-CROSS_PREFIX = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_"}  # the job's rule
+CROSS_PREFIX = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_",
+                "HD4": "hd_"}  # the job's rule
 # EE4 entries excluded by decision (pool_physics.DROPPED: ee4_epem_cgsxwm, its 3 TeV block dropped, D193); the job
 # leaves them out and lists (V3_AXIS_PARTIAL) every other entry without a pool, so any other one missing is still
 # reported here
 EE4_DROPPED = set(pool_physics.DROPPED)
 # the role each axis is scored on, as scripts/job_catalog_v3_short.sh sets SPLIT (test on PP4 and TR, val elsewhere)
-AXIS_SPLIT = {"PP4": "test", "TR": "test", "EE4": "test"}
+AXIS_SPLIT = {"PP4": "test", "TR": "test", "EE4": "test", "HD4": "test"}
 FINISHED = {"COMPLETED", "FAILED", "TIMEOUT", "CANCELLED", "OUT_OF_MEMORY", "NODE_FAIL", "DONE", "REMOVED"}
 
 
@@ -70,6 +71,8 @@ def axis_recipe(axis, cat):
         return "recipes/catalog_v4_pp_test.yaml"
     if axis == "EE4":
         return "recipes/catalog_v4_ee_test.yaml"
+    if axis == "HD4":
+        return "recipes/catalog_v4_heldout_default_test.yaml"
     if axis == "TR":   # the in-distribution read of the job's axis TR: the controls' training recipe (other arms' differ)
         return "recipes/catalog_%s_train.yaml" % cat
     return "recipes/catalog_%s_heldout_%s.yaml" % (cat, axis)
