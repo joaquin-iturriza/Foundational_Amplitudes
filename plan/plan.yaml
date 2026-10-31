@@ -6326,6 +6326,21 @@ entries:
       step with the loss still falling too low, either reported to Joaquin with the cell, not refit. Width yes at 16x (32
       over 8 interval below 1): the network is too small, the wider cell becomes the candidate; width no: width 8 is big enough
       at this data. The H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore).'
+    fix_at: '2026-10-31T22:29:20+00:00'
+    fix: 'Re-check of the 22:28 revision: the loss (HETEROSC, control the het share-0.25 pair f0156d88/df858d33; job_catalog_v3_short.sh
+      v4_het_default25 sets HETEROSC, sign head off, MuonAdamW 4.997e-3; recipes/catalog_v4_train.yaml is identical to the
+      control''s catalog_v4_default25_train.yaml), the steps-and-data naming, the lr DyHPO at 4x, the outcomes, the H2 gap
+      read and the resume chains all address the earlier FIX. One point still fails (checks 6 and 1): the width go rule makes
+      the 4x/16x width-16/32 cells depend on width 32 beating width 8 at 1x (R below 1). Width bought nothing at 1x does not
+      predict width buying nothing at 16x: a short, compute-limited run is exactly where a wider model is expected not to
+      help, and capacity shows when training is long. So the rule can drop the cells that answer D219 (''to challenge our
+      assumptions that the network is big enough ... also bigger models, wider'') on a read that cannot answer it, and that
+      is a scope cut, which is Joaquin''s call (CLAUDE.md). Fix: gate the wide long cells only on what 1x can tell, i.e. muP
+      lr transfer under Muon (best checkpoint at the last 5%, no blow-up at width 32); report width 32''s 1x R as a result,
+      not a gate. If 1x shows no width gain and you want to save GPU-h, put that as an option with its cost to Joaquin alongside
+      the grid, not as an automatic rule. Also state in the design (a caveat, not a fail on its own): the 1x control''s lr
+      4.997e-3 is the Muon search best at 4264 steps under the MSE loss, transferred to het untuned, while 4x gets a het DyHPO;
+      so part of a 4x-over-1x gain may be lr tuning, and that is to be said wherever the length R is reported.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
