@@ -2288,6 +2288,18 @@ entries:
       17 held out, +29). Cost: GPU 8 runs x 1 V100 x about 3.5 h (tools/short_wall.py) = 28 GPU-h, under 30 (D153); CPU: MadGraph
       check and class check of 147 candidates, generation of the kept pools after a probe of a few (yield, time, disk); catalog_v4''s
       478-entry prebuild took about 6 CPU-h.'
+    passed_at: '2026-10-31T03:49:48+00:00'
+    reviewer: 'Re-check of the one revision. Reproduced multext_compare.py @468421a0 on the existing short reads: signext
+      arm/control on 218 H2 pools r 1.253/1.298/1.057/1.020, s -0.348/-0.551/-0.084/-0.045 (var(u) and s move with a training-set
+      change, check 2); control-vs-control null (42/43, 44/45, both directions) r SD 0.057, s SD 0.092, SE of a 4-pair mean
+      0.029 / 0.046, so s = 0.25 is about 5 SE (check 3); margin 2 x max(null SE, arm''s observed SE) on 4-pair means, 4 seeds
+      per arm and matched same-commit control = 8 runs, 28 GPU-h; units: u = q - t with q de-standardized (zero_shot_parent.py:201-224),
+      no re-basing needed; one change (147 enumerated 2->4 pools added, fewer steps per pool stated); yes/no/between fixed.
+      Prior now names the ladder''s W+ng fine-tune result and how this differs. Searched: 2->4, six-particle/6-particle, more
+      pools/examples/added pools, data scaling/number of pools, held-out multiplicity, W+ng/added to the largest in results.tex;
+      entry dead ends; site decisions D20, D78, D88, D178, D216, catalog_coverage. Caveat: the null spread rests on two independent
+      control pairs; if the arm''s pairs scatter like signext''s (SE 0.12 in s), yes needs mean s about 0.34 and a true 0.25
+      lands in between.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
