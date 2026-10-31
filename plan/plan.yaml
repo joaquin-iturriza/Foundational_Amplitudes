@@ -430,6 +430,12 @@ entries:
       the yes arm derived from it (target_propagators if the factors hold most of f; otherwise named inputs or target terms,
       never a map fitted on held-out labels), the ceiling labelled K = 400 or 2000 events kept for it'
     at: '2026-10-31T01:12:51+00:00'
+  - tried: t-free stage 1 FA-ccin2p3-e1e0b219 / -febe530d and stage 2 FA-ccin2p3-2c63b5b9 (code 901c0318)
+    why: 'stage 1 read 1 probe of 218 per seed: the ceiling''s column list was named keep and overwrote the loop''s probe
+      filter; stage 2''s pairing check refused (217 pools in one dump only), no numbers. Fixed in 6f50c550; rerun as dry run
+      FA-ccin2p3-3864f1e7 (3 probes per seed), then FA-ccin2p3-b383281f / -11305a34 and stage 2 FA-ccin2p3-07afff2f, chained
+      afterok'
+    at: '2026-10-31T02:52:06+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
