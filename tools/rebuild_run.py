@@ -63,8 +63,9 @@ def cached_parent_loads(models_dir):
             key = (tag, p, str(kw.get("map_location")))
             if key not in cache:
                 cache[key] = load(path, *args, **kw)
-            # ZS_PARENT_COPY=deep: the earlier deep copy of every tensor, kept for the A/B
-            return copy.deepcopy(cache[key]) if os.environ.get("ZS_PARENT_COPY") == "deep" else container_copy(cache[key])
+            # ZS_PARENT_COPY=shared: the containers copied, the tensors shared; else (default until its A/B and review
+            # pass) the deep copy of every tensor
+            return container_copy(cache[key]) if os.environ.get("ZS_PARENT_COPY") == "shared" else copy.deepcopy(cache[key])
         return f
     import base_experiment
     base_experiment._torch_load = wrap(base_experiment._torch_load, "torch_load")

@@ -113,7 +113,7 @@ _ckpt_cache = cached_parent_loads(os.path.join(parent, "models"))
 # frozen-stats check: one answer per run directory for the whole job
 import functools  # noqa: E402
 from experiment import AmplitudeExperiment as _AE  # noqa: E402
-if os.environ.get("ZS_PARENT_COPY") != "deep":       # deep: the earlier path (asked per probe), kept for the A/B
+if os.environ.get("ZS_PARENT_COPY") == "shared":     # else the earlier path (asked per probe) until the A/B passes
     _AE._infer_orders_source = classmethod(functools.lru_cache(maxsize=None)(_AE._infer_orders_source.__func__))
 # the parent's training catalog, the reference of every probe's physics check (built once, from the entries' backends)
 _pcfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
