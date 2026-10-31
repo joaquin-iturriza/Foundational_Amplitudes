@@ -6931,6 +6931,13 @@ entries:
       and each ZERO_SHOT record carries s_stages, so the next read splits the 0.6-2.1 s. One experiment for all probes of
       an axis was not built: the model''s setup depends on the probe''s data (diagram sets, context rows, pair-bias specs,
       momentum scale). tools/short_wall.py S_PROBE stays 1.6 s until a read under the change measures it.'
+  - at: '2026-10-31T15:45:59+00:00'
+    text: 'Step-18 gridpool layout fix after E3344/E3345 (rc=137 from the job''s own timeout -s KILL, three beam-energy grids
+      run serially): one job per pool and energy, 3 jobs of 1 run of 1000 events each at the 20 TeV collider energy (10 TeV
+      beams), 3 h limit, batch target hd_gridpool_e20_beam10tev (3 h, 3 jobs; site pick: ccin2p3 htc): FA-ccin2p3-667e6659
+      (e+e- -> photon photon c cbar, seed 101), FA-ccin2p3-9f0ec4a3 and FA-ccin2p3-4a169835 (e+e- -> c cbar d dbar, seeds
+      101, 102). They give the missing points: the second 20 TeV run of the first pool, both 20 TeV runs of the second; times
+      expected from the 5 TeV-beam runs (up to 3524 s) and the first pool''s 10 TeV-beam run (1255 s plus 874 s gridpack).'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
