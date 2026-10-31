@@ -6526,9 +6526,9 @@ entries:
       - 'a part depends on each probe''s data and cannot be shared: say which, with its seconds, to Joaquin'
   owner:
     agent: ab2b2bbf984fd46ba
-    state: stopped
+    state: working
     since: '2026-10-31T17:12:02+00:00'
-    state_at: '2026-10-31T17:52:14+00:00'
+    state_at: '2026-10-31T18:17:50+00:00'
     context: 202152
     context_at: '2026-10-31T18:17:45+00:00'
   findings:
