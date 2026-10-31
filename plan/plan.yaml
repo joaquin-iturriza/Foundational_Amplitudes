@@ -6331,7 +6331,7 @@ entries:
       - 'H5 R outside it: reported per axis to Joaquin'
   owner:
     agent: ae7bc0ff5c64982f0
-    state: working
+    state: closed
     since: '2026-10-31T05:04:19+00:00'
     state_at: '2026-10-31T09:07:10.956000+00:00'
     context: 146035
@@ -6768,38 +6768,37 @@ entries:
       the het batch then about 28 GPU-h, over the design''s 22.8, under 30). Cancelling and resubmitting at 5.75 h would cost
       about 33 GPU-h.'
   handoff:
-    state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
-      reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
-      with held-out read on default-sampled events, catalog-sampled beside; sigma rules A/B; <= 22.8 GPU-h). Smoke FA-ccin2p3-da21ae07
-      (slurm 62899632, CC, 1 h, code b6f61a7d30) submitted; step 15 waits on it. Held-out default-sampled read done for 558
-      classes (H1 62, H2 217, H3 279: PP4/EE4 probes), MSE R 0.912 [0.802,1.068] / 0.921 [0.795,1.064] vs catalog-sampled
-      1.267 / 1.223 on the same classes (mixture_ab.py heldout_default @744fad42). New step (recorded by coordinator): default-sampled
-      test pools for the 142 held-out classes without one (H2p5 38, H5 28, H6 8, H7E 34, H7c 34), estimate 20.8 core-h MadEvent
-      (heldout_default_pools.py @f15cd5bf), not started.'
-    decisions: 'Share arms back in the het design because Joaquin asked (via coordinator, 2026-10-31; reviewer notes these
-      asks are not in site decisions: main session to record his words). Held-out classes of H1-H3 read on PP4/EE4 probes
-      because those are MadEvent default test pools of the same classes (Joaquin: the check is against data generated the
-      default way). Het control in its own case branch in job_catalog_v3_short.sh (submit_guard''s arm_recipe reads the last
-      TRAIN= of a branch; the nested case made it read catalog_v4_control_train.yaml). Placement --only ccin2p3: the catalog_v4
-      training pools exist only on CC (site pick unrestricted chose lxplus).'
-    ruled_out: 'Re-reading an existing catalog_v4 het run: none exists (1525 HETEROSC configs on CC, none on catalog_v4).
-      The share ratio of sigma S: dropped (no evidence sigma moves with share).'
-    running: 'FA-ccin2p3-da21ae07: v4_het_control smoke. On its end: read the log (HETEROSC, Muon, sign head off, sigma stage
-      time, reads from sigma_stage with s non-empty); then site pick FA --jobs 6 --mem 48G --hours 3.75 --only ccin2p3, plan
-      target catalog_coverage --batch het_mixture --wall 3.75 --jobs 6, submit the six arms (v4_het_control[_seed2], v4_het_default50[_seed2],
-      v4_het_default25[_seed2]) with --allow-dirty --hdr=--mem=48G --hdr=--time=03:45:00 (adjust from the smoke''s sigma stage)
-      --est-gpu-hours 3.75 --item catalog_coverage, plan run each, plan wait 15. Then: mixture_ab.py gains MIX_HET and analysis/catalog_v4/het_uncertainty.py,
-      committed before reading. Generation step for the 142 classes: spec entries per class at its own settings (H7E: base
-      at sqrts 20 TeV window; H7c: pt_min 30 cut in the run card; H6: base kinematics, labels at alpha_s 0.13 (mg5_pipeline_final
-      lhe.label_alphas has aqcdup/running rules only: needs a fixed-value rule); H5: base Born MadEvent events with one-loop
-      labels (no lhe loop-label path found in mg5_pipeline_final: needs one); H2p5: e+e- 5-body ee4-style entries at catalog
-      energies), 2000 test events each; probe (scripts/job_lhe_probe.sh), lhe_parts plan queue, workers; then eval-only REREAD
-      of 6c246603 1d46b938 11ad944a 9c6fc7ab and 339ec100 380842ed (and the het arms) on the new pools, extend heldout_default
-      to them.'
-    files: scripts/job_catalog_v3_short.sh, tools/short_wall.py, tests/test_short_wall.py, analysis/catalog_v4/mixture_ab.py,
-      analysis/catalog_v4/data/mixture_heldout_default.json, analysis/catalog_v4/heldout_default_pools.py, analysis/catalog_v4/data/heldout_default_pools.json,
-      analysis/catalog_daniel/catalog_sigma_heldout.py, analysis/catalog_daniel/data/catalog_sigma_heldout.json
-    written: '2026-10-31T05:01:21+00:00'
+    state: 'Step 18 (default-sampled held-out test pools) design PASSED on re-check (reviewer a71d6cc5dbe922bef): 114 hd_
+      pools (H2p5 38, H6 8, H7E 34, H7c 34; recipes/catalog_v4_heldout_default_processes.yaml @5d4c0e9c, 19.19 core-h est.),
+      read as job axis HD4 (@1acddbff), eval-only REREAD of MSE arms 6c246603 1d46b938 11ad944a 9c6fc7ab and control 339ec100
+      380842ed plus the six het arms; pooled 672-class R feeds next 14. H5 (28 one-loop classes) is next 19 (label rule ''virt''
+      on MadEvent Born events, not built). Het batch (step 15): control pair 87ea24d0 321a3de2 (3.75 h jobs); the four mixture
+      arms 466656b2 9897833d f0156d88 df858d33 spent ~93 min composing 912 default-share pools at load (silent), and per supervisor
+      events E3235-E3238 ended TIMEOUT at 10:06; their logs are UNREAD. Probes: hd_probe batch of 6 CPU jobs (180 runs x 1000
+      events, PROBE_SHARD=list, code 11297eec): fd7cf028 ended clean (E3232), 231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf
+      were running when last checked, not read since. Repo-reviewer watermark ff37971e; commits since then unreviewed: 5d4c0e9c
+      1acddbff 7eb15b55 (and 56635699 spec).'
+    decisions: Did not cancel/resubmit the four het mixture arms (resubmitting at 5.75 h would cost ~33 GPU-h vs ~28 with
+      a reread of cut axes); short_wall now counts load-time composition (6.1 s/entry, @7eb15b55) and mix_compose logs each
+      pool. H6 labelled at alpha_s run from alpha_s(M_Z)=0.13 (lhe.label_alphas_mz), events from catalog_v4 cards at 0.118
+      as H2p5. Undecided pooled R goes to Joaquin with interval; extra seeds offered, not run.
+    ruled_out: 'Treating the silent het arms as hung: they were composing (measured on login node with tools/mix_compose_check.py
+      --load: 4.2-5.8 s train + 0.1-0.3 s val per pool). tests/test_default_share.py::test_lhe_runs failure predates this
+      work (fails at 1ede6016).'
+    running: 'Probes 231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf (state not re-read); het control pair 87ea24d0 321a3de2
+      (state not re-read). FIRST CHECKS for the fresh owner: (1) site logs -n 100000 of 466656b2 9897833d f0156d88 df858d33:
+      did loading finish, did training reach 4264 steps with a best checkpoint, did the sigma-only stage complete (sigma_stage/
+      written), which zero-shot axes were read and which were cut by TIMEOUT; (2) the control pair''s logs (all axes read?);
+      (3) the five probes: lhe_probe summary / kept --yields-out, then tools/lhe_parts.py plan on recipes/catalog_v4_heldout_default_processes.yaml
+      and one-wave workers (scripts/job_lhe_parts.sh), then assembly; (4) eval-only REREAD of the het arms'' cut axes folded
+      with HD4 once hd_ pools exist (short_wall --eval for wall); (5) add MIX_HET to analysis/catalog_v4/mixture_ab.py and
+      write analysis/catalog_v4/het_uncertainty.py, committed before reading results; (6) send the unreviewed commits to the
+      repo-reviewer.'
+    files: recipes/gen_catalog_v4_heldout_default.py, recipes/catalog_v4_heldout_default_processes.yaml, recipes/catalog_v4_heldout_default_test.yaml,
+      mg5_pipeline_final.py (label_alphas_mz), tests/test_label_alphas_mz.py, scripts/job_catalog_v3_short.sh (HD4), tools/short_wall.py,
+      tools/collect_run.py, mix_compose.py, analysis/catalog_v4/heldout_default_pools.py, analysis/catalog_v4/mixture_ab.py;
+      probe shard lists /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/probe_{0..5}.txt
+    written: '2026-10-31T09:07:31+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
