@@ -1,0 +1,236 @@
+{
+ "v4_dimensionless_muon": {
+  "n_H2": 218,
+  "n_TR": 647,
+  "n_classes": 218,
+  "n_H2_emitter": 94,
+  "median_var_H2": 0.37799602894353856,
+  "floor_TR_per_cell": {
+   "6bb": 0.1197753493727508,
+   "6bg": 0.0946574477630573,
+   "6bq": 0.163946368763243,
+   "6qq": 0.18993009614173695,
+   "6qg": 0.13373759312278444,
+   "6ee": 0.21643250699695255,
+   "6gg": 0.060284932108576134
+  },
+  "median_gap": 0.2070911397721684,
+  "median_ceiling_own_K1600": 0.18231663435393008,
+  "f_ceil": 0.2708,
+  "boot_ceil": [
+   0.246,
+   0.322
+  ],
+  "f_lco": 0.1469,
+  "boot_lco": [
+   0.131,
+   0.179
+  ],
+  "f_lco_emitter": 0.2035,
+  "f_lco_no_emitter": 0.204,
+  "median_r2_lco": 0.0969,
+  "f_lco_factors": 0.0894,
+  "boot_lco_factors": [
+   0.081,
+   0.109
+  ],
+  "median_r2_lco_factors": 0.0524,
+  "f_lco_drop_pairs": 0.1366,
+  "boot_lco_drop_pairs": [
+   0.12,
+   0.166
+  ],
+  "median_r2_lco_drop_pairs": 0.0922,
+  "f_lco_drop_energy_angle": 0.152,
+  "boot_lco_drop_energy_angle": [
+   0.12,
+   0.17
+  ],
+  "median_r2_lco_drop_energy_angle": 0.0861,
+  "f_lco_drop_species": 0.12,
+  "boot_lco_drop_species": [
+   0.103,
+   0.137
+  ],
+  "median_r2_lco_drop_species": 0.0816,
+  "f_lco_drop_factors": 0.0018,
+  "boot_lco_drop_factors": [
+   -0.001,
+   0.005
+  ],
+  "median_r2_lco_drop_factors": 0.0014,
+  "f_loco_cell": 0.0604,
+  "boot_loco_cell": [
+   0.048,
+   0.079
+  ],
+  "median_r2_loco_cell": 0.0381,
+  "f_trainmap": 0.063,
+  "median_r2_trainmap_TR_oof": 0.0388,
+  "per_cell": {
+   "6bb": {
+    "n_H2": 28,
+    "median_r2_lco": 0.1001,
+    "median_r2_lco_factors": 0.0504
+   },
+   "6bg": {
+    "n_H2": 6,
+    "median_r2_lco": 0.0338,
+    "median_r2_lco_factors": 0.0104
+   },
+   "6bq": {
+    "n_H2": 8,
+    "median_r2_lco": 0.0436,
+    "median_r2_lco_factors": -0.0063
+   },
+   "6ee": {
+    "n_H2": 21,
+    "median_r2_lco": 0.0179,
+    "median_r2_lco_factors": 0.0401
+   },
+   "6gg": {
+    "n_H2": 17,
+    "median_r2_lco": 0.1493,
+    "median_r2_lco_factors": 0.0984
+   },
+   "6qg": {
+    "n_H2": 28,
+    "median_r2_lco": 0.1452,
+    "median_r2_lco_factors": 0.0547
+   },
+   "6qq": {
+    "n_H2": 110,
+    "median_r2_lco": 0.1129,
+    "median_r2_lco_factors": 0.0631
+   }
+  }
+ },
+ "v4_dimensionless_muon_seed2": {
+  "n_H2": 218,
+  "n_TR": 647,
+  "n_classes": 218,
+  "n_H2_emitter": 94,
+  "median_var_H2": 0.3852533709694914,
+  "floor_TR_per_cell": {
+   "6bb": 0.14490077486177222,
+   "6bg": 0.11311686118759232,
+   "6bq": 0.19302509788994893,
+   "6qq": 0.21930183769558942,
+   "6qg": 0.17234371371025892,
+   "6ee": 0.2549064648792986,
+   "6gg": 0.07282474478353332
+  },
+  "median_gap": 0.18885578993521393,
+  "median_ceiling_own_K1600": 0.17459802478887027,
+  "f_ceil": 0.3158,
+  "boot_ceil": [
+   0.287,
+   0.363
+  ],
+  "f_lco": 0.1252,
+  "boot_lco": [
+   0.111,
+   0.155
+  ],
+  "f_lco_emitter": 0.2311,
+  "f_lco_no_emitter": 0.2082,
+  "median_r2_lco": 0.0831,
+  "f_lco_factors": 0.0844,
+  "boot_lco_factors": [
+   0.069,
+   0.103
+  ],
+  "median_r2_lco_factors": 0.0505,
+  "f_lco_drop_pairs": 0.124,
+  "boot_lco_drop_pairs": [
+   0.105,
+   0.149
+  ],
+  "median_r2_lco_drop_pairs": 0.0762,
+  "f_lco_drop_energy_angle": 0.1334,
+  "boot_lco_drop_energy_angle": [
+   0.111,
+   0.164
+  ],
+  "median_r2_lco_drop_energy_angle": 0.076,
+  "f_lco_drop_species": 0.1056,
+  "boot_lco_drop_species": [
+   0.089,
+   0.125
+  ],
+  "median_r2_lco_drop_species": 0.0646,
+  "f_lco_drop_factors": 0.0037,
+  "boot_lco_drop_factors": [
+   0.001,
+   0.007
+  ],
+  "median_r2_lco_drop_factors": 0.0018,
+  "f_loco_cell": 0.0324,
+  "boot_loco_cell": [
+   0.02,
+   0.049
+  ],
+  "median_r2_loco_cell": 0.0303,
+  "f_trainmap": 0.0928,
+  "median_r2_trainmap_TR_oof": 0.0522,
+  "per_cell": {
+   "6bb": {
+    "n_H2": 28,
+    "median_r2_lco": 0.095,
+    "median_r2_lco_factors": 0.0546
+   },
+   "6bg": {
+    "n_H2": 6,
+    "median_r2_lco": 0.0668,
+    "median_r2_lco_factors": 0.031
+   },
+   "6bq": {
+    "n_H2": 8,
+    "median_r2_lco": 0.0948,
+    "median_r2_lco_factors": 0.0477
+   },
+   "6ee": {
+    "n_H2": 21,
+    "median_r2_lco": 0.0389,
+    "median_r2_lco_factors": 0.0716
+   },
+   "6gg": {
+    "n_H2": 17,
+    "median_r2_lco": 0.0659,
+    "median_r2_lco_factors": 0.0551
+   },
+   "6qg": {
+    "n_H2": 28,
+    "median_r2_lco": 0.1495,
+    "median_r2_lco_factors": 0.0793
+   },
+   "6qq": {
+    "n_H2": 110,
+    "median_r2_lco": 0.0819,
+    "median_r2_lco_factors": 0.0392
+   }
+  }
+ },
+ "seed_difference_f_lco": 0.0217,
+ "verdict": {
+  "per_seed": {
+   "v4_dimensionless_muon": {
+    "branch": "between",
+    "f_lco": 0.1469,
+    "f_ceil": 0.2708,
+    "margin": 0.024
+   },
+   "v4_dimensionless_muon_seed2": {
+    "branch": "between",
+    "f_lco": 0.1252,
+    "f_ceil": 0.3158,
+    "margin": 0.022
+   }
+  },
+  "flags": [
+   "v4_dimensionless_muon: training-pool map's TR score 0.0388 not near 0",
+   "v4_dimensionless_muon_seed2: training-pool map's TR score 0.0522 not near 0"
+  ],
+  "branch": "between"
+ }
+}

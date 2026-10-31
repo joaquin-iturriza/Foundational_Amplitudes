@@ -17,6 +17,7 @@ and the control's zero-shot residual u. Here, per arm (seed) of the control pair
   margins         the 16-84% range of f over H2 and TR pools resampled with replacement (1000 draws, seed 0)
 TR pools are those of the H2 pools' cells (as dipole_gate.py). Writes one JSON.
     python3 analysis/catalog_v4/lco_map.py --root <dump root> --out <json> [--arms a b]
+    python3 analysis/catalog_v4/lco_map.py --read analysis/catalog_v4/data/lco_map.json
 """
 import argparse
 import glob
@@ -132,10 +133,17 @@ def verdict(out, arms):
 def main():
     from sklearn.model_selection import GroupKFold
     ap = argparse.ArgumentParser()
-    ap.add_argument("--root", required=True, help="stage 1's dump root: <root>/<arm>_<axis>/<probe>.npz")
+    ap.add_argument("--root", help="stage 1's dump root: <root>/<arm>_<axis>/<probe>.npz")
+    ap.add_argument("--read", help="print a stage-2 JSON (data/lco_map.json, FA-ccin2p3-7ad4b5e3) as one line, seeds "
+                    "as s42 and s43, without refitting: the results line's provenance")
     ap.add_argument("--arms", nargs="+", default=list(ARMS))
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out")
     a = ap.parse_args()
+    if a.read:
+        d = json.load(open(a.read))
+        tag = {"v4_dimensionless_muon": "s42", "v4_dimensionless_muon_seed2": "s43"}
+        print(json.dumps({tag.get(k, k): v for k, v in d.items()}))
+        return
     tl = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
     info = dict(tl["train"])
     for ax in tl["heldout"].values():
