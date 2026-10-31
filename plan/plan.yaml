@@ -5883,6 +5883,15 @@ entries:
       auto-delete of failed-build workdirs 28242339; 33 GB freed on /sps (90%). Owners: catalog_coverage a95e29b40c3a46e59
       (EE4 rereads c1863adf, def11c5c; mixture arms 6c246603 1d46b938 11ad944a 9c6fc7ab), v3_prep_explore aaa8b1f043eaa6ee9
       (dipole CPU read 3a2a388b).'
+  - at: '2026-10-31T00:28:49+00:00'
+    text: 'Regression of 85064616 (test_redesign_d D3 generate_sweep and lhe_parts) was caused by the 9,000-char output limit
+      of 0d2ddf73, not the on-write trigger: fa-sweeps-and-hpo (11.1k) and fa-catalog-reference + fa-generation (9.9k) do
+      not fit one output, so part of what a command triggers arrived only after it ran. Fixed 9ba3ed6b: a PreToolUse call
+      is held (permissionDecision deny with the delivered part as additionalContext; the agent sends the same call again)
+      until all its triggered sections arrived; outputs packed largest first. Tested live on this agent (lhe_parts --help:
+      held once, fa-catalog-reference arrived with the deny, fa-generation with the run). Replay (tools/push_replay.py, 33
+      transcripts): 8320 -> 8315 tokens per call, 13 held calls of 1590. test_redesign_d 48/49 (the D6 close-note failure
+      predates), test_context_push 4/4.'
   handoff:
     state: 'Step 5 cut 1 (hook pushes) applied 2026-10-31 under a passed design (FIX then PASS): (c) repair 0d2ddf73: a hook
       output over 10,000 chars reached agents as a 2,178-char preview, sections lost while marked delivered (17 of 32 redesign
