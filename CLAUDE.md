@@ -84,7 +84,7 @@ on the sites (`~/work/CLAUDE.md`).
 <!-- index -->
 
 - working-on-the-plan: plan entries, owners, resume and close, hand-offs, questions, designs, done; pushed to the main session at start and on `tools/plan.py`, Agent, SendMessage.
-- fa-generation: how a generation batch is probed, cut, laid out and watched; pushed on `lhe_*`, `gen_catalog_*`, `mg5_pipeline_final`.
+- fa-generation: how a generation batch is probed, cut, laid out and watched, and how catalog_v4 is regenerated; pushed on `lhe_*`, `gen_catalog_*`, `mg5_pipeline_final`.
 - fa-catalog-reference: what catalog_v3 and catalog_v4 pools contain and how they are sampled; pushed with fa-generation.
 - fa-canonical-setup: the decided run defaults and the one sweep template; pushed on sweep configs and `site submit`.
 - fa-sweeps-and-hpo: DyHPO, `sweep_manager`, `drive.py`, rebalancing, the HPO search ranges; pushed on `sweep/**`.

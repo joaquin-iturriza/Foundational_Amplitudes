@@ -30,3 +30,20 @@ After
 - Assembly reads the mixture as training reads it (`lhe_probe mixcheck`) and checks short runs against the reuse pool
   (`lhe_probe runsize`); a pool short at assembly is resized from its measured yield (`resize_short`), never padded
   blindly.
+
+Regenerating catalog_v4
+No MadGraph process outputs are kept [D208]. Kept on CC: the MadGraph install, the pools and the recipes. Every step
+resumes: a built pool is a cache hit. Standalones are rebuilt on regeneration (the probe reads' physics check reads
+the pools' sidecars); `tools/pool_physics.py prune-standalones` deletes those no pool needs [D209].
+1. MadEvent pools (lhe_pp: pp13v4_, pp13_, dsh_, ee4_), per spec (`recipes/catalog_v4_pp_parts.yaml`,
+   `catalog_v4_default_lhe.yaml`, `catalog_v4_ee_processes.yaml`): `site run --item <item> ccin2p3 FA -- python
+   tools/lhe_parts.py plan <spec> --queue <Q> --grid-cores 8`, then workers `site submit --item <item> ccin2p3 FA
+   scripts/job_lhe_parts.sh --env LHE_QUEUE=<Q>`, laid out as in steps 4-5 above. Once the queue is
+   assembled, `lhe_parts gc --queue <Q> --parts` deletes its part files [D208].
+2. Tree and one-loop pools (sampling: fa-catalog-reference): `site submit --item <item> ccin2p3 FA
+   scripts/job_catalog_v4_regen.sh --env V4REGEN_N=<n> --env V4REGEN_K=<k>` for each k < n builds stages 1-4 and writes
+   each tree pool's per-event alpha_s; stage 5 (the electroweak-order classes) is a second pass with `--env
+   V4REGEN_STAGES=5`. Default-share mixtures (`catalog_v4_default50/25`) are never stored: the loader composes them
+   (`mix_compose.py`) from these pools and the dsh_ pools.
+3. Diagram sidecars: `python tools/dump_diagrams.py --all` (CPU).
+Time, compiles included: `docs/results.tex` (par:v4_regen_time).
