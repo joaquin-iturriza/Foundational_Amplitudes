@@ -571,7 +571,15 @@ def bound_default():
                      "not_trained": [k for k in keys if cls(probe_name(k)) not in trained]}
             res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
             res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
-        res["held_default"], _ = _held_default(reads, a, cls, ax_of, extra)
+        res["held_default"], hkeys = _held_default(reads, a, cls, ax_of, extra)
+        # whether the table's 'PP4 not trained' and 'held out, default-sampled' rows read the same probes: the PP4
+        # classes catalog_v4 does not train that are also in the held-out pool (through H1-H3's PP4 probes)
+        nt = {cls(probe_name(k)) for k in set(side(reads[a]["PP4"])) & set(side(c["PP4"]))} - trained
+        held = {cls(k[1]) for k in hkeys}
+        res["overlap_PP4_not_trained_held_default"] = {
+            "n_classes_PP4_not_trained": len(nt), "n_classes_held_default": len(held),
+            "n_classes_shared": len(nt & held),
+            "n_classes_held_default_via_PP4": len({cls(k[1]) for k in hkeys if k[0] == "PP4"})}
         out["arms"][a] = res
     runs = [run for v in table.values() for pair in v.values() for run in pair] + \
         [run for tab in extra.values() for pair in tab.values() for run in pair]
