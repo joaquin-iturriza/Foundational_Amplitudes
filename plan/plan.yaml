@@ -5436,11 +5436,9 @@ entries:
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
-    agent: aefa0ef5a5b0832b7
-    state: closed
-    since: '2026-10-30T23:45:55+00:00'
-    context: 271541
-    context_at: '2026-10-31T00:06:57+00:00'
+    agent: a0de3dd02a89d8a43
+    state: working
+    since: '2026-10-31T00:09:16+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
