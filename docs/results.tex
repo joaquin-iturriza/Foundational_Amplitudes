@@ -2254,6 +2254,33 @@ the new combinations, recorded for the full pretraining's design.
   \label{tab:v4_shape_gap}
 \end{table}
 
+% src: python3 analysis/catalog_v4/dipole_gate.py @606fbe94
+% claim: dip.multiplicity_cells.heldout.s42.median_r2_tD=0.094
+% claim: dip.multiplicity_cells.heldout.s43.median_r2_tD=0.094
+% claim: dip.multiplicity_cells.heldout.s42.median_r2_rawD=0.705
+% claim: dip.multiplicity_cells.heldout.s42.median_r2_D=0.005
+% claim: dip.multiplicity_cells.heldout.s43.median_r2_D=0.007
+% claim: dip.multiplicity_cells.heldout.s42.n_read=94
+% claim: dip.multiplicity_cells.train.s42.n_read=332
+% claim: dip.multiplicity_cells.train.s42.median_r2_tD=0.089
+% claim: dip.multiplicity_cells.heldout.s42.median_r2_E=0.006
+% claim: dip.multiplicity_cells.heldout.s43.median_r2_E=0.008
+% allow: 0.1 because it is the design's gate, a setting
+% allow: 2 42 43 because they are the multiplicity 2 to 4 and the control's seeds, settings
+\paragraph{The soft-dipole factor against the multiplicity gap (2026-10-31).}\label{par:v4_dipole} The first candidate
+prior for the multiplicity pools' transfer gap: does the per-event soft-dipole factor $D$ (per final gluon or photon, the
+colour-blind antenna sum $s_{ab}/(s_{aj}s_{bj})$ over the other coloured or charged legs) still carry variance of the
+control's target $t$, and does the zero-shot residual track it? Design (passed review): CPU only, on the control pair's
+existing reads ($2000$ events per pool, events aligned on the pools' rows through the reads' saved split positions
+and the role shuffle, every probe checked), the $94$ held-out multiplicity pools with a final gluon or photon (all
+$2\to4$) against the $332$ training pools of the same cells, placebos the summed energy and the emission-scale factor.
+Over the multiplicity cells $\log D$ explains a median $0.705$ of $\log|\mathcal M|^2$ but only $0.094$ of $t$ (both
+seeds; $0.089$ on the training pools), under the gate of $0.1$: the emission-scale target already holds what $D$
+carries at these cuts. The residual's $r^2$ on $\log D$ is $0.005$ and $0.007$ (seeds $42$, $43$), level with the
+placebos ($0.006$, $0.008$). A dead end. Open: the propagator-product read (the same frame with the diagrams'
+propagator product $P$, a ceiling on what any per-event quantity explains of the residual, and a read of the error's
+size against $\log P$), run as FA-ccin2p3-71a96ca2 with a Higgs width below the card's (fixed since), not yet read.
+
 % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
 % claim: mb.median_signed_off_all=0.12
 % claim: mb.positive_share_all=0.642
