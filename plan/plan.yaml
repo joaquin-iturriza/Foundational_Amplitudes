@@ -7192,6 +7192,19 @@ entries:
       -> FA-ccin2p3-7c131715, default25 f0156d88 -> FA-ccin2p3-9538e607, default25_seed2 df858d33 -> FA-ccin2p3-ed96b552 (PP4
       EE4 HD4 HD5, 1612 probes, 1:45 limit from the het rate measured on the old reader 2.46 s/probe + 15 min, x1.25; short_wall
       at 0.71 says 0.79 h). GPU-h at the limits: 8 x 0.5 + 4 x 1.75 = 11.0; batch target step20_hd_rereads 1.75 h.'
+  - at: '2026-10-31T18:35:46+00:00'
+    text: 'Step 20 defect fixed (311380bf): the first two re-reads (9512cac2 v4_dimensionless_muon, 783892e6 seed2) read HD4
+      114/114 but refused all 28 HD5 probes: tools/pool_physics.check_probe took an lhe_pp pool labelled by a one-loop entry''s
+      MadLoop (lhe label rule virt) as its Born tree (is_loop false), so it compared order vector [1,0,2,2] and alpha_s rule
+      madevent_virt against the same legs'' tree entry (v4_bb_bb). Fixed: such a pool carries its labeller''s physics (one-loop
+      reference, the labeller''s model, order vector, alpha_s rule; card from the labeller''s MadLoop standalone when present);
+      tests/test_pool_physics.py test_label_virt_probe (old sidecar with and without the labeller''s card, a labeller at MT
+      173 still refused); CPU dry run on CC against v4_dimensionless_muon''s training recipe: 28/28 ok, catalog-wide one-loop
+      reference (108 entries). HD5-only re-reads of the two: FA-ccin2p3-c37a4b26, FA-ccin2p3-a1ea15aa. The 10 pending step-20
+      jobs start on the CC checkout at 311380bf (registered at 5c9fb5b9; the fix changes only the check). Reader timing from
+      9512cac2''s records (114 HD4 probes): per probe mean 0.548 s, build median 0.318 s, weights 0.041, forward 0.052, physics
+      check 0.001; the whole job ran 2 min against short_wall''s 0.39 h estimate (startup_min 15 assumed): a margin above
+      2x in short_wall, to fix with the het rate (step 20).'
   handoff:
     state: 'Step 18 and 19 generation done: all 142 default-sampled held-out test pools on ccin2p3 (114 trees: H2p5 38, H6
       8, H7E 34, H7c 34; 28 one-loop H5, MadEvent Born events labelled by the class''s MadLoop, lhe label rule virt). Step
