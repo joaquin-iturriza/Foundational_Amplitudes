@@ -5917,6 +5917,20 @@ entries:
       finite on all 1301, physics check ok on all 1301 (counts from the job''s PP4 ZERO_SHOT records). The comparison against
       the controls'' PP4 reads (04253ff7, e7e32847) waits on the seed-2 twin a01ad665 (REREAD d26f13aa); the per-probe MSE
       medians come then from a committed reader, not recorded here.'
+  - at: '2026-10-31T02:52:59+00:00'
+    text: 'Step 11 verdict YES (E3200; analysis/catalog_v4/mixture_ab.py bound at 23d33dee -> analysis/catalog_v4/data/pp_bound.json;
+      design passed 2026-10-30T17:29). Question: how much does training the hadronic tree classes on default-sampled 13 TeV
+      pp events (the pure-default bound, recipes/catalog_v4_pp_mixed_train.yaml: 797 classes on pp pools) lower the error
+      on default-sampled pp test events, against catalog_v4''s mixture-trained control? Design: bound arm afc96598 (seed 42)
+      and d26f13aa (43), read on PP4 by a152d7d0, a01ad665; control 339ec100, 380842ed read on PP4 by 04253ff7, e7e32847;
+      same events (catalog_v4_pp_test.yaml, test split, 2000 events), same scorer; all 1301 probes scored on all four, finite,
+      physics ok. Measure: per-probe MSE of log|M|^2 at the best checkpoint, seeds by geometric mean, R = median over classes
+      of arm/control; 95% class bootstrap (10000) widened by |ln R_seed|. Trained classes (797): R = 0.388, bootstrap [0.363,
+      0.415], widened [0.338, 0.446] (control seed shift R_seed 1.073); 93.1% of classes lower. Classes not trained on pp
+      (504): R = 1.132, bootstrap [1.064, 1.244], widened [0.969, 1.367] (R_seed 1.099), 42.5% lower: the expected held-out
+      cost, not settled at the widened interval. Rule: YES R <= 0.90 with the widened interval below 1. So pure default sampling
+      on the trained classes cuts the default-sampled error by about 61%, the ceiling step 14''s mixtures are measured against.
+      Not yet in docs/results.tex: written up with step 14''s mixture_ab.json.'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
