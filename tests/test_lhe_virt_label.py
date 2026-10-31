@@ -99,6 +99,37 @@ def test_virt_entry_parent_physics_is_the_labellers():
         assert chk["status"] == "ok" and chk["labels_from"] == mg.PROCESSES[n]["parent"], (n, chk)
 
 
+def test_virt_assembly_builds_no_born_standalone():
+    """Assembly of a 'virt' pool never builds the Born tree standalone: g g > z h ([noborn=QCD]) has none, and its
+    hd_test_h5 assembly died on 'No compilable backend' (2026-10-31)."""
+    import mg5_pipeline_final as mg
+    name = next(n for n, c in mg.PROCESSES.items()
+                if (c.get("lhe") or {}).get("label_alphas") == "virt" and "zh_loop" in n)
+    saved = (mg.lhe_part_paths, mg._lhe_check_recipes, mg.lhe_prepare, mg._lhe_finish)
+    try:
+        mg.lhe_part_paths = lambda process, items: []
+        mg._lhe_check_recipes = lambda process, items: (0, 0, 0)
+
+        def no_prepare(*a, **k):
+            raise AssertionError("lhe_prepare called for a virt pool")
+        mg.lhe_prepare = no_prepare
+        seen = {}
+
+        def finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, *a, **k):
+            seen["sa"] = sa
+            return "finished"
+        mg._lhe_finish = finish
+        import tempfile
+        try:
+            mg.lhe_assemble(name, [], work_root=tempfile.mkdtemp())
+        except (ValueError, IndexError, KeyError):
+            pass                                  # empty part list past the standalone step: not this test's concern
+    finally:
+        mg.lhe_part_paths, mg._lhe_check_recipes, mg.lhe_prepare, mg._lhe_finish = saved
+    assert seen.get("sa", None) is None
+
+
 if __name__ == "__main__":
     test_virt_entry_parent_physics_is_the_labellers()
+    test_virt_assembly_builds_no_born_standalone()
     print("ok")

@@ -4806,7 +4806,10 @@ def lhe_assemble(process, items, mg_cores=1, write_sidecars=True, work_root=None
     log_path = os.path.join(work_root, f"{process}.assemble.mg5.log")
     open(log_path, "w").close()
     t0 = time.time()
-    _, sa = lhe_prepare(process, work_root, log_path, madevent=False, standalone=True)
+    # label rule 'virt': the labels come from lhe.label_virt's MadLoop standalone (_lhe_virt_block), the Born tree
+    # standalone is never read, and a loop-induced class (g g > z h, [noborn=QCD]) has none to build
+    virt = (PROCESSES[process].get("lhe") or {}).get("label_alphas") == "virt"
+    sa = None if virt else lhe_prepare(process, work_root, log_path, madevent=False, standalone=True)[1]
     lhe_parent_physics_check(process)
     secs = {"output": time.time() - t0, "madevent": 0.0}
     if not PROCESSES[process]["lhe"].get("parts"):
