@@ -568,6 +568,15 @@ entries:
     - 5
     answered_at: '2026-10-30T23:09:53.846000+00:00'
     decision: D199
+  - ask: 'The event-level prior route for the held-out multiplicity gap is closed. Which takes the gap next: (a) capacity
+      and training length inside the full catalog pretraining (held by D78), or (b) more 6-particle training pools in the
+      held-out cells (a GPU arm design)? (c), a per-process level and spread correction from K labelled events, is CPU only
+      and runs now inside the entry''s approval.'
+    at: '2026-10-31T03:34:14+00:00'
+    searched: 'CLAUDE.md, site decisions (D78 holds the full pretraining design, D114 keep iterating, D198/D199 more examples
+      helped sign pools), docs/results.tex par:v4_shape_gap, par:v4_kshot_level: none picks between a and b'
+    blocks: only the choice between (a) and (b); (c) proceeds
+    blocks_steps: &id001 []
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -2121,6 +2130,15 @@ entries:
       the design (written by this entry''s owners) nor the design reviewer (two reviews of it) caught it; it was seen only
       while writing up the result. Repair: the t-free re-read (design recorded 2026-10-31, REREAD=FA-ccin2p3-7ad4b5e3); a
       checklist line for the design reviewer proposed.'
+  ask: 'The event-level prior route for the held-out multiplicity gap is closed. Which takes the gap next: (a) capacity and
+    training length inside the full catalog pretraining (held by D78), or (b) more 6-particle training pools in the held-out
+    cells (a GPU arm design)? (c), a per-process level and spread correction from K labelled events, is CPU only and runs
+    now inside the entry''s approval.'
+  waiting_since: '2026-10-31T03:34:14+00:00'
+  searched: 'CLAUDE.md, site decisions (D78 holds the full pretraining design, D114 keep iterating, D198/D199 more examples
+    helped sign pools), docs/results.tex par:v4_shape_gap, par:v4_kshot_level: none picks between a and b'
+  blocks: only the choice between (a) and (b); (c) proceeds
+  blocks_steps: *id001
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
