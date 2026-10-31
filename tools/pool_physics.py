@@ -710,12 +710,24 @@ def sidecar_scan(dirs):
     return n, out
 
 
+def standalone_kind(d):
+    """which MadGraph process output `d` is: "madloop" (an output keeping Cards/proc_card_mg5.dat: the MadLoop
+    *_virt_standalone ones and some trees), "standalone_cpp" (output standalone_cpp keeps no proc card: Cards/param_card.dat
+    with SubProcesses/), or None (not a process output, or a symlink: never pruned)"""
+    if os.path.islink(d) or not os.path.isdir(d):
+        return None
+    if os.path.isfile(os.path.join(d, "Cards", "proc_card_mg5.dat")):
+        return "madloop"
+    if os.path.isfile(os.path.join(d, "Cards", "param_card.dat")) and os.path.isdir(os.path.join(d, "SubProcesses")):
+        return "standalone_cpp"
+    return None
+
+
 def standalone_dirs(work_dir):
-    """The compiled process outputs directly under the MadGraph install `work_dir`: <name>_standalone directories
-    holding Cards/proc_card_mg5.dat (a MadGraph output; the install's own directories never end so)."""
+    """The compiled process outputs directly under the MadGraph install `work_dir`: <name>_standalone directories that
+    standalone_kind recognises (the install's own directories never end so) [D208]"""
     return sorted(os.path.join(work_dir, x) for x in os.listdir(work_dir)
-                  if x.endswith("_standalone") and os.path.isfile(os.path.join(work_dir, x, "Cards", "proc_card_mg5.dat"))
-                  and not os.path.islink(os.path.join(work_dir, x)))
+                  if x.endswith("_standalone") and standalone_kind(os.path.join(work_dir, x)))
 
 
 def standalones_census(work_dir):
@@ -734,8 +746,8 @@ def standalones_census(work_dir):
             cls = "symlink"
         elif not os.path.isdir(d):
             cls = "not a directory"
-        elif os.path.isfile(os.path.join(cards, "proc_card_mg5.dat")):
-            cls = "prune candidate (Cards/proc_card_mg5.dat)"
+        elif standalone_kind(d):
+            cls = "prune candidate (" + standalone_kind(d) + ")"
         elif not os.path.isdir(cards):
             cls = "no Cards/"
         else:

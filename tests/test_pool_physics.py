@@ -402,12 +402,58 @@ def test_real_recipe_shape():
     print("ok real recipe shape")
 
 
+def test_standalone_kinds():
+    """the prune's matcher on one fixture of each kind (2026-10-31 census: 706 outputs keep Cards/proc_card_mg5.dat,
+    8698 standalone_cpp outputs keep only Cards/param_card.dat with SubProcesses/ and their compiled libME_*.so): both
+    kinds are pruned, manifest first; a symlink, a half-written output without SubProcesses/, a MadEvent directory and
+    the install's own files are never touched"""
+    w = tempfile.mkdtemp(prefix="standalone_kinds_")
+    outside = tempfile.mkdtemp(prefix="standalone_target_")
+    try:
+        def mk(name, files):
+            for f in files:
+                fp = os.path.join(w, name, f)
+                os.makedirs(os.path.dirname(fp), exist_ok=True)
+                if not f.endswith("/"):
+                    open(fp, "w").write("x" * 10)
+            return os.path.join(w, name)
+        ml = mk("dd_dd_virt_standalone", ["Cards/proc_card_mg5.dat", "Cards/param_card.dat", "SubProcesses/P0_dd_dd/matrix2py.so"])
+        cpp = mk("v4_bbx_aaz_standalone", ["Cards/param_card.dat", "SubProcesses/P1_Sigma_sm_bbx_aaz/CPPProcess.cc",
+                                           "libME_P1_Sigma_sm_bbx_aaz.so", "driver.cpp"])
+        half = mk("v4_half_standalone", ["Cards/param_card.dat"])
+        mev = mk("pp13v4_udx_ddxwp_madevent", ["Cards/param_card.dat", "SubProcesses/"])
+        mk("madgraph", ["__init__.py"]); open(os.path.join(w, "VERSION"), "w").write("3.7.0")
+        tgt = os.path.join(outside, "x_standalone")
+        os.makedirs(os.path.join(tgt, "SubProcesses")); os.makedirs(os.path.join(tgt, "Cards"))
+        open(os.path.join(tgt, "Cards", "param_card.dat"), "w").write("x")
+        os.symlink(tgt, os.path.join(w, "link_standalone"))
+        assert pp.standalone_kind(ml) == "madloop" and pp.standalone_kind(cpp) == "standalone_cpp", (ml, cpp)
+        assert pp.standalone_kind(half) is None and pp.standalone_kind(os.path.join(w, "link_standalone")) is None
+        assert pp.standalone_dirs(w) == sorted([ml, cpp]), pp.standalone_dirs(w)
+        cen = pp.standalones_census(w)
+        assert cen["prune candidate (madloop)"]["n"] == 1 and cen["prune candidate (standalone_cpp)"]["n"] == 1, cen
+        assert cen["symlink"]["n"] == 1 and sum(c["n"] for c in cen.values()) == 4, cen
+        r = pp.prune_standalones(w, [], apply=False)
+        assert r["deletable"] == 2 and os.path.isdir(cpp) and os.path.isdir(ml), r
+        r = pp.prune_standalones(w, [ml], apply=True)          # a kept backend (a pool without a sidecar block) stays
+        man = json.load(open(r["manifest"]))
+        assert [e["path"] for e in man["entries"]] == [cpp] and not os.path.exists(cpp) and os.path.isdir(ml), (r, man)
+        for keep in (half, mev, os.path.join(w, "madgraph"), os.path.join(w, "VERSION"), tgt):
+            assert os.path.exists(keep), keep
+        assert os.path.islink(os.path.join(w, "link_standalone"))
+    finally:
+        shutil.rmtree(w, ignore_errors=True)
+        shutil.rmtree(outside, ignore_errors=True)
+    print("ok standalone kinds")
+
+
 if __name__ == "__main__":
     try:
         setup_rec = setup()
         TRAIN = setup_rec
         for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_sidecar_block_used,
-                  test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars, test_real_recipe_shape):
+                  test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars, test_real_recipe_shape,
+                  test_standalone_kinds):
             t()
         print("all pool physics tests passed")
     finally:
