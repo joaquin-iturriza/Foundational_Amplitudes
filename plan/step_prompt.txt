@@ -59,6 +59,9 @@ How you work
    batch the wakes: parallel background commands go out as one job (`tools/detach.py --entry {id} --name <batch>
    --each "<cmd 1>" --each "<cmd 2>" ...`, one event when all end), and a batch of runs is put on its step with
    `plan wait {id} <step> --on "<the run ids>"` (one RUN_DONE when all of them end; a broken one still comes at once).
+   A clean run end that closes no wait wakes no one. A chain (dry run, then stage 1, then stage 2, with dependencies)
+   is one wait on its final job: record the others with `plan run {id} <run> --intermediate` and name only the final
+   job in `plan wait`.
 4. Record through the plan CLI only: evidence, dead-end, set-next/add-next/drop-next, design, target, finding.
 5. Before asking the user, read CLAUDE.md and `site decisions --project FA`; a choice with one correct answer is made,
    not asked. Only a call none of them settles goes in your final message, word for word, with what you read and what

@@ -5,8 +5,13 @@ and event table; the code under test is ~/.local/bin/site_runends.py (run_done_e
 
   B1  an entry with 2 runs in one plan wait, one ends clean: no RUN_DONE; then the second ends clean: one RUN_DONE
       listing both
-  B2  a run in no wait ends clean: one RUN_DONE at once (unchanged)
+  B2  a run in no wait ends clean: no RUN_DONE (the supervisor acks it; 2026-10-31, one wake per wait)
   B3  a broken run inside a wait whose other run is live: its RUN event opens at once
+  C1  a 3-job chain (dry run, stage 1 intermediate, wait on stage 2): the middle ends clean, no event; the final
+      ends clean, one RUN_DONE
+  C2  a chain's middle job broken: its RUN event at once
+  D1  debounced waiter: two RUN_DONE 2 s apart with --debounce 3 (scaled from 2 min): one return carrying both
+  D2  debounced waiter: a RUN arriving while a RUN_DONE is being debounced: immediate return
   B4  detach --each with 3 commands (rc 0, 3, 0): one DONE event, the job's rc 3, each command's rc in the log
   B5  plan owners lists a step's waited runs
 
@@ -62,8 +67,8 @@ def test_no_wait_unchanged():
         m = load_site(tmp)
         rx, c = m._rx(), m.ldb()
         put(c, C, "COMPLETED")
-        assert rx.run_done_events(m, c, "FA", [C], owners([C], []), log=quiet) == 1
-        print("B2 ok: a run in no wait gives its RUN_DONE at once")
+        assert rx.run_done_events(m, c, "FA", [C], owners([C], []), log=quiet) == 0 and not events(c, "RUN_DONE")
+        print("B2 ok: a run in no wait raises no RUN_DONE")
 
 
 def test_broken_in_wait():
@@ -77,6 +82,78 @@ def test_broken_in_wait():
         ev = events(c, "RUN")
         assert n == 1 and len(ev) == 1 and A in ev[0][1], (n, ev)
         print("B3 ok: a broken run inside a live wait opens its RUN event at once:", ev[0][1][:100])
+
+
+def test_chain():
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        rx, c = m._rx(), m.ldb()
+        o = owners([A, B, C], [{"step": "2", "runs": [C]}])
+        o["cov"]["intermediate"] = [A, B]
+        put(c, A, "COMPLETED"), put(c, B, "RUNNING"), put(c, C, "PENDING")
+        assert rx.run_done_events(m, c, "FA", [A], o, log=quiet) == 0
+        put(c, B, "COMPLETED")
+        assert rx.run_done_events(m, c, "FA", [B], o, log=quiet) == 0 and not events(c, "RUN_DONE")
+        put(c, C, "COMPLETED")
+        assert rx.run_done_events(m, c, "FA", [C], o, log=quiet) == 1
+        ev = events(c, "RUN_DONE")
+        assert len(ev) == 1 and C in ev[0][1], ev
+        print("C1 ok: chain dry run and middle end clean: none; final: one event:", ev[0][1][:90])
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        rx, c = m._rx(), m.ldb()
+        put(c, A, "COMPLETED"), put(c, B, "FAILED"), put(c, C, "PENDING")
+        rx.read_log = lambda *a, **k: {"head": "", "tail": "Traceback (most recent call last):\nRuntimeError: stage 1\n"}
+        rx._collections = lambda *a, **k: {}
+        n = rx.run_end(m, c, "FA", {"local": tmp}, B, None, "FAILED", "cov", log=quiet, cache={})
+        ev = events(c, "RUN")
+        assert n == 1 and len(ev) == 1 and B in ev[0][1], (n, ev)
+        print("C2 ok: a broken chain middle opens its RUN event at once")
+
+
+def _waiter(m, debounce, out):
+    import types, io, contextlib
+    a = types.SimpleNamespace(wait=True, project="FA", new_only=False, all=False, limit=20, debounce=debounce)
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        m.cmd_events(a)
+    out.append((time.time(), buf.getvalue()))
+
+
+def test_debounce():
+    import threading
+    os.environ["SITE_WAIT_POLL_S"] = "1"
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        c = m.ldb()
+        m.add_event(c, "FA", "cov", "RUN_DONE", "k1", "first batch done")
+        c.close()
+        out = []
+        t = threading.Thread(target=_waiter, args=(m, 3, out), daemon=True)
+        t.start()
+        time.sleep(2)
+        c = m.ldb()
+        m.add_event(c, "FA", "cov", "RUN_DONE", "k2", "second batch done")
+        c.close()
+        t.join(15)
+        assert not t.is_alive() and len(out) == 1 and "first batch" in out[0][1] and "second batch" in out[0][1], out
+        print("D1 ok: two RUN_DONE 2 s apart, one return with both")
+    with tempfile.TemporaryDirectory() as tmp:
+        m = load_site(tmp)
+        c = m.ldb()
+        m.add_event(c, "FA", "cov", "RUN_DONE", "k1", "batch done")
+        c.close()
+        out = []
+        t0 = time.time()
+        t = threading.Thread(target=_waiter, args=(m, 60, out), daemon=True)
+        t.start()
+        time.sleep(2)
+        c = m.ldb()
+        m.add_event(c, "FA", "cov", "RUN", "r1", "FA-ccin2p3-0000000b ended FAILED")
+        c.close()
+        t.join(10)
+        assert not t.is_alive() and "ended FAILED" in out[0][1] and out[0][0] - t0 < 8, out
+        print("D2 ok: a RUN during debounce returns at once (%.1f s)" % (out[0][0] - t0))
 
 
 def test_detach_each():
@@ -123,6 +200,8 @@ if __name__ == "__main__":
     test_wait_group()
     test_no_wait_unchanged()
     test_broken_in_wait()
+    test_chain()
+    test_debounce()
     test_detach_each()
     test_owners_waits()
     print("all ok")

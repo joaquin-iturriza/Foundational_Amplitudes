@@ -1788,6 +1788,7 @@ def cmd_owners(a):
         o = owner_of(e)
         rows.append({"entry": e["id"], "status": e.get("status"), "owner": o and o["agent"],
                      "owner_state": owner_state(e), "runs": sorted((st.get(e["id"]) or {}).get("runs", [])),
+                     "intermediate": sorted((st.get(e["id"]) or {}).get("intermediate", [])),
                      # the steps waiting on runs (plan wait): the supervisor's RUN_DONE waits until all of a step's runs end
                      "waits": [{"step": k, "runs": sorted(set(re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))))}
                                for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
@@ -2422,6 +2423,11 @@ def cmd_run(a):
         rs += [r for r in a.runs if r not in rs]
         if a.next is not None:
             st[a.id].setdefault("run_steps", {}).update({r: a.next for r in a.runs})
+        if getattr(a, "intermediate", False):
+            # a chain's intermediate jobs (dry run, stage 1 before stage 2): their clean ends never wake anyone; the
+            # step's `plan wait` names the final job (the supervisor's RUN_DONE, 2026-10-31)
+            im = st[a.id].setdefault("intermediate", [])
+            im += [r for r in a.runs if r not in im]
         sl = st[a.id].setdefault("sweeps", [])
         for site, name in specs:
             x = next((x for x in sl if x.get("site") == site and x.get("name") == name), None)
@@ -2925,7 +2931,9 @@ def main(argv=None):
     cmd("run", cmd_run, "record jobs of the entry: registry runs or sweeps", ID,
         A("runs", nargs="*", help="registry run ids (site runs)"),
         A("--sweep", action="append", help="SITE:NAME of a sweep submitted through sweep_manager (repeatable)"),
-        A("--next", type=int, help="the number of the next step the jobs belong to (default: the first step)"))
+        A("--next", type=int, help="the number of the next step the jobs belong to (default: the first step)"),
+        A("--intermediate", action="store_true", help="the runs are a chain's intermediate jobs (their clean ends "
+          "raise no RUN_DONE; `plan wait` names the chain's final job)"))
     cmd("sweeps", cmd_sweeps, "every recorded sweep's state on its site; records the unrecorded ones",
         A("--fresh", action="store_true", help="read the sites now, not the cache"))
     cmd("evidence", cmd_evidence, "add evidence to the entry", ID,

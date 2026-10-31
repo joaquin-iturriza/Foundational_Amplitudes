@@ -2,8 +2,8 @@
 """The supervisor's RUN_DONE events and the quiet waiter (plan entry agent_redesign, 2026-10-31), on a scratch registry
 and event table; the code under test is ~/.local/bin/site_runends.py and its glue in ~/.local/bin/site.
 
-  R1  a 32-job batch recorded on an entry ends clean in one pass: one RUN_DONE event naming the owner to resume, and
-      the same pass again adds none
+  R1  a 32-job batch recorded on an entry, one step waiting on all of it (plan wait), ends clean in one pass: one
+      RUN_DONE event naming the owner to resume, and the same pass again adds none
   R2  the same batch while the entry's owner is working: no event
   W1  an open RUN_DONE of an entry whose owner is working: the waiter does not return
   W2  the owner stops: the waiter returns with that event
@@ -37,7 +37,8 @@ def load_site(tmp):
 def world(owner_state):
     runs = ["FA-ccin2p3-%08x" % i for i in range(32)]
     owners = {"catalog_coverage": {"entry": "catalog_coverage", "status": "running", "owner": "a0000000000000001",
-                                   "owner_state": owner_state, "runs": runs + ["FA-ccin2p3-ffffffff"]},
+                                   "owner_state": owner_state, "runs": runs + ["FA-ccin2p3-ffffffff"],
+                                   "waits": [{"step": "1", "runs": runs}]},
               "agent_redesign": {"entry": "agent_redesign", "status": "running", "owner": None, "owner_state": None,
                                  "runs": []}}
     return runs, owners
@@ -49,6 +50,8 @@ def test_run_done_one_event_per_entry():
         rx = m._rx()
         c = m.ldb()
         runs, owners = world("stopped")
+        for r in runs:
+            c.execute("INSERT INTO runs (id, project, state) VALUES (?,?,?)", (r, "FA", "COMPLETED"))
         n = rx.run_done_events(m, c, "FA", runs, owners, log=lambda *a: None)
         rows = c.execute("SELECT item, kind, msg FROM events WHERE acked IS NULL").fetchall()
         assert n == 1 and len(rows) == 1, rows
