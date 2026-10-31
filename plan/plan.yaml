@@ -1481,6 +1481,53 @@ entries:
       read: D86, D113/D114 (qperp_soft), D178, D179. The prior now names par:dimless_qperp, D86 and the alignment dead ends.
       Checks 6/7: within D178 and step 6, largest cells first. Note: H2 is read on val and TR on test; neither is the control''s
       checkpoint-selection set for those pools. Report the refused count per group beside each median.'
+  - at: '2026-10-31T00:36:29+00:00'
+    question: 'Does the per-event product of the diagrams'' propagator factors carry the shape gap of catalog_v4''s held-out
+      multiplicity pools (par:v4_shape_gap: median e 0.383 / 0.356, a transfer gap) that the soft-dipole factor did not (dipole
+      read dead end, 2026-10-31)? A CPU read on the existing control-pair reads, the same frame as the dipole read: first
+      a gate, whether log P carries per-event variance of the control''s own target t in the multiplicity pools; past it,
+      whether the control''s zero-shot residual tracks log P on held-out multiplicity pools beyond the training pools of the
+      same cells and beyond three placebos. A yes is the precondition for a propagator input or target prior on the catalog
+      (a later GPU design, the target_propagators lever being the candidate); a no ends this route. Feeds D178 and step 6.'
+    prior: 'Searched docs/results.tex (the surrogates paragraph near line 5660, tab:levers, the target-side propagator subtraction
+      near 9653, par:v4_shape_gap, par:v4_mult_cand), plan show v3_prep_explore, site decisions (D86, D178), terms propagator
+      product, prop surrogate, target_propagators, offshell, Breit-Wigner. Found: (i) norm_surrogate.py''s prop surrogate
+      (sum over the sidecar''s diagrams of C_d prod 1/|D_S|^k): within-process r^2 with the true log|M|^2 0.69 on the new
+      processes, 0.46 on training, 0.20 on the relabels (catalog_daniel); with the eikonal 0.50 on training. (ii) The target-side
+      propagator subtraction (data.target_propagators, massive s- and t-channel Breit-Wigner factors) was adopted at the catalog
+      working point but loses in the transfer study''s seeded cells (fa-canonical-setup); the control (v4_dimensionless_muon)
+      runs it off. (iii) The dipole read (FA-ccin2p3-18269717, analysis/catalog_v4/data/dipole_gate.json @606fbe94): log D
+      explains 0.705 of log|M|^2 but only 0.094 of t; the residual''s r^2 on log D 0.005/0.007, at the placebos: the emission-scale
+      target removes the soft structure; P holds the hard (massive, t-channel) structure the emission scales do not.'
+    measure: 'Per probe of the control pair''s reads (H2: the 218 held-out multiplicity pools, val split; TR: the training
+      pools of the same 6-particle cells, test split; 2000 events each; seeds 42, 43), momenta from the pool rows at pool_rows()
+      (dipole_residual.py @b5173fa7, alignment checked, refused counted): log P = log sum_d C_d prod_{internal S} 1/|s_S -
+      M_S^2 + i M_S Gamma_S|^k (k = 2 massive, 1 massless; s_S from the legs on one side of the edge; diagrams from data/diagrams/<probe>.diagrams.json
+      on CC, 1771 v4 sidecars; C_d the diagram''s coupling product alpha_s^{QCD} alpha^{QED} from its vertex orders; norm_surrogate.py''s
+      prop without the constant). Gate: median r^2 of t on log P per group (held out; training of the same cells), per cell
+      and over all multiplicity cells, log|M|^2 = t - logF beside. Main: r^2 of the residual u = (q - t) - mean on log P;
+      placebos E (summed energy), logF, log D; per group the median per seed, the seed difference, the 16-84% bootstrap of
+      the median over pools (1000 draws, seed 0). Script: an extension of dipole_residual.py (log P column), tested on 5 probes
+      before the job.'
+    check: 'The gate is the check, inside this read and with no network: whether log P carries variance of the target the
+      control trains on. On existing data the prop surrogate is known to move with log|M|^2 within a process (r^2 0.46 to
+      0.69, catalog_daniel), and the dipole read showed the raw-vs-target contrast is measurable at these cuts (0.705 vs 0.094),
+      so the gate separates ''P already absorbed by the emission scales'' from ''P still in t''.'
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected (/zz_v4_short_<arm>/H2, TR); the pools' frozen
+      val and test rows; the sidecars as on CC; P, E, logF, D as defined, no tuning, no fit; cells as loop_levels.py --shape-gap
+      (n particles, initial state); bootstrap 1000 draws, seed 0.
+    control: Held-out multiplicity pools against the training pools of the same cells, same network, scorer and events; three
+      placebos (summed energy, the emission-scale factor logF, the dipole log D), so a residual correlation with log P counts
+      only beyond a generic energy trend, the target's own soft scale and the soft dipoles.
+    seeds: Seeds 42 and 43 of the control; each margin must exceed both the seed difference of the group median and the bootstrap
+      half-range.
+    outcome: 'Gate fails (median r^2 of t on log P below 0.1 over all multiplicity cells on both seeds): the propagator route
+      is a dead end, recorded; the next candidate for the multiplicity gap is designed. Gate passes, main read yes (both seeds:
+      held-out median residual r^2 on log P >= 0.1, >= 2x training, above all three placebos, margins beyond the seed difference
+      and bootstrap half-range): a GPU design follows (the control''s short pretraining with data.target_propagators on, or
+      log P as an input, two seeds, read on H2 and TR by the shape-gap rule). Gate passes, main read no (below 0.05 or not
+      above training or a placebo): the network already uses P or the gap is elsewhere: dead end. Between: reported, no GPU
+      arm. Cost: one CPU job on CC-IN2P3 (4 cores, under 1 h); no GPU.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
