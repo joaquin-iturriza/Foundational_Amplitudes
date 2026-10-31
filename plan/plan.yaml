@@ -6661,7 +6661,7 @@ entries:
       (asked 2026-10-31 ~00:30)'
   owner:
     agent: aa7670a7d3cbd2cba
-    state: stopped
+    state: closed
     since: '2026-10-31T03:33:44+00:00'
     context: 70402
     context_at: '2026-10-31T04:24:11+00:00'
@@ -7343,27 +7343,21 @@ entries:
     text: 'a compaction inside the turn of owner aa7670a7d3cbd2cba at 2026-10-31T04:17:54.920Z: its brief or scope was too
       large; narrow the next brief'
   handoff:
-    state: 'Step 4 model trial closed: first trial (10 pairs) result, extension (D212) stopped by D213 (switch to Sonnet for
-      mechanical steps). Switch live in code: .claude/agents/mechanical-worker.md (model sonnet, scope only, loads live CLAUDE.md),
-      plan brief --mechanical with plan/mechanical_prompt.txt accepted by brief_guard for mechanical-worker only, routing
-      line in working-on-the-plan, live check agent_tasks.py --mechanical in the supervisor''s maintain (ALERT mechanical_revert
-      at 5 failures among the first 30). Wake reduction: RUN_DONE only when a step''s plan wait closes (site_runends.py),
-      plan run --intermediate for chain jobs, site events --wait --debounce SEC, detach.py --each, ROUTINE: hand-backs (step_prompt
-      + CLAUDE.md 3bd63a41); main session to restart supervisor and waiter with --debounce 600. Reviews: repo-reviewer passed
-      (watermark 3210dac1); claudemd-keeper passed my items but its pillar stays BLOCKED on catalog_coverage''s fa-generation
-      index line (needs Joaquin). NEW, not started: the usage-attribution measurement (next step ''Usage attribution''), design
-      first then design reviewer.'
-    decisions: D213 supersedes the routing dead end (verdict No under 0.6 rule) of the first trial; checks of the trial harness
-      run outside worktrees/zz_* and score per scenario (plan.py refuses writes in zz_* trees); a clean run end in no wait
-      wakes no one (owners must plan wait); revert rule N 30 K 5 (p 0.006 at Opus's 0.04 failure rate, 0.745 at 0.20).
-    ruled_out: Trial extension (stopped by D213); suppressing the parent's wake on a subagent hand-back (no hook found; untested).
-    running: none (revalidate batches killed; scratch check worktrees removed; refs/model_trial/* keep the first ten agent
-      commits)
-    files: 'tools/model_trial.py, analysis/agent_redesign/model_trial*.json, model_trial_baseline/, model_trial_first10_heads.txt,
-      tools/agent_tasks.py (--mechanical), tools/detach.py, tools/plan.py (owners waits/intermediate, brief --mechanical,
-      run --intermediate), plan/step_prompt.txt, plan/mechanical_prompt.txt, .claude/agents/mechanical-worker.md, .claude/hooks/brief_guard.py,
-      .claude/hooks/test_guards.py, ~/.local/bin/site (debounce; backup site.bak_20261031_debounce), ~/.local/bin/site_runends.py
-      (run_done_events; backups .bak_20261031, .bak_20261031b), ~/.config/ccorch/projects.toml (maintain; backup .bak_20261031),
-      tests/test_wake_batching.py, test_run_done_waiter.py, test_mechanical_watch.py, test_mechanical_brief.py; for the usage
-      step: tools/usage_windows.py, tools/context_breakdown.py, analysis/agent_redesign/figs/usage.png and its script'
-    written: '2026-10-31T03:32:10+00:00'
+    state: 'Held by D220 for the weekend. Committed 5708b248: (2) Stop-hook bookkeeping in plan_check (owners recorded resumed/launched/stopped
+      from the turn''s SendMessage, Agent launch and task-notification; waiter refusal says the hook cannot arm one; plan
+      owner --state counts via state_at) and (1) context_guard refuses an auto PreCompact while a question has no plan ask,
+      an answer no site decide, an ''I''ll do X'' no plan step (reply_check model call; on this session''s two windows it
+      found 3 and 3 such items, one false positive removed once hand-offs were visible). Tests: test_redesign_d 58/58 (bookkeeping
+      group 8, 5 fail on old code), test_hooks_real stop_conditions 12/12, test_guards 20/20; full test_hooks_real timed out
+      at 590 s in both new and base copies with the same 2 FAILs (A3, B2). Queued: double wake test (plain final text gives
+      one wake with the report whole: real case acc18380b00739f5c 01:05; the mechanical-worker test called SubagentHandback
+      anyway after its text because the harness reminder tells it to, so prompts alone do not stop the second wake; needs
+      a decision on a PreToolUse refusal of SubagentHandback); guard note leaking to owners (not started); repo-reviewer and
+      claudemd-keeper pass over 5708b248 and d14f4691 (a claudemd-keeper adfa2736b07a1628b was launched before the hold and
+      could not be stopped by me).'
+    decisions: Hook changes developed in a scratch copy and installed only after tests pass; real-transcript records never
+      copied into fixtures (synthetic only).
+    running: claudemd-keeper adfa2736b07a1628b (launched before D220; stop it if the hold forbids reviewers)
+    files: tools/plan.py .claude/hooks/plan_check.py .claude/hooks/context_guard.py .claude/hooks/stop_conditions.py tests/test_redesign_d.py
+      tests/test_hooks_real.py ~/.local/bin/site (waiter text; backup site.bak_20261030_waitertext)
+    written: '2026-10-31T04:24:26+00:00'
