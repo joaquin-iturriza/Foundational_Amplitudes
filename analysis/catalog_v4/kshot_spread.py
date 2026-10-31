@@ -17,6 +17,8 @@ uses only the K drawn events and the prior pools, the score only the other 2000 
           a = mean_K t - b mean_K q; b0 = median full-data slope over the cell's TR pools, lam = s2 / tau2 with s2 the
           median residual variance after their affine fit and tau2 the variance of their slopes (the deployable one:
           the prior uses training data only)
+  shr1    the same with b0 = 1 and the cell's training-pool lam (shrink toward 1: the D83 few-shot read, Daniel's
+          catalog, helped at k = 3)
   shr_ho  the same with the prior from the H2 pools of the other classes (census_classes.json), leave-class-out
           (the precedent of kshot_level.py's shrunk offset, which pulls toward the other probes of the axis)
   ceil    the affine's ceiling: 5 folds of the 2000 events, fit on 1600, scored on the other 400; ceil_cubic the
@@ -47,9 +49,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SR = os.path.join(ROOT, "analysis", "catalog_v3", "data", "short_reads")
 ARMS = {"v4_dimensionless_muon": "s42", "v4_dimensionless_muon_seed2": "s43"}
-KS = (4, 16, 64, 256)
+KS = (4, 8, 16, 64, 256)
 NDRAW = 200
-METHODS = ("off", "aff", "shr_tr", "shr_ho")
+METHODS = ("off", "aff", "shr_tr", "shr1", "shr_ho")
 
 
 def load(run, axis, keep=None):
@@ -114,7 +116,7 @@ def per_pool(q, t, k, seed, priors):
         assert len(rest) + k == n and not np.intersect1d(pick, rest).size   # fit and score events disjoint
         acc["off"] += float(np.mean((t[rest] - q[rest] - (t[pick] - q[pick]).mean()) ** 2))
         acc["aff"] += fit_apply(q, t, pick, rest)
-        for m in ("shr_tr", "shr_ho"):
+        for m in ("shr_tr", "shr1", "shr_ho"):
             if priors.get(m) is not None:
                 acc[m] += fit_apply(q, t, pick, rest, *priors[m])
     return {m: v / NDRAW for m, v in acc.items() if m in ("off", "aff") or priors.get(m) is not None}
@@ -175,11 +177,13 @@ def main():
                 sh = {}
                 for i, p in enumerate(hp):
                     oth = [H[o] for o in hp if klass[o] != klass[p]]
-                    sh[p] = per_pool(*H[p], K, i, {"shr_tr": pri_tr[cell(p)], "shr_ho": prior(oth)})
+                    sh[p] = per_pool(*H[p], K, i, {"shr_tr": pri_tr[cell(p)], "shr1": (1.0, pri_tr[cell(p)][1]),
+                                                   "shr_ho": prior(oth)})
                 st = {}
                 for i, p in enumerate(tp):
                     oth = [T[o] for o in tp if o != p and cell(o) == cell(p)]
-                    st[p] = per_pool(*T[p], K, 10000 + i, {"shr_tr": prior(oth) if len(oth) > 1 else None})
+                    po = prior(oth) if len(oth) > 1 else None
+                    st[p] = per_pool(*T[p], K, 10000 + i, {"shr_tr": po, "shr1": (1.0, po[1]) if po else None})
                 for m in METHODS:
                     v2 = [sh[p][m] for p in hp]
                     R[f"f_{m}{K}"] = round(f_of(v1, v2, f1), 4)
@@ -201,22 +205,24 @@ def main():
 
 
 def verdict(res):
-    """The design's rule (primary: shr_tr at K = 16). Per seed, margin = max(seed difference, bootstrap half-range):
-    ends when f_ceil < 0.1 on both seeds (no per-process affine carries the gap); yes when f - margin >= 0.5 f_ceil
-    and >= 0.1; no when f + margin < 0.25 f_ceil or < 0.05; else between. A branch holds only on both seeds."""
-    V = {"per_seed": {}}
-    if all(res[s]["f_ceil"] < 0.1 for s in ("s42", "s43")):
-        V["branch"] = "ends: f_ceil < 0.1 on both seeds"
-        return V
-    for s in ("s42", "s43"):
-        R = res[s]
-        f, fc = R["f_shr_tr16"], R["f_ceil"]
-        m = max(res["seed_difference"]["shr_tr16"], (R["boot_shr_tr16"][1] - R["boot_shr_tr16"][0]) / 2)
-        b = ("yes" if f - m >= 0.5 * fc and f - m >= 0.1 else
-             "no" if f + m < 0.25 * fc or f + m < 0.05 else "between")
-        V["per_seed"][s] = {"branch": b, "f": f, "f_ceil": fc, "margin": round(m, 4)}
-    bs = {v["branch"] for v in V["per_seed"].values()}
-    V["branch"] = bs.pop() if len(bs) == 1 else "between (seeds disagree)"
+    """The revised design's rule (2026-10-31). Option (c) itself is answered by the ceiling: f_ceil < 0.1 on both seeds
+    means no per-process affine carries the gap. The K reads answer: does fitting a slope at K <= 16 cost or gain
+    against the plain offset on the same draws? Per seed and K in (4, 8, 16), g = f_shr_tr<K> - f_off<K>, margin =
+    max(seed difference of g, half the larger bootstrap half-range of the two f): gain when g - margin > 0, cost when
+    g + margin < 0, else neutral; a branch holds only on both seeds. Primary: K = 16."""
+    V = {"ceiling": "ends: f_ceil < 0.1 on both seeds" if all(res[s]["f_ceil"] < 0.1 for s in ("s42", "s43"))
+         else "f_ceil >= 0.1 on a seed", "slope_vs_offset": {}}
+    for K in (4, 8, 16):
+        g = {s: res[s][f"f_shr_tr{K}"] - res[s][f"f_off{K}"] for s in ("s42", "s43")}
+        sd = abs(g["s42"] - g["s43"])
+        per = {}
+        for s in ("s42", "s43"):
+            hr = max((res[s][f"boot_{m}{K}"][1] - res[s][f"boot_{m}{K}"][0]) / 2 for m in ("shr_tr", "off"))
+            m = max(sd, hr)
+            per[s] = {"g": round(g[s], 4), "margin": round(m, 4),
+                      "branch": "gain" if g[s] - m > 0 else "cost" if g[s] + m < 0 else "neutral"}
+        bs = {v["branch"] for v in per.values()}
+        V["slope_vs_offset"][f"K{K}"] = {"per_seed": per, "branch": bs.pop() if len(bs) == 1 else "neutral (seeds disagree)"}
     return V
 
 
