@@ -6886,6 +6886,44 @@ entries:
       tasks. Check 5: searched docs/results.tex (sonnet, haiku, opus, low effort, model trial, reasoning effort: nothing),
       the decisions (D138, D203, D205, D206) and agent_tasks.json; they match the prior field. Advisory: the interfaces make
       the tasks easier for both arms and may push both near a ceiling, so the hand read and cost may end up deciding'
+  - at: '2026-10-31T03:40:01+00:00'
+    question: 'Usage attribution (step 7, Joaquin 2026-10-31 on figs/usage.png): what wakes the main session and what it does
+      when woken, and what each class costs. Feeds: which wakes to cut or route (hand-back plus task-notification double wakes,
+      Stop-hook refusals, waiter wakes, nothing-to-say wakes) and whether the main session still does inline work under the
+      owner set-up (CLAUDE.md: the main session never does an entry''s work itself).'
+    prior: 'tools/usage_report.py nothing_new (v2 @f3624f9c): main-session turns started by a notification whose calls are
+      only the waiter re-arm, 10.4% of turns main-alone, 22.9% step-agents; it split only by transcript file, not by trigger
+      or by what the turn did. usage_report v3 (7dbd656d): main session 560M/126M/20M weighted tokens in the three eras, subagents
+      146M/272M/65M, trial replays 15M (were counted as main in v2). docs/results.tex: nothing on main-session attribution
+      (searched usage, wake, orchestration, main session). Decisions: none on this measure.'
+    measure: 'tools/main_turns.py (scratchpad draft, committed before the report). Main-session transcripts of ~/.claude/projects/-home-joaquin-work-FA
+      (A/B replay folders excluded). Segment = a turn-starting user record (not a tool result) and every API message (deduplicated
+      on message id) until the next one; trigger classes: user, handback (agent-message/peer), agent_done (task-notification
+      with an agent task id), waiter (task-notification of a background site events --wait, or Monitor event), supervisor,
+      bg_other, goal_checkin, stop_hook (Stop hook feedback), nudge (no visible output, usage-limit notes, artifact auto-react,
+      safety stop), compaction. Mid-turn arrivals (queued_command attachments, silent_turn_reminder) do not start a segment
+      and are counted per segment as absorbed_mid_turn. What it did, first that applies: inline (Edit/Write; Bash git commit|merge|worktree|rm|push,
+      site submit|run|copy|sync|cancel, pytest, python other than tools/plan.py, sed -i, tee, redirect into a file), read
+      (Read/Grep/Glob/Skill/MCP, other Bash), orchestration (Agent, SendMessage, TaskStop, ToolSearch, tools/plan.py, site
+      ack|events|decide|items|supervise|digest|hold|release|pick, tools/detach.py), none. Per era (usage_report PERIODS) and
+      per class: segments, API calls, context at the segment''s first call (median), weighted tokens (in 1, out 5, cache write
+      1.25, read 0.1), list-price $ (usage_windows prices), $ share. Nothing-to-say wake: not user-started, class none or
+      orchestration, visible text <= 60 chars; subset starting ''Working''.'
+    check: 'Hand check: 2 random segments per trigger x did cell (about 60) printed with trigger text, first tools and visible
+      text (main_turns.py --samples 2), read: each trigger label matched its text in all read cases; the first draft cut segments
+      at mid-turn arrivals and silent_turn_reminder, which attributed the turn''s own continuing work to the reminder (nudge
+      29% of main-alone $), fixed by counting them as absorbed instead. Totals check: era sums of $ and weighted tokens equal
+      usage_report v3''s main role within the dedup (main-alone 560.3M vs 560.0M).'
+    fixed: 'Weights, list prices, era boundaries (usage_report PERIODS: 653aed00, 84a15232), transcripts as on disk at the
+      run; one classifier, regexes stated in the tool docstring.'
+    control: The three eras against each other (main alone as the reference where the main session did all work); within an
+      era, $ share per class.
+    seeds: 'Not stochastic: one pass over all transcripts; the hand check is a fixed random sample (seed 0).'
+    outcome: 'Reports the numbers either way. Changes it feeds: if hand-back + agent_done double wakes or Stop-hook refusals
+      carry >= 10% of the main session''s redesign-era $, propose suppressing the duplicate task-notification or the refusing
+      hook to Joaquin; if inline work by the main session in the redesign era is >= 20% of its $, name the turns and propose
+      the routing rule be enforced; nothing-to-say wakes are reported with count and $ per wake as the price of each extra
+      wake.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
