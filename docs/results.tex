@@ -2364,8 +2364,8 @@ without carry it alike ($0.20$ and $0.20$; $0.23$ and $0.21$), so the parent-fac
 leaving a whole cell out drops it to $0.060$ and $0.032$, so the shared part is mostly shared within a cell; the map
 fitted on the training pools takes $0.063$ and $0.093$ (its own out-of-fold score there $0.039$ and $0.052$). Caveat:
 the factors include $t$, the scored event's own target, which no prior has at prediction time; since nothing transfers
-without the factor group, part of $f$ may be the network's compression of $t$ read back from $t$ itself rather than
-structure a prior could carry. The re-read without $t$ (par.~\ref{par:v4_lco_not}) settles it: $f$ was $t$ read back.
+without the factor group, part of $f$ may be $t$ read back from $t$ itself rather than structure a prior could
+carry. The re-read without $t$ (par.~\ref{par:v4_lco_not}) settles it: $f$ was $t$ read back.
 
 % src: python3 analysis/catalog_v4/lco_map.py --read analysis/catalog_v4/data/lco_map_not.json @955f326f
 % claim: s42.median_ceiling_own_K1600=0.011
@@ -2387,11 +2387,52 @@ labels explain a median $0.011$ and $0.010$ of its residual (seeds $42$, $43$), 
 $f_{\rm ceil}=0.016$ and $0.019$, under the bar of $0.1$ on both seeds: by the design's rule the route ends. The
 leave-class-out map takes $0.022$ and $0.019$, the factors $\log F$, $\log P$, $\log D$ alone $0.004$ and $0.001$,
 leaving a whole cell out $-0.017$ and $-0.033$. Everything par.~\ref{par:v4_lco} read as shared structure was $t$
-read back: the network compresses the held-out pools' target range, and given $t$ a map undoes that, but nothing known
-at prediction time predicts the residual event by event. The held-out multiplicity pools' gap is in the level and
-spread of the residual, not in a per-event shape an event-level input or target prior could carry; with
+read back: with $q$ calibrated (par.~\ref{par:v4_kshot_spread}), $u=q-t$ is the scatter of $t$ about $q$, which a map
+given $t$ recovers, but nothing known at prediction time predicts it event by event. The held-out multiplicity pools' gap is not a per-event
+shape an event-level input or target prior could carry, nor a per-process level and spread
+(par.~\ref{par:v4_kshot_spread}): it is scatter of the residual within each process that nothing tried predicts; with
 par.~\ref{par:v4_dipole} and par.~\ref{par:v4_prop}, the event-level prior route for par.~\ref{par:v4_shape_gap}'s
 transfer gap ends here.
+
+% src: python3 analysis/catalog_v4/kshot_spread.py --read analysis/catalog_v4/data/kshot_spread.json @a0e0dfa9
+% claim: s42.n_H2=218
+% claim: s42.n_TR=716
+% claim: s42.f_ceil=0.012
+% claim: s43.f_ceil=0.017
+% claim: s42.f_ceil_cubic=0.023
+% claim: s43.f_ceil_cubic=0.037
+% claim: s42.median_slope_H2=1.008
+% claim: s43.median_slope_H2=1.006
+% claim: s42.median_slope_TR=0.998
+% claim: s43.median_slope_TR=0.999
+% claim: s42.f_off16=-0.115
+% claim: s43.f_off16=-0.131
+% claim: s42.f_off64=-0.03
+% claim: s43.f_off64=-0.03
+% claim: s42.f_off256=-0.008
+% claim: s43.f_off256=-0.009
+% claim: verdict.slope_vs_offset.K16.per_seed.s42.g=0.0035
+% claim: verdict.slope_vs_offset.K16.per_seed.s43.g=0.0095
+% claim: verdict.slope_vs_offset.K16.per_seed.s42.margin=0.0105
+% claim: verdict.slope_vs_offset.K16.per_seed.s43.margin=0.013
+% allow: 0.1 42 43 2000 1600 400 5 200 4 8 16 64 256 1 3 6 69 because they are the design's bar, the seeds, the read's settings, the pools' particle count and par:v4_prop's refused count
+\paragraph{A per-process affine from the pool's own labels (2026-10-31).}\label{par:v4_kshot_spread} Of the three routes
+for the held-out multiplicity gap (capacity and training length, more 6-particle training data, a per-process
+correction from labelled events), the third: does a per-process correction $t\approx a+b\,q$, fitted on labelled events of a
+held-out pool, remove its gap to the training floor? Same reads as par.~\ref{par:v4_lco_not} (the control pair,
+$218$ held-out multiplicity pools, best checkpoint, $2000$ events each; floors from the $716$ training pools of the
+same cells, all kept: $q$ and $t$ come from the reads themselves, so the $69$ pools refused for event alignment in
+par.~\ref{par:v4_prop} need none here; design passed review after one revision; \code{kshot\_spread.py}). The ceiling, an affine in $q$ fitted on
+$1600$ of a pool's own events and scored on the other $400$ ($5$ folds), removes $f_{\rm ceil}=0.012$ and $0.017$ of
+the gap (seeds $42$, $43$; $f$ as in par.~\ref{par:v4_lco}), a cubic in $q$ $0.023$ and $0.037$: under the bar of
+$0.1$ on both seeds, so by the design's rule the route ends. The held-out residual is calibrated, not compressed: the
+median slope of $t$ on $q$ is $1.008$ and $1.006$ (training pools $0.998$ and $0.999$). With $K$ labelled events
+($200$ draws per pool), the offset alone costs at every $K$ ($f=-0.115$ and $-0.131$ at $K=16$, $-0.03$ at $K=64$
+on both seeds, $-0.008$ and $-0.009$ at $K=256$): its own $1/K$ noise exceeds the level it removes; a
+slope shrunk toward its cell's training slopes neither gains nor costs against the offset at $K=4$, $8$, $16$ on
+either seed ($f_{\rm slope}-f_{\rm off}=0.0035$ and $0.0095$ at $K=16$, margins $0.0105$ and $0.013$): neutral by the
+design's rule. The gap is therefore scatter within each process, as par.~\ref{par:v4_lco_not} states. This route is closed; capacity and training length wait on the full pretraining's design,
+and more 6-particle training pools are being built.
 
 % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
 % claim: mb.median_signed_off_all=0.12
@@ -3404,7 +3445,7 @@ $2.54$\,h. This is an estimate: it assumes every other pool fits beside that run
 % allow: 99 because it is a quantile level
 
 The compiled standalones are not kept either: the probe reads' physics check reads each pool's sidecar
-(\code{tools/pool\_physics.py}, D209), so a regeneration rebuilds them. Their cost is MadGraph's output and compile
+(\code{tools/pool\_physics.py}) [D209], so a regeneration rebuilds them. Their cost is MadGraph's output and compile
 before MadEvent runs, timed on one core in each of the $2388$ pp pools built in a single job: median $22.8$\,s per
 process, $90\%$ under $54.2$\,s, the largest $186.4$\,s, and $21.4$ core-hours in all.
 % src: python3 tools/regen_time.py @8f532896
