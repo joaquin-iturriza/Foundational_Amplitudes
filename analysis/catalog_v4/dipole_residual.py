@@ -211,6 +211,46 @@ def joint_features(mom, t, logF, logP, logD):
     return np.stack(cols, 1)
 
 
+# the leave-class-out read (design of 2026-10-31, after the joint read's dead end): leg-order-free features, column
+# groups for the drop-group read; species counted over the final legs
+SPECIES = (("g", {21}), ("a", {22}), ("q", {1, 2, 3, 4}), ("b", {5}), ("l", {11, 13, 15}), ("nu", {12, 14, 16}),
+           ("W", {24}), ("Z", {23}), ("H", {25}), ("t", {6}))
+FACTORS = ("t", "logF", "logP", "logD")
+
+
+def lof_features(mom, pdg, t, logF, logP, logD, n_in=2):
+    """(X, names): the sorted log s_ij/s_hat over all leg pairs (incoming reversed), the sorted final legs'
+    log E/sqrt(s_hat) and |cos theta| (partonic frame), log s_hat, the final legs' species counts, and the factors
+    t, logF, log P, log D (0 where none). No column depends on the order the legs are listed in."""
+    Q = mom.copy()
+    Q[:, :n_in] *= -1
+    n = mom.shape[1]
+    tot = mom[:, 0] + mom[:, 1]
+    shat = mdot(tot, tot)
+    sij = np.stack([np.log(np.maximum(np.abs(mdot(Q[:, i], Q[:, j])) * 2 / shat, 1e-300))
+                    for i in range(n) for j in range(i + 1, n)], 1)
+    fin = mom[:, n_in:]
+    lE = np.log(np.maximum(fin[..., 0], 1e-300) / np.sqrt(shat)[:, None])
+    cth = np.abs(fin[..., 3]) / np.maximum(np.linalg.norm(fin[..., 1:], axis=-1), 1e-300)
+    ids = np.abs(pdg[0, n_in:])
+    counts = np.array([sum(int(i in s) for i in ids) for _, s in SPECIES], dtype=np.float64)
+    cols = [np.sort(sij, 1), np.sort(lE, 1), np.sort(cth, 1), np.log(shat)[:, None], np.tile(counts, (len(t), 1)),
+            np.stack([t, logF, logP, logD if logD is not None else np.zeros(len(t))], 1)]
+    names = ([f"sij{k}" for k in range(sij.shape[1])] + [f"lE{k}" for k in range(lE.shape[1])]
+             + [f"cth{k}" for k in range(cth.shape[1])] + ["lshat"] + [f"n_{k}" for k, _ in SPECIES] + list(FACTORS))
+    return np.concatenate(cols, 1), names
+
+
+def own_ceiling(X, u, seed=0):
+    """The per-pool own-label ceiling: out-of-fold R^2 of u on X in 5 folds of the pool's own events (K = 4/5 of n),
+    the map's settings (300 iterations, defaults)."""
+    from sklearn.ensemble import HistGradientBoostingRegressor
+    from sklearn.model_selection import KFold, cross_val_predict
+    p = cross_val_predict(HistGradientBoostingRegressor(max_iter=300, random_state=seed), X, u,
+                          cv=KFold(5, shuffle=True, random_state=seed))
+    return 1 - float(np.var(u - p) / np.var(u))
+
+
 def joint_r2(X, u, seed=0):
     """(out-of-fold R^2 of a gradient-boosted fit of u on X, the same on u permuted): 5 folds, 100 iterations."""
     from sklearn.ensemble import HistGradientBoostingRegressor
@@ -234,6 +274,9 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--prop", action="store_true", help="the propagator-product read (log P; placebos E, logF, log D)")
     ap.add_argument("--joint", action="store_true", help="with --prop: the joint out-of-fold fit of u (R2_joint, R2_null)")
+    ap.add_argument("--dump", default="", help="with --prop: the leave-class-out read's stage 1: per probe, 500 events "
+                    "(seed 0) of lof_features and u to <dump>/<probe>.npz")
+    ap.add_argument("--ceiling", action="store_true", help="with --dump: the own-label ceiling on all the probe's events")
     ap.add_argument("--sidecars", default="data/diagrams", help="the diagram sidecars' directory (--prop)")
     a = ap.parse_args()
     rows = []
@@ -291,6 +334,17 @@ def main():
                     rec[f"eta2_{k}"] = eta2(uk, x)      # the mean read
                     rec[f"r2size_{k}"] = r2(lu2, x)     # the size read: log u^2 on x
                 rec["tail_lo_P"], rec["tail_hi_P"] = tail_share(uk, logP[ok])
+                if a.dump:       # the leave-class-out read's stage 1 (design of 2026-10-31)
+                    Xf, names = lof_features(mom[ok], pdg[ok], t[ok], logF[ok], logP[ok],
+                                             None if logD is None else logD[ok])
+                    if a.ceiling:
+                        rec["ceiling_own"] = own_ceiling(Xf, uk)
+                        rec["ceiling_K"] = int(len(uk) * 4 // 5)
+                    pick = np.sort(np.random.default_rng(0).permutation(len(uk))[:500])
+                    os.makedirs(a.dump, exist_ok=True)
+                    np.savez(os.path.join(a.dump, name + ".npz"), X=Xf[pick].astype(np.float32), u=uk[pick],
+                             names=np.array(names), var_u=float(np.var(uk)), n=len(uk),
+                             ceiling_own=rec.get("ceiling_own", np.nan))
                 if a.joint:      # the joint read (design of 2026-10-31): u on the event's full kinematics together
                     X = joint_features(mom[ok], t[ok], logF[ok], logP[ok], None if logD is None else logD[ok])
                     rec["R2_joint"], rec["R2_null"] = joint_r2(X, uk)
@@ -314,7 +368,7 @@ def main():
             per.setdefault(r["dir"], []).append(r)
     keys = ("eta2_P", "r2size_P", "ceiling", "r2_tP", "r2_rawP", "eta2_E", "eta2_F", "r2size_E", "r2size_F", "r2_P",
             "tail_lo_P", "tail_hi_P") + (("R2_joint", "R2_null", "R2_joint_minus_null", "var_u") if a.joint else ()) \
-        if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
+        + (("ceiling_own",) if a.ceiling else ()) if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
     main_k = keys[0]
     rng = np.random.default_rng(0)
 

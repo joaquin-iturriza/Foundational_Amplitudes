@@ -66,3 +66,44 @@ def test_joint_r2_finds_signal_and_not_noise():
     rj, rn = joint_r2(X, u)
     assert rj > 0.5 and rn < 0.05
     assert joint_r2(X, r.normal(size=2000))[0] < 0.05
+
+
+def test_lof_features_ignore_leg_order():
+    """The leave-class-out read's features are the same when the final legs are listed in another order."""
+    from analysis.catalog_v4.dipole_residual import lof_features
+    r = np.random.default_rng(1)
+    n, N = 6, 50
+    m = np.zeros((N, n, 4))
+    m[:, 2:, 1:] = r.normal(size=(N, n - 2, 3))
+    m[:, 2:, 0] = np.linalg.norm(m[:, 2:, 1:], axis=-1)
+    tot = m[:, 2:].sum(1)
+    m[:, 2:, 1:] -= tot[:, None, 1:] / (n - 2)       # roughly balanced; exact balance is not needed here
+    m[:, 2:, 0] = np.linalg.norm(m[:, 2:, 1:], axis=-1)
+    E = m[:, 2:, 0].sum(1) / 2
+    m[:, 0] = np.stack([E, 0 * E, 0 * E, E], 1)
+    m[:, 1] = np.stack([E, 0 * E, 0 * E, -E], 1)
+    pdg = np.tile([11, -11, 21, 1, -1, 22], (N, 1))
+    t = r.normal(size=N)
+    X1, names = lof_features(m, pdg, t, t, t, None)
+    perm = [0, 1, 5, 3, 2, 4]
+    X2, _ = lof_features(m[:, perm], pdg[:, perm], t, t, t, None)
+    assert np.allclose(X1, X2) and X1.shape[1] == len(names) == 38
+    assert X1[0, names.index("n_g")] == 1 and X1[0, names.index("n_q")] == 2 and X1[0, names.index("n_a")] == 1
+
+
+def test_lco_scored_never_sees_the_scored_group():
+    """A pool's prediction comes from a map fitted without its group: a per-group signal no other group shares
+    is not recovered, one every group shares is."""
+    from analysis.catalog_v4.lco_map import scored
+    r = np.random.default_rng(0)
+    pools, groups = {}, {}
+    for k in range(8):
+        X = r.normal(size=(300, 3))
+        shared = np.sin(2 * X[:, 0])
+        own = (k - 3.5) * X[:, 1]          # a slope only this pool has
+        pools[f"p{k}"] = (X, shared + own + 0.1 * r.normal(size=300), np.nan)
+        groups[f"p{k}"] = k
+    vr = scored(pools, groups, [0, 1, 2])
+    for p, (X, u, _) in pools.items():
+        own_var = np.var(u - np.sin(2 * X[:, 0]))
+        assert vr[p] > 0.5 * own_var       # its own slope is left in the residual

@@ -19,12 +19,28 @@ MODE="${1:-dipole}"; FLAG=(); TAG=DIPOLE_RESIDUAL
 # $1 = joint: the joint read (gradient-boosted fit of u on the event's kinematics); $2 $3 narrow it to one arm and one
 # axis, so the four (arm, axis) reads go as four jobs in parallel
 [ "$MODE" = joint ] && { FLAG=(--prop --joint); TAG=JOINT_RESIDUAL; }
+# $1 = lcodump: the leave-class-out read's stage 1 (design of 2026-10-31): 500 events per probe of the leg-order-free
+# features and u to $SCRATCH/zz_v4_lco_dump/<arm>_<axis>, the own-label ceiling on H2; $1 = lco: its stage 2
+# (analysis/catalog_v4/lco_map.py over that dump, every arm). $4 = a probes file: the dry run, dumped to
+# $SCRATCH/zz_v4_lco_dry instead (stage 2 on it: $1 = lco, $2 = zz_v4_lco_dry)
+[ "$MODE" = lcodump ] && TAG=LCO_DUMP
+DUMP=zz_v4_lco_dump; [ -n "${4:-}" ] && DUMP=zz_v4_lco_dry
+if [ "$MODE" = lco ]; then
+    OUT="$SCRATCH/zz_v4_lco_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
+    export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-4}"
+    python analysis/catalog_v4/lco_map.py --root "$SCRATCH/${2:-zz_v4_lco_dump}" --out "$OUT/lco_map.json" || exit 1
+    echo "V4_LCO_DONE $OUT"; exit 0
+fi
 ARMS="${2:-v4_dimensionless_muon v4_dimensionless_muon_seed2}"; AXES="${3:-H2 TR}"
 OUT="$SCRATCH/zz_v4_${MODE}_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
 for arm in $ARMS; do
     for ax in $AXES; do
         d="$SCRATCH/zz_v4_short_$arm/$ax"
         [ -d "$d" ] || { echo "missing $d"; exit 1; }
+        if [ "$MODE" = lcodump ]; then
+            FLAG=(--prop --dump "$SCRATCH/$DUMP/${arm}_$ax"); [ "$ax" = H2 ] && FLAG+=(--ceiling)
+            [ -n "${4:-}" ] && FLAG+=(--probes "$4")
+        fi
         s=$(python analysis/catalog_v4/dipole_residual.py "$d" "${FLAG[@]}" --out "$OUT/${arm}_$ax.json") || exit 1
         echo "$TAG {\"arm\": \"$arm\", \"axis\": \"$ax\", \"summary\": $s}"
     done
