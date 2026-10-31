@@ -3459,6 +3459,8 @@ entries:
       --queue <hd queue>; a pool whose run of 1000 events takes over 1800 s (hd_ddx_dhuxwp__E20 timed out at 1800 s in pass
       1, hd_epem_aaccx__E20 1787 s) gets a smaller run size in the queue layout; workers at site pick''s width in one wave,
       plan target, submit'
+    22: 'Wall-time table from logs: catalog MSE/het arms vs 2-3 standard short trainings of 4264 steps (loading, steps, validations,
+      final evaluation), with the one-line cause; to Joaquin (his 2026-10-31 objection to 3.6 h / 5.6 h)'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6386,6 +6388,11 @@ entries:
       - 'every pool''s gridpack built and yield >= 0.5: plan the hd queue and submit workers'
       - 'a pool cut again or yield < 0.5: read its GRIDPACK_PROGRESS/PROBE_JSON lines and fix its layout (cores, run size)
         before the queue'
+    22:
+      feeds: whether the catalog arms' wall time is a defect to fix before the eval-only re-read and the next arms
+      if:
+      - 'the arms'' extra time is a defect (loading, composition, evaluation layout): fix it before any re-read or new arm'
+      - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
   owner:
     agent: a5d0c97d9d3e9a7dc
     state: working
