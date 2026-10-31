@@ -5405,6 +5405,8 @@ entries:
     6: 'Cut 1 live check: after 10 subagents have run past 85064616, python3 tools/push_replay.py --since 2026-10-31T00:25:00Z
       --check (in-force hook reproduces recorded REFERENCE chars within 5 percent), matched saving per agent, hand read of
       every correction of them for a cause in a withheld section'
+    7: 'Fix the regression of 85064616: test_redesign_d D3 push scenarios (generate_sweep pushes fa-sweeps-and-hpo and fa-canonical-setup,
+      lhe_parts pushes fa-generation and fa-catalog-reference, before they run) fail after the on-write/part-split change'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -5487,6 +5489,12 @@ entries:
       if:
       - 'reproduced and no correction traced: keep, write up'
       - 'a correction traced to a withheld section: remove that header line, dead end'
+    7:
+      feeds: whether cut 1 can be kept
+      if:
+      - 'fixed with all D3 passing: keep the cut'
+      - 'not fixable without losing the cut''s saving: revert the part of 85064616 that drops those pushes and record a dead
+        end'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
