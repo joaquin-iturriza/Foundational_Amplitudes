@@ -131,7 +131,6 @@ def verdict(out, arms):
 
 
 def main():
-    from sklearn.model_selection import GroupKFold
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", help="stage 1's dump root: <root>/<arm>_<axis>/<probe>.npz")
     ap.add_argument("--read", help="print a stage-2 JSON (data/lco_map.json, FA-ccin2p3-7ad4b5e3) as one line, seeds "
@@ -144,6 +143,7 @@ def main():
         tag = {"v4_dimensionless_muon": "s42", "v4_dimensionless_muon_seed2": "s43"}
         print(json.dumps({tag.get(k, k): v for k, v in d.items()}))
         return
+    from sklearn.model_selection import GroupKFold
     tl = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
     info = dict(tl["train"])
     for ax in tl["heldout"].values():
