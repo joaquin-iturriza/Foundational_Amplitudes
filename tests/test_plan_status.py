@@ -112,6 +112,11 @@ def test_ask_on_held_entry_and_no_step(tmp_path):
     assert r.returncode == 0, r.stderr
     e = next(x for x in yaml.safe_load(open(p))["entries"] if x["id"] == "agent_redesign")
     assert e["status"] == "held" and e["blocks_steps"] == [] and e["asks"][-1]["blocks"] == "the wait_guard fix only"
+    r = subprocess.run(plan + ["withdraw", "agent_redesign", "--decision", "D228", "--why",
+                               "D228 approves setup fixes during the weekend hold"], env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    e = next(x for x in yaml.safe_load(open(p))["entries"] if x["id"] == "agent_redesign")
+    assert e["status"] == "held" and "ask" not in e and e["asks"][-1]["decision"] == "D228"
     multi = next((x for x in yaml.safe_load(open(p))["entries"] if x.get("status") == "running"
                   and isinstance(x.get("next"), dict) and len(x["next"]) > 1 and x["id"] != "agent_redesign"), None)
     if multi is None:

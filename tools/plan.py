@@ -2247,7 +2247,7 @@ def cmd_withdraw(a):
         sys.exit("plan: not withdrawn: %s is no longer in force (site decisions --project %s)" % (a.decision, PROJECT))
     with transaction() as (d, st):
         e = entry(d, a.id)
-        if not open_question(e):
+        if not open_question(e) and not (e.get("status") == "held" and e.get("ask")):   # a held entry's question too
             sys.exit("plan: %s has no open question to withdraw" % a.id)
         t = now().isoformat()
         rec = next((x for x in reversed(e.get("asks") or []) if x.get("ask") == e.get("ask")
