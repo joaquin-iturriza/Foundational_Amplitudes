@@ -6164,8 +6164,6 @@ entries:
     1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
       reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
       write-up of what changed and what was measured'
-    4: 'Matched small-model trial (needs Joaquin''s go): 10 small tool-fix/analysis tasks each run on Sonnet 5.5 and on Opus
-      5.5 at low effort, same briefs, scored by tools/agent_tasks.py plus a hand read; about $30 at list price'
     5: 'Context cuts for agents: lower effort on mechanical calls (hidden thinking ~15k/call at median, 29k at last), trim
       the skill listing (~7k) and prompt snapshot (~6k) in agents'' fixed part, shorten or once-only hook pushes (7-9k); each
       measured with tools/context_breakdown.py and tools/usage_windows.py before and after'
@@ -6249,12 +6247,6 @@ entries:
       if:
       - 'a day passes with no misfire of a new hook: clean up and close'
       - 'a misfire: fix it first, restart the day'
-    4:
-      feeds: 'whether small tasks go to Sonnet (Joaquin 2026-10-30: small models are fine if they get the job done most of
-        the time or fixing their mistakes is cheaper)'
-      if:
-      - 'Sonnet stands within 0.1 of Opus-low and costs <=0.6x with rework: route small tool fixes and analyses to Sonnet'
-      - 'otherwise: keep Opus at low effort for mechanical steps (D138)'
     5:
       feeds: 'whether agent cost per call and per window falls further (redesign agents: $0.053/call, 45% cache read, 33%
         cache write, 22% output)'
