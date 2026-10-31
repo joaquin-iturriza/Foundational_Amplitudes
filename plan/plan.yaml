@@ -6875,6 +6875,20 @@ entries:
       7.4 s, files identical (mix_compose_check --split 5). Estimate for the 912 entries of catalog_v4_default50 on 5 CPUs:
       about 3 min (assumption: 40-pool rate scales). tools/short_wall.py S_COMPOSE (6.1 s) not yet updated. Tests: test_composed_record,
       test_default_share pass but test_lhe_runs (already failing before).'
+  - at: '2026-10-31T15:22:27+00:00'
+    text: 'Wall-time split of the catalog short jobs, read from their SLURM logs by a draft tool (job_wall_split.py, NOT yet
+      committed: the repo-reviewer gate refuses new tool files until its blocking finding, no blow-up check in het_uncertainty.py
+      and mixture_ab.py, is fixed; draft and output in the step owner''s scratchpad, tool/job_wall_split.py and wall.json).
+      On V100 all jobs train alike: 4264 steps at 0.94-1.00 s/step, 51 validations of about 4-5 s each (derived), and an end-of-training
+      evaluation of 7-12 min, mostly plots. MSE share 0.50 seed 42 (6c246603): data load 245 s (composed pools already cached),
+      training 4197 s, evaluation 478 s, zero-shot reads 2284 probes in 4064 s (8 held-out sets 612 probes; catalog_v3 pp
+      1396; catalog_v4 pp 187 of 1301 when the 2.5 h limit cut it); total 2.50 h. Het share 0.50 (466656b2): data phase 4442
+      s, of which the default-share composition took 4202 s; training 4490 s; evaluation 453 s; sigma stage 449 s; reads 1473
+      probes in 3665 s (catalog_v4 pp 772 of 1301 at the 3.75 h limit); total 3.75 h. Standard short trainings 878d6b9a and
+      7c41ffd5: training 4439 s and 4022 s, reads 610 probes in about 1650 s, totals 1.94 h and 1.82 h. The MSE control 339ec100
+      ran on an H100 (0.33 s/step) and read 3260 probes in 3751 s; total 1.57 h. Cause: the two pp read sets (1396 + 1301
+      probes at about 2 s each, the model and data rebuilt for every probe) and, in the het arms, 70 min of composition at
+      load.'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
