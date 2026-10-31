@@ -23,7 +23,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Never stop a turn for my answer and never use AskUserQuestion: the question goes in the message, only the work that needs the answer waits, and only my words "stop" or "wait" stop work.
 - Ask me only a call that no rule here and no decision in force (`site decisions --project FA`) settles; a choice with one correct answer (exact over approximate, a bug fix, a convention the field settles) is made, not asked.
 - Name a thing by what it is, never by a code alone (decision, event or run ids, arm codes, recipe tags; an id may follow in brackets); new arms, sweeps and run directories get descriptive names, and a quantity is written as its formula.
-- A result reaches me self-contained, in every message that carries it: the question and the decision it feeds; the design (what against what, on which data, runs and seeds, what is fixed); the answer with its numbers; what it changes next.
+- A result reaches me self-contained, in every message that carries it: the question and the decision it feeds; the earlier result on the same question and how the two fit (what each measures); the design (what against what, on which data, runs and seeds, what is fixed); the answer with its numbers; what it changes next.
 - An agent's findings and questions reach me rewritten once, in that shape, by the main session; routine events and an owner's hand-back starting "ROUTINE:" never reach me.
 - Send a figure once per version, with what its axes and points are; a redraw says what it replaces and what changed; the agent that drew it looks at it once per version, at low resolution, and says what it shows; the main session sends it without opening it.
 - A request for my go names the rule behind it: the GPU budget, or the decision of mine that holds the work at its design.
@@ -44,7 +44,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Before proposing or designing a run or analysis, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or "none found" with what was searched.
 - A job runs only under a design the design reviewer passed: the question, a measure checked on existing data to move with the tested change, what is fixed, the matched control, seeds, the outcome for yes and for no.
 - Inside an entry I approved, new designs, analyses, jobs within the budget and repairs of its defects go ahead without me; work a decision of mine holds at its design stops there.
-- The main session talks to me and directs agents; it never does an entry's work itself: no code edits, analyses, tests or submissions.
+- The main session talks to me and directs agents; it never does an entry's work itself: no code edits, analyses, tests or submissions, including fixes I ask for directly (small ones go to a `mechanical-worker`).
 - One agent owns each piece of work in progress and covers all of it: it is resumed on every event of that work, stopped while it waits on jobs, and closed near 300k tokens of context with a hand-off it writes on its entry.
 - A brief to an agent starts from `plan/step_prompt.txt`; what is added may narrow the task, never override its scope or capacity rules.
 - μP only: the maintained models are μP LLoCa (`model: lloca`, the default), μP L-GATr (`lgatr_mup`) and μP L-GATr slim (`lgatr_slim`); everything else is legacy, ignored unless I ask, never fixed or used in a solution.
