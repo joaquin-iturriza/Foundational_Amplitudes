@@ -8,6 +8,8 @@ Opus 5.5 at low effort, each task's pass check its own, every output read by han
     python3 tools/model_trial.py check TASK ARM           the task's pass check on the agent's committed work
     python3 tools/model_trial.py cost AGENT_ID [...]      $ of one agent's transcript at list price (usage_windows)
     python3 tools/model_trial.py report --out JSON        per arm: tasks passed, $ per task, $ per task with rework
+    python3 tools/model_trial.py altcheck                 the hand-written alternative fixes (other internals than the
+                                                          original's) pass their checks: the check accepts another fix
 
 A task is a past fix of this repo (commit C) with its own test: the agent gets a worktree at C^ (the defect present,
 C's test not in it) and a brief that states the defect as it was seen, never the fix. Pass check: C's test files
@@ -101,8 +103,17 @@ TASKS = {
                 "Zero-shot reads should save each event's pool row."),
 }
 
-# what each task's check calls, written from the check (never from the fix): names, signatures, returns, the strings
-# a source-level assertion of the check reads; given in the brief so a correct fix is not failed on a name
+# source-level assertions of a check (they read the original fix's exact lines): turned into `pass` in the copied
+# test; what they asked for (the wiring) is judged in the hand read instead (design review FIX, 2026-10-31)
+STRIP = {
+    "zsrole": ['assert "datagen.ensure_split_set = stand_in_split_set(" in zs'],
+    "ordsrc": ['assert re.search(r"self\\._check_frozen_orders_source\\(stats\\)", body)'],
+    "hybridcp": ['assert re.search(r\'_cp_frozen\\s*=', 'assert re.search(r"hybrid_cps\\(names,',
+                 'assert \'"target_physics_hybrid_cp": getattr(self, "_phys_cp", None)\' in src'],
+}
+
+# what each task's check calls, written from the check (never from the fix): names, signatures, returns;
+# given in the brief so a correct fix is not failed on a name
 INTERFACE = {
     "defshare": "mg5_pipeline_final.default_share_rows(f_default, counts) gives each chunk's (start, stop) of the "
                 "default rows, and build_mixture_dataset(...) with a chunk's default rows must return exactly that "
@@ -125,21 +136,21 @@ INTERFACE = {
               "events, else the scored split first, else another role it has, else its own (0); "
               "stand_in_split_set(real_ensure_split_set, counts, scored_split) -> a function with real's signature "
               "(specs, role, seed, dest_dir=None, require_cache=False) that reads each spec from its stand-in role. "
-              "tools/zero_shot_parent.py installs it with the line `datagen.ensure_split_set = stand_in_split_set(` "
-              "and records `\"own_stats_role\": own_stats_role` in its output.",
+              "tools/zero_shot_parent.py installs it per recipe in place of datagen.ensure_split_set and records "
+              "own_stats_role (the role the probe's own statistics came from) in its output.",
     "ordsrc": "experiment.AmplitudeExperiment: with data.orders_from_diagrams false the target's monomial is the "
               "table's (a table-mixed entry refused with an AssertionError saying 'coupling homogeneity is not exact'), "
               "with it true the diagrams' highest alpha_s power; _save_data_stats writes target_physics_orders_source "
               "('diagrams_highest_alphas' or 'table'); _check_frozen_orders_source(stats) raises AssertionError naming "
               "target_physics_orders_source on a mismatch while data.target_physics_orders is on (stats without the "
               "key count as 'table'; orders_from_diagrams unset counts as true), passes when it is off; init_data "
-              "calls `self._check_frozen_orders_source(stats)` on every reload of frozen stats.",
-    "hybridcp": "physics_scales.hybrid_cp(P) (the existing c_p fit of one process's momenta) and a new "
+              "calls it on every reload of frozen stats.",
+    "hybridcp": "physics_scales.hybrid_cp(P) -> float: the c_p of one process's momenta P (n, N, 4), the formula of "
+                "experiment._physics_hybrid_cp as a module function (0.0 for a 2 -> 2), and "
                 "physics_scales.hybrid_cps(names, events_of, frozen=None) -> (cps {name: c_p}, reused [names]): a name "
                 "in `frozen` keeps that value and its events are not read, any other is fitted with hybrid_cp. "
-                "experiment.py: `_cp_frozen = stats.get(\"target_physics_hybrid_cp\")` on the frozen-stats path, the fit "
-                "as `hybrid_cps(names, _cp_events, frozen=_cp_frozen)`, and _save_data_stats writes "
-                "`\"target_physics_hybrid_cp\": getattr(self, \"_phys_cp\", None)`.",
+                "experiment.py wires it: the frozen-stats path reads the stats key target_physics_hybrid_cp and passes "
+                "it to the fit as frozen, and _save_data_stats writes the fitted c_p under that key.",
     "loopenc": "models/diagram_encoder_llm4lhc.py: a module-level _LOOP_LINES (the one-loop ghost and Goldstone PDG "
                "ids); the vocabulary is the 30 SM labels (0..29) then one label per _LOOP_LINES entry; "
                "_label(pdg, vocab) maps -250 to vocab[250] and keeps 82 and -82 apart; an unknown PDG (9000099) still "
@@ -159,14 +170,25 @@ def wt(task, arm):
     return os.path.join(ROOT, "worktrees", "zz_trial_%s_%s" % (task, arm))
 
 
-def run_check(path, commit, tests, timeout=900):
-    """(passed, output tail) of `commit`'s test files run over the tree at `path`; the tree is restored after."""
+def stripped(text, task):
+    """The check's text with the task's source-level assertions turned into `pass` (same indentation)."""
+    out = []
+    for line in text.splitlines(True):
+        if any(line.strip().startswith(x) for x in STRIP.get(task, [])):
+            line = line[:len(line) - len(line.lstrip())] + "pass\n"
+        out.append(line)
+    return "".join(out)
+
+
+def run_check(path, commit, tests, timeout=900, task=None):
+    """(passed, output tail) of `commit`'s test files run over the tree at `path` (source-level assertions of `task`
+    stripped); the tree is restored after."""
     saved = {}
     for t in tests:
         p = os.path.join(path, t)
         saved[t] = open(p).read() if os.path.exists(p) else None
         os.makedirs(os.path.dirname(p), exist_ok=True)
-        open(p, "w").write(git("show", "%s:%s" % (commit, t)))
+        open(p, "w").write(stripped(git("show", "%s:%s" % (commit, t)), task))
     try:
         ok, out = True, ""
         for t in tests:        # a test file with its own __main__ runner is run by it (some set globals there)
@@ -196,12 +218,35 @@ def validate(names):
     for name in names:
         c, tests, _ = TASKS[name]
         git("checkout", "-q", "--detach", c + "^", cwd=vt)
-        before = run_check(vt, c, tests)
+        before = run_check(vt, c, tests, task=name)
         git("checkout", "-q", "--detach", c, cwd=vt)
-        after = run_check(vt, c, tests)
+        after = run_check(vt, c, tests, task=name)
         out[name] = {"commit": c, "fails_at_parent": not before[0], "passes_at_fix": after[0],
                      "parent_tail": before[1][-600:], "fix_tail": after[1][-600:]}
         print("%-14s %s fails_at_parent=%s passes_at_fix=%s" % (name, c, not before[0], after[0]))
+    return out
+
+
+# hand-written alternative fixes, appended to the file at the fix's parent (analysis/agent_redesign/model_trial_alt/)
+ALT = {"poolrow": "analysis/catalog_v4/dipole_residual.py", "hybridcp": "physics_scales.py"}
+
+
+def altcheck():
+    vt = os.path.join(ROOT, "worktrees", "zz_trial_validate")
+    if not os.path.isdir(vt):
+        git("worktree", "add", "--detach", vt, "HEAD")
+    out = {}
+    for task, target in ALT.items():
+        c, tests, _ = TASKS[task]
+        git("checkout", "-q", "--detach", c + "^", cwd=vt)
+        with open(os.path.join(vt, target), "a") as f:
+            f.write("\n\n" + open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial_alt", task + ".py")).read())
+        try:
+            ok, tail = run_check(vt, c, tests, task=task)
+        finally:
+            git("checkout", "-q", "--", ".", cwd=vt)
+        out[task] = {"passed": ok, "tail": tail[-400:]}
+        print(task, "alternative fix passes its check:", ok)
     return out
 
 
@@ -232,7 +277,7 @@ def check(task, arm):
     c, tests, _ = TASKS[task]
     p = wt(task, arm)
     dirty = git("status", "--porcelain", "--untracked-files=no", cwd=p).strip()
-    ok, out = run_check(p, c, tests)
+    ok, out = run_check(p, c, tests, task=task)
     return {"task": task, "arm": arm, "passed": ok, "uncommitted": bool(dirty),
             "diff_stat": git("diff", "--stat", c + "^", "HEAD", cwd=p)[-1500:], "tail": out[-1500:]}
 
@@ -274,6 +319,13 @@ def report(out):
                     "hand_read_ok": sum(r.get("hand_read_ok", False) for r in rs),
                     "usd_total": round(sum(usd), 3),
                     "usd_per_task_with_rework": round(sum(usd) / max(1, len(rs)), 3)}
+    # paired per-task cost ratio sonnet / opuslow: median and range (design review: not only the ratio of totals)
+    by = {(r["task"], r["arm"]): sum(cost(a)["usd"] for a in r["agents"]) for r in rec["runs"]}
+    ratios = sorted(by[(t, "sonnet")] / by[(t, "opuslow")] for t in {t for t, _ in by}
+                    if (t, "sonnet") in by and (t, "opuslow") in by and by[(t, "opuslow")] > 0)
+    if ratios:
+        per["cost_ratio_sonnet_over_opuslow"] = {"n": len(ratios), "median": round(ratios[len(ratios) // 2], 3),
+                                                 "min": round(ratios[0], 3), "max": round(ratios[-1], 3)}
     print(json.dumps(per, indent=1))
     if out:
         rec["summary"] = per
@@ -282,7 +334,7 @@ def report(out):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["validate", "setup", "brief", "check", "cost", "report"])
+    ap.add_argument("cmd", choices=["validate", "setup", "brief", "check", "cost", "report", "altcheck"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--out")
     a = ap.parse_args()
@@ -298,6 +350,10 @@ def main():
         print(json.dumps(check(*a.args), indent=1))
     elif a.cmd == "cost":
         print(json.dumps([cost(x) for x in a.args], indent=1))
+    elif a.cmd == "altcheck":
+        res = altcheck()
+        if a.out:
+            json.dump(res, open(a.out, "w"), indent=1)
     else:
         report(a.out)
 

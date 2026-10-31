@@ -1,0 +1,10 @@
+{
+ "poolrow": {
+  "passed": true,
+  "tail": "ok\n"
+ },
+ "hybridcp": {
+  "passed": true,
+  "tail": "PASS test_cp_is_the_mean_of_lq_minus_the_shat_power\nPASS test_experiment_wires_the_frozen_cp\nPASS test_frozen_cp_is_reused_and_events_not_read\nPASS test_no_frozen_stats_fits_every_process\nPASS test_process_not_in_frozen_stats_falls_back_to_its_own_events\nPASS test_stats_written_without_the_key_fit_every_process\n6/6 passed\n"
+ }
+}

@@ -1,0 +1,23 @@
+{
+ "zsrole": {
+  "commit": "9702a254",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_zero_shot_split.py\", line 10, in <module>\n    from rebuild_run import scored_split, recipe_role_counts, stand_in_role, stand_in_split_set  # noqa: E402\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nImportError: cannot import name 'recipe_role_counts' from 'rebuild_run' (/home/joaquin/work/FA/worktrees/zz_trial_validate/tools/rebuild_run.py)\n",
+  "fix_tail": "ok test_val_and_test_roles\nok test_cli_default_is_val\nok test_reader_and_job_use_the_split\nok test_probe_without_train_pool_reads_a_role_it_has\n"
+ },
+ "ordsrc": {
+  "commit": "77b43ae3",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_orders_source.py\", line 154, in <module>\n    test_switch_off_is_the_table_target()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_orders_source.py\", line 92, in test_switch_off_is_the_table_target\n    assert np.allclose(new_off, hand, rtol=0, atol=1e-12), np.abs(new_off - hand).max()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 5.34050240466549\n",
+  "fix_tail": "it (alpha_s^1)\n[mixed] refused with the switch off (as before), alpha_s^2 alpha^0 with it on\n[stats] the source is recorded, a mismatch refused, stats without it read as the table\nall ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "hybridcp": {
+  "commit": "6b387fbb",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_hybrid_cp_frozen.py\", line 18, in <module>\n    from physics_scales import hybrid_cp, hybrid_cps, qperp_logs  # noqa: E402\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nImportError: cannot import name 'hybrid_cp' from 'physics_scales' (/home/joaquin/work/FA/worktrees/zz_trial_validate/physics_scales.py)\n",
+  "fix_tail": "PASS test_cp_is_the_mean_of_lq_minus_the_shat_power\nPASS test_experiment_wires_the_frozen_cp\nPASS test_frozen_cp_is_reused_and_events_not_read\nPASS test_no_frozen_stats_fits_every_process\nPASS test_process_not_in_frozen_stats_falls_back_to_its_own_events\nPASS test_stats_written_without_the_key_fit_every_process\n6/6 passed\n"
+ }
+}

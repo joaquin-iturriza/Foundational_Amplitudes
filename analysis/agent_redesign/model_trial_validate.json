@@ -1,0 +1,72 @@
+{
+ "defshare": {
+  "commit": "91a639fe",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/mg5_pipeline_final.py\", line 3380, in _candidates\n    P, sq = _collect_with_cuts(draw, nb, m_finals, pdg, cuts)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/mg5_pipeline_final.py\", line 2871, in _collect_with_cuts\n    return np.concatenate(accP)[:n_events], np.concatenate(accS)[:n_events]\n           ^^^^^^^^^^^^^^^^^^^^\nValueError: need at least one array to concatenate\n",
+  "fix_tail": "identity] ok (v4_bb_abbh <- dsh_bb_abbh, 36 chunks)\n  [SAMPLE] mixture: bulk 60 + flat-log|M|^2 70 kept from 420 candidates (adaptive sqrt s: True, democratic share 0.5)\n[read+mixture] ok\n  [SAMPLE] mixture: bulk 0 + flat-log|M|^2 117 kept from 702 candidates (adaptive sqrt s: True, democratic share 0.5)\n  [SAMPLE] mixture: bulk 0 + flat-log|M|^2 117 kept from 702 candidates (adaptive sqrt s: True, democratic share 0.5)\n  [SAMPLE] mixture: bulk 0 + flat-log|M|^2 117 kept from 702 candidates (adaptive sqrt s: True, democratic share 0.5)\n[chunked full shares] ok\n[generated] ok (912 dsh entries)\n"
+ },
+ "ftorders": {
+  "commit": "6e0eece0",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "yped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_orders_source.py\", line 268, in <module>\n    test_catalog_ft_follows_parent()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_orders_source.py\", line 244, in test_catalog_ft_follows_parent\n    assert ft.parent_orders_flag(rec)[:2] == (False, \"table\"), ft.parent_orders_flag(rec)\n           ^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'catalog_ft' has no attribute 'parent_orders_flag'\n",
+  "fix_tail": "a_s only, 1d9d6a29 the diagrams; a parent at 1d9d6a29 passes a diagrams run\n[catalog_ft] the fine-tune's data.orders_from_diagrams follows the parent's source (recorded, inferred)\nall ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "poolphys": {
+  "commit": "bb70a04a",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ol_physics.py\", line 157, in test_scenario\n    assert c[\"status\"] == \"ok\" and \"alphas_mz\" in c[\"not_compared\"], c\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'probe': 'pp13_ddx_aag', 'pool': None, 'block_source': 'computed at read (no sidecar)', 'mismatches': [{'field': 'alphas_mz', 'probe': 0.118, 'reference': [0.15]}], 'reference': {'kind': 'same process', 'entries': ['v4_ddx_aag__as150']}, 'status': 'mismatch', 'not_compared': [], 'exempt': [], 'probe_physics': {'model': 'sm', 'order_clause': '', 'MB': 4.7, 'MT': 173.0, 'WT': 1.4915, 'b_row': None}}\n",
+  "fix_tail": "ok card reader\nok blocks\nok write_recipe\nok scenario\nok sidecar block\nok lhe parent check\nok backfill\nok reads\nall pool physics tests passed\n"
+ },
+ "skipclaim": {
+  "commit": "c9b5c8f0",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "icity median\": {\"tasks\": 3, \"core_h\": 0.0}}, \"est_longest_task_wall_h\": 0.0}\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_lhe_parts.py\", line 590, in <module>\n    test_park_and_skip_claimed()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_lhe_parts.py\", line 574, in test_park_and_skip_claimed\n    assert all(os.path.exists(p) for p, _ in new[:2]) and len(os.listdir(os.path.join(q3, \"todo\"))) == 1\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "fix_tail": "e\": {\"multiplicity median\": {\"tasks\": 4, \"core_h\": 0.0}}, \"est_longest_task_wall_h\": 0.0}\n{\"parked\": 3, \"to\": \"/tmp/tmpv13g9zax/q1/parked/20261031_015317\", \"claimed_left\": 1}\n{\"processes\": 1, \"tasks_new\": 3, \"tasks_present\": 1, \"parts_adopted\": 0, \"est_core_h\": 0.0, \"est_by_rate_source\": {\"multiplicity median\": {\"tasks\": 4, \"core_h\": 0.0}}, \"est_longest_task_wall_h\": 0.0}\n{\"processes\": 1, \"tasks_new\": 1, \"tasks_present\": 2, \"parts_adopted\": 2, \"est_core_h\": 0.0, \"est_by_rate_source\": {\"multiplicity median\": {\"tasks\": 3, \"core_h\": 0.0}}, \"est_longest_task_wall_h\": 0.0}\n[park + skip-claimed] ok\n"
+ },
+ "stallshort": {
+  "commit": "53c80201",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "DONE ok 1 failed 0 left 0\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_lhe_parts.py\", line 361, in <module>\n    test_queue_stall_layout_short_parts()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_lhe_parts.py\", line 205, in test_queue_stall_layout_short_parts\n    test_queue_end_to_end(run_events=None, short=True)\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_lhe_parts.py\", line 188, in test_queue_end_to_end\n    assert codes == [0, 0], codes\n           ^^^^^^^^^^^^^^^\nAssertionError: [1, 0]\n",
+  "fix_tail": "fvaf/q_bad/gc')\n{\"manifest\": \"/tmp/tmp58fafvaf/queue/gc/manifest_20261031_015327_dry.json\", \"dry_run\": true, \"dirs\": 3, \"gb\": 0.0, \"saved_dirs\": 1, \"saved_gb\": 0.0, \"logs_only_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 0, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n{\"manifest\": \"/tmp/tmp58fafvaf/queue/gc/manifest_20261031_015327.json\", \"dry_run\": false, \"dirs\": 3, \"gb\": 0.0, \"saved_dirs\": 1, \"saved_gb\": 0.0, \"logs_only_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 1, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n[tidy + gc] ok\n"
+ },
+ "zsrole": {
+  "commit": "9702a254",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_zero_shot_split.py\", line 10, in <module>\n    from rebuild_run import scored_split, recipe_role_counts, stand_in_role, stand_in_split_set  # noqa: E402\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nImportError: cannot import name 'recipe_role_counts' from 'rebuild_run' (/home/joaquin/work/FA/worktrees/zz_trial_validate/tools/rebuild_run.py)\n",
+  "fix_tail": "ok test_val_and_test_roles\nok test_cli_default_is_val\nok test_reader_and_job_use_the_split\nok test_probe_without_train_pool_reads_a_role_it_has\n"
+ },
+ "ordsrc": {
+  "commit": "77b43ae3",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_orders_source.py\", line 154, in <module>\n    test_switch_off_is_the_table_target()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_orders_source.py\", line 92, in test_switch_off_is_the_table_target\n    assert np.allclose(new_off, hand, rtol=0, atol=1e-12), np.abs(new_off - hand).max()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 5.34050240466549\n",
+  "fix_tail": "it (alpha_s^1)\n[mixed] refused with the switch off (as before), alpha_s^2 alpha^0 with it on\n[stats] the source is recorded, a mismatch refused, stats without it read as the table\nall ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "hybridcp": {
+  "commit": "6b387fbb",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_hybrid_cp_frozen.py\", line 18, in <module>\n    from physics_scales import hybrid_cp, hybrid_cps, qperp_logs  # noqa: E402\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nImportError: cannot import name 'hybrid_cp' from 'physics_scales' (/home/joaquin/work/FA/worktrees/zz_trial_validate/physics_scales.py)\n",
+  "fix_tail": "PASS test_cp_is_the_mean_of_lq_minus_the_shat_power\nPASS test_experiment_wires_the_frozen_cp\nPASS test_frozen_cp_is_reused_and_events_not_read\nPASS test_no_frozen_stats_fits_every_process\nPASS test_process_not_in_frozen_stats_falls_back_to_its_own_events\nPASS test_stats_written_without_the_key_fit_every_process\n6/6 passed\n"
+ },
+ "loopenc": {
+  "commit": "ebeb0954",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_diagram_encoder_llm4lhc.py\", line 382, in <module>\n    test_graph_construction()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_diagram_encoder_llm4lhc.py\", line 187, in test_graph_construction\n    loop = _m._LOOP_LINES\n           ^^^^^^^^^^^^^^\nAttributeError: module 'models.diagram_encoder_llm4lhc' has no attribute '_LOOP_LINES'\n",
+  "fix_tail": " and gradient flow: ok\nreal sidecar syn_00000.diagrams.json: D=3, out (1, 128), 2428588 parameters at the paper's size (256 wide, 3 layers, 4 heads)\nwrapper forward on CPU: ok\nall passed\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "poolrow": {
+  "commit": "b5173fa7",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_validate/tests/test_dipole_pool_rows.py\", line 9, in <module>\n    from analysis.catalog_v4.dipole_residual import pool_rows  # noqa: E402\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nImportError: cannot import name 'pool_rows' from 'analysis.catalog_v4.dipole_residual' (/home/joaquin/work/FA/worktrees/zz_trial_validate/analysis/catalog_v4/dipole_residual.py)\n",
+  "fix_tail": "ok\n"
+ }
+}
