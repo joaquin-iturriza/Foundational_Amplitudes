@@ -6866,6 +6866,15 @@ entries:
       default-sampled 0.679 [0.490, 0.911] on 395 of 558, catalog-sampled 0.931 [0.725, 1.191]. The PP4 subsets are the probes
       read first, not a random sample. Het control over MSE control: PP4 trained 1.003, not trained 1.170, EE4 1.418, held-out
       catalog-sampled 1.159 (H5 13.8).'
+  - at: '2026-10-31T15:11:54+00:00'
+    text: 'Load-time composition (Joaquin: ''no way mixing two sets takes 2 hours''): cause, compose() reloaded, boosted and
+      cut a class''s whole default-sampled pools once per chunk (36 chunks per train pool) to keep its own slice. Fix f8dc5675:
+      once per pool; train pool 4.8-5.2 s -> 1.4-1.6 s (v4_bb_abbh, v4_gg_gggg, CC login node, mix_compose_check --timing;
+      rows identical to the old path); 1.0 s of the rest is replaying the sampler to label rows. Fix 11660896: datagen.ensure_split_set
+      composes the missing default-share pools in parallel over the job''s CPUs; 40 train pools on 5 CPUs 67.8 s serial ->
+      7.4 s, files identical (mix_compose_check --split 5). Estimate for the 912 entries of catalog_v4_default50 on 5 CPUs:
+      about 3 min (assumption: 40-pool rate scales). tools/short_wall.py S_COMPOSE (6.1 s) not yet updated. Tests: test_composed_record,
+      test_default_share pass but test_lhe_runs (already failing before).'
   handoff:
     state: 'Step 15 analysis code written, not yet committed: the commit hook blocks until the repo-reviewer passes its overdue
       backlog. analysis/catalog_v4/mixture_ab.py (working tree, uncommitted) adds MIX_HET (the six het runs), HD4_HET (empty
