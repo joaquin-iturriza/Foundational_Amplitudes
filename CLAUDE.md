@@ -49,6 +49,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A brief to an agent starts from `plan/step_prompt.txt`; what is added may narrow the task, never override its scope or capacity rules.
 - μP only: the maintained models are μP LLoCa (`model: lloca`, the default), μP L-GATr (`lgatr_mup`) and μP L-GATr slim (`lgatr_slim`); everything else is legacy, ignored unless I ask, never fixed or used in a solution.
 - A hyperparameter question goes through a single-fidelity DyHPO sweep, never a hand-rolled grid, whatever it is called; job arrays are for non-HP axes (seeds, data tags, ablation flags).
+- Lookup agents (Explore, claude-code-guide) run at low effort.
 
 ## Clusters and jobs
 
