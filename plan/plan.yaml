@@ -5840,6 +5840,33 @@ entries:
       each set beside step 14''s R (same direction or not). No share verdict: the numbers go to Joaquin with step 14''s. A
       run that blows up (NLL spikes, non-finite) is listed with where it blew up, never dropped; both control seeds blowing
       up ends the read as a dead end (HETEROSC at the MSE search''s lr) and goes to Joaquin.'
+    fix_at: '2026-10-31T04:49:41+00:00'
+    fix: 'Check 5 (prior incomplete): the prior cites only the Daniel-catalog held-out sigma read and the recalibration paragraph,
+      and omits results.tex sec:div-sampling, which is prior work on exactly this question (sigma as the signal for where
+      to sample): (a) ''The sigma step costs ~1 min'': Spearman(sigma,|r|) is strong across processes (rho about 0.85) and
+      weak within a process (about 0.29 on base22, 0.46 on uug) and does not improve with training; (b) ''Uncapped data: the
+      uncertainty tail floors, and more data does not move it'': at a fixed step budget 8x more data moves sigma''s p99 by
+      under 7% (0.0448/0.0468/0.0477), so sigma did not respond to more training data at fixed steps, which is what the share
+      arms change; (c) the het Delta cells: sigma too small on test at 2->3 and 2->4 (pull std 2.14 and 1.48 median) because
+      the sigma stage fits training residuals; (d) sigma reweighting/steering results (about 80% of the oracle gain; sigma-steered
+      generation beats uniform on ee->uugg). Name these with their numbers and say what this run adds beyond them. Check 2
+      (measure not shown to respond): the check shows the error R moved with the share and that pull std separates in- from
+      out-of-distribution on Daniel''s catalog, but nothing shows sigma (S, arm/control median s) moves with the training
+      share; ''S has the same class counts'' is an assertion, and (b) above is existing evidence that it may not. Show on
+      existing het data that median sigma moves with the training density of a region or process (e.g. the het fine-tunes
+      at D=1e2 vs 1e4 of the same probe from the D94 stage-2 cells, or the steering base vs sigma arms'' 8% floor gap against
+      ~2% repeat noise), with the size of the move against its noise. Likewise the INFORMATIVE threshold (class Spearman of
+      median s vs RMSE >= 0.5) is not checked on any existing catalog-scale het read: compute it on the saved Daniel-catalog
+      reads (catalog_sigma_heldout.py inputs, relabels and new apart) and on base22''s 0.85/0.29, so the 0.5/0.3 cuts are
+      known to discriminate. Check 4 (outcome partly fixed in advance): INFORMATIVE requires the held-out pooled pull std
+      <= 3, but the cited prior already measured 13.3 on held-out processes; if it repeats, the ''where'' bins on PP4/EE4
+      (D220''s actual ask: where the network is uncertain) are never reported as candidate regions even if sigma tracks the
+      error within trained classes there. Decouple: one rule for whether sigma ranks error within the trained PP4/EE4 classes
+      and their eta / pair-invariant bins (that decides whether (3) points at regions to oversample), a separate one for out-of-distribution
+      calibration on H1..H7c, each with its yes/no consequence. Checks that hold: 1 (the three het arms differ only in the
+      training recipe; loss, sign head off and sigma stage changed alike for all, het-vs-MSE mu cost stated as information
+      only), 3 (seed spread of S measured in-run from the het control pair, class noise of R 1.5-3.3%), 6, 7 (D220''s mixtures
+      are the arms), 8 (no label among inputs).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
