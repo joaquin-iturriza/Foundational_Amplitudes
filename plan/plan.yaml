@@ -8679,7 +8679,7 @@ entries:
   next: 'Step 1 read done (369eaff9; data/error_correlates.json): write-up in docs/results.tex once the notes-editor backlog
     passes (coordinator, 2026-10-31), then plan done'
   done_when: null
-  notes_ref: null
+  notes_ref: par:v4_error_correlates
   match: zz_never_*
   evidence:
     runs: []
