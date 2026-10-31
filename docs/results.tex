@@ -3238,6 +3238,32 @@ with that selection. Open: how this pool's $3$\,TeV block is to be made (catalog
   \label{fig:v4_run_size}
 \end{figure}
 
+\paragraph{What regenerating catalog\_v4 costs (2026-10-31).}\label{par:v4_regen_time} The user's decision of
+2026-10-31 [D208] keeps no MadGraph process output: the catalog is regenerated when it is needed (the procedure is in
+the fa-generation reference), and this records how long that takes. Read from the pools' sidecars
+(\code{tools/lhe\_rates.py} on CC-IN2P3) by \code{tools/regen\_time.py}, the MadEvent runs of the $3448$ MadEvent
+pools ($1396$ pp13, $971$ pp13v4, $912$ default-share, $169$ $e^+e^-$ ee4) take $898$ core-hours in all. Per pool the
+median is $232$ core-s, $90\%$ of pools take under $1818$ and $99\%$ under $12532$. The largest is
+\code{pp13\_dd\_ddgg}: $146330$ core-s, one run of $2.54$\,h on $16$ cores. Not counted: MadGraph output and compile,
+the tree and one-loop prebuild, and the diagram sidecars. At the width \code{site pick} offers, the pools run side by
+side, and a run's integration is not split across jobs. So the wall time is set by the longest single run, about
+$2.54$\,h. This is an estimate: it assumes every other pool fits beside that run in one wave.
+% src: python3 tools/regen_time.py @97c43af9
+% claim: all.pools=3448
+% claim: by_prefix.pp13_.pools=1396
+% claim: by_prefix.pp13v4_.pools=971
+% claim: by_prefix.dsh_.pools=912
+% claim: by_prefix.ee4_.pools=169
+% claim: all.total_core_h=898
+% claim: all.median_core_s=232
+% claim: all.q90_core_s=1818
+% claim: all.q99_core_s=12532
+% claim: all.max_core_s=146330
+% claim: all.max_madevent_h=2.54
+% claim: all.max_cores=16
+% allow: 90 because it is a quantile level
+% allow: 99 because it is a quantile level
+
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
 probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
 as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
