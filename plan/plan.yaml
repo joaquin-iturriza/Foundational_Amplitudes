@@ -2321,7 +2321,6 @@ entries:
         the catalog gains these pools'
       - 'it does not: the gap is capacity or training length, (a) inside the full pretraining'
   step_waits:
-    '8': FA-ccin2p3-52345dd6
     '7': 'D78: the user''s hold on the full catalog pretraining''s design (step (a) is held there, nothing to launch until
       it is released)'
   owner:
