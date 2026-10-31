@@ -8423,3 +8423,34 @@ entries:
       .claude/agents/compact-worker.md .claude/hooks/owner_context.py
     written: '2026-10-31T04:40:45+00:00'
   hold_decision: D225
+- id: error_correlates
+  title: What correlates with the error and the predicted uncertainty
+  question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
+    correlate most strongly with the per-event error and the het sigma of the catalog_v4 networks?
+  status: running
+  quotes:
+  - said_at: '2026-10-31T20:42:57.510000+00:00'
+    text: Seems like the error is concentrated in very particular places, though it would be nice if we can study not only
+      those, but if there are any other quantities that correlate even more strongly with the error and predicted uncertainty,
+      I'm sure this is not hard to do with some basic methods.
+    decision: D233
+    covers:
+    - error_correlates
+    - quantities correlating with the error and the predicted uncertainty (het sigma) in parallel
+  decisions:
+  - D233
+  next: 'From the existing step-20 reads (per-event predictions, sigma and truth saved in the zero-shot .npz of the het and
+    MSE arms and controls), compute per-event and per-class quantities (kinematic: |eta|, pT, pair invariants, sqrt(s_hat),
+    multiplicity, angles; process: coupling orders, masses, class, held-out axis; target: log|M|^2 level and local variation)
+    and rank them by rank correlation and mutual information with the error and with sigma, within and across classes; then
+    a small regression (gradient-boosted trees with permutation importance) for what explains them jointly. No new GPU runs
+    unless the reads lack a quantity.'
+  done_when: null
+  notes_ref: null
+  match: zz_never_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
