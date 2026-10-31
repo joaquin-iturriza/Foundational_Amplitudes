@@ -5437,6 +5437,7 @@ entries:
       at 93371175 (both kinds, manifest first)
     '15': default50 re-reads FA-ccin2p3-8e1cc529, 52efacaf (PP4+EE4); default25 arms 11ad944a, 9c6fc7ab (will TIMEOUT in their
       cross reads at 2.5 h; their PP4+EE4 re-reads then)
+    '14': FA-ccin2p3-8e1cc529 FA-ccin2p3-7a6a1967 FA-ccin2p3-9c6fc7ab
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
