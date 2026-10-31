@@ -5753,6 +5753,28 @@ entries:
       Control EE4 re-read FA-ccin2p3-def11c5c (REREAD 380842ed, seed 43 parent): 169 of 170 probes read, mse_logm2_real finite
       on all 169, in-job physics check ok on all 169 (backend reference); 1 refused: ee4_epem_cgsxwm test pool not prebuilt
       (recipe_id 71164da294583efe); same single refusal in c1863adf.'
+  - at: '2026-10-31T01:24:04+00:00'
+    text: 'Process finding (E3173 follow-up). The sidecar-only check''s tests (test_reference_from_sidecars, 2efb08ea) reported
+      ''verdicts unchanged with the backends removed'', yet the real audit FA-ccin2p3-aab94b13 refused every shaped probe
+      and read the training reference from 108 of 1153 entries. Cause: tools/pool_physics.py registered a recipe''s sampling
+      under the key default_sampling (TrainingReference and the check CLI), while catalog_v4''s training recipe and every
+      held-out recipe set it as top-level sampling: (the key the experiment, prebuild_recipes and check_site_data read). The
+      check therefore looked for unshaped pool names (no _smix_) that do not exist: the probes were reported as ''no sidecar''
+      and the training entries as unreadable; only H5 (one-loop pools, never shaped) and the 108 unshaped entries were found.
+      The H1..H7c pools do have sidecars with physics blocks (sidecar scan: 4 of 26764 without one), so no blocks needed writing.
+      The EE4 coupling_kind (170) and model (26) mismatches were against that 108-entry catalog-wide reference (minimal-QED
+      and sm entries), not real differences: the in-job read with the full reference matched every EE4 probe to its own process
+      (v4_epem_zzzz etc.), all ok. What the CPU test missed: its fixture recipe had no top-level sampling and its pools were
+      built under unshaped names, so the wrong key was invisible. Fix 4e844204: recipe_sampling() reads the top-level key
+      in both places; a probe pool absent at the computed path is reported as such, not as ''no sidecar''; the summary lists
+      the first unreadable training entries; test_real_recipe_shape builds a training and an H6-shaped probe recipe with top-level
+      sampling under shaped names and runs the CLI sidecar-only check (fails on the old code: 1 of 2 reference entries, verified).
+      Also: DROPPED in pool_physics (ee4_epem_cgsxwm, its 3 TeV block dropped, D193) is excluded by the check, by the EE4
+      read in job_catalog_v3_short.sh (a stale test pool of it on disk had passed the old glob filter, so require_cache refused
+      it in c1863adf and def11c5c) and by the collector; its refusal in the control re-reads is expected, not a missing pool.
+      Standalones: all 9404 *_standalone entries are real directories (no symlinks); 706 have Cards/proc_card_mg5.dat; the
+      standalones-census added to the audit classifies the other 8698 and sizes them. Re-run: FA-ccin2p3-7697177c (audit at
+      4e844204, same 19 checks + census).'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
