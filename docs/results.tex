@@ -2415,7 +2415,15 @@ transfer gap ends here.
 % claim: verdict.slope_vs_offset.K16.per_seed.s43.g=0.0095
 % claim: verdict.slope_vs_offset.K16.per_seed.s42.margin=0.0105
 % claim: verdict.slope_vs_offset.K16.per_seed.s43.margin=0.013
+% src: python3 analysis/catalog_v4/kshot_level.py @9f64f323
+% claim: v4_dimensionless_muon.H2.zero=0.46
+% claim: v4_dimensionless_muon_seed2.H2.zero=0.48
+% claim: v4_dimensionless_muon.H2.off16=0.41
+% claim: v4_dimensionless_muon_seed2.H2.off16=0.42
+% claim: v4_dimensionless_muon.H2.floor=0.38
+% claim: v4_dimensionless_muon_seed2.H2.floor=0.39
 % allow: 0.1 42 43 2000 1600 400 5 200 4 8 16 64 256 1 3 6 69 because they are the design's bar, the seeds, the read's settings, the pools' particle count and par:v4_prop's refused count
+% allow: M|^2
 \paragraph{A per-process affine from the pool's own labels (2026-10-31).}\label{par:v4_kshot_spread} Of the three routes
 for the held-out multiplicity gap (capacity and training length, more 6-particle training data, a per-process
 correction from labelled events), the third: does a per-process correction $t\approx a+b\,q$, fitted on labelled events of a
@@ -2427,8 +2435,11 @@ $1600$ of a pool's own events and scored on the other $400$ ($5$ folds), removes
 the gap (seeds $42$, $43$; $f$ as in par.~\ref{par:v4_lco}), a cubic in $q$ $0.023$ and $0.037$: under the bar of
 $0.1$ on both seeds, so by the design's rule the route ends. The held-out residual is calibrated, not compressed: the
 median slope of $t$ on $q$ is $1.008$ and $1.006$ (training pools $0.998$ and $0.999$). With $K$ labelled events
-($200$ draws per pool), the offset alone costs at every $K$ ($f=-0.115$ and $-0.131$ at $K=16$, $-0.03$ at $K=64$
-on both seeds, $-0.008$ and $-0.009$ at $K=256$): its own $1/K$ noise exceeds the level it removes; a
+($200$ draws per pool), $f$ is measured beyond the level: its reference is the floor $\mathrm{var}(q-t)$, what an
+exact offset reaches, so an offset can only add its own $1/K$ estimation noise there ($f=-0.115$ and $-0.131$ at
+$K=16$, $-0.03$ at $K=64$ on both seeds, $-0.008$ and $-0.009$ at $K=256$). On the total MSE the offset still helps,
+as par.~\ref{par:v4_kshot_level} found: on these $218$ pools the median MSE of $\log|\mathcal M|^2$ is $0.46$ and
+$0.48$ zero-shot, $0.41$ and $0.42$ after an offset from $16$ events, against the floor's $0.38$ and $0.39$. A
 slope shrunk toward its cell's training slopes neither gains nor costs against the offset at $K=4$, $8$, $16$ on
 either seed ($f_{\rm slope}-f_{\rm off}=0.0035$ and $0.0095$ at $K=16$, margins $0.0105$ and $0.013$): neutral by the
 design's rule. The gap is therefore scatter within each process, as par.~\ref{par:v4_lco_not} states. This route is closed; capacity and training length wait on the full pretraining's design,
