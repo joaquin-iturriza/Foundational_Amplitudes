@@ -2004,6 +2004,12 @@ entries:
     units: null
     start: '2026-10-31T00:40:30+00:00'
     at: '2026-10-31T00:40:30+00:00'
+  - batch: lco_stage1
+    wall_h: 1.0
+    jobs: 4
+    units: null
+    start: '2026-10-31T01:45:20+00:00'
+    at: '2026-10-31T01:45:20+00:00'
   handoff:
     state: 'Done this owner: the dipole read repaired (pool rows rebuilt from the role shuffle, b5173fa7; zero_shot_parent
       saves pool_row) and read: dead end, gate 0.094 (par:v4_dipole). The propagator-product read FA-ccin2p3-71a96ca2: between
