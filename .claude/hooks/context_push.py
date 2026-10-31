@@ -25,6 +25,8 @@ DIRS = (os.environ.get("CONTEXT_DIRS") or "%s:%s" % (os.path.join(ROOT, ".claude
                                                      os.path.join(HOME, ".claude", "context"))).split(":")
 STATE = os.environ.get("CONTEXT_STATE") or os.path.join(ROOT, ".claude", ".context_pushed")
 KEEP_S = 7 * 24 * 3600
+WRITES = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
+LIMIT = 9000        # chars of one hook output: the harness turns an additionalContext over 10,000 chars into a ~2k preview
 
 
 def sections():
@@ -41,7 +43,7 @@ def sections():
             h = {}
             for line in head.splitlines():
                 k, _, v = line.partition(":")
-                if k.strip() in ("paths", "cmds", "tools", "session"):
+                if k.strip() in ("paths", "cmds", "tools", "session", "agents", "on"):
                     sep = "," if k.strip() in ("paths", "tools") else None
                     h[k.strip()] = [x.strip() for x in (v.split(sep) if sep else [v]) if x.strip()]
             if h.get("cmds"):              # a regex may hold commas: one regex per comma-separated item, as written
@@ -97,7 +99,7 @@ def call_paths(tool, ti):
     return ps
 
 
-def matches(tool, ti, secs):
+def matches(tool, ti, secs, who="main"):
     text, words = "", []
     if tool == "Bash":
         import cmdparse
@@ -108,17 +110,38 @@ def matches(tool, ti, secs):
         # every path-like run of the text, inside python -c programs too: a/b/c, or a name with a known suffix
         words = re.findall(r"[\w.~-]*(?:/[\w.*-]+)+|[\w.-]+\.(?:py|sh|yaml|yml|json|txt|tex|toml)\b", text)
     paths = call_paths(tool, ti) + words
+    wpaths = call_paths(tool, ti) if tool in WRITES else []
     out = []
     for name, h, body in secs:
-        hit = tool in (h.get("tools") or []) or path_hit(h.get("paths") or [], paths) or \
+        if who != "main" and "no" in (h.get("agents") or []):
+            continue
+        ps = wpaths if "write" in (h.get("on") or []) else paths
+        hit = tool in (h.get("tools") or []) or path_hit(h.get("paths") or [], ps) or \
             (text and any(re.search(c, text) for c in h.get("cmds") or []))
         if hit:
             out.append((name, body))
     return out
 
 
+def parts(name, body):
+    """The pushed texts of one section: one, or consecutive parts of at most LIMIT chars split at line ends."""
+    head = "REFERENCE %s (pushed once; rules stay in CLAUDE.md)\n" % name
+    if len(head) + len(body) <= LIMIT:
+        return [head + body]
+    chunks, cur = [], ""
+    for line in body.splitlines(True):
+        if cur and len(cur) + len(line) > LIMIT - 120:
+            chunks.append(cur)
+            cur = ""
+        cur += line
+    chunks.append(cur)
+    return ["REFERENCE %s (part %d of %d, pushed once; the rest follows on your next calls)\n%s" % (name, i + 1, len(chunks), c)
+            for i, c in enumerate(chunks)]
+
+
 def deliver(session, who, found, reset=False):
-    """The sections of `found` not yet delivered to `who` (by hash), marked delivered."""
+    """The texts to push to `who` now: its pending parts first, then the sections of `found` not yet delivered (by
+    hash), at most LIMIT chars in all (always at least one text); what does not fit stays pending for its next call."""
     os.makedirs(STATE, exist_ok=True)
     for f in glob.glob(os.path.join(STATE, "*.json")):
         if time.time() - os.path.getmtime(f) > KEEP_S:
@@ -136,12 +159,20 @@ def deliver(session, who, found, reset=False):
         if reset:
             st.pop(who, None)
         mine = st.setdefault(who, {})
-        new = []
+        queue = list(mine.pop("_pending", []))
         for name, body in found:
             h = hashlib.sha1(body.encode()).hexdigest()
             if mine.get(name) != h:
                 mine[name] = h
-                new.append((name, body))
+                queue += parts(name, body)
+        new, used = [], 0
+        while queue and (not new or used + 2 + len(queue[0]) <= LIMIT):
+            used += len(queue[0]) + 2
+            new.append(queue.pop(0))
+        if queue:
+            mine["_pending"] = queue
+        if not new and not reset:
+            return []
         tmp = p + ".tmp"
         json.dump(st, open(tmp, "w"))
         os.replace(tmp, p)
@@ -160,11 +191,11 @@ def respond(inp, mode="post"):
         new = deliver(inp.get("session_id"), "main", found, reset=inp.get("source") in ("compact", "clear"))
         ev = "SessionStart"
     else:
-        found = matches(inp.get("tool_name") or "", inp.get("tool_input") or {}, secs)
-        new = deliver(inp.get("session_id"), who, found) if found else []
+        found = matches(inp.get("tool_name") or "", inp.get("tool_input") or {}, secs, who)
+        new = deliver(inp.get("session_id"), who, found)
     if not new:
         return ev, None
-    return ev, "\n\n".join("REFERENCE %s (pushed once; rules stay in CLAUDE.md)\n%s" % (n, b) for n, b in new)
+    return ev, "\n\n".join(new)
 
 
 def main():
