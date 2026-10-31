@@ -1551,6 +1551,64 @@ entries:
       for this route. Checks 1, 3, 6, 7 hold. The control is matched: same network, scorer and events, held-out against training
       pools of the same cells, three placebos. The measured spread is a seed difference of about 0.002 and placebos at 0.006-0.008
       held out, well below 0.1. The design stays within D178''s shape priority.'
+  - at: '2026-10-31T00:39:34+00:00'
+    question: 'Does the per-event product of the diagrams'' propagator factors carry the shape gap of catalog_v4''s held-out
+      multiplicity pools (par:v4_shape_gap: median e 0.383 / 0.356, a transfer gap) that the soft-dipole factor did not (dipole
+      read dead end, 2026-10-31)? A CPU read on the existing control-pair reads: a gate (does log P carry per-event variance
+      of the control''s own target t), a ceiling (how much of the zero-shot residual u any per-event scalar of the event explains),
+      then whether u''s mean or its size depends on log P on held-out multiplicity pools beyond training pools of the same
+      cells and beyond three placebos. Revised after the review''s FIX of 2026-10-31 00:38. Feeds D178 (which input or target
+      prior closes the multiplicity gap) and step 6.'
+    prior: 'Searched docs/results.tex (surrogates near 5660; tab:levers and the off-shellness lever near 6750; the attention
+      bias near 7224; the fine-tune lever study near 11979; the target-side propagator subtraction near 9653; catalog_v2''s
+      residual profile near 9636, residual_vs_target.py; par:v4_shape_gap, par:v4_mult_cand), plan show v3_prep_explore, site
+      decisions D86, D178, D199; terms propagator, prop surrogate, target_propagators, offshell, off-shellness, Breit-Wigner,
+      residual_vs_target, dipole, diagram_encoder. Found: (i) norm_surrogate.py prop: within-process r^2 with log|M|^2 0.69
+      new / 0.46 training / 0.20 relabels (catalog_daniel). (ii) The per-event off-shellness input (data.offshell_per_event,
+      about 50x on resonant sets, tab:levers; off-shellness off was worse in the fine-tune lever study) is the existing per-event
+      propagator input; its pair-level generalisation, the attention bias, was tested and not adopted. The control (runs/catalog_v4_short/v4_dimensionless_muon/config.yaml
+      on CC, read 2026-10-31) has offshell_per_event true, internal_mass_scalars true, coupling_scalars true, use_diagrams
+      true (llm4lhc diagram encoder), target_propagators false: it already receives the massive propagators'' off-shellness
+      and the diagrams; what it does not have is the propagator product in its target. (iii) catalog_v2''s residual profile:
+      resonant and t-channel pools put 50-86% of their MSE in the highest target decile, i.e. the error''s size, not its mean,
+      depends on the target there. (iv) The dipole read (dipole_gate.json @606fbe94): log D r^2 0.705 on log|M|^2 but 0.094
+      on t; every per-event scalar''s r^2 on u at 0.001-0.008, so a linear r^2 on u alone cannot separate ''not P'' from ''nothing
+      linear explains u''. A 5-probe test of the --prop mode (@0c289bf1, CC): log P r^2 0.85-0.93 on log|M|^2, 0.03-0.37 on
+      t.'
+    measure: 'Per probe (H2: the 218 held-out multiplicity pools, val split; TR: training pools of the same 6-particle cells,
+      test split; 2000 events; seeds 42, 43; pool rows by pool_rows(), alignment checked, refused counted), dipole_residual.py
+      --prop: log P = log sum_d C_d prod_S 1/|s_S - M^2 + i M Gamma|^k (k 2 massive, 1 massless; C_d g^2 per coupling power
+      from the sidecar''s vertex orders; data/diagrams/<probe>.diagrams.json). Gate: r^2 of t on log P (log|M|^2 beside).
+      Mean read: eta^2(u | x) = the share of var(u) explained by u''s mean in 20 equal-count bins of x, for x = log P and
+      the placebos E (summed energy), logF, log D (where there is a final gluon or photon). Ceiling: eta^2 of u on t and on
+      log|M|^2 (the most a per-event scalar explains), and r^2 of u on t. Size read: r^2 of log u^2 on log P (and on each
+      placebo), and the share of sum u^2 in the top and the bottom decile of log P (0.10 each for flat). Per group (held out;
+      training of the same cells), per cell and over all multiplicity cells: medians per seed, seed difference, 16-84% bootstrap
+      of the median over pools (1000 draws, seed 0).'
+    check: 'The gate checks on these reads, with no network, whether log P still carries variance of t (the 5-probe test:
+      0.03 to 0.37). The ceiling checks whether u is readable at all by a per-event scalar: if eta^2 of u on t and on log|M|^2
+      is itself under 0.05, no scalar prior is testable on u and the read says so instead of a no. The size read covers the
+      shape catalog_v2 found for propagator classes (error concentrated at one end of the target, no linear tilt), so a P
+      that sets where the error sits is caught even with eta^2 at zero.'
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected (/zz_v4_short_<arm>/H2, TR); pools' frozen
+      val and test rows; sidecars on CC; P, E, logF, D as defined; 20 equal-count bins; deciles; no tuning, no fit beyond
+      the binned means; cells as loop_levels.py --shape-gap; bootstrap 1000 draws, seed 0.
+    control: Held-out multiplicity pools against training pools of the same cells, same network, scorer and events; three
+      placebos (E, logF, log D) on every read; the ceiling (u on t and on log|M|^2) on the same events.
+    seeds: Seeds 42 and 43 of the control; each margin must exceed both the seed difference of the group median and the bootstrap
+      half-range.
+    outcome: 'Decided over all multiplicity cells; per-cell results are reported as diagnostics only (a gate passing in some
+      cells but failing over all does not open the route; it names those cells for a later look). Gate fails (median r^2 of
+      t on log P below 0.1 on both seeds): dead end, next candidate designed. Ceiling unreadable (held-out median of max(eta^2(u|t),
+      eta^2(u|log|M|^2)) below 0.05): no per-event scalar prior is testable on these reads; reported as such, the route set
+      aside, and the next design targets the gap''s other parts (level, held-out cell structure). Yes (both seeds, past the
+      gate and the ceiling): held-out median eta^2(u|log P) at least half the held-out ceiling, at least 2x training and above
+      every placebo; or held-out r^2 of log u^2 on log P at least 0.1, at least 2x training, above every placebo; margins
+      beyond seed difference and bootstrap half-range. A yes leads to a GPU design: the control''s short pretraining with
+      data.target_propagators on (the product in the target; log P as an input would repeat the off-shellness input the control
+      already has), two seeds, read on H2 and TR by the shape-gap rule. No (past gate and ceiling, both reads below half those
+      bars or not above training or a placebo): the network already uses P through the off-shellness input and the diagrams,
+      or the gap is elsewhere: dead end. Between: reported, no GPU arm. Cost: one CPU job on CC (4 cores, 1 h limit); no GPU.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
