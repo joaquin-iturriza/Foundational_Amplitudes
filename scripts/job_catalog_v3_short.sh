@@ -207,15 +207,22 @@ PY
     # per-pool signedlog target instead of log|x| plus the sign loss. Read on the held-out axes, PP4 and EE4 from the
     # sigma stage (mu frozen there, so its MSE is the main run's; sigma calibrated); no XV3 (pools deleted), no
     # catalog_v3 PP (outside the design)
-    v4_het_control|v4_het_control_seed2|v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2)
+    # the control apart from the shares: one TRAIN= per branch, which submit_guard's recipe read needs
+    v4_het_control|v4_het_control_seed2)
                             CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4); HET=1
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
-                            SH=${ARM#v4_het_}; SH=${SH%_seed2}
-                            case "$SH" in control) TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml" ;;
-                                          *) TRAIN="$PROJECT_DIR/recipes/catalog_v4_${SH}_train.yaml" ;; esac
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
-                            ITERS_FIXED=4264 ;;
+                            ITERS_FIXED=4264
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml" ;;
+    v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4); HET=1
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            ITERS_FIXED=4264
+                            SH=${ARM#v4_het_}; SH=${SH%_seed2}
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_${SH}_train.yaml" ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/zz_${CAT}_short_$ARM"
