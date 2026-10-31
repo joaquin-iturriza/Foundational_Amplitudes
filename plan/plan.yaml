@@ -5659,11 +5659,12 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 9ba3ed6b
+    commit: 096b5fe4
     paths:
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
+    - analysis/agent_redesign/model_trial.json
     - analysis/agent_redesign/push_replay.json
     - analysis/agent_redesign/push_replay_hold.json
     - analysis/agent_redesign/usage_report.json
