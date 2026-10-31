@@ -6375,7 +6375,7 @@ entries:
     agent: a1ec511cff87b5ca2
     state: closed
     since: '2026-10-31T09:09:21+00:00'
-    state_at: '2026-10-31T13:33:35.428000+00:00'
+    state_at: '2026-10-31T13:35:45+00:00'
     context: 136446
     context_at: '2026-10-31T13:33:37+00:00'
   findings:
