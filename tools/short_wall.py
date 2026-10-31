@@ -9,11 +9,15 @@ Prints one JSON line {hours, slurm_time, probes per axis, ...}; with --limit, ex
 (the job checks its own limit with it before training). Rates, measured on CC-IN2P3 V100s (2026-10-31, the step-14
 arm FA-ccin2p3-6c246603 and its seed-2 twin 1d46b938): 1.01 s per training step at batch 16384 (0.94 and 1.01, the
 slower kept), 1.6 s per zero-shot probe (6c246603's PP4 read: 187 probes in 5.0 min, 02:49:40 to 02:54:42), 15 min of start-up (data
-load, model build) and 1 min per axis (recipe split, model reload); then a 1.25 margin."""
+load, model build) and 1 min per axis (recipe split, model reload); then a 1.25 margin. A HETEROSC arm (--sigma-stage)
+adds its sigma-only stage (run.py: 250 steps, 25 validations, the evaluation with predictions saved): 20 min, an
+estimate (250 x 1.01 s = 4.2 min of steps, the rest validations and the saved evaluation), to be replaced by the
+smoke's measured time."""
 import argparse, json, math, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 1.6, 15.0, 1.0, 1.25
+SIGMA_STAGE_MIN = 20.0
 
 
 def axis_recipe(axis, cat, train):
@@ -57,15 +61,18 @@ def parse_limit(s):
     return int(d) * 24 + parts[0] + parts[1] / 60 + parts[2] / 3600
 
 
-def plan(train, cat, axes, eval_only=False, iters=None):
+def plan(train, cat, axes, eval_only=False, iters=None, sigma_stage=False):
     probes = {a: n_probes(axis_recipe(a, cat, train), a) for a in axes}
     it = 0 if eval_only else (iters if iters is not None else iterations(train))
     minutes = STARTUP_MIN + it * S_ITER / 60 + sum(probes.values()) * S_PROBE / 60 + AXIS_MIN * len(axes)
+    if sigma_stage and not eval_only:
+        minutes += SIGMA_STAGE_MIN
     hours = minutes * MARGIN / 60
     whole_min = math.ceil(hours * 60 / 15) * 15
     return {"hours": round(hours, 2), "slurm_time": f"{whole_min // 60:02d}:{whole_min % 60:02d}:00",
             "iterations": it, "probes": probes, "n_probes": sum(probes.values()),
-            "rates": {"s_per_step": S_ITER, "s_per_probe": S_PROBE, "startup_min": STARTUP_MIN, "margin": MARGIN}}
+            "rates": {"s_per_step": S_ITER, "s_per_probe": S_PROBE, "startup_min": STARTUP_MIN, "margin": MARGIN,
+                      "sigma_stage_min": SIGMA_STAGE_MIN if sigma_stage and not eval_only else 0.0}}
 
 
 def main(argv=None):
@@ -75,9 +82,10 @@ def main(argv=None):
     ap.add_argument("--axes", nargs="+", required=True)
     ap.add_argument("--eval", action="store_true", help="mode eval: reads only, no training")
     ap.add_argument("--iters", type=int)
+    ap.add_argument("--sigma-stage", action="store_true", help="a HETEROSC arm: its sigma-only stage after training")
     ap.add_argument("--limit", help="the job's time limit (squeue %%l): exit 1 when below the plan")
     a = ap.parse_args(argv)
-    out = plan(a.train, a.cat, a.axes, a.eval, a.iters)
+    out = plan(a.train, a.cat, a.axes, a.eval, a.iters, a.sigma_stage)
     if a.limit:
         out["limit_hours"] = round(parse_limit(a.limit), 2)
         out["ok"] = out["limit_hours"] >= out["hours"]

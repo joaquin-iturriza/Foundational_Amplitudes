@@ -28,5 +28,14 @@ def test_mixture_arm_needs_more_than_2p5h():
     assert r["iterations"] == 0 and r["n_probes"] == 1301 + 169, r
 
 
+def test_het_arm_counts_its_sigma_stage():
+    axes = ["H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c", "PP4", "EE4"]
+    a = sw.plan("recipes/catalog_v4_train.yaml", "v4", axes, iters=4264)
+    b = sw.plan("recipes/catalog_v4_train.yaml", "v4", axes, iters=4264, sigma_stage=True)
+    assert abs((b["hours"] - a["hours"]) - sw.SIGMA_STAGE_MIN * sw.MARGIN / 60) < 0.02, (a, b)
+    e = sw.plan("recipes/catalog_v4_train.yaml", "v4", ["PP4"], eval_only=True, sigma_stage=True)
+    assert e["rates"]["sigma_stage_min"] == 0.0, e   # a re-read trains nothing
+
+
 if __name__ == "__main__":
-    test_limits(); test_mixture_arm_needs_more_than_2p5h(); print("short_wall tests passed")
+    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); print("short_wall tests passed")

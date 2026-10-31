@@ -43,7 +43,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -54,7 +54,7 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++dat
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 # the Muon search's best (sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml, trial_1860; par:v3_muon, D155)
 MUON_BEST=(training.optimizer=MuonAdamW ++training.lr=0.004997423 ++training.muon_weight_decay=0.02171863)
-CAT=v3; CROSS=()   # the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
+HET=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
 case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
     dimensionless)         NORM=("${DIM[@]}") ;;
@@ -199,6 +199,23 @@ PY
                            TRAIN="$PROJECT_DIR/recipes/catalog_v3_train_signext.yaml"; ITERS_FIXED=4264 ;;
     baseline_sign_near)    NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false
                                  ++training.sign_near_weight=10 ++training.sign_near_factor=10) ;;
+    # the het-loss uncertainty read (catalog_coverage step 15, D220; the het loss of D52): the control
+    # v4_dimensionless_muon[_seed2] and the step-14 mixture arms default50/default25[_seed2] with only the loss changed:
+    # training.loss=HETEROSC with the parent config's het defaults (heterosc_select nll, heterosc_beta 0,
+    # sigma_after_pool) and run.py's sigma-only stage on the best checkpoint (250 steps, <run>/sigma_stage); the sign
+    # head off (asserted incompatible with HETEROSC), so the 63 sign-changing one-loop training pools take their
+    # per-pool signedlog target instead of log|x| plus the sign loss. Read on the held-out axes, PP4 and EE4 from the
+    # sigma stage (mu frozen there, so its MSE is the main run's; sigma calibrated); no XV3 (pools deleted), no
+    # catalog_v3 PP (outside the design)
+    v4_het_control|v4_het_control_seed2|v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4); HET=1
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            SH=${ARM#v4_het_}; SH=${SH%_seed2}
+                            case "$SH" in control) TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml" ;;
+                                          *) TRAIN="$PROJECT_DIR/recipes/catalog_v4_${SH}_train.yaml" ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            ITERS_FIXED=4264 ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/zz_${CAT}_short_$ARM"
@@ -224,7 +241,7 @@ AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin 
 if [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
-           $([ "$MODE" = eval ] && echo --eval) ${ITERS_FIXED:+--iters $ITERS_FIXED} ${LIM:+--limit "$LIM"}) \
+           $([ "$MODE" = eval ] && echo --eval) ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--sigma-stage} ${LIM:+--limit "$LIM"}) \
         || { case "$WALL" in *'"ok": false'*) echo "V3_WALL_SHORT $WALL" ;; *) echo "V3_WALL_ERROR tools/short_wall.py failed: $WALL" ;; esac; exit 1; }
     echo "V3_WALL $WALL"
 fi
@@ -263,7 +280,9 @@ PY
     AXES=(H1 H5 "${CROSS[@]}")
 fi
 if [ "$MODE" != eval ]; then
-    if [ ! -e "$OUT/models/model_run0_best.pt" ] && [ ! -e "$OUT/models/model_run0_best.pt.gz" ]; then
+    # a het arm is finished only with its sigma stage's checkpoint (run.py writes it after the main run's)
+    DONE="$OUT"; [ -n "$HET" ] && DONE="$OUT/sigma_stage"
+    if [ ! -e "$DONE/models/model_run0_best.pt" ] && [ ! -e "$DONE/models/model_run0_best.pt.gz" ]; then
         test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
         python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null warm_start_idx=null \
             base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
@@ -271,6 +290,9 @@ if [ "$MODE" != eval ]; then
     fi
 fi
 ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
+# the parent the reads score: a het arm's sigma stage (its calibrated sigma; mu frozen, the main run's)
+READ_PARENT="$OUT"; [ -n "$HET" ] && READ_PARENT="$OUT/sigma_stage"
+ls "$READ_PARENT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $READ_PARENT"; exit 1; }
 # the held-out recipes this job reads: a folder of its own, made fresh (plain mkdir refuses an existing one). The folder
 # was once one per axis shared by every job of both catalogs and never emptied, so catalog_v3 runs read catalog_v4's
 # probes and the reverse (baseline_more_signed_muon: 62 on H1, 28 on H5); jobs rewriting it while another read it
@@ -351,11 +373,12 @@ PY
     # every axis on log max(|M|^2, floor) for a sign-changing pool (the one-loop pools of H5, and the twin's tau
     # one-loop pools of H3p); a positive pool's target is log|M|^2 either way
     SM=(--signed-magnitude)
-    python tools/zero_shot_parent.py --parent "$OUT" --save-dir "$PRED/$A" --split "$SPLIT" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
+    python tools/zero_shot_parent.py --parent "$READ_PARENT" --save-dir "$PRED/$A" --split "$SPLIT" "${SM[@]}" "${P[@]}" | sed -u "s/^/$A /"
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
     # (not on TR: signed_ab_score reads the val split, the checkpoint-selection pool of a training process)
-    if [ "$A" != TR ] && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
+    # (not on a het arm: it has no sign head)
+    if [ "$A" != TR ] && [ -z "$HET" ] && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
         # the sign head's scoring on every H5 pool: signed_ab_score.py scores those the run resolves as sign-changing
         # (any role non-positive, its abslog transform) and lists the others as skipped
         python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/${A}_signed.txt"
