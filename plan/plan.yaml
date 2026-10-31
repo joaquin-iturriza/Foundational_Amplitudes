@@ -1706,6 +1706,57 @@ entries:
       the control (input or target). Checks 1, 3, 6, 7 hold. Held-out against training of the same cells, with the same network,
       events and model, plus a permuted-u null. The seeds and bootstrap are as before, with the measured seed spread small
       (eta^2 seeds 0.042/0.042). The read stays within D178''s shape priority.'
+  - at: '2026-10-31T01:11:59+00:00'
+    question: 'Can one shared map from event-level quantities, fitted on the training pools only, predict the zero-shot residual
+      of catalog_v4''s held-out multiplicity pools and so close part of their shape gap (par:v4_shape_gap: var(u) held out
+      above training; par:v4_prop: held-out single-scalar ceiling 0.12 against 0.04)? A CPU read on the control pair''s existing
+      reads: a gradient-boosted map of u on leg-order-free event features, trained across training pools, applied to held-out
+      pools with none of their labels; the share f of the gap it removes bounds what an input or target prior of those features
+      could close. Revised after the review''s FIX of 2026-10-31 (the per-pool fit used the held-out labels, a K-shot fit,
+      not a prior). Feeds D178.'
+    prior: 'Searched docs/results.tex (par:v4_dipole, par:v4_prop, par:v4_shape_gap, par:v4_mult_cand, par:v4_kshot_level
+      near 1466, the context vector''s K-shot fits on catalog_v3 near 3410, the surrogates near 5660, norm_explore6.py near
+      5655, catalog_v2''s residual profile near 9636), plan dead ends, site decisions D86, D178; terms kNN, gradient boosting,
+      flexible fit, residual, ceiling, few-shot, K-shot, context vector, stand-in. Found: (i) par:v4_dipole: log D a dead
+      end (gate 0.094). (ii) par:v4_prop: log P between (gate 0.106; eta^2 0.042 vs 0.015 training, above the placebos, under
+      half the 0.12 ceiling). (iii) par:v4_kshot_level (same control pair): K labelled events of a held-out pool fix its level
+      by an offset, the floor var(q - t) is what any per-process constant leaves; the context vector''s K-shot fits on catalog_v3
+      (2->4 families, K = 16: floor 0.84, context fit 1.25) did not reach the floor. Those use the held-out process''s labels;
+      this read uses none: the map is fitted on training pools only and is the same for every process, so it measures a prior,
+      not a K-shot correction; the per-pool out-of-fold fit (K = 1600 of the pool''s own labels) is kept only as a ceiling
+      beside it. (iv) norm_explore6.py''s CPU stand-in for the network could not rank targets; here the map fits the trained
+      network''s residual, a different object.'
+    measure: 'Per probe (H2: the 218 held-out multiplicity pools; TR: training pools of the same 6-particle cells; seeds 42,
+      43; rows by pool_rows(), alignment checked, refused counted; 500 events per pool drawn with seed 0, so the stage-1 dump
+      stays small on CC at 91% disk): leg-order-free features: the sorted log s_ij/s_hat over all pairs (6-particle: 15 values),
+      the sorted final legs'' log E/sqrt(s_hat) and |cos theta|, log s_hat, the counts of final gluons, photons, quarks, b,
+      leptons, neutrinos, W, Z, H, t, and t, logF, log P, log D (0 where none). Map: sklearn HistGradientBoostingRegressor
+      (300 iterations, defaults, random_state 0) of u = (q - t) - pool mean on these, fitted on all training pools'' events
+      (grouped 5-fold by pool for its training-pool score); applied to every held-out pool. Per held-out pool the gap removed:
+      var(u) - var(u - u_hat); f = (median var_ho - median var(u - u_hat)_ho) / (median var_ho - median var_tr) over all multiplicity
+      cells (seed per seed). Beside it: the per-pool out-of-fold fit on the pool''s own labels (5 folds, 100 iterations; the
+      K = 1600 ceiling), and the map with t, logF, log P, log D only (the physics factors'' share). Seed difference and the
+      16-84% bootstrap over pools (1000 draws, seed 0).'
+    check: On the same events (par:v4_prop) the held-out residual carries per-event structure a scalar of the event explains
+      (eta^2 up to 0.12) and log P takes 0.042 of it, above the placebos; the shared map can only reach what is common to
+      training and held-out processes, which is exactly what a prior could carry; the K = 1600 per-pool fit beside it bounds
+      f from above, and the factors-only map shows how much the physics factors alone hold. A 5-probe dry run of stage 1 (features
+      and u dumped, time and size per pool) and a stage-2 fit on it run on CC before submission.
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected; pools' frozen rows; 500 events per pool (seed
+      0); the feature list and the model settings fixed before reading; no tuning; cells as loop_levels.py --shape-gap; bootstrap
+      1000 draws, seed 0.
+    control: Held-out pools scored by a map that never saw them against the training pools' own grouped out-of-fold score
+      (same features, model and events); the factors-only map; the per-pool own-label ceiling; seeds 42 and 43 fitted and
+      scored separately.
+    seeds: Seeds 42 and 43 of the control; f must exceed both the seed difference and the bootstrap half-range on both seeds.
+    outcome: 'Decided on f over all multiplicity cells, both seeds. f >= 0.3: a shared map of event features closes a real
+      part of the gap; the yes branch is a GPU arm with the map''s prediction subtracted from the target (a fixed, frozen
+      per-event term fitted on the training pools only, as data.target_propagators subtracts a factor), on the control''s
+      short pretraining, two seeds, read on H2 and TR by the shape-gap rule; if the factors-only map holds most of f, the
+      arm instead puts log P in the target (data.target_propagators). f < 0.1: no event-level prior shared across processes
+      closes the gap; reported to the user with the alternatives (capacity, training length, data), this route ends. Between:
+      reported, no GPU arm. Cost: CPU only on CC: stage 1, four jobs (two seeds x H2/TR), 4 cores, 1 h limit each; stage 2,
+      one job, 4 cores, 1 h; no GPU; disk about 50 MB.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
