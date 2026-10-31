@@ -6211,7 +6211,7 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '18': FA-ccin2p3-51155c99 FA-ccin2p3-f8e6c322 FA-ccin2p3-4d19f701  FA-ccin2p3-765bdd9c FA-ccin2p3-1e7f2159 FA-ccin2p3-62f8cc25
+    '18': FA-ccin2p3-019f489b FA-ccin2p3-7a099e39 FA-ccin2p3-7cd23d53 FA-ccin2p3-765bdd9c FA-ccin2p3-1e7f2159 FA-ccin2p3-62f8cc25
       FA-ccin2p3-22ea52de
     '20': FA-ccin2p3-bfec5501
     '19': 'FA-ccin2p3-ff4a512f FA-ccin2p3-e8239785 FA-ccin2p3-485cc0e1 FA-ccin2p3-047392e8 FA-ccin2p3-35f2e959 FA-ccin2p3-56a2086f
