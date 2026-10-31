@@ -57,6 +57,33 @@ def timing(name, lo, hi, n, role, seed):
             "identical": bool(np.array_equal(rows, rows0) and np.array_equal(kinds, kinds0))}
 
 
+def split_check(a):
+    import glob, shutil, tempfile
+    spec = yaml.safe_load(open(a.recipe))
+    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
+                                   "sampling": p.get("sampling")} for p in spec["processes"]],
+                                 default_sampling=spec.get("sampling"))
+    ents = spec["processes"] if a.names == ["all"] else [p for p in spec["processes"] if p["name"] in a.names]
+    cpus = sorted(os.sched_getaffinity(0))[:a.split]
+    for role in a.roles:
+        specs = [{"process": p["name"], "sqrts_min": float(p["sqrts"][0]), "sqrts_max": float(p["sqrts"][1]),
+                  "n_events": int(p["n_" + role])} for p in ents]
+        got = {}
+        for mode, ncpu in (("serial", 1), ("parallel", len(cpus))):
+            d = tempfile.mkdtemp(prefix="zz_probe_compose_"); os.environ["TMPDIR"] = d
+            os.sched_setaffinity(0, cpus[:ncpu])
+            t0 = time.time(); paths = datagen.ensure_split_set(specs, role, a.seed, require_cache=True)
+            got[mode] = (time.time() - t0, d, paths)
+        same = all(np.array_equal(np.load(got["serial"][2][k]), np.load(got["parallel"][2][k]))
+                   for k in got["serial"][2])
+        print(json.dumps({"role": role, "pools": len(specs), "cpus": len(cpus),
+                          "s_serial": round(got["serial"][0], 1), "s_parallel": round(got["parallel"][0], 1),
+                          "identical": bool(same)}), flush=True)
+        for _, d, _ in got.values():
+            shutil.rmtree(d)
+    os.sched_setaffinity(0, cpus)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("recipe"); ap.add_argument("names", nargs="+")
@@ -65,7 +92,13 @@ def main():
     ap.add_argument("--timing", action="store_true",
                     help="compose twice, the default-sampled rows read once per pool (as compose does) and once per "
                          "chunk (the old path): seconds of each phase and whether the two compositions are identical")
+    ap.add_argument("--split", type=int, default=0, metavar="CPUS",
+                    help="the loader's path (datagen.ensure_split_set) on the first len(names) entries of the recipe "
+                         "('all' as the only name: every entry), on CPUS CPUs, in a fresh zz_probe TMPDIR: composed "
+                         "serially (one CPU), then in parallel; seconds of each and whether every file is identical")
     a = ap.parse_args()
+    if a.split:
+        return split_check(a)
     spec = yaml.safe_load(open(a.recipe))
     mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
                                    "sampling": p.get("sampling")} for p in spec["processes"]],

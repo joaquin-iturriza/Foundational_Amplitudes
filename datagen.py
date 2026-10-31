@@ -20,6 +20,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 
 import numpy as np
 
@@ -566,12 +567,50 @@ def composed_record(paths):
     return out
 
 
+def _needs_compose(s, role, seed, dest_dir):
+    recipe = mg.variable_energy_recipe(s["process"], s["sqrts_min"], s["sqrts_max"], s["n_events"], role=role, seed=seed)
+    if float((recipe.get("sampling") or {}).get("f_default", 0)) <= 0:
+        return False
+    out = mg.recipe_output_path(recipe, dest_dir or dest_for_role(role))
+    if _is_cached(out, mg.recipe_id(recipe)):
+        return False
+    import mix_compose
+    return not _is_cached(os.path.join(mix_compose.compose_dir(), os.path.basename(out)), mg.recipe_id(recipe))
+
+
+def _compose_one(a):
+    s, role, seed, dest_dir = a
+    return ensure_dataset(s["process"], s["sqrts_min"], s["sqrts_max"], s["n_events"], role=role, seed=seed,
+                          dest_dir=dest_dir)
+
+
+def _compose_parallel(specs, role, seed, dest_dir):
+    """Compose the default-share pools of `specs` that are not composed yet, in parallel (fork: the processes the
+    recipe registered in mg.PROCESSES carry over); a worker's error is raised here."""
+    todo = [s for s in specs if _needs_compose(s, role, seed, dest_dir)]
+    try:
+        ncpu = len(os.sched_getaffinity(0))
+    except AttributeError:
+        ncpu = os.cpu_count() or 1
+    n = min(len(todo), ncpu)
+    if n < 2:
+        return
+    import multiprocessing as mp
+    t0 = time.time()
+    with mp.get_context("fork").Pool(n) as pool:
+        for _ in pool.imap_unordered(_compose_one, [(s, role, seed, dest_dir) for s in todo]):
+            pass
+    print(f"[mix_compose] {len(todo)} {role} pools composed on {n} CPUs in {time.time() - t0:.1f} s", flush=True)
+
+
 def ensure_split_set(specs, role, seed, dest_dir=None, require_cache=False):
     """Materialize a list of process specs for one role.
 
     `specs`: iterable of dicts {process, sqrts_min, sqrts_max, n_events}.
-    Returns {process: npy_path}.
+    Returns {process: npy_path}. Default-share mixtures not yet composed (mix_compose.py) are composed first in
+    parallel over the job's CPUs (one pool per worker, the same files the serial path writes), then read as cache hits.
     """
+    _compose_parallel(list(specs), role, seed, dest_dir)
     return {
         s["process"]: ensure_dataset(
             s["process"], s["sqrts_min"], s["sqrts_max"], s["n_events"],
