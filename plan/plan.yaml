@@ -3390,14 +3390,9 @@ entries:
   - D188
   - D189
   next:
-    14: 'The catalog''s sampling mixture (Joaquin''s priority 1, D178: catalog_v4 mixes the default generator sampling with
-      the smart choices, flat in log|M|^2, splitter, forward, on every beam): design and run the mixture A/B on the 112 assembled
-      rebuilt pools: default share 0.50 and 0.25 of each tree pool, taken out of the RAMBO bulk, with the 0.35 flat and 0.15
-      forward shares kept (recipes/catalog_v4_default{50,25}_train.yaml), two seeds per arm at catalog_v4''s Muon short-run
-      settings, against the current catalog_v4 control pair (FA-ccin2p3-339ec100, -380842ed); read on default-sampled test
-      events (the pp pools'' test split and the e+e- default test pools) and on the smart test pools; sized by the pure-default
-      bound (step 11). Lost from the plan on 2026-10-30 05:15, when it was folded into a collection step''s branch that was
-      later dropped; restored here as its own step'
+    14: 'Step 14 done, verdict trade-off (par:v4_mixture, mixture_ab.json): Joaquin chooses catalog_v4''s default share (none,
+      0.25 or 0.50, or a smaller share tested); the chosen recipe is composed at load (D207), no pools to build; then close
+      the entry after the backlog review'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -5879,12 +5874,11 @@ entries:
     at: '2026-10-31T02:58:24+00:00'
   step_why:
     14:
-      feeds: which default share catalog_v4's final pools carry (D178 priority 1)
+      feeds: which default share catalog_v4's pools carry (D178 priority 1)
       if:
-      - 'a share wins on default-sampled events without losing on the smart pools: it becomes catalog_v4''s mixture, pools
-        rebuilt at it'
-      - 'neither beats the control on default-sampled events: report both reads to Joaquin with the pure-default bound beside
-        them'
+      - 'Joaquin picks a share: catalog_v4_train.yaml takes that share''s f_default and default_source; check_site_data on
+        it'
+      - 'Joaquin keeps the current mixture: close the entry with the write-up 614d512c'
   owner:
     agent: a1260706ea6f103cc
     state: working
