@@ -383,10 +383,10 @@
     }
    },
    "total": {
-    "weighted_tokens_M": 413.22,
-    "usd_list_price": 1088.34,
-    "usd_per_result": 2.85,
-    "weighted_tokens_M_per_result": 1.082,
+    "weighted_tokens_M": 398.5,
+    "usd_list_price": 1036.33,
+    "usd_per_result": 2.71,
+    "weighted_tokens_M_per_result": 1.043,
     "wasted_share": 0.0447,
     "results": 382,
     "registry_runs_submitted": 1317,
@@ -401,43 +401,43 @@
   "redesign": {
    "main": {
     "transcripts": 1,
-    "api_messages": 670,
-    "calls": 549,
-    "weighted_tokens_M": 19.82,
-    "usd_list_price": 49.29,
+    "api_messages": 682,
+    "calls": 556,
+    "weighted_tokens_M": 20.21,
+    "usd_list_price": 50.14,
     "usd_by_model": {
-     "claude-opus-5-5": 49.29
+     "claude-opus-5-5": 50.14
     },
-    "usd_per_result": 8.21,
-    "usd_per_commit": 3.79,
+    "usd_per_result": 8.36,
+    "usd_per_commit": 3.86,
     "raw_tokens_M": {
      "input_tokens": 0.0,
      "output_tokens": 0.32,
-     "cache_creation_input_tokens": 1.17,
-     "cache_read_input_tokens": 167.54
+     "cache_creation_input_tokens": 1.18,
+     "cache_read_input_tokens": 171.14
     },
     "runs_submitted": 5,
     "results": 6,
     "commits": 13,
-    "weighted_tokens_M_per_run": 3.964,
-    "weighted_tokens_M_per_result": 3.303,
-    "weighted_tokens_M_per_commit": 1.524,
+    "weighted_tokens_M_per_run": 4.041,
+    "weighted_tokens_M_per_result": 3.368,
+    "weighted_tokens_M_per_commit": 1.554,
     "wasted_calls": {
      "hook": {
       "count": 8,
-      "share": 0.0146
+      "share": 0.0144
      },
      "denial": {
       "count": 3,
-      "share": 0.0055
+      "share": 0.0054
      },
      "repeat": {
       "count": 9,
-      "share": 0.0164
+      "share": 0.0162
      },
      "wait": {
       "count": 9,
-      "share": 0.0164
+      "share": 0.0162
      },
      "reread": {
       "count": 0,
@@ -445,13 +445,13 @@
      },
      "nothing_new": {
       "count": 39,
-      "turns": 145,
+      "turns": 148,
       "wake_turns": 84,
-      "share_of_turns": 0.269
+      "share_of_turns": 0.2635
      }
     },
-    "wasted_share": 0.0528,
-    "context_median_k": 243.1,
+    "wasted_share": 0.0522,
+    "context_median_k": 244.5,
     "context_max_k": 567.1,
     "stall_min": {
      "n": 24,
@@ -460,54 +460,54 @@
     }
    },
    "agents": {
-    "transcripts": 72,
-    "api_messages": 3127,
-    "calls": 3156,
-    "weighted_tokens_M": 64.7,
-    "usd_list_price": 178.6,
+    "transcripts": 76,
+    "api_messages": 3239,
+    "calls": 3270,
+    "weighted_tokens_M": 66.54,
+    "usd_list_price": 184.34,
     "usd_by_model": {
-     "claude-opus-5-5": 173.31,
+     "claude-opus-5-5": 179.05,
      "claude-sonnet-5-5": 5.29,
      "claude-haiku-5-5": 0.01
     },
-    "usd_per_result": 1.92,
+    "usd_per_result": 1.9,
     "usd_per_commit": 1.08,
     "raw_tokens_M": {
      "input_tokens": 0.01,
-     "output_tokens": 1.93,
-     "cache_creation_input_tokens": 13.27,
-     "cache_read_input_tokens": 384.38
+     "output_tokens": 2.04,
+     "cache_creation_input_tokens": 13.68,
+     "cache_read_input_tokens": 392.49
     },
-    "runs_submitted": 136,
-    "results": 93,
-    "commits": 165,
-    "weighted_tokens_M_per_run": 0.476,
-    "weighted_tokens_M_per_result": 0.696,
-    "weighted_tokens_M_per_commit": 0.392,
+    "runs_submitted": 137,
+    "results": 97,
+    "commits": 171,
+    "weighted_tokens_M_per_run": 0.486,
+    "weighted_tokens_M_per_result": 0.686,
+    "weighted_tokens_M_per_commit": 0.389,
     "wasted_calls": {
      "hook": {
-      "count": 74,
-      "share": 0.0234
+      "count": 75,
+      "share": 0.0229
      },
      "denial": {
-      "count": 9,
-      "share": 0.0029
+      "count": 10,
+      "share": 0.0031
      },
      "repeat": {
       "count": 35,
-      "share": 0.0111
+      "share": 0.0107
      },
      "wait": {
       "count": 51,
-      "share": 0.0162
+      "share": 0.0156
      },
      "reread": {
       "count": 3,
-      "share": 0.001
+      "share": 0.0009
      }
     },
-    "wasted_share": 0.0545,
-    "context_median_k": 117.1,
+    "wasted_share": 0.0532,
+    "context_median_k": 114.6,
     "context_max_k": 333.9,
     "stall_min": {
      "n": 51,
@@ -563,13 +563,13 @@
     }
    },
    "total": {
-    "weighted_tokens_M": 84.52,
-    "usd_list_price": 227.89,
-    "usd_per_result": 2.3,
-    "weighted_tokens_M_per_result": 0.854,
-    "wasted_share": 0.0543,
-    "results": 99,
-    "registry_runs_submitted": 142,
+    "weighted_tokens_M": 86.75,
+    "usd_list_price": 234.48,
+    "usd_per_result": 2.28,
+    "weighted_tokens_M_per_result": 0.842,
+    "wasted_share": 0.0531,
+    "results": 103,
+    "registry_runs_submitted": 143,
     "stall_min": {
      "n": 75,
      "median": 2.6,
