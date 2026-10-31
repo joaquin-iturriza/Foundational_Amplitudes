@@ -3403,12 +3403,14 @@ through the same PP4 probes).}\label{tab:v4_bound_shares}
 \end{table}
 \begin{figure}[t]
   \centering
-  \widerow{\includegraphics{../analysis/catalog_v4/figs/shares_bound.pdf}}
-  % src: python3 analysis/catalog_v4/fig_shares_bound.py @186d0957
+  \includegraphics{../analysis/catalog_v4/figs/shares_bound_a.pdf} \\[1ex]
+  \includegraphics{../analysis/catalog_v4/figs/shares_bound_b.pdf}
+  % src: python3 analysis/catalog_v4/fig_shares_bound.py @bbe94ea2
   % allow: 0.50 0.25 0.90 1 because they are the shares, the design's bar and the reference ratio
+  % allow: 13 797 504 169 700 279 28 because they are the pp energy and the class counts of Table~\ref{tab:v4_bound_shares}
   \caption{Arm over control, $R$ with its widened interval, per read group, every read on MadEvent default-sampled test
-    events. Left, MSE loss: the pure-default bound and shares $0.50$ and $0.25$ against the MSE control pair (the rows of
-    Table~\ref{tab:v4_bound_shares}); right, het loss: the two shares against the het control pair (no het bound arm was
+    events; class counts in brackets. Top, MSE loss: the pure-default bound and shares $0.50$ and $0.25$ against the MSE control pair (the rows of
+    Table~\ref{tab:v4_bound_shares}); bottom, het loss: the two shares against the het control pair (no het bound arm was
     trained). Dashed line the control ($R=1$), dotted the design's gain bar ($R=0.90$).}
   \label{fig:v4_shares_bound}
 \end{figure}
