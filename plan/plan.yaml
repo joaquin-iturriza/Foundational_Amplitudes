@@ -144,13 +144,11 @@ entries:
   - D195
   - D199
   next:
-    6: 'New design for the multiplicity gap (the joint read''s design took two FIX verdicts and is a dead end): a leave-one-class-out
-      map among the held-out multiplicity pools (fitted on the other held-out classes, predicting the left-out class without
-      its labels) on leg-order-free event features, with the factors-only map (t, logF, log P, log D) under the same scheme
-      and the training-pool map as a diagnostic; f = the share of the gap var(u)_ho - var(u)_tr it removes; the yes arm derived
-      from which map carries f (target_propagators on the control''s short pretraining if the factors hold most of it). Record
-      with plan design and pass the design reviewer before any job; code start: dipole_residual.py joint_features (to be made
-      leg-order-free) and the job script''s joint mode.'
+    6: 'Leave-class-out read of the held-out multiplicity gap (design passed 2026-10-31 after one FIX): code on branch v3_lco
+      (604cb718, a97b1efc; dipole_residual.py --prop --dump, lco_map.py, job modes lcodump and lco), under repo review; after
+      it passes and merges: 5-probe dry run of stage 1 (analysis/catalog_v4/data/lco_dry_probes.txt) and stage 2 on it on
+      CC, then stage 1 as four CPU jobs (two seeds x H2/TR) at the dry run''s measured limit and stage 2 as one 8-core job;
+      f_ceil first, thresholds as shares of it.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1961,12 +1959,12 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     6:
-      feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap (par:v4_shape_gap) in the
-        catalog preprocessing design'
+      feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap'
       if:
-      - 'f >= 0.3 and the factors hold most of it: GPU design with data.target_propagators on'
-      - 'f < 0.1: report to the user that no shared event-level prior closes the gap (capacity, training length, data instead)'
-      - 'between: reported, no GPU arm'
+      - 'f_ceil < 0.1 both seeds: route ends, reported with capacity, training length, data'
+      - 'f_lco >= 0.5 f_ceil and >= 0.1: GPU arm designed from which map holds f (target_propagators, parent-factorised target,
+        or the named group)'
+      - 'f_lco < 0.25 f_ceil or < 0.05: no shared event-level prior; route ends'
   step_waits: {}
   owner:
     agent: a884f79261a86aff9
