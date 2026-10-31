@@ -179,6 +179,16 @@ def test_read_and_mixture():
         raise AssertionError("shares over the pool accepted")
     except ValueError:
         pass
+    # chunks [334, 333, 333] at f_default 0.5: each chunk's shares sum to its count, the default rows read once
+    counts = [334, 333, 333]
+    big = np.concatenate([truth] * (500 // len(truth) + 1))[:500]
+    Bsq = np.sqrt(np.clip((lambda q: q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1))(big[:, 0] + big[:, 1]), 0, None))
+    rows = mg.default_share_rows(0.5, counts)
+    assert rows[0][0] == 0 and rows[-1][1] == 500 and all(rows[i][1] == rows[i + 1][0] for i in range(2)), rows
+    for c, (a, b) in zip(counts, rows):
+        ev, s, me = mg.build_mixture_dataset(c, 30, 6000, [0.0] * 3, [21] * k, np.random.default_rng(4), cuts, pol,
+                                             label, "log", {}, (big[a:b], Bsq[a:b]))
+        assert len(ev) == c and len(s) == c and len(me) == c, (c, len(ev))
     for n in (base, "zz_ds_reuse", "zz_ds_src"):
         del mg.PROCESSES[n]
     print("[read+mixture] ok")
