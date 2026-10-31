@@ -1478,7 +1478,7 @@ entries:
   step_waits: {}
   owner:
     agent: a208e44d49598bdaf
-    state: working
+    state: closed
     since: '2026-10-30T16:56:05+00:00'
     context: 231596
     context_at: '2026-10-30T23:16:06+00:00'
@@ -1507,6 +1507,29 @@ entries:
     units: null
     start: '2026-10-30T23:13:41+00:00'
     at: '2026-10-30T23:13:41+00:00'
+  handoff:
+    state: 'Done this owner: the one-loop sign extension on catalog_v4 at four seeds, yes by the design''s rule (18/21 pools
+      lower, p=0.001, median wrong-sign 6.69% -> 2.91%; tree-axis MSE cost 1.03-1.25x), par:v4_signext; the user kept it a
+      result, not in the full pretraining (D199), step closed. The shape gap decided (par:v4_shape_gap, tab:v4_shape_gap):
+      multiplicity pools a transfer gap (median e 0.383 / 0.356), new combinations at the floor (0.297 / 0.270); notes-editor
+      passed @30b8fde9. Open: step 6, the dipole read (CPU, design passed 2026-10-30 22:28) as the first candidate input prior
+      for the multiplicity gap; its gate is pending on the running CPU job.'
+    decisions: 'Dipole read made CPU-only after the design review''s FIX (the emission-scale target already holds a per-event
+      soft scale, so a no-network gate comes first: median r^2 of the target t on log D < 0.1 ends it). Event alignment by
+      saved indices (zero_shot_parent saves idx and pool since 902b96c5) with a correlation check, because the old reads''
+      events are neither the pool''s first rows nor matchable by value (dead end FA-ccin2p3-464da136). Submissions on CC only:
+      the control checkpoints and catalog_v4 data live there (lxplus lacks both); real time limits on every job, since the
+      site gate counts the time limit.'
+    ruled_out: lxplus for these jobs (no checkpoints, no catalog_v4 data, venv broken); matching events by log|M|^2 value;
+      the per-process colour weight in the target (par:v4_mult_cand); the GPU dipole reread design as first written (review
+      FIX).
+    running: 'FA-ccin2p3-3a2a388b: the dipole CPU read on CC (outputs $SCRATCH/zz_v4_dipole_62894489, DIPOLE_RESIDUAL lines
+      in its log); step 6 says how to read and decide it. CC /sps/lpnhe at 91%: write nothing large.'
+    files: analysis/catalog_v4/signext_compare.py, analysis/catalog_v4/data/signext_compare.json, analysis/catalog_v4/dipole_residual.py,
+      scripts/job_v4_dipole_residual.sh, scripts/job_catalog_v3_short.sh (seeds 44/45 arms), tools/zero_shot_parent.py (idx,
+      pool saved), analysis/catalog_v4/data/shape_gap.json, docs/results.tex (par:v4_signext, par:v4_shape_gap). Code changes
+      of 902b96c5, a1cc783e, 99ec191c, 036a8b19, 0e0cf15e not yet reviewed by the repo-reviewer.
+    written: '2026-10-31T00:16:30+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
