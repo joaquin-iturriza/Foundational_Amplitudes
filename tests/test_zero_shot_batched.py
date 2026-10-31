@@ -43,7 +43,10 @@ def test_probes_score_identically_with_one_read(tmp_path, monkeypatch):
         m = _fresh()
         ck_ft = base_experiment._torch_load(ck, map_location="cpu", weights_only=False)   # init_model's load
         m.load_state_dict(ck_ft["model"])
-        ck_ft["model"]["2.weight"].zero_()            # a probe editing its state dict (the HETEROSC sigma row)
+        # a probe editing its state dict as the HETEROSC sigma row does (a new tensor assigned; the cache shares tensors)
+        ck_ft["model"]["2.weight"] = torch.zeros_like(ck_ft["model"]["2.weight"])
+        assert not torch.equal(base_experiment._torch_load(ck, map_location="cpu", weights_only=False)["model"]["2.weight"],
+                               ck_ft["model"]["2.weight"])     # the next probe's copy keeps the parent's
         assert rebuild_run.load_best_weights(m, str(tmp_path)) is True
         after.append(m(x).detach())
         if i == 0:
