@@ -7220,6 +7220,13 @@ entries:
       (dimensionless mass stats, per-process context), and a deep-copied module drops the muP infshape attributes on its parameters
       (torch Parameter.__deepcopy__), so a shared model is not exact without a rework. The rest is the probe''s own data.
       A/B: FA-ccin2p3-30cc8928 (B, B2 old path, D new).'
+  - at: '2026-10-31T19:31:08+00:00'
+    text: 'Repo-reviewer a8a308817be9d886d re-check PASS (watermark e906ef74) on 311380bf (H5 label-virt physics check), a9775ded/e0f7a54a
+      (shared-tensor parent copy, opt-in) and f28117ef/480a4d2d. Its condition before ZS_PARENT_COPY=shared becomes the default:
+      _load_model_weights hands ck[''ema''] to ema.load_state_dict by reference, so a training path with EMA on would need
+      a deep copy there (the reader never trains, ema off); the default switch is a separate commit for review with the A/B
+      FA-ccin2p3-30cc8928. The 7 test_pool_physics failures it saw under pytest were the file''s harness (setup only in __main__);
+      fixed in the commit after e906ef74, 13/13 pass under pytest and the runner.'
   handoff:
     state: 'Step 18 and 19 generation done: all 142 default-sampled held-out test pools on ccin2p3 (114 trees: H2p5 38, H6
       8, H7E 34, H7c 34; 28 one-loop H5, MadEvent Born events labelled by the class''s MadLoop, lhe label rule virt). Step
