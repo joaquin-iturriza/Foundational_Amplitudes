@@ -192,6 +192,35 @@ def tail_share(u, x):
     return float((u[x <= lo] ** 2).sum() / tot), float((u[x >= hi] ** 2).sum() / tot)
 
 
+def joint_features(mom, t, logF, logP, logD):
+    """The event's full kinematics with the candidate factors: log s_ij/s_hat per leg pair (all outgoing), log s_hat,
+    each final leg's log energy over sqrt(s_hat) and |cos theta| in the partonic frame, logF, log P, log D (0 where
+    the process has none), the control's target t."""
+    Q = mom.copy()
+    Q[:, :2] *= -1
+    n = mom.shape[1]
+    tot = mom[:, 0] + mom[:, 1]
+    shat = mdot(tot, tot)
+    cols = [np.log(np.maximum(np.abs(mdot(Q[:, i], Q[:, j])) * 2 / shat, 1e-300))
+            for i in range(n) for j in range(i + 1, n)]
+    cols.append(np.log(shat))
+    for i in range(2, n):
+        cols.append(np.log(np.maximum(mom[:, i, 0], 1e-300) / np.sqrt(shat)))
+        cols.append(np.abs(mom[:, i, 3]) / np.maximum(np.linalg.norm(mom[:, i, 1:], axis=1), 1e-300))
+    cols += [logF, logP, logD if logD is not None else np.zeros(len(t)), t]
+    return np.stack(cols, 1)
+
+
+def joint_r2(X, u, seed=0):
+    """(out-of-fold R^2 of a gradient-boosted fit of u on X, the same on u permuted): 5 folds, 100 iterations."""
+    from sklearn.ensemble import HistGradientBoostingRegressor
+    from sklearn.model_selection import KFold, cross_val_predict
+    cv = KFold(5, shuffle=True, random_state=seed)
+    fit = lambda y: 1 - float(np.var(y - cross_val_predict(HistGradientBoostingRegressor(max_iter=100, random_state=seed),
+                                                              X, y, cv=cv)) / np.var(y))
+    return fit(u), fit(np.random.default_rng(seed).permutation(u))
+
+
 def r2(u, x):
     if np.std(x) == 0:
         return 0.0
@@ -204,6 +233,7 @@ def main():
     ap.add_argument("--probes", default="", help="a file of probe names, one per line (empty: all)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--prop", action="store_true", help="the propagator-product read (log P; placebos E, logF, log D)")
+    ap.add_argument("--joint", action="store_true", help="with --prop: the joint out-of-fold fit of u (R2_joint, R2_null)")
     ap.add_argument("--sidecars", default="data/diagrams", help="the diagram sidecars' directory (--prop)")
     a = ap.parse_args()
     rows = []
@@ -261,6 +291,10 @@ def main():
                     rec[f"eta2_{k}"] = eta2(uk, x)      # the mean read
                     rec[f"r2size_{k}"] = r2(lu2, x)     # the size read: log u^2 on x
                 rec["tail_lo_P"], rec["tail_hi_P"] = tail_share(uk, logP[ok])
+                if a.joint:      # the joint read (design of 2026-10-31): u on the event's full kinematics together
+                    X = joint_features(mom[ok], t[ok], logF[ok], logP[ok], None if logD is None else logD[ok])
+                    rec["R2_joint"], rec["R2_null"] = joint_r2(X, uk)
+                    rec["R2_joint_minus_null"] = rec["R2_joint"] - rec["R2_null"]
                 rows.append(rec)
                 continue
             fx = factors(mom, pdg)
@@ -279,7 +313,8 @@ def main():
         if ("r2_P" if a.prop else "r2_D") in r:
             per.setdefault(r["dir"], []).append(r)
     keys = ("eta2_P", "r2size_P", "ceiling", "r2_tP", "r2_rawP", "eta2_E", "eta2_F", "r2size_E", "r2size_F", "r2_P",
-            "tail_lo_P", "tail_hi_P") if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
+            "tail_lo_P", "tail_hi_P") + (("R2_joint", "R2_null", "R2_joint_minus_null", "var_u") if a.joint else ()) \
+        if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
     main_k = keys[0]
     rng = np.random.default_rng(0)
 

@@ -52,3 +52,17 @@ def test_eta2_and_tail_share():
     assert hi > 0.9 and lo < 0.05
     w = r.normal(size=4000)
     assert eta2(w, x) < 0.02 and all(0.07 < s < 0.13 for s in tail_share(w, x))
+
+
+def test_joint_r2_finds_signal_and_not_noise():
+    """The joint read's out-of-fold fit recovers a nonlinear signal in one feature and reads no signal in noise."""
+    from analysis.catalog_v4.dipole_residual import joint_features, joint_r2
+    r = np.random.default_rng(1)
+    m = r.normal(size=(2000, 6, 4))
+    m[..., 0] = np.abs(m[..., 0]) + 3
+    t = r.normal(size=2000)
+    X = joint_features(m, t, t * 0, t * 0, None)
+    u = np.sin(2 * t) + 0.5 * r.normal(size=2000)
+    rj, rn = joint_r2(X, u)
+    assert rj > 0.5 and rn < 0.05
+    assert joint_r2(X, r.normal(size=2000))[0] < 0.05
