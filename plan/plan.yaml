@@ -2373,6 +2373,12 @@ entries:
     units: null
     start: '2026-10-31T02:39:36+00:00'
     at: '2026-10-31T02:39:36+00:00'
+  - batch: multext_census
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-10-31T03:52:00+00:00'
+    at: '2026-10-31T03:52:00+00:00'
   handoff:
     state: 'Done this owner: the leave-class-out read of the held-out multiplicity gap (design passed after one FIX; par:v4_lco
       @a767b36a: f 0.147/0.125 of the gap, ceiling 0.271/0.316, between) and its t-free re-read (t, the scored event''s target,
