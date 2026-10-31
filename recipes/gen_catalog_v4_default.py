@@ -16,8 +16,11 @@ RAMBO bulk (mg5_pipeline_final, "DEFAULT-SAMPLED SHARE"). This script writes the
                                      of the same role already holds (`reuse`: its pp13v4 / pp13 / ee4 pool), its own
                                      iseeds (the name enters lhe_iseed), so no event repeats one of the reused pool's
   catalog_v4_default_lhe.yaml        the dsh pools to build first (a CPU MadEvent job, prebuild_recipes.py)
-  catalog_v4_default<f>_train.yaml   catalog_v4_train.yaml with every tree class that has a default source at
-                                     f_default = f (one per arm); everything else as catalog_v4_train.yaml
+  catalog_v4_default<f>_train.yaml   catalog_v4_base_train.yaml (the catalog-sampled recipe, select_catalog_v4.py)
+                                     with every tree class that has a default source at f_default = f (one per arm);
+                                     everything else as the base
+  catalog_v4_train.yaml              the catalog in use: the base at the chosen share CHOSEN (0.25: D229, D231, the
+                                     mixture A/B of docs/results.tex par:v4_mixture)
 
 Open calls, waiting on the user (plan ask, 2026-10-29): the arms' fractions (ARMS), the e+e- energies (EE_ENERGIES),
 the e+e- run-card cuts and ISR (the card below: the catalog's own e+e- acceptance, no ISR), and whether the one-loop,
@@ -39,6 +42,7 @@ sys.path.insert(0, HERE)
 from gen_catalog_v3_pp import PARTONS
 
 ARMS = (0.50, 0.25)                                    # the design's arms B and C (open: the user's call)
+CHOSEN = 0.25          # catalog_v4's default share (D229, D231): catalog_v4_train.yaml
 F_MAX = max(ARMS)
 ACCEPT_MARGIN = 0.10      # extra default events per role for those outside the pool's window or cuts (open, unsourced)
 # a class whose pool keeps less than 1 / (1 + ACCEPT_MARGIN) of its MadEvent events (e+e- with photons or leptons at the
@@ -507,17 +511,20 @@ def main():
         f.write(HDR)
         yaml.safe_dump({"processes": [{"name": k, "sqrts": [13000, 13000], **{s: e["lhe"][s] for s in SIZES}}
                                       for k, e in dsh.items()]}, f, sort_keys=False)
-    base = yaml.safe_load(open(os.path.join(HERE, "catalog_v4_train.yaml")))
+    base = yaml.safe_load(open(os.path.join(HERE, "catalog_v4_base_train.yaml")))
     samp = dict(base.get("sampling") or {})
-    for f_d in ARMS:
+    for f_d in sorted(set(ARMS) | {CHOSEN}):
         procs = []
         for e in base["processes"]:
             src = src_of.get(e["name"]) if not e.get("physics") and e.get("base", e["name"]) == e["name"] else None
             procs.append({**e, "sampling": {**samp, "f_default": f_d, "default_source": src}} if src else e)
-        with open(os.path.join(HERE, f"catalog_v4_default{int(round(100 * f_d)):02d}_train.yaml"), "w") as f:
-            f.write(HDR)
-            yaml.safe_dump({**{k: v for k, v in base.items() if k != "processes"}, "processes": procs}, f,
-                           sort_keys=False)
+        names = [f"catalog_v4_default{int(round(100 * f_d)):02d}_train.yaml"] * (f_d in ARMS) + \
+            ["catalog_v4_train.yaml"] * (f_d == CHOSEN)
+        for name in names:
+            with open(os.path.join(HERE, name), "w") as f:
+                f.write(HDR)
+                yaml.safe_dump({**{k: v for k, v in base.items() if k != "processes"}, "processes": procs}, f,
+                               sort_keys=False)
     n_shared = sum(1 for e in base["processes"] if e["name"] in src_of)
     print(json.dumps({"ee_classes": len(ee), "ee_below_every_energy": skipped, "dsh_entries": len(dsh),
                       "dsh_hadronic": sum(1 for e in dsh.values() if e["reuse"].startswith("pp13")),

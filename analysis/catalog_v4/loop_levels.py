@@ -67,7 +67,7 @@ def heldout(axis):
 
 
 def entries(trees=False):
-    tr = [p for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]
+    tr = [p for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]
           if is_loop(p["name"]) != trees]
     ho = [p for a in TREE_AXES for p in heldout(a)] if trees else heldout("H5")
     return tr, ho
@@ -79,7 +79,7 @@ def dump(trees=False, chunk=0, nchunks=1):
     from omegaconf import OmegaConf, open_dict
     tr, ho = entries(trees)
     parent = os.path.join(os.environ.get("PROJECT_DIR", ROOT), PARENT)
-    rec = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))
+    rec = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))
     rec = {k: v for k, v in rec.items() if k != "processes"}
     rec["processes"] = (tr + ho)[chunk::nchunks]
     rdir = tempfile.mkdtemp(prefix="zz_loop_levels_", dir=os.environ["SCRATCH"])

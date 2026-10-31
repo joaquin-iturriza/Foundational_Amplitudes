@@ -50,7 +50,7 @@ SHAPE = (len(S_EDGES) - 1, len(U_EDGES) - 1, len(Y_EDGES) - 1)
 def pools():
     """pp class -> (catalog_v4 training class or None, catalog_v3 training class or None)"""
     names = [e["name"] for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_pp_test.yaml")))["processes"]]
-    tr4 = {e["name"]: e for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
+    tr4 = {e["name"]: e for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
     tr3 = {e["name"]: e for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v3_train.yaml")))["processes"]}
     cc = json.load(open(os.path.join(HERE, "data", "class_changes.json")))
     holder = {}                                       # catalog_v4 member -> the class whose pool holds it

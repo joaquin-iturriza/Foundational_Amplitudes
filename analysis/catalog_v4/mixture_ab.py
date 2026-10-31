@@ -37,7 +37,7 @@ Step 11, on PP4 (recipes/catalog_v4_pp_test.yaml, test split), the classes the b
   YES  R <= 0.90 with the widened interval below 1;  NO  R >= 0.97 or the widened interval contains 1;
   otherwise a small gain, with its interval. The held-out classes' R is reported (expected: a cost or nothing).
 Step 14, per default share (0.50, 0.25), arm over the catalog_v4 control on three reads: PP4 on all its 1301 classes
-(the classes catalog_v4 trains, recipes/catalog_v4_train.yaml, 797, and the others also reported apart: the design says
+(the classes catalog_v4 trains, recipes/catalog_v4_base_train.yaml, 797, and the others also reported apart: the design says
 "on PP4", reporting the parts apart), EE4 on its 169 probes (split the same way), and the held-out H1..H7c pooled (catalog_v4 probes only, v4_*; each axis
 reported as information), with R_seed taken per read:
   GAIN     R <= 0.90 with the widened interval below 1, on PP4 and on EE4
@@ -370,7 +370,7 @@ def _probes_missing(pair, ctl_pair):
 
 def mixture(partial=False, het=False):
     cls = class_of()
-    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
+    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
     table = MIX_HET if het else MIX
     reads, missing = _reads(table)
     if missing and not (partial or het):
@@ -549,7 +549,7 @@ def bound_default():
     """The bound arm beside the shares, every read on default-sampled events, the same control pair and measure as
     mixture (MSE runs); the rule's verdict is not applied (the bound is a reference, not a candidate share)"""
     cls = class_of()
-    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
+    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
     table = {"bound": {"PP4": BOUND_DEFAULT["PP4"], "EE4": BOUND_DEFAULT["EE4"]},
              **{a: {r: MIX[a][r] for r in ("PP4", "EE4")} for a in ("default50", "default25", "control")}}
     reads, missing = _reads(table)

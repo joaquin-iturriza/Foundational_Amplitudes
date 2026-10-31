@@ -14,7 +14,7 @@ import plot_style as ps  # noqa: E402
 d = json.load(open(os.path.join(ROOT, "analysis/catalog_v4/data/mixed_order_audit.json")))["entries"]
 fig, ax = ps.figure()
 cats = ["2->2", "2->2 one-loop", "2->3", "2->3 one-loop", "2->4", "2->5"]
-for i, (rf, lab, col) in enumerate([("catalog_v4_train", "training", ps.C.blue),
+for i, (rf, lab, col) in enumerate([("catalog_v4_base_train", "training", ps.C.blue),
                                     ("catalog_v4_shared_heldout", "shared held-out", ps.C.orange)]):
     tot, mix = {}, {}
     for p in yaml.safe_load(open(os.path.join(ROOT, f"recipes/{rf}.yaml")))["processes"]:

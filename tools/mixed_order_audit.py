@@ -15,7 +15,7 @@ QCD order; for a single monomial y is the same function of the momenta in every 
 of each final pair's invariant mass, the pair with the largest spread), means compared with the nominal pool's: the
 weighted mean and the largest bin difference, and a pure process of the same scan as the control.
 
-python tools/mixed_order_audit.py --recipes recipes/catalog_v4_train.yaml ... --scans --out <json>
+python tools/mixed_order_audit.py --recipes recipes/catalog_v4_base_train.yaml ... --scans --out <json>
 """
 import argparse
 import glob

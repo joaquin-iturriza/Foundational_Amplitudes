@@ -187,10 +187,10 @@ def test_read_and_mixture():
 
 def test_generated():
     """The generated entries and recipes: every training tree class of a hadronic or e+e- beam has a dsh source whose
-    events plus its reuse pool's cover the largest arm's share in every role; the arms differ from catalog_v4_train.yaml
+    events plus its reuse pool's cover the largest arm's share in every role; the arms differ from catalog_v4_base_train.yaml
     only by the share; the e+e- card is an e+e- card."""
     import gen_catalog_v4_default as g
-    base = yaml.safe_load(open(R("catalog_v4_train.yaml")))
+    base = yaml.safe_load(open(R("catalog_v4_base_train.yaml")))
     for f in g.ARMS:
         arm = yaml.safe_load(open(R(f"catalog_v4_default{int(round(100 * f)):02d}_train.yaml")))
         assert len(arm["processes"]) == len(base["processes"])

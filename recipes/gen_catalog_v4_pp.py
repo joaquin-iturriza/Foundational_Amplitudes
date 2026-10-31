@@ -22,7 +22,7 @@ Writes
   catalog_v4_pp_test.yaml        every hadronic catalog_v4 class (training and the held-out H1, H2, H3): pp13v4_<x> when
                                  regenerated, its pp13_<x> pool when reused
   catalog_v4_pp_train.yaml       every hadronic catalog_v4 training class, the same names
-  catalog_v4_pp_mixed_train.yaml catalog_v4_train.yaml with every hadronic tree class swapped for its pp version
+  catalog_v4_pp_mixed_train.yaml catalog_v4_base_train.yaml with every hadronic tree class swapped for its pp version
   catalog_v4_pp_part<k>.yaml     the regenerated entries in 8 parts, one CPU generation job each
   catalog_v4_pp_parts.yaml       the entries built as one-run part jobs (lhe.parts), tools/lhe_parts.py plan's spec
 A process whose catalog_v3 pp run came back short or stalled starts at that run's margin or run count
@@ -149,7 +149,7 @@ def main():
         with open(os.path.join(HERE, fn), "w") as f:
             f.write(hdr)
             yaml.safe_dump({"processes": es}, f, sort_keys=False)
-    base = yaml.safe_load(open(os.path.join(HERE, "catalog_v4_train.yaml")))
+    base = yaml.safe_load(open(os.path.join(HERE, "catalog_v4_base_train.yaml")))
     swap = {n: {"name": name(n), "sqrts": [13000, 13000], **sz} for n in train}
     mixed = [swap.get(e["name"], e) for e in base["processes"]]
     assert sum(e["name"] in swap for e in base["processes"]) == len(train), "a hadronic training class not in the recipe"

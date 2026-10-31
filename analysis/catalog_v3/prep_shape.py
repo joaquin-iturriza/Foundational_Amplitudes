@@ -18,7 +18,7 @@ tree classes, and every class of the held-out axes H1, H2, H2p5, H3, H6, H7c, H7
 the signed check is apart). Pools with a non-positive |M|^2 or fewer events are listed as skipped, with the reason.
     python analysis/catalog_v3/prep_shape.py [--workers 32] [--n-fit 7500 --n-score 2500] [--tag ""]
                                               (a CPU job on CC: scripts/job_prep_shape_v3.sh)
---catalog v4 (the zero-shot shape gap, v3_prep_explore): every tree pool of catalog_v4_train.yaml (no draw) and the
+--catalog v4 (the zero-shot shape gap, v3_prep_explore): every tree pool of catalog_v4_base_train.yaml (no draw) and the
 tree held-out axes H1, H2, H3, the intrinsic-difficulty control of analysis/catalog_v4/loop_levels.py --shape-gap;
 --targets restricts the targets (qperp is the control pretraining's).
 Output: $SCRATCH/zz_v3_prep/prep_shape<tag>.json and one SHAPE line per class.

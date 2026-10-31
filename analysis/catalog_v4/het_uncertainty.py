@@ -27,7 +27,7 @@ npz pool / pool_row): per event
 binned in deciles of the read (edges from control seed 42's events of the same read group), per run and bin: median
 s, RMSE, and the same on per-probe normalised values (s over its probe's median s, |q - t| over its probe's RMSE;
 information: it takes the class mix out of the bins).
-Read groups: PP4 and EE4 each split into trained classes (recipes/catalog_v4_train.yaml) and not trained; held-out
+Read groups: PP4 and EE4 each split into trained classes (recipes/catalog_v4_base_train.yaml) and not trained; held-out
 H1..H7c pooled and per axis (catalog-sampled); held_default, the default-sampled held-out pools HD4 (114 tree classes)
 and HD5 (28 one-loop classes) of the step-20 REREADs, pooled and per pool, rule B on it beside (D227).
 
@@ -135,7 +135,7 @@ def bins_of(x, edges, s, e, sn, en):
 def run(workers, runs=None):
     from multiprocessing import Pool
     cls = class_of()
-    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
+    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
     S = os.environ["SCRATCH"]
     tasks = []
     for run_id, (arm, _) in RUNS.items():

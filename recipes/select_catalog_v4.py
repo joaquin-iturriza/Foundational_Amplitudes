@@ -32,7 +32,8 @@ Roles then rechecked, not redrawn:
   twin    the removal twin's tau / tau-neutrino (H3p) and quartic gauge (H4) classes by catalog_v3's rule on the v4
           representatives (the pool a class trains on)
 Writes analysis/catalog_v4/census_classes.json ({classes: {representative: members}, representatives}),
-recipes/catalog_v4_roles.json, recipes/catalog_v4_gen_stage5.yaml, catalog_v4_train.yaml, catalog_v4_twin_train.yaml
+recipes/catalog_v4_roles.json, recipes/catalog_v4_gen_stage5.yaml, catalog_v4_base_train.yaml (the catalog-sampled
+training recipe; catalog_v4_train.yaml, the one in use, is it with the chosen default share: gen_catalog_v4_default.py), catalog_v4_twin_train.yaml
 and catalog_v4_heldout_<axis>.yaml, and prints every split and merge with what it changed
 (analysis/catalog_v4/data/class_changes.json).
     python3 recipes/select_catalog_v4.py
@@ -290,7 +291,7 @@ def main():
     quart = [e for e in train if e not in seen and rep_of.get(base.get(e["name"], e["name"])) in set(twin_out)]
     out = {e["name"] for e in seen + quart}
     counts = {"catalog_v4_gen_stage5.yaml": dump("catalog_v4_gen_stage5.yaml", stage5),
-              "catalog_v4_train.yaml": dump("catalog_v4_train.yaml", train),
+              "catalog_v4_base_train.yaml": dump("catalog_v4_base_train.yaml", train),
               "catalog_v4_twin_train.yaml": dump("catalog_v4_twin_train.yaml", [e for e in train if e["name"] not in out])}
     for a, es in held.items():
         counts[f"catalog_v4_heldout_{a}.yaml"] = dump(f"catalog_v4_heldout_{a}.yaml", es)

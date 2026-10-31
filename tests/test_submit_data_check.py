@@ -14,7 +14,7 @@ def test_arm_recipe():
     assert g.arm_recipe(SCRIPT, "v4_dimensionless_muon_default50") == "recipes/catalog_v4_default50_train.yaml"
     assert g.arm_recipe(SCRIPT, "v4_dimensionless_muon_default25_seed2") == "recipes/catalog_v4_default25_train.yaml"
     assert g.arm_recipe(SCRIPT, "v4_dimensionless_muon_pp_seed2") == "recipes/catalog_v4_pp_mixed_train.yaml"
-    assert g.arm_recipe(SCRIPT, "v4_dimensionless_muon") == "recipes/catalog_v4_train.yaml"
+    assert g.arm_recipe(SCRIPT, "v4_dimensionless_muon") == "recipes/catalog_v4_base_train.yaml"
     assert g.arm_recipe(SCRIPT, "dimensionless") == "recipes/catalog_v3_train.yaml"        # the default before the case
     assert g.arm_recipe("echo no recipe\n", "x") is None
 

@@ -40,7 +40,7 @@ import yaml  # noqa: E402
 import mg5_pipeline_final as mg  # noqa: E402
 from tools import lhe_parts as lp  # noqa: E402
 
-TRAIN_RECIPE = os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")
+TRAIN_RECIPE = os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")
 
 
 def _queues(qs):

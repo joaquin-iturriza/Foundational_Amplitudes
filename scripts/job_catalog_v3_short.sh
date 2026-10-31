@@ -93,7 +93,7 @@ case "$ARM" in
     sign_search_best)       OUT_FIXED=runs/sign_head_search/trial_0177 ;;
     # catalog_v4's short pretrainings against catalog_v3's (catalog_coverage; D130 the coverage, D155 Muon): the
     # dimensionless arm with MuonAdamW at the Muon search's best (trial_1860 above: lr 4.997423e-3, decoupled weight
-    # decay 0.02171863, the rest the arm's) on recipes/catalog_v4_train.yaml (1153 pools) at catalog_v3's 4264 steps:
+    # decay 0.02171863, the rest the arm's) on recipes/catalog_v4_base_train.yaml (1153 pools) at catalog_v3's 4264 steps:
     # same steps and batch, so about 6 epochs of each pool's 1e4 events where catalog_v3 has 5. Seeds 42 and 43; the
     # catalog_v3 pair is dimensionless_muon_best (trial_1860 retrained, seed 42) and dimensionless_muon_best_seed2 (seed 43). Besides its own
     # axes each reads the other catalog's pools of the probes held out in both (XV3/XV4,
@@ -104,23 +104,23 @@ case "$ARM" in
     # (2 of 1397 pools), so both catalog_v3 seeds now carry what catalog_v4's do
     dimensionless_muon_best) NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV4 PP) ;;
     v4_dimensionless_muon)  CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP)
-                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml"; ITERS_FIXED=4264 ;;
     v4_dimensionless_muon_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP)
-                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml"; ITERS_FIXED=4264 ;;
     # third and fourth seeds (44, 45) of the control and of the sign extension (v3_prep_explore, the user 2026-10-30:
     # "Okay, yes to both"), everything else as the first two
     v4_dimensionless_muon_seed3|v4_dimensionless_muon_seed4) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP)
                             case "$ARM" in *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
-                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml"; ITERS_FIXED=4264 ;;
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml"; ITERS_FIXED=4264 ;;
     # the pure-default bound (catalog_coverage, the design of 2026-10-29): the control v4_dimensionless_muon[_seed2]
-    # with only the training recipe changed, catalog_v4_train.yaml with its 797 hadronic tree training classes on their
+    # with only the training recipe changed, catalog_v4_base_train.yaml with its 797 hadronic tree training classes on their
     # pp pools (466 pp13v4_, 331 reused pp13_; 1e4/2e3/2e3 events against 1e5/1e4/1e4); the other 356 entries are the
     # control's pools (analysis/catalog_v4/control_pool_check.py: 1068 of 1068 the same files and recipe ids); the same
     # 4264 steps
     v4_dimensionless_muon_pp)       CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(XV3 PP PP4)
                                     TRAIN="$PROJECT_DIR/recipes/catalog_v4_pp_mixed_train.yaml"; ITERS_FIXED=4264 ;;
     # the mixture A/B (catalog_coverage step 14, D178; the shares D194): v4_dimensionless_muon[_seed2] with only the training recipe
-    # changed, catalog_v4_train.yaml with a default-sampled (MadEvent) share of 0.50 or 0.25 of each tree pool taken out
+    # changed, catalog_v4_base_train.yaml with a default-sampled (MadEvent) share of 0.50 or 0.25 of each tree pool taken out
     # of the RAMBO bulk, the 0.35 flat and 0.15 forward shares kept (recipes/catalog_v4_default{50,25}_train.yaml);
     # read besides on the pp pools' test split (PP4) and the e+e- default test pools (EE4)
     v4_dimensionless_muon_default50|v4_dimensionless_muon_default50_seed2|v4_dimensionless_muon_default25|v4_dimensionless_muon_default25_seed2)
@@ -131,7 +131,7 @@ case "$ARM" in
     v4_dimensionless_muon_pp_seed2) CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" seed=43); CROSS=(XV3 PP PP4)
                                     TRAIN="$PROJECT_DIR/recipes/catalog_v4_pp_mixed_train.yaml"; ITERS_FIXED=4264 ;;
     # catalog_v4 with more sign-changing one-loop pools (plan v3_prep_explore, the design of 2026-10-29): the control
-    # v4_dimensionless_muon[_seed2] with only the training recipe changed, catalog_v4_train.yaml plus the extension's
+    # v4_dimensionless_muon[_seed2] with only the training recipe changed, catalog_v4_base_train.yaml plus the extension's
     # pools whose train split holds both signs ($SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml, written by
     # scripts/job_catalog_v4_signext.sh, which builds their sidecars); the same 4264 steps. No XV3 read: catalog_v3's
     # pools are deleted (D167)
@@ -140,12 +140,12 @@ case "$ARM" in
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
                             TRAIN="$SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml"; ITERS_FIXED=4264
                             # the control's pools, in its order, then only one-loop extension pools
-                            python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_train.yaml" <<'PY' || exit 1
+                            python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" <<'PY' || exit 1
 import sys, yaml
 a, b = (yaml.safe_load(open(f)) for f in sys.argv[1:])
 n = len(b["processes"]); ext = a["processes"][n:]
 assert a["processes"][:n] == b["processes"] and {k: v for k, v in a.items() if k != "processes"} == \
-    {k: v for k, v in b.items() if k != "processes"}, "V4_SIGNEXT base recipe differs from catalog_v4_train.yaml"
+    {k: v for k, v in b.items() if k != "processes"}, "V4_SIGNEXT base recipe differs from catalog_v4_base_train.yaml"
 assert ext and all(p["name"].endswith("_nlo") for p in ext), "V4_SIGNEXT extension pools missing or not one-loop"
 print(f"V4_SIGNEXT_RECIPE {n} control pools + {len(ext)} sign-changing one-loop pools")
 PY
@@ -214,7 +214,7 @@ PY
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             ITERS_FIXED=4264
-                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_train.yaml" ;;
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
     v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2)
                             CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4); HET=1
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac

@@ -48,7 +48,7 @@ N_EVENTS, TOL_STEP = 2000, 0.2
 
 def recipe_entries():
     out = {}
-    for f in ("catalog_v4_train.yaml", "catalog_v4_heldout_H5.yaml"):
+    for f in ("catalog_v4_base_train.yaml", "catalog_v4_heldout_H5.yaml"):
         for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f)))["processes"]:
             out[p["name"]] = p
     return out
@@ -152,14 +152,14 @@ def read():
 def shift_census():
     """catalog_v4's one-loop entries (the _nlo entries of its training recipe and of every held-out recipe,
     recipes/catalog_v4_heldout_*.yaml, each entry counted once) by the mass-scheme shift generate_virt_dataset gives
-    them (the removal twin's axes H3p and H4 excepted: they train in catalog_v4_train.yaml): virt_evaluator's own rule (nlo_virtual_pipeline.scheme_shift_mass), counted by role and by the shift's mass."""
+    them (the removal twin's axes H3p and H4 excepted: they train in catalog_v4_base_train.yaml): virt_evaluator's own rule (nlo_virtual_pipeline.scheme_shift_mass), counted by role and by the shift's mass."""
     import mg5_pipeline_final as mg
     import nlo_virtual_pipeline as nv
     names = {"train": set(), "heldout": set()}
     # the removal twin's axes (H3p, H4) are held out of the twin's recipe only: their classes train in
-    # catalog_v4_train.yaml (recipes/gen_catalog_v4.py, the same exclusion), so they count as training here
+    # catalog_v4_base_train.yaml (recipes/gen_catalog_v4.py, the same exclusion), so they count as training here
     twin_axes = ("catalog_v4_heldout_H3p.yaml", "catalog_v4_heldout_H4.yaml")
-    files = [("catalog_v4_train.yaml", "train")] + [
+    files = [("catalog_v4_base_train.yaml", "train")] + [
         (os.path.basename(f), "heldout") for f in sorted(glob.glob(os.path.join(ROOT, "recipes", "catalog_v4_heldout_*.yaml")))
         if os.path.basename(f) not in twin_axes]
     for f, role in files:

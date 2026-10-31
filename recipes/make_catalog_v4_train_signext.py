@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """The training recipe of catalog_v4's arm with more sign-changing one-loop pools (v4_dimensionless_muon_more_signed;
-plan v3_prep_explore, the design of 2026-10-29): recipes/catalog_v4_train.yaml unchanged plus, from the extension
+plan v3_prep_explore, the design of 2026-10-29): recipes/catalog_v4_base_train.yaml unchanged plus, from the extension
 recipes/catalog_v4_gen_signext.yaml (123 one-loop pools of the coloured 2->3 training tree classes outside the one-loop
 layer), only the pools whose train role holds events of both signs and no audit flag, read from the extension's audit
 (analysis/catalog_v3/pool_audit.py --stages v4_signext). As recipes/make_catalog_v3_train_signext.py.
@@ -46,7 +46,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--summary", default=None, help="where to write the kept / dropped lists (json)")
     a = ap.parse_args()
-    base = yaml.safe_load(open(os.path.join(ROOT, "recipes/catalog_v4_train.yaml")))
+    base = yaml.safe_load(open(os.path.join(ROOT, "recipes/catalog_v4_base_train.yaml")))
     ext = yaml.safe_load(open(os.path.join(ROOT, "recipes/catalog_v4_gen_signext.yaml")))["processes"]
     failed = read_failed(a.cert_failed)
     out, summ = build(base, ext, json.load(open(a.audit))["pools"], failed)
