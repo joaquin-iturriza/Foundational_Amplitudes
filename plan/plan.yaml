@@ -5367,6 +5367,9 @@ entries:
       write-up of what changed and what was measured'
     4: 'Matched small-model trial (needs Joaquin''s go): 10 small tool-fix/analysis tasks each run on Sonnet 5.5 and on Opus
       5.5 at low effort, same briefs, scored by tools/agent_tasks.py plus a hand read; about $30 at list price'
+    5: 'Context cuts for agents: lower effort on mechanical calls (hidden thinking ~15k/call at median, 29k at last), trim
+      the skill listing (~7k) and prompt snapshot (~6k) in agents'' fixed part, shorten or once-only hook pushes (7-9k); each
+      measured with tools/context_breakdown.py and tools/usage_windows.py before and after'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -5416,6 +5419,12 @@ entries:
       if:
       - 'Sonnet stands within 0.1 of Opus-low and costs <=0.6x with rework: route small tool fixes and analyses to Sonnet'
       - 'otherwise: keep Opus at low effort for mechanical steps (D138)'
+    5:
+      feeds: 'whether agent cost per call and per window falls further (redesign agents: $0.053/call, 45% cache read, 33%
+        cache write, 22% output)'
+      if:
+      - 'context per call and $ per call fall with no rise in corrections (tools/agent_tasks.py): keep the cuts'
+      - 'no fall, or more corrections: revert that cut and record it as a dead end'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
