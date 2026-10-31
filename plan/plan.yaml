@@ -6036,6 +6036,11 @@ entries:
     6: 'Cut 1 live check: after 10 subagents have run past 85064616, python3 tools/push_replay.py --since 2026-10-31T00:25:00Z
       --check (in-force hook reproduces recorded REFERENCE chars within 5 percent), matched saving per agent, hand read of
       every correction of them for a cause in a withheld section'
+    7: 'Model trial extension (D212): 20-30 more past mechanical fixes picked by the validate rule (40 candidates validating
+      detached, model_trial_validate_ext_{a,b,c,d}.json), arms sonnet / opuslow / sonnetlow (sonnetlow also on the first ten),
+      revised design through the design reviewer, hand read of every diff, report per arm pooled with CIs (model_trial.py
+      report). Sizing (model_trial.py size @da75d1f9): ratio CI half-width 0.045 already at 10 pairs; error rate drives n:
+      at 35 pairs a first-pass failure-rate difference of 0.30 is detectable (McNemar, power 0.8).'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -6130,6 +6135,11 @@ entries:
       if:
       - 'reproduced and no correction traced: keep, write up'
       - 'a correction traced to a withheld section: remove that header line, dead end'
+    7:
+      feeds: route mechanical code fixes to Sonnet (default or low effort) or keep Opus low (D138)
+      if:
+      - 'a Sonnet arm passes within 0.1 of opuslow and costs <=0.7x with CI: propose the routing CLAUDE.md line to Joaquin'
+      - 'a Sonnet arm fails more often or the ratio CI reaches 1: keep Opus low, record dead end'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
