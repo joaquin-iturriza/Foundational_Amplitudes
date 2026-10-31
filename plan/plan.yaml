@@ -1771,7 +1771,7 @@ entries:
   step_waits: {}
   owner:
     agent: aaa8b1f043eaa6ee9
-    state: working
+    state: closed
     since: '2026-10-31T00:17:19+00:00'
     context: 223454
     context_at: '2026-10-31T01:08:54+00:00'
@@ -1807,28 +1807,36 @@ entries:
     start: '2026-10-31T00:40:30+00:00'
     at: '2026-10-31T00:40:30+00:00'
   handoff:
-    state: 'Done this owner: the one-loop sign extension on catalog_v4 at four seeds, yes by the design''s rule (18/21 pools
-      lower, p=0.001, median wrong-sign 6.69% -> 2.91%; tree-axis MSE cost 1.03-1.25x), par:v4_signext; the user kept it a
-      result, not in the full pretraining (D199), step closed. The shape gap decided (par:v4_shape_gap, tab:v4_shape_gap):
-      multiplicity pools a transfer gap (median e 0.383 / 0.356), new combinations at the floor (0.297 / 0.270); notes-editor
-      passed @30b8fde9. Open: step 6, the dipole read (CPU, design passed 2026-10-30 22:28) as the first candidate input prior
-      for the multiplicity gap; its gate is pending on the running CPU job.'
-    decisions: 'Dipole read made CPU-only after the design review''s FIX (the emission-scale target already holds a per-event
-      soft scale, so a no-network gate comes first: median r^2 of the target t on log D < 0.1 ends it). Event alignment by
-      saved indices (zero_shot_parent saves idx and pool since 902b96c5) with a correlation check, because the old reads''
-      events are neither the pool''s first rows nor matchable by value (dead end FA-ccin2p3-464da136). Submissions on CC only:
-      the control checkpoints and catalog_v4 data live there (lxplus lacks both); real time limits on every job, since the
-      site gate counts the time limit.'
-    ruled_out: lxplus for these jobs (no checkpoints, no catalog_v4 data, venv broken); matching events by log|M|^2 value;
-      the per-process colour weight in the target (par:v4_mult_cand); the GPU dipole reread design as first written (review
-      FIX).
-    running: 'FA-ccin2p3-3a2a388b: the dipole CPU read on CC (outputs $SCRATCH/zz_v4_dipole_62894489, DIPOLE_RESIDUAL lines
-      in its log); step 6 says how to read and decide it. CC /sps/lpnhe at 91%: write nothing large.'
-    files: analysis/catalog_v4/signext_compare.py, analysis/catalog_v4/data/signext_compare.json, analysis/catalog_v4/dipole_residual.py,
-      scripts/job_v4_dipole_residual.sh, scripts/job_catalog_v3_short.sh (seeds 44/45 arms), tools/zero_shot_parent.py (idx,
-      pool saved), analysis/catalog_v4/data/shape_gap.json, docs/results.tex (par:v4_signext, par:v4_shape_gap). Code changes
-      of 902b96c5, a1cc783e, 99ec191c, 036a8b19, 0e0cf15e not yet reviewed by the repo-reviewer.
-    written: '2026-10-31T00:16:30+00:00'
+    state: 'Done this owner: the dipole read repaired (pool rows rebuilt from the role shuffle, b5173fa7; zero_shot_parent
+      saves pool_row) and read: dead end, gate 0.094 (par:v4_dipole). The propagator-product read FA-ccin2p3-71a96ca2: between
+      by its rule, no GPU arm (gate 0.106; ceiling eta^2 0.122/0.119 held out vs 0.036/0.041 training; eta^2(u|log P) 0.042
+      vs 0.015 training, above the placebos, under half the ceiling; size read 0.005/0.006), Higgs width check r^2 >= 0.9999996
+      so no re-run (par:v4_prop @5f15e75b). Open, step 6: the cross-pool joint read. Its design (revised once after a FIX:
+      the first version fitted each held-out pool on its own labels, a K-shot fit) is recorded and the design reviewer is
+      re-checking it. On PASS: implement stage 1 (a mode of dipole_residual.py dumping per probe 500 events, seed 0, of the
+      leg-order-free features and u to a small npz under SCRATCH) and stage 2 (one script: HistGradientBoostingRegressor 300
+      iterations fitted on all training pools, grouped 5-fold by pool for the training score, applied to held-out pools; f
+      = (median var_ho - median var(u - u_hat)_ho) / (median var_ho - median var_tr); beside it the factors-only map and the
+      per-pool own-label ceiling); dry-run 5 probes on CC; submit stage 1 as four jobs (arm x axis, scripts/job_v4_dipole_residual.sh
+      takes MODE ARMS AXES), then stage 2. On a second FIX: record a dead end (one revision allowed).'
+    decisions: 'Verdict for the propagator read taken from 71a96ca2: every read is an r^2, eta^2 or decile share and log P
+      at the two Higgs widths agrees to r^2 >= 0.9999996 on the 253 pools with an internal Higgs line (prop_width_check.py).
+      The decision is over all multiplicity cells; per-cell results are diagnostics (the design''s rule). The control already
+      gets offshell_per_event, internal_mass_scalars, coupling_scalars and the diagrams (use_diagrams) but target_propagators
+      false (config read on CC), so any propagator yes goes into the target, not as an input. The joint read''s deciding map
+      uses no held-out labels (review FIX: a per-pool fit is a K-shot correction, not a prior). The step agent''s own Higgs
+      width matters only for log P: MW in dipole_residual.py now holds the card''s 6.382339e-3 (97c43af9).'
+    ruled_out: The soft-dipole factor as a prior for the multiplicity gap (par:v4_dipole); the propagator product alone (par:v4_prop,
+      between); a per-pool out-of-fold fit as the deciding measure (review FIX 2026-10-31); log P as an input (repeats the
+      off-shellness input the control has); lxplus for these jobs (no checkpoints, no catalog_v4 data).
+    running: none (FA-ccin2p3-71a96ca2 ended and read; the design reviewer is re-checking the cross-pool joint design)
+    files: 'analysis/catalog_v4/dipole_residual.py (pool_rows, log_prop, eta2, tail_share, joint_features and joint_r2: the
+      per-pool joint fit, to be replaced by the cross-pool stages), analysis/catalog_v4/dipole_gate.py (--prop: per cell and
+      the design rule), analysis/catalog_v4/prop_width_check.py, analysis/catalog_v4/data/{dipole_residual,prop_residual}/,
+      analysis/catalog_v4/data/{dipole_gate,prop_gate}.json, scripts/job_v4_dipole_residual.sh (MODE dipole|prop|joint, ARMS,
+      AXES), tests/test_dipole_pool_rows.py, tools/zero_shot_parent.py (pool_row), docs/results.tex (par:v4_dipole, par:v4_prop).
+      Commits b5173fa7..6abdc895 not yet reviewed by the repo-reviewer.'
+    written: '2026-10-31T01:12:20+00:00'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
