@@ -165,22 +165,33 @@ def deliver(session, who, found, reset=False):
             if mine.get(name) != h:
                 mine[name] = h
                 queue += parts(name, body)
+        # largest first, filled with what still fits (a section's parts in order): the fewest outputs
         new, used = [], 0
-        while queue and (not new or used + 2 + len(queue[0]) <= LIMIT):
-            used += len(queue[0]) + 2
-            new.append(queue.pop(0))
+        for t in sorted(queue, key=len, reverse=True):
+            name = t.split(None, 2)[1]
+            first = next(u for u in queue if u.split(None, 2)[1] == name)
+            if t is first and (not new or used + 2 + len(t) <= LIMIT):
+                used += len(t) + 2
+                new.append(t)
+                queue.remove(t)
         if queue:
             mine["_pending"] = queue
         if not new and not reset:
-            return []
+            return [], []
         tmp = p + ".tmp"
         json.dump(st, open(tmp, "w"))
         os.replace(tmp, p)
-    return new
+    return new, [t.split(None, 2)[1] for t in queue]
 
 
 def respond(inp, mode="post"):
-    """The additionalContext text for one hook input (None when nothing is new), delivery recorded."""
+    """(event, the additionalContext text for one hook input or None when nothing is new, delivery recorded).
+    respond_full adds the sections this call triggered that are still pending (a PreToolUse with any is held)."""
+    ev, text, _ = respond_full(inp, mode)
+    return ev, text
+
+
+def respond_full(inp, mode="post"):
     secs = sections()
     who = inp.get("agent_id") or "main"
     ev = inp.get("hook_event_name") or {"pre": "PreToolUse", "post": "PostToolUse", "session": "SessionStart"}[mode]
@@ -188,14 +199,16 @@ def respond(inp, mode="post"):
         if inp.get("agent_id"):
             return ev, None
         found = [(n, b) for n, h, b in secs if "main" in " ".join(h.get("session") or [])]
-        new = deliver(inp.get("session_id"), "main", found, reset=inp.get("source") in ("compact", "clear"))
+        new, _ = deliver(inp.get("session_id"), "main", found, reset=inp.get("source") in ("compact", "clear"))
         ev = "SessionStart"
+        held = []
     else:
         found = matches(inp.get("tool_name") or "", inp.get("tool_input") or {}, secs, who)
-        new = deliver(inp.get("session_id"), who, found)
+        new, pending = deliver(inp.get("session_id"), who, found)
+        held = sorted({n for n, _ in found} & set(pending)) if ev == "PreToolUse" else []
     if not new:
-        return ev, None
-    return ev, "\n\n".join(new)
+        return ev, None, held
+    return ev, "\n\n".join(new), held
 
 
 def main():
@@ -206,9 +219,19 @@ def main():
         return 0
     if not isinstance(inp, dict):
         return 0
-    ev, text = respond(inp, mode)
+    ev, text, held = respond_full(inp, mode)
+    out = {"hookEventName": ev}
     if text:
-        print(json.dumps({"hookSpecificOutput": {"hookEventName": ev, "additionalContext": text}}))
+        out["additionalContext"] = text
+    if held:
+        # one output holds at most LIMIT chars: the call waits until every section it triggers has arrived
+        heads = [l for l in (text or "").splitlines() if l.startswith("REFERENCE ")]
+        out.update(permissionDecision="deny", permissionDecisionReason=(
+            "Not run yet: the reference section(s) %s this call needs do not fit in one hook output; %s arrived now "
+            "as context, the rest arrives when you send the same call again (nothing else is needed)."
+            % (", ".join(held), "; ".join(re.sub(r" \((part \d+ of \d+)?.*", r" \1", h[10:]).strip() for h in heads))))
+    if len(out) > 1:
+        print(json.dumps({"hookSpecificOutput": out}))
     return 0
 
 if __name__ == "__main__":

@@ -217,8 +217,27 @@ def push(inp, state, dirs=None):
                        input=J({k: v for k, v in inp.items() if k != "_mode"}), env=env, capture_output=True, text=True)
     if r.returncode or not r.stdout.strip():
         return r.returncode, []
-    text = json.loads(r.stdout)["hookSpecificOutput"]["additionalContext"]
+    text = json.loads(r.stdout)["hookSpecificOutput"].get("additionalContext", "")
     return 0, [l.split()[1] for l in text.splitlines() if l.startswith("REFERENCE ")]
+
+
+def push_run(inp, state, dirs=None, most=4):
+    """(sections delivered, held calls) of one PreToolUse call sent again while the hook holds it (a section longer
+    than one output arrives over several sends; the call runs only once all it triggers has arrived)."""
+    env = dict(os.environ, CONTEXT_STATE=state, CLAUDE_PROJECT_DIR=ROOT)
+    if dirs:
+        env["CONTEXT_DIRS"] = dirs
+    names, held = [], 0
+    for _ in range(most):
+        r = subprocess.run([sys.executable, os.path.join(HOOKS, "context_push.py"), inp.get("_mode", "post")],
+                           input=J({k: v for k, v in inp.items() if k != "_mode"}), env=env, capture_output=True,
+                           text=True)
+        out = json.loads(r.stdout)["hookSpecificOutput"] if r.stdout.strip() else {}
+        names += [l.split()[1] for l in out.get("additionalContext", "").splitlines() if l.startswith("REFERENCE ")]
+        if out.get("permissionDecision") != "deny":
+            return sorted(set(names)), held
+        held += 1
+    return sorted(set(names)), -1
 
 
 def d3():
@@ -238,9 +257,9 @@ def d3():
     c = push(bash("C", 'git commit -m "sweep_manager.py: fix" -- x'), st)
     scenario("D3: a commit message naming sweep_manager.py pushes nothing (git sections aside)",
              not any(n.startswith("fa-sweeps") for n in c[1]), c)
-    g = push(bash("D", "python sweep/generate_sweep.py --config x"), st)
+    g = push_run(bash("D", "python sweep/generate_sweep.py --config x"), st)
     scenario("D3: python sweep/generate_sweep.py --config x pushes fa-sweeps-and-hpo and fa-canonical-setup before it "
-             "runs", {"fa-sweeps-and-hpo", "fa-canonical-setup"} <= set(g[1]), g)
+             "runs (held until both arrived)", {"fa-sweeps-and-hpo", "fa-canonical-setup"} <= set(g[0]) and g[1] >= 0, g)
     # an edited section is pushed again (a scratch copy of the sections)
     d = tempfile.mkdtemp(prefix="secs_")
     for f in glob.glob(os.path.join(ROOT, ".claude", "context", "fa-model.txt")):
@@ -279,8 +298,8 @@ def d3():
             if os.path.basename(f) in firsts:
                 break
     st3 = tempfile.mkdtemp(prefix="push_")
-    got = {k: push(bash(k, v), st3)[1] for k, v in firsts.items()}
-    miss = {k: v for k, v in got.items() if not {"fa-generation", "fa-catalog-reference"} <= set(v)}
+    got = {k: push_run(bash(k, v), st3) for k, v in firsts.items()}
+    miss = {k: v for k, v in got.items() if not {"fa-generation", "fa-catalog-reference"} <= set(v[0]) or v[1] < 0}
     scenario("D3: the first lhe_parts command of each of the night's %d subagents that ran one pushes fa-generation "
              "and fa-catalog-reference before it runs" % len(firsts), firsts and not miss,
              {k: (firsts[k][:120], v) for k, v in list(miss.items())[:3]})

@@ -10,6 +10,8 @@ using the sections found in --dirs (default: the live section directories). Per 
   token_calls     sum over pushes of tokens(push) * (calls after the push): what the push costs in context over the
                   agent's remaining calls (each later call re-reads it)
   per_call        token_calls / calls: the push's share of context per call
+  held_calls      PreToolUse calls the hook held (a section the call triggers did not fit in one output), each sent
+                  again and counted as one more call
 tokens(push) = 1.722 * chars/4 (tools/context_breakdown.py's fit of API context growth on chars/4, f3624f9c).
 --check compares the replayed pushed_chars with the REFERENCE text actually recorded in each transcript (only
 meaningful with the live directories over a period when the live sections were in force).
@@ -55,7 +57,7 @@ def load_hook(dirs, hook=None, state=None):
 def replay(path, cp):
     """(calls, pushes [(call index, chars received)], recorded REFERENCE chars) of one transcript. A hook output over
     HARNESS_CAP chars reaches the agent as a PREVIEW-char preview (the harness's persisted-output), as recorded."""
-    calls, seen, pushes, recorded = -1, set(), [], 0
+    calls, seen, pushes, recorded, holds = -1, set(), [], 0, 0
     agent = os.path.basename(path)[:-6]
     for line in open(path, errors="replace"):
         try:
@@ -85,10 +87,18 @@ def replay(path, cp):
                     continue
                 inp = {"session_id": "replay_" + agent, "agent_id": agent, "tool_name": tool, "tool_input": ti,
                        "hook_event_name": "PreToolUse" if phase == "pre" else "PostToolUse"}
-                _, text = cp.respond(inp, phase)
-                if text:
-                    pushes.append((calls, len(text) if len(text) <= HARNESS_CAP else PREVIEW))
-    return calls + 1, pushes, recorded
+                while True:
+                    if hasattr(cp, "respond_full"):
+                        _, text, held = cp.respond_full(inp, phase)
+                    else:
+                        (_, text), held = cp.respond(inp, phase), []
+                    if text:
+                        pushes.append((calls, len(text) if len(text) <= HARNESS_CAP else PREVIEW))
+                    if not held or phase != "pre":
+                        break
+                    calls += 1                     # the held call is sent again: one more call
+                    holds += 1
+    return calls + 1, pushes, recorded, holds
 
 
 def main():
@@ -111,18 +121,19 @@ def main():
             continue
         if not t0 or not (lo <= ts(t0) < hi):
             continue
-        n, pushes, rec = replay(f, cp)
+        n, pushes, rec, holds = replay(f, cp)
         if n < a.min_calls:
             continue
         tc = sum(TOK_PER_C4 * c / 4 * max(0, n - 1 - k) for k, c in pushes)
         rows.append({"agent": os.path.basename(f)[:-6], "calls": n, "pushed_chars": sum(c for _, c in pushes),
                      "recorded_chars": rec, "token_calls": round(tc), "per_call": round(tc / n),
-                     "pushes": len(pushes)})
+                     "pushes": len(pushes), "held_calls": holds})
     per = [r["per_call"] for r in rows]
     summ = {"agents": len(rows), "calls": sum(r["calls"] for r in rows),
             "pushed_chars_median": statistics.median([r["pushed_chars"] for r in rows]) if rows else 0,
             "per_call_tokens_mean": round(sum(r["token_calls"] for r in rows) / max(1, sum(r["calls"] for r in rows))),
             "per_call_tokens_median_agent": statistics.median(per) if per else 0,
+            "held_calls": sum(r["held_calls"] for r in rows),
             "dirs": a.dirs or "live", "hook": a.hook or "live", "since": a.since, "until": a.until}
     if a.check:
         bad = [r for r in rows if abs(r["pushed_chars"] - r["recorded_chars"]) > 0.05 * max(1, r["recorded_chars"])]

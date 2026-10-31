@@ -38,6 +38,23 @@ def test_limit_and_parts():
     assert call(m, "A", "Bash", {"command": "foo"}, "pre") == ""                  # once per agent
 
 
+def test_hold_until_delivered():
+    """A PreToolUse call is held (deny, same call again) while a section it triggers is pending; a section pending
+    from an earlier call does not hold an unrelated call; the fewest outputs (largest first, filled)."""
+    big = "".join("line %05d %s\n" % (i, "x" * 60) for i in range(200))          # ~14.6k chars: 2 parts
+    m = hook({"s1": ("cmds: \\bfoo\\b", big), "s2": ("cmds: \\bfoo\\b", "y" * 3000 + "\n"),
+              "s3": ("cmds: \\bbar\\b", "z\n")})
+    inp = {"session_id": "s", "agent_id": "A", "tool_name": "Bash", "tool_input": {"command": "foo"},
+           "hook_event_name": "PreToolUse"}
+    ev, t1, h1 = m.respond_full(inp, "pre")
+    ev, t2, h2 = m.respond_full(inp, "pre")
+    assert h1 == ["s1", "s2"] and "part 1 of 2" in t1 and h2 == [] and "part 2 of 2" in t2 and "REFERENCE s2" in t2
+    m2 = hook({"s1": ("cmds: \\bfoo\\b", big), "s3": ("cmds: \\bbar\\b", "z\n")})
+    m2.respond_full(dict(inp, tool_input={"command": "bar foo"}, hook_event_name="PostToolUse"), "post")
+    ev, t3, h3 = m2.respond_full(dict(inp, tool_input={"command": "bar"}), "pre")
+    assert h3 == [] and "part 2 of 2" in t3                                       # pending part, call not held
+
+
 def test_agents_no():
     m = hook({"plan": ("agents: no\ncmds: tools/plan\\.py", "plan text\n")})
     assert call(m, "A", "Bash", {"command": "python3 tools/plan.py show x"}, "pre") == ""
@@ -53,6 +70,6 @@ def test_on_write():
 
 
 if __name__ == "__main__":
-    for t in (test_limit_and_parts, test_agents_no, test_on_write):
+    for t in (test_limit_and_parts, test_hold_until_delivered, test_agents_no, test_on_write):
         t()
         print("PASS", t.__name__)
