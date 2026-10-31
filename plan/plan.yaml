@@ -6384,12 +6384,10 @@ entries:
       - 'a pool cut again or yield < 0.5: read its GRIDPACK_PROGRESS/PROBE_JSON lines and fix its layout (cores, run size)
         before the queue'
   owner:
-    agent: a739618f977b0a427
-    state: closed
-    since: '2026-10-31T13:35:47+00:00'
-    state_at: '2026-10-31T14:03:11+00:00'
-    context: 138449
-    context_at: '2026-10-31T13:59:02+00:00'
+    agent: afa86296e4947978a
+    state: working
+    since: '2026-10-31T14:04:11+00:00'
+    state_at: '2026-10-31T14:04:11+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
