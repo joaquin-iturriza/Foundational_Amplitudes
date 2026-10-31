@@ -6535,9 +6535,9 @@ entries:
         per axis'
   owner:
     agent: a9ed84e84b4c49f4b
-    state: working
+    state: stopped
     since: '2026-10-31T19:55:31+00:00'
-    state_at: '2026-10-31T20:44:56+00:00'
+    state_at: '2026-10-31T20:50:48+00:00'
     context: 128777
     context_at: '2026-10-31T20:44:49+00:00'
   findings:
