@@ -2,7 +2,8 @@
 """Steps 11 and 14 of plan entry catalog_coverage under the design passed 2026-10-30T17:29 (plan show
 catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14), read on per-probe zero-shot MSEs.
 
-  extract <run id> <log> [<axis>]   the axis's ZERO_SHOT records of a job log (site logs -n 400000 <run>) ->
+  extract <run id> <log> [<axis>]   the axis's ZERO_SHOT records of a job log (site logs -n 3000000 <run>: a
+                                    het run's log is ~506k lines) ->
                                     data/reads/<run>_<axis>.json {probe: mse_logm2_real}; a record with an error, a
                                     non-finite MSE or a physics status other than ok/allowed is listed apart
   bound                             step 11 -> data/pp_bound.json
@@ -11,6 +12,13 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
   mixture [--partial]               step 14 -> data/mixture_ab.json, only when every read of the design is in;
                                     --partial prints what the reads in hand give (a missing seed left out, no
                                     verdict, nothing written)
+  mixture --het                     step 15 (design passed 2026-10-31T04:56, question 1): the same comparison on the
+                                    het-loss runs (MIX_HET, control v4_het_control) -> data/mixture_ab_het.json,
+                                    written with what is read: every read or probe not in hand is listed as missing
+                                    (never dropped), the verdict only when nothing is missing; beside it het_over_mse,
+                                    the het control pair over the MSE control pair on each read (what the het loss
+                                    costs mu, information)
+  heldout_default [--het]           with --het the het runs, missing reads listed -> data/mixture_heldout_default_het.json
 
 The measure (the design's): per probe the MSE of log|M|^2 at the best checkpoint (tools/zero_shot_parent.py,
 mse_logm2_real); each side the geometric mean of its two seeds (42, 43); per class (analysis/catalog_v4/
@@ -58,6 +66,17 @@ MIX = {"default50": {"PP4": ("FA-ccin2p3-8e1cc529", "FA-ccin2p3-52efacaf"),   # 
                    "EE4": ("FA-ccin2p3-c1863adf", "FA-ccin2p3-def11c5c"),     # REREAD 339ec100, 380842ed
                    "held": ("FA-ccin2p3-339ec100", "FA-ccin2p3-380842ed")}}
 GAIN, LOSS = 0.90, 1.05
+# the runs of step 15 (design passed 2026-10-31T04:56): the het-loss twins of MIX, every read from the run's own job
+# (its sigma_stage parent; mu frozen there, so mu is the best checkpoint by val_loss_no_reg). The four share arms were
+# cut by their limit inside PP4 (772/1055 of 1301 for 466656b2/f0156d88, 908/1129 for 9897833d/df858d33) before EE4:
+# those reads wait on their eval-only REREAD (plan step 20) and are reported missing until then
+MIX_HET = {"default50": {r: ("FA-ccin2p3-466656b2", "FA-ccin2p3-9897833d") for r in ("PP4", "EE4", "held")},
+           "default25": {r: ("FA-ccin2p3-f0156d88", "FA-ccin2p3-df858d33") for r in ("PP4", "EE4", "held")},
+           "control": {r: ("FA-ccin2p3-87ea24d0", "FA-ccin2p3-321a3de2") for r in ("PP4", "EE4", "held")}}
+# the HD4 eval-only REREADs of the het runs (step 18's 114 default-sampled held-out pools; plan step 20), (seed 42, seed
+# 43) per arm, filled when they are submitted; until then the default-sampled held-out read is H1-H3's PP4/EE4 probes
+# only and mixture --het reports itself incomplete
+HD4_HET = {}
 
 
 def extract(run, log, axis="PP4", allow_unchecked=False):
@@ -191,24 +210,51 @@ def compare(arm, ctl, c42, c43, keys, cls):
     return res
 
 
-def mixture(partial=False):
+def _reads(table):
+    """{arm: {read: (seed 42 reads, seed 43 reads)}} and the (arm, read, run) missing, as strings"""
+    reads = {a: {r: tuple(read_of(run, r) for run in runs) for r, runs in v.items()} for a, v in table.items()}
+    missing = sorted(f"{a} {r} {table[a][r][i]}" for a, v in reads.items() for r, pair in v.items()
+                     for i, s in enumerate(pair) if s is None)
+    return reads, missing
+
+
+def _probes_missing(pair, ctl_pair):
+    """Per seed of an arm, the control's probes that seed has no read of (a read cut by the job's limit): a count and
+    the first names, so a partial read is reported as such, never as complete"""
+    ref = set.union(*(set(x) for x in ctl_pair if x is not None)) if any(x is not None for x in ctl_pair) else set()
+    out = {}
+    for i, x in enumerate(pair):
+        m = sorted((str(k) for k in ref - set(x or {})))
+        if m:
+            out[("seed42", "seed43")[i]] = {"n": len(m), "of": len(ref), "first": m[:10]}
+    return out
+
+
+def mixture(partial=False, het=False):
     cls = class_of()
     trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")))["processes"]}
-    reads = {a: {r: tuple(read_of(run, r) for run in runs) for r, runs in v.items()} for a, v in MIX.items()}
-    missing = sorted(f"{a} {r} {MIX[a][r][i]}" for a, v in reads.items() for r, pair in v.items()
-                     for i, s in enumerate(pair) if s is None)
-    if missing and not partial:
+    table = MIX_HET if het else MIX
+    reads, missing = _reads(table)
+    if missing and not (partial or het):
         sys.exit("mixture: reads missing (extract them first; --partial for what is in hand): " + "; ".join(missing))
     c = reads["control"]
     if any(s is None for pair in c.values() for s in pair):
         sys.exit("mixture: a control read is missing: " + "; ".join(missing))
-    out = {"design": "plan catalog_coverage, passed 2026-10-30T17:29", "runs": MIX, "missing_reads": missing,
+    design = "plan catalog_coverage step 15, passed 2026-10-31T04:56 (het loss)" if het else \
+        "plan catalog_coverage, passed 2026-10-30T17:29"
+    out = {"design": design, "runs": table, "missing_reads": missing, "probes_missing": {},
            "rule": f"GAIN R <= {GAIN} with the widened interval below 1 on PP4 (all classes) and EE4 (all); NO LOSS "
                    f"the pooled held-out widened upper end below {LOSS}; LOSS pooled R >= {LOSS} with the widened "
-                   f"interval above 1; WIN = GAIN and NO LOSS", "shares": {}}
+                   f"interval above 1; WIN = GAIN and NO LOSS" + (
+                       "; het: the held-out cost on default-sampled events (held_default: the PP4/EE4 probes of the "
+                       "held-out classes, and HD4 once read), the catalog-sampled read (held) beside" if het else ""),
+           "shares": {}}
     for a in ("default50", "default25"):
         res = {}
         for r in ("PP4", "EE4", "held"):
+            pm = _probes_missing(reads[a][r], c[r])
+            if pm:
+                out["probes_missing"][f"{a} {r}"] = pm
             arm = side(reads[a][r])
             ctl = side(c[r])
             keys = sorted(set(arm) & set(ctl), key=str)
@@ -218,13 +264,24 @@ def mixture(partial=False):
             if r == "held":
                 parts = {"pooled": keys, **{ax: [k for k in keys if k[0] == ax] for ax in HELD}}
             res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
-            res[r]["seeds_read"] = [run for run, s in zip(MIX[a][r], reads[a][r]) if s is not None]
+            res[r]["seeds_read"] = [run for run, s in zip(table[a][r], reads[a][r]) if s is not None]
             res[r]["probes_unmatched"] = sorted(str(k) for k in set(arm) ^ set(ctl))[:50]
+            res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
         if not all(k in res[r] for r, k in (("PP4", "all"), ("EE4", "all"), ("held", "pooled"))):
-            res.update(gain=None, cost=None, wins=None)      # --partial with no seed of a read in hand
+            res.update(gain=None, cost=None, wins=None)      # a read with no seed in hand
             out["shares"][a] = res
             continue
         pp, ee, h = res["PP4"]["all"], res["EE4"]["all"], res["held"]["pooled"]
+        if het:
+            # the design (04:56) and D227: the cost is read on default-sampled held-out events, the catalog-sampled
+            # held-out read (res["held"]) beside it as information
+            hd, _ = _held_default(reads, a, cls, _held_axes(cls))
+            res["held_default"] = hd
+            h = hd.get("pooled")
+            if h is None:
+                res.update(gain=None, cost=None, wins=None)
+                out["shares"][a] = res
+                continue
         gain = all(x["R"] <= GAIN and x["widened"][1] < 1 for x in (pp, ee))
         if h["widened"][1] < LOSS:
             cost = "NO LOSS"
@@ -246,59 +303,140 @@ def mixture(partial=False):
         v = "keep the current mixture"
     else:
         v = "trade-off"
-    if partial:
+    complete = not missing and not out["probes_missing"]
+    if het:
+        # the default-sampled held-out pool is complete only with HD4 (step 18's 114 classes) read on every side
+        hd_missing = [f"{a} HD4" for a in table if not HD4_HET.get(a)] + \
+            [f"{a} HD4 {run}" for a, runs in HD4_HET.items() for run in runs if read_of(run, "HD4") is None]
+        out["held_default_missing"] = hd_missing
+        complete = complete and not hd_missing
+    if partial and not het:
         out["verdict_if_complete"] = v if not missing else None
         out["would_be"] = v
         print(json.dumps(out, indent=1))
         return
-    out["verdict"] = v
-    out["bound"] = json.load(open(os.path.join(DATA, "pp_bound.json")))["trained"]
-    path = os.path.join(DATA, "mixture_ab.json")
+    out["complete"] = complete
+    out["verdict"] = v if complete else None
+    if het:
+        out["verdict_on_reads_in_hand"] = v                 # information only while reads are missing
+        out["het_over_mse"] = het_over_mse(cls, trained)
+        out["het_over_mse_note"] = "het control over MSE control: loss HETEROSC + sigma stage AND sign_head off together"
+        path = os.path.join(DATA, "mixture_ab_het.json")
+    else:
+        out["bound"] = json.load(open(os.path.join(DATA, "pp_bound.json")))["trained"]
+        path = os.path.join(DATA, "mixture_ab.json")
     json.dump(out, open(path, "w"), indent=1)
     print(json.dumps(out))   # the whole result, the last JSON line (tools/verify_claims.py reads its claims from it)
 
 
-def heldout_default():
-    """The held-out classes read on default-sampled events (Joaquin, 2026-10-31: the check is against data generated
-    the default way): the PP4 and EE4 probes (MadEvent default, test split) whose class is in a held-out axis
-    (recipes/catalog_v4_heldout_<axis>.yaml), per axis and pooled, R as in mixture (arm over control, R_seed of the
-    same probes), beside the catalog-sampled held-out read on the same classes and on the classes with no
-    default-sampled pool. -> data/mixture_heldout_default.json"""
-    cls = class_of()
+def het_over_mse(cls, trained):
+    """What the het setup costs or gains mu (information, design 04:56): the het control pair (MIX_HET) over the MSE
+    control pair (MIX) on each read. Two things differ between them, the loss (HETEROSC plus its sigma stage) and
+    sign_head (off in the het runs, on in the MSE runs): the ratio is the two together, not the loss alone, R as in mixture with R_seed from the MSE control's seeds"""
+    h, _ = _reads({"control": MIX_HET["control"]})
+    m, _ = _reads({"control": MIX["control"]})
+    out = {}
+    for r in ("PP4", "EE4", "held"):
+        hp, mp = h["control"][r], m["control"][r]
+        if any(x is None for x in hp + mp):
+            out[r] = None
+            continue
+        arm, ctl = side(hp), side(mp)
+        keys = sorted(set(arm) & set(ctl), key=str)
+        parts = {"all": keys,
+                 "trained": [k for k in keys if cls(probe_name(k)) in trained],
+                 "not_trained": [k for k in keys if cls(probe_name(k)) not in trained]}
+        if r == "held":
+            parts = {"pooled": keys, **{ax: [k for k in keys if k[0] == ax] for ax in HELD}}
+        out[r] = {n: compare(arm, ctl, mp[0], mp[1], ks, cls) for n, ks in parts.items() if ks}
+        out[r]["het_seed_R"] = compare(hp[1], hp[0], mp[0], mp[1], keys, cls)["R"]   # het control seed 43 over 42
+        out[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
+    return out
+
+
+def _held_axes(cls):
+    """catalog_v4 class -> its held-out axis (recipes/catalog_v4_heldout_<axis>.yaml)"""
     ax_of = {}
     for ax in HELD:
         for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v4_heldout_{ax}.yaml")))["processes"]:
             if p["name"].startswith("v4_"):
                 ax_of[cls(p["name"])] = ax
-    reads = {a: {r: tuple(read_of(run, r) for run in runs) for r, runs in v.items()} for a, v in MIX.items()}
+    return ax_of
+
+
+def _held_default(reads, a, cls, ax_of, hd4=None):
+    """R of arm a over the control on the default-sampled events of the held-out classes: the PP4/EE4 probes whose
+    class is held out, plus HD4 (hd4 = {arm: (run 42, run 43)}, the het default HD4_HET) where read; per axis and
+    pooled, with how many probes the control has and how many were read on every side"""
+    hd4 = HD4_HET if hd4 is None else hd4
+    tag = lambda r, d: {(r, k): x for k, x in (d or {}).items()}
+    arm, ctl, c42, c43 = {}, {}, {}, {}
+    srcs = [(r, reads[a][r], reads["control"][r]) for r in ("PP4", "EE4")]
+    hd4_missing = [f"{x} HD4" for x in (a, "control") if not hd4.get(x)]
+    if not hd4_missing:
+        ap = tuple(read_of(x, "HD4") for x in hd4[a])
+        cp = tuple(read_of(x, "HD4") for x in hd4["control"])
+        hd4_missing = [f"{x} HD4 {run}" for x, runs, rd in ((a, hd4[a], ap), ("control", hd4["control"], cp))
+                       for run, y in zip(runs, rd) if y is None]
+        if not hd4_missing:                   # HD4 only with all four seeds read, never on one seed
+            srcs.append(("HD4", ap, cp))
+    used = []
+    for r, ap, cp in srcs:
+        if any(x is None for x in cp):
+            continue
+        used.append(r)
+        arm.update(tag(r, side(ap))); ctl.update(tag(r, side(cp)))
+        c42.update(tag(r, cp[0])); c43.update(tag(r, cp[1]))
+    held_ctl = [k for k in ctl if cls(k[1]) in ax_of]
+    keys = sorted((k for k in set(arm) & set(ctl) if cls(k[1]) in ax_of), key=str)
+    res = {"sources": used, "hd4_missing": hd4_missing, "n_probes_control": len(held_ctl), "n_probes_read": len(keys),
+           "probes_missing": sorted(str(k) for k in set(held_ctl) - set(keys))[:20]}
+    if keys:
+        res["pooled"] = compare(arm, ctl, c42, c43, keys, cls)
+    for ax in HELD:
+        ks = [k for k in keys if ax_of[cls(k[1])] == ax]
+        if ks:
+            res[ax] = compare(arm, ctl, c42, c43, ks, cls)
+    return res, keys
+
+
+def heldout_default(het=False):
+    """The held-out classes read on default-sampled events (Joaquin, 2026-10-31: the check is against data generated
+    the default way): the PP4 and EE4 probes (MadEvent default, test split) whose class is in a held-out axis
+    (recipes/catalog_v4_heldout_<axis>.yaml), per axis and pooled, R as in mixture (arm over control, R_seed of the
+    same probes), beside the catalog-sampled held-out read on the same classes and on the classes with no
+    default-sampled pool. -> data/mixture_heldout_default.json. With het, the het runs (MIX_HET, HD4 from HD4_HET
+    once read): a missing read or probe is listed (missing_reads, probes_missing) and the classes read are the ones
+    every side has -> data/mixture_heldout_default_het.json"""
+    cls = class_of()
+    ax_of = _held_axes(cls)
+    table = MIX_HET if het else MIX
+    reads, missing = _reads(table)
     # every seed of every read this uses, as mixture() without --partial: a missing seed would leave R on one seed
-    missing = sorted(f"{a} {r} {MIX[a][r][i]}" for a, v in reads.items() for r, pair in v.items()
-                     for i, x in enumerate(pair) if x is None)
-    if missing:
+    if missing and not het:
         sys.exit("heldout_default: reads missing (extract them first): " + "; ".join(missing))
-    tag = lambda r, d: {(r, k): x for k, x in d.items()}
-    out = {"design": "plan catalog_coverage step 14, REREAD on default-sampled held-out events", "shares": {}}
+    if any(x is None for pair in reads["control"].values() for x in pair):
+        sys.exit("heldout_default: a control read is missing: " + "; ".join(missing))
+    out = {"design": "plan catalog_coverage step 15 (het), passed 2026-10-31T04:56" if het else
+           "plan catalog_coverage step 14, REREAD on default-sampled held-out events",
+           "runs": table, "missing_reads": missing, "shares": {}}
     for a in ("default50", "default25"):
-        arm, ctl, c42, c43 = {}, {}, {}, {}
-        for r in ("PP4", "EE4"):
-            arm.update(tag(r, side(reads[a][r]))); ctl.update(tag(r, side(reads["control"][r])))
-            c42.update(tag(r, reads["control"][r][0])); c43.update(tag(r, reads["control"][r][1]))
-        keys = sorted((k for k in set(arm) & set(ctl) if cls(k[1]) in ax_of), key=str)
-        res = {"default": {"pooled": compare(arm, ctl, c42, c43, keys, cls)}}
-        for ax in HELD:
-            ks = [k for k in keys if ax_of[cls(k[1])] == ax]
-            if ks:
-                res["default"][ax] = compare(arm, ctl, c42, c43, ks, cls)
+        d, keys = _held_default(reads, a, cls, ax_of, None if het else {})
+        if not het:          # the MSE file's layout as written at 744fad42
+            d = {k: v for k, v in d.items() if k in ("pooled",) + HELD}
+        res = {"default": d}
         have = {cls(k[1]) for k in keys}
         harm, hctl = side(reads[a]["held"]), side(reads["control"]["held"])
         hk = sorted(set(harm) & set(hctl), key=str)
         hc = reads["control"]["held"]
+        same = [k for k in hk if cls(k[1]) in have]
         res["catalog_sampled"] = {
-            "same_classes": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) in have], cls),
+            "same_classes": compare(harm, hctl, hc[0], hc[1], same, cls) if same else None,
             "no_default_pool": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) not in have], cls)}
         res["axes_without_default_pool"] = sorted({ax for c, ax in ax_of.items() if c not in have})
         out["shares"][a] = res
-    json.dump(out, open(os.path.join(DATA, "mixture_heldout_default.json"), "w"), indent=1)
+    name = "mixture_heldout_default_het.json" if het else "mixture_heldout_default.json"
+    json.dump(out, open(os.path.join(DATA, name), "w"), indent=1)
     print(json.dumps(out))
 
 
@@ -309,16 +447,18 @@ def main():
     e.add_argument("run"); e.add_argument("log"); e.add_argument("axis", nargs="?", default="PP4")
     e.add_argument("--allow-unchecked", action="store_true")
     sub.add_parser("bound")
-    sub.add_parser("heldout_default")
+    hd = sub.add_parser("heldout_default")
+    hd.add_argument("--het", action="store_true")
     m = sub.add_parser("mixture")
     m.add_argument("--partial", action="store_true")
+    m.add_argument("--het", action="store_true")
     a = ap.parse_args()
     if a.cmd == "extract":
         extract(a.run, a.log, a.axis, a.allow_unchecked)
     elif a.cmd == "mixture":
-        mixture(a.partial)
+        mixture(a.partial, a.het)
     elif a.cmd == "heldout_default":
-        heldout_default()
+        heldout_default(a.het)
     else:
         bound()
 
