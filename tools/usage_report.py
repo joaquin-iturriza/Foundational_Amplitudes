@@ -13,8 +13,9 @@ Periods (UTC; boundaries from git, see PERIODS):
   redesign     switch-overs A to D live (owners per entry, single Stop gate, guards, supervisor run-end sorting)
 
 What is counted (a "call" is one tool_use block; a "turn" starts at a user record carrying text, not a tool result):
-  tokens       per API message (deduplicated on message id within a transcript), weighted
+  tokens       per API message (deduplicated on message id over all transcripts read), weighted
                input 1, output 5, cache write 1.25, cache read 0.1
+  usd          the same messages at list price per model (tools/usage_windows.py PRICES)
   context      input + cache write + cache read of each API message
   runs         registry runs whose id first appears in a tool result as `run FA-<site>-<hex> (` (site submit's line)
   results      `tools/plan.py evidence|finding` calls and `git commit` calls naming docs/results.tex, not errored
@@ -38,6 +39,9 @@ from datetime import datetime, timezone
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TRANSCRIPTS = os.path.expanduser("~/.claude/projects/-home-joaquin-work-FA")
 RUNS_DB = os.path.expanduser("~/.local/share/ccorch/runs.db")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import usage_windows as uw     # list prices per model (cost per call)
+SEEN_ALL = set()               # message ids over all transcripts: a subagent's call also logged in its parent counts once
 W = {"input_tokens": 1.0, "output_tokens": 5.0, "cache_creation_input_tokens": 1.25, "cache_read_input_tokens": 0.1}
 
 
@@ -86,7 +90,7 @@ def text_of(content):
 
 
 def new_stats():
-    return {"tokens": 0.0, "tokens_raw": defaultdict(int), "messages": 0, "calls": 0, "runs": set(), "results": 0,
+    return {"tokens": 0.0, "usd": 0.0, "usd_by_model": defaultdict(float), "tokens_raw": defaultdict(int), "messages": 0, "calls": 0, "runs": set(), "results": 0,
             "commits": 0, "waste": defaultdict(int), "turns": 0, "wake_turns": 0, "contexts": [], "transcripts": set()}
 
 
@@ -166,8 +170,17 @@ def scan(path, role, S, samples, actions):
                 continue
             mid = msg.get("id")
             u = msg.get("usage") or {}
-            if mid and mid not in seen_msg and u:
+            if mid and mid not in seen_msg and mid not in SEEN_ALL and u:
                 seen_msg.add(mid)
+                SEEN_ALL.add(mid)
+                cc = u.get("cache_creation") or {}
+                c5, c1 = cc.get("ephemeral_5m_input_tokens") or 0, cc.get("ephemeral_1h_input_tokens") or 0
+                usd = uw.cost({"model": msg.get("model"), "in": u.get("input_tokens") or 0,
+                               "out": u.get("output_tokens") or 0, "cw5": c5, "cw1h": c1,
+                               "cwu": max((u.get("cache_creation_input_tokens") or 0) - c5 - c1, 0),
+                               "cr": u.get("cache_read_input_tokens") or 0}) or 0.0
+                st["usd"] += usd
+                st["usd_by_model"][msg.get("model")] += usd
                 st["messages"] += 1
                 for k, w in W.items():
                     st["tokens"] += w * (u.get(k) or 0)
@@ -213,12 +226,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="analysis/agent_redesign/usage_report.json")
     ap.add_argument("--fig", default="analysis/agent_redesign/figs/usage")
+    ap.add_argument("--all-fa-folders", action="store_true",
+                    help="also read the FA worktree and replay folders (-home-joaquin-work-FA-*), not only -home-joaquin-work-FA")
     ap.add_argument("--samples", help="print 5 cases, spread over time, of each listed classifier (comma list: (hook, nothing_new, denial, wait, repeat, reread)")
     a = ap.parse_args()
     S = defaultdict(lambda: defaultdict(new_stats))
     samples, actions = defaultdict(list), defaultdict(list)
-    mains = sorted(glob.glob(os.path.join(TRANSCRIPTS, "*.jsonl")))
-    agents = sorted(glob.glob(os.path.join(TRANSCRIPTS, "*", "subagents", "**", "*.jsonl"), recursive=True))
+    roots = [TRANSCRIPTS] + (sorted(glob.glob(TRANSCRIPTS + "-*")) if a.all_fa_folders else [])
+    mains = sorted(p for r in roots for p in glob.glob(os.path.join(r, "*.jsonl")))
+    agents = sorted(p for r in roots for p in glob.glob(os.path.join(r, "*", "subagents", "**", "*.jsonl"), recursive=True))
     for p in mains:
         scan(p, "main", S, samples, actions)
     for p in agents:
@@ -263,6 +279,10 @@ def main():
             runs, res, com = len(st["runs"]), st["results"], st["commits"]
             P[role] = {"transcripts": len(st["transcripts"]), "api_messages": st["messages"], "calls": st["calls"],
                        "weighted_tokens_M": round(st["tokens"] / 1e6, 2),
+                       "usd_list_price": round(st["usd"], 2),
+                       "usd_by_model": {m: round(v, 2) for m, v in sorted(st["usd_by_model"].items(), key=lambda x: -x[1])},
+                       "usd_per_result": res and round(st["usd"] / res, 2),
+                       "usd_per_commit": com and round(st["usd"] / com, 2),
                        "raw_tokens_M": {k: round(v / 1e6, 2) for k, v in st["tokens_raw"].items()},
                        "runs_submitted": runs, "results": res, "commits": com,
                        "weighted_tokens_M_per_run": runs and round(st["tokens"] / 1e6 / runs, 3),
@@ -276,7 +296,9 @@ def main():
         tot_tok = (S[n]["main"]["tokens"] + S[n]["agents"]["tokens"]) / 1e6
         tot_res = S[n]["main"]["results"] + S[n]["agents"]["results"]
         allst = stall[n]["main"] + stall[n]["agents"]
-        P["total"] = {"weighted_tokens_M": round(tot_tok, 2),
+        tot_usd = S[n]["main"]["usd"] + S[n]["agents"]["usd"]
+        P["total"] = {"weighted_tokens_M": round(tot_tok, 2), "usd_list_price": round(tot_usd, 2),
+                      "usd_per_result": tot_res and round(tot_usd / tot_res, 2),
                       "weighted_tokens_M_per_result": tot_res and round(tot_tok / tot_res, 3),
                       "wasted_share": round(sum(S[n][r]["waste"][k] for r in ("main", "agents")
                                                 for k in ("hook", "denial", "repeat", "wait", "reread"))

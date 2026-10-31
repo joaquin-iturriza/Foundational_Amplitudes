@@ -1,0 +1,6340 @@
+{
+ "prices": {
+  "source": "claude-api skill 2.1.312, model table cached 2026-10-06; cache write 1.25x (5m) / 2x (1h) input, shared/prompt-caching.md",
+  "per_mtok_in_out_read": {
+   "claude-opus-5-5": [
+    4.0,
+    20.0,
+    0.2
+   ],
+   "claude-opus-5": [
+    5.0,
+    25.0,
+    0.5
+   ],
+   "claude-opus-4": [
+    5.0,
+    25.0,
+    0.5
+   ],
+   "claude-sonnet-5-5": [
+    2.0,
+    10.0,
+    0.2
+   ],
+   "claude-sonnet-5": [
+    2.0,
+    10.0,
+    0.2
+   ],
+   "claude-sonnet-4-6": [
+    3.0,
+    15.0,
+    0.3
+   ],
+   "claude-sonnet-4": [
+    3.0,
+    15.0,
+    0.3
+   ],
+   "claude-haiku-5-5": [
+    0.1,
+    0.5,
+    0.01
+   ],
+   "claude-haiku-4": [
+    1.0,
+    5.0,
+    0.1
+   ],
+   "claude-fable-5-1": [
+    10.0,
+    50.0,
+    0.25
+   ],
+   "claude-fable-5": [
+    10.0,
+    50.0,
+    1.0
+   ]
+  }
+ },
+ "inventory": [
+  {
+   "folder": "-home-joaquin",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 13,
+   "first": "2026-10-29T01:31:08",
+   "last": "2026-10-29T01:41:28",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-hasan-clipper",
+   "sessions": 5,
+   "agents": 0,
+   "calls": 2050,
+   "first": "2026-08-05T18:34:24",
+   "last": "2026-09-07T17:33:33",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-mnt-ccin2p3-Foundational-Amplitudes",
+   "sessions": 1,
+   "agents": 22,
+   "calls": 1989,
+   "first": "2026-09-12T12:52:02",
+   "last": "2026-09-22T15:33:19",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-mnt-ccin2p3-madgrav",
+   "sessions": 1,
+   "agents": 14,
+   "calls": 1205,
+   "first": "2026-09-01T13:01:42",
+   "last": "2026-09-08T13:45:12",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-mnt-eos-jitu-amplitude-DSI",
+   "sessions": 4,
+   "agents": 0,
+   "calls": 852,
+   "first": "2026-07-03T11:31:36",
+   "last": "2026-09-17T14:00:39",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-mnt-eos-likelihoods",
+   "sessions": 3,
+   "agents": 0,
+   "calls": 359,
+   "first": "2026-09-08T13:04:10",
+   "last": "2026-09-16T16:16:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA",
+   "sessions": 3,
+   "agents": 728,
+   "calls": 40590,
+   "first": "2026-09-22T21:20:32",
+   "last": "2026-10-31T00:00:12",
+   "in_usage_report": true
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-gate-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 16,
+   "first": "2026-10-29T05:06:48",
+   "last": "2026-10-29T05:13:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-gate-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 15,
+   "first": "2026-10-29T05:06:42",
+   "last": "2026-10-29T05:15:56",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-gate-on",
+   "sessions": 2,
+   "agents": 0,
+   "calls": 2,
+   "first": "2026-10-29T05:05:34",
+   "last": "2026-10-29T05:05:44",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-lookups-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 40,
+   "first": "2026-10-29T05:06:52",
+   "last": "2026-10-29T05:16:05",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-lookups-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 34,
+   "first": "2026-10-29T05:06:55",
+   "last": "2026-10-29T05:17:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-prior-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 19,
+   "first": "2026-10-29T05:06:49",
+   "last": "2026-10-29T05:13:29",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-prior-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 25,
+   "first": "2026-10-29T05:06:51",
+   "last": "2026-10-29T05:17:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-sendcheck-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 26,
+   "first": "2026-10-29T05:06:46",
+   "last": "2026-10-29T05:14:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab-sendcheck-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 27,
+   "first": "2026-10-29T05:06:53",
+   "last": "2026-10-29T05:13:53",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 23,
+   "first": "2026-10-29T05:47:45",
+   "last": "2026-10-29T05:59:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 18,
+   "first": "2026-10-29T05:47:43",
+   "last": "2026-10-29T05:52:17",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-c",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 19,
+   "first": "2026-10-29T06:00:24",
+   "last": "2026-10-29T06:05:21",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-dfew-d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 19,
+   "first": "2026-10-29T06:00:22",
+   "last": "2026-10-29T06:05:39",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 50,
+   "first": "2026-10-29T05:47:53",
+   "last": "2026-10-29T05:57:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 49,
+   "first": "2026-10-29T05:47:57",
+   "last": "2026-10-29T05:56:33",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-c",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 54,
+   "first": "2026-10-29T06:00:38",
+   "last": "2026-10-29T06:11:27",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-ftharm-d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 43,
+   "first": "2026-10-29T06:00:36",
+   "last": "2026-10-29T06:09:55",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 24,
+   "first": "2026-10-29T05:47:50",
+   "last": "2026-10-29T05:52:26",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 30,
+   "first": "2026-10-29T05:47:53",
+   "last": "2026-10-29T05:53:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-c",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 16,
+   "first": "2026-10-29T06:00:33",
+   "last": "2026-10-29T06:03:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-hsplit-d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 24,
+   "first": "2026-10-29T06:00:33",
+   "last": "2026-10-29T06:04:09",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 28,
+   "first": "2026-10-29T05:48:16",
+   "last": "2026-10-29T05:53:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 38,
+   "first": "2026-10-29T05:48:15",
+   "last": "2026-10-29T05:59:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-c",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 54,
+   "first": "2026-10-29T06:00:58",
+   "last": "2026-10-29T06:15:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-FA-worktrees-zz-ab2-v4pp-d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 55,
+   "first": "2026-10-29T06:01:00",
+   "last": "2026-10-29T06:16:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-amplitude-dsi",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 25,
+   "first": "2026-10-05T13:08:19",
+   "last": "2026-10-05T13:20:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-finml",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 27,
+   "first": "2026-10-26T17:55:59",
+   "last": "2026-10-26T18:29:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-likelihoods",
+   "sessions": 2,
+   "agents": 0,
+   "calls": 2114,
+   "first": "2026-09-25T10:37:44",
+   "last": "2026-10-30T20:58:17",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-home-joaquin-work-madgrav",
+   "sessions": 2,
+   "agents": 0,
+   "calls": 24,
+   "first": "2026-10-26T17:14:41",
+   "last": "2026-10-26T17:54:38",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-mnt-c-Users-Joaquin",
+   "sessions": 3,
+   "agents": 0,
+   "calls": 3,
+   "first": "2026-09-03T12:44:44",
+   "last": "2026-09-07T14:06:52",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-30kq1wq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:21:06",
+   "last": "2026-08-20T15:21:06",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-4q7vwxh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:28:49",
+   "last": "2026-08-22T01:28:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-5pu8jry",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:05",
+   "last": "2026-08-20T16:41:05",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-7ucwuy-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:03",
+   "last": "2026-08-20T14:37:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-gf82xhk",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:00:00",
+   "last": "2026-08-21T15:00:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-h4q248g",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:03:10",
+   "last": "2026-08-20T18:03:10",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-jl7ufgc",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:00",
+   "last": "2026-08-20T15:22:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-rhltd7e",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:23",
+   "last": "2026-08-20T17:01:23",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp-s4mhoyw",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:05:03",
+   "last": "2026-08-20T18:05:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp06izw2a9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:30",
+   "last": "2026-08-20T17:03:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp085lww4c",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:51",
+   "last": "2026-08-20T16:37:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0h0h6e07",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:31",
+   "last": "2026-08-20T14:41:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0kjkakg2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:38:24",
+   "last": "2026-08-20T12:38:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0knl4wd3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:27:05",
+   "last": "2026-08-22T01:27:05",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0p0gfafx",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:49",
+   "last": "2026-08-20T16:37:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0r-gx-n1",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:26",
+   "last": "2026-08-20T16:43:26",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0sciuo3d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:24",
+   "last": "2026-08-20T14:40:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0xsg5gvs",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:44",
+   "last": "2026-08-20T12:37:44",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp0zzrwccv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:35",
+   "last": "2026-08-20T14:40:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp13xu0ssa",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:00:57",
+   "last": "2026-08-20T17:00:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp143bqmzr",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:24",
+   "last": "2026-08-20T14:40:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp190rigy2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:27",
+   "last": "2026-08-19T14:25:27",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp1dfox3wj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:00:15",
+   "last": "2026-08-21T15:00:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp1lnnjvzx",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:38:05",
+   "last": "2026-08-20T14:38:05",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp1n0nfwry",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:14",
+   "last": "2026-08-20T14:40:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp1pxr1110",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:21",
+   "last": "2026-08-20T16:37:21",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp1rkqkb0k",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:59:48",
+   "last": "2026-08-22T01:59:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp2-vt1ypj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:38:18",
+   "last": "2026-08-20T14:38:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp235gfl88",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:02:53",
+   "last": "2026-08-21T15:02:53",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp2eq4do7o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:45:58",
+   "last": "2026-08-20T16:45:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp2hyrbvr9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:51",
+   "last": "2026-08-20T14:34:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp2ovkyew3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:02:58",
+   "last": "2026-08-20T17:02:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp2sc3tfum",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:03:07",
+   "last": "2026-08-21T15:03:07",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp32-q-act",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:53",
+   "last": "2026-08-20T14:37:53",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp32da6uwr",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:20",
+   "last": "2026-08-20T16:37:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp39if284h",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:03",
+   "last": "2026-08-20T14:37:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3c1eaayd",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:19:15",
+   "last": "2026-08-20T15:19:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3e1cxto9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:38",
+   "last": "2026-08-19T14:24:38",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3e5exozc",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:11",
+   "last": "2026-08-20T16:46:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3i92yi37",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:58:36",
+   "last": "2026-08-22T01:58:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3jzyj2zp",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:45:57",
+   "last": "2026-08-20T16:45:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3kgua9h1",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:51",
+   "last": "2026-08-19T14:25:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3ks12u7r",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:57:26",
+   "last": "2026-08-22T01:57:26",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3lfy9700",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:13",
+   "last": "2026-08-20T14:37:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3o0g6l6d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:38",
+   "last": "2026-08-20T16:40:38",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3pws5epw",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:23:23",
+   "last": "2026-08-20T15:23:23",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3sv3xcnv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:18",
+   "last": "2026-08-19T14:24:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp3x20bb7f",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:22",
+   "last": "2026-08-20T16:46:22",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp42abxwbk",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:23:22",
+   "last": "2026-08-19T14:23:22",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp485uyer7",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:12",
+   "last": "2026-08-20T16:46:12",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp48ldc8qn",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:23",
+   "last": "2026-08-20T14:41:23",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp4d6o60r7",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:12",
+   "last": "2026-08-20T16:41:12",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp4dulbigs",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T14:59:43",
+   "last": "2026-08-21T14:59:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp4s0xfrqt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:36",
+   "last": "2026-08-20T16:37:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp4vt55m9h",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:57",
+   "last": "2026-08-20T18:02:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5-8t606z",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:44:09",
+   "last": "2026-08-20T16:44:09",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp526544cb",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:07",
+   "last": "2026-08-19T14:25:07",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp52yu4-v-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:58:00",
+   "last": "2026-08-22T01:58:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5aawzolt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:26:18",
+   "last": "2026-08-22T01:26:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5ezkns0s",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:25",
+   "last": "2026-08-20T16:43:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5ghxr2go",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:44",
+   "last": "2026-08-20T14:34:44",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5gpduusv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:32",
+   "last": "2026-08-19T14:24:32",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5lczkdex",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:36:51",
+   "last": "2026-08-20T14:36:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5ludcsb0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:03",
+   "last": "2026-08-20T14:40:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp5xpj0ht2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:44",
+   "last": "2026-08-20T17:03:44",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp63ma5pii",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T01:08:34",
+   "last": "2026-08-21T01:08:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6e539092",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:30",
+   "last": "2026-08-20T12:37:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6fqnwz6l",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T01:08:13",
+   "last": "2026-08-21T01:08:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6fwdthp5",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:56:13",
+   "last": "2026-08-22T01:56:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6jz179qn",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:13",
+   "last": "2026-08-20T15:22:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6kmb2ixe",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:25",
+   "last": "2026-08-20T16:43:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6oenz0vq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:25",
+   "last": "2026-08-20T16:37:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6stppd2g",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:35",
+   "last": "2026-08-20T16:46:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6tlajjd2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:17",
+   "last": "2026-08-20T16:41:17",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp6zk4rbne",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:44:20",
+   "last": "2026-08-20T16:44:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp767o1boh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:58",
+   "last": "2026-08-20T18:02:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp7o00dz3n",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:45",
+   "last": "2026-08-20T16:37:45",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp83lnhhuv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:25:03",
+   "last": "2026-08-22T01:25:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp83zpw2vj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:56",
+   "last": "2026-08-20T14:34:56",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp84x7ec6r",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:24",
+   "last": "2026-08-20T14:37:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp87277hrt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:04:31",
+   "last": "2026-08-20T17:04:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8c860onq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T01:07:53",
+   "last": "2026-08-21T01:07:53",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8crpra-c",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:38:36",
+   "last": "2026-08-20T12:38:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8ilt99bm",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:28",
+   "last": "2026-08-20T15:17:28",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8liucdde",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:38:26",
+   "last": "2026-08-20T16:38:26",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8t2qf6rr",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:47",
+   "last": "2026-08-20T16:43:47",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8xlqilbr",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T01:10:21",
+   "last": "2026-08-21T01:10:21",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp8xnzi90d",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:14",
+   "last": "2026-08-20T17:03:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp9-7ctwjp",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:56",
+   "last": "2026-08-20T16:43:56",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp91xiwi3n",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:08",
+   "last": "2026-08-19T14:24:08",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp96kvd-e3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:10",
+   "last": "2026-08-20T16:46:10",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp96mu92b0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:37",
+   "last": "2026-08-20T18:04:37",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp96w32eus",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:48",
+   "last": "2026-08-20T17:01:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmp9j9gmq3a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:23:43",
+   "last": "2026-08-20T15:23:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpa-8qbii4",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:32",
+   "last": "2026-08-20T14:41:32",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpa0kywdj3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:01",
+   "last": "2026-08-20T15:17:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpa2-wqe7a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:01",
+   "last": "2026-08-20T14:41:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpa2z9jjj6",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:18",
+   "last": "2026-08-20T12:37:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpa4c54pwv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:54",
+   "last": "2026-08-20T14:37:54",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpag2w02e0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:46",
+   "last": "2026-08-20T16:43:46",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpahg0feo0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:04:01",
+   "last": "2026-08-20T17:04:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpao-arb7n",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:30:39",
+   "last": "2026-08-22T01:30:39",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpaw6p1d1j",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:14",
+   "last": "2026-08-20T17:03:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpazkzvspj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:05:14",
+   "last": "2026-08-20T18:05:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpb-ge9awx",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:35",
+   "last": "2026-08-20T14:40:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpb-r3lufd",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:46",
+   "last": "2026-08-20T17:03:46",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpb57vbb61",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:29:13",
+   "last": "2026-08-22T01:29:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpb59ui26i",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:34",
+   "last": "2026-08-20T14:34:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpbdlto8w0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:47",
+   "last": "2026-08-20T16:43:47",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpbevgdrp6",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:15",
+   "last": "2026-08-20T15:17:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpbmlp3gtd",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:03:24",
+   "last": "2026-08-20T18:03:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpbnp35hx3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:01",
+   "last": "2026-08-20T17:01:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpc1tklph6",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:35",
+   "last": "2026-08-20T16:37:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpc3tev9xv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:36:50",
+   "last": "2026-08-20T14:36:50",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpci9vhek1",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:13",
+   "last": "2026-08-20T17:03:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpcjoox-zb",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:39:18",
+   "last": "2026-08-20T12:39:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpcksbgkft",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:05:20",
+   "last": "2026-08-20T18:05:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpclkbr040",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:54",
+   "last": "2026-08-20T16:40:54",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpctgc1und",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:43",
+   "last": "2026-08-20T18:02:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpcvuaffdh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:24",
+   "last": "2026-08-20T12:37:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpcxsqwcy-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:44:12",
+   "last": "2026-08-20T16:44:12",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpd-0r4q4n",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:34",
+   "last": "2026-08-20T18:04:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpd4f-miwy",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:29",
+   "last": "2026-08-20T15:17:29",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpdc4a371t",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:56:59",
+   "last": "2026-08-22T01:56:59",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpdsiq6syh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:23",
+   "last": "2026-08-19T14:24:23",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpdudft2sj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:16:57",
+   "last": "2026-08-20T15:16:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpe-90wf01",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:28:21",
+   "last": "2026-08-22T01:28:21",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpeadrne47",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:09",
+   "last": "2026-08-20T16:37:09",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpebl7ueuc",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:01",
+   "last": "2026-08-20T14:41:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpebt4cjkb",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:14",
+   "last": "2026-08-20T15:17:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpeyr6mhfk",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:27",
+   "last": "2026-08-20T15:22:27",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpeyz23uxo",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:24:47",
+   "last": "2026-08-22T01:24:47",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpf-jqfs6y",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:38:14",
+   "last": "2026-08-20T14:38:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpf5b88e-k",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:03:10",
+   "last": "2026-08-20T18:03:10",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpf5rjiiub",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:19",
+   "last": "2026-08-20T14:40:19",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpf93hc23o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:23:58",
+   "last": "2026-08-19T14:23:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpfc4uavma",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:57",
+   "last": "2026-08-20T18:02:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpff08o1sc",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:05:02",
+   "last": "2026-08-20T18:05:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpfgpv4p2f",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:35",
+   "last": "2026-08-20T16:37:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpflqhh3hu",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:44:05",
+   "last": "2026-08-20T16:44:05",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpfm75s7ml",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:07",
+   "last": "2026-08-20T18:04:07",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpfooc0o17",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:20",
+   "last": "2026-08-19T14:25:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpfvmr3y9o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:09",
+   "last": "2026-08-20T16:37:09",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpfziecqv1",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:00",
+   "last": "2026-08-20T16:41:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgckcx6wy",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:02:20",
+   "last": "2026-08-21T15:02:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgd6v3wp8",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:38:41",
+   "last": "2026-08-20T12:38:41",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgefztv52",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:34",
+   "last": "2026-08-20T16:40:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpggf3pi9w",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:33",
+   "last": "2026-08-20T14:34:33",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgm5qblxi",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:03:11",
+   "last": "2026-08-20T18:03:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgm8y2ti0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:53",
+   "last": "2026-08-20T15:20:53",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgn8epzsp",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:36:52",
+   "last": "2026-08-20T14:36:52",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgnh0pp0-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:05:17",
+   "last": "2026-08-20T18:05:17",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgrean9g5",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:30",
+   "last": "2026-08-20T15:17:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgsf8bsqt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:45:58",
+   "last": "2026-08-20T16:45:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpgyh9cs8t",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T01:10:45",
+   "last": "2026-08-21T01:10:45",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmph-r-dcy2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:25",
+   "last": "2026-08-20T16:43:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmph7oed2ld",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:41",
+   "last": "2026-08-20T15:17:41",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmph8tkja9p",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:02",
+   "last": "2026-08-20T17:01:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmphnumcztb",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:56",
+   "last": "2026-08-20T14:34:56",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmphyb25mua",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:00",
+   "last": "2026-08-20T14:41:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpi3qieeg3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:42",
+   "last": "2026-08-20T14:37:42",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpi5i5o6ko",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:32",
+   "last": "2026-08-20T17:03:32",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpi995iuky",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:11",
+   "last": "2026-08-20T15:22:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpid09dve8",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:35",
+   "last": "2026-08-20T14:34:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpidw4o017",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:48",
+   "last": "2026-08-20T18:04:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpiesa-vq3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:30",
+   "last": "2026-08-20T14:40:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpijgswmon",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:00",
+   "last": "2026-08-20T15:22:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpijl9maue",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:14",
+   "last": "2026-08-20T15:22:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpimqgx405",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:21",
+   "last": "2026-08-20T15:20:21",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpj1v6wo42",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:40",
+   "last": "2026-08-20T12:37:40",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjbl0wnax",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T14:59:08",
+   "last": "2026-08-21T14:59:08",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjf1wbrlv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:43:40",
+   "last": "2026-08-20T16:43:40",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjl91jhvo",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:26:30",
+   "last": "2026-08-22T01:26:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjpd4huv-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T02:00:18",
+   "last": "2026-08-22T02:00:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjr-lsyoy",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:06:00",
+   "last": "2026-08-20T18:06:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjre5ou75",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:15",
+   "last": "2026-08-20T17:03:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjx05l2y0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:02:04",
+   "last": "2026-08-20T17:02:04",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpjyx--ral",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:24",
+   "last": "2026-08-20T14:41:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpk053q5un",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:02:57",
+   "last": "2026-08-20T17:02:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpk2twnspq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:38:03",
+   "last": "2026-08-20T14:38:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpk846le4n",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:30",
+   "last": "2026-08-20T14:40:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpkj0j7wye",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:22",
+   "last": "2026-08-20T15:20:22",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpl239nb72",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:16",
+   "last": "2026-08-20T17:01:16",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpl3eopud9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:15",
+   "last": "2026-08-20T15:17:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpl58llyfq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:37",
+   "last": "2026-08-20T18:04:37",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplgqwkmxv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:21:02",
+   "last": "2026-08-20T15:21:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplgslg3zg",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:51",
+   "last": "2026-08-19T14:24:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplkk7dxpm",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:35:10",
+   "last": "2026-08-20T14:35:10",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplmmgc-vt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:39:13",
+   "last": "2026-08-20T12:39:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplr-ytkt6",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:50",
+   "last": "2026-08-20T17:01:50",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplrt3juyx",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:42",
+   "last": "2026-08-20T16:46:42",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmplyhtzxmh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:02:29",
+   "last": "2026-08-20T17:02:29",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpm-07t6f3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:54",
+   "last": "2026-08-20T17:01:54",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpm1i3a1xq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:36:51",
+   "last": "2026-08-20T14:36:51",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpm7ozz1ol",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:13",
+   "last": "2026-08-19T14:24:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpmbd1hhvj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:59:13",
+   "last": "2026-08-22T01:59:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpme-92gll",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:02",
+   "last": "2026-08-20T16:41:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpmij9oasa",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:42",
+   "last": "2026-08-20T14:40:42",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpmr-gqyrf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:42",
+   "last": "2026-08-20T14:37:42",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpmtq80z9z",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:15",
+   "last": "2026-08-20T16:41:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpmwhfug1o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:03:09",
+   "last": "2026-08-20T18:03:09",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpn1wxmxw8",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:23:14",
+   "last": "2026-08-22T01:23:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpn2g04908",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:24:46",
+   "last": "2026-08-19T14:24:46",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpn732unax",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:30:07",
+   "last": "2026-08-22T01:30:07",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpnucymmbd",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:59",
+   "last": "2026-08-20T16:37:59",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpny837pzl",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:03",
+   "last": "2026-08-20T14:40:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpo-njtk0w",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:31",
+   "last": "2026-08-20T17:01:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpo147lxnt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:00",
+   "last": "2026-08-20T15:17:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpo2v0brs3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:25",
+   "last": "2026-08-20T15:22:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpo3bx5y4q",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:14",
+   "last": "2026-08-19T14:25:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpon0c4-j-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:00",
+   "last": "2026-08-20T15:22:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmposl246sl",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T14:58:47",
+   "last": "2026-08-21T14:58:47",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpp0y0v92j",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:53",
+   "last": "2026-08-20T16:40:53",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpp8nqzw64",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:49",
+   "last": "2026-08-20T15:20:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmppbj3nzvf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T02:01:20",
+   "last": "2026-08-22T02:01:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmppkcr9wbl",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:23",
+   "last": "2026-08-20T14:37:23",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmppvfogy2i",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:31",
+   "last": "2026-08-20T17:03:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpq1plkmts",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:12",
+   "last": "2026-08-20T15:22:12",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpq5f-mlx3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:02",
+   "last": "2026-08-19T14:25:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpq5l4uff7",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:36",
+   "last": "2026-08-20T16:40:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpq9gmev01",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:43",
+   "last": "2026-08-20T18:02:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpqit2qsqv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:22",
+   "last": "2026-08-20T14:41:22",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpqq6gdsrr",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:41:54",
+   "last": "2026-08-20T16:41:54",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpqs9zsebe",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:49",
+   "last": "2026-08-20T16:40:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpqw4rapn9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T02:00:58",
+   "last": "2026-08-22T02:00:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpqzcuxymu",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:49",
+   "last": "2026-08-20T12:37:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpr95330j8",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:22:57",
+   "last": "2026-08-22T01:22:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmprnd45rv-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:43",
+   "last": "2026-08-20T14:37:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmprnv20bib",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:42",
+   "last": "2026-08-20T14:37:42",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmprnwrsf2b",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:38",
+   "last": "2026-08-20T15:20:38",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmprqz7ry1h",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:16",
+   "last": "2026-08-20T15:20:16",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmprs5-p9bd",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:36",
+   "last": "2026-08-20T16:40:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmprwljw5tm",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:38:04",
+   "last": "2026-08-20T14:38:04",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmps1y993r0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:03:31",
+   "last": "2026-08-21T15:03:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmps2q6f8cy",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T01:10:59",
+   "last": "2026-08-21T01:10:59",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmps6cvz08h",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:48",
+   "last": "2026-08-20T18:04:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmps9sivc3k",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:39:22",
+   "last": "2026-08-20T12:39:22",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpscoqhzac",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:03:30",
+   "last": "2026-08-20T17:03:30",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsgbq-sqq",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:46",
+   "last": "2026-08-20T14:34:46",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsguw2itt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:47:11",
+   "last": "2026-08-20T16:47:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsj9an7l3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:24",
+   "last": "2026-08-20T14:37:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsjadjqi-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:43",
+   "last": "2026-08-20T18:02:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsme7s15l",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:12",
+   "last": "2026-08-20T14:41:12",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsp5mnbhf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:44",
+   "last": "2026-08-20T18:02:44",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsqq0z1j0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:35:02",
+   "last": "2026-08-20T14:35:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsrmspwnf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:45:58",
+   "last": "2026-08-20T16:45:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpss9dyeea",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:23",
+   "last": "2026-08-20T16:46:23",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpssy0hj48",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:59",
+   "last": "2026-08-20T14:37:59",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpswwufucx",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:13",
+   "last": "2026-08-20T14:41:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsxkrnnfd",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:38:09",
+   "last": "2026-08-20T12:38:09",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpsybugtao",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:03:24",
+   "last": "2026-08-20T18:03:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpt-7rc7-k",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:14",
+   "last": "2026-08-20T14:41:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpt-lshu2p",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:56",
+   "last": "2026-08-20T18:04:56",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmptiau53v-",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:31",
+   "last": "2026-08-20T15:17:31",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmptiss6pz4",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:23:42",
+   "last": "2026-08-19T14:23:42",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpto225z-o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:40",
+   "last": "2026-08-20T15:22:40",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmptoq0c-zi",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:56:33",
+   "last": "2026-08-22T01:56:33",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmptq-n2adv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:24",
+   "last": "2026-08-20T16:46:24",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmptwt0n2uh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:14",
+   "last": "2026-08-20T14:40:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmptzlzm9yl",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:02:57",
+   "last": "2026-08-20T18:02:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpu0pjcjxz",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:38:54",
+   "last": "2026-08-20T12:38:54",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpu2yah1mw",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:38",
+   "last": "2026-08-20T15:20:38",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpu3d6qvip",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:55",
+   "last": "2026-08-19T14:25:55",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpu6ilhypf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:34",
+   "last": "2026-08-20T15:20:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpu6rc72h3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:59",
+   "last": "2026-08-20T12:37:59",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpugsv0i4l",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:56",
+   "last": "2026-08-20T14:34:56",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpukbuujwa",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:01:20",
+   "last": "2026-08-21T15:01:20",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpuqo01znk",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:36",
+   "last": "2026-08-20T16:46:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpuu4egb6a",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:02",
+   "last": "2026-08-20T14:40:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpuytjvpv1",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:37",
+   "last": "2026-08-20T15:22:37",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpv4pzdns9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:33",
+   "last": "2026-08-20T14:34:33",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpv5pfz9g8",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:35:07",
+   "last": "2026-08-20T14:35:07",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpva5ynyky",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:21:35",
+   "last": "2026-08-20T15:21:35",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpvcx7ycbv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:32",
+   "last": "2026-08-20T17:01:32",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpvdkqtqzw",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:52",
+   "last": "2026-08-20T14:37:52",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpvj40imad",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:45:01",
+   "last": "2026-08-20T16:45:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpvjyic8a0",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:02:59",
+   "last": "2026-08-20T17:02:59",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpvlctd6vi",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:03",
+   "last": "2026-08-20T14:41:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpvo9ikecl",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:41",
+   "last": "2026-08-19T14:25:41",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpw0rlbjte",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:48",
+   "last": "2026-08-20T14:41:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpw0whw53k",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:01",
+   "last": "2026-08-20T14:37:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpw3g40r-9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:54",
+   "last": "2026-08-20T12:37:54",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpw6ktzwmi",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:16:58",
+   "last": "2026-08-20T15:16:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwb608y0m",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:40:49",
+   "last": "2026-08-20T16:40:49",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwg085o31",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:26:11",
+   "last": "2026-08-19T14:26:11",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwjtnm8tf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:15",
+   "last": "2026-08-20T14:37:15",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwkn0zn30",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:36",
+   "last": "2026-08-20T18:04:36",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwqqih8ce",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:45",
+   "last": "2026-08-20T15:17:45",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwrho883v",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:13",
+   "last": "2026-08-20T14:37:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwtvg-jee",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:44:04",
+   "last": "2026-08-20T16:44:04",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpwxl72l0n",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:14",
+   "last": "2026-08-20T14:37:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpx4joh511",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:26",
+   "last": "2026-08-20T17:01:26",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpx94k68jt",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:00",
+   "last": "2026-08-20T17:01:00",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxco25r3o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:05:02",
+   "last": "2026-08-20T18:05:02",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxfi2jplv",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:27",
+   "last": "2026-08-20T15:22:27",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxhp8y6hy",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:08",
+   "last": "2026-08-20T16:37:08",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxjxy5-sh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:16",
+   "last": "2026-08-20T15:20:16",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxk6x4r2t",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:01:57",
+   "last": "2026-08-21T15:01:57",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxq69-p03",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:01:47",
+   "last": "2026-08-20T17:01:47",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpxyg6nvx3",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T18:04:48",
+   "last": "2026-08-20T18:04:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpy1cycf-h",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:33",
+   "last": "2026-08-19T14:25:33",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpy2iudark",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:34:43",
+   "last": "2026-08-20T14:34:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpy4fqm-t8",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:57:10",
+   "last": "2026-08-22T01:57:10",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpy6dtv-hz",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-21T15:00:43",
+   "last": "2026-08-21T15:00:43",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpy7cs9pwg",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:37:08",
+   "last": "2026-08-20T16:37:08",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpy9qep8ka",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:34",
+   "last": "2026-08-20T14:41:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpycw56zqz",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:27",
+   "last": "2026-08-20T15:22:27",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpyeoz3tf7",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:37:01",
+   "last": "2026-08-20T14:37:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpyi2t67l2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T12:37:13",
+   "last": "2026-08-20T12:37:13",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpyn3cxp0o",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T16:46:25",
+   "last": "2026-08-20T16:46:25",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpytk2fubm",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:18:18",
+   "last": "2026-08-20T15:18:18",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpyuupoxbm",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T17:02:58",
+   "last": "2026-08-20T17:02:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpyxytbe7u",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:41:17",
+   "last": "2026-08-20T14:41:17",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpz-v3aqvf",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:34",
+   "last": "2026-08-20T15:20:34",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpz0kzn0sh",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:25:37",
+   "last": "2026-08-19T14:25:37",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpz15p5piw",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:27:27",
+   "last": "2026-08-22T01:27:27",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpz4xf2ff9",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:17:40",
+   "last": "2026-08-20T15:17:40",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpz5nustn2",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:48",
+   "last": "2026-08-20T15:20:48",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpzd90sxjj",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:22:01",
+   "last": "2026-08-20T15:22:01",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpzhneemz1",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-22T01:25:58",
+   "last": "2026-08-22T01:25:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpziqadwiu",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-19T14:26:04",
+   "last": "2026-08-19T14:26:04",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpzjjnv7pg",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:20:58",
+   "last": "2026-08-20T15:20:58",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpzksvg08l",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:38:14",
+   "last": "2026-08-20T14:38:14",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpzpa1zpvp",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T15:21:03",
+   "last": "2026-08-20T15:21:03",
+   "in_usage_report": false
+  },
+  {
+   "folder": "-tmp-tmpzvvlh9ie",
+   "sessions": 1,
+   "agents": 0,
+   "calls": 1,
+   "first": "2026-08-20T14:40:02",
+   "last": "2026-08-20T14:40:02",
+   "in_usage_report": false
+  }
+ ],
+ "calibration": {
+  "window_convention": {
+   "first call": {
+    "starts": 110,
+    "hits": [
+     {
+      "hit": "2026-09-13T09:08:10",
+      "limit": "session",
+      "reset_utc": "2026-09-13T09:30:00",
+      "window_start": null,
+      "predicted_end": null,
+      "end_minus_reset_min": null
+     },
+     {
+      "hit": "2026-10-25T20:57:39",
+      "limit": "session",
+      "reset_utc": "2026-10-25T22:40:00",
+      "window_start": "2026-10-25T17:46:46",
+      "predicted_end": "2026-10-25T22:46:46",
+      "end_minus_reset_min": 7
+     },
+     {
+      "hit": "2026-10-29T06:19:15",
+      "limit": "5-hour",
+      "reset_utc": "2026-10-29T06:30:00",
+      "window_start": "2026-10-29T01:31:08",
+      "predicted_end": "2026-10-29T06:31:08",
+      "end_minus_reset_min": 1
+     },
+     {
+      "hit": "2026-10-29T17:13:20",
+      "limit": "5-hour",
+      "reset_utc": "2026-10-29T18:00:00",
+      "window_start": "2026-10-29T13:08:02",
+      "predicted_end": "2026-10-29T18:08:02",
+      "end_minus_reset_min": 8
+     }
+    ],
+    "max_abs_end_error_min": 8
+   },
+   "floored hour": {
+    "starts": 116,
+    "hits": [
+     {
+      "hit": "2026-09-13T09:08:10",
+      "limit": "session",
+      "reset_utc": "2026-09-13T09:30:00",
+      "window_start": null,
+      "predicted_end": null,
+      "end_minus_reset_min": null
+     },
+     {
+      "hit": "2026-10-25T20:57:39",
+      "limit": "session",
+      "reset_utc": "2026-10-25T22:40:00",
+      "window_start": "2026-10-25T16:00:00",
+      "predicted_end": "2026-10-25T21:00:00",
+      "end_minus_reset_min": -100
+     },
+     {
+      "hit": "2026-10-29T06:19:15",
+      "limit": "5-hour",
+      "reset_utc": "2026-10-29T06:30:00",
+      "window_start": "2026-10-29T06:00:00",
+      "predicted_end": "2026-10-29T11:00:00",
+      "end_minus_reset_min": 270
+     },
+     {
+      "hit": "2026-10-29T17:13:20",
+      "limit": "5-hour",
+      "reset_utc": "2026-10-29T18:00:00",
+      "window_start": "2026-10-29T13:00:00",
+      "predicted_end": "2026-10-29T18:00:00",
+      "end_minus_reset_min": 0
+     }
+    ],
+    "max_abs_end_error_min": 270
+   }
+  },
+  "used": "first call",
+  "scopes": {
+   "this session and its agents": {
+    "usd list price": {
+     "per_pct": 1.6496,
+     "per_pct_range_1pt": [
+      1.5808,
+      1.7245
+     ],
+     "checks": [
+      {
+       "what": "5% at 2026-10-30T16:54:25 from its window start 2026-10-30T14:57:29",
+       "predicted_pct": 2.4,
+       "read_pct": 5,
+       "ratio": 0.48
+      },
+      {
+       "what": "7% at 2026-10-30T16:59:04 (2-point step, +-50%)",
+       "predicted_pct": 7.0,
+       "read_pct": 7,
+       "ratio": 1.0
+      },
+      {
+       "what": "100% at the session-limit refusal 2026-10-25T20:57:39 (window from 2026-10-25T17:46:46)",
+       "predicted_pct": 78.6,
+       "read_pct": 100,
+       "ratio": 0.786
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T06:19:15 (window from 2026-10-29T01:31:08)",
+       "predicted_pct": 46.0,
+       "read_pct": 100,
+       "ratio": 0.46
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T17:13:20 (window from 2026-10-29T13:08:02)",
+       "predicted_pct": 89.2,
+       "read_pct": 100,
+       "ratio": 0.892
+      }
+     ],
+     "pass_20pct": false
+    },
+    "old weighting": {
+     "per_pct": 640351,
+     "per_pct_range_1pt": [
+      613669.5104,
+      669457.6477
+     ],
+     "checks": [
+      {
+       "what": "5% at 2026-10-30T16:54:25 from its window start 2026-10-30T14:57:29",
+       "predicted_pct": 2.0,
+       "read_pct": 5,
+       "ratio": 0.4
+      },
+      {
+       "what": "7% at 2026-10-30T16:59:04 (2-point step, +-50%)",
+       "predicted_pct": 6.7,
+       "read_pct": 7,
+       "ratio": 0.957
+      },
+      {
+       "what": "100% at the session-limit refusal 2026-10-25T20:57:39 (window from 2026-10-25T17:46:46)",
+       "predicted_pct": 81.7,
+       "read_pct": 100,
+       "ratio": 0.817
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T06:19:15 (window from 2026-10-29T01:31:08)",
+       "predicted_pct": 42.5,
+       "read_pct": 100,
+       "ratio": 0.425
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T17:13:20 (window from 2026-10-29T13:08:02)",
+       "predicted_pct": 81.6,
+       "read_pct": 100,
+       "ratio": 0.816
+      }
+     ],
+     "pass_20pct": false
+    }
+   },
+   "every call of the account": {
+    "usd list price": {
+     "per_pct": 1.7012,
+     "per_pct_range_1pt": [
+      1.6303,
+      1.7785
+     ],
+     "checks": [
+      {
+       "what": "5% at 2026-10-30T16:54:25 from its window start 2026-10-30T14:57:29",
+       "predicted_pct": 4.4,
+       "read_pct": 5,
+       "ratio": 0.88
+      },
+      {
+       "what": "7% at 2026-10-30T16:59:04 (2-point step, +-50%)",
+       "predicted_pct": 7.0,
+       "read_pct": 7,
+       "ratio": 1.0
+      },
+      {
+       "what": "100% at the session-limit refusal 2026-10-25T20:57:39 (window from 2026-10-25T17:46:46)",
+       "predicted_pct": 76.2,
+       "read_pct": 100,
+       "ratio": 0.762
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T06:19:15 (window from 2026-10-29T01:31:08)",
+       "predicted_pct": 75.5,
+       "read_pct": 100,
+       "ratio": 0.755
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T17:13:20 (window from 2026-10-29T13:08:02)",
+       "predicted_pct": 86.5,
+       "read_pct": 100,
+       "ratio": 0.865
+      }
+     ],
+     "pass_20pct": false
+    },
+    "old weighting": {
+     "per_pct": 661569,
+     "per_pct_range_1pt": [
+      634003.275,
+      691639.9364
+     ],
+     "checks": [
+      {
+       "what": "5% at 2026-10-30T16:54:25 from its window start 2026-10-30T14:57:29",
+       "predicted_pct": 3.6,
+       "read_pct": 5,
+       "ratio": 0.72
+      },
+      {
+       "what": "7% at 2026-10-30T16:59:04 (2-point step, +-50%)",
+       "predicted_pct": 6.7,
+       "read_pct": 7,
+       "ratio": 0.957
+      },
+      {
+       "what": "100% at the session-limit refusal 2026-10-25T20:57:39 (window from 2026-10-25T17:46:46)",
+       "predicted_pct": 79.1,
+       "read_pct": 100,
+       "ratio": 0.791
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T06:19:15 (window from 2026-10-29T01:31:08)",
+       "predicted_pct": 63.6,
+       "read_pct": 100,
+       "ratio": 0.636
+      },
+      {
+       "what": "100% at the 5-hour-limit refusal 2026-10-29T17:13:20 (window from 2026-10-29T13:08:02)",
+       "predicted_pct": 79.0,
+       "read_pct": 100,
+       "ratio": 0.79
+      }
+     ],
+     "pass_20pct": false
+    }
+   }
+  }
+ },
+ "usd_per_pct": null,
+ "models_per_period": {
+  "main alone": {
+   "claude-opus-5-5": {
+    "calls": 19341,
+    "usd": 1718.56
+   },
+   "claude-sonnet-5": {
+    "calls": 226,
+    "usd": 6.02
+   },
+   "claude-haiku-4-5-20251001": {
+    "calls": 30,
+    "usd": 0.45
+   },
+   "claude-sonnet-5-5": {
+    "calls": 283,
+    "usd": 7.55
+   },
+   "claude-haiku-5-5": {
+    "calls": 6,
+    "usd": 0.01
+   }
+  },
+  "step agents": {
+   "claude-opus-5-5": {
+    "calls": 17394,
+    "usd": 1075.59
+   },
+   "claude-sonnet-5-5": {
+    "calls": 531,
+    "usd": 16.83
+   },
+   "claude-haiku-5-5": {
+    "calls": 17,
+    "usd": 0.06
+   }
+  },
+  "redesign": {
+   "claude-opus-5-5": {
+    "calls": 2012,
+    "usd": 121.85
+   },
+   "claude-sonnet-5-5": {
+    "calls": 127,
+    "usd": 3.38
+   }
+  }
+ },
+ "blocks": [
+  {
+   "start": "2026-10-01T00:15:57",
+   "calls": 324,
+   "usd": 20.72,
+   "old_weight": 7891771,
+   "first": "2026-10-01T00:15:57",
+   "last": "2026-10-01T04:44:09",
+   "by_model": {
+    "claude-opus-5-5": 19.33,
+    "claude-sonnet-5": 1.4
+   },
+   "by_source": {
+    "this session": 17.5,
+    "this session's agents": 3.22
+   },
+   "by_period": {
+    "main alone": 20.72
+   },
+   "cache_read_usd": 12.05,
+   "unpriced_calls": 0,
+   "active_h": 4.47,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-01T07:24:36",
+   "calls": 221,
+   "usd": 20.76,
+   "old_weight": 7094346,
+   "first": "2026-10-01T07:24:36",
+   "last": "2026-10-01T12:24:22",
+   "by_model": {
+    "claude-opus-5-5": 20.76
+   },
+   "by_source": {
+    "this session": 13.6,
+    "other projects": 7.16
+   },
+   "by_period": {
+    "main alone": 20.76
+   },
+   "cache_read_usd": 10.25,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-01T12:24:55",
+   "calls": 282,
+   "usd": 33.14,
+   "old_weight": 12943029,
+   "first": "2026-10-01T12:24:55",
+   "last": "2026-10-01T17:22:21",
+   "by_model": {
+    "claude-opus-5-5": 33.14
+   },
+   "by_source": {
+    "this session": 23.36,
+    "other projects": 7.91,
+    "this session's agents": 1.88
+   },
+   "by_period": {
+    "main alone": 33.14
+   },
+   "cache_read_usd": 21.11,
+   "unpriced_calls": 0,
+   "active_h": 4.96,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-01T17:25:32",
+   "calls": 36,
+   "usd": 5.26,
+   "old_weight": 2297069,
+   "first": "2026-10-01T17:25:32",
+   "last": "2026-10-01T18:30:30",
+   "by_model": {
+    "claude-opus-5-5": 5.26
+   },
+   "by_source": {
+    "this session": 5.26
+   },
+   "by_period": {
+    "main alone": 5.26
+   },
+   "cache_read_usd": 4.1,
+   "unpriced_calls": 0,
+   "active_h": 1.08,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-02T00:57:40",
+   "calls": 389,
+   "usd": 30.02,
+   "old_weight": 11283867,
+   "first": "2026-10-02T00:57:40",
+   "last": "2026-10-02T03:57:50",
+   "by_model": {
+    "claude-opus-5-5": 27.29,
+    "claude-sonnet-5": 2.73
+   },
+   "by_source": {
+    "this session": 26.09,
+    "this session's agents": 3.93
+   },
+   "by_period": {
+    "main alone": 30.02
+   },
+   "cache_read_usd": 17.43,
+   "unpriced_calls": 0,
+   "active_h": 3.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-02T07:42:46",
+   "calls": 214,
+   "usd": 32.19,
+   "old_weight": 11361521,
+   "first": "2026-10-02T07:42:46",
+   "last": "2026-10-02T12:40:53",
+   "by_model": {
+    "claude-opus-5-5": 32.19
+   },
+   "by_source": {
+    "this session": 21.03,
+    "other projects": 9.93,
+    "this session's agents": 1.23
+   },
+   "by_period": {
+    "main alone": 32.19
+   },
+   "cache_read_usd": 17.55,
+   "unpriced_calls": 0,
+   "active_h": 4.97,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-02T12:53:57",
+   "calls": 166,
+   "usd": 23.34,
+   "old_weight": 7812944,
+   "first": "2026-10-02T12:53:57",
+   "last": "2026-10-02T17:11:44",
+   "by_model": {
+    "claude-opus-5-5": 23.34
+   },
+   "by_source": {
+    "this session": 16.14,
+    "other projects": 6.56,
+    "this session's agents": 0.64
+   },
+   "by_period": {
+    "main alone": 23.34
+   },
+   "cache_read_usd": 11.6,
+   "unpriced_calls": 0,
+   "active_h": 4.3,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-02T19:28:40",
+   "calls": 78,
+   "usd": 12.18,
+   "old_weight": 2995374,
+   "first": "2026-10-02T19:28:40",
+   "last": "2026-10-03T00:24:20",
+   "by_model": {
+    "claude-opus-5-5": 12.18
+   },
+   "by_source": {
+    "this session": 7.64,
+    "other projects": 4.53
+   },
+   "by_period": {
+    "main alone": 12.18
+   },
+   "cache_read_usd": 2.9,
+   "unpriced_calls": 0,
+   "active_h": 4.93,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-03T00:30:56",
+   "calls": 94,
+   "usd": 11.68,
+   "old_weight": 4139769,
+   "first": "2026-10-03T00:30:56",
+   "last": "2026-10-03T05:14:58",
+   "by_model": {
+    "claude-opus-5-5": 11.68
+   },
+   "by_source": {
+    "this session": 11.68
+   },
+   "by_period": {
+    "main alone": 11.68
+   },
+   "cache_read_usd": 6.36,
+   "unpriced_calls": 0,
+   "active_h": 4.73,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-03T09:03:10",
+   "calls": 69,
+   "usd": 13.27,
+   "old_weight": 3825648,
+   "first": "2026-10-03T09:03:10",
+   "last": "2026-10-03T12:54:54",
+   "by_model": {
+    "claude-opus-5-5": 13.27
+   },
+   "by_source": {
+    "this session": 12.69,
+    "this session's agents": 0.57
+   },
+   "by_period": {
+    "main alone": 13.27
+   },
+   "cache_read_usd": 4.74,
+   "unpriced_calls": 0,
+   "active_h": 3.86,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-03T14:10:55",
+   "calls": 56,
+   "usd": 10.72,
+   "old_weight": 3265933,
+   "first": "2026-10-03T14:10:55",
+   "last": "2026-10-03T15:16:23",
+   "by_model": {
+    "claude-opus-5-5": 10.72
+   },
+   "by_source": {
+    "this session": 10.72
+   },
+   "by_period": {
+    "main alone": 10.72
+   },
+   "cache_read_usd": 4.41,
+   "unpriced_calls": 0,
+   "active_h": 1.09,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-03T19:31:12",
+   "calls": 92,
+   "usd": 7.67,
+   "old_weight": 2802502,
+   "first": "2026-10-03T19:31:12",
+   "last": "2026-10-03T21:54:59",
+   "by_model": {
+    "claude-opus-5-5": 7.67
+   },
+   "by_source": {
+    "this session": 7.67
+   },
+   "by_period": {
+    "main alone": 7.67
+   },
+   "cache_read_usd": 4.36,
+   "unpriced_calls": 0,
+   "active_h": 2.4,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-04T00:47:20",
+   "calls": 31,
+   "usd": 7.17,
+   "old_weight": 1792421,
+   "first": "2026-10-04T00:47:20",
+   "last": "2026-10-04T02:57:34",
+   "by_model": {
+    "claude-opus-5-5": 7.17
+   },
+   "by_source": {
+    "this session": 7.17
+   },
+   "by_period": {
+    "main alone": 7.17
+   },
+   "cache_read_usd": 1.85,
+   "unpriced_calls": 0,
+   "active_h": 2.17,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-04T07:34:43",
+   "calls": 119,
+   "usd": 18.19,
+   "old_weight": 5507616,
+   "first": "2026-10-04T07:34:43",
+   "last": "2026-10-04T11:07:24",
+   "by_model": {
+    "claude-opus-5-5": 18.19
+   },
+   "by_source": {
+    "this session": 17.38,
+    "this session's agents": 0.81
+   },
+   "by_period": {
+    "main alone": 18.19
+   },
+   "cache_read_usd": 7.24,
+   "unpriced_calls": 0,
+   "active_h": 3.54,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-04T15:27:04",
+   "calls": 375,
+   "usd": 35.68,
+   "old_weight": 13729490,
+   "first": "2026-10-04T15:27:04",
+   "last": "2026-10-04T19:46:04",
+   "by_model": {
+    "claude-opus-5-5": 34.87,
+    "claude-sonnet-5": 0.81
+   },
+   "by_source": {
+    "this session": 33.76,
+    "this session's agents": 1.91
+   },
+   "by_period": {
+    "main alone": 35.68
+   },
+   "cache_read_usd": 21.9,
+   "unpriced_calls": 0,
+   "active_h": 4.32,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-04T22:16:27",
+   "calls": 182,
+   "usd": 18.76,
+   "old_weight": 6686671,
+   "first": "2026-10-04T22:16:27",
+   "last": "2026-10-05T03:16:21",
+   "by_model": {
+    "claude-opus-5-5": 17.67,
+    "claude-sonnet-5": 1.09
+   },
+   "by_source": {
+    "this session": 17.67,
+    "this session's agents": 1.09
+   },
+   "by_period": {
+    "main alone": 18.76
+   },
+   "cache_read_usd": 10.12,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-05T03:16:31",
+   "calls": 131,
+   "usd": 11.96,
+   "old_weight": 4744467,
+   "first": "2026-10-05T03:16:31",
+   "last": "2026-10-05T04:42:20",
+   "by_model": {
+    "claude-opus-5-5": 11.96
+   },
+   "by_source": {
+    "this session": 10.27,
+    "this session's agents": 1.69
+   },
+   "by_period": {
+    "main alone": 11.96
+   },
+   "cache_read_usd": 7.49,
+   "unpriced_calls": 0,
+   "active_h": 1.43,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-05T09:51:49",
+   "calls": 109,
+   "usd": 31.84,
+   "old_weight": 8169121,
+   "first": "2026-10-05T09:51:49",
+   "last": "2026-10-05T13:53:58",
+   "by_model": {
+    "claude-opus-5-5": 31.84
+   },
+   "by_source": {
+    "other projects": 21.7,
+    "this session": 10.15
+   },
+   "by_period": {
+    "main alone": 31.84
+   },
+   "cache_read_usd": 8.9,
+   "unpriced_calls": 0,
+   "active_h": 4.04,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-05T19:02:03",
+   "calls": 210,
+   "usd": 22.56,
+   "old_weight": 8238650,
+   "first": "2026-10-05T19:02:03",
+   "last": "2026-10-06T00:00:36",
+   "by_model": {
+    "claude-opus-5-5": 22.17,
+    "claude-haiku-4-5-20251001": 0.39
+   },
+   "by_source": {
+    "this session": 22.17,
+    "this session's agents": 0.39
+   },
+   "by_period": {
+    "main alone": 22.56
+   },
+   "cache_read_usd": 12.21,
+   "unpriced_calls": 0,
+   "active_h": 4.98,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-06T00:03:25",
+   "calls": 437,
+   "usd": 27.67,
+   "old_weight": 11229794,
+   "first": "2026-10-06T00:03:25",
+   "last": "2026-10-06T04:34:24",
+   "by_model": {
+    "claude-opus-5-5": 27.38,
+    "claude-sonnet-5-5": 0.3
+   },
+   "by_source": {
+    "this session": 18.84,
+    "this session's agents": 8.84
+   },
+   "by_period": {
+    "main alone": 27.67
+   },
+   "cache_read_usd": 18.24,
+   "unpriced_calls": 0,
+   "active_h": 4.52,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-06T07:39:46",
+   "calls": 117,
+   "usd": 11.39,
+   "old_weight": 4282934,
+   "first": "2026-10-06T07:39:46",
+   "last": "2026-10-06T10:29:56",
+   "by_model": {
+    "claude-opus-5-5": 11.39
+   },
+   "by_source": {
+    "this session": 10.71,
+    "this session's agents": 0.68
+   },
+   "by_period": {
+    "main alone": 11.39
+   },
+   "cache_read_usd": 6.8,
+   "unpriced_calls": 0,
+   "active_h": 2.84,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-06T15:02:57",
+   "calls": 172,
+   "usd": 27.53,
+   "old_weight": 9919275,
+   "first": "2026-10-06T15:02:57",
+   "last": "2026-10-06T19:08:20",
+   "by_model": {
+    "claude-opus-5-5": 27.53
+   },
+   "by_source": {
+    "this session": 16.7,
+    "other projects": 9.77,
+    "this session's agents": 1.06
+   },
+   "by_period": {
+    "main alone": 27.53
+   },
+   "cache_read_usd": 15.54,
+   "unpriced_calls": 0,
+   "active_h": 4.09,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-06T20:13:56",
+   "calls": 88,
+   "usd": 18.14,
+   "old_weight": 4770894,
+   "first": "2026-10-06T20:13:56",
+   "last": "2026-10-07T00:55:41",
+   "by_model": {
+    "claude-opus-5-5": 18.14
+   },
+   "by_source": {
+    "this session": 11.91,
+    "other projects": 6.22
+   },
+   "by_period": {
+    "main alone": 18.14
+   },
+   "cache_read_usd": 5.37,
+   "unpriced_calls": 0,
+   "active_h": 4.7,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-07T02:06:55",
+   "calls": 30,
+   "usd": 8.66,
+   "old_weight": 2010576,
+   "first": "2026-10-07T02:06:55",
+   "last": "2026-10-07T03:35:00",
+   "by_model": {
+    "claude-opus-5-5": 8.66
+   },
+   "by_source": {
+    "other projects": 6.37,
+    "this session": 2.3
+   },
+   "by_period": {
+    "main alone": 8.66
+   },
+   "cache_read_usd": 1.84,
+   "unpriced_calls": 0,
+   "active_h": 1.47,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-07T10:54:22",
+   "calls": 205,
+   "usd": 31.66,
+   "old_weight": 9610368,
+   "first": "2026-10-07T10:54:22",
+   "last": "2026-10-07T15:51:45",
+   "by_model": {
+    "claude-opus-5-5": 31.66
+   },
+   "by_source": {
+    "this session": 18.87,
+    "other projects": 12.79
+   },
+   "by_period": {
+    "main alone": 31.66
+   },
+   "cache_read_usd": 12.8,
+   "unpriced_calls": 0,
+   "active_h": 4.96,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-07T16:07:01",
+   "calls": 122,
+   "usd": 15.93,
+   "old_weight": 5445975,
+   "first": "2026-10-07T16:07:01",
+   "last": "2026-10-07T21:04:15",
+   "by_model": {
+    "claude-opus-5-5": 15.93
+   },
+   "by_source": {
+    "this session": 12.63,
+    "other projects": 3.3
+   },
+   "by_period": {
+    "main alone": 15.93
+   },
+   "cache_read_usd": 8.11,
+   "unpriced_calls": 0,
+   "active_h": 4.95,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-07T22:36:30",
+   "calls": 442,
+   "usd": 36.55,
+   "old_weight": 12884938,
+   "first": "2026-10-07T22:36:30",
+   "last": "2026-10-08T03:36:17",
+   "by_model": {
+    "claude-opus-5-5": 35.56,
+    "claude-sonnet-5-5": 0.93,
+    "claude-haiku-4-5-20251001": 0.06
+   },
+   "by_source": {
+    "this session": 23.44,
+    "this session's agents": 10.98,
+    "other projects": 2.13
+   },
+   "by_period": {
+    "main alone": 36.55
+   },
+   "cache_read_usd": 17.7,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-08T03:37:15",
+   "calls": 85,
+   "usd": 15.97,
+   "old_weight": 4092322,
+   "first": "2026-10-08T03:37:15",
+   "last": "2026-10-08T07:45:58",
+   "by_model": {
+    "claude-opus-5-5": 15.97
+   },
+   "by_source": {
+    "this session": 10.16,
+    "other projects": 5.18,
+    "this session's agents": 0.62
+   },
+   "by_period": {
+    "main alone": 15.97
+   },
+   "cache_read_usd": 4.37,
+   "unpriced_calls": 0,
+   "active_h": 4.15,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-08T10:25:47",
+   "calls": 274,
+   "usd": 22.83,
+   "old_weight": 7740410,
+   "first": "2026-10-08T10:25:47",
+   "last": "2026-10-08T15:25:19",
+   "by_model": {
+    "claude-opus-5-5": 22.83
+   },
+   "by_source": {
+    "this session": 13.15,
+    "other projects": 9.68
+   },
+   "by_period": {
+    "main alone": 22.83
+   },
+   "cache_read_usd": 11.03,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-08T15:26:13",
+   "calls": 264,
+   "usd": 26.99,
+   "old_weight": 11072625,
+   "first": "2026-10-08T15:26:13",
+   "last": "2026-10-08T20:16:44",
+   "by_model": {
+    "claude-opus-5-5": 26.72,
+    "claude-sonnet-5-5": 0.27
+   },
+   "by_source": {
+    "this session": 23.64,
+    "this session's agents": 2.07,
+    "other projects": 1.27
+   },
+   "by_period": {
+    "main alone": 26.99
+   },
+   "cache_read_usd": 18.71,
+   "unpriced_calls": 0,
+   "active_h": 4.84,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-08T21:39:08",
+   "calls": 205,
+   "usd": 13.48,
+   "old_weight": 5072444,
+   "first": "2026-10-08T21:39:08",
+   "last": "2026-10-09T02:31:10",
+   "by_model": {
+    "claude-opus-5-5": 12.98,
+    "claude-sonnet-5-5": 0.5
+   },
+   "by_source": {
+    "this session": 11.13,
+    "other projects": 1.85,
+    "this session's agents": 0.5
+   },
+   "by_period": {
+    "main alone": 13.48
+   },
+   "cache_read_usd": 7.58,
+   "unpriced_calls": 0,
+   "active_h": 4.87,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-09T02:52:45",
+   "calls": 300,
+   "usd": 28.41,
+   "old_weight": 10819318,
+   "first": "2026-10-09T02:52:45",
+   "last": "2026-10-09T07:11:10",
+   "by_model": {
+    "claude-opus-5-5": 28.41
+   },
+   "by_source": {
+    "this session": 21.38,
+    "other projects": 5.09,
+    "this session's agents": 1.94
+   },
+   "by_period": {
+    "main alone": 28.41
+   },
+   "cache_read_usd": 17.61,
+   "unpriced_calls": 0,
+   "active_h": 4.31,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-09T08:33:18",
+   "calls": 301,
+   "usd": 16.84,
+   "old_weight": 6321044,
+   "first": "2026-10-09T08:33:18",
+   "last": "2026-10-09T11:56:43",
+   "by_model": {
+    "claude-opus-5-5": 16.84
+   },
+   "by_source": {
+    "other projects": 10.41,
+    "this session": 5.4,
+    "this session's agents": 1.03
+   },
+   "by_period": {
+    "main alone": 16.84
+   },
+   "cache_read_usd": 9.82,
+   "unpriced_calls": 0,
+   "active_h": 3.39,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-09T13:41:03",
+   "calls": 145,
+   "usd": 12.76,
+   "old_weight": 4417778,
+   "first": "2026-10-09T13:41:03",
+   "last": "2026-10-09T17:59:23",
+   "by_model": {
+    "claude-opus-5-5": 12.76
+   },
+   "by_source": {
+    "this session": 12.17,
+    "other projects": 0.58
+   },
+   "by_period": {
+    "main alone": 12.76
+   },
+   "cache_read_usd": 6.58,
+   "unpriced_calls": 0,
+   "active_h": 4.31,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-09T19:31:29",
+   "calls": 97,
+   "usd": 7.35,
+   "old_weight": 1967930,
+   "first": "2026-10-09T19:31:29",
+   "last": "2026-10-10T00:18:15",
+   "by_model": {
+    "claude-opus-5-5": 7.35
+   },
+   "by_source": {
+    "this session": 3.94,
+    "other projects": 3.4
+   },
+   "by_period": {
+    "main alone": 7.35
+   },
+   "cache_read_usd": 2.2,
+   "unpriced_calls": 0,
+   "active_h": 4.78,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-10T00:43:57",
+   "calls": 390,
+   "usd": 24.06,
+   "old_weight": 8635164,
+   "first": "2026-10-10T00:43:57",
+   "last": "2026-10-10T05:38:34",
+   "by_model": {
+    "claude-opus-5-5": 23.82,
+    "claude-sonnet-5-5": 0.24
+   },
+   "by_source": {
+    "this session": 13.05,
+    "other projects": 8.31,
+    "this session's agents": 2.7
+   },
+   "by_period": {
+    "main alone": 24.06
+   },
+   "cache_read_usd": 12.85,
+   "unpriced_calls": 0,
+   "active_h": 4.91,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-10T05:49:26",
+   "calls": 121,
+   "usd": 7.45,
+   "old_weight": 2523580,
+   "first": "2026-10-10T05:49:26",
+   "last": "2026-10-10T10:47:30",
+   "by_model": {
+    "claude-opus-5-5": 7.45
+   },
+   "by_source": {
+    "this session": 5.1,
+    "other projects": 2.35
+   },
+   "by_period": {
+    "main alone": 7.45
+   },
+   "cache_read_usd": 3.68,
+   "unpriced_calls": 0,
+   "active_h": 4.97,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-10T10:53:21",
+   "calls": 131,
+   "usd": 10.74,
+   "old_weight": 3980832,
+   "first": "2026-10-10T10:53:21",
+   "last": "2026-10-10T15:51:14",
+   "by_model": {
+    "claude-opus-5-5": 10.74
+   },
+   "by_source": {
+    "this session": 9.03,
+    "other projects": 1.71
+   },
+   "by_period": {
+    "main alone": 10.74
+   },
+   "cache_read_usd": 6.33,
+   "unpriced_calls": 0,
+   "active_h": 4.96,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-10T16:20:32",
+   "calls": 108,
+   "usd": 9.5,
+   "old_weight": 4212500,
+   "first": "2026-10-10T16:20:32",
+   "last": "2026-10-10T20:48:42",
+   "by_model": {
+    "claude-opus-5-5": 9.5
+   },
+   "by_source": {
+    "this session": 9.5
+   },
+   "by_period": {
+    "main alone": 9.5
+   },
+   "cache_read_usd": 7.63,
+   "unpriced_calls": 0,
+   "active_h": 4.47,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-10T22:14:50",
+   "calls": 350,
+   "usd": 18.04,
+   "old_weight": 6633956,
+   "first": "2026-10-10T22:14:50",
+   "last": "2026-10-11T02:44:21",
+   "by_model": {
+    "claude-opus-5-5": 17.85,
+    "claude-sonnet-5-5": 0.19
+   },
+   "by_source": {
+    "this session": 7.36,
+    "this session's agents": 5.66,
+    "other projects": 5.02
+   },
+   "by_period": {
+    "main alone": 18.04
+   },
+   "cache_read_usd": 9.98,
+   "unpriced_calls": 0,
+   "active_h": 4.49,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-11T04:12:25",
+   "calls": 66,
+   "usd": 7.66,
+   "old_weight": 1910923,
+   "first": "2026-10-11T04:12:25",
+   "last": "2026-10-11T08:12:04",
+   "by_model": {
+    "claude-opus-5-5": 7.66
+   },
+   "by_source": {
+    "this session": 5.21,
+    "other projects": 2.45
+   },
+   "by_period": {
+    "main alone": 7.66
+   },
+   "cache_read_usd": 1.91,
+   "unpriced_calls": 0,
+   "active_h": 3.99,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-11T12:08:37",
+   "calls": 15,
+   "usd": 1.5,
+   "old_weight": 382196,
+   "first": "2026-10-11T12:08:37",
+   "last": "2026-10-11T12:12:34",
+   "by_model": {
+    "claude-opus-5-5": 1.5
+   },
+   "by_source": {
+    "this session": 1.5
+   },
+   "by_period": {
+    "main alone": 1.5
+   },
+   "cache_read_usd": 0.39,
+   "unpriced_calls": 0,
+   "active_h": 0.07,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-11T17:34:39",
+   "calls": 7,
+   "usd": 1.22,
+   "old_weight": 257492,
+   "first": "2026-10-11T17:34:39",
+   "last": "2026-10-11T17:36:35",
+   "by_model": {
+    "claude-opus-5-5": 1.22
+   },
+   "by_source": {
+    "this session": 1.22
+   },
+   "by_period": {
+    "main alone": 1.22
+   },
+   "cache_read_usd": 0.18,
+   "unpriced_calls": 0,
+   "active_h": 0.03,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-12T01:07:13",
+   "calls": 9,
+   "usd": 1.35,
+   "old_weight": 302443,
+   "first": "2026-10-12T01:07:13",
+   "last": "2026-10-12T01:09:15",
+   "by_model": {
+    "claude-opus-5-5": 1.35
+   },
+   "by_source": {
+    "this session": 1.35
+   },
+   "by_period": {
+    "main alone": 1.35
+   },
+   "cache_read_usd": 0.25,
+   "unpriced_calls": 0,
+   "active_h": 0.03,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-12T07:05:58",
+   "calls": 59,
+   "usd": 5.81,
+   "old_weight": 1728572,
+   "first": "2026-10-12T07:05:58",
+   "last": "2026-10-12T11:25:48",
+   "by_model": {
+    "claude-opus-5-5": 5.81
+   },
+   "by_source": {
+    "other projects": 4.14,
+    "this session": 1.67
+   },
+   "by_period": {
+    "main alone": 5.81
+   },
+   "cache_read_usd": 2.17,
+   "unpriced_calls": 0,
+   "active_h": 4.33,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-12T13:55:53",
+   "calls": 372,
+   "usd": 22.49,
+   "old_weight": 8565072,
+   "first": "2026-10-12T13:55:53",
+   "last": "2026-10-12T17:59:12",
+   "by_model": {
+    "claude-opus-5-5": 22.49
+   },
+   "by_source": {
+    "this session": 11.59,
+    "this session's agents": 8.22,
+    "other projects": 2.68
+   },
+   "by_period": {
+    "main alone": 22.49
+   },
+   "cache_read_usd": 13.21,
+   "unpriced_calls": 0,
+   "active_h": 4.06,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-12T19:39:15",
+   "calls": 452,
+   "usd": 63.36,
+   "old_weight": 21719662,
+   "first": "2026-10-12T19:39:15",
+   "last": "2026-10-13T00:37:23",
+   "by_model": {
+    "claude-opus-5-5": 62.72,
+    "claude-sonnet-5-5": 0.65
+   },
+   "by_source": {
+    "this session's agents": 49.5,
+    "this session": 12.11,
+    "other projects": 1.76
+   },
+   "by_period": {
+    "main alone": 63.36
+   },
+   "cache_read_usd": 24.96,
+   "unpriced_calls": 0,
+   "active_h": 4.97,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-13T00:40:06",
+   "calls": 144,
+   "usd": 9.44,
+   "old_weight": 3874342,
+   "first": "2026-10-13T00:40:06",
+   "last": "2026-10-13T03:47:25",
+   "by_model": {
+    "claude-opus-5-5": 9.08,
+    "claude-sonnet-5-5": 0.36
+   },
+   "by_source": {
+    "this session": 5.08,
+    "this session's agents": 4.36
+   },
+   "by_period": {
+    "main alone": 9.44
+   },
+   "cache_read_usd": 5.92,
+   "unpriced_calls": 0,
+   "active_h": 3.12,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-13T07:55:50",
+   "calls": 126,
+   "usd": 16.23,
+   "old_weight": 5915792,
+   "first": "2026-10-13T07:55:50",
+   "last": "2026-10-13T11:23:17",
+   "by_model": {
+    "claude-opus-5-5": 16.23
+   },
+   "by_source": {
+    "this session": 16.23
+   },
+   "by_period": {
+    "main alone": 16.23
+   },
+   "cache_read_usd": 9.52,
+   "unpriced_calls": 0,
+   "active_h": 3.46,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-13T13:17:11",
+   "calls": 146,
+   "usd": 15.14,
+   "old_weight": 4674796,
+   "first": "2026-10-13T13:17:11",
+   "last": "2026-10-13T17:44:49",
+   "by_model": {
+    "claude-opus-5-5": 15.14
+   },
+   "by_source": {
+    "other projects": 9.73,
+    "this session": 5.42
+   },
+   "by_period": {
+    "main alone": 15.14
+   },
+   "cache_read_usd": 6.18,
+   "unpriced_calls": 0,
+   "active_h": 4.46,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-14T09:53:43",
+   "calls": 41,
+   "usd": 3.15,
+   "old_weight": 811105,
+   "first": "2026-10-14T09:53:43",
+   "last": "2026-10-14T14:51:09",
+   "by_model": {
+    "claude-opus-5-5": 3.15
+   },
+   "by_source": {
+    "other projects": 1.99,
+    "this session": 1.16
+   },
+   "by_period": {
+    "main alone": 3.15
+   },
+   "cache_read_usd": 0.81,
+   "unpriced_calls": 0,
+   "active_h": 4.96,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-14T15:54:13",
+   "calls": 452,
+   "usd": 25.97,
+   "old_weight": 8988695,
+   "first": "2026-10-14T15:54:13",
+   "last": "2026-10-14T20:53:53",
+   "by_model": {
+    "claude-opus-5-5": 25.97
+   },
+   "by_source": {
+    "this session's agents": 15.62,
+    "this session": 10.34
+   },
+   "by_period": {
+    "main alone": 25.97
+   },
+   "cache_read_usd": 11.85,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-14T20:55:49",
+   "calls": 372,
+   "usd": 23.11,
+   "old_weight": 8756319,
+   "first": "2026-10-14T20:55:49",
+   "last": "2026-10-15T01:55:20",
+   "by_model": {
+    "claude-opus-5-5": 23.11
+   },
+   "by_source": {
+    "this session": 12.31,
+    "this session's agents": 10.81
+   },
+   "by_period": {
+    "main alone": 23.11
+   },
+   "cache_read_usd": 13.13,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-15T01:55:52",
+   "calls": 934,
+   "usd": 66.05,
+   "old_weight": 25131394,
+   "first": "2026-10-15T01:55:52",
+   "last": "2026-10-15T06:51:30",
+   "by_model": {
+    "claude-opus-5-5": 65.68,
+    "claude-sonnet-5-5": 0.37
+   },
+   "by_source": {
+    "this session's agents": 37.03,
+    "this session": 24.85,
+    "other projects": 4.17
+   },
+   "by_period": {
+    "main alone": 66.05
+   },
+   "cache_read_usd": 36.24,
+   "unpriced_calls": 0,
+   "active_h": 4.93,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-15T07:00:46",
+   "calls": 347,
+   "usd": 23.97,
+   "old_weight": 9760220,
+   "first": "2026-10-15T07:00:46",
+   "last": "2026-10-15T12:00:45",
+   "by_model": {
+    "claude-opus-5-5": 23.97
+   },
+   "by_source": {
+    "this session": 14.0,
+    "this session's agents": 9.97
+   },
+   "by_period": {
+    "main alone": 23.97
+   },
+   "cache_read_usd": 15.54,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-15T12:00:50",
+   "calls": 963,
+   "usd": 64.4,
+   "old_weight": 25563663,
+   "first": "2026-10-15T12:00:50",
+   "last": "2026-10-15T16:42:25",
+   "by_model": {
+    "claude-opus-5-5": 64.18,
+    "claude-sonnet-5-5": 0.21,
+    "claude-haiku-5-5": 0.01
+   },
+   "by_source": {
+    "this session's agents": 40.21,
+    "this session": 21.94,
+    "other projects": 2.25
+   },
+   "by_period": {
+    "main alone": 64.4
+   },
+   "cache_read_usd": 38.92,
+   "unpriced_calls": 0,
+   "active_h": 4.69,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-15T18:19:42",
+   "calls": 90,
+   "usd": 9.17,
+   "old_weight": 3342533,
+   "first": "2026-10-15T18:19:42",
+   "last": "2026-10-15T22:15:58",
+   "by_model": {
+    "claude-opus-5-5": 9.17
+   },
+   "by_source": {
+    "this session": 9.17
+   },
+   "by_period": {
+    "main alone": 9.17
+   },
+   "cache_read_usd": 5.37,
+   "unpriced_calls": 0,
+   "active_h": 3.94,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-15T23:44:46",
+   "calls": 230,
+   "usd": 14.26,
+   "old_weight": 5227902,
+   "first": "2026-10-15T23:44:46",
+   "last": "2026-10-16T04:15:38",
+   "by_model": {
+    "claude-opus-5-5": 14.26
+   },
+   "by_source": {
+    "this session": 10.31,
+    "other projects": 3.94
+   },
+   "by_period": {
+    "main alone": 14.26
+   },
+   "cache_read_usd": 8.16,
+   "unpriced_calls": 0,
+   "active_h": 4.51,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-16T05:04:41",
+   "calls": 101,
+   "usd": 9.76,
+   "old_weight": 3653583,
+   "first": "2026-10-16T05:04:41",
+   "last": "2026-10-16T09:45:42",
+   "by_model": {
+    "claude-opus-5-5": 9.76
+   },
+   "by_source": {
+    "this session": 9.76
+   },
+   "by_period": {
+    "main alone": 9.76
+   },
+   "cache_read_usd": 5.99,
+   "unpriced_calls": 0,
+   "active_h": 4.68,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-16T10:11:24",
+   "calls": 80,
+   "usd": 6.05,
+   "old_weight": 2752975,
+   "first": "2026-10-16T10:11:24",
+   "last": "2026-10-16T14:23:40",
+   "by_model": {
+    "claude-opus-5-5": 5.77,
+    "claude-sonnet-5-5": 0.28
+   },
+   "by_source": {
+    "this session": 5.77,
+    "this session's agents": 0.28
+   },
+   "by_period": {
+    "main alone": 6.05
+   },
+   "cache_read_usd": 4.97,
+   "unpriced_calls": 0,
+   "active_h": 4.2,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-16T15:23:09",
+   "calls": 35,
+   "usd": 1.47,
+   "old_weight": 472307,
+   "first": "2026-10-16T15:23:09",
+   "last": "2026-10-16T19:39:58",
+   "by_model": {
+    "claude-opus-5-5": 1.47
+   },
+   "by_source": {
+    "this session": 1.47
+   },
+   "by_period": {
+    "main alone": 1.47
+   },
+   "cache_read_usd": 0.66,
+   "unpriced_calls": 0,
+   "active_h": 4.28,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-16T20:40:40",
+   "calls": 21,
+   "usd": 1.23,
+   "old_weight": 354136,
+   "first": "2026-10-16T20:40:40",
+   "last": "2026-10-17T00:59:33",
+   "by_model": {
+    "claude-opus-5-5": 1.23
+   },
+   "by_source": {
+    "this session": 1.23
+   },
+   "by_period": {
+    "main alone": 1.23
+   },
+   "cache_read_usd": 0.45,
+   "unpriced_calls": 0,
+   "active_h": 4.31,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-17T01:50:03",
+   "calls": 20,
+   "usd": 0.59,
+   "old_weight": 262372,
+   "first": "2026-10-17T01:50:03",
+   "last": "2026-10-17T06:14:27",
+   "by_model": {
+    "claude-opus-5-5": 0.59
+   },
+   "by_source": {
+    "this session": 0.59
+   },
+   "by_period": {
+    "main alone": 0.59
+   },
+   "cache_read_usd": 0.48,
+   "unpriced_calls": 0,
+   "active_h": 4.41,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-17T07:04:29",
+   "calls": 20,
+   "usd": 0.62,
+   "old_weight": 277873,
+   "first": "2026-10-17T07:04:29",
+   "last": "2026-10-17T11:22:30",
+   "by_model": {
+    "claude-opus-5-5": 0.62
+   },
+   "by_source": {
+    "this session": 0.62
+   },
+   "by_period": {
+    "main alone": 0.62
+   },
+   "cache_read_usd": 0.51,
+   "unpriced_calls": 0,
+   "active_h": 4.3,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-17T12:13:02",
+   "calls": 24,
+   "usd": 1.66,
+   "old_weight": 482134,
+   "first": "2026-10-17T12:13:02",
+   "last": "2026-10-17T16:56:11",
+   "by_model": {
+    "claude-opus-5-5": 1.66
+   },
+   "by_source": {
+    "this session": 1.66
+   },
+   "by_period": {
+    "main alone": 1.66
+   },
+   "cache_read_usd": 0.63,
+   "unpriced_calls": 0,
+   "active_h": 4.72,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-17T17:48:12",
+   "calls": 20,
+   "usd": 1.63,
+   "old_weight": 451074,
+   "first": "2026-10-17T17:48:12",
+   "last": "2026-10-17T22:22:56",
+   "by_model": {
+    "claude-opus-5-5": 1.63
+   },
+   "by_source": {
+    "this session": 1.63
+   },
+   "by_period": {
+    "main alone": 1.63
+   },
+   "cache_read_usd": 0.56,
+   "unpriced_calls": 0,
+   "active_h": 4.58,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-17T23:12:40",
+   "calls": 20,
+   "usd": 0.72,
+   "old_weight": 327498,
+   "first": "2026-10-17T23:12:40",
+   "last": "2026-10-18T03:23:38",
+   "by_model": {
+    "claude-opus-5-5": 0.72
+   },
+   "by_source": {
+    "this session": 0.72
+   },
+   "by_period": {
+    "main alone": 0.72
+   },
+   "cache_read_usd": 0.61,
+   "unpriced_calls": 0,
+   "active_h": 4.18,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-18T04:15:44",
+   "calls": 30,
+   "usd": 1.16,
+   "old_weight": 524482,
+   "first": "2026-10-18T04:15:44",
+   "last": "2026-10-18T09:13:51",
+   "by_model": {
+    "claude-opus-5-5": 1.16
+   },
+   "by_source": {
+    "this session": 1.16
+   },
+   "by_period": {
+    "main alone": 1.16
+   },
+   "cache_read_usd": 0.98,
+   "unpriced_calls": 0,
+   "active_h": 4.97,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-18T10:00:18",
+   "calls": 32,
+   "usd": 1.31,
+   "old_weight": 598821,
+   "first": "2026-10-18T10:00:18",
+   "last": "2026-10-18T14:58:57",
+   "by_model": {
+    "claude-opus-5-5": 1.31
+   },
+   "by_source": {
+    "this session": 1.31
+   },
+   "by_period": {
+    "main alone": 1.31
+   },
+   "cache_read_usd": 1.12,
+   "unpriced_calls": 0,
+   "active_h": 4.98,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-18T15:44:04",
+   "calls": 31,
+   "usd": 1.35,
+   "old_weight": 620340,
+   "first": "2026-10-18T15:44:04",
+   "last": "2026-10-18T20:43:39",
+   "by_model": {
+    "claude-opus-5-5": 1.35
+   },
+   "by_source": {
+    "this session": 1.35
+   },
+   "by_period": {
+    "main alone": 1.35
+   },
+   "cache_read_usd": 1.17,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-18T21:12:03",
+   "calls": 39,
+   "usd": 1.8,
+   "old_weight": 834219,
+   "first": "2026-10-18T21:12:03",
+   "last": "2026-10-19T01:59:36",
+   "by_model": {
+    "claude-opus-5-5": 1.8
+   },
+   "by_source": {
+    "this session": 1.8
+   },
+   "by_period": {
+    "main alone": 1.8
+   },
+   "cache_read_usd": 1.58,
+   "unpriced_calls": 0,
+   "active_h": 4.79,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-19T02:18:58",
+   "calls": 32,
+   "usd": 1.57,
+   "old_weight": 729156,
+   "first": "2026-10-19T02:18:58",
+   "last": "2026-10-19T07:03:01",
+   "by_model": {
+    "claude-opus-5-5": 1.57
+   },
+   "by_source": {
+    "this session": 1.57
+   },
+   "by_period": {
+    "main alone": 1.57
+   },
+   "cache_read_usd": 1.39,
+   "unpriced_calls": 0,
+   "active_h": 4.73,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-19T07:48:50",
+   "calls": 49,
+   "usd": 2.85,
+   "old_weight": 1263110,
+   "first": "2026-10-19T07:48:50",
+   "last": "2026-10-19T12:29:48",
+   "by_model": {
+    "claude-opus-5-5": 2.85
+   },
+   "by_source": {
+    "this session": 2.85
+   },
+   "by_period": {
+    "main alone": 2.85
+   },
+   "cache_read_usd": 2.3,
+   "unpriced_calls": 0,
+   "active_h": 4.68,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-19T12:51:28",
+   "calls": 35,
+   "usd": 4.29,
+   "old_weight": 1158599,
+   "first": "2026-10-19T12:51:28",
+   "last": "2026-10-19T16:57:36",
+   "by_model": {
+    "claude-opus-5-5": 4.29
+   },
+   "by_source": {
+    "this session": 4.29
+   },
+   "by_period": {
+    "main alone": 4.29
+   },
+   "cache_read_usd": 1.34,
+   "unpriced_calls": 0,
+   "active_h": 4.1,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-19T18:52:54",
+   "calls": 5,
+   "usd": 0.7,
+   "old_weight": 141584,
+   "first": "2026-10-19T18:52:54",
+   "last": "2026-10-19T18:53:24",
+   "by_model": {
+    "claude-opus-5-5": 0.7
+   },
+   "by_source": {
+    "this session": 0.7
+   },
+   "by_period": {
+    "main alone": 0.7
+   },
+   "cache_read_usd": 0.08,
+   "unpriced_calls": 0,
+   "active_h": 0.01,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-20T00:41:01",
+   "calls": 9,
+   "usd": 0.82,
+   "old_weight": 188336,
+   "first": "2026-10-20T00:41:01",
+   "last": "2026-10-20T00:41:30",
+   "by_model": {
+    "claude-opus-5-5": 0.82
+   },
+   "by_source": {
+    "this session": 0.82
+   },
+   "by_period": {
+    "main alone": 0.82
+   },
+   "cache_read_usd": 0.17,
+   "unpriced_calls": 0,
+   "active_h": 0.01,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-21T13:13:21",
+   "calls": 74,
+   "usd": 5.44,
+   "old_weight": 1724812,
+   "first": "2026-10-21T13:13:21",
+   "last": "2026-10-21T16:46:33",
+   "by_model": {
+    "claude-opus-5-5": 5.44
+   },
+   "by_source": {
+    "this session": 5.44
+   },
+   "by_period": {
+    "main alone": 5.44
+   },
+   "cache_read_usd": 2.38,
+   "unpriced_calls": 0,
+   "active_h": 3.55,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-21T22:53:45",
+   "calls": 553,
+   "usd": 51.7,
+   "old_weight": 21060133,
+   "first": "2026-10-21T22:53:45",
+   "last": "2026-10-22T03:53:06",
+   "by_model": {
+    "claude-opus-5-5": 51.47,
+    "claude-sonnet-5-5": 0.23
+   },
+   "by_source": {
+    "this session": 49.7,
+    "this session's agents": 2.0
+   },
+   "by_period": {
+    "main alone": 51.7
+   },
+   "cache_read_usd": 35.3,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-22T03:54:26",
+   "calls": 56,
+   "usd": 7.03,
+   "old_weight": 2978974,
+   "first": "2026-10-22T03:54:26",
+   "last": "2026-10-22T07:06:56",
+   "by_model": {
+    "claude-opus-5-5": 7.03
+   },
+   "by_source": {
+    "this session": 7.03
+   },
+   "by_period": {
+    "main alone": 7.03
+   },
+   "cache_read_usd": 5.31,
+   "unpriced_calls": 0,
+   "active_h": 3.21,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-22T09:01:14",
+   "calls": 455,
+   "usd": 38.0,
+   "old_weight": 15252634,
+   "first": "2026-10-22T09:01:14",
+   "last": "2026-10-22T13:50:32",
+   "by_model": {
+    "claude-opus-5-5": 37.72,
+    "claude-sonnet-5-5": 0.27
+   },
+   "by_source": {
+    "this session": 24.9,
+    "this session's agents": 8.42,
+    "other projects": 4.68
+   },
+   "by_period": {
+    "main alone": 38.0
+   },
+   "cache_read_usd": 24.66,
+   "unpriced_calls": 0,
+   "active_h": 4.82,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-22T14:06:51",
+   "calls": 367,
+   "usd": 29.2,
+   "old_weight": 12226356,
+   "first": "2026-10-22T14:06:51",
+   "last": "2026-10-22T19:01:21",
+   "by_model": {
+    "claude-opus-5-5": 28.73,
+    "claude-sonnet-5-5": 0.47
+   },
+   "by_source": {
+    "this session": 25.6,
+    "this session's agents": 3.6
+   },
+   "by_period": {
+    "main alone": 29.2
+   },
+   "cache_read_usd": 20.85,
+   "unpriced_calls": 0,
+   "active_h": 4.91,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-22T19:07:02",
+   "calls": 436,
+   "usd": 34.49,
+   "old_weight": 14505537,
+   "first": "2026-10-22T19:07:02",
+   "last": "2026-10-22T23:58:32",
+   "by_model": {
+    "claude-opus-5-5": 34.49
+   },
+   "by_source": {
+    "this session": 30.91,
+    "this session's agents": 3.57
+   },
+   "by_period": {
+    "main alone": 34.49
+   },
+   "cache_read_usd": 24.97,
+   "unpriced_calls": 0,
+   "active_h": 4.86,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-23T00:15:05",
+   "calls": 469,
+   "usd": 39.22,
+   "old_weight": 16556272,
+   "first": "2026-10-23T00:15:05",
+   "last": "2026-10-23T04:51:39",
+   "by_model": {
+    "claude-opus-5-5": 39.22
+   },
+   "by_source": {
+    "this session": 35.28,
+    "this session's agents": 3.94
+   },
+   "by_period": {
+    "main alone": 39.22
+   },
+   "cache_read_usd": 28.61,
+   "unpriced_calls": 0,
+   "active_h": 4.61,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-23T05:15:05",
+   "calls": 52,
+   "usd": 7.86,
+   "old_weight": 2659859,
+   "first": "2026-10-23T05:15:05",
+   "last": "2026-10-23T09:39:43",
+   "by_model": {
+    "claude-opus-5-5": 7.86
+   },
+   "by_source": {
+    "this session": 7.86
+   },
+   "by_period": {
+    "main alone": 7.86
+   },
+   "cache_read_usd": 4.05,
+   "unpriced_calls": 0,
+   "active_h": 4.41,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-23T11:00:56",
+   "calls": 554,
+   "usd": 37.44,
+   "old_weight": 15594331,
+   "first": "2026-10-23T11:00:56",
+   "last": "2026-10-23T15:38:17",
+   "by_model": {
+    "claude-opus-5-5": 37.24,
+    "claude-sonnet-5-5": 0.2
+   },
+   "by_source": {
+    "this session": 29.62,
+    "this session's agents": 4.76,
+    "other projects": 3.06
+   },
+   "by_period": {
+    "main alone": 37.44
+   },
+   "cache_read_usd": 26.54,
+   "unpriced_calls": 0,
+   "active_h": 4.62,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-23T17:01:24",
+   "calls": 547,
+   "usd": 46.03,
+   "old_weight": 19343605,
+   "first": "2026-10-23T17:01:24",
+   "last": "2026-10-23T21:35:30",
+   "by_model": {
+    "claude-opus-5-5": 45.15,
+    "claude-sonnet-5-5": 0.87
+   },
+   "by_source": {
+    "this session": 40.71,
+    "this session's agents": 5.31
+   },
+   "by_period": {
+    "main alone": 46.03
+   },
+   "cache_read_usd": 32.75,
+   "unpriced_calls": 0,
+   "active_h": 4.57,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-23T23:29:29",
+   "calls": 243,
+   "usd": 16.9,
+   "old_weight": 6781705,
+   "first": "2026-10-23T23:29:29",
+   "last": "2026-10-24T04:29:28",
+   "by_model": {
+    "claude-opus-5-5": 16.9
+   },
+   "by_source": {
+    "this session": 15.23,
+    "this session's agents": 1.68
+   },
+   "by_period": {
+    "main alone": 16.9
+   },
+   "cache_read_usd": 11.21,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-24T04:30:15",
+   "calls": 540,
+   "usd": 38.72,
+   "old_weight": 15579370,
+   "first": "2026-10-24T04:30:15",
+   "last": "2026-10-24T09:26:52",
+   "by_model": {
+    "claude-opus-5-5": 38.41,
+    "claude-sonnet-5-5": 0.31
+   },
+   "by_source": {
+    "this session": 30.55,
+    "this session's agents": 8.17
+   },
+   "by_period": {
+    "main alone": 38.72
+   },
+   "cache_read_usd": 25.38,
+   "unpriced_calls": 0,
+   "active_h": 4.94,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-24T10:06:11",
+   "calls": 438,
+   "usd": 27.42,
+   "old_weight": 11425690,
+   "first": "2026-10-24T10:06:11",
+   "last": "2026-10-24T15:04:52",
+   "by_model": {
+    "claude-opus-5-5": 27.42
+   },
+   "by_source": {
+    "this session's agents": 14.49,
+    "this session": 12.93
+   },
+   "by_period": {
+    "main alone": 27.42
+   },
+   "cache_read_usd": 19.52,
+   "unpriced_calls": 0,
+   "active_h": 4.98,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-24T15:09:17",
+   "calls": 228,
+   "usd": 21.6,
+   "old_weight": 9910873,
+   "first": "2026-10-24T15:09:17",
+   "last": "2026-10-24T19:51:35",
+   "by_model": {
+    "claude-opus-5-5": 21.41,
+    "claude-sonnet-5-5": 0.19
+   },
+   "by_source": {
+    "this session": 21.41,
+    "this session's agents": 0.19
+   },
+   "by_period": {
+    "main alone": 21.6
+   },
+   "cache_read_usd": 18.41,
+   "unpriced_calls": 0,
+   "active_h": 4.71,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-24T21:23:18",
+   "calls": 497,
+   "usd": 40.17,
+   "old_weight": 15898971,
+   "first": "2026-10-24T21:23:18",
+   "last": "2026-10-25T02:15:00",
+   "by_model": {
+    "claude-opus-5-5": 39.79,
+    "claude-sonnet-5-5": 0.38
+   },
+   "by_source": {
+    "this session": 34.92,
+    "this session's agents": 5.25
+   },
+   "by_period": {
+    "main alone": 40.17
+   },
+   "cache_read_usd": 25.7,
+   "unpriced_calls": 0,
+   "active_h": 4.86,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-25T02:37:45",
+   "calls": 265,
+   "usd": 22.7,
+   "old_weight": 9249133,
+   "first": "2026-10-25T02:37:45",
+   "last": "2026-10-25T07:09:27",
+   "by_model": {
+    "claude-opus-5-5": 22.7
+   },
+   "by_source": {
+    "this session": 20.73,
+    "this session's agents": 1.97
+   },
+   "by_period": {
+    "main alone": 22.7
+   },
+   "cache_read_usd": 15.42,
+   "unpriced_calls": 0,
+   "active_h": 4.53,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-25T07:46:29",
+   "calls": 199,
+   "usd": 12.16,
+   "old_weight": 5074911,
+   "first": "2026-10-25T07:46:29",
+   "last": "2026-10-25T12:46:28",
+   "by_model": {
+    "claude-opus-5-5": 11.82,
+    "claude-sonnet-5-5": 0.34
+   },
+   "by_source": {
+    "this session": 10.84,
+    "this session's agents": 1.32
+   },
+   "by_period": {
+    "main alone": 12.16
+   },
+   "cache_read_usd": 8.58,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-25T12:46:36",
+   "calls": 1171,
+   "usd": 107.45,
+   "old_weight": 42335344,
+   "first": "2026-10-25T12:46:36",
+   "last": "2026-10-25T17:46:35",
+   "by_model": {
+    "claude-opus-5-5": 106.27,
+    "claude-sonnet-5-5": 1.19
+   },
+   "by_source": {
+    "this session's agents": 76.1,
+    "this session": 31.35
+   },
+   "by_period": {
+    "main alone": 83.6,
+    "step agents": 23.86
+   },
+   "cache_read_usd": 63.19,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "main alone",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-25T17:46:46",
+   "calls": 2321,
+   "usd": 137.02,
+   "old_weight": 54488134,
+   "first": "2026-10-25T17:46:46",
+   "last": "2026-10-25T22:45:03",
+   "by_model": {
+    "claude-opus-5-5": 132.4,
+    "claude-sonnet-5-5": 4.6,
+    "claude-haiku-5-5": 0.02
+   },
+   "by_source": {
+    "this session's agents": 94.56,
+    "this session": 42.45
+   },
+   "by_period": {
+    "step agents": 137.02
+   },
+   "cache_read_usd": 80.91,
+   "unpriced_calls": 0,
+   "active_h": 4.97,
+   "period": "step agents",
+   "limit_hit": [
+    "2026-10-25T20:57:39"
+   ],
+   "usd_at_hit": 129.63
+  },
+  {
+   "start": "2026-10-25T22:50:36",
+   "calls": 2095,
+   "usd": 98.36,
+   "old_weight": 39846904,
+   "first": "2026-10-25T22:50:36",
+   "last": "2026-10-26T03:50:35",
+   "by_model": {
+    "claude-opus-5-5": 96.92,
+    "claude-sonnet-5-5": 1.44
+   },
+   "by_source": {
+    "this session's agents": 61.74,
+    "this session": 36.62
+   },
+   "by_period": {
+    "step agents": 98.36
+   },
+   "cache_read_usd": 61.48,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-26T03:50:41",
+   "calls": 1290,
+   "usd": 59.61,
+   "old_weight": 24090968,
+   "first": "2026-10-26T03:50:41",
+   "last": "2026-10-26T08:46:57",
+   "by_model": {
+    "claude-opus-5-5": 58.81,
+    "claude-sonnet-5-5": 0.8
+   },
+   "by_source": {
+    "this session's agents": 41.36,
+    "this session": 18.25
+   },
+   "by_period": {
+    "step agents": 59.61
+   },
+   "cache_read_usd": 37.01,
+   "unpriced_calls": 0,
+   "active_h": 4.94,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-26T08:55:37",
+   "calls": 1478,
+   "usd": 65.38,
+   "old_weight": 26747159,
+   "first": "2026-10-26T08:55:37",
+   "last": "2026-10-26T13:55:04",
+   "by_model": {
+    "claude-opus-5-5": 62.93,
+    "claude-sonnet-5-5": 2.45
+   },
+   "by_source": {
+    "this session's agents": 45.19,
+    "this session": 20.19
+   },
+   "by_period": {
+    "step agents": 65.38
+   },
+   "cache_read_usd": 40.54,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-26T13:56:35",
+   "calls": 783,
+   "usd": 39.68,
+   "old_weight": 15841451,
+   "first": "2026-10-26T13:56:35",
+   "last": "2026-10-26T18:51:02",
+   "by_model": {
+    "claude-opus-5-5": 39.46,
+    "claude-sonnet-5-5": 0.21
+   },
+   "by_source": {
+    "this session's agents": 21.93,
+    "this session": 15.27,
+    "other projects": 2.48
+   },
+   "by_period": {
+    "step agents": 39.68
+   },
+   "cache_read_usd": 24.74,
+   "unpriced_calls": 0,
+   "active_h": 4.91,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-26T18:58:54",
+   "calls": 1740,
+   "usd": 88.73,
+   "old_weight": 35819081,
+   "first": "2026-10-26T18:58:54",
+   "last": "2026-10-26T23:29:29",
+   "by_model": {
+    "claude-opus-5-5": 86.43,
+    "claude-sonnet-5-5": 2.31
+   },
+   "by_source": {
+    "this session's agents": 64.4,
+    "this session": 23.22,
+    "other projects": 1.11
+   },
+   "by_period": {
+    "step agents": 88.73
+   },
+   "cache_read_usd": 54.1,
+   "unpriced_calls": 0,
+   "active_h": 4.51,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-27T01:38:24",
+   "calls": 157,
+   "usd": 31.64,
+   "old_weight": 9636206,
+   "first": "2026-10-27T01:38:24",
+   "last": "2026-10-27T04:16:48",
+   "by_model": {
+    "claude-opus-5-5": 31.53,
+    "claude-sonnet-5-5": 0.11
+   },
+   "by_source": {
+    "this session": 16.31,
+    "this session's agents": 15.33
+   },
+   "by_period": {
+    "step agents": 31.64
+   },
+   "cache_read_usd": 10.51,
+   "unpriced_calls": 0,
+   "active_h": 2.64,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-29T01:31:08",
+   "calls": 1810,
+   "usd": 128.67,
+   "old_weight": 42125941,
+   "first": "2026-10-29T01:31:08",
+   "last": "2026-10-29T06:19:32",
+   "by_model": {
+    "claude-opus-5-5": 127.51,
+    "claude-sonnet-5-5": 1.15
+   },
+   "by_source": {
+    "FA worktrees and replays": 52.01,
+    "this session's agents": 51.92,
+    "this session": 24.22,
+    "other projects": 0.52
+   },
+   "by_period": {
+    "step agents": 128.67
+   },
+   "cache_read_usd": 48.85,
+   "unpriced_calls": 0,
+   "active_h": 4.81,
+   "period": "step agents",
+   "limit_hit": [
+    "2026-10-29T06:19:15"
+   ],
+   "usd_at_hit": 128.39
+  },
+  {
+   "start": "2026-10-29T06:31:42",
+   "calls": 76,
+   "usd": 8.01,
+   "old_weight": 3027488,
+   "first": "2026-10-29T06:31:42",
+   "last": "2026-10-29T06:37:33",
+   "by_model": {
+    "claude-opus-5-5": 8.01
+   },
+   "by_source": {
+    "this session": 4.26,
+    "this session's agents": 3.74
+   },
+   "by_period": {
+    "step agents": 8.01
+   },
+   "cache_read_usd": 4.23,
+   "unpriced_calls": 0,
+   "active_h": 0.1,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-29T13:08:02",
+   "calls": 2450,
+   "usd": 152.13,
+   "old_weight": 54135262,
+   "first": "2026-10-29T13:08:02",
+   "last": "2026-10-29T18:07:26",
+   "by_model": {
+    "claude-opus-5-5": 150.43,
+    "claude-sonnet-5-5": 1.7
+   },
+   "by_source": {
+    "this session's agents": 120.67,
+    "this session": 31.46
+   },
+   "by_period": {
+    "step agents": 152.13
+   },
+   "cache_read_usd": 66.08,
+   "unpriced_calls": 0,
+   "active_h": 4.99,
+   "period": "step agents",
+   "limit_hit": [
+    "2026-10-29T17:13:20"
+   ],
+   "usd_at_hit": 147.21
+  },
+  {
+   "start": "2026-10-29T18:08:15",
+   "calls": 876,
+   "usd": 64.45,
+   "old_weight": 24283240,
+   "first": "2026-10-29T18:08:15",
+   "last": "2026-10-29T23:05:41",
+   "by_model": {
+    "claude-opus-5-5": 63.69,
+    "claude-sonnet-5-5": 0.74,
+    "claude-haiku-5-5": 0.02
+   },
+   "by_source": {
+    "this session's agents": 37.37,
+    "this session": 27.09
+   },
+   "by_period": {
+    "step agents": 64.45
+   },
+   "cache_read_usd": 32.93,
+   "unpriced_calls": 0,
+   "active_h": 4.96,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-29T23:50:42",
+   "calls": 845,
+   "usd": 64.55,
+   "old_weight": 24303225,
+   "first": "2026-10-29T23:50:42",
+   "last": "2026-10-30T04:50:25",
+   "by_model": {
+    "claude-opus-5-5": 64.42,
+    "claude-sonnet-5-5": 0.13
+   },
+   "by_source": {
+    "this session's agents": 53.31,
+    "this session": 11.24
+   },
+   "by_period": {
+    "step agents": 64.55
+   },
+   "cache_read_usd": 33.28,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-30T04:50:58",
+   "calls": 1046,
+   "usd": 83.18,
+   "old_weight": 33012510,
+   "first": "2026-10-30T04:50:58",
+   "last": "2026-10-30T09:50:54",
+   "by_model": {
+    "claude-opus-5-5": 83.15,
+    "claude-haiku-5-5": 0.02
+   },
+   "by_source": {
+    "this session's agents": 68.06,
+    "this session": 15.12
+   },
+   "by_period": {
+    "step agents": 83.18
+   },
+   "cache_read_usd": 49.39,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-30T09:51:09",
+   "calls": 1141,
+   "usd": 71.12,
+   "old_weight": 27276769,
+   "first": "2026-10-30T09:51:09",
+   "last": "2026-10-30T14:51:01",
+   "by_model": {
+    "claude-opus-5-5": 71.12
+   },
+   "by_source": {
+    "this session's agents": 52.39,
+    "this session": 18.73
+   },
+   "by_period": {
+    "step agents": 47.21,
+    "redesign": 23.91
+   },
+   "cache_read_usd": 39.2,
+   "unpriced_calls": 0,
+   "active_h": 5.0,
+   "period": "step agents",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-30T14:57:29",
+   "calls": 894,
+   "usd": 50.6,
+   "old_weight": 19015101,
+   "first": "2026-10-30T14:57:29",
+   "last": "2026-10-30T19:54:56",
+   "by_model": {
+    "claude-opus-5-5": 47.88,
+    "claude-sonnet-5-5": 2.72
+   },
+   "by_source": {
+    "this session's agents": 29.59,
+    "this session": 16.22,
+    "other projects": 4.78
+   },
+   "by_period": {
+    "redesign": 50.6
+   },
+   "cache_read_usd": 25.63,
+   "unpriced_calls": 0,
+   "active_h": 4.96,
+   "period": "redesign",
+   "limit_hit": [],
+   "usd_at_hit": null
+  },
+  {
+   "start": "2026-10-30T20:29:10",
+   "calls": 831,
+   "usd": 50.72,
+   "old_weight": 18764936,
+   "first": "2026-10-30T20:29:10",
+   "last": "2026-10-31T00:00:12",
+   "by_model": {
+    "claude-opus-5-5": 50.06,
+    "claude-sonnet-5-5": 0.66
+   },
+   "by_source": {
+    "this session's agents": 38.62,
+    "this session": 9.27,
+    "other projects": 2.83
+   },
+   "by_period": {
+    "redesign": 50.72
+   },
+   "cache_read_usd": 25.02,
+   "unpriced_calls": 0,
+   "active_h": 3.52,
+   "period": "redesign",
+   "limit_hit": [],
+   "usd_at_hit": null
+  }
+ ],
+ "lowest_usd_at_a_limit_hit_since_oct": 128.39,
+ "usd_at_limit_hits": [
+  129.63,
+  128.39,
+  147.21
+ ],
+ "period_summary": {
+  "main alone": {
+   "windows_with_use": 89,
+   "median_usd": 15.97,
+   "max_usd": 107.45,
+   "windows_at_or_above_lowest_hit_usd": 0,
+   "windows_at_or_above_75pct_of_it": 1,
+   "limit_hits": 0,
+   "usd_per_active_hour": 4.71
+  },
+  "step agents": {
+   "windows_with_use": 14,
+   "median_usd": 71.12,
+   "max_usd": 152.13,
+   "windows_at_or_above_lowest_hit_usd": 3,
+   "windows_at_or_above_75pct_of_it": 4,
+   "limit_hits": 3,
+   "usd_per_active_hour": 17.67
+  },
+  "redesign": {
+   "windows_with_use": 2,
+   "median_usd": 50.72,
+   "max_usd": 50.72,
+   "windows_at_or_above_lowest_hit_usd": 0,
+   "windows_at_or_above_75pct_of_it": 0,
+   "limit_hits": 0,
+   "usd_per_active_hour": 11.95
+  }
+ }
+}
