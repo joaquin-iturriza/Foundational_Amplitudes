@@ -6938,6 +6938,9 @@ entries:
       (e+e- -> photon photon c cbar, seed 101), FA-ccin2p3-9f0ec4a3 and FA-ccin2p3-4a169835 (e+e- -> c cbar d dbar, seeds
       101, 102). They give the missing points: the second 20 TeV run of the first pool, both 20 TeV runs of the second; times
       expected from the 5 TeV-beam runs (up to 3524 s) and the first pool''s 10 TeV-beam run (1255 s plus 874 s gridpack).'
+  - at: '2026-10-31T15:46:59+00:00'
+    text: 'a compaction inside the turn of owner acadf5fd3cc8f4bac at 2026-10-31T15:39:16.372Z: its brief or scope was too
+      large; narrow the next brief'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
