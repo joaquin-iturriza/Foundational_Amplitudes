@@ -1,6 +1,9 @@
 """The sigma head on the 139 held-out processes (docs/results.tex, "The sigma head on the held-out processes"): pulls
 (q - t) / sigma in log|M|^2 per process, the median over processes of each one's pull standard deviation and of its
-fraction of events within one sigma (calibrated: 1 and 0.68), and the pull std with each process's mean error removed.
+fraction of events within one sigma (calibrated: 1 and 0.68), the pull std with each process's mean error removed, and
+whether sigma ranks the error: the Spearman correlation across processes of each one's median sigma against its RMSE of
+q - t (rank_across), and the median over processes of the within-process Spearman of sigma against |q - t|
+(rank_within).
   hp58 after its sigma stage: data/heldout_preds_sigstage.npz (scripts/job_catalog_heldout_preds.sh
       runs/dancat_het_pre/trial_0058/sigma_stage), read with each process's own statistics: q = mu_p + sd_p h,
       sigma = sd_p sig (mu_sd, h, sig in the npz; the zero-shot statistics would need the twin or g);
@@ -15,6 +18,19 @@ import json, os
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def spearman(a, b):
+    ra, rb = np.argsort(np.argsort(a)), np.argsort(np.argsort(b))
+    return float(np.corrcoef(ra, rb)[0, 1])
+
+
+def qts(z, p, own):
+    t = z[f"{p}__t"].astype(float)
+    if own:
+        mu, sd = z[f"{p}__mu_sd"]
+        return mu + sd * z[f"{p}__h"].astype(float), t, sd * z[f"{p}__sig"].astype(float)
+    return z[f"{p}__q"].astype(float), t, z[f"{p}__s"].astype(float)
 
 
 def pulls(z, p, own):
@@ -41,10 +57,14 @@ def main():
             r = dict(n=len(ps), pull_std=float(np.median([a.std() for a, _ in pp])),
                      cover68=float(np.median([np.mean(np.abs(a) < 1) for a, _ in pp])),
                      pull_std_level_removed=float(np.median([b.std() for _, b in pp])))
+            tr = [qts(z, p, own) for p in ps]
+            r["rank_across"] = spearman([np.median(s) for _, _, s in tr], [np.sqrt(np.mean((q - t) ** 2)) for q, t, _ in tr])
+            r["rank_within"] = float(np.median([spearman(s, np.abs(q - t)) for q, t, s in tr]))
             key = f"{lab}|{'96 relabels' if rel else '43 new'}"
             res[key] = r
             print(f"{key:52s} pull std {r['pull_std']:.2f}, within one sigma {r['cover68']:.2f}, "
-                  f"pull std after the level {r['pull_std_level_removed']:.2f}")
+                  f"pull std after the level {r['pull_std_level_removed']:.2f}, rank across {r['rank_across']:.2f}, "
+                  f"rank within {r['rank_within']:.2f}")
     json.dump(res, open(os.path.join(HERE, "data", "catalog_sigma_heldout.json"), "w"), indent=1)
 
 

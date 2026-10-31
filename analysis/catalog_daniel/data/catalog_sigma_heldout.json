@@ -3,36 +3,48 @@
   "n": 43,
   "pull_std": 13.482434136734382,
   "cover68": 0.061,
-  "pull_std_level_removed": 12.257097525457908
+  "pull_std_level_removed": 12.257097525457908,
+  "rank_across": 0.37496224705527026,
+  "rank_within": 0.23263578865894718
  },
  "hp58, sigma stage, own statistics|96 relabels": {
   "n": 96,
   "pull_std": 1.8629103636566806,
   "cover68": 0.3835,
-  "pull_std_level_removed": 1.7604534174880928
+  "pull_std_level_removed": 1.7604534174880928,
+  "rank_across": 0.5519126424308193,
+  "rank_within": 0.33202523900630976
  },
  "A, sigma stage|43 new": {
   "n": 43,
   "pull_std": 13.289951358432486,
   "cover68": 0.017,
-  "pull_std_level_removed": 9.292651434033864
+  "pull_std_level_removed": 9.292651434033864,
+  "rank_across": -0.010117789187556629,
+  "rank_within": 0.13120265380066343
  },
  "A, sigma stage|96 relabels": {
   "n": 96,
   "pull_std": 1.3242580776232162,
   "cover68": 0.57975,
-  "pull_std_level_removed": 1.3293327713571208
+  "pull_std_level_removed": 1.3293327713571208,
+  "rank_across": 0.7338171459576776,
+  "rank_within": 0.5092808578202145
  },
  "B, best checkpoint (no sigma stage)|43 new": {
   "n": 43,
   "pull_std": 1.195378799269442,
   "cover68": 0.336,
-  "pull_std_level_removed": 1.198884589029701
+  "pull_std_level_removed": 1.198884589029701,
+  "rank_across": 0.4164904862579281,
+  "rank_within": 0.22137847184461795
  },
  "B, best checkpoint (no sigma stage)|96 relabels": {
   "n": 96,
   "pull_std": 0.6636844922496591,
   "cover68": 0.8680000000000001,
-  "pull_std_level_removed": 0.6633791973969686
+  "pull_std_level_removed": 0.6633791973969686,
+  "rank_across": 0.8126966901790558,
+  "rank_within": 0.31131215382803845
  }
 }
