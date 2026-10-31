@@ -88,7 +88,13 @@ VALID_EDGE_FEATURE_MODES = ("bias", "bias_kv")
 
 # MadGraph SM particles that are their own antiparticle; their sign in a diagram's line
 # list is an orientation artefact.
-_SELF_CONJUGATE = {21, 22, 23, 25}
+_SELF_CONJUGATE = {21, 22, 23, 25, 250}
+
+# MadGraph's one-loop internal lines (loop_sm): the gluon ghost 82, the EW ghosts
+# 9000001-9000004 (A, Z, W+, W-), each distinct from its antighost, and the Goldstones
+# 250 (G0, self-conjugate) and 251 (G+, with -251 = G-). Labelled after the 30 SM labels.
+_LOOP_LINES = (82, -82, 9000001, -9000001, 9000002, -9000002, 9000003, -9000003,
+               9000004, -9000004, 250, 251, -251)
 
 
 def particle_label_vocab():
@@ -97,7 +103,10 @@ def particle_label_vocab():
     their ``particles.json``; only the numbering differs, which a learned embedding
     does not see)."""
     from particle_ids import GLOBAL_PDG_IDX
-    return {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    vocab = {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    n = len(vocab)
+    vocab.update({pdg: n + k for k, pdg in enumerate(_LOOP_LINES)})
+    return vocab
 
 
 def _label(pdg, vocab):

@@ -183,7 +183,16 @@ def reference_pooled(enc):
 # ---------------------------------------------------------------------------------------
 def test_graph_construction():
     vocab = particle_label_vocab()
-    assert len(vocab) == 30 and sorted(vocab.values()) == list(range(30))
+    n = 30 + len(_m._LOOP_LINES)
+    assert len(vocab) == n and sorted(vocab.values()) == list(range(n))
+    assert [vocab[p] for p in _m._LOOP_LINES] == list(range(30, n))
+    assert _m._label(-250, vocab) == vocab[250]
+    assert _m._label(82, vocab) != _m._label(-82, vocab)
+    try:
+        _m._label(9000099, vocab)
+        raise AssertionError("unknown PDG accepted")
+    except KeyError:
+        pass
     nt, edges = graph_from_sidecar_diagram(schannel(-22), EXT_EEUU, vocab)
     # externals first, by leg number, typed in/out; then the vertices
     assert nt == [EXT_IN_TYPE, EXT_IN_TYPE, EXT_OUT_TYPE, EXT_OUT_TYPE, VERTEX_TYPE, VERTEX_TYPE]
@@ -201,7 +210,7 @@ def test_graph_construction():
     # pad nodes carry nothing
     assert not ds.adj[~ds.node_mask].any() and (ds.node_types[~ds.node_mask] == 0).all()
     # an unknown particle fails loudly
-    bad = {"subprocesses": [{"external": EXT_EEUU, "diagrams": [schannel(9000001)]}]}
+    bad = {"subprocesses": [{"external": EXT_EEUU, "diagrams": [schannel(9000099)]}]}
     try:
         load_llm4lhc_diagram_set([bad])
         raise AssertionError("unknown PDG accepted")
