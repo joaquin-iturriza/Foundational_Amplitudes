@@ -6043,6 +6043,26 @@ entries:
       1.05; else undecided; reported per axis beside the catalog-sampled read of the same classes. Generation itself: 106
       pools, estimate 13.2 core-h (heldout_default_pools.py @647cfada: H2p5 3.6, H7E 7.62, H7c 7.62 core-h minus overlaps
       not counted), CPU only.'
+    fix_at: '2026-10-31T05:21:38+00:00'
+    fix: 'Seeds against spread (check 3): the design never states the spread or what R it can resolve. Measured spread on
+      these same classes (mixture_ab.json, catalog-sampled held-out, default50): H2p5 38 classes widened [1.024,1.497] R_seed
+      1.10; H7E 34 [1.352,1.566] R_seed 0.98; H7c 34 [1.265,2.038] R_seed 1.18; the 143 classes without a default pool pooled
+      [1.088,1.592] R_seed 1.12 (mixture_heldout_default.json). With two seeds and 106 classes the widened half-width is about
+      0.2 in ln R, so ''no cost'' (upper end below 1.05) needs R below about 0.85 and ''cost'' needs R above about 1.2; per
+      axis wider still. State this, say which result the two existing seeds can resolve, and what is done if R lands in between
+      (more seeds of the existing arms, or accept undecided). Outcome (check 4): say what each branch changes for the entry,
+      including the undecided branch, and add the read that feeds the share choice: step 14''s rule is on the pooled held-out
+      set, so report the pooled default-sampled R over H1-H3 plus the new 106 (664 classes; 558 alone gave 0.912 [0.802,1.068],
+      undecided) beside the per-axis and new-axes reads. Scope (check 6): next 18 and Joaquin''s ask (D227, ''the right numbers'')
+      cover all 142 held-out classes; H5 (28) and H6 (8) are deferred for missing pipeline pieces: record their follow-on
+      step (what pieces, estimate) so they are not dropped, or put the deferral to Joaquin. Also: the generation estimate
+      in the outcome is 18.84 core-h (3.6 + 7.62 + 7.62), not 13.2; the eval-only re-reads'' GPU-h (12 REREAD jobs, tools/short_wall.py
+      on 106 probes) is not stated (next 17 requires it); say the het-arm reads wait on the six het runs now in flight. Checks
+      that hold: matched control (eval-only, same pools for arms and control); measure moves (558 H1-H3 classes 1.267 catalog-sampled
+      to 0.912 default-sampled, per axis H1 0.58 H2 0.70 H3 1.13); test events MadEvent default at each axis''s energy and
+      cut (H7c pT 30 matches pt_min 30 of catalog_v4_heldout_H7c.yaml; H7E pp at 20 TeV with sqrt(s_hat)>6 TeV, ee at 6/10/20
+      TeV), labels at alpha_s(sqrt(s_hat)) as the catalog''s; het arms carry the decided HETEROSC loss; no prior default-sampled
+      pools for these classes found.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
