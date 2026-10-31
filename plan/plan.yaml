@@ -388,6 +388,16 @@ entries:
       Repaired @b5173fa7: rows rebuilt from the role shuffle (alignment check passes on 5 of 5 probes tested on CC, 0 refused),
       and zero_shot_parent now saves pool_row; redone as FA-ccin2p3-18269717'
     at: '2026-10-31T00:30:27+00:00'
+  - tried: 'the dipole read (CPU, FA-ccin2p3-18269717, dipole_residual.py @b5173fa7, per cell analysis/catalog_v4/dipole_gate.py):
+      per-event soft-dipole factor log D against the control pair''s target and zero-shot residual, 94 held-out multiplicity
+      pools with a final gluon or photon (all 2->4; 124 without one; 0 refused) and 332 training pools of the same cells'
+    why: 'gate fails over all multiplicity cells: median r^2 of the control''s target t on log D 0.094 on both seeds (training
+      0.089), below 0.1; log|M|^2 = t - logF has 0.705, so the emission-scale target already removes most of what D carries
+      at these cuts. Per cell the gate passes in 6ee (0.26), 6bb (0.143), 6qg (0.114), but the main read is no there and everywhere:
+      held-out residual r^2 on log D 0.005 / 0.007 (seeds 42/43; 6ee 0.010), level with the placebos E 0.006 / 0.008 and logF
+      0.006 / 0.008, training 0.001 / 0.002. The 5ee, 5bb, 5qg cells step 6 named first hold no multiplicity pool (all H2
+      pools are 6-particle).'
+    at: '2026-10-31T00:35:57+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
