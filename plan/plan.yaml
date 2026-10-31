@@ -6525,7 +6525,7 @@ entries:
       - 'a part depends on each probe''s data and cannot be shared: say which, with its seconds, to Joaquin'
   owner:
     agent: ab2b2bbf984fd46ba
-    state: working
+    state: closed
     since: '2026-10-31T17:12:02+00:00'
     state_at: '2026-10-31T18:17:50+00:00'
     context: 202152
@@ -7191,41 +7191,30 @@ entries:
       EE4 HD4 HD5, 1612 probes, 1:45 limit from the het rate measured on the old reader 2.46 s/probe + 15 min, x1.25; short_wall
       at 0.71 says 0.79 h). GPU-h at the limits: 8 x 0.5 + 4 x 1.75 = 11.0; batch target step20_hd_rereads 1.75 h.'
   handoff:
-    state: 'Step 18: queue hd_test_measured done (348/348 tasks, 106/106 pools assembled, test pools on ccin2p3). Queue hd_test_e20_small_runs
-      (the three 20 TeV pools: e+e- photon photon c cbar, e+e- c cbar d dbar, pp d dbar -> d h ubar W+; 35 tasks, est 0.9
-      core-h) running on 3 workers 62f8cc25 22ea52de 585d8d94, target 0.5 h (wait on step 21). 5-body pools: old 16-core jobs
-      cut (E3379-E3382 acked; 518be432 hd_ug_ddxguz actually COMPLETED rc=0 with its gridpack and probe runs of 1000 returning
-      1000), 64-core jobs 765bdd9c 5d4e6872 1e7f2159 49120869 926b4f19 in gridpack integration (wait on step 18). hd_ entries
-      now read their tree''s diagram sidecar (diagrams_of, 35d4deab); before it the HD4 reads would have run with off-shellness/order
-      features off. Step 19 (H5, 28 one-loop classes): label rule ''virt'' in mg5_pipeline_final (77312c3f), H5 pools recipes/catalog_v4_heldout_default_H5_processes.yaml
-      (42 gridpacks, 92 runs), design passed 2026-10-31 18:0x (reviewer: H5 widened half-width is 0.12-0.18 in ln R, not 0.4
-      as written; H5 alone resolves R >1.2 or <0.85); label check a82278d8 and 42 gridpool probes running (wait on step 19,
-      target 1.5 h). Zero-shot reader: config parsed once (a142d81e) took 62 H1 probes 106 s -> 47 s; forked workers failed
-      (CUDA in fork), now spawned subprocesses (b9441370); B vs A differ 7e-6..1.1e-4 in h, A2 control pending in A/B rerun
-      bfec5501 (wait on step 20); repo-reviewer a8a308817be9d886d to be re-checked with the fix commits a142d81e b9441370
-      once the A/B reads.'
-    decisions: 'MadLoop-unusable points on MadEvent events: replaced by the next same-energy spare and the pool refused above
-      2%, the rule of nlo_virtual_pipeline.generate_virt_dataset (redraw, 2% refusal), not asked. Stripped virtual labelled
-      at alpha_s(M_Z) 0.118 with the entry''s mass shift, alpha_s sidecar the constant (write_own_alphas convention), as the
-      catalog''s _nlo pools. H5 Born events from the class''s MadLoop generate string minus [virt=QCD] (the exact Born), loop-induced
-      g g > z h as [noborn=QCD] with loop_sm-no_b_mass. E20 yields read from the run-size probe logs alone (the old runs of
-      1000 timed out under another layout). Zero-shot workers spawned, not forked.'
-    ruled_out: Forked zero-shot workers (CUDA cannot re-initialise in a forked child, e2da5118 path C); planning the E20 queue
-      with the pass-1/2 yields (timeouts of runs of 1000); a recipe 'base' for the H5 sidecar (base also redirects generation).
-    running: 'FA-ccin2p3-62f8cc25 22ea52de 585d8d94 (E20 queue workers); 765bdd9c 5d4e6872 1e7f2159 49120869 926b4f19 (64-core
-      5-body gridpacks); a82278d8 (virt label check) and the 42 H5 gridpool probes recorded on the entry (list: scratchpad
-      h5_runs.txt); bfec5501 (zero-shot A/B 2).'
-    files: 'tools/zero_shot_parent.py, scripts/job_zero_shot_timing.sh (AB=1), mg5_pipeline_final.py (lhe_label_virt, _lhe_virt_block),
-      tools/nlo_virtual_pipeline.py (label_events), tools/virt_label_check.py, scripts/job_virt_label_check.sh, recipes/gen_catalog_v4_heldout_default.py
-      (--h5, PP_RUN_SIZES, diagrams_of), recipes/catalog_v4_heldout_default_H5_{processes,test}.yaml, experiment.py (_resolve_diagram_path),
-      tools/check_site_data.py, tests/test_lhe_virt_label.py, analysis/catalog_v4/data/lhe_probe_yields_hd_e20.json, lhe_rates_hd_e20.json.
-      Next: (a) bfec5501 ends: A2 vs A decides whether B''s 1e-5 differences are the GPU''s own, set S_PROBE in short_wall
-      from C, SendMessage the reviewer a8a308817be9d886d; (b) 5-body gridpacks end: lhe_probe kept over their logs (+518be432)
-      -> yields, plan their queue with --probe, workers at site pick width, target, submit; (c) H5 probes + label check end:
-      read unusable share and s/point, kept --yields-out for H5, plan H5 queue (recipes/catalog_v4_heldout_default_H5_test.yaml),
-      workers sized so MadLoop labels fit the assembly; (d) when all 142 hd_ pools exist: HD4/HD5 eval-only rereads of the
-      12 arms (step 20).'
-    written: '2026-10-31T17:11:22+00:00'
+    state: 'Step 18 and 19 generation done: all 142 default-sampled held-out test pools on ccin2p3 (114 trees: H2p5 38, H6
+      8, H7E 34, H7c 34; 28 one-loop H5, MadEvent Born events labelled by the class''s MadLoop, lhe label rule virt). Step
+      20 eval-only re-reads of the 12 runs (6 MSE, 6 het) out in one wave on ccin2p3: 9512cac2 783892e6 58631ca5 698c1a0b
+      4dca09e5 926dea24 (MSE control, seed2, default50, d50 seed2, default25, d25 seed2; HD4 HD5), 87aeabca 53b9ed56 (het
+      control pair; HD4 HD5), ead54b75 7c131715 9538e607 ed96b552 (het default50, d50 seed2, default25, d25 seed2; PP4 EE4
+      HD4 HD5); 11.0 GPU-h at the limits, target 1.75 h. Zero-shot reader fix passed by repo-reviewer a8a308817be9d886d (watermark
+      112725da): config parsed once, 1 worker, S_PROBE 0.71.'
+    decisions: 'H5 pools: parent physics check on the labeller (the parent''s own MadLoop standalone), no Born standalone
+      built at assembly (9735fcc5, 8b4d9892). e+e- -> photon photon c cbar at 20 TeV laid out at its measured complete share
+      0.5 (7 runs of 250 there), pool rebuilt whole as the layout is its identity (480a4d2d). Reader default 1 worker (4 spawned
+      workers slower, 155 s vs 44 s), A2-vs-A shows the B-vs-A differences are GPU noise. Re-reads on ccin2p3 although site
+      pick offered lxplus: parents and hd_ pools only on CC. Het share re-reads sized at the old measured het rate 2.46 s/probe
+      (cached-path het rate unmeasured), an upper bound.'
+    ruled_out: Forked zero-shot workers; more than one zero-shot worker per job; queues planned with a bare name before 0718400d
+      (built under the checkout; two stray dirs hd_test_h5, hd_test_5body remain in the CC checkout, unread).
+    running: 'Step 20: FA-ccin2p3-9512cac2 FA-ccin2p3-783892e6 FA-ccin2p3-58631ca5 FA-ccin2p3-698c1a0b FA-ccin2p3-4dca09e5
+      FA-ccin2p3-926dea24 FA-ccin2p3-87aeabca FA-ccin2p3-53b9ed56 FA-ccin2p3-ead54b75 FA-ccin2p3-7c131715 FA-ccin2p3-9538e607
+      FA-ccin2p3-ed96b552'
+    files: 'scripts/job_catalog_v3_short.sh (HD5), tools/short_wall.py, tools/collect_run.py, tools/lhe_parts.py (queue_path),
+      mg5_pipeline_final.py (virt physics check, assembly), tools/zero_shot_parent.py, recipes/gen_catalog_v4_heldout_default.py,
+      recipes/catalog_v4_heldout_default_*.yaml, analysis/catalog_v4/data/lhe_probe_yields_hd_{h5,5body}.json, lhe_rates_hd_{h5,5body}.json,
+      tests/test_lhe_queue_path.py, tests/test_lhe_virt_label.py. Next: when the 12 end, read logs, extract, fill mixture_ab.py
+      HD4_HET and add HD5, mixture_ab mixture + het_uncertainty, het rate into short_wall (next 20).'
+    written: '2026-10-31T18:23:33+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
