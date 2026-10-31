@@ -144,14 +144,11 @@ entries:
   - D195
   - D199
   next:
-    6: 'Propagator-product read running: CPU job FA-ccin2p3-71a96ca2 on CC (scripts/job_v4_dipole_residual.sh prop, dipole_residual.py
-      --prop @d9bfe295; design passed 2026-10-31 after one FIX). When it ends: read its PROP_RESIDUAL lines and copy the per-probe
-      JSONs from $SCRATCH/zz_v4_prop_62894966 home via site run cat; group per cell and over all multiplicity cells with a
-      dipole_gate.py-style tool (refused count beside each median); apply in order: gate (median r^2 of t on log P >= 0.1
-      over all multiplicity cells, both seeds), ceiling (held-out median max eta^2 of u on t, log|M|^2 >= 0.05, else unreadable),
-      then the mean read (eta^2(u|log P) >= half the ceiling, >= 2x training, above E, logF, log D) or the size read (r^2
-      of log u^2 on log P >= 0.1, >= 2x training, above placebos), margins beyond the seed difference and bootstrap half-range.
-      The dipole read before it is a dead end (dipole_gate.json @606fbe94).'
+    6: 'Design the next candidate for the multiplicity shape gap, now that the two per-event scalar priors (soft dipole par:v4_dipole,
+      propagator product par:v4_prop) are read: the held-out residual''s per-event structure is 3x the training pools'' (ceiling
+      eta^2 0.12 against 0.04) and no single scalar holds it; candidates are multi-variable (a binned or kNN fit of u on several
+      invariants together, to bound what any event-level prior could recover) or not per-event (the level and cell structure
+      of par:v4_shape_gap). Search docs/results.tex and the plan''s dead ends first; CPU on existing reads before any GPU.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1651,10 +1648,9 @@ entries:
       feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap (par:v4_shape_gap) in the
         catalog preprocessing design'
       if:
-      - 'gate fails or ceiling unreadable: dead end for per-event scalar priors, design the next multiplicity-gap candidate'
-      - 'yes: GPU design, the control''s short pretraining with data.target_propagators on, two seeds, read on H2 and TR by
-        the shape-gap rule'
-      - 'no or between: dead end, reported'
+      - 'a multi-variable read recovers most of the ceiling: design the matching input or target prior as a GPU arm'
+      - 'it does not: report to the user that the multiplicity gap is not an event-level prior''s to close (capacity, training
+        length or data instead)'
   step_waits: {}
   owner:
     agent: aaa8b1f043eaa6ee9
