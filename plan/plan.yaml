@@ -7297,6 +7297,9 @@ entries:
       check agent_tasks.py --mechanical in the supervisor''s maintain (ALERT mechanical_revert at 5 failures among the first
       30; tests/test_mechanical_watch.py). The routing dead end recorded earlier (verdict No under the 0.6 rule) is superseded
       by D213.'
+  - at: '2026-10-31T04:00:01+00:00'
+    text: 'a compaction inside the turn of owner aa7670a7d3cbd2cba at 2026-10-31T03:59:22.944Z: its brief or scope was too
+      large; narrow the next brief'
   handoff:
     state: 'Step 4 model trial closed: first trial (10 pairs) result, extension (D212) stopped by D213 (switch to Sonnet for
       mechanical steps). Switch live in code: .claude/agents/mechanical-worker.md (model sonnet, scope only, loads live CLAUDE.md),
