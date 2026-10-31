@@ -7076,6 +7076,54 @@ entries:
       for usage, wake, main session, orchestration, task-notification, stop hook, nothing_new, inline work (only the review-launch
       count at line 13401, not this question), usage_report.py nothing_new, site decisions (D177, D185, D202 related, none
       on this measure); not stochastic, one pass.'
+  - at: '2026-10-31T03:45:24+00:00'
+    question: 'Usage attribution (step 7, Joaquin 2026-10-31 on figs/usage.png), all three parts: (1) what wakes the main
+      session and what it does when woken, and what each class costs; (2) main-alone era agent spend by kind (fork, general-purpose,
+      Explore, reviewers), context at launch and total, whether forks carried the parent''s full context; (3) which figure
+      version Joaquin views and which correction applies. Feeds: cut wakes and the main session''s context (if its cost is
+      mostly orchestration-only) or move inline work to agents (if mostly inline).'
+    prior: 'usage_report nothing_new (v2 @f3624f9c): notification-started turns whose calls are only the waiter re-arm, 10.4%
+      of main turns main-alone, 22.9% step-agents; split by transcript file only. usage_report v3 (7dbd656d, fix pending review):
+      main 560/126/20M weighted tokens over the three eras, subagents 146/272/65M, A/B replays 15M (counted as main in v2).
+      Part 3: Joaquin views figs/usage.png = v1 (5b14ab22, main folder only, right panel divides each role by its own results);
+      v2 (f3624f9c) read all FA folders; v3 (one denominator, replays apart, wasted-calls panel kept) replaces both. docs/results.tex:
+      only the count of who launched each code review (line 13401), a different question. Decisions D177, D185, D202 related,
+      none on this measure.'
+    measure: 'tools/main_turns.py. Main-session transcripts (A/B replay folders excluded). Segment = a turn-starting user
+      record (not a tool result) and its API messages (dedup on message id) until the next; triggers user, handback, agent_done,
+      waiter, supervisor, bg_other, goal_checkin, stop_hook, nudge, compaction; mid-turn arrivals and silent_turn_reminder
+      counted as absorbed_mid_turn. What it did, per API call (each call''s $ to what that call issued) and per segment (first
+      that applies): inline = Edit/Write; Bash git commit|merge|worktree|rm|push (not plan-only commits), site submit|run|copy|sync|cancel,
+      pytest, cp/mv/rm/mkdir/ln at command position, sed -i, a redirect or tee into a file outside /tmp and $S, running a
+      script (python3 <x>.py, not plan.py, not --help, not a scratchpad script), python heredoc or -c only when its body writes
+      (open w/a/x, json.dump, savefig, to_csv, np.save, write_text, .write(, shutil, os.remove/rename, subprocess); quoted
+      strings blanked and heredoc bodies dropped before matching; read = Read/Grep/Glob/Skill/MCP and other Bash; orchestration
+      = Agent, SendMessage, TaskStop, ToolSearch, tools/plan.py, site ack|events|decide|item(s)|supervise|digest|hold|release|pick,
+      detach.py, plan-only commits; none = text only. Per era and class: segments, API calls, context at first call (median),
+      weighted tokens, list-price $, $ share; orchestration-only wakes (not user-started, segment class orchestration or none);
+      nothing-to-say wakes (also visible text <= 60 chars) and the ''Working'' subset. Part 2: subagent transcripts by meta.json
+      agentType and era of first call: count, $, weighted tokens, median first-call context; forks: first-call context over
+      the parent''s context at the launching call.'
+    check: 'Hand check of the did-classifier, redesign era, seed 0, the call that set each label printed (main_turns.py --handcheck):
+      20 inline, 10 orchestration, 10 none. Before the fix: about 10 of 20 inline wrong (quoted --note/--quote text, grep
+      -ln matched ln, read-only heredocs, brief redirects to the scratchpad, scratchpad token counters). After: orchestration
+      10/10 and none 10/10 right; inline 18/20 clearly right (Edit, edits of hooks/site/settings/CLAUDE.md, site submit, git
+      commit), 2 debatable by definition (running .claude/hooks/plan_check.py to test it; running tools/agent_context.py,
+      an analysis read) both kept inline: error rate <= 2/40 = 5%; at the 20% line per segment the redesign inline share 31%
+      is far from the line by more than that. Unit cases in the commit''s test. Totals: era sums equal usage_report v3''s
+      main role within dedup (560.3M vs 560.0M; redesign 19.99 vs 19.82M); fork ratios computed from the parent''s own message
+      usage.'
+    fixed: Weights, list prices, era boundaries (653aed00, 84a15232), transcripts on disk at the run, one classifier.
+    control: The three eras against each other (main alone, where the main session did all the work, as reference); within
+      an era, $ shares.
+    seeds: 'Not stochastic: one pass; hand checks a fixed sample (seed 0).'
+    outcome: '''Mostly'' is read per API call on the redesign era''s main-session $: orchestration plus text-only replies
+      vs inline. If orchestration-only wakes or hand-back plus agent_done double wakes or Stop-hook refusals carry >= 10%
+      of that $, propose to Joaquin the cut (drop the duplicate task-notification, quiet the refusing hook, debounce). If
+      inline per call >= 20% (or per segment >= 20%, reported both), name the turns and propose the main session hand them
+      to agents. If both are below their lines: report, no change proposed. Part 2 feeds the agent-kind rule (forks carry
+      the parent''s whole context: at what cost against a fresh agent). Part 3: Joaquin is told v3 replaces v1 and v2 and
+      what changed.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
