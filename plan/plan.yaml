@@ -5631,6 +5631,20 @@ entries:
       3300 probes, about 1.8 h), so the job needed about 3.3 h against 1.5: over 2x, the target was wrong. Fix: PP4 eval-only
       re-reads FA-ccin2p3-a152d7d0 (REREAD afc96598) and a01ad665 (REREAD d26f13aa), 1.5 h limit; future arms reading PP and
       PP4 get the reads in their time (training 1.4 h + 2 s x probes).'
+  - at: '2026-10-31T01:16:45+00:00'
+    text: 'E3173. Standalones audit FA-ccin2p3-aab94b13 (job_standalones.sh audit, pool_physics.py at its run commit): 9404
+      *_standalone directories under $WORK/mg5amcnlo by name, but only 706 qualify for the prune (standalone_dirs: own Cards/proc_card_mg5.dat,
+      not a symlink), 10.7 GB, all 706 deletable (dry manifest .prune_manifests/standalones_20261031_020516_dry.json); the
+      other 8698 not checked (no proc card or symlinks). Sidecars: 26764 scanned in datasets/ and amp_data_cache, 4 without
+      a physics block, none needing a standalone, 1 unmapped process (ee_uug__as130). Sidecar-only check FAILS except H5 (28/28
+      ok on default50 and default25): EE4 170/170 mismatch on all three train recipes (coupling_kind 170, model 26) against
+      a catalog-wide reference built from only 108 of 1153 training entries (1045 unreadable from sidecars, so the reference
+      is the old minimal-QED subset); H1 62, H2 218, H2p5 38, H3 279, H6 8, H7E 34, H7c 34 all mismatch with reference none:
+      their val pools have no sidecar and their backend card is already absent. So prune --apply stays blocked (step 16);
+      cause to fix: why 1045 training reference entries are unreadable sidecar-only and why the held-out val pools lack sidecars.
+      Control EE4 re-read FA-ccin2p3-def11c5c (REREAD 380842ed, seed 43 parent): 169 of 170 probes read, mse_logm2_real finite
+      on all 169, in-job physics check ok on all 169 (backend reference); 1 refused: ee4_epem_cgsxwm test pool not prebuilt
+      (recipe_id 71164da294583efe); same single refusal in c1863adf.'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
