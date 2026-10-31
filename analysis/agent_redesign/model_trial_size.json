@@ -44,10 +44,10 @@
   }
  },
  "live_revert_rule": {
-  "N": 20,
-  "K": 4,
-  "p_revert_at_0.04": 0.007,
-  "p_revert_at_0.20": 0.589,
-  "p_revert_at_0.25": 0.775
+  "N": 30,
+  "K": 5,
+  "p_revert_at_0.04": 0.006,
+  "p_revert_at_0.20": 0.745,
+  "p_revert_at_0.25": 0.902
  }
 }

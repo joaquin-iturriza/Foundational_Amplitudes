@@ -448,9 +448,9 @@ def size(n_list=(10, 20, 30, 35, 40)):
     # that rate plus 0.16 (a 0.2 failure rate)
     def tail(k, n, p):
         return sum(math.comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(k, n + 1))
-    out["live_revert_rule"] = {"N": 20, "K": 4, "p_revert_at_0.04": round(tail(4, 20, 0.04), 3),
-                               "p_revert_at_0.20": round(tail(4, 20, 0.2), 3),
-                               "p_revert_at_0.25": round(tail(4, 20, 0.25), 3)}
+    out["live_revert_rule"] = {"N": 30, "K": 5, "p_revert_at_0.04": round(tail(5, 30, 0.04), 3),
+                               "p_revert_at_0.20": round(tail(5, 30, 0.2), 3),
+                               "p_revert_at_0.25": round(tail(5, 30, 0.25), 3)}
     print(json.dumps(out, indent=1))
     return out
 
