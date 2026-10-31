@@ -6419,7 +6419,7 @@ entries:
     agent: acadf5fd3cc8f4bac
     state: stopped
     since: '2026-10-31T15:26:39+00:00'
-    state_at: '2026-10-31T16:12:15+00:00'
+    state_at: '2026-10-31T16:12:32+00:00'
     context: 143284
     context_at: '2026-10-31T15:56:30+00:00'
   findings:
