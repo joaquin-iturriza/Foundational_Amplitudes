@@ -1848,6 +1848,33 @@ entries:
       reported beside it; if it falls under 0.1 while leave-class-out is >= 0.3, the result is said to be cell-local. Cost:
       CPU only on CC: stage 1 four jobs (seeds x H2/TR), 4 cores, 1 h each; stage 2 one job, 8 cores, 2 h (about 2 x (10 +
       7 + 4 x 10) fits of about 100k events); no GPU; disk about 60 MB.'
+    fix_at: '2026-10-31T01:16:45+00:00'
+    fix: 'Check 5 (prior incomplete): the search missed the closest prior work, docs/results.tex par. ''Design (ii) on the
+      data: the 2->4 probes factorised onto their parents'' (2026-10-25, lines ~6194-6212): a gradient-boosted correction
+      learned leave-one-probe-out on the other 39 held-out 2->4 probes (splitting variables s_ak/s_hat, s_bk/s_hat, s_jk/s_hat,
+      pT_k^2/s_hat, y_k, 1-x, s_hat, flavour) took the per-probe spread from 2.5/3.1 to 0.73/1.11, under the network''s own
+      2->4 zero-shot floor 1.34/1.37, on 17 of 20 +g and 14 of 20 +gamma probes; also the cross-fitted process-statistics
+      map (D81, par. near line 5548) and the surrogates paragraph (line ~5776: momenta-alone soft-collinear factors carry
+      most per-event structure and extrapolate in n). ''leave-one'' finds it in results.tex. Fix: cite them with their numbers,
+      say what differs (catalog_v4 H2, the control''s residual u rather than log|M|^2 over the parent''s) and use the factorised-onto-parent
+      correction as evidence for check 2 and as a candidate yes arm (named target terms), or say why not. Check 2 and 4 (yes
+      bar not shown reachable): from analysis/catalog_v4/data/prop_residual/*_H2.json the median var(u) held out is 0.382
+      / 0.394 (seeds 42/43); the cells'' training floors (shape_gap.json: 6qq 0.207, 6bb 0.136, 6gg 0.076, 6ee 0.23 ...) make
+      the gap about 0.5-0.65 of var(u)_ho, so f >= 0.3 needs the out-of-class map to remove about 0.15-0.2 of held-out var(u).
+      The only measured own-label structure, the scalar ceiling eta^2 0.122/0.119, converts to f about 0.20 / 0.28 (per pool
+      var_u x ceiling, my computation from those files), under the 0.3 bar, and a map that never sees the class''s labels
+      will reach less than its own-label ceiling. So the yes outcome may be unreachable by construction, the same flaw as
+      the last FIX in the other direction. Fix: compute the full-feature K=1600 own-label ceiling''s f first (it is cheap,
+      in the dry run or as stage 2''s first output, both seeds) and fix the thresholds before the deciding fit, either as
+      a share of the ceiling''s f (e.g. yes when leave-class-out f >= half the ceiling''s f and >= 0.1 absolute) or by stating
+      that a ceiling f under 0.3 ends the route as ''no shared structure large enough'' and what that changes. Minor, same
+      fix: f takes medians pooled over cells whose H2 and TR mixes differ (6gg 17 H2 vs 10 TR at floor 0.076; 6qq 110 vs 351);
+      compute var(u) and var(u - u_hat) per pool over its own cell''s training median (as the shape-gap rule does) or state
+      why the pooled median is unbiased. Checks 1, 3, 6, 7 hold: the map vs no map against the same training floor with everything
+      fixed is a matched read; seeds 42/43 decided separately with seed difference and pool bootstrap measured in the run;
+      it answers the entry''s step 6 and D178; no decision names a comparison it omits. Each H2 pool is its own class in census_classes.json
+      (218 distinct classes, 201 class siblings outside H2), so 10 class-grouped folds are leave-pool-out among H2, which
+      is fine.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
