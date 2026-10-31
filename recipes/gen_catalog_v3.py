@@ -219,6 +219,24 @@ OUT_PROC = os.path.join(ROOT, "recipes", "catalog_v3_processes.yaml")
 OUT_CENSUS = os.path.join(ROOT, "recipes", "catalog_v3_census.yaml")
 
 
+def tree_entry(c):
+    """one checked tree candidate (stage 2's output, exists) -> its catalog_v3 entry"""
+    import sys
+    sys.path.insert(0, ROOT)
+    import mg5_pipeline_final as mg
+    pdg_b, pdg_f = mg.generate_slot_pdgs(c["generate"])
+    if pdg_b[1] == -pdg_b[0] and pdg_b[0] < 0:
+        pdg_b = [pdg_b[1], pdg_b[0]]
+    n = len(pdg_f); W = c["weighted"]; a = 2 * n - W if W is not None else None
+    e = {"mg5_generate": [c["generate"]], "nfinal": n, "pdg_ids": pdg_b + pdg_f,
+         "m_finals": [MASS.get(abs(p), 0.0) for p in pdg_f], "run_card_patches": {"lpp1": "0", "lpp2": "0"},
+         "param_card_patches": (dict(mg.TOP_PATCHES) if 6 in map(abs, pdg_f + pdg_b) else {}),
+         "layer": c["layer"], "why": c["why"], "diagrams": c["diagrams"], "v3_key": c["key"]}
+    if a:
+        e["alphas_power"] = a
+    return e
+
+
 def write(*checked):
     """stage 2 -> the tree entries (recipes/catalog_v3_processes.yaml, loaded by mg5_pipeline_final._load_catalog_v3 at
     import) and the census recipe the numeric equality check reads (recipes/catalog_v3_census.yaml: every tree that
@@ -231,17 +249,7 @@ def write(*checked):
     for c in (c for f in checked for c in json.load(open(f))):
         if not c.get("exists") or c["layer"] not in (2, 3, 4, 5):
             continue
-        pdg_b, pdg_f = mg.generate_slot_pdgs(c["generate"])
-        if pdg_b[1] == -pdg_b[0] and pdg_b[0] < 0:
-            pdg_b = [pdg_b[1], pdg_b[0]]
-        n = len(pdg_f); W = c["weighted"]; a = 2 * n - W if W is not None else None
-        e = {"mg5_generate": [c["generate"]], "nfinal": n, "pdg_ids": pdg_b + pdg_f,
-             "m_finals": [MASS.get(abs(p), 0.0) for p in pdg_f], "run_card_patches": {"lpp1": "0", "lpp2": "0"},
-             "param_card_patches": (dict(mg.TOP_PATCHES) if 6 in map(abs, pdg_f + pdg_b) else {}),
-             "layer": c["layer"], "why": c["why"], "diagrams": c["diagrams"], "v3_key": c["key"]}
-        if a:
-            e["alphas_power"] = a
-        procs[c["name"]] = e
+        procs[c["name"]] = e = tree_entry(c)
         lo = int(round(max(1.05 * (sum(e["m_finals"]) + 0.0), 25.0)))
         lines.append(f"  - {{name: {c['name']}, sqrts: [{max(lo, 25)}, 1000], n_train: 0, n_val: 0, n_test: 0}}")
     yaml.safe_dump({"processes": procs}, open(OUT_PROC, "w"), sort_keys=True)
