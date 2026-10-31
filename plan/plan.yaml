@@ -2175,6 +2175,48 @@ entries:
       training pools only, shr_ho from other classes'' held-out pools, the ceiling is out-of-fold, and the floor comes from
       training pools. Minor: the verdict() docstring says ''half the larger bootstrap half-range'' while the code uses the
       half-range, which matches the design; fix the wording.'
+  - at: '2026-10-31T03:44:43+00:00'
+    question: 'Option (b), D216 (''Yes, do b)''): does training on more 6-particle (2->4) tree pools in the held-out multiplicity
+      cells (bb, bg, bq, qq, qg, ee, gg) shrink the 218 held-out multiplicity pools'' zero-shot gap to their cells'' training
+      floor, at the control''s fixed step count? Yes: data is a lever for the multiplicity gap and the pools join the catalog''s
+      training set; no: the gap is the network''s capacity or training length, (a) inside the full pretraining (wanted, held
+      by D78).'
+    prior: 'par:v4_shape_gap (H2 median e 0.389/0.358 on the free floor: a transfer gap, not the pools'' difficulty); par:v4_signext
+      (more sign-changing one-loop pools: the held-out wrong-sign share 6.69% -> 2.91%, sign test p=0.001 over 4 seeds, at
+      a cost of 1.15x zero-shot MSE on H2 at fixed steps; the user kept it as a result, 2026-10-30); par:v4_lco_not and today''s
+      kshot_spread ceiling (no event-level prior and no per-process affine carry the gap: f_ceil 0.016/0.019 and 0.012/0.017);
+      par:v4_kshot_level (H2 floor 0.38/0.39). Searched results.tex for multiplicity, more pools, 2->4 training, data scaling,
+      H2; plan dead ends; decisions D78, D178, D216: no prior read of adding same-multiplicity pools found.'
+    measure: 'Pools: catalog_v4''s census is exhaustive over its beams and finals (every MadGraph-accepted 2->4 of the enumeration
+      is a class with a role), so the new pools are the conserved 2->4 keys over the same BEAMS x FINALS not in the census,
+      without top or tau (they belong to H3 and the twin): upper bound 261 (qq 135, bq 32, gg 32, qg 26, ee 19, bb 13, bg
+      4; mostly +W+W- and all-fermion finals), taken all, none subsampled, against 716 training 2->4 pools in these cells.
+      Kept only if MadGraph accepts it (census check) and the class check admits it: not a child of a held-out family, and
+      in no class (tools/equal_processes.py exact and near pairs < 1e-2, with v4''s massless-b merges) holding an H1, H2 or
+      H3 member. Generated as catalog_v4 tree pools (v4 cuts, sampling, 1e5/1e4/1e4), sidecars, recipe = catalog_v4_train.yaml
+      + these, as the sign extension''s. Read: per H2 pool at each run''s best checkpoint, 2000 val events, zero-shot MSE
+      and var(u); per seed r = median_p var(u)_arm / var(u)_ctrl and s = median_p[var(u)_ctrl - var(u)_arm] / median_p[var(u)_ctrl
+      - floor_c] (floor_c from the matched control''s TR pools of the cell), per cell beside; costs on every other axis (median
+      arm/control MSE ratio, as par:v4_signext).'
+    check: 'The measure moved on existing data with the training set: par:v4_signext''s arm changed H2''s zero-shot MSE by
+      1.15x (seed ratios 1.176, 1.314, 1.046, 1.047) and the held-out sign share 6.69% -> 2.91% with the same reads; the control
+      pair''s seed-43-over-42 ratio on H2 is 1.071 (the noise the arm must clear); the gap s''s denominator is 0.21/0.19 (kshot_spread
+      --check).'
+    fixed: The control's recipe, HPs (dimensionless target, Muon at the search's best), 4264 steps, batch, reads (2652 zero-shot
+      probes, best checkpoint, 2000 events), held-out probes unchanged; only the training recipe gains the new pools (fewer
+      steps per pool, as in par:v4_signext).
+    control: A matched control pair rerun at the arm's commit in the same wave (v4_dimensionless_muon seeds 42/43), so no
+      code drift since 2026-10-26 enters; the old pair (FA-ccin2p3-339ec100 / -380842ed) checked against it (H2 median ratio
+      within the seed spread).
+    seeds: Seeds 42 and 43 for arm and control (D216's design ask), each decided on its own; margin max(the matched control's
+      seed-43/42 ratio's distance from 1 on H2, the 16-84% bootstrap half-range of r over H2 pools).
+    outcome: 'Yes when r <= 1 - margin and s >= 0.25 on both seeds: data closes part of the gap; the pools proposed for catalog_v4''s
+      training set (to the user), and the cost on other axes reported. No when r >= 1 - margin on both seeds or s < 0.1 on
+      both: more same-multiplicity data at fixed steps does not carry the gap; (a) capacity and length inside the full pretraining
+      is the remaining lever (held by D78, to the user). Else between: reported, two more seeds per arm only by the user''s
+      go (as par:v4_signext). Per cell shown beside (gg: 10 training pools against 17 held out). Cost: GPU 4 runs x 1 V100
+      x about 3.5 h (tools/short_wall.py) = 14 GPU-h, under 30 (D153); CPU: MadGraph check, class check, generation of up
+      to 261 tree pools (catalog_v4''s 478-entry prebuild took about 6 CPU-h) after a probe of a few pools (yield, time, disk).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
