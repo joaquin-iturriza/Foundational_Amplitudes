@@ -6309,6 +6309,11 @@ entries:
       (het loss for catalog trainings once settled) never became a config default or a canonical-setup line, which still says
       MSE fixed, so designs and reviewers followed it. Guidance fix sent to a mechanical worker; open to Joaquin: flip config/default.yaml
       to HETEROSC for every new run?'
+  - at: '2026-10-31T04:46:44+00:00'
+    text: '2026-10-31 correction: the het loss WAS settled (D70/D71 2026-10-16, under D52; Delta cells and fine-tunes rerun
+      with it). The main session''s search of the ledger stopped at D69 (grep D5x/D6x only) and it told Joaquin it was never
+      settled. config/default.yaml was never switched; worker now sets loss: HETEROSC and fixes the guidance. The six mixture
+      runs trained MSE against that default.'
   handoff:
     state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
       @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
