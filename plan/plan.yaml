@@ -6283,6 +6283,11 @@ entries:
       index line (diff shown to him). v3_prep_explore owner aaa8b1f043eaa6ee9: prop read FA-ccin2p3-71a96ca2 running, told
       the Higgs width fix may need a re-run. agent_redesign owner acc18380b00739f5c asked to hand off at 323k; fresh owner
       then. Joaquin''s sign-vs-loops question recorded on synthetic_prior_alternatives_not_built (held).'
+  - at: '2026-10-31T01:07:41+00:00'
+    text: 'Model trial closed out 2026-10-31: E3167 (validate re-run, 10/10 fail at parent, pass at fix) acked; result recorded
+      as evidence (model_trial.json @096b5fe4) and as the routing dead end (verdict No, ratio 0.654 vs 0.6 rule); 21 zz_trial
+      worktrees removed with remove_worktree.sh (it now skips .pytest_cache, 202fb3a1), 20 zz_trial_* branches deleted. Waiting
+      on Joaquin: whether to add analysis tasks to the trial; steps 1, 5, 6 left.'
   handoff:
     state: 'Step 4 matched model trial (D203) run and scored, write-up and cleanup left. Design: FIX (interfaces, source asserts,
       alt fix, analyses) then PASS by the design reviewer 2026-10-31. Ran 20 compact-worker agents on 10 past repo fixes (tools/model_trial.py,
