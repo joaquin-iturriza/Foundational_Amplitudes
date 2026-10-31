@@ -7311,6 +7311,12 @@ entries:
   - at: '2026-10-31T04:00:06+00:00'
     text: Owner aa7670a7d3cbd2cba compacted inside its turn (2026-10-31T03:59Z) after ~219k context carrying the usage figure,
       the reply-check fix and the three approved changes; next brief narrowed to one change per turn
+  - at: '2026-10-31T04:04:14+00:00'
+    text: '2026-10-31: an uncommitted edit of .claude/hooks/plan_check.py by the agent_redesign owner (Stop-hook bookkeeping,
+      in progress) crashed the live Stop hook (UnboundLocalError: an inner ''import re'' made re local to main()). Hook files
+      in the shared checkout are live the moment they are saved; hook changes are developed in a copy or worktree and installed
+      only after their tests pass. Fixed in the working copy by removing the inner import; tests/test_redesign_d.py d2_d6
+      15/15 pass.'
   handoff:
     state: 'Step 4 model trial closed: first trial (10 pairs) result, extension (D212) stopped by D213 (switch to Sonnet for
       mechanical steps). Switch live in code: .claude/agents/mechanical-worker.md (model sonnet, scope only, loads live CLAUDE.md),
