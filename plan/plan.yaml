@@ -3440,15 +3440,11 @@ entries:
       events with the class''s MadLoop [virt=QCD] standalone (tools/nlo_virtual_pipeline.py, an isolated subprocess per chunk
       as datagen''s kind virt), test on a small ee pool, then generation (about 1.0 core-h of MadEvent, the loop labels measured
       in the probe) and the same HD4 re-read'
-    20: 'Het share arms'' eval-only REREAD (step 15 repair, inside the passed het design): logs of v4_het_default50 FA-ccin2p3-466656b2,
-      v4_het_default50_seed2 9897833d, v4_het_default25 f0156d88, v4_het_default25_seed2 df858d33 read whole 2026-10-31: training
-      4264/4264 steps, best checkpoint model_run0_best.pt saved and reloaded, sigma-only stage (250 steps) done, final model
-      written; H1 H2 H2p5 H3 H5 H6 H7E H7c read in full; PP4 cut at 772/908/1055/1129 of 1301, EE4 0/169 (TIMEOUT 10:01:26
-      at 03:45:00: ~74 min of load-time composition not in the wall at submission, and reads ran 1.7-2.0 s/probe in-axis,
-      2.05-2.46 s overall, against short_wall''s 1.6). Once hd_ pools exist: one eval job per arm, MODE eval, V3_AXES=''PP4
-      EE4 HD4'', REREAD=<arm run>, 1584 probes, --hdr=--time=01:45:00 (1584 x 2.46 s + 15 min startup, x1.25 = 1.67 h; short_wall
-      --eval says 01:30:00 at 1.6 s/probe, too short), 4 x 1.75 = 7.0 GPU-h; het batch total 6 x 3.75 + 7.0 = 29.5 GPU-h,
-      under 30. Also fix short_wall S_PROBE to the measured het rate before submitting.'
+    20: 'Step 20 re-reads running (12 runs, waits on step 20). When they end: read each log whole (V3_AXIS_SKIPPED, TIMEOUT,
+      ZERO_SHOT counts 142 or 1612), extract the reads (mixture_ab.py extract), fill mixture_ab.py HD4_HET with the het reruns
+      and add HD5 to the held-out pooling (step 18 design: pooled default-sampled R over H1-H3 plus the 114, and H5 by axis
+      per step 19), then mixture_ab mixture and het uncertainty (het_uncertainty.py) with the control pairs; measure the het
+      per-probe rate on the cached reader from these logs and set it in short_wall'
     21: 'Step 18 last 4 tree pools: hd_test_e20_aaccx (FA-ccin2p3-6581e775 FA-ccin2p3-e58cb2fe), hd_ddx_dhuxwp__E20 (FA-ccin2p3-62f8cc25,
       queue hd_test_e20_small_runs), hd_test_5body_b (FA-ccin2p3-8f072868 FA-ccin2p3-9d27468a); then check_site_data: 114/114
       test pools, H5 28/28 already'
@@ -6211,8 +6207,6 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '20': FA-ccin2p3-9512cac2 FA-ccin2p3-783892e6 FA-ccin2p3-58631ca5 FA-ccin2p3-698c1a0b FA-ccin2p3-4dca09e5 FA-ccin2p3-926dea24
-      FA-ccin2p3-87aeabca FA-ccin2p3-53b9ed56 FA-ccin2p3-ead54b75 FA-ccin2p3-7c131715 FA-ccin2p3-9538e607 FA-ccin2p3-ed96b552
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -6508,11 +6502,11 @@ entries:
       - 'H5 R within the pooled interval: the pooled read stands'
       - 'H5 R outside it: reported per axis to Joaquin'
     20:
-      feeds: next 14, the share choice (het-loss uncertainty, D220)
+      feeds: next 14, the share choice
       if:
-      - 'all four reread complete: het uncertainty read (mixture_ab MIX_HET, het_uncertainty.py) on PP4/EE4/HD4 with the control
-        pair'
-      - 'a reread times out again: read the log for the probe rate and resubmit at the measured wall, no axis cut'
+      - 'all 12 complete: the default-sampled held-out verdict per share (R with widened interval vs 1.05) and the het uncertainty
+        read, to Joaquin'
+      - 'a read times out or skips an axis: read its log for the rate and resubmit at the measured wall, no axis cut'
     21:
       feeds: 'next 18: the default-sampled held-out pools'
       if:
