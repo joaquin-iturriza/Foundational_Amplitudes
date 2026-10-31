@@ -18,7 +18,7 @@ copied over the agent's work and run in .venv-cpu (every test of those files pas
 failed on the first attempt is resumed once with the failing check's output; its $ is the sum over both attempts,
 and it counts as passed with rework when the second check passes. Records: analysis/agent_redesign/model_trial.json.
 """
-import argparse, glob, json, os, subprocess, sys
+import argparse, glob, json, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = os.path.join(ROOT, ".venv-cpu", "bin", "python")
@@ -222,8 +222,26 @@ def stripped(text, task):
     return "".join(out)
 
 
+SCRATCH = os.environ.get("MODEL_TRIAL_SCRATCH") or os.path.join(
+    "/tmp", "claude-%d" % os.getuid(), "model_trial_checks")
+BASE = os.path.join(ROOT, "analysis", "agent_redesign", "model_trial_baseline")      # <task>.json each
+RESULT = re.compile(r"^(PASS|FAIL)\s+(.+?)\s*$|^(PASSED|FAILED|ERROR)\s+(\S+)", re.M)
+
+
+def results(out):
+    """{scenario: True/False} from a run's output: a runner's `PASS  <text>` / `FAIL  <text>` lines, or pytest -rA's
+    PASSED/FAILED/ERROR lines; digits in a scenario's text are masked (they count live things); a name seen failing
+    once is failing."""
+    res = {}
+    for m in RESULT.finditer(out):
+        word, name = (m.group(1), m.group(2)) if m.group(1) else (m.group(3), m.group(4))
+        name = re.sub(r"\d+", "#", name)
+        res[name] = res.get(name, True) and word in ("PASS", "PASSED")
+    return res
+
+
 def run_check(path, commit, tests, timeout=900, task=None):
-    """(passed, output tail) of `commit`'s test files run over the tree at `path` (source-level assertions of `task`
+    """(rc ok, full output) of `commit`'s test files run over the tree at `path` (source-level assertions of `task`
     stripped); the tree is restored after."""
     saved = {}
     for t in tests:
@@ -236,12 +254,13 @@ def run_check(path, commit, tests, timeout=900, task=None):
         for t in tests:        # a test file with its own __main__ runner is run by it (some set globals there)
             src = open(os.path.join(path, t)).read()
             cmd = [PY, t] if '__name__ == "__main__"' in src or "__name__ == '__main__'" in src else \
-                [PY, "-m", "pytest", "-q", "-p", "no:cacheprovider", t]
-            r = subprocess.run(cmd, cwd=path, capture_output=True, text=True, timeout=timeout,
-                               env=dict(os.environ, CLAUDE_PROJECT_DIR=path, PYTHONDONTWRITEBYTECODE="1"))
-            ok, out = ok and r.returncode == 0, out + (r.stdout + r.stderr)[-3000:]
-    except subprocess.TimeoutExpired:
-        ok, out = False, "timeout after %d s" % timeout
+                [PY, "-m", "pytest", "-q", "-rA", "-p", "no:cacheprovider", t]
+            try:
+                r = subprocess.run(cmd, cwd=path, capture_output=True, text=True, timeout=timeout,
+                                   env=dict(os.environ, CLAUDE_PROJECT_DIR=path, PYTHONDONTWRITEBYTECODE="1"))
+                ok, out = ok and r.returncode == 0, out + "\n#### %s rc=%d\n" % (t, r.returncode) + r.stdout + r.stderr
+            except subprocess.TimeoutExpired:
+                ok, out = False, out + "\n#### %s timeout after %d s\n" % (t, timeout)
     finally:
         for t, s in saved.items():
             p = os.path.join(path, t)
@@ -252,20 +271,52 @@ def run_check(path, commit, tests, timeout=900, task=None):
     return ok, out
 
 
-def validate(names, vt_name="zz_trial_validate"):
-    vt = os.path.join(ROOT, "worktrees", vt_name)
-    if not os.path.isdir(vt):
-        git("worktree", "add", "--detach", vt, "HEAD")
+def run_at(rev, commit, tests, task, patch=None):
+    """run_check on a scratch worktree at `rev`, outside worktrees/zz_* (a tree under worktrees/zz_* is a test
+    worktree to tools/plan.py, which refuses its writes even in a test world: 2026-10-31, acceptyield), removed
+    after; `patch` (path, text) is appended to a file first (altcheck)."""
+    os.makedirs(SCRATCH, exist_ok=True)
+    d = os.path.join(SCRATCH, "%s_%s_%d" % (task, rev[:12].replace("/", "_"), os.getpid()))
+    git("worktree", "add", "-q", "--detach", d, rev)
+    try:
+        if patch:
+            with open(os.path.join(d, patch[0]), "a") as f:
+                f.write("\n\n" + patch[1])
+        return run_check(d, commit, tests, task=task)
+    finally:
+        git("worktree", "remove", "--force", d, check=False)
+
+
+def verdict(task, res):
+    """A tree passes when every scenario that passes at the fix passes in it (the task's targets, which fail or are
+    missing at the parent, among them); scenarios failing at the fix itself (the laptop's live state: the user-level
+    hooks, the live ledger) are not scored. Missing = failed (a crashed runner)."""
+    b = json.load(open(os.path.join(BASE, task + ".json")))
+    need = [n for n, ok in b["fix"].items() if ok]
+    return all(res.get(n) is True for n in need)
+
+
+def validate(names, vt_name=None):
+    """Per task: the scenarios at the parent and at the fix; valid when some scenario passing at the fix fails or
+    is missing at the parent (its targets). Writes the baseline the check scores against."""
+    os.makedirs(BASE, exist_ok=True)
     out = {}
     for name in names:
         c, tests, _ = TASKS[name]
-        git("checkout", "-q", "--detach", c + "^", cwd=vt)
-        before = run_check(vt, c, tests, task=name)
-        git("checkout", "-q", "--detach", c, cwd=vt)
-        after = run_check(vt, c, tests, task=name)
-        out[name] = {"commit": c, "fails_at_parent": not before[0], "passes_at_fix": after[0],
-                     "parent_tail": before[1][-600:], "fix_tail": after[1][-600:]}
-        print("%-14s %s fails_at_parent=%s passes_at_fix=%s" % (name, c, not before[0], after[0]))
+        okp, outp = run_at(c + "^", c, tests, name)
+        okf, outf = run_at(c, c, tests, name)
+        rp, rf = results(outp), results(outf)
+        if not rf:              # no scenario lines: the file's exit code is its one scenario
+            rp, rf = {"<rc>": okp}, {"<rc>": okf}
+        targets = sorted(n for n, ok in rf.items() if ok and rp.get(n) is not True)
+        json.dump({"commit": c, "fix": rf, "targets": targets}, open(os.path.join(BASE, name + ".json"), "w"),
+                  indent=1)
+        out[name] = {"commit": c, "valid": bool(targets), "targets": targets,
+                     "fail_at_fix_unscored": sorted(n for n, ok in rf.items() if not ok),
+                     "rc_fails_at_parent": not okp, "rc_passes_at_fix": okf,
+                     "parent_tail": outp[-600:], "fix_tail": outf[-600:]}
+        print("%-14s %s valid=%s targets=%d unscored_at_fix=%d" % (name, c, bool(targets), len(targets),
+                                                                  len(out[name]["fail_at_fix_unscored"])), flush=True)
     return out
 
 
@@ -274,21 +325,13 @@ ALT = {"poolrow": "analysis/catalog_v4/dipole_residual.py", "hybridcp": "physics
 
 
 def altcheck():
-    vt = os.path.join(ROOT, "worktrees", "zz_trial_validate")
-    if not os.path.isdir(vt):
-        git("worktree", "add", "--detach", vt, "HEAD")
     out = {}
     for task, target in ALT.items():
         c, tests, _ = TASKS[task]
-        git("checkout", "-q", "--detach", c + "^", cwd=vt)
-        with open(os.path.join(vt, target), "a") as f:
-            f.write("\n\n" + open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial_alt", task + ".py")).read())
-        try:
-            ok, tail = run_check(vt, c, tests, task=task)
-        finally:
-            git("checkout", "-q", "--", ".", cwd=vt)
-        out[task] = {"passed": ok, "tail": tail[-400:]}
-        print(task, "alternative fix passes its check:", ok)
+        alt = open(os.path.join(ROOT, "analysis", "agent_redesign", "model_trial_alt", task + ".py")).read()
+        ok, tail = run_at(c + "^", c, tests, task, patch=(target, alt))
+        out[task] = {"passed": verdict(task, results(tail) or {"<rc>": ok}), "tail": tail[-400:]}
+        print(task, "alternative fix passes its check:", out[task]["passed"])
     return out
 
 
@@ -319,8 +362,11 @@ def check(task, arm):
     c, tests, _ = TASKS[task]
     p = wt(task, arm)
     dirty = git("status", "--porcelain", "--untracked-files=no", cwd=p).strip()
-    ok, out = run_check(p, c, tests, task=task)
-    return {"task": task, "arm": arm, "passed": ok, "uncommitted": bool(dirty),
+    head = git("rev-parse", "HEAD", cwd=p).strip()
+    ok, out = run_at(head, c, tests, task)
+    res = results(out) or {"<rc>": ok}
+    return {"task": task, "arm": arm, "passed": verdict(task, res), "rc_ok": ok, "uncommitted": bool(dirty),
+            "failing": sorted(n for n, v in res.items() if not v),
             "diff_stat": git("diff", "--stat", c + "^", "HEAD", cwd=p)[-1500:], "tail": out[-1500:]}
 
 
@@ -460,10 +506,9 @@ def main():
     ap.add_argument("cmd", choices=["validate", "setup", "brief", "check", "cost", "report", "altcheck", "size"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--out")
-    ap.add_argument("--vt", default="zz_trial_validate", help="validate: the worktree name (parallel validates)")
     a = ap.parse_args()
     if a.cmd == "validate":
-        res = validate(a.args or sorted(TASKS), a.vt)
+        res = validate(a.args or sorted(TASKS))
         if a.out:
             json.dump(res, open(a.out, "w"), indent=1)
     elif a.cmd == "setup":
