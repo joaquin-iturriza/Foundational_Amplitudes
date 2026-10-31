@@ -411,6 +411,17 @@ entries:
       is from 71a96ca2, no re-run. No single per-event quantity tried carries the gap: the held-out residual has 3x the training
       per-event structure, log P about a third of it, the placebos nearly as much.'
     at: '2026-10-31T01:09:13+00:00'
+  - tried: 'design of 2026-10-31 for the joint per-event read, two versions: per-pool out-of-fold fit of u on the event''s
+      kinematics (FIX: a K-shot fit on the held-out labels, not a prior), then a map fitted on the training pools only and
+      applied to held-out pools (FIX: training residuals hold little per-event structure, ceiling 0.036/0.041 vs 0.122/0.119
+      held out, so f < 0.1 is close to built in and the yes arm barely changes the training target; the 500-event ceiling
+      fits on K = 400, not 1600)'
+    why: 'two FIX verdicts, the one revision used; no job run. The reviewer''s direction for a new design: decide on a leave-one-class-out
+      map among the held-out multiplicity pools (is the held-out excess a systematic extrapolation error shared across held-out
+      processes), the training-pool map as a diagnostic, the factors-only map (t, logF, log P, log D) under the same scheme,
+      the yes arm derived from it (target_propagators if the factors hold most of f; otherwise named inputs or target terms,
+      never a map fitted on held-out labels), the ceiling labelled K = 400 or 2000 events kept for it'
+    at: '2026-10-31T01:12:51+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
