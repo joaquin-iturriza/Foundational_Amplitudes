@@ -1,0 +1,119 @@
+{
+ "v4_dimensionless_muon:v4_dimensionless_muon_seed2": {
+  "floor_run": "v4_dimensionless_muon_seed2",
+  "n": 218,
+  "n_arm_only": 0,
+  "n_ctrl_only": 0,
+  "r": 0.9337,
+  "s": 0.1152,
+  "mse_ratio": 0.9339,
+  "boot_r": [
+   0.9214,
+   0.9519
+  ],
+  "boot_s": [
+   0.0884,
+   0.1376
+  ],
+  "median_gap_ctrl": 0.1922,
+  "r_per_cell": {
+   "6bb": 0.9279,
+   "6bg": 0.8449,
+   "6bq": 0.8456,
+   "6ee": 0.963,
+   "6gg": 0.8569,
+   "6qg": 0.8911,
+   "6qq": 0.9521
+  }
+ },
+ "v4_dimensionless_muon_seed3:v4_dimensionless_muon_seed4": {
+  "floor_run": "v4_dimensionless_muon",
+  "n": 218,
+  "n_arm_only": 0,
+  "n_ctrl_only": 0,
+  "r": 0.9859,
+  "s": 0.0218,
+  "mse_ratio": 0.9701,
+  "boot_r": [
+   0.9751,
+   0.9959
+  ],
+  "boot_s": [
+   0.0056,
+   0.0325
+  ],
+  "median_gap_ctrl": 0.2353,
+  "r_per_cell": {
+   "6bb": 1.0003,
+   "6bg": 0.8367,
+   "6bq": 1.1448,
+   "6ee": 1.0375,
+   "6gg": 1.0406,
+   "6qg": 0.959,
+   "6qq": 0.9731
+  }
+ },
+ "v4_dimensionless_muon_seed2:v4_dimensionless_muon": {
+  "floor_run": "v4_dimensionless_muon",
+  "n": 218,
+  "n_arm_only": 0,
+  "n_ctrl_only": 0,
+  "r": 1.071,
+  "s": -0.1053,
+  "mse_ratio": 1.0708,
+  "boot_r": [
+   1.0506,
+   1.0853
+  ],
+  "boot_s": [
+   -0.1296,
+   -0.0803
+  ],
+  "median_gap_ctrl": 0.2102,
+  "r_per_cell": {
+   "6bb": 1.0777,
+   "6bg": 1.1836,
+   "6bq": 1.1833,
+   "6ee": 1.0384,
+   "6gg": 1.167,
+   "6qg": 1.1224,
+   "6qq": 1.0503
+  }
+ },
+ "v4_dimensionless_muon_seed4:v4_dimensionless_muon_seed3": {
+  "floor_run": "v4_dimensionless_muon",
+  "n": 218,
+  "n_arm_only": 0,
+  "n_ctrl_only": 0,
+  "r": 1.0143,
+  "s": -0.0228,
+  "mse_ratio": 1.0308,
+  "boot_r": [
+   1.0041,
+   1.0256
+  ],
+  "boot_s": [
+   -0.0359,
+   -0.0062
+  ],
+  "median_gap_ctrl": 0.2249,
+  "r_per_cell": {
+   "6bb": 0.9997,
+   "6bg": 1.1959,
+   "6bq": 0.8738,
+   "6ee": 0.9639,
+   "6gg": 0.961,
+   "6qg": 1.0428,
+   "6qq": 1.0277
+  }
+ },
+ "mean_r": 1.0012,
+ "sd_r": 0.0573,
+ "se_mean_r": 0.0286,
+ "mean_s": 0.0022,
+ "sd_s": 0.0919,
+ "se_mean_s": 0.0459,
+ "mean_mse_ratio": 1.0014,
+ "sd_mse_ratio": 0.0611,
+ "se_mean_mse_ratio": 0.0306
+}
