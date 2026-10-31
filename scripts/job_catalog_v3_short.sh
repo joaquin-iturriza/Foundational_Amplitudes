@@ -251,7 +251,7 @@ AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin 
 # the time limit must hold the training AND every zero-shot read (tools/short_wall.py; the step-11 and step-14 arms of
 # catalog_coverage were cut by TIMEOUT in their PP4/EE4 reads at a 2.5 h limit that counted training only): checked
 # before any GPU time is spent; submit with --hdr=--time=<its slurm_time>
-if [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ]; then
+if [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
            $([ "$MODE" = eval ] && echo --eval) ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
@@ -291,6 +291,28 @@ PY
     EXTRA=(training.iterations=40 training.validate_frac=0.5 evaluate=false data.processes_file="$SUB"
            ++data.memmap=false ++data.train_subsample=2000 ++data.eval_subsample=200)
     AXES=(H1 H5 "${CROSS[@]}")
+fi
+# mode probe (catalog_coverage step 16, the long runs' cost): PROBE_HEADS=<num_heads> runs 200 steps at the 16x
+# cell's data (every train event of the pool in memory, train_subsample null; eval_subsample 3200 = 200 x 16), no
+# evaluation, no sigma stage, then stops: the log gives the load time (job start to the first iteration), s/iter
+# (avg and LLOCA_PROFILE_STEP's data/step split), the GPU peak and, from /usr/bin/time, the host peak memory.
+# Its run dir is a zz_probe_ scratch dir of this job. The GPU model is printed (submit with --partition to choose it).
+if [ "$MODE" = probe ]; then
+    H="${PROBE_HEADS:?PROBE_HEADS=<num_heads> for mode probe}"
+    OUT="$SCRATCH/zz_probe_long_w${H}_${SLURM_JOB_ID:-$$}"
+    nvidia-smi --query-gpu=name,memory.total --format=csv,noheader | sed 's/^/PROBE_GPU /'
+    echo "PROBE_START $(date +%s) heads=$H"
+    TIMEV=(); [ -x /usr/bin/time ] && TIMEV=(/usr/bin/time -v)
+    LLOCA_PROFILE_STEP=1 "${TIMEV[@]}" python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" \
+        run_name=null warm_start_idx=null base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
+        training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" \
+        training.iterations=200 training.validate_frac=0.5 evaluate=false data.processes_file="$TRAIN" \
+        ++data.memmap=false ++data.train_subsample=null ++data.eval_subsample=3200 evaluation.train_subsample=2000 \
+        ++training.heterosc_sigma_stage_steps=0 model.net.num_heads="$H" 2>&1 | tee "$OUT.log"
+    RC=${PIPESTATUS[0]}
+    echo "PROBE_END $(date +%s) rc=$RC"
+    grep -E "Maximum resident set size|Elapsed \(wall" "$OUT.log" | sed 's/^/PROBE_HOST /'
+    exit "$RC"
 fi
 if [ "$MODE" != eval ]; then
     # a het arm is finished only with its sigma stage's checkpoint (run.py writes it after the main run's)
