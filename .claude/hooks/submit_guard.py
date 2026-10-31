@@ -25,7 +25,7 @@ A command is refused (exit 2, every reason found) when
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
 through both). It fails closed on a submission like design_guard did; a command that submits nothing is never refused.
 Env for tests: the PLAN_* variables of tools/plan.py; SUBMIT_RUNS_DB (default the site registry); HOME (placement)."""
-import json, os, re, shlex, sqlite3, sys, time
+import hashlib, json, os, re, shlex, sqlite3, sys, time
 
 HOOKS = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HOOKS)
@@ -730,10 +730,58 @@ def problems(inp):
         try:
             for site, project in named_submissions(scan):
                 if site != "auto" and not site.startswith("-"):
-                    spend_unit(project, site)
+                    if spend_unit(project, site) == "ok":
+                        _log_spent(inp, project, site)
         except Exception:
             pass
     return out
+
+
+def _spent_file():
+    return os.path.join(os.path.expanduser("~/.local/share/ccorch/placement"), "spent_pending.json")
+
+
+def _cmd_key(inp):
+    return hashlib.sha1(((inp.get("tool_input") or {}).get("command", "") or "").encode()).hexdigest()
+
+
+def _log_spent(inp, project, site):
+    """the unit just spent, kept so the failure hook can return it if `site submit` itself refuses the command."""
+    f = _spent_file()
+    try:
+        d = json.load(open(f))
+    except Exception:
+        d = []
+    d = [x for x in d if time.time() - x["ts"] < 3600]
+    d.append({"key": _cmd_key(inp), "project": project, "site": site, "ts": time.time()})
+    json.dump(d, open(f, "w"))
+
+
+def refund(inp):
+    """PostToolUseFailure: a command that failed with a `site:` refusal (dirty working copy, ...) submitted nothing, so
+    the units it spent in problems() go back to the plan (2026-10-31: a refused `site submit` cost a `site pick` slot)."""
+    msg = "%s %s" % (inp.get("error", ""), json.dumps(inp.get("tool_response", "")))
+    if not re.search(r"(^|\\n|\s)site: ", msg):
+        return 0
+    f = _spent_file()
+    try:
+        d = json.load(open(f))
+    except Exception:
+        return 0
+    key, keep = _cmd_key(inp), []
+    for x in d:
+        if x["key"] != key:
+            keep.append(x)
+            continue
+        pf = os.path.join(os.path.dirname(f), "%s.json" % x["project"])
+        try:
+            pl = json.load(open(pf))
+            pl["quota"][x["site"]] = int(pl["quota"].get(x["site"], 0)) + 1
+            json.dump(pl, open(pf, "w"))
+        except Exception:
+            pass
+    json.dump(keep, open(f, "w"))
+    return 0
 
 
 def main():
@@ -741,6 +789,8 @@ def main():
         inp = json.loads(sys.stdin.read() or "{}")
     except ValueError:
         return 0
+    if "refund" in sys.argv[1:]:
+        return refund(inp)
     bad = problems(inp)
     if bad:
         sys.stderr.write("BLOCKED by submit_guard:\n" + "\n".join("  " + b for b in bad) + "\n")

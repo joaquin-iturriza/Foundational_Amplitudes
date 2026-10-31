@@ -75,6 +75,41 @@ def test_refused_command_keeps_its_pick_unit():
             os.environ["SUBMIT_TEST"] = old_test
 
 
+def test_refused_submit_returns_its_pick_unit():
+    """`site submit` itself refusing (dirty working copy) returns the unit the guard spent; a success keeps it spent."""
+    import json, time
+    home = tempfile.mkdtemp()
+    pl = os.path.join(home, ".local", "share", "ccorch", "placement")
+    os.makedirs(pl)
+    f = os.path.join(pl, "FA.json")
+    old_home, old_test = os.environ.get("HOME"), os.environ.get("SUBMIT_TEST")
+    os.environ["HOME"] = home
+    os.environ.pop("SUBMIT_TEST", None)
+    g.RUNS_DB = _db([])
+    g.design = lambda *a: []
+    g.budget = lambda *a: []
+    g._site_data_ok = lambda site, r: (True, "ok")
+    cmd = "site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --item x -- v4_dimensionless_muon_default50"
+    inp = {"tool_input": {"command": cmd}}
+    try:
+        for outcome, left in (("refused", 1), ("success", 0)):
+            json.dump({"ts": int(time.time()), "quota": {"ccin2p3": 1}}, open(f, "w"))
+            assert g.problems(inp) == [] and json.load(open(f))["quota"]["ccin2p3"] == 0
+            if outcome == "refused":
+                g.refund(dict(inp, error="Exit code 2\nsite: working copy has uncommitted changes"))
+            assert json.load(open(f))["quota"]["ccin2p3"] == left
+        # an unrelated failure (no `site:` refusal) keeps the unit spent
+        json.dump({"ts": int(time.time()), "quota": {"ccin2p3": 1}}, open(f, "w"))
+        assert g.problems(inp) == []
+        g.refund(dict(inp, error="Exit code 1\nsbatch: error"))
+        assert json.load(open(f))["quota"]["ccin2p3"] == 0
+    finally:
+        os.environ["HOME"] = old_home or ""
+        if old_test is not None:
+            os.environ["SUBMIT_TEST"] = old_test
+
+
 if __name__ == "__main__":
     test_arm_recipe(); test_chained_on_prebuild_passes_without_read(); test_refused_command_keeps_its_pick_unit()
+    test_refused_submit_returns_its_pick_unit()
     print("ok")
