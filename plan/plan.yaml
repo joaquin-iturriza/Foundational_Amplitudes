@@ -5402,6 +5402,9 @@ entries:
     5: 'Context cuts for agents: lower effort on mechanical calls (hidden thinking ~15k/call at median, 29k at last), trim
       the skill listing (~7k) and prompt snapshot (~6k) in agents'' fixed part, shorten or once-only hook pushes (7-9k); each
       measured with tools/context_breakdown.py and tools/usage_windows.py before and after'
+    6: 'Cut 1 live check: after 10 subagents have run past 85064616, python3 tools/push_replay.py --since 2026-10-31T00:25:00Z
+      --check (in-force hook reproduces recorded REFERENCE chars within 5 percent), matched saving per agent, hand read of
+      every correction of them for a cause in a withheld section'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -5470,6 +5473,11 @@ entries:
       if:
       - 'context per call and $ per call fall with no rise in corrections (tools/agent_tasks.py): keep the cuts'
       - 'no fall, or more corrections: revert that cut and record it as a dead end'
+    6:
+      feeds: 'whether cut 1 (a: working-on-the-plan main only; b: seven acting sections on writes only) stays'
+      if:
+      - 'reproduced and no correction traced: keep, write up'
+      - 'a correction traced to a withheld section: remove that header line, dead end'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
