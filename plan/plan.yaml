@@ -6507,7 +6507,7 @@ entries:
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
   owner:
     agent: a9ed84e84b4c49f4b
-    state: working
+    state: closed
     since: '2026-10-31T19:55:31+00:00'
     state_at: '2026-10-31T19:55:31+00:00'
   findings:
@@ -7243,24 +7243,18 @@ entries:
       final |eta| (10 = forward) and of log10 min 2p_i.p_j/s_hat (1 = collinear); PP4 trained classes, het control seeds 42/43.
       Repo-reviewer re-check of short_wall/het_uncertainty changes not yet run.'
   handoff:
-    state: 'Step 20 done: all 14 re-reads read and extracted; mixture_ab.json (MSE) and mixture_ab_het.json verdict default25
-      (both shares GAIN and NO LOSS on the 700 default-sampled held-out classes; tie rule picks 0.25), het_uncertainty.json
-      complete (finding of this hand-off''s time). Step 23 done: zero-shot reader shared-tensor parent copy default (02554283),
-      A/B 30cc8928, repo-reviewer a8a308817be9d886d PASS at 43e35e49, its nit fixed 8836430b (not yet re-checked). H5 physics-check
-      fix 311380bf passed review. The result has not reached Joaquin yet beyond this owner''s final message.'
-    decisions: Held-out cost read on default-sampled events for MSE too (D227), with HD4 and HD5 pooled (700 classes, step-18/19
-      designs); het share arms' PP4/EE4 from their step-20 REREADs; het_uncertainty keys an arm's job folder by its training
-      run.
-    ruled_out: Sharing one built model across probes (data-dependent setup; Parameter deepcopy drops muP infshape); a second
-      H5 read before the fix (all 28 refused against tree references).
+    state: 'Step 20 written up in par:v4_mixture (c70595af): both shares WIN (GAIN and NO LOSS on 700 default-sampled held-out
+      classes) under MSE and het, verdict default25 by the tie rule; H3 open (MSE 1.133/1.082, intervals across 1). Waits
+      only on Joaquin''s share choice (next 14); catalog_v4_train.yaml untouched. short_wall eval start-up 1.5 min and het
+      probe rate 1.45 s (c0fed433). het_where relabelled (34278e1f). Next: (1) repo-reviewer re-check covering 8836430b, c0fed433,
+      34278e1f; (2) steps 15, 17, 18, 19, 21 have their results in (findings 18:23-19:54) and can be dropped after a read
+      by the next owner; (3) step 22 wall-time table.'
+    decisions: Eval-only start-up and het rate from the step-20 logs, slowest kept; --het passed by the job script (alias
+      of --sigma-stage). Write-up keeps the catalog-sampled held-out read beside the rule's default-sampled read (D227).
     running: none
-    files: 'analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/het_uncertainty.py, analysis/catalog_v4/data/{mixture_ab,mixture_ab_het,mixture_heldout_default,mixture_heldout_default_het,het_uncertainty}.json,
-      data/reads/*, figs/het_where.{png,pdf} (gitignored png), tools/pool_physics.py, tools/rebuild_run.py, tools/zero_shot_parent.py,
-      tools/short_wall.py, scripts/job_zero_shot_timing.sh. Next: (1) short_wall: het per-probe rate 1.45 s (slowest step-20
-      span) and an eval-only start-up (measured 15-82 s; 15 min assumed) for eval jobs, the het flag passed from scripts/job_catalog_v3_short.sh
-      line 256; repo-reviewer re-check with 8836430b; (2) write-up of the verdict in docs/results.tex (par:v4_mixture) and
-      Joaquin''s share choice (next 14); (3) step 22 wall-time table.'
-    written: '2026-10-31T19:54:14+00:00'
+    files: tools/short_wall.py, tests/test_short_wall.py, scripts/job_catalog_v3_short.sh, docs/results.tex (par:v4_mixture),
+      analysis/catalog_v4/het_uncertainty.py, analysis/catalog_v4/figs/het_where.{png,pdf}
+    written: '2026-10-31T20:01:24+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
