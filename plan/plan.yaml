@@ -7089,6 +7089,16 @@ entries:
       processes forked after start-up (default one per two CPUs, at most 8); the original path kept as --build load --workers
       1. A/B job FA-ccin2p3-e2da5118 (scripts/job_zero_shot_timing.sh AB=1, 100 H1 probes of 339ec100, REREAD, 0.67 GPU-h):
       A load/1 worker, B cached/1, C cached/4 workers, every .npz array of B and C compared exactly with A''s.'
+  - at: '2026-10-31T17:04:55+00:00'
+    text: 'Zero-shot reader A/B FA-ccin2p3-e2da5118 (V100, 62 H1 probes of the MSE control 339ec100, code 05a48fd7, log read
+      whole): A original (config re-read per probe, 1 process) 106 s; B config parsed once (1 process) 47 s, so about 1.4
+      -> 0.45 s per probe after a ~20 s start-up; C (B with 4 forked workers) failed every probe: ''Cannot re-initialize CUDA
+      in forked subprocess'' (CUDA initialised before the fork although torch.cuda.is_initialized() was False). B against
+      A: t identical, predictions h differ by 7e-6 to 1.1e-4 on all 62 probes, not bit-identical; whether that is the GPU
+      forward''s own run-to-run difference is not checked. Fix b9441370: workers are spawned subprocesses of the reader (--workers
+      1 on every W-th recipe); the A/B gains A2 (A repeated) as the control for the forward''s own difference. Rerun FA-ccin2p3-bfec5501
+      (0.67 GPU-h; submitted on ccin2p3 though site pick offered lxplus: the parent checkpoint and the earlier reads exist
+      only on ccin2p3, the data-locality gap of 15:50).'
   handoff:
     state: 'Step 18: queue hd_test_measured (106 pools) almost done at 17:32 (346/348 tasks, 105/106 assembled). Running:
       five 250-event run-size probes for the three slow 20 TeV pools (f0b9c35e 0da42a47 5f5ef310 fffbc4e3 f719bbff), five
