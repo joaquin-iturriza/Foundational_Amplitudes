@@ -38,6 +38,16 @@ import siteconf  # noqa: E402
 import pool_physics  # noqa: E402
 from rebuild_run import _build, load_best_weights, scored_split  # noqa: E402
 from multiplicity_extrap import parent_target_standardization  # noqa: E402
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from analysis.catalog_v4.dipole_residual import pool_rows  # noqa: E402
+
+
+def _pool_row(exp, split_idx, split, n):
+    """Each scored event's row in the split's pool (empty when the role sizes or the indices are missing)."""
+    rc, idx = getattr(exp, "_role_counts", None), np.asarray(split_idx).reshape(-1)
+    if rc is None or len(idx) != n:
+        return np.zeros(0, np.int64)
+    return pool_rows({"idx": idx, "split": split}, role_counts=rc)
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--parent", required=True, help="pretraining run dir (config.yaml, data_stats.json, models/)")
@@ -231,5 +241,8 @@ for recipe in a.recipes:
                             # these, never by matching log|M|^2 (the sampling-sensitivity dead ends)
                             idx=(np.asarray(split_idx).reshape(-1) if len(np.asarray(split_idx).reshape(-1)) == len(t)
                                  else np.zeros(0, np.int64)),
-                            pool=np.array(str(_pool or "")))
+                            pool=np.array(str(_pool or "")),
+                            # the role sizes and each scored event's row in the pool (the split is shuffled per role)
+                            role_counts=np.asarray(getattr(exp, "_role_counts", None) or (), np.int64),
+                            pool_row=_pool_row(exp, split_idx, a.split, len(t)))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)

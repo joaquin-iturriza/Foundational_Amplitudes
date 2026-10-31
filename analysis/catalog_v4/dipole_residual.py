@@ -77,6 +77,22 @@ def r2(u, x):
     return float(np.corrcoef(u, x)[0, 1] ** 2)
 
 
+def pool_rows(z, role_counts=None):
+    """The pool rows of a saved read's events: z['idx'] are positions in the role-contiguous train|val|test array of
+    a one-probe experiment, z['split'] the role. experiment._init_data shuffles each role in turn (train, val, test) by
+    one numpy default_rng(seed=42) drawing rng.permutation(n_role); the role's position p came from pool row perm[p].
+    A saved z['pool_row'] wins; else the role sizes are z['role_counts'] (or the argument)."""
+    files = getattr(z, "files", z.keys())
+    if "pool_row" in files and len(z["pool_row"]):
+        return np.asarray(z["pool_row"], dtype=np.int64)
+    n = [int(c) for c in (role_counts if role_counts is not None else z["role_counts"])]
+    rng = np.random.default_rng(seed=42)
+    perms = {r: rng.permutation(k) for r, k in zip(("train", "val", "test"), n)}
+    role = str(z["split"])
+    start = {"train": 0, "val": n[0], "test": n[0] + n[1]}[role]
+    return perms[role][np.asarray(z["idx"], dtype=np.int64) - start]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dirs", nargs="+", help="read directories; restrict to cells with --probes")
@@ -95,12 +111,13 @@ def main():
             if len(z["q"]) != len(t) or len(z["logF"]) != len(t):
                 rows.append({"dir": d, "probe": name, "error": "no q or no logF in the read"})
                 continue
-            if "idx" not in z.files or len(z["idx"]) != len(t) or not str(z["pool"]):
+            if ("idx" not in z.files or len(z["idx"]) != len(t) or not str(z["pool"])
+                    or not ("pool_row" in z.files or "role_counts" in z.files)):
                 rows.append({"dir": d, "probe": name, "error": "no event indices in the read (a read before @902b96c5)"})
                 continue
             pr = np.load(str(z["pool"]), mmap_mode="r")
             n = (pr.shape[1] - 1) // 5
-            mom, pdg, amp = split_pool(np.asarray(pr[np.asarray(z["idx"])]), n)
+            mom, pdg, amp = split_pool(np.asarray(pr[pool_rows(z)]), n)
             raw = t - z["logF"].astype(np.float64)
             diff = np.log(np.abs(amp)) - raw
             if np.corrcoef(np.log(np.abs(amp)), raw)[0, 1] < 0.999 or np.median(np.abs(diff - np.median(diff))) >= 0.05:
