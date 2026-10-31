@@ -6307,6 +6307,12 @@ entries:
     units: null
     start: '2026-10-31T05:28:21+00:00'
     at: '2026-10-31T05:28:21+00:00'
+  - batch: hd_gridpool_probe
+    wall_h: 0.5
+    jobs: 16
+    units: null
+    start: '2026-10-31T12:25:49+00:00'
+    at: '2026-10-31T12:25:49+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
