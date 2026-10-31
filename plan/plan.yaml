@@ -178,6 +178,7 @@ entries:
     - FA-ccin2p3-67ca3313
     - FA-ccin2p3-6d35589c
     - FA-ccin2p3-7145824e
+    - FA-ccin2p3-71a96ca2
     - FA-ccin2p3-84b85010
     - FA-ccin2p3-84f8e70b
     - FA-ccin2p3-878d6b9a
@@ -198,7 +199,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: d9bfe295
+    commit: 5f15e75b
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -237,6 +238,7 @@ entries:
     - analysis/catalog_v4/data/loop_groups.json
     - analysis/catalog_v4/data/loop_levels.json
     - analysis/catalog_v4/data/prep_shape_v4.json
+    - analysis/catalog_v4/data/prop_gate.json
     - analysis/catalog_v4/data/shape_gap.json
     - analysis/catalog_v4/data/signext_classes.json
     - analysis/catalog_v4/data/signext_compare.json
@@ -259,6 +261,7 @@ entries:
     - analysis/catalog_v4/kshot_level.py
     - analysis/catalog_v4/loop_born_events.py
     - analysis/catalog_v4/loop_levels.py
+    - analysis/catalog_v4/prop_width_check.py
     - analysis/catalog_v4/signext_compare.py
     - docs/results.tex
     - recipes/catalog_v3_gen_signext.yaml
