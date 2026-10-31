@@ -5972,6 +5972,12 @@ entries:
       the arm-to-arm spread). Step 16: the prune is safe now (in-flight reads take physics from sidecars, reference 1153/1153,
       standalones_needed []), but site submit of job_standalones.sh STANDALONES_MODE=apply was refused by the session''s permission
       classifier (irreversible deletion): needs Joaquin''s go or his permission rule.'
+  - at: '2026-10-31T03:36:43+00:00'
+    text: '2026-10-31: E3214, prune FA-ccin2p3-d00ec3e0 (D216) refused at its guard, nothing deleted, no manifest, 0 GB freed:
+      ee_uug__as130 unmapped (a recipe-only alpha_s scan name, two differing definitions). Fix ad00db78: the sidecar scan
+      gives such a name every standalone its definitions name, all kept; CC scan: unmapped [], standalones_needed ee_uug_standalone
+      and ee_uug__as130_standalone. Resubmit (site submit ccin2p3 FA scripts/job_standalones.sh --hdr=--time=01:30:00 --env
+      STANDALONES_MODE=apply) refused by this agent''s permission classifier.'
   handoff:
     state: 'Step 11 DONE: verdict YES (analysis/catalog_v4/mixture_ab.py bound @23d33dee -> data/pp_bound.json): PP4 trained-class
       R 0.388, widened [0.338, 0.446]; classes not trained on pp R 1.132 [0.969, 1.367]; not yet in docs/results.tex (write
