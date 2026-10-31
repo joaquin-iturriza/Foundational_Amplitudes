@@ -1309,10 +1309,36 @@ def events_by_item(strict=False):
     return out
 
 
+RUN_ID_RE = r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b"
+
+
+def wait_run_ids(text):
+    """The registry runs a plan-wait text names: full ids (FA-<site>-<8 hex>) and bare 8-hex suffixes that match
+    exactly one registry run of the project ("FA-ccin2p3-fd7cf028 231e0e90 ..."). 2026-10-31: step 18's wait named
+    six probes as one full id and five bare suffixes; only the full id was read, so the supervisor took the wait as
+    closed on that one run and acked the other five clean ends with no event for five hours."""
+    text = str(text)
+    ids = set(re.findall(RUN_ID_RE, text))
+    bare = set(re.findall(r"(?<![-0-9a-zA-Z_])([0-9a-f]{8})(?![-0-9a-zA-Z_])", re.sub(RUN_ID_RE, " ", text)))
+    if bare and os.path.exists(RUNS_DB):
+        try:
+            c = sqlite3.connect("file:%s?mode=ro" % RUNS_DB, uri=True)
+            for h in sorted(bare):
+                got = [r[0] for r in c.execute("SELECT id FROM runs WHERE project=? AND id LIKE ?",
+                                               (PROJECT, "%s-%%-%s" % (PROJECT, h)))]
+                if len(got) == 1:
+                    ids.add(got[0])
+            c.close()
+        except sqlite3.Error:
+            pass
+    return sorted(ids)
+
+
 def waited_runs_ended(text):
-    """True when a plan-wait text names registry run ids (FA-<site>-<8 hex>) and every one has ended (state read
-    from the run registry); a text without run ids, or an id the registry does not know, is not ended."""
-    ids = re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(text))
+    """True when a plan-wait text names registry run ids (wait_run_ids: full ids and resolved bare suffixes) and every
+    one has ended (state read from the run registry); a text without run ids, or an id the registry does not know, is
+    not ended."""
+    ids = wait_run_ids(text)
     if not ids:
         return False
     try:
@@ -1763,10 +1789,10 @@ def entry_status(d, st, events=None):
         ended = [(k, w) for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
                  if waited_runs_ended(w)]
         if ended:
-            ids = sorted({r for _k, w in ended for r in re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))})
+            ids = sorted({r for _k, w in ended for r in wait_run_ids(w)})
             why.append("steps %s wait on runs that ended (%s)" % (", ".join(str(k) for k, _w in ended), ", ".join(ids)))
         timed = [str(w) for _k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
-                 if w and not re.search(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))]
+                 if w and not wait_run_ids(w)]
         if timed and not evs and not ended:       # a wait that names no run (a day of clean running): not a stall
             out.append((eid, "WAITING", "; ".join(timed)))
             continue
@@ -1800,9 +1826,9 @@ def cmd_owners(a):
                      "owner_state": owner_state(e), "runs": sorted((st.get(e["id"]) or {}).get("runs", [])),
                      "intermediate": sorted((st.get(e["id"]) or {}).get("intermediate", [])),
                      # the steps waiting on runs (plan wait): the supervisor's RUN_DONE waits until all of a step's runs end
-                     "waits": [{"step": k, "runs": sorted(set(re.findall(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))))}
+                     "waits": [{"step": k, "runs": ids}
                                for k, w in sorted((e.get("step_waits") or {}).items(), key=lambda kv: str(kv[0]))
-                               if re.search(r"\bFA-[a-z0-9]+-[0-9a-f]{8}\b", str(w))]})
+                               for ids in [wait_run_ids(w)] if ids]})
     print(json.dumps(rows))
 
 
@@ -2631,6 +2657,10 @@ def cmd_wait(a):
             sys.exit("plan: %s has no next step %d" % (a.id, a.n))
         e.setdefault("step_waits", {})[str(a.n)] = a.on
     print("plan: %s step %d waits on: %s" % (a.id, a.n, a.on))
+    ids = wait_run_ids(a.on)
+    # what the supervisor will read: its RUN_DONE comes when these runs (per batch) have ended
+    print("plan: the supervisor reads %d run(s) in it%s" % (len(ids), (": " + " ".join(ids)) if ids else
+          " (no run id: no RUN_DONE will come for this wait)"))
 
 
 def cmd_unwait(a):
