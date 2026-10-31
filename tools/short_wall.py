@@ -33,7 +33,8 @@ def axis_recipe(axis, cat, train):
     fixed = {"XV3": "recipes/catalog_v3_shared_heldout.yaml", "XV4": "recipes/catalog_v4_shared_heldout.yaml",
              "PP": "recipes/catalog_v3_pp_test.yaml", "PP4": "recipes/catalog_v4_pp_test.yaml",
              "EE4": "recipes/catalog_v4_ee_test.yaml",
-             "HD4": "recipes/catalog_v4_heldout_default_test.yaml", "TR": train}
+             "HD4": "recipes/catalog_v4_heldout_default_test.yaml",
+             "HD5": "recipes/catalog_v4_heldout_default_H5_test.yaml", "TR": train}
     return fixed.get(axis) or f"recipes/catalog_{cat}_heldout_{axis}.yaml"
 
 

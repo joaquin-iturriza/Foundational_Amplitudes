@@ -234,6 +234,9 @@ axis_recipe() { case "$1" in
     # HD4: the held-out classes without a PP4/EE4 pool, on their default-sampled test pools (catalog_coverage step 18,
     # recipes/gen_catalog_v4_heldout_default.py)
     HD4) echo recipes/catalog_v4_heldout_default_test.yaml ;;
+    # HD5: H5's 28 one-loop held-out classes on their default-sampled test pools (MadEvent Born events labelled by the
+    # class's MadLoop, lhe label rule virt; catalog_coverage step 19)
+    HD5) echo recipes/catalog_v4_heldout_default_H5_test.yaml ;;
     TR) echo "$TRAIN" ;; *) echo "recipes/catalog_${CAT}_heldout_$1.yaml" ;; esac; }
 # TR (mode eval only, V3_AXES=TR): the arm's own training pools read by the same zero-shot scorer on their test
 # split, the in-distribution reference of the held-out reads (v3_prep_explore, the shape gap, par:v4_tree_shape)
@@ -349,7 +352,7 @@ PY
     # the role scored: the test pool on PP4 (the pp-trained arm's training classes selected their checkpoint on
     # their pp13v4 val pools; catalog_coverage's design reads test) and on TR (the arm's own training pools, whose val
     # split selected its checkpoint), val on every other axis (every read so far); tools/collect_run.py AXIS_SPLIT
-    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ] || [ "$A" = EE4 ] || [ "$A" = HD4 ]; } && SPLIT=test
+    SPLIT=val; { [ "$A" = PP4 ] || [ "$A" = TR ] || [ "$A" = EE4 ] || [ "$A" = HD4 ] || [ "$A" = HD5 ]; } && SPLIT=test
     miss=$(python -c "
 import glob, os, sys, yaml
 print(sum(not glob.glob(os.path.join(os.environ['DATA_DIR'], f\"{p['name']}_*_{sys.argv[2]}_*amplitudes.npy\"))
@@ -370,7 +373,7 @@ print(' '.join(([f for f in fs if neg(f)][:1] + [f for f in fs if not neg(f)][:1
     python - "$CAT" "$A" "$AR" "$MODE" "${P[@]}" <<'PY' || exit 1
 import os, sys, yaml
 cat, axis, ar, mode, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:]
-pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_", "HD4": "hd_"}.get(axis, f"{cat}_")
+pfx = {"XV3": "v3_", "XV4": "v4_", "PP": "pp13_", "PP4": ("pp13v4_", "pp13_"), "EE4": "ee4_", "HD4": "hd_", "HD5": "hd_"}.get(axis, f"{cat}_")
 names = {p["name"] for p in yaml.safe_load(open(ar))["processes"]}
 got = [os.path.basename(f)[:-len(".yaml")] for f in files]
 bad = sorted(n for n in got if n not in names or not n.startswith(pfx))
@@ -388,7 +391,8 @@ PY
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
     # (not on TR: signed_ab_score reads the val split, the checkpoint-selection pool of a training process)
     # (not on a het arm: it has no sign head)
-    if [ "$A" != TR ] && [ -z "$HET" ] && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
+    # (not on HD5: its pools have a test split only)
+    if [ "$A" != TR ] && [ "$A" != HD5 ] && [ -z "$HET" ] && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
         # the sign head's scoring on every H5 pool: signed_ab_score.py scores those the run resolves as sign-changing
         # (any role non-positive, its abslog transform) and lists the others as skipped
         python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/${A}_signed.txt"
