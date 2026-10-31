@@ -4,8 +4,10 @@ and process quantities correlate most strongly with the per-event error and with
 networks? CPU only, on the saved step-15/20 zero-shot reads; no new run.
 
     site run --item error_correlates ccin2p3 FA -- python analysis/catalog_v4/error_correlates.py probe
-    site run --item error_correlates ccin2p3 FA -- python analysis/catalog_v4/error_correlates.py run \
-        | gzip > analysis/catalog_v4/data/error_correlates_reads.json.gz          (login node, CPU)
+    site run --item error_correlates ccin2p3 FA -- python analysis/catalog_v4/error_correlates.py extract --part I --nparts N
+    site run ... aggregate --run <arm> > A_<arm>;  ... gbt --run <arm> --target T > G_<arm>_T;  ... excluded > X
+                                                                       (login node, CPU; each under site run's limit)
+    python3 analysis/catalog_v4/error_correlates.py combine X A_* G_*   -> data/error_correlates_reads.json.gz
     python3 analysis/catalog_v4/error_correlates.py summary   -> data/error_correlates.json, figs/error_correlates.{png,pdf}
 
 The reads: per probe <probe>.npz of tools/zero_shot_parent.py --save-dir in $SCRATCH/zz_v4_short_<arm>/<axis>/, with
@@ -81,6 +83,7 @@ RUNS = {"v4_het_control": ("het", "control", 42), "v4_het_control_seed2": ("het"
 UNCHECKED_OK = {"v4_dimensionless_muon", "v4_dimensionless_muon_seed2"}   # the MSE control's own held-out reads
 GBT_RUNS = ("v4_het_control", "v4_het_control_seed2", "v4_dimensionless_muon", "v4_dimensionless_muon_seed2")
 SUB = 250            # events per probe kept for the pooled measures, the profiles and the GBT
+GBT_FIT, GBT_TEST = 150000, 30000    # GBT events fitted (of the training half) and scored (of the other half)
 EV_FEATS = ("eta_max", "y_min", "y_ff", "y_if", "u_fwd", "pt_min", "pt_max", "e_min", "dr_min", "sqrt_shat", "thr",
             "y_boost", "res_min", "t_level", "t_z", "loc_var")
 PR_FEATS = ("n_final", "n_massive", "n_gluon", "n_quark", "n_lepton", "n_nu", "n_photon", "n_heavy", "as_pow",
@@ -127,6 +130,34 @@ def mutual_info(a, b, B, rng):
         nz = p > 0
         return float((p[nz] * np.log(p[nz] / pxy[nz])).sum())
     return mi(x, y) - float(np.mean([mi(x, rng.permutation(y)) for _ in range(3)]))
+
+
+def rank(x):
+    """ranks with ties broken by order (as spearman and mutual_info)"""
+    r = np.empty(len(x), np.int64)
+    r[np.argsort(x, kind="stable")] = np.arange(len(x))
+    return r
+
+
+def rank_corr(rx, ry):
+    if np.ptp(rx) == 0:
+        return None
+    c = np.corrcoef(rx, ry)[0, 1]
+    return float(c) if math.isfinite(c) else None
+
+
+def rank_mi(rx, ry, B, rng):
+    """mutual_info on precomputed ranks of finite arrays, one shuffle as the baseline (the pooled reads are large)"""
+    n = len(rx)
+    x, y = rx * B // n, ry * B // n
+
+    def mi(x, y):
+        h = np.bincount(x * B + y, minlength=B * B).reshape(B, B).astype(float)
+        p = h / h.sum()
+        pxy = p.sum(1, keepdims=True) @ p.sum(0, keepdims=True)
+        nz = p > 0
+        return float((p[nz] * np.log(p[nz] / pxy[nz])).sum())
+    return mi(x, y) - mi(x, rng.permutation(y))
 
 
 def mdot(x, z):
@@ -348,35 +379,87 @@ def probe_cmd():
                   "\n  rmse", {a: round(r["rmse"], 3) for a, r in o[2]["runs"].items()})
 
 
-def run_cmd(workers, limit=None):
+# The site part in stages, each one site run under the tool's two-minute limit: extract writes each run's per-probe
+# results to $SCRATCH/zz_error_correlates/<arm>/part_<i>.pkl; aggregate (per run) and gbt (per run and target) read
+# them and print JSON; the laptop's combine joins the printed outputs into data/error_correlates_reads.json.gz.
+def out_dir():
+    return os.path.join(os.environ["SCRATCH"], "zz_error_correlates")
+
+
+def extract_cmd(part, nparts, workers):
+    import pickle
     from multiprocessing import Pool
     tasks, cls = tasks_of(os.environ["SCRATCH"])
-    if limit:
-        tasks = tasks[::max(1, len(tasks) // limit)][:limit]
-    probes, excluded = [], {}
+    mine = tasks[part::nparts]
+    per_arm, excluded = {arm: [] for arm in RUNS}, {}
     with Pool(workers) as pool:
-        for ax, p, o, exc in pool.imap_unordered(read_task, tasks, chunksize=4):
+        for ax, p, o, exc in pool.imap_unordered(read_task, mine, chunksize=2):
             for arm, why in exc.items():
                 excluded.setdefault(arm, {})[f"{ax} {p}"] = why
             if o is not None:
-                probes.append((ax, p, cls(p), o))
-    probes.sort(key=lambda x: (x[0], x[1]))
-    res = {"runs": RUNS, "excluded": excluded, "n_tasks": len(tasks), "per_run": {}, "gbt": {},
-           "n_probes": {arm: {} for arm in RUNS}}
+                for arm, r in o["runs"].items():
+                    per_arm[arm].append((ax, p, cls(p), {"runs": {arm: r}}))
+    for arm, ps in per_arm.items():
+        os.makedirs(os.path.join(out_dir(), arm), exist_ok=True)
+        pickle.dump(ps, open(os.path.join(out_dir(), arm, f"part_{part}.pkl"), "wb"))
+    json.dump({"part": part, "nparts": nparts, "n_tasks": len(mine), "n_tasks_all": len(tasks),
+               "kept": {a: len(v) for a, v in per_arm.items()}, "excluded": excluded}, open(
+        os.path.join(out_dir(), f"excluded_{part}.json"), "w"))
+    print(json.dumps({"part": part, "n_tasks": len(mine), "kept": {a: len(v) for a, v in per_arm.items()}}))
+
+
+def load_arm(arm):
+    import glob, pickle
+    ps = []
+    for f in sorted(glob.glob(os.path.join(out_dir(), arm, "part_*.pkl"))):
+        ps += pickle.load(open(f, "rb"))
+    return sorted(ps, key=lambda x: (x[0], x[1]))
+
+
+def aggregate_cmd(arm):
+    loss = RUNS[arm][0]
+    probes = load_arm(arm)
     rng = np.random.default_rng(0)
-    for arm, (loss, _, _) in RUNS.items():
-        pr = {}
-        for g in READ_GROUPS:
-            ps = [x for x in probes if arm in x[3]["runs"] and (g == "all" or group_of(x[0]) == g)]
-            res["n_probes"][arm][g] = len(ps)
-            if ps:
-                pr[g] = group_stats(arm, loss, ps, rng)
-        res["per_run"][arm] = pr
-    for arm in GBT_RUNS:
-        ps = [x for x in probes if arm in x[3]["runs"]]
+    res = {"arm": arm, "n_probes": {}, "stats": {}}
+    for g in READ_GROUPS:
+        ps = [x for x in probes if g == "all" or group_of(x[0]) == g]
+        res["n_probes"][g] = len(ps)
         if ps:
-            res["gbt"][arm] = gbt(arm, RUNS[arm][0], ps, workers)
-    print(json.dumps(res, allow_nan=True).replace("NaN", "null").replace("Infinity", "null"))
+            res["stats"][g] = group_stats(arm, loss, ps, rng)
+    print(json.dumps(res).replace("NaN", "null").replace("Infinity", "null"))
+
+
+def gbt_cmd(arm, target):
+    print(json.dumps({"arm": arm, "target": target, "gbt": gbt(arm, RUNS[arm][0], load_arm(arm), target)}))
+
+
+def excluded_cmd():
+    import glob
+    out = {"excluded": {}, "n_tasks": None, "parts": []}
+    for f in sorted(glob.glob(os.path.join(out_dir(), "excluded_*.json"))):
+        d = json.load(open(f))
+        out["parts"].append(d["part"])
+        out["n_tasks"] = d["n_tasks_all"]
+        for arm, v in d["excluded"].items():
+            out["excluded"].setdefault(arm, {}).update(v)
+    print(json.dumps(out))
+
+
+def combine_cmd(paths):
+    """join the printed outputs of excluded, aggregate and gbt (one JSON object per file, after site's command line)"""
+    res = {"runs": RUNS, "per_run": {}, "n_probes": {}, "gbt": {}}
+    for f in paths:
+        t = open(f).read()
+        d = json.loads(t[t.index("{"):])
+        if "excluded" in d:
+            res.update(excluded=d["excluded"], n_tasks=d["n_tasks"], parts=d["parts"])
+        elif "stats" in d:
+            res["per_run"][d["arm"]], res["n_probes"][d["arm"]] = d["stats"], d["n_probes"]
+        else:
+            res["gbt"].setdefault(d["arm"], {}).update(d["gbt"])
+    with gzip.open(os.path.join(DATA, "error_correlates_reads.json.gz"), "wt") as fh:
+        json.dump(res, fh)
+    print({k: len(v) for k, v in res.items() if isinstance(v, dict)})
 
 
 def stack(arm, ps, key):
@@ -419,8 +502,15 @@ def group_stats(arm, loss, ps, rng):
     if het:
         T.update(s_n=stack(arm, ps, "s_sub"), s=stack(arm, ps, "s_raw_sub"))
         out["pooled_s_ae"] = {"rho_raw": r4(spearman(T["s"], T["ae"])), "rho_n": r4(spearman(T["s_n"], T["ae_n"]))}
+    TR = {tg: rank(y) for tg, y in T.items()}          # every target is finite: its ranks once
     for fn, x in F.items():
-        out["pooled"][fn] = {tg: {"rho": r4(spearman(x, y)), "mi": r4(mutual_info(x, y, 20, rng))} for tg, y in T.items()}
+        if np.isfinite(x).all():
+            rx = rank(x)
+            out["pooled"][fn] = {tg: {"rho": r4(rank_corr(rx, ry)), "mi": r4(rank_mi(rx, ry, 20, rng))}
+                                 for tg, ry in TR.items()}
+        else:
+            out["pooled"][fn] = {tg: {"rho": r4(spearman(x, y)), "mi": r4(mutual_info(x, y, 20, rng))}
+                                 for tg, y in T.items()}
         if fn not in EV_FEATS:
             continue
         m = np.isfinite(x)
@@ -455,7 +545,7 @@ def group_stats(arm, loss, ps, rng):
     return out
 
 
-def gbt(arm, loss, ps, workers):
+def gbt(arm, loss, ps, target):
     try:
         from sklearn.ensemble import HistGradientBoostingRegressor
         from sklearn.inspection import permutation_importance
@@ -471,6 +561,7 @@ def gbt(arm, loss, ps, workers):
          "log_ae_n": np.log10(np.clip(stack(arm, ps, "ae_sub"), 1e-12, None))}
     if het:
         T.update(log_s=np.log10(stack(arm, ps, "s_raw_sub")), log_s_n=np.log10(stack(arm, ps, "s_sub")))
+    T = {target: T[target]}
     out = {"n_events": int(len(X)), "dropped": [f for f in F if f not in names], "n_classes_half": [int(len({x[2] for x in ps if
                                                                  int(hashlib.md5(x[2].encode()).hexdigest()[:8], 16) % 2 == h}))
                                                         for h in (0, 1)]}
@@ -479,11 +570,14 @@ def gbt(arm, loss, ps, workers):
         r2, imp, gimp = [], [], {g: [] for g in GROUPS}
         for h in (0, 1):
             tr, te = half == h, half != h
-            m = HistGradientBoostingRegressor(max_iter=300, learning_rate=0.1, max_leaf_nodes=31, random_state=0)
-            m.fit(X[tr], y[tr])
+            m = HistGradientBoostingRegressor(max_iter=200, learning_rate=0.1, max_leaf_nodes=31, random_state=0)
+            itr = np.flatnonzero(tr)
+            if len(itr) > GBT_FIT:
+                itr = rng.choice(itr, GBT_FIT, replace=False)
+            m.fit(X[itr], y[itr])
             Xt, yt = X[te], y[te]
-            if len(yt) > 60000:
-                sel = rng.choice(len(yt), 60000, replace=False)
+            if len(yt) > GBT_TEST:
+                sel = rng.choice(len(yt), GBT_TEST, replace=False)
                 Xt, yt = Xt[sel], yt[sel]
             base = m.score(Xt, yt)
             r2.append(base)
@@ -589,16 +683,33 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd")
     sub.add_parser("probe")
-    r = sub.add_parser("run")
-    r.add_argument("--workers", type=int, default=8)
-    r.add_argument("--limit", type=int, default=None, help="a spread of N probes only (a timing read)")
+    e = sub.add_parser("extract")
+    e.add_argument("--part", type=int, required=True)
+    e.add_argument("--nparts", type=int, required=True)
+    e.add_argument("--workers", type=int, default=8)
+    g = sub.add_parser("aggregate")
+    g.add_argument("--run", required=True, choices=list(RUNS))
+    b = sub.add_parser("gbt")
+    b.add_argument("--run", required=True, choices=GBT_RUNS)
+    b.add_argument("--target", required=True, choices=("log_ae", "log_ae_n", "log_s", "log_s_n"))
+    sub.add_parser("excluded")
+    c = sub.add_parser("combine")
+    c.add_argument("paths", nargs="+")
     sm = sub.add_parser("summary")
     sm.add_argument("--reads", default=None)
     a = ap.parse_args()
     if a.cmd == "probe":
         probe_cmd()
-    elif a.cmd == "run":
-        run_cmd(a.workers, a.limit)
+    elif a.cmd == "extract":
+        extract_cmd(a.part, a.nparts, a.workers)
+    elif a.cmd == "aggregate":
+        aggregate_cmd(a.run)
+    elif a.cmd == "gbt":
+        gbt_cmd(a.run, a.target)
+    elif a.cmd == "excluded":
+        excluded_cmd()
+    elif a.cmd == "combine":
+        combine_cmd(a.paths)
     else:
         out = summary(getattr(a, "reads", None))
         print(json.dumps({k: out[k] for k in ("n_tasks", "excluded_counts", "gbt")})[:6000])
