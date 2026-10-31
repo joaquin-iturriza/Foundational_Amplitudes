@@ -7967,6 +7967,10 @@ entries:
     text: 'Open to Joaquin (2026-10-31): the 200k window (D217) is shared by owners, which close at CONTEXT_CLOSE=300k, so
       both owners compacted mid-turn; keep 200k and move the hand-off to 170k (CLAUDE.md ''near 300k'' and plan.py CONTEXT_CLOSE),
       or restore 400k? No agent-only window exists in settings (checked).'
+  - at: '2026-10-31T13:59:20+00:00'
+    text: '2026-10-31: wait_guard.py refused a legitimate ''cd ~/work/FA && site events --wait ...'' (WATCH regex lacks the
+      optional cd prefix DETACH has); waiter re-armed without the prefix. Asked Joaquin: fix now (one regex) or after the
+      weekend hold (D225)? Unanswered.'
   handoff:
     state: 'Held by D220 except next 10, which is done (2cc96941, D224): .claude/hooks/owner_handoff.py, PostToolUse on every
       tool, tells a not-closed owner agent whose own context is >= CONTEXT_CLOSE (170k) to commit, record, plan handoff and
