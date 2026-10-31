@@ -5620,7 +5620,7 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: a0ab7c2280e0bb83a
-    state: working
+    state: closed
     since: '2026-10-31T01:08:59+00:00'
     context: 239763
     context_at: '2026-10-31T02:52:35+00:00'
@@ -5943,25 +5943,36 @@ entries:
       1301/1301 and EE4 169/170 (ee4_epem_cgsxwm excluded, D193), all finite, physics ok; extracted to analysis/catalog_v4/data/reads/FA-ccin2p3-52efacaf_{PP4,EE4}.json
       (mixture_ab.py extract).'
   handoff:
-    state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
-      def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
-      queued. Standalones audit FA-ccin2p3-aab94b13 running (count, size, pools without sidecar physics, sidecar-only check
-      on EE4 and H1..H7c). Regeneration procedure in .claude/context fa-generation + sections_v2 UNCOMMITTED: keeper (a0f0543ca1c399907,
-      lock held) BLOCKs only on the CLAUDE.md fa-generation index line, which needs Joaquin''s go (diff in the main session''s
-      report); on his go commit the three files together and continue the keeper. NEXT on arms'' end: step 15 (delete _smixd50_/_smixd25_
-      pools, check_site_data both recipes, arms'' EE4 re-reads REREAD=<arm>, mixture_ab.json under the 17:29 rule); step 11
-      verdict from the PP4 re-reads; then prune-standalones --apply via job_standalones.sh STANDALONES_MODE=apply once every
-      sidecar-only check is ok; report GB freed and /sps use.'
-    decisions: Physics check reads pool sidecars, backend card only as fallback (D209; 97c43af9, 2efb08ea). lhe_parts gc --parts
-      deletes part files of built pools (D208). Composed pools recorded per run in composed_pools.json. Regeneration time
-      in results.tex par:v4_regen_time (898 core-h MadEvent, compiles 21.4 core-h). Step-11 arms' wall target missed the reads
-      (over 2x), fixed by PP4 re-reads.
-    ruled_out: du of 9404 standalones through site run (login-node timeout).
-    running: FA-ccin2p3-6c246603, 1d46b938, 11ad944a, 9c6fc7ab, def11c5c, aab94b13, a152d7d0, a01ad665
-    files: tools/pool_physics.py, tools/lhe_parts.py, tools/regen_time.py, tools/lhe_rates.py, scripts/job_standalones.sh,
-      datagen.py, experiment.py, mix_compose.py, tests/test_pool_physics.py, tests/test_lhe_parts.py, tests/test_composed_record.py,
-      docs/results.tex
-    written: '2026-10-31T01:08:12+00:00'
+    state: 'Step 11 DONE: verdict YES (analysis/catalog_v4/mixture_ab.py bound @23d33dee -> data/pp_bound.json): PP4 trained-class
+      R 0.388, widened [0.338, 0.446]; classes not trained on pp R 1.132 [0.969, 1.367]; not yet in docs/results.tex (write
+      up with step 14). Step 14/15: mixture arms trained in full (4264 steps, best checkpoints saved, all H1..H7c read in
+      the arms'' own jobs); their PP4+EE4 come from re-reads: default50 8e1cc529 (REREAD 6c246603, running), default50_seed2
+      52efacaf DONE (reads extracted to data/reads/), default25 7a6a1967 (REREAD 11ad944a, queued, 01:15), default25_seed2
+      9c6fc7ab still running at its 2.5 h limit: it will TIMEOUT in its cross reads; then submit its PP4+EE4 re-read: site
+      submit --allow-dirty --item catalog_coverage --est-gpu-hours 1.25 ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G
+      --hdr=--time=<short_wall.py --eval --axes PP4 EE4 slurm_time, 01:15:00> --env V3_AXES=''PP4 EE4'' --env REREAD=FA-ccin2p3-9c6fc7ab
+      -- v4_dimensionless_muon_default25_seed2 eval. Control EE4 re-reads c1863adf, def11c5c DONE; control PP4 04253ff7, e7e32847
+      DONE (data/reads/). NEXT step 15 when all re-reads end: (a) mixture_ab.py extract <run> <log> PP4|EE4 for every re-read
+      and the controls'' EE4 (site logs -n 400000 <run>); the arms'' H1..H7c reads are in the arms'' own logs (6c246603, 1d46b938,
+      11ad944a, 9c6fc7ab), extract per axis and pool them; (b) extend mixture_ab.py with a ''mixture'' subcommand applying
+      the 17:29 rule per share (GAIN on PP4 and EE4, NO LOSS on pooled H1..H7c, winner rule) -> data/mixture_ab.json (the
+      done_when); (c) delete stored _smixd50_/_smixd25_ pools on CC (~65 GB; Joaquin: build the mixture at load), check_site_data
+      on both recipes; (d) write up steps 11 and 14 in docs/results.tex with % src/% claim. Step 16: sidecar-only check passes
+      everywhere (7697177c); prune extended to standalone_cpp outputs (93371175): once the four arms have ended (9c6fc7ab
+      last), site submit ccin2p3 FA scripts/job_standalones.sh --env STANDALONES_MODE=apply (CPU), expected ~16.4 GB freed
+      of 9404 outputs, manifest first; report GB freed and /sps use. Regeneration procedure in .claude/context fa-generation
+      + sections_v2 still UNCOMMITTED, waiting on Joaquin''s go for the CLAUDE.md index line.'
+    decisions: Check registers a recipe's top-level sampling (4e844204; the sidecar-only failures were the check's bug). DROPPED
+      probes in pool_physics (ee4_epem_cgsxwm, D193) excluded by check, EE4 read and collector. Prune covers standalone_cpp
+      outputs per D208; nothing at train/load reads a standalone. Short-job limit counts reads (tools/short_wall.py, job refuses
+      a short limit; 9510604e). Step-14 reads leave out catalog_v3 PP (outside the design). Mixture A/B per-class unit = catalog_v4
+      class (census_classes.json), seeds by geometric mean.
+    ruled_out: Raising a running job's SLURM limit (not possible by resubmit). Writing physics blocks into H1..H7c sidecars
+      (they had them).
+    running: FA-ccin2p3-8e1cc529, 7a6a1967, 9c6fc7ab
+    files: analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/pp_bound.json, analysis/catalog_v4/data/reads/, tools/short_wall.py,
+      tools/pool_physics.py, scripts/job_catalog_v3_short.sh, scripts/job_standalones.sh, tests/test_short_wall.py, tests/test_pool_physics.py
+    written: '2026-10-31T02:59:02+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
