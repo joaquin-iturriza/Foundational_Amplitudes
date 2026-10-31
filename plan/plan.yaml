@@ -6755,6 +6755,18 @@ entries:
   - at: '2026-10-31T06:12:54+00:00'
     text: 'a compaction inside the turn of owner ae7bc0ff5c64982f0 at 2026-10-31T05:22:17.356Z: its brief or scope was too
       large; narrow the next brief'
+  - at: '2026-10-31T06:16:42+00:00'
+    text: 'The four het mixture arms (466656b2 9897833d f0156d88 df858d33, default50/25 seeds 42/43) logged nothing after
+      ''Recipe data source'' for over 45 min while the het control pair trains: they are composing their 912 default-share
+      entries at load (mix_compose.ensure_composed, serial, silent; D207''s no-stored-copy path, first used at scale here:
+      the step-14 MSE arms trained on stored _smixd pools). Measured on the CC login node (tools/mix_compose_check.py --load):
+      4.2-5.8 s per train pool plus 0.1-0.3 s val, about 93 min for 912; tools/short_wall.py did not count it (3.64 h planned,
+      5.57 h with it). Fixed @7eb15b55: short_wall counts composition (6.1 s per entry), mix_compose logs each pool. The arms
+      are not resubmitted: projected composition ends about 07:50, training about 09:00, sigma stage about 09:20, inside the
+      03:45 limit (ends about 10:01); the reads after that (held-out axes, then PP4/EE4) are cut by the limit; the axes cut
+      get an eval-only REREAD folded into the step-18 HD4 re-read of these arms (about 1.3 h each for PP4+EE4, about 5 GPU-h,
+      the het batch then about 28 GPU-h, over the design''s 22.8, under 30). Cancelling and resubmitting at 5.75 h would cost
+      about 33 GPU-h.'
   handoff:
     state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
       reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
