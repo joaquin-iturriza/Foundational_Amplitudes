@@ -2008,8 +2008,8 @@ processes:
     lhe:
       cards_dir: recipes/catalog_v4_pp_E20
       complete_runs: true
-      run_events: 1000
-      n_runs: 3
+      run_events: 250
+      n_runs: 10
       gridpack: 31774
     parent: v4_ddx_dhuxwp
     split: heldout

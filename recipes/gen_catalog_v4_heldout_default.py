@@ -50,6 +50,10 @@ N_TEST = 2000
 # over 1790 s (c cbar d dbar, 10 and 20 TeV)
 RUN_SIZES = {"v4_epem_aaccx__E20": {"10000": (250, 1.0), "20000": (250, 1.0)},
              "v4_epem_ccxddx__E20": {"10000": (250, 1.0), "20000": (250, 1.0)}}
+# pp pools in runs of fewer events (complete_layout's run_events): d d~ -> d h u~ W+ at 20 TeV, whose runs of 1000 returned
+# 1000 and 304 events and timed out twice at 1800 s (step 18 pass 1-2), returned 250 of 250 in each of its runs of 250
+# in 103-266 s (run-size probe FA-ccin2p3-f719bbff, 5 runs)
+PP_RUN_SIZES = {"v4_ddx_dhuxwp__E20": 250}
 E20_EE = (6000.0, 10000.0, 20000.0)
 CARDS = {  # cards dir -> (source dir, run-card values patched)
     "recipes/catalog_v4_pp_E20": ("recipes/catalog_v4_pp", {"ebeam1": 10000.0, "ebeam2": 10000.0,
@@ -107,7 +111,7 @@ def main():
             amz = (h.get("physics") or {}).get("alpha_s")
             lhe = {**hdr, "cards_dir": cards, **({"energies": energies} if energies else {}),
                    **({"label_alphas_mz": float(amz)} if amz is not None else {})}
-            lhe = complete_layout(lhe, SMALL_RUN, gridpack=True, name=n, sizes=RUN_SIZES.get(n))
+            lhe = complete_layout(lhe, PP_RUN_SIZES.get(n, SMALL_RUN), gridpack=True, name=n, sizes=RUN_SIZES.get(n))
             lhe = {k: v for k, v in lhe.items() if k not in hdr or hdr[k] != v}
             name = "hd_" + n[3:]
             out[name] = {**lhe_entry(mg, base, e, mg.V4_MODEL, lhe), "parent": base, "split": "heldout",
