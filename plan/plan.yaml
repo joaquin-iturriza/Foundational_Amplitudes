@@ -6527,7 +6527,7 @@ entries:
     agent: ab2b2bbf984fd46ba
     state: closed
     since: '2026-10-31T17:12:02+00:00'
-    state_at: '2026-10-31T18:17:50+00:00'
+    state_at: '2026-10-31T18:23:55+00:00'
     context: 202152
     context_at: '2026-10-31T18:17:45+00:00'
   findings:
