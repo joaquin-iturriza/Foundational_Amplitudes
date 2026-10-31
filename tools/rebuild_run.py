@@ -9,7 +9,7 @@ fitted on every role together, so they are pinned to the run's own (data.offshel
 data_stats.json, or for older runs a build on the run's own pools): a swapped split otherwise shifts
 every event's input (the steering cross-pool offset, docs/results.tex sec:ladder).
 """
-import gzip, io, json, os, sys, tempfile
+import copy, gzip, io, json, os, sys, tempfile
 
 import numpy as np
 import torch
@@ -27,6 +27,29 @@ def _load_best_ckpt(run_dir):
         return torch.load(p, map_location="cpu", weights_only=False)
     with gzip.open(p + ".gz", "rb") as f:
         return torch.load(io.BytesIO(f.read()), map_location="cpu", weights_only=False)
+
+
+def cached_parent_loads(models_dir):
+    """Read each checkpoint under models_dir once per call: base_experiment._torch_load (init_model's fine-tune load)
+    and _load_best_ckpt (load_best_weights) then return a deep copy of the first read, so a probe that edits
+    its state dict (a HETEROSC child's sigma row) leaves the next probe's unchanged. Any other path loads as before."""
+    models_dir = os.path.realpath(models_dir)
+    cache = {}
+
+    def wrap(load, tag):
+        def f(path, *args, **kw):
+            p = os.path.realpath(str(path)) if tag == "torch_load" else os.path.realpath(os.path.join(str(path), "models"))
+            if not (p == models_dir or p.startswith(models_dir + os.sep)):
+                return load(path, *args, **kw)
+            key = (tag, p, str(kw.get("map_location")))
+            if key not in cache:
+                cache[key] = load(path, *args, **kw)
+            return copy.deepcopy(cache[key])
+        return f
+    import base_experiment
+    base_experiment._torch_load = wrap(base_experiment._torch_load, "torch_load")
+    globals()["_load_best_ckpt"] = wrap(_load_best_ckpt, "best_ckpt")
+    return cache
 
 
 def load_best_state(run_dir):

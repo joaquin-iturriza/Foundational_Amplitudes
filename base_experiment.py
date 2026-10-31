@@ -390,7 +390,10 @@ class BaseExperiment:
             for name, module in model.named_modules():
                 if name:  # Skip empty names
                     LOGGER.info(f"  {name}: {module.__class__.__name__}")
-        list_all_layer_names(self.model)
+        # every module's name per build: off in a reader that builds once per probe (tools/zero_shot_parent.py: 0.2-0.3 s of
+        # its ~1-1.7 s per probe, analysis/catalog_v4/data/job_wall_split.json)
+        if self.cfg.get("log_module_names", True):
+            list_all_layer_names(self.model)
 
         # === EMA setup ===
         if self.cfg.ema:

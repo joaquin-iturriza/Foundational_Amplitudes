@@ -22,10 +22,13 @@ particle-table row are compared with the parent's training catalog (data.process
 process, else the catalog-wide values. A difference refuses the probe (a ZERO_SHOT line with error "physics mismatch:
 ...", one PHYSICS_CHECK line with the details) unless --allow-physics-mismatch "<reason>" (or the environment variable
 ZS_ALLOW_PHYSICS_MISMATCH) is given; the reason goes into the ZERO_SHOT record and the probe's .npz (physics_check).
+The parent's checkpoint is read from disk once per call: both loads of every probe's build (init_model's
+fine-tune load and load_best_weights) take a deep copy of that one read (cached_parent_loads), so every probe
+starts from the same tensors as before; s_stages in each ZERO_SHOT record gives the seconds of each stage.
     python tools/zero_shot_parent.py --parent <pretraining run dir> [--twins J] [--save-dir D]
         [--allow-physics-mismatch "<reason>"] <probe recipe.yaml> [...]
 """
-import argparse, json, os, sys, tempfile
+import argparse, json, os, sys, tempfile, time
 
 import numpy as np
 import torch
@@ -36,7 +39,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
 import pool_physics  # noqa: E402
-from rebuild_run import _build, load_best_weights, scored_split  # noqa: E402
+from rebuild_run import _build, cached_parent_loads, load_best_weights, scored_split  # noqa: E402
 from multiplicity_extrap import parent_target_standardization  # noqa: E402
 from preprocessing import unresolved_amp_trafos  # noqa: E402
 
@@ -73,6 +76,8 @@ if twins:
     assert len(parent_index) == len(pstats["prepd_mean"]), "parent recipe and its data_stats disagree in length"
 if a.save_dir:
     os.makedirs(a.save_dir, exist_ok=True)
+
+_ckpt_cache = cached_parent_loads(os.path.join(parent, "models"))
 # the parent's training catalog, the reference of every probe's physics check (built once, from the entries' backends)
 _pcfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
 _train_recipe = _pcfg.data.get("processes_file", None)
@@ -87,6 +92,7 @@ from rebuild_run import recipe_role_counts, stand_in_role, stand_in_split_set  #
 _ensure_split_set = datagen.ensure_split_set
 
 for recipe in a.recipes:
+    _t0 = time.perf_counter(); stages = {}
     recipe = os.path.abspath(siteconf._expand_str(recipe))
     _counts = recipe_role_counts(recipe)
     datagen.ensure_split_set = stand_in_split_set(_ensure_split_set, _counts, a.split)
@@ -96,6 +102,7 @@ for recipe in a.recipes:
     with open_dict(cfg):
         cfg.train = False; cfg.evaluate = False; cfg.plot = False; cfg.save = False
         cfg.use_mlflow = False; cfg.count_flops = False; cfg.ema = False
+        cfg.log_module_names = False                  # base_experiment.init_model: no module-name listing per probe
         cfg.warm_start_idx = None
         cfg.training.validate_frac = 0; cfg.training.validate_every_n_steps = 1
         cfg.run_dir = tempfile.mkdtemp(prefix="zeroshot_", dir=os.environ["SCRATCH"])
@@ -122,6 +129,7 @@ for recipe in a.recipes:
     except Exception as e:                            # a missing pool or sidecar on this site: listed, not dropped
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "error": repr(e)[:300]}), flush=True)
         continue
+    stages["build"] = time.perf_counter() - _t0; _t = time.perf_counter()
     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
     # the physics check, before anything is scored
     _spec = exp._recipe_specs[0]
@@ -137,6 +145,7 @@ for recipe in a.recipes:
         continue
     # the parent's recorded loss is its EMA weights' (docs/results.tex sec:ema-ckpt), so that is what is scored here,
     # as fine-tunes start from it since D63 (base_experiment._ckpt_scored_state)
+    stages["physics_check"] = time.perf_counter() - _t; _t = time.perf_counter()
     ema_applied = load_best_weights(exp.model, parent)
     probe = str(exp.cfg.data.dataset[0])
     N = int(exp._proc_npart[0])
@@ -145,6 +154,7 @@ for recipe in a.recipes:
     exp.val_loss, exp.val_loss_no_reg, exp.val_mse = [], [], []
     exp.proc_val_losses, exp.proc_val_losses_no_reg = {}, {}
     exp._init_regularization()
+    stages["weights"] = time.perf_counter() - _t; _t = time.perf_counter()
     with torch.no_grad():
         hs, zs, ss = [], [], []
         for data in loader:
@@ -153,6 +163,7 @@ for recipe in a.recipes:
             if sig is not None:                       # HETEROSC: the per-event sigma, in the parent's standardized units
                 ss.append(sig.reshape(-1).double().cpu())
     h, z = torch.cat(hs).numpy(), torch.cat(zs).numpy()
+    stages["forward"] = time.perf_counter() - _t; _t = time.perf_counter()
     sig = torch.cat(ss).numpy() if ss else np.zeros(0)
     A = np.stack([np.ones_like(h), h], 1)
     coef = np.linalg.lstsq(A, z, rcond=None)[0]
@@ -243,4 +254,6 @@ for recipe in a.recipes:
                                 and len((getattr(exp, "_role_perm", None) or {}).get(a.split, [])) == len(t)
                                 else np.zeros(0, np.int64)),
                             pool=np.array(str(_pool or "")))
+    stages["score_and_save"] = time.perf_counter() - _t
+    rec["s_stages"] = {k: round(v, 4) for k, v in stages.items()}   # seconds per stage of this probe (timing only)
     print("ZERO_SHOT " + json.dumps(rec), flush=True)
