@@ -73,6 +73,15 @@ def setup():
     return rec
 
 
+def setup_module(module):
+    """pytest: the stub backends and the training recipe, as the __main__ runner builds them"""
+    module.TRAIN = setup()
+
+
+def teardown_module(module):
+    shutil.rmtree(TMP, ignore_errors=True)
+
+
 def test_card_reader():
     """a DECAY line counts only in column 1; an indented one keeps the compiled default; a parameter the model's
     restriction removed is 0"""
