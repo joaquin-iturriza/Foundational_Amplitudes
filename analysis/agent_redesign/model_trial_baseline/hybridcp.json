@@ -1,0 +1,19 @@
+{
+ "commit": "6b387fbb",
+ "fix": {
+  "test_cp_is_the_mean_of_lq_minus_the_shat_power": true,
+  "test_experiment_wires_the_frozen_cp": true,
+  "test_frozen_cp_is_reused_and_events_not_read": true,
+  "test_no_frozen_stats_fits_every_process": true,
+  "test_process_not_in_frozen_stats_falls_back_to_its_own_events": true,
+  "test_stats_written_without_the_key_fit_every_process": true
+ },
+ "targets": [
+  "test_cp_is_the_mean_of_lq_minus_the_shat_power",
+  "test_experiment_wires_the_frozen_cp",
+  "test_frozen_cp_is_reused_and_events_not_read",
+  "test_no_frozen_stats_fits_every_process",
+  "test_process_not_in_frozen_stats_falls_back_to_its_own_events",
+  "test_stats_written_without_the_key_fit_every_process"
+ ]
+}

@@ -1,0 +1,72 @@
+{
+ "refusestand": {
+  "commit": "c868f490",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": ": user: nothing but the hooks changed\nPASS  A4: applied twice is a no-op (an already dispatched command is kept)\nPASS  A4: --revert A restores both files\nFAIL  A4: the user-level dispatcher is installed and is the same file as the project's\n      /home/joaquin/.claude/hooks/dispatch.py\nPASS  A3: the suite's hook runs went through the dispatcher (157 runs of 5 hooks: auto_push.sh, context_guard.py, git_verify_guard.py, plan_check.py, plan_files_guard.py)\nPASS  A3: test_setup_scenarios through the dispatcher: the same 242 results as direct (55 of them fail on trunk already)\n42/47 scenarios pass\n",
+  "fix_tail": ": user: nothing but the hooks changed\nPASS  A4: applied twice is a no-op (an already dispatched command is kept)\nPASS  A4: --revert A restores both files\nFAIL  A4: the user-level dispatcher is installed and is the same file as the project's\n      /home/joaquin/.claude/hooks/dispatch.py\nPASS  A3: the suite's hook runs went through the dispatcher (157 runs of 5 hooks: auto_push.sh, context_guard.py, git_verify_guard.py, plan_check.py, plan_files_guard.py)\nPASS  A3: test_setup_scenarios through the dispatcher: the same 242 results as direct (55 of them fail on trunk already)\n45/47 scenarios pass\n"
+ },
+ "sharesreg": {
+  "commit": "e887b556",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ly_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 0, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n{\"manifest\": \"/tmp/tmp2941vpt5/queue/gc/manifest_20261031_023745.json\", \"dry_run\": false, \"dirs\": 3, \"gb\": 0.0, \"saved_dirs\": 1, \"saved_gb\": 0.0, \"logs_only_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 1, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n[tidy + gc] ok\nusage: lhe_parts.py [-h] {plan,work,status,gc,yields} ...\nlhe_parts.py: error: argument cmd: invalid choice: 'shares' (choose from 'plan', 'work', 'status', 'gc', 'yields')\n",
+  "fix_tail": "logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 0, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n{\"manifest\": \"/tmp/tmpe11_4dvk/queue/gc/manifest_20261031_023751.json\", \"dry_run\": false, \"dirs\": 3, \"gb\": 0.0, \"saved_dirs\": 1, \"saved_gb\": 0.0, \"logs_only_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 1, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n[tidy + gc] ok\n{\"zz_parts_proc\": {\"assembled\": true, \"counts\": {\"3000\": 310, \"500\": 340, \"91.1876\": 340}, \"ok\": false, \"requeued\": true, \"share\": 334}}\n[e+e- energy runs + equal shares + shares CLI] ok\n"
+ },
+ "continuous": {
+  "commit": "948c59d5",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n376/377 scenarios pass\n",
+  "fix_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n377/377 scenarios pass\n"
+ },
+ "donecont": {
+  "commit": "9d75f5e3",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n375/376 scenarios pass\n",
+  "fix_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n376/376 scenarios pass\n"
+ },
+ "proposed": {
+  "commit": "80367b7d",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nFAIL  a term below the glossary's PROPOSED marker is still refused\n      \nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n371/372 scenarios pass\n",
+  "fix_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n372/372 scenarios pass\n"
+ },
+ "compactskip": {
+  "commit": "e3698073",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n273/274 scenarios pass\n",
+  "fix_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n274/274 scenarios pass\n"
+ },
+ "statssrc": {
+  "commit": "5cd8c2b3",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "et.__get__(instance, owner)()\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vb/tests/test_orders_source.py\", line 237, in <module>\n    test_stats_without_record_inferred_from_parent()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vb/tests/test_orders_source.py\", line 176, in test_stats_without_record_inferred_from_parent\n    infer = AmplitudeExperiment._infer_orders_source\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: type object 'AmplitudeExperiment' has no attribute '_infer_orders_source'. Did you mean: '_target_orders_source'?\n",
+  "fix_tail": " table; unknown commit -> config\n[infer] the log's commit: before 6dee967a table, 6dee967a/5e4040a9 alpha_s only, 1d9d6a29 the diagrams; a parent at 1d9d6a29 passes a diagrams run\nall ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "alphapow": {
+  "commit": "1d9d6a29",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "Traceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vb/tests/test_order_features.py\", line 164, in <module>\n    test_from_diagrams()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vb/tests/test_order_features.py\", line 67, in test_from_diagrams\n    q = mg.sidecar_born_orders(_sidecar(d, \"pure\", [(0, 3)]))\n        ^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'mg5_pipeline_final' has no attribute 'sidecar_born_orders'. Did you mean: 'sidecar_qcd_orders'?\n",
+  "fix_tail": "[from_diagrams] ok\n[recipe_id] ok: amp_orders is not part of a pool's identity or path\nall ok\n"
+ },
+ "valtotal": {
+  "commit": "577164a6",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": " UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vb/tests/test_val_total.py\", line 219, in <module>\n    f()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vb/tests/test_val_total.py\", line 148, in test_validate_start_val_total\n    assert not hasattr(s, \"val_total\"), \"a step-0 val_total must not survive as the first entry\"\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: a step-0 val_total must not survive as the first entry\n",
+  "fix_tail": "st_validation_aggregation_decides ok\ntest_near_weight_and_monitors ok\ntest_run_trial_objective ok\ntest_validate_start_val_total ok\ntest_result_json_fields ok\ntest_detached_result_json ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "replylist": {
+  "commit": "4fe75ce5",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n270/271 scenarios pass\n",
+  "fix_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n271/271 scenarios pass\n"
+ }
+}

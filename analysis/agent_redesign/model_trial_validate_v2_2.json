@@ -1,0 +1,196 @@
+{
+ "asksearch": {
+  "commit": "9ce1cb16",
+  "valid": true,
+  "targets": [
+   "plan ask (and plan add --ask) without what was searched first, or with a token note, is refused",
+   "plan ask refuses a question already answered",
+   "plan ask with what was searched stores it on the entry and its ask, and plan view and show print it",
+   "the step prompt has a step agent read CLAUDE.md's setup and HPO rules and the decisions before asking"
+  ],
+  "fail_at_fix_unscored": [
+   "#: PLAN_TEST=# with a root outside the temp directory is refused",
+   "migration: every open entry has a next step; each carries its site item's globs"
+  ],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": false,
+  "parent_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n182/188 scenarios pass\n",
+  "fix_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n186/188 scenarios pass\n"
+ },
+ "compactskip": {
+  "commit": "e3698073",
+  "valid": true,
+  "targets": [
+   "lower: reply_check never takes a compaction summary for a new user message (it quotes old questions)"
+  ],
+  "fail_at_fix_unscored": [
+   "#: PLAN_TEST=# with a root outside the temp directory is refused"
+  ],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": false,
+  "parent_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n272/274 scenarios pass\n",
+  "fix_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n273/274 scenarios pass\n"
+ },
+ "emaload": {
+  "commit": "cff8039a",
+  "valid": false,
+  "targets": [],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": false,
+  "rc_passes_at_fix": true,
+  "parent_tail": "uation scores the best checkpoint's EMA\n[ema] (d) fine-tunes start from the parent's EMA weights (new and old format, reset head); (e) rebuild_run.load_best_weights both formats\n[ema] ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n",
+  "fix_tail": "uation scores the best checkpoint's EMA\n[ema] (d) fine-tunes start from the parent's EMA weights (new and old format, reset head); (e) rebuild_run.load_best_weights both formats\n[ema] ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "ftorders": {
+  "commit": "6e0eece0",
+  "valid": true,
+  "targets": [
+   "<rc>"
+  ],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": true,
+  "parent_tail": "tensor.storage()\n  return self.fget.__get__(instance, owner)()\nTraceback (most recent call last):\n  File \"/tmp/claude-1000/model_trial_checks/ftorders_6e0eece0^_2999048/tests/test_orders_source.py\", line 268, in <module>\n    test_catalog_ft_follows_parent()\n  File \"/tmp/claude-1000/model_trial_checks/ftorders_6e0eece0^_2999048/tests/test_orders_source.py\", line 244, in test_catalog_ft_follows_parent\n    assert ft.parent_orders_flag(rec)[:2] == (False, \"table\"), ft.parent_orders_flag(rec)\n           ^^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'catalog_ft' has no attribute 'parent_orders_flag'\n",
+  "fix_tail": "a_s only, 1d9d6a29 the diagrams; a parent at 1d9d6a29 passes a diagrams run\n[catalog_ft] the fine-tune's data.orders_from_diagrams follows the parent's source (recorded, inferred)\nall ok\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "holditem": {
+  "commit": "22fbd7b9",
+  "valid": true,
+  "targets": [
+   "a hold on a paused entry with no item: the item is filed under its scope, held, and nothing is flagged",
+   "if the hold itself fails, the item made for it is closed and the entry is unchanged",
+   "live: `sed -n #,#p plan/plan.yaml` is allowed (a read)",
+   "migration: every open entry has a next step; each carries its site item's globs",
+   "with no approval or scope in force to file an item under, it is refused before anything is recorded"
+  ],
+  "fail_at_fix_unscored": [
+   "#: PLAN_TEST=# with a root outside the temp directory is refused"
+  ],
+  "rc_fails_at_parent": false,
+  "rc_passes_at_fix": true,
+  "parent_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n192/198 scenarios pass\n",
+  "fix_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n197/198 scenarios pass\n"
+ },
+ "lightprop": {
+  "commit": "d406f965",
+  "valid": false,
+  "targets": [],
+  "fail_at_fix_unscored": [
+   "<rc>"
+  ],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": false,
+  "parent_tail": "t_set\n    return {\n           ^\n  File \"/tmp/claude-1000/model_trial_checks/lightprop_d406f965^_2999048/datagen.py\", line 477, in <dictcomp>\n    s[\"process\"]: ensure_dataset(\n                  ^^^^^^^^^^^^^^^\n  File \"/tmp/claude-1000/model_trial_checks/lightprop_d406f965^_2999048/datagen.py\", line 440, in ensure_dataset\n    raise RuntimeError(\nRuntimeError: require_cache: dataset for (syn_00000, train, 20000 ev) not prebuilt at /home/joaquin/datasets/syn_00000_25-1000GeV_train_smix_amplitudes.npy (recipe_id=561250bc79052429). Run the prebuild job first: sbatch prebuild_recipes.sh <spec.yaml>.\n",
+  "fix_tail": "lit_set\n    return {\n           ^\n  File \"/tmp/claude-1000/model_trial_checks/lightprop_d406f965_2999048/datagen.py\", line 477, in <dictcomp>\n    s[\"process\"]: ensure_dataset(\n                  ^^^^^^^^^^^^^^^\n  File \"/tmp/claude-1000/model_trial_checks/lightprop_d406f965_2999048/datagen.py\", line 440, in ensure_dataset\n    raise RuntimeError(\nRuntimeError: require_cache: dataset for (syn_00000, train, 20000 ev) not prebuilt at /home/joaquin/datasets/syn_00000_25-1000GeV_train_smix_amplitudes.npy (recipe_id=192ac7ab6ffe0b35). Run the prebuild job first: sbatch prebuild_recipes.sh <spec.yaml>.\n"
+ },
+ "memmask": {
+  "commit": "9087df0f",
+  "valid": false,
+  "targets": [],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": false,
+  "rc_passes_at_fix": true,
+  "parent_tail": "\n#### tests/test_memmap_data.py rc=0\nsection 0: streamed float32 mean/std and axis-0 float64 mean/std are bitwise numpy's\nsection 1: MmapAmplitudeDataset batches/items and RandomBatchSampler order are bitwise the in-memory ones\nOK\n",
+  "fix_tail": "\n#### tests/test_memmap_data.py rc=0\nsection 0: streamed float32 mean/std and axis-0 float64 mean/std are bitwise numpy's\nsection 1: MmapAmplitudeDataset batches/items and RandomBatchSampler order are bitwise the in-memory ones\nOK\n"
+ },
+ "poolphys": {
+  "commit": "bb70a04a",
+  "valid": true,
+  "targets": [
+   "<rc>"
+  ],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": true,
+  "parent_tail": "ol_physics.py\", line 157, in test_scenario\n    assert c[\"status\"] == \"ok\" and \"alphas_mz\" in c[\"not_compared\"], c\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'probe': 'pp13_ddx_aag', 'pool': None, 'block_source': 'computed at read (no sidecar)', 'mismatches': [{'field': 'alphas_mz', 'probe': 0.118, 'reference': [0.15]}], 'reference': {'kind': 'same process', 'entries': ['v4_ddx_aag__as150']}, 'status': 'mismatch', 'not_compared': [], 'exempt': [], 'probe_physics': {'model': 'sm', 'order_clause': '', 'MB': 4.7, 'MT': 173.0, 'WT': 1.4915, 'b_row': None}}\n",
+  "fix_tail": "\n#### tests/test_pool_physics.py rc=0\nok card reader\nok blocks\nok write_recipe\nok scenario\nok sidecar block\nok lhe parent check\nok backfill\nok reads\nall pool physics tests passed\n"
+ },
+ "quietstop": {
+  "commit": "e830f4ca",
+  "valid": true,
+  "targets": [
+   "# (fifth review): a done entry that regressed is a note and a reopen suggestion, never a block",
+   "#: a regression is seen after a write; plan reopen takes it back to running and keeps the write-up",
+   "#: an item check that cannot reach its site counts as in flight, with a note",
+   "#: an item check that hangs is cut at its timeout, counted in flight",
+   "#: the failure is cached, and the note stays",
+   "a done check longer than the stop's time is noted once, then cached for the day like a pass",
+   "sweeps: a done entry is never reopened by its sweeps, recorded or not; a live one nobody runs is a note",
+   "sweeps: a live sweep no entry records is caught and recorded on the running entry whose match names it, with a note",
+   "sweeps: end to end, the stamped sweep (its name outside the entry's globs) is recorded on its item's entry, in flight while queued, listed when the queue drains",
+   "sweeps: the recorded sweep's site cannot be read: in flight, with a note naming the site and the error",
+   "sweeps: the work item its submission named (sweep_manager's stamp) settles which entry it is",
+   "sweeps: with the site down the sweep is recorded anyway, with a note, and counts in flight"
+  ],
+  "fail_at_fix_unscored": [
+   "#: PLAN_TEST=# with a root outside the temp directory is refused"
+  ],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": false,
+  "parent_tail": "ns\n      a passing stop check printed to the user's screen: {\"systemMessage\": \"plan check notes:\\n  sweep mu_search_d on ccin2p3 ran with no record on the plan: recorded on mu\"}\nPLAN CHECK: the turn cannot end yet.\n  mu: sweep ended: mu_search_d (ccin2p3, 3 of 3 trials submitted, 1 results); launch its step agent (plan next --prompts, then plan step mu --agent <subagent id>)\nPASS  sweeps: a submission with no work item is still refused by the work gate (nothing stamped)\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n244/257 scenarios pass\n",
+  "fix_tail": "corded or not; a live one nobody runs is a note\nPASS  sweeps: sweep_manager submit stamps the sweep with the work item and time and prints SWEEP_SUBMITTED; its state reports the queued jobs, scripts and results\nPASS  sweeps: end to end, the stamped sweep (its name outside the entry's globs) is recorded on its item's entry, in flight while queued, listed when the queue drains\nPASS  sweeps: a submission with no work item is still refused by the work gate (nothing stamped)\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n256/257 scenarios pass\n"
+ },
+ "repeatfp": {
+  "commit": "2a16b36f",
+  "valid": true,
+  "targets": [
+   "A#: a retried md_guard refusal stays refused (five times), is never disabled, and opens one incident with one ALERT"
+  ],
+  "fail_at_fix_unscored": [
+   "A#: the user-level dispatcher is installed and is the same file as the project's",
+   "A#: user: all # registrations run through the dispatcher, same events, matchers and timeouts"
+  ],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": false,
+  "parent_tail": "th files\nFAIL  A4: the user-level dispatcher is installed and is the same file as the project's\n      /home/joaquin/.claude/hooks/dispatch.py\nPASS  A3: the suite's hook runs went through the dispatcher (361 runs of 13 hooks: auto_push.sh, context_guard.py, design_guard.py, git_verify_guard.py, lock_guard.py, main_session_guard.py, placement_guard.sh, plan_check.py, plan_files_guard.py, plot_guard.sh, review_backlog.sh, reviewer_resume.py, send_check.py)\nPASS  A3: test_setup_scenarios through the dispatcher: the same 500 results as direct (21 of them fail on trunk already)\n45/48 scenarios pass\n",
+  "fix_tail": "th files\nFAIL  A4: the user-level dispatcher is installed and is the same file as the project's\n      /home/joaquin/.claude/hooks/dispatch.py\nPASS  A3: the suite's hook runs went through the dispatcher (361 runs of 13 hooks: auto_push.sh, context_guard.py, design_guard.py, git_verify_guard.py, lock_guard.py, main_session_guard.py, placement_guard.sh, plan_check.py, plan_files_guard.py, plot_guard.sh, review_backlog.sh, reviewer_resume.py, send_check.py)\nPASS  A3: test_setup_scenarios through the dispatcher: the same 500 results as direct (21 of them fail on trunk already)\n46/48 scenarios pass\n"
+ },
+ "replylist": {
+  "commit": "4fe75ce5",
+  "valid": true,
+  "targets": [
+   "open question: a user reply after a running entry's question is listed by plan next (REPLY) and never blocks the stop"
+  ],
+  "fail_at_fix_unscored": [
+   "#: PLAN_TEST=# with a root outside the temp directory is refused"
+  ],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": false,
+  "parent_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n269/271 scenarios pass\n",
+  "fix_tail": "ep) records the decision and clears the question; the prompt shows none\nPASS  open question: once answered, asking it again is refused\nPASS  open question: --holds-all keeps the old behaviour (the entry waits, plan next routes no step to it, a step is refused) and records why\nPASS  open question: --holds-all without a reason, or with --blocks, is refused and nothing is recorded\nPASS  open question: plan view and show print a running entry's question and what waits on it\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n270/271 scenarios pass\n"
+ },
+ "scanwindow": {
+  "commit": "324510e2",
+  "valid": false,
+  "targets": [],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": false,
+  "rc_passes_at_fix": true,
+  "parent_tail": "ee_WW: no built pool at ee_WW_162-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_ttbar: no built pool at ee_ttbar_346-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uug: no built pool at ee_uug_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uugg: no built pool at ee_uugg_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aa: no built pool at ee_aa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aaa: no built pool at ee_aaa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uu: no built pool at ee_uu_91-1000GeV_train_amplitudes.npy, skipped\n[pool] 0 pools agree with a fresh evaluation\n",
+  "fix_tail": "ee_WW: no built pool at ee_WW_162-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_ttbar: no built pool at ee_ttbar_346-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uug: no built pool at ee_uug_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uugg: no built pool at ee_uugg_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aa: no built pool at ee_aa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aaa: no built pool at ee_aaa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uu: no built pool at ee_uu_91-1000GeV_train_amplitudes.npy, skipped\n[pool] 0 pools agree with a fresh evaluation\n"
+ },
+ "stallshort": {
+  "commit": "53c80201",
+  "valid": true,
+  "targets": [
+   "<rc>"
+  ],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": true,
+  "parent_tail": "ent call last):\n  File \"/tmp/claude-1000/model_trial_checks/stallshort_53c80201^_2999048/tests/test_lhe_parts.py\", line 361, in <module>\n    test_queue_stall_layout_short_parts()\n  File \"/tmp/claude-1000/model_trial_checks/stallshort_53c80201^_2999048/tests/test_lhe_parts.py\", line 205, in test_queue_stall_layout_short_parts\n    test_queue_end_to_end(run_events=None, short=True)\n  File \"/tmp/claude-1000/model_trial_checks/stallshort_53c80201^_2999048/tests/test_lhe_parts.py\", line 188, in test_queue_end_to_end\n    assert codes == [0, 0], codes\n           ^^^^^^^^^^^^^^^\nAssertionError: [1, 0]\n",
+  "fix_tail": "rc2f/q_bad/gc')\n{\"manifest\": \"/tmp/tmp2s1jrc2f/queue/gc/manifest_20261031_033018_dry.json\", \"dry_run\": true, \"dirs\": 3, \"gb\": 0.0, \"saved_dirs\": 1, \"saved_gb\": 0.0, \"logs_only_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 0, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n{\"manifest\": \"/tmp/tmp2s1jrc2f/queue/gc/manifest_20261031_033018.json\", \"dry_run\": false, \"dirs\": 3, \"gb\": 0.0, \"saved_dirs\": 1, \"saved_gb\": 0.0, \"logs_only_dirs\": 2, \"logs_only_gb\": 0.0, \"running_skipped\": 1, \"claimed_at_delete_skipped\": 1, \"no_dir\": 0, \"short_parts_kept_logs\": 1}\n[tidy + gc] ok\n"
+ },
+ "topsampling": {
+  "commit": "4e844204",
+  "valid": true,
+  "targets": [
+   "<rc>"
+  ],
+  "fail_at_fix_unscored": [],
+  "rc_fails_at_parent": true,
+  "rc_passes_at_fix": true,
+  "parent_tail": "ence from sidecars\nTraceback (most recent call last):\n  File \"/tmp/claude-1000/model_trial_checks/topsampling_4e844204^_2999048/tests/test_pool_physics.py\", line 411, in <module>\n    t()\n  File \"/tmp/claude-1000/model_trial_checks/topsampling_4e844204^_2999048/tests/test_pool_physics.py\", line 392, in test_real_recipe_shape\n    assert ref.sources == {\"sidecar\": 2} and not ref.unreadable, (ref.sources, ref.unreadable)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ({'sidecar': 1}, [('v4_ddx_aag', \"RuntimeError('no sidecar physics block and no backend card')\")])\n",
+  "fix_tail": "\n#### tests/test_pool_physics.py rc=0\nok card reader\nok blocks\nok write_recipe\nok scenario\nok sidecar block\nok lhe parent check\nok backfill\nok reads\nok reference from sidecars\nok real recipe shape\nall pool physics tests passed\n"
+ }
+}

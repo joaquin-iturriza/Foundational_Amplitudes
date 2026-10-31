@@ -1,0 +1,72 @@
+{
+ "scanwindow": {
+  "commit": "324510e2",
+  "fails_at_parent": false,
+  "passes_at_fix": true,
+  "parent_tail": "ee_WW: no built pool at ee_WW_162-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_ttbar: no built pool at ee_ttbar_346-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uug: no built pool at ee_uug_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uugg: no built pool at ee_uugg_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aa: no built pool at ee_aa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aaa: no built pool at ee_aaa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uu: no built pool at ee_uu_91-1000GeV_train_amplitudes.npy, skipped\n[pool] 0 pools agree with a fresh evaluation\n",
+  "fix_tail": "ee_WW: no built pool at ee_WW_162-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_ttbar: no built pool at ee_ttbar_346-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uug: no built pool at ee_uug_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uugg: no built pool at ee_uugg_91-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aa: no built pool at ee_aa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_aaa: no built pool at ee_aaa_10-1000GeV_train_amplitudes.npy, skipped\n[pool] ee_uu: no built pool at ee_uu_91-1000GeV_train_amplitudes.npy, skipped\n[pool] 0 pools agree with a fresh evaluation\n"
+ },
+ "massconv": {
+  "commit": "27c5ffc8",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "[perm] ok: 44 e+e- entries swap the beams, 34 others keep slot order\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_beam_order.py\", line 152, in <module>\n    test_masses_match_card()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_beam_order.py\", line 78, in test_masses_match_card\n    assert patches.get(\"MT\") == mg.LOCKED_MT and patches.get(\"ymt\") == mg.LOCKED_MT, name\n                                ^^^^^^^^^^^^\nAttributeError: module 'mg5_pipeline_final' has no attribute 'LOCKED_MT'\n",
+  "fix_tail": "[perm] ok: 44 e+e- entries swap the beams, 34 others keep slot order\n[mass] ok: 78 LO entries sample at their card masses\n[cpp] skipped: no compiled ee_uu standalone at /home/joaquin/mg5amcnlo/ee_uu_standalone\n[pool] ee_wwz: no built pool, skipped\n[pool] ee_WW: no built pool, skipped\n[pool] ee_ttbar: no built pool, skipped\n[pool] ee_uug: no built pool, skipped\n[pool] ee_uugg: no built pool, skipped\n[pool] ee_aa: no built pool, skipped\n[pool] ee_aaa: no built pool, skipped\n[pool] ee_uu: no built pool, skipped\n[pool] 0 pools agree with a fresh evaluation\n"
+ },
+ "lightprop": {
+  "commit": "d406f965",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "vd/datagen.py\", line 476, in ensure_split_set\n    return {\n           ^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/datagen.py\", line 477, in <dictcomp>\n    s[\"process\"]: ensure_dataset(\n                  ^^^^^^^^^^^^^^^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/datagen.py\", line 440, in ensure_dataset\n    raise RuntimeError(\nRuntimeError: require_cache: dataset for (syn_00000, train, 20000 ev) not prebuilt at /home/joaquin/datasets/syn_00000_25-1000GeV_train_smix_amplitudes.npy (recipe_id=561250bc79052429). Run the prebuild job first: sbatch prebuild_recipes.sh <spec.yaml>.\n",
+  "fix_tail": "vd/datagen.py\", line 476, in ensure_split_set\n    return {\n           ^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/datagen.py\", line 477, in <dictcomp>\n    s[\"process\"]: ensure_dataset(\n                  ^^^^^^^^^^^^^^^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/datagen.py\", line 440, in ensure_dataset\n    raise RuntimeError(\nRuntimeError: require_cache: dataset for (syn_00000, train, 20000 ev) not prebuilt at /home/joaquin/datasets/syn_00000_25-1000GeV_train_smix_amplitudes.npy (recipe_id=192ac7ab6ffe0b35). Run the prebuild job first: sbatch prebuild_recipes.sh <spec.yaml>.\n"
+ },
+ "quotedcut": {
+  "commit": "23e149a8",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "(72 additions): the guard runs on each and lists what it refuses\nPASS  D: the delegation hook notes the main session's code edits, analyses, tests and submissions, never refuses, and lets plan, git and reading calls be\nPASS  D: each noted call is counted once for site digest (5), a subagent's never\nPASS  D: known cause: of the ledger's 58 broke [FAIL] run ends, 58 name a pool on the rebuild list and would be acked with that note, 0 stay open\nPASS  D: decide_run_end acks a listed pool's failure with the note, keeps an unlisted one open, and changes nothing without the rule\n42/48 scenarios pass\n",
+  "fix_tail": "(72 additions): the guard runs on each and lists what it refuses\nPASS  D: the delegation hook notes the main session's code edits, analyses, tests and submissions, never refuses, and lets plan, git and reading calls be\nPASS  D: each noted call is counted once for site digest (5), a subagent's never\nPASS  D: known cause: of the ledger's 58 broke [FAIL] run ends, 58 name a pool on the rebuild list and would be acked with that note, 0 stay open\nPASS  D: decide_run_end acks a listed pool's failure with the note, keeps an unlisted one open, and changes nothing without the rule\n44/48 scenarios pass\n"
+ },
+ "topsampling": {
+  "commit": "4e844204",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "e parent check\nok backfill\nok reads\nok reference from sidecars\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_pool_physics.py\", line 411, in <module>\n    t()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_pool_physics.py\", line 392, in test_real_recipe_shape\n    assert ref.sources == {\"sidecar\": 2} and not ref.unreadable, (ref.sources, ref.unreadable)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ({'sidecar': 1}, [('v4_ddx_aag', \"RuntimeError('no sidecar physics block and no backend card')\")])\n",
+  "fix_tail": "ok card reader\nok blocks\nok write_recipe\nok scenario\nok sidecar block\nok lhe parent check\nok backfill\nok reads\nok reference from sidecars\nok real recipe shape\nall pool physics tests passed\n"
+ },
+ "switchB": {
+  "commit": "69c9b567",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "reviewed one is not\nPASS  B7: `git commit -F msg.txt` with `Co-Authored-By` is refused by commit-msg\nPASS  B7: `git commit -m` with `Co-Authored-By` is refused before it runs\nPASS  B7: `git commit -F msg.txt` with `Claude-Session` is refused by commit-msg\nPASS  B7: `git commit -m` with `Claude-Session` is refused before it runs\nPASS  B7: a real collaborator's Co-authored-by passes\nPASS  B7: the history since 1 Oct scanned with the same pattern: 0 commit(s) since 2026-10-01 carry an attribution\nPASS  B8: test_guards.py passes, its memory-file and agent-model cases included\n87/91 scenarios pass\n",
+  "fix_tail": "reviewed one is not\nPASS  B7: `git commit -F msg.txt` with `Co-Authored-By` is refused by commit-msg\nPASS  B7: `git commit -m` with `Co-Authored-By` is refused before it runs\nPASS  B7: `git commit -F msg.txt` with `Claude-Session` is refused by commit-msg\nPASS  B7: `git commit -m` with `Claude-Session` is refused before it runs\nPASS  B7: a real collaborator's Co-authored-by passes\nPASS  B7: the history since 1 Oct scanned with the same pattern: 0 commit(s) since 2026-10-01 carry an attribution\nPASS  B8: test_guards.py passes, its memory-file and agent-model cases included\n88/91 scenarios pass\n"
+ },
+ "twoword": {
+  "commit": "5bf79e0d",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "n(sys.argv[1:]))\n             ^^^^^^^^^^^^^^^^^^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_hooks_real.py\", line 1008, in main\n    GROUPS[name]()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_hooks_real.py\", line 973, in run_end_markers\n    logs = json.load(open(os.path.join(HF.DEFAULT_OUT, \"gridpack_probe_logs.json\")))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/fixtures/hooks_20261029/gridpack_probe_logs.json'\n",
+  "fix_tail": "efore it runs\nPASS  B7: a real collaborator's Co-authored-by passes\nPASS  B7: the history since 1 Oct scanned with the same pattern: 0 commit(s) since 2026-10-01 carry an attribution\nPASS  B8: test_guards.py passes, its memory-file and agent-model cases included\nPASS  run ends: the six gridpack probe jobs (COMPLETED, `RUN_SUMMARY lhe_probe gridpack rc=0`) are sorted clean by FA's end markers; the old one-word marker sorted them broke\nPASS  run ends: the RUN_SUMMARY reader takes the k=v form of the six (rc=0 read, so no false 'no RUN_SUMMARY' alert) and still the JSON form\n97/99 scenarios pass\n"
+ },
+ "acceptyield": {
+  "commit": "b2050260",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "cted 9.7 h)\n[C4] replan from 23:46, target 4 h: alert at 03:45 (4.0 h in, predicted 8.9 h)\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_supervisor_c.py\", line 309, in <module>\n    test_c4_plan_target()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_supervisor_c.py\", line 294, in test_c4_plan_target\n    assert plan(\"target\", \"gen\", \"--batch\", \"catalog_v4_w3\", \"--wall\", \"4\", \"--jobs\", \"10\").returncode == 0\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "fix_tail": "cted 9.7 h)\n[C4] replan from 23:46, target 4 h: alert at 03:45 (4.0 h in, predicted 8.9 h)\nTraceback (most recent call last):\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_supervisor_c.py\", line 309, in <module>\n    test_c4_plan_target()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vd/tests/test_supervisor_c.py\", line 294, in test_c4_plan_target\n    assert plan(\"target\", \"gen\", \"--batch\", \"catalog_v4_w3\", \"--wall\", \"4\", \"--jobs\", \"10\").returncode == 0\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n"
+ },
+ "reviewlock": {
+  "commit": "275845c9",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n373/375 scenarios pass\n",
+  "fix_tail": "  held-out axis and decision codes are refused\nPASS  run ids, trial names, hashes and snake_case identifiers are found (text stub)\nPASS  a ratio that does not say what over what is refused; one that does passes\nPASS  a code is refused until the glossary lists it, then passes\nPASS  a term below the glossary's PROPOSED marker is still refused\nPASS  a clean figure passes\nPASS  a .png is read through its sibling .pdf, and refused without one\nPASS  another tool is left alone\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n375/375 scenarios pass\n"
+ },
+ "asksearch": {
+  "commit": "9ce1cb16",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n183/188 scenarios pass\n",
+  "fix_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n187/188 scenarios pass\n"
+ }
+}

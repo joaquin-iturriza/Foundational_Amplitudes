@@ -1,0 +1,72 @@
+{
+ "replyblock": {
+  "commit": "85eeb4f0",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "corded or not; a live one nobody runs is a note\nPASS  sweeps: sweep_manager submit stamps the sweep with the work item and time and prints SWEEP_SUBMITTED; its state reports the queued jobs, scripts and results\nPASS  sweeps: end to end, the stamped sweep (its name outside the entry's globs) is recorded on its item's entry, in flight while queued, listed when the queue drains\nPASS  sweeps: a submission with no work item is still refused by the work gate (nothing stamped)\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n257/262 scenarios pass\n",
+  "fix_tail": "corded or not; a live one nobody runs is a note\nPASS  sweeps: sweep_manager submit stamps the sweep with the work item and time and prints SWEEP_SUBMITTED; its state reports the queued jobs, scripts and results\nPASS  sweeps: end to end, the stamped sweep (its name outside the entry's globs) is recorded on its item's entry, in flight while queued, listed when the queue drains\nPASS  sweeps: a submission with no work item is still refused by the work gate (nothing stamped)\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n262/262 scenarios pass\n"
+ },
+ "quietstop": {
+  "commit": "e830f4ca",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ns\n      a passing stop check printed to the user's screen: {\"systemMessage\": \"plan check notes:\\n  sweep mu_search_d on ccin2p3 ran with no record on the plan: recorded on mu\"}\nPLAN CHECK: the turn cannot end yet.\n  mu: sweep ended: mu_search_d (ccin2p3, 3 of 3 trials submitted, 1 results); launch its step agent (plan next --prompts, then plan step mu --agent <subagent id>)\nPASS  sweeps: a submission with no work item is still refused by the work gate (nothing stamped)\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n245/257 scenarios pass\n",
+  "fix_tail": "corded or not; a live one nobody runs is a note\nPASS  sweeps: sweep_manager submit stamps the sweep with the work item and time and prints SWEEP_SUBMITTED; its state reports the queued jobs, scripts and results\nPASS  sweeps: end to end, the stamped sweep (its name outside the entry's globs) is recorded on its item's entry, in flight while queued, listed when the queue drains\nPASS  sweeps: a submission with no work item is still refused by the work gate (nothing stamped)\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n257/257 scenarios pass\n"
+ },
+ "emastart": {
+  "commit": "ddfc0314",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "trial_vc/tests/test_ft_ema_start.py\", line 84, in <module>\n    fn()\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vc/tests/test_ft_ema_start.py\", line 43, in test_restart_ema_scores_the_loaded_weights\n    s = _stub()                                                       # the live weights are still the parent's\n        ^^^^^^^\n  File \"/home/joaquin/work/FA/worktrees/zz_trial_vc/tests/test_ft_ema_start.py\", line 24, in _stub\n    setattr(s, k, getattr(BaseExperiment, k))\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: type object 'BaseExperiment' has no attribute '_START_CURVES'\n",
+  "fix_tail": "ok test_restart_ema_scores_the_loaded_weights\nok test_validate_start_leaves_no_trace_in_the_curves\n/home/joaquin/work/FA/.venv-cpu/lib/python3.11/site-packages/torch/_utils.py:831: UserWarning: TypedStorage is deprecated. It will be removed in the future and UntypedStorage will be the only storage class. This should only matter to you if you are using storages directly.  To access UntypedStorage directly, use tensor.untyped_storage() instead of tensor.storage()\n  return self.fget.__get__(instance, owner)()\n"
+ },
+ "endedrun": {
+  "commit": "39886d3a",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n238/240 scenarios pass\n",
+  "fix_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n240/240 scenarios pass\n"
+ },
+ "eventblock": {
+  "commit": "e7cddfce",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n234/235 scenarios pass\n",
+  "fix_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n235/235 scenarios pass\n"
+ },
+ "inflight": {
+  "commit": "ced2a62f",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n228/229 scenarios pass\n",
+  "fix_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n229/229 scenarios pass\n"
+ },
+ "backlogdepth": {
+  "commit": "240b0f14",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "changes only through tools/plan.py (plan add, answer, ask, step, check, evidence, set-next, done ...), which checks what it records.\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n220/225 scenarios pass\n",
+  "fix_tail": "ml').read() / open('/tmp/out` is allowed\nPASS  heredoc: `git commit -F - <<'EOF' / plan: an edit to plan/plan.yaml / EOF` is allowed\nPASS  heredoc: `python3 - <<'EOF' / open('plan/plan.yaml', 'w').write('x') / EOF` is refused\nPASS  heredoc: `python3 - <<'EOF' / import json / p = 'plan/.state.json' / json.dump({` is refused\nPASS  heredoc: `bash <<'EOF' / echo x > plan/plan.yaml / EOF` is refused\nPASS  heredoc: `cat <<'EOF' > plan/plan.yaml / entries: [] / EOF` is refused\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n225/225 scenarios pass\n"
+ },
+ "recheck": {
+  "commit": "41faddd6",
+  "fails_at_parent": true,
+  "passes_at_fix": true,
+  "parent_tail": "est -f an/fig.png' already passes in the checkout: it would finish the entry with nothing done; check what this entry still has to produce\nFAIL  plan check --replace gives a done entry a fast check that passes, keeping the old one in its history\n      usage: plan [-h]\n            {where,show,add,item,check,ref,answer,ask,unanswered,step,run,evidence,set-next,dead-end,next,done,kind,view,claims,reopen,commit}\n            ...\nplan: error: unrecognized arguments: --replace\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n209/216 scenarios pass\n",
+  "fix_tail": "the stop's time is noted once, then cached for the day like a pass\nPASS  plan recheck runs it with no limit, and the stops read its result\nPASS  plan check --replace refuses a running entry\nPASS  plan check --replace refuses a trivially true check\nPASS  plan check --replace refuses a check that fails now\nPASS  plan check without --replace on a done entry is refused\nPASS  plan check --replace gives a done entry a fast check that passes, keeping the old one in its history\nPASS  every function that runs scenarios is in GROUPS\nPASS  a failing scenario makes the suite exit 1\n216/216 scenarios pass\n"
+ },
+ "holditem": {
+  "commit": "22fbd7b9",
+  "fails_at_parent": false,
+  "passes_at_fix": true,
+  "parent_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n193/198 scenarios pass\n",
+  "fix_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n198/198 scenarios pass\n"
+ },
+ "claimtime": {
+  "commit": "ee42732d",
+  "fails_at_parent": true,
+  "passes_at_fix": false,
+  "parent_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n187/191 scenarios pass\n",
+  "fix_tail": "nd the note stays\nPASS  8: an item check that hangs is cut at its timeout, counted in flight\nPASS  reads with no plan create nothing; a write is refused\nPASS  lower: a hold whose covers glob matches the entry passes (the rule of plan.py)\nPASS  lower: SessionStart (startup) prints the plan\nPASS  lower: SessionStart (resume) prints the plan\nPASS  lower: SessionStart (clear) prints the plan\nPASS  lower: the switch-over's settings retire the four guards, add the new ones (plan check 300 s) and keep every other hook\nPASS  lower: the switch-over refuses to run from a worktree\n190/191 scenarios pass\n"
+ }
+}

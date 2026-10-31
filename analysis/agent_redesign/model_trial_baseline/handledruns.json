@@ -1,0 +1,9 @@
+{
+ "commit": "e5cd7bb1",
+ "fix": {
+  "test_handled": true
+ },
+ "targets": [
+  "test_handled"
+ ]
+}

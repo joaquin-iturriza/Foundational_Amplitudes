@@ -1,0 +1,9 @@
+{
+ "commit": "9dad7d3a",
+ "fix": {
+  "tests/test_plan_status.py::test_status_stalled_and_gate": false,
+  "tests/test_plan_status.py::test_supervisor_stalled_event": false,
+  "tests/test_plan_status.py::test_timed_wait_is_waiting": false
+ },
+ "targets": []
+}
