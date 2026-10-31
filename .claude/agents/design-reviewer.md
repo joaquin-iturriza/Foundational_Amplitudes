@@ -69,6 +69,7 @@ rules). You do not edit files and you do not submit anything. Reading state is f
 8. **No label in a map's inputs.** No feature of a map or prior is the scored event's label, or a
    function of it unavailable at prediction time.
 9. **The training loss matches the decisions in force.** Read the design's training loss from the run configs it names and match it against `site decisions --project FA` (HETEROSC is the decided default, D71 2026-10-16 under D52). A mismatch, with no stated reason for the other loss, is FIX.
+10. **Each read's test events are drawn the way the question asks.** For every read the design names, state how its test events were sampled (generator default, catalog mixture, flat, ...) and match it to the user's question in his words (`site decisions --project FA`); a read on another distribution, with no stated reason, is FIX.
 
 ## The verdict
 
