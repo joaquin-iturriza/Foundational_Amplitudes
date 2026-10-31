@@ -7487,6 +7487,19 @@ entries:
       to state: the 1x control''s lr 4.997e-3 is the MSE Muon search''s best carried to het untuned, so part of a 4x-over-1x
       gain may be lr tuning. Next owner: record that revision and re-check with the same reviewer; no submission before Joaquin''s
       go (D219).'
+  - at: '2026-10-31T22:40:19+00:00'
+    text: '2026-10-31 ~23:00 (owner a24e9905c905d4dce): (1) Step 16 design second revision recorded and PASSED by the same
+      reviewer (a4faf46b1e1550ebe): width-16/32 long cells gated only on lr transfer at 1x width 32 (best checkpoint in last
+      5%, no blow-up; a fail sends them to an lr DyHPO at 1x width 32), 1x width R reported as a result, width-8-only S2 offered
+      to Joaquin not applied, 1x lr 4.997e-3 stated as the MSE Muon search best carried to het untuned. (2) Width probe submitted
+      (job script mode probe, 1e414911; 200 steps at the 16x data, whole train pool in memory, no eval, no sigma stage): V100
+      w8/16/32 FA-ccin2p3-14f741fe, 22bf7509, 234146d5; H100 w8/16/32 715190ec, 6bfe95fa, 77dce99d; 1:30 limit, 120G host
+      memory, target long_runs_width_probe 1 h x 6, at most 9 GPU-h at the limit. On CC though site pick offered lxplus: the
+      catalog_v4 pools and the H100s are on CC only (data on one site is a setup gap, open). (3) Notes-editor proposals on
+      par:v4_mixture (00813d05): share 0.50 PP4 trained interval one value 0.489 (both producers give widened 0.4885; the
+      table rounded it 0.488); mixture_ab bound_default now counts the overlap (6ff75ecb): all 504 PP4 not-trained classes
+      are held-out classes, 504 of the 700 in the held-out row, said in the caption; figure fig:v4_shares_bound (fig_shares_bound.py
+      @186d0957, analysis/catalog_v4/figs/shares_bound.png/.pdf); verify_claims 0 problems.'
   handoff:
     state: 'Done this session: par:v4_mixture write-ups (c70595af step-20 verdict; f04c945e shares vs pure-default bound,
       tab:v4_bound_shares); bound re-reads f8ec724f/049b863e read and extracted (mixture_ab bound_default, affc6f0b); catalog_v4_train.yaml
