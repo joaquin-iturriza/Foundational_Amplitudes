@@ -53,7 +53,7 @@ Measures per run and read group (every event read, each probe's 2000):
     classes  Spearman over classes (probes of a class pooled) of the class median of the feature against the class
              RMSE and the class median s
     profile  per decile of the feature (edges from the group's pooled events of the run), RMS of ae_n and median s_n
-GBT (the four control runs, sklearn HistGradientBoostingRegressor, SUB events per probe): targets log ae, log ae_n,
+GBT (the four control runs and the 0.25-share MSE pair, sklearn HistGradientBoostingRegressor, SUB events per probe): targets log ae, log ae_n,
 log s, log s_n on all event and process features; classes split in two halves by a fixed hash, fit on one, R^2 and
 permutation importance (3 repeats) and grouped importance (kinematic, process, target features permuted together)
 on the other, then the halves swapped; the mean of the two reported.
@@ -81,7 +81,10 @@ RUNS = {"v4_het_control": ("het", "control", 42), "v4_het_control_seed2": ("het"
         "v4_dimensionless_muon_default25": ("mse", "default25", 42),
         "v4_dimensionless_muon_default25_seed2": ("mse", "default25", 43)}
 UNCHECKED_OK = {"v4_dimensionless_muon", "v4_dimensionless_muon_seed2"}   # the MSE control's own held-out reads
-GBT_RUNS = ("v4_het_control", "v4_het_control_seed2", "v4_dimensionless_muon", "v4_dimensionless_muon_seed2")
+GBT_RUNS = ("v4_het_control", "v4_het_control_seed2", "v4_dimensionless_muon", "v4_dimensionless_muon_seed2",
+            # the MSE control's reads with pool rows are EE4, HD4 and HD5 only: the 0.25-share MSE pair, read on every
+            # group, beside it
+            "v4_dimensionless_muon_default25", "v4_dimensionless_muon_default25_seed2")
 SUB = 250            # events per probe kept for the pooled measures, the profiles and the GBT
 GBT_FIT, GBT_TEST = 150000, 30000    # GBT events fitted (of the training half) and scored (of the other half)
 EV_FEATS = ("eta_max", "y_min", "y_ff", "y_if", "u_fwd", "pt_min", "pt_max", "e_min", "dr_min", "sqrt_shat", "thr",
