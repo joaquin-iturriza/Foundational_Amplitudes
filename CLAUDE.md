@@ -30,7 +30,7 @@ on the sites (`~/work/CLAUDE.md`).
 - When I point out a mistake: no apology; trace what in the process produced it ("not checked" until read, and read before the message ends), make the change that stops it recurring in that turn (a rule, a check, a tool fix; one needing a setting I hold goes to me as a concrete diff), then fix the instance.
 - A fix is reported by what it changed and the named cases it was tested on; failure modes not tested are listed as not fixed.
 - A statement about current state (a setting, what an agent runs on) is read from its live source in that turn, or says "not checked".
-- Asked about an agent's work or report, the main session reads its sources itself (the agent's transcript with `tools/agent_context.py`, the files, commits and logs it names) and answers from them; it never answers that it does not know what an agent meant.
+- Asked about an agent's work or report, the main session reads its sources itself (its transcript `subagents/agent-<id>.jsonl`, the files, commits and logs it names) and answers from them, never that it does not know what the agent meant.
 - A claim that something is absent (no decision, no run, no record) rests on a whole search, never a truncated one (`head`, a range of ids, a pattern cut short), and names what was searched.
 - A statement to me about what waits on me is checked against my own words (`site decisions`, my messages), never against the plan's notes.
 
@@ -55,9 +55,9 @@ on the sites (`~/work/CLAUDE.md`).
 
 ## Clusters and jobs
 
-- State every batch's wall-time target before submission and record it on its plan entry.
+- State every batch's wall-time target before submission and record it on its plan entry: the time of its work (training steps at the model's step rate in a plain training run on that GPU, one forward pass per read, generation at the probe's time per event), never a measured rate that includes overhead.
 - A batch goes out only after a small probe (yield, time and disk per unit), laid out to finish in one wave at the width `site pick` offers.
-- A margin above 2× (events asked over events kept, a run's wall time over its target) is a finding to fix, not to absorb.
+- A margin above 2× (events asked over events kept, a run's or a stage's wall time over its target) is a finding to fix, not to absorb.
 - A failed task goes to the agent that owns its work, which reads its cause in the log before anything is resubmitted.
 
 ## Code and git
