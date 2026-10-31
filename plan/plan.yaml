@@ -6263,6 +6263,13 @@ entries:
       and G- onto their particles (labels wrong, and calls 9000001-4 R2/UV pseudo-particles); opuslow stallshort missed tidy_run
       (one of three short-part call sites) and its report says otherwise; the rest correct. Left: check poolrow reworks, model_trial.json
       record + report, remove 21 zz_trial worktrees with scripts/remove_worktree.sh (branches zz_trial_* then deleted).'
+  - at: '2026-10-31T01:05:16+00:00'
+    text: 'Main session state 2026-10-31 ~03:00: supervisor bmcsb2hms, waiter bisv03b4d. catalog_coverage owner ab11dfab0dad3975c
+      stopped, waiting on mixture arms 6c246603/1d46b938/11ad944a/9c6fc7ab and EE4 re-read def11c5c, audit FA-ccin2p3-aab94b13;
+      then step 15 and the standalone prune (D209). Its regeneration text waits on Joaquin''s go for the CLAUDE.md fa-generation
+      index line (diff shown to him). v3_prep_explore owner aaa8b1f043eaa6ee9: prop read FA-ccin2p3-71a96ca2 running, told
+      the Higgs width fix may need a re-run. agent_redesign owner acc18380b00739f5c asked to hand off at 323k; fresh owner
+      then. Joaquin''s sign-vs-loops question recorded on synthetic_prior_alternatives_not_built (held).'
   handoff:
     state: 'Step 5 cut 1 (hook pushes) applied 2026-10-31 under a passed design (FIX then PASS): (c) repair 0d2ddf73: a hook
       output over 10,000 chars reached agents as a 2,178-char preview, sections lost while marked delivered (17 of 32 redesign
