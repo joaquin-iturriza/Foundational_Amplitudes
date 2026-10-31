@@ -253,7 +253,7 @@ def mixture(partial=False):
     out["bound"] = json.load(open(os.path.join(DATA, "pp_bound.json")))["trained"]
     path = os.path.join(DATA, "mixture_ab.json")
     json.dump(out, open(path, "w"), indent=1)
-    print(json.dumps({k: out[k] for k in ("verdict", "missing_reads")}))
+    print(json.dumps(out))   # the whole result, the last JSON line (tools/verify_claims.py reads its claims from it)
 
 
 def main():
