@@ -443,7 +443,10 @@ def aggregate_cmd(arm):
     loss = RUNS[arm][0]
     probes = load_arm(arm)
     rng = np.random.default_rng(0)
-    res = {"arm": arm, "n_probes": {}, "stats": {}}
+    al = np.array([x[3]["runs"][arm]["align_rho"] for x in probes], np.float64)
+    res = {"arm": arm, "n_probes": {}, "stats": {},
+           "align": {"n": len(al), "min": float(al.min()) if len(al) else None,
+                     "q01": float(np.quantile(al, 0.01)) if len(al) else None, "n_below_0p999": int(np.sum(al < 0.999))}}
     for g in READ_GROUPS:
         ps = [x for x in probes if g == "all" or group_of(x[0]) == g]
         res["n_probes"][g] = len(ps)
@@ -478,6 +481,7 @@ def combine_cmd(paths):
             res.update(excluded=d["excluded"], n_tasks=d["n_tasks"], parts=d["parts"])
         elif "stats" in d:
             res["per_run"][d["arm"]], res["n_probes"][d["arm"]] = d["stats"], d["n_probes"]
+            res.setdefault("align", {})[d["arm"]] = d.get("align")
         else:
             res["gbt"].setdefault(d["arm"], {}).update(d["gbt"])
     with gzip.open(os.path.join(DATA, "error_correlates_reads.json.gz"), "wt") as fh:
@@ -637,6 +641,7 @@ def summary(path=None):
     raw = load(path)
     out = {"design": "plan error_correlates step 1 (CPU, existing reads)", "n_tasks": raw["n_tasks"],
            "n_probes": raw["n_probes"], "excluded_counts": {a: len(v) for a, v in raw["excluded"].items()},
+           "align": raw.get("align"),
            "misaligned": {a: sorted(k for k, w in v.items() if w.startswith("misaligned")) for a, v in raw["excluded"].items()},
            "excluded": raw["excluded"], "tables": {}, "gbt": raw["gbt"]}
     # per read group and target: each feature's within-probe median Spearman, its MI, the pooled Spearman against the
