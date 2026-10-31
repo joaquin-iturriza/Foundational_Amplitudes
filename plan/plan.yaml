@@ -6648,7 +6648,7 @@ entries:
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
   owner:
     agent: a9ed84e84b4c49f4b
-    state: working
+    state: closed
     since: '2026-10-31T19:55:31+00:00'
     state_at: '2026-10-31T22:17:39+00:00'
     context: 254879
@@ -7396,18 +7396,21 @@ entries:
       0.17 h plan (15 min limit): over 2x, the 1 min per axis start-up dominates eval jobs; a short_wall fix (per-axis minute
       on eval) is open.'
   handoff:
-    state: 'Step 20 written up in par:v4_mixture (c70595af): both shares WIN (GAIN and NO LOSS on 700 default-sampled held-out
-      classes) under MSE and het, verdict default25 by the tie rule; H3 open (MSE 1.133/1.082, intervals across 1). Waits
-      only on Joaquin''s share choice (next 14); catalog_v4_train.yaml untouched. short_wall eval start-up 1.5 min and het
-      probe rate 1.45 s (c0fed433). het_where relabelled (34278e1f). Next: (1) repo-reviewer re-check covering 8836430b, c0fed433,
-      34278e1f; (2) steps 15, 17, 18, 19, 21 have their results in (findings 18:23-19:54) and can be dropped after a read
-      by the next owner; (3) step 22 wall-time table.'
-    decisions: Eval-only start-up and het rate from the step-20 logs, slowest kept; --het passed by the job script (alias
-      of --sigma-stage). Write-up keeps the catalog-sampled held-out read beside the rule's default-sampled read (D227).
+    state: 'Done this session: par:v4_mixture write-ups (c70595af step-20 verdict; f04c945e shares vs pure-default bound,
+      tab:v4_bound_shares); bound re-reads f8ec724f/049b863e read and extracted (mixture_ab bound_default, affc6f0b); catalog_v4_train.yaml
+      = share 0.25 (e3f37300; the catalog-sampled recipe is now catalog_v4_base_train.yaml, used by the control arms and generators),
+      check_site_data on CC: 1153 processes, pools prebuilt, sidecars present; short_wall rates (c0fed433, 10a5cb11). Step
+      16 design recorded and revised after the reviewer''s FIX; re-check sent to the same reviewer (a4faf46b1e1550ebe), verdict
+      pending at hand-off. Nothing submitted for step 16; it waits on Joaquin''s go on the GPU-h (D219).'
+    decisions: Loss HETEROSC for the long runs (D226, reviewer); length axis = steps-and-data (events per process grow with
+      steps); lr measured by a single-fidelity DyHPO at 4x width 8 before longer cells; widths staged with a go rule at 1x.
+    ruled_out: Overwriting catalog_v4_train.yaml in place without moving the base (the share generator, pp/signext generators
+      and control arms read it as the catalog-sampled base).
     running: none
-    files: tools/short_wall.py, tests/test_short_wall.py, scripts/job_catalog_v3_short.sh, docs/results.tex (par:v4_mixture),
-      analysis/catalog_v4/het_uncertainty.py, analysis/catalog_v4/figs/het_where.{png,pdf}
-    written: '2026-10-31T20:01:24+00:00'
+    files: docs/results.tex (par:v4_mixture), analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/bound_default.json,
+      recipes/catalog_v4_train.yaml, recipes/catalog_v4_base_train.yaml, recipes/gen_catalog_v4_default.py, tools/short_wall.py,
+      tests/test_short_wall.py, scripts/job_catalog_v3_short.sh
+    written: '2026-10-31T22:29:00+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
