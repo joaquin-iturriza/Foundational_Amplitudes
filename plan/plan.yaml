@@ -8694,7 +8694,7 @@ entries:
   asks: []
   owner:
     agent: a7937d461dd1b0e68
-    state: working
+    state: closed
     since: '2026-10-31T22:17:37+00:00'
     state_at: '2026-10-31T22:56:36+00:00'
     context: 229744
@@ -8707,3 +8707,16 @@ entries:
       - 'the write-up passes the notes review: plan done error_correlates --writeup <commit>'
       - 'Joaquin asks for a follow-up (oversample high-|M|^2 or near-resonance events, or a feature): a new design on this
         entry'
+  handoff:
+    state: 'Step 1 done and written up: par:v4_error_correlates (abe43c71, retitled 4d64bea8), verify_claims clean; done_when
+      set (label, data json, write-up and 369eaff9 inside passed notes-editor and repo-reviewer watermarks). Only plan done
+      error_correlates --writeup 4d64bea8 remains, after both reviewers pass.'
+    decisions: MSE side read on the 0.25-share pair because the MSE control's PP4 and H1-H7c reads lack pool rows (2002 probes);
+      site part staged under site run's 2-minute limit; rank figure shows the 8 strongest features with its legend as a strip
+      file
+    running: repo-reviewer agent a7350a46320753a2f (code backlog, includes error_correlates.py) and notes-editor agent a6de2553c80bf5ea4
+      (results.tex backlog, includes the write-up); on a FIX the fix goes to this entry's next owner, the re-check continues
+      the same reviewer
+    files: analysis/catalog_v4/error_correlates.py, analysis/catalog_v4/data/error_correlates.json, analysis/catalog_v4/data/error_correlates_reads.json.gz,
+      docs/results.tex par:v4_error_correlates, analysis/catalog_v4/figs/error_correlates_{rank,rank_legend,profile}.{png,pdf}
+    written: '2026-10-31T22:59:16+00:00'
