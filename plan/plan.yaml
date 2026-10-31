@@ -7265,6 +7265,13 @@ entries:
     - 4
     answered_at: '2026-10-31T00:38:10.031000+00:00'
     decision: D211
+  - ask: 'May the setup bugs found during the weekend hold be fixed now: the wait_guard watch regex refusing ''cd ~/work/FA
+      && site events --wait'', and plan ask refusing questions on a held entry or ones holding no step?'
+    at: '2026-10-31T15:09:54+00:00'
+    searched: 'CLAUDE.md (rules on held work and repairs: ''Repairing a defect in approved work stays inside that approval'')
+      and site decisions FA; the weekend hold leaves open whether repairs run during it'
+    blocks: the wait_guard and plan ask fixes only
+    blocks_steps: &id001 []
   step_why:
     1:
       feeds: whether the redesign is finished
@@ -8019,3 +8026,10 @@ entries:
       .claude/agents/compact-worker.md .claude/hooks/owner_context.py
     written: '2026-10-31T04:40:45+00:00'
   hold_decision: D225
+  ask: 'May the setup bugs found during the weekend hold be fixed now: the wait_guard watch regex refusing ''cd ~/work/FA
+    && site events --wait'', and plan ask refusing questions on a held entry or ones holding no step?'
+  waiting_since: '2026-10-31T15:09:54+00:00'
+  searched: 'CLAUDE.md (rules on held work and repairs: ''Repairing a defect in approved work stays inside that approval'')
+    and site decisions FA; the weekend hold leaves open whether repairs run during it'
+  blocks: the wait_guard and plan ask fixes only
+  blocks_steps: *id001
