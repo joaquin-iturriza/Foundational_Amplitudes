@@ -6375,6 +6375,12 @@ entries:
     units: null
     start: '2026-10-31T16:28:44+00:00'
     at: '2026-10-31T16:28:44+00:00'
+  - batch: hd_5body_gridpack_64core
+    wall_h: 2.0
+    jobs: 5
+    units: null
+    start: '2026-10-31T16:31:02+00:00'
+    at: '2026-10-31T16:31:02+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
