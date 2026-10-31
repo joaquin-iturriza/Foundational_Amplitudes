@@ -1798,7 +1798,12 @@ entries:
   decisions:
   - D43
   - D125
-  next: resumes when the user releases it
+  next:
+    1: resumes when the user releases it
+    2: 'When the item comes back (design first, held under D125): does the sign-extension gain (par:v4_signext: 18/21 pools,
+      6.69%->2.91%) come from more one-loop pools or from targets that cross zero? Arms: synthetic sign-changing data, (a)
+      in the spirit of the synthetic prior, (b) a plain sign-changing function with no loop structure, against the real sign-extension
+      pools and the control. Joaquin, 2026-10-31.'
   done_when: null
   match: null
   notes_ref: null
@@ -1818,6 +1823,14 @@ entries:
     (Sec. ), with a cheaper symmetrisation than the permutation average. How close to real amplitudes the prior should be
     is still to be settled with others.'
   hold_decision: D125
+  step_why:
+    2:
+      feeds: whether sign-changing amplitudes in pretraining can come from synthetic data instead of more generated one-loop
+        pools
+      if:
+      - 'synthetic sign-changing data recovers most of the gain: the sign behaviour is learned from zero crossings; synthetic
+        sign data goes into the prior'
+      - 'only the real loop pools give the gain: the loops'' structure matters; more real one-loop pools are the route'
 - status: done
   quotes:
   - said_at: '2026-10-14T16:48:48.871Z'
