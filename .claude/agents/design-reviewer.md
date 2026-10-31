@@ -66,6 +66,8 @@ rules). You do not edit files and you do not submit anything. Reading state is f
    names a comparison, a reference or an arm ("compare against X", "X as the reference"), the
    design either includes it (an existing run of it counts, reused) or says why it is answered
    elsewhere. A comparison the user asked for and the design leaves out fails.
+8. **No label in a map's inputs.** No feature of a map or prior is the scored event's label, or a
+   function of it unavailable at prediction time.
 
 ## The verdict
 
