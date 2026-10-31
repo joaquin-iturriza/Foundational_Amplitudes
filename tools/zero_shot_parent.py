@@ -226,10 +226,17 @@ for recipe in a.recipes:
                             # carries its reason here and in physics_reason
                             physics_check=np.array(json.dumps(physics_chk, default=str)),
                             physics_reason=np.array(physics_chk.get("reason") or ""),
-                            # the scored events' indices in the split's pool, in scoring order, and that pool's path:
+                            # the scored events' positions in the experiment's split (idx) and their rows in the split's pool (pool_row), in scoring order, and that pool's path:
                             # a per-event read from the pool's momenta (v3_prep_explore, the dipole residual) aligns on
                             # these, never by matching log|M|^2 (the sampling-sensitivity dead ends)
                             idx=(np.asarray(split_idx).reshape(-1) if len(np.asarray(split_idx).reshape(-1)) == len(t)
                                  else np.zeros(0, np.int64)),
+                            # idx are positions in the experiment's role-contiguous array, not pool rows: the pool
+                            # row of each scored event is the role's shuffle (_role_perm) at its position in the role
+                            pool_row=(np.asarray((getattr(exp, "_role_perm", None) or {}).get(a.split, []))[
+                                np.asarray(split_idx).reshape(-1) - int(np.min(split_idx))]
+                                if len(np.asarray(split_idx).reshape(-1)) == len(t)
+                                and len((getattr(exp, "_role_perm", None) or {}).get(a.split, [])) == len(t)
+                                else np.zeros(0, np.int64)),
                             pool=np.array(str(_pool or "")))
     print("ZERO_SHOT " + json.dumps(rec), flush=True)

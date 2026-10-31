@@ -71,6 +71,31 @@ def factors(mom, pdg, n_in=2):
     return np.log(np.maximum(D, 1e-300)), E
 
 
+def pool_rows(z):
+    """The scored events' rows in the read's pool file. A read saves `pool_row` (zero_shot_parent from the dipole
+    repair on); before that its `idx` are positions in the experiment's role-contiguous array (train|val|test, each
+    role shuffled by one rng seeded 42, experiment._init_data: _role_perm), not pool rows (the first job,
+    FA-ccin2p3-3a2a388b, failed on idx 10000 in a 10000-row pool). Rebuilt here from the role counts: the read scores its
+    whole role, so n_role = len(idx), the role starts at min(idx), and a test read's val role is taken of the same size;
+    a wrong guess is caught by the alignment check below."""
+    if "pool_row" in z.files and len(z["pool_row"]):
+        return np.asarray(z["pool_row"])
+    idx = np.asarray(z["idx"]).astype(np.int64)
+    n, start = len(idx), int(idx.min())
+    if str(z["split"]) == "val":
+        counts = [start, n]
+    else:
+        counts = [start - n, n, n]
+    if counts[0] < 0:
+        return None
+    rng = np.random.default_rng(seed=42)
+    perm = [rng.permutation(c) for c in counts][-1]
+    pos = idx - start
+    if pos.max() >= n:
+        return None
+    return perm[pos]
+
+
 def r2(u, x):
     if np.std(x) == 0:
         return 0.0
@@ -100,7 +125,11 @@ def main():
                 continue
             pr = np.load(str(z["pool"]), mmap_mode="r")
             n = (pr.shape[1] - 1) // 5
-            mom, pdg, amp = split_pool(np.asarray(pr[np.asarray(z["idx"])]), n)
+            rows_at = pool_rows(z)
+            if rows_at is None or rows_at.max() >= len(pr):
+                rows.append({"dir": d, "probe": name, "error": "event indices do not map to the pool's rows"})
+                continue
+            mom, pdg, amp = split_pool(np.asarray(pr[rows_at]), n)
             raw = t - z["logF"].astype(np.float64)
             diff = np.log(np.abs(amp)) - raw
             if np.corrcoef(np.log(np.abs(amp)), raw)[0, 1] < 0.999 or np.median(np.abs(diff - np.median(diff))) >= 0.05:
