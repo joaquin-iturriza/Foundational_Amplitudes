@@ -2284,20 +2284,25 @@ def cmd_ask(a):
     _ask_ok(a.ask)
     _searched_ok(a.searched)
     bsteps = None
-    if a.blocks_steps:
+    if (a.blocks_steps or "").strip().lower() == "none":
+        bsteps = []   # explicitly holds no next step (the question blocks only what --blocks names)
+    elif a.blocks_steps:
         try:
             bsteps = sorted({int(x) for x in re.split(r"[,\s]+", a.blocks_steps.strip()) if x})
         except ValueError:
             sys.exit("plan: --blocks-steps takes step numbers, e.g. 1,6,7")
-    if a.holds_all is not None and (a.blocks or bsteps):
+    if a.holds_all is not None and (a.blocks or bsteps or bsteps == []):
         sys.exit("plan: --blocks names the part that waits; --holds-all makes everything wait: pass one")
     if a.holds_all is not None and len(a.holds_all.strip()) < HOLDS_ALL_MIN:
         sys.exit("plan: --holds-all must say why nothing else in the entry can move without the answer, in at least "
                  "%d characters (otherwise pass --blocks: only what needs the answer waits)" % HOLDS_ALL_MIN)
     with transaction() as (d, st):
         e = entry(d, a.id)
-        if e.get("status") not in ("running", "waiting_user"):
+        if e.get("status") not in ("running", "waiting_user", "held"):
             sys.exit("plan: %s is %s" % (a.id, e.get("status")))
+        held_entry = e.get("status") == "held"     # a held entry stays held; the question is recorded on it
+        if held_entry and a.holds_all is not None:
+            sys.exit("plan: %s is held; a question on it names what it blocks (--blocks), not --holds-all" % a.id)
         again = [(o, x) for o, x in answered_asks(d) if overlap(x["ask"], a.ask) or overlap(a.ask, x["ask"])]
         if again:
             o, x = again[0]
@@ -2306,8 +2311,9 @@ def cmd_ask(a):
         t = now().isoformat()
         for k in ("checked_until", "blocks", "blocks_steps", "holds_all"):
             e.pop(k, None)
-        if a.holds_all is None and not bsteps and len(step_keys(e)) > 1:
-            sys.exit("plan: %s has %d next steps (%s): pass --blocks-steps N,N naming the ones the answer holds" % (
+        if a.holds_all is None and bsteps is None and len(step_keys(e)) > 1:
+            sys.exit("plan: %s has %d next steps (%s): pass --blocks-steps N,N naming the ones the answer holds, or "
+                     "--blocks-steps none if it holds none" % (
                 a.id, len(step_keys(e)), ", ".join(str(k) for k in step_keys(e))))
         if a.holds_all is None and bsteps is None:
             bsteps = []   # a lone next step not named: it keeps moving, its prompt names what waits (--blocks)
@@ -2320,7 +2326,8 @@ def cmd_ask(a):
             e.update(status="waiting_user", holds_all=a.holds_all)
             rec["holds_all"] = a.holds_all
         else:
-            e["status"] = "running"
+            if not held_entry:
+                e["status"] = "running"
             if a.blocks:
                 e["blocks"] = rec["blocks"] = a.blocks
             e["blocks_steps"] = rec["blocks_steps"] = bsteps
@@ -2328,8 +2335,8 @@ def cmd_ask(a):
     if e["status"] == "waiting_user":
         print("plan: %s waits on the user from %s (everything: %s)" % (a.id, t, a.holds_all))
     else:
-        print("plan: %s keeps running; question open from %s, waiting on it: %s" % (
-            a.id, t, a.blocks or "not recorded"))
+        print("plan: %s %s; question open from %s, waiting on it: %s" % (
+            a.id, "stays held" if e["status"] == "held" else "keeps running", t, a.blocks or "not recorded"))
         held = e.get("blocks_steps") or []
         for k in step_keys(e):
             print("  step %d %s: %s" % (k, "HELD" if k in held else "moves", (step_text(e, k) or "")[:160]))
@@ -2908,8 +2915,8 @@ def main(argv=None):
         A("--searched", required=True, help="what was read before asking (CLAUDE.md rules, site decisions) and why "
           "none settles it"),
         A("--blocks", help="what in the entry waits on the answer; the rest keeps moving"),
-        A("--blocks-steps", metavar="N,N", help="the next steps (numbers) the answer holds; required when the entry has "
-          "more than one next step"),
+        A("--blocks-steps", metavar="N,N", help="the next steps (numbers) the answer holds, or 'none'; required when "
+          "the entry has more than one next step"),
         A("--holds-all", metavar="WHY", help="the whole entry waits on the user; say why nothing else can move"))
     cmd("design", cmd_design, "record the design of the entry's next job (needed, and passed by the design reviewer, "
         "before any submission)", ID,

@@ -90,3 +90,37 @@ def test_timed_wait_is_waiting(tmp_path):
     r = subprocess.run([sys.executable, os.path.join(REPO, ".claude", "hooks", "plan_check.py")], input="{}", env=env,
                        capture_output=True, text=True)
     assert "agent_redesign is STALLED" not in r.stderr
+
+
+def test_ask_on_held_entry_and_no_step(tmp_path):
+    """plan ask records a question on a held entry (it stays held) and one holding no step (--blocks-steps none) of an
+    entry with several next steps; a running entry's question still needs --blocks-steps."""
+    env = world(tmp_path)
+    p = tmp_path / "plan" / "plan.yaml"
+    d = yaml.safe_load(open(p))
+    for e in d["entries"]:
+        if e["id"] == "agent_redesign":
+            e["status"] = "held"
+            for k in ("ask", "waiting_since", "blocks", "blocks_steps", "holds_all"):
+                e.pop(k, None)
+    yaml.safe_dump(d, open(p, "w"))
+    plan = [sys.executable, os.path.join(REPO, "tools", "plan.py")]
+    r = subprocess.run(plan + ["ask", "agent_redesign", "--ask", "Fix the wait_guard watch regex during the hold?",
+                               "--searched", "CLAUDE.md and site decisions FA: none on repairs during a hold",
+                               "--blocks", "the wait_guard fix only", "--blocks-steps", "none"],
+                       env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    e = next(x for x in yaml.safe_load(open(p))["entries"] if x["id"] == "agent_redesign")
+    assert e["status"] == "held" and e["blocks_steps"] == [] and e["asks"][-1]["blocks"] == "the wait_guard fix only"
+    multi = next((x for x in yaml.safe_load(open(p))["entries"] if x.get("status") == "running"
+                  and isinstance(x.get("next"), dict) and len(x["next"]) > 1 and x["id"] != "agent_redesign"), None)
+    if multi is None:
+        return
+    q = ["--ask", "Is the second figure needed for the memo at all?", "--searched", "docs/results.tex, CLAUDE.md and site decisions FA: none settles it"]
+    r = subprocess.run(plan + ["ask", multi["id"]] + q, env=env, capture_output=True, text=True)
+    assert r.returncode != 0 and "--blocks-steps none" in r.stderr, r.stderr
+    r = subprocess.run(plan + ["ask", multi["id"]] + q + ["--blocks", "the figure", "--blocks-steps", "none"],
+                       env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    e = next(x for x in yaml.safe_load(open(p))["entries"] if x["id"] == multi["id"])
+    assert e["status"] == "running" and e["blocks_steps"] == []
