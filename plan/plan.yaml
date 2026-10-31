@@ -8676,13 +8676,8 @@ entries:
     - quantities correlating with the error and the predicted uncertainty (het sigma) in parallel
   decisions:
   - D233
-  next: 'From the existing step-15/20 zero-shot reads of the 12 catalog_v4 short runs (het and MSE; control, default50, default25;
-    seeds 42, 43) on PP4, EE4, H1-H7c, HD4, HD5: per-event kinematic features (|eta|, pT, pair invariants split final-final
-    and beam-final, partonic |cos theta|, E_min, Delta R, sqrt(s_hat), distance to threshold, boost, nearest s-channel resonance),
-    target features (log|M|^2 level, its probe z-score, its local spread over 10 nearest events) and per-process features
-    (multiplicity, species counts, coupling powers, loop, beams, the probe''s log|M|^2 spread, trained); ranked by within-probe
-    Spearman and binned MI, pooled Spearman and class-level Spearman against |q-t| and sigma; GBT with permutation and grouped
-    importance on held-out classes for the control runs (analysis/catalog_v4/error_correlates.py, CC login node, CPU)'
+  next: 'Step 1 read done (369eaff9; data/error_correlates.json): write-up in docs/results.tex once the notes-editor backlog
+    passes (coordinator, 2026-10-31), then plan done'
   done_when: null
   notes_ref: null
   match: zz_never_*
@@ -8707,7 +8702,6 @@ entries:
       feeds: 'which quantities beyond |eta| and collinearity drive the error and sigma: where catalog_v4''s sampling, features
         or model capacity should go next'
       if:
-      - 'a feature beyond |eta| and y_min ranks above both in both seeds and both losses: reported to Joaquin as the stronger
-        correlate, with its profile, as a candidate for oversampling or an input feature'
-      - '|eta| and y_min stay the strongest, or the error is mostly class level (process features dominate the GBT): reported
-        as such; the class-level drivers named'
+      - 'the write-up passes the notes review: plan done error_correlates --writeup <commit>'
+      - 'Joaquin asks for a follow-up (oversample high-|M|^2 or near-resonance events, or a feature): a new design on this
+        entry'
