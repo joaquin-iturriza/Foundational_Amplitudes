@@ -50,6 +50,23 @@ def test_rows():
     print("[rows] ok")
 
 
+def test_chunk_shares():
+    """f_default 0.5 over chunks [334, 333, 333]: each chunk returns exactly its count (the flat and forward
+    roundings give way to the fixed default rows) and the chunks read the default rows [0, 500) once."""
+    counts = [334, 333, 333]
+    rows = mg.default_share_rows(0.5, counts)
+    assert rows[0][0] == 0 and rows[-1][1] == 500 and all(rows[i][1] == rows[i + 1][0] for i in range(2)), rows
+    pol = {**mg.DEFAULT_SAMPLING, **mg.V4_SAMPLING, "f_default": 0.5}
+    cuts = dict(mg.V4_CUTS["hadronic"])
+    label = lambda ev, s: np.ones(len(ev))
+    for n, (a, b) in zip(counts, rows):
+        D = np.zeros((b - a, 5, 4)); Dsq = np.full(b - a, 100.0)
+        ev, s, me = mg.build_mixture_dataset(n, 30, 6000, [0.0] * 3, [21] * 5, np.random.default_rng(3), cuts, pol,
+                                             label, "log", {}, (D, Dsq))
+        assert len(ev) == len(s) == len(me) == n, (n, len(ev))
+    print("[chunk shares] ok")
+
+
 def test_lhe_runs():
     pp = next(n for n, e in mg.PROCESSES.items() if n.startswith("pp13v4_") and int(e["lhe"].get("n_runs", 1)) > 1)
     k = int(mg.PROCESSES[pp]["lhe"]["n_runs"])
@@ -229,6 +246,7 @@ if __name__ == "__main__":
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     test_partonic_frame()
     test_rows()
+    test_chunk_shares()
     test_lhe_runs()
     test_identity_and_path()
     test_read_and_mixture()

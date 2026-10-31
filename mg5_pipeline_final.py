@@ -3397,13 +3397,19 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
     f_fwd, fwd_cand = float(pol.get("f_fwd", 0.0)), float(pol.get("fwd_cand", 0.0))
     n_flat = int(round(pol["f_flat"] * n_events)); n_fwd = int(round(f_fwd * n_events))
     n_def = 0 if default is None else len(default[0])
+    over = n_flat + n_fwd + n_def - n_events
+    if n_def and 0 < over <= 2:   # rounding of the three shares (default rows fixed by default_share_rows): trim fwd, then flat
+        t = min(over, n_fwd); n_fwd -= t; n_flat -= over - t
     n_bulk = n_events - n_flat - n_fwd - n_def
     if n_bulk < 0:
         raise ValueError(f"mixture shares exceed the pool: flat {n_flat} + forward {n_fwd} + default {n_def} > {n_events}")
     uni = _sqrts_sampler(lo, hi, sqrts_measure, rng)
     log_s = sqrts_measure == "log"
-    ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 0.0, beam_mass)   # bulk
-    me_b = np.asarray(label(ev_b, sq_b), float)
+    if n_bulk:
+        ev_b, sq_b = _candidates(n_bulk, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 0.0, beam_mass)   # bulk
+        me_b = np.asarray(label(ev_b, sq_b), float)
+    else:   # no bulk left (shares fill the chunk): _candidates cannot draw zero
+        ev_b, sq_b, me_b = [], np.zeros(0), np.zeros(0)
     if n_fwd:
         ev_w, sq_w = _candidates(n_fwd, uni, m_finals, pdg_ids, rng, cuts, 0.0, pol["y_lo"], 1.0, beam_mass)
         ev_b = ev_b + ev_w; sq_b = np.concatenate([sq_b, sq_w])
