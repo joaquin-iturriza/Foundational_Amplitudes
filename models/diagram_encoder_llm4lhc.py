@@ -91,19 +91,30 @@ VALID_EDGE_FEATURE_MODES = ("bias", "bias_kv")
 _SELF_CONJUGATE = {21, 22, 23, 25}
 
 
+# MadGraph's one-loop ghosts (82, -82 kept apart: ghost and antighost), the R2/UV
+# pseudo-particles and the Goldstones (250, 251; their antiparticles fold onto them).
+_LOOP_LINES = (82, -82, 9000001, 9000002, 9000003, 9000004, 250, 251)
+
+
 def particle_label_vocab():
     """Signed PDG -> edge label in [0, 30): the SM particles and antiparticles of
     ``particle_ids.PARTICLE_PROPERTIES`` in sorted-PDG order (the same 30 entries as
     their ``particles.json``; only the numbering differs, which a learned embedding
     does not see)."""
     from particle_ids import GLOBAL_PDG_IDX
-    return {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    vocab = {int(pdg): int(i) - 1 for pdg, i in GLOBAL_PDG_IDX.items()}
+    n = len(vocab)
+    for k, pdg in enumerate(_LOOP_LINES):
+        vocab[pdg] = n + k
+    return vocab
 
 
 def _label(pdg, vocab):
     pdg = int(pdg)
     if abs(pdg) in _SELF_CONJUGATE:
         pdg = abs(pdg)
+    if pdg not in vocab and -pdg in vocab and pdg < 0 and -pdg in _LOOP_LINES:
+        pdg = -pdg
     if pdg not in vocab:
         raise KeyError(f"diagram_encoder_llm4lhc: PDG {pdg} not in the particle vocabulary "
                        f"(particle_ids.PARTICLE_PROPERTIES)")
