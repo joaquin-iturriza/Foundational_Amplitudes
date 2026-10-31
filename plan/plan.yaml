@@ -2421,6 +2421,9 @@ entries:
       with 2 steps): keep the 147 new 2->4 pools for (b) though most differ in kind from the held-out families (91 all-fermion,
       33 extra W+W-), or generate closer ones? And delete the empty literal-$SCRATCH/zz_v4_multext folder in the CC checkout?
       (b) proceeds with the 147 unless he answers otherwise.'
+  - at: '2026-10-31T04:24:08+00:00'
+    text: 'a compaction inside the turn of owner acd8bbf4e51c1e6d4 at 2026-10-31T04:22:08.879Z: its brief or scope was too
+      large; narrow the next brief'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
