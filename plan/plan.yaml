@@ -3440,11 +3440,6 @@ entries:
       events with the class''s MadLoop [virt=QCD] standalone (tools/nlo_virtual_pipeline.py, an isolated subprocess per chunk
       as datagen''s kind virt), test on a small ee pool, then generation (about 1.0 core-h of MadEvent, the loop labels measured
       in the probe) and the same HD4 re-read'
-    20: 'Step 20 re-reads running (12 runs, waits on step 20). When they end: read each log whole (V3_AXIS_SKIPPED, TIMEOUT,
-      ZERO_SHOT counts 142 or 1612), extract the reads (mixture_ab.py extract), fill mixture_ab.py HD4_HET with the het reruns
-      and add HD5 to the held-out pooling (step 18 design: pooled default-sampled R over H1-H3 plus the 114, and H5 by axis
-      per step 19), then mixture_ab mixture and het uncertainty (het_uncertainty.py) with the control pairs; measure the het
-      per-probe rate on the cached reader from these logs and set it in short_wall'
     21: 'Step 18 last 4 tree pools: hd_test_e20_aaccx (FA-ccin2p3-6581e775 FA-ccin2p3-e58cb2fe), hd_ddx_dhuxwp__E20 (FA-ccin2p3-62f8cc25,
       queue hd_test_e20_small_runs), hd_test_5body_b (FA-ccin2p3-8f072868 FA-ccin2p3-9d27468a); then check_site_data: 114/114
       test pools, H5 28/28 already'
@@ -6501,12 +6496,6 @@ entries:
       if:
       - 'H5 R within the pooled interval: the pooled read stands'
       - 'H5 R outside it: reported per axis to Joaquin'
-    20:
-      feeds: next 14, the share choice
-      if:
-      - 'all 12 complete: the default-sampled held-out verdict per share (R with widened interval vs 1.05) and the het uncertainty
-        read, to Joaquin'
-      - 'a read times out or skips an axis: read its log for the rate and resubmit at the measured wall, no axis cut'
     21:
       feeds: 'next 18: the default-sampled held-out pools'
       if:
