@@ -4339,6 +4339,13 @@ entries:
       control had too few small runs, detectable KS 0.018 to 0.07 against effects of 0.015 to 0.029); the three held pools
       wait on exactly that question. Replaced by the run-size measurement (20 probe jobs) before any rebuild'
     at: '2026-10-30T04:43:25+00:00'
+  - tried: V100 width probes at --mem=120G (FA-ccin2p3-14f741fe, 22bf7509, 234146d5), cancelled pending
+    why: '1.1 h PENDING (Resources): no V100 node had a free GPU and 120G unallocated (0113: 2 free GPUs, 95G free; 0100:
+      1 GPU, 0.5G); the memmap path cannot replace the in-memory load (it refuses dimensionless_inputs and target_physics_orders,
+      both on in this arm). Resubmitted at 90G: FA-ccin2p3-f907c7dc (w8), 74ac1266 (w16), d1415f2f (w32); an out-of-memory
+      there says the 16x in-memory load does not fit a V100 share, and the H100 probes (1.5 TB nodes, waiting on a GPU only)
+      measure the host need'
+    at: '2026-10-31T23:42:42+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
