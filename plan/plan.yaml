@@ -5361,6 +5361,8 @@ entries:
       in full
     '16': the four mixture arms (6c246603, 1d46b938, 11ad944a, 9c6fc7ab) ending; then job_standalones.sh STANDALONES_MODE=apply
       at 93371175 (both kinds, manifest first)
+    '15': default50 re-reads FA-ccin2p3-8e1cc529, 52efacaf (PP4+EE4); default25 arms 11ad944a, 9c6fc7ab (will TIMEOUT in their
+      cross reads at 2.5 h; their PP4+EE4 re-reads then)
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
