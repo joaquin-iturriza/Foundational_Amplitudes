@@ -144,12 +144,11 @@ entries:
   - D195
   - D199
   next:
-    6: 't-free re-read of the leave-class-out map (design passed 2026-10-31, REREAD=FA-ccin2p3-7ad4b5e3; code 901c0318): running
-      stage 1 on the held-out pools with the ceiling refitted without t (FA-ccin2p3-e1e0b219 seed 42, -febe530d seed 43; target
-      1 h, limit 2 h; dumps to SCRATCH/zz_v4_lco_dump_not) and stage 2 FA-ccin2p3-2c63b5b9 (afterok; t excluded, training
-      pools from the first dump, --same-as checks the dumps are paired). When it ends: the passed rule on the t-free numbers
-      (LCO_CEIL, LCO_MAP, LCO_VERDICT), amend par:v4_lco with them, and on no route the end to the user with the alternatives
-      (capacity, training length, data).'
+    6: 't-free re-read (design passed 2026-10-31, REREAD=FA-ccin2p3-7ad4b5e3; code 6f50c550): chained on CC, dry run FA-ccin2p3-3864f1e7
+      (must read 3 of 3 held-out probes per seed), then stage 1 FA-ccin2p3-b383281f (seed 42) and -11305a34 (seed 43) (218
+      each expected; target 1 h, limit 2 h), then stage 2 FA-ccin2p3-07afff2f. When stage 2 ends: the passed rule on the t-free
+      numbers (LCO_CEIL, LCO_MAP, LCO_VERDICT), amend par:v4_lco, and a no ends the route (to the user with capacity, training
+      length, data).'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
