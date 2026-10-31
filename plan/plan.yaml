@@ -144,14 +144,12 @@ entries:
   - D195
   - D199
   next:
-    6: 'Dipole read (design passed 2026-10-30 22:28): CPU job FA-ccin2p3-3a2a388b running on CC (scripts/job_v4_dipole_residual.sh,
-      analysis/catalog_v4/dipole_residual.py @99ec191c) on the control pair''s re-reads with event indices (FA-ccin2p3-a3a2c475
-      seed 42, -56b985a5 seed 43; all 2742 reads carry idx). When it ends: read its DIPOLE_RESIDUAL lines (site logs) and
-      the per-probe JSONs under $SCRATCH/zz_v4_dipole_62894489 (small; copy home via site run cat, CC disk at 91%); group
-      per cell (5ee, 5bb, 5qg first; cells as loop_levels.py --shape-gap) with the refused count per group beside each median;
-      apply the gate (median r^2 of the target t on log D in the held-out multiplicity pools of 5ee, 5bb, 5qg and over all
-      multiplicity cells; below 0.1: dead end), then the main rule (residual r^2 on log D >= 0.1, >= 2x training, above both
-      placebos E and logF, margins beyond the seed difference and the bootstrap half-range); write up beside par:v4_shape_gap'
+    6: 'Propagator-product read (design recorded 2026-10-31, design reviewer running): when it passes, extend analysis/catalog_v4/dipole_residual.py
+      with the log P column (norm_surrogate.py''s prop from data/diagrams/<probe>.diagrams.json on CC, diagrams weighted by
+      alpha_s^QCD alpha^QED), test it on 5 probes on CC, then one CPU job on CC (4 cores, 1 h limit, scripts/launch_cc_only.sh
+      GPUS=0) over the control pair''s H2 and TR reads; read it with a dipole_gate.py-style per-cell tool. The dipole read
+      before it (FA-ccin2p3-18269717, repaired after FA-ccin2p3-3a2a388b) is a dead end: gate 0.094 < 0.1 over the multiplicity
+      cells, residual r^2 0.005/0.007 at the placebos (analysis/catalog_v4/data/dipole_gate.json @606fbe94)'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1533,13 +1531,12 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     6:
-      feeds: 'the user''s shape priority (D178): whether an input prior from the per-event dipole factor is aimed at the multiplicity
-        gap'
+      feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap (par:v4_shape_gap) in the
+        catalog preprocessing design'
       if:
-      - 'gate fails: dead end for the dipole route; design the propagator-product factor (the surrogates'' other per-event
-        factor)'
-      - 'gate passes and main read yes: design the GPU arm with log D as a per-event input'
-      - 'gate passes, main read no: dead end for this route'
+      - 'gate fails: dead end, design the next multiplicity-gap candidate'
+      - 'gate passes and main read yes: GPU design (data.target_propagators on the control''s short pretraining, two seeds)'
+      - 'gate passes and main read no: dead end'
   step_waits: {}
   owner:
     agent: aaa8b1f043eaa6ee9
