@@ -1,0 +1,38 @@
+{
+ "hd_dbx_bxdddxg": {
+  "core_s_per_event": 0.1355,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 135.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_adxggu": {
+  "core_s_per_event": 0.1093,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 109.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_ddxguz": {
+  "core_s_per_event": 0.2327,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 232.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_addxgz": {
+  "core_s_per_event": 0.0985,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 98.5,
+  "source": "probe logs (lhe_probe kept)"
+ }
+}
