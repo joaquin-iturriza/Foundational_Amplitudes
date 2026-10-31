@@ -5927,7 +5927,7 @@ entries:
       - 'he cuts it: launch his version'
   owner:
     agent: a1260706ea6f103cc
-    state: working
+    state: closed
     since: '2026-10-31T04:06:26+00:00'
     state_at: '2026-10-31T04:37:24+00:00'
     context: 152976
@@ -6284,26 +6284,31 @@ entries:
     text: 'Correction to the previous finding: the mixture prune manifest is /sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/.prune_manifests/mixture_pools_20261031_051555.json.
       The --load check left 18 composed pools (about 0.2 GB) under the CC login node''s /tmp/amp_mix_compose.'
   handoff:
-    state: 'Step 11 DONE (pp bound YES, R 0.388 widened [0.338, 0.446], data/pp_bound.json; dropped from next). All PP4+EE4
-      re-reads COMPLETED (8e1cc529 default50 s42, 7a6a1967 default25 s42, 897aa5d4 default25 s43 = REREAD 9c6fc7ab; 52efacaf
-      extracted earlier). NEXT step 15: (a) site logs -n 3000000 <run> > scratchpad; mixture_ab.py extract <run> <log> PP4
-      and EE4 for 8e1cc529, 7a6a1967, 897aa5d4; (b) mixture_ab.py mixture -> data/mixture_ab.json (verdict; rule fixed in
-      22e39795: GAIN R<=0.90 widened<1 on ALL PP4 (1301) and EE4 (169); NO LOSS pooled 701 H1..H7c widened hi<1.05; winner
-      rule), commit; repo reviewer PASSed 22e39795; (c) delete stored _smixd50_/_smixd25_ pools on CC (~65 GB, Joaquin: compose
-      at load) and check_site_data on both recipes; (d) write up steps 11 and 14 in docs/results.tex with % src/% claim. Partial
-      (not a verdict): pooled held-out R 1.27 [1.14,1.42] default50, 1.22 [1.11,1.36] default25 (both seeds) -> likely LOSS/trade-off;
-      default50 one-seed PP4 all 0.73, EE4 0.43. Step 16: prune FA-ccin2p3-93625c9d (submitted by Joaquin, D216) COMPLETED,
-      log not yet read: report GB freed, /sps use (was 422/512 GB) and manifest; earlier d00ec3e0 refused, nothing deleted,
-      fixed ad00db78 (ee_uug__as130 scan keeps ee_uug_standalone and ee_uug__as130_standalone).'
-    decisions: 'Step-14 GAIN on all PP4 classes as the design literally says (reviewer finding), trained/not-trained reported
-      apart. Control held-out reads (339ec100, 380842ed) predate the in-job physics check: kept as unchecked (extract --allow-unchecked)
-      because arms read same pools with check ok, n_val equal on 701, var_logm2 within arm-to-arm spread; control H logs also
-      hold v3_ probes, filtered (v4_ only). Seeds by geometric mean; class = census_classes.'
-    ruled_out: Raising a running job's SLURM limit. Writing physics blocks into H1..H7c sidecars.
-    running: none (prune 93625c9d and all re-reads COMPLETED, logs to read)
-    files: analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/reads/, analysis/catalog_v4/data/pp_bound.json, tools/pool_physics.py,
-      tests/test_pool_physics.py, scripts/job_standalones.sh, tools/short_wall.py
-    written: '2026-10-31T04:05:34+00:00'
+    state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
+      @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
+      share 0.25 PP4 0.755, EE4 0.413, held 1.225; written up par:v4_pp_bound + par:v4_mixture (614d512c, claims verify).
+      Open question on the entry to Joaquin: which share catalog_v4 carries (none / 0.25 / 0.50 / test 0.10 first). Old steps
+      15/16 done: stored _smixd50/_smixd25 pools deleted under D207 (tools/prune_mixture_pools.py @7510a057, 5472 pools, 53.11
+      GB, manifest /sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/.prune_manifests/mixture_pools_20261031_051555.json);
+      check_site_data --alphas ok on both recipes; mix_compose_check --load composes at load (18 pools ok); standalones prune
+      93625c9d freed 16.42 GB; /sps now 355/512 GB. NEXT 15, het-loss uncertainty read (D220): the four mixture arms (6c246603,
+      1d46b938, 11ad944a, 9c6fc7ab) and the control pair (339ec100, 380842ed) were trained by scripts/job_catalog_v3_short.sh
+      with the MSE loss (its header, line 25: arithmetic-mean MSE, sign head not in the het loss), so they carry NO predicted
+      variance and cannot be re-read for sigma. The only het-loss (sigma head) runs found: Daniel''s catalog pretraining sweep
+      dancat_het_pre (sweep/sweep_config_dancat_het_pre.yaml, best runs/dancat_het_pre/trial_0058 under the CC sweep dir;
+      results.tex ~5724) and its sigma read on held-out processes (par ''The sigma head on the held-out processes'', ~6496:
+      tools/zero_shot_parent.py saves per-event sigma, analysis/catalog_daniel/catalog_sigma_heldout.py): a different catalog,
+      so it does not answer D220 on catalog_v4. Not checked: any other het run on catalog_v4 (grep plan/site runs for het/sigma
+      first). Likely needs het-loss twins of control and arm(s), GPU-h stated before any run, design then design-reviewer.'
+    decisions: Deleted the stored mixture pools under D207 ('no stored mixture pools'), not D209/D216 which cover standalones/v3_prep_explore;
+      pre-delete check showed composed default rows equal the stored ones (max rel 2.3e-7, KS p>=0.14). Trade-off sent to
+      Joaquin as the design requires, no winner chosen.
+    ruled_out: Re-reading the step-14 arms for sigma (MSE-trained, no sigma head).
+    running: none
+    files: analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/mixture_ab.json, analysis/catalog_v4/data/pp_bound.json,
+      analysis/catalog_v4/data/reads/, tools/prune_mixture_pools.py, tools/mix_compose_check.py, mix_compose.py, scripts/job_catalog_v3_short.sh,
+      tools/zero_shot_parent.py, analysis/catalog_daniel/catalog_sigma_heldout.py, docs/results.tex (par:v4_pp_bound, par:v4_mixture)
+    written: '2026-10-31T04:37:50+00:00'
   ask: 'The mixture A/B (D178) is a trade-off: default share 0.50 cuts the error on default-sampled events (PP4 R 0.68 [0.59,
     0.77], EE4 0.40 [0.31, 0.52]) but raises it on the 701 held-out classes (1.27 [1.14, 1.42]); share 0.25: PP4 0.75 [0.67,
     0.85], EE4 0.41 [0.34, 0.53], held out 1.22 [1.11, 1.36]; the pure-default bound is 0.39 on PP4''s trained classes. Which
