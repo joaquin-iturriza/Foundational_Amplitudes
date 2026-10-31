@@ -2084,6 +2084,13 @@ entries:
       AXES), tests/test_dipole_pool_rows.py, tools/zero_shot_parent.py (pool_row), docs/results.tex (par:v4_dipole, par:v4_prop).
       Commits b5173fa7..6abdc895 not yet reviewed by the repo-reviewer.'
     written: '2026-10-31T01:12:20+00:00'
+  findings:
+  - at: '2026-10-31T02:25:32+00:00'
+    text: 'Label leakage passed review: the leave-class-out design (passed 2026-10-31) fed the scored event''s own target
+      t into a map predicting u = q - t, so part of its f (par:v4_lco, 0.147/0.125) may be t read back, not a prior. Neither
+      the design (written by this entry''s owners) nor the design reviewer (two reviews of it) caught it; it was seen only
+      while writing up the result. Repair: the t-free re-read (design recorded 2026-10-31, REREAD=FA-ccin2p3-7ad4b5e3); a
+      checklist line for the design reviewer proposed.'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
