@@ -6015,6 +6015,34 @@ entries:
       results.tex (heterosc, het loss, sigma, pull std, spearman, mixture, default-sampled, smixd), plan.yaml, site decisions
       (D52, D71, D220, D226); Joaquin''s fold-in and default-sampled held-out asks are relayed via the coordinator, not found
       in site decisions (D220 names the mixtures, D226 het as default)'
+  - at: '2026-10-31T05:19:33+00:00'
+    question: 'Step 18 (Joaquin 2026-10-31: the held-out check is against data generated the default way; ''nothing to say
+      about the mixture until I see the right numbers''): do the MSE mixture arms (default share 0.50 / 0.25) and the het
+      arms cost or gain on the held-out classes of H2p5, H7E, H7c when read on MadEvent default-sampled events, as already
+      read for H1-H3 (558 classes)?'
+    prior: 'plan catalog_coverage finding 2026-10-31T04:56 (mixture_ab.py heldout_default @744fad42): H1-H3 on PP4/EE4 default
+      pools, MSE R 0.912 [0.802,1.068] / 0.921 [0.795,1.064] vs catalog-sampled 1.267 / 1.223 on the same classes; docs/results.tex
+      par:v4_mixture (catalog-sampled held-out read, LOSS rule). This differs: the 106 classes of H2p5 (38), H7E (34), H7c
+      (34) with no default pool get one; H5 (28) and H6 (8) wait on pipeline pieces (one-loop labels on Born events; fixed
+      alpha_s 0.13 labels).'
+    measure: 'Per probe zero-shot MSE (tools/zero_shot_parent.py, test split, 2000 events) of each arm and control seed on
+      pools hd_<class> (recipes/catalog_v4_heldout_default_processes.yaml @56635699: MadEvent default, H2p5 pp 13 TeV catalog_v4_pp
+      cards / ee at EE4 energies above the class''s lower edge; H7E pp 20 TeV with dsqrt_shat 6000 / ee 6, 10, 20 TeV; H7c
+      catalog_v4 cards with ptj ptb pta ptl 30), labels at alpha_s(sqrt(s_hat)); R = arm/control per axis and pooled with
+      the seed-spread-widened interval, as mixture_ab.py heldout_default.'
+    check: 'The same R on the 558 H1-H3 classes moved from 1.267 (catalog-sampled) to 0.912 (default-sampled) for the 0.50
+      arm, so the sampling measure moves R on held-out classes by more than the seed spread; generation side: a per-process
+      probe (scripts/job_lhe_probe.sh list, 1000 events each, every e+e- energy) measures kept fraction, time and disk before
+      the queue.'
+    fixed: Every trained run unchanged (eval-only REREAD of 6c246603 1d46b938 11ad944a 9c6fc7ab 339ec100 380842ed and the
+      six het arms); probe count 2000 test events per class; label rule running_sqrt_shat as pp13v4_/ee4_; complete runs of
+      1000 events from one gridpack per energy (par:v4_short_runs).
+    control: control pair v4_dimensionless_muon seeds 42/43 (MSE) and v4_het_control seeds 42/43 (het), read on the same pools
+    seeds: 42, 43 per arm (existing runs)
+    outcome: 'Yes (cost): pooled R >= 1.05 with widened interval above 1 on the new axes; no cost: widened upper end below
+      1.05; else undecided; reported per axis beside the catalog-sampled read of the same classes. Generation itself: 106
+      pools, estimate 13.2 core-h (heldout_default_pools.py @647cfada: H2p5 3.6, H7E 7.62, H7c 7.62 core-h minus overlaps
+      not counted), CPU only.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
