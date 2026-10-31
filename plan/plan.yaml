@@ -5705,6 +5705,32 @@ entries:
       and no post-change correction traces to a dropped push (with fewer than 10 scored post-change tasks the stood-rate comparison
       is undecidable and said so; kept provisionally, re-read at 10). Reverted and recorded as a dead end otherwise. (c) stays
       either way (it repairs lost sections), and its own cost is reported apart.'
+    fix_at: '2026-10-31T00:14:14+00:00'
+    fix: '(1) One change at a time: the keep test compares the live hook WITH its 10k-preview loss against the cut hook with
+      (a) working-on-the-plan dropped for subagents, (b) acting sections on writes only, AND (c) the under-10k repair, which
+      delivers sections the live hook lost (replayed/recorded = 1.286 on the 31 agents). (c) raises what (a)+(b) lower, so
+      the 20 percent test mixes three changes, and (a) and (b) cannot be reverted one by one as next 5 says (''revert that
+      cut''). Fix: keep (c) on both sides of the keep test (before = live sections with full delivery under the 10k split,
+      after = same plus (a)+(b)), report (a) and (b) each against that before, and (c) apart against the truncated live replay.
+      (2) The 10k repair as written loses a section: fa-sweeps-and-hpo alone is 10,855 chars pushed (context_push.sections()
+      today), so ''sections that do not fit wait for the next matching call'' never delivers it, and the fixed field forbids
+      shortening it. State what happens to a single section over the limit (split across calls, or send to claudemd-keeper
+      to shorten as a separate change) and replay it. (3) Replay fidelity not yet shown: push_replay.py --check on the live
+      state gives 17 of 31 agents off by over 5 percent (replayed/recorded 1.286). Most carry persisted-output previews, but
+      e33720085e0f has recorded 42138 > replayed 39121, which a preview cannot explain (likely a re-push after a section edit,
+      keyed by hash, that the replay keys by name only). Run the preview and re-push model and show all 31 within 5 percent
+      before the before/after numbers count. (4) Live check unmatched and unpowered: per-agent replayed push tokens per call
+      over the 31 run from 1.9k to 20.5k (mean 8.3k, sd 4.1k), so ''post-change mean below the before mean'' over an unstated
+      number of different agents on different tasks cannot see a 20 percent (~1.7k) cut: about 20 or more agents per side
+      would be needed, and the before side is deflated by the previews it is about to repair. Fix: make the live check matched,
+      replay each post-change agent''s own transcript through the before and cut hooks and confirm the cut hook reproduces
+      what it recorded within 5 percent; keep context_breakdown/usage_windows per-call numbers as reported context, not a
+      pass test, or state the agent count and the spread they are judged against. (5) Outcome: once (1) and (4) change, restate
+      yes/no per cut ((a), (b) each: kept if its replayed fall is at least X percent of the before and no post-change correction
+      traces to it). Checks that held: question answers next 5 cut 1 and D202 (''study the new agents'' context''); no prior
+      work on pushes in docs/results.tex or site decisions (searched context_push, push, REFERENCE, additionalContext, persisted,
+      skill listing, hook output, reference section; plan show has no dead ends on it); corrections plan (hand read of every
+      post-change correction, stood rate called undecidable under 10 tasks) is adequate.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
