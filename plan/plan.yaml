@@ -6137,6 +6137,46 @@ entries:
       and no are stated; for prior work I searched docs/results.tex for sonnet, haiku, opus, low effort, model trial and reasoning
       effort (nothing), the decisions (D138, D203, D205, D206) and the entry''s evidence (agent_tasks.json), which match the
       design''s prior field.'
+  - at: '2026-10-31T00:57:15+00:00'
+    question: 'Step 4 (D203): on small tool fixes, does Sonnet 5.5 (its default effort) get the job done as often as Opus
+      5.5 at low effort (D138''s model for mechanical steps), and at what cost with rework? Feeds: route small tool fixes
+      to Sonnet, or keep Opus at low effort. Analyses (step 4 named ''tool-fix/analysis tasks'') are not in this set: three
+      of the ten are fixes of analysis code (poolrow, hybridcp, defshare), none is an analysis judged on its conclusions;
+      whether to add analysis tasks with a check that catches a wrong analysis is Joaquin''s call, asked in the report.'
+    prior: 'analysis/agent_redesign/agent_tasks.json (tools/agent_tasks.py, live tasks scored by later corrections): opus-low
+      analyses n=23 all stood at $0.40/task; sonnet analyses n=1 ($0.52), sonnet reviews n=118 all stood $0.36; tool fixes
+      only on opus (n=25, 0.96 stood, $1.87): no sonnet or opus-low tool-fix cell, so undecidable from live data. D138 (opus
+      low for mechanical steps), D203 (run this trial), D205 (TRIAL=model exemption). docs/results.tex: nothing on model choice
+      (searched sonnet, haiku, effort, model trial).'
+    measure: 'tools/model_trial.py at 953fc517. Ten tasks, each a past fix of this repo (commit C) with its own test: the
+      agent gets a worktree worktrees/zz_trial_<task>_<arm> at C^ and a brief stating the defect as it was seen plus what
+      the check calls (names, signatures, returns, written from the check, never its body or the fix; INTERFACE), git history
+      past HEAD and ~/work/FA forbidden, identical text in both arms but the worktree path (model_trial.py brief). Per task
+      and arm: first_pass = C''s test files copied over the agent''s committed work (source-level asserts of zsrole, ordsrc,
+      hybridcp turned into pass: STRIP; that wiring judged in the hand read) and run in .venv-cpu all pass; a failed task
+      is resumed once (SendMessage) with the check''s output, final_pass after that; $ = the agent''s transcript at list price
+      (usage_windows prices, model_trial.py cost), both attempts summed; hand read of every diff and final report (right cause,
+      no collateral edits, wiring present, test added, honest report, no lookup of the fix in history). Per arm: tasks passed
+      first and with rework, hand-read OK, $ per task with rework; per task the paired outcome and the paired cost ratio (median,
+      min, max).'
+    check: 'model_trial.py validate: each of the ten checks fails at C^ and passes at C (analysis/agent_redesign/model_trial_validate.json,
+      10/10; the three stripped checks rerun: model_trial_validate_stripped.json, 3/3). The check accepts a different correct
+      fix: hand-written alternatives with other internals for poolrow (dict lookup over rebuilt permutations) and hybridcp
+      (dict comprehension, no experiment wiring) pass their checks (model_trial.py altcheck, model_trial_alt.json, 2/2). Eight
+      other candidates dropped by the validate rule (emaload, runperm, sizeprobe, ppsidecar, memmask pass at the parent; planwait,
+      statusjson fail at the fix on the laptop; ggh over 15 min).'
+    fixed: Briefs (identical but for the worktree path), subagent type compact-worker (its tools, hooks and rules block),
+      the worktree at C^, one rework resume at most with the same check output format, CPU venv, no jobs; Sonnet at its default
+      effort, Opus with effort low; the tasks chosen before any agent ran, by the validate rule only.
+    control: 'Matched pairs: the same ten tasks in both arms; Opus 5.5 low effort is the reference arm (D138).'
+    seeds: 'One run per task per arm (20 agents, about $30 at list price; no GPU). With 10 pairs the spread of a pass rate
+      near 0.8 is about 0.13, wider than the 0.1 rule: the result is read on paired discordance and stated as indicative,
+      not decided, when it hinges on one task; the paired cost ratio is reported with its range.'
+    outcome: 'Yes (route small tool fixes to Sonnet): Sonnet''s tasks passed with rework within 0.1 of Opus-low''s (at most
+      one task fewer), its hand-read OK count within one, and its $ per task with rework at most 0.6x Opus-low''s with the
+      median paired ratio also at most 0.6. No: keep Opus at low effort for mechanical steps (D138) and record the trial as
+      a dead end for routing. Either way the per-task results go to Joaquin; a routing change is a CLAUDE.md line he approves;
+      analyses stay as they are until tested.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
