@@ -7012,6 +7012,15 @@ entries:
       3dad72b1 c1461694 219e0935, 16 cores, silent after 2.7 h; left to their self-cut at about 17:45 for the stage line):
       resubmitted at 64 cores one per job with live progress every 10 min (@9b33d461): 765bdd9c hd_ug_ddxguz, 5d4e6872 hd_dbx_bxdddxg,
       1e7f2159 hd_udx_dxguzz, 49120869 hd_uux_addxgz, 926b4f19 hd_udx_adxggu; 8 h limit, target 2 h.'
+  - at: '2026-10-31T16:43:18+00:00'
+    text: 'Zero-shot build cost (profile FA-ccin2p3-6f8f6e98 read whole: 10 probes under cProfile, 55.9 s): OmegaConf.load
+      of the parent''s config.yaml 11 calls 25.3 s (2.3 s each profiled; 0.64 s each on the laptop for the 64 kB config whose
+      data.dataset and data.amp_orders hold 1153 entries each), _build itself 5.1 s (0.51 s each), imports 19.5 s once, TrainingReference
+      4.8 s once. Fix a142d81e/05a48fd7: the config parsed once (to_container, the two 1153-entry lists dropped since the
+      recipe path rewrites them) and created per probe (0.013 s on the laptop against 0.64 s), and probes scored by --workers
+      processes forked after start-up (default one per two CPUs, at most 8); the original path kept as --build load --workers
+      1. A/B job FA-ccin2p3-e2da5118 (scripts/job_zero_shot_timing.sh AB=1, 100 H1 probes of 339ec100, REREAD, 0.67 GPU-h):
+      A load/1 worker, B cached/1, C cached/4 workers, every .npz array of B and C compared exactly with A''s.'
   handoff:
     state: 'Step 18: queue hd_test_measured (106 pools) almost done at 17:32 (346/348 tasks, 105/106 assembled). Running:
       five 250-event run-size probes for the three slow 20 TeV pools (f0b9c35e 0da42a47 5f5ef310 fffbc4e3 f719bbff), five
