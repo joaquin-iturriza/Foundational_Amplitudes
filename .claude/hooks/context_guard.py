@@ -201,8 +201,10 @@ def pending(path, ask=None, steps=None):
         return []
 
 
-def stop_items(inp, ask=None, repo=REPO, steps=None):
-    """Stop: the refusal lines, once per state of the transcript (its size), while a compaction is wanted."""
+def stop_items(inp, ask=None, repo=REPO, steps=None, notes=None):
+    """Stop: the refusal lines, once per state of the transcript (its size), while a compaction is wanted. An omission
+    already refused once never refuses again: when every omission found was refused before, the turn passes and the
+    list goes to `notes` (2026-10-31: the same unclearable list blocked turn after turn)."""
     path = inp.get("transcript_path")
     if inp.get("agent_id") or not path or not os.path.exists(path):
         return []
@@ -218,8 +220,13 @@ def stop_items(inp, ask=None, repo=REPO, steps=None):
     if last.get("size") == size:
         return []                       # this state was checked: never block twice on it
     got = pending(path, ask, steps)
-    json.dump({"size": size, "items": got}, open(checked, "w"))
-    return [INSTR + "\n" + "\n".join("  - " + g for g in got)] if got else []
+    key = lambda g: g.split('" (')[0]   # the kind and the quote; the model's reason varies between calls
+    refused = list(last.get("refused") or [])
+    new = [g for g in got if key(g) not in refused]
+    json.dump({"size": size, "items": got, "refused": refused + [key(g) for g in new]}, open(checked, "w"))
+    if got and not new and notes is not None:
+        notes.append("context guard: refused once already, still open: " + "; ".join(got))
+    return [INSTR + "\n" + "\n".join("  - " + g for g in got)] if new else []
 
 
 def _clear(path):

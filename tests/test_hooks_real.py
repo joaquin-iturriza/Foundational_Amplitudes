@@ -654,6 +654,16 @@ def stop_conditions():
              not c0 and len(c1) == 1 and all(x in c1[0] for x in ("no `plan ask`", "no `site decide`",
                                                                   "no plan step")) and "nowhere" not in c1[0]
              and not c2 and not c3 and not c4 and not c5, (c0, c1, c2, c3, c4, c5))
+    tr2 = tr + ".later"
+    shutil.copy(tr, tr2)
+    open(tr2, "a").write(json.dumps(rec(5, "assistant", "Again.")) + "\n")
+    c6, n6 = sc.context({"transcript_path": tr2}, d, ask=found(miss), steps="")
+    open(tr2, "a").write(json.dumps(rec(6, "assistant", "Joaquin, may I widen the pools?")) + "\n")
+    more = dict(miss, questions=miss["questions"] + [{"quote": "may I widen the pools?", "why": "w"}])
+    c7, _ = sc.context({"transcript_path": tr2}, d, ask=found(more), steps="")
+    scenario("B1: context_guard's Stop branch refuses once per omission: the same omissions at a new transcript "
+             "state pass with a note; a new omission refuses again",
+             not c6 and n6 and "no `plan ask`" in n6[0] and len(c7) == 1 and "widen the pools" in c7[0], (c6, n6, c7))
     sys.path.insert(0, os.path.join(ROOT, ".claude", "hooks"))
     import context_guard as cg
     u, says, recs = cg.window(tr)

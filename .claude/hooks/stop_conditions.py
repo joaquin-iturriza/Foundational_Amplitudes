@@ -87,7 +87,8 @@ def context(inp, repo=REPO, ask=None, steps=None):
         return [], []
     sys.path.insert(0, HOOKS)
     import context_guard
-    return context_guard.stop_items(inp, ask, repo, steps), []
+    notes = []
+    return context_guard.stop_items(inp, ask, repo, steps, notes), notes
 
 
 # ------------------------------------------------------------------ reply
