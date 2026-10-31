@@ -2410,6 +2410,11 @@ entries:
       the design (written by this entry''s owners) nor the design reviewer (two reviews of it) caught it; it was seen only
       while writing up the result. Repair: the t-free re-read (design recorded 2026-10-31, REREAD=FA-ccin2p3-7ad4b5e3); a
       checklist line for the design reviewer proposed.'
+  - at: '2026-10-31T04:21:52+00:00'
+    text: 'Open to Joaquin (asked 2026-10-31 ~05:00, holds nothing; plan ask cannot record a non-blocking question on an entry
+      with 2 steps): keep the 147 new 2->4 pools for (b) though most differ in kind from the held-out families (91 all-fermion,
+      33 extra W+W-), or generate closer ones? And delete the empty literal-$SCRATCH/zz_v4_multext folder in the CC checkout?
+      (b) proceeds with the 147 unless he answers otherwise.'
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
