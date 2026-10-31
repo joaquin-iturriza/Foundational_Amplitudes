@@ -67,3 +67,28 @@ def qperp_logs(P, massive_shat=False, saturate=False, soft=None):
         out += np.log(qk * np.exp(Ls) / (qk + np.exp(Ls)) if saturate else qk)
         alive[np.arange(n), k] = False
     return out
+
+
+def hybrid_cp(P):
+    """c_p of one process (target_physics_hybrid): the mean over its events of Lq - (N - 4) log s_hat, Lq the emission
+    scales (qperp_logs). P: (n, N, 4) momenta, rows 0 and 1 incoming. 0.0 for a 2 -> 2 (Lq = (N - 4) log s_hat)."""
+    pp = np.asarray(P, dtype=np.float64)
+    if pp.shape[1] <= 4:
+        return 0.0
+    q = pp[:, 0] + pp[:, 1]
+    ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
+    return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
+
+
+def hybrid_cps(names, events_of, frozen=None):
+    """c_p per process name. A name in `frozen` keeps that value (the parent's, from the frozen data stats) and its
+    events are not read; any other is fitted with hybrid_cp(events_of(name)). Returns ({name: c_p}, [reused names])."""
+    frozen = frozen or {}
+    cps, reused = {}, []
+    for name in names:
+        if name in frozen:
+            cps[name] = float(frozen[name])
+            reused.append(name)
+        else:
+            cps[name] = hybrid_cp(events_of(name))
+    return cps, reused

@@ -1519,11 +1519,13 @@ class AmplitudeExperiment(BaseExperiment):
         # data.preprocess_per_dataset (default False = global).
         per_dataset = bool(self.cfg.data.get("preprocess_per_dataset", False))
 
+        _frozen_stats = None
         _dms_frozen = None   # dimensionless_inputs: the mass column's (mean, std), the parent's when stats are frozen
         if stats_src is not None:
             with open(stats_src) as f:
                 stats = json.load(f)
             _dms_frozen = stats.get("dimless_mass_stats")
+            _frozen_stats = stats
             mom_div    = float(stats["mom_div"])
             mom_mean   = float(stats["mom_mean"])
             mom_std    = float(stats["mom_std"])
@@ -1873,10 +1875,17 @@ class AmplitudeExperiment(BaseExperiment):
             if bool(self.cfg.data.get("target_physics_hybrid", False)):
                 assert str(self.cfg.data.get("target_physics_dim_ref", "shat")) == "shat", \
                     "target_physics_hybrid: the s_hat reference (target_physics_dim_ref=shat) plus the constant"
-                for name in names:
+                from physics_scales import hybrid_cps
+
+                def _cp_events(name):
                     src = next(((r, name) for r in ("train", "val", "test") if (r, name) in store), None)
                     assert src is not None, f"target_physics_hybrid: no events of {name} to fit its constant on"
-                    self._phys_cp[name] = self._physics_hybrid_cp(_phys(store[src]))
+                    return _phys(store[src])
+                # a process the frozen stats already carry keeps the parent's c_p (its events are not read)
+                self._phys_cp, _cp_reused = hybrid_cps(
+                    names, _cp_events, frozen=(_frozen_stats.get("target_physics_hybrid_cp") if _frozen_stats else None))
+                if _cp_reused:
+                    LOGGER.info(f"target_physics_hybrid: c_p of {len(_cp_reused)} processes read from the frozen stats")
                 _cps = np.array(list(self._phys_cp.values()))
                 LOGGER.info(f"target_physics_hybrid ON: c_p for {len(_cps)} processes, median {np.median(_cps):.3g}, "
                             f"5-95% {np.percentile(_cps, 5):.3g} to {np.percentile(_cps, 95):.3g}")
@@ -2384,11 +2393,8 @@ class AmplitudeExperiment(BaseExperiment):
         design; analysis/catalog_v3/prep_level.py): c_p = the mean over its events of Lq - (N - 4) log s_hat, Lq the
         emission scales (physics_scales.qperp_logs). The s_hat target plus c_p keeps the s_hat target's shape within
         the process and takes the emission-scale target's class mean. Momenta only, no amplitude; s0 cancels."""
-        from physics_scales import qperp_logs
-        pp = np.asarray(mom_phys, dtype=np.float64)
-        q = pp[:, 0] + pp[:, 1]
-        ls = np.log(np.abs(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)))
-        return float(np.mean(qperp_logs(pp) - (pp.shape[1] - 4) * ls))
+        from physics_scales import hybrid_cp
+        return hybrid_cp(mom_phys)
 
     def _orders_of(self, name):
         """[L_QCD, L_EW, alpha_s power, alpha power] of a process: the resolved data.amp_orders entry, the same vector
