@@ -12,4 +12,6 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
-python recipes/gen_catalog_v3.py --check --workers "${SLURM_CPUS_PER_TASK:-16}" "$@"
+# CENSUS_ARGS: extra arguments through site submit --env (it passes no positional ones), e.g. the multiplicity
+# extension's candidates: CENSUS_ARGS="--cands recipes/catalog_v4_multext_candidates.json --out <path>"
+python recipes/gen_catalog_v3.py --check --workers "${SLURM_CPUS_PER_TASK:-16}" ${CENSUS_ARGS:-} "$@"
