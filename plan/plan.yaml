@@ -5621,6 +5621,17 @@ entries:
       if the fixed part fell by roughly the CLAUDE.md cut and other sources (tool results, hook pushes, messages) grew by
       about as much, or if the cut never reached the agents'' fixed part; not explained if the fixed part fell and nothing
       grew yet context stayed the same (then the context figure is wrong and is re-measured).'
+    passed_at: '2026-10-31T00:00:00+00:00'
+    reviewer: 'Re-check after FIX. Window rule now checked on data: the 429s ''resets 7:30am'' (2026-10-29T06:19Z) and ''resets
+      7pm'' (17:13Z) Paris = 06:30 and 18:00 UTC match the first-call chain (starts 01:31 and 13:08 UTC), not the floored
+      hour (06:00), so the readings 5% at 16:54:25Z and 28% at 19:37:53Z share the window from 14:50:58Z; the 23% step (+-4%)
+      calibrates, tested on the 5% from window start and the 100% hits within 20%, 2% step only a +-50% bound. All models
+      present priced. Small models: scorable tasks ending before 2026-10-29: Sonnet 5.5 91 + Sonnet 5 28, Opus 5.5 376, Haiku
+      5 (undecidable, said); cells under 10 undecidable with a matched trial; effort field present in the launch calls; size
+      from brief length, 48 h censoring handled; decision rule stated (note: Joaquin''s words are ''most of the time, OR fixing
+      the mistake is cheaper'', the report must show the rework-inclusive cost branch on its own too). Prior: D138, D173-D175,
+      the plugin token test and usage_report.py now named. Terms searched: token, 5-hour, five hour, usage window, sonnet,
+      haiku, small model, context breakdown, usage meter, effort (results.tex, plan show, site decisions).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
