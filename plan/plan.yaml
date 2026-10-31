@@ -6679,6 +6679,12 @@ entries:
     units: null
     start: '2026-10-31T22:25:30+00:00'
     at: '2026-10-31T22:25:30+00:00'
+  - batch: long_runs_width_probe
+    wall_h: 1.0
+    jobs: 6
+    units: null
+    start: '2026-10-31T22:34:54+00:00'
+    at: '2026-10-31T22:34:54+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
