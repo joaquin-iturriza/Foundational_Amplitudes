@@ -73,13 +73,29 @@ GAIN, LOSS = 0.90, 1.05
 # (its sigma_stage parent; mu frozen there, so mu is the best checkpoint by val_loss_no_reg). The four share arms were
 # cut by their limit inside PP4 (772/1055 of 1301 for 466656b2/f0156d88, 908/1129 for 9897833d/df858d33) before EE4:
 # those reads wait on their eval-only REREAD (plan step 20) and are reported missing until then
-MIX_HET = {"default50": {r: ("FA-ccin2p3-466656b2", "FA-ccin2p3-9897833d") for r in ("PP4", "EE4", "held")},
-           "default25": {r: ("FA-ccin2p3-f0156d88", "FA-ccin2p3-df858d33") for r in ("PP4", "EE4", "held")},
+# Their PP4 and EE4 come from the step-20 eval-only REREADs (ead54b75 7c131715, 9538e607 ed96b552: 1301 and 169 probes)
+MIX_HET = {"default50": {"PP4": ("FA-ccin2p3-ead54b75", "FA-ccin2p3-7c131715"),     # REREAD 466656b2, 9897833d
+                         "EE4": ("FA-ccin2p3-ead54b75", "FA-ccin2p3-7c131715"),
+                         "held": ("FA-ccin2p3-466656b2", "FA-ccin2p3-9897833d")},
+           "default25": {"PP4": ("FA-ccin2p3-9538e607", "FA-ccin2p3-ed96b552"),     # REREAD f0156d88, df858d33
+                         "EE4": ("FA-ccin2p3-9538e607", "FA-ccin2p3-ed96b552"),
+                         "held": ("FA-ccin2p3-f0156d88", "FA-ccin2p3-df858d33")},
            "control": {r: ("FA-ccin2p3-87ea24d0", "FA-ccin2p3-321a3de2") for r in ("PP4", "EE4", "held")}}
-# the HD4 eval-only REREADs of the het runs (step 18's 114 default-sampled held-out pools; plan step 20), (seed 42, seed
-# 43) per arm, filled when they are submitted; until then the default-sampled held-out read is H1-H3's PP4/EE4 probes
-# only and mixture --het reports itself incomplete
-HD4_HET = {}
+# the default-sampled held-out pools beyond H1-H3's PP4/EE4 probes (plan steps 18-20; D227: the held-out check is on
+# events generated the default way): HD4, the 114 tree classes of H2p5 38, H6 8, H7E 34, H7c 34
+# (recipes/catalog_v4_heldout_default_test.yaml), and HD5, the 28 one-loop classes of H5 (MadEvent Born events labelled
+# by the class's MadLoop, recipes/catalog_v4_heldout_default_H5_test.yaml); the step-20 eval-only REREADs, (seed 42,
+# seed 43) per arm. The MSE control's HD5 is its HD5-only re-read after the H5 physics-check fix 311380bf (its first
+# step-20 read refused all 28)
+HD4_HET = {"default50": ("FA-ccin2p3-ead54b75", "FA-ccin2p3-7c131715"),
+           "default25": ("FA-ccin2p3-9538e607", "FA-ccin2p3-ed96b552"),
+           "control": ("FA-ccin2p3-87aeabca", "FA-ccin2p3-53b9ed56")}
+HD5_HET = dict(HD4_HET)
+HD4_MSE = {"default50": ("FA-ccin2p3-58631ca5", "FA-ccin2p3-698c1a0b"),
+           "default25": ("FA-ccin2p3-4dca09e5", "FA-ccin2p3-926dea24"),
+           "control": ("FA-ccin2p3-9512cac2", "FA-ccin2p3-783892e6")}
+HD5_MSE = dict(HD4_MSE, control=("FA-ccin2p3-c37a4b26", "FA-ccin2p3-a1ea15aa"))
+DEFAULT_EXTRA = {False: {"HD4": HD4_MSE, "HD5": HD5_MSE}, True: {"HD4": HD4_HET, "HD5": HD5_HET}}
 # The blow-up check (CLAUDE.md: a run that blows up is listed apart with where it blew up, never dropped). Every read
 # above is made at its training run's best checkpoint; an eval-only REREAD reads its parent's, so the check is on the
 # training run (TRAINED_BY; a run not listed trained itself). The validation curve (val_loss_no_reg of each "Val loss"
@@ -100,7 +116,15 @@ TRAINED_BY = {"FA-ccin2p3-a152d7d0": "FA-ccin2p3-afc96598", "FA-ccin2p3-a01ad665
               "FA-ccin2p3-8e1cc529": "FA-ccin2p3-6c246603", "FA-ccin2p3-52efacaf": "FA-ccin2p3-1d46b938",
               "FA-ccin2p3-7a6a1967": "FA-ccin2p3-11ad944a", "FA-ccin2p3-897aa5d4": "FA-ccin2p3-9c6fc7ab",
               "FA-ccin2p3-04253ff7": "FA-ccin2p3-339ec100", "FA-ccin2p3-e7e32847": "FA-ccin2p3-380842ed",
-              "FA-ccin2p3-c1863adf": "FA-ccin2p3-339ec100", "FA-ccin2p3-def11c5c": "FA-ccin2p3-380842ed"}
+              "FA-ccin2p3-c1863adf": "FA-ccin2p3-339ec100", "FA-ccin2p3-def11c5c": "FA-ccin2p3-380842ed",
+              # the step-20 REREADs
+              "FA-ccin2p3-9512cac2": "FA-ccin2p3-339ec100", "FA-ccin2p3-783892e6": "FA-ccin2p3-380842ed",
+              "FA-ccin2p3-c37a4b26": "FA-ccin2p3-339ec100", "FA-ccin2p3-a1ea15aa": "FA-ccin2p3-380842ed",
+              "FA-ccin2p3-58631ca5": "FA-ccin2p3-6c246603", "FA-ccin2p3-698c1a0b": "FA-ccin2p3-1d46b938",
+              "FA-ccin2p3-4dca09e5": "FA-ccin2p3-11ad944a", "FA-ccin2p3-926dea24": "FA-ccin2p3-9c6fc7ab",
+              "FA-ccin2p3-87aeabca": "FA-ccin2p3-87ea24d0", "FA-ccin2p3-53b9ed56": "FA-ccin2p3-321a3de2",
+              "FA-ccin2p3-ead54b75": "FA-ccin2p3-466656b2", "FA-ccin2p3-7c131715": "FA-ccin2p3-9897833d",
+              "FA-ccin2p3-9538e607": "FA-ccin2p3-f0156d88", "FA-ccin2p3-ed96b552": "FA-ccin2p3-df858d33"}
 
 
 def val(run, log):
@@ -351,9 +375,9 @@ def mixture(partial=False, het=False):
     out = {"design": design, "runs": table, "missing_reads": missing, "probes_missing": {},
            "rule": f"GAIN R <= {GAIN} with the widened interval below 1 on PP4 (all classes) and EE4 (all); NO LOSS "
                    f"the pooled held-out widened upper end below {LOSS}; LOSS pooled R >= {LOSS} with the widened "
-                   f"interval above 1; WIN = GAIN and NO LOSS" + (
-                       "; het: the held-out cost on default-sampled events (held_default: the PP4/EE4 probes of the "
-                       "held-out classes, and HD4 once read), the catalog-sampled read (held) beside" if het else ""),
+                   f"interval above 1; WIN = GAIN and NO LOSS; the held-out cost on default-sampled events (D227; "
+                   f"held_default: the PP4/EE4 probes of the held-out classes, HD4 and HD5), the catalog-sampled "
+                   f"read (held) beside",
            "shares": {}}
     for a in ("default50", "default25"):
         res = {}
@@ -378,16 +402,16 @@ def mixture(partial=False, het=False):
             out["shares"][a] = res
             continue
         pp, ee, h = res["PP4"]["all"], res["EE4"]["all"], res["held"]["pooled"]
-        if het:
-            # the design (04:56) and D227: the cost is read on default-sampled held-out events, the catalog-sampled
-            # held-out read (res["held"]) beside it as information
-            hd, _ = _held_default(reads, a, cls, _held_axes(cls))
-            res["held_default"] = hd
-            h = hd.get("pooled")
-            if h is None:
-                res.update(gain=None, cost=None, wins=None)
-                out["shares"][a] = res
-                continue
+        # D227 (Joaquin 2026-10-31: the check is against data generated the default way) and steps 17-20: the cost
+        # is read on the default-sampled held-out events (H1-H3's PP4/EE4 probes, HD4, HD5: 700 classes), MSE and
+        # het alike; the catalog-sampled held-out read (res["held"]) beside it as information
+        hd, _ = _held_default(reads, a, cls, _held_axes(cls), DEFAULT_EXTRA[het])
+        res["held_default"] = hd
+        h = hd.get("pooled")
+        if h is None or hd["default_missing"]:
+            res.update(gain=None, cost=None, wins=None)
+            out["shares"][a] = res
+            continue
         gain = all(x["R"] <= GAIN and x["widened"][1] < 1 for x in (pp, ee))
         if h["widened"][1] < LOSS:
             cost = "NO LOSS"
@@ -411,14 +435,15 @@ def mixture(partial=False, het=False):
         v = "trade-off"
     out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs])
     complete = not missing and not out["probes_missing"] and not out["blowups"]["flagged"]
-    if het:
-        # the default-sampled held-out pool is complete only with HD4 (step 18's 114 classes) read on every side
-        hd_missing = [f"{a} HD4" for a in table if not HD4_HET.get(a)] + \
-            [f"{a} HD4 {run}" for a, runs in HD4_HET.items() for run in runs if read_of(run, "HD4") is None]
-        out["held_default_missing"] = hd_missing
-        out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs] +
-                                 [run for runs in HD4_HET.values() for run in runs])
-        complete = complete and not hd_missing and not out["blowups"]["flagged"]
+    # the default-sampled held-out pool is complete only with HD4 and HD5 read on every side
+    ext = DEFAULT_EXTRA[het]
+    hd_missing = [f"{a} {ax}" for ax, tab in ext.items() for a in table if not tab.get(a)] + \
+        [f"{a} {ax} {run}" for ax, tab in ext.items() for a, runs in tab.items() for run in runs
+         if read_of(run, ax) is None]
+    out["held_default_missing"] = hd_missing
+    out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs] +
+                             [run for tab in ext.values() for runs in tab.values() for run in runs])
+    complete = complete and not hd_missing and not out["blowups"]["flagged"]
     if partial and not het:
         out["verdict_if_complete"] = v if not missing else None
         out["would_be"] = v
@@ -473,22 +498,25 @@ def _held_axes(cls):
     return ax_of
 
 
-def _held_default(reads, a, cls, ax_of, hd4=None):
+def _held_default(reads, a, cls, ax_of, extra):
     """R of arm a over the control on the default-sampled events of the held-out classes: the PP4/EE4 probes whose
-    class is held out, plus HD4 (hd4 = {arm: (run 42, run 43)}, the het default HD4_HET) where read; per axis and
-    pooled, with how many probes the control has and how many were read on every side"""
-    hd4 = HD4_HET if hd4 is None else hd4
+    class is held out, plus the default-sampled held-out pools of `extra` ({"HD4": {arm: (run 42, run 43)}, "HD5":
+    ...}, DEFAULT_EXTRA) where all four seeds are read; per axis and pooled, with how many probes the control has and
+    how many were read on every side"""
     tag = lambda r, d: {(r, k): x for k, x in (d or {}).items()}
     arm, ctl, c42, c43 = {}, {}, {}, {}
     srcs = [(r, reads[a][r], reads["control"][r]) for r in ("PP4", "EE4")]
-    hd4_missing = [f"{x} HD4" for x in (a, "control") if not hd4.get(x)]
-    if not hd4_missing:
-        ap = tuple(read_of(x, "HD4") for x in hd4[a])
-        cp = tuple(read_of(x, "HD4") for x in hd4["control"])
-        hd4_missing = [f"{x} HD4 {run}" for x, runs, rd in ((a, hd4[a], ap), ("control", hd4["control"], cp))
-                       for run, y in zip(runs, rd) if y is None]
-        if not hd4_missing:                   # HD4 only with all four seeds read, never on one seed
-            srcs.append(("HD4", ap, cp))
+    hd4_missing = []
+    for ax, tab in extra.items():
+        miss = [f"{x} {ax}" for x in (a, "control") if not tab.get(x)]
+        if not miss:
+            ap = tuple(read_of(x, ax) for x in tab[a])
+            cp = tuple(read_of(x, ax) for x in tab["control"])
+            miss = [f"{x} {ax} {run}" for x, runs, rd in ((a, tab[a], ap), ("control", tab["control"], cp))
+                    for run, y in zip(runs, rd) if y is None]
+            if not miss:                      # only with all four seeds read, never on one seed
+                srcs.append((ax, ap, cp))
+        hd4_missing += miss
     used = []
     for r, ap, cp in srcs:
         if any(x is None for x in cp):
@@ -498,7 +526,7 @@ def _held_default(reads, a, cls, ax_of, hd4=None):
         c42.update(tag(r, cp[0])); c43.update(tag(r, cp[1]))
     held_ctl = [k for k in ctl if cls(k[1]) in ax_of]
     keys = sorted((k for k in set(arm) & set(ctl) if cls(k[1]) in ax_of), key=str)
-    res = {"sources": used, "hd4_missing": hd4_missing, "n_probes_control": len(held_ctl), "n_probes_read": len(keys),
+    res = {"sources": used, "default_missing": hd4_missing, "n_probes_control": len(held_ctl), "n_probes_read": len(keys),
            "probes_missing": sorted(str(k) for k in set(held_ctl) - set(keys))[:20]}
     if keys:
         res["pooled"] = compare(arm, ctl, c42, c43, keys, cls)
@@ -530,9 +558,7 @@ def heldout_default(het=False):
            "plan catalog_coverage step 14, REREAD on default-sampled held-out events",
            "runs": table, "missing_reads": missing, "shares": {}}
     for a in ("default50", "default25"):
-        d, keys = _held_default(reads, a, cls, ax_of, None if het else {})
-        if not het:          # the MSE file's layout as written at 744fad42
-            d = {k: v for k, v in d.items() if k in ("pooled",) + HELD}
+        d, keys = _held_default(reads, a, cls, ax_of, DEFAULT_EXTRA[het])
         res = {"default": d}
         have = {cls(k[1]) for k in keys}
         harm, hctl = side(reads[a]["held"]), side(reads["control"]["held"])
@@ -548,7 +574,7 @@ def heldout_default(het=False):
         res["axes_without_default_pool"] = sorted({ax for c, ax in ax_of.items() if c not in pooled})
         out["shares"][a] = res
     out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs] +
-                             ([run for runs in HD4_HET.values() for run in runs] if het else []))
+                             [run for tab in DEFAULT_EXTRA[het].values() for runs in tab.values() for run in runs])
     name = "mixture_heldout_default_het.json" if het else "mixture_heldout_default.json"
     json.dump(out, open(os.path.join(DATA, name), "w"), indent=1)
     print(json.dumps(out))

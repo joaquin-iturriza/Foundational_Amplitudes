@@ -28,7 +28,8 @@ binned in deciles of the read (edges from control seed 42's events of the same r
 s, RMSE, and the same on per-probe normalised values (s over its probe's median s, |q - t| over its probe's RMSE;
 information: it takes the class mix out of the bins).
 Read groups: PP4 and EE4 each split into trained classes (recipes/catalog_v4_train.yaml) and not trained; held-out
-H1..H7c pooled and per axis.
+H1..H7c pooled and per axis (catalog-sampled); held_default, the default-sampled held-out pools HD4 (114 tree classes)
+and HD5 (28 one-loop classes) of the step-20 REREADs, pooled and per pool, rule B on it beside (D227).
 
 The summary (laptop), measures and rules of the design, fixed before the read, per run; a verdict on the control pair
 (v4_het_control, both seeds), the share arms reported beside (information; their reads in hand only, the missing ones
@@ -55,8 +56,11 @@ from mixture_ab import HELD, MIX_HET, blowups, class_of   # noqa: E402
 RUNS = {"FA-ccin2p3-87ea24d0": ("v4_het_control", 42), "FA-ccin2p3-321a3de2": ("v4_het_control_seed2", 43),
         "FA-ccin2p3-466656b2": ("v4_het_default50", 42), "FA-ccin2p3-9897833d": ("v4_het_default50_seed2", 43),
         "FA-ccin2p3-f0156d88": ("v4_het_default25", 42), "FA-ccin2p3-df858d33": ("v4_het_default25_seed2", 43)}
-ARMS = {a: MIX_HET[a]["PP4"] for a in ("control", "default50", "default25")}
-AXES = ("PP4", "EE4") + HELD
+# an arm's reads are its job folder's (the step-20 eval-only REREADs wrote PP4, EE4, HD4 and HD5 there from the same
+# parent), keyed by the training run
+ARMS = {a: MIX_HET[a]["held"] for a in ("control", "default50", "default25")}
+DEFAULT_HELD = ("HD4", "HD5")       # the default-sampled held-out pools (mixture_ab.DEFAULT_EXTRA), read held_default
+AXES = ("PP4", "EE4") + HELD + DEFAULT_HELD
 REF = "FA-ccin2p3-87ea24d0"          # the decile edges: control seed 42's events of each read group
 YES_A, YES_W, NO_A, NO_W = 0.5, 0.3, 0.3, 0.15
 PULL_MAX, COVER_MIN = 3.0, 0.4
@@ -141,7 +145,7 @@ def run(workers, runs=None):
             dd = os.path.join(S, f"zz_v4_short_{arm}", ax)
             if os.path.isdir(dd):
                 tasks += [(run_id, ax, os.path.join(dd, f)) for f in sorted(os.listdir(dd))
-                          if f.endswith(".npz") and (ax in ("PP4", "EE4") or f.startswith("v4_"))]
+                          if f.endswith(".npz") and (ax in ("PP4", "EE4") + DEFAULT_HELD or f.startswith("v4_"))]
     ev, per_class, excluded = {}, {}, {}
     with Pool(workers) as pool:
         for run_id, ax, probe, o in pool.imap_unordered(read_probe, tasks, chunksize=8):
@@ -149,7 +153,7 @@ def run(workers, runs=None):
                 excluded.setdefault(run_id, {})[f"{ax} {probe}"] = o["excluded"]
                 continue
             c = cls(probe)
-            read = ax if ax in ("PP4", "EE4") else "held"
+            read = ax if ax in ("PP4", "EE4") else "held_default" if ax in DEFAULT_HELD else "held"
             per_class.setdefault((run_id, read), {}).setdefault(c, []).append(dict(o, axis=ax, probe=probe))
             if ax in ("PP4", "EE4"):
                 if "eta" in o:
@@ -254,14 +258,20 @@ def summary(path=None, out_dir=None):
             seed = RUNS[run_id][1]
             cr = cls_reads.get(run_id, {})
             ps = {}
-            for read in ("PP4", "EE4", "held"):
+            for read in ("PP4", "EE4", "held", "held_default"):
                 n = raw["n_probes"].get(run_id, {}).get(read, 0)
                 if n < expected.get(read, 0):
                     a["missing"][f"seed{seed} {read}"] = f"{expected[read] - n} of {expected[read]} probes not read"
                 rows = cr.get(read)
                 if not rows:
                     continue
-                if read == "held":
+                if read == "held_default":       # HD4 and HD5 by held-out axis (the class's), pooled
+                    ps["held_default_pooled"] = ranks(list(rows.values()))
+                    for ax in DEFAULT_HELD:
+                        r = [x for x in rows.values() if x["axis"] == ax]
+                        if r:
+                            ps[f"held_default_{ax}"] = ranks(r)
+                elif read == "held":
                     ps["held_pooled"] = ranks(list(rows.values()))
                     for ax in HELD:
                         r = [x for x in rows.values() if x["axis"] == ax]
@@ -286,6 +296,11 @@ def summary(path=None, out_dir=None):
                 both([rule_a(s[k][read]) if read in s.get(k, {}) else None for k in ("seed42", "seed43")])
         verd["B held_pooled"] = "withheld: read incomplete" if part("held_pooled") else \
             both([rule_b(s[k]["held_pooled"]) if "held_pooled" in s.get(k, {}) else None for k in ("seed42", "seed43")])
+        # the same rule on the default-sampled held-out pools HD4 + HD5 (D227: the held-out check on default events)
+        verd["B held_default_pooled"] = "withheld: read incomplete" if any(
+            k.split()[1] == "held_default" for k in a["missing"]) else \
+            both([rule_b(s[k]["held_default_pooled"]) if "held_default_pooled" in s.get(k, {}) else None
+                  for k in ("seed42", "seed43")])
         bu = sorted(r for r in pair if r in flagged)
         if bu:                    # a blown-up or unchecked run: its numbers stay above, listed apart in blowups
             verd = {k: f"withheld: {', '.join(bu)} blew up or unchecked (blowups); on the reads: {v}"
