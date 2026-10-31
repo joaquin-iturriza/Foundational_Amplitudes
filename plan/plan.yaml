@@ -6920,6 +6920,17 @@ entries:
       probes in 3750 s, 1.57 h. Cause of the extra time: the zero-shot reads at about 1.6-2.4 s per probe with one experiment
       (data load, model build, weight load) built per probe, over 1500-3300 probes (the two pp sets), and in the het share
       arms 70 min of composition at load. Fix in hand: batched reads (one build per held-out set), next item.'
+  - at: '2026-10-31T15:45:51+00:00'
+    text: 'Zero-shot read cost per probe (tools/probe_stage_split.py @8e212f9f, mean over each job''s probes but the first,
+      from second-resolution log timestamps): data 0.17-0.34 s, model build 0.04-0.09 s, module-name listing plus the parent
+      checkpoint''s load 0.07-0.34 s, and 0.58-2.09 s after the fine-tune load (the second weight load, physics check, forward,
+      scoring, .npz; no timestamped line inside), totals 0.96 s (339ec100, H100), 1.74-1.84 s (6c246603, afc96598, V100),
+      2.14-2.46 s (het 87ea24d0, 466656b2). The build and weight loads the batching targeted are 0.3-0.5 s of it. Change @8e212f9f:
+      the parent checkpoint is read from disk once per call (deep copy per probe; tests/test_zero_shot_batched.py: three probes
+      give identical outputs with a read each and with one read), the module listing is off in the reader (cfg.log_module_names),
+      and each ZERO_SHOT record carries s_stages, so the next read splits the 0.6-2.1 s. One experiment for all probes of
+      an axis was not built: the model''s setup depends on the probe''s data (diagram sets, context rows, pair-bias specs,
+      momentum scale). tools/short_wall.py S_PROBE stays 1.6 s until a read under the change measures it.'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
