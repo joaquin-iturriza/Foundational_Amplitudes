@@ -176,6 +176,22 @@ def log_prop(mom, pdg, sidecar):
     return np.log(np.maximum(tot, 1e-300))
 
 
+def eta2(u, x, bins=20):
+    """The share of var(u) explained by u's mean in `bins` equal-count bins of x (a flexible, monotone-free fit)."""
+    if np.std(x) == 0 or np.var(u) == 0:
+        return 0.0
+    b = np.minimum((np.argsort(np.argsort(x)) * bins) // len(x), bins - 1)
+    m = np.bincount(b, u, bins) / np.maximum(np.bincount(b, None, bins), 1)
+    return float(np.var(m[b]) / np.var(u))
+
+
+def tail_share(u, x):
+    """(share of sum u^2 in the bottom decile of x, in the top decile); 0.10 each when the error is flat in x."""
+    lo, hi = np.quantile(x, [0.1, 0.9])
+    tot = float((u ** 2).sum()) or 1.0
+    return float((u[x <= lo] ** 2).sum() / tot), float((u[x >= hi] ** 2).sum() / tot)
+
+
 def r2(u, x):
     if np.std(x) == 0:
         return 0.0
@@ -231,11 +247,20 @@ def main():
                 ok = np.isfinite(logP) & np.isfinite(E) & np.isfinite(logF)
                 if logD is not None:
                     ok &= np.isfinite(logD)
-                rec.update({"n": int(ok.sum()), "var_u": float(np.var(u[ok])), "has_emitter": fx is not None,
-                            "r2_P": r2(u[ok], logP[ok]), "r2_E": r2(u[ok], E[ok]), "r2_F": r2(u[ok], logF[ok]),
-                            "r2_tP": r2(t[ok], logP[ok]), "r2_rawP": r2(raw[ok], logP[ok])})
+                uk, lu2 = u[ok], np.log(np.maximum(u[ok] ** 2, 1e-300))
+                X = {"P": logP[ok], "E": E[ok], "F": logF[ok]}
                 if logD is not None:
-                    rec["r2_D"] = r2(u[ok], logD[ok])
+                    X["D"] = logD[ok]
+                rec.update({"n": int(ok.sum()), "var_u": float(np.var(uk)), "has_emitter": fx is not None,
+                            "r2_tP": r2(t[ok], logP[ok]), "r2_rawP": r2(raw[ok], logP[ok]),
+                            # the ceiling: what one per-event scalar explains of u
+                            "eta2_t": eta2(uk, t[ok]), "eta2_raw": eta2(uk, raw[ok]), "r2_ut": r2(uk, t[ok])})
+                rec["ceiling"] = max(rec["eta2_t"], rec["eta2_raw"])
+                for k, x in X.items():
+                    rec[f"r2_{k}"] = r2(uk, x)          # linear, as the dipole read
+                    rec[f"eta2_{k}"] = eta2(uk, x)      # the mean read
+                    rec[f"r2size_{k}"] = r2(lu2, x)     # the size read: log u^2 on x
+                rec["tail_lo_P"], rec["tail_hi_P"] = tail_share(uk, logP[ok])
                 rows.append(rec)
                 continue
             fx = factors(mom, pdg)
@@ -253,7 +278,8 @@ def main():
     for r in rows:
         if ("r2_P" if a.prop else "r2_D") in r:
             per.setdefault(r["dir"], []).append(r)
-    keys = ("r2_P", "r2_E", "r2_F", "r2_tP", "r2_rawP") if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
+    keys = ("eta2_P", "r2size_P", "ceiling", "r2_tP", "r2_rawP", "eta2_E", "eta2_F", "r2size_E", "r2size_F", "r2_P",
+            "tail_lo_P", "tail_hi_P") if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
     main_k = keys[0]
     rng = np.random.default_rng(0)
 

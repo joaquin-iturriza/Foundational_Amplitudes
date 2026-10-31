@@ -38,3 +38,17 @@ if __name__ == "__main__":
     test_val_and_test_rows()
     test_saved_pool_row_wins()
     print("ok")
+
+
+def test_eta2_and_tail_share():
+    """eta2 sees a mean that depends on x with no linear tilt; tail_share sees an error concentrated at one end."""
+    from analysis.catalog_v4.dipole_residual import eta2, tail_share
+    r = np.random.default_rng(0)
+    x = r.normal(size=4000)
+    u = np.sin(3 * x) + 0.3 * r.normal(size=4000)
+    assert eta2(u, x) > 0.6 and np.corrcoef(u, x)[0, 1] ** 2 < 0.05
+    v = np.where(x > 1.3, 3.0, 0.0) * r.normal(size=4000) + 0.1 * r.normal(size=4000)
+    lo, hi = tail_share(v, x)
+    assert hi > 0.9 and lo < 0.05
+    w = r.normal(size=4000)
+    assert eta2(w, x) < 0.02 and all(0.07 < s < 0.13 for s in tail_share(w, x))
