@@ -198,7 +198,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 207947b5
+    commit: b5173fa7
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -243,6 +243,7 @@ entries:
     - analysis/catalog_v4/data/tree_levels_cc.json
     - analysis/catalog_v4/data/tree_levels_mult.json
     - analysis/catalog_v4/data/tree_levels_mult_cand.json
+    - analysis/catalog_v4/dipole_residual.py
     - analysis/catalog_v4/figs/kshot_level.png
     - analysis/catalog_v4/figs/loop_born.png
     - analysis/catalog_v4/figs/loop_born_events.png
@@ -268,6 +269,7 @@ entries:
     - scripts/job_v4_loop_born.sh
     - sweep/sweep_config_ccin2p3_sign_head_search.yaml
     - tests/test_born_sidecar.py
+    - tests/test_dipole_pool_rows.py
     - tests/test_hybrid_blend.py
     - tests/test_v4_signext.py
     - tests/test_val_total.py
