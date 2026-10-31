@@ -5372,6 +5372,15 @@ entries:
       \ processes (hours at one run per pool, the parts and gridpack queue splits only the\nevent generation, not the integration),\
       \ so a full regeneration is about 1-3 h of wall time (estimate: the integration\nfloor of the gridpack runs was not\
       \ timed)."
+  - at: '2026-10-31T01:01:12+00:00'
+    text: '2026-10-31: (a) The four mixture arms (6c246603, 1d46b938, 11ad944a, 9c6fc7ab) trained on the stored _smixd50_/_smixd25_
+      pools, not on load-time compositions; any later run of the default recipes composes at load and records it in <run_dir>/composed_pools.json
+      (97c43af9; the composed sidecar carries the stored pool''s recipe id, so the run dir is the only trace). (b) Probe-read
+      physics check moved to the pool sidecars (97c43af9, 2efb08ea; D209): reference blocks from each training entry''s stored
+      pool sidecar, backend card only as fallback; a probe with neither is refused; tests/test_pool_physics.py test_reference_from_sidecars.
+      Audit + sidecar-only check on CC: FA-ccin2p3-aab94b13 (EE4 on the control and both mixture recipes; H1..H7c on both
+      mixture recipes). (c) lhe_parts gc --parts deletes part files of built pools [D208]. (d) Regeneration time in results.tex
+      par:v4_regen_time (150117d7): 898 core-h of MadEvent over 3448 pools.'
   handoff:
     state: 'Step 14: the four mixture arms (default50 6c246603, default50_seed2 1d46b938, default25 11ad944a, default25_seed2
       9c6fc7ab) read the stored _smixd pools; control EE4 re-reads FA-ccin2p3-c1863adf (REREAD 339ec100) and def11c5c (REREAD
