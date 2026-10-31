@@ -400,6 +400,17 @@ entries:
       0.006 / 0.008, training 0.001 / 0.002. The 5ee, 5bb, 5qg cells step 6 named first hold no multiplicity pool (all H2
       pools are 6-particle).'
     at: '2026-10-31T00:35:57+00:00'
+  - tried: 'the propagator-product read (CPU, FA-ccin2p3-71a96ca2, dipole_residual.py --prop @d9bfe295; per cell and the design''s
+      rule in dipole_gate.py --prop @6a4b26ac; par:v4_prop @5f15e75b): log P from the diagram sidecars against the control
+      pair''s target and zero-shot residual, 218 held-out multiplicity pools against 647 training pools of the same cells'
+    why: 'between by the design''s rule, no GPU arm: gate 0.106 (both seeds, >= 0.1), ceiling 0.122 / 0.119 held out (training
+      0.036 / 0.041); mean read eta^2(u|log P) 0.042 both seeds, 2.8x training 0.015 and above the placebos (E 0.032 / 0.030,
+      logF 0.028 / 0.030) beyond the margins, but under its bar of half the ceiling (0.061 / 0.059); size read r^2(log u^2,
+      log P) 0.005 / 0.006 under training 0.009. The run used the Higgs width 0.00407 (card 6.382339e-3 since 97c43af9); log
+      P at both widths agrees to r^2 >= 0.9999996 on the 253 pools with an internal Higgs (prop_width_check.py), so the verdict
+      is from 71a96ca2, no re-run. No single per-event quantity tried carries the gap: the held-out residual has 3x the training
+      per-event structure, log P about a third of it, the placebos nearly as much.'
+    at: '2026-10-31T01:09:13+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
