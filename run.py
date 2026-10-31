@@ -8,6 +8,7 @@ import hydra
 import torch
 from omegaconf import OmegaConf, open_dict
 from experiment import AmplitudeExperiment
+from preprocessing import unresolved_amp_trafos
 
 
 def sigma_stage_cfg(cfg):
@@ -24,6 +25,10 @@ def sigma_stage_cfg(cfg):
         s.run_dir = os.path.join(cfg.run_dir, "sigma_stage")
         s.run_name = None
         s.warm_start_idx = None
+        # the run resolved data.amp_trafos in place (its representative, 'signedlog:<s>' once a training pool is
+        # signed); the stage's config.yaml keeps the unresolved base, so a probe read from this dir resolves its own
+        # transform as a fresh run does (tools/zero_shot_parent.py). The stage itself reads the frozen per-pool ones.
+        s.data.amp_trafos = unresolved_amp_trafos(s.data.amp_trafos)
         s.ema = False
         s.fine_tune.pretrained_path = os.path.join(cfg.run_dir, "models", "model_run0_best.pt")
         s.fine_tune.lr_scale = 1.0

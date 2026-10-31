@@ -38,6 +38,7 @@ import siteconf  # noqa: E402
 import pool_physics  # noqa: E402
 from rebuild_run import _build, load_best_weights, scored_split  # noqa: E402
 from multiplicity_extrap import parent_target_standardization  # noqa: E402
+from preprocessing import unresolved_amp_trafos  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--parent", required=True, help="pretraining run dir (config.yaml, data_stats.json, models/)")
@@ -107,6 +108,9 @@ for recipe in a.recipes:
         cfg.data.eval_subsample = a.eval_subsample
         if a.signed_magnitude:
             cfg.data.signed_abslog = True
+        # a het run's sigma_stage/config.yaml written before run.py kept the unresolved base carries the main run's
+        # resolved representative ('signedlog:<s>'), which resolve_amp_trafos would pass through to every probe
+        cfg.data.amp_trafos = unresolved_amp_trafos(cfg.data.amp_trafos)
         # the probe's own target statistics (one process: no pooled or affine fit)
         cfg.data.shared_standardization = False
         cfg.data.affine_multiplicity_std = False

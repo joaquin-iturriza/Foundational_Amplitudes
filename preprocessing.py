@@ -51,6 +51,13 @@ def resolve_amp_trafos(trafos, amplitude, scale_quantile=SIGNEDLOG_QUANTILE, sig
     return [f"{kind}:{s:.6e}" if t == "log" else t for t in trafos]
 
 
+def unresolved_amp_trafos(trafos):
+    """The configured transform list a resolved one came from: 'signedlog[:<s>]' and 'abslog:<s>' back to 'log'
+    (resolve_amp_trafos only ever writes them in place of 'log')."""
+    return [("log" if str(t) == "signedlog" or str(t).startswith(("signedlog:", "abslog:")) else t)
+            for t in trafos] if trafos else trafos
+
+
 def signedlog_scale(fn_str):
     """Scale s of a 'signedlog' / 'signedlog:<s>' transform string (1.0 if absent)."""
     if fn_str == "signedlog":
