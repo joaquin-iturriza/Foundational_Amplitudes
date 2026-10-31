@@ -5695,7 +5695,14 @@ entries:
     - tests/test_context_push.py
     - tools/model_trial.py
     - tools/push_replay.py
-  dead_ends: []
+  dead_ends:
+  - tried: Route small tool fixes to Sonnet 5.5 (default effort) instead of Opus 5.5 at low effort (D203 matched trial, 10
+      past repo fixes, tools/model_trial.py, analysis/agent_redesign/model_trial.json @096b5fe4)
+    why: 'Sonnet did as well (9/10 first pass and 10/10 after one rework in both arms; hand read OK 9/10 each) but cost was
+      not low enough: $1.91 vs $2.88 total, $0.19 vs $0.29 per task with rework, paired cost ratio median 0.654 (min 0.585,
+      max 0.782), against the pre-stated yes rule of <=0.6x total and median. Verdict No, keep Opus low for mechanical steps
+      (D138); indicative (10 pairs); analyses judged on conclusions were not tested'
+    at: '2026-10-31T01:06:49+00:00'
   asks:
   - ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
       effort, same briefs, scored by tools/agent_tasks.py plus a hand read, about $30 at list price?'
