@@ -37,22 +37,23 @@ PY
 T0=$(date +%s)
 if [ -n "$AB" ]; then
     # AB=1: the reader's paths on the same probes, GPU and job: A the original (config re-read per probe, one process),
-    # B the config parsed once (one process), C B with ZS_WORKERS (default 4) processes; each prediction of B and C
-    # compared array by array with A's (ZS_AB_SAME / ZS_AB_DIFF, one ZS_AB summary per path)
-    for P in "A load 1" "B cached 1" "C cached ${ZS_WORKERS:-4}"; do
+    # A2 A again (the GPU forward's own run-to-run difference), B the config parsed once (one process), C B with
+    # ZS_WORKERS (default 4) processes; each prediction of A2, B and C compared array by array with A's (ZS_AB_SAME /
+    # ZS_AB_DIFF, one ZS_AB summary per path, with the largest difference per array)
+    for P in "A load 1" "A2 load 1" "B cached 1" "C cached ${ZS_WORKERS:-4}"; do
         set -- $P; mkdir "$R/pred_$1" || exit 1; T1=$(date +%s)
         python tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred_$1" --split "$SPLIT" --signed-magnitude \
             --build "$2" --workers "$3" "$R"/recipes/*.yaml > "$R/read_$1.log" 2>&1
         rc=$?; echo "ZS_AB_WALL path=$1 build=$2 workers=$3 rc=$rc wall_s=$(( $(date +%s) - T1 ))"
-        grep -E "^(ZS_WORKERS|ZERO_SHOT \{)" "$R/read_$1.log" | sed "s/^/$1 /" | cut -c1-600
+        grep -E "^(ZS_WORKERS|ZERO_SHOT \{)" "$R/read_$1.log" | sed "s/^/$1 /"
         [ "$rc" = 0 ] || { tail -40 "$R/read_$1.log"; echo "RUN_SUMMARY zero_shot_timing rc=$rc stage=read_$1"; exit "$rc"; }
     done
     python - "$R" <<'PY'
 import glob, os, sys
 import numpy as np
 R = sys.argv[1]
-for path in ("B", "C"):
-    same = diff = 0
+for path in ("A2", "B", "C"):
+    same = diff = 0; mx = {}
     for f in sorted(glob.glob(os.path.join(R, "pred_A", "*.npz"))):
         name = os.path.basename(f); g = os.path.join(R, f"pred_{path}", name)
         a = np.load(f); b = np.load(g) if os.path.exists(g) else None
@@ -60,11 +61,14 @@ for path in ("B", "C"):
         for k in ([] if b is None else a.files):
             if k in b.files and not np.array_equal(a[k], b[k]):
                 bad[k] = float(np.max(np.abs(a[k].astype(float) - b[k].astype(float)))) if a[k].shape == b[k].shape and a[k].dtype.kind in "fiub" else "differs"
+        for k, v in bad.items():
+            if isinstance(v, float):
+                mx.setdefault(k, []).append(v)
         if bad:
             diff += 1; print(f"ZS_AB_DIFF {path} {name[:-4]} {bad}")
         else:
             same += 1
-    print(f"ZS_AB path={path} vs=A same={same} diff={diff}")
+    print(f"ZS_AB path={path} vs=A same={same} diff={diff} max={ {k: max(v) for k, v in mx.items()} }")
 PY
     echo "RUN_SUMMARY zero_shot_timing rc=0 probes=$(ls "$R"/pred_A/*.npz | wc -l) wall_s=$(( $(date +%s) - T0 ))"
     exit 0

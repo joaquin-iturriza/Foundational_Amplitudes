@@ -64,10 +64,34 @@ ap.add_argument("--build", choices=("cached", "load"), default=os.environ.get("Z
                 help="the parent's config per probe: cached (parsed once at start-up) or load (re-read per probe, "
                      "the original path, kept for A/B)")
 ap.add_argument("--workers", type=int, default=int(os.environ.get("ZS_WORKERS", "0")),
-                help="probes scored in parallel by this many processes forked after start-up, sharing the GPU "
+                help="probes scored in parallel by this many processes, sharing the GPU "
                      "(0: one per two CPUs of the job, at most 8 and at most one per probe)")
 ap.add_argument("recipes", nargs="+")
 a = ap.parse_args()
+
+
+def _workers():
+    if a.workers > 0:
+        return min(a.workers, len(a.recipes))
+    cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
+    return max(1, min(8, cpus // 2, len(a.recipes)))
+
+
+# the probes are independent: W processes, each this script with --workers 1 on every W-th recipe, share the GPU
+# (spawned, not forked: a CUDA context does not survive a fork). Each record is one flushed line, so the children's
+# lines do not interleave within a line; their order across probes is not kept. Exit 1 if any child failed.
+W = _workers()
+print(f"ZS_WORKERS {W} probes={len(a.recipes)} build={a.build}", flush=True)
+if W > 1:
+    import subprocess
+    _rset = set(a.recipes)
+    _opts = [x for x in sys.argv[1:] if x not in _rset]
+    kids = [subprocess.Popen([sys.executable, os.path.abspath(__file__), *_opts, "--workers", "1", *a.recipes[w::W]])
+            for w in range(W)]
+    bad = [w for w, k in enumerate(kids) if k.wait() != 0]
+    if bad:
+        print(f"ZS_WORKERS failed workers {bad} of {W}", flush=True)
+    sys.exit(1 if bad else 0)
 
 parent = os.path.abspath(a.parent)
 pstats = json.load(open(os.path.join(parent, "data_stats.json")))
@@ -277,41 +301,5 @@ def _read(recipe):
     print("ZERO_SHOT " + json.dumps(rec), flush=True)
 
 
-def _workers():
-    if a.workers > 0:
-        return min(a.workers, len(a.recipes))
-    cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else (os.cpu_count() or 1)
-    return max(1, min(8, cpus // 2, len(a.recipes)))
-
-
-# the probes are independent: W processes forked after the shared start-up (imports, the checkpoint read, the
-# training reference; no CUDA context yet, each child opens its own) score every W-th recipe. Each record is one
-# flushed line, so the children's lines do not interleave within a line; their order across probes is not kept.
-assert not torch.cuda.is_initialized(), "CUDA initialised before the fork"
-W = _workers()
-print(f"ZS_WORKERS {W} probes={len(a.recipes)} build={a.build}", flush=True)
-if W == 1:
-    for _r in a.recipes:
-        _read(_r)
-else:
-    sys.stdout.flush(); sys.stderr.flush()
-    kids = []
-    for w in range(W):
-        pid = os.fork()
-        if pid == 0:
-            rc = 0
-            try:
-                for _r in a.recipes[w::W]:
-                    _read(_r)
-            except BaseException:
-                import traceback
-                traceback.print_exc()
-                rc = 1
-            finally:
-                sys.stdout.flush(); sys.stderr.flush()
-                os._exit(rc)
-        kids.append(pid)
-    bad = [w for w, pid in enumerate(kids) if os.waitstatus_to_exitcode(os.waitpid(pid, 0)[1]) != 0]
-    if bad:
-        print(f"ZS_WORKERS failed workers {bad} of {W}", flush=True)
-        sys.exit(1)
+for _r in a.recipes:
+    _read(_r)
