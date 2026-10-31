@@ -6018,7 +6018,7 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '15': FA-ccin2p3-da21ae07 (het control smoke)
+    '15': FA-ccin2p3-87ea24d0 FA-ccin2p3-321a3de2 FA-ccin2p3-466656b2 FA-ccin2p3-9897833d FA-ccin2p3-f0156d88 FA-ccin2p3-df858d33
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
