@@ -3330,6 +3330,7 @@ entries:
     - FA-ccin2p3-83053084
     - FA-ccin2p3-84bc4800
     - FA-ccin2p3-868ac7a2
+    - FA-ccin2p3-897aa5d4
     - FA-ccin2p3-898378c8
     - FA-ccin2p3-8a2659f4
     - FA-ccin2p3-8a6b3882
@@ -3491,7 +3492,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: c52ab62b
+    commit: 171c2395
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -3786,6 +3787,7 @@ entries:
     - analysis/catalog_v4/figs/short_run_bias_b.png
     - analysis/catalog_v4/figs/short_run_bias_size.png
     - analysis/catalog_v4/mixed_order_fig.py
+    - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/pp_trained_compare.py
     - analysis/catalog_v4/read_validation.py
     - analysis/catalog_v4/v3_delete_manifest.py
