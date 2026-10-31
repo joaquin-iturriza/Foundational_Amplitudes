@@ -8,7 +8,7 @@ networks? CPU only, on the saved step-15/20 zero-shot reads; no new run.
     site run ... aggregate --run <arm> > A_<arm>;  ... gbt --run <arm> --target T > G_<arm>_T;  ... excluded > X
                                                                        (login node, CPU; each under site run's limit)
     python3 analysis/catalog_v4/error_correlates.py combine X A_* G_*   -> data/error_correlates_reads.json.gz
-    python3 analysis/catalog_v4/error_correlates.py summary   -> data/error_correlates.json, figs/error_correlates.{png,pdf}
+    python3 analysis/catalog_v4/error_correlates.py summary   -> data/error_correlates.json, figs/error_correlates_{rank,profile}.{png,pdf}
 
 The reads: per probe <probe>.npz of tools/zero_shot_parent.py --save-dir in $SCRATCH/zz_v4_short_<arm>/<axis>/, with
 per event t (truth log|M|^2), q (the prediction, log|M|^2; het: mu) and, het only, s = sd_c * sigma (log|M|^2), the
@@ -600,14 +600,12 @@ def gbt(arm, loss, ps, target):
 
 # ---------------------------------------------------------------------------------------------------------------------
 # the summary, on the laptop
-LABEL = {"eta_max": r"largest final $|\eta|$", "y_min": r"$\log_{10}\min 2|p_i\cdot p_j|/\hat s$",
-         "y_ff": r"$\log_{10}\min_{\rm ff} 2p_i\cdot p_j/\hat s$", "y_if": r"$\log_{10}\min_{\rm if} 2|p_i\cdot p_j|/\hat s$",
-         "u_fwd": r"$\log_{10}1/(1-|\cos\theta|_{\max})$", "pt_min": r"$\log_{10}p_{T,\min}/\sqrt{\hat s}$",
-         "pt_max": r"$\log_{10}p_{T,\max}/\sqrt{\hat s}$", "e_min": r"$\log_{10}E_{\min}/\sqrt{\hat s}$",
-         "dr_min": r"$\Delta R_{\min}$", "sqrt_shat": r"$\log_{10}\sqrt{\hat s}$",
-         "thr": r"$\log_{10}(1-\sum m/\sqrt{\hat s})$", "y_boost": r"$|y_{\rm boost}|$",
-         "res_min": r"$\log_{10}\min|m^2-M_V^2|/M_V\Gamma_V$", "t_level": r"$\log|\mathcal{M}|^2$",
-         "t_z": r"$\log|\mathcal{M}|^2$, probe $z$", "loc_var": r"local spread of $\log|\mathcal{M}|^2$"}
+LABEL = {"eta_max": r"largest $|\eta|$", "y_min": r"$\min 2|p_i p_j|/\hat s$", "y_ff": r"$\min_{\rm ff} 2p_i p_j/\hat s$",
+         "y_if": r"$\min_{\rm if} 2|p_i p_j|/\hat s$", "u_fwd": r"$1/(1-|\cos\theta|_{\max})$",
+         "pt_min": r"$p_{T,\min}/\sqrt{\hat s}$", "pt_max": r"$p_{T,\max}/\sqrt{\hat s}$", "e_min": r"$E_{\min}/\sqrt{\hat s}$",
+         "dr_min": r"$\Delta R_{\min}$", "sqrt_shat": r"$\sqrt{\hat s}$", "thr": r"$1-\sum m/\sqrt{\hat s}$",
+         "y_boost": r"$|y_{\rm boost}|$", "res_min": "nearest resonance", "t_level": r"$\log|\mathcal{M}|^2$",
+         "t_z": r"$\log|\mathcal{M}|^2$, $z$", "loc_var": "local spread"}
 
 
 def load(path=None):
@@ -678,38 +676,53 @@ def ranking(raw):
     return out
 
 
+SHORT = {"t_level": r"$\log|\mathcal{M}|^2$", "y_ff": "final-final collinearity", "sqrt_shat": r"$\sqrt{\hat s}$"}
+PROFILE_FEATS = ("t_level", "y_ff", "sqrt_shat")
+N_RANK = 8           # the rank figure shows the strongest 8 (the box holds no more); the rest are in the JSON   # three distinct kinds (target, collinearity, energy), chosen after reading
+
+
 def figures(raw):
+    """(rank) per event feature the median over probes of the within-probe Spearman against the error and sigma: het
+    control (error, sigma) and the 0.25-share MSE pair (error; the MSE control lacks pool rows on PP4 and H1-H7c), both
+    seeds, every read pooled, the 8 strongest by the het control's mean |rho| over error and sigma; t_z left out
+    (within a probe it ranks as t_level). (profile) per pooled decile of three
+    features the RMS of the per-probe normalised error and the median normalised sigma, het control seed 42."""
     sys.path.insert(0, ROOT)
     import plot_style as ps
     g = "all"
-    het = [raw["per_run"]["v4_het_control"][g], raw["per_run"]["v4_het_control_seed2"][g]]
-    mse = [raw["per_run"]["v4_dimensionless_muon"][g], raw["per_run"]["v4_dimensionless_muon_seed2"][g]]
-    mean_abs = lambda f: -np.nanmean([abs(x["within"][f]["ae"]["rho_med"]) if x["within"][f]["ae"]["rho_med"] is not None
-                                      else np.nan for x in het + mse])
-    order = sorted(EV_FEATS, key=mean_abs)
-    fig, (axa, axb) = ps.figure(ncols=2)
+    st = lambda a: raw["per_run"][a][g]
+    het = [st("v4_het_control"), st("v4_het_control_seed2")]
+    mse = [st("v4_dimensionless_muon_default25"), st("v4_dimensionless_muon_default25_seed2")]
+    feats = [f for f in EV_FEATS if f != "t_z"]
+    sc = lambda f: -np.nanmean([abs(x["within"][f][t]["rho_med"]) if x["within"][f][t]["rho_med"] is not None else np.nan
+                                for x, t in [(h, "ae") for h in het] + [(h, "s") for h in het]])
+    order = sorted(feats, key=sc)[:N_RANK]
+    fig, ax = ps.figure()
     yy = np.arange(len(order))[::-1]
-    for runs, tgt, col, mk, lab, dy in ((mse, "ae", ps.C.blue, "s", r"MSE net, $|q-t|$", 0.2),
-                                        (het, "ae", ps.C.green, "D", r"het net, $|\mu-t|$", 0.0),
-                                        (het, "s", ps.C.vermillion, "o", r"het net, $\sigma$", -0.2)):
+    for runs, tgt, col, mk, lab, dy in ((mse, "ae", ps.C.blue, "s", r"MSE 0.25, error", 0.22),
+                                        (het, "ae", ps.C.green, "D", r"het, error", 0.0),
+                                        (het, "s", ps.C.vermillion, "o", r"het, $\sigma$", -0.22)):
         for x, fill, sd in zip(runs, ("full", "none"), ("42", "43")):
             v = [x["within"][f][tgt]["rho_med"] for f in order]
-            axa.plot([np.nan if z is None else z for z in v], yy + dy, mk, color=col, fillstyle=fill, ls="none",
-                     label=f"{lab}, seed {sd}")
-    axa.axvline(0, color="0.6", lw=0.8)
-    axa.set_yticks(yy)
-    axa.set_yticklabels([LABEL[f] for f in order], fontsize=7)
-    axa.set_xlabel("median over probes of Spearman with the feature")
-    ps.legend(axa, "lower right")
+            ax.plot([np.nan if z is None else z for z in v], yy + dy, mk, color=col, fillstyle=fill, ls="none",
+                    label=f"{lab}, s{sd}")
+    ax.axvline(0, color="0.6", lw=0.8)
+    ax.set_yticks(yy)
+    ax.set_yticklabels([LABEL[f] for f in order])
+    ax.set_xlabel("median over probes of the within-probe Spearman")
+    ax.set_ylim(-0.6, len(order) - 0.4)
+    ps.legend_strip(ax, os.path.join(FIGS, "error_correlates_rank_legend"), ncol=3)   # its own file: the rows fill the box
+    ps.save(fig, os.path.join(FIGS, "error_correlates_rank"))
+    fig, ax = ps.figure()
     x = np.arange(1, 11)
-    for f, c in zip(order[:3], (ps.C.blue, ps.C.vermillion, ps.C.green)):
+    for f, c in zip(PROFILE_FEATS, (ps.C.blue, ps.C.vermillion, ps.C.green)):
         p = het[0]["profile"][f]
-        axb.plot(x, p["rms_ae_n"], "-", color=c, marker="s", label=LABEL[f] + ": error")
-        axb.plot(x, p["med_s_n"], "--", color=c, marker="o", label=LABEL[f] + r": $\sigma$")
-    axb.set_xlabel("decile of the feature, all reads pooled")
-    axb.set_ylabel("bin / whole probe, het control seed 42")
-    ps.legend(axb, "upper left")
-    ps.save(fig, os.path.join(FIGS, "error_correlates"))
+        ax.plot(x, p["rms_ae_n"], "-", color=c, marker="s", label=SHORT[f] + ": error")
+        ax.plot(x, p["med_s_n"], "--", color=c, marker="o", label=SHORT[f] + r": $\sigma$")
+    ax.set_xlabel("decile of the feature, every read pooled")
+    ax.set_ylabel("bin over whole probe")
+    ps.legend(ax, "upper left")
+    ps.save(fig, os.path.join(FIGS, "error_correlates_profile"))
 
 
 def main():
