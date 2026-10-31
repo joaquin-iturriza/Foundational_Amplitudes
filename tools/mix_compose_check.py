@@ -9,6 +9,8 @@ stored pools go (catalog_coverage step 14; the user, 2026-10-31). Per class, rec
               sqrt(s_hat) over the whole pool (statistic, p-value) and the difference of the means of log|M|^2 in units
               of its standard error; the stored pool's flat and forward rows come from another random stream (no bulk
               at f_default 0.50), so only the default rows can match row for row
+--load: once the stored pools are gone, the loader's own path instead (datagen.ensure_dataset with require_cache, as a
+run calls it): the pool it returns, whether it was composed at load, its rows, shares and the share of finite |M|^2
     site run --item catalog_coverage ccin2p3 FA -- python tools/mix_compose_check.py recipes/catalog_v4_default50_train.yaml v4_bb_abbh ...
 """
 import argparse, json, os, sys, time
@@ -39,6 +41,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("recipe"); ap.add_argument("names", nargs="+")
     ap.add_argument("--roles", nargs="+", default=["train", "test"]); ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--load", action="store_true")
     a = ap.parse_args()
     spec = yaml.safe_load(open(a.recipe))
     mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
@@ -49,6 +52,16 @@ def main():
         p = ent[name]; lo, hi = map(float, p["sqrts"]); k = int(mg.PROCESSES[name]["nfinal"]) + 2
         for role in a.roles:
             n = int(p["n_" + role]); t0 = time.time()
+            if a.load:
+                path = datagen.ensure_dataset(name, lo, hi, n, role, a.seed, require_cache=True)
+                rows = np.load(path, mmap_mode="r"); side = json.load(open(path + ".recipe.json"))
+                der = side.get("derived_from") or {}
+                print(json.dumps({"class": name, "recipe": os.path.basename(a.recipe), "role": role, "n": n,
+                                  "seconds": round(time.time() - t0, 1), "path": path,
+                                  "composed_at_load": bool(der.get("composed_at_load")), "rows": int(len(rows)),
+                                  "shares": der.get("shares"), "physics_block": bool(side.get("physics")),
+                                  "finite_me2": float(np.isfinite(np.asarray(rows[:, -1])).mean())}), flush=True)
+                continue
             rec = mg.variable_energy_recipe(name, lo, hi, n, role=role, seed=a.seed)
             stored_path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
             stored = np.load(stored_path, mmap_mode="r")
