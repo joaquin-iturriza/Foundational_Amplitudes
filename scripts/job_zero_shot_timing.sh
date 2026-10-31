@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=zero_shot_timing
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=5
 #SBATCH --time=00:30:00
 #SBATCH --gres=gpu:1
 #SBATCH --output=zero_shot_timing_%j.out
