@@ -6519,6 +6519,8 @@ entries:
     7: 'Wake cuts from the usage attribution (main_turns.py @379982a1, redesign era main session $49): Stop-hook refusals
       18% of $ (35 wakes, $0.25 each), orchestration-only wakes 45% (145, $0.15 each at ~240k context), 34 inline turns 31%
       per turn / 9% per call (edits of hooks, site, site_gate, settings, CLAUDE.md): proposals to Joaquin'
+    8: 'Double wake per agent stop: test whether ending with plain final text (no SubagentHandback) gives one main-session
+      wake carrying the report (Joaquin asked 2026-10-31)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -6629,6 +6631,11 @@ entries:
       - 'Joaquin approves quieting the refusing Stop hooks and routing inline fixes to agents: apply, re-measure with main_turns.py
         after a day'
       - 'Joaquin declines: record as a dead end with his words'
+    8:
+      feeds: fewer main-session wakes
+      if:
+      - 'one wake with the report whole: change step_prompt, mechanical_prompt and agent definitions'
+      - 'still two wakes or report lost: report what the transcript shows to Joaquin'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
