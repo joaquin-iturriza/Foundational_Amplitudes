@@ -104,6 +104,8 @@ def definition_model(agent_type):
 
 def model_mismatch(ti):
     want, given = definition_model(ti.get("subagent_type")), ti.get("model")
+    if "TRIAL=model" in (ti.get("description") or ""):
+        return None        # the matched model trial (agent_redesign step 4, D203; exemption D205): only the model check
     if want and given and given != want:
         return ("brief_guard: model %r differs from the %s definition's model %r (.claude/agents/%s.md). Leave `model` "
                 "out (the definition's model is used) or pass %r; another model is Joaquin's call.\n"
