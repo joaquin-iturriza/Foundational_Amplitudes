@@ -6193,6 +6193,20 @@ entries:
       interval above 1.05 while the pool''s is not: a localized one-loop cost, reported per axis to Joaquin for the share
       choice. A pool refused (above 2% unusable or no spares, or MadEvent unable to make gg>zh loop-induced events): listed
       with its reason, not dropped silently; the other 27 read.'
+    passed_at: '2026-10-31T16:55:54+00:00'
+    reviewer: 'Step 19 (H5 default-sampled, eval-only): arms and controls are the existing MSE and het runs read on the same
+      hd_ H5 pools, so only the share differs (1). Check 2 confirmed in mixture_heldout_default.json: the test-event sampling
+      moved pooled R on the 558 H1-H3 classes from 1.267 (catalog-sampled) to 0.912 (default-sampled, widened [0.802,1.068]).
+      Check 3: the design''s ''about 0.4 in ln R'' is wrong; the measured H5 widened half-widths in ln R are 0.143/0.180 (MSE,
+      shares 0.50/0.25; mixture_ab.json H5 R 0.971 [0.861,1.147], 0.971 [0.831,1.191]) and 0.116/0.153 (het, mixture_ab_het.json),
+      so H5 alone resolves R above about 1.2 or below about 0.85, not 1.5/0.67; this errs conservative and the decision rests
+      on the pooled 700 read, so it holds, but report the measured spread. Outcome: inside-pool and lower-end-above-1.05 branches
+      stated; an H5 interval outside the pool but spanning 1.05 falls to next 19''s ''reported per axis''. Labels: label_events
+      uses the catalog''s virt_evaluator at datagen''s settings (0.118, mass shift), no EW one-loop class among the 28 (one
+      loop-induced, gg>zh), tests/test_lhe_virt_label.py 4 passed on CPU at 77312c3f. Test events: MadEvent default Born events
+      at H2p5''s settings, as D227 asks. Loss: het arms HETEROSC (D226), MSE arms re-read as step 17 asked. Searched: H5,
+      one-loop held, default-sampled, heldout_default, Born events, label virt, hd_, MadLoop label in docs/results.tex; entry
+      evidence/dead ends; site decisions (H5, one-loop, default way): no prior default-sampled H5 read.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
