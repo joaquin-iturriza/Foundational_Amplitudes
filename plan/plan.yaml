@@ -3419,6 +3419,10 @@ entries:
       an existing het-loss run can be re-read; GPU-h stated before any run'
     16: 'Once the share is chosen (catalog final): longer and wider muP pretrainings (D219); grid of lengths x widths x seeds
       with GPU-h, wall time and token cost goes to Joaquin before launch'
+    17: 'Held-out read on default-sampled pools (Joaquin 2026-10-31 ''I have nothing to say about the mixture until I see
+      the right numbers''): build MadEvent-default test pools for H1-H7c, re-read the MSE arms and control pair on them (REREAD),
+      then the same comparison under the het loss (arms at both shares and control, seeds 42/43) folded into the het design;
+      GPU-h stated, above 30 to Joaquin'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6105,6 +6109,11 @@ entries:
       if:
       - 'Joaquin approves the grid: launch'
       - 'he cuts it: launch his version'
+    17:
+      feeds: next 14, the share choice
+      if:
+      - 'default-sampled held-out R below 1.05 at a share with PP4/EE4 gain: that share is a clean win'
+      - 'held-out R above 1.05 on default-sampled pools: a real generalisation cost, a trade-off for Joaquin'
   owner:
     agent: aadc46d99c71df5e6
     state: working
