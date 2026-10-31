@@ -4630,8 +4630,16 @@ entries:
     searched: docs/results.tex par:v4_mixture (held-out pools are catalog-sampled; the 5% held-out bar was set in the design,
       not by Joaquin); site decisions D178, D194, D207 do not settle the bar
     blocks: next 14, the share choice
-    blocks_steps: &id001
+    blocks_steps:
     - 14
+    - 16
+  - ask: 'Switch config/default.yaml to loss: HETEROSC for every new run (D52 never became the default; the six mixture runs
+      trained MSE)?'
+    at: '2026-10-31T04:44:53+00:00'
+    searched: 'site decisions D52 (conditional: once settled), D53-D68 (het tests and sweeps); config/default.yaml loss: MSE;
+      fa-canonical-setup.txt says MSE fixed'
+    blocks: the loss of the long and wide pretrainings
+    blocks_steps: &id001
     - 16
   designs:
   - at: '2026-10-29T05:15:16+00:00'
@@ -6327,12 +6335,12 @@ entries:
       analysis/catalog_v4/data/reads/, tools/prune_mixture_pools.py, tools/mix_compose_check.py, mix_compose.py, scripts/job_catalog_v3_short.sh,
       tools/zero_shot_parent.py, analysis/catalog_daniel/catalog_sigma_heldout.py, docs/results.tex (par:v4_pp_bound, par:v4_mixture)
     written: '2026-10-31T04:37:50+00:00'
-  ask: Read the held-out bar on default-sampled events of the held-out processes (new test pools, sized by the owner), or
-    judge the share on PP4 and EE4 alone and pick 0.50, 0.25 or none now?
-  waiting_since: '2026-10-31T04:40:47+00:00'
-  searched: docs/results.tex par:v4_mixture (held-out pools are catalog-sampled; the 5% held-out bar was set in the design,
-    not by Joaquin); site decisions D178, D194, D207 do not settle the bar
-  blocks: next 14, the share choice
+  ask: 'Switch config/default.yaml to loss: HETEROSC for every new run (D52 never became the default; the six mixture runs
+    trained MSE)?'
+  waiting_since: '2026-10-31T04:44:53+00:00'
+  searched: 'site decisions D52 (conditional: once settled), D53-D68 (het tests and sweeps); config/default.yaml loss: MSE;
+    fa-canonical-setup.txt says MSE fixed'
+  blocks: the loss of the long and wide pretrainings
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
