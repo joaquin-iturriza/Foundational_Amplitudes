@@ -160,6 +160,13 @@ def test_scenario():
     backend("pp13_zz_rowlie", "sm-no_b_mass", ["generate b b~ > b b~ g g QED<=2"], V4_CARD)
     c = pp.check_probe("pp13_zz_rowlie", None, None, ref)
     assert "b_row vs the probe's own MB" in {m["field"] for m in c["mismatches"]}, c
+    # a probe whose only training entries are alpha_s scan points: alpha_s is not compared against them
+    rec = os.path.join(TMP, "train_as.yaml")
+    yaml.safe_dump({"processes": [
+        {"name": f"v4_gg_ttx__as{int(a * 1000)}", "base": "v4_gg_ttx", "physics": {"alpha_s": a},
+         "sqrts": [400, 6000], "n_train": 10, "n_val": 10, "n_test": 10} for a in (0.110, 0.126)]}, open(rec, "w"))
+    c = pp.check_probe("v4_gg_ttx", None, None, pp.TrainingReference(rec))
+    assert c["status"] == "ok" and "alphas_mz" in c["not_compared"], c
     # a parent without a training recipe: nothing to compare with, refused
     assert pp.check_probe("pp13_ddx_aag", None, None, None)["status"] == "mismatch"
     print("ok scenario")
