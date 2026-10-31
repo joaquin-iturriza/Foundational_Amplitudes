@@ -4343,6 +4343,19 @@ def lhe_parent_physics_check(process):
     parent = cfg.get("parent")
     if not parent or parent not in PROCESSES:
         return None
+    lab = cfg.get("lhe") or {}
+    if lab.get("label_alphas") == "virt":
+        # label rule 'virt': the events are labelled by the one-loop entry lhe.label_virt's MadLoop standalone, not by
+        # this entry's tree (Born) standalone, which only draws the kinematics; the physics that must match the
+        # parent's is the labeller's
+        nlo = str(lab["label_virt"])
+        if nlo == parent:
+            chk = {"probe": process, "parent": parent, "status": "ok", "mismatches": [], "not_compared": [],
+                   "labels_from": nlo}
+            print(f"[LHE] {process}: physics vs parent {parent}: ok (labels from the parent's own one-loop "
+                  f"standalone, label rule virt)", flush=True)
+            return chk
+        process, cfg = nlo, PROCESSES[nlo]
     blk = pp.physics_block(process, cfg=cfg)
     pcfg = PROCESSES[parent]
     ref = [{"name": parent, "pdg": [int(p) for p in pcfg["pdg_ids"]], "block": pp.physics_block(parent, cfg=pcfg)}]

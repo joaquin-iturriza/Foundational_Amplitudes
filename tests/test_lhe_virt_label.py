@@ -85,3 +85,20 @@ def test_stripped_virtual_alpha_s_fixed():
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-q"]))
+
+
+def test_virt_entry_parent_physics_is_the_labellers():
+    """A 'virt'-labelled H5 pool is labelled by its parent's own one-loop standalone, so its physics check against the
+    parent passes without comparing the Born tree standalone (which only draws kinematics: sm-no_b_mass, MadEvent's
+    alpha_s), the refusal every hd_test_h5 part hit on 2026-10-31."""
+    import mg5_pipeline_final as mg
+    names = [n for n, c in mg.PROCESSES.items() if (c.get("lhe") or {}).get("label_alphas") == "virt"]
+    assert names, "no virt-labelled entry registered"
+    for n in names:
+        chk = mg.lhe_parent_physics_check(n)
+        assert chk["status"] == "ok" and chk["labels_from"] == mg.PROCESSES[n]["parent"], (n, chk)
+
+
+if __name__ == "__main__":
+    test_virt_entry_parent_physics_is_the_labellers()
+    print("ok")
