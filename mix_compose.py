@@ -13,7 +13,7 @@ and the default rows; then shuffled with the chunk's seed. The composed pool is 
 $TMPDIR (removed with the job), with its per-event alpha_s (mg.compute_alphas at sqrt(s_hat)) and a recipe sidecar
 carrying the stored pool's recipe id, so the loader reads it as it read the stored pool.
 Nothing is generated and no matrix element is evaluated."""
-import copy, hashlib, json, os, tempfile
+import copy, hashlib, json, os, tempfile, time
 
 import numpy as np
 
@@ -224,7 +224,10 @@ def ensure_composed(process, sqrts_min, sqrts_max, n_events, role, seed, recipe,
     if not datagen._is_cached(ctrl, mg.recipe_id(rec_c)):
         raise RuntimeError(f"load-time mixture of {process} ({role}): its catalog_v4 pool {ctrl} is not built "
                            f"(recipe_id {mg.recipe_id(rec_c)})")
+    t0 = time.time()
     rows, kinds = compose(process, sqrts_min, sqrts_max, n_events, role, seed, ctrl)
+    # one line per pool: a run composing hundreds of them at load otherwise logs nothing for over an hour
+    print(f"[mix_compose] {process} {role}: {len(rows)} rows composed at load in {time.time() - t0:.1f} s", flush=True)
     tmp = out[:-len(".npy")] + f".tmp{os.getpid()}.npy"
     np.save(tmp, rows)
     k = int(_cfg(process)["nfinal"]) + 2

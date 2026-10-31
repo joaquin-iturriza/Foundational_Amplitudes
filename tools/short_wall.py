@@ -12,12 +12,18 @@ slower kept), 1.6 s per zero-shot probe (6c246603's PP4 read: 187 probes in 5.0 
 load, model build) and 1 min per axis (recipe split, model reload); then a 1.25 margin. A HETEROSC arm (--sigma-stage)
 adds its sigma-only stage (run.py: 250 steps, 25 validations, the evaluation with predictions saved): 20 min, an
 estimate (250 x 1.01 s = 4.2 min of steps, the rest validations and the saved evaluation), to be replaced by the
-smoke's measured time."""
+smoke's measured time. A training recipe with default-share entries (sampling.f_default > 0, catalog_v4_default50/25)
+composes each of them at load (mix_compose.ensure_composed, serially, no log line until data loading ends): 6.1 s per
+entry for its train and val pools (measured 2026-10-31 on the CC-IN2P3 login node with tools/mix_compose_check.py --load:
+v4_bb_abbh 4.9 + 0.1 s, v4_udx_aawpz 4.2 + 0.2 s, v4_gg_gggg 5.8 + 0.3 s, the slowest kept; an estimate for a GPU
+node), about 93 min for the 912 of catalog_v4_default50_train.yaml; the step-15 het mixture arms were submitted at
+3.75 h without it."""
 import argparse, json, math, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 1.6, 15.0, 1.0, 1.25
 SIGMA_STAGE_MIN = 20.0
+S_COMPOSE = 6.1
 
 
 def axis_recipe(axis, cat, train):
@@ -50,6 +56,15 @@ def iterations(train):
     return math.ceil(len(yaml.safe_load(open(p))["processes"]) * 1e4 / 16384 * 5)
 
 
+def composed_entries(train):
+    """entries of the training recipe composed at load (sampling.f_default > 0, the entry's over the recipe's)"""
+    import yaml
+    p = train if os.path.isabs(train) else os.path.join(ROOT, train)
+    r = yaml.load(open(p), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    top = r.get("sampling") or {}
+    return sum(float({**top, **(e.get("sampling") or {})}.get("f_default", 0) or 0) > 0 for e in r["processes"])
+
+
 def parse_limit(s):
     """slurm's time limit (D-HH:MM:SS, HH:MM:SS, MM:SS) in hours"""
     s = s.strip()
@@ -68,11 +83,13 @@ def plan(train, cat, axes, eval_only=False, iters=None, sigma_stage=False):
     minutes = STARTUP_MIN + it * S_ITER / 60 + sum(probes.values()) * S_PROBE / 60 + AXIS_MIN * len(axes)
     if sigma_stage and not eval_only:
         minutes += SIGMA_STAGE_MIN
+    n_comp = 0 if eval_only else composed_entries(train)
+    minutes += n_comp * S_COMPOSE / 60
     hours = minutes * MARGIN / 60
     whole_min = math.ceil(hours * 60 / 15) * 15
     return {"hours": round(hours, 2), "slurm_time": f"{whole_min // 60:02d}:{whole_min % 60:02d}:00",
-            "iterations": it, "probes": probes, "n_probes": sum(probes.values()),
-            "rates": {"s_per_step": S_ITER, "s_per_probe": S_PROBE, "startup_min": STARTUP_MIN, "margin": MARGIN,
+            "iterations": it, "composed_at_load": n_comp, "probes": probes, "n_probes": sum(probes.values()),
+            "rates": {"s_per_step": S_ITER, "s_per_probe": S_PROBE, "startup_min": STARTUP_MIN, "margin": MARGIN, "s_per_composed_entry": S_COMPOSE,
                       "sigma_stage_min": SIGMA_STAGE_MIN if sigma_stage and not eval_only else 0.0}}
 
 
