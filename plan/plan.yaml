@@ -7271,6 +7271,16 @@ entries:
       median and actual error RMS per decile, each over the same quantity on the whole probe; x the decile of the largest
       final |eta| (10 = forward) and of log10 min 2p_i.p_j/s_hat (1 = collinear); PP4 trained classes, het control seeds 42/43.
       Repo-reviewer re-check of short_wall/het_uncertainty changes not yet run.'
+  - at: '2026-10-31T21:17:52+00:00'
+    text: 'Step 23 (E3503): bound-arm re-reads FA-ccin2p3-f8ec724f (REREAD afc96598) and 049b863e (REREAD d26f13aa) COMPLETED,
+      logs read whole: EE4 169/169 (cgsxwm out, D193), HD4 114/114, HD5 28/28, all physics ok, no traceback; mixture_ab bound_default
+      @affc6f0b -> data/bound_default.json (same MSE control; shares'' rows reproduce mixture_ab.json). Pure-default bound
+      vs shares 0.50 / 0.25: PP4 trained 0.388 [0.338,0.446] vs 0.549 / 0.650; PP4 not trained 1.132 [0.969,1.367] vs 0.921
+      / 0.932; EE4 1.216 [1.099,1.355] vs 0.401 / 0.413; held-out default-sampled pooled (700) 1.122 [0.977,1.305] vs 0.860
+      [0.745,0.983] / 0.871 [0.754,0.994]; per axis bound H1 0.64, H2 0.92, H2p5 0.78, H3 1.631 [1.302,1.942], H5 1.401 [0.920,1.802],
+      H6 0.84, H7E 0.97, H7c 0.82. No run blew up. Wall: each job about 2.5 min (21:50:55-21:53:26) against short_wall''s
+      0.17 h plan (15 min limit): over 2x, the 1 min per axis start-up dominates eval jobs; a short_wall fix (per-axis minute
+      on eval) is open.'
   handoff:
     state: 'Step 20 written up in par:v4_mixture (c70595af): both shares WIN (GAIN and NO LOSS on 700 default-sampled held-out
       classes) under MSE and het, verdict default25 by the tie rule; H3 open (MSE 1.133/1.082, intervals across 1). Waits
