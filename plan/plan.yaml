@@ -1526,6 +1526,31 @@ entries:
       log P as an input, two seeds, read on H2 and TR by the shape-gap rule). Gate passes, main read no (below 0.05 or not
       above training or a placebo): the network already uses P or the gap is elsewhere: dead end. Between: reported, no GPU
       arm. Cost: one CPU job on CC-IN2P3 (4 cores, under 1 h); no GPU.'
+    fix_at: '2026-10-31T00:38:28+00:00'
+    fix: 'Check 2 (main read not shown to respond): the main measure is the squared Pearson correlation of the signed residual
+      u=(q-t)-mean with log P (dipole_residual.py r2()). On the dipole read every per-event quantity, the tested one and all
+      placebos, sat at 0.001-0.008 held out and 0.001-0.002 training (analysis/catalog_v4/data/dipole_gate.json). No data
+      show that any per-event scalar can reach the 0.1 threshold on this residual, so a no cannot tell ''P is not the gap''
+      from ''nothing linear explains u''. The gap is also var(u) (par:v4_shape_gap). If the error is larger in some range
+      of P but has no linear tilt, var(u) goes up and r^2(u, log P) stays at zero. catalog_v2''s residual profile found that
+      shape for the propagator classes: the resonant and t-channel pools put 50-86% of their MSE in the highest target decile
+      (results.tex near line 9640). Fix: (a) add a ceiling on the same reads, e.g. r^2 of u on t and on log|M|^2, plus a flexible
+      fit (binned conditional mean or kNN) of u on the event''s invariants, held out and training; (b) add a read of the error''s
+      size against log P, e.g. the share of var(u) in the top and bottom deciles of log P, or r^2 of log u^2 on log P, held
+      out against training with the same placebos; (c) set the yes and no thresholds against the ceiling, not as a bare 0.1.
+      Check 5 (prior incomplete): searched propagator, prop surrogate, target_propagators, offshell, off-shellness, Breit-Wigner,
+      residual_vs_target, dipole, v4_shape_gap, v4_mult_cand, diagram_encoder, plan dead ends, site decisions D86/D178/D199.
+      The design lists ''offshell'' as searched but does not report what it found. The per-event off-shellness input (data.offshell_per_event;
+      flagship win about 50x, Sec. levers near line 6750) is the existing per-event propagator input, and the fine-tune lever
+      study found ''off-shellness off'' worse (near line 11979). Its pair-level generalisation, the attention bias, was tested
+      and not adopted (near line 7224). The catalog_v2 residual profile is also missing. The design must say whether the control
+      (v4_dimensionless_muon, from parent runs/dancat_het_pre/trial_0058 with the diagram encoder) already receives the off-shellness
+      input or the diagrams. That decides how to read a no (''the network already uses P''), and whether the planned GPU follow-up
+      ''log P as an input'' repeats the off-shellness lever. Check 4 (minor): the dipole read passed per cell (6ee, 6bb, 6qg)
+      while failing over all cells. State what a gate that passes in some cells but fails over all multiplicity cells means
+      for this route. Checks 1, 3, 6, 7 hold. The control is matched: same network, scorer and events, held-out against training
+      pools of the same cells, three placebos. The measured spread is a seed difference of about 0.002 and placebos at 0.006-0.008
+      held out, well below 0.1. The design stays within D178''s shape priority.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
