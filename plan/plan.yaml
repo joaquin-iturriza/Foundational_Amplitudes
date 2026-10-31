@@ -5435,8 +5435,7 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '16': the four mixture arms (6c246603, 1d46b938, 11ad944a, 9c6fc7ab) ending; then job_standalones.sh STANDALONES_MODE=apply
       at 93371175 (both kinds, manifest first)
-    '15': default50 re-reads FA-ccin2p3-8e1cc529, 52efacaf (PP4+EE4); default25 arms 11ad944a, 9c6fc7ab (will TIMEOUT in their
-      cross reads at 2.5 h; their PP4+EE4 re-reads then)
+    '15': FA-ccin2p3-8e1cc529 FA-ccin2p3-7a6a1967 FA-ccin2p3-9c6fc7ab
     '14': FA-ccin2p3-8e1cc529 FA-ccin2p3-7a6a1967 FA-ccin2p3-9c6fc7ab
   targets:
   - batch: gridpool_probe
