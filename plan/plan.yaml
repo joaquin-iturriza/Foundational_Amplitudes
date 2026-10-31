@@ -3391,6 +3391,14 @@ entries:
     answers_after: '2026-10-30T10:50:16+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-10-31T04:52:33.333000+00:00'
+    text: Okay, now back to the other point, you on your own words said that the check has to be against data generated in
+      the default way, so why were the heldouts ever considered to not be that? I have nothing to say about the mixture until
+      I see the right numbers
+    decision: D227
+    answers_after: '2026-10-31T04:46:58+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3411,6 +3419,7 @@ entries:
   - D181
   - D188
   - D189
+  - D227
   next:
     14: 'Step 14 done, verdict trade-off (par:v4_mixture, mixture_ab.json): Joaquin chooses catalog_v4''s default share (none,
       0.25 or 0.50, or a smaller share tested); the chosen recipe is composed at load (D207), no pools to build; then close
@@ -4631,6 +4640,8 @@ entries:
       the passed design sends a trade-off to Joaquin; none weighs default-sampled accuracy against held-out generalisation
     blocks: which share catalog_v4_train.yaml carries and the entry's close
     blocks_steps: []
+    answered_at: '2026-10-31T04:52:33.233000+00:00'
+    decision: D227
   - ask: Read the held-out bar on default-sampled events of the held-out processes (new test pools, sized by the owner), or
       judge the share on PP4 and EE4 alone and pick 0.50, 0.25 or none now?
     at: '2026-10-31T04:40:47+00:00'
@@ -4640,6 +4651,8 @@ entries:
     blocks_steps:
     - 14
     - 16
+    answered_at: '2026-10-31T04:52:33.233000+00:00'
+    decision: D227
   - ask: 'Switch config/default.yaml to loss: HETEROSC for every new run (D52 never became the default; the six mixture runs
       trained MSE)?'
     at: '2026-10-31T04:44:53+00:00'
@@ -4658,9 +4671,11 @@ entries:
     searched: docs/results.tex par:v4_mixture (held-out pools are catalog-sampled; the 5% held-out bar was set in the design,
       not by Joaquin); D178, D194, D207 do not settle the bar
     blocks: the share choice and the pretrainings
-    blocks_steps: &id001
+    blocks_steps:
     - 14
     - 16
+    answered_at: '2026-10-31T04:52:33.233000+00:00'
+    decision: D227
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -6623,13 +6638,6 @@ entries:
       analysis/catalog_v4/data/mixture_heldout_default.json, analysis/catalog_v4/heldout_default_pools.py, analysis/catalog_v4/data/heldout_default_pools.json,
       analysis/catalog_daniel/catalog_sigma_heldout.py, analysis/catalog_daniel/data/catalog_sigma_heldout.json
     written: '2026-10-31T05:01:21+00:00'
-  ask: Read the held-out bar on default-sampled events of the held-out processes (new test pools, sized by the owner), or
-    judge the share on PP4 and EE4 alone and pick 0.50, 0.25 or none now?
-  waiting_since: '2026-10-31T04:46:58+00:00'
-  searched: docs/results.tex par:v4_mixture (held-out pools are catalog-sampled; the 5% held-out bar was set in the design,
-    not by Joaquin); D178, D194, D207 do not settle the bar
-  blocks: the share choice and the pretrainings
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
