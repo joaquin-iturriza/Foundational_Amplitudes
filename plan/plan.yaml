@@ -5935,6 +5935,13 @@ entries:
       cost, not settled at the widened interval. Rule: YES R <= 0.90 with the widened interval below 1. So pure default sampling
       on the trained classes cuts the default-sampled error by about 61%, the ceiling step 14''s mixtures are measured against.
       Not yet in docs/results.tex: written up with step 14''s mixture_ab.json.'
+  - at: '2026-10-31T02:58:43+00:00'
+    text: 'E3203: default25 arm FA-ccin2p3-11ad944a TIMEOUT at 2.5 h (03:56:44): training finished (4264 steps, 69.56 min,
+      best checkpoint saved 02:48), every held-out axis read (H1 62, H2 218, H2p5 38, H3 279, H5 28, H6 8, H7E 34, H7c 34),
+      catalog_v3 PP 1396, then cut in PP4 (246 of 1301), EE4 none. PP4+EE4 re-read FA-ccin2p3-7a6a1967 (REREAD 11ad944a),
+      01:15:00 from tools/short_wall.py. E3206: default50_seed2 re-read FA-ccin2p3-52efacaf (REREAD 1d46b938) COMPLETED: PP4
+      1301/1301 and EE4 169/170 (ee4_epem_cgsxwm excluded, D193), all finite, physics ok; extracted to analysis/catalog_v4/data/reads/FA-ccin2p3-52efacaf_{PP4,EE4}.json
+      (mixture_ab.py extract).'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
