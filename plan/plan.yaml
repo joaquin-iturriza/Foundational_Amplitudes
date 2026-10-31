@@ -6807,6 +6807,22 @@ entries:
       get an eval-only REREAD folded into the step-18 HD4 re-read of these arms (about 1.3 h each for PP4+EE4, about 5 GPU-h,
       the het batch then about 28 GPU-h, over the design''s 22.8, under 30). Cancelling and resubmitting at 5.75 h would cost
       about 33 GPU-h.'
+  - at: '2026-10-31T13:42:33+00:00'
+    text: 'Step 18 gridpool probe (16 jobs x 16 cores, htc, limit 1 h, estimate 0.40 h longest; logs of all 16 read whole
+      2026-10-31): 9 TIMEOUT, 7 COMPLETED. Pools ran one after another in each job (3 to 8 per job), so one slow pool held
+      every pool behind it. Measured against gridpool-plan''s per-pool estimate (multiplicity-median rate x GRID_TIME_FACTOR
+      4.3): gridpack build 0.1x to 18.4x (median 0.35x 3-body, 0.5x 4-body, 2.8x 5-body; longest built hd_bbx_ddxgwpwm 2779
+      s against 151 s, hd_dbx_bxgguwm 2201 s), probe runs up to 34x (hd_epem_aaccx__E20 1787 s, hd_uux_aepemz__E20 585 s against
+      18 s), and both runs of hd_ddx_dhuxwp__E20 hit the 1800 s run timeout (its c30 twin: 68 s). Three 5-body gridpacks were
+      still building when cut, after 0.83-0.93 h each (hd_bg_bguuxz, hd_udx_adxggu, hd_dbx_bxdddxg: three of the plain probe''s
+      ten timeouts). Survey/refine split not recorded (the MadEvent log is in node-local TMPDIR, gone with the job). Outcome:
+      67 of 114 pools done (every gridpack built, both runs returned, yield 1.0, kept 1.0 on all returned runs); 110 of the
+      180 gridpacks on disk at the queue''s own paths (lhe_gridpack_paths names match all 110, writes atomic, none partial);
+      47 pools unfinished (44 with gridpacks missing, hd_uux_uuxvevex__E20 and hd_uux_aepemz__E20 with runs missing, hd_ddx_dhuxwp__E20
+      with runs timed out). Cause: the estimate (a multiplicity-median rate does not predict a 5-body gridpack) compounded
+      by a serial layout (16 jobs at a width of 1238). Fix 009a1949: gridpool-plan --logs/--order (finished pools dropped,
+      built gridpacks free, measured per-multiplicity factor, a cut pool floored at its elapsed time), one pool per job, run
+      timeout 5400 s; the job script stops 5 min before its limit and prints the MadEvent log tail (GRIDPACK_PROGRESS).'
   handoff:
     state: 'Step 18 (default-sampled held-out pools, 114 hd_ gridpack pools): the plain-MadEvent probe (6 jobs, 180 runs)
       gave kept 1.0 everywhere, disk <=340 MB/run, but 13 short yields and 10 timeouts in plain mode, which does not measure
