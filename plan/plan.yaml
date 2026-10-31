@@ -6343,6 +6343,12 @@ entries:
     units: null
     start: '2026-10-31T13:44:59+00:00'
     at: '2026-10-31T13:44:59+00:00'
+  - batch: hd_gridpool_e20_beam10tev
+    wall_h: 3.0
+    jobs: 3
+    units: null
+    start: '2026-10-31T15:37:50+00:00'
+    at: '2026-10-31T15:37:50+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
