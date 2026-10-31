@@ -6389,6 +6389,16 @@ entries:
       with it). The main session''s search of the ledger stopped at D69 (grep D5x/D6x only) and it told Joaquin it was never
       settled. config/default.yaml was never switched; worker now sets loss: HETEROSC and fixes the guidance. The six mixture
       runs trained MSE against that default.'
+  - at: '2026-10-31T04:48:59+00:00'
+    text: 'Step 15: read from config.yaml on CC (runs/catalog_v4_short/<arm>/config.yaml): the control v4_dimensionless_muon
+      (339ec100, seed 42) and _seed2 (380842ed, 43), default50 (6c246603) and _seed2 (1d46b938), default25 (11ad944a) and
+      _seed2 (9c6fc7ab) all trained training.loss MSE, loss_aggregation mean, sign_head true (63/1153 sign-changing pools
+      on the sign loss, control log). Search: 1525 HETEROSC config.yaml under runs/ on CC (Daniel''s catalog dancat_het_pre,
+      catalog_norm*, het_delta*, het_shared*, tp3_*_het, zz_het_ab); 20 configs name catalog_v4, all runs/catalog_v4_short
+      (MSE); intersection empty: no catalog_v4 het-loss run to re-read. Not checked: lxplus and Jean Zay run dirs (they hold
+      no catalog_v4 training pools). Het arms added (9eaa04d6): v4_het_control/default50/default25[_seed2], only the loss
+      changed (HETEROSC, the parent config''s het defaults, sign head off), reads from <run>/sigma_stage; design recorded,
+      design reviewer launched.'
   handoff:
     state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
       @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
