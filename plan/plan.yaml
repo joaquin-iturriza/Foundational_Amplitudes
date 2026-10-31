@@ -3840,7 +3840,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 7719c03f
+    commit: 009a1949
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4174,6 +4174,7 @@ entries:
     - scripts/job_catalog_v4_regen.sh
     - scripts/job_catalog_v4_validate.sh
     - scripts/job_coverage_check.sh
+    - scripts/job_lhe_probe.sh
     - scripts/job_mixed_order_virt.sh
     - scripts/job_v4_hwpwm_zero_width.sh
     - scripts/job_width_regen.sh
@@ -4186,6 +4187,7 @@ entries:
     - 'the lhe_parts gc job: 2435 directories trimmed to their logs, 122.4 GB; CC at 115G free'
     - tools/catalog_ft.py
     - tools/certify_v4_loops.py
+    - tools/lhe_probe.py
     - tools/mix_compose_check.py
     - tools/mixed_order_audit.py
     - tools/mixed_order_virt_check.py
