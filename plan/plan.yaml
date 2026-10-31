@@ -3602,6 +3602,7 @@ entries:
     - FA-ccin2p3-790fac19
     - FA-ccin2p3-79989476
     - FA-ccin2p3-7a07eb55
+    - FA-ccin2p3-7a6a1967
     - FA-ccin2p3-7b5eb87e
     - FA-ccin2p3-7d5a7664
     - FA-ccin2p3-7ee6ab6f
@@ -3626,6 +3627,7 @@ entries:
     - FA-ccin2p3-8beaf5c9
     - FA-ccin2p3-8cff58dc
     - FA-ccin2p3-8d5f5f67
+    - FA-ccin2p3-8e1cc529
     - FA-ccin2p3-8ee26e71
     - FA-ccin2p3-8eeb8f3d
     - FA-ccin2p3-8f35d8b4
@@ -3634,6 +3636,7 @@ entries:
     - FA-ccin2p3-9014278b
     - FA-ccin2p3-91a6c7fd
     - FA-ccin2p3-9208a3d3
+    - FA-ccin2p3-93625c9d
     - FA-ccin2p3-9370fea8
     - FA-ccin2p3-94c731cf
     - FA-ccin2p3-97002cf9
@@ -3779,7 +3782,7 @@ entries:
     - FA-ccin2p3-ff3ed2e3
     - FA-ccin2p3-ff51a3bc
     - FA-ccin2p3-ffc3cd1c
-    commit: 171c2395
+    commit: 614d512c
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4054,6 +4057,8 @@ entries:
     - analysis/catalog_v4/data/lhe_probe_by_energy.json
     - analysis/catalog_v4/data/lhe_probe_yields.json
     - analysis/catalog_v4/data/mixed_order_audit.json
+    - analysis/catalog_v4/data/mixture_ab.json
+    - analysis/catalog_v4/data/pp_bound.json
     - analysis/catalog_v4/data/pp_trained_compare.json
     - analysis/catalog_v4/data/short_built_pools.json
     - analysis/catalog_v4/data/short_run_bias.json
@@ -4128,6 +4133,7 @@ entries:
     - tools/mixed_order_virt_check.py
     - tools/nlo_virtual_pipeline.py
     - tools/pole_guard_diag.py
+    - tools/prune_mixture_pools.py
     - tools/shard_recipes.py
     - tools/width_regen.py
     - tools/zero_shot_parent.py
