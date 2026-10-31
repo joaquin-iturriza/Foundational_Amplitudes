@@ -7124,6 +7124,20 @@ entries:
       to agents. If both are below their lines: report, no change proposed. Part 2 feeds the agent-kind rule (forks carry
       the parent''s whole context: at what cost against a fresh agent). Part 3: Joaquin is told v3 replaces v1 and v2 and
       what changed.'
+    passed_at: '2026-10-31T03:46:20+00:00'
+    reviewer: 'Re-check after FIX. Re-ran the draft --handcheck (seed 0, redesign era) and read all 40 labels: the 20 inline
+      cases are edits of hooks/site/site_gate/settings/CLAUDE.md, git apply/commit and Edit, the 10 orchestration cases SendMessage/plan.py/site
+      events/ack, the 10 none cases text only; I agree with 38-40/40 (the two debatable ones are declared). Redesign main
+      $49.05: inline 8.8% per call ($4.31), 30.9% per segment ($15.14), orchestration 48.4% per call, orchestration-only wakes
+      45.2% ($22.17); per-call attribution answers the earlier whole-segment over-count, and the outcome reports both. Totals
+      match usage_report v3 (main 560.33 vs 559.97M; redesign 19.99 vs 19.82M); part 2 sums 487M vs v3 agents 485.5M overall,
+      eras assigned by an agent''s first call (main-alone +15M, step-agents -10M against v3), stated in the measure; forks
+      16 in main-alone at 1.025x (1.015-1.047) the parent''s context at launch. Parts 2 and 3 now in the design; both-below
+      branch and the per-call ''mostly'' rule stated (note: the inline rule fires on per call OR per segment, so per segment
+      31% will trigger the proposal; that is stated before the run). Not stochastic. Searched docs/results.tex for usage,
+      wake, main session, orchestration, task-notification, stop hook, nothing_new, inline work, fork (only line 13401, review
+      launches); usage_report.py nothing_new; site decisions for usage, wake, attribut, main session, agents (D177, D185,
+      D202 related, none on this measure).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
