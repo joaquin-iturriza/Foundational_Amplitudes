@@ -458,6 +458,11 @@ entries:
       it would have re-checked the whole v3 census), the second passed $SCRATCH unexpanded (job script fixed @51933b4e to
       eval it); the second left an empty ./$SCRATCH/zz_v4_multext in the CC checkout, not deleted; rerun as FA-ccin2p3-52345dd6'
     at: '2026-10-31T03:54:14+00:00'
+  - tried: 'option (c): a per-process affine (or cubic) in q from a held-out multiplicity pool''s own labelled events (kshot_spread.py
+      @a0e0dfa9, par:v4_kshot_spread @6c43e0ef)'
+    why: ceiling 0.012/0.017 of the gap (cubic 0.023/0.037), under 0.1 on both seeds; the slope is calibrated (1.008/1.006);
+      at K 4/8/16 a shrunk slope is neutral against the offset, and the offset alone costs at every K up to 256
+    at: '2026-10-31T04:00:13+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
