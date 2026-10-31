@@ -6385,7 +6385,7 @@ entries:
         before the queue'
   owner:
     agent: afa86296e4947978a
-    state: working
+    state: closed
     since: '2026-10-31T14:04:11+00:00'
     state_at: '2026-10-31T14:11:31.012000+00:00'
     context: 134991
@@ -6838,34 +6838,43 @@ entries:
       built gridpacks free, measured per-multiplicity factor, a cut pool floored at its elapsed time), one pool per job, run
       timeout 5400 s; the job script stops 5 min before its limit and prints the MadEvent log tail (GRIDPACK_PROGRESS).'
   handoff:
-    state: 'Step 18 (default-sampled test pools for the 114 held-out hd_ pools): gridpool probe pass 1 (16 jobs, pools in
-      series) finished 67 pools, 110 of 180 gridpacks on disk at the queue''s paths; finding recorded (estimate off 0.1x-18.4x
-      on gridpacks, up to 34x on runs; serial layout). Pass 2 hd_gridpool_probe2: the other 47 pools one per job (target 2.0
-      h, run list /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/gp2_runs.txt). As
-      of 2026-10-31 ~15:30: 35 COMPLETED with rc=0, every gridpack built, all probe runs returned, 0 errors (longest gridpack
-      hd_ubx_bxghuz 665 s); 12 RUNNING: hd_ddx_dhuxwp__E20 b8aacd01, hd_bg_bguuxz c169d47f, hd_gg_dddxdxg 611003cb, hd_ug_ddxguz
-      518be432, hd_dbx_bxdddxg 9c2ef90a, hd_udx_dxguzz 3dad72b1, hd_uux_addxgz c1461694, hd_udx_adxggu 219e0935 (03:00:00),
-      hd_epem_aaccx__E20 1ba52b78, hd_epem_ccxddx__E20 fa070157, hd_uux_uuxvevex__E20 aaaaa704, hd_uux_aepemz__E20 167ac0d6
-      (01:30:00). Step 18 waits on all 47. Each of these 12 will raise the same false ALERT at its end (--expect key, below):
-      read its log, ack, never cancel. Het step 15 arms intact; their eval-only REREAD (step 20) waits on the hd_ pools.'
-    decisions: 'One pool per job (site pick width 1268): a serial layout let one slow 5-body pool block the others. Run timeout
-      5400 s, because 1800 s cut the hd_ddx_dhuxwp__E20 measurement. Planning reads measured logs (gridpool-plan --logs/--order,
-      009a1949), not the multiplicity-median rate x 4.3. The job stops 5 min before its limit and prints GRIDPACK_PROGRESS
-      (the MadEvent log tail), so a cut job shows survey/refine/generation. The pass-2 ALERTs (E3292-E3326) are my submission''s
-      --expect ''lhe_probe gridpool rc=0'': site parses the plain RUN_SUMMARY into {rc: 0}, so that key never matches; the
-      right form is --expect rc=0; submit_guard refuses such keys now (d3c2a623); all 35 acked with each log''s reading.'
-    ruled_out: 'Treating the pass-2 ALERTs as a setup error in 009a1949: every alerted log ended rc=0 with gridpacks and runs
-      complete. Treating them as the check reading a running job: summary_pass only alerts on a mismatch once a RUN_SUMMARY
-      line exists. Planning the hd queue from the plain-MadEvent probe: it does not measure gridpack pools.'
-    running: 12 pass-2 gridpool jobs listed in state (CC htc, CPU only)
-    files: 'tools/lhe_probe.py (gridpool, gridpool-plan --logs/--order), scripts/job_lhe_probe.sh (PROBE_SHARD=gridpool, GRIDPACK_PROGRESS),
-      .claude/hooks/submit_guard.py (expect check), recipes/catalog_v4_heldout_default_processes.yaml, tools/lhe_parts.py
-      (plan --probe), tools/short_wall.py (S_PROBE 1.6 too low for het reads). Pass 1 logs and job pool lists: scratchpad
-      gplogs/, gp_00..15.txt, gp_runs.txt, gp_order.json, hd_pools.json. NEXT: when the 12 end, read each log, then lhe_probe
-      kept --yields-out analysis/catalog_v4/data/lhe_probe_yields_hd.json over pass-1 and pass-2 logs, lhe_parts plan with
-      that file, smaller run size for any pool with a 1000-event run over 1800 s, workers at site pick width in one wave,
-      plan target, submit with --expect rc=0.'
-    written: '2026-10-31T14:02:55+00:00'
+    state: 'Step 15 analysis code written, not yet committed: the commit hook blocks until the repo-reviewer passes its overdue
+      backlog. analysis/catalog_v4/mixture_ab.py (working tree, uncommitted) adds MIX_HET (the six het runs), HD4_HET (empty
+      until the step-20 HD4 re-reads exist), mixture --het, heldout_default --het and het_over_mse. Per the reviewer and the
+      04:56 design / D227, the het held-out cost is decided on default-sampled held-out events (held_default: PP4/EE4 probes
+      of the held-out classes, plus HD4 only when all four seeds are read); the catalog-sampled read is shown beside as information.
+      Every missing read or probe is listed, and there is no verdict until complete. Tests passed: the MSE outputs reproduce
+      the committed mixture_ab.json and mixture_heldout_default.json exactly; with the arms replaced by the control, R=1.0;
+      a fake partial arm read and absent HD4 reads are listed as missing. The repo-reviewer (agent a37205a4e7c152695, holding
+      the lock) blocked twice: (1) the het cost was read on catalog-sampled events, fixed; (2) a partial HD4 read was used
+      silently, fixed. Its third re-check is running; on PASS it runs advance. analysis/catalog_v4/het_uncertainty.py (sigma
+      read, question 2) is written and tested on synthetic data (perfect sigma gives pull std 1.0, cover68 0.68, rule A YES,
+      rule B calibrated; missing probes are listed). It sits only at /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/het_uncertainty.py
+      because the review gate refused writing it into the repo; copy it to analysis/catalog_v4/ once the review passes. The
+      control pair''s reads are extracted (data/reads FA-ccin2p3-87ea24d0_*, 321a3de2_*: 2171 each, 0 excluded). No share-arm
+      result has been read. Control-pair blow-up scan (val_loss_no_reg, 77 validations each): transient spikes, 87ea24d0 1.28e9
+      at val 2 and 2.81e9 at val 13; 321a3de2 3.89e9 at val 1, 2.03e9 at val 24 and 767 at val 34; both converged, last -2.862
+      and -2.786. These are listed, not dropped (the design''s 10x-of-step-500 rule is ill-defined for a negative NLL). E3329
+      acked: 167ac0d6 hd_uux_aepemz__E20, rc=0, the false ALERT; its second probe run returned 162 of 1000 (yield 0.162),
+      to fix in that pool''s layout before the hd queue.'
+    decisions: 'Analysis edits on trunk (as with mixture_ab''s earlier commits), because the CC run part needs site sync.
+      het_uncertainty run part on the CC login node (site run ... run | gzip > data/het_reads.json.gz), reading $SCRATCH/zz_v4_short_<arm>/<axis>/*.npz
+      (t, q, s, pool, pool_row; verified on CC: all 10 axes present for the control pair, share arms PP4 772/908/1055/1129
+      and no EE4). The where-map decile edges come from control seed 42 per read group; per-probe-normalised bins are added
+      as information (they take the class mix out). het logs need site logs -n 3000000 (~506k lines).'
+    ruled_out: Reading the het cost on the catalog-sampled held-out (design and D227 say default-sampled). Pooling HD4 on
+      fewer than four seeds.
+    running: 12 pass-2 gridpool probe jobs (step 18), minus 167ac0d6, which is done and acked; each ends with the false ALERT,
+      to read and ack. repo-reviewer a37205a4e7c152695 re-checking mixture_ab.py.
+    files: 'analysis/catalog_v4/mixture_ab.py (uncommitted), /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/het_uncertainty.py
+      (to move to analysis/catalog_v4/), /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/hu_test/
+      (synthetic test), /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/hetlogs/ (control
+      logs), analysis/catalog_v4/data/reads/FA-ccin2p3-{87ea24d0,321a3de2}_*.json (untracked). NEXT: on reviewer PASS, copy
+      het_uncertainty.py in, commit both (named paths), site sync, then site run het_uncertainty.py run --runs 87ea24d0 321a3de2
+      to test on the control pair, then all six; extract the share arms'' logs (-n 3000000, axes H1..H7c and PP4); run mixture
+      --het, heldout_default --het and the het_uncertainty summary; report missing reads (share arms PP4 remainder, EE4, HD4)
+      as missing.'
+    written: '2026-10-31T14:16:26+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
