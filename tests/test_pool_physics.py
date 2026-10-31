@@ -165,6 +165,20 @@ def test_scenario():
     print("ok scenario")
 
 
+def test_scan_entry_not_reference():
+    """an entry that scans a field (an alpha_s point) is no reference for that field: skipped, not refused"""
+    pdg = [21, 21, 25]
+    probe = {"alpha_s": {"rule": "1loop_nf5_mu_sqrt_shat", "alphas_mz": 0.118}}
+    scan = {"name": "scan", "pdg": pdg, "declared": {"alphas_mz"},
+            "block": {"alpha_s": {"rule": "1loop_nf5_mu_sqrt_shat", "alphas_mz": 0.120}}}
+    bad, skipped, _ = pp.compare(probe, pdg, [scan], ("alphas_mz",))
+    assert not bad and skipped == ["alphas_mz"], (bad, skipped)
+    scan["declared"] = set()
+    bad, _, _ = pp.compare(probe, pdg, [scan], ("alphas_mz",))
+    assert [b["field"] for b in bad] == ["alphas_mz"], bad
+    print("ok scan entry")
+
+
 def test_sidecar_block_used():
     """the probe's block comes from its pool's sidecar when there is one (what the backend did at generation), the b
     row from the particle table now"""
@@ -275,7 +289,7 @@ if __name__ == "__main__":
     try:
         setup_rec = setup()
         TRAIN = setup_rec
-        for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_sidecar_block_used,
+        for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_scan_entry_not_reference, test_sidecar_block_used,
                   test_lhe_parent_check, test_backfill, test_reads):
             t()
         print("all pool physics tests passed")

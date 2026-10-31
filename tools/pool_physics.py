@@ -441,7 +441,7 @@ class TrainingReference:
                 continue
             blk = (blocks or {}).get(name) or physics_block(name if name in mg.PROCESSES else s["base"],
                                                             spec_physics=s["physics"], cfg=cfg)
-            self.entries.append({"name": name, "scan": bool(s["physics"]), "pdg": [int(p) for p in cfg["pdg_ids"]],
+            self.entries.append({"name": name, "scan": bool(s["physics"]), "declared": declared_fields(s["physics"]), "pdg": [int(p) for p in cfg["pdg_ids"]],
                                  "loop": is_loop(cfg), "family": model_family(blk.get("model")), "block": blk})
         self.by_key = {}
         for e in self.entries:
@@ -465,7 +465,6 @@ def compare(probe_blk, pdg_ids, refs, fields, exempt=()):
     """[(field, probe value, reference values)] where the probe's value is none of the references'; plus the fields
     not compared (absent on either side) and the exempt ones present"""
     pv = _view(probe_blk, pdg_ids)
-    rv = [_view(r["block"], r["pdg"]) for r in refs]
     bad, skipped, ex = [], [], []
     for f in fields:
         if f in exempt:
@@ -474,7 +473,11 @@ def compare(probe_blk, pdg_ids, refs, fields, exempt=()):
         if not relevant(f, pdg_ids, probe_blk):
             continue
         vals = []
-        for v in rv:
+        # an entry that scans a field sets it on purpose: it is no reference for that field
+        for r in refs:
+            if f in r.get("declared", ()):
+                continue
+            v = _view(r["block"], r["pdg"])
             if f in v and not any(_same(v[f], w) for w in vals):
                 vals.append(v[f])
         if f not in pv or not vals:
