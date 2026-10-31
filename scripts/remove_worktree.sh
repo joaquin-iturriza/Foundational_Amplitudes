@@ -14,10 +14,10 @@ fi
 bash scripts/fold_worktree.sh "$WT" --apply
 # git refuses to remove a worktree holding untracked files; --force is used only once every untracked file has an
 # identical copy at the same path in the trunk (the fold put the results there); anything else is listed and kept
-# regenerable bytecode (__pycache__/ dirs, *.pyc) never counts: it is never a result
+# regenerable caches (__pycache__/ dirs, *.pyc, .pytest_cache/) never count: they are never a result
 left=()
 while IFS= read -r f; do
-    case "$f" in */__pycache__/*|__pycache__/*|*.pyc) continue ;; esac
+    case "$f" in */__pycache__/*|__pycache__/*|*.pyc|.pytest_cache/*|*/.pytest_cache/*) continue ;; esac
     cmp -s "$WT/$f" "$REPO/$f" || left+=("$f")
 done < <(git -C "$WT" ls-files --others; git -C "$WT" ls-files --others --ignored --exclude-standard)
 if [ ${#left[@]} -gt 0 ]; then
