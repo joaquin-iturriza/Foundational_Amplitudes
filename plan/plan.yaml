@@ -7135,6 +7135,21 @@ entries:
       writes its gridpack): 9 tasks, 0.3 core-h, 3 workers, 1 h limit, target 0.5 h. Still building: 1e7f2159 (u d~ -> d~
       g u z z, 103 of 104 integration channels at 45 min). E20 queue: 585d8d94 done (12 tasks ok), 1 of 3 pools assembled,
       62f8cc25 22ea52de finishing the rest.'
+  - at: '2026-10-31T17:39:19+00:00'
+    text: '2026-10-31T17:55. E3436-E3466: all 28 hd_test_h5 workers and the 3 hd_test_5body workers FAILED at start (logs
+      read whole, the same three tracebacks in each): FileNotFoundError on $SCRATCH/lhe_queue/<queue>/todo and locks. Cause:
+      I planned both queues with a bare --queue name from the checkout (site run), so lhe_parts built them under the checkout
+      while job_lhe_parts.sh drains $SCRATCH/lhe_queue/<name>. Fix 0718400d: a bare name resolves to $SCRATCH/lhe_queue/<name>
+      in every lhe_parts subcommand (tests/test_lhe_queue_path.py); both queues replanned there. Test worker FA-ccin2p3-08fed76b
+      then built all 92 H5 MadEvent parts (64 tasks ok) and exposed two H5 assembly defects (28 tasks failed at assembly):
+      (1) the parent physics check compared the Born tree standalone (sm-no_b_mass, MadEvent alpha_s) with the parent one-loop
+      entry and refused every pool; for label rule virt the labeller is the parent''s own MadLoop standalone, so the check
+      is on it (9735fcc5); (2) assembly built the Born tree standalone, never read for virt pools, and g g > z h ([noborn=QCD])
+      has none (''No compilable backend'', 8b4d9892); tests in tests/test_lhe_virt_label.py, the assembly one fails before
+      the fix and passes after. Test worker FA-ccin2p3-26ae46ac (code 8b4d9892) assembles the 28 pools from the existing parts:
+      8 assembled in its first minutes (2000 test events each, MadLoop labels, label+write 7.5-16 s per pool, e.g. hd_bbx_zz_nlo
+      |M|^2 in [0.10, 240]); the rest are assemblies only (no MadEvent task left), so one worker finishes them, about 10 min.
+      5-body queue resubmitted: FA-ccin2p3-019f489b 7a099e39 7cd23d53 (9 tasks, target 0.5 h).'
   handoff:
     state: 'Step 18: queue hd_test_measured done (348/348 tasks, 106/106 pools assembled, test pools on ccin2p3). Queue hd_test_e20_small_runs
       (the three 20 TeV pools: e+e- photon photon c cbar, e+e- c cbar d dbar, pp d dbar -> d h ubar W+; 35 tasks, est 0.9
