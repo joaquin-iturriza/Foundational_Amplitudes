@@ -3483,7 +3483,8 @@ through the same PP4 probes).}\label{tab:v4_bound_shares}
 \paragraph{What correlates with the error and the predicted uncertainty (2026-10-31).}\label{par:v4_error_correlates} The user's question
 (plan entry error\_correlates): beyond the largest final $|\eta|$ and the collinearity (the smallest pair invariant over
 $\hat s$), which event and process quantities track the per-event error $|q-t|$ of catalog\_v4's short networks and the
-het loss's $\sigma$? No new run: the saved zero-shot reads (best checkpoint) of the twelve short runs of
+het loss's $\sigma$? No new run: the saved reads (best checkpoint; zero-shot for the held-out classes, in distribution
+for the trained classes of PP4 and EE4) of the twelve short runs of
 par.~\ref{par:v4_mixture} (MSE and het loss; control, shares $0.25$ and $0.50$; seeds 42 and 43) on PP4, EE4, the
 catalog-sampled held-out axes and the default-sampled HD4 and HD5, $2313$ probes of $1613$ classes, $2000$ events each.
 The MSE control's PP4 and catalog-sampled held-out reads were saved before the scored events' pool rows were, so their
@@ -3528,7 +3529,7 @@ then 43, het control unless named:
     % allow: 0.25 2 because they are the share and exponents
   \item \emph{The error is mostly the process's.} The log error itself has held-out $R^2$ $0.47$, $0.45$ ($0.25$-share
     MSE: $0.25$, $0.25$), the process features ahead of the kinematic ones. Over classes the error follows the class's
-    spread of $\log|\mathcal M|^2$ ($0.40$; MSE control on its probes $0.53$), its local spread ($0.40$), the neutrinos
+    spread of $\log|\mathcal M|^2$ ($0.40$; the MSE control on its $311$ EE4, HD4 and HD5 probes $0.53$), its local spread ($0.40$), the neutrinos
     ($0.42$) and charged leptons ($0.36$) among the finals, the nearness of its events to a resonance ($-0.32$), the
     electroweak power ($0.30$) and the multiplicity ($0.30$).
     % src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
@@ -3538,6 +3539,7 @@ then 43, het control unless named:
     % claim: gbt_mse25_log_ae_s43=0.25
     % claim: class_ae_t_std=0.40
     % claim: class_ae_t_std_mse_ctl=0.53
+    % claim: mse_ctl_probes=311
     % claim: class_ae_loc_var=0.40
     % claim: class_ae_n_nu=0.42
     % claim: class_ae_n_lepton=0.36
@@ -3546,12 +3548,13 @@ then 43, het control unless named:
     % claim: class_ae_n_final=0.30
     % allow: 0.25 2 because they are the share and exponents
   \item \emph{The control errs on the large amplitudes; default-sampled training removes it.} The within-probe
-    coefficient of the error with $\log|\mathcal M|^2$ is $0.16$, $0.17$ for the het control and $0.26$ for the MSE
-    control's probes, but $-0.05$ to $0.00$ over the four het share arms and $-0.01$, $-0.02$ for the $0.25$-share MSE
+    coefficient of the error with $\log|\mathcal M|^2$ is $0.16$, $0.17$ for the het control (every probe) and $0.26$ for
+    the MSE control on its $311$ EE4, HD4 and HD5 probes, but $-0.05$ to $0.00$ over the four het share arms and $-0.01$, $-0.02$ for the $0.25$-share MSE
     pair; in the het control the top decile of $\log|\mathcal M|^2$ has $1.32$ times its probe's RMS error
     (Fig.~\ref{fig:v4_error_correlates}, right).
     % src: python3 analysis/catalog_v4/error_correlates.py claims @dbc30a14
     % claim: mse_ctl_ae_t_level_s42=0.26
+    % claim: mse_ctl_probes=311
     % claim: share_het_ae_t_level_min=-0.05
     % claim: share_het_ae_t_level_max=0.00
     % claim: mse25_ae_t_level_s42=-0.01
