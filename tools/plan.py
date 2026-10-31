@@ -1206,7 +1206,7 @@ def step_prompt(e, reason, key=None):
 # One agent owns an entry in progress and covers all of it (CLAUDE.md; Joaquin, D186). Owner mode is switched on with
 # the hooks of switch-over D (owner_context.py registered in .claude/settings.json), so the plan, its check and the
 # hooks change in one sitting; before it, plan next lists step agents as it did.
-CONTEXT_CLOSE = 300000        # tokens of an owner's context at which plan next says close (Joaquin, 2026-10-30)
+CONTEXT_CLOSE = 170000        # tokens of an owner's context at which plan next says close (Joaquin, 2026-10-31: keep the 200k window)
 OWNER_STATES = ("working", "stopped", "closed")
 HANDOFF_FIELDS = ("state", "decisions", "ruled_out", "running", "files")
 DESCRIBE_FIELDS = ("objective", "mechanism", "expected")

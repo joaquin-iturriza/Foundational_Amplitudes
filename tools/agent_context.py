@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A subagent's context, read from its transcript (agent redesign D5): the input + cache read + cache creation tokens
 of its last model call, and the compaction boundaries in it. The main session reads it after each hand-back of an
-owner; at 300k tokens or more (tools/plan.py CONTEXT_CLOSE) the owner is asked to write its hand-off and close.
+owner; at 170k tokens or more (tools/plan.py CONTEXT_CLOSE) the owner is asked to write its hand-off and close.
     python3 tools/agent_context.py <agent id> [--json]
 Only subagent transcripts (<session>/subagents/agent-<id>.jsonl) are read, never the main session's."""
 import argparse, json, os, sys
