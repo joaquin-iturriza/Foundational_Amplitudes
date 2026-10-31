@@ -6062,6 +6062,39 @@ entries:
       docs/results.tex, plan show and site decisions for context_push, push, REFERENCE, additionalContext, persisted, skill
       listing, hook output, pushed section, reference section: nothing prior; D202 is the context study it builds on. (6,7)
       Answers next 5 cut 1; no decision names a comparison for it.'
+  - at: '2026-10-31T00:52:49+00:00'
+    question: 'Step 4 (D203): on small tool fixes, does Sonnet 5.5 (its default effort) get the job done as often as Opus
+      5.5 at low effort (D138''s model for mechanical steps), and at what cost with rework? Feeds: route small tool fixes
+      and analyses to Sonnet, or keep Opus at low effort.'
+    prior: 'analysis/agent_redesign/agent_tasks.json (tools/agent_tasks.py, live tasks scored by later corrections): opus-low
+      analyses n=23 all stood at $0.40/task; sonnet analyses n=1 ($0.52), sonnet reviews n=118 all stood $0.36; tool fixes
+      only on opus (n=25, 0.96 stood, $1.87): no sonnet or opus-low tool-fix cell, so undecidable from live data. D138 (opus
+      low for mechanical steps), D203 (run this trial), D205 (TRIAL=model exemption). docs/results.tex: nothing on model choice
+      (searched sonnet, haiku, effort, model trial).'
+    measure: 'tools/model_trial.py at d14f7a37. Ten tasks, each a past fix of this repo (commit C) with its own test: the
+      agent gets a worktree worktrees/zz_trial_<task>_<arm> at C^ and a brief stating the defect as it was seen (never the
+      fix; git history past HEAD and ~/work/FA forbidden), identical text in both arms (model_trial.py brief). Per task and
+      arm: first_pass = C''s test files copied over the agent''s committed work and run in .venv-cpu all pass; a failed task
+      is resumed once (SendMessage) with the check''s output, final_pass after that; $ = the agent''s transcript at list price
+      (usage_windows prices, model_trial.py cost), both attempts summed; hand read of every diff and final report (right cause,
+      no collateral edits, test added, honest report, no lookup of the fix). Per arm: tasks passed first and with rework,
+      hand-read OK, $ per task with rework; per task the paired outcome.'
+    check: 'model_trial.py validate (2026-10-31, before the agents): each of the ten checks fails at C^ and passes at C (defshare
+      91a639fe, ftorders 6e0eece0, poolphys bb70a04a, skipclaim c9b5c8f0, stallshort 53c80201, zsrole 9702a254, ordsrc 77b43ae3,
+      hybridcp 6b387fbb, loopenc ebeb0954, poolrow b5173fa7); 8 other candidates dropped because their check did not separate
+      parent from fix (emaload, runperm, sizeprobe, ppsidecar, memmask pass at the parent; planwait, statusjson fail at the
+      fix on the laptop; ggh over 15 min). Rerun committed to analysis/agent_redesign/model_trial_validate.json.'
+    fixed: Briefs (byte-identical but for the worktree path), subagent type compact-worker (its tools, hooks and rules block),
+      the worktree at C^, one rework resume at most with the same check output format, CPU venv, no jobs; Sonnet at its default
+      effort, Opus with effort low; the tasks chosen before any agent ran, by the validate rule only.
+    control: 'Matched pairs: the same ten tasks in both arms; Opus 5.5 low effort is the reference arm (D138).'
+    seeds: 'One run per task per arm (20 agents, about $30 at list price; no GPU). Repeats not run: the paired design and
+      the hand read carry it; with 10 pairs a difference of one task is 0.1, so the rule below is read on paired discordance
+      and stated as indicative, not decided, when it hinges on one task.'
+    outcome: 'Yes (route small tool fixes and analyses to Sonnet): Sonnet''s tasks passed with rework within 0.1 of Opus-low''s,
+      its hand-read OK count within one, and its $ per task with rework at most 0.6x Opus-low''s. No: keep Opus at low effort
+      for mechanical steps (D138) and record the trial as a dead end for routing. Either way the per-task results go to Joaquin;
+      a routing change is a CLAUDE.md line he approves.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
