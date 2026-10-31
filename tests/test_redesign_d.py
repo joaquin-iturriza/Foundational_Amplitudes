@@ -306,9 +306,9 @@ def d3():
 
 
 # ---------------------------------------------------------------- D4: the owner's brief and its guard
-def brief(prompt, typ="general-purpose", agent=None, model=None):
+def brief(prompt, typ="general-purpose", agent=None, model=None, description="x"):
     inp = {"hook_event_name": "PreToolUse", "tool_name": "Agent", "session_id": "s",
-           "tool_input": {"subagent_type": typ, "prompt": prompt, "description": "x"}}
+           "tool_input": {"subagent_type": typ, "prompt": prompt, "description": description}}
     if model:
         inp["tool_input"]["model"] = model
     if agent:
@@ -362,6 +362,9 @@ def d4():
     scenario("D4: a launch whose model differs from its definition's is refused (compact-worker + sonnet); no model, or "
              "the definition's own (design-reviewer + opus), passes",
              son[0] == 2 and "sonnet" in son[1] and dflt[0] == 0 and rev[0] == 0, (son, dflt, rev))
+    tri = brief(b, "compact-worker", model="sonnet", agent="o1", description="zz_trial t1 TRIAL=model")
+    scenario("D4: a model-trial launch (TRIAL=model in its description, D203/D205) may take another model "
+             "(compact-worker + sonnet passes; without TRIAL=model it is refused)", tri[0] == 0 and son[0] == 2, tri)
     # the night's launches: each main-session addition to a step prompt, replayed in the narrowing slot
     import re as _re
     norm = lambda x: " ".join(x.split())
