@@ -19,9 +19,9 @@ Step 11, on PP4 (recipes/catalog_v4_pp_test.yaml, test split), the classes the b
 (a probe of recipes/catalog_v4_pp_mixed_train.yaml in the class) apart from the others:
   YES  R <= 0.90 with the widened interval below 1;  NO  R >= 0.97 or the widened interval contains 1;
   otherwise a small gain, with its interval. The held-out classes' R is reported (expected: a cost or nothing).
-Step 14, per default share (0.50, 0.25), arm over the catalog_v4 control on three reads: PP4 on the classes catalog_v4
-trains (recipes/catalog_v4_train.yaml, 797; the others reported apart), EE4 on its 169 probes (the classes catalog_v4
-trains and the others also reported apart), and the held-out H1..H7c pooled (catalog_v4 probes only, v4_*; each axis
+Step 14, per default share (0.50, 0.25), arm over the catalog_v4 control on three reads: PP4 on all its 1301 classes
+(the classes catalog_v4 trains, recipes/catalog_v4_train.yaml, 797, and the others also reported apart: the design says
+"on PP4", reporting the parts apart), EE4 on its 169 probes (split the same way), and the held-out H1..H7c pooled (catalog_v4 probes only, v4_*; each axis
 reported as information), with R_seed taken per read:
   GAIN     R <= 0.90 with the widened interval below 1, on PP4 and on EE4
   NO LOSS  the pooled held-out widened interval's upper end below 1.05
@@ -201,7 +201,7 @@ def mixture(partial=False):
     if any(s is None for pair in c.values() for s in pair):
         sys.exit("mixture: a control read is missing: " + "; ".join(missing))
     out = {"design": "plan catalog_coverage, passed 2026-10-30T17:29", "runs": MIX, "missing_reads": missing,
-           "rule": f"GAIN R <= {GAIN} with the widened interval below 1 on PP4 (trained classes) and EE4 (all); NO LOSS "
+           "rule": f"GAIN R <= {GAIN} with the widened interval below 1 on PP4 (all classes) and EE4 (all); NO LOSS "
                    f"the pooled held-out widened upper end below {LOSS}; LOSS pooled R >= {LOSS} with the widened "
                    f"interval above 1; WIN = GAIN and NO LOSS", "shares": {}}
     for a in ("default50", "default25"):
@@ -218,11 +218,11 @@ def mixture(partial=False):
             res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
             res[r]["seeds_read"] = [run for run, s in zip(MIX[a][r], reads[a][r]) if s is not None]
             res[r]["probes_unmatched"] = sorted(str(k) for k in set(arm) ^ set(ctl))[:50]
-        if not all(k in res[r] for r, k in (("PP4", "trained"), ("EE4", "all"), ("held", "pooled"))):
+        if not all(k in res[r] for r, k in (("PP4", "all"), ("EE4", "all"), ("held", "pooled"))):
             res.update(gain=None, cost=None, wins=None)      # --partial with no seed of a read in hand
             out["shares"][a] = res
             continue
-        pp, ee, h = res["PP4"]["trained"], res["EE4"]["all"], res["held"]["pooled"]
+        pp, ee, h = res["PP4"]["all"], res["EE4"]["all"], res["held"]["pooled"]
         gain = all(x["R"] <= GAIN and x["widened"][1] < 1 for x in (pp, ee))
         if h["widened"][1] < LOSS:
             cost = "NO LOSS"
@@ -236,7 +236,7 @@ def mixture(partial=False):
     if s50["wins"] is None or s25["wins"] is None:
         v = None
     elif s50["wins"] and s25["wins"]:
-        below = all(s50[r][n]["widened"][1] < s25[r][n]["R"] for r, n in (("PP4", "trained"), ("EE4", "all")))
+        below = all(s50[r][n]["widened"][1] < s25[r][n]["R"] for r, n in (("PP4", "all"), ("EE4", "all")))
         v = "default50" if below else "default25"
     elif s50["wins"] or s25["wins"]:
         v = "default50" if s50["wins"] else "default25"
