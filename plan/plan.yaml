@@ -439,6 +439,12 @@ entries:
       FA-ccin2p3-3864f1e7 (3 probes per seed), then FA-ccin2p3-b383281f / -11305a34 and stage 2 FA-ccin2p3-07afff2f, chained
       afterok'
     at: '2026-10-31T02:52:06+00:00'
+  - tried: 'event-level prior for the held-out multiplicity gap: soft-dipole factor (par:v4_dipole), propagator product (par:v4_prop),
+      a leave-class-out gradient-boosted map of the event (par:v4_lco, with t), the same without t (par:v4_lco_not, FA-ccin2p3-07afff2f)'
+    why: 'without the label t the own-label ceiling''s share of the gap is 0.016/0.019, under the passed rule''s 0.1 on both
+      seeds: route ends; the leave-class-out map 0.022/0.019, factors only 0.004/0.001; par:v4_lco''s f 0.147/0.125 was t
+      read back. The gap is level and spread, not per-event shape'
+    at: '2026-10-31T03:33:10+00:00'
   asks:
   - ask: 'Go or not for the hybrid reference scale''s GPU test: one more short-pretraining arm (dimensionless_hybrid: log|M|^2
       + (N-4) log s-hat + a per-process constant from the events'' momenta), about 2 GPU-h, plus a target option in experiment.py;
