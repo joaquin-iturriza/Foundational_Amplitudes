@@ -5932,6 +5932,59 @@ entries:
       held-out read; searched results.tex heterosc/het loss/sigma head/sigma stage/pull std/spearman/cover68/uncertain, plan.yaml
       het_uncertainty/sigma map, site decisions sigma/uncertain/het (D52, D69-D71, D220); D220 asks the het-loss uncertainty
       map, not het mixtures, so dropping the share arms narrows nothing the user named'
+  - at: '2026-10-31T04:56:01+00:00'
+    question: 'Two questions, one set of runs (D220; Joaquin 2026-10-31 via the coordinator: fold the mixture comparison under
+      the het loss, D52/D71, config default HETEROSC at 9575cdb2, into the uncertainty read). (1) Under the het loss, does
+      a default-sampled share of 0.50 or 0.25 lower the error on default-sampled events and what does it do on the held-out
+      classes, read on default-sampled held-out events where they exist? (2) Where is a catalog_v4 network uncertain (sigma),
+      on default-sampled events of its trained classes and on held-out classes? Arms v4_het_control, v4_het_default50, v4_het_default25,
+      each seeds 42/43 (scripts/job_catalog_v3_short.sh at 9eaa04d6): training.loss=HETEROSC with the het defaults (heterosc_select
+      nll, beta 0, sigma_after_pool, the 250-step sigma-only stage), sign_head off (experiment.py asserts it is not combined
+      with HETEROSC), all else as the MSE mixture runs. Supersedes the 2-arm design passed 04:52 (share arms back because
+      Joaquin asked for them).'
+    prior: 'MSE mixture result par:v4_mixture (mixture_ab.py mixture @4973581b): R arm/control share 0.50 / 0.25: PP4 all
+      0.682 / 0.755, PP4 trained 0.549 / 0.650, PP4 not trained 0.921 / 0.932, EE4 0.401 / 0.413, held out catalog-sampled
+      pooled 1.271 / 1.225 (GAIN and LOSS, trade-off). New today (mixture_ab.py heldout_default @744fad42): the held-out classes
+      on default-sampled events (the PP4/EE4 probes of H1-H3, 558 classes): pooled R 0.912 [0.802, 1.068] / 0.921 [0.795,
+      1.064]; H1 0.58 / 0.65, H2 0.70 / 0.75, H3 1.13 / 1.08; the same 558 classes catalog-sampled 1.267 / 1.223; the 143
+      classes with no default pool (H2p5, H5, H6, H7E, H7c, one H2 out by D193) catalog-sampled 1.317 / 1.260. Sigma: sec:div-sampling
+      (rank across processes rho about 0.85, within 0.29 base22 / 0.46 u ubar g g, tail floors with 8x data p99 0.0448/0.0468/0.0477,
+      het retraining pull std 2.14 / 1.48 at 2->3 / 2->4, sigma reweighting about 80% of oracle, steering beats uniform on
+      ee->uugg); Daniel''s catalog (catalog_sigma_heldout.py @7719c03f) pull std 1.32 / 13.3 relabels / new, Spearman across
+      0.73 / -0.01, within 0.51 / 0.13. No catalog_v4 het run exists (finding). New: the mixture A/B under the loss now default,
+      and the first sigma on catalog_v4.'
+    measure: '(1) R exactly as par:v4_mixture (mixture_ab.py: per-probe MSE of log|M|^2 at the best checkpoint, het mu; seed
+      geometric mean; class geometric mean of arm/control ratios; median over classes; class bootstrap 10000 widened by |ln
+      R_seed|), on PP4 (all, trained, not trained), EE4, held-out catalog-sampled pooled and per axis, and held-out default-sampled
+      (heldout_default: PP4/EE4 probes of the held-out classes; extended to H2p5..H7c when their default pools exist, a REREAD
+      of these runs). Reported beside the MSE R of the same read. Information: het control over MSE control R on each read
+      (what D52''s loss costs or gains mu). (2) Sigma as the passed design: per class median s, RMSE, pull std, cover68; rank_across
+      and rank_within on PP4/EE4 trained and on held-out; PP4/EE4 deciles of max final |eta| and min pair invariant / s-hat
+      (median s and RMSE per bin), per arm. Scripts committed before reading: mixture_ab.py gains a het run table (MIX_HET),
+      analysis/catalog_v4/het_uncertainty.py -> data/het_uncertainty.json.'
+    check: '(1) R moved with the share on these reads under MSE: PP4 trained 0.549 / 0.650, EE4 0.401 / 0.413, held-out 1.27
+      / 1.22 catalog-sampled against 0.91 / 0.92 default-sampled, against seed noise R_seed 1.08-1.12 (mixture_ab.json, mixture_heldout_default.json
+      @744fad42). (2) Daniel-catalog held-out reads (7719c03f): rank across 0.73 / 0.55 / 0.81 relabels vs -0.01 / 0.37 /
+      0.42 new; within 0.51 vs 0.13; pull std 1.3-1.9 vs 13.3.'
+    fixed: 'As the MSE mixture runs (control FA-ccin2p3-339ec100 / 380842ed, default50 6c246603 / 1d46b938, default25 11ad944a
+      / 9c6fc7ab): recipes catalog_v4_train.yaml / catalog_v4_default50_train.yaml / catalog_v4_default25_train.yaml, dimensionless
+      preprocessing, Muon best HPs, bsm_labels, ITERS_FIXED 4264, mean aggregation, the same probes (2171), events, best-checkpoint
+      rule (lowest val_loss_no_reg), V100 on CC-IN2P3. Changed for all three: loss HETEROSC plus its sigma stage, sign_head
+      off.'
+    control: v4_het_control (seeds 42/43) for both shares, as v4_dimensionless_muon was for the MSE arms; the MSE pairs are
+      read beside, not as the control.
+    seeds: 42 and 43 for every arm, as the MSE mixture cells.
+    outcome: '(1) The par:v4_mixture rule, fixed before any read, per share under het: GAIN at R <= 0.90 with the widened
+      interval below 1 on PP4 and on EE4; NO LOSS when the pooled held-out widened interval ends below 1.05, LOSS at pooled
+      R >= 1.05 with the widened interval above 1; read on default-sampled held-out events (Joaquin: the check is against
+      data generated the default way), the catalog-sampled held-out read reported beside; a share wins on GAIN and NO LOSS;
+      a gain with a loss or an undecided cost is a trade-off for Joaquin. Same verdict as MSE: the loss does not change the
+      share choice; a different verdict: the share choice is read under het (the default). No share chosen here (next 14 is
+      Joaquin''s). (2) Sigma rules as passed: (A) trained classes YES rank_across >= 0.5 and rank_within >= 0.3 (map reported,
+      offered to steering and the share choice), NO rank_across < 0.3 or rank_within < 0.15 (bins from |q-t| only), between
+      weak; (B) held-out calibrated if pull std <= 3 and cover68 >= 0.4, else rank_across >= 0.5 orders the worst held-out
+      cells, < 0.3 does not. A run that blows up is listed apart with where it blew up. Cost: smoke 0.3 GPU-h + 6 x <= 3.75
+      h = <= 22.8 GPU-h.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
