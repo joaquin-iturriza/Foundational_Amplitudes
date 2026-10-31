@@ -48,15 +48,18 @@ def write(fp, content):
 
 
 def agents_on_opus(d):
-    """one result per agent definition: its front matter says `model: opus` (agent redesign B8)."""
+    """one result per agent definition: its front matter says `model: opus` (agent redesign B8), except
+    mechanical-worker, which says `model: sonnet` (D213: mechanical steps on Sonnet)."""
+    want_of = {"mechanical-worker.md": "sonnet"}
     out = []
     for f in sorted(os.listdir(d)) if os.path.isdir(d) else []:
         if not f.endswith(".md"):
             continue
         head = open(os.path.join(d, f)).read().split("---")
         front = head[1] if len(head) > 2 else ""
-        good = any(l.strip() == "model: opus" for l in front.splitlines())
-        print(f"  [{'PASS' if good else 'FAIL'}] {f}: model {'opus' if good else 'NOT opus'}")
+        want = want_of.get(f, "opus")
+        good = any(l.strip() == "model: " + want for l in front.splitlines())
+        print(f"  [{'PASS' if good else 'FAIL'}] {f}: model {want if good else 'NOT ' + want}")
         out.append(good)
     return out
 
@@ -119,7 +122,7 @@ def main():
     ok.append(check("Write ~/.claude/projects/x/memory/MEMORY.md", "md_guard.sh",
                     write(os.path.expanduser("~/.claude/projects/x/memory/MEMORY.md"), "remember this\n"), True))
 
-    print("\nagents — every .claude/agents/*.md runs on opus:")
+    print("\nagents — every .claude/agents/*.md runs on opus (mechanical-worker on sonnet, D213):")
     ok += agents_on_opus(os.path.join(REPO, ".claude", "agents"))
 
     print("\nrun ends — FA's end markers take the RUN_SUMMARY forms its jobs print:")

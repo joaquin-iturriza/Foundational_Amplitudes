@@ -23,6 +23,10 @@ TEMPLATE = os.path.join(ROOT, "plan", "step_prompt.txt")
 EXEMPT = {"design-reviewer", "repo-reviewer", "notes-editor", "claudemd-keeper", "Explore", "Plan",
           "claude-code-guide", "statusline-setup"}
 BEGIN, END = "=== RULES", "=== END RULES ==="
+# a mechanical-worker (D213) may instead carry the short block of plan/mechanical_prompt.txt (`plan brief <entry>
+# --mechanical "<step>"`); the cut check then reads everything outside that block
+MECH_TYPE, MECH_TEMPLATE = "mechanical-worker", os.path.join(ROOT, "plan", "mechanical_prompt.txt")
+MBEGIN, MEND = "=== MECHANICAL RULES", "=== END MECHANICAL RULES ==="
 N = r"(?:\d+|one|two|three|four|five|a few|some|half)"
 UNITS = r"(?:jobs?|seeds?|arms?|workers?|trials?|probes?|parents?|pools?|horizons?|energies|cells?|processes)"
 CUTS = [r"\b(?:fewer|less)\s+(?:\w+\s+)?" + UNITS + r"\b",
@@ -113,6 +117,32 @@ def model_mismatch(ti):
     return None
 
 
+def mech_check(prompt):
+    """A mechanical-worker brief: the mechanical rules block verbatim ({id} filled), and no cut outside it."""
+    try:
+        t = open(MECH_TEMPLATE).read()
+    except OSError:          # no template, no short block to accept: the owner block is then required
+        sys.stderr.write("brief_guard: plan/mechanical_prompt.txt is missing; a mechanical-worker brief needs the "
+                         "owner rules block (`plan brief <entry>`).\n")
+        return 2
+    i, j = t.find(MBEGIN), t.find(MEND)
+    mb = t[i:j + len(MEND)]
+    m = block_re(mb).search(norm(prompt))
+    if not m:
+        sys.stderr.write("brief_guard: a mechanical-worker brief carries the mechanical rules block of "
+                         "plan/mechanical_prompt.txt (or an owner's full rules block). Build it with `python3 "
+                         "tools/plan.py brief <entry> --mechanical \"<the step>\"` and pass its output whole.\n")
+        return 2
+    i, j = prompt.find(MBEGIN), prompt.find(MEND)
+    rest = prompt[:i] + prompt[j + len(MEND):] if 0 <= i < j else prompt   # header spaced otherwise: read it all
+    bad = cuts(rest)
+    if bad:
+        sys.stderr.write("brief_guard: the step cuts the work (a cut of the design is the user's call):\n"
+                         + "\n".join("  " + x for x in bad) + "\n")
+        return 2
+    return 0
+
+
 def main():
     try:
         inp = json.loads(sys.stdin.read() or "{}")
@@ -130,6 +160,8 @@ def main():
     prompt, b = ti.get("prompt") or "", block()
     if b is None:
         return 0
+    if ti.get("subagent_type") == MECH_TYPE and not block_re(b).search(norm(prompt)):
+        return mech_check(prompt)
     if not block_re(b).search(norm(prompt)):
         sys.stderr.write("brief_guard: this brief lacks the rules block of plan/step_prompt.txt (CLAUDE.md: a brief to "
                          "an agent starts from it). Build it with `python3 tools/plan.py brief <entry> --add "

@@ -1480,9 +1480,16 @@ def cmd_describe(a):
     print("plan: %s described" % a.id)
 
 
+MECH_TEMPLATE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "plan", "mechanical_prompt.txt")
+
+
 def cmd_brief(a):
     d, st = load()
     e = entry(d, a.id)
+    if getattr(a, "mechanical", None):
+        # one mechanical step for a mechanical-worker (D213): the short template, its own rules block (brief_guard)
+        print(open(MECH_TEMPLATE).read().replace("{id}", e["id"]).replace("{step}", a.mechanical.strip()))
+        return
     if e.get("status") != "running":
         sys.exit("plan: %s is %s; only a running entry gets an owner" % (a.id, e.get("status")))
     print(owner_brief(e, a.add))
@@ -2969,7 +2976,9 @@ def main(argv=None):
     cmd("describe", cmd_describe, "the entry's objective, the mechanism it tests and the expected outcome", ID,
         A("--objective"), A("--mechanism"), A("--expected"))
     cmd("brief", cmd_brief, "the owner's brief of the entry (plan/step_prompt.txt filled)", ID,
-        A("--add", help="the main session's narrowing (it never overrides the rules block)"))
+        A("--add", help="the main session's narrowing (it never overrides the rules block)"),
+        A("--mechanical", metavar="STEP", help="instead: a mechanical-worker's brief for this one step "
+          "(plan/mechanical_prompt.txt, D213)"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
         A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
     cmd("continuous", cmd_continuous, "mark the entry continuous, with the user's words asking for it", ID,
