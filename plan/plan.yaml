@@ -7128,6 +7128,21 @@ entries:
       Step 19: label rule ''virt'' (77312c3f) and H5 pools (28; 42 gridpacks, 92 runs); design passed; label check a82278d8
       (each H5 class''s 200 catalog test rows relabelled through the rule, compared with stored labels, MadLoop s/point) and
       42 gridpool probes (one per pool and e+e- energy, GP_RUNS 2, 1.5 h limit, target 1.5 h).'
+  - at: '2026-10-31T17:26:12+00:00'
+    text: '2026-10-31T17:40. Step 19: virt label check FA-ccin2p3-a82278d8 COMPLETED (rc=0, log read whole): all 28 H5 classes,
+      200 catalog test rows each relabelled through the ''virt'' rule against the stored labels: 0 unusable of 5600, max relative
+      difference 0 on 18 classes and at most 4.6e-5 (v4_bg_bgg_nlo, 3 points above 1e-6), MadLoop 0.17-0.31 core-s/point,
+      1.23-1.32 for the three 2->3 classes with a gluon (bg_bgg, dg_dgz, gg_bbxg); every double-pole certification PASS. The
+      42 H5 gridpool probes COMPLETED rc=0: 84 runs of 1000 events, each returned 1000 (yield 1.0, kept 1.0), slowest run
+      94 s (lhe_probe_yields_hd_h5.json, lhe_rates_hd_h5.json @5ce30f71). Queue hd_test_h5 (28 pools, 92 tasks, 0.2 core-h
+      MadEvent + about 5 core-h of MadLoop labels at assembly, 16 subprocesses per assembly): 28 workers of 16 cores (one
+      per pool, site pick width 1220, one wave), 1 h limit, target 0.5 h. Step 18: 5-body gridpacks 5d4e6872 (d b~ -> b~ d
+      d d~ g), 926b4f19 (u d~ -> a d~ g g u), 49120869 (u u~ -> a d d~ g z) COMPLETED rc=0 with probe runs of 1000 returning
+      1000 (83-135 s per run); with 518be432 (u g -> d d~ g u z, 227-233 s per run) in lhe_probe_yields_hd_5body.json @9d0f98ba.
+      Queue hd_test_5body (the first three; hd_ug_ddxguz held out of it while the redundant 64-core rebuild 765bdd9c still
+      writes its gridpack): 9 tasks, 0.3 core-h, 3 workers, 1 h limit, target 0.5 h. Still building: 1e7f2159 (u d~ -> d~
+      g u z z, 103 of 104 integration channels at 45 min). E20 queue: 585d8d94 done (12 tasks ok), 1 of 3 pools assembled,
+      62f8cc25 22ea52de finishing the rest.'
   handoff:
     state: 'Step 18: queue hd_test_measured done (348/348 tasks, 106/106 pools assembled, test pools on ccin2p3). Queue hd_test_e20_small_runs
       (the three 20 TeV pools: e+e- photon photon c cbar, e+e- c cbar d dbar, pp d dbar -> d h ubar W+; 35 tasks, est 0.9
