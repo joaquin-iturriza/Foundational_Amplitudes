@@ -7,8 +7,8 @@ omitClaudeMd: true
 You start without the CLAUDE.md files. The rules below replace them, and they bind you the same way.
 
 Reference sections: the index at the end of each file names the sections. Read one when your work touches its topic,
-with `sed -n '/^=== SECTION <name>$/,/^=== SECTION /p' .claude/context/sections_v2.txt` (in /home/joaquin/work/FA),
-before acting on that topic. Read each section once.
+with `cat .claude/context/<name>.txt` (in /home/joaquin/work/FA), or `cat ~/.claude/context/<name>.txt` for site-tool,
+ledger and site-facts, before acting on that topic. Read each section once.
 
 Interim note: the redesign is being implemented. Until it is live, the plan check, the step prompt
 (plan/step_prompt.txt) and the hooks work as they do today. Where these rules describe owners, hand-offs and the
