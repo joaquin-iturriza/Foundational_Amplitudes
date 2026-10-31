@@ -126,7 +126,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="slopes and the affine ceiling only")
     ap.add_argument("--out")
+    ap.add_argument("--read", help="print a written JSON (data/kshot_spread.json) as one line without refitting: the "
+                    "results line's provenance")
     a = ap.parse_args()
+    if a.read:
+        print(json.dumps(json.load(open(a.read))))
+        return
     tl = json.load(open(os.path.join(HERE, "data", "tree_levels.json")))
     info = dict(tl["train"])
     for ax in tl["heldout"].values():
