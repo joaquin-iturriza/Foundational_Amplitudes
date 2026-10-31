@@ -2331,11 +2331,9 @@ entries:
   step_waits:
     '8': FA-ccin2p3-52345dd6
   owner:
-    agent: aa0e9372a78e34830
-    state: closed
-    since: '2026-10-31T03:34:38+00:00'
-    context: 186692
-    context_at: '2026-10-31T03:52:17+00:00'
+    agent: acd8bbf4e51c1e6d4
+    state: working
+    since: '2026-10-31T03:56:15+00:00'
   targets:
   - batch: shape_gap_TR_reread
     wall_h: 1.5
