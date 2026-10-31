@@ -5776,6 +5776,19 @@ entries:
       Standalones: all 9404 *_standalone entries are real directories (no symlinks); 706 have Cards/proc_card_mg5.dat; the
       standalones-census added to the audit classifies the other 8698 and sizes them. Re-run: FA-ccin2p3-7697177c (audit at
       4e844204, same 19 checks + census).'
+  - at: '2026-10-31T01:44:27+00:00'
+    text: 'E3176. Audit re-run FA-ccin2p3-7697177c (pool_physics at 4e844204), sidecar-only check, both mixture train recipes
+      (and catalog_v4_train on EE4): EE4 169 ok + 1 excluded (ee4_epem_cgsxwm, D193) of 170 on all three recipes (118 same-process,
+      51 catalog-wide references); H1 62/62, H2 218/218, H2p5 38/38, H3 279/279, H5 28/28, H6 8/8, H7E 34/34, H7c 34/34 ok
+      on default50 and default25; no mismatching field anywhere. Training reference: 1153 of 1153 entries from sidecars, 0
+      unreadable. Sidecars: 26764, 4 without a physics block, none needing a standalone (1 unmapped: ee_uug__as130). Standalones
+      census: 9404 directories, no symlinks; 706 prune candidates (Cards/proc_card_mg5.dat; mostly the MadLoop *_virt_standalone
+      outputs plus v3_/v4_ ones), 10.7 GB; the other 8698 are standalone_cpp outputs (Cards/ with param_card.dat, SubProcesses,
+      driver.cpp, compiled libME_*.so) that keep no proc_card_mg5.dat, 5.72 GB, prefixes v4 2370, v3 1684, dc 1491, pp13 1396,
+      pp13v4 992, dsh 331, ee4 170, ee 54, d4*/dE100 201, others 9. standalone_dirs() keys on proc_card_mg5.dat, so the prune
+      as written frees 10.7 GB and leaves these 5.72 GB, short of D208 (no MadGraph process outputs kept). Since every sidecar-only
+      check passes, extending standalone_dirs to the standalone_cpp outputs (Cards/param_card.dat + SubProcesses) is physics-safe;
+      not done yet.'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
