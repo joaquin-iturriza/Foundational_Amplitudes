@@ -443,6 +443,14 @@ def size(n_list=(10, 20, 30, 35, 40)):
                 break
         out["by_n"][n] = {"ratio_ci_halfwidth": round(hw, 3), "detectable_failure_rate_difference": dd,
                           "pass_rate_ci_at_0.9": wilson(round(0.9 * n), n)}
+    # live check after a switch (agent_tasks.py, tool-fix cell): revert when failures among the next N Sonnet
+    # tool-fix tasks reach K; chance of a revert when Sonnet fails at Opus's live rate (0.04: 24/25 stood) and at
+    # that rate plus 0.16 (a 0.2 failure rate)
+    def tail(k, n, p):
+        return sum(math.comb(n, i) * p ** i * (1 - p) ** (n - i) for i in range(k, n + 1))
+    out["live_revert_rule"] = {"N": 20, "K": 4, "p_revert_at_0.04": round(tail(4, 20, 0.04), 3),
+                               "p_revert_at_0.20": round(tail(4, 20, 0.2), 3),
+                               "p_revert_at_0.25": round(tail(4, 20, 0.25), 3)}
     print(json.dumps(out, indent=1))
     return out
 
