@@ -95,6 +95,17 @@ def _rate(name, rates, med):
     return med.get(int(cfg["nfinal"]), max(med.values())), "multiplicity median"
 
 
+def queue_path(q):
+    """A bare queue name (no '/') is the queue $SCRATCH/lhe_queue/<name>, the directory job_lhe_parts.sh's workers
+    drain; a plan run with a bare name otherwise built the queue under the current directory, which no worker read."""
+    if os.sep in q:
+        return q
+    s = os.environ.get("SCRATCH")
+    if not s:
+        raise SystemExit(f"queue {q!r}: a bare queue name needs $SCRATCH (the queue is $SCRATCH/lhe_queue/{q})")
+    return os.path.join(s, "lhe_queue", q)
+
+
 def _dirs(q):
     return {k: os.path.join(q, k) for k in ("todo", "claimed", "done", "failed", "assembled", "locks", "specs")}
 
@@ -1240,6 +1251,8 @@ def main():
     rq.add_argument("--energies", action="store_true"); rq.add_argument("--apply", action="store_true")
     sb = sub.add_parser("shortbuilt"); sb.add_argument("--out", required=True); sb.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
+    if getattr(a, "queue", None):
+        a.queue = queue_path(a.queue)
     {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "workdirs": cmd_workdirs, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
