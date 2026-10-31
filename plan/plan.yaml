@@ -5724,7 +5724,6 @@ entries:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '15': FA-ccin2p3-8e1cc529 FA-ccin2p3-7a6a1967 FA-ccin2p3-897aa5d4
-    '14': FA-ccin2p3-8e1cc529 FA-ccin2p3-7a6a1967 FA-ccin2p3-897aa5d4
     '16': the standalone prune FA-ccin2p3-93625c9d
   targets:
   - batch: gridpool_probe
