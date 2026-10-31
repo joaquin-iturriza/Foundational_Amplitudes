@@ -2328,8 +2328,8 @@ entries:
     agent: aa0e9372a78e34830
     state: working
     since: '2026-10-31T03:34:38+00:00'
-    context: 174503
-    context_at: '2026-10-31T03:49:21+00:00'
+    context: 186692
+    context_at: '2026-10-31T03:52:17+00:00'
   targets:
   - batch: shape_gap_TR_reread
     wall_h: 1.5
