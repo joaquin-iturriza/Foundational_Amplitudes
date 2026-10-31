@@ -5189,7 +5189,7 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: ab11dfab0dad3975c
-    state: working
+    state: closed
     since: '2026-10-31T00:44:51+00:00'
     context: 239730
     context_at: '2026-10-31T01:04:59+00:00'
@@ -5405,36 +5405,25 @@ entries:
       re-reads FA-ccin2p3-a152d7d0 (REREAD afc96598) and a01ad665 (REREAD d26f13aa), 1.5 h limit; future arms reading PP and
       PP4 get the reads in their time (training 1.4 h + 2 s x probes).'
   handoff:
-    state: 'Step 14: the four mixture arms (default50 6c246603, default50_seed2 1d46b938, default25 11ad944a, default25_seed2
-      9c6fc7ab) read the stored _smixd pools; control EE4 re-reads FA-ccin2p3-c1863adf (REREAD 339ec100) and def11c5c (REREAD
-      380842ed) queued at 9702a254 (EE4 reader repair: rebuild_run.stand_in_split_set, a probe without train/val pools reads
-      its test pool for them; t, q, mse_logm2_real independent). Load-time mixtures live (mix_compose.py, datagen.ensure_dataset
-      when the stored pool is absent, check_site_data accepts them; c52ab62b), checked on 6 classes x 2 shares x train/test
-      (tools/mix_compose_check.py: every default row is the stored pool''s event, |M|^2 rel <= 3.6e-7, KS log|M|^2 p 0.14-0.9995).
-      Disk on /sps/lpnhe: 420/512 GB used after deleting lhe_work (33 GB), lhe_parts, zz_width_regen, probe keeps, certify/MOV
-      work dirs, mg5amcnlo/*_events. NEXT: (1) once the four arms end: delete the _smixd50_/_smixd25_ pools (train cache,
-      val/test in DATA_DIR, with .alphas.npy and sidecars; ~65 GB), run check_site_data on both default recipes (must pass
-      via composition), submit the arms'' EE4 re-reads (REREAD=<arm>, V3_AXES=EE4, mode eval, --mem=48G, 1 h), write analysis/catalog_v4/data/mixture_ab.json
-      under the 17:29 rule (no readout tool exists yet; compare_v3.py shows how reads are collected). (2) Commit the regeneration
-      procedure into the fa-generation reference: text in the plan finding and /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/regen_procedure.txt;
-      edit sections_v2.txt and fa-generation.txt only (running tools/context_split.py strips the ''on:'' lines of other section
-      files: revert those), after the claudemd-keeper pass. (3) Joaquin''s open call: the 9404 compiled standalones in mg5amcnlo
-      are kept because every probe read''s physics check (tools/pool_physics.py backend_dir -> Cards/param_card.dat) reads
-      them; deleting them needs the check moved to the pool sidecar''s physics block.'
-    decisions: 'Auto-delete fix 28242339 (failed builds keep logs only; lhe_parts workdirs catches any leftover; job_lhe_gc.sh
-      runs it). Control re-reads on CC though site pick offered lxplus: lxplus has neither parents nor EE4 pools, the design
-      fixes CC. Load-time mix statistically, not row for row: the stored pool''s flat/forward rows came from another random
-      stream (no bulk at 0.50); default rows identical. Composed pools under the job''s TMPDIR, not /sps (Joaquin: nothing
-      stored). Rows matched within 1e-9 (build-node momenta differ by ~1 ulp) on the first outgoing p_x (e+e- sqrt(s) takes
-      few values). Standalones kept (reads need them).'
-    ruled_out: Exact byte matching of replayed events (1-ulp differences). Matching by sqrt(s_hat) (ties on e+e- pools). Storing
-      composed pools on /sps.
-    running: FA-ccin2p3-6c246603, 1d46b938 (running), 11ad944a, 9c6fc7ab (pending), c1863adf, def11c5c (pending EE4 control
-      re-reads); step 11 arms afc96598, d26f13aa not mine
-    files: mix_compose.py, tools/mix_compose_check.py, datagen.py, tools/check_site_data.py (c52ab62b); tools/zero_shot_parent.py,
-      tools/rebuild_run.py, tests/test_zero_shot_split.py (9702a254); mg5_pipeline_final.py, tools/lhe_parts.py, scripts/job_lhe_gc.sh,
-      tests/test_lhe_parts.py (28242339)
-    written: '2026-10-31T00:43:21+00:00'
+    state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
+      def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
+      queued. Standalones audit FA-ccin2p3-aab94b13 running (count, size, pools without sidecar physics, sidecar-only check
+      on EE4 and H1..H7c). Regeneration procedure in .claude/context fa-generation + sections_v2 UNCOMMITTED: keeper (a0f0543ca1c399907,
+      lock held) BLOCKs only on the CLAUDE.md fa-generation index line, which needs Joaquin''s go (diff in the main session''s
+      report); on his go commit the three files together and continue the keeper. NEXT on arms'' end: step 15 (delete _smixd50_/_smixd25_
+      pools, check_site_data both recipes, arms'' EE4 re-reads REREAD=<arm>, mixture_ab.json under the 17:29 rule); step 11
+      verdict from the PP4 re-reads; then prune-standalones --apply via job_standalones.sh STANDALONES_MODE=apply once every
+      sidecar-only check is ok; report GB freed and /sps use.'
+    decisions: Physics check reads pool sidecars, backend card only as fallback (D209; 97c43af9, 2efb08ea). lhe_parts gc --parts
+      deletes part files of built pools (D208). Composed pools recorded per run in composed_pools.json. Regeneration time
+      in results.tex par:v4_regen_time (898 core-h MadEvent, compiles 21.4 core-h). Step-11 arms' wall target missed the reads
+      (over 2x), fixed by PP4 re-reads.
+    ruled_out: du of 9404 standalones through site run (login-node timeout).
+    running: FA-ccin2p3-6c246603, 1d46b938, 11ad944a, 9c6fc7ab, def11c5c, aab94b13, a152d7d0, a01ad665
+    files: tools/pool_physics.py, tools/lhe_parts.py, tools/regen_time.py, tools/lhe_rates.py, scripts/job_standalones.sh,
+      datagen.py, experiment.py, mix_compose.py, tests/test_pool_physics.py, tests/test_lhe_parts.py, tests/test_composed_record.py,
+      docs/results.tex
+    written: '2026-10-31T01:08:12+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
