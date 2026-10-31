@@ -5588,6 +5588,12 @@ entries:
     units: null
     start: '2026-10-31T02:09:35+00:00'
     at: '2026-10-31T02:09:35+00:00'
+  - batch: mixture_default25_reread_11ad944a
+    wall_h: 1.25
+    jobs: 1
+    units: null
+    start: '2026-10-31T02:58:24+00:00'
+    at: '2026-10-31T02:58:24+00:00'
   step_why:
     11:
       feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
