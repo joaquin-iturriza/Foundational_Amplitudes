@@ -6374,9 +6374,9 @@ entries:
         before the queue; never padded'
   owner:
     agent: a1ec511cff87b5ca2
-    state: working
+    state: stopped
     since: '2026-10-31T09:09:21+00:00'
-    state_at: '2026-10-31T12:20:04+00:00'
+    state_at: '2026-10-31T12:29:11+00:00'
     context: 85769
     context_at: '2026-10-31T12:20:02+00:00'
   findings:
