@@ -7410,6 +7410,14 @@ entries:
       H6 0.84, H7E 0.97, H7c 0.82. No run blew up. Wall: each job about 2.5 min (21:50:55-21:53:26) against short_wall''s
       0.17 h plan (15 min limit): over 2x, the 1 min per axis start-up dominates eval jobs; a short_wall fix (per-axis minute
       on eval) is open.'
+  - at: '2026-10-31T22:29:43+00:00'
+    text: 'Step 16 design re-check (reviewer a4faf46b1e1550ebe, 2026-10-31 ~22:45): FIX on one point: the go rule for the
+      4x/16x width-16/32 cells must not depend on width 32 beating width 8 at 1x (capacity shows at long training; that would
+      cut D219''s scope); the go rule keeps only the lr-transfer read at 1x width 32 (best checkpoint in the last 5% of steps,
+      no blow-up), its 1x R reported as a result; the width-8-only S2 (76 GPU-h vs 466) offered to Joaquin as his cut. Also
+      to state: the 1x control''s lr 4.997e-3 is the MSE Muon search''s best carried to het untuned, so part of a 4x-over-1x
+      gain may be lr tuning. Next owner: record that revision and re-check with the same reviewer; no submission before Joaquin''s
+      go (D219).'
   handoff:
     state: 'Done this session: par:v4_mixture write-ups (c70595af step-20 verdict; f04c945e shares vs pure-default bound,
       tab:v4_bound_shares); bound re-reads f8ec724f/049b863e read and extracted (mixture_ab bound_default, affc6f0b); catalog_v4_train.yaml
