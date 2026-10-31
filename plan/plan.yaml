@@ -7351,6 +7351,13 @@ entries:
   - at: '2026-10-31T04:24:12+00:00'
     text: 'a compaction inside the turn of owner aa7670a7d3cbd2cba at 2026-10-31T04:17:54.920Z: its brief or scope was too
       large; narrow the next brief'
+  - at: '2026-10-31T04:25:10+00:00'
+    text: 'claudemd-keeper adfa2736b07a1628b (launched before D220) blocked the CLAUDE.md backlog, with its lock still held.
+      d14f4691 itself is fine. Blocking: the reference text for the Stop gate and the context flush is untrue after 5708b248
+      (working-on-the-plan:69-70, fa-hooks:18,26; the Joaquin-opener clause too); context_split --check fails (agents/on fields
+      missing from sections_v2); fa-run-and-config:21, fa-canonical-setup:28,30,32 and fa-sweeps-and-hpo:99,111 are untrue;
+      the jeanzay template has t_steps with 3 values; CONTEXT_CLOSE 300k sits above the 200k compaction window (Joaquin''s
+      call); three passages are said twice. Full report: the agent''s hand-back message in agent-aa7670a7d3cbd2cba.jsonl.'
   handoff:
     state: 'Held by D220 for the weekend. Committed 5708b248: (2) Stop-hook bookkeeping in plan_check (owners recorded resumed/launched/stopped
       from the turn''s SendMessage, Agent launch and task-notification; waiter refusal says the hook cannot arm one; plan
