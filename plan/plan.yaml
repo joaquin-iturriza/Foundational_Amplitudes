@@ -6524,12 +6524,10 @@ entries:
       - 'per-probe time within 2x of the forward: done, short_wall S_PROBE from it'
       - 'a part depends on each probe''s data and cannot be shared: say which, with its seconds, to Joaquin'
   owner:
-    agent: ab2b2bbf984fd46ba
-    state: closed
-    since: '2026-10-31T17:12:02+00:00'
-    state_at: '2026-10-31T18:23:55+00:00'
-    context: 202152
-    context_at: '2026-10-31T18:17:45+00:00'
+    agent: a602c760c71b6a6b3
+    state: working
+    since: '2026-10-31T18:24:31+00:00'
+    state_at: '2026-10-31T18:24:31+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
