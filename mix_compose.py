@@ -132,9 +132,25 @@ def provenance(process, sqrts_min, sqrts_max, n_events, role, seed, pool):
     return out
 
 
-def default_rows_labelled(source, role, seed, rows, accept):
-    """mg.default_share_momenta's rows [a, b), with the |M|^2 the lhe pools carry for them."""
+def default_rows_labelled(source, role, seed, rows, accept, _cache=None):
+    """mg.default_share_momenta's rows [a, b), with the |M|^2 the lhe pools carry for them. The accepted rows of
+    `source` are read, boosted and cut once per (source, role, seed, accept) when a dict `_cache` is passed (compose
+    passes one per pool: every chunk of a pool reads its own slice of the same accepted rows)."""
     a, b = int(rows[0]), int(rows[1])
+    key = (source, role, seed, repr(accept))
+    if _cache is not None and key in _cache:
+        P, sq, me = _cache[key]
+    else:
+        P, sq, me = _default_accepted(source, role, seed, accept)
+        if _cache is not None:
+            _cache[key] = (P, sq, me)
+    if len(P) < b:
+        raise RuntimeError(f"default share of {source} ({role}): rows [{a}, {b}) asked, {len(P)} accepted")
+    return P[a:b], sq[a:b], me[a:b]
+
+
+def _default_accepted(source, role, seed, accept):
+    """Every row of `source`'s lhe pools in the partonic frame inside the pool's window and cuts, in order."""
     parts, labels = [], []
     for name, rec, path in mg.default_share_pools(source, role, seed):
         with open(path + ".recipe.json") as f:
@@ -151,10 +167,7 @@ def default_rows_labelled(source, role, seed, rows, accept):
     ok = (sq >= float(lo)) & (sq <= float(hi))
     if cuts:
         ok &= mg.fiducial_pass_mask(P, np.asarray(m_finals, float), np.asarray(pdg_ids, int), cuts)
-    P, sq, me = P[ok], sq[ok], me[ok]
-    if len(P) < b:
-        raise RuntimeError(f"default share of {source} ({role}): rows [{a}, {b}) asked, {len(P)} accepted")
-    return P[a:b], sq[a:b], me[a:b]
+    return P[ok], sq[ok], me[ok]
 
 
 def compose(process, sqrts_min, sqrts_max, n_events, role, seed, control_pool_path):
@@ -166,7 +179,7 @@ def compose(process, sqrts_min, sqrts_max, n_events, role, seed, control_pool_pa
     prov = provenance(process, sqrts_min, sqrts_max, n_events, role, seed, pool)
     tasks = chunk_plan(process, sqrts_min, sqrts_max, n_events, role, seed)
     f_fwd = float(pol.get("f_fwd", 0.0)); f_def = float(pol["f_default"])
-    out, src, start = [], [], 0
+    out, src, start, cache = [], [], 0, {}
     pdg = np.asarray(cfg["pdg_ids"], np.float64)
     for t in tasks:
         n = int(t["count"]); blk = slice(start, start + n)
@@ -183,7 +196,7 @@ def compose(process, sqrts_min, sqrts_max, n_events, role, seed, control_pool_pa
         take = np.concatenate([idx[p == KIND["flat"]], fwd[:n_fwd], idx[p == KIND["bulk"]][:n_bulk + short]])
         assert len(idx[p == KIND["flat"]]) == n_flat and len(take) == n - n_def, (t["idx"], len(take), n, n_def)
         Pd, _, med = default_rows_labelled(pol["default_source"], role or "train", t.get("default_seed", seed), (a, b),
-                                           (sqrts_min, sqrts_max, m_list, cfg["pdg_ids"], cuts))
+                                           (sqrts_min, sqrts_max, m_list, cfg["pdg_ids"], cuts), cache)
         dr = np.concatenate([Pd.reshape(len(Pd), -1), np.tile(pdg, (len(Pd), 1)), med.reshape(-1, 1)], axis=1)
         rows = np.concatenate([np.asarray(pool[take], np.float64), dr])
         kinds = np.concatenate([p[take - start], np.full(len(dr), KIND["default"], np.int8)])

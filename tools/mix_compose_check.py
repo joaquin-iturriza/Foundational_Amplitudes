@@ -37,11 +37,34 @@ def sqrts(rows, k):
     return np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0, None))
 
 
+def timing(name, lo, hi, n, role, seed):
+    """Seconds of the composition's phases on one pool, and the composed rows with the default-sampled pools read once
+    per pool (compose's cache) against once per chunk (no cache): they must be identical."""
+    with mc._Swap(name, mc.control_config(name)):
+        rec_c = mg.variable_energy_recipe(name, lo, hi, n, role=role, seed=seed)
+        ctrl = mg.recipe_output_path(rec_c, datagen.dest_for_role(role))
+    pool = np.load(ctrl, mmap_mode="r")
+    t0 = time.time(); mc.provenance(name, lo, hi, n, role, seed, pool); t_prov = time.time() - t0
+    t0 = time.time(); rows, kinds = mc.compose(name, lo, hi, n, role, seed, ctrl); t_new = time.time() - t0
+    orig = mc.default_rows_labelled
+    mc.default_rows_labelled = lambda *x, **kw: orig(*x[:5])          # the old path: no cache, every chunk reloads
+    try:
+        t0 = time.time(); rows0, kinds0 = mc.compose(name, lo, hi, n, role, seed, ctrl); t_old = time.time() - t0
+    finally:
+        mc.default_rows_labelled = orig
+    return {"n_chunks": len(mc.chunk_plan(name, lo, hi, n, role, seed)), "s_provenance": round(t_prov, 2),
+            "s_compose_cached": round(t_new, 2), "s_compose_per_chunk": round(t_old, 2),
+            "identical": bool(np.array_equal(rows, rows0) and np.array_equal(kinds, kinds0))}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("recipe"); ap.add_argument("names", nargs="+")
     ap.add_argument("--roles", nargs="+", default=["train", "test"]); ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--load", action="store_true")
+    ap.add_argument("--timing", action="store_true",
+                    help="compose twice, the default-sampled rows read once per pool (as compose does) and once per "
+                         "chunk (the old path): seconds of each phase and whether the two compositions are identical")
     a = ap.parse_args()
     spec = yaml.safe_load(open(a.recipe))
     mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
@@ -52,6 +75,9 @@ def main():
         p = ent[name]; lo, hi = map(float, p["sqrts"]); k = int(mg.PROCESSES[name]["nfinal"]) + 2
         for role in a.roles:
             n = int(p["n_" + role]); t0 = time.time()
+            if a.timing:
+                print(json.dumps(dict(timing(name, lo, hi, n, role, a.seed), **{"class": name, "role": role})), flush=True)
+                continue
             if a.load:
                 path = datagen.ensure_dataset(name, lo, hi, n, role, a.seed, require_cache=True)
                 rows = np.load(path, mmap_mode="r"); side = json.load(open(path + ".recipe.json"))
