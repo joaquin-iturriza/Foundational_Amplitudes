@@ -463,7 +463,7 @@ def gbt(arm, loss, ps, workers):
         return {"error": f"no sklearn: {e}"}
     het = loss == "het"
     F = feat_matrix(arm, ps)
-    names = list(F)
+    names = [f for f in F if np.isfinite(F[f]).any() and np.nanmax(F[f]) > np.nanmin(F[f])]   # all-nan or constant out
     X = np.stack([F[f] for f in names], 1)
     half = np.concatenate([np.full(len(x[3]["runs"][arm]["ev_sub"]["t_level"]), int(hashlib.md5(x[2].encode()).hexdigest()[:8], 16) % 2)
                            for x in ps])
@@ -471,7 +471,7 @@ def gbt(arm, loss, ps, workers):
          "log_ae_n": np.log10(np.clip(stack(arm, ps, "ae_sub"), 1e-12, None))}
     if het:
         T.update(log_s=np.log10(stack(arm, ps, "s_raw_sub")), log_s_n=np.log10(stack(arm, ps, "s_sub")))
-    out = {"n_events": int(len(X)), "n_classes_half": [int(len({x[2] for x in ps if
+    out = {"n_events": int(len(X)), "dropped": [f for f in F if f not in names], "n_classes_half": [int(len({x[2] for x in ps if
                                                                  int(hashlib.md5(x[2].encode()).hexdigest()[:8], 16) % 2 == h}))
                                                         for h in (0, 1)]}
     rng = np.random.default_rng(1)
@@ -487,12 +487,12 @@ def gbt(arm, loss, ps, workers):
                 Xt, yt = Xt[sel], yt[sel]
             base = m.score(Xt, yt)
             r2.append(base)
-            pi = permutation_importance(m, Xt, yt, n_repeats=3, random_state=0, n_jobs=min(workers, 8))
+            pi = permutation_importance(m, Xt, yt, n_repeats=3, random_state=0)
             imp.append(pi.importances_mean)
             for g, fs in GROUPS.items():
                 Xp = Xt.copy()
                 perm = rng.permutation(len(Xp))
-                for f in fs:
+                for f in (f for f in fs if f in names):
                     Xp[:, names.index(f)] = Xt[perm, names.index(f)]
                 gimp[g].append(base - m.score(Xp, yt))
         out[tg] = {"r2_heldout_classes": [r4(x) for x in r2],
