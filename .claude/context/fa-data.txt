@@ -38,7 +38,7 @@ cmds: \bprocesses_file\b
     (deficit-to-solo plateau-aware). Not the default (`training.use_balanced_sampler: false`): the equal/uniform
     sampler won best-vs-best at 8 datasets, the benefit diluting with many datasets. Opt-in for mixtures of few, very
     unbalanced datasets.
-  - **Loss aggregation is `geometric_mean` by default** (`config/default.yaml`;
+  - **Loss aggregation is `geometric_mean` by default (under MSE; HETEROSC forces mean)** (`config/default.yaml`;
     used in essentially every run): a log-space mean over per-process MSEs, so a 10%
     relative gain on a 1e-6 process counts equally with a 10% gain on a 1e-2 one —
     processes of different final-state dimensionality (hence very different MSE
