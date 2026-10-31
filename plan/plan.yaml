@@ -2120,6 +2120,43 @@ entries:
       is about 0.003 against a bar of 0.1; the fit and score events are asserted disjoint (kshot_spread.py line 114), the
       shr_tr prior uses only the cell''s training pools, shr_ho uses other classes'' held-out pools, the ceiling is out-of-fold,
       and the floor comes from training pools.'
+  - at: '2026-10-31T03:41:07+00:00'
+    question: 'Option (c) of step 6, run under D178''s priority (3) (''check that 8-16 points really remove it''), beside
+      D216''s (b): (1) does a per-process level and spread correction from labelled events close the held-out multiplicity
+      gap? Answered by the check already run (affine ceiling, below). (2) The open question the K reads decide: at K = 4,
+      8, 16 labelled events, does fitting a slope as well as the level (shrunk to a prior) cost or gain MSE against the plain
+      offset on the same draws? It sets the few-shot protocol for new multiplicity processes (offset only, or offset and slope).'
+    prior: 'par:v4_kshot_level (H2: zero-shot 0.46/0.48, floor var(q-t) 0.38/0.39, offset K=16 0.41/0.42); catalog_v3 context-vector
+      K-shot (2->4: floor 0.84, offset 0.89, context fit 1.25: free per-process parameters at K<=16 chase noise); par:kshot_level,
+      Daniel''s catalog (affine needs K>=8 to beat the offset, lowered the floor 10-50%); ''Few-shot calibration, and surrogates
+      computed from momenta alone'' (D83, Daniel''s catalog: rescale and shift at k=3/10/100 0.137/0.091/0.082 on the 43 new,
+      oracle 0.080 vs 1.27 uncalibrated; shrinking the slope toward 1 helped at k=3, s_hat+coupling 0.22 -> 0.14, shared 0.36
+      -> 0.29); par:v4_lco_not (own-label kinematic ceiling 0.016/0.019 of the gap). Searched results.tex: affine, K-shot,
+      kshot, context vector, compress, calibrat, rescale, few-shot, spread; plan dead ends; D178, D216.'
+    measure: 'analysis/catalog_v4/kshot_spread.py @68cbe363 on the control pair''s local reads (2000 val events per pool):
+      218 H2 pools, 716 TR pools of the 7 cells (floor_c = median var(u) over the cell''s TR pools). K in {4,8,16,64,256},
+      200 draws per pool, seeded per pool, shared by all methods: plain offset; OLS affine; affine with the slope shrunk to
+      the cell''s training-pool median slope (lam = s2/tau2 from TR pools only; primary); shrunk toward 1 with the same lam;
+      shrunk to the other held-out classes'' slopes (leave-class-out). Fit on the K drawn events and prior pools only, scored
+      on the other 2000-K (asserted disjoint). f_m = median_p[var(u)_p - mse_m,p]/median_p[var(u)_p - floor_c]; g = f_shr_tr
+      - f_off at each K.'
+    check: 'Run (@aa5aff19 --check, reproduced by the reviewer): median gap 0.210/0.192 (par:v4_lco 0.207/0.189); affine ceiling
+      (1600 fit, 400 scored, 5 folds) f_ceil 0.012/0.017 (bootstrap 0.010-0.016 / 0.012-0.021), cubic in q 0.023/0.037; slope
+      of t on q 1.008/1.006 on H2, 0.998/0.999 on TR; median mse after the affine / var(u) 0.992 (H2), 1.001 (TR). This answers
+      question (1): no per-process affine or smooth function of q carries more than 4% of the gap; the prediction is calibrated
+      (slope about 1), not compressed. For question (2) the measure moves: the D83 read found slope shrinkage changed k=3
+      MSE 0.22 -> 0.14, and an unshrunk slope at K=4 adds estimation noise of order 2 var/K that the offset does not.'
+    fixed: The control pair's existing reads (v4_dimensionless_muon / _seed2, best checkpoint, 2000 events per pool), cells,
+      floors, draws (200, seeded per pool), bootstrap (1000, seed 0, lco_map.boot). No new run, laptop CPU about 15 min.
+    control: The plain offset at the same K and draws (g's reference); the same corrections on the 716 TR pools; the ceiling
+      at K=1600.
+    seeds: Seeds 42 and 43 decided separately; margin max(seed difference of g, the larger bootstrap half-range of the two
+      f).
+    outcome: '(1) Written up now from the ceiling: option (c) does not carry the gap; par:v4_lco_not''s ''level and spread''
+      sentence corrected to: neither level beyond an offset, nor process-wide spread, nor per-event kinematics; the gap is
+      left to (b) (D216) and (a) (held, D78). (2) Per K in 4, 8, 16 (primary 16), g = f_shr_tr - f_off: gain when g - margin
+      > 0 on both seeds (the protocol fits offset and shrunk slope from that K), cost when g + margin < 0 on both (offset
+      only at that K), else neutral (offset only, the simpler); shr1 and the unshrunk affine reported beside.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
