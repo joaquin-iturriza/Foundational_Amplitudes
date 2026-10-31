@@ -3423,6 +3423,9 @@ entries:
       the right numbers''): build MadEvent-default test pools for H1-H7c, re-read the MSE arms and control pair on them (REREAD),
       then the same comparison under the het loss (arms at both shares and control, seeds 42/43) folded into the het design;
       GPU-h stated, above 30 to Joaquin'
+    18: 'Default-sampled test pools for the 142 held-out classes without one (H2p5 38, H5 28, H6 8, H7E 34, H7c 34; about
+      20.8 core-h CPU, estimate from heldout_default_pools.py f15cd5bf): generation spec at their own energy, cuts and labels,
+      per-class probe, queue, then eval-only re-read of the MSE arms and control pair'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6179,6 +6182,11 @@ entries:
       if:
       - 'default-sampled held-out R below 1.05 at a share with PP4/EE4 gain: that share is a clean win'
       - 'held-out R above 1.05 on default-sampled pools: a real generalisation cost, a trade-off for Joaquin'
+    18:
+      feeds: next 14, the share choice
+      if:
+      - 'the 142 classes read below 1.05 pooled: the held-out read is complete and no loss'
+      - 'above 1.05: a generalisation cost on those axes, a trade-off for Joaquin'
   owner:
     agent: aadc46d99c71df5e6
     state: working
