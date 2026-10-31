@@ -5396,6 +5396,14 @@ entries:
       Audit + sidecar-only check on CC: FA-ccin2p3-aab94b13 (EE4 on the control and both mixture recipes; H1..H7c on both
       mixture recipes). (c) lhe_parts gc --parts deletes part files of built pools [D208]. (d) Regeneration time in results.tex
       par:v4_regen_time (150117d7): 898 core-h of MadEvent over 3448 pools.'
+  - at: '2026-10-31T01:07:59+00:00'
+    text: '2026-10-31: step-11 pure-default bound arms v4_dimensionless_muon_pp (FA-ccin2p3-afc96598) and _seed2 (d26f13aa)
+      ended at TIMEOUT: training complete (4264 of 4264 steps in 75.3 and 80.9 min, best checkpoint saved), held-out H1..H7c
+      read in full (701 probes), then killed inside the catalog_v3 PP axis (1308 probes read) before PP4, the design''s measure.
+      The wall target (about 1.5 GPU-h) left out the zero-shot reads (about 2 s per probe; H1..H7c + XV3 + PP + PP4 is about
+      3300 probes, about 1.8 h), so the job needed about 3.3 h against 1.5: over 2x, the target was wrong. Fix: PP4 eval-only
+      re-reads FA-ccin2p3-a152d7d0 (REREAD afc96598) and a01ad665 (REREAD d26f13aa), 1.5 h limit; future arms reading PP and
+      PP4 get the reads in their time (training 1.4 h + 2 s x probes).'
   handoff:
     state: 'Step 14: the four mixture arms (default50 6c246603, default50_seed2 1d46b938, default25 11ad944a, default25_seed2
       9c6fc7ab) read the stored _smixd pools; control EE4 re-reads FA-ccin2p3-c1863adf (REREAD 339ec100) and def11c5c (REREAD
