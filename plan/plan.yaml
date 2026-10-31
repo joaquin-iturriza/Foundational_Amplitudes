@@ -6450,6 +6450,9 @@ entries:
     6: 'Cut 1 live check: after 10 subagents have run past 85064616, python3 tools/push_replay.py --since 2026-10-31T00:25:00Z
       --check (in-force hook reproduces recorded REFERENCE chars within 5 percent), matched saving per agent, hand read of
       every correction of them for a cause in a withheld section'
+    7: 'Wake cuts from the usage attribution (main_turns.py @379982a1, redesign era main session $49): Stop-hook refusals
+      18% of $ (35 wakes, $0.25 each), orchestration-only wakes 45% (145, $0.15 each at ~240k context), 34 inline turns 31%
+      per turn / 9% per call (edits of hooks, site, site_gate, settings, CLAUDE.md): proposals to Joaquin'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -6554,6 +6557,12 @@ entries:
       if:
       - 'reproduced and no correction traced: keep, write up'
       - 'a correction traced to a withheld section: remove that header line, dead end'
+    7:
+      feeds: whether the main session's wake and inline cost falls under the redesign
+      if:
+      - 'Joaquin approves quieting the refusing Stop hooks and routing inline fixes to agents: apply, re-measure with main_turns.py
+        after a day'
+      - 'Joaquin declines: record as a dead end with his words'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
