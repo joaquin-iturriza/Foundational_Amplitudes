@@ -2367,7 +2367,7 @@ processes:
       energy_runs:
       - 1
       - 4
-      - 4
+      - 7
       gridpack: 13057
     parent: v4_epem_aaccx
     split: heldout

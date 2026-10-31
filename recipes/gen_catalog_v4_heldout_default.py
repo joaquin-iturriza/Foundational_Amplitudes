@@ -48,7 +48,9 @@ N_TEST = 2000
 # size, complete share)}). Every run of these two that returned gave all 1000 events it asked (share 1.0); the slow
 # energies' runs of 1000 took 340-1787 s and 1255 s or more (photon photon c cbar, 10 and 20 TeV) and 3509-3524 s and
 # over 1790 s (c cbar d dbar, 10 and 20 TeV)
-RUN_SIZES = {"v4_epem_aaccx__E20": {"10000": (250, 1.0), "20000": (250, 1.0)},
+# photon photon c cbar at 20 TeV: of its 4 queue runs of 250 (hd_test_e20_small_runs, FA-ccin2p3-22ea52de) 2 returned 250,
+# one 237 and one 54 (802 s), complete share 0.5 there, so 500 complete events against the 667 its equal share needs
+RUN_SIZES = {"v4_epem_aaccx__E20": {"10000": (250, 1.0), "20000": (250, 0.5)},
              "v4_epem_ccxddx__E20": {"10000": (250, 1.0), "20000": (250, 1.0)}}
 # pp pools in runs of fewer events (complete_layout's run_events): d d~ -> d h u~ W+ at 20 TeV, whose runs of 1000 returned
 # 1000 and 304 events and timed out twice at 1800 s (step 18 pass 1-2), returned 250 of 250 in each of its runs of 250
