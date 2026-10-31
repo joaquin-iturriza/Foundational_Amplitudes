@@ -174,11 +174,14 @@ entries:
     - FA-ccin2p3-4ecff34d
     - FA-ccin2p3-56b985a5
     - FA-ccin2p3-5a8c8fde
+    - FA-ccin2p3-5b90e4f8
     - FA-ccin2p3-61c09ed7
     - FA-ccin2p3-67ca3313
     - FA-ccin2p3-6d35589c
     - FA-ccin2p3-7145824e
     - FA-ccin2p3-71a96ca2
+    - FA-ccin2p3-74276bdb
+    - FA-ccin2p3-7ad4b5e3
     - FA-ccin2p3-84b85010
     - FA-ccin2p3-84f8e70b
     - FA-ccin2p3-878d6b9a
@@ -191,15 +194,17 @@ entries:
     - FA-ccin2p3-a3a2c475
     - FA-ccin2p3-a7009d00
     - FA-ccin2p3-bc20e0d6
+    - FA-ccin2p3-d42685fe
     - FA-ccin2p3-d634e7d6
     - FA-ccin2p3-e3506d57
     - FA-ccin2p3-e37d7ec2
+    - FA-ccin2p3-e772de8c
     - FA-ccin2p3-eaff0f54
     - FA-ccin2p3-ecc413f9
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: 5f15e75b
+    commit: a767b36a
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -233,6 +238,7 @@ entries:
     - analysis/catalog_v3/sign_head_search.py
     - analysis/catalog_v4/data/dipole_gate.json
     - analysis/catalog_v4/data/kshot_level.json
+    - analysis/catalog_v4/data/lco_map.json
     - analysis/catalog_v4/data/loop_born.json
     - analysis/catalog_v4/data/loop_born_events.json
     - analysis/catalog_v4/data/loop_groups.json
@@ -259,6 +265,7 @@ entries:
     - analysis/catalog_v4/figs/tree_levels_shape.png
     - analysis/catalog_v4/figs/tree_levels_top.png
     - analysis/catalog_v4/kshot_level.py
+    - analysis/catalog_v4/lco_map.py
     - analysis/catalog_v4/loop_born_events.py
     - analysis/catalog_v4/loop_levels.py
     - analysis/catalog_v4/prop_width_check.py
