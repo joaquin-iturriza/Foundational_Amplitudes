@@ -1,0 +1,213 @@
+{
+ "design": "plan catalog_coverage step 14, REREAD on default-sampled held-out events",
+ "shares": {
+  "default50": {
+   "default": {
+    "pooled": {
+     "R": 0.9117,
+     "n_classes": 558,
+     "boot95": [
+      0.8734,
+      0.9807
+     ],
+     "widened": [
+      0.802,
+      1.0679
+     ],
+     "frac_classes_below_1": 0.5609,
+     "n_probes": 558,
+     "R_seed": 1.0889
+    },
+    "H1": {
+     "R": 0.5821,
+     "n_classes": 62,
+     "boot95": [
+      0.4594,
+      0.717
+     ],
+     "widened": [
+      0.4287,
+      0.7684
+     ],
+     "frac_classes_below_1": 0.7581,
+     "n_probes": 62,
+     "R_seed": 1.0716
+    },
+    "H2": {
+     "R": 0.7049,
+     "n_classes": 217,
+     "boot95": [
+      0.6086,
+      0.7621
+     ],
+     "widened": [
+      0.5554,
+      0.8351
+     ],
+     "frac_classes_below_1": 0.7419,
+     "n_probes": 217,
+     "R_seed": 1.0958
+    },
+    "H3": {
+     "R": 1.1332,
+     "n_classes": 279,
+     "boot95": [
+      1.0501,
+      1.2009
+     ],
+     "widened": [
+      0.9698,
+      1.3003
+     ],
+     "frac_classes_below_1": 0.3763,
+     "n_probes": 279,
+     "R_seed": 1.0828
+    }
+   },
+   "catalog_sampled": {
+    "same_classes": {
+     "R": 1.2673,
+     "n_classes": 558,
+     "boot95": [
+      1.2355,
+      1.3012
+     ],
+     "widened": [
+      1.1471,
+      1.4014
+     ],
+     "frac_classes_below_1": 0.1918,
+     "n_probes": 558,
+     "R_seed": 1.0771
+    },
+    "no_default_pool": {
+     "R": 1.3168,
+     "n_classes": 143,
+     "boot95": [
+      1.2172,
+      1.4223
+     ],
+     "widened": [
+      1.0876,
+      1.5917
+     ],
+     "frac_classes_below_1": 0.1958,
+     "n_probes": 143,
+     "R_seed": 1.1191
+    }
+   },
+   "axes_without_default_pool": [
+    "H2",
+    "H2p5",
+    "H5",
+    "H6",
+    "H7E",
+    "H7c"
+   ]
+  },
+  "default25": {
+   "default": {
+    "pooled": {
+     "R": 0.9211,
+     "n_classes": 558,
+     "boot95": [
+      0.866,
+      0.9772
+     ],
+     "widened": [
+      0.7953,
+      1.0642
+     ],
+     "frac_classes_below_1": 0.5591,
+     "n_probes": 558,
+     "R_seed": 1.0889
+    },
+    "H1": {
+     "R": 0.6541,
+     "n_classes": 62,
+     "boot95": [
+      0.5138,
+      0.8113
+     ],
+     "widened": [
+      0.4794,
+      0.8694
+     ],
+     "frac_classes_below_1": 0.7419,
+     "n_probes": 62,
+     "R_seed": 1.0716
+    },
+    "H2": {
+     "R": 0.7468,
+     "n_classes": 217,
+     "boot95": [
+      0.6742,
+      0.8231
+     ],
+     "widened": [
+      0.6153,
+      0.902
+     ],
+     "frac_classes_below_1": 0.6774,
+     "n_probes": 217,
+     "R_seed": 1.0958
+    },
+    "H3": {
+     "R": 1.0824,
+     "n_classes": 279,
+     "boot95": [
+      1.0211,
+      1.1368
+     ],
+     "widened": [
+      0.943,
+      1.2309
+     ],
+     "frac_classes_below_1": 0.4265,
+     "n_probes": 279,
+     "R_seed": 1.0828
+    }
+   },
+   "catalog_sampled": {
+    "same_classes": {
+     "R": 1.2225,
+     "n_classes": 558,
+     "boot95": [
+      1.1946,
+      1.2471
+     ],
+     "widened": [
+      1.1091,
+      1.3432
+     ],
+     "frac_classes_below_1": 0.2276,
+     "n_probes": 558,
+     "R_seed": 1.0771
+    },
+    "no_default_pool": {
+     "R": 1.2598,
+     "n_classes": 143,
+     "boot95": [
+      1.1782,
+      1.2976
+     ],
+     "widened": [
+      1.0528,
+      1.4522
+     ],
+     "frac_classes_below_1": 0.2378,
+     "n_probes": 143,
+     "R_seed": 1.1191
+    }
+   },
+   "axes_without_default_pool": [
+    "H2",
+    "H2p5",
+    "H5",
+    "H6",
+    "H7E",
+    "H7c"
+   ]
+  }
+ }
+}

@@ -6,6 +6,8 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
                                     data/reads/<run>_<axis>.json {probe: mse_logm2_real}; a record with an error, a
                                     non-finite MSE or a physics status other than ok/allowed is listed apart
   bound                             step 11 -> data/pp_bound.json
+  heldout_default                   step 14's held-out classes on default-sampled events (PP4/EE4 probes of the
+                                    held-out classes) -> data/mixture_heldout_default.json
   mixture [--partial]               step 14 -> data/mixture_ab.json, only when every read of the design is in;
                                     --partial prints what the reads in hand give (a missing seed left out, no
                                     verdict, nothing written)
@@ -256,6 +258,45 @@ def mixture(partial=False):
     print(json.dumps(out))   # the whole result, the last JSON line (tools/verify_claims.py reads its claims from it)
 
 
+def heldout_default():
+    """The held-out classes read on default-sampled events (Joaquin, 2026-10-31: the check is against data generated
+    the default way): the PP4 and EE4 probes (MadEvent default, test split) whose class is in a held-out axis
+    (recipes/catalog_v4_heldout_<axis>.yaml), per axis and pooled, R as in mixture (arm over control, R_seed of the
+    same probes), beside the catalog-sampled held-out read on the same classes and on the classes with no
+    default-sampled pool. -> data/mixture_heldout_default.json"""
+    cls = class_of()
+    ax_of = {}
+    for ax in HELD:
+        for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v4_heldout_{ax}.yaml")))["processes"]:
+            if p["name"].startswith("v4_"):
+                ax_of[cls(p["name"])] = ax
+    reads = {a: {r: tuple(read_of(run, r) for run in runs) for r, runs in v.items()} for a, v in MIX.items()}
+    tag = lambda r, d: {(r, k): x for k, x in d.items()}
+    out = {"design": "plan catalog_coverage step 14, REREAD on default-sampled held-out events", "shares": {}}
+    for a in ("default50", "default25"):
+        arm, ctl, c42, c43 = {}, {}, {}, {}
+        for r in ("PP4", "EE4"):
+            arm.update(tag(r, side(reads[a][r]))); ctl.update(tag(r, side(reads["control"][r])))
+            c42.update(tag(r, reads["control"][r][0])); c43.update(tag(r, reads["control"][r][1]))
+        keys = sorted((k for k in set(arm) & set(ctl) if cls(k[1]) in ax_of), key=str)
+        res = {"default": {"pooled": compare(arm, ctl, c42, c43, keys, cls)}}
+        for ax in HELD:
+            ks = [k for k in keys if ax_of[cls(k[1])] == ax]
+            if ks:
+                res["default"][ax] = compare(arm, ctl, c42, c43, ks, cls)
+        have = {cls(k[1]) for k in keys}
+        harm, hctl = side(reads[a]["held"]), side(reads["control"]["held"])
+        hk = sorted(set(harm) & set(hctl), key=str)
+        hc = reads["control"]["held"]
+        res["catalog_sampled"] = {
+            "same_classes": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) in have], cls),
+            "no_default_pool": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) not in have], cls)}
+        res["axes_without_default_pool"] = sorted({ax for c, ax in ax_of.items() if c not in have})
+        out["shares"][a] = res
+    json.dump(out, open(os.path.join(DATA, "mixture_heldout_default.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -263,6 +304,7 @@ def main():
     e.add_argument("run"); e.add_argument("log"); e.add_argument("axis", nargs="?", default="PP4")
     e.add_argument("--allow-unchecked", action="store_true")
     sub.add_parser("bound")
+    sub.add_parser("heldout_default")
     m = sub.add_parser("mixture")
     m.add_argument("--partial", action="store_true")
     a = ap.parse_args()
@@ -270,6 +312,8 @@ def main():
         extract(a.run, a.log, a.axis, a.allow_unchecked)
     elif a.cmd == "mixture":
         mixture(a.partial)
+    elif a.cmd == "heldout_default":
+        heldout_default()
     else:
         bound()
 
