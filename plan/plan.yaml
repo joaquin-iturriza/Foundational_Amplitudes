@@ -6495,7 +6495,7 @@ entries:
   title: the redesign of how agents work on this project
   question: Does the implemented redesign (hooks, review, supervisor, owners and hand-offs, rules-only CLAUDE.md with pushed
     sections) hold on tonight's real states and in live use?
-  status: running
+  status: held
   quotes:
   - said_at: '2026-10-30T04:46:16.657000+00:00'
     text: everything else I believe looks good I believe, you can start
@@ -6514,10 +6514,19 @@ entries:
     answers_after: '2026-10-31T00:21:20+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-10-31T04:23:28.836000+00:00'
+    text: 'So right now, we let things that are running finish, but nothing else gets done except two things: The catalog4
+      + pp beams mixtures, smart sampling arm, we see the results of the mixtures, we see using the het loss the places where
+      the network is uncertain, and decide what to do then, but nothing more than that.'
+    decision: D221
+    answers_after: '2026-10-31T00:21:20+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
   - D211
+  - D221
   next:
     1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
       reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
@@ -7361,3 +7370,4 @@ entries:
     files: tools/plan.py .claude/hooks/plan_check.py .claude/hooks/context_guard.py .claude/hooks/stop_conditions.py tests/test_redesign_d.py
       tests/test_hooks_real.py ~/.local/bin/site (waiter text; backup site.bak_20261030_waitertext)
     written: '2026-10-31T04:24:26+00:00'
+  hold_decision: D221
