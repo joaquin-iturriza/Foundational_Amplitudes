@@ -6205,6 +6205,50 @@ entries:
       at H2p5''s settings, as D227 asks. Loss: het arms HETEROSC (D226), MSE arms re-read as step 17 asked. Searched: H5,
       one-loop held, default-sampled, heldout_default, Born events, label virt, hd_, MadLoop label in docs/results.tex; entry
       evidence/dead ends; site decisions (H5, one-loop, default way): no prior default-sampled H5 read.'
+  - at: '2026-10-31T22:25:06+00:00'
+    question: 'Step 16 (D219, D229, D231: the long runs on the 0.25 catalog): on catalog_v4 at default share 0.25 (recipes/catalog_v4_train.yaml),
+      how do the validation loss and the zero-shot reads fall with training length and with muP width, and is the network
+      big enough (does width still buy at the longest length)? Grid: lengths 4264 (1x, the short runs), 17056 (4x) and 68224
+      (16x) steps x widths net.num_heads 8, 16, 32 x seeds 42, 43; 18 cells, the 2 at 1x width 8 exist (the share-0.25 arms
+      FA-ccin2p3-11ad944a, 9c6fc7ab), 16 new runs'
+    prior: 'docs/results.tex: sec. muP holds across width (eta* flat over num_heads 2-32: 6.0, 3.6, 3.4, 3.0, 2.9e-3; not
+      flat in horizon, inverted-U law eta*(t) ~ 1e-2 min[(t/3000)^0.5, (t/3000)^-0.55]); par. ''The het loss trained longer''
+      (single process ee->ttbar, 8k/16k/32k steps: best at the last step each time, test MSE 2.9e-8, 1.2e-8, 5.1e-9); par.
+      ''A 32k horizon at D=1e3'' (no clear gain at small data: over-training, best checkpoints early); sec:bigrun (448 processes,
+      8601 steps, one width). catalog_v4: only the short runs (4264 steps, width 8, 1e4 events per process; par:v4_mixture,
+      tab:v4_bound_shares). Plan: catalog_coverage next 16 (this), next 7 (capacity and length for the multiplicity gap, held
+      inside the full pretraining). Decisions: D219 (longer and wider muP runs, GPU-h to Joaquin before launch), D229/D231
+      (0.25 final). No catalog-scale length or width scan found (searched: scaling, width, num_heads, horizon, long, bigrun,
+      muP).'
+    measure: 'Per run at its best checkpoint (es_load_best_model true): aggregate val_loss_no_reg (geometric mean over processes)
+      and the zero-shot reads of the short runs, each probe''s MSE of log|M|^2 at 2000 test events: PP4 (1301), EE4 (169),
+      the 700 default-sampled held-out classes (H1-H3 via PP4/EE4, HD4, HD5), and the catalog-sampled held-out axes H1-H7c.
+      R of each cell against the 1x width-8 share-0.25 pair (median over classes of the ratio, class bootstrap widened by
+      |ln R_seed|, as mixture_ab). Scaling: L(C) = A C^-alpha + L_inf over compute C = steps x per-step FLOPs, per width and
+      across widths (CLAUDE.md fit form; bare power law a labelled diagnostic). A run that blows up listed apart with where.'
+    check: 'Length moves the loss on existing data: the ee->ttbar het runs fell 2.5x per doubling-of-four (2.9e-8 to 5.1e-9
+      from 8k to 32k), each best at its last step; the catalog short runs end at their last validation (best_step 4264 in
+      the blow-up check of every share and control run, mixture_ab.json blowups), so they are still improving at 1x. Width:
+      no catalog-scale width data (the muP sweep measured eta* transfer, not loss vs width at fixed data); the 1x widths 16
+      and 32 measure it first, and their R at 1x is the check that width moves the reads.'
+    fixed: 'Recipe catalog_v4_train.yaml (share 0.25, composed at load, D207); the short runs'' setup otherwise (job_catalog_v3_short.sh
+      arm v4_dimensionless_muon_default25: MSE loss with the sign head, the dimensionless target, MuonAdamW, muon_weight_decay
+      0.02171863, batch 16384, cosine over the whole run, 8 blocks, attn_reps 8x0n+2x1n); lr from the short runs'' 4.997e-3
+      at 4264 steps scaled by the inverted-U law''s decaying branch (t^-0.55): 2.34e-3 at 4x, 1.09e-3 at 16x, the same at
+      every width (muP); events per process scaled with length so each run sees about 6 epochs: train_subsample 1e4 (1x),
+      4e4 (4x), all of the pool (1e5 trees, 5e4 one-loop) at 16x (about 9.7 epochs, the pool''s limit); eval_subsample 200
+      x length factor (validation); same reads and probes as the short runs. Before the grid: one probe job per width (200
+      steps at the 16x data, 1 GPU each) to measure s/step and memory at widths 16 and 32 (estimates below assume s/step proportional
+      to num_heads, 1.01 s at 8 on a V100) and that the in-memory 1e5-event load fits (else memmap).'
+    control: The 1x width-8 share-0.25 pair (FA-ccin2p3-11ad944a seed 42, 9c6fc7ab seed 43), already run with the same recipe
+      and setup; every cell differs from it only in steps (with lr and events per process by the rules above) and/or num_heads.
+    seeds: 42 and 43 in every cell, as the share A/B (seed changes init and batch order; pools fixed).
+    outcome: 'Yes, longer helps: R on the held-out default-sampled pool and PP4/EE4 below 1 with widened intervals below 1
+      at 4x and 16x width 8, and the L(C) fit gives the remaining gain to L_inf. Yes, the network is too small: at 16x, width
+      32 below width 8 (R of width 32 over width 8 at equal length with interval below 1); No: width 16/32 within the seed
+      interval of width 8 at 16x (capacity not the limit at this data). A cell that blows up or ends before its best checkpoint
+      is listed apart; the 16x lr is an extrapolation of the law past its measured high-D range, so a 16x width-8 run whose
+      best checkpoint sits before 60% of its steps reads as lr too high, reported, not refit.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
