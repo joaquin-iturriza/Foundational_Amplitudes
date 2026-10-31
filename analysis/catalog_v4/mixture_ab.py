@@ -94,7 +94,7 @@ HD4_HET = {}
 # is an NLL above the reference + 0.5 ln(BLOWUP_FACTOR). Such a validation is a spike; the run blew up only when its
 # best checkpoint (the read's) is before it, as analysis/catalog_v3/muon_compare.py; a recovered spike is listed.
 BLOWUP_FACTOR = 10      # the repo's blow-up factor (analysis/catalog_v3/pair_head_blowup.py BLOWUP_FACTOR)
-REF_STEP = 500          # the repo-reviewer's reference step for these reads (2026-10-31), past the warm-up
+REF_STEP = 500          # the passed step-15 design's outcome rule (val_loss_no_reg NaN or above 10x its step-500 value)
 HET_RISE = 0.5 * math.log(BLOWUP_FACTOR)
 TRAINED_BY = {"FA-ccin2p3-a152d7d0": "FA-ccin2p3-afc96598", "FA-ccin2p3-a01ad665": "FA-ccin2p3-d26f13aa",
               "FA-ccin2p3-8e1cc529": "FA-ccin2p3-6c246603", "FA-ccin2p3-52efacaf": "FA-ccin2p3-1d46b938",
