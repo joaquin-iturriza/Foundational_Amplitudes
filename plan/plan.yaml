@@ -2699,6 +2699,10 @@ entries:
       pools on CC (about 65 GB; Joaquin 2026-10-31 ''just build the mixture from the data that already exists when you load
       the data''), then check_site_data on both recipes (load-time composition, mix_compose.py at c52ab62b), then the arms''
       EE4 re-reads (REREAD=<arm>) and mixture_ab.json'
+    16: 'Standalones (D208, D209): read the audit FA-ccin2p3-aab94b13 (count, size, pools without a sidecar physics block,
+      sidecar-only check on EE4 x {control, default50, default25} and H1..H7c x {default50, default25}); once the four arms
+      and the control EE4 re-reads have ended (their code reads the standalones'' cards), submit scripts/job_standalones.sh
+      --env STANDALONES_MODE=apply on CC; report GB freed and /sps use'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -5172,6 +5176,11 @@ entries:
       if:
       - 'check_site_data passes on default50 and default25: re-read EE4 on the four arms and write mixture_ab.json'
       - 'it fails: fix the composition before any read, nothing resubmitted'
+    16:
+      feeds: whether the 9404 compiled standalones can be deleted with the physics check reading pool sidecars (D209)
+      if:
+      - 'every sidecar-only check ok and no unmapped block-less pool: prune-standalones --apply after the arms end'
+      - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: ab11dfab0dad3975c
     state: working
