@@ -144,11 +144,13 @@ entries:
   - D195
   - D199
   next:
-    6: 'Design the next candidate for the multiplicity shape gap, now that the two per-event scalar priors (soft dipole par:v4_dipole,
-      propagator product par:v4_prop) are read: the held-out residual''s per-event structure is 3x the training pools'' (ceiling
-      eta^2 0.12 against 0.04) and no single scalar holds it; candidates are multi-variable (a binned or kNN fit of u on several
-      invariants together, to bound what any event-level prior could recover) or not per-event (the level and cell structure
-      of par:v4_shape_gap). Search docs/results.tex and the plan''s dead ends first; CPU on existing reads before any GPU.'
+    6: 'New design for the multiplicity gap (the joint read''s design took two FIX verdicts and is a dead end): a leave-one-class-out
+      map among the held-out multiplicity pools (fitted on the other held-out classes, predicting the left-out class without
+      its labels) on leg-order-free event features, with the factors-only map (t, logF, log P, log D) under the same scheme
+      and the training-pool map as a diagnostic; f = the share of the gap var(u)_ho - var(u)_tr it removes; the yes arm derived
+      from which map carries f (target_propagators on the control''s short pretraining if the factors hold most of it). Record
+      with plan design and pass the design reviewer before any job; code start: dipole_residual.py joint_features (to be made
+      leg-order-free) and the job script''s joint mode.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1796,9 +1798,9 @@ entries:
       feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap (par:v4_shape_gap) in the
         catalog preprocessing design'
       if:
-      - 'a multi-variable read recovers most of the ceiling: design the matching input or target prior as a GPU arm'
-      - 'it does not: report to the user that the multiplicity gap is not an event-level prior''s to close (capacity, training
-        length or data instead)'
+      - 'f >= 0.3 and the factors hold most of it: GPU design with data.target_propagators on'
+      - 'f < 0.1: report to the user that no shared event-level prior closes the gap (capacity, training length, data instead)'
+      - 'between: reported, no GPU arm'
   step_waits: {}
   owner:
     agent: a884f79261a86aff9
