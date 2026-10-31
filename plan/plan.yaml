@@ -6177,6 +6177,20 @@ entries:
       median paired ratio also at most 0.6. No: keep Opus at low effort for mechanical steps (D138) and record the trial as
       a dead end for routing. Either way the per-task results go to Joaquin; a routing change is a CLAUDE.md line he approves;
       analyses stay as they are until tested.'
+    passed_at: '2026-10-31T00:57:53+00:00'
+    reviewer: 'Re-check of 953fc517. Check 2: model_trial_validate.json shows 10/10 checks fail at the parent and pass at
+      the fix. The three stripped checks (zsrole, ordsrc, hybridcp) still separate parent from fix, 3/3 (model_trial_validate_stripped.json).
+      Hand-written alternative fixes with other internals pass for poolrow and hybridcp, 2/2 (model_trial_alt.json; I read
+      both files). Each brief now carries the interface its check calls, and the sonnet and opus-low briefs are byte-identical
+      apart from the worktree path (diffed for loopenc; read zsrole). The wiring the stripped asserts asked for is judged
+      in the hand read. Check 3: 10 pairs, one run each, binomial spread about 0.13 against the 0.1 rule, stated as indicative
+      and read on paired discordance; the paired cost-ratio median and range are now in the report. Checks 1 and 4: model
+      plus effort is the question D203 states; yes and no are stated, and yes now also needs median paired ratio <= 0.6. Checks
+      6 and 7: the yes outcome is limited to tool fixes and analyses are stated untested. The message that reports this trial
+      must open by telling Joaquin that no analysis judged on its conclusions is in the set, and ask him whether to add analysis
+      tasks. Check 5: searched docs/results.tex (sonnet, haiku, opus, low effort, model trial, reasoning effort: nothing),
+      the decisions (D138, D203, D205, D206) and agent_tasks.json; they match the prior field. Advisory: the interfaces make
+      the tasks easier for both arms and may push both near a ceiling, so the hand read and cost may end up deciding'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
