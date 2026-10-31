@@ -5795,6 +5795,23 @@ entries:
       as written frees 10.7 GB and leaves these 5.72 GB, short of D208 (no MadGraph process outputs kept). Since every sidecar-only
       check passes, extending standalone_dirs to the standalone_cpp outputs (Cards/param_card.dat + SubProcesses) is physics-safe;
       not done yet.'
+  - at: '2026-10-31T01:46:27+00:00'
+    text: 'Prune extended to the standalone_cpp outputs (D208 ''There is no reason to keep the madgraph files''; 93371175):
+      standalone_kind() matches MadLoop/proc-card outputs and standalone_cpp outputs (Cards/param_card.dat + SubProcesses/);
+      symlinks, half-written outputs without SubProcesses, *_madevent dirs and the install itself never match; test_standalone_kinds
+      on a fixture of each kind (dry run lists 2, apply with one kept deletes only the other, manifest first). Expected at
+      apply: 9404 outputs, about 16.4 GB (10.7 + 5.72 by the census of 7697177c). Load-time check (grep for libME_, matrix2py,
+      ctypes, *_standalone, WORK_DIR, ensure_backend, detect_compiled_backend, backend_dir, physics_block): experiment.py,
+      base_experiment.py, dataset.py, mix_compose.py, run.py, wrappers.py, models/, particle_ids.py, tools/zero_shot_parent.py,
+      tools/rebuild_run.py, tools/collect_run.py: none. Training and reads load pools through datagen.ensure_dataset with
+      require_cache true (config/amplitudes.yaml), which returns a cached pool or composes a default-share mixture (mix_compose,
+      no backend) before any backend call; the order features and off-shellness read data/diagrams sidecars; the probe physics
+      check reads pool sidecars and falls back to a backend card only for a sidecar without a block (4 of 26764, none in the
+      current reads). The running mixture arms (6c246603, 1d46b938, 11ad944a, 9c6fc7ab) and PP4 re-reads (a152d7d0, a01ad665)
+      run job_catalog_v3_short.sh, which calls no generation. Tools that need a standalone and would rebuild it on use (generation
+      only, D208): datagen.ensure_backend/gen_chunk, prebuild, nlo_virtual_pipeline, nlo_madloop, certify_v4_loops, width_regen,
+      compare_madloop_vs_dat, pole_*_diag, ew_sudakov_check, relabel_check, nonsm_validate, analysis/catalog_v4 validate_v4,
+      pp_physics_check, card_width_audit, read_validation. None kept.'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
