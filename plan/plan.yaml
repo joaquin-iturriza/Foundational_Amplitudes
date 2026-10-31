@@ -5320,6 +5320,28 @@ entries:
       a probe without a train or val pool reads its test pool for those roles; t, q, mse_logm2_real independent of it; test_zero_shot_split).
       Control EE4 re-reads submitted: FA-ccin2p3-c1863adf (REREAD 339ec100), FA-ccin2p3-def11c5c (REREAD 380842ed), 1 h each;
       placed on CC by the design (pick offered lxplus, which holds neither the parents nor the EE4 pools).'
+  - at: '2026-10-31T00:41:20+00:00'
+    text: "Regenerating catalog_v4 from nothing (the user, 2026-10-31: no MadGraph files are kept; the data is regenerated\n\
+      when needed). Kept on CC: the MadGraph install with its compiled standalones ($WORK/mg5amcnlo; every probe read's\n\
+      physics check reads their param cards), the pools, the recipes. Everything is resumable (built pools are cache hits).\n\
+      1. MadEvent pools (lhe_pp: pp13v4_, reused pp13_, dsh_, ee4_): per spec (recipes/catalog_v4_pp_parts.yaml,\n   catalog_v4_default_lhe.yaml,\
+      \ catalog_v4_ee_processes.yaml), `site run ... python tools/lhe_parts.py plan <spec>\n   --queue <Q> --grid-cores 8`,\
+      \ then N workers `site submit ccin2p3 FA scripts/job_lhe_parts.sh --env LHE_QUEUE=<Q>`\n   at the width `site pick FA\
+      \ --gpus 0 --cpus 16 --jobs N` offers (2026-10-31: 1188 slots of 16 cores free on htc).\n   Run directories on node-local\
+      \ $TMPDIR; part files in $SCRATCH/lhe_parts are deleted after assembly by hand\n   (`rm -r $SCRATCH/lhe_parts` once\
+      \ every pool is assembled; nothing reads them after).\n2. Tree and one-loop pools (the mixture: 0.35 flat in log|M|^2,\
+      \ 0.15 forward, the rest RAMBO): \n   `site submit ccin2p3 FA scripts/job_catalog_v4_regen.sh --env V4REGEN_N=<n> --env\
+      \ V4REGEN_K=<k>` for k < n\n   (stages 1-5, per-event alpha_s written by the job). Default-share mixtures (f_default,\
+      \ catalog_v4_default50/25)\n   are never stored: the loader composes them (mix_compose.py) from the step-2 pools and\
+      \ the step-1 dsh pools.\n3. Diagram sidecars: `python tools/dump_diagrams.py --all` (CPU).\nTime (2026-10-31 measurements):\
+      \ MadEvent per pool at one run of 14280 events, lhe_rates.json: median 181 core-s,\n90% 947, 99% 1.0e4, largest pp13_dd_ddgg\
+      \ 1.46e5 (16 cores, 2.5 h); pp13_ and pp13v4_ together 441 core-h (dsh_ and ee4_\nnot in lhe_rates). Mixture pools,\
+      \ probe FA-ccin2p3-39269ddb (train+val+test, 1.2e5 events each): 26 (bb_bb) to 1399\n(gg_gggg) core-s; the default50\
+      \ rebuild of 912 classes x 3 roles took 325 s on 16 jobs x 16 cores. One-loop pools: not\nmeasured. At full width the\
+      \ mixture pools take minutes; the whole catalog is bounded by the slowest MadEvent\nintegrations of the 2->4 QCD pp\
+      \ processes (hours at one run per pool, the parts and gridpack queue splits only the\nevent generation, not the integration),\
+      \ so a full regeneration is about 1-3 h of wall time (estimate: the integration\nfloor of the gridpack runs was not\
+      \ timed)."
   handoff:
     state: 'Step 14: mixture pools prebuilt on CC (default50 and default25, 912 default-share tree entries each, ~22.5 GB
       each) with per-event alpha_s written (check_site_data --alphas passes both); the four arms resubmitted at 2.5 h with
