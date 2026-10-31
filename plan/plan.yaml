@@ -5867,6 +5867,57 @@ entries:
       training recipe; loss, sign head off and sigma stage changed alike for all, het-vs-MSE mu cost stated as information
       only), 3 (seed spread of S measured in-run from the het control pair, class noise of R 1.5-3.3%), 6, 7 (D220''s mixtures
       are the arms), 8 (no label among inputs).'
+  - at: '2026-10-31T04:52:17+00:00'
+    question: 'D220 (next 15): where is a catalog_v4 network uncertain, on default-sampled events of its trained classes and
+      on held-out classes? Revised after the reviewer''s FIX: the share arms (het default50/default25) and the share ratio
+      S are dropped (nothing shows sigma moving with training share; the share choice is next 14, Joaquin''s); this is the
+      het-loss twin of the MSE control only. The loss follows D52 (het from now on): training.loss=HETEROSC with the existing
+      het defaults (heterosc_select nll, beta 0, sigma_after_pool, the 250-step sigma-only stage), sign_head off (experiment.py
+      asserts it is not combined with HETEROSC), all else as the control.'
+    prior: 'docs/results.tex sec:div-sampling (single-process u ubar g, ee->uu, b bbar g): sigma ranks the error across processes
+      (rho about 0.85) and within one process only weakly (0.29 base22, 0.46 u ubar g g); sigma rises inside every divergence
+      and its singular/bulk contrast predicts the steering gain; the sigma tail floors where 8x data does not move it (p99
+      0.0448/0.0468/0.0477, +6.4% against about 2% repeat noise); het retraining of single-process cells left sigma too small
+      on test at 2->3 and 2->4 (pull std 2.14, 1.48) because the sigma stage fits training residuals; sigma reweighting recovers
+      about 80% of the oracle gain on a starved pool, sigma-steered generation beats uniform on ee->uugg. Daniel''s catalog
+      (sec ''The sigma head on the held-out processes'', analysis/catalog_daniel/catalog_sigma_heldout.py at 7719c03f): pull
+      std 1.32 (A) / 1.86 (hp58) on the 96 relabels and 13.3 / 13.5 on the 43 new processes; Spearman across processes of
+      median sigma vs RMSE 0.73 / 0.55 on relabels, -0.01 / 0.37 on new; within-process median Spearman 0.51 / 0.33 relabels,
+      0.13 / 0.23 new. catalog_v4: no het run exists (1525 HETEROSC configs on CC, none on catalog_v4; finding recorded);
+      the six catalog_v4_short runs all trained MSE. What this adds: the first sigma on catalog_v4 (1153 trained pools, catalog_v4
+      held-out cells), read on the trained classes'' default-sampled PP4/EE4 events in kinematic bins (D220''s ask), which
+      no prior read did.'
+    measure: 'From the sigma-stage checkpoint, the arm''s reads (zero_shot_parent, s = sd_c sigma saved per event) on the
+      same 2171 probes as the control (H1 62, H2 218, H2p5 38, H3 279, H5 28, H6 8, H7E 34, H7c 34, PP4 1301, EE4 169). Per
+      class: median s, RMSE of q-t, pull std, cover68. (a) Trained classes (PP4/EE4 trained pools, default-sampled events):
+      rank_across = Spearman over classes of median s vs RMSE; rank_within = median over classes of Spearman(s, |q-t|); and
+      the where-map: PP4/EE4 events binned in deciles of max final |eta| and of min pair invariant / s-hat, median s and RMSE
+      per bin (sigma''s bin contrast top/bottom decile vs the error''s). (b) Held-out classes (H1..H7c pooled and per cell):
+      rank_across, rank_within, pull std, cover68. (c) Information only: het mu RMSE per class over the MSE control''s, median
+      ratio per seed (the cost of D52''s loss). Script analysis/catalog_v4/het_uncertainty.py -> analysis/catalog_v4/data/het_uncertainty.json,
+      committed before reading.'
+    check: 'On saved Daniel-catalog held-out reads (catalog_sigma_heldout.py at 7719c03f) the same rank measures separate
+      the cases they should: across-process Spearman 0.73 (relabels) vs -0.01 (new) for A, 0.55 vs 0.37 for hp58, 0.81 vs
+      0.42 for B; within-process 0.51 vs 0.13 (A). Spread between arms on the same split 0.18-0.26, so a 0.2 difference is
+      the noise scale and the cuts below sit apart from it. Pull std 1.3-1.9 on relabels vs 13.3 on new: the calibration measure
+      moves with seen vs unseen.'
+    fixed: 'Everything of the MSE control v4_dimensionless_muon (FA-ccin2p3-339ec100 seed 42, 380842ed seed 43): catalog_v4_train.yaml,
+      dimensionless preprocessing, Muon best HPs, bsm_labels, ITERS_FIXED 4264, mean loss aggregation, the same probes, events,
+      folds and best-checkpoint rule (lowest val_loss_no_reg), V100 on CC-IN2P3. Changed: loss HETEROSC plus its sigma stage,
+      sign_head off (required).'
+    control: MSE control pair v4_dimensionless_muon / _seed2, read at their best checkpoints on the same probes (for (c) and
+      for the error maps); sigma has no MSE counterpart, so (a) and (b) are judged against the cuts and the priors above.
+    seeds: 42 and 43, as the control pair (arms v4_het_control, v4_het_control_seed2; scripts/job_catalog_v3_short.sh at 9eaa04d6).
+    outcome: 'Read per seed; a verdict needs both seeds. (A) Trained classes: YES if rank_across >= 0.5 and rank_within >=
+      0.3 on PP4/EE4 trained: sigma is a usable per-event uncertainty map on catalog_v4, the eta / pair-invariant bins are
+      reported as where the network is uncertain, and that map is offered as the input to next 14''s share choice and to steering.
+      NO if rank_across < 0.3 or rank_within < 0.15: sigma does not rank the error on catalog_v4, the bins are reported from
+      the error |q-t| alone and sigma is not used for sampling; between: reported as weak, sigma used only as a class-level
+      signal. (B) Held-out classes: separate rule. Calibrated if pull std <= 3 and cover68 >= 0.4: sigma is a usable error
+      bar on unseen classes. Otherwise (the prior, 13.3 on new processes, expects this) sigma is under-dispersed off the training
+      classes and held-out uncertainty is read from rank_across only: >= 0.5 sigma still orders which held-out cells are worst
+      (the cells to target with data), < 0.3 it does not and held-out uncertainty must come from errors. No share verdict.
+      A run that blows up (val_loss_no_reg NaN or above 10x its step-500 value) is listed apart with where it blew up.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
