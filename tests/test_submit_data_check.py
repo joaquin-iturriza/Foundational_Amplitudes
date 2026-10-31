@@ -103,6 +103,14 @@ def test_refused_submit_returns_its_pick_unit():
         assert g.problems(inp) == []
         g.refund(dict(inp, error="Exit code 1\nsbatch: error"))
         assert json.load(open(f))["quota"]["ccin2p3"] == 0
+        # chains: units of submissions that went through stay spent
+        two = cmd + " ; " + cmd.replace("FA scripts", "FA scripts/other_").replace("ccin2p3", "lxplus")
+        for chain in (two, cmd + " && site poll FA"):
+            json.dump({"ts": int(time.time()), "quota": {"ccin2p3": 1, "lxplus": 1}}, open(f, "w"))
+            assert g.problems({"tool_input": {"command": chain}}) == []
+            spent = json.load(open(f))["quota"]
+            g.refund({"tool_input": {"command": chain}, "error": "Exit code 2\nsite: working copy has uncommitted"})
+            assert json.load(open(f))["quota"] == spent, chain
     finally:
         os.environ["HOME"] = old_home or ""
         if old_test is not None:

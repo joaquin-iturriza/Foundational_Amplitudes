@@ -760,6 +760,11 @@ def _log_spent(inp, project, site):
 def refund(inp):
     """PostToolUseFailure: a command that failed with a `site:` refusal (dirty working copy, ...) submitted nothing, so
     the units it spent in problems() go back to the plan (2026-10-31: a refused `site submit` cost a `site pick` slot)."""
+    cmd = (inp.get("tool_input") or {}).get("command", "") or ""
+    # only a command that is one `site` step in all (one submission, nothing chained): in a chain the failing `site:`
+    # line may belong to another step while an earlier submission went through, and its unit must stay spent
+    if len(re.findall(r"(?:^|[;&|(]|\$\()\s*site\s+\S", cmd, re.M)) != 1 or len(named_submissions(cmd)) != 1:
+        return 0
     msg = "%s %s" % (inp.get("error", ""), json.dumps(inp.get("tool_response", "")))
     if not re.search(r"(^|\\n|\s)site: ", msg):
         return 0
