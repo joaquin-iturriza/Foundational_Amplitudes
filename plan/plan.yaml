@@ -6385,7 +6385,7 @@ entries:
         before the queue'
   owner:
     agent: a739618f977b0a427
-    state: working
+    state: closed
     since: '2026-10-31T13:35:47+00:00'
     state_at: '2026-10-31T13:59:04+00:00'
     context: 138449
@@ -6838,35 +6838,34 @@ entries:
       built gridpacks free, measured per-multiplicity factor, a cut pool floored at its elapsed time), one pool per job, run
       timeout 5400 s; the job script stops 5 min before its limit and prints the MadEvent log tail (GRIDPACK_PROGRESS).'
   handoff:
-    state: 'Step 18 (default-sampled held-out pools, 114 hd_ gridpack pools): the plain-MadEvent probe (6 jobs, 180 runs)
-      gave kept 1.0 everywhere, disk <=340 MB/run, but 13 short yields and 10 timeouts in plain mode, which does not measure
-      gridpack pools; so a gridpool probe of all 114 (lhe_probe gridpool, GP_RUNS=2, 16 CPU jobs x 16 cores on htc, lhe_probe
-      gridpool-plan est 0.40 h longest, --time 01:00:00, target 0.5 h hd_gridpool_probe) went out. It ended with 9 of 16 TIMEOUT
-      at 01:00:00 (fed92320 ebc3a0c9 1f4c1553 807fe0fd 77dea69c f00ab4ea 8f593f2b bb139216 3fdcfadc; events E3248-E3254 and
-      more, OPEN, not acked) and 7 COMPLETED (dfeb8d04 b8fc1f2a cd2db7e0 60c14066 ece76b60 cc50b354 c10e2f5b): over 2x the
-      estimate, a finding to fix; LOGS UNREAD. Het step 15: the four share arms (466656b2 9897833d f0156d88 df858d33) are
-      intact (4264 steps, best checkpoint, sigma stage, H1-H7c read; PP4 cut at 772/908/1055/1129 of 1301, EE4 0/169); control
-      pair 87ea24d0 321a3de2 complete (2171 reads). Their eval-only REREAD (V3_AXES=''PP4 EE4 HD4'', --time 01:45:00, 7.0
-      GPU-h, batch total 29.5 GPU-h) waits on the hd_ pools.'
-    decisions: 'Gridpool probe instead of planning from plain-MadEvent yields: all 114 pools are lhe.gridpack and lhe_probe
-      kept ignores plain runs with energy patches; the gridpool probe builds gridpacks at their queue paths (reused by the
-      queue). Reread wall from measured read rate (2.05-2.46 s/probe overall vs short_wall''s 1.6), not short_wall --eval''s
-      01:30:00. Yields for hd go to a separate file analysis/catalog_v4/data/lhe_probe_yields_hd.json so the shared lhe_probe_yields.json
-      is not overwritten.'
-    ruled_out: 'Treating the het share arms as broken: their logs show training and sigma stage complete; only PP4/EE4 reads
-      were cut. Planning the hd queue from the plain probe: it does not measure the gridpack layout.'
-    running: none known (the gridpool probe batch has ended per the main session)
-    files: 'recipes/catalog_v4_heldout_default_processes.yaml, tools/lhe_probe.py (gridpool, gridpool-plan, kept), tools/lhe_parts.py
-      (plan --probe), scripts/job_lhe_probe.sh (PROBE_SHARD=gridpool), tools/short_wall.py (S_PROBE 1.6 too low for het reads),
-      scripts/job_catalog_v3_short.sh. FIRST CHECKS: (1) site logs of the 9 timed-out gridpool jobs: which gridpacks finished
-      (GRIDPACK_JSON s_gridpack vs the estimate; GRID_TIME_FACTOR 4.3 too low?), which pools were not reached; ack E3248-E3254+
-      with what each showed; (2) re-lay the unfinished pools (gridpacks already built are reused) at the measured gridpack
-      time, one wave, target recorded; (3) lhe_probe kept --yields-out lhe_probe_yields_hd.json over all gridpool logs, then
-      lhe_parts plan and workers; (4) raise short_wall S_PROBE to the measured het rate; (5) het rereads once hd_ pools are
-      assembled; (6) MIX_HET in mixture_ab.py and het_uncertainty.py committed before reading; (7) repo-reviewer for 5d4c0e9c
-      1acddbff 7eb15b55. Job pool lists of the gridpool batch: /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/gp_{00..15}.txt
-      (submission order = c10e2f5b first ... dfeb8d04 last)'
-    written: '2026-10-31T13:33:54+00:00'
+    state: 'Step 18 (default-sampled test pools for the 114 held-out hd_ pools): gridpool probe pass 1 (16 jobs, pools in
+      series) finished 67 pools, 110 of 180 gridpacks on disk at the queue''s paths; finding recorded (estimate off 0.1x-18.4x
+      on gridpacks, up to 34x on runs; serial layout). Pass 2 hd_gridpool_probe2: the other 47 pools one per job (target 2.0
+      h, run list /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/gp2_runs.txt). As
+      of 2026-10-31 ~15:30: 35 COMPLETED with rc=0, every gridpack built, all probe runs returned, 0 errors (longest gridpack
+      hd_ubx_bxghuz 665 s); 12 RUNNING: hd_ddx_dhuxwp__E20 b8aacd01, hd_bg_bguuxz c169d47f, hd_gg_dddxdxg 611003cb, hd_ug_ddxguz
+      518be432, hd_dbx_bxdddxg 9c2ef90a, hd_udx_dxguzz 3dad72b1, hd_uux_addxgz c1461694, hd_udx_adxggu 219e0935 (03:00:00),
+      hd_epem_aaccx__E20 1ba52b78, hd_epem_ccxddx__E20 fa070157, hd_uux_uuxvevex__E20 aaaaa704, hd_uux_aepemz__E20 167ac0d6
+      (01:30:00). Step 18 waits on all 47. Each of these 12 will raise the same false ALERT at its end (--expect key, below):
+      read its log, ack, never cancel. Het step 15 arms intact; their eval-only REREAD (step 20) waits on the hd_ pools.'
+    decisions: 'One pool per job (site pick width 1268): a serial layout let one slow 5-body pool block the others. Run timeout
+      5400 s, because 1800 s cut the hd_ddx_dhuxwp__E20 measurement. Planning reads measured logs (gridpool-plan --logs/--order,
+      009a1949), not the multiplicity-median rate x 4.3. The job stops 5 min before its limit and prints GRIDPACK_PROGRESS
+      (the MadEvent log tail), so a cut job shows survey/refine/generation. The pass-2 ALERTs (E3292-E3326) are my submission''s
+      --expect ''lhe_probe gridpool rc=0'': site parses the plain RUN_SUMMARY into {rc: 0}, so that key never matches; the
+      right form is --expect rc=0; submit_guard refuses such keys now (d3c2a623); all 35 acked with each log''s reading.'
+    ruled_out: 'Treating the pass-2 ALERTs as a setup error in 009a1949: every alerted log ended rc=0 with gridpacks and runs
+      complete. Treating them as the check reading a running job: summary_pass only alerts on a mismatch once a RUN_SUMMARY
+      line exists. Planning the hd queue from the plain-MadEvent probe: it does not measure gridpack pools.'
+    running: 12 pass-2 gridpool jobs listed in state (CC htc, CPU only)
+    files: 'tools/lhe_probe.py (gridpool, gridpool-plan --logs/--order), scripts/job_lhe_probe.sh (PROBE_SHARD=gridpool, GRIDPACK_PROGRESS),
+      .claude/hooks/submit_guard.py (expect check), recipes/catalog_v4_heldout_default_processes.yaml, tools/lhe_parts.py
+      (plan --probe), tools/short_wall.py (S_PROBE 1.6 too low for het reads). Pass 1 logs and job pool lists: scratchpad
+      gplogs/, gp_00..15.txt, gp_runs.txt, gp_order.json, hd_pools.json. NEXT: when the 12 end, read each log, then lhe_probe
+      kept --yields-out analysis/catalog_v4/data/lhe_probe_yields_hd.json over pass-1 and pass-2 logs, lhe_parts plan with
+      that file, smaller run size for any pool with a 1000-event run over 1800 s, workers at site pick width in one wave,
+      plan target, submit with --expect rc=0.'
+    written: '2026-10-31T14:02:55+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
