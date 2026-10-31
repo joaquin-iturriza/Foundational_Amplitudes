@@ -5778,6 +5778,68 @@ entries:
       of 1665). Outcomes fixed for GAIN, NO LOSS, LOSS and undecided, with the mixture_ab.json verdict rule. Searched results.tex
       (pp-trained, default share, f_default, mixture, blend, pp blend, seed spread), plan show catalog_coverage with its asks,
       site decisions D166, D167, D178, D187-D194.'
+  - at: '2026-10-31T04:47:50+00:00'
+    question: 'Step 15 (D220; het loss per D52): where is catalog_v4''s network uncertain, read from the het loss''s per-event
+      sigma, on default-sampled events (PP4: 1301 pp classes, test split, trained 797 / not trained 504 apart; EE4: 169 e+e-
+      classes, test split) and on the held-out classes (H1..H7c pooled, 701, val split), for the current mixture (control)
+      and the step-14 shares 0.50 and 0.25; does sigma track the measured error there (so it can point at the regions to oversample),
+      and does a share lower sigma where it lowered the error? Feeds Joaquin''s share choice (step 14) and what is done next
+      (D220). No catalog_v4 het run exists: the six step-14 runs (339ec100, 380842ed, 6c246603, 1d46b938, 11ad944a, 9c6fc7ab)
+      trained training.loss MSE (read from their config.yaml on CC), and none of the 1525 HETEROSC configs under runs/ on
+      CC is a catalog_v4 run (the 20 catalog_v4 configs are all runs/catalog_v4_short, all MSE). Arms: v4_het_control, v4_het_default50,
+      v4_het_default25, each seeds 42 and 43 (scripts/job_catalog_v3_short.sh).'
+    prior: 'results.tex ''The sigma head on the held-out processes'' (Daniel''s catalog, dancat_het_pre trial_0058 and catalog_norm
+      A/B, catalog_sigma_heldout.py): after the sigma stage the median per-process pull std is 1.32 (cover68 0.58) on the
+      96 relabels and 13.3 (0.02) on the 43 new held-out processes: sigma did not flag processes outside the training set.
+      ''Recalibrating sigma'' (2026-10-15, D69/D70): the joint fit''s sigma is compressed (pull std 0.42-0.60), the sigma-only
+      stage calibrates it on test (1.00, 1.01, 0.97) and ranks events correctly. Step 14 (par:v4_mixture, mixture_ab.json):
+      MSE error R arm/control: share 0.50 PP4 0.682, EE4 0.401, held-out 1.271; share 0.25 0.755, 0.413, 1.225. No het run
+      on catalog_v4, none on default-sampled reads. Searched results.tex (sigma, het, HETEROSC, pull, calibrat), plan.yaml
+      (HETEROSC, het loss), site decisions (D52, D69, D70, D220), runs/ configs on CC.'
+    measure: 'From tools/zero_shot_parent.py''s reads of each arm''s sigma-stage parent (<run>/sigma_stage; mu frozen there,
+      so mu is the main run''s best checkpoint by val_loss_no_reg): per event s = sd_c*sigma in log|M|^2, q, t (saved npz).
+      Per class: median s, RMSE of q-t, pull std of (q-t)/s, cover68. (1) Informative: Spearman correlation over classes of
+      median s against RMSE, per read (PP4 trained, PP4 not trained, EE4, held-out pooled), and the median over classes of
+      the within-class Spearman of s against |q-t|. (2) Calibration: median over classes of the pull std, per read. (3) Where:
+      PP4 and EE4 events (momenta from the same test rows) binned by the largest final-state |eta| and by the smallest pair
+      invariant over s-hat (deciles over the read): median s and median |q-t| per bin, control. (4) Shares against control:
+      S = median over classes of the arm/control ratio of median s, each side the geometric mean of its two seeds, 95% class
+      bootstrap (10000) widened by |ln S_seed| (het control seed 43 over 42), per read, beside step 14''s R. Mu''s cost of
+      the het loss (information): R of het control over MSE control (339ec100, 380842ed) on the same reads. One committed
+      analysis script (analysis/catalog_v4/het_uncertainty.py) writes analysis/catalog_v4/data/het_uncertainty.json.'
+    check: 'The calibration measure moves between in- and out-of-distribution classes on existing data: Daniel''s catalog
+      after its sigma stage, median pull std 1.32 on relabels vs 13.3 on new held-out processes (x10). The error the sigma
+      should track moved with the share in step 14 (PP4 0.68, EE4 0.40, held-out 1.27 at 0.50) against a noise of R of about
+      1.5% (PP4), 3.3% (EE4), 2% (held-out pooled) from the per-class spread; S has the same class counts. The sigma stage''s
+      calibration on training data: test pull std 1.00 (recalibration paragraph). A smoke (mode smoke, v4_het_control) first:
+      HETEROSC with MuonAdamW and the sign head off on 16 pools + 3 sign-changing one-loop pools, the sigma stage, the H1/H5
+      reads from sigma_stage with sigma saved (s non-empty, finite); its time per step and the sigma stage''s time checked
+      against tools/short_wall.py (20 min stage estimate, 03:45:00 limit).'
+    fixed: 'Everything of the step-14 design: muP LLoCa, dimensionless target, MuonAdamW at the Muon search best (lr 0.004997423,
+      muon wd 0.02171863), 4264 steps, batch 16384, 1e4 train events per process, arithmetic-mean aggregation, the same three
+      training recipes (catalog_v4_train.yaml, catalog_v4_default50_train.yaml, catalog_v4_default25_train.yaml), CC-IN2P3,
+      --mem=48G, the same reads (PP4 test, EE4 test, H1..H7c val, 2000 events, same scorer). Changed against the MSE runs,
+      for all three arms alike: training.loss=HETEROSC with the parent config''s het defaults (heterosc_select nll, heterosc_beta
+      0, sigma_after_pool true, detach_sigma_backbone false) and run.py''s default sigma-only stage (250 steps, lr 0.01, 25
+      validations); sign_head off (asserted incompatible with HETEROSC), so the 63 of 1153 sign-changing one-loop training
+      pools take their per-pool signedlog target instead of log|x| plus the sign loss. No XV3 (pools deleted) and no catalog_v3
+      PP read (outside the question).'
+    control: 'v4_het_control (seeds 42, 43): the het twin of the step-14 control v4_dimensionless_muon, catalog_v4_train.yaml,
+      only the loss changed. The MSE control pair (339ec100, 380842ed) is the reference for what the het loss costs mu, not
+      for sigma.'
+    seeds: '2 per arm (42, 43), as the step-14 cells; 6 trainings. Cost: smoke about 0.3 GPU-h; 6 x 03:45:00 limit (tools/short_wall.py
+      --sigma-stage: 3.64 h planned with x1.25 margin, about 2.9 h expected) = 22.5 GPU-h at most; total under 23 GPU-h, below
+      the 30 GPU-h budget; D220 names this read.'
+    outcome: 'Fixed before any read. Sigma INFORMATIVE when, on the het control (both seeds), the class Spearman of median
+      s against RMSE is >= 0.5 on the held-out pooled read and on PP4, and the held-out median pull std is <= 3: then the
+      bins of (3) with the largest s are reported as where the network is uncertain and the candidate regions to oversample.
+      NOT INFORMATIVE when that Spearman is < 0.3 or the held-out pull std is > 3 (as on Daniel''s catalog, 13.3): sigma does
+      not mark the uncertain classes off the training density; the error maps (MSE, step 14) stay the guide and sigma is not
+      used for the share. Between: reported with its numbers as undecided. Shares: S <= 0.90 with the widened interval below
+      1 on PP4 or EE4 = the share lowers sigma there; S >= 1.05 with the interval above 1 on held-out = it raises sigma there;
+      each set beside step 14''s R (same direction or not). No share verdict: the numbers go to Joaquin with step 14''s. A
+      run that blows up (NLL spikes, non-finite) is listed with where it blew up, never dropped; both control seeds blowing
+      up ends the read as a dead end (HETEROSC at the MSE search''s lr) and goes to Joaquin.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
