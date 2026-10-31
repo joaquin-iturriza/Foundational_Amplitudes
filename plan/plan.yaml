@@ -3454,6 +3454,9 @@ entries:
       test pools, H5 28/28 already'
     22: 'Wall-time table from logs: catalog MSE/het arms vs 2-3 standard short trainings of 4264 steps (loading, steps, validations,
       final evaluation), with the one-line cause; to Joaquin (his 2026-10-31 objection to 3.6 h / 5.6 h)'
+    23: 'Zero-shot reader still 0.71 s per probe against a 0.046 s forward (about 15x): over 2x its work, a finding under
+      CLAUDE.md lines 58/60 (fcb1ccd9). Find what remains in the per-probe build (about 0.5 s) and remove it (cache what does
+      not depend on the probe''s data), A/B in one GPU job as bfec5501; the step-20 re-reads do not wait on it.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6516,6 +6519,11 @@ entries:
       if:
       - 'the arms'' extra time is a defect (loading, composition, evaluation layout): fix it before any re-read or new arm'
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
+    23:
+      feeds: the wall time of every zero-shot read (short jobs, re-reads)
+      if:
+      - 'per-probe time within 2x of the forward: done, short_wall S_PROBE from it'
+      - 'a part depends on each probe''s data and cannot be shared: say which, with its seconds, to Joaquin'
   owner:
     agent: ab2b2bbf984fd46ba
     state: stopped
