@@ -4639,8 +4639,12 @@ entries:
     searched: 'site decisions D52 (conditional: once settled), D53-D68 (het tests and sweeps); config/default.yaml loss: MSE;
       fa-canonical-setup.txt says MSE fixed'
     blocks: the loss of the long and wide pretrainings
-    blocks_steps: &id001
+    blocks_steps:
     - 16
+    answered_at: '2026-10-31T04:46:47+00:00'
+    decision: D71
+    withdrawn_at: '2026-10-31T04:46:47+00:00'
+    withdrawn_why: the het loss was settled 2026-10-16 (D70/D71 under D52); the question about switching the default was wrong
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -6340,13 +6344,6 @@ entries:
       analysis/catalog_v4/data/reads/, tools/prune_mixture_pools.py, tools/mix_compose_check.py, mix_compose.py, scripts/job_catalog_v3_short.sh,
       tools/zero_shot_parent.py, analysis/catalog_daniel/catalog_sigma_heldout.py, docs/results.tex (par:v4_pp_bound, par:v4_mixture)
     written: '2026-10-31T04:37:50+00:00'
-  ask: 'Switch config/default.yaml to loss: HETEROSC for every new run (D52 never became the default; the six mixture runs
-    trained MSE)?'
-  waiting_since: '2026-10-31T04:44:53+00:00'
-  searched: 'site decisions D52 (conditional: once settled), D53-D68 (het tests and sweeps); config/default.yaml loss: MSE;
-    fa-canonical-setup.txt says MSE fixed'
-  blocks: the loss of the long and wide pretrainings
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
