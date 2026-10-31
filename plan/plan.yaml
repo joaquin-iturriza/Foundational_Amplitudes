@@ -7341,6 +7341,9 @@ entries:
   - at: '2026-10-31T04:06:29+00:00'
     text: The main session's context-guard flush note reached owner a8f01a86034d7b73e, which closed at 153k instead of ~270k;
       the guard should target only the main session
+  - at: '2026-10-31T04:24:12+00:00'
+    text: 'a compaction inside the turn of owner aa7670a7d3cbd2cba at 2026-10-31T04:17:54.920Z: its brief or scope was too
+      large; narrow the next brief'
   handoff:
     state: 'Step 4 model trial closed: first trial (10 pairs) result, extension (D212) stopped by D213 (switch to Sonnet for
       mechanical steps). Switch live in code: .claude/agents/mechanical-worker.md (model sonnet, scope only, loads live CLAUDE.md),
