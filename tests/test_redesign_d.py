@@ -472,6 +472,89 @@ GROUPS += [d3, d4, delegation, known_cause]
 
 
 
+
+# ---------------------------------------------------------------- the Stop check's owner bookkeeping (2026-10-31)
+# Joaquin approved "1 2 and 3" (site decide, 2026-10-31): the check records what the turn already did about owners,
+# instead of refusing the turn for the bookkeeping. The records below have the shape of the main transcript's (an
+# assistant SendMessage, an enqueued task-notification and its later 'remove', an async Agent launch); the cases are
+# the refusals of 2026-10-31 00:33, 02:25, 00:37, 23:39 (which should now pass) and 02:57 (which should still refuse).
+O1, O2, NEW = "a884f79261a86aff9", "a0ab7c2280e0bb83a", "a95e29b40c3a46e59"
+
+
+def send(m, to):
+    return {"type": "assistant", "timestamp": ago(m), "message": {"role": "assistant", "content": [
+        {"type": "tool_use", "id": "t", "name": "SendMessage", "input": {"to": to, "summary": "s", "message": "go"}}]}}
+
+
+def notif(m, agent, op="enqueue", tid="toolu_x1"):
+    return {"type": "queue-operation", "operation": op, "timestamp": ago(m), "content":
+            "<task-notification>\n<task-id>%s</task-id>\n<tool-use-id>%s</tool-use-id>\n<status>completed</status>\n"
+            "</task-notification>" % (agent, tid)}
+
+
+def launch(m, agent, eid):
+    return {"type": "user", "timestamp": ago(m), "message": {"role": "user", "content": [
+        {"type": "tool_result", "tool_use_id": "t", "content": "launched"}]},
+        "toolUseResult": {"status": "async_launched", "agentId": agent, "description": "owner",
+                          "prompt": "You own one entry ... record yourself first, `python3 tools/plan.py owner %s "
+                          "--agent <your id>`" % eid}}
+
+
+def check_with(w, records):
+    tr = os.path.join(w.d, "main.jsonl")
+    open(tr, "w").write("".join(J(r) + "\n" for r in records))
+    r = subprocess.run([sys.executable, os.path.join(HOOKS, "plan_check.py")], env=w.env, capture_output=True,
+                       text=True, input=json.dumps({"transcript_path": tr, "hook_event_name": "Stop"}))
+    return r.returncode, r.stderr + r.stdout
+
+
+def bookkeeping():
+    handed = [(ago(40), "work"), (ago(20), "handback")]
+    w = owner_world([owned("a", O1)], events=EV.replace(" a  FA-", " a  FA-"), agents=[(O1, "a", handed)])
+    rc, out = check_with(w, [notif(12, O1), send(5, O1), notif(4, O1, op="remove")])
+    scenario("bookkeeping (00:33, 02:25): an open event, its owner resumed by SendMessage this turn -> no refusal, "
+             "the owner recorded working (a later 'remove' of the earlier notification does not undo it)",
+             rc == 0 and w.entries()["a"]["owner"]["state"] == "working", (out, w.entries()["a"]["owner"]))
+    w = owner_world([owned("a", O1)], events=EV, agents=[(O1, "a", handed)])
+    rc, out = check_with(w, [notif(12, O1), send(5, O2)])
+    scenario("bookkeeping (02:57): an open event, a SendMessage to another agent only -> still refuses (resume)",
+             rc == 2 and "resume its owner %s" % O1 in out, out)
+    w = owner_world([owned("a", O1)], agents=[(O1, "a", handed)], acked=["FA-ccin2p3-r1"],
+                    runs=[("FA-ccin2p3-r1", "COMPLETED", "a", epoch(90), epoch(70))])    # read before its hand-back
+    rc, out = check_with(w, [])
+    scenario("bookkeeping (00:37): the owner handed back, no event, nothing in flight -> no STALLED refusal (a note)",
+             rc == 0 and "STALLED" not in out, out)
+    w = owner_world([owned("a", O1, state="closed", handoff={"state": "s", "running": "none", "written": ago(60)})],
+                    events=EV, agents=[(O1, "a", handed)])
+    rc, out = check_with(w, [launch(2, NEW, "a")])
+    e = w.entries()["a"]
+    scenario("bookkeeping (23:39): an owner launched this turn, not yet recorded -> recorded from its launch, no "
+             "refusal", rc == 0 and e["owner"]["agent"] == NEW, (out, e.get("owner")))
+    w = owner_world([owned("a", O1, state="closed", handoff={"state": "s", "running": "none", "written": ago(60)})],
+                    events=EV, agents=[(O1, "a", handed)])
+    rc, out = check_with(w, [])
+    scenario("bookkeeping: an open event and no live owner, nothing launched -> still refuses (launch)",
+             rc == 2 and "no live owner" in out, out)
+    plain = [(ago(40), "work"), (ago(3), "work")]          # ended with its report as plain text, no hand-back call
+    w = owner_world([owned("a", O1)], events=EV, agents=[(O1, "a", plain)])
+    rc, out = check_with(w, [notif(2, O1)])
+    scenario("bookkeeping: an owner whose notification says it ended -> recorded stopped; with an open event the "
+             "check asks for its resume", rc == 2 and "resume its owner %s" % O1 in out
+             and w.entries()["a"]["owner"]["state"] == "stopped", (out, w.entries()["a"]["owner"]))
+    w = owner_world([owned("a", O1)], agents=[(O1, "a", handed)])
+    rc, out = w.plan_cmd("owner", "a", "--state", "working")
+    rcc, outc = w.check()
+    scenario("bookkeeping (02:25): `plan owner --state working` after a hand-back counts (it was ignored before)",
+             rcc == 0 and "is working" in outc, outc)
+    w = owner_world([owned("a", O1)], events=EV, agents=[(O1, "a", handed)])
+    open(os.path.join(w.d, "main.jsonl"), "w").write("")
+    rc, out = check_with(w, [send(5, O1)] + [notif(1, O1, tid="toolu_x2")])
+    scenario("bookkeeping: resumed, then its notification that it ended again -> stopped, refuses (resume)",
+             rc == 2 and "resume its owner" in out, out)
+
+
+GROUPS += [bookkeeping]
+
 def main():
     only = sys.argv[1:]
     for g in GROUPS:

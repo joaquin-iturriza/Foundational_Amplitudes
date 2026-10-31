@@ -165,6 +165,101 @@ def problems():
     return out, once, st
 
 
+TAIL_BYTES = 24 * 2 ** 20     # the main transcript's tail read for this turn's calls (the file passes 400 MB)
+NOTIF = re.compile(r"<task-notification>.*?<task-id>(\w+)</task-id>.*?<status>(\w+)</status>", re.S)
+
+
+def turn_owner_events(path, since):
+    """[(time, kind, agent, entry)] from the main transcript's records after `since`: 'resumed' (a SendMessage to an
+    agent), 'stopped' (a task-notification saying the agent completed, failed or was killed), 'launched' (an Agent
+    launch whose prompt records itself as an entry's owner, `plan.py owner <entry> --agent`). The records a turn
+    writes before its Stop hook runs, so the check does the bookkeeping the turn already acted on."""
+    try:
+        f = open(path, "rb")
+    except (OSError, TypeError):
+        return []
+    with f:
+        f.seek(0, 2)
+        start = max(0, f.tell() - TAIL_BYTES)
+        f.seek(start)
+        lines = f.read().decode(errors="replace").splitlines()
+        return owner_events_of(lines[1:] if start else lines, since)     # a cut first line only when seeking
+
+
+def owner_events_of(lines, since):
+    """turn_owner_events on transcript lines."""
+    import plan
+    out, seen = [], set()
+    for ln in lines:
+        try:
+            m = json.loads(ln)
+        except ValueError:
+            continue
+        if not isinstance(m, dict):
+            continue
+        ts = plan.parse(m.get("timestamp"))
+        if not ts or ts <= since:
+            continue
+        c = (m.get("message") or {}).get("content") if isinstance(m.get("message"), dict) else m.get("content")
+        if m.get("type") == "assistant" and isinstance(c, list):
+            for x in c:
+                if isinstance(x, dict) and x.get("type") == "tool_use" and x.get("name") == "SendMessage":
+                    to = (x.get("input") or {}).get("to")
+                    if isinstance(to, str) and re.fullmatch(r"a[0-9a-f]{16}", to):
+                        out.append((ts, "resumed", to, None))
+        r = m.get("toolUseResult")
+        if isinstance(r, dict) and r.get("agentId") and r.get("status") == "async_launched":
+            k = re.search(r"plan\.py owner (\S+) --agent", r.get("prompt") or "")
+            if k:
+                out.append((ts, "launched", r["agentId"], k.group(1)))
+        if m.get("type") == "queue-operation" and m.get("operation") != "enqueue":
+            continue                  # a 'remove' (absorbed mid-turn) is written later, after the turn may resume it
+        text = c if isinstance(c, str) else " ".join(x.get("text", "") for x in c if isinstance(x, dict)) \
+            if isinstance(c, list) else ""
+        for block in re.findall(r"<task-notification>.*?</task-notification>|<task-notification>.*", text or "", re.S):
+            for agent, status in NOTIF.findall(block):
+                key = re.search(r"<tool-use-id>(\S+?)</tool-use-id>", block)
+                key = key.group(1) if key else block[:300]
+                if status in ("completed", "failed", "killed", "stopped") and key not in seen:
+                    seen.add(key)     # one notification, written at its arrival and again when it wakes the turn
+                    out.append((ts, "stopped", agent, None))
+    return sorted(out, key=lambda x: x[0])
+
+
+def bookkeep_owners(path):
+    """Record on the plan what this turn already did about owners (2026-10-31, Joaquin's approval of "1 2 and 3"): an
+    owner it resumed with SendMessage is working, an owner whose notification says it ended is stopped, an owner it
+    launched is recorded (if the entry has no working owner). Returns the notes of what was recorded."""
+    import plan
+    t = plan.now()
+    evs = turn_owner_events(path, t - dt.timedelta(minutes=plan.STEP_MIN))
+    if not evs:
+        return []
+    notes = []
+    with plan.transaction() as (d, st):
+        for ts, kind, agent, eid in evs:
+            for e in d["entries"]:
+                o = plan.owner_of(e)
+                if kind == "launched":
+                    if e["id"] != eid or e.get("status") != "running" or (o and o["agent"] == agent):
+                        continue
+                    if o and plan.owner_state(e, t) == "working":
+                        continue
+                    e["owner"] = {"agent": agent, "state": "working", "since": ts.isoformat(),
+                                  "state_at": ts.isoformat()}
+                    notes.append("%s: owner %s recorded from its launch" % (e["id"], agent))
+                    continue
+                if not o or o["agent"] != agent or o.get("state") == "closed":
+                    continue
+                if plan.parse(o.get("state_at")) and plan.parse(o["state_at"]) >= ts:
+                    continue
+                o["state"] = "working" if kind == "resumed" else "stopped"
+                o["state_at"] = ts.isoformat()
+                notes.append("%s: owner %s recorded %s (%s at %s)" % (e["id"], agent, o["state"], kind,
+                                                                      ts.isoformat()[11:16]))
+    return notes
+
+
 def owner_problems(d, st, msgs):
     """Switch-over D (agent redesign D6): a running entry with something to do and no live or stopped owner is a
     refusal (launch); an open event of an entry whose owner is stopped, neither resumed nor launched this turn, is a
@@ -244,13 +339,21 @@ def main():
         except ValueError:
             inp = {}
         inp = inp if isinstance(inp, dict) else {}
+        main_session = not (inp.get("agent_id") or inp.get("agent_type"))
+        booked = bookkeep_owners(inp.get("transcript_path")) if main_session and inp.get("transcript_path") else []
         bad, once, st = problems()
         import plan
         if os.path.exists(plan.PLAN_FILE):
             bad += report_once(st, once)
-        if not (inp.get("agent_id") or inp.get("agent_type")):     # the main session only
+        plan.NOTES.extend(booked)
+        if main_session:
             d_, st_ = plan.load()
             for eid, state, text in plan.entry_status(d_, st_, plan.events_by_item(strict=True)):
+                # an owner that is stopped (it handed back or ended) with no open event and nothing to resume for is
+                # a note: what it waits on is in its hand-back; an entry with no owner, or with events, still refuses
+                if state == "STALLED" and "open events" not in text and re.search(r"; owner \S+ stopped$", text):
+                    plan.NOTES.append("%s: its owner is stopped and nothing is in flight (%s)" % (eid, text))
+                    continue
                 if state == "STALLED":
                     bad.append("%s is STALLED (%s): resume its owner (SendMessage) or launch one (plan brief %s, then "
                                "plan owner %s --agent <id>)" % (eid, text, eid, eid))
@@ -267,7 +370,6 @@ def main():
     if bad:
         if plan.NOTES:                            # notes go to plan next, never to the user's screen with a block
             plan._set_state("_stop_notes", list(plan.NOTES))
-        import re
         def short(b):
             m = re.search(r"runs ended: ((?:FA-\S+, )+FA-\S+?);", b)
             if m and m.group(1).count(",") >= 3:

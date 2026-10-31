@@ -622,13 +622,62 @@ def stop_conditions():
     b3, _ = sc.figure_pairs(d)
     scenario("B1: a .png saved without its .pdf is a refusal; with it, or under runs/ (pruned), it passes",
              not b and len(b1) == 1 and "analysis/f.pdf" in b1[0] and not b2 and not b3, (b1, b2, b3))
+    # context_guard's Stop branch (Joaquin's approval of "1 2 and 3", 2026-10-31): near compaction, a question to the
+    # user with no plan ask, an answer with no site decide or a commitment with no plan step refuses; the model is a
+    # stub here (the real call was run on the session's two compaction windows of 2026-10-31)
+    tr = os.path.join(d, "main.jsonl")
+    rec = lambda t, role, text: {"type": role, "timestamp": "2026-10-31T0%d:00:00Z" % t,
+                                 "message": {"role": role, "content": [{"type": "text", "text": text}]}}
+    open(tr, "w").write("".join(json.dumps(r) + "\n" for r in (
+        {"type": "system", "subtype": "compact_boundary", "timestamp": "2026-10-31T00:00:00Z"},
+        rec(1, "user", "Run the mixture arms on both seeds."),
+        rec(2, "assistant", "Joaquin, should the held-out pools be generated closer to the families? I'll run the "
+                             "ablation after the verdict."))))
+    found = lambda v: (lambda prompt: v)
+    miss = {"questions": [{"quote": "should the held-out pools be generated closer to the families?", "why": "w"}],
+            "answers": [{"quote": "Run the mixture arms on both seeds.", "why": "w"}],
+            "commitments": [{"quote": "I'll run the ablation after the verdict.", "why": "w"},
+                            {"quote": "a sentence that is nowhere in the window", "why": "w"}]}
+    inp = {"transcript_path": tr}
+    c0, _ = sc.context(inp, d, ask=found(miss), steps="")
     open(os.path.join(d, ".claude", ".compact_wanted"), "w").close()
-    c1, _ = sc.context({}, d)
-    c2, _ = sc.context({"stop_hook_active": True}, d)
-    open(os.path.join(d, ".claude", ".notes_flushed"), "w").close()
-    c3, _ = sc.context({}, d)
-    scenario("B1: a wanted compaction with the notes not flushed is a refusal (context_guard's Stop branch)",
-             len(c1) == 1 and not c2 and not c3, (c1, c2, c3))
+    c1, _ = sc.context(inp, d, ask=found(miss), steps="")
+    c2, _ = sc.context(inp, d, ask=found(miss), steps="")
+    c3, _ = sc.context({"stop_hook_active": True, "transcript_path": tr}, d, ask=found(miss), steps="")
+    open(tr, "a").write(json.dumps(rec(3, "assistant", "Recorded.")) + "\n")
+    c4, _ = sc.context(inp, d, ask=found({"questions": [], "answers": [], "commitments": []}), steps="")
+    open(tr, "a").write(json.dumps(rec(4, "assistant", "More.")) + "\n")
+    c5, _ = sc.context(inp, d, ask=lambda prompt: None, steps="")
+    scenario("B1: context_guard's Stop branch: no compaction wanted -> nothing; wanted -> one refusal naming the "
+             "question, the answer and the commitment (a quote not in the window dropped); the same transcript state "
+             "-> not again; stop_hook_active -> nothing; the model finds nothing, or fails -> passes",
+             not c0 and len(c1) == 1 and all(x in c1[0] for x in ("no `plan ask`", "no `site decide`",
+                                                                  "no plan step")) and "nowhere" not in c1[0]
+             and not c2 and not c3 and not c4 and not c5, (c0, c1, c2, c3, c4, c5))
+    sys.path.insert(0, os.path.join(ROOT, ".claude", "hooks"))
+    import context_guard as cg
+    u, says, recs = cg.window(tr)
+    p_ = cg.check_prompt(u, says, recs, steps="STEPS")
+    scenario("B1: the check's window starts at the last compaction and holds the user's message, the assistant's "
+             "text and the plan's steps", len(u) == 1 and len(says) == 3 and "STEPS" in p_ and
+             "Run the mixture arms" in p_, (u, says))
+    import io, reply_check
+    saved = (cg.WANTED, cg.CHECKED, cg.FLUSHED, reply_check.ask_model, cg.plan_text, sys.stdin, sys.stderr)
+    cg.WANTED, cg.CHECKED, cg.FLUSHED = (os.path.join(d, ".claude", x) for x in ("w2", "c2", "f2"))
+    cg.plan_text = lambda: ""
+    pre = []
+    for v in (miss, {"questions": [], "answers": [], "commitments": []}, None):
+        reply_check.ask_model = lambda prompt, v=v: v
+        sys.stdin, sys.stderr = io.StringIO(json.dumps({"hook_event_name": "PreCompact", "trigger": "auto",
+                                                        "transcript_path": tr})), io.StringIO()
+        pre.append((cg.main(), sys.stderr.getvalue()))
+    sys.stdin = io.StringIO(json.dumps({"hook_event_name": "PreCompact", "trigger": "manual", "transcript_path": tr}))
+    reply_check.ask_model = lambda prompt: miss
+    pre.append((cg.main(), ""))
+    (cg.WANTED, cg.CHECKED, cg.FLUSHED, reply_check.ask_model, cg.plan_text, sys.stdin, sys.stderr) = saved
+    scenario("B1: PreCompact (auto) is held with the list while something is unrecorded; it goes through when "
+             "nothing is, when the model fails, and on a manual /compact",
+             pre[0][0] == 2 and "no `plan ask`" in pre[0][1] and [x[0] for x in pre[1:]] == [0, 0, 0], pre)
     for code, err, want, what in (
             (0, "", 0, "passes"),
             (2, "site ledger: this turn cannot end yet.\nFA has active work items and the supervisor is not running "

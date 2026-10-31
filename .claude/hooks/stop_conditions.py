@@ -5,7 +5,8 @@ waiter); a note waits on the outside (an agent, a job, a cluster, Joaquin) and n
 
   figure_pairs     figure_pair_guard.sh ported: a .png or .pdf changed since the last passing check without its
                    counterpart (same pruned trees, same marker .claude/.figpair_last, same ignore list)
-  context          context_guard.py's Stop branch: a compaction is wanted and the notes are not flushed
+  context          context_guard.py's Stop branch: a compaction is wanted and the window's questions,
+                   answers or commitments are not recorded on the plan or the ledger
   reply            reply_check.py: does the reply answer the user's message (once per message, passes when the check
                    cannot run)
   ledger           `site guard --stop`: for a plan_check project, the supervisor and the armed waiter (its open events
@@ -81,14 +82,12 @@ def figure_pairs(repo=REPO):
 
 
 # ------------------------------------------------------------------ context
-def context(inp, repo=REPO):
-    wanted = os.path.join(repo, ".claude", ".compact_wanted")
-    flushed = os.path.join(repo, ".claude", ".notes_flushed")
-    if inp.get("stop_hook_active") or not os.path.exists(wanted) or os.path.exists(flushed):
+def context(inp, repo=REPO, ask=None, steps=None):
+    if inp.get("stop_hook_active"):
         return [], []
     sys.path.insert(0, HOOKS)
     import context_guard
-    return [context_guard.INSTR], []
+    return context_guard.stop_items(inp, ask, repo, steps), []
 
 
 # ------------------------------------------------------------------ reply

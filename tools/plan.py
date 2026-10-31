@@ -1268,10 +1268,16 @@ def owner_state(e, t=None):
     if o.get("state") == "closed":
         return "closed"
     a = subagent_activity(o["agent"])
+    t = t or now()
+    # A state recorded at state_at (plan owner --state, or the Stop check's bookkeeping: a SendMessage that resumed the
+    # owner, the notification that it stopped) stands until its transcript writes after it; a recorded 'working'
+    # lapses after STEP_MIN with nothing written (2026-10-31: `plan owner --state working` was ignored).
+    at = parse(o.get("state_at"))
+    if o.get("state") in ("working", "stopped") and at and (a is None or a[0] <= at):
+        return o["state"] if o["state"] == "stopped" or (t - at).total_seconds() / 60 <= STEP_MIN else "stopped"
     if a is None:
         return "stopped"
     last, handed = a
-    t = t or now()
     return "working" if not handed and (t - last).total_seconds() / 60 <= STEP_MIN else "stopped"
 
 
@@ -1431,13 +1437,14 @@ def cmd_owner(a):
                          "close it with its hand-off first" % (a.id, o["agent"]))
             if o and owner_state(e) != "closed":
                 print("plan: note: the previous owner %s left no hand-off; the new one starts from the entry" % o["agent"])
-            e["owner"] = {"agent": a.agent, "state": "working", "since": now().isoformat()}
+            e["owner"] = {"agent": a.agent, "state": "working", "since": now().isoformat(),
+                          "state_at": now().isoformat()}
             print("plan: %s is owned by %s" % (a.id, a.agent))
         elif not o:
             sys.exit("plan: %s has no owner: plan owner %s --agent <id>" % (a.id, a.id))
         o = e["owner"]
         if a.state:
-            o["state"] = a.state
+            o["state"], o["state_at"] = a.state, now().isoformat()
         if a.context is not None:
             o["context"], o["context_at"] = a.context, now().isoformat()
         print("plan: %s owner %s, %s%s" % (a.id, o["agent"], o["state"],
