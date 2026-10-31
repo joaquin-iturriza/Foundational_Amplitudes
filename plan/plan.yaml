@@ -6380,6 +6380,13 @@ entries:
     - tests/test_context_push.py
     - tools/model_trial.py
     - tools/push_replay.py
+    - 'usage figure v3 (tools/usage_report.py @7dbd656d, analysis/agent_redesign/usage_report_v3.json, figs/usage_v3.png replaces
+      usage.png v1 [main folder only, per-role own denominator] and usage_v2.png [all folders, same per-role panel]): one
+      denominator per era = results of main session + subagents; weighted tokens per result 1.84 / 1.08 / 0.85 M and list-price
+      $ 4.82 / 2.85 / 2.30 per result (main alone, 384 results / step agents, 382 / redesign so far, 99); main session 560M
+      ($1464) / 126M ($304) / 20M ($49), subagents 146M ($386) / 272M ($732) / 65M ($179), A/B replay sessions 15M ($52) in
+      step agents, counted as main in v2. site sync: a site already ahead of the pushed commit on the local trunk''s history
+      no longer fails (ff_verdict in ~/.local/bin/site, backup site.bak_20261031_ffahead)'
   dead_ends:
   - tried: Route small tool fixes to Sonnet 5.5 (default effort) instead of Opus 5.5 at low effort (D203 matched trial, 10
       past repo fixes, tools/model_trial.py, analysis/agent_redesign/model_trial.json @096b5fe4)
