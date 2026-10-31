@@ -6369,6 +6369,12 @@ entries:
     units: null
     start: '2026-10-31T16:25:01+00:00'
     at: '2026-10-31T16:25:01+00:00'
+  - batch: hd_slow_e20_run250_probe
+    wall_h: 1.0
+    jobs: 5
+    units: null
+    start: '2026-10-31T16:28:44+00:00'
+    at: '2026-10-31T16:28:44+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
