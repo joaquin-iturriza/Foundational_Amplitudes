@@ -6899,6 +6899,19 @@ entries:
       s (second 10 TeV run cut); c cbar d dbar 128/243 s, 3509/3524 s, none at 10 TeV. Yield 1.0 in every run. Layout defect:
       next pass one job per pool and energy (GP_ENERGY), limits from these times; missing points: the second 10 TeV run of
       the first pool and both 10 TeV runs of the second.'
+  - at: '2026-10-31T15:34:40+00:00'
+    text: 'Wall-time split at tools/job_wall_split.py @8c7534ef (analysis/catalog_v4/data/job_wall_split.json; per job from
+      its full SLURM log). Training is alike on every V100 job: 4264 steps at 0.88-1.08 s/step, 51 validations of 3.7-5.2
+      s each (derived: training time minus steps at the no-validation rate), training 4022-4851 s; end-of-training evaluation
+      406-731 s. MSE share 0.50 seed 42 (6c246603): data 245 s, train 4197 s, eval 478 s, zero-shot reads 2284 probes in 4064
+      s, cut at 2.50 h. Pure-default bound arms afc96598/d26f13aa: reads 2009/1689 probes in 3774/3402 s, cut at 2.5 h. Het
+      control 87ea24d0/321a3de2: data 267/283 s, train 4569/4505 s, sigma stage 179/181 s, reads 2171 probes in 4674/5202
+      s, total 2.88/3.04 h. Het share arms 466656b2, 9897833d, f0156d88, df858d33: data 4354-4442 s of which the default-share
+      composition at load 4189-4204 s, reads 1473-1830 probes in 3665-3800 s, all cut at 3.75 h. Standard short trainings
+      878d6b9a/7c41ffd5: 610 probes in 1654/1648 s, totals 1.94/1.82 h. MSE control 339ec100 on an H100: 0.32 s/step, 3260
+      probes in 3750 s, 1.57 h. Cause of the extra time: the zero-shot reads at about 1.6-2.4 s per probe with one experiment
+      (data load, model build, weight load) built per probe, over 1500-3300 probes (the two pp sets), and in the het share
+      arms 70 min of composition at load. Fix in hand: batched reads (one build per held-out set), next item.'
   handoff:
     state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
       verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
