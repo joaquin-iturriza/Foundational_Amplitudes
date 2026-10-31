@@ -1,0 +1,570 @@
+{
+ "design": "plan catalog_coverage, passed 2026-10-30T17:29",
+ "runs": {
+  "default50": {
+   "PP4": [
+    "FA-ccin2p3-8e1cc529",
+    "FA-ccin2p3-52efacaf"
+   ],
+   "EE4": [
+    "FA-ccin2p3-8e1cc529",
+    "FA-ccin2p3-52efacaf"
+   ],
+   "held": [
+    "FA-ccin2p3-6c246603",
+    "FA-ccin2p3-1d46b938"
+   ]
+  },
+  "default25": {
+   "PP4": [
+    "FA-ccin2p3-7a6a1967",
+    "FA-ccin2p3-897aa5d4"
+   ],
+   "EE4": [
+    "FA-ccin2p3-7a6a1967",
+    "FA-ccin2p3-897aa5d4"
+   ],
+   "held": [
+    "FA-ccin2p3-11ad944a",
+    "FA-ccin2p3-9c6fc7ab"
+   ]
+  },
+  "control": {
+   "PP4": [
+    "FA-ccin2p3-04253ff7",
+    "FA-ccin2p3-e7e32847"
+   ],
+   "EE4": [
+    "FA-ccin2p3-c1863adf",
+    "FA-ccin2p3-def11c5c"
+   ],
+   "held": [
+    "FA-ccin2p3-339ec100",
+    "FA-ccin2p3-380842ed"
+   ]
+  }
+ },
+ "missing_reads": [],
+ "rule": "GAIN R <= 0.9 with the widened interval below 1 on PP4 (all classes) and EE4 (all); NO LOSS the pooled held-out widened upper end below 1.05; LOSS pooled R >= 1.05 with the widened interval above 1; WIN = GAIN and NO LOSS",
+ "shares": {
+  "default50": {
+   "PP4": {
+    "all": {
+     "R": 0.6823,
+     "n_classes": 1301,
+     "boot95": [
+      0.6426,
+      0.7157
+     ],
+     "widened": [
+      0.5936,
+      0.7748
+     ],
+     "frac_classes_below_1": 0.7502,
+     "n_probes": 1301,
+     "R_seed": 1.0826
+    },
+    "trained": {
+     "R": 0.549,
+     "n_classes": 797,
+     "boot95": [
+      0.5244,
+      0.582
+     ],
+     "widened": [
+      0.4885,
+      0.6247
+     ],
+     "frac_classes_below_1": 0.8758,
+     "n_probes": 797,
+     "R_seed": 1.0734
+    },
+    "not_trained": {
+     "R": 0.9212,
+     "n_classes": 504,
+     "boot95": [
+      0.8815,
+      0.9911
+     ],
+     "widened": [
+      0.8023,
+      1.0889
+     ],
+     "frac_classes_below_1": 0.5516,
+     "n_probes": 504,
+     "R_seed": 1.0987
+    },
+    "seeds_read": [
+     "FA-ccin2p3-8e1cc529",
+     "FA-ccin2p3-52efacaf"
+    ],
+    "probes_unmatched": []
+   },
+   "EE4": {
+    "all": {
+     "R": 0.4013,
+     "n_classes": 169,
+     "boot95": [
+      0.3332,
+      0.49
+     ],
+     "widened": [
+      0.3139,
+      0.5201
+     ],
+     "frac_classes_below_1": 0.8757,
+     "n_probes": 169,
+     "R_seed": 1.0615
+    },
+    "trained": {
+     "R": 0.2665,
+     "n_classes": 115,
+     "boot95": [
+      0.1946,
+      0.3601
+     ],
+     "widened": [
+      0.1779,
+      0.394
+     ],
+     "frac_classes_below_1": 0.9826,
+     "n_probes": 115,
+     "R_seed": 1.0939
+    },
+    "not_trained": {
+     "R": 0.7707,
+     "n_classes": 54,
+     "boot95": [
+      0.635,
+      0.9818
+     ],
+     "widened": [
+      0.6343,
+      0.983
+     ],
+     "frac_classes_below_1": 0.6481,
+     "n_probes": 54,
+     "R_seed": 1.0012
+    },
+    "seeds_read": [
+     "FA-ccin2p3-8e1cc529",
+     "FA-ccin2p3-52efacaf"
+    ],
+    "probes_unmatched": []
+   },
+   "held": {
+    "pooled": {
+     "R": 1.2709,
+     "n_classes": 701,
+     "boot95": [
+      1.2423,
+      1.3064
+     ],
+     "widened": [
+      1.1446,
+      1.4179
+     ],
+     "frac_classes_below_1": 0.1926,
+     "n_probes": 701,
+     "R_seed": 1.0853
+    },
+    "H1": {
+     "R": 1.3809,
+     "n_classes": 62,
+     "boot95": [
+      1.3196,
+      1.477
+     ],
+     "widened": [
+      1.1913,
+      1.6362
+     ],
+     "frac_classes_below_1": 0.129,
+     "n_probes": 62,
+     "R_seed": 1.1078
+    },
+    "H2": {
+     "R": 1.336,
+     "n_classes": 218,
+     "boot95": [
+      1.2729,
+      1.3686
+     ],
+     "widened": [
+      1.1887,
+      1.4655
+     ],
+     "frac_classes_below_1": 0.0917,
+     "n_probes": 218,
+     "R_seed": 1.0708
+    },
+    "H2p5": {
+     "R": 1.2466,
+     "n_classes": 38,
+     "boot95": [
+      1.1258,
+      1.3611
+     ],
+     "widened": [
+      1.0237,
+      1.4968
+     ],
+     "frac_classes_below_1": 0.1579,
+     "n_probes": 38,
+     "R_seed": 1.0997
+    },
+    "H3": {
+     "R": 1.1823,
+     "n_classes": 279,
+     "boot95": [
+      1.1164,
+      1.2372
+     ],
+     "widened": [
+      1.0541,
+      1.3102
+     ],
+     "frac_classes_below_1": 0.2832,
+     "n_probes": 279,
+     "R_seed": 1.059
+    },
+    "H5": {
+     "R": 0.9711,
+     "n_classes": 28,
+     "boot95": [
+      0.8772,
+      1.1262
+     ],
+     "widened": [
+      0.8612,
+      1.1471
+     ],
+     "frac_classes_below_1": 0.5357,
+     "n_probes": 28,
+     "R_seed": 0.9818
+    },
+    "H6": {
+     "R": 1.2666,
+     "n_classes": 8,
+     "boot95": [
+      0.9521,
+      1.4223
+     ],
+     "widened": [
+      0.8042,
+      1.6838
+     ],
+     "frac_classes_below_1": 0.25,
+     "n_probes": 8,
+     "R_seed": 1.1839
+    },
+    "H7E": {
+     "R": 1.4539,
+     "n_classes": 34,
+     "boot95": [
+      1.3753,
+      1.5391
+     ],
+     "widened": [
+      1.3515,
+      1.5662
+     ],
+     "frac_classes_below_1": 0.0588,
+     "n_probes": 34,
+     "R_seed": 0.9827
+    },
+    "H7c": {
+     "R": 1.6127,
+     "n_classes": 34,
+     "boot95": [
+      1.4928,
+      1.727
+     ],
+     "widened": [
+      1.2648,
+      2.0383
+     ],
+     "frac_classes_below_1": 0.0882,
+     "n_probes": 34,
+     "R_seed": 1.1803
+    },
+    "seeds_read": [
+     "FA-ccin2p3-6c246603",
+     "FA-ccin2p3-1d46b938"
+    ],
+    "probes_unmatched": []
+   },
+   "gain": true,
+   "cost": "LOSS",
+   "wins": false
+  },
+  "default25": {
+   "PP4": {
+    "all": {
+     "R": 0.7545,
+     "n_classes": 1301,
+     "boot95": [
+      0.7222,
+      0.7847
+     ],
+     "widened": [
+      0.6671,
+      0.8495
+     ],
+     "frac_classes_below_1": 0.7302,
+     "n_probes": 1301,
+     "R_seed": 1.0826
+    },
+    "trained": {
+     "R": 0.6496,
+     "n_classes": 797,
+     "boot95": [
+      0.6026,
+      0.688
+     ],
+     "widened": [
+      0.5614,
+      0.7385
+     ],
+     "frac_classes_below_1": 0.8444,
+     "n_probes": 797,
+     "R_seed": 1.0734
+    },
+    "not_trained": {
+     "R": 0.9323,
+     "n_classes": 504,
+     "boot95": [
+      0.882,
+      0.9926
+     ],
+     "widened": [
+      0.8027,
+      1.0906
+     ],
+     "frac_classes_below_1": 0.5496,
+     "n_probes": 504,
+     "R_seed": 1.0987
+    },
+    "seeds_read": [
+     "FA-ccin2p3-7a6a1967",
+     "FA-ccin2p3-897aa5d4"
+    ],
+    "probes_unmatched": []
+   },
+   "EE4": {
+    "all": {
+     "R": 0.4127,
+     "n_classes": 169,
+     "boot95": [
+      0.3575,
+      0.5036
+     ],
+     "widened": [
+      0.3368,
+      0.5346
+     ],
+     "frac_classes_below_1": 0.8817,
+     "n_probes": 169,
+     "R_seed": 1.0615
+    },
+    "trained": {
+     "R": 0.3148,
+     "n_classes": 115,
+     "boot95": [
+      0.2397,
+      0.3985
+     ],
+     "widened": [
+      0.2191,
+      0.4359
+     ],
+     "frac_classes_below_1": 0.9913,
+     "n_probes": 115,
+     "R_seed": 1.0939
+    },
+    "not_trained": {
+     "R": 0.7291,
+     "n_classes": 54,
+     "boot95": [
+      0.5767,
+      0.9723
+     ],
+     "widened": [
+      0.576,
+      0.9735
+     ],
+     "frac_classes_below_1": 0.6481,
+     "n_probes": 54,
+     "R_seed": 1.0012
+    },
+    "seeds_read": [
+     "FA-ccin2p3-7a6a1967",
+     "FA-ccin2p3-897aa5d4"
+    ],
+    "probes_unmatched": []
+   },
+   "held": {
+    "pooled": {
+     "R": 1.2246,
+     "n_classes": 701,
+     "boot95": [
+      1.2,
+      1.2495
+     ],
+     "widened": [
+      1.1057,
+      1.3561
+     ],
+     "frac_classes_below_1": 0.2297,
+     "n_probes": 701,
+     "R_seed": 1.0853
+    },
+    "H1": {
+     "R": 1.318,
+     "n_classes": 62,
+     "boot95": [
+      1.2619,
+      1.3568
+     ],
+     "widened": [
+      1.1392,
+      1.503
+     ],
+     "frac_classes_below_1": 0.1129,
+     "n_probes": 62,
+     "R_seed": 1.1078
+    },
+    "H2": {
+     "R": 1.2385,
+     "n_classes": 218,
+     "boot95": [
+      1.1751,
+      1.2652
+     ],
+     "widened": [
+      1.0974,
+      1.3548
+     ],
+     "frac_classes_below_1": 0.1835,
+     "n_probes": 218,
+     "R_seed": 1.0708
+    },
+    "H2p5": {
+     "R": 1.1675,
+     "n_classes": 38,
+     "boot95": [
+      1.121,
+      1.2843
+     ],
+     "widened": [
+      1.0193,
+      1.4123
+     ],
+     "frac_classes_below_1": 0.2105,
+     "n_probes": 38,
+     "R_seed": 1.0997
+    },
+    "H3": {
+     "R": 1.1921,
+     "n_classes": 279,
+     "boot95": [
+      1.1353,
+      1.2246
+     ],
+     "widened": [
+      1.072,
+      1.2969
+     ],
+     "frac_classes_below_1": 0.2867,
+     "n_probes": 279,
+     "R_seed": 1.059
+    },
+    "H5": {
+     "R": 0.9706,
+     "n_classes": 28,
+     "boot95": [
+      0.8467,
+      1.1696
+     ],
+     "widened": [
+      0.8313,
+      1.1913
+     ],
+     "frac_classes_below_1": 0.5714,
+     "n_probes": 28,
+     "R_seed": 0.9818
+    },
+    "H6": {
+     "R": 1.1686,
+     "n_classes": 8,
+     "boot95": [
+      1.0727,
+      1.4092
+     ],
+     "widened": [
+      0.9061,
+      1.6683
+     ],
+     "frac_classes_below_1": 0.0,
+     "n_probes": 8,
+     "R_seed": 1.1839
+    },
+    "H7E": {
+     "R": 1.3418,
+     "n_classes": 34,
+     "boot95": [
+      1.2665,
+      1.4057
+     ],
+     "widened": [
+      1.2446,
+      1.4304
+     ],
+     "frac_classes_below_1": 0.1471,
+     "n_probes": 34,
+     "R_seed": 0.9827
+    },
+    "H7c": {
+     "R": 1.3968,
+     "n_classes": 34,
+     "boot95": [
+      1.276,
+      1.4507
+     ],
+     "widened": [
+      1.0811,
+      1.7122
+     ],
+     "frac_classes_below_1": 0.1471,
+     "n_probes": 34,
+     "R_seed": 1.1803
+    },
+    "seeds_read": [
+     "FA-ccin2p3-11ad944a",
+     "FA-ccin2p3-9c6fc7ab"
+    ],
+    "probes_unmatched": []
+   },
+   "gain": true,
+   "cost": "LOSS",
+   "wins": false
+  }
+ },
+ "verdict": "trade-off",
+ "bound": {
+  "R": 0.3879,
+  "n_classes": 797,
+  "boot95": [
+   0.3627,
+   0.415
+  ],
+  "widened": [
+   0.3379,
+   0.4455
+  ],
+  "frac_classes_below_1": 0.931,
+  "n_probes": 797,
+  "R_seed": 1.0734,
+  "arm_seed_R": 0.9081
+ }
+}
