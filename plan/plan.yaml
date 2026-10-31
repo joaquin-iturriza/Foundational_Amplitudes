@@ -7184,6 +7184,18 @@ entries:
       in h against A: A2 median 2.5e-5 max 4.3e-3, B 1.9e-5 / 8.3e-3, C 2.5e-5 / 4.2e-3, t identical: the differences are
       the GPU''s own run-to-run difference. Reader default 1 worker and short_wall S_PROBE 0.71 s (112725da); repo-reviewer
       a8a308817be9d886d PASS on the backlog to 112725da.'
+  - at: '2026-10-31T18:23:16+00:00'
+    text: '2026-10-31T19:1x. All 142 default-sampled held-out test pools on ccin2p3 (check_site_data, test split): 114/114
+      trees (H2p5 38, H6 8, H7E 34, H7c 34), 28/28 one-loop H5. Axis HD5 (the 28 H5 pools, test split, signed magnitude, no
+      sign-head rescoring) added to the catalog short job, short_wall and collect_run (f28117ef). Step 20 eval-only re-reads,
+      one wave of 12 on ccin2p3 (site pick offered lxplus; the parents and hd_ pools exist only on CC): MSE control 339ec100
+      -> FA-ccin2p3-9512cac2, seed2 380842ed -> FA-ccin2p3-783892e6, default50 6c246603 -> FA-ccin2p3-58631ca5, default50_seed2
+      1d46b938 -> FA-ccin2p3-698c1a0b, default25 11ad944a -> FA-ccin2p3-4dca09e5, default25_seed2 9c6fc7ab -> FA-ccin2p3-926dea24
+      (HD4 HD5, 142 probes, 0:30 limit, short_wall 0.39 h at 0.71 s/probe); het control 87ea24d0 -> FA-ccin2p3-87aeabca, seed2
+      321a3de2 -> FA-ccin2p3-53b9ed56 (HD4 HD5, 0:30); het default50 466656b2 -> FA-ccin2p3-ead54b75, default50_seed2 9897833d
+      -> FA-ccin2p3-7c131715, default25 f0156d88 -> FA-ccin2p3-9538e607, default25_seed2 df858d33 -> FA-ccin2p3-ed96b552 (PP4
+      EE4 HD4 HD5, 1612 probes, 1:45 limit from the het rate measured on the old reader 2.46 s/probe + 15 min, x1.25; short_wall
+      at 0.71 says 0.79 h). GPU-h at the limits: 8 x 0.5 + 4 x 1.75 = 11.0; batch target step20_hd_rereads 1.75 h.'
   handoff:
     state: 'Step 18: queue hd_test_measured done (348/348 tasks, 106/106 pools assembled, test pools on ccin2p3). Queue hd_test_e20_small_runs
       (the three 20 TeV pools: e+e- photon photon c cbar, e+e- c cbar d dbar, pp d dbar -> d h ubar W+; 35 tasks, est 0.9
