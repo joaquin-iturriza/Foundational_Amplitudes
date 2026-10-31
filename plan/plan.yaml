@@ -6590,6 +6590,7 @@ entries:
     runs: []
     commit: 096b5fe4
     paths:
+    - .claude/hooks/owner_handoff.py
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
@@ -6607,6 +6608,16 @@ entries:
       match), plan next resumes owners when waited runs end (8f7aeda1), tools/detach.py (07a611ed, long-run detachment untested),
       compaction 400k/notes 350k (c534526a, next session). Owners: catalog_coverage a48477264f6500ec0 (resubmitting steps
       11+14 at real limits), v3_prep_explore a208e44d49598bdaf (stopped; 6 GPU jobs pending on CC).'
+    - 'next 10 done 2026-10-31 (commit 2cc96941, D224): PostToolUse hook owner_handoff.py on every tool call; fires only when
+      the call carries agent_id (never the main session), the agent is the recorded not-closed owner of an entry, and its
+      own transcript''s last-call context >= CONTEXT_CLOSE 170000; tells it to commit, record, plan handoff <entry> and end;
+      stops once the hand-off closes the owner. Tests: tests/test_owner_handoff.py 11/11 in the copy and installed (main session
+      at 190k silent, owner 120k/169999 silent, 170000 and 205k fire, non-owner 190k silent, closed owner silent, agent_transcript_path
+      field, missing transcript, garbage input, tool-result last). Replay in place of owner aa7670a7d3cbd2cba (compacted twice):
+      would have fired at tool call 46 (175229 tokens, 03:45Z), 29 calls and 14 min before its first compaction (03:59Z, after
+      call 75). Live: with a per-agent override (.claude/hooks/.owner_handoff_test, gitignored, removed after) at 20000 this
+      owner got the note on its next Bash call; silent after removal. Also stale 300k -> 170k in plan/step_prompt.txt item
+      6, .claude/agents/compact-worker.md, owner_context.py docstring (D223).'
     - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
       projects.toml and site_runends.py)
     - 'switch-over D built on branch redesign-d (worktrees/wt-redesign-d, commits 1bb22b6c..e23611f1): tests/test_redesign_d.py
@@ -6622,6 +6633,7 @@ entries:
     - switch-overs A, B, D applied and committed (merge 2c7741c0, settings 84a15232); reply check fixed (d2c15a58); worktree
       removal script (d39af33d, 978b7179); supervisor summary-check fixes in ~/.local/bin/site, supervisor restarted 12:55
     - tests/test_context_push.py
+    - tests/test_owner_handoff.py
     - tools/model_trial.py
     - tools/push_replay.py
     - 'usage attribution (design passed 2026-10-31 ~03:50; tools/main_turns.py, commit waits on the repo-reviewer backlog,
