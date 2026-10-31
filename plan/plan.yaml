@@ -5811,6 +5811,21 @@ entries:
       agent traces to the section it withheld; one such correction reverts that change and records a dead end. The stood rate
       is reported; with fewer than 10 scored post-change tasks per side it is undecidable and said so (kept provisionally,
       re-read at 10).'
+    passed_at: '2026-10-31T00:19:12+00:00'
+    reviewer: 'Re-check after FIX. (1) Changes now separate and matched: (c) under-10k repair vs live hook at cdd1f456; (a)
+      working-on-the-plan off for subagents and (b) seven acting sections on writes, each vs the repaired hook on the same
+      calls; read the working-tree diff of context_push.py (split into <=9,000-char parts, pending parts on next calls, agents:/on:
+      header keys; header lines do not change the body hash, so no re-push). (2) Reproduced with tools/push_replay.py (variant
+      section dirs built in my scratchpad): live replay --check 1 of 33 agents off by >5 percent, pooled replayed/recorded
+      0.995 (the off one is e33720085e0f, re-pushes after edits, listed apart); pooled tokens per call live 9956, (c) 11368,
+      (a) 9348 (-17.8 percent vs c), (b) 10380 (-8.7 percent vs c); the agent''s 32-transcript numbers match within 1 percent
+      (one more transcript since). (3) Deterministic replay, no seed spread; the live test is each post-change agent''s own
+      transcript reproduced within 5 percent, not a mean of different agents. (4) Yes/no per change stated (saving >=5 percent,
+      first 10 live agents reproduced, no correction traced to a withheld section, else revert and dead end); note the 5 percent
+      bar was set after the replay numbers were known, so the deciding risk is the hand read of corrections. (5) Searched
+      docs/results.tex, plan show and site decisions for context_push, push, REFERENCE, additionalContext, persisted, skill
+      listing, hook output, pushed section, reference section: nothing prior; D202 is the context study it builds on. (6,7)
+      Answers next 5 cut 1; no decision names a comparison for it.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
