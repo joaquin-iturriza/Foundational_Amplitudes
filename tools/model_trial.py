@@ -8,6 +8,7 @@ Opus 5.5 at low effort, each task's pass check its own, every output read by han
     python3 tools/model_trial.py check TASK ARM           the task's pass check on the agent's committed work
     python3 tools/model_trial.py cost AGENT_ID [...]      $ of one agent's transcript at list price (usage_windows)
     python3 tools/model_trial.py report --out JSON        per arm: tasks passed, $ per task, $ per task with rework
+    python3 tools/model_trial.py size [--out JSON]        the extension's sizing from the first ten pairs
     python3 tools/model_trial.py altcheck                 the hand-written alternative fixes (other internals than the
                                                           original's) pass their checks: the check accepts another fix
 
@@ -22,7 +23,7 @@ import argparse, glob, json, os, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = os.path.join(ROOT, ".venv-cpu", "bin", "python")
 REC = os.path.join(ROOT, "analysis", "agent_redesign", "model_trial.json")
-ARMS = ("sonnet", "opuslow")
+ARMS = ("sonnet", "opuslow", "sonnetlow")      # sonnetlow: Sonnet 5.5 at effort low (extension, D212)
 # the ten tasks whose check fails at the parent and passes at the fix (validate, 2026-10-31); the other candidates
 # below failed that test (passed at the parent: emaload, runperm, sizeprobe, ppsidecar, memmask; failed at the fix on
 # the laptop: planwait, statusjson; check over 15 min: ggh) and are kept only as the record of what was tried
@@ -101,6 +102,47 @@ TASKS = {
                 "(the role's shuffle), and nothing maps a read position to its row in the pool file, so per-event "
                 "quantities computed from the pool (the dipole variables) cannot be joined to the read's errors. "
                 "Zero-shot reads should save each event's pool row."),
+    # extension candidates (D212, 2026-10-31): defect text and interface written for those that pass validate
+    "handledruns": ("e5cd7bb1", ['tests/test_plan_handled_runs.py'], ""),
+    "modelguard": ("0eff43b9", ['tests/test_redesign_d.py'], ""),
+    "replygrant": ("49fd91b4", ['tests/test_reply_check.py'], ""),
+    "replyexc": ("77261ced", ['tests/test_reply_check.py'], ""),
+    "replyneg": ("f49724fd", ['tests/test_reply_check.py'], ""),
+    "gatecount": ("9cb31aa5", ['tests/test_hooks_real.py'], ""),
+    "loopread": ("5380dd62", ['tests/test_hooks_real.py'], ""),
+    "claimdead": ("4609381f", ['tests/test_lhe_parts.py'], ""),
+    "repeatfp": ("2a16b36f", ['tests/test_hooks_real.py'], ""),
+    "letthrough": ("382a662f", ['tests/test_hooks_real.py'], ""),
+    "refusestand": ("c868f490", ['tests/test_hooks_real.py'], ""),
+    "sharesreg": ("e887b556", ['tests/test_lhe_parts.py'], ""),
+    "continuous": ("948c59d5", ['tests/test_setup_scenarios.py'], ""),
+    "donecont": ("9d75f5e3", ['tests/test_setup_scenarios.py'], ""),
+    "proposed": ("80367b7d", ['tests/test_setup_scenarios.py'], ""),
+    "compactskip": ("e3698073", ['tests/test_setup_scenarios.py'], ""),
+    "statssrc": ("5cd8c2b3", ['tests/test_orders_source.py'], ""),
+    "alphapow": ("1d9d6a29", ['tests/test_order_features.py'], ""),
+    "valtotal": ("577164a6", ['tests/test_val_total.py'], ""),
+    "replylist": ("4fe75ce5", ['tests/test_setup_scenarios.py'], ""),
+    "replyblock": ("85eeb4f0", ['tests/test_setup_scenarios.py'], ""),
+    "quietstop": ("e830f4ca", ['tests/test_setup_scenarios.py'], ""),
+    "emastart": ("ddfc0314", ['tests/test_ft_ema_start.py'], ""),
+    "endedrun": ("39886d3a", ['tests/test_setup_scenarios.py'], ""),
+    "eventblock": ("e7cddfce", ['tests/test_setup_scenarios.py'], ""),
+    "inflight": ("ced2a62f", ['tests/test_setup_scenarios.py'], ""),
+    "backlogdepth": ("240b0f14", ['tests/test_setup_scenarios.py'], ""),
+    "recheck": ("41faddd6", ['tests/test_setup_scenarios.py'], ""),
+    "holditem": ("22fbd7b9", ['tests/test_setup_scenarios.py'], ""),
+    "claimtime": ("ee42732d", ['tests/test_setup_scenarios.py'], ""),
+    "scanwindow": ("324510e2", ['tests/test_beam_order.py'], ""),
+    "massconv": ("27c5ffc8", ['tests/test_beam_order.py'], ""),
+    "lightprop": ("d406f965", ['tests/test_synthetic_amplitudes.py'], ""),
+    "quotedcut": ("23e149a8", ['tests/test_redesign_d.py'], ""),
+    "topsampling": ("4e844204", ['tests/test_pool_physics.py'], ""),
+    "switchB": ("69c9b567", ['tests/test_hooks_real.py'], ""),
+    "twoword": ("5bf79e0d", ['tests/test_hooks_real.py'], ""),
+    "acceptyield": ("b2050260", ['tests/test_lhe_parts.py', 'tests/test_supervisor_c.py'], ""),
+    "reviewlock": ("275845c9", ['tests/test_setup_scenarios.py'], ""),
+    "asksearch": ("9ce1cb16", ['tests/test_setup_scenarios.py'], ""),
 }
 
 # source-level assertions of a check (they read the original fix's exact lines): turned into `pass` in the copied
@@ -210,8 +252,8 @@ def run_check(path, commit, tests, timeout=900, task=None):
     return ok, out
 
 
-def validate(names):
-    vt = os.path.join(ROOT, "worktrees", "zz_trial_validate")
+def validate(names, vt_name="zz_trial_validate"):
+    vt = os.path.join(ROOT, "worktrees", vt_name)
     if not os.path.isdir(vt):
         git("worktree", "add", "--detach", vt, "HEAD")
     out = {}
@@ -308,38 +350,112 @@ def cost(agent):
     return {"agent": agent, "files": len(fs), "calls": len(seen), "usd": round(usd, 4), "models": sorted(models)}
 
 
+def wilson(k, n, z=1.96):
+    """95% Wilson interval of k successes in n."""
+    if not n:
+        return None
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * (p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5 / d
+    return [round(c - h, 3), round(c + h, 3)]
+
+
+def boot(vals, stat, n=10000, seed=0):
+    """95% percentile bootstrap interval of stat over tasks (vals: one item per task, resampled together)."""
+    import random
+    rng = random.Random(seed)
+    xs = sorted(stat([vals[rng.randrange(len(vals))] for _ in vals]) for _ in range(n))
+    return [round(xs[int(0.025 * n)], 3), round(xs[int(0.975 * n) - 1], 3)]
+
+
 def report(out):
+    """Per arm over every task it ran (first ten and extension pooled): pass rates first and with rework (Wilson
+    95%), hand-read flaws, $ per task with rework (bootstrap 95% over tasks), and on the tasks both it and opuslow ran
+    the ratio of $ totals and the median paired ratio to opuslow (bootstrap 95% over tasks)."""
     rec = json.load(open(REC)) if os.path.exists(REC) else {"runs": []}
+    usd = {(r["task"], r["arm"]): sum(cost(a)["usd"] for a in r["agents"]) for r in rec["runs"]}
     per = {}
     for arm in ARMS:
         rs = [r for r in rec["runs"] if r["arm"] == arm]
-        usd = [sum(cost(a)["usd"] for a in r["agents"]) for r in rs]
-        per[arm] = {"tasks": len(rs), "passed_first": sum(r["first_pass"] for r in rs),
-                    "passed_with_rework": sum(r["final_pass"] for r in rs),
-                    "hand_read_ok": sum(r.get("hand_read_ok", False) for r in rs),
-                    "usd_total": round(sum(usd), 3),
-                    "usd_per_task_with_rework": round(sum(usd) / max(1, len(rs)), 3)}
-    # paired per-task cost ratio sonnet / opuslow: median and range (design review: not only the ratio of totals)
-    by = {(r["task"], r["arm"]): sum(cost(a)["usd"] for a in r["agents"]) for r in rec["runs"]}
-    ratios = sorted(by[(t, "sonnet")] / by[(t, "opuslow")] for t in {t for t, _ in by}
-                    if (t, "sonnet") in by and (t, "opuslow") in by and by[(t, "opuslow")] > 0)
-    if ratios:
-        per["cost_ratio_sonnet_over_opuslow"] = {"n": len(ratios), "median": round(ratios[len(ratios) // 2], 3),
-                                                 "min": round(ratios[0], 3), "max": round(ratios[-1], 3)}
+        n = len(rs)
+        if not n:
+            continue
+        u = [usd[(r["task"], arm)] for r in rs]
+        f1, f2 = sum(r["first_pass"] for r in rs), sum(r["final_pass"] for r in rs)
+        ok = sum(r.get("hand_read_ok", False) for r in rs)
+        d = {"tasks": n, "passed_first": f1, "first_ci": wilson(f1, n), "passed_with_rework": f2,
+             "rework_ci": wilson(f2, n), "hand_read_ok": ok, "hand_read_flaws": [r["task"] for r in rs
+                                                                                 if not r.get("hand_read_ok")],
+             "usd_total": round(sum(u), 3), "usd_per_task": round(sum(u) / n, 3),
+             "usd_per_task_ci": boot(u, lambda v: sum(v) / len(v))}
+        if arm != "opuslow":
+            pairs = [(usd[(t, arm)], usd[(t, "opuslow")]) for t in sorted({r["task"] for r in rs})
+                     if (t, "opuslow") in usd and usd[(t, "opuslow")] > 0]
+            if pairs:
+                med = lambda v: sorted(a / b for a, b in v)[len(v) // 2]
+                tot = lambda v: sum(a for a, _ in v) / sum(b for _, b in v)
+                d["vs_opuslow"] = {"pairs": len(pairs), "ratio_of_totals": round(tot(pairs), 3),
+                                   "ratio_of_totals_ci": boot(pairs, tot), "median_paired_ratio": round(med(pairs), 3),
+                                   "median_paired_ratio_ci": boot(pairs, med),
+                                   "min": round(min(a / b for a, b in pairs), 3),
+                                   "max": round(max(a / b for a, b in pairs), 3)}
+                # first-pass discordant pairs: [this arm passed and opuslow failed, this arm failed and opuslow passed]
+                d["vs_opuslow"]["discordant_first"] = [
+                    sum(1 for r in rs if r["first_pass"] and not fp(rec, r["task"], "opuslow")),
+                    sum(1 for r in rs if not r["first_pass"] and fp(rec, r["task"], "opuslow") is True)]
+        per[arm] = d
     print(json.dumps(per, indent=1))
     if out:
         rec["summary"] = per
         json.dump(rec, open(out, "w"), indent=1)
 
 
+def fp(rec, task, arm):
+    for r in rec["runs"]:
+        if r["task"] == task and r["arm"] == arm:
+            return r["first_pass"]
+    return None
+
+
+def size(n_list=(10, 20, 30, 35, 40)):
+    """Sizing of the extension from the first ten pairs: the 95% half-width of the ratio of $ totals and of the
+    mean paired ratio at n pairs (normal approximation, the first ten's paired spread), and the smallest difference
+    in first-pass failure rate a paired McNemar test detects at n (alpha 0.05 two-sided, power 0.8, failures
+    independent across arms, reference failure rate 0.1 as in the first ten)."""
+    import math, statistics as st
+    rec = json.load(open(REC))
+    usd = {(r["task"], r["arm"]): sum(cost(a)["usd"] for a in r["agents"]) for r in rec["runs"]}
+    ts = sorted({t for t, a in usd if a == "sonnet" and (t, "opuslow") in usd})
+    rat = [usd[(t, "sonnet")] / usd[(t, "opuslow")] for t in ts]
+    sd = st.stdev(rat)
+    out = {"first_pairs": len(ts), "paired_ratio_sd": round(sd, 4), "by_n": {}}
+    for n in n_list:
+        hw = 1.96 * sd / math.sqrt(n)
+        dd = None
+        for k in range(1, 90):
+            d, p1 = k / 100, 0.1
+            p2 = p1 + d
+            pd = p1 * (1 - p2) + p2 * (1 - p1)
+            need = (1.96 * math.sqrt(pd) + 0.8416 * math.sqrt(max(pd - d * d, 1e-9))) ** 2 / (d * d)
+            if need <= n:
+                dd = d
+                break
+        out["by_n"][n] = {"ratio_ci_halfwidth": round(hw, 3), "detectable_failure_rate_difference": dd,
+                          "pass_rate_ci_at_0.9": wilson(round(0.9 * n), n)}
+    print(json.dumps(out, indent=1))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["validate", "setup", "brief", "check", "cost", "report", "altcheck"])
+    ap.add_argument("cmd", choices=["validate", "setup", "brief", "check", "cost", "report", "altcheck", "size"])
     ap.add_argument("args", nargs="*")
     ap.add_argument("--out")
+    ap.add_argument("--vt", default="zz_trial_validate", help="validate: the worktree name (parallel validates)")
     a = ap.parse_args()
     if a.cmd == "validate":
-        res = validate(a.args or sorted(TASKS))
+        res = validate(a.args or sorted(TASKS), a.vt)
         if a.out:
             json.dump(res, open(a.out, "w"), indent=1)
     elif a.cmd == "setup":
@@ -352,6 +468,10 @@ def main():
         print(json.dumps([cost(x) for x in a.args], indent=1))
     elif a.cmd == "altcheck":
         res = altcheck()
+        if a.out:
+            json.dump(res, open(a.out, "w"), indent=1)
+    elif a.cmd == "size":
+        res = size()
         if a.out:
             json.dump(res, open(a.out, "w"), indent=1)
     else:
