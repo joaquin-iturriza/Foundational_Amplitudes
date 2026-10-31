@@ -5903,7 +5903,7 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: a8f01a86034d7b73e
-    state: working
+    state: stopped
     since: '2026-10-31T02:59:56+00:00'
     context: 134790
     context_at: '2026-10-31T03:33:39+00:00'
