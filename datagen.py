@@ -468,6 +468,11 @@ def ensure_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
 
     if _is_cached(out, wanted):
         return out
+    if float((recipe.get("sampling") or {}).get("f_default", 0)) > 0:
+        # a default-share mixture is composed at load from the entry's catalog_v4 pool and its default_source's lhe
+        # pools (mix_compose.py; the user, 2026-10-31: no stored copy per mixture); a stored one is still read above
+        import mix_compose
+        return mix_compose.ensure_composed(process, sqrts_min, sqrts_max, n_events, role, seed, recipe, out)
     if require_cache:
         raise RuntimeError(
             f"require_cache: dataset for ({process}, {role}, {n_events} ev) "

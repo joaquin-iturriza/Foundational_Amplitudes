@@ -47,6 +47,18 @@ for spec in ARGS or DEFAULT:
             rec = mg.variable_energy_recipe(p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]),
                                             int(p[n_key[role]]), role=role, seed=SEED)
             path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
+            if float((rec.get("sampling") or {}).get("f_default", 0)) > 0 and not datagen._is_cached(path, mg.recipe_id(rec)):
+                # a default-share mixture is composed at load (mix_compose.py): its catalog_v4 pool and the default
+                # source's lhe pools must be here instead
+                import mix_compose
+                with mix_compose._Swap(p["name"], mix_compose.control_config(p["name"])):
+                    rec = mg.variable_energy_recipe(p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]),
+                                                    int(p[n_key[role]]), role=role, seed=SEED)
+                    path = mg.recipe_output_path(rec, datagen.dest_for_role(role))
+                src = mg.sampling_policy(mg.PROCESSES[p["name"]], role)["default_source"]
+                for nm, r2, p2 in mg.default_share_pools(src, role, SEED):
+                    if not datagen._is_cached(p2, mg.recipe_id(r2)):
+                        uncached.append(f"{nm}/{role} (default share of {p['name']})")
             if PATHS:
                 for f in (path, path + ".recipe.json"):
                     if f not in seen:
