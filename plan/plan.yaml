@@ -2379,6 +2379,12 @@ entries:
     units: null
     start: '2026-10-31T03:52:00+00:00'
     at: '2026-10-31T03:52:00+00:00'
+  - batch: multext_check
+    wall_h: 12.0
+    jobs: 1
+    units: null
+    start: '2026-10-31T04:22:25+00:00'
+    at: '2026-10-31T04:22:25+00:00'
   handoff:
     state: 'Option (c) answered by its check (kshot_spread.py --check @aa5aff19, design passed after one FIX): a per-process
       affine fitted on 1600 of a held-out multiplicity pool''s own events removes 0.012/0.017 of the gap (seeds 42/43), a
