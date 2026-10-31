@@ -6258,6 +6258,9 @@ entries:
       composes all 18 pools at load, shares exact, physics block, finite. Step 16: prune FA-ccin2p3-93625c9d (D216): 9404
       standalones, 9403 deletable, 2 kept, 16.42 GB freed, manifest standalones_20261031_044141.json; /sps 422 -> 404 GB of
       512; after the mixture prune 355 GB used (70%).'
+  - at: '2026-10-31T04:19:18+00:00'
+    text: 'Correction to the previous finding: the mixture prune manifest is /sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/.prune_manifests/mixture_pools_20261031_051555.json.
+      The --load check left 18 composed pools (about 0.2 GB) under the CC login node''s /tmp/amp_mix_compose.'
   handoff:
     state: 'Step 11 DONE (pp bound YES, R 0.388 widened [0.338, 0.446], data/pp_bound.json; dropped from next). All PP4+EE4
       re-reads COMPLETED (8e1cc529 default50 s42, 7a6a1967 default25 s42, 897aa5d4 default25 s43 = REREAD 9c6fc7ab; 52efacaf
