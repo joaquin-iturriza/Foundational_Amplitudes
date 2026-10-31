@@ -5412,12 +5412,13 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: '85064616'
+    commit: 9ba3ed6b
     paths:
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
     - analysis/agent_redesign/push_replay.json
+    - analysis/agent_redesign/push_replay_hold.json
     - analysis/agent_redesign/usage_report.json
     - analysis/agent_redesign/usage_report_v2.json
     - analysis/agent_redesign/usage_windows.json
