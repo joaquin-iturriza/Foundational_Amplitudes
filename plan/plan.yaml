@@ -6388,9 +6388,9 @@ entries:
         before the queue'
   owner:
     agent: a5d0c97d9d3e9a7dc
-    state: stopped
+    state: working
     since: '2026-10-31T14:18:03.498000+00:00'
-    state_at: '2026-10-31T14:28:02.824000+00:00'
+    state_at: '2026-10-31T15:04:29+00:00'
     context: 125932
     context_at: '2026-10-31T14:53:51+00:00'
   findings:
