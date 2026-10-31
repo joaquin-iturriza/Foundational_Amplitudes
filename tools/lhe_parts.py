@@ -199,6 +199,13 @@ def part_ok(path, n_asked=None):
     return n > 0 and (n_asked is None or n >= int(n_asked))
 
 
+def run_asked(name, run):
+    """The events a run must return to count as done: what it asked, where the pool is split into runs meant to deliver
+    them (lhe.run_events set); None for the stall layout (run_events None: every run asks the whole pool and returns a few
+    thousand by design, the pool assembling from their sum), where any non-empty part is done."""
+    return run[1] if mg.PROCESSES[name]["lhe"].get("run_events") else None
+
+
 def _du(path):
     n = 0
     for dp, _, fs in os.walk(path):
@@ -280,7 +287,7 @@ def tidy_run(name, items, k, q):
             return None
         root = parts_work_root()
         _under(root, wd)
-        saved = part_ok(part, run[1])
+        saved = part_ok(part, run_asked(name, run))
         rm, _ = _removals(wd, saved)
         os.makedirs(os.path.join(q, "gc"), exist_ok=True)
         man = os.path.join(q, "gc", f"worker_{os.environ.get('SLURM_JOB_ID', f'local{os.getpid()}')}.jsonl")
@@ -312,7 +319,7 @@ def _run_task(q, t):
         try:
             mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
             part, run = mg.lhe_part_paths(name, items)[t["k"]]
-            if not part_ok(part, run[1]):        # a short part (MadEvent stopped early) is a failed run, not a done one
+            if not part_ok(part, run_asked(name, run)):        # a short part (MadEvent stopped early) is a failed run, not a done one
                 raise RuntimeError(f"{name}: part {t['k']} written but holds fewer events than the {run[1]} asked: "
                                    f"{part}")
         finally:
@@ -440,7 +447,7 @@ def cmd_gc(a):
                 stats["running_skipped"] += 1
                 continue
             _under(root, wd)
-            saved = part_ok(part, run[1])            # all the events it asked; a short part keeps its logs
+            saved = part_ok(part, run_asked(name, run))            # all the events it asked; a short part keeps its logs
             if not saved and part_ok(part):
                 stats["short_parts"] += 1
             n, kept = tidy_plan(wd, saved)

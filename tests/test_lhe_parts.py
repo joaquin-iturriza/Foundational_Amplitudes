@@ -348,8 +348,31 @@ def test_tidy_and_gc():
     print("[tidy + gc] ok")
 
 
+def test_stall_layout_short_part_done():
+    """The stall layout (run_events None: every run asks the whole pool and returns fewer by design): a short part is
+    done, not failed (run_asked None); a pool with run_events still asks the events of its run."""
+    try:
+        _register(n_runs=2, run_events=None)
+        items = _items()
+        for part, run in mg.lhe_part_paths(NAME, items):
+            assert lhe_parts.run_asked(NAME, run) is None
+            os.makedirs(os.path.dirname(part), exist_ok=True)
+            with tempfile.TemporaryDirectory() as d:
+                f = os.path.join(d, "p.npz")
+                np.savez(f, mom=np.zeros((run[1] // 10, 2)))        # a tenth of the events asked
+                assert lhe_parts.part_ok(f, lhe_parts.run_asked(NAME, run))
+                assert not lhe_parts.part_ok(f, run[1])
+        _register(n_runs=2, run_events=400)
+        run = mg.lhe_part_paths(NAME, items)[0][1]
+        assert lhe_parts.run_asked(NAME, run) == 400
+    finally:
+        mg.PROCESSES.pop(NAME, None)
+    print("[stall layout short part] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
     test_queue_end_to_end()
     test_tidy_and_gc()
+    test_stall_layout_short_part_done()
