@@ -5900,7 +5900,7 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: a8f01a86034d7b73e
-    state: working
+    state: closed
     since: '2026-10-31T02:59:56+00:00'
     context: 153206
     context_at: '2026-10-31T03:52:19+00:00'
@@ -6240,36 +6240,26 @@ entries:
       and ee_uug__as130_standalone. Resubmit (site submit ccin2p3 FA scripts/job_standalones.sh --hdr=--time=01:30:00 --env
       STANDALONES_MODE=apply) refused by this agent''s permission classifier.'
   handoff:
-    state: 'Step 11 DONE: verdict YES (analysis/catalog_v4/mixture_ab.py bound @23d33dee -> data/pp_bound.json): PP4 trained-class
-      R 0.388, widened [0.338, 0.446]; classes not trained on pp R 1.132 [0.969, 1.367]; not yet in docs/results.tex (write
-      up with step 14). Step 14/15: mixture arms trained in full (4264 steps, best checkpoints saved, all H1..H7c read in
-      the arms'' own jobs); their PP4+EE4 come from re-reads: default50 8e1cc529 (REREAD 6c246603, running), default50_seed2
-      52efacaf DONE (reads extracted to data/reads/), default25 7a6a1967 (REREAD 11ad944a, queued, 01:15), default25_seed2
-      9c6fc7ab still running at its 2.5 h limit: it will TIMEOUT in its cross reads; then submit its PP4+EE4 re-read: site
-      submit --allow-dirty --item catalog_coverage --est-gpu-hours 1.25 ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G
-      --hdr=--time=<short_wall.py --eval --axes PP4 EE4 slurm_time, 01:15:00> --env V3_AXES=''PP4 EE4'' --env REREAD=FA-ccin2p3-9c6fc7ab
-      -- v4_dimensionless_muon_default25_seed2 eval. Control EE4 re-reads c1863adf, def11c5c DONE; control PP4 04253ff7, e7e32847
-      DONE (data/reads/). NEXT step 15 when all re-reads end: (a) mixture_ab.py extract <run> <log> PP4|EE4 for every re-read
-      and the controls'' EE4 (site logs -n 400000 <run>); the arms'' H1..H7c reads are in the arms'' own logs (6c246603, 1d46b938,
-      11ad944a, 9c6fc7ab), extract per axis and pool them; (b) extend mixture_ab.py with a ''mixture'' subcommand applying
-      the 17:29 rule per share (GAIN on PP4 and EE4, NO LOSS on pooled H1..H7c, winner rule) -> data/mixture_ab.json (the
-      done_when); (c) delete stored _smixd50_/_smixd25_ pools on CC (~65 GB; Joaquin: build the mixture at load), check_site_data
-      on both recipes; (d) write up steps 11 and 14 in docs/results.tex with % src/% claim. Step 16: sidecar-only check passes
-      everywhere (7697177c); prune extended to standalone_cpp outputs (93371175): once the four arms have ended (9c6fc7ab
-      last), site submit ccin2p3 FA scripts/job_standalones.sh --env STANDALONES_MODE=apply (CPU), expected ~16.4 GB freed
-      of 9404 outputs, manifest first; report GB freed and /sps use. Regeneration procedure in .claude/context fa-generation
-      + sections_v2 still UNCOMMITTED, waiting on Joaquin''s go for the CLAUDE.md index line.'
-    decisions: Check registers a recipe's top-level sampling (4e844204; the sidecar-only failures were the check's bug). DROPPED
-      probes in pool_physics (ee4_epem_cgsxwm, D193) excluded by check, EE4 read and collector. Prune covers standalone_cpp
-      outputs per D208; nothing at train/load reads a standalone. Short-job limit counts reads (tools/short_wall.py, job refuses
-      a short limit; 9510604e). Step-14 reads leave out catalog_v3 PP (outside the design). Mixture A/B per-class unit = catalog_v4
-      class (census_classes.json), seeds by geometric mean.
-    ruled_out: Raising a running job's SLURM limit (not possible by resubmit). Writing physics blocks into H1..H7c sidecars
-      (they had them).
-    running: FA-ccin2p3-8e1cc529, 7a6a1967, 9c6fc7ab
-    files: analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/pp_bound.json, analysis/catalog_v4/data/reads/, tools/short_wall.py,
-      tools/pool_physics.py, scripts/job_catalog_v3_short.sh, scripts/job_standalones.sh, tests/test_short_wall.py, tests/test_pool_physics.py
-    written: '2026-10-31T02:59:02+00:00'
+    state: 'Step 11 DONE (pp bound YES, R 0.388 widened [0.338, 0.446], data/pp_bound.json; dropped from next). All PP4+EE4
+      re-reads COMPLETED (8e1cc529 default50 s42, 7a6a1967 default25 s42, 897aa5d4 default25 s43 = REREAD 9c6fc7ab; 52efacaf
+      extracted earlier). NEXT step 15: (a) site logs -n 3000000 <run> > scratchpad; mixture_ab.py extract <run> <log> PP4
+      and EE4 for 8e1cc529, 7a6a1967, 897aa5d4; (b) mixture_ab.py mixture -> data/mixture_ab.json (verdict; rule fixed in
+      22e39795: GAIN R<=0.90 widened<1 on ALL PP4 (1301) and EE4 (169); NO LOSS pooled 701 H1..H7c widened hi<1.05; winner
+      rule), commit; repo reviewer PASSed 22e39795; (c) delete stored _smixd50_/_smixd25_ pools on CC (~65 GB, Joaquin: compose
+      at load) and check_site_data on both recipes; (d) write up steps 11 and 14 in docs/results.tex with % src/% claim. Partial
+      (not a verdict): pooled held-out R 1.27 [1.14,1.42] default50, 1.22 [1.11,1.36] default25 (both seeds) -> likely LOSS/trade-off;
+      default50 one-seed PP4 all 0.73, EE4 0.43. Step 16: prune FA-ccin2p3-93625c9d (submitted by Joaquin, D216) COMPLETED,
+      log not yet read: report GB freed, /sps use (was 422/512 GB) and manifest; earlier d00ec3e0 refused, nothing deleted,
+      fixed ad00db78 (ee_uug__as130 scan keeps ee_uug_standalone and ee_uug__as130_standalone).'
+    decisions: 'Step-14 GAIN on all PP4 classes as the design literally says (reviewer finding), trained/not-trained reported
+      apart. Control held-out reads (339ec100, 380842ed) predate the in-job physics check: kept as unchecked (extract --allow-unchecked)
+      because arms read same pools with check ok, n_val equal on 701, var_logm2 within arm-to-arm spread; control H logs also
+      hold v3_ probes, filtered (v4_ only). Seeds by geometric mean; class = census_classes.'
+    ruled_out: Raising a running job's SLURM limit. Writing physics blocks into H1..H7c sidecars.
+    running: none (prune 93625c9d and all re-reads COMPLETED, logs to read)
+    files: analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/reads/, analysis/catalog_v4/data/pp_bound.json, tools/pool_physics.py,
+      tests/test_pool_physics.py, scripts/job_standalones.sh, tools/short_wall.py
+    written: '2026-10-31T04:05:34+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
