@@ -16,9 +16,13 @@ cd "$PROJECT_DIR"
 # $1 = prop: the propagator-product read (log P; placebos E, logF, log D), the design of 2026-10-31
 MODE="${1:-dipole}"; FLAG=(); TAG=DIPOLE_RESIDUAL
 [ "$MODE" = prop ] && { FLAG=(--prop); TAG=PROP_RESIDUAL; }
+# $1 = joint: the joint read (gradient-boosted fit of u on the event's kinematics); $2 $3 narrow it to one arm and one
+# axis, so the four (arm, axis) reads go as four jobs in parallel
+[ "$MODE" = joint ] && { FLAG=(--prop --joint); TAG=JOINT_RESIDUAL; }
+ARMS="${2:-v4_dimensionless_muon v4_dimensionless_muon_seed2}"; AXES="${3:-H2 TR}"
 OUT="$SCRATCH/zz_v4_${MODE}_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
-for arm in v4_dimensionless_muon v4_dimensionless_muon_seed2; do
-    for ax in H2 TR; do
+for arm in $ARMS; do
+    for ax in $AXES; do
         d="$SCRATCH/zz_v4_short_$arm/$ax"
         [ -d "$d" ] || { echo "missing $d"; exit 1; }
         s=$(python analysis/catalog_v4/dipole_residual.py "$d" "${FLAG[@]}" --out "$OUT/${arm}_$ax.json") || exit 1
