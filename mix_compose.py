@@ -175,7 +175,11 @@ def compose(process, sqrts_min, sqrts_max, n_events, role, seed, control_pool_pa
         if n_bulk < 0 or abs(float(pol["f_flat"]) + f_fwd + f_def - 1.0) < 1e-9:     # mg.build_mixture_dataset
             n_fwd += n_bulk; n_bulk = 0
         p = prov[blk]; idx = np.arange(start, start + n)
-        take = np.concatenate([idx[p == KIND["flat"]], idx[p == KIND["fwd"]][:n_fwd], idx[p == KIND["bulk"]][:n_bulk]])
+        fwd = idx[p == KIND["fwd"]]
+        # the stored chunk's forward share can exceed the catalog_v4 chunk's by its rounding remainder (a share or two
+        # of ~1e4): that remainder is read from the bulk rows, and counted as bulk in the shares
+        short = max(n_fwd - len(fwd), 0)
+        take = np.concatenate([idx[p == KIND["flat"]], fwd[:n_fwd], idx[p == KIND["bulk"]][:n_bulk + short]])
         assert len(idx[p == KIND["flat"]]) == n_flat and len(take) == n - n_def, (t["idx"], len(take), n, n_def)
         Pd, _, med = default_rows_labelled(pol["default_source"], role or "train", t.get("default_seed", seed), (a, b),
                                            (sqrts_min, sqrts_max, m_list, cfg["pdg_ids"], cuts))
