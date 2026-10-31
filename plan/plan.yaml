@@ -5985,6 +5985,18 @@ entries:
       weak; (B) held-out calibrated if pull std <= 3 and cover68 >= 0.4, else rank_across >= 0.5 orders the worst held-out
       cells, < 0.3 does not. A run that blows up is listed apart with where it blew up. Cost: smoke 0.3 GPU-h + 6 x <= 3.75
       h = <= 22.8 GPU-h.'
+    passed_at: '2026-10-31T04:56:34+00:00'
+    reviewer: 'Three het arms (control, default50, default25; seeds 42/43) differ only in the training recipe, same HPs, steps,
+      probes, checkpoint rule, sigma stage and sign head off for all; check 2: R moved with the share under MSE, read in mixture_ab.json
+      and analysis/catalog_v4/data/mixture_heldout_default.json (744fad42): PP4 trained 0.549/0.650, EE4 0.401/0.413, held-out
+      default-sampled pooled 0.912 widened [0.802,1.068] and 0.921 [0.795,1.064] on 558 classes vs catalog-sampled 1.267/1.223
+      on the same classes; sigma ranks as passed (Daniel-catalog rank_across 0.73 vs -0.01, within 0.51 vs 0.13); check 3:
+      R_seed 1.07-1.12 against effects of 0.40-0.65 on PP4/EE4, held-out cost near the 1.05 cut but the rule names the undecided
+      case (trade-off); outcome per share fixed (par:v4_mixture rule, same/different-from-MSE consequence) plus sigma rules
+      A/B unchanged; 143 held-out classes without default pools read catalog-sampled now and re-read later, stated; searched
+      results.tex (heterosc, het loss, sigma, pull std, spearman, mixture, default-sampled, smixd), plan.yaml, site decisions
+      (D52, D71, D220, D226); Joaquin''s fold-in and default-sampled held-out asks are relayed via the coordinator, not found
+      in site decisions (D220 names the mixtures, D226 het as default)'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
