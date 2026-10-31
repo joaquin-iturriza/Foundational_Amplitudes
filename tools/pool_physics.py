@@ -683,9 +683,43 @@ def val_pool_path(name, spec, recipe_doc, seed=42, role="val"):
 def sidecar_scan(dirs):
     """Every pool sidecar (*.npy.recipe.json) under `dirs`: (n sidecars, [{sidecar, process, backend, reason}] of those
     without a usable physics block). `backend` is the standalone that labelled the pool (backend_dir of its process),
-    None when the process is not in the pipeline's table."""
+    None when the process is not in the pipeline's table; `backends` every standalone that may have: a name only
+    recipes define (an alpha_s scan such as ee_uug__as130, base ee_uug) gets the backend of each distinct definition
+    recipes/**/*.yaml give it (scan_template.yaml and catalog_v2_holdout_scan.yaml define ee_uug__as130 differently,
+    with and without alpha_ew, which names ee_uug__as130_standalone or ee_uug_standalone), so the prune keeps them all."""
     mg = _mg()
     n, out = 0, []
+    index = []
+
+    def candidates(proc):
+        if proc in mg.PROCESSES:
+            return [backend_dir(proc)]
+        if not index:
+            import yaml
+            defs = {}
+            for f in sorted(glob.glob(os.path.join(ROOT, "recipes", "**", "*.yaml"), recursive=True)):
+                try:
+                    d = yaml.load(open(f), Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+                except Exception:
+                    continue
+                procs = d.get("processes") if isinstance(d, dict) else d
+                for e in procs if isinstance(procs, list) else []:
+                    if isinstance(e, dict) and "name" in e:
+                        k = json.dumps({"base": e.get("base", e["name"]), "physics": e.get("physics")}, sort_keys=True,
+                                       default=str)
+                        defs.setdefault(e["name"], {})[k] = {"name": e["name"], "base": e.get("base", e["name"]),
+                                                            "physics": e.get("physics")}
+            index.append(defs)
+        bes = set()
+        for spec in index[0].get(proc, {}).values():
+            try:
+                mg.register_recipe_processes([spec])
+                bes.add(backend_dir(proc))
+            except Exception:
+                pass
+            finally:
+                mg.PROCESSES.pop(proc, None)
+        return sorted(b for b in bes if b)
     for d in dirs:
         for dp, _, fs in os.walk(d):
             for f in fs:
@@ -702,10 +736,10 @@ def sidecar_scan(dirs):
                     continue
                 proc = side.get("process")
                 try:
-                    be = backend_dir(proc) if proc in mg.PROCESSES else None
+                    bes = candidates(proc) if proc else []
                 except Exception:
-                    be = None
-                out.append({"sidecar": fp, "process": proc, "backend": be,
+                    bes = []
+                out.append({"sidecar": fp, "process": proc, "backend": bes[0] if bes else None, "backends": bes,
                             "reason": "physics error" if blk else "no physics block"})
     return n, out
 
@@ -826,7 +860,7 @@ def main(argv=None):
         import datagen
         dirs = sorted({os.path.realpath(datagen.frozen_dir()), os.path.realpath(datagen.train_cache_dir())})
         n, bad = sidecar_scan(dirs)
-        keep = sorted({e["backend"] for e in bad if e["backend"]})
+        keep = sorted({b for e in bad for b in e["backends"]})
         unmapped = sorted({str(e["process"]) for e in bad if not e["backend"]})
         if a.mode == "sidecars":
             out = {"dirs": dirs, "sidecars": n, "without_block": len(bad), "standalones_needed": keep,

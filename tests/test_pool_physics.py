@@ -447,13 +447,34 @@ def test_standalone_kinds():
     print("ok standalone kinds")
 
 
+def test_scan_name_resolved():
+    """the prune's sidecar scan resolves a recipe-defined scan name to every standalone its definitions name (2026-10-31, FA-ccin2p3-d00ec3e0: the apply refused,
+    nothing deleted, on ee_uug__as130, an alpha_s scan of ee_uug defined in recipes/catalog_v2_holdout_scan.yaml whose
+    old pool has no physics block): its backend is the base's standalone and is kept; an unknown name stays unmapped"""
+    d = os.path.join(TMP, "scan_scan")
+    os.makedirs(d, exist_ok=True)
+    for name in ("ee_uug__as130", "zz_unknown_proc"):
+        f = os.path.join(d, name + "_val.npy")
+        np.save(f, np.zeros((1, 1)))
+        json.dump({"process": name, "recipe_id": "x"}, open(f + ".recipe.json", "w"))
+    n, bad = pp.sidecar_scan([d])
+    be = {b["process"]: b["backend"] for b in bad}
+    assert n == 2 and be["zz_unknown_proc"] is None, be
+    bes = {b["process"]: b["backends"] for b in bad}
+    assert bes["zz_unknown_proc"] == [], bes
+    # two recipes define it (with and without alpha_ew): both standalones are kept, and the name is not left registered
+    assert bes["ee_uug__as130"] == sorted([pp.backend_dir("ee_uug"), os.path.join(mg.WORK_DIR, "ee_uug__as130_standalone")]), bes
+    assert "ee_uug__as130" not in mg.PROCESSES
+    shutil.rmtree(d)
+
+
 if __name__ == "__main__":
     try:
         setup_rec = setup()
         TRAIN = setup_rec
         for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_sidecar_block_used,
                   test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars, test_real_recipe_shape,
-                  test_standalone_kinds):
+                  test_standalone_kinds, test_scan_name_resolved):
             t()
         print("all pool physics tests passed")
     finally:
