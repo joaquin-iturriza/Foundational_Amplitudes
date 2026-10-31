@@ -3391,11 +3391,6 @@ entries:
   - D188
   - D189
   next:
-    11: 'Submit the pure-default bound pair once the pp13v4 validation passes and the amended design has passed review (797
-      swapped hadronic training classes, PP4 scored on the pp pools'' test split): sync once, scripts/job_catalog_v3_short.sh
-      v4_dimensionless_muon_pp smoke, then v4_dimensionless_muon_pp and _seed2 afterok on it (--hdr=--mem=48G, about 1.5 GPU-h
-      each), plus the controls'' PP4 mode-eval reads; control reused: catalog_v4''s Muon short runs (FA-ccin2p3-339ec100,
-      -380842ed)'
     14: 'The catalog''s sampling mixture (Joaquin''s priority 1, D178: catalog_v4 mixes the default generator sampling with
       the smart choices, flat in log|M|^2, splitter, forward, on every beam): design and run the mixture A/B on the 112 assembled
       rebuilt pools: default share 0.50 and 0.25 of each tree pool, taken out of the RAMBO bulk, with the 0.35 flat and 0.15
@@ -5889,12 +5884,6 @@ entries:
     start: '2026-10-31T02:58:24+00:00'
     at: '2026-10-31T02:58:24+00:00'
   step_why:
-    11:
-      feeds: whether a default-sampled (MadEvent) share can improve catalog_v4 on default-sampled events, which sizes the
-        mixture A/B the user asked for (2026-10-29)
-      if:
-      - 'validation passed: submit the smoke and the two seeds afterok on it, plus the controls'' reads'
-      - 'not yet passed: keep waiting; a failing class is left out of the arm''s scoring and listed'
     14:
       feeds: which default share catalog_v4's final pools carry (D178 priority 1)
       if:
