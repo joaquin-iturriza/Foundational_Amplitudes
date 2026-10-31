@@ -7230,6 +7230,18 @@ entries:
       the |eta| contrast flattens (0.99-1.08 / 1.04-1.10). Step-20 rates: eval start-up 15-31 s MSE, 20-82 s het; per probe
       0.58-0.65 s MSE (span), het 1.25-1.31 (142 probes) and 1.33-1.45 (1612): short_wall''s 15 min start-up is a >2x margin
       for eval-only jobs; het rate and eval start-up not yet set in short_wall (hand-off).'
+  - at: '2026-10-31T20:01:11+00:00'
+    text: '2026-10-31: (1) Steps 20 and 23 waits cleared and dropped (all runs ended clean, results in the 19:48/19:54 findings).
+      (2) short_wall (c0fed433, tests/test_short_wall.py 4 passed incl. a new check that the het eval of PP4+EE4+HD4+HD5 plans
+      between 39 and 78 min): eval-only start-up 1.5 min instead of 15 (step-20 re-reads 15-82 s to the first probe), het
+      per-probe rate 1.45 s (step-20 het re-reads 1.25-1.45 s), passed by job_catalog_v3_short.sh as --het (alias of --sigma-stage);
+      a het eval-only read of the 1612 probes now plans 0.93 h (01:00:00), MSE 0.50 h (00:30:00), against 36-39 min measured
+      for het. (3) Write-up of the step-20 verdict in par:v4_mixture (c70595af, verify_claims 0 problems, src mixture_ab @19ccfe6e
+      with and without --het): held-out cost on 700 default-sampled classes, both shares GAIN and NO LOSS, verdict default25,
+      catalog-sampled read kept beside, H3 the open axis. (4) het_where figure relabelled in words (34278e1f): predicted sigma
+      median and actual error RMS per decile, each over the same quantity on the whole probe; x the decile of the largest
+      final |eta| (10 = forward) and of log10 min 2p_i.p_j/s_hat (1 = collinear); PP4 trained classes, het control seeds 42/43.
+      Repo-reviewer re-check of short_wall/het_uncertainty changes not yet run.'
   handoff:
     state: 'Step 20 done: all 14 re-reads read and extracted; mixture_ab.json (MSE) and mixture_ab_het.json verdict default25
       (both shares GAIN and NO LOSS on the 700 default-sampled held-out classes; tie rule picks 0.25), het_uncertainty.json
