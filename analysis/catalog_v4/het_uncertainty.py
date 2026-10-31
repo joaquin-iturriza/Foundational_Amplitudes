@@ -276,10 +276,12 @@ def summary(path=None, out_dir=None):
             a["per_seed"][f"seed{seed}"] = ps
         s = a["per_seed"]
         verd = {}
+        part = lambda read: any(k.split()[1] == read.split("_")[0] for k in a["missing"])   # a seed's read is partial
         for read in ("PP4_trained", "EE4_trained"):
-            verd[f"A {read}"] = both([rule_a(s[k][read]) if read in s.get(k, {}) else None for k in ("seed42", "seed43")])
-        verd["B held_pooled"] = both([rule_b(s[k]["held_pooled"]) if "held_pooled" in s.get(k, {}) else None
-                                      for k in ("seed42", "seed43")])
+            verd[f"A {read}"] = "withheld: read incomplete" if part(read) else \
+                both([rule_a(s[k][read]) if read in s.get(k, {}) else None for k in ("seed42", "seed43")])
+        verd["B held_pooled"] = "withheld: read incomplete" if part("held_pooled") else \
+            both([rule_b(s[k]["held_pooled"]) if "held_pooled" in s.get(k, {}) else None for k in ("seed42", "seed43")])
         a["verdicts"] = verd
         a["complete"] = not a["missing"] and len(s) == 2
         out["arms"][arm] = a
