@@ -1757,6 +1757,26 @@ entries:
       closes the gap; reported to the user with the alternatives (capacity, training length, data), this route ends. Between:
       reported, no GPU arm. Cost: CPU only on CC: stage 1, four jobs (two seeds x H2/TR), 4 cores, 1 h limit each; stage 2,
       one job, 4 cores, 1 h; no GPU; disk about 50 MB.'
+    fix_at: '2026-10-31T01:12:28+00:00'
+    fix: 'Check 2 (the deciding read is close to blind by construction, the other way from the last FIX): the map is fitted
+      only on the training pools'' residuals. On those pools the network has already absorbed what it can learn from the event,
+      and the residual has little per-event structure left (single-scalar ceiling 0.036 / 0.041 against 0.122 / 0.119 held
+      out, prop_gate.json; eta^2(u|log P) 0.015 training against 0.042 held out). A map fitted to that near-noise cannot learn
+      the held-out excess, whatever an event-level prior could do, so f < 0.1 (''route ends'') is close to built in. The yes
+      branch has the same flaw: subtracting the map''s prediction, fitted on training residuals, from the target barely changes
+      the training target. Fix: make the deciding read the one my last FIX named as the variant, leave one class out among
+      the held-out multiplicity pools. Fit the map on the held-out pools of the other classes (or cells) and predict the left-out
+      class without its labels. That measures whether the extra held-out residual is shared across held-out processes, a systematic
+      extrapolation error that one prior could carry, without using the scored process''s labels. Keep the training-pool map
+      beside it as a diagnostic. Report the factors-only map (t, logF, log P, log D) under the same leave-class-out scheme.
+      Re-derive the yes branch from it: if the factors-only map holds most of f, the arm with data.target_propagators on;
+      if the full feature set is needed, name which features enter as inputs or in the target, since a map fitted on held-out
+      labels cannot itself go into training. Check 2 (minor): with 500 events per pool, the per-pool 5-fold ceiling fits on
+      400 events, not 1600; label it K = 400, or keep 2000 events for the ceiling pools only. Checks 1, 3, 4 (thresholds),
+      5, 6, 7 otherwise hold. The control is matched, with grouped out-of-fold scores and the permuted ceiling. The seed spread
+      is small (0.042 on both seeds), with bootstrap and seed margins. The prior now covers par:v4_kshot_level and the context
+      vector''s K-shot fits. Terms searched before: kNN, gradient boosting, flexible fit, residual, ceiling, few-shot, K-shot,
+      context vector, stand-in, par:v4_prop, par:v4_dipole. The read stays within D178.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
