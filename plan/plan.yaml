@@ -5943,6 +5943,16 @@ entries:
       01:15:00 from tools/short_wall.py. E3206: default50_seed2 re-read FA-ccin2p3-52efacaf (REREAD 1d46b938) COMPLETED: PP4
       1301/1301 and EE4 169/170 (ee4_epem_cgsxwm excluded, D193), all finite, physics ok; extracted to analysis/catalog_v4/data/reads/FA-ccin2p3-52efacaf_{PP4,EE4}.json
       (mixture_ab.py extract).'
+  - at: '2026-10-31T03:10:03+00:00'
+    text: '2026-10-31T03:40: Steps 14-16 wait on the PP4+EE4 re-reads 8e1cc529, 7a6a1967 and 897aa5d4 (REREAD 9c6fc7ab, submitted
+      after its TIMEOUT E3208; its log: training done, all 701 held-out probes read, cut in catalog_v3 PP). mixture_ab.py
+      mixture at 171c2395 applies the 17:29 rule (GAIN on PP4''s 797 trained classes and EE4''s 169, NO LOSS/LOSS on the pooled
+      701 held-out H1..H7c, winner rule), refuses a verdict until every read is in; tested with --partial on the reads in
+      hand. Held-out reads extracted for the four arms and the control (control reads predate the in-job physics check: kept
+      as ''unchecked'' only because the arms read the same pools with the check ok, n_val equal on all 701, var_logm2 within
+      the arm-to-arm spread). Step 16: the prune is safe now (in-flight reads take physics from sidecars, reference 1153/1153,
+      standalones_needed []), but site submit of job_standalones.sh STANDALONES_MODE=apply was refused by the session''s permission
+      classifier (irreversible deletion): needs Joaquin''s go or his permission rule.'
   handoff:
     state: 'Step 11 DONE: verdict YES (analysis/catalog_v4/mixture_ab.py bound @23d33dee -> data/pp_bound.json): PP4 trained-class
       R 0.388, widened [0.338, 0.446]; classes not trained on pp R 1.132 [0.969, 1.367]; not yet in docs/results.tex (write
