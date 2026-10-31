@@ -48,7 +48,8 @@ def write(fp, content):
 
 
 def agents_on_opus(d):
-    """one result per agent definition: its front matter says `model: opus` (agent redesign B8), except
+    """one result per agent definition: its front matter says `model: inherit`, the main session's Opus with its 1M
+    window (agent redesign B8; Joaquin 2026-10-31: 300k for the agents, beyond plain opus's window), except
     mechanical-worker, which says `model: sonnet` (D213: mechanical steps on Sonnet)."""
     want_of = {"mechanical-worker.md": "sonnet"}
     out = []
@@ -57,7 +58,7 @@ def agents_on_opus(d):
             continue
         head = open(os.path.join(d, f)).read().split("---")
         front = head[1] if len(head) > 2 else ""
-        want = want_of.get(f, "opus")
+        want = want_of.get(f, "inherit")
         good = any(l.strip() == "model: " + want for l in front.splitlines())
         print(f"  [{'PASS' if good else 'FAIL'}] {f}: model {want if good else 'NOT ' + want}")
         out.append(good)
@@ -122,7 +123,7 @@ def main():
     ok.append(check("Write ~/.claude/projects/x/memory/MEMORY.md", "md_guard.sh",
                     write(os.path.expanduser("~/.claude/projects/x/memory/MEMORY.md"), "remember this\n"), True))
 
-    print("\nagents — every .claude/agents/*.md runs on opus (mechanical-worker on sonnet, D213):")
+    print("\nagents — every .claude/agents/*.md inherits the main session's opus (mechanical-worker on sonnet, D213):")
     ok += agents_on_opus(os.path.join(REPO, ".claude", "agents"))
 
     print("\nrun ends — FA's end markers take the RUN_SUMMARY forms its jobs print:")
