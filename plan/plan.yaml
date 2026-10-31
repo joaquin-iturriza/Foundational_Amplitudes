@@ -8507,9 +8507,9 @@ entries:
   asks: []
   owner:
     agent: a7937d461dd1b0e68
-    state: working
+    state: stopped
     since: '2026-10-31T22:17:37+00:00'
-    state_at: '2026-10-31T22:17:37+00:00'
+    state_at: '2026-10-31T22:26:08+00:00'
   step_why:
     1:
       feeds: 'which quantities beyond |eta| and collinearity drive the error and sigma: where catalog_v4''s sampling, features
