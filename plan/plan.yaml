@@ -1668,6 +1668,12 @@ entries:
     units: null
     start: '2026-10-30T23:13:41+00:00'
     at: '2026-10-30T23:13:41+00:00'
+  - batch: prop_read
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-10-31T00:40:30+00:00'
+    at: '2026-10-31T00:40:30+00:00'
   handoff:
     state: 'Done this owner: the one-loop sign extension on catalog_v4 at four seeds, yes by the design''s rule (18/21 pools
       lower, p=0.001, median wrong-sign 6.69% -> 2.91%; tree-axis MSE cost 1.03-1.25x), par:v4_signext; the user kept it a
