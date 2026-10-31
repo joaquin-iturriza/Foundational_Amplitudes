@@ -1,0 +1,1602 @@
+{
+ "definitions": "starts at a trigger and holds every API message (deduplicated on message id, over all main transcripts) until\nthe next trigger. A trigger is a user record that is not a tool result and carries text (a new turn, or a Stop hook's\nfeedback that keeps the turn going); skill text, image captions and local-command caveats are part of the turn.\nMessages that arrive mid-turn (queued_command attachments: notifications, hand-backs, typed messages) and the harness's\nsilent_turn_reminder do not start a segment: the model goes on with its turn; they are counted per class as\nabsorbed_mid_turn, by the trigger class they would have had. Classified as\n  user           origin kind human, or a text with no machine marker (typed messages, /commands, interrupts)\n  handback       an agent's message (\"[Subagent hand-back]\" or any <agent-message>/peer message)\n  agent_done     <task-notification> whose task id is an agent id (a + 16 hex): a background subagent finished\n  waiter         <task-notification> of a background Bash whose command was `site events ... --wait` (the event waiter),\n                 or a Monitor event\n  supervisor     <task-notification> of `site supervise`\n  bg_other       <task-notification> of any other background command (detach jobs, tests, copies)\n  goal_checkin   \"Goal check-in\" (task-notification summary or meta text)\n  stop_hook      \"Stop hook feedback:\" (a Stop hook refused the turn's end)\n  nudge          other harness text: \"no visible output\", usage-limit notes, artifact auto-react, safety-classifier stop\n  compaction     \"This session is being continued\" (the summary after a compaction)\nWhat the segment did (the first that applies, over its tool calls):\n  inline         Edit/Write/NotebookEdit; Bash with git commit|merge|worktree|rm|push, site submit|run|copy|sync|cancel,\n                 pytest, python running anything but tools/plan.py, sed -i, tee or a redirect into a file\n  read           Read/Grep/Glob/Skill/web/MCP, or other Bash (cat, grep, git log/diff, site runs/logs/status ...)\n  orchestration  Agent, SendMessage, TaskStop, Task*, ToolSearch, tools/plan.py, site ack|events|decide|items|supervise|\n                 digest|hold|release|pick, tools/detach.py\n  none           no tool call\nA \"nothing to say\" wake: a segment not started by the user whose class is none or orchestration and whose visible text\nis at most 60 characters (e.g. \"Working.\"); reported with its count and cost, and the subset whose text starts \"Working\".",
+ "files": [
+  "1ee92351-7b02-4ce1-a6a4-ef4a5c06be14.jsonl",
+  "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+  "8b1133c4-5723-4203-9606-93654ab58051.jsonl",
+  "aa399761-532f-4bab-af23-7e9d0ab80eb1.jsonl",
+  "b3c0dabf-4e3f-4af2-9655-6d7382c40d15.jsonl"
+ ],
+ "by_period": {
+  "main_alone": {
+   "total": {
+    "segments": 2144,
+    "absorbed_mid_turn": {
+     "silent_turn_reminder": 910,
+     "waiter": 203,
+     "agent_done": 239,
+     "handback": 72,
+     "bg_other": 144,
+     "user": 36
+    },
+    "unpriced_calls": {
+     "<synthetic>": 4
+    },
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 14382,
+    "weighted_tokens_M": 560.334,
+    "usd": 1465.62,
+    "usd_per_segment": 0.684,
+    "context_at_first_call_median_k": 339.8
+   },
+   "by_trigger": {
+    "agent_done": {
+     "segments": 43,
+     "absorbed_mid_turn": {
+      "handback": 1,
+      "silent_turn_reminder": 3,
+      "bg_other": 1,
+      "user": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 86,
+     "weighted_tokens_M": 4.17,
+     "usd": 12.94,
+     "usd_per_segment": 0.301,
+     "context_at_first_call_median_k": 382.0,
+     "usd_share": 0.0088
+    },
+    "bg_other": {
+     "segments": 202,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 61,
+      "waiter": 5,
+      "handback": 2,
+      "agent_done": 2,
+      "bg_other": 15,
+      "user": 4
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 1441,
+     "weighted_tokens_M": 63.676,
+     "usd": 170.83,
+     "usd_per_segment": 0.846,
+     "context_at_first_call_median_k": 389.0,
+     "usd_share": 0.1166
+    },
+    "compaction": {
+     "segments": 14,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 19,
+      "handback": 2,
+      "agent_done": 3,
+      "waiter": 5,
+      "bg_other": 3
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 154,
+     "weighted_tokens_M": 5.032,
+     "usd": 21.0,
+     "usd_per_segment": 1.5,
+     "context_at_first_call_median_k": 145.0,
+     "usd_share": 0.0143
+    },
+    "goal_checkin": {
+     "segments": 168,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 71,
+      "bg_other": 16,
+      "waiter": 13,
+      "handback": 1,
+      "agent_done": 4
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 898,
+     "weighted_tokens_M": 32.198,
+     "usd": 99.04,
+     "usd_per_segment": 0.59,
+     "context_at_first_call_median_k": 217.4,
+     "usd_share": 0.0676
+    },
+    "handback": {
+     "segments": 160,
+     "absorbed_mid_turn": {
+      "agent_done": 167,
+      "waiter": 22,
+      "handback": 24,
+      "silent_turn_reminder": 95,
+      "bg_other": 5,
+      "user": 7
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 1343,
+     "weighted_tokens_M": 57.679,
+     "usd": 135.22,
+     "usd_per_segment": 0.845,
+     "context_at_first_call_median_k": 397.2,
+     "usd_share": 0.0923
+    },
+    "nudge": {
+     "segments": 32,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 2,
+      "waiter": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 50,
+     "weighted_tokens_M": 1.518,
+     "usd": 3.47,
+     "usd_per_segment": 0.109,
+     "context_at_first_call_median_k": 313.9,
+     "usd_share": 0.0024
+    },
+    "stop_hook": {
+     "segments": 352,
+     "absorbed_mid_turn": {
+      "waiter": 56,
+      "bg_other": 52,
+      "handback": 18,
+      "silent_turn_reminder": 78,
+      "agent_done": 33,
+      "user": 12
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 1373,
+     "weighted_tokens_M": 50.655,
+     "usd": 116.44,
+     "usd_per_segment": 0.331,
+     "context_at_first_call_median_k": 392.6,
+     "usd_share": 0.0794
+    },
+    "user": {
+     "segments": 676,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 394,
+      "waiter": 59,
+      "bg_other": 47,
+      "user": 8,
+      "handback": 22,
+      "agent_done": 27
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 6279,
+     "weighted_tokens_M": 251.182,
+     "usd": 673.22,
+     "usd_per_segment": 0.996,
+     "context_at_first_call_median_k": 338.0,
+     "usd_share": 0.4593
+    },
+    "waiter": {
+     "segments": 497,
+     "absorbed_mid_turn": {
+      "waiter": 42,
+      "silent_turn_reminder": 187,
+      "user": 4,
+      "bg_other": 5,
+      "handback": 2,
+      "agent_done": 3
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 2758,
+     "weighted_tokens_M": 94.226,
+     "usd": 233.46,
+     "usd_per_segment": 0.47,
+     "context_at_first_call_median_k": 300.3,
+     "usd_share": 0.1593
+    }
+   },
+   "by_did": {
+    "inline": {
+     "segments": 950,
+     "absorbed_mid_turn": {
+      "waiter": 163,
+      "silent_turn_reminder": 874,
+      "agent_done": 214,
+      "handback": 66,
+      "bg_other": 116,
+      "user": 27
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 11542,
+     "weighted_tokens_M": 452.823,
+     "usd": 1176.89,
+     "usd_per_segment": 1.239,
+     "context_at_first_call_median_k": 348.5,
+     "usd_share": 0.803
+    },
+    "read": {
+     "segments": 583,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 34,
+      "handback": 5,
+      "agent_done": 21,
+      "waiter": 29,
+      "bg_other": 25,
+      "user": 7
+     },
+     "unpriced_calls": {
+      "<synthetic>": 2
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 1972,
+     "weighted_tokens_M": 71.116,
+     "usd": 195.42,
+     "usd_per_segment": 0.335,
+     "context_at_first_call_median_k": 269.9,
+     "usd_share": 0.1333
+    },
+    "orchestration": {
+     "segments": 171,
+     "absorbed_mid_turn": {
+      "waiter": 11,
+      "user": 2,
+      "silent_turn_reminder": 2,
+      "bg_other": 2,
+      "agent_done": 4,
+      "handback": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 427,
+     "weighted_tokens_M": 16.369,
+     "usd": 38.94,
+     "usd_per_segment": 0.228,
+     "context_at_first_call_median_k": 350.7,
+     "usd_share": 0.0266
+    },
+    "none": {
+     "segments": 440,
+     "absorbed_mid_turn": {
+      "bg_other": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 2
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 441,
+     "weighted_tokens_M": 20.026,
+     "usd": 54.37,
+     "usd_per_segment": 0.124,
+     "context_at_first_call_median_k": 398.2,
+     "usd_share": 0.0371
+    }
+   },
+   "trigger_x_did": {
+    "agent_done": {
+     "inline": {
+      "n": 5,
+      "usd": 2.63
+     },
+     "read": {
+      "n": 6,
+      "usd": 1.71
+     },
+     "orchestration": {
+      "n": 6,
+      "usd": 1.59
+     },
+     "none": {
+      "n": 26,
+      "usd": 7.01
+     }
+    },
+    "bg_other": {
+     "inline": {
+      "n": 133,
+      "usd": 145.82
+     },
+     "read": {
+      "n": 59,
+      "usd": 24.27
+     },
+     "orchestration": {
+      "n": 0,
+      "usd": 0
+     },
+     "none": {
+      "n": 10,
+      "usd": 0.74
+     }
+    },
+    "compaction": {
+     "inline": {
+      "n": 12,
+      "usd": 18.79
+     },
+     "read": {
+      "n": 1,
+      "usd": 1.3
+     },
+     "orchestration": {
+      "n": 0,
+      "usd": 0
+     },
+     "none": {
+      "n": 1,
+      "usd": 0.9
+     }
+    },
+    "goal_checkin": {
+     "inline": {
+      "n": 49,
+      "usd": 70.27
+     },
+     "read": {
+      "n": 66,
+      "usd": 23.01
+     },
+     "orchestration": {
+      "n": 22,
+      "usd": 3.47
+     },
+     "none": {
+      "n": 31,
+      "usd": 2.28
+     }
+    },
+    "handback": {
+     "inline": {
+      "n": 122,
+      "usd": 128.51
+     },
+     "read": {
+      "n": 9,
+      "usd": 2.94
+     },
+     "orchestration": {
+      "n": 3,
+      "usd": 1.07
+     },
+     "none": {
+      "n": 26,
+      "usd": 2.72
+     }
+    },
+    "nudge": {
+     "inline": {
+      "n": 2,
+      "usd": 0.72
+     },
+     "read": {
+      "n": 5,
+      "usd": 0.73
+     },
+     "orchestration": {
+      "n": 1,
+      "usd": 0.25
+     },
+     "none": {
+      "n": 24,
+      "usd": 1.78
+     }
+    },
+    "stop_hook": {
+     "inline": {
+      "n": 93,
+      "usd": 75.59
+     },
+     "read": {
+      "n": 89,
+      "usd": 18.46
+     },
+     "orchestration": {
+      "n": 47,
+      "usd": 11.31
+     },
+     "none": {
+      "n": 123,
+      "usd": 11.08
+     }
+    },
+    "user": {
+     "inline": {
+      "n": 367,
+      "usd": 570.07
+     },
+     "read": {
+      "n": 153,
+      "usd": 76.74
+     },
+     "orchestration": {
+      "n": 21,
+      "usd": 4.11
+     },
+     "none": {
+      "n": 135,
+      "usd": 22.3
+     }
+    },
+    "waiter": {
+     "inline": {
+      "n": 167,
+      "usd": 164.49
+     },
+     "read": {
+      "n": 195,
+      "usd": 46.26
+     },
+     "orchestration": {
+      "n": 71,
+      "usd": 17.15
+     },
+     "none": {
+      "n": 64,
+      "usd": 5.56
+     }
+    }
+   },
+   "by_call": {
+    "inline": {
+     "api_calls": 4458,
+     "usd": 471.86,
+     "usd_share": 0.322
+    },
+    "read": {
+     "api_calls": 6277,
+     "usd": 643.17,
+     "usd_share": 0.4388
+    },
+    "orchestration": {
+     "api_calls": 1563,
+     "usd": 151.37,
+     "usd_share": 0.1033
+    },
+    "none": {
+     "api_calls": 2084,
+     "usd": 199.22,
+     "usd_share": 0.1359
+    }
+   },
+   "orchestration_only_wakes": {
+    "segments": 455,
+    "absorbed_mid_turn": {
+     "bg_other": 3,
+     "user": 2,
+     "silent_turn_reminder": 2,
+     "waiter": 10,
+     "agent_done": 4,
+     "handback": 1
+    },
+    "unpriced_calls": {
+     "<synthetic>": 2
+    },
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 689,
+    "weighted_tokens_M": 27.476,
+    "usd": 66.9,
+    "usd_per_segment": 0.147,
+    "context_at_first_call_median_k": 380.4,
+    "usd_share": 0.0456
+   },
+   "nothing_to_say": {
+    "segments": 47,
+    "absorbed_mid_turn": {
+     "bg_other": 1,
+     "waiter": 1
+    },
+    "unpriced_calls": {
+     "<synthetic>": 1
+    },
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 53,
+    "weighted_tokens_M": 1.824,
+    "usd": 3.79,
+    "usd_per_segment": 0.081,
+    "context_at_first_call_median_k": 349.2,
+    "usd_share": 0.0026
+   },
+   "working_turns": {
+    "segments": 0,
+    "absorbed_mid_turn": {},
+    "unpriced_calls": {},
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 0,
+    "weighted_tokens_M": 0.0,
+    "usd": 0,
+    "usd_per_segment": 0.0,
+    "context_at_first_call_median_k": null
+   }
+  },
+  "step_agents": {
+   "total": {
+    "segments": 1053,
+    "absorbed_mid_turn": {
+     "handback": 86,
+     "agent_done": 350,
+     "silent_turn_reminder": 118,
+     "waiter": 61,
+     "user": 11,
+     "supervisor": 1,
+     "bg_other": 4
+    },
+    "unpriced_calls": {
+     "<synthetic>": 23
+    },
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 3090,
+    "weighted_tokens_M": 125.869,
+    "usd": 303.72,
+    "usd_per_segment": 0.288,
+    "context_at_first_call_median_k": 359.9
+   },
+   "by_trigger": {
+    "agent_done": {
+     "segments": 52,
+     "absorbed_mid_turn": {
+      "user": 1,
+      "silent_turn_reminder": 2,
+      "handback": 1,
+      "agent_done": 1,
+      "waiter": 1,
+      "bg_other": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 6
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 83,
+     "weighted_tokens_M": 3.07,
+     "usd": 6.85,
+     "usd_per_segment": 0.132,
+     "context_at_first_call_median_k": 336.2,
+     "usd_share": 0.0226
+    },
+    "bg_other": {
+     "segments": 2,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 3
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 20,
+     "weighted_tokens_M": 0.685,
+     "usd": 1.51,
+     "usd_per_segment": 0.754,
+     "context_at_first_call_median_k": 405.5,
+     "usd_share": 0.005
+    },
+    "compaction": {
+     "segments": 8,
+     "absorbed_mid_turn": {
+      "agent_done": 1,
+      "silent_turn_reminder": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 23,
+     "weighted_tokens_M": 1.492,
+     "usd": 8.36,
+     "usd_per_segment": 1.045,
+     "context_at_first_call_median_k": 147.0,
+     "usd_share": 0.0275
+    },
+    "goal_checkin": {
+     "segments": 13,
+     "absorbed_mid_turn": {
+      "handback": 1,
+      "agent_done": 2,
+      "silent_turn_reminder": 2,
+      "waiter": 1,
+      "user": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 37,
+     "weighted_tokens_M": 1.538,
+     "usd": 3.35,
+     "usd_per_segment": 0.257,
+     "context_at_first_call_median_k": 339.0,
+     "usd_share": 0.011
+    },
+    "handback": {
+     "segments": 314,
+     "absorbed_mid_turn": {
+      "agent_done": 214,
+      "silent_turn_reminder": 18,
+      "handback": 11,
+      "waiter": 7,
+      "bg_other": 1,
+      "user": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 8
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 751,
+     "weighted_tokens_M": 29.41,
+     "usd": 68.23,
+     "usd_per_segment": 0.217,
+     "context_at_first_call_median_k": 348.6,
+     "usd_share": 0.2246
+    },
+    "nudge": {
+     "segments": 23,
+     "absorbed_mid_turn": {
+      "waiter": 1,
+      "handback": 1,
+      "agent_done": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 5
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 33,
+     "weighted_tokens_M": 1.421,
+     "usd": 4.88,
+     "usd_per_segment": 0.212,
+     "context_at_first_call_median_k": 226.1,
+     "usd_share": 0.0161
+    },
+    "stop_hook": {
+     "segments": 295,
+     "absorbed_mid_turn": {
+      "waiter": 34,
+      "handback": 42,
+      "agent_done": 71,
+      "silent_turn_reminder": 25,
+      "user": 4
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 747,
+     "weighted_tokens_M": 30.141,
+     "usd": 67.16,
+     "usd_per_segment": 0.228,
+     "context_at_first_call_median_k": 365.7,
+     "usd_share": 0.2211
+    },
+    "user": {
+     "segments": 218,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 50,
+      "agent_done": 48,
+      "waiter": 8,
+      "handback": 24,
+      "user": 1,
+      "supervisor": 1,
+      "bg_other": 2
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 871,
+     "weighted_tokens_M": 37.555,
+     "usd": 94.81,
+     "usd_per_segment": 0.435,
+     "context_at_first_call_median_k": 380.4,
+     "usd_share": 0.3122
+    },
+    "waiter": {
+     "segments": 128,
+     "absorbed_mid_turn": {
+      "waiter": 9,
+      "silent_turn_reminder": 17,
+      "agent_done": 12,
+      "user": 3,
+      "handback": 6
+     },
+     "unpriced_calls": {
+      "<synthetic>": 2
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 525,
+     "weighted_tokens_M": 20.558,
+     "usd": 48.58,
+     "usd_per_segment": 0.38,
+     "context_at_first_call_median_k": 351.7,
+     "usd_share": 0.1599
+    }
+   },
+   "by_did": {
+    "inline": {
+     "segments": 171,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 90,
+      "agent_done": 123,
+      "waiter": 19,
+      "user": 7,
+      "handback": 46,
+      "supervisor": 1,
+      "bg_other": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 1067,
+     "weighted_tokens_M": 42.899,
+     "usd": 98.95,
+     "usd_per_segment": 0.579,
+     "context_at_first_call_median_k": 353.2,
+     "usd_share": 0.3258
+    },
+    "read": {
+     "segments": 175,
+     "absorbed_mid_turn": {
+      "handback": 19,
+      "agent_done": 70,
+      "waiter": 24,
+      "silent_turn_reminder": 20,
+      "user": 3,
+      "bg_other": 3
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 679,
+     "weighted_tokens_M": 28.58,
+     "usd": 72.73,
+     "usd_per_segment": 0.416,
+     "context_at_first_call_median_k": 359.3,
+     "usd_share": 0.2395
+    },
+    "orchestration": {
+     "segments": 361,
+     "absorbed_mid_turn": {
+      "agent_done": 157,
+      "silent_turn_reminder": 8,
+      "handback": 21,
+      "waiter": 18,
+      "user": 1
+     },
+     "unpriced_calls": {
+      "<synthetic>": 1
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 997,
+     "weighted_tokens_M": 41.173,
+     "usd": 100.05,
+     "usd_per_segment": 0.277,
+     "context_at_first_call_median_k": 368.9,
+     "usd_share": 0.3294
+    },
+    "none": {
+     "segments": 346,
+     "absorbed_mid_turn": {},
+     "unpriced_calls": {
+      "<synthetic>": 21
+     },
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 347,
+     "weighted_tokens_M": 13.218,
+     "usd": 31.99,
+     "usd_per_segment": 0.092,
+     "context_at_first_call_median_k": 353.0,
+     "usd_share": 0.1053
+    }
+   },
+   "trigger_x_did": {
+    "agent_done": {
+     "inline": {
+      "n": 3,
+      "usd": 1.86
+     },
+     "read": {
+      "n": 2,
+      "usd": 0.6
+     },
+     "orchestration": {
+      "n": 8,
+      "usd": 1.7
+     },
+     "none": {
+      "n": 39,
+      "usd": 2.69
+     }
+    },
+    "bg_other": {
+     "inline": {
+      "n": 1,
+      "usd": 1.29
+     },
+     "read": {
+      "n": 1,
+      "usd": 0.22
+     },
+     "orchestration": {
+      "n": 0,
+      "usd": 0
+     },
+     "none": {
+      "n": 0,
+      "usd": 0
+     }
+    },
+    "compaction": {
+     "inline": {
+      "n": 2,
+      "usd": 2.46
+     },
+     "read": {
+      "n": 0,
+      "usd": 0
+     },
+     "orchestration": {
+      "n": 2,
+      "usd": 2.13
+     },
+     "none": {
+      "n": 4,
+      "usd": 3.78
+     }
+    },
+    "goal_checkin": {
+     "inline": {
+      "n": 2,
+      "usd": 1.44
+     },
+     "read": {
+      "n": 2,
+      "usd": 0.78
+     },
+     "orchestration": {
+      "n": 3,
+      "usd": 0.78
+     },
+     "none": {
+      "n": 6,
+      "usd": 0.36
+     }
+    },
+    "handback": {
+     "inline": {
+      "n": 50,
+      "usd": 21.0
+     },
+     "read": {
+      "n": 31,
+      "usd": 9.22
+     },
+     "orchestration": {
+      "n": 118,
+      "usd": 28.02
+     },
+     "none": {
+      "n": 115,
+      "usd": 9.99
+     }
+    },
+    "nudge": {
+     "inline": {
+      "n": 0,
+      "usd": 0
+     },
+     "read": {
+      "n": 1,
+      "usd": 3.02
+     },
+     "orchestration": {
+      "n": 4,
+      "usd": 0.98
+     },
+     "none": {
+      "n": 18,
+      "usd": 0.88
+     }
+    },
+    "stop_hook": {
+     "inline": {
+      "n": 29,
+      "usd": 17.75
+     },
+     "read": {
+      "n": 41,
+      "usd": 12.53
+     },
+     "orchestration": {
+      "n": 116,
+      "usd": 27.76
+     },
+     "none": {
+      "n": 109,
+      "usd": 9.13
+     }
+    },
+    "user": {
+     "inline": {
+      "n": 72,
+      "usd": 44.38
+     },
+     "read": {
+      "n": 46,
+      "usd": 25.14
+     },
+     "orchestration": {
+      "n": 47,
+      "usd": 20.11
+     },
+     "none": {
+      "n": 53,
+      "usd": 5.17
+     }
+    },
+    "waiter": {
+     "inline": {
+      "n": 12,
+      "usd": 8.78
+     },
+     "read": {
+      "n": 51,
+      "usd": 21.22
+     },
+     "orchestration": {
+      "n": 63,
+      "usd": 18.58
+     },
+     "none": {
+      "n": 2,
+      "usd": 0.0
+     }
+    }
+   },
+   "by_call": {
+    "inline": {
+     "api_calls": 330,
+     "usd": 31.95,
+     "usd_share": 0.1052
+    },
+    "read": {
+     "api_calls": 572,
+     "usd": 63.0,
+     "usd_share": 0.2074
+    },
+    "orchestration": {
+     "api_calls": 1157,
+     "usd": 118.9,
+     "usd_share": 0.3915
+    },
+    "none": {
+     "api_calls": 1031,
+     "usd": 89.88,
+     "usd_share": 0.2959
+    }
+   },
+   "orchestration_only_wakes": {
+    "segments": 607,
+    "absorbed_mid_turn": {
+     "agent_done": 149,
+     "silent_turn_reminder": 5,
+     "handback": 19,
+     "waiter": 18,
+     "user": 1
+    },
+    "unpriced_calls": {
+     "<synthetic>": 22
+    },
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 1156,
+    "weighted_tokens_M": 45.281,
+    "usd": 106.75,
+    "usd_per_segment": 0.176,
+    "context_at_first_call_median_k": 353.8,
+    "usd_share": 0.3515
+   },
+   "nothing_to_say": {
+    "segments": 60,
+    "absorbed_mid_turn": {
+     "waiter": 1
+    },
+    "unpriced_calls": {
+     "<synthetic>": 12
+    },
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 66,
+    "weighted_tokens_M": 1.993,
+    "usd": 4.38,
+    "usd_per_segment": 0.073,
+    "context_at_first_call_median_k": 271.1,
+    "usd_share": 0.0144
+   },
+   "working_turns": {
+    "segments": 0,
+    "absorbed_mid_turn": {},
+    "unpriced_calls": {},
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 0,
+    "weighted_tokens_M": 0.0,
+    "usd": 0,
+    "usd_per_segment": 0.0,
+    "context_at_first_call_median_k": null
+   }
+  },
+  "redesign": {
+   "total": {
+    "segments": 235,
+    "absorbed_mid_turn": {
+     "silent_turn_reminder": 22,
+     "waiter": 8,
+     "agent_done": 76,
+     "handback": 24,
+     "user": 2
+    },
+    "unpriced_calls": {},
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 682,
+    "weighted_tokens_M": 20.1,
+    "usd": 49.34,
+    "usd_per_segment": 0.21,
+    "context_at_first_call_median_k": 244.8
+   },
+   "by_trigger": {
+    "agent_done": {
+     "segments": 13,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 24,
+     "weighted_tokens_M": 0.554,
+     "usd": 1.23,
+     "usd_per_segment": 0.094,
+     "context_at_first_call_median_k": 244.8,
+     "usd_share": 0.0249
+    },
+    "compaction": {
+     "segments": 2,
+     "absorbed_mid_turn": {},
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 3,
+     "weighted_tokens_M": 0.202,
+     "usd": 1.21,
+     "usd_per_segment": 0.607,
+     "context_at_first_call_median_k": 100.1,
+     "usd_share": 0.0245
+    },
+    "handback": {
+     "segments": 82,
+     "absorbed_mid_turn": {
+      "agent_done": 52,
+      "silent_turn_reminder": 4,
+      "handback": 5,
+      "waiter": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 192,
+     "weighted_tokens_M": 5.413,
+     "usd": 13.11,
+     "usd_per_segment": 0.16,
+     "context_at_first_call_median_k": 239.8,
+     "usd_share": 0.2657
+    },
+    "nudge": {
+     "segments": 8,
+     "absorbed_mid_turn": {
+      "handback": 1,
+      "agent_done": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 10,
+     "weighted_tokens_M": 0.269,
+     "usd": 0.6,
+     "usd_per_segment": 0.075,
+     "context_at_first_call_median_k": 254.3,
+     "usd_share": 0.0122
+    },
+    "stop_hook": {
+     "segments": 35,
+     "absorbed_mid_turn": {
+      "agent_done": 19,
+      "handback": 16,
+      "silent_turn_reminder": 6,
+      "waiter": 5,
+      "user": 2
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 119,
+     "weighted_tokens_M": 3.821,
+     "usd": 8.79,
+     "usd_per_segment": 0.251,
+     "context_at_first_call_median_k": 268.2,
+     "usd_share": 0.1782
+    },
+    "user": {
+     "segments": 61,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 10,
+      "agent_done": 2,
+      "handback": 1,
+      "waiter": 1
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 229,
+     "weighted_tokens_M": 6.369,
+     "usd": 15.58,
+     "usd_per_segment": 0.255,
+     "context_at_first_call_median_k": 249.7,
+     "usd_share": 0.3158
+    },
+    "waiter": {
+     "segments": 34,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 1,
+      "waiter": 1,
+      "handback": 1,
+      "agent_done": 2
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 105,
+     "weighted_tokens_M": 3.472,
+     "usd": 8.82,
+     "usd_per_segment": 0.259,
+     "context_at_first_call_median_k": 216.4,
+     "usd_share": 0.1788
+    }
+   },
+   "by_did": {
+    "inline": {
+     "segments": 34,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 13,
+      "waiter": 3,
+      "agent_done": 16,
+      "handback": 10,
+      "user": 2
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 206,
+     "weighted_tokens_M": 6.292,
+     "usd": 15.14,
+     "usd_per_segment": 0.445,
+     "context_at_first_call_median_k": 254.3,
+     "usd_share": 0.3069
+    },
+    "read": {
+     "segments": 27,
+     "absorbed_mid_turn": {
+      "silent_turn_reminder": 5,
+      "agent_done": 12,
+      "handback": 2
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 112,
+     "weighted_tokens_M": 3.432,
+     "usd": 8.01,
+     "usd_per_segment": 0.297,
+     "context_at_first_call_median_k": 252.7,
+     "usd_share": 0.1623
+    },
+    "orchestration": {
+     "segments": 111,
+     "absorbed_mid_turn": {
+      "agent_done": 48,
+      "waiter": 5,
+      "handback": 12,
+      "silent_turn_reminder": 4
+     },
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 301,
+     "weighted_tokens_M": 8.532,
+     "usd": 21.58,
+     "usd_per_segment": 0.194,
+     "context_at_first_call_median_k": 237.8,
+     "usd_share": 0.4374
+    },
+    "none": {
+     "segments": 63,
+     "absorbed_mid_turn": {},
+     "unpriced_calls": {},
+     "unpriced_weighted_tokens_M": 0.0,
+     "api_calls": 63,
+     "weighted_tokens_M": 1.844,
+     "usd": 4.62,
+     "usd_per_segment": 0.073,
+     "context_at_first_call_median_k": 249.7,
+     "usd_share": 0.0936
+    }
+   },
+   "trigger_x_did": {
+    "agent_done": {
+     "inline": {
+      "n": 0,
+      "usd": 0
+     },
+     "read": {
+      "n": 1,
+      "usd": 0.17
+     },
+     "orchestration": {
+      "n": 4,
+      "usd": 0.57
+     },
+     "none": {
+      "n": 8,
+      "usd": 0.49
+     }
+    },
+    "compaction": {
+     "inline": {
+      "n": 0,
+      "usd": 0
+     },
+     "read": {
+      "n": 0,
+      "usd": 0
+     },
+     "orchestration": {
+      "n": 1,
+      "usd": 0.65
+     },
+     "none": {
+      "n": 1,
+      "usd": 0.57
+     }
+    },
+    "handback": {
+     "inline": {
+      "n": 5,
+      "usd": 2.08
+     },
+     "read": {
+      "n": 10,
+      "usd": 2.77
+     },
+     "orchestration": {
+      "n": 38,
+      "usd": 6.27
+     },
+     "none": {
+      "n": 29,
+      "usd": 1.99
+     }
+    },
+    "nudge": {
+     "inline": {
+      "n": 0,
+      "usd": 0
+     },
+     "read": {
+      "n": 0,
+      "usd": 0
+     },
+     "orchestration": {
+      "n": 1,
+      "usd": 0.19
+     },
+     "none": {
+      "n": 7,
+      "usd": 0.42
+     }
+    },
+    "stop_hook": {
+     "inline": {
+      "n": 7,
+      "usd": 3.69
+     },
+     "read": {
+      "n": 3,
+      "usd": 0.88
+     },
+     "orchestration": {
+      "n": 17,
+      "usd": 3.71
+     },
+     "none": {
+      "n": 8,
+      "usd": 0.51
+     }
+    },
+    "user": {
+     "inline": {
+      "n": 21,
+      "usd": 8.14
+     },
+     "read": {
+      "n": 11,
+      "usd": 3.42
+     },
+     "orchestration": {
+      "n": 20,
+      "usd": 3.43
+     },
+     "none": {
+      "n": 9,
+      "usd": 0.6
+     }
+    },
+    "waiter": {
+     "inline": {
+      "n": 1,
+      "usd": 1.23
+     },
+     "read": {
+      "n": 2,
+      "usd": 0.77
+     },
+     "orchestration": {
+      "n": 30,
+      "usd": 6.77
+     },
+     "none": {
+      "n": 1,
+      "usd": 0.04
+     }
+    }
+   },
+   "by_call": {
+    "inline": {
+     "api_calls": 58,
+     "usd": 4.31,
+     "usd_share": 0.0873
+    },
+    "read": {
+     "api_calls": 92,
+     "usd": 6.25,
+     "usd_share": 0.1267
+    },
+    "orchestration": {
+     "api_calls": 301,
+     "usd": 23.75,
+     "usd_share": 0.4815
+    },
+    "none": {
+     "api_calls": 231,
+     "usd": 15.03,
+     "usd_share": 0.3046
+    }
+   },
+   "orchestration_only_wakes": {
+    "segments": 145,
+    "absorbed_mid_turn": {
+     "agent_done": 48,
+     "waiter": 4,
+     "handback": 12,
+     "silent_turn_reminder": 4
+    },
+    "unpriced_calls": {},
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 308,
+    "weighted_tokens_M": 8.716,
+    "usd": 22.17,
+    "usd_per_segment": 0.153,
+    "context_at_first_call_median_k": 240.5,
+    "usd_share": 0.4493
+   },
+   "nothing_to_say": {
+    "segments": 19,
+    "absorbed_mid_turn": {
+     "agent_done": 3,
+     "waiter": 1
+    },
+    "unpriced_calls": {},
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 33,
+    "weighted_tokens_M": 0.932,
+    "usd": 2.11,
+    "usd_per_segment": 0.111,
+    "context_at_first_call_median_k": 244.7,
+    "usd_share": 0.0428
+   },
+   "working_turns": {
+    "segments": 5,
+    "absorbed_mid_turn": {
+     "agent_done": 1
+    },
+    "unpriced_calls": {},
+    "unpriced_weighted_tokens_M": 0.0,
+    "api_calls": 9,
+    "weighted_tokens_M": 0.232,
+    "usd": 0.5,
+    "usd_per_segment": 0.101,
+    "context_at_first_call_median_k": 244.3
+   }
+  }
+ },
+ "agents_by_kind": {
+  "main_alone": {
+   "general-purpose": {
+    "agents": 46,
+    "usd": 177.84,
+    "weighted_tokens_M": 65.85,
+    "usd_per_agent": 3.87,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 51.2
+   },
+   "fork": {
+    "agents": 16,
+    "usd": 113.14,
+    "weighted_tokens_M": 44.35,
+    "usd_per_agent": 7.07,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 320.3,
+    "fork_ctx_over_parent": {
+     "n": 16,
+     "median": 1.025,
+     "min": 1.015,
+     "max": 1.047
+    }
+   },
+   "repo-reviewer": {
+    "agents": 93,
+    "usd": 113.04,
+    "weighted_tokens_M": 39.99,
+    "usd_per_agent": 1.22,
+    "unpriced_calls": {
+     "<synthetic>": 1
+    },
+    "context_at_first_call_median_k": 33.6
+   },
+   "notes-editor": {
+    "agents": 33,
+    "usd": 19.09,
+    "weighted_tokens_M": 9.55,
+    "usd_per_agent": 0.58,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 34.3
+   },
+   "Explore": {
+    "agents": 3,
+    "usd": 1.95,
+    "weighted_tokens_M": 0.6,
+    "usd_per_agent": 0.65,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 12.4
+   },
+   "claude-code-guide": {
+    "agents": 4,
+    "usd": 0.47,
+    "weighted_tokens_M": 0.58,
+    "usd_per_agent": 0.12,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 34.8
+   },
+   "claudemd-keeper": {
+    "agents": 1,
+    "usd": 0.21,
+    "weighted_tokens_M": 0.1,
+    "usd_per_agent": 0.21,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 31.9
+   }
+  },
+  "redesign": {
+   "compact-worker": {
+    "agents": 44,
+    "usd": 149.54,
+    "weighted_tokens_M": 55.26,
+    "usd_per_agent": 3.4,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 31.1
+   },
+   "design-reviewer": {
+    "agents": 14,
+    "usd": 13.81,
+    "weighted_tokens_M": 4.17,
+    "usd_per_agent": 0.99,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 12.1
+   },
+   "repo-reviewer": {
+    "agents": 11,
+    "usd": 11.0,
+    "weighted_tokens_M": 3.36,
+    "usd_per_agent": 1.0,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 15.0
+   },
+   "claudemd-keeper": {
+    "agents": 2,
+    "usd": 2.3,
+    "weighted_tokens_M": 0.62,
+    "usd_per_agent": 1.15,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 12.1
+   },
+   "notes-editor": {
+    "agents": 3,
+    "usd": 1.54,
+    "weighted_tokens_M": 0.46,
+    "usd_per_agent": 0.51,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 15.4
+   },
+   "Explore": {
+    "agents": 1,
+    "usd": 1.1,
+    "weighted_tokens_M": 0.36,
+    "usd_per_agent": 1.1,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 11.0
+   },
+   "claude-code-guide": {
+    "agents": 1,
+    "usd": 0.01,
+    "weighted_tokens_M": 0.08,
+    "usd_per_agent": 0.01,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 19.5
+   }
+  },
+  "step_agents": {
+   "general-purpose": {
+    "agents": 270,
+    "usd": 509.75,
+    "weighted_tokens_M": 193.1,
+    "usd_per_agent": 1.89,
+    "unpriced_calls": {
+     "<synthetic>": 9
+    },
+    "context_at_first_call_median_k": 55.4
+   },
+   "repo-reviewer": {
+    "agents": 113,
+    "usd": 103.59,
+    "weighted_tokens_M": 32.75,
+    "usd_per_agent": 0.92,
+    "unpriced_calls": {
+     "<synthetic>": 4
+    },
+    "context_at_first_call_median_k": 39.7
+   },
+   "compact-worker": {
+    "agents": 10,
+    "usd": 58.46,
+    "weighted_tokens_M": 23.02,
+    "usd_per_agent": 5.85,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 32.7
+   },
+   "notes-editor": {
+    "agents": 33,
+    "usd": 10.87,
+    "weighted_tokens_M": 5.29,
+    "usd_per_agent": 0.33,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 39.0
+   },
+   "design-reviewer": {
+    "agents": 13,
+    "usd": 10.07,
+    "weighted_tokens_M": 3.12,
+    "usd_per_agent": 0.77,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 37.9
+   },
+   "claudemd-keeper": {
+    "agents": 61,
+    "usd": 9.0,
+    "weighted_tokens_M": 4.03,
+    "usd_per_agent": 0.15,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 36.0
+   },
+   "claude-code-guide": {
+    "agents": 2,
+    "usd": 0.04,
+    "weighted_tokens_M": 0.42,
+    "usd_per_agent": 0.02,
+    "unpriced_calls": {},
+    "context_at_first_call_median_k": 48.1
+   }
+  }
+ }
+}
