@@ -2315,6 +2315,58 @@ holds about a third and the placebos almost as much; no single per-event quantit
 Higgs width below the card's; on every pool with an internal Higgs line the two widths' $\log P$ agree to
 $r^2\ge0.9999996$ (\code{prop\_width\_check.py}), so the read stands.
 
+% src: python3 analysis/catalog_v4/lco_map.py --read analysis/catalog_v4/data/lco_map.json @a8d5086c
+% claim: s42.n_H2=218
+% claim: s42.n_TR=647
+% claim: s42.n_H2_emitter=94
+% claim: s42.f_ceil=0.271
+% claim: s43.f_ceil=0.316
+% claim: s42.median_gap=0.207
+% claim: s43.median_gap=0.189
+% claim: s42.f_lco=0.147
+% claim: s43.f_lco=0.125
+% claim: verdict.per_seed.v4_dimensionless_muon.margin=0.024
+% claim: verdict.per_seed.v4_dimensionless_muon_seed2.margin=0.022
+% claim: s42.f_lco_factors=0.089
+% claim: s43.f_lco_factors=0.084
+% claim: s42.f_lco_drop_factors=0.002
+% claim: s43.f_lco_drop_factors=0.004
+% claim: s42.f_lco_emitter=0.20
+% claim: s42.f_lco_no_emitter=0.20
+% claim: s43.f_lco_emitter=0.23
+% claim: s43.f_lco_no_emitter=0.21
+% claim: s42.f_loco_cell=0.060
+% claim: s43.f_loco_cell=0.032
+% claim: s42.f_trainmap=0.063
+% claim: s43.f_trainmap=0.093
+% claim: s42.median_r2_trainmap_TR_oof=0.039
+% claim: s43.median_r2_trainmap_TR_oof=0.052
+% allow: 500 38 10 1600 because they are the events per pool, the feature count, the folds and the ceiling's K, settings
+% allow: 0.1 0.5 42 43 because they are the design's bars and the seeds, settings
+\paragraph{A shared map of the event against the multiplicity gap (2026-10-31).}\label{par:v4_lco} After the single
+factors (par.~\ref{par:v4_dipole}, par.~\ref{par:v4_prop}): is the held-out multiplicity pools' extra per-event
+residual shared across held-out processes, so that one event-level prior could carry it? Design (passed review after
+one FIX; \code{analysis/catalog\_v4/lco\_map.py}, CPU, on the control pair's existing reads): per pool $500$ events of
+$38$ features that do not depend on the order of the legs (the sorted $\log s_{ij}/\hat s$, the final legs' sorted
+$\log E/\sqrt{\hat s}$ and $|\cos\theta|$, $\log\hat s$, the final species counts, and $t$, $\log F$, $\log P$,
+$\log D$); a gradient-boosted map of $u$ fitted on the held-out pools of the other classes ($10$ folds grouped by class
+over the $218$ pools, each its own class) and applied to the left-out class without its labels. Its share of the gap is
+$f=\mathrm{median}_p[\mathrm{var}(u)_p-\mathrm{var}(u-\hat u)_p]/\mathrm{median}_p[\mathrm{var}(u)_p-\mathrm{floor}_{c(p)}]$,
+the floor being the median $\mathrm{var}(u)$ over the training pools of the pool's cell ($647$ in all); the bars are
+shares of the own-label ceiling $f_{\rm ceil}$ (each pool fitted on its own labels, $K=1600$), computed first. The
+ceiling is $0.271$ and $0.316$ (seeds $42$, $43$; median gap $0.207$ and $0.189$), over $0.1$, so the read decides.
+The leave-class-out map takes $f=0.147$ and $0.125$: just over half and two fifths of the ceiling, past the yes bar
+(half the ceiling, after the margin of $0.024$ and $0.022$, the larger of the seed difference and the bootstrap
+half-range) on neither seed, above the no bar on both. Between by the design's rule: reported, no GPU arm.
+Diagnostics: the factors alone take $0.089$ and $0.084$, the other features without them $0.002$ and $0.004$, so what
+transfers lives in the factors together with the kinematics; the pools with a final gluon or photon ($94$) and those
+without carry it alike ($0.20$ and $0.20$; $0.23$ and $0.21$), so the parent-factorised target is not singled out;
+leaving a whole cell out drops it to $0.060$ and $0.032$, so the shared part is mostly shared within a cell; the map
+fitted on the training pools takes $0.063$ and $0.093$ (its own out-of-fold score there $0.039$ and $0.052$). Caveat:
+the factors include $t$, the scored event's own target, which no prior has at prediction time; since nothing transfers
+without the factor group, part of $f$ may be the network's compression of $t$ read back from $t$ itself rather than
+structure a prior could carry. A re-read without $t$ (the same dumps, CPU) comes before any arm is designed.
+
 % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
 % claim: mb.median_signed_off_all=0.12
 % claim: mb.positive_share_all=0.642
