@@ -30,6 +30,7 @@ on the sites (`~/work/CLAUDE.md`).
 - When I point out a mistake: no apology; trace what in the process produced it ("not checked" until read, and read before the message ends), make the change that stops it recurring in that turn (a rule, a check, a tool fix; one needing a setting I hold goes to me as a concrete diff), then fix the instance.
 - A fix is reported by what it changed and the named cases it was tested on; failure modes not tested are listed as not fixed.
 - A statement about current state (a setting, what an agent runs on) is read from its live source in that turn, or says "not checked".
+- A claim that something is absent (no decision, no run, no record) rests on a whole search, never a truncated one (`head`, a range of ids, a pattern cut short), and names what was searched.
 - A statement to me about what waits on me is checked against my own words (`site decisions`, my messages), never against the plan's notes.
 
 ## What you may do
