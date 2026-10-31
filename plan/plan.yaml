@@ -5455,6 +5455,15 @@ entries:
     - 4
     answered_at: '2026-10-31T00:16:02.497000+00:00'
     decision: D203
+  - ask: 'Apply the brief_guard exemption for TRIAL=model launches (diff in scratchpad brief_guard_trial.diff), so the matched
+      model trial can run? Also: syncClaudeAiSkills false in ~/.claude/settings.json; the CLAUDE.md line for low-effort lookup
+      agents.'
+    at: '2026-10-31T00:21:20+00:00'
+    searched: D203 approves the trial; the guard edit was refused by the permission classifier as self-modification, and the
+      settings and CLAUDE.md are Joaquin's
+    blocks: the matched model trial
+    blocks_steps: &id001
+    - 4
   step_why:
     1:
       feeds: whether the redesign is finished
@@ -5875,3 +5884,11 @@ entries:
     files: tools/push_replay.py, .claude/hooks/context_push.py, tests/test_context_push.py, .claude/context/*.txt headers,
       analysis/agent_redesign/push_replay.json
     written: '2026-10-31T00:20:33+00:00'
+  ask: 'Apply the brief_guard exemption for TRIAL=model launches (diff in scratchpad brief_guard_trial.diff), so the matched
+    model trial can run? Also: syncClaudeAiSkills false in ~/.claude/settings.json; the CLAUDE.md line for low-effort lookup
+    agents.'
+  waiting_since: '2026-10-31T00:21:20+00:00'
+  searched: D203 approves the trial; the guard edit was refused by the permission classifier as self-modification, and the
+    settings and CLAUDE.md are Joaquin's
+  blocks: the matched model trial
+  blocks_steps: *id001
