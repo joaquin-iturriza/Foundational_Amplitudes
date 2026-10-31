@@ -1640,6 +1640,48 @@ entries:
       the control''s config (offshell_per_event, use_diagrams on, target_propagators off), and the GPU follow-up is narrowed
       to target_propagators, so it does not repeat the off-shellness input. Checks 6-7: within D178; no comparison the user
       named is missing. The eta^2, ceiling and size reads are not yet in dipole_residual.py; they go in before the job.'
+  - at: '2026-10-31T01:10:20+00:00'
+    question: 'How much of the held-out multiplicity pools'' shape gap (par:v4_shape_gap, transfer gap; the held-out residual''s
+      single-scalar ceiling 0.12 against 0.04 on training, par:v4_prop) can any event-level prior recover? A CPU read on the
+      control pair''s existing reads: a flexible model of the zero-shot residual u on the event''s full kinematics and the
+      candidate factors together, out of fold, per pool; the share of the gap var(u)_held-out - var(u)_training it explains
+      bounds what an input or target prior built from the event could close. Feeds D178: whether the multiplicity gap is an
+      event-level prior''s to close (then a GPU arm with the matching prior) or not (capacity, training length or data).'
+    prior: 'Searched docs/results.tex (par:v4_dipole, par:v4_prop, par:v4_shape_gap, par:v4_mult_cand, the surrogates paragraph
+      near 5660, catalog_v2''s residual profile near 9636, the CPU stand-in norm_explore6.py near 5655), plan show v3_prep_explore
+      dead ends, site decisions D86, D178; terms kNN, gradient boosting, flexible fit, residual, ceiling, invariants, stand-in.
+      Found: (i) par:v4_dipole: soft-dipole log D, gate 0.094, residual r^2 0.005/0.007 at the placebos (dead end). (ii) par:v4_prop:
+      propagator product log P, gate 0.106, ceiling eta^2 0.122/0.119 held out vs 0.036/0.041 training, mean read 0.042 (2.8x
+      training, above placebos), size read 0.005: between. (iii) norm_explore6.py, a small network on summary invariants as
+      a CPU stand-in for shape transfer, could not rank targets (0.40-0.57 on the new): that was a stand-in for the network,
+      not a residual read; here the model fits the trained network''s residual on its own pool, a different question. No joint
+      per-event read of the residual found.'
+    measure: 'Per probe (H2: the 218 held-out multiplicity pools, val split; TR: the training pools of the same 6-particle
+      cells, test split; 2000 events; seeds 42, 43; rows by pool_rows(), alignment checked, refused counted): features X =
+      log s_ij/s_hat for every leg pair (all-outgoing), log s_hat, the legs'' log energies and |cos theta| in the partonic
+      frame, logF, log P, log D (0 where none), the control''s target t; model a gradient-boosted regressor (sklearn HistGradientBoostingRegressor,
+      100 iterations, defaults), 5-fold out-of-fold prediction of u = (q - t) - mean; R2_joint = 1 - var(u - u_hat)/var(u).
+      Null: the same fit on u permuted within the pool (the overfit floor). Per group and cell: medians per seed of R2_joint,
+      R2_null, var(u). The recoverable share of the gap per cell: f = (median var_ho x median R2_ho - median var_tr x median
+      R2_tr) / (median var_ho - median var_tr), over all multiplicity cells pool-weighted and per cell; seed difference and
+      the 16-84% bootstrap over pools (1000 draws, seed 0).'
+    check: 'The single-scalar reads on the same events (par:v4_prop) already show the held-out residual has explainable per-event
+      structure (eta^2 ceiling 0.12 vs 0.04 training) and that log P alone takes 0.042 of it, so the joint fit must at least
+      reach those (a sanity floor printed beside it: R2_joint >= max single eta^2 on the median); the permuted-u null measures
+      the fit''s own floor, so R2_joint - R2_null is the readable part. The 5-probe test on CC is run before submission (R2_joint,
+      R2_null, time per pool).'
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected; pools' frozen rows; the feature list, the
+      model and its settings (100 iterations, sklearn defaults, 5 folds, random_state 0) fixed before reading; no tuning;
+      cells as loop_levels.py --shape-gap; bootstrap 1000 draws, seed 0.
+    control: Held-out multiplicity pools against training pools of the same cells (same network, scorer, events, features
+      and model); the permuted-u null on every pool; the single-scalar reads of par:v4_prop as the floor.
+    seeds: Seeds 42 and 43 of the control; f and R2_joint margins must exceed both the seed difference and the bootstrap half-range.
+    outcome: 'Decided on f over all multiplicity cells, both seeds. f >= 0.5 (an event-level model recovers at least half
+      the gap) and R2_joint - R2_null held out at least 2x training''s: a GPU design follows, the prior built from the features
+      that carry the fit (permutation importance read on the fitted models), the control''s short pretraining, two seeds,
+      read by the shape-gap rule. f < 0.2: the gap is not an event-level prior''s to close; reported to the user with the
+      alternatives (capacity, training length, data), this route ends. Between: reported, no GPU arm. Cost: CPU only on CC,
+      four jobs (two seeds x H2/TR) in parallel, 4 cores, 3 h limit each (about 5 s per pool fit, two fits per pool); no GPU.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
