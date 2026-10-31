@@ -10,7 +10,9 @@ networks? CPU only, on the saved step-15/20 zero-shot reads; no new run.
 
 The reads: per probe <probe>.npz of tools/zero_shot_parent.py --save-dir in $SCRATCH/zz_v4_short_<arm>/<axis>/, with
 per event t (truth log|M|^2), q (the prediction, log|M|^2; het: mu) and, het only, s = sd_c * sigma (log|M|^2), the
-pool and the scored events' pool rows. The twelve runs are the het-loss and MSE twins of mixture_ab.py (control,
+pool and the scored events' pool rows. Each run's read draws its own events of the probe's pool, so the features are
+computed per run (once per distinct pool and rows); a read saved before the pool_row field (the MSE control's PP4 and
+catalog-sampled held-out reads) has no momenta and is listed as excluded. The twelve runs are the het-loss and MSE twins of mixture_ab.py (control,
 default50, default25; seeds 42 and 43), one job folder per arm. A probe is kept as het_uncertainty.read_probe keeps it
 (finite t, q, s; physics status ok or allowed; the MSE control's own held-out reads, made before the physics check, as
 mixture_ab.extract's allow_unchecked); the held-out axes H1..H7c read their v4_* probes only. Read groups: PP4 and EE4
@@ -329,12 +331,18 @@ def probe_cmd():
         if not x:
             continue
         d = np.load(x[2][0][1])
-        print(ax, x[1], {k: d[k].shape for k in d.files}, str(d["physics_check"])[:300])
+        print(ax, x[1], sorted(d.files))
+        if "physics_check" in d.files:
+            c = json.loads(str(d["physics_check"])) or {}
+            flat = lambda z, pre="": sum([flat(v, pre + k + ".") if isinstance(v, dict) else [pre + k] for k, v in z.items()], [])
+            print("  physics_check keys", flat(c)[:80])
         t0 = time.time()
         o = read_task(x)
         print("  one probe", round(time.time() - t0, 2), "s; excluded", o[3])
         if o[2]:
-            print("  ev_med", {k: round(v, 3) for k, v in o[2]["ev_med"].items() if v is not None}, "\n  pr", o[2]["pr"],
+            r0 = next(iter(o[2]["runs"].values()))
+            print("  event sets", o[2]["n_event_sets"], "ev_med", {k: round(v, 3) for k, v in r0["ev_med"].items() if v is not None},
+                  "\n  pr", o[2]["pr"],
                   "\n  rmse", {a: round(r["rmse"], 3) for a, r in o[2]["runs"].items()})
 
 
