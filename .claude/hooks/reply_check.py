@@ -160,6 +160,12 @@ def _check(inp, ask):
           " flagged and why that is wrong (CLAUDE.md 0g).")
 
 
+def clip(reply, head=4000, tail=8000):
+    """the reply for the model: whole up to head + tail characters, else its start and its end; a cut to the end
+    alone dropped an answer written in the first block of a long turn"""
+    return reply if len(reply) <= head + tail else reply[:head] + "\n[...]\n" + reply[-tail:]
+
+
 def prompt(recent, reply):
     return f"""You check one reply of an assistant to a researcher. Answer ONLY with JSON: {{"ok": true}} or
 {{"ok": false, "question": "<the researcher's unanswered question, copied word for word from their message>",
@@ -172,7 +178,7 @@ The researcher's latest message(s), oldest first:
 
 The assistant's reply:
 <<<
-{reply[-8000:]}
+{clip(reply)}
 >>>
 
 Rules:
