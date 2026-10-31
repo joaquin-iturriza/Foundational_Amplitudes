@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 POLL = re.compile(r"\bsite\s+(?:--\S+\s+)*(?:poll|runs|logs|status|events)\b|\bsqueue\b|\bcondor_q\b")
-WATCH = re.compile(r"^\s*site\s+(?:--\S+\s+)*(?:events\s+--wait|supervise)\b[^;&|]*$")
+WATCH = re.compile(r"^\s*(?:cd\s+\S+\s*(?:&&|;)\s*)?site\s+(?:--\S+\s+)*(?:events\s+--wait|supervise)\b[^;&|]*$")
 DETACH = re.compile(r"^\s*(?:cd\s+\S+\s*(?:&&|;)\s*)?(?:python3?\s+)?(?:\S*/)?tools/detach\.py\b")
 LOOP = re.compile(r"\b(?:for|while|until)\b[^;]*;\s*do\b|\bwatch\s|\bsleep\s+\d")
 
