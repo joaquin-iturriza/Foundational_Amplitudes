@@ -6210,14 +6210,7 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '18': 'FA-ccin2p3-b8aacd01 FA-ccin2p3-c169d47f FA-ccin2p3-275e1edb FA-ccin2p3-1372e489 FA-ccin2p3-611003cb FA-ccin2p3-25624817
-      FA-ccin2p3-67c9c5c1 FA-ccin2p3-5c5da4c8 FA-ccin2p3-1369fba4 FA-ccin2p3-c43bb6c2 FA-ccin2p3-518be432 FA-ccin2p3-9c2ef90a
-      FA-ccin2p3-c3980e94 FA-ccin2p3-3dad72b1 FA-ccin2p3-c1461694 FA-ccin2p3-219e0935 FA-ccin2p3-aa3541f5 FA-ccin2p3-5aba9842
-      FA-ccin2p3-972b79d4 FA-ccin2p3-5eee7f9a FA-ccin2p3-656b64a9 FA-ccin2p3-659ca35a FA-ccin2p3-e64298dd FA-ccin2p3-ccfc14d5
-      FA-ccin2p3-da7b061e FA-ccin2p3-168ab1cd FA-ccin2p3-82509898 FA-ccin2p3-bf1a538a FA-ccin2p3-e9768ac7 FA-ccin2p3-1ba52b78
-      FA-ccin2p3-fa070157 FA-ccin2p3-aaaaa704 FA-ccin2p3-bb0e96a0 FA-ccin2p3-617f4184 FA-ccin2p3-9d3f638f FA-ccin2p3-086bb766
-      FA-ccin2p3-cf70485a FA-ccin2p3-26fd43a9 FA-ccin2p3-3728cc4b FA-ccin2p3-f12dad91 FA-ccin2p3-d4f5936a FA-ccin2p3-cfb31c0c
-      FA-ccin2p3-347d605b FA-ccin2p3-d588ec7b FA-ccin2p3-167ac0d6 FA-ccin2p3-b395c7c4 FA-ccin2p3-4c5d0b1e '
+    '18': FA-ccin2p3-765bdd9c FA-ccin2p3-5d4e6872 FA-ccin2p3-1e7f2159 FA-ccin2p3-49120869 FA-ccin2p3-926b4f19
     '20': FA-ccin2p3-bfec5501
     '19': FA-ccin2p3-0e34042c FA-ccin2p3-1713c01c FA-ccin2p3-20034f07 FA-ccin2p3-297bee83 FA-ccin2p3-3138e3da FA-ccin2p3-34d05aa4
       FA-ccin2p3-35160c75 FA-ccin2p3-3c03fcc9 FA-ccin2p3-3ed3d4a8 FA-ccin2p3-4cb6d12c FA-ccin2p3-5225f86c FA-ccin2p3-5c906caf
