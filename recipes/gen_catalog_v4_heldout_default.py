@@ -14,7 +14,11 @@ class map (analysis/catalog_v4/mixture_ab.py class_of) gives each probe its held
   H6    the classes at alpha_s(M_Z) 0.13: the base's events as H2p5's (catalog_v4's cards, MadEvent's own alpha_s,
         which for pp follows the PDF's), labelled at alpha_s(sqrt(s_hat)) run at one loop from 0.13
         (lhe.label_alphas_mz, as physics.alpha_s sets the catalog's own pools)
-  H5    (one-loop labels on Born events): not written yet, it needs a pipeline piece
+  H5    the one-loop classes (python3 recipes/gen_catalog_v4_heldout_default.py --h5): MadEvent events of the class's
+        Born (its MadLoop generate string without [virt=QCD]; a loop-induced class, [sqrvirt=QCD], as [noborn=QCD] with
+        loop_sm-no_b_mass), at H2p5's settings, labelled by the class's own MadLoop standalone (lhe label rule 'virt',
+        mg5_pipeline_final._lhe_virt_block: signed labels, the catalog's one-loop alpha_s convention, the Born
+        sidecar); each pool reads the class's one-loop diagram sidecar (diagrams_of) and carries its order vector
 
 Each pool: 2000 test events (the EE4/PP4 test measure), labelled at alpha_s(sqrt(s_hat)) run at one loop from 0.118
 (as pp13v4_/ee4_), built in the layout every rebuilt catalog_v4 MadEvent pool has (par:v4_short_runs): complete runs
@@ -123,5 +127,54 @@ def main():
                       "gridpacks": grids}))
 
 
+def born_generate(nlo, v):
+    """(MadEvent generate line, model) of one-loop class nlo's Born (v: its VIRT_PROCESSES entry)."""
+    g = v["mg5"].strip()
+    if v.get("loopind"):
+        return g.replace("[sqrvirt=QCD]", "[noborn=QCD]"), "loop_sm-no_b_mass"
+    assert g.endswith("[virt=QCD]"), (nlo, g)
+    return g[:-len("[virt=QCD]")].rstrip(), None
+
+
+def main_h5():
+    import mg5_pipeline_final as mg
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from nlo_virtual_pipeline import VIRT_PROCESSES
+    hdr = {"run_card": "run_card.dat", "param_card": "param_card.dat", "model": mg.V4_MODEL,
+           "n_val": 0, "n_test": N_TEST, "n_train": 0, "label_alphas": "virt", "parts": True,
+           "source": "catalog_v4's parameter card and catalog_v4_pp's or catalog_v4_ee's run card (H2p5's settings); "
+                     "Born events labelled by the class's MadLoop (recipes/gen_catalog_v4_heldout_default.py --h5)"}
+    out, skipped = {}, []
+    for h in yaml.safe_load(open(os.path.join(HERE, "catalog_v4_heldout_H5.yaml")))["processes"]:
+        n = h["name"]
+        c = mg.PROCESSES[n]
+        v = VIRT_PROCESSES[c["virt_base"]]
+        cards, energies = settings("H5", c, float(h["sqrts"][0]))
+        if energies == []:
+            skipped.append(n); continue
+        gen, model = born_generate(n, v)
+        lhe = {**hdr, "cards_dir": cards, "label_virt": n, **({"energies": energies} if energies else {}),
+               **({"model": model} if model else {})}
+        lhe = complete_layout(lhe, SMALL_RUN, gridpack=True, name=n, sizes=RUN_SIZES.get(n))
+        lhe = {k: v_ for k, v_ in lhe.items() if k not in hdr or hdr[k] != v_}
+        # the class's own entry (its order vector with the loop, alpha_s power, pdg row order) with the Born's
+        # MadEvent generate line
+        name = "hd_" + n[3:]
+        out[name] = {**lhe_entry(mg, name, dict(c, mg5_generate=[gen]), mg.V4_MODEL, lhe), "parent": n,
+                     "split": "heldout", "test_group": "held-out default v4: H5", "heldout_class": n,
+                     "diagrams_of": n}
+    with open(os.path.join(HERE, "catalog_v4_heldout_default_H5_processes.yaml"), "w") as f:
+        f.write(HDR)
+        yaml.safe_dump({"lhe": hdr, "processes": out}, f, sort_keys=False)
+    with open(os.path.join(HERE, "catalog_v4_heldout_default_H5_test.yaml"), "w") as f:
+        f.write(HDR)
+        yaml.safe_dump({"processes": [{"name": k, "sqrts": [13000, 13000], "n_train": 0, "n_val": 0,
+                                       "n_test": N_TEST} for k in out]}, f, sort_keys=False)
+    runs = sum(sum(e["lhe"]["energy_runs"]) if e["lhe"].get("energy_runs") else
+               int(e["lhe"]["n_runs"]) * len(e["lhe"].get("energies") or [1]) for e in out.values())
+    print(json.dumps({"pools": len(out), "below_every_energy": skipped, "runs": runs,
+                      "gridpacks": sum(len(e["lhe"].get("energies") or [1]) for e in out.values())}))
+
+
 if __name__ == "__main__":
-    main()
+    main_h5() if "--h5" in sys.argv[1:] else main()

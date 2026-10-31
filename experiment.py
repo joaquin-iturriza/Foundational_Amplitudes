@@ -831,6 +831,12 @@ class AmplitudeExperiment(BaseExperiment):
         path or None."""
         import re
         cands = [name]
+        # an entry read with another process's diagrams (diagrams_of: a held-out one-loop class's default-sampled
+        # pool, MadEvent Born events labelled by the class's MadLoop, reads the class's one-loop sidecar), first
+        import mg5_pipeline_final as _mg
+        _dof = (_mg.PROCESSES.get(name) or {}).get("diagrams_of")
+        if _dof:
+            cands = [_dof]
         # explicit recipe ``base`` (coupling/mass scan: decorated name → real process)
         recipe_base = getattr(self, "_recipe_base_by_name", {}).get(name)
         if recipe_base and recipe_base not in cands:

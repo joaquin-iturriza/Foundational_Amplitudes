@@ -1898,7 +1898,10 @@ def _load_catalog_2to4():
                                                 "catalog_v4_default_processes.yaml"))
                        # default-sampled test pools of the held-out classes (recipes/gen_catalog_v4_heldout_default.py)
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
-                                                "catalog_v4_heldout_default_processes.yaml"))):
+                                                "catalog_v4_heldout_default_processes.yaml"))
+                       # and of the one-loop held-out classes, H5 (Born events, one-loop labels: lhe label rule 'virt')
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_heldout_default_H5_processes.yaml"))):
         with open(path) as f:
             d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
         lhe = dict(d.get("lhe") or {})
@@ -3960,6 +3963,8 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
                              else str(cfg["lhe"]["label_alphas"])),
         **({"label_alphas_mz": float(cfg["lhe"]["label_alphas_mz"])} if cfg["lhe"].get("label_alphas_mz") is not None
            else {}),
+        # the label rule 'virt': the one-loop entry whose MadLoop labels the events (part of the pool's identity)
+        **({"label_virt": str(cfg["lhe"]["label_virt"])} if cfg["lhe"].get("label_alphas") == "virt" else {}),
         "label_convention": "mg5_slot_v2",
         "lhe": {
             "model":             cfg["lhe"].get("model", "sm"),
@@ -4439,6 +4444,94 @@ def _lhe_check_recipes(process, items):
     return runs.pop()
 
 
+LHE_VIRT_UNUSABLE_MAX = 0.02   # tools/nlo_virtual_pipeline.generate_virt_dataset's refusal: above 2% redrawn, untrusted
+
+
+def lhe_label_virt(nlo, m, alphas_mz=0.118, workers=None):
+    """(value, ok, born, alphas) of events m (n x npart x 4, the entry's row order) labelled with the one-loop entry
+    `nlo`'s MadLoop standalone (tools/nlo_virtual_pipeline.label_events), in chunks, each in its own subprocess as
+    datagen.gen_virt_chunk runs the catalog's one-loop generation (MadLoop chdir's and is a process singleton),
+    `workers` at once (default: the job's CPUs). The flags are gen_virt_chunk's: --alphas-mz and --alphas-prefactor
+    only for an entry with alphas_prefactor; the reference alpha_s(M_Z) of a stripped virtual is the catalog's 0.118."""
+    import subprocess, tempfile
+    from concurrent.futures import ThreadPoolExecutor
+    import datagen
+    cfg = PROCESSES[nlo]
+    if cfg.get("alphas_prefactor"):
+        alphas_mz, extra = float(cfg.get("alphas_mz", 0.118)), ["--alphas-prefactor"]
+    else:
+        extra = []
+        if abs(float(alphas_mz) - 0.118) > 1e-12:
+            raise ValueError(f"{nlo}: a stripped virtual is labelled at the catalog's alpha_s(M_Z) 0.118, not {alphas_mz}")
+    datagen.ensure_virt_backend(nlo)
+    n = len(m)
+    W = max(1, min(n, workers or (len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else 1)))
+    tmp = tempfile.mkdtemp(prefix=f"virtlabel_{nlo}_", dir=os.environ.get("TMPDIR") or os.environ.get("SCRATCH"))
+    pipe = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools", "nlo_virtual_pipeline.py")
+    env = dict(os.environ, SETUPTOOLS_USE_DISTUTILS="stdlib", PYTHONDONTWRITEBYTECODE="1")
+    chunks = [c for c in np.array_split(np.arange(n), W) if len(c)]
+
+    def run(k):
+        f, o = os.path.join(tmp, f"mom_{k}.npy"), os.path.join(tmp, f"lab_{k}.npz")
+        np.save(f, np.asarray(m[chunks[k]], dtype=np.float64).reshape(len(chunks[k]), -1))
+        cmd = [sys.executable, pipe, cfg["virt_base"], "--label-events", f, "--out", o,
+               "--alphas-mz", repr(float(alphas_mz))] + extra
+        r = subprocess.run(cmd, env=env, capture_output=True, text=True)
+        if r.returncode != 0 or not os.path.exists(o):
+            # a Fortran STOP inside MadLoop ends the interpreter with exit 0 and no output: a failure too
+            raise RuntimeError(f"lhe label virt {nlo} chunk {k}: exit {r.returncode}, output "
+                               f"{'missing' if not os.path.exists(o) else 'present'}:\n{(r.stdout or '')[-1500:]}\n"
+                               f"{(r.stderr or '')[-1500:]}")
+        return np.load(o)
+    with ThreadPoolExecutor(W) as ex:
+        res = list(ex.map(run, range(len(chunks))))
+    shutil.rmtree(tmp, ignore_errors=True)
+    cat = {k: np.concatenate([r[k] for r in res]) for k in ("value", "ok", "born", "alphas")}
+    return cat["value"], cat["ok"].astype(bool), cat["born"], cat["alphas"]
+
+
+def _lhe_virt_block(process, cfg, m, a_up, mom, aqcd, spare, need):
+    """Label block m with the one-loop entry lhe.label_virt; a MadLoop-unusable point (which the catalog's generator
+    redraws from its sampler) is replaced by the next spare event of the same collider energy (mom[spare[0]:], the
+    shuffled events past the blocks' need, read in order), so the block keeps its size and energy shares; refused when
+    the spare events run out or more than LHE_VIRT_UNUSABLE_MAX of the points labelled were unusable."""
+    nlo = cfg["lhe"]["label_virt"]
+    if [int(p) for p in PROCESSES[nlo]["pdg_ids"]] != [int(p) for p in cfg["pdg_ids"]]:
+        raise ValueError(f"{process}: row order {cfg['pdg_ids']} is not {nlo}'s {PROCESSES[nlo]['pdg_ids']}")
+    amz = float(cfg["lhe"].get("label_alphas_mz", 0.118))
+    m, a_up = np.array(m, copy=True), np.array(a_up, copy=True)
+    amps, ok, born, a = lhe_label_virt(nlo, m, amz)
+    ee = abs(int(cfg["pdg_ids"][0])) in (11, 13)
+
+    def ekey(x):        # e+e-: the collider energy of each event (its sqrt(s_hat)); pp: one class
+        if not ee:
+            return np.zeros(len(x))
+        q = x[:, 0] + x[:, 1]
+        return np.round(np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0, None)), 3)
+    n_lab, n_bad = len(m), int((~ok).sum())
+    while not ok.all():
+        k = int((~ok).sum())
+        take = min(len(mom) - spare[0], k + 8 + k // 4)
+        if take <= 0:
+            raise RuntimeError(f"{process}: {k} MadLoop-unusable labels left and no spare events ({len(mom)} events, "
+                               f"the blocks need {need}); raise lhe.margin")
+        sm, sa_ = mom[spare[0]:spare[0] + take], aqcd[spare[0]:spare[0] + take]
+        spare[0] += take
+        v2, ok2, b2, al2 = lhe_label_virt(nlo, sm, amz)
+        n_lab += take; n_bad += int((~ok2).sum())
+        kb, ks = ekey(m), ekey(sm)
+        used = np.zeros(take, bool)
+        for i in np.flatnonzero(~ok):
+            j = np.flatnonzero(ok2 & ~used & (ks == kb[i]))
+            if len(j):
+                j = j[0]; used[j] = True
+                m[i], a_up[i], amps[i], born[i], a[i], ok[i] = sm[j], sa_[j], v2[j], b2[j], al2[j], True
+    if n_bad > LHE_VIRT_UNUSABLE_MAX * n_lab:
+        raise RuntimeError(f"{process}: {n_bad} of {n_lab} MadLoop points unusable (exceptional or wrong double pole), "
+                           f"above {LHE_VIRT_UNUSABLE_MAX:.0%}: the module is not trustworthy ({nlo})")
+    return m, a_up, amps, born, a, {"label_virt": nlo, "n_labelled": n_lab, "n_unusable": n_bad}
+
+
 def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed, iseed, n_req, mg_cores,
                 write_sidecars):
     """The events of the runs (moms, aqcds: per run, in run order) -> the pools of `items`: concatenated in run
@@ -4463,12 +4556,18 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
     npart = int(cfg["nfinal"]) + 2
     pdg_row = np.asarray(cfg["pdg_ids"], dtype=np.float64)
     out = []
+    spare = [need]                       # the label rule 'virt': the next spare event past the blocks
     for rec, path in items:
         lo, hi = rec["lhe"]["block"]
         m, a = mom[lo:hi], aqcd[lo:hi]
         a_up = a
         rule = cfg["lhe"].get("label_alphas", "aqcdup")
-        if rule == "running_sqrt_shat":
+        virt = None
+        if rule == "virt":
+            # one-loop labels on MadEvent's Born events (a held-out one-loop class's default-sampled pool): signed,
+            # each event's alpha_s the catalog's one-loop convention, MadLoop's Born kept as the .born.npy sidecar
+            m, a_up, amps, born, a, virt = _lhe_virt_block(process, cfg, m, a, mom, aqcd, spare, need)
+        elif rule == "running_sqrt_shat":
             q = m[:, 0] + m[:, 1]
             # lhe.label_alphas_mz: the reference alpha_s(M_Z) of the running (a held-out alpha_s class, H6: 0.13, as
             # physics.alpha_s sets it for the catalog's own pools, physics_to_generation); 0.118 when absent
@@ -4476,10 +4575,12 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
                                alphas_mz=float(cfg["lhe"].get("label_alphas_mz", 0.118)))
         elif rule != "aqcdup":
             raise ValueError(f"{process}: unknown lhe.label_alphas {rule!r}")
-        amps = label_lhe_pp(process, m, a, sa)
-        bad = ~np.isfinite(amps) | (amps <= 0)
+        if virt is None:
+            amps = label_lhe_pp(process, m, a, sa)
+        bad = ~np.isfinite(amps) | ((amps <= 0) if virt is None else False)   # a one-loop finite part is signed
         if bad.any():
-            raise RuntimeError(f"{process} {rec['role']}: {int(bad.sum())} labels non-finite or <= 0")
+            raise RuntimeError(f"{process} {rec['role']}: {int(bad.sum())} labels non-finite"
+                               + (" or <= 0" if virt is None else ""))
         n = hi - lo
         data = np.concatenate([m.reshape(n, npart * 4), np.tile(pdg_row, (n, 1)), amps[:, None]], axis=1)
         d = os.path.dirname(path) or "."
@@ -4493,6 +4594,8 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
         np.save(path[:-len(".npy")] + ".alphas.npy", np.asarray(a, dtype=np.float64))
         if rule != "aqcdup":
             np.save(path[:-len(".npy")] + ".aqcdup.npy", np.asarray(a_up, dtype=np.float64))
+        if virt is not None:
+            np.save(path[:-len(".npy")] + ".born.npy", np.asarray(born, dtype=np.float64))
         bcopy = None
         if banner:
             bcopy = os.path.join(d, f"{process}_lhe_iseed{iseed}.banner.txt")
@@ -4506,6 +4609,7 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
                            "banner": bcopy, "mg_cores": int(mg_cores),
                            "alphas_range": [float(a.min()), float(a.max())],
                            "amp_range": [float(amps.min()), float(amps.max())],
+                           **({"virt": virt} if virt is not None else {}),
                            "seconds": {k: round(v, 1) for k, v in secs.items()}}
         if write_sidecars:
             write_recipe(path, full)
@@ -4749,7 +4853,7 @@ def lhe_set_aside(process, items):
         except (OSError, ValueError):
             pass
         b = (side.get("lhe_run") or {}).get("banner")
-        for f in [path, path + ".recipe.json", stem + ".alphas.npy", stem + ".aqcdup.npy"] + ([b] if b else []):
+        for f in [path, path + ".recipe.json", stem + ".alphas.npy", stem + ".aqcdup.npy", stem + ".born.npy"] + ([b] if b else []):
             if f and os.path.exists(f):
                 shutil.move(f, os.path.join(dest, os.path.basename(f)))
                 moved.append(f)

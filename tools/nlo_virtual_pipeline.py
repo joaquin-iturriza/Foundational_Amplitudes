@@ -766,6 +766,40 @@ def born_of_pool(process, pool_file, n_events=None, seed=0, out=None, alphas_mz=
     return summary
 
 
+def label_events(process, mom_file, out, mass_shift=True, alphas_mz=0.118, alphas_prefactor=False):
+    """One-loop labels of given events (MadEvent's Born events of a held-out one-loop class, mg5_pipeline_final's lhe
+    label rule 'virt'): each row of mom_file (n x npart*4, the entry's stored row order) evaluated by virt_evaluator,
+    the evaluator the catalog's own one-loop pools are generated with, at the same settings datagen.gen_virt_chunk
+    passes (the stripped virtual at alpha_s(M_Z) 0.118 unless alphas_prefactor). Writes an npz (out): value (the stored
+    target, signed), ok (False: a MadLoop-unusable point, an exceptional return code or a wrong double pole, which the
+    catalog's generator redraws), born (MadLoop's Born |M0|^2), alphas (each event's alpha_s as the catalog's pools
+    record it, tools/write_own_alphas.py: the constant alpha_s(M_Z) for a stripped virtual, whose Born MadLoop evaluates
+    there; the running alpha_s(sqrt(s_hat)) for a loop-induced entry or with alphas_prefactor). An electroweak one-loop
+    entry is refused (no rule for its alpha_s)."""
+    cfg = VIRT_PROCESSES[process]
+    if cfg.get("ew"):
+        raise ValueError(f"{process}: label_events has no alpha_s rule for an electroweak one-loop entry")
+    npart = len(cfg["pdg_ids"])
+    rows = np.load(mom_file)
+    assert rows.ndim == 2 and rows.shape[1] == npart * 4, (rows.shape, npart)
+    out = os.path.abspath(out)
+    evaluate_point, balanced, last, info = virt_evaluator(process, mass_shift, alphas_mz, alphas_prefactor)
+    n = len(rows)
+    rec = {k: np.empty(n) for k in ("value", "born", "sqrts")}
+    ok = np.zeros(n, bool)
+    for i in range(n):
+        mom = rows[i].reshape(npart, 4)
+        q = mom[0] + mom[1]
+        sq = float(np.sqrt(max(q[0] ** 2 - (q[1:] ** 2).sum(), 0.0)))
+        rec["value"][i], ok[i] = evaluate_point(balanced(mom), sq)
+        rec["born"][i], rec["sqrts"][i] = last["born"], sq
+    running = bool(info["loopind"] or alphas_prefactor)
+    alphas = mg.compute_alphas(rec["sqrts"], alphas_mz=alphas_mz) if running else np.full(n, float(alphas_mz))
+    np.savez(out, ok=ok, alphas=np.asarray(alphas, dtype=np.float64), **rec)
+    print(f"LABEL_EVENTS {process} n={n} unusable={int((~ok).sum())} -> {out}", flush=True)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("process", choices=list(VIRT_PROCESSES))
@@ -788,8 +822,15 @@ def main():
     ap.add_argument("--born-of", default=None, metavar="POOL",
                     help="re-evaluate an existing pool's events and write their Born (born_of_pool); --n events "
                          "drawn from it with --seed (all rows when --n is at least its size), npz to --out")
+    ap.add_argument("--label-events", default=None, metavar="MOM_NPY",
+                    help="one-loop labels of the events in MOM_NPY (rows of npart*4 momenta), npz to --out "
+                         "(label_events)")
     args = ap.parse_args()
 
+    if args.label_events:
+        label_events(args.process, args.label_events, args.out, mass_shift=not args.no_mass_shift,
+                     alphas_mz=args.alphas_mz, alphas_prefactor=args.alphas_prefactor)
+        return
     if args.born_of:
         import json
         s = born_of_pool(args.process, args.born_of, n_events=args.n, seed=args.seed, out=args.out,
