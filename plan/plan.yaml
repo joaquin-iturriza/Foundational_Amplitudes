@@ -3417,6 +3417,8 @@ entries:
       the entry after the backlog review'
     15: 'Het-loss uncertainty read (D220): where the network is uncertain on the mixture arms vs control; first check whether
       an existing het-loss run can be re-read; GPU-h stated before any run'
+    16: 'Once the share is chosen (catalog final): longer and wider muP pretrainings (D219); grid of lengths x widths x seeds
+      with GPU-h, wall time and token cost goes to Joaquin before launch'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -5918,6 +5920,11 @@ entries:
       if:
       - 'uncertainty concentrates where default sampling adds events: favours a default share'
       - 'it does not: keep the current mixture (a)'
+    16:
+      feeds: 'D219: scaling and whether the network is big enough'
+      if:
+      - 'Joaquin approves the grid: launch'
+      - 'he cuts it: launch his version'
   owner:
     agent: a1260706ea6f103cc
     state: stopped
