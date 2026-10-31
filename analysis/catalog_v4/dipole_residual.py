@@ -96,6 +96,86 @@ def pool_rows(z):
     return perm[pos]
 
 
+# catalog_v4's masses and widths (fa-catalog-reference: MT 172.5, WT 1.4915; the loop-induced pools' corrected Z, W;
+# b massless in v4, so a b line is a massless propagator); alpha at the G_mu scheme's 1/132.5, alpha_s(M_Z) 0.118
+MW = {23: (91.188, 2.441404), 24: (80.419, 2.0476), 25: (125.0, 0.00407), 6: (172.5, 1.4915)}
+LOG_G2 = {"QCD": np.log(4 * np.pi * 0.118), "QED": np.log(4 * np.pi / 132.5)}
+
+
+def edge_sides(diag):  # dup-ok: norm_surrogate.py parses its arguments at import, so it cannot be imported
+    """Per internal edge of a tree diagram: (|pdg|, the external leg numbers on one side of it)."""
+    nodes, edges = diag["nodes"], diag["edges"]
+    adj = {i: [] for i in range(len(nodes))}
+    for k, e in enumerate(edges):
+        adj[e["u"]].append((e["v"], k))
+        adj[e["v"]].append((e["u"], k))
+    out = []
+    for k, e in enumerate(edges):
+        if e["external"]:
+            continue
+        seen, stack, legs = {e["u"]}, [e["u"]], []
+        while stack:
+            x = stack.pop()
+            if nodes[x]["kind"] == "external":
+                legs.append(nodes[x]["leg_number"])
+            for y, kk in adj[x]:
+                if kk != k and y not in seen:
+                    seen.add(y)
+                    stack.append(y)
+        out.append((abs(int(e["pdg"])), legs))
+    return out
+
+
+def log_prop(mom, pdg, sidecar):
+    """log P per event: log sum_d C_d prod_{internal S} 1/|D_S|^k over the sidecar's tree diagrams (norm_surrogate.py's
+    prop, the process constant left out): D_S = s_S - M^2 + i M Gamma, k = 2 for a massive line (Breit-Wigner), 1 for a
+    massless one (|s_S|), s_S from the legs on one side of the edge (all outgoing); C_d = prod over the diagram's
+    vertices of g^2 per coupling power (g^2 = 4 pi alpha_s or 4 pi alpha). None when the sidecar is missing or has no
+    subprocess with the pool's legs."""
+    if not os.path.exists(sidecar):
+        return None
+    sd = json.load(open(sidecar))
+    ids = [int(x) for x in pdg[0]]
+    n = len(ids)
+    perm, sub = None, None
+    for s_ in sd["subprocesses"]:
+        want = [int(l["pdg"]) for l in sorted(s_["external"], key=lambda l: l["number"])]
+        if want == ids:
+            perm, sub = list(range(n)), s_
+            break
+        if sorted(want[:2]) == sorted(ids[:2]) and sorted(want[2:]) == sorted(ids[2:]):
+            pm, used = [], set()
+            for w in want:
+                k = next(k for k in range(n) if ids[k] == w and k not in used and (k < 2) == (len(pm) < 2))
+                pm.append(k)
+                used.add(k)
+            perm, sub = pm, s_
+            break
+    if sub is None:
+        return None
+    Q = mom[:, perm].copy()
+    Q[:, :2] *= -1
+    shat = mdot(mom[:, 0] + mom[:, 1], mom[:, 0] + mom[:, 1])
+    diags = [d for d in sub["diagrams"] if d.get("diagram_type", "tree") == "tree"]
+    logc = np.array([sum(LOG_G2.get(o, 0.0) * v for nd in d["nodes"] for o, v in (nd.get("orders") or {}).items())
+                     for d in diags])
+    if not len(diags):
+        return None
+    tot = np.zeros(len(mom))
+    for d, lc in zip(diags, logc):
+        term = np.full(len(mom), np.exp(lc - logc.max()))
+        for pid, legs in edge_sides(d):
+            k = Q[:, [l - 1 for l in legs]].sum(1)
+            sS = mdot(k, k)
+            if pid in MW:
+                M, G = MW[pid]
+                term = term / ((sS - M * M) ** 2 + (M * G) ** 2)
+            else:
+                term = term / np.maximum(np.abs(sS), 1e-12 * shat)
+        tot += term
+    return np.log(np.maximum(tot, 1e-300))
+
+
 def r2(u, x):
     if np.std(x) == 0:
         return 0.0
@@ -107,6 +187,8 @@ def main():
     ap.add_argument("dirs", nargs="+", help="read directories; restrict to cells with --probes")
     ap.add_argument("--probes", default="", help="a file of probe names, one per line (empty: all)")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--prop", action="store_true", help="the propagator-product read (log P; placebos E, logF, log D)")
+    ap.add_argument("--sidecars", default="data/diagrams", help="the diagram sidecars' directory (--prop)")
     a = ap.parse_args()
     rows = []
     for d in a.dirs:
@@ -135,24 +217,44 @@ def main():
             if np.corrcoef(np.log(np.abs(amp)), raw)[0, 1] < 0.999 or np.median(np.abs(diff - np.median(diff))) >= 0.05:
                 rows.append({"dir": d, "probe": name, "error": "pool rows at idx do not align with the read"})
                 continue
-            fx = factors(mom, pdg)
-            if fx is None:
-                rows.append({"dir": d, "probe": name, "no_emitter": True})
-                continue
             u = z["q"].astype(np.float64) - t
             u -= u.mean()
             logF = z["logF"].astype(np.float64)
+            rec = {"dir": d, "probe": name}
+            if a.prop:     # the propagator-product read: log P with E, logF and log D (when there is one) as placebos
+                logP = log_prop(mom, pdg, os.path.join(a.sidecars, name + ".diagrams.json"))
+                if logP is None:
+                    rows.append({**rec, "error": "no sidecar subprocess for the pool's legs"})
+                    continue
+                fx = factors(mom, pdg)
+                logD, E = fx if fx is not None else (None, np.log(np.abs(mom[:, 2:, 0]).sum(1)))
+                ok = np.isfinite(logP) & np.isfinite(E) & np.isfinite(logF)
+                if logD is not None:
+                    ok &= np.isfinite(logD)
+                rec.update({"n": int(ok.sum()), "var_u": float(np.var(u[ok])), "has_emitter": fx is not None,
+                            "r2_P": r2(u[ok], logP[ok]), "r2_E": r2(u[ok], E[ok]), "r2_F": r2(u[ok], logF[ok]),
+                            "r2_tP": r2(t[ok], logP[ok]), "r2_rawP": r2(raw[ok], logP[ok])})
+                if logD is not None:
+                    rec["r2_D"] = r2(u[ok], logD[ok])
+                rows.append(rec)
+                continue
+            fx = factors(mom, pdg)
+            if fx is None:
+                rows.append({**rec, "no_emitter": True})
+                continue
             logD, E = fx
             ok = np.isfinite(logD) & np.isfinite(E) & np.isfinite(logF)
-            rows.append({"dir": d, "probe": name, "n": int(ok.sum()), "var_u": float(np.var(u[ok])),
+            rows.append({**rec, "n": int(ok.sum()), "var_u": float(np.var(u[ok])),
                          "r2_D": r2(u[ok], logD[ok]), "r2_E": r2(u[ok], E[ok]), "r2_F": r2(u[ok], logF[ok]),
                          "r2_tD": r2(t[ok], logD[ok]), "r2_rawD": r2(raw[ok], logD[ok])})
     with open(a.out, "w") as fh:
         json.dump(rows, fh)
     per = {}
     for r in rows:
-        if "r2_D" in r:
+        if ("r2_P" if a.prop else "r2_D") in r:
             per.setdefault(r["dir"], []).append(r)
+    keys = ("r2_P", "r2_E", "r2_F", "r2_tP", "r2_rawP") if a.prop else ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")
+    main_k = keys[0]
     rng = np.random.default_rng(0)
 
     def med(v, k):
@@ -162,8 +264,8 @@ def main():
         a = np.array([x[k] for x in v])
         m = [np.median(rng.choice(a, len(a))) for _ in range(1000)]
         return [round(float(np.quantile(m, 0.16)), 3), round(float(np.quantile(m, 0.84)), 3)]
-    print(json.dumps({d: {"n": len(v), **{f"median_{k}": med(v, k) for k in ("r2_D", "r2_E", "r2_F", "r2_tD", "r2_rawD")},
-                          "boot_r2_D": boot(v, "r2_D"), "refused": sum(1 for r in rows if r["dir"] == d and "error" in r)}
+    print(json.dumps({d: {"n": len(v), **{f"median_{k}": med(v, k) for k in keys},
+                          f"boot_{main_k}": boot(v, main_k), "refused": sum(1 for r in rows if r["dir"] == d and "error" in r)}
                       for d, v in per.items()}))
 
 

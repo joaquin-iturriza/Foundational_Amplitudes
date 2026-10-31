@@ -13,13 +13,16 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 cd "$PROJECT_DIR"
-OUT="$SCRATCH/zz_v4_dipole_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
+# $1 = prop: the propagator-product read (log P; placebos E, logF, log D), the design of 2026-10-31
+MODE="${1:-dipole}"; FLAG=(); TAG=DIPOLE_RESIDUAL
+[ "$MODE" = prop ] && { FLAG=(--prop); TAG=PROP_RESIDUAL; }
+OUT="$SCRATCH/zz_v4_${MODE}_${SLURM_JOB_ID:-$$}"; mkdir -p "$OUT"
 for arm in v4_dimensionless_muon v4_dimensionless_muon_seed2; do
     for ax in H2 TR; do
         d="$SCRATCH/zz_v4_short_$arm/$ax"
         [ -d "$d" ] || { echo "missing $d"; exit 1; }
-        s=$(python analysis/catalog_v4/dipole_residual.py "$d" --out "$OUT/${arm}_$ax.json") || exit 1
-        echo "DIPOLE_RESIDUAL {\"arm\": \"$arm\", \"axis\": \"$ax\", \"summary\": $s}"
+        s=$(python analysis/catalog_v4/dipole_residual.py "$d" "${FLAG[@]}" --out "$OUT/${arm}_$ax.json") || exit 1
+        echo "$TAG {\"arm\": \"$arm\", \"axis\": \"$ax\", \"summary\": $s}"
     done
 done
-echo "V4_DIPOLE_DONE $OUT"
+echo "V4_${TAG}_DONE $OUT"
