@@ -469,7 +469,7 @@ class TrainingReference:
     an entry with neither is listed in `unreadable`, never a reference. `sources` counts where the blocks came from.
     Indexed by process and by (model family, loop kind)"""
 
-    def __init__(self, recipe_path, blocks=None, seed=42):
+    def __init__(self, recipe_path, blocks=None, seed=42, backend=True):
         mg = _mg()
         self.recipe = recipe_path
         self.sources = {}
@@ -491,7 +491,7 @@ class TrainingReference:
                     if blk is not None:     # the b row the encoding reads is the particle table's now, as for a probe
                         blk["b_row"] = b_row([int(p) for p in cfg["pdg_ids"]], cfg, s["physics"])
                 if blk is None:
-                    be = backend_dir(proc, cfg)
+                    be = backend_dir(proc, cfg) if backend else None
                     if not be or not os.path.exists(os.path.join(be, "Cards", "param_card.dat")):
                         raise RuntimeError("no sidecar physics block and no backend card")
                     blk, src = physics_block(proc, spec_physics=s["physics"], cfg=cfg), "backend card"
@@ -547,9 +547,10 @@ def compare(probe_blk, pdg_ids, refs, fields, exempt=()):
     return bad, skipped, ex
 
 
-def check_probe(name, spec_physics, pool_path, reference, cfg=None):
+def check_probe(name, spec_physics, pool_path, reference, cfg=None, backend=True):
     """the check of one probe pool: {status ok|mismatch, reference, mismatches, ...}. `reference` is a
-    TrainingReference (None: the parent has no training recipe, which refuses)"""
+    TrainingReference (None: the parent has no training recipe, which refuses). backend=False: the sidecar's block
+    only, as the check runs once the standalones are gone"""
     mg = _mg()
     cfg = cfg if cfg is not None else mg.PROCESSES[name]
     pdg = [int(p) for p in cfg["pdg_ids"]]
@@ -566,7 +567,7 @@ def check_probe(name, spec_physics, pool_path, reference, cfg=None):
     else:
         src = "computed at read" + ("" if side else " (no sidecar)")
         blk = physics_block(name, recipe=side, spec_physics=spec_physics, cfg=cfg)
-        if blk.get("backend") and blk.get("card") is None:     # nothing to read the physics from: refused
+        if blk.get("backend") and (blk.get("card") is None or not backend):     # nothing to read the physics from: refused
             return {"probe": name, "pool": pool_path, "block_source": src, "status": "mismatch",
                     "reference": {"kind": "none"},
                     "mismatches": [{"field": "physics block", "probe": None,
@@ -657,13 +658,14 @@ def require_npz(z, path=""):
 
 
 # ------------------------------------------------------------------------------------------------------- command line
-def val_pool_path(name, spec, recipe_doc, seed=42):
-    """the val pool a probe read scores (the experiment's recipe path: datagen.ensure_dataset's file name)"""
+def val_pool_path(name, spec, recipe_doc, seed=42, role="val"):
+    """the pool of `role` (default val) a probe read scores (the experiment's recipe path: datagen.ensure_dataset's
+    file name)"""
     mg = _mg()
     import datagen
     lo, hi = (float(x) for x in spec["sqrts"])
-    rec = mg.variable_energy_recipe(name, lo, hi, int(spec["n_val"]), role="val", seed=seed)
-    return mg.recipe_output_path(rec, datagen.dest_for_role("val"))
+    rec = mg.variable_energy_recipe(name, lo, hi, int(spec[f"n_{role}"]), role=role, seed=seed)
+    return mg.recipe_output_path(rec, datagen.dest_for_role(role))
 
 
 def sidecar_scan(dirs):
@@ -744,6 +746,9 @@ def main(argv=None):
     c.add_argument("--train", required=True)
     c.add_argument("--seed", type=int, default=42)
     c.add_argument("--quiet", action="store_true", help="only the counts and the mismatching probes")
+    c.add_argument("--role", default="val", choices=("val", "test"), help="the probe pool read (EE4: test)")
+    c.add_argument("--sidecar-only", action="store_true",
+                   help="blocks from the pools' sidecars only, no backend card: the check without the standalones")
     c.add_argument("probes", nargs="+")
     b = sub.add_parser("block")
     b.add_argument("process")
@@ -779,7 +784,7 @@ def main(argv=None):
             out["sidecar"] = json.load(open(a.pool + ".recipe.json")).get("physics")
         print(json.dumps(out, indent=1, default=str))
         return
-    ref = TrainingReference(a.train)
+    ref = TrainingReference(a.train, seed=a.seed, backend=not a.sidecar_only)
     counts, fields, refs = {}, {}, {}
     for f in a.probes:
         doc = yaml.safe_load(open(f))
@@ -790,8 +795,8 @@ def main(argv=None):
         for p in procs:
             name = p["name"]
             try:
-                pool = val_pool_path(name, p, doc, a.seed)
-                chk = check_probe(name, p.get("physics"), pool, ref)
+                pool = val_pool_path(name, p, doc, a.seed, a.role)
+                chk = check_probe(name, p.get("physics"), pool, ref, backend=not a.sidecar_only)
             except Exception as e:
                 chk = {"probe": name, "status": "error", "error": repr(e)[:200]}
             counts[chk["status"]] = counts.get(chk["status"], 0) + 1
@@ -801,7 +806,9 @@ def main(argv=None):
                 fields[m["field"]] = fields.get(m["field"], 0) + 1
             if not a.quiet or chk["status"] != "ok":
                 print("PHYSICS_CHECK " + json.dumps(chk, default=str), flush=True)
-    print(json.dumps({"train": a.train, "probes": a.probes, "status": counts, "reference": refs,
+    print(json.dumps({"train": a.train, "probes": a.probes, "role": a.role, "sidecar_only": a.sidecar_only,
+                      "reference_sources": ref.sources, "reference_unreadable": len(ref.unreadable),
+                      "status": counts, "reference": refs,
                       "mismatching_fields": dict(sorted(fields.items(), key=lambda x: -x[1]))}))
 
 

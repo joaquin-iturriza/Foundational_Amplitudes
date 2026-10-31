@@ -309,6 +309,11 @@ def test_reference_from_sidecars():
     assert keep == [os.path.join(mg.WORK_DIR, "pp13_ddx_aag_standalone")], keep
     with_be = {c["probe"]: c["status"] for c in
                (pp.check_probe(n, None, f, pp.TrainingReference(TRAIN)) for n, f in probes.items())}
+    # sidecar-only (the check as it runs without the standalones, on a site that still has them): same verdicts
+    so = pp.TrainingReference(TRAIN, backend=False)
+    assert so.sources == {"sidecar": len(train)}, so.sources
+    assert {n: pp.check_probe(n, None, f, so, backend=False)["status"] for n, f in probes.items()} == with_be
+    assert pp.check_probe("pp13_gg_ttx", None, nosc, so, backend=False)["mismatches"][0]["field"] == "physics block"
     # the dry run lists every standalone but the kept one and deletes nothing
     all_sa = pp.standalone_dirs(mg.WORK_DIR)
     r = pp.prune_standalones(mg.WORK_DIR, keep, apply=False)
