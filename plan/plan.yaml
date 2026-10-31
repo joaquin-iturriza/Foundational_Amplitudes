@@ -5407,11 +5407,12 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: f3624f9c
+    commit: '85064616'
     paths:
     - analysis/agent_redesign/agent_tasks.json
     - analysis/agent_redesign/context_breakdown.json
     - analysis/agent_redesign/figs/context_breakdown.png
+    - analysis/agent_redesign/push_replay.json
     - analysis/agent_redesign/usage_report.json
     - analysis/agent_redesign/usage_report_v2.json
     - analysis/agent_redesign/usage_windows.json
@@ -5437,6 +5438,8 @@ entries:
       known_causes live in projects.toml, supervisor pickup not checked'
     - switch-overs A, B, D applied and committed (merge 2c7741c0, settings 84a15232); reply check fixed (d2c15a58); worktree
       removal script (d39af33d, 978b7179); supervisor summary-check fixes in ~/.local/bin/site, supervisor restarted 12:55
+    - tests/test_context_push.py
+    - tools/push_replay.py
   dead_ends: []
   asks:
   - ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
