@@ -2325,7 +2325,7 @@ entries:
       it is released)'
   owner:
     agent: acd8bbf4e51c1e6d4
-    state: working
+    state: closed
     since: '2026-10-31T03:56:15+00:00'
     context: 58695
     context_at: '2026-10-31T04:24:07+00:00'
@@ -2386,29 +2386,27 @@ entries:
     start: '2026-10-31T04:22:25+00:00'
     at: '2026-10-31T04:22:25+00:00'
   handoff:
-    state: 'Option (c) answered by its check (kshot_spread.py --check @aa5aff19, design passed after one FIX): a per-process
-      affine fitted on 1600 of a held-out multiplicity pool''s own events removes 0.012/0.017 of the gap (seeds 42/43), a
-      cubic in q 0.023/0.037, slope of t on q 1.008/1.006 (training 0.998/0.999): calibrated, not compressed; par:v4_lco_not''s
-      ''level and spread'' sentence needs correcting. Its K reads (slope vs offset at K 4/8/16; at K=16 shrunk slope f -0.112/-0.121
-      vs offset -0.115/-0.131, both below zero from the 1/K offset noise) run detached on the laptop (log ~/.local/share/ccorch/detached/20261031-044200_kshot_spread.log,
-      out analysis/catalog_v4/data/kshot_spread.json): read verdict(), write up in results.tex (new paragraph after par:v4_lco_not),
-      commit json. Option (b) (D216) design passed after one FIX: 147 new 2->4 candidates (recipes/gen_catalog_v4_multext.py
-      @263340ca), 4 seeds arm + rerun control (42-45), 28 GPU-h, read by multext_compare.py; first step running: MadGraph
-      existence check FA-ccin2p3-52345dd6 (output $SCRATCH/zz_v4_multext/checked.json). Next for (b): fetch checked.json,
-      convert accepted candidates to v3-style then v4 entries (gen_catalog_v3.write lines 222-250, gen_catalog_v4.tree_entry),
-      add a file to mg5_pipeline_final._load_catalog_v4, v4 string check (gen_catalog_v4.check only=), class check (tools/equal_processes.py,
-      reject any class with an H1/H2/H3 member or held-out-family parent), probe a few pools (job_catalog_v4_regen.sh V4REGEN_RECIPES),
-      build, sidecars, alphas, arm v4_dimensionless_muon_multext[_seedN] in job_catalog_v3_short.sh plus control reruns, 8
-      runs.'
-    decisions: (c) run under D178 priority (3); ceiling decides it (reviewer). (b) 4 seeds because the null spread of s per
-      pair is 0.09 (signext pairs 0.24); matched control rerun at the arm commit to exclude code drift; all 147 candidates
-      taken, none subsampled; u read in target units, no re-basing (zero_shot_parent.py:201-224).
-    ruled_out: a per-process affine or smooth function of q as a fix for the held-out multiplicity gap (ceiling 0.012-0.037
-      of it)
-    running: laptop detached kshot_spread read; CC census check FA-ccin2p3-52345dd6
-    files: analysis/catalog_v4/kshot_spread.py, analysis/catalog_v4/multext_compare.py, analysis/catalog_v4/data/multext_check_{signext,null}.json,
-      recipes/gen_catalog_v4_multext.py, recipes/catalog_v4_multext_candidates.json, scripts/job_catalog_v3_census.sh (CENSUS_ARGS)
-    written: '2026-10-31T03:55:06+00:00'
+    state: 'Held for the weekend by D220. Option (c) closed: par:v4_kshot_spread written and committed (a0e0dfa9, 6c43e0ef,
+      clarification bf4582db; verify_claims 0 problems). Option (b): MadGraph existence check FA-ccin2p3-52345dd6 done (E3223
+      acked): 125 of 147 candidates exist (22 gg->colourless(+h) have no tree); checked.json fetched to analysis/catalog_v4/data/multext_checked.json;
+      28 dropped as children of held-out families (v4_bbx_ccx, v4_ddx_wpwm, v4_bbx_gg), 97 kept (6qq 44, 6bq 20, 6ee 14, 6qg
+      8, 6bb 6, 6gg 3, 6bg 2), fewer than the design''s 147 and gg only +3: to report to Joaquin as a difference from the
+      design. Entries, recipe and class-check recipe written and committed at 07f2e008 (repo-reviewer passed). NOT submitted:
+      the v4 string and class check job scripts/job_catalog_v4_multext_check.sh (CPU 16 cores, 12 h; target multext_check
+      recorded 12 h x 1). On release: site sync ccin2p3 FA --allow-dirty (dirty files are other agents''; shape_gap.json and
+      tree_levels_mult_cand.json differ only by float noise), site pick FA --jobs 1 --gpus 0 --cpus 16 (offered lxplus; CC
+      has MG5 3.7.0 used by the existence check, so check MG5 on lxplus or route to ccin2p3 htc), submit with --item v3_prep_explore,
+      plan run, plan wait step 8. Then the reader rejecting any class with an H1/H2/H3 member, generation probe (job_catalog_v4_regen.sh
+      V4REGEN_RECIPES=recipes/catalog_v4_multext.yaml), build, sidecars, alphas, arm v4_dimensionless_muon_multext + matched
+      controls, seeds 42-45 (step 8 text still says 42/43), 28 GPU-h.'
+    decisions: Kept the design's own filters (MadGraph existence, no held-out-family child) though they cut 147 to 97; the
+      class check is the remaining filter. Nothing submitted after the D220 hold.
+    ruled_out: a per-process affine or smooth function of q (option c; ceiling 0.012-0.037 of the gap)
+    running: nothing
+    files: recipes/gen_catalog_v4_multext.py, recipes/catalog_v4_multext_processes.yaml, recipes/catalog_v4_multext.yaml,
+      recipes/catalog_v4_multext_classcheck.yaml, scripts/job_catalog_v4_multext_check.sh, analysis/catalog_v4/data/multext_checked.json,
+      mg5_pipeline_final.py, recipes/gen_catalog_v3.py
+    written: '2026-10-31T04:24:22+00:00'
   findings:
   - at: '2026-10-31T02:25:32+00:00'
     text: 'Label leakage passed review: the leave-class-out design (passed 2026-10-31) fed the scored event''s own target
