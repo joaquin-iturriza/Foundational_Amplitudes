@@ -326,16 +326,16 @@ def figure(out, out_dir=None):
     fig, (axa, axb) = ps.figure(ncols=2)
     ctl = out["arms"]["control"]["per_seed"]
     x = np.arange(1, 11)
-    for ax, v, xl in ((axa, "eta", r"decile of $\max|\eta|$"),
-                      (axb, "y", r"decile of $\log_{10}\min 2|p_i\cdot p_j|/\hat s$")):
+    for ax, v, xl in ((axa, "eta", r"decile of largest final $|\eta|$ (10 = forward)"),
+                      (axb, "y", r"decile of $\log_{10}\min 2p_i\cdot p_j/\hat s$ (1 = collinear)")):
         for seed, ls in (("seed42", "-"), ("seed43", "--")):
             b = ctl[seed]["where"]["PP4_trained"]["bins"][v]
             ax.plot(x, [z["med_s_norm"] for z in b], ls, color=ps.C.vermillion, marker="o",
-                    label=rf"median $s$, seed {seed[-2:]}")
+                    label=rf"predicted $\sigma$, median (seed {seed[-2:]})")
             ax.plot(x, [z["rmse_norm"] for z in b], ls, color=ps.C.blue, marker="s",
-                    label=rf"RMSE$(q-t)$, seed {seed[-2:]}")
+                    label=rf"actual error, RMS (seed {seed[-2:]})")
         ax.set_xlabel(xl)
-        ax.set_ylabel("over the probe's own")
+        ax.set_ylabel("bin / whole probe")
     ps.legend(axa, "upper left")
     ps.save(fig, os.path.join(out_dir or os.path.join(HERE, "figs"), "het_where"))
 
