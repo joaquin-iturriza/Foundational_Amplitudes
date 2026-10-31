@@ -152,6 +152,9 @@ Roles
 - A compaction inside an owner's turn is a finding (its brief or scope was too large): `plan finding <entry>`, and the
   next brief is narrowed.
 - Delegated work goes to a fresh agent with a written brief, never a fork.
+- Mechanical steps (requeue or resubmit a job, read a log and ack, check a count, collect, sync and submit an
+  already-designed job, small tool fixes) go to a `mechanical-worker` agent (Sonnet) [D213]; anything needing judgment
+  stays on the default model.
 
 Briefs
 - `plan brief <entry>` fills `plan/step_prompt.txt` with the entry; the main session's addition goes in its narrowing

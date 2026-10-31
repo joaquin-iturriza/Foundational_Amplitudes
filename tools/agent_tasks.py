@@ -190,6 +190,33 @@ def git_log(since):
     return out
 
 
+MECH_TYPE, MECH_SINCE, MECH_N, MECH_K = "mechanical-worker", "2026-10-31T02:47", 30, 5   # D213: first 30, revert at 5
+
+
+def mechanical_report(rows, out, event=None):
+    """The first MECH_N mechanical-worker tasks by start, each stood or failed as scored above (corrections seen so
+    far; a task under 48 h old may still fail later); at MECH_K failures among them one ALERT (key mechanical_revert:
+    revert mechanical steps to Opus at low effort, D213), raised once by `site event`."""
+    mech = sorted((r for r in rows if r["type"] == MECH_TYPE), key=lambda r: r["start"])[:MECH_N]
+    failed = [r for r in mech if not r["stood"]]
+    rep = {"rule": "D213: first %d mechanical-worker tasks, revert at %d failures" % (MECH_N, MECH_K),
+           "tasks": len(mech), "failed": len(failed), "alert": len(failed) >= MECH_K,
+           "models": sorted({r["model"] for r in mech}),
+           "rows": [{k: r[k] for k in ("agent", "model", "start", "end", "description", "stood", "corrections", "usd",
+                                      "rework_usd")} for r in mech]}
+    json.dump(rep, open(os.path.join(ROOT, out), "w"), indent=1, default=list)
+    print("mechanical-worker: %d of the first %d tasks, %d failed (revert at %d)%s" % (
+        len(mech), MECH_N, len(failed), MECH_K, ": ALERT" if rep["alert"] else ""))
+    if rep["alert"]:
+        site = event or os.environ.get("MECH_SITE", "site")
+        subprocess.run([site, "event", "--project", "FA", "--kind", "ALERT", "--item", "agent_redesign",
+                        "--key", "mechanical_revert", "--msg",
+                        "%d of the first %d mechanical-worker (Sonnet) tasks failed (%s): D213's revert rule says "
+                        "mechanical steps go back to Opus at low effort; analysis/agent_redesign/mechanical_watch.json"
+                        % (len(failed), len(mech), ", ".join(r["agent"] for r in failed))])
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--since", default="2026-09-01")
@@ -197,7 +224,16 @@ def main():
     ap.add_argument("--sample", type=int, default=5)
     ap.add_argument("--scored-before", default="2026-10-29T00:00", help="score only tasks ending before (48 h follow-up)")
     ap.add_argument("--seed", type=int, default=0, help="seed of the hand-check sample")
+    ap.add_argument("--mechanical", action="store_true",
+                    help="D213's live check: only mechanical-worker tasks (and the reviewers that may correct them) "
+                         "since the switch; corrections seen so far count; ALERT at %d failures among the first %d" % (
+                             MECH_K, MECH_N))
     a = ap.parse_args()
+    if a.mechanical:
+        a.since, a.scored_before = max(a.since, MECH_SINCE), "9999"
+        a.out = a.out if a.out != ap.get_default("out") else "analysis/agent_redesign/mechanical_watch.json"
+        subprocess.run([sys.executable, os.path.join(ROOT, "tools", "usage_windows.py"), "extract"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     calls = [c for c in uw.load() if c["agent"]]
     by_agent = defaultdict(list)
     for c in calls:
@@ -205,7 +241,9 @@ def main():
     metas = {os.path.basename(f)[6:-10]: json.load(open(f))
              for f in glob.glob(uw.PROJ + "/*/*/subagents/agent-*.meta.json")}
     agent_files = {os.path.basename(f)[6:-6]: f for f in glob.glob(uw.PROJ + "/*/*/subagents/agent-*.jsonl")}
-    scans = {k: scan_agent(f) for k, f in agent_files.items() if k in by_agent and by_agent[k][0]["ts"] >= a.since}
+    keep = (lambda k: metas.get(k, {}).get("agentType") in REVIEWERS | {MECH_TYPE}) if a.mechanical else (lambda k: True)
+    scans = {k: scan_agent(f) for k, f in agent_files.items()
+             if k in by_agent and by_agent[k][0]["ts"] >= a.since and keep(k)}
     mains = [scan_main(f) for f in glob.glob(uw.PROJ + "/-home-joaquin-work-FA*/*.jsonl")]
     # who launched whom: tool_use id of the launch -> launcher (agent id or "main")
     launcher, effort = {}, {}
@@ -304,6 +342,8 @@ def main():
                      "parent": parent.get(k), "description": metas.get(k, {}).get("description"),
                      "files": sorted(files)[:20], "commits": sorted(mine), "stood": not corr, "corrections": corr,
                      "rework_usd": round(sum(c["rework_usd"] for c in corr), 3)})
+    if a.mechanical:
+        return mechanical_report(rows, a.out)
     fam = lambda r: ("opus" + ("-low" if r["effort"] == "low" else "") if "opus" in r["model"] else
                      "sonnet" if "sonnet" in r["model"] else "haiku" if "haiku" in r["model"] else r["model"])
     # size band: terciles of brief length within each kind (known before the task runs)
