@@ -1,0 +1,327 @@
+{
+ "design": "plan catalog_coverage step 15 (het), passed 2026-10-31T04:56",
+ "runs": {
+  "default50": {
+   "PP4": [
+    "FA-ccin2p3-466656b2",
+    "FA-ccin2p3-9897833d"
+   ],
+   "EE4": [
+    "FA-ccin2p3-466656b2",
+    "FA-ccin2p3-9897833d"
+   ],
+   "held": [
+    "FA-ccin2p3-466656b2",
+    "FA-ccin2p3-9897833d"
+   ]
+  },
+  "default25": {
+   "PP4": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ],
+   "EE4": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ],
+   "held": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ]
+  },
+  "control": {
+   "PP4": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ],
+   "EE4": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ],
+   "held": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ]
+  }
+ },
+ "missing_reads": [
+  "default25 EE4 FA-ccin2p3-df858d33",
+  "default25 EE4 FA-ccin2p3-f0156d88",
+  "default50 EE4 FA-ccin2p3-466656b2",
+  "default50 EE4 FA-ccin2p3-9897833d"
+ ],
+ "shares": {
+  "default50": {
+   "default": {
+    "sources": [
+     "PP4",
+     "EE4"
+    ],
+    "hd4_missing": [
+     "default50 HD4",
+     "control HD4"
+    ],
+    "n_probes_control": 558,
+    "n_probes_read": 224,
+    "probes_missing": [
+     "('EE4', 'ee4_epem_aabbx')",
+     "('EE4', 'ee4_epem_aattx')",
+     "('EE4', 'ee4_epem_aavevex')",
+     "('EE4', 'ee4_epem_abbxg')",
+     "('EE4', 'ee4_epem_abbxh')",
+     "('EE4', 'ee4_epem_abtxwp')",
+     "('EE4', 'ee4_epem_acsxwm')",
+     "('EE4', 'ee4_epem_agttx')",
+     "('EE4', 'ee4_epem_ahmupmum')",
+     "('EE4', 'ee4_epem_ahttx')",
+     "('EE4', 'ee4_epem_ahvmvmx')",
+     "('EE4', 'ee4_epem_ahwpwm')",
+     "('EE4', 'ee4_epem_attx')",
+     "('EE4', 'ee4_epem_attxz')",
+     "('EE4', 'ee4_epem_bbxgg')",
+     "('EE4', 'ee4_epem_bbxgh')",
+     "('EE4', 'ee4_epem_bbxhz')",
+     "('EE4', 'ee4_epem_bbxttx')",
+     "('EE4', 'ee4_epem_bbxvmvmx')",
+     "('EE4', 'ee4_epem_bgtxwp')"
+    ],
+    "pooled": {
+     "R": 0.7451,
+     "n_classes": 224,
+     "boot95": [
+      0.649,
+      0.8121
+     ],
+     "widened": [
+      0.5542,
+      0.9511
+     ],
+     "frac_classes_below_1": 0.7098,
+     "n_probes": 224,
+     "R_seed": 1.1711
+    },
+    "H1": {
+     "R": 0.3843,
+     "n_classes": 28,
+     "boot95": [
+      0.3354,
+      0.5172
+     ],
+     "widened": [
+      0.3035,
+      0.5716
+     ],
+     "frac_classes_below_1": 0.8929,
+     "n_probes": 28,
+     "R_seed": 1.1051
+    },
+    "H2": {
+     "R": 0.6046,
+     "n_classes": 103,
+     "boot95": [
+      0.4846,
+      0.741
+     ],
+     "widened": [
+      0.4279,
+      0.8391
+     ],
+     "frac_classes_below_1": 0.7379,
+     "n_probes": 103,
+     "R_seed": 1.1324
+    },
+    "H3": {
+     "R": 0.9104,
+     "n_classes": 93,
+     "boot95": [
+      0.8228,
+      0.9776
+     ],
+     "widened": [
+      0.6597,
+      1.2194
+     ],
+     "frac_classes_below_1": 0.6237,
+     "n_probes": 93,
+     "R_seed": 1.2473
+    }
+   },
+   "catalog_sampled": {
+    "same_classes": {
+     "R": 1.1661,
+     "n_classes": 224,
+     "boot95": [
+      1.1213,
+      1.2169
+     ],
+     "widened": [
+      0.8451,
+      1.6145
+     ],
+     "frac_classes_below_1": 0.2411,
+     "n_probes": 224,
+     "R_seed": 1.3268
+    },
+    "no_default_pool": {
+     "R": 1.2654,
+     "n_classes": 143,
+     "boot95": [
+      1.2052,
+      1.3339
+     ],
+     "widened": [
+      0.9955,
+      1.6148
+     ],
+     "frac_classes_below_1": 0.2168,
+     "n_probes": 143,
+     "R_seed": 1.2106
+    }
+   },
+   "axes_without_default_pool": [
+    "H2",
+    "H2p5",
+    "H5",
+    "H6",
+    "H7E",
+    "H7c"
+   ]
+  },
+  "default25": {
+   "default": {
+    "sources": [
+     "PP4",
+     "EE4"
+    ],
+    "hd4_missing": [
+     "default25 HD4",
+     "control HD4"
+    ],
+    "n_probes_control": 558,
+    "n_probes_read": 395,
+    "probes_missing": [
+     "('EE4', 'ee4_epem_aabbx')",
+     "('EE4', 'ee4_epem_aattx')",
+     "('EE4', 'ee4_epem_aavevex')",
+     "('EE4', 'ee4_epem_abbxg')",
+     "('EE4', 'ee4_epem_abbxh')",
+     "('EE4', 'ee4_epem_abtxwp')",
+     "('EE4', 'ee4_epem_acsxwm')",
+     "('EE4', 'ee4_epem_agttx')",
+     "('EE4', 'ee4_epem_ahmupmum')",
+     "('EE4', 'ee4_epem_ahttx')",
+     "('EE4', 'ee4_epem_ahvmvmx')",
+     "('EE4', 'ee4_epem_ahwpwm')",
+     "('EE4', 'ee4_epem_attx')",
+     "('EE4', 'ee4_epem_attxz')",
+     "('EE4', 'ee4_epem_bbxgg')",
+     "('EE4', 'ee4_epem_bbxgh')",
+     "('EE4', 'ee4_epem_bbxhz')",
+     "('EE4', 'ee4_epem_bbxttx')",
+     "('EE4', 'ee4_epem_bbxvmvmx')",
+     "('EE4', 'ee4_epem_bgtxwp')"
+    ],
+    "pooled": {
+     "R": 0.6787,
+     "n_classes": 395,
+     "boot95": [
+      0.6288,
+      0.7103
+     ],
+     "widened": [
+      0.4904,
+      0.9108
+     ],
+     "frac_classes_below_1": 0.8228,
+     "n_probes": 395,
+     "R_seed": 1.2823
+    },
+    "H1": {
+     "R": 0.4423,
+     "n_classes": 46,
+     "boot95": [
+      0.3636,
+      0.4946
+     ],
+     "widened": [
+      0.293,
+      0.6136
+     ],
+     "frac_classes_below_1": 0.9348,
+     "n_probes": 46,
+     "R_seed": 1.2408
+    },
+    "H2": {
+     "R": 0.4864,
+     "n_classes": 157,
+     "boot95": [
+      0.4308,
+      0.5252
+     ],
+     "widened": [
+      0.3508,
+      0.645
+     ],
+     "frac_classes_below_1": 0.8981,
+     "n_probes": 157,
+     "R_seed": 1.2281
+    },
+    "H3": {
+     "R": 0.8194,
+     "n_classes": 192,
+     "boot95": [
+      0.7613,
+      0.8506
+     ],
+     "widened": [
+      0.5877,
+      1.1019
+     ],
+     "frac_classes_below_1": 0.7344,
+     "n_probes": 192,
+     "R_seed": 1.2954
+    }
+   },
+   "catalog_sampled": {
+    "same_classes": {
+     "R": 0.8981,
+     "n_classes": 395,
+     "boot95": [
+      0.8728,
+      0.9223
+     ],
+     "widened": [
+      0.6659,
+      1.2088
+     ],
+     "frac_classes_below_1": 0.6684,
+     "n_probes": 395,
+     "R_seed": 1.3107
+    },
+    "no_default_pool": {
+     "R": 0.9842,
+     "n_classes": 143,
+     "boot95": [
+      0.9556,
+      1.0169
+     ],
+     "widened": [
+      0.7894,
+      1.231
+     ],
+     "frac_classes_below_1": 0.5664,
+     "n_probes": 143,
+     "R_seed": 1.2106
+    }
+   },
+   "axes_without_default_pool": [
+    "H2",
+    "H2p5",
+    "H5",
+    "H6",
+    "H7E",
+    "H7c"
+   ]
+  }
+ }
+}

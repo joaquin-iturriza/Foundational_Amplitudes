@@ -430,10 +430,13 @@ def heldout_default(het=False):
         hk = sorted(set(harm) & set(hctl), key=str)
         hc = reads["control"]["held"]
         same = [k for k in hk if cls(k[1]) in have]
+        # classes with a default-sampled pool: the control's PP4/EE4 held-out probes (its reads are complete), plus
+        # those read (HD4); a pooled class an arm's cut read missed is in neither group (listed in probes_missing)
+        pooled = have | {cls(p) for r in ("PP4", "EE4") for x in reads["control"][r] for p in x if cls(p) in ax_of}
         res["catalog_sampled"] = {
             "same_classes": compare(harm, hctl, hc[0], hc[1], same, cls) if same else None,
-            "no_default_pool": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) not in have], cls)}
-        res["axes_without_default_pool"] = sorted({ax for c, ax in ax_of.items() if c not in have})
+            "no_default_pool": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) not in pooled], cls)}
+        res["axes_without_default_pool"] = sorted({ax for c, ax in ax_of.items() if c not in pooled})
         out["shares"][a] = res
     name = "mixture_heldout_default_het.json" if het else "mixture_heldout_default.json"
     json.dump(out, open(os.path.join(DATA, name), "w"), indent=1)

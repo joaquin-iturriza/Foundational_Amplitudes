@@ -1,0 +1,1058 @@
+{
+ "design": "plan catalog_coverage step 15, passed 2026-10-31T04:56 (het loss)",
+ "runs": {
+  "default50": {
+   "PP4": [
+    "FA-ccin2p3-466656b2",
+    "FA-ccin2p3-9897833d"
+   ],
+   "EE4": [
+    "FA-ccin2p3-466656b2",
+    "FA-ccin2p3-9897833d"
+   ],
+   "held": [
+    "FA-ccin2p3-466656b2",
+    "FA-ccin2p3-9897833d"
+   ]
+  },
+  "default25": {
+   "PP4": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ],
+   "EE4": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ],
+   "held": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ]
+  },
+  "control": {
+   "PP4": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ],
+   "EE4": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ],
+   "held": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ]
+  }
+ },
+ "missing_reads": [
+  "default25 EE4 FA-ccin2p3-df858d33",
+  "default25 EE4 FA-ccin2p3-f0156d88",
+  "default50 EE4 FA-ccin2p3-466656b2",
+  "default50 EE4 FA-ccin2p3-9897833d"
+ ],
+ "probes_missing": {
+  "default50 PP4": {
+   "seed42": {
+    "n": 529,
+    "of": 1301,
+    "first": [
+     "pp13v4_dbx_adtxwp",
+     "pp13v4_dbx_agtxu",
+     "pp13v4_dbx_ahtxu",
+     "pp13v4_dbx_atxu",
+     "pp13v4_dbx_atxuz",
+     "pp13v4_dbx_bbxbxd",
+     "pp13v4_dbx_bbxtxu",
+     "pp13v4_dbx_bxdepem",
+     "pp13v4_dbx_bxdg",
+     "pp13v4_dbx_bxdgg"
+    ]
+   },
+   "seed43": {
+    "n": 393,
+    "of": 1301,
+    "first": [
+     "pp13v4_dg_duuxz",
+     "pp13v4_dg_uuuxwm",
+     "pp13v4_ds_acdwm",
+     "pp13v4_ds_adsz",
+     "pp13v4_ds_bbxds",
+     "pp13v4_ds_cdgwm",
+     "pp13v4_ds_cdhwm",
+     "pp13v4_ds_cdwm",
+     "pp13v4_ds_cdwmz",
+     "pp13v4_ds_dggs"
+    ]
+   }
+  },
+  "default50 EE4": {
+   "seed42": {
+    "n": 169,
+    "of": 169,
+    "first": [
+     "ee4_epem_aabbx",
+     "ee4_epem_aaccx",
+     "ee4_epem_aaepem",
+     "ee4_epem_aamupmum",
+     "ee4_epem_aataptam",
+     "ee4_epem_aattx",
+     "ee4_epem_aavevex",
+     "ee4_epem_aavmvmx",
+     "ee4_epem_aawpwm",
+     "ee4_epem_abbx"
+    ]
+   },
+   "seed43": {
+    "n": 169,
+    "of": 169,
+    "first": [
+     "ee4_epem_aabbx",
+     "ee4_epem_aaccx",
+     "ee4_epem_aaepem",
+     "ee4_epem_aamupmum",
+     "ee4_epem_aataptam",
+     "ee4_epem_aattx",
+     "ee4_epem_aavevex",
+     "ee4_epem_aavmvmx",
+     "ee4_epem_aawpwm",
+     "ee4_epem_abbx"
+    ]
+   }
+  },
+  "default25 PP4": {
+   "seed42": {
+    "n": 246,
+    "of": 1301,
+    "first": [
+     "pp13v4_ud_aduz",
+     "pp13v4_ud_auuwm",
+     "pp13v4_ud_bbxdu",
+     "pp13v4_ud_dddxu",
+     "pp13v4_ud_ddgwp",
+     "pp13v4_ud_ddhwp",
+     "pp13v4_ud_ddwp",
+     "pp13v4_ud_ddwpz",
+     "pp13v4_ud_depemu",
+     "pp13v4_ud_dggu"
+    ]
+   },
+   "seed43": {
+    "n": 172,
+    "of": 1301,
+    "first": [
+     "pp13v4_udx_dxhuz",
+     "pp13v4_udx_dxu",
+     "pp13v4_udx_dxuuux",
+     "pp13v4_udx_dxuvevex",
+     "pp13v4_udx_dxuz",
+     "pp13v4_udx_dxuzz",
+     "pp13v4_udx_epuuxve",
+     "pp13v4_udx_gssxwp",
+     "pp13v4_udx_gttxwp",
+     "pp13v4_udx_guuxwp"
+    ]
+   }
+  },
+  "default25 EE4": {
+   "seed42": {
+    "n": 169,
+    "of": 169,
+    "first": [
+     "ee4_epem_aabbx",
+     "ee4_epem_aaccx",
+     "ee4_epem_aaepem",
+     "ee4_epem_aamupmum",
+     "ee4_epem_aataptam",
+     "ee4_epem_aattx",
+     "ee4_epem_aavevex",
+     "ee4_epem_aavmvmx",
+     "ee4_epem_aawpwm",
+     "ee4_epem_abbx"
+    ]
+   },
+   "seed43": {
+    "n": 169,
+    "of": 169,
+    "first": [
+     "ee4_epem_aabbx",
+     "ee4_epem_aaccx",
+     "ee4_epem_aaepem",
+     "ee4_epem_aamupmum",
+     "ee4_epem_aataptam",
+     "ee4_epem_aattx",
+     "ee4_epem_aavevex",
+     "ee4_epem_aavmvmx",
+     "ee4_epem_aawpwm",
+     "ee4_epem_abbx"
+    ]
+   }
+  }
+ },
+ "rule": "GAIN R <= 0.9 with the widened interval below 1 on PP4 (all classes) and EE4 (all); NO LOSS the pooled held-out widened upper end below 1.05; LOSS pooled R >= 1.05 with the widened interval above 1; WIN = GAIN and NO LOSS; het: the held-out cost on default-sampled events (held_default: the PP4/EE4 probes of the held-out classes, and HD4 once read), the catalog-sampled read (held) beside",
+ "shares": {
+  "default50": {
+   "PP4": {
+    "all": {
+     "R": 0.4774,
+     "n_classes": 772,
+     "boot95": [
+      0.4418,
+      0.5295
+     ],
+     "widened": [
+      0.3969,
+      0.5894
+     ],
+     "frac_classes_below_1": 0.842,
+     "n_probes": 772,
+     "R_seed": 1.1131
+    },
+    "trained": {
+     "R": 0.3972,
+     "n_classes": 548,
+     "boot95": [
+      0.3475,
+      0.4407
+     ],
+     "widened": [
+      0.3158,
+      0.485
+     ],
+     "frac_classes_below_1": 0.896,
+     "n_probes": 548,
+     "R_seed": 1.1004
+    },
+    "not_trained": {
+     "R": 0.7451,
+     "n_classes": 224,
+     "boot95": [
+      0.649,
+      0.8121
+     ],
+     "widened": [
+      0.5542,
+      0.9511
+     ],
+     "frac_classes_below_1": 0.7098,
+     "n_probes": 224,
+     "R_seed": 1.1711
+    },
+    "seeds_read": [
+     "FA-ccin2p3-466656b2",
+     "FA-ccin2p3-9897833d"
+    ],
+    "probes_unmatched": [
+     "pp13v4_dbx_adtxwp",
+     "pp13v4_dbx_agtxu",
+     "pp13v4_dbx_ahtxu",
+     "pp13v4_dbx_atxu",
+     "pp13v4_dbx_atxuz",
+     "pp13v4_dbx_bbxbxd",
+     "pp13v4_dbx_bbxtxu",
+     "pp13v4_dbx_bxdepem",
+     "pp13v4_dbx_bxdg",
+     "pp13v4_dbx_bxdgg",
+     "pp13v4_dbx_bxdgh",
+     "pp13v4_dbx_bxdgz",
+     "pp13v4_dbx_bxdhz",
+     "pp13v4_dbx_bxduux",
+     "pp13v4_dbx_bxdvevex",
+     "pp13v4_dbx_bxdz",
+     "pp13v4_dbx_bxdzz",
+     "pp13v4_dbx_bxguwm",
+     "pp13v4_dbx_bxhuwm",
+     "pp13v4_dbx_bxuwm",
+     "pp13v4_dbx_bxuwmz",
+     "pp13v4_dbx_ddxtxu",
+     "pp13v4_dbx_dgtxwp",
+     "pp13v4_dbx_dhtxwp",
+     "pp13v4_dbx_dtxwp",
+     "pp13v4_dbx_dtxwpz",
+     "pp13v4_dbx_epemtxu",
+     "pp13v4_dbx_ggtxu",
+     "pp13v4_dbx_ghtxu",
+     "pp13v4_dbx_gtxu",
+     "pp13v4_dbx_gtxuz",
+     "pp13v4_dbx_hhtxu",
+     "pp13v4_dbx_htxu",
+     "pp13v4_dbx_htxuz",
+     "pp13v4_dbx_txu",
+     "pp13v4_dbx_txuuux",
+     "pp13v4_dbx_txuvevex",
+     "pp13v4_dbx_txuz",
+     "pp13v4_dbx_txuzz",
+     "pp13v4_dd_add",
+     "pp13v4_dd_aduwm",
+     "pp13v4_dd_dduux",
+     "pp13v4_dd_dguwm",
+     "pp13v4_dd_dhuwm",
+     "pp13v4_dd_duwm",
+     "pp13v4_dd_duwmz",
+     "pp13v4_ddx_aattx",
+     "pp13v4_ddx_aauux",
+     "pp13v4_ddx_abtxwp",
+     "pp13v4_ddx_accxg"
+    ],
+    "n_probes_unmatched": 529
+   },
+   "EE4": {
+    "seeds_read": [],
+    "probes_unmatched": [
+     "ee4_epem_aabbx",
+     "ee4_epem_aaccx",
+     "ee4_epem_aaepem",
+     "ee4_epem_aamupmum",
+     "ee4_epem_aataptam",
+     "ee4_epem_aattx",
+     "ee4_epem_aavevex",
+     "ee4_epem_aavmvmx",
+     "ee4_epem_aawpwm",
+     "ee4_epem_abbx",
+     "ee4_epem_abbxg",
+     "ee4_epem_abbxh",
+     "ee4_epem_abbxz",
+     "ee4_epem_abtxwp",
+     "ee4_epem_accx",
+     "ee4_epem_accxg",
+     "ee4_epem_accxh",
+     "ee4_epem_accxz",
+     "ee4_epem_acsxwm",
+     "ee4_epem_aepem",
+     "ee4_epem_aepemh",
+     "ee4_epem_aepemz",
+     "ee4_epem_aepvewm",
+     "ee4_epem_agttx",
+     "ee4_epem_ahmupmum",
+     "ee4_epem_ahtaptam",
+     "ee4_epem_ahttx",
+     "ee4_epem_ahvevex",
+     "ee4_epem_ahvmvmx",
+     "ee4_epem_ahwpwm",
+     "ee4_epem_amupmum",
+     "ee4_epem_amupmumz",
+     "ee4_epem_amupvmwm",
+     "ee4_epem_ataptam",
+     "ee4_epem_ataptamz",
+     "ee4_epem_atapvtwm",
+     "ee4_epem_attx",
+     "ee4_epem_attxz",
+     "ee4_epem_avevex",
+     "ee4_epem_avevexz",
+     "ee4_epem_avmvmx",
+     "ee4_epem_avmvmxz",
+     "ee4_epem_awpwm",
+     "ee4_epem_awpwmz",
+     "ee4_epem_azzz",
+     "ee4_epem_bbbxbx",
+     "ee4_epem_bbxccx",
+     "ee4_epem_bbxddx",
+     "ee4_epem_bbxepem",
+     "ee4_epem_bbxg"
+    ],
+    "n_probes_unmatched": 169
+   },
+   "held": {
+    "pooled": {
+     "R": 1.144,
+     "n_classes": 701,
+     "boot95": [
+      1.1213,
+      1.1747
+     ],
+     "widened": [
+      0.8943,
+      1.4729
+     ],
+     "frac_classes_below_1": 0.2867,
+     "n_probes": 701,
+     "R_seed": 1.2538
+    },
+    "H1": {
+     "R": 1.1136,
+     "n_classes": 62,
+     "boot95": [
+      1.0043,
+      1.2531
+     ],
+     "widened": [
+      0.8084,
+      1.5567
+     ],
+     "frac_classes_below_1": 0.3871,
+     "n_probes": 62,
+     "R_seed": 1.2423
+    },
+    "H2": {
+     "R": 1.1345,
+     "n_classes": 218,
+     "boot95": [
+      1.1109,
+      1.1717
+     ],
+     "widened": [
+      0.8511,
+      1.5294
+     ],
+     "frac_classes_below_1": 0.2294,
+     "n_probes": 218,
+     "R_seed": 1.3053
+    },
+    "H2p5": {
+     "R": 1.265,
+     "n_classes": 38,
+     "boot95": [
+      1.1364,
+      1.3098
+     ],
+     "widened": [
+      0.9261,
+      1.6072
+     ],
+     "frac_classes_below_1": 0.1316,
+     "n_probes": 38,
+     "R_seed": 1.2271
+    },
+    "H3": {
+     "R": 1.1024,
+     "n_classes": 279,
+     "boot95": [
+      1.0727,
+      1.148
+     ],
+     "widened": [
+      0.8774,
+      1.4035
+     ],
+     "frac_classes_below_1": 0.3441,
+     "n_probes": 279,
+     "R_seed": 1.2226
+    },
+    "H5": {
+     "R": 0.9792,
+     "n_classes": 28,
+     "boot95": [
+      0.8932,
+      1.11
+     ],
+     "widened": [
+      0.8865,
+      1.1183
+     ],
+     "frac_classes_below_1": 0.5714,
+     "n_probes": 28,
+     "R_seed": 1.0075
+    },
+    "H6": {
+     "R": 1.0157,
+     "n_classes": 8,
+     "boot95": [
+      0.9015,
+      1.313
+     ],
+     "widened": [
+      0.5876,
+      2.0142
+     ],
+     "frac_classes_below_1": 0.375,
+     "n_probes": 8,
+     "R_seed": 1.5341
+    },
+    "H7E": {
+     "R": 1.3603,
+     "n_classes": 34,
+     "boot95": [
+      1.2483,
+      1.4373
+     ],
+     "widened": [
+      0.9801,
+      1.8307
+     ],
+     "frac_classes_below_1": 0.1176,
+     "n_probes": 34,
+     "R_seed": 1.2737
+    },
+    "H7c": {
+     "R": 1.5065,
+     "n_classes": 34,
+     "boot95": [
+      1.3591,
+      1.6389
+     ],
+     "widened": [
+      1.1445,
+      1.9461
+     ],
+     "frac_classes_below_1": 0.0882,
+     "n_probes": 34,
+     "R_seed": 1.1875
+    },
+    "seeds_read": [
+     "FA-ccin2p3-466656b2",
+     "FA-ccin2p3-9897833d"
+    ],
+    "probes_unmatched": [],
+    "n_probes_unmatched": 0
+   },
+   "gain": null,
+   "cost": null,
+   "wins": null
+  },
+  "default25": {
+   "PP4": {
+    "all": {
+     "R": 0.4593,
+     "n_classes": 1055,
+     "boot95": [
+      0.4263,
+      0.4857
+     ],
+     "widened": [
+      0.3684,
+      0.562
+     ],
+     "frac_classes_below_1": 0.9052,
+     "n_probes": 1055,
+     "R_seed": 1.1572
+    },
+    "trained": {
+     "R": 0.353,
+     "n_classes": 660,
+     "boot95": [
+      0.3269,
+      0.3892
+     ],
+     "widened": [
+      0.2936,
+      0.4333
+     ],
+     "frac_classes_below_1": 0.9545,
+     "n_probes": 660,
+     "R_seed": 1.1134
+    },
+    "not_trained": {
+     "R": 0.6787,
+     "n_classes": 395,
+     "boot95": [
+      0.6288,
+      0.7103
+     ],
+     "widened": [
+      0.4904,
+      0.9108
+     ],
+     "frac_classes_below_1": 0.8228,
+     "n_probes": 395,
+     "R_seed": 1.2823
+    },
+    "seeds_read": [
+     "FA-ccin2p3-f0156d88",
+     "FA-ccin2p3-df858d33"
+    ],
+    "probes_unmatched": [
+     "pp13v4_ud_aduz",
+     "pp13v4_ud_auuwm",
+     "pp13v4_ud_bbxdu",
+     "pp13v4_ud_dddxu",
+     "pp13v4_ud_ddgwp",
+     "pp13v4_ud_ddhwp",
+     "pp13v4_ud_ddwp",
+     "pp13v4_ud_ddwpz",
+     "pp13v4_ud_depemu",
+     "pp13v4_ud_dggu",
+     "pp13v4_ud_dgu",
+     "pp13v4_ud_dguz",
+     "pp13v4_ud_dhuz",
+     "pp13v4_ud_du",
+     "pp13v4_ud_duuux",
+     "pp13v4_ud_duvevex",
+     "pp13v4_ud_duz",
+     "pp13v4_ud_duzz",
+     "pp13v4_ud_huuwm",
+     "pp13v4_ud_uuwmz",
+     "pp13v4_udx_aabxt",
+     "pp13v4_udx_aadxu",
+     "pp13v4_udx_abbxwp",
+     "pp13v4_udx_abxgt",
+     "pp13v4_udx_abxht",
+     "pp13v4_udx_abxt",
+     "pp13v4_udx_abxtz",
+     "pp13v4_udx_accxwp",
+     "pp13v4_udx_addxwp",
+     "pp13v4_udx_adxgu",
+     "pp13v4_udx_adxu",
+     "pp13v4_udx_adxuz",
+     "pp13v4_udx_assxwp",
+     "pp13v4_udx_attxwp",
+     "pp13v4_udx_auuxwp",
+     "pp13v4_udx_bbxbxt",
+     "pp13v4_udx_bbxcsx",
+     "pp13v4_udx_bbxdxu",
+     "pp13v4_udx_bbxepve",
+     "pp13v4_udx_bbxgwp",
+     "pp13v4_udx_bbxhwp",
+     "pp13v4_udx_bbxtapvt",
+     "pp13v4_udx_bbxwp",
+     "pp13v4_udx_bbxwpz",
+     "pp13v4_udx_bxddxt",
+     "pp13v4_udx_bxepemt",
+     "pp13v4_udx_bxggt",
+     "pp13v4_udx_bxght",
+     "pp13v4_udx_bxgt",
+     "pp13v4_udx_bxgtz"
+    ],
+    "n_probes_unmatched": 246
+   },
+   "EE4": {
+    "seeds_read": [],
+    "probes_unmatched": [
+     "ee4_epem_aabbx",
+     "ee4_epem_aaccx",
+     "ee4_epem_aaepem",
+     "ee4_epem_aamupmum",
+     "ee4_epem_aataptam",
+     "ee4_epem_aattx",
+     "ee4_epem_aavevex",
+     "ee4_epem_aavmvmx",
+     "ee4_epem_aawpwm",
+     "ee4_epem_abbx",
+     "ee4_epem_abbxg",
+     "ee4_epem_abbxh",
+     "ee4_epem_abbxz",
+     "ee4_epem_abtxwp",
+     "ee4_epem_accx",
+     "ee4_epem_accxg",
+     "ee4_epem_accxh",
+     "ee4_epem_accxz",
+     "ee4_epem_acsxwm",
+     "ee4_epem_aepem",
+     "ee4_epem_aepemh",
+     "ee4_epem_aepemz",
+     "ee4_epem_aepvewm",
+     "ee4_epem_agttx",
+     "ee4_epem_ahmupmum",
+     "ee4_epem_ahtaptam",
+     "ee4_epem_ahttx",
+     "ee4_epem_ahvevex",
+     "ee4_epem_ahvmvmx",
+     "ee4_epem_ahwpwm",
+     "ee4_epem_amupmum",
+     "ee4_epem_amupmumz",
+     "ee4_epem_amupvmwm",
+     "ee4_epem_ataptam",
+     "ee4_epem_ataptamz",
+     "ee4_epem_atapvtwm",
+     "ee4_epem_attx",
+     "ee4_epem_attxz",
+     "ee4_epem_avevex",
+     "ee4_epem_avevexz",
+     "ee4_epem_avmvmx",
+     "ee4_epem_avmvmxz",
+     "ee4_epem_awpwm",
+     "ee4_epem_awpwmz",
+     "ee4_epem_azzz",
+     "ee4_epem_bbbxbx",
+     "ee4_epem_bbxccx",
+     "ee4_epem_bbxddx",
+     "ee4_epem_bbxepem",
+     "ee4_epem_bbxg"
+    ],
+    "n_probes_unmatched": 169
+   },
+   "held": {
+    "pooled": {
+     "R": 0.9312,
+     "n_classes": 701,
+     "boot95": [
+      0.9094,
+      0.9495
+     ],
+     "widened": [
+      0.7253,
+      1.1905
+     ],
+     "frac_classes_below_1": 0.6291,
+     "n_probes": 701,
+     "R_seed": 1.2538
+    },
+    "H1": {
+     "R": 0.9211,
+     "n_classes": 62,
+     "boot95": [
+      0.8549,
+      0.961
+     ],
+     "widened": [
+      0.6882,
+      1.1938
+     ],
+     "frac_classes_below_1": 0.6935,
+     "n_probes": 62,
+     "R_seed": 1.2423
+    },
+    "H2": {
+     "R": 0.8821,
+     "n_classes": 218,
+     "boot95": [
+      0.852,
+      0.9056
+     ],
+     "widened": [
+      0.6527,
+      1.1821
+     ],
+     "frac_classes_below_1": 0.7202,
+     "n_probes": 218,
+     "R_seed": 1.3053
+    },
+    "H2p5": {
+     "R": 0.9722,
+     "n_classes": 38,
+     "boot95": [
+      0.9018,
+      1.0263
+     ],
+     "widened": [
+      0.735,
+      1.2594
+     ],
+     "frac_classes_below_1": 0.6316,
+     "n_probes": 38,
+     "R_seed": 1.2271
+    },
+    "H3": {
+     "R": 0.9471,
+     "n_classes": 279,
+     "boot95": [
+      0.9113,
+      0.9714
+     ],
+     "widened": [
+      0.7454,
+      1.1876
+     ],
+     "frac_classes_below_1": 0.5771,
+     "n_probes": 279,
+     "R_seed": 1.2226
+    },
+    "H5": {
+     "R": 1.0761,
+     "n_classes": 28,
+     "boot95": [
+      0.9214,
+      1.2338
+     ],
+     "widened": [
+      0.9145,
+      1.2431
+     ],
+     "frac_classes_below_1": 0.4286,
+     "n_probes": 28,
+     "R_seed": 1.0075
+    },
+    "H6": {
+     "R": 0.7621,
+     "n_classes": 8,
+     "boot95": [
+      0.6315,
+      0.9739
+     ],
+     "widened": [
+      0.4116,
+      1.494
+     ],
+     "frac_classes_below_1": 1.0,
+     "n_probes": 8,
+     "R_seed": 1.5341
+    },
+    "H7E": {
+     "R": 0.9975,
+     "n_classes": 34,
+     "boot95": [
+      0.9242,
+      1.1335
+     ],
+     "widened": [
+      0.7256,
+      1.4437
+     ],
+     "frac_classes_below_1": 0.5588,
+     "n_probes": 34,
+     "R_seed": 1.2737
+    },
+    "H7c": {
+     "R": 1.0065,
+     "n_classes": 34,
+     "boot95": [
+      0.9451,
+      1.1197
+     ],
+     "widened": [
+      0.7959,
+      1.3297
+     ],
+     "frac_classes_below_1": 0.5,
+     "n_probes": 34,
+     "R_seed": 1.1875
+    },
+    "seeds_read": [
+     "FA-ccin2p3-f0156d88",
+     "FA-ccin2p3-df858d33"
+    ],
+    "probes_unmatched": [],
+    "n_probes_unmatched": 0
+   },
+   "gain": null,
+   "cost": null,
+   "wins": null
+  }
+ },
+ "held_default_missing": [
+  "default50 HD4",
+  "default25 HD4",
+  "control HD4"
+ ],
+ "complete": false,
+ "verdict": null,
+ "verdict_on_reads_in_hand": null,
+ "het_over_mse": {
+  "PP4": {
+   "all": {
+    "R": 1.048,
+    "n_classes": 1301,
+    "boot95": [
+     1.0237,
+     1.0782
+    ],
+    "widened": [
+     0.9456,
+     1.1672
+    ],
+    "frac_classes_below_1": 0.4366,
+    "n_probes": 1301,
+    "R_seed": 1.0826
+   },
+   "trained": {
+    "R": 1.0028,
+    "n_classes": 797,
+    "boot95": [
+     0.9663,
+     1.0271
+    ],
+    "widened": [
+     0.9002,
+     1.1024
+    ],
+    "frac_classes_below_1": 0.4969,
+    "n_probes": 797,
+    "R_seed": 1.0734
+   },
+   "not_trained": {
+    "R": 1.1698,
+    "n_classes": 504,
+    "boot95": [
+     1.0995,
+     1.2209
+    ],
+    "widened": [
+     1.0007,
+     1.3414
+    ],
+    "frac_classes_below_1": 0.3413,
+    "n_probes": 504,
+    "R_seed": 1.0987
+   },
+   "het_seed_R": 1.1721,
+   "n_probes_unmatched": 0
+  },
+  "EE4": {
+   "all": {
+    "R": 1.4182,
+    "n_classes": 169,
+    "boot95": [
+     1.3709,
+     1.5012
+    ],
+    "widened": [
+     1.2915,
+     1.5935
+    ],
+    "frac_classes_below_1": 0.213,
+    "n_probes": 169,
+    "R_seed": 1.0615
+   },
+   "trained": {
+    "R": 1.3729,
+    "n_classes": 115,
+    "boot95": [
+     1.2641,
+     1.4433
+    ],
+    "widened": [
+     1.1556,
+     1.5788
+    ],
+    "frac_classes_below_1": 0.2609,
+    "n_probes": 115,
+    "R_seed": 1.0939
+   },
+   "not_trained": {
+    "R": 1.5738,
+    "n_classes": 54,
+    "boot95": [
+     1.4327,
+     1.9921
+    ],
+    "widened": [
+     1.4309,
+     1.9945
+    ],
+    "frac_classes_below_1": 0.1111,
+    "n_probes": 54,
+    "R_seed": 1.0012
+   },
+   "het_seed_R": 1.1293,
+   "n_probes_unmatched": 0
+  },
+  "held": {
+   "pooled": {
+    "R": 1.1586,
+    "n_classes": 701,
+    "boot95": [
+     1.1093,
+     1.1908
+    ],
+    "widened": [
+     1.0221,
+     1.2924
+    ],
+    "frac_classes_below_1": 0.3524,
+    "n_probes": 701,
+    "R_seed": 1.0853
+   },
+   "H1": {
+    "R": 1.1622,
+    "n_classes": 62,
+    "boot95": [
+     1.0515,
+     1.2161
+    ],
+    "widened": [
+     0.9492,
+     1.3472
+    ],
+    "frac_classes_below_1": 0.3065,
+    "n_probes": 62,
+    "R_seed": 1.1078
+   },
+   "H2": {
+    "R": 1.1582,
+    "n_classes": 218,
+    "boot95": [
+     1.0997,
+     1.2318
+    ],
+    "widened": [
+     1.0269,
+     1.319
+    ],
+    "frac_classes_below_1": 0.3211,
+    "n_probes": 218,
+    "R_seed": 1.0708
+   },
+   "H2p5": {
+    "R": 1.5117,
+    "n_classes": 38,
+    "boot95": [
+     1.4342,
+     1.7004
+    ],
+    "widened": [
+     1.3042,
+     1.8699
+    ],
+    "frac_classes_below_1": 0.0263,
+    "n_probes": 38,
+    "R_seed": 1.0997
+   },
+   "H3": {
+    "R": 1.1066,
+    "n_classes": 279,
+    "boot95": [
+     1.0371,
+     1.1797
+    ],
+    "widened": [
+     0.9793,
+     1.2493
+    ],
+    "frac_classes_below_1": 0.3871,
+    "n_probes": 279,
+    "R_seed": 1.059
+   },
+   "H5": {
+    "R": 13.8025,
+    "n_classes": 28,
+    "boot95": [
+     5.7665,
+     19.1347
+    ],
+    "widened": [
+     5.6615,
+     19.4893
+    ],
+    "frac_classes_below_1": 0.1429,
+    "n_probes": 28,
+    "R_seed": 0.9818
+   },
+   "H6": {
+    "R": 0.4363,
+    "n_classes": 8,
+    "boot95": [
+     0.3082,
+     0.5838
+    ],
+    "widened": [
+     0.2604,
+     0.6912
+    ],
+    "frac_classes_below_1": 1.0,
+    "n_probes": 8,
+    "R_seed": 1.1839
+   },
+   "H7E": {
+    "R": 1.084,
+    "n_classes": 34,
+    "boot95": [
+     0.9256,
+     1.2539
+    ],
+    "widened": [
+     0.9096,
+     1.276
+    ],
+    "frac_classes_below_1": 0.4412,
+    "n_probes": 34,
+    "R_seed": 0.9827
+   },
+   "H7c": {
+    "R": 0.8822,
+    "n_classes": 34,
+    "boot95": [
+     0.8295,
+     1.0094
+    ],
+    "widened": [
+     0.7028,
+     1.1914
+    ],
+    "frac_classes_below_1": 0.6471,
+    "n_probes": 34,
+    "R_seed": 1.1803
+   },
+   "het_seed_R": 1.2538,
+   "n_probes_unmatched": 0
+  }
+ },
+ "het_over_mse_note": "het control over MSE control: loss HETEROSC + sigma stage AND sign_head off together"
+}
