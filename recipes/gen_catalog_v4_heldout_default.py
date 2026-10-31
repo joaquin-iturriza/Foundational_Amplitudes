@@ -39,6 +39,13 @@ from gen_catalog_v4_default import EE_ENERGIES, SMALL_RUN, complete_layout, lhe_
 
 AXES = ("H2p5", "H6", "H7E", "H7c")
 N_TEST = 2000
+# pools whose runs of 1000 events outlast a run (step 18 probe logs, analysis/catalog_v4/data/lhe_rates_hd.json): smaller
+# runs at the slow energies, as many as the share needs, in parallel (complete_layout sizes: {collider energy: (run
+# size, complete share)}). Every run of these two that returned gave all 1000 events it asked (share 1.0); the slow
+# energies' runs of 1000 took 340-1787 s and 1255 s or more (photon photon c cbar, 10 and 20 TeV) and 3509-3524 s and
+# over 1790 s (c cbar d dbar, 10 and 20 TeV)
+RUN_SIZES = {"v4_epem_aaccx__E20": {"10000": (250, 1.0), "20000": (250, 1.0)},
+             "v4_epem_ccxddx__E20": {"10000": (250, 1.0), "20000": (250, 1.0)}}
 E20_EE = (6000.0, 10000.0, 20000.0)
 CARDS = {  # cards dir -> (source dir, run-card values patched)
     "recipes/catalog_v4_pp_E20": ("recipes/catalog_v4_pp", {"ebeam1": 10000.0, "ebeam2": 10000.0,
@@ -96,7 +103,7 @@ def main():
             amz = (h.get("physics") or {}).get("alpha_s")
             lhe = {**hdr, "cards_dir": cards, **({"energies": energies} if energies else {}),
                    **({"label_alphas_mz": float(amz)} if amz is not None else {})}
-            lhe = complete_layout(lhe, SMALL_RUN, gridpack=True, name=n)
+            lhe = complete_layout(lhe, SMALL_RUN, gridpack=True, name=n, sizes=RUN_SIZES.get(n))
             lhe = {k: v for k, v in lhe.items() if k not in hdr or hdr[k] != v}
             name = "hd_" + n[3:]
             out[name] = {**lhe_entry(mg, base, e, mg.V4_MODEL, lhe), "parent": base, "split": "heldout",

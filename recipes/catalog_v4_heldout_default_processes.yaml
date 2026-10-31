@@ -2300,6 +2300,14 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 1
+      energy_run_events:
+      - 1000
+      - 250
+      - 250
+      energy_runs:
+      - 1
+      - 4
+      - 4
       gridpack: 13057
     parent: v4_epem_aaccx
     split: heldout
@@ -2340,6 +2348,14 @@ processes:
       complete_runs: true
       run_events: 1000
       n_runs: 1
+      energy_run_events:
+      - 1000
+      - 250
+      - 250
+      energy_runs:
+      - 1
+      - 4
+      - 4
       gridpack: 13057
     parent: v4_epem_ccxddx
     split: heldout
