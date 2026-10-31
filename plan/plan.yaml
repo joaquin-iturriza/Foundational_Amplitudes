@@ -6296,6 +6296,11 @@ entries:
     text: '2026-10-31: the main session told Joaquin the mixture arms and control already predict a per-event variance (het
       loss); the closing owner reports they trained with plain MSE. The claim was relayed from session memory, not read from
       the run configs; the new owner reads the six configs first.'
+  - at: '2026-10-31T04:44:18+00:00'
+    text: '2026-10-31: all six mixture runs (339ec100 380842ed 6c246603 1d46b938 11ad944a 9c6fc7ab) trained loss MSE: D52
+      (het loss for catalog trainings once settled) never became a config default or a canonical-setup line, which still says
+      MSE fixed, so designs and reviewers followed it. Guidance fix sent to a mechanical worker; open to Joaquin: flip config/default.yaml
+      to HETEROSC for every new run?'
   handoff:
     state: 'Step 11 DONE (bound YES, R 0.388 [0.338,0.446], pp_bound.json). Step 14 DONE: verdict trade-off (mixture_ab.json
       @58748c0a, mixture_ab.py @4973581b): share 0.50 PP4 0.682 [0.594,0.775], EE4 0.401, held-out pooled 1.271 [1.145,1.418];
