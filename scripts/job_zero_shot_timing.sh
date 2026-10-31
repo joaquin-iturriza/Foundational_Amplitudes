@@ -12,7 +12,8 @@
 # read of it ($SCRATCH/zz_<cat>_short_<arm>/<axis>/<probe>.npz), array by array: ZS_SAME / ZS_DIFF / ZS_NO_EARLIER per
 # probe and one ZS_COMPARE summary line. Every ZERO_SHOT record carries s_stages (seconds per stage of that probe).
 #   REREAD=<run id> site submit <site> FA scripts/job_zero_shot_timing.sh --env ARM=v4_dimensionless_muon --env AXIS=H1 --env N=50
-# ARM, CAT (v4), AXIS (H1), N (50), SPLIT (val; the axis loop's split for the axis).
+# ARM, CAT (v4), AXIS (H1), N (50), SPLIT (val; the axis loop's split for the axis), PROFILE (K: the first K probes
+# again under cProfile, ZS_PROF lines). Ends with one RUN_SUMMARY line (rc, probes, wall seconds).
 
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
@@ -34,8 +35,20 @@ for p in ps:
 print(f"ZS_TIMING_PROBES {len(ps)} of {len(r['processes'])}")
 PY
 T0=$(date +%s)
-python tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred" --split "$SPLIT" --signed-magnitude "$R"/recipes/*.yaml || exit 1
+python tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred" --split "$SPLIT" --signed-magnitude "$R"/recipes/*.yaml
+rc=$?
 echo "ZS_TIMING_WALL $(( $(date +%s) - T0 )) s"
+[ "$rc" = 0 ] || { echo "RUN_SUMMARY zero_shot_timing rc=$rc stage=read"; exit "$rc"; }
+# PROFILE=K: the first K probes read again under cProfile into a folder of their own; the calls by cumulative time
+if [ -n "$PROFILE" ]; then
+    mkdir "$R/pred_prof" || exit 1
+    python -m cProfile -o "$R/prof.out" tools/zero_shot_parent.py --parent "$PARENT" --save-dir "$R/pred_prof" \
+        --split "$SPLIT" --signed-magnitude $(ls "$R"/recipes/*.yaml | head -n "$PROFILE") > "$R/prof_read.log" 2>&1
+    echo "ZS_PROFILE rc=$? probes=$PROFILE"
+    python -c "
+import pstats, sys
+s = pstats.Stats(sys.argv[1]); s.sort_stats('cumulative').print_stats(60); s.sort_stats('tottime').print_stats(30)" "$R/prof.out" | sed 's/^/ZS_PROF /'
+fi
 python - "$R/pred" "$EARLIER" <<'PY'
 import glob, os, sys
 import numpy as np
@@ -57,3 +70,4 @@ for f in sorted(glob.glob(os.path.join(new, "*.npz"))):
         same += 1; print(f"ZS_SAME {name}")
 print(f"ZS_COMPARE same={same} diff={diff} no_earlier={none} earlier={old}")
 PY
+echo "RUN_SUMMARY zero_shot_timing rc=0 probes=$(ls "$R"/pred/*.npz | wc -l) wall_s=$(( $(date +%s) - T0 ))"
