@@ -1682,6 +1682,30 @@ entries:
       read by the shape-gap rule. f < 0.2: the gap is not an event-level prior''s to close; reported to the user with the
       alternatives (capacity, training length, data), this route ends. Between: reported, no GPU arm. Cost: CPU only on CC,
       four jobs (two seeds x H2/TR) in parallel, 4 cores, 3 h limit each (about 5 s per pool fit, two fits per pool); no GPU.'
+    fix_at: '2026-10-31T01:11:06+00:00'
+    fix: 'Check 2 (the measure cannot tell an event-level prior from a fit on the held-out pool''s own labels): u = q - t
+      is a deterministic function of the event''s momenta (the network''s output and the target both are). So a gradient-boosted
+      fit of u on the full kinematics, trained out of fold on 1600 labelled events of the same pool, recovers whatever is
+      smooth enough to learn from 1600 labels. That is a many-shot per-process correction, not a prior. A prior is one map
+      shared by every process, fixed before the held-out process is seen. The held-out residual already has 3x the training''s
+      single-scalar structure (eta^2 ceiling 0.122/0.119 against 0.036/0.041, prop_gate.json), so a large f is close to built
+      in, and the yes branch would not identify any prior. Permutation importance would name kinematic invariants, not a physics
+      factor. Fix: make the decisive fit cross-pool. Train the regressor on the training pools (same cells, or all cells)
+      on process-independent features and predict the held-out pools'' u with no held-out labels; for the held-out-only variant,
+      leave one class out. Decide f on that prediction. Keep the per-pool out-of-fold fit only as the ceiling beside it. A
+      cross-pool fit needs fixed-length features whose meaning does not depend on how the legs are ordered: for example sorted
+      or aggregated pair invariants, the particle species counts, t, logF, log P, log D, not log s_ij indexed by leg position,
+      which means different things in different processes. Check 5 (prior incomplete): searched kNN, gradient boosting, flexible
+      fit, residual, ceiling, few-shot, K-shot, kshot, context vector, stand-in, par:v4_prop, par:v4_dipole, par:v4_shape_gap,
+      plan dead ends, site decisions D86/D178. The per-pool fit is a supervised use of the held-out process''s labels. Prior
+      work on what labelled events of a held-out process recover is omitted: par:v4_kshot_level (catalog_v4, the same control
+      pair: level against floor var(q-t), the plain and shrunk offsets at K events) and the context vector''s K-shot fits
+      on catalog_v3 (2->4 families at K=16: floor 0.84, context fit 1.25). State them, and say how this read differs from
+      a K-shot fit at K=1600. Check 4 (follows from 2): the yes branch (''a prior built from the features that carry the fit'')
+      does not name the GPU arm. With the cross-pool fit, a yes should name the map, the features it uses and how it enters
+      the control (input or target). Checks 1, 3, 6, 7 hold. Held-out against training of the same cells, with the same network,
+      events and model, plus a permuted-u null. The seeds and bootstrap are as before, with the measured seed spread small
+      (eta^2 seeds 0.042/0.042). The read stays within D178''s shape priority.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
