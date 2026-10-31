@@ -3369,12 +3369,98 @@ control's training events are drawn; on events drawn the default way the held-ou
 par.~\ref{par:v4_pp_bound} ($0.388$ on the trained classes, all their training events default-sampled), half the events
 default-sampled brings the trained classes to $0.549$, most of the way. Open: H3, the one axis above $1$ under MSE at
 both shares, with intervals across $1$; whether a share costs the top classes is not settled on these two seeds. The
-share catalog\_v4 carries is the user's choice (none, $0.25$ or $0.50$); the mixtures are composed at load time from
-the stored pools [D207], so the chosen one is trained without building pools.
+user kept share $0.25$ as catalog\_v4's mixture [D229, D231]; the mixtures are composed at load time from the stored
+pools [D207], so it is trained without building pools.
 % src: python3 analysis/catalog_v4/mixture_ab.py mixture @19ccfe6e
 % claim: bound.R=0.388
 % claim: shares.default50.PP4.trained.R=0.549
 % allow: 1 0.50 0.25 because they are the reference ratio and the shares
+
+The shares against the pure-default bound, on the same default-sampled events (2026-10-31). The bound arm of
+par.~\ref{par:v4_pp_bound} (FA-ccin2p3-afc96598, FA-ccin2p3-d26f13aa) trains every hadronic tree class on its
+$13$\,TeV MadEvent pp events only; its $e^+e^-$ and one-loop classes keep the catalog's sampling, as the control's do.
+It had been read on PP4 alone. Read again eval-only from its best checkpoints on EE4, HD4 and HD5
+(FA-ccin2p3-f8ec724f, FA-ccin2p3-049b863e; every probe read, physics check ok), against the same MSE control pair and
+measure as the shares, it gives the third column of Table~\ref{tab:v4_bound_shares}. The pure-default arm is the best
+of the three on the pp classes it trains, and the worst everywhere else: on PP4's classes it does not train, on
+$e^+e^-$ (a fifth above the control though its $e^+e^-$ events are the control's), and on the held-out classes, where its
+pooled interval crosses $1$ and the top classes (H3) are clearly worse. A share gives back part of the trained-class gain
+and keeps the generalisation the catalog's own sampling carries, so the verdict above stands.
+\begin{table}[h]\centering\small
+\begin{tabular}{lccc}
+read (classes) & pure default & share $0.50$ & share $0.25$ \\\hline
+PP4 trained ($797$) & $0.388$ $[0.338, 0.446]$ & $0.549$ $[0.488, 0.625]$ & $0.650$ $[0.561, 0.739]$ \\
+PP4 not trained ($504$) & $1.132$ $[0.969, 1.367]$ & $0.921$ $[0.802, 1.089]$ & $0.932$ $[0.803, 1.091]$ \\
+EE4 ($169$) & $1.216$ $[1.099, 1.355]$ & $0.401$ $[0.314, 0.520]$ & $0.413$ $[0.337, 0.535]$ \\
+held out, default-sampled ($700$) & $1.122$ $[0.977, 1.305]$ & $0.860$ $[0.745, 0.983]$ & $0.871$ $[0.754, 0.994]$ \\
+\quad H3 ($279$) & $1.631$ $[1.302, 1.942]$ & $1.133$ $[0.970, 1.300]$ & $1.082$ $[0.943, 1.231]$ \\
+\quad H5 ($28$) & $1.401$ $[0.920, 1.802]$ & $0.987$ $[0.719, 1.313]$ & $0.977$ $[0.602, 1.369]$ \\
+\end{tabular}
+\caption{Arm over the MSE control, $R$ (median over classes of the arm/control MSE ratio) with its widened interval,
+two seeds a side; every read on MadEvent default-sampled test events.}\label{tab:v4_bound_shares}
+\end{table}
+% src: python3 analysis/catalog_v4/mixture_ab.py bound_default @affc6f0b
+% claim: arms.bound.PP4.trained.R=0.388
+% claim: arms.bound.PP4.trained.widened.0=0.338
+% claim: arms.bound.PP4.trained.widened.1=0.446
+% claim: arms.bound.PP4.not_trained.R=1.132
+% claim: arms.bound.PP4.not_trained.widened.0=0.969
+% claim: arms.bound.PP4.not_trained.widened.1=1.367
+% claim: arms.bound.EE4.all.R=1.216
+% claim: arms.bound.EE4.all.widened.0=1.099
+% claim: arms.bound.EE4.all.widened.1=1.355
+% claim: arms.bound.held_default.pooled.R=1.122
+% claim: arms.bound.held_default.pooled.widened.0=0.977
+% claim: arms.bound.held_default.pooled.widened.1=1.305
+% claim: arms.bound.held_default.H3.R=1.631
+% claim: arms.bound.held_default.H3.widened.0=1.302
+% claim: arms.bound.held_default.H3.widened.1=1.942
+% claim: arms.bound.held_default.H5.R=1.401
+% claim: arms.bound.held_default.H5.widened.0=0.920
+% claim: arms.bound.held_default.H5.widened.1=1.802
+% claim: arms.default50.PP4.trained.R=0.549
+% claim: arms.default50.PP4.trained.widened.0=0.488
+% claim: arms.default50.PP4.trained.widened.1=0.625
+% claim: arms.default50.PP4.not_trained.R=0.921
+% claim: arms.default50.PP4.not_trained.widened.0=0.802
+% claim: arms.default50.PP4.not_trained.widened.1=1.089
+% claim: arms.default50.EE4.all.R=0.401
+% claim: arms.default50.EE4.all.widened.0=0.314
+% claim: arms.default50.EE4.all.widened.1=0.520
+% claim: arms.default50.held_default.pooled.R=0.860
+% claim: arms.default50.held_default.pooled.widened.0=0.745
+% claim: arms.default50.held_default.pooled.widened.1=0.983
+% claim: arms.default50.held_default.H3.R=1.133
+% claim: arms.default50.held_default.H3.widened.0=0.970
+% claim: arms.default50.held_default.H3.widened.1=1.300
+% claim: arms.default50.held_default.H5.R=0.987
+% claim: arms.default50.held_default.H5.widened.0=0.719
+% claim: arms.default50.held_default.H5.widened.1=1.313
+% claim: arms.default25.PP4.trained.R=0.650
+% claim: arms.default25.PP4.trained.widened.0=0.561
+% claim: arms.default25.PP4.trained.widened.1=0.739
+% claim: arms.default25.PP4.not_trained.R=0.932
+% claim: arms.default25.PP4.not_trained.widened.0=0.803
+% claim: arms.default25.PP4.not_trained.widened.1=1.091
+% claim: arms.default25.EE4.all.R=0.413
+% claim: arms.default25.EE4.all.widened.0=0.337
+% claim: arms.default25.EE4.all.widened.1=0.535
+% claim: arms.default25.held_default.pooled.R=0.871
+% claim: arms.default25.held_default.pooled.widened.0=0.754
+% claim: arms.default25.held_default.pooled.widened.1=0.994
+% claim: arms.default25.held_default.H3.R=1.082
+% claim: arms.default25.held_default.H3.widened.0=0.943
+% claim: arms.default25.held_default.H3.widened.1=1.231
+% claim: arms.default25.held_default.H5.R=0.977
+% claim: arms.default25.held_default.H5.widened.0=0.602
+% claim: arms.default25.held_default.H5.widened.1=1.369
+% claim: arms.bound.PP4.trained.n_classes=797
+% claim: arms.bound.PP4.not_trained.n_classes=504
+% claim: arms.bound.EE4.all.n_classes=169
+% claim: arms.bound.held_default.pooled.n_classes=700
+% claim: arms.bound.held_default.H3.n_classes=279
+% claim: arms.bound.held_default.H5.n_classes=28
+% allow: 13 0.50 0.25 1 because they are the beam energy, the shares and the reference ratio
 
 
 \paragraph{MadEvent runs that stop short of their target (2026-10-30).}\label{par:v4_short_runs} The question, from the
