@@ -5489,6 +5489,7 @@ entries:
       - 'a correction traced to a withheld section: remove that header line, dead end'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
+    '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
   owner:
     agent: a0de3dd02a89d8a43
     state: closed
