@@ -6609,6 +6609,14 @@ entries:
       1.267 / 1.223. Rule: no LOSS (R < 1.05) but NO LOSS not reached (upper end 1.068 / 1.064 >= 1.05): cost undecided, against
       LOSS on catalog-sampled events. 142 held-out classes (H2p5 38, H5 28, H6 8, H7E 34, H7c 34) have no default pool: estimate
       20.8 core-h of MadEvent (heldout_default_pools.py @f15cd5bf), longest run about 3100 core-s, labels not counted.'
+  - at: '2026-10-31T05:17:48+00:00'
+    text: 'Het smoke FA-ccin2p3-da21ae07 (b6f61a7d30): HETEROSC main run, MuonAdamW, sigma-only stage 250 steps (0.81 min
+      on the 19-pool smoke) ran; all 7 zero-shot reads from sigma_stage failed ''signed probe: transform signedlog:1.427451e-07''
+      because run.py sigma_stage_cfg copied the config after init_data resolved data.amp_trafos in place. Fixed in 9b555968
+      (sigma stage keeps the unresolved base; zero_shot_parent normalises an old stage dir''s base), reviewed clean. Repo-reviewer
+      fixes 647cfada: the 142-class pool estimate now uses each class''s own multiplicity: 20.19 core-h (was 20.8; 38 five-body
+      classes a lower bound); heldout_default refuses a missing read. Six het arms submitted at ff37971e: control 87ea24d0/321a3de2,
+      default50 466656b2/9897833d, default25 f0156d88/df858d33, 3.75 h each, 22.5 GPU-h.'
   handoff:
     state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
       reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
