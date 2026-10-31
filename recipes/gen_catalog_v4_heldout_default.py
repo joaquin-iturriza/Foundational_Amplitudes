@@ -11,7 +11,10 @@ class map (analysis/catalog_v4/mixture_ab.py class_of) gives each probe its held
         its log midpoint rounded to 10 TeV)
   H7c   the classes at pT > 30 GeV: catalog_v4_pp's and catalog_v4_ee's cards with ptj, ptb, pta, ptl 30 (recipes/
         catalog_v4_pp_c30, catalog_v4_ee_c30); e+e- at the EE4 energies past the class's lower edge at that cut
-  H5, H6 (one-loop labels on Born events, labels at fixed alpha_s 0.13): not written yet, they need pipeline pieces
+  H6    the classes at alpha_s(M_Z) 0.13: the base's events as H2p5's (catalog_v4's cards, MadEvent's own alpha_s,
+        which for pp follows the PDF's), labelled at alpha_s(sqrt(s_hat)) run at one loop from 0.13
+        (lhe.label_alphas_mz, as physics.alpha_s sets the catalog's own pools)
+  H5    (one-loop labels on Born events): not written yet, it needs a pipeline piece
 
 Each pool: 2000 test events (the EE4/PP4 test measure), labelled at alpha_s(sqrt(s_hat)) run at one loop from 0.118
 (as pp13v4_/ee4_), built in the layout every rebuilt catalog_v4 MadEvent pool has (par:v4_short_runs): complete runs
@@ -34,7 +37,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, HERE)
 from gen_catalog_v4_default import EE_ENERGIES, SMALL_RUN, complete_layout, lhe_entry  # noqa: E402
 
-AXES = ("H2p5", "H7E", "H7c")
+AXES = ("H2p5", "H6", "H7E", "H7c")
 N_TEST = 2000
 E20_EE = (6000.0, 10000.0, 20000.0)
 CARDS = {  # cards dir -> (source dir, run-card values patched)
@@ -90,7 +93,9 @@ def main():
             cards, energies = settings(ax, e, float(h["sqrts"][0]))
             if energies == []:
                 skipped.append(n); continue
-            lhe = {**hdr, "cards_dir": cards, **({"energies": energies} if energies else {})}
+            amz = (h.get("physics") or {}).get("alpha_s")
+            lhe = {**hdr, "cards_dir": cards, **({"energies": energies} if energies else {}),
+                   **({"label_alphas_mz": float(amz)} if amz is not None else {})}
             lhe = complete_layout(lhe, SMALL_RUN, gridpack=True, name=n)
             lhe = {k: v for k, v in lhe.items() if k not in hdr or hdr[k] != v}
             name = "hd_" + n[3:]

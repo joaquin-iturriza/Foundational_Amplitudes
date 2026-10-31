@@ -3958,6 +3958,8 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
         # pool is the same |M|^2 function as its catalog_v3 window parent)
         "per_event_alphas": ("lhe_aqcdup" if cfg["lhe"].get("label_alphas", "aqcdup") == "aqcdup"
                              else str(cfg["lhe"]["label_alphas"])),
+        **({"label_alphas_mz": float(cfg["lhe"]["label_alphas_mz"])} if cfg["lhe"].get("label_alphas_mz") is not None
+           else {}),
         "label_convention": "mg5_slot_v2",
         "lhe": {
             "model":             cfg["lhe"].get("model", "sm"),
@@ -4468,7 +4470,10 @@ def _lhe_finish(process, recs, items, moms, aqcds, runs, banner, secs, sa, seed,
         rule = cfg["lhe"].get("label_alphas", "aqcdup")
         if rule == "running_sqrt_shat":
             q = m[:, 0] + m[:, 1]
-            a = compute_alphas(np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 1e-300, None)), alphas_mz=0.118)
+            # lhe.label_alphas_mz: the reference alpha_s(M_Z) of the running (a held-out alpha_s class, H6: 0.13, as
+            # physics.alpha_s sets it for the catalog's own pools, physics_to_generation); 0.118 when absent
+            a = compute_alphas(np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 1e-300, None)),
+                               alphas_mz=float(cfg["lhe"].get("label_alphas_mz", 0.118)))
         elif rule != "aqcdup":
             raise ValueError(f"{process}: unknown lhe.label_alphas {rule!r}")
         amps = label_lhe_pp(process, m, a, sa)

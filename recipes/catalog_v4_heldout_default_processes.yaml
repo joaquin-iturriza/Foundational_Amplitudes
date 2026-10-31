@@ -1488,6 +1488,291 @@ processes:
     split: heldout
     test_group: 'held-out default v4: H2p5'
     heldout_class: v4_udx_dxguzz
+  hd_bbx_gvevex__as130:
+    kind: lhe_pp
+    folder: v4_bbx_gvevex
+    mg5_generate:
+    - generate b b~ > g ve ve~ QED<=2
+    proc_str: b b~ > g ve ve~ QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 5
+    - -5
+    - 21
+    - 12
+    - -12
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_bbx_gvevex
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_bbx_gvevex__as130
+  hd_dbx_abxd__as130:
+    kind: lhe_pp
+    folder: v4_dbx_abxd
+    mg5_generate:
+    - generate d b~ > a b~ d QED<=3
+    proc_str: d b~ > a b~ d QED<=3
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - -5
+    - 22
+    - -5
+    - 1
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 3
+    alphas_power: 2
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_dbx_abxd
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_dbx_abxd__as130
+  hd_dg_adg__as130:
+    kind: lhe_pp
+    folder: v4_dg_adg
+    mg5_generate:
+    - generate d g > a d g QED<=1
+    proc_str: d g > a d g QED<=1
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - 21
+    - 22
+    - 1
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_dg_adg
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_dg_adg__as130
+  hd_dg_dhz__as130:
+    kind: lhe_pp
+    folder: v4_dg_dhz
+    mg5_generate:
+    - generate d g > d h z QED<=2
+    proc_str: d g > d h z QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 1
+    - 21
+    - 1
+    - 25
+    - 23
+    m_finals:
+    - 0.0
+    - 125.0
+    - 91.188
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_dg_dhz
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_dg_dhz__as130
+  hd_epem_bbxg__as130:
+    kind: lhe_pp
+    folder: v4_epem_bbxg
+    mg5_generate:
+    - generate e+ e- > b b~ g QED<=2
+    proc_str: e+ e- > b b~ g QED<=2
+    nfinal: 3
+    pdg_ids:
+    - 11
+    - -11
+    - 5
+    - -5
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 1
+    - 2
+    alphas_power: 1
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_ee
+      energies:
+      - 91.1876
+      - 240.0
+      - 365.0
+      - 500.0
+      - 1000.0
+      - 3000.0
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 1
+      gridpack: 13057
+    parent: v4_epem_bbxg
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_epem_bbxg__as130
+  hd_gg_gg__as130:
+    kind: lhe_pp
+    folder: v4_gg_gg
+    mg5_generate:
+    - generate g g > g g QED<=0
+    proc_str: g g > g g QED<=0
+    nfinal: 2
+    pdg_ids:
+    - 21
+    - 21
+    - 21
+    - 21
+    m_finals:
+    - 0.0
+    - 0.0
+    order:
+    - 0
+    - 0
+    - 2
+    - 0
+    alphas_power: 2
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_gg_gg
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_gg_gg__as130
+  hd_udx_ddxwp__as130:
+    kind: lhe_pp
+    folder: v4_udx_ddxwp
+    mg5_generate:
+    - generate u d~ > d d~ w+ QED<=3
+    proc_str: u d~ > d d~ w+ QED<=3
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 1
+    - -1
+    - 24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 3
+    alphas_power: 2
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_udx_ddxwp
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_udx_ddxwp__as130
+  hd_udx_ggwp__as130:
+    kind: lhe_pp
+    folder: v4_udx_ggwp
+    mg5_generate:
+    - generate u d~ > g g w+ QED<=1
+    proc_str: u d~ > g g w+ QED<=1
+    nfinal: 3
+    pdg_ids:
+    - 2
+    - -1
+    - 21
+    - 21
+    - 24
+    m_finals:
+    - 0.0
+    - 0.0
+    - 80.419
+    order:
+    - 0
+    - 0
+    - 2
+    - 1
+    alphas_power: 2
+    beam_masses: {}
+    lhe:
+      cards_dir: recipes/catalog_v4_pp
+      label_alphas_mz: 0.13
+      complete_runs: true
+      run_events: 1000
+      n_runs: 3
+      gridpack: 31774
+    parent: v4_udx_ggwp
+    split: heldout
+    test_group: 'held-out default v4: H6'
+    heldout_class: v4_udx_ggwp__as130
   hd_bbx_epvewm__E20:
     kind: lhe_pp
     folder: v4_bbx_epvewm

@@ -266,6 +266,62 @@ processes:
   n_train: 0
   n_val: 0
   n_test: 2000
+- name: hd_bbx_gvevex__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_dbx_abxd__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_dg_adg__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_dg_dhz__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_epem_bbxg__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_gg_gg__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_udx_ddxwp__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
+- name: hd_udx_ggwp__as130
+  sqrts:
+  - 13000
+  - 13000
+  n_train: 0
+  n_val: 0
+  n_test: 2000
 - name: hd_bbx_epvewm__E20
   sqrts:
   - 13000
