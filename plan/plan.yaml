@@ -5358,8 +5358,6 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '11': PP4 re-reads FA-ccin2p3-a152d7d0 (REREAD afc96598) and FA-ccin2p3-a01ad665 (REREAD d26f13aa); bound arms trained
       in full
-    '16': audit re-run FA-ccin2p3-7697177c (sidecar-only check at 4e844204 on EE4 and H1..H7c, standalones census); then the
-      four mixture arms' end before STANDALONES_MODE=apply
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
