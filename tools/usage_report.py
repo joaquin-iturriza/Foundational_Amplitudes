@@ -228,8 +228,8 @@ def pct(xs, q):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="analysis/agent_redesign/usage_report_v3.json")
-    ap.add_argument("--fig", default="analysis/agent_redesign/figs/usage_v3")
+    ap.add_argument("--out", default="analysis/agent_redesign/usage_report_v4.json")
+    ap.add_argument("--fig", default="analysis/agent_redesign/figs/usage_v4")
     ap.add_argument("--all-fa-folders", action="store_true",
                     help="also read the FA worktree and replay folders (-home-joaquin-work-FA-*), not only -home-joaquin-work-FA")
     ap.add_argument("--samples", help="print 5 cases, spread over time, of each listed classifier (comma list: (hook, nothing_new, denial, wait, repeat, reread)")
@@ -321,48 +321,34 @@ def main():
 
 
 def figure(report, base):
-    """Left: wasted calls as a share of each role's calls (as in v1). Middle and right, one denominator per era: the
-    project roles' (main session, subagents) weighted tokens and list-price $ divided by the era's results of both
-    together, stacked by role, so a bar's height is the era's total per result and a segment is that role's share of
-    it; the number in a segment is that role's era total. The A/B replay sessions are neither project work nor project
-    results: they are left out of the bars (their totals are in the JSON as role "trials")."""
+    """Left: wasted calls as a share of each role's calls. Right: list-price $ per result, one denominator per era
+    (the results of main session and subagents together), stacked by role: a bar's height is the era's total per
+    result and a segment is that role's share. The era totals go in the caption, not the plot. The A/B replay
+    sessions are neither project work nor project results and are left out (role "trials" in the JSON)."""
     sys.path.insert(0, ROOT)
     import plot_style as ps
     import numpy as np
     names = [n for n, _, _ in PERIODS]
     x = np.arange(len(names))
-    fig, (axW, axL, axR) = ps.figure(ncols=3)
+    fig, (axW, axR) = ps.figure(ncols=2)
     cols = {"main": ps.C.blue, "agents": ps.C.vermillion}
     labels = {"main": "main session", "agents": "subagents"}
     for i, role in enumerate(("main", "agents")):
         axW.bar(x + (i - .5) * .38, [100 * report["by_period"][n][role]["wasted_share"] for n in names], .38,
                 color=cols[role], label=labels[role])
     res = np.array([max(1, report["by_period"][n]["total"]["results"]) for n in names])
-    for ax, key, fmt in ((axL, "weighted_tokens_M", "{:.0f}M"), (axR, "usd_list_price", "${:.0f}")):
-        bottom = np.zeros(len(names))
-        for role in ("main", "agents"):
-            tot = np.array([report["by_period"][n][role][key] for n in names])
-            h = tot / res
-            ax.bar(x, h, .6, bottom=bottom, color=cols[role], label=labels[role])
-            bottom += h
-        top = bottom.max()
-        b2 = np.zeros(len(names))
-        for role in ("main", "agents"):
-            tot = np.array([report["by_period"][n][role][key] for n in names])
-            h = tot / res
-            for k in range(len(names)):
-                if h[k] > 0.06 * top:
-                    ax.text(x[k], b2[k] + h[k] / 2, fmt.format(tot[k]), ha="center", va="center", fontsize=7,
-                            color="white")
-            b2 += h
-        ax.set_ylim(0, 1.12 * top)
-    for ax in (axW, axL, axR):
+    bottom = np.zeros(len(names))
+    for role in ("main", "agents"):
+        h = np.array([report["by_period"][n][role]["usd_list_price"] for n in names]) / res
+        axR.bar(x, h, .6, bottom=bottom, color=cols[role], label=labels[role])
+        bottom += h
+    ticks = ["main alone\n%d res." % res[0], "step agents\n%d res." % res[1], "redesign\n%d res." % res[2]]
+    for ax in (axW, axR):
         ax.set_xticks(x)
-        ax.set_xticklabels(["main alone\n%d res." % res[0], "step agents\n%d res." % res[1], "redesign\n%d res." % res[2]])
+        ax.set_xticklabels(ticks)
     axW.set_ylabel("wasted calls [% of calls]")
-    axL.set_ylabel("weighted tokens per result [M]")
     axR.set_ylabel("list-price \\$ per result")
-    ps.legend(axW, loc="upper right")
+    ps.legend(axR, "upper right")
     os.makedirs(os.path.dirname(base), exist_ok=True)
     ps.save(fig, base)
 
