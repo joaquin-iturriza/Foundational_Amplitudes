@@ -156,8 +156,10 @@ entries:
     runs:
     - FA-ccin2p3-019b939c
     - FA-ccin2p3-0239c199
+    - FA-ccin2p3-07afff2f
     - FA-ccin2p3-0a9d3d4c
     - FA-ccin2p3-0bddbf48
+    - FA-ccin2p3-11305a34
     - FA-ccin2p3-161fc56b
     - FA-ccin2p3-19971006
     - FA-ccin2p3-1c11d753
@@ -190,6 +192,7 @@ entries:
     - FA-ccin2p3-9d6b050f
     - FA-ccin2p3-a3a2c475
     - FA-ccin2p3-a7009d00
+    - FA-ccin2p3-b383281f
     - FA-ccin2p3-bc20e0d6
     - FA-ccin2p3-d42685fe
     - FA-ccin2p3-d634e7d6
@@ -201,7 +204,7 @@ entries:
     - FA-ccin2p3-ef655fd7
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
-    commit: a767b36a
+    commit: ed39613e
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -236,6 +239,7 @@ entries:
     - analysis/catalog_v4/data/dipole_gate.json
     - analysis/catalog_v4/data/kshot_level.json
     - analysis/catalog_v4/data/lco_map.json
+    - analysis/catalog_v4/data/lco_map_not.json
     - analysis/catalog_v4/data/loop_born.json
     - analysis/catalog_v4/data/loop_born_events.json
     - analysis/catalog_v4/data/loop_groups.json
