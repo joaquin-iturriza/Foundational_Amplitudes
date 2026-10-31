@@ -415,6 +415,17 @@ def _canon_key(pdg_ids, loop):
     return (tuple(sorted(p[:2])), tuple(sorted(p[2:])), bool(loop))
 
 
+# probes left out of every read by the user's decision (never "missing until built"): the read skips them and lists
+# them as excluded; tools/collect_run.py does not expect them, scripts/job_catalog_v3_short.sh leaves them out
+DROPPED = {"ee4_epem_cgsxwm": "its 3 TeV block dropped (D193)"}
+
+
+def recipe_sampling(doc):
+    """a recipe's sampling policy for every entry without its own: its top-level `sampling` key, as the experiment,
+    prebuild_recipes and check_site_data read it (the pool's file name follows it: `_smix_` for the mixture)"""
+    return doc.get("sampling") if isinstance(doc, dict) else None
+
+
 def load_recipe_specs(path):
     import yaml
     d = yaml.safe_load(open(path))
@@ -475,7 +486,7 @@ class TrainingReference:
         self.sources = {}
         self.unreadable = []
         specs, d = load_recipe_specs(recipe_path)
-        mg.register_recipe_processes(specs, default_sampling=(d.get("default_sampling") if isinstance(d, dict) else None))
+        mg.register_recipe_processes(specs, default_sampling=recipe_sampling(d))
         self.entries = []
         for s in specs:
             name = s["name"]
@@ -565,7 +576,8 @@ def check_probe(name, spec_physics, pool_path, reference, cfg=None, backend=True
         src = "sidecar"
         blk = dict(blk)
     else:
-        src = "computed at read" + ("" if side else " (no sidecar)")
+        src = "computed at read" + ("" if side else (" (no sidecar)" if not pool_path or os.path.exists(pool_path)
+                                                     else " (no pool at this path)"))
         blk = physics_block(name, recipe=side, spec_physics=spec_physics, cfg=cfg)
         if blk.get("backend") and (blk.get("card") is None or not backend):     # nothing to read the physics from: refused
             return {"probe": name, "pool": pool_path, "block_source": src, "status": "mismatch",
@@ -706,6 +718,41 @@ def standalone_dirs(work_dir):
                   and not os.path.islink(os.path.join(work_dir, x)))
 
 
+def standalones_census(work_dir):
+    """every <name>_standalone entry directly under `work_dir` sorted by why it is or is not a prune candidate
+    (standalone_dirs): symlink, no Cards/ at all, Cards/ without proc_card_mg5.dat (with or without a param_card), or
+    a candidate; per class the count, the bytes (files only, symlinks not followed) and the name prefixes"""
+    sys.path.insert(0, os.path.join(ROOT, "tools"))
+    from lhe_parts import _du as du
+    out = {}
+    for x in sorted(os.listdir(work_dir)):
+        if not x.endswith("_standalone"):
+            continue
+        d = os.path.join(work_dir, x)
+        cards = os.path.join(d, "Cards")
+        if os.path.islink(d):
+            cls = "symlink"
+        elif not os.path.isdir(d):
+            cls = "not a directory"
+        elif os.path.isfile(os.path.join(cards, "proc_card_mg5.dat")):
+            cls = "prune candidate (Cards/proc_card_mg5.dat)"
+        elif not os.path.isdir(cards):
+            cls = "no Cards/"
+        else:
+            has_pc = os.path.isfile(os.path.join(cards, "param_card.dat"))
+            cls = "Cards/ without proc_card_mg5.dat" + (", param_card present" if has_pc else ", no param_card")
+        c = out.setdefault(cls, {"n": 0, "bytes": 0, "prefixes": {}, "first": []})
+        c["n"] += 1
+        c["bytes"] += 0 if os.path.islink(d) else du(d)
+        pre = x.split("_", 1)[0]
+        c["prefixes"][pre] = c["prefixes"].get(pre, 0) + 1
+        if len(c["first"]) < 5:
+            c["first"].append([x, sorted(os.listdir(d))[:8] if os.path.isdir(d) and not os.path.islink(d) else None])
+    for c in out.values():
+        c["gb"] = round(c.pop("bytes") / 1e9, 2)
+    return out
+
+
 def prune_standalones(work_dir, keep, apply=False, manifest_dir=None):
     """The standalones of standalone_dirs(work_dir) not in `keep` (the backends of pools without a sidecar physics
     block), each deleted with --apply after a manifest of every path and size [D208]. The install itself is never
@@ -755,10 +802,14 @@ def main(argv=None):
     b.add_argument("pool", nargs="?")
     sc = sub.add_parser("sidecars", help="pools whose sidecar has no physics block, with the standalones they need")
     sc.add_argument("--out")
+    sub.add_parser("standalones-census", help="every *_standalone under the install by why it is (not) a prune candidate")
     pr = sub.add_parser("prune-standalones", help="delete the standalones no pool needs (manifest first) [D208]")
     pr.add_argument("--apply", action="store_true")
     a = ap.parse_args(argv)
     mg = _mg()
+    if a.mode == "standalones-census":
+        print(json.dumps({"work_dir": mg.WORK_DIR, "classes": standalones_census(mg.WORK_DIR)}))
+        return
     if a.mode in ("sidecars", "prune-standalones"):
         import datagen
         dirs = sorted({os.path.realpath(datagen.frozen_dir()), os.path.realpath(datagen.train_cache_dir())})
@@ -785,15 +836,19 @@ def main(argv=None):
         print(json.dumps(out, indent=1, default=str))
         return
     ref = TrainingReference(a.train, seed=a.seed, backend=not a.sidecar_only)
-    counts, fields, refs = {}, {}, {}
+    counts, fields, refs, excluded = {}, {}, {}, {}
     for f in a.probes:
         doc = yaml.safe_load(open(f))
         procs = doc.get("processes", doc) if isinstance(doc, dict) else doc
         mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics")}
                                       for p in procs],
-                                     default_sampling=doc.get("default_sampling") if isinstance(doc, dict) else None)
+                                     default_sampling=recipe_sampling(doc))
         for p in procs:
             name = p["name"]
+            if name in DROPPED:
+                counts["excluded"] = counts.get("excluded", 0) + 1
+                excluded[name] = DROPPED[name]
+                continue
             try:
                 pool = val_pool_path(name, p, doc, a.seed, a.role)
                 chk = check_probe(name, p.get("physics"), pool, ref, backend=not a.sidecar_only)
@@ -808,7 +863,8 @@ def main(argv=None):
                 print("PHYSICS_CHECK " + json.dumps(chk, default=str), flush=True)
     print(json.dumps({"train": a.train, "probes": a.probes, "role": a.role, "sidecar_only": a.sidecar_only,
                       "reference_sources": ref.sources, "reference_unreadable": len(ref.unreadable),
-                      "status": counts, "reference": refs,
+                      "reference_unreadable_first": ref.unreadable[:10],
+                      "status": counts, "excluded": excluded, "reference": refs,
                       "mismatching_fields": dict(sorted(fields.items(), key=lambda x: -x[1]))}))
 
 

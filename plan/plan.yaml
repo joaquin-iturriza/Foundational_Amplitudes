@@ -144,13 +144,11 @@ entries:
   - D195
   - D199
   next:
-    6: 'New design for the multiplicity gap (the joint read''s design took two FIX verdicts and is a dead end): a leave-one-class-out
-      map among the held-out multiplicity pools (fitted on the other held-out classes, predicting the left-out class without
-      its labels) on leg-order-free event features, with the factors-only map (t, logF, log P, log D) under the same scheme
-      and the training-pool map as a diagnostic; f = the share of the gap var(u)_ho - var(u)_tr it removes; the yes arm derived
-      from which map carries f (target_propagators on the control''s short pretraining if the factors hold most of it). Record
-      with plan design and pass the design reviewer before any job; code start: dipole_residual.py joint_features (to be made
-      leg-order-free) and the job script''s joint mode.'
+    6: 'Leave-class-out read of the held-out multiplicity gap (design passed 2026-10-31 after one FIX): code on branch v3_lco
+      (604cb718, a97b1efc; dipole_residual.py --prop --dump, lco_map.py, job modes lcodump and lco), under repo review; after
+      it passes and merges: 5-probe dry run of stage 1 (analysis/catalog_v4/data/lco_dry_probes.txt) and stage 2 on it on
+      CC, then stage 1 as four CPU jobs (two seeds x H2/TR) at the dry run''s measured limit and stage 2 as one 8-core job;
+      f_ceil first, thresholds as shares of it.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -1848,24 +1846,132 @@ entries:
       reported beside it; if it falls under 0.1 while leave-class-out is >= 0.3, the result is said to be cell-local. Cost:
       CPU only on CC: stage 1 four jobs (seeds x H2/TR), 4 cores, 1 h each; stage 2 one job, 8 cores, 2 h (about 2 x (10 +
       7 + 4 x 10) fits of about 100k events); no GPU; disk about 60 MB.'
+    fix_at: '2026-10-31T01:16:45+00:00'
+    fix: 'Check 5 (prior incomplete): the search missed the closest prior work, docs/results.tex par. ''Design (ii) on the
+      data: the 2->4 probes factorised onto their parents'' (2026-10-25, lines ~6194-6212): a gradient-boosted correction
+      learned leave-one-probe-out on the other 39 held-out 2->4 probes (splitting variables s_ak/s_hat, s_bk/s_hat, s_jk/s_hat,
+      pT_k^2/s_hat, y_k, 1-x, s_hat, flavour) took the per-probe spread from 2.5/3.1 to 0.73/1.11, under the network''s own
+      2->4 zero-shot floor 1.34/1.37, on 17 of 20 +g and 14 of 20 +gamma probes; also the cross-fitted process-statistics
+      map (D81, par. near line 5548) and the surrogates paragraph (line ~5776: momenta-alone soft-collinear factors carry
+      most per-event structure and extrapolate in n). ''leave-one'' finds it in results.tex. Fix: cite them with their numbers,
+      say what differs (catalog_v4 H2, the control''s residual u rather than log|M|^2 over the parent''s) and use the factorised-onto-parent
+      correction as evidence for check 2 and as a candidate yes arm (named target terms), or say why not. Check 2 and 4 (yes
+      bar not shown reachable): from analysis/catalog_v4/data/prop_residual/*_H2.json the median var(u) held out is 0.382
+      / 0.394 (seeds 42/43); the cells'' training floors (shape_gap.json: 6qq 0.207, 6bb 0.136, 6gg 0.076, 6ee 0.23 ...) make
+      the gap about 0.5-0.65 of var(u)_ho, so f >= 0.3 needs the out-of-class map to remove about 0.15-0.2 of held-out var(u).
+      The only measured own-label structure, the scalar ceiling eta^2 0.122/0.119, converts to f about 0.20 / 0.28 (per pool
+      var_u x ceiling, my computation from those files), under the 0.3 bar, and a map that never sees the class''s labels
+      will reach less than its own-label ceiling. So the yes outcome may be unreachable by construction, the same flaw as
+      the last FIX in the other direction. Fix: compute the full-feature K=1600 own-label ceiling''s f first (it is cheap,
+      in the dry run or as stage 2''s first output, both seeds) and fix the thresholds before the deciding fit, either as
+      a share of the ceiling''s f (e.g. yes when leave-class-out f >= half the ceiling''s f and >= 0.1 absolute) or by stating
+      that a ceiling f under 0.3 ends the route as ''no shared structure large enough'' and what that changes. Minor, same
+      fix: f takes medians pooled over cells whose H2 and TR mixes differ (6gg 17 H2 vs 10 TR at floor 0.076; 6qq 110 vs 351);
+      compute var(u) and var(u - u_hat) per pool over its own cell''s training median (as the shape-gap rule does) or state
+      why the pooled median is unbiased. Checks 1, 3, 6, 7 hold: the map vs no map against the same training floor with everything
+      fixed is a matched read; seeds 42/43 decided separately with seed difference and pool bootstrap measured in the run;
+      it answers the entry''s step 6 and D178; no decision names a comparison it omits. Each H2 pool is its own class in census_classes.json
+      (218 distinct classes, 201 class siblings outside H2), so 10 class-grouped folds are leave-pool-out among H2, which
+      is fine.'
+  - at: '2026-10-31T01:18:01+00:00'
+    question: 'Is the extra per-event residual of catalog_v4''s held-out multiplicity pools (par:v4_shape_gap; par:v4_prop:
+      single-scalar ceiling eta^2 0.122/0.119 held out against 0.036/0.041 training) a systematic extrapolation error shared
+      across held-out processes, so that one event-level prior could carry it? A CPU read on the control pair''s existing
+      zero-shot reads: a gradient-boosted map of u on leg-order-free event features, fitted on the held-out multiplicity pools
+      of the other classes, applied to each left-out class with none of its labels; its share of the gap, read against what
+      the pool''s own labels can reach (the own-label ceiling). Revised once after the review''s FIX of 2026-10-31 (prior
+      incomplete; thresholds not tied to the reachable ceiling; cells pooled). Feeds D178.'
+    prior: 'Searched docs/results.tex, the plan''s dead ends, site decisions D81, D86, D178; terms leave-one, leave-class,
+      GroupKFold, gradient, HistGradient, boosted, cross-process, extrapolat, shared across, per-event structure, joint read,
+      event features, kNN, ceiling, K-shot, context vector, stand-in. Found: (i) Design (ii) on the data, the 2->4 probes
+      factorised onto their parents (2026-10-25, near line 6194; tools/factorised_2to4.py): on Daniel''s catalog, log|M|^2
+      over the 2->3 parent''s at the Catani-Seymour-mapped event, plus a gradient-boosted correction on the splitting variables
+      learned leave-one-probe-out on the other 39 held-out 2->4 probes: spread 7.1/6.2 (+g/+gamma) to 2.5/3.1 by the parent,
+      to 0.73/1.11 with the correction, under the network''s zero-shot floor 1.34/1.37 on 17/20 and 14/20 probes. That is
+      the closest prior work and evidence that a correction learned across held-out processes of one multiplicity transfers;
+      it differs here: catalog_v4''s held-out pools, the control network''s residual u (not log|M|^2 over a parent''s), and
+      all 218 pools, of which only 94 have a final gluon or photon (the parent route needs one). (ii) The cross-fitted process-statistics
+      map (D81, near line 5548, pool_stats.py): ridge plus trees on physics features, level error 0.46/0.064 cross-fitted
+      by relabelling class, spread ratio 0.88-1.24: a pool-level map, the per-process level and spread, not the per-event
+      shape. (iii) The surrogates paragraph (near line 5776): a soft-collinear factor carries most per-event structure of
+      multi-gluon families, on the catalog the propagators; here log D (par:v4_dipole, dead end, gate 0.094) and log P (par:v4_prop,
+      between, eta^2 0.042) as single inputs were already read on these events. (iv) The joint read''s two designs (dead end
+      2026-10-31): per-pool own-label fit (K-shot) and the training-pool map (near-blind); here the first is the ceiling,
+      the second a diagnostic. (v) par:v4_kshot_level and the context K-shot fits use the scored process''s labels; this read
+      uses none.'
+    measure: 'Per probe (H2: the 218 held-out multiplicity pools, all 6-particle, cells 6bb 28, 6bg 6, 6bq 8, 6ee 21, 6gg
+      17, 6qg 28, 6qq 110; TR: the training pools of the same cells; seeds 42 and 43; rows by pool_rows(), alignment checked,
+      refused counted): the read''s 2000 events give the own-label ceiling, 500 of them (seed 0) the maps. Features, leg-order-free:
+      sorted log s_ij/s_hat over the 15 pairs, sorted final legs'' log E/sqrt(s_hat) and |cos theta|, log s_hat, final species
+      counts (g, gamma, light q, b, charged lepton, neutrino, W, Z, H, t), and t, logF, log P, log D (0 where none). u = (q
+      - t) minus the pool mean. Map: sklearn HistGradientBoostingRegressor (300 iterations, defaults, random_state 0). The
+      gap is measured per pool against its own cell''s floor, as the shape-gap rule: floor_c = median var(u) over the cell''s
+      TR pools; per H2 pool p, gap_p = var(u)_p - floor_c(p) and removed_p = var(u)_p - var(u - u_hat)_p; f = median_p removed_p
+      / median_p gap_p (each seed). Stage 2 computes first, before any map: the ceiling f_ceil, removed_p = R2_own,p x var(u)_p
+      with R2_own the per-pool own-label 5-fold out-of-fold fit (K = 1600 of the 2000 events, same features and model). Deciding
+      read, leave-class-out: classes from census_classes.json (each H2 pool its own class); 10 folds grouped by class over
+      the sorted pools; each fold scored by the map fitted on the other folds'' H2 events only; f_lco. Beside it, same folds:
+      factors only (t, logF, log P, log D); drop-group (without pairs, energies and angles, species, factors). Diagnostics:
+      leave-one-cell-out; the training-pool map applied to H2 and its TR out-of-fold score (5 folds by pool); f_lco on the
+      94 pools with a final gluon or photon against the 124 without; per cell. Margins: seed difference; 16-84% of f over
+      H2 and TR pools resampled (1000 draws, seed 0).'
+    check: 'On these events (par:v4_prop) the held-out residual has per-event structure (single scalars to eta^2 0.12, about
+      0.20/0.28 of the gap by the reviewer''s conversion), and the 2->4 factorised result (near line 6194) shows a correction
+      learned on other held-out processes of one multiplicity reducing spread 2.5 to 0.73 on Daniel''s catalog, so a shared,
+      transferable part is plausible; whether the yes bar is reachable is set by f_ceil, computed first, and every threshold
+      is a share of it, so neither branch is built in. Sanity: training-pool map''s TR score near 0; f_lco <= f_ceil. A 5-probe
+      dry run of stage 1 and a stage-2 fit on it on CC before the batch (time and size per pool).'
+    fixed: The control pair FA-ccin2p3-339ec100 / -380842ed reads as collected; pools' frozen rows; 500 events per pool (seed
+      0), 2000 for the ceiling; features, groups, model settings, the 10 class-grouped folds and the per-cell floor fixed
+      before reading; no tuning; cells as loop_levels.py --shape-gap; bootstrap 1000 draws, seed 0.
+    control: The same pools scored by maps that never saw the scored class's labels, against (a) the cell's training floor
+      (the gap) and (b) the pool's own-label ceiling (what any per-event map could reach with labels); the factors-only map;
+      the training-pool map; seeds 42 and 43 separately.
+    seeds: Seeds 42 and 43 of the control pair, each read and decided on its own; a branch holds only when it holds on both
+      seeds and f_lco's distance from each threshold exceeds the seed difference and the bootstrap half-range.
+    outcome: 'First f_ceil per seed. If f_ceil < 0.1 on both seeds: even the pool''s own labels leave the gap in level and
+      spread, not per-event shape; this route ends, reported with the alternatives (capacity, training length, data); the
+      maps are reported as diagnostics. Otherwise, decided on f_lco over all multiplicity cells, both seeds: yes when f_lco
+      >= 0.5 f_ceil and f_lco >= 0.1: the held-out excess is shared and transferable; if the factors-only map gives >= half
+      of f_lco, the next arm is data.target_propagators on the control''s short pretraining, two seeds, read by the shape-gap
+      rule; if f_lco is held mostly by the 94 pools with a final gluon or photon, the candidate arm is the parent-factorised
+      target of the 2->4 result; otherwise the group the drop-group read names, with the input or target term it implies;
+      any such arm is its own design, costed and reviewed before a GPU job. No when f_lco < 0.25 f_ceil or f_lco < 0.05: the
+      per-event part is pool-specific, not shared; no event-level prior; reported with the alternatives, this route ends.
+      Between: reported, no GPU arm. Leave-one-cell-out beside it; if under 0.25 f_ceil while f_lco says yes, the result is
+      called cell-local. Cost: CPU only on CC: stage 1 four jobs (seeds x H2/TR), 4 cores, limit set from the dry run (H2
+      jobs carry the ceiling fits); stage 2 one job, 8 cores, 2 h; no GPU; disk about 130 MB.'
+    passed_at: '2026-10-31T01:18:23+00:00'
+    reviewer: 'Re-check after FIX: prior now cites the 2->4 factorised-onto-parent leave-one-probe-out boosted correction
+      (spread 2.5/3.1 -> 0.73/1.11, under the floor 1.34/1.37), D81 statistics map and surrogates paragraph, with what differs;
+      check 2: held-out residual structure measured (scalar own-label eta^2 0.122/0.119 vs 0.036/0.041 training, about f 0.20/0.28
+      of the gap from prop_residual *_H2.json against cell floors in shape_gap.json), reachability now set by f_ceil computed
+      first and every threshold a share of it (yes >= 0.5 f_ceil and >= 0.1, no < 0.25 f_ceil or < 0.05, f_ceil < 0.1 on both
+      seeds ends the route), so neither branch is built in; gap per pool against its own cell''s training floor; check 3:
+      seeds 42/43 decided separately, branch must clear seed difference and 1000-draw pool bootstrap; check 1: maps with and
+      without the scored class''s labels on the same pools, everything fixed; 218 H2 pools are 218 singleton classes in census_classes.json
+      so 10 grouped folds are fine. Note: f_lco above f_ceil is possible (a map on about 98k events can beat a 1600-event
+      own fit), so that sanity should be reported, not taken as a bug. Terms searched: leave-one, leave-class, leave one,
+      GroupKFold, gradient, HistGradient, boosted, cross-process, extrapolat, shared across, per-event structure, joint read,
+      event features; site decisions D81, D178.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     6:
-      feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap (par:v4_shape_gap) in the
-        catalog preprocessing design'
+      feeds: 'D178: which input or target prior closes the held-out multiplicity pools'' shape gap'
       if:
-      - 'f >= 0.3 and the factors hold most of it: GPU design with data.target_propagators on'
-      - 'f < 0.1: report to the user that no shared event-level prior closes the gap (capacity, training length, data instead)'
-      - 'between: reported, no GPU arm'
+      - 'f_ceil < 0.1 both seeds: route ends, reported with capacity, training length, data'
+      - 'f_lco >= 0.5 f_ceil and >= 0.1: GPU arm designed from which map holds f (target_propagators, parent-factorised target,
+        or the named group)'
+      - 'f_lco < 0.25 f_ceil or < 0.05: no shared event-level prior; route ends'
   step_waits: {}
   owner:
     agent: a884f79261a86aff9
     state: working
     since: '2026-10-31T01:12:50+00:00'
-    context: 68468
-    context_at: '2026-10-31T01:13:57+00:00'
+    context: 137166
+    context_at: '2026-10-31T01:30:56+00:00'
   targets:
   - batch: shape_gap_TR_reread
     wall_h: 1.5
@@ -5245,6 +5351,8 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '11': PP4 re-reads FA-ccin2p3-a152d7d0 (REREAD afc96598) and FA-ccin2p3-a01ad665 (REREAD d26f13aa); bound arms trained
       in full
+    '16': audit re-run FA-ccin2p3-7697177c (sidecar-only check at 4e844204 on EE4 and H1..H7c, standalones census); then the
+      four mixture arms' end before STANDALONES_MODE=apply
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -5416,10 +5524,10 @@ entries:
       - 'a check refused or pools unmapped: fix the sidecars or keep those standalones, nothing deleted until it passes'
   owner:
     agent: a0ab7c2280e0bb83a
-    state: working
+    state: stopped
     since: '2026-10-31T01:08:59+00:00'
-    context: 47797
-    context_at: '2026-10-31T01:09:34+00:00'
+    context: 153915
+    context_at: '2026-10-31T01:30:58+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
@@ -5631,6 +5739,42 @@ entries:
       3300 probes, about 1.8 h), so the job needed about 3.3 h against 1.5: over 2x, the target was wrong. Fix: PP4 eval-only
       re-reads FA-ccin2p3-a152d7d0 (REREAD afc96598) and a01ad665 (REREAD d26f13aa), 1.5 h limit; future arms reading PP and
       PP4 get the reads in their time (training 1.4 h + 2 s x probes).'
+  - at: '2026-10-31T01:16:45+00:00'
+    text: 'E3173. Standalones audit FA-ccin2p3-aab94b13 (job_standalones.sh audit, pool_physics.py at its run commit): 9404
+      *_standalone directories under $WORK/mg5amcnlo by name, but only 706 qualify for the prune (standalone_dirs: own Cards/proc_card_mg5.dat,
+      not a symlink), 10.7 GB, all 706 deletable (dry manifest .prune_manifests/standalones_20261031_020516_dry.json); the
+      other 8698 not checked (no proc card or symlinks). Sidecars: 26764 scanned in datasets/ and amp_data_cache, 4 without
+      a physics block, none needing a standalone, 1 unmapped process (ee_uug__as130). Sidecar-only check FAILS except H5 (28/28
+      ok on default50 and default25): EE4 170/170 mismatch on all three train recipes (coupling_kind 170, model 26) against
+      a catalog-wide reference built from only 108 of 1153 training entries (1045 unreadable from sidecars, so the reference
+      is the old minimal-QED subset); H1 62, H2 218, H2p5 38, H3 279, H6 8, H7E 34, H7c 34 all mismatch with reference none:
+      their val pools have no sidecar and their backend card is already absent. So prune --apply stays blocked (step 16);
+      cause to fix: why 1045 training reference entries are unreadable sidecar-only and why the held-out val pools lack sidecars.
+      Control EE4 re-read FA-ccin2p3-def11c5c (REREAD 380842ed, seed 43 parent): 169 of 170 probes read, mse_logm2_real finite
+      on all 169, in-job physics check ok on all 169 (backend reference); 1 refused: ee4_epem_cgsxwm test pool not prebuilt
+      (recipe_id 71164da294583efe); same single refusal in c1863adf.'
+  - at: '2026-10-31T01:24:04+00:00'
+    text: 'Process finding (E3173 follow-up). The sidecar-only check''s tests (test_reference_from_sidecars, 2efb08ea) reported
+      ''verdicts unchanged with the backends removed'', yet the real audit FA-ccin2p3-aab94b13 refused every shaped probe
+      and read the training reference from 108 of 1153 entries. Cause: tools/pool_physics.py registered a recipe''s sampling
+      under the key default_sampling (TrainingReference and the check CLI), while catalog_v4''s training recipe and every
+      held-out recipe set it as top-level sampling: (the key the experiment, prebuild_recipes and check_site_data read). The
+      check therefore looked for unshaped pool names (no _smix_) that do not exist: the probes were reported as ''no sidecar''
+      and the training entries as unreadable; only H5 (one-loop pools, never shaped) and the 108 unshaped entries were found.
+      The H1..H7c pools do have sidecars with physics blocks (sidecar scan: 4 of 26764 without one), so no blocks needed writing.
+      The EE4 coupling_kind (170) and model (26) mismatches were against that 108-entry catalog-wide reference (minimal-QED
+      and sm entries), not real differences: the in-job read with the full reference matched every EE4 probe to its own process
+      (v4_epem_zzzz etc.), all ok. What the CPU test missed: its fixture recipe had no top-level sampling and its pools were
+      built under unshaped names, so the wrong key was invisible. Fix 4e844204: recipe_sampling() reads the top-level key
+      in both places; a probe pool absent at the computed path is reported as such, not as ''no sidecar''; the summary lists
+      the first unreadable training entries; test_real_recipe_shape builds a training and an H6-shaped probe recipe with top-level
+      sampling under shaped names and runs the CLI sidecar-only check (fails on the old code: 1 of 2 reference entries, verified).
+      Also: DROPPED in pool_physics (ee4_epem_cgsxwm, its 3 TeV block dropped, D193) is excluded by the check, by the EE4
+      read in job_catalog_v3_short.sh (a stale test pool of it on disk had passed the old glob filter, so require_cache refused
+      it in c1863adf and def11c5c) and by the collector; its refusal in the control re-reads is expected, not a missing pool.
+      Standalones: all 9404 *_standalone entries are real directories (no symlinks); 706 have Cards/proc_card_mg5.dat; the
+      standalones-census added to the audit classifies the other 8698 and sizes them. Re-run: FA-ccin2p3-7697177c (audit at
+      4e844204, same 19 checks + census).'
   handoff:
     state: 'Step 14 mixture arms 6c246603, 1d46b938, 11ad944a, 9c6fc7ab running; control EE4 re-reads c1863adf COMPLETED,
       def11c5c running. Step 11 bound arms trained in full; PP4 re-reads a152d7d0 (REREAD afc96598), a01ad665 (REREAD d26f13aa)
