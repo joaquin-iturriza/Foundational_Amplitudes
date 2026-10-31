@@ -103,6 +103,8 @@ def cmd_plan(a):
         if name in (getattr(a, "exclude", None) or []):
             continue                                  # held out of this queue (plan --exclude)
         n_adopt += _adopt(D, name, its)
+        for q2 in getattr(a, "skip_claimed", None) or []:   # parts made under a taken-over queue's layout
+            n_adopt += _adopt(_dirs(q2), name, its)
         with open(os.path.join(D["specs"], name + ".json"), "w") as f:
             json.dump({"seed": a.seed, "items": [[r, p] for r, p in its]}, f)
         rate, src = _rate(name, rates, med)

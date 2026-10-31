@@ -567,6 +567,35 @@ def test_park_and_skip_claimed():
     print("[park + skip-claimed] ok")
 
 
+def test_skip_claimed_adopts():
+    """plan --skip-claimed Q on a new queue links the parts made under Q's layout to the new layout's names."""
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            q1, q2 = os.path.join(d, "q1"), os.path.join(d, "q2")
+            _register(n_runs=2, run_events=400, accept_short=True)
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q1, seed=42, rates=rates, cores=[]))
+            old = [p for p, _ in mg.lhe_part_paths(NAME, _items())]
+            for p in old:
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                np.savez(p, mom=np.zeros((37, K, 4)))
+            _register(n_runs=3, run_events=400, accept_short=True)
+            new = mg.lhe_part_paths(NAME, _items())
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q2, seed=42, rates=rates, cores=[],
+                                                  skip_claimed=[q1]))
+            assert all(os.path.samefile(a, b) for a, (b, _) in zip(old, new[:2]))
+            assert len(os.listdir(os.path.join(q2, "todo"))) == 1
+    finally:
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[skip-claimed adopts] ok")
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
@@ -577,3 +606,4 @@ if __name__ == "__main__":
     test_ee_energy_runs_and_equal_shares()
     test_stale_worker_returns_tasks()
     test_park_and_skip_claimed()
+    test_skip_claimed_adopts()
