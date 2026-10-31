@@ -1,0 +1,226 @@
+{
+ "v4_dimensionless_muon": {
+  "excluded": [
+   "t"
+  ],
+  "n_H2": 218,
+  "n_TR": 647,
+  "n_classes": 218,
+  "n_H2_emitter": 94,
+  "median_var_H2": 0.37799602894353856,
+  "floor_TR_per_cell": {
+   "6bb": 0.1197753493727508,
+   "6bg": 0.0946574477630573,
+   "6bq": 0.163946368763243,
+   "6qq": 0.18993009614173695,
+   "6qg": 0.13373759312278444,
+   "6ee": 0.21643250699695255,
+   "6gg": 0.060284932108576134
+  },
+  "median_gap": 0.2070911397721684,
+  "median_ceiling_own_K1600": 0.011277219327973653,
+  "f_ceil": 0.0163,
+  "boot_ceil": [
+   -0.005,
+   0.037
+  ],
+  "f_lco": 0.0218,
+  "boot_lco": [
+   0.018,
+   0.028
+  ],
+  "f_lco_emitter": 0.0164,
+  "f_lco_no_emitter": 0.0388,
+  "median_r2_lco": 0.0172,
+  "f_lco_factors": 0.0038,
+  "boot_lco_factors": [
+   -0.0,
+   0.007
+  ],
+  "median_r2_lco_factors": 0.0026,
+  "f_lco_drop_pairs": 0.0169,
+  "boot_lco_drop_pairs": [
+   0.012,
+   0.024
+  ],
+  "median_r2_lco_drop_pairs": 0.0149,
+  "f_lco_drop_energy_angle": 0.0134,
+  "boot_lco_drop_energy_angle": [
+   0.011,
+   0.025
+  ],
+  "median_r2_lco_drop_energy_angle": 0.0123,
+  "f_lco_drop_species": 0.0037,
+  "boot_lco_drop_species": [
+   -0.001,
+   0.01
+  ],
+  "median_r2_lco_drop_species": 0.0025,
+  "f_lco_drop_factors": 0.0018,
+  "boot_lco_drop_factors": [
+   -0.001,
+   0.005
+  ],
+  "median_r2_lco_drop_factors": 0.0014,
+  "f_loco_cell": -0.0172,
+  "boot_loco_cell": [
+   -0.027,
+   -0.009
+  ],
+  "median_r2_loco_cell": -0.0135,
+  "f_trainmap": 0.001,
+  "median_r2_trainmap_TR_oof": 0.0149,
+  "per_cell": {
+   "6bb": {
+    "n_H2": 28,
+    "median_r2_lco": 0.0193,
+    "median_r2_lco_factors": 0.0053
+   },
+   "6bg": {
+    "n_H2": 6,
+    "median_r2_lco": -0.0181,
+    "median_r2_lco_factors": -0.0174
+   },
+   "6bq": {
+    "n_H2": 8,
+    "median_r2_lco": -0.0067,
+    "median_r2_lco_factors": -0.0134
+   },
+   "6ee": {
+    "n_H2": 21,
+    "median_r2_lco": -0.0073,
+    "median_r2_lco_factors": -0.0031
+   },
+   "6gg": {
+    "n_H2": 17,
+    "median_r2_lco": 0.0126,
+    "median_r2_lco_factors": 0.0063
+   },
+   "6qg": {
+    "n_H2": 28,
+    "median_r2_lco": 0.0184,
+    "median_r2_lco_factors": -0.0056
+   },
+   "6qq": {
+    "n_H2": 110,
+    "median_r2_lco": 0.0231,
+    "median_r2_lco_factors": 0.0061
+   }
+  }
+ },
+ "v4_dimensionless_muon_seed2": {
+  "excluded": [
+   "t"
+  ],
+  "n_H2": 218,
+  "n_TR": 647,
+  "n_classes": 218,
+  "n_H2_emitter": 94,
+  "median_var_H2": 0.3852533709694914,
+  "floor_TR_per_cell": {
+   "6bb": 0.14490077486177222,
+   "6bg": 0.11311686118759232,
+   "6bq": 0.19302509788994893,
+   "6qq": 0.21930183769558942,
+   "6qg": 0.17234371371025892,
+   "6ee": 0.2549064648792986,
+   "6gg": 0.07282474478353332
+  },
+  "median_gap": 0.18885578993521393,
+  "median_ceiling_own_K1600": 0.01038595035664791,
+  "f_ceil": 0.019,
+  "boot_ceil": [
+   0.001,
+   0.037
+  ],
+  "f_lco": 0.0191,
+  "boot_lco": [
+   0.014,
+   0.027
+  ],
+  "f_lco_emitter": 0.0204,
+  "f_lco_no_emitter": 0.0414,
+  "median_r2_lco": 0.0108,
+  "f_lco_factors": 0.001,
+  "boot_lco_factors": [
+   -0.002,
+   0.004
+  ],
+  "median_r2_lco_factors": 0.0005,
+  "f_lco_drop_pairs": 0.0154,
+  "boot_lco_drop_pairs": [
+   0.011,
+   0.019
+  ],
+  "median_r2_lco_drop_pairs": 0.0096,
+  "f_lco_drop_energy_angle": 0.019,
+  "boot_lco_drop_energy_angle": [
+   0.009,
+   0.023
+  ],
+  "median_r2_lco_drop_energy_angle": 0.0101,
+  "f_lco_drop_species": 0.0111,
+  "boot_lco_drop_species": [
+   0.004,
+   0.015
+  ],
+  "median_r2_lco_drop_species": 0.0056,
+  "f_lco_drop_factors": 0.0037,
+  "boot_lco_drop_factors": [
+   0.001,
+   0.007
+  ],
+  "median_r2_lco_drop_factors": 0.0018,
+  "f_loco_cell": -0.0328,
+  "boot_loco_cell": [
+   -0.048,
+   -0.024
+  ],
+  "median_r2_loco_cell": -0.0228,
+  "f_trainmap": 0.0067,
+  "median_r2_trainmap_TR_oof": 0.0196,
+  "per_cell": {
+   "6bb": {
+    "n_H2": 28,
+    "median_r2_lco": 0.0199,
+    "median_r2_lco_factors": -0.0126
+   },
+   "6bg": {
+    "n_H2": 6,
+    "median_r2_lco": 0.0158,
+    "median_r2_lco_factors": -0.0096
+   },
+   "6bq": {
+    "n_H2": 8,
+    "median_r2_lco": -0.0009,
+    "median_r2_lco_factors": -0.0072
+   },
+   "6ee": {
+    "n_H2": 21,
+    "median_r2_lco": -0.0219,
+    "median_r2_lco_factors": -0.0025
+   },
+   "6gg": {
+    "n_H2": 17,
+    "median_r2_lco": 0.0083,
+    "median_r2_lco_factors": -0.001
+   },
+   "6qg": {
+    "n_H2": 28,
+    "median_r2_lco": 0.0354,
+    "median_r2_lco_factors": 0.0052
+   },
+   "6qq": {
+    "n_H2": 110,
+    "median_r2_lco": 0.0121,
+    "median_r2_lco_factors": 0.0038
+   }
+  }
+ },
+ "seed_difference_f_lco": 0.0027,
+ "verdict": {
+  "per_seed": {},
+  "flags": [],
+  "branch": "route ends: f_ceil < 0.1 on every seed (the gap is level and spread, not per-event shape)"
+ }
+}
