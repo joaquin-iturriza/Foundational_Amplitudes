@@ -2328,7 +2328,8 @@ entries:
       - 'the gap (median e of par:v4_shape_gap on the H2 pools) shrinks beyond the margin on both seeds: data is the lever,
         the catalog gains these pools'
       - 'it does not: the gap is capacity or training length, (a) inside the full pretraining'
-  step_waits: {}
+  step_waits:
+    '8': FA-ccin2p3-52345dd6
   owner:
     agent: aa0e9372a78e34830
     state: working
