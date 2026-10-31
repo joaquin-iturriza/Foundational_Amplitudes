@@ -7161,6 +7161,18 @@ entries:
       8 assembled in its first minutes (2000 test events each, MadLoop labels, label+write 7.5-16 s per pool, e.g. hd_bbx_zz_nlo
       |M|^2 in [0.10, 240]); the rest are assemblies only (no MadEvent task left), so one worker finishes them, about 10 min.
       5-body queue resubmitted: FA-ccin2p3-019f489b 7a099e39 7cd23d53 (9 tasks, target 0.5 h).'
+  - at: '2026-10-31T17:51:47+00:00'
+    text: '2026-10-31T18:5x. Pools on ccin2p3 (check_site_data, test split): H5 28/28 (assembled by FA-ccin2p3-26ae46ac under
+      9735fcc5/8b4d9892, g g -> z h included, |M|^2 in [2.7e-7, 3.9e-5]); trees 110/114. Missing 4, all queued: e+e- -> photon
+      photon c cbar at 20 TeV (E3469: at 20000 GeV 2 of 4 runs of 250 complete, 500 vs 667 events; laid out at its measured
+      share 0.5, 7 runs there, 480a4d2d; rebuilt whole as its layout is its identity: queue hd_test_e20_aaccx, 15 tasks incl.
+      3 gridpacks, 7.7 core-h, FA-ccin2p3-6581e775 e58cb2fe, target 1 h), d d~ -> d h u~ W+ at 20 TeV (worker FA-ccin2p3-62f8cc25),
+      u g -> d d~ g u z and u d~ -> d~ g u z z (gridpacks 765bdd9c, 1e7f2159 done, yield 1.0, 75603b3a; queue hd_test_5body_b,
+      FA-ccin2p3-8f072868 9d27468a, target 0.5 h). Zero-shot reader A/B FA-ccin2p3-bfec5501 (V100, 62 H1 probes of 339ec100):
+      wall A original 99 s, A2 original repeated 90 s, B config parsed once 44 s, C 4 spawned workers 155 s; prediction differences
+      in h against A: A2 median 2.5e-5 max 4.3e-3, B 1.9e-5 / 8.3e-3, C 2.5e-5 / 4.2e-3, t identical: the differences are
+      the GPU''s own run-to-run difference. Reader default 1 worker and short_wall S_PROBE 0.71 s (112725da); repo-reviewer
+      a8a308817be9d886d PASS on the backlog to 112725da.'
   handoff:
     state: 'Step 18: queue hd_test_measured done (348/348 tasks, 106/106 pools assembled, test pools on ccin2p3). Queue hd_test_e20_small_runs
       (the three 20 TeV pools: e+e- photon photon c cbar, e+e- c cbar d dbar, pp d dbar -> d h ubar W+; 35 tasks, est 0.9
