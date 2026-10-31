@@ -1,3 +1,4 @@
+on: write
 paths: scripts/publish_main.sh, scripts/fold_worktree.sh, scripts/remove_worktree.sh, worktrees/**
 cmds: \bgit\s+(worktree|merge|checkout|branch|rebase|push)\b
 ---

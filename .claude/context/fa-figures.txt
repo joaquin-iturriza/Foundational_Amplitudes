@@ -1,3 +1,4 @@
+on: write
 paths: analysis/**/*.py, tools/plot_*.py, **/plot*.py, **/make_fig*.py, talks/**
 cmds: \bsavefig\b, \bplot\w*\.py\b, \bmake_fig\w*\.py\b
 tools: SendUserFile

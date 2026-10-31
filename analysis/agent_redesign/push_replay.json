@@ -1,0 +1,45 @@
+{
+ "tool": "tools/push_replay.py @0d2ddf73",
+ "transcripts": "subagents first record after 2026-10-30T11:35:10Z, >=5 calls",
+ "results": {
+  "live_cdd1f456": {
+   "what": "live hook at cdd1f456, live sections, preview modeled",
+   "agents": 32,
+   "calls": 1509,
+   "per_call_tokens_mean": 10023,
+   "per_call_tokens_median_agent": 5930.5,
+   "check_agents_off_by_5pct": 1
+  },
+  "c_repaired": {
+   "what": "repaired hook 0d2ddf73, live sections",
+   "agents": 32,
+   "calls": 1515,
+   "per_call_tokens_mean": 11454,
+   "per_call_tokens_median_agent": 6807.5,
+   "check_agents_off_by_5pct": 17
+  },
+  "a_plan_not_to_agents": {
+   "what": "repaired hook + agents: no on working-on-the-plan",
+   "agents": 32,
+   "calls": 1515,
+   "per_call_tokens_mean": 9440,
+   "per_call_tokens_median_agent": 5159.5,
+   "check_agents_off_by_5pct": 30
+  },
+  "b_write_only": {
+   "what": "repaired hook + on: write on 7 acting sections",
+   "agents": 32,
+   "calls": 1515,
+   "per_call_tokens_mean": 10473,
+   "per_call_tokens_median_agent": 5296.5,
+   "check_agents_off_by_5pct": 27
+  },
+  "ab_both": {
+   "what": "repaired hook + (a) + (b)",
+   "agents": 33,
+   "calls": 1542,
+   "per_call_tokens_mean": 8353,
+   "per_call_tokens_median_agent": 3330
+  }
+ }
+}

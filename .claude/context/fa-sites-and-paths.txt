@@ -1,3 +1,4 @@
+on: write
 paths: sites/**, siteconf.py, scripts/*.sh, sweep/trial_job.sh
 cmds: \bsite\s+(submit|run|env|sync|copy)\b.*\bFA\b, \bscontrol\b
 ---

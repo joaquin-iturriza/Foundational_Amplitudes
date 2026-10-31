@@ -1,3 +1,4 @@
+agents: no
 session: main (SessionStart, every source)
 tools: Agent, SendMessage
 paths: plan/**, tools/plan.py

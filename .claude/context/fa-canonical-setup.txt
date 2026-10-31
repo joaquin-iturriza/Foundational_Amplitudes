@@ -1,3 +1,4 @@
+on: write
 paths: sweep/sweep_config*.yaml, config/default.yaml, config/amplitudes.yaml, config/model/lloca.yaml, sweep/generate_*.py
 cmds: \b(generate_sweep|generate_scaling_sweep|generate_pretraining_scaling_sweeps|drive)\.py\b, \bsite\s+submit\b.*\bFA\b, \brun\.py\b
 ---

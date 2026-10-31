@@ -1,3 +1,4 @@
+on: write
 paths: docs/*.tex, tools/verify_claims.py, analysis/common/**
 cmds: \bverify_claims\.py\b, tools/plan\.py\s+done\b
 ---
