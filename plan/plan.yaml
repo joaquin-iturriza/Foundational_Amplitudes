@@ -5482,7 +5482,7 @@ entries:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
     agent: a0de3dd02a89d8a43
-    state: working
+    state: closed
     since: '2026-10-31T00:09:16+00:00'
     context: 106898
     context_at: '2026-10-31T00:16:28+00:00'
@@ -5856,25 +5856,22 @@ entries:
       and 2 H200 slots unclaimed), while still admitting A100 MIG slices against its own comment. Fixed: CONDOR_GPU_REQ =
       whole A100/V100/T4/H100/H200, no MIG, used in the submit file and in site pick''s slot count; probe resubmitted as FA-lxplus-ed084f25.'
   handoff:
-    state: 'Done this owner run (2026-10-31): (A) brief_guard refuses an Agent launch whose model differs from its definition''s
-      model: (0eff43b9; test D4 compact-worker+sonnet refused, no model and design-reviewer+opus pass; D6 failure pre-existing).
-      (B) usage measured from all 362 transcript folders at list price (tools/usage_windows.py, f3624f9c): window = first
-      call + 5 h (matches API reset times within 1-8 min); calibration FAILED the 20% bar (28% reading gives ~$170 per window,
-      the three real limit hits came at $128-147), so no percent stated; step-agent period: 14 windows, median $71, 3 limit
-      hits, $17.7/active h; redesign: 2 windows $50.7, $12.0/h; $ per result 4.82/2.74/2.37 (main alone/step/redesign); the
-      old usage_report read 1 folder and missed $52 of A/B replays in the 10-29 06:19 hit window and the likelihoods project.
-      (D) tools/agent_tasks.py: no decidable Sonnet cell outside reviews; classifier blind to review misses and unhand-checked
-      on successes; matched trial proposed. (C) context_breakdown.py: fixed part 50k->25k at first call; pooled per-call median
-      stays ~107-110k because owners run longer and hook pushes (7-9k) and hidden thinking grew; chars/4 covers 45% of API
-      growth (fit 1.72 tok per chars/4 + 604/call).'
-    decisions: Design reviewed (FIX then PASS 2026-10-31T00:00). Cost not converted to percent because calibration failed,
-      as the design said. Later-fix signal narrowed to commits removing the task's own lines with fix/revert in the subject;
-      self-corrections of a brief excluded; user-message signal needs an agent named (hand check showed misattribution otherwise).
-    ruled_out: Reweighting cache reads to reconcile the meter (diagnostic fit did not). Brief-free size bands by calls/cost
-      (biased against cheaper models).
-    running: none
-    files: tools/usage_windows.py, tools/agent_tasks.py, tools/usage_report.py (--all-fa-folders, usd), tools/context_breakdown.py,
-      .claude/hooks/brief_guard.py, tests/test_redesign_d.py, analysis/agent_redesign/{usage_windows,agent_tasks,usage_report_v2,context_breakdown}.json,
-      figs/context_breakdown.png (gitignored); untracked superseded tools/token_windows.py and analysis/agent_redesign/token_windows.json
-      from the stopped sonnet agent
-    written: '2026-10-31T00:07:11+00:00'
+    state: 'Step 5 cut 1 (hook pushes) applied 2026-10-31 under a passed design (FIX then PASS): (c) repair 0d2ddf73: a hook
+      output over 10,000 chars reached agents as a 2,178-char preview, sections lost while marked delivered (17 of 32 redesign
+      agents); now outputs <=9,000 chars, a longer section split in parts sent on the next calls; (a)+(b) 85064616: working-on-the-plan
+      to the main session only, fa-hooks/results-notes/figures/git-and-release/testing/sites-and-paths/canonical-setup on
+      writes only (cmds unchanged). Matched replay (tools/push_replay.py, 32 transcripts, pooled tokens per call): live 10023,
+      repaired 11454, (a) 9440, (b) 10473, both 8353 (-27 percent vs repaired, -17 percent vs live; per-agent median 6808
+      -> 3330). Live check and corrections pending (next step). Cuts 2 and 3 not applied: skill listing needs Joaquin''s ~/.claude/settings.json
+      (syncClaudeAiSkills false drops 6278 of 15180 listing chars, ~2.7k tok/call); effort is supported (agent frontmatter
+      effort:, Agent tool effort param, D138) but routing lookups to low effort is a CLAUDE.md line. Step 4 (D203 approved):
+      the auto-mode classifier refused this agent editing brief_guard.py to exempt TRIAL=model launches (self-modification);
+      diff at scratchpad brief_guard_trial.diff for Joaquin or the main session; trial not designed yet.'
+    decisions: Separated (c) from (a)/(b) per reviewer FIX; section texts not shortened (content goes through claudemd-keeper);
+      did not route around the brief_guard refusal (no sonnet agent definition).
+    ruled_out: none
+    running: tests/test_redesign_d.py detached (pid 2425595, output scratchpad testD.txt); its D3 cases and tests/test_context_push.py
+      3/3 passed before (a)/(b)
+    files: tools/push_replay.py, .claude/hooks/context_push.py, tests/test_context_push.py, .claude/context/*.txt headers,
+      analysis/agent_redesign/push_replay.json
+    written: '2026-10-31T00:20:33+00:00'
