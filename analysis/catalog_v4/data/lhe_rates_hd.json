@@ -1,0 +1,983 @@
+{
+ "hd_bbx_bbxgvevex": {
+  "core_s_per_event": 0.0255,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 25.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_ddxgwpwm": {
+  "core_s_per_event": 0.0913,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 91.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_epvewm__E20": {
+  "core_s_per_event": 0.0029,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_epvewm__c30": {
+  "core_s_per_event": 0.0025,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_gghwpwm": {
+  "core_s_per_event": 0.0327,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 32.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_ggtaptamz": {
+  "core_s_per_event": 0.0247,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 24.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_ggzzz": {
+  "core_s_per_event": 0.2286,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 228.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_ghhwpwm": {
+  "core_s_per_event": 0.0584,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 58.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bbx_gvevex__as130": {
+  "core_s_per_event": 0.0026,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bg_bccx__E20": {
+  "core_s_per_event": 0.0023,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bg_bccx__c30": {
+  "core_s_per_event": 0.0032,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 3.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bg_bg__E20": {
+  "core_s_per_event": 0.0015,
+  "mg_cores": 1,
+  "nfinal": 2,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 1.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bg_bg__c30": {
+  "core_s_per_event": 0.0018,
+  "mg_cores": 1,
+  "nfinal": 2,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 1.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_bg_bguuxz": {
+  "core_s_per_event": 0.1218,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 121.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dbx_abxd__as130": {
+  "core_s_per_event": 0.003,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 3.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dbx_bxdepemg": {
+  "core_s_per_event": 0.0356,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 35.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dbx_bxgguwm": {
+  "core_s_per_event": 0.0735,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 73.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dd_dguwm__E20": {
+  "core_s_per_event": 0.0213,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 21.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dd_dguwm__c30": {
+  "core_s_per_event": 0.016,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 16.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_agvevex__E20": {
+  "core_s_per_event": 0.053,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 53.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_agvevex__c30": {
+  "core_s_per_event": 0.0067,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 6.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_awpwm__E20": {
+  "core_s_per_event": 0.0084,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 8.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_awpwm__c30": {
+  "core_s_per_event": 0.004,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 4.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_bbxghh": {
+  "core_s_per_event": 0.0251,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 25.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_dhuxwp__E20": {
+  "core_s_per_event": 2.2882,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 4,
+  "runs_timed_out": 2,
+  "s_run_max": 2288.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_dhuxwp__c30": {
+  "core_s_per_event": 0.0676,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 67.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_gtaptaptamtam": {
+  "core_s_per_event": 0.0321,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 32.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_gvevex__E20": {
+  "core_s_per_event": 0.0555,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 55.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_gvevex__c30": {
+  "core_s_per_event": 0.0025,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_hssxz__E20": {
+  "core_s_per_event": 0.0612,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 61.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ddx_hssxz__c30": {
+  "core_s_per_event": 0.0064,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 6.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_adg__as130": {
+  "core_s_per_event": 0.0037,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 3.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_adgzz": {
+  "core_s_per_event": 0.0776,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 77.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_cxghsu": {
+  "core_s_per_event": 0.0145,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 14.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_dhwpwm__E20": {
+  "core_s_per_event": 0.0515,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 51.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_dhwpwm__c30": {
+  "core_s_per_event": 0.005,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 5.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_dhz__as130": {
+  "core_s_per_event": 0.0019,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 1.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_dvevexz__E20": {
+  "core_s_per_event": 0.022,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 22.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dg_dvevexz__c30": {
+  "core_s_per_event": 0.0044,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 4.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ds_depems__E20": {
+  "core_s_per_event": 0.0101,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 10.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ds_depems__c30": {
+  "core_s_per_event": 0.0112,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 11.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ds_dghhs": {
+  "core_s_per_event": 0.0155,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 15.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dsx_adsxz__E20": {
+  "core_s_per_event": 0.4955,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 495.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dsx_adsxz__c30": {
+  "core_s_per_event": 0.0111,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 11.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dsx_cxguuux": {
+  "core_s_per_event": 0.0449,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 44.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dsx_cxuzz__E20": {
+  "core_s_per_event": 0.0434,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 43.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_dsx_cxuzz__c30": {
+  "core_s_per_event": 0.013,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 13.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_aaavmvmx": {
+  "core_s_per_event": 0.0304,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 12,
+  "runs_timed_out": 0,
+  "s_run_max": 30.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_aaccx__E20": {
+  "core_s_per_event": 1.8,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 10,
+  "runs_timed_out": 1,
+  "s_run_max": 1800.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_aaccx__c30": {
+  "core_s_per_event": 0.1173,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 10,
+  "runs_timed_out": 0,
+  "s_run_max": 117.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_avevexzz": {
+  "core_s_per_event": 0.0889,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 10,
+  "runs_timed_out": 0,
+  "s_run_max": 88.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_bbxg__as130": {
+  "core_s_per_event": 0.0043,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 12,
+  "runs_timed_out": 0,
+  "s_run_max": 4.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_bbxggh": {
+  "core_s_per_event": 0.0464,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 10,
+  "runs_timed_out": 0,
+  "s_run_max": 46.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ccxddx__E20": {
+  "core_s_per_event": 3.524,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 8,
+  "runs_timed_out": 2,
+  "s_run_max": 3524.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ccxddx__c30": {
+  "core_s_per_event": 0.5477,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 10,
+  "runs_timed_out": 0,
+  "s_run_max": 547.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ccxgvevex": {
+  "core_s_per_event": 0.0183,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 12,
+  "runs_timed_out": 0,
+  "s_run_max": 18.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ccxh__E20": {
+  "core_s_per_event": 0.0027,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 6,
+  "runs_timed_out": 0,
+  "s_run_max": 2.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ccxh__c30": {
+  "core_s_per_event": 0.0021,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 10,
+  "runs_timed_out": 0,
+  "s_run_max": 2.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ddxg__E20": {
+  "core_s_per_event": 0.0079,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 6,
+  "runs_timed_out": 0,
+  "s_run_max": 7.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ddxg__c30": {
+  "core_s_per_event": 0.0036,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 12,
+  "runs_timed_out": 0,
+  "s_run_max": 3.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_ddxggg": {
+  "core_s_per_event": 0.3602,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 12,
+  "runs_timed_out": 0,
+  "s_run_max": 360.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_epemz__E20": {
+  "core_s_per_event": 0.0176,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 6,
+  "runs_timed_out": 0,
+  "s_run_max": 17.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_epemz__c30": {
+  "core_s_per_event": 0.0063,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 10,
+  "runs_timed_out": 0,
+  "s_run_max": 6.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_mupmum__E20": {
+  "core_s_per_event": 0.0015,
+  "mg_cores": 1,
+  "nfinal": 2,
+  "runs": 6,
+  "runs_timed_out": 0,
+  "s_run_max": 1.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_epem_mupmum__c30": {
+  "core_s_per_event": 0.0019,
+  "mg_cores": 1,
+  "nfinal": 2,
+  "runs": 12,
+  "runs_timed_out": 0,
+  "s_run_max": 1.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_gg_ccxg__E20": {
+  "core_s_per_event": 0.0057,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 5.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_gg_ccxg__c30": {
+  "core_s_per_event": 0.0042,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 4.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_gg_dddxdxg": {
+  "core_s_per_event": 0.474,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 474.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_gg_gg__as130": {
+  "core_s_per_event": 0.0016,
+  "mg_cores": 1,
+  "nfinal": 2,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 1.6,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ubx_abxhu__E20": {
+  "core_s_per_event": 0.0029,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ubx_abxhu__c30": {
+  "core_s_per_event": 0.0054,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 5.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ubx_bxghuz": {
+  "core_s_per_event": 0.0211,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 21.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uc_cgghu": {
+  "core_s_per_event": 0.0165,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 16.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ucx_adsxz__E20": {
+  "core_s_per_event": 0.0139,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 13.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ucx_adsxz__c30": {
+  "core_s_per_event": 0.0127,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 12.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ucx_dggsxz": {
+  "core_s_per_event": 0.0397,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 39.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ud_ddhwp__E20": {
+  "core_s_per_event": 0.2369,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 236.9,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ud_ddhwp__c30": {
+  "core_s_per_event": 0.0221,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 22.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_aawpz__E20": {
+  "core_s_per_event": 0.2777,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 277.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_aawpz__c30": {
+  "core_s_per_event": 0.0231,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 23.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_acggsx": {
+  "core_s_per_event": 0.0402,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 40.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_ddxwp__as130": {
+  "core_s_per_event": 0.0052,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 5.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_epvevevex__E20": {
+  "core_s_per_event": 0.095,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 95.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_epvevevex__c30": {
+  "core_s_per_event": 0.006,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 6.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_udx_ggwp__as130": {
+  "core_s_per_event": 0.0038,
+  "mg_cores": 1,
+  "nfinal": 3,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 3.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_aepemu__E20": {
+  "core_s_per_event": 0.0588,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 58.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_aepemu__c30": {
+  "core_s_per_event": 0.0124,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 12.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_agtaptamu": {
+  "core_s_per_event": 0.0281,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 28.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_ghtaptamu": {
+  "core_s_per_event": 0.0087,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 8.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_uzzz__E20": {
+  "core_s_per_event": 0.1308,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 130.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_ug_uzzz__c30": {
+  "core_s_per_event": 0.0074,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 7.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_us_acdgh": {
+  "core_s_per_event": 0.0165,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 16.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_us_cdghz": {
+  "core_s_per_event": 0.0171,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 17.1,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uu_ahuu__E20": {
+  "core_s_per_event": 0.0038,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 3.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uu_ahuu__c30": {
+  "core_s_per_event": 0.0032,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 3.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uu_epemuu__E20": {
+  "core_s_per_event": 0.5908,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 590.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uu_epemuu__c30": {
+  "core_s_per_event": 0.0177,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 17.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_aepemz__E20": {
+  "core_s_per_event": 1.3603,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 3,
+  "runs_timed_out": 0,
+  "s_run_max": 1360.3,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_aepemz__c30": {
+  "core_s_per_event": 0.0225,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 22.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_aepgvewm": {
+  "core_s_per_event": 0.0248,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 24.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_csxwmz__E20": {
+  "core_s_per_event": 0.0345,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 34.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_csxwmz__c30": {
+  "core_s_per_event": 0.0118,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 11.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_epemggh": {
+  "core_s_per_event": 0.008,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 8.0,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_epemvevex__E20": {
+  "core_s_per_event": 0.0282,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 28.2,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_epemvevex__c30": {
+  "core_s_per_event": 0.0047,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 4.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_ggtaptamz": {
+  "core_s_per_event": 0.0367,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 36.7,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_ghzzz": {
+  "core_s_per_event": 0.0385,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 38.5,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_uuxvevex__E20": {
+  "core_s_per_event": 2.7178,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 2717.8,
+  "source": "probe logs (lhe_probe kept)"
+ },
+ "hd_uux_uuxvevex__c30": {
+  "core_s_per_event": 0.0066,
+  "mg_cores": 1,
+  "nfinal": 4,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 6.6,
+  "source": "probe logs (lhe_probe kept)"
+ }
+}

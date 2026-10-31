@@ -19,7 +19,7 @@ returns, how much of it its pool keeps, what it costs in time and disk, and what
                                             multiplicity): runs, timeouts, median and minimum yield, median kept
                                             fraction, median seconds per kept event, median MG5 output seconds, peak
                                             run-directory size (median, max); variants (--patch) apart
-    kept LOG... --out F.json [--yields-out Y.json] [--by-energy-out B.json]
+    kept LOG... --out F.json [--yields-out Y.json] [--by-energy-out B.json] [--rates-out R.json]
                                             the default-share runs' kept fractions per process and e+e- energy; with
                                             --yields-out each probed process's yield too (a gridpack pool's worst
                                             energy's), with --by-energy-out its yield and complete share per energy
@@ -531,7 +531,7 @@ def cmd_kept(a):
     """{process: {kept, by_energy: {E: kept}}} of the default-share (dsh_) runs in probe logs: the fraction of a run's
     events its pool keeps, per e+e- collider energy (2 x ebeam1 of the run's patches), the mean over the runs of one
     energy; read by recipes/gen_catalog_v4_default.py (accept_margin)."""
-    acc, ys, by_e = {}, {}, {}
+    acc, ys, by_e, rt = {}, {}, {}, {}
     for f in a.logs:
         for line in open(f):
             if "PROBE_JSON " not in line:
@@ -544,6 +544,14 @@ def cmd_kept(a):
                 ys.setdefault(r["process"], []).append(float(r["yield"]))
             # a gridpack pool's runs per collider energy (2 x ebeam1; "all" for pp): yield and the share of runs that
             # returned all they asked (the assembly keeps only those); a run that errored counts as returning nothing
+            # the wall of each run over the events it asked (one core per run): a timed-out run counts its timeout,
+            # a lower bound of its cost
+            if r.get("gridpack") and int(r.get("events_asked") or 0) > 0:
+                s_run = r.get("s_generate")
+                if r.get("error") and "timed out after" in str(r["error"]):
+                    s_run = float(re.search(r"timed out after ([0-9.]+)", str(r["error"])).group(1))
+                if s_run:
+                    rt.setdefault(r["process"], []).append((float(s_run), int(r["events_asked"]), bool(r.get("error"))))
             if r.get("gridpack"):
                 pe = r.get("patches") or {}
                 E = f"{2.0 * float(pe['ebeam1']):g}" if "ebeam1" in pe else "all"
@@ -576,6 +584,17 @@ def cmd_kept(a):
         y.update({n: min(e["yield"] for e in by.values()) for n, by in energy.items()})
         with open(a.yields_out, "w") as f:
             json.dump(dict(sorted(y.items())), f, indent=1)
+    if getattr(a, "rates_out", None):
+        # lhe_parts plan --rates: each probed gridpack pool's slowest run, seconds per event asked on one core
+        # (core_s_per_event, the rates file's unit), so a task's estimate is the wall of its pool's slowest probe run
+        rates = {}
+        for n, v in sorted(rt.items()):
+            s_ev = max(s / k for s, k, _ in v)
+            rates[n] = {"core_s_per_event": round(s_ev, 5), "mg_cores": 1, "nfinal": int(mg.PROCESSES[n]["nfinal"]),
+                        "runs": len(v), "runs_timed_out": sum(e for _, _, e in v),
+                        "s_run_max": round(max(s for s, _, _ in v), 1), "source": "probe logs (lhe_probe kept)"}
+        with open(a.rates_out, "w") as f:
+            json.dump(rates, f, indent=1)
     if getattr(a, "by_energy_out", None):
         with open(a.by_energy_out, "w") as f:
             json.dump(energy, f, indent=1)
@@ -897,6 +916,8 @@ def main():
     s.add_argument("--yields-out", default=None, help="also each process's probe yield (returned over asked)")
     s.add_argument("--small-run", type=int, default=1000, help="the run size the yields are kept for")
     s.add_argument("--by-energy-out", default=None, help="a gridpack pool's yield and complete-run share per energy")
+    s.add_argument("--rates-out", default=None, help="a gridpack pool's slowest probe run as core seconds per event "
+                   "(lhe_parts plan --rates)")
     a = ap.parse_args()
     {"list": cmd_list, "parts": cmd_parts, "run": cmd_run, "node": cmd_node, "summary": cmd_summary, "kept": cmd_kept, "mixcheck": cmd_mixcheck, "runsize": cmd_runsize, "runlevel": cmd_runlevel, "runlevel-summary": cmd_runlevel_summary, "gridpack": cmd_gridpack, "gridpool": cmd_gridpool, "gridpool-plan": cmd_gridpool_plan}[a.cmd](a)
 
