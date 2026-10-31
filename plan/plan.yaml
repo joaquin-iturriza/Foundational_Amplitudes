@@ -6154,6 +6154,45 @@ entries:
       test_label_alphas_mz passes, labels run from 0.13 as the catalog''s alpha_s 0.13 pools), H5 recorded as next 19; 19.19
       core-h, 4.8-6 GPU-h; HD4 job-axis edits to be committed before any re-read. Searched heldout_default, hd_, E20, c30,
       d4c30r, dsh_, default-sampled held-out in results.tex, plan.yaml, site decisions: only the cited 04:56 finding.'
+  - at: '2026-10-31T16:53:24+00:00'
+    question: 'Step 19 (Joaquin 2026-10-31 [D227], and 17:2x ''the remaining generation is to be done now''): H5''s 28 one-loop
+      held-out classes read on MadEvent default-sampled events as the 114 of step 18 are: do the MSE mixture arms (default
+      share 0.50 / 0.25) and the het arms cost or gain on H5 when the test events are MadEvent''s Born events (the class''s
+      own MadLoop labels), and does the pooled default-sampled R change when H5 joins (700 classes)?'
+    prior: 'Step 18''s passed design (2026-10-31T05:24) and its 04:56 finding (H1-H3 default-sampled R 0.912 [0.802,1.068]
+      vs catalog-sampled 1.267); H5 catalog-sampled read in mixture_ab.json (par:v4_mixture). Searched docs/results.tex, plan.yaml,
+      site decisions for H5 default, hd_*_nlo, label rule virt, one-loop on MadEvent events: none found beyond step 18''s
+      design naming H5 as next 19.'
+    measure: 'Per probe zero-shot MSE (tools/zero_shot_parent.py --signed-magnitude as the catalog''s H5 read, test split,
+      2000 events) of each arm and control seed on pools hd_<class> (recipes/catalog_v4_heldout_default_H5_processes.yaml
+      @77312c3f: MadEvent events of the class''s Born, its MadLoop generate line without [virt=QCD], loop-induced gg>zh as
+      [noborn=QCD] with loop_sm-no_b_mass; pp 13 TeV catalog_v4_pp cards, e+e- at the EE4 energies above the class''s lower
+      edge; labels by the class''s own MadLoop standalone, lhe rule virt @77312c3f: the stripped virtual at alpha_s(M_Z) 0.118
+      with the entry''s mass-scheme shift, as datagen.gen_virt_chunk generates the catalog''s pools, signed; .alphas.npy the
+      catalog''s one-loop convention (tools/write_own_alphas.py); the pool reads the class''s one-loop diagram sidecar, diagrams_of,
+      and carries its order vector). R = arm/control with the seed-spread-widened interval (mixture_ab.py heldout_default),
+      on H5 alone and pooled with step 18''s 672.'
+    check: 'The sampling of the test events moved R on H1-H3 from 1.267 to 0.912 (step 18 check), so the same move is possible
+      on H5. Labels: a MadLoop-unusable point (rc hundreds digit 4 or a wrong double pole) is replaced by the next spare event
+      of the same collider energy, the pool refused above 2% unusable (nlo_virtual_pipeline.generate_virt_dataset''s rule);
+      tests/test_lhe_virt_label.py (replacement, energy shares, refusals, alpha_s 0.118) passes on CPU. Generation: a per-pool
+      probe (gridpack + one run per energy, as step 18) gives kept fraction, time and disk; a first full pool (hd_epem_bbx_nlo,
+      e+e- -> b b~, six energies) checks labels end to end and measures the MadLoop seconds per point before the queue.'
+    fixed: 'Every trained run unchanged (eval-only REREAD of the six MSE runs and six het runs of step 18); 2000 test events
+      per class; complete runs of 1000 events from one gridpack per energy (par:v4_short_runs), run sizes from the probe;
+      MadLoop settings of the catalog''s one-loop pools (mass shift on, alpha_s(M_Z) 0.118, no prefactor). Cost: 28 pools,
+      42 gridpacks, 92 runs, about 1-2 core-h of MadEvent and at most about 8 core-h of MadLoop labels (2100 points x 28 at
+      up to 0.5 s; measured on the first pool); re-read 28 probes per arm inside step 18''s eval jobs (axis HD5), under 1
+      GPU-h added.'
+    control: control pair v4_dimensionless_muon seeds 42/43 (MSE) and v4_het_control seeds 42/43 (het), on the same hd_ H5
+      pools
+    seeds: 42 and 43, the existing arms' and controls' (eval-only). Spread on H5 catalog-sampled from mixture_ab.json; on
+      28 classes the widened half-width is wider than step 18's 114 (about 0.4 in ln R), so H5 alone resolves only R below
+      about 0.67 or above 1.5; pooled with the 672 it moves the pooled interval by at most its 4% share.
+    outcome: 'H5''s R inside the pooled 672 interval: the pooled read stands and H5 joins it (700 classes) for next 14. H5''s
+      interval above 1.05 while the pool''s is not: a localized one-loop cost, reported per axis to Joaquin for the share
+      choice. A pool refused (above 2% unusable or no spares, or MadEvent unable to make gg>zh loop-induced events): listed
+      with its reason, not dropped silently; the other 27 read.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
