@@ -3264,6 +3264,18 @@ $2.54$\,h. This is an estimate: it assumes every other pool fits beside that run
 % allow: 90 because it is a quantile level
 % allow: 99 because it is a quantile level
 
+The compiled standalones are not kept either: the probe reads' physics check reads each pool's sidecar
+(\code{tools/pool\_physics.py}, D209), so a regeneration rebuilds them. Their cost is MadGraph's output and compile
+before MadEvent runs, timed on one core in each of the $2388$ pp pools built in a single job: median $22.8$\,s per
+process, $90\%$ under $54.2$\,s, the largest $186.4$\,s, and $21.4$ core-hours in all.
+% src: python3 tools/regen_time.py @8f532896
+% claim: output_compile.pools=2388
+% claim: output_compile.median_s=22.8
+% claim: output_compile.q90_s=54.2
+% claim: output_compile.max_s=186.4
+% claim: output_compile.total_core_h=21.4
+% allow: 90 because it is a quantile level
+
 \paragraph{The factorised $2\to4$ head's data check on catalog\_v3 (2026-10-25).} Daniel's catalog asked it of $40$
 probes with an added gluon or photon (par.\ Design (ii) on the data); catalog\_v3 asks it of every $2\to4$ class built
 as a $2\to3$ class plus one gluon, photon, $Z$ or $H$: $880$ classes ($312$, $298$, $164$, $106$), $303$ of them held
