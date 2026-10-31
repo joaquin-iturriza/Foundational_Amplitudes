@@ -82,8 +82,8 @@ def pool_rows(z):
     role-contiguous train|val|test array and z['split'] the role; each role was shuffled by one default_rng(42)
     drawing rng.permutation(n) for train, val, test in turn (experiment._init_data), so position i of a role holds
     pool row perm[i]. The role sizes come from z['role_counts'] when saved, else from the idx: the scored role is whole
-    (n = len(idx)) and starts after the earlier roles (idx.min()); a test read with earlier roles of unknown split
-    is refused."""
+    (n = len(idx)) and starts after the earlier roles (idx.min()); a test read assumes val and test
+    pools of equal size (the catalog's), else it is refused."""
     if "pool_row" in z.files and len(z["pool_row"]):
         return np.asarray(z["pool_row"]).astype(np.int64)
     idx = np.asarray(z["idx"]).astype(np.int64).reshape(-1)
@@ -97,6 +97,10 @@ def pool_rows(z):
             cnt = {"train": lo, "val": len(idx), "test": 0}
         elif role == "test" and lo == 0:
             cnt = {"train": 0, "val": 0, "test": len(idx)}
+        elif role == "test" and lo >= len(idx):
+            # a read saved before role_counts: the catalog's val and test pools have the same size (1e4/1e4, 5e3/5e3),
+            # so val = len(idx) and train = idx.min() - len(idx) (an assumption; role_counts replaces it)
+            cnt = {"train": lo - len(idx), "val": len(idx), "test": len(idx)}
         elif role == "train" and lo == 0:
             cnt = {"train": len(idx), "val": 0, "test": 0}
         else:

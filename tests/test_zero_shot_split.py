@@ -97,6 +97,10 @@ def test_pool_rows_follow_the_role_shuffle():
     assert (pool_rows(z) == p["val"][[1, 3]]).all()
     z = mk(idx=np.arange(12, 16), split=np.array("test"), role_counts=np.array([7, 5, 4]))
     assert (pool_rows(z) == p["test"]).all()
+    rng = np.random.default_rng(seed=42)
+    q = {r: rng.permutation(n) for r, n in (("train", 8), ("val", 4), ("test", 4))}
+    z = mk(idx=np.arange(12, 16), split=np.array("test"))          # old read: equal val and test sizes assumed
+    assert (pool_rows(z) == q["test"]).all()
     z = mk(idx=np.arange(7, 12), split=np.array("val"), pool_row=np.arange(5) + 100)
     assert (pool_rows(z) == np.arange(5) + 100).all()
 
