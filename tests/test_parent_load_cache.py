@@ -11,7 +11,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
-os.environ["ZS_PARENT_COPY"] = "shared"
+os.environ.pop("ZS_PARENT_COPY", None)          # the default path
 import rebuild_run  # noqa: E402
 
 

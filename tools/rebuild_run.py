@@ -51,7 +51,8 @@ def cached_parent_loads(models_dir):
     unchanged. The tensors are shared, not cloned: their consumers only read them (load_state_dict and the EMA shadow
     copy_ into the model; _ckpt_scored_state, _merge_lora_state and the sigma row build new tensors), and the deep copy
     of every tensor, the optimizer state's included, was about 0.1 s of each probe (cProfile FA-ccin2p3-eaf96d1c).
-    Any other path loads as before."""
+    Only for a reader that never trains: an EMA built from the shared shadow (base_experiment._load_model_weights'
+    ema.load_state_dict keeps its tensors) would update the cache in place. Any other path loads as before."""
     models_dir = os.path.realpath(models_dir)
     cache = {}
 
@@ -63,9 +64,9 @@ def cached_parent_loads(models_dir):
             key = (tag, p, str(kw.get("map_location")))
             if key not in cache:
                 cache[key] = load(path, *args, **kw)
-            # ZS_PARENT_COPY=shared: the containers copied, the tensors shared; else (default until its A/B and review
-            # pass) the deep copy of every tensor
-            return container_copy(cache[key]) if os.environ.get("ZS_PARENT_COPY") == "shared" else copy.deepcopy(cache[key])
+            # ZS_PARENT_COPY=deep: the earlier deep copy of every tensor (A/B FA-ccin2p3-30cc8928: the shared copy's
+            # predictions differ from it by less than the deep path's own repeat does, 0.09 s a probe faster)
+            return copy.deepcopy(cache[key]) if os.environ.get("ZS_PARENT_COPY") == "deep" else container_copy(cache[key])
         return f
     import base_experiment
     base_experiment._torch_load = wrap(base_experiment._torch_load, "torch_load")

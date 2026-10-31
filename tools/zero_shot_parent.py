@@ -23,7 +23,7 @@ process, else the catalog-wide values. A difference refuses the probe (a ZERO_SH
 ...", one PHYSICS_CHECK line with the details) unless --allow-physics-mismatch "<reason>" (or the environment variable
 ZS_ALLOW_PHYSICS_MISMATCH) is given; the reason goes into the ZERO_SHOT record and the probe's .npz (physics_check).
 The parent's checkpoint is read from disk once per call: both loads of every probe's build (init_model's
-fine-tune load and load_best_weights) take a deep copy of that one read (cached_parent_loads), so every probe
+fine-tune load and load_best_weights) take a copy of that one read's containers, its tensors shared (cached_parent_loads), so every probe
 starts from the same tensors as before; s_stages in each ZERO_SHOT record gives the seconds of each stage.
     python tools/zero_shot_parent.py --parent <pretraining run dir> [--twins J] [--save-dir D]
         [--allow-physics-mismatch "<reason>"] <probe recipe.yaml> [...]
@@ -113,7 +113,7 @@ _ckpt_cache = cached_parent_loads(os.path.join(parent, "models"))
 # frozen-stats check: one answer per run directory for the whole job
 import functools  # noqa: E402
 from experiment import AmplitudeExperiment as _AE  # noqa: E402
-if os.environ.get("ZS_PARENT_COPY") == "shared":     # else the earlier path (asked per probe) until the A/B passes
+if os.environ.get("ZS_PARENT_COPY") != "deep":       # deep: the earlier path (asked per probe), kept for A/B
     _AE._infer_orders_source = classmethod(functools.lru_cache(maxsize=None)(_AE._infer_orders_source.__func__))
 # the parent's training catalog, the reference of every probe's physics check (built once, from the entries' backends)
 _pcfg = OmegaConf.load(os.path.join(parent, "config.yaml"))
