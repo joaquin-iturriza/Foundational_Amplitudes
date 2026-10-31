@@ -5429,7 +5429,7 @@ entries:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
   owner:
     agent: aefa0ef5a5b0832b7
-    state: working
+    state: closed
     since: '2026-10-30T23:45:55+00:00'
     context: 271541
     context_at: '2026-10-31T00:06:57+00:00'
@@ -5674,22 +5674,25 @@ entries:
       and 2 H200 slots unclaimed), while still admitting A100 MIG slices against its own comment. Fixed: CONDOR_GPU_REQ =
       whole A100/V100/T4/H100/H200, no MIG, used in the submit file and in site pick''s slot count; probe resubmitted as FA-lxplus-ed084f25.'
   handoff:
-    state: 'Done this owner run (2026-10-30/31): lxplus made a data-ready GPU site (catalog_v4 pools, sidecars, control checkpoints
-      copied CC->lxplus; verify passes; HTCondor GPU requirement fixed to whole A100/V100/T4/H100/H200, no MIG); probe FA-lxplus-ed084f25
-      submitted (IDLE at last look, 3 willing slots) - read its log before any job moves to lxplus. Supervisor: COMPLETED
-      judged by exit code for scripts that print no end marker, banner lines never the last line; one RUN_DONE per entry per
-      pass for clean recorded runs, muted while the owner works; the waiter returns only for ALERT/STALLED/MAINTAIN/REFUSED
-      or an entry with no or a stopped owner (66b4cfd1, tests/test_run_done_waiter.py). Usage report tools/usage_report.py
-      (5b14ab22, evidence). Opener unregistered from the Stop gate (29a1d82f). wait_guard: an agent''s run_in_background must
-      be tools/detach.py (3f52b93c); live test: a detached 120 s site run on lxplus ended as site event E3144, no task notice
-      reached the main session, the waiter returned it with the owner stopped.'
-    decisions: 'Copied whole datasets/amp_data_cache dirs (139 GB, ~2x need) because site copy had no file lists; added site
-      copy --from-file for exact lists next time. Muted RUN_DONE while the owner works, as asked: runs that end then never
-      raise RUN_DONE later.'
-    ruled_out: 'Moving to a separate entry for the lxplus probe: the reviewer passed it under agent_redesign.'
-    running: FA-lxplus-ed084f25 (lxplus GPU probe, design passed)
-    files: ~/.local/bin/site (CONDOR_GPU_REQ, copy --from-file, RUN_DONE glue, quiet waiter; backups site.bak_20261030, site.bak_20261031),
-      ~/.local/bin/site_runends.py (marker_producers, _last_line, run_done_events, waiter_wants; backups .bak_20261031, .bak_20261031b),
-      tools/check_site_data.py --paths, tools/plan.py owners, tools/usage_report.py, tests/test_run_done_waiter.py, .claude/hooks/wait_guard.py,
-      plan/step_prompt.txt
-    written: '2026-10-30T23:38:41+00:00'
+    state: 'Done this owner run (2026-10-31): (A) brief_guard refuses an Agent launch whose model differs from its definition''s
+      model: (0eff43b9; test D4 compact-worker+sonnet refused, no model and design-reviewer+opus pass; D6 failure pre-existing).
+      (B) usage measured from all 362 transcript folders at list price (tools/usage_windows.py, f3624f9c): window = first
+      call + 5 h (matches API reset times within 1-8 min); calibration FAILED the 20% bar (28% reading gives ~$170 per window,
+      the three real limit hits came at $128-147), so no percent stated; step-agent period: 14 windows, median $71, 3 limit
+      hits, $17.7/active h; redesign: 2 windows $50.7, $12.0/h; $ per result 4.82/2.74/2.37 (main alone/step/redesign); the
+      old usage_report read 1 folder and missed $52 of A/B replays in the 10-29 06:19 hit window and the likelihoods project.
+      (D) tools/agent_tasks.py: no decidable Sonnet cell outside reviews; classifier blind to review misses and unhand-checked
+      on successes; matched trial proposed. (C) context_breakdown.py: fixed part 50k->25k at first call; pooled per-call median
+      stays ~107-110k because owners run longer and hook pushes (7-9k) and hidden thinking grew; chars/4 covers 45% of API
+      growth (fit 1.72 tok per chars/4 + 604/call).'
+    decisions: Design reviewed (FIX then PASS 2026-10-31T00:00). Cost not converted to percent because calibration failed,
+      as the design said. Later-fix signal narrowed to commits removing the task's own lines with fix/revert in the subject;
+      self-corrections of a brief excluded; user-message signal needs an agent named (hand check showed misattribution otherwise).
+    ruled_out: Reweighting cache reads to reconcile the meter (diagnostic fit did not). Brief-free size bands by calls/cost
+      (biased against cheaper models).
+    running: none
+    files: tools/usage_windows.py, tools/agent_tasks.py, tools/usage_report.py (--all-fa-folders, usd), tools/context_breakdown.py,
+      .claude/hooks/brief_guard.py, tests/test_redesign_d.py, analysis/agent_redesign/{usage_windows,agent_tasks,usage_report_v2,context_breakdown}.json,
+      figs/context_breakdown.png (gitignored); untracked superseded tools/token_windows.py and analysis/agent_redesign/token_windows.json
+      from the stopped sonnet agent
+    written: '2026-10-31T00:07:11+00:00'
