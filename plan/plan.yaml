@@ -3357,6 +3357,7 @@ entries:
     - analysis/catalog_v4/validate_v4.py
     - analysis/storage/free_manifest_2026-10-26.tsv
     - analysis/storage/free_space.py
+    - mix_compose.py
     - particle_ids.py
     - 'pp13v4 generation part 3 of 8 (commit c7ca7d55, before the beam_masses fix e7a1775d), TIMEOUT 2026-10-30 02:26 while
       building pp13v4_dd_ddgg: 83 pools done; 3 short MadEvent runs (pp13v4_ub_bggu 3428, pp13v4_dg_dguux 680, pp13v4_uu_aauu
@@ -3396,6 +3397,7 @@ entries:
     - 'the lhe_parts gc job: 2435 directories trimmed to their logs, 122.4 GB; CC at 115G free'
     - tools/catalog_ft.py
     - tools/certify_v4_loops.py
+    - tools/mix_compose_check.py
     - tools/mixed_order_audit.py
     - tools/mixed_order_virt_check.py
     - tools/nlo_virtual_pipeline.py
