@@ -114,8 +114,10 @@ def main():
             lhe = complete_layout(lhe, PP_RUN_SIZES.get(n, SMALL_RUN), gridpack=True, name=n, sizes=RUN_SIZES.get(n))
             lhe = {k: v for k, v in lhe.items() if k not in hdr or hdr[k] != v}
             name = "hd_" + n[3:]
+            # diagrams_of: the pool reads its tree's diagram sidecar (no hd_ sidecar is dumped; without one the
+            # off-shellness and order features would be silently off for the probe)
             out[name] = {**lhe_entry(mg, base, e, mg.V4_MODEL, lhe), "parent": base, "split": "heldout",
-                         "test_group": f"held-out default v4: {ax}", "heldout_class": n}
+                         "test_group": f"held-out default v4: {ax}", "heldout_class": n, "diagrams_of": base}
             per_axis[ax] = per_axis.get(ax, 0) + 1
     with open(os.path.join(HERE, "catalog_v4_heldout_default_processes.yaml"), "w") as f:
         f.write(HDR)

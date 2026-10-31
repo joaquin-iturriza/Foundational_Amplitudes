@@ -68,7 +68,8 @@ for spec in ARGS or DEFAULT:
             elif ALPHAS and rec.get("per_event_alphas") is True and not os.path.exists(path[:-len(".npy")] + ".alphas.npy"):
                 noalphas.append(f"{p['name']}/{role}")
         cars = [f for f in (os.path.join(ROOT, "data", "diagrams", f"{c}.diagrams.json")
-                            for c in (p["name"], p.get("base")) if c) if os.path.exists(f)]
+                            for c in ((mg.PROCESSES.get(p["name"]) or {}).get("diagrams_of"), p["name"], p.get("base"))
+                            if c) if os.path.exists(f)]
         if PATHS:
             for f in cars:
                 if f not in seen:
