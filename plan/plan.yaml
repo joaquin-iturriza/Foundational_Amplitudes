@@ -2217,6 +2217,29 @@ entries:
       go (as par:v4_signext). Per cell shown beside (gg: 10 training pools against 17 held out). Cost: GPU 4 runs x 1 V100
       x about 3.5 h (tools/short_wall.py) = 14 GPU-h, under 30 (D153); CPU: MadGraph check, class check, generation of up
       to 261 tree pools (catalog_v4''s 478-entry prebuild took about 6 CPU-h) after a probe of a few pools (yield, time, disk).'
+    fix_at: '2026-10-31T03:46:42+00:00'
+    fix: 'Seeds against the measured spread (check 3) FAILS: the design takes its noise as the control pair''s seed-43/42
+      ratio on H2 (1.071, margin 0.071), but the spread of this exact statistic, the per-seed arm/control median ratio on
+      the 218 H2 pools after a training-set change, is already measured in analysis/catalog_v4/data/signext_compare.json (mse_ratio.H2.per_seed
+      1.176, 1.314, 1.046, 1.047: SD about 0.13 for one seed pair). The smallest effect the design acts on, s >= 0.25 of the
+      gap (median gap 0.207/0.189, lco_map.json) on a control median near 0.4-0.47 (median_mse_ctrl 0.472), is a drop of about
+      0.05, r about 0.89: one seed''s spread or less. Converted to s, the per-seed noise is about 0.25-0.3, larger than the
+      0.15 between the yes (0.25) and no (0.1) thresholds, and each seed is decided on its own. Fix: compute r and s on var(u)
+      per seed for the four signext arm/control seed pairs from their existing H2 reads (CPU), take that spread as the margin,
+      and size the seeds so the s = 0.25 effect stands above it (signext needed four; 4 per arm here is 8 runs x 3.5 h = 28
+      GPU-h, under 30), or decide on seed means with the measured spread instead of per seed. The measure''s response (check
+      2) is shown on zero-shot MSE (1.154 H2, signext), not on var(u) and s, which is what the rule reads; the same CPU read
+      on the signext pairs closes that too, stating how far r and s moved there. Prior work omitted (check 5): docs/results.tex,
+      the transfer ladder''s preliminary read (around line 11036): adding the W+ng family (more multiplicity in the pretraining)
+      raised the fine-tune gain on Zg to 4.0 and Zggg to 2.8 from 1.1/1.3 (rung 9 vs rung 4, D20); the prior says no prior
+      read of adding same-multiplicity pools was found. Name it, with how this differs (zero-shot floor on catalog_v4''s held-out
+      cells at fixed steps, one change, against a rung comparison that changed many structures and read fine-tune gain). Also
+      state: whether var(u) is read in log|M|^2 units or in the run''s standardized units; the shared standardization pools
+      (mu, sigma) over the training targets, so 147 added 2->4 pools move sigma and a standardized r must be re-based by sigma_arm^2/sigma_ctrl^2
+      (CLAUDE.md: re-based when preprocessing differs). Update the pool count to the committed enumeration (recipes/catalog_v4_multext_candidates.json
+      @263340ca: 147, per cell bb 10, bg 2, bq 20, ee 14, gg 29, qg 10, qq 62), not the 261 upper bound. Checks 1, 4, 6, 7,
+      8 hold: one change (pools added, fewer steps per pool stated), control rerun in the same wave, outcomes for yes/no/between
+      stated, D216 ''do b'' covered, no learned map.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
