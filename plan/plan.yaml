@@ -6843,6 +6843,22 @@ entries:
   - at: '2026-10-31T14:17:40+00:00'
     text: '2026-10-31: owner afa86296 reached the 170k close line inside one step (het analysis code + 3 review rounds), before
       running anything; next briefs: run only, no new code.'
+  - at: '2026-10-31T14:27:29+00:00'
+    text: 'Step 15 run on the reads in hand (het_uncertainty @4e3e7318, mixture_ab @f15d25cd; both fixes: no rule verdict
+      on a partial read; a cut read no longer counted as ''no default pool''). Question 2, sigma (control pair complete, 2171
+      probes each): sigma ranks the error on trained classes, rule A YES on PP4 (Spearman across classes 0.93/0.93, within
+      class 0.40/0.40) and EE4 (0.84/0.85, 0.52/0.54); trained median pull std 1.15/1.12, cover68 0.58 (calibrated would be
+      1.0, 0.68). Held-out pooled (701 classes, catalog-sampled): across 0.48/0.46, pull std 2.32, cover68 0.33: rule B ''not
+      calibrated; weak ordering''; H5 (one-loop) pull std 38/26, cover68 0.02; H7E/H7c near calibrated (pull 1.08-1.19, cover68
+      0.61-0.67). Share arms: B the same at both shares; A withheld (PP4 partial, EE4 unread). Where-map (control, PP4 trained,
+      per-probe normalised, het_where.png): top over bottom decile of max|eta| median s x1.19/1.21, RMSE x1.30/1.32; smallest
+      over largest pair invariant decile median s x1.5/1.6, RMSE x1.7/1.8: sigma follows the hard regions, under the error''s
+      rise. Question 1, arm/control R on what is read, no verdict (EE4 unread on all four arms, PP4 cut 529/393 and 246/172
+      of 1301, HD4 for none): default50 PP4 0.477 [0.397, 0.589] on 772 classes, held-out default-sampled 0.745 [0.554, 0.951]
+      on 224 of 558 probes (PP4 only), catalog-sampled 1.144 [0.894, 1.473]; default25 PP4 0.459 [0.368, 0.562] on 1055, held-out
+      default-sampled 0.679 [0.490, 0.911] on 395 of 558, catalog-sampled 0.931 [0.725, 1.191]. The PP4 subsets are the probes
+      read first, not a random sample. Het control over MSE control: PP4 trained 1.003, not trained 1.170, EE4 1.418, held-out
+      catalog-sampled 1.159 (H5 13.8).'
   handoff:
     state: 'Step 15 analysis code written, not yet committed: the commit hook blocks until the repo-reviewer passes its overdue
       backlog. analysis/catalog_v4/mixture_ab.py (working tree, uncommitted) adds MIX_HET (the six het runs), HD4_HET (empty
