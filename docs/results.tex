@@ -2435,7 +2435,7 @@ $1600$ of a pool's own events and scored on the other $400$ ($5$ folds), removes
 the gap (seeds $42$, $43$; $f$ as in par.~\ref{par:v4_lco}), a cubic in $q$ $0.023$ and $0.037$: under the bar of
 $0.1$ on both seeds, so by the design's rule the route ends. The held-out residual is calibrated, not compressed: the
 median slope of $t$ on $q$ is $1.008$ and $1.006$ (training pools $0.998$ and $0.999$). With $K$ labelled events
-($200$ draws per pool), $f$ is measured beyond the level: its reference is the floor $\mathrm{var}(q-t)$, what an
+($200$ draws per pool), $f$ measures what remains beyond the level: its reference is the floor $\mathrm{var}(q-t)$, what an
 exact offset reaches, so an offset can only add its own $1/K$ estimation noise there ($f=-0.115$ and $-0.131$ at
 $K=16$, $-0.03$ at $K=64$ on both seeds, $-0.008$ and $-0.009$ at $K=256$). On the total MSE the offset still helps,
 as par.~\ref{par:v4_kshot_level} found: on these $218$ pools the median MSE of $\log|\mathcal M|^2$ is $0.46$ and
@@ -3155,8 +3155,8 @@ it is from pp's density follows its per-class ratio only weakly: a rank correlat
 for catalog\_v3, where pp training buys a factor of about seven. The density gap is real; that it costs catalog\_v4
 accuracy on pp events is not shown by this check. A
 pp component at $f=0.3$ halves the KL; reweighting catalog\_v4's own events in $\sqrt{\hat s}$ alone does much less. The pp
-blend proposed on this check (sec.~\ref{sec:ladder-open}, \emph{The pp blend}) is on hold: its motivation rested on
-the all-class gap.
+blend proposed on this check was run, on pp pools of catalog\_v4's physics, as the pure-default bound
+(par.~\ref{par:v4_pp_bound}) and the default-share mixture A/B (par.~\ref{par:v4_mixture}).
 
 \begin{figure}[t]
   \centering
@@ -3184,13 +3184,13 @@ $797$ hadronic tree training classes on pp pools (\code{recipes/catalog\_v4\_pp\
 the control's), seeds $42$ and $43$ (FA-ccin2p3-afc96598, FA-ccin2p3-d26f13aa), against catalog\_v4's control pair
 (FA-ccin2p3-339ec100, FA-ccin2p3-380842ed) at the same hyperparameters and steps. All four are read on the same events,
 the test split of the $1301$ PP4 pools (\code{recipes/catalog\_v4\_pp\_test.yaml}, $2000$ events each), by the same
-zero-shot scorer, every probe finite and physics-checked. Measure: per probe the MSE of $\log|\mathcal M|^2$ at the
+per-probe scorer (\code{tools/zero\_shot\_parent.py}), every probe finite and physics-checked. Measure: per probe the MSE of $\log|\mathcal M|^2$ at the
 best checkpoint, each side the geometric mean of its two seeds; per class the ratio arm over control; $R$ the median
 over classes, with a $95\%$ class bootstrap widened on each side by the control's seed shift. The rule, fixed before
 the read, says YES at $R\le0.90$ with the widened interval below $1$. On the $797$ classes the arm trains on pp events,
 $R=0.388$ (widened $[0.338, 0.446]$, $0.93$ of the classes lower): YES, default-sampled training brings the
-default-sampled error to about two fifths of what catalog\_v4's mixture gives. On the $504$ PP4 classes it does not
-train on pp events, $R=1.13$ (widened $[0.97, 1.37]$): the expected cost on classes outside the changed training, not
+default-sampled error to about two fifths of what catalog\_v4's mixture gives. On the $504$ PP4 classes outside its training
+recipe, $R=1.13$ (widened $[0.97, 1.37]$): the expected cost on classes outside the changed training, not
 settled at the widened interval. How it fits the earlier reads: on pp labels of catalog\_v3's physics, catalog\_v4 was
 ahead of the catalog\_v3-era pp-trained arm (par.~\ref{par:v4_vs_pp}), and the density check could not show that
 catalog\_v4's thin density where the pp events sit costs accuracy (par.~\ref{par:v4_density}). Both comparisons mixed
@@ -3232,8 +3232,8 @@ wins on GAIN and NO LOSS, and a gain with a loss is a trade-off for the user.
 \begin{itemize}
   \item \emph{Share $0.50$.} PP4, $1301$ classes: $R=0.682$ (widened $[0.594, 0.775]$); on the $797$ classes catalog\_v4
     trains $0.549$ ($[0.489, 0.625]$), on the other $504$ $0.921$ ($[0.802, 1.089]$). EE4, $169$ classes: $0.401$
-    ($[0.314, 0.520]$). Held out, $701$ classes pooled: $1.271$ ($[1.145, 1.418]$), $0.19$ of the classes lower. GAIN
-    and LOSS.
+    ($[0.314, 0.520]$). Held out, $701$ classes pooled: $1.271$ ($[1.145, 1.418]$), $0.19$ of the classes lower. GAIN,
+    and LOSS on this catalog-sampled held-out read.
     % src: python3 analysis/catalog_v4/mixture_ab.py mixture @4973581b
     % claim: shares.default50.PP4.all.n_classes=1301
     % claim: shares.default50.PP4.all.R=0.682
@@ -3259,7 +3259,7 @@ wins on GAIN and NO LOSS, and a gain with a loss is a trade-off for the user.
     % allow: 0.50 because it is the share, a setting
   \item \emph{Share $0.25$.} PP4: $R=0.755$ ($[0.667, 0.850]$); trained classes $0.650$ ($[0.561, 0.739]$), the others
     $0.932$ ($[0.803, 1.091]$). EE4: $0.413$ ($[0.337, 0.535]$). Held out, pooled: $1.225$ ($[1.106, 1.356]$), $0.23$
-    of the classes lower. GAIN and LOSS.
+    of the classes lower. GAIN, and LOSS on this catalog-sampled held-out read.
     % src: python3 analysis/catalog_v4/mixture_ab.py mixture @4973581b
     % claim: shares.default25.PP4.all.R=0.755
     % claim: shares.default25.PP4.all.widened.0=0.667
@@ -3330,7 +3330,7 @@ wins on GAIN and NO LOSS, and a gain with a loss is a trade-off for the user.
     FA-ccin2p3-df858d33 at $0.25$; control FA-ccin2p3-87ea24d0, FA-ccin2p3-321a3de2), read the same way. Share $0.50$:
     PP4 $0.505$ ($[0.406, 0.633]$), EE4 $0.220$ ($[0.166, 0.280]$), held out on default-sampled events $0.722$
     ($[0.554, 0.929]$); share $0.25$: PP4 $0.450$ ($[0.360, 0.556]$), EE4 $0.223$ ($[0.173, 0.301]$), held out $0.638$
-    ($[0.501, 0.834]$). Both win. H3 is at $0.959$ and $0.846$ (upper ends $1.238$ and $1.055$). On the catalog-sampled
+    ($[0.501, 0.834]$). Both take the win branch. H3 is at $0.959$ and $0.846$ (upper ends $1.238$ and $1.055$). On the catalog-sampled
     held-out read the het shares sit at $1.144$ and $0.931$, intervals across $1$.
     % src: python3 analysis/catalog_v4/mixture_ab.py mixture --het @19ccfe6e
     % claim: shares.default50.PP4.all.R=0.505
@@ -3376,7 +3376,7 @@ pools [D207], so it is trained without building pools.
 % claim: shares.default50.PP4.trained.R=0.549
 % allow: 1 0.50 0.25 because they are the reference ratio and the shares
 
-The shares against the pure-default bound, on the same default-sampled events (2026-10-31). The bound arm of
+\emph{The shares against the pure-default bound, on the same default-sampled events (2026-10-31).} The bound arm of
 par.~\ref{par:v4_pp_bound} (FA-ccin2p3-afc96598, FA-ccin2p3-d26f13aa) trains every hadronic tree class on its
 $13$\,TeV MadEvent pp events only; its $e^+e^-$ and one-loop classes keep the catalog's sampling, as the control's do.
 It had been read on PP4 alone. Read again eval-only from its best checkpoints on EE4, HD4 and HD5
@@ -12811,9 +12811,8 @@ of the three share a test set.
     regeneration. The preprocessing
     exploration is continuous (\code{plan continuous}, the user's ``Keep iterating.''); it closes only on their word.
     % allow: 2026 10 29 07 40 152 8 30 05 39 because they are dates, clock times, a disk size and a job count, not results
-  \item \textbf{The default-share mixture (open, the user's call).} The pp blend proposed on
-    par.~\ref{par:v4_density} was run as catalog\_v4's default-share mixture A/B (par.~\ref{par:v4_mixture}): both
-    shares gain on default-sampled events and lose on the held-out classes, a trade-off the design leaves to the user.
+  \item \textbf{The top classes under the default share (open).} Whether catalog\_v4's default share costs the
+    held-out top classes (H3) is not settled on two seeds (par.~\ref{par:v4_mixture}).
   \item \textbf{The level.} Open on Daniel's catalog (held): what the $43$ new pay for. Proposed and held by the user
     (2026-10-21) until the preprocessing design settles: the full-length catalog pretraining with the adopted target, the
     emission scales (par.\ The emission scales in training).
