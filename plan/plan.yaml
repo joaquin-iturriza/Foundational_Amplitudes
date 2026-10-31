@@ -2157,6 +2157,24 @@ entries:
       left to (b) (D216) and (a) (held, D78). (2) Per K in 4, 8, 16 (primary 16), g = f_shr_tr - f_off: gain when g - margin
       > 0 on both seeds (the protocol fits offset and shrunk slope from that K), cost when g + margin < 0 on both (offset
       only at that K), else neutral (offset only, the simpler); shr1 and the unshrunk affine reported beside.'
+    passed_at: '2026-10-31T03:41:37+00:00'
+    reviewer: 'Revised design @68cbe363. Question (1) is answered by the ceiling: I re-ran --check myself and got f_ceil 0.0121
+      / 0.0168 (bootstrap 0.010-0.016 / 0.011-0.021) and a cubic-in-q ceiling of 0.023 / 0.037, under the 0.1 bar, so it is
+      written up with no job. Question (2) is open with stated bars: the slope-and-offset fit against the offset alone on
+      the same draws, g = f_shr_tr - f_off at K = 4, 8 and 16, read as gain, cost or neutral on both seeds. Check 1: the plain
+      offset on the same 200 draws, with the training pools as the control. Check 2: par:kshot_level found the affine needs
+      K >= 8 to beat the offset on Daniel''s catalog, and the D83 few-shot read found slope shrinkage moved k = 3 from 0.22
+      to 0.14, so g moves with K. Gain is bounded by the ceiling of about 0.012 to 0.017 of the gap, against a margin of about
+      0.003 to 0.005 (the ceiling''s bootstrap half-range), so gain is reachable and cost is distinguishable. The margin uses
+      the unpaired half-range for a paired difference, which is conservative toward neutral, and neutral leads to the same
+      action as cost (offset only). Check 3: two seeds decided separately, with margin max(seed difference, bootstrap half-range).
+      Check 5: I searched results.tex for affine, K-shot, kshot, context vector, compress, calibrat, rescale, few-shot and
+      spread correction, plus the plan dead ends and decisions D178 and D216; the D83 few-shot calibration and the oracle
+      rescale-and-shift reads are now named. Check 6: the work runs under D178 (3). Check 7: K = 8 is added for D178''s ''8-16
+      points''. Check 8: fit and score events are asserted disjoint (line 114), the shr_tr and shr1 priors come from the cell''s
+      training pools only, shr_ho from other classes'' held-out pools, the ceiling is out-of-fold, and the floor comes from
+      training pools. Minor: the verdict() docstring says ''half the larger bootstrap half-range'' while the code uses the
+      half-range, which matches the design; fix the wording.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
