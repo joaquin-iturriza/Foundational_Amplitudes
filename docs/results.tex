@@ -2277,9 +2277,43 @@ $2\to4$) against the $332$ training pools of the same cells, placebos the summed
 Over the multiplicity cells $\log D$ explains a median $0.705$ of $\log|\mathcal M|^2$ but only $0.094$ of $t$ (both
 seeds; $0.089$ on the training pools), under the gate of $0.1$: the emission-scale target already holds what $D$
 carries at these cuts. The residual's $r^2$ on $\log D$ is $0.005$ and $0.007$ (seeds $42$, $43$), level with the
-placebos ($0.006$, $0.008$). A dead end. Open: the propagator-product read (the same frame with the diagrams'
-propagator product $P$, a ceiling on what any per-event quantity explains of the residual, and a read of the error's
-size against $\log P$), run as FA-ccin2p3-71a96ca2 with a Higgs width below the card's (fixed since), not yet read.
+placebos ($0.006$, $0.008$). A dead end; the propagator product is read next (par.~\ref{par:v4_prop}).
+
+% src: python3 analysis/catalog_v4/dipole_gate.py --prop @6a4b26ac
+% claim: dip.multiplicity_cells.heldout.s42.n_read=218
+% claim: dip.multiplicity_cells.train.s42.n_read=647
+% claim: dip.multiplicity_cells.train.s42.n_refused=69
+% claim: dip.multiplicity_cells.heldout.s42.median_r2_tP=0.106
+% claim: dip.multiplicity_cells.heldout.s42.median_r2_rawP=0.87
+% claim: dip.multiplicity_cells.heldout.s42.median_ceiling=0.122
+% claim: dip.multiplicity_cells.heldout.s43.median_ceiling=0.119
+% claim: dip.multiplicity_cells.train.s42.median_ceiling=0.036
+% claim: dip.multiplicity_cells.heldout.s42.median_eta2_P=0.042
+% claim: dip.multiplicity_cells.train.s42.median_eta2_P=0.015
+% claim: dip.multiplicity_cells.heldout.s42.median_eta2_E=0.032
+% claim: dip.multiplicity_cells.heldout.s42.median_eta2_F=0.028
+% claim: dip.multiplicity_cells.heldout.s42.median_r2size_P=0.005
+% claim: dip.multiplicity_cells.heldout.s43.median_r2size_P=0.006
+% claim: dip.multiplicity_cells.train.s42.median_r2size_P=0.009
+% allow: 0.05 0.5 20 because they are the design's ceiling bar, the share of the ceiling and the bin count, settings
+% allow: 1 2 0.1 42 because they are exponents, the gate and a seed, settings
+\paragraph{The propagator product against the multiplicity gap (2026-10-31).}\label{par:v4_prop} The second
+candidate: the diagrams' propagator product $P=\sum_d C_d\prod_S 1/|s_S-M_S^2+iM_S\Gamma_S|^{k}$ per event ($k=2$
+massive, $1$ massless, $C_d$ the diagram's couplings, from the diagram sidecars). The control already receives the
+massive lines' off-shellness and the diagrams as inputs, but not $P$ in its target. Design (passed review after one
+FIX): the frame of par.~\ref{par:v4_dipole} on all $218$ held-out multiplicity pools against the $647$ training pools
+of the same cells ($69$ refused for alignment), plus a ceiling, $\eta^2$ of the residual $u$ on $t$ and on
+$\log|\mathcal M|^2$ ($\eta^2$: the share of $\mathrm{var}(u)$ in $u$'s mean over $20$ equal-count bins), a mean read
+$\eta^2(u\,|\log P)$ against the placebos' (summed energy, emission-scale factor, $\log D$), and a size read, $r^2$ of
+$\log u^2$ on $\log P$. $\log P$ explains $0.87$ of $\log|\mathcal M|^2$ and $0.106$ of $t$ (both seeds), just past
+the gate of $0.1$. The ceiling is $0.122$ and $0.119$ held out ($0.036$ on training): readable, and three times the
+training pools'. The mean read is $0.042$ on both seeds against training's $0.015$, above the placebos ($0.032$,
+$0.028$ at seed $42$) by more than the seed difference and the bootstrap half-range, but under its bar of half the
+ceiling. The size read is $0.005$ and $0.006$, under training's $0.009$. By the design's rule this is between:
+reported, no GPU arm. The held-out residual has three times the training pools' per-event structure, of which $\log P$
+holds about a third and the placebos almost as much; no single per-event quantity tried carries the gap. The run had the
+Higgs width below the card's; on every pool with an internal Higgs line the two widths' $\log P$ agree to
+$r^2\ge0.9999996$ (\code{prop\_width\_check.py}), so the read stands.
 
 % src: python3 analysis/catalog_v4/loop_levels.py --multiplicity @9e5ba63b
 % claim: mb.median_signed_off_all=0.12
