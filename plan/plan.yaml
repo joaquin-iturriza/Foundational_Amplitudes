@@ -6357,6 +6357,12 @@ entries:
     units: null
     start: '2026-10-31T15:48:15+00:00'
     at: '2026-10-31T15:48:15+00:00'
+  - batch: zero_shot_profile_read
+    wall_h: 0.3
+    jobs: 1
+    units: null
+    start: '2026-10-31T16:11:09+00:00'
+    at: '2026-10-31T16:11:09+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
