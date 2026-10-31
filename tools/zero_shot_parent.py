@@ -36,7 +36,9 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import siteconf  # noqa: E402
 import pool_physics  # noqa: E402
-from rebuild_run import _build, load_best_weights, scored_split  # noqa: E402
+from rebuild_run import (_build, load_best_weights, scored_split, recipe_role_counts, stand_in_role,  # noqa: E402
+                         stand_in_split_set)
+import datagen  # noqa: E402
 from multiplicity_extrap import parent_target_standardization  # noqa: E402
 
 ap = argparse.ArgumentParser()
@@ -101,11 +103,16 @@ for recipe in a.recipes:
         cfg.fine_tune.pretrained_path = ckpt
         cfg.fine_tune.target_stats = "own"
         cfg.fine_tune.offshell_stats = "parent"
+    counts = recipe_role_counts(recipe)
+    _real_ess = datagen.ensure_split_set
+    datagen.ensure_split_set = stand_in_split_set(_real_ess, counts, a.split)   # a role the probe lacks is read from one it has
     try:
         exp = _build(cfg, None, None, None)          # init_model loads the parent's weights, as a fine-tune does
     except Exception as e:                            # a missing pool or sidecar on this site: listed, not dropped
         print("ZERO_SHOT " + json.dumps({"recipe": recipe, "parent": parent, "error": repr(e)[:300]}), flush=True)
         continue
+    finally:
+        datagen.ensure_split_set = _real_ess
     assert len(exp.cfg.data.dataset) == 1, f"{recipe}: one probe process per recipe"
     # the physics check, before anything is scored
     _spec = exp._recipe_specs[0]
@@ -159,6 +166,7 @@ for recipe in a.recipes:
     else:
         mu_c = sd_c = None; kind = "per_process"
     rec = {"probe": probe, "split": a.split, "n_particles": N, "recipe": recipe, "parent": parent, "ema_applied": ema_applied, "parent_stats": kind,
+           "own_stats_role": stand_in_role(counts, probe, "train", a.split)[0],
            "n_val": int(len(z)),   # the events scored, of --split (key kept for the readers)
            "var_logm2": float(np.var(t)), "val_loss_affine": affine,
            "affine_ab": [float(c) for c in coef], "twin": twins.get(probe), "transform": str(tr[0]),

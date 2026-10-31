@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-from rebuild_run import scored_split  # noqa: E402
+from rebuild_run import scored_split, stand_in_role, stand_in_split_set, recipe_role_counts  # noqa: E402
 
 
 def _exp():
@@ -41,6 +41,23 @@ def test_reader_and_job_use_the_split():
     assert "scored_split(exp, a.split" in zs and "exp.val_loader" not in zs and '_split_indices["val"]' not in zs
     job = open(os.path.join(ROOT, "scripts", "job_catalog_v3_short.sh")).read()
     assert '--split "$SPLIT"' in job and 'SPLIT=val;' in job and '[ "$A" = PP4 ]' in job
+
+
+def test_stand_in_roles():
+    c = {"a": {"train": 5, "val": 3, "test": 0}, "e": {"train": 0, "val": 0, "test": 7}, "z": {"train": 0, "val": 0, "test": 0}}
+    assert stand_in_role(c, "a", "train", "val") == ("train", 5)
+    assert stand_in_role(c, "a", "test", "val") == ("val", 3)       # scored split first
+    assert stand_in_role(c, "e", "train", "val") == ("test", 7)     # else another role it has
+    assert stand_in_role(c, "z", "val", "val") == ("val", 0)
+    calls = []
+    f = stand_in_split_set(lambda specs, role, seed, dest_dir=None, require_cache=False:
+                           calls.append((role, [s["n_events"] for s in specs])) or {s["process"]: role for s in specs}, c, "val")
+    assert f([{"process": "e", "n_events": 0}], "val", 1) == {"e": "test"} and calls == [("test", [7])]
+    assert f([{"process": "a", "n_events": 5}], "train", 1) == {"a": "train"}
+    zs = open(os.path.join(ROOT, "tools", "zero_shot_parent.py")).read()
+    assert "stand_in_split_set(" in zs and "own_stats_role" in zs
+    rc = recipe_role_counts(os.path.join(ROOT, "recipes", "catalog_v4_ee_test.yaml"))
+    assert rc["ee4_epem_aabbx"] == {"train": 0, "val": 0, "test": 2000}
 
 
 if __name__ == "__main__":

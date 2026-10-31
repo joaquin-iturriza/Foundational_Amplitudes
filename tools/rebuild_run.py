@@ -71,6 +71,36 @@ def scored_split(exp, split, name):
     return loader, pool, exp._split_indices[split]
 
 
+def recipe_role_counts(recipe_yaml):
+    """{process: {'train': n, 'val': n, 'test': n}}: the events each role of a recipe asks for (absent: 0)."""
+    rec = yaml.safe_load(open(os.path.expandvars(str(recipe_yaml))))
+    procs = rec.get("processes", rec) if isinstance(rec, dict) else rec
+    return {p["name"]: {r: int(p.get(f"n_{r}", 0) or 0) for r in ("train", "val", "test")} for p in procs}
+
+
+def stand_in_role(counts, process, role, scored_split):
+    """(role read, n events) for `role` of `process`: its own role when it has events, else the scored split, else
+    another role it has, else its own (0)."""
+    c = counts[process]
+    for r in (role, scored_split, *("train", "val", "test")):
+        if c.get(r, 0) > 0:
+            return r, int(c[r])
+    return role, 0
+
+
+def stand_in_split_set(real_ensure_split_set, counts, scored_split):
+    """A drop-in for datagen.ensure_split_set that reads each spec from its stand-in role (see stand_in_role),
+    so a probe without a pool of some role is still built."""
+    def split(specs, role, seed, dest_dir=None, require_cache=False):
+        out = {}
+        for s in specs:
+            r, n = stand_in_role(counts, s["process"], role, scored_split)
+            out.update(real_ensure_split_set([{**s, "n_events": n}] if r != role else [s], role=r, seed=seed,
+                                             dest_dir=dest_dir, require_cache=require_cache))
+        return out
+    return split
+
+
 def _build(cfg, swap, path, name):
     """The experiment built through init_model, with the `swap` role's pool read from `path` (None: none)."""
     real = datagen.ensure_split_set
