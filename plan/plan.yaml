@@ -2000,6 +2000,23 @@ entries:
       if factors-only holds half of f, else the named group), its own design and review before any GPU job. Cost: CPU only
       on CC: two stage-1 jobs (held-out pools, 4 cores, about 1 h, limit 2 h), one stage-2 job (8 cores, limit 2 h); no GPU;
       disk about 40 MB for the new held-out dumps.'
+    passed_at: '2026-10-31T02:26:31+00:00'
+    reviewer: 't-free re-read of par:v4_lco: one change (t column dropped from every map and from the own-label ceiling),
+      same dumps, rows, folds, floors, bootstrap, control pair 339ec100/380842ed, with-t read as the paired control. Ceiling:
+      K = 1600 of the 2000 read events via a stage-1 rerun on the H2 pools is right and keeps the passed rule (with-t f_ceil
+      0.271/0.316 was K = 1600; K = 400 on the 500 dumps would have changed the rule); dipole_residual.py picks the 500 dump
+      events with rng(0) over the same finite rows, so the new H2 dumps are the same events (paired), conditions: write them
+      to a new dump dir, not over the with-t reference, check their non-t columns equal the old dumps'', and fit own_ceiling
+      without the t column; stage 2 already has lco_map.py --exclude t and --tr-root for the existing TR dumps. Features at
+      prediction time: logF is log of the experiment''s all_amp_factor (target physics factor from momenta, species, couplings;
+      zero_shot_parent.py), log P from momenta and diagram sidecars, log D from momenta, kinematics and species counts from
+      momenta and pdg; none uses t, q or log|M|^2; u centring per pool leaves the variances unchanged. Check 2: lco_map.json
+      f_lco 0.1469 vs drop-factors 0.0018 (seed 42), factors only 0.0894, so the measure moves with the factor group. Check
+      3: seed difference 0.022/0.024 and 1000-draw bootstrap (boot_lco 0.131-0.179) as the margin, both seeds decided separately.
+      Check 4: passed rule on the t-free f_ceil and f_lco, yes/between/no each with its consequence. Check 5 searched: t-free,
+      without t, label leak, leakage, own target, re-read without, leave-class, lco in results.tex (only par:v4_lco''s caveat
+      line 2366, which this design answers), plan dead ends, site decisions (D178; no other comparison named). CPU only, about
+      6 core-h.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
