@@ -151,14 +151,6 @@ entries:
   - D199
   - D216
   next:
-    6: 'The event-level prior route for the held-out multiplicity gap ended (par:v4_lco_not @ed39613e: without t the own-label
-      ceiling holds 0.016/0.019 of the gap, under 0.1). For the user, the alternatives D178 can take for the multiplicity
-      pools, nothing run until they choose: (a) capacity and training length, which par:v4_shape_gap already assigns to the
-      new combinations and the full catalog pretraining''s design (held by D78); (b) data, more 6-particle training pools
-      in the held-out cells (no prior multiplicity result found; the user''s 2026-10-30 words record that more examples helped
-      the sign-changing pools); (c) a per-process level and spread correction from K labelled events (par:v4_kshot_level:
-      an offset removes the level, the floor var(q - t) stays; the context vector''s K-shot fits on catalog_v3, K = 16, floor
-      0.84 vs fit 1.25, did not reach the floor).'
     7: '(a) capacity and training length for the held-out multiplicity gap: wanted by the user (D216), held by D78 inside
       the full catalog pretraining''s design; not started.'
     8: '(b) more 6-particle training pools in the held-out multiplicity cells (D216): design, review, generation probe, generation,
@@ -2309,13 +2301,6 @@ entries:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
   step_why:
-    6:
-      feeds: 'D178: which route closes the held-out multiplicity pools'' shape gap'
-      if:
-      - 'user picks (a): fold into the full pretraining''s design under D78'
-      - 'user picks (b): design a data arm (added 6-particle training pools) on the control''s short pretraining, reviewed
-        before any GPU job'
-      - 'user picks (c): design a K-shot spread correction read on the existing dumps (CPU)'
     7:
       feeds: 'D178/D216: what closes the held-out multiplicity gap'
       if:
