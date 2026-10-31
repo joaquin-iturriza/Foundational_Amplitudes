@@ -59,6 +59,32 @@ def _key(row_mom):
     return hashlib.blake2b(np.ascontiguousarray(row_mom, dtype=np.float64).tobytes(), digest_size=16).digest()
 
 
+REL_TOL = 1e-9      # a replayed event and its pool row agree to rounding (the build node's floating point: ~1 ulp seen)
+
+
+def _shat(P):
+    q = P[:, 0] + P[:, 1]
+    return np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None))
+
+
+def match_rows(C, P, window=8):
+    """For each event of C (m, k, 4) the index of the row of P (n, k, 4) equal to it within REL_TOL of its energy
+    scale, -1 when none: candidates are the rows nearest in sqrt(s_hat)."""
+    sp, sc = _shat(P), _shat(C)
+    o = np.argsort(sp, kind="stable"); ss = sp[o]
+    at = np.searchsorted(ss, sc)
+    scale = np.maximum(np.abs(C).reshape(len(C), -1).max(1), 1.0)
+    out = np.full(len(C), -1, np.int64)
+    for off in sorted(range(-window, window), key=abs):
+        todo = out < 0
+        if not todo.any():
+            break
+        i = o[np.clip(at[todo] + off, 0, len(o) - 1)]
+        ok = np.abs(P[i] - C[todo]).reshape(len(i), -1).max(1) <= REL_TOL * scale[todo]
+        out[np.where(todo)[0][ok]] = i[ok]
+    return out
+
+
 def chunk_plan(process, sqrts_min, sqrts_max, n_events, role, seed):
     import datagen
     return datagen.chunk_tasks(process, sqrts_min, sqrts_max, n_events, role, seed, "/nonexistent")
@@ -87,13 +113,15 @@ def provenance(process, sqrts_min, sqrts_max, n_events, role, seed, pool):
         if n_fwd:
             drawn["fwd"] = mg._candidates(n_fwd, uni, m_list, cfg["pdg_ids"], rng, cuts, 0.0, pol["y_lo"], 1.0,
                                           beam_mass)[0]
-        rows = {_key(pool[start + i, :4 * k]): start + i for i in range(n)}
+        Pc = np.asarray(pool[start:start + n, :4 * k], np.float64).reshape(n, k, 4)
         for kind, evs in drawn.items():
-            for e in evs:
-                i = rows.get(_key(np.asarray(e[0]).reshape(-1)))
-                if i is None:
-                    raise RuntimeError(f"{process} {role} chunk {t['idx']}: a replayed {kind} event is not in the pool")
-                out[i] = KIND[kind]
+            m = match_rows(np.stack([np.asarray(e[0], np.float64) for e in evs]), Pc)
+            if (m < 0).any():
+                raise RuntimeError(f"{process} {role} chunk {t['idx']}: {int((m < 0).sum())} of {len(m)} replayed {kind} "
+                                   f"events not in the pool")
+            if (out[start + m] != KIND["flat"]).any() or len(np.unique(m)) != len(m):
+                raise RuntimeError(f"{process} {role} chunk {t['idx']}: a pool row matched twice")
+            out[start + m] = KIND[kind]
         c = np.bincount(out[start:start + n], minlength=3)
         if (c[0], c[1], c[2]) != (n_bulk, n_fwd, n_flat):
             raise RuntimeError(f"{process} {role} chunk {t['idx']}: provenance {c.tolist()} against bulk {n_bulk}, "

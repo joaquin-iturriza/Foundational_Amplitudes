@@ -58,10 +58,9 @@ def main():
             rows, kinds = mc.compose(name, lo, hi, n, role, a.seed, ctrl)
             dt = time.time() - t0
             st = np.asarray(stored, np.float64)
-            idx = {mc._key(st[i, :4 * k]): i for i in range(len(st))}
             d = np.where(kinds == mc.KIND["default"])[0]
-            hit = [(j, idx.get(mc._key(rows[j, :4 * k]))) for j in d]
-            found = [(j, i) for j, i in hit if i is not None]
+            m = mc.match_rows(rows[d, :4 * k].reshape(len(d), k, 4), st[:, :4 * k].reshape(len(st), k, 4))
+            found = [(j, int(i)) for j, i in zip(d, m) if i >= 0]
             rel = [abs(rows[j, -1] - st[i, -1]) / abs(st[i, -1]) for j, i in found if st[i, -1] != 0]
             a_st = np.load(stored_path[:-len(".npy")] + ".alphas.npy")
             a_co = mc.alphas_of_rows(rows, k, mg.PROCESSES[name])
