@@ -32,10 +32,21 @@ def test_het_arm_counts_its_sigma_stage():
     axes = ["H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c", "PP4", "EE4"]
     a = sw.plan("recipes/catalog_v4_train.yaml", "v4", axes, iters=4264)
     b = sw.plan("recipes/catalog_v4_train.yaml", "v4", axes, iters=4264, sigma_stage=True)
-    assert abs((b["hours"] - a["hours"]) - sw.SIGMA_STAGE_MIN * sw.MARGIN / 60) < 0.02, (a, b)
+    extra = sw.SIGMA_STAGE_MIN + a["n_probes"] * (sw.S_PROBE_HET - sw.S_PROBE) / 60
+    assert abs((b["hours"] - a["hours"]) - extra * sw.MARGIN / 60) < 0.02, (a, b)
     e = sw.plan("recipes/catalog_v4_train.yaml", "v4", ["PP4"], eval_only=True, sigma_stage=True)
     assert e["rates"]["sigma_stage_min"] == 0.0, e   # a re-read trains nothing
+    assert e["rates"]["s_per_probe"] == sw.S_PROBE_HET and e["rates"]["startup_min"] == sw.STARTUP_EVAL_MIN, e
+
+
+def test_eval_reread_fits_step20_times():
+    """the step-20 het re-reads of PP4+EE4+HD4+HD5 (1612 probes) ran 36-39 min; the MSE ones under that"""
+    axes = ["PP4", "EE4", "HD4", "HD5"]
+    h = sw.plan("recipes/catalog_v4_train.yaml", "v4", axes, eval_only=True, sigma_stage=True)
+    m = sw.plan("recipes/catalog_v4_train.yaml", "v4", axes, eval_only=True)
+    assert 39 / 60 < h["hours"] < 2 * 39 / 60, h
+    assert m["hours"] < h["hours"], (m, h)
 
 
 if __name__ == "__main__":
-    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); print("short_wall tests passed")
+    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); test_eval_reread_fits_step20_times(); print("short_wall tests passed")
