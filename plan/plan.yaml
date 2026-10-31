@@ -7011,6 +7011,29 @@ entries:
       hook to Joaquin; if inline work by the main session in the redesign era is >= 20% of its $, name the turns and propose
       the routing rule be enforced; nothing-to-say wakes are reported with count and $ per wake as the price of each extra
       wake.'
+    fix_at: '2026-10-31T03:41:38+00:00'
+    fix: '(2) The ''what the turn did'' classifier is not hand-checked, and it decides the inline >= 20% outcome: the check
+      covers only trigger labels. Read on the draft''s own output (scratchpad main_turns.py, redesign era): inline is 55 segments,
+      $21.88, 44.6% of $49.05, far over the 20% line, so its errors set the verdict. Errors seen in the top inline segments
+      and by direct calls to bash_kind: read-only Python is inline (python3 - heredocs reading transcripts, git show | python3
+      -c yaml, ''cat a.json | python3 -m json.tool'', ''python3 tools/usage_windows.py --help''); ''site item set/done'' (ledger
+      bookkeeping) is read because ORCH_BASH lists only ''items''; and a segment''s whole $ goes to inline when any one call
+      in it is inline, so a 26-call turn with one read-only heredoc counts as $1.66 of inline work. Fix: attribute $ per API
+      call to what that call issued (or report both per-call and per-segment); split Python by whether it writes (open(...,''w''),
+      write_text, sed -i, redirect, git commit of non-plan files) and treat plan.yaml/ledger commits and ''site item'' as
+      orchestration; then hand-check about 20 redesign-era inline segments (and 10 orchestration and 10 none), naming the
+      call that set each label, and report the error rate next to the 20% line. (6) It answers only part (1) of step 7. Parts
+      (2) main-alone-era agent spend by kind (fork, fresh general-purpose, Explore, reviewers: context at launch and total,
+      whether forks inherited the full parent context) and (3) which version of figs/usage.png Joaquin is viewing and which
+      correction applies (the 1-of-362 folder bug or others) are neither in the design nor said to be answered elsewhere;
+      include them (agent_tasks.py, context_breakdown.py already exist) or say where each is answered. (4) The no branch is
+      missing: state what is done when both shares fall below their lines, and map the result to the step''s own rule (cost
+      mostly orchestration-only wakes -> cut wakes and main context; mostly inline -> move work to agents), e.g. which share
+      decides ''mostly''. Passed: totals match usage_report v3 (main-alone 560.33M vs 559.97M weighted, $1465.62 vs $1464.09;
+      redesign 19.99M vs 19.82M); trigger labels matched their text in every sample I read (2 per cell); prior search: docs/results.tex
+      for usage, wake, main session, orchestration, task-notification, stop hook, nothing_new, inline work (only the review-launch
+      count at line 13401, not this question), usage_report.py nothing_new, site decisions (D177, D185, D202 related, none
+      on this measure); not stochastic, one pass.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
