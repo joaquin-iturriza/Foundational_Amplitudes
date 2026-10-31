@@ -6581,8 +6581,6 @@ entries:
     8: 'Double wake per agent stop: test whether ending with plain final text (no SubagentHandback) gives one main-session
       wake carrying the report (Joaquin asked 2026-10-31)'
     9: 'Context-guard flush note reaches owners (catalog owner closed at 153k): make it target only the main session'
-    10: 'Owner hand-off inside the turn: a PostToolUse hook on agents that, once the owner''s context passes 170k, tells it
-      to write plan handoff and end (an owner can pass 170k and 200k in one turn; CONTEXT_CLOSE is read only between turns)'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -6715,11 +6713,6 @@ entries:
       if:
       - 'the hook can tell main from agent: restrict it and test on an agent turn'
       - 'it cannot: owners'' briefs say to ignore it'
-    10:
-      feeds: owners never compact mid-turn under the 200k window (D223 'Yes, keep 200k.')
-      if:
-      - 'the hook can read the agent''s own context size: install it, test on a long agent turn'
-      - 'it cannot: report to Joaquin; restore a larger window is his call'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
