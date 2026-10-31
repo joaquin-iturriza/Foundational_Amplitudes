@@ -4623,7 +4623,16 @@ entries:
     searched: CLAUDE.md, site decisions D178 (priority 1, mix default sampling in), D194 (the shares), D207 (compose at load);
       the passed design sends a trade-off to Joaquin; none weighs default-sampled accuracy against held-out generalisation
     blocks: which share catalog_v4_train.yaml carries and the entry's close
-    blocks_steps: &id001 []
+    blocks_steps: []
+  - ask: Read the held-out bar on default-sampled events of the held-out processes (new test pools, sized by the owner), or
+      judge the share on PP4 and EE4 alone and pick 0.50, 0.25 or none now?
+    at: '2026-10-31T04:40:47+00:00'
+    searched: docs/results.tex par:v4_mixture (held-out pools are catalog-sampled; the 5% held-out bar was set in the design,
+      not by Joaquin); site decisions D178, D194, D207 do not settle the bar
+    blocks: next 14, the share choice
+    blocks_steps: &id001
+    - 14
+    - 16
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -6311,15 +6320,12 @@ entries:
       analysis/catalog_v4/data/reads/, tools/prune_mixture_pools.py, tools/mix_compose_check.py, mix_compose.py, scripts/job_catalog_v3_short.sh,
       tools/zero_shot_parent.py, analysis/catalog_daniel/catalog_sigma_heldout.py, docs/results.tex (par:v4_pp_bound, par:v4_mixture)
     written: '2026-10-31T04:37:50+00:00'
-  ask: 'The mixture A/B (D178) is a trade-off: default share 0.50 cuts the error on default-sampled events (PP4 R 0.68 [0.59,
-    0.77], EE4 0.40 [0.31, 0.52]) but raises it on the 701 held-out classes (1.27 [1.14, 1.42]); share 0.25: PP4 0.75 [0.67,
-    0.85], EE4 0.41 [0.34, 0.53], held out 1.22 [1.11, 1.36]; the pure-default bound is 0.39 on PP4''s trained classes. Which
-    should catalog_v4 carry: (a) the current mixture (no default share), (b) 0.25, (c) 0.50, or (d) test a smaller share (0.10,
-    two seeds, about 9 GPU-h) first?'
-  waiting_since: '2026-10-31T04:19:44+00:00'
-  searched: CLAUDE.md, site decisions D178 (priority 1, mix default sampling in), D194 (the shares), D207 (compose at load);
-    the passed design sends a trade-off to Joaquin; none weighs default-sampled accuracy against held-out generalisation
-  blocks: which share catalog_v4_train.yaml carries and the entry's close
+  ask: Read the held-out bar on default-sampled events of the held-out processes (new test pools, sized by the owner), or
+    judge the share on PP4 and EE4 alone and pick 0.50, 0.25 or none now?
+  waiting_since: '2026-10-31T04:40:47+00:00'
+  searched: docs/results.tex par:v4_mixture (held-out pools are catalog-sampled; the 5% held-out bar was set in the design,
+    not by Joaquin); site decisions D178, D194, D207 do not settle the bar
+  blocks: next 14, the share choice
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
