@@ -7382,6 +7382,10 @@ entries:
       missing from sections_v2); fa-run-and-config:21, fa-canonical-setup:28,30,32 and fa-sweeps-and-hpo:99,111 are untrue;
       the jeanzay template has t_steps with 3 values; CONTEXT_CLOSE 300k sits above the 200k compaction window (Joaquin''s
       call); three passages are said twice. Full report: the agent''s hand-back message in agent-aa7670a7d3cbd2cba.jsonl.'
+  - at: '2026-10-31T04:27:48+00:00'
+    text: 'Open to Joaquin (2026-10-31): the 200k window (D217) is shared by owners, which close at CONTEXT_CLOSE=300k, so
+      both owners compacted mid-turn; keep 200k and move the hand-off to 170k (CLAUDE.md ''near 300k'' and plan.py CONTEXT_CLOSE),
+      or restore 400k? No agent-only window exists in settings (checked).'
   handoff:
     state: 'Held by D220 for the weekend. Committed 5708b248: (2) Stop-hook bookkeeping in plan_check (owners recorded resumed/launched/stopped
       from the turn''s SendMessage, Agent launch and task-notification; waiter refusal says the hook cannot arm one; plan
