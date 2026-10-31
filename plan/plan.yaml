@@ -5663,6 +5663,48 @@ entries:
       the mistake is cheaper'', the report must show the rework-inclusive cost branch on its own too). Prior: D138, D173-D175,
       the plugin token test and usage_report.py now named. Terms searched: token, 5-hour, five hour, usage window, sonnet,
       haiku, small model, context breakdown, usage meter, effort (results.tex, plan show, site decisions).'
+  - at: '2026-10-31T00:12:37+00:00'
+    question: 'Step 5, cut 1 of 3 (context cuts for agents): does pushing each reference section to an agent only where it
+      acts, and never past the hook''s 10,000-character limit, lower the context tokens per call that pushes cost agents,
+      with no rise in corrections? Feeds whether the cut stays (kept) or is reverted and recorded as a dead end; cuts 2 (skill
+      listing, a setting Joaquin holds: ~/.claude/settings.json syncClaudeAiSkills false, skillOverrides) and 3 (low effort
+      on mechanical calls, D138) follow under the same measure.'
+    prior: 'Previous owner run (hand-off 2026-10-31T00:07, context_breakdown.py at f3624f9c): redesign-period agents'' hook
+      pushes 7.1k chars/4 at their median call and 8.8k at the last (x1.72 tok per chars/4 = 12-15k tokens), fixed part 25.4k
+      chars/4 of which skill listing 4.2k and prompt snapshot (the system prompt itself) 3.4k. D138 (''for mechanical steps
+      we can manage with opus but at low reasoning''). Nothing on push trimming in docs/results.tex or site decisions (searched:
+      push, REFERENCE, context_push, skill listing, effort, hook).'
+    measure: 'tools/push_replay.py (new): replays every recorded tool call of the 31 redesign-period subagent transcripts
+      (first record after 2026-10-30T11:35:10Z, >=5 calls) through context_push.matches() and its once-per-agent delivery
+      with the settings.json registration (Pre on acts, Post on reads and acts), with a given set of section files and hook
+      code. Per agent: pushed chars, token-calls = sum over pushes of 1.722*chars/4*(calls after the push), tokens per call
+      = token-calls/calls; pooled mean and per-agent median. Before = the live hook and sections, with the harness''s behaviour
+      that an additionalContext over 10,000 chars arrives as a ~2.2k-char <persisted-output> preview (seen in transcripts:
+      e.g. agent ...5f1029a759 got 2178 chars of a 17 kB push). After = the cut hook and sections on the same calls (matched).
+      Live confirmation after the change: tools/context_breakdown.py ''hook'' tokens and API context per call, and tools/usage_windows.py
+      cost per call, on agents launched after the commit, against the 31 before. Corrections: tools/agent_tasks.py stood rate
+      (48 h follow-up) on post-change agents against the redesign-period rate, plus a hand read of every correction of a post-change
+      agent for a cause in a dropped push.'
+    check: 'Replay of the live state against what transcripts recorded: 14 of 31 agents match within 5 percent already; the
+      17 others are exactly the agents whose single hook output passed 10,000 chars and got the preview (to be modeled in
+      the before replay; pass = all 31 within 5 percent after modeling). The cut moves the measure by construction (sections
+      dropped from calls); the replay on the 31 transcripts gives its size before anything changes. The 10k truncation shows
+      the measure moves with what a hook outputs: recorded chars 1927 vs 17333 replayed on agent ...5f1029a759.'
+    fixed: Section texts unchanged (no shortening of content in this cut; reference content changes go through claudemd-keeper);
+      the triggers of sections an agent needs to act (paths of writes, cmds) unchanged; the main session's pushes unchanged;
+      the 31 transcripts; 1.722 tok per chars/4 (f3624f9c).
+    control: The same 31 transcripts replayed through the live hook and sections (matched, same calls); for the live check,
+      the 31 redesign-period agents before the commit.
+    seeds: none (deterministic replay); hand read of every post-change correction
+    outcome: 'Cut 1 = (a) working-on-the-plan not pushed to subagents (owners get the same rules in plan/step_prompt.txt''s
+      How you work; reviewers do not plan); (b) sections about acting (fa-hooks, fa-results-notes, fa-figures, fa-git-and-release,
+      fa-testing, fa-sites-and-paths, fa-canonical-setup) fire their path triggers only on writes (Edit/Write/MultiEdit/NotebookEdit),
+      their cmds unchanged; (c) defect repair: one hook output stays under 10,000 chars, sections that do not fit wait for
+      the agent''s next matching call (not marked delivered), so no section is lost to a preview. Kept if the replayed tokens
+      per call fall by at least 20 percent, the live mean hook tokens per call of post-change agents is below the before mean,
+      and no post-change correction traces to a dropped push (with fewer than 10 scored post-change tasks the stood-rate comparison
+      is undecidable and said so; kept provisionally, re-read at 10). Reverted and recorded as a dead end otherwise. (c) stays
+      either way (it repairs lost sections), and its own cost is reported apart.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
