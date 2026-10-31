@@ -43,6 +43,28 @@ def test_reader_and_job_use_the_split():
     assert '--split "$SPLIT"' in job and 'SPLIT=val;' in job and '[ "$A" = PP4 ]' in job
 
 
+def test_stand_in_role_for_a_test_only_probe():
+    from rebuild_run import recipe_role_counts, stand_in_role, stand_in_split_set
+    c = recipe_role_counts(os.path.join(ROOT, "recipes", "catalog_v4_ee_test.yaml"))
+    assert c["ee4_epem_aabbx"] == {"train": 0, "val": 0, "test": 2000}
+    assert stand_in_role(c, "ee4_epem_aabbx", "train", "val") == ("test", 2000)
+    assert stand_in_role(c, "ee4_epem_aabbx", "test", "val") == ("test", 2000)
+    c2 = {"p": {"train": 0, "val": 5, "test": 7}, "z": {"train": 0, "val": 0, "test": 0}}
+    assert stand_in_role(c2, "p", "train", "test") == ("test", 7)      # the scored split first
+    assert stand_in_role(c2, "p", "train", "val") == ("val", 5)
+    assert stand_in_role(c2, "z", "train", "val") == ("train", 0)
+    calls = []
+
+    def real(specs, role, seed, dest_dir=None, require_cache=False):
+        calls.append((role, [s["n_events"] for s in specs]))
+        return {s["process"]: f"{s['process']}_{role}.npy" for s in specs}
+    f = stand_in_split_set(real, c2, "test")
+    assert f([{"process": "p", "sqrts_min": 1, "sqrts_max": 1, "n_events": 0}], "train", 0) == {"p": "p_test.npy"}
+    assert calls == [("test", [7])]
+    zs = open(os.path.join(ROOT, "tools", "zero_shot_parent.py")).read()
+    assert "stand_in_split_set(" in zs and '"own_stats_role"' in zs
+
+
 if __name__ == "__main__":
     for k, f in list(globals().items()):
         if k.startswith("test_"):
