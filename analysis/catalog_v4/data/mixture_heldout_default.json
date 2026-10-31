@@ -1,5 +1,50 @@
 {
  "design": "plan catalog_coverage step 14, REREAD on default-sampled held-out events",
+ "runs": {
+  "default50": {
+   "PP4": [
+    "FA-ccin2p3-8e1cc529",
+    "FA-ccin2p3-52efacaf"
+   ],
+   "EE4": [
+    "FA-ccin2p3-8e1cc529",
+    "FA-ccin2p3-52efacaf"
+   ],
+   "held": [
+    "FA-ccin2p3-6c246603",
+    "FA-ccin2p3-1d46b938"
+   ]
+  },
+  "default25": {
+   "PP4": [
+    "FA-ccin2p3-7a6a1967",
+    "FA-ccin2p3-897aa5d4"
+   ],
+   "EE4": [
+    "FA-ccin2p3-7a6a1967",
+    "FA-ccin2p3-897aa5d4"
+   ],
+   "held": [
+    "FA-ccin2p3-11ad944a",
+    "FA-ccin2p3-9c6fc7ab"
+   ]
+  },
+  "control": {
+   "PP4": [
+    "FA-ccin2p3-04253ff7",
+    "FA-ccin2p3-e7e32847"
+   ],
+   "EE4": [
+    "FA-ccin2p3-c1863adf",
+    "FA-ccin2p3-def11c5c"
+   ],
+   "held": [
+    "FA-ccin2p3-339ec100",
+    "FA-ccin2p3-380842ed"
+   ]
+  }
+ },
+ "missing_reads": [],
  "shares": {
   "default50": {
    "default": {
@@ -209,5 +254,264 @@
     "H7c"
    ]
   }
+ },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-04253ff7": {
+    "train_run": "FA-ccin2p3-339ec100",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05088137,
+      "early_max": 0.4591467,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05309672
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-11ad944a": {
+    "train_run": "FA-ccin2p3-11ad944a",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05309018,
+      "early_max": 0.458867,
+      "best_step": 4250,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05309018
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-1d46b938": {
+    "train_run": "FA-ccin2p3-1d46b938",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05558795,
+      "early_max": 0.4806098,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05558795
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-339ec100": {
+    "train_run": "FA-ccin2p3-339ec100",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05088137,
+      "early_max": 0.4591467,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05309672
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-380842ed": {
+    "train_run": "FA-ccin2p3-380842ed",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.0651271,
+      "early_max": 0.4607805,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.0651271
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-52efacaf": {
+    "train_run": "FA-ccin2p3-1d46b938",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05558795,
+      "early_max": 0.4806098,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05558795
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-6c246603": {
+    "train_run": "FA-ccin2p3-6c246603",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.04841886,
+      "early_max": 0.4616905,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.04841886
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-7a6a1967": {
+    "train_run": "FA-ccin2p3-11ad944a",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05309018,
+      "early_max": 0.458867,
+      "best_step": 4250,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05309018
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-897aa5d4": {
+    "train_run": "FA-ccin2p3-9c6fc7ab",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.06204294,
+      "early_max": 0.4493777,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.06204294
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-8e1cc529": {
+    "train_run": "FA-ccin2p3-6c246603",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.04841886,
+      "early_max": 0.4616905,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.04841886
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-9c6fc7ab": {
+    "train_run": "FA-ccin2p3-9c6fc7ab",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.06204294,
+      "early_max": 0.4493777,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.06204294
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-c1863adf": {
+    "train_run": "FA-ccin2p3-339ec100",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05088137,
+      "early_max": 0.4591467,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05309672
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-def11c5c": {
+    "train_run": "FA-ccin2p3-380842ed",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.0651271,
+      "early_max": 0.4607805,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.0651271
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-e7e32847": {
+    "train_run": "FA-ccin2p3-380842ed",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.0651271,
+      "early_max": 0.4607805,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.0651271
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": []
  }
 }

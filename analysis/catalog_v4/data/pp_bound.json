@@ -44,6 +44,86 @@
   "R_seed": 1.0987,
   "arm_seed_R": 0.885
  },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-04253ff7": {
+    "train_run": "FA-ccin2p3-339ec100",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05088137,
+      "early_max": 0.4591467,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05309672
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-a01ad665": {
+    "train_run": "FA-ccin2p3-d26f13aa",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.05376004,
+      "early_max": 0.3368194,
+      "best_step": 4250,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.05376004
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-a152d7d0": {
+    "train_run": "FA-ccin2p3-afc96598",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.04519008,
+      "early_max": 0.3070547,
+      "best_step": 4250,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.04519008
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-e7e32847": {
+    "train_run": "FA-ccin2p3-380842ed",
+    "loss": "MSE",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": 0.0651271,
+      "early_max": 0.4607805,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": 0.0651271
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": []
+ },
  "verdict": "YES",
+ "verdict_on_reads": "YES",
  "rule": "YES R <= 0.9 with the widened interval below 1; NO R >= 0.97 or the interval contains 1"
 }

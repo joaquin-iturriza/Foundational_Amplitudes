@@ -10,7 +10,9 @@ the held-out classes, and does sigma rank the error there?
 The site part reads each het run's zero-shot reads (tools/zero_shot_parent.py --save-dir, the job's
 $SCRATCH/zz_v4_short_<arm>/<axis>/<probe>.npz, read from the run's sigma_stage parent: mu frozen there, so mu is the
 best checkpoint by val_loss_no_reg) with per event t (truth log|M|^2), q (prediction) and s = sd_c * sigma (sigma in
-log|M|^2). A probe is used only as mixture_ab.py extract keeps it (finite t, q, s; physics status ok or allowed);
+log|M|^2). Every run's training curve is checked for a blow-up (mixture_ab.py blowups: the het NLL rule, an NLL above its
+step-500 value + 0.5 ln 10); an arm with a run flagged keeps its numbers, its verdicts withheld.
+A probe is used only as mixture_ab.py extract keeps it (finite t, q, s; physics status ok or allowed);
 held-out axes catalog_v4 probes (v4_*) only, as mixture_ab.read_of. A probe's class is mixture_ab.class_of's.
 Per (run, read, class), events of the class's probes pooled:
     med_s       median s
@@ -47,7 +49,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 DATA = os.path.join(HERE, "data")
 sys.path.insert(0, HERE)
-from mixture_ab import HELD, MIX_HET, class_of   # noqa: E402
+from mixture_ab import HELD, MIX_HET, blowups, class_of   # noqa: E402
 
 # run id -> the job's arm (scripts/job_catalog_v3_short.sh ARM, the prediction dir's name), seed
 RUNS = {"FA-ccin2p3-87ea24d0": ("v4_het_control", 42), "FA-ccin2p3-321a3de2": ("v4_het_control_seed2", 43),
@@ -243,7 +245,9 @@ def summary(path=None, out_dir=None):
                           f"rank_across < {NO_A} or rank_within < {NO_W}; else weak; both seeds",
                      "B": f"held-out pooled: calibrated median pull_std <= {PULL_MAX} and median cover68 >= "
                           f"{COVER_MIN}; else rank_across >= {YES_A} orders the worst cells, < {NO_A} does not"},
-           "excluded": raw["excluded"], "edges": raw["edges"], "arms": {}}
+           "excluded": raw["excluded"], "edges": raw["edges"], "arms": {},
+           "blowups": blowups(RUNS)}      # each run's training curve (mixture_ab.py blowup_of; the het NLL rule)
+    flagged = {f.split(":")[0] for f in out["blowups"]["flagged"]}
     for arm, pair in ARMS.items():
         a = {"runs": list(pair), "per_seed": {}, "missing": {}}
         for run_id in pair:
@@ -282,6 +286,10 @@ def summary(path=None, out_dir=None):
                 both([rule_a(s[k][read]) if read in s.get(k, {}) else None for k in ("seed42", "seed43")])
         verd["B held_pooled"] = "withheld: read incomplete" if part("held_pooled") else \
             both([rule_b(s[k]["held_pooled"]) if "held_pooled" in s.get(k, {}) else None for k in ("seed42", "seed43")])
+        bu = sorted(r for r in pair if r in flagged)
+        if bu:                    # a blown-up or unchecked run: its numbers stay above, listed apart in blowups
+            verd = {k: f"withheld: {', '.join(bu)} blew up or unchecked (blowups); on the reads: {v}"
+                    for k, v in verd.items()}
         a["verdicts"] = verd
         a["complete"] = not a["missing"] and len(s) == 2
         out["arms"][arm] = a

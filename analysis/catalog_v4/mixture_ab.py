@@ -6,6 +6,9 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
                                     het run's log is ~506k lines) ->
                                     data/reads/<run>_<axis>.json {probe: mse_logm2_real}; a record with an error, a
                                     non-finite MSE or a physics status other than ok/allowed is listed apart
+  val <run id> <log>                a training run's validation curves -> data/reads/<run>_val.json, read by
+                                    the blow-up check (blowups) every result below carries; a verdict is withheld
+                                    while a run it reads blew up or is unchecked
   bound                             step 11 -> data/pp_bound.json
   heldout_default                   step 14's held-out classes on default-sampled events (PP4/EE4 probes of the
                                     held-out classes) -> data/mixture_heldout_default.json
@@ -40,7 +43,7 @@ A share WINS on GAIN and NO LOSS. Verdict: one winner -> it; both -> 0.25 unless
 both lie below 0.25's R on the same read (then 0.50); no winner -> 'keep the current mixture' when no share has GAIN,
 else 'trade-off' (a GAIN with a LOSS or an undecided cost: the numbers go to Joaquin with the step-11 bound beside them).
 """
-import argparse, json, math, os, sys
+import argparse, json, math, os, re, sys
 
 import numpy as np
 import yaml
@@ -77,6 +80,107 @@ MIX_HET = {"default50": {r: ("FA-ccin2p3-466656b2", "FA-ccin2p3-9897833d") for r
 # 43) per arm, filled when they are submitted; until then the default-sampled held-out read is H1-H3's PP4/EE4 probes
 # only and mixture --het reports itself incomplete
 HD4_HET = {}
+# The blow-up check (CLAUDE.md: a run that blows up is listed apart with where it blew up, never dropped). Every read
+# above is made at its training run's best checkpoint; an eval-only REREAD reads its parent's, so the check is on the
+# training run (TRAINED_BY; a run not listed trained itself). The validation curve (val_loss_no_reg of each "Val loss"
+# line, step = every * k, the last at the last step) is extracted from the training log by `val` into
+# data/reads/<run>_val.json. A training block blows up at its first validation that is non-finite (anywhere), or after
+# the reference step REF_STEP above BLOWUP_FACTOR times the value at the reference (the first validation at or after
+# REF_STEP; a block shorter than REF_STEP, the het runs' 250-step sigma stage, takes its first validation). Validations
+# before the reference are the warm-up transient (the het runs' second validation, step 170, is ~1e9 in all six) and
+# are reported as early_max, not judged. The het loss (loss HETEROSC: a Gaussian NLL, negative once fitted) has no
+# ratio; there the same factor is read on the variance scale: at the sigma that minimises it the NLL is
+# 0.5 ln(MSE) + const, so an MSE BLOWUP_FACTOR times larger raises it by 0.5 ln(BLOWUP_FACTOR) = 1.151; the het rule
+# is an NLL above the reference + 0.5 ln(BLOWUP_FACTOR). Such a validation is a spike; the run blew up only when its
+# best checkpoint (the read's) is before it, as analysis/catalog_v3/muon_compare.py; a recovered spike is listed.
+BLOWUP_FACTOR = 10      # the repo's blow-up factor (analysis/catalog_v3/pair_head_blowup.py BLOWUP_FACTOR)
+REF_STEP = 500          # the repo-reviewer's reference step for these reads (2026-10-31), past the warm-up
+HET_RISE = 0.5 * math.log(BLOWUP_FACTOR)
+TRAINED_BY = {"FA-ccin2p3-a152d7d0": "FA-ccin2p3-afc96598", "FA-ccin2p3-a01ad665": "FA-ccin2p3-d26f13aa",
+              "FA-ccin2p3-8e1cc529": "FA-ccin2p3-6c246603", "FA-ccin2p3-52efacaf": "FA-ccin2p3-1d46b938",
+              "FA-ccin2p3-7a6a1967": "FA-ccin2p3-11ad944a", "FA-ccin2p3-897aa5d4": "FA-ccin2p3-9c6fc7ab",
+              "FA-ccin2p3-04253ff7": "FA-ccin2p3-339ec100", "FA-ccin2p3-e7e32847": "FA-ccin2p3-380842ed",
+              "FA-ccin2p3-c1863adf": "FA-ccin2p3-339ec100", "FA-ccin2p3-def11c5c": "FA-ccin2p3-380842ed"}
+
+
+def val(run, log):
+    """The training run's validation curves from its log (one block per 'Starting to train', the het runs' sigma
+    stage the second) -> data/reads/<run>_val.json"""
+    blocks, loss = [], None
+    for line in open(log, errors="replace"):
+        if line.startswith("RUN_SUMMARY ") and loss is None:
+            m = re.search(r'"loss": "(\w+)"', line)
+            loss = m.group(1) if m else None
+        elif "Starting to train for" in line:
+            it = int(re.search(r"Starting to train for (\d+) iterations", line).group(1))
+            ev = int(re.search(r"validating every (\d+) steps", line).group(1))
+            blocks.append({"iterations": it, "every": ev, "vals": []})
+        elif "Val loss (combined)" in line and blocks:
+            b = blocks[-1]
+            x = float(re.search(r"val_loss_no_reg: ([0-9.eE+-]+|nan|inf|-inf)", line).group(1))
+            b["vals"].append([min(b["every"] * (len(b["vals"]) + 1), b["iterations"]), x])
+    if not blocks or not blocks[0]["vals"]:
+        sys.exit(f"val: no validation in {log}")
+    os.makedirs(READS, exist_ok=True)
+    out = os.path.join(READS, f"{run}_val.json")
+    json.dump({"run": run, "loss": loss, "log": os.path.basename(log), "blocks": blocks}, open(out, "w"), indent=0)
+    print(json.dumps({"out": out, "loss": loss, "blocks": [len(b["vals"]) for b in blocks]}))
+
+
+def blowup_block(vals, het):
+    """{ref_step, ref, early_max, blew_up_at, at_value} of one block's [[step, val_loss_no_reg], ...]"""
+    bad = next((s for s, x in vals if not math.isfinite(x)), None)
+    i = next((k for k, (s, _) in enumerate(vals) if s >= REF_STEP), 0)
+    if vals[-1][0] < REF_STEP:
+        i = 0
+    ref_step, ref = vals[i]
+    early = [x for _, x in vals[:i]]
+    over = (lambda x: x > ref + HET_RISE) if het else (lambda x: x > BLOWUP_FACTOR * ref)
+    hit = next(((s, x) for s, x in vals[i + 1:] if math.isfinite(x) and over(x)), None)
+    at = min(z for z in (bad, hit and hit[0]) if z is not None) if (bad is not None or hit) else None
+    fin = [(s, x) for s, x in vals if math.isfinite(x)]
+    best = min(fin, key=lambda z: z[1])[0] if fin else None
+    # as analysis/catalog_v3/muon_compare.py: a spike after which the block reached its best checkpoint recovered
+    # (the read, at that best, is after it; listed as spike_at); it blew up when its best is before the spike
+    blew = at if at is not None and (best is None or best < at) else None
+    return {"ref_step": ref_step, "ref": ref, "early_max": max(early) if early else None, "best_step": best,
+            "spike_at": at, "blew_up_at": blew,
+            "at_value": None if at is None else next(x for s, x in vals if s == at),
+            "max_after_ref": max((x for _, x in vals[i:] if math.isfinite(x)), default=None)}
+
+
+def blowup_of(run):
+    """The blow-up check of the training run behind a read run; 'unchecked' when its curve is not extracted"""
+    t = TRAINED_BY.get(run, run)
+    f = os.path.join(READS, f"{t}_val.json")
+    if not os.path.exists(f):
+        return {"train_run": t, "unchecked": f"no {os.path.relpath(f, ROOT)} (mixture_ab.py val {t} <log>)"}
+    d = json.load(open(f))
+    het = d["loss"] == "HETEROSC"
+    blocks = [blowup_block(b["vals"], het) for b in d["blocks"]]
+    first = next((k for k, b in enumerate(blocks) if b["blew_up_at"] is not None), None)
+    return {"train_run": t, "loss": d["loss"], "blocks": blocks,
+            "spiked_recovered": [{"block": k, "step": b["spike_at"]} for k, b in enumerate(blocks)
+                                 if b["spike_at"] is not None and b["blew_up_at"] is None],
+            "blew_up": None if first is None else {"block": first, "step": blocks[first]["blew_up_at"]}}
+
+
+def blowups(runs):
+    """{run: check} over the runs a result reads, and the runs that blew up or are unchecked (a verdict is withheld
+    while that list is not empty; the run's reads stay in the result, listed apart here)"""
+    chk = {r: blowup_of(r) for r in sorted(set(runs))}
+    flagged = sorted(f"{r}: " + (c["unchecked"] if "unchecked" in c else
+                                 f"training run {c['train_run']} blew up at step {c['blew_up']['step']} "
+                                 f"(block {c['blew_up']['block']})")
+                     for r, c in chk.items() if "unchecked" in c or c["blew_up"])
+    return {"rule": f"non-finite val_loss_no_reg, or after step {REF_STEP} (a block shorter than that: after its "
+                    f"first validation) above {BLOWUP_FACTOR}x the reference validation; het NLL: above the "
+                    f"reference + 0.5 ln {BLOWUP_FACTOR} = {HET_RISE:.3f}; blown up when the block's best checkpoint is "
+                    f"before that validation, spiked and recovered (listed, not flagged) when it is after",
+            "runs": chk, "flagged": flagged,
+            "spiked_recovered": sorted(f"{r}: training run {c['train_run']} " + ", ".join(
+                f"block {z['block']} step {z['step']}" for z in c["spiked_recovered"])
+                for r, c in chk.items() if c.get("spiked_recovered"))}
 
 
 def extract(run, log, axis="PP4", allow_unchecked=False):
@@ -170,7 +274,9 @@ def bound():
         v = "NO"
     else:
         v = "small gain"
-    out["verdict"] = v
+    out["blowups"] = blowups(BOUND["arm"] + BOUND["control"])
+    out["verdict"] = None if out["blowups"]["flagged"] else v
+    out["verdict_on_reads"] = v                  # the rule's outcome; the verdict only with no run flagged
     out["rule"] = f"YES R <= {YES} with the widened interval below 1; NO R >= {NO} or the interval contains 1"
     path = os.path.join(DATA, "pp_bound.json")
     json.dump(out, open(path, "w"), indent=1)
@@ -303,13 +409,16 @@ def mixture(partial=False, het=False):
         v = "keep the current mixture"
     else:
         v = "trade-off"
-    complete = not missing and not out["probes_missing"]
+    out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs])
+    complete = not missing and not out["probes_missing"] and not out["blowups"]["flagged"]
     if het:
         # the default-sampled held-out pool is complete only with HD4 (step 18's 114 classes) read on every side
         hd_missing = [f"{a} HD4" for a in table if not HD4_HET.get(a)] + \
             [f"{a} HD4 {run}" for a, runs in HD4_HET.items() for run in runs if read_of(run, "HD4") is None]
         out["held_default_missing"] = hd_missing
-        complete = complete and not hd_missing
+        out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs] +
+                                 [run for runs in HD4_HET.values() for run in runs])
+        complete = complete and not hd_missing and not out["blowups"]["flagged"]
     if partial and not het:
         out["verdict_if_complete"] = v if not missing else None
         out["would_be"] = v
@@ -438,6 +547,8 @@ def heldout_default(het=False):
             "no_default_pool": compare(harm, hctl, hc[0], hc[1], [k for k in hk if cls(k[1]) not in pooled], cls)}
         res["axes_without_default_pool"] = sorted({ax for c, ax in ax_of.items() if c not in pooled})
         out["shares"][a] = res
+    out["blowups"] = blowups([run for v in table.values() for runs in v.values() for run in runs] +
+                             ([run for runs in HD4_HET.values() for run in runs] if het else []))
     name = "mixture_heldout_default_het.json" if het else "mixture_heldout_default.json"
     json.dump(out, open(os.path.join(DATA, name), "w"), indent=1)
     print(json.dumps(out))
@@ -449,6 +560,8 @@ def main():
     e = sub.add_parser("extract")
     e.add_argument("run"); e.add_argument("log"); e.add_argument("axis", nargs="?", default="PP4")
     e.add_argument("--allow-unchecked", action="store_true")
+    v = sub.add_parser("val")
+    v.add_argument("run"); v.add_argument("log")
     sub.add_parser("bound")
     hd = sub.add_parser("heldout_default")
     hd.add_argument("--het", action="store_true")
@@ -458,6 +571,8 @@ def main():
     a = ap.parse_args()
     if a.cmd == "extract":
         extract(a.run, a.log, a.axis, a.allow_unchecked)
+    elif a.cmd == "val":
+        val(a.run, a.log)
     elif a.cmd == "mixture":
         mixture(a.partial, a.het)
     elif a.cmd == "heldout_default":
