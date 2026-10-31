@@ -1609,6 +1609,22 @@ entries:
       already has), two seeds, read on H2 and TR by the shape-gap rule. No (past gate and ceiling, both reads below half those
       bars or not above training or a placebo): the network already uses P through the off-shellness input and the diagrams,
       or the gap is elsewhere: dead end. Between: reported, no GPU arm. Cost: one CPU job on CC (4 cores, 1 h limit); no GPU.'
+    passed_at: '2026-10-31T00:40:04+00:00'
+    reviewer: 'Re-check after the FIX of 00:38. Check 1: held-out multiplicity pools against training pools of the same cells,
+      same network, scorer and events, three placebos binned the same way. Check 2: the gate is a direct no-network statistic,
+      with the 5-probe --prop test @0c289bf1 giving log P r^2 0.03-0.37 on t and 0.85-0.93 on log|M|^2. The residual reads
+      now carry an in-run ceiling, eta^2 of u on t and on log|M|^2, with an ''unreadable'' outcome below 0.05. A size read,
+      r^2 of log u^2 on log P plus the decile shares, covers the error concentration catalog_v2 found in the highest target
+      decile for its resonant and t-channel pools (50-86% of MSE). The 20-bin eta^2 has a no-signal floor of about 19/2000
+      = 0.01, cancelled by binning the placebos the same way. Check 3: the dipole read''s seed difference of about 0.002 and
+      placebos at 0.006-0.008 (dipole_gate.json) sit well below the bars; margins must exceed the seed difference and the
+      bootstrap half-range. Check 4: yes, no, between, gate-fail, unreadable, and mixed-cell outcomes all stated. Check 5:
+      searched propagator, prop surrogate, target_propagators, offshell, off-shellness, Breit-Wigner, residual_vs_target,
+      dipole, diagram_encoder, v4_shape_gap, v4_mult_cand, plan dead ends, site decisions D86/D178/D199. The prior now names
+      the off-shellness lever, the attention bias, the fine-tune lever study and catalog_v2''s residual profile. It also gives
+      the control''s config (offshell_per_event, use_diagrams on, target_propagators off), and the GPU follow-up is narrowed
+      to target_propagators, so it does not repeat the off-shellness input. Checks 6-7: within D178; no comparison the user
+      named is missing. The eta^2, ceiling and size reads are not yet in dipole_residual.py; they go in before the job.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
