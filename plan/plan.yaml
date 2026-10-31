@@ -6373,7 +6373,7 @@ entries:
         before the queue; never padded'
   owner:
     agent: a1ec511cff87b5ca2
-    state: working
+    state: closed
     since: '2026-10-31T09:09:21+00:00'
     state_at: '2026-10-31T13:33:35.428000+00:00'
     context: 136446
@@ -6810,37 +6810,35 @@ entries:
       the het batch then about 28 GPU-h, over the design''s 22.8, under 30). Cancelling and resubmitting at 5.75 h would cost
       about 33 GPU-h.'
   handoff:
-    state: 'Step 18 (default-sampled held-out test pools) design PASSED on re-check (reviewer a71d6cc5dbe922bef): 114 hd_
-      pools (H2p5 38, H6 8, H7E 34, H7c 34; recipes/catalog_v4_heldout_default_processes.yaml @5d4c0e9c, 19.19 core-h est.),
-      read as job axis HD4 (@1acddbff), eval-only REREAD of MSE arms 6c246603 1d46b938 11ad944a 9c6fc7ab and control 339ec100
-      380842ed plus the six het arms; pooled 672-class R feeds next 14. H5 (28 one-loop classes) is next 19 (label rule ''virt''
-      on MadEvent Born events, not built). Het batch (step 15): control pair 87ea24d0 321a3de2 (3.75 h jobs); the four mixture
-      arms 466656b2 9897833d f0156d88 df858d33 spent ~93 min composing 912 default-share pools at load (silent), and per supervisor
-      events E3235-E3238 ended TIMEOUT at 10:06; their logs are UNREAD. Probes: hd_probe batch of 6 CPU jobs (180 runs x 1000
-      events, PROBE_SHARD=list, code 11297eec): fd7cf028 ended clean (E3232), 231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf
-      were running when last checked, not read since. Repo-reviewer watermark ff37971e; commits since then unreviewed: 5d4c0e9c
-      1acddbff 7eb15b55 (and 56635699 spec).'
-    decisions: Did not cancel/resubmit the four het mixture arms (resubmitting at 5.75 h would cost ~33 GPU-h vs ~28 with
-      a reread of cut axes); short_wall now counts load-time composition (6.1 s/entry, @7eb15b55) and mix_compose logs each
-      pool. H6 labelled at alpha_s run from alpha_s(M_Z)=0.13 (lhe.label_alphas_mz), events from catalog_v4 cards at 0.118
-      as H2p5. Undecided pooled R goes to Joaquin with interval; extra seeds offered, not run.
-    ruled_out: 'Treating the silent het arms as hung: they were composing (measured on login node with tools/mix_compose_check.py
-      --load: 4.2-5.8 s train + 0.1-0.3 s val per pool). tests/test_default_share.py::test_lhe_runs failure predates this
-      work (fails at 1ede6016).'
-    running: 'Probes 231e0e90 1ffcb240 c7137105 d2fb03c4 2d00ecdf (state not re-read); het control pair 87ea24d0 321a3de2
-      (state not re-read). FIRST CHECKS for the fresh owner: (1) site logs -n 100000 of 466656b2 9897833d f0156d88 df858d33:
-      did loading finish, did training reach 4264 steps with a best checkpoint, did the sigma-only stage complete (sigma_stage/
-      written), which zero-shot axes were read and which were cut by TIMEOUT; (2) the control pair''s logs (all axes read?);
-      (3) the five probes: lhe_probe summary / kept --yields-out, then tools/lhe_parts.py plan on recipes/catalog_v4_heldout_default_processes.yaml
-      and one-wave workers (scripts/job_lhe_parts.sh), then assembly; (4) eval-only REREAD of the het arms'' cut axes folded
-      with HD4 once hd_ pools exist (short_wall --eval for wall); (5) add MIX_HET to analysis/catalog_v4/mixture_ab.py and
-      write analysis/catalog_v4/het_uncertainty.py, committed before reading results; (6) send the unreviewed commits to the
-      repo-reviewer.'
-    files: recipes/gen_catalog_v4_heldout_default.py, recipes/catalog_v4_heldout_default_processes.yaml, recipes/catalog_v4_heldout_default_test.yaml,
-      mg5_pipeline_final.py (label_alphas_mz), tests/test_label_alphas_mz.py, scripts/job_catalog_v3_short.sh (HD4), tools/short_wall.py,
-      tools/collect_run.py, mix_compose.py, analysis/catalog_v4/heldout_default_pools.py, analysis/catalog_v4/mixture_ab.py;
-      probe shard lists /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/probe_{0..5}.txt
-    written: '2026-10-31T09:07:31+00:00'
+    state: 'Step 18 (default-sampled held-out pools, 114 hd_ gridpack pools): the plain-MadEvent probe (6 jobs, 180 runs)
+      gave kept 1.0 everywhere, disk <=340 MB/run, but 13 short yields and 10 timeouts in plain mode, which does not measure
+      gridpack pools; so a gridpool probe of all 114 (lhe_probe gridpool, GP_RUNS=2, 16 CPU jobs x 16 cores on htc, lhe_probe
+      gridpool-plan est 0.40 h longest, --time 01:00:00, target 0.5 h hd_gridpool_probe) went out. It ended with 9 of 16 TIMEOUT
+      at 01:00:00 (fed92320 ebc3a0c9 1f4c1553 807fe0fd 77dea69c f00ab4ea 8f593f2b bb139216 3fdcfadc; events E3248-E3254 and
+      more, OPEN, not acked) and 7 COMPLETED (dfeb8d04 b8fc1f2a cd2db7e0 60c14066 ece76b60 cc50b354 c10e2f5b): over 2x the
+      estimate, a finding to fix; LOGS UNREAD. Het step 15: the four share arms (466656b2 9897833d f0156d88 df858d33) are
+      intact (4264 steps, best checkpoint, sigma stage, H1-H7c read; PP4 cut at 772/908/1055/1129 of 1301, EE4 0/169); control
+      pair 87ea24d0 321a3de2 complete (2171 reads). Their eval-only REREAD (V3_AXES=''PP4 EE4 HD4'', --time 01:45:00, 7.0
+      GPU-h, batch total 29.5 GPU-h) waits on the hd_ pools.'
+    decisions: 'Gridpool probe instead of planning from plain-MadEvent yields: all 114 pools are lhe.gridpack and lhe_probe
+      kept ignores plain runs with energy patches; the gridpool probe builds gridpacks at their queue paths (reused by the
+      queue). Reread wall from measured read rate (2.05-2.46 s/probe overall vs short_wall''s 1.6), not short_wall --eval''s
+      01:30:00. Yields for hd go to a separate file analysis/catalog_v4/data/lhe_probe_yields_hd.json so the shared lhe_probe_yields.json
+      is not overwritten.'
+    ruled_out: 'Treating the het share arms as broken: their logs show training and sigma stage complete; only PP4/EE4 reads
+      were cut. Planning the hd queue from the plain probe: it does not measure the gridpack layout.'
+    running: none known (the gridpool probe batch has ended per the main session)
+    files: 'recipes/catalog_v4_heldout_default_processes.yaml, tools/lhe_probe.py (gridpool, gridpool-plan, kept), tools/lhe_parts.py
+      (plan --probe), scripts/job_lhe_probe.sh (PROBE_SHARD=gridpool), tools/short_wall.py (S_PROBE 1.6 too low for het reads),
+      scripts/job_catalog_v3_short.sh. FIRST CHECKS: (1) site logs of the 9 timed-out gridpool jobs: which gridpacks finished
+      (GRIDPACK_JSON s_gridpack vs the estimate; GRID_TIME_FACTOR 4.3 too low?), which pools were not reached; ack E3248-E3254+
+      with what each showed; (2) re-lay the unfinished pools (gridpacks already built are reused) at the measured gridpack
+      time, one wave, target recorded; (3) lhe_probe kept --yields-out lhe_probe_yields_hd.json over all gridpool logs, then
+      lhe_parts plan and workers; (4) raise short_wall S_PROBE to the measured het rate; (5) het rereads once hd_ pools are
+      assembled; (6) MIX_HET in mixture_ab.py and het_uncertainty.py committed before reading; (7) repo-reviewer for 5d4c0e9c
+      1acddbff 7eb15b55. Job pool lists of the gridpool batch: /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/gp_{00..15}.txt
+      (submission order = c10e2f5b first ... dfeb8d04 last)'
+    written: '2026-10-31T13:33:54+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
