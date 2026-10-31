@@ -5154,11 +5154,9 @@ entries:
       - 'check_site_data passes on default50 and default25: re-read EE4 on the four arms and write mixture_ab.json'
       - 'it fails: fix the composition before any read, nothing resubmitted'
   owner:
-    agent: a95e29b40c3a46e59
-    state: closed
-    since: '2026-10-30T23:39:54+00:00'
-    context: 293593
-    context_at: '2026-10-31T00:42:59+00:00'
+    agent: ab11dfab0dad3975c
+    state: working
+    since: '2026-10-31T00:44:51+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
