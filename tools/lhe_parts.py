@@ -102,7 +102,8 @@ def cmd_plan(a):
     for name, its in sorted(items.items()):
         if name in (getattr(a, "exclude", None) or []):
             continue                                  # held out of this queue (plan --exclude)
-        n_adopt += _adopt(D, name, its)
+        for sd in [D["specs"]] + [_dirs(q2)["specs"] for q2 in getattr(a, "skip_claimed", None) or []]:
+            n_adopt += _adopt(sd, name, its)     # parts of this queue's previous plan and of the taken-over queues'
         with open(os.path.join(D["specs"], name + ".json"), "w") as f:
             json.dump({"seed": a.seed, "items": [[r, p] for r, p in its]}, f)
         rate, src = _rate(name, rates, med)
@@ -128,15 +129,14 @@ def cmd_plan(a):
                                                    2)}))
 
 
-def _adopt(D, name, its):
-    """Hard-link the part files of a process's previous plan (Q/specs) to its new names when the new layout changes only
+def _adopt(specs_dir, name, its):
+    """Hard-link the part files of a process's previous plan (specs_dir = Q/specs, of this queue or one it takes over) to its new names when the new layout changes only
     the number of runs (lhe.n_runs raised or cut; with lhe.run_events unchanged, also the margin; no lhe.energies): run
     k below both counts has the same run name, iseed and events, so the same MadEvent run. Nothing is deleted. Returns
     the parts linked."""
-    sf = os.path.join(D["specs"], name + ".json")
-    if not os.path.exists(sf):
+    if not os.path.exists(os.path.join(specs_dir, name + ".json")):
         return 0
-    old = [r for r, _ in _spec(D, name)]
+    old = [r for r, _ in _spec({"specs": specs_dir}, name)]
     new = [r for r, _ in its]
     # n_runs may go up (more runs) or down (the leading runs made already hold the blocks); with lhe.run_events the
     # events each run asks are fixed by it, so n_requested (margin) may change too; anything else is another layout

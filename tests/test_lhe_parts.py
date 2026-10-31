@@ -561,6 +561,19 @@ def test_park_and_skip_claimed():
             lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q2, seed=42, rates=rates, cores=[],
                                                   skip_claimed=[q1]))
             assert sorted(os.listdir(os.path.join(q2, "todo"))) == todo[1:]
+            # a taken-over queue's finished parts are linked to the new layout's names, not queued again
+            _register(n_runs=4, run_events=400)
+            old = [p for p, _ in mg.lhe_part_paths(NAME, _items())]
+            for p in old[:2]:
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                np.savez(p, mom=np.zeros((37, K, 4)))
+            _register(n_runs=5, run_events=400)
+            new = mg.lhe_part_paths(NAME, _items())
+            q3 = os.path.join(d, "q3")
+            lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q3, seed=42, rates=rates, cores=[],
+                                                  skip_claimed=[q1]))
+            assert all(os.path.samefile(a, b) for a, (b, _) in zip(old[:2], new[:2]))
+            assert len(os.listdir(os.path.join(q3, "todo"))) == 3 and not os.path.exists(new[2][0])
     finally:
         os.environ.pop("AMP_LHE_PARTS_DIR", None)
         del mg.PROCESSES[NAME]
