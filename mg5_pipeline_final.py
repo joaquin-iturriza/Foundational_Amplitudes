@@ -1895,7 +1895,10 @@ def _load_catalog_2to4():
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
                                                 "catalog_v4_ee_processes.yaml"))
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
-                                                "catalog_v4_default_processes.yaml"))):
+                                                "catalog_v4_default_processes.yaml"))
+                       # default-sampled test pools of the held-out classes (recipes/gen_catalog_v4_heldout_default.py)
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_heldout_default_processes.yaml"))):
         with open(path) as f:
             d = _yaml.load(f, Loader=getattr(_yaml, "CSafeLoader", _yaml.SafeLoader)) or {}
         lhe = dict(d.get("lhe") or {})
