@@ -5642,9 +5642,16 @@ entries:
     answers_after: '2026-10-31T00:08:51+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-10-31T00:38:10.093000+00:00'
+    text: Apply the trial exemption
+    decision: D211
+    answers_after: '2026-10-31T00:21:20+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
+  - D211
   next:
     1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
       reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
@@ -5724,8 +5731,10 @@ entries:
     searched: D203 approves the trial; the guard edit was refused by the permission classifier as self-modification, and the
       settings and CLAUDE.md are Joaquin's
     blocks: the matched model trial
-    blocks_steps: &id001
+    blocks_steps:
     - 4
+    answered_at: '2026-10-31T00:38:10.031000+00:00'
+    decision: D211
   step_why:
     1:
       feeds: whether the redesign is finished
@@ -6310,11 +6319,3 @@ entries:
       to do: record the finding/dead end for routing, report to Joaquin, remove the 21 worktrees worktrees/zz_trial_* with
       scripts/remove_worktree.sh (branches zz_trial_<task>_<arm> unmerged: delete after), then steps 1, 5, 6'
     written: '2026-10-31T01:05:38+00:00'
-  ask: 'Apply the brief_guard exemption for TRIAL=model launches (diff in scratchpad brief_guard_trial.diff), so the matched
-    model trial can run? Also: syncClaudeAiSkills false in ~/.claude/settings.json; the CLAUDE.md line for low-effort lookup
-    agents.'
-  waiting_since: '2026-10-31T00:21:20+00:00'
-  searched: D203 approves the trial; the guard edit was refused by the permission classifier as self-modification, and the
-    settings and CLAUDE.md are Joaquin's
-  blocks: the matched model trial
-  blocks_steps: *id001
