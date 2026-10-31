@@ -189,6 +189,13 @@ def _under(root, path):
     return r
 
 
+def run_asked(name, run):
+    """The events a run must deliver: run[1] where lhe.run_events is set (a pool split into runs sized to deliver
+    them); None for the stall layout (no run_events: each run asks the whole pool and returns what MadEvent gives,
+    lhe.n_runs being sized from that yield), whose short parts are done, the pool assembled from their sum."""
+    return run[1] if mg.PROCESSES[name]["lhe"].get("run_events") else None
+
+
 def part_ok(path, n_asked=None):
     """A run's events are saved: its part file loads and holds events (all it was asked for, when n_asked is given)."""
     try:
@@ -312,7 +319,7 @@ def _run_task(q, t):
         try:
             mg.lhe_build_part(name, items, t["k"], mg_cores=int(t.get("cores", 1)), keep_dir=True)
             part, run = mg.lhe_part_paths(name, items)[t["k"]]
-            if not part_ok(part, run[1]):        # a short part (MadEvent stopped early) is a failed run, not a done one
+            if not part_ok(part, run_asked(name, run)):   # a short part fails a run sized to deliver its events
                 raise RuntimeError(f"{name}: part {t['k']} written but holds fewer events than the {run[1]} asked: "
                                    f"{part}")
         finally:
@@ -440,7 +447,7 @@ def cmd_gc(a):
                 stats["running_skipped"] += 1
                 continue
             _under(root, wd)
-            saved = part_ok(part, run[1])            # all the events it asked; a short part keeps its logs
+            saved = part_ok(part, run_asked(name, run))   # all the events it must deliver; a short part keeps its logs
             if not saved and part_ok(part):
                 stats["short_parts"] += 1
             n, kept = tidy_plan(wd, saved)

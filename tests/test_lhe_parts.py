@@ -152,13 +152,13 @@ def _worker(q, out):
         out.put(e.code)
 
 
-def test_queue_end_to_end():
-    _register()
+def test_queue_end_to_end(stall=False):
+    _register(run_events=None if stall else 400)
     saved = (mg.lhe_prepare, mg.lhe_run_madevent, mg.read_lhe_pp, mg.label_lhe_pp, mg.lhe_parent_physics_check,
              datagen.dest_for_role, lhe_parts.ASSEMBLE_S)
     try:
         with tempfile.TemporaryDirectory() as d:
-            _fakes(d, short=False)
+            _fakes(d, short=stall)     # stall layout: every run short of the whole pool it asks, done not failed
             datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
             os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
             os.environ["AMP_LHE_WORK_DIR"] = os.path.join(d, "work")
@@ -196,7 +196,7 @@ def test_queue_end_to_end():
         for v in ("AMP_LHE_PARTS_DIR", "AMP_LHE_WORK_DIR"):
             os.environ.pop(v, None)
         del mg.PROCESSES[NAME]
-    print("[queue end to end] ok")
+    print(f"[queue end to end{' stall' if stall else ''}] ok")
 
 
 def test_tidy_and_gc():
@@ -352,4 +352,5 @@ if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
     test_queue_end_to_end()
+    test_queue_end_to_end(stall=True)
     test_tidy_and_gc()
