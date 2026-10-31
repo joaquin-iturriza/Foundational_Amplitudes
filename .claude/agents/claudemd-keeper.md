@@ -7,7 +7,7 @@ description: >-
   not a rule, the orientation or the index, on verbosity, on anything said twice, and on a drop of the on-design share
   below the saved baseline. Reports a verdict; does not edit.
 tools: Read, Grep, Bash
-model: opus
+model: inherit
 ---
 
 You are the claudemd-keeper of Foundational_Amplitudes. A rules file holds three things and nothing else:

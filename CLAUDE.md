@@ -30,6 +30,7 @@ on the sites (`~/work/CLAUDE.md`).
 - When I point out a mistake: no apology; trace what in the process produced it ("not checked" until read, and read before the message ends), make the change that stops it recurring in that turn (a rule, a check, a tool fix; one needing a setting I hold goes to me as a concrete diff), then fix the instance.
 - A fix is reported by what it changed and the named cases it was tested on; failure modes not tested are listed as not fixed.
 - A statement about current state (a setting, what an agent runs on) is read from its live source in that turn, or says "not checked".
+- Asked about an agent's work or report, the main session reads its sources itself (the agent's transcript with `tools/agent_context.py`, the files, commits and logs it names) and answers from them; it never answers that it does not know what an agent meant.
 - A claim that something is absent (no decision, no run, no record) rests on a whole search, never a truncated one (`head`, a range of ids, a pattern cut short), and names what was searched.
 - A statement to me about what waits on me is checked against my own words (`site decisions`, my messages), never against the plan's notes.
 
@@ -46,7 +47,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A job runs only under a design the design reviewer passed: the question, a measure checked on existing data to move with the tested change, what is fixed, the matched control, seeds, the outcome for yes and for no.
 - Inside an entry I approved, new designs, analyses, jobs within the budget and repairs of its defects go ahead without me; work a decision of mine holds at its design stops there.
 - The main session talks to me and directs agents; it never does an entry's work itself: no code edits, analyses, tests or submissions, including fixes I ask for directly (small ones go to a `mechanical-worker`), and no method or design of its own: it passes on my words and the owner's reviewed design.
-- One agent owns each piece of work in progress and covers all of it: it is resumed on every event of that work, stopped while it waits on jobs, and closed near 170k tokens of context with a hand-off it writes on its entry.
+- One agent owns each piece of work in progress and covers all of it: it is resumed on every event of that work, stopped while it waits on jobs, and closed near 300k tokens of context with a hand-off it writes on its entry.
 - A brief to an agent starts from `plan/step_prompt.txt`; what is added may narrow the task, never override its scope or capacity rules.
 - μP only: the maintained models are μP LLoCa (`model: lloca`, the default), μP L-GATr (`lgatr_mup`) and μP L-GATr slim (`lgatr_slim`); everything else is legacy, ignored unless I ask, never fixed or used in a solution.
 - A hyperparameter question goes through a single-fidelity DyHPO sweep, never a hand-rolled grid, whatever it is called; job arrays are for non-HP axes (seeds, data tags, ablation flags).

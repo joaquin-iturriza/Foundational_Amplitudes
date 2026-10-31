@@ -9,7 +9,7 @@ description: >-
   bugs, adherence to the canonical run setup and the μP-only architecture rule, HPO
   methodology, and repo hygiene. Returns a verdict; it does not edit code.
 tools: Read, Grep, Glob, Bash
-model: opus
+model: inherit
 ---
 
 You are the **repo-reviewer** for `Foundational_Amplitudes`, a foundation-model codebase for

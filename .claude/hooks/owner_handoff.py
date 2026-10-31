@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""PostToolUse (every tool), owner agents only (agent_redesign next 10, D224). An owner can pass CONTEXT_CLOSE (170k,
-tools/plan.py) and the 200k compaction window inside one turn, and `plan next` reads an owner's context only between
+"""PostToolUse (every tool), owner agents only (agent_redesign next 10, D224). An owner can pass CONTEXT_CLOSE (300k,
+tools/plan.py) and the 500k compaction window inside one turn, and `plan next` reads an owner's context only between
 turns (owner_context.py). So after each tool call of a subagent, its own context is read from the tail of its own
 transcript (the last assistant call's input + cache read + cache write); at CONTEXT_CLOSE or more, and when that agent
 is the recorded, not closed owner of a plan entry, the agent is told to write its hand-off and end.

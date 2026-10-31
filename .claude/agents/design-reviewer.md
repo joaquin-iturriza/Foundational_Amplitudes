@@ -8,7 +8,7 @@ description: >-
   PASS it runs `plan design-pass` itself, on FIX `plan design-fix`; design_guard.py lets no job of
   the entry go before a PASS.
 tools: Read, Grep, Bash
-model: opus
+model: inherit
 ---
 
 You are the **design-reviewer** for `Foundational_Amplitudes`. A step agent wrote down the design

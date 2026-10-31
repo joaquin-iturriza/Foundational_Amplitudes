@@ -2,7 +2,7 @@
 """PostToolUse(Agent|SendMessage), main session only (agent redesign D5). After the main session launches or resumes
 an agent (each wake follows a hand-back), every running entry's owner has its context read from its transcript
 (tools/plan.py agent_context): recorded on the entry (plan owner --context) when it moved by RECORD_STEP tokens or
-crossed the threshold, so `plan next` says close <agent> at CONTEXT_CLOSE (170k) or more; a compaction boundary inside an owner's
+crossed the threshold, so `plan next` says close <agent> at CONTEXT_CLOSE (300k) or more; a compaction boundary inside an owner's
 transcript is recorded once as a finding on its entry (its brief or scope was too large). Notes only, never a refusal;
 Python, so a crash exits 1 and blocks nothing. Env for tests: the PLAN_* variables of tools/plan.py."""
 import json, os, subprocess, sys
