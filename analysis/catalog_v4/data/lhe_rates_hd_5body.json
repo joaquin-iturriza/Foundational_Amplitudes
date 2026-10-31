@@ -17,11 +17,20 @@
   "s_run_max": 109.3,
   "source": "probe logs (lhe_probe kept)"
  },
+ "hd_udx_dxguzz": {
+  "core_s_per_event": 0.1254,
+  "mg_cores": 1,
+  "nfinal": 5,
+  "runs": 2,
+  "runs_timed_out": 0,
+  "s_run_max": 125.4,
+  "source": "probe logs (lhe_probe kept)"
+ },
  "hd_ug_ddxguz": {
   "core_s_per_event": 0.2327,
   "mg_cores": 1,
   "nfinal": 5,
-  "runs": 2,
+  "runs": 4,
   "runs_timed_out": 0,
   "s_run_max": 232.7,
   "source": "probe logs (lhe_probe kept)"
