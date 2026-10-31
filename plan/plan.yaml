@@ -6752,6 +6752,9 @@ entries:
   - at: '2026-10-31T06:12:52+00:00'
     text: 'a compaction inside the turn of owner ae7bc0ff5c64982f0 at 2026-10-31T05:09:55.139Z: its brief or scope was too
       large; narrow the next brief'
+  - at: '2026-10-31T06:12:54+00:00'
+    text: 'a compaction inside the turn of owner ae7bc0ff5c64982f0 at 2026-10-31T05:22:17.356Z: its brief or scope was too
+      large; narrow the next brief'
   handoff:
     state: 'Step 15 (het-loss mixture A/B + sigma uncertainty, D220/D52/D71): design superseding 04:52 PASSED 04:56 by design
       reviewer a6b73857e1bb9b3b7 (arms v4_het_control, v4_het_default50, v4_het_default25, seeds 42/43; R as par:v4_mixture
