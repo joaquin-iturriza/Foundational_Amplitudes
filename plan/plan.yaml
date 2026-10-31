@@ -3449,6 +3449,16 @@ entries:
       EE4 HD4'', REREAD=<arm run>, 1584 probes, --hdr=--time=01:45:00 (1584 x 2.46 s + 15 min startup, x1.25 = 1.67 h; short_wall
       --eval says 01:30:00 at 1.6 s/probe, too short), 4 x 1.75 = 7.0 GPU-h; het batch total 6 x 3.75 + 7.0 = 29.5 GPU-h,
       under 30. Also fix short_wall S_PROBE to the measured het rate before submitting.'
+    21: 'Step 18 queue after gridpool pass 2: pass 1 (16 jobs, 3-8 pools in series each) finished 67 of 114 hd_ pools (110
+      of 180 gridpacks on disk at the queue''s paths, yield 1.0 and kept 1.0 on every returned run); pass 2 hd_gridpool_probe2
+      = the other 47 pools, one per job (16 cores, htc, GP_RUNS=2, GP_TIMEOUT=5400; 16 jobs at --time 03:00:00 (the 5-body
+      pools with no measurement and hd_ddx_dhuxwp__E20), 31 at 01:30:00; target 2.0 h; site pick width 1268, one wave; gridpool-plan
+      --logs est longest 1.51 h; run list scratchpad gp2_runs.txt). When it ends: read every log (GRIDPACK_PROGRESS on any
+      cut job says survey/refine/generation), then lhe_probe kept --yields-out analysis/catalog_v4/data/lhe_probe_yields_hd.json
+      over all pass 1 and pass 2 logs, lhe_parts plan recipes/catalog_v4_heldout_default_processes.yaml --probe that file
+      --queue <hd queue>; a pool whose run of 1000 events takes over 1800 s (hd_ddx_dhuxwp__E20 timed out at 1800 s in pass
+      1, hd_epem_aaccx__E20 1787 s) gets a smaller run size in the queue layout; workers at site pick''s width in one wave,
+      plan target, submit'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6367,6 +6377,12 @@ entries:
       - 'all four reread complete: het uncertainty read (mixture_ab MIX_HET, het_uncertainty.py) on PP4/EE4/HD4 with the control
         pair'
       - 'a reread times out again: read the log for the probe rate and resubmit at the measured wall, no axis cut'
+    21:
+      feeds: 'next 18: the default-sampled held-out pools'
+      if:
+      - 'every pool''s gridpack built and yield >= 0.5: plan the hd queue and submit workers'
+      - 'a pool cut again or yield < 0.5: read its GRIDPACK_PROGRESS/PROBE_JSON lines and fix its layout (cores, run size)
+        before the queue'
   owner:
     agent: a739618f977b0a427
     state: working
