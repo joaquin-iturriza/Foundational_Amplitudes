@@ -6255,6 +6255,14 @@ entries:
       held once, fa-catalog-reference arrived with the deny, fa-generation with the run). Replay (tools/push_replay.py, 33
       transcripts): 8320 -> 8315 tokens per call, 13 held calls of 1590. test_redesign_d 48/49 (the D6 close-note failure
       predates), test_context_push 4/4.'
+  - at: '2026-10-31T01:05:02+00:00'
+    text: 'Model trial (step 4, D203, design passed after one FIX) in progress 2026-10-31: 20 agents ran (agent ids analysis/agent_redesign/model_trial_agents.txt,
+      worktrees worktrees/zz_trial_<task>_<arm>). First-pass checks: 9/10 pass in both arms; poolrow failed in both (old reads
+      with idx only), one rework sent to each (opuslow rework committed 703618f3, sonnet pending). Cost at list price before
+      rework (model_trial.py cost): sonnet total ~$1.88, opuslow ~$2.82. Hand read so far: sonnet loopenc folds EW antighosts
+      and G- onto their particles (labels wrong, and calls 9000001-4 R2/UV pseudo-particles); opuslow stallshort missed tidy_run
+      (one of three short-part call sites) and its report says otherwise; the rest correct. Left: check poolrow reworks, model_trial.json
+      record + report, remove 21 zz_trial worktrees with scripts/remove_worktree.sh (branches zz_trial_* then deleted).'
   handoff:
     state: 'Step 5 cut 1 (hook pushes) applied 2026-10-31 under a passed design (FIX then PASS): (c) repair 0d2ddf73: a hook
       output over 10,000 chars reached agents as a 2,178-char preview, sections lost while marked delivered (17 of 32 redesign
