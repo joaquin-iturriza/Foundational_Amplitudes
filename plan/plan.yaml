@@ -6500,6 +6500,15 @@ entries:
     - tests/test_context_push.py
     - tools/model_trial.py
     - tools/push_replay.py
+    - 'usage attribution (design passed 2026-10-31 ~03:50; tools/main_turns.py, commit waits on the repo-reviewer backlog,
+      draft in the scratchpad): redesign era main session $49.05: per API call orchestration 48.4%, text-only replies 30.4%,
+      reads 12.4%, inline 8.8% ($4.31); per turn inline 31% ($15.14, 34 turns: edits of hooks, site, site_gate, settings,
+      CLAUDE.md, mostly on Joaquin''s direct asks). Triggers: user 31%, agent hand-back 27%, waiter 18%, Stop-hook refusals
+      18% (35 wakes, $0.25 each), task-notification after hand-back 2.5% (13; 52 more absorbed mid-turn). Orchestration-only
+      wakes 145, $22.17 (45%), $0.15 each at ~240k context; nothing-to-say wakes 19, $2.11, $0.11 each (''Working.'' 5, $0.10
+      each). Step-agents era: orchestration-only wakes 35% of main $, Stop-hook 22%. Main-alone agents: general-purpose 46
+      ($178, $3.87 each, 51k at launch), forks 16 ($113, $7.07 each, 320k at launch = 1.025x the parent''s context: full inheritance),
+      repo-reviewer 93 ($113), notes-editor 33 ($19), Explore 3 ($2).'
     - 'usage figure v3 (tools/usage_report.py @7dbd656d, analysis/agent_redesign/usage_report_v3.json, figs/usage_v3.png replaces
       usage.png v1 [main folder only, per-role own denominator] and usage_v2.png [all folders, same per-role panel]): one
       denominator per era = results of main session + subagents; weighted tokens per result 1.84 / 1.08 / 0.85 M and list-price
