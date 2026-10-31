@@ -127,11 +127,15 @@ def test_lco_map_end_to_end_on_a_synthetic_dump(tmp_path):
             d.mkdir()
             for p in ps:
                 X = r.normal(size=(500, 38)).astype(np.float32)
+                X[:, 37] = 0                  # no final gluon or photon: the drop-group branch names the arm
                 u = (np.sin(2 * X[:, 0]) if ax == "H2" else 0) + 0.5 * r.normal(size=500)
                 np.savez(d / f"{p}.npz", X=X, u=u, names=np.array(names), var_u=np.var(u), n=2000, ceiling_own=0.6)
     out = tmp_path / "o.json"
-    subprocess.run([sys.executable, lco_map.__file__, "--root", str(tmp_path), "--arms", "A", "--out", str(out)],
+    run = subprocess.run([sys.executable, lco_map.__file__, "--root", str(tmp_path), "--arms", "A", "--out", str(out)],
                    check=False, capture_output=True, text=True)
+    assert run.returncode == 0, run.stderr
     R = json.load(open(out))["A"]
     assert R["f_lco"] > 0.5 * R["f_ceil"] > 0.2
     assert R["f_lco_factors"] < 0.2
+    V = json.load(open(out))["verdict"]
+    assert V["per_seed"]["A"]["branch"] == "yes" and V["per_seed"]["A"]["next_arm"] == "the pairs group's term"

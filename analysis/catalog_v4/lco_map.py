@@ -32,7 +32,8 @@ GROUPS = {"pairs": ("sij",), "energy_angle": ("lE", "cth", "lshat"), "species": 
 
 
 def load(d):
-    """{probe: (X, u, var_u over all the probe's events, own-label ceiling)}, names."""
+    """{probe: (X, u, own-label R^2 on all the probe's events)}, names. var(u), the gap and the floors are taken over
+    the 500 dumped events (removed = var(u) - var(u - u_hat) must use one sample); the stored var_u is not used."""
     out, names = {}, None
     for f in sorted(glob.glob(os.path.join(d, "*.npz"))):
         z = np.load(f)
@@ -75,8 +76,10 @@ def floors(vt_by_cell):
     return {c: float(np.median(v)) for c, v in vt_by_cell.items()}
 
 
-def boot(vh, vr, cells, vt_by_cell, rng):
-    """16-84% of f over H2 pools and each cell's TR pools resampled with replacement, 1000 draws."""
+def boot(vh, vr, cells, vt_by_cell):
+    """16-84% of f over H2 pools and each cell's TR pools resampled with replacement, 1000 draws, seed 0 for every
+    read, so the reads' intervals are paired (the same resamples)."""
+    rng = np.random.default_rng(0)
     vh, vr = np.asarray(vh), np.asarray(vr)
     fs = []
     for _ in range(1000):
@@ -84,6 +87,46 @@ def boot(vh, vr, cells, vt_by_cell, rng):
         fl = floors({c: np.asarray(v)[rng.integers(len(v), size=len(v))] for c, v in vt_by_cell.items()})
         fs.append(f_of(vh[i], vr[i], [fl[cells[k]] for k in i]))
     return [round(float(np.quantile(fs, 0.16)), 3), round(float(np.quantile(fs, 0.84)), 3)]
+
+
+def verdict(out, arms):
+    """The design's rule (passed 2026-10-31). Per seed, margin = max(seed difference, f_lco's bootstrap half-range):
+    the route ends when f_ceil < 0.1 on both seeds; yes when f_lco - margin >= 0.5 f_ceil and >= 0.1; no when
+    f_lco + margin < 0.25 f_ceil or < 0.05; else between. A branch holds only on both seeds (else between). On yes,
+    the next arm: factors-only f >= f_lco / 2 -> data.target_propagators; else f_lco held by the pools with a final
+    gluon or photon (f_lco_emitter > f_lco_no_emitter) -> the parent-factorised target; else the feature group whose
+    drop loses the most f. Flags: cell-local (leave-one-cell-out < 0.25 f_ceil on a yes), f_lco > f_ceil (reported,
+    not a bug: the map sees about 98k events of other pools), the training-pool map's TR score not near 0 (|r2| > 0.02)."""
+    V = {"per_seed": {}, "flags": []}
+    if any(out[a].get("f_lco") is None for a in arms):
+        V["branch"] = "no read (a fold or cell had nothing to fit on)"
+        return V
+    if all(out[a]["f_ceil"] < 0.1 for a in arms):
+        V["branch"] = "route ends: f_ceil < 0.1 on every seed (the gap is level and spread, not per-event shape)"
+        return V
+    sd = out.get("seed_difference_f_lco") or 0.0
+    for a in arms:
+        R = out[a]
+        f, fc = R["f_lco"], R["f_ceil"]
+        m = max(sd, (R["boot_lco"][1] - R["boot_lco"][0]) / 2)
+        b = ("yes" if f - m >= 0.5 * fc and f - m >= 0.1 else
+             "no" if f + m < 0.25 * fc or f + m < 0.05 else "between")
+        V["per_seed"][a] = {"branch": b, "f_lco": f, "f_ceil": fc, "margin": round(m, 4)}
+        if f > fc:
+            V["flags"].append(f"{a}: f_lco {f} > f_ceil {fc}")
+        if abs(R["median_r2_trainmap_TR_oof"]) > 0.02:
+            V["flags"].append(f"{a}: training-pool map's TR score {R['median_r2_trainmap_TR_oof']} not near 0")
+        if b == "yes":
+            drops = {g: R.get(f"f_lco_drop_{g}") for g in GROUPS if R.get(f"f_lco_drop_{g}") is not None}
+            V["per_seed"][a]["next_arm"] = (
+                "data.target_propagators" if R["f_lco_factors"] >= f / 2 else
+                "parent-factorised target" if R.get("f_lco_emitter", -1) > R.get("f_lco_no_emitter", -1) else
+                f"the {min(drops, key=drops.get)} group's term" if drops else "unnamed")
+            if R.get("f_loco_cell") is not None and R["f_loco_cell"] < 0.25 * fc:
+                V["flags"].append(f"{a}: cell-local (leave-one-cell-out {R['f_loco_cell']})")
+    bs = {v["branch"] for v in V["per_seed"].values()}
+    V["branch"] = bs.pop() if len(bs) == 1 else "between (seeds disagree)"
+    return V
 
 
 def main():
@@ -102,7 +145,6 @@ def main():
     rep = {m: r for r, ms in cls.items() for m in ms}
     out = {}
     for arm in a.arms:
-        rng = np.random.default_rng(0)
         H, names = load(os.path.join(a.root, f"{arm}_H2"))
         T, _ = load(os.path.join(a.root, f"{arm}_TR"))
         cells = {cell(p) for p in H}
@@ -113,6 +155,9 @@ def main():
         for p, v in T.items():
             vt_by_cell.setdefault(cell(p), []).append(float(np.var(v[1])))
         fl = floors(vt_by_cell)
+        bare = sorted(c for c in cells if c not in fl)
+        if bare:
+            raise SystemExit(f"lco_map: held-out cells with no training pool, no floor: {bare} ({arm})")
         hc = [cell(p) for p in hp]
         v1 = [vh[p] for p in hp]
         f1 = [fl[c] for c in hc]
@@ -134,7 +179,7 @@ def main():
              "median_ceiling_own_K1600": float(np.nanmedian([H[p][2] for p in hp]))}
         vc = [vh[p] * (1 - H[p][2]) for p in hp]           # first: the own-label ceiling's f
         R["f_ceil"] = round(f_of(v1, vc, f1), 4)
-        R["boot_ceil"] = boot(v1, vc, hc, vt_by_cell, rng)
+        R["boot_ceil"] = boot(v1, vc, hc, vt_by_cell)
         print("LCO_CEIL", json.dumps({arm: R["f_ceil"]}), flush=True)
         per = {}
         for key, (grp, cols) in reads.items():
@@ -145,7 +190,7 @@ def main():
             per[key] = vr
             v2 = [vr[p] for p in hp]
             R[f"f_{key}"] = round(f_of(v1, v2, f1), 4)
-            R[f"boot_{key}"] = boot(v1, v2, hc, vt_by_cell, rng)
+            R[f"boot_{key}"] = boot(v1, v2, hc, vt_by_cell)
             if key == "lco":
                 for lab, m in (("emitter", emit), ("no_emitter", ~emit)):
                     if m.any():
@@ -160,14 +205,16 @@ def main():
         vtr = scored(T, tfold, allc)
         R["median_r2_trainmap_TR_oof"] = round(float(np.median([1 - vtr[p] / np.var(T[p][1]) for p in tp])), 4)
         R["per_cell"] = {c: {"n_H2": sum(cell(p) == c for p in hp),
-                             "median_r2_lco": round(float(np.median([1 - per["lco"][p] / vh[p] for p in hp if cell(p) == c])), 4),
-                             "median_r2_lco_factors": round(float(np.median([1 - per["lco_factors"][p] / vh[p]
-                                                                             for p in hp if cell(p) == c])), 4)}
+                             **{f"median_r2_{k}": round(float(np.median([1 - per[k][p] / vh[p] for p in hp
+                                                                          if cell(p) == c])), 4)
+                                for k in ("lco", "lco_factors") if k in per}}
                          for c in sorted(cells)}
         out[arm] = R
         print("LCO_MAP", json.dumps({arm: {k: v for k, v in R.items() if k != "per_cell"}}), flush=True)
     s = [out[x]["f_lco"] for x in a.arms]
-    out["seed_difference_f_lco"] = round(float(max(s) - min(s)), 4)
+    out["seed_difference_f_lco"] = round(float(max(s) - min(s)), 4) if None not in s else None
+    out["verdict"] = verdict(out, a.arms)
+    print("LCO_VERDICT", json.dumps(out["verdict"]), flush=True)
     json.dump(out, open(a.out, "w"), indent=1)
 
 
