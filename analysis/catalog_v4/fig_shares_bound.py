@@ -5,7 +5,7 @@ training loss. MSE: pure default (the bound arm), share 0.50, share 0.25 against
 bound arm was trained). Every read on MadEvent default-sampled test events. Lines at R = 1 (the control) and R = 0.90
 (the design's GAIN bar).
 
-    python3 analysis/catalog_v4/fig_shares_bound.py  ->  analysis/catalog_v4/figs/shares_bound.{png,pdf}
+    python3 analysis/catalog_v4/fig_shares_bound.py  ->  analysis/catalog_v4/figs/shares_bound_{a,b}.{png,pdf}
 """
 import json
 import os
@@ -19,9 +19,12 @@ from matplotlib.ticker import FixedFormatter, FixedLocator, NullFormatter  # noq
 
 DATA = os.path.join(HERE, "data")
 # (label, path into an arm's result)
-READS = [("PP4 trained", ("PP4", "trained")), ("PP4 not trained", ("PP4", "not_trained")), ("EE4", ("EE4", "all")),
-         ("held out (700)", ("held_default", "pooled")), ("held out H3", ("held_default", "H3")),
-         ("held out H5", ("held_default", "H5"))]
+# labels in words: pp 13 TeV MadEvent probes of the trained / untrained classes, the e+e- probes, the held-out pool,
+# its physical-top classes and its one-loop classes; class counts from data/bound_default.json
+READS = [("pp 13 TeV, trained classes (797)", ("PP4", "trained")),
+         ("pp 13 TeV, untrained classes (504)", ("PP4", "not_trained")), (r"$e^+e^-$ (169)", ("EE4", "all")),
+         ("held out, default-sampled (700)", ("held_default", "pooled")),
+         ("held out, physical top (279)", ("held_default", "H3")), ("held out, one-loop (28)", ("held_default", "H5"))]
 ARMS = [("bound", "pure default", ps.C.vermillion, "s"), ("default50", "share 0.50", ps.C.green, "o"),
         ("default25", "share 0.25", ps.C.blue, "D")]
 
@@ -51,15 +54,15 @@ def panel(ax, arms_res, present):
 def main():
     mse = json.load(open(os.path.join(DATA, "bound_default.json")))["arms"]
     het = json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]
-    fig, (a, b) = ps.figure(ncols=2)
+    # one file per loss, stacked: the read groups' labels in words make a two-across row wider than the paper
+    (fa, a), (fb, b) = ps.panels(2)
     panel(a, mse, {"bound", "default50", "default25"})
     panel(b, het, {"default50", "default25"})
     ps.process_label(a, "MSE")
     ps.process_label(b, "het")
-    ps.shared_legend(fig, a, ncol=5)    # one strip above: the dot rows fill every corner of both panels
+    ps.shared_legend(fa, a, ncol=3)     # one strip above the first panel: the dot rows fill every corner
     os.makedirs(os.path.join(HERE, "figs"), exist_ok=True)
-    ps.save(fig, os.path.join(HERE, "figs", "shares_bound"))
-
+    ps.save_panels([(fa, a), (fb, b)], os.path.join(HERE, "figs", "shares_bound"))
 
 if __name__ == "__main__":
     main()
