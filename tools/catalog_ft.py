@@ -42,7 +42,29 @@ def probe_recipe(probe, out):
     raise KeyError(f"{probe} is in no recipes/catalog_v3_heldout_*.yaml")
 
 
-def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False, target_stats="own"):
+def parent_orders_flag(parent_dir):
+    """(data.orders_from_diagrams for a fine-tune of parent_dir, the parent's coupling-monomial source, how it was read).
+    The source is the parent's data_stats.json target_physics_orders_source, else inferred from the parent's run
+    (AmplitudeExperiment._infer_orders_source). 'table' -> False, 'diagrams_highest_alphas' -> True; any other source
+    (an alpha_s-only parent) is refused."""
+    path = os.path.join(parent_dir, "data_stats.json")
+    src = json.load(open(path)).get("target_physics_orders_source") if os.path.exists(path) else None
+    if src:
+        how = "data_stats.json target_physics_orders_source"
+    else:
+        sys.path.insert(0, ROOT)
+        from experiment import AmplitudeExperiment
+        src, how = AmplitudeExperiment._infer_orders_source(parent_dir)
+    if src == "table":
+        return False, src, how
+    if src == "diagrams_highest_alphas":
+        return True, src, how
+    raise ValueError(f"parent {parent_dir} has coupling-monomial source {src!r} ({how}); only 'table' and "
+                     f"'diagrams_highest_alphas' can be fine-tuned")
+
+
+def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scratch=False, target_stats="own",
+            orders_from_diagrams=None):
     ft = [] if scratch else [
         f"fine_tune.pretrained_path={os.path.abspath(parent)}/models/model_run0_best.pt",
         "fine_tune.lr_scale=1.0", "fine_tune.layer_decay=1.0", f"fine_tune.target_stats={target_stats}",
@@ -53,7 +75,8 @@ def command(parent, optimizer, recipe, D, T, run_dir, result_path, exp_name, scr
             f"training.iterations={T}", "training.validate_frac=0.01", "training.es_load_best_model=true",
             f"training.optimizer={optimizer}", f"training.result_path={result_path}",
             f"data.processes_file={recipe}", f"++data.train_subsample={D}", f"++data.eval_subsample={EVAL_EVENTS}",
-            "evaluation.train_subsample=2000", "plot=true"] + ft
+            "evaluation.train_subsample=2000", "plot=true"] + ft + (
+        [] if orders_from_diagrams is None else [f"++data.orders_from_diagrams={str(bool(orders_from_diagrams)).lower()}"])
 
 
 def main():
@@ -74,6 +97,10 @@ def main():
     assert not (a.scratch and a.keep_parent_stats), "scratch has no parent statistics"
     kind = "scratch" if a.scratch else ("catft_parentstats" if a.keep_parent_stats else "catft")
     target_stats = "parent_shared" if a.keep_parent_stats else "own"
+    flag = None
+    if not a.scratch:
+        flag, src, how = parent_orders_flag(a.parent)
+        print(f"parent orders source {src} ({how}): data.orders_from_diagrams={str(flag).lower()}", flush=True)
     base = os.path.join(a.out, f"{kind}_{pname}_{a.optimizer}")
     os.makedirs(base, exist_ok=True)
     failed = 0
@@ -89,7 +116,7 @@ def main():
             t0 = time.time()
             try:
                 p = subprocess.run(command(a.parent, a.optimizer, recipe, D, T, run_dir, res,
-                                           f"{kind}_{pname}_{a.optimizer}", a.scratch, target_stats), cwd=ROOT)
+                                           f"{kind}_{pname}_{a.optimizer}", a.scratch, target_stats, flag), cwd=ROOT)
                 if p.returncode:
                     raise RuntimeError(f"run.py exit {p.returncode}")
                 r = json.load(open(res))

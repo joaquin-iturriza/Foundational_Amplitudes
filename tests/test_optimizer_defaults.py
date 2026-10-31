@@ -34,6 +34,24 @@ def test_catalog_ft_default_muon():
     assert "training.optimizer=MuonAdamW" in cmd
 
 
+def test_catalog_ft_parent_orders_flag(tmp_path=None):
+    import json, tempfile
+    import tools.catalog_ft as cf
+    d = tempfile.mkdtemp()
+    for src, want in (("table", False), ("diagrams_highest_alphas", True)):
+        json.dump({"target_physics_orders_source": src}, open(os.path.join(d, "data_stats.json"), "w"))
+        flag, s, _how = cf.parent_orders_flag(d)
+        assert (flag, s) == (want, src)
+        cmd = cf.command("runs/x", "MuonAdamW", "r.yaml", 10, 176, "rd", "rd.json", "e", orders_from_diagrams=flag)
+        assert f"++data.orders_from_diagrams={str(want).lower()}" in cmd
+    json.dump({"target_physics_orders_source": "diagrams_alphas_only"}, open(os.path.join(d, "data_stats.json"), "w"))
+    try:
+        cf.parent_orders_flag(d)
+        raise AssertionError("alpha_s-only parent not refused")
+    except ValueError:
+        pass
+
+
 def test_default_yaml_unchanged_and_no_forced_adamw():
     d = yaml.safe_load(open(os.path.join(ROOT, "config", "default.yaml")))
     assert d["training"]["optimizer"] == "AdamW"           # old sweeps / reruns keep what they ran with
