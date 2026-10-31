@@ -6395,7 +6395,7 @@ entries:
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
   owner:
     agent: a5d0c97d9d3e9a7dc
-    state: working
+    state: closed
     since: '2026-10-31T14:18:03.498000+00:00'
     state_at: '2026-10-31T15:09:26.939000+00:00'
     context: 167278
@@ -6876,43 +6876,33 @@ entries:
       about 3 min (assumption: 40-pool rate scales). tools/short_wall.py S_COMPOSE (6.1 s) not yet updated. Tests: test_composed_record,
       test_default_share pass but test_lhe_runs (already failing before).'
   handoff:
-    state: 'Step 15 analysis code written, not yet committed: the commit hook blocks until the repo-reviewer passes its overdue
-      backlog. analysis/catalog_v4/mixture_ab.py (working tree, uncommitted) adds MIX_HET (the six het runs), HD4_HET (empty
-      until the step-20 HD4 re-reads exist), mixture --het, heldout_default --het and het_over_mse. Per the reviewer and the
-      04:56 design / D227, the het held-out cost is decided on default-sampled held-out events (held_default: PP4/EE4 probes
-      of the held-out classes, plus HD4 only when all four seeds are read); the catalog-sampled read is shown beside as information.
-      Every missing read or probe is listed, and there is no verdict until complete. Tests passed: the MSE outputs reproduce
-      the committed mixture_ab.json and mixture_heldout_default.json exactly; with the arms replaced by the control, R=1.0;
-      a fake partial arm read and absent HD4 reads are listed as missing. The repo-reviewer (agent a37205a4e7c152695, holding
-      the lock) blocked twice: (1) the het cost was read on catalog-sampled events, fixed; (2) a partial HD4 read was used
-      silently, fixed. Its third re-check is running; on PASS it runs advance. analysis/catalog_v4/het_uncertainty.py (sigma
-      read, question 2) is written and tested on synthetic data (perfect sigma gives pull std 1.0, cover68 0.68, rule A YES,
-      rule B calibrated; missing probes are listed). It sits only at /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/het_uncertainty.py
-      because the review gate refused writing it into the repo; copy it to analysis/catalog_v4/ once the review passes. The
-      control pair''s reads are extracted (data/reads FA-ccin2p3-87ea24d0_*, 321a3de2_*: 2171 each, 0 excluded). No share-arm
-      result has been read. Control-pair blow-up scan (val_loss_no_reg, 77 validations each): transient spikes, 87ea24d0 1.28e9
-      at val 2 and 2.81e9 at val 13; 321a3de2 3.89e9 at val 1, 2.03e9 at val 24 and 767 at val 34; both converged, last -2.862
-      and -2.786. These are listed, not dropped (the design''s 10x-of-step-500 rule is ill-defined for a negative NLL). E3329
-      acked: 167ac0d6 hd_uux_aepemz__E20, rc=0, the false ALERT; its second probe run returned 162 of 1000 (yield 0.162),
-      to fix in that pool''s layout before the hd queue.'
-    decisions: 'Analysis edits on trunk (as with mixture_ab''s earlier commits), because the CC run part needs site sync.
-      het_uncertainty run part on the CC login node (site run ... run | gzip > data/het_reads.json.gz), reading $SCRATCH/zz_v4_short_<arm>/<axis>/*.npz
-      (t, q, s, pool, pool_row; verified on CC: all 10 axes present for the control pair, share arms PP4 772/908/1055/1129
-      and no EE4). The where-map decile edges come from control seed 42 per read group; per-probe-normalised bins are added
-      as information (they take the class mix out). het logs need site logs -n 3000000 (~506k lines).'
-    ruled_out: Reading the het cost on the catalog-sampled held-out (design and D227 say default-sampled). Pooling HD4 on
-      fewer than four seeds.
-    running: 12 pass-2 gridpool probe jobs (step 18), minus 167ac0d6, which is done and acked; each ends with the false ALERT,
-      to read and ack. repo-reviewer a37205a4e7c152695 re-checking mixture_ab.py.
-    files: 'analysis/catalog_v4/mixture_ab.py (uncommitted), /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/het_uncertainty.py
-      (to move to analysis/catalog_v4/), /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/hu_test/
-      (synthetic test), /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/hetlogs/ (control
-      logs), analysis/catalog_v4/data/reads/FA-ccin2p3-{87ea24d0,321a3de2}_*.json (untracked). NEXT: on reviewer PASS, copy
-      het_uncertainty.py in, commit both (named paths), site sync, then site run het_uncertainty.py run --runs 87ea24d0 321a3de2
-      to test on the control pair, then all six; extract the share arms'' logs (-n 3000000, axes H1..H7c and PP4); run mixture
-      --het, heldout_default --het and the het_uncertainty summary; report missing reads (share arms PP4 remainder, EE4, HD4)
-      as missing.'
-    written: '2026-10-31T14:16:26+00:00'
+    state: 'Step 15 run on reads in hand (finding 15:3x): sigma rule A YES on control, B not calibrated; mixture --het no
+      verdict (EE4 of share arms unread, PP4 cut, HD4 none). Fixes committed 4e3e7318 (het_uncertainty withholds verdict on
+      partial read), f15d25cd (heldout_default --het no_default_pool labels), f8dc5675 + 11660896 (composition once per pool,
+      then parallel: 4.9 s -> 1.5 s per pool serial, 40 pools 67.8 s -> 7.4 s on 5 CPUs, identical). OPEN from Joaquin via
+      coordinator, in this order: (A) PRIORITY: from logs, with a committed tool, a wall-time table for one MSE share arm
+      (step-14 own jobs: 6c246603 default50 s42, 11ad944a default25 s42), one MSE control (339ec100; note scratchpad/339ec100.log
+      looked like a 10-26 dancat_het_pre job, refetch with site logs -n 3000000), one het arm (466656b2, log at scratchpad/hetlogs/466656b2.log),
+      and 2-3 standard short trainings of 4264 steps, same model size, from earlier catalog/transfer work (find in site runs):
+      job start to first step, steps (s/step, total), each validation pass, final evaluation (processes, s each), other; ''not
+      found'' where timestamps lack; one-line cause. Logs have [YYYY-mm-dd HH:MM:SS I] lines and the SLURM header Date. Nothing
+      written yet; tools/short_wall.py holds the old rate assumptions. (B) Also report of the eval-only REREAD wall: composition
+      vs per-probe reads (2.46 s against 1.6 s assumed), and whether per-probe reads can be batched; update short_wall S_COMPOSE.
+      (C) Redraw het_where: x = decile within each process of largest final |eta| (left) / log10 min 2|p_i.p_j|/s_hat (right);
+      y = median sigma (or RMSE of log|M|^2) in that decile over the same quantity over all that process''s events; legend
+      names quantities; png+pdf, look once, say what changed from v1 (v1 legend ''RMSE(q-t)'', y ''over the probe''s own'').
+      Edit only figure() in analysis/catalog_v4/het_uncertainty.py, rerun summary. (D) Timeline 07:00-15:30 UTC 2026-10-31
+      from plan and site runs: het arms, both gridpack probe passes (jobs, limits, outcomes), when the 18x gridpack overrun
+      was first visible. (E) Final messages name things in words, not PP4/EE4/H1-H7/HD4 codes.'
+    decisions: Fixed defects inside the passed step-15 design without a new go. Composition fix keeps rows byte-identical;
+      parallel composition uses fork so registered processes carry over.
+    ruled_out: Verdicts on partial reads. Storing a provenance sidecar per pool (not needed once parallel).
+    running: '11 pass-2 gridpool probe jobs (step 18), all acked E3330-E3340 (b8aacd01 done: hd_ddx_dhuxwp__E20 yield 0.304
+      second run, both runs >1800 s, fix its layout before the hd queue); 7 silent 5-body gridpack builds at 03:00:00 limit.'
+    files: analysis/catalog_v4/het_uncertainty.py, analysis/catalog_v4/mixture_ab.py, mix_compose.py, datagen.py (_compose_parallel),
+      tools/mix_compose_check.py (--timing, --split), tools/short_wall.py, analysis/catalog_v4/data/{het_uncertainty,mixture_ab_het,mixture_heldout_default_het}.json,
+      scratchpad/hetlogs/*.log
+    written: '2026-10-31T15:11:55+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
