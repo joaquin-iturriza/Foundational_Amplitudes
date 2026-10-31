@@ -468,13 +468,60 @@ def test_scan_name_resolved():
     shutil.rmtree(d)
 
 
+def test_label_virt_probe():
+    """a held-out one-loop class read on MadEvent's Born events labelled by its MadLoop (lhe label rule 'virt', H5;
+    2026-10-31, FA-ccin2p3-9512cac2: all 28 HD5 probes refused): the pool's physics is its labeller's, so it is checked
+    as a one-loop pool (catalog-wide one-loop reference when its class is held out), not against the Born tree of the
+    same legs, and its alpha_s rule is the labeller's; a labeller with another top mass is still refused"""
+    P = mg.PROCESSES
+    backend("v4_bb_bb", "sm-no_b_mass", P["v4_bb_bb"]["mg5_generate"], V4_CARD)
+    backend("v4_bb_bbz_virt", "loop_sm-no_b_mass", ["generate b b > b b z QED<=3 [virt=QCD]"], V4_CARD)
+    rec = os.path.join(TMP, "train_loop.yaml")
+    yaml.safe_dump({"processes": [{"name": n, "sqrts": [100, 6000], "n_train": 10, "n_val": 10, "n_test": 10}
+                                  for n in ("v4_bb_bb", "v4_bb_bbz_nlo")]}, open(rec, "w"))
+    ref = pp.TrainingReference(rec)
+    hd = yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_heldout_default_H5_processes.yaml")))
+    cfg = dict(hd["processes"]["hd_bb_bb_nlo"], lhe=dict(hd["lhe"], **hd["processes"]["hd_bb_bb_nlo"]["lhe"]))
+    P["hd_bb_bb_nlo"] = cfg
+    try:
+        # the sidecar as generation wrote it (the Born tree's block: loop false, rule madevent_virt), as on CC
+        backend("hd_bb_bb_nlo", "sm-no_b_mass", cfg["mg5_generate"], V4_CARD)
+        old = {"schema": 1, "process": "hd_bb_bb_nlo", "loop": False, "model": "sm-no_b_mass", "model_source": "entry",
+               "generate": "generate b b > b b QED<=2", "order_clause": "QED<=2", "order_vector": [1, 0, 2, 2],
+               "alpha_s": {"rule": "madevent_virt", "alphas_mz": None}, "MB": 0.0, "ymb": 0.0, **V4_CARD,
+               "backend": os.path.join(mg.WORK_DIR, "hd_bb_bb_nlo_standalone"), "missing": []}
+        pool = os.path.join(TMP, "datasets", "hd_bb_bb_nlo_test.npy")
+        json.dump({"process": "hd_bb_bb_nlo", "physics": old}, open(pool + ".recipe.json", "w"))
+        assert pp.labeller(cfg) == "v4_bb_bb_nlo" and pp.labels_loop(cfg) and not pp.is_loop(cfg)
+        # without the labeller's standalone: the pool's card, the labeller's model, order vector and alpha_s rule
+        c = pp.check_probe("hd_bb_bb_nlo", None, pool, ref)
+        assert c["status"] == "ok", c
+        assert c["reference"]["kind"] == "catalog-wide" and c["reference"]["loop"] is True, c
+        assert "the pool's own card" in c["block_source"], c
+        # with it: the labeller's own card read
+        backend("v4_bb_bb_virt", "loop_sm-no_b_mass", ["generate b b > b b QED<=2 [virt=QCD]"], V4_CARD)
+        c = pp.check_probe("hd_bb_bb_nlo", None, pool, ref)
+        assert c["status"] == "ok" and "labeller's standalone" in c["block_source"], c
+        b = pp.physics_block("hd_bb_bb_nlo")              # what generation writes into a new sidecar
+        assert b["labels_from"] == "v4_bb_bb_nlo" and b["loop"] and b["alpha_s"]["rule"] == "1loop_nf5_mu_sqrt_shat", b
+        # a labeller at another top mass is refused: the check still compares the card
+        backend("v4_bb_bb_virt", "loop_sm-no_b_mass", ["generate b b > b b QED<=2 [virt=QCD]"],
+                dict(V4_CARD, MT=173.0, ymt=173.0))
+        pp._CARD_CACHE.clear()
+        c = pp.check_probe("hd_bb_bb_nlo", None, pool, ref)
+        assert c["status"] == "mismatch" and "MT" in {m["field"] for m in c["mismatches"]}, c
+    finally:
+        P.pop("hd_bb_bb_nlo", None)
+    print("ok label virt probe")
+
+
 if __name__ == "__main__":
     try:
         setup_rec = setup()
         TRAIN = setup_rec
         for t in (test_card_reader, test_blocks, test_write_recipe, test_scenario, test_sidecar_block_used,
                   test_lhe_parent_check, test_backfill, test_reads, test_reference_from_sidecars, test_real_recipe_shape,
-                  test_standalone_kinds, test_scan_name_resolved):
+                  test_standalone_kinds, test_scan_name_resolved, test_label_virt_probe):
             t()
         print("all pool physics tests passed")
     finally:

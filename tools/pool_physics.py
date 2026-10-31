@@ -225,6 +225,49 @@ def is_loop(cfg):
     return cfg.get("kind") == "virt" or bool(cfg.get("virt"))
 
 
+def labeller(cfg):
+    """the one-loop entry whose MadLoop labelled an lhe_pp pool (mg5_pipeline_final's lhe label rule 'virt': MadEvent's
+    Born events of a held-out one-loop class, H5), else None. Such a pool's |M|^2 is that entry's, so its physics is
+    the labeller's: a one-loop block, the labeller's model, order vector and alpha_s rule, not the Born tree's"""
+    lab = (cfg or {}).get("lhe") or {}
+    return str(lab["label_virt"]) if lab.get("label_alphas") == "virt" and lab.get("label_virt") else None
+
+
+def labels_loop(cfg):
+    """whether a pool's labels are one-loop |M|^2: a one-loop entry, or an lhe_pp pool labelled by one (labeller)"""
+    return is_loop(cfg) or labeller(cfg) is not None
+
+
+def labelled_block(blk, cfg, spec_physics=None, backend=True):
+    """the physics block of an lhe_pp pool labelled by a one-loop entry (labeller), from `blk` (its sidecar's, written
+    before 2026-10-31 as the Born tree's: loop false, the tree's model, alpha_s rule madevent_virt). The labeller's own
+    block from its MadLoop standalone's card when that card is there (backend), else `blk`'s card values with the
+    labeller's model, generate string, order vector and alpha_s rule; card_source says which"""
+    mg = _mg()
+    nlo = labeller(cfg)
+    ncfg = mg.PROCESSES[nlo]
+    amz = float(((cfg.get("lhe") or {}).get("label_alphas_mz")) or 0.118)
+    own = None
+    if backend:
+        be = backend_dir(nlo, ncfg)
+        if be and os.path.exists(os.path.join(be, "Cards", "param_card.dat")):
+            own = physics_block(nlo, recipe={"alphas_mz": amz}, spec_physics=spec_physics, cfg=ncfg)
+    if own is not None:
+        out = dict(own, card_source="labeller's standalone")
+    else:
+        out = dict(blk or {})
+        gen = entry_generate(ncfg)
+        out.update(loop=True, model=entry_model(ncfg), model_source="labeller entry", generate=gen,
+                   order_clause=order_clause(gen), order_vector=[int(x) for x in mg.order_vector(ncfg)],
+                   alpha_s=alpha_s_of(ncfg, {"alphas_mz": amz}),
+                   card_source="the pool's own card (the labeller's standalone card is absent)")
+        if "card" not in out:                    # nothing to read the card values from: check_probe refuses it
+            out.update(backend=backend_dir(nlo, ncfg), card=None)
+    out["process"] = (blk or {}).get("process", out.get("process"))
+    out["labels_from"] = nlo
+    return out
+
+
 # -------------------------------------------------------------------------------------------------------- the block
 def _mg():
     import mg5_pipeline_final as mg
@@ -311,6 +354,8 @@ def physics_block(process, recipe=None, spec_physics=None, cfg=None):
     mg = _mg()
     if cfg is None:
         cfg = mg.register_synthetic(process) if mg.is_synthetic(process) else mg.PROCESSES[process]
+    if labeller(cfg):                            # labelled by a one-loop entry's MadLoop: that entry's physics
+        return labelled_block({"process": process}, cfg, spec_physics)
     pdg = [int(p) for p in cfg["pdg_ids"]]
     blk = {"schema": SCHEMA, "process": process, "loop": is_loop(cfg)}
     be = backend_dir(process, cfg)
@@ -512,7 +557,7 @@ class TrainingReference:
             self.sources[src] = self.sources.get(src, 0) + 1
             self.entries.append({"name": name, "scan": bool(s["physics"]), "declared": declared_fields(s["physics"]),
                                  "pdg": [int(p) for p in cfg["pdg_ids"]],
-                                 "loop": is_loop(cfg), "family": model_family(blk.get("model")), "block": blk})
+                                 "loop": labels_loop(cfg), "family": model_family(blk.get("model")), "block": blk})
         self.by_key = {}
         for e in self.entries:
             self.by_key.setdefault(_canon_key(e["pdg"], e["loop"]), []).append(e)
@@ -575,6 +620,9 @@ def check_probe(name, spec_physics, pool_path, reference, cfg=None, backend=True
     if blk and "error" not in blk:
         src = "sidecar"
         blk = dict(blk)
+        if labeller(cfg) and not blk.get("labels_from"):   # a sidecar written as the Born tree's (before 2026-10-31)
+            blk = labelled_block(blk, cfg, spec_physics, backend)
+            src = "sidecar, labeller's physics (" + blk["card_source"] + ")"
     else:
         src = "computed at read" + ("" if side else (" (no sidecar)" if not pool_path or os.path.exists(pool_path)
                                                      else " (no pool at this path)"))
@@ -597,7 +645,7 @@ def check_probe(name, spec_physics, pool_path, reference, cfg=None, backend=True
                                 "reference": "the parent has no training recipe (data.processes_file) to compare with"}])
         return out
     exempt = declared_fields(spec_physics)
-    loop = is_loop(cfg)
+    loop = labels_loop(cfg)
     refs = reference.same_process(pdg, loop)
     if refs:
         out["reference"] = {"kind": "same process", "entries": [r["name"] for r in refs][:8]}
