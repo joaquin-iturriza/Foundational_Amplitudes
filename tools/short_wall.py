@@ -35,7 +35,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 0.40, 15.0, 0.4, 1.25
 SIGMA_STAGE_MIN = 20.0
 STARTUP_EVAL_MIN, S_PROBE_HET = 1.5, 1.45
-S_COMPOSE = 6.1
+# S_COMPOSE: was 6.1 s per entry (serial compose, login node, 2026-10-31); the parallel compose now in run.py's load
+# took 170.3 + 19.8 + 19.7 s for the 912 default-share entries' train, val and test pools on 5 CPUs of a V100 node
+# (sweep cov_v4_long_lr_x4 trial_0000, job 62932715, 2026-11-01): 0.23 s per entry. The 6.1 s rate made the step-16
+# 1x pair FA-ccin2p3-89c84a63/55202992 refuse a 4 h limit (93 min of composition planned, 3.5 min real).
+S_COMPOSE = 0.23
 
 
 def axis_recipe(axis, cat, train):
