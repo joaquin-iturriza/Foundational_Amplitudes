@@ -18,7 +18,6 @@ on the sites (`~/work/CLAUDE.md`).
 
 ## Talking to me
 
-- Harm our work does to others (a shared disk filling, a site unusable for the group) is stopped at once by cancelling our writers; a fix that waits on me reaches me at once by push notification, not only in a message.
 - Start every message to me with "Joaquin".
 - Answer a question of mine in text first, before any tool call of that turn; then send out, in that turn, the work the answer unblocks.
 - Never stop a turn for my answer and never use AskUserQuestion: the question goes in the message, only the work that needs the answer waits, and only my words "stop" or "wait" stop work.
@@ -44,6 +43,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Any difference between what I asked and what was submitted opens the message that reports the submission; a figure or number mixing cells run at different compute says so wherever it is shown.
 - GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost or I asked for it by name [D153, D242]; otherwise run it and show me what ran.
 - Reading state, git and file edits are never confirm-first.
+- A problem whose fix is easy and costs nothing hard to get back is fixed at once, never brought to me and never left waiting: a fault of our own work (above all one that harms the group, such as a full shared disk) is repaired, then reported.
 - Work exists only as a plan entry, changed only through `tools/plan.py`; every submission names its entry's item (`--item`).
 - Before proposing or designing a run or analysis, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or that none was found.
 - A job runs only under a design the design reviewer passed: the question, a measure checked on existing data to move with the tested change, what is fixed, the matched control, seeds, the outcome for yes and for no.
