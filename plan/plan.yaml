@@ -7006,12 +7006,10 @@ entries:
       - 'memmap fits a V100 share: the long runs may use V100s'
       - 'it does not: H100 chains as planned'
   owner:
-    agent: a24e9905c905d4dce
-    state: closed
-    since: '2026-10-31T22:30:46+00:00'
-    state_at: '2026-11-01T02:23:33+00:00'
-    context: 230000
-    context_at: '2026-11-01T02:23:33+00:00'
+    agent: a018d7c567ba57e1b
+    state: working
+    since: '2026-11-01T02:24:43+00:00'
+    state_at: '2026-11-01T02:24:43+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
