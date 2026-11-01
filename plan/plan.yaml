@@ -4724,6 +4724,16 @@ entries:
     - 16
     answered_at: '2026-10-31T04:52:33.233000+00:00'
     decision: D227
+  - ask: 'Which target does the catalog_v4 long-run pretraining use: the hybrid reference scale (best inside the catalog''s
+      range), the emission scales (best level at a new multiplicity, what the catalog_v4 runs have used), or a blend (lambda
+      0.25 or 0.5)?'
+    at: '2026-11-01T00:01:53+00:00'
+    searched: 'docs/results.tex par:v3_prep_signed last paragraph (study closed 2026-10-29, carry-over to catalog_v4 ''the
+      user''s call''), the hybrid and blend paragraphs, site decisions --project FA, Joaquin''s messages since 2026-10-24:
+      no decision adopts a target for catalog_v4'
+    blocks: the step-16 long-run design and its submission (the width probes measure cost only and keep running)
+    blocks_steps: &id001
+    - 16
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -7525,6 +7535,15 @@ entries:
       recipes/catalog_v4_train.yaml, recipes/catalog_v4_base_train.yaml, recipes/gen_catalog_v4_default.py, tools/short_wall.py,
       tests/test_short_wall.py, scripts/job_catalog_v3_short.sh
     written: '2026-10-31T22:29:00+00:00'
+  ask: 'Which target does the catalog_v4 long-run pretraining use: the hybrid reference scale (best inside the catalog''s
+    range), the emission scales (best level at a new multiplicity, what the catalog_v4 runs have used), or a blend (lambda
+    0.25 or 0.5)?'
+  waiting_since: '2026-11-01T00:01:53+00:00'
+  searched: 'docs/results.tex par:v3_prep_signed last paragraph (study closed 2026-10-29, carry-over to catalog_v4 ''the user''s
+    call''), the hybrid and blend paragraphs, site decisions --project FA, Joaquin''s messages since 2026-10-24: no decision
+    adopts a target for catalog_v4'
+  blocks: the step-16 long-run design and its submission (the width probes measure cost only and keep running)
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
