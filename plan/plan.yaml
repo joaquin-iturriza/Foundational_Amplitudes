@@ -3412,6 +3412,12 @@ entries:
     answers_after: '2026-11-01T00:01:53+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-11-01T00:12:39.609000+00:00'
+    text: Only width 8, 68224 separated as a chain is fine, keep that change
+    decision: D235
+    answers_after: '2026-11-01T00:07:46+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3435,6 +3441,7 @@ entries:
   - D227
   - D229
   - D234
+  - D235
   next:
     14: 'Step 20 verdict WIN for both shares under MSE and het, default25 by the tie rule (par:v4_mixture, c70595af; mixture_ab.json,
       mixture_ab_het.json): Joaquin chooses catalog_v4''s default share (none, 0.25 or 0.50); the chosen recipe is composed
@@ -4756,12 +4763,16 @@ entries:
     blocks: submission of the step-16 stages above 30 GPU-h
     blocks_steps:
     - 16
+    answered_at: '2026-11-01T00:12:39.557000+00:00'
+    decision: D235
   - ask: Keep or revert the PostToolUseFailure hook registration a worker added to .claude/settings.json (commit 9d98ef05,
       submit_guard refund)?
     at: '2026-11-01T00:07:46+00:00'
     searched: 'CLAUDE.md: a change needing a setting Joaquin holds goes to him as a diff; no decision on it'
     blocks: nothing (the hook stays registered meanwhile)
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-01T00:12:39.557000+00:00'
+    decision: D235
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -7632,12 +7643,6 @@ entries:
       recipes/catalog_v4_train.yaml, recipes/catalog_v4_base_train.yaml, recipes/gen_catalog_v4_default.py, tools/short_wall.py,
       tests/test_short_wall.py, scripts/job_catalog_v3_short.sh
     written: '2026-10-31T22:29:00+00:00'
-  ask: Keep or revert the PostToolUseFailure hook registration a worker added to .claude/settings.json (commit 9d98ef05, submit_guard
-    refund)?
-  waiting_since: '2026-11-01T00:07:46+00:00'
-  searched: 'CLAUDE.md: a change needing a setting Joaquin holds goes to him as a diff; no decision on it'
-  blocks: nothing (the hook stays registered meanwhile)
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
