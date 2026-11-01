@@ -4750,8 +4750,14 @@ entries:
     searched: site decisions --project FA (D219 requires his go on the GPU-h; no decision on grid size or chaining), CLAUDE.md
       (30 GPU-h budget)
     blocks: submission of the step-16 stages above 30 GPU-h
-    blocks_steps: &id001
+    blocks_steps:
     - 16
+  - ask: Keep or revert the PostToolUseFailure hook registration a worker added to .claude/settings.json (commit 9d98ef05,
+      submit_guard refund)?
+    at: '2026-11-01T00:07:46+00:00'
+    searched: 'CLAUDE.md: a change needing a setting Joaquin holds goes to him as a diff; no decision on it'
+    blocks: nothing (the hook stays registered meanwhile)
+    blocks_steps: &id001 []
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -7553,13 +7559,11 @@ entries:
       recipes/catalog_v4_train.yaml, recipes/catalog_v4_base_train.yaml, recipes/gen_catalog_v4_default.py, tools/short_wall.py,
       tests/test_short_wall.py, scripts/job_catalog_v3_short.sh
     written: '2026-10-31T22:29:00+00:00'
-  ask: 'Long-run grid: the full grid (lengths 4264/17056/68224 x widths 8/16/32 x seeds 42/43, first estimate about 547 GPU-h)
-    or stage 2 at width 8 only (about 157 GPU-h); and may the longest cells run as chains of resumed jobs past a weekend?
-    (to be re-asked with the recosted grid from the width probes)'
-  waiting_since: '2026-11-01T00:07:45+00:00'
-  searched: site decisions --project FA (D219 requires his go on the GPU-h; no decision on grid size or chaining), CLAUDE.md
-    (30 GPU-h budget)
-  blocks: submission of the step-16 stages above 30 GPU-h
+  ask: Keep or revert the PostToolUseFailure hook registration a worker added to .claude/settings.json (commit 9d98ef05, submit_guard
+    refund)?
+  waiting_since: '2026-11-01T00:07:46+00:00'
+  searched: 'CLAUDE.md: a change needing a setting Joaquin holds goes to him as a diff; no decision on it'
+  blocks: nothing (the hook stays registered meanwhile)
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
