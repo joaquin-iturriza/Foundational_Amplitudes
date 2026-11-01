@@ -4357,6 +4357,12 @@ entries:
       later trials failed at start. Fixed 52b7a537 (content digest key, tests/test_pool_doc_composed.py). All step-16 jobs
       stopped except the 3 pending H100 probes; resubmission waits on Joaquin''s go to delete the obsolete caches'
     at: '2026-11-01T04:00:30+00:00'
+  - tried: H100 width probes at 200G (FA-ccin2p3-c15cdd47 w8 @a6005517, f77a5e0e w16 and 5a6ddb32 w32 @ddaeeec1; sched 62931680/2/4),
+      cancelled unstarted 2026-11-01 after 6.7 h PENDING (Priority), E3532
+    why: /sps/lpnhe is 100% full, so they would die on start, and their commits predate the memmap extension and the cache-key
+      fix 52b7a537 (in-memory load at 200G, one cache per job); resubmitted after the cache deletion as step 16's width probes
+      at the synced commit
+    at: '2026-11-01T06:56:59+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
