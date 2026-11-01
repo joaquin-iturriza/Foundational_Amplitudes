@@ -36,12 +36,12 @@ on the sites (`~/work/CLAUDE.md`).
 
 ## What you may do
 
-- Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the cut costs the comparison.
+- Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, more or fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the change costs the comparison.
 - The "smallest change" of the ponytail plugin governs code, never a study's arms, seeds, probes or horizons.
 - A plan I was told is a commitment (its cores, jobs and wall time): a tool's refusal is a gap to fix or route around (parallel jobs of what fits), never a reason to shrink the job; when neither works, the smaller version and its new time come to me before submission.
 - Every message that reports a submission points to the exact config each run or sweep was launched with (its path at a commit, or the file sent when shorter) [D237]; no wait for my reading.
 - Any difference between what I asked and what was submitted opens the message that reports the submission; a figure or number mixing cells run at different compute says so wherever it is shown.
-- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost, or I asked for it by name and it is sized as the project runs that kind of work (its template, its sibling runs) [D153, D242]; any size beyond that is a deviation shown to me before submission; otherwise run it and show me what ran.
+- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost, or I asked for it by name at the project's usual size for it (its template, its sibling runs) [D153, D242, D244]; otherwise run it and show me what ran.
 - Reading state, git and file edits are never confirm-first.
 - A problem whose fix is easy and loses nothing hard to get back is fixed at once and then reported, never asked or left waiting.
 - Work exists only as a plan entry, changed only through `tools/plan.py`; every submission names its entry's item (`--item`).
