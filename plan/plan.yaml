@@ -6913,6 +6913,55 @@ entries:
       check ee->ttbar het 2.9e-8 -> 1.2e-8 -> 5.1e-9 and share-0.25 best at 4250-4264 of 4264; seeds 42/43 against PP4 0.450
       [0.360,0.556]; HETEROSC D226; emission-scales target D234; default-sampled reads D227; D235 cut stated). Searched as
       at 02:25.'
+  - at: '2026-11-01T03:30:35+00:00'
+    question: 'Step 16 revised (D238, D239, D240 on top of D219, D234, D235, D236): on catalog_v4 at share 0.25 with the het
+      loss (D226) and the emission-scales target (D234), every cell on the whole training set (D236), how do the reads fall
+      with training steps at width 8 (1x 4264, 4x 17056, 16x 68224), each length at its own tuned HPs, and how do widths 16
+      and 32 compare with width 8 at 1x? The lr-only search cov_v4_long_lr_x4 is cancelled (D239: HPO rules 3, 5, 6). The
+      4x and 16x HPs come from two full single-fidelity DyHPOs built from sweep/sweep_config_jeanzay_template.yaml (coupled
+      space, template ranges, 40 trials, 10 start-up): sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml and _x16.yaml @4b3683d4.
+      The 4x and 16x cells are each sweep''s best trial (seed 42) plus a seed-43 run at its HPs. Nothing is submitted before
+      Joaquin''s go on the total GPU-h (main session 05:1x).'
+    prior: 'As the 02:35 pass (no catalog-scale length or width scan found; ee->ttbar het 8k/16k/32k still falling; share-0.25
+      arms best at 4250-4264 of 4264). Long HPO prior: dancat_het_pre (docs/results.tex par ''Pretraining on it'', D59): full
+      DyHPO on Daniel''s 1352-process catalog at 32k steps, AdamW, het, 8 trials, best lr 8.9e-3 at the top of its window
+      [1e-3, 9e-3], every trial but one best at its last step; differs here in catalog (catalog_v4 1153 processes), optimizer
+      (MuonAdamW), steps and trial budget. Muon search muon_test_search_muon (par:v3_muon): best lr 5.0e-3, muon_weight_decay
+      0.0217 at 4264 steps on catalog_v3, MSE. lr*(t,D) surface (analysis/hpo_optima, AdamW, scaling_p): tools/lr_surface_center.py
+      @3d12f881 gives 5.6e-3 at 4264, 2.63e-3 at 17056, 1.23e-3 at 68224 on its high-D rows with the t^-0.55 slope. Searched:
+      results.tex, plan, decisions for long, HPO, horizon, 32k, dancat_het_pre, muon, lr surface.'
+    measure: 'As the 02:35 pass, per cell at its best checkpoint (het rule: sigma-stage parent, mu at best val_loss_no_reg):
+      R against the full-set 1x width-8 het pair on PP4, EE4, the 700 default-sampled held-out classes, H1-H7c beside, and
+      the H2 multiplicity gap; L(C) = A C^-alpha + L_inf over the width-8 lengths. Each sweep''s objective is the main run''s
+      best val_loss_no_reg (sigma stage off in trials); its best trial gets the sigma-only stage and every read as an eval
+      job (REREAD=<trial run>) so it is scored like the other cells; the seed-43 twin runs the full job (training, sigma stage,
+      reads) at the best HPs.'
+    check: 'As the 02:35 pass: steps alone moved the het loss on ee->ttbar (2.9e-8 to 5.1e-9 from 8k to 32k); dancat_het_pre''s
+      8 trials at 32k spread validation NLL from -3.35 to -4.10 with the lr, so HPs move the long-run loss on a catalog; the
+      share-0.25 1x arms are best at their last step.'
+    fixed: 'As the 02:35 pass (recipe catalog_v4_train.yaml share 0.25; dimensionless emission-scales target; het setup of
+      v4_het_default25: HETEROSC mean aggregation, sign head off, sigma-only end stage, clip 5, MuonAdamW, batch 16384, 8
+      blocks 8x0n+2x1n; whole training set; validation 200 per process; memmap path; 1x keeps lr 4.997e-3 and the short arm''s
+      HPs at every width (muP)). Sweeps: base_config runs/catalog_v4_short/v4_het_default25, num_heads 8, seed 42, template
+      search space: lr float_log [c/3, 3c] with c from the surface (17056: [8.78e-4, 7.90e-3]; 68224: [4.09e-4, 3.69e-3];
+      AdamW-measured, untested with Muon past 4264, said wherever an R is reported), muon_weight_decay [1e-3, 0.3], regularization_lambda
+      [1e-10, 1e-6], cosanneal_warmup_frac [0.05, 0.2], cosanneal_eta_min [1e-10, 1e-7], ema {false, true}, ema_decay [0.9,
+      0.999]; lr range extension on (dancat_het_pre best at its top edge); 40 trials, 300 candidates, 10 start-up; V100 46G
+      5 CPUs; 06:30 per 17056 trial, 24:00 per 68224 trial, one job per trial (CC QoS gpu MaxWall 7-00:00:00, read 2026-11-01:
+      no chain is needed on CC). Because each length gets its own HPO and 1x keeps the short arm''s HPs, a length R mixes
+      steps and tuning: said wherever it is reported.'
+    control: 'The 1x width-8 pair on the whole training set (FA-ccin2p3-da6564de seed 42, FA-ccin2p3-bd3bc251 seed 43, running):
+      every other cell differs from it in steps and HPs (4x, 16x at their sweeps'' best) or in num_heads only (1x widths 16,
+      32). f0156d88/df858d33 (1e4 events per process) read beside only.'
+    seeds: Sweep trials seed 42; each sweep's best trial is the seed-42 cell, its seed-43 twin reruns the best HPs; 1x cells
+      seeds 42 and 43.
+    outcome: 'As the 02:35 pass: length yes when 4x and 16x R below 1 with interval below 1 on the held-out pool and PP4/EE4
+      (L(C) gives L_inf; the 16x becomes the foundation pretraining candidate); length no when 16x is within the seed interval
+      of 4x. HPO reads: a sweep whose best lr sits at an extended edge or whose best trials are best at their last step is
+      reported as not converged in that HP, with the cell. Cost (estimate, V100 0.967 s/step memmap, x1.25 margin): 17056
+      HPO 40 x 6.1 h = 243 GPU-h, 68224 HPO 40 x 23.2 h = 930, 4x and 16x cells (best-trial reads 2 h each, seed-43 twins
+      7.7 and 24.9 h) 37, 1x pairs 8 + at most 67 for widths 16/32: about 1285 GPU-h with margin (1026 without), above D235''s
+      about 200: to Joaquin before any submission.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
