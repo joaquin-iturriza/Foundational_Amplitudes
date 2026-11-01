@@ -3471,10 +3471,6 @@ entries:
       test pools, H5 28/28 already'
     22: 'Wall-time table from logs: catalog MSE/het arms vs 2-3 standard short trainings of 4264 steps (loading, steps, validations,
       final evaluation), with the one-line cause; to Joaquin (his 2026-10-31 objection to 3.6 h / 5.6 h)'
-    24: 'When the six width probes end (H100 715190ec 6bfe95fa 77dce99d; V100 f907c7dc 74ac1266 d1415f2f) and the step-16
-      re-check passes: recost the grid from measured s/step and host memory, then ask Joaquin (told 2026-11-01): full grid
-      or stage 2 at width 8 only, and may the longest cells run as resumed chains past a weekend; nothing above 30 GPU-h before
-      his go (D219).'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7451,11 +7447,6 @@ entries:
       if:
       - 'the arms'' extra time is a defect (loading, composition, evaluation layout): fix it before any re-read or new arm'
       - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
-    24:
-      feeds: 'D219: the long and wide muP pretrainings'' grid and its GPU-h'
-      if:
-      - 'Joaquin picks the full grid: submit S1 then S2 per the passed design'
-      - 'Joaquin picks width 8 only: submit S1 and the width-8 S2 cells'
   owner:
     agent: adaed743f490372f8
     state: working
