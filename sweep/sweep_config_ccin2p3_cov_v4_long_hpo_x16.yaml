@@ -12,14 +12,14 @@
 # t^-0.55 slope (tools/lr_surface_center.py @3d12f881, 32 sweeps, D >= 22130, t >= 3162; HPO rule 2). The surface was
 # measured with AdamW and is untested with Muon past 4264 steps; at 4264 it gives 5.6e-3 against the Muon search's
 # measured best 5.0e-3 (par:v3_muon). muon_weight_decay keeps the Muon search's window [1e-3, 0.3].
-# Time: the V100 memmap probe FA-ccin2p3-08a0f39f, 0.967 s/step at width 8: 68224 x 0.967 s = 18.3 h + 16 min first cache build, x1.25, one job per trial (QoS gpu MaxWall 7-00:00:00, read 2026-11-01 with sacctmgr).
+# Time: the V100 memmap probe FA-ccin2p3-08a0f39f, 0.967 s/step at width 8: 68224 x 0.967 s = 18.3 h + 16 min first cache build, x1.25 = 23.6 h, limit 28 h for the slowest node, one job per trial (QoS gpu MaxWall 7-00:00:00, read 2026-11-01 with sacctmgr).
 cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
   mem: 46G
   cpus_per_task: 5
-  time: '24:00:00'
+  time: '28:00:00'
 paths: null
 sweep_name: cov_v4_long_hpo_x16
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25
