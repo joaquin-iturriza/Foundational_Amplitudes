@@ -7722,6 +7722,23 @@ entries:
       cells go to H100 (1.5 TB nodes) unless the load is made lighter (the memmap path refuses dimensionless_inputs and target_physics_orders).
       H100 probes resubmitted at 200G (cancelled 120G ones, 94 GB already reached before training): FA-ccin2p3-c15cdd47 (w8),
       f77a5e0e (w16), 5a6ddb32 (w32).'
+  - at: '2026-11-01T02:23:15+00:00'
+    text: '2026-11-01 (Joaquin 02:3x ''why exactly do we need 94GB''): host-memory profile of the 16x in-memory load, CPU
+      dry run on the CC login node (tools/mem_profile_data.py --run-config runs/catalog_v4_short/v4_het_default25 --n-procs
+      20 --set ++data.train_subsample=null ++data.eval_subsample=3200 ++data.memmap=false, @3c3ac93e; out $SCRATCH/zz_memprof/v4_x16_n20/memprof.json):
+      20 processes, 2.128M events, 11.92M particles. RSS by stage: recipe+physics 0.69 GB; pool load and boost (float64 pools
+      read whole, momenta boosted, tokens, amplitudes, alpha_s) +0.52 to 1.21 (44 B per particle); target_physics_factor +0.38
+      to 1.63 (peak 1.77); offshell_per_event internal-mass fill +0.90 to 2.53 (peak 2.63, the stage where the V100 probe
+      died); after the combined flat arrays and the loaders 1.73 GB steady. So 221 B per particle at the peak, 145 B per particle
+      steady, the whole data set in host memory: at 16x (1e5 train events per tree process, 5e4 one-loop, all 1153 processes)
+      the peak scales to the 94 GB the V100 probe reached before step 1 (that probe''s run: whole load 19 min, killed after
+      the offshell masks). Nothing is a stray copy: it is the in-memory design (every event''s momenta, tokens, per-event
+      masses, factors and off-shellness held for the run); the memmap path (data_mmap.py, host memory scaling with the batch)
+      is the existing fix, and it refuses data.dimensionless_inputs and data.target_physics_orders (data_mmap.py:325-328),
+      both on in this arm (D234 target). Next: extend the memmap path to both (per-event sqrt(s_hat) scaling and log10(m/sqrt(s_hat))
+      mass column, per-event alpha_s from <pool>.alphas.npy into the cached target), equivalence test against the in-memory
+      load on a few pools on CPU (tests/test_memmap_data.py pattern), repo-reviewer, then one V100 width-8 16x probe on the
+      memmap path for its host peak.'
   handoff:
     state: 'Done this session: par:v4_mixture write-ups (c70595af step-20 verdict; f04c945e shares vs pure-default bound,
       tab:v4_bound_shares); bound re-reads f8ec724f/049b863e read and extracted (mixture_ab bound_default, affc6f0b); catalog_v4_train.yaml
