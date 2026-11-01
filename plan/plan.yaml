@@ -7080,9 +7080,6 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '16': Joaquin's words to delete the obsolete memmap caches (184 GB, /sps/lpnhe full); then sync 52b7a537 and resubmit
-      the 1x pair, both DyHPO sweeps (fresh state) and the width probes; H100 probes FA-ccin2p3-c15cdd47 FA-ccin2p3-f77a5e0e
-      FA-ccin2p3-5a6ddb32 still pending
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
