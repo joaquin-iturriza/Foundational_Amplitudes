@@ -7176,6 +7176,16 @@ entries:
       32); 68224 sweep 8 x 8.2 h = 66 GPU-h (limit 96); best-trial reads 2 x about 1 h; about 86 GPU-h, inside D242''s approval
       (item est 1420). Finish: 17056 about 3 x 2.3 h = 7 h, 68224 about 3 x 8.2 h = 25 h after start (Mon 2 Nov about 01:00
       and 19:00 CET if they start now).'
+    passed_at: '2026-11-01T16:17:43+00:00'
+    reviewer: 'Re-check after the 16:14 FIX, design 16:17 @efc54ab4: config diff fc4e848e..efc54ab4 is only partition gpu_h100
+      and a 4 h limit for x4 plus comments (x16 comment no longer cites D244 for H100); both sweeps and both best-trial reads
+      on H100 with TF32 on, so only steps and the lr window differ between cells. The x4 limit of 4 h is 1.7 times its 2.3
+      h target, x16''s 12 h is 1.5 times 8.2 h. Check 2 unchanged: ee->ttbar het loss 2.9e-8, 1.2e-8, 5.1e-9 at 8k, 16k, 32k
+      steps; dancat_het_pre validation NLL -3.35 to -4.10 over its 8 trials. Check 3: seed 42 only on Joaquin''s instruction,
+      with the interval widened by the 1x pair''s seed spread |ln R| 0.450 [0.360,0.556] on PP4. Trials 8 with 3 start-up
+      and 3 sequential waves (3+3+2) match D244 and template 8247811a. Disk: /sps/lpnhe 153 GB free against one shared 20
+      GB content-keyed cache. Cost about 86 GPU-h under D242. Searched: cov_v4_long, dyhpo_17056/68224, hpo8, 40 trials, n_startup,
+      H100, V100, TF32 (results.tex sec:tf32-eval), decisions D219-D244, entry dead ends'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
