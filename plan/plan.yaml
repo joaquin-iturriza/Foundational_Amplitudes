@@ -7605,7 +7605,7 @@ entries:
     agent: adaed743f490372f8
     state: stopped
     since: '2026-11-01T06:14:49+00:00'
-    state_at: '2026-11-01T16:18:21.121000+00:00'
+    state_at: '2026-11-01T16:27:25+00:00'
     context: 140758
     context_at: '2026-11-01T16:17:49+00:00'
   findings:
