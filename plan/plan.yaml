@@ -6928,7 +6928,7 @@ entries:
     agent: a24e9905c905d4dce
     state: stopped
     since: '2026-10-31T22:30:46+00:00'
-    state_at: '2026-11-01T00:14:52+00:00'
+    state_at: '2026-11-01T00:15:07.370000+00:00'
     context: 197791
     context_at: '2026-11-01T00:12:56+00:00'
   findings:
