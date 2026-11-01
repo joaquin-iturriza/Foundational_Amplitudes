@@ -7045,6 +7045,21 @@ entries:
       (1x widths 16/32 R over 1x width 8, short-run caveat; lr transfer read at width 32). Cost (estimate, V100 0.967 s/step
       memmap, x1.25): 17056 sweep 40 x 6.1 h = 243 GPU-h, 68224 sweep 40 x 23.6 h = 944, best-trial reads 2 x 2 h = 4, 1x
       width-8 pair 8 (running), 1x widths 16/32 at most 67: about 1266 GPU-h.'
+    passed_at: '2026-11-01T03:34:35+00:00'
+    reviewer: 'Re-check of the 03:33 design after the 03:30 FIX. Check 1: the length verdict is now 16x best against 4x best,
+      both from the same template DyHPO (same base v4_het_default25, 7 HPs, 40 trials, 300 candidates, 10 start-up, range
+      extension); they differ only in steps and the lr window placed by the same surface rule (x4 @4b3683d4 [8.775e-4,7.898e-3],
+      x16 @fa0397e7 [4.094e-4,3.685e-3], 28 h limit). 1x against 4x/16x and L(C) are labelled information only. Width: 1x
+      widths 16/32 against the 1x width-8 pair da6564de/bd3bc251, num_heads only. D238 superseded by D242 (''I asked you to
+      run the HPO sweep for the long run, I already aproved it''); the dropped seed-43 twin is Joaquin''s own cut, read in
+      his 03:32 message (''plus a seed-43 run at the best hyperparameters. huh? why, just do the HPO''). Check 2: dancat_het_pre
+      at 32k spreads val NLL -3.35 to -4.10 with lr (results.tex l.6028-6032); het ee->ttbar 2.9e-8/1.2e-8/5.1e-9 at 8k/16k/32k
+      (l.8590). Check 3: one seed per length, interval widened by the 1x PP4 seed spread 0.450 [0.360,0.556]; a 4x step increase
+      moved ee->ttbar 2.3-5.7x, well above that; the cost of the cut is stated. Check 4: yes = widened interval below 1 on
+      held-out and PP4/EE4, no = spans 1; non-converged edge and last-step flags. Checks 9-12: HETEROSC (D226), emission scales
+      (D234), default-sampled held-out (D227), full set at every length (D236), only steps and the searched HPs move. Searched
+      for check 5: 68224, 17056, cov_v4_long, long run, longer pretrain, het_long, 64k, horizon, dancat_het_pre, muon_hp,
+      muon_test_search in results.tex, the entry and site decisions (D238-D242): no catalog-scale length scan.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
