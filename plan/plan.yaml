@@ -6970,6 +6970,33 @@ entries:
       HPO 40 x 6.1 h = 243 GPU-h, 68224 HPO 40 x 23.2 h = 930, 4x and 16x cells (best-trial reads 2 h each, seed-43 twins
       7.7 and 24.9 h) 37, 1x pairs 8 + at most 67 for widths 16/32: about 1285 GPU-h with margin (1026 without), above D235''s
       about 200: to Joaquin before any submission.'
+    fix_at: '2026-11-01T03:32:57+00:00'
+    fix: 'Check 1 (matched control) fails: the length comparison is tuned against untuned-by-the-same-procedure. The 4x (17056)
+      and 16x (68224) cells take the best of a 40-trial template DyHPO over 7 HPs on catalog_v4 share 0.25, het loss, emission-scales
+      target; the 1x control pair (FA-ccin2p3-da6564de/bd3bc251) keeps v4_het_default25''s HPs, i.e. lr 5.0e-3 from the 8-trial
+      Muon search at 4264 steps on catalog_v3 with the MSE loss and the old target (docs/results.tex par:v3_muon, 3 HPs searched;
+      warmup/EMA inherited from dancat_het_pre''s AdamW 32k search). The design states the mix (''a length R mixes steps and
+      tuning'') but stating it does not make the R against 1x a length result, and the L(C) fit over 1x/4x/16x inherits the
+      asymmetry (CLAUDE.md: same sweep for both, best against best, re-based when preprocessing differs). Fix: add the same
+      template DyHPO at 4264 steps from the same base config (sweep_config_ccin2p3_cov_v4_long_hpo_x1.yaml: lr window [c/3,3c]
+      around the surface''s 5.6e-3, 40 trials, 10 start-up; about 40 x 1.4 h x 1.25 = 70 GPU-h, about 5% of the 1285 total)
+      and make the 1x cell its best trial plus a seed-43 twin, the existing 1x pair read beside; or restrict the length verdict
+      to 16x against 4x (both from the same procedure) and report R against the current 1x pair only as information, with
+      the outcome rewritten to match. Check 6/7 (decisions in force): D238 (''I don''t understand why would we wait for that
+      search to send the longest jobs''; covers: the 68224-step runs go now, lr from the measured lr*(t,D) surface) is not
+      addressed: the design drops the surface-lr 68224 runs and makes the 16x cell the 68224 HPO''s best, which arrives only
+      after its 40 trials (24 h each, sequential waves). Either keep the D238 pair (lr 1.23e-3 from tools/lr_surface_center.py,
+      seeds 42/43, now) beside the HPO and say how it is read against the HPO best, or state that D240 (''also do an hpo of
+      the long runs'') supersedes it and put that reading to Joaquin with the GPU-h question. Checks that hold: 2 (dancat_het_pre
+      at 32k spreads validation NLL -3.35 to -4.10 with lr, results.tex l.6028-6032; het ee->ttbar 2.9e-8/1.2e-8/5.1e-9 at
+      8k/16k/32k, l.8590); 3 (PP4 seed interval 0.450 [0.360,0.556] from the passed design; the length effect on ee->ttbar
+      is 5.7x); 4 (yes/no stated, extended-edge and last-step reported as not converged); 5 (searched 68224, 17056, cov_v4_long,
+      long run, longer pretrain, het_long, 64k, horizon, dancat_het_pre, muon_hp, muon_test_search in results.tex, the entry
+      and site decisions: no catalog-scale length scan; prior names dancat_het_pre, the Muon search and het_long); 8 (no label
+      in inputs); 9 (HETEROSC, D226); 10 (default-sampled held-out, D227); 11 (emission scales, D234); 12 (cells differ in
+      steps and HPs, both asked by D240; full set D236, validation 200, memmap in all). Configs at 4b3683d4 match the template''s
+      search space and budget (40 trials, 300 candidates, 10 start-up), lr windows [8.775e-4, 7.898e-3] and [4.094e-4, 3.685e-3]
+      with range extension on.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
