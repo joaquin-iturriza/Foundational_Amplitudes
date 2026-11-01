@@ -15,4 +15,9 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 echo "site=${CCORCH_SITE:-?} host=$(hostname) run=${CCORCH_RUN_ID:-?} args: $*"
+nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null | sed 's/^/TRIAL_GPU /'
+# TRIAL_TIMEV=1 (a probe): the host peak memory and wall from /usr/bin/time -v, in the log
+if [ "${TRIAL_TIMEV:-}" = 1 ] && [ -x /usr/bin/time ]; then
+    exec /usr/bin/time -v python sweep/run_trial.py "$@"
+fi
 exec python sweep/run_trial.py "$@"
