@@ -7443,6 +7443,12 @@ entries:
     units: null
     start: '2026-11-01T16:14:49+00:00'
     at: '2026-11-01T16:14:49+00:00'
+  - batch: cov_v4_long_hpo8_68224
+    wall_h: 24.6
+    jobs: 8
+    units: null
+    start: '2026-11-01T16:14:51+00:00'
+    at: '2026-11-01T16:14:51+00:00'
   step_why:
     16:
       feeds: 'D219: whether length past 17056 still pays at this data and whether width 8 is big enough'
