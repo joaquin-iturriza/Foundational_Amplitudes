@@ -6499,6 +6499,17 @@ entries:
       high, at the last step with the loss still falling too low, either reported to Joaquin with the cell, not refit. Width
       yes at 16x (32 over 8 interval below 1): the network is too small, the wider cell becomes the candidate; width no: width
       8 is big enough at this data. The H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore).'
+    passed_at: '2026-11-01T00:08:19+00:00'
+    reviewer: 'Re-record of the 22:33 design passed earlier; only the fixed field changed (diffed against designs[-2]): it
+      names the target and preprocessing, the dimensionless target with the emission scales (target_physics_factor, dim_only,
+      s0 1.0, dim_ref qperp, orders, dimensionless_inputs, shared_standardization, affine_multiplicity_std false), which matches
+      job_catalog_v3_short.sh''s DIM array used by the control pair f0156d88/df858d33, and Joaquin''s D234 (2026-11-01 ''Emission
+      scales is fine then, ...'') keeps it for the long runs. Target and preprocessing are the same in every cell and the
+      control and match the decision in force. All other checks as at 22:33: length shown on data (ee->ttbar het 2.9e-8 ->
+      1.2e-8 -> 5.1e-9; share-0.25 runs best at 4250-4264 of 4264), width measured in S1 and not used as a gate, seeds 42/43
+      against widened share-A/B intervals (PP4 0.450 [0.360,0.556]), HETEROSC per D226, default-sampled reads per D227. Searched
+      as before (scaling, width, num_heads, horizon, long, wider, capacity, bigrun, muP, inverted-U, full pretraining) plus
+      D234 and emission scales in site decisions.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
