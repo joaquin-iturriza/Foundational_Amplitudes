@@ -7627,6 +7627,16 @@ entries:
       table rounded it 0.488); mixture_ab bound_default now counts the overlap (6ff75ecb): all 504 PP4 not-trained classes
       are held-out classes, 504 of the 700 in the held-out row, said in the caption; figure fig:v4_shares_bound (fig_shares_bound.py
       @186d0957, analysis/catalog_v4/figs/shares_bound.png/.pdf); verify_claims 0 problems.'
+  - at: '2026-11-01T00:13:26+00:00'
+    text: '2026-11-01 01:10 (E3508): V100 width-8 probe FA-ccin2p3-f907c7dc OUT_OF_MEMORY at --mem=90G: the whole load finished
+      (1153 recipe processes, 1825 train pools composed at load, eval 3200/process, dimensionless_inputs, target_physics_factor
+      9 min, shared standardization, offshell masks 1153/1153 at 01:01:56; load 00:42:42 -> 01:01:56, 19 min) and it was killed
+      at 01:05 before the first training step, max RSS 94.0 GB (/usr/bin/time). Host memory does not depend on num_heads,
+      so the w16/w32 V100 probes (74ac1266 running, d1415f2f pending) were cancelled: they would hit the same. The 16x (68224-step,
+      whole-pool) in-memory load does not fit a V100 share (191 GB nodes, 4 GPUs; 90G is the most a free V100 had); the 16x
+      cells go to H100 (1.5 TB nodes) unless the load is made lighter (the memmap path refuses dimensionless_inputs and target_physics_orders).
+      H100 probes resubmitted at 200G (cancelled 120G ones, 94 GB already reached before training): FA-ccin2p3-c15cdd47 (w8),
+      f77a5e0e (w16), 5a6ddb32 (w32).'
   handoff:
     state: 'Done this session: par:v4_mixture write-ups (c70595af step-20 verdict; f04c945e shares vs pure-default bound,
       tab:v4_bound_shares); bound re-reads f8ec724f/049b863e read and extracted (mixture_ab bound_default, affc6f0b); catalog_v4_train.yaml
