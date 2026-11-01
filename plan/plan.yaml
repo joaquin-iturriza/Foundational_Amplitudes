@@ -7417,6 +7417,22 @@ entries:
       68224 sweep 8 x 18.6 h = 149 GPU-h; best-trial reads about 4; about 192 GPU-h, inside D242''s approval (item est 1420);
       faster GPUs lower it. Finish: three waves each, 17056 about 3 x 4.9 h = 15 h, 68224 about 3 x 18.6 h = 56 h on V100-class
       GPUs (about 25 h on H100), from the first start.'
+    fix_at: '2026-11-01T17:28:43+00:00'
+    fix: 'Almost there. Points 2 and 3 of the 17:25 FIX are met: the layout now names only drive.py with waves [3,3,2]; the
+      lxplus probe measures step rate, validation cost, host peak, cache build time and size; estimates and limits come from
+      those measurements; the EOS quota was read (108 GB free of 1.00 TB). One gap remains in the disk check: the probe''s
+      lock test can pass without testing the lock. ''One log built the cache, the other opening the cache'' shows that flock
+      holds only if (a) the two jobs ran on different worker nodes (flock within one node works on any filesystem; the failure
+      we fear is across nodes on EOS) and (b) their build windows overlapped: the second job reached the lock while the first
+      was still building, so it waited rather than finding a finished cache. Two HTCondor jobs submitted together can start
+      minutes apart, and the build is about 16 min. As written, the go rule would pass a probe whose second job simply started
+      after the build. Fix: in the go rule, require both jobs'' hostnames (trial_job.sh already prints the GPU; add the hostname)
+      and timestamps showing that the second job reached the lock (its data.memmap start line) before the first job''s ''built
+      the cache'' line, and that it then read the cache. If the jobs landed on one node, or did not overlap, the lock is untested:
+      either repeat the probe or point data.memmap_dir at AFS or node-local storage before the sweeps (node-local: 20 GB per
+      job, so the slot''s disk request must cover it). Everything else holds: question, measure and its check (ee->ttbar het
+      loss 2.9e-8, 1.2e-8, 5.1e-9; dancat_het_pre NLL -3.35 to -4.10), seeds (1x pair |ln R| 0.450), outcome, the HPO setup
+      of D244, D245 and D246, placement and reads per D247, about 192 GPU-h plus a 6 GPU-h probe under D242.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
