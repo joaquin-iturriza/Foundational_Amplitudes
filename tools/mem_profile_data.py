@@ -12,6 +12,8 @@ Writes <out>/memprof.json and prints a per-stage table (end and peak RSS of each
 
     python tools/mem_profile_data.py --sweep-config sweep/sweep_config_dancat_het_pre.yaml --n-procs 100 \
         --out $SCRATCH/zz_memprof/n100 [--set data.memmap=true] [--batches 300] [--workers 2]
+    python tools/mem_profile_data.py --run-config runs/catalog_v4_short/v4_het_default25 --n-procs 20 \
+        --set ++data.train_subsample=null --out $SCRATCH/zz_memprof/v4_x16_n20
 """
 import argparse
 import inspect
@@ -242,9 +244,36 @@ def sweep_cfg(sweep_config, n_procs, out, extra=()):
     return cfg, ov
 
 
+def run_cfg(run_dir, n_procs, out, extra=()):
+    """The Hydra config of the run in `run_dir` (its config.yaml), `extra` overrides applied, then its recipe
+    (data.processes_file after the overrides) cut to the first n_procs processes (0: all), the run dir under `out`."""
+    from hydra import compose, initialize_config_dir
+    pdir = os.environ.get("PROJECT_DIR", ROOT)
+    os.makedirs(out, exist_ok=True)
+    ov = list(extra) + ["training.iterations=1", "use_mlflow=false", "warm_start_idx=null", f"base_dir={pdir}",
+                        "exp_name=zz_memprof", f"run_dir={os.path.join(out, 'run')}", "run_name=null"]
+    with initialize_config_dir(config_dir=os.path.abspath(run_dir), version_base=None):
+        cfg = compose(config_name="config", overrides=ov)
+    recipe = cfg.data.get("processes_file")
+    if recipe and n_procs:
+        spec = yaml.safe_load(open(recipe))
+        procs = spec["processes"] if isinstance(spec, dict) else spec
+        top = {k: v for k, v in spec.items() if k != "processes"} if isinstance(spec, dict) else {}
+        cut = os.path.join(out, f"recipe_first{n_procs}.yaml")
+        with open(cut, "w") as f:
+            yaml.safe_dump({**top, "processes": procs[:n_procs]}, f, sort_keys=False)
+        ov.append(f"data.processes_file={cut}")
+        with initialize_config_dir(config_dir=os.path.abspath(run_dir), version_base=None):
+            cfg = compose(config_name="config", overrides=ov)
+    return cfg, ov
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--sweep-config", required=True)
+    src = ap.add_mutually_exclusive_group(required=True)
+    src.add_argument("--sweep-config")
+    src.add_argument("--run-config", help="a run's directory holding its config.yaml (the run's own Hydra config, as "
+                                          "run.py --config-path <dir> --config-name config builds it); --set after it")
     ap.add_argument("--n-procs", type=int, default=0, help="first N processes of the recipe (0: all)")
     ap.add_argument("--batches", type=int, default=300)
     ap.add_argument("--workers", type=int, default=2)
@@ -261,7 +290,9 @@ def main():
     rec.mark("start")
     hook_concatenate(rec)
 
-    cfg, ov = sweep_cfg(a.sweep_config, a.n_procs, a.out, a.set + [f"training.num_workers={a.workers}"])
+    extra = a.set + [f"training.num_workers={a.workers}"]
+    cfg, ov = (sweep_cfg(a.sweep_config, a.n_procs, a.out, extra) if a.sweep_config
+               else run_cfg(a.run_config, a.n_procs, a.out, extra))
     import torch
     torch.set_default_dtype(torch.float32)
     from experiment import AmplitudeExperiment
