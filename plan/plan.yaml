@@ -7529,6 +7529,7 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
+    '16': FA-lxplus-fdf08708 FA-lxplus-f44c7c06
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
