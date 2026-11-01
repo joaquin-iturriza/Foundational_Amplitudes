@@ -75,6 +75,8 @@ How you work
    continuing it (SendMessage with the fix commits).
 Existing code (analysis/common; python3 tools/readers_index.py):
 {readers}
+Every submission you report names, per run or sweep, the exact config it was launched with: its path at a commit
+(the job script and arm, the sweep config, or the run's saved config.yaml) [D237].
 Final message, short, readable by someone who has forgotten this entry: the question and the decision it feeds, what
 you did, what you found (numbers), what it changes next, the figure files (absolute paths of the .png; you looked at
 each once, at low resolution, and say what it shows), what you recorded, and any question.
