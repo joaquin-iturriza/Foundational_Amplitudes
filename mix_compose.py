@@ -244,15 +244,21 @@ def ensure_composed(process, sqrts_min, sqrts_max, n_events, role, seed, recipe,
     tmp = out[:-len(".npy")] + f".tmp{os.getpid()}.npy"
     np.save(tmp, rows)
     k = int(_cfg(process)["nfinal"]) + 2
-    np.save(out[:-len(".npy")] + ".alphas.npy", alphas_of_rows(rows, k, _cfg(process)))
+    alphas = alphas_of_rows(rows, k, _cfg(process))
+    np.save(out[:-len(".npy")] + ".alphas.npy", alphas)
     os.replace(tmp, out)
+    # content digests of the composed rows and alpha_s, read by data_mmap._pool_doc as the pool's identity in the memmap
+    # cache key: the composed file is rewritten in node-local /tmp by every job, so its path and mtime differ per job
+    # and keyed on them every job built its own ~20 GB cache (2026-11-01: /sps/lpnhe filled, 512 GB)
+    digests = {"rows_sha256": hashlib.sha256(np.ascontiguousarray(rows).tobytes()).hexdigest(),
+               "alphas_sha256": hashlib.sha256(np.ascontiguousarray(alphas).tobytes()).hexdigest()}
     # the sidecar as the stored pool's (its recipe id, the backend's physics block, read from the control pool's: the
     # same backend labelled both), the composition under derived_from (not identity); no manifest upsert
     side = json.load(open(ctrl + ".recipe.json"))
     full = dict(recipe)
     full["physics"] = side.get("physics")
     full["derived_from"] = {"composed_at_load": True, "control_pool": ctrl, "control_recipe_id": mg.recipe_id(rec_c),
-                            "shares": {kk: int((kinds == v).sum()) for kk, v in KIND.items()}}
+                            "shares": {kk: int((kinds == v).sum()) for kk, v in KIND.items()}, **digests}
     full["output_file"] = out
     assert mg.recipe_id(full) == wanted
     full["recipe_id"] = wanted

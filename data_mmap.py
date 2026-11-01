@@ -245,15 +245,30 @@ def first_k_per_process(process_ids, start, stop, n_proc, k):
 # Cache build / open
 # ----------------------------------------------------------------------------------------------------------------
 def _pool_doc(path):
+    """A pool file's identity in the cache key: [path, size, mtime, recipe_id]; for a pool composed at load
+    (mix_compose, its sidecar's derived_from.composed_at_load) and its .alphas.npy, [basename, size, content sha256,
+    recipe_id] instead: the composed file is rewritten in node-local /tmp by every job, so path and mtime differ per job
+    (keyed on them, every job built its own ~20 GB cache; /sps/lpnhe filled on 2026-11-01)."""
     st = os.stat(path)
-    rid = None
-    for side in (path + ".recipe.json", os.path.splitext(path)[0] + ".recipe.json"):
+    rid, side_doc = None, None
+    is_alphas = path.endswith(".alphas.npy")
+    pool = path[:-len(".alphas.npy")] + ".npy" if is_alphas else path
+    sides = ((pool + ".recipe.json",) if is_alphas else
+             (path + ".recipe.json", os.path.splitext(path)[0] + ".recipe.json"))
+    for side in sides:
         if os.path.exists(side):
             try:
-                rid = json.load(open(side)).get("recipe_id")
+                side_doc = json.load(open(side))
+                rid = side_doc.get("recipe_id")
             except (OSError, ValueError):
                 pass
             break
+    der = (side_doc or {}).get("derived_from") or {}
+    digest = der.get("alphas_sha256" if is_alphas else "rows_sha256") if der.get("composed_at_load") else None
+    if digest:
+        return [os.path.basename(path), int(st.st_size), "sha256:" + digest, rid]
+    if is_alphas:
+        rid = None                                  # as before: an alpha_s file keyed by itself
     return [os.path.abspath(path), int(st.st_size), int(st.st_mtime_ns), rid]
 
 
