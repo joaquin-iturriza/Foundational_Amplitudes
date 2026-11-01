@@ -1677,7 +1677,7 @@ class AmplitudeExperiment(BaseExperiment):
                 mom_div=mom_div, mom_mean=mom_mean, mom_std=mom_std, amp_trafos=amp_trafos,
                 amp_trafos_pp=amp_trafos_pp, prepd_means=prepd_means, prepd_stds=prepd_stds,
                 amp_orders=amp_orders, n_order_features=n_order_features, cap_for=cap_for,
-                stats_on_pool=stats_on_pool))
+                stats_on_pool=stats_on_pool, dimless_mass_stats=_dms_frozen))
             if self.cfg.save and not os.path.exists(stats_path):
                 self._save_data_stats(stats_path, self.mom_div, self.cfg.data.amp_trafos, per_dataset)
             self._finalize_data_sizing()

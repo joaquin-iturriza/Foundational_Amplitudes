@@ -4,6 +4,9 @@ CPU only. Run as a script (pytest is shadowed by the stray root-level py.py):
     python tests/test_memmap_data.py                       # sections 0-1: reductions, dataset, sampler
     python tests/test_memmap_data.py --sweep-config sweep/sweep_config_dancat_het_pre.yaml --n-procs 4 \\
         --out $SCRATCH/zz_memmap_test                       # + section 2: end to end on a recipe's pools
+    python tests/test_memmap_data.py --run-config runs/catalog_v4_short/v4_het_default25 --n-procs 12 \
+        --set ++data.train_subsample=2000 --out $SCRATCH/zz_memmap_test   # section 2 on a run's own config
+        (dimensionless_inputs, target_physics_factor with target_physics_orders, off-shellness)
 Section 0's streamed reductions reproduce numpy's own summation order (8192-element pairwise blocks for a
 contiguous float32 sum, sequential rows for a C-order axis-0 sum): checked here on the numpy the sites pin.
 Section 2 builds the experiment with the flag off, on (cache built), on again (cache hit), and as a fine-tune
@@ -28,6 +31,7 @@ import data_mmap as dm  # noqa: E402
 from dataset import AmplitudeDataset, build_flat_arrays, collate_variable_length  # noqa: E402
 
 PINNED_NUMPY = "1.26.4"
+RUN_CONFIG, SET = None, []     # --run-config / --set (section 2 on a run's own config)
 
 
 def section0_reductions():
@@ -104,9 +108,12 @@ def section1_dataset_sampler():
 
 # ---------------------------------------------------------------------------------------------------------------
 def _build(sweep_config, n_procs, out, extra):
-    from mem_profile_data import sweep_cfg
+    from mem_profile_data import sweep_cfg, run_cfg
     from experiment import AmplitudeExperiment
-    cfg, _ = sweep_cfg(sweep_config, n_procs, out, list(extra) + ["training.num_workers=2"])
+    if RUN_CONFIG:      # a run's own config.yaml (--run-config), its overrides (--set) first
+        cfg, _ = run_cfg(RUN_CONFIG, n_procs, out, list(SET) + list(extra) + ["training.num_workers=2"])
+    else:
+        cfg, _ = sweep_cfg(sweep_config, n_procs, out, list(extra) + ["training.num_workers=2"])
     torch.set_default_dtype(torch.float32)
     exp = AmplitudeExperiment(cfg)
     exp._init(); exp.init_physics(); exp.init_geometric_algebra()
@@ -117,13 +124,17 @@ def _build(sweep_config, n_procs, out, extra):
     for k in ("mom_div",):
         snap[k] = exp.mom_div
     for k in ("mom_mean", "mom_std", "prepd_mean", "prepd_std", "_offshell_stats", "_amp_trafos_pp",
-              "_role_counts", "n_order_features", "N_events", "_slot_pdgs_by_name", "_proc_npart"):
+              "_role_counts", "n_order_features", "N_events", "_slot_pdgs_by_name", "_proc_npart",
+              "_dimless_mass_stats"):
         snap[k] = getattr(exp, k, None)
     snap["amp_trafos"] = list(exp.cfg.data.amp_trafos)
     snap["vocab"] = dict(exp.tokenizer._pdg_to_idx)
     snap["cfg_net"] = (exp.cfg.model.net.in_channels, exp.cfg.model.net.num_scalars)
     for k in ("particles_flat", "tokens_flat", "offsets", "all_amplitudes", "all_process_ids", "all_order_labels"):
         snap[k] = np.asarray(getattr(exp, k))
+    snap["all_amp_factor"] = None if exp.all_amp_factor is None else np.asarray(exp.all_amp_factor)
+    snap["flags"] = {k: bool(exp.cfg.data.get(k, False)) for k in (
+        "dimensionless_inputs", "target_physics_factor", "target_physics_orders", "offshell_per_event")}
     snap["perm"] = {r: np.asarray(v) for r, v in exp._role_perm.items()}
     it = iter(exp.train_loader)
     snap["train"] = [next(it) for _ in range(4)]
@@ -158,6 +169,8 @@ def _compare(A, B, label):
         a, b = A[k], B[k]
         if k == "rng":
             assert torch.equal(a, b), f"{label}: torch RNG state after init_data differs"
+        elif k == "all_amp_factor":
+            assert (a is None) == (b is None) and (a is None or np.array_equal(a, b)), f"{label}: {k} differs"
         elif k in ("particles_flat", "tokens_flat", "offsets", "all_amplitudes", "all_process_ids",
                    "all_order_labels", "split_train"):
             assert a.shape == b.shape and np.array_equal(a.astype(np.float64), b.astype(np.float64)), \
@@ -179,7 +192,7 @@ def _compare(A, B, label):
     for k in A["proc_train_eval"]:
         _eq_batch(A["proc_train_eval"][k], B["proc_train_eval"][k], f"{label}: per-process train-eval {k}")
     _eq_batch(A["train_eval"], B["train_eval"], f"{label}: train-eval batch")
-    print(f"  {label}: identical ({A['N_events']} events, {A['particles_flat'].shape[0]} particles, "
+    print(f"  {label}: identical ({A['N_events']} events, flags {A['flags']}, {A['particles_flat'].shape[0]} particles, "
           f"{A['n_train_batches']} train batches; 4 train batches, {len(A['val'])} val batches, "
           f"{len(A['proc_val'])} per-process loaders compared)")
 
@@ -187,7 +200,7 @@ def _compare(A, B, label):
 def section2_end_to_end(sweep_config, n_procs, out):
     shutil.rmtree(out, ignore_errors=True)
     cache = os.path.join(out, "cache")
-    on = ["data.memmap=true", f"data.memmap_dir={cache}"]
+    on = ["++data.memmap=true", f"++data.memmap_dir={cache}"]
     A = _build(sweep_config, n_procs, os.path.join(out, "off"), [])
     B = _build(sweep_config, n_procs, os.path.join(out, "on"), on)
     assert B["mmap_dir"] and os.path.exists(os.path.join(B["mmap_dir"], "meta.json"))
@@ -234,15 +247,18 @@ def section3_gpu_training(sweep_config, n_procs, out, steps):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--sweep-config")
+    ap.add_argument("--run-config", help="a run's directory holding its config.yaml (section 2 on that config)")
+    ap.add_argument("--set", action="append", default=[], help="an override applied to --run-config (repeatable)")
     ap.add_argument("--n-procs", type=int, default=4)
     ap.add_argument("--out")
     ap.add_argument("--gpu-steps", type=int, default=0, help="section 3 only: train this many steps off/on/off")
     a = ap.parse_args()
+    RUN_CONFIG, SET = a.run_config, a.set
     if a.gpu_steps:
         section3_gpu_training(a.sweep_config, a.n_procs, os.path.expandvars(a.out), a.gpu_steps)
         sys.exit(0)
     section0_reductions()
     section1_dataset_sampler()
-    if a.sweep_config:
+    if a.sweep_config or a.run_config:
         section2_end_to_end(a.sweep_config, a.n_procs, os.path.expandvars(a.out))
     print("OK")

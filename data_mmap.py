@@ -17,8 +17,12 @@ from other inputs is never read. A cache hit restores the torch RNG state the bu
 draws what it would have drawn after the in-memory path.
 
 Not on this path (asserted): data.target_propagators, training.sign_head, data.resonance_per_event,
-data.phase_space_on_pool. data.target_physics_factor is: the factor multiplies |M|^2 as each pool loads and is kept
-per event in amp_factor.npy, in the final order, so the evaluation divides it out as on the in-memory path.
+data.phase_space_on_pool, data.target_physics_hybrid. data.target_physics_factor is: the factor multiplies |M|^2 as
+each pool loads and is kept per event in amp_factor.npy, in the final order, so the evaluation divides it out as on the
+in-memory path; with data.target_physics_orders it reads each pool's per-event alpha_s (<pool>.alphas.npy) as the
+in-memory path does. data.dimensionless_inputs is: each event's momenta in units of its own sqrt(s_hat) before the
+global scale, the off-shellness over s_hat (and data.dimless_offshell_eps), the mass statistics over the massive train
+particles, and log10 sqrt(s_hat) as one column past the order features, all as on the in-memory path.
 """
 import fcntl
 import hashlib
@@ -35,7 +39,7 @@ import logging.handlers  # noqa: F401  (logger.py uses logging.handlers without 
 
 from logger import LOGGER
 
-MMAP_VERSION = 1
+MMAP_VERSION = 2
 CHUNK = 1 << 22            # elements per streamed chunk (a multiple of the 8192-element reduction block)
 NP_BLOCK = 8192            # numpy's pairwise-sum block over a contiguous float reduction (NPY_BUFSIZE)
 
@@ -253,6 +257,11 @@ def _pool_doc(path):
     return [os.path.abspath(path), int(st.st_size), int(st.st_mtime_ns), rid]
 
 
+def _alphas_path(pool):
+    """the per-event alpha_s next to a pool (mg5_pipeline_final.build_lhe_pp; tools/recover_alphas.py)"""
+    return pool[:-len(".npy")] + ".alphas.npy"
+
+
 def _jsonable(x):
     if isinstance(x, dict):
         return {str(k): _jsonable(v) for k, v in x.items()}
@@ -283,7 +292,7 @@ def _code_hash():
         physics_scales)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
-        E._setup_offshell_masks, E._physics_logF, E._eikonal_logS)]
+        E._setup_offshell_masks, E._physics_logF, E._eikonal_logS, E._orders_of)]
     parts += [np.__version__, torch.__version__]
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
@@ -322,16 +331,16 @@ def init_data_recipes_mmap(exp, c):
     names, roles, specs = c["names"], c["roles"], c["specs"]
 
     assert not c["stats_on_pool"], "data.memmap: data.phase_space_on_pool is not implemented on the memmap path"
-    assert not bool(cfg.data.get("dimensionless_inputs", False)), \
-        "data.memmap: data.dimensionless_inputs is implemented on the in-memory path only (data.memmap=false)"
-    assert not bool(cfg.data.get("target_physics_orders", False)), \
-        "data.memmap: data.target_physics_orders (per-event alpha_s) is implemented on the in-memory path only"
     assert not bool(cfg.data.get("target_physics_hybrid", False)), \
         "data.memmap: data.target_physics_hybrid (a per-process constant from its events) is implemented on the in-memory path only"
     for k in ("target_propagators", "resonance_per_event"):
         assert not bool(cfg.data.get(k, False)), f"data.memmap: data.{k} is not implemented on the memmap path"
     assert not bool(cfg.training.get("sign_head", False)), "data.memmap: training.sign_head is not implemented"
     phys_on = bool(cfg.data.get("target_physics_factor", False))
+    orders_on = bool(cfg.data.get("target_physics_orders", False))
+    assert phys_on or not orders_on, \
+        "data.target_physics_orders acts through the target factor: set data.target_physics_factor=true"
+    dimless = bool(cfg.data.get("dimensionless_inputs", False))
     exp._target_factor_on = phys_on
     exp._sign_head = False
 
@@ -371,7 +380,16 @@ def init_data_recipes_mmap(exp, c):
                                    bool(cfg.data.get("target_physics_dim_only", False)),
                                    str(cfg.data.get("target_physics_dim_ref", "shat")),
                                    bool(cfg.data.get("target_physics_eikonal", False)),
-                                   float(cfg.data.get("target_physics_qperp_tau", 0.3))] if phys_on else None),
+                                   float(cfg.data.get("target_physics_qperp_tau", 0.3)),
+                                   float(cfg.data.get("target_physics_alpha_inv", 132.507)),
+                                   orders_on, exp._target_orders_source() if orders_on else None]
+                                  if phys_on else None),
+        # the per-event alpha_s files the factor reads (data.target_physics_orders); None where a pool has none
+        "alphas": ({r: [_pool_doc(a) if os.path.exists(a) else None
+                        for a in (_alphas_path(c["paths"][r][n]) for n in names)] for r in roles}
+                   if orders_on else None),
+        "dimless": ([float(cfg.data.get("dimless_offshell_eps", 1e-6)),
+                     _jsonable(c.get("dimless_mass_stats"))] if dimless else None),
         "order_rows": _jsonable(order_rows),
         "offshell": _jsonable({
             "on": want_offshell, "pdgs": exp._internal_mass_pdgs,
@@ -448,6 +466,17 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     raw_amp = {r: fmt.open_memmap(os.path.join(d, f"stage_amp_{r}.npy"), "w+", np.float64, (n_role[r], 1))
                for r in roles}
     phys_on = bool(exp.cfg.data.get("target_physics_factor", False))
+    orders_on = bool(exp.cfg.data.get("target_physics_orders", False))
+    dimless = bool(exp.cfg.data.get("dimensionless_inputs", False))
+    # dimensionless_inputs: each event's sqrt(s_hat) in GeV, in the role's load order (the off-shellness and the
+    # mass column need it), and the mass statistics' sums over the massive train particles (in memory's order)
+    rs_st = ({r: fmt.open_memmap(os.path.join(d, f"stage_rs_{r}.npy"), "w+", np.float64, (n_role[r],))
+              for r in roles} if dimless else None)
+    dms_frozen = c.get("dimless_mass_stats")
+    if dimless and dms_frozen is None:
+        from particle_ids import GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, MASS_MASSLESS_LOG10_THR
+        raw_lm = np.asarray(GLOBAL_PROPERTY_MATRIX)[:, PARTICLE_FEATURE_NAMES.index("log10_mass_gev")]
+    dms_n1 = dms_s1 = dms_s2 = 0.0
     fac = ({r: fmt.open_memmap(os.path.join(d, f"stage_factor_{r}.npy"), "w+", np.float64, (n_role[r], 1))
             for r in roles} if phys_on else None)
     reg, slot_pdgs, npart = [], {}, {}
@@ -480,14 +509,22 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
             mom = exp._boost_augment_momenta(parts, n_particles)
             Nn, P = mom.shape[0], mom.shape[1]
             assert (Nn, P) == shape[(role, name)]
+            if dimless:      # the in-memory path's operations, in its order (experiment._init_data_recipes)
+                mm = mom.astype(np.float64)
+                q = mm[:, 0] + mm[:, 1]
+                rs = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
+                assert np.all(rs > 0), f"dimensionless_inputs: non-positive s_hat in {(role, name)}"
+                mom = (mm / rs[:, None, None]).astype(np.float32)
+                rs_st[role][er:er + Nn] = rs
+                if role == "train" and dms_frozen is None:
+                    t = np.asarray(toks).reshape(Nn, P)
+                    v = (raw_lm[t] - np.log10(rs)[:, None])[(raw_lm[t] >= MASS_MASSLESS_LOG10_THR) & (t > 0)]
+                    dms_n1 += v.size; dms_s1 += float(v.sum()); dms_s2 += float((v.astype(np.float64) ** 2).sum())
+                del mm, q
             toks = np.asarray(toks).reshape(Nn * P)
             assert toks.min() >= np.iinfo(np.int16).min and toks.max() <= np.iinfo(np.int16).max
             particles[pbase:pbase + Nn * P] = mom.reshape(Nn * P, 4)
             tokens[pbase:pbase + Nn * P] = toks
-            if phys_on:      # data.target_physics_factor: s_hat is boost invariant, so the lab momenta serve
-                F_ev = np.exp(exp._physics_logF(name, parts.reshape(len(parts), n_particles, 4))).reshape(-1, 1)
-                amplitudes = amplitudes * F_ev
-                fac[role][er:er + Nn] = F_ev
             raw_amp[role][er:er + Nn] = amplitudes
             seg[(role, name)] = (pbase, er, Nn, P)
             npart[name] = int(P)
@@ -496,6 +533,17 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
                         f" -> memmap")
             del data_raw, parts, mom, toks
     exp._slot_pdgs_by_name = {**slot_pdgs, **getattr(exp, "_slot_pdgs_by_name", {})}
+    dimless_mass_stats = None
+    if dimless:
+        if dms_frozen is not None:
+            dimless_mass_stats = [float(dms_frozen[0]), float(dms_frozen[1])]
+        else:
+            mu = dms_s1 / dms_n1 if dms_n1 else 0.0
+            sd = float(np.sqrt(max(dms_s2 / dms_n1 - mu ** 2, 0.0))) if dms_n1 else 1.0
+            dimless_mass_stats = [mu, sd if sd > 1e-6 else 1.0]
+        exp._dimless_mass_stats = dimless_mass_stats
+        LOGGER.info(f"dimensionless_inputs (memmap): log10(m / sqrt(s_hat)) over the massive train particles, mean "
+                    f"{dimless_mass_stats[0]:.3f}, std {dimless_mass_stats[1]:.3f}")
     offshell_masks = exp._setup_offshell_masks(names) if want_offshell else None
     rng_out = torch.get_rng_state().numpy().copy()
     np.save(os.path.join(d, "rng_out.npy"), rng_out)
@@ -520,6 +568,32 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
         particles[i:j] = np.asarray(particles[i:j]) / mom_div
     particles.flush()
 
+    # ---- data.target_physics_factor: from the momenta in GeV rebuilt as the in-memory path's _phys does (the scaled
+    #      float32 momenta times mom_div, times sqrt(s_hat) under dimensionless_inputs), so the factor is bitwise its ----
+    if phys_on:
+        for role in roles:
+            cap = c["cap_for"][role]
+            cap = int(cap) if cap not in (None, "null", "none") else None
+            for name in names:
+                pb, er, Nn, P = seg[(role, name)]
+                pp = np.asarray(particles[pb:pb + Nn * P]).reshape(Nn, P, 4).astype(np.float64) * mom_div
+                if dimless:
+                    pp = pp * np.asarray(rs_st[role][er:er + Nn])[:, None, None]
+                a_s = None
+                if orders_on:    # each event's own alpha_s, read as the in-memory path reads it
+                    ap = _alphas_path(paths[role][name])
+                    if not os.path.exists(ap) and int(exp._orders_of(name)[2]) == 0:
+                        a_s = np.ones(Nn)    # alpha_s power 0: the factor does not depend on alpha_s
+                    else:
+                        assert os.path.exists(ap), f"data.target_physics_orders: no per-event alpha_s for {paths[role][name]}"
+                        a_s = np.load(ap, mmap_mode="r")
+                        a_s = np.asarray(a_s[:cap] if cap is not None else a_s, dtype=np.float64)
+                    assert a_s.shape[0] == Nn, (ap, a_s.shape, Nn)
+                F_ev = np.exp(exp._physics_logF(name, pp, alphas=a_s)).reshape(-1, 1)
+                raw_amp[role][er:er + Nn] = np.asarray(raw_amp[role][er:er + Nn]) * F_ev
+                fac[role][er:er + Nn] = F_ev
+                del pp
+
     # ---- amplitude transform and statistics (per process; the shared helper of the in-memory path) ----
     def get_amp(role, name):
         _, er, Nn, _ = seg[(role, name)]
@@ -538,7 +612,8 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     amp_out = fmt.open_memmap(os.path.join(d, "amplitudes.npy"), "w+", np.float32, (N, 1))
     fac_out = fmt.open_memmap(os.path.join(d, "amp_factor.npy"), "w+", np.float64, (N, 1)) if phys_on else None
     pid_out = fmt.open_memmap(os.path.join(d, "process_ids.npy"), "w+", np.int32, (N,))
-    order_out = fmt.open_memmap(os.path.join(d, "order_labels.npy"), "w+", np.float32, (N, F))
+    # dimensionless_inputs: one column past the order features, log10 sqrt(s_hat), which the wrapper takes off
+    order_out = fmt.open_memmap(os.path.join(d, "order_labels.npy"), "w+", np.float32, (N, F + int(dimless)))
     n_pdg = len(exp._internal_mass_pdgs)
     osh_raw = (fmt.open_memmap(os.path.join(d, "stage_offshell.npy"), "w+", np.float32, (N, n_pdg))
                if want_offshell else None)
@@ -569,16 +644,22 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
                 cols = np.zeros((Nn, n_pdg), dtype=np.float64)
                 sel = offshell_masks[proc_idx] if offshell_masks is not None else None
                 if sel is not None:
-                    pp = np.asarray(particles[pb:pb + Nn * P]).reshape(Nn, P, 4).astype(np.float64)
+                    # the momenta in GeV as the in-memory path rebuilds them (_phys: the scale, then sqrt(s_hat))
+                    pp = np.asarray(particles[pb:pb + Nn * P]).reshape(Nn, P, 4).astype(np.float64) * mom_div
+                    s_ev = 1.0
+                    if dimless:
+                        rs_ev = np.asarray(rs_st[role][er:er + Nn])
+                        pp = pp * rs_ev[:, None, None]
+                        s_ev = rs_ev ** 2         # (s_prop - M^2) / s_hat, a pure number like every other input
                     for col, pdg in enumerate(exp._internal_mass_pdgs):
                         props = sel.get(pdg, [])
                         if not props:
                             continue
                         offs = []
                         for mrow, mm in props:
-                            q = np.einsum("s,nsc->nc", mrow, pp) * mom_div
+                            q = np.einsum("s,nsc->nc", mrow, pp)
                             s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                            offs.append(s_prop - mm)
+                            offs.append((s_prop - mm) / s_ev)
                         offs = np.stack(offs, axis=1)
                         idx = np.argmin(np.abs(offs), axis=1)
                         cols[:, col] = offs[np.arange(Nn), idx]
@@ -596,7 +677,9 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
             if phys_on:
                 fac_out[o] = np.asarray(fac[role][src])
             pid_out[o] = p.astype(np.int32)
-            order_out[o] = order_rows[p]
+            order_out[o, :F] = order_rows[p]
+            if dimless:
+                order_out[o, F] = np.log10(np.asarray(rs_st[role][src])).astype(np.float32)
             if want_offshell:
                 osh_raw[o] = st_osh[src]
         row0 += nr
@@ -607,6 +690,14 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     del raw_amp
     for r in roles:
         os.remove(os.path.join(d, f"stage_amp_{r}.npy"))
+    if dimless:
+        lrs = np.asarray(order_out[:, F])
+        LOGGER.info(f"dimensionless_inputs ON (memmap): momenta per event / sqrt(s_hat), masses as "
+                    f"log10(m / sqrt(s_hat)), off-shellness / s_hat; sqrt(s_hat) {np.median(10 ** lrs):.4g} GeV median "
+                    f"({np.percentile(10 ** lrs, 5):.4g} to {np.percentile(10 ** lrs, 95):.4g})")
+        del rs_st, lrs
+        for r in roles:
+            os.remove(os.path.join(d, f"stage_rs_{r}.npy"))
     if phys_on:
         fac_out.flush()
         lf = np.log(np.asarray(fac["train"]).reshape(-1))
@@ -618,16 +709,20 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
 
     offshell_stats = None
     if want_offshell:
+        eps = float(exp.cfg.data.get("dimless_offshell_eps", 1e-6))
+
         def osh_chunks():
             for i in range(0, N, CHUNK // max(n_pdg, 1)):
                 o = np.asarray(osh_raw[i:i + CHUNK // max(n_pdg, 1)]).astype(np.float64)
+                if dimless:      # log1p's unit, 1 GeV^2, becomes eps x s_hat (the in-memory path's)
+                    o = o / eps
                 yield np.sign(o) * np.log1p(np.abs(o))
         mean0, std0 = rows_mean_std(osh_chunks)
         mu, sd = exp._resolve_offshell_stats(lambda: (mean0, std0), n_pdg)
         offshell_stats = [mu.tolist(), sd.tolist()]
         i = 0
         for t in osh_chunks():
-            order_out[i:i + len(t), -n_pdg:] = ((t - mu) / sd).astype(np.float32)
+            order_out[i:i + len(t), F - n_pdg:F] = ((t - mu) / sd).astype(np.float32)
             i += len(t)
         del osh_raw
         os.remove(os.path.join(d, "stage_offshell.npy"))
@@ -641,6 +736,7 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
         "amp_trafos": amp_trafos, "amp_trafos_pp": trafos_pp, "per_dataset": per_dataset,
         "prepd_mean": [float(x) for x in prepd_means], "prepd_std": [float(x) for x in prepd_stds],
         "affine_multiplicity": affine, "offshell_stats": offshell_stats,
+        "dimless_mass_stats": dimless_mass_stats,
     }
 
 
@@ -668,6 +764,8 @@ def _apply(exp, c, d, meta, built):
         exp._affine_multiplicity = meta["affine_multiplicity"]
     if meta.get("offshell_stats") is not None:
         exp._offshell_stats = meta["offshell_stats"]
+    if meta.get("dimless_mass_stats") is not None:
+        exp._dimless_mass_stats = [float(x) for x in meta["dimless_mass_stats"]]
     if not built:
         LOGGER.info(
             f"Preprocessing amplitudes "
