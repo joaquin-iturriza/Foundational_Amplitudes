@@ -8428,6 +8428,13 @@ entries:
       left: 3 complete caches, 10 partial .tmp, their .lock files); df /sps/lpnhe 512G used 512G (44M free, 100%) -> 360G
       used, 153G free, 71%. CC checkout synced to bd5027a9 (contains 52b7a537, the content-digest cache key). Nothing submitted:
       step 16 held by D243 (''Don''t resubmit jobs, I have things to say about that'').'
+  - at: '2026-11-01T16:26:47+00:00'
+    text: '2026-11-01 17:3x: both long-run DyHPO sweeps submitted on CC gpu_h100 after design pass 16:21 (configs @6f7b4060:
+      gp surrogate, 2000 candidates, objective_scale auto, 8 trials, 3 start-up, waves 3/3/2): cov_v4_long_hpo8_68224 jobs
+      62935928-62935935 (12:00 limit), cov_v4_long_hpo8_17056 jobs 62935936-62935943 (04:00 limit). All wave-0 trials PENDING
+      with reason AssocMaxJobsLimit: sacctmgr shows MaxJobs=0 on the user''s association (account lpnhe), so no job of ours
+      can start on CC until it is lifted (site pick also prints ''cap 0''); jobs ran on CC this morning, so the limit is new.
+      Also the 3 H100 nodes have been IDLE+COMPLETING since 16:47. Nothing started; the jobs stay queued.'
   handoff:
     state: 'Step 16 (design passed ~03:35 by a9c9d4760d3b2f095: length verdict 68224-step DyHPO best vs 17056-step DyHPO best,
       template coupled space, 40 trials each, approved D242; 1x widths 16/32 vs the 1x width-8 pair; no seed-43 twins). Everything
