@@ -1,0 +1,80 @@
+# catalog_coverage step 16 (D219, D234, D235, D236; Joaquin 2026-11-01 05:1x via the main session: "also do an hpo of
+# the long runs while we are at it", and the lr-only search cov_v4_long_lr_x4 cancelled as against HPO rules 3, 5, 6):
+# the full single-fidelity DyHPO of the long width-8 runs at 68224 steps (x16 of the 4264-step short arm), built from
+# sweep/sweep_config_jeanzay_template.yaml: its coupled search space, its narrowed ranges and its trial budget
+# (40 trials, 10 random start-up, 300 candidates). Every trial starts from the resolved configuration of the het
+# share-0.25 short arm (runs/catalog_v4_short/v4_het_default25: catalog_v4_train at share 0.25, HETEROSC with mean
+# aggregation, the emission-scales dimensionless target D234, MuonAdamW, batch 16384, 8 blocks, 8x0n+2x1n, num_heads 8),
+# so a trial differs from it only in the lines below: the whole training set (train_subsample null, D236), validation
+# 200 per process as the short arms, the memmap data path (data_mmap.py), 68224 steps, and the searched HPs. Objective:
+# the main run's best val_loss_no_reg (the sigma-only end stage off in trials: it does not move mu's checkpoint).
+# lr window: +-1/2 decade [c/3, 3c] around c = 1.228e-03, the lr*(t,D) surface at t = 68224 on its high-D rows with the law's
+# t^-0.55 slope (tools/lr_surface_center.py @3d12f881, 32 sweeps, D >= 22130, t >= 3162; HPO rule 2). The surface was
+# measured with AdamW and is untested with Muon past 4264 steps; at 4264 it gives 5.6e-3 against the Muon search's
+# measured best 5.0e-3 (par:v3_muon). muon_weight_decay keeps the Muon search's window [1e-3, 0.3].
+# Time: the V100 memmap probe FA-ccin2p3-08a0f39f, 0.967 s/step at width 8: 68224 x 0.967 s = 18.3 h + 16 min first cache build, x1.25, one job per trial (QoS gpu MaxWall 7-00:00:00, read 2026-11-01 with sacctmgr).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 46G
+  cpus_per_task: 5
+  time: '24:00:00'
+paths: null
+sweep_name: cov_v4_long_hpo_x16
+base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25
+n_trials: 40
+dyhpo:
+  n_candidates: 300
+  seed: 42
+  n_startup: 10
+  total_budget: 10000
+fidelity_schedule:
+  t_steps:
+  - 68224
+fixed_params:
+  model: lloca
+  plot: 'true'
+  training.batchsize: 16384
+  evaluation.batchsize: 16384
+  training.regularization: L2
+  training.save_intermediate: 'false'
+  training.scheduler: CosineAnnealingLR
+  training.optimizer: MuonAdamW
+  data.train_subsample: 'null'
+  data.eval_subsample: 200
+  data.memmap: 'true'
+  training.validate_frac: '0.02'
+  evaluation.train_subsample: 2000
+  evaluate: 'false'
+  training.heterosc_sigma_stage_steps: 0
+  model.net.num_heads: 8
+  seed: 42
+search_space:
+- name: training.lr
+  type: float_log
+  low: 4.094e-04
+  high: 3.685e-03
+- name: training.muon_weight_decay
+  type: float_log
+  low: 1.0e-03
+  high: 0.3
+- name: training.regularization_lambda
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-06
+- name: training.cosanneal_warmup_frac
+  type: float_uniform
+  low: 0.05
+  high: 0.2
+- name: training.cosanneal_eta_min
+  type: float_log
+  low: 1.0e-10
+  high: 1.0e-07
+- name: ema
+  type: categorical
+  choices: ["false", "true"]
+- name: training.ema_decay
+  type: float_uniform
+  low: 0.9
+  high: 0.999
