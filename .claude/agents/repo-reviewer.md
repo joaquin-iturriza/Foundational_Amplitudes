@@ -117,6 +117,13 @@ isolated hunks.
    or runs serially per unit where one batched pass would do is **blocking**, to be batched, never
    absorbed into the limit (2026-10-31: the zero-shot reads at about 2 s per probe over about 2700
    probes and the 70 min serial pool composition passed review inside a raised limit, 9510604e).
+   The same holds across jobs: anything a batch's jobs could share (a cache, a composed pool, a
+   prebuilt dataset, a download) that each job builds or writes again instead is **blocking**. Read
+   how the artifact is keyed or named and check that two jobs on the same data resolve to one copy;
+   then multiply what one job writes to shared storage by the jobs that run at once and compare it
+   with the site's free disk (2026-11-01: the memmap cache keyed composed pools by each job's
+   node-local path and mtime, so every job wrote its own 20 GB and /sps/lpnhe, shared by the whole
+   lab, filled to 100%).
 4. **Repo structure & hygiene.** New files in the right place. No needless new top-level
    dirs. No new scattered `.md`/`.tex` docs (ground rule #3). Reuse over duplication.
 5. **Committed artifacts.** Nothing `.gitignore` should catch: `runs/`, `outputs/`, `*.npz`,

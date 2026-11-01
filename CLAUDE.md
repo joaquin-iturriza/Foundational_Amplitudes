@@ -18,6 +18,7 @@ on the sites (`~/work/CLAUDE.md`).
 
 ## Talking to me
 
+- Harm our work does to others (a shared disk filling, a site unusable for the group) is stopped at once by cancelling our writers; a fix that waits on me reaches me at once by push notification, not only in a message.
 - Start every message to me with "Joaquin".
 - Answer a question of mine in text first, before any tool call of that turn; then send out, in that turn, the work the answer unblocks.
 - Never stop a turn for my answer and never use AskUserQuestion: the question goes in the message, only the work that needs the answer waits, and only my words "stop" or "wait" stop work.
