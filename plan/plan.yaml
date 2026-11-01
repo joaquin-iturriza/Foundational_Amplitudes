@@ -7062,6 +7062,53 @@ entries:
       (D234), default-sampled held-out (D227), full set at every length (D236), only steps and the searched HPs move. Searched
       for check 5: 68224, 17056, cov_v4_long, long run, longer pretrain, het_long, 64k, horizon, dancat_het_pre, muon_hp,
       muon_test_search in results.tex, the entry and site decisions (D238-D242): no catalog-scale length scan.'
+  - at: '2026-11-01T16:14:28+00:00'
+    question: 'Step 16, revised for D244 (Joaquin 2026-11-01T16:09: ''some initialization runs, and then 2 sequential batches,
+      for a total of about 8 trials ... this is what should be done here as well''): on catalog_v4 at share 0.25, het loss
+      (D226), emission-scales target (D234), whole training set (D236), width 8: does the tuned 16x (68224 steps) beat the
+      tuned 4x (17056 steps) on the reads? Only the two DyHPO sweeps go now: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      @8247811a (sweep cov_v4_long_hpo8_17056) and _x16.yaml @fc4e848e (cov_v4_long_hpo8_68224), 8 trials and 3 random start-up
+      each (the template, fixed @8247811a, and the project''s practice: muon_test_search_* 8/3, catalog_steps_* 6/3), everything
+      else as @6e32b1b4. The 1x width cells (width-8 pair, width probes, widths 16/32) stay held by D243 and are not part
+      of this submission. Each sweep''s best trial (seed 42) is read like the other cells by an eval job (sigma-only stage
+      plus every axis, REREAD=<trial run>).'
+    prior: 'As the 03:33 design: dancat_het_pre (32k, AdamW het, 8 trials, best lr 8.9e-3 at its window''s top), muon_test_search_muon
+      (4264, 8 trials 3 start-up, best 5.0e-3), lr*(t,D) surface via tools/lr_surface_center.py @3d12f881 (5.6e-3 at 4264,
+      2.63e-3 at 17056, 1.23e-3 at 68224), ee->ttbar het 8k/16k/32k. No catalog-scale length scan (searched results.tex, plan,
+      decisions D219-D244).'
+    measure: 'Per cell at its best checkpoint (het rule: sigma-stage parent, mu at best val_loss_no_reg): R of 16x best over
+      4x best on PP4 (1301), EE4 (169), the 700 default-sampled held-out classes (pooled, per axis), H1-H7c beside, and the
+      H2 multiplicity gap, mixture_ab''s measure (median over classes, class bootstrap). Each sweep''s objective is the main
+      run''s best val_loss_no_reg (sigma stage off in trials); each sweep''s trial table (best val_loss_no_reg against each
+      HP, edge and last-step flags) reported. Information only: 4x/16x against the 1x width-8 cells when those run, L(C) =
+      A C^-alpha + L_inf labelled with that caveat.'
+    check: 'Steps moved the het loss on ee->ttbar (2.9e-8, 1.2e-8, 5.1e-9 at 8k, 16k, 32k, same data); HPs moved a long catalog
+      run''s loss (dancat_het_pre''s 8 trials at 32k: validation NLL -3.35 to -4.10, ordered by lr); share-0.25 1x arms best
+      at their last step (still improving).'
+    fixed: 'Both sweeps share everything but steps, lr window and placement: base_config runs/catalog_v4_short/v4_het_default25
+      (share 0.25, emission-scales target, HETEROSC mean, MuonAdamW, batch 16384, 8 blocks 8x0n+2x1n), num_heads 8, seed 42,
+      whole training set, validation 200 per process, memmap path (content-digest cache key 52b7a537: both sweeps share one
+      cache, about 20 GB, 153 GB free), validate_frac 0.02, the template''s 7 HPs and ranges (lr [c/3,3c]: 17056 [8.78e-4,7.90e-3],
+      68224 [4.09e-4,3.69e-3]; muon_weight_decay [1e-3,0.3], regularization_lambda [1e-10,1e-6], warmup_frac [0.05,0.2], eta_min
+      [1e-10,1e-7], ema {false,true}, ema_decay [0.9,0.999]), 300 candidates, 8 trials, 3 random start-up, same procedure
+      at both lengths. Layout: each sweep submitted alone through sweep_manager with its default 3 sequential waves (afterany;
+      3+3+2 trials: start-up, then 2 DyHPO batches), not --chain. lr range extension on but not reached (it acts after 10
+      observations). Placement: 17056 on gpu_v100,gpu_h100 (whichever starts first; 34 GPUs free), 46G 5 CPUs, 06:30 limit;
+      68224 on gpu_h100 only (siteconf partition narrowing fc4e848e), 46G 5 CPUs, 12:00 limit (het on H100 assumed at the
+      MSE control''s 0.33 s/step: 8.2 h with x1.25; on V100 it would be 23.6 h per trial, 3 waves about 3 days).'
+    control: 'Length: the 4x sweep''s best (same procedure, same base, same budget of 8 trials) is the control of the 16x
+      sweep''s best.'
+    seeds: 'Seed 42, one best trial per length (no seed-43 twin, Joaquin''s 05:3x instruction). Cost: no seed interval on
+      4x or 16x; the R carries the class bootstrap widened by the 1x pair''s |ln R_seed| (PP4 0.450 [0.360,0.556]) as the
+      seed-noise stand-in, said wherever reported; best-of-8 selection bias shared by both lengths; with 8 trials the lr optimum
+      is located to about the 2 DyHPO batches'' resolution, and an lr best at a window edge is reported as not converged.'
+    outcome: 'Length yes: 16x best over 4x best R below 1 with its widened interval below 1 on the held-out pool and PP4/EE4:
+      length still pays at this data; the 16x best becomes the foundation pretraining candidate, to Joaquin. Length no: interval
+      spans 1: length past 17056 is not the limit at this data. Not converged (best lr at an edge, or top trials best at their
+      last step): reported with the cell. Cost (estimate): 17056 sweep 8 x 6.1 h V100 = 49 GPU-h (limit 52); 68224 sweep 8
+      x 8.2 h H100 = 66 GPU-h (limit 96); best-trial reads 2 x 2 h = 4; about 119 GPU-h, inside D242''s approval (item est
+      1420). Finish: 17056 about 3 x 6.1 h = 18 h, 68224 about 3 x 8.2 h = 25 h after start (Mon 2 Nov about 11:00 and 18:00
+      CET).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
