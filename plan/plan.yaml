@@ -7274,7 +7274,7 @@ entries:
       - 'he prefers a search at 68224: design it with its GPU-h'
   owner:
     agent: a018d7c567ba57e1b
-    state: working
+    state: closed
     since: '2026-11-01T02:24:43+00:00'
     state_at: '2026-11-01T03:13:02+00:00'
     context: 237023
@@ -8083,28 +8083,35 @@ entries:
       3200) fixed; eval_subsample 200 per process in every long cell (design re-passed 02:35 by a4faf46b1e1550ebe). Lr DyHPO
       config sweep/sweep_config_ccin2p3_v4_long_lr_x4.yaml @929c3eb4.'
   handoff:
-    state: 'Step 16 (long runs; D219/D229/D231/D234/D235/D236): design re-recorded 2026-11-01 ~02:30 for D236 (every cell
-      on the whole training set, 1e5 per tree process / 5e4 one-loop, validation 3200 per process; only steps move); re-check
-      sent to design-reviewer a4faf46b1e1550ebe (verdict pending at this hand-off: continue that reviewer). Cells, seeds 42/43:
-      1x (4264) widths 8/16/32 (the new full-set 1x width-8 pair is the control; the 1e4 short pair f0156d88/df858d33 read
-      beside as data-size information only), 4x (17056) and 16x (68224) width 8 only (D235, 68224 as resumed chains), plus
-      an 8-trial single-fidelity lr DyHPO at 4x width 8. Job script: LONG_HEADS/LONG_FACTOR(steps only)/LONG_LR/LONG_MEMMAP
-      on v4_het_default25[_seed2] (7207f5bf, 1a737c34), probe mode (1e414911). Every run loads the whole pool: 94 GB in memory
-      (V100 probe OOM; profile 221 B/particle peak, 145 steady, finding of 2026-11-01). OPEN WORK, in order: (a) extend data_mmap.py
-      to data.dimensionless_inputs and data.target_physics_orders (asserts at data_mmap.py:325-328; in-memory code experiment.py:1732-1790
-      and 1998-2200), equivalence test vs the in-memory load on a few pools on CPU (pattern tests/test_memmap_data.py), repo-reviewer;
-      (b) one V100 width-8 probe on the memmap path (probe mode needs ++data.memmap from an env switch) for host peak and
-      s/step; (c) recost all 10 runs + DyHPO from the probes (H100 probes c15cdd47/f77a5e0e/5a6ddb32 pending, 200G) and submit
-      S1 if within about 200 GPU-h (D235''s go, 157 estimated before D236 changed the data), else the number to Joaquin; (d)
-      build the 4x lr DyHPO sweep (window [7.8e-4, 7.0e-3]) and the 16x resume chain.'
-    decisions: D234 emission-scales target; D235 width-8-only S2, 68224 chains, go on about 157 GPU-h; D236 full training
-      set at every length, only steps vary.
-    ruled_out: Scaling events per process with length (D236); V100 in-memory at 90-120G (94 GB before step 1); the memmap
-      path as it is.
-    running: H100 width probes FA-ccin2p3-c15cdd47 (w8), f77a5e0e (w16), 5a6ddb32 (w32), 200G, PENDING; design re-check pending
-      with a4faf46b1e1550ebe
-    files: scripts/job_catalog_v3_short.sh, data_mmap.py, experiment.py, tests/test_memmap_data.py, tools/mem_profile_data.py
-    written: '2026-11-01T02:24:45+00:00'
+    state: 'Step 16 (long runs, D219/D234/D235/D236; design re-passed 2026-11-01 02:35 by a4faf46b1e1550ebe with validation
+      200 per process in every cell). Memmap path now carries dimensionless_inputs and target_physics_orders (data_mmap.py
+      f0142f19/1f848f4a; equivalence test tests/test_memmap_data.py @78f77040 OK on CC: every float32 array, RNG, perms, batches
+      bitwise; float64 target factor within 2.64e-12 rel, held to rtol 1e-10, cause not found; repo-reviewer a1e3758157a7bfeca
+      PASS, watermark 219b3424). V100 memmap probe FA-ccin2p3-08a0f39f (job_catalog_v3_short.sh @11fee148, v4_het_default25
+      probe, PROBE_HEADS=8 PROBE_MEMMAP=true, 46G): host peak RSS 25.2 GB, cache build 947 s (once per seed, 19.9 GB at $SCRATCH/amp_mmap_cache),
+      prefetch 10 s, 0.967 s/iter avg over 200 steps (step 0.923 s, data 1.7 ms), GPU peak 18.6 GB, job 24 min. Recost (estimate;
+      V100 0.967 s/step, eval 1.5 h per training run assumed, x1.25 margin): width 8 total (1x pair 5.9 h, lr DyHPO 8 x 4.9
+      h = 39 h, 4x pair 12.8 h, 16x pair 40.6 h) = 98.5 h, 123 GPU-h with margin; widths 16/32 at 1x unmeasured: bound with
+      compute up to 4x/16x of width 8 = 53 h (67 with margin), total at most about 190 GPU-h, within D235''s about-200 rule;
+      item est set to 157 (D235). SUBMITTED S1 width-8 part: 1x width-8 pair FA-ccin2p3-89c84a63 (v4_het_default25) and FA-ccin2p3-55202992
+      (v4_het_default25_seed2), job_catalog_v3_short.sh @ab95de6a LONG_HEADS=8 LONG_FACTOR=1 LONG_MEMMAP=true, V100 46G 4:00
+      (target 3.2 h); lr DyHPO sweep cov_v4_long_lr_x4 (sweep/sweep_config_ccin2p3_cov_v4_long_lr_x4.yaml @ab95de6a, 8 trials,
+      3 sequential waves via sweep_manager, 6:30 each, target 16 h). OPEN, in order: (a) widths 16/32 at 1x: at width 8 the
+      V100 GPU peak is 18.6 GB, so width 16/32 likely exceed a V100''s 32 GB: read the H100 probes (c15cdd47 w8, f77a5e0e
+      w16, 5a6ddb32 w32, in-memory at 200G, spooled scripts validate on 3200) for GPU peak and s/step, then submit 1x w16/w32
+      x seeds 42/43 on H100 with LONG_MEMMAP=true (or V100 with model.net.checkpoint_blocks if they do not fit and H100 stays
+      full); (b) when the DyHPO ends: its best lr -> LONG_LR for 4x; 16x lr = best x 4^-0.55 per the passed design (flag to
+      Joaquin that only the design covers this extrapolation); (c) build the 16x resume chain (68224 steps = 18.3 h on V100:
+      two or three chained jobs, run.py warm_start_idx); (d) S2 = 4x and 16x width-8 pairs. Probe mode now prints RUN_SUMMARY
+      (1c73b68e). Every reported submission names its config (D237).'
+    decisions: D236 full set at every length; D235 width 8 only at 4x/16x, 68224 as a chain, go about 157 GPU-h, above about
+      200 back to Joaquin; D237 every submission names its config; eval_subsample 200 (reviewer, unsourced 3200 removed)
+    ruled_out: In-memory load on V100 (94 GB); bitwise float64 target factor on memmap (2.6e-12 rel differences, cause not
+      found, accepted by the repo-reviewer since the network reads only bitwise float32 arrays)
+    running: FA-ccin2p3-89c84a63, FA-ccin2p3-55202992 (1x width-8 pair), sweep cov_v4_long_lr_x4 (8 trials), H100 width probes
+      FA-ccin2p3-c15cdd47, f77a5e0e, 5a6ddb32 (pending)
+    files: data_mmap.py, tests/test_memmap_data.py, scripts/job_catalog_v3_short.sh, sweep/sweep_config_ccin2p3_cov_v4_long_lr_x4.yaml
+    written: '2026-11-01T03:17:35+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
