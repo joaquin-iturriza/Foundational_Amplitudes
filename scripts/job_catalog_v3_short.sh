@@ -313,6 +313,7 @@ fi
 # evaluation, no sigma stage, then stops: the log gives the load time (job start to the first iteration), s/iter
 # (avg and LLOCA_PROFILE_STEP's data/step split), the GPU peak and, from /usr/bin/time, the host peak memory.
 # Its run dir is a zz_probe_ scratch dir of this job. The GPU model is printed (submit with --partition to choose it).
+# PROBE_MEMMAP=true loads on the memmap path (data_mmap.py; the cache under $SCRATCH/amp_mmap_cache, built on a miss).
 if [ "$MODE" = probe ]; then
     H="${PROBE_HEADS:?PROBE_HEADS=<num_heads> for mode probe}"
     OUT="$SCRATCH/zz_probe_long_w${H}_${SLURM_JOB_ID:-$$}"
@@ -323,7 +324,7 @@ if [ "$MODE" = probe ]; then
         run_name=null warm_start_idx=null base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
         training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" \
         training.iterations=200 training.validate_frac=0.5 evaluate=false data.processes_file="$TRAIN" \
-        ++data.memmap=false ++data.train_subsample=null ++data.eval_subsample=3200 evaluation.train_subsample=2000 \
+        ++data.memmap=${PROBE_MEMMAP:-false} ++data.train_subsample=null ++data.eval_subsample=3200 evaluation.train_subsample=2000 \
         ++training.heterosc_sigma_stage_steps=0 model.net.num_heads="$H" 2>&1 | tee "$OUT.log"
     RC=${PIPESTATUS[0]}
     echo "PROBE_END $(date +%s) rc=$RC"
