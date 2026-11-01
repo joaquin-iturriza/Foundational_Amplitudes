@@ -6896,6 +6896,15 @@ entries:
       H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore). The existing 1e4-event
       short runs (f0156d88/df858d33) are read beside: full set over 1e4 at 4264 steps is information on data size at fixed
       steps only.'
+    passed_at: '2026-11-01T02:36:21+00:00'
+    reviewer: 'Re-check of the 02:35:50 design against the 02:25 pass: only ''fixed'' changed: validation 200 events per process
+      in every cell, as the short arms (3200 was the scaled-data leftover; job_catalog_v3_short.sh @1f848f4a sets eval_subsample=200
+      in the long cells and the probe, train_subsample null kept), and the loads go on the memmap path only once its CPU equivalence
+      test against the in-memory load passes. Validation size and checkpoint rule are the same in every cell and the full-set
+      control, so the comparison stays matched; everything else as passed at 02:25 (steps-only at fixed data per D236; length
+      check ee->ttbar het 2.9e-8 -> 1.2e-8 -> 5.1e-9 and share-0.25 best at 4250-4264 of 4264; seeds 42/43 against PP4 0.450
+      [0.360,0.556]; HETEROSC D226; emission-scales target D234; default-sampled reads D227; D235 cut stated). Searched as
+      at 02:25.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
