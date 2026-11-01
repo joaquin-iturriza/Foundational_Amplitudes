@@ -329,6 +329,7 @@ if [ "$MODE" = probe ]; then
     RC=${PIPESTATUS[0]}
     echo "PROBE_END $(date +%s) rc=$RC"
     grep -E "Maximum resident set size|Elapsed \(wall" "$OUT.log" | sed 's/^/PROBE_HOST /'
+    echo "RUN_SUMMARY catalog_short probe heads=$H memmap=${PROBE_MEMMAP:-false} rc=$RC"
     exit "$RC"
 fi
 if [ "$MODE" != eval ]; then
