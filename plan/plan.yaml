@@ -7395,6 +7395,12 @@ entries:
     units: null
     start: '2026-11-01T03:48:17+00:00'
     at: '2026-11-01T03:48:17+00:00'
+  - batch: cov_v4_long_dyhpo_17056
+    wall_h: 70.0
+    jobs: 40
+    units: null
+    start: '2026-11-01T03:48:19+00:00'
+    at: '2026-11-01T03:48:19+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
