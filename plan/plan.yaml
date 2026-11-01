@@ -3466,9 +3466,6 @@ entries:
       events with the class''s MadLoop [virt=QCD] standalone (tools/nlo_virtual_pipeline.py, an isolated subprocess per chunk
       as datagen''s kind virt), test on a small ee pool, then generation (about 1.0 core-h of MadEvent, the loop labels measured
       in the probe) and the same HD4 re-read'
-    21: 'Step 18 last 4 tree pools: hd_test_e20_aaccx (FA-ccin2p3-6581e775 FA-ccin2p3-e58cb2fe), hd_ddx_dhuxwp__E20 (FA-ccin2p3-62f8cc25,
-      queue hd_test_e20_small_runs), hd_test_5body_b (FA-ccin2p3-8f072868 FA-ccin2p3-9d27468a); then check_site_data: 114/114
-      test pools, H5 28/28 already'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7434,12 +7431,6 @@ entries:
       if:
       - 'H5 R within the pooled interval: the pooled read stands'
       - 'H5 R outside it: reported per axis to Joaquin'
-    21:
-      feeds: 'next 18: the default-sampled held-out pools'
-      if:
-      - 'all 142 present: step 20 HD4/HD5 eval-only rereads of the 12 arms (walls from short_wall at S_PROBE 0.71 for MSE;
-        het at its measured old rate until a het read measures the cached path)'
-      - 'a pool fails or assembles short: read its log, fix its layout from the measured share, requeue'
   owner:
     agent: adaed743f490372f8
     state: working
