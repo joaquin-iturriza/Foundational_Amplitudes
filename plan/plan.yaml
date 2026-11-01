@@ -7478,7 +7478,7 @@ entries:
     agent: a6abb471b22a991ce
     state: closed
     since: '2026-11-01T03:20:19+00:00'
-    state_at: '2026-11-01T06:12:39.157000+00:00'
+    state_at: '2026-11-01T06:13:20+00:00'
     context: 262304
     context_at: '2026-11-01T06:12:42+00:00'
   findings:
