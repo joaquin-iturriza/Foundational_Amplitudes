@@ -3443,11 +3443,14 @@ entries:
   - D234
   - D235
   next:
-    16: 'HELD (Joaquin 2026-11-01 via the main session): the two long-run DyHPO sweeps (sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
-      and _x16.yaml @efc54ab4, cov_v4_long_hpo8_17056/_68224, 8 trials 3 start-up, both gpu_h100, design passed 16:17, about
-      86 GPU-h) wait for the likelihoods project''s sweep tooling (new surrogate, more candidates) to be ported as FA''s default
-      and for the layout rule (1/3 start-up, then two sequential batches over the rest, at any trial count); then the design
-      is revised for those changes, re-reviewed and submitted. The 1x width cells stay held by D243. Nothing submitted.'
+    16: 'Long-run DyHPO sweeps (D242, D244-D247; design passed 2026-11-01T17:29): stage 0 lxplus probes FA-lxplus-fdf08708
+      / FA-lxplus-f44c7c06 (trial path, 17056 config, 1000 steps, TRIAL_TIMEV=1) running. On their end: read both logs whole:
+      hosts, ''waiting for the lock'' vs ''built the cache'' timestamps, ''opening the cache'', host peak, step rate between
+      validations, validation cost, cache build time and size (du on EOS). Lock tested and held -> set each config''s time
+      to the measured estimate (steps x rate + validations + build), commit, sync, then launch two sweep/drive.py processes
+      under tools/detach.py (--config ..._x4.yaml and ..._x16.yaml, --item catalog_coverage, --sites lxplus ccin2p3), waves
+      [3,3,2]; check after the first trials that one cache key is built. Untested -> repeat once or node-local memmap_dir.
+      The 1x width cells stay held (D243).'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7529,7 +7532,6 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '16': FA-lxplus-fdf08708 FA-lxplus-f44c7c06
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
