@@ -6944,7 +6944,7 @@ entries:
       - 'it does not: H100 chains as planned'
   owner:
     agent: a24e9905c905d4dce
-    state: working
+    state: closed
     since: '2026-10-31T22:30:46+00:00'
     state_at: '2026-11-01T02:20:44+00:00'
     context: 210479
@@ -7740,21 +7740,32 @@ entries:
       load on a few pools on CPU (tests/test_memmap_data.py pattern), repo-reviewer, then one V100 width-8 16x probe on the
       memmap path for its host peak.'
   handoff:
-    state: 'Done this session: par:v4_mixture write-ups (c70595af step-20 verdict; f04c945e shares vs pure-default bound,
-      tab:v4_bound_shares); bound re-reads f8ec724f/049b863e read and extracted (mixture_ab bound_default, affc6f0b); catalog_v4_train.yaml
-      = share 0.25 (e3f37300; the catalog-sampled recipe is now catalog_v4_base_train.yaml, used by the control arms and generators),
-      check_site_data on CC: 1153 processes, pools prebuilt, sidecars present; short_wall rates (c0fed433, 10a5cb11). Step
-      16 design recorded and revised after the reviewer''s FIX; re-check sent to the same reviewer (a4faf46b1e1550ebe), verdict
-      pending at hand-off. Nothing submitted for step 16; it waits on Joaquin''s go on the GPU-h (D219).'
-    decisions: Loss HETEROSC for the long runs (D226, reviewer); length axis = steps-and-data (events per process grow with
-      steps); lr measured by a single-fidelity DyHPO at 4x width 8 before longer cells; widths staged with a go rule at 1x.
-    ruled_out: Overwriting catalog_v4_train.yaml in place without moving the base (the share generator, pp/signext generators
-      and control arms read it as the catalog-sampled base).
-    running: none
-    files: docs/results.tex (par:v4_mixture), analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/bound_default.json,
-      recipes/catalog_v4_train.yaml, recipes/catalog_v4_base_train.yaml, recipes/gen_catalog_v4_default.py, tools/short_wall.py,
-      tests/test_short_wall.py, scripts/job_catalog_v3_short.sh
-    written: '2026-10-31T22:29:00+00:00'
+    state: 'Step 16 (long runs, D219/D229/D231/D234/D235): design passed 2026-11-01 00:13 (reviewer a4faf46b1e1550ebe) with
+      Joaquin''s cut D235 (S2 width 8 only, 68224-step cells as resumed chains; his go covers about 157 GPU-h, recost above
+      about 200 back to him). S1 = 1x widths 16/32 x seeds 42/43 + 8-trial lr DyHPO at 4x width 8; S2 = 4x and 16x width 8
+      x 2 seeds. Job script: LONG_HEADS/LONG_FACTOR/LONG_LR on v4_het_default25[_seed2] (7207f5bf), probe mode (1e414911).
+      The V100 16x probe died OOM at 94 GB (90G limit) after the whole load; the profile (finding of 2026-11-01, mem_profile_data
+      --run-config @3c3ac93e) puts it at 221 B per particle peak, 145 steady, the in-memory design. Joaquin (02:3x) wants
+      the memory fixed, not 1.5 TB nodes: OPEN WORK, in order: (a) extend data_mmap.py to data.dimensionless_inputs and data.target_physics_orders
+      (it asserts against both at data_mmap.py:325-328; the in-memory code is experiment.py:1732-1790 (alphas per event, rs
+      = sqrt(s_hat), momenta / rs, the dimless mass stats) and 1998-2200 (per-event lrs, off-shellness (s - M^2)/s_hat));
+      equivalence test against the in-memory load on a few pools on CPU (pattern tests/test_memmap_data.py); repo-reviewer;
+      (b) one V100 width-8 16x probe on the memmap path (job script probe mode: add ++data.memmap=true via an env switch)
+      for host peak and s/step; (c) recost S1 + width-8 S2 from the probes (H100 ones running or pending) and submit S1 if
+      within about 200 GPU-h (D235), else the number to Joaquin; (d) build the 4x lr DyHPO sweep (single-fidelity, lr window
+      [7.8e-4, 7.0e-3], 8 trials, sweep template) and the 16x resume chain (run.py warm_start_idx). Also done this session:
+      par:v4_mixture notes-editor proposals (00813d05, 81f7c861), figure fig:v4_shares_bound (shares_bound_a/b), answer to
+      D234''s conditioning question (diagrams llm4lhc pooled with BSM labels, coupling orders, per-event off-shellness 1153/1153,
+      physical particle properties).'
+    decisions: D234 emission-scales target kept; D235 width-8-only S2 and 68224 chains, his go on about 157 GPU-h; H100 probes
+      at 200G because 94 GB is reached before the first step; V100 120G/90G probes cancelled (none fits).
+    ruled_out: Lowering the probe memory request on V100 without the memmap path (94 GB before step 1); the memmap path as
+      it is (refuses dimensionless_inputs, target_physics_orders).
+    running: H100 width probes FA-ccin2p3-c15cdd47 (w8), f77a5e0e (w16), 5a6ddb32 (w32), 200G, 1:30, PENDING (all H100 GPUs
+      busy); step 16 waits on them
+    files: scripts/job_catalog_v3_short.sh, tools/mem_profile_data.py, data_mmap.py, experiment.py, tests/test_memmap_data.py,
+      analysis/catalog_v4/fig_shares_bound.py, analysis/catalog_v4/mixture_ab.py, docs/results.tex par:v4_mixture
+    written: '2026-11-01T02:23:32+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
