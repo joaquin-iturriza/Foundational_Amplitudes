@@ -7104,7 +7104,7 @@ entries:
     agent: a018d7c567ba57e1b
     state: working
     since: '2026-11-01T02:24:43+00:00'
-    state_at: '2026-11-01T02:25:13.562000+00:00'
+    state_at: '2026-11-01T02:25:43.064000+00:00'
     context: 93735
     context_at: '2026-11-01T02:25:45+00:00'
   findings:
