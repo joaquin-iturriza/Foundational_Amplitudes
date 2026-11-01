@@ -3479,6 +3479,10 @@ entries:
       (widths 16/32 at 4264, lr search at 17056 width 8) and the 4 width-8 long runs; within about 200 GPU-h submit S1 then
       S2 (68224 as a resumed chain on H100); above it, the number goes to Joaquin first. Build the lr-search and the resume
       chain.'
+    26: 'Memory (Joaquin 2026-11-01 ''we had fixed the memory issue before''): the memmap data path refuses dimensionless_inputs
+      and target_physics_orders, so the long runs'' whole-pool load takes 94 GB host. Measure where the 94 GB goes, extend
+      memmap to those two inputs with a CPU equivalence test against the in-memory load, repo-reviewer, then one V100 width-8
+      probe on memmap for its host peak.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -6933,6 +6937,11 @@ entries:
       if:
       - 'recost within about 200 GPU-h: submit'
       - 'above: to Joaquin with the number'
+    26:
+      feeds: 'D235: where the 68224-step width-8 runs can run (V100 or H100) and their cost'
+      if:
+      - 'memmap fits a V100 share: the long runs may use V100s'
+      - 'it does not: H100 chains as planned'
   owner:
     agent: a24e9905c905d4dce
     state: working
