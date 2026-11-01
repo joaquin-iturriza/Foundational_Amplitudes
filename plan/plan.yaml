@@ -7080,6 +7080,9 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
+    '16': Joaquin's go to delete tmp/amp_mmap_cache on CC (184 GB, /sps/lpnhe full); cancelled sweeps cov_v4_long_lr_x4, cov_v4_long_hpo_x16,
+      cov_v4_long_hpo_x4, cov_v4_long_dyhpo_68224, cov_v4_long_dyhpo_17056 ended (0 results, not live); H100 probes FA-ccin2p3-c15cdd47
+      FA-ccin2p3-f77a5e0e FA-ccin2p3-5a6ddb32 pending
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
