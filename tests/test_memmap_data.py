@@ -171,6 +171,8 @@ def _diagnose(A, B, label):
             continue
         try:
             x, y = np.asarray(a, dtype=np.float64), np.asarray(b, dtype=np.float64)
+            if k == "all_amp_factor":
+                x, y = x.reshape(-1), y.reshape(-1)
         except (TypeError, ValueError):
             continue
         if x.shape != y.shape:

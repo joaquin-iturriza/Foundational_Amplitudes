@@ -779,7 +779,7 @@ def _apply(exp, c, d, meta, built):
     exp.all_amplitudes = _open(d, "amplitudes")
     exp.all_process_ids = _open(d, "process_ids")
     exp.all_order_labels = _open(d, "order_labels")
-    exp.all_amp_factor = (np.asarray(_open(d, "amp_factor"))
+    exp.all_amp_factor = (np.asarray(_open(d, "amp_factor")).reshape(-1)      # (N,), the in-memory path's shape
                           if os.path.exists(os.path.join(d, "amp_factor.npy")) else None)
     assert (exp.all_amp_factor is not None) == bool(cfg.data.get("target_physics_factor", False)), \
         "data.memmap: the cache's amp_factor does not match data.target_physics_factor"
