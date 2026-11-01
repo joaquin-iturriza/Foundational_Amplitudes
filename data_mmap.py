@@ -25,6 +25,7 @@ global scale, the off-shellness over s_hat (and data.dimless_offshell_eps), the 
 particles, and log10 sqrt(s_hat) as one column past the order features, all as on the in-memory path.
 """
 import fcntl
+import socket
 import hashlib
 import json
 import os
@@ -447,7 +448,9 @@ def init_data_recipes_mmap(exp, c):
     d = os.path.join(root, key)
     os.makedirs(root, exist_ok=True)
     with open(os.path.join(root, key + ".lock"), "w") as lk:
+        LOGGER.info(f"data.memmap: waiting for the lock of {key} on {socket.gethostname()}")
         fcntl.flock(lk, fcntl.LOCK_EX)              # one builder per key; the others wait and then read it
+        LOGGER.info(f"data.memmap: holding the lock of {key}")
         meta_p = os.path.join(d, "meta.json")
         built = not os.path.exists(meta_p)
         if not built:
