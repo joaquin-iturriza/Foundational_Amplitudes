@@ -7476,7 +7476,7 @@ entries:
       - 'he cuts it: redesign to his cut'
   owner:
     agent: a6abb471b22a991ce
-    state: working
+    state: closed
     since: '2026-11-01T03:20:19+00:00'
     state_at: '2026-11-01T06:12:39.157000+00:00'
     context: 262304
@@ -8285,32 +8285,34 @@ entries:
       3200) fixed; eval_subsample 200 per process in every long cell (design re-passed 02:35 by a4faf46b1e1550ebe). Lr DyHPO
       config sweep/sweep_config_ccin2p3_v4_long_lr_x4.yaml @929c3eb4.'
   handoff:
-    state: 'Step 16 under the design re-passed 2026-11-01 ~03:35 (reviewer a9c9d4760d3b2f095; length verdict = 68224 best
-      vs 17056 best of two template DyHPOs, 1x against them information only; no seed-43 twin, D242). Submitted: 1x width-8
-      pair FA-ccin2p3-da6564de (v4_het_default25) / FA-ccin2p3-bd3bc251 (_seed2), job_catalog_v3_short.sh LONG_HEADS=8 LONG_FACTOR=1
-      LONG_MEMMAP=true, V100 46G 4:00 (resubmits of 89c84a63/55202992, refused by their wall guard: short_wall S_COMPOSE 6.1
-      -> 0.23 s/entry, 29b1a4b6). Sweeps on ccin2p3, chained (sweep_manager --chain: 10 start-up together, then width 3, MAX_CHAIN_WIDTH):
-      cov_v4_long_hpo_x16 (sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml @fa0397e7, 68224 steps, 40 trials, 28:00 each,
-      target 265 h) and cov_v4_long_hpo_x4 (_x4.yaml @4b3683d4, 17056 steps, 40 trials, 06:30 each, target 70 h); one job
-      per trial (CC QoS gpu MaxWall 7 days), not resumed chains. V100 width probes with checkpoint_blocks (PROBE_CKPT, 3e4d3252):
-      FA-ccin2p3-8ec30352 w16, FA-ccin2p3-c242280c w32; H100 probes c15cdd47 f77a5e0e 5a6ddb32 still pending (Resources).
-      NEXT: (a) when a probe gives GPU peak and s/step for w16/w32: submit 1x w16 and w32 x seeds 42/43 (LONG_HEADS=16|32
-      LONG_FACTOR=1 LONG_MEMMAP=true, LONG_CKPT=true on V100, or H100 without), time from short_wall plus measured s/step;
-      (b) when each sweep ends: its best trial gets an eval job (sigma-only stage + every axis, REREAD=<trial run>), then
-      the 16x-vs-4x read per the design; (c) question open to Joaquin: a 4264-step template DyHPO (about 70 GPU-h) would make
-      the 1x point matched.'
-    decisions: 'D238 superseded by D240/D242 (the long runs are the two full DyHPO sweeps, approved at their estimate); D241
-      HP work is a full DyHPO; item est set to 1420 GPU-h under D242 (the reserved ceiling: 40x28 + 40x6.5 + 1x pair; estimate
-      with margin 1266); 16x lr window centred by tools/lr_surface_center.py @3d12f881 (1.23e-3 at 68224, 2.63e-3 at 17056;
-      AdamW-measured, untested with Muon), lr range extension on'
-    ruled_out: 'lr-only search cov_v4_long_lr_x4 (cancelled, D239-D241); lxplus for the sweeps: the 68224 trials (23.6 h)
-      exceed its 24 h tomorrow flavour, and the catalog_v4 memmap workload is untested there (GPU types under the 18.6 GB
-      width-8 peak); with the chain width cap 3 the finish time is the same at either site'
-    running: FA-ccin2p3-da6564de, FA-ccin2p3-bd3bc251, sweeps ccin2p3:cov_v4_long_hpo_x16 and ccin2p3:cov_v4_long_hpo_x4,
-      probes FA-ccin2p3-8ec30352, FA-ccin2p3-c242280c, FA-ccin2p3-c15cdd47, FA-ccin2p3-f77a5e0e, FA-ccin2p3-5a6ddb32
-    files: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml, tools/lr_surface_center.py,
-      tools/short_wall.py, scripts/job_catalog_v3_short.sh
-    written: '2026-11-01T03:41:52+00:00'
+    state: 'Step 16 (design passed ~03:35 by a9c9d4760d3b2f095: length verdict 68224-step DyHPO best vs 17056-step DyHPO best,
+      template coupled space, 40 trials each, approved D242; 1x widths 16/32 vs the 1x width-8 pair; no seed-43 twins). Everything
+      stopped: /sps/lpnhe is full (512 GB) because data_mmap keyed composed-at-load pools by node-local path+mtime, so each
+      job built its own ~20 GB memmap cache (184 GB in $SCRATCH/amp_mmap_cache: 3 complete, 10 partial .tmp). Fixed 52b7a537
+      (content-digest key; tests/test_pool_doc_composed.py), committed, NOT synced (disk full). Earlier fixes: short_wall
+      compose rate 29b1a4b6; configs without the model override 6e32b1b4; generate_sweep guard 5a5b6c6d; PROBE_CKPT/LONG_CKPT
+      3e4d3252; lr centre tool 3d12f881. All five sweeps (cov_v4_long_lr_x4, _hpo_x16, _hpo_x4, _dyhpo_68224, _dyhpo_17056)
+      ended with 0 results. RESUBMISSION ORDER once Joaquin says to delete the caches: (1) delete /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
+      contents (record his words with site decide); (2) site sync ccin2p3 FA (52b7a537); (3) 1x width-8 pair: job_catalog_v3_short.sh
+      v4_het_default25 and v4_het_default25_seed2, LONG_HEADS=8 LONG_FACTOR=1 LONG_MEMMAP=true, V100 --mem=46G --time=04:00:00;
+      (4) V100 width probes: mode probe PROBE_HEADS=16 and 32, PROBE_MEMMAP=true PROBE_CKPT=true, 46G 1:00 (or read the H100
+      probes c15cdd47/f77a5e0e/5a6ddb32 if they ran), then 1x w16/w32 x seeds 42/43; (5) both DyHPO sweeps from fresh state
+      with new sweep_name values: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml and _x4.yaml @6e32b1b4 (generate on
+      CC, sweep_manager submit --chain --capacity 6; the site gate counts recent jobs at their limits: item est 1420 GPU-h,
+      D242), targets 265 h / 70 h; check after the first trials that only one cache key is built. Then: each sweep''s best
+      trial gets an eval job (sigma-only stage + every axis, REREAD=<trial run>) and the 16x-vs-4x read.'
+    decisions: D238 superseded by D240/D242 (the long runs are the two full DyHPO sweeps, approved at estimate); D241 HP work
+      is a full DyHPO; D236 full set at every length; D237 report configs; item est 1420 GPU-h (reserved ceiling) under D242;
+      trials run unsplit (CC QoS gpu MaxWall 7 days), not as resumed chains
+    ruled_out: 'lr-only search (D239-D241); fixed_params model: lloca under base_config (breaks the model node); lxplus for
+      the sweeps (24 h flavour below the 68224 trial, workload untested there); memmap key on composed-pool path/mtime (one
+      cache per job)'
+    running: none of step 16's training; H100 width probes FA-ccin2p3-c15cdd47, FA-ccin2p3-f77a5e0e, FA-ccin2p3-5a6ddb32 still
+      pending (will fail while the disk is full)
+    files: data_mmap.py, mix_compose.py, tests/test_pool_doc_composed.py, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml,
+      sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml, sweep/generate_sweep.py, tools/lr_surface_center.py, tools/short_wall.py,
+      scripts/job_catalog_v3_short.sh
+    written: '2026-11-01T06:13:19+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
