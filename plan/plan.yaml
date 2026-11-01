@@ -3454,10 +3454,6 @@ entries:
       to num_heads, 1.25 margin): S1 = 1x widths 16/32 x 2 seeds + 8-trial lr DyHPO at 4x width 8 = 81 GPU-h; S2 all 4x/16x
       cells = 466 GPU-h (16x width 32 is 100 h per run: chained jobs), width-8-only S2 = 76 GPU-h; width probe 0.5 GPU-h.
       Goes to Joaquin for his go on the GPU-h before anything launches'
-    17: 'Held-out read on default-sampled pools (Joaquin 2026-10-31 ''I have nothing to say about the mixture until I see
-      the right numbers''): build MadEvent-default test pools for H1-H7c, re-read the MSE arms and control pair on them (REREAD),
-      then the same comparison under the het loss (arms at both shares and control, seeds 42/43) folded into the het design;
-      GPU-h stated, above 30 to Joaquin'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7405,11 +7401,6 @@ entries:
       if:
       - 'Joaquin approves (all or a cut): width probe, then S1, then S2 by the go rules'
       - 'Joaquin cuts it: his version, re-costed'
-    17:
-      feeds: next 14, the share choice
-      if:
-      - 'default-sampled held-out R below 1.05 at a share with PP4/EE4 gain: that share is a clean win'
-      - 'held-out R above 1.05 on default-sampled pools: a real generalisation cost, a trade-off for Joaquin'
   owner:
     agent: adaed743f490372f8
     state: working
