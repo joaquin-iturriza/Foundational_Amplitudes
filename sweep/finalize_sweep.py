@@ -20,6 +20,8 @@ import yaml
 import os as _os, sys as _sys
 _sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))  # repo root, so siteconf imports from anywhere
 import siteconf
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from generate_sweep import condor_flavour  # the shortest HTCondor flavour covering a job's time
 
 
 _project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -133,7 +135,7 @@ error       = {afs_dir}/error/{job_name}.$(ClusterId).$(ProcId).err
 log         = {afs_dir}/log/{job_name}.$(ClusterId).$(ProcId).log
 
 request_gpus          = {cluster["request_gpus"]}
-{gpu_mem_line}+JobFlavour           = "{cluster["job_flavour"]}"
+{gpu_mem_line}+JobFlavour           = "{cluster.get("job_flavour") or condor_flavour(cluster.get("time")) or cluster.get("flavour", "tomorrow")}"
 requirements          = {requirements}
 max_retries           = 3
 {extra}

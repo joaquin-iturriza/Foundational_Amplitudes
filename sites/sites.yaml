@@ -68,7 +68,8 @@ lxplus:
     - source /eos/user/j/joiturri/Foundational_Amplitudes/sites/activate.sh
   cluster:
     scheduler: htcondor
-    flavour:   tomorrow
+    flavour:   tomorrow   # a default only: a job's flavour is the shortest covering its time (espresso 20m, microcentury 1h,
+                          # longlunch 2h, workday 8h, tomorrow 1d, testmatch 3d, nextweek 1w); no 24 h cap
     mem:       32G
 
 local:
