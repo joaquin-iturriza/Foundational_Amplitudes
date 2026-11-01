@@ -7515,6 +7515,17 @@ entries:
       68224 sweep 8 x 18.6 h = 149 GPU-h; best-trial reads about 4; about 192 GPU-h, inside D242''s approval (item est 1420);
       faster GPUs lower it. Finish: three waves each, 17056 about 3 x 4.9 h = 15 h, 68224 about 3 x 18.6 h = 56 h on V100-class
       GPUs (about 25 h on H100), from the first start.'
+    passed_at: '2026-11-01T17:29:35+00:00'
+    reviewer: 'Re-check of design 17:29 after the 17:28 FIX. Lock test now valid: data_mmap logs ''waiting for the lock of
+      <key> on <host>'' and ''holding the lock'' (b9c44085, read), trial_job.sh line 17 prints the host. Lock counts as tested
+      only on different hosts with the second job''s waiting line before the first''s ''built the cache'', then ''opening
+      the cache'', and no second staging dir. Untested: repeat once, or node-local memmap_dir with a 20 GB disk request. Disk:
+      EOS quota 108 GB free; one 20 GB key, plus at most a second key in a repeat, fits; a failing lock is caught before the
+      sweeps. Stage-0 probe (6 GPU-h) re-derives estimates and limits from the lxplus rate and host peak. Unchanged and holding:
+      check 2 (ee->ttbar het loss 2.9e-8, 1.2e-8, 5.1e-9 at 8k, 16k, 32k; dancat_het_pre NLL -3.35 to -4.10), check 3 (seed
+      42, 1x pair |ln R| 0.450 on PP4), HPO per D244, D245, D246 (gp, 2000 candidates, 8 trials with 3 start-up, waves 3,3,2),
+      placement and same-GPU-type reads per D247, about 192 GPU-h under D242. Searched: lxplus, EOS, flock, amp_mmap_cache,
+      memmap_dir, D247, plus the earlier terms (cov_v4_long, hpo8, surrogate, TF32, D219-D246)'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
