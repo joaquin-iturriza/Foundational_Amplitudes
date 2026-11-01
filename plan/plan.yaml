@@ -8044,6 +8044,19 @@ entries:
       mass column, per-event alpha_s from <pool>.alphas.npy into the cached target), equivalence test against the in-memory
       load on a few pools on CPU (tests/test_memmap_data.py pattern), repo-reviewer, then one V100 width-8 16x probe on the
       memmap path for its host peak.'
+  - at: '2026-11-01T02:39:59+00:00'
+    text: '2026-11-01 03:40 (owner a018d7c567ba57e1b): memmap path extended to data.dimensionless_inputs and data.target_physics_orders
+      (data_mmap.py f0142f19, 1f848f4a; target factor now from the in-memory path''s GeV momenta; cache key holds the per-process
+      coupling-monomial inputs and the sidecars). CPU equivalence test (tests/test_memmap_data.py @78f77040 on CC, run config
+      runs/catalog_v4_short/v4_het_default25, first 12 processes, train_subsample 8000, eval 200; log ~/.local/share/ccorch/detached/20261101-033846_memmap_equiv.log):
+      cache built, cache hit and fine-tune (frozen stats) identical to the in-memory load: every float32 array the network
+      reads (particles, tokens, offsets, targets, order labels with off-shellness and the log10 sqrt(s_hat) column), RNG state,
+      permutations and the first train/val/per-process batches bitwise; the float64 target factor differs on 32813 of 100800
+      events by at most 2.64e-12 relative and prepd mean/std by 1 ulp (cause not found; inputs to _physics_logF bitwise equal;
+      the in-memory path reproduces itself across processes), held to rtol 1e-10. Not tested: one-loop pools, pools without
+      alpha_s files (alpha_s power 0), a held-out read on the memmap path. Repo-reviewer FIX (cache key, unsourced eval_subsample
+      3200) fixed; eval_subsample 200 per process in every long cell (design re-passed 02:35 by a4faf46b1e1550ebe). Lr DyHPO
+      config sweep/sweep_config_ccin2p3_v4_long_lr_x4.yaml @929c3eb4.'
   handoff:
     state: 'Step 16 (long runs; D219/D229/D231/D234/D235/D236): design re-recorded 2026-11-01 ~02:30 for D236 (every cell
       on the whole training set, 1e5 per tree process / 5e4 one-loop, validation 3200 per process; only steps move); re-check
