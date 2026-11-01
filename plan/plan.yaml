@@ -3447,8 +3447,6 @@ entries:
       mixture_ab_het.json): Joaquin chooses catalog_v4''s default share (none, 0.25 or 0.50); the chosen recipe is composed
       at load (D207), no pools to build; catalog_v4_train.yaml unchanged until he chooses; H3 (top classes) open at MSE 1.133/1.082
       with intervals across 1'
-    15: 'Het-loss uncertainty read (D220): where the network is uncertain on the mixture arms vs control; first check whether
-      an existing het-loss run can be re-read; GPU-h stated before any run'
     16: 'Long muP runs on the 0.25 catalog (D219, D229, D231): design of 2026-10-31 ~22:40 (revised after a design-reviewer
       FIX: het loss, staged widths, lr DyHPO first). Cost estimate (short_wall rates, het, V100, s/step assumed proportional
       to num_heads, 1.25 margin): S1 = 1x widths 16/32 x 2 seeds + 8-trial lr DyHPO at 4x width 8 = 81 GPU-h; S2 all 4x/16x
@@ -7391,11 +7389,6 @@ entries:
       - 'Joaquin picks a share: catalog_v4_train.yaml takes that share''s f_default and default_source; check_site_data on
         it; close after the backlog review'
       - 'Joaquin keeps the current mixture: close the entry with the write-up c70595af'
-    15:
-      feeds: 'D220: the catalog_v4 default share'
-      if:
-      - 'uncertainty concentrates where default sampling adds events: favours a default share'
-      - 'it does not: keep the current mixture (a)'
     16:
       feeds: 'D219: scaling and whether the network is big enough'
       if:
