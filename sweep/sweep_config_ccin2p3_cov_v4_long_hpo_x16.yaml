@@ -20,7 +20,11 @@ cluster:
   request_gpus: 1
   mem: 46G
   cpus_per_task: 5
-  time: '28:00:00'
+  time: '12:00:00'
+  # H100 only (D244: the 68224-step sweep on H100s when free): het on H100 assumed at the MSE control's 0.33 s/step
+  # (FA-ccin2p3-339ec100; het and MSE run alike on V100, 0.94-1.00 s/step): 68224 x 0.33 s = 6.3 h + 16 min cache,
+  # x1.25 = 8.2 h; limit 12 h. The first trials' logs measure the rate.
+  partition: gpu_h100
 paths: null
 sweep_name: cov_v4_long_hpo8_68224
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25

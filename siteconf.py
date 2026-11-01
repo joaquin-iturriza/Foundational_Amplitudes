@@ -118,10 +118,13 @@ def resolve(cfg):
     paths["python_bin"] = "python"               # env is activated by setup_commands
     cl = cfg.get("cluster") or {}
     cfg["cluster"] = cl
+    want = str(cl.get("partition") or "")
     for k in SITE_KEYS:
         cl.pop(k, None)                     # a stale value from another cluster
     for k, v in CLUSTER.items():
         cl.setdefault(k, v)
+    if want and all(w in str(CLUSTER.get("partition") or "").split(",") for w in want.split(",")):
+        cl["partition"] = want              # narrowed to some of this site's own partitions
     cl.setdefault("request_gpus", 1)
     _expand(cfg)
     return cfg
@@ -148,6 +151,12 @@ def slurm_header(cluster, job_name, out, err, extra=()):
     ceiling, and never names a partition or account that isn't this cluster's.
     """
     cl = {**CLUSTER, **{k: v for k, v in (cluster or {}).items() if k in JOB_KEYS}}
+    # a job may narrow the site's partition list to some of its own partitions (e.g. gpu_h100 of
+    # gpu_v100,gpu_h100); any other partition is ignored, never passed to the scheduler
+    want = str((cluster or {}).get("partition") or "")
+    have = str(CLUSTER.get("partition") or "").split(",")
+    if want and all(w in have for w in want.split(",")):
+        cl["partition"] = want
     gpus = int(cl.get("request_gpus", 1) or 0)
     cpus = clamp_cpus(cl.get("cpus_per_task", 8), max(gpus, 1))
     lines = ["#!/bin/bash", "#SBATCH --job-name=%s" % job_name]
