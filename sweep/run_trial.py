@@ -191,6 +191,35 @@ def format_value(v):
     return str(v)
 
 
+# keys run_trial sets itself for every trial (below): never re-rooted from the base run's values
+_TRIAL_SET = {"base_dir", "run_dir", "exp_name", "training.result_path", "training.iterations"}
+
+
+def _rerooted_base_paths(base):
+    """`++key=value` overrides for the base run's paths written on another site: a run copied from CC-IN2P3 to lxplus
+    keeps /sps/... paths in its config.yaml (data.processes_file), which do not exist here; each string leaf under
+    another site's project_dir is re-rooted onto this site's (siteconf._expand_str), except the keys set per trial."""
+    import yaml
+    try:
+        with open(os.path.join(base, "config.yaml")) as f:
+            tree = yaml.safe_load(f) or {}
+    except OSError:
+        return []
+    out = []
+
+    def walk(node, pre):
+        for k, v in node.items():
+            key = pre + str(k)
+            if isinstance(v, dict):
+                walk(v, key + ".")
+            elif isinstance(v, str) and key not in _TRIAL_SET:
+                new = siteconf._expand_str(v)
+                if new != v:
+                    out.append("++%s=%s" % (key, new))
+    walk(tree, "")
+    return out
+
+
 def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
                   warm_start_idx=None, increment_steps=None):
     project_dir = cfg["paths"]["project_dir"]
@@ -206,6 +235,7 @@ def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
     pre = "++" if base else ""
     if base:
         cmd += ["--config-path", base, "--config-name", "config", "run_name=null"]
+        cmd += _rerooted_base_paths(base)
     else:
         cmd.append("local=none")
 
@@ -324,6 +354,15 @@ def _write_summary(cfg, sampler, eos_dir):
     os.makedirs(eos_dir, exist_ok=True)
     with open(os.path.join(eos_dir, "summary.txt"), "w") as f:
         f.write("\n".join(lines) + "\n")
+
+
+def _gpu_name():
+    """The GPU this trial ran on (a sweep's trials may run on different GPU types), None without CUDA."""
+    try:
+        import torch
+        return torch.cuda.get_device_name(0) if torch.cuda.is_available() else None
+    except Exception:
+        return None
 
 
 def main():
@@ -496,7 +535,7 @@ def main():
                 "val_loss": val_loss, "objective": obj_name, "objective_value": obj_value,
                 "observe_loss": float(observe_loss),
                 "hpo_obj": hpo_obj, "proc_val_losses": proc_val_losses,
-                "result_path": result_path, "run_dir": run_dir}), flush=True)
+                "result_path": result_path, "run_dir": run_dir, "gpu": _gpu_name()}), flush=True)
             return
         with DyHPOSampler.locked(state_path, eos_output_path) as sampler:
             sampler.observe(hp_idx, t_steps, observe_loss, proc_val_losses)

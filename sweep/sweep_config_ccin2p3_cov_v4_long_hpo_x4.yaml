@@ -13,18 +13,20 @@
 # t^-0.55 slope (tools/lr_surface_center.py @3d12f881, 32 sweeps, D >= 22130, t >= 3162; HPO rule 2). The surface was
 # measured with AdamW and is untested with Muon past 4264 steps; at 4264 it gives 5.6e-3 against the Muon search's
 # measured best 5.0e-3 (par:v3_muon). muon_weight_decay keeps the Muon search's window [1e-3, 0.3].
-# Time: the V100 memmap probe FA-ccin2p3-08a0f39f, 0.967 s/step at width 8: 17056 x 0.967 s = 4.6 h + 16 min first cache build, x1.25.
+# Time: the V100 memmap probe FA-ccin2p3-08a0f39f, 0.967 s/step at width 8: 17056 x 0.967 s = 4.6 h + 16 min first cache build = 4.9 h per trial (the estimate); drive.py's limit 1.5x + 6 min = 7.45 h.
 cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
   mem: 46G
   cpus_per_task: 5
-  time: '04:00:00'
-  # H100 only, as the 68224-step sweep, so the 16x-over-4x read compares the same GPU and TF32 precision (design
-  # review 2026-11-01): het on H100 assumed at the MSE control's 0.33 s/step (FA-ccin2p3-339ec100): 17056 x 0.33 s
-  # = 1.56 h + 16 min cache, x1.25 = 2.3 h; limit 4 h. The first trials' logs measure the rate.
-  partition: gpu_h100
+  # Run by sweep/drive.py on any site and GPU that takes it (Joaquin 2026-11-01: 'just send it on lxplus and to
+  # whatever gpu accepts it'; this overrides the design review's same-hardware objection, and each trial's GPU is
+  # recorded in its RESULT_JSON). `time` is drive.py's per-trial ESTIMATE on the slowest GPU accepted (V100, memmap
+  # probe FA-ccin2p3-08a0f39f, 0.967 s/step): 17056 x 0.967 s = 4.6 h + 16 min first cache build = 4.9 h; drive.py
+  # sets the wall limit at 1.5x + 6 min, and on HTCondor the flavour is the shortest covering that limit.
+  time: '04:54:00'
+  gpu_min_mem: 24G     # width-8 peak 18.6 GB plus margin: keeps trials off 16 GB GPUs (T4)
 paths: null
 sweep_name: cov_v4_long_hpo8_17056
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25
@@ -34,7 +36,8 @@ dyhpo:
   n_candidates: 2000
   objective_scale: auto      # the het NLL is signed: standardised once any value is <= 0
   seed: 42
-  n_startup: 3               # n_trials / 3; then two sequential batches (sweep_manager's 3 waves: 3, 3, 2)
+  n_startup: 3               # n_trials / 3; then two sequential batches
+  waves: [3, 3, 2]           # drive.py: each wave suggested only once every earlier trial has ended
   total_budget: 10000
 fidelity_schedule:
   t_steps:

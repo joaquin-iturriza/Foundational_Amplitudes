@@ -4,9 +4,13 @@ import siteconf
 
 
 def _part(cluster):
-    siteconf.CLUSTER.update({"partition": "gpu_v100,gpu_h100", "scheduler": "slurm"})
-    cl = siteconf.resolve({"cluster": dict(cluster)})["cluster"]
-    return [l for l in siteconf.slurm_header(cl, "t", "o", "e").split("\n") if "--partition" in l]
+    saved = dict(siteconf.CLUSTER)
+    try:
+        siteconf.CLUSTER.update({"partition": "gpu_v100,gpu_h100", "scheduler": "slurm"})
+        cl = siteconf.resolve({"cluster": dict(cluster)})["cluster"]
+        return [l for l in siteconf.slurm_header(cl, "t", "o", "e").split("\n") if "--partition" in l]
+    finally:
+        siteconf.CLUSTER.clear(); siteconf.CLUSTER.update(saved)
 
 
 def test_narrowed():

@@ -34,5 +34,15 @@ def test_site_tool():
         assert '+JobFlavour = "%s"' % f in sub, (t, sub)
 
 
+
+def test_gpu_min_mem():
+    m = _site_tool()
+    if m is None:
+        return
+    sub = m.condor_sub({"--time": "12:00:00", "--gres": "gpu:1", "--gpu-min-mem": "24G"}, "/afs/x/job.sh")[1]
+    assert "gpus_minimum_memory = 24576" in sub and '+JobFlavour = "tomorrow"' in sub, sub
+    assert "gpus_minimum_memory" not in m.condor_sub({"--gres": "gpu:1"}, "/afs/x/job.sh")[1]
+
+
 if __name__ == "__main__":
-    test_generate_sweep(); test_site_tool(); print("ok")
+    test_generate_sweep(); test_site_tool(); test_gpu_min_mem(); print("ok")

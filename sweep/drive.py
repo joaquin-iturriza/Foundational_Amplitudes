@@ -143,6 +143,7 @@ class Sweep:
         cl = self.cfg.get("cluster", {}) or {}
         self.mem = a.mem or cl.get("mem") or cl.get("request_memory") or "8G"
         self.cpus = int(a.cpus or cl.get("cpus_per_task") or 4)
+        self.gpu_min_mem = cl.get("gpu_min_mem")          # e.g. 24G: HTCondor keeps the trial off smaller GPUs
         self.hours = float(a.hours) if a.hours else hours_of(cl.get("time", "01:00:00"))
         self.time = hhmmss(self.hours * 1.5 + 0.1)           # wall limit: margin over the estimate
         fp = self.cfg.get("fixed_params", {})
@@ -288,6 +289,8 @@ class Sweep:
                 "--hdr=--mem=%s" % self.mem, "--hdr=--time=%s" % self.time,
                 "--hdr=--cpus-per-task=%d" % self.cpus,
                 "--hdr=--job-name=%s_%04d" % (self.name[:20], idx)]
+        if self.gpu_min_mem:
+            args.append("--hdr=--gpu-min-mem=%s" % self.gpu_min_mem)
         if s == "jeanzay":
             args += ["--est-gpu-hours", "%.2f" % self.hours, "--allow-jeanzay"]
         args += ["--", "--sweep-config", self.config_rel, "--detached", "--trial-idx", str(idx),
@@ -366,6 +369,8 @@ def plan(k, sweeps, a):
     s0 = sweeps[0]
     args = ["pick", PROJECT, "--jobs", str(k), "--mem", s0.mem, "--cpus", str(s0.cpus),
             "--hours", "%.2f" % s0.hours, "--json"]
+    if s0.gpu_min_mem:
+        args += ["--gpu-min-mem", str(s0.gpu_min_mem)]     # count only the GPUs the trials may run on
     if a.sites:
         args += ["--only"] + list(a.sites)
     if a.allow_jeanzay:
