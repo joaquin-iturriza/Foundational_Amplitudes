@@ -246,6 +246,23 @@ ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(ya
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
+# the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
+# LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; events per process 1e4 x factor, the whole train pool at 16;
+# validation events 200 x factor), LONG_LR=<lr> (the 4x lr DyHPO's best, the law's scaling at 16x; 1x keeps the
+# Muon search best). Its own run dir runs/catalog_v4_long/<arm>_w<heads>_x<factor>; the AXES the short arm's plus HD4
+# and HD5 (the default-sampled held-out pools); the H2 multiplicity gap is read from its H2 predictions
+if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
+    case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "LONG_* only on v4_het_default25[_seed2]"; exit 1 ;; esac
+    LH=${LONG_HEADS:-8}; LF=${LONG_FACTOR:-1}
+    case "$LF" in 1|4|16) ;; *) echo "LONG_FACTOR must be 1, 4 or 16"; exit 1 ;; esac
+    ITERS=$((4264 * LF)); ITERS_FIXED=$ITERS
+    SUBS=$((10000 * LF)); [ "$LF" = 16 ] && SUBS=null
+    EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=$SUBS
+           ++data.eval_subsample=$((200 * LF)) evaluation.train_subsample=2000 data.processes_file="$TRAIN")
+    NORM+=(model.net.num_heads=$LH); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
+    OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
+    AXES+=(HD4 HD5)
+fi
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
 [ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"
 # the time limit must hold the training AND every zero-shot read (tools/short_wall.py; the step-11 and step-14 arms of
