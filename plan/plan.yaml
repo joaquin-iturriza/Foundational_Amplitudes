@@ -4814,6 +4814,14 @@ entries:
     decision: D242
     withdrawn_at: '2026-11-01T03:36:55+00:00'
     withdrawn_why: 'the ~400 GPU-h ask is answered: Joaquin asked for both HPO sweeps by name'
+  - ask: May I delete everything under /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache on CC (188 GB of memmap caches, obsolete
+      after the cache-key fix 52b7a537)? /sps/lpnhe is 100% full and every step 16 job died on it.
+    at: '2026-11-01T06:13:50+00:00'
+    searched: '~/work/CLAUDE.md deletion rule; site decisions --project FA: D19/D200 cover sweep/prune.py only (amp_data_cache,
+      not amp_mmap_cache); D84 and D103 covered earlier named caches only'
+    blocks: 'step 16: the 1x pair, the width probes and both DyHPO sweeps'
+    blocks_steps: &id001
+    - 16
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -8313,6 +8321,13 @@ entries:
       sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml, sweep/generate_sweep.py, tools/lr_surface_center.py, tools/short_wall.py,
       scripts/job_catalog_v3_short.sh
     written: '2026-11-01T06:13:19+00:00'
+  ask: May I delete everything under /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache on CC (188 GB of memmap caches, obsolete
+    after the cache-key fix 52b7a537)? /sps/lpnhe is 100% full and every step 16 job died on it.
+  waiting_since: '2026-11-01T06:13:50+00:00'
+  searched: '~/work/CLAUDE.md deletion rule; site decisions --project FA: D19/D200 cover sweep/prune.py only (amp_data_cache,
+    not amp_mmap_cache); D84 and D103 covered earlier named caches only'
+  blocks: 'step 16: the 1x pair, the width probes and both DyHPO sweeps'
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
