@@ -4783,6 +4783,14 @@ entries:
     blocks_steps: []
     answered_at: '2026-11-01T00:12:39.557000+00:00'
     decision: D235
+  - ask: Do you approve about 400 GPU-h in total for the long runs, with a full DyHPO at both 17056 and 68224 steps (width
+      8, full set; the 68224 cells are that HPO's best trial plus a seed-43 run)?
+    at: '2026-11-01T03:28:50+00:00'
+    searched: D235 (go about 157 GPU-h, above about 200 back to Joaquin), D240 (HPO of the long runs asked), CLAUDE.md budget
+      rule
+    blocks: every new step-16 submission
+    blocks_steps: &id001
+    - 16
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -8112,6 +8120,13 @@ entries:
       FA-ccin2p3-c15cdd47, f77a5e0e, 5a6ddb32 (pending)
     files: data_mmap.py, tests/test_memmap_data.py, scripts/job_catalog_v3_short.sh, sweep/sweep_config_ccin2p3_cov_v4_long_lr_x4.yaml
     written: '2026-11-01T03:17:35+00:00'
+  ask: Do you approve about 400 GPU-h in total for the long runs, with a full DyHPO at both 17056 and 68224 steps (width 8,
+    full set; the 68224 cells are that HPO's best trial plus a seed-43 run)?
+  waiting_since: '2026-11-01T03:28:50+00:00'
+  searched: D235 (go about 157 GPU-h, above about 200 back to Joaquin), D240 (HPO of the long runs asked), CLAUDE.md budget
+    rule
+  blocks: every new step-16 submission
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
