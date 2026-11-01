@@ -8290,6 +8290,17 @@ entries:
       alpha_s files (alpha_s power 0), a held-out read on the memmap path. Repo-reviewer FIX (cache key, unsourced eval_subsample
       3200) fixed; eval_subsample 200 per process in every long cell (design re-passed 02:35 by a4faf46b1e1550ebe). Lr DyHPO
       config sweep/sweep_config_ccin2p3_v4_long_lr_x4.yaml @929c3eb4.'
+  - at: '2026-11-01T06:15:49+00:00'
+    text: '2026-11-01 (owner adaed743f490372f8): stale next steps dropped, each finished or superseded: 14 share chosen by
+      Joaquin (D229/D231: 0.25); 15 het uncertainty read done (het_uncertainty, finding 2026-10-31T19:54); 17, 18, 19, 21
+      default-sampled held-out pools built and read (HD4 114/114, HD5 28/28; step-20 verdict and bound re-reads, findings
+      19:54 and 21:17); 22 wall-time table done (tools/job_wall_split.py @8c7534ef, analysis/catalog_v4/data/job_wall_split.json,
+      findings 2026-10-31T15:34 and 15:45); 24 and 25 superseded by the step-16 design passed 2026-11-01T03:34 under D242
+      (width probes and S1/S2 staging replaced by the two full DyHPO sweeps and the 1x width cells; the hand-off''s resubmission
+      order carries the width probes); 26 memmap path extended to dimensionless_inputs and target_physics_orders in f0142f19/1f848f4a
+      with the CPU equivalence test (finding 02:39); 27 configs sent to Joaquin and the D240 ask answered by D242 (approved
+      at estimate). The five cancelled sweeps stay recorded as dead ends (cov_v4_long_lr_x4; cov_v4_long_hpo_x16/_x4; cov_v4_long_dyhpo_68224/_17056
+      in the disk-full dead end). Only step 16 stays, waiting on Joaquin''s go to delete the CC memmap caches.'
   handoff:
     state: 'Step 16 (design passed ~03:35 by a9c9d4760d3b2f095: length verdict 68224-step DyHPO best vs 17056-step DyHPO best,
       template coupled space, 40 trials each, approved D242; 1x widths 16/32 vs the 1x width-8 pair; no seed-43 twins). Everything
