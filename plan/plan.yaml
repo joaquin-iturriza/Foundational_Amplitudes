@@ -7186,6 +7186,12 @@ entries:
     units: null
     start: '2026-10-31T22:34:54+00:00'
     at: '2026-10-31T22:34:54+00:00'
+  - batch: memmap_probe_v100
+    wall_h: 1.5
+    jobs: 1
+    units: null
+    start: '2026-11-01T02:41:45+00:00'
+    at: '2026-11-01T02:41:45+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
