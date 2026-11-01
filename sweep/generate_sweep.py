@@ -350,6 +350,14 @@ def run_generate(config_path, n_trials=None, extend=False, dry_run=False, submit
     cfg = load_config(config_abs_path)
     from run_trial import _check_objective   # an objective the search could game is refused before any trial
     _check_objective(cfg)
+    # with base_config, run.py's config path is that run's directory, which has no config groups: a group override
+    # such as model: lloca becomes ++model=lloca and replaces the whole node by a string (every trial of
+    # cov_v4_long_hpo_x4/x16 died in init_physics on model.net._target_, 2026-11-01); refused before any trial
+    if cfg.get("base_config"):
+        groups = [k for k in (cfg.get("fixed_params") or {}) if k in ("model", "local", "hydra")]
+        if groups:
+            raise SystemExit(f"generate_sweep: fixed_params {groups} are config groups; with base_config they replace "
+                             "the base run's node by a string. Drop them (the base run's own node is used)")
     # Fix the init seed by default so trials differ only by hyperparameters
     # (a config may override by setting its own fixed_params.seed).
     cfg.setdefault("fixed_params", {}).setdefault("seed", 42)
