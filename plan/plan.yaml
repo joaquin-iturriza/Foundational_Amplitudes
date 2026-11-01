@@ -7318,6 +7318,30 @@ entries:
       68224 sweep 8 x 18.6 h = 149 GPU-h; best-trial reads about 4; about 192 GPU-h, inside D242''s approval (item est 1420);
       faster GPUs lower it. Finish: three waves each, 17056 about 3 x 4.9 h = 15 h, 68224 about 3 x 18.6 h = 56 h on V100-class
       GPUs (about 25 h on H100), from the first start.'
+    fix_at: '2026-11-01T17:26:45+00:00'
+    fix: 'Joaquin''s D247 settles placement: any site and any GPU, with each best trial read on its training GPU type. The
+      mixed hardware is accepted as his call. What fails is the move to lxplus, which is not shown to work for this workload.
+      (1) The batch must fit the disk, with a shared cache shown to be shared. On lxplus the memmap cache goes to SCRATCH=/eos/user/j/joiturri/tmp
+      (sites/activate.sh, data_mmap._cache_root), about 20 GB per key. One builder per key is enforced only by fcntl.flock
+      on a .lock file on EOS (data_mmap.py lines 449-464). FA''s own sites.yaml keeps the sweep locks on AFS (''AFS: fcntl
+      locks''), and nothing in the repo or results.tex shows flock holding across nodes on EOS FUSE. If it does not hold,
+      the 3 start-up trials per sweep that start together (6 jobs) each build their own 20 GB copy. Worse, each builder''s
+      stale-staging cleanup rmtree()s the other builders'' live .tmp directories. The design''s disk line still gives only
+      CC''s 153 GB free. Nobody read the EOS quota for the user (/eos/user/j/joiturri/tmp already holds 66 GB; df shows only
+      the 5 PB volume). Fix: show sharing on lxplus the way two trials would do it, for example two concurrent probe jobs
+      (scripts/job_probe.sh) on the same key, where one log says ''built the cache'' and the other ''opening the cache'',
+      with no .tmp removed under a live builder. Or point data.memmap_dir at a filesystem where the lock is known to hold.
+      Read the user''s EOS quota and fit (concurrent builders times 20 GB) plus the shared cache inside it with margin. (2)
+      No probe of this workload on lxplus, as CLAUDE.md requires before a batch (time and disk per unit). The last FA runs
+      on lxplus are 2026-10-08 and of other scripts. The per-trial estimates (4.9 h and 18.6 h) use CC''s V100 rate of 0.967
+      s/step, measured with memmap on /sps. Memmap reads over EOS FUSE, and lxplus''s 46G host-memory slots, are untested.
+      drive.py''s limit of 1.5x + 6 min would kill a trial slowed by EOS I/O. Fix: one short lxplus probe of the memmap path
+      (step rate on its GPU, host memory peak, cache build time and size), and the estimates and limits taken from it. (3)
+      The design text contradicts itself: ''fixed'' says each sweep goes ''through sweep_manager with its default 3 sequential
+      waves ... not --chain'' and also says sweep/drive.py with dyhpo.waves [3,3,2]. Say which one runs, at commit 414edc6d.
+      The other checks hold and need no change: question, measure and its check (ee->ttbar het loss 2.9e-8, 1.2e-8, 5.1e-9;
+      dancat_het_pre NLL -3.35 to -4.10), seeds (1x pair |ln R| 0.450), outcome, the gp, 2000-candidate, 8 trials with 3 start-up
+      HPO (D244, D245, D246), het loss, emission-scales target, full training set, about 192 GPU-h under D242.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
