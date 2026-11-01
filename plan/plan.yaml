@@ -7878,9 +7878,9 @@ entries:
       - 'interval spans 1: length past 17056 is not the limit at this data'
   owner:
     agent: adaed743f490372f8
-    state: working
+    state: stopped
     since: '2026-11-01T06:14:49+00:00'
-    state_at: '2026-11-01T17:10:47.680000+00:00'
+    state_at: '2026-11-01T17:31:09+00:00'
     context: 168658
     context_at: '2026-11-01T17:10:53+00:00'
   findings:
