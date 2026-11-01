@@ -7239,6 +7239,21 @@ entries:
       32); 68224 sweep 8 x 8.2 h = 66 GPU-h (limit 96); best-trial reads 2 x about 1 h; about 86 GPU-h, inside D242''s approval
       (item est 1420). Finish: 17056 about 3 x 2.3 h = 7 h, 68224 about 3 x 8.2 h = 25 h after start (Mon 2 Nov about 01:00
       and 19:00 CET if they start now).'
+    passed_at: '2026-11-01T16:22:09+00:00'
+    reviewer: 'Re-check of design 16:21 @6f7b4060. What changed since efc54ab4: the template and both long configs add dyhpo
+      surrogate gp, 2000 candidates and objective_scale auto. These are Joaquin''s D246 words, and they match the likelihoods
+      project''s sweeps (its latest rafalunc configs: gp, 2000 candidates). FA''s gp path is the likelihoods _suggest_gp plus
+      the signed-objective transform the het NLL needs. sweep_manager makes wave 0 the sweep''s own n_startup, per D245 (a
+      third start-up, then two batches). I checked the formula: 8 trials with 3 start-up gives 3,3,2; 10 gives 3,4,3. Fallback
+      when sweep_config.yaml is unreadable: equal waves, still 3,3,2 at 8. generate_sweep writes sweep_config.yaml into the
+      sweep dir. Both lengths share the same surrogate, so the control stays matched. The laptop test at 8 trials with 3 start-up
+      locates the optimum''s neighbourhood: guided bests -13.1, -12.9, -12.7 against a pool best of -13.1. The guided median
+      beats random on 1 of 3 seeds. That limit is accepted: the 8-trial budget is Joaquin''s (D244), it is the same at both
+      lengths, and the outcome reports a best at a window edge or at its last step as not converged. Unchanged from the earlier
+      pass: both sweeps and both reads on H100 with TF32 on; check 2 (ee->ttbar 2.9e-8, 1.2e-8, 5.1e-9 at 8k, 16k, 32k; dancat_het_pre
+      NLL -3.35 to -4.10); check 3 (seed 42 with the 1x pair''s spread |ln R| 0.450 on PP4); disk 153 GB free against one
+      shared 20 GB cache; about 86 GPU-h under D242. Searched: surrogate, gp, n_candidates, objective_scale, likelihoods sweep
+      configs, D59, D245, D246, plus the earlier terms (cov_v4_long, hpo8, H100, TF32, D219-D244)'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
