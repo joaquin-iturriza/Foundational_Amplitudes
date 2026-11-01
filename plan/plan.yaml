@@ -7067,9 +7067,9 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '16': FA-ccin2p3-da6564de FA-ccin2p3-bd3bc251 (1x width-8 pair, resubmitted after the wall-guard refusal of FA-ccin2p3-89c84a63
-      FA-ccin2p3-55202992); H100 width probes FA-ccin2p3-c15cdd47 FA-ccin2p3-f77a5e0e FA-ccin2p3-5a6ddb32; Joaquin's go on
-      the step-16 GPU-h total
+    '16': FA-ccin2p3-da6564de FA-ccin2p3-bd3bc251 (1x width-8 pair); V100 width probes FA-ccin2p3-8ec30352 (w16) FA-ccin2p3-c242280c
+      (w32) with checkpoint_blocks; H100 width probes FA-ccin2p3-c15cdd47 FA-ccin2p3-f77a5e0e FA-ccin2p3-5a6ddb32; sweeps
+      ccin2p3:cov_v4_long_hpo_x4 and ccin2p3:cov_v4_long_hpo_x16
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
