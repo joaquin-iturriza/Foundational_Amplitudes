@@ -21,7 +21,7 @@ cluster:
   cpus_per_task: 5
   time: '28:00:00'
 paths: null
-sweep_name: cov_v4_long_hpo_x16
+sweep_name: cov_v4_long_dyhpo_68224
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25
 n_trials: 40
 dyhpo:
@@ -33,7 +33,9 @@ fidelity_schedule:
   t_steps:
   - 68224
 fixed_params:
-  model: lloca
+  # no `model: lloca` here: with base_config, run.py's config path is the run dir, which has no model group, so
+  # ++model=lloca replaced the whole model node by the string 'lloca' (every trial died in init_physics on
+  # model.net._target_, 2026-11-01); the base run's model node is already the muP LLoCa
   plot: 'true'
   training.batchsize: 16384
   evaluation.batchsize: 16384
