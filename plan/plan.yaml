@@ -6997,6 +6997,54 @@ entries:
       steps and HPs, both asked by D240; full set D236, validation 200, memmap in all). Configs at 4b3683d4 match the template''s
       search space and budget (40 trials, 300 candidates, 10 start-up), lr windows [8.775e-4, 7.898e-3] and [4.094e-4, 3.685e-3]
       with range extension on.'
+  - at: '2026-11-01T03:33:55+00:00'
+    question: 'Step 16 revised twice (D238 superseded by D240 and Joaquin''s 05:3x ''just do the HPO ... I asked you to run
+      the HPO sweep for the long run, I already aproved it'', relayed by the main session: the long runs ARE the two full
+      DyHPO sweeps, no extra seed-43 run). On catalog_v4 at share 0.25, het loss (D226), emission-scales target (D234), whole
+      training set (D236), width 8: does the tuned 16x (68224 steps) beat the tuned 4x (17056 steps) on the reads, and how
+      do widths 16 and 32 compare with width 8 at 1x (4264)? Sweeps: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml @4b3683d4
+      and _x16.yaml @fa0397e7 (template coupled space and budget, 40 trials, 10 start-up, surface-centred lr, lr range extension).
+      The 4x and 16x cells are each sweep''s best trial (seed 42), read like the other cells by an eval job (sigma-only stage
+      plus every axis, REREAD=<trial run>). The D238 surface-lr pair at 68224 (lr 1.23e-3) is not run: D240 and the 05:3x
+      relay replace it with the 68224 sweep, whose candidates include that lr.'
+    prior: 'As the 03:30 record: dancat_het_pre (32k, AdamW het, 8 trials, best lr 8.9e-3 at its window''s top), muon_test_search_muon
+      (4264, best 5.0e-3), lr*(t,D) surface via tools/lr_surface_center.py @3d12f881 (5.6e-3 at 4264, 2.63e-3 at 17056, 1.23e-3
+      at 68224), ee->ttbar het 8k/16k/32k. No catalog-scale length or width scan found (searched results.tex, plan, decisions:
+      long, HPO, horizon, 32k, 64k, 68224, 17056, dancat_het_pre, muon, lr surface).'
+    measure: 'Per cell at its best checkpoint (het rule: sigma-stage parent, mu at best val_loss_no_reg): R of 16x best over
+      4x best on PP4 (1301), EE4 (169), the 700 default-sampled held-out classes (pooled, per axis), H1-H7c beside, and the
+      H2 multiplicity gap (median e on the 218 H2 pools), mixture_ab''s measure (median over classes, class bootstrap). Each
+      sweep''s objective is the main run''s best val_loss_no_reg (sigma stage off in trials); the sweep''s own trial table
+      (best val_loss_no_reg against each HP, edge and last-step flags) is reported. Width: 1x widths 16 and 32 against the
+      1x width-8 pair, as the 02:35 pass. Information only, never a length verdict: 4x and 16x against the 1x width-8 pair
+      (different tuning procedure), and L(C) = A C^-alpha + L_inf over 1x/4x/16x labelled with that caveat.'
+    check: 'Steps moved the het loss on ee->ttbar (2.9e-8, 1.2e-8, 5.1e-9 at 8k, 16k, 32k, same data); HPs moved a long catalog
+      run''s loss (dancat_het_pre''s 8 trials at 32k: validation NLL -3.35 to -4.10, ordered by lr); share-0.25 1x arms best
+      at their last step (still improving).'
+    fixed: 'Both sweeps share everything but steps and the lr window: base_config runs/catalog_v4_short/v4_het_default25 (recipe
+      catalog_v4_train.yaml share 0.25; dimensionless emission-scales target; HETEROSC mean aggregation, sign head off, clip
+      5, MuonAdamW, batch 16384, 8 blocks 8x0n+2x1n), num_heads 8, seed 42, whole training set, validation 200 per process,
+      memmap path, validate_frac 0.02, the template''s 7 HPs and ranges (lr [c/3, 3c] around the surface: 17056 [8.78e-4,
+      7.90e-3], 68224 [4.09e-4, 3.69e-3], AdamW-measured, untested with Muon past 4264, said with every R; muon_weight_decay
+      [1e-3, 0.3], regularization_lambda [1e-10, 1e-6], warmup_frac [0.05, 0.2], eta_min [1e-10, 1e-7], ema {false,true},
+      ema_decay [0.9, 0.999]), lr range extension on, 40 trials, 300 candidates, 10 start-up, same tuning procedure at both
+      lengths; V100 46G 5 CPUs, 06:30 per 17056 trial, 28:00 per 68224 trial, one job per trial (CC QoS gpu MaxWall 7-00:00:00:
+      the chain of D235 is not needed on CC, so a trial runs unsplit, its data order identical to an unchained run). 1x cells
+      as the 02:35 pass (short arm''s HPs, lr 4.997e-3, muP).'
+    control: 'Length: the 4x sweep''s best (same procedure, same base, same budget) is the control of the 16x sweep''s best.
+      Width: the 1x width-8 pair FA-ccin2p3-da6564de (42) / FA-ccin2p3-bd3bc251 (43) for the 1x widths 16 and 32 (num_heads
+      only). The 1x pair against 4x/16x and f0156d88/df858d33 are read beside as information.'
+    seeds: 'Sweeps seed 42 (one best trial per length, no seed-43 twin, by Joaquin''s 05:3x instruction); 1x cells 42 and
+      43. Cost of the cut: no seed interval on 4x or 16x; the 16x-over-4x R carries the class bootstrap only, widened by the
+      1x pair''s |ln R_seed| (PP4 seed interval 0.450 [0.360, 0.556] at 1x) as the seed-noise stand-in, said wherever it is
+      reported; best-of-40 selection bias is shared by both lengths.'
+    outcome: 'Length yes: 16x best over 4x best R below 1 with its widened interval below 1 on the held-out pool and PP4/EE4:
+      length still pays at this data; the 16x best becomes the foundation pretraining candidate, to Joaquin. Length no: interval
+      spans 1: length past 17056 is not the limit at this data. A sweep whose best lr sits at an extended edge, or whose top
+      trials are best at their last step, is reported as not converged in that HP, with the cell. Width: as the 02:35 pass
+      (1x widths 16/32 R over 1x width 8, short-run caveat; lr transfer read at width 32). Cost (estimate, V100 0.967 s/step
+      memmap, x1.25): 17056 sweep 40 x 6.1 h = 243 GPU-h, 68224 sweep 40 x 23.6 h = 944, best-trial reads 2 x 2 h = 4, 1x
+      width-8 pair 8 (running), 1x widths 16/32 at most 67: about 1266 GPU-h.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
