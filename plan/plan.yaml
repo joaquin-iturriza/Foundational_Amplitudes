@@ -7887,7 +7887,7 @@ entries:
       - 'interval spans 1: length past 17056 is not the limit at this data'
   owner:
     agent: adaed743f490372f8
-    state: working
+    state: closed
     since: '2026-11-01T17:33:33+00:00'
     context: 264829
     context_at: '2026-11-01T17:33:51+00:00'
@@ -8720,34 +8720,43 @@ entries:
       can start on CC until it is lifted (site pick also prints ''cap 0''); jobs ran on CC this morning, so the limit is new.
       Also the 3 H100 nodes have been IDLE+COMPLETING since 16:47. Nothing started; the jobs stay queued.'
   handoff:
-    state: 'Step 16 (design passed ~03:35 by a9c9d4760d3b2f095: length verdict 68224-step DyHPO best vs 17056-step DyHPO best,
-      template coupled space, 40 trials each, approved D242; 1x widths 16/32 vs the 1x width-8 pair; no seed-43 twins). Everything
-      stopped: /sps/lpnhe is full (512 GB) because data_mmap keyed composed-at-load pools by node-local path+mtime, so each
-      job built its own ~20 GB memmap cache (184 GB in $SCRATCH/amp_mmap_cache: 3 complete, 10 partial .tmp). Fixed 52b7a537
-      (content-digest key; tests/test_pool_doc_composed.py), committed, NOT synced (disk full). Earlier fixes: short_wall
-      compose rate 29b1a4b6; configs without the model override 6e32b1b4; generate_sweep guard 5a5b6c6d; PROBE_CKPT/LONG_CKPT
-      3e4d3252; lr centre tool 3d12f881. All five sweeps (cov_v4_long_lr_x4, _hpo_x16, _hpo_x4, _dyhpo_68224, _dyhpo_17056)
-      ended with 0 results. RESUBMISSION ORDER once Joaquin says to delete the caches: (1) delete /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
-      contents (record his words with site decide); (2) site sync ccin2p3 FA (52b7a537); (3) 1x width-8 pair: job_catalog_v3_short.sh
-      v4_het_default25 and v4_het_default25_seed2, LONG_HEADS=8 LONG_FACTOR=1 LONG_MEMMAP=true, V100 --mem=46G --time=04:00:00;
-      (4) V100 width probes: mode probe PROBE_HEADS=16 and 32, PROBE_MEMMAP=true PROBE_CKPT=true, 46G 1:00 (or read the H100
-      probes c15cdd47/f77a5e0e/5a6ddb32 if they ran), then 1x w16/w32 x seeds 42/43; (5) both DyHPO sweeps from fresh state
-      with new sweep_name values: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml and _x4.yaml @6e32b1b4 (generate on
-      CC, sweep_manager submit --chain --capacity 6; the site gate counts recent jobs at their limits: item est 1420 GPU-h,
-      D242), targets 265 h / 70 h; check after the first trials that only one cache key is built. Then: each sweep''s best
-      trial gets an eval job (sigma-only stage + every axis, REREAD=<trial run>) and the 16x-vs-4x read.'
-    decisions: D238 superseded by D240/D242 (the long runs are the two full DyHPO sweeps, approved at estimate); D241 HP work
-      is a full DyHPO; D236 full set at every length; D237 report configs; item est 1420 GPU-h (reserved ceiling) under D242;
-      trials run unsplit (CC QoS gpu MaxWall 7 days), not as resumed chains
-    ruled_out: 'lr-only search (D239-D241); fixed_params model: lloca under base_config (breaks the model node); lxplus for
-      the sweeps (24 h flavour below the 68224 trial, workload untested there); memmap key on composed-pool path/mtime (one
-      cache per job)'
-    running: none of step 16's training; H100 width probes FA-ccin2p3-c15cdd47, FA-ccin2p3-f77a5e0e, FA-ccin2p3-5a6ddb32 still
-      pending (will fail while the disk is full)
-    files: data_mmap.py, mix_compose.py, tests/test_pool_doc_composed.py, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml,
-      sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml, sweep/generate_sweep.py, tools/lr_surface_center.py, tools/short_wall.py,
-      scripts/job_catalog_v3_short.sh
-    written: '2026-11-01T06:13:19+00:00'
+    state: 'Step 16 (long-run DyHPO, design passed 2026-11-01T17:29 by af8bc336031948642). Stage 0: two lxplus probe jobs
+      through the trials'' own path, FA-lxplus-fdf08708 (lr 2.633e-3) and FA-lxplus-f44c7c06 (lr 1.5e-3): sweep/trial_job.sh
+      with TRIAL_TIMEV=1 -> run_trial --detached, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, --t-steps 1000, 46G,
+      5 CPUs, gpu_min_mem 24G, 3 h, plan wait on step 16. On their end read both logs whole (site logs -n 100000). PASS reads:
+      (a) lock: different hosts (trial_job prints host=), the second job''s ''data.memmap: waiting for the lock of <key> on
+      <host>'' before the first''s ''built the cache'', then the second logs ''opening the cache'', and only one <key> dir
+      and no leftover .tmp under /eos/user/j/joiturri/tmp/amp_mmap_cache; (b) both rc 0 with a RESULT_JSON; (c) host peak
+      (''Maximum resident set size'', /usr/bin/time) under 46G, else mem = peak x1.25; (d) TRIAL_GPU and the step rate between
+      validations, validation cost and cache build time (tools/job_wall_split.py on the logs), cache size by du. FAIL: same
+      host or no overlap = lock untested -> repeat the probe once (third job submitted while the first builds) or set data.memmap_dir
+      to node-local storage with a 20 GB disk request; a second builder = flock does not hold on EOS -> node-local memmap_dir;
+      delete any extra probe cache key (only the probe made it). NEXT on pass: set cluster.time in both configs to the measured
+      estimate (steps x rate + validations + cache build; drive.py limit is 1.5x + 6 min), commit, site sync lxplus and ccin2p3,
+      record targets (plan target), then start two drivers under tools/detach.py --entry catalog_coverage: python sweep/drive.py
+      --config sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml --item catalog_coverage --sites lxplus ccin2p3 (and the
+      same for _x16.yaml), waves [3,3,2] from dyhpo.waves; after the first trials start check that exactly one cache key is
+      built; each trial''s GPU is in its RESULT_JSON (sweeps_local/<name>/results). Then each sweep''s best trial gets an
+      eval read on its training GPU type (sigma-only stage plus every axis, REREAD) and the 16x-vs-4x R. CC: account MaxJobs=0
+      (AssocMaxJobsLimit) since ~17:30, all CC GPU jobs blocked; the 16 sweep_manager jobs were cancelled unstarted. Held
+      under D243 until Joaquin speaks: the 1x width-8 pair, width probes, 1x widths 16/32.'
+    decisions: 'D243 caches deleted (/sps/lpnhe 100% -> 71%), no resubmission of step 16''s other cells; D244 HPO = start-up
+      then 2 sequential batches, about 8 trials (template 8247811a: 8 trials, n_startup 3); D245 layout 1/3 start-up then
+      two batches at any size (sweep_manager wave 0 = n_startup, 6f7b4060; drive.py dyhpo.waves); D246 likelihoods setup as
+      FA default: surrogate gp, n_candidates 2000, objective_scale auto (6f7b4060); D247 any site and any GPU, lxplus has
+      no 24 h cap (flavour follows wall time, 5a1dd0d3; site pick/submit --gpu-min-mem; overrides the same-hardware FIX; each
+      best trial read on its training GPU type); D242 both sweeps approved at estimate (about 192 GPU-h at V100 rates, item
+      est 1420).'
+    ruled_out: H100-only placement (overridden by D247); sweep_manager on CC (MaxJobs=0; one-site state); 40-trial/10-start-up
+      budget (D244); flavour 'tomorrow' as a 24 h cap; rebuilding pools on lxplus (all catalog_v4_default25 pools, default-source
+      pools, alphas and sidecars already there, check_site_data 0 missing).
+    running: FA-lxplus-fdf08708, FA-lxplus-f44c7c06 (lxplus probes, IDLE at hand-off, plan wait on step 16)
+    files: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml (@414edc6d),
+      sweep/sweep_config_jeanzay_template.yaml, sweep/drive.py, sweep/run_trial.py (_rerooted_base_paths, gpu in RESULT_JSON),
+      sweep/trial_job.sh (TRIAL_TIMEV, TRIAL_GPU), data_mmap.py (lock log b9c44085), sweep/sweep_manager.py, siteconf.py,
+      sweep/finalize_sweep.py, tests/test_condor_flavour.py, tests/test_siteconf_partition.py, ~/.local/bin/site (_secs, FLAVOURS,
+      --gpu-min-mem; backups site.bak-20261101-*), runs/catalog_v4_short/v4_het_default25 (copied to lxplus)
+    written: '2026-11-01T17:35:17+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
