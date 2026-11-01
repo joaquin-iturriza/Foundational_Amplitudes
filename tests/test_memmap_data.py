@@ -31,8 +31,8 @@ import data_mmap as dm  # noqa: E402
 from dataset import AmplitudeDataset, build_flat_arrays, collate_variable_length  # noqa: E402
 
 PINNED_NUMPY = "1.26.4"
-RUN_CONFIG, SET = None, []
-FACTOR_RTOL = 1e-10            # data.target_physics_factor's float64 factor and the statistics fitted after it     # --run-config / --set (section 2 on a run's own config)
+RUN_CONFIG, SET = None, []     # --run-config / --set (section 2 on a run's own config)
+FACTOR_RTOL = 1e-10            # data.target_physics_factor's float64 factor and the statistics fitted after it
 
 
 def section0_reductions():
