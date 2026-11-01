@@ -7261,6 +7261,12 @@ entries:
     units: null
     start: '2026-11-01T03:14:47+00:00'
     at: '2026-11-01T03:14:47+00:00'
+  - batch: step16_1x_w8_pair
+    wall_h: 3.6
+    jobs: 2
+    units: null
+    start: '2026-11-01T03:30:49+00:00'
+    at: '2026-11-01T03:30:49+00:00'
   step_why:
     14:
       feeds: which default share catalog_v4's pools carry (D178 priority 1)
