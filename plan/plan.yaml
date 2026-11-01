@@ -3483,6 +3483,9 @@ entries:
       and target_physics_orders, so the long runs'' whole-pool load takes 94 GB host. Measure where the 94 GB goes, extend
       memmap to those two inputs with a CPU equivalence test against the in-memory load, repo-reviewer, then one V100 width-8
       probe on memmap for its host peak.'
+    27: 'Told Joaquin 2026-11-01 05:2x (D240): send him both DyHPO config paths (17056 and 68224 steps, width 8, full set,
+      template coupled space) at their commit with the GPU-h table, after the design reviewer passes them; nothing new submitted
+      until his go on about 400 GPU-h.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7335,6 +7338,11 @@ entries:
       if:
       - 'memmap fits a V100 share: the long runs may use V100s'
       - 'it does not: H100 chains as planned'
+    27:
+      feeds: 'D240: the long runs'' HPO and its cost'
+      if:
+      - 'Joaquin approves the cost: submit both HPOs and the seed-43 runs at their best'
+      - 'he cuts it: redesign to his cut'
   owner:
     agent: a6abb471b22a991ce
     state: working
