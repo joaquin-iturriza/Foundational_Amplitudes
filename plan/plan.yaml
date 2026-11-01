@@ -4364,6 +4364,15 @@ entries:
       fix 52b7a537 (in-memory load at 200G, one cache per job); resubmitted after the cache deletion as step 16's width probes
       at the synced commit
     at: '2026-11-01T06:56:59+00:00'
+  - tried: DyHPO sweeps ccin2p3:cov_v4_long_hpo8_68224 (jobs 62935928-35) and ccin2p3:cov_v4_long_hpo8_17056 (62935936-43),
+      sweep_manager 3 waves on gpu_h100, configs @6f7b4060, 2026-11-01 ~17:35 CET
+    why: 'cancelled unstarted ~17:50 (sweep_manager cancel; 0 results): CC''s association MaxJobs=0 kept every trial PENDING
+      (AssocMaxJobsLimit), and Joaquin''s D247 (''just send it on lxplus and to whatever gpu accepts it'') moved both sweeps
+      to sweep/drive.py (one laptop-held DyHPO state per sweep, trials on lxplus and any site, configs @414edc6d) after an
+      lxplus probe; the same sweep names are reused by drive.py under sweeps_local/. The five older ccin2p3 sweeps (cov_v4_long_lr_x4,
+      cov_v4_long_hpo_x16, cov_v4_long_hpo_x4, cov_v4_long_dyhpo_68224, cov_v4_long_dyhpo_17056) are dead ends recorded above
+      (lr-only search cancelled; model-node crash; disk full).'
+    at: '2026-11-01T17:34:23+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
