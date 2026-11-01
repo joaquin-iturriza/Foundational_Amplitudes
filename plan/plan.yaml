@@ -6678,6 +6678,73 @@ entries:
       Optional, not a fail: the 1x lr 4.997e-3 was found at 1e4 events per process (6.8 epochs); at the whole set it is 0.68
       epoch, and results.tex puts eta* rising weakly with D (D^0.15-0.3, saturating), so add that to the existing untuned-lr
       caveat on the 1x control.'
+  - at: '2026-11-01T02:25:15+00:00'
+    question: 'Step 16 (D219, D229, D231, D234, D235, D236): on catalog_v4 at share 0.25 with the het loss (D226) and the
+      emission-scales target (D234), every cell trained on the whole training set (1e5 events per tree process, 5e4 per one-loop
+      process; D236: only the steps move), how do the reads fall with training steps, and how do widths 16 and 32 compare
+      with width 8 at the short length? Cells, seeds 42 and 43 each: 1x (4264 steps) at widths 8, 16, 32; 4x (17056) and 16x
+      (68224) at width 8 only (Joaquin''s cut D235; 68224 as chains of resumed jobs). 10 runs, plus a single-fidelity lr DyHPO
+      at 4x width 8 (8 trials). Stages: S1 = the 1x cells (6 runs) and the DyHPO; S2 = 4x and 16x width 8 (4 runs)'
+    prior: 'As the 22:25 design: muP eta* flat over num_heads 2-32 and the inverted-U law, both measured with AdamW (Muon
+      not); ee->ttbar het 8k/16k/32k (2.9e-8, 1.2e-8, 5.1e-9, best at the last step); 32k at D=1e3 over-trains; sec:bigrun
+      one width. This grid is also plan v3_prep_explore next 7 (capacity and length for the multiplicity gap, D216), whose
+      read is added. No catalog-scale length or width scan found (scaling, width, num_heads, horizon, long, wider, capacity,
+      bigrun, muP, inverted-U, full pretraining).'
+    measure: 'Per run at its best checkpoint (the het arms'' rule: sigma_stage parent, mu at best val_loss_no_reg): R against
+      the full-set 1x width-8 het pair (mixture_ab measure: median over classes, class bootstrap widened by |ln R_seed|) on
+      PP4 (1301), EE4 (169), the 700 default-sampled held-out classes (pooled, per axis), the catalog-sampled H1-H7c beside,
+      and the multiplicity gap: median e on the 218 H2 held-out pools (par:v4_shape_gap, eval-only on these runs). Scaling:
+      L(C) = A C^-alpha + L_inf on val_loss_no_reg, labelled steps-only scaling at fixed data (the whole training set in every
+      cell, C = steps x FLOPs per step), at width 8 (the only width with more than one length). Blow-ups with mixture_ab''s
+      het rule; a spike recovered (the het share arms spiked to 1e8-2e9 near step 2000) listed, a run whose best checkpoint
+      precedes its spike listed apart.'
+    check: 'Length: ee->ttbar het fell 2.9e-8 to 5.1e-9 from 8k to 32k, best at the last step; the share-0.25 runs are best
+      at step 4250-4264 of 4264 (mixture_ab blowups): still improving at 1x. Width has no catalog-scale data: S1''s 1x widths
+      16 and 32 are that check, the 1x widths 16 and 32 are the only width cells (D235) and their R over the full-set 1x width
+      8 is a short-run result. Steps alone (data fixed) moved the loss in the ee->ttbar het runs (same training set at 8k/16k/32k).'
+    fixed: 'Recipe catalog_v4_train.yaml (share 0.25); target and preprocessing the settled ones: the dimensionless target
+      with the emission scales (target_physics_factor, dim_only, s0 1.0, target_physics_dim_ref=qperp, target_physics_orders,
+      dimensionless_inputs, shared_standardization, affine_multiplicity_std false; job_catalog_v3_short.sh DIM, as the control
+      pair), kept for the long runs by Joaquin''s choice D234 (''Emission scales is fine then''); the het share arm''s setup
+      (job_catalog_v3_short.sh v4_het_default25: HETEROSC, mean aggregation, sign head off, sigma-only end stage D70, clip
+      5 D72, MuonAdamW, muon_weight_decay 0.02171863, batch 16384, cosine over the run, 8 blocks, 8x0n+2x1n); events: the
+      whole training set at every length (1e5 per tree process, 5e4 per one-loop process; about 1.0e8 train events, so 1x
+      is about 0.7 epoch, 4x 2.7, 16x 10.8), validation 3200 per process, the same in every cell (D236: only the steps move;
+      job_catalog_v3_short.sh LONG_FACTOR scales iterations only, 1a737c34); lr: 1x keeps 4.997e-3 at every width (muP); that
+      4.997e-3 is the Muon search''s best at 4264 steps under the MSE loss, carried to het untuned (the control pair f0156d88/df858d33
+      used it), while 4x gets a het DyHPO, so part of a 4x-over-1x gain may be lr tuning: said wherever a length R is reported;
+      it was also found at 1e4 events per process (about 6.8 epochs), while the full-set 1x is about 0.68 epoch, and docs/results.tex
+      puts the optimal lr rising weakly with data (about D^0.15 to D^0.3, saturating), so the 1x control''s lr is untuned
+      for this data size too; 4x and 16x take S1''s DyHPO best at 4x width 8 (window [7.8e-4, 7.0e-3], ±1/2 decade around
+      the law''s 2.34e-3), 16x that times 4^-0.55 (an extrapolation, read by its best-checkpoint position). Before S1: a 200-step
+      probe per width 8, 16, 32 on the whole pool, on a V100 and on an H100 (CC gpu_v100 and gpu_h100, 6 jobs, about 3 GPU-h
+      at most): s/step (the run''s avg s/iter, with LLOCA_PROFILE_STEP=1''s data/step split), GPU peak memory, host memory
+      and load time; the grid''s cost is recomputed from it (no s/step proportional to num_heads assumption) and goes to Joaquin
+      before S1 or S2 (D219). Cells longer than the site''s job limit run as a chain of resumed jobs (checkpoint resume),
+      laid out after the probe. Placement and cost (D235, D219): every cell now loads the whole train pool (94.0 GB RSS in
+      memory before the first step, V100 probe FA-ccin2p3-f907c7dc OOM at 90G): the runs go out on the memmap path (data_mmap.py)
+      once it carries dimensionless_inputs and target_physics_orders and passes its equivalence test against the in-memory
+      load (LONG_MEMMAP=true); the 68224-step cells run as chains of resumed jobs (D235); the cost is recomputed from the
+      H100 probes (s/step per width); Joaquin''s go D235 covers about 157 GPU-h; a recost above about 200 GPU-h goes back
+      to him before submission.'
+    control: 'The new 1x width-8 pair on the whole training set (seeds 42/43, in S1): every other cell differs from it in
+      steps only (4x, 16x; lr from the DyHPO, 16x by the law''s t^-0.55) or in num_heads only (1x widths 16, 32). The existing
+      short pair FA-ccin2p3-f0156d88/df858d33 trained on 1e4 events per process is NOT a matched control any more (different
+      data size): it is read beside, and 1x-full over 1x-1e4 at equal steps (0.68 vs 6.8 epochs of their sets) is reported
+      only as information on data size at fixed steps, never as a length or width result.'
+    seeds: 42 and 43 in every cell and for the DyHPO's best rerun at 4x.
+    outcome: 'Scope cut by Joaquin (D235): S2 runs width 8 only, so the width-16/32 cells exist at 1x only; what it costs:
+      no answer to whether a wider network gains at long training (D219''s ''bigger models, wider''); 1x widths 16/32 R over
+      the full-set 1x width 8 are reported as the short-run width result, with the caveat that a short run is where width
+      is expected not to help. The lr-transfer read at 1x width 32 (best checkpoint in its last 5%, no blow-up) is still reported
+      (it tells whether muP+Muon transfers the lr at width 32 for a later wider round). Length yes (against the full-set 1x
+      width-8 pair): 4x and 16x width 8 R below 1 with interval below 1 on the held-out pool and PP4/EE4: L(C) gives L_inf,
+      the longest width-8 run becomes the foundation pretraining candidate, to Joaquin. Length no: 16x within the seed interval
+      of 4x (or of 1x): length is not the limit at this data; if the best checkpoint sits before 60% of steps the lr is too
+      high, at the last step with the loss still falling too low, either reported to Joaquin with the cell, not refit. The
+      H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore). The existing 1e4-event
+      short runs (f0156d88/df858d33) are read beside: full set over 1e4 at 4264 steps is information on data size at fixed
+      steps only.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
