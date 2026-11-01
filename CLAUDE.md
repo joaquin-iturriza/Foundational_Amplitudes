@@ -41,7 +41,7 @@ on the sites (`~/work/CLAUDE.md`).
 - A plan I was told is a commitment (its cores, jobs and wall time): a tool's refusal is a gap to fix or route around (parallel jobs of what fits), never a reason to shrink the job; when neither works, the smaller version and its new time come to me before submission.
 - Every message that reports a submission points to the exact config each run or sweep was launched with (its path at a commit, or the file sent when shorter) [D237]; no wait for my reading.
 - Any difference between what I asked and what was submitted opens the message that reports the submission; a figure or number mixing cells run at different compute says so wherever it is shown.
-- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost [D153]; under it, run it and show me what ran.
+- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost [D153]; work I asked for by name is approved at its estimate, shown to me, not asked [D242]; under it, run it and show me what ran.
 - Reading state, git and file edits are never confirm-first.
 - Work exists only as a plan entry, changed only through `tools/plan.py`; every submission names its entry's item (`--item`).
 - Before proposing or designing a run or analysis, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or that none was found.
@@ -51,7 +51,7 @@ on the sites (`~/work/CLAUDE.md`).
 - One agent owns each piece of work in progress and covers all of it: it is resumed on every event of that work, stopped while it waits on jobs, and closed near 300k tokens of context with a hand-off it writes on its entry.
 - A brief to an agent starts from `plan/step_prompt.txt`; what is added may narrow the task, never override its scope or capacity rules.
 - μP only: the maintained models are μP LLoCa (`model: lloca`, the default), μP L-GATr (`lgatr_mup`) and μP L-GATr slim (`lgatr_slim`); everything else is legacy, ignored unless I ask, never fixed or used in a solution.
-- A hyperparameter question goes through a single-fidelity DyHPO sweep, never a hand-rolled grid, whatever it is called; job arrays are for non-HP axes (seeds, data tags, ablation flags).
+- A hyperparameter question goes through a single-fidelity DyHPO sweep over the template's coupled space, never a hand-rolled grid or a one-HP search, whatever it is called; a one-HP search I did not ask for comes to me as an explicit proposal with its reason and runs only on my yes to it [D241]; job arrays are for non-HP axes (seeds, data tags, ablation flags).
 - Lookup agents (Explore, claude-code-guide) run at low effort.
 
 ## Clusters and jobs
