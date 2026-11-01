@@ -50,6 +50,13 @@ fixed_params:
   training.heterosc_sigma_stage_steps: 0
   model.net.num_heads: 8
   seed: 42
+# lr range extension (sweep/dyhpo_sampler.py check_and_extend_ranges, defaults: after 10 observations, when 3 of the
+# top 5 sit in the outer 20% of the window, the edge moves 3x, at most 3 times): the one catalog-scale long HPO,
+# dancat_het_pre at 32k steps (docs/results.tex, AdamW het), found its best lr 8.9e-3 at the top of its window, above
+# the surface's 1.9e-3 there, so the window may need to move up.
+range_extension:
+  enabled: true
+  params: [training.lr]
 search_space:
 - name: training.lr
   type: float_log
