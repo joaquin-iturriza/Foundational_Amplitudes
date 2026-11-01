@@ -7653,11 +7653,11 @@ entries:
     start: '2026-11-01T16:14:51+00:00'
     at: '2026-11-01T16:14:51+00:00'
   - batch: cov_v4_long_hpo8_17056
-    wall_h: 7.0
+    wall_h: 15.0
     jobs: 8
     units: null
-    start: '2026-11-01T16:17:39+00:00'
-    at: '2026-11-01T16:17:39+00:00'
+    start: '2026-11-01T17:26:15+00:00'
+    at: '2026-11-01T17:26:15+00:00'
   step_why:
     16:
       feeds: 'D219: whether length past 17056 still pays at this data'
