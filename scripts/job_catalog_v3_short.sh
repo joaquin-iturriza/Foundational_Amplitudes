@@ -248,7 +248,7 @@ EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=fals
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
 # LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; only the steps move: every cell trains on the whole train pool,
-# 1e5 events per tree process, 5e4 one-loop, and validates on 3200 per process, Joaquin D236), LONG_LR=<lr> (the 4x lr DyHPO's best, the law's scaling at 16x; 1x keeps the
+# 1e5 events per tree process, 5e4 one-loop, and validates on 200 per process like the short arms, Joaquin D236), LONG_LR=<lr> (the 4x lr DyHPO's best, the law's scaling at 16x; 1x keeps the
 # Muon search best). Its own run dir runs/catalog_v4_long/<arm>_w<heads>_x<factor>; the AXES the short arm's plus HD4
 # and HD5 (the default-sampled held-out pools); the H2 multiplicity gap is read from its H2 predictions
 if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
@@ -257,7 +257,7 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     case "$LF" in 1|4|16) ;; *) echo "LONG_FACTOR must be 1, 4 or 16"; exit 1 ;; esac
     ITERS=$((4264 * LF)); ITERS_FIXED=$ITERS
     EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=${LONG_MEMMAP:-false} ++data.train_subsample=null
-           ++data.eval_subsample=3200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
+           ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
     NORM+=(model.net.num_heads=$LH); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
     AXES+=(HD4 HD5)
@@ -309,7 +309,7 @@ PY
     AXES=(H1 H5 "${CROSS[@]}")
 fi
 # mode probe (catalog_coverage step 16, the long runs' cost): PROBE_HEADS=<num_heads> runs 200 steps at the 16x
-# cell's data (every train event of the pool in memory, train_subsample null; eval_subsample 3200 = 200 x 16), no
+# cell's data (every train event of the pool, train_subsample null; eval_subsample 200 as the short arms), no
 # evaluation, no sigma stage, then stops: the log gives the load time (job start to the first iteration), s/iter
 # (avg and LLOCA_PROFILE_STEP's data/step split), the GPU peak and, from /usr/bin/time, the host peak memory.
 # Its run dir is a zz_probe_ scratch dir of this job. The GPU model is printed (submit with --partition to choose it).
@@ -324,7 +324,7 @@ if [ "$MODE" = probe ]; then
         run_name=null warm_start_idx=null base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
         training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" \
         training.iterations=200 training.validate_frac=0.5 evaluate=false data.processes_file="$TRAIN" \
-        ++data.memmap=${PROBE_MEMMAP:-false} ++data.train_subsample=null ++data.eval_subsample=3200 evaluation.train_subsample=2000 \
+        ++data.memmap=${PROBE_MEMMAP:-false} ++data.train_subsample=null ++data.eval_subsample=200 evaluation.train_subsample=2000 \
         ++training.heterosc_sigma_stage_steps=0 model.net.num_heads="$H" 2>&1 | tee "$OUT.log"
     RC=${PIPESTATUS[0]}
     echo "PROBE_END $(date +%s) rc=$RC"

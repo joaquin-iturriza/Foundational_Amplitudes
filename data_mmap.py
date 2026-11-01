@@ -257,6 +257,21 @@ def _pool_doc(path):
     return [os.path.abspath(path), int(st.st_size), int(st.st_mtime_ns), rid]
 
 
+def _orders_inputs(exp, names):
+    import mg5_pipeline_final as mg
+    ddir = exp.cfg.model.get("diagrams_dir", "data/diagrams")
+    if not os.path.isabs(ddir):
+        ddir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
+    out = []
+    for n in names:
+        pc = mg.PROCESSES.get(n, {})
+        sc = exp._resolve_diagram_path(ddir, n)
+        out.append(_jsonable([list(exp._orders_of(n)),
+                              {k: pc.get(k) for k in ("kind", "order", "alphas_prefactor", "nfinal")},
+                              exp._diagram_born_orders(n), None if sc is None else _pool_doc(sc)[:3]]))
+    return out
+
+
 def _alphas_path(pool):
     """the per-event alpha_s next to a pool (mg5_pipeline_final.build_lhe_pp; tools/recover_alphas.py)"""
     return pool[:-len(".npy")] + ".alphas.npy"
@@ -287,12 +302,14 @@ def _code_hash():
     from lloca.utils import polar_decomposition, rand_transforms
     E = experiment.AmplitudeExperiment
     import physics_scales
+    import mg5_pipeline_final as mg
     parts = [inspect.getsource(m) for m in (
         __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition,
         physics_scales)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
-        E._setup_offshell_masks, E._physics_logF, E._eikonal_logS, E._orders_of)]
+        E._setup_offshell_masks, E._physics_logF, E._eikonal_logS, E._orders_of,
+        E._diagram_born_orders, E._target_orders_source, mg.sidecar_born_orders, mg.target_monomial_from_diagrams)]
     parts += [np.__version__, torch.__version__]
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
@@ -388,6 +405,10 @@ def init_data_recipes_mmap(exp, c):
         "alphas": ({r: [_pool_doc(a) if os.path.exists(a) else None
                         for a in (_alphas_path(c["paths"][r][n]) for n in names)] for r in roles}
                    if orders_on else None),
+        # data.target_physics_orders: what the coupling monomial the target divides by is resolved from, per process
+        # (experiment._physics_logF): its order vector, the catalog entry's fields, the Born orders its diagram sidecar
+        # gives and that sidecar file itself (keyed here whatever offshell_per_event says)
+        "orders_in": (_orders_inputs(exp, names) if orders_on else None),
         "dimless": ([float(cfg.data.get("dimless_offshell_eps", 1e-6)),
                      _jsonable(c.get("dimless_mass_stats"))] if dimless else None),
         "order_rows": _jsonable(order_rows),
@@ -691,9 +712,10 @@ def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve
     for r in roles:
         os.remove(os.path.join(d, f"stage_amp_{r}.npy"))
     if dimless:
-        lrs = np.asarray(order_out[:, F])
+        lrs = np.asarray(order_out[::max(1, N // 1000000), F])      # a strided sample: the log line only
         LOGGER.info(f"dimensionless_inputs ON (memmap): momenta per event / sqrt(s_hat), masses as "
                     f"log10(m / sqrt(s_hat)), off-shellness / s_hat; sqrt(s_hat) {np.median(10 ** lrs):.4g} GeV median "
+                    f"over {len(lrs)} events "
                     f"({np.percentile(10 ** lrs, 5):.4g} to {np.percentile(10 ** lrs, 95):.4g})")
         del rs_st, lrs
         for r in roles:
