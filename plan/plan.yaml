@@ -3447,9 +3447,10 @@ entries:
       and 68224 steps (sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml and _x16.yaml @6e32b1b4, 40 trials each, item est
       1420 GPU-h) and 1x widths 16/32 against the 1x width-8 pair. Waits on Joaquin''s go to delete /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
       (disk full). On his go, the hand-off''s resubmission order: site decide his words, delete the caches, site sync ccin2p3
-      FA (52b7a537 cache key), 1x width-8 pair, width probes, 1x w16/w32 seeds 42/43, both sweeps from fresh state under new
-      sweep names, check after the first trials that one cache key is built; then each sweep''s best trial gets an eval job
-      (REREAD) and the 16x-vs-4x read'
+      FA (52b7a537 cache key), 1x width-8 pair, width probes w16/w32 (V100 46G 1:00, PROBE_MEMMAP=true PROBE_CKPT=true; the
+      H100 probes c15cdd47/f77a5e0e/5a6ddb32 were cancelled unstarted, E3532, so they are not read), 1x w16/w32 seeds 42/43,
+      both sweeps from fresh state under new sweep names, check after the first trials that one cache key is built; then each
+      sweep''s best trial gets an eval job (REREAD) and the 16x-vs-4x read'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
