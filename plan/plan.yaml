@@ -4372,6 +4372,11 @@ entries:
       there says the 16x in-memory load does not fit a V100 share, and the H100 probes (1.5 TB nodes, waiting on a GPU only)
       measure the host need'
     at: '2026-10-31T23:42:42+00:00'
+  - tried: lr-only DyHPO cov_v4_long_lr_x4 at 17056 steps (sweep/sweep_config_ccin2p3_cov_v4_long_lr_x4.yaml @ab95de6a, 8
+      trials; 3 ran about 1 h, 5 pending), cancelled 2026-11-01 ~04:25 CET
+    why: 'Joaquin D239/D240: an lr-only search breaks HPO rules 3, 5, 6 (coupled space, template ranges and budget) and was
+      never approved by him; replaced by the full DyHPO configs _hpo_x4/_hpo_x16 @4b3683d4'
+    at: '2026-11-01T03:31:14+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
