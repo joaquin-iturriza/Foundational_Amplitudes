@@ -221,10 +221,18 @@ def _compare(A, B, label):
 
 
 def section2_end_to_end(sweep_config, n_procs, out):
+    keep = os.path.join(os.path.dirname(out.rstrip("/")), os.path.basename(out.rstrip("/")) + "_inmem_prev.npz")
     shutil.rmtree(out, ignore_errors=True)
     cache = os.path.join(out, "cache")
     on = ["++data.memmap=true", f"++data.memmap_dir={cache}"]
     A = _build(sweep_config, n_procs, os.path.join(out, "off"), [])
+    # the in-memory path against its own previous process (same inputs, another process): what it reproduces
+    if os.path.exists(keep):
+        P = dict(np.load(keep, allow_pickle=False))
+        _diagnose({k: A[k] for k in P}, P, "flag off vs flag off of the previous process")
+    np.savez(keep, **{k: np.asarray(A[k], dtype=np.float64) for k in (
+        "prepd_mean", "prepd_std", "particles_flat", "all_amplitudes", "all_order_labels")
+        if A.get(k) is not None}, **({"all_amp_factor": A["all_amp_factor"]} if A.get("all_amp_factor") is not None else {}))
     if os.environ.get("MEMMAP_TEST_TWIN"):     # the in-memory path against itself: its own run-to-run differences
         _diagnose(A, _build(sweep_config, n_procs, os.path.join(out, "off_twin"), []), "flag off vs off (twin)")
     B = _build(sweep_config, n_procs, os.path.join(out, "on"), on)
