@@ -2,7 +2,8 @@
 # the long runs while we are at it", and the lr-only search cov_v4_long_lr_x4 cancelled as against HPO rules 3, 5, 6):
 # the full single-fidelity DyHPO of the long width-8 runs at 17056 steps (x4 of the 4264-step short arm), built from
 # sweep/sweep_config_jeanzay_template.yaml: its coupled search space, its narrowed ranges and its trial budget
-# (40 trials, 10 random start-up, 300 candidates). Every trial starts from the resolved configuration of the het
+# (8 trials, 3 random start-up, 300 candidates; Joaquin D244: start-up then 2 sequential batches, submitted as
+# sweep_manager's 3 waves, not --chain). Every trial starts from the resolved configuration of the het
 # share-0.25 short arm (runs/catalog_v4_short/v4_het_default25: catalog_v4_train at share 0.25, HETEROSC with mean
 # aggregation, the emission-scales dimensionless target D234, MuonAdamW, batch 16384, 8 blocks, 8x0n+2x1n, num_heads 8),
 # so a trial differs from it only in the lines below: the whole training set (train_subsample null, D236), validation
@@ -21,13 +22,13 @@ cluster:
   cpus_per_task: 5
   time: '06:30:00'
 paths: null
-sweep_name: cov_v4_long_dyhpo_17056
+sweep_name: cov_v4_long_hpo8_17056
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25
-n_trials: 40
+n_trials: 8
 dyhpo:
   n_candidates: 300
   seed: 42
-  n_startup: 10
+  n_startup: 3
   total_budget: 10000
 fidelity_schedule:
   t_steps:
@@ -52,7 +53,8 @@ fixed_params:
   training.heterosc_sigma_stage_steps: 0
   model.net.num_heads: 8
   seed: 42
-# lr range extension (sweep/dyhpo_sampler.py check_and_extend_ranges, defaults: after 10 observations, when 3 of the
+# lr range extension (sweep/dyhpo_sampler.py check_and_extend_ranges, defaults: after 10 observations, so not reached
+# at 8 trials; when 3 of the
 # top 5 sit in the outer 20% of the window, the edge moves 3x, at most 3 times): the one catalog-scale long HPO,
 # dancat_het_pre at 32k steps (docs/results.tex, AdamW het), found its best lr 8.9e-3 at the top of its window, above
 # the surface's 1.9e-3 there, so the window may need to move up.

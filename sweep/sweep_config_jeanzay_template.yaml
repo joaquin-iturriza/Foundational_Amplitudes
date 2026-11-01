@@ -7,12 +7,12 @@ cluster:
 
 paths:
 sweep_name: my_sweep_name
-n_trials: 40
+n_trials: 8                # start-up then 2 sequential DyHPO batches (sweep_manager's 3 waves); project practice since HPO rule 5 (D244)
 
 dyhpo:
   n_candidates: 300
   seed: 42
-  n_startup: 10
+  n_startup: 3
   total_budget: 10000
 
 fidelity_schedule:
