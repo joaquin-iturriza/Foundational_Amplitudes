@@ -162,7 +162,28 @@ def _plain(x):
     return x
 
 
+def _diagnose(A, B, label):
+    """every array and statistic, equal or not, with its largest relative difference (to locate a mismatch)"""
+    for k in A:
+        a, b = A[k], B[k]
+        if k in ("mmap_dir", "run_dir", "train", "val", "proc_val", "proc_train_eval", "train_eval", "rng", "perm",
+                 "flags", "vocab", "_slot_pdgs_by_name", "amp_trafos", "_amp_trafos_pp", "cfg_net"):
+            continue
+        try:
+            x, y = np.asarray(a, dtype=np.float64), np.asarray(b, dtype=np.float64)
+        except (TypeError, ValueError):
+            continue
+        if x.shape != y.shape:
+            print(f"  [diag {label}] {k}: shapes {x.shape} vs {y.shape}")
+            continue
+        d = np.abs(x - y) / np.maximum(np.abs(x), 1e-300)
+        n = int((x != y).sum())
+        print(f"  [diag {label}] {k}: {n} of {x.size} differ, max rel {float(d.max()) if d.size else 0.0:.3g}"
+              + (f"; first at {np.argwhere(x != y)[0].tolist()}" if n else ""))
+
+
 def _compare(A, B, label):
+    _diagnose(A, B, label)
     for k in A:
         if k in ("mmap_dir", "run_dir", "train", "val", "proc_val", "proc_train_eval", "train_eval"):
             continue
