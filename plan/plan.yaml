@@ -6663,6 +6663,21 @@ entries:
       H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore). The existing 1e4-event
       short runs (f0156d88/df858d33) are read beside: full set over 1e4 at 4264 steps is information on data size at fixed
       steps only.'
+    fix_at: '2026-11-01T02:24:52+00:00'
+    fix: 'Re-check of the 02:24 re-record for D236 (diffed against the 00:13 pass). The substance holds: every cell on the
+      whole training set, a new matched 1x width-8 full-set pair as control (length cells differ in steps and the lr the design
+      sets, width cells in num_heads only), job_catalog_v3_short.sh @1a737c34 sets train_subsample=null and eval_subsample=3200
+      for every LONG_FACTOR, the 1e4 short pair read beside only as data-size information, memmap only after its equivalence
+      test, and the length check now cites the fixed-data ee->ttbar het runs. Two fields still carry the dropped design and
+      contradict D236 (''Sorry, but why would you do that with the dataset size? that was never shown to me, and it makes
+      no sense at all''), and the write-up to Joaquin is built from these fields: (a) measure: ''Scaling: L(C) ... labelled
+      steps-and-data scaling (events per process grow with steps, below)'' is false now; label it steps-only scaling at fixed
+      data (D fixed at the whole set, C = steps x per-step FLOPs). (b) check: ''the 4x/16x width cells are gated only on the
+      lr-transfer read at width 32'' refers to cells D235 removed; say instead that the 1x widths 16/32 are the only width
+      cells and their R is a short-run result. Re-record with those two sentences corrected; nothing else needs to change.
+      Optional, not a fail: the 1x lr 4.997e-3 was found at 1e4 events per process (6.8 epochs); at the whole set it is 0.68
+      epoch, and results.tex puts eta* rising weakly with D (D^0.15-0.3, saturating), so add that to the existing untuned-lr
+      caveat on the 1x control.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
