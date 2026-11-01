@@ -6581,6 +6581,17 @@ entries:
       at this data; if the best checkpoint sits before 60% of steps the lr is too high, at the last step with the loss still
       falling too low, either reported to Joaquin with the cell, not refit. The H2 multiplicity gap read reports whether capacity
       or length moves it (next 7 of v3_prep_explore).'
+    passed_at: '2026-11-01T00:14:28+00:00'
+    reviewer: 'Re-record for Joaquin''s D235 (2026-11-01 00:12, ''Only width 8, 68224 separated as a chain is fine, keep that
+      change''); diffed against the 00:07 design passed: question, fixed and outcome changed, nothing else. The cut is Joaquin''s,
+      recorded in his words, and the outcome states what it costs (no wider-at-long-training answer to D219), so the scope
+      check holds; the width-16/32 1x cells stay and are reported as the short-run width result with its caveat. Placement:
+      V100 probe FA-ccin2p3-f907c7dc OUT_OF_MEMORY (oom_kill in its log, site runs), so 16x on H100 as resumed chains, recost
+      from the H100 probes c15cdd47/f77a5e0e/5a6ddb32 (SUBMITTED, not yet read), above about 200 GPU-h back to Joaquin. Measurement
+      unchanged: length shown on data (ee->ttbar het 2.9e-8 -> 1.2e-8 -> 5.1e-9; share-0.25 runs best at 4250-4264 of 4264),
+      seeds 42/43 against widened share-A/B intervals (PP4 0.450 [0.360,0.556]), HETEROSC (D226), emission-scales target (D234),
+      default-sampled reads (D227). Wording: the question still asks whether width 8 is big enough at the longest length,
+      which the cut no longer answers; the outcome says so, report it that way. Searched as before plus D235 in site decisions.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
