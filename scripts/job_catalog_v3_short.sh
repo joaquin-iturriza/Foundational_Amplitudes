@@ -258,7 +258,7 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     ITERS=$((4264 * LF)); ITERS_FIXED=$ITERS
     EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=${LONG_MEMMAP:-false} ++data.train_subsample=null
            ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
-    NORM+=(model.net.num_heads=$LH); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
+    NORM+=(model.net.num_heads=$LH model.net.checkpoint_blocks=${LONG_CKPT:-false}); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
     AXES+=(HD4 HD5)
 fi
@@ -313,6 +313,8 @@ fi
 # evaluation, no sigma stage, then stops: the log gives the load time (job start to the first iteration), s/iter
 # (avg and LLOCA_PROFILE_STEP's data/step split), the GPU peak and, from /usr/bin/time, the host peak memory.
 # Its run dir is a zz_probe_ scratch dir of this job. The GPU model is printed (submit with --partition to choose it).
+# PROBE_CKPT=true (and LONG_CKPT=true for the long cells) gradient-checkpoints the transformer blocks
+# (model.net.checkpoint_blocks: one extra forward per step, the activations not kept), for widths 16/32 on a V100.
 # PROBE_MEMMAP=true loads on the memmap path (data_mmap.py; the cache under $SCRATCH/amp_mmap_cache, built on a miss).
 if [ "$MODE" = probe ]; then
     H="${PROBE_HEADS:?PROBE_HEADS=<num_heads> for mode probe}"
@@ -325,7 +327,7 @@ if [ "$MODE" = probe ]; then
         training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" \
         training.iterations=200 training.validate_frac=0.5 evaluate=false data.processes_file="$TRAIN" \
         ++data.memmap=${PROBE_MEMMAP:-false} ++data.train_subsample=null ++data.eval_subsample=200 evaluation.train_subsample=2000 \
-        ++training.heterosc_sigma_stage_steps=0 model.net.num_heads="$H" 2>&1 | tee "$OUT.log"
+        ++training.heterosc_sigma_stage_steps=0 model.net.num_heads="$H" model.net.checkpoint_blocks=${PROBE_CKPT:-false} 2>&1 | tee "$OUT.log"
     RC=${PIPESTATUS[0]}
     echo "PROBE_END $(date +%s) rc=$RC"
     grep -E "Maximum resident set size|Elapsed \(wall" "$OUT.log" | sed 's/^/PROBE_HOST /'
