@@ -8218,6 +8218,12 @@ entries:
       with the CPU equivalence test (finding 02:39); 27 configs sent to Joaquin and the D240 ask answered by D242 (approved
       at estimate). The five cancelled sweeps stay recorded as dead ends (cov_v4_long_lr_x4; cov_v4_long_hpo_x16/_x4; cov_v4_long_dyhpo_68224/_17056
       in the disk-full dead end). Only step 16 stays, waiting on Joaquin''s go to delete the CC memmap caches.'
+  - at: '2026-11-01T15:58:06+00:00'
+    text: '2026-11-01 ~16:0x (D243): checked first that nothing of ours ran or queued on CC (squeue empty, no python process
+      on the login node); deleted every file under /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache (du 184G -> 2.5K, 0 entries
+      left: 3 complete caches, 10 partial .tmp, their .lock files); df /sps/lpnhe 512G used 512G (44M free, 100%) -> 360G
+      used, 153G free, 71%. CC checkout synced to bd5027a9 (contains 52b7a537, the content-digest cache key). Nothing submitted:
+      step 16 held by D243 (''Don''t resubmit jobs, I have things to say about that'').'
   handoff:
     state: 'Step 16 (design passed ~03:35 by a9c9d4760d3b2f095: length verdict 68224-step DyHPO best vs 17056-step DyHPO best,
       template coupled space, 40 trials each, approved D242; 1x widths 16/32 vs the 1x width-8 pair; no seed-43 twins). Everything
