@@ -7254,6 +7254,70 @@ entries:
       NLL -3.35 to -4.10); check 3 (seed 42 with the 1x pair''s spread |ln R| 0.450 on PP4); disk 153 GB free against one
       shared 20 GB cache; about 86 GPU-h under D242. Searched: surrogate, gp, n_candidates, objective_scale, likelihoods sweep
       configs, D59, D245, D246, plus the earlier terms (cov_v4_long, hpo8, H100, TF32, D219-D244)'
+  - at: '2026-11-01T17:25:14+00:00'
+    question: 'Step 16, revised for D244 (Joaquin 2026-11-01T16:09: ''some initialization runs, and then 2 sequential batches,
+      for a total of about 8 trials ... this is what should be done here as well''): on catalog_v4 at share 0.25, het loss
+      (D226), emission-scales target (D234), whole training set (D236), width 8: does the tuned 16x (68224 steps) beat the
+      tuned 4x (17056 steps) on the reads? Only the two DyHPO sweeps go now: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      and _x16.yaml at the commit after the repo review (sweeps cov_v4_long_hpo8_17056 and cov_v4_long_hpo8_68224), run by
+      sweep/drive.py on any site and GPU that takes them (D247) 8 trials and 3 random start-up each (the template, fixed @8247811a,
+      and the project''s practice: muon_test_search_* 8/3, catalog_steps_* 6/3), everything else as @6e32b1b4. The 1x width
+      cells (width-8 pair, width probes, widths 16/32) stay held by D243 and are not part of this submission. Each sweep''s
+      best trial (seed 42) is read like the other cells by an eval job (sigma-only stage plus every axis, REREAD=<trial run>).'
+    prior: 'As the 03:33 design: dancat_het_pre (32k, AdamW het, 8 trials, best lr 8.9e-3 at its window''s top), muon_test_search_muon
+      (4264, 8 trials 3 start-up, best 5.0e-3), lr*(t,D) surface via tools/lr_surface_center.py @3d12f881 (5.6e-3 at 4264,
+      2.63e-3 at 17056, 1.23e-3 at 68224), ee->ttbar het 8k/16k/32k. No catalog-scale length scan (searched results.tex, plan,
+      decisions D219-D244).'
+    measure: 'Per cell at its best checkpoint (het rule: sigma-stage parent, mu at best val_loss_no_reg): R of 16x best over
+      4x best on PP4 (1301), EE4 (169), the 700 default-sampled held-out classes (pooled, per axis), H1-H7c beside, and the
+      H2 multiplicity gap, mixture_ab''s measure (median over classes, class bootstrap). Each sweep''s objective is the main
+      run''s best val_loss_no_reg (sigma stage off in trials); each sweep''s trial table (best val_loss_no_reg against each
+      HP, edge and last-step flags) reported. Information only: 4x/16x against the 1x width-8 cells when those run, L(C) =
+      A C^-alpha + L_inf labelled with that caveat.'
+    check: 'Steps moved the het loss on ee->ttbar (2.9e-8, 1.2e-8, 5.1e-9 at 8k, 16k, 32k, same data); HPs moved a long catalog
+      run''s loss (dancat_het_pre''s 8 trials at 32k: validation NLL -3.35 to -4.10, ordered by lr); share-0.25 1x arms best
+      at their last step (still improving).'
+    fixed: 'Both sweeps share everything but steps and the lr window, placement included: base_config runs/catalog_v4_short/v4_het_default25
+      (share 0.25, emission-scales target, HETEROSC mean, MuonAdamW, batch 16384, 8 blocks 8x0n+2x1n), num_heads 8, seed 42,
+      whole training set, validation 200 per process, memmap path (content-digest cache key 52b7a537: both sweeps share one
+      cache, about 20 GB, 153 GB free), validate_frac 0.02, the template''s 7 HPs and ranges (lr [c/3,3c]: 17056 [8.78e-4,7.90e-3],
+      68224 [4.09e-4,3.69e-3]; muon_weight_decay [1e-3,0.3], regularization_lambda [1e-10,1e-6], warmup_frac [0.05,0.2], eta_min
+      [1e-10,1e-7], ema {false,true}, ema_decay [0.9,0.999]), surrogate gp (plain GP, Matern-5/2 ARD + white noise, EI over
+      the candidates; the likelihoods setup, FA''s practice since D59, as the Muon searches), 2000 candidates, objective_scale
+      auto (standardises the signed het NLL once a value is <= 0; the Muon searches used linear on a positive objective),
+      8 trials, 3 random start-up (n_trials/3), same procedure at both lengths. Layout: each sweep submitted alone through
+      sweep_manager with its default 3 sequential waves (afterany; wave 0 = the sweep''s n_startup, sweep_manager @6f7b4060:
+      3+3+2 trials, start-up then 2 surrogate-guided batches), not --chain. lr range extension on but not reached (it acts
+      after 10 observations). Placement (D247, Joaquin 2026-11-01T17:10: ''just send it on lxplus and to whatever gpu accepts
+      it''; this overrides the 16:14 same-hardware FIX): sweep/drive.py keeps one DyHPO state per sweep on the laptop and
+      sends stateless trials wherever site pick places them (lxplus HTCondor, CC-IN2P3 when its job limit allows; Jean Zay
+      excluded), on any whole GPU with at least 24 GB (gpu_min_mem 24G against the 18.6 GB width-8 peak: V100, A100, H100,
+      H200; T4 excluded), 46G host, 5 CPUs; waves [3,3,2] (dyhpo.waves; each wave suggested once every earlier trial has ended).
+      Per-trial estimate on the slowest GPU (V100 0.967 s/step memmap): 17056 4.9 h, 68224 18.6 h; drive.py''s limit 1.5x
+      + 6 min (7.45 h workday, 28 h testmatch on HTCondor; the flavour now follows the wall time, 5a1dd0d3). Each trial''s
+      RESULT_JSON names its GPU; GPU type and TF32 (on for A100/H100, a no-op on V100) are reported per trial and per best
+      cell, and both best-trial reads run on the same GPU type as their trial. Data: every pool and sidecar of catalog_v4_default25
+      (control and default-source pools, alphas) already on lxplus (check_site_data: prebuilt, 0 missing, 0 without alphas);
+      the base run dir copied CC -> lxplus with site copy; its /sps paths re-rooted per site by run_trial. Tests on the laptop:
+      sweep/test_sampler_learns.py --surrogate gp --objective nll at 30 trials 5 start-up passes on seeds 0-2 (guided median
+      -12.9/-12.9/-12.8 vs random -10.5/-10.4/-10.5, pool best -13.1); at 8 trials 3 start-up guided bests -13.1/-12.9/-12.7
+      (pool best -13.1) but the guided median beats random only on seed 0 (fails the test''s median criterion on seeds 1,
+      2): with 5 guided picks the budget locates the optimum''s neighbourhood, not its median; the 8-trial budget is Joaquin''s
+      (D244).'
+    control: 'Length: the 4x sweep''s best (same procedure, same base, same budget of 8 trials) is the control of the 16x
+      sweep''s best. GPU type may differ between and within the sweeps (Joaquin''s call, D247); each cell''s GPU and TF32
+      state is stated with its R, and the read of each best trial uses its training GPU type.'
+    seeds: 'Seed 42, one best trial per length (no seed-43 twin, Joaquin''s 05:3x instruction). Cost: no seed interval on
+      4x or 16x; the R carries the class bootstrap widened by the 1x pair''s |ln R_seed| (PP4 0.450 [0.360,0.556]) as the
+      seed-noise stand-in, said wherever reported; best-of-8 selection bias shared by both lengths; with 8 trials the lr optimum
+      is located to about the 2 DyHPO batches'' resolution, and an lr best at a window edge is reported as not converged.'
+    outcome: 'Length yes: 16x best over 4x best R below 1 with its widened interval below 1 on the held-out pool and PP4/EE4:
+      length still pays at this data; the 16x best becomes the foundation pretraining candidate, to Joaquin. Length no: interval
+      spans 1: length past 17056 is not the limit at this data. Not converged (best lr at an edge, or top trials best at their
+      last step): reported with the cell. Cost (estimate at V100 rates, the upper bound): 17056 sweep 8 x 4.9 h = 39 GPU-h;
+      68224 sweep 8 x 18.6 h = 149 GPU-h; best-trial reads about 4; about 192 GPU-h, inside D242''s approval (item est 1420);
+      faster GPUs lower it. Finish: three waves each, 17056 about 3 x 4.9 h = 15 h, 68224 about 3 x 18.6 h = 56 h on V100-class
+      GPUs (about 25 h on H100), from the first start.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
