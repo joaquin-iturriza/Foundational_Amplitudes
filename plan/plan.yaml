@@ -7109,6 +7109,23 @@ entries:
       x 8.2 h H100 = 66 GPU-h (limit 96); best-trial reads 2 x 2 h = 4; about 119 GPU-h, inside D242''s approval (item est
       1420). Finish: 17056 about 3 x 6.1 h = 18 h, 68224 about 3 x 8.2 h = 25 h after start (Mon 2 Nov about 11:00 and 18:00
       CET).'
+    fix_at: '2026-11-01T16:16:40+00:00'
+    fix: 'Only the asked axis moves (and one change against a matched control): the revision puts the 68224-step sweep on
+      gpu_h100 only (TF32 active) while the 17056-step sweep stays on gpu_v100,gpu_h100, where it will mostly land on V100
+      (TF32 a no-op; the design''s own cost assumes 8 x 6.1 h V100). The GPU type and matmul precision now move together with
+      training length, without Joaquin''s words for it: no decision names H100 (searched site decisions and his messages of
+      2026-11-01; his 16:09 message speaks of 8 trials and timing only), and the x16 config comment ''D244: the 68224-step
+      sweep on H100s when free'' attributes words to D244 that it does not contain. docs/results.tex sec:tf32-eval leaves
+      exactly this open (''Not settled: whether the study''s V100/A100/H100 mix moves its cell values beyond the run-to-run
+      spread'', the training-side A/B covers two small cells) and shows evaluation at a precision other than the training
+      one moves a model''s loss up to 133x. Fix: pin the 17056-step sweep to gpu_h100 as well (17056 x 0.33 s x 1.25 = about
+      2 h per trial, so cheaper and sooner, which serves his Monday deadline; 3 concurrent trials per sweep fit the 12 H100s),
+      or keep the split only with a measured reason; state that both best trials are read by eval jobs on H100 with TF32 on,
+      the precision they trained at; correct the x16 config comment so it no longer cites D244 for H100, and recompute cost
+      and finish times. Everything else checked holds: config diffs against 6e32b1b4 are only n_trials 8, n_startup 3, sweep
+      names, comments, and for x16 partition and the 12 h limit; template 8/3 at 8247811a matches D244 (start-up then 2 sequential
+      batches, sweep_manager''s 3 waves 3+3+2); /sps/lpnhe has 153 GB free against one shared 20 GB content-keyed cache; the
+      check, seeds and outcome are unchanged from the passed design.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
