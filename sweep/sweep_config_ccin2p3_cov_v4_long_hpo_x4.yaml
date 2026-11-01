@@ -2,7 +2,7 @@
 # the long runs while we are at it", and the lr-only search cov_v4_long_lr_x4 cancelled as against HPO rules 3, 5, 6):
 # the full single-fidelity DyHPO of the long width-8 runs at 17056 steps (x4 of the 4264-step short arm), built from
 # sweep/sweep_config_jeanzay_template.yaml: its coupled search space, its narrowed ranges and its trial budget
-# (8 trials, 3 random start-up, 300 candidates; Joaquin D244: start-up then 2 sequential batches, submitted as
+# (8 trials, 3 random start-up, 2000 candidates, gp surrogate, objective_scale auto; Joaquin D244: start-up then 2 sequential batches, submitted as
 # sweep_manager's 3 waves, not --chain). Every trial starts from the resolved configuration of the het
 # share-0.25 short arm (runs/catalog_v4_short/v4_het_default25: catalog_v4_train at share 0.25, HETEROSC with mean
 # aggregation, the emission-scales dimensionless target D234, MuonAdamW, batch 16384, 8 blocks, 8x0n+2x1n, num_heads 8),
@@ -30,9 +30,11 @@ sweep_name: cov_v4_long_hpo8_17056
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_default25
 n_trials: 8
 dyhpo:
-  n_candidates: 300
+  surrogate: gp              # the template's (likelihoods setup, D59): plain GP, Matern-5/2 ARD + white noise, EI
+  n_candidates: 2000
+  objective_scale: auto      # the het NLL is signed: standardised once any value is <= 0
   seed: 42
-  n_startup: 3
+  n_startup: 3               # n_trials / 3; then two sequential batches (sweep_manager's 3 waves: 3, 3, 2)
   total_budget: 10000
 fidelity_schedule:
   t_steps:

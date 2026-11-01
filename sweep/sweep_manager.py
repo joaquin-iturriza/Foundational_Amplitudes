@@ -93,6 +93,16 @@ def save_registry(path, reg):
     os.replace(tmp, path)
 
 
+def _startup_of(sweep_dir):
+    """dyhpo.n_startup of a generated sweep (its sweep_config.yaml), None when not readable."""
+    try:
+        import yaml
+        with open(os.path.join(sweep_dir, "sweep_config.yaml")) as f:
+            return int(((yaml.safe_load(f) or {}).get("dyhpo") or {}).get("n_startup"))
+    except Exception:
+        return None
+
+
 def sweep_name_from_dir(d):
     return os.path.basename(os.path.normpath(d))
 
@@ -409,9 +419,18 @@ def submit_sweeps(sweep_dirs, weight=None, registry=DEFAULT_REGISTRY, dry_run=Fa
     if seq_batches is None:
         seq_batches = 3 if len(new_items) == 1 else 1
     seq_batches = max(1, min(int(seq_batches), len(ordered)))
-    # Contiguous, roughly-equal waves over the round-ordered trials. batch_of[i] is
-    # the wave index of the i-th ordered trial.
+    # Contiguous waves over the round-ordered trials. batch_of[i] is the wave index of the
+    # i-th ordered trial. A lone sweep in 3 waves follows the layout rule (D244): wave 0 is
+    # its random start-up (dyhpo.n_startup of its sweep_config.yaml), the two sequential
+    # surrogate-guided batches split the rest (8 trials, 3 start-up -> 3, 3, 2); otherwise
+    # roughly equal waves.
+    n_start = _startup_of(sweep_dirs[0]) if (len(new_items) == 1 and seq_batches == 3) else None
+    if n_start is not None and not (0 < n_start < len(ordered) - 1):
+        n_start = None
+
     def _batch_of(i):
+        if n_start is not None:
+            return 0 if i < n_start else 1 + ((i - n_start) * 2) // (len(ordered) - n_start)
         return (i * seq_batches) // len(ordered)
 
     print(f"Submitting {len(ordered)} trials across {len(new_items)} sweep(s), "

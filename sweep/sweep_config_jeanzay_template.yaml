@@ -7,12 +7,16 @@ cluster:
 
 paths:
 sweep_name: my_sweep_name
-n_trials: 8                # start-up then 2 sequential DyHPO batches (sweep_manager's 3 waves); project practice since HPO rule 5 (D244)
+n_trials: 8
+# Layout (D244, any trial count): n_startup = n_trials/3 random start-up trials, then two sequential surrogate-guided
+# batches covering the rest (sweep_manager submit's default 3 waves, afterany-chained; 8 -> 3, 3, 2). Not --chain.
 
 dyhpo:
-  n_candidates: 300
+  surrogate: gp              # plain GP (Matern-5/2 ARD + white noise, EI over the candidates): the likelihoods setup, FA's since D59
+  n_candidates: 2000
+  objective_scale: auto      # standardises once any value is <= 0 (the signed het NLL)
   seed: 42
-  n_startup: 3
+  n_startup: 3               # n_trials / 3
   total_budget: 10000
 
 fidelity_schedule:
