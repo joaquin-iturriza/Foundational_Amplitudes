@@ -6745,6 +6745,19 @@ entries:
       H2 multiplicity gap read reports whether capacity or length moves it (next 7 of v3_prep_explore). The existing 1e4-event
       short runs (f0156d88/df858d33) are read beside: full set over 1e4 at 4264 steps is information on data size at fixed
       steps only.'
+    passed_at: '2026-11-01T02:25:34+00:00'
+    reviewer: 'Re-check of the 02:25 design (D236 revision with the two stale sentences corrected; diffed against 02:24: only
+      measure, check and fixed changed, and no ''steps-and-data'', ''grow with steps'' or ''gated only'' text remains in any
+      field). Every cell trains on the whole training set (job_catalog_v3_short.sh @1a737c34: train_subsample=null, eval_subsample=3200
+      at every LONG_FACTOR); control is the new full-set 1x width-8 het pair, seeds 42/43; length cells differ in steps and
+      the lr the design sets, width cells (1x 16/32 only, D235) in num_heads only; the scaling fit is labelled steps-only
+      at fixed data. Check 2: steps alone at fixed data moved the loss in the ee->ttbar het runs (2.9e-8 -> 1.2e-8 -> 5.1e-9
+      at 8k/16k/32k, results.tex par. het trained longer); the share-0.25 runs are best at 4250-4264 of 4264 (mixture_ab.json),
+      still improving. Check 3: seeds 42/43 against the share A/B''s widened intervals (PP4 0.450 [0.360,0.556]), expected
+      length effect about 2.5x per 4x. The 1x lr is untuned for het and for the full data size, stated as a caveat on every
+      length R. HETEROSC (D226), emission-scales target (D234), default-sampled reads (D227), D235 cut with its cost stated,
+      D236 applied. Searched: scaling, width, num_heads, horizon, long, longer, wider, capacity, bigrun, muP, inverted-U,
+      full pretraining in results.tex, the plan and site decisions (D219-D236): no earlier catalog-scale length scan.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
