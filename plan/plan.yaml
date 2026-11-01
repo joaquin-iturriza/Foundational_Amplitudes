@@ -3469,8 +3469,6 @@ entries:
     21: 'Step 18 last 4 tree pools: hd_test_e20_aaccx (FA-ccin2p3-6581e775 FA-ccin2p3-e58cb2fe), hd_ddx_dhuxwp__E20 (FA-ccin2p3-62f8cc25,
       queue hd_test_e20_small_runs), hd_test_5body_b (FA-ccin2p3-8f072868 FA-ccin2p3-9d27468a); then check_site_data: 114/114
       test pools, H5 28/28 already'
-    22: 'Wall-time table from logs: catalog MSE/het arms vs 2-3 standard short trainings of 4264 steps (loading, steps, validations,
-      final evaluation), with the one-line cause; to Joaquin (his 2026-10-31 objection to 3.6 h / 5.6 h)'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7442,11 +7440,6 @@ entries:
       - 'all 142 present: step 20 HD4/HD5 eval-only rereads of the 12 arms (walls from short_wall at S_PROBE 0.71 for MSE;
         het at its measured old rate until a het read measures the cached path)'
       - 'a pool fails or assembles short: read its log, fix its layout from the measured share, requeue'
-    22:
-      feeds: whether the catalog arms' wall time is a defect to fix before the eval-only re-read and the next arms
-      if:
-      - 'the arms'' extra time is a defect (loading, composition, evaluation layout): fix it before any re-read or new arm'
-      - 'the extra time is the design''s 2171-process evaluation: Joaquin decides the evaluation''s size'
   owner:
     agent: adaed743f490372f8
     state: working
