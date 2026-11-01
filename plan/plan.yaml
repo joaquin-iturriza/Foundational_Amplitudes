@@ -7471,7 +7471,7 @@ entries:
     agent: a6abb471b22a991ce
     state: stopped
     since: '2026-11-01T03:20:19+00:00'
-    state_at: '2026-11-01T03:48:20+00:00'
+    state_at: '2026-11-01T03:48:40.175000+00:00'
     context: 193824
     context_at: '2026-11-01T03:43:26+00:00'
   findings:
