@@ -225,6 +225,8 @@ def section2_end_to_end(sweep_config, n_procs, out):
     cache = os.path.join(out, "cache")
     on = ["++data.memmap=true", f"++data.memmap_dir={cache}"]
     A = _build(sweep_config, n_procs, os.path.join(out, "off"), [])
+    if os.environ.get("MEMMAP_TEST_TWIN"):     # the in-memory path against itself: its own run-to-run differences
+        _diagnose(A, _build(sweep_config, n_procs, os.path.join(out, "off_twin"), []), "flag off vs off (twin)")
     B = _build(sweep_config, n_procs, os.path.join(out, "on"), on)
     assert B["mmap_dir"] and os.path.exists(os.path.join(B["mmap_dir"], "meta.json"))
     _compare(A, B, "flag off vs on (cache built)")
