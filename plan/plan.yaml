@@ -4386,6 +4386,13 @@ entries:
       GPU-h. Fixed 6e32b1b4 (configs, renamed cov_v4_long_dyhpo_68224/_17056), guard 5a5b6c6d (generate_sweep refuses group
       fixed_params under base_config)'
     at: '2026-11-01T03:48:15+00:00'
+  - tried: 'step 16 jobs of 2026-11-01 04:25-04:56 CET: 1x pair da6564de/bd3bc251, sweeps cov_v4_long_dyhpo_68224/_17056 (first
+      trials), V100 width probes 8ec30352/c242280c'
+    why: '/sps/lpnhe filled (512 GB): data_mmap keyed composed-at-load pools by node-local path+mtime, so every job built
+      its own ~20 GB memmap cache (184 GB in $SCRATCH/amp_mmap_cache); runs died without tracebacks (ENOSPC on their logs),
+      later trials failed at start. Fixed 52b7a537 (content digest key, tests/test_pool_doc_composed.py). All step-16 jobs
+      stopped except the 3 pending H100 probes; resubmission waits on Joaquin''s go to delete the obsolete caches'
+    at: '2026-11-01T04:00:30+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
