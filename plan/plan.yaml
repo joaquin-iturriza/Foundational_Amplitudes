@@ -4380,6 +4380,12 @@ entries:
     why: 'Joaquin D239/D240: an lr-only search breaks HPO rules 3, 5, 6 (coupled space, template ranges and budget) and was
       never approved by him; replaced by the full DyHPO configs _hpo_x4/_hpo_x16 @4b3683d4'
     at: '2026-11-01T03:31:14+00:00'
+  - tried: DyHPO sweeps cov_v4_long_hpo_x16 / cov_v4_long_hpo_x4 (configs @fa0397e7 / @4b3683d4), 2026-11-01 ~04:38 CET
+    why: 'every trial died in init_physics (ConfigAttributeError model.net._target_): fixed_params model: lloca became ++model=lloca
+      under base_config and replaced the model node by a string; the afterany chain released each next trial; 35 jobs, 0.56
+      GPU-h. Fixed 6e32b1b4 (configs, renamed cov_v4_long_dyhpo_68224/_17056), guard 5a5b6c6d (generate_sweep refuses group
+      fixed_params under base_config)'
+    at: '2026-11-01T03:48:15+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
