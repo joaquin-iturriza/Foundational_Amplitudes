@@ -21,7 +21,8 @@ cluster:
   mem: 46G
   cpus_per_task: 5
   time: '12:00:00'
-  # H100 only (D244: the 68224-step sweep on H100s when free): het on H100 assumed at the MSE control's 0.33 s/step
+  # H100 only, as the 17056-step sweep, so the 16x-over-4x read compares the same GPU and TF32 precision (design
+  # review 2026-11-01; placement asked by the main session to finish by Monday, D244's deadline): het on H100 assumed at the MSE control's 0.33 s/step
   # (FA-ccin2p3-339ec100; het and MSE run alike on V100, 0.94-1.00 s/step): 68224 x 0.33 s = 6.3 h + 16 min cache,
   # x1.25 = 8.2 h; limit 12 h. The first trials' logs measure the rate.
   partition: gpu_h100
