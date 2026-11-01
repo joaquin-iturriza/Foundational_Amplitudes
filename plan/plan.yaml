@@ -6910,7 +6910,7 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '16': FA-ccin2p3-08a0f39f FA-ccin2p3-c15cdd47 FA-ccin2p3-f77a5e0e FA-ccin2p3-5a6ddb32
+    '16': FA-ccin2p3-89c84a63 FA-ccin2p3-55202992 FA-ccin2p3-c15cdd47 FA-ccin2p3-f77a5e0e FA-ccin2p3-5a6ddb32
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
