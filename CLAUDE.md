@@ -91,7 +91,7 @@ on the sites (`~/work/CLAUDE.md`).
 - fa-generation: how a generation batch is probed, cut, laid out and watched, and how catalog_v4 is regenerated; pushed on `lhe_*`, `gen_catalog_*`, `mg5_pipeline_final`.
 - fa-catalog-reference: what catalog_v3 and catalog_v4 pools contain and how they are sampled; pushed with fa-generation.
 - fa-canonical-setup: the decided run defaults and the one sweep template; pushed on sweep configs and `site submit`.
-- fa-sweeps-and-hpo: DyHPO, `sweep_manager`, running a sweep on its site, rebalancing, the HPO search ranges; pushed on `sweep/**`.
+- fa-sweeps-and-hpo: DyHPO, `sweep_manager`, `drive.py`, rebalancing, the HPO search ranges; pushed on `sweep/**`.
 - fa-data: which datasets a run saw, process classes, sampling roles, the data pipeline; pushed on `dataset.py`, recipes, run configs.
 - fa-model: the model code map, particle encoding, coupling orders, μP; pushed on `models/**`, `wrappers.py`.
 - fa-run-and-config: `run.py`, the experiment classes, the Hydra configs; pushed on `run.py`, `config/**`.
