@@ -8824,6 +8824,13 @@ entries:
       gpu_v100 8 idle nodes, gpu_h100 0 idle; /sps/lpnhe 152G free; catalog_v4 pools are on CC. lxplus: 1 running + 9 queued
       of ours. Nothing submitted, nothing cancelled; the lxplus DAGs 13110747/13110751 and width runs e512219a, e2dbd507,
       b13188d5, 86b59b90 stay queued.'
+  - at: '2026-11-02T11:47:39+00:00'
+    text: 'FREEZE (coordinator 2026-11-02): data_mmap.py and every module its _code_hash reads (preprocessing, particle_ids,
+      multiplicity_extrap, lloca rand_transforms/polar_decomposition, physics_scales, the experiment.py methods and mg5_pipeline_final
+      functions it lists) are not edited until both CC sweeps cov_v4_long_hpo8_cc_17056/_68224 end: the cache key hashes their
+      source, so any edit makes each later wave build another ~23 GB cache (/sps 86%, 77 GB free). The two lock commits already
+      built duplicates: width-8 runs 804a65bc/66e8c31f (@9439612d) built keys 55632f21/8ef2c8d8 (their logs, 11:45:46), the
+      deb290bc jobs build two others.'
   handoff:
     state: 'Step 16: the two long-run DyHPO sweeps run on lxplus as HTCondor DAGs (generate_sweep @7ce26b87; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
       and _x16.yaml at 7ce26b87: 8 trials, 3 start-up, waves 3,3,2, gp 2000 candidates, GPU>=24G, 46G, 5 CPUs, limits 08:03
