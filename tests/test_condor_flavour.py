@@ -44,5 +44,29 @@ def test_gpu_min_mem():
     assert "gpus_minimum_memory" not in m.condor_sub({"--gres": "gpu:1"}, "/afs/x/job.sh")[1]
 
 
+
+def test_dag_waves_and_sub(tmp_path=None):
+    """dyhpo.waves [3, 3, 2] gives a DAG of three waves, each waiting on the whole wave before it (D245), and the
+    .sub asks for gpu_min_mem in MB and cpus_per_task CPUs."""
+    import tempfile
+    import generate_sweep as g
+    d = str(tmp_path) if tmp_path else tempfile.mkdtemp()
+    os.makedirs(os.path.join(d, "subs")); os.makedirs(os.path.join(d, "jobs"))
+    cfg = {"sweep_name": "zz", "dyhpo": {"n_startup": 3, "waves": [3, 3, 2]},
+           "cluster": {"request_gpus": 1, "gpu_min_mem": "24G", "cpus_per_task": 5, "mem": "46G", "time": "08:03:00"},
+           "paths": {"project_dir": "/p", "python_env": "/p/sites/activate.sh"}}
+    subs = [g.write_sub(i, cfg, d, g.write_sh(i, cfg, d, "/c.yaml")) for i in range(8)]
+    dag = open(g.write_dag(cfg, d, subs)).read().splitlines()
+    parents = [l for l in dag if l.startswith("PARENT")]
+    assert parents == ["PARENT trial_0000 trial_0001 trial_0002 CHILD trial_0003 trial_0004 trial_0005",
+                       "PARENT trial_0003 trial_0004 trial_0005 CHILD trial_0006 trial_0007"], parents
+    assert sum(l.startswith("SCRIPT POST") for l in dag) == 6
+    sub = open(subs[0]).read()
+    assert "gpus_minimum_memory     = 24576" in sub and "request_cpus          = 5" in sub
+    assert '+JobFlavour           = "tomorrow"' in sub
+    del cfg["dyhpo"]["waves"]
+    assert [l for l in open(g.write_dag(cfg, d, subs)).read().splitlines() if l.startswith("PARENT")] == [
+        "PARENT trial_0000 trial_0001 trial_0002 CHILD " + " ".join("trial_%04d" % i for i in range(3, 8))]
+
 if __name__ == "__main__":
-    test_generate_sweep(); test_site_tool(); test_gpu_min_mem(); print("ok")
+    test_generate_sweep(); test_site_tool(); test_gpu_min_mem(); test_dag_waves_and_sub(); print("ok")

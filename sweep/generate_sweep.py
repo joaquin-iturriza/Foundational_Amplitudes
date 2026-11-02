@@ -136,7 +136,11 @@ if [ "${{_eos_ok}}" -eq 0 ]; then echo "ERROR: EOS not accessible."; exit 1; fi
 #!/bin/bash
 set -euo pipefail
 
-{eos_check}source {python_env}
+{eos_check}set +u   # the site's activate script and the venv's are not written for nounset
+source {python_env}
+set -u
+echo "host=$(hostname) sweep={cfg['sweep_name']} trial={i}"
+nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null | sed 's/^/TRIAL_GPU /' || true
 
 python {trial_script} \\
     --sweep-config {config_abs_path} \\
@@ -208,6 +212,13 @@ def write_sub(i, cfg, afs_dir, sh_path, low_fidelity=False):
     gpu_mem_line = ""
     if "gpus_minimum_memory" in cluster:
         gpu_mem_line = f"gpus_minimum_memory     = {cluster['gpus_minimum_memory']}\n"
+    elif cluster.get("gpu_min_mem"):
+        # the site-neutral key (e.g. 24G, as `site submit --gpu-min-mem`): HTCondor takes MB
+        v = str(cluster["gpu_min_mem"]).strip().upper().rstrip("B")
+        mb = int(float(v[:-1]) * 1024) if v[-1:] == "G" else int(float(v.rstrip("M")))
+        gpu_mem_line = f"gpus_minimum_memory     = {mb}\n"
+    if cluster.get("cpus_per_task"):
+        gpu_mem_line += f"request_cpus          = {int(cluster['cpus_per_task'])}\n"
 
     # longer trials first among my jobs (HTCondor: higher priority runs first); the trial's
     # time limit in minutes, unless the config sets one
@@ -263,9 +274,23 @@ def write_dag(cfg, afs_dir, sub_paths, first_idx=0):
     so --extend can submit again."""
     n_first = max(1, min(int(cfg.get("dyhpo", {}).get("n_startup", 3)), len(sub_paths)))
     width = cfg.get("cluster", {}).get("chain_width")
+    waves = cfg.get("dyhpo", {}).get("waves")
     names = [os.path.splitext(os.path.basename(p))[0] for p in sub_paths]
     lines = [f"JOB {n} {p}" for n, p in zip(names, sub_paths)]
-    if width is None:
+    if waves and width is None:
+        # dyhpo.waves (D245: the start-up third, then two batches, e.g. [3, 3, 2]): each wave starts once every
+        # trial of the wave before it has ended, so its suggestions see every earlier result; trials beyond the
+        # listed sizes join the last wave
+        groups, k = [], 0
+        for w in waves:
+            if k < len(names):
+                groups.append(names[k:k + int(w)]); k += int(w)
+        if k < len(names):
+            groups[-1] = groups[-1] + names[k:]
+        lines += [f"SCRIPT POST {n} /bin/true" for g in groups[:-1] for n in g]
+        for a, b in zip(groups, groups[1:]):
+            lines.append(f"PARENT {' '.join(a)} CHILD {' '.join(b)}")
+    elif width is None:
         # the default: two waves, the startup trials, then every other trial once they have ended
         if len(names) > n_first:
             lines += [f"SCRIPT POST {n} /bin/true" for n in names[:n_first]]
