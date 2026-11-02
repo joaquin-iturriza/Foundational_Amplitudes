@@ -33,7 +33,7 @@ authorise live in its ledger (`site decisions`, `site items`), and `site supervi
 
 ## What you may do
 
-- A decision is recorded only in the user's exact words (`site decide`).
+- A decision is recorded only in the user's exact words, his whole sentence, never a fragment of it (`site decide`).
 - No work without an active item: `site submit`, `site copy` and any `site run` that starts work name it (`--item`; `'*'` for upkeep).
 - Use Jean Zay only when the work fits nowhere else or the user asked (`--allow-jeanzay`); over 10 GPU-h there, confirm.
 - Never delete on a cluster what is costly to get back (runs, checkpoints, hard-to-regenerate data, results) or what our work did not make; our own cheap-to-rebuild debris (a duplicate cache, `zz_probe_*`) is deleted when in the way, and reported; results are pruned only by a project's pruning tool under the user's recorded decision.
@@ -46,7 +46,7 @@ authorise live in its ledger (`site decisions`, `site items`), and `site supervi
 - Test infrastructure with `scripts/job_probe.sh`, never with a real training job.
 - Login nodes have no GPU: `site run` is for sweep generators, submitters and CPU dry runs, never training, CUDA code or a shell loop.
 - Never hardcode a path: Python uses `siteconf`, Hydra configs `${oc.env:DATA_DIR}`; a job script holds only the job's business (name, time, CPUs, `--gres=gpu:N`, output), and the site's directives come at submit time.
-- Never wait in the foreground: `site supervise` and one `site events --wait` in the background are the watch.
+- Nobody waits on jobs, in the foreground or the background: the watch is `site supervise` and one `site events --wait`, run by the main session; an agent records its jobs and ends its turn.
 - An event that reaches you is fixed or explained, then acked with what was done (`site ack`).
 - Verify before claiming: a run's state is read in that turn from `site runs` (sweep trials: `site status` or the item's check) and its log (`site logs`); RUNNING with an empty log is not working.
 - CC-IN2P3's login notice never stops work or prompts a question, unless it changes or addresses the user [D176].
@@ -91,14 +91,14 @@ on the sites (`~/work/CLAUDE.md`).
 - Never stop a turn for my answer and never use AskUserQuestion: the question goes in the message, only the work that needs the answer waits, and only my words "stop" or "wait" stop work.
 - Ask me only a call that no rule here and no decision in force (`site decisions --project FA`) settles; a choice with one correct answer (exact over approximate, a bug fix, a convention the field settles) is made, not asked.
 - Name a thing by what it is, never by a code alone (decision, event or run ids, arm codes, recipe tags; an id may follow in brackets); new arms, sweeps and run directories get descriptive names, and a quantity is written as its formula.
-- A result reaches me self-contained, in every message that carries it: the question and the decision it feeds; the design (what against what, on which data, runs and seeds, what is fixed); the answer with its numbers; what it changes next.
-- An agent's findings and questions reach me rewritten once, in that shape, by the main session; routine events never reach me.
-- Send a figure once per version, with what its axes and points are; a redraw says what it replaces and what changed; the main session sends figures without opening them, and the agent that drew one says what it shows.
+- A result reaches me self-contained, in every message that carries it: the question and the decision it feeds; the earlier result on the same question and how the two fit (what each measures); the design (what against what, on which data, runs and seeds, what is fixed); the answer with its numbers; what it changes next.
+- An agent's findings and questions reach me rewritten once, in that shape, by the main session; routine events and an owner's hand-back starting "ROUTINE:" never reach me; a wake with nothing new for me (routing an event, re-arming the waiter, relaunching an owner) ends with no text at all; an open question is asked once, repeated only with something new.
+- Send a figure once per version, with what its axes and points are; a redraw says what it replaces and what changed; the agent that drew it looks at it once per version, at low resolution, and says what it shows; the main session sends it without opening it.
 - A request for my go names the rule behind it: the GPU budget, or the decision of mine that holds the work at its design.
 - When I point out a mistake: no apology; trace what in the process produced it ("not checked" until read, and read before the message ends), make the change that stops it recurring in that turn (a rule, a check, a tool fix; one needing a setting I hold goes to me as a concrete diff), then fix the instance.
 - A fix is reported by what it changed and the named cases it was tested on; failure modes not tested are listed as not fixed.
-- A statement about current state (a setting, a job, what an agent runs on) is read from its live source in that turn, or says "not checked".
-- A check that refuses wrongly gets one line to me (which check, what it flagged, why it is wrong), never a reply addressed to the check.
+- A statement about current state (a setting, what an agent runs on) is read from its live source in that turn, or says "not checked".
+- A check that refuses wrongly is never answered as if it were addressed, and never left misfiring: fixed at once when the fix is obvious, otherwise disabled with `tools/hook_incident.py <hook> --why "<why>"`, which opens an incident; it reaches me, as one line (which check, what it flagged, why it is wrong), only for a call that is mine.
 
 ## What you may do
 
@@ -106,23 +106,23 @@ on the sites (`~/work/CLAUDE.md`).
 - The "smallest change" of the ponytail plugin governs code, never a study's arms, seeds, probes or horizons.
 - A plan I was told is a commitment (its cores, jobs and wall time): a tool's refusal is a gap to fix or route around (parallel jobs of what fits), never a reason to shrink the job; when neither works, the smaller version and its new time come to me before submission.
 - Any difference between what I asked and what was submitted opens the message that reports the submission; a figure or number mixing cells run at different compute says so wherever it is shown.
-- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h (10 on Jean Zay) confirm with me unless a decision in force approves that work at that cost [D153]; under it, run it and show me what ran.
+- GPU budget: estimate wall time × GPUs over everything about to be submitted, sized to what I asked; above 30 GPU-h confirm with me unless a decision in force approves that work at that cost, or I asked for it by name at the project's usual size for it (its template, its sibling runs) [D153, D242, D244]; otherwise run it and show me what ran.
 - Reading state, git and file edits are never confirm-first.
-- Work exists only as a plan entry, changed only through `tools/plan.py`: its objective, my authorising words, the mechanism it tests and the expected outcome, status, evidence, dead ends and `done_when`; every submission names its entry's item (`--item`).
-- Before proposing or designing a run or analysis, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or "none found" with what was searched.
+- Work exists only as a plan entry, changed only through `tools/plan.py`; every submission names its entry's item (`--item`).
+- Before proposing or designing a run or analysis, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or that none was found.
 - A job runs only under a design the design reviewer passed: the question, a measure checked on existing data to move with the tested change, what is fixed, the matched control, seeds, the outcome for yes and for no.
-- Inside an entry I approved, new designs, analyses and jobs within the budget go ahead without me; work a decision of mine holds at its design stops there.
-- The main session talks to me and directs agents; it never does an entry's work itself.
+- Inside an entry I approved, new designs, analyses, jobs within the budget and repairs of its defects go ahead without me; work a decision of mine holds at its design stops there.
+- The main session talks to me and directs agents; it never does an entry's work itself: no code edits, analyses, tests or submissions, including fixes I ask for directly (small ones go to a `mechanical-worker`), and no method or design of its own: it passes on my words and the owner's reviewed design.
 - One agent owns each piece of work in progress and covers all of it: it is resumed on every event of that work, stopped while it waits on jobs, and closed near 300k tokens of context with a hand-off it writes on its entry.
 - A brief to an agent starts from `plan/step_prompt.txt`; what is added may narrow the task, never override its scope or capacity rules.
 - μP only: the maintained models are μP LLoCa (`model: lloca`, the default), μP L-GATr (`lgatr_mup`) and μP L-GATr slim (`lgatr_slim`); everything else is legacy, ignored unless I ask, never fixed or used in a solution.
-- A hyperparameter question goes through a single-fidelity DyHPO sweep, never a hand-rolled grid, whatever it is called; job arrays are for non-HP axes (seeds, data tags, ablation flags).
+- A hyperparameter question goes through a single-fidelity DyHPO sweep over the template's coupled space, never a hand-rolled grid, whatever it is called; a one-HP search runs only when I ask for it or on my yes to an explicit proposal with its reason [D241]; job arrays are for non-HP axes (seeds, data tags, ablation flags).
 
 ## Clusters and jobs
 
-- State every batch's wall-time target before submission and record it on its plan entry.
+- State every batch's wall-time target before submission and record it on its plan entry: the time of its work (training steps at the model's step rate in a plain training run on that GPU, one forward pass per read, generation at the probe's time per event), never a measured rate that includes overhead.
 - A batch's yield, time and disk per unit are measured by a small probe, or by the batch's own first jobs when a separate probe would add a queue wait; it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
-- A margin above 2× (events asked over events kept, a run's wall time over its target) is a finding to fix, not to absorb.
+- A margin above 2× (events asked over events kept, a run's or a stage's wall time over its target) is a finding to fix, not to absorb.
 - A failed task goes to the agent that owns its work, which reads its cause in the log before anything is resubmitted.
 
 ## Code and git
@@ -132,8 +132,8 @@ on the sites (`~/work/CLAUDE.md`).
 - Never edit, merge into or check out `main` (generated by `scripts/publish_main.sh`) or the retired `ccin2p3` and `jeanzay` branches.
 - A merge into `trunk`, or the close of a piece of work, waits for its backlog's reviewer to pass; one reviewer per backlog, and its re-check continues that same reviewer.
 - On the laptop run only the tests a change touches, in `.venv-cpu`; training and CUDA code run only in jobs on sites.
-- A misfiring check is never left misfiring: fixed at once when the fix is obvious, otherwise disabled with `tools/hook_incident.py <hook> --why "<why>"`, which opens an incident.
-- All guidance lives in this file and `~/work/CLAUDE.md`, changed when I ask or after a mistake and shown to me as a diff; no other CLAUDE.md, no memory file, no Claude persistent memory.
+- A check that refuses wrongly is never answered as if it were addressed, and never left misfiring: fixed at once when the fix is obvious, otherwise disabled with `tools/hook_incident.py <hook> --why "<why>"`, which opens an incident; it reaches me, as one line (which check, what it flagged, why it is wrong), only for a call that is mine.
+- All guidance lives in this file, `~/work/CLAUDE.md` and the sections they index, changed when I ask or after a mistake and shown to me as a diff; no other CLAUDE.md, no memory file, no Claude persistent memory.
 - Never create a new `.md`, `.tex` or `.rst` file (exempt: `CLAUDE.md`, `README*`, `.claude/agents|commands/*.md`); a new doc needs my approval.
 
 ## Results and reporting
