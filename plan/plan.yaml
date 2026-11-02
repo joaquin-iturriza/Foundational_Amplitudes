@@ -8740,6 +8740,15 @@ entries:
       with reason AssocMaxJobsLimit: sacctmgr shows MaxJobs=0 on the user''s association (account lpnhe), so no job of ours
       can start on CC until it is lifted (site pick also prints ''cap 0''); jobs ran on CC this morning, so the limit is new.
       Also the 3 H100 nodes have been IDLE+COMPLETING since 16:47. Nothing started; the jobs stay queued.'
+  - at: '2026-11-02T10:16:36+00:00'
+    text: '2026-11-02 (owner a5af1a86ca67f9f3a): move of steps 16 and 24 to Jean Zay (Joaquin 2026-11-02) blocked before any
+      copy: every ''site run jeanzay FA'' (echo, quota read) hung and ended in ssh timeouts (120 s x3, 400 s: ''Timeout, server
+      jean-zay.idris.fr not responding''); site pick now lists jeanzay DOWN (connection backoff 44 min). site status jeanzay
+      answers (squeue): 19 PENDING trial_00xx jobs on gpu_p5 (717020-717808) not in the site registry, origin not checked.
+      Same pick: ccin2p3 UP, 32 free GPUs, association MaxJobs now empty (sacctmgr; the MaxJobs=0 of 2026-11-01 is lifted),
+      gpu_v100 8 idle nodes, gpu_h100 0 idle; /sps/lpnhe 152G free; catalog_v4 pools are on CC. lxplus: 1 running + 9 queued
+      of ours. Nothing submitted, nothing cancelled; the lxplus DAGs 13110747/13110751 and width runs e512219a, e2dbd507,
+      b13188d5, 86b59b90 stay queued.'
   handoff:
     state: 'Step 16: the two long-run DyHPO sweeps run on lxplus as HTCondor DAGs (generate_sweep @7ce26b87; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
       and _x16.yaml at 7ce26b87: 8 trials, 3 start-up, waves 3,3,2, gp 2000 candidates, GPU>=24G, 46G, 5 CPUs, limits 08:03
