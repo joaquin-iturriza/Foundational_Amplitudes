@@ -7973,9 +7973,9 @@ entries:
       - 'orphaned: report to the main session for the cancel'
   owner:
     agent: a5af1a86ca67f9f3a
-    state: working
+    state: stopped
     since: '2026-11-02T09:59:35+00:00'
-    state_at: '2026-11-02T10:36:20+00:00'
+    state_at: '2026-11-02T10:43:41+00:00'
     context: 162000
     context_at: '2026-11-02T10:36:15+00:00'
   findings:
