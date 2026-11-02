@@ -8983,6 +8983,19 @@ entries:
       path (both changed together). plot_style.save now raises LegendOverflow for a legend wider than its plot box (tests/test_plot_style_legend.py:
       refused case writes nothing, narrow case saves); other figure scripts not re-run under it (size_figs.py''s two-column
       legends would now be refused).'
+  - at: '2026-11-02T19:51:41+00:00'
+    text: '2026-11-02 night: presentation figures redone @16957b58 (fig_shares_bound.py arms, size_figs.py pull/figs, mixture_ab.py
+      arms + new epochs subcommand -> data/epochs.json). Epochs (steps x 16384 / training events = steps / batches, the runs''
+      ''Starting to train'' lines): control and share-0.25 1e4/process arm 4264/703 = 6.07; whole-set width runs 4264/6707
+      = 0.636; 17056-step trials 2.54; 68224-step trials 10.2. Absolute zero-shot MSE of log|M|^2 (class median of per-class
+      geometric mean over probes; seed 42 / seed 43): pp control 0.421/0.553, 1e4 share-0.25 0.208/0.208, width 8 full 0.272/0.283,
+      width 16 0.188/0.140, width 32 0.117/0.112; e+e- control 1.135/1.898, w32 0.161/0.170; held out default-sampled control
+      0.974/1.379, w32 0.489/0.476; held out catalog-sampled control 0.599/0.769, w32 0.509/0.482; one-loop (HD5, 28 classes)
+      control 11.6/17.4, every arm 9.8-18.2 (no gain). Per-seed R against the control''s two-seed geometric mean replaces
+      the bootstrap bars (control''s own seeds 0.92/1.08 on pp, 0.94/1.06 on e+e-, 0.91/1.10 held default). Sweep state at
+      the pull (~21:00): 17056 wave 2 trials 0753/0849/1262 at steps 13640-13981, lr 7.33e-3/7.57e-3/7.82e-3 (all within 1.1x
+      of the window top 7.90e-3), best so far -3.42/-3.40/-3.39; 68224 trials at steps 30008-32736, best so far hp1333 (lr
+      2.03e-3) -3.250, hp0353 (2.88e-3) -3.047, hp1860 (5.39e-4) -2.780.'
   handoff:
     state: 'Width cells (step 33) done and read: at 4264 steps width 32 > 16 > 8 on every tree read (PP4 R w32/w8 0.370, held
       default 0.528; one-loop not separated), all six best at their last validation. Per-arm zero-shot figure against the
