@@ -8856,6 +8856,20 @@ entries:
       source, so any edit makes each later wave build another ~23 GB cache (/sps 86%, 77 GB free). The two lock commits already
       built duplicates: width-8 runs 804a65bc/66e8c31f (@9439612d) built keys 55632f21/8ef2c8d8 (their logs, 11:45:46), the
       deb290bc jobs build two others.'
+  - at: '2026-11-02T11:56:38+00:00'
+    text: '2026-11-02 (owner a7f1fe982d7564477), step 34: Jean Zay still does not answer site run: ''site --timeout 600 run
+      jeanzay FA -- squeue ...'' ended after 600 s with ''Timeout, server jean-zay.idris.fr not responding'' (a first try
+      with --timeout after the project name sent ''--timeout 600'' as the remote command: site run''s argument swallows it;
+      the flag is global, before ''run''). site status jeanzay (plain squeue, no cd to /lustre/fswork, no activate.sh) does
+      answer: the same 19 PENDING jobs on gpu_p5: 717020-717034 (15 jobs, all named trial_0004) and 717791 trial_0005, 717796
+      trial_0007, 717798 trial_0008, 717808 trial_0009. Not in the site registry. Their ids fall between registry jobs 657934
+      (2026-10-06 02:58) and 878251 (2026-10-10 19:23), so they were submitted 2026-10-06..10 and have pended about 4 weeks.
+      15 consecutive trial_0004 jobs is sweep_manager''s round-robin over 15 sweeps; in that window Jean Zay held only tp3_
+      transfer-program sweeps (results.tex hand-off @bcf4a367: 579 Jean Zay jobs scontrol-held for the held items horizon32k
+      (tp3_r[0-9]fte32k_*, tp3_scr32k_*, tp3_uu64fte32k_*), eqd (tp3_eqd*, held on Jean Zay without HELD markers) and the
+      synthetic 32k cells). Not catalog_coverage''s work (none of this entry''s jobs ever ran on Jean Zay; D249''s move to
+      Jean Zay never submitted). Sweep dirs, configs and submitter not confirmed: needs squeue -o ''%i %j %Z %V %r'' and scontrol
+      show job on Jean Zay, which only site run reaches. Nothing cancelled.'
   handoff:
     state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
       started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
