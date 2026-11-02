@@ -8008,9 +8008,9 @@ entries:
       - 'it fails: fix before any new memmap run'
   owner:
     agent: a7f1fe982d7564477
-    state: working
+    state: stopped
     since: '2026-11-02T11:49:23+00:00'
-    state_at: '2026-11-02T11:49:23+00:00'
+    state_at: '2026-11-02T11:56:56+00:00'
     context: 63456
     context_at: '2026-11-02T11:53:53+00:00'
   findings:
