@@ -4883,6 +4883,13 @@ entries:
     withdrawn_at: '2026-11-01T15:58:00+00:00'
     withdrawn_why: Joaquin approved deleting the caches (D243); deleted 2026-11-01, /sps/lpnhe 100% -> 71%; step 16 stays
       held by the same words
+  - ask: Data generation keeps its separate probe ahead of a queue (its run sizes come from the kept fraction); should generation
+      also start without one?
+    at: '2026-11-02T16:56:32+00:00'
+    searched: 'CLAUDE.md line 61 (my exception, cbb7ec2b), fa-generation step 1, site decisions --project FA: none settles
+      it'
+    blocks: nothing running; the next generation queue's layout
+    blocks_steps: &id001 []
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -8954,6 +8961,12 @@ entries:
       analysis/catalog_v4/expect_cov_v4_long_hpo8.json; CC: sweeps/zz_enolck_*, sweeps/zz_flockpoll_* (set-aside failed sweeps),
       ~/.sweep_manager/registry.json(.bak-20261102-enolck)'
     written: '2026-11-02T11:48:46+00:00'
+  ask: Data generation keeps its separate probe ahead of a queue (its run sizes come from the kept fraction); should generation
+    also start without one?
+  waiting_since: '2026-11-02T16:56:32+00:00'
+  searched: 'CLAUDE.md line 61 (my exception, cbb7ec2b), fa-generation step 1, site decisions --project FA: none settles it'
+  blocks: nothing running; the next generation queue's layout
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
