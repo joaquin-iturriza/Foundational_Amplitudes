@@ -44,10 +44,10 @@ ARM_READS = [("pp 13 TeV", ("PP4", "all")), (r"$e^+e^-$", ("EE4", "all")),
 ARM_AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ families"), ("H2p5", r"$2\to5$"),
             ("H3", "physical top"), ("H6", r"$\alpha_s=0.13$"), ("H7E", r"$\sqrt{\hat s}$ 6 to 20 TeV"),
             ("H7c", r"$p_T\geq30$ GeV"), ("H5", "one loop")]
-ARM_ARMS = [("default25_1e4", r"share 0.25, width 8, $10^4$/process", ps.C.grey, "s"),
-            ("w8_full", r"share 0.25, width 8, $10^5$/process", ps.C.blue, "o"),
-            ("w16_full", r"share 0.25, width 16, $10^5$/process", ps.C.green, "D"),
-            ("w32_full", r"share 0.25, width 32, $10^5$/process", ps.C.vermillion, "^")]
+ARM_ARMS = [("default25_1e4", r"share 0.25, width 8, $10^4$ events per process", ps.C.grey, "s"),
+            ("w8_full", r"share 0.25, width 8, $10^5$ events per process", ps.C.blue, "o"),
+            ("w16_full", r"share 0.25, width 16, $10^5$ events per process", ps.C.green, "D"),
+            ("w32_full", r"share 0.25, width 32, $10^5$ events per process", ps.C.vermillion, "^")]
 
 
 def panel(ax, arms_res, present, reads=READS, arms=ARMS, lines=((1.0, "--", r"$R=1$"), (0.90, ":", r"$R=0.90$")),
@@ -77,7 +77,7 @@ def panel(ax, arms_res, present, reads=READS, arms=ARMS, lines=((1.0, "--", r"$R
 
 def arms_figure():
     res = json.load(open(os.path.join(DATA, "arms_vs_het_control.json")))["arms"]
-    kw = dict(arms=ARM_ARMS, lines=((1.0, "--", r"control: share 0, width 8, $10^4$/process"),),
+    kw = dict(arms=ARM_ARMS, lines=((1.0, "--", r"control: share 0, width 8, $10^4$ events per process"),),
               ticks=(0.1, 0.2, 0.5, 1.0), counts=True, xlabel=r"$R$ = MSE(arm) / MSE(control)")
     (fa, a), (fb, b) = ps.panels(2)
     panel(a, res, set(res), reads=ARM_READS, **kw)
