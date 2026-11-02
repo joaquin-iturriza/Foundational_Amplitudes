@@ -4406,6 +4406,16 @@ entries:
       (tests/test_mmap_lock.py; exclusion checked on the CC login node on /sps: second holder refused, errno 11). Resubmitted
       whole at 9439612d.'
     at: '2026-11-02T10:43:04+00:00'
+  - tried: 'CC-IN2P3 submission of 2026-11-02 ~11:25 at 08da28f8/73073f7f: sweeps cov_v4_long_hpo8_cc_17056 (62936765-72),
+      cov_v4_long_hpo8_cc_68224 (62936773-80), width runs FA-ccin2p3-9d41b955, 0899399c, 1367f4f4, 674fa271, c6f7ab9d, 78a0e8db'
+    why: 'the memmap cache lock: a blocking fcntl.flock on NFS /sps raised OSError 37 ''No locks available'' (E3550: 0899399c;
+      17056 trials 0000-0005 and 68224 trial 0000, afterany releasing wave 1 blind) while two builders held keys 5495f707
+      (seed 42, shared by the sweeps) and c3c8499a (seed 43). All cancelled ~11:38 (both builders too, so the whole set runs
+      at one commit; the fix changes the cache key''s code hash anyway); partial caches removed; sweep dirs kept as sweeps/zz_enolck_*,
+      their sweep_manager registry entries dropped (backup registry.json.bak-20261102-enolck). Fixed 9439612d: polling non-blocking
+      flock retried on ENOLCK (tests/test_mmap_lock.py; exclusion checked on the CC login node on /sps: second holder refused,
+      errno 11). Resubmitted whole at 9439612d.'
+    at: '2026-11-02T10:43:35+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
