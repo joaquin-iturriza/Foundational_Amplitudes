@@ -990,6 +990,10 @@ def why_moves(e, st, msgs, t, d=None, checks=None, sweeps=None, key=None):
         sw_end, sw_live, sw_unread = sweep_status(e["id"], st, sweeps, mine)
         # a sweep that ended after the last step, as (label, ended, recorded) in epoch seconds
         sended = [(lab, f.timestamp(), r.timestamp() if r else 0) for lab, f, r in sw_end if not ls or f > ls]
+        # a sweep recorded as a dead end on the entry was read and handled; with no end time in its registry it is
+        # dated now() and would ask for an agent on every turn (2026-11-02: five cancelled CC sweeps, every Stop)
+        dead = " ".join(str(x) for x in (e.get("dead_ends") or []))
+        sended = [x for x in sended if x[0].split(" (")[0] not in dead]
         # an ended run a working step agent owns is its to handle: one it submitted (after its step started) or one
         # that ended before its last transcript record; once it hands back, the run is listed again (it ended after
         # the step started, so after `ls`). Hidden only when every ended run is owned: when one is not, the reason
