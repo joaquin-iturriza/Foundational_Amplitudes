@@ -8915,6 +8915,10 @@ entries:
       last metrics file in sort order and sigma_stage/plots_0 sorts after plots_0; fixed in 44a02702 (shallowest files only),
       tested on the six runs here (main-run curves of 50 validations, matching the logs'' Val loss lines to 1e-4); not tested
       on a run with plots_1 continuations.'
+  - at: '2026-11-02T17:04:10+00:00'
+    text: '2026-11-02 ~15:20: step 35 done: Joaquin deleted the width-8 caches 55632f21 and 8ef2c8d8 himself (the rm was refused
+      to the agent by the permission classifier); per the coordinator''s read of the folder only 746f01a3 and 85be0204 remain,
+      /sps/lpnhe at 79%, 113 GB free.'
   handoff:
     state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
       started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
