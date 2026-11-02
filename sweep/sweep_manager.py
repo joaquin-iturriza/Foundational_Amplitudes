@@ -56,6 +56,7 @@ import argparse
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -511,6 +512,48 @@ def stamp_submitted(reg, before):
               f"<entry> --sweep {site or '<site>'}:{name}")
 
 
+def _sweep_state_condor(want, reg):
+    """`state` on an HTCondor site (lxplus): no squeue and no registry, a sweep is a DAG under siteconf.SWEEP_DIR.
+    live: its jobs in condor_q (the DAGMan job and its trials, matched by Iwd = the sweep's dir, so a sweep whose DAG
+    has ended reads live 0); submitted: its trial scripts counted from the DAG files; scripts: trials in jobs/;
+    results: result files under siteconf.RESULTS_DIR/<name>/results. Read only."""
+    import glob as _glob
+    r = subprocess.run(["condor_q", "-af", "ClusterId", "Iwd", "DAGManJobId"], capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError(f"condor_q failed: {r.stderr.strip()}")
+    live = {}
+    for line in r.stdout.splitlines():
+        f = line.split()
+        if len(f) >= 2:
+            n = sweep_name_from_dir(f[1])
+            if os.path.isdir(os.path.join(siteconf.SWEEP_DIR, n)) and f[1].startswith(siteconf.SWEEP_DIR):
+                live[n] = live.get(n, 0) + 1
+    cut = time.time() - RECENT_H * 3600
+    out = {}
+    for name in set(want) | set(live):
+        d = os.path.join(siteconf.SWEEP_DIR, name)
+        if not os.path.isdir(d):
+            continue
+        dags = _glob.glob(os.path.join(d, "sweep_*.dag"))
+        nodes = 0
+        for dg in dags:
+            with open(dg) as fh:
+                nodes += sum(1 for l in fh if l.startswith("JOB "))
+        if not (live.get(name) or name in want or (dags and max(os.path.getmtime(x) for x in dags) >= cut)):
+            continue
+        try:
+            scripts = len(discover_trial_scripts(d))
+        except OSError:
+            scripts = None
+        out[name] = {"dir": d, "live": live.get(name, 0), "submitted": nodes, "scripts": scripts,
+                     "results": len(_glob.glob(os.path.join(getattr(siteconf, "RESULTS_DIR", siteconf.SWEEP_DIR),
+                                                            name, "results", "*.json"))),
+                     "items": [], "submitted_at": int(max((os.path.getmtime(x) for x in dags), default=0)) or None}
+    for n in want - set(out):
+        out[n] = None
+    print("SWEEP_STATE " + json.dumps({"sweeps": out}, sort_keys=True))
+
+
 RECENT_H = 48      # `state` reports, besides the named and live sweeps, those submitted within this many hours
 
 
@@ -521,8 +564,10 @@ def sweep_state(names=(), registry=DEFAULT_REGISTRY):
     (result files), items and submitted_at (stamp_submitted's stamp; absent on sweeps submitted before it)."""
     import glob as _glob
     reg = load_registry(registry)
-    states = squeue_states()
     want = {sweep_name_from_dir(n) for n in names}
+    if shutil.which("squeue") is None and shutil.which("condor_q"):
+        return _sweep_state_condor(want, reg)
+    states = squeue_states()
     cut = time.time() - RECENT_H * 3600
     out = {}
     for name, entry in reg["sweeps"].items():
