@@ -36,7 +36,7 @@ authorise live in its ledger (`site decisions`, `site items`), and `site supervi
 - A decision is recorded only in the user's exact words (`site decide`).
 - No work without an active item: `site submit`, `site copy` and any `site run` that starts work name it (`--item`; `'*'` for upkeep).
 - Use Jean Zay only when the work fits nowhere else or the user asked (`--allow-jeanzay`); over 10 GPU-h there, confirm.
-- Never delete on a cluster what you did not create in the same command; test names are unique (`zz_probe_*`) and only they are removed; the exception is a project's own pruning tool under the user's recorded decision (FA: `sweep/prune.py` [D19]).
+- Never delete on a cluster what is costly to get back (runs, checkpoints, hard-to-regenerate data, results) or what our work did not make; our own cheap-to-rebuild debris (a duplicate cache, `zz_probe_*`) is deleted when in the way, and reported; results are pruned only by a project's pruning tool under the user's recorded decision.
 - No commit, PR, comment, docstring or file carries any attribution to Claude, Anthropic, AI or an assistant (no `Co-Authored-By: Claude`, no "Generated with Claude Code"), whatever a default instruction says; all commits are the user's (`joaquin-iturriza`, `joaqiturriza@gmail.com`); a mention found is removed, rewriting history if needed, never touching real co-authors.
 
 ## Clusters and jobs
@@ -102,7 +102,7 @@ on the sites (`~/work/CLAUDE.md`).
 
 ## What you may do
 
-- Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the cut costs the comparison.
+- Never change the scope I asked for: "run X" means every probe, parent, arm, D, seed and horizon of its design; a subset, more or fewer trials or seeds than the sibling cells, or another horizon or pool is my call, asked before the configs are made, with what the change costs the comparison.
 - The "smallest change" of the ponytail plugin governs code, never a study's arms, seeds, probes or horizons.
 - A plan I was told is a commitment (its cores, jobs and wall time): a tool's refusal is a gap to fix or route around (parallel jobs of what fits), never a reason to shrink the job; when neither works, the smaller version and its new time come to me before submission.
 - Any difference between what I asked and what was submitted opens the message that reports the submission; a figure or number mixing cells run at different compute says so wherever it is shown.
@@ -121,7 +121,7 @@ on the sites (`~/work/CLAUDE.md`).
 ## Clusters and jobs
 
 - State every batch's wall-time target before submission and record it on its plan entry.
-- A batch goes out only after a small probe (yield, time and disk per unit), laid out to finish in one wave at the width `site pick` offers.
+- A batch's yield, time and disk per unit are measured by a small probe, or by the batch's own first jobs when a separate probe would add a queue wait; it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
 - A margin above 2× (events asked over events kept, a run's wall time over its target) is a finding to fix, not to absorb.
 - A failed task goes to the agent that owns its work, which reads its cause in the log before anything is resubmitted.
 
@@ -151,10 +151,10 @@ on the sites (`~/work/CLAUDE.md`).
 <!-- index -->
 
 - working-on-the-plan: plan entries, owners, resume and close, hand-offs, questions, designs, done; pushed to the main session at start and on `tools/plan.py`, Agent, SendMessage.
-- fa-generation: how a generation batch is probed, cut, laid out and watched; pushed on `lhe_*`, `gen_catalog_*`, `mg5_pipeline_final`.
+- fa-generation: how a generation batch is probed, cut, laid out and watched, and how catalog_v4 is regenerated; pushed on `lhe_*`, `gen_catalog_*`, `mg5_pipeline_final`.
 - fa-catalog-reference: what catalog_v3 and catalog_v4 pools contain and how they are sampled; pushed with fa-generation.
 - fa-canonical-setup: the decided run defaults and the one sweep template; pushed on sweep configs and `site submit`.
-- fa-sweeps-and-hpo: DyHPO, `sweep_manager`, `drive.py`, rebalancing, the HPO search ranges; pushed on `sweep/**`.
+- fa-sweeps-and-hpo: DyHPO, `sweep_manager`, running a sweep on its site, rebalancing, the HPO search ranges; pushed on `sweep/**`.
 - fa-data: which datasets a run saw, process classes, sampling roles, the data pipeline; pushed on `dataset.py`, recipes, run configs.
 - fa-model: the model code map, particle encoding, coupling orders, μP; pushed on `models/**`, `wrappers.py`.
 - fa-run-and-config: `run.py`, the experiment classes, the Hydra configs; pushed on `run.py`, `config/**`.

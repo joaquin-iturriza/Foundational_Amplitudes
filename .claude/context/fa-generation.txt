@@ -5,7 +5,7 @@ Before a full queue
 1. Probe every process (each energy of an e+e- pool) with a short run: `scripts/job_lhe_probe.sh` running
    `tools/lhe_probe.py run`; it measures the kept fraction after the pool's cuts, wall time per event and disk per
    run; `lhe_probe kept --yields-out` writes `analysis/catalog_v4/data/lhe_probe_yields.json`. `lhe_parts plan`
-   refuses a queue with a process the probe file lacks.
+   refuses a queue with a process the probe file lacks. Generation keeps this separate probe: the queue's run sizes come from the kept fraction it measures.
 2. Generate at the pool's cuts wherever MadGraph's run card can express them (pT, η, ΔR, pair mass), so the kept
    fraction is near 1; only what the card cannot express is cut afterwards, by rejection.
 3. Events asked = events needed / measured kept fraction, times at most 1.25 (`KEPT_SAFETY`). A process whose factor
