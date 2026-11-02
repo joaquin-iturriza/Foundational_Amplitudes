@@ -8034,9 +8034,9 @@ entries:
       - 'one can''t be made honestly: say why'
   owner:
     agent: a7f1fe982d7564477
-    state: working
+    state: stopped
     since: '2026-11-02T11:49:23+00:00'
-    state_at: '2026-11-02T18:34:20+00:00'
+    state_at: '2026-11-02T18:34:28+00:00'
     context: 228263
     context_at: '2026-11-02T18:33:26+00:00'
   findings:
