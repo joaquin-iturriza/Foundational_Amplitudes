@@ -7912,7 +7912,7 @@ entries:
     agent: acb96e9b7c0e4da34
     state: closed
     since: '2026-11-02T03:25:45+00:00'
-    state_at: '2026-11-02T05:32:12.447000+00:00'
+    state_at: '2026-11-02T05:34:53+00:00'
     context: 243031
     context_at: '2026-11-02T05:32:16+00:00'
   findings:
