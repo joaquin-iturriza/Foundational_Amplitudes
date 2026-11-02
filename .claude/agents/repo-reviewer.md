@@ -124,6 +124,11 @@ isolated hunks.
    with the site's free disk (2026-11-01: the memmap cache keyed composed pools by each job's
    node-local path and mtime, so every job wrote its own 20 GB and /sps/lpnhe, shared by the whole
    lab, filled to 100%).
+   A copy per seed, per code version or per run of data that differs only by a cheap transform
+   (an augmentation, a shuffle, a standardisation) is the same waste: the shared part is stored once
+   and the transform applied at read time; matching a reference path bit for bit is no reason to
+   store its derived arrays (2026-11-02: the memmap cache stored events after the random Lorentz
+   augmentation, one 23 GB copy per seed, and hashed its whole source file, one copy per lock fix).
 4. **Repo structure & hygiene.** New files in the right place. No needless new top-level
    dirs. No new scattered `.md`/`.tex` docs (ground rule #3). Reuse over duplication.
 5. **Committed artifacts.** Nothing `.gitignore` should catch: `runs/`, `outputs/`, `*.npz`,
