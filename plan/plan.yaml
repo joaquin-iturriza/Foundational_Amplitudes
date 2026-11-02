@@ -3443,17 +3443,17 @@ entries:
   - D234
   - D235
   next:
-    26: '16: Long-run DyHPO sweeps on CC-IN2P3 (generate_sweep + sweep_manager on the CC login node, state on /sps; configs
-      sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f; partition gpu_v100,gpu_h100, 46G, 5 CPUs,
-      limits 08:03 / 28:42): ccin2p3:cov_v4_long_hpo8_cc_17056 (jobs 62936765-72) and ccin2p3:cov_v4_long_hpo8_cc_68224 (jobs
-      62936773-80), waves 3,3,2 afterany-chained; wave 0 of both started on V100 2026-11-02 ~11:25. Targets 16 h and 57 h
-      (V100). When the first trials train: read their logs (step rate, TRIAL_GPU), check /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
-      holds one key (12 jobs started at once: the lock on NFS /sps untested) and df /sps/lpnhe (152G free at submit).'
-    27: '24: Width runs at 4264 steps (1x) on CC-IN2P3, scripts/job_catalog_v3_short.sh @08da28f8, LONG_FACTOR=1 LONG_MEMMAP=true,
-      46G, 5 CPUs, gpu_v100,gpu_h100: w8 FA-ccin2p3-9d41b955 (s42, 4:15), 0899399c (s43); w16 LONG_CKPT=true 1367f4f4 (s42,
-      12:10), 674fa271 (s43); w32 LONG_CKPT=true c6f7ab9d (s42, 37:00), 78a0e8db (s43); all started on V100 ~11:25. On the
-      first w16/w32 that trains read its GPU peak (VRAM line).'
-    28: 'Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, trial_00xx, not in the site registry). When Jean Zay
+    29: 'Long-run DyHPO sweeps on CC-IN2P3 at 9439612d (generate_sweep + sweep_manager on the CC login node, state on /sps;
+      configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f, unchanged at 9439612d; gpu_v100,gpu_h100,
+      46G, 5 CPUs, limits 08:03 / 28:42): ccin2p3:cov_v4_long_hpo8_cc_17056 (jobs 62936941-48) and ccin2p3:cov_v4_long_hpo8_cc_68224
+      (62936949-56), waves 3,3,2 afterany-chained, submitted ~11:50 2026-11-02. Targets 16 h and 57 h (V100). When the first
+      trials train: read their logs (step rate, TRIAL_GPU, the lock lines: one ''built the cache'' per key), check /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
+      holds at most two keys (seed 42 and 43) and df /sps/lpnhe (152G free at submit).'
+    30: 'Width runs at 4264 steps (1x) on CC-IN2P3, scripts/job_catalog_v3_short.sh @9439612d, LONG_FACTOR=1 LONG_MEMMAP=true,
+      46G, 5 CPUs, gpu_v100,gpu_h100, submitted ~11:45: w8 FA-ccin2p3-804a65bc (s42, 4:15), 66e8c31f (s43); w16 LONG_CKPT=true
+      d8f1d92e (s42, 12:10), 5dbe4385 (s43); w32 LONG_CKPT=true 02f80e1e (s42, 37:00), 8412dd6f (s43). On the first w16/w32
+      that trains read its GPU peak (VRAM line).'
+    31: 'Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, trial_00xx, not in the site registry). When Jean Zay
       answers again: find their sweep and whether anyone still wants them; do not cancel before that.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
@@ -7943,19 +7943,19 @@ entries:
     start: '2026-11-02T10:24:41+00:00'
     at: '2026-11-02T10:24:41+00:00'
   step_why:
-    26:
+    29:
       feeds: whether training 16x (68224 steps) beats 4x (17056 steps) at tuned HPs, i.e. which length becomes the foundation
         pretraining candidate (D242)
       if:
       - 'both sweeps done: eval reads of each best trial on its GPU type (REREAD), R 16x/4x on PP4, EE4, held-out'
       - 'a trial broke: read its log, fix, extend the sweep with generate_sweep --extend'
-    27:
+    30:
       feeds: the 1x width reference for the 4x/16x length cells and whether width 16/32 beats width 8 at 1x (lr transfer read
         at width 32)
       if:
       - 'all six done: best-checkpoint reads, width R per axis with the seed pair''s spread'
       - 'a w32 runs out of GPU memory on V100: resubmit it to gpu_h100 only'
-    28:
+    31:
       feeds: whether Jean Zay GPU hours are held by stale sweep jobs of ours
       if:
       - 'they belong to a live sweep someone wants: leave them, note the owner'
