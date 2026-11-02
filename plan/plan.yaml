@@ -7895,9 +7895,9 @@ entries:
       - 'a trial broke: read its log, fix, extend the sweep with generate_sweep --extend'
   owner:
     agent: acb96e9b7c0e4da34
-    state: working
+    state: stopped
     since: '2026-11-02T03:25:45+00:00'
-    state_at: '2026-11-02T04:59:26.651000+00:00'
+    state_at: '2026-11-02T05:00:39+00:00'
     context: 184485
     context_at: '2026-11-02T04:59:36+00:00'
   findings:
