@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 """Width and length figures of plan entry catalog_coverage (steps 16 and 33), for the group meeting of 2026-11-03.
 
-  pull    the validation curves (val_loss_no_reg of every 'Val loss (combined)' line of out_0.log) of the long-run
-          DyHPO trials cov_v4_long_hpo8_cc_17056 (4x, 17056 steps) and cov_v4_long_hpo8_cc_68224 (16x, 68224 steps),
-          trials 0-2 (the three random start-up points hp1860, hp0353, hp1333, the same three in both sweeps), read
-          from CC-IN2P3 with one read-only `site run` -> data/size_curves.json (a trial without 'Finished training'
-          is marked running, at its last validation)
-  figs    figs/width_x1_loss, figs/width_x1_ratio (from data/width_x1.json, mixture_ab.py width),
-          figs/length_w8_curves, figs/loss_vs_compute_preliminary (png + pdf)
+  pull    the validation curves (val_loss_no_reg of every 'Val loss (combined)' line of out_0.log) of every trial
+          of the long-run DyHPO sweeps cov_v4_long_hpo8_cc_17056 (17056 steps) and cov_v4_long_hpo8_cc_68224 (68224
+          steps) that has validated (each runs/<sweep>/trial_* directory with such lines), each trial's learning rate
+          (training.lr of its config.yaml) and its training set in batches (its 'Starting to train ... with B batches'
+          line), read from CC-IN2P3 with one read-only `site run` -> data/size_curves.json (a trial without
+          'Finished training' is marked running, at its last validation)
+  figs    figs/width_x1_loss (from data/width_x1.json, mixture_ab.py width), figs/length_w8_curves,
+          figs/loss_vs_compute (png + pdf)
 
-Best checkpoint: the lowest aggregate val_loss_no_reg (het NLL) of the main training block. The 1x curves are the
-width runs' own (data/reads/<run>_val.json, mixture_ab.py val). Compute: C = steps x N/N_8, N the learnable parameter
-count of the run's model (from its log: width 8 1775829, 16 6516181, 32 25434069), i.e. the 6 N D estimate with the
-same events per step in every run (batch 16384), in units of width-8 steps; attention over particles and gradient
-checkpointing's recompute are not counted (an estimate).
+Best checkpoint: the lowest aggregate val_loss_no_reg (het NLL) of the main training block. The 4264-step curves are
+the width runs' own (data/reads/<run>_val.json, mixture_ab.py val), their lr training.lr of the run's config.yaml
+(LR_X1). Epochs = steps x batch / training events = steps / batches (data/epochs.json for the 4264-step runs, the
+trials' own lines for the sweeps). Compute: C = 6 N S B, N the learnable parameter count of the run's model (its log:
+width 8 1775829, 16 6516181, 32 25434069), S the steps, B = 16384 events per step: the 6ND estimate with D the events
+seen (not the particles: every run here trains on the same mixture, so counting particles would shift every point
+by the same factor); attention over particles and gradient checkpointing's recompute are not counted (an estimate).
+Validations above OFF_SCALE (the warm-up spikes, up to ~1e11) are not drawn and are counted in the printed report.
 """
 import argparse, json, math, os, re, subprocess, sys
 
@@ -23,50 +27,52 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 DATA = os.path.join(HERE, "data")
 FIGS = os.path.join(HERE, "figs")
-SWEEPS = {"4x": "cov_v4_long_hpo8_cc_17056", "16x": "cov_v4_long_hpo8_cc_68224"}
-STEPS = {"1x": 4264, "4x": 17056, "16x": 68224}
-HPS = ("1860", "0353", "1333")
+SWEEPS = {"17056": "cov_v4_long_hpo8_cc_17056", "68224": "cov_v4_long_hpo8_cc_68224"}
+BATCH = 16384
 N_PARAMS = {8: 1775829, 16: 6516181, 32: 25434069}     # 'Instantiated model ... learnable parameters' of each log
 WIDTH_RUNS = {8: ("FA-ccin2p3-804a65bc", "FA-ccin2p3-66e8c31f"), 16: ("FA-ccin2p3-493c98db", "FA-ccin2p3-7288b3fe"),
               32: ("FA-ccin2p3-e26059bf", "FA-ccin2p3-fd7fc137")}     # (seed 42, seed 43), mixture_ab.WIDTH
-# each trial's lr (RUN_SUMMARY of its out log on CC) and each length's lr window centre c (the step-16 design's
-# lr*(t, D), tools/lr_surface_center.py @3d12f881): one hp set sits at the same lr / c at both lengths
-LR = {"4x": {"1860": 1.156305e-3, "0353": 6.17248e-3, "1333": 4.341778e-3},
-      "16x": {"1860": 5.394801e-4, "0353": 2.879903e-3, "1333": 2.025735e-3}}
-LR_CENTRE = {"4x": 2.63e-3, "16x": 1.23e-3}
-OFF_SCALE = 1.0          # validations above this NLL (the warm-up spikes, up to ~1e11) are not drawn, and counted
+LR_X1 = 4.997423e-3      # training.lr of the 4264-step width runs' config.yaml (one lr at every width under muP)
+OFF_SCALE = 1.0
 
 
 def pull():
-    dirs = " ".join(f"runs/{SWEEPS[l]}/trial_{h}_r2" for l in SWEEPS for h in HPS)
-    cmd = (f'for d in {dirs}; do echo "@@ $d"; grep -E "Starting to train for|Val loss \\(combined\\)|'
-           f'Finished training" $d/out_0.log; done')
+    cmd = ('for s in ' + " ".join(SWEEPS.values()) + '; do for d in runs/$s/trial_*; do '
+           'grep -q "Val loss (combined)" $d/out_0.log 2>/dev/null || continue; echo "@@ $d"; '
+           'grep -m1 -E "^  lr:" $d/config.yaml; '
+           'grep -E "Starting to train for|Val loss \\(combined\\)|Finished training" $d/out_0.log; done; done')
     out = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd], capture_output=True,
                          text=True, timeout=700).stdout
     res, cur = {}, None
     for line in out.splitlines():
-        m = re.match(r"@@ runs/(\S+)/trial_(\d+)_r2", line)
+        m = re.match(r"@@ runs/(\S+)/(trial_\S+)", line)
         if m:
-            length = next(l for l, s in SWEEPS.items() if s == m.group(1))
-            cur = res.setdefault(f"{length}_hp{m.group(2)}", {"sweep": m.group(1), "hp": m.group(2), "length": length,
-                                                            "every": None, "vals": [], "finished": False})
+            steps = next(k for k, v in SWEEPS.items() if v == m.group(1))
+            cur = res.setdefault(f"{steps}_{m.group(2)}", {"sweep": m.group(1), "trial": m.group(2),
+                                                           "steps": int(steps), "lr": None, "batches": None,
+                                                           "every": None, "vals": [], "finished": False})
             continue
         if cur is None:
             continue
-        if "Starting to train for" in line:
+        if re.match(r"^  lr:", line):
+            cur["lr"] = float(line.split(":", 1)[1])
+        elif "Starting to train for" in line and cur["every"] is None:
             cur["every"] = int(re.search(r"validating every (\d+) steps", line).group(1))
+            cur["batches"] = int(re.search(r"dataset with (\d+) batches", line).group(1))
         elif "Val loss (combined)" in line:
             x = float(re.search(r"val_loss_no_reg: ([0-9.eE+-]+|nan|inf|-inf)", line).group(1))
-            cur["vals"].append([min(cur["every"] * (len(cur["vals"]) + 1), STEPS[cur["length"]]), x])
+            cur["vals"].append([min(cur["every"] * (len(cur["vals"]) + 1), cur["steps"]), x])
         elif "Finished training" in line:
             cur["finished"] = True
-    if len(res) != 6 or any(not r["vals"] for r in res.values()):
-        sys.exit("pull: missing curves: " + json.dumps({k: len(v["vals"]) for k, v in res.items()}))
+    bad = {k: v for k, v in res.items() if not v["vals"] or v["lr"] is None or v["batches"] is None}
+    if not res or bad:
+        sys.exit("pull: incomplete trials: " + json.dumps({k: [len(v["vals"]), v["lr"], v["batches"]]
+                                                          for k, v in bad.items()}))
     path = os.path.join(DATA, "size_curves.json")
-    json.dump({"source": "out_0.log of each trial on ccin2p3, read-only site run", "trials": res}, open(path, "w"),
-              indent=0)
-    print(json.dumps({k: {"n": len(v["vals"]), "last_step": v["vals"][-1][0], "finished": v["finished"]}
-                      for k, v in res.items()}))
+    json.dump({"source": "out_0.log and config.yaml of each validated trial on ccin2p3, read-only site run",
+               "trials": res}, open(path, "w"), indent=0)
+    print(json.dumps({k: {"n": len(v["vals"]), "last_step": v["vals"][-1][0], "finished": v["finished"],
+                          "lr": v["lr"]} for k, v in res.items()}))
 
 
 def best(vals):
@@ -78,108 +84,108 @@ def width_curve(run):
     return json.load(open(os.path.join(DATA, "reads", f"{run}_val.json")))["blocks"][0]["vals"]
 
 
+def lr_tex(x):
+    e = int(math.floor(math.log10(x)))
+    return rf"lr ${x / 10 ** e:.1f}\times10^{{{e}}}$"
+
+
 def figs():
     sys.path.insert(0, ROOT)
     import plot_style as ps
+    from matplotlib.lines import Line2D
     w = json.load(open(os.path.join(DATA, "width_x1.json")))
     tr = json.load(open(os.path.join(DATA, "size_curves.json")))["trials"]
-    col = {"1860": ps.C.blue, "0353": ps.C.vermillion, "1333": ps.C.green}
-    rel = {h: [LR[l][h] / LR_CENTRE[l] for l in LR] for h in HPS}
-    assert all(abs(a / b - 1) < 0.02 for a, b in rel.values()), rel
-    hpl = {h: rf"lr ${rel[h][0]:.2f}\,c$" for h in HPS}
+    ep = json.load(open(os.path.join(DATA, "epochs.json")))
+    ep_x1 = {round(ep[r]["epochs"], 4) for runs in WIDTH_RUNS.values() for r in runs}
+    assert len(ep_x1) == 1, ep_x1
+    ep_x1 = ep_x1.pop()
+    ep_of = {k: t["steps"] / t["batches"] for k, t in tr.items()}
     os.makedirs(FIGS, exist_ok=True)
     report = {}
 
-    # 1a: best val_loss_no_reg against width, one point per seed
+    # 1: best val_loss_no_reg against width, one point per seed
     fig, ax = ps.figure()
     for i, (seed, c, mk) in enumerate(((42, ps.C.blue, "o"), (43, ps.C.vermillion, "s"))):
         ys = [w["best"][WIDTH_RUNS[k][i]]["val_loss_no_reg"] for k in (8, 16, 32)]
         ax.plot([8, 16, 32], ys, marker=mk, color=c, label=f"seed {seed}")
-        report[f"1a seed {seed}"] = [round(y, 4) for y in ys]
+        report[f"width seed {seed}"] = [round(y, 4) for y in ys]
     ax.set_xscale("log", base=2)
     ax.set_xticks([8, 16, 32], ["8", "16", "32"])
     ax.minorticks_off()
-    ax.set_xlabel("width (attention heads)")
+    ax.set_xlabel(f"width (attention heads), 4264 steps ({ep_x1:.2g} epochs)")
     ax.set_ylabel("best validation NLL")
     ps.legend(ax, "upper right")
     ps.save(fig, os.path.join(FIGS, "width_x1_loss"))
 
-    # 1b: zero-shot ratio R over width 8, per read, widened 95% class-bootstrap intervals
-    reads = (("PP4", "all", r"$pp$ (PP4)"), ("EE4", "all", r"$e^+e^-$ (EE4)"),
-             ("held_default", "pooled", "held out, default-sampled"),
-             ("held", "pooled", "held out, catalog-sampled"), ("HD5", "all", "one-loop held out (HD5)"))
-    cols = (ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple)
-    fig, ax = ps.figure()
-    ax.axhline(1.0, color=ps.C.grey, ls=":", label="width 8")
-    for j, ((r, part, lab), c) in enumerate(zip(reads, cols)):
-        xs, ys, lo, hi = [], [], [], []
-        for k in (16, 32):
-            x = w["arms"][f"w{k}"][r][part]
-            xs.append(k * 2 ** ((j - 2) * 0.06)); ys.append(x["R"])
-            lo.append(x["R"] - x["widened"][0]); hi.append(x["widened"][1] - x["R"])
-        ax.errorbar(xs, ys, yerr=[lo, hi], marker="o", color=c, ls="-", capsize=2, label=lab)
-        report[f"1b {r}"] = ys
-    ax.set_xscale("log", base=2)
-    ax.set_yscale("log")
-    ax.set_xticks([16, 32], ["16", "32"])
-    ax.set_xlim(16 / 1.5, 32 * 1.5)
-    ax.minorticks_off()
-    ax.set_yticks([0.3, 0.5, 1.0], ["0.3", "0.5", "1"])
-    ax.set_xlabel("width (attention heads)")
-    ax.set_ylabel(r"$R$ = MSE / MSE(width 8)")
-    ps.legend(ax, "lower left")
-    ps.save(fig, os.path.join(FIGS, "width_x1_ratio"))
-
-    # 2: validation curves at width 8: the 1x run (seed 42, the base config's HPs) and the 4x/16x trials
+    # 2: validation curves at width 8: the 4264-step run (seed 42) and every validated sweep trial (seed 42)
+    groups = {"17056": sorted((k for k in tr if tr[k]["steps"] == 17056), key=lambda k: tr[k]["lr"]),
+              "68224": sorted((k for k in tr if tr[k]["steps"] == 68224), key=lambda k: tr[k]["lr"])}
+    pal = {g: ps.sequence(len(groups[g]), cm, lo=0.45, hi=0.95)
+           for g, cm in (("17056", "Blues"), ("68224", "Oranges"))}
+    colour = {k: pal[g][i] for g, ks in groups.items() for i, k in enumerate(ks)}
+    style = {"17056": "-", "68224": "--"}
     fig, ax = ps.figure()
     off = {}
-    def draw(vals, **kw):
+
+    def draw(vals, label, **kw):
         s = np.array([v[0] for v in vals], float); y = np.array([v[1] for v in vals], float)
         bad = ~(np.isfinite(y) & (y <= OFF_SCALE))
-        off[kw["label"]] = int(bad.sum())
+        off[label] = int(bad.sum())
         y[bad] = np.nan
-        ax.plot(s, y, **kw)
-    from matplotlib.lines import Line2D
-    draw(width_curve(WIDTH_RUNS[8][0]), color=ps.C.grey, label="1x")
-    for length, ls in (("4x", "-"), ("16x", "--")):
-        for h in HPS:
-            t = tr[f"{length}_hp{h}"]
-            draw(t["vals"], color=col[h], ls=ls, label=f"{length} hp{h}")
-            report[f"2 {length} hp{h} last step"] = [t["vals"][-1][0], t["finished"]]
+        ax.plot(s, y, label=label, **kw)
+
+    draw(width_curve(WIDTH_RUNS[8][0]), f"4264 steps ({ep_x1:.2g} epochs), {lr_tex(LR_X1)}, done", color="k",
+         ls=":")
+    for g in ("17056", "68224"):
+        for k in groups[g]:
+            t = tr[k]
+            state = "done" if t["finished"] else f"running, at step {t['vals'][-1][0]}"
+            draw(t["vals"], f"{g} steps ({ep_of[k]:.2g} epochs), {lr_tex(t['lr'])}, {state}", color=colour[k],
+                 ls=style[g])
+            report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
+                                    "best": round(best(t["vals"])[1], 4)}
     ax.set_xscale("log")
     ax.set_xlabel("training step")
     ax.set_ylabel("validation NLL")
-    hs = [Line2D([], [], color=ps.C.grey, label="1x")] + \
-        [Line2D([], [], color=col[h], label=hpl[h]) for h in HPS] + \
-        [Line2D([], [], color="k", ls="-", label="4x"), Line2D([], [], color="k", ls="--", label="16x, running")]
-    ps.legend(ax, "lower left", handles=hs, ncol=2)
+    ps.shared_legend(fig, ax, ncol=1)
     ps.save(fig, os.path.join(FIGS, "length_w8_curves"))
-    report["2 off-scale validations not drawn"] = off
+    report["validations above NLL 1 not drawn"] = off
 
-    # 3: best loss against compute C = steps x N/N_8 (preliminary: the 16x trials are running)
+    # 3: best validation NLL against the estimated compute C = 6 N S B
     fig, ax = ps.figure()
-    wcol = {8: ps.C.grey, 16: ps.C.orange, 32: ps.C.purple}
+    C = lambda width, steps: 6.0 * N_PARAMS[width] * steps * BATCH
+    wcol = {8: "k", 16: ps.C.green, 32: ps.C.vermillion}
+    hs = []
     for k in (8, 16, 32):
         ys = [w["best"][r]["val_loss_no_reg"] for r in WIDTH_RUNS[k]]
-        ax.plot([STEPS["1x"] * N_PARAMS[k] / N_PARAMS[8]] * 2, ys, ls="", marker="D", color=wcol[k])
-    for length, filled in (("4x", True), ("16x", False)):
-        for h in HPS:
-            t = tr[f"{length}_hp{h}"]
-            s, y = best(t["vals"])
-            c = (t["vals"][-1][0] if not t["finished"] else STEPS[length])
-            ax.plot([c], [y], ls="", marker="o", color=col[h], mfc=col[h] if filled else "none")
-            report[f"3 {length} hp{h}"] = {"C": c, "best": round(y, 4), "at_step": s}
+        ax.plot([C(k, 4264)] * 2, ys, ls="", marker="D", color=wcol[k])
+        hs.append(Line2D([], [], ls="", marker="D", color=wcol[k],
+                         label=f"width {k}, 4264 steps ({ep_x1:.2g} epochs), seeds 42 and 43"))
+        report[f"compute width {k}"] = {"C": C(k, 4264), "best": ys}
+    for g, mk, col in (("17056", "o", ps.C.blue), ("68224", "s", ps.C.orange)):
+        n_run = 0
+        for k in groups[g]:
+            t = tr[k]
+            s_best, y = best(t["vals"])
+            done = t["finished"]
+            n_run += not done
+            c = C(8, t["steps"] if done else t["vals"][-1][0])
+            ax.plot([c], [y], ls="", marker=mk, color=col, mfc=col if done else "none")
+            report[f"compute {k}"] = {"C": c, "best": round(y, 4), "at_step": s_best, "finished": done}
+        hs.append(Line2D([], [], ls="", marker=mk, color=col,
+                         label=f"width 8, {g} steps ({ep_of[groups[g][0]]:.2g} epochs), {len(groups[g])} trials"
+                               f" of the learning-rate sweep, {n_run} running"))
+    hs.append(Line2D([], [], ls="", marker="o", color="k", label="trial done"))
+    hs.append(Line2D([], [], ls="", marker="o", color="k", mfc="none",
+                     label="trial running: best so far, at the compute so far"))
+    for h in hs:            # empty proxies, read by ps.shared_legend
+        ax.add_line(h)
     ax.set_xscale("log")
-    ax.minorticks_off()
-    ax.set_xticks([5e3, 1e4, 2e4, 5e4], ["5k", "10k", "20k", "50k"])
-    ax.set_xlabel(r"$C$ = steps $\times N / N_8$")
+    ax.set_xlabel("estimated compute $C = 6\\,N\\,S\\,B$ [FLOP]\n"
+                  "($N$ parameters, $S$ steps, $B = 16384$ events per step)")
     ax.set_ylabel("best validation NLL")
-    hs = [Line2D([], [], ls="", marker="D", color=wcol[k], label=f"1x w{k}") for k in (8, 16, 32)] + \
-        [Line2D([], [], ls="", marker="o", color=col[h], label=hpl[h]) for h in HPS] + \
-        [Line2D([], [], ls="", marker="o", color="k", label="4x w8"),
-         Line2D([], [], ls="", marker="o", color="k", mfc="none", label="16x w8, running")]
-    ps.legend(ax, "lower left", handles=hs, ncol=2)
-    ps.save(fig, os.path.join(FIGS, "loss_vs_compute_preliminary"))
+    ps.shared_legend(fig, ax, ncol=1)
+    ps.save(fig, os.path.join(FIGS, "loss_vs_compute"))
     print(json.dumps(report))
 
 

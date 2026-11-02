@@ -1388,6 +1388,750 @@
    }
   }
  },
+ "seeds": {
+  "default25_1e4": {
+   "PP4": {
+    "n_probes": 1301,
+    "seed42": {
+     "mse": 0.20825,
+     "R": 0.4459
+    },
+    "seed43": {
+     "mse": 0.20783,
+     "R": 0.4417
+    }
+   },
+   "EE4": {
+    "n_probes": 169,
+    "seed42": {
+     "mse": 0.31381,
+     "R": 0.2275
+    },
+    "seed43": {
+     "mse": 0.33172,
+     "R": 0.2209
+    }
+   },
+   "held": {
+    "n_probes": 701,
+    "seed42": {
+     "mse": 0.61801,
+     "R": 0.9208
+    },
+    "seed43": {
+     "mse": 0.60683,
+     "R": 0.9464
+    }
+   },
+   "held_default": {
+    "n_probes": 700,
+    "seed42": {
+     "mse": 0.64661,
+     "R": 0.6128
+    },
+    "seed43": {
+     "mse": 0.70053,
+     "R": 0.6203
+    }
+   },
+   "held_default/H1": {
+    "n_probes": 62,
+    "seed42": {
+     "mse": 0.21144,
+     "R": 0.4661
+    },
+    "seed43": {
+     "mse": 0.20454,
+     "R": 0.3655
+    }
+   },
+   "held_default/H2": {
+    "n_probes": 217,
+    "seed42": {
+     "mse": 0.33418,
+     "R": 0.4536
+    },
+    "seed43": {
+     "mse": 0.30007,
+     "R": 0.4205
+    }
+   },
+   "held_default/H2p5": {
+    "n_probes": 38,
+    "seed42": {
+     "mse": 2.3162,
+     "R": 0.757
+    },
+    "seed43": {
+     "mse": 1.661,
+     "R": 0.5354
+    }
+   },
+   "held_default/H3": {
+    "n_probes": 279,
+    "seed42": {
+     "mse": 1.0363,
+     "R": 0.8318
+    },
+    "seed43": {
+     "mse": 1.1887,
+     "R": 0.8988
+    }
+   },
+   "held_default/H5": {
+    "n_probes": 28,
+    "seed42": {
+     "mse": 12.375,
+     "R": 1.1422
+    },
+    "seed43": {
+     "mse": 11.538,
+     "R": 1.0083
+    }
+   },
+   "held_default/H6": {
+    "n_probes": 8,
+    "seed42": {
+     "mse": 0.0047807,
+     "R": 0.3315
+    },
+    "seed43": {
+     "mse": 0.0075975,
+     "R": 0.3633
+    }
+   },
+   "held_default/H7E": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.55937,
+     "R": 0.3322
+    },
+    "seed43": {
+     "mse": 0.62074,
+     "R": 0.3674
+    }
+   },
+   "held_default/H7c": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.090695,
+     "R": 0.2982
+    },
+    "seed43": {
+     "mse": 0.098988,
+     "R": 0.2895
+    }
+   }
+  },
+  "control": {
+   "PP4": {
+    "n_probes": 1301,
+    "seed42": {
+     "mse": 0.42115,
+     "R": 0.9237
+    },
+    "seed43": {
+     "mse": 0.55277,
+     "R": 1.0826
+    }
+   },
+   "EE4": {
+    "n_probes": 169,
+    "seed42": {
+     "mse": 1.1352,
+     "R": 0.941
+    },
+    "seed43": {
+     "mse": 1.8975,
+     "R": 1.0627
+    }
+   },
+   "held": {
+    "n_probes": 701,
+    "seed42": {
+     "mse": 0.59898,
+     "R": 0.8931
+    },
+    "seed43": {
+     "mse": 0.76929,
+     "R": 1.1197
+    }
+   },
+   "held_default": {
+    "n_probes": 700,
+    "seed42": {
+     "mse": 0.97398,
+     "R": 0.907
+    },
+    "seed43": {
+     "mse": 1.3785,
+     "R": 1.1025
+    }
+   },
+   "held_default/H1": {
+    "n_probes": 62,
+    "seed42": {
+     "mse": 0.43624,
+     "R": 0.9096
+    },
+    "seed43": {
+     "mse": 0.6955,
+     "R": 1.0994
+    }
+   },
+   "held_default/H2": {
+    "n_probes": 217,
+    "seed42": {
+     "mse": 0.67102,
+     "R": 0.8895
+    },
+    "seed43": {
+     "mse": 1.0225,
+     "R": 1.1243
+    }
+   },
+   "held_default/H2p5": {
+    "n_probes": 38,
+    "seed42": {
+     "mse": 2.6404,
+     "R": 0.883
+    },
+    "seed43": {
+     "mse": 3.6111,
+     "R": 1.1325
+    }
+   },
+   "held_default/H3": {
+    "n_probes": 279,
+    "seed42": {
+     "mse": 1.1043,
+     "R": 0.9051
+    },
+    "seed43": {
+     "mse": 1.3913,
+     "R": 1.1048
+    }
+   },
+   "held_default/H5": {
+    "n_probes": 28,
+    "seed42": {
+     "mse": 11.637,
+     "R": 1.0341
+    },
+    "seed43": {
+     "mse": 17.384,
+     "R": 0.9671
+    }
+   },
+   "held_default/H6": {
+    "n_probes": 8,
+    "seed42": {
+     "mse": 0.01228,
+     "R": 0.8227
+    },
+    "seed43": {
+     "mse": 0.039156,
+     "R": 1.2157
+    }
+   },
+   "held_default/H7E": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 1.7073,
+     "R": 0.9017
+    },
+    "seed43": {
+     "mse": 2.8124,
+     "R": 1.1092
+    }
+   },
+   "held_default/H7c": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.23062,
+     "R": 0.9246
+    },
+    "seed43": {
+     "mse": 0.38209,
+     "R": 1.0815
+    }
+   }
+  },
+  "w8_full": {
+   "PP4": {
+    "n_probes": 1301,
+    "seed42": {
+     "mse": 0.27168,
+     "R": 0.5699
+    },
+    "seed43": {
+     "mse": 0.28306,
+     "R": 0.5814
+    }
+   },
+   "EE4": {
+    "n_probes": 169,
+    "seed42": {
+     "mse": 0.47958,
+     "R": 0.2785
+    },
+    "seed43": {
+     "mse": 0.36658,
+     "R": 0.2357
+    }
+   },
+   "held": {
+    "n_probes": 701,
+    "seed42": {
+     "mse": 0.77424,
+     "R": 1.1113
+    },
+    "seed43": {
+     "mse": 0.8237,
+     "R": 1.153
+    }
+   },
+   "held_default": {
+    "n_probes": 700,
+    "seed42": {
+     "mse": 0.96443,
+     "R": 0.7971
+    },
+    "seed43": {
+     "mse": 0.94215,
+     "R": 0.8101
+    }
+   },
+   "held_default/H1": {
+    "n_probes": 62,
+    "seed42": {
+     "mse": 0.25486,
+     "R": 0.5045
+    },
+    "seed43": {
+     "mse": 0.30834,
+     "R": 0.5649
+    }
+   },
+   "held_default/H2": {
+    "n_probes": 217,
+    "seed42": {
+     "mse": 0.47958,
+     "R": 0.6657
+    },
+    "seed43": {
+     "mse": 0.57985,
+     "R": 0.6675
+    }
+   },
+   "held_default/H2p5": {
+    "n_probes": 38,
+    "seed42": {
+     "mse": 1.6796,
+     "R": 0.4766
+    },
+    "seed43": {
+     "mse": 1.6824,
+     "R": 0.5213
+    }
+   },
+   "held_default/H3": {
+    "n_probes": 279,
+    "seed42": {
+     "mse": 1.3887,
+     "R": 1.0379
+    },
+    "seed43": {
+     "mse": 1.2686,
+     "R": 1.0524
+    }
+   },
+   "held_default/H5": {
+    "n_probes": 28,
+    "seed42": {
+     "mse": 18.214,
+     "R": 0.9583
+    },
+    "seed43": {
+     "mse": 14.346,
+     "R": 1.1155
+    }
+   },
+   "held_default/H6": {
+    "n_probes": 8,
+    "seed42": {
+     "mse": 0.006735,
+     "R": 0.4038
+    },
+    "seed43": {
+     "mse": 0.0062903,
+     "R": 0.4007
+    }
+   },
+   "held_default/H7E": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 1.1549,
+     "R": 0.5027
+    },
+    "seed43": {
+     "mse": 0.94851,
+     "R": 0.4781
+    }
+   },
+   "held_default/H7c": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.14486,
+     "R": 0.4576
+    },
+    "seed43": {
+     "mse": 0.1471,
+     "R": 0.4249
+    }
+   }
+  },
+  "w16_full": {
+   "PP4": {
+    "n_probes": 1301,
+    "seed42": {
+     "mse": 0.18812,
+     "R": 0.3415
+    },
+    "seed43": {
+     "mse": 0.13952,
+     "R": 0.2814
+    }
+   },
+   "EE4": {
+    "n_probes": 169,
+    "seed42": {
+     "mse": 0.21493,
+     "R": 0.1686
+    },
+    "seed43": {
+     "mse": 0.22716,
+     "R": 0.1411
+    }
+   },
+   "held": {
+    "n_probes": 701,
+    "seed42": {
+     "mse": 0.69861,
+     "R": 0.9092
+    },
+    "seed43": {
+     "mse": 0.52528,
+     "R": 0.7283
+    }
+   },
+   "held_default": {
+    "n_probes": 700,
+    "seed42": {
+     "mse": 0.71683,
+     "R": 0.6037
+    },
+    "seed43": {
+     "mse": 0.54597,
+     "R": 0.4863
+    }
+   },
+   "held_default/H1": {
+    "n_probes": 62,
+    "seed42": {
+     "mse": 0.1842,
+     "R": 0.389
+    },
+    "seed43": {
+     "mse": 0.13793,
+     "R": 0.2742
+    }
+   },
+   "held_default/H2": {
+    "n_probes": 217,
+    "seed42": {
+     "mse": 0.34825,
+     "R": 0.4666
+    },
+    "seed43": {
+     "mse": 0.19684,
+     "R": 0.3061
+    }
+   },
+   "held_default/H2p5": {
+    "n_probes": 38,
+    "seed42": {
+     "mse": 1.5584,
+     "R": 0.5554
+    },
+    "seed43": {
+     "mse": 1.5539,
+     "R": 0.5757
+    }
+   },
+   "held_default/H3": {
+    "n_probes": 279,
+    "seed42": {
+     "mse": 1.1577,
+     "R": 0.8569
+    },
+    "seed43": {
+     "mse": 0.98622,
+     "R": 0.7105
+    }
+   },
+   "held_default/H5": {
+    "n_probes": 28,
+    "seed42": {
+     "mse": 14.419,
+     "R": 0.9973
+    },
+    "seed43": {
+     "mse": 9.8194,
+     "R": 0.8686
+    }
+   },
+   "held_default/H6": {
+    "n_probes": 8,
+    "seed42": {
+     "mse": 0.0041753,
+     "R": 0.1864
+    },
+    "seed43": {
+     "mse": 0.0036158,
+     "R": 0.1157
+    }
+   },
+   "held_default/H7E": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.88576,
+     "R": 0.3593
+    },
+    "seed43": {
+     "mse": 0.47848,
+     "R": 0.1918
+    }
+   },
+   "held_default/H7c": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.087926,
+     "R": 0.2582
+    },
+    "seed43": {
+     "mse": 0.050421,
+     "R": 0.1631
+    }
+   }
+  },
+  "w32_full": {
+   "PP4": {
+    "n_probes": 1301,
+    "seed42": {
+     "mse": 0.11705,
+     "R": 0.186
+    },
+    "seed43": {
+     "mse": 0.11153,
+     "R": 0.1708
+    }
+   },
+   "EE4": {
+    "n_probes": 169,
+    "seed42": {
+     "mse": 0.16096,
+     "R": 0.0969
+    },
+    "seed43": {
+     "mse": 0.17049,
+     "R": 0.0917
+    }
+   },
+   "held": {
+    "n_probes": 701,
+    "seed42": {
+     "mse": 0.50934,
+     "R": 0.705
+    },
+    "seed43": {
+     "mse": 0.48248,
+     "R": 0.6553
+    }
+   },
+   "held_default": {
+    "n_probes": 700,
+    "seed42": {
+     "mse": 0.48852,
+     "R": 0.4459
+    },
+    "seed43": {
+     "mse": 0.47599,
+     "R": 0.4384
+    }
+   },
+   "held_default/H1": {
+    "n_probes": 62,
+    "seed42": {
+     "mse": 0.12733,
+     "R": 0.2448
+    },
+    "seed43": {
+     "mse": 0.12356,
+     "R": 0.2063
+    }
+   },
+   "held_default/H2": {
+    "n_probes": 217,
+    "seed42": {
+     "mse": 0.20742,
+     "R": 0.3134
+    },
+    "seed43": {
+     "mse": 0.24188,
+     "R": 0.2748
+    }
+   },
+   "held_default/H2p5": {
+    "n_probes": 38,
+    "seed42": {
+     "mse": 1.1116,
+     "R": 0.3111
+    },
+    "seed43": {
+     "mse": 1.0109,
+     "R": 0.3516
+    }
+   },
+   "held_default/H3": {
+    "n_probes": 279,
+    "seed42": {
+     "mse": 0.98156,
+     "R": 0.6988
+    },
+    "seed43": {
+     "mse": 0.84618,
+     "R": 0.6645
+    }
+   },
+   "held_default/H5": {
+    "n_probes": 28,
+    "seed42": {
+     "mse": 9.9465,
+     "R": 1.012
+    },
+    "seed43": {
+     "mse": 13.398,
+     "R": 0.9588
+    }
+   },
+   "held_default/H6": {
+    "n_probes": 8,
+    "seed42": {
+     "mse": 0.0019043,
+     "R": 0.0994
+    },
+    "seed43": {
+     "mse": 0.0035433,
+     "R": 0.0894
+    }
+   },
+   "held_default/H7E": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.51761,
+     "R": 0.164
+    },
+    "seed43": {
+     "mse": 0.45105,
+     "R": 0.1822
+    }
+   },
+   "held_default/H7c": {
+    "n_probes": 34,
+    "seed42": {
+     "mse": 0.05529,
+     "R": 0.1125
+    },
+    "seed43": {
+     "mse": 0.03709,
+     "R": 0.1178
+    }
+   }
+  }
+ },
+ "epochs": {
+  "default25_1e4": {
+   "FA-ccin2p3-f0156d88": {
+    "batches": 703,
+    "epochs": 6.0654,
+    "iterations": 4264,
+    "log": "log_FA-ccin2p3-f0156d88.txt"
+   },
+   "FA-ccin2p3-df858d33": {
+    "batches": 703,
+    "epochs": 6.0654,
+    "iterations": 4264,
+    "log": "log_FA-ccin2p3-df858d33.txt"
+   }
+  },
+  "w8_full": {
+   "FA-ccin2p3-804a65bc": {
+    "batches": 6707,
+    "epochs": 0.6358,
+    "iterations": 4264,
+    "log": "out_0.log"
+   },
+   "FA-ccin2p3-66e8c31f": {
+    "batches": 6707,
+    "epochs": 0.6358,
+    "iterations": 4264,
+    "log": "out_0.log"
+   }
+  },
+  "w16_full": {
+   "FA-ccin2p3-493c98db": {
+    "batches": 6707,
+    "epochs": 0.6358,
+    "iterations": 4264,
+    "log": "out_0.log"
+   },
+   "FA-ccin2p3-7288b3fe": {
+    "batches": 6707,
+    "epochs": 0.6358,
+    "iterations": 4264,
+    "log": "out_0.log"
+   }
+  },
+  "w32_full": {
+   "FA-ccin2p3-e26059bf": {
+    "batches": 6707,
+    "epochs": 0.6358,
+    "iterations": 4264,
+    "log": "out_0.log"
+   },
+   "FA-ccin2p3-fd7fc137": {
+    "batches": 6707,
+    "epochs": 0.6358,
+    "iterations": 4264,
+    "log": "out_0.log"
+   }
+  },
+  "control": {
+   "FA-ccin2p3-87ea24d0": {
+    "batches": 703,
+    "epochs": 6.0654,
+    "iterations": 4264,
+    "log": "log_FA-ccin2p3-87ea24d0.txt"
+   },
+   "FA-ccin2p3-321a3de2": {
+    "batches": 703,
+    "epochs": 6.0654,
+    "iterations": 4264,
+    "log": "log_FA-ccin2p3-321a3de2.txt"
+   }
+  }
+ },
  "blowups": {
   "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
   "runs": {

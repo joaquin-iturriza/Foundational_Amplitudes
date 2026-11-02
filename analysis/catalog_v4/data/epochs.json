@@ -1,0 +1,62 @@
+{
+ "FA-ccin2p3-321a3de2": {
+  "batches": 703,
+  "epochs": 6.0654,
+  "iterations": 4264,
+  "log": "log_FA-ccin2p3-321a3de2.txt"
+ },
+ "FA-ccin2p3-493c98db": {
+  "batches": 6707,
+  "epochs": 0.6358,
+  "iterations": 4264,
+  "log": "out_0.log"
+ },
+ "FA-ccin2p3-66e8c31f": {
+  "batches": 6707,
+  "epochs": 0.6358,
+  "iterations": 4264,
+  "log": "out_0.log"
+ },
+ "FA-ccin2p3-7288b3fe": {
+  "batches": 6707,
+  "epochs": 0.6358,
+  "iterations": 4264,
+  "log": "out_0.log"
+ },
+ "FA-ccin2p3-804a65bc": {
+  "batches": 6707,
+  "epochs": 0.6358,
+  "iterations": 4264,
+  "log": "out_0.log"
+ },
+ "FA-ccin2p3-87ea24d0": {
+  "batches": 703,
+  "epochs": 6.0654,
+  "iterations": 4264,
+  "log": "log_FA-ccin2p3-87ea24d0.txt"
+ },
+ "FA-ccin2p3-df858d33": {
+  "batches": 703,
+  "epochs": 6.0654,
+  "iterations": 4264,
+  "log": "log_FA-ccin2p3-df858d33.txt"
+ },
+ "FA-ccin2p3-e26059bf": {
+  "batches": 6707,
+  "epochs": 0.6358,
+  "iterations": 4264,
+  "log": "out_0.log"
+ },
+ "FA-ccin2p3-f0156d88": {
+  "batches": 703,
+  "epochs": 6.0654,
+  "iterations": 4264,
+  "log": "log_FA-ccin2p3-f0156d88.txt"
+ },
+ "FA-ccin2p3-fd7fc137": {
+  "batches": 6707,
+  "epochs": 0.6358,
+  "iterations": 4264,
+  "log": "out_0.log"
+ }
+}

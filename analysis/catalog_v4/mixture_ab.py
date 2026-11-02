@@ -35,7 +35,16 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
                                     events per process, 4264 steps): the share-0.25 het arm of step 15 and the 1x
                                     width cells (share 0.25, whole training set, widths 8, 16, 32), R as in mixture
                                     per read (PP4, EE4, held out default-sampled pooled and per axis, held out
-                                    catalog-sampled pooled) -> data/arms_vs_het_control.json
+                                    catalog-sampled pooled) -> data/arms_vs_het_control.json; beside R, under
+                                    "seeds", each seed of every arm and of the control apart on the same probes: its
+                                    absolute MSE (median over classes of the class's geometric mean over its probes of
+                                    mse_logm2_real) and its R (median over classes of the class's geometric mean of
+                                    seed / control, the control the geometric mean of its two seeds; the control's own
+                                    seeds read the same way), and each arm's epochs (data/epochs.json)
+  epochs <run id> <log>             the first 'Starting to train for N iterations ... on a dataset with B batches'
+                                    line of a training log (the main block) -> data/epochs.json {run: iterations,
+                                    batches, epochs = iterations / batches}; B is the training events over the batch
+                                    size (16384), floored, so epochs = steps x batch / training events
 
 The measure (the design's): per probe the MSE of log|M|^2 at the best checkpoint (tools/zero_shot_parent.py,
 mse_logm2_real); each side the geometric mean of its two seeds (42, 43); per class (analysis/catalog_v4/
@@ -726,6 +735,57 @@ ARMS_HD = {"default25_1e4": HD4_HET["default25"], **{f"w{k}_full": WIDTH[f"w{k}"
            "control": HD4_HET["control"]}
 
 
+def epochs(run, log):
+    pat = re.compile(r"Starting to train for (\d+) iterations = [0-9.]+ epochs on a dataset with (\d+) batches")
+    for line in open(log, errors="replace"):
+        m = pat.search(line)
+        if m:
+            it, b = int(m.group(1)), int(m.group(2))
+            break
+    else:
+        sys.exit(f"epochs: no 'Starting to train' line in {log}")
+    path = os.path.join(DATA, "epochs.json")
+    d = json.load(open(path)) if os.path.exists(path) else {}
+    d[run] = {"iterations": it, "batches": b, "epochs": round(it / b, 4), "log": os.path.basename(log)}
+    json.dump(d, open(path, "w"), indent=1, sort_keys=True)
+    print(json.dumps({run: d[run]}))
+
+
+def _default_pairs(reads, a, extra):
+    """(arm (seed 42, seed 43), control (seed 42, seed 43)) reads tagged (source, probe) over the default-sampled
+    sources _held_default uses (PP4, EE4, and each extra axis read on all four seeds)"""
+    tag = lambda r, d: {(r, k): x for k, x in (d or {}).items()}
+    arm, ctl = ({}, {}), ({}, {})
+    srcs = [(r, reads[a][r], reads["control"][r]) for r in ("PP4", "EE4")]
+    for ax, tab in extra.items():
+        if tab.get(a) and tab.get("control"):
+            ap = tuple(read_of(x, ax) for x in tab[a])
+            cp = tuple(read_of(x, ax) for x in tab["control"])
+            if all(x is not None for x in ap + cp):
+                srcs.append((ax, ap, cp))
+    for r, ap, cp in srcs:
+        if any(x is None for x in cp):
+            continue
+        for i in (0, 1):
+            arm[i].update(tag(r, ap[i])); ctl[i].update(tag(r, cp[i]))
+    return arm, ctl
+
+
+def _seed_points(pair, ctl_pair, keys, cls):
+    """Each seed of `pair` apart on `keys`: absolute MSE (class median of the class's geometric mean over its probes)
+    and R against the control's two-seed geometric mean (class median of the class's geometric mean of the ratios)"""
+    cl = lambda k: cls(probe_name(k))
+    ctl = {k: gmean([ctl_pair[0][k], ctl_pair[1][k]]) for k in keys}
+    out = {"n_probes": len(keys)}
+    for i, s in enumerate(("seed42", "seed43")):
+        by = {}
+        for k in keys:
+            by.setdefault(cl(k), []).append(pair[i][k])
+        out[s] = {"mse": float(f"{np.median([gmean(v) for v in by.values()]):.5g}"),
+                  "R": round(float(np.median(list(class_ratios(pair[i], ctl, keys, cl).values()))), 4)}
+    return out
+
+
 def arms():
     cls = class_of()
     ax_of = _held_axes(cls)
@@ -749,8 +809,26 @@ def arms():
                 else {"all": keys}
             res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
             res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
-        res["held_default"], _ = _held_default(reads, a, cls, ax_of, extra)
+        res["held_default"], dkeys = _held_default(reads, a, cls, ax_of, extra)
         out["arms"][a] = res
+        # each seed apart, the arm's and (on the same probes) the control's
+        dpair, dctl = _default_pairs(reads, a, extra)
+        for who, sel in ((a, lambda p, cp: p), ("control", lambda p, cp: cp)):
+            pts = out.setdefault("seeds", {}).setdefault(who, {})
+            for r in ("PP4", "EE4", "held"):
+                ks = sorted(set(reads[a][r][0]) & set(reads[a][r][1]) & set(c[r][0]) & set(c[r][1]), key=str)
+                if r == "held":
+                    ks = [k for k in ks if str(probe_name(k)).startswith("v4_")]
+                pts.setdefault(r, _seed_points(sel(reads[a][r], c[r]), c[r], ks, cls))
+            pts.setdefault("held_default", _seed_points(sel(dpair, dctl), dctl, dkeys, cls))
+            for ax in HELD:
+                ks = [k for k in dkeys if ax_of[cls(k[1])] == ax]
+                if ks:
+                    pts.setdefault(f"held_default/{ax}", _seed_points(sel(dpair, dctl), dctl, ks, cls))
+    ep = json.load(open(os.path.join(DATA, "epochs.json")))
+    trained = {a: [TRAINED_BY.get(run, run) for run in v["PP4"]] for a, v in ARMS_VS_CONTROL.items()}
+    out["epochs"] = {a: {run: ep[run] for run in runs} if all(run in ep for run in runs) else None
+                     for a, runs in trained.items()}
     out["blowups"] = blowups([run for v in ARMS_VS_CONTROL.values() for runs in v.values() for run in runs] +
                              [run for runs in ARMS_HD.values() for run in runs])
     json.dump(out, open(os.path.join(DATA, "arms_vs_het_control.json"), "w"), indent=1)
@@ -774,6 +852,8 @@ def main():
     m.add_argument("--het", action="store_true")
     sub.add_parser("width")
     sub.add_parser("arms")
+    ep = sub.add_parser("epochs")
+    ep.add_argument("run"); ep.add_argument("log")
     a = ap.parse_args()
     if a.cmd == "extract":
         extract(a.run, a.log, a.axis, a.allow_unchecked)
@@ -789,6 +869,8 @@ def main():
         width()
     elif a.cmd == "arms":
         arms()
+    elif a.cmd == "epochs":
+        epochs(a.run, a.log)
     else:
         bound()
 
