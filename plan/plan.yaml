@@ -3449,6 +3449,10 @@ entries:
       files, never submitted) and cov_v4_long_hpo8_68224 (DAGMan 13110751, wave 0 = 13110752-54); waves 3,3,2. When the first
       trial trains: read its .out/.err under the sweep dir (step rate per GPU, TRIAL_GPU line), check EOS still holds one
       cache key (850b33bd).'
+    24: 'Width runs at 4264 steps (1x), held by D243 until Joaquin releases them: widths 16 and 32 at seeds 42 and 43 against
+      the width-8 pair at seeds 42 and 43 (job_catalog_v3_short.sh, v4_het_default25, LONG_FACTOR=1, LONG_MEMMAP=true, full
+      training set), sent whole with no separate probe, on any GPU whose memory fits the width (lxplus or CC). Dropped from
+      step 16 by the set-next of 2026-11-02 06:00 and restored.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7893,6 +7897,11 @@ entries:
       if:
       - 'both sweeps done: eval reads of each best trial on its GPU type (REREAD), R 16x/4x on PP4, EE4, held-out'
       - 'a trial broke: read its log, fix, extend the sweep with generate_sweep --extend'
+    24:
+      feeds: 'D219/D229: does width at fixed training length improve the catalog pretraining'
+      if:
+      - 'w16 and w32 both below w8 on both seeds: width is a lever for the long run'
+      - 'no gain beyond the seed spread: keep width 8'
   owner:
     agent: acb96e9b7c0e4da34
     state: stopped
