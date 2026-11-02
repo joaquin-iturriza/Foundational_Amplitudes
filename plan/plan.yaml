@@ -3451,9 +3451,6 @@ entries:
       the cache'' per key), check /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache keys and df /sps/lpnhe (152G free at submit).'
     34: 'Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, trial_00xx, not in the site registry). When Jean Zay
       answers again: find their sweep and whether anyone still wants them; do not cancel before that.'
-    35: 'When width-8 FA-ccin2p3-804a65bc and 66e8c31f end: delete their two memmap caches under /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache,
-      after confirming from the logs which keys they built (at 11:45:46 they held 55632f216654f479bea62624 and 8ef2c8d8315b649823e2643f)
-      and that no deb290bc job uses those keys; report the deletion (our own rebuildable debris).'
     36: 'After both CC sweeps end (the freeze lifts): limit data_mmap._code_hash to the code that produces the cached arrays
       (boost/augment, ordering, preprocessing, standardisation, tables), not the lock, logging or I/O, with a test that a
       lock-only edit of data_mmap.py keeps the key.'
@@ -7999,11 +7996,6 @@ entries:
       if:
       - 'they belong to a live sweep someone wants: leave them, note the owner'
       - 'orphaned: report to the main session for the cancel'
-    35:
-      feeds: disk room on /sps for the sweeps' later waves
-      if:
-      - 'keys confirmed as only the width-8 runs'': delete both, report GB freed'
-      - 'a live job uses one: keep it, report'
     36:
       feeds: whether later code edits force new ~23 GB memmap caches
       if:
