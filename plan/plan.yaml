@@ -3449,6 +3449,14 @@ entries:
       files, never submitted) and cov_v4_long_hpo8_68224 (DAGMan 13110751, wave 0 = 13110752-54); waves 3,3,2. When the first
       trial trains: read its .out/.err under the sweep dir (step rate per GPU, TRIAL_GPU line), check EOS still holds one
       cache key (850b33bd).'
+    24: 'Width runs at 4264 steps (1x), released by Joaquin 2026-11-02 (''Now I just want these jobs to be done as soon as
+      possible''): widths 16 and 32 at seeds 42 and 43 against the width-8 pair at seeds 42 and 43 (scripts/job_catalog_v3_short.sh
+      @5e207b13, v4_het_default25[_seed2], LONG_HEADS=<w> LONG_FACTOR=1 LONG_MEMMAP=true, full training set), no separate
+      probe, lxplus. IDLE: w8 FA-lxplus-e512219a (s42, job 13110756), e2dbd507 (s43, 13110757), GPU>=24G, 4:15; w16 with LONG_CKPT=true
+      (gradient checkpointing, same result, slower) FA-lxplus-b13188d5 (s42, 13110760), 86b59b90 (s43, 13110761), GPU>=24G,
+      12:10 (the 40G-GPU w16 jobs 8bc0c981/5797f7e9 cancelled unstarted: only 3 slots matched). NOT YET SUBMITTED: w32 seeds
+      42 and 43 (80G GPU, 15:40): refused by the permission check, with Joaquin. On the first w16 start read its GPU peak
+      (VRAM line).'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7893,6 +7901,12 @@ entries:
       if:
       - 'both sweeps done: eval reads of each best trial on its GPU type (REREAD), R 16x/4x on PP4, EE4, held-out'
       - 'a trial broke: read its log, fix, extend the sweep with generate_sweep --extend'
+    24:
+      feeds: the 1x width reference for the 4x/16x length cells and whether width 16/32 beats width 8 at 1x (lr transfer read
+        at width 32)
+      if:
+      - 'all six done: best-checkpoint reads, width R per axis with the seed pair''s spread'
+      - 'a width runs out of GPU memory: rerun it with LONG_CKPT=true'
   owner:
     agent: acb96e9b7c0e4da34
     state: working
