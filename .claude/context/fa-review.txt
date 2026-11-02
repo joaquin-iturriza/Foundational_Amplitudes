@@ -19,4 +19,4 @@ cmds: review_backlog\.sh, /review-now, \bgit\s+merge\b
   `advance <name>` are the reviewer's own (the user's override is a `!` command). Watermarks: `.claude/.review_state/`.
 - All four reviewers (claudemd-keeper, notes-editor, repo-reviewer, design-reviewer) run on opus.
 - The code reviewer reviews cost: a change to generation or to how a batch is laid out is checked for yield and wall
-  time (the probe's numbers, the margin, run size against its limit, the number of waves).
+  time (time per unit and its source, the margin, run size against its limit, the number of waves).

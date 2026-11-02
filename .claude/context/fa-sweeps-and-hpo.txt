@@ -121,7 +121,7 @@ HPO search-space rules (harvested from 422 converged sweeps; derivation in `docs
    checkpoint, ablation flags, seeds).
 
 Sweeps across sites (`sweep/drive.py`):
-A sweep no longer has to live on one cluster. `generate_sweep` + `sweep_manager` keep the
+`generate_sweep` + `sweep_manager` keep the
 DyHPO state in a file that every trial locks on one site's filesystem; `sweep/drive.py`
 keeps that state on the laptop and sends stateless trials wherever `site pick` says:
     python sweep/drive.py --config sweep/sweep_config_X.yaml [--config ...] \
