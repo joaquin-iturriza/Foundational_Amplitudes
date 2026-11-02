@@ -3472,6 +3472,9 @@ entries:
       a finding): the width/checkpointing scaling in the estimate overshot; (e) repo-reviewer per-commit review of hot-path
       and data code instead of only large batches (proposed to Joaquin); (f) Joaquin''s idea for later: a way to know when
       a source (guidance, a report) is up to date before stating it as fact.'
+    40: Write up the 1x width result (widths 8/16/32 x seeds 42/43, analysis/catalog_v4/mixture_ab.py width @44a02702, width_x1.json)
+      in docs/results.tex with src/claim lines; when both CC length sweeps end, read each best trial and fit L(C) = A*C^(-alpha)
+      + L_inf across widths and lengths, labelled as information (widths not tuned separately).
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8016,6 +8019,11 @@ entries:
       if:
       - 'each fixed with a test: done'
       - 'not: listed as open'
+    40:
+      feeds: width against length for the catalog pretraining
+      if:
+      - 'fit done and written: report to Joaquin'
+      - 'a sweep fails: report with its log'
   owner:
     agent: a7f1fe982d7564477
     state: working
