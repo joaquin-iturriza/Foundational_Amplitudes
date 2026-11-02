@@ -189,7 +189,8 @@ def main():
             if isinstance(hps, int):
                 # a DyHPO search: its points are not known in advance, only how many results it must produce
                 # (2026-10-08: the 8k searches of the arms were invisible to the check, which knew fixed points only)
-                have = len(got.get(sw, set()))
+                # hp indices from 9900 up are probe results (hp9900/hp9901 of cov_v4_long_hpo8_17056), not trials
+                have = len([h for h in got.get(sw, set()) if h < 9900])
                 miss = list(range(max(0, hps - have)))
                 expected = hps
             else:
