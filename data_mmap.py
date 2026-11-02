@@ -354,6 +354,22 @@ def _open(d, name):
     return np.load(os.path.join(d, name + ".npy"), mmap_mode="r")
 
 
+def _lock_polling(f, poll=15.0, sleep=time.sleep):
+    """Exclusive flock on `f`, taken by polling a non-blocking request. A blocking flock on CC-IN2P3's NFS /sps
+    raised OSError ENOLCK ('No locks available') on 2026-11-02 (catalog_coverage: 8 sweep trials and a width run died
+    at the lock while two builders held theirs): an NFS blocking lock needs the server's grant callback, a non-blocking
+    one does not. EWOULDBLOCK / EAGAIN (held by another job) and ENOLCK are retried every `poll` seconds."""
+    import errno
+    while True:
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return
+        except OSError as e:
+            if e.errno not in (errno.EWOULDBLOCK, errno.EAGAIN, errno.ENOLCK):
+                raise
+        sleep(poll)
+
+
 def init_data_recipes_mmap(exp, c):
     """The memory-mapped twin of the tail of AmplitudeExperiment._init_data_recipes (from the per-role loads on).
     `c` holds the locals that function computed before: specs, names, roles, paths, use_pids, per_dataset, the
@@ -449,7 +465,7 @@ def init_data_recipes_mmap(exp, c):
     os.makedirs(root, exist_ok=True)
     with open(os.path.join(root, key + ".lock"), "w") as lk:
         LOGGER.info(f"data.memmap: waiting for the lock of {key} on {socket.gethostname()}")
-        fcntl.flock(lk, fcntl.LOCK_EX)              # one builder per key; the others wait and then read it
+        _lock_polling(lk)                           # one builder per key; the others wait and then read it
         LOGGER.info(f"data.memmap: holding the lock of {key}")
         meta_p = os.path.join(d, "meta.json")
         built = not os.path.exists(meta_p)
