@@ -4416,6 +4416,15 @@ entries:
       flock retried on ENOLCK (tests/test_mmap_lock.py; exclusion checked on the CC login node on /sps: second holder refused,
       errno 11). Resubmitted whole at 9439612d.'
     at: '2026-11-02T10:43:35+00:00'
+  - tried: 'CC resubmission at 9439612d (polling non-blocking flock retried on ENOLCK), 2026-11-02 ~11:45: sweeps 62936941-56,
+      width runs d8f1d92e, 02f80e1e, 5dbe4385, 8412dd6f'
+    why: 'the coordinator flagged likelihoods 128f913: on some /sps nodes ENOLCK is persistent, so the retry loop could wait
+      to the time limit, and flock over NFS may not exclude across nodes. No job had failed or built twice (one builder per
+      key at 11:46, waiters on ccwgslurm0102 polling); the waiters and both sweeps were cancelled before reaching or while
+      at the lock (sweep dirs set aside as sweeps/zz_flockpoll_*), the two width-8 builders 804a65bc/66e8c31f kept. Replaced
+      by the atomic-mkdir lock dirlock.py (deb290bc, repo-reviewer PASS) for the cache, the DyHPO state and the checkpoint
+      index.'
+    at: '2026-11-02T10:53:53+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
