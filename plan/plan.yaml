@@ -8882,6 +8882,22 @@ entries:
       synthetic 32k cells). Not catalog_coverage''s work (none of this entry''s jobs ever ran on Jean Zay; D249''s move to
       Jean Zay never submitted). Sweep dirs, configs and submitter not confirmed: needs squeue -o ''%i %j %Z %V %r'' and scontrol
       show job on Jean Zay, which only site run reaches. Nothing cancelled.'
+  - at: '2026-11-02T13:43:29+00:00'
+    text: '2026-11-02 14:45 (E3563), width runs at 4264 steps (1x), all Tesla V100-SXM2-32GB, TF32 flag on (no-op on V100).
+      Width 8 (scripts/job_catalog_v3_short.sh @9439612d): FA-ccin2p3-804a65bc seed 42 and 66e8c31f seed 43 COMPLETED, job
+      wall 11:42:11-14:21:44 = 2:40 against the 4:15 limit (no wall target recorded for this batch); cache build 933 s / 958
+      s; training 4264 steps in 69.6 / 69.9 min (0.932 / 0.935 s/step incl. validations; the design''s V100 memmap estimate
+      was 0.967); main run 1.61 / 1.62 h; GPU peak 19.6 / 19.5 GB; best checkpoint (analysis/common best_checkpoint on the
+      fetched metrics) at validation 23 of 25: val_loss_no_reg -2.8424 (seed 42), -2.8267 (seed 43), last -2.8424 / -2.8266
+      (still improving at the end). Width 16 (@deb290bc, LONG_CKPT): 493c98db / 7288b3fe trained 4264 steps in 121.1 / 120.2
+      min (1.627 / 1.616 s/step), GPU peak 16.7 GB each, in the post-training reads at 14:40. Width 32 (@deb290bc, LONG_CKPT):
+      e26059bf / fd7fc137 training, step 2369 of 4264 at 14:28, 3.45 s/step, training estimate 4.08 / 4.04 h (ends ~16:10),
+      VRAM peak 22.3 GB; the 37:00 limit is ~8x the measured need. Cache keys: every deb290bc job (w16/w32 and the 6 running
+      sweep trials of cov_v4_long_hpo8_cc_17056/_68224) holds 746f01a3cff290e21aad8172 (seed 42, built by 493c98db, 976 s)
+      or 85be020425c11d39564f90bf (seed 43, built by 7288b3fe, 980 s): one build per key, the waiters opened it (atomic-mkdir
+      lock works across jobs on ccwgslurm0102). No log names the width-8 keys 55632f21/8ef2c8d8. Deleting them (23 GB each;
+      /sps/lpnhe 437G used, 76G free, 86%) was refused by the laptop''s permission classifier (irreversible deletion): not
+      deleted, step 35 still open, waits on Joaquin''s permission.'
   handoff:
     state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
       started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
