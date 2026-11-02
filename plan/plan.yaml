@@ -8914,6 +8914,25 @@ entries:
       lock works across jobs on ccwgslurm0102). No log names the width-8 keys 55632f21/8ef2c8d8. Deleting them (23 GB each;
       /sps/lpnhe 437G used, 76G free, 86%) was refused by the laptop''s permission classifier (irreversible deletion): not
       deleted, step 35 still open, waits on Joaquin''s permission.'
+  - at: '2026-11-02T17:03:25+00:00'
+    text: '2026-11-02 (E3568, E3569), step 33 done: the six 1x width cells (4264 steps, het loss, share 0.25, catalog_v4,
+      Tesla V100, same lr and HPs at every width under muP; w8 @9439612d, w16/w32 @deb290bc with LONG_CKPT gradient checkpointing;
+      only the cache-lock code differs) all COMPLETED, no blow-up (spikes recovered: 493c98db step 850, 66e8c31f step 3060).
+      Tool: analysis/catalog_v4/mixture_ab.py width @44a02702 -> analysis/catalog_v4/data/width_x1.json. Best checkpoint (lowest
+      aggregate val_loss_no_reg, het NLL; all at the last validation, index 49 of 50: still improving): w8 -2.8364 (s42),
+      -2.8206 (s43); w16 -3.2055, -3.2448; w32 -3.5668, -3.6089. Per process at that step, width minus w8, median over 1153
+      processes: w16 -0.378 / -0.433 (lower on 99.0% / 98.1%), w32 -0.777 / -0.841 (99.4% / 99.5%). Zero-shot MSE ratio R
+      (per class geometric mean over its probes of width/w8 with each side the two seeds'' geometric mean, median over classes,
+      95% class bootstrap widened by w8''s |ln R_seed|; per-seed R beside): w16: PP4 0.565 [0.522,0.614] (s42 0.643, s43 0.490),
+      EE4 0.562 [0.512,0.649], held-out catalog-sampled H1-H7c pooled 0.703 [0.637,0.763], held-out default-sampled (700 classes:
+      H1-H3 PP4/EE4 probes, HD4, HD5) 0.660 [0.623,0.707], HD5 one-loop 0.927 [0.786,1.131]; w32: PP4 0.370 [0.334,0.413]
+      (0.384, 0.343), EE4 0.374 [0.333,0.436], held 0.595 [0.544,0.654], held default 0.528 [0.490,0.572], HD5 0.839 [0.713,1.107].
+      Seed spread (w8 s43/s42 R_seed): PP4 1.056, EE4 0.968, held 1.053, held default 1.016. Every read but the one-loop axes
+      (H5, HD5: intervals contain 1) gains with width. CORRECTION of the E3563 finding: the width-8 best val_loss_no_reg reported
+      there (-2.8424 / -2.8267, validation 23 of 25) were the 250-step sigma stage''s: analysis/common run_metrics took the
+      last metrics file in sort order and sigma_stage/plots_0 sorts after plots_0; fixed in 44a02702 (shallowest files only),
+      tested on the six runs here (main-run curves of 50 validations, matching the logs'' Val loss lines to 1e-4); not tested
+      on a run with plots_1 continuations.'
   handoff:
     state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
       started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
