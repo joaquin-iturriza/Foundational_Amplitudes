@@ -3443,24 +3443,18 @@ entries:
   - D234
   - D235
   next:
-    16: 'Long-run DyHPO sweeps on lxplus as HTCondor DAGs (generate_sweep @7ce26b87, configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
-      / _x16.yaml at 7ce26b87; state on AFS /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps/<name>/dyhpo_state.pkl):
-      cov_v4_long_hpo8_17056 (DAGMan 13110747, wave 0 trials 0008-0010 = 13110748-50; trials 0000-0007 in jobs/ are dry-run
-      files, never submitted) and cov_v4_long_hpo8_68224 (DAGMan 13110751, wave 0 = 13110752-54); waves 3,3,2. When the first
-      trial trains: read its .out/.err under the sweep dir (step rate per GPU, TRIAL_GPU line), check EOS still holds one
-      cache key (850b33bd).'
-    24: 'Width runs at 4264 steps (1x), released by Joaquin 2026-11-02 (''Now I just want these jobs to be done as soon as
-      possible''): widths 16 and 32 at seeds 42 and 43 against the width-8 pair at seeds 42 and 43 (scripts/job_catalog_v3_short.sh
-      @5e207b13, v4_het_default25[_seed2], LONG_HEADS=<w> LONG_FACTOR=1 LONG_MEMMAP=true, full training set), no separate
-      probe, lxplus. IDLE: w8 FA-lxplus-e512219a (s42, job 13110756), e2dbd507 (s43, 13110757), GPU>=24G, 4:15; w16 with LONG_CKPT=true
-      (gradient checkpointing, same result, slower) FA-lxplus-b13188d5 (s42, 13110760), 86b59b90 (s43, 13110761), GPU>=24G,
-      12:10 (the 40G-GPU w16 jobs 8bc0c981/5797f7e9 cancelled unstarted: only 3 slots matched). NOT YET SUBMITTED: w32 seeds
-      42 and 43 (80G GPU, 15:40): refused by the permission check, with Joaquin. On the first w16 start read its GPU peak
-      (VRAM line).'
-    25: 'Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, named trial_00xx, not in the site registry), seen 2026-11-02
-      by site status jeanzay while Jean Zay''s login commands timed out. When Jean Zay answers again: find which sweep they
-      belong to (sweep_manager registry on Jean Zay, job scripts'' paths) and whether any owner or decision still wants them;
-      do not cancel them before that.'
+    26: '16: Long-run DyHPO sweeps on CC-IN2P3 (generate_sweep + sweep_manager on the CC login node, state on /sps; configs
+      sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f; partition gpu_v100,gpu_h100, 46G, 5 CPUs,
+      limits 08:03 / 28:42): ccin2p3:cov_v4_long_hpo8_cc_17056 (jobs 62936765-72) and ccin2p3:cov_v4_long_hpo8_cc_68224 (jobs
+      62936773-80), waves 3,3,2 afterany-chained; wave 0 of both started on V100 2026-11-02 ~11:25. Targets 16 h and 57 h
+      (V100). When the first trials train: read their logs (step rate, TRIAL_GPU), check /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
+      holds one key (12 jobs started at once: the lock on NFS /sps untested) and df /sps/lpnhe (152G free at submit).'
+    27: '24: Width runs at 4264 steps (1x) on CC-IN2P3, scripts/job_catalog_v3_short.sh @08da28f8, LONG_FACTOR=1 LONG_MEMMAP=true,
+      46G, 5 CPUs, gpu_v100,gpu_h100: w8 FA-ccin2p3-9d41b955 (s42, 4:15), 0899399c (s43); w16 LONG_CKPT=true 1367f4f4 (s42,
+      12:10), 674fa271 (s43); w32 LONG_CKPT=true c6f7ab9d (s42, 37:00), 78a0e8db (s43); all started on V100 ~11:25. On the
+      first w16/w32 that trains read its GPU peak (VRAM line).'
+    28: 'Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, trial_00xx, not in the site registry). When Jean Zay
+      answers again: find their sweep and whether anyone still wants them; do not cancel before that.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7939,23 +7933,23 @@ entries:
     start: '2026-11-02T10:24:41+00:00'
     at: '2026-11-02T10:24:41+00:00'
   step_why:
-    16:
+    26:
       feeds: whether training 16x (68224 steps) beats 4x (17056 steps) at tuned HPs, i.e. which length becomes the foundation
         pretraining candidate (D242)
       if:
       - 'both sweeps done: eval reads of each best trial on its GPU type (REREAD), R 16x/4x on PP4, EE4, held-out'
       - 'a trial broke: read its log, fix, extend the sweep with generate_sweep --extend'
-    24:
+    27:
       feeds: the 1x width reference for the 4x/16x length cells and whether width 16/32 beats width 8 at 1x (lr transfer read
         at width 32)
       if:
       - 'all six done: best-checkpoint reads, width R per axis with the seed pair''s spread'
-      - 'a width runs out of GPU memory: rerun it with LONG_CKPT=true'
-    25:
-      feeds: whether Jean Zay GPU hours are being held by stale sweep jobs of ours
+      - 'a w32 runs out of GPU memory on V100: resubmit it to gpu_h100 only'
+    28:
+      feeds: whether Jean Zay GPU hours are held by stale sweep jobs of ours
       if:
       - 'they belong to a live sweep someone wants: leave them, note the owner'
-      - 'orphaned (no owner, no decision wants them): report to the main session for the cancel'
+      - 'orphaned: report to the main session for the cancel'
   owner:
     agent: a5af1a86ca67f9f3a
     state: working
