@@ -3457,6 +3457,10 @@ entries:
       12:10 (the 40G-GPU w16 jobs 8bc0c981/5797f7e9 cancelled unstarted: only 3 slots matched). NOT YET SUBMITTED: w32 seeds
       42 and 43 (80G GPU, 15:40): refused by the permission check, with Joaquin. On the first w16 start read its GPU peak
       (VRAM line).'
+    25: 'Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, named trial_00xx, not in the site registry), seen 2026-11-02
+      by site status jeanzay while Jean Zay''s login commands timed out. When Jean Zay answers again: find which sweep they
+      belong to (sweep_manager registry on Jean Zay, job scripts'' paths) and whether any owner or decision still wants them;
+      do not cancel them before that.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7908,6 +7912,11 @@ entries:
       if:
       - 'all six done: best-checkpoint reads, width R per axis with the seed pair''s spread'
       - 'a width runs out of GPU memory: rerun it with LONG_CKPT=true'
+    25:
+      feeds: whether Jean Zay GPU hours are being held by stale sweep jobs of ours
+      if:
+      - 'they belong to a live sweep someone wants: leave them, note the owner'
+      - 'orphaned (no owner, no decision wants them): report to the main session for the cancel'
   owner:
     agent: a5af1a86ca67f9f3a
     state: working
