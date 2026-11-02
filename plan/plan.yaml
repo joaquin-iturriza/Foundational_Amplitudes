@@ -7999,7 +7999,7 @@ entries:
       - 'the array code cannot be separated cleanly: hash per function and list them in the test'
   owner:
     agent: a5af1a86ca67f9f3a
-    state: working
+    state: closed
     since: '2026-11-02T09:59:35+00:00'
     state_at: '2026-11-02T11:48:18.206000+00:00'
     context: 241084
@@ -8848,32 +8848,49 @@ entries:
       built duplicates: width-8 runs 804a65bc/66e8c31f (@9439612d) built keys 55632f21/8ef2c8d8 (their logs, 11:45:46), the
       deb290bc jobs build two others.'
   handoff:
-    state: 'Step 16: the two long-run DyHPO sweeps run on lxplus as HTCondor DAGs (generate_sweep @7ce26b87; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
-      and _x16.yaml at 7ce26b87: 8 trials, 3 start-up, waves 3,3,2, gp 2000 candidates, GPU>=24G, 46G, 5 CPUs, limits 08:03
-      / 28:42): lxplus:cov_v4_long_hpo8_17056 (DAGMan 13110747, wave 0 trials 0008-0010 = 13110748-50; jobs/trial_0000-0007
-      are dry-run files never submitted) and lxplus:cov_v4_long_hpo8_68224 (DAGMan 13110751, wave 0 = 13110752-54); state
-      /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps/<name>/dyhpo_state.pkl. All IDLE at 06:45: lxplus has no
-      free whole-GPU slot (the schedd raises each GPU job to 16 CPUs / 48000 MB; better-analyze: 0 match, 34 if drained).
-      Stage-0 probe passed (fdf08708/f44c7c06, A100: 0.55 s/step, 2.2 s/validation, cache 850b33bd 19G built once in 1319
-      s, lock held, host peak 25.2 GB). Step 24 (1x width runs, released 2026-11-02): w8 e512219a/e2dbd507, w16 with LONG_CKPT
-      b13188d5/86b59b90 queued on lxplus; the w32 pair not submitted (permission check refused it; with Joaquin). Next on
-      resume: when the first trial / w16 run trains read its log (step rate, TRIAL_GPU, VRAM peak) and check EOS holds one
-      cache key.'
-    decisions: 'D242 approved both sweeps at estimate (~195 GPU-h at V100 rates); D244-D247 HPO layout and any-GPU placement;
-      Joaquin 2026-11-02 ~05:50: sweeps run on their site, not from the laptop (drive.py coordinators stopped, 6 trials cancelled;
-      the coordinator later retracted, the lxplus move stands); Joaquin 2026-11-02: width runs released (''Now I just want
-      these jobs to be done as soon as possible''), no probe, gradient checkpointing allowed (w16 moved to LONG_CKPT and 24G
-      GPUs). Time limits: w8 short_wall V100 3.47 h + cache = 4:15; w16/w32 scaled by (width/8)^1.5 from A100 0.55 s/step,
-      x1.25 margin; w16 with checkpointing x1.33 on training and the sigma stage and V100 x1.76 = 12:10; w32 15:40 at >=80G.'
-    ruled_out: drive.py from the laptop for these sweeps (Joaquin); 40G-GPU minimum for w16 (only 3 slots ever match); a separate
-      probe before the width runs (Joaquin)
-    running: lxplus DAGs 13110747 (17056) and 13110751 (68224); width runs FA-lxplus-e512219a, e2dbd507 (w8), b13188d5, 86b59b90
-      (w16 ckpt)
-    files: 'sweep/generate_sweep.py (@7ce26b87: dyhpo.waves DAG, gpu_min_mem, request_cpus, TRIAL_GPU), tests/test_condor_flavour.py,
-      the two sweep configs, scripts/job_catalog_v3_short.sh, ~/.local/bin/site_runends.py (condor log reads .err+.out; backup
-      .bak-20261102-condorout), ~/.local/bin/site (pick: START=false slots and the 16 CPU/48000 MB GPU share, cap-0 sites
-      dropped; backup site.bak-20261102-pickfree)'
-    written: '2026-11-02T05:34:51+00:00'
+    state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
+      started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
+      association MaxJobs is lifted). All at code deb290bc (atomic-mkdir locks, dirlock.py) except the two width-8 runs at
+      9439612d. Nothing trained yet at hand-off (~12:00): read the first logs for step rate, TRIAL_GPU, the lock lines (one
+      ''built the cache'' per key) and the w16/w32 GPU peak (VRAM line). CACHE FREEZE: data_mmap.py and every module data_mmap._code_hash
+      reads (preprocessing, particle_ids, multiplicity_extrap, lloca rand_transforms/polar_decomposition, physics_scales,
+      the listed experiment.py methods and mg5_pipeline_final functions) are not edited until both sweeps end: the key hashes
+      their source, so an edit makes each later wave build another ~23 GB cache (/sps at 86%, 77 GB free). Keys: seed 42 and
+      seed 43 each have one key per code version (augmentation baked in); the deb290bc jobs (w16/w32 and both sweeps) build
+      two new keys; the width-8 runs built 55632f216654f479bea62624 (seed 42) and 8ef2c8d8315b649823e2643f (seed 43) at 11:45:46
+      by their logs. Next steps on the entry: when 804a65bc and 66e8c31f end, delete those two caches (confirm from the logs
+      that no deb290bc job uses them; our rebuildable debris, report it); after the sweeps narrow _code_hash to the array-producing
+      code with a test that a lock-only edit keeps the key. Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, trial_00xx,
+      not in the site registry), seen via site status jeanzay; when Jean Zay answers find their sweep and whether anyone wants
+      them, do not cancel before that. Known bug, not fixed: generate_sweep.next_available_name reads a trailing _<digits>
+      of a sweep name as a counter, so with FA_NEW_SWEEP_REASON ''cov_v4_long_hpo8_17056'' became ''cov_v4_long_hpo8_17057''
+      (cancelled; set aside as sweeps/zz_enolck_cov_v4_long_hpo8_17057); the sweeps were renamed cov_v4_long_hpo8_cc_* (73073f7f)
+      instead.'
+    decisions: 'D242 approved both sweeps at estimate (~195 GPU-h). D243 (2026-11-01): delete the CC caches, no resubmission
+      then (lifted later by the step-16 go). D244: HPO layout = start-up runs then 2 sequential batches, ~8 trials. D245:
+      1/3 start-up then two sequential batches (8 trials: 3,3,2). D246: the likelihoods sweep changes (gp surrogate, 2000
+      candidates). D247: any site and any GPU that accepts the work (any GPU >= 24 GB). D248 (2026-11-02 05:20): ''Now I just
+      want these jobs to be done as soon as possible'' releases the width runs at 4264 steps (w16, w32 vs the w8 pair, seeds
+      42, 43), no probe, gradient checkpointing allowed. Joaquin 2026-11-02: move to Jean Zay; the coordinator then moved
+      all to CC (Jean Zay unreachable, CC open). Width 32 runs with LONG_CKPT=true on gpu_v100,gpu_h100 (H100s all busy),
+      limit 37:00 = A100 15:40 x1.76 (V100) x1.33 (ckpt). E3550 (flock ENOLCK on NFS /sps) fixed by dirlock.py deb290bc (repo-reviewer
+      PASS, backlog advanced to cea13f87); E3551 item check moved to the cc sweep names (acked).'
+    ruled_out: 'lxplus for these jobs (no free whole-GPU slot in ~5 h; DAGs 13110747/13110751 and width runs removed); Jean
+      Zay today (unreachable); blocking fcntl.flock on /sps (ENOLCK: killed 0899399c and 7 trials); polling non-blocking flock
+      9439612d (persistent ENOLCK on some nodes per likelihoods 128f913; superseded); reusing sweep names that hold cancelled
+      states (sweep_manager registry says ''no new trial scripts'')'
+    running: 'CC-IN2P3: sweeps ccin2p3:cov_v4_long_hpo8_cc_17056 (jobs 62936972-79, limit 08:03, target 16 h, ~42 GPU-h) and
+      ccin2p3:cov_v4_long_hpo8_cc_68224 (62936980-87, limit 28:42, target 57 h, ~152 GPU-h), waves 3,3,2, configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      / _x16.yaml @73073f7f, code deb290bc; width runs (scripts/job_catalog_v3_short.sh, LONG_FACTOR=1 LONG_MEMMAP=true, 46G,
+      5 CPUs, gpu_v100,gpu_h100): w8 FA-ccin2p3-804a65bc (s42), 66e8c31f (s43) @9439612d, 4:15; w16 LONG_CKPT 493c98db (s42),
+      7288b3fe (s43) @deb290bc, 12:10; w32 LONG_CKPT e26059bf (s42), fd7fc137 (s43) @deb290bc, 37:00; plan wait on step 33
+      for the six. Total ~280 GPU-h at estimate. Finish estimates: w8 ~16:00 11-02, w16 ~22:00 11-02, 17056 sweep ~04:00 11-03,
+      w32 ~18:00 11-03, 68224 sweep ~21:00 11-04.'
+    files: 'dirlock.py, data_mmap.py (frozen), sweep/dyhpo_sampler.py, sweep/checkpoint_index.py, tests/test_mmap_lock.py,
+      sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, _x16.yaml, sweep/generate_sweep.py (next_available_name bug), scripts/job_catalog_v3_short.sh,
+      analysis/catalog_v4/expect_cov_v4_long_hpo8.json; CC: sweeps/zz_enolck_*, sweeps/zz_flockpoll_* (set-aside failed sweeps),
+      ~/.sweep_manager/registry.json(.bak-20261102-enolck)'
+    written: '2026-11-02T11:48:46+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
