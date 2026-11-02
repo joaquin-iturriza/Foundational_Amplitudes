@@ -4393,6 +4393,15 @@ entries:
       condor_rm''d (REMOVED), sweeps regenerated on lxplus by generate_sweep as HTCondor DAGs (7ce26b87; DAGMan 13110747 and
       13110751). The coordinator later retracted the instruction; the lxplus move stands as instructed (no second move).'
     at: '2026-11-02T05:00:15+00:00'
+  - tried: long-run DyHPO sweeps lxplus:cov_v4_long_hpo8_17056 / _68224 as HTCondor DAGs (DAGMan 13110747, 13110751, generate_sweep
+      @7ce26b87) and the 1x width runs FA-lxplus-e512219a, e2dbd507 (w8), b13188d5, 86b59b90 (w16 ckpt), 2026-11-02 06:27-11:25
+    why: 'never trained: IDLE about 5 h on lxplus (no free whole-GPU slot; e512219a ran 10 s and went back to IDLE). Joaquin
+      2026-11-02 moved them to Jean Zay, which was unreachable (site run timeouts); the coordinator then moved all of it to
+      CC-IN2P3 (association MaxJobs lifted, free V100s). All removed with condor_rm after their CC copies were submitted.
+      Also: a CC sweep cov_v4_long_hpo8_17057 (generate_sweep with FA_NEW_SWEEP_REASON read the step suffix _17056 as a counter)
+      was cancelled within 5 min (trials 0000-0002 had just started); replaced by cov_v4_long_hpo8_cc_17056 (configs renamed
+      @73073f7f)'
+    at: '2026-11-02T10:28:48+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
