@@ -8029,8 +8029,8 @@ entries:
     state: working
     since: '2026-11-02T11:49:23+00:00'
     state_at: '2026-11-02T16:55:38+00:00'
-    context: 127801
-    context_at: '2026-11-02T16:55:26+00:00'
+    context: 179375
+    context_at: '2026-11-02T17:04:01+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
