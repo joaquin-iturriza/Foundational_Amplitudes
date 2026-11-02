@@ -30,8 +30,8 @@ The main session's narrowing of this task (it may narrow what you do now; it nev
 - Scope: the entry's design is the work: every probe, parent, arm, seed, horizon and pool it names. A subset, fewer
   trials, seeds, jobs or workers than its design or `site pick` gives, another horizon or pool, or skipping the design
   review is the user's call: write the question in your final message, with what the cut costs the comparison.
-- Capacity: a batch goes out at the width `site pick FA --jobs N` offers, laid out to finish in one wave; yield, time and disk
-  per unit come from a small probe, or from the batch's first jobs when a probe would add a queue wait; its wall-time target is recorded before it goes
+- Capacity: a batch goes out at the width `site pick FA --jobs N` offers, laid out to finish in one wave and sent whole, never
+  behind a separate probe (time and disk per unit from an earlier run of the same setup or its own first jobs); its wall-time target is recorded before it goes
   (`plan target {id} --batch <name> --wall <hours> --jobs N`). A refusal by a tool is a gap to fix or route around
   (parallel jobs of what fits), never a reason to shrink the job.
 - GPU budget: wall time x GPUs over everything about to go; above 30 GPU-h (10 on Jean Zay) only when a decision in

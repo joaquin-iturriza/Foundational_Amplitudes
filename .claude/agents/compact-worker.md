@@ -121,7 +121,7 @@ on the sites (`~/work/CLAUDE.md`).
 ## Clusters and jobs
 
 - State every batch's wall-time target before submission and record it on its plan entry: the time of its work (training steps at the model's step rate in a plain training run on that GPU, one forward pass per read, generation at the probe's time per event), never a measured rate that includes overhead.
-- A batch's yield, time and disk per unit are measured by a small probe, or by the batch's own first jobs when a separate probe would add a queue wait; it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
+- A batch goes out whole, never behind a separate probe: its time and disk per unit come from an earlier run of the same setup or are read from its own first jobs (generation keeps its probe, which sizes the runs from the kept fraction); it is laid out to finish in one wave at the width `site pick` offers; disk per unit times the jobs, plus any cache they should share (shown shared by two jobs on the same data), must fit the site's free disk read at submission.
 - A margin above 2× (events asked over events kept, a run's or a stage's wall time over its target) is a finding to fix, not to absorb.
 - A failed task goes to the agent that owns its work, which reads its cause in the log before anything is resubmitted.
 
