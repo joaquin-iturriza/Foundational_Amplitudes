@@ -7910,7 +7910,7 @@ entries:
       - 'a width runs out of GPU memory: rerun it with LONG_CKPT=true'
   owner:
     agent: acb96e9b7c0e4da34
-    state: working
+    state: closed
     since: '2026-11-02T03:25:45+00:00'
     state_at: '2026-11-02T05:32:12.447000+00:00'
     context: 243031
@@ -8743,43 +8743,32 @@ entries:
       can start on CC until it is lifted (site pick also prints ''cap 0''); jobs ran on CC this morning, so the limit is new.
       Also the 3 H100 nodes have been IDLE+COMPLETING since 16:47. Nothing started; the jobs stay queued.'
   handoff:
-    state: 'Step 16 (long-run DyHPO, design passed 2026-11-01T17:29 by af8bc336031948642). Stage 0: two lxplus probe jobs
-      through the trials'' own path, FA-lxplus-fdf08708 (lr 2.633e-3) and FA-lxplus-f44c7c06 (lr 1.5e-3): sweep/trial_job.sh
-      with TRIAL_TIMEV=1 -> run_trial --detached, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, --t-steps 1000, 46G,
-      5 CPUs, gpu_min_mem 24G, 3 h, plan wait on step 16. On their end read both logs whole (site logs -n 100000). PASS reads:
-      (a) lock: different hosts (trial_job prints host=), the second job''s ''data.memmap: waiting for the lock of <key> on
-      <host>'' before the first''s ''built the cache'', then the second logs ''opening the cache'', and only one <key> dir
-      and no leftover .tmp under /eos/user/j/joiturri/tmp/amp_mmap_cache; (b) both rc 0 with a RESULT_JSON; (c) host peak
-      (''Maximum resident set size'', /usr/bin/time) under 46G, else mem = peak x1.25; (d) TRIAL_GPU and the step rate between
-      validations, validation cost and cache build time (tools/job_wall_split.py on the logs), cache size by du. FAIL: same
-      host or no overlap = lock untested -> repeat the probe once (third job submitted while the first builds) or set data.memmap_dir
-      to node-local storage with a 20 GB disk request; a second builder = flock does not hold on EOS -> node-local memmap_dir;
-      delete any extra probe cache key (only the probe made it). NEXT on pass: set cluster.time in both configs to the measured
-      estimate (steps x rate + validations + cache build; drive.py limit is 1.5x + 6 min), commit, site sync lxplus and ccin2p3,
-      record targets (plan target), then start two drivers under tools/detach.py --entry catalog_coverage: python sweep/drive.py
-      --config sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml --item catalog_coverage --sites lxplus ccin2p3 (and the
-      same for _x16.yaml), waves [3,3,2] from dyhpo.waves; after the first trials start check that exactly one cache key is
-      built; each trial''s GPU is in its RESULT_JSON (sweeps_local/<name>/results). Then each sweep''s best trial gets an
-      eval read on its training GPU type (sigma-only stage plus every axis, REREAD) and the 16x-vs-4x R. CC: account MaxJobs=0
-      (AssocMaxJobsLimit) since ~17:30, all CC GPU jobs blocked; the 16 sweep_manager jobs were cancelled unstarted. Held
-      under D243 until Joaquin speaks: the 1x width-8 pair, width probes, 1x widths 16/32.'
-    decisions: 'D243 caches deleted (/sps/lpnhe 100% -> 71%), no resubmission of step 16''s other cells; D244 HPO = start-up
-      then 2 sequential batches, about 8 trials (template 8247811a: 8 trials, n_startup 3); D245 layout 1/3 start-up then
-      two batches at any size (sweep_manager wave 0 = n_startup, 6f7b4060; drive.py dyhpo.waves); D246 likelihoods setup as
-      FA default: surrogate gp, n_candidates 2000, objective_scale auto (6f7b4060); D247 any site and any GPU, lxplus has
-      no 24 h cap (flavour follows wall time, 5a1dd0d3; site pick/submit --gpu-min-mem; overrides the same-hardware FIX; each
-      best trial read on its training GPU type); D242 both sweeps approved at estimate (about 192 GPU-h at V100 rates, item
-      est 1420).'
-    ruled_out: H100-only placement (overridden by D247); sweep_manager on CC (MaxJobs=0; one-site state); 40-trial/10-start-up
-      budget (D244); flavour 'tomorrow' as a 24 h cap; rebuilding pools on lxplus (all catalog_v4_default25 pools, default-source
-      pools, alphas and sidecars already there, check_site_data 0 missing).
-    running: FA-lxplus-fdf08708, FA-lxplus-f44c7c06 (lxplus probes, IDLE at hand-off, plan wait on step 16)
-    files: sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml (@414edc6d),
-      sweep/sweep_config_jeanzay_template.yaml, sweep/drive.py, sweep/run_trial.py (_rerooted_base_paths, gpu in RESULT_JSON),
-      sweep/trial_job.sh (TRIAL_TIMEV, TRIAL_GPU), data_mmap.py (lock log b9c44085), sweep/sweep_manager.py, siteconf.py,
-      sweep/finalize_sweep.py, tests/test_condor_flavour.py, tests/test_siteconf_partition.py, ~/.local/bin/site (_secs, FLAVOURS,
-      --gpu-min-mem; backups site.bak-20261101-*), runs/catalog_v4_short/v4_het_default25 (copied to lxplus)
-    written: '2026-11-01T17:35:17+00:00'
+    state: 'Step 16: the two long-run DyHPO sweeps run on lxplus as HTCondor DAGs (generate_sweep @7ce26b87; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
+      and _x16.yaml at 7ce26b87: 8 trials, 3 start-up, waves 3,3,2, gp 2000 candidates, GPU>=24G, 46G, 5 CPUs, limits 08:03
+      / 28:42): lxplus:cov_v4_long_hpo8_17056 (DAGMan 13110747, wave 0 trials 0008-0010 = 13110748-50; jobs/trial_0000-0007
+      are dry-run files never submitted) and lxplus:cov_v4_long_hpo8_68224 (DAGMan 13110751, wave 0 = 13110752-54); state
+      /afs/cern.ch/user/j/joiturri/Foundational_Amplitudes/sweeps/<name>/dyhpo_state.pkl. All IDLE at 06:45: lxplus has no
+      free whole-GPU slot (the schedd raises each GPU job to 16 CPUs / 48000 MB; better-analyze: 0 match, 34 if drained).
+      Stage-0 probe passed (fdf08708/f44c7c06, A100: 0.55 s/step, 2.2 s/validation, cache 850b33bd 19G built once in 1319
+      s, lock held, host peak 25.2 GB). Step 24 (1x width runs, released 2026-11-02): w8 e512219a/e2dbd507, w16 with LONG_CKPT
+      b13188d5/86b59b90 queued on lxplus; the w32 pair not submitted (permission check refused it; with Joaquin). Next on
+      resume: when the first trial / w16 run trains read its log (step rate, TRIAL_GPU, VRAM peak) and check EOS holds one
+      cache key.'
+    decisions: 'D242 approved both sweeps at estimate (~195 GPU-h at V100 rates); D244-D247 HPO layout and any-GPU placement;
+      Joaquin 2026-11-02 ~05:50: sweeps run on their site, not from the laptop (drive.py coordinators stopped, 6 trials cancelled;
+      the coordinator later retracted, the lxplus move stands); Joaquin 2026-11-02: width runs released (''Now I just want
+      these jobs to be done as soon as possible''), no probe, gradient checkpointing allowed (w16 moved to LONG_CKPT and 24G
+      GPUs). Time limits: w8 short_wall V100 3.47 h + cache = 4:15; w16/w32 scaled by (width/8)^1.5 from A100 0.55 s/step,
+      x1.25 margin; w16 with checkpointing x1.33 on training and the sigma stage and V100 x1.76 = 12:10; w32 15:40 at >=80G.'
+    ruled_out: drive.py from the laptop for these sweeps (Joaquin); 40G-GPU minimum for w16 (only 3 slots ever match); a separate
+      probe before the width runs (Joaquin)
+    running: lxplus DAGs 13110747 (17056) and 13110751 (68224); width runs FA-lxplus-e512219a, e2dbd507 (w8), b13188d5, 86b59b90
+      (w16 ckpt)
+    files: 'sweep/generate_sweep.py (@7ce26b87: dyhpo.waves DAG, gpu_min_mem, request_cpus, TRIAL_GPU), tests/test_condor_flavour.py,
+      the two sweep configs, scripts/job_catalog_v3_short.sh, ~/.local/bin/site_runends.py (condor log reads .err+.out; backup
+      .bak-20261102-condorout), ~/.local/bin/site (pick: START=false slots and the 16 CPU/48000 MB GPU share, cap-0 sites
+      dropped; backup site.bak-20261102-pickfree)'
+    written: '2026-11-02T05:34:51+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
