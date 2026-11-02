@@ -29,6 +29,11 @@ HPS = ("1860", "0353", "1333")
 N_PARAMS = {8: 1775829, 16: 6516181, 32: 25434069}     # 'Instantiated model ... learnable parameters' of each log
 WIDTH_RUNS = {8: ("FA-ccin2p3-804a65bc", "FA-ccin2p3-66e8c31f"), 16: ("FA-ccin2p3-493c98db", "FA-ccin2p3-7288b3fe"),
               32: ("FA-ccin2p3-e26059bf", "FA-ccin2p3-fd7fc137")}     # (seed 42, seed 43), mixture_ab.WIDTH
+# each trial's lr (RUN_SUMMARY of its out log on CC) and each length's lr window centre c (the step-16 design's
+# lr*(t, D), tools/lr_surface_center.py @3d12f881): one hp set sits at the same lr / c at both lengths
+LR = {"4x": {"1860": 1.156305e-3, "0353": 6.17248e-3, "1333": 4.341778e-3},
+      "16x": {"1860": 5.394801e-4, "0353": 2.879903e-3, "1333": 2.025735e-3}}
+LR_CENTRE = {"4x": 2.63e-3, "16x": 1.23e-3}
 OFF_SCALE = 1.0          # validations above this NLL (the warm-up spikes, up to ~1e11) are not drawn, and counted
 
 
@@ -79,6 +84,9 @@ def figs():
     w = json.load(open(os.path.join(DATA, "width_x1.json")))
     tr = json.load(open(os.path.join(DATA, "size_curves.json")))["trials"]
     col = {"1860": ps.C.blue, "0353": ps.C.vermillion, "1333": ps.C.green}
+    rel = {h: [LR[l][h] / LR_CENTRE[l] for l in LR] for h in HPS}
+    assert all(abs(a / b - 1) < 0.02 for a, b in rel.values()), rel
+    hpl = {h: rf"lr ${rel[h][0]:.2f}\,c$" for h in HPS}
     os.makedirs(FIGS, exist_ok=True)
     report = {}
 
@@ -142,7 +150,7 @@ def figs():
     ax.set_xlabel("training step")
     ax.set_ylabel("validation NLL")
     hs = [Line2D([], [], color=ps.C.grey, label="1x")] + \
-        [Line2D([], [], color=col[h], label=f"hp{h}") for h in HPS] + \
+        [Line2D([], [], color=col[h], label=hpl[h]) for h in HPS] + \
         [Line2D([], [], color="k", ls="-", label="4x"), Line2D([], [], color="k", ls="--", label="16x, running")]
     ps.legend(ax, "lower left", handles=hs, ncol=2)
     ps.save(fig, os.path.join(FIGS, "length_w8_curves"))
@@ -167,7 +175,7 @@ def figs():
     ax.set_xlabel(r"$C$ = steps $\times N / N_8$")
     ax.set_ylabel("best validation NLL")
     hs = [Line2D([], [], ls="", marker="D", color=wcol[k], label=f"1x w{k}") for k in (8, 16, 32)] + \
-        [Line2D([], [], ls="", marker="o", color=col[h], label=f"hp{h}") for h in HPS] + \
+        [Line2D([], [], ls="", marker="o", color=col[h], label=hpl[h]) for h in HPS] + \
         [Line2D([], [], ls="", marker="o", color="k", label="4x w8"),
          Line2D([], [], ls="", marker="o", color="k", mfc="none", label="16x w8, running")]
     ps.legend(ax, "lower left", handles=hs, ncol=2)
