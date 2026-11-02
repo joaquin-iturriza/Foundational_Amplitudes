@@ -19,8 +19,7 @@ Typical usage in run_trial.py:
 """
 
 import fcntl
-import time
-import errno
+import sys as _sys
 import itertools
 import math
 import os
@@ -29,6 +28,12 @@ from contextlib import contextmanager
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
+
+try:
+    from dirlock import dir_lock
+except ImportError:     # imported from sweep/ without the repo root on sys.path
+    _sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from dirlock import dir_lock
 
 
 # ---------------------------------------------------------------------------
@@ -745,34 +750,23 @@ class DyHPOSampler:
         with DyHPOSampler.locked(state_path, output_path) as sampler:
             hp_idx, hp_params, t_steps = sampler.suggest()
         """
-        lock_path = state_path + '.lock'
-        with open(lock_path, 'w') as lf:
-            # flock on the shared FS can fail transiently with ENOLCK ("No locks
-            # available"); one such failure lost a finished trial's observation.
-            for attempt in range(8):             # ~3 min in total, well inside a trial's wall time
-                try:
-                    fcntl.flock(lf, fcntl.LOCK_EX)
-                    break
-                except OSError as e:
-                    if e.errno != errno.ENOLCK or attempt == 7:
-                        raise
-                    time.sleep(5.0 + 5.0 * attempt)
-            try:
-                # A lock on the state file's own inode makes the NFS client drop its cached pages
-                # for it (the flock above is on .lock, which says nothing about the pkl's cache):
-                # the load below then reads what the last holder wrote, not a stale copy.
-                if os.path.exists(state_path):
-                    with open(state_path, 'rb') as sf:
-                        try:        # a cache refresh only: the flock on .lock serializes access,
-                            fcntl.lockf(sf, fcntl.LOCK_SH)   # so a transient ENOLCK here must not
-                            fcntl.lockf(sf, fcntl.LOCK_UN)   # fail a finished trial's observe()
-                        except OSError:
-                            pass
-                sampler = DyHPOSampler.load(state_path, output_path)
-                yield sampler
-                sampler.save(state_path)
-            finally:
-                fcntl.flock(lf, fcntl.LOCK_UN)
+        # An atomic-mkdir lock (dirlock.py) on <state>.lockdir: flock on CC-IN2P3's NFS /sps answers ENOLCK on
+        # some nodes (likelihoods 128f913; FA E3550, 2026-11-02), and a retried flock lost a finished trial's
+        # observation before
+        with dir_lock(state_path):
+            # Locking the state file's own inode makes the NFS client drop its cached pages for it: the load
+            # below then reads what the last holder wrote, not a stale copy (best effort: a failure here is
+            # only a missed cache refresh, never a failed observe())
+            if os.path.exists(state_path):
+                with open(state_path, 'rb') as sf:
+                    try:
+                        fcntl.lockf(sf, fcntl.LOCK_SH)
+                        fcntl.lockf(sf, fcntl.LOCK_UN)
+                    except OSError:
+                        pass
+            sampler = DyHPOSampler.load(state_path, output_path)
+            yield sampler
+            sampler.save(state_path)
 
 
 # ---------------------------------------------------------------------------

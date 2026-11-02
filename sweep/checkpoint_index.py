@@ -14,9 +14,15 @@ fcntl.LOCK_EX advisory locking:
         idx.register(hp_idx, run_dir, run_idx, steps_done, t_steps)
 """
 
-import fcntl
 import json
 import os
+import sys
+
+try:
+    from dirlock import dir_lock
+except ImportError:     # imported from sweep/ without the repo root on sys.path
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from dirlock import dir_lock
 
 
 class CheckpointIndex:
@@ -39,16 +45,18 @@ class CheckpointIndex:
     # ------------------------------------------------------------------
 
     def __enter__(self):
-        self._fh = open(self.index_path + '.lock', 'w')
-        fcntl.flock(self._fh, fcntl.LOCK_EX)
+        # atomic-mkdir lock (dirlock.py): flock on CC-IN2P3's NFS /sps answers ENOLCK on some nodes
+        self._fh = dir_lock(self.index_path)
+        self._fh.__enter__()
         self._load()
         return self
 
     def __exit__(self, *_):
-        self._save()
-        fcntl.flock(self._fh, fcntl.LOCK_UN)
-        self._fh.close()
-        self._fh = None
+        try:
+            self._save()
+        finally:
+            self._fh.__exit__(None, None, None)
+            self._fh = None
         self._data = None
 
     # ------------------------------------------------------------------

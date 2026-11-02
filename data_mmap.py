@@ -24,7 +24,6 @@ in-memory path does. data.dimensionless_inputs is: each event's momenta in units
 global scale, the off-shellness over s_hat (and data.dimless_offshell_eps), the mass statistics over the massive train
 particles, and log10 sqrt(s_hat) as one column past the order features, all as on the in-memory path.
 """
-import fcntl
 import socket
 import hashlib
 import json
@@ -39,6 +38,7 @@ from torch.utils.data import Dataset, Sampler
 import logging.handlers  # noqa: F401  (logger.py uses logging.handlers without importing it)
 
 from logger import LOGGER
+from dirlock import dir_lock
 
 MMAP_VERSION = 2
 CHUNK = 1 << 22            # elements per streamed chunk (a multiple of the 8192-element reduction block)
@@ -354,22 +354,6 @@ def _open(d, name):
     return np.load(os.path.join(d, name + ".npy"), mmap_mode="r")
 
 
-def _lock_polling(f, poll=15.0, sleep=time.sleep):
-    """Exclusive flock on `f`, taken by polling a non-blocking request. A blocking flock on CC-IN2P3's NFS /sps
-    raised OSError ENOLCK ('No locks available') on 2026-11-02 (catalog_coverage: 8 sweep trials and a width run died
-    at the lock while two builders held theirs): an NFS blocking lock needs the server's grant callback, a non-blocking
-    one does not. EWOULDBLOCK / EAGAIN (held by another job) and ENOLCK are retried every `poll` seconds."""
-    import errno
-    while True:
-        try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            return
-        except OSError as e:
-            if e.errno not in (errno.EWOULDBLOCK, errno.EAGAIN, errno.ENOLCK):
-                raise
-        sleep(poll)
-
-
 def init_data_recipes_mmap(exp, c):
     """The memory-mapped twin of the tail of AmplitudeExperiment._init_data_recipes (from the per-role loads on).
     `c` holds the locals that function computed before: specs, names, roles, paths, use_pids, per_dataset, the
@@ -463,9 +447,11 @@ def init_data_recipes_mmap(exp, c):
     root = _cache_root(cfg)
     d = os.path.join(root, key)
     os.makedirs(root, exist_ok=True)
-    with open(os.path.join(root, key + ".lock"), "w") as lk:
-        LOGGER.info(f"data.memmap: waiting for the lock of {key} on {socket.gethostname()}")
-        _lock_polling(lk)                           # one builder per key; the others wait and then read it
+    # one builder per key; the others wait and then read it. An atomic-mkdir lock (dirlock.py): flock on CC-IN2P3's
+    # NFS /sps answers ENOLCK on some nodes (E3550, 2026-11-02)
+    LOGGER.info(f"data.memmap: waiting for the lock of {key} on {socket.gethostname()}")
+    with dir_lock(os.path.join(root, key),
+                  on_wait=lambda o: LOGGER.info(f"data.memmap: lock of {key} held by {o}, waiting")):
         LOGGER.info(f"data.memmap: holding the lock of {key}")
         meta_p = os.path.join(d, "meta.json")
         built = not os.path.exists(meta_p)
