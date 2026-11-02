@@ -7999,9 +7999,9 @@ entries:
       - 'the array code cannot be separated cleanly: hash per function and list them in the test'
   owner:
     agent: a5af1a86ca67f9f3a
-    state: working
+    state: stopped
     since: '2026-11-02T09:59:35+00:00'
-    state_at: '2026-11-02T11:47:25.057000+00:00'
+    state_at: '2026-11-02T11:47:47.793000+00:00'
     context: 241084
     context_at: '2026-11-02T11:47:27+00:00'
   findings:
