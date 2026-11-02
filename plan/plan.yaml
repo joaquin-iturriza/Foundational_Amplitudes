@@ -8935,6 +8935,19 @@ entries:
     text: '2026-11-02 ~15:20: step 35 done: Joaquin deleted the width-8 caches 55632f21 and 8ef2c8d8 himself (the rm was refused
       to the agent by the permission classifier); per the coordinator''s read of the folder only 746f01a3 and 85be0204 remain,
       /sps/lpnhe at 79%, 113 GB free.'
+  - at: '2026-11-02T18:32:47+00:00'
+    text: '2026-11-02 evening: group-meeting figures, analysis/catalog_v4/size_figs.py @005c7545 (pull: trials'' validation
+      curves read-only from CC into data/size_curves.json; figs: from it and data/width_x1.json @44a02702). figs/width_x1_loss,
+      figs/width_x1_ratio, figs/length_w8_curves, figs/loss_vs_compute_preliminary (png+pdf). Length so far (width 8, seed
+      42, 4x start-up trials finished, 16x at steps 25916-27280 of 68224): 4x best validation NLL hp0353 -3.711, hp1333 -3.638,
+      hp1860 -2.944 (all at the last validation); 1x at the base config''s HPs -2.836; 16x running best so far hp1333 -3.162,
+      hp0353 -2.915, hp1860 -2.653, each above its own 4x trial''s curve at the same step (lower lr per the 68224 window,
+      longer cosine). Compute axis C = steps x N/N_8 (6ND estimate, parameter counts 1775829 / 6516181 / 25434069, same events
+      per step; attention and checkpoint recompute not counted): 1x w32 (-3.567/-3.609 at C 6.1e4) about equals the best 4x
+      w8 trial (-3.711 at C 1.7e4) in loss at 3.6x the estimated compute; the measured V100 time ratio is 1 : 1.74 : 3.70
+      per step (w16/w32 with checkpointing), far below the parameter ratio 1 : 3.67 : 14.3, so on these GPUs width is cheaper
+      in wall time than the C axis says. Off-scale warm-up validations not drawn (NLL > 1): 1x one, 4x hp1860 two (~1e11 at
+      validations 2-3, recovered), 16x hp1860 one.'
   handoff:
     state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
       started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
