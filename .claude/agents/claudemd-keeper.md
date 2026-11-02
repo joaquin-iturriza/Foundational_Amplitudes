@@ -28,6 +28,7 @@ Then, in two calls:
 
     cat CLAUDE.md ../CLAUDE.md; ls .claude/context ~/.claude/context
     python3 tools/claudemd_check.py --list --baseline .claude/claudemd_baseline.json
+    .venv-cpu/bin/python -m pytest -q tests/test_compact_worker_sync.py   # compact-worker's rule copy; a failure blocks until it is synced
 
 Read both files whole every time, old text as much as new; use the backlog diff (`git diff <watermark> -- CLAUDE.md`,
 from the launch message) only to say which findings are new. Read a section only to check a passage against it.
