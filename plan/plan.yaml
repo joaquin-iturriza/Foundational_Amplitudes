@@ -8043,9 +8043,9 @@ entries:
       - 'a read is missing for an arm: say which'
   owner:
     agent: a7f1fe982d7564477
-    state: closed
+    state: stopped
     since: '2026-11-02T11:49:23+00:00'
-    state_at: '2026-11-02T18:41:59+00:00'
+    state_at: '2026-11-02T18:47:07+00:00'
     context: 228263
     context_at: '2026-11-02T18:33:26+00:00'
   findings:
