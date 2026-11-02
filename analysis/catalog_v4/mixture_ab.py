@@ -26,6 +26,11 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
                                     the 700 held-out classes (H1-H3's PP4/EE4 probes, HD4, HD5), pooled and per axis,
                                     against the same MSE control, the two shares' rows beside -> data/bound_default.json
   heldout_default [--het]           with --het the het runs, missing reads listed -> data/mixture_heldout_default_het.json
+  width                             step 33 (the 1x width cells, D248): widths 16 and 32 over width 8 (num_heads, 4264
+                                    steps, het loss, share 0.25), each run's best checkpoint (lowest aggregate
+                                    val_loss_no_reg of the main block, each process at that step) and R per read as in
+                                    mixture (seeds' geometric mean, class median, interval widened by width 8's seed
+                                    pair), plus R per seed (seed 42 over seed 42, 43 over 43) -> data/width_x1.json
 
 The measure (the design's): per probe the MSE of log|M|^2 at the best checkpoint (tools/zero_shot_parent.py,
 mse_logm2_real); each side the geometric mean of its two seeds (42, 43); per class (analysis/catalog_v4/
@@ -631,6 +636,83 @@ def heldout_default(het=False):
     print(json.dumps(out))
 
 
+# step 33: the 1x width cells (scripts/job_catalog_v3_short.sh, LONG_FACTOR=1 LONG_MEMMAP=true, 4264 steps), every read
+# from the run's own job; width 8 at 9439612d, widths 16/32 at deb290bc (only the cache lock differs) with
+# LONG_CKPT=true (gradient checkpointing)
+WIDTH = {"w8": ("FA-ccin2p3-804a65bc", "FA-ccin2p3-66e8c31f"),
+         "w16": ("FA-ccin2p3-493c98db", "FA-ccin2p3-7288b3fe"),
+         "w32": ("FA-ccin2p3-e26059bf", "FA-ccin2p3-fd7fc137")}
+WIDTH_RUN_DIR = {"FA-ccin2p3-804a65bc": "v4_het_default25_w8_x1", "FA-ccin2p3-66e8c31f": "v4_het_default25_seed2_w8_x1",
+                 "FA-ccin2p3-493c98db": "v4_het_default25_w16_x1", "FA-ccin2p3-7288b3fe": "v4_het_default25_seed2_w16_x1",
+                 "FA-ccin2p3-e26059bf": "v4_het_default25_w32_x1", "FA-ccin2p3-fd7fc137": "v4_het_default25_seed2_w32_x1"}
+
+
+def _best_of(run):
+    """The run's best checkpoint from its fetched per_process_metrics.json (analysis/common best_checkpoint): index,
+    aggregate val_loss_no_reg, each process at that step; None when not fetched"""
+    sys.path.insert(0, ROOT)
+    from analysis.common import best_checkpoint, run_metrics
+    d = os.path.expanduser(f"~/.local/share/ccorch/artifacts/FA/{run}/sps/lpnhe/jiturrizaramirez01/"
+                           f"Foundational_Amplitudes/runs/catalog_v4_long/{WIDTH_RUN_DIR[run]}")
+    if not os.path.isdir(d):
+        return None
+    m = run_metrics(d)
+    i, v, procs = best_checkpoint(m)
+    return {"index": i, "n_validations": len(m["val_loss_no_reg"]), "val_loss_no_reg": v,
+            "last": float(m["val_loss_no_reg"][-1]), "procs": procs}
+
+
+def width():
+    cls = class_of()
+    ax_of = _held_axes(cls)
+    reads = {w: {r: tuple(read_of(run, r) for run in runs) for r in ("PP4", "EE4", "held", "HD4", "HD5")}
+             for w, runs in WIDTH.items()}
+    missing = [f"{w} {r} {WIDTH[w][i]}" for w, v in reads.items() for r, pair in v.items()
+               for i, x in enumerate(pair) if x is None]
+    if missing:
+        sys.exit("width: reads missing (extract them first): " + "; ".join(missing))
+    out = {"design": "plan catalog_coverage step 33 (1x width cells, D248; the step-16 design's information read)",
+           "runs": WIDTH, "best": {}, "arms": {}}
+    best = {run: _best_of(run) for runs in WIDTH.values() for run in runs}
+    for run, b in best.items():
+        out["best"][run] = None if b is None else {k: b[k] for k in ("index", "n_validations", "val_loss_no_reg", "last")}
+    c = reads["w8"]
+    extra = {ax: {w: WIDTH[w] for w in WIDTH} for ax in ("HD4", "HD5")}
+    tab = {w: {r: reads[w][r] for r in ("PP4", "EE4")} for w in WIDTH}
+    tab["control"] = tab["w8"]
+    ext = {ax: dict(t, control=WIDTH["w8"]) for ax, t in extra.items()}
+    for w in ("w16", "w32"):
+        res = {}
+        for r in ("PP4", "EE4", "held", "HD4", "HD5"):
+            arm, ctl = side(reads[w][r]), side(c[r])
+            keys = sorted(set(arm) & set(ctl), key=str)
+            parts = {"all": keys}
+            if r == "held":
+                parts = {"pooled": keys, **{ax: [k for k in keys if k[0] == ax] for ax in HELD}}
+            res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
+            cl = lambda k: cls(probe_name(k))
+            res[r]["per_seed_R"] = {s: round(float(np.median(list(class_ratios(reads[w][r][i], c[r][i], keys, cl)
+                                                                   .values()))), 4)
+                                    for i, s in enumerate(("seed42", "seed43"))}
+            res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
+        res["held_default"], _ = _held_default({**tab, "arm": tab[w]}, "arm", cls, ax_of,
+                                               {ax: {"arm": WIDTH[w], "control": WIDTH["w8"]} for ax in ext})
+        # each process's val_loss_no_reg (het NLL) at the best checkpoint: width minus width 8, per seed
+        dif = {}
+        for i, s in enumerate(("seed42", "seed43")):
+            a, b = best[WIDTH[w][i]], best[WIDTH["w8"][i]]
+            if a and b:
+                d = [a["procs"][p] - b["procs"][p] for p in a["procs"] if p in b["procs"]]
+                dif[s] = {"n_processes": len(d), "median_delta_nll": round(float(np.median(d)), 4),
+                          "frac_lower": round(float(np.mean(np.array(d) < 0)), 4),
+                          "delta_aggregate": round(a["val_loss_no_reg"] - b["val_loss_no_reg"], 4)}
+        res["val_per_process"] = dif
+        out["arms"][w] = res
+    out["blowups"] = blowups([run for runs in WIDTH.values() for run in runs])
+    json.dump(out, open(os.path.join(DATA, "width_x1.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -646,6 +728,7 @@ def main():
     m = sub.add_parser("mixture")
     m.add_argument("--partial", action="store_true")
     m.add_argument("--het", action="store_true")
+    sub.add_parser("width")
     a = ap.parse_args()
     if a.cmd == "extract":
         extract(a.run, a.log, a.axis, a.allow_unchecked)
@@ -657,6 +740,8 @@ def main():
         bound_default()
     elif a.cmd == "heldout_default":
         heldout_default(a.het)
+    elif a.cmd == "width":
+        width()
     else:
         bound()
 
