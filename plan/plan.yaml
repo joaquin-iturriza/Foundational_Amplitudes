@@ -8957,6 +8957,19 @@ entries:
       per step (w16/w32 with checkpointing), far below the parameter ratio 1 : 3.67 : 14.3, so on these GPUs width is cheaper
       in wall time than the C axis says. Off-scale warm-up validations not drawn (NLL > 1): 1x one, 4x hp1860 two (~1e11 at
       validations 2-3, recovered), 16x hp1860 one.'
+  - at: '2026-11-02T18:46:43+00:00'
+    text: '2026-11-02 late: zero-shot reads per arm against the het control (share 0, width 8, 1e4 train events/process, in
+      memory, 4264 steps): mixture_ab.py arms @cdc6cd73 -> data/arms_vs_het_control.json; figure fig_shares_bound.py arms
+      -> figs/arms_zero_shot_{a,b}. R (class median, widened interval): share 0.25 width 8 at 1e4/process: pp 0.450 [0.360,0.556],
+      e+e- 0.223 [0.174,0.301], held out default-sampled 0.638 [0.501,0.834], catalog-sampled 0.931 [0.725,1.191], one-loop
+      1.044 [0.786,1.266]; share 0.25 at 1e5/process (whole set, memmap): width 8 pp 0.583 [0.472,0.714], e+e- 0.266, held
+      default 0.816 [0.629,1.055], catalog 1.137, one-loop 1.005; width 16 pp 0.310, e+e- 0.152, held default 0.545, catalog
+      0.810, one-loop 0.866; width 32 pp 0.177 [0.139,0.219], e+e- 0.092, held default 0.449 [0.344,0.590], catalog 0.686,
+      one-loop 0.939 [0.693,1.154]. Open: at width 8 and 4264 steps the whole training set (1e5/process, ~0.6 epoch) reads
+      worse than the 1e4/process arm (~6 epochs) on every read (pp 0.583 vs 0.450); not separated from the in-memory vs memmap
+      path (both changed together). plot_style.save now raises LegendOverflow for a legend wider than its plot box (tests/test_plot_style_legend.py:
+      refused case writes nothing, narrow case saves); other figure scripts not re-run under it (size_figs.py''s two-column
+      legends would now be refused).'
   handoff:
     state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
       started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
