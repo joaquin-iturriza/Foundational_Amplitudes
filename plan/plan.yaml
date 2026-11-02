@@ -8026,9 +8026,9 @@ entries:
       - 'a sweep fails: report with its log'
   owner:
     agent: a7f1fe982d7564477
-    state: stopped
+    state: working
     since: '2026-11-02T11:49:23+00:00'
-    state_at: '2026-11-02T17:04:59+00:00'
+    state_at: '2026-11-02T18:28:17+00:00'
     context: 179375
     context_at: '2026-11-02T17:04:01+00:00'
   findings:
