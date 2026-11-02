@@ -3478,6 +3478,10 @@ entries:
     41: 'Figures for Joaquin''s group presentation (asked 2026-11-02 evening, for the next day): width at 1x (best loss and
       zero-shot R against width), validation curves against step for 1x / 4x / 16x-so-far at width 8, and loss against compute
       (preliminary); house style, png+pdf, sent to Joaquin.'
+    42: 'Presentation figures, redo (Joaquin 2026-11-02 evening): zero-shot error per arm per read (pp, e+e-, held-out default-sampled,
+      held-out catalog-sampled, one-loop), the earlier catalog_v4 4264-step arms (control, 0.25-share het arm) next to the
+      1x width runs 8/16/32; plain names, legends inside and clear of data; plot_style''s legend-too-wide warning made an
+      error first.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8032,6 +8036,11 @@ entries:
       if:
       - 'made and looked at: sent'
       - 'one can''t be made honestly: say why'
+    42:
+      feeds: Joaquin's presentation on 2026-11-03
+      if:
+      - 'drawn and checked: sent with what each shows'
+      - 'a read is missing for an arm: say which'
   owner:
     agent: a7f1fe982d7564477
     state: working
