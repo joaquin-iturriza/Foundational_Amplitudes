@@ -3465,6 +3465,13 @@ entries:
       one cache for every seed; each event''s transform is drawn at read time from (run seed, event index), so a run sees
       exactly the transform it sees today; momentum standardisation stats computed at open from the seed. Equivalence test
       against the in-memory path per seed. Joaquin 2026-11-02: one cache per seed ''is just dumb''.'
+    38: 'After both CC sweeps end (data_mmap freeze): redesign the memmap cache from the blind review of 2026-11-02 (agent
+      a7d466b9adb53c54d, transcript in the session''s subagents dir): key by pool content identity and an explicit format
+      version (not path, mtime, seed, frozen stats, tokenizer, caps or source text); store seed- and stats-independent arrays,
+      apply standardisation and the Lorentz augmentation per batch with per-event keyed draws; build in a CPU prebuild job,
+      never inside a GPU job; staging dirs unique per host and job, never another''s deleted; disk check and fallocate before
+      the build; staging in RAM or node-local; LRU pruning; a canary check on open instead of the source hash. Equivalence
+      test per seed.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8006,6 +8013,11 @@ entries:
       if:
       - 'equivalence test passes for two seeds from one cache: switch the default'
       - 'it fails: fix before any new memmap run'
+    38:
+      feeds: one shared data cache that a GPU job only opens
+      if:
+      - 'equivalence holds for two seeds and two concurrent jobs open one cache: switch the default'
+      - 'not: fix before any new memmap run'
   owner:
     agent: a7f1fe982d7564477
     state: stopped
