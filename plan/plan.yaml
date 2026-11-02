@@ -4374,6 +4374,12 @@ entries:
       cov_v4_long_hpo_x16, cov_v4_long_hpo_x4, cov_v4_long_dyhpo_68224, cov_v4_long_dyhpo_17056) are dead ends recorded above
       (lr-only search cancelled; model-node crash; disk full).'
     at: '2026-11-01T17:34:23+00:00'
+  - tried: 'long-run DyHPO sweeps cov_v4_long_hpo8_17056/_68224 under sweep/drive.py from the laptop (configs @c00e1730),
+      2026-11-02 04:35-~06:00: first wave FA-lxplus-23ce6252 (running), 4bdb4821, 79c10824, 5a6a7109, 34ee9297, 8bd1c89e'
+    why: 'Joaquin ~05:50 via the main session: sweeps run on their site, not from the laptop; drivers stopped, the 6 jobs
+      condor_rm''d (REMOVED), sweeps regenerated on lxplus by generate_sweep as HTCondor DAGs (7ce26b87; DAGMan 13110747 and
+      13110751). The coordinator later retracted the instruction; the lxplus move stands as instructed (no second move).'
+    at: '2026-11-02T05:00:15+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
