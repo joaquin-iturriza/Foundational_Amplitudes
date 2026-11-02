@@ -32,6 +32,17 @@ the old value, that a fast path was added without its equivalence guard, or that
 duplicated instead of reused. Those are the findings that matter. Judge whole files, not
 isolated hunks.
 
+## First: find what is wrong
+
+Before any checklist, read every changed function as an adversary: assume nothing in it is correct
+or sensible, and list its flaws ranked by what they cost in practice: design mistakes, waste of disk,
+memory, GPU or wall time, behaviour under many concurrent jobs on a shared filesystem, across seeds,
+code versions and sites, and correctness risks, each with the line, a concrete scenario, its cost and
+the fix. A flaw that costs real resources or can corrupt results is blocking whether or not any rule
+below names it. The axes that follow are additional checks, never the limit of the review (2026-11-02:
+a blind flaw hunt found twelve flaws in data_mmap.py, among them per-job and per-seed 22 GB caches,
+GPUs held through a CPU build and an unsafe lock on NFS, in code this review had passed).
+
 ## Axes, in priority order
 
 0. **Consistency with the project — the first axis, and always blocking.** Your job is to keep
@@ -101,7 +112,7 @@ isolated hunks.
    - **μP-only, three maintained architectures** (`lloca`, `lgatr_mup`, `lgatr_slim`). A
      change that touches, revives, or references a legacy model is a finding unless the user
      explicitly asked.
-3. **Efficiency.** Obvious waste only: recomputing an invariant in a loop, an O(N²) pass with
+3. **Efficiency.** Waste, including: recomputing an invariant in a loop, an O(N²) pass with
    a trivial vectorized form, a per-step host/device sync added to the hot path, reloading
    data per block. Do not bikeshed micro-optimizations at this scale. When the backlog adds a
    numerical fast path, check it has an equivalence guard (`test_amp.py` Section 0 pattern)
