@@ -8001,7 +8001,7 @@ entries:
     agent: a5af1a86ca67f9f3a
     state: closed
     since: '2026-11-02T09:59:35+00:00'
-    state_at: '2026-11-02T11:48:18.206000+00:00'
+    state_at: '2026-11-02T11:48:48+00:00'
     context: 241084
     context_at: '2026-11-02T11:47:27+00:00'
   findings:
