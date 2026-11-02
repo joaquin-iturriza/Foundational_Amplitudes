@@ -4892,6 +4892,13 @@ entries:
     searched: 'CLAUDE.md line 61 (my exception, cbb7ec2b), fa-generation step 1, site decisions --project FA: none settles
       it'
     blocks: nothing running; the next generation queue's layout
+    blocks_steps: []
+  - ask: 'The zero-shot error bars are a class bootstrap padded by one control seed ratio, not a seed uncertainty (width 16
+      pp: bar [0.522, 0.614], seeds alone 0.643 and 0.490). For the presentation: redraw with each seed as its own point and
+      no bars, or add a third seed per arm for a real seed spread?'
+    at: '2026-11-02T19:25:33+00:00'
+    searched: 'CLAUDE.md, site decisions --project FA: none sets how seed spread is shown with two seeds'
+    blocks: the redraw of arms_zero_shot_a/b
     blocks_steps: &id001 []
   designs:
   - at: '2026-10-29T05:15:16+00:00'
@@ -8993,11 +9000,12 @@ entries:
       (LegendOverflow) + tests/test_plot_style_legend.py, analysis/catalog_v4/data/width_x1.json, arms_vs_het_control.json,
       size_curves.json
     written: '2026-11-02T18:46:45+00:00'
-  ask: Data generation keeps its separate probe ahead of a queue (its run sizes come from the kept fraction); should generation
-    also start without one?
-  waiting_since: '2026-11-02T16:56:32+00:00'
-  searched: 'CLAUDE.md line 61 (my exception, cbb7ec2b), fa-generation step 1, site decisions --project FA: none settles it'
-  blocks: nothing running; the next generation queue's layout
+  ask: 'The zero-shot error bars are a class bootstrap padded by one control seed ratio, not a seed uncertainty (width 16
+    pp: bar [0.522, 0.614], seeds alone 0.643 and 0.490). For the presentation: redraw with each seed as its own point and
+    no bars, or add a third seed per arm for a real seed spread?'
+  waiting_since: '2026-11-02T19:25:33+00:00'
+  searched: 'CLAUDE.md, site decisions --project FA: none sets how seed spread is shown with two seeds'
+  blocks: the redraw of arms_zero_shot_a/b
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
