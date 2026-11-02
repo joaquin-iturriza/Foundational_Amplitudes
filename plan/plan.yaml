@@ -7888,9 +7888,9 @@ entries:
       - 'a trial broke: read its log, fix, rerun with drive.py --retry-lost'
   owner:
     agent: acb96e9b7c0e4da34
-    state: working
+    state: stopped
     since: '2026-11-02T03:25:45+00:00'
-    state_at: '2026-11-02T03:25:45+00:00'
+    state_at: '2026-11-02T03:36:15+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
