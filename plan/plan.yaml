@@ -3472,6 +3472,13 @@ entries:
       never inside a GPU job; staging dirs unique per host and job, never another''s deleted; disk check and fallocate before
       the build; staging in RAM or node-local; LRU pruning; a canary check on open instead of the source hash. Equivalence
       test per seed.'
+    39: 'Tool follow-ups from 2026-11-02 (main session''s list): (a) generate_sweep reads a step suffix like _17056 as a counter
+      (made cov_v4_long_hpo8_17057); (b) site run silently sends a --timeout placed after the project name to the site as
+      the command; (c) lxplus sweep configs carry CC''s mem 46G (25.2 GB measured peak), so lxplus''s 3 GB/core rule makes
+      every job 16 CPUs: use the site''s own mem; (d) width-32 time limit 37 h against about 4.5 h needed (margin above 2x,
+      a finding): the width/checkpointing scaling in the estimate overshot; (e) repo-reviewer per-commit review of hot-path
+      and data code instead of only large batches (proposed to Joaquin); (f) Joaquin''s idea for later: a way to know when
+      a source (guidance, a report) is up to date before stating it as fact.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8018,6 +8025,11 @@ entries:
       if:
       - 'equivalence holds for two seeds and two concurrent jobs open one cache: switch the default'
       - 'not: fix before any new memmap run'
+    39:
+      feeds: tooling defects found while sending the long runs
+      if:
+      - 'each fixed with a test: done'
+      - 'not: listed as open'
   owner:
     agent: a7f1fe982d7564477
     state: working
