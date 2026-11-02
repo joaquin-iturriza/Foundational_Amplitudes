@@ -8043,7 +8043,7 @@ entries:
       - 'a read is missing for an arm: say which'
   owner:
     agent: a7f1fe982d7564477
-    state: working
+    state: closed
     since: '2026-11-02T11:49:23+00:00'
     state_at: '2026-11-02T18:41:59+00:00'
     context: 228263
@@ -8971,49 +8971,28 @@ entries:
       refused case writes nothing, narrow case saves); other figure scripts not re-run under it (size_figs.py''s two-column
       legends would now be refused).'
   handoff:
-    state: 'Step 16 and the width runs (step 24) moved to CC-IN2P3 on 2026-11-02 (Joaquin: as soon as possible; lxplus never
-      started them in ~5 h, Jean Zay unreachable: every site run timed out, ''server jean-zay.idris.fr not responding''; CC''s
-      association MaxJobs is lifted). All at code deb290bc (atomic-mkdir locks, dirlock.py) except the two width-8 runs at
-      9439612d. Nothing trained yet at hand-off (~12:00): read the first logs for step rate, TRIAL_GPU, the lock lines (one
-      ''built the cache'' per key) and the w16/w32 GPU peak (VRAM line). CACHE FREEZE: data_mmap.py and every module data_mmap._code_hash
-      reads (preprocessing, particle_ids, multiplicity_extrap, lloca rand_transforms/polar_decomposition, physics_scales,
-      the listed experiment.py methods and mg5_pipeline_final functions) are not edited until both sweeps end: the key hashes
-      their source, so an edit makes each later wave build another ~23 GB cache (/sps at 86%, 77 GB free). Keys: seed 42 and
-      seed 43 each have one key per code version (augmentation baked in); the deb290bc jobs (w16/w32 and both sweeps) build
-      two new keys; the width-8 runs built 55632f216654f479bea62624 (seed 42) and 8ef2c8d8315b649823e2643f (seed 43) at 11:45:46
-      by their logs. Next steps on the entry: when 804a65bc and 66e8c31f end, delete those two caches (confirm from the logs
-      that no deb290bc job uses them; our rebuildable debris, report it); after the sweeps narrow _code_hash to the array-producing
-      code with a test that a lock-only edit keeps the key. Jean Zay: 19 PENDING jobs of ours on gpu_p5 (717020-717808, trial_00xx,
-      not in the site registry), seen via site status jeanzay; when Jean Zay answers find their sweep and whether anyone wants
-      them, do not cancel before that. Known bug, not fixed: generate_sweep.next_available_name reads a trailing _<digits>
-      of a sweep name as a counter, so with FA_NEW_SWEEP_REASON ''cov_v4_long_hpo8_17056'' became ''cov_v4_long_hpo8_17057''
-      (cancelled; set aside as sweeps/zz_enolck_cov_v4_long_hpo8_17057); the sweeps were renamed cov_v4_long_hpo8_cc_* (73073f7f)
-      instead.'
-    decisions: 'D242 approved both sweeps at estimate (~195 GPU-h). D243 (2026-11-01): delete the CC caches, no resubmission
-      then (lifted later by the step-16 go). D244: HPO layout = start-up runs then 2 sequential batches, ~8 trials. D245:
-      1/3 start-up then two sequential batches (8 trials: 3,3,2). D246: the likelihoods sweep changes (gp surrogate, 2000
-      candidates). D247: any site and any GPU that accepts the work (any GPU >= 24 GB). D248 (2026-11-02 05:20): ''Now I just
-      want these jobs to be done as soon as possible'' releases the width runs at 4264 steps (w16, w32 vs the w8 pair, seeds
-      42, 43), no probe, gradient checkpointing allowed. Joaquin 2026-11-02: move to Jean Zay; the coordinator then moved
-      all to CC (Jean Zay unreachable, CC open). Width 32 runs with LONG_CKPT=true on gpu_v100,gpu_h100 (H100s all busy),
-      limit 37:00 = A100 15:40 x1.76 (V100) x1.33 (ckpt). E3550 (flock ENOLCK on NFS /sps) fixed by dirlock.py deb290bc (repo-reviewer
-      PASS, backlog advanced to cea13f87); E3551 item check moved to the cc sweep names (acked).'
-    ruled_out: 'lxplus for these jobs (no free whole-GPU slot in ~5 h; DAGs 13110747/13110751 and width runs removed); Jean
-      Zay today (unreachable); blocking fcntl.flock on /sps (ENOLCK: killed 0899399c and 7 trials); polling non-blocking flock
-      9439612d (persistent ENOLCK on some nodes per likelihoods 128f913; superseded); reusing sweep names that hold cancelled
-      states (sweep_manager registry says ''no new trial scripts'')'
-    running: 'CC-IN2P3: sweeps ccin2p3:cov_v4_long_hpo8_cc_17056 (jobs 62936972-79, limit 08:03, target 16 h, ~42 GPU-h) and
-      ccin2p3:cov_v4_long_hpo8_cc_68224 (62936980-87, limit 28:42, target 57 h, ~152 GPU-h), waves 3,3,2, configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
-      / _x16.yaml @73073f7f, code deb290bc; width runs (scripts/job_catalog_v3_short.sh, LONG_FACTOR=1 LONG_MEMMAP=true, 46G,
-      5 CPUs, gpu_v100,gpu_h100): w8 FA-ccin2p3-804a65bc (s42), 66e8c31f (s43) @9439612d, 4:15; w16 LONG_CKPT 493c98db (s42),
-      7288b3fe (s43) @deb290bc, 12:10; w32 LONG_CKPT e26059bf (s42), fd7fc137 (s43) @deb290bc, 37:00; plan wait on step 33
-      for the six. Total ~280 GPU-h at estimate. Finish estimates: w8 ~16:00 11-02, w16 ~22:00 11-02, 17056 sweep ~04:00 11-03,
-      w32 ~18:00 11-03, 68224 sweep ~21:00 11-04.'
-    files: 'dirlock.py, data_mmap.py (frozen), sweep/dyhpo_sampler.py, sweep/checkpoint_index.py, tests/test_mmap_lock.py,
-      sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml, _x16.yaml, sweep/generate_sweep.py (next_available_name bug), scripts/job_catalog_v3_short.sh,
-      analysis/catalog_v4/expect_cov_v4_long_hpo8.json; CC: sweeps/zz_enolck_*, sweeps/zz_flockpoll_* (set-aside failed sweeps),
-      ~/.sweep_manager/registry.json(.bak-20261102-enolck)'
-    written: '2026-11-02T11:48:46+00:00'
+    state: 'Width cells (step 33) done and read: at 4264 steps width 32 > 16 > 8 on every tree read (PP4 R w32/w8 0.370, held
+      default 0.528; one-loop not separated), all six best at their last validation. Per-arm zero-shot figure against the
+      het control made (figs/arms_zero_shot_a/b via fig_shares_bound.py arms @cdc6cd73). Length sweeps on CC: cov_v4_long_hpo8_cc_17056
+      wave 1 finished (best NLL hp0353 -3.711, hp1333 -3.638, hp1860 -2.944), wave 2 running; cov_v4_long_hpo8_cc_68224 wave
+      1 at ~26k/68224 steps. Sweeps have no zero-shot reads yet (each best trial gets an eval REREAD per the design when the
+      sweep ends). Open finding: the whole-set width-8 1x arm reads worse than the 1e4/process arm (pp R 0.583 vs 0.450 against
+      the het control); data size and the in-memory/memmap path changed together, not separated. CACHE FREEZE still on: data_mmap.py
+      and every module its _code_hash reads are not edited until both sweeps end (keys 746f01a3 seed 42, 85be0204 seed 43).'
+    decisions: 'D242 approves both sweeps (~195 GPU-h); D244/D245 8 trials waves 3,3,2; D246 gp surrogate 2000 candidates;
+      D247 any GPU >= 24 GB; D248 released the 1x width runs (done). Joaquin 2026-11-02: figures name arms in words, legends
+      never clip or cover data (plot_style now refuses a too-wide legend).'
+    ruled_out: 'lxplus and Jean Zay for these jobs (lxplus no slots; Jean Zay site run times out, site status answers); blocking
+      or polling flock on /sps (ENOLCK); size_figs.py length/compute figures as shown (Joaquin: incomprehensible, not what
+      he asked; codes and multiples of c in legends)'
+    running: 'CC-IN2P3: sweep cov_v4_long_hpo8_cc_17056 (jobs 62936972-79, wave 2 trials 0003-0005 running, wave 3 0006-0007
+      pending afterany); sweep cov_v4_long_hpo8_cc_68224 (62936980-87, wave 1 trials 0000-0002 running at ~26k steps, est.
+      end of all ~21:00 2026-11-04)'
+    files: analysis/catalog_v4/mixture_ab.py (width, arms), analysis/catalog_v4/fig_shares_bound.py (arms), analysis/catalog_v4/size_figs.py
+      (pull of trial curves; its figures superseded), analysis/common/readers.py (run_metrics fix 44a02702), plot_style.py
+      (LegendOverflow) + tests/test_plot_style_legend.py, analysis/catalog_v4/data/width_x1.json, arms_vs_het_control.json,
+      size_curves.json
+    written: '2026-11-02T18:46:45+00:00'
   ask: Data generation keeps its separate probe ahead of a queue (its run sizes come from the kept fraction); should generation
     also start without one?
   waiting_since: '2026-11-02T16:56:32+00:00'
