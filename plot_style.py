@@ -1008,6 +1008,11 @@ def tidy_colorbars(fig) -> None:
         axis.set_major_formatter(fmt)
 
 
+class LegendOverflow(ValueError):
+    """A legend wider than its plot box: it hangs over the neighbouring panel or off the canvas. `save` refuses
+    the figure (nothing is written) rather than warn: a warning was printed and the figure shipped anyway."""
+
+
 def save(fig, base: str, repo: str | None = None) -> str:
     """Save `fig` as BOTH `<base>.png` and `<base>.pdf` (repo convention, no exceptions).
 
@@ -1124,10 +1129,13 @@ def _warn_if_squeezed(fig, base: str) -> None:
             if lg is None:
                 continue
             try:
-                if lg.get_window_extent(rend).width > ax.get_window_extent().width + 1:
-                    print(f"  !! {name}: legend is wider than its plot box -- use ps.legend(), "
-                          f"which drops to ncol=1, or shorten the labels")
+                wide = lg.get_window_extent(rend).width > ax.get_window_extent().width + 1
             except Exception:
-                pass
+                wide = False
+            if wide:
+                raise LegendOverflow(f"{name}: legend is wider than its plot box -- use ps.legend(), which "
+                                     f"drops its font and then its columns, or shorten the labels")
+    except LegendOverflow:
+        raise
     except Exception as exc:
         print(f"  !! {name}: layout check failed to run: {type(exc).__name__}: {exc}")

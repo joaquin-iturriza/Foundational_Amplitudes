@@ -31,6 +31,11 @@ catalog_coverage): the pure-default bound (step 11) and the mixture A/B (step 14
                                     val_loss_no_reg of the main block, each process at that step) and R per read as in
                                     mixture (seeds' geometric mean, class median, interval widened by width 8's seed
                                     pair), plus R per seed (seed 42 over seed 42, 43 over 43) -> data/width_x1.json
+  arms                              the zero-shot reads per arm against the het control (share 0, 1e4 train
+                                    events per process, 4264 steps): the share-0.25 het arm of step 15 and the 1x
+                                    width cells (share 0.25, whole training set, widths 8, 16, 32), R as in mixture
+                                    per read (PP4, EE4, held out default-sampled pooled and per axis, held out
+                                    catalog-sampled pooled) -> data/arms_vs_het_control.json
 
 The measure (the design's): per probe the MSE of log|M|^2 at the best checkpoint (tools/zero_shot_parent.py,
 mse_logm2_real); each side the geometric mean of its two seeds (42, 43); per class (analysis/catalog_v4/
@@ -713,6 +718,45 @@ def width():
     print(json.dumps(out))
 
 
+ARMS_VS_CONTROL = {"default25_1e4": {"PP4": MIX_HET["default25"]["PP4"], "EE4": MIX_HET["default25"]["EE4"],
+                                     "held": MIX_HET["default25"]["held"]},
+                   **{f"w{k}_full": {r: WIDTH[f"w{k}"] for r in ("PP4", "EE4", "held")} for k in (8, 16, 32)},
+                   "control": MIX_HET["control"]}
+ARMS_HD = {"default25_1e4": HD4_HET["default25"], **{f"w{k}_full": WIDTH[f"w{k}"] for k in (8, 16, 32)},
+           "control": HD4_HET["control"]}
+
+
+def arms():
+    cls = class_of()
+    ax_of = _held_axes(cls)
+    reads, missing = _reads(ARMS_VS_CONTROL)
+    extra = {ax: dict(ARMS_HD) for ax in ("HD4", "HD5")}
+    miss_hd = [f"{a} {ax} {run}" for ax in extra for a, runs in ARMS_HD.items() for run in runs
+               if read_of(run, ax) is None]
+    if missing or miss_hd:
+        sys.exit("arms: reads missing: " + "; ".join(missing + miss_hd))
+    c = reads["control"]
+    out = {"design": "plan catalog_coverage steps 15 and 33 (information: every arm against the het control)",
+           "runs": ARMS_VS_CONTROL, "runs_HD4_HD5": ARMS_HD, "arms": {}}
+    for a in ARMS_VS_CONTROL:
+        if a == "control":
+            continue
+        res = {}
+        for r in ("PP4", "EE4", "held"):
+            arm, ctl = side(reads[a][r]), side(c[r])
+            keys = sorted(set(arm) & set(ctl), key=str)
+            parts = {"pooled": keys, **{ax: [k for k in keys if k[0] == ax] for ax in HELD}} if r == "held" \
+                else {"all": keys}
+            res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
+            res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
+        res["held_default"], _ = _held_default(reads, a, cls, ax_of, extra)
+        out["arms"][a] = res
+    out["blowups"] = blowups([run for v in ARMS_VS_CONTROL.values() for runs in v.values() for run in runs] +
+                             [run for runs in ARMS_HD.values() for run in runs])
+    json.dump(out, open(os.path.join(DATA, "arms_vs_het_control.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -729,6 +773,7 @@ def main():
     m.add_argument("--partial", action="store_true")
     m.add_argument("--het", action="store_true")
     sub.add_parser("width")
+    sub.add_parser("arms")
     a = ap.parse_args()
     if a.cmd == "extract":
         extract(a.run, a.log, a.axis, a.allow_unchecked)
@@ -742,6 +787,8 @@ def main():
         heldout_default(a.het)
     elif a.cmd == "width":
         width()
+    elif a.cmd == "arms":
+        arms()
     else:
         bound()
 
