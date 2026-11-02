@@ -3461,6 +3461,10 @@ entries:
     36: 'After both CC sweeps end (the freeze lifts): limit data_mmap._code_hash to the code that produces the cached arrays
       (boost/augment, ordering, preprocessing, standardisation, tables), not the lock, logging or I/O, with a test that a
       lock-only edit of data_mmap.py keeps the key.'
+    37: 'After both CC sweeps end (data_mmap freeze): the memmap cache stores events BEFORE the random Lorentz augmentation,
+      one cache for every seed; each event''s transform is drawn at read time from (run seed, event index), so a run sees
+      exactly the transform it sees today; momentum standardisation stats computed at open from the seed. Equivalence test
+      against the in-memory path per seed. Joaquin 2026-11-02: one cache per seed ''is just dumb''.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -7997,6 +8001,11 @@ entries:
       if:
       - 'test passes: commit, repo-reviewer, note that the next run of each key rebuilds once'
       - 'the array code cannot be separated cleanly: hash per function and list them in the test'
+    37:
+      feeds: one data cache per dataset, not per seed or code version
+      if:
+      - 'equivalence test passes for two seeds from one cache: switch the default'
+      - 'it fails: fix before any new memmap run'
   owner:
     agent: a7f1fe982d7564477
     state: working
