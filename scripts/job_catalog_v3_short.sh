@@ -223,9 +223,20 @@ PY
                             ITERS_FIXED=4264
                             SH=${ARM#v4_het_}; SH=${SH%_seed2}
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_${SH}_train.yaml" ;;
+    # a long-run DyHPO sweep's best trial read like the 1x width cells (catalog_coverage step 16's design: "Each
+    # sweep's best trial (seed 42) is read like the other cells by an eval job (sigma-only stage plus every axis)"):
+    # LONG_BEST=<sweep>/<trial> (runs/<sweep>/<trial>, trained with the sigma stage off). Mode eval only: the trial's
+    # config, tokenizer, stats and best checkpoint are copied to runs/catalog_v4_long/best_<sweep>_<trial> (the trial
+    # dir is left as it is), run.py's sigma-only stage (250 steps, the arms' setting) runs there on the trial's own
+    # data path, then every axis of the 1x width cells is read from its sigma stage
+    v4_het_long_best)       CAT=v4; CROSS=(PP4 EE4); HET=1
+                            LB="${LONG_BEST:?LONG_BEST=<sweep>/<trial> for v4_het_long_best}"
+                            SIGMA_FROM="runs/$LB"; OUT_FIXED="runs/catalog_v4_long/best_${LB//\//_}"
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_default25_train.yaml" ;;
     *) echo "unknown arm $ARM"; exit 1 ;;
 esac
 OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/zz_${CAT}_short_$ARM"
+[ -n "$SIGMA_FROM" ] && PRED="$SCRATCH/zz_v4_long_best_${LONG_BEST//\//_}"
 # an axis's recipe: the arm's catalog's held-out axis, or one of the cross reads
 axis_recipe() { case "$1" in
     XV3) echo recipes/catalog_v3_shared_heldout.yaml ;; XV4) echo recipes/catalog_v4_shared_heldout.yaml ;;
@@ -262,6 +273,7 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
     AXES+=(HD4 HD5)
 fi
+[ -n "$SIGMA_FROM" ] && AXES+=(HD4 HD5)
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
 [ "$MODE" = eval ] && [ -n "$V3_AXES" ] && read -ra AXES <<< "$V3_AXES"
 # the time limit must hold the training AND every zero-shot read (tools/short_wall.py; the step-11 and step-14 arms of
@@ -270,7 +282,7 @@ fi
 if [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
-           $([ "$MODE" = eval ] && echo --eval) ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
+           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
         || { case "$WALL" in *'"ok": false'*) echo "V3_WALL_SHORT $WALL" ;; *) echo "V3_WALL_ERROR tools/short_wall.py failed: $WALL" ;; esac; exit 1; }
     echo "V3_WALL $WALL"
 fi
@@ -343,6 +355,70 @@ if [ "$MODE" != eval ]; then
             base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
             training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" "${EXTRA[@]}" || exit 1
     fi
+fi
+# v4_het_long_best: the trial's sigma-only stage, in a dir of its own, once. As run.py runs it after a training run:
+# one process loads the trial's data with the trial's own config (so the memmap cache key is the trial's and the cache
+# its sweep built is opened, not a second ~20 GB copy built: a stage loading by itself would freeze the parent's stats
+# into the key), the loaded data are handed to the stage (_reuse_data_from), and the job stops unless the statistics
+# and tokenizer it computed equal the trial's (the checkpoint was trained on those). The stage evaluates (the 1x
+# cells' stages did; the sweep's trials ran with evaluate false) and plots.
+if [ -n "$SIGMA_FROM" ] && ! ls "$OUT"/sigma_stage/models/model_run0_best.pt* >/dev/null 2>&1; then
+    ls "$PROJECT_DIR/$SIGMA_FROM"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $SIGMA_FROM"; exit 1; }
+    test -e "$OUT" && mv "$OUT" "$OUT.partial_$SLURM_JOB_ID"
+    echo "LONG_BEST $LB -> $OUT: data load at the trial's config, then the sigma-only stage"
+    python - "$PROJECT_DIR/$SIGMA_FROM" "$OUT" <<'PY' || exit 1
+import json, os, shutil, sys
+import torch
+from omegaconf import OmegaConf, open_dict
+import run
+from experiment import AmplitudeExperiment
+src, out = sys.argv[1], sys.argv[2]
+cfg = OmegaConf.load(os.path.join(src, "config.yaml"))
+assert str(cfg.training.loss) == "HETEROSC", cfg.training.loss
+with open_dict(cfg):
+    cfg.run_dir, cfg.run_name, cfg.warm_start_idx = out, None, None
+    cfg.training.heterosc_sigma_stage_steps = 250          # off in the sweep's trials; the arms' 250 (D70)
+    cfg.training.is_dyhpo_run = False                      # the stage is no trial: nothing reported to the sweep
+    cfg.training.increment_steps = None
+    cfg.training.result_path = None
+    cfg.evaluate = True
+    cfg.plot = True
+torch.set_default_dtype(torch.float32)
+exp = AmplitudeExperiment(cfg)
+exp._init()
+exp.init_physics()
+exp._save_config("config.yaml")     # as full_run after init_physics: the stage's warm start reads the parent's loss here
+exp.init_geometric_algebra()
+before = dict(exp.__dict__)
+exp.init_data()
+exp._data_keys = [k for k, v in exp.__dict__.items() if k not in before or before[k] is not v]
+exp._data_keys += [k for k in ("_proc_npart", "mom_mean", "mom_std") if hasattr(exp, k) and k not in exp._data_keys]
+def same(a, b):          # equal up to float rounding (relative 1e-9)
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(same(a[k], b[k]) for k in a)
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(same(x, y) for x, y in zip(a, b))
+    if isinstance(a, float) or isinstance(b, float):
+        return isinstance(a, (int, float)) and isinstance(b, (int, float)) and abs(a - b) <= 1e-9 * max(abs(a), abs(b), 1e-300)
+    return a == b
+for f in ("data_stats.json", "particle_tokenizer.json"):
+    if not same(json.load(open(os.path.join(src, f))), json.load(open(os.path.join(out, f)))):
+        sys.exit(f"LONG_BEST {f} of the reload differs from the trial's: not reading")
+print("LONG_BEST data_stats.json and particle_tokenizer.json equal the trial's", flush=True)
+os.makedirs(os.path.join(out, "models"), exist_ok=True)
+for f in os.listdir(os.path.join(src, "models")):
+    if f.startswith("model_run0_best.pt"):
+        shutil.copyfile(os.path.join(src, "models", f), os.path.join(out, "models", f))
+for f in ("context_names.json",):  # read by the stage when model.context_dim is on (not on in these sweeps)
+    if os.path.exists(os.path.join(src, f)) and not os.path.exists(os.path.join(out, f)):
+        shutil.copyfile(os.path.join(src, f), os.path.join(out, f))
+stage = run.sigma_stage_cfg(exp.cfg)
+exp.model = exp.optimizer = exp.scheduler = exp.ema = None
+nxt = AmplitudeExperiment(stage)
+nxt._reuse_data_from = exp
+nxt()
+run.promote_final_model(out, stage.run_dir)
+PY
 fi
 ls "$OUT"/models/model_run0_best.pt* >/dev/null 2>&1 || { echo "no best checkpoint in $OUT"; exit 1; }
 # the parent the reads score: a het arm's sigma stage (its calibrated sigma; mu frozen, the main run's)

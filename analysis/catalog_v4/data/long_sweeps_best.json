@@ -1,0 +1,115 @@
+{
+ "edge_rule": {
+  "top_k": 5,
+  "boundary_frac": 0.2,
+  "trigger_count": 3,
+  "source": "sweep/dyhpo_sampler.py check_and_extend_ranges defaults"
+ },
+ "17056": {
+  "sweep": "cov_v4_long_hpo8_cc_17056",
+  "lr_window": [
+   0.0008775,
+   0.007898
+  ],
+  "n_finished": 8,
+  "trials": [
+   {
+    "hp": "1262",
+    "val_loss": -3.8238031845451603,
+    "best_step": 17050.0,
+    "lr": 0.00782114,
+    "lr_log_position": 0.9955,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.790975863933563
+   },
+   {
+    "hp": "0353",
+    "val_loss": -3.7106180127620565,
+    "best_step": 17050.0,
+    "lr": 0.00617248,
+    "lr_log_position": 0.8878,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.445884071985881
+   },
+   {
+    "hp": "0753",
+    "val_loss": -3.639031024823412,
+    "best_step": 17050.0,
+    "lr": 0.007327191,
+    "lr_log_position": 0.9659,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.790264894366264
+   },
+   {
+    "hp": "1333",
+    "val_loss": -3.6378800693803517,
+    "best_step": 17050.0,
+    "lr": 0.004341778,
+    "lr_log_position": 0.7277,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.47663356701533
+   },
+   {
+    "hp": "0849",
+    "val_loss": -3.6072614213190217,
+    "best_step": 17050.0,
+    "lr": 0.007574548,
+    "lr_log_position": 0.981,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.814907329413626
+   },
+   {
+    "hp": "1176",
+    "val_loss": -3.222480333340417,
+    "best_step": 17050.0,
+    "lr": 0.001582604,
+    "lr_log_position": 0.2684,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.440114341179529
+   },
+   {
+    "hp": "0331",
+    "val_loss": -3.0523997831421483,
+    "best_step": 17050.0,
+    "lr": 0.00151101,
+    "lr_log_position": 0.2473,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.449913455711471
+   },
+   {
+    "hp": "1860",
+    "val_loss": -2.944409385214076,
+    "best_step": 17050.0,
+    "lr": 0.001156305,
+    "lr_log_position": 0.1256,
+    "best_at_last_validation": true,
+    "traintime_hours": 4.457654058204757
+   }
+  ],
+  "best": {
+   "hp": "1262",
+   "val_loss": -3.8238031845451603,
+   "best_step": 17050.0,
+   "lr": 0.00782114,
+   "lr_log_position": 0.9955,
+   "best_at_last_validation": true,
+   "traintime_hours": 4.790975863933563
+  },
+  "not_converged": [
+   "best lr in the window's outer 0.2 (log position 0.9955)",
+   "4 of the top 5 lr in the outer 0.2",
+   "5 of the top 5 best at their last validation, the best included"
+  ]
+ },
+ "68224": {
+  "sweep": "cov_v4_long_hpo8_cc_68224",
+  "lr_window": [
+   0.0004094,
+   0.003685
+  ],
+  "n_finished": 0,
+  "trials": [],
+  "best": null,
+  "not_converged": null
+ }
+}

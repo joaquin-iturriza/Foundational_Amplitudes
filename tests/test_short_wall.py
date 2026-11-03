@@ -54,5 +54,16 @@ def test_eval_mse_reread_within_2x_of_step23():
     assert 218 / 3600 < m["hours"] < 2 * 218 / 3600, m
 
 
+def test_eval_with_sigma_stage_counts_load_stage_and_cache():
+    """v4_het_long_best: an eval job that first runs a sweep trial's sigma-only stage on the whole training set"""
+    tr, ax = "recipes/catalog_v4_default25_train.yaml", ["HD5"]
+    e = sw.plan(tr, "v4", ax, eval_only=True, sigma_stage=True)
+    s = sw.plan(tr, "v4", ax, eval_only=True, sigma_stage=True, eval_stage=True)
+    extra = (sw.STARTUP_MIN - sw.STARTUP_EVAL_MIN + sw.SIGMA_STAGE_MIN + sw.CACHE_BUILD_MIN
+             + s["composed_at_load"] * sw.S_COMPOSE / 60) * sw.MARGIN / 60
+    assert s["iterations"] == 0 and s["composed_at_load"] > 0, s
+    assert abs(s["hours"] - e["hours"] - extra) < 0.02, (s, e, extra)
+
+
 if __name__ == "__main__":
-    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); test_eval_reread_fits_step20_times(); test_eval_mse_reread_within_2x_of_step23(); print("short_wall tests passed")
+    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); test_eval_reread_fits_step20_times(); test_eval_mse_reread_within_2x_of_step23(); test_eval_with_sigma_stage_counts_load_stage_and_cache(); print("short_wall tests passed")

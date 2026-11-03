@@ -7,6 +7,8 @@
           (training.lr of its config.yaml) and its training set in batches (its 'Starting to train ... with B batches'
           line), read from CC-IN2P3 with one read-only `site run` -> data/size_curves.json (a trial without
           'Finished training' is marked running, at its last validation)
+  best    each sweep's finished trials, its best, and the design's not-converged flags (lr at a window edge, best at
+          the last validation) -> data/long_sweeps_best.json
   figs    figs/width_x1_loss (from data/width_x1.json, mixture_ab.py width), figs/length_w8_curves,
           figs/loss_vs_compute (png + pdf)
 
@@ -68,11 +70,96 @@ def pull():
     if not res or bad:
         sys.exit("pull: incomplete trials: " + json.dumps({k: [len(v["vals"]), v["lr"], v["batches"]]
                                                           for k, v in bad.items()}))
+    # each sweep's results/*.json (the trial's objective: the main run's best val_loss_no_reg, and its step)
+    cmd2 = ('for s in ' + " ".join(SWEEPS.values()) + '; do for f in sweeps/$s/results/*.json; do '
+            'echo "@@ $s $(basename $f)"; '
+            'grep -oE "(val_loss|best_step|validate_every|traintime_hours).: [-0-9.eE+]+" $f; done; done')
+    out2 = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd2], capture_output=True,
+                          text=True, timeout=700).stdout
+    results, key = {}, None
+    for line in out2.splitlines():
+        m = re.match(r"@@ (\S+) hp(\d+)_t\d+_\S+\.json", line)
+        if m:
+            key = f"{m.group(1)}/{m.group(2)}"
+            results[key] = {}
+            continue
+        m = re.match(r'(val_loss|best_step|validate_every|traintime_hours).: (\S+)', line)
+        if key and m and m.group(1) not in results[key]:
+            results[key][m.group(1)] = float(m.group(2))
+    if not results:
+        sys.exit("pull: no sweep results read: " + out2[-500:])
     path = os.path.join(DATA, "size_curves.json")
-    json.dump({"source": "out_0.log and config.yaml of each validated trial on ccin2p3, read-only site run",
-               "trials": res}, open(path, "w"), indent=0)
+    json.dump({"source": "out_0.log and config.yaml of each validated trial, results/*.json of each sweep, on "
+                         "ccin2p3, read-only site run", "trials": res, "results": results}, open(path, "w"), indent=0)
     print(json.dumps({k: {"n": len(v["vals"]), "last_step": v["vals"][-1][0], "finished": v["finished"],
                           "lr": v["lr"]} for k, v in res.items()}))
+
+
+SWEEP_CONFIGS = {"17056": "sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml",
+                 "68224": "sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x16.yaml"}
+
+
+def sampler_edge_rule():
+    """(top_k, boundary_frac, trigger_count) of sweep/dyhpo_sampler.py's check_and_extend_ranges: the sampler's own
+    test that the best results cluster at a search-space edge (read from its defaults, not copied)"""
+    import ast
+    src = open(os.path.join(ROOT, "sweep", "dyhpo_sampler.py")).read()
+    fn = next(n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and n.name == "check_and_extend_ranges")
+    names = [a.arg for a in fn.args.args][-len(fn.args.defaults):]
+    d = {k: ast.literal_eval(v) for k, v in zip(names, fn.args.defaults)}
+    return d["top_k"], d["boundary_frac"], d["trigger_count"]
+
+
+def sweep_best():
+    """Per sweep: every finished trial's objective (results/*.json val_loss: the main run's best val_loss_no_reg) with
+    its lr, the best trial, where each lr sits in the search window (log position, 0 the low edge, 1 the high), and
+    whether each trial's best checkpoint is its last validation -> data/long_sweeps_best.json. Not converged (the
+    step-16 design: a best lr at a window edge, or top trials best at their last step): the best trial's lr in the
+    window's outer boundary_frac, or the sampler's edge cluster (trigger_count of the top_k trials' lr in the same
+    outer band; sweep/dyhpo_sampler.py check_and_extend_ranges, its defaults), or the best trial or a majority of the
+    top_k best at their last validation. A trial without its lr or validate_every stops the tool."""
+    import yaml
+    top_k, frac, trig = sampler_edge_rule()
+    d = json.load(open(os.path.join(DATA, "size_curves.json")))
+    tr, results = d["trials"], d.get("results", {})
+    out = {"edge_rule": {"top_k": top_k, "boundary_frac": frac, "trigger_count": trig,
+                         "source": "sweep/dyhpo_sampler.py check_and_extend_ranges defaults"}}
+    for steps, sweep in SWEEPS.items():
+        space = {x["name"]: x for x in yaml.safe_load(open(os.path.join(ROOT, SWEEP_CONFIGS[steps])))["search_space"]}
+        lo, hi = float(space["training.lr"]["low"]), float(space["training.lr"]["high"])
+        rows = []
+        for key, r in results.items():
+            sw, hp = key.split("/")
+            if sw != sweep or r.get("val_loss") is None:
+                continue
+            t = next((v for v in tr.values() if v["sweep"] == sweep and re.match(rf"trial_{hp}(_r\d+)?$", v["trial"])),
+                     None)
+            if t is None or t.get("lr") is None or not r.get("validate_every"):
+                sys.exit(f"best: {sweep} hp{hp}: no lr (trial dir not pulled) or no validate_every in its result")
+            pos = math.log(t["lr"] / lo) / math.log(hi / lo)
+            rows.append({"hp": hp, "val_loss": r["val_loss"], "best_step": r["best_step"], "lr": t["lr"],
+                         "lr_log_position": round(pos, 4),
+                         "best_at_last_validation": r["best_step"] + r["validate_every"] > int(steps),
+                         "traintime_hours": r.get("traintime_hours")})
+        rows.sort(key=lambda x: x["val_loss"])
+        b, top = (rows[0] if rows else None), rows[:top_k]
+        edge = lambda x: x["lr_log_position"] >= 1 - frac or x["lr_log_position"] <= frac
+        flags = []
+        if b is not None:
+            if edge(b):
+                flags.append(f"best lr in the window's outer {frac:g} (log position {b['lr_log_position']})")
+            n_edge = sum(edge(x) for x in top)
+            if n_edge >= trig:
+                flags.append(f"{n_edge} of the top {len(top)} lr in the outer {frac:g}")
+            n_last = sum(x["best_at_last_validation"] for x in top)
+            if b["best_at_last_validation"] or 2 * n_last > len(top):
+                flags.append(f"{n_last} of the top {len(top)} best at their last validation, the best included"
+                             if b["best_at_last_validation"] else f"{n_last} of the top {len(top)} best at their last validation")
+        out[steps] = {"sweep": sweep, "lr_window": [lo, hi], "n_finished": len(rows), "trials": rows, "best": b,
+                      "not_converged": flags if b is not None else None}
+    json.dump(out, open(os.path.join(DATA, "long_sweeps_best.json"), "w"), indent=1)
+    print(json.dumps({k: {"n": v["n_finished"], "best": v["best"], "not_converged": v["not_converged"]}
+                      for k, v in out.items() if k != "edge_rule"}))
 
 
 def best(vals):
@@ -191,9 +278,9 @@ def figs():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=("pull", "figs"))
+    ap.add_argument("cmd", choices=("pull", "figs", "best"))
     a = ap.parse_args()
-    pull() if a.cmd == "pull" else figs()
+    {"pull": pull, "figs": figs, "best": sweep_best}[a.cmd]()
 
 
 if __name__ == "__main__":
