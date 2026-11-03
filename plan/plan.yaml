@@ -8210,9 +8210,9 @@ entries:
       - 'a figure can''t be made today: say which and why'
   owner:
     agent: a81e6ba99cdb38b13
-    state: working
+    state: stopped
     since: '2026-11-03T09:14:31+00:00'
-    state_at: '2026-11-03T09:21:04.892000+00:00'
+    state_at: '2026-11-03T09:22:24.652000+00:00'
     context: 136008
     context_at: '2026-11-03T09:21:09+00:00'
   findings:
