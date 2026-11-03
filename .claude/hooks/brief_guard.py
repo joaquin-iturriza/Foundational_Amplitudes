@@ -83,12 +83,26 @@ def users_words(q):
         return False
 
 
+# a sentence about drawing (an error bar, a line, a legend, a panel, a row of a figure) names units without cutting them
+DRAW = re.compile(r"\b(?:bars?|error bars?|lines?|markers?|legends?|labels?|panels?|axes|axis|figures?|plots?|rows?|"
+                  r"curves?|points?|whiskers?|ticks?|colou?rs?)\b", re.I)
+COUNT_CUTS = CUTS[:3]        # the unit-count patterns; the design/review-skipping patterns are never excused by drawing words
+
+
+def is_cut(line):
+    for sent in re.split(r"(?<=[^.][.;!?])\s+", line):
+        for p in CUTS:
+            if re.search(p, sent, re.I) and not (p in COUNT_CUTS and DRAW.search(sent)):
+                return True
+    return False
+
+
 def cuts(text):
     text = re.sub(r"\"([^\"\n]*)\"|“([^”]*)”",
                   lambda m: " " if users_words(m.group(1) or m.group(2)) else m.group(0), text)
     bad = []
     for line in text.splitlines():
-        if any(re.search(p, line, re.I) for p in CUTS) and line.strip().lower() != "none":
+        if is_cut(line) and line.strip().lower() != "none":
             bad.append(line.strip())
     return bad
 

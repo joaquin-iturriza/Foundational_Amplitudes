@@ -57,6 +57,18 @@ def test_all():
     print("K6 ok: an owner's full brief also passes")
 
 
+def test_drawing_sentence_is_not_a_cut():
+    """The incident sentence about an error bar passes; real cuts of seeds and arms are still refused."""
+    step = ("Redraw the figure. If the control has only one seed on some row, say so and leave that row without a bar.")
+    rc, err = guard(plan("brief", "agent_redesign", "--mechanical", step))
+    assert rc == 0, err
+    for cut in ("Run only one seed of the sweep.", "Drop the arm at 16x and run only two arms, with fewer trials."):
+        rc, err = guard(plan("brief", "agent_redesign", "--mechanical", cut))
+        assert rc == 2 and "cuts the work" in err, (cut, err)
+    print("K7 ok: a drawing sentence passes, real cuts refused")
+
+
 if __name__ == "__main__":
     test_all()
+    test_drawing_sentence_is_not_a_cut()
     print("all ok")
