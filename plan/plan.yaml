@@ -3485,6 +3485,9 @@ entries:
     43: 'Open, to come back to (Joaquin 2026-11-02): (1) at width 8 and 4264 steps the full set (1e5/process, about 0.6 epoch,
       memmap) reads worse than 1e4/process (about 6 epochs, in memory): separate data size from loading path; (2) why e+e-
       gains most from the default share against the pure catalog-sampled control.'
+    44: 'Today''s deck (Joaquin 2026-11-03): sampling slide (default vs catalog mixture by component, pp example), width/length/zero-shot
+      with restored error bars, MSE log|M|^2 against compute and wall time, het. loss naming; plus a show/skip list of other
+      results since the last deck for Joaquin.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8178,6 +8181,11 @@ entries:
       if:
       - 'explained with a run or read: written up'
       - 'not yet: stays open'
+    44:
+      feeds: Joaquin's presentation 2026-11-03
+      if:
+      - 'built and checked: sent with the list'
+      - 'a figure can''t be made today: say which and why'
   owner:
     agent: afe05580f2c6da391
     state: working
