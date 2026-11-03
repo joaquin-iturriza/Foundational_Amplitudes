@@ -19,7 +19,7 @@ of the class's geometric mean over its probes); c and d: the same on the held-ou
     python3 analysis/catalog_v4/fig_shares_bound.py arms  ->  analysis/catalog_v4/figs/arms_zero_shot_{a,b,c,d}.{png,pdf}
 
 With `merged` (the deck): one panel, the MSE-trained arms (share 1 on pp, 0.50, 0.25) and the het-trained shares (0.50,
-0.25), each R against the control trained with its own loss, on four disjoint-labelled rows.
+0.25), each R against the share-0 control trained with the MSE loss, on four disjoint-labelled rows.
 
     python3 analysis/catalog_v4/fig_shares_bound.py merged  ->  analysis/catalog_v4/figs/shares_deck.{png,pdf}
 """
@@ -165,42 +165,89 @@ def arms_figure():
 
 
 
-# the deck's one figure of the share study (Joaquin 2026-11-03): MSE-trained and het-trained arms together, each against
-# the control trained with its own loss; rows and arm names as on the zero-shot figure (ARM_READS, ARM_ARMS)
+# the deck's one figure of the share study (Joaquin 2026-11-03: "The point is to show the advantage of het over MSE"):
+# every arm's R is over the share-0 control trained with the MSE loss, whatever the arm's own loss; rows and arm names
+# as on the zero-shot figure (ARM_READS, ARM_ARMS)
 SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-# one colour per share fraction for both losses (share 1 orange, 0.50 sky, 0.25 vermillion),
-# the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
-# row (one for both losses), its bar the wider of the two controls' bars, each the arms' bar applied to the control's two seeds against their geometric mean: every
-# class ratio is 1, so the class bootstrap is [1, 1] and the bar is the widening alone, [exp(-|ln R_seed|),
-# exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the "R_seed" of the data files)
+# one colour per share fraction for both losses (share 1 orange, 0.50 sky, 0.25 vermillion), the loss told apart by the
+# marker fill (open MSE, filled het.); the MSE control a black square at R = 1 with its seed-spread bar, the het control
+# (share 0, het loss) a black filled circle over the MSE control
 SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.orange, "s", "none"),
               ("mse", "default50", r"share 0.50, MSE loss", ps.C.sky, "o", "none"),
               ("mse", "default25", r"share 0.25, MSE loss", ps.C.vermillion, "D", "none"),
               ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
               ("het", "default25", r"share 0.25, het. loss", ps.C.vermillion, "D", None)]
-CONTROLS = [("mse", "bound"), ("het", "default25")]   # drawn as one square per row, the wider of the two bars
+
+
+def het_over_mse_control():
+    """R of the het-loss arms and the het control over the MSE control (same per-class construction as mixture_ab's
+    compare: geometric mean over seeds per probe, class geometric mean, median over classes, class bootstrap widened by
+    the MSE control's seed ratio), on the classes both have (the intersection) -> data/shares_deck_mse_ref.json"""
+    sys.path.insert(0, HERE)
+    import mixture_ab as m
+    cls = m.class_of()
+    ax_of = m._held_axes(cls)
+    trained = {cls(p["name"]) for p in m.yaml.safe_load(open(os.path.join(ROOT, "recipes",
+                                                                      "catalog_v4_base_train.yaml")))["processes"]}
+    names = ("default50", "default25", "hetctl")
+    table = {a: {r: m.MIX_HET[a][r] for r in ("PP4", "EE4")} for a in names[:2]}
+    table["hetctl"] = {r: m.MIX_HET["control"][r] for r in ("PP4", "EE4")}
+    table["control"] = {r: m.MIX["control"][r] for r in ("PP4", "EE4")}
+    reads, missing = m._reads(table)
+    assert not missing, missing
+    out = {"design": "R over the share-0 MSE-loss control (MIX['control'] runs), arms from MIX_HET, het control "
+                     "MIX_HET['control']; classes = intersection of the arm's and the MSE control's", "arms": {},
+           "class_counts": {}}
+    for a in names:
+        extra = {ax: {a: (m.HD4_HET["control"] if a == "hetctl" else m.HD4_HET[a]), "control": m.HD4_MSE["control"]}
+                 for ax in ("HD4",)}
+        extra["HD5"] = {a: (m.HD5_HET["control"] if a == "hetctl" else m.HD5_HET[a]), "control": m.HD5_MSE["control"]}
+        res = {}
+        c = reads["control"]
+        for r in ("PP4", "EE4"):
+            arm, ctl = m.side(reads[a][r]), m.side(c[r])
+            keys = sorted(set(arm) & set(ctl), key=str)
+            parts = {"trained": [k for k in keys if cls(m.probe_name(k)) in trained]}
+            res[r] = {n: m.compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
+            out["class_counts"][f"{a} {r} trained"] = {
+                "arm_classes": len({cls(m.probe_name(k)) for k in arm if cls(m.probe_name(k)) in trained}),
+                "control_classes": len({cls(m.probe_name(k)) for k in ctl if cls(m.probe_name(k)) in trained}),
+                "used": res[r]["trained"]["n_classes"]}
+        res["held_default"], _ = m._held_default(reads, a, cls, ax_of, extra)
+        assert not res["held_default"]["default_missing"], res["held_default"]["default_missing"]
+        out["arms"][a] = res
+    json.dump(out, open(os.path.join(DATA, "shares_deck_mse_ref.json"), "w"), indent=1)
+    return out
 
 
 def merged_figure():
-    res = {"mse": json.load(open(os.path.join(DATA, "bound_default.json")))["arms"],
-           "het": json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]}
+    mse = json.load(open(os.path.join(DATA, "bound_default.json")))["arms"]
+    het = het_over_mse_control()["arms"]
+    res = {"mse": mse, "het": {"default50": het["default50"], "default25": het["default25"]}}
     fig, ax = ps.figure()
     n = len(SHARE_READS)
-    k = len(SHARE_ARMS) + 1
-    off = [(i - (k - 1) / 2) * 0.13 for i in range(k)]
+    k = len(SHARE_ARMS) + 2
+    off = [(i - (k - 1) / 2) * 0.12 for i in range(k)]
     for j, (lab, (r, part)) in enumerate(SHARE_READS):
-        ws = [abs(math.log(res[loss][a][r][part]["R_seed"])) for loss, a in CONTROLS]
-        lo_c, hi_c = min(math.exp(-w) for w in ws), max(math.exp(w) for w in ws)
-        print("control bar", lab, round(lo_c, 4), round(hi_c, 4))
+        w = abs(math.log(mse["default25"][r][part]["R_seed"]))   # the MSE control's seed 43 over 42, class median
+        lo_c, hi_c = math.exp(-w), math.exp(w)
+        print("MSE control bar", lab, round(lo_c, 4), round(hi_c, 4))
         ax.errorbar([1.0], [n - 1 - j + off[0]], xerr=[[1 - lo_c], [hi_c - 1]], color="k", marker="s",
-                    linestyle="none", label="control: share 0, same loss as the arm" if j == 0 else None)
+                    linestyle="none", label="control: share 0, MSE loss" if j == 0 else None)
+        d = het["hetctl"][r][part]
+        lo, hi = d["widened"]
+        print("het control over MSE control", lab, d["R"], d["widened"], d["n_classes"])
+        ax.errorbar([d["R"]], [n - 1 - j + off[1]], xerr=[[d["R"] - lo], [hi - d["R"]]], color="k", marker="o",
+                    linestyle="none", label="share 0, het. loss" if j == 0 else None)
         for i, (loss, a, label, col, mk, mfc) in enumerate(SHARE_ARMS):
             d = res[loss][a][r][part]
             lo, hi = d["widened"]
-            ax.errorbar([d["R"]], [n - 1 - j + off[i + 1]], xerr=[[d["R"] - lo], [hi - d["R"]]],
+            if loss == "het":
+                print("het", a, lab, d["R"], d["widened"], d["n_classes"])
+            ax.errorbar([d["R"]], [n - 1 - j + off[i + 2]], xerr=[[d["R"] - lo], [hi - d["R"]]],
                         color=col, marker=mk, linestyle="none", mfc=mfc or col, label=label if j == 0 else None)
     ticks = (0.2, 0.5, 1.0, 2.0)
     ax.set_xscale("log")
@@ -208,9 +255,9 @@ def merged_figure():
     ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
     ax.xaxis.set_minor_formatter(NullFormatter())
     ax.set_yticks(range(n))
-    ax.set_yticklabels([f"{lab} ({res['het']['default25'][r][p]['n_classes']})" for lab, (r, p) in SHARE_READS][::-1])
+    ax.set_yticklabels([f"{lab} ({mse['default25'][r][p]['n_classes']})" for lab, (r, p) in SHARE_READS][::-1])
     ax.set_ylim(-0.6, n - 0.4)
-    ax.set_xlabel(r"$R$ = MSE(arm) / MSE(control)")
+    ax.set_xlabel(r"$R$ = MSE(arm) / MSE(control: share 0, MSE loss)")
     ps.shared_legend(fig, ax, ncol=3)   # every arm here at width 8 and 10^4 events per process, as the control
     ps.save(fig, os.path.join(HERE, "figs", "shares_deck"))
 
