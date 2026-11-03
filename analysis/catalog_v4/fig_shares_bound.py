@@ -171,8 +171,8 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-# one colour per share fraction for both losses (share 0.25 vermillion by decision; the other colours are
-# purple), the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
+# one colour per share fraction for both losses (share 1 orange, 0.50 sky, 0.25 vermillion),
+# the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
 # row for each loss, its bar the arms' bar applied to the control's two seeds against their geometric mean: every
 # class ratio is 1, so the class bootstrap is [1, 1] and the bar is the widening alone, [exp(-|ln R_seed|),
 # exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the "R_seed" of the data files)
