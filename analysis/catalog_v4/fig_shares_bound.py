@@ -173,7 +173,7 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                ("one-loop, not in training", ("held_default", "H5"))]
 # one colour per share fraction for both losses (share 1 orange, 0.50 sky, 0.25 vermillion),
 # the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
-# row for each loss, its bar the arms' bar applied to the control's two seeds against their geometric mean: every
+# row (one for both losses), its bar the wider of the two controls' bars, each the arms' bar applied to the control's two seeds against their geometric mean: every
 # class ratio is 1, so the class bootstrap is [1, 1] and the bar is the widening alone, [exp(-|ln R_seed|),
 # exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the "R_seed" of the data files)
 SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.orange, "s", "none"),
@@ -181,7 +181,7 @@ SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.orange, "s", "no
               ("mse", "default25", r"share 0.25, MSE loss", ps.C.vermillion, "D", "none"),
               ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
               ("het", "default25", r"share 0.25, het. loss", ps.C.vermillion, "D", None)]
-CONTROLS = [("mse", "bound", "control: share 0, MSE loss", "none"), ("het", "default25", "control: share 0, het. loss", None)]
+CONTROLS = [("mse", "bound"), ("het", "default25")]   # drawn as one square per row, the wider of the two bars
 
 
 def merged_figure():
@@ -189,17 +189,18 @@ def merged_figure():
            "het": json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]}
     fig, ax = ps.figure()
     n = len(SHARE_READS)
-    k = len(SHARE_ARMS) + len(CONTROLS)
+    k = len(SHARE_ARMS) + 1
     off = [(i - (k - 1) / 2) * 0.13 for i in range(k)]
     for j, (lab, (r, part)) in enumerate(SHARE_READS):
-        for c, (loss, a, label, mfc) in enumerate(CONTROLS):
-            w = abs(math.log(res[loss][a][r][part]["R_seed"]))
-            ax.errorbar([1.0], [n - 1 - j + off[c]], xerr=[[1 - math.exp(-w)], [math.exp(w) - 1]], color="k",
-                        marker="s", linestyle="none", mfc=mfc or "k", label=label if j == 0 else None)
+        ws = [abs(math.log(res[loss][a][r][part]["R_seed"])) for loss, a in CONTROLS]
+        lo_c, hi_c = min(math.exp(-w) for w in ws), max(math.exp(w) for w in ws)
+        print("control bar", lab, round(lo_c, 4), round(hi_c, 4))
+        ax.errorbar([1.0], [n - 1 - j + off[0]], xerr=[[1 - lo_c], [hi_c - 1]], color="k", marker="s",
+                    linestyle="none", label="control: share 0, same loss as the arm" if j == 0 else None)
         for i, (loss, a, label, col, mk, mfc) in enumerate(SHARE_ARMS):
             d = res[loss][a][r][part]
             lo, hi = d["widened"]
-            ax.errorbar([d["R"]], [n - 1 - j + off[i + len(CONTROLS)]], xerr=[[d["R"] - lo], [hi - d["R"]]],
+            ax.errorbar([d["R"]], [n - 1 - j + off[i + 1]], xerr=[[d["R"] - lo], [hi - d["R"]]],
                         color=col, marker=mk, linestyle="none", mfc=mfc or col, label=label if j == 0 else None)
     ticks = (0.2, 0.5, 1.0, 2.0)
     ax.set_xscale("log")
@@ -210,7 +211,7 @@ def merged_figure():
     ax.set_yticklabels([f"{lab} ({res['het']['default25'][r][p]['n_classes']})" for lab, (r, p) in SHARE_READS][::-1])
     ax.set_ylim(-0.6, n - 0.4)
     ax.set_xlabel(r"$R$ = MSE(arm) / MSE(control)")
-    ps.shared_legend(fig, ax, ncol=2)   # every arm here at width 8 and 10^4 events per process, as the control
+    ps.shared_legend(fig, ax, ncol=3)   # every arm here at width 8 and 10^4 events per process, as the control
     ps.save(fig, os.path.join(HERE, "figs", "shares_deck"))
 
 
