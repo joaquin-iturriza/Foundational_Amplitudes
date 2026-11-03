@@ -8200,7 +8200,7 @@ entries:
     agent: afe05580f2c6da391
     state: closed
     since: '2026-11-03T01:39:16+00:00'
-    state_at: '2026-11-03T03:39:24+00:00'
+    state_at: '2026-11-03T03:39:47+00:00'
     context: 257680
     context_at: '2026-11-03T03:39:29+00:00'
   findings:
