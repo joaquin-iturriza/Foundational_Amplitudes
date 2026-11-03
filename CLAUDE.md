@@ -45,7 +45,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Reading state, git and file edits are never confirm-first.
 - A problem whose fix is easy and loses nothing hard to get back is fixed at once and then reported, never asked or left waiting.
 - Work exists only as a plan entry, changed only through `tools/plan.py`; every submission names its entry's item (`--item`).
-- Before proposing or designing a run or analysis, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or that none was found.
+- Before proposing or designing a run, analysis or tool fix, or launching a lookup, search `docs/results.tex`, the plan and `site decisions` for prior work on the same question and name what was found with its result, or that none was found.
 - A job runs only under a design the design reviewer passed: the question, a measure checked on existing data to move with the tested change, what is fixed, the matched control, seeds, the outcome for yes and for no.
 - Inside an entry I approved, new designs, analyses, jobs within the budget and repairs of its defects go ahead without me; work a decision of mine holds at its design stops there.
 - The main session talks to me and directs agents; it never does an entry's work itself: no code edits, analyses, tests or submissions, including fixes I ask for directly (small ones go to a `mechanical-worker`), and no method or design of its own: it passes on my words and the owner's reviewed design.
