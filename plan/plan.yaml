@@ -8212,7 +8212,7 @@ entries:
     agent: af4ab0f75ac3ab59b
     state: closed
     since: '2026-11-03T03:40:33+00:00'
-    state_at: '2026-11-03T09:02:40+00:00'
+    state_at: '2026-11-03T09:14:06+00:00'
     context: 123237
     context_at: '2026-11-03T09:02:37+00:00'
   findings:
