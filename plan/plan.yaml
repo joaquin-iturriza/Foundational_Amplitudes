@@ -8209,12 +8209,10 @@ entries:
       - 'built and checked: sent with the list'
       - 'a figure can''t be made today: say which and why'
   owner:
-    agent: af4ab0f75ac3ab59b
-    state: closed
-    since: '2026-11-03T03:40:33+00:00'
-    state_at: '2026-11-03T09:14:06+00:00'
-    context: 123237
-    context_at: '2026-11-03T09:02:37+00:00'
+    agent: a81e6ba99cdb38b13
+    state: working
+    since: '2026-11-03T09:14:31+00:00'
+    state_at: '2026-11-03T09:14:31+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
