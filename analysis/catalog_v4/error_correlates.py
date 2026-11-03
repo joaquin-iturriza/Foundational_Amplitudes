@@ -751,13 +751,13 @@ def figures(raw):
     ps.save(fig, os.path.join(FIGS, "error_correlates_profile"))
 
 
-DECK_LABEL = {"y_ff": r"smallest $2p_ip_j/\hat s$, two outgoing", "y_min": r"smallest $2|p_ip_j|/\hat s$, any two",
-              "y_if": r"smallest $2|p_ip_j|/\hat s$, in and out", "pt_min": r"smallest $p_T/\sqrt{\hat s}$",
-              "e_min": r"smallest $E/\sqrt{\hat s}$", "sqrt_shat": r"$\sqrt{\hat s}$",
-              "t_level": r"$\log|\mathcal{M}|^2$", "u_fwd": r"$1/(1-|\cos\theta|)$, most forward",
-              "eta_max": r"largest $|\eta|$", "pt_max": r"largest $p_T/\sqrt{\hat s}$", "dr_min": r"smallest $\Delta R$",
+DECK_LABEL = {"y_ff": r"$\min 2p_ip_j/\hat s$, out-out", "y_min": r"$\min 2|p_ip_j|/\hat s$, any",
+              "y_if": r"$\min 2|p_ip_j|/\hat s$, in-out", "pt_min": r"$\min p_T/\sqrt{\hat s}$",
+              "e_min": r"$\min E/\sqrt{\hat s}$", "sqrt_shat": r"$\sqrt{\hat s}$",
+              "t_level": r"$\log|\mathcal{M}|^2$", "u_fwd": r"$1/(1-|\cos\theta|_{\max})$",
+              "eta_max": r"$\max|\eta|$", "pt_max": r"$\max p_T/\sqrt{\hat s}$", "dr_min": r"$\min\Delta R$",
               "thr": r"$1-\sum m/\sqrt{\hat s}$", "y_boost": r"$|y_{\rm boost}|$", "res_min": "nearest resonance",
-              "loc_var": "local spread"}
+              "loc_var": "local spread"}    # short row labels: the deck's two panels side by side at one plot box
 DECK_SHORT = {"t_level": r"$\log|\mathcal{M}|^2$", "y_ff": r"smallest $2p_ip_j/\hat s$", "sqrt_shat": r"$\sqrt{\hat s}$"}
 
 
@@ -781,12 +781,11 @@ def deck_figures(raw):
     for tgt, col, mk, lab, dy in (("ae", ps.C.blue, "s", "absolute error", 0.15),
                                   ("s", ps.C.vermillion, "o", r"predicted $\sigma$", -0.15)):
         ax.plot([rho(f, tgt) for f in order], yy + dy, mk, color=col, ls="none", label=lab)
-    ax.axvline(0, color=ps.C.grey, linestyle="--", label="no correlation")
     ax.set_yticks(yy)
     ax.set_yticklabels([DECK_LABEL.get(f, LABEL[f]) for f in order])
     ax.set_xlabel(r"Spearman corr. with error or $\sigma$")
     ax.set_ylim(-0.6, len(order) - 0.4)
-    ps.shared_legend(fig, ax, ncol=3)
+    ps.shared_legend(fig, ax, ncol=2)
     ps.save(fig, os.path.join(FIGS, "error_correlates_deck_rank"))
     fig, ax = ps.figure()
     x = np.arange(1, 11)

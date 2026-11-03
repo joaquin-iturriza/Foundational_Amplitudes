@@ -76,13 +76,16 @@ ARM_READS = [("pp, processes in training", "PP4_trained"), (r"$e^+e^-$, processe
              ("one-loop, not in training", "held_default/H5")]
 ARM_AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ families"), ("H2p5", r"$2\to5$"),
             ("H3", "physical top"), ("H6", r"$\alpha_s=0.13$"), ("H7E", r"$\sqrt{\hat s}$ 6 to 20 TeV"),
-            ("H7c", r"$p_T\geq30$ GeV"), ("H5", "one loop")]
-ARM_ARMS = [("control", r"control: share 0, width 8, $10^4$ events per process", "k", "s"),
-            ("default25_1e4", r"share 0.25, width 8, $10^4$ events per process", ps.C.grey, "v"),
-            ("w8_full", r"share 0.25, width 8, $10^5$ events per process", ps.C.blue, "o"),
-            ("w16_full", r"share 0.25, width 16, $10^5$ events per process", ps.C.green, "D"),
-            ("w32_full", r"share 0.25, width 32, $10^5$ events per process", ps.C.vermillion, "^"),
-            ("long4x_best", r"share 0.25, width 8, $10^5$ events per process, 4$\times$ steps, tuned, one seed, "
+            ("H7c", r"$p_T\geq30$ GeV"), ("H5", "one-loop")]
+# deck colours (talks/progress_nov2026, one per arm on every slide): control black square, share 0.25 at 10^4 events
+# per process orange (as on the share slide), widths 8/16/32 blue/green/vermillion, the 4x best purple; {ep} is the
+# arm's epochs (data/epochs.json)
+ARM_ARMS = [("control", r"control: share 0, width 8, $10^4$ events per process, {ep} epochs", "k", "s"),
+            ("default25_1e4", r"share 0.25, width 8, $10^4$ events per process, {ep} epochs", ps.C.orange, "v"),
+            ("w8_full", r"share 0.25, width 8, $10^5$ events per process, {ep} epochs", ps.C.blue, "o"),
+            ("w16_full", r"share 0.25, width 16, $10^5$ events per process, {ep} epochs", ps.C.green, "D"),
+            ("w32_full", r"share 0.25, width 32, $10^5$ events per process, {ep} epochs", ps.C.vermillion, "^"),
+            ("long4x_best", r"share 0.25, width 8, $10^5$ events per process, {ep} epochs, best tuned trial, "
              "not converged", ps.C.purple, "P")]
 
 
@@ -117,11 +120,11 @@ def seed_panel(ax, seeds, reads, arms, key, xlabel, ticks, ref=None):
         ax.add_line(h)
 
 
-def point_panel(ax, pts, reads, arms, key, xlabel, ticks, ref=None):
+def point_panel(ax, pts, reads, arms, key, xlabel, ticks, ref=None, step=0.16):
     """One row per read, one point per arm (its seeds' geometric mean) with its bar (the per-seed 95% class-bootstrap
     intervals' lowest lower to highest upper end)"""
     n = len(reads)
-    off = {a[0]: (i - (len(arms) - 1) / 2) * 0.14 for i, a in enumerate(arms)}
+    off = {a[0]: (i - (len(arms) - 1) / 2) * step for i, a in enumerate(arms)}   # rows apart by a marker or more
     for j, (lab, r) in enumerate(reads):
         for a, label, col, mk in arms:
             d = pts[a][r]
@@ -146,19 +149,22 @@ def arms_figure():
     pts, ep = d["points"], d["epochs"]
     eps = {a: sorted({round(v["epochs"], 2) for v in ep[a].values()}) for a in ep}
     assert all(len(v) == 1 for v in eps.values()), eps
-    arms = [(a, f"{lab}, {eps[a][0]:.2g} epochs", c, m) for a, lab, c, m in ARM_ARMS]
+    arms = [(a, lab.format(ep=f"{eps[a][0]:.2g}"), c, m) for a, lab, c, m in ARM_ARMS]
     axes = [(lab, f"held_default/{ax}") for ax, lab in ARM_AXES]
     ref = None           # the control is its own point at R = 1 (a line too named it twice)
     rlab = r"$R$ = MSE(arm) / MSE(control)"
     mlab = r"MSE of $\log|\mathcal{M}|^2$"
-    for name, reads, rt, mt in (("arms_zero_shot", ARM_READS, (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0)),
-                                ("arms_zero_shot_axes", axes, (0.02, 0.05, 0.1, 0.2, 0.5, 1.0),
-                                 (0.001, 0.01, 0.1, 1.0, 10.0))):
+    # the held-out axes in two figures of four rows (eight rows of six arms piled the markers in one plot box)
+    for name, reads, rt, mt, step in (
+            ("arms_zero_shot", ARM_READS, (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0), 0.16),
+            ("arms_zero_shot_axes_a", axes[:4], (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0), 0.16),
+            ("arms_zero_shot_axes_b", axes[4:], (0.02, 0.05, 0.1, 0.2, 0.5, 1.0), (0.001, 0.01, 0.1, 1.0, 10.0),
+             0.16)):
         fig, (a, b) = ps.figure(ncols=2)
-        point_panel(a, pts, reads, arms, "R", rlab, rt, ref)
-        point_panel(b, pts, reads, arms, "mse", mlab, mt)
+        point_panel(a, pts, reads, arms, "R", rlab, rt, ref, step)
+        point_panel(b, pts, reads, arms, "mse", mlab, mt, None, step)
         b.set_yticklabels([])
-        ps.shared_legend(fig, a, ncol=1)
+        ps.shared_legend(fig, a, ncol=1)     # two columns of these names run off the canvas
         ps.save(fig, os.path.join(HERE, "figs", name))
 
 
@@ -169,11 +175,13 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.vermillion, "s"),
-              ("mse", "default50", r"share 0.50, MSE loss", ps.C.orange, "o"),
-              ("mse", "default25", r"share 0.25, MSE loss", ps.C.sky, "D"),
-              ("het", "default50", r"share 0.50, het. loss", ps.C.green, "o"),
-              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "v")]
+# colour by share as on every slide (0.25 orange, 0.50 sky, 1 grey), filled het. loss, open MSE loss; the control
+# a black square at R = 1 on each row, as on the zero-shot slides
+SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.grey, "D", "none"),
+              ("mse", "default50", r"share 0.50, MSE loss", ps.C.sky, "o", "none"),
+              ("mse", "default25", r"share 0.25, MSE loss", ps.C.orange, "v", "none"),
+              ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
+              ("het", "default25", r"share 0.25, het. loss", ps.C.orange, "v", None)]
 
 
 def merged_figure():
@@ -181,14 +189,17 @@ def merged_figure():
            "het": json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]}
     fig, ax = ps.figure()
     n = len(SHARE_READS)
-    off = {i: (i - (len(SHARE_ARMS) - 1) / 2) * 0.15 for i in range(len(SHARE_ARMS))}
+    k = len(SHARE_ARMS) + 1
+    off = [(i - (k - 1) / 2) * 0.15 for i in range(k)]
     for j, (lab, (r, part)) in enumerate(SHARE_READS):
-        for i, (loss, a, label, col, mk) in enumerate(SHARE_ARMS):
+        ax.plot([1.0], [n - 1 - j + off[0]], ls="none", marker="s", color="k",
+                label="control: share 0, same loss" if j == 0 else None)
+        for i, (loss, a, label, col, mk, mfc) in enumerate(SHARE_ARMS):
             d = res[loss][a][r][part]
             lo, hi = d["widened"]
-            ax.errorbar([d["R"]], [n - 1 - j + off[i]], xerr=[[d["R"] - lo], [hi - d["R"]]], color=col, marker=mk,
-                        linestyle="none", label=label if j == 0 else None)
-    ax.axvline(1.0, color="k", linestyle="--", label="control: share 0, same loss")
+            kw = {"mfc": mfc} if mfc else {}
+            ax.errorbar([d["R"]], [n - 1 - j + off[i + 1]], xerr=[[d["R"] - lo], [hi - d["R"]]], color=col,
+                        marker=mk, linestyle="none", label=label if j == 0 else None, **kw)
     ticks = (0.2, 0.5, 1.0, 2.0)
     ax.set_xscale("log")
     ax.xaxis.set_major_locator(FixedLocator(list(ticks)))

@@ -31,57 +31,66 @@
 
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 
+% one scale for every figure, so legend and tick text are the same size on every slide
+\newcommand{\fig}[1]{\includegraphics[scale=0.62]{#1}}
+\newcommand{\figtop}[1]{\raisebox{-\height}{\includegraphics[scale=0.6]{#1}}}
+
 \begin{document}
 
 \begin{frame}{Catalog sampling by component}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_a.pdf}
+  \fig{sampling_example_a.pdf}
 \end{frame}
 
 \begin{frame}{Default, catalog and the trained mixture}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_b.pdf}
+  \fig{sampling_example_b.pdf}
 \end{frame}
 
 \begin{frame}{Share of default sampled events}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{shares_deck.pdf}
+  \fig{shares_deck.pdf}
 \end{frame}
 
 \begin{frame}{Width}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{width_x1_loss.pdf}
+  \fig{width_x1_loss.pdf}
 \end{frame}
 
 \begin{frame}{Length}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{length_w8_curves.pdf}
+  \fig{length_w8_curves.pdf}
 \end{frame}
 
 \begin{frame}{Zero shot per arm}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_zero_shot.pdf}
+  \fig{arms_zero_shot.pdf}
 \end{frame}
 
 \begin{frame}{Zero shot per held-out axis}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_zero_shot_axes.pdf}
+  \fig{arms_zero_shot_axes_a.pdf}
+\end{frame}
+
+\begin{frame}{Zero shot per held-out axis}
+  \centering
+  \fig{arms_zero_shot_axes_b.pdf}
 \end{frame}
 
 \begin{frame}{MSE against compute and wall time}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{mse_vs_compute.pdf}
+  \fig{mse_vs_compute.pdf}
 \end{frame}
 
 \begin{frame}{More one-loop training data}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loop_more_pools.pdf}
+  \fig{loop_more_pools.pdf}
 \end{frame}
 
 \begin{frame}{What the error and sigma follow}
   \centering
-  \includegraphics[scale=0.56]{error_correlates_deck_rank.pdf}\hfill
-  \includegraphics[scale=0.56]{error_correlates_deck_profile.pdf}
+  \figtop{error_correlates_deck_rank.pdf}\hfill
+  \figtop{error_correlates_deck_profile.pdf}
 \end{frame}
 
 \end{document}

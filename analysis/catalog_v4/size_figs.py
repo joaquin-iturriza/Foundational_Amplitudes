@@ -341,51 +341,75 @@ def figs():
     os.makedirs(FIGS, exist_ok=True)
     report = {}
 
-    # 1: best val_loss_no_reg against width, one point per seed
+    # deck names and colours (talks/progress_nov2026, as on the zero-shot slides): widths 8/16/32 blue/green/vermillion
+    # (o, D, ^), the 4x best purple; NAME is the zero-shot slides' wording of the whole-set share-0.25 runs
+    NAME = r"share 0.25, width {w}, $10^5$ events per process, {ep} epochs"
+    WCOL = {8: (ps.C.blue, "o"), 16: (ps.C.green, "D"), 32: (ps.C.vermillion, "^")}
+    b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
+
+    # 1: best val_loss_no_reg against width, one line per seed (42 solid, filled; 43 dashed, open), markers in the
+    # width's colour
     fig, ax = ps.figure()
-    for i, (seed, c, mk) in enumerate(((42, ps.C.blue, "o"), (43, ps.C.vermillion, "s"))):
+    for i, (seed, ls, mfc) in enumerate(((42, "-", None), (43, "--", "none"))):
         ys = [w["best"][WIDTH_RUNS[k][i]]["val_loss_no_reg"] for k in (8, 16, 32)]
-        ax.plot([8, 16, 32], ys, marker=mk, color=c, label=f"seed {seed}")
+        ax.plot([8, 16, 32], ys, color=ps.C.grey, ls=ls)
+        for k, y in zip((8, 16, 32), ys):
+            ax.plot([k], [y], ls="none", marker=WCOL[k][1], color=WCOL[k][0], **({"mfc": mfc} if mfc else {}))
+        ax.add_line(Line2D([], [], color=ps.C.grey, ls=ls, marker="o", label=f"seed {seed}",
+                           **({"mfc": mfc} if mfc else {})))
         report[f"width seed {seed}"] = [round(y, 4) for y in ys]
     ax.set_xscale("log", base=2)
     ax.set_xticks([8, 16, 32], ["8", "16", "32"])
     ax.minorticks_off()
-    ax.set_xlabel(f"width (attention heads), 4264 steps ({ep_x1:.2g} epochs)")
+    ax.set_xlabel("width (attention heads)")
     ax.set_ylabel("best validation het. loss")
     ps.legend(ax, "upper right")
     ps.save(fig, os.path.join(FIGS, "width_x1_loss"))
 
-    # 2: validation curves at width 8: the 4264-step run (seed 42) and every validated sweep trial (seed 42)
-    groups = {"17056": sorted((k for k in tr if tr[k]["steps"] == 17056), key=lambda k: tr[k]["lr"]),
-              "68224": sorted((k for k in tr if tr[k]["steps"] == 68224), key=lambda k: tr[k]["lr"])}
-    pal = {g: ps.sequence(len(groups[g]), cm, lo=0.45, hi=0.95)
-           for g, cm in (("17056", "Blues"), ("68224", "Oranges"))}
-    colour = {k: pal[g][i] for g, ks in groups.items() for i, k in enumerate(ks)}
-    style = {"17056": "-", "68224": "--"}
+    # 2: validation curves at width 8 (seed 42): the 4264-step run, the 17056-step sweep's best trial (bold), its
+    # other trials (thin, light: emphasis only), every 68224-step trial (finished solid, running dashed)
+    t4 = [k for k in tr if tr[k]["steps"] == 17056]
+    t16 = sorted((k for k in tr if tr[k]["steps"] == 68224), key=lambda k: tr[k]["lr"])
+    best4 = f"17056_trial_{b17}"
+    assert best4 in t4, best4
+    e4 = {round(ep_of[k], 1) for k in t4}; e16 = {round(ep_of[k], 0) for k in t16}
+    assert len(e4) == 1 and len(e16) == 1, (e4, e16)
+    e4, e16 = f"{e4.pop():.2g}", f"{e16.pop():.0f}"
     fig, ax = ps.figure()
     off = {}
 
     def draw(vals, label, **kw):
         s = np.array([v[0] for v in vals], float); y = np.array([v[1] for v in vals], float)
         bad = ~(np.isfinite(y) & (y <= OFF_SCALE))
-        off[label] = int(bad.sum())
+        off[label] = off.get(label, 0) + int(bad.sum())
         y[bad] = np.nan
         ax.plot(s, y, label=label, **kw)
 
-    draw(width_curve(WIDTH_RUNS[8][0]), f"4264 steps, {lr_tex(LR_X1)}", color="k",
-         ls=":")
-    for g in ("17056", "68224"):
-        for k in groups[g]:
-            t = tr[k]
-            state = "" if t["finished"] else ", running"
-            draw(t["vals"], f"{g} steps, {lr_tex(t['lr'])}{state}", color=colour[k],
-                 ls=style[g])
-            report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
-                                    "best": round(best(t["vals"])[1], 4)}
+    pre = NAME.format(w=8, ep="{ep}")
+    seen = set()
+    # drawn in the legend's order (1x, 4x best, other 4x, 16x finished, 16x running); the bold curves on top by zorder
+    draw(width_curve(WIDTH_RUNS[8][0]), pre.format(ep=f"{ep_x1:.2g}"), color=ps.C.blue, zorder=4)
+    for k in sorted(t4, key=lambda k: k != best4):
+        t = tr[k]
+        if k == best4:
+            draw(t["vals"], pre.format(ep=e4) + ", best tuned trial, not converged", color=ps.C.purple, zorder=3)
+        else:
+            lab = pre.format(ep=e4) + ", other tuned trials"
+            draw(t["vals"], lab if lab not in seen else None, color=ps.C.purple, alpha=0.35, lw=0.8)  # lw: emphasis
+            seen.add(lab)
+        report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
+                                "best": round(best(t["vals"])[1], 4)}
+    for k in sorted(t16, key=lambda k: not tr[k]["finished"]):
+        t = tr[k]
+        lab = pre.format(ep=e16) + (", tuned trials" if t["finished"] else ", tuned trials still running")
+        draw(t["vals"], lab if lab not in seen else None, color=ps.C.grey, ls="-" if t["finished"] else "--")
+        seen.add(lab)
+        report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
+                                "best": round(best(t["vals"])[1], 4)}
     ax.set_xscale("log")
     ax.set_xlabel("training step")
     ax.set_ylabel("validation het. loss")
-    ps.shared_legend(fig, ax, ncol=2)
+    ps.shared_legend(fig, ax, ncol=1)
     ps.save(fig, os.path.join(FIGS, "length_w8_curves"))
     report["validations above NLL 1 not drawn"] = off
 
@@ -395,11 +419,10 @@ def figs():
     # objective, the only trial with an end-of-run evaluation, from its eval re-read)
     sm = json.load(open(os.path.join(DATA, "size_mse.json")))["runs"]
     C = lambda width, steps: 6.0 * N_PARAMS[width] * steps * BATCH
-    cats = [(f"width {k}, 4264 steps ({ep_x1:.2g} epochs)", k,
+    cats = [(NAME.format(w=k, ep=f"{ep_x1:.2g}"), k,
              [f"runs/catalog_v4_long/v4_het_default25{sfx}_w{k}_x1" for sfx in ("", "_seed2")], wc, mk)
             for k, wc, mk in ((8, ps.C.blue, "o"), (16, ps.C.green, "D"), (32, ps.C.vermillion, "^"))]   # the zero-shot figure's colours
-    b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
-    cats.append((f"width 8, 4$\\times$ steps, tuned, {ep_of['17056_trial_' + b17]:.2g} epochs", 8,
+    cats.append((NAME.format(w=8, ep=f"{ep_of['17056_trial_' + b17]:.2g}") + ", best tuned trial, not converged", 8,
                  [f"runs/{SWEEPS['17056']}/trial_{b17}"], ps.C.purple, "P"))
     # every run here is on a V100 (SXM2 or PCIe, not separated: Joaquin 2026-11-03), named on the wall-time axis
     fig, (axc, axw) = ps.figure(ncols=2)
@@ -433,7 +456,7 @@ def figs():
         ax.yaxis.set_minor_formatter(NullFormatter())
     for h in hs:            # empty proxies, read by ps.shared_legend
         axc.add_line(h)
-    ps.shared_legend(fig, axc, ncol=2)
+    ps.shared_legend(fig, axc, ncol=1)
     ps.save(fig, os.path.join(FIGS, "mse_vs_compute"))
     print(json.dumps(report))
 
