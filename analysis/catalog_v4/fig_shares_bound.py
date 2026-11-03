@@ -24,6 +24,7 @@ With `merged` (the deck): one panel, the MSE-trained arms (share 1 on pp, 0.50, 
     python3 analysis/catalog_v4/fig_shares_bound.py merged  ->  analysis/catalog_v4/figs/shares_deck.{png,pdf}
 """
 import json
+import math
 import os
 import sys
 
@@ -170,13 +171,17 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-# the house palette; share 0.25 het. loss grey as on the zero-shot slides; the control a black square at R = 1 on each
-# row, as on the zero-shot slides
-SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.vermillion, "s", None),
-              ("mse", "default50", r"share 0.50, MSE loss", ps.C.orange, "o", None),
-              ("mse", "default25", r"share 0.25, MSE loss", ps.C.sky, "D", None),
-              ("het", "default50", r"share 0.50, het. loss", ps.C.green, "o", None),
-              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "v", None)]
+# one colour per share fraction for both losses (none of the deck's width or 4x-run colours: blue, green, vermillion,
+# purple), the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
+# row for each loss, its bar the arms' bar applied to the control's two seeds against their geometric mean: every
+# class ratio is 1, so the class bootstrap is [1, 1] and the bar is the widening alone, [exp(-|ln R_seed|),
+# exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the "R_seed" of the data files)
+SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.orange, "s", "none"),
+              ("mse", "default50", r"share 0.50, MSE loss", ps.C.sky, "o", "none"),
+              ("mse", "default25", r"share 0.25, MSE loss", ps.C.grey, "D", "none"),
+              ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
+              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "D", None)]
+CONTROLS = [("mse", "bound", "control: share 0, MSE loss", "none"), ("het", "default25", "control: share 0, het. loss", None)]
 
 
 def merged_figure():
@@ -184,17 +189,18 @@ def merged_figure():
            "het": json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]}
     fig, ax = ps.figure()
     n = len(SHARE_READS)
-    k = len(SHARE_ARMS) + 1
-    off = [(i - (k - 1) / 2) * 0.15 for i in range(k)]
+    k = len(SHARE_ARMS) + len(CONTROLS)
+    off = [(i - (k - 1) / 2) * 0.13 for i in range(k)]
     for j, (lab, (r, part)) in enumerate(SHARE_READS):
-        ax.plot([1.0], [n - 1 - j + off[0]], ls="none", marker="s", color="k",
-                label="control: share 0, same loss" if j == 0 else None)
+        for c, (loss, a, label, mfc) in enumerate(CONTROLS):
+            w = abs(math.log(res[loss][a][r][part]["R_seed"]))
+            ax.errorbar([1.0], [n - 1 - j + off[c]], xerr=[[1 - math.exp(-w)], [math.exp(w) - 1]], color="k",
+                        marker="s", linestyle="none", mfc=mfc or "k", label=label if j == 0 else None)
         for i, (loss, a, label, col, mk, mfc) in enumerate(SHARE_ARMS):
             d = res[loss][a][r][part]
             lo, hi = d["widened"]
-            kw = {"mfc": mfc} if mfc else {}
-            ax.errorbar([d["R"]], [n - 1 - j + off[i + 1]], xerr=[[d["R"] - lo], [hi - d["R"]]], color=col,
-                        marker=mk, linestyle="none", label=label if j == 0 else None, **kw)
+            ax.errorbar([d["R"]], [n - 1 - j + off[i + len(CONTROLS)]], xerr=[[d["R"] - lo], [hi - d["R"]]],
+                        color=col, marker=mk, linestyle="none", mfc=mfc or col, label=label if j == 0 else None)
     ticks = (0.2, 0.5, 1.0, 2.0)
     ax.set_xscale("log")
     ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
