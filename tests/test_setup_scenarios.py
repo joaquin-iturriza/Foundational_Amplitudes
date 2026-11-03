@@ -2168,6 +2168,16 @@ def sent_figures():
     scenario("run ids, trial names, hashes and snake_case identifiers are found (text stub)",
              r.returncode == 1 and all(x in r.stdout for x in ("'FA-ccin2p3-cb09b906'", "'trial_0012'", "'3abde40c'",
                                                                "'val_loss_no_reg'")), r.stdout)
+    stub2 = os.path.join(d, "stub2.txt")
+    open(stub2, "w").write("min2pi min2jpi max3x log2 s\n")
+    r2 = subprocess.run([sys.executable, SEND, "--scan", stub2], capture_output=True, text=True,
+                        env=dict(os.environ, CLAUDE_PROJECT_DIR=d))
+    open(stub2, "w").write("run hp1860 and v4_het_default25 and tp3\n")
+    r3 = subprocess.run([sys.executable, SEND, "--scan", stub2], capture_output=True, text=True,
+                        env=dict(os.environ, CLAUDE_PROJECT_DIR=d))
+    scenario("mathtext residue (min2pi) passes, real codes (hp1860, v4_het_default25) are still found",
+             r2.returncode == 0 and r3.returncode == 1 and "'hp1860'" in r3.stdout and "'v4_het_default25'" in r3.stdout,
+             [r2.stdout, r3.stdout])
     rc, err = send(fig("ratio", "error ratio"))
     rc2, err2 = send(fig("ratio_ok", "error, fine-tune over scratch"))
     rc3, err3 = send(fig("slash_ok", "fine-tune / scratch"))

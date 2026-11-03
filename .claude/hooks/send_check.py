@@ -9,7 +9,7 @@ the text holds, on any page:
   - an identifier with an underscore (snake_case, a config key, a file stem); a math subscript (one letter, then up
     to three characters: s_0, m_k, c_v) is not one, so formulas keep their symbols;
   - a code-like token that lost its underscore in the PDF (TeX draws \\_ as a rule, so "catalog\\_v3" extracts as
-    "catalog v3"): a short lowercase stem glued to digits, such as v3, tp3, pp13;
+    "catalog v3"): a short lowercase stem glued to digits, such as v3, tp3, pp13 (a math word glued to digits, min2pi from "min 2p_i p_j", is mathtext residue, not one);
   - a run id (FA-<site>-<hash>, trial_NNNN) or a bare hex hash;
   - a recipe or arm prefix (tp3_, tp2_, v3_, v4_, pp13_, dc_, zz_);
   - a held-out axis code (H1..H9 with any suffix, H2p5, H7E, H7c, XV3, XV4) or a decision or event code (D12, E345);
@@ -32,7 +32,7 @@ RULES = [  # (what it is, pattern); order = priority when several match the same
     ("decision or event code", re.compile(r"\b[DE]\d+\b")),
     ("hex hash", re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b")),
     ("identifier with an underscore", re.compile(r"\b(?![A-Za-z]_[A-Za-z0-9]{1,3}\b)\w*[A-Za-z0-9]_\w*|\b_\w+")),
-    ("code-like token (a lost underscore?)", re.compile(r"(?<![\w.])(?!log\d|ln\d)(?:[a-z]{2,4}\d+[a-z0-9]*|v\d+)\b")),
+    ("code-like token (a lost underscore?)", re.compile(r"(?<![\w.])(?!(?:log|ln|min|max|exp|sin|cos|tan)\d)(?:[a-z]{2,4}\d+[a-z0-9]*|v\d+)\b")),
 ]
 RATIO = re.compile(r"\b(ratios?|gains?)\b", re.I)
 BOTH_SIDES = re.compile(r"[A-Za-z]\S*\s*/\s*\S*[A-Za-z0-9]")

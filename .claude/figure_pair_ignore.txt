@@ -24,3 +24,5 @@ talks/progress_nov2026/figs/sampling_example_a.pdf
 talks/progress_nov2026/figs/sampling_example_b.pdf
 talks/progress_nov2026/figs/shares_deck.pdf
 talks/progress_nov2026/figs/width_x1_loss.pdf
+talks/progress_nov2026/figs/arms_zero_shot_axes_a.pdf
+talks/progress_nov2026/figs/arms_zero_shot_axes_b.pdf
