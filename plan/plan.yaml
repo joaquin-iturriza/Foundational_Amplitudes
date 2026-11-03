@@ -9186,6 +9186,11 @@ entries:
       0.0941 (s42, 1.16 h), w16 1x 0.0477 (s43, 2.00 h), w32 1x 0.0270 (s43, 4.04 h), 4x best 0.0208 (4.79 h V100 PCIe; the
       1x cells on V100 SXM2). Figures: arms_zero_shot, arms_zero_shot_axes, mse_vs_compute (size_figs.py figs), sampling_example_a/b
       (sampling_example.py, b673cbc1).'
+  - at: '2026-11-03T03:41:13+00:00'
+    text: '2026-11-03: figure_pair_guard flagged the deck''s single-format copies in talks/progress_nov2026/figs (pairs live
+      in analysis/catalog_v4/figs); fixed as the July deck was, by listing talks/progress_nov2026/main.pdf and the 7 figs/*.pdf
+      in .claude/figure_pair_ignore.txt @06fe5c3e; guard re-run: exit 0. Owner stopped; open: Joaquin''s deck show/skip list,
+      Jean Zay 19 jobs, 16x sweep end.'
   handoff:
     state: 'Deck of 2026-11-03 built: talks/progress_nov2026/main.pdf (10 slides, @55c16c87, 0 errors, 0 overfull; figures
       copied from analysis/catalog_v4/figs into its figs/). 4x best-trial zero-shot read FA-ccin2p3-6f8a1eed done (E3574 acked;
