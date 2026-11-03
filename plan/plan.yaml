@@ -9204,6 +9204,14 @@ entries:
       in analysis/catalog_v4/figs); fixed as the July deck was, by listing talks/progress_nov2026/main.pdf and the 7 figs/*.pdf
       in .claude/figure_pair_ignore.txt @06fe5c3e; guard re-run: exit 0. Owner stopped; open: Joaquin''s deck show/skip list,
       Jean Zay 19 jobs, 16x sweep end.'
+  - at: '2026-11-03T04:19:51+00:00'
+    text: '2026-11-03 (D258): deck talks/progress_nov2026/main.pdf rebuilt @5dead410, 14 slides, 0 errors, 0 overfull: sampling
+      text, sampling_example_a/b, shares_bound_a (items 1 and 2: the pure-default bound is that figure''s pure-default series;
+      pp_bound.json holds only the summary, no separate figure), shares_bound_b, width_x1_loss, length_w8_curves, arms_zero_shot,
+      arms_zero_shot_axes, mse_vs_compute (one V100 marker, size_figs.py), loop_born_events, loop_groups, signext_a/b (new
+      fig_signext.py from data/signext_compare.json @9ec60f21: 18 of 21 pools lower, MSE ratios per axis as in par:v4_signext),
+      error_correlates_rank/profile/legend. Figures checked against results.tex numbers (tab:v4_bound_shares, par:v4_loop_groups
+      medians, par:v4_signext, error_correlates claims).'
   handoff:
     state: 'Deck of 2026-11-03 built: talks/progress_nov2026/main.pdf (10 slides, @55c16c87, 0 errors, 0 overfull; figures
       copied from analysis/catalog_v4/figs into its figs/). 4x best-trial zero-shot read FA-ccin2p3-6f8a1eed done (E3574 acked;
