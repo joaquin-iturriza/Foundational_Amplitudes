@@ -8198,9 +8198,9 @@ entries:
       - 'a figure can''t be made today: say which and why'
   owner:
     agent: afe05580f2c6da391
-    state: working
+    state: closed
     since: '2026-11-03T01:39:16+00:00'
-    state_at: '2026-11-03T03:40:05+00:00'
+    state_at: '2026-11-03T03:40:15+00:00'
     context: 257680
     context_at: '2026-11-03T03:39:29+00:00'
   findings:
