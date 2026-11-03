@@ -7665,6 +7665,29 @@ entries:
       job, about 1.6 h of work, limit 2.5 h (tools/short_wall.py --eval --eval-stage --het: 2.42 h with its 1.25 margin and
       a 17-min cache build if the key misses), 2.5 GPU-h; disk: none on a cache hit, one ~23 GB cache on a miss (/sps/lpnhe
       113 GB free).'
+    fix_at: '2026-11-03T01:33:44+00:00'
+    fix: 'Checks 1, 12 and 4 (one change against a matched control; only the asked axis moves; outcome): the outcome reads
+      R(4x best / 1x width-8 seed-42 cell 804a65bc) < 1 as ''length pays at width 8'', but the two cells differ in steps AND
+      in all seven searched HPs: 804a65bc ran at the base config''s HPs (runs/catalog_v4_short/v4_het_default25, lr carried
+      from the 4264-step Muon search on catalog_v3, never swept on this setup), the 4x best at its sweep''s best (lr 7.82e-3
+      at the window''s top edge, plus muon_weight_decay, regularization_lambda, warmup_frac, eta_min, ema, ema_decay). long_sweeps_best.json
+      shows the HPs alone move val NLL by 0.88 at 17056 steps (hp1860 lr 1.16e-3 -2.944 vs hp1262 -3.824), as large as the
+      1x-to-4x gap you cite (-2.84 vs -3.82), so the 4x/1x ratio cannot attribute a gain to length. The step-16 design that
+      passed (2026-11-01T17:29) kept this comparison ''information only ... with that caveat''; this design dropped the caveat
+      and turned it into a length conclusion. Fix: restate the 4x/1x outcome as ''tuned 4x against the 1x cell at untuned
+      base HPs: length and tuning together'', say both branches change nothing for the length verdict (that remains 16x best
+      over 4x best, the step-16 control), and drop ''means length pays at width 8'' / ''does not''. The check field''s sentence
+      ''the reads are expected to move with the 4x length'' should likewise cite the width evidence as what shows the reads
+      respond (width_x1.json: w32/w8 PP4 R 0.370 against a seed ratio 1.056) and not attribute the val NLL gap to length.
+      Minor, state it: the step-16 design said each best-trial read runs on its trial''s GPU type (V100 here); this design
+      allows gpu_h100 with the reason that mu is frozen; keep it on V100 or state the deviation and that TF32 on H100 changes
+      the mu forward pass. Checks that hold: 2 (reads moved with model quality: w32/w8 PP4 0.370, held default 0.528, w16
+      0.565, far above the w8 seed ratio 1.016-1.056), 3 (threshold stated against the 1x pair''s seed spread), 5 (searched
+      results.tex for 17056, cov_v4_long, hpo8, hp1262/trial_1262, long_best, 4x, 16x, catalog_steps, ''training length'':
+      no read of a long-run trial; plan dead ends and decisions D219-D253 hold no such read), 7 (D252 per-arm zero-shot and
+      D253 absolute MSE both in the measure), 8, 9 (HETEROSC asserted in the arm''s code), 10 (PP4/EE4/default-sampled held-out
+      as the 1x cells, D227), 11 (emission-scales target, D234), 13 (no sweep), 14 (cache key the trial''s 746f01a3 via its
+      own config, no hashed module changed deb290bc..b629bd68; 23 GB on a miss against 113 GB free, read again at submission).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
