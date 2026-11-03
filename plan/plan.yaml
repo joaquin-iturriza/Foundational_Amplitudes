@@ -8198,7 +8198,7 @@ entries:
       - 'a figure can''t be made today: say which and why'
   owner:
     agent: afe05580f2c6da391
-    state: stopped
+    state: closed
     since: '2026-11-03T01:39:16+00:00'
     state_at: '2026-11-03T03:39:24+00:00'
     context: 257680
@@ -9189,35 +9189,40 @@ entries:
       1x cells on V100 SXM2). Figures: arms_zero_shot, arms_zero_shot_axes, mse_vs_compute (size_figs.py figs), sampling_example_a/b
       (sampling_example.py, b673cbc1).'
   handoff:
-    state: 'Presentation figures redone @16957b58 (fig_shares_bound.py arms -> figs/arms_zero_shot_a-d: per-seed points, no
-      bars, absolute MSE beside R, epochs in labels; size_figs.py figs -> width_x1_loss, length_w8_curves, loss_vs_compute;
-      width_x1_ratio and loss_vs_compute_preliminary dropped). Epochs: control and 1e4/process arm 6.07, whole-set 4264-step
-      runs 0.64, 17056 trials 2.54, 68224 trials 10.2 (mixture_ab.py epochs -> data/epochs.json). 4x sweep cov_v4_long_hpo8_cc_17056
-      finished 8/8 (size_figs.py best @b629bd68 -> data/long_sweeps_best.json): best hp1262 val NLL -3.824 at lr 7.82e-3,
-      NOT CONVERGED (lr log position 0.9955 of [8.78e-4,7.90e-3], 4 of top 5 in the outer 0.2, every trial best at its last
-      validation). Its best-trial zero-shot read FA-ccin2p3-6f8a1eed (job 62943062, gpu_v100, limit 2:30, target 1.6 h) runs
-      the new arm v4_het_long_best (scripts/job_catalog_v3_short.sh @b629bd68, repo-reviewer PASS; design passed 2026-11-03T01:34).
-      When it ends, check its log: (1) ''opening the cache'' and not ''built the cache'' (cache key 746f01a3 expected; a miss
-      builds ~23 GB on /sps, 113 GB free at submit); (2) ''LONG_BEST data_stats.json and particle_tokenizer.json equal the
-      trial''s''; (3) no ''Fine-tuning ... from a ... parent ... mu row kept'' line. Then extract its reads (mixture_ab.py
-      extract <run> <log> <axis> for H1..H7c PP4 EE4 HD4 HD5), add it as an arm to mixture_ab.py arms (ARMS_VS_CONTROL, ARMS_HD,
-      epochs.json entry 2.54) and to the arms figure, and the 4x/1x-w8 ratio as information (''length and tuning together'').
-      16x sweep cov_v4_long_hpo8_cc_68224: 0/8 done, wave 1 at steps ~50-55k of 68224 at 02:00, waves 2-3 pending; its best
-      gets the same read (arm v4_het_long_best, LONG_BEST=cov_v4_long_hpo8_cc_68224/<trial>, REREAD not possible: record a
-      design citing 2026-11-03T01:34). E3570, E3571 acked.'
-    decisions: 'Joaquin via the main session: seeds as own points with no bootstrap bars (answers the 2026-11-02T19:25 question;
-      not closed in the plan for lack of his exact words), absolute MSE beside ratios (D253), lr as values and plain names,
-      legends clear of data. Design reviewer: the tuned 4x against the untuned 1x cell is length and tuning together, information
-      only; the length verdict stays 16x best over 4x best. Best-trial reads on the trial''s GPU type (V100).'
-    ruled_out: 'Running the sigma stage by itself from the trial dir (would freeze parent stats into the memmap key and build
-      a second 20 GB cache; and without config.yaml the warm start zeroes the trained sigma row); REREAD for sweep trials
-      (they are not registry runs: design_guard needs a recorded design).'
-    running: FA-ccin2p3-6f8a1eed (ccin2p3 job 62943062, 17056 best-trial read, waited on step 32); sweep ccin2p3:cov_v4_long_hpo8_cc_68224
-      (jobs 62936980-87; 3 running, 5 pending)
-    files: analysis/catalog_v4/fig_shares_bound.py, analysis/catalog_v4/size_figs.py (pull/best/figs), analysis/catalog_v4/mixture_ab.py
-      (arms seeds, epochs), scripts/job_catalog_v3_short.sh (v4_het_long_best), tools/short_wall.py (--eval-stage) + tests/test_short_wall.py,
-      analysis/catalog_v4/data/{arms_vs_het_control,epochs,size_curves,long_sweeps_best,width_x1}.json
-    written: '2026-11-03T01:38:34+00:00'
+    state: 'Deck of 2026-11-03 built: talks/progress_nov2026/main.pdf (10 slides, @55c16c87, 0 errors, 0 overfull; figures
+      copied from analysis/catalog_v4/figs into its figs/). 4x best-trial zero-shot read FA-ccin2p3-6f8a1eed done (E3574 acked;
+      mixture_ab.py arms one-seed arm long4x_best @bc64745c): pp R 0.061 vs het control on trained classes, 0.185 vs 1x w8
+      seed 42 (length and tuning together, one seed, not converged). Arms figures (fig_shares_bound.py arms -> figs/arms_zero_shot,
+      arms_zero_shot_axes): one point per arm = per-probe geometric mean over seeds; bar = the design''s widened interval
+      (r_with_interval: 10000-resample class bootstrap widened by the control''s |ln R_seed| on the same classes), the same
+      on the class-median absolute MSE, one-seed arm included; pp and e+e- rows restricted to trained classes (797, 115).
+      The coordinator''s per-seed min/max bar construction was blocked by repo-reviewer (narrower than the design interval,
+      e.g. w8 1e5 held catalog-sampled [1.084,1.187] excludes 1 vs design [0.886,1.469]); Joaquin was told and can ask for
+      the per-seed version. MSE vs compute and wall time (size_figs.py pull_mse, eval_mse, figs -> data/size_mse.json, figs/mse_vs_compute):
+      MSE of log|M|^2 is not logged; it is sigma^2 x the end-of-run ''MSE (prepd) val_<process>'' (first block = main run
+      at best checkpoint; sigma = data_stats.json prepd_std, 5.427 shared); exact for positive (plain-log) pools; aggregate
+      = geometric mean over the 1061 tree processes (92 one-loop _nlo pools left out: they hold every signed pool; exact alternative:
+      exclude only signed pools from per-pool transforms). DyHPO trials have no end-of-run eval: the 4x best''s MSE comes
+      from its eval re-read. Best per category: w8 0.094 (1.16 h), w16 0.048 (2.00 h), w32 0.027 (4.04 h), 4x best 0.021 (4.79
+      h, V100 PCIe; others V100 SXM2). Jean Zay: 19 pending trial_00xx jobs most likely horizon32k/eqd under holds D12/D13;
+      site run on Jean Zay times out; nothing cancelled; question with Joaquin.'
+    decisions: 'Joaquin 2026-11-03 (via main session): bars back on the zero-shot figures, pp/e+e- labelled training processes,
+      MSE of log|M|^2 not het loss, best seed per category, compute x-label short, a wall-time version marking GPU type, ''het.
+      loss'' never ''NLL'', one legend per figure, deck as last week starting with a sampling slide. Bars use the design interval
+      on repo-reviewer''s block (the decision''s own construction was the coordinator''s, not Joaquin''s words).'
+    ruled_out: 'Per-seed min/max bootstrap bars (narrower than the design interval, change what the figure says); MSE of trials
+      from logs (DyHPO trials skip the end-of-run eval: needs an eval re-read per trial).'
+    running: Sweep ccin2p3:cov_v4_long_hpo8_cc_68224 (16x, 3 trials at steps 57288-62744 of 68224 at ~04:40, waves 2-3 pending);
+      its best trial gets the same read as the 4x (arm v4_het_long_best, LONG_BEST=cov_v4_long_hpo8_cc_68224/<trial>; needs
+      its own recorded design citing 2026-11-03T01:34), then size_figs.py eval_mse and pull/figs, and mixture_ab.py LONG_BEST
+      entry.
+    files: 'talks/progress_nov2026/main.tex, analysis/catalog_v4/mixture_ab.py (LONG_BEST, _long_best, _points), analysis/catalog_v4/fig_shares_bound.py
+      (arms_figure, point_panel), analysis/catalog_v4/size_figs.py (pull_mse, eval_mse, figs), analysis/catalog_v4/sampling_example.py,
+      analysis/catalog_v4/data/{arms_vs_het_control,size_mse,size_curves,sampling_example}.json. Open with Joaquin: which
+      of the 10 ''show'' results since the last deck go in (list in the 2026-11-03 report: share A/B and pure-default bound,
+      error correlates, top at its mass, k-shot level, short-run bias and gridpacks, per-event Born check, optional mult bias
+      and loop groups); Jean Zay 19 jobs keep or cancel.'
+    written: '2026-11-03T03:39:45+00:00'
   ask: 'Which of the other results since the last deck go into today''s deck: 1 share against pure-default bound, 2 pure-default
     pp bound, 3 what the error and sigma follow, 4 top at its own mass drives tree error, 5 level vs shape from few events,
     6 short MadEvent runs biased, 7 run size and gridpack fix, 8 per-event Born check of the one-loop target (negative), optional
