@@ -9221,6 +9221,15 @@ entries:
       a fresh curve pull (16x finished 0353 -4.108, 1333 -4.022, 1860 -3.282 val het NLL vs 4x best -3.824; 0753/0849/1262
       running at 10912), signext axes ''without'' / ''with more one-loop pools'', error/sigma short labels, no guide line.
       Cold reads off per Joaquin.'
+  - at: '2026-11-03T09:43:53+00:00'
+    text: '2026-11-03 slide 8 on all training pools without a GPU job: every run''s sigma-only stage (run.py sigma_stage_cfg
+      sets evaluation.save_predictions=true, mu frozen at the main run''s best checkpoint) already saved sigma_stage/preds_val.npz
+      (230600 val events, 200 per pool, 1153 pools). size_figs.py pull_preds @403482f1 -> data/size_mse_preds.json: per pool
+      mean over events of (ln|raw_pred| - ln|raw_truth|)^2; check on the 1089 plain-log pools: median ratio to sigma^2 MSE(prepd)
+      1.0000000, gmean within 0.6% of pull_mse for the 1x runs (4x best 0.0184 vs 0.0187); 0-3 events per run with a zero
+      |M|^2 left out (log). Geometric mean over all 1153 pools (plain / 64 signed): w8 1x s42 0.0914 (0.0857/0.274), w16 s43
+      0.0471 (0.0432/0.207), w32 s43 0.0271 (0.0245/0.157), 4x best 0.0206 (0.0184/0.142). The planned eval-only re-read (about
+      4 GPU-h) is not needed and was not submitted.'
   handoff:
     state: 'Deck talks/progress_nov2026/main.pdf rebuilt per Joaquin''s rejection of 2026-11-03 (@23cf5b33, 10 slides, 0 errors/overfull):
       sampling a/b (y label density), shares_deck (fig_shares_bound.py merged: MSE and het arms in one panel, rows pp/e+e-
