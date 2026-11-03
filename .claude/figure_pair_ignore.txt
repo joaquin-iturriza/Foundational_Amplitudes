@@ -12,3 +12,11 @@ talks/progress_jul2026/figs/tth_C.pdf
 phase1_scaling
 talks/progress_oct2026/main.pdf
 talks/progress_oct2026b/main.pdf
+talks/progress_nov2026/main.pdf
+talks/progress_nov2026/figs/arms_zero_shot.pdf
+talks/progress_nov2026/figs/arms_zero_shot_axes.pdf
+talks/progress_nov2026/figs/length_w8_curves.pdf
+talks/progress_nov2026/figs/mse_vs_compute.pdf
+talks/progress_nov2026/figs/sampling_example_a.pdf
+talks/progress_nov2026/figs/sampling_example_b.pdf
+talks/progress_nov2026/figs/width_x1_loss.pdf
