@@ -9166,6 +9166,18 @@ entries:
       0.562, held default 0.505, catalog 0.597, one-loop 0.935. Held default by axis, R vs control: H1 0.081, H2 0.086, H2p5
       0.362, H3 0.404, H6 0.031, H7E 0.090, H7c 0.060, H5 0.774. Caveats: one seed, best of 8 tuned trials, NOT CONVERGED
       (lr at the window top). Blow-up check on the trial curve (size_curves.json): none.'
+  - at: '2026-11-03T03:38:42+00:00'
+    text: '2026-11-03 deck (talks/progress_nov2026/main.pdf, @55c16c87, repo-reviewer PASS after a FIX): arms figure back
+      to one point per arm (per-probe geometric mean over seeds) with the design''s widened interval (r_with_interval: 10000-resample
+      class bootstrap widened by the control''s |ln R_seed|), the same on the class-median absolute MSE, one-seed arm included
+      (the coordinator''s per-seed min/max bar construction was replaced by the design interval on the reviewer''s block).
+      pp and e+e- reads restricted to trained classes (797, 115). Validation MSE of log|M|^2 at the best checkpoint is not
+      logged as such: it is sigma^2 x the end-of-run ''MSE (prepd) val_<process>'' (sigma 5.427, data_stats prepd_std), DyHPO
+      trials have no end-of-run evaluation (the 4x best''s comes from the eval re-read 6f8a1eed); aggregate = geometric mean
+      over the 1061 tree processes (the 92 one-loop pools, which hold the signed pools, left out). Best per category: w8 1x
+      0.0941 (s42, 1.16 h), w16 1x 0.0477 (s43, 2.00 h), w32 1x 0.0270 (s43, 4.04 h), 4x best 0.0208 (4.79 h V100 PCIe; the
+      1x cells on V100 SXM2). Figures: arms_zero_shot, arms_zero_shot_axes, mse_vs_compute (size_figs.py figs), sampling_example_a/b
+      (sampling_example.py, b673cbc1).'
   handoff:
     state: 'Presentation figures redone @16957b58 (fig_shares_bound.py arms -> figs/arms_zero_shot_a-d: per-seed points, no
       bars, absolute MSE beside R, epochs in labels; size_figs.py figs -> width_x1_loss, length_w8_curves, loss_vs_compute;
