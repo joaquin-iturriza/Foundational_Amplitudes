@@ -8210,7 +8210,7 @@ entries:
       - 'a figure can''t be made today: say which and why'
   owner:
     agent: af4ab0f75ac3ab59b
-    state: working
+    state: closed
     since: '2026-11-03T03:40:33+00:00'
     state_at: '2026-11-03T09:02:40+00:00'
     context: 123237
@@ -9214,40 +9214,22 @@ entries:
       error_correlates_rank/profile/legend. Figures checked against results.tex numbers (tab:v4_bound_shares, par:v4_loop_groups
       medians, par:v4_signext, error_correlates claims).'
   handoff:
-    state: 'Deck of 2026-11-03 built: talks/progress_nov2026/main.pdf (10 slides, @55c16c87, 0 errors, 0 overfull; figures
-      copied from analysis/catalog_v4/figs into its figs/). 4x best-trial zero-shot read FA-ccin2p3-6f8a1eed done (E3574 acked;
-      mixture_ab.py arms one-seed arm long4x_best @bc64745c): pp R 0.061 vs het control on trained classes, 0.185 vs 1x w8
-      seed 42 (length and tuning together, one seed, not converged). Arms figures (fig_shares_bound.py arms -> figs/arms_zero_shot,
-      arms_zero_shot_axes): one point per arm = per-probe geometric mean over seeds; bar = the design''s widened interval
-      (r_with_interval: 10000-resample class bootstrap widened by the control''s |ln R_seed| on the same classes), the same
-      on the class-median absolute MSE, one-seed arm included; pp and e+e- rows restricted to trained classes (797, 115).
-      The coordinator''s per-seed min/max bar construction was blocked by repo-reviewer (narrower than the design interval,
-      e.g. w8 1e5 held catalog-sampled [1.084,1.187] excludes 1 vs design [0.886,1.469]); Joaquin was told and can ask for
-      the per-seed version. MSE vs compute and wall time (size_figs.py pull_mse, eval_mse, figs -> data/size_mse.json, figs/mse_vs_compute):
-      MSE of log|M|^2 is not logged; it is sigma^2 x the end-of-run ''MSE (prepd) val_<process>'' (first block = main run
-      at best checkpoint; sigma = data_stats.json prepd_std, 5.427 shared); exact for positive (plain-log) pools; aggregate
-      = geometric mean over the 1061 tree processes (92 one-loop _nlo pools left out: they hold every signed pool; exact alternative:
-      exclude only signed pools from per-pool transforms). DyHPO trials have no end-of-run eval: the 4x best''s MSE comes
-      from its eval re-read. Best per category: w8 0.094 (1.16 h), w16 0.048 (2.00 h), w32 0.027 (4.04 h), 4x best 0.021 (4.79
-      h, V100 PCIe; others V100 SXM2). Jean Zay: 19 pending trial_00xx jobs most likely horizon32k/eqd under holds D12/D13;
-      site run on Jean Zay times out; nothing cancelled; question with Joaquin.'
-    decisions: 'Joaquin 2026-11-03 (via main session): bars back on the zero-shot figures, pp/e+e- labelled training processes,
-      MSE of log|M|^2 not het loss, best seed per category, compute x-label short, a wall-time version marking GPU type, ''het.
-      loss'' never ''NLL'', one legend per figure, deck as last week starting with a sampling slide. Bars use the design interval
-      on repo-reviewer''s block (the decision''s own construction was the coordinator''s, not Joaquin''s words).'
-    ruled_out: 'Per-seed min/max bootstrap bars (narrower than the design interval, change what the figure says); MSE of trials
-      from logs (DyHPO trials skip the end-of-run eval: needs an eval re-read per trial).'
-    running: Sweep ccin2p3:cov_v4_long_hpo8_cc_68224 (16x, 3 trials at steps 57288-62744 of 68224 at ~04:40, waves 2-3 pending);
-      its best trial gets the same read as the 4x (arm v4_het_long_best, LONG_BEST=cov_v4_long_hpo8_cc_68224/<trial>; needs
-      its own recorded design citing 2026-11-03T01:34), then size_figs.py eval_mse and pull/figs, and mixture_ab.py LONG_BEST
-      entry.
-    files: 'talks/progress_nov2026/main.tex, analysis/catalog_v4/mixture_ab.py (LONG_BEST, _long_best, _points), analysis/catalog_v4/fig_shares_bound.py
-      (arms_figure, point_panel), analysis/catalog_v4/size_figs.py (pull_mse, eval_mse, figs), analysis/catalog_v4/sampling_example.py,
-      analysis/catalog_v4/data/{arms_vs_het_control,size_mse,size_curves,sampling_example}.json. Open with Joaquin: which
-      of the 10 ''show'' results since the last deck go in (list in the 2026-11-03 report: share A/B and pure-default bound,
-      error correlates, top at its mass, k-shot level, short-run bias and gridpacks, per-event Born check, optional mult bias
-      and loop groups); Jean Zay 19 jobs keep or cancel.'
-    written: '2026-11-03T03:39:45+00:00'
+    state: 'Deck talks/progress_nov2026/main.pdf rebuilt per Joaquin''s rejection of 2026-11-03 (@23cf5b33, 10 slides, 0 errors/overfull):
+      sampling a/b (y label density), shares_deck (fig_shares_bound.py merged: MSE and het arms in one panel, rows pp/e+e-
+      in training, not in training default sampling, one-loop, counts), width, length, arms_zero_shot(_axes) (rows in words,
+      control named once), mse_vs_compute (MSE of log|M|^2 over 1089 plain-log pools, 64 signed one-loop pools left out: size_figs.py
+      pull_signed -> data/signed_pools.json; signed need an eval re-read with evaluation.save_predictions=true, none of the
+      runs saved predictions; colours as the zero-shot figure), loop_more_pools (fig_signext.py: 28 held-out one-loop processes,
+      control vs more one-loop training pools, seeds 42-45, 23 of 28 lower, median ratio 0.612), error_correlates_deck_rank/profile
+      (error_correlates.py deck, het control, seeds averaged). Cold reads by Explore agents (brief_guard refuses a general-purpose
+      agent without the rules block). weekly-deck skill gained the cold-read rule and no text/title/open-ends slides.'
+    decisions: D258 order; Joaquin 2026-11-03 rejection list (plain labels, one share figure, all training pools, one one-loop
+      slide, seeds combined).
+    ruled_out: 'Signed pools from the logs'' MSE (prepd): signedlog target, not log|M|^2.'
+    running: Sweep ccin2p3:cov_v4_long_hpo8_cc_68224 (16x); Jean Zay 19 pending jobs unresolved
+    files: talks/progress_nov2026/main.tex, analysis/catalog_v4/{fig_shares_bound,fig_signext,error_correlates,size_figs,sampling_example}.py,
+      analysis/catalog_v4/data/{size_mse,signed_pools}.json
+    written: '2026-11-03T09:13:07+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
