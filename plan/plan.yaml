@@ -3424,6 +3424,14 @@ entries:
     answers_after: '2026-11-03T01:43:16+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-11-03T04:15:59.539000+00:00'
+    text: Okay, from the list I'd put 1 and 2 right after the plots showing the mixed dataset 3 at the end. The results for
+      the one loop thing I believe are also relevant, create figures then if they don't exist yet. Also at the end, before
+      3.
+    decision: D258
+    answers_after: '2026-11-03T03:39:26+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3449,6 +3457,7 @@ entries:
   - D234
   - D235
   - D254
+  - D258
   next:
     32: 'Long-run DyHPO sweeps on CC-IN2P3 at deb290bc (atomic-mkdir locks; generate_sweep + sweep_manager on the CC login
       node, state on /sps; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f, unchanged at
@@ -4929,8 +4938,10 @@ entries:
     at: '2026-11-03T03:39:26+00:00'
     searched: 'site decisions --project FA: none picks deck contents beyond the catalog_v4 results'
     blocks: adding further slides to talks/progress_nov2026
-    blocks_steps: &id001
+    blocks_steps:
     - 44
+    answered_at: '2026-11-03T04:15:59.502000+00:00'
+    decision: D258
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9228,14 +9239,6 @@ entries:
       error correlates, top at its mass, k-shot level, short-run bias and gridpacks, per-event Born check, optional mult bias
       and loop groups); Jean Zay 19 jobs keep or cancel.'
     written: '2026-11-03T03:39:45+00:00'
-  ask: 'Which of the other results since the last deck go into today''s deck: 1 share against pure-default bound, 2 pure-default
-    pp bound, 3 what the error and sigma follow, 4 top at its own mass drives tree error, 5 level vs shape from few events,
-    6 short MadEvent runs biased, 7 run size and gridpack fix, 8 per-event Born check of the one-loop target (negative), optional
-    9 multiplicity offset, 10 one-loop by group?'
-  waiting_since: '2026-11-03T03:39:26+00:00'
-  searched: 'site decisions --project FA: none picks deck contents beyond the catalog_v4 results'
-  blocks: adding further slides to talks/progress_nov2026
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
