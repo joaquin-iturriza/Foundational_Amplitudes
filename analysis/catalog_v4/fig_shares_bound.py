@@ -66,7 +66,7 @@ def panel(ax, arms_res, present, reads=READS, arms=ARMS, lines=((1.0, "--", r"$R
 
 
 # the arms figure: reads, held-out axes in words, arms (label without its epochs, colour, marker)
-ARM_READS = [("pp 13 TeV", "PP4"), (r"$e^+e^-$", "EE4"), ("held out, default-sampled", "held_default"),
+ARM_READS = [("pp 13 TeV, trained processes", "PP4_trained"), (r"$e^+e^-$, trained processes", "EE4_trained"), ("held out, default-sampled", "held_default"),
              ("held out, catalog-sampled", "held"), ("held out, one-loop", "held_default/H5")]
 ARM_AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ families"), ("H2p5", r"$2\to5$"),
             ("H3", "physical top"), ("H6", r"$\alpha_s=0.13$"), ("H7E", r"$\sqrt{\hat s}$ 6 to 20 TeV"),
@@ -111,25 +111,49 @@ def seed_panel(ax, seeds, reads, arms, key, xlabel, ticks, ref=None):
         ax.add_line(h)
 
 
+def point_panel(ax, pts, reads, arms, key, xlabel, ticks, ref=None):
+    """One row per read, one point per arm (its seeds' geometric mean) with its bar (the per-seed 95% class-bootstrap
+    intervals' lowest lower to highest upper end)"""
+    n = len(reads)
+    off = {a[0]: (i - (len(arms) - 1) / 2) * 0.14 for i, a in enumerate(arms)}
+    for j, (lab, r) in enumerate(reads):
+        for a, label, col, mk in arms:
+            d = pts[a][r]
+            y = n - 1 - j + off[a]
+            lo, hi = d[key + "_bar"]
+            ax.errorbar([d[key]], [y], xerr=[[d[key] - lo], [hi - d[key]]], ls="none", marker=mk, color=col,
+                        label=label if j == 0 else None)
+    if ref is not None:
+        ax.axvline(ref[0], color=ps.C.grey, linestyle="--", label=ref[1])
+    ax.set_xscale("log")
+    ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
+    ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.set_yticks(range(n))
+    ax.set_yticklabels([f"{lab} ({pts[arms[0][0]][r]['n_classes']})" for lab, r in reads][::-1])
+    ax.set_ylim(-0.6, n - 0.4)
+    ax.set_xlabel(xlabel)
+
+
 def arms_figure():
     d = json.load(open(os.path.join(DATA, "arms_vs_het_control.json")))
-    seeds, ep = d["seeds"], d["epochs"]
+    pts, ep = d["points"], d["epochs"]
     eps = {a: sorted({round(v["epochs"], 2) for v in ep[a].values()}) for a in ep}
     assert all(len(v) == 1 for v in eps.values()), eps
     arms = [(a, f"{lab}, {eps[a][0]:.2g} epochs", c, m) for a, lab, c, m in ARM_ARMS]
     axes = [(lab, f"held_default/{ax}") for ax, lab in ARM_AXES]
-    ref = (1.0, "control, geometric mean of its two seeds")
-    rlab = r"$R$ = MSE(arm, seed) / MSE(control)"
+    ref = (1.0, "control")
+    rlab = r"$R$ = MSE(arm) / MSE(control)"
     mlab = r"MSE of $\log|\mathcal{M}|^2$"
-    figs = ps.panels(4)
-    for (fig, ax), reads, key, xl, ticks, rf in (
-            (figs[0], ARM_READS, "R", rlab, (0.1, 0.2, 0.5, 1.0), ref),
-            (figs[1], ARM_READS, "mse", mlab, (0.1, 1.0, 10.0), None),
-            (figs[2], axes, "R", rlab, (0.05, 0.1, 0.2, 0.5, 1.0), ref),
-            (figs[3], axes, "mse", mlab, (0.001, 0.01, 0.1, 1.0, 10.0), None)):
-        seed_panel(ax, seeds, reads, arms, key, xl, ticks, rf)
-        ps.shared_legend(fig, ax, ncol=1)
-    ps.save_panels(figs, os.path.join(HERE, "figs", "arms_zero_shot"))
+    for name, reads, rt, mt in (("arms_zero_shot", ARM_READS, (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0)),
+                                ("arms_zero_shot_axes", axes, (0.02, 0.05, 0.1, 0.2, 0.5, 1.0),
+                                 (0.001, 0.01, 0.1, 1.0, 10.0))):
+        fig, (a, b) = ps.figure(ncols=2)
+        point_panel(a, pts, reads, arms, "R", rlab, rt, ref)
+        point_panel(b, pts, reads, arms, "mse", mlab, mt)
+        b.set_yticklabels([])
+        ps.shared_legend(fig, a, ncol=1)
+        ps.save(fig, os.path.join(HERE, "figs", name))
 
 
 def main():

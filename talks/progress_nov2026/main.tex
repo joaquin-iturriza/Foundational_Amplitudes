@@ -1,0 +1,112 @@
+%=========================================================================
+%  Foundational Amplitudes, informal weekly update (early November 2026)
+%  Joaquin Iturriza Ramirez
+%  Compile (twice):  pdflatex -interaction=nonstopmode main.tex
+%=========================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usefonttheme{professionalfonts}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+
+\graphicspath{{figs/}}
+
+\definecolor{navy}{RGB}{38,38,110}
+
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em\hbox{\hspace{0.2em}\usebeamerfont{frametitle}\insertframetitle}%
+  \vskip0.12em\hbox{\hspace{0.2em}\textcolor{navy}{\rule{0.965\paperwidth}{0.8pt}}}\vskip0.2em}
+
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{normal text}\color{gray}\scriptsize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \vfill
+  \begin{center}
+    {\Large\bfseries\color{navy} Foundational Amplitudes}\\[1.4em]
+    {\large Joaqu\'in Iturriza Ramirez}\\[0.4em]
+    {\footnotesize\color{gray} November 2026}
+  \end{center}
+  \vfill
+\end{frame}
+
+%---------------------------------------------------------------- sampling
+\begin{frame}{Default and catalog sampling}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \small
+    \begin{itemize}\setlength{\itemsep}{0.8em}
+      \item Default, the generator's own sampling. MadEvent, $pp$ at 13 TeV or $e^+e^-$ at fixed energies, events distributed as the cross section
+      \item Catalog, our sampling of the partonic process. $\sqrt{\hat s}$ log uniform up to 6 TeV, a bulk part, a forward part and a part flat in $\log|\mathcal M|^2$
+      \item Trained on 0.75 catalog plus 0.25 default
+    \end{itemize}
+  \end{minipage}
+  \vfill
+\end{frame}
+
+\begin{frame}{Catalog sampling by component}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_a.pdf}
+\end{frame}
+
+\begin{frame}{Default, catalog and the trained mixture}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_b.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- width and length
+\begin{frame}{Width}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{width_x1_loss.pdf}
+\end{frame}
+
+\begin{frame}{Length}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{length_w8_curves.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- zero shot
+\begin{frame}{Zero shot per arm}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_zero_shot.pdf}
+\end{frame}
+
+\begin{frame}{Zero shot per held-out axis}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_zero_shot_axes.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- compute
+\begin{frame}{MSE against compute and wall time}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{mse_vs_compute.pdf}
+\end{frame}
+
+\begin{frame}{Open ends}
+  \vfill
+  \begin{minipage}{0.97\textwidth}
+    \small
+    \begin{itemize}\setlength{\itemsep}{0.8em}
+      \item The 4$\times$ sweep is not converged, its best learning rate sits at the top of the window
+      \item The 16$\times$ sweep is still running
+      \item One loop does not improve with width, length or the default share
+      \item The full set at 0.64 epochs reads worse than $10^4$ events per process at 6 epochs
+    \end{itemize}
+  \end{minipage}
+  \vfill
+\end{frame}
+
+\end{document}

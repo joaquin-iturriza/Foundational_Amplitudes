@@ -9,8 +9,12 @@
           'Finished training' is marked running, at its last validation)
   best    each sweep's finished trials, its best, and the design's not-converged flags (lr at a window edge, best at
           the last validation) -> data/long_sweeps_best.json
+  pull_mse  the validation MSE of log|M|^2 at the best checkpoint, training wall time and GPU of every finished
+          run (pull_mse's docstring) -> data/size_mse.json
+  eval_mse <eval run> <log> <trial dir>   a sweep trial's MSE from the eval job that re-read it (DyHPO trials
+          have no end-of-run evaluation) -> data/size_mse.json
   figs    figs/width_x1_loss (from data/width_x1.json, mixture_ab.py width), figs/length_w8_curves,
-          figs/loss_vs_compute (png + pdf)
+          figs/mse_vs_compute (MSE of log|M|^2 against compute and wall time, from data/size_mse.json) (png + pdf)
 
 Best checkpoint: the lowest aggregate val_loss_no_reg (het NLL) of the main training block. The 4264-step curves are
 the width runs' own (data/reads/<run>_val.json, mixture_ab.py val), their lr training.lr of the run's config.yaml
@@ -93,6 +97,122 @@ def pull():
                          "ccin2p3, read-only site run", "trials": res, "results": results}, open(path, "w"), indent=0)
     print(json.dumps({k: {"n": len(v["vals"]), "last_step": v["vals"][-1][0], "finished": v["finished"],
                           "lr": v["lr"]} for k, v in res.items()}))
+
+
+MSE_RE = re.compile(r"MSE \(prepd\) val_(\S+) \S+: ([0-9.eE+-]+|nan|inf)")
+
+
+def pull_mse():
+    """The validation MSE of log|M|^2 at the best checkpoint of every finished run of the width and length studies
+    (the 4264-step width runs runs/catalog_v4_long/v4_het_default25_*_x1 and every trial of the two long sweeps),
+    with its training wall time and GPU, read from CC-IN2P3 with one read-only `site run` -> data/size_mse.json.
+
+    What the runs log: after training, the run reloads models/model_run0_best.pt (the best checkpoint, lowest
+    aggregate val_loss_no_reg) and logs per process 'MSE (prepd) val_<process>' on its validation events, in the
+    preprocessed target (experiment.py, the 'MSE (prepd)' line of the end-of-run metrics). The preprocessing
+    (preprocess_per_dataset, experiment.py) takes plain log of a positive pool and signedlog at the pool's own scale of
+    a signed one, then one shared standardisation (the run's data_stats.json prepd_std: one sigma for every process);
+    the emission-scales target multiplies |M|^2 by a factor that is the same for truth and prediction, so on a
+    positive pool the error in ln|M|^2 is sigma times the error in the preprocessed target and MSE = sigma^2 MSE(prepd).
+    Signed pools exist only among the one-loop pools (names ending _nlo; 92 of the 1153 trained processes): those
+    are left out of the aggregate (mse_stats), which is over the tree processes only. The first block of these lines in a log is the main run's (the second, after the
+    250-step sigma-only stage, has mu frozen and repeats it). Wall time: the main block's 'Finished training ... in X
+    min' (training only: no data load, no end-of-run evaluation); GPU: the run's RUN_SUMMARY 'gpu'. A trial that was
+    restarted (trial_<n>_r<k>) counts only its own block, flagged."""
+    dirs = ("runs/catalog_v4_long/v4_het_default25_*x1 " +
+            " ".join(f"runs/{s}/trial_*" for s in SWEEPS.values()))
+    cmd = (f'for d in {dirs}; do f=$d/out_0.log; grep -q "Finished training" $f 2>/dev/null || continue; '
+           'echo "@@ $d"; python3 -c "import json,sys; s=set(json.load(open(sys.argv[1]))[\\"prepd_std\\"]); '
+           'print(\\"DATA_STATS_SIGMA\\", s.pop() if len(s) == 1 else \\"multi\\")" $d/data_stats.json; '
+           'grep -E "shared_standardization|Starting to train for|Finished training|'
+           'Loading model from|MSE \\(prepd\\) val_" $f; done; '
+           'echo "@@ RUN_SUMMARY"; cat catalog_v3_short_*.out ' + " ".join(f"sweeps/{s}/output/*.out" for s in SWEEPS.values())
+           + ' 2>/dev/null | grep -h "^RUN_SUMMARY" | grep -E "catalog_v4_long/v4_het_default25|cov_v4_long_hpo8_cc_"')
+    out = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd], capture_output=True,
+                         text=True, timeout=700).stdout
+    runs, cur, gpu = {}, None, {}
+    for line in out.splitlines():
+        if line.startswith("@@ "):
+            name = line[3:].strip()
+            cur = None if name == "RUN_SUMMARY" else runs.setdefault(name, {"blocks": [], "mse_prepd": {},
+                                                                              "sigma": None, "best_loaded": None})
+            continue
+        if line.startswith("RUN_SUMMARY "):
+            d = json.loads(line.split(" ", 1)[1])
+            rd = d.get("run_dir", "")
+            if d.get("T_max", 0) > 1000:            # the main run's summary, not the sigma stage's
+                gpu[rd.split("Foundational_Amplitudes/", 1)[-1]] = d.get("gpu")
+            continue
+        if cur is None:
+            continue
+        if line.startswith("DATA_STATS_SIGMA "):        # the run's data_stats.json: one prepd_std for every process
+            v = line.split()[1]
+            cur["sigma"] = None if v == "multi" else float(v)
+        m = re.search(r"Starting to train for (\d+) iterations", line)
+        if m:
+            cur["blocks"].append({"iterations": int(m.group(1)), "minutes": None})
+        m = re.search(r"Finished training: (\d+) iterations .* in ([0-9.]+)min", line)
+        if m and cur["blocks"]:
+            cur["blocks"][-1]["minutes"] = float(m.group(2))
+        if "Loading model from" in line and cur["best_loaded"] is None:
+            cur["best_loaded"] = line.split("Loading model from", 1)[1].strip()
+        m = MSE_RE.search(line)
+        if m and m.group(1) not in cur["mse_prepd"]:     # the first evaluation: the main run's
+            cur["mse_prepd"][m.group(1)] = float(m.group(2))
+    res = {}
+    for d, r in runs.items():
+        main = [b for b in r["blocks"] if b["iterations"] > 1000 and b["minutes"] is not None]
+        if not main:
+            continue
+        res[d] = {"sigma": r["sigma"], "iterations": main[0]["iterations"],
+                  "train_hours": round(sum(b["minutes"] for b in main) / 60, 4), "n_main_blocks": len(main),
+                  "gpu": gpu.get(d), "best_loaded": r["best_loaded"], "restarted": bool(re.search(r"_r\d+$", d)),
+                  **mse_stats(r["mse_prepd"], r["sigma"])}
+    if not res:
+        sys.exit("pull_mse: nothing read: " + out[-800:])
+    json.dump({"source": "out_0.log 'MSE (prepd) val_<process>' (main run, best checkpoint) times sigma^2 of its "
+                         "shared standardisation (data_stats.json prepd_std), tree processes only (one-loop _nlo pools, "
+                         "which hold every signed pool, left out); 'Finished training' minutes; RUN_SUMMARY gpu; CC-IN2P3, read-only "
+                         "site run", "runs": res}, open(os.path.join(DATA, "size_mse.json"), "w"), indent=1)
+    print(json.dumps({d: {k: v[k] for k in ("iterations", "train_hours", "gpu", "n_processes", "mse_logm2_gmean")}
+                      for d, v in res.items()}))
+
+
+def mse_stats(mse_prepd, sigma):
+    """n_processes, geometric and arithmetic mean over the TREE processes (one-loop pools, which hold every signed
+    pool, left out) of MSE(log|M|^2) = sigma^2 MSE(prepd); None when the
+    log has no end-of-run evaluation (a DyHPO trial: no 'MSE (prepd)' lines)"""
+    mse = [sigma ** 2 * x for p, x in mse_prepd.items() if math.isfinite(x) and not p.endswith("_nlo")] if sigma else []
+    if not mse:
+        return {"n_processes": 0, "mse_logm2_gmean": None, "mse_logm2_mean": None}
+    return {"n_processes": len(mse), "n_one_loop_left_out": sum(p.endswith("_nlo") for p in mse_prepd), "mse_logm2_gmean": float(np.exp(np.mean(np.log(mse)))),
+            "mse_logm2_mean": float(np.mean(mse))}
+
+
+def eval_mse(run, log, trial_dir):
+    """A sweep trial's validation MSE of log|M|^2 at its best checkpoint, from the eval job that re-read it (its
+    LONG_BEST arm: the trial's config and data load, mu frozen at the trial's best, so its first end-of-run
+    'MSE (prepd) val_' block is the trial's) -> added to data/size_mse.json under the trial's directory, with the
+    eval run named"""
+    sigma, mp = None, {}
+    for line in open(log, errors="replace"):
+        m = re.search(r"one \(mu, sigma\) = \(([-0-9.eE+]+), ([-0-9.eE+]+)\)", line)
+        if m and sigma is None:
+            sigma = float(m.group(2))
+        m = MSE_RE.search(line)
+        if m and m.group(1) not in mp:
+            mp[m.group(1)] = float(m.group(2))
+    path = os.path.join(DATA, "size_mse.json")
+    d = json.load(open(path))
+    t = d["runs"][trial_dir]
+    if t.get("sigma") is None:
+        sys.exit(f"eval_mse: no sigma for {trial_dir} (its data_stats.json was not read)")
+    if sigma is not None and abs(t["sigma"] - sigma) > 1e-3:
+        sys.exit(f"eval_mse: sigma {sigma} of {run} differs from the trial's {t['sigma']}")
+    t.update(mse_stats(mp, t["sigma"]), mse_from_eval_run=run)   # the trial's sigma (its data_stats.json, equal
+    # to the eval run's: the eval job checks 'data_stats.json ... equal the trial's')
+    json.dump(d, open(path, "w"), indent=1)
+    print(json.dumps({trial_dir: t}))
 
 
 SWEEP_CONFIGS = {"17056": "sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml",
@@ -200,7 +320,7 @@ def figs():
     ax.set_xticks([8, 16, 32], ["8", "16", "32"])
     ax.minorticks_off()
     ax.set_xlabel(f"width (attention heads), 4264 steps ({ep_x1:.2g} epochs)")
-    ax.set_ylabel("best validation NLL")
+    ax.set_ylabel("best validation het. loss")
     ps.legend(ax, "upper right")
     ps.save(fig, os.path.join(FIGS, "width_x1_loss"))
 
@@ -221,66 +341,81 @@ def figs():
         y[bad] = np.nan
         ax.plot(s, y, label=label, **kw)
 
-    draw(width_curve(WIDTH_RUNS[8][0]), f"4264 steps ({ep_x1:.2g} epochs), {lr_tex(LR_X1)}, done", color="k",
+    draw(width_curve(WIDTH_RUNS[8][0]), f"4264 steps, {lr_tex(LR_X1)}", color="k",
          ls=":")
     for g in ("17056", "68224"):
         for k in groups[g]:
             t = tr[k]
-            state = "done" if t["finished"] else f"running, at step {t['vals'][-1][0]}"
-            draw(t["vals"], f"{g} steps ({ep_of[k]:.2g} epochs), {lr_tex(t['lr'])}, {state}", color=colour[k],
+            state = "" if t["finished"] else ", running"
+            draw(t["vals"], f"{g} steps, {lr_tex(t['lr'])}{state}", color=colour[k],
                  ls=style[g])
             report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
                                     "best": round(best(t["vals"])[1], 4)}
     ax.set_xscale("log")
     ax.set_xlabel("training step")
-    ax.set_ylabel("validation NLL")
-    ps.shared_legend(fig, ax, ncol=1)
+    ax.set_ylabel("validation het. loss")
+    ps.shared_legend(fig, ax, ncol=2)
     ps.save(fig, os.path.join(FIGS, "length_w8_curves"))
     report["validations above NLL 1 not drawn"] = off
 
-    # 3: best validation NLL against the estimated compute C = 6 N S B
-    fig, ax = ps.figure()
+    # 3: validation MSE of log|M|^2 at the best checkpoint (data/size_mse.json, pull_mse / eval_mse) against the
+    # estimated compute C = 6 N S B (a) and the training wall time on one GPU (b); per category the best run on that
+    # MSE (the width cells: the better of seeds 42 and 43; the 17056-step sweep: its best trial by the sweep's
+    # objective, the only trial with an end-of-run evaluation, from its eval re-read)
+    sm = json.load(open(os.path.join(DATA, "size_mse.json")))["runs"]
     C = lambda width, steps: 6.0 * N_PARAMS[width] * steps * BATCH
-    wcol = {8: "k", 16: ps.C.green, 32: ps.C.vermillion}
+    cats = [(f"width {k}, 4264 steps ({ep_x1:.2g} epochs)", k,
+             [f"runs/catalog_v4_long/v4_het_default25{sfx}_w{k}_x1" for sfx in ("", "_seed2")], wc, "D")
+            for k, wc in ((8, "k"), (16, ps.C.green), (32, ps.C.vermillion))]
+    b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
+    cats.append((f"width 8, 17056 steps ({ep_of['17056_trial_' + b17]:.2g} epochs), best of the 8-trial sweep", 8,
+                 [f"runs/{SWEEPS['17056']}/trial_{b17}"], ps.C.blue, "o"))
+    gpu_fill = {"Tesla V100-SXM2-32GB": True, "Tesla V100-PCIE-32GB": False}
+    fig, (axc, axw) = ps.figure(ncols=2)
     hs = []
-    for k in (8, 16, 32):
-        ys = [w["best"][r]["val_loss_no_reg"] for r in WIDTH_RUNS[k]]
-        ax.plot([C(k, 4264)] * 2, ys, ls="", marker="D", color=wcol[k])
-        hs.append(Line2D([], [], ls="", marker="D", color=wcol[k],
-                         label=f"width {k}, 4264 steps ({ep_x1:.2g} epochs), seeds 42 and 43"))
-        report[f"compute width {k}"] = {"C": C(k, 4264), "best": ys}
-    for g, mk, col in (("17056", "o", ps.C.blue), ("68224", "s", ps.C.orange)):
-        n_run = 0
-        for k in groups[g]:
-            t = tr[k]
-            s_best, y = best(t["vals"])
-            done = t["finished"]
-            n_run += not done
-            c = C(8, t["steps"] if done else t["vals"][-1][0])
-            ax.plot([c], [y], ls="", marker=mk, color=col, mfc=col if done else "none")
-            report[f"compute {k}"] = {"C": c, "best": round(y, 4), "at_step": s_best, "finished": done}
-        hs.append(Line2D([], [], ls="", marker=mk, color=col,
-                         label=f"width 8, {g} steps ({ep_of[groups[g][0]]:.2g} epochs), {len(groups[g])} trials"
-                               f" of the learning-rate sweep, {n_run} running"))
-    hs.append(Line2D([], [], ls="", marker="o", color="k", label="trial done"))
-    hs.append(Line2D([], [], ls="", marker="o", color="k", mfc="none",
-                     label="trial running: best so far, at the compute so far"))
+    for label, width, dirs, col, mk in cats:
+        have = [(sm[d]["mse_logm2_gmean"], d) for d in dirs if sm.get(d, {}).get("mse_logm2_gmean") is not None]
+        y, d = min(have)
+        r = sm[d]
+        fill = gpu_fill[r["gpu"]]
+        for ax, x in ((axc, C(width, r["iterations"])), (axw, r["train_hours"])):
+            ax.plot([x], [y], ls="", marker=mk, color=col, mfc=col if fill else "none")
+        hs.append(Line2D([], [], ls="", marker=mk, color=col, label=label))
+        report[f"mse {label}"] = {"run_dir": d, "mse_logm2_gmean": round(y, 5), "C": C(width, r["iterations"]),
+                                  "train_hours": r["train_hours"], "gpu": r["gpu"],
+                                  "of": {x: sm.get(x, {}).get("mse_logm2_gmean") for x in dirs}}
+    hs += [Line2D([], [], ls="", marker="s", color="k", label="V100 SXM2"),
+           Line2D([], [], ls="", marker="s", color="k", mfc="none", label="V100 PCIe")]
+    for ax in (axc, axw):
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_ylabel(r"validation MSE of $\log|\mathcal{M}|^2$, trees")
+    axc.set_xlabel("compute [FLOP]")
+    axw.set_xlabel("training wall time [GPU h]")
+    from matplotlib.ticker import FixedLocator, FixedFormatter, NullFormatter
+    for ax, ticks in ((axw, (1, 2, 4)), (axc, None)):
+        if ticks:
+            ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
+            ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
+        ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.yaxis.set_major_locator(FixedLocator([0.02, 0.05, 0.1]))
+        ax.yaxis.set_major_formatter(FixedFormatter(["0.02", "0.05", "0.1"]))
+        ax.yaxis.set_minor_formatter(NullFormatter())
     for h in hs:            # empty proxies, read by ps.shared_legend
-        ax.add_line(h)
-    ax.set_xscale("log")
-    ax.set_xlabel("estimated compute $C = 6\\,N\\,S\\,B$ [FLOP]\n"
-                  "($N$ parameters, $S$ steps, $B = 16384$ events per step)")
-    ax.set_ylabel("best validation NLL")
-    ps.shared_legend(fig, ax, ncol=1)
-    ps.save(fig, os.path.join(FIGS, "loss_vs_compute"))
+        axc.add_line(h)
+    ps.shared_legend(fig, axc, ncol=2)
+    ps.save(fig, os.path.join(FIGS, "mse_vs_compute"))
     print(json.dumps(report))
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=("pull", "figs", "best"))
+    ap.add_argument("cmd", choices=("pull", "pull_mse", "eval_mse", "figs", "best"))
+    ap.add_argument("args", nargs="*", help="eval_mse: <eval run> <its log> <trial dir>")
     a = ap.parse_args()
-    {"pull": pull, "figs": figs, "best": sweep_best}[a.cmd]()
+    if a.cmd == "eval_mse":
+        return eval_mse(*a.args)
+    {"pull": pull, "pull_mse": pull_mse, "figs": figs, "best": sweep_best}[a.cmd]()
 
 
 if __name__ == "__main__":

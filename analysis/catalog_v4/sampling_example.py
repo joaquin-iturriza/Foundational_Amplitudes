@@ -27,6 +27,7 @@ FIGS = os.path.join(ROOT, "analysis", "catalog_v4", "figs", "sampling_example")
 RECIPE = os.path.join(ROOT, "recipes", "catalog_v4_train.yaml")
 NAME, ROLE, SEED = "v4_uux_epemg", "train", 42
 LOGM_BINS = np.linspace(-14.0, 4.0, 73)              # log10 |M|^2, 0.25 per bin; under/overflow counted apart
+LOGM_XLIM = (-9.5, 1.0)                              # the figures' range: every event of the class lies inside
 SQ_BINS = np.logspace(np.log10(30.0), np.log10(6000.0), 61)   # sqrt(s_hat) in GeV, the pool's window
 
 
@@ -113,7 +114,7 @@ def figs():
             ax.stairs(base + y, x, baseline=base, fill=True, color=col, alpha=0.6, label=lab)
             base = base + y
         step(ax, "catalog", var, color=ps.C.blue, label="catalog (sum)")
-    axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel(r"density per $\log_{10}$")
+    axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel(r"density per $\log_{10}$")
     axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel(r"density per $\log_{10}$")
     ps.legend(axL, "upper left")
     ps.process_label(axR, proc)
@@ -129,7 +130,7 @@ def figs():
                                       ("trained", r"trained: $0.75\,$catalog$\,+\,0.25\,$default", ps.C.grey, nt, "--")):
             y = np.asarray(h[key][var], float) / (nn * np.diff(e))
             ax.stairs(y, x, color=col, linestyle=ls, label=lab)
-    axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel(r"density per $\log_{10}$")
+    axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel(r"density per $\log_{10}$")
     axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel(r"density per $\log_{10}$")
     ps.legend(axL, "upper left")
     ps.process_label(axR, proc)

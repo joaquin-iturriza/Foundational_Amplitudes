@@ -9,3 +9,4 @@
 talks/progress_sep2026/main.tex
 talks/progress_oct2026/main.tex
 talks/progress_oct2026b/main.tex
+talks/progress_nov2026/main.tex

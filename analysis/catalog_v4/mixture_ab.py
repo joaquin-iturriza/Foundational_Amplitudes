@@ -864,6 +864,52 @@ def _seed_points(pair, ctl_pair, keys, cls):
     return out
 
 
+def _points(arm_seeds, ctl_seeds, cls, ax_of):
+    """The figure's one point per arm and read (Joaquin 2026-11-03): the arm's per-probe geometric mean over its
+    seeds, R against the control's two-seed geometric mean and the absolute MSE (class median of the class's geometric
+    mean); the bar the design's interval (r_with_interval "widened": the 95% class bootstrap of the class median,
+    10000 resamples, widened on each side by |ln R_seed|, R_seed the control's seed 43 over seed 42 class median on
+    the same classes; the same for every arm, a one-seed arm included, and for the absolute MSE's class median). Reads: PP4 and EE4 on the TRAINED classes
+    only (their held-out classes are in held_default), the held-out pool catalog-sampled (held) and default-sampled
+    (held_default, pooled and per axis). arm_seeds / ctl_seeds: {read: [seed dicts]}, read in PP4, EE4, held,
+    held_default (keys (source, probe))"""
+    cl = lambda k: cls(probe_name(k))
+    out = {}
+    for r in ("PP4", "EE4", "held", "held_default"):
+        xs, cs = arm_seeds[r], ctl_seeds[r]
+        keys = set.intersection(*(set(x) for x in xs + cs))
+        if r in ("PP4", "EE4"):
+            keys = {k for k in keys if cl(k) not in ax_of}
+        elif r == "held_default":
+            keys = {k for k in keys if cl(k) in ax_of}
+        parts = {r + ("_trained" if r in ("PP4", "EE4") else ""): sorted(keys, key=str)}
+        if r == "held_default":
+            parts.update({f"held_default/{ax}": sorted((k for k in keys if ax_of[cl(k)] == ax), key=str)
+                          for ax in HELD})
+        for name, ks in parts.items():
+            if not ks:
+                continue
+            ctl = {k: gmean([c[k] for c in cs]) for k in ks}
+            arm = {k: gmean([x[k] for x in xs]) for k in ks}
+            r_seed = float(np.median(list(class_ratios(cs[1], cs[0], ks, cl).values())))
+            res = {"n_probes": len(ks), "n_classes": len({cl(k) for k in ks}), "n_seeds": len(xs),
+                   "R_seed_control": round(r_seed, 4)}
+            for q, vals in (("R", class_ratios(arm, ctl, ks, cl)),
+                            ("mse", {c: gmean(v) for c, v in _by_class(arm, ks, cl).items()})):
+                iv = r_with_interval(vals, r_seed)
+                res[q] = float(f"{np.median(list(vals.values())):.5g}")
+                res[q + "_bar"] = [float(f"{x:.5g}") for x in iv["widened"]]
+            out[name] = res
+    return out
+
+
+def _by_class(d, keys, cl):
+    by = {}
+    for k in keys:
+        by.setdefault(cl(k), []).append(d[k])
+    return by
+
+
 def arms():
     cls = class_of()
     ax_of = _held_axes(cls)
@@ -907,6 +953,21 @@ def arms():
     trained = {a: [TRAINED_BY.get(run, run) for run in v["PP4"]] for a, v in ARMS_VS_CONTROL.items()}
     out["epochs"] = {a: {run: ep[run] for run in runs} if all(run in ep for run in runs) else None
                      for a, runs in trained.items()}
+    # the figure's points (one per arm and read, bars from the per-seed bootstrap intervals)
+    dflt = lambda pp, ee, hd: _tagged([(pp, "PP4"), (ee, "EE4"), (hd, "HD4"), (hd, "HD5")])
+    ctl_runs = ARMS_VS_CONTROL["control"]
+    ctl_seeds = {r: list(c[r]) for r in ("PP4", "EE4", "held")}
+    ctl_seeds["held_default"] = [dflt(ctl_runs["PP4"][i], ctl_runs["EE4"][i], ARMS_HD["control"][i]) for i in (0, 1)]
+    out["points"] = {}
+    for a in ARMS_VS_CONTROL:
+        av = ARMS_VS_CONTROL[a]
+        seeds_a = {r: list(reads[a][r]) for r in ("PP4", "EE4", "held")}
+        seeds_a["held_default"] = [dflt(av["PP4"][i], av["EE4"][i], ARMS_HD[a][i]) for i in (0, 1)]
+        out["points"][a] = _points(seeds_a, ctl_seeds, cls, ax_of)
+    for a, (run, _k) in LONG_BEST.items():
+        seeds_a = {r: [read_of(run, r)] for r in ("PP4", "EE4", "held")}
+        seeds_a["held_default"] = [dflt(run, run, run)]
+        out["points"][a] = _points(seeds_a, ctl_seeds, cls, ax_of)
     out["one_seed_arms"] = {"runs": LONG_BEST, "caveat": "one seed (42), the best of an 8-trial DyHPO sweep (lr and "
                             "HPs tuned, best-of-8 selection), not converged (best lr at the window's top edge, best "
                             "checkpoint at the last validation); against the 1x width cells: length and tuning "
