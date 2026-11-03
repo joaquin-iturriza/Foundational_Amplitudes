@@ -66,14 +66,16 @@ def editor_read(prog, words):
 
 INTERP = re.compile(r"^(?:python[0-9.]*|perl|ruby|node)$")
 WRITE = re.compile(r"""open\([^)\n]*,\s*(?:mode\s*=\s*)?['"][^'"]*[wax+]|\.write_(?:text|bytes)\(|"""
-                   r"""\bos\.(?:replace|rename|remove|unlink)\(|\bshutil\.|\.(?:unlink|rename|replace)\(|>\s*\$?\w""")
+                   r"""\bos\.(?:replace|rename|remove|unlink)\(|\bshutil\.|\.(?:unlink|rename)\(|\.replace\([^,()]*\)|>\s*\$?\w""")
 
 
 def writes_plan(body):
     """A line of an interpreter's script that writes and names a plan file, itself or through a variable set to one."""
     # variables set to a plan file's PATH (p = "plan/plan.yaml", Path(...), os.path.join(...)), not to its contents
+    # a string with whitespace is text (a pattern, a message), not a path: it is dropped before the name is looked for
+    text = re.compile(r"\"[^\"\n]*\s[^\"\n]*\"|'[^'\n]*\s[^'\n]*'")
     names = {m.group(1) for m in re.finditer(r"^\s*([A-Za-z_]\w*)\s*=([^=\n].*)$", body, re.M)
-             if re.search(DATA, m.group(2)) and not re.search(r"\bopen\(|\.read|\bload\(|safe_load", m.group(2))}
+             if re.search(DATA, text.sub("", m.group(2))) and not re.search(r"\bopen\(|\.read|\bload\(|safe_load", m.group(2))}
     for line in body.splitlines():
         if WRITE.search(line) and (re.search(DATA, line) or any(re.search(r"\b%s\b" % re.escape(n), line)
                                                                  for n in names)):

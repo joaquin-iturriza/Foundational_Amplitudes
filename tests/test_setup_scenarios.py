@@ -2501,6 +2501,10 @@ def command_reading():
             ("awk '/id:/{print $2}' plan/plan.yaml", 0), ("awk '$1==\"id:\" || $1==\"x\"' plan/plan.yaml", 0),
             ("grep -n %s tools/plan.py tests/test_setup_scenarios.py" % pv, 0),
             ("python3 - <<'EOF'\nopen('tests/t.py', 'a').write('env %s=/tmp/p.yaml')\nEOF" % pv, 0),
+            # editing the tool's source with str.replace is no write of a plan file; Path.replace onto one is
+            ("python3 - <<'EOF'\nfrom pathlib import Path\np = Path('tools/plan.py')\nold = \"PLAN = 'plan/plan.yaml'\"\n"
+             "p.write_text(p.read_text().replace(old, 'X'))\nEOF", 0),
+            ("python3 - <<'EOF'\nfrom pathlib import Path\np = Path('tmp.yaml')\np.replace('plan/plan.yaml')\nEOF", 2),
             ("sed -i s/held/running/ plan/plan.yaml", 2), ("perl -pi -e s/a/b/ plan/plan.yaml", 2),
             ("awk '{print > \"plan/plan.yaml\"}' /tmp/x", 2), ("awk -i inplace '{print}' plan/plan.yaml", 2),
             ("%s=/tmp/p.yaml python3 tools/plan.py show" % pv, 2), ("export %s=/tmp/p.yaml" % pv, 2)):
