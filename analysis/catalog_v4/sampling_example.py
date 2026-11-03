@@ -114,8 +114,8 @@ def figs():
             ax.stairs(base + y, x, baseline=base, fill=True, color=col, alpha=0.6, label=lab)
             base = base + y
         step(ax, "catalog", var, color=ps.C.blue, label="catalog (sum)")
-    axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel(r"density per $\log_{10}$")
-    axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel(r"density per $\log_{10}$")
+    axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel("density")
+    axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel("density")
     ps.legend(axL, "upper left")
     ps.process_label(axR, proc)
     ps.save(fig, FIGS + "_a")
@@ -130,8 +130,8 @@ def figs():
                                       ("trained", r"trained: $0.75\,$catalog$\,+\,0.25\,$default", ps.C.grey, nt, "--")):
             y = np.asarray(h[key][var], float) / (nn * np.diff(e))
             ax.stairs(y, x, color=col, linestyle=ls, label=lab)
-    axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel(r"density per $\log_{10}$")
-    axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel(r"density per $\log_{10}$")
+    axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel("density")
+    axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel("density")
     ps.legend(axL, "upper left")
     ps.process_label(axR, proc)
     ps.save(fig, FIGS + "_b")

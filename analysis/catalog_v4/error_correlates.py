@@ -751,6 +751,56 @@ def figures(raw):
     ps.save(fig, os.path.join(FIGS, "error_correlates_profile"))
 
 
+DECK_LABEL = {"y_ff": r"smallest $2p_ip_j/\hat s$, two outgoing", "y_min": r"smallest $2|p_ip_j|/\hat s$, any two",
+              "y_if": r"smallest $2|p_ip_j|/\hat s$, in and out", "pt_min": r"smallest $p_T/\sqrt{\hat s}$",
+              "e_min": r"smallest $E/\sqrt{\hat s}$", "sqrt_shat": r"$\sqrt{\hat s}$",
+              "t_level": r"$\log|\mathcal{M}|^2$", "u_fwd": r"$1/(1-|\cos\theta|)$, most forward",
+              "eta_max": r"largest $|\eta|$", "pt_max": r"largest $p_T/\sqrt{\hat s}$", "dr_min": r"smallest $\Delta R$",
+              "thr": r"$1-\sum m/\sqrt{\hat s}$", "y_boost": r"$|y_{\rm boost}|$", "res_min": "nearest resonance",
+              "loc_var": "local spread"}
+DECK_SHORT = {"t_level": r"$\log|\mathcal{M}|^2$", "y_ff": r"smallest $2p_ip_j/\hat s$", "sqrt_shat": r"$\sqrt{\hat s}$"}
+
+
+def deck_figures(raw):
+    """The deck's pair (Joaquin 2026-11-03): het control only, its two seeds averaged. (rank) per event quantity the
+    within-process Spearman correlation with the event's absolute error |q - t| and with its predicted sigma, median
+    over the processes read, mean of seeds 42 and 43, the 8 strongest (as figures()). (profile) per decile of three
+    quantities over all events read (each event's error and sigma first divided by its own process's RMS error and
+    median sigma), the RMS of the error and the median sigma in the decile, mean of the two seeds. Two canvases with
+    the standard plot box, legends in a strip above each.
+        python3 analysis/catalog_v4/error_correlates.py deck -> figs/error_correlates_deck_{rank,profile}.{png,pdf}"""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    het = [raw["per_run"][a]["all"] for a in ("v4_het_control", "v4_het_control_seed2")]
+    feats = [f for f in EV_FEATS if f != "t_z"]
+    rho = lambda f, t: np.nanmean([np.nan if x["within"][f][t]["rho_med"] is None else x["within"][f][t]["rho_med"]
+                                   for x in het])
+    order = sorted(feats, key=lambda f: -np.nanmean([abs(rho(f, "ae")), abs(rho(f, "s"))]))[:N_RANK]
+    fig, ax = ps.figure()
+    yy = np.arange(len(order))[::-1]
+    for tgt, col, mk, lab, dy in (("ae", ps.C.blue, "s", "absolute error", 0.15),
+                                  ("s", ps.C.vermillion, "o", r"predicted $\sigma$", -0.15)):
+        ax.plot([rho(f, tgt) for f in order], yy + dy, mk, color=col, ls="none", label=lab)
+    ax.axvline(0, color=ps.C.grey, linestyle="--", label="no correlation")
+    ax.set_yticks(yy)
+    ax.set_yticklabels([DECK_LABEL.get(f, LABEL[f]) for f in order])
+    ax.set_xlabel("rank correlation within a process")
+    ax.set_ylim(-0.6, len(order) - 0.4)
+    ps.shared_legend(fig, ax, ncol=3)
+    ps.save(fig, os.path.join(FIGS, "error_correlates_deck_rank"))
+    fig, ax = ps.figure()
+    x = np.arange(1, 11)
+    for f, c in zip(PROFILE_FEATS, (ps.C.blue, ps.C.vermillion, ps.C.green)):
+        e = np.mean([h["profile"][f]["rms_ae_n"] for h in het], axis=0)
+        sg = np.mean([h["profile"][f]["med_s_n"] for h in het], axis=0)
+        ax.plot(x, e, "-", color=c, marker="s", label=DECK_SHORT[f] + ": error")
+        ax.plot(x, sg, "--", color=c, marker="o", label=DECK_SHORT[f] + r": $\sigma$")
+    ax.set_xlabel("decile of the quantity")
+    ax.set_ylabel("in the decile / whole process")
+    ps.shared_legend(fig, ax, ncol=3)
+    ps.save(fig, os.path.join(FIGS, "error_correlates_deck_profile"))
+
+
 def claims(path=None):
     """the numbers the write-up quotes (docs/results.tex par:v4_error_correlates), from the combined read; every
     read pooled ("all") unless named; s42/s43 the seeds; rho the median over probes of the within-probe Spearman"""
@@ -811,9 +861,12 @@ def main():
     c = sub.add_parser("combine")
     c.add_argument("paths", nargs="+")
     sub.add_parser("claims")
+    sub.add_parser("deck")
     sm = sub.add_parser("summary")
     sm.add_argument("--reads", default=None)
     a = ap.parse_args()
+    if a.cmd == "deck":
+        return deck_figures(load())
     if a.cmd == "probe":
         probe_cmd()
     elif a.cmd == "extract":

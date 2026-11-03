@@ -114,8 +114,8 @@ def pull_mse():
     a signed one, then one shared standardisation (the run's data_stats.json prepd_std: one sigma for every process);
     the emission-scales target multiplies |M|^2 by a factor that is the same for truth and prediction, so on a
     positive pool the error in ln|M|^2 is sigma times the error in the preprocessed target and MSE = sigma^2 MSE(prepd).
-    Signed pools exist only among the one-loop pools (names ending _nlo; 92 of the 1153 trained processes): those
-    are left out of the aggregate (mse_stats), which is over the tree processes only. The first block of these lines in a log is the main run's (the second, after the
+    Signed pools exist only among the one-loop pools (64 of the 92 _nlo pools of the 1153 trained, data/signed_pools.json
+    from pull_signed): only those are left out of the aggregate (mse_stats), which is over the other 1089. The first block of these lines in a log is the main run's (the second, after the
     250-step sigma-only stage, has mu frozen and repeats it). Wall time: the main block's 'Finished training ... in X
     min' (training only: no data load, no end-of-run evaluation); GPU: the run's RUN_SUMMARY 'gpu'. A trial that was
     restarted (trial_<n>_r<k>) counts only its own block, flagged."""
@@ -126,7 +126,7 @@ def pull_mse():
            'print(\\"DATA_STATS_SIGMA\\", s.pop() if len(s) == 1 else \\"multi\\")" $d/data_stats.json; '
            'grep -E "shared_standardization|Starting to train for|Finished training|'
            'Loading model from|MSE \\(prepd\\) val_" $f; done; '
-           'echo "@@ RUN_SUMMARY"; cat catalog_v3_short_*.out ' + " ".join(f"sweeps/{s}/output/*.out" for s in SWEEPS.values())
+           'echo "@@ RUN_SUMMARY"; zcat -f catalog_v3_short_*.out ' + " ".join(f"sweeps/{s}/output/*.out*" for s in SWEEPS.values())
            + ' 2>/dev/null | grep -h "^RUN_SUMMARY" | grep -E "catalog_v4_long/v4_het_default25|cov_v4_long_hpo8_cc_"')
     out = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd], capture_output=True,
                          text=True, timeout=700).stdout
@@ -171,22 +171,53 @@ def pull_mse():
     if not res:
         sys.exit("pull_mse: nothing read: " + out[-800:])
     json.dump({"source": "out_0.log 'MSE (prepd) val_<process>' (main run, best checkpoint) times sigma^2 of its "
-                         "shared standardisation (data_stats.json prepd_std), tree processes only (one-loop _nlo pools, "
-                         "which hold every signed pool, left out); 'Finished training' minutes; RUN_SUMMARY gpu; CC-IN2P3, read-only "
+                         "shared standardisation (data_stats.json prepd_std), every pool with a plain-log target (the "
+                         "signed pools of data/signed_pools.json left out); 'Finished training' minutes; RUN_SUMMARY gpu; CC-IN2P3, read-only "
                          "site run", "runs": res}, open(os.path.join(DATA, "size_mse.json"), "w"), indent=1)
     print(json.dumps({d: {k: v[k] for k in ("iterations", "train_hours", "gpu", "n_processes", "mse_logm2_gmean")}
                       for d, v in res.items()}))
 
 
+SIGNED = os.path.join(DATA, "signed_pools.json")
+
+
+def pull_signed():
+    """The training pools each run preprocesses with signedlog (signed |M|^2: some events negative), from its
+    config.yaml data.dataset and data_stats.json amp_trafos_pp (aligned), read-only on CC-IN2P3 -> data/signed_pools.json"""
+    dirs = " ".join(["runs/catalog_v4_long/v4_het_default25*_x1"] + [f"runs/{s}/trial_*" for s in SWEEPS.values()])
+    py = ("import json,yaml,sys\n"
+          "for r in sys.argv[1:]:\n"
+          "    try:\n"
+          "        n=list(yaml.safe_load(open(r+'/config.yaml'))['data']['dataset']); t=json.load(open(r+'/data_stats.json'))['amp_trafos_pp']\n"
+          "    except Exception:\n"
+          "        continue\n"
+          "    assert len(n)==len(t)\n"
+          "    print('SIGNED', r, json.dumps([a for a,b in zip(n,t) if not b[0].startswith('log')]))\n")
+    cmd = f"cat > /tmp/zz_probe_signed.py <<'PYEOF'\n{py}PYEOF\npython3 /tmp/zz_probe_signed.py {dirs}; rm -f /tmp/zz_probe_signed.py"
+    out = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd], capture_output=True,
+                         text=True, timeout=700).stdout
+    per = {l.split()[1]: json.loads(l.split(" ", 2)[2]) for l in out.splitlines() if l.startswith("SIGNED runs/")}
+    sets = {tuple(sorted(v)) for v in per.values()}
+    if len(sets) != 1:
+        sys.exit(f"pull_signed: {len(per)} runs, {len(sets)} different signed sets")
+    json.dump({"source": "config.yaml data.dataset with data_stats.json amp_trafos_pp, every run read (same set)",
+               "runs": sorted(per), "signed": sorted(sets.pop())}, open(SIGNED, "w"), indent=1)
+    print(len(per), "runs,", len(json.load(open(SIGNED))["signed"]), "signed pools")
+
+
 def mse_stats(mse_prepd, sigma):
-    """n_processes, geometric and arithmetic mean over the TREE processes (one-loop pools, which hold every signed
-    pool, left out) of MSE(log|M|^2) = sigma^2 MSE(prepd); None when the
-    log has no end-of-run evaluation (a DyHPO trial: no 'MSE (prepd)' lines)"""
-    mse = [sigma ** 2 * x for p, x in mse_prepd.items() if math.isfinite(x) and not p.endswith("_nlo")] if sigma else []
+    """n_processes, geometric and arithmetic mean over every training pool whose target is plain log (trees and the
+    positive one-loop pools) of MSE(log|M|^2) = sigma^2 MSE(prepd); the signed pools (signedlog, data/signed_pools.json)
+    are left out and counted: their MSE(prepd) is not an MSE of log|M|^2, which needs per-event predictions. None when
+    the log has no end-of-run evaluation (a DyHPO trial: no 'MSE (prepd)' lines)"""
+    signed = set(json.load(open(SIGNED))["signed"])
+    mse = [sigma ** 2 * x for p, x in mse_prepd.items() if math.isfinite(x) and p not in signed] if sigma else []
     if not mse:
         return {"n_processes": 0, "mse_logm2_gmean": None, "mse_logm2_mean": None}
-    return {"n_processes": len(mse), "n_one_loop_left_out": sum(p.endswith("_nlo") for p in mse_prepd), "mse_logm2_gmean": float(np.exp(np.mean(np.log(mse)))),
-            "mse_logm2_mean": float(np.mean(mse))}
+    return {"n_processes": len(mse), "n_one_loop_in": sum(p.endswith("_nlo") and p not in signed for p in mse_prepd),
+            "n_signed_left_out": sum(p in signed for p in mse_prepd),
+            "n_nonfinite": sum(not math.isfinite(x) for x in mse_prepd.values()),
+            "mse_logm2_gmean": float(np.exp(np.mean(np.log(mse)))), "mse_logm2_mean": float(np.mean(mse))}
 
 
 def eval_mse(run, log, trial_dir):
@@ -387,7 +418,7 @@ def figs():
     for ax in (axc, axw):
         ax.set_xscale("log")
         ax.set_yscale("log")
-        ax.set_ylabel(r"validation MSE of $\log|\mathcal{M}|^2$, trees")
+        ax.set_ylabel(r"validation MSE of $\log|\mathcal{M}|^2$")
     axc.set_xlabel("compute [FLOP]")
     axw.set_xlabel("training wall time on one V100 [h]")
     from matplotlib.ticker import FixedLocator, FixedFormatter, NullFormatter
@@ -408,12 +439,12 @@ def figs():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=("pull", "pull_mse", "eval_mse", "figs", "best"))
+    ap.add_argument("cmd", choices=("pull", "pull_mse", "pull_signed", "eval_mse", "figs", "best"))
     ap.add_argument("args", nargs="*", help="eval_mse: <eval run> <its log> <trial dir>")
     a = ap.parse_args()
     if a.cmd == "eval_mse":
         return eval_mse(*a.args)
-    {"pull": pull, "pull_mse": pull_mse, "figs": figs, "best": sweep_best}[a.cmd]()
+    {"pull": pull, "pull_mse": pull_mse, "pull_signed": pull_signed, "figs": figs, "best": sweep_best}[a.cmd]()
 
 
 if __name__ == "__main__":

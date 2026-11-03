@@ -33,20 +33,6 @@
 
 \begin{document}
 
-%---------------------------------------------------------------- sampling
-\begin{frame}{Default and catalog sampling}
-  \vfill
-  \begin{minipage}{0.97\textwidth}
-    \small
-    \begin{itemize}\setlength{\itemsep}{0.8em}
-      \item Default, the generator's own sampling. MadEvent, $pp$ at 13 TeV or $e^+e^-$ at fixed energies, events distributed as the cross section
-      \item Catalog, our sampling of the partonic process. $\sqrt{\hat s}$ log uniform up to 6 TeV, a bulk part, a forward part and a part flat in $\log|\mathcal M|^2$
-      \item Trained on 0.75 catalog plus 0.25 default
-    \end{itemize}
-  \end{minipage}
-  \vfill
-\end{frame}
-
 \begin{frame}{Catalog sampling by component}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_a.pdf}
@@ -57,18 +43,11 @@
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_b.pdf}
 \end{frame}
 
-%---------------------------------------------------------------- default share against the bound
-\begin{frame}{Default share against the pure default bound}
+\begin{frame}{Share of default sampled events}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{shares_bound_a.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{shares_deck.pdf}
 \end{frame}
 
-\begin{frame}{Default share with the het loss}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{shares_bound_b.pdf}
-\end{frame}
-
-%---------------------------------------------------------------- width and length
 \begin{frame}{Width}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{width_x1_loss.pdf}
@@ -79,7 +58,6 @@
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{length_w8_curves.pdf}
 \end{frame}
 
-%---------------------------------------------------------------- zero shot
 \begin{frame}{Zero shot per arm}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_zero_shot.pdf}
@@ -90,35 +68,20 @@
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{arms_zero_shot_axes.pdf}
 \end{frame}
 
-%---------------------------------------------------------------- compute
 \begin{frame}{MSE against compute and wall time}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{mse_vs_compute.pdf}
 \end{frame}
 
-%---------------------------------------------------------------- one loop
-\begin{frame}{One loop target against the Born per event}
+\begin{frame}{More one loop training data}
   \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loop_born_events.pdf}
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loop_more_pools.pdf}
 \end{frame}
 
-\begin{frame}{One loop error by group}
-  \centering
-  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loop_groups.pdf}
-\end{frame}
-
-\begin{frame}{One loop sign extension}
-  \centering
-  \includegraphics[height=0.56\textheight]{signext_a.pdf}\hfill
-  \includegraphics[height=0.56\textheight]{signext_b.pdf}
-\end{frame}
-
-%---------------------------------------------------------------- error and sigma
 \begin{frame}{What the error and sigma follow}
   \centering
-  \includegraphics[width=0.49\textwidth,height=0.62\textheight,keepaspectratio]{error_correlates_rank.pdf}\hfill
-  \includegraphics[width=0.49\textwidth,height=0.62\textheight,keepaspectratio]{error_correlates_profile.pdf}\\[0.5em]
-  \includegraphics[width=0.75\textwidth,height=0.12\textheight,keepaspectratio]{error_correlates_rank_legend.pdf}
+  \includegraphics[scale=0.56]{error_correlates_deck_rank.pdf}\hfill
+  \includegraphics[scale=0.56]{error_correlates_deck_profile.pdf}
 \end{frame}
 
 \end{document}

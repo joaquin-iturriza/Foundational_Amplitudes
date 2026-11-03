@@ -1,5 +1,5 @@
 {
- "source": "out_0.log 'MSE (prepd) val_<process>' (main run, best checkpoint) times sigma^2 of its shared standardisation (data_stats.json prepd_std), tree processes only (one-loop _nlo pools, which hold every signed pool, left out); 'Finished training' minutes; RUN_SUMMARY gpu; CC-IN2P3, read-only site run",
+ "source": "out_0.log 'MSE (prepd) val_<process>' (main run, best checkpoint) times sigma^2 of its shared standardisation (data_stats.json prepd_std), every pool with a plain-log target (the signed pools of data/signed_pools.json left out); 'Finished training' minutes; RUN_SUMMARY gpu; CC-IN2P3, read-only site run",
  "runs": {
   "runs/catalog_v4_long/v4_het_default25_seed2_w16_x1": {
    "sigma": 5.427057323464978,
@@ -9,10 +9,12 @@
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_v4_long/v4_het_default25_seed2_w16_x1/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "n_one_loop_left_out": 92,
-   "mse_logm2_gmean": 0.04765899579476595,
-   "mse_logm2_mean": 0.6607329959002918
+   "n_processes": 1089,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
+   "mse_logm2_gmean": 0.04355122728414103,
+   "mse_logm2_mean": 0.6463532011696519
   },
   "runs/catalog_v4_long/v4_het_default25_seed2_w32_x1": {
    "sigma": 5.427057323464978,
@@ -22,10 +24,12 @@
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_v4_long/v4_het_default25_seed2_w32_x1/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "n_one_loop_left_out": 92,
-   "mse_logm2_gmean": 0.027042028404995744,
-   "mse_logm2_mean": 0.31144097916758634
+   "n_processes": 1089,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
+   "mse_logm2_gmean": 0.024433841266600618,
+   "mse_logm2_mean": 0.30592876996454543
   },
   "runs/catalog_v4_long/v4_het_default25_seed2_w8_x1": {
    "sigma": 5.427057323464978,
@@ -35,10 +39,12 @@
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_v4_long/v4_het_default25_seed2_w8_x1/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "n_one_loop_left_out": 92,
-   "mse_logm2_gmean": 0.09773848602976222,
-   "mse_logm2_mean": 0.8900104984812329
+   "n_processes": 1089,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
+   "mse_logm2_gmean": 0.08928069894681832,
+   "mse_logm2_mean": 0.869891644951621
   },
   "runs/catalog_v4_long/v4_het_default25_w16_x1": {
    "sigma": 5.427062276041371,
@@ -48,10 +54,12 @@
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_v4_long/v4_het_default25_w16_x1/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "n_one_loop_left_out": 92,
-   "mse_logm2_gmean": 0.052246454156626834,
-   "mse_logm2_mean": 0.5528796397962782
+   "n_processes": 1089,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
+   "mse_logm2_gmean": 0.04756046011848182,
+   "mse_logm2_mean": 0.5412137871483688
   },
   "runs/catalog_v4_long/v4_het_default25_w32_x1": {
    "sigma": 5.427062276041371,
@@ -61,10 +69,12 @@
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_v4_long/v4_het_default25_w32_x1/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "n_one_loop_left_out": 92,
-   "mse_logm2_gmean": 0.028975812559171282,
-   "mse_logm2_mean": 0.35652172338155075
+   "n_processes": 1089,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
+   "mse_logm2_gmean": 0.026212220450987055,
+   "mse_logm2_mean": 0.34984240393595706
   },
   "runs/catalog_v4_long/v4_het_default25_w8_x1": {
    "sigma": 5.427062276041371,
@@ -74,10 +84,12 @@
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/catalog_v4_long/v4_het_default25_w8_x1/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "n_one_loop_left_out": 92,
-   "mse_logm2_gmean": 0.09407268370829143,
-   "mse_logm2_mean": 0.5286884826551969
+   "n_processes": 1089,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
+   "mse_logm2_gmean": 0.08572431292368558,
+   "mse_logm2_mean": 0.5178162074493442
   },
   "runs/cov_v4_long_hpo8_cc_17056/trial_0331": {
    "sigma": 5.427062276041371,
@@ -147,10 +159,12 @@
    "gpu": "Tesla V100-PCIE-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/cov_v4_long_hpo8_cc_17056/trial_1262/models/model_run0_best.pt",
    "restarted": false,
-   "n_processes": 1061,
-   "mse_logm2_gmean": 0.02075020846598959,
-   "mse_logm2_mean": 0.6022615617157222,
-   "n_one_loop_left_out": 92,
+   "n_processes": 1089,
+   "mse_logm2_gmean": 0.018704730669139264,
+   "mse_logm2_mean": 0.5892713608269385,
+   "n_one_loop_in": 28,
+   "n_signed_left_out": 64,
+   "n_nonfinite": 0,
    "mse_from_eval_run": "FA-ccin2p3-6f8a1eed"
   },
   "runs/cov_v4_long_hpo8_cc_17056/trial_1333_r2": {
@@ -172,6 +186,42 @@
    "n_main_blocks": 1,
    "gpu": "Tesla V100-SXM2-32GB",
    "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/cov_v4_long_hpo8_cc_17056/trial_1860_r2/models/model_run0_best.pt",
+   "restarted": true,
+   "n_processes": 0,
+   "mse_logm2_gmean": null,
+   "mse_logm2_mean": null
+  },
+  "runs/cov_v4_long_hpo8_cc_68224/trial_0353_r2": {
+   "sigma": 5.427062276041371,
+   "iterations": 68224,
+   "train_hours": 18.9943,
+   "n_main_blocks": 1,
+   "gpu": "Tesla V100-PCIE-32GB",
+   "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/cov_v4_long_hpo8_cc_68224/trial_0353_r2/models/model_run0_best.pt",
+   "restarted": true,
+   "n_processes": 0,
+   "mse_logm2_gmean": null,
+   "mse_logm2_mean": null
+  },
+  "runs/cov_v4_long_hpo8_cc_68224/trial_1333_r2": {
+   "sigma": 5.427062276041371,
+   "iterations": 68224,
+   "train_hours": 19.0385,
+   "n_main_blocks": 1,
+   "gpu": "Tesla V100-PCIE-32GB",
+   "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/cov_v4_long_hpo8_cc_68224/trial_1333_r2/models/model_run0_best.pt",
+   "restarted": true,
+   "n_processes": 0,
+   "mse_logm2_gmean": null,
+   "mse_logm2_mean": null
+  },
+  "runs/cov_v4_long_hpo8_cc_68224/trial_1860_r2": {
+   "sigma": 5.427062276041371,
+   "iterations": 68224,
+   "train_hours": 17.6142,
+   "n_main_blocks": 1,
+   "gpu": "Tesla V100-SXM2-32GB",
+   "best_loaded": "/sps/lpnhe/jiturrizaramirez01/Foundational_Amplitudes/runs/cov_v4_long_hpo8_cc_68224/trial_1860_r2/models/model_run0_best.pt",
    "restarted": true,
    "n_processes": 0,
    "mse_logm2_gmean": null,

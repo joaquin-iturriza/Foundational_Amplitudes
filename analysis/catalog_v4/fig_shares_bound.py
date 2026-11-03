@@ -17,6 +17,11 @@ mean, class median; the control's own seeds read the same way); b: the absolute 
 of the class's geometric mean over its probes); c and d: the same on the held-out pool by axis (default-sampled).
 
     python3 analysis/catalog_v4/fig_shares_bound.py arms  ->  analysis/catalog_v4/figs/arms_zero_shot_{a,b,c,d}.{png,pdf}
+
+With `merged` (the deck): one panel, the MSE-trained arms (share 1 on pp, 0.50, 0.25) and the het-trained shares (0.50,
+0.25), each R against the control trained with its own loss, on four disjoint-labelled rows.
+
+    python3 analysis/catalog_v4/fig_shares_bound.py merged  ->  analysis/catalog_v4/figs/shares_deck.{png,pdf}
 """
 import json
 import os
@@ -66,8 +71,9 @@ def panel(ax, arms_res, present, reads=READS, arms=ARMS, lines=((1.0, "--", r"$R
 
 
 # the arms figure: reads, held-out axes in words, arms (label without its epochs, colour, marker)
-ARM_READS = [("pp 13 TeV, trained processes", "PP4_trained"), (r"$e^+e^-$, trained processes", "EE4_trained"), ("held out, default-sampled", "held_default"),
-             ("held out, catalog-sampled", "held"), ("held out, one-loop", "held_default/H5")]
+ARM_READS = [("pp, processes in training", "PP4_trained"), (r"$e^+e^-$, processes in training", "EE4_trained"),
+             ("not in training, default sampling", "held_default"), ("not in training, catalog sampling", "held"),
+             ("one loop, not in training", "held_default/H5")]
 ARM_AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ families"), ("H2p5", r"$2\to5$"),
             ("H3", "physical top"), ("H6", r"$\alpha_s=0.13$"), ("H7E", r"$\sqrt{\hat s}$ 6 to 20 TeV"),
             ("H7c", r"$p_T\geq30$ GeV"), ("H5", "one loop")]
@@ -156,6 +162,46 @@ def arms_figure():
         ps.save(fig, os.path.join(HERE, "figs", name))
 
 
+
+# the deck's one figure of the share study (Joaquin 2026-11-03): MSE-trained and het-trained arms together, each against
+# the control trained with its own loss; rows and arm names as on the zero-shot figure (ARM_READS, ARM_ARMS)
+SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
+               (r"$e^+e^-$, processes in training", ("EE4", "trained")),
+               ("not in training, default sampling", ("held_default", "pooled")),
+               ("one loop, not in training", ("held_default", "H5"))]
+SHARE_ARMS = [("mse", "bound", r"share 1 on pp, width 8, $10^4$ events per process, MSE loss", ps.C.vermillion, "s"),
+              ("mse", "default50", r"share 0.50, width 8, $10^4$ events per process, MSE loss", ps.C.orange, "o"),
+              ("mse", "default25", r"share 0.25, width 8, $10^4$ events per process, MSE loss", ps.C.sky, "D"),
+              ("het", "default50", r"share 0.50, width 8, $10^4$ events per process, het. loss", ps.C.green, "o"),
+              ("het", "default25", r"share 0.25, width 8, $10^4$ events per process, het. loss", ps.C.grey, "v")]
+
+
+def merged_figure():
+    res = {"mse": json.load(open(os.path.join(DATA, "bound_default.json")))["arms"],
+           "het": json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]}
+    fig, ax = ps.figure()
+    n = len(SHARE_READS)
+    off = {i: (i - (len(SHARE_ARMS) - 1) / 2) * 0.15 for i in range(len(SHARE_ARMS))}
+    for j, (lab, (r, part)) in enumerate(SHARE_READS):
+        for i, (loss, a, label, col, mk) in enumerate(SHARE_ARMS):
+            d = res[loss][a][r][part]
+            lo, hi = d["widened"]
+            ax.errorbar([d["R"]], [n - 1 - j + off[i]], xerr=[[d["R"] - lo], [hi - d["R"]]], color=col, marker=mk,
+                        linestyle="none", label=label if j == 0 else None)
+    ax.axvline(1.0, color="k", linestyle="--", label=r"control: share 0, width 8, $10^4$ events per process, same loss")
+    ticks = (0.2, 0.5, 1.0, 2.0)
+    ax.set_xscale("log")
+    ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
+    ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.set_yticks(range(n))
+    ax.set_yticklabels([lab for lab, _ in SHARE_READS][::-1])
+    ax.set_ylim(-0.6, n - 0.4)
+    ax.set_xlabel(r"$R$ = MSE(arm) / MSE(control)")
+    ps.shared_legend(fig, ax, ncol=1)
+    ps.save(fig, os.path.join(HERE, "figs", "shares_deck"))
+
+
 def main():
     mse = json.load(open(os.path.join(DATA, "bound_default.json")))["arms"]
     het = json.load(open(os.path.join(DATA, "mixture_ab_het.json")))["shares"]
@@ -170,4 +216,4 @@ def main():
     ps.save_panels([(fa, a), (fb, b)], os.path.join(HERE, "figs", "shares_bound"))
 
 if __name__ == "__main__":
-    arms_figure() if sys.argv[1:] == ["arms"] else main()
+    {"arms": arms_figure, "merged": merged_figure}.get((sys.argv[1:] or ["main"])[0], main)()
