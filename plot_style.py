@@ -1135,6 +1135,18 @@ def _warn_if_squeezed(fig, base: str) -> None:
             if wide:
                 raise LegendOverflow(f"{name}: legend is wider than its plot box -- use ps.legend(), which "
                                      f"drops its font and then its columns, or shorten the labels")
+        # A figure-level legend (ps.shared_legend) must lie fully inside the saved canvas; a strip wider
+        # than its plot box is fine as long as the canvas grew to hold it.
+        fwp, fhp = fig.get_size_inches() * fig.dpi
+        for lg in fig.legends:
+            e = lg.get_window_extent(rend)
+            # layout() grows the canvas to hold the strip, so it is inside by construction; what
+            # still clips is a strip wider than the printable page (MAX_FIG_IN), cut off in the paper.
+            if (e.x0 < -1 or e.y0 < -1 or e.x1 > fwp + 1 or e.y1 > fhp + 1
+                    or e.width / fig.dpi > MAX_FIG_IN + 0.01):
+                raise LegendOverflow(f"{name}: figure legend runs off the canvas "
+                                     f"({e.x0 / fig.dpi:.2f}..{e.x1 / fig.dpi:.2f}in of {fwp / fig.dpi:.2f}in) "
+                                     f"-- shorten the labels or use fewer columns")
     except LegendOverflow:
         raise
     except Exception as exc:
