@@ -8159,7 +8159,7 @@ entries:
       - 'not yet: stays open'
   owner:
     agent: a259ac3549ec2f32b
-    state: working
+    state: closed
     since: '2026-11-02T19:40:10+00:00'
     state_at: '2026-11-03T01:38:17.345000+00:00'
     context: 297068
@@ -9110,28 +9110,35 @@ entries:
       (repo-reviewer PASS; design passed 2026-11-03T01:34); to check in its log: ''opening the cache'' (not ''built''), ''data_stats.json
       and particle_tokenizer.json equal the trial''s'', no ''mu row kept'' line.'
   handoff:
-    state: 'Width cells (step 33) done and read: at 4264 steps width 32 > 16 > 8 on every tree read (PP4 R w32/w8 0.370, held
-      default 0.528; one-loop not separated), all six best at their last validation. Per-arm zero-shot figure against the
-      het control made (figs/arms_zero_shot_a/b via fig_shares_bound.py arms @cdc6cd73). Length sweeps on CC: cov_v4_long_hpo8_cc_17056
-      wave 1 finished (best NLL hp0353 -3.711, hp1333 -3.638, hp1860 -2.944), wave 2 running; cov_v4_long_hpo8_cc_68224 wave
-      1 at ~26k/68224 steps. Sweeps have no zero-shot reads yet (each best trial gets an eval REREAD per the design when the
-      sweep ends). Open finding: the whole-set width-8 1x arm reads worse than the 1e4/process arm (pp R 0.583 vs 0.450 against
-      the het control); data size and the in-memory/memmap path changed together, not separated. CACHE FREEZE still on: data_mmap.py
-      and every module its _code_hash reads are not edited until both sweeps end (keys 746f01a3 seed 42, 85be0204 seed 43).'
-    decisions: 'D242 approves both sweeps (~195 GPU-h); D244/D245 8 trials waves 3,3,2; D246 gp surrogate 2000 candidates;
-      D247 any GPU >= 24 GB; D248 released the 1x width runs (done). Joaquin 2026-11-02: figures name arms in words, legends
-      never clip or cover data (plot_style now refuses a too-wide legend).'
-    ruled_out: 'lxplus and Jean Zay for these jobs (lxplus no slots; Jean Zay site run times out, site status answers); blocking
-      or polling flock on /sps (ENOLCK); size_figs.py length/compute figures as shown (Joaquin: incomprehensible, not what
-      he asked; codes and multiples of c in legends)'
-    running: 'CC-IN2P3: sweep cov_v4_long_hpo8_cc_17056 (jobs 62936972-79, wave 2 trials 0003-0005 running, wave 3 0006-0007
-      pending afterany); sweep cov_v4_long_hpo8_cc_68224 (62936980-87, wave 1 trials 0000-0002 running at ~26k steps, est.
-      end of all ~21:00 2026-11-04)'
-    files: analysis/catalog_v4/mixture_ab.py (width, arms), analysis/catalog_v4/fig_shares_bound.py (arms), analysis/catalog_v4/size_figs.py
-      (pull of trial curves; its figures superseded), analysis/common/readers.py (run_metrics fix 44a02702), plot_style.py
-      (LegendOverflow) + tests/test_plot_style_legend.py, analysis/catalog_v4/data/width_x1.json, arms_vs_het_control.json,
-      size_curves.json
-    written: '2026-11-02T18:46:45+00:00'
+    state: 'Presentation figures redone @16957b58 (fig_shares_bound.py arms -> figs/arms_zero_shot_a-d: per-seed points, no
+      bars, absolute MSE beside R, epochs in labels; size_figs.py figs -> width_x1_loss, length_w8_curves, loss_vs_compute;
+      width_x1_ratio and loss_vs_compute_preliminary dropped). Epochs: control and 1e4/process arm 6.07, whole-set 4264-step
+      runs 0.64, 17056 trials 2.54, 68224 trials 10.2 (mixture_ab.py epochs -> data/epochs.json). 4x sweep cov_v4_long_hpo8_cc_17056
+      finished 8/8 (size_figs.py best @b629bd68 -> data/long_sweeps_best.json): best hp1262 val NLL -3.824 at lr 7.82e-3,
+      NOT CONVERGED (lr log position 0.9955 of [8.78e-4,7.90e-3], 4 of top 5 in the outer 0.2, every trial best at its last
+      validation). Its best-trial zero-shot read FA-ccin2p3-6f8a1eed (job 62943062, gpu_v100, limit 2:30, target 1.6 h) runs
+      the new arm v4_het_long_best (scripts/job_catalog_v3_short.sh @b629bd68, repo-reviewer PASS; design passed 2026-11-03T01:34).
+      When it ends, check its log: (1) ''opening the cache'' and not ''built the cache'' (cache key 746f01a3 expected; a miss
+      builds ~23 GB on /sps, 113 GB free at submit); (2) ''LONG_BEST data_stats.json and particle_tokenizer.json equal the
+      trial''s''; (3) no ''Fine-tuning ... from a ... parent ... mu row kept'' line. Then extract its reads (mixture_ab.py
+      extract <run> <log> <axis> for H1..H7c PP4 EE4 HD4 HD5), add it as an arm to mixture_ab.py arms (ARMS_VS_CONTROL, ARMS_HD,
+      epochs.json entry 2.54) and to the arms figure, and the 4x/1x-w8 ratio as information (''length and tuning together'').
+      16x sweep cov_v4_long_hpo8_cc_68224: 0/8 done, wave 1 at steps ~50-55k of 68224 at 02:00, waves 2-3 pending; its best
+      gets the same read (arm v4_het_long_best, LONG_BEST=cov_v4_long_hpo8_cc_68224/<trial>, REREAD not possible: record a
+      design citing 2026-11-03T01:34). E3570, E3571 acked.'
+    decisions: 'Joaquin via the main session: seeds as own points with no bootstrap bars (answers the 2026-11-02T19:25 question;
+      not closed in the plan for lack of his exact words), absolute MSE beside ratios (D253), lr as values and plain names,
+      legends clear of data. Design reviewer: the tuned 4x against the untuned 1x cell is length and tuning together, information
+      only; the length verdict stays 16x best over 4x best. Best-trial reads on the trial''s GPU type (V100).'
+    ruled_out: 'Running the sigma stage by itself from the trial dir (would freeze parent stats into the memmap key and build
+      a second 20 GB cache; and without config.yaml the warm start zeroes the trained sigma row); REREAD for sweep trials
+      (they are not registry runs: design_guard needs a recorded design).'
+    running: FA-ccin2p3-6f8a1eed (ccin2p3 job 62943062, 17056 best-trial read, waited on step 32); sweep ccin2p3:cov_v4_long_hpo8_cc_68224
+      (jobs 62936980-87; 3 running, 5 pending)
+    files: analysis/catalog_v4/fig_shares_bound.py, analysis/catalog_v4/size_figs.py (pull/best/figs), analysis/catalog_v4/mixture_ab.py
+      (arms seeds, epochs), scripts/job_catalog_v3_short.sh (v4_het_long_best), tools/short_wall.py (--eval-stage) + tests/test_short_wall.py,
+      analysis/catalog_v4/data/{arms_vs_het_control,epochs,size_curves,long_sweeps_best,width_x1}.json
+    written: '2026-11-03T01:38:34+00:00'
   ask: 'The zero-shot error bars are a class bootstrap padded by one control seed ratio, not a seed uncertainty (width 16
     pp: bar [0.522, 0.614], seeds alone 0.643 and 0.490). For the presentation: redraw with each seed as its own point and
     no bars, or add a third seed per arm for a real seed spread?'
