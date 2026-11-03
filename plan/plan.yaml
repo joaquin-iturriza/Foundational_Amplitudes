@@ -4895,6 +4895,13 @@ entries:
     at: '2026-11-02T19:25:33+00:00'
     searched: 'CLAUDE.md, site decisions --project FA: none sets how seed spread is shown with two seeds'
     blocks: the redraw of arms_zero_shot_a/b
+    blocks_steps: []
+  - ask: 19 pending Jean Zay jobs of ours on gpu_p5 (717020-717808, trial_0004/5/7/8/9, submitted 10-06 to 10-10, never ran),
+      most likely trials of the 32k-horizon or equal-D sweeps held by D12/D13 (inferred from dates; site run on Jean Zay times
+      out so their folders are unread). Keep them queued under the holds, or cancel them?
+    at: '2026-11-03T01:43:16+00:00'
+    searched: site decisions --project FA (D12, D13 holds, no release), site items (horizon32k, eqd held)
+    blocks: Jean Zay queue cleanup (step 34)
     blocks_steps: &id001 []
   designs:
   - at: '2026-10-29T05:15:16+00:00'
@@ -9150,12 +9157,12 @@ entries:
       (arms seeds, epochs), scripts/job_catalog_v3_short.sh (v4_het_long_best), tools/short_wall.py (--eval-stage) + tests/test_short_wall.py,
       analysis/catalog_v4/data/{arms_vs_het_control,epochs,size_curves,long_sweeps_best,width_x1}.json
     written: '2026-11-03T01:38:34+00:00'
-  ask: 'The zero-shot error bars are a class bootstrap padded by one control seed ratio, not a seed uncertainty (width 16
-    pp: bar [0.522, 0.614], seeds alone 0.643 and 0.490). For the presentation: redraw with each seed as its own point and
-    no bars, or add a third seed per arm for a real seed spread?'
-  waiting_since: '2026-11-02T19:25:33+00:00'
-  searched: 'CLAUDE.md, site decisions --project FA: none sets how seed spread is shown with two seeds'
-  blocks: the redraw of arms_zero_shot_a/b
+  ask: 19 pending Jean Zay jobs of ours on gpu_p5 (717020-717808, trial_0004/5/7/8/9, submitted 10-06 to 10-10, never ran),
+    most likely trials of the 32k-horizon or equal-D sweeps held by D12/D13 (inferred from dates; site run on Jean Zay times
+    out so their folders are unread). Keep them queued under the holds, or cancel them?
+  waiting_since: '2026-11-03T01:43:16+00:00'
+  searched: site decisions --project FA (D12, D13 holds, no release), site items (horizon32k, eqd held)
+  blocks: Jean Zay queue cleanup (step 34)
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
