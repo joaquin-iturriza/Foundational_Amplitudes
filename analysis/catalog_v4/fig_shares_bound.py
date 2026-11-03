@@ -171,16 +171,16 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-# one colour per share fraction for both losses (none of the deck's width or 4x-run colours: blue, green, vermillion,
+# one colour per share fraction for both losses (share 0.25 vermillion by decision; the other colours are
 # purple), the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
 # row for each loss, its bar the arms' bar applied to the control's two seeds against their geometric mean: every
 # class ratio is 1, so the class bootstrap is [1, 1] and the bar is the widening alone, [exp(-|ln R_seed|),
 # exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the "R_seed" of the data files)
 SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.orange, "s", "none"),
               ("mse", "default50", r"share 0.50, MSE loss", ps.C.sky, "o", "none"),
-              ("mse", "default25", r"share 0.25, MSE loss", ps.C.grey, "D", "none"),
+              ("mse", "default25", r"share 0.25, MSE loss", ps.C.vermillion, "D", "none"),
               ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
-              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "D", None)]
+              ("het", "default25", r"share 0.25, het. loss", ps.C.vermillion, "D", None)]
 CONTROLS = [("mse", "bound", "control: share 0, MSE loss", "none"), ("het", "default25", "control: share 0, het. loss", None)]
 
 
