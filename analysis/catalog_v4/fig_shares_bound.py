@@ -171,19 +171,17 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-# colour = loss (Joaquin 2026-11-03; none of the deck's width or 4x-run colours: blue, green, vermillion, purple): het.
-# orange, MSE sky; all markers filled, the share fraction told apart by marker shape; each loss's control in its colour
-# with its own shape (star for het., X for MSE) at R = 1 on each row, its bar the arms' bar applied to the control's two
-# seeds against their geometric mean: every class ratio is 1, so the class bootstrap is [1, 1] and the bar is the
-# widening alone, [exp(-|ln R_seed|), exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the
-# "R_seed" of the data files)
-LOSS_COL = {"mse": ps.C.sky, "het": ps.C.orange}
-SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", "s"),
-              ("mse", "default50", r"share 0.50, MSE loss", "o"),
-              ("mse", "default25", r"share 0.25, MSE loss", "D"),
-              ("het", "default50", r"share 0.50, het. loss", "o"),
-              ("het", "default25", r"share 0.25, het. loss", "D")]
-CONTROLS = [("mse", "bound", "control (share 0), MSE loss", "X"), ("het", "default25", "control (share 0), het. loss", "*")]
+# one colour per share fraction for both losses (none of the deck's width or 4x-run colours: blue, green, vermillion,
+# purple), the loss told apart by the marker fill (open MSE, filled het.); the control a black square at R = 1 on each
+# row for each loss, its bar the arms' bar applied to the control's two seeds against their geometric mean: every
+# class ratio is 1, so the class bootstrap is [1, 1] and the bar is the widening alone, [exp(-|ln R_seed|),
+# exp(|ln R_seed|)], R_seed the control's seed 43 over seed 42 class median (the "R_seed" of the data files)
+SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.orange, "s", "none"),
+              ("mse", "default50", r"share 0.50, MSE loss", ps.C.sky, "o", "none"),
+              ("mse", "default25", r"share 0.25, MSE loss", ps.C.grey, "D", "none"),
+              ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
+              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "D", None)]
+CONTROLS = [("mse", "bound", "control: share 0, MSE loss", "none"), ("het", "default25", "control: share 0, het. loss", None)]
 
 
 def merged_figure():
@@ -194,15 +192,15 @@ def merged_figure():
     k = len(SHARE_ARMS) + len(CONTROLS)
     off = [(i - (k - 1) / 2) * 0.13 for i in range(k)]
     for j, (lab, (r, part)) in enumerate(SHARE_READS):
-        for c, (loss, a, label, mk) in enumerate(CONTROLS):
+        for c, (loss, a, label, mfc) in enumerate(CONTROLS):
             w = abs(math.log(res[loss][a][r][part]["R_seed"]))
-            ax.errorbar([1.0], [n - 1 - j + off[c]], xerr=[[1 - math.exp(-w)], [math.exp(w) - 1]], color=LOSS_COL[loss],
-                        marker=mk, markersize=9, linestyle="none", label=label if j == 0 else None)
-        for i, (loss, a, label, mk) in enumerate(SHARE_ARMS):
+            ax.errorbar([1.0], [n - 1 - j + off[c]], xerr=[[1 - math.exp(-w)], [math.exp(w) - 1]], color="k",
+                        marker="s", linestyle="none", mfc=mfc or "k", label=label if j == 0 else None)
+        for i, (loss, a, label, col, mk, mfc) in enumerate(SHARE_ARMS):
             d = res[loss][a][r][part]
             lo, hi = d["widened"]
             ax.errorbar([d["R"]], [n - 1 - j + off[i + len(CONTROLS)]], xerr=[[d["R"] - lo], [hi - d["R"]]],
-                        color=LOSS_COL[loss], marker=mk, linestyle="none", label=label if j == 0 else None)
+                        color=col, marker=mk, linestyle="none", mfc=mfc or col, label=label if j == 0 else None)
     ticks = (0.2, 0.5, 1.0, 2.0)
     ax.set_xscale("log")
     ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
