@@ -7688,6 +7688,46 @@ entries:
       D253 absolute MSE both in the measure), 8, 9 (HETEROSC asserted in the arm''s code), 10 (PP4/EE4/default-sampled held-out
       as the 1x cells, D227), 11 (emission-scales target, D234), 13 (no sweep), 14 (cache key the trial''s 746f01a3 via its
       own config, no hashed module changed deb290bc..b629bd68; 23 GB on a miss against 113 GB free, read again at submission).'
+  - at: '2026-11-03T01:34:19+00:00'
+    question: 'Step 16 read of the 17056-step (4x) sweep''s best trial: its zero-shot errors on every read, against the het
+      control and beside the 1x width cells. The step-16 design (passed 2026-11-01T17:29) names this read: ''Each sweep''s
+      best trial (seed 42) is read like the other cells by an eval job (sigma-only stage plus every axis, REREAD=<trial run>)'';
+      the trial is a sweep_manager trial, not a registry run, so REREAD cannot name it and the read is recorded here. One
+      eval job: scripts/job_catalog_v3_short.sh arm v4_het_long_best, LONG_BEST=cov_v4_long_hpo8_cc_17056/trial_1262, mode
+      eval, @b629bd68 (repo-reviewer PASS), on gpu_v100 (the trial''s GPU type, as step 16 says).'
+    prior: 'Searched results.tex, the plan and site decisions (cov_v4_long, hpo8, 17056, best trial, REREAD): no read of any
+      long-run sweep trial exists. Sweep cov_v4_long_hpo8_cc_17056 finished 8/8 (size_figs.py best @b629bd68 -> data/long_sweeps_best.json):
+      best hp1262 val NLL -3.824 (lr 7.82e-3, log position 0.9955 in [8.78e-4, 7.90e-3], best at the last validation), next
+      hp0353 -3.711, hp0753 -3.639, hp1333 -3.638; NOT CONVERGED by the design''s rule (best lr at the window edge, 4 of the
+      top 5 lr in the outer 0.2, 5 of 5 best at their last validation). Earlier arms read the same way: data/arms_vs_het_control.json
+      (1x width 8/16/32 pp R 0.583/0.310/0.177 against the het control; width 32 absolute pp MSE 0.117/0.112).'
+    measure: 'The step-16 measure: per probe the MSE of log|M|^2 (tools/zero_shot_parent.py mse_logm2_real) at the best checkpoint,
+      read from the sigma stage (mu frozen); per class geometric mean, median over classes, on PP4 (1301 classes), EE4 (169),
+      the 700 default-sampled held-out classes pooled and per axis, the catalog-sampled H1-H7c pooled, HD5 one-loop; R against
+      the het control''s two-seed geometric mean and the absolute MSE (mixture_ab.py arms, the per-seed points). Information
+      only, with its caveat: R of the tuned 4x best over the 1x width-8 seed-42 cell at its untuned base HPs (length and tuning
+      together).'
+    check: 'The reads respond to model quality on existing data: width 32 over width 8 at 1x pp R 0.370 [0.334,0.413], held
+      default 0.528, width 16 pp 0.565, against a width-8 seed ratio of 1.016-1.056 (width_x1.json); share 0.25 at 1e4 over
+      the control pp 0.450 (arms_vs_het_control.json).'
+    fixed: Everything of the trial (share 0.25, emission-scales target, HETEROSC, MuonAdamW at the trial's HPs, batch 16384,
+      width 8, whole training set, memmap, seed 42, 17056 steps); the sigma-only stage of the 1x cells (run.py sigma_stage_cfg,
+      250 steps, lr 1e-2, 25 validations), on the trial's own data load (its config, so the trial's memmap cache key; data_stats
+      and tokenizer checked equal to the trial's); the axes and recipes of the 1x width cells (H1 H2 H2p5 H3 H5 H6 H7E H7c
+      PP4 EE4 HD4 HD5); CC-IN2P3 gpu_v100, the trial's GPU type.
+    control: 'The het control pair (share 0, width 8, 1e4 per process, 87ea24d0/321a3de2) as every arm. Beside it, information
+      only: the 1x width-8 seed-42 cell 804a65bc (same data and width, 4264 steps, the base config''s HPs from the catalog_v3
+      Muon search, never swept here). The length verdict''s control is the 4x best for the 16x best (step 16), read the same
+      way when that sweep ends.'
+    seeds: 'Seed 42 only (one best trial per length, the step-16 design: no seed-43 twin); the control''s own seed spread
+      (0.92/1.08 on pp) stated beside; best-of-8 selection noted.'
+    outcome: 'No verdict from this read alone: the length verdict stays the 16x best over the 4x best (step 16). Reported:
+      the 4x best''s R and absolute MSE per read against the control, beside the arms; the 4x/1x ratio labelled ''the tuned
+      4x against the 1x cell at untuned base HPs: length and tuning together'', neither branch read as length paying or not;
+      the 4x best flagged NOT CONVERGED (lr at the window''s top edge, best at its last validation). Cost: one job, about
+      1.6 h of work, limit 2.5 h (tools/short_wall.py --eval --eval-stage --het: 2.42 h with its 1.25 margin and a 17-min
+      cache build if the key misses), 2.5 GPU-h; disk: none on a cache hit, one ~23 GB cache on a miss (free disk read again
+      at submission).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
