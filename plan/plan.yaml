@@ -9129,6 +9129,21 @@ entries:
   - at: '2026-11-03T01:42:59+00:00'
     text: '2026-11-03 step 34 addendum: the site run squeue read ended ''Timeout, server jean-zay.idris.fr not responding''
       (exit 255) again, while site status jeanzay answers; sweep dirs of the 19 pending jobs still not read. Nothing cancelled.'
+  - at: '2026-11-03T03:01:46+00:00'
+    text: '2026-11-03 (E3574), step 32''s 4x best-trial read done: FA-ccin2p3-6f8a1eed (eval of cov_v4_long_hpo8_cc_17056
+      trial_1262, hp1262, lr 7.82e-3, seed 42, 17056 steps = 2.54 epochs, width 8, whole set, share 0.25, het; scripts/job_catalog_v3_short.sh
+      arm v4_het_long_best @b629bd68) COMPLETED. Log checks: ''opening the cache .../746f01a3cff290e21aad8172'' (no build),
+      ''LONG_BEST data_stats.json and particle_tokenizer.json equal the trial''s'', no ''mu row kept''; sigma stage starts
+      at val_loss_no_reg -3.8238 = the trial''s best. Reads: all 12 axes, 0 excluded (PP4 1301, EE4 169, H1-H7c 701, HD4 114,
+      HD5 28). Tool: mixture_ab.py arms @bc64745c (new one-seed arm long4x_best) -> data/arms_vs_het_control.json; figure
+      fig_shares_bound.py arms -> figs/arms_zero_shot_a-d. Against the het control''s two-seed geometric mean (R, absolute
+      MSE of log|M|^2, class medians): pp 0.086 (MSE 0.048; control seeds 0.92/1.08, MSE 0.42/0.55), e+e- 0.055 (0.114), held
+      out default-sampled 0.186 (0.265), catalog-sampled 0.365 (0.301), one-loop HD5 0.774 (10.1; control 11.6/17.4). Against
+      the 1x width cells'' seed 42 on the same probes (length and tuning together, information only): over w8 (804a65bc, untuned
+      base HPs) pp 0.185, e+e- 0.218, held default 0.233, catalog 0.327, one-loop 0.923; over w32 (e26059bf) pp 0.520, e+e-
+      0.562, held default 0.505, catalog 0.597, one-loop 0.935. Held default by axis, R vs control: H1 0.081, H2 0.086, H2p5
+      0.362, H3 0.404, H6 0.031, H7E 0.090, H7c 0.060, H5 0.774. Caveats: one seed, best of 8 tuned trials, NOT CONVERGED
+      (lr at the window top). Blow-up check on the trial curve (size_curves.json): none.'
   handoff:
     state: 'Presentation figures redone @16957b58 (fig_shares_bound.py arms -> figs/arms_zero_shot_a-d: per-seed points, no
       bars, absolute MSE beside R, epochs in labels; size_figs.py figs -> width_x1_loss, length_w8_curves, loss_vs_compute;
