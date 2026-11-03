@@ -9099,6 +9099,16 @@ entries:
       the pull (~21:00): 17056 wave 2 trials 0753/0849/1262 at steps 13640-13981, lr 7.33e-3/7.57e-3/7.82e-3 (all within 1.1x
       of the window top 7.90e-3), best so far -3.42/-3.40/-3.39; 68224 trials at steps 30008-32736, best so far hp1333 (lr
       2.03e-3) -3.250, hp0353 (2.88e-3) -3.047, hp1860 (5.39e-4) -2.780.'
+  - at: '2026-11-03T01:37:46+00:00'
+    text: '2026-11-03 02:2x: 4x sweep cov_v4_long_hpo8_cc_17056 finished 8/8 (size_figs.py best @b629bd68 -> data/long_sweeps_best.json;
+      objective = main run''s best val_loss_no_reg, het NLL): hp1262 -3.824 (lr 7.82e-3), hp0353 -3.711 (6.17e-3), hp0753
+      -3.639 (7.33e-3), hp1333 -3.638 (4.34e-3), hp0849 -3.607 (7.57e-3), hp1176 -3.222 (1.58e-3), hp0331 -3.052 (1.51e-3),
+      hp1860 -2.944 (1.16e-3); every trial best at its last validation (step 17050); best lr at log position 0.9955 of [8.78e-4,
+      7.90e-3]; 4 of the top 5 in the outer 0.2 (sampler''s check_and_extend_ranges defaults): NOT CONVERGED (lr window too
+      low; the sampler''s range extension acts only after 10 observations, never reached at 8 trials). Best-trial read FA-ccin2p3-6f8a1eed
+      (job 62943062, gpu_v100, 2:30 limit, target 1.6 h): new arm v4_het_long_best of scripts/job_catalog_v3_short.sh @b629bd68
+      (repo-reviewer PASS; design passed 2026-11-03T01:34); to check in its log: ''opening the cache'' (not ''built''), ''data_stats.json
+      and particle_tokenizer.json equal the trial''s'', no ''mu row kept'' line.'
   handoff:
     state: 'Width cells (step 33) done and read: at 4264 steps width 32 > 16 > 8 on every tree read (PP4 R w32/w8 0.370, held
       default 0.528; one-loop not separated), all six best at their last validation. Per-arm zero-shot figure against the
