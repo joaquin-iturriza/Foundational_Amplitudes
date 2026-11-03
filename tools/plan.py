@@ -1443,6 +1443,9 @@ def owner_brief(e, add=None):
     if open_question(e):
         oq = '  asked %s: "%s"; waits on it: %s' % ((e.get("waiting_since") or "")[:16], e["ask"], e.get("blocks") or
                                                      "only what the question decides")
+        oq = ("WAITING ON JOAQUIN, do not do:\n  question: %s\n  blocks: %s\n" % (
+            e["ask"], e.get("holds_all") and "the whole entry (%s)" % e["holds_all"] or e.get("blocks") or
+            "only what the question decides")) + oq
     return tpl.format(id=e["id"], title=e.get("title"), question=e.get("question"),
                       objective=e.get("objective") or e.get("question"), mechanism=e.get("mechanism") or "not recorded",
                       expected=e.get("expected") or "not recorded",
@@ -2324,6 +2327,9 @@ def cmd_ask(a):
             bsteps = sorted({int(x) for x in re.split(r"[,\s]+", a.blocks_steps.strip()) if x})
         except ValueError:
             sys.exit("plan: --blocks-steps takes step numbers, e.g. 1,6,7")
+    if (a.blocks or "").strip() and a.blocks.strip().lower().rstrip(".") != "nothing" and bsteps == []:
+        sys.exit("plan: --blocks %r names work the answer gates, but --blocks-steps none gates no step: pass the step "
+                 "numbers the answer gates (--blocks-steps N,N), or --blocks nothing if it blocks nothing" % a.blocks)
     if a.holds_all is not None and (a.blocks or bsteps or bsteps == []):
         sys.exit("plan: --blocks names the part that waits; --holds-all makes everything wait: pass one")
     if a.holds_all is not None and len(a.holds_all.strip()) < HOLDS_ALL_MIN:

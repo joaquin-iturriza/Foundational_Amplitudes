@@ -109,9 +109,14 @@ def test_ask_on_held_entry_and_no_step(tmp_path):
                                "--searched", "CLAUDE.md and site decisions FA: none on repairs during a hold",
                                "--blocks", "the wait_guard fix only", "--blocks-steps", "none"],
                        env=env, capture_output=True, text=True)
+    assert r.returncode != 0 and "step numbers the answer gates" in r.stderr, r.stderr
+    r = subprocess.run(plan + ["ask", "agent_redesign", "--ask", "Fix the wait_guard watch regex during the hold?",
+                               "--searched", "CLAUDE.md and site decisions FA: none on repairs during a hold",
+                               "--blocks", "nothing", "--blocks-steps", "none"],
+                       env=env, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
     e = next(x for x in yaml.safe_load(open(p))["entries"] if x["id"] == "agent_redesign")
-    assert e["status"] == "held" and e["blocks_steps"] == [] and e["asks"][-1]["blocks"] == "the wait_guard fix only"
+    assert e["status"] == "held" and e["blocks_steps"] == [] and e["asks"][-1]["blocks"] == "nothing"
     r = subprocess.run(plan + ["withdraw", "agent_redesign", "--decision", "D228", "--why",
                                "D228 approves setup fixes during the weekend hold"], env=env, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
@@ -124,8 +129,25 @@ def test_ask_on_held_entry_and_no_step(tmp_path):
     q = ["--ask", "Is the second figure needed for the memo at all?", "--searched", "docs/results.tex, CLAUDE.md and site decisions FA: none settles it"]
     r = subprocess.run(plan + ["ask", multi["id"]] + q, env=env, capture_output=True, text=True)
     assert r.returncode != 0 and "--blocks-steps none" in r.stderr, r.stderr
-    r = subprocess.run(plan + ["ask", multi["id"]] + q + ["--blocks", "the figure", "--blocks-steps", "none"],
+    r = subprocess.run(plan + ["ask", multi["id"]] + q + ["--blocks", "nothing", "--blocks-steps", "none"],
                        env=env, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr
     e = next(x for x in yaml.safe_load(open(p))["entries"] if x["id"] == multi["id"])
     assert e["status"] == "running" and e["blocks_steps"] == []
+
+
+def test_brief_lists_open_question(tmp_path):
+    """plan brief prints an open question and what it blocks under WAITING ON JOAQUIN, do not do:."""
+    env = world(tmp_path)
+    p = tmp_path / "plan" / "plan.yaml"
+    d = yaml.safe_load(open(p))
+    for e in d["entries"]:
+        if e["id"] == "catalog_coverage":
+            e.update(ask="Redraw the zero-shot arms on option A or B?", waiting_since="2026-11-03T10:00:00+00:00",
+                     searched="none", blocks="the redraw of arms_zero_shot_a/b", blocks_steps=[])
+    yaml.safe_dump(d, open(p, "w"))
+    r = subprocess.run([sys.executable, os.path.join(REPO, "tools", "plan.py"), "brief", "catalog_coverage"],
+                       env=env, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    assert "WAITING ON JOAQUIN, do not do:" in r.stdout
+    assert "Redraw the zero-shot arms on option A or B?" in r.stdout and "the redraw of arms_zero_shot_a/b" in r.stdout
