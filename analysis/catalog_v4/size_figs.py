@@ -347,16 +347,11 @@ def figs():
     WCOL = {8: (ps.C.blue, "o"), 16: (ps.C.green, "D"), 32: (ps.C.vermillion, "^")}
     b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
 
-    # 1: best val_loss_no_reg against width, one line per seed (42 solid, filled; 43 dashed, open), markers in the
-    # width's colour
+    # 1: best val_loss_no_reg against width, one line per seed
     fig, ax = ps.figure()
-    for i, (seed, ls, mfc) in enumerate(((42, "-", None), (43, "--", "none"))):
+    for i, (seed, c, mk) in enumerate(((42, ps.C.blue, "o"), (43, ps.C.vermillion, "s"))):
         ys = [w["best"][WIDTH_RUNS[k][i]]["val_loss_no_reg"] for k in (8, 16, 32)]
-        ax.plot([8, 16, 32], ys, color=ps.C.grey, ls=ls)
-        for k, y in zip((8, 16, 32), ys):
-            ax.plot([k], [y], ls="none", marker=WCOL[k][1], color=WCOL[k][0], **({"mfc": mfc} if mfc else {}))
-        ax.add_line(Line2D([], [], color=ps.C.grey, ls=ls, marker="o", label=f"seed {seed}",
-                           **({"mfc": mfc} if mfc else {})))
+        ax.plot([8, 16, 32], ys, marker=mk, color=c, label=f"seed {seed}")
         report[f"width seed {seed}"] = [round(y, 4) for y in ys]
     ax.set_xscale("log", base=2)
     ax.set_xticks([8, 16, 32], ["8", "16", "32"])
@@ -367,7 +362,7 @@ def figs():
     ps.save(fig, os.path.join(FIGS, "width_x1_loss"))
 
     # 2: validation curves at width 8 (seed 42): the 4264-step run, the 17056-step sweep's best trial (bold), its
-    # other trials (thin, light: emphasis only), every 68224-step trial (finished solid, running dashed)
+    # other trials (thin grey: emphasis only), every 68224-step trial (orange, finished solid, running dashed)
     t4 = [k for k in tr if tr[k]["steps"] == 17056]
     t16 = sorted((k for k in tr if tr[k]["steps"] == 68224), key=lambda k: tr[k]["lr"])
     best4 = f"17056_trial_{b17}"
@@ -395,14 +390,14 @@ def figs():
             draw(t["vals"], pre.format(ep=e4) + ", best tuned trial, not converged", color=ps.C.purple, zorder=3)
         else:
             lab = pre.format(ep=e4) + ", other tuned trials"
-            draw(t["vals"], lab if lab not in seen else None, color=ps.C.purple, alpha=0.35, lw=0.8)  # lw: emphasis
+            draw(t["vals"], lab if lab not in seen else None, color=ps.C.grey, alpha=0.5, lw=0.8)  # lw: emphasis
             seen.add(lab)
         report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
                                 "best": round(best(t["vals"])[1], 4)}
     for k in sorted(t16, key=lambda k: not tr[k]["finished"]):
         t = tr[k]
         lab = pre.format(ep=e16) + (", tuned trials" if t["finished"] else ", tuned trials still running")
-        draw(t["vals"], lab if lab not in seen else None, color=ps.C.grey, ls="-" if t["finished"] else "--")
+        draw(t["vals"], lab if lab not in seen else None, color=ps.C.orange, ls="-" if t["finished"] else "--")
         seen.add(lab)
         report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
                                 "best": round(best(t["vals"])[1], 4)}

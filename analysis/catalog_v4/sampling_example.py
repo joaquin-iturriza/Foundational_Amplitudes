@@ -105,9 +105,7 @@ def figs():
     # (a) the catalog mixture by component, stacked shares of the one pool
     fig, (axL, axR) = ps.figure(ncols=2)
     comps = [("catalog_bulk", "bulk (RAMBO)", ps.C.sky), ("catalog_fwd", "forward", ps.C.green),
-             ("catalog_flat", r"flat in $\log|\mathcal{M}|^2$", ps.C.yellow)]
-    # deck colours (talks/progress_nov2026): catalog black as the share-0 control, default grey as share 1, the 0.25
-    # mixture orange as the share-0.25 arms
+             ("catalog_flat", r"flat in $\log|\mathcal{M}|^2$", ps.C.orange)]
     for ax, var in ((axL, "logm"), (axR, "sqrts")):
         x = lb if var == "logm" else sb
         base = np.zeros(len(x) - 1)
@@ -115,7 +113,7 @@ def figs():
             y = dens(key, var)
             ax.stairs(base + y, x, baseline=base, fill=True, color=col, alpha=0.6, label=lab)
             base = base + y
-        step(ax, "catalog", var, color="k", label="catalog (sum)")
+        step(ax, "catalog", var, color=ps.C.blue, label="catalog (sum)")
     axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel("density")
     axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel("density")
     ps.legend(axL, "upper left")
@@ -127,9 +125,9 @@ def figs():
     for ax, var in ((axL, "logm"), (axR, "sqrts")):
         x = lb if var == "logm" else sb
         e = lb if var == "logm" else np.log10(sb)
-        for key, lab, col, nn, ls in (("default", "default (MadEvent, pp 13 TeV)", ps.C.grey, nd, "-"),
-                                      ("catalog", "catalog", "k", nc, "-"),
-                                      ("trained", r"trained: $0.75\,$catalog$\,+\,0.25\,$default", ps.C.orange, nt, "--")):
+        for key, lab, col, nn, ls in (("default", "default (MadEvent, pp 13 TeV)", ps.C.vermillion, nd, "-"),
+                                      ("catalog", "catalog", ps.C.blue, nc, "-"),
+                                      ("trained", r"trained: $0.75\,$catalog$\,+\,0.25\,$default", ps.C.grey, nt, "--")):
             y = np.asarray(h[key][var], float) / (nn * np.diff(e))
             ax.stairs(y, x, color=col, linestyle=ls, label=lab)
     axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel("density")

@@ -35,8 +35,7 @@ def main():
     fig, ax = ps.figure()
     lo, hi = 0.25 * min(x.min(), y.min()), 1.25 * max(x.max(), y.max())   # room for the legend below the points
     ax.plot([lo, hi], [lo, hi], color=ps.C.grey, linestyle="--", label="equal")
-    # sky: no arm of the deck's other slides has it (talks/progress_nov2026, one colour per arm)
-    ax.plot(x, y, ls="none", marker="o", color=ps.C.sky, label=f"one-loop process ({len(probes)})")
+    ax.plot(x, y, ls="none", marker="o", color=ps.C.vermillion, label=f"one-loop process ({len(probes)})")
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlim(lo, hi)
@@ -47,7 +46,7 @@ def main():
         a_.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
         a_.set_minor_formatter(NullFormatter())
     ax.set_xlabel(r"MSE of $\log|\mathcal{M}|^2$, without")
-    ax.set_ylabel(r"with more one-loop training pools")
+    ax.set_ylabel(r"with more one-loop pools")
     ps.legend(ax, "lower right")
     ps.save(fig, os.path.join(HERE, "figs", "loop_more_pools"))
 

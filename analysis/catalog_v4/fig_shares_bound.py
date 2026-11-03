@@ -77,11 +77,9 @@ ARM_READS = [("pp, processes in training", "PP4_trained"), (r"$e^+e^-$, processe
 ARM_AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ families"), ("H2p5", r"$2\to5$"),
             ("H3", "physical top"), ("H6", r"$\alpha_s=0.13$"), ("H7E", r"$\sqrt{\hat s}$ 6 to 20 TeV"),
             ("H7c", r"$p_T\geq30$ GeV"), ("H5", "one-loop")]
-# deck colours (talks/progress_nov2026, one per arm on every slide): control black square, share 0.25 at 10^4 events
-# per process orange (as on the share slide), widths 8/16/32 blue/green/vermillion, the 4x best purple; {ep} is the
-# arm's epochs (data/epochs.json)
+# one colour per arm on every slide of the deck (talks/progress_nov2026); {ep} is the arm's epochs (data/epochs.json)
 ARM_ARMS = [("control", r"control: share 0, width 8, $10^4$ events per process, {ep} epochs", "k", "s"),
-            ("default25_1e4", r"share 0.25, width 8, $10^4$ events per process, {ep} epochs", ps.C.orange, "v"),
+            ("default25_1e4", r"share 0.25, width 8, $10^4$ events per process, {ep} epochs", ps.C.grey, "v"),
             ("w8_full", r"share 0.25, width 8, $10^5$ events per process, {ep} epochs", ps.C.blue, "o"),
             ("w16_full", r"share 0.25, width 16, $10^5$ events per process, {ep} epochs", ps.C.green, "D"),
             ("w32_full", r"share 0.25, width 32, $10^5$ events per process, {ep} epochs", ps.C.vermillion, "^"),
@@ -154,12 +152,9 @@ def arms_figure():
     ref = None           # the control is its own point at R = 1 (a line too named it twice)
     rlab = r"$R$ = MSE(arm) / MSE(control)"
     mlab = r"MSE of $\log|\mathcal{M}|^2$"
-    # the held-out axes in two figures of four rows (eight rows of six arms piled the markers in one plot box)
     for name, reads, rt, mt, step in (
             ("arms_zero_shot", ARM_READS, (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0), 0.16),
-            ("arms_zero_shot_axes_a", axes[:4], (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0), 0.16),
-            ("arms_zero_shot_axes_b", axes[4:], (0.02, 0.05, 0.1, 0.2, 0.5, 1.0), (0.001, 0.01, 0.1, 1.0, 10.0),
-             0.16)):
+            ("arms_zero_shot_axes", axes, (0.02, 0.05, 0.1, 0.2, 0.5, 1.0), (0.001, 0.01, 0.1, 1.0, 10.0), 0.14)):
         fig, (a, b) = ps.figure(ncols=2)
         point_panel(a, pts, reads, arms, "R", rlab, rt, ref, step)
         point_panel(b, pts, reads, arms, "mse", mlab, mt, None, step)
@@ -175,13 +170,13 @@ SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
                ("one-loop, not in training", ("held_default", "H5"))]
-# colour by share as on every slide (0.25 orange, 0.50 sky, 1 grey), filled het. loss, open MSE loss; the control
-# a black square at R = 1 on each row, as on the zero-shot slides
-SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.grey, "D", "none"),
-              ("mse", "default50", r"share 0.50, MSE loss", ps.C.sky, "o", "none"),
-              ("mse", "default25", r"share 0.25, MSE loss", ps.C.orange, "v", "none"),
-              ("het", "default50", r"share 0.50, het. loss", ps.C.sky, "o", None),
-              ("het", "default25", r"share 0.25, het. loss", ps.C.orange, "v", None)]
+# the house palette; share 0.25 het. loss grey as on the zero-shot slides; the control a black square at R = 1 on each
+# row, as on the zero-shot slides
+SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.vermillion, "s", None),
+              ("mse", "default50", r"share 0.50, MSE loss", ps.C.orange, "o", None),
+              ("mse", "default25", r"share 0.25, MSE loss", ps.C.sky, "D", None),
+              ("het", "default50", r"share 0.50, het. loss", ps.C.green, "o", None),
+              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "v", None)]
 
 
 def merged_figure():

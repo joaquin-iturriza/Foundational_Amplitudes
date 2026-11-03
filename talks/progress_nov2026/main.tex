@@ -31,9 +31,9 @@
 
 \setbeamerfont{frametitle}{size=\Large,series=\bfseries}
 
-% one scale for every figure, so legend and tick text are the same size on every slide
-\newcommand{\fig}[1]{\includegraphics[scale=0.62]{#1}}
-\newcommand{\figtop}[1]{\raisebox{-\height}{\includegraphics[scale=0.6]{#1}}}
+% full slide size (weekly-deck skill); two side by side at 0.49\textwidth each
+\newcommand{\fig}[1]{\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{#1}}
+\newcommand{\figtop}[1]{\raisebox{-\height}{\includegraphics[width=0.49\textwidth,height=0.78\textheight,keepaspectratio]{#1}}}
 
 \begin{document}
 
@@ -69,12 +69,7 @@
 
 \begin{frame}{Zero shot per held-out axis}
   \centering
-  \fig{arms_zero_shot_axes_a.pdf}
-\end{frame}
-
-\begin{frame}{Zero shot per held-out axis}
-  \centering
-  \fig{arms_zero_shot_axes_b.pdf}
+  \fig{arms_zero_shot_axes.pdf}
 \end{frame}
 
 \begin{frame}{MSE against compute and wall time}
