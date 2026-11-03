@@ -9117,6 +9117,9 @@ entries:
       held) and D13 (2026-10-07T12:50, item eqd, held); site items shows both held. No plan entry of catalog_coverage uses
       Jean Zay. So the 19 jobs are most likely horizon32k/eqd trials kept pending under those holds; their release or cancellation
       is Joaquin''s call under D12/D13, not this entry''s. Nothing cancelled.'
+  - at: '2026-11-03T01:42:59+00:00'
+    text: '2026-11-03 step 34 addendum: the site run squeue read ended ''Timeout, server jean-zay.idris.fr not responding''
+      (exit 255) again, while site status jeanzay answers; sweep dirs of the 19 pending jobs still not read. Nothing cancelled.'
   handoff:
     state: 'Presentation figures redone @16957b58 (fig_shares_bound.py arms -> figs/arms_zero_shot_a-d: per-seed points, no
       bars, absolute MSE beside R, epochs in labels; size_figs.py figs -> width_x1_loss, length_w8_curves, loss_vs_compute;
