@@ -9213,6 +9213,14 @@ entries:
       fig_signext.py from data/signext_compare.json @9ec60f21: 18 of 21 pools lower, MSE ratios per axis as in par:v4_signext),
       error_correlates_rank/profile/legend. Figures checked against results.tex numbers (tab:v4_bound_shares, par:v4_loop_groups
       medians, par:v4_signext, error_correlates claims).'
+  - at: '2026-11-03T09:41:36+00:00'
+    text: '2026-11-03 deck rounds: @25f987c9 (one colour per arm with black/yellow/grey reassignments, held-out axes over
+      two slides, one 0.62 figure scale) rejected by Joaquin (''held out arms separated in two different slides, the color
+      choices are strange, All plots look weirdly small''); @f0c3da18 (10 slides, 0 errors/overfull): held-out axes one slide,
+      house palette restored, every figure at full slide size, length slide five legend entries in the zero-shot names from
+      a fresh curve pull (16x finished 0353 -4.108, 1333 -4.022, 1860 -3.282 val het NLL vs 4x best -3.824; 0753/0849/1262
+      running at 10912), signext axes ''without'' / ''with more one-loop pools'', error/sigma short labels, no guide line.
+      Cold reads off per Joaquin.'
   handoff:
     state: 'Deck talks/progress_nov2026/main.pdf rebuilt per Joaquin''s rejection of 2026-11-03 (@23cf5b33, 10 slides, 0 errors/overfull):
       sampling a/b (y label density), shares_deck (fig_shares_bound.py merged: MSE and het arms in one panel, rows pp/e+e-
