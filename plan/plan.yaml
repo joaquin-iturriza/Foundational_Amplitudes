@@ -9107,6 +9107,16 @@ entries:
       (job 62943062, gpu_v100, 2:30 limit, target 1.6 h): new arm v4_het_long_best of scripts/job_catalog_v3_short.sh @b629bd68
       (repo-reviewer PASS; design passed 2026-11-03T01:34); to check in its log: ''opening the cache'' (not ''built''), ''data_stats.json
       and particle_tokenizer.json equal the trial''s'', no ''mu row kept'' line.'
+  - at: '2026-11-03T01:42:47+00:00'
+    text: '2026-11-03 (owner afe05580f2c6da391), step 34: site status jeanzay answers: the same 19 PENDING jobs on gpu_p5,
+      0:00 run time (717020-717034 trial_0004 x15, 717791 trial_0005, 717796 trial_0007, 717798 trial_0008, 717808 trial_0009);
+      gpu_p5 45 allocated / 2 idle nodes. The read-only ''site --timeout 600 run jeanzay FA -- squeue -u $USER -o "%i %j %Z
+      %V %r"'' went out 2026-11-03 and had printed nothing when this turn ended (as on 2026-11-02 the login-shell path of
+      site run hangs; sweep dirs still not confirmed). Who wants them: the ledger holds the only Jean Zay sweep work of 2026-10-06..10
+      under user holds: D12 (2026-10-06T20:34, ''put on hold the 32k runs ... resume them only when I say'', item horizon32k,
+      held) and D13 (2026-10-07T12:50, item eqd, held); site items shows both held. No plan entry of catalog_coverage uses
+      Jean Zay. So the 19 jobs are most likely horizon32k/eqd trials kept pending under those holds; their release or cancellation
+      is Joaquin''s call under D12/D13, not this entry''s. Nothing cancelled.'
   handoff:
     state: 'Presentation figures redone @16957b58 (fig_shares_bound.py arms -> figs/arms_zero_shot_a-d: per-seed points, no
       bars, absolute MSE beside R, epochs in labels; size_figs.py figs -> width_x1_loss, length_w8_curves, loss_vs_compute;
