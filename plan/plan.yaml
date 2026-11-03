@@ -7998,11 +7998,11 @@ entries:
     start: '2026-11-02T10:24:41+00:00'
     at: '2026-11-02T10:24:41+00:00'
   - batch: long_best_17056_read
-    wall_h: 1.9
+    wall_h: 2.42
     jobs: 1
     units: null
-    start: '2026-11-03T01:24:52+00:00'
-    at: '2026-11-03T01:24:52+00:00'
+    start: '2026-11-03T01:28:21+00:00'
+    at: '2026-11-03T01:28:21+00:00'
   step_why:
     32:
       feeds: whether training 16x (68224 steps) beats 4x (17056 steps) at tuned HPs, i.e. which length becomes the foundation
