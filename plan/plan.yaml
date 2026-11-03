@@ -4922,6 +4922,15 @@ entries:
     blocks_steps: []
     answered_at: '2026-11-03T03:22:16.601000+00:00'
     decision: D254
+  - ask: 'Which of the other results since the last deck go into today''s deck: 1 share against pure-default bound, 2 pure-default
+      pp bound, 3 what the error and sigma follow, 4 top at its own mass drives tree error, 5 level vs shape from few events,
+      6 short MadEvent runs biased, 7 run size and gridpack fix, 8 per-event Born check of the one-loop target (negative),
+      optional 9 multiplicity offset, 10 one-loop by group?'
+    at: '2026-11-03T03:39:26+00:00'
+    searched: 'site decisions --project FA: none picks deck contents beyond the catalog_v4 results'
+    blocks: adding further slides to talks/progress_nov2026
+    blocks_steps: &id001
+    - 44
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9209,6 +9218,14 @@ entries:
       (arms seeds, epochs), scripts/job_catalog_v3_short.sh (v4_het_long_best), tools/short_wall.py (--eval-stage) + tests/test_short_wall.py,
       analysis/catalog_v4/data/{arms_vs_het_control,epochs,size_curves,long_sweeps_best,width_x1}.json
     written: '2026-11-03T01:38:34+00:00'
+  ask: 'Which of the other results since the last deck go into today''s deck: 1 share against pure-default bound, 2 pure-default
+    pp bound, 3 what the error and sigma follow, 4 top at its own mass drives tree error, 5 level vs shape from few events,
+    6 short MadEvent runs biased, 7 run size and gridpack fix, 8 per-event Born check of the one-loop target (negative), optional
+    9 multiplicity offset, 10 one-loop by group?'
+  waiting_since: '2026-11-03T03:39:26+00:00'
+  searched: 'site decisions --project FA: none picks deck contents beyond the catalog_v4 results'
+  blocks: adding further slides to talks/progress_nov2026
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
