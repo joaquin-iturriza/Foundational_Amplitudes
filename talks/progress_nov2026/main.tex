@@ -33,16 +33,6 @@
 
 \begin{document}
 
-\begin{frame}[plain]
-  \vfill
-  \begin{center}
-    {\Large\bfseries\color{navy} Foundational Amplitudes}\\[1.4em]
-    {\large Joaqu\'in Iturriza Ramirez}\\[0.4em]
-    {\footnotesize\color{gray} November 2026}
-  \end{center}
-  \vfill
-\end{frame}
-
 %---------------------------------------------------------------- sampling
 \begin{frame}{Default and catalog sampling}
   \vfill
@@ -65,6 +55,17 @@
 \begin{frame}{Default, catalog and the trained mixture}
   \centering
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{sampling_example_b.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- default share against the bound
+\begin{frame}{Default share against the pure default bound}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{shares_bound_a.pdf}
+\end{frame}
+
+\begin{frame}{Default share with the het loss}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{shares_bound_b.pdf}
 \end{frame}
 
 %---------------------------------------------------------------- width and length
@@ -95,18 +96,29 @@
   \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{mse_vs_compute.pdf}
 \end{frame}
 
-\begin{frame}{Open ends}
-  \vfill
-  \begin{minipage}{0.97\textwidth}
-    \small
-    \begin{itemize}\setlength{\itemsep}{0.8em}
-      \item The 4$\times$ sweep is not converged, its best learning rate sits at the top of the window
-      \item The 16$\times$ sweep is still running
-      \item One loop does not improve with width, length or the default share
-      \item The full set at 0.64 epochs reads worse than $10^4$ events per process at 6 epochs
-    \end{itemize}
-  \end{minipage}
-  \vfill
+%---------------------------------------------------------------- one loop
+\begin{frame}{One loop target against the Born per event}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loop_born_events.pdf}
+\end{frame}
+
+\begin{frame}{One loop error by group}
+  \centering
+  \includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{loop_groups.pdf}
+\end{frame}
+
+\begin{frame}{One loop sign extension}
+  \centering
+  \includegraphics[height=0.56\textheight]{signext_a.pdf}\hfill
+  \includegraphics[height=0.56\textheight]{signext_b.pdf}
+\end{frame}
+
+%---------------------------------------------------------------- error and sigma
+\begin{frame}{What the error and sigma follow}
+  \centering
+  \includegraphics[width=0.49\textwidth,height=0.62\textheight,keepaspectratio]{error_correlates_rank.pdf}\hfill
+  \includegraphics[width=0.49\textwidth,height=0.62\textheight,keepaspectratio]{error_correlates_profile.pdf}\\[0.5em]
+  \includegraphics[width=0.75\textwidth,height=0.12\textheight,keepaspectratio]{error_correlates_rank_legend.pdf}
 \end{frame}
 
 \end{document}

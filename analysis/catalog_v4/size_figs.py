@@ -370,28 +370,26 @@ def figs():
     b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
     cats.append((f"width 8, 17056 steps ({ep_of['17056_trial_' + b17]:.2g} epochs), best of the 8-trial sweep", 8,
                  [f"runs/{SWEEPS['17056']}/trial_{b17}"], ps.C.blue, "o"))
-    gpu_fill = {"Tesla V100-SXM2-32GB": True, "Tesla V100-PCIE-32GB": False}
+    # every run here is on a V100 (SXM2 or PCIe, not separated: Joaquin 2026-11-03), named on the wall-time axis
     fig, (axc, axw) = ps.figure(ncols=2)
     hs = []
     for label, width, dirs, col, mk in cats:
         have = [(sm[d]["mse_logm2_gmean"], d) for d in dirs if sm.get(d, {}).get("mse_logm2_gmean") is not None]
         y, d = min(have)
         r = sm[d]
-        fill = gpu_fill[r["gpu"]]
+        assert "V100" in r["gpu"], (d, r["gpu"])
         for ax, x in ((axc, C(width, r["iterations"])), (axw, r["train_hours"])):
-            ax.plot([x], [y], ls="", marker=mk, color=col, mfc=col if fill else "none")
+            ax.plot([x], [y], ls="", marker=mk, color=col)
         hs.append(Line2D([], [], ls="", marker=mk, color=col, label=label))
         report[f"mse {label}"] = {"run_dir": d, "mse_logm2_gmean": round(y, 5), "C": C(width, r["iterations"]),
                                   "train_hours": r["train_hours"], "gpu": r["gpu"],
                                   "of": {x: sm.get(x, {}).get("mse_logm2_gmean") for x in dirs}}
-    hs += [Line2D([], [], ls="", marker="s", color="k", label="V100 SXM2"),
-           Line2D([], [], ls="", marker="s", color="k", mfc="none", label="V100 PCIe")]
     for ax in (axc, axw):
         ax.set_xscale("log")
         ax.set_yscale("log")
         ax.set_ylabel(r"validation MSE of $\log|\mathcal{M}|^2$, trees")
     axc.set_xlabel("compute [FLOP]")
-    axw.set_xlabel("training wall time [GPU h]")
+    axw.set_xlabel("training wall time on one V100 [h]")
     from matplotlib.ticker import FixedLocator, FixedFormatter, NullFormatter
     for ax, ticks in ((axw, (1, 2, 4)), (axc, None)):
         if ticks:
