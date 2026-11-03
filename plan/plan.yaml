@@ -3418,6 +3418,12 @@ entries:
     answers_after: '2026-11-01T00:07:46+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-11-03T03:22:16.678000+00:00'
+    text: I'm not sure why you dropped the error bars and added each individual seed, the plot is less legible like that.
+    decision: D254
+    answers_after: '2026-11-03T01:43:16+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3442,6 +3448,7 @@ entries:
   - D229
   - D234
   - D235
+  - D254
   next:
     32: 'Long-run DyHPO sweeps on CC-IN2P3 at deb290bc (atomic-mkdir locks; generate_sweep + sweep_manager on the CC login
       node, state on /sps; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f, unchanged at
@@ -4891,6 +4898,8 @@ entries:
       it'
     blocks: nothing running; the next generation queue's layout
     blocks_steps: []
+    answered_at: '2026-11-03T03:22:16.601000+00:00'
+    decision: D254
   - ask: 'The zero-shot error bars are a class bootstrap padded by one control seed ratio, not a seed uncertainty (width 16
       pp: bar [0.522, 0.614], seeds alone 0.643 and 0.490). For the presentation: redraw with each seed as its own point and
       no bars, or add a third seed per arm for a real seed spread?'
@@ -4898,13 +4907,17 @@ entries:
     searched: 'CLAUDE.md, site decisions --project FA: none sets how seed spread is shown with two seeds'
     blocks: the redraw of arms_zero_shot_a/b
     blocks_steps: []
+    answered_at: '2026-11-03T03:22:16.601000+00:00'
+    decision: D254
   - ask: 19 pending Jean Zay jobs of ours on gpu_p5 (717020-717808, trial_0004/5/7/8/9, submitted 10-06 to 10-10, never ran),
       most likely trials of the 32k-horizon or equal-D sweeps held by D12/D13 (inferred from dates; site run on Jean Zay times
       out so their folders are unread). Keep them queued under the holds, or cancel them?
     at: '2026-11-03T01:43:16+00:00'
     searched: site decisions --project FA (D12, D13 holds, no release), site items (horizon32k, eqd held)
     blocks: Jean Zay queue cleanup (step 34)
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-03T03:22:16.601000+00:00'
+    decision: D254
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9175,13 +9188,6 @@ entries:
       (arms seeds, epochs), scripts/job_catalog_v3_short.sh (v4_het_long_best), tools/short_wall.py (--eval-stage) + tests/test_short_wall.py,
       analysis/catalog_v4/data/{arms_vs_het_control,epochs,size_curves,long_sweeps_best,width_x1}.json
     written: '2026-11-03T01:38:34+00:00'
-  ask: 19 pending Jean Zay jobs of ours on gpu_p5 (717020-717808, trial_0004/5/7/8/9, submitted 10-06 to 10-10, never ran),
-    most likely trials of the 32k-horizon or equal-D sweeps held by D12/D13 (inferred from dates; site run on Jean Zay times
-    out so their folders are unread). Keep them queued under the holds, or cancel them?
-  waiting_since: '2026-11-03T01:43:16+00:00'
-  searched: site decisions --project FA (D12, D13 holds, no release), site items (horizon32k, eqd held)
-  blocks: Jean Zay queue cleanup (step 34)
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
