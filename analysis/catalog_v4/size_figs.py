@@ -13,6 +13,11 @@
           run (pull_mse's docstring) -> data/size_mse.json
   eval_mse <eval run> <log> <trial dir>   a sweep trial's MSE from the eval job that re-read it (DyHPO trials
           have no end-of-run evaluation) -> data/size_mse.json
+  pull_preds  per training pool the validation MSE of log|M|^2 at the best checkpoint over EVERY pool, the 64 signed
+          one-loop pools included, from the per-event predictions the sigma-only stage saved (sigma_stage/preds_val.npz:
+          mu frozen at the main run's best checkpoint; raw_pred, raw_truth signed |M|^2), mean over events of
+          (ln|raw_pred| - ln|raw_truth|)^2; with the standardized-target MSE x sigma^2 per pool as the check against
+          pull_mse on the plain-log pools -> data/size_mse_preds.json
   figs    figs/width_x1_loss (from data/width_x1.json, mixture_ab.py width), figs/length_w8_curves,
           figs/mse_vs_compute (MSE of log|M|^2 against compute and wall time, from data/size_mse.json) (png + pdf)
 
@@ -203,6 +208,55 @@ def pull_signed():
     json.dump({"source": "config.yaml data.dataset with data_stats.json amp_trafos_pp, every run read (same set)",
                "runs": sorted(per), "signed": sorted(sets.pop())}, open(SIGNED, "w"), indent=1)
     print(len(per), "runs,", len(json.load(open(SIGNED))["signed"]), "signed pools")
+
+
+PRED_DIRS = ["runs/catalog_v4_long/v4_het_default25%s_w%d_x1" % (sfx, k) for k in (8, 16, 32) for sfx in ("", "_seed2")]
+
+
+def pull_preds():
+    """pull_preds of the module docstring; one read-only `site run` on CC-IN2P3"""
+    b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
+    trial = f"runs/{SWEEPS['17056']}/trial_{b17}"
+    dirs = PRED_DIRS + [f"runs/catalog_v4_long/best_{SWEEPS['17056']}_trial_{b17}"]
+    py = ("import json,sys\nimport numpy as np\n"
+          "for r in sys.argv[1:]:\n"
+          "    z=np.load(r+'/sigma_stage/preds_val.npz'); n=[str(x) for x in z['names']]; pid=z['process_id']\n"
+          "    s=json.load(open(r+'/data_stats.json'))['prepd_std']; s=set(s) if isinstance(s,list) else {s}\n"
+          "    sig=float(s.pop()) if len(s)==1 else None\n"
+          "    d=(np.log(np.abs(z['raw_pred'].ravel()))-np.log(np.abs(z['raw_truth'].ravel())))**2\n"
+          "    q=(z['pred'].ravel()-z['truth'].ravel())**2\n"
+          "    out={}\n"
+          "    for i in np.unique(pid):\n"
+          "        m=pid==i; v=d[m]; f=np.isfinite(v)\n"
+          "        out[n[i]]=[float(v[f].mean()) if f.any() else None, int(m.sum()), int((~f).sum()), float(q[m].mean())*sig**2 if sig else None]\n"
+          "    print('PREDS', r, json.dumps(out))\n")
+    cmd = f"cat > /tmp/zz_probe_preds.py <<'PYEOF'\n{py}PYEOF\npython3 /tmp/zz_probe_preds.py {' '.join(dirs)}; rm -f /tmp/zz_probe_preds.py"
+    out = subprocess.run(["site", "--timeout", "600", "run", "ccin2p3", "FA", "--", cmd], capture_output=True,
+                         text=True, timeout=700).stdout
+    dec = json.JSONDecoder()
+    per = {l.split()[1]: dec.raw_decode(l.split(" ", 2)[2])[0] for l in out.splitlines() if l.startswith("PREDS runs/")}
+    if len(per) != len(dirs):
+        sys.exit(f"pull_preds: {len(per)} of {len(dirs)} runs read\n{out[-2000:]}")
+    per[trial] = per.pop(dirs[-1])        # the 4x best's eval re-read stands for its trial, as in size_mse.json
+    signed = set(json.load(open(SIGNED))["signed"])
+    sm = json.load(open(os.path.join(DATA, "size_mse.json")))["runs"]
+    res = {}
+    for r, pools in per.items():
+        allm = [v[0] for v in pools.values() if v[0] is not None and v[0] > 0]
+        plain = [v[0] for p, v in pools.items() if p not in signed and v[0] is not None and v[0] > 0]
+        sgn = [v[0] for p, v in pools.items() if p in signed and v[0] is not None and v[0] > 0]
+        chk = [v[0] / v[3] for p, v in pools.items() if p not in signed and v[0] and v[3]]
+        g = lambda x: float(np.exp(np.mean(np.log(x)))) if x else None
+        res[r] = {"n_pools": len(pools), "n_signed": len(sgn), "n_plain": len(plain),
+                  "nonfinite_events": sum(v[2] for v in pools.values()),
+                  "mse_logm2_gmean_all": g(allm), "mse_logm2_gmean_plain": g(plain), "mse_logm2_gmean_signed": g(sgn),
+                  "check_plain_vs_pull_mse": {"pull_mse_gmean": sm.get(r, {}).get("mse_logm2_gmean"),
+                                              "ratio_raw_over_sigma2_prepd_median": float(np.median(chk)) if chk else None},
+                  "pools": pools}
+    json.dump({"source": "sigma_stage/preds_val.npz of each run (pull_preds); pools: [MSE of ln|M|^2, events, "
+               "non-finite events, sigma^2 x MSE of the standardized target]", "runs": res},
+              open(os.path.join(DATA, "size_mse_preds.json"), "w"), indent=1)
+    print(json.dumps({r: {k: v for k, v in x.items() if k != "pools"} for r, x in res.items()}, indent=1))
 
 
 def mse_stats(mse_prepd, sigma):
@@ -413,6 +467,7 @@ def figs():
     # MSE (the width cells: the better of seeds 42 and 43; the 17056-step sweep: its best trial by the sweep's
     # objective, the only trial with an end-of-run evaluation, from its eval re-read)
     sm = json.load(open(os.path.join(DATA, "size_mse.json")))["runs"]
+    sp = json.load(open(os.path.join(DATA, "size_mse_preds.json")))["runs"]
     C = lambda width, steps: 6.0 * N_PARAMS[width] * steps * BATCH
     cats = [(NAME.format(w=k, ep=f"{ep_x1:.2g}"), k,
              [f"runs/catalog_v4_long/v4_het_default25{sfx}_w{k}_x1" for sfx in ("", "_seed2")], wc, mk)
@@ -423,7 +478,8 @@ def figs():
     fig, (axc, axw) = ps.figure(ncols=2)
     hs = []
     for label, width, dirs, col, mk in cats:
-        have = [(sm[d]["mse_logm2_gmean"], d) for d in dirs if sm.get(d, {}).get("mse_logm2_gmean") is not None]
+        # every training pool, the 64 signed one-loop pools included (pull_preds, from the saved per-event predictions)
+        have = [(sp[d]["mse_logm2_gmean_all"], d) for d in dirs if sp.get(d, {}).get("mse_logm2_gmean_all") is not None]
         y, d = min(have)
         r = sm[d]
         assert "V100" in r["gpu"], (d, r["gpu"])
@@ -432,11 +488,11 @@ def figs():
         hs.append(Line2D([], [], ls="", marker=mk, color=col, label=label))
         report[f"mse {label}"] = {"run_dir": d, "mse_logm2_gmean": round(y, 5), "C": C(width, r["iterations"]),
                                   "train_hours": r["train_hours"], "gpu": r["gpu"],
-                                  "of": {x: sm.get(x, {}).get("mse_logm2_gmean") for x in dirs}}
+                                  "of": {x: sp.get(x, {}).get("mse_logm2_gmean_all") for x in dirs}}
     for ax in (axc, axw):
         ax.set_xscale("log")
         ax.set_yscale("log")
-        ax.set_ylabel(r"validation MSE of $\log|\mathcal{M}|^2$")
+        ax.set_ylabel(r"MSE of $\log|\mathcal{M}|^2$, all pools")
     axc.set_xlabel("compute [FLOP]")
     axw.set_xlabel("training wall time on one V100 [h]")
     from matplotlib.ticker import FixedLocator, FixedFormatter, NullFormatter
@@ -458,12 +514,12 @@ def figs():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=("pull", "pull_mse", "pull_signed", "eval_mse", "figs", "best"))
+    ap.add_argument("cmd", choices=("pull", "pull_mse", "pull_signed", "pull_preds", "eval_mse", "figs", "best"))
     ap.add_argument("args", nargs="*", help="eval_mse: <eval run> <its log> <trial dir>")
     a = ap.parse_args()
     if a.cmd == "eval_mse":
         return eval_mse(*a.args)
-    {"pull": pull, "pull_mse": pull_mse, "pull_signed": pull_signed, "figs": figs, "best": sweep_best}[a.cmd]()
+    {"pull": pull, "pull_mse": pull_mse, "pull_signed": pull_signed, "pull_preds": pull_preds, "figs": figs, "best": sweep_best}[a.cmd]()
 
 
 if __name__ == "__main__":
