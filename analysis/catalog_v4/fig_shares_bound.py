@@ -8,10 +8,11 @@ bound arm was trained). Every read on MadEvent default-sampled test events. Line
     python3 analysis/catalog_v4/fig_shares_bound.py  ->  analysis/catalog_v4/figs/shares_bound_{a,b}.{png,pdf}
 
 With `arms`: the zero-shot reads per arm, each seed its own point (seed 42 filled, 43 open), no error bars
-(data/arms_vs_het_control.json "seeds", mixture_ab.py arms), every arm at 4264 steps, het loss, its epochs
+(data/arms_vs_het_control.json "seeds", mixture_ab.py arms), every arm at 4264 steps but the last, het loss, its epochs
 (data/epochs.json) in its label. The arms: the control (share 0, width 8, 1e4 train events per process, in memory),
 share 0.25 at width 8 on 1e4 events per process (step 15), and share 0.25 on the whole training set (1e5 per process,
-memmap path) at widths 8, 16 and 32 (step 33). Panel a: R per read (a seed's MSE over the control's two-seed geometric
+memmap path) at widths 8, 16 and 32 (step 33), and the best trial of the 17056-step DyHPO sweep (width 8, whole set,
+lr and HPs tuned, seed 42 only, not converged; step 16). Panel a: R per read (a seed's MSE over the control's two-seed geometric
 mean, class median; the control's own seeds read the same way); b: the absolute MSE of log|M|^2 per read (class median
 of the class's geometric mean over its probes); c and d: the same on the held-out pool by axis (default-sampled).
 
@@ -74,7 +75,9 @@ ARM_ARMS = [("control", r"control: share 0, width 8, $10^4$ events per process",
             ("default25_1e4", r"share 0.25, width 8, $10^4$ events per process", ps.C.grey, "v"),
             ("w8_full", r"share 0.25, width 8, $10^5$ events per process", ps.C.blue, "o"),
             ("w16_full", r"share 0.25, width 16, $10^5$ events per process", ps.C.green, "D"),
-            ("w32_full", r"share 0.25, width 32, $10^5$ events per process", ps.C.vermillion, "^")]
+            ("w32_full", r"share 0.25, width 32, $10^5$ events per process", ps.C.vermillion, "^"),
+            ("long4x_best", r"share 0.25, width 8, $10^5$ events per process, 4$\times$ steps, tuned, one seed, "
+             "not converged", ps.C.purple, "P")]
 
 
 def seed_panel(ax, seeds, reads, arms, key, xlabel, ticks, ref=None):
@@ -87,7 +90,8 @@ def seed_panel(ax, seeds, reads, arms, key, xlabel, ticks, ref=None):
             d = seeds[a][r]
             y = n - 1 - j + off[a]
             ax.plot([d["seed42"][key]], [y + 0.035], ls="none", marker=mk, color=col)
-            ax.plot([d["seed43"][key]], [y - 0.035], ls="none", marker=mk, color=col, mfc="none")
+            if "seed43" in d:          # a one-seed arm (a sweep's best trial) has seed 42 only
+                ax.plot([d["seed43"][key]], [y - 0.035], ls="none", marker=mk, color=col, mfc="none")
     if ref is not None:
         ax.axvline(ref[0], color=ps.C.grey, linestyle="--")
     ax.set_xscale("log")

@@ -733,6 +733,84 @@ ARMS_VS_CONTROL = {"default25_1e4": {"PP4": MIX_HET["default25"]["PP4"], "EE4": 
                    "control": MIX_HET["control"]}
 ARMS_HD = {"default25_1e4": HD4_HET["default25"], **{f"w{k}_full": WIDTH[f"w{k}"] for k in (8, 16, 32)},
            "control": HD4_HET["control"]}
+# one-seed arms: a long-run sweep's best trial (seed 42, its lr and HPs tuned by DyHPO), read by an eval job
+# (scripts/job_catalog_v3_short.sh arm v4_het_long_best; design passed 2026-11-03T01:34): {arm: (eval run, the
+# trial's key in data/size_curves.json, which holds its training curve, steps and batches)}
+LONG_BEST = {"long4x_best": ("FA-ccin2p3-6f8a1eed", "17056_trial_1262")}
+for _a, (_run, _key) in LONG_BEST.items():
+    TRAINED_BY[_run] = f"trial_{_key}"
+
+
+def trial_val(key):
+    """A sweep trial's training curve from data/size_curves.json (size_figs.py pull) -> data/reads/trial_<key>_val.json,
+    the format `val` writes, so blowups() checks the trial an eval run read"""
+    t = json.load(open(os.path.join(DATA, "size_curves.json")))["trials"][key]
+    os.makedirs(READS, exist_ok=True)
+    out = os.path.join(READS, f"trial_{key}_val.json")
+    json.dump({"run": f"trial_{key}", "loss": "HETEROSC", "log": f"size_curves.json trials/{key}",
+               "blocks": [{"iterations": t["steps"], "every": t["every"], "vals": t["vals"]}]}, open(out, "w"), indent=0)
+    return {"iterations": t["steps"], "batches": t["batches"], "epochs": round(t["steps"] / t["batches"], 4),
+            "source": f"size_curves.json trials/{key}"}
+
+
+def _tagged(pairs):
+    """{(source, probe): mse} over [(run, source read), ...]; None when one is missing"""
+    out = {}
+    for run, r in pairs:
+        d = read_of(run, r)
+        if d is None:
+            return None
+        out.update({(r, k): x for k, x in d.items()})
+    return out
+
+
+def _one_point(x, ref, keys, cls):
+    """One seed's absolute MSE (class median of the class's geometric mean over its probes) and R = x / ref (class
+    median of the class's geometric mean of the ratios) on `keys`"""
+    cl = lambda k: cls(probe_name(k))
+    by = {}
+    for k in keys:
+        by.setdefault(cl(k), []).append(x[k])
+    return {"mse": float(f"{np.median([gmean(v) for v in by.values()]):.5g}"),
+            "R": round(float(np.median(list(class_ratios(x, ref, keys, cl).values()))), 4)}
+
+
+def _long_best(a, cls, ax_of):
+    """A one-seed arm: per read, its point against the het control's two-seed geometric mean (as `seeds`), and its
+    ratio to each 1x width cell's seed 42 on the same probes (information: length and tuning together)"""
+    run, key = LONG_BEST[a]
+    ctl_runs = ARMS_VS_CONTROL["control"]
+    hd_ctl = ARMS_HD["control"]
+    reads = {r: (read_of(run, r), tuple(read_of(c, r) for c in ctl_runs[r]),
+                 {w: read_of(WIDTH[w][0], r) for w in WIDTH}) for r in ("PP4", "EE4", "held")}
+    dflt = lambda r42pp, r42ee, rhd: _tagged([(r42pp, "PP4"), (r42ee, "EE4"), (rhd, "HD4"), (rhd, "HD5")])
+    reads["held_default"] = (dflt(run, run, run),
+                             tuple(dflt(ctl_runs["PP4"][i], ctl_runs["EE4"][i], hd_ctl[i]) for i in (0, 1)),
+                             {w: dflt(WIDTH[w][0], WIDTH[w][0], WIDTH[w][0]) for w in WIDTH})
+    miss = [f"{a} {r}" for r, (x, cp, ws) in reads.items() if x is None or None in cp or None in ws.values()]
+    if miss:
+        sys.exit("arms: reads missing: " + "; ".join(miss))
+    pts, vs = {}, {}
+    for r, (x, cp, ws) in reads.items():
+        keys = set(x) & set(cp[0]) & set(cp[1])
+        if r == "held_default":
+            keys = {k for k in keys if cls(k[1]) in ax_of}
+        keys = sorted(keys, key=str)
+        parts = {r: keys}
+        if r == "held_default":
+            parts.update({f"held_default/{ax}": [k for k in keys if ax_of[cls(k[1])] == ax] for ax in HELD})
+        for name, ks in parts.items():
+            if not ks:
+                continue
+            ctl = {k: gmean([cp[0][k], cp[1][k]]) for k in ks}
+            pts[name] = {"n_probes": len(ks), "seed42": _one_point(x, ctl, ks, cls)}
+            vs[name] = {}
+            for w, cell in ws.items():
+                kw = [k for k in ks if k in cell]
+                p = _one_point(x, cell, kw, cls)
+                vs[name][w] = {"n_probes": len(kw), "R_over_cell_seed42": p["R"], "mse_arm": p["mse"],
+                               "mse_cell_seed42": _one_point(cell, cell, kw, cls)["mse"], "cell_run": WIDTH[w][0]}
+    return pts, vs, trial_val(key)
 
 
 def epochs(run, log):
@@ -829,8 +907,17 @@ def arms():
     trained = {a: [TRAINED_BY.get(run, run) for run in v["PP4"]] for a, v in ARMS_VS_CONTROL.items()}
     out["epochs"] = {a: {run: ep[run] for run in runs} if all(run in ep for run in runs) else None
                      for a, runs in trained.items()}
+    out["one_seed_arms"] = {"runs": LONG_BEST, "caveat": "one seed (42), the best of an 8-trial DyHPO sweep (lr and "
+                            "HPs tuned, best-of-8 selection), not converged (best lr at the window's top edge, best "
+                            "checkpoint at the last validation); against the 1x width cells: length and tuning "
+                            "together, information only", "vs_width_cells": {}}
+    for a in LONG_BEST:
+        pts, vs, ep_a = _long_best(a, cls, ax_of)
+        out["seeds"][a] = pts
+        out["one_seed_arms"]["vs_width_cells"][a] = vs
+        out["epochs"][a] = {LONG_BEST[a][0]: ep_a}
     out["blowups"] = blowups([run for v in ARMS_VS_CONTROL.values() for runs in v.values() for run in runs] +
-                             [run for runs in ARMS_HD.values() for run in runs])
+                             [run for runs in ARMS_HD.values() for run in runs] + [v[0] for v in LONG_BEST.values()])
     json.dump(out, open(os.path.join(DATA, "arms_vs_het_control.json"), "w"), indent=1)
     print(json.dumps(out))
 
