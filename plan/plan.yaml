@@ -7728,6 +7728,16 @@ entries:
       1.6 h of work, limit 2.5 h (tools/short_wall.py --eval --eval-stage --het: 2.42 h with its 1.25 margin and a 17-min
       cache build if the key misses), 2.5 GPU-h; disk: none on a cache hit, one ~23 GB cache on a miss (free disk read again
       at submission).'
+    passed_at: '2026-11-03T01:34:37+00:00'
+    reviewer: 'Re-check of the 01:34 design after the 01:31 FIX: the 4x/1x ratio is now information only, labelled length
+      and tuning together (804a65bc at untuned base HPs vs the tuned 4x; HPs alone move val NLL 0.88 at 17056 in long_sweeps_best.json),
+      length verdict stays 16x best over 4x best per the passed step-16 design, which defines its yes/no; GPU fixed to gpu_v100
+      as the trial. Check 2: reads respond to model quality, width_x1.json w32/w8 PP4 R 0.370, held default 0.528, w16 0.565
+      against a w8 seed ratio 1.016-1.056. Check 3: control seed spread 0.92/1.08 stated, one seed per length per step 16.
+      Searched results.tex for 17056, cov_v4_long, hpo8, hp1262/trial_1262, long_best, 4x, 16x, catalog_steps, training length;
+      plan dead ends; decisions D219-D253: no read of a long-run trial. HETEROSC, emission-scales target (D234), default-sampled
+      reads (D227), D252/D253 absolute MSE included; cache key the trial''s own (no hashed module changed deb290bc..b629bd68),
+      23 GB on a miss vs 113 GB free.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
