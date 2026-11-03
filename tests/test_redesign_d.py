@@ -365,6 +365,12 @@ def d4():
     tri = brief(b, "compact-worker", model="sonnet", agent="o1", description="zz_trial t1 TRIAL=model")
     scenario("D4: a model-trial launch (TRIAL=model in its description, D203/D205) may take another model "
              "(compact-worker + sonnet passes; without TRIAL=model it is refused)", tri[0] == 0 and son[0] == 2, tri)
+    cold = "COLD READ: you see only these page images. List every axis label or legend entry you cannot explain."
+    c_ok, c_no = brief(cold), brief(cold[len("COLD READ: "):])
+    c_sub, c_git = brief(cold + " Then run site submit foo."), brief(cold + " Then git commit the notes.")
+    scenario("D4: a COLD READ: prompt passes; the same prompt without the marker is refused; with site submit or "
+             "git commit it is refused", c_ok[0] == 0 and c_no[0] == 2 and c_sub[0] == 2 and c_git[0] == 2,
+             (c_ok, c_no, c_sub, c_git))
     # the night's launches: each main-session addition to a step prompt, replayed in the narrowing slot
     import re as _re
     norm = lambda x: " ".join(x.split())

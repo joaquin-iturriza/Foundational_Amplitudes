@@ -13,6 +13,8 @@ Subagents' launches are checked too (an owner is never split into more agents fo
 another tool). A launch whose `model` differs from its subagent_type definition's `model:` (.claude/agents/<type>.md,
 then ~/.claude/agents/) is refused for every type, the exempt ones included: the definition is the decided model (three
 owners went out on sonnet on 2026-10-30 against definitions saying opus; nobody decided it). No `model` given passes.
+Also exempt: a cold read, a prompt starting with the line `COLD READ:` that names no `site submit|run|copy|sync`,
+`git commit|push` or other writing command.
 A cut the user asked for is quoted in the brief as his words in double quotes: a quote he typed
 (tools/plan.py typed_at) is not read, an invented one is.
 Python on purpose: a crash exits 1, which blocks nothing."""
@@ -117,6 +119,17 @@ def model_mismatch(ti):
     return None
 
 
+COLD = "COLD READ:"
+# a cold read (weekly-deck skill, Delivering): a fresh agent given page images only, listing unclear labels; it does
+# no entry work, so it carries no rules block, but it may only read: a prompt naming a state-changing command is refused
+COLD_WRITES = r"\bsite\s+(?:submit|run|copy|sync|decide|ack)\b|\bgit\s+(?:commit|push|add|checkout|merge)\b|\bplan(?:\.py)?\s+run\b|\bsed\s+-i\b"
+
+
+def cold_read(prompt):
+    """True for a prompt starting with the marker line `COLD READ:` that names no submit, commit or edit command."""
+    return prompt.lstrip().startswith(COLD) and not re.search(COLD_WRITES, prompt)
+
+
 def mech_check(prompt):
     """A mechanical-worker brief: the mechanical rules block verbatim ({id} filled), and no cut outside it."""
     try:
@@ -159,6 +172,8 @@ def main():
         return 0
     prompt, b = ti.get("prompt") or "", block()
     if b is None:
+        return 0
+    if cold_read(prompt):
         return 0
     if ti.get("subagent_type") == MECH_TYPE and not block_re(b).search(norm(prompt)):
         return mech_check(prompt)
