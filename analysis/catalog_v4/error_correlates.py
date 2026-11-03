@@ -784,7 +784,7 @@ def deck_figures(raw):
     ax.axvline(0, color=ps.C.grey, linestyle="--", label="no correlation")
     ax.set_yticks(yy)
     ax.set_yticklabels([DECK_LABEL.get(f, LABEL[f]) for f in order])
-    ax.set_xlabel("rank correlation within a process")
+    ax.set_xlabel(r"Spearman corr. with error or $\sigma$")
     ax.set_ylim(-0.6, len(order) - 0.4)
     ps.shared_legend(fig, ax, ncol=3)
     ps.save(fig, os.path.join(FIGS, "error_correlates_deck_rank"))
@@ -796,7 +796,7 @@ def deck_figures(raw):
         ax.plot(x, e, "-", color=c, marker="s", label=DECK_SHORT[f] + ": error")
         ax.plot(x, sg, "--", color=c, marker="o", label=DECK_SHORT[f] + r": $\sigma$")
     ax.set_xlabel("decile of the quantity")
-    ax.set_ylabel("in the decile / whole process")
+    ax.set_ylabel(r"error or $\sigma$, decile / process")
     ps.shared_legend(fig, ax, ncol=3)
     ps.save(fig, os.path.join(FIGS, "error_correlates_deck_profile"))
 

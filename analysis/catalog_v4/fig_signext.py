@@ -33,7 +33,7 @@ def main():
                       "median_mse_control": round(float(np.median(x)), 4), "median_mse_more": round(float(np.median(y)), 4)}))
 
     fig, ax = ps.figure()
-    lo, hi = 0.8 * min(x.min(), y.min()), 1.25 * max(x.max(), y.max())
+    lo, hi = 0.25 * min(x.min(), y.min()), 1.25 * max(x.max(), y.max())   # room for the legend below the points
     ax.plot([lo, hi], [lo, hi], color=ps.C.grey, linestyle="--", label="equal")
     ax.plot(x, y, ls="none", marker="o", color=ps.C.vermillion, label=f"one-loop process ({len(probes)})")
     ax.set_xscale("log")
@@ -46,7 +46,7 @@ def main():
         a_.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
         a_.set_minor_formatter(NullFormatter())
     ax.set_xlabel(r"MSE of $\log|\mathcal{M}|^2$, control")
-    ax.set_ylabel(r"MSE, more one-loop training")
+    ax.set_ylabel(r"same, more one-loop training")
     ps.legend(ax, "lower right")
     ps.save(fig, os.path.join(HERE, "figs", "loop_more_pools"))
 

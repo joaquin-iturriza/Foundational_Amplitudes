@@ -396,11 +396,11 @@ def figs():
     sm = json.load(open(os.path.join(DATA, "size_mse.json")))["runs"]
     C = lambda width, steps: 6.0 * N_PARAMS[width] * steps * BATCH
     cats = [(f"width {k}, 4264 steps ({ep_x1:.2g} epochs)", k,
-             [f"runs/catalog_v4_long/v4_het_default25{sfx}_w{k}_x1" for sfx in ("", "_seed2")], wc, "D")
-            for k, wc in ((8, "k"), (16, ps.C.green), (32, ps.C.vermillion))]
+             [f"runs/catalog_v4_long/v4_het_default25{sfx}_w{k}_x1" for sfx in ("", "_seed2")], wc, mk)
+            for k, wc, mk in ((8, ps.C.blue, "o"), (16, ps.C.green, "D"), (32, ps.C.vermillion, "^"))]   # the zero-shot figure's colours
     b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
-    cats.append((f"width 8, 17056 steps ({ep_of['17056_trial_' + b17]:.2g} epochs), best of the 8-trial sweep", 8,
-                 [f"runs/{SWEEPS['17056']}/trial_{b17}"], ps.C.blue, "o"))
+    cats.append((f"width 8, 4$\\times$ steps, tuned, {ep_of['17056_trial_' + b17]:.2g} epochs", 8,
+                 [f"runs/{SWEEPS['17056']}/trial_{b17}"], ps.C.purple, "P"))
     # every run here is on a V100 (SXM2 or PCIe, not separated: Joaquin 2026-11-03), named on the wall-time axis
     fig, (axc, axw) = ps.figure(ncols=2)
     hs = []
@@ -427,8 +427,9 @@ def figs():
             ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
             ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
         ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.yaxis.set_major_locator(FixedLocator([0.02, 0.05, 0.1]))
-        ax.yaxis.set_major_formatter(FixedFormatter(["0.02", "0.05", "0.1"]))
+        ax.yaxis.set_major_locator(FixedLocator([0.02, 0.03, 0.05, 0.08]))
+        ax.yaxis.set_major_formatter(FixedFormatter(["0.02", "0.03", "0.05", "0.08"]))
+        ax.margins(x=0.12, y=0.12)
         ax.yaxis.set_minor_formatter(NullFormatter())
     for h in hs:            # empty proxies, read by ps.shared_legend
         axc.add_line(h)

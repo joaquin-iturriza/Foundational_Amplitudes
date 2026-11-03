@@ -73,7 +73,7 @@ def panel(ax, arms_res, present, reads=READS, arms=ARMS, lines=((1.0, "--", r"$R
 # the arms figure: reads, held-out axes in words, arms (label without its epochs, colour, marker)
 ARM_READS = [("pp, processes in training", "PP4_trained"), (r"$e^+e^-$, processes in training", "EE4_trained"),
              ("not in training, default sampling", "held_default"), ("not in training, catalog sampling", "held"),
-             ("one loop, not in training", "held_default/H5")]
+             ("one-loop, not in training", "held_default/H5")]
 ARM_AXES = [("H1", "new combinations"), ("H2", r"$2\to4$ families"), ("H2p5", r"$2\to5$"),
             ("H3", "physical top"), ("H6", r"$\alpha_s=0.13$"), ("H7E", r"$\sqrt{\hat s}$ 6 to 20 TeV"),
             ("H7c", r"$p_T\geq30$ GeV"), ("H5", "one loop")]
@@ -148,7 +148,7 @@ def arms_figure():
     assert all(len(v) == 1 for v in eps.values()), eps
     arms = [(a, f"{lab}, {eps[a][0]:.2g} epochs", c, m) for a, lab, c, m in ARM_ARMS]
     axes = [(lab, f"held_default/{ax}") for ax, lab in ARM_AXES]
-    ref = (1.0, "control")
+    ref = None           # the control is its own point at R = 1 (a line too named it twice)
     rlab = r"$R$ = MSE(arm) / MSE(control)"
     mlab = r"MSE of $\log|\mathcal{M}|^2$"
     for name, reads, rt, mt in (("arms_zero_shot", ARM_READS, (0.05, 0.1, 0.2, 0.5, 1.0), (0.01, 0.1, 1.0, 10.0)),
@@ -168,12 +168,12 @@ def arms_figure():
 SHARE_READS = [("pp, processes in training", ("PP4", "trained")),
                (r"$e^+e^-$, processes in training", ("EE4", "trained")),
                ("not in training, default sampling", ("held_default", "pooled")),
-               ("one loop, not in training", ("held_default", "H5"))]
-SHARE_ARMS = [("mse", "bound", r"share 1 on pp, width 8, $10^4$ events per process, MSE loss", ps.C.vermillion, "s"),
-              ("mse", "default50", r"share 0.50, width 8, $10^4$ events per process, MSE loss", ps.C.orange, "o"),
-              ("mse", "default25", r"share 0.25, width 8, $10^4$ events per process, MSE loss", ps.C.sky, "D"),
-              ("het", "default50", r"share 0.50, width 8, $10^4$ events per process, het. loss", ps.C.green, "o"),
-              ("het", "default25", r"share 0.25, width 8, $10^4$ events per process, het. loss", ps.C.grey, "v")]
+               ("one-loop, not in training", ("held_default", "H5"))]
+SHARE_ARMS = [("mse", "bound", r"share 1 on pp, MSE loss", ps.C.vermillion, "s"),
+              ("mse", "default50", r"share 0.50, MSE loss", ps.C.orange, "o"),
+              ("mse", "default25", r"share 0.25, MSE loss", ps.C.sky, "D"),
+              ("het", "default50", r"share 0.50, het. loss", ps.C.green, "o"),
+              ("het", "default25", r"share 0.25, het. loss", ps.C.grey, "v")]
 
 
 def merged_figure():
@@ -188,17 +188,17 @@ def merged_figure():
             lo, hi = d["widened"]
             ax.errorbar([d["R"]], [n - 1 - j + off[i]], xerr=[[d["R"] - lo], [hi - d["R"]]], color=col, marker=mk,
                         linestyle="none", label=label if j == 0 else None)
-    ax.axvline(1.0, color="k", linestyle="--", label=r"control: share 0, width 8, $10^4$ events per process, same loss")
+    ax.axvline(1.0, color="k", linestyle="--", label="control: share 0, same loss")
     ticks = (0.2, 0.5, 1.0, 2.0)
     ax.set_xscale("log")
     ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
     ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
     ax.xaxis.set_minor_formatter(NullFormatter())
     ax.set_yticks(range(n))
-    ax.set_yticklabels([lab for lab, _ in SHARE_READS][::-1])
+    ax.set_yticklabels([f"{lab} ({res['het']['default25'][r][p]['n_classes']})" for lab, (r, p) in SHARE_READS][::-1])
     ax.set_ylim(-0.6, n - 0.4)
     ax.set_xlabel(r"$R$ = MSE(arm) / MSE(control)")
-    ps.shared_legend(fig, ax, ncol=1)
+    ps.shared_legend(fig, ax, ncol=2)   # every arm here at width 8 and 10^4 events per process, as the control
     ps.save(fig, os.path.join(HERE, "figs", "shares_deck"))
 
 
