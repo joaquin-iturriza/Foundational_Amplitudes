@@ -8658,7 +8658,7 @@ entries:
     agent: a4cdf21816cbb03c0
     state: working
     since: '2026-11-04T18:53:21.609000+00:00'
-    state_at: '2026-11-04T19:01:33+00:00'
+    state_at: '2026-11-04T19:01:57.423000+00:00'
     context: 110177
     context_at: '2026-11-04T19:00:41+00:00'
   findings:
