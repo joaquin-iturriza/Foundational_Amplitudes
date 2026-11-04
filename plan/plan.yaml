@@ -9897,6 +9897,13 @@ entries:
       [0.97, 1.99] (seeds 1.33/1.47; sign-changing 1.59, positive 1.20): <= 1.5, the target is all of it (borderline; two
       differences, not the loss alone). Beside vs het control: H5 (catalog-sampled one-loop) 0.18 [0.07, 0.30]; PP4 1.00,
       EE4 1.03, HD4 1.05, H1-H3/H6-H7c 0.87-1.11, all intervals span 1. No blow-ups.'
+  - at: '2026-11-04T21:14:32+00:00'
+    text: '2026-11-04 figures for Joaquin: sampling_example_c (flat-in-log|M|^2 part alone, generators stacked; flat within
+      +-8% from log10|M|^2 -8.75 to about -3.5, falling to 0 by about -1: its top is the candidates'' max) @1c (sampling_example.py);
+      long_hpo_landscape.py @HEAD -> data/long_hpo_landscape.json, figs/long_hpo_landscape_hps_a-g (+_legend) and _curves:
+      in both sweeps the objective falls with lr up to the window''s top (bests 7.82e-3 of 7.90e-3 and 3.65e-3 of 3.69e-3),
+      the lowest-lr trial worst; no visible trend in the other six HPs at 8 trials; both bests EMA off; every curve still
+      descending at its last step.'
   handoff:
     state: '2026-11-04 ~20:51. Step 53 (Joaquin: show the catalog sampling with each part separated, democratic splitter included):
       sampling_example.py @cd54ef52 replays each chunk of v4_uux_epemg train seed 42 exactly (datagen.gen_chunk with the standalone,
