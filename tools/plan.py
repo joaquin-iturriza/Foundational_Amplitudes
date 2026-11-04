@@ -45,6 +45,7 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           recorded (its step agent gone) is listed by plan next as a design to
                                           review; the main session launches the design reviewer
                                           (.claude/agents/design-reviewer.md) from that prompt and records it here
+  plan design-withdraw <id> --decision D<n> --why W  the user rejected the latest unreviewed design: no review is demanded
   plan design-pass <id> --reviewer NOTE | design-fix <id> --reasons R    the reviewer's verdict on the latest design
                                           (run by the reviewer itself; design_guard.py refuses them from anyone else)
   plan unanswered <id> | step <id> --agent <subagent id> [--next N]
@@ -1942,7 +1943,7 @@ REVIEW_FALLBACK_MIN = 30     # minutes a design may wait for its verdict before 
 def design_pending(e):
     """The latest design has no verdict yet (after REVIEW_FALLBACK_MIN, plan next lists it as a design to review)."""
     x = last_design(e)
-    return bool(x) and not x.get("passed_at") and not x.get("fix_at")
+    return bool(x) and not x.get("passed_at") and not x.get("fix_at") and not x.get("withdrawn_at")
 
 
 REVIEW_HEAD = "Design review."
@@ -1980,6 +1981,7 @@ def design_text(x, indent="  "):
         return indent + "none recorded (a job needs one first: python3 tools/plan.py design, step 2)"
     verdict = ("passed review %s (%s)" % (x["passed_at"][:16], x.get("reviewer")) if x.get("passed_at") else
                "review asked for a fix %s: %s" % (x["fix_at"][:16], x.get("fix")) if x.get("fix_at") else
+               "withdrawn %s (%s)" % (x["withdrawn_at"][:16], x.get("withdrawn_decision")) if x.get("withdrawn_at") else
                "not reviewed yet")
     return "\n".join(["%srecorded %s, %s" % (indent, (x.get("at") or "")[:16], verdict)] +
                       ["%s%s: %s" % (indent, k, x.get(k) if x.get(k) is not None else "not recorded")
@@ -2052,6 +2054,33 @@ def cmd_design_fix(a):
     print("plan: the latest design of %s needs a fix; the next step records a new one" % a.id)
 
 
+def prompt_file_is(prompt, text):
+    """The launch prompt names a file whose content is `text` (a long review prompt passed by path)."""
+    for path in re.findall(r"(?<![\w/.~-])((?:~|/)[^\s`'\"<>()\[\],;]+)", prompt or ""):
+        try:
+            if open(os.path.expanduser(path), errors="replace").read().strip() == text.strip():
+                return True
+        except OSError:
+            continue
+    return False
+
+
+def cmd_design_withdraw(a):
+    """The user rejected the entry's latest unreviewed design in conversation: mark it withdrawn, citing the recorded
+    decision, so the Stop gate and plan next stop demanding its review."""
+    if not a.why.strip():
+        sys.exit("plan: --why needs the reason")
+    if not decision(a.decision):
+        sys.exit("plan: %s is not a recorded decision of the user (site decisions --project %s)" % (a.decision, PROJECT))
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        x = last_design(e)
+        if not design_pending(e):
+            sys.exit("plan: %s has no unreviewed design to withdraw" % a.id)
+        x.update(withdrawn_at=now().isoformat(), withdrawn_decision=a.decision, withdrawn_why=a.why.strip())
+    print("plan: the latest design of %s is withdrawn (%s); a job needs a new design" % (a.id, a.decision))
+
+
 def cmd_review(a):
     """The design reviewer (a real subagent started from the entry's review prompt) launched on the latest design."""
     with transaction() as (d, st):
@@ -2063,8 +2092,9 @@ def cmd_review(a):
         if rec is None:
             sys.exit("plan: no subagent %s in this project's transcripts" % a.agent)
         started, prompt = rec
-        if not names_entry(prompt, a.id) or REVIEW_HEAD not in (prompt or ""):
-            sys.exit("plan: subagent %s was not started with %s's review prompt (plan next --prompts)" % (a.agent, a.id))
+        if not ((names_entry(prompt, a.id) and REVIEW_HEAD in (prompt or "")) or prompt_file_is(prompt, review_prompt(e))):
+            sys.exit("plan: subagent %s was not started with %s's review prompt (plan next --prompts), inline or as "
+                     "a file whose content is it" % (a.agent, a.id))
         if started < parse(x["at"]):
             sys.exit("plan: subagent %s started before the design was recorded" % a.agent)
         st.setdefault(a.id, {}).setdefault("reviews", []).append({"agent": a.agent, "at": started.isoformat(),
@@ -2978,6 +3008,10 @@ def main(argv=None):
         A("--reviewer", required=True, help="the reviewer's note"))
     cmd("design-fix", cmd_design_fix, "the design reviewer's FIX on the latest design (the reviewer runs it)", ID,
         A("--reasons", required=True, help="what must change before the job goes"))
+    cmd("design-withdraw", cmd_design_withdraw, "the user rejected the latest unreviewed design in conversation: "
+        "mark it withdrawn (no review demanded), citing his recorded decision", ID,
+        A("--decision", required=True, help="the recorded decision (D<n>) in which the user rejected it"),
+        A("--why", required=True, help="why it is withdrawn"))
     cmd("review", cmd_review, "record the design reviewer the main session launched for a design left without a "
         "verdict", ID, A("--agent", required=True, help="the reviewer subagent's id"))
     cmd("unanswered", cmd_unanswered, "the user's messages since the open question do not answer it (it stays open)",
