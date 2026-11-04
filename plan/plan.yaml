@@ -11403,3 +11403,24 @@ entries:
       NO: no k up to 2132 matches; then g_k says how much of the scratch gain the warm start recovers per k, and whether more
       steps would close it (g rising with k) or not (g flat). The catalog-sampled held-out read is reported beside as the
       cost check (from scratch the change cost nothing there, 0.931).'
+    fix_at: '2026-11-04T21:17:11+00:00'
+    fix: 'Seeds against spread, and outcome for yes and for no: the MATCH rule cannot be resolved by two seeds and leaves
+      results unclassified. (a) MATCH asks R(W_k/B) <= 1.10, but the seed spread on these reads is R_seed 1.13 (EE4), 1.17
+      (PP4) and 1.22 (held-out default-sampled) (mixture_ab_het.json), and the widened intervals stretch about 1.24x (PP4:
+      0.450 [0.360, 0.556]) to 1.31x (held-out default-sampled: 0.638 [0.501, 0.834]) above R. So a 10% tolerance is smaller
+      than one seed''s noise. Because ''widened interval contains 1'' counts as MATCH, a warm start that is truly 1.3x worse
+      than scratch would still be called a MATCH (on PP4 that is only g of about 0.6 of the scratch gain). A failure to detect
+      a difference is being read as equivalence. Fix: write MATCH as an equivalence bound that two seeds can resolve (for
+      example, the widened upper end of R(W_k/B) at or below a stated tolerance, chosen from the interval widths above, with
+      the matching g stated), or add seeds until 1.10 is resolvable, giving the seed count and its cost. (b) The two rules
+      leave a gap. R(W_k/B) above 1.10 with every widened interval containing 1 is neither MATCH nor SHORT, and with these
+      spreads that covers roughly R from 1.10 to 1.25-1.3, which is the most likely region for a partial recovery. Name this
+      inconclusive outcome and what it changes for the entry (more seeds at that k, or report g_k only). (c) The NO outcome
+      should also say that the warm start runs at the pretraining''s own restarted schedule (lr 5e-3, warmup 0.158, lr_scale
+      1), which is untuned for a warm start. Under the A/B protocol a NO at these HPs is followed by the same sweep for the
+      warm-start arm (or goes to Joaquin as the next call) before ''warm start does not match'' is concluded. State which.
+      Everything else holds: one change between W_k and C_k (the recipe), B and A reused. The measure moves with this change
+      (PP4 R 0.450, EE4 0.223, held-out default-sampled 0.638, checked in mixture_ab_het.json). Prior work is covered (add-W
+      continual pretraining, the het share runs). The loss is HETEROSC. The target is the emission-scale dimensionless target
+      (D234). Disk per job is about 0.85 GB (128 MB run dir plus 727 MB scratch predictions), so 12 jobs are about 10 GB against
+      about 92 GB free on /sps/lpnhe.'
