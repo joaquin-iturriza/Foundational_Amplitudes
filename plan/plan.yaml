@@ -11916,6 +11916,16 @@ entries:
       over the template''s fine-tune space goes to Joaquin as the next call (D241) before concluding. Across changes: whether
       data changes (C1-C6) and the loss/target changes (C7, C8) differ in how far a short warm start gets, read from their
       g_k at equal k. A change with no from-scratch gain on its reads is reported as such, not judged.'
+    passed_at: '2026-11-04T21:51:35+00:00'
+    reviewer: 'Superset re-check. C1 is as passed (PP4 0.450, EE4 0.223; seed spread 1.17/1.13; equivalence bound 1.35 that
+      two seeds resolve). C2 0.505/0.220 (mixture_ab_het.json) and C5 trained 0.388 [0.338, 0.446] (pp_bound.json) verified;
+      C3, C4 and C6 cited from par:v4_mixture and par:v4_signext. C7 and C8 are now gated on step 47''s magnitude pair showing
+      R <= 0.90 with its interval below 1; the confounded het_over_mse (PP4 1.048, EE4 1.418) is named as no reference. C9
+      is dropped for its confound and its 20-22 GB memmap cache. C6 uses a bootstrapped, widened ratio of medians with MATCH,
+      SHORT and INCONCLUSIVE. A data_stats equivalence check covers parent_shared against parent. The dropped changes go to
+      Joaquin with costs (about 12 GPU-h each), alongside the 95 GPU-h request. Disk is about 46 GB against about 92 GB free.
+      Searched: warm start, warm-start, warmstart, continu, resume, restart, pretrained_path, from scratch, LONG_CKPT (results.tex);
+      warm, continu, resum, pretrain, from scratch (decisions, plan).'
   step_why:
     1:
       feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
