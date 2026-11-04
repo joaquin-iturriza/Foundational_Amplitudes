@@ -10158,9 +10158,6 @@ entries:
       load at session start, so the probe adc076b4eb704d7c5 in this session still had them (fixed part 29.8k against 13-16k
       for the reviewers with three tools). Measure the first mechanical-worker of the next session (first-call context minus
       brief) and its corrections; lower effort for it only after D213''s watch ends (27 of 30 tasks, 0 failed)'
-    13: 'Main-session wake cost (next 7): after D217 the Stop-hook share fell 19% -> 13% and inline per call 8.7% -> 5.1%,
-      but orchestration-only wakes still carry 37% at 268k median context under the 500k window. Proposal to Joaquin (his
-      setting): CLAUDE_CODE_AUTO_COMPACT_WINDOW 500000 -> 300000 in .claude/settings.json'
     14: 'Deck cold-read agent (Joaquin 2026-11-03: ''it has to be well designed, not this, we will do it later''): removed
       from the weekly-deck skill; brief_guard''s COLD READ exemption (b03f41b1) stays unused. Design it with Joaquin when
       he brings it back.'
@@ -10346,11 +10343,6 @@ entries:
       if:
       - 'fixed part near 15k and no rise in corrections: keep'
       - 'unchanged, or a task needed a dropped tool: revert the tools line, dead end'
-    13:
-      feeds: whether the main session's wake cost falls under the redesign
-      if:
-      - 'Joaquin approves: apply, re-measure with main_turns.py --split at the change after a day'
-      - 'Joaquin declines: record his words, no change'
     14:
       feeds: whether decks get an independent readability check before they reach Joaquin, and in what form
       if:
