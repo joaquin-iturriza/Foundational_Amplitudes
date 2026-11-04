@@ -2484,6 +2484,53 @@ and more 6-particle training pools are being built.
 % claim: mb.median_abs_resid_parent_step=0.769
 % claim: mb.median_abs_resid_match_mean=2.042
 % allow: 42 43 because they are the seeds
+\paragraph{Width and length on the held-out multiplicity error (2026-11-04).}\label{par:v4_mult_width_length} The
+first of the two routes left for the held-out multiplicity pools (par.~\ref{par:v4_kshot_spread}), capacity and training
+length, read on the absolute zero-shot error, as the user asked (2026-11-04: ``the gap is not what we care about''):
+does the MSE of $\log|\mathcal M|^2$ on the held-out 6-particle classes fall with width and with training length? No new
+training: catalog\_coverage's catalog\_v4 runs (het loss, default share $0.25$, the whole training set), widths $8$,
+$16$, $32$ at $4264$ steps on seeds $42$ and $43$, and the best trials of the $4\times$ ($17056$ steps) and $16\times$
+($68224$ steps) length sweeps, width $8$, seed $42$. Each read is of the run's final model (the mean at the best
+checkpoint, then the sigma fit). Reads: the $218$ catalog-sampled H2 pools ($2000$ events each) and, on default-sampled
+events, the PP4 and EE4 probes of the H2 classes ($217$). Per read the MSE is the median over classes of the class's
+geometric mean over its probes; a ratio $R$ is the median over classes of the class's geometric mean of run over
+reference (\code{abs\_multiplicity.py}). Width lowers it on both seeds: catalog-sampled $0.624$ and $0.702$ at width $8$,
+$0.466$ and $0.330$ at $16$, $0.384$ and $0.337$ at $32$ ($R$ over width $8$ at $32$: $0.608$ and $0.476$);
+default-sampled $0.480$ and $0.580$ at width $8$, $0.207$ and $0.242$ at $32$ ($R$ $0.482$ and $0.433$). Length lowers
+it more: the $4\times$ best reads $0.131$ catalog-sampled and $0.0575$ default-sampled ($R$ over width $8$ at
+$1\times$: $0.245$ and $0.154$, length and tuning together, base HPs against tuned), the $16\times$ best $0.125$ and
+$0.0556$ ($R$ over the $4\times$ best: $0.789$ and $0.875$, the best of the same eight-trial sweep each, one seed, both
+best learning rates at the top of their search window). So capacity and length both lower the held-out multiplicity
+error, length by far the most per step taken here, with a smaller step from $4\times$ to $16\times$ than from
+$1\times$ to $4\times$. Against each run's own training floor the error does not close: the training pools' MSE falls
+faster with width than the held-out one (\code{gap\_capacity.py}), which the user set aside as not the question.
+% src: python3 analysis/catalog_v4/abs_multiplicity.py @a07b0fed
+% claim: n.catalog.0=218
+% claim: n.default.0=217
+% claim: absolute.w8_s42.catalog=0.624
+% claim: absolute.w8_s43.catalog=0.702
+% claim: absolute.w16_s42.catalog=0.466
+% claim: absolute.w16_s43.catalog=0.330
+% claim: absolute.w32_s42.catalog=0.384
+% claim: absolute.w32_s43.catalog=0.337
+% claim: width.catalog.w32_over_w8_s42=0.608
+% claim: width.catalog.w32_over_w8_s43=0.476
+% claim: absolute.w8_s42.default=0.480
+% claim: absolute.w8_s43.default=0.580
+% claim: absolute.w32_s42.default=0.207
+% claim: absolute.w32_s43.default=0.242
+% claim: width.default.w32_over_w8_s42=0.482
+% claim: width.default.w32_over_w8_s43=0.433
+% claim: absolute.x4_best.catalog=0.131
+% claim: absolute.x4_best.default=0.0575
+% claim: length.catalog.x4_over_x1=0.245
+% claim: length.default.x4_over_x1=0.154
+% claim: absolute.x16_best.catalog=0.125
+% claim: absolute.x16_best.default=0.0556
+% claim: length.catalog.x16_over_x4=0.789
+% claim: length.default.x16_over_x4=0.875
+% allow: 2 6 8 16 32 4264 17056 68224 2000 42 43 0.25 1 4 16 because they are the square in |M|^2, the pools' particle count, the widths, the steps, the read's events, the seeds, the mixture share and the length multiples
+
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
 tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
