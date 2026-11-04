@@ -5245,8 +5245,15 @@ entries:
     searched: 'docs/results.tex sampling study (lines 8958-9140, 289), his messages 10-26 to 11-04, site decisions: none fixes
       the sqrt(s) draw'
     blocks: the step-49 envelope design redo
-    blocks_steps: &id001
+    blocks_steps:
     - 49
+  - ask: 'Het. loss reporting: keep reading the main run''s best checkpoint, or report the kept post-sigma-retraining model''s
+      het. loss (D95 keeps only that model)?'
+    at: '2026-11-04T19:20:41+00:00'
+    searched: CLAUDE.md 'Every reported loss is read at the best checkpoint', D95 keeps the post-sigma model; they disagree
+      for het. loss only
+    blocks: nothing
+    blocks_steps: &id001 []
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9851,12 +9858,12 @@ entries:
     files: analysis/catalog_v4/size_figs.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/data/long_sweeps_best.json,
       analysis/catalog_v4/data/pp_support_reads.json, scripts/job_catalog_v3_short.sh, analysis/catalog_v4/validate_v4.py
     written: '2026-11-04T18:52:23+00:00'
-  ask: 'Sampling redesign: keep the sampling study''s mixture (bulk RAMBO/democratic + flat-log|M|^2 admixture + forward)
-    and change only the sqrt(s) draw to cover the pp range densely and continue wider, or do you see it differently?'
-  waiting_since: '2026-11-04T19:20:38+00:00'
-  searched: 'docs/results.tex sampling study (lines 8958-9140, 289), his messages 10-26 to 11-04, site decisions: none fixes
-    the sqrt(s) draw'
-  blocks: the step-49 envelope design redo
+  ask: 'Het. loss reporting: keep reading the main run''s best checkpoint, or report the kept post-sigma-retraining model''s
+    het. loss (D95 keeps only that model)?'
+  waiting_since: '2026-11-04T19:20:41+00:00'
+  searched: CLAUDE.md 'Every reported loss is read at the best checkpoint', D95 keeps the post-sigma model; they disagree
+    for het. loss only
+  blocks: nothing
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
