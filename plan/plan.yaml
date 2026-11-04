@@ -8392,9 +8392,9 @@ entries:
       - 'a candidate cannot reach 0% outside: say which classes and why'
   owner:
     agent: a4cdf21816cbb03c0
-    state: working
+    state: stopped
     since: '2026-11-04T18:53:27+00:00'
-    state_at: '2026-11-04T18:53:27+00:00'
+    state_at: '2026-11-04T18:53:43+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
