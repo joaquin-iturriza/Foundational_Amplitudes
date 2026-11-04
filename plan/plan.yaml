@@ -10190,6 +10190,13 @@ entries:
       max 0.782), against the pre-stated yes rule of <=0.6x total and median. Verdict No, keep Opus low for mechanical steps
       (D138); indicative (10 pairs); analyses judged on conclusions were not tested'
     at: '2026-10-31T01:06:49+00:00'
+  - tried: 'Double wake per agent stop (next 8): end subagents with plain final text instead of SubagentHandback, enforced
+      by .claude/hooks/handback_guard.py (0b8ca005, never registered)'
+    why: 'Claude Code now requires SubagentHandback to end a subagent''s run (a plain-text ending is not delivered), so the
+      guard would leave agents unable to report; handback_guard.py deleted. The double wake is also nearly gone on its own:
+      since 2026-10-31T04:22Z, of 362 main-session wakes (07.69, main_turns.py --split 2026-10-31T04:22:16Z), separate task-notification
+      (agent_done) wakes are 4 (/bin/bash.48, 0.45%); 138 more were absorbed mid-turn at no extra wake'
+    at: '2026-11-04T19:17:19+00:00'
   asks:
   - ask: 'Run the matched small-model trial: 10 small tool-fix or analysis tasks, each on Sonnet 5.5 and on Opus 5.5 at low
       effort, same briefs, scored by tools/agent_tasks.py plus a hand read, about $30 at list price?'
