@@ -4479,6 +4479,12 @@ entries:
       by the atomic-mkdir lock dirlock.py (deb290bc, repo-reviewer PASS) for the cache, the DyHPO state and the checkpoint
       index.'
     at: '2026-11-02T10:53:53+00:00'
+  - tried: step 47 het magnitude pair FA-ccin2p3-8cfe2b29 / FA-ccin2p3-35514231 (slurm 62973729/30, 2026-11-04 19:35 at fbceba90),
+      cancelled after ~2 min running
+    why: 'site submit recorded CC''s sbatch SPS-incident WARNING line as the slurm id (last output line), so the registry
+      showed UNKNOWN and the supervisor could not track them; fixed in ~/.local/bin/site (slurm: last line matching <digits>[;cluster]),
+      resubmitted as FA-ccin2p3-5abe4a0e / 92207f6a at 80f98c55'
+    at: '2026-11-04T18:37:54+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
