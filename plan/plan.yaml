@@ -3770,6 +3770,10 @@ entries:
     52: 'Envelope design redo, pending Joaquin''s word: keep the sampling study''s mixture (bulk RAMBO/democratic + flat-log|M|^2
       admixture f 0.25-0.5 + forward), change the sqrt(s) draw to cover the pp range densely and continue wider; drop the
       70% |M|^2-proportional component unless shown necessary.'
+    53: 'Sampling slide (sampling_example_a, sampling_example.py): the democratic splitter is used only in the flat-in-|M|^2
+      component (its candidates are half splitter, half RAMBO; bulk and forward use RAMBO only, mg5_pipeline_final.py:3425-3466);
+      split the flat part into splitter and RAMBO candidates by replaying the generator''s seeded draws, report the realised
+      splitter share among kept flat events, and label every component by what it is.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8753,6 +8757,11 @@ entries:
       if:
       - 'Joaquin agrees: redo step 49 that way'
       - 'he sees it differently: follow his words'
+    53:
+      feeds: Joaquin's request to see the catalog sampling broken down by what it contains (2026-11-04)
+      if:
+      - 'replay recovers it: redraw'
+      - 'it cannot: say why and add origin tagging to the generator'
   owner:
     agent: a4cdf21816cbb03c0
     state: stopped
