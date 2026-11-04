@@ -10497,3 +10497,8 @@ entries:
     decision: D265
     withdrawn_at: '2026-11-04T17:59:14+00:00'
     withdrawn_why: D265 is Joaquin's request for exactly this explainer, made before the entry existed
+  owner:
+    agent: afe065cc8cddf65c1
+    state: working
+    since: '2026-11-04T17:59:55+00:00'
+    state_at: '2026-11-04T17:59:55+00:00'
