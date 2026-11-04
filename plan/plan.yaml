@@ -9886,6 +9886,12 @@ entries:
       at d2683b3f (json via $SCRATCH file, cat after a SAMPEX_BEGIN marker). Rerun detached sampling_tags3 (log ~/.local/share/ccorch/detached/20261104-205414_sampling_tags3.log).
       Joaquin D278: flat part coloured by generator (RAMBO vs democratic splitter). On its end: figs, look at figs/sampling_example_a.png,
       commit data/sampling_example.json, report splitter_share_of_kept_flat.'
+  - at: '2026-11-04T19:59:52+00:00'
+    text: '2026-11-04 step 53 done: sampling_example.py @94391873 on CC -> data/sampling_example.json, figs/sampling_example_a/b
+      (.png/.pdf) committed; v4_uux_epemg train seed 42 catalog pool 1e5: bulk RAMBO 50002, forward RAMBO 15000, flat in log|M|^2
+      34998 of which democratic splitter 13803 (0.394) and RAMBO 21195; trained 0.25 mixture: bulk 25002, forward 15000, flat
+      34998, default 25000. The replay equals the pool to rounding (rtol 1e-9; chunk 0: 6695 of 16667 rows bit-equal, max
+      |dp| 2.2e-9 GeV).'
   handoff:
     state: '2026-11-04 ~20:51. Step 53 (Joaquin: show the catalog sampling with each part separated, democratic splitter included):
       sampling_example.py @cd54ef52 replays each chunk of v4_uux_epemg train seed 42 exactly (datagen.gen_chunk with the standalone,
