@@ -11365,8 +11365,9 @@ entries:
   match: warm_*,ws_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: 74a30052
+    paths:
+    - analysis/catalog_v4/data/het_magnitude.json
   dead_ends: []
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
