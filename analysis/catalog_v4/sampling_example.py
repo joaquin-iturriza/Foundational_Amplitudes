@@ -155,7 +155,13 @@ def flat_tags(name, lo, hi, n, role, seed, pool, k):
                     _, path = datagen.gen_chunk(t)
                     ch = np.load(path)
                 m = int(t["count"])
-                if ch.shape != pool[start:start + m].shape or not np.array_equal(ch, pool[start:start + m]):
+                # row by row the same events in the same order, to rounding: the pool's rows differ from a replay on
+                # another node in the last digits (E3587: max |dp| 2.2e-9 GeV, max rel |M|^2 1.6e-11; 6695 of 16667
+                # rows bit-equal), so equality is to rtol 1e-9; a different selection or order differs at O(1).
+                # The tags come from the replay's own records, compared bit for bit against the replayed rows.
+                b = pool[start:start + m]
+                if ch.shape != b.shape or not (np.allclose(ch, b, rtol=1e-9, atol=0)
+                                               and np.array_equal(ch[:, 4 * k:-1], b[:, 4 * k:-1])):
                     raise RuntimeError(f"chunk {t['idx']}: the replay differs from the pool's rows: "
                                        + _mismatch(ch, pool[start:start + m], k))
                 dem_f = {r.tobytes() for D in rec["dem"] for r in np.asarray(D, np.float64)}
