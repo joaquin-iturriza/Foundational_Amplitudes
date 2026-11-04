@@ -11997,3 +11997,6 @@ entries:
   - at: '2026-11-04T21:53:54+00:00'
     text: 'Correction to the run count: C2-C6 plus C8 are 54 runs (C2 6, MSE controls 6, C3 6, C4 6, C5 6, C6 12 warm + 6
       controls, C8 6), not 48; the 79.8 GPU-h stands. The design''s ''54 with C7, C8'' was 60.'
+  step_waits:
+    '1': FA-ccin2p3-341bf564 FA-ccin2p3-254abf4f FA-ccin2p3-ed946736 FA-ccin2p3-8e41ac1e FA-ccin2p3-f699e170 FA-ccin2p3-04fc5b3b
+      FA-ccin2p3-343e3d58 FA-ccin2p3-c2acc1fc FA-ccin2p3-aa64733e FA-ccin2p3-c477a52c FA-ccin2p3-0564ad5b FA-ccin2p3-a97e8083
