@@ -2452,6 +2452,16 @@ entries:
   - at: '2026-10-31T04:24:08+00:00'
     text: 'a compaction inside the turn of owner acd8bbf4e51c1e6d4 at 2026-10-31T04:22:08.879Z: its brief or scope was too
       large; narrow the next brief'
+  objective: 'The held-out multiplicity gap on catalog_v4 (D267, D271: the preprocessing exploration moves to catalog_v4).
+    The 218 held-out 6-particle (2->4) tree pools of H2 read zero-shot above their cells'' training floor (par:v4_shape_gap),
+    and no per-event or per-process correction carries it (par:v4_lco_not, par:v4_kshot_spread). Which lever narrows it: (a)
+    capacity and training length, (b) more 6-particle training pools in those 7 cells (bb, bg, bq, qq, qg, ee, gg). Setup
+    and reads are catalog_coverage''s catalog_v4 ones (analysis/catalog_v4/mixture_ab.py, fig_shares_bound.py): het loss,
+    share-0.25 default mixture, the het control pair FA-ccin2p3-87ea24d0/321a3de2 (share 0, 1e4 events per process, 4264 steps),
+    H2 catalog-sampled zero-shot reads at the best checkpoint, training floors from each run''s sigma_stage/preds_val.npz.'
+  mechanism: a held-out process of a trained multiplicity is predicted worse than training processes of its cell; either the
+    network lacks capacity or steps (a), or the cell lacks training processes close to it (b)
+  expected: not recorded
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
