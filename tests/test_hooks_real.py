@@ -1013,17 +1013,21 @@ def _repo_with_backlog(prefix):
 
 
 def review_modes():
-    """B4: the Stop nudge and bashpost are gone: still registered until switch-over B, they are no-ops (exit 0, no
-    output); gate and bashpre still refuse an overdue pillar."""
+    """B4 and switch-over E: the Stop nudge (`check`) and `bashpost` are gone: no registration in
+    .claude/settings.json names them and the script answers them with its usage; gate and bashpre still refuse an
+    overdue pillar."""
     repo, g, rb = _repo_with_backlog("rb4_")
     open(os.path.join(repo, "a.py"), "a").write("".join("y%d = %d\n" % (i, i) for i in range(600)))
     commit = J({"tool_name": "Bash", "tool_input": {"command": "git commit -qam x"}})
     edit = J({"tool_name": "Edit", "tool_input": {"file_path": os.path.join(repo, "a.py")}})
     c, bp = rb("check", stdin="{}"), rb("bashpost", stdin=commit)
     pre, gate = rb("bashpre", stdin=commit), rb("gate", stdin=edit)
-    scenario("B4: an overdue pillar: check and bashpost say nothing (exit 0), bashpre refuses its commit, gate its edit",
-             (c.returncode, c.stdout, bp.returncode, bp.stdout) == (0, "", 0, "") and pre.returncode == 2
-             and gate.returncode == 2, (c.stdout[:200], bp.stdout[:200], pre.returncode, gate.returncode))
+    reg = open(os.path.join(ROOT, ".claude", "settings.json")).read()
+    scenario("B4: an overdue pillar: check and bashpost are unregistered and unknown (usage), bashpre refuses its "
+             "commit, gate its edit",
+             "review_backlog.sh check" not in reg and "review_backlog.sh bashpost" not in reg
+             and "usage" in c.stderr and "usage" in bp.stderr and pre.returncode == 2 and gate.returncode == 2,
+             (c.stderr[:200], bp.stderr[:200], pre.returncode, gate.returncode))
 
 
 def review_paths():
@@ -1128,7 +1132,7 @@ def guards_selftest():
     r = subprocess.run([sys.executable, os.path.join(HOOKS, "test_guards.py")], capture_output=True, text=True,
                        env=dict(os.environ, CLAUDE_PROJECT_DIR=ROOT))
     scenario("B8: test_guards.py passes, its memory-file and agent-model cases included",
-             r.returncode == 0 and "MEMORY.md" in r.stdout and "model opus" in r.stdout, r.stdout[-600:])
+             r.returncode == 0 and "MEMORY.md" in r.stdout and "model inherit" in r.stdout, r.stdout[-600:])
 
 
 def _site_modules():

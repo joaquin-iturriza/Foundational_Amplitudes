@@ -20,7 +20,6 @@
 # every other pillar, stay unblocked.
 #
 # Modes:
-#   check, bashpost       removed (no-ops until unregistered, agent redesign B4)
 #   gate                  (PreToolUse(Edit|Write)) DENY edits to an over-threshold pillar
 #   begin <reviewer>      reviewer takes the lock: lifts `gate` so it can apply its own fixes
 #   advance <reviewer>    reviewer PASSED; resets its watermark and drops the lock
@@ -294,15 +293,6 @@ except Exception: print("")' 2>/dev/null)
       if [ -f "$(lock_file "$who")" ]; then lock_fresh "$who" && s="$s, locked" || s="$s, STALE lock (no longer exempts)"; fi
       printf '%-18s %8s %8s   %s\n' "$who" "$l/$lt" "$c/$ct" "$s"
     done
-    exit 0
-    ;;
-
-  # The Stop nudge (`check`) and the PostToolUse write check (`bashpost`) were removed (agent redesign B4: one Stop
-  # gate, plan_check.py; an overdue pillar is held by `gate`, `bashpre` and the review before a merge). Both stay
-  # no-ops until their registrations leave .claude/settings.json with switch-over B, so a registered call never
-  # refuses.
-  check|bashpost)
-    cat >/dev/null 2>&1 || true
     exit 0
     ;;
 

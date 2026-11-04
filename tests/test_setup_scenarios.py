@@ -2219,9 +2219,10 @@ def the_suite_itself():
 
 
 def reviewer_resume():
-    """reviewer_resume.py: a blocking review's re-check continues the same reviewer; a fresh one goes after release."""
+    """review_guard.py (was reviewer_resume.py): a blocking review's re-check continues the same reviewer; a fresh one
+    goes after release."""
     d = tempfile.mkdtemp(prefix="resume_"); st = os.path.join(d, ".claude", ".review_state"); os.makedirs(st)
-    hook = os.path.join(ROOT, ".claude", "hooks", "reviewer_resume.py")
+    hook = os.path.join(ROOT, ".claude", "hooks", "review_guard.py")
     env = dict(os.environ, CLAUDE_PROJECT_DIR=d)
     run = lambda ev: subprocess.run(["python3", hook], input=json.dumps(ev), capture_output=True, text=True, env=env)
     launch = {"tool_name": "Agent", "tool_input": {"subagent_type": "repo-reviewer", "prompt": "review"}}
@@ -2470,7 +2471,7 @@ def command_reading():
     spec.loader.exec_module(cp)
     shared = all("import cmdparse" in open(os.path.join(HOOKS, f)).read() or "from cmdparse import" in
                  open(os.path.join(HOOKS, f)).read() or "cmdparse.py" in open(os.path.join(HOOKS, f)).read()
-                 for f in ("git_verify_guard.py", "plan_files_guard.py", "lock_guard.py", "design_guard.py",
+                 for f in ("git_verify_guard.py", "plan_files_guard.py", "review_guard.py", "design_guard.py",
                            "placement_guard.sh", "plot_guard.sh", "review_backlog.sh"))
     own = [f for f in ("git_verify_guard.py", "plan_files_guard.py", "design_guard.py")
            if "def heredocs(" in open(os.path.join(HOOKS, f)).read() or "def segments(cmd):" in
@@ -2534,8 +2535,8 @@ def command_reading():
         scenario("placement: `%s` is %s" % (c.replace("\n", " / ")[:70], "refused" if want else "allowed"),
                  rc == want, out)
 
-    # 4. lock_guard and design_guard: a call is a command word, not a mention
-    lock = os.path.join(HOOKS, "lock_guard.py")
+    # 4. review_guard (the reviewer lock, was lock_guard) and design_guard: a call is a command word, not a mention
+    lock = os.path.join(HOOKS, "review_guard.py")
     lenv = dict(os.environ, CLAUDE_PROJECT_DIR=tempfile.mkdtemp(prefix="lock_"))
     rb = "review_backlog.sh"
     for c, caller, want in (

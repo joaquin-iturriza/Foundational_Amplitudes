@@ -17,7 +17,10 @@ passes: the check never stalls the compaction or the turn.
                 state of the transcript (CHECKED holds the size checked), with the list.
   PostToolUse   a compaction is wanted: the instruction as additional context (no model call).
   SessionStart  every source: print the plan (tools/plan.py show --compact); after a compaction also clear the
-                markers and say that the summary is not the plan.
+                markers and say that the summary is not the plan. A subagent's compaction also fires SessionStart,
+                with the main session's ids and no agent_id: compacted_agent() tells it apart (the newest
+                compact_boundary is in a subagent transcript) and the agent gets AGENT_AFTER only, the main
+                session's markers untouched (agent_redesign next 9).
 
 When auto-compaction fires is Claude Code's call (env CLAUDE_CODE_AUTO_COMPACT_WINDOW in settings.json); a hook
 cannot start one, only hold it. Held, it is retried on the next auto-compaction check.
@@ -38,6 +41,68 @@ AFTER = ("CONTEXT GUARD: this context was just compacted. The summary above is a
          "was in flight), not of the plan: work only from the plan printed below, not from the summary's "
          "pending list. CLAUDE.md's ground rules hold (0: start every message with 'Joaquin'; 0b: never narrow the scope). "
          "Re-check the running batches with `site` before acting on any number in the summary.")
+AGENT_AFTER = ("CONTEXT GUARD: your context was just compacted. The summary above is a lossy record of the "
+               "conversation: re-read your entry (`python3 tools/plan.py show <your entry>`) and the rules block of "
+               "your brief before acting, and re-check running jobs with `site` before acting on any number in the "
+               "summary. This note is for you only; the main session's bookkeeping is not yours.")
+
+
+def _boundary_at(path, tail=1 << 18):
+    """The timestamp of the last compact_boundary record in the last `tail` bytes of a transcript, '' when none."""
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(0, f.tell() - tail))
+            lines = f.read().split(b"\n")
+    except (OSError, TypeError):
+        return ""
+    for line in reversed(lines):
+        if b'"compact_boundary"' in line:
+            try:
+                return json.loads(line).get("timestamp") or ""
+            except ValueError:
+                continue
+    return ""
+
+
+def compacted_agent(inp, now=None, within=120):
+    """The id of the subagent whose compaction fired this SessionStart, None when it is the main session's. Claude
+    Code gives a subagent's SessionStart:compact the main session's session_id and transcript_path and no agent_id
+    (seen 2026-10-31 on agents ae7bc0ff5c64982f0 and acadf5fd3cc8f4bac: the boundary is written ~0.4 s before the
+    hook runs). The agent is the one whose transcript, written in the last `within` s, holds a compact_boundary newer
+    than the main transcript's last one; a tie or nothing readable is the main session."""
+    if inp.get("agent_id"):
+        return inp["agent_id"]
+    import time
+    from datetime import datetime, timezone
+    t, sid = inp.get("transcript_path") or "", inp.get("session_id") or ""
+    if not t or not sid:
+        return None
+    sub = os.path.join(os.path.dirname(t), sid, "subagents")
+    now = time.time() if now is None else now
+    main_b = _boundary_at(t)
+    best = (main_b, None)
+    try:
+        names = os.listdir(sub)
+    except OSError:
+        return None
+    for n in names:
+        if not (n.startswith("agent-") and n.endswith(".jsonl")):
+            continue
+        p = os.path.join(sub, n)
+        try:
+            if os.path.getmtime(p) < now - within:
+                continue
+        except OSError:
+            continue
+        b = _boundary_at(p)
+        try:
+            age = now - datetime.fromisoformat(b.replace("Z", "+00:00")).timestamp() if b else None
+        except ValueError:
+            age = None
+        if age is not None and -5 <= age <= within and b > best[0]:
+            best = (b, n[len("agent-"):-len(".jsonl")])
+    return best[1]
 
 
 def plan_text():
@@ -252,6 +317,9 @@ def main():
         sys.stderr.write(INSTR + "\n" + "\n".join("  - " + g for g in got) + "\n")
         return 2
     if ev == "SessionStart":
+        if inp.get("source") == "compact" and compacted_agent(inp):
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": AGENT_AFTER}}))
+            return 0
         ctx = plan_text()                     # every source (startup, resume, clear, compact) starts from the plan
         if inp.get("source") == "compact":
             for p in (FLUSHED, WANTED, CHECKED):

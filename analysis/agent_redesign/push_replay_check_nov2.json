@@ -1,0 +1,418 @@
+{
+ "summary": {
+  "agents": 40,
+  "calls": 1632,
+  "pushed_chars_median": 17226.0,
+  "per_call_tokens_mean": 8041,
+  "per_call_tokens_median_agent": 4411.0,
+  "held_calls": 16,
+  "dirs": "live",
+  "hook": "live",
+  "since": "2026-11-02T05:14:00Z",
+  "until": "2100-01-01T00:00:00+00:00",
+  "check_agents_off_by_5pct": 0,
+  "check_replayed_over_recorded": 0.999
+ },
+ "agents": [
+  {
+   "agent": "agent-a0735876e6698c1aa",
+   "calls": 138,
+   "pushed_chars": 34843,
+   "recorded_chars": 35196,
+   "token_calls": 1612919,
+   "per_call": 11688,
+   "pushes": 11,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a0eb9bc4d4238b030",
+   "calls": 27,
+   "pushed_chars": 33540,
+   "recorded_chars": 33540,
+   "token_calls": 278272,
+   "per_call": 10306,
+   "pushes": 5,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a108bce26b329869a",
+   "calls": 9,
+   "pushed_chars": 3477,
+   "recorded_chars": 3477,
+   "token_calls": 11345,
+   "per_call": 1261,
+   "pushes": 2,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a1f9b68d447c05789",
+   "calls": 27,
+   "pushed_chars": 20919,
+   "recorded_chars": 20919,
+   "token_calls": 152473,
+   "per_call": 5647,
+   "pushes": 6,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a259ac3549ec2f32b",
+   "calls": 144,
+   "pushed_chars": 51119,
+   "recorded_chars": 51119,
+   "token_calls": 2073260,
+   "per_call": 14398,
+   "pushes": 11,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a2c248372f2a5cf85",
+   "calls": 37,
+   "pushed_chars": 31416,
+   "recorded_chars": 31416,
+   "token_calls": 310081,
+   "per_call": 8381,
+   "pushes": 7,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a2c99e73462e7fd07",
+   "calls": 8,
+   "pushed_chars": 9374,
+   "recorded_chars": 9374,
+   "token_calls": 20196,
+   "per_call": 2525,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a309bb0ec9bd78f27",
+   "calls": 36,
+   "pushed_chars": 26079,
+   "recorded_chars": 26079,
+   "token_calls": 264574,
+   "per_call": 7349,
+   "pushes": 5,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a3c87bc016f01a716",
+   "calls": 58,
+   "pushed_chars": 16593,
+   "recorded_chars": 16947,
+   "token_calls": 222488,
+   "per_call": 3836,
+   "pushes": 5,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a49c6d8e5a6db9fdb",
+   "calls": 27,
+   "pushed_chars": 3477,
+   "recorded_chars": 3477,
+   "token_calls": 30147,
+   "per_call": 1117,
+   "pushes": 2,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a4cdf21816cbb03c0",
+   "calls": 34,
+   "pushed_chars": 17859,
+   "recorded_chars": 17859,
+   "token_calls": 174033,
+   "per_call": 5119,
+   "pushes": 4,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a5af1a86ca67f9f3a",
+   "calls": 152,
+   "pushed_chars": 37664,
+   "recorded_chars": 37664,
+   "token_calls": 1600150,
+   "per_call": 10527,
+   "pushes": 8,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a72c7cf6700bd9f07",
+   "calls": 38,
+   "pushed_chars": 33005,
+   "recorded_chars": 33005,
+   "token_calls": 370864,
+   "per_call": 9760,
+   "pushes": 6,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a7d466b9adb53c54d",
+   "calls": 25,
+   "pushed_chars": 22208,
+   "recorded_chars": 22208,
+   "token_calls": 116153,
+   "per_call": 4646,
+   "pushes": 4,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a7f1fe982d7564477",
+   "calls": 131,
+   "pushed_chars": 38898,
+   "recorded_chars": 39243,
+   "token_calls": 1459927,
+   "per_call": 11144,
+   "pushes": 10,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a81e6ba99cdb38b13",
+   "calls": 59,
+   "pushed_chars": 25370,
+   "recorded_chars": 25370,
+   "token_calls": 287748,
+   "per_call": 4877,
+   "pushes": 7,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a84c7e2c5dabdd023",
+   "calls": 14,
+   "pushed_chars": 21966,
+   "recorded_chars": 21966,
+   "token_calls": 76128,
+   "per_call": 5438,
+   "pushes": 6,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-a84f3983c98def0e2",
+   "calls": 11,
+   "pushed_chars": 10208,
+   "recorded_chars": 10208,
+   "token_calls": 17026,
+   "per_call": 1548,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a865221e989223a08",
+   "calls": 11,
+   "pushed_chars": 488,
+   "recorded_chars": 488,
+   "token_calls": 1471,
+   "per_call": 134,
+   "pushes": 1,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a946c631eddf917c4",
+   "calls": 8,
+   "pushed_chars": 5392,
+   "recorded_chars": 5392,
+   "token_calls": 13078,
+   "per_call": 1635,
+   "pushes": 2,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a98de9ec7bcf10a31",
+   "calls": 33,
+   "pushed_chars": 7140,
+   "recorded_chars": 7140,
+   "token_calls": 9221,
+   "per_call": 279,
+   "pushes": 1,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-a9d4c2cfc169de8a1",
+   "calls": 19,
+   "pushed_chars": 18316,
+   "recorded_chars": 18316,
+   "token_calls": 122653,
+   "per_call": 6455,
+   "pushes": 4,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-aae68a323e02b1a97",
+   "calls": 16,
+   "pushed_chars": 2929,
+   "recorded_chars": 2929,
+   "token_calls": 16392,
+   "per_call": 1025,
+   "pushes": 1,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-aaf01b2d42241ffe1",
+   "calls": 55,
+   "pushed_chars": 10208,
+   "recorded_chars": 10208,
+   "token_calls": 180967,
+   "per_call": 3290,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-ab2b7f4164c897426",
+   "calls": 9,
+   "pushed_chars": 7628,
+   "recorded_chars": 7628,
+   "token_calls": 25641,
+   "per_call": 2849,
+   "pushes": 2,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-ab83b9fec79cdcfcc",
+   "calls": 12,
+   "pushed_chars": 9864,
+   "recorded_chars": 9864,
+   "token_calls": 45115,
+   "per_call": 3760,
+   "pushes": 3,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-ab94b7209f7c6d69e",
+   "calls": 13,
+   "pushed_chars": 13361,
+   "recorded_chars": 13361,
+   "token_calls": 41555,
+   "per_call": 3197,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-aba768ef52ae79375",
+   "calls": 28,
+   "pushed_chars": 26886,
+   "recorded_chars": 26886,
+   "token_calls": 168277,
+   "per_call": 6010,
+   "pushes": 4,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-ac0cf9dd002e4f539",
+   "calls": 12,
+   "pushed_chars": 15702,
+   "recorded_chars": 15702,
+   "token_calls": 50118,
+   "per_call": 4176,
+   "pushes": 3,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-ac78f898212939788",
+   "calls": 9,
+   "pushed_chars": 8088,
+   "recorded_chars": 8088,
+   "token_calls": 8992,
+   "per_call": 999,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-adbc769e515e993bb",
+   "calls": 6,
+   "pushed_chars": 10865,
+   "recorded_chars": 10865,
+   "token_calls": 19601,
+   "per_call": 3267,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-ae217042b742b41fc",
+   "calls": 28,
+   "pushed_chars": 24893,
+   "recorded_chars": 24893,
+   "token_calls": 142642,
+   "per_call": 5094,
+   "pushes": 4,
+   "held_calls": 1
+  },
+  {
+   "agent": "agent-ae24d72150040da8b",
+   "calls": 10,
+   "pushed_chars": 9864,
+   "recorded_chars": 9864,
+   "token_calls": 18375,
+   "per_call": 1838,
+   "pushes": 3,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-af294ad8605780841",
+   "calls": 7,
+   "pushed_chars": 6729,
+   "recorded_chars": 6729,
+   "token_calls": 10326,
+   "per_call": 1475,
+   "pushes": 2,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-af4ab0f75ac3ab59b",
+   "calls": 122,
+   "pushed_chars": 21668,
+   "recorded_chars": 21668,
+   "token_calls": 719975,
+   "per_call": 5901,
+   "pushes": 7,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-af5fc1469d3e274f8",
+   "calls": 11,
+   "pushed_chars": 2461,
+   "recorded_chars": 2461,
+   "token_calls": 3169,
+   "per_call": 288,
+   "pushes": 2,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-af67f5612500a5634",
+   "calls": 103,
+   "pushed_chars": 46335,
+   "recorded_chars": 46335,
+   "token_calls": 1328621,
+   "per_call": 12899,
+   "pushes": 9,
+   "held_calls": 2
+  },
+  {
+   "agent": "agent-afc685ba11a46232a",
+   "calls": 11,
+   "pushed_chars": 9862,
+   "recorded_chars": 9862,
+   "token_calls": 34160,
+   "per_call": 3105,
+   "pushes": 4,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-afe05580f2c6da391",
+   "calls": 112,
+   "pushed_chars": 26667,
+   "recorded_chars": 26667,
+   "token_calls": 946853,
+   "per_call": 8454,
+   "pushes": 7,
+   "held_calls": 0
+  },
+  {
+   "agent": "agent-afe065cc8cddf65c1",
+   "calls": 22,
+   "pushed_chars": 17861,
+   "recorded_chars": 17861,
+   "token_calls": 137691,
+   "per_call": 6259,
+   "pushes": 3,
+   "held_calls": 1
+  }
+ ]
+}

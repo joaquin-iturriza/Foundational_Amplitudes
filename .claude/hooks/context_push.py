@@ -191,13 +191,23 @@ def respond(inp, mode="post"):
     return ev, text
 
 
+def _compacted_agent(inp):
+    """context_guard.compacted_agent: a subagent's compaction fires SessionStart with the main session's ids."""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import context_guard
+        return context_guard.compacted_agent(inp)
+    except Exception:                   # noqa: BLE001
+        return None
+
+
 def respond_full(inp, mode="post"):
     secs = sections()
     who = inp.get("agent_id") or "main"
     ev = inp.get("hook_event_name") or {"pre": "PreToolUse", "post": "PostToolUse", "session": "SessionStart"}[mode]
     if mode == "session" or ev == "SessionStart":
-        if inp.get("agent_id"):
-            return ev, None
+        if inp.get("agent_id") or (inp.get("source") == "compact" and _compacted_agent(inp)):
+            return ev, None, []
         found = [(n, b) for n, h, b in secs if "main" in " ".join(h.get("session") or [])]
         new, _ = deliver(inp.get("session_id"), "main", found, reset=inp.get("source") in ("compact", "clear"))
         ev = "SessionStart"

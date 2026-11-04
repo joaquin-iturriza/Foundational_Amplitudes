@@ -7,11 +7,13 @@ CONTEXT_CLOSE or more to write its hand-off and end. Synthetic transcripts and a
         call at which the hook would have fired, against the transcript's compaction boundaries)
 
 OWNER_HANDOFF_HOOK points the tests at a copy of the hook (it is built and tested in a copy before install)."""
-import json, os, subprocess, sys, tempfile
+import json, os, re, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOK = os.environ.get("OWNER_HANDOFF_HOOK") or os.path.join(ROOT, ".claude", "hooks", "owner_handoff.py")
 OWNER, OTHER, CLOSED = "a0000000000000001", "a0000000000000002", "a0000000000000003"
+# the close line as tools/plan.py sets it (170k at 2cc96941, 300k since 30ce4d7b): the cases sit relative to it
+C = int(re.search(r"^CONTEXT_CLOSE = (\d+)", open(os.path.join(ROOT, "tools", "plan.py")).read(), re.M).group(1))
 
 
 def assistant(tokens, tool=True):
@@ -75,31 +77,31 @@ def check(name, sizes, agent, want, **k):
 
 
 def test_main_session_never():
-    check("main session at 190k", {"main": 190000, OWNER: 190000}, None, None)
+    check("main session past the line", {"main": C + 20000, OWNER: C + 20000}, None, None)
 
 
 def test_owner_below():
-    check("owner at 120k", {OWNER: 120000}, OWNER, None)
+    check("owner 50k below the line", {OWNER: C - 50000}, OWNER, None)
 
 
 def test_owner_just_below():
-    check("owner at 169999", {OWNER: 169999}, OWNER, None)
+    check("owner 1 below the line", {OWNER: C - 1}, OWNER, None)
 
 
 def test_owner_at_line():
-    check("owner at 170000", {OWNER: 170000}, OWNER, ["170000", "plan.py handoff e_own", "end"])
+    check("owner at the line", {OWNER: C}, OWNER, [str(C), "plan.py handoff e_own", "end"])
 
 
 def test_owner_past_window():
-    check("owner at 205k (past the window, compaction pending)", {OWNER: 205000}, OWNER, ["205000", "e_own"])
+    check("owner 35k past the line", {OWNER: C + 35000}, OWNER, [str(C + 35000), "e_own"])
 
 
 def test_non_owner_agent():
-    check("reviewer at 190k owns nothing", {OTHER: 190000}, OTHER, None)
+    check("reviewer past the line owns nothing", {OTHER: C + 20000}, OTHER, None)
 
 
 def test_closed_owner():
-    check("owner whose hand-off is written", {CLOSED: 190000}, CLOSED, None)
+    check("owner whose hand-off is written", {CLOSED: C + 20000}, CLOSED, None)
 
 
 def test_agent_transcript_path_field():
@@ -107,9 +109,9 @@ def test_agent_transcript_path_field():
         main_t = world(tmp, {OWNER: 100000})
         alt = os.path.join(tmp, "alt.jsonl")
         with open(alt, "w") as f:
-            f.write(json.dumps(assistant(180000)) + "\n")
+            f.write(json.dumps(assistant(C + 10000)) + "\n")
         got = run(tmp, call(main_t, OWNER, agent_transcript_path=alt))
-    assert got and "180000" in got, got
+    assert got and str(C + 10000) in got, got
 
 
 def test_missing_transcript():
@@ -128,7 +130,7 @@ def test_garbage_input():
 
 def test_last_record_not_assistant():
     """The tail ends in a tool result (the PostToolUse moment): the context is the last assistant call's."""
-    check("owner 175k, tool result last", {OWNER: 175000}, OWNER, ["175000"])
+    check("owner 5k past the line, tool result last", {OWNER: C + 5000}, OWNER, [str(C + 5000)])
 
 
 def replay(path):

@@ -370,7 +370,13 @@ def main():
     ap.add_argument("--samples", type=int, default=0, help="print N segments of each trigger x did cell (hand check)")
     ap.add_argument("--handcheck", action="store_true",
                     help="redesign era: 20 inline, 10 orchestration, 10 none segments (seed 0) with the call that set the label")
+    ap.add_argument("--split", help="ISO time: the redesign era ends there and redesign_after starts (a before/after "
+                    "of a change; agent_redesign step 7 re-measure)")
     a = ap.parse_args()
+    if a.split:                                  # in place: usage_report.period_of reads this same list
+        name, lo, _ = PERIODS[-1]
+        PERIODS[-1] = (name, lo, ts(a.split))
+        PERIODS.append(("redesign_after", ts(a.split), None))
     paths = sorted(p for p in glob.glob(os.path.join(FOLDER, "*.jsonl")) if TRIAL_DIR not in p)
     segs = scan(paths)
     if a.samples:

@@ -874,8 +874,8 @@ def subagent_activity(agent_id):
             last = parse(m.get("timestamp")) or last
             if m.get("type") == "assistant":
                 c = (m.get("message") or {}).get("content")
-                # over: a SubagentHandback call, or a final plain-text report (stop_reason end_turn), which
-                # handback_guard.py makes the only way a subagent ends
+                # over: a SubagentHandback call (Claude Code's required end of a subagent's run), or a last record
+                # that is plain text with stop_reason end_turn (an agent run without that requirement)
                 handed = (m.get("message") or {}).get("stop_reason") == "end_turn" or (
                     isinstance(c, list) and any(isinstance(x, dict) and x.get("type") == "tool_use"
                                                 and x.get("name") == "SubagentHandback" for x in c))
