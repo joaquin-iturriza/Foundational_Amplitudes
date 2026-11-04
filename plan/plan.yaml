@@ -7801,6 +7801,38 @@ entries:
       plan dead ends; decisions D219-D253: no read of a long-run trial. HETEROSC, emission-scales target (D234), default-sampled
       reads (D227), D252/D253 absolute MSE included; cache key the trial''s own (no hashed module changed deb290bc..b629bd68),
       23 GB on a miss vs 113 GB free.'
+  - at: '2026-11-04T18:23:03+00:00'
+    question: 'Step 47: is the het-loss arms'' ~12x on the 28 held-out one-loop classes (HD5) the het loss or the target of
+      the 63 sign-changing one-loop training pools? The het arms train those pools on signedlog (HETEROSC rules out the sign
+      head), the MSE arms on log max(|x|,s) plus the sign head. Arm v4_het_control_magnitude[_seed2]: the het control with
+      only data.signed_magnitude_target=true (those 63 pools on log max(|x|,s), no sign output), scripts/job_catalog_v3_short.sh,
+      recipes/catalog_v4_base_train.yaml, plus HD4/HD5 reads.'
+    prior: 'het_oneloop.py @fc71ee9e (data/het_oneloop.json): same pools, rows and truth on all 12 arms; het/MSE at share
+      0 class median 12.0 (sign-changing HD5 pools 19.9, positive 2.5), het bias -2.2 vs -0.27; sigma small on the training
+      one-loop pools (not a down-weighting). Searched results.tex (HD5, one-loop het, signedlog het, sign head HETEROSC),
+      the plan and decisions D219-D263: no het run with the signed pools on a magnitude target.'
+    measure: 'MSE of log|M|^2 on HD5 (tools/zero_shot_parent.py mse_logm2_real, --signed-magnitude, test split, 2000 events
+      per probe) at the best checkpoint (sigma stage, mu frozen); per class geometric mean over seeds 42/43, median over the
+      28 classes of the ratio to the MSE control (c37a4b26/a1ea15aa) and to the het control (87aeabca/53b9ed56), the sign-changing
+      (19) and positive (9) pools apart; het_oneloop.py extended with the new arm. Beside, information: PP4, EE4, H1-H7c,
+      HD4 against the het control.'
+    check: 'The HD5 read separates the two training targets on existing data: het (signedlog) over MSE (abslog+sign head)
+      12.0 overall, 19.9 on the sign-changing pools against 2.5 on the positive ones, 26 of 28 classes above 1, the seed spread
+      of the MSE control R_seed 1.17 (shares_deck_mse_ref.json); so a change of the signed pools'' target must move it if
+      it is the cause.'
+    fixed: 'Everything of v4_het_control: catalog_v4_base_train.yaml (1153 pools, share 0), emission-scales dimensionless
+      target and inputs, shared standardization, HETEROSC (heterosc_select nll, beta 0), loss_aggregation mean, sign_head
+      false, MuonAdamW at the Muon search best (lr 4.997e-3, decay 0.0217), batch 16384, width 8, 4264 steps, 1e4 train events
+      per process in memory, 200 val, the sigma-only stage (250 steps); the readers and recipes of the arms; CC-IN2P3 gpu_v100.'
+    control: 'The het control pair 87ea24d0/321a3de2 (HD5 re-reads 87aeabca/53b9ed56): one change, the 63 signed pools'' target.
+      The MSE control pair (HD5 c37a4b26/a1ea15aa) as the reference the deck uses.'
+    seeds: 42 and 43, as both controls.
+    outcome: 'R_mag = median class ratio of the new arm over the MSE control on HD5. YES (the target, not the loss): R_mag
+      <= 1.5 with the sign-changing pools'' ratio <= 2; the deck says so and the het row is relabelled. NO (the loss costs
+      one-loop transfer): R_mag >= 3; then sigma weighting is looked at. Between: both, reported with numbers. Cost: 2 jobs,
+      work 2.8 h each (tools/short_wall.py --het, 4264 steps at 1.01 s, sigma stage, 2313 probes at 1.45 s), limit 03:30:00
+      each with its 1.25 margin, 7 GPU-h on V100; no disk beyond the run dirs (in memory). Code: experiment.py data.signed_magnitude_target
+      (tests/test_parent_target_stats.py test_signed_magnitude_target_trains_on_abslog).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
