@@ -10381,6 +10381,7 @@ entries:
     '5': 'Joaquin: syncClaudeAiSkills false in ~/.claude/settings.json, and the CLAUDE.md line for low-effort lookup agents
       (asked 2026-10-31 ~00:30)'
     '11': step 14, the deck cold-read agent, held under D261/D268
+    '12': the next session's first mechanical-worker (agent definitions load at session start)
   owner:
     agent: a33c56fbc23d237da
     state: closed
