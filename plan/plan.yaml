@@ -8392,7 +8392,7 @@ entries:
     agent: af67f5612500a5634
     state: closed
     since: '2026-11-04T18:28:39+00:00'
-    state_at: '2026-11-04T18:48:57+00:00'
+    state_at: '2026-11-04T18:52:59+00:00'
     context: 160116
     context_at: '2026-11-04T18:50:44+00:00'
   findings:
