@@ -10205,7 +10205,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 37cced30
+    commit: 26f5a64a
     paths:
     - .claude/hooks/owner_handoff.py
     - '2026-11-04 owner aaf01b2d42241ffe1: next 1 cleanup done (lock_guard.py, reviewer_resume.py, handback_guard.py deleted;
@@ -10224,6 +10224,18 @@ entries:
     - analysis/agent_redesign/usage_report.json
     - analysis/agent_redesign/usage_report_v2.json
     - analysis/agent_redesign/usage_windows.json
+    - 'double wake (next 15, D279), 2026-11-04: main-session record since 2026-10-31T04:22Z: 32 agent task-notifications started
+      a turn of their own (the rest were folded mid-turn); the harness called the model on 4 (10-31 15:15, 19:31, 22:27 delivered-by-hand-back;
+      23:06 waiting on its own work), none since 10-31T23:06; the other 28 were held without a call. Hand-back to notification
+      gap: median 0.17 s, 82 of 83 under 1 s; the costly ones came 17-64 s later (resumed agents). Stop-hook hold refuted
+      by the record: at 10-31T19:31 the notification was queued 15 s before the Stop hooks finished and still started its
+      own turn. Fix: .claude/hooks/notification_absorb.py (UserPromptSubmit) blocks a completed agent notification whose result
+      says the report came by SubagentHandback, when the transcript holds that hand-back; dispatch.py never counts a prompt
+      block as a loop. Live (isolated claude -p 2.1.314, haiku): UserPromptSubmit fires on the turn-starting notification;
+      a block gives num_turns 0, no model call. Tests: tests/test_notification_absorb.py unit 13 cases pass (dispatcher case
+      fails without the dispatch fix); replay since 10-31T04:22Z: 29 turn-starting delivered blocked, 3 waiting passed, 0
+      of 438 other prompts blocked. Not live: needs the UserPromptSubmit registration (scratchpad dw/settings_ups.patch);
+      not tested: the interactive main session''s view of a block, UserPromptSubmit on mid-turn queued messages'
     - 'main-session state at the 2026-10-30 ~19:30 compaction: token pilot (Joaquin: cap 40% of the 5 h window, from 5%):
       baseline 16:55 UTC, scratchpad tokens_since.py and token_cap.json, weighted (in 1, out 5, cache write 1.25, read 0.1),
       0.536M per percent, stop at 15M; used 11.8M. Pending for Joaquin: CLAUDE.md owner close 300k->150k diff (proposed, unanswered);
