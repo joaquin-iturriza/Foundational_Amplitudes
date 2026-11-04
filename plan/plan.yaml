@@ -8293,6 +8293,32 @@ entries:
       largest class about 17 core-h, a lower bound if our sampler is less efficient than MadEvent''s; the 0.30 part subsampled
       from the existing pools except the 2->4 flat part with the IS branch (at most the tree regeneration, 39 core-h + 21
       core-h compiles).'
+    fix_at: '2026-11-04T19:40:28+00:00'
+    fix: '(5, not a repeat / prior incomplete) The prior names only the step 46-49 density and support reads and the share
+      arms; it omits the project''s sampling work that Joaquin pointed to on 2026-11-04 19:13: docs/results.tex sec:div-sampling
+      (coverage vs emphasis: coverage comes from generation, and the settled general default is flat in log|M|^2 shaped by
+      |M|^2-guided importance sampling, explicitly NOT the physical measure |M|^2 dPhi a cross-section generator targets,
+      ''the RAMBO starvation trap''; the antenna/uniform mixture''s interior optimum, both endpoints bad), the Sampling policy
+      paragraph (f_flat 0.35, 6x oversampling, IR-democratic splitter, adaptive sqrt(s) pass), the pre-generation coverage
+      check of the current/proposed/wide samples (lines ~776-1090), and D117''s pp-beam PDF-weighted sqrt(s_hat) sampler (approved,
+      ''never built'' per par:v4_density). The new design must start from these, say what each settled, and build on them.
+      (6, the user''s question) Joaquin D270: ''I''m not asking you to recreate the pp sampling, that''s why we are adding
+      it after ... sample in a way that covers the range the pp beams cover, but wider''. The proposal makes 0.70 of every
+      hadronic tree pool |M|^2-unweighted events at pp''s own sqrt(s_hat) distribution widened by only 0.05 dex: that is a
+      recreation of the pp (MadEvent) sampling, the very thing he said not to do and the measure sec:div-sampling rejected;
+      the default share 0.25 already supplies it. Redesign the catalog''s own coverage sampler (sqrt(s_hat) range spanning
+      pp''s and beyond, flat-in-log|M|^2 coverage reaching pp''s |M|^2 extremes incl. the initial-state collinear corners,
+      enough events per bin), not a pp emulator. (2, measure shown) The ''gap(0.5) 0 at u 0.7'' numbers are modelled with
+      pp''s own conditional ln|M|^2 standing in for the new component (envelope_design.py docstring: ''an upper bound ...
+      assumes the candidates reach every bin pp reaches''), so the candidate''s pass is by construction; the only real candidate
+      measurement must come from samples the candidate sampler actually draws (a CPU sample on a few classes, including 2->4
+      classes with the 1.57% above-max tail), shown before the design is chosen. (3, spread) No noise of the per-bin gap measure
+      is given: with 12000 pp events and 0.1 dex x 2 nat bins, sparse bins make ''density < f x pp'' a count fluctuation;
+      measure the gap of the current catalog on two disjoint halves (or two seeds of the candidate) and state the threshold
+      0.01 against that spread. (4, outcome) No branch for the gate failing (what changes if gap(0.5) > 0.01 or the 2->4 max
+      is not reached), and the follow-up training comparison at seeds 42/43 has no yes/no numbers; state both, or drop the
+      training part from this design and design it separately. (14, disk) No disk estimate for the rebuilt pools (1301 classes
+      x 1e5/1e4/1e4 plus the 6x candidate pools) against free disk on the generation site; read it and state it.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
