@@ -3758,6 +3758,8 @@ entries:
       is the one after the sigma fit, so its reported het. loss is the final (sigma_stage) value; re-read every het. loss
       quoted since at every width and length, redraw the width figure and the deck''s width and length slides. The checkpoint
       rule needs no change.'
+    55: 'Per-class read of the 16x-over-4x regression on the held-out 2->5 classes (H2p5, 38 classes, R 3.07 default-sampled
+      / 2.28 catalog-sampled, par:v4_length @7c47ca2f): which classes, whether level or shape, against their 4x errors'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8775,6 +8777,11 @@ entries:
       if:
       - 'reverted and re-read: corrected numbers to Joaquin'
       - 'a quoted number cannot be re-read: say which'
+    55:
+      feeds: 'whether the 16x best becomes the foundation pretraining candidate (step 16 outcome: length yes -> to Joaquin)'
+      if:
+      - 'a level offset on most 2->5 classes: report it with the length verdict as the 16x cost, propose a level fix read'
+      - 'a few classes carry it: name them and their cause, the verdict stands as written'
   owner:
     agent: a350a6cc3b59b136f
     state: working
