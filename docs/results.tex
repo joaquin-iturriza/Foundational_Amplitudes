@@ -14208,6 +14208,148 @@ reappear beyond the run-to-run spread. The round used 69.7 million re-read token
 million for the reviews; the two reviews that ended without a report, the hooks' own model checks and the
 orchestrating session not counted).
 
+\subsection{The agent redesign: what it changed and what it measured}\label{sec:agent-redesign}
+
+\paragraph{What changed.} From 2026-10-30 11:35 UTC (\code{84a15232}) every plan entry has one owning agent that is
+resumed on each event of its work and closes with a written hand-off; the main session only talks to the user and
+directs owners; a single Stop gate does the owner and waiter bookkeeping itself instead of refusing the main session's
+turn (D217); guards refuse waiting loops, unreviewed designs and work outside an item; the supervisor sorts every run
+end; and CLAUDE.md holds only rules, with the reference sections pushed into an agent's context by
+\code{.claude/hooks/context\_push.py} on the first tool call that needs them. Four parts of it were measured on the
+recorded transcripts, read in place.
+
+% src: python3 tools/push_replay.py --since 2026-11-02T05:14:00Z --until 2026-11-04T19:00:00Z --check @d30cb3aa
+% claim: agents=40
+% claim: check_replayed_over_recorded=0.999
+% claim: check_agents_off_by_5pct=0
+% claim: calls=1584
+% claim: per_call_tokens_mean=8111
+% claim: per_call_tokens_median_agent=4372
+% claim: token_calls_M=12.85
+% src: python3 tools/push_replay.py --since 2026-11-02T05:14:00Z --until 2026-11-04T19:00:00Z --revert 85064616 @d30cb3aa
+% claim: calls=1586
+% claim: per_call_tokens_mean=10802
+% claim: per_call_tokens_median_agent=6024
+% claim: token_calls_M=17.13
+% allow: 5 because it is the tolerance of the check, a setting
+% allow: 1 because it names the first cut, a label
+% allow: 8 because it is the size of the cut's commit, a fact of the diff
+\paragraph{Cut 1: acting sections pushed on writes only.} Commit \code{85064616} (2026-10-31) stopped pushing seven
+acting sections (canonical setup, figures, git, hooks, results notes, sites, testing) on reads, and stopped pushing the
+plan-work section to agents, who carry it in their brief. The question was whether the push hook, replayed, says what
+agents really received, and what the cut saves on the same tool calls. The replay
+(\code{tools/push\_replay.py}) runs every tool call of every subagent transcript through the hook in order; its
+token cost of a push is the push's tokens times the calls after it, each later call re-reading it. Over the 40 agents
+that started between the last change of the sections (2026-11-02 05:14 UTC) and 2026-11-04 19:00 UTC, the replayed
+reference text is 0.999 of what the transcripts recorded, and 0 agents differ by more than 5\%, so the replay can stand
+in for the live hook. The matched replay on the same transcripts, with only the 8 lines the cut added removed again,
+gives what the agents would have received without it: pushed text per API call falls from 10802 to 8111 tokens on
+average (1586 and 1584 calls: a held call is sent again), from 6024 to 4372 at the median agent, and the pushes' total
+from 17.13 to 12.85 million token-calls, about a quarter less, as the replay at the cut had predicted. None of the
+corrections these agents received in that window traces to a section the cut withheld (read by hand), so the cut was
+kept.
+
+% src: python3 tools/main_turns.py --split 2026-10-31T04:22:16Z --until 2026-11-04T19:00:00Z --out /dev/null @d30cb3aa
+% claim: redesign.total.usd=54.11
+% claim: redesign.total.segments=263
+% claim: redesign_after.total.usd=106.26
+% claim: redesign_after.total.segments=357
+% claim: redesign.by_trigger.stop_hook.usd_share=0.191
+% claim: redesign.by_trigger.stop_hook.segments=46
+% claim: redesign_after.by_trigger.stop_hook.usd_share=0.128
+% claim: redesign_after.by_trigger.stop_hook.segments=72
+% claim: redesign.by_call.inline.usd_share=0.087
+% claim: redesign_after.by_call.inline.usd_share=0.052
+% claim: redesign.by_did.inline.usd_share=0.299
+% claim: redesign_after.by_did.inline.usd_share=0.234
+% claim: redesign.orchestration_only_wakes.usd_share=0.459
+% claim: redesign_after.orchestration_only_wakes.usd_share=0.362
+% claim: redesign.orchestration_only_wakes.segments=162
+% claim: redesign_after.orchestration_only_wakes.segments=185
+% claim: redesign.orchestration_only_wakes.usd_per_segment=0.153
+% claim: redesign_after.orchestration_only_wakes.usd_per_segment=0.208
+% claim: redesign.orchestration_only_wakes.context_at_first_call_median_k=240.2
+% claim: redesign_after.orchestration_only_wakes.context_at_first_call_median_k=263.3
+% claim: redesign.by_trigger.waiter.usd_share=0.165
+% claim: redesign_after.by_trigger.waiter.usd_share=0.206
+% claim: redesign.by_trigger.waiter.usd_per_segment=0.255
+% claim: redesign_after.by_trigger.waiter.usd_per_segment=0.624
+% claim: redesign.by_trigger.agent_done.segments=15
+% claim: redesign_after.by_trigger.agent_done.segments=4
+% claim: redesign.total.absorbed_mid_turn.agent_done=85
+% claim: redesign_after.total.absorbed_mid_turn.agent_done=135
+% allow: 10 20 because they are the design's thresholds, settings
+% allow: 500k 200k because they are auto-compact windows, settings
+\paragraph{What wakes the main session, before and after D217.} The question was what the main session's cost goes to,
+to decide whether to cut its wakes or move its inline work to agents; the design's rule was to propose a cut when
+wakes that only orchestrate, double wakes per agent or Stop-hook refusals carry at least 10\% of its cost, and to move
+inline work when it carries at least 20\%. \code{tools/main\_turns.py} splits the main-session transcripts into
+segments, each from what woke the session (the user, an agent's hand-back, a task notification, the event waiter, a
+Stop-hook refusal, \dots) to the next wake, and classes each segment and each API call by what it did (inline: edits,
+commits, submissions, scripts run; read; orchestration: agents, plan and ledger commands; none: text only), priced at
+list price. The redesign before D217 (2026-10-30 11:35 to 2026-10-31 04:22 UTC, \$54.11 over 263 wakes) is set
+against the time after it, up to 2026-11-04 19:00 UTC (\$106.26 over 357 wakes). Stop-hook refusals fell from 0.191
+to 0.128 of the cost, although they woke the session more often (46 and 72 times: the context guard and real
+omissions, such as an unsent reply, a missing figure pair or an owner not resumed). Inline work fell from 0.087 to
+0.052 of the cost counted per API call, and from 0.299 to 0.234 counted per wake (a wake is inline if any of its calls
+is). Separate wakes for a finished background agent fell from 15 to 4, with 85 and 135 absorbed into a turn already
+running. Wakes that only orchestrate or say nothing still carry 0.459 and then 0.362 of the cost (162 and 185 wakes),
+and each costs more, \$0.153 against \$0.208, because the context at their first call grew from a median of 240.2 to
+263.3 thousand tokens once the auto-compact window was raised from 200k to 500k (D277); the event waiter's wakes cost \$0.255
+and \$0.624 each (0.165 and 0.206 of the cost). So the orchestration branch of the design fired; the cut it pointed
+to, a smaller auto-compact window, was withdrawn, because the user set that window at 500k (D277). Inline work per
+call is well under its line and per wake just above it, with D217 already routing inline fixes to agents.
+
+% src: python3 tools/compaction_replay.py .claude/hooks --until 2026-11-04T19:00:00Z @d30cb3aa
+% claim: events=57
+% claim: right=57
+% claim: main_events=36
+% claim: agent_events=21
+% claim: agent_compactions=7
+% claim: agents=5
+% claim: agent_events_before_fix=21
+% allow: 120 because it is the detection window in seconds, a setting
+\paragraph{The compaction leak.} Two notes meant for the main session reached agents. The first, the context guard's
+flush note at an owner's tool call (2026-10-31 04:05 UTC), came from a hook branch that did not test for an agent and
+was fixed by \code{5708b248}. The second is how Claude Code reports a subagent's compaction: its
+\code{SessionStart:compact} hooks run with the main session's ids and no agent id, so the guard printed the whole plan
+and the main session's instruction to launch owners into the agent, cleared the main session's compaction markers,
+and the push hook pushed the plan-work section to it. \code{context\_guard.compacted\_agent} (\code{4550ed8c}) now
+names the agent whose transcript, written in the last 120 s, holds a compaction boundary newer than the main
+session's; the agent gets a short note of its own and the markers stay. Replayed on every recorded
+\code{SessionStart:compact} hook call from 2026-10-29 to 2026-11-04 19:00 UTC (\code{tools/compaction\_replay.py}), it
+names the right session in 57 of 57: 36 calls of the main session and 21 of agents, these 7 compactions of 5 agents,
+all 21 before the fix.
+
+% src: python3 tools/model_trial.py report @d30cb3aa
+% claim: sonnet.tasks=10
+% claim: sonnet.passed_first=9
+% claim: opuslow.passed_first=9
+% claim: sonnet.passed_with_rework=10
+% claim: opuslow.passed_with_rework=10
+% claim: sonnet.hand_read_ok=9
+% claim: opuslow.hand_read_ok=9
+% claim: sonnet.usd_total=1.91
+% claim: opuslow.usd_total=2.88
+% claim: sonnet.usd_per_task=0.19
+% claim: opuslow.usd_per_task=0.29
+% claim: sonnet.vs_opuslow.ratio_of_totals=0.662
+% claim: sonnet.vs_opuslow.median_paired_ratio=0.654
+% claim: sonnet.vs_opuslow.min=0.585
+% claim: sonnet.vs_opuslow.max=0.782
+% allow: 5.5 because it is the model version, a name
+% allow: 0.6 because it is the design's threshold, a setting
+% allow: 30 5 because they are the watch's size and revert count, settings
+\paragraph{Which model for small tool fixes.} The question (D203) was whether small tool fixes can go to Sonnet 5.5 at
+its default effort instead of Opus 5.5 at low effort (D138) at no loss and at most 0.6 of the cost. 10 past fixes of
+this repository, each with its own test, were given to both from the fix's parent commit, with the same brief stating
+the defect as it was seen; a task passed when the fix's own tests passed on the agent's work, and a failed one was
+resumed once with the failing output. Both passed 9 at the first attempt and 10 after one rework, and the hand read
+found 9 of 10 sound in each. Sonnet cost \$1.91 against \$2.88 in all (\$0.19 and \$0.29 a task): 0.662 of the cost
+over all tasks and a median of 0.654 per pair (0.585 to 0.782), above the 0.6 line, so by the design the answer was no.
+With equal quality on the 10 pairs, the user switched mechanical steps to Sonnet anyway (D213), watching its first 30
+tasks and reverting after 5 failures.
+
 % ==========================================================================
 \section{The compute envelope: VRAM and step time}\label{sec:envelope}
 % ==========================================================================
