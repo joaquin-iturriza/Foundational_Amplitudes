@@ -8388,9 +8388,9 @@ entries:
       - 'a candidate cannot reach 0% outside: say which classes and why'
   owner:
     agent: af67f5612500a5634
-    state: stopped
+    state: working
     since: '2026-11-04T18:28:39+00:00'
-    state_at: '2026-11-04T18:48:17+00:00'
+    state_at: '2026-11-04T18:48:57+00:00'
     context: 137982
     context_at: '2026-11-04T18:48:54+00:00'
   findings:
