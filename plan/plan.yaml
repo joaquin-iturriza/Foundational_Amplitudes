@@ -10382,7 +10382,7 @@ entries:
       (asked 2026-10-31 ~00:30)'
   owner:
     agent: a33c56fbc23d237da
-    state: working
+    state: closed
     since: '2026-11-04T19:30:39+00:00'
     state_at: '2026-11-04T19:30:39+00:00'
     context: 127296
@@ -11087,19 +11087,16 @@ entries:
       reaches SubagentHandback; needs a settings registration (matcher SubagentHandback -> dispatch.py handback_guard.py),
       diff given to the main session. Not verified live.'
   handoff:
-    state: '2026-11-04 (D268, D272): next 1 cleanup, 6 cut-1 check (keep), 8 (dead end: SubagentHandback is required), 9 (flush
-      note: fixed by 5708b248; new leak via a subagent''s SessionStart:compact fixed in 4550ed8c) done; 5 partly (mechanical-worker
-      tools line, measurable only in the next session; effort after D213''s watch, 27/30); 7 re-measured, proposal to Joaquin:
-      auto-compact window 500k -> 300k (his setting); write-up and close wait on next 10 (held, D261)'
-    decisions: Hook changes built in a scratch copy, installed after their tests; transcripts read in place; the cut-1 matched
-      replay reverts only the 8 header lines of 85064616; mechanical-worker effort left unchanged until D213's 30-task watch
-      ends so the watch stays clean
-    ruled_out: 'plain-text endings for subagents (handback_guard): Claude Code requires SubagentHandback'
+    state: '2026-11-04: write-up in docs/results.tex sec:agent-redesign committed and passed by the notes-editor (37cced30);
+      step 13 dropped (D277 keeps the main window at 500k); open: next 12 (mechanical-worker tool cut, measurable next session;
+      effort after D213''s watch) and next 14 (deck cold read, held D268); next 11 = plan done once 14 is settled'
+    decisions: 'Numbers rerun over a closed window ending 2026-11-04T19:00Z (tools d30cb3aa: --until in push_replay/main_turns/compaction_replay,
+      push_replay --revert 85064616 rebuilds the cut-1 counterfactual from git) so verify_claims reproduces them; no cut proposed
+      for the three wake branches that fired (D277, Stop refusals are real omissions, D217 already routes inline work)'
+    ruled_out: lowering the main session's auto-compact window (D277)
     running: none
-    files: .claude/hooks/context_guard.py .claude/hooks/context_push.py tests/test_compacted_agent.py tools/compaction_replay.py
-      tools/main_turns.py .claude/agents/mechanical-worker.md analysis/agent_redesign/main_turns_split_5708b248.json analysis/agent_redesign/push_replay_check_nov2.json
-      analysis/agent_redesign/push_replay_precut_nov2.json
-    written: '2026-11-04T19:24:21+00:00'
+    files: docs/results.tex tools/push_replay.py tools/main_turns.py tools/compaction_replay.py tools/model_trial.py analysis/agent_redesign/main_turns_split_5708b248.json
+    written: '2026-11-04T19:52:42+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
