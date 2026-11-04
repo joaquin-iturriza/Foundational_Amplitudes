@@ -9888,6 +9888,15 @@ entries:
       the het control the 16x is 0.195 [0.142,0.273] vs 4x 0.186 [0.136,0.268], absolute class-median MSE 0.268 vs 0.265 (PP4
       trained 0.0099 vs 0.0161, EE4 trained 0.0223 vs 0.0355). Both sweeps not converged (best lr at the window''s top, best
       at the last validation). Write-up in docs/results.tex pending (file carries other agents'' uncommitted edits).'
+  - at: '2026-11-04T21:10:14+00:00'
+    text: '2026-11-04 step 47 read (E3603/E3604; het_oneloop.py magnitude @74a30052 -> data/het_magnitude.json): het control
+      with only data.signed_magnitude_target (FA-ccin2p3-5abe4a0e/92207f6a, sigma-stage parent) on HD5 (28 one-loop classes,
+      abslog scoring), R = class median, seeds'' gmean, bootstrap widened by the het pair''s seed ratio: (a) over the het
+      control 0.097 [0.047, 0.291] (seeds 0.082/0.106): YES, the signedlog target of the 63 sign-changing training pools is
+      the main cause; sign-changing 19: 0.058 [0.027, 0.115], positive 9: 0.41 [0.10, 1.02]. (b) over the MSE control 1.47
+      [0.97, 1.99] (seeds 1.33/1.47; sign-changing 1.59, positive 1.20): <= 1.5, the target is all of it (borderline; two
+      differences, not the loss alone). Beside vs het control: H5 (catalog-sampled one-loop) 0.18 [0.07, 0.30]; PP4 1.00,
+      EE4 1.03, HD4 1.05, H1-H3/H6-H7c 0.87-1.11, all intervals span 1. No blow-ups.'
   handoff:
     state: '2026-11-04 ~20:51. Step 53 (Joaquin: show the catalog sampling with each part separated, democratic splitter included):
       sampling_example.py @cd54ef52 replays each chunk of v4_uux_epemg train seed 42 exactly (datagen.gen_chunk with the standalone,
