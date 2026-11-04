@@ -8355,9 +8355,9 @@ entries:
       - 'Joaquin says no: the share-0.25 default component covers that tail in training; note the gap in results.tex'
   owner:
     agent: af67f5612500a5634
-    state: working
+    state: stopped
     since: '2026-11-04T18:28:39+00:00'
-    state_at: '2026-11-04T18:28:39+00:00'
+    state_at: '2026-11-04T18:38:26+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
