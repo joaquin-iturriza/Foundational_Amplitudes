@@ -78,7 +78,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Results go in `docs/results.tex`: a finished finding in its results section with its hand-off item deleted; the hand-off holds only open work.
 - Every number reported comes from a committed tool at a named commit, never a throwaway one-liner, and says what it counts and how it was selected; a number in `docs/results.tex` carries `% src:` and `% claim:` lines that reproduce.
 - A proxy is checked on a few cases before it is reported; an estimate says it is one, with its assumption.
-- Every reported loss is read at the best checkpoint (lowest aggregate `val_loss_no_reg`, each process at that step); a het. run's model is its final one, after the σ fit that ends its training [D276]; a run that blows up is listed apart with where it blew up, never dropped.
+- Every reported loss is read at the best checkpoint (lowest aggregate `val_loss_no_reg`, each process at that step); a `HETEROSC` run's model is its final one, after the σ fit that ends its training [D276]; a run that blows up is listed apart with where it blew up, never dropped.
 - Every scaling fit uses `L(C) = A·C^(−α) + L_∞`; the bare power law is a labelled diagnostic only.
 - A feature is judged against the existing baseline (the best of a short HPO sweep, never retrained): first at the baseline's best HPs, done if better; else the same sweep for the feature, best against best, on `val_loss_no_reg`, re-based when preprocessing differs.
 - Every figure is saved as both `.png` and `.pdf`, and no run is configured with plotting off.
