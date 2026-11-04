@@ -9435,6 +9435,19 @@ entries:
       slide''s ''energy'' gap (v4_uux_epemg) is density, not support: log-uniform sqrt(s_hat) puts 2/8/27 of 1e5 catalog events
       in the three lowest bins against 29/83/212 of 55001 pp; its pp events all lie in window and cuts and reach 0.25 dex
       above the catalog''s log10|M|^2 max.'
+  - at: '2026-11-04T18:47:35+00:00'
+    text: '2026-11-04 (E3579): 16x sweep cov_v4_long_hpo8_cc_68224 finished 8/8 (size_figs.py pull+best @cb3fa933 -> data/long_sweeps_best.json;
+      objective = main run''s best val_loss_no_reg, het NLL): hp1262 -4.197 (lr 3.65e-3), 0753 -4.166 (3.42e-3), 0353 -4.108
+      (2.88e-3), 0849 -4.063 (3.53e-3), 1333 -4.022 (2.03e-3), 1806 -3.911 (3.44e-3), 0686 -3.856 (3.55e-3), 1860 -3.282 (5.39e-4);
+      all best at the last validation (68200); lr window [4.09e-4, 3.69e-3], best at log position 0.9955, 4 of the top 5 in
+      the outer 0.2: NOT CONVERGED (as the 4x, best -3.824 at 0.9955). Val het NLL 16x best -4.197 vs 4x best -3.824 (not
+      the length verdict, which is the zero-shot read). 17.6 h training per trial. Best-trial read FA-ccin2p3-1a46f3e0 (slurm
+      62973753, gpu_v100, limit 2:30, target 1.5 h = the 4x read''s 1.15 h plus one ~15.5 min memmap build: data_mmap.py changed
+      at f9822972/34fe4d93 so the key differs from the trial''s cache; 23 GB against 112 GB free): arm v4_het_long_best of
+      scripts/job_catalog_v3_short.sh @610422cc, LONG_BEST=cov_v4_long_hpo8_cc_68224/trial_1262, mode eval, REREAD of 6f8a1eed''s
+      arm under step 16''s design (2026-11-01T16:14). On its end: log checks (one ''built the cache'', ''data_stats.json and
+      particle_tokenizer.json equal the trial''s''), size_figs.py eval_mse, mixture_ab.py arms with the 16x best, R 16x/4x
+      per step 16''s design, mse_vs_compute and arms figures, write-up, ack E3579. Length figure redrawn (16x best bold) @cb3fa933.'
   handoff:
     state: '2026-11-04: Q1 (het one-loop 12x) and Q2 (pp support) answered and recorded as findings (het_oneloop.py @fc71ee9e,
       pp_support.py @a8d4b97f; figs/het_oneloop, figs/pp_support). pp_support split by physics: pp13v4_ 868 classes logm_above
