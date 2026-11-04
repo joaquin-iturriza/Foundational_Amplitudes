@@ -2437,6 +2437,36 @@ entries:
       prior is the lever) when |dG(w32)| < m on both seeds; WIDENS (training gains more than held-out) when dG(w32) >= +m
       on both; otherwise BETWEEN, reported with both seeds. w16 beside. Cost: CPU seconds on the laptop, 0 GPU-h; the 16x
       point waits only on catalog_coverage''s running read FA-ccin2p3-1a46f3e0 and a pull of its preds.'
+    fix_at: '2026-11-04T19:00:25+00:00'
+    fix: 'Checks 6 and 4 fail; the rest hold. (6, scope) Step (a), the one D216 asks for, is ''capacity and training length'',
+      but the design settles width only and keeps length as information. Its no-outcome (LEVEL: ''capacity leaves the gap,
+      (b) or a target prior is the lever'') would close (a) without length having been tested, and the step-16 review already
+      recorded that capacity may only show at long training. A matched length read exists without a new job: the 4x best (trial_1262,
+      eval FA-ccin2p3-6f8a1eed, floor already in size_mse_preds.json) against the 16x best (read FA-ccin2p3-1a46f3e0 running,
+      its sigma-stage preds to pull). Both are best-of-sweep results from the same 8-trial template at width 8, seed 42, which
+      is the project''s best-against-best protocol. Only 1x against 4x is unmatched (base HPs against tuned). Fix: decide
+      length on dG(16x best minus 4x best) with the same margin m, the same NARROWS/LEVEL/WIDENS rule and its one seed stated.
+      State that both sweeps have their best lr at the top of the window (not converged), so length and residual tuning are
+      read together. Keep 1x against 4x as information only. Then write the outcome per axis: width NARROWS/LEVEL/WIDENS and
+      length NARROWS/LEVEL/WIDENS, with (a) closed only when both are LEVEL or WIDENS and (b) or a target prior named as the
+      lever only then. If the 16x read is not in yet, the width verdict may be reported but (a) stays open. (4) As written,
+      the no-branch claims more than the width read can show; fixed with the per-axis outcome above. Passing, for the next
+      revision: (1) width 8/16/32 at 4264 steps, the same muP HPs, same data and selection; only the cache-lock code and LONG_CKPT
+      checkpointing differ, numerics unchanged. (2) Re-read: --null-only @27ef0192 gives G 0.4767/0.5514 at w8, seed difference
+      0.0747. width_x1.json H2 R 0.6423 at w16 (log10 -0.19). size_mse_preds.json plain-pool gmean floor 0.0857/0.0887 at
+      w8 against 0.0262/0.0245 at w32 (log10 about -0.52). Both parts move by more than m = 0.15. Natural-log units on both
+      sides: zero_shot_parent.py q-t uses np.log, and the floor ln|pred|-ln|truth| agrees with sigma^2 x MSE(prepd) at a ratio
+      of 1.0000000. The scorer differences (200 against 2000 events, the training pools'' val events also being the checkpoint-selection
+      events, shared against own standardization) are constant across widths and cancel in dG to first order. Say this in
+      the write-up, since G''s level alone carries them. (3) The seed difference of G is distributed like the noise of a paired
+      dG, so 2x the largest |diff| with both seeds required is sound. (5) Not a repeat. Searched docs/results.tex for capacity,
+      width, w32, held-out multiplicity, shape gap, training floor, 6-particle, gap_capacity, and catalog_coverage''s plan
+      for held-out over training, training floor and gap with width. par:v4_shape_gap (transfer gap, e 0.383/0.356, old control)
+      and par:v4_kshot_spread leave capacity and length open (results.tex ~2445). catalog_coverage step 33 / width_x1.json
+      reads each side separately, never held-out over training. (7) D216 and D267 name no comparison arm. (8) No map. (9)
+      Het loss, the decided default. (10) Both sides use catalog-sampled val events of catalog_v4. (11) No new pretraining.
+      (12) Only width moves among the width cells. (13, 14) No sweep, no job. Cells: H2 110/28/28/21/17/8/6 pools against
+      351/114/70/86/10/58/27 training pools (6gg has only 10, so report G per cell).'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
