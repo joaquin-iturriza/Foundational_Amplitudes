@@ -11331,11 +11331,12 @@ entries:
     - warm_start
   decisions:
   - D282
-  next: 'Warm start against scratch-with-change (design recorded; share 0.25 as the change): on design PASS submit the 12
-    runs on CC-IN2P3 (scripts/job_catalog_v3_short.sh @58bcf238, arms v4_het_warm25_k{533,1066,2132}[_seed2] and v4_het_cont_k{533,1066,2132}[_seed2],
-    --hdr=--time= from tools/short_wall.py), record them and the batch target; when all end extract their reads (mixture_ab.py
-    extract) and add a warm mode comparing W_k with B (scratch share 0.25), C_k and A (het control) on PP4, EE4, held-out
-    default- and catalog-sampled'
+  next: 'Design PASSED 2026-11-04 (re-check). First submission of the 12 (22:24) failed at start on a script bug (usage braces,
+    fixed @7f945910, CC synced). On the ws_budget_window timer (about 23:29, after the site gate''s 60-min window clears):
+    site pick FA --jobs 12 --mem 16G, then submit all 12 arms of scripts/job_catalog_v3_short.sh @7f945910 (v4_het_warm25_k533/1066/2132
+    and v4_het_cont_k533/1066/2132, each [_seed2]; --hdr=--mem=16G) with limits at short_wall''s margin-included hours rounded
+    to the minute (2:15, 2:27, 2:49 warm; 2:11, 2:23, 2:45 cont; 29.7 GPU-h, under the gate''s 30), record them and plan wait
+    on all 12; when they end extract reads (mixture_ab.py extract) and add the warm mode'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -11502,8 +11503,8 @@ entries:
       feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
         new pretraining, and at what fraction of its steps (D282)
       if:
-      - 'MATCH at some k with the change carried: report k/4264 to Joaquin as the cheap route, write up'
-      - 'no k matches: report g_k (recovered share of the scratch gain) per k and whether it rises with k'
+      - 'MATCH at some k with the change carried: report k/4264 to Joaquin, write up'
+      - 'no k matches or INCONCLUSIVE: report g_k per k; NO goes with the warm-start DyHPO as the next call for Joaquin'
       - 'a run broke: read its log, fix, resubmit that run'
   targets:
   - batch: ws_k_ladder
