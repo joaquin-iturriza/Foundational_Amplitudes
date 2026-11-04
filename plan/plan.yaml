@@ -7898,6 +7898,15 @@ entries:
       limit 03:30:00 each with its 1.25 margin, 7 GPU-h on V100; disk about 0.9 GB per arm against 112 GB free. Code: experiment.py
       data.signed_magnitude_target (f9822972, test_signed_magnitude_target_trains_on_abslog), memmap key 34fe4d93; repo-reviewer
       passed at 34fe4d93.'
+    passed_at: '2026-11-04T18:29:26+00:00'
+    reviewer: 'Re-check after FIX: only data.signed_magnitude_target moves vs het control (job script 211-229 unchanged at
+      34fe4d93, which adds the flag to the memmap key only); MSE control stated as two differences (loss + sign cross-entropy),
+      never read as loss alone. Check 2: het/MSE 12.0 on HD5 (19.9 sign-changing vs 2.5 positive, het_oneloop.json) and under
+      MSE signedlog vs sign head 2.78 on 14 held-out signed pools (signed_ab.json). Check 3: het pair seed spread, per-seed
+      het/MSE 9.23 vs 15.08, per-class 1.32 (het_oneloop_reads.json), interval widened by it; YES (a)<=0.25 vs a seed factor
+      ~1.3-1.6. Outcome yes/no/graded (b) stated; (a) between 0.25 and 0.7 is a partial cause, to be reported as such. HETEROSC
+      (D226), emission scales (D234), HD5 default-sampled (D263), 7 GPU-h, 0.9 GB/arm vs 112 GB free. Searched: signedlog,
+      sign head, sign_off, abslog, signed_magnitude, magnitude target, HD5, one-loop het in results.tex, plan, site decisions.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
