@@ -156,7 +156,8 @@ def flat_tags(name, lo, hi, n, role, seed, pool, k):
                     ch = np.load(path)
                 m = int(t["count"])
                 if ch.shape != pool[start:start + m].shape or not np.array_equal(ch, pool[start:start + m]):
-                    raise RuntimeError(f"chunk {t['idx']}: the replay differs from the pool's rows")
+                    raise RuntimeError(f"chunk {t['idx']}: the replay differs from the pool's rows: "
+                                       + _mismatch(ch, pool[start:start + m], k))
                 dem_f = {r.tobytes() for D in rec["dem"] for r in np.asarray(D, np.float64)}
                 for Pin, Q in rec["rot"]:
                     for a, b in zip(np.asarray(Pin, np.float64)[:, 2:], np.asarray(Q, np.float64)[:, 2:]):
@@ -168,6 +169,23 @@ def flat_tags(name, lo, hi, n, role, seed, pool, k):
         finally:
             mg.democratic_draw, mg.rotate_forward = dd, rf
     return out
+
+
+def _mismatch(a, b, k):
+    """what differs between a replayed chunk a and the pool's rows b: shapes, rows equal in momenta and in |M|^2,
+    rows of a found anywhere in b (an order change), the largest relative |M|^2 and momentum differences"""
+    if a.shape != b.shape:
+        return f"shapes {a.shape} vs {b.shape}"
+    pa, pb = a[:, :4 * k], b[:, :4 * k]
+    mom = (pa == pb).all(1); me = a[:, -1] == b[:, -1]
+    inb = {r.tobytes() for r in pb}
+    anyw = sum(r.tobytes() in inb for r in pa)
+    dme = float(np.max(np.abs(a[:, -1] - b[:, -1]) / np.maximum(np.abs(b[:, -1]), 1e-300)))
+    dp = float(np.max(np.abs(pa - pb)))
+    first = int(np.argmin(mom)) if not mom.all() else -1
+    return (f"{len(a)} rows, momenta equal {int(mom.sum())}, |M|^2 equal {int(me.sum())}, replayed momenta found "
+            f"anywhere in the pool {anyw}, max rel |M|^2 diff {dme:.3g}, max |dp| {dp:.3g}, first momentum mismatch "
+            f"row {first}, extra columns {a.shape[1] - 4 * k - 1}")
 
 
 def figs():
