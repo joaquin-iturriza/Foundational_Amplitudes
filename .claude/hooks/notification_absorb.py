@@ -10,6 +10,7 @@ called on it at the full context (main_turns.py agent_done).
 This hook blocks that prompt, so no model call is made on it, only when all hold:
   - the prompt is a <task-notification> whose task id is an agent id (a + 16 hex) and whose status is completed;
   - its result says the report was delivered through SubagentHandback (nothing in it is new);
+  - the prompt is that one notification and nothing else (no second notification, no reminder after it);
   - the transcript holds a hand-back message from that same agent (the report did reach this session).
 Anything else (a notification with the report inline, an agent waiting on its own work, a failed or killed agent,
 a background command, typed text) passes untouched. A crash exits 1 (non-blocking: the prompt goes through).
@@ -43,6 +44,10 @@ def verdict(prompt, transcript):
     if i < 0 or i > 1500:          # the harness's notification preamble may come first, nothing else
         return False, "not a task-notification"
     s = s[i:]
+    end = s.find("</task-notification>")
+    if end < 0 or s.count("<task-notification>") != 1 or s[end + len("</task-notification>"):].strip():
+        return False, "more than one notification, or text after it"      # anything else in it may be new
+    s = s[:end]
     m = AGENT.search(s[:300])
     if not m:
         return False, "not an agent's notification"

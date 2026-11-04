@@ -64,7 +64,12 @@ def unit():
                  ("agent killed", KILLED, hb, False),
                  ("background command", BASH, hb, False),
                  ("typed text quoting a notification late", "x" * 2000 + DELIVERED, hb, False),
-                 ("typed text", "Joaquin here: why did it wake twice?", hb, False)]
+                 ("typed text", "Joaquin here: why did it wake twice?", hb, False),
+                 ("delivered + a second notification (inline)", DELIVERED + "\n" + INLINE.replace(A, "a0123456789abcdef"),
+                  hb, False),
+                 ("delivered + trailing system-reminder", DELIVERED + "\n<system-reminder>Goal check-in</system-reminder>",
+                  hb, False),
+                 ("delivered + trailing whitespace", DELIVERED + "\n\n", hb, True)]
         for name, prompt, tp, want in cases:
             got, why = na.verdict(prompt, tp)
             print("%-45s block=%-5s %s" % (name, got, why))
@@ -158,8 +163,8 @@ def replay(since=None):
                 m = na.AGENT.search(prompt[:2000])
                 deliv = bool(na.DELIVERED.search(prompt)) and "<status>completed</status>" in prompt
                 counts[(where, kind, "delivered" if kind == "agent_done" and deliv else "-", block)] += 1
-                if block and kind != "agent_done":
-                    fails.append(("blocked a %s" % kind, p, t))
+                if block and not (kind == "agent_done" and deliv):
+                    fails.append(("blocked a %s that is not a hand-back delivery" % kind, p, t))
                 if kind == "agent_done" and deliv and m and m.group(1) in handed and not block:
                     fails.append(("passed a delivered notification after its hand-back", p, t, why))
             out.close()
