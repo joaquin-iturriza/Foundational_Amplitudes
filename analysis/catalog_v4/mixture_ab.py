@@ -1034,7 +1034,7 @@ def length():
                      "pair's |ln R_seed|")
     json.dump(out, open(os.path.join(DATA, "length_x16_over_x4.json"), "w"), indent=1)
     print(json.dumps({r: {n: (x["R"], x["widened"], x["n_classes"]) for n, x in v.items() if isinstance(x, dict)}
-                      for r, v in out["reads"].items()}, indent=0))
+                      for r, v in out["reads"].items()}))
     print("verdict", v)
 
 
