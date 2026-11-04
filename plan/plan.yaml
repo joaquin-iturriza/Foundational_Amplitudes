@@ -8225,12 +8225,10 @@ entries:
       - 'it covers: show support, not density'
       - 'it does not: name the cause per class and the fix'
   owner:
-    agent: a81e6ba99cdb38b13
-    state: stopped
-    since: '2026-11-03T09:14:31+00:00'
-    state_at: '2026-11-03T09:44:16+00:00'
-    context: 190534
-    context_at: '2026-11-03T09:47:00+00:00'
+    agent: a0735876e6698c1aa
+    state: working
+    since: '2026-11-04T17:59:53+00:00'
+    state_at: '2026-11-04T17:59:53+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
