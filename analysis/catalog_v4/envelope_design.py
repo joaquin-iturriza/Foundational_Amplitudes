@@ -150,7 +150,7 @@ def main():
     print(json.dumps(by_n, indent=0)); print(supp)
 
 
-if __name__ == "__main__" and sys.argv[1:2] != ["sampler"]:
+if __name__ == "__main__" and sys.argv[1:2] not in (["sampler"], ["own"]):
     main()
 
 
@@ -260,3 +260,69 @@ def sampler():
 
 if __name__ == "__main__" and sys.argv[1:2] == ["sampler"]:
     sampler()
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# own mode (step 49, the main session's correction of 2026-11-04): the criterion of main() (gap at f, outside support)
+# on the catalog's OWN partonic sampler, no events taken from the MadEvent pools (the default share is added on top
+# in training, separately). Weights sum to 1:
+#     python3 analysis/catalog_v4/envelope_design.py own   -> data/envelope_own.json
+#   own_u{u}_s{S}_keep  u: our own |M|^2-unweighted partonic events (accept-reject / VEGAS on our candidates, the
+#                       partonic cuts) at sqrt(s_hat) drawn from the class's pp sqrt(s_hat) marginal widened by a
+#                       Gaussian of S dex; its ln|M|^2 at each sqrt(s_hat) is stood in for by pp's conditional (equal up
+#                       to the lab vs partonic cut, 0.07% of pp events, and the PDF's boost, which does not change
+#                       |M|^2 at fixed sqrt(s_hat)); 1-u: the current catalog_v4 rows (subsampled, no IS branch)
+#   own_u{u}_s{S}_ext   1-u: the current sampling with the flat-in-log|M|^2 part (g = 0.35 of it) spanning
+#                       [pp min - 2 nat, pp max + 4 nat] per sqrt(s_hat) slice: what the initial-state collinear branch
+#                       must reach (upper bound above the current candidates' max); sqrt(s_hat) log-uniform to 6 TeV
+# The unweighted part is built from the same pp sample it is scored against, so the gap is optimistic in sparse bins;
+# the gate rescores built pools against the pp pools.
+def own_one(r):
+    pp = np.array(r["default"]["hist2d"], float); c = np.array(r["catalog"]["hist2d"], float)
+    if pp.sum() == 0 or c.sum() == 0:
+        return None
+    pp /= pp.sum(); c /= c.sum()
+    filled = np.where(pp.sum(1) > 0)[0]
+    ppc0 = pp / np.where(pp.sum(1, keepdims=True) > 0, pp.sum(1, keepdims=True), 1)
+    for i in range(ppc0.shape[0]):
+        if ppc0[i].sum() == 0:
+            ppc0[i] = ppc0[filled[np.argmin(np.abs(filled - i))]]
+    lo, hi = r["window"] if r.get("window") else (r["catalog"]["sqrts_min"], 6000.0)
+    lu = log_uniform_rows(lo, hi)
+    rest_ext = lu[:, None] * (0.65 * catalog_conditional(c) + 0.35 * flat_rows(pp, pp.shape[1]))
+    cands = {"current": c}
+    for S in (0.05, 0.1):
+        m_s = widen_rows(pp.sum(1, keepdims=True), S / 0.1)[:, 0]
+        comp = m_s[:, None] * ppc0; comp /= comp.sum()
+        for u in (0.5, 0.6, 0.7):
+            cands[f"own_u{u}_s{S}_keep"] = u * comp + (1 - u) * c
+            cands[f"own_u{u}_s{S}_ext"] = u * comp + (1 - u) * rest_ext
+    m = pp > 0
+    out = {k: {**{f"gap_{f:.3g}": gap(v, pp, f) for f in F}, "outside_support": float(pp[m & (v * 1e5 < 0.5)].sum()),
+               "mass_outside_pp_bins": float(v[~m].sum())} for k, v in cands.items()}
+    out["n_final"] = len(r["default"]["pdg"]) - 2
+    out["n_pp"] = r["default"]["n"]
+    return out
+
+
+def own():
+    global SQ2
+    d = json.load(open(os.path.join(DATA, "pp_support_reads.json")))
+    SQ2 = d["hist2d_edges"][0]
+    per = {r["probe"]: o for r in d["rows"] if "error" not in r for o in [own_one(r)] if o is not None}
+    p0 = next(iter(per.values()))
+    n = np.array([p["n_pp"] for p in per.values()], float)
+    summ = {k: {m: {"pooled": float((x * n).sum() / n.sum()), "median": float(np.median(x)), "p90": float(np.quantile(x, 0.9)),
+                    "max": float(x.max()), "n_classes_over_1pct": int((x > 0.01).sum())}
+                for m in p0[k] for x in [np.array([p[k][m] for p in per.values()], float)]}
+            for k in p0 if isinstance(p0[k], dict)}
+    json.dump({"source": "data/pp_support_reads.json (pp_support.py pull @841c5e29), envelope_design.py own",
+               "n_classes": len(per), "summary": summ, "per_class": per},
+              open(os.path.join(DATA, "envelope_own.json"), "w"), indent=1)
+    for k, v in summ.items():
+        print(k, {m: (round(s["pooled"], 4), round(s["median"], 4), s["n_classes_over_1pct"]) for m, s in v.items()
+                  if m in ("gap_0.5", "gap_0.333", "outside_support", "mass_outside_pp_bins")})
+
+
+if __name__ == "__main__" and sys.argv[1:2] == ["own"]:
+    own()
