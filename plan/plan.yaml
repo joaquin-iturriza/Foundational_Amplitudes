@@ -9244,6 +9244,23 @@ entries:
       |M|^2 left out (log). Geometric mean over all 1153 pools (plain / 64 signed): w8 1x s42 0.0914 (0.0857/0.274), w16 s43
       0.0471 (0.0432/0.207), w32 s43 0.0271 (0.0245/0.157), 4x best 0.0206 (0.0184/0.142). The planned eval-only re-read (about
       4 GPU-h) is not needed and was not submitted.'
+  - at: '2026-11-04T18:14:18+00:00'
+    text: '2026-11-04 step 45 (het one-loop zero-shot, het_oneloop.py @fc71ee9e -> data/het_oneloop.json, figs/het_oneloop):
+      no reading mismatch. On the 28 HD5 probes all 12 arms (het and MSE, shares 0/0.50/0.25, seeds 42/43) score the same
+      pool, rows and truth (n 2000, truth mean and variance equal to 1e-4, abslog via --signed-magnitude on both, physics
+      ok, read files reproduced to 9e-8; het read from the sigma stage with mu frozen at the best checkpoint, MSE at its best
+      checkpoint). The cause is the training target, not the loss: the het arms cannot carry the sign head (asserted incompatible
+      with HETEROSC), so the 63 sign-changing one-loop training pools (of 108 one-loop) train on signedlog sgn(x)log(1+|x|/s)
+      where the MSE arms train them on abslog log max(|x|,s) plus the sign head (data_stats amp_trafos_pp). Het over MSE at
+      share 0, class median: sign-changing HD5 pools (19, pool share of label<=0 >0) 19.9, positive pools (9) 2.5; all 28:
+      12.0, 26 of 28 above 1, 10/50/90% 1.8/12.0/89. Het MSE is mostly offset: median bias of log|M|^2 -2.2 (sign-changing)
+      vs MSE arm -0.27; bias^2 about 0.66 of the het MSE (approximate) against 0.22 for MSE. Inside the 13 sign-changing probes
+      with >= 20 negative-label events: het MSE 45 on negative-label events, 23 on positive; MSE arm 1.96 / 1.84. Sigma: het
+      median sigma 0.27 against RMSE 33x larger (overconfident), Spearman across classes 0.35, within 0.22; on its training
+      one-loop pools sigma is small (median 0.020 standardized on signedlog pools, 0.005 on the 45 log pools, 0.045 on trees),
+      so the mean is not pulled less there. Shares: het/MSE 12.0 (0), 16.7 (0.50), 13.9 (0.25). The deck''s ''het. loss''
+      one-loop row is loss plus target for the signed pools; a clean het test needs the signed pools on abslog without sign
+      (a GPU design, not run).'
   handoff:
     state: 'Deck talks/progress_nov2026/main.pdf rebuilt per Joaquin''s rejection of 2026-11-03 (@23cf5b33, 10 slides, 0 errors/overfull):
       sampling a/b (y label density), shares_deck (fig_shares_bound.py merged: MSE and het arms in one panel, rows pp/e+e-
