@@ -201,6 +201,11 @@ SHAPE_VARS = {"sqrts": np.logspace(np.log10(30.0), np.log10(6000.0), 31),
               "ptg": np.logspace(np.log10(10.0), np.log10(3000.0), 31),
               "absyg": np.linspace(0.0, 5.0, 26),
               "drgl": np.logspace(np.log10(0.4), np.log10(8.0), 26)}
+SHAPE_LAB = {"sqrts": r"$\sqrt{\hat s}$ [GeV]", "mll_over_mz": r"$m_{\ell\ell}/m_Z$", "ptg": r"gluon $p_T$ [GeV]",
+             "absyg": r"gluon $|y|$", "drgl": r"gluon $\min\Delta R_{g\ell}$"}
+# "the top events": log10|M|^2 above TOP, TOP derived in shape_figs from the kept flat part itself; rule and value
+# written to the report
+TOP_RULE = "lower edge of the first 0.25-dex bin above the kept part's median-count bin where kept < 0.5 x median"
 MZ = 91.1876
 
 
@@ -326,10 +331,10 @@ def shape_figs():
                                    for i in range(nz[0], nz[-1] + 1) if c1["candidates"][i]}
     figs = ps.panels(1 + len(SHAPE_VARS))
     fig, ax = figs[0]
-    ax.stairs(c1["candidates"], lb, color=ps.C.grey, label="candidates (6 per kept event)")
-    ax.stairs(c1["kept"], lb, color=ps.C.blue, label=r"kept: flat in $\log|\mathcal{M}|^2$")
+    ax.stairs(c1["candidates"], lb, color=ps.C.grey, label="candidates")
+    ax.stairs(c1["kept"], lb, color=ps.C.blue, label="kept flat")
     ax.stairs(c1["default"] * c1["kept"].sum() / c1["default"].sum(), lb, color=ps.C.vermillion, ls="--",
-              label="default (MadEvent), same total")
+              label="default, same total")
     ax.set_yscale("log"); ax.set_xlim(*LOGM_XLIM); ax.set_ylim(1, None)
     ax.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); ax.set_ylabel("events per 0.25")
     ps.legend(ax, "upper left")
@@ -341,20 +346,33 @@ def shape_figs():
     rep["top_rule"] = {"rule": TOP_RULE, "plateau": plateau, "TOP": TOP}
     top = mid > TOP
     rep["top_share"] = {s: round(float(c1[s][top].sum() / c1[s].sum()), 4) for s in c1}
+    # the Z bin: the m_ll/m_Z bin holding 1 (edges a factor 1.17 apart); per set its share of all events and of the
+    # top events, and the share of its events above TOP
+    em = np.array(d["vars"]["mll_over_mz"]); iz = int(np.searchsorted(em, 1.0) - 1)
+    rep["z_bin"] = {"edges": [round(float(em[iz]), 4), round(float(em[iz + 1]), 4)]}
+    for s in c1:
+        H = np.array(d[s]["mll_over_mz"], float)
+        rep["z_bin"][s] = {"share_of_all": round(float(H[:, iz].sum() / H.sum()), 4),
+                           "share_of_top": round(float(H[top, iz].sum() / max(H[top].sum(), 1)), 4),
+                           "top_share_in_bin": round(float(H[top, iz].sum() / max(H[:, iz].sum(), 1)), 4),
+                           "n_in_bin": int(H[:, iz].sum())}
     for (fig, ax), v in zip(figs[1:], SHAPE_VARS):
         e = np.array(d["vars"][v]); xm = np.sqrt(e[1:] * e[:-1]) if v != "absyg" else 0.5 * (e[1:] + e[:-1])
         rep[v] = {}
-        for s, col, lab in (("default", ps.C.vermillion, "default (MadEvent)"), ("candidates", ps.C.grey, "candidates"),
+        for s, col, lab in (("default", ps.C.vermillion, "default"), ("candidates", ps.C.grey, "candidates"),
                             ("kept", ps.C.blue, "kept flat")):
             H = np.array(d[s][v], float)
             t = H[top].sum(0)
-            ax.stairs(t / max(t.sum(), 1), e, color=col, label=lab + rf", $\log_{{10}}|\mathcal{{M}}|^2>{TOP:g}$")
+            ax.stairs(t / max(t.sum(), 1), e, color=col, label=lab)
             a = H.sum(0)
             rep[v][s] = {"top_median": float(xm[np.searchsorted(np.cumsum(t), t.sum() / 2)]) if t.sum() else None,
                          "all_median": float(xm[np.searchsorted(np.cumsum(a), a.sum() / 2)]),
                          "n_top": int(t.sum())}
         if v != "absyg":
             ax.set_xscale("log")
+        if v == "drgl":
+            from matplotlib.ticker import NullFormatter
+            ax.xaxis.set_minor_formatter(NullFormatter())
         ax.set_xlabel(SHAPE_LAB[v]); ax.set_ylabel("fraction of the top events")
         ps.legend(ax, "upper left")
     ps.save_panels(figs, FIGS.replace("sampling_example", "sampling_shape"))
