@@ -100,19 +100,33 @@ def hist():
     t_dem = np.zeros(len(Pt), bool); t_dem[fl] = dem[t_idx[fl]]
     out["h"]["trained_flat_splitter"] = _h(me_t[t_dem], sq_t[t_dem])
     out["h"]["trained_flat_rambo"] = _h(me_t[fl & ~t_dem], sq_t[fl & ~t_dem])
-    print("SAMPEX " + json.dumps(out, separators=(",", ":")))
+    # to a file, not stdout: site run merges stderr into stdout, and a long stdout line (block-buffered in a pipe) can
+    # be cut by stderr output written between its flushes (E3584: 'pull: no SAMPEX line'); pull cats the file
+    with open(_site_json(), "w") as f:
+        json.dump(out, f, separators=(",", ":"))
+    print("hist: wrote", _site_json())
+
+
+def _site_json():
+    """where hist writes its histograms on the site (outside the checkout, so the checkout stays clean)"""
+    return os.path.join(os.environ.get("SCRATCH") or "/tmp", "sampling_example.json")
 
 
 def pull():
-    """the hist step on CC-IN2P3 through site run; its SAMPEX line -> OUT_JSON"""
+    """the hist step on CC-IN2P3 through site run; the file it writes, printed after a marker line once hist has
+    exited (nothing else writes then) -> OUT_JSON"""
     import subprocess
     res = subprocess.run(["site", "--timeout", "3000", "run", "--item", "catalog_coverage", "ccin2p3", "FA", "--",
-                          "python analysis/catalog_v4/sampling_example.py hist"], capture_output=True, text=True, timeout=3100)
-    line = [l for l in res.stdout.splitlines() if l.startswith("SAMPEX ")]
-    if not line:
-        sys.exit("pull: no SAMPEX line\n" + res.stdout[-3000:] + res.stderr[-2000:])
-    open(OUT_JSON, "w").write(line[-1][len("SAMPEX "):])
-    print(json.loads(line[-1][len("SAMPEX "):])["flat_tags"])
+                          "python analysis/catalog_v4/sampling_example.py hist && echo && echo SAMPEX_BEGIN && "
+                          "cat \"${SCRATCH:-/tmp}/sampling_example.json\" && echo"],
+                         capture_output=True, text=True, timeout=3100)
+    lines = res.stdout.splitlines()
+    k = [i for i, l in enumerate(lines) if l.strip() == "SAMPEX_BEGIN"]
+    if res.returncode or not k or k[-1] + 1 >= len(lines):
+        sys.exit("pull: rc %d, no SAMPEX_BEGIN block\n" % res.returncode + res.stdout[-3000:] + res.stderr[-2000:])
+    d = json.loads(lines[k[-1] + 1])
+    open(OUT_JSON, "w").write(lines[k[-1] + 1])
+    print(d["flat_tags"])
 
 
 def flat_tags(name, lo, hi, n, role, seed, pool, k):
