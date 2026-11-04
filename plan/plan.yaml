@@ -7833,6 +7833,26 @@ entries:
       work 2.8 h each (tools/short_wall.py --het, 4264 steps at 1.01 s, sigma stage, 2313 probes at 1.45 s), limit 03:30:00
       each with its 1.25 margin, 7 GPU-h on V100; no disk beyond the run dirs (in memory). Code: experiment.py data.signed_magnitude_target
       (tests/test_parent_target_stats.py test_signed_magnitude_target_trains_on_abslog).'
+    fix_at: '2026-11-04T18:26:29+00:00'
+    fix: '(1) Not a repeat / prior (check 5): the prior omits earlier work on the same quantity, the signed one-loop pools''
+      target on held-out signed pools: docs/results.tex par. ''The signed pools'' A/B: the sign head ahead in one seed (2026-10-24)''
+      (~line 6615; analysis/catalog_daniel/data/signed_ab.json): under MSE, Daniel''s catalog, one seed, MSE of log max(|x|,floor):
+      14 held-out signed pools shifted signedlog 4.70 vs sign head 1.88, median per-pool ratio 2.78 (10-90% 0.63-5.8); 48
+      trained pools ratio 1.70. Also the catalog_v2 sign-head paragraph (~line 10712, 15-20% magnitude gain). Add both to
+      prior, say what differs here (het loss, catalog_v4, signedlog_quantile 0.01 instead of shift -3, two seeds), cite the
+      2.78 as evidence the measure moves with this kind of change, and use it in the outcome: if the target alone costs about
+      what it cost under MSE (~2.8x on the signed pools), say what R_mag about 2-3 means (target at its MSE size, loss the
+      rest) instead of leaving it as ''between''. (2) One change (check 1): the outcome''s R_mag is against the MSE control,
+      which differs from the new arm in the loss AND in the sign output with its cross-entropy on the 63 pools (sign_head
+      true vs false); NO is attributed to ''the loss'' alone. State the second difference and phrase NO as ''the het loss
+      or the missing sign cross-entropy, not the signedlog target'' (no arm separates them), and give an outcome on the one-change
+      ratio too, new arm over the het control on HD5 (12x now; what drop means yes). (3) Seeds (check 3, to state): the spread
+      cited (R_seed 1.17) is the MSE control''s; the het pair''s own on HD5 is larger: per-seed het/MSE class median 9.23
+      (seed 42) vs 15.08 (seed 43), per-class seed ratio exp(median|ln|) 1.32 het, 1.56 MSE (het_oneloop_reads.json). The
+      1.5 and 3 thresholds are a factor 2 apart; state this spread, report per-seed R_mag beside the seed average and the
+      widened class bootstrap as in the other reads. Passed: only data.signed_magnitude_target moves (job script lines 211-229,
+      f9822972); HETEROSC (D226/D71); emission-scales target (D234); HD5 default-sampled as the deck read D263 asks about;
+      2 jobs ~7 GPU-h, ~0.9 GB per arm (run dir 128M + predictions 727M) against 112 GB free on /sps/lpnhe; no sweep.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
