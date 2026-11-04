@@ -14301,8 +14301,8 @@ and each costs more, \$0.153 against \$0.208, partly because the context at thei
 each (0.165 and 0.206 of the cost). Three branches of the design fired. Wakes that only orchestrate are above the
 10\% line; the cut they point to, a smaller auto-compact window for the main session, is not proposed, because the
 user's decision in force sets that window at 500k (D277: ``let's do 500k for you, 300k for the others''). Stop-hook
-refusals are also above it; the cut it names, quieting the refusing hook, is not proposed, because since D217 the hook
-refuses only for what the main session left undone (the bookkeeping it used to refuse for it now does itself), and
+refusals are also above that line; the cut the design names for them, quieting the refusing hook, is not proposed, because since D217 the hook
+refuses only for what the main session left undone (it now does itself the bookkeeping it used to refuse for), and
 quieting it would let those omissions through. Inline work is well under its line per call and above it per wake; the
 hand-off that branch calls for is D217's routing of inline fixes, including the user's direct asks, to agents, already
 in force over this window, and the remaining inline wakes are not named here.
