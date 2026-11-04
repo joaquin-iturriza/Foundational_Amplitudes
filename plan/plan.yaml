@@ -10119,22 +10119,19 @@ entries:
   - D268
   - D272
   next:
-    1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
-      reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
-      write-up of what changed and what was measured'
-    5: 'Context cuts for agents: lower effort on mechanical calls (hidden thinking ~15k/call at median, 29k at last), trim
-      the skill listing (~7k) and prompt snapshot (~6k) in agents'' fixed part, shorten or once-only hook pushes (7-9k); each
-      measured with tools/context_breakdown.py and tools/usage_windows.py before and after'
-    6: 'Cut 1 live check: after 10 subagents have run past 85064616, python3 tools/push_replay.py --since 2026-10-31T00:25:00Z
-      --check (in-force hook reproduces recorded REFERENCE chars within 5 percent), matched saving per agent, hand read of
-      every correction of them for a cause in a withheld section'
-    7: 'Wake cuts from the usage attribution (main_turns.py @379982a1, redesign era main session $49): Stop-hook refusals
-      18% of $ (35 wakes, $0.25 each), orchestration-only wakes 45% (145, $0.15 each at ~240k context), 34 inline turns 31%
-      per turn / 9% per call (edits of hooks, site, site_gate, settings, CLAUDE.md): proposals to Joaquin'
-    8: 'Double wake per agent stop: test whether ending with plain final text (no SubagentHandback) gives one main-session
-      wake carrying the report (Joaquin asked 2026-10-31)'
-    9: 'Context-guard flush note reaches owners (catalog owner closed at 153k): make it target only the main session'
-    10: 'Deck cold-read agent (Joaquin 2026-11-03: ''it has to be well designed, not this, we will do it later''): removed
+    11: 'Close: write up in docs/results.tex what the redesign changed and measured (cut 1 replay and check, the main-session
+      wake re-measure, the compaction leak fix, the model trial), with % src lines from push_replay.py, main_turns.py --split
+      and compaction_replay.py; merged-away hooks (lock_guard.py, reviewer_resume.py, handback_guard.py), review_backlog.sh
+      check/bashpost and the scratchpad backups are removed (2026-11-04); plan done once next 10 is settled'
+    12: 'Context cut for the mechanical-worker (next 5): its definition now lists tools Bash, Read, Edit, Write, Grep, Glob
+      (2026-11-04), which drops the Agent, Artifact, Skill and ToolSearch definitions and the skill listing; agent definitions
+      load at session start, so the probe adc076b4eb704d7c5 in this session still had them (fixed part 29.8k against 13-16k
+      for the reviewers with three tools). Measure the first mechanical-worker of the next session (first-call context minus
+      brief) and its corrections; lower effort for it only after D213''s watch ends (27 of 30 tasks, 0 failed)'
+    13: 'Main-session wake cost (next 7): after D217 the Stop-hook share fell 19% -> 13% and inline per call 8.7% -> 5.1%,
+      but orchestration-only wakes still carry 37% at 268k median context under the 500k window. Proposal to Joaquin (his
+      setting): CLAUDE_CODE_AUTO_COMPACT_WINDOW 500000 -> 300000 in .claude/settings.json'
+    14: 'Deck cold-read agent (Joaquin 2026-11-03: ''it has to be well designed, not this, we will do it later''): removed
       from the weekly-deck skill; brief_guard''s COLD READ exemption (b03f41b1) stays unused. Design it with Joaquin when
       he brings it back.'
   done_when: null
@@ -10287,39 +10284,22 @@ entries:
     answered_at: '2026-11-04T18:49:52.981000+00:00'
     decision: D272
   step_why:
-    1:
+    11:
       feeds: whether the redesign is finished
       if:
-      - 'a day passes with no misfire of a new hook: clean up and close'
-      - 'a misfire: fix it first, restart the day'
-    5:
-      feeds: 'whether agent cost per call and per window falls further (redesign agents: $0.053/call, 45% cache read, 33%
-        cache write, 22% output)'
+      - 'next 10 settled by Joaquin and the write-up passes the notes-editor: plan done'
+      - 'next 10 still held: leave the entry open with the write-up committed'
+    12:
+      feeds: whether agent cost per call falls further
       if:
-      - 'context per call and $ per call fall with no rise in corrections (tools/agent_tasks.py): keep the cuts'
-      - 'no fall, or more corrections: revert that cut and record it as a dead end'
-    6:
-      feeds: 'whether cut 1 (a: working-on-the-plan main only; b: seven acting sections on writes only) stays'
+      - 'fixed part near 15k and no rise in corrections: keep'
+      - 'unchanged, or a task needed a dropped tool: revert the tools line, dead end'
+    13:
+      feeds: whether the main session's wake cost falls under the redesign
       if:
-      - 'reproduced and no correction traced: keep, write up'
-      - 'a correction traced to a withheld section: remove that header line, dead end'
-    7:
-      feeds: whether the main session's wake and inline cost falls under the redesign
-      if:
-      - 'Joaquin approves quieting the refusing Stop hooks and routing inline fixes to agents: apply, re-measure with main_turns.py
-        after a day'
-      - 'Joaquin declines: record as a dead end with his words'
-    8:
-      feeds: fewer main-session wakes
-      if:
-      - 'one wake with the report whole: change step_prompt, mechanical_prompt and agent definitions'
-      - 'still two wakes or report lost: report what the transcript shows to Joaquin'
-    9:
-      feeds: owner lifetimes
-      if:
-      - 'the hook can tell main from agent: restrict it and test on an agent turn'
-      - 'it cannot: owners'' briefs say to ignore it'
-    10:
+      - 'Joaquin approves: apply, re-measure with main_turns.py --split at the change after a day'
+      - 'Joaquin declines: record his words, no change'
+    14:
       feeds: whether decks get an independent readability check before they reach Joaquin, and in what form
       if:
       - 'Joaquin brings it back: design it with him'
