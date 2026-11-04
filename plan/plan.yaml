@@ -8799,9 +8799,9 @@ entries:
       - 'a quoted number cannot be re-read: say which'
   owner:
     agent: a6cc542156004bfd9
-    state: working
+    state: stopped
     since: '2026-11-04T19:52:13+00:00'
-    state_at: '2026-11-04T19:58:52.914000+00:00'
+    state_at: '2026-11-04T19:59:55+00:00'
     context: 94593
     context_at: '2026-11-04T19:57:08+00:00'
   findings:
