@@ -9924,6 +9924,19 @@ entries:
       length and het_oneloop.py magnitude withhold the verdict when blowups() flags a run (none flagged: YES/YES stand). Re-check
       sent to the same reviewer. Next owner: on its PASS, commit sampling_example.py, long_hpo_landscape.py, mixture_ab.py,
       het_oneloop.py, data/length_x16_over_x4.json, data/het_magnitude.json, then the shape run (hand-off).'
+  - at: '2026-11-04T21:55:53+00:00'
+    text: '2026-11-04 shape check of the flat-in-log|M|^2 part (Joaquin on figure c: ''I don''t see how you call that uniform'';
+      sampling_example.py shape @cf87b124 on CC, shape_figs @4e58eba1 -> data/sampling_shape.json, sampling_shape_report.json,
+      figs/sampling_shape_a-f; v4_uux_epemg train seed 42: 209988 candidates, 34998 kept flat, 55001 default MadEvent). Kept
+      per 0.25 dex 1010-1522 from -8.75 to -3.75 (median 1334), then 1159 at -3.5 down to 35 at -1.25, <=5 above -1. kept/candidates
+      0.12-0.16 on the plateau, 0.40 at -3.5, 0.90 at -2.5, 1.0 from -1.75: above about -2 every candidate is kept, so the
+      falling top is the candidates'' own density (672 candidates at -2.5, 35 at -1.25). TOP by the written rule -2.5: share
+      above it default 0.60, candidates 0.0083, kept 0.047. 99.8% of default and 94.7% of candidate/kept top events lie in
+      the m_ll/m_Z bin [0.938,1.101] (Z resonance); top median sqrt(s_hat) 113 GeV default, 135 GeV candidates (all candidates
+      939); gluon pT 16 / 19 GeV; gluon |y| and min DeltaR of the top events alike in the three sets (no initial-state collinear
+      excess on this 2->3 class). Cause: candidates'' sqrt(s_hat) log-uniform 30 GeV-6 TeV, lepton pair not drawn on the Z
+      Breit-Wigner: 3.3% of candidates in the Z bin (default 76%), 23.5% of those above TOP; the selection keeps at most the
+      candidates a bin has. Step 55 write-up committed 7c47ca2f (par:v4_length, notes-editor PASS).'
   handoff:
     state: '2026-11-04 ~22:30. Done today: step 53 sampling figures a/b/c (sampling_example.py @f08c5ef3; flat part split
       by generator, splitter 0.394); step 32 length verdict YES (mixture_ab.py length @d3b90e0d, data/length_x16_over_x4.json:
