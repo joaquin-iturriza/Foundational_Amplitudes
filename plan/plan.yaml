@@ -10172,6 +10172,16 @@ entries:
       call 75). Live: with a per-agent override (.claude/hooks/.owner_handoff_test, gitignored, removed after) at 20000 this
       owner got the note on its next Bash call; silent after removal. Also stale 300k -> 170k in plan/step_prompt.txt item
       6, .claude/agents/compact-worker.md, owner_context.py docstring (D223).'
+    - 'next 9 done 2026-11-04: the flush-note leak to owner a8f01a86034d7b73e (2026-10-31T04:05Z) came from c534526a''s PostToolUse
+      branch with no agent_id test, already fixed by 5708b248 (04:22Z); no PostToolUse/Stop/PreCompact delivery to an agent
+      since (all subagent transcripts read). A second leak was found and fixed: a subagent''s compaction fires SessionStart:compact
+      with the main session''s ids and no agent_id, so context_guard printed the whole plan and ''launch a step agent for
+      each entry'' into the agent and cleared the main session''s compaction markers, and context_push pushed working-on-the-plan
+      to it (5 agents since 10-31: aa7670a7d3cbd2cba, acd8bbf4e51c1e6d4, aadc46d99c71df5e6, ae7bc0ff5c64982f0 x2, acadf5fd3cc8f4bac).
+      context_guard.compacted_agent() tells them apart (newest compact_boundary in a subagent transcript written in the last
+      120 s); the agent gets a short note of its own, the markers stay. Tests: tests/test_compacted_agent.py 4/4 (6 detection
+      cases); tools/compaction_replay.py over every recorded SessionStart:compact since 10-29: 57/57 (19 compactions x 3 hook
+      calls, 7 agent and 12 main)'
     - switch-over C live since 06:19 (projects.toml run_ends enabled; review fixes 4609381f; end-marker misfires fixed in
       projects.toml and site_runends.py)
     - 'switch-over D built on branch redesign-d (worktrees/wt-redesign-d, commits 1bb22b6c..e23611f1): tests/test_redesign_d.py
