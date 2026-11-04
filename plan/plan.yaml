@@ -9904,6 +9904,18 @@ entries:
       in both sweeps the objective falls with lr up to the window''s top (bests 7.82e-3 of 7.90e-3 and 3.65e-3 of 3.69e-3),
       the lowest-lr trial worst; no visible trend in the other six HPs at 8 trials; both bests EMA off; every curve still
       descending at its last step.'
+  - at: '2026-11-04T21:46:37+00:00'
+    text: '2026-11-04 Joaquin on sampling_example_c (''I don''t see how you call that uniform''; asks the cause): sampling_example.py
+      shape/pull_shape/shape_figs written (uncommitted at handback: the review-backlog hook blocks commits while repo-reviewer
+      runs its overdue backlog): replays the 6 chunks of v4_uux_epemg train seed 42 recording the flat part''s candidates
+      and _flat_logm_select''s choice, then 2D hists of log10|M|^2 against sqrt(s_hat), m_ll/m_Z, gluon pT, |y|, min Delta
+      R to leptons for candidates, kept flat and default (MadEvent) events -> data/sampling_shape.json; shape_figs -> figs/sampling_shape_a-f
+      and data/sampling_shape_report.json. Mechanism read from code (mg5_pipeline_final.py:3347-3358, 3443-3470): the flat
+      part draws 6 candidates per kept event (half log-uniform sqrt(s), half an adaptive sqrt(s) pass), and keeps n_flat without
+      replacement with weight 1/(candidate density in 60 equal bins over the candidates'' own min..max of ln|M|^2): a bin
+      can give at most the candidates it has, so kept = min(candidates, level): flat only where candidates exceed the level,
+      the candidates'' own density above it. Per-bin kept counts (0.25 dex, sampling_example.json): 1010-1522 from -8.75 to
+      -3.75 (mean 1395, std/mean 7.8%), then 1159, 1013, 864, 743, 604, 439, 283, 177, 92, 35 from -3.5 to -1.25.'
   handoff:
     state: '2026-11-04 ~20:51. Step 53 (Joaquin: show the catalog sampling with each part separated, democratic splitter included):
       sampling_example.py @cd54ef52 replays each chunk of v4_uux_epemg train seed 42 exactly (datagen.gen_chunk with the standalone,
