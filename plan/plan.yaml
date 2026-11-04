@@ -10206,6 +10206,9 @@ entries:
       call 75). Live: with a per-agent override (.claude/hooks/.owner_handoff_test, gitignored, removed after) at 20000 this
       owner got the note on its next Bash call; silent after removal. Also stale 300k -> 170k in plan/step_prompt.txt item
       6, .claude/agents/compact-worker.md, owner_context.py docstring (D223).'
+    - 'next 13 withdrawn 2026-11-04: Joaquin''s D277 (''let''s do 500k for you, 300k for the others'', 2026-10-31) keeps the
+      main session''s auto-compact window at 500k, so the proposal to lower it to 300k is not put to him; the re-measure stands
+      as a result (docs/results.tex)'
     - 'next 6 done 2026-11-04: cut 1 live check over the 40 agents since the sections last changed (2026-11-02T05:14Z): push_replay
       --check reproduces the recorded REFERENCE chars at 0.999, 0 agents off by 5%; matched replay with cut 1 reverted (the
       8 header lines of 85064616 removed, same transcripts): pushes per call 10722 -> 8041 tokens (mean), per-agent median
