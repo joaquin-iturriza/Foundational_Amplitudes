@@ -10340,7 +10340,7 @@ entries:
       (asked 2026-10-31 ~00:30)'
   owner:
     agent: aaf01b2d42241ffe1
-    state: working
+    state: closed
     since: '2026-11-04T18:50:54+00:00'
     state_at: '2026-11-04T18:50:54+00:00'
     context: 105404
@@ -11045,22 +11045,19 @@ entries:
       reaches SubagentHandback; needs a settings registration (matcher SubagentHandback -> dispatch.py handback_guard.py),
       diff given to the main session. Not verified live.'
   handoff:
-    state: 'Held by D220 except next 10, which is done (2cc96941, D224): .claude/hooks/owner_handoff.py, PostToolUse on every
-      tool, tells a not-closed owner agent whose own context is >= CONTEXT_CLOSE (170k) to commit, record, plan handoff and
-      end; main session and non-owner agents never; tests/test_owner_handoff.py 11/11, replay of aa7670a7d3cbd2cba fires 29
-      calls before its first compaction, live-fired on owner adee1508af67be1ef via the per-agent override. Stale 300k -> 170k
-      fixed in plan/step_prompt.txt, compact-worker.md, owner_context.py. Earlier state stands: 5708b248 (Stop-hook bookkeeping,
-      context_guard PreCompact refusal) committed; queued under the hold: double-wake test (next 8, needs a decision on refusing
-      SubagentHandback), next 9 (note: context_guard''s PostToolUse branch already skips calls with agent_id at line 261,
-      so check whether the leak to a8f01a86034d7b73e came from another path before building), repo-reviewer and claudemd-keeper
-      over 5708b248, d14f4691 and 2cc96941; next 1, 5, 6, 7.'
-    decisions: Hook changes built in a scratch copy and installed only after tests pass; real transcripts read in place, never
-      copied into fixtures; the live-test override is per agent id so no other owner can be hit.
-    ruled_out: none new
+    state: '2026-11-04 (D268, D272): next 1 cleanup, 6 cut-1 check (keep), 8 (dead end: SubagentHandback is required), 9 (flush
+      note: fixed by 5708b248; new leak via a subagent''s SessionStart:compact fixed in 4550ed8c) done; 5 partly (mechanical-worker
+      tools line, measurable only in the next session; effort after D213''s watch, 27/30); 7 re-measured, proposal to Joaquin:
+      auto-compact window 500k -> 300k (his setting); write-up and close wait on next 10 (held, D261)'
+    decisions: Hook changes built in a scratch copy, installed after their tests; transcripts read in place; the cut-1 matched
+      replay reverts only the 8 header lines of 85064616; mechanical-worker effort left unchanged until D213's 30-task watch
+      ends so the watch stays clean
+    ruled_out: 'plain-text endings for subagents (handback_guard): Claude Code requires SubagentHandback'
     running: none
-    files: .claude/hooks/owner_handoff.py tests/test_owner_handoff.py .claude/settings.json .gitignore plan/step_prompt.txt
-      .claude/agents/compact-worker.md .claude/hooks/owner_context.py
-    written: '2026-10-31T04:40:45+00:00'
+    files: .claude/hooks/context_guard.py .claude/hooks/context_push.py tests/test_compacted_agent.py tools/compaction_replay.py
+      tools/main_turns.py .claude/agents/mechanical-worker.md analysis/agent_redesign/main_turns_split_5708b248.json analysis/agent_redesign/push_replay_check_nov2.json
+      analysis/agent_redesign/push_replay_precut_nov2.json
+    written: '2026-11-04T19:24:21+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
