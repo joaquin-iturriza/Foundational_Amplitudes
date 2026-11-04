@@ -8784,9 +8784,9 @@ entries:
       - 'H2p5 regression broad over its classes: write YES with a held-out cost on that axis, to Joaquin'
   owner:
     agent: a6cc542156004bfd9
-    state: working
+    state: stopped
     since: '2026-11-04T19:52:13+00:00'
-    state_at: '2026-11-04T21:44:20+00:00'
+    state_at: '2026-11-04T21:46:40+00:00'
     context: 223614
     context_at: '2026-11-04T21:44:01+00:00'
   findings:
