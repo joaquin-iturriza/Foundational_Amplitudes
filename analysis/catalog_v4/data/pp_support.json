@@ -125,6 +125,26 @@
   "near_pole_share_median": 0.5021199273167777,
   "near_pole_default_median": 0.5633333333333334
  },
+ "by_physics": {
+  "pp13v4_": {
+   "n_classes": 868,
+   "outside_any": 0.0009035138248847926,
+   "logm_above": 0.015644969278033796,
+   "logm_above_in_support": 0.01542967929061356,
+   "n_classes_logm_above_over_1pct": 199,
+   "n_2to4": 674,
+   "n_2to4_logm_above_over_1pct": 196
+  },
+  "pp13_": {
+   "n_classes": 433,
+   "outside_any": 0.0005706312548113934,
+   "logm_above": 0.015695919938414165,
+   "logm_above_in_support": 0.015551943342425165,
+   "n_classes_logm_above_over_1pct": 113,
+   "n_2to4": 327,
+   "n_2to4_logm_above_over_1pct": 113
+  }
+ },
  "logm_above_over_1pct_by_final": {
   "4 finals, 0 partons": 76,
   "4 finals, 2 partons": 124,

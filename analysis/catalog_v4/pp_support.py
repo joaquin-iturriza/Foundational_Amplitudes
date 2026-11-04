@@ -283,6 +283,18 @@ def summary():
                                "n_small_default_median_median": float(np.median([r["n_small_default_median"] for r in rows])),
                                "near_pole_share_median": float(np.median([x["near_pole_share"] for x in a])),
                                "near_pole_default_median": float(np.median([r["near_pole_default"] for r in rows]))}
+    # by the pp pool's physics: pp13v4_ (catalog_v4's) against pp13_ reused (catalog_v3's physics: massive b, minimal
+    # QED order), so a physics difference is not read as missing support
+    out["by_physics"] = {}
+    for pre in ("pp13v4_", "pp13_"):
+        rr = [r for r in rows if r["probe"].startswith(pre) and not (pre == "pp13_" and r["probe"].startswith("pp13v4_"))]
+        n = np.array([r["default"]["n"] for r in rr], float)
+        out["by_physics"][pre] = {"n_classes": len(rr),
+            **{k: float(sum(r["default"][k] * r["default"]["n"] for r in rr) / n.sum())
+               for k in ("outside_any", "logm_above", "logm_above_in_support")},
+            "n_classes_logm_above_over_1pct": int(sum(r["default"]["logm_above"] > 0.01 for r in rr)),
+            "n_2to4": int(sum(len(r["default"]["pdg"]) == 6 for r in rr)),
+            "n_2to4_logm_above_over_1pct": int(sum(len(r["default"]["pdg"]) == 6 and r["default"]["logm_above"] > 0.01 for r in rr))}
     big = [r for r in rows if r["default"]["logm_above"] > 0.01]
     out["logm_above_over_1pct_by_final"] = {}
     for r in big:
