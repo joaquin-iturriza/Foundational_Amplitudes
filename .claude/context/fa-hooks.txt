@@ -29,6 +29,7 @@ cmds: \bhook_incident\.py\b, \bswitch_settings\.py\b
 - Python hooks exit 1 on a crash (non-blocking); shell hooks are parsed before a write and restored from the last good
   copy after one.
 - Tests: `tests/test_setup_scenarios.py` and `tests/test_hooks_real.py` over the recorded states in
-  `tests/fixtures/hooks_20261029/`. A registration change goes to the user as the diff `tools/switch_settings.py` prints.
+  `tests/fixtures/hooks_20261029/`. A registration change goes in with the fix it completes when Joaquin asked for that fix [D280], shown to him as the
+  diff `tools/switch_settings.py` prints; any other registration change goes to him as that diff first.
 - A new doc Joaquin approved goes in `.claude/md_allowlist.txt`; a single-format figure he accepts goes in
   `.claude/figure_pair_ignore.txt`.
