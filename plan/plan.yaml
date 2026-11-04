@@ -10478,7 +10478,8 @@ entries:
     so Joaquin can decide whether and how to do it?
   status: running
   quotes: []
-  decisions: []
+  decisions:
+  - D266
   next: 'Researched explainer for Joaquin: two-loop amplitudes in detail, tools and public results, feasible processes, cost
     per point, what we would store; sourced; no generation until he decides'
   done_when: null
