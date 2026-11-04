@@ -2354,12 +2354,10 @@ entries:
     '7': 'D78: the user''s hold on the full catalog pretraining''s design (step (a) is held there, nothing to launch until
       it is released)'
   owner:
-    agent: acd8bbf4e51c1e6d4
-    state: stopped
-    since: '2026-10-31T03:56:15+00:00'
-    context: 58695
-    context_at: '2026-10-31T04:24:07+00:00'
-    state_at: '2026-10-31T04:24:31+00:00'
+    agent: a3c87bc016f01a716
+    state: working
+    since: '2026-11-04T18:50:51+00:00'
+    state_at: '2026-11-04T18:50:51+00:00'
   targets:
   - batch: shape_gap_TR_reread
     wall_h: 1.5
