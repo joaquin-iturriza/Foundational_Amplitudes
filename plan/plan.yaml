@@ -9914,6 +9914,14 @@ entries:
       can give at most the candidates it has, so kept = min(candidates, level): flat only where candidates exceed the level,
       the candidates'' own density above it. Per-bin kept counts (0.25 dex, sampling_example.json): 1010-1522 from -8.75 to
       -3.75 (mean 1395, std/mean 7.8%), then 1159, 1013, 864, 743, 604, 439, 283, 177, 92, 35 from -3.5 to -1.25.'
+  - at: '2026-11-04T21:49:38+00:00'
+    text: '2026-11-04 repo-reviewer BLOCK on the backlog (2 findings) fixed in the working tree, uncommitted (the hook blocks
+      commits until advance): long_hpo_landscape.py curves now keep every validation (off-scale ones at a cap of 1.0, marked
+      ^, listed): mid-run spikes in the 4x sweep (17056 steps), not only the warm-up: trial 0753 up to 7.9e8 at steps 4774/8184/13299,
+      0849 up to 7.4e8 at 5456/12617/13299 (both EMA on; both recovered, objective -3.64/-3.61); 16x only 1860 at 2728. mixture_ab.py
+      length and het_oneloop.py magnitude withhold the verdict when blowups() flags a run (none flagged: YES/YES stand). Re-check
+      sent to the same reviewer. Next owner: on its PASS, commit sampling_example.py, long_hpo_landscape.py, mixture_ab.py,
+      het_oneloop.py, data/length_x16_over_x4.json, data/het_magnitude.json, then the shape run (hand-off).'
   handoff:
     state: '2026-11-04 ~22:30. Done today: step 53 sampling figures a/b/c (sampling_example.py @f08c5ef3; flat part split
       by generator, splitter 0.394); step 32 length verdict YES (mixture_ab.py length @d3b90e0d, data/length_x16_over_x4.json:
