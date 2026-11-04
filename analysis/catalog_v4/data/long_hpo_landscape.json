@@ -1,0 +1,207 @@
+{
+ "source": "config.yaml of each finished trial on ccin2p3 (read-only site run); objective from data/long_sweeps_best.json",
+ "sweeps": {
+  "17056": {
+   "sweep": "cov_v4_long_hpo8_cc_17056",
+   "trials": [
+    {
+     "key": "17056_trial_1262",
+     "hp": "1262",
+     "val_loss": -3.8238031845451603,
+     "lr": 0.00782114,
+     "muon_weight_decay": 0.04733132,
+     "regularization_lambda": 9.114591e-08,
+     "cosanneal_warmup_frac": 0.1800024,
+     "cosanneal_eta_min": 1.376875e-08,
+     "ema_decay": 0.9597525,
+     "ema": false
+    },
+    {
+     "key": "17056_trial_0353_r2",
+     "hp": "0353",
+     "val_loss": -3.7106180127620565,
+     "lr": 0.00617248,
+     "muon_weight_decay": 0.01122899,
+     "regularization_lambda": 8.243626e-08,
+     "cosanneal_warmup_frac": 0.1488406,
+     "cosanneal_eta_min": 1.13953e-08,
+     "ema_decay": 0.9805811,
+     "ema": false
+    },
+    {
+     "key": "17056_trial_0753",
+     "hp": "0753",
+     "val_loss": -3.639031024823412,
+     "lr": 0.007327191,
+     "muon_weight_decay": 0.01215853,
+     "regularization_lambda": 4.845674e-07,
+     "cosanneal_warmup_frac": 0.1402441,
+     "cosanneal_eta_min": 1.33362e-08,
+     "ema_decay": 0.907564,
+     "ema": true
+    },
+    {
+     "key": "17056_trial_1333_r2",
+     "hp": "1333",
+     "val_loss": -3.6378800693803517,
+     "lr": 0.004341778,
+     "muon_weight_decay": 0.01451547,
+     "regularization_lambda": 8.398127e-07,
+     "cosanneal_warmup_frac": 0.089705,
+     "cosanneal_eta_min": 1.127397e-08,
+     "ema_decay": 0.968325,
+     "ema": true
+    },
+    {
+     "key": "17056_trial_0849",
+     "hp": "0849",
+     "val_loss": -3.6072614213190217,
+     "lr": 0.007574548,
+     "muon_weight_decay": 0.00102377,
+     "regularization_lambda": 1.315887e-08,
+     "cosanneal_warmup_frac": 0.1147136,
+     "cosanneal_eta_min": 1.281766e-08,
+     "ema_decay": 0.936911,
+     "ema": true
+    },
+    {
+     "key": "17056_trial_1176",
+     "hp": "1176",
+     "val_loss": -3.222480333340417,
+     "lr": 0.001582604,
+     "muon_weight_decay": 0.08488533,
+     "regularization_lambda": 7.387553e-09,
+     "cosanneal_warmup_frac": 0.1527933,
+     "cosanneal_eta_min": 2.208895e-08,
+     "ema_decay": 0.9085266,
+     "ema": false
+    },
+    {
+     "key": "17056_trial_0331",
+     "hp": "0331",
+     "val_loss": -3.0523997831421483,
+     "lr": 0.00151101,
+     "muon_weight_decay": 0.002060195,
+     "regularization_lambda": 9.066433e-08,
+     "cosanneal_warmup_frac": 0.08589013,
+     "cosanneal_eta_min": 2.221158e-08,
+     "ema_decay": 0.9726046,
+     "ema": false
+    },
+    {
+     "key": "17056_trial_1860_r2",
+     "hp": "1860",
+     "val_loss": -2.944409385214076,
+     "lr": 0.001156305,
+     "muon_weight_decay": 0.02796892,
+     "regularization_lambda": 4.685537e-08,
+     "cosanneal_warmup_frac": 0.1908437,
+     "cosanneal_eta_min": 4.115949e-09,
+     "ema_decay": 0.9831303,
+     "ema": true
+    }
+   ]
+  },
+  "68224": {
+   "sweep": "cov_v4_long_hpo8_cc_68224",
+   "trials": [
+    {
+     "key": "68224_trial_1262",
+     "hp": "1262",
+     "val_loss": -4.196568052896887,
+     "lr": 0.003649139,
+     "muon_weight_decay": 0.04733132,
+     "regularization_lambda": 9.114591e-08,
+     "cosanneal_warmup_frac": 0.1800024,
+     "cosanneal_eta_min": 1.376875e-08,
+     "ema_decay": 0.9597525,
+     "ema": false
+    },
+    {
+     "key": "68224_trial_0753",
+     "hp": "0753",
+     "val_loss": -4.165529888813414,
+     "lr": 0.00341867,
+     "muon_weight_decay": 0.01215853,
+     "regularization_lambda": 4.845674e-07,
+     "cosanneal_warmup_frac": 0.1402441,
+     "cosanneal_eta_min": 1.33362e-08,
+     "ema_decay": 0.907564,
+     "ema": true
+    },
+    {
+     "key": "68224_trial_0353_r2",
+     "hp": "0353",
+     "val_loss": -4.107877376369683,
+     "lr": 0.002879903,
+     "muon_weight_decay": 0.01122899,
+     "regularization_lambda": 8.243626e-08,
+     "cosanneal_warmup_frac": 0.1488406,
+     "cosanneal_eta_min": 1.13953e-08,
+     "ema_decay": 0.9805811,
+     "ema": false
+    },
+    {
+     "key": "68224_trial_0849",
+     "hp": "0849",
+     "val_loss": -4.062908835169953,
+     "lr": 0.003534083,
+     "muon_weight_decay": 0.00102377,
+     "regularization_lambda": 1.315887e-08,
+     "cosanneal_warmup_frac": 0.1147136,
+     "cosanneal_eta_min": 1.281766e-08,
+     "ema_decay": 0.936911,
+     "ema": true
+    },
+    {
+     "key": "68224_trial_1333_r2",
+     "hp": "1333",
+     "val_loss": -4.021714820420706,
+     "lr": 0.002025735,
+     "muon_weight_decay": 0.01451547,
+     "regularization_lambda": 8.398127e-07,
+     "cosanneal_warmup_frac": 0.089705,
+     "cosanneal_eta_min": 1.127397e-08,
+     "ema_decay": 0.968325,
+     "ema": true
+    },
+    {
+     "key": "68224_trial_1806",
+     "hp": "1806",
+     "val_loss": -3.910580124462305,
+     "lr": 0.003440204,
+     "muon_weight_decay": 0.2471496,
+     "regularization_lambda": 5.691528e-07,
+     "cosanneal_warmup_frac": 0.06649504,
+     "cosanneal_eta_min": 6.108961e-10,
+     "ema_decay": 0.9143514,
+     "ema": false
+    },
+    {
+     "key": "68224_trial_0686",
+     "hp": "0686",
+     "val_loss": -3.856443709834977,
+     "lr": 0.003554815,
+     "muon_weight_decay": 0.2843515,
+     "regularization_lambda": 2.082915e-07,
+     "cosanneal_warmup_frac": 0.1490761,
+     "cosanneal_eta_min": 5.152443e-08,
+     "ema_decay": 0.9677816,
+     "ema": false
+    },
+    {
+     "key": "68224_trial_1860_r2",
+     "hp": "1860",
+     "val_loss": -3.282260321678674,
+     "lr": 0.0005394801,
+     "muon_weight_decay": 0.02796892,
+     "regularization_lambda": 4.685537e-08,
+     "cosanneal_warmup_frac": 0.1908437,
+     "cosanneal_eta_min": 4.115949e-09,
+     "ema_decay": 0.9831303,
+     "ema": true
+    }
+   ]
+  }
+ }
+}
