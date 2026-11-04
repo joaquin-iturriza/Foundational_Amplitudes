@@ -448,10 +448,22 @@ def figs():
             seen.add(lab)
         report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
                                 "best": round(best(t["vals"])[1], 4)}
-    for k in sorted(t16, key=lambda k: not tr[k]["finished"]):
+    # the 68224-step sweep once all its trials finished: its best trial (long_sweeps_best.json) bold, the others thin,
+    # as the 17056-step sweep; while trials run, every trial orange (finished solid, running dashed)
+    b68 = json.load(open(os.path.join(DATA, "long_sweeps_best.json"))).get("68224", {}).get("best") or {}
+    best16 = f"68224_trial_{b68['hp']}" if b68 and all(tr[k]["finished"] for k in t16) else None
+    assert best16 is None or best16 in t16, best16
+    for k in sorted(t16, key=lambda k: (k != best16, not tr[k]["finished"])):
         t = tr[k]
-        lab = pre.format(ep=e16) + (", tuned trials" if t["finished"] else ", tuned trials still running")
-        draw(t["vals"], lab if lab not in seen else None, color=ps.C.orange, ls="-" if t["finished"] else "--")
+        if k == best16:
+            draw(t["vals"], pre.format(ep=e16) + ", best tuned trial, not converged", color=ps.C.orange, zorder=3)
+            lab = None
+        elif best16:
+            lab = pre.format(ep=e16) + ", other tuned trials"
+            draw(t["vals"], lab if lab not in seen else None, color=ps.C.orange, alpha=0.35, lw=0.8)  # lw: emphasis
+        else:
+            lab = pre.format(ep=e16) + (", tuned trials" if t["finished"] else ", tuned trials still running")
+            draw(t["vals"], lab if lab not in seen else None, color=ps.C.orange, ls="-" if t["finished"] else "--")
         seen.add(lab)
         report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
                                 "best": round(best(t["vals"])[1], 4)}

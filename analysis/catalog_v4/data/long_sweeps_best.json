@@ -107,9 +107,94 @@
    0.0004094,
    0.003685
   ],
-  "n_finished": 0,
-  "trials": [],
-  "best": null,
-  "not_converged": null
+  "n_finished": 8,
+  "trials": [
+   {
+    "hp": "1262",
+    "val_loss": -4.196568052896887,
+    "best_step": 68200.0,
+    "lr": 0.003649139,
+    "lr_log_position": 0.9955,
+    "best_at_last_validation": true,
+    "traintime_hours": 17.577607146501542
+   },
+   {
+    "hp": "0753",
+    "val_loss": -4.165529888813414,
+    "best_step": 68200.0,
+    "lr": 0.00341867,
+    "lr_log_position": 0.9659,
+    "best_at_last_validation": true,
+    "traintime_hours": 17.90420435872343
+   },
+   {
+    "hp": "0353",
+    "val_loss": -4.107877376369683,
+    "best_step": 68200.0,
+    "lr": 0.002879903,
+    "lr_log_position": 0.8878,
+    "best_at_last_validation": true,
+    "traintime_hours": 18.9943252840307
+   },
+   {
+    "hp": "0849",
+    "val_loss": -4.062908835169953,
+    "best_step": 68200.0,
+    "lr": 0.003534083,
+    "lr_log_position": 0.981,
+    "best_at_last_validation": true,
+    "traintime_hours": 17.70955373492506
+   },
+   {
+    "hp": "1333",
+    "val_loss": -4.021714820420706,
+    "best_step": 68200.0,
+    "lr": 0.002025735,
+    "lr_log_position": 0.7277,
+    "best_at_last_validation": true,
+    "traintime_hours": 19.038542000717587
+   },
+   {
+    "hp": "1806",
+    "val_loss": -3.910580124462305,
+    "best_step": 68200.0,
+    "lr": 0.003440204,
+    "lr_log_position": 0.9687,
+    "best_at_last_validation": true,
+    "traintime_hours": 17.571077457136578
+   },
+   {
+    "hp": "0686",
+    "val_loss": -3.856443709834977,
+    "best_step": 68200.0,
+    "lr": 0.003554815,
+    "lr_log_position": 0.9836,
+    "best_at_last_validation": true,
+    "traintime_hours": 17.632414759596188
+   },
+   {
+    "hp": "1860",
+    "val_loss": -3.282260321678674,
+    "best_step": 68200.0,
+    "lr": 0.0005394801,
+    "lr_log_position": 0.1256,
+    "best_at_last_validation": true,
+    "traintime_hours": 17.61408820927143
+   }
+  ],
+  "best": {
+   "hp": "1262",
+   "val_loss": -4.196568052896887,
+   "best_step": 68200.0,
+   "lr": 0.003649139,
+   "lr_log_position": 0.9955,
+   "best_at_last_validation": true,
+   "traintime_hours": 17.577607146501542
+  },
+  "not_converged": [
+   "best lr in the window's outer 0.2 (log position 0.9955)",
+   "4 of the top 5 lr in the outer 0.2",
+   "5 of the top 5 best at their last validation, the best included"
+  ]
  }
 }
