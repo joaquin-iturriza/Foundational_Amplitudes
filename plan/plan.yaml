@@ -3497,9 +3497,6 @@ entries:
     44: 'Today''s deck (Joaquin 2026-11-03): sampling slide (default vs catalog mixture by component, pp example), width/length/zero-shot
       with restored error bars, MSE log|M|^2 against compute and wall time, het. loss naming; plus a show/skip list of other
       results since the last deck for Joaquin.'
-    46: 'Catalog sampling does not envelop the pp 13 TeV default pools (Joaquin 2026-11-04): over every pp class, measure
-      where default events fall outside the catalog''s sqrt(s) and log|M|^2 support (support, not density), and trace why
-      (sqrt(s) window and draw, partonic vs lab cuts, other).'
     47: 'Het one-loop zero-shot (finding 2026-11-04, het_oneloop.py @fc71ee9e): the het arms'' 12x on HD5 follows the 63 sign-changing
       one-loop training pools trained on signedlog (no sign head under HETEROSC). Proposed to Joaquin, not run: a het control
       pair (share 0, seeds 42/43) with those pools on abslog (magnitude only), read on HD5 like the arms'
@@ -8214,11 +8211,6 @@ entries:
       if:
       - 'built and checked: sent with the list'
       - 'a figure can''t be made today: say which and why'
-    46:
-      feeds: whether catalog_v4's sampling meets its design goal of covering the pp beam range, and what to change if not
-      if:
-      - 'it covers: show support, not density'
-      - 'it does not: name the cause per class and the fix'
     47:
       feeds: whether the het loss itself costs the one-loop zero-shot, or only the signed pools' target
       if:
