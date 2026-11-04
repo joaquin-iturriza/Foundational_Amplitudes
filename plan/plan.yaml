@@ -2494,8 +2494,8 @@ entries:
     state: working
     since: '2026-11-04T18:50:51+00:00'
     state_at: '2026-11-04T18:50:51+00:00'
-    context: 110896
-    context_at: '2026-11-04T18:54:30+00:00'
+    context: 135722
+    context_at: '2026-11-04T19:00:38+00:00'
   targets:
   - batch: shape_gap_TR_reread
     wall_h: 1.5
