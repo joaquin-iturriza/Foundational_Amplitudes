@@ -8784,9 +8784,9 @@ entries:
       - 'a few classes carry it: name them and their cause, the verdict stands as written'
   owner:
     agent: a350a6cc3b59b136f
-    state: working
+    state: stopped
     since: '2026-11-04T21:48:23+00:00'
-    state_at: '2026-11-04T21:52:22.378000+00:00'
+    state_at: '2026-11-04T21:56:26+00:00'
     context: 121293
     context_at: '2026-11-04T21:53:11+00:00'
   findings:
