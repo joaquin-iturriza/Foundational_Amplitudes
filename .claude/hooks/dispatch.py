@@ -381,6 +381,7 @@ def main(argv):
 
 
 STOP_EVENTS = ("Stop", "SubagentStop")
+PROMPT_EVENTS = ("UserPromptSubmit",)   # notification_absorb.py blocks a prompt on purpose: never a loop
 
 
 def loop_through(spec, raw, r):
@@ -393,6 +394,8 @@ def loop_through(spec, raw, r):
     except ValueError:
         return False
     if not isinstance(inp, dict):
+        return False
+    if (inp.get("hook_event_name") or "") in PROMPT_EVENTS:      # a prompt absorbed is not a refusal to repeat
         return False
     state = os.environ.get("DISPATCH_STATE") or os.path.join(HERE, ".dispatch_state.json")
     cwd = inp.get("cwd") or os.getcwd()
