@@ -11981,3 +11981,6 @@ entries:
       and not run. Cost of C2-C6 plus C8: C2 15.0, MSE matched controls (seeds 42/43) 7.0, C3 7.4, C4 7.4, C5 6.8, C6 14.6
       + 7.0 (controls at seeds 44/45), C8 14.6 = 79.8 GPU-h beyond C1''s 29.6, 48 runs (short_wall.py, margin 1.25 included);
       above 30, Joaquin''s go asked by the main session.'
+  - at: '2026-11-04T21:53:54+00:00'
+    text: 'Correction to the run count: C2-C6 plus C8 are 54 runs (C2 6, MSE controls 6, C3 6, C4 6, C5 6, C6 12 warm + 6
+      controls, C8 6), not 48; the 79.8 GPU-h stands. The design''s ''54 with C7, C8'' was 60.'
