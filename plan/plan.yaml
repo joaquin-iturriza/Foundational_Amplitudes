@@ -206,6 +206,7 @@ entries:
     - FA-ccin2p3-11305a34
     - FA-ccin2p3-161fc56b
     - FA-ccin2p3-19971006
+    - FA-ccin2p3-1a46f3e0
     - FA-ccin2p3-1c11d753
     - FA-ccin2p3-2f7d86e7
     - FA-ccin2p3-30990343
@@ -255,7 +256,7 @@ entries:
     - FA-ccin2p3-f72f1379
     - FA-ccin2p3-fd393560
     - FA-ccin2p3-fd7fc137
-    commit: cbe2b221
+    commit: 93cb6425
     paths:
     - analysis/catalog_v3/data/pair_head_blowup.json
     - analysis/catalog_v3/data/prep_blend.json
@@ -287,6 +288,8 @@ entries:
     - analysis/catalog_v3/prep_sampling.py
     - analysis/catalog_v3/prep_shat_slope.py
     - analysis/catalog_v3/sign_head_search.py
+    - analysis/catalog_v4/abs_multiplicity.py
+    - analysis/catalog_v4/data/abs_multiplicity.json
     - analysis/catalog_v4/data/dipole_gate.json
     - analysis/catalog_v4/data/gap_capacity.json
     - analysis/catalog_v4/data/kshot_level.json
