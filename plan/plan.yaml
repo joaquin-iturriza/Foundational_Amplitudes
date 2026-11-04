@@ -11488,6 +11488,15 @@ entries:
       template''s fine-tune space (lr_scale, layer_decay, at the k in question), goes to Joaquin as the next call (D241).
       The catalog-sampled held-out read is reported beside as the cost check (from scratch the change cost nothing there,
       0.931).'
+    passed_at: '2026-11-04T21:18:32+00:00'
+    reviewer: 'Re-check: W_k and C_k differ only in the recipe (job_catalog_v3_short.sh 215-241). Measure: the 0.25 share
+      over the het control moved PP4 R 0.450 [0.360,0.556], EE4 0.223 [0.174,0.301] (mixture_ab_het.json). Seed spread R_seed
+      1.17/1.13; MATCH is now an equivalence bound (widened upper end <= 1.35; widened/R 1.235 on PP4, 1.347 on EE4), g at
+      the bound 0.62/0.80 verified; SHORT and INCONCLUSIVE named; a NO is qualified as at the untuned restarted schedule,
+      with the fine-tune DyHPO going to Joaquin next. HETEROSC, qperp target (D234), about 10 GB disk against about 92 GB
+      free on /sps/lpnhe. Searched: warm start, warm-start, warmstart, continu, resume, restart, pretrained_path, from scratch,
+      LONG_CKPT in results.tex; warm/continu/resum/pretrain/from scratch in site decisions and the plan; prior covers the
+      add-W continual pretraining and the het share runs.'
   step_why:
     1:
       feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
