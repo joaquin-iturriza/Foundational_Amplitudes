@@ -8786,7 +8786,7 @@ entries:
     agent: a350a6cc3b59b136f
     state: working
     since: '2026-11-04T21:48:23+00:00'
-    state_at: '2026-11-04T21:48:23+00:00'
+    state_at: '2026-11-04T21:50:05.610000+00:00'
     context: 93093
     context_at: '2026-11-04T21:50:11+00:00'
   findings:
