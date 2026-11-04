@@ -8786,7 +8786,7 @@ entries:
     agent: a6cc542156004bfd9
     state: stopped
     since: '2026-11-04T19:52:13+00:00'
-    state_at: '2026-11-04T21:14:31+00:00'
+    state_at: '2026-11-04T21:14:55.026000+00:00'
     context: 180600
     context_at: '2026-11-04T21:09:03+00:00'
   findings:
