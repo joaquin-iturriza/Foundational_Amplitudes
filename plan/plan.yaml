@@ -3758,6 +3758,8 @@ entries:
       is the one after the sigma fit, so its reported het. loss is the final (sigma_stage) value; re-read every het. loss
       quoted since at every width and length, redraw the width figure and the deck''s width and length slides. The checkpoint
       rule needs no change.'
+    55: Write up step 32's length verdict (data/length_x16_over_x4.json @d3b90e0d) in docs/results.tex with src/claim lines
+      beside the 4x best read; read the H2p5 regression (R 2.3-3.1 on 38 classes) per class
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8777,6 +8779,11 @@ entries:
       if:
       - 'reverted and re-read: corrected numbers to Joaquin'
       - 'a quoted number cannot be re-read: say which'
+    55:
+      feeds: 'whether the 16x best becomes the foundation pretraining candidate (step 16 outcome: length yes -> to Joaquin)'
+      if:
+      - 'H2p5 regression traced to a few classes or a read defect: write YES with it listed'
+      - 'H2p5 regression broad over its classes: write YES with a held-out cost on that axis, to Joaquin'
   owner:
     agent: a6cc542156004bfd9
     state: stopped
