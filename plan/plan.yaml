@@ -11300,3 +11300,32 @@ entries:
   blocks: nothing
   blocks_steps: *id001
   checked_until: '2026-11-04T20:21:31+00:00'
+- id: warm_start
+  title: Warm start from a pretrained model against pretraining from scratch, for a new change
+  question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
+    short retraining under the change match pretraining from scratch with the change, and at what fraction of the compute?
+    (short runs, D282)
+  status: running
+  quotes:
+  - said_at: '2026-11-04T21:07:53.532000+00:00'
+    text: So I'd like to test an idea first. If we find a change that is really good, and the change allows it, could we take
+      a pretrained model and warm start from that, and only do a short retraining with the new change? and how would that
+      compare to doing the pretraining with the new change from scratch? Of course let's test this with short runs
+    decision: D282
+    covers:
+    - warm_start
+  decisions:
+  - D282
+  next: Search docs/results.tex, the plan and site decisions for prior work (transfer and fine-tuning ladder, continuation
+    runs, LONG_CKPT resumes, any warm start under a changed setup) and name it with its results; then pick the test change(s)
+    and design the comparison (warm start + short retrain against from-scratch with the change, matched compute and data,
+    seeds), and pass the design reviewer before any job.
+  done_when: null
+  notes_ref: null
+  match: warm_*,ws_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
