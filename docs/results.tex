@@ -14245,7 +14245,7 @@ reference text is 0.999 of what the transcripts recorded, and 0 agents differ by
 in for the live hook. The matched replay on the same transcripts, with only the 8 lines the cut added removed again,
 gives what the agents would have received without it: pushed text per API call falls from 10802 to 8111 tokens on
 average (over 1586 and 1584 calls, which differ because a held call is sent again), from 6024 to 4372 at the median agent, and the pushes' total
-from 17.13 to 12.85 million token-calls, about a quarter less, as the replay at the cut had predicted. None of the
+from 17.13 to 12.85 million token-calls, about a quarter less. None of the
 corrections these agents received in that window traces to a section the cut withheld (read by hand), so the cut was
 kept.
 
@@ -14279,7 +14279,7 @@ kept.
 % claim: redesign.total.absorbed_mid_turn.agent_done=85
 % claim: redesign_after.total.absorbed_mid_turn.agent_done=135
 % allow: 10 20 because they are the design's thresholds, settings
-% allow: 500k 200k because they are auto-compact windows, settings
+% allow: 500k 300k 200k because they are context windows, settings
 \paragraph{What wakes the main session, before and after D217.} The question was what the main session's cost goes to,
 to decide whether to cut its wakes or move its inline work to agents; the design's rule was to propose a cut when
 wakes that only orchestrate, double wakes per agent or Stop-hook refusals carry at least 10\% of its cost, and to move
@@ -14289,16 +14289,23 @@ Stop-hook refusal, \dots) to the next wake, and classes each segment and each AP
 commits, submissions, scripts run; read; orchestration: agents, plan and ledger commands; none: text only), priced at
 list price. The redesign before D217 (2026-10-30 11:35 to 2026-10-31 04:22 UTC, \$54.11 over 263 wakes) is set
 against the time after it, up to 2026-11-04 19:00 UTC (\$106.26 over 357 wakes). Stop-hook refusals fell from 0.191
-to 0.128 of the cost, although they woke the session more often (46 and 72 times: the context guard and real
-omissions, such as an unsent reply, a missing figure pair or an owner not resumed). Inline work fell from 0.087 to
+to 0.128 of the cost, though they woke the session more often (46 and 72 times, in a window about six times
+longer: the context guard and real omissions, such as an unsent reply, a missing figure pair or an owner not
+resumed). Inline work fell from 0.087 to
 0.052 of the cost counted per API call, and from 0.299 to 0.234 counted per wake (a wake is inline if any of its calls
-is). Separate wakes for a finished background agent fell from 15 to 4, with 85 and 135 absorbed into a turn already
-running. Wakes that only orchestrate or say nothing still carry 0.459 and then 0.362 of the cost (162 and 185 wakes),
-and each costs more, \$0.153 against \$0.208, because the context at their first call grew from a median of 240.2 to
-263.3 thousand tokens once the auto-compact window was raised from 200k to 500k (D277); the event waiter's wakes cost \$0.255
-and \$0.624 each (0.165 and 0.206 of the cost). So the orchestration branch of the design fired; the cut it pointed
-to, a smaller auto-compact window, was withdrawn, because the user set that window at 500k (D277). Inline work per
-call is well under its line and per wake just above it, with D217 already routing inline fixes to agents.
+is). Separate wakes for a finished background agent fell from 15 of 263 wakes to 4 of 357, with 85 and 135 absorbed into
+a turn already running. Wakes that only orchestrate or say nothing still carry 0.459 and then 0.362 of the cost (162 and 185 wakes),
+and each costs more, \$0.153 against \$0.208, partly because the context at their first call grew from a median of
+240.2 to 263.3 thousand tokens: the window after D217 runs first under a 200k auto-compact window and, from
+2026-10-31 15:39 UTC, under 500k (D277), and is not split there. The event waiter's wakes cost \$0.255 and \$0.624
+each (0.165 and 0.206 of the cost). Three branches of the design fired. Wakes that only orchestrate are above the
+10\% line; the cut they point to, a smaller auto-compact window for the main session, is not proposed, because the
+user's decision in force sets that window at 500k (D277: ``let's do 500k for you, 300k for the others''). Stop-hook
+refusals are also above it; the cut it names, quieting the refusing hook, is not proposed, because since D217 the hook
+refuses only for what the main session left undone (the bookkeeping it used to refuse for it now does itself), and
+quieting it would let those omissions through. Inline work is well under its line per call and above it per wake; the
+hand-off that branch calls for is D217's routing of inline fixes, including the user's direct asks, to agents, already
+in force over this window, and the remaining inline wakes are not named here.
 
 % src: python3 tools/compaction_replay.py .claude/hooks --until 2026-11-04T19:00:00Z @d30cb3aa
 % claim: events=57
