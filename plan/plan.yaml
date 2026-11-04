@@ -10497,6 +10497,15 @@ entries:
     decision: D265
     withdrawn_at: '2026-11-04T17:59:14+00:00'
     withdrawn_why: D265 is Joaquin's request for exactly this explainer, made before the entry existed
+  - ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
+      form factors, checked against published NNLO coefficients); (2) which label: Catani remainder or MS-bar hard function,
+      and should the one-loop pools get a remainder label in the same scheme (needs colour-correlated Borns beyond two coloured
+      legs)?'
+    at: '2026-11-04T18:09:07+00:00'
+    searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
+      which ask for the explainer'
+    blocks: nothing
+    blocks_steps: &id001 []
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -10521,3 +10530,12 @@ entries:
       - 'go on the calibration tier: design a two-loop pipeline for ee->qq and ee->tt from closed-form form factors, certified
         against published NNLO coefficients'
       - 'no go: close the entry with the explainer as its result'
+  ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
+    form factors, checked against published NNLO coefficients); (2) which label: Catani remainder or MS-bar hard function,
+    and should the one-loop pools get a remainder label in the same scheme (needs colour-correlated Borns beyond two coloured
+    legs)?'
+  waiting_since: '2026-11-04T18:09:07+00:00'
+  searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
+    which ask for the explainer'
+  blocks: nothing
+  blocks_steps: *id001
