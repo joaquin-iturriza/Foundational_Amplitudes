@@ -8333,7 +8333,7 @@ entries:
       - 'Joaquin says no: the share-0.25 default component covers that tail in training; note the gap in results.tex'
   owner:
     agent: a0735876e6698c1aa
-    state: working
+    state: closed
     since: '2026-11-04T17:59:53+00:00'
     state_at: '2026-11-04T18:20:59+00:00'
     context: 262053
@@ -9391,22 +9391,27 @@ entries:
       in the three lowest bins against 29/83/212 of 55001 pp; its pp events all lie in window and cuts and reach 0.25 dex
       above the catalog''s log10|M|^2 max.'
   handoff:
-    state: 'Deck talks/progress_nov2026/main.pdf rebuilt per Joaquin''s rejection of 2026-11-03 (@23cf5b33, 10 slides, 0 errors/overfull):
-      sampling a/b (y label density), shares_deck (fig_shares_bound.py merged: MSE and het arms in one panel, rows pp/e+e-
-      in training, not in training default sampling, one-loop, counts), width, length, arms_zero_shot(_axes) (rows in words,
-      control named once), mse_vs_compute (MSE of log|M|^2 over 1089 plain-log pools, 64 signed one-loop pools left out: size_figs.py
-      pull_signed -> data/signed_pools.json; signed need an eval re-read with evaluation.save_predictions=true, none of the
-      runs saved predictions; colours as the zero-shot figure), loop_more_pools (fig_signext.py: 28 held-out one-loop processes,
-      control vs more one-loop training pools, seeds 42-45, 23 of 28 lower, median ratio 0.612), error_correlates_deck_rank/profile
-      (error_correlates.py deck, het control, seeds averaged). Cold reads by Explore agents (brief_guard refuses a general-purpose
-      agent without the rules block). weekly-deck skill gained the cold-read rule and no text/title/open-ends slides.'
-    decisions: D258 order; Joaquin 2026-11-03 rejection list (plain labels, one share figure, all training pools, one one-loop
-      slide, seeds combined).
-    ruled_out: 'Signed pools from the logs'' MSE (prepd): signedlog target, not log|M|^2.'
-    running: Sweep ccin2p3:cov_v4_long_hpo8_cc_68224 (16x); Jean Zay 19 pending jobs unresolved
-    files: talks/progress_nov2026/main.tex, analysis/catalog_v4/{fig_shares_bound,fig_signext,error_correlates,size_figs,sampling_example}.py,
-      analysis/catalog_v4/data/{size_mse,signed_pools}.json
-    written: '2026-11-03T09:13:07+00:00'
+    state: '2026-11-04: Q1 (het one-loop 12x) and Q2 (pp support) answered and recorded as findings (het_oneloop.py @fc71ee9e,
+      pp_support.py @a8d4b97f; figs/het_oneloop, figs/pp_support). pp_support split by physics: pp13v4_ 868 classes logm_above
+      1.56%, 199 over 1% (196 of them 2->4); pp13_ 433 classes 1.57%, 113 over 1% (all 2->4): the |M|^2 tail gap is not a
+      physics mismatch. Step 47 (het control with the 63 signed one-loop pools on log max(|x|,s), arm v4_het_control_magnitude[_seed2],
+      flag data.signed_magnitude_target @f9822972, memmap key 34fe4d93, repo-reviewer PASS at 34fe4d93): design recorded twice;
+      the design reviewer (agent aba768ef52ae79375) gave FIX on the first (prior signed_ab A/B 2.78 missing, MSE control differs
+      in loss and sign output, het seed spread 9.23 vs 15.08); the revised design (the second record) addresses all three
+      and waits for the re-check: continue that same reviewer with SendMessage, then on PASS: site pick FA --jobs 2, plan
+      target catalog_coverage --batch het_magnitude --wall 3.5 --jobs 2, site submit ccin2p3 FA scripts/job_catalog_v3_short.sh
+      --hdr=--time=03:30:00 --hdr=--mem=48G --item catalog_coverage -- v4_het_control_magnitude (and _seed2), plan run each,
+      plan wait on both. Step 48 (splitter initial-state branch) waits on Joaquin (coordinator asking).'
+    decisions: 'D263 (Joaquin''s two questions 2026-11-04) covers both reads and step 47 inside catalog_coverage''s approval
+      (coordinator: small, go after design PASS).'
+    ruled_out: Het one-loop 12x as a reading mismatch (same pools, rows, truth, reader, checkpoint rule); sigma down-weighting
+      of the one-loop mean (sigma small there); pp support gap from sqrt(s) window or cuts (0.079% of pp events); |M|^2 gap
+      from pp13_ physics (same in pp13v4_).
+    running: none (step 47 not submitted)
+    files: analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/data/{het_oneloop,het_oneloop_reads,pp_support,pp_support_reads}.json,
+      experiment.py (_resolve_amp_preprocessing), data_mmap.py key_doc, scripts/job_catalog_v3_short.sh v4_het_control_magnitude,
+      tests/test_parent_target_stats.py
+    written: '2026-11-04T18:27:41+00:00'
   ask: 'pp tail above the catalog''s |M|^2: add an initial-state collinear branch to the catalog''s splitter before the next
     catalog round, or leave that tail to the share-0.25 default component?'
   waiting_since: '2026-11-04T18:21:02+00:00'
