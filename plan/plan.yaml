@@ -11684,6 +11684,38 @@ entries:
       as the next call (D241) before concluding. Across changes: whether data changes (C1-C6, C9) and the loss/target changes
       (C7, C8) differ in how far a short warm start gets, read from their g_k at equal k. A change with no from-scratch gain
       on its reads is reported as such, not judged.'
+    fix_at: '2026-11-04T21:49:43+00:00'
+    fix: 'C1 (the 12 runs passed earlier) is unchanged and still sound; the failures are in C2-C9. (1) C7, the loss change
+      MSE to het, has no measured from-scratch effect. Its check cites het_over_mse in mixture_ab_het.json, but that is the
+      het control against the MSE control, which changes two things at once (the note says: loss HETEROSC plus sigma stage
+      AND sign head off with the signed pools on signedlog). On these reads it shows het worse, not better: PP4 R 1.048 [0.946,
+      1.167], EE4 1.418 [1.29, 1.59], held-out pooled 1.159. C7''s own reference, the magnitude het pair v4_het_control_magnitude[_seed2],
+      has finished on CC (owner''s correction: the design''s ''training now'' is wrong) but its reads are not in. Fix: read
+      catalog_coverage step 47''s pair first, put C7''s numbers in check, and submit C7 only if that pair moved beyond its
+      seed spread. If the change is worse from scratch, say what a warm start into a worse change tells the entry, since the
+      question is about a change that is good. (2) C8, the signedlog to magnitude target, has the same gap. Its check names
+      the 12x on HD5 but no from-scratch number for this change, so its 6 runs (14.6 GPU-h) would be spent before knowing
+      there is a gain to recover. Gate them on the same step-47 reads, with the numbers in check. (3) C9, 1e4 events per pool
+      to the whole pool: (a) the reference (the w8 full-set pair 804a65bc/66e8c31f, width_x1.json, from the long-run mode:
+      memmap, validate_frac 0.02, train_subsample null) differs from the 1e4 parent in data size and in loading path together.
+      The plan''s catalog_coverage next 43 still lists ''separate data size from loading path'' as open, so W_k against B
+      would not test one change. (b) The check gives no number, only ''read worse'', so there is no shown gain. (c) Disk:
+      memmap jobs map about 20 GB of cache each (job_catalog_v3_short.sh header: 20.7-22.5 GB). The disk line in fixed covers
+      only C1''s 10 GB. For 12 memmap jobs, show the cache is shared (its key in two jobs'' logs, or a test that builds it
+      twice) or multiply it, against free space on /sps/lpnhe (about 92 GB now), as the 2026-11-01 long runs teach. Either
+      settle next 43''s confound first or drop C9 with that reason stated. (4) C6, the sign extension: MATCH uses a point
+      estimate, W''s median wrong-sign share within 1.35x of B''s, plus a non-significant two-sided test. That counts a failure
+      to detect a difference as a match, which the first FIX of this entry removed for the other reads. Bound the upper end
+      of an interval (a pool bootstrap of the median ratio W/B, widened by the seed spread) at 1.35, and name C6''s INCONCLUSIVE
+      case. (5) Target statistics: C5, C6 and C8 run W_k with target_stats=parent_shared while their C_k (the parent''s own
+      setup) uses parent. State and check that parent_shared reproduces parent''s transform and shared mean/std on the unchanged
+      pools (shared_standardization is on), so W_k and C_k still differ only in the change. Otherwise run C_k with the same
+      option. (6) Scope: Joaquin''s ''I was also talking about all the other changes we tried'' is not in site decisions,
+      so the main session should record it (site decide). The design drops changes he tried: every catalog_v3 change, width,
+      and the older setups. Dropping them is his call (CLAUDE.md: a cut is the user''s call). Put the cut to him with what
+      each dropped change would cost (catalog_v3 regenerated, or a new from-scratch pair on catalog_v4), in the same message
+      as the 125 GPU-h request, rather than as settled. Verified and fine: C2 het share 0.50 PP4 0.505, EE4 0.220 (mixture_ab_het.json);
+      C5 PP4 trained 0.388 [0.338, 0.446], others 1.132 (pp_bound.json); C1 as passed.'
   step_why:
     1:
       feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
