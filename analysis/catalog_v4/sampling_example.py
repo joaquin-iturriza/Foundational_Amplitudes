@@ -16,7 +16,7 @@ compiled standalone labelling the candidates as in the build, so the adaptive sq
 mg.democratic_draw and mg.rotate_forward recorded; the replayed chunk must equal the pool's rows bit for bit, and a
 kept flat row is the splitter's when its final momenta are a recorded splitter draw (or that draw turned forward).
 
-    site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/sampling_example.py hist
+    python analysis/catalog_v4/sampling_example.py pull     # the hist step on CC-IN2P3 (site run) -> data/sampling_example.json
     python analysis/catalog_v4/sampling_example.py figs     # local, from analysis/catalog_v4/data/sampling_example.json
 """
 import json, os, sys
@@ -100,7 +100,19 @@ def hist():
     t_dem = np.zeros(len(Pt), bool); t_dem[fl] = dem[t_idx[fl]]
     out["h"]["trained_flat_splitter"] = _h(me_t[t_dem], sq_t[t_dem])
     out["h"]["trained_flat_rambo"] = _h(me_t[fl & ~t_dem], sq_t[fl & ~t_dem])
-    print(json.dumps(out, separators=(",", ":")))
+    print("SAMPEX " + json.dumps(out, separators=(",", ":")))
+
+
+def pull():
+    """the hist step on CC-IN2P3 through site run; its SAMPEX line -> OUT_JSON"""
+    import subprocess
+    res = subprocess.run(["site", "--timeout", "3000", "run", "--item", "catalog_coverage", "ccin2p3", "FA", "--",
+                          "python analysis/catalog_v4/sampling_example.py hist"], capture_output=True, text=True, timeout=3100)
+    line = [l for l in res.stdout.splitlines() if l.startswith("SAMPEX ")]
+    if not line:
+        sys.exit("pull: no SAMPEX line\n" + res.stdout[-3000:] + res.stderr[-2000:])
+    open(OUT_JSON, "w").write(line[-1][len("SAMPEX "):])
+    print(json.loads(line[-1][len("SAMPEX "):])["flat_tags"])
 
 
 def flat_tags(name, lo, hi, n, role, seed, pool, k):
@@ -197,4 +209,4 @@ def figs():
 
 
 if __name__ == "__main__":
-    {"hist": hist, "figs": figs}[sys.argv[1]]()
+    {"hist": hist, "pull": pull, "figs": figs}[sys.argv[1]]()
