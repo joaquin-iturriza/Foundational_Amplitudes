@@ -11595,6 +11595,89 @@ entries:
       as the next call (D241) before concluding. Across changes: whether data changes (C1-C6, C9) and the loss/target changes
       (C7, C8) differ in how far a short warm start gets, read from their g_k at equal k. A change with no from-scratch gain
       on its reads is reported as such, not judged.'
+  - at: '2026-11-04T21:47:46+00:00'
+    question: 'D282 (''if the change allows it'', Joaquin 2026-11-04: ''I was also talking about all the other changes we
+      tried''): for every change tried in this project that allows a warm start (same parameter shapes, or an added part initialised
+      so the parent''s function is kept), does warm-starting the pretrained model without the change and retraining it k steps
+      with it reach the change''s existing from-scratch run, and at what fraction k/4264 of that pretraining? Changes run
+      (all catalog_v4 short setup, 4264 steps, the only setup whose data and parents are on CC): C1 default-sampled share
+      0.25, het (the 12 runs of the first design, unchanged); C2 share 0.50, het; C3 share 0.25, MSE; C4 share 0.50, MSE;
+      C5 the pp-mixed training set (797 hadronic tree classes on 13 TeV pp pools), MSE; C6 the one-loop sign extension (more
+      sign-changing one-loop training pools), MSE; C7 the loss, MSE (sign head) -> het, both with the signed pools on their
+      magnitude (readout: mu row kept, the sign-logit row replaced by a zero sigma row, base_experiment._load_pretrained_weights);
+      C8 the signed one-loop pools'' target, signedlog -> magnitude (data.signed_magnitude_target), het; C9 the training set
+      size, 1e4 events per pool in memory -> the whole pool (memmap), het share 0.25. Not run, with why: width 8 -> 16/32
+      (num_heads changes every hidden shape; no width-growth init exists, so no warm start); length 4x/16x and their tuned
+      lr (a longer run is what a warm start already is); catalog_v3''s changes (Muon vs AdamW, the dimensionless target and
+      inputs vs GeV, the s_hat, hybrid and blended targets, the context vector and the sign-pair head as added parts, near-zero
+      weighting, the twin and pp-trained sets): they allow it (same shapes or added parts zero-initialised) and their parents
+      and from-scratch runs are on CC, but catalog_v3''s pools are deleted there (0 v3_ pools in DATA_DIR), so each needs
+      catalog_v3 regenerated or a new from-scratch pair on catalog_v4; the older setups'' changes (rung-9 levers D2, causal
+      mask D55, the diagram encoder D45, global preprocessing D77, the synthetic pretraining, the generation one-hot as a
+      partial warm start of the projection''s new columns) are 32k-64k-step pretrainings read through fine-tune grids on other
+      catalogs, not short runs, so not designed here.'
+    prior: '(1) The add-W continual pretraining (docs/results.tex near lines 12401-12610; D20-D23, D30, D31, D34): the finale
+      continued 1k-16k steps on W+4g/W+5g against finale+W from the start; the best late parent trails by 0.1-0.3 dex on Z+4g
+      fine-tunes, keeping most of the gain at 1/16 of a pretraining''s steps, with 3-30x forgetting even with replay; interpolation
+      finale<->add-W has no good point. (2) Each change''s own from-scratch result, the reference here: C1/C2 het shares (mixture_ab_het.json:
+      share 0.25 PP4 R=0.450, EE4 0.223, held-out default-sampled 0.638; share 0.50 GAIN too, lost the tie-break); C3/C4 MSE
+      shares (par:v4_mixture: PP4 0.755 and 0.682, EE4 0.413 and 0.401, held-out catalog-sampled 1.225 and 1.271); C5 the
+      pp bound (par:v4_pp_bound, afc96598/d26f13aa against 339ec100/380842ed: PP4 trained classes R=0.388, others 1.13); C6
+      the sign extension (par:v4_signext, seeds 42-45: wrong-sign median 6.69% -> 2.91%, lower on 18 of 21 pools, p=0.001;
+      MSE cost 1.03-1.23 on H1-H3); C7 het over MSE (mixture_ab_het.json het_over_mse; the magnitude pair v4_het_control_magnitude[_seed2]
+      of catalog_coverage step 47 is training now on CC and is C7''s and C8''s reference); C8 step 47''s question (het one-loop
+      zero-shot 12x worse on HD5, follows the signed pools'' target); C9 the 1x width w8 runs on the whole set (804a65bc/66e8c31f)
+      read worse than 1e4 per pool at 4264 steps (catalog_coverage next 43, open). (3) No warm start under a changed setup
+      compared with the change from scratch was found (results.tex: warm start, pretrained, continuation, resume, replay,
+      LONG_CKPT; plan; site decisions: warm, continu, pretrain).'
+    measure: 'Per change, its own from-scratch study''s reads, scored the same way on the warm start W_k, its matched control
+      C_k and the reference B (from scratch with the change), A (the parent) as step 0: zero-shot MSE of log|M|^2 per probe
+      (tools/zero_shot_parent.py) of each run''s final model (het: mean at best checkpoint then the sigma stage, D276; MSE:
+      best checkpoint), R as in mixture_ab.py (seeds'' geometric mean, class geometric mean of probe ratios, median over classes,
+      95% class bootstrap widened by |ln R_seed| of the denominator pair). Reads: C1-C4 PP4, EE4, held-out default-sampled
+      pooled (H1-H3''s PP4/EE4 probes, HD4, HD5), held-out catalog-sampled pooled; C5 PP4 (trained classes and the others
+      apart); C6 the 21 held-out sign-changing one-loop pools'' wrong-sign share (signed_ab_score.py, the sign test per pool)
+      and the MSE on H1-H3; C7 PP4, EE4, held-out pooled and HD5; C8 HD5 and the held-out one-loop H5; C9 H2 (the multiplicity
+      read of abs_multiplicity.py) and PP4, EE4. Per k in {533, 1066, 2132}: R(W_k/B), R(W_k/C_k), R(W_k/A), g_k = ln R(W_k/A)
+      / ln R(B/A). New modes in analysis/catalog_v4/mixture_ab.py (warm, per change).'
+    check: 'Each change moved its own reads from scratch beyond the seed spread: C1 PP4 0.450 and EE4 0.223 (R_seed 1.17,
+      1.13); C2 likewise (GAIN on both); C3 PP4 0.755, EE4 0.413 and C4 0.682, 0.401 (MSE, GAIN on both); C5 PP4 trained classes
+      R=0.388 [0.338, 0.446], the others 1.13 [0.97, 1.37] (par:v4_pp_bound); C6 wrong-sign median 6.69% -> 2.91%, p=0.001
+      over 4 seeds; C7 het_over_mse in mixture_ab_het.json; C8 the 12x on HD5 (het_oneloop.py @fc71ee9e) that the magnitude
+      pair tests; C9 the w8 full-set read against the 1e4 run (catalog_coverage next 43). A change whose from-scratch pair
+      ends inside its seed spread on its reads (if C7 or C8''s magnitude pair does, when it finishes) is reported as having
+      no gain to recover, its warm start not judged.'
+    fixed: 'Everything of each change''s parent and from-scratch runs (scripts/job_catalog_v3_short.sh): width 8, MuonAdamW
+      at the Muon search best (lr 4.997e-3, decay 0.0217, warmup 0.158), cosine, batch 16384, EMA on, the dimensionless target
+      (qperp, D234), diagram encoder, 1e4 train / 200 val events per pool in memory (C9''s arm: the whole pool, memmap, as
+      its reference), each loss as its pair; the reads and reader as each study''s. Warm start: fine_tune.pretrained_path
+      = the parent''s final model (EMA weights, D63), its tokenizer, lr_scale 1, layer_decay 1, no frozen blocks, the parent''s
+      schedule restarted over k (fresh optimizer, untuned for a warm start). Target statistics: target_stats=parent where
+      the recipe has the parent''s pools in the parent''s order (C1-C4, C7, C9); parent_shared (each pool''s own transform
+      resolved on its train split, the parent''s shared mu/sigma) where pools are new or re-targeted (C5 pp pools, C6 new
+      signed pools, C8 magnitude target). k in {533, 1066, 2132}.'
+    control: 'C_k: the same warm start of the same parent, same k and schedule, on the parent''s own setup (recipe, loss,
+      target), so W_k and C_k differ only in the change. Parents and their shared C_k: het control (87ea24d0/321a3de2) for
+      C1, C2, C8 (the 12 runs of C1 hold its C_k); MSE control v4_dimensionless_muon (339ec100/380842ed, seeds 44/45 v4_dimensionless_muon_seed3/4)
+      for C3, C4, C5, C6, C7; het share 0.25 at 1e4 (f0156d88/df858d33) for C9. B: each change''s from-scratch pair named
+      in prior.'
+    seeds: 'As each change''s from-scratch study: 42 and 43, C6 42 to 45 (its study ran four, the sign test needs them). W_k
+      and C_k at seed s start from the parent at seed s. Runs: C1 12 (submitted design 1); C2 6 W; C3, C4, C5 6 W each plus
+      6 shared MSE C_k; C6 12 W plus 6 MSE C_k at seeds 44/45; C7 6 W; C8 6 W; C9 6 W plus 6 C_k: 66 new runs beyond C1''s
+      12. GPU-h (tools/short_wall.py, margin 1.25 included): C2 15.0, MSE C_k 42/43 7.0, C3 7.4, C4 7.4, C5 6.8, C6 14.6 +
+      7.0, C7 14.6, C8 14.6, C9 about 30 (in-memory rate plus the 17-min cache build, an estimate): about 125 GPU-h beyond
+      C1''s 29.6, above the 30 GPU-h budget: Joaquin''s go before any of C2-C9 is submitted.'
+    outcome: 'Per change and k, on the change''s deciding reads (C1-C4 PP4 and EE4; C5 PP4 trained classes; C7 PP4, EE4 and
+      HD5; C8 HD5; C9 H2 and PP4): MATCH when the widened upper end of R(W_k/B) is at or below 1.35 on each; SHORT when the
+      widened lower end is above 1 on any; INCONCLUSIVE otherwise (reported with g_k; more seeds only to Joaquin if that k
+      decides). C6: MATCH when W_k''s wrong-sign share is not above B''s (two-sided per-pool sign test p >= 0.05 with W''s
+      median within 1.35x of B''s) and lower than C_k''s (one-sided p < 0.05); SHORT when above B''s at p < 0.05. Change carried:
+      R(W_k/C_k) <= 0.90 with the widened interval below 1 on the deciding reads (C6: the sign test against C_k). Per change,
+      YES: the smallest k with MATCH and the change carried, as k/4264. NO: no k up to 2132 matches, reported as a NO at the
+      restarted untuned schedule with g_k per k; the warm-start DyHPO over the template''s fine-tune space goes to Joaquin
+      as the next call (D241) before concluding. Across changes: whether data changes (C1-C6, C9) and the loss/target changes
+      (C7, C8) differ in how far a short warm start gets, read from their g_k at equal k. A change with no from-scratch gain
+      on its reads is reported as such, not judged.'
   step_why:
     1:
       feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
