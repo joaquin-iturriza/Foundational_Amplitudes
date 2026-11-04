@@ -212,8 +212,8 @@ def figs():
     # (a) the catalog mixture by component, stacked shares of the one pool
     fig, (axL, axR) = ps.figure(ncols=2)
     comps = [("trained_bulk", "bulk (RAMBO)", ps.C.sky), ("trained_fwd", "forward (RAMBO)", ps.C.green),
-             ("trained_flat_rambo", r"flat in $|\mathcal{M}|^2$ (RAMBO)", ps.C.orange),
-             ("trained_flat_splitter", r"flat in $|\mathcal{M}|^2$ (splitter)", ps.C.purple),
+             ("trained_flat_rambo", r"flat in $\log|\mathcal{M}|^2$ (RAMBO)", ps.C.orange),
+             ("trained_flat_splitter", r"flat in $\log|\mathcal{M}|^2$ (splitter)", ps.C.purple),
              ("trained_default", "default share (MadEvent)", ps.C.vermillion)]
     for ax, var in ((axL, "logm"), (axR, "sqrts")):
         x = lb if var == "logm" else sb
@@ -223,6 +223,8 @@ def figs():
             ax.stairs(base + y, x, baseline=base, fill=True, color=col, alpha=0.6, label=lab)
             base = base + y
         step(ax, "trained", var, color=ps.C.blue, label="trained mixture (sum)")
+        if var == "logm":
+            ax.set_ylim(0, 2.0 * base.max())         # headroom for the six-entry legend above the stack
     axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel("density")
     axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel("density")
     ps.legend(axL, "upper left")
