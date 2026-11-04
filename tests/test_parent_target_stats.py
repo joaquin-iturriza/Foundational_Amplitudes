@@ -118,6 +118,25 @@ def test_tools_share_the_helper():
     assert "parent_target_standardization(pstats, [N])" in zs
     assert '"parent_shared" if a.keep_parent_stats' in ft and "fine_tune.target_stats={target_stats}" in ft
 
+def test_signed_magnitude_target_trains_on_abslog():
+    """data.signed_magnitude_target: a sign-changing pool resolves to abslog (log max(|x|, s)) with train on and no
+    sign head; off, the same pool resolves to signedlog; a positive pool keeps log either way"""
+    rng = np.random.default_rng(1)
+    signed = {r: rng.normal(0.0, 1.0, n) * 1e-5 for r, n in (("train", 300), ("val", 400))}
+    pos = _amps()
+    for flag, kind in ((True, "abslog"), (False, "signedlog")):
+        e = _exp(); e.cfg.data.signed_magnitude_target = flag; e.cfg.train = True; e.cfg.training.loss = "HETEROSC"
+        tr, z = _resolve(e, signed)
+        assert str(tr[0]).startswith(kind + ":"), tr
+        if flag:
+            s = float(str(tr[0]).split(":")[1])
+            t = e.prepd_mean[0] + e.prepd_std[0] * z["val"]
+            assert np.allclose(t, np.log(np.maximum(np.abs(signed["val"]), s)), atol=1e-5)
+        e = _exp(); e.cfg.data.signed_magnitude_target = flag
+        tr, _ = _resolve(e, pos)
+        assert list(tr) == ["log", "standardization"], tr
+
+
 
 if __name__ == "__main__":
     for k, f in list(globals().items()):

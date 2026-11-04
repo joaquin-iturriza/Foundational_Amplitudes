@@ -2239,7 +2239,11 @@ class AmplitudeExperiment(BaseExperiment):
                 self.cfg.model.net.out_channels = int(self.cfg.model.net.get("out_channels", 1)) + 1 + k_pair
         q = self._signedlog_quantile()
         shift = self._signedlog_scale_shift()
-        _abslog = self._sign_head or bool(self.cfg.data.get("signed_abslog", False))
+        # data.signed_magnitude_target (training): a signed pool trains on its magnitude, log max(|x|, s) ('abslog',
+        # the sign head's target), with no sign output and no sign loss: the het arms' one-loop control (plan
+        # catalog_coverage step 47), where HETEROSC rules out the sign head and the signed pools otherwise take signedlog
+        _abslog = (self._sign_head or bool(self.cfg.data.get("signed_abslog", False))
+                   or bool(self.cfg.data.get("signed_magnitude_target", False)))
         # data.signed_abslog changes a signed pool's target to log max(|x|, s) with no sign output: a scoring-only read
         # (tools/zero_shot_parent.py --signed-magnitude), never a training target
         assert not (self.cfg.data.get("signed_abslog", False) and self.cfg.get("train", True)), \
