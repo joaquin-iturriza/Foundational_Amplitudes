@@ -36,6 +36,11 @@ FIGS = os.path.join(HERE, "figs")
 sys.path.insert(0, ROOT)
 sys.path.insert(0, HERE)
 HELD = ("H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")
+# shared histogram grids: log10 sqrt(s_hat) [GeV] in 0.05, ln|M|^2 in 0.5 nat; coarse 2D grids 0.1 x 2 nat
+SQ_EDGES = np.arange(0.5, 4.15, 0.05)
+LM_EDGES = np.arange(-150.0, 60.01, 0.5)
+SQ2_EDGES = np.arange(0.5, 4.15, 0.1)
+LM2_EDGES = np.arange(-150.0, 60.01, 2.0)
 
 
 def classes():
@@ -62,6 +67,10 @@ sys.path.insert(0, os.getcwd())
 import mg5_pipeline_final as mg
 D, C = os.environ["DATA_DIR"], os.path.join(os.environ["SCRATCH"], "amp_data_cache")
 NU = {12, 14, 16}
+SQ_EDGES = np.arange(0.5, 4.15, 0.05)
+LM_EDGES = np.arange(-150.0, 60.01, 0.5)
+SQ2_EDGES = np.arange(0.5, 4.15, 0.1)
+LM2_EDGES = np.arange(-150.0, 60.01, 2.0)
 
 def find(stem):
     for d in (C, D):
@@ -113,7 +122,10 @@ def one(task):
                         "sqrts_max": float(sc.max()), "logm_min": float(lc.min()), "logm_max": float(lc.max()),
                         "logm_q001": float(np.quantile(lc, 0.001)), "logm_q999": float(np.quantile(lc, 0.999)),
                         "ymin_min": float(yc.min()), "ymin_q001": float(np.quantile(yc, 0.001)),
-                        "n_logm_above_default_q99": None}
+                        "n_logm_above_default_q99": None,
+                        # step 49 (envelope criterion): the pool's marginal densities on the shared grids
+                        "hist_sqrts": np.histogram(np.log10(np.clip(sc, 1, None)), SQ_EDGES)[0].tolist(),
+                        "hist_logm": np.histogram(lc, LM_EDGES)[0].tolist()}
         rows = []
         for role in ("train", "test"):
             f = find(f"{probe}_13000-13000GeV_{role}_lhe_amplitudes.npy")
@@ -218,8 +230,13 @@ def one(task):
             "logm_above_in_support": float(np.mean(lm[fin & sup] > r["catalog"]["logm_max"])) if (fin & sup).any() else None,
             "logm_above_outside_cuts": float(np.mean(lm[fin & ~ok] > r["catalog"]["logm_max"])) if (fin & ~ok).any() else None,
             "logm_below_below_lo": float(np.mean(lm[fin & (s < lo)] < r["catalog"]["logm_min"])) if (fin & (s < lo)).any() else None,
-            "hist_sqrts": np.histogram(np.log10(np.clip(s, 1, None)), np.arange(0.5, 4.15, 0.05))[0].tolist(),
+            "hist_sqrts": np.histogram(np.log10(np.clip(s, 1, None)), SQ_EDGES)[0].tolist(),
+            "hist_logm": np.histogram(lm[fin], LM_EDGES)[0].tolist(),
+            # the 2D occupancy (log10 sqrt(s_hat) x ln|M|^2) on coarse grids, default and catalog
+            "hist2d": np.histogram2d(np.log10(np.clip(s[fin], 1, None)), lm[fin], (SQ2_EDGES, LM2_EDGES))[0].astype(int).tolist(),
         }
+        r["catalog"]["hist2d"] = np.histogram2d(np.log10(np.clip(sc[np.isfinite(np.log(np.abs(mc)))], 1, None)), lc,
+                                                (SQ2_EDGES, LM2_EDGES))[0].astype(int).tolist()
     except Exception as e:
         r["error"] = f"{type(e).__name__}: {e}"
     return r
@@ -244,7 +261,8 @@ def pull(workers=8, limit=None):
     if not line:
         sys.exit("pull: no PPSUP line\n" + res.stdout[-3000:] + res.stderr[-2000:])
     rows = json.loads(line[-1][len("PPSUP "):])
-    json.dump({"rows": sorted(rows, key=lambda r: r["probe"]), "sqrts_hist_edges_log10": np.arange(0.5, 4.15, 0.05).tolist()},
+    json.dump({"rows": sorted(rows, key=lambda r: r["probe"]), "sqrts_hist_edges_log10": SQ_EDGES.tolist(), "logm_hist_edges": LM_EDGES.tolist(),
+               "hist2d_edges": [SQ2_EDGES.tolist(), LM2_EDGES.tolist()]},
               open(os.path.join(DATA, "pp_support_reads.json"), "w"))
     print(len(rows), sum("error" in r for r in rows))
 
