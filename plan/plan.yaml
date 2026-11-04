@@ -10205,7 +10205,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: 26f5a64a
+    commit: eb2831c7
     paths:
     - .claude/hooks/owner_handoff.py
     - '2026-11-04 owner aaf01b2d42241ffe1: next 1 cleanup done (lock_guard.py, reviewer_resume.py, handback_guard.py deleted;
@@ -10237,6 +10237,11 @@ entries:
       of 450 other prompts (hand-backs, typed, Stop feedback, background commands) blocked. Not live: needs the UserPromptSubmit
       registration (scratchpad dw/settings_ups.patch); not tested: the interactive main session''s view of a block, UserPromptSubmit
       on mid-turn queued messages'
+    - 'double wake fix merged into trunk eb2831c7 (26f5a64a hook + test + dispatcher, d351162a repo-reviewer fixes: block
+      only a prompt that is one delivered notification with nothing after it; the replay fails any block that is not a hand-back
+      delivery); repo-reviewer PASS, watermark d351162a. Replay since 2026-10-31T04:22Z after the fixes: 30 turn-starting
+      delivered notifications blocked, 3 waiting passed, 145 queued deliveries blocked, 0 others blocked. Registration pending
+      Joaquin: UserPromptSubmit -> dispatch.py notification_absorb.py (timeout 30)'
     - 'main-session state at the 2026-10-30 ~19:30 compaction: token pilot (Joaquin: cap 40% of the 5 h window, from 5%):
       baseline 16:55 UTC, scratchpad tokens_since.py and token_cap.json, weighted (in 1, out 5, cache write 1.25, read 0.1),
       0.536M per percent, stop at 15M; used 11.8M. Pending for Joaquin: CLAUDE.md owner close 300k->150k diff (proposed, unanswered);
