@@ -246,6 +246,20 @@ def figs():
     ps.legend(axL, "upper left")
     ps.process_label(axR, proc)
     ps.save(fig, FIGS + "_b")
+    # (c) the flat-in-log|M|^2 part alone (Joaquin 2026-11-04: 'to see that they are indeed flat'), its two generators
+    # stacked, density per unit log10|M|^2 per kept flat event of the catalog pool
+    fig, ax = ps.figure()
+    nf = h["catalog_flat"]["n"]; base = np.zeros(len(lb) - 1)
+    for key, lab, col in (("catalog_flat_rambo", "RAMBO candidates", ps.C.orange),
+                          ("catalog_flat_splitter", "splitter candidates", ps.C.purple)):
+        y = np.asarray(h[key]["logm"], float) / (nf * np.diff(lb))
+        ax.stairs(base + y, lb, baseline=base, fill=True, color=col, alpha=0.6, label=lab)
+        base = base + y
+    ax.stairs(base, lb, color=ps.C.blue, label=r"flat in $\log|\mathcal{M}|^2$ (sum)")
+    ax.set_xlim(*LOGM_XLIM)
+    ax.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); ax.set_ylabel("density")
+    ps.legend(ax, "upper left", title=proc)
+    ps.save(fig, FIGS + "_c")
 
 
 if __name__ == "__main__":
