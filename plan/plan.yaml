@@ -2524,6 +2524,20 @@ entries:
       width/length choice. (a) closes, naming (b) or a target prior as the lever, only when both axes read LEVEL or WIDENS.
       With the 16x read not yet in, the width verdict is reported and (a) stays open. Cost: CPU seconds on the laptop, 0 GPU-h;
       one read-only site run on CC to pull the 16x best''s preds once FA-ccin2p3-1a46f3e0 (catalog_coverage''s) ends.'
+    passed_at: '2026-11-04T19:02:07+00:00'
+    reviewer: 'Re-check of the 19:01 revision, gap_capacity.py @81854829. Width: 8/16/32 at 4264 steps, same muP HPs, data
+      and checkpoint selection, seeds 42/43 paired. Length is now a decided axis: 16x best (FA-ccin2p3-1a46f3e0) against 4x
+      best (FA-ccin2p3-6f8a1eed), each the best of the same 8-trial template sweep, width 8, seed 42; lr at the window top
+      stated, 1x against 4x information only. Outcome is per axis; (a) closes only when both read LEVEL or WIDENS and stays
+      open while the 16x read is missing (the tool''s a_closed flag). Check 2: --null-only re-run gives G 0.4767/0.5514 at
+      width 8 (seed difference 0.0747, so m >= 0.15); H2 zero-shot MSE ratio 0.642 at width 16 (log10 -0.19) and 0.552 at
+      width 32 (-0.26); training-pool floor geometric mean 0.0857 at width 8 against 0.0262 at width 32 (about -0.52) and
+      0.0184 at the 4x best; both sides in natural-log units (zero_shot_parent np.log; floor ratio 1.0000000). Check 3: the
+      seed difference of G is distributed like the noise of a paired dG, so 2x the largest one with both seeds required is
+      sound; length rests on one seed, stated. Check 5: searched results.tex for capacity, width, w32, held-out multiplicity,
+      shape gap, training floor, 6-particle, gap_capacity, and catalog_coverage''s plan for held-out over training and gap
+      with width; only each side apart (width_x1.json) and par:v4_shape_gap / par:v4_kshot_spread, which leave capacity and
+      length open. Het loss, catalog-sampled validation events on both sides, no new pretraining, sweep or job.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
