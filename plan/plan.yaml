@@ -11384,9 +11384,9 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: ab46b28c7e6e33570
-    state: working
+    state: stopped
     since: '2026-11-04T21:09:55+00:00'
-    state_at: '2026-11-04T21:44:17+00:00'
+    state_at: '2026-11-04T21:52:26+00:00'
     context: 236836
     context_at: '2026-11-04T21:48:16+00:00'
   designs:
