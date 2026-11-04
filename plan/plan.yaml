@@ -8230,7 +8230,7 @@ entries:
     agent: a0735876e6698c1aa
     state: working
     since: '2026-11-04T17:59:53+00:00'
-    state_at: '2026-11-04T17:59:53+00:00'
+    state_at: '2026-11-04T18:20:59+00:00'
     context: 262053
     context_at: '2026-11-04T18:20:49+00:00'
   findings:
