@@ -174,14 +174,14 @@ entries:
   - D267
   - D271
   next:
-    9: '(a) capacity and training length for the held-out multiplicity gap, on catalog_coverage''s catalog_v4 runs, no new
-      training (catalog_coverage runs them: widths 8/16/32 at 1x = 4264 steps, seeds 42/43, its step 33; the 4x and 16x length
-      sweeps'' best trials, its steps 16/32). catalog_coverage reads only each side apart (H2 MSE over width 8: R 0.64 at
-      w16, 0.55 at w32; training NLL per process lower at w32 by 0.78), never held-out against training, so (a) narrows to
-      that read: per run the gap G = median over the 218 H2 pools of log10(zero-shot MSE of log|M|^2 / the median training-pool
-      MSE of its cell), w16 and w32 against w8 per seed; the 4x best (trial_1262, FA-ccin2p3-6f8a1eed) and 16x best (FA-ccin2p3-1a46f3e0,
-      when its read ends) beside as information (one seed, length and tuning together). Tool analysis/catalog_v4/gap_capacity.py;
-      design to the design reviewer.'
+    9: '(a) capacity and training length for the held-out multiplicity gap (design passed 2026-11-04 19:0x, gap_capacity.py
+      @81854829). Width done (data/gap_capacity.json @cbe2b221): WIDENS. G = median over the 218 H2 pools of log10(zero-shot
+      MSE / cell''s median training MSE): w8 0.477/0.551, w16 0.660/0.582, w32 0.810/0.779 (seeds 42/43); dG(w32) +0.333/+0.228
+      against margin 0.155; held-out MSE falls (dH -0.216/-0.322 log10) but the cells'' training floor falls about twice as
+      fast (dF -0.586/-0.585); every cell widens at w32. Length open: G(16x best) - G(4x best) when catalog_coverage''s read
+      FA-ccin2p3-1a46f3e0 ends: extract its H2 read (mixture_ab.py extract), pull its sigma-stage preds (size_figs.py pull_preds
+      pattern, read-only site run), rerun gap_capacity.py. Information: 4x best G 0.532 (w8 1x seed 42 0.477, +0.055 within
+      m).'
     10: '(b) more 6-particle training pools in the held-out multiplicity cells (D216), on catalog_v4: the 97 kept candidates
       of the MadGraph existence check (analysis/catalog_v4/data/multext_checked.json; recipes/catalog_v4_multext*.yaml @07f2e008),
       their class check (scripts/job_catalog_v4_multext_check.sh, CPU, not yet run), generated with the sampling that catalog_coverage''s
@@ -2555,11 +2555,8 @@ entries:
       feeds: whether capacity or training length narrows the held-out multiplicity gap relative to the training floor, i.e.
         whether (a) is a lever and the full pretraining's width and length choice (catalog_coverage) carries it
       if:
-      - 'G falls with width on both seeds beyond the seed margin: capacity narrows the gap; (a) is carried by catalog_coverage''s
-        width/length choice, reported to Joaquin'
-      - 'G level within the margin: held-out and training gain by the same factor; capacity lowers both but leaves the gap,
-        so (b) or a target prior is the lever'
-      - 'G rises: training gains more than held-out with width (the gap widens), reported'
+      - 'length NARROWS: length is a lever, to Joaquin with catalog_coverage''s length choice'
+      - 'length LEVEL or WIDENS: (a) closes (both axes), (b) or a target prior is the lever; write-up in results.tex'
     10:
       feeds: whether more same-multiplicity training data narrows the held-out multiplicity gap, and whether the pools join
         the catalog's training set
