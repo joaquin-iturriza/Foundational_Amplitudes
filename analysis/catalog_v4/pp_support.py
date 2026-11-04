@@ -275,7 +275,25 @@ def summary():
                                "sqrts_median_median": float(np.median([x["sqrts_median"] for x in a])),
                                "ymin_median_median": float(np.median([x["ymin_median"] for x in a])),
                                "share_below_catalog_ymin_min_max": float(max(x["below_catalog_ymin_min"] for x in a)),
-                               "beam_pair_share_median": float(np.median([x["beam_pair_share"] for x in a]))}
+                               "beam_pair_share_median": float(np.median([x["beam_pair_share"] for x in a])),
+                               "n_classes_beam_pair_share_over_half": int(sum(x["beam_pair_share"] > 0.5 for x in a)),
+                               "below_catalog_ymin_min_median": float(np.median([x["below_catalog_ymin_min"] for x in a])),
+                               "n_classes_below_catalog_ymin_min_over_half": int(sum(x["below_catalog_ymin_min"] > 0.5 for x in a)),
+                               "n_small_median_median": float(np.median([x["n_small_median"] for x in a])),
+                               "n_small_default_median_median": float(np.median([r["n_small_default_median"] for r in rows])),
+                               "near_pole_share_median": float(np.median([x["near_pole_share"] for x in a])),
+                               "near_pole_default_median": float(np.median([r["near_pole_default"] for r in rows]))}
+    big = [r for r in rows if r["default"]["logm_above"] > 0.01]
+    out["logm_above_over_1pct_by_final"] = {}
+    for r in big:
+        f = r["default"]["pdg"][2:]
+        key = f"{len(f)} finals, {sum(abs(p) in (1, 2, 3, 4, 5, 21) for p in f)} partons"
+        out["logm_above_over_1pct_by_final"][key] = out["logm_above_over_1pct_by_final"].get(key, 0) + 1
+    out["n_finals_all"] = {}
+    for r in rows:
+        f = r["default"]["pdg"][2:]
+        key = f"{len(f)} finals, {sum(abs(p) in (1, 2, 3, 4, 5, 21) for p in f)} partons"
+        out["n_finals_all"][key] = out["n_finals_all"].get(key, 0) + 1
     gap = np.array([r["default"]["logm_max"] - r["catalog"]["logm_max"] for r in rows])
     gapq = np.array([r["default"]["logm_max"] - r["catalog"]["logm_q999"] for r in rows])
     low = np.array([r["catalog"]["logm_min"] - r["default"]["logm_min"] for r in rows])

@@ -1,0 +1,373 @@
+{
+ "source": "data/pp_support_reads.json (pp_support.py pull)",
+ "n_classes": 1301,
+ "errors": {},
+ "n_default_events": 15612000,
+ "pooled_share": {
+  "below_lo": 3.503715090955675e-05,
+  "above_hi": 5.277991288752242e-05,
+  "fail_cuts": 0.0007070842941327185,
+  "fail_pt": 0.0,
+  "fail_angle": 0.0006971560338201383,
+  "fail_dr_b": 9.928260312580067e-06,
+  "fail_dr_other": 0.0,
+  "outside_any": 0.0007927235459902639,
+  "logm_below": 0.0,
+  "logm_above": 0.015661926723033563,
+  "logm_above_in_support": 0.015470371323230333
+ },
+ "per_class_median_p90_p99_max": {
+  "below_lo": [
+   0.0,
+   0.0,
+   8.333333333333333e-05,
+   0.016833333333333332
+  ],
+  "above_hi": [
+   0.0,
+   8.333333333333333e-05,
+   0.0010833333333333333,
+   0.00725
+  ],
+  "fail_cuts": [
+   8.333333333333333e-05,
+   0.0020833333333333333,
+   0.0085,
+   0.013416666666666667
+  ],
+  "fail_pt": [
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "fail_angle": [
+   8.333333333333333e-05,
+   0.0020833333333333333,
+   0.0085,
+   0.013416666666666667
+  ],
+  "fail_dr_b": [
+   0.0,
+   0.0,
+   0.0003333333333333333,
+   0.0008333333333333334
+  ],
+  "fail_dr_other": [
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "outside_any": [
+   8.333333333333333e-05,
+   0.00225,
+   0.00925,
+   0.016833333333333332
+  ],
+  "logm_below": [
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "logm_above": [
+   0.0003333333333333333,
+   0.04491666666666667,
+   0.22591666666666665,
+   0.45666666666666667
+  ],
+  "logm_above_in_support": [
+   0.00025006251562890725,
+   0.0445,
+   0.22503128911138923,
+   0.45666666666666667
+  ]
+ },
+ "n_classes_any": {
+  "below_lo": 15,
+  "above_hi": 175,
+  "fail_cuts": 694,
+  "fail_pt": 0,
+  "fail_angle": 652,
+  "fail_dr_b": 54,
+  "fail_dr_other": 0,
+  "outside_any": 723,
+  "logm_below": 0,
+  "logm_above": 846,
+  "logm_above_in_support": 805
+ },
+ "n_classes_over_1pct": {
+  "below_lo": 1,
+  "above_hi": 0,
+  "fail_cuts": 6,
+  "fail_pt": 0,
+  "fail_angle": 6,
+  "fail_dr_b": 0,
+  "fail_dr_other": 0,
+  "outside_any": 11,
+  "logm_below": 0,
+  "logm_above": 312,
+  "logm_above_in_support": 312
+ },
+ "above_max_events": {
+  "n_classes": 805,
+  "n_events": 241087,
+  "sqrts_median_median": 1157.7772813214083,
+  "ymin_median_median": -3.579945950112525,
+  "share_below_catalog_ymin_min_max": 1.0,
+  "beam_pair_share_median": 0.6073298429319371,
+  "n_classes_beam_pair_share_over_half": 442,
+  "below_catalog_ymin_min_median": 0.0,
+  "n_classes_below_catalog_ymin_min_over_half": 1,
+  "n_small_median_median": 4.0,
+  "n_small_default_median_median": 1.0,
+  "near_pole_share_median": 0.5021199273167777,
+  "near_pole_default_median": 0.5633333333333334
+ },
+ "logm_above_over_1pct_by_final": {
+  "4 finals, 0 partons": 76,
+  "4 finals, 2 partons": 124,
+  "4 finals, 3 partons": 47,
+  "4 finals, 1 partons": 34,
+  "4 finals, 4 partons": 28,
+  "3 finals, 2 partons": 3
+ },
+ "n_finals_all": {
+  "4 finals, 0 partons": 203,
+  "2 finals, 1 partons": 9,
+  "4 finals, 1 partons": 196,
+  "4 finals, 2 partons": 367,
+  "3 finals, 0 partons": 72,
+  "4 finals, 3 partons": 138,
+  "3 finals, 1 partons": 64,
+  "3 finals, 2 partons": 92,
+  "2 finals, 0 partons": 20,
+  "4 finals, 4 partons": 97,
+  "3 finals, 3 partons": 29,
+  "2 finals, 2 partons": 14
+ },
+ "logm_edges": {
+  "default_max_minus_catalog_max_median_p90_max": [
+   0.8513253891028203,
+   6.07846273612574,
+   9.57005048180644,
+   10.537541598858597
+  ],
+  "n_default_max_above_catalog_max": 846,
+  "default_max_minus_catalog_q999_median": 4.679050409389555,
+  "catalog_min_minus_default_min_median": -10.105655230600028,
+  "n_catalog_min_below_default_min": 0
+ },
+ "sqrts_edges": {
+  "catalog_pool_min_over_lo_max": 1.2624589894291929,
+  "default_sqrts_max_median": 4071.504073560869,
+  "default_sqrts_min_over_lo_median": 1.1108111687500917,
+  "n_default_below_lo": 15,
+  "n_default_above_6TeV": 175
+ },
+ "angle_cut": {
+  "n_classes": 652,
+  "lab_eta_max_of_failing": 4.999974851384184,
+  "boost_rapidity_median_of_failing": 0.46187061869077395
+ },
+ "worst_outside_any": [
+  [
+   "pp13_udx_gwp",
+   0.0168,
+   0.0,
+   0.0,
+   0.0,
+   0.0168
+  ],
+  [
+   "pp13_uu_hhuu",
+   0.0167,
+   0.0095,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13_ud_dhhu",
+   0.0145,
+   0.01,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_uuuux",
+   0.0135,
+   0.0134,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_bbxuu",
+   0.0134,
+   0.0133,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_gguu",
+   0.0126,
+   0.0123,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_udx_bxddxt",
+   0.0121,
+   0.0119,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_ddxuu",
+   0.0121,
+   0.0121,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_dhuwp",
+   0.0121,
+   0.0096,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_huuz",
+   0.0108,
+   0.0106,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_uuzz",
+   0.0104,
+   0.0096,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_uu_guuz",
+   0.0094,
+   0.0092,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_ud_ddgwp",
+   0.0092,
+   0.009,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_ud_dhuz",
+   0.0092,
+   0.0069,
+   0.0,
+   0.0,
+   0.0
+  ],
+  [
+   "pp13v4_ud_dddxu",
+   0.0089,
+   0.0089,
+   0.0,
+   0.0,
+   0.0
+  ]
+ ],
+ "worst_logm_above": [
+  [
+   "pp13_uux_epemvevex",
+   0.4567,
+   8.81
+  ],
+  [
+   "pp13v4_uu_bbxuu",
+   0.3515,
+   9.77
+  ],
+  [
+   "pp13v4_us_ddxsu",
+   0.3183,
+   10.21
+  ],
+  [
+   "pp13_udx_csxvevex",
+   0.3131,
+   10.54
+  ],
+  [
+   "pp13v4_uu_ddxuu",
+   0.2959,
+   9.69
+  ],
+  [
+   "pp13v4_ud_bbxdu",
+   0.2888,
+   8.86
+  ],
+  [
+   "pp13v4_uu_gguu",
+   0.2772,
+   7.3
+  ],
+  [
+   "pp13v4_udx_bbxdxu",
+   0.2664,
+   10.39
+  ],
+  [
+   "pp13v4_bbx_epemvtvtx",
+   0.2626,
+   6.07
+  ],
+  [
+   "pp13v4_uux_bbxuux",
+   0.2557,
+   10.08
+  ],
+  [
+   "pp13v4_ddx_ccxddx",
+   0.2538,
+   9.81
+  ],
+  [
+   "pp13v4_uux_ccxuux",
+   0.2462,
+   10.34
+  ],
+  [
+   "pp13_uux_epemvmvmx",
+   0.2299,
+   6.57
+  ],
+  [
+   "pp13v4_ds_bbxds",
+   0.2259,
+   8.85
+  ],
+  [
+   "pp13v4_uc_bbxcu",
+   0.2235,
+   9.57
+  ]
+ ]
+}
