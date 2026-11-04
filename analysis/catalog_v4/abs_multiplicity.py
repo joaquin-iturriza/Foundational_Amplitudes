@@ -85,7 +85,7 @@ def main():
                       "n": {s: (out["absolute"]["w8_s42"][s]["n_classes"], out["absolute"]["w8_s42"][s]["n_probes"])
                             for s in ("catalog", "default")},
                       "width": {s: {k: d["R"] for k, d in v.items()} for s, v in out["width"].items()},
-                      "length": {s: {k: d["R"] for k, d in v.items()} for s, v in out["length"].items()}}, indent=1))
+                      "length": {s: {k: d["R"] for k, d in v.items()} for s, v in out["length"].items()}}))
 
 
 if __name__ == "__main__":
