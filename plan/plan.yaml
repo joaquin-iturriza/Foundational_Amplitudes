@@ -8784,7 +8784,7 @@ entries:
       - 'H2p5 regression broad over its classes: write YES with a held-out cost on that axis, to Joaquin'
   owner:
     agent: a6cc542156004bfd9
-    state: stopped
+    state: closed
     since: '2026-11-04T19:52:13+00:00'
     state_at: '2026-11-04T21:46:40+00:00'
     context: 223614
@@ -9917,27 +9917,29 @@ entries:
       the candidates'' own density above it. Per-bin kept counts (0.25 dex, sampling_example.json): 1010-1522 from -8.75 to
       -3.75 (mean 1395, std/mean 7.8%), then 1159, 1013, 864, 743, 604, 439, 283, 177, 92, 35 from -3.5 to -1.25.'
   handoff:
-    state: '2026-11-04 ~20:51. Step 53 (Joaquin: show the catalog sampling with each part separated, democratic splitter included):
-      sampling_example.py @cd54ef52 replays each chunk of v4_uux_epemg train seed 42 exactly (datagen.gen_chunk with the standalone,
-      democratic_draw/rotate_forward recorded; raises unless the replay equals the pool bit for bit) and tags kept flat rows
-      splitter vs RAMBO; figure (a) now stacks the trained 0.25 mixture by five parts (bulk RAMBO, forward RAMBO, flat RAMBO,
-      flat splitter, default share). Detached pull sampling_tags (log ~/.local/share/ccorch/detached/20261104-205038_sampling_tags.log)
-      runs the hist on CC via site run -> data/sampling_example.json. On its end: if it raised, read why (replay mismatch,
-      backend build); else python3 analysis/catalog_v4/sampling_example.py figs, look once at figs/sampling_example_a.png
-      at low resolution, commit the json, report figure paths, the commit and flat_tags.splitter_share_of_kept_flat (bulk
-      and forward are RAMBO only, mg5_pipeline_final.py:3425-3466; only the flat part''s candidates use democratic 0.5). Step
-      49: envelope designs (own sampler: 0.70 own |M|^2-unweighted at pp sqrt(s) widened 0.05 dex + 0.30 current mixture with
-      IS-collinear branch, f 0.5; envelope_design.py own @23cf0dba) reported; the reviewer''s FIX on the 19:04 design is NOT
-      to be acted on: Joaquin ''we are not done talking about the sampling for the catalog''; no new design until his word.'
-    decisions: 'D263 covers step 47 and the reads; step 16''s passed design covers the 16x best read; Joaquin 2026-11-04:
-      step 49 design only, no review until he says.'
-    ruled_out: 'step 49 variant taking catalog events from the MadEvent pools (Joaquin: not recreating the pp sampling); the
-      events-per-bin criterion (main session withdrew it).'
-    running: FA-ccin2p3-5abe4a0e, FA-ccin2p3-92207f6a (step 47), FA-ccin2p3-1a46f3e0 (step 32), detached sampling_tags (step
-      53)
-    files: analysis/catalog_v4/sampling_example.py, analysis/catalog_v4/envelope_design.py, analysis/catalog_v4/data/envelope_own.json,
-      analysis/catalog_v4/data/pp_support_reads.json, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/size_figs.py
-    written: '2026-11-04T19:50:50+00:00'
+    state: '2026-11-04 ~22:30. Done today: step 53 sampling figures a/b/c (sampling_example.py @f08c5ef3; flat part split
+      by generator, splitter 0.394); step 32 length verdict YES (mixture_ab.py length @d3b90e0d, data/length_x16_over_x4.json:
+      PP4 0.671, EE4 0.677, held-out default 0.921 widened [0.874,0.976]; H2p5 regresses 2.3-3.1; write-up in results.tex
+      pending, next step recorded); step 47 YES (het_oneloop.py magnitude @74a30052, data/het_magnitude.json: HD5 over het
+      control 0.097 [0.047,0.291], over MSE control 1.47); HPO landscape figures (long_hpo_landscape.py @f08c5ef3). IN PROGRESS:
+      Joaquin on figure c (''I don''t see how you call that uniform''; wants the cause of the shape: inside-range unevenness
+      and the top end, where default high-|M|^2 events sit in sqrt(s_hat), m_ll/m_Z, gluon pT/|y|/DeltaR vs the candidates,
+      what the 6x flat selection can reach; hypothesis Z resonance + initial-state collinear gluon). Code written, UNCOMMITTED
+      in analysis/catalog_v4/sampling_example.py (shape, pull_shape, shape_figs; the shape replay records _candidates and
+      _flat_logm_select per chunk). Commit was blocked by the review-backlog hook (repo-reviewer overdue); a repo-reviewer
+      was launched on the whole backlog (lock held). Next: once it PASSes, commit sampling_example.py, site sync ccin2p3 FA
+      --allow-dirty, tools/detach.py --entry catalog_coverage --name sampling_shape -- python3 analysis/catalog_v4/sampling_example.py
+      pull_shape; on its end shape_figs (local .venv-cpu), look once at figs/sampling_shape_a-f, commit data/sampling_shape.json
+      + sampling_shape_report.json, report to Joaquin: per-bin counts (recorded in the finding), the water-filling mechanism
+      kept=min(candidates, level) of _flat_logm_select (mg5_pipeline_final.py:3347-3358), and where the top events sit.'
+    decisions: 'D276 (het model after sigma fit) used in steps 32/47 reads; D278 flat part coloured by generator; step 49
+      envelope design on hold (Joaquin: not done talking about the sampling)'
+    ruled_out: 'stderr-cut hypothesis for E3584 (real cause: stale CC checkout)'
+    running: repo-reviewer backlog review (launched by this owner); no GPU jobs
+    files: analysis/catalog_v4/sampling_example.py, analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/het_oneloop.py,
+      analysis/catalog_v4/long_hpo_landscape.py, analysis/catalog_v4/data/length_x16_over_x4.json, analysis/catalog_v4/data/het_magnitude.json,
+      analysis/catalog_v4/data/sampling_example.json
+    written: '2026-11-04T21:46:54+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
