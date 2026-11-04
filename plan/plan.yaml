@@ -190,6 +190,9 @@ entries:
       arm FA-ccin2p3-f0156d88/df858d33 of catalog_coverage step 15, rerun at the arm''s commit as the matched control; the
       het control pair FA-ccin2p3-87ea24d0/321a3de2, share 0, beside), seeds 42-45, read on H2 with multext_compare.py''s
       r and s on the het reads; design, review, generation probe, GPU-h stated before submission.'
+    11: 'Redo (a) on the measure Joaquin cares about (2026-11-04: ''the gap is not what we care about''): absolute zero-shot
+      MSE of log|M|^2 on the held-out 2->4 pools against width (8/16/32) and length (1x, 4x best, 16x best), not relative
+      to training error.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -2563,6 +2566,11 @@ entries:
       if:
       - 'step 49''s sampling settled: class check, generation probe, generation at that sampling, arm design to the reviewer'
       - 'step 49 still open: nothing is generated; the class check alone may run'
+    11:
+      feeds: whether capacity and training length lower the held-out multiplicity zero-shot error
+      if:
+      - 'falls: report by how much per axis'
+      - 'flat: (b) more 6-particle pools is the lever'
   step_waits:
     '7': 'D78: the user''s hold on the full catalog pretraining''s design (step (a) is held there, nothing to launch until
       it is released)'
