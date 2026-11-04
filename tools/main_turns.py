@@ -3,7 +3,10 @@ started its segment and the segment classified by what it did; count, context at
 tokens and list-price $ per class, per era (tools/usage_report.py PERIODS). Read-only over the main-session transcripts
 of ~/.claude/projects/-home-joaquin-work-FA (the A/B replay folders are not the main session); CPU, under a minute.
 
-    python3 tools/main_turns.py [--out analysis/agent_redesign/main_turns.json] [--samples N]
+    python3 tools/main_turns.py [--out analysis/agent_redesign/main_turns.json] [--samples N] [--split ISO] [--until ISO]
+
+--until ends the last era there (segments starting at or after it are not counted), so a re-measure over a closed
+window reproduces; the last line printed is the per-era summary as one JSON object (tools/verify_claims.py reads it).
 
 Segment: starts at a trigger and holds every API message (deduplicated on message id, over all main transcripts) until
 the next trigger. A trigger is a user record that is not a tool result and carries text (a new turn, or a Stop hook's
@@ -372,11 +375,15 @@ def main():
                     help="redesign era: 20 inline, 10 orchestration, 10 none segments (seed 0) with the call that set the label")
     ap.add_argument("--split", help="ISO time: the redesign era ends there and redesign_after starts (a before/after "
                     "of a change; agent_redesign step 7 re-measure)")
+    ap.add_argument("--until", help="ISO time: the last era ends there")
     a = ap.parse_args()
     if a.split:                                  # in place: usage_report.period_of reads this same list
         name, lo, _ = PERIODS[-1]
         PERIODS[-1] = (name, lo, ts(a.split))
         PERIODS.append(("redesign_after", ts(a.split), None))
+    if a.until:
+        name, lo, _ = PERIODS[-1]
+        PERIODS[-1] = (name, lo, ts(a.until))
     paths = sorted(p for p in glob.glob(os.path.join(FOLDER, "*.jsonl")) if TRIAL_DIR not in p)
     segs = scan(paths)
     if a.samples:
@@ -416,6 +423,7 @@ def main():
     for per, A in rep["agents_by_kind"].items():
         for k, v in A.items():
             print("agents", per, k, json.dumps(v))
+    print(json.dumps(rep["by_period"]))
 
 
 if __name__ == "__main__":

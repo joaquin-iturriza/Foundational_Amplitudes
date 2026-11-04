@@ -1,6 +1,6 @@
 """Replay of the reference pushes (.claude/hooks/context_push.py) over recorded agent transcripts.
 
-    python3 tools/push_replay.py [--dirs DIR[:DIR]] [--since ISO] [--until ISO] [--check] [--out JSON]
+    python3 tools/push_replay.py [--dirs DIR[:DIR]] [--revert REV] [--since ISO] [--until ISO] [--check] [--out JSON]
 
 For every subagent transcript under ~/.claude/projects/-home-joaquin-work-FA/*/subagents/ whose first record falls in
 [--since, --until), each tool call is replayed in order through context_push.matches() and its once-per-agent
@@ -16,7 +16,11 @@ tokens(push) = 1.722 * chars/4 (tools/context_breakdown.py's fit of API context 
 --check compares the replayed pushed_chars with the REFERENCE text actually recorded in each transcript (only
 meaningful with the live directories over a period when the live sections were in force).
 Matched before/after: run twice over the same transcripts with two --dirs; the difference is the cut's saving on the
-same tool calls.
+same tool calls. --revert REV replays the sections (--dirs, default live) with the lines commit REV added to
+.claude/context/ removed again (cut 1: --revert 85064616), the rest of the sections as they are.
+--until also ends each transcript there (records stamped at or after it are not read), so a replay over a closed
+window gives the same numbers when rerun while agents of it are still writing. The last line printed is the summary
+as one JSON object (tools/verify_claims.py reads it).
 """
 import argparse, glob, json, os, re, statistics, sys
 from datetime import datetime
@@ -54,7 +58,41 @@ def load_hook(dirs, hook=None, state=None):
     return m
 
 
-def replay(path, cp):
+def reverted_dirs(dirs, rev):
+    """Copies of the section directories with the lines commit `rev` added under .claude/context/ removed (one
+    occurrence each, in the file of the same name); a temp ':'-joined list for CONTEXT_DIRS."""
+    import shutil, subprocess, tempfile
+    live = [os.path.join(ROOT, ".claude", "context"), os.path.expanduser("~/.claude/context")]
+    src = dirs.split(":") if dirs else live
+    diff = subprocess.run(["git", "-C", ROOT, "show", "--format=", "-U0", rev, "--", ".claude/context"],
+                          capture_output=True, text=True, check=True).stdout
+    added, cur = {}, None
+    for l in diff.splitlines():
+        if l.startswith("+++ "):
+            cur = os.path.basename(l[4:].strip())
+        elif l.startswith("+") and cur:
+            added.setdefault(cur, []).append(l[1:])
+    out = []
+    for i, d in enumerate(src):
+        t = tempfile.mkdtemp(prefix="push_replay_rev%d_" % i)
+        for f in glob.glob(os.path.join(d, "*")):
+            shutil.copy(f, t)
+        if os.path.realpath(d) == os.path.realpath(live[0]):
+            for name, lines in added.items():
+                p = os.path.join(t, name)
+                if not os.path.exists(p):
+                    continue
+                keep = open(p).read().split("\n")
+                for a in lines:
+                    if a not in keep:
+                        sys.exit("push_replay: %s no longer holds the line %r that %s added" % (name, a, rev))
+                    keep.remove(a)
+                open(p, "w").write("\n".join(keep))
+        out.append(t)
+    return ":".join(out)
+
+
+def replay(path, cp, until=None):
     """(calls, pushes [(call index, chars received)], recorded REFERENCE chars) of one transcript. A hook output over
     HARNESS_CAP chars reaches the agent as a PREVIEW-char preview (the harness's persisted-output), as recorded."""
     calls, seen, pushes, recorded, holds = -1, set(), [], 0, 0
@@ -64,6 +102,8 @@ def replay(path, cp):
             d = json.loads(line)
         except ValueError:
             continue
+        if until is not None and d.get("timestamp") and ts(d["timestamp"]) >= until:
+            break
         if d.get("type") == "attachment":
             a = d.get("attachment") or {}
             if a.get("type") == "hook_additional_context":
@@ -104,6 +144,7 @@ def replay(path, cp):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dirs", help="':'-separated section directories (default: live)")
+    ap.add_argument("--revert", help="a commit whose added .claude/context lines are removed for the replay")
     ap.add_argument("--hook", help="the hook file to replay: a path or git:<rev> (default: the live file)")
     ap.add_argument("--since", default="2026-10-30T11:35:10+00:00")
     ap.add_argument("--until", default="2100-01-01T00:00:00+00:00")
@@ -111,7 +152,7 @@ def main():
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--out")
     a = ap.parse_args()
-    cp = load_hook(a.dirs, a.hook)
+    cp = load_hook(reverted_dirs(a.dirs, a.revert) if a.revert else a.dirs, a.hook)
     lo, hi = ts(a.since), ts(a.until)
     rows = []
     for f in sorted(glob.glob(os.path.join(TR, "*", "subagents", "**", "agent-*.jsonl"), recursive=True)):
@@ -121,7 +162,7 @@ def main():
             continue
         if not t0 or not (lo <= ts(t0) < hi):
             continue
-        n, pushes, rec, holds = replay(f, cp)
+        n, pushes, rec, holds = replay(f, cp, hi)
         if n < a.min_calls:
             continue
         tc = sum(TOK_PER_C4 * c / 4 * max(0, n - 1 - k) for k, c in pushes)
@@ -134,13 +175,14 @@ def main():
             "per_call_tokens_mean": round(sum(r["token_calls"] for r in rows) / max(1, sum(r["calls"] for r in rows))),
             "per_call_tokens_median_agent": statistics.median(per) if per else 0,
             "held_calls": sum(r["held_calls"] for r in rows),
-            "dirs": a.dirs or "live", "hook": a.hook or "live", "since": a.since, "until": a.until}
+            "token_calls_M": round(sum(r["token_calls"] for r in rows) / 1e6, 2),
+            "dirs": a.dirs or "live", "revert": a.revert, "hook": a.hook or "live", "since": a.since, "until": a.until}
     if a.check:
         bad = [r for r in rows if abs(r["pushed_chars"] - r["recorded_chars"]) > 0.05 * max(1, r["recorded_chars"])]
         summ["check_agents_off_by_5pct"] = len(bad)
         summ["check_replayed_over_recorded"] = round(sum(r["pushed_chars"] for r in rows) /
                                                      max(1, sum(r["recorded_chars"] for r in rows)), 3)
-    print(json.dumps(summ, indent=1))
+    print(json.dumps(summ))
     if a.out:
         json.dump({"summary": summ, "agents": rows}, open(a.out, "w"), indent=1)
 

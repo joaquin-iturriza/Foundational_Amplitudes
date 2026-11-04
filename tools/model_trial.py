@@ -452,6 +452,7 @@ def report(out):
                     sum(1 for r in rs if not r["first_pass"] and fp(rec, r["task"], "opuslow") is True)]
         per[arm] = d
     print(json.dumps(per, indent=1))
+    print(json.dumps(per))                       # one line, last: what tools/verify_claims.py reads
     if out:
         rec["summary"] = per
         json.dump(rec, open(out, "w"), indent=1)
