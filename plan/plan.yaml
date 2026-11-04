@@ -8390,7 +8390,7 @@ entries:
       - 'a candidate cannot reach 0% outside: say which classes and why'
   owner:
     agent: af67f5612500a5634
-    state: working
+    state: closed
     since: '2026-11-04T18:28:39+00:00'
     state_at: '2026-11-04T18:48:57+00:00'
     context: 160116
@@ -9471,27 +9471,33 @@ entries:
       arms 16G (1.44x), memmap arms / long-best reads / long sweeps 32G (1.42x of 22.5), eval reads 8G. Running jobs untouched:
       step 47 pair 5abe4a0e/92207f6a and 16x read 1a46f3e0 at 48G (measured need about 11 and 22 GB).'
   handoff:
-    state: '2026-11-04: Q1 (het one-loop 12x) and Q2 (pp support) answered and recorded as findings (het_oneloop.py @fc71ee9e,
-      pp_support.py @a8d4b97f; figs/het_oneloop, figs/pp_support). pp_support split by physics: pp13v4_ 868 classes logm_above
-      1.56%, 199 over 1% (196 of them 2->4); pp13_ 433 classes 1.57%, 113 over 1% (all 2->4): the |M|^2 tail gap is not a
-      physics mismatch. Step 47 (het control with the 63 signed one-loop pools on log max(|x|,s), arm v4_het_control_magnitude[_seed2],
-      flag data.signed_magnitude_target @f9822972, memmap key 34fe4d93, repo-reviewer PASS at 34fe4d93): design recorded twice;
-      the design reviewer (agent aba768ef52ae79375) gave FIX on the first (prior signed_ab A/B 2.78 missing, MSE control differs
-      in loss and sign output, het seed spread 9.23 vs 15.08); the revised design (the second record) addresses all three
-      and waits for the re-check: continue that same reviewer with SendMessage, then on PASS: site pick FA --jobs 2, plan
-      target catalog_coverage --batch het_magnitude --wall 3.5 --jobs 2, site submit ccin2p3 FA scripts/job_catalog_v3_short.sh
-      --hdr=--time=03:30:00 --hdr=--mem=48G --item catalog_coverage -- v4_het_control_magnitude (and _seed2), plan run each,
-      plan wait on both. Step 48 (splitter initial-state branch) waits on Joaquin (coordinator asking).'
-    decisions: 'D263 (Joaquin''s two questions 2026-11-04) covers both reads and step 47 inside catalog_coverage''s approval
-      (coordinator: small, go after design PASS).'
-    ruled_out: Het one-loop 12x as a reading mismatch (same pools, rows, truth, reader, checkpoint rule); sigma down-weighting
-      of the one-loop mean (sigma small there); pp support gap from sqrt(s) window or cuts (0.079% of pp events); |M|^2 gap
-      from pp13_ physics (same in pp13v4_).
-    running: none (step 47 not submitted)
-    files: analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/data/{het_oneloop,het_oneloop_reads,pp_support,pp_support_reads}.json,
-      experiment.py (_resolve_amp_preprocessing), data_mmap.py key_doc, scripts/job_catalog_v3_short.sh v4_het_control_magnitude,
-      tests/test_parent_target_stats.py
-    written: '2026-11-04T18:27:41+00:00'
+    state: '2026-11-04 ~19:55. Running: step 47 het magnitude pair FA-ccin2p3-5abe4a0e (v4_het_control_magnitude, seed 42)
+      and 92207f6a (_seed2), job_catalog_v3_short.sh @80f98c55, design PASS (reviewer aba768ef52ae79375, note: (a) between
+      0.25 and 0.7 = partial cause), plan wait step 47; on end: extend het_oneloop.py with the arm, read HD5 per the design
+      (ratio to het control 87aeabca/53b9ed56 and MSE control c37a4b26/a1ea15aa, widened interval, sign-changing 19 / positive
+      9 apart), PP4/EE4/H1-H7c/HD4 beside. 16x sweep finished (finding E3579): best trial_1262 -4.197, lr at the window top,
+      not converged; its read FA-ccin2p3-1a46f3e0 (v4_het_long_best eval, LONG_BEST=cov_v4_long_hpo8_cc_68224/trial_1262,
+      @610422cc, gpu_v100, 2:30, target 1.5 h incl. one ~15 min cache build), plan wait step 32; on end: log checks, size_figs.py
+      eval_mse, mixture_ab.py arms with the 16x best, R 16x/4x per step 16''s design, redraw mse_vs_compute + arms figures,
+      write the length verdict in docs/results.tex, then the L(C) fit of step 40. E3579 acked --no-writeup (waits on that
+      read). Step 49 (envelope design, Joaquin 2026-11-04 ''sample in a way that covers the range the pp beams cover, but
+      wider, and with enough data so that performance is good''; design only, nothing built): pp_support.py @841c5e29 now
+      saves per class the catalog and pp marginal densities (log10 sqrt(s_hat) 0.05, ln|M|^2 0.5 nat) and a 2D occupancy (0.1
+      x 2 nat); full pull detached (tools/detach.py pp_density_pull, ~/.local/share/ccorch/detached/20261104-195144_pp_density_pull.log)
+      rewriting data/pp_support_reads.json (2-class test ok). Next: per class, catalog density / pp density per bin inside
+      the pp range, the share of pp events in bins under a fraction f, propose f from performance (e.g. the error-vs-training-density
+      relation of error_correlates), the sqrt(s) mixture (pp-range density + log-uniform tail to 6 TeV), the initial-state
+      collinear splitter branch for the 2->4 tail, regeneration cost from the catalog_v4 generation timings, and a validate_v4.py
+      gate; record as a design and send to Joaquin. Memory done (finding; @a03d9f99).'
+    decisions: D263 covers step 47 and both reads; step 16's passed design covers the 16x best read (REREAD of 6f8a1eed's
+      arm); Joaquin 2026-11-04 asked step 49 as design only and the memory fix (new jobs at measured peak + margin under 2x).
+    ruled_out: first step-47 pair 8cfe2b29/35514231 (sbatch WARNING parsed as slurm id; site tool fixed, resubmitted; their
+      registry rows stay UNKNOWN, dead)
+    running: FA-ccin2p3-5abe4a0e, FA-ccin2p3-92207f6a (step 47), FA-ccin2p3-1a46f3e0 (step 32), detached pp_density_pull (step
+      49)
+    files: analysis/catalog_v4/size_figs.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/data/long_sweeps_best.json,
+      analysis/catalog_v4/data/pp_support_reads.json, scripts/job_catalog_v3_short.sh, analysis/catalog_v4/validate_v4.py
+    written: '2026-11-04T18:52:23+00:00'
   ask: 'pp tail above the catalog''s |M|^2: add an initial-state collinear branch to the catalog''s splitter before the next
     catalog round, or leave that tail to the share-0.25 default component?'
   waiting_since: '2026-11-04T18:21:02+00:00'
