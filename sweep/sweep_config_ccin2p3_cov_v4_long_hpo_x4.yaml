@@ -18,7 +18,7 @@ cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  mem: 46G
+  mem: 32G  # measured peak RSS 19.9 GB per trial (sacct, 62936975-84), margin 1.6x
   cpus_per_task: 5
   # Any GPU of at least 24 GB (Joaquin 2026-11-01, D247: 'just send it on lxplus and to whatever gpu accepts it'; each
   # trial's GPU is printed in its log as TRIAL_GPU). Run on lxplus by generate_sweep as an HTCondor DAG in waves

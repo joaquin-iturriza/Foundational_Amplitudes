@@ -12,7 +12,7 @@ cluster:
   scheduler: slurm
   auto_submit: false
   request_gpus: 1
-  mem: 46G
+  mem: 32G  # measured peak RSS 19.9 GB per trial (sacct, 62936975-84), margin 1.6x
   cpus_per_task: 5
   time: '06:30:00'
 paths: null

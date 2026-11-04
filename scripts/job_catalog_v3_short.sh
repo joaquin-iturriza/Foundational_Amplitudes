@@ -39,7 +39,11 @@
 #                          controls read PP4 with mode eval, V3_AXES=PP4
 # Mode smoke also fine-tunes the smoke parent on one held-out probe, 20 steps, with AdamW and with Muon (tools/catalog_ft.py;
 # catalog_v3 arms only).
-#   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=48G -- <arm> [smoke|eval]
+#   site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --hdr=--mem=<M> -- <arm> [smoke|eval]
+# --mem from measured peak RSS (sacct MaxRSS, CC-IN2P3, 2026-11-04) with a margin under 2x: in-memory arms (1e4 train
+# events per process, e.g. v4_het_control[_seed2] 62899733/31: 10.4/11.1 GB) 16G; memmap arms and v4_het_long_best
+# (whole set, the ~20 GB cache mapped: w8 62936935 22.3 GB, w32 62936969 22.5 GB, the 4x best read 62943062 20.7 GB)
+# 32G; eval-only reads of an arm's checkpoint (62921473: 1.3 GB) 8G
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
