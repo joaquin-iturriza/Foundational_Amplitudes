@@ -11351,3 +11351,55 @@ entries:
     state_at: '2026-11-04T21:09:55+00:00'
     context: 41440
     context_at: '2026-11-04T21:10:18+00:00'
+  designs:
+  - at: '2026-11-04T21:14:59+00:00'
+    question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
+      pretrained model and retraining it briefly under the change reach the model pretrained from scratch with the change,
+      and at what fraction of that pretraining''s steps? Test change: catalog_v4''s default-sampled share 0.25 (recipes/catalog_v4_default25_train.yaml
+      against catalog_v4_base_train.yaml), the one catalog_v4 change measured a clear win and kept by Joaquin [D229, D231];
+      a data change, so every tensor of the parent loads unchanged.'
+    prior: '(1) The add-W continual pretraining (docs/results.tex par. around 12401-12610; D20-D23, D30, D31, D34): the finale
+      (28 processes, 64k steps) continued 1k-16k steps on W+4g/W+5g (naive, replay 1%/10%, EWC) against finale+W pretrained
+      with W from the start; on the Z+ng fine-tune children the best late parent trails finale+W by 0.1-0.3 dex on Z+4g at
+      every D, keeping most of the gain at 4k/64k = 1/16 of a pretraining''s steps, with 3-30x forgetting of the old processes
+      even with replay; weight interpolation finale<->add-W has no good point (par. 12636). Differs: the change there added
+      processes and was read on fine-tune children; here the change is the sampling of the same processes, read zero-shot
+      on the reads that measured it. (2) The change itself, from scratch (catalog_coverage step 15, analysis/catalog_v4/data/mixture_ab_het.json,
+      mixture_ab.py mixture --het): het arms share 0.25 (FA-ccin2p3-f0156d88/df858d33, reads 9538e607/ed96b552) over the het
+      control (87ea24d0/321a3de2), 4264 steps, seeds 42/43: PP4 R=0.450 [0.360,0.556], EE4 0.223 [0.174,0.301], held-out on
+      default-sampled events 0.638 [0.501,0.834], held-out catalog-sampled 0.931 [0.725,1.191]. (3) Warm starts in the code
+      that are not this: DyHPO fidelity resumes (warm_start_idx, same config), the het sigma-only stage (D70), grow_sigma_head
+      (1ch->2ch); the generation one-hot (par. near 9976) is a change that cannot warm-start (input width). No warm start
+      under a changed setup read against the same change from scratch was found (searched results.tex for warm start, pretrained,
+      continuation, resume, replay, LONG_CKPT; plan show; site decisions for warm/continu/pretrain).'
+    measure: 'Per read, the zero-shot MSE of log|M|^2 per probe (tools/zero_shot_parent.py, mse_logm2_real) of each run''s
+      final model (mean at its best checkpoint, then the sigma-only stage, D276), compared as in mixture_ab.py: each side
+      the geometric mean of its two seeds, per class the geometric mean of the probes'' ratios, R = the median over classes,
+      its 95% class-bootstrap interval widened by |ln R_seed| of the denominator''s seed pair. Reads: PP4 (1301 classes),
+      EE4 (169), the held-out classes on default-sampled events pooled (H1-H3''s PP4/EE4 probes, HD4, HD5; 700), the held-out
+      H1..H7c catalog-sampled pooled (701). Ratios per k in {533, 1066, 2132}: R(W_k/B) (warm start against scratch-with-change),
+      R(W_k/C_k) (the change against the same extra steps without it), R(W_k/A) and the recovered fraction g_k = ln R(W_k/A)
+      / ln R(B/A). Compute fraction = k/4264. New mode in analysis/catalog_v4/mixture_ab.py (warm).'
+    check: 'The same reads moved with this change from scratch: het share 0.25 over the het control R=0.450 on PP4 and 0.223
+      on EE4, with the seed spread R_seed 1.17 and 1.13 (mixture_ab_het.json), so the gap B vs A is 5-25 times the seed spread
+      on these reads; a warm start that fails or succeeds is visible. Length alone also moves them (par:v4_mult_width_length:
+      4x steps R=0.245 on H2), which is why C_k is in the design.'
+    fixed: 'Everything of the het arms v4_het_control / v4_het_default25 (scripts/job_catalog_v3_short.sh): width 8, MuonAdamW
+      lr 4.997e-3, muon_weight_decay 0.0217, warmup fraction 0.158, cosine, batch 16384, EMA on, 1e4 train and 200 val events
+      per pool, in memory, HETEROSC + 250-step sigma stage, the dimensionless target, diagram encoder; the same axes read
+      with the same reader. Warm-start arms load the parent''s final model through fine_tune.pretrained_path (EMA weights,
+      D63), the parent''s tokenizer and frozen data_stats (target_stats parent), lr_scale 1, layer_decay 1, no frozen blocks:
+      the pretraining''s own schedule restarted over k steps (fresh optimizer). Every arm the same GPU partition rule (gpu_v100,gpu_h100)
+      as its parents.'
+    control: 'C_k: the same warm start from the same parent for the same k steps and schedule on the parent''s own recipe
+      (catalog_v4_base_train.yaml, share 0): the matched-compute control that separates the change from k more steps. B (existing,
+      share 0.25 from scratch, 4264 steps) is the reference the question names; A (existing, the parent) is step 0 of both.'
+    seeds: '42 and 43: W_k and C_k at seed s start from the het control at seed s (87ea24d0 for 42, 321a3de2 for 43) and are
+      compared with B at seed s''s pair; 3 values of k x 2 arms x 2 seeds = 12 new runs.'
+    outcome: 'Per k, on PP4, EE4 and the default-sampled held-out pooled: MATCH when R(W_k/B) <= 1.10 with its widened interval
+      containing or below 1 on all three; SHORT when R(W_k/B) >= 1.10 with the widened interval above 1 on any. Separately,
+      the change carried: R(W_k/C_k) <= 0.90 with the widened interval below 1 on PP4 and EE4; not carried otherwise. YES
+      (warm start is the cheap route): the smallest MATCH k, reported as k/4264 of a pretraining, with the change carried.
+      NO: no k up to 2132 matches; then g_k says how much of the scratch gain the warm start recovers per k, and whether more
+      steps would close it (g rising with k) or not (g flat). The catalog-sampled held-out read is reported beside as the
+      cost check (from scratch the change cost nothing there, 0.931).'
