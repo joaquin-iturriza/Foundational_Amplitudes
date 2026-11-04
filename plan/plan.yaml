@@ -11331,10 +11331,11 @@ entries:
     - warm_start
   decisions:
   - D282
-  next: Search docs/results.tex, the plan and site decisions for prior work (transfer and fine-tuning ladder, continuation
-    runs, LONG_CKPT resumes, any warm start under a changed setup) and name it with its results; then pick the test change(s)
-    and design the comparison (warm start + short retrain against from-scratch with the change, matched compute and data,
-    seeds), and pass the design reviewer before any job.
+  next: 'Warm start against scratch-with-change (design recorded; share 0.25 as the change): on design PASS submit the 12
+    runs on CC-IN2P3 (scripts/job_catalog_v3_short.sh @58bcf238, arms v4_het_warm25_k{533,1066,2132}[_seed2] and v4_het_cont_k{533,1066,2132}[_seed2],
+    --hdr=--time= from tools/short_wall.py), record them and the batch target; when all end extract their reads (mixture_ab.py
+    extract) and add a warm mode comparing W_k with B (scratch share 0.25), C_k and A (het control) on PP4, EE4, held-out
+    default- and catalog-sampled'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -11424,3 +11425,11 @@ entries:
       continual pretraining, the het share runs). The loss is HETEROSC. The target is the emission-scale dimensionless target
       (D234). Disk per job is about 0.85 GB (128 MB run dir plus 727 MB scratch predictions), so 12 jobs are about 10 GB against
       about 92 GB free on /sps/lpnhe.'
+  step_why:
+    1:
+      feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
+        new pretraining, and at what fraction of its steps (D282)
+      if:
+      - 'MATCH at some k with the change carried: report k/4264 to Joaquin as the cheap route, write up'
+      - 'no k matches: report g_k (recovered share of the scratch gain) per k and whether it rises with k'
+      - 'a run broke: read its log, fix, resubmit that run'
