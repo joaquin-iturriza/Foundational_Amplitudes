@@ -10169,6 +10169,12 @@ entries:
     answers_after: '2026-11-04T18:48:22+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-11-04T21:07:53.532000+00:00'
+    text: Yes, register the fix, I don't see how it is my call if I asked you to do implement the fix.
+    decision: D281
+    answers_after: '2026-11-04T20:17:36+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
@@ -10178,6 +10184,7 @@ entries:
   - D225
   - D268
   - D272
+  - D281
   next:
     11: 'Close: write up in docs/results.tex what the redesign changed and measured (cut 1 replay and check, the main-session
       wake re-measure, the compaction leak fix, the model trial), with % src lines from push_replay.py, main_turns.py --split
@@ -10406,8 +10413,10 @@ entries:
     searched: 'settings registrations are Joaquin''s (fa-hooks: a registration change goes to the user as a diff); D279 asked
       for the fix, not this setting'
     blocks: only the double-wake fix going live
-    blocks_steps: &id001
+    blocks_steps:
     - 15
+    answered_at: '2026-11-04T21:07:53.532000+00:00'
+    decision: D281
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -11160,13 +11169,6 @@ entries:
     running: none
     files: docs/results.tex tools/push_replay.py tools/main_turns.py tools/compaction_replay.py tools/model_trial.py analysis/agent_redesign/main_turns_split_5708b248.json
     written: '2026-11-04T19:52:42+00:00'
-  ask: Register the double-wake fix (notification_absorb.py, eb2831c7) as a UserPromptSubmit hook in .claude/settings.json
-    (patch at scratchpad/dw/settings_ups.patch)?
-  waiting_since: '2026-11-04T20:17:36+00:00'
-  searched: 'settings registrations are Joaquin''s (fa-hooks: a registration change goes to the user as a diff); D279 asked
-    for the fix, not this setting'
-  blocks: only the double-wake fix going live
-  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -11261,7 +11263,7 @@ entries:
     searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
       which ask for the explainer'
     blocks: nothing
-    blocks_steps: &id002 []
+    blocks_steps: &id001 []
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -11296,5 +11298,5 @@ entries:
   searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
     which ask for the explainer'
   blocks: nothing
-  blocks_steps: *id002
+  blocks_steps: *id001
   checked_until: '2026-11-04T20:21:31+00:00'
