@@ -25,7 +25,7 @@ Candidates (mixtures, each normalised; w the weight of the added component):
 The last is an upper bound for that component: it assumes the candidates reach every bin pp reaches; where the
 candidates' support ends (the 2->4 tail above the catalog's max, step 46/48) only a new candidate generator does.
 """
-import json, os
+import json, os, sys
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -150,5 +150,113 @@ def main():
     print(json.dumps(by_n, indent=0)); print(supp)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and sys.argv[1:2] != ["sampler"]:
     main()
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# sampler mode (step 49 redone, coordinator 2026-11-04 relaying Joaquin's "I'm not asking you to recreate the pp
+# sampling"): catalog-sampler-only candidates, scored on support and on training events per bin inside the pp range.
+#     python3 analysis/catalog_v4/envelope_design.py sampler   -> data/envelope_sampler.json
+# Counts are expected training events per 2D bin (0.1 dex x 2 nat) at N_TRAIN events of the class (1e4: the short
+# arms' in-memory load; x10 for the 1e5 pool). pp range = the bins holding pp events; "outside support" = pp events in
+# bins whose expected catalog count at the 1e5 pool is below 0.5 event.
+# Dose-response reference: the share arms' training mixture (1-s) catalog + s default-sampled (the pp sample stands in),
+# s = 0, 0.25, 0.5, 1, on the same metric, beside their measured R on PP4 trained (tab:v4_bound_shares).
+# Candidates (each a 2D density built from the class's catalog and pp occupancies, no MadEvent component):
+#   current          catalog_v4 as generated
+#   sq_w{w}          sqrt(s_hat): w x pp's sqrt(s_hat) marginal widened by a 0.1-dex Gaussian (the class's pp pool),
+#                    1-w log-uniform on the class's window to 6 TeV; ln|M|^2 at each sqrt(s_hat) the catalog's own
+#                    conditional (nearest filled row)
+#   sq_w{w}_flat{g}  as sq_w{w}, with the ln|M|^2 conditional per sqrt(s_hat) row (1-g) catalog's + g flat in ln|M|^2
+#                    over [pp min - 2 nat, pp max + 4 nat] of that row (the class's range where the row has no pp event):
+#                    a flat-in-log|M|^2 part selected per sqrt(s_hat) slice; above the catalog's current max it assumes
+#                    candidates that reach there (the initial-state collinear branch): an upper bound there
+N_TRAIN = 1e4
+NMIN = (1, 3, 10, 30)
+SHARES = {0.0: 1.0, 0.25: 0.650, 0.5: 0.549, 1.0: 0.388}   # tab:v4_bound_shares, PP4 trained, MSE R
+
+
+def log_uniform_rows(lo, hi):
+    e = np.array(SQ2)
+    a, b = np.log10(max(lo, 1.0)), np.log10(hi)
+    w = np.clip(np.minimum(e[1:], b) - np.maximum(e[:-1], a), 0, None)
+    return w / w.sum()
+
+
+def flat_rows(pp, ncols):
+    """per row the uniform ln|M|^2 density over [pp min - 1 bin, pp max + 2 bins] of the row (class range if empty)"""
+    out = np.zeros_like(pp)
+    cols = np.where(pp.sum(0) > 0)[0]
+    glo, ghi = cols.min(), cols.max()
+    for i in range(pp.shape[0]):
+        cc = np.where(pp[i] > 0)[0]
+        lo, hi = (cc.min(), cc.max()) if len(cc) else (glo, ghi)
+        lo, hi = max(lo - 1, 0), min(hi + 2, ncols - 1)
+        out[i, lo:hi + 1] = 1.0 / (hi - lo + 1)
+    return out
+
+
+def metrics(dens, pp, n_cat=1e5):
+    m = pp > 0
+    cnt = dens * N_TRAIN
+    o = {"outside_support": float(pp[m & (dens * n_cat < 0.5)].sum())}
+    for k in NMIN:
+        o[f"below_{k}"] = float(pp[m & (cnt < k)].sum())
+    o["pp_weighted_median_count"] = float(np.interp(0.5, np.cumsum(pp[m][np.argsort(cnt[m])]), np.sort(cnt[m])))
+    o["catalog_mass_in_pp_range"] = float(dens[m].sum())
+    o["n_pp_bins"] = int(m.sum())
+    return o
+
+
+def sampler_one(r):
+    pp = np.array(r["default"]["hist2d"], float); c = np.array(r["catalog"]["hist2d"], float)
+    if pp.sum() == 0 or c.sum() == 0:
+        return None
+    pp /= pp.sum(); c /= c.sum()
+    cond = catalog_conditional(c)
+    ppm = widen_rows(pp.sum(1, keepdims=True))[:, 0]
+    lo, hi = r["window"] if r.get("window") else (r["catalog"]["sqrts_min"], 6000.0)
+    lu = log_uniform_rows(lo, hi)
+    flat = flat_rows(pp, pp.shape[1])
+    out = {"current": metrics(c, pp)}
+    for s in SHARES:
+        out[f"share_{s}"] = metrics((1 - s) * c + s * pp, pp)
+    for w in (0.5, 0.7):
+        marg = w * ppm + (1 - w) * lu
+        out[f"sq_w{w}"] = metrics(marg[:, None] * cond, pp)
+        for g in (0.35, 0.5):
+            out[f"sq_w{w}_flat{g}"] = metrics(marg[:, None] * ((1 - g) * cond + g * flat), pp)
+    out["n_final"] = len(r["default"]["pdg"]) - 2
+    out["n_pp"] = r["default"]["n"]
+    return out
+
+
+def sampler():
+    global SQ2
+    d = json.load(open(os.path.join(DATA, "pp_support_reads.json")))
+    SQ2 = d["hist2d_edges"][0]
+    per = {r["probe"]: o for r in d["rows"] if "error" not in r for o in [sampler_one(r)] if o is not None}
+    cands = [k for k in next(iter(per.values())) if isinstance(next(iter(per.values()))[k], dict)]
+    n = np.array([p["n_pp"] for p in per.values()], float)
+    summ = {}
+    for k in cands:
+        summ[k] = {}
+        for m in next(iter(per.values()))[k]:
+            x = np.array([p[k][m] for p in per.values()], float)
+            summ[k][m] = {"pooled": float((x * n).sum() / n.sum()), "median": float(np.median(x)),
+                          "p10": float(np.quantile(x, 0.1)), "p90": float(np.quantile(x, 0.9)), "max": float(x.max()),
+                          "n_classes_over_1pct": int((x > 0.01).sum())}
+    by_n = {str(nf): {k: {"below_10": float(np.median([p[k]["below_10"] for p in per.values() if p["n_final"] == nf])),
+                          "outside": float(np.median([p[k]["outside_support"] for p in per.values() if p["n_final"] == nf]))}
+                      for k in cands} for nf in sorted({p["n_final"] for p in per.values()})}
+    out = {"source": "data/pp_support_reads.json (pp_support.py pull @841c5e29), envelope_design.py sampler",
+           "n_train": N_TRAIN, "share_R_pp4_trained": SHARES, "n_classes": len(per), "summary": summ,
+           "median_by_n_final": by_n, "per_class": per}
+    json.dump(out, open(os.path.join(DATA, "envelope_sampler.json"), "w"), indent=1)
+    for k, v in summ.items():
+        print(k, {m: (round(s["pooled"], 4), round(s["median"], 4)) for m, s in v.items() if m != "n_pp_bins"})
+
+
+if __name__ == "__main__" and sys.argv[1:2] == ["sampler"]:
+    sampler()
