@@ -8799,7 +8799,7 @@ entries:
       - 'a quoted number cannot be re-read: say which'
   owner:
     agent: a4cdf21816cbb03c0
-    state: working
+    state: closed
     since: '2026-11-04T18:53:21.609000+00:00'
     state_at: '2026-11-04T19:48:17+00:00'
     context: 135031
@@ -9880,33 +9880,27 @@ entries:
       arms 16G (1.44x), memmap arms / long-best reads / long sweeps 32G (1.42x of 22.5), eval reads 8G. Running jobs untouched:
       step 47 pair 5abe4a0e/92207f6a and 16x read 1a46f3e0 at 48G (measured need about 11 and 22 GB).'
   handoff:
-    state: '2026-11-04 ~19:55. Running: step 47 het magnitude pair FA-ccin2p3-5abe4a0e (v4_het_control_magnitude, seed 42)
-      and 92207f6a (_seed2), job_catalog_v3_short.sh @80f98c55, design PASS (reviewer aba768ef52ae79375, note: (a) between
-      0.25 and 0.7 = partial cause), plan wait step 47; on end: extend het_oneloop.py with the arm, read HD5 per the design
-      (ratio to het control 87aeabca/53b9ed56 and MSE control c37a4b26/a1ea15aa, widened interval, sign-changing 19 / positive
-      9 apart), PP4/EE4/H1-H7c/HD4 beside. 16x sweep finished (finding E3579): best trial_1262 -4.197, lr at the window top,
-      not converged; its read FA-ccin2p3-1a46f3e0 (v4_het_long_best eval, LONG_BEST=cov_v4_long_hpo8_cc_68224/trial_1262,
-      @610422cc, gpu_v100, 2:30, target 1.5 h incl. one ~15 min cache build), plan wait step 32; on end: log checks, size_figs.py
-      eval_mse, mixture_ab.py arms with the 16x best, R 16x/4x per step 16''s design, redraw mse_vs_compute + arms figures,
-      write the length verdict in docs/results.tex, then the L(C) fit of step 40. E3579 acked --no-writeup (waits on that
-      read). Step 49 (envelope design, Joaquin 2026-11-04 ''sample in a way that covers the range the pp beams cover, but
-      wider, and with enough data so that performance is good''; design only, nothing built): pp_support.py @841c5e29 now
-      saves per class the catalog and pp marginal densities (log10 sqrt(s_hat) 0.05, ln|M|^2 0.5 nat) and a 2D occupancy (0.1
-      x 2 nat); full pull detached (tools/detach.py pp_density_pull, ~/.local/share/ccorch/detached/20261104-195144_pp_density_pull.log)
-      rewriting data/pp_support_reads.json (2-class test ok). Next: per class, catalog density / pp density per bin inside
-      the pp range, the share of pp events in bins under a fraction f, propose f from performance (e.g. the error-vs-training-density
-      relation of error_correlates), the sqrt(s) mixture (pp-range density + log-uniform tail to 6 TeV), the initial-state
-      collinear splitter branch for the 2->4 tail, regeneration cost from the catalog_v4 generation timings, and a validate_v4.py
-      gate; record as a design and send to Joaquin. Memory done (finding; @a03d9f99).'
-    decisions: D263 covers step 47 and both reads; step 16's passed design covers the 16x best read (REREAD of 6f8a1eed's
-      arm); Joaquin 2026-11-04 asked step 49 as design only and the memory fix (new jobs at measured peak + margin under 2x).
-    ruled_out: first step-47 pair 8cfe2b29/35514231 (sbatch WARNING parsed as slurm id; site tool fixed, resubmitted; their
-      registry rows stay UNKNOWN, dead)
-    running: FA-ccin2p3-5abe4a0e, FA-ccin2p3-92207f6a (step 47), FA-ccin2p3-1a46f3e0 (step 32), detached pp_density_pull (step
-      49)
-    files: analysis/catalog_v4/size_figs.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/data/long_sweeps_best.json,
-      analysis/catalog_v4/data/pp_support_reads.json, scripts/job_catalog_v3_short.sh, analysis/catalog_v4/validate_v4.py
-    written: '2026-11-04T18:52:23+00:00'
+    state: '2026-11-04 ~20:51. Step 53 (Joaquin: show the catalog sampling with each part separated, democratic splitter included):
+      sampling_example.py @cd54ef52 replays each chunk of v4_uux_epemg train seed 42 exactly (datagen.gen_chunk with the standalone,
+      democratic_draw/rotate_forward recorded; raises unless the replay equals the pool bit for bit) and tags kept flat rows
+      splitter vs RAMBO; figure (a) now stacks the trained 0.25 mixture by five parts (bulk RAMBO, forward RAMBO, flat RAMBO,
+      flat splitter, default share). Detached pull sampling_tags (log ~/.local/share/ccorch/detached/20261104-205038_sampling_tags.log)
+      runs the hist on CC via site run -> data/sampling_example.json. On its end: if it raised, read why (replay mismatch,
+      backend build); else python3 analysis/catalog_v4/sampling_example.py figs, look once at figs/sampling_example_a.png
+      at low resolution, commit the json, report figure paths, the commit and flat_tags.splitter_share_of_kept_flat (bulk
+      and forward are RAMBO only, mg5_pipeline_final.py:3425-3466; only the flat part''s candidates use democratic 0.5). Step
+      49: envelope designs (own sampler: 0.70 own |M|^2-unweighted at pp sqrt(s) widened 0.05 dex + 0.30 current mixture with
+      IS-collinear branch, f 0.5; envelope_design.py own @23cf0dba) reported; the reviewer''s FIX on the 19:04 design is NOT
+      to be acted on: Joaquin ''we are not done talking about the sampling for the catalog''; no new design until his word.'
+    decisions: 'D263 covers step 47 and the reads; step 16''s passed design covers the 16x best read; Joaquin 2026-11-04:
+      step 49 design only, no review until he says.'
+    ruled_out: 'step 49 variant taking catalog events from the MadEvent pools (Joaquin: not recreating the pp sampling); the
+      events-per-bin criterion (main session withdrew it).'
+    running: FA-ccin2p3-5abe4a0e, FA-ccin2p3-92207f6a (step 47), FA-ccin2p3-1a46f3e0 (step 32), detached sampling_tags (step
+      53)
+    files: analysis/catalog_v4/sampling_example.py, analysis/catalog_v4/envelope_design.py, analysis/catalog_v4/data/envelope_own.json,
+      analysis/catalog_v4/data/pp_support_reads.json, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/size_figs.py
+    written: '2026-11-04T19:50:50+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
