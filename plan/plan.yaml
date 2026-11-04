@@ -8201,6 +8201,45 @@ entries:
       need dsh pools only if trained. Training read afterwards: the new mixture vs share 0.25 and share 0.50 on PP4/EE4/HD5,
       two seeds; YES if PP4 trained R <= the share-0.50 arm''s 0.549 with EE4 and held-out within their intervals; NO if held-out
       or EE4 worse than share 0.25.'
+  - at: '2026-11-04T19:04:05+00:00'
+    question: 'Step 49 (design only; Joaquin 2026-11-04 ''sample in a way that covers the range the pp beams cover, but wider,
+      and with enough data so that performance is good''; 10-26 ''larger than pp beams, but smartly sample places that benefit
+      pp beams''): which catalog sampler, using only its own partonic generation (no events from the MadEvent pools; the default
+      share stays on top in training), puts per 13 TeV pp class 0% of pp events outside its support and density >= f x pp
+      density in every (log10 sqrt(s_hat) 0.1 dex x ln|M|^2 2 nat) bin pp reaches, f = 0.5?'
+    prior: 'density_check.py @fcb9dae8 (par:v4_density): catalog_v4 at a pp event 0.22 of pp''s density; reweighting sqrt(s)
+      alone KL 1.38->0.96. pp_support.py @07ab67cf (step 46): 1.57% of pp events above the catalog''s |M|^2 max, 309 of the
+      312 classes over 1% are 2->4, from initial-state collinear corners no candidate reaches. Shares (tab:v4_bound_shares,
+      R vs MSE control): PP4 trained 0.650 (0.25), 0.549 (0.50), 0.388 (pure default); EE4 0.413/0.401/1.216; held-out 0.871/0.860/1.122.
+      envelope_design.py @79283d3e/@23cf0dba (this step).'
+    measure: envelope_design.gap at f (share of the class's 12000 pp events in bins where catalog density < f x pp density)
+      and outside support (pp events in bins with < 0.5 expected catalog events per 1e5), per class and pooled over 1301 PP4
+      classes; mass of the catalog outside the bins pp reaches (the 'wider' part).
+    check: 'Current catalog_v4: gap(0.5) pooled 0.866, median 0.886, all 1301 classes over 1%; outside support 3.9% (624 classes
+      over 1%); the gap is |M|^2 at fixed sqrt(s), not energy (sqrt(s) marginal 0.686, ln|M|^2 marginal 0.829). sqrt(s) from
+      pp with the current |M|^2 sampling (w 0.5): 0.784. Own unweighted part u at pp''s sqrt(s) widened S dex, rest the current
+      mixture with the flat part reaching pp max + 4 nat: u 0.6 S 0.05: gap(0.5) 0.0055 (12 classes over 1%), gap(1/3) 0,
+      outside 0, 17% of the mass outside pp''s bins; u 0.7 S 0.05: gap(0.5) 0 in every class, 12.8% outside; S 0.1 needs more
+      (u 0.7: 0.037, 140 classes).'
+    fixed: catalog_v4 physics, V4_CUTS (partonic), window [v4_sqrts_lo, 6 TeV], pool sizes 1e5/1e4/1e4 and the same mixture
+      in every role, e+e- and one-loop pools, the default share 0.25 on top in training (D229/D231), the readers.
+    control: Current catalog_v4 (same classes, same pools), scored on the same bins against the same pp pools; in training
+      afterwards the share-0.25 setup in force.
+    seeds: Generation seeds as the recipes'; a training comparison afterwards at seeds 42/43.
+    outcome: 'Proposed: per hadronic tree class 0.70 own |M|^2-unweighted partonic events (accept-reject against the max weight
+      of our candidates, VEGAS-adapted per class, cuts partonic) at sqrt(s_hat) from the class''s pp sqrt(s_hat) distribution
+      widened by a 0.05-dex Gaussian (classes without a pp pool: the template of their beams and multiplicity); 0.30 the current
+      mixture (log-uniform sqrt(s_hat) to 6 TeV; flat-in-log|M|^2 0.35 of it, forward 0.15, splitter/RAMBO) with an initial-state
+      collinear splitter branch so the flat part and the unweighting reach pp max + 4 nat. f = 0.5 because the share-0.50
+      arm (density >= 0.5 pp) gained on PP4 trained over share 0.25 (0.549 vs 0.650) at no cost on EE4 or held-out; f = 1
+      (pure default) lost them. Gate: validate_v4.py new ''envelope'' check on its sampled hadronic classes with a pp13 pool
+      (2e4 events each): gap(0.5) <= 0.01 and no pp event outside support in bins with >= 3 pp events, catalog ln|M|^2 max
+      >= pp max on every sampled 2->4 class, the unweighted part''s efficiency and s per kept event recorded; after the build:
+      pp_support.py pull + envelope_design.py on every rebuilt pool, 0 classes with gap(0.5) > 0.01. Cost (estimate, CPU):
+      the unweighted part 84000 events x 1301 classes at MadEvent''s measured 26.4 ms per event (dsh_ pools) = about 800 core-h,
+      largest class about 17 core-h, a lower bound if our sampler is less efficient than MadEvent''s; the 0.30 part subsampled
+      from the existing pools except the 2->4 flat part with the IS branch (at most the tree regeneration, 39 core-h + 21
+      core-h compiles).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
