@@ -186,9 +186,10 @@ entries:
       of the MadGraph existence check (analysis/catalog_v4/data/multext_checked.json; recipes/catalog_v4_multext*.yaml @07f2e008),
       their class check (scripts/job_catalog_v4_multext_check.sh, CPU, not yet run), generated with the sampling that catalog_coverage''s
       step 49 (the envelope redesign of the catalog sampling, to Joaquin) settles, so the generation waits on that design;
-      then one arm against a matched het control in the catalog_v4 setup (het loss, share 0.25, 1e4 per process, 4264 steps,
-      as the het control pair), seeds 42-45, read on H2 with multext_compare.py''s r and s on the het reads; design, review,
-      generation probe, GPU-h stated before submission.'
+      then one arm in the catalog_v4 het setup at the final share 0.25 (het loss, 1e4 per process, 4264 steps: the het share-0.25
+      arm FA-ccin2p3-f0156d88/df858d33 of catalog_coverage step 15, rerun at the arm''s commit as the matched control; the
+      het control pair FA-ccin2p3-87ea24d0/321a3de2, share 0, beside), seeds 42-45, read on H2 with multext_compare.py''s
+      r and s on the het reads; design, review, generation probe, GPU-h stated before submission.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
