@@ -2559,7 +2559,7 @@ entries:
     agent: a3c87bc016f01a716
     state: stopped
     since: '2026-11-04T18:50:51+00:00'
-    state_at: '2026-11-04T20:20:05+00:00'
+    state_at: '2026-11-04T20:20:19.800000+00:00'
     context: 163894
     context_at: '2026-11-04T20:18:10+00:00'
   targets:
@@ -8788,7 +8788,7 @@ entries:
     agent: a6cc542156004bfd9
     state: stopped
     since: '2026-11-04T19:52:13+00:00'
-    state_at: '2026-11-04T20:19:48+00:00'
+    state_at: '2026-11-04T20:20:14.420000+00:00'
     context: 156316
     context_at: '2026-11-04T20:18:13+00:00'
   findings:
