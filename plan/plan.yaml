@@ -11972,3 +11972,12 @@ entries:
     change the scope)'
   blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
   blocks_steps: *id002
+  findings:
+  - at: '2026-11-04T21:53:41+00:00'
+    text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
+      @74a30052): magnitude het over the het control on HD5 R=0.097 [0.047, 0.291] (H5 0.182 [0.070, 0.300]; PP4, EE4 1.00,
+      1.03): C8 passes its gate, in. Magnitude het over the MSE control on HD5 R=1.47 [0.97, 1.99] (PP4/EE4 not read against
+      MSE): the loss change has no gain from scratch on its deciding read, so C7 is reported as a change with nothing to recover
+      and not run. Cost of C2-C6 plus C8: C2 15.0, MSE matched controls (seeds 42/43) 7.0, C3 7.4, C4 7.4, C5 6.8, C6 14.6
+      + 7.0 (controls at seeds 44/45), C8 14.6 = 79.8 GPU-h beyond C1''s 29.6, 48 runs (short_wall.py, margin 1.25 included);
+      above 30, Joaquin''s go asked by the main session.'
