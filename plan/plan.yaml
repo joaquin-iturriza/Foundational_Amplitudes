@@ -9652,7 +9652,7 @@ entries:
   title: the redesign of how agents work on this project
   question: Does the implemented redesign (hooks, review, supervisor, owners and hand-offs, rules-only CLAUDE.md with pushed
     sections) hold on tonight's real states and in live use?
-  status: held
+  status: running
   quotes:
   - said_at: '2026-10-30T04:46:16.657000+00:00'
     text: everything else I believe looks good I believe, you can start
@@ -9693,6 +9693,12 @@ entries:
     answers_after: '2026-10-31T00:21:20+00:00'
     covers:
     - agent_redesign
+  - said_at: '2026-11-04T18:44:17.514000+00:00'
+    text: The agent redesign also, seems like those are quick fixes. the cold read agent stays held for now.
+    decision: D268
+    answers_after: '2026-10-31T04:23:28.836000+00:00'
+    covers:
+    - agent_redesign
   decisions:
   - D186
   - D203
@@ -9700,6 +9706,7 @@ entries:
   - D221
   - D224
   - D225
+  - D268
   next:
     1: 'Switch-over E (cleanup) after a day of clean running of A to D: delete the merged-away hook scripts (lock_guard.py,
       reviewer_resume.py, the review Stop nudge and bashpost branches), the scratchpad backups, and close the entry with its
@@ -10596,7 +10603,6 @@ entries:
     files: .claude/hooks/owner_handoff.py tests/test_owner_handoff.py .claude/settings.json .gitignore plan/step_prompt.txt
       .claude/agents/compact-worker.md .claude/hooks/owner_context.py
     written: '2026-10-31T04:40:45+00:00'
-  hold_decision: D225
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
