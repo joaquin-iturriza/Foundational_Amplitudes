@@ -313,6 +313,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/dispatch.py\" notification_absorb.py",
+            "timeout": 30
+          }
+        ]
+      }
     ]
   },
   "enabledPlugins": {
