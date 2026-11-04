@@ -10,8 +10,11 @@ The class is u u~ > e+ e- g (v4_uux_epemg, Drell-Yan plus a jet), train role, se
              dsh_uux_epemg) in the partonic frame inside the pool's sqrt(s_hat) window and cuts
              (mix_compose._default_accepted), i.e. the generator's own sampling with pp beams
   trained    the default-share 0.25 mixture as the loader composes it (mix_compose.compose): what training reads
-The flat part's splitter and RAMBO candidates are not told apart: the pool keeps no tag and the flat selection draws
-from both after labelling, so only bulk / forward / flat are split.
+The flat part's candidates are half democratic splitter, half RAMBO (pol["democratic"]; bulk and forward draw RAMBO
+only). The pool keeps no tag, so each chunk is regenerated here exactly (datagen.gen_chunk at the chunk's seed, the
+compiled standalone labelling the candidates as in the build, so the adaptive sqrt(s_hat) pass replays too) with
+mg.democratic_draw and mg.rotate_forward recorded; the replayed chunk must equal the pool's rows bit for bit, and a
+kept flat row is the splitter's when its final momenta are a recorded splitter draw (or that draw turned forward).
 
     site run --item catalog_coverage ccin2p3 FA -- python analysis/catalog_v4/sampling_example.py hist
     python analysis/catalog_v4/sampling_example.py figs     # local, from analysis/catalog_v4/data/sampling_example.json
@@ -75,16 +78,70 @@ def hist():
            "catalog_pool": ctrl, "default_source": pol["default_source"], "f_default": float(pol["f_default"]),
            "default_pools": [[nm, path] for nm, path in src_pools], "default_rows_total": n_src,
            "logm_bins": LOGM_BINS.tolist(), "sqrts_bins": SQ_BINS.tolist(), "h": {}}
+    dem = flat_tags(NAME, lo, hi, n, ROLE, SEED, pool, k)
+    out["flat_tags"] = {"n_flat": int((prov == mc.KIND["flat"]).sum()), "n_flat_splitter": int(dem.sum()),
+                        "splitter_share_of_kept_flat": float(dem.sum() / max(1, (prov == mc.KIND["flat"]).sum()))}
     out["h"]["catalog"] = _h(me_c, sq_c)
     for kind in ("bulk", "fwd", "flat"):
         s = prov == mc.KIND[kind]
         out["h"]["catalog_" + kind] = _h(me_c[s], sq_c[s])
+    for key, s in (("catalog_flat_splitter", dem), ("catalog_flat_rambo", (prov == mc.KIND["flat"]) & ~dem)):
+        out["h"][key] = _h(me_c[s], sq_c[s])
     out["h"]["default"] = _h(me_d, sq_d)
     out["h"]["trained"] = _h(me_t, sq_t)
+    keys = {Pc[i, 2:].tobytes(): i for i in range(len(Pc))}
+    t_idx = np.array([keys.get(Pt[i, 2:].tobytes(), -1) for i in range(len(Pt))])
     for kind in ("bulk", "fwd", "flat", "default"):
         s = kinds == mc.KIND[kind]
-        out["h"]["trained_" + kind] = {"n": int(s.sum())}
+        out["h"]["trained_" + kind] = _h(me_t[s], sq_t[s])
+    fl = kinds == mc.KIND["flat"]
+    if (t_idx[fl] < 0).any():
+        raise RuntimeError(f"{int((t_idx[fl] < 0).sum())} trained flat rows not in the catalog pool")
+    t_dem = np.zeros(len(Pt), bool); t_dem[fl] = dem[t_idx[fl]]
+    out["h"]["trained_flat_splitter"] = _h(me_t[t_dem], sq_t[t_dem])
+    out["h"]["trained_flat_rambo"] = _h(me_t[fl & ~t_dem], sq_t[fl & ~t_dem])
     print(json.dumps(out, separators=(",", ":")))
+
+
+def flat_tags(name, lo, hi, n, role, seed, pool, k):
+    """bool per pool row: a kept flat-part row drawn by the democratic splitter (see the module note)"""
+    import tempfile
+    import datagen
+    import mg5_pipeline_final as mg
+    import mix_compose as mc
+    out = np.zeros(len(pool), bool)
+    rec = {"dem": [], "rot": []}
+    dd, rf = mg.democratic_draw, mg.rotate_forward
+    def dem_rec(*a, **kw):
+        P = dd(*a, **kw); rec["dem"].append(np.array(P)); return P
+    def rot_rec(P, *a, **kw):
+        Q = rf(P, *a, **kw); rec["rot"].append((np.array(P), np.array(Q))); return Q
+    with mc._Swap(name, mc.control_config(name)):
+        datagen.ensure_backend(name)
+        tasks = mc.chunk_plan(name, lo, hi, n, role, seed)
+        mg.democratic_draw, mg.rotate_forward = dem_rec, rot_rec
+        try:
+            start = 0
+            for t in tasks:
+                rec["dem"].clear(); rec["rot"].clear()
+                with tempfile.TemporaryDirectory(prefix="zz_probe_sampling_") as td:
+                    t = dict(t, out_dir=td)
+                    _, path = datagen.gen_chunk(t)
+                    ch = np.load(path)
+                m = int(t["count"])
+                if ch.shape != pool[start:start + m].shape or not np.array_equal(ch, pool[start:start + m]):
+                    raise RuntimeError(f"chunk {t['idx']}: the replay differs from the pool's rows")
+                dem_f = {r.tobytes() for D in rec["dem"] for r in np.asarray(D, np.float64)}
+                for Pin, Q in rec["rot"]:
+                    for a, b in zip(np.asarray(Pin, np.float64)[:, 2:], np.asarray(Q, np.float64)[:, 2:]):
+                        if a.tobytes() in dem_f:
+                            dem_f.add(b.tobytes())
+                fin = ch[:, :4 * k].reshape(m, k, 4)[:, 2:]
+                out[start:start + m] = [fin[i].tobytes() in dem_f for i in range(m)]
+                start += m
+        finally:
+            mg.democratic_draw, mg.rotate_forward = dd, rf
+    return out
 
 
 def figs():
@@ -94,7 +151,7 @@ def figs():
 
     def dens(key, var):
         c = np.asarray(h[key][var], float); e = lb if var == "logm" else np.log10(sb)
-        return c / (h["catalog"]["n"] * np.diff(e))      # events per unit log10, per event of the full pool
+        return c / (h[key.split("_")[0]]["n"] * np.diff(e))   # per unit log10, per event of its whole pool
 
     def step(ax, key, var, **kw):
         x = lb if var == "logm" else sb
@@ -104,8 +161,10 @@ def figs():
     proc = r"$u\bar u\to e^+e^-g$"
     # (a) the catalog mixture by component, stacked shares of the one pool
     fig, (axL, axR) = ps.figure(ncols=2)
-    comps = [("catalog_bulk", "bulk (RAMBO)", ps.C.sky), ("catalog_fwd", "forward", ps.C.green),
-             ("catalog_flat", r"flat in $\log|\mathcal{M}|^2$", ps.C.orange)]
+    comps = [("trained_bulk", "bulk (RAMBO)", ps.C.sky), ("trained_fwd", "forward (RAMBO)", ps.C.green),
+             ("trained_flat_rambo", r"flat in $|\mathcal{M}|^2$ (RAMBO)", ps.C.orange),
+             ("trained_flat_splitter", r"flat in $|\mathcal{M}|^2$ (splitter)", ps.C.purple),
+             ("trained_default", "default share (MadEvent)", ps.C.vermillion)]
     for ax, var in ((axL, "logm"), (axR, "sqrts")):
         x = lb if var == "logm" else sb
         base = np.zeros(len(x) - 1)
@@ -113,7 +172,7 @@ def figs():
             y = dens(key, var)
             ax.stairs(base + y, x, baseline=base, fill=True, color=col, alpha=0.6, label=lab)
             base = base + y
-        step(ax, "catalog", var, color=ps.C.blue, label="catalog (sum)")
+        step(ax, "trained", var, color=ps.C.blue, label="trained mixture (sum)")
     axL.set_xlim(*LOGM_XLIM); axL.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); axL.set_ylabel("density")
     axR.set_xscale("log"); axR.set_xlabel(r"$\sqrt{\hat s}$ [GeV]"); axR.set_ylabel("density")
     ps.legend(axL, "upper left")
