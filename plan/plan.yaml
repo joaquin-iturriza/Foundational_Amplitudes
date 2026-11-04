@@ -10480,8 +10480,7 @@ entries:
   quotes: []
   decisions:
   - D266
-  next: 'Researched explainer for Joaquin: two-loop amplitudes in detail, tools and public results, feasible processes, cost
-    per point, what we would store; sourced; no generation until he decides'
+  next: Joaquin reads the two-loop explainer and calls go/tier and the label scheme
   done_when: null
   notes_ref: null
   match: zz_two_loop_*
@@ -10515,3 +10514,10 @@ entries:
       ~200-250 core-h CPU; massive loops via sector decomposition ~2 GPU-h/pt -> infeasible. Proposed order: ee->qq and ee->tt
       calibration, then ee->qqg and 4-parton, then 2->3 via NJet. Open calls for Joaquin: go/tier; label scheme and whether
       one-loop pools get remainder labels too.'
+  step_why:
+    1:
+      feeds: whether and how to generate two-loop datasets
+      if:
+      - 'go on the calibration tier: design a two-loop pipeline for ee->qq and ee->tt from closed-form form factors, certified
+        against published NNLO coefficients'
+      - 'no go: close the entry with the explainer as its result'
