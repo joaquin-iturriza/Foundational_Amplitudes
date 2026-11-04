@@ -736,7 +736,8 @@ ARMS_HD = {"default25_1e4": HD4_HET["default25"], **{f"w{k}_full": WIDTH[f"w{k}"
 # one-seed arms: a long-run sweep's best trial (seed 42, its lr and HPs tuned by DyHPO), read by an eval job
 # (scripts/job_catalog_v3_short.sh arm v4_het_long_best; design passed 2026-11-03T01:34): {arm: (eval run, the
 # trial's key in data/size_curves.json, which holds its training curve, steps and batches)}
-LONG_BEST = {"long4x_best": ("FA-ccin2p3-6f8a1eed", "17056_trial_1262")}
+LONG_BEST = {"long4x_best": ("FA-ccin2p3-6f8a1eed", "17056_trial_1262"),
+             "long16x_best": ("FA-ccin2p3-1a46f3e0", "68224_trial_1262")}
 for _a, (_run, _key) in LONG_BEST.items():
     TRAINED_BY[_run] = f"trial_{_key}"
 
@@ -983,6 +984,59 @@ def arms():
     print(json.dumps(out))
 
 
+def length():
+    """Step 16's length verdict (design 2026-11-01T16:14): the 16x sweep's best trial (68224 steps) over the 4x
+    sweep's best (17056), one seed (42) each, read as the other cells (sigma-stage parent, D276). Per read R = median
+    over classes of the class's geometric mean of 16x/4x per probe; 95% class bootstrap widened on each side by the
+    1x width-8 seed pair's |ln R_seed| on the same probes (the seed-noise stand-in: no seed twin at either length).
+    Reads: PP4 (all), EE4 (all), the 700 default-sampled held-out classes (PP4/EE4 probes of held-out classes, HD4,
+    HD5) pooled and per axis, the catalog-sampled held-out H1-H7c pooled and per axis (beside).
+    YES: R < 1 with the widened interval below 1 on PP4, EE4 and the default-sampled held-out pool;
+    NO: the widened interval contains 1 on all three; else MIXED (per read). -> data/length_x16_over_x4.json"""
+    cls = class_of()
+    ax_of = _held_axes(cls)
+    x16, x4 = LONG_BEST["long16x_best"][0], LONG_BEST["long4x_best"][0]
+    w42, w43 = WIDTH["w8"]
+    dflt = lambda r: _tagged([(r, "PP4"), (r, "EE4"), (r, "HD4"), (r, "HD5")])
+    reads = {r: [read_of(x, r) for x in (x16, x4, w42, w43)] for r in ("PP4", "EE4", "held")}
+    reads["held_default"] = [dflt(x) for x in (x16, x4, w42, w43)]
+    miss = [f"{r} {x}" for r, v in reads.items() for x, d in zip((x16, x4, w42, w43), v) if d is None]
+    if miss:
+        sys.exit("length: reads missing: " + "; ".join(miss))
+    out = {"design": "plan catalog_coverage step 16 (2026-11-01T16:14), step 32 verdict", "x16": x16, "x4": x4,
+           "seed_pair": [w42, w43], "reads": {}}
+    for r, (a, b, s42, s43) in reads.items():
+        keys = set(a) & set(b) & set(s42) & set(s43)
+        if r == "held_default":
+            keys = {k for k in keys if cls(k[1]) in ax_of}
+        keys = sorted(keys, key=str)
+        parts = {"all": keys}
+        if r == "held":
+            parts = {"pooled": keys, **{ax: [k for k in keys if k[0] == ax] for ax in HELD}}
+        if r == "held_default":
+            parts = {"pooled": keys, **{ax: [k for k in keys if ax_of[cls(k[1])] == ax] for ax in HELD}}
+        res = {n: compare(a, b, s42, s43, ks, cls) for n, ks in parts.items() if ks}
+        res["n_probes_unmatched"] = len(set(a) ^ set(b))
+        res["mse_x16"] = _one_point(a, b, keys, cls)["mse"]; res["mse_x4"] = _one_point(b, b, keys, cls)["mse"]
+        out["reads"][r] = res
+    main3 = [out["reads"][r]["pooled" if r == "held_default" else "all"] for r in ("PP4", "EE4", "held_default")]
+    if all(x["R"] < 1 and x["widened"][1] < 1 for x in main3):
+        v = "YES"
+    elif all(x["widened"][0] <= 1 <= x["widened"][1] for x in main3):
+        v = "NO"
+    else:
+        v = "MIXED"
+    out["verdict"] = v
+    out["caveat"] = ("one seed per length, each the best of an 8-trial DyHPO sweep; both not converged (best lr at the "
+                     "window's top, best checkpoint at the last validation); interval widened by the 1x width-8 seed "
+                     "pair's |ln R_seed|")
+    out["blowups"] = blowups([x16, x4])
+    json.dump(out, open(os.path.join(DATA, "length_x16_over_x4.json"), "w"), indent=1)
+    print(json.dumps({r: {n: (x["R"], x["widened"], x["n_classes"]) for n, x in v.items() if isinstance(x, dict)}
+                      for r, v in out["reads"].items()}, indent=0))
+    print("verdict", v)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1000,6 +1054,7 @@ def main():
     m.add_argument("--het", action="store_true")
     sub.add_parser("width")
     sub.add_parser("arms")
+    sub.add_parser("length")
     ep = sub.add_parser("epochs")
     ep.add_argument("run"); ep.add_argument("log")
     a = ap.parse_args()
@@ -1017,6 +1072,8 @@ def main():
         width()
     elif a.cmd == "arms":
         arms()
+    elif a.cmd == "length":
+        length()
     elif a.cmd == "epochs":
         epochs(a.run, a.log)
     else:

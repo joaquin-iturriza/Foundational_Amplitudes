@@ -1,0 +1,376 @@
+{
+ "design": "plan catalog_coverage step 16 (2026-11-01T16:14), step 32 verdict",
+ "x16": "FA-ccin2p3-1a46f3e0",
+ "x4": "FA-ccin2p3-6f8a1eed",
+ "seed_pair": [
+  "FA-ccin2p3-804a65bc",
+  "FA-ccin2p3-66e8c31f"
+ ],
+ "reads": {
+  "PP4": {
+   "all": {
+    "R": 0.6714,
+    "n_classes": 1301,
+    "boot95": [
+     0.6575,
+     0.6956
+    ],
+    "widened": [
+     0.6227,
+     0.7344
+    ],
+    "frac_classes_below_1": 0.7855,
+    "n_probes": 1301,
+    "R_seed": 1.0558
+   },
+   "n_probes_unmatched": 0,
+   "mse_x16": 0.033547,
+   "mse_x4": 0.048459
+  },
+  "EE4": {
+   "all": {
+    "R": 0.6772,
+    "n_classes": 169,
+    "boot95": [
+     0.6253,
+     0.7424
+    ],
+    "widened": [
+     0.6054,
+     0.7669
+    ],
+    "frac_classes_below_1": 0.8284,
+    "n_probes": 169,
+    "R_seed": 0.9681
+   },
+   "n_probes_unmatched": 0,
+   "mse_x16": 0.068059,
+   "mse_x4": 0.11446
+  },
+  "held": {
+   "pooled": {
+    "R": 0.8478,
+    "n_classes": 701,
+    "boot95": [
+     0.8138,
+     0.8822
+    ],
+    "widened": [
+     0.7726,
+     0.9292
+    ],
+    "frac_classes_below_1": 0.6362,
+    "n_probes": 701,
+    "R_seed": 1.0533
+   },
+   "H1": {
+    "R": 0.8113,
+    "n_classes": 62,
+    "boot95": [
+     0.7012,
+     0.899
+    ],
+    "widened": [
+     0.6353,
+     0.9924
+    ],
+    "frac_classes_below_1": 0.7742,
+    "n_probes": 62,
+    "R_seed": 1.1038
+   },
+   "H2": {
+    "R": 0.7892,
+    "n_classes": 218,
+    "boot95": [
+     0.742,
+     0.8181
+    ],
+    "widened": [
+     0.6833,
+     0.8884
+    ],
+    "frac_classes_below_1": 0.7431,
+    "n_probes": 218,
+    "R_seed": 1.0859
+   },
+   "H2p5": {
+    "R": 2.2833,
+    "n_classes": 38,
+    "boot95": [
+     1.9662,
+     2.9292
+    ],
+    "widened": [
+     1.7096,
+     3.3688
+    ],
+    "frac_classes_below_1": 0.0263,
+    "n_probes": 38,
+    "R_seed": 1.1501
+   },
+   "H3": {
+    "R": 0.9503,
+    "n_classes": 279,
+    "boot95": [
+     0.8921,
+     1.0104
+    ],
+    "widened": [
+     0.8901,
+     1.0128
+    ],
+    "frac_classes_below_1": 0.552,
+    "n_probes": 279,
+    "R_seed": 0.9977
+   },
+   "H5": {
+    "R": 1.0497,
+    "n_classes": 28,
+    "boot95": [
+     0.9635,
+     1.2685
+    ],
+    "widened": [
+     0.9223,
+     1.3251
+    ],
+    "frac_classes_below_1": 0.3929,
+    "n_probes": 28,
+    "R_seed": 1.0447
+   },
+   "H6": {
+    "R": 0.4743,
+    "n_classes": 8,
+    "boot95": [
+     0.3774,
+     0.616
+    ],
+    "widened": [
+     0.3535,
+     0.6576
+    ],
+    "frac_classes_below_1": 0.875,
+    "n_probes": 8,
+    "R_seed": 1.0676
+   },
+   "H7E": {
+    "R": 0.6447,
+    "n_classes": 34,
+    "boot95": [
+     0.5721,
+     0.7275
+    ],
+    "widened": [
+     0.5693,
+     0.7311
+    ],
+    "frac_classes_below_1": 0.9118,
+    "n_probes": 34,
+    "R_seed": 1.0049
+   },
+   "H7c": {
+    "R": 0.6653,
+    "n_classes": 34,
+    "boot95": [
+     0.5876,
+     0.7509
+    ],
+    "widened": [
+     0.5825,
+     0.7574
+    ],
+    "frac_classes_below_1": 0.9412,
+    "n_probes": 34,
+    "R_seed": 1.0087
+   },
+   "n_probes_unmatched": 0,
+   "mse_x16": 0.25057,
+   "mse_x4": 0.30142
+  },
+  "held_default": {
+   "pooled": {
+    "R": 0.9211,
+    "n_classes": 700,
+    "boot95": [
+     0.8876,
+     0.961
+    ],
+    "widened": [
+     0.8738,
+     0.9762
+    ],
+    "frac_classes_below_1": 0.5686,
+    "n_probes": 700,
+    "R_seed": 1.0158
+   },
+   "H1": {
+    "R": 0.8125,
+    "n_classes": 62,
+    "boot95": [
+     0.7151,
+     0.9127
+    ],
+    "widened": [
+     0.691,
+     0.9446
+    ],
+    "frac_classes_below_1": 0.6774,
+    "n_probes": 62,
+    "R_seed": 1.0349
+   },
+   "H2": {
+    "R": 0.8745,
+    "n_classes": 217,
+    "boot95": [
+     0.8392,
+     0.9263
+    ],
+    "widened": [
+     0.8274,
+     0.9396
+    ],
+    "frac_classes_below_1": 0.6313,
+    "n_probes": 217,
+    "R_seed": 1.0143
+   },
+   "H2p5": {
+    "R": 3.0745,
+    "n_classes": 38,
+    "boot95": [
+     2.3719,
+     3.6312
+    ],
+    "widened": [
+     1.948,
+     4.4214
+    ],
+    "frac_classes_below_1": 0.0,
+    "n_probes": 38,
+    "R_seed": 1.2176
+   },
+   "H3": {
+    "R": 0.9844,
+    "n_classes": 279,
+    "boot95": [
+     0.917,
+     1.0326
+    ],
+    "widened": [
+     0.884,
+     1.0712
+    ],
+    "frac_classes_below_1": 0.5233,
+    "n_probes": 279,
+    "R_seed": 0.964
+   },
+   "H5": {
+    "R": 1.0084,
+    "n_classes": 28,
+    "boot95": [
+     0.9054,
+     1.2632
+    ],
+    "widened": [
+     0.8169,
+     1.4001
+    ],
+    "frac_classes_below_1": 0.4643,
+    "n_probes": 28,
+    "R_seed": 1.1084
+   },
+   "H6": {
+    "R": 0.4692,
+    "n_classes": 8,
+    "boot95": [
+     0.4179,
+     1.1143
+    ],
+    "widened": [
+     0.3954,
+     1.1776
+    ],
+    "frac_classes_below_1": 0.75,
+    "n_probes": 8,
+    "R_seed": 0.9463
+   },
+   "H7E": {
+    "R": 0.7362,
+    "n_classes": 34,
+    "boot95": [
+     0.6044,
+     0.9592
+    ],
+    "widened": [
+     0.5862,
+     0.9892
+    ],
+    "frac_classes_below_1": 0.6765,
+    "n_probes": 34,
+    "R_seed": 0.9697
+   },
+   "H7c": {
+    "R": 0.5213,
+    "n_classes": 34,
+    "boot95": [
+     0.4944,
+     0.5957
+    ],
+    "widened": [
+     0.4848,
+     0.6075
+    ],
+    "frac_classes_below_1": 0.9118,
+    "n_probes": 34,
+    "R_seed": 0.9805
+   },
+   "n_probes_unmatched": 0,
+   "mse_x16": 0.2682,
+   "mse_x4": 0.26538
+  }
+ },
+ "verdict": "YES",
+ "caveat": "one seed per length, each the best of an 8-trial DyHPO sweep; both not converged (best lr at the window's top, best checkpoint at the last validation); interval widened by the 1x width-8 seed pair's |ln R_seed|",
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-1a46f3e0": {
+    "train_run": "trial_68224_trial_1262",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 1364,
+      "ref": -0.7648287,
+      "early_max": null,
+      "best_step": 68224,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -0.7648287
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-6f8a1eed": {
+    "train_run": "trial_17056_trial_1262",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 682,
+      "ref": -0.7873358,
+      "early_max": -0.2804,
+      "best_step": 17056,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -0.7873358
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": []
+ }
+}
