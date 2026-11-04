@@ -235,6 +235,76 @@ def summary():
     figure(rows)
 
 
+MAG = ("FA-ccin2p3-5abe4a0e", "FA-ccin2p3-92207f6a")          # v4_het_control_magnitude[_seed2], step 47
+HET_CTL = {"HD5": ("FA-ccin2p3-87aeabca", "FA-ccin2p3-53b9ed56"), "HD4": ("FA-ccin2p3-87aeabca", "FA-ccin2p3-53b9ed56"),
+           "other": ("FA-ccin2p3-87ea24d0", "FA-ccin2p3-321a3de2")}
+MSE_CTL = ("FA-ccin2p3-c37a4b26", "FA-ccin2p3-a1ea15aa")
+
+
+def magnitude():
+    """Step 47 (design passed 2026-11-04T18:29): the het control with only data.signed_magnitude_target (the 63
+    sign-changing one-loop training pools on log max(|x|,s), no sign output) over (a) the het control and (b) the MSE
+    control, on HD5 (28 classes, abslog scoring, mse_logm2_real); per probe the geometric mean over seeds 42/43,
+    per class the geometric mean of the ratios, R the median over classes, 95% class bootstrap widened by the het
+    pair's seed ratio (mixture_ab.r_with_interval); each seed's ratio beside; sign-changing (pool share of label <= 0
+    above 0, het_oneloop_reads.json) and positive pools apart; PP4, EE4, H1-H7c, HD4 against the het control beside.
+    -> data/het_magnitude.json"""
+    import math
+    from mixture_ab import class_of, load, class_ratios, r_with_interval, blowups
+    cls = class_of()
+    nonpos = {p: v["pool_nonpos"] for p, v in
+              json.load(open(os.path.join(DATA, "het_oneloop_reads.json")))["probes"]["v4_het_control"].items()}
+    sd = lambda pair, ax: [load(r, ax) for r in pair]
+    side = lambda xs, ks: {k: gm([x[k] for x in xs]) for k in ks}
+    med = lambda num, den, ks: float(np.median(list(class_ratios(num, den, ks, cls).values())))
+    out = {"design": "plan catalog_coverage step 47 (2026-11-04T18:29)", "arm": MAG, "het_control": HET_CTL,
+           "mse_control": MSE_CTL, "reads": {}}
+    for ax in ("HD5", "HD4", "PP4", "EE4", "H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c"):
+        a = sd(MAG, ax)
+        h = sd(HET_CTL.get(ax, HET_CTL["other"]), ax)
+        refs = {"het_control": h}
+        if ax == "HD5":
+            refs["mse_control"] = sd(MSE_CTL, ax)
+        keys_all = sorted(set.intersection(*[set(x) for x in a + h]))
+        r_seed = med(h[1], h[0], keys_all)
+        parts = {"all": keys_all}
+        if ax == "HD5":
+            parts.update(sign_changing=[k for k in keys_all if nonpos[k] > 0],
+                         positive=[k for k in keys_all if nonpos[k] <= 0])
+        res = {"R_seed_het_pair": round(r_seed, 4)}
+        for ref, rr in refs.items():
+            res[ref] = {}
+            for n, ks in parts.items():
+                ks = [k for k in ks if all(k in x for x in rr)]
+                x = r_with_interval(class_ratios(side(a, ks), side(rr, ks), ks, cls), r_seed)
+                x["per_seed"] = {s: round(med(a[i], rr[i], ks), 4) for i, s in enumerate(("seed42", "seed43"))}
+                x["n_probes"] = len(ks)
+                res[ref][n] = x
+        out["reads"][ax] = res
+    A = out["reads"]["HD5"]["het_control"]["all"]
+    B = out["reads"]["HD5"]["mse_control"]["all"]
+    if A["R"] <= 0.25 and A["widened"][1] < 0.5:
+        va = "YES: the signed pools' signedlog target is the main cause"
+    elif A["widened"][0] <= 1 <= A["widened"][1] or A["R"] >= 0.7:
+        va = "NO: the target is not the cause"
+    else:
+        va = "PARTIAL: the target is a partial cause (0.25 < R < 0.7)"
+    if B["R"] <= 1.5:
+        vb = "the target is all of it"
+    elif B["R"] < 3:
+        vb = "the target costs about what it cost under MSE; the het loss or the missing sign cross-entropy the rest"
+    else:
+        vb = "both matter" if A["R"] <= 0.25 else ">= 3 with (a) > 0.25: the het loss or the missing sign cross-entropy dominates"
+    out["verdict"] = {"a": va, "b": vb, "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"}
+    out["blowups"] = blowups(list(MAG))
+    json.dump(out, open(os.path.join(DATA, "het_magnitude.json"), "w"), indent=1)
+    for ax, res in out["reads"].items():
+        for ref in ("het_control", "mse_control"):
+            for n, x in res.get(ref, {}).items():
+                print(ax, ref, n, x["R"], x["widened"], x["per_seed"], x["n_classes"])
+    print(out["verdict"], out["blowups"]["flagged"])
+
+
 def figure(rows):
     import plot_style as ps
     fig, (a, b) = ps.figure(ncols=2)
@@ -264,4 +334,7 @@ def figure(rows):
 
 
 if __name__ == "__main__":
-    pull() if sys.argv[1:] == ["pull"] else summary()
+    if sys.argv[1:] == ["magnitude"]:
+        magnitude()
+    else:
+        pull() if sys.argv[1:] == ["pull"] else summary()

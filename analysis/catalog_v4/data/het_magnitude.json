@@ -1,0 +1,476 @@
+{
+ "design": "plan catalog_coverage step 47 (2026-11-04T18:29)",
+ "arm": [
+  "FA-ccin2p3-5abe4a0e",
+  "FA-ccin2p3-92207f6a"
+ ],
+ "het_control": {
+  "HD5": [
+   "FA-ccin2p3-87aeabca",
+   "FA-ccin2p3-53b9ed56"
+  ],
+  "HD4": [
+   "FA-ccin2p3-87aeabca",
+   "FA-ccin2p3-53b9ed56"
+  ],
+  "other": [
+   "FA-ccin2p3-87ea24d0",
+   "FA-ccin2p3-321a3de2"
+  ]
+ },
+ "mse_control": [
+  "FA-ccin2p3-c37a4b26",
+  "FA-ccin2p3-a1ea15aa"
+ ],
+ "reads": {
+  "HD5": {
+   "R_seed_het_pair": 0.9353,
+   "het_control": {
+    "all": {
+     "R": 0.0972,
+     "n_classes": 28,
+     "boot95": [
+      0.0506,
+      0.2717
+     ],
+     "widened": [
+      0.0473,
+      0.2905
+     ],
+     "frac_classes_below_1": 0.8929,
+     "per_seed": {
+      "seed42": 0.0819,
+      "seed43": 0.1059
+     },
+     "n_probes": 28
+    },
+    "sign_changing": {
+     "R": 0.0576,
+     "n_classes": 19,
+     "boot95": [
+      0.0288,
+      0.1078
+     ],
+     "widened": [
+      0.0269,
+      0.1152
+     ],
+     "frac_classes_below_1": 0.8947,
+     "per_seed": {
+      "seed42": 0.0404,
+      "seed43": 0.059
+     },
+     "n_probes": 19
+    },
+    "positive": {
+     "R": 0.4079,
+     "n_classes": 9,
+     "boot95": [
+      0.103,
+      0.9577
+     ],
+     "widened": [
+      0.0963,
+      1.0239
+     ],
+     "frac_classes_below_1": 0.8889,
+     "per_seed": {
+      "seed42": 0.3569,
+      "seed43": 0.4989
+     },
+     "n_probes": 9
+    }
+   },
+   "mse_control": {
+    "all": {
+     "R": 1.4747,
+     "n_classes": 28,
+     "boot95": [
+      1.0372,
+      1.8598
+     ],
+     "widened": [
+      0.9701,
+      1.9885
+     ],
+     "frac_classes_below_1": 0.25,
+     "per_seed": {
+      "seed42": 1.3328,
+      "seed43": 1.4676
+     },
+     "n_probes": 28
+    },
+    "sign_changing": {
+     "R": 1.5872,
+     "n_classes": 19,
+     "boot95": [
+      1.0021,
+      2.0364
+     ],
+     "widened": [
+      0.9373,
+      2.1773
+     ],
+     "frac_classes_below_1": 0.2632,
+     "per_seed": {
+      "seed42": 1.3858,
+      "seed43": 1.4539
+     },
+     "n_probes": 19
+    },
+    "positive": {
+     "R": 1.1969,
+     "n_classes": 9,
+     "boot95": [
+      0.9174,
+      10.5106
+     ],
+     "widened": [
+      0.858,
+      11.2377
+     ],
+     "frac_classes_below_1": 0.2222,
+     "per_seed": {
+      "seed42": 0.7618,
+      "seed43": 2.033
+     },
+     "n_probes": 9
+    }
+   }
+  },
+  "HD4": {
+   "R_seed_het_pair": 1.2135,
+   "het_control": {
+    "all": {
+     "R": 1.0518,
+     "n_classes": 114,
+     "boot95": [
+      1.0016,
+      1.0992
+     ],
+     "widened": [
+      0.8254,
+      1.3339
+     ],
+     "frac_classes_below_1": 0.3947,
+     "per_seed": {
+      "seed42": 1.0173,
+      "seed43": 1.1083
+     },
+     "n_probes": 114
+    }
+   }
+  },
+  "PP4": {
+   "R_seed_het_pair": 1.1721,
+   "het_control": {
+    "all": {
+     "R": 1.0035,
+     "n_classes": 1301,
+     "boot95": [
+      0.9937,
+      1.0109
+     ],
+     "widened": [
+      0.8478,
+      1.1849
+     ],
+     "frac_classes_below_1": 0.4889,
+     "per_seed": {
+      "seed42": 0.9744,
+      "seed43": 1.0398
+     },
+     "n_probes": 1301
+    }
+   }
+  },
+  "EE4": {
+   "R_seed_het_pair": 1.1293,
+   "het_control": {
+    "all": {
+     "R": 1.0305,
+     "n_classes": 169,
+     "boot95": [
+      0.9823,
+      1.0533
+     ],
+     "widened": [
+      0.8698,
+      1.1895
+     ],
+     "frac_classes_below_1": 0.4675,
+     "per_seed": {
+      "seed42": 0.9991,
+      "seed43": 1.049
+     },
+     "n_probes": 169
+    }
+   }
+  },
+  "H1": {
+   "R_seed_het_pair": 1.2423,
+   "het_control": {
+    "all": {
+     "R": 1.0189,
+     "n_classes": 62,
+     "boot95": [
+      0.9744,
+      1.0655
+     ],
+     "widened": [
+      0.7844,
+      1.3237
+     ],
+     "frac_classes_below_1": 0.4194,
+     "per_seed": {
+      "seed42": 0.9499,
+      "seed43": 1.0854
+     },
+     "n_probes": 62
+    }
+   }
+  },
+  "H2": {
+   "R_seed_het_pair": 1.3053,
+   "het_control": {
+    "all": {
+     "R": 1.0128,
+     "n_classes": 218,
+     "boot95": [
+      0.9936,
+      1.0331
+     ],
+     "widened": [
+      0.7612,
+      1.3486
+     ],
+     "frac_classes_below_1": 0.4495,
+     "per_seed": {
+      "seed42": 0.9651,
+      "seed43": 1.0645
+     },
+     "n_probes": 218
+    }
+   }
+  },
+  "H2p5": {
+   "R_seed_het_pair": 1.2271,
+   "het_control": {
+    "all": {
+     "R": 1.1081,
+     "n_classes": 38,
+     "boot95": [
+      1.0063,
+      1.1746
+     ],
+     "widened": [
+      0.8201,
+      1.4413
+     ],
+     "frac_classes_below_1": 0.3158,
+     "per_seed": {
+      "seed42": 1.0007,
+      "seed43": 1.2376
+     },
+     "n_probes": 38
+    }
+   }
+  },
+  "H3": {
+   "R_seed_het_pair": 1.2226,
+   "het_control": {
+    "all": {
+     "R": 1.0187,
+     "n_classes": 279,
+     "boot95": [
+      0.9857,
+      1.0419
+     ],
+     "widened": [
+      0.8063,
+      1.2739
+     ],
+     "frac_classes_below_1": 0.4731,
+     "per_seed": {
+      "seed42": 0.9516,
+      "seed43": 1.059
+     },
+     "n_probes": 279
+    }
+   }
+  },
+  "H5": {
+   "R_seed_het_pair": 1.0075,
+   "het_control": {
+    "all": {
+     "R": 0.1823,
+     "n_classes": 28,
+     "boot95": [
+      0.0706,
+      0.2979
+     ],
+     "widened": [
+      0.0701,
+      0.3001
+     ],
+     "frac_classes_below_1": 0.8571,
+     "per_seed": {
+      "seed42": 0.1123,
+      "seed43": 0.2396
+     },
+     "n_probes": 28
+    }
+   }
+  },
+  "H6": {
+   "R_seed_het_pair": 1.5341,
+   "het_control": {
+    "all": {
+     "R": 0.8743,
+     "n_classes": 8,
+     "boot95": [
+      0.8511,
+      1.041
+     ],
+     "widened": [
+      0.5548,
+      1.597
+     ],
+     "frac_classes_below_1": 0.75,
+     "per_seed": {
+      "seed42": 1.011,
+      "seed43": 0.89
+     },
+     "n_probes": 8
+    }
+   }
+  },
+  "H7E": {
+   "R_seed_het_pair": 1.2737,
+   "het_control": {
+    "all": {
+     "R": 0.9873,
+     "n_classes": 34,
+     "boot95": [
+      0.933,
+      1.0655
+     ],
+     "widened": [
+      0.7325,
+      1.3571
+     ],
+     "frac_classes_below_1": 0.5588,
+     "per_seed": {
+      "seed42": 1.0216,
+      "seed43": 1.0359
+     },
+     "n_probes": 34
+    }
+   }
+  },
+  "H7c": {
+   "R_seed_het_pair": 1.1875,
+   "het_control": {
+    "all": {
+     "R": 1.0006,
+     "n_classes": 34,
+     "boot95": [
+      0.9709,
+      1.0282
+     ],
+     "widened": [
+      0.8176,
+      1.221
+     ],
+     "frac_classes_below_1": 0.5,
+     "per_seed": {
+      "seed42": 0.9896,
+      "seed43": 1.092
+     },
+     "n_probes": 34
+    }
+   }
+  }
+ },
+ "verdict": {
+  "a": "YES: the signed pools' signedlog target is the main cause",
+  "b": "the target is all of it",
+  "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"
+ },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-5abe4a0e": {
+    "train_run": "FA-ccin2p3-5abe4a0e",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -1.05277,
+      "early_max": 0.1231734,
+      "best_step": 4264,
+      "spike_at": 2040,
+      "blew_up_at": null,
+      "at_value": 458154300.0,
+      "max_after_ref": 458154300.0
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.869344,
+      "early_max": null,
+      "best_step": 240,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.859645
+     }
+    ],
+    "spiked_recovered": [
+     {
+      "block": 0,
+      "step": 2040
+     }
+    ],
+    "blew_up": null
+   },
+   "FA-ccin2p3-92207f6a": {
+    "train_run": "FA-ccin2p3-92207f6a",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -0.9319443,
+      "early_max": 172560100.0,
+      "best_step": 4250,
+      "spike_at": 1190,
+      "blew_up_at": null,
+      "at_value": 6723584000.0,
+      "max_after_ref": 6723584000.0
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.753693,
+      "early_max": null,
+      "best_step": 210,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.748193
+     }
+    ],
+    "spiked_recovered": [
+     {
+      "block": 0,
+      "step": 1190
+     }
+    ],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": [
+   "FA-ccin2p3-5abe4a0e: training run FA-ccin2p3-5abe4a0e block 0 step 2040",
+   "FA-ccin2p3-92207f6a: training run FA-ccin2p3-92207f6a block 0 step 1190"
+  ]
+ }
+}
