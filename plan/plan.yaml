@@ -3497,6 +3497,9 @@ entries:
     44: 'Today''s deck (Joaquin 2026-11-03): sampling slide (default vs catalog mixture by component, pp example), width/length/zero-shot
       with restored error bars, MSE log|M|^2 against compute and wall time, het. loss naming; plus a show/skip list of other
       results since the last deck for Joaquin.'
+    45: 'Why het.-loss arms read about 12x worse than MSE on the held-out one-loop zero-shot (Joaquin 2026-11-04): first rule
+      out a reading mismatch (same pools, reader, checkpoint, target transform for het. and MSE), then the sigma mechanism
+      and sign-changing pools, from existing reads and saved predictions.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8208,6 +8211,11 @@ entries:
       if:
       - 'built and checked: sent with the list'
       - 'a figure can''t be made today: say which and why'
+    45:
+      feeds: whether het. loss is the right default for one-loop zero-shot, or the one-loop row is a reading artefact
+      if:
+      - 'reading mismatch: fix the read and redraw slide 3'
+      - 'real: name the mechanism with numbers and what would test it'
   owner:
     agent: a81e6ba99cdb38b13
     state: stopped
