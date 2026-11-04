@@ -10474,3 +10474,27 @@ entries:
       docs/results.tex par:v4_error_correlates, analysis/catalog_v4/figs/error_correlates_{rank,rank_legend,profile}.{png,pdf}
     written: '2026-10-31T22:59:16+00:00'
   writeup: 4d64bea8
+- id: two_loop
+  title: 'Two-loop amplitude datasets: what it takes'
+  question: What does generating two-loop amplitude datasets for the catalog require (theory, tools, feasible processes, cost),
+    so Joaquin can decide whether and how to do it?
+  status: waiting_user
+  quotes: []
+  decisions: []
+  next: 'Researched explainer for Joaquin: two-loop amplitudes in detail, tools and public results, feasible processes, cost
+    per point, what we would store; sourced; no generation until he decides'
+  done_when: null
+  notes_ref: null
+  match: zz_two_loop_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks:
+  - ask: Approve a researched two-loop explainer as the first step?
+    at: '2026-11-04T17:58:43+00:00'
+    searched: 'CLAUDE.md and site decisions --project FA searched for two-loop: no decision covers two-loop work before D265'
+  ask: Approve a researched two-loop explainer as the first step?
+  waiting_since: '2026-11-04T17:58:43+00:00'
+  searched: 'CLAUDE.md and site decisions --project FA searched for two-loop: no decision covers two-loop work before D265'
