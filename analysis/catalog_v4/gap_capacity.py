@@ -16,8 +16,11 @@ Width (seeds 42, 43 paired): dG(w) = G(w) - G(w8) per seed, beside the numerator
   Verdict (the design of 2026-11-04): NARROWS when dG(w32) <= -m on both seeds; WIDENS when dG(w32) >= +m on both;
   LEVEL when |dG(w32)| < m on both; otherwise BETWEEN. w16 reported beside. Bootstrap over H2 pools (1000 draws,
   seed 0) gives each G's 16-84% band.
-Length (information: one seed, tuned HPs, length and tuning together): the 4x best trial (17056 steps, its eval read)
-and, once its read is in, the 16x best (68224 steps), G against w8 seed 42.
+Length (one seed, width 8, seed 42): the 16x best (68224 steps, eval read FA-ccin2p3-1a46f3e0) against the 4x best
+(17056 steps, eval read FA-ccin2p3-6f8a1eed), each the best of the same 8-trial template sweep: dG = G(16x) - G(4x),
+same m and rule (both sweeps' best lr at the window top: length and leftover tuning read together); 1x w8 against
+4x is information only (base HPs against tuned). (a) closes only when both axes read LEVEL or WIDENS; with the 16x
+read missing the width verdict is reported and (a) stays open.
     python3 analysis/catalog_v4/gap_capacity.py [--null-only]  -> data/gap_capacity.json
 """
 import argparse
@@ -34,7 +37,8 @@ from mixture_ab import WIDTH, WIDTH_RUN_DIR  # noqa: E402
 
 FLOOR_KEY = {r: f"runs/catalog_v4_long/{d}" for r, d in WIDTH_RUN_DIR.items()}
 # length points: (H2 read run, training-floor key in size_mse_preds.json); the 16x best is added when its read ends
-LENGTH = {"x4_best": ("FA-ccin2p3-6f8a1eed", "runs/cov_v4_long_hpo8_cc_17056/trial_1262")}
+LENGTH = {"x4_best": ("FA-ccin2p3-6f8a1eed", "runs/cov_v4_long_hpo8_cc_17056/trial_1262"),
+          "x16_best": ("FA-ccin2p3-1a46f3e0", "runs/cov_v4_long_hpo8_cc_68224/trial_1262")}
 MARGIN_MIN = 0.05
 
 
@@ -105,8 +109,22 @@ def main():
         x = gap(run, fkey, preds, cell, train, h2, boot)
         x["dG_vs_w8_seed42"] = round(x["G"] - b42["G"], 4)
         res["length"][name] = {k: v for k, v in x.items() if k != "_held"}
+    # the length verdict: 16x best over 4x best (the same 8-trial template sweep's best, width 8, seed 42), same m and
+    # rule; one seed; both sweeps' best lr sits at the top of the search window, so length and leftover tuning read
+    # together. 1x over 4x stays information (base HPs against tuned)
+    L = res["length"]
+    if all(isinstance(L.get(k), dict) for k in ("x4_best", "x16_best")):
+        dl = round(L["x16_best"]["G"] - L["x4_best"]["G"], 4)
+        res["length_dG_16x_over_4x"] = dl
+        res["length_verdict"] = "NARROWS" if dl <= -m else "WIDENS" if dl >= m else "LEVEL"
+    else:
+        res["length_verdict"] = "read missing: (a) stays open"
+    both = (res["verdict"], res["length_verdict"])
+    res["a_closed"] = all(v in ("LEVEL", "WIDENS") for v in both)
     json.dump(res, open(os.path.join(DATA, "gap_capacity.json"), "w"), indent=1)
     print(json.dumps({"margin": res["margin"], "seed_diff": seed_diff, "verdict": res["verdict"],
+                      "length_verdict": res["length_verdict"], "length_dG": res.get("length_dG_16x_over_4x"),
+                      "a_closed": res["a_closed"],
                       "G": {w: [res["widths"][w][s]["G"] for s in ("seed42", "seed43")] for w in widths},
                       "dG": {w: [res["widths"][w][s]["dG"] for s in ("seed42", "seed43")] for w in widths},
                       "dH": {w: [res["widths"][w][s]["dH"] for s in ("seed42", "seed43")] for w in widths},
