@@ -2569,9 +2569,9 @@ entries:
     '9': FA-ccin2p3-1a46f3e0
   owner:
     agent: a3c87bc016f01a716
-    state: working
+    state: stopped
     since: '2026-11-04T18:50:51+00:00'
-    state_at: '2026-11-04T18:50:51+00:00'
+    state_at: '2026-11-04T19:03:16+00:00'
     context: 135722
     context_at: '2026-11-04T19:00:38+00:00'
   targets:
