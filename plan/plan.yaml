@@ -11128,6 +11128,12 @@ entries:
       back (acc18380b00739f5c True, a live mid-turn agent False; test_redesign_d d2_d6 15/15). Not live: no PreToolUse matcher
       reaches SubagentHandback; needs a settings registration (matcher SubagentHandback -> dispatch.py handback_guard.py),
       diff given to the main session. Not verified live.'
+  - at: '2026-11-04T20:16:01+00:00'
+    text: '2026-11-04: a reviewer that passes a worktree branch must run ''review_backlog.sh advance'' from the worktree (its
+      HEAD becomes the watermark); run from the main checkout it records trunk''s HEAD, and git_verify_guard then refuses
+      the merge (double_wake: advance re-run from the worktree, d351162a). scripts/remove_worktree.sh left the merged branch
+      because auto_push had given it a stale upstream (origin/double_wake at 79aaaf64): ''git branch -d'' refuses a branch
+      not merged to its upstream; deleted by hand after --unset-upstream, remote branch deleted'
   handoff:
     state: '2026-11-04: write-up in docs/results.tex sec:agent-redesign committed and passed by the notes-editor (37cced30);
       step 13 dropped (D277 keeps the main window at 500k); open: next 12 (mechanical-worker tool cut, measurable next session;
