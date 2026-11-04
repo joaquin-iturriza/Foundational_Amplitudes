@@ -2531,6 +2531,69 @@ faster with width than the held-out one (\code{gap\_capacity.py}), which the use
 % claim: length.default.x16_over_x4=0.875
 % allow: 2 6 8 16 32 4264 17056 68224 2000 42 43 0.25 1 4 16 because they are the square in |M|^2, the pools' particle count, the widths, the steps, the read's events, the seeds, the mixture share and the length multiples
 
+\paragraph{Training length on the test and held-out reads: $16\times$ over $4\times$ (2026-11-04).}\label{par:v4_length}
+The question of catalog\_coverage's long runs [D219, D229, D231]: on catalog\_v4 at default share $0.25$ (het loss,
+width $8$, the whole training set), does training $16\times$ ($68224$ steps) lower the MSE of $\log|\mathcal M|^2$ against
+$4\times$ ($17056$ steps), each at its tuned hyperparameters, on default-sampled test events (PP4 and EE4, the test
+splits of trained and held-out classes alike) and zero-shot on the held-out classes? It decides which length the foundation pretraining
+starts from. Design (passed review 2026-11-01): the best trial of each length's eight-trial DyHPO sweep
+(\code{cov\_v4\_long\_hpo8\_cc\_68224} and \code{cov\_v4\_long\_hpo8\_cc\_17056}, seed $42$), each read as its final
+model (the mean at the best checkpoint, then the sigma fit [D276]; reads FA-ccin2p3-1a46f3e0 and FA-ccin2p3-6f8a1eed)
+on PP4 ($1301$ classes), EE4 ($169$), the $700$ default-sampled held-out classes pooled, and beside them the
+catalog-sampled held-out pools H1 to H7c ($701$). $R$ is the median over classes of the class's geometric mean of
+$16\times$ over $4\times$ per probe; its $95\%$ class bootstrap is widened on each side by the $1\times$ width-$8$ seed
+pair's $|\ln R_{\rm seed}|$ (no seed twin exists at either length). Rule fixed before the read: YES when $R<1$ with the
+widened interval below $1$ on PP4, EE4 and the default-sampled held-out pool. It is YES: PP4 $R=0.671$
+($[0.623, 0.734]$), EE4 $0.677$ ($[0.605, 0.767]$), held out default-sampled $0.921$ ($[0.874, 0.976]$),
+catalog-sampled $0.848$ ($[0.773, 0.929]$); no run blew up. The gain is large on the PP4 and EE4 test splits; on the
+held-out classes it is small. By axis, default-sampled: H1 $0.813$, H2 ($2\to4$ families) $0.875$, H7E $0.736$
+($[0.586, 0.989]$), H7c $0.521$ fall; H6 $0.469$ ($8$ classes) is not resolved, its interval reaching $1.178$; H3 (the top)
+$0.984$ ($[0.884, 1.071]$) and H5 (one loop) $1.008$ ($[0.817, 1.400]$) do not move; H2p5 ($2\to5$, $38$
+classes) rises, $R=3.07$ ($[1.95, 4.42]$; catalog-sampled $2.28$, $[1.71, 3.37]$): the longer run extrapolates
+worse to the held-out $2\to5$ classes, the cost of length on these reads. Caveats: one seed per length,
+each the best of eight trials; neither sweep has converged (both best learning rates at the top of their search window,
+both best checkpoints at the last validation), so $R$ is not yet the asymptotic gain of length.
+% src: python3 analysis/catalog_v4/mixture_ab.py length @83bddc20
+% claim: PP4.all.2=1301
+% claim: EE4.all.2=169
+% claim: held_default.pooled.2=700
+% claim: held.pooled.2=701
+% claim: PP4.all.0=0.671
+% claim: PP4.all.1.0=0.623
+% claim: PP4.all.1.1=0.734
+% claim: EE4.all.0=0.677
+% claim: EE4.all.1.0=0.605
+% claim: EE4.all.1.1=0.767
+% claim: held_default.pooled.0=0.921
+% claim: held_default.pooled.1.0=0.874
+% claim: held_default.pooled.1.1=0.976
+% claim: held.pooled.0=0.848
+% claim: held.pooled.1.0=0.773
+% claim: held.pooled.1.1=0.929
+% claim: held_default.H1.0=0.813
+% claim: held_default.H2.0=0.875
+% claim: held_default.H7c.0=0.521
+% claim: held_default.H7E.0=0.736
+% claim: held_default.H7E.1.0=0.586
+% claim: held_default.H7E.1.1=0.989
+% claim: held_default.H6.0=0.469
+% claim: held_default.H6.1.1=1.178
+% claim: held_default.H6.2=8
+% claim: held_default.H3.0=0.984
+% claim: held_default.H3.1.0=0.884
+% claim: held_default.H3.1.1=1.071
+% claim: held_default.H5.0=1.008
+% claim: held_default.H5.1.0=0.817
+% claim: held_default.H5.1.1=1.400
+% claim: held_default.H2p5.2=38
+% claim: held_default.H2p5.0=3.07
+% claim: held_default.H2p5.1.0=1.95
+% claim: held_default.H2p5.1.1=4.42
+% claim: held.H2p5.0=2.28
+% claim: held.H2p5.1.0=1.71
+% claim: held.H2p5.1.1=3.37
+% allow: 0.25 8 16 4 68224 17056 42 95 1 2 because they are the mixture share, the width, the length multiples and steps, the seed, the interval's level, the rule's bar and the bounds of the width-8 seed pair's subscript
+
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
 tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
