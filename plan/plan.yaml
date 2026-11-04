@@ -2346,6 +2346,51 @@ entries:
       entry dead ends; site decisions D20, D78, D88, D178, D216, catalog_coverage. Caveat: the null spread rests on two independent
       control pairs; if the arm''s pairs scatter like signext''s (SE 0.12 in s), yes needs mean s about 0.34 and a true 0.25
       lands in between.'
+  - at: '2026-11-04T18:56:46+00:00'
+    question: 'Step (a) on catalog_v4 (D216 ''we eventually want to do a''; D267): does more capacity (width 8 -> 16 -> 32
+      at 4264 steps) narrow the held-out multiplicity gap, i.e. lower the 218 H2 (6-particle, held-out) pools'' zero-shot
+      MSE relative to the training floor of their cells, or do held-out and training pools gain by the same factor? Yes: capacity
+      is a lever on the gap and catalog_coverage''s width/length choice for the full pretraining carries (a). No: capacity
+      lowers both sides but leaves the gap; (b) more 6-particle training pools or a target prior is the lever.'
+    prior: 'par:v4_shape_gap (H2 floor var(q-t) over the cell''s training floor at the old MSE control, a transfer gap, median
+      e 0.389/0.358); par:v4_lco_not and par:v4_kshot_spread (no event-level prior, no per-process affine carries the gap:
+      0.016/0.019, 0.012/0.017); catalog_coverage step 33 (data/width_x1.json @44a02702, mixture_ab.py width): H2 zero-shot
+      MSE over width 8, R 0.642 at w16 and 0.552 at w32 (class median, two-seed geometric means), training val NLL per process
+      lower at w32 by 0.78 (median over 1153 processes): each side apart, never held-out over training, which is this read;
+      catalog_coverage''s arms read (data/arms_vs_het_control.json): 4x best trial R on H2 0.086 against the het control (one
+      seed, length+tuning+data together). results.tex ''Weighting by a reference, and width'' (line ~10022) is an old 1000-step
+      catalog_v3-era arm, not a held-out gap read. Searched results.tex for width, capacity, length, held-out multiplicity,
+      6-particle, shape gap; plan show v3_prep_explore and catalog_coverage; site decisions D78, D216, D242, D248, D267.'
+    measure: 'analysis/catalog_v4/gap_capacity.py @27ef0192 (no new job; data in hand). Per run: F_c = median training-pool
+      MSE of log|M|^2 over the run''s training pools of cell c (particle count x initial state, tree_levels.json; the 7 H2
+      cells hold 716 training pools), from size_mse_preds.json (sigma-stage preds_val.npz, mu frozen at the best checkpoint,
+      200 val events per pool, ln|pred|-ln|truth| squared); g_p = log10(MSE_p / F_c(p)) for each H2 pool, MSE_p its zero-shot
+      MSE of log|M|^2 at the best checkpoint (data/reads/<run>_H2.json, 2000 val events, catalog-sampled; mixture_ab.py extract);
+      G = median_p g_p. dG(w) = G(w) - G(w8) per seed (paired 42/42, 43/43), with its parts dH = median_p log10(MSE_p(w)/MSE_p(w8))
+      and dF = median_c log10(F_c(w)/F_c(w8)); 16-84% bootstrap band of G over H2 pools (1000, seed 0); G per cell. Length
+      beside, information: 4x best (trial_1262, eval FA-ccin2p3-6f8a1eed) and 16x best (FA-ccin2p3-1a46f3e0) once its H2 read
+      and floor are in, G - G(w8 seed 42).'
+    check: 'On existing data (gap_capacity.py --null-only @27ef0192): G at w8 is 0.477 (seed 42) and 0.551 (seed 43), seed
+      difference 0.075, so the margin is at least 0.15. Both parts of G move with width in catalog_coverage''s reads: H2 MSE
+      R 0.642 (w16), 0.552 (w32) (log10 -0.19, -0.26); training NLL per process -0.38 (w16), -0.78 (w32), i.e. training MSE
+      falls by about exp(-2*0.78)=0.21 (log10 -0.68) at w32 if the NLL tracks 0.5 ln MSE: the two sides move by amounts of
+      the order of the margin or more, so G can move by more than m. Floors and H2 MSE are both log|M|^2 at the best checkpoint
+      in natural-log units (catalog_coverage checked ln|raw| MSE against sigma^2 x standardized MSE: median ratio 1.0000000
+      on 1089 plain-log pools).'
+    fixed: 'Catalog_coverage''s 1x width cells as run: het loss, share-0.25 default mixture, whole catalog_v4 training set
+      (memmap), 4264 steps, the base config''s HPs, LLoCa muP with num_heads setting width 8/16/32, best checkpoint by aggregate
+      val_loss_no_reg; H2''s 218 catalog-sampled probes and 2000 events; training floors from each run''s own sigma stage;
+      cells from tree_levels.json.'
+    control: 'Width 8 at the same seed (FA-ccin2p3-804a65bc seed 42, FA-ccin2p3-66e8c31f seed 43) against w16 (493c98db, 7288b3fe)
+      and w32 (e26059bf, fd7fc137): one change, width. The length points have no matched control (one seed, tuned HPs), information
+      only.'
+    seeds: 42 and 43, as the width cells; each seed's dG reported; margin m = max(0.05, 2 x the largest |G(seed 43) - G(seed
+      42)| over the three widths).
+    outcome: 'NARROWS (capacity is a lever: report to Joaquin that the width/length choice carries (a), with dG per cell)
+      when dG(w32) <= -m on both seeds; LEVEL (held-out and training gain alike; capacity leaves the gap, (b) or a target
+      prior is the lever) when |dG(w32)| < m on both seeds; WIDENS (training gains more than held-out) when dG(w32) >= +m
+      on both; otherwise BETWEEN, reported with both seeds. w16 beside. Cost: CPU seconds on the laptop, 0 GPU-h; the 16x
+      point waits only on catalog_coverage''s running read FA-ccin2p3-1a46f3e0 and a pull of its preds.'
   continuous:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
