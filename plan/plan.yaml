@@ -10184,7 +10184,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: a72fb682
+    commit: 37cced30
     paths:
     - .claude/hooks/owner_handoff.py
     - '2026-11-04 owner aaf01b2d42241ffe1: next 1 cleanup done (lock_guard.py, reviewer_resume.py, handback_guard.py deleted;
@@ -10289,6 +10289,8 @@ entries:
       per call 0.087 -> 0.052, per wake 0.299 -> 0.234; orchestration-only 0.459 -> 0.362 at $0.153 -> $0.208 each, median
       context 240.2k -> 263.3k; agent_done wakes 15 -> 4. Compaction replay 57/57 (36 main, 21 agent = 7 compactions of 5
       agents, all before 4550ed8c). Model trial as recorded. notes-editor review launched'
+    - 'write-up passed the notes-editor 2026-11-04 (a72fb682, 95d3c175, editor fixes c4fad606 37cced30; backlog advanced to
+      37cced30); entry left open: next 14 (deck cold-read agent) held under D268'
   dead_ends:
   - tried: Route small tool fixes to Sonnet 5.5 (default effort) instead of Opus 5.5 at low effort (D203 matched trial, 10
       past repo fixes, tools/model_trial.py, analysis/agent_redesign/model_trial.json @096b5fe4)
