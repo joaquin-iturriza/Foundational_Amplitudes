@@ -174,14 +174,6 @@ entries:
   - D267
   - D271
   next:
-    9: '(a) capacity and training length for the held-out multiplicity gap (design passed 2026-11-04 19:0x, gap_capacity.py
-      @81854829). Width done (data/gap_capacity.json @cbe2b221): WIDENS. G = median over the 218 H2 pools of log10(zero-shot
-      MSE / cell''s median training MSE): w8 0.477/0.551, w16 0.660/0.582, w32 0.810/0.779 (seeds 42/43); dG(w32) +0.333/+0.228
-      against margin 0.155; held-out MSE falls (dH -0.216/-0.322 log10) but the cells'' training floor falls about twice as
-      fast (dF -0.586/-0.585); every cell widens at w32. Length open: G(16x best) - G(4x best) when catalog_coverage''s read
-      FA-ccin2p3-1a46f3e0 ends: extract its H2 read (mixture_ab.py extract), pull its sigma-stage preds (size_figs.py pull_preds
-      pattern, read-only site run), rerun gap_capacity.py. Information: 4x best G 0.532 (w8 1x seed 42 0.477, +0.055 within
-      m).'
     10: '(b) more 6-particle training pools in the held-out multiplicity cells (D216), on catalog_v4: the 97 kept candidates
       of the MadGraph existence check (analysis/catalog_v4/data/multext_checked.json; recipes/catalog_v4_multext*.yaml @07f2e008),
       their class check (scripts/job_catalog_v4_multext_check.sh, CPU, not yet run), generated with the sampling that catalog_coverage''s
@@ -2554,12 +2546,6 @@ entries:
     quote: Keep iterating.
     at: '2026-10-29T05:33:23+00:00'
   step_why:
-    9:
-      feeds: whether capacity or training length narrows the held-out multiplicity gap relative to the training floor, i.e.
-        whether (a) is a lever and the full pretraining's width and length choice (catalog_coverage) carries it
-      if:
-      - 'length NARROWS: length is a lever, to Joaquin with catalog_coverage''s length choice'
-      - 'length LEVEL or WIDENS: (a) closes (both axes), (b) or a target prior is the lever; write-up in results.tex'
     10:
       feeds: whether more same-multiplicity training data narrows the held-out multiplicity gap, and whether the pools join
         the catalog's training set
@@ -2569,7 +2555,6 @@ entries:
   step_waits:
     '7': 'D78: the user''s hold on the full catalog pretraining''s design (step (a) is held there, nothing to launch until
       it is released)'
-    '9': FA-ccin2p3-1a46f3e0
   owner:
     agent: a3c87bc016f01a716
     state: working
