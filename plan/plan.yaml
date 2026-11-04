@@ -5256,7 +5256,12 @@ entries:
     searched: CLAUDE.md 'Every reported loss is read at the best checkpoint', D95 keeps the post-sigma model; they disagree
       for het. loss only
     blocks: nothing
-    blocks_steps: &id001 []
+    blocks_steps: []
+    answered_at: '2026-11-04T19:28:52+00:00'
+    decision: D276
+    withdrawn_at: '2026-11-04T19:28:52+00:00'
+    withdrawn_why: 'D276: the sigma fit is the final part of training, so the reported het. loss is the trained model''s,
+      after the sigma fit; the 2026-11-02 reader change took the opposite view and is to be reverted'
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9866,13 +9871,6 @@ entries:
     files: analysis/catalog_v4/size_figs.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/data/long_sweeps_best.json,
       analysis/catalog_v4/data/pp_support_reads.json, scripts/job_catalog_v3_short.sh, analysis/catalog_v4/validate_v4.py
     written: '2026-11-04T18:52:23+00:00'
-  ask: 'Het. loss reporting: keep reading the main run''s best checkpoint, or report the kept post-sigma-retraining model''s
-    het. loss (D95 keeps only that model)?'
-  waiting_since: '2026-11-04T19:20:41+00:00'
-  searched: CLAUDE.md 'Every reported loss is read at the best checkpoint', D95 keeps the post-sigma model; they disagree
-    for het. loss only
-  blocks: nothing
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -11166,7 +11164,7 @@ entries:
     searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
       which ask for the explainer'
     blocks: nothing
-    blocks_steps: &id002 []
+    blocks_steps: &id001 []
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -11201,4 +11199,4 @@ entries:
   searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
     which ask for the explainer'
   blocks: nothing
-  blocks_steps: *id002
+  blocks_steps: *id001
