@@ -5214,8 +5214,17 @@ entries:
     searched: 'site decisions --project FA (D130, D137 catalog_v4 sampling; D245-D258 mixture share 0.25): none decides the
       splitter''s initial-state corner'
     blocks: step 48, the splitter change
-    blocks_steps: &id001
+    blocks_steps:
     - 48
+  - ask: 'Envelope design: build f = 0.5 with 0.70 of each hadronic tree class from our own |M|^2-unweighted partonic sampler
+      at the class''s pp sqrt(s) distribution widened 0.05 dex, and 0.30 the current mixture with an initial-state collinear
+      splitter branch (about 860 core-h CPU)? Or 0.60 / 0.40 (more mass beyond the pp range, 12 classes slightly short)?'
+    at: '2026-11-04T19:04:57+00:00'
+    searched: 'site decisions --project FA: D130/D137 set catalog_v4''s sampling, his 2026-11-04 words set the envelope goal,
+      none sets the weights or the CPU cost'
+    blocks: the design review, the sampler code, the validate_v4 envelope check and the regeneration
+    blocks_steps: &id001
+    - 49
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9810,12 +9819,13 @@ entries:
     files: analysis/catalog_v4/size_figs.py, analysis/catalog_v4/pp_support.py, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/data/long_sweeps_best.json,
       analysis/catalog_v4/data/pp_support_reads.json, scripts/job_catalog_v3_short.sh, analysis/catalog_v4/validate_v4.py
     written: '2026-11-04T18:52:23+00:00'
-  ask: 'pp tail above the catalog''s |M|^2: add an initial-state collinear branch to the catalog''s splitter before the next
-    catalog round, or leave that tail to the share-0.25 default component?'
-  waiting_since: '2026-11-04T18:21:02+00:00'
-  searched: 'site decisions --project FA (D130, D137 catalog_v4 sampling; D245-D258 mixture share 0.25): none decides the
-    splitter''s initial-state corner'
-  blocks: step 48, the splitter change
+  ask: 'Envelope design: build f = 0.5 with 0.70 of each hadronic tree class from our own |M|^2-unweighted partonic sampler
+    at the class''s pp sqrt(s) distribution widened 0.05 dex, and 0.30 the current mixture with an initial-state collinear
+    splitter branch (about 860 core-h CPU)? Or 0.60 / 0.40 (more mass beyond the pp range, 12 classes slightly short)?'
+  waiting_since: '2026-11-04T19:04:57+00:00'
+  searched: 'site decisions --project FA: D130/D137 set catalog_v4''s sampling, his 2026-11-04 words set the envelope goal,
+    none sets the weights or the CPU cost'
+  blocks: the design review, the sampler code, the validate_v4 envelope check and the regeneration
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
