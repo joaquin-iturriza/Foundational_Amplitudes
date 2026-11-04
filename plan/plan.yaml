@@ -11505,3 +11505,10 @@ entries:
       - 'MATCH at some k with the change carried: report k/4264 to Joaquin as the cheap route, write up'
       - 'no k matches: report g_k (recovered share of the scratch gain) per k and whether it rises with k'
       - 'a run broke: read its log, fix, resubmit that run'
+  targets:
+  - batch: ws_k_ladder
+    wall_h: 2.25
+    jobs: 12
+    units: null
+    start: '2026-11-04T21:24:12+00:00'
+    at: '2026-11-04T21:24:12+00:00'
