@@ -3500,6 +3500,11 @@ entries:
     47: 'Het one-loop zero-shot (finding 2026-11-04, het_oneloop.py @fc71ee9e): the het arms'' 12x on HD5 follows the 63 sign-changing
       one-loop training pools trained on signedlog (no sign head under HETEROSC). Proposed to Joaquin, not run: a het control
       pair (share 0, seeds 42/43) with those pools on abslog (magnitude only), read on HD5 like the arms'
+    48: 'pp support gap (finding 2026-11-04, pp_support.py @07ab67cf): catalog_v4 misses the top of log|M|^2 on 2->4 (1.57%
+      of pp events, over 1% in 312 classes, 309 of them 2->4), from multiply-singular corners with an initial-state collinear
+      pair the candidates (RAMBO, final-final splitter, one-final forward rotation) do not reach. Proposed to Joaquin, not
+      built: an initial-state collinear branch of the splitter feeding the flat-in-log|M|^2 candidates, checked by rerunning
+      pp_support.py on rebuilt 2->4 pools'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8216,6 +8221,11 @@ entries:
       if:
       - 'het on abslog reads HD5 within 1.5x of the MSE control: the 12x is the target, the deck says so'
       - 'it stays above 3x: the het loss costs one-loop transfer, look at sigma weighting'
+    48:
+      feeds: whether the catalog sampling is extended before the next catalog round
+      if:
+      - 'Joaquin says build it: implement, regenerate a probe set of the worst 2->4 classes, rerun pp_support'
+      - 'Joaquin says no: the share-0.25 default component covers that tail in training; note the gap in results.tex'
   owner:
     agent: a0735876e6698c1aa
     state: working
