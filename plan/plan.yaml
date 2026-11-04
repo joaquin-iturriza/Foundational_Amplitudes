@@ -10179,6 +10179,13 @@ entries:
       push_replay_precut_nov2.json). Corrections (agent_tasks.py since 11-02): 2, hand read: afe05580f2c6da391 (Joaquin on
       error bars vs seeds, D254: a figure choice, fa-figures says nothing on it and was delivered) and a4cdf21816cbb03c0 (the
       main session corrected its own instruction); none traced to a withheld section. Branch: keep'
+    - 'next 7 re-measure 2026-11-04 (main_turns.py --split 2026-10-31T04:22:16Z, analysis/agent_redesign/main_turns_split_5708b248.json):
+      after D217''s Stop bookkeeping and inline-to-agents, 4.6 days, main session $107.69, 362 wakes. Stop-hook wakes 19.1%
+      -> 13.0% of $ (46 -> 73 wakes; 27 context guard, 16 of them after the once-only fix 0e63ef4a; the rest owner resumes
+      and missing owners, reply checks 7, waiter 4, figure pairs 3, unsent questions 3: each a real omission). Inline per
+      call 8.7% -> 5.1%, per wake 30% -> 23% (62 wakes, mostly Joaquin''s questions answered with site run or a script read).
+      Orchestration-only wakes 45.9% -> 36.7% (189, $0.21 each) but context at first call rose 240k -> 268k median (500k window,
+      30ce4d7b); waiter wakes $0.62 each, 20%'
     - 'next 9 done 2026-11-04: the flush-note leak to owner a8f01a86034d7b73e (2026-10-31T04:05Z) came from c534526a''s PostToolUse
       branch with no agent_id test, already fixed by 5708b248 (04:22Z); no PostToolUse/Stop/PreCompact delivery to an agent
       since (all subagent transcripts read). A second leak was found and fixed: a subagent''s compaction fires SessionStart:compact
