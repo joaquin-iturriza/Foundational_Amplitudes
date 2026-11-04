@@ -10398,6 +10398,14 @@ entries:
     withdrawn_at: '2026-11-04T19:28:58+00:00'
     withdrawn_why: D277 set the main session's window to 500k on 2026-10-31 because 400k made the main session lose track;
       the 300k proposal is withdrawn; the remaining call is whether to close the entry
+  - ask: Register the double-wake fix (notification_absorb.py, eb2831c7) as a UserPromptSubmit hook in .claude/settings.json
+      (patch at scratchpad/dw/settings_ups.patch)?
+    at: '2026-11-04T20:17:36+00:00'
+    searched: 'settings registrations are Joaquin''s (fa-hooks: a registration change goes to the user as a diff); D279 asked
+      for the fix, not this setting'
+    blocks: only the double-wake fix going live
+    blocks_steps: &id001
+    - 15
   step_why:
     11:
       feeds: whether the redesign is finished
@@ -11150,6 +11158,13 @@ entries:
     running: none
     files: docs/results.tex tools/push_replay.py tools/main_turns.py tools/compaction_replay.py tools/model_trial.py analysis/agent_redesign/main_turns_split_5708b248.json
     written: '2026-11-04T19:52:42+00:00'
+  ask: Register the double-wake fix (notification_absorb.py, eb2831c7) as a UserPromptSubmit hook in .claude/settings.json
+    (patch at scratchpad/dw/settings_ups.patch)?
+  waiting_since: '2026-11-04T20:17:36+00:00'
+  searched: 'settings registrations are Joaquin''s (fa-hooks: a registration change goes to the user as a diff); D279 asked
+    for the fix, not this setting'
+  blocks: only the double-wake fix going live
+  blocks_steps: *id001
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
@@ -11244,7 +11259,7 @@ entries:
     searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
       which ask for the explainer'
     blocks: nothing
-    blocks_steps: &id001 []
+    blocks_steps: &id002 []
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -11279,5 +11294,5 @@ entries:
   searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
     which ask for the explainer'
   blocks: nothing
-  blocks_steps: *id001
+  blocks_steps: *id002
   checked_until: '2026-11-04T19:54:28+00:00'
