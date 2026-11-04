@@ -11367,7 +11367,20 @@ entries:
     commit: null
     paths: []
   dead_ends: []
-  asks: []
+  asks:
+  - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
+      beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
+      magnitude pair shows no gain). Go for that? And the changes left out: the eight catalog_v3 changes (Muon vs AdamW, GeV
+      vs dimensionless target and inputs, s_hat, hybrid, two blended targets, context vector, sign-pair head) need either
+      catalog_v3 regenerated (its pools are deleted on CC) or a new from-scratch pair each on catalog_v4, about 12 GPU-h per
+      change, about 100 for all eight; the whole-pool training set waits on its data-size/loading-path confound; width and
+      the older 32k-64k-step setups are not designed. Bring any of those in?'
+    at: '2026-11-04T21:52:11+00:00'
+    searched: 'CLAUDE.md GPU budget rule (above 30 GPU-h confirm unless a decision covers it); site decisions --project FA:
+      D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
+      change the scope)'
+    blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
+    blocks_steps: &id002 []
   owner:
     agent: ab46b28c7e6e33570
     state: working
@@ -11941,3 +11954,16 @@ entries:
     units: null
     start: '2026-11-04T21:24:12+00:00'
     at: '2026-11-04T21:24:12+00:00'
+  ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
+    beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
+    magnitude pair shows no gain). Go for that? And the changes left out: the eight catalog_v3 changes (Muon vs AdamW, GeV
+    vs dimensionless target and inputs, s_hat, hybrid, two blended targets, context vector, sign-pair head) need either catalog_v3
+    regenerated (its pools are deleted on CC) or a new from-scratch pair each on catalog_v4, about 12 GPU-h per change, about
+    100 for all eight; the whole-pool training set waits on its data-size/loading-path confound; width and the older 32k-64k-step
+    setups are not designed. Bring any of those in?'
+  waiting_since: '2026-11-04T21:52:11+00:00'
+  searched: 'CLAUDE.md GPU budget rule (above 30 GPU-h confirm unless a decision covers it); site decisions --project FA:
+    D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
+    change the scope)'
+  blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
+  blocks_steps: *id002
