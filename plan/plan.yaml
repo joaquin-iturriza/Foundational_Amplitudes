@@ -8393,8 +8393,8 @@ entries:
   owner:
     agent: a4cdf21816cbb03c0
     state: stopped
-    since: '2026-11-04T18:53:27+00:00'
-    state_at: '2026-11-04T18:54:05+00:00'
+    since: '2026-11-04T18:53:21.609000+00:00'
+    state_at: '2026-11-04T18:53:50.425000+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
