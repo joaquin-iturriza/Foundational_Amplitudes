@@ -3754,8 +3754,6 @@ entries:
       a stated fraction of the pp density; candidates: a component drawn from the pp sqrt(s) distribution, an initial-state
       collinear splitter branch for the 2->4 |M|^2 tail. Design only, with the fraction and the measured gap per class, to
       Joaquin before anything is built.'
-    50: 'Step 49 follow-up: Joaquin''s answer on the envelope design (f=0.5; 0.50 13 TeV unweighted + 0.15 at 10.3/16.4 TeV
-      + 0.35 catalog with an initial-state collinear branch), then design review, the validate_v4.py envelope check, generation'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8655,12 +8653,6 @@ entries:
       if:
       - 'design ready: to Joaquin with the fraction and cost'
       - 'a candidate cannot reach 0% outside: say which classes and why'
-    50:
-      feeds: how catalog_v4 is sampled for pp classes
-      if:
-      - 'Joaquin approves: run the design reviewer, build the IS branch and the validate_v4 envelope check, plan the MadEvent
-        queue (about 103 core-h) and the 2->4 regeneration'
-      - 'Joaquin changes f or the weights: rerun envelope_design.py with them and re-propose'
   owner:
     agent: a4cdf21816cbb03c0
     state: working
