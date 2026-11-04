@@ -11328,7 +11328,7 @@ entries:
     which ask for the explainer'
   blocks: nothing
   blocks_steps: *id001
-  checked_until: '2026-11-04T20:21:31+00:00'
+  checked_until: '2026-11-04T21:47:57+00:00'
 - id: warm_start
   title: Warm start from a pretrained model against pretraining from scratch, for a new change
   question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
