@@ -10380,6 +10380,7 @@ entries:
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
     '5': 'Joaquin: syncClaudeAiSkills false in ~/.claude/settings.json, and the CLAUDE.md line for low-effort lookup agents
       (asked 2026-10-31 ~00:30)'
+    '11': step 14, the deck cold-read agent, held under D261/D268
   owner:
     agent: a33c56fbc23d237da
     state: closed
