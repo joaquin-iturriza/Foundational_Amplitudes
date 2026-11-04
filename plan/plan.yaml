@@ -72,7 +72,7 @@ entries:
     stale_because: the figure was drawn as four panel files (figure-style rules), and the old check looked for one pp_trained
       file
   writeup: 8a0f886
-- status: running
+- status: waiting_user
   quotes:
   - said_at: '2026-10-22T03:20:41.808Z'
     text: send the A against B, and while that runs, keep working on this
@@ -610,6 +610,11 @@ entries:
     blocks_steps: []
     answered_at: '2026-10-31T03:37:32.443000+00:00'
     decision: D216
+  - ask: 'You interrupted the launch of this entry''s agent (moving the exploration to catalog_v4): what should change in
+      how it is started?'
+    at: '2026-11-04T18:48:19+00:00'
+    searched: D267 releases it onto catalog_v4; nothing says how; the launch was interrupted 2026-11-04
+    holds_all: Joaquin interrupted its launch; nothing starts until he says how
   id: v3_prep_explore
   title: the preprocessing exploration on catalog_v3 (continuous; moved from Daniel's catalog by D114, 'Keep iterating' 10-24)
   question: 'The level. Open on Daniel''s catalog (held): what the 43 new pay for. Proposed and held by the user (2026-10-21)
@@ -2438,6 +2443,11 @@ entries:
   - at: '2026-10-31T04:24:08+00:00'
     text: 'a compaction inside the turn of owner acd8bbf4e51c1e6d4 at 2026-10-31T04:22:08.879Z: its brief or scope was too
       large; narrow the next brief'
+  ask: 'You interrupted the launch of this entry''s agent (moving the exploration to catalog_v4): what should change in how
+    it is started?'
+  waiting_since: '2026-11-04T18:48:19+00:00'
+  searched: D267 releases it onto catalog_v4; nothing says how; the launch was interrupted 2026-11-04
+  holds_all: Joaquin interrupted its launch; nothing starts until he says how
 - status: done
   quotes:
   - said_at: '2026-10-25T14:50:51.032Z'
