@@ -11353,12 +11353,13 @@ entries:
     - warm_start
   decisions:
   - D282
-  next: 'Design PASSED 2026-11-04 (re-check). First submission of the 12 (22:24) failed at start on a script bug (usage braces,
-    fixed @7f945910, CC synced). On the ws_budget_window timer (about 23:29, after the site gate''s 60-min window clears):
-    site pick FA --jobs 12 --mem 16G, then submit all 12 arms of scripts/job_catalog_v3_short.sh @7f945910 (v4_het_warm25_k533/1066/2132
-    and v4_het_cont_k533/1066/2132, each [_seed2]; --hdr=--mem=16G) with limits at short_wall''s margin-included hours rounded
-    to the minute (2:15, 2:27, 2:49 warm; 2:11, 2:23, 2:45 cont; 29.7 GPU-h, under the gate''s 30), record them and plan wait
-    on all 12; when they end extract reads (mixture_ab.py extract) and add the warm mode'
+  next:
+    1: 'C1 (share 0.25, 12 runs, design passed as part of the superset): on the ws_budget_window timer (about 23:29) site
+      pick FA --jobs 12 --mem 16G and submit the 12 arms of scripts/job_catalog_v3_short.sh @7f945910 with limits 2:15/2:27/2:49
+      (warm25 k533/1066/2132) and 2:11/2:23/2:45 (cont), record them, plan wait on all 12; then extract reads and add the
+      warm mode to mixture_ab.py'
+    2: 'C2-C8 on Joaquin''s go (open ask): implement their arms (parent, recipe, target_stats per the design), C7/C8 only
+      after catalog_coverage step 47 reads the magnitude het pair and shows a gain'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -11941,12 +11942,15 @@ entries:
       warm, continu, resum, pretrain, from scratch (decisions, plan).'
   step_why:
     1:
-      feeds: whether a good change can be added to an existing pretraining by a short warm-started retraining instead of a
-        new pretraining, and at what fraction of its steps (D282)
+      feeds: whether the data change can be added to the pretraining by a short warm start (D282)
       if:
-      - 'MATCH at some k with the change carried: report k/4264 to Joaquin, write up'
-      - 'no k matches or INCONCLUSIVE: report g_k per k; NO goes with the warm-start DyHPO as the next call for Joaquin'
-      - 'a run broke: read its log, fix, resubmit that run'
+      - 'MATCH at some k: report k/4264'
+      - 'no match: report g_k per k'
+    2:
+      feeds: whether warm start reaches scratch across data, loss and target changes (D282 widened)
+      if:
+      - 'go: implement, submit at site pick width'
+      - 'no or a subset: record, run what he names'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
