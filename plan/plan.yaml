@@ -4951,6 +4951,14 @@ entries:
     - 44
     answered_at: '2026-11-03T04:15:59.502000+00:00'
     decision: D258
+  - ask: 'pp tail above the catalog''s |M|^2: add an initial-state collinear branch to the catalog''s splitter before the
+      next catalog round, or leave that tail to the share-0.25 default component?'
+    at: '2026-11-04T18:21:02+00:00'
+    searched: 'site decisions --project FA (D130, D137 catalog_v4 sampling; D245-D258 mixture share 0.25): none decides the
+      splitter''s initial-state corner'
+    blocks: step 48, the splitter change
+    blocks_steps: &id001
+    - 48
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -9302,6 +9310,13 @@ entries:
     files: talks/progress_nov2026/main.tex, analysis/catalog_v4/{fig_shares_bound,fig_signext,error_correlates,size_figs,sampling_example}.py,
       analysis/catalog_v4/data/{size_mse,signed_pools}.json
     written: '2026-11-03T09:13:07+00:00'
+  ask: 'pp tail above the catalog''s |M|^2: add an initial-state collinear branch to the catalog''s splitter before the next
+    catalog round, or leave that tail to the share-0.25 default component?'
+  waiting_since: '2026-11-04T18:21:02+00:00'
+  searched: 'site decisions --project FA (D130, D137 catalog_v4 sampling; D245-D258 mixture share 0.25): none decides the
+    splitter''s initial-state corner'
+  blocks: step 48, the splitter change
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -10546,7 +10561,7 @@ entries:
     searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
       which ask for the explainer'
     blocks: nothing
-    blocks_steps: &id001 []
+    blocks_steps: &id002 []
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -10581,4 +10596,4 @@ entries:
   searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
     which ask for the explainer'
   blocks: nothing
-  blocks_steps: *id001
+  blocks_steps: *id002
