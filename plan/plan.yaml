@@ -10188,6 +10188,12 @@ entries:
     14: 'Deck cold-read agent (Joaquin 2026-11-03: ''it has to be well designed, not this, we will do it later''): removed
       from the weekly-deck skill; brief_guard''s COLD READ exemption (b03f41b1) stays unused. Design it with Joaquin when
       he brings it back.'
+    15: 'Double wake, reopened (Joaquin 2026-11-04, D-next): fix the second wake itself, not the hand-back. Each agent end
+      gives two signals, the SubagentHandback message and the task-notification ''agent finished''; the notification wakes
+      the main session only when it arrives after the main turn ended (4 of 357 wakes since 10-31; 138 arrived mid-turn and
+      woke nothing). Look up (claude-code-guide, low effort) whether Claude Code offers a setting or hook to suppress or absorb
+      a task-notification; try a Stop-hook route that holds the main turn''s end a few seconds when an agent handed back this
+      turn and its notification has not arrived; test on the recorded double wakes (main_turns.py) and on a live agent end.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -10384,6 +10390,11 @@ entries:
       if:
       - 'Joaquin brings it back: design it with him'
       - 'not yet: nothing'
+    15:
+      feeds: 'Joaquin: fix the double wake, not the hand-back'
+      if:
+      - 'a route removes the second wake: keep it, re-measure after a day'
+      - 'none works: say which were tried, with evidence'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
