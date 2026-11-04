@@ -10478,7 +10478,7 @@ entries:
   title: 'Two-loop amplitude datasets: what it takes'
   question: What does generating two-loop amplitude datasets for the catalog require (theory, tools, feasible processes, cost),
     so Joaquin can decide whether and how to do it?
-  status: waiting_user
+  status: running
   quotes: []
   decisions: []
   next: 'Researched explainer for Joaquin: two-loop amplitudes in detail, tools and public results, feasible processes, cost
@@ -10495,6 +10495,7 @@ entries:
   - ask: Approve a researched two-loop explainer as the first step?
     at: '2026-11-04T17:58:43+00:00'
     searched: 'CLAUDE.md and site decisions --project FA searched for two-loop: no decision covers two-loop work before D265'
-  ask: Approve a researched two-loop explainer as the first step?
-  waiting_since: '2026-11-04T17:58:43+00:00'
-  searched: 'CLAUDE.md and site decisions --project FA searched for two-loop: no decision covers two-loop work before D265'
+    answered_at: '2026-11-04T17:59:14+00:00'
+    decision: D265
+    withdrawn_at: '2026-11-04T17:59:14+00:00'
+    withdrawn_why: D265 is Joaquin's request for exactly this explainer, made before the entry existed
