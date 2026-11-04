@@ -14216,7 +14216,7 @@ directs owners; a single Stop gate does the owner and waiter bookkeeping itself 
 turn (D217); guards refuse waiting loops, unreviewed designs and work outside an item; the supervisor sorts every run
 end; and CLAUDE.md holds only rules, with the reference sections pushed into an agent's context by
 \code{.claude/hooks/context\_push.py} on the first tool call that needs them. Four parts of it were measured on the
-recorded transcripts, read in place.
+recorded transcripts, read where they lie.
 
 % src: python3 tools/push_replay.py --since 2026-11-02T05:14:00Z --until 2026-11-04T19:00:00Z --check @d30cb3aa
 % claim: agents=40
@@ -14244,7 +14244,7 @@ that started between the last change of the sections (2026-11-02 05:14 UTC) and 
 reference text is 0.999 of what the transcripts recorded, and 0 agents differ by more than 5\%, so the replay can stand
 in for the live hook. The matched replay on the same transcripts, with only the 8 lines the cut added removed again,
 gives what the agents would have received without it: pushed text per API call falls from 10802 to 8111 tokens on
-average (1586 and 1584 calls: a held call is sent again), from 6024 to 4372 at the median agent, and the pushes' total
+average (over 1586 and 1584 calls, which differ because a held call is sent again), from 6024 to 4372 at the median agent, and the pushes' total
 from 17.13 to 12.85 million token-calls, about a quarter less, as the replay at the cut had predicted. None of the
 corrections these agents received in that window traces to a section the cut withheld (read by hand), so the cut was
 kept.
@@ -14318,8 +14318,8 @@ and the push hook pushed the plan-work section to it. \code{context\_guard.compa
 names the agent whose transcript, written in the last 120 s, holds a compaction boundary newer than the main
 session's; the agent gets a short note of its own and the markers stay. Replayed on every recorded
 \code{SessionStart:compact} hook call from 2026-10-29 to 2026-11-04 19:00 UTC (\code{tools/compaction\_replay.py}), it
-names the right session in 57 of 57: 36 calls of the main session and 21 of agents, these 7 compactions of 5 agents,
-all 21 before the fix.
+names the right session in 57 of 57: 36 calls of the main session and 21 of agents, the latter from 7 compactions of
+5 agents, all before the fix.
 
 % src: python3 tools/model_trial.py report @d30cb3aa
 % claim: sonnet.tasks=10
