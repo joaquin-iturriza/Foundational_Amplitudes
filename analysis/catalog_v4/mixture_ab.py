@@ -1026,11 +1026,12 @@ def length():
         v = "NO"
     else:
         v = "MIXED"
-    out["verdict"] = v
+    out["blowups"] = blowups([x16, x4])
+    out["verdict_on_reads"] = v
+    out["verdict"] = None if out["blowups"]["flagged"] else v       # withheld while a run it reads blew up
     out["caveat"] = ("one seed per length, each the best of an 8-trial DyHPO sweep; both not converged (best lr at the "
                      "window's top, best checkpoint at the last validation); interval widened by the 1x width-8 seed "
                      "pair's |ln R_seed|")
-    out["blowups"] = blowups([x16, x4])
     json.dump(out, open(os.path.join(DATA, "length_x16_over_x4.json"), "w"), indent=1)
     print(json.dumps({r: {n: (x["R"], x["widened"], x["n_classes"]) for n, x in v.items() if isinstance(x, dict)}
                       for r, v in out["reads"].items()}, indent=0))

@@ -295,8 +295,9 @@ def magnitude():
         vb = "the target costs about what it cost under MSE; the het loss or the missing sign cross-entropy the rest"
     else:
         vb = "both matter" if A["R"] <= 0.25 else ">= 3 with (a) > 0.25: the het loss or the missing sign cross-entropy dominates"
-    out["verdict"] = {"a": va, "b": vb, "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"}
     out["blowups"] = blowups(list(MAG))
+    out["verdict_on_reads"] = {"a": va, "b": vb, "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"}
+    out["verdict"] = None if out["blowups"]["flagged"] else out["verdict_on_reads"]   # withheld while a run blew up
     json.dump(out, open(os.path.join(DATA, "het_magnitude.json"), "w"), indent=1)
     for ax, res in out["reads"].items():
         for ref in ("het_control", "mse_control"):

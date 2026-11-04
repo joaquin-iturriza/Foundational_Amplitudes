@@ -117,22 +117,29 @@ def figs():
     base = os.path.join(FIGS, "long_hpo_landscape_hps")
     ps.legend_strip(ax0, base + "_legend", ncol=4)
     ps.save_panels(figs, base)
-    # (2) validation curves
+    # (2) validation curves; every validation drawn, those at or above YCAP at the cap (listed in the printout)
+    YCAP, spikes = 1.0, {}
     fig, axes = ps.figure(ncols=2, sharey=True)
     for ax, (steps, (c, mk, sl)) in zip(axes, col.items()):
         T = d["sweeps"][steps]["trials"]
         b = min(T, key=lambda t: t["val_loss"])
         for t in T:
             v = np.array(tr[t["key"]]["vals"], float)
-            v = v[v[:, 1] < 1.0]                       # warm-up spikes (up to ~1e11) off the scale
+            off = v[:, 1] >= YCAP                      # spikes (warm-up and mid-run, up to ~1e11): kept, drawn at the cap
+            if off.any():
+                spikes.setdefault(steps, {})[t["hp"]] = [[int(a), float(f"{y:.3g}")] for a, y in v[off]]
             best = t is b
-            ax.plot(v[:, 0], v[:, 1], color=c if best else ps.C.grey, lw=1.6 if best else 0.8,
+            ax.plot(v[:, 0], np.minimum(v[:, 1], YCAP), color=c if best else ps.C.grey, lw=1.6 if best else 0.8,
                     alpha=1 if best else 0.6, label=(f"{sl}: best, lr {t['lr']:.2g}" if best else None))
+            ax.scatter(v[off, 0], np.full(off.sum(), YCAP), marker="^", s=14, color=c if best else ps.C.grey, zorder=3)
         ax.plot([], [], color=ps.C.grey, lw=0.8, label=f"{sl}: other trials")
+        ax.scatter([], [], marker="^", s=14, color=ps.C.grey, label="validation off the scale")
+        ax.set_ylim(None, YCAP + 0.3)
         ax.set_xlabel("step")
         ps.legend(ax, "upper right")
     axes[0].set_ylabel(r"val. loss (het. NLL)")
     ps.save(fig, os.path.join(FIGS, "long_hpo_landscape_curves"))
+    print("validations off the scale (step, value) per sweep and trial:", json.dumps(spikes))
     for steps in SWEEPS:
         T = sorted(d["sweeps"][steps]["trials"], key=lambda t: t["val_loss"])
         print(steps, [(t["hp"], round(t["val_loss"], 3), t["lr"], t["ema"]) for t in T])

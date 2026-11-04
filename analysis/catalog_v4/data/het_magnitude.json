@@ -392,11 +392,6 @@
    }
   }
  },
- "verdict": {
-  "a": "YES: the signed pools' signedlog target is the main cause",
-  "b": "the target is all of it",
-  "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"
- },
  "blowups": {
   "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
   "runs": {
@@ -472,5 +467,15 @@
    "FA-ccin2p3-5abe4a0e: training run FA-ccin2p3-5abe4a0e block 0 step 2040",
    "FA-ccin2p3-92207f6a: training run FA-ccin2p3-92207f6a block 0 step 1190"
   ]
+ },
+ "verdict_on_reads": {
+  "a": "YES: the signed pools' signedlog target is the main cause",
+  "b": "the target is all of it",
+  "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"
+ },
+ "verdict": {
+  "a": "YES: the signed pools' signedlog target is the main cause",
+  "b": "the target is all of it",
+  "note": "(b) differs in the loss and the sign cross-entropy: never the loss alone"
  }
 }

@@ -328,8 +328,6 @@
    "mse_x4": 0.26538
   }
  },
- "verdict": "YES",
- "caveat": "one seed per length, each the best of an 8-trial DyHPO sweep; both not converged (best lr at the window's top, best checkpoint at the last validation); interval widened by the 1x width-8 seed pair's |ln R_seed|",
  "blowups": {
   "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
   "runs": {
@@ -372,5 +370,8 @@
   },
   "flagged": [],
   "spiked_recovered": []
- }
+ },
+ "verdict_on_reads": "YES",
+ "verdict": "YES",
+ "caveat": "one seed per length, each the best of an 8-trial DyHPO sweep; both not converged (best lr at the window's top, best checkpoint at the last validation); interval widened by the 1x width-8 seed pair's |ln R_seed|"
 }

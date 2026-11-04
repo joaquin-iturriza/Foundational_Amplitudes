@@ -112,21 +112,22 @@ def _site_json():
     return os.path.join(os.environ.get("SCRATCH") or "/tmp", "sampling_example.json")
 
 
-def pull():
-    """the hist step on CC-IN2P3 through site run; the file it writes, printed after a marker line once hist has
-    exited (nothing else writes then) -> OUT_JSON"""
+def pull(step="hist", out_file="sampling_example.json"):
+    """a step (hist, shape) on CC-IN2P3 through site run; the file it writes in $SCRATCH, printed after a marker line
+    once the step has exited (nothing else writes then) -> analysis/catalog_v4/data/<out_file>"""
     import subprocess
+    src = "sampling_example" if step == "hist" else "sampling_shape"
     res = subprocess.run(["site", "--timeout", "3000", "run", "--item", "catalog_coverage", "ccin2p3", "FA", "--",
-                          "python analysis/catalog_v4/sampling_example.py hist && echo && echo SAMPEX_BEGIN && "
-                          "cat \"${SCRATCH:-/tmp}/sampling_example.json\" && echo"],
+                          f"python analysis/catalog_v4/sampling_example.py {step} && echo && echo SAMPEX_BEGIN && "
+                          f"cat \"${{SCRATCH:-/tmp}}/{src}.json\" && echo"],
                          capture_output=True, text=True, timeout=3100)
     lines = res.stdout.splitlines()
     k = [i for i, l in enumerate(lines) if l.strip() == "SAMPEX_BEGIN"]
     if res.returncode or not k or k[-1] + 1 >= len(lines):
         sys.exit("pull: rc %d, no SAMPEX_BEGIN block\n" % res.returncode + res.stdout[-3000:] + res.stderr[-2000:])
     d = json.loads(lines[k[-1] + 1])
-    open(OUT_JSON, "w").write(lines[k[-1] + 1])
-    print(d["flat_tags"])
+    open(os.path.join(ROOT, "analysis", "catalog_v4", "data", out_file), "w").write(lines[k[-1] + 1])
+    print(d.get("flat_tags") or {x: d.get(x) for x in ("n_candidates", "n_kept", "n_default")})
 
 
 def flat_tags(name, lo, hi, n, role, seed, pool, k):
@@ -192,6 +193,173 @@ def _mismatch(a, b, k):
     return (f"{len(a)} rows, momenta equal {int(mom.sum())}, |M|^2 equal {int(me.sum())}, replayed momenta found "
             f"anywhere in the pool {anyw}, max rel |M|^2 diff {dme:.3g}, max |dp| {dp:.3g}, first momentum mismatch "
             f"row {first}, extra columns {a.shape[1] - 4 * k - 1}")
+
+
+# phase-space variables of the shape study (Joaquin 2026-11-04, on figure c): name -> bin edges
+SHAPE_VARS = {"sqrts": np.logspace(np.log10(30.0), np.log10(6000.0), 31),
+              "mll_over_mz": np.logspace(np.log10(0.1), np.log10(60.0), 41),
+              "ptg": np.logspace(np.log10(10.0), np.log10(3000.0), 31),
+              "absyg": np.linspace(0.0, 5.0, 26),
+              "drgl": np.logspace(np.log10(0.4), np.log10(8.0), 26)}
+MZ = 91.1876
+
+
+def _shape_vars(P, pdg):
+    """per event (P: (N, k, 4) partonic frame, beams first) the shape variables: sqrt(s_hat), the lepton pair's mass
+    over m_Z, the gluon's pT and |rapidity| to the beam axis, and its smallest Delta R to a lepton"""
+    pdg = list(int(x) for x in pdg)
+    ig = pdg.index(21, 2); il = [i for i in range(2, len(pdg)) if abs(pdg[i]) in (11, 13)]
+    q = P[:, il[0]] + P[:, il[1]]
+    mll = np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0, None))
+    g = P[:, ig]
+    pt = np.hypot(g[:, 1], g[:, 2])
+    y = 0.5 * np.log((g[:, 0] + g[:, 3]) / np.clip(g[:, 0] - g[:, 3], 1e-300, None))
+    def eta_phi(v):
+        ptv = np.hypot(v[:, 1], v[:, 2]); return np.arcsinh(v[:, 3] / ptv), np.arctan2(v[:, 2], v[:, 1])
+    eg, pg = eta_phi(g)
+    dr = np.full(len(P), np.inf)
+    for i in il:
+        el, pl = eta_phi(P[:, i]); dphi = np.angle(np.exp(1j * (pg - pl)))
+        dr = np.minimum(dr, np.hypot(eg - el, dphi))
+    return {"sqrts": _sqrts(P), "mll_over_mz": mll / MZ, "ptg": pt, "absyg": np.abs(y), "drgl": dr}
+
+
+def _h2(lm, v):
+    """{var: 2D counts [log10|M|^2 bin][var bin]} (out-of-range values clipped into the edge bins)"""
+    out = {}
+    for k, e in SHAPE_VARS.items():
+        x = np.clip(v[k], e[0], e[-1] * (1 - 1e-12))
+        out[k] = np.histogram2d(np.clip(lm, LOGM_BINS[0], LOGM_BINS[-1] - 1e-9), x, bins=[LOGM_BINS, e])[0].astype(int).tolist()
+    return out
+
+
+def shape():
+    """on CC-IN2P3 (the pools and the standalone): the flat part's candidates of every chunk (replayed as flat_tags
+    does, _candidates and _flat_logm_select recorded), which of them were kept, the kept flat events and the default
+    (MadEvent) events, each as 2D histograms of log10|M|^2 against the SHAPE_VARS -> $SCRATCH/sampling_shape.json"""
+    import tempfile, yaml
+    import datagen
+    import mg5_pipeline_final as mg
+    import mix_compose as mc
+    spec = yaml.safe_load(open(RECIPE))
+    mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
+                                   "sampling": p.get("sampling")} for p in spec["processes"]],
+                                 default_sampling=spec.get("sampling"))
+    p = {q["name"]: q for q in spec["processes"]}[NAME]
+    lo, hi = map(float, p["sqrts"]); n = int(p["n_" + ROLE])
+    cfg = mg.PROCESSES[NAME]; k = int(cfg["nfinal"]) + 2; pdg = cfg["pdg_ids"]
+    with mc._Swap(NAME, mc.control_config(NAME)):
+        ctrl = mg.recipe_output_path(mg.variable_energy_recipe(NAME, lo, hi, n, role=ROLE, seed=SEED),
+                                     datagen.dest_for_role(ROLE))
+    pool = np.asarray(np.load(ctrl, mmap_mode="r"), np.float64)
+    calls, sel = [], []
+    cd, fs = mg._candidates, mg._flat_logm_select
+    def cd_rec(nb, *a, **kw):
+        ev, sq = cd(nb, *a, **kw); calls.append(np.stack([np.asarray(e[0], float) for e in ev])); return ev, sq
+    def fs_rec(logm, n_keep, rng, n_bins=60):
+        keep = fs(logm, n_keep, rng, n_bins=n_bins)
+        sel.append((np.asarray(logm, float).copy(), np.asarray(keep).copy(), int(n_bins))); return keep
+    cand_P, cand_lm, kept_mask, nbins = [], [], [], []
+    with mc._Swap(NAME, mc.control_config(NAME)):
+        datagen.ensure_backend(NAME)
+        tasks = mc.chunk_plan(NAME, lo, hi, n, ROLE, SEED)
+        mg._candidates, mg._flat_logm_select = cd_rec, fs_rec
+        try:
+            start = 0
+            for t in tasks:
+                calls.clear(); sel.clear()
+                with tempfile.TemporaryDirectory(prefix="zz_probe_sampling_") as td:
+                    _, path = datagen.gen_chunk(dict(t, out_dir=td))
+                    ch = np.load(path)
+                m = int(t["count"]); b = pool[start:start + m]
+                if ch.shape != b.shape or not np.allclose(ch, b, rtol=1e-9, atol=0):
+                    raise RuntimeError(f"chunk {t['idx']}: the replay differs from the pool's rows: " + _mismatch(ch, b, k))
+                if len(sel) != 1:
+                    raise RuntimeError(f"chunk {t['idx']}: {len(sel)} flat selections")
+                lm, keep, nb = sel[0]
+                Pc = np.concatenate(calls[-2:]) if sum(len(c) for c in calls[-2:]) == len(lm) else calls[-1]
+                if len(Pc) != len(lm):
+                    raise RuntimeError(f"chunk {t['idx']}: {len(Pc)} recorded candidates against {len(lm)} labels")
+                km = np.zeros(len(lm), bool); km[keep] = True
+                cand_P.append(Pc); cand_lm.append(lm / np.log(10.0)); kept_mask.append(km); nbins.append(nb)
+                start += m
+        finally:
+            mg._candidates, mg._flat_logm_select = cd, fs
+    Pc = np.concatenate(cand_P); lmc = np.concatenate(cand_lm); km = np.concatenate(kept_mask)
+    fin = np.isfinite(lmc)
+    vc = _shape_vars(Pc[fin], pdg)
+    out = {"class": NAME, "role": ROLE, "seed": SEED, "logm_bins": LOGM_BINS.tolist(),
+           "vars": {kk: e.tolist() for kk, e in SHAPE_VARS.items()}, "n_chunks": len(tasks), "select_bins": nbins,
+           "n_candidates": int(len(lmc)), "n_candidates_finite": int(fin.sum()), "n_kept": int(km.sum())}
+    out["candidates"] = _h2(lmc[fin], vc)
+    out["kept"] = _h2(lmc[fin][km[fin]], {kk: v[km[fin]] for kk, v in vc.items()})
+    _, _, pol, _, _ = mc._sampler_args(cfg, ROLE)
+    m_list, cuts, _, _, _ = mc._sampler_args(cfg, ROLE)
+    Pd, sq_d, me_d = mc._default_accepted(pol["default_source"], ROLE, SEED, (lo, hi, m_list, pdg, cuts))
+    Pd = np.asarray(Pd, float).reshape(len(Pd), k, 4)
+    out["default"] = _h2(np.log10(np.asarray(me_d, float)), _shape_vars(Pd, pdg))
+    out["n_default"] = int(len(Pd))
+    with open(os.path.join(os.environ.get("SCRATCH") or "/tmp", "sampling_shape.json"), "w") as f:
+        json.dump(out, f, separators=(",", ":"))
+    print("shape: wrote", out["n_candidates"], "candidates,", out["n_kept"], "kept,", out["n_default"], "default")
+
+
+def pull_shape():
+    """shape on CC-IN2P3 -> data/sampling_shape.json"""
+    pull("shape", "sampling_shape.json")
+
+
+def shape_figs():
+    """from data/sampling_shape.json (values outside a variable's range are counted in its edge bins): (a) the flat part's candidates and kept events per 0.25-dex bin of log10|M|^2
+    (kept counts against their mean over the flat range), printed per bin; (b-f) per variable, the share of events
+    with log10|M|^2 > TOP among the default events, the candidates and the kept flat events, per variable bin, and
+    each set's distribution of that variable among its own top events -> figs/sampling_shape_*.{png,pdf}"""
+    import plot_style as ps
+    d = json.load(open(os.path.join(ROOT, "analysis", "catalog_v4", "data", "sampling_shape.json")))
+    lb = np.array(d["logm_bins"]); mid = 0.5 * (lb[1:] + lb[:-1])
+    rep = {}
+    c1 = {s: np.array(d[s]["sqrts"]).sum(1) for s in ("candidates", "kept", "default")}
+    nz = np.nonzero(c1["kept"])[0]
+    rep["kept_per_bin"] = {f"{lb[i]:.2f}": int(c1["kept"][i]) for i in range(nz[0], nz[-1] + 1)}
+    rep["candidates_per_bin"] = {f"{lb[i]:.2f}": int(c1["candidates"][i]) for i in range(nz[0], nz[-1] + 1)}
+    rep["kept_over_candidates"] = {f"{lb[i]:.2f}": round(float(c1["kept"][i] / c1["candidates"][i]), 4)
+                                   for i in range(nz[0], nz[-1] + 1) if c1["candidates"][i]}
+    figs = ps.panels(1 + len(SHAPE_VARS))
+    fig, ax = figs[0]
+    ax.stairs(c1["candidates"], lb, color=ps.C.grey, label="candidates (6 per kept event)")
+    ax.stairs(c1["kept"], lb, color=ps.C.blue, label=r"kept: flat in $\log|\mathcal{M}|^2$")
+    ax.stairs(c1["default"] * c1["kept"].sum() / c1["default"].sum(), lb, color=ps.C.vermillion, ls="--",
+              label="default (MadEvent), same total")
+    ax.set_yscale("log"); ax.set_xlim(*LOGM_XLIM); ax.set_ylim(1, None)
+    ax.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$"); ax.set_ylabel("events per 0.25")
+    ps.legend(ax, "upper left")
+    occ = c1["kept"] > 0
+    plateau = float(np.median(c1["kept"][occ]))
+    i_pl = int(np.nonzero(occ)[0][np.argmin(np.abs(c1["kept"][occ] - plateau))])
+    i_top = next(i for i in range(i_pl, len(mid)) if c1["kept"][i] < 0.5 * plateau)
+    TOP = float(lb[i_top])
+    rep["top_rule"] = {"rule": TOP_RULE, "plateau": plateau, "TOP": TOP}
+    top = mid > TOP
+    rep["top_share"] = {s: round(float(c1[s][top].sum() / c1[s].sum()), 4) for s in c1}
+    for (fig, ax), v in zip(figs[1:], SHAPE_VARS):
+        e = np.array(d["vars"][v]); xm = np.sqrt(e[1:] * e[:-1]) if v != "absyg" else 0.5 * (e[1:] + e[:-1])
+        rep[v] = {}
+        for s, col, lab in (("default", ps.C.vermillion, "default (MadEvent)"), ("candidates", ps.C.grey, "candidates"),
+                            ("kept", ps.C.blue, "kept flat")):
+            H = np.array(d[s][v], float)
+            t = H[top].sum(0)
+            ax.stairs(t / max(t.sum(), 1), e, color=col, label=lab + rf", $\log_{{10}}|\mathcal{{M}}|^2>{TOP:g}$")
+            a = H.sum(0)
+            rep[v][s] = {"top_median": float(xm[np.searchsorted(np.cumsum(t), t.sum() / 2)]) if t.sum() else None,
+                         "all_median": float(xm[np.searchsorted(np.cumsum(a), a.sum() / 2)]),
+                         "n_top": int(t.sum())}
+        if v != "absyg":
+            ax.set_xscale("log")
+        ax.set_xlabel(SHAPE_LAB[v]); ax.set_ylabel("fraction of the top events")
+        ps.legend(ax, "upper left")
+    ps.save_panels(figs, FIGS.replace("sampling_example", "sampling_shape"))
+    json.dump(rep, open(os.path.join(ROOT, "analysis", "catalog_v4", "data", "sampling_shape_report.json"), "w"), indent=1)
+    print(json.dumps(rep, indent=0))
 
 
 def figs():
@@ -263,4 +431,5 @@ def figs():
 
 
 if __name__ == "__main__":
-    {"hist": hist, "pull": pull, "figs": figs}[sys.argv[1]]()
+    {"hist": hist, "pull": pull, "figs": figs, "shape": shape, "pull_shape": pull_shape,
+     "shape_figs": shape_figs}[sys.argv[1]]()
