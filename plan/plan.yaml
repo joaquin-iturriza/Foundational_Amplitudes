@@ -10500,9 +10500,9 @@ entries:
     withdrawn_why: D265 is Joaquin's request for exactly this explainer, made before the entry existed
   owner:
     agent: afe065cc8cddf65c1
-    state: working
+    state: stopped
     since: '2026-11-04T17:59:55+00:00'
-    state_at: '2026-11-04T17:59:55+00:00'
+    state_at: '2026-11-04T18:07:08+00:00'
   findings:
   - at: '2026-11-04T18:06:59+00:00'
     text: 'Explainer written (scratchpad two_loop_explainer.html; no repo file). No earlier two-loop work in results.tex,
