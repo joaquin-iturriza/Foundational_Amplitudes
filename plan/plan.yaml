@@ -10503,3 +10503,15 @@ entries:
     state: working
     since: '2026-11-04T17:59:55+00:00'
     state_at: '2026-11-04T17:59:55+00:00'
+  findings:
+  - at: '2026-11-04T18:06:59+00:00'
+    text: 'Explainer written (scratchpad two_loop_explainer.html; no repo file). No earlier two-loop work in results.tex,
+      plan or decisions (only D265). Findings: (1) two-loop label should be a finite remainder/hard function H2 = 2Re<M0|M2fin>
+      + <M1fin|M1fin> in a named scheme (Catani or MS-bar) at mu^2=s, stored with its pieces and H1; the bare finite part
+      used at one loop (virt_e4) is not provided by libraries and needs M1 to O(eps^2). (2) Ready per-point sources: form
+      factors (ee->qq, ee->tt, DY), ee->qqg (EERAD3), massless 4-parton 2->2 (NNLOJET), VVamp/ggVVamp, massless 2->3 LC/FC
+      (NJet 3, FivePointAmplitudes); no public automated two-loop tool (OpenLoops two-loop reduction only for simple cases
+      as of 2412.14856). (3) Cost: analytic routes ms/pt; 2->3 full colour 2.6-9 s/pt (2302.08999, 2106.08664) -> 1e5 events
+      ~200-250 core-h CPU; massive loops via sector decomposition ~2 GPU-h/pt -> infeasible. Proposed order: ee->qq and ee->tt
+      calibration, then ee->qqg and 4-parton, then 2->3 via NJet. Open calls for Joaquin: go/tier; label scheme and whether
+      one-loop pools get remainder labels too.'
