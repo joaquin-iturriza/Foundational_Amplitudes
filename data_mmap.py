@@ -404,6 +404,9 @@ def init_data_recipes_mmap(exp, c):
         "base_trafos": list(cfg.data.amp_trafos),
         "signedlog_quantile": exp._signedlog_quantile(),
         "signedlog_scale_shift": exp._signedlog_scale_shift(),
+        # data.signed_magnitude_target (abslog for the signed pools, no sign head) only when on, so every other key
+        # stays as it was
+        **({"signed_magnitude_target": True} if bool(cfg.data.get("signed_magnitude_target", False)) else {}),
         "shared_standardization": bool(cfg.data.get("shared_standardization", False)),
         "affine_multiplicity_std": bool(cfg.data.get("affine_multiplicity_std", False)),
         "target_physics_factor": ([float(cfg.data.get("target_physics_s0", 289.0)),
