@@ -8283,6 +8283,12 @@ entries:
     units: null
     start: '2026-11-03T01:28:28+00:00'
     at: '2026-11-03T01:28:28+00:00'
+  - batch: het_magnitude
+    wall_h: 3.5
+    jobs: 2
+    units: null
+    start: '2026-11-04T18:33:35+00:00'
+    at: '2026-11-04T18:33:35+00:00'
   step_why:
     32:
       feeds: whether training 16x (68224 steps) beats 4x (17056 steps) at tuned HPs, i.e. which length becomes the foundation
