@@ -3500,6 +3500,9 @@ entries:
     46: 'Catalog sampling does not envelop the pp 13 TeV default pools (Joaquin 2026-11-04): over every pp class, measure
       where default events fall outside the catalog''s sqrt(s) and log|M|^2 support (support, not density), and trace why
       (sqrt(s) window and draw, partonic vs lab cuts, other).'
+    47: 'Het one-loop zero-shot (finding 2026-11-04, het_oneloop.py @fc71ee9e): the het arms'' 12x on HD5 follows the 63 sign-changing
+      one-loop training pools trained on signedlog (no sign head under HETEROSC). Proposed to Joaquin, not run: a het control
+      pair (share 0, seeds 42/43) with those pools on abslog (magnitude only), read on HD5 like the arms'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -8216,6 +8219,11 @@ entries:
       if:
       - 'it covers: show support, not density'
       - 'it does not: name the cause per class and the fix'
+    47:
+      feeds: whether the het loss itself costs the one-loop zero-shot, or only the signed pools' target
+      if:
+      - 'het on abslog reads HD5 within 1.5x of the MSE control: the 12x is the target, the deck says so'
+      - 'it stays above 3x: the het loss costs one-loop transfer, look at sigma weighting'
   owner:
     agent: a0735876e6698c1aa
     state: working
