@@ -12097,8 +12097,16 @@ entries:
     searched: 'CLAUDE.md: HPO objective is val_loss_no_reg (house rule); D284 asks for the lr sweep; nothing settles a change
       of objective'
     blocks: only the step-3 extension
-    blocks_steps: &id002
+    blocks_steps:
     - 3
+  - ask: 'Width growth 8 to 16 is SHORT at every retraining length: R(warm/scratch) on pp 1.75 / 1.59 / 1.29 at 533 / 1066
+      / 2132 steps (bar 1.19), gain reached -0.01 / 0.13 / 0.52 (data change reached 1.07 at 2132). Next: tune the grown warm
+      start with a sweep like step 3''s, try the 16 to 32 pair on the same rule, or stop the shape-changing branch here?'
+    at: '2026-11-05T09:25:31+00:00'
+    searched: D285 asked to test it; no decision covers what follows SHORT
+    blocks: the width-growth follow-up only
+    blocks_steps: &id002
+    - 4
   owner:
     agent: a0ca24cd204278468
     state: stopped
@@ -13056,13 +13064,11 @@ entries:
     units: null
     start: '2026-11-05T04:36:37+00:00'
     at: '2026-11-05T04:36:37+00:00'
-  ask: 'Tuned 533-step warm start came out SHORT and worse than untuned on the held-out reads (R(W/B) 1.59 pp / 2.21 e+e-,
-    gain reached 0.31/0.29 vs untuned 0.55/0.66), while the sweep''s validation NLL improved. Next: (1) the designed 8-trial
-    extension with lr_scale down to 0.01, (2) retune on an objective that follows the reads (e.g. the mean''s validation MSE
-    instead of the NLL), or (3) drop tuning and test a warmup-stable-decay schedule with a short cooldown?'
-  waiting_since: '2026-11-05T05:41:13+00:00'
-  searched: 'CLAUDE.md: HPO objective is val_loss_no_reg (house rule); D284 asks for the lr sweep; nothing settles a change
-    of objective'
+  ask: 'Width growth 8 to 16 is SHORT at every retraining length: R(warm/scratch) on pp 1.75 / 1.59 / 1.29 at 533 / 1066 /
+    2132 steps (bar 1.19), gain reached -0.01 / 0.13 / 0.52 (data change reached 1.07 at 2132). Next: tune the grown warm
+    start with a sweep like step 3''s, try the 16 to 32 pair on the same rule, or stop the shape-changing branch here?'
+  waiting_since: '2026-11-05T09:25:31+00:00'
+  searched: D285 asked to test it; no decision covers what follows SHORT
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
@@ -13220,5 +13226,5 @@ entries:
       par:v4_warm_start_tuned, par:v4_warm_start_grow). Branch ws-grow-sigma merged but undeleted (needs git branch -D); worktrees/wt-ws-ckpt
       and wt-ws-grow merged, removal pending.'
     written: '2026-11-05T09:25:04+00:00'
-  blocks: only the step-3 extension
+  blocks: the width-growth follow-up only
   blocks_steps: *id002
