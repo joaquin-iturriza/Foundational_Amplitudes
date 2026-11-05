@@ -12012,6 +12012,17 @@ entries:
   - at: '2026-11-04T21:53:54+00:00'
     text: 'Correction to the run count: C2-C6 plus C8 are 54 runs (C2 6, MSE controls 6, C3 6, C4 6, C5 6, C6 12 warm + 6
       controls, C8 6), not 48; the 79.8 GPU-h stands. The design''s ''54 with C7, C8'' was 60.'
+  - at: '2026-11-05T00:54:22+00:00'
+    text: 'C1 (share 0.25, het) read, mixture_ab.py warm C1 @f0015680 -> data/warm_start_C1.json; every read from the run''s
+      own job at its sigma-stage model (D276), no run blew up (spikes recovered on 0564ad5b at 588, a97e8083 at 630). R over
+      the parent A (het control) on PP4 / EE4 (all classes): from scratch B 0.450 / 0.223; warm start W_k at k=533, 1066,
+      2132: 0.646 / 0.373, 0.543 / 0.285, 0.425 / 0.229; matched control C_k (same warm start on share 0): 1.02 / 1.05, 0.94
+      / 0.96, 0.81 / 0.85. R(W_k/B) PP4 / EE4 (widened): k=533 1.33 [1.30, 1.37] / 1.51 [1.37, 1.71] SHORT; k=1066 1.15 [1.13,
+      1.18] / 1.23 [1.14, 1.33] MATCH by the 1.35 bound but resolved worse; k=2132 0.95 [0.94, 0.97] / 1.01 [0.96, 1.07] MATCH
+      and equal. Change carried at every k (R(W_k/C_k) PP4 0.62, 0.59, 0.56; EE4 0.36, 0.30, 0.27). g_k (share of ln B/A reached)
+      PP4 0.55, 0.76, 1.07; EE4 0.66, 0.84, 0.98; held-out default-sampled pooled 0.62, 0.80, 1.14 (W/B 1.19, 1.08, 0.94).
+      Verdict by the design''s rule: YES at k=1066 (0.25 of the from-scratch steps); equal to scratch on every read only at
+      k=2132 (0.50). Figure analysis/catalog_v4/figs/warm_start_C1.png.'
   step_waits:
     '1': FA-ccin2p3-341bf564 FA-ccin2p3-254abf4f FA-ccin2p3-ed946736 FA-ccin2p3-8e41ac1e FA-ccin2p3-f699e170 FA-ccin2p3-04fc5b3b
       FA-ccin2p3-343e3d58 FA-ccin2p3-c2acc1fc FA-ccin2p3-aa64733e FA-ccin2p3-c477a52c FA-ccin2p3-0564ad5b FA-ccin2p3-a97e8083
