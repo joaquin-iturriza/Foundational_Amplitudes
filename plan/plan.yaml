@@ -3664,6 +3664,14 @@ entries:
     answers_after: '2026-11-03T03:39:26+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-11-05T03:52:16.921000+00:00'
+    text: '1. Let''s do b)
+
+      2. Yes, build it and run the check'
+    decision: D288
+    answers_after: '2026-11-05T02:15:52+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3690,6 +3698,7 @@ entries:
   - D235
   - D254
   - D258
+  - D288
   next:
     32: 'Long-run DyHPO sweeps on CC-IN2P3 at deb290bc (atomic-mkdir locks; generate_sweep + sweep_manager on the CC login
       node, state on /sps; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f, unchanged at
@@ -5236,6 +5245,8 @@ entries:
     blocks: step 48, the splitter change
     blocks_steps:
     - 48
+    answered_at: '2026-11-05T03:52:16.220000+00:00'
+    decision: D288
   - ask: 'Envelope design: build f = 0.5 with 0.70 of each hadronic tree class from our own |M|^2-unweighted partonic sampler
       at the class''s pp sqrt(s) distribution widened 0.05 dex, and 0.30 the current mixture with an initial-state collinear
       splitter branch (about 860 core-h CPU)? Or 0.60 / 0.40 (more mass beyond the pp range, 12 classes slightly short)?'
@@ -5245,6 +5256,8 @@ entries:
     blocks: the design review, the sampler code, the validate_v4 envelope check and the regeneration
     blocks_steps:
     - 49
+    answered_at: '2026-11-05T03:52:16.220000+00:00'
+    decision: D288
   - ask: 'Sampling redesign: keep the sampling study''s mixture (bulk RAMBO/democratic + flat-log|M|^2 admixture + forward)
       and change only the sqrt(s) draw to cover the pp range densely and continue wider, or do you see it differently?'
     at: '2026-11-04T19:20:38+00:00'
@@ -5253,6 +5266,8 @@ entries:
     blocks: the step-49 envelope design redo
     blocks_steps:
     - 49
+    answered_at: '2026-11-05T03:52:16.220000+00:00'
+    decision: D288
   - ask: 'Het. loss reporting: keep reading the main run''s best checkpoint, or report the kept post-sigma-retraining model''s
       het. loss (D95 keeps only that model)?'
     at: '2026-11-04T19:20:41+00:00'
@@ -5274,9 +5289,11 @@ entries:
     searched: D287 asks for the combination but no seed count or tolerance; seeds/tolerance and the sampling redesign are
       Joaquin's (scope rule; 'we are not done talking about the sampling')
     blocks: steps 56 and 57 only
-    blocks_steps: &id001
+    blocks_steps:
     - 56
     - 57
+    answered_at: '2026-11-05T03:52:16.220000+00:00'
+    decision: D288
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -10176,16 +10193,6 @@ entries:
       analysis/catalog_v4/long_hpo_landscape.py, analysis/catalog_v4/data/length_x16_over_x4.json, analysis/catalog_v4/data/het_magnitude.json,
       analysis/catalog_v4/data/sampling_example.json
     written: '2026-11-04T21:46:54+00:00'
-  ask: 'Sign head with het (D287), magnitude test at 4 seeds cannot resolve a 1.25 no-worse tolerance (pair''s own seed ratio
-    1.28/1.41): (a) accept ~1.5 tolerance, (b) seed-paired contrast checked on the first pair, or (c) more seeds at ~5 GPU-h
-    per extra pair? And the flat-part candidate change (multichannel: Breit-Wigner channels per s-channel propagator, an initial-state
-    collinear channel, shares adapted by |M|^2): go to implement it in a worktree and run the CPU check on 5 classes, or another
-    route?'
-  waiting_since: '2026-11-05T02:15:52+00:00'
-  searched: D287 asks for the combination but no seed count or tolerance; seeds/tolerance and the sampling redesign are Joaquin's
-    (scope rule; 'we are not done talking about the sampling')
-  blocks: steps 56 and 57 only
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -11640,7 +11647,7 @@ entries:
       D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
       change the scope)'
     blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
-    blocks_steps: &id002 []
+    blocks_steps: &id001 []
   owner:
     agent: af3e3405e0def313b
     state: stopped
@@ -12309,7 +12316,7 @@ entries:
     D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
     change the scope)'
   blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
-  blocks_steps: *id002
+  blocks_steps: *id001
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
