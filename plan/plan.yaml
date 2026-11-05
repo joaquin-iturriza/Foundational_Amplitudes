@@ -3738,6 +3738,11 @@ entries:
       than the MSE control on H5 17/21, HD5 15/19; not better than all-positive) though it fits the training signs (0.99);
       magnitude UNRESOLVED (pairing failed, R ~1.03 [0.64,1.56]). Waiting on his call: keep the het magnitude target without
       a sign, change the sign loss weight or how the sign head is attached, or use the MSE model for the sign'
+    62: 'Step 43 results to Joaquin (findings 2026-11-05): (1) loader control UNRESOLVED by its rule only on one value (seed-43
+      held-default memmap/rerun 0.897, |ln| 0.109 vs the 0.094 rerun-spread bound); PP4 R_L 1.059/0.981 against the 1.39 gap;
+      his call whether that unblocks the warm_start whole-set change on this point. (2) e+e- larger default-share gain: ordered
+      by the control''s MSE and the |M|^2 coverage, EE4 x0.56 left unexplained by marginal coverage; closed without a new
+      reading'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -9256,6 +9261,11 @@ entries:
       if:
       - 'Joaquin picks a change: design it under the same reads'
       - 'Joaquin drops the sign under het: note it in results.tex with this read'
+    62:
+      feeds: whether the loading path is ruled out as the cause of the full-set w8 gap (warm_start waits on it)
+      if:
+      - 'Joaquin takes it as clear: tell warm_start, write up par in results.tex'
+      - 'Joaquin wants it resolved: more seeds of the pair, his call on cost'
   owner:
     agent: a9838af5fa2f7d0bb
     state: working
