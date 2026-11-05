@@ -8770,6 +8770,43 @@ entries:
       results.tex memmap/memory-mapped/loading path, site decisions memmap/in-memory/1e4/events per process: no earlier run
       separates the two keys), 6, 7, 8, 9 (het loss, D71), 10 (PP4, EE4, held default as the control''s reads), 11, 12 (only
       data.memmap moves in the script diff), 13 (no sweep).'
+  - at: '2026-11-05T05:19:39+00:00'
+    question: 'Step 43(1): at width 8 and 4264 steps the whole training set on the memmap path (1x width cells w8, 1e5 events
+      per process, 0.64 epoch) reads worse than the 1e4-per-process short arm in memory (6.07 epochs); their configs differ
+      in exactly data.memmap and data.train_subsample. Is the loading path part of the gap? The short arm with data.memmap=true
+      against a same-commit, same-GPU in-memory rerun of the same arm and seed.'
+    prior: 'arms_vs_het_control.json (mixture_ab.py): default25_1e4 (FA-ccin2p3-f0156d88/df858d33, 2026-10-31, PP4 rereads
+      9538e607/ed96b552) PP4 MSE 0.0876, EE4 0.150, held default 0.681; w8_full (804a65bc/66e8c31f) PP4 0.1216, EE4 0.184,
+      held default 0.934. Same-seed rerun spread measured before: a catalog trial rerun at its own HPs and seed 0.054 -> 0.068
+      (25%, results.tex ~l.10546), per-process reruns 0.43-2.5x (~l.11684). tests/test_memmap_data.py: memmap bitwise equal
+      to in-memory on CPU subsets only. Searched results.tex (memmap, memory-mapped, loading path, 1e4, events per process),
+      the plan, site decisions: no run separates the two keys.'
+    measure: 'Per seed and read (PP4 trained 797 classes, EE4 115, held-out default-sampled 700): R = median over classes
+      of the class''s geometric mean of run over reference, MSE of log|M|^2 as mixture_ab reads it; plus best aggregate val_loss_no_reg
+      (sigma stage, D276). Two contrasts per seed: loader R_L = memmap / in-memory rerun (same commit, GPU type, seed); rerun
+      spread R_0 = in-memory rerun / the 2026-10-31 in-memory arm (same seed, older commit).'
+    check: 'On existing data the measure separates the two cells to be split: PP4 MSE ratio full/1e4 = 1.39 (ln 0.33), against
+      the control''s seed ratio 1.14 (PP4), 1.12 (EE4), 1.22 (held default). The rerun spread is unknown at this horizon and
+      measure, hence the in-memory reruns, which measure it directly (R_0).'
+    fixed: Everything of arm v4_het_default25[_seed2] (scripts/job_catalog_v3_short.sh at the launch commit, recipe catalog_v4_default25_train.yaml,
+      width 8, 4264 steps, train_subsample 1e4, eval_subsample 200, het loss + sigma stage, MUON_BEST HPs, reads H1-H7c, PP4,
+      EE4); all four jobs at one commit, on gpu_v100 only (--hdr=--partition=gpu_v100; the control's node ccwgslurm0112 is
+      a V100 node), so TF32 and GPU type do not differ. Only ++data.memmap (SHORT_MEMMAP=true, run dir <arm>_memmap) differs
+      between the loader pair; the reruns write <arm>_rerun (a RERUN switch, run dir only).
+    control: The in-memory rerun of the same arm and seed at the same commit and GPU type (new, 2 jobs); the 2026-10-31 arm
+      (f0156d88, df858d33) only as the reference of the rerun spread R_0.
+    seeds: 42 and 43 for both the memmap and the in-memory rerun
+    outcome: 'Let s = max over seeds and reads of |ln R_0| (the rerun spread), and g = ln 1.39 = 0.33 the gap. LOADING PATH
+      CLEAR: on both seeds and all three reads |ln R_L| <= max(s, 0.05) and < g/3 -> the gap is data size/epochs, reported;
+      the warm_start whole-set change is unblocked on this point. LOADING PATH IMPLICATED: on both seeds, on PP4 and at least
+      one other read, ln R_L >= g/2 (toward the full cells) and > 2s -> bisect memmap vs in-memory on CPU (test_memmap_data
+      section 2 on this run''s config) before any further memmap run. NOISE-LIMITED: s >= g/2 (reruns move as much as the
+      gap) -> report that a two-seed run cannot separate the loader at this measure, with the numbers, and propose more seeds
+      to Joaquin. Otherwise UNRESOLVED, reported with the numbers. Cost: 4 GPU jobs on V100, work about 2.7 h each (4264 x
+      1.01 s + 2171 probes x 1.45 s + sigma stage 20 min + start-up 15 min; memmap + 1e4 cache build), limit 03:50:00 = tools/short_wall.py''s
+      3.47 h with reads plus the cache build, so the reads finish inside it (the 10-31 arm was cut at a 2.5 h limit that counted
+      training only); about 11 GPU-h of work, 15.3 at the limits. Disk: a 1e4 cache is about 2.3 GB (1/10 of the 23 GB whole-set
+      cache); the key holds the RNG state, so one per seed, 4.6 GB against 87 GB free on /sps/lpnhe (read 2026-11-05 06:15).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
