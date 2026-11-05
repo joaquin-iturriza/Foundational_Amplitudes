@@ -178,7 +178,13 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
     print("MCHECK_DONE", name, json.dumps({k: [r["kept_max"], r["above_max"]] for k, r in out["runs"].items()}))
 
 
-def judge(r, q999):
+def _pp_quantile(hist, q):
+    """the lower edge of the 0.25-dex bin holding the q quantile of a pp histogram"""
+    c = np.cumsum(hist) / max(np.sum(hist), 1)
+    return float(LOGM_BINS[int(np.searchsorted(c, q))])
+
+
+def judge(r, q999, pp_hist=None):
     """the pass rule on one run: above_max (pp events in the support) and the kept bins' least over their median,
     between the kept part's lowest value and the in-support pp events' 99.9% quantile (bins wholly inside)"""
     e = LOGM_BINS
@@ -188,7 +194,14 @@ def judge(r, q999):
     plateau = float(np.median(v)) if len(v) else None
     mo = float(v.min() / plateau) if len(v) and plateau else None
     low = [float(e[i]) for i in np.nonzero(inside)[0] if plateau and h[i] < 0.5 * plateau]
+    # where the failing bins sit: below the pp events' bulk (the bottom edge) or within it, from its median up
+    med = _pp_quantile(pp_hist, 0.5) if pp_hist is not None else None
+    top = [x for x in low if med is not None and x >= med]
+    top_all = [float(e[i]) for i in np.nonzero(inside)[0] if med is not None and e[i] >= med]
     return {"above_max": r["above_max"], "above_max_all": r.get("above_max_all"), "n_bins": int(len(v)),
+            "pp_median_bin": med, "bins_from_pp_median": len(top_all), "bins_below_half_from_pp_median": top,
+            "min_over_plateau_from_pp_median": float(min(h[i] for i in np.nonzero(inside)[0] if e[i] >= med) / plateau)
+            if med is not None and top_all and plateau else None,
             "plateau": plateau, "min_over_plateau": mo, "bins_below_half": low,
             "pass": bool(r["above_max"] <= 0.001 and mo is not None and mo >= 0.5)}
 
@@ -207,7 +220,7 @@ def summary():
         c = {"probe": d["probe"], "resonances": d["resonances"], "res_params": d.get("res_params"), "pp_n": d["pp"]["n"],
              "pp_out_of_support": d["pp"]["out_of_support"], "pp_q999_in_support": q}
         for pol in ("current", "multichannel"):
-            js = {s: judge(d["runs"][f"{pol}_{s}"], q) for s in SEEDS}
+            js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in SEEDS}
             ch = d["runs"][f"{pol}_{SEEDS[0]}"]["chunks"]
             kc = np.sum([x["kept_per_channel"] for x in ch], 0).tolist() if ch else None
             c[pol] = {"seeds": js, "pass": all(j["pass"] for j in js.values()),
@@ -220,15 +233,18 @@ def summary():
     json.dump(out, open(os.path.join(DATA, "multichannel_check.json"), "w"), indent=1)
 
 
+PULL_REMOTE = r'''
+import json, os, sys
+print("MCHECK_READ " + open(os.path.join(os.environ["SCRATCH"], "zz_mcheck", sys.argv[1] + ".json")).read().strip())
+'''
+
+
 def pull():
-    import subprocess
+    """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/"""
+    from analysis.common import site_python
     os.makedirs(READS, exist_ok=True)
     for name in CLASSES:
-        out = subprocess.run(["site", "--timeout", "300", "run", "ccin2p3", "FA", "--",
-                              f'echo MCHECK_BEGIN; cat "$SCRATCH/zz_mcheck/{name}.json"; echo; echo MCHECK_END'],
-                             capture_output=True, text=True, timeout=400).stdout
-        body = out.split("MCHECK_BEGIN", 1)[-1].split("MCHECK_END", 1)[0].strip()
-        d = json.loads(body)
+        d = site_python(PULL_REMOTE, [name], "MCHECK_READ", timeout=300)
         json.dump(d, open(os.path.join(READS, f"{name}.json"), "w"), separators=(",", ":"))
         print("pulled", name, sorted(d["runs"]))
 
