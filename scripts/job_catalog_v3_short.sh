@@ -366,6 +366,13 @@ if [ -n "$SHORT_MEMMAP" ]; then
     EXTRA=("${EXTRA[@]/#++data.memmap=false/++data.memmap=true}")
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_memmap"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_memmap"
 fi
+# SHORT_RERUN=true: the same arm in memory, unchanged, in its own run dir <arm>_rerun (the same-commit, same-GPU twin of
+# SHORT_MEMMAP and the measure of the same-seed rerun spread against the original arm)
+if [ -n "$SHORT_RERUN" ]; then
+    [ -n "$SHORT_MEMMAP" ] && { echo "SHORT_RERUN and SHORT_MEMMAP are exclusive"; exit 1; }
+    case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "SHORT_RERUN only on v4_het_default25[_seed2]"; exit 1 ;; esac
+    OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_rerun"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_rerun"
+fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
 # LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; only the steps move: every cell trains on the whole train pool,
 # 1e5 events per tree process, 5e4 one-loop, and validates on 200 per process like the short arms, Joaquin D236), LONG_LR=<lr> (the 4x lr DyHPO's best, the law's scaling at 16x; 1x keeps the
