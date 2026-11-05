@@ -3758,9 +3758,6 @@ entries:
       Joaquin before anything is built.'
     50: 'Step 49 follow-up: Joaquin''s answer on the own-sampler envelope design (f 0.5; 0.70 own |M|^2-unweighted at pp''s
       sqrt(s_hat) widened 0.05 dex + 0.30 current mixture with the initial-state collinear branch; about 800 core-h CPU)'
-    51: 'Cancel the 19 pending Jean Zay jobs (Joaquin 2026-11-04: ''Just cancel the jeanzay jobs''): 717808 717798 717796
-      717791 717020-717034. site run jeanzay times out (jean-zay.idris.fr not responding) while site status answers: fix site
-      run on Jean Zay, then scancel them.'
     52: 'Envelope design redo, pending Joaquin''s word: keep the sampling study''s mixture (bulk RAMBO/democratic + flat-log|M|^2
       admixture f 0.25-0.5 + forward), change the sqrt(s) draw to cover the pp range densely and continue wider; drop the
       70% |M|^2-proportional component unless shown necessary.'
@@ -9057,11 +9054,6 @@ entries:
       - 'approved: design review, build the unweighting and the IS branch, validate_v4 envelope check, then the generation
         queue'
       - 'f or weights changed: rerun envelope_design.py own and re-propose'
-    51:
-      feeds: Joaquin's instruction to cancel the old Jean Zay queue
-      if:
-      - 'site run works: cancel and confirm with site status'
-      - 'still times out: fix the site tool''s Jean Zay run path first'
     52:
       feeds: the catalog sampling redesign Joaquin asked for (cover the pp range and wider, enough data)
       if:
