@@ -17,7 +17,15 @@ a measure-zero set for the catalog's draw; on pp sqrt(s_hat) is spread, partly c
   read   per class (the census classes, as mixture_ab) log R of the arm over the control (each seed's probe ratio, the
          seeds' geometric mean) against the class's density gain log10(m/c); medians per probe set, Spearman correlation
          within PP4, within EE4 and pooled, and the EE4-PP4 gap at matched density gain (classes binned in it)
-    python3 analysis/catalog_v4/ee_gain.py pull | read
+  pull_kin / read_kin   the next readings (the sqrt(s) one did not order the gain): the same density gain, per test
+         event, in four variables, each in the partonic centre-of-mass frame: log10 sqrt(s) (window +-log10 1.02),
+         the most forward final's log10(1 - |cos theta|) against the beam, the most collinear final pair's
+         log10(1 - cos theta_ij), and log10 |M|^2 (windows +-0.1); per probe the median gain per variable ->
+         data/ee_gain_kin.json; read as `read`, per variable -> data/ee_gain_kin_read.json
+  read_level   the per-class target level: log R against the control's own MSE of the class (does the default
+         share help most where the control is worst, and is EE4 still ahead at matched control MSE)
+         -> data/ee_gain_level.json
+    python3 analysis/catalog_v4/ee_gain.py pull | read | pull_kin | read_kin | read_level
 """
 import json, os, sys
 
@@ -60,6 +68,59 @@ print("EEGAIN " + json.dumps(out))
 '''
 
 
+PULL_KIN = r'''
+import json, sys, numpy as np
+sys.path.insert(0, "analysis/common")
+from readers import find_pool
+SHARE, N_CAT = float(sys.argv[1]), int(sys.argv[2])
+pairs = json.load(open(sys.argv[3]))
+WIN = {"sqrts": float(np.log10(1.02)), "fwd": 0.1, "coll": 0.1, "logm2": 0.1}
+def boost(p, b):
+    b2 = np.clip((b ** 2).sum(-1), 1e-300, None)
+    g = 1 / np.sqrt(np.clip(1 - b2, 1e-300, None))
+    bp = (b[:, None, :] * p[..., 1:]).sum(-1)
+    e = g[:, None] * (p[..., 0] - bp)
+    v = p[..., 1:] + (((g - 1) / b2)[:, None] * bp - g[:, None] * p[..., 0])[..., None] * b[:, None, :]
+    return np.concatenate([e[..., None], v], -1)
+def feats(path, n):
+    a = np.asarray(np.load(path, mmap_mode="r")[:n], dtype=np.float64)
+    k = (a.shape[1] - 1) // 5
+    p = a[:, :4 * k].reshape(-1, k, 4)
+    P = p[:, 0] + p[:, 1]
+    q = boost(p, P[:, 1:] / P[:, :1])
+    ax = q[:, 0, 1:] / np.linalg.norm(q[:, 0, 1:], axis=-1, keepdims=True)
+    f = q[:, 2:, 1:]
+    u = f / np.clip(np.linalg.norm(f, axis=-1, keepdims=True), 1e-300, None)
+    c = (u * ax[:, None, :]).sum(-1)
+    fwd = np.log10(np.clip(1 - np.abs(c), 1e-12, None)).min(1)
+    cij = np.einsum("nid,njd->nij", u, u)
+    iu = np.triu_indices(k - 2, 1)
+    coll = np.log10(np.clip(1 - cij[:, iu[0], iu[1]], 1e-12, None)).min(1) if k > 3 else np.zeros(len(a))
+    s = np.sqrt(np.clip(P[:, 0] ** 2 - (P[:, 1:] ** 2).sum(1), 1e-300, None))
+    m = np.abs(a[:, -1])
+    return {"sqrts": np.log10(s), "fwd": fwd, "coll": coll, "logm2": np.log10(np.clip(m, 1e-300, None))}
+out = {}
+for probe, cls in pairs:
+    tp, cp = find_pool(probe, role="test"), find_pool(cls, role="val")
+    if tp is None or cp is None:
+        out[probe] = {"missing": [tp is None, cp is None]}; continue
+    T, C = feats(tp, 2000), feats(cp, N_CAT)
+    r = {"cls": cls, "n_test": int(len(T["sqrts"]))}
+    for v, w in WIN.items():
+        t, c = np.sort(T[v]), np.sort(C[v])
+        lo, hi = t - w, t + w
+        cs = (np.searchsorted(c, hi) - np.searchsorted(c, lo)) / len(c)
+        ts = (np.searchsorted(t, hi) - np.searchsorted(t, lo)) / len(t)
+        g = np.log10(((1 - SHARE) * cs + SHARE * ts) / np.maximum(cs, 0.5 / len(c)))
+        r[v] = {"gain_median": float(np.median(g)), "c_zero": float(np.mean(cs == 0)),
+                "test_median": float(np.median(t)), "cat_median": float(np.median(c))}
+    out[probe] = r
+print("EEKIN " + json.dumps(out))
+'''
+VARS = ("sqrts", "fwd", "coll", "logm2")
+OUT_KIN = os.path.join(DATA, "ee_gain_kin.json")
+
+
 def arm_runs():
     import mixture_ab as mab
     return mab.MIX_HET["default25"], mab.MIX_HET["control"], mab.class_of()
@@ -82,16 +143,22 @@ def probes():
     return out
 
 
-def pull():
+def pull(kin=False):
+    """sqrt(s) gain (pull) or the four kinematic gains (pull_kin) on CC; the probe list goes inside the script."""
     from readers import site_python
     pr = probes()
     pairs = [[p, c] for p, (ax, c) in pr.items()]
-    # the probe list goes over inside the script (site_python sends only the script)
-    script = PULL.replace("pairs = json.load(open(sys.argv[4]))", "pairs = " + json.dumps(pairs))
-    res = site_python(script, [str(W), str(SHARE), str(N_CAT), "-"], "EEGAIN", timeout=1800)
+    if kin:
+        script = PULL_KIN.replace("pairs = json.load(open(sys.argv[3]))", "pairs = " + json.dumps(pairs))
+        res = site_python(script, [str(SHARE), str(N_CAT), "-"], "EEKIN", timeout=3000)
+        head, out = {"share": SHARE, "n_cat": N_CAT}, OUT_KIN
+    else:
+        script = PULL.replace("pairs = json.load(open(sys.argv[4]))", "pairs = " + json.dumps(pairs))
+        res = site_python(script, [str(W), str(SHARE), str(N_CAT), "-"], "EEGAIN", timeout=1800)
+        head, out = {"window_rel": W, "share": SHARE, "n_cat": N_CAT}, OUT
     for p, v in res.items():
         v["axis"] = pr[p][0]
-    json.dump({"window_rel": W, "share": SHARE, "n_cat": N_CAT, "probes": res}, open(OUT, "w"), indent=1)
+    json.dump(dict(head, probes=res), open(out, "w"), indent=1)
     miss = [p for p, v in res.items() if "missing" in v]
     print(json.dumps({"n": len(res), "missing": len(miss), "first_missing": miss[:5]}))
 
@@ -140,5 +207,87 @@ def read():
     print(json.dumps(out))
 
 
+def class_log_r():
+    """{axis: {class: (mean over the class's probes of the seeds' mean log R, the control's log MSE likewise)}}."""
+    import mixture_ab as mab
+    arm, ctl, cls = arm_runs()
+    tr = trained()
+    out = {}
+    for ax in ("EE4", "PP4"):
+        a = [json.load(open(os.path.join(mab.READS, f"{r}_{ax}.json")))["mse"] for r in arm[ax]]
+        c = [json.load(open(os.path.join(mab.READS, f"{r}_{ax}.json")))["mse"] for r in ctl[ax]]
+        by = {}
+        for p in a[0]:
+            if cls(p) not in tr or not all(p in x for x in a + c):
+                continue
+            by.setdefault(cls(p), []).append((np.mean([np.log(a[s][p] / c[s][p]) for s in range(2)]),
+                                               np.mean([np.log(c[s][p]) for s in range(2)]), p))
+        out[ax] = by
+    return out
+
+
+def matched(rows, key):
+    """Spearman of log R against `key` within each set and pooled, and R per set in the pooled quartiles of `key`."""
+    res = {}
+    for ax, r in rows.items():
+        res[ax] = {"n_classes": len(r), "spearman_logR": spearman([x[0] for x in r.values()], [x[key] for x in r.values()]),
+                   "median": round(float(np.median([x[key] for x in r.values()])), 3)}
+    allx = np.array([x[key] for r in rows.values() for x in r.values()])
+    res["pooled_spearman_logR"] = spearman([x[0] for r in rows.values() for x in r.values()], allx)
+    q = np.quantile(allx, [0, 0.25, 0.5, 0.75, 1.0])
+    bins = []
+    for i in range(4):
+        sel = lambda r: [x[0] for x in r.values() if q[i] <= x[key] <= q[i + 1]]
+        e, p = sel(rows["EE4"]), sel(rows["PP4"])
+        bins.append({"range": [round(float(q[i]), 3), round(float(q[i + 1]), 3)], "n_EE4": len(e), "n_PP4": len(p),
+                     "R_EE4": round(float(np.exp(np.median(e))), 3) if e else None,
+                     "R_PP4": round(float(np.exp(np.median(p))), 3) if p else None})
+    res["matched_bins"] = bins
+    return res
+
+
+def read_kin():
+    g = json.load(open(OUT_KIN))["probes"]
+    lr = class_log_r()
+    out = {"design": "plan catalog_coverage step 43(2), kinematic readings; runs mixture_ab.MIX_HET default25 vs control"}
+    for v in VARS:
+        rows = {}
+        for ax, by in lr.items():
+            r = {}
+            for k, lst in by.items():
+                ok = [(x[0], g[x[2]][v]["gain_median"], g[x[2]][v]["c_zero"]) for x in lst
+                      if x[2] in g and "missing" not in g[x[2]]]
+                if ok:
+                    r[k] = tuple(np.mean(np.array(ok), axis=0))
+            rows[ax] = r
+        out[v] = matched(rows, 1)
+        for ax in rows:
+            out[v][ax]["c_zero_median"] = round(float(np.median([x[2] for x in rows[ax].values()])), 3)
+    json.dump(out, open(os.path.join(DATA, "ee_gain_kin_read.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
+def read_level():
+    lr = class_log_r()
+    rows = {ax: {k: tuple(np.mean(np.array([x[:2] for x in lst]), axis=0)) for k, lst in by.items()} for ax, by in lr.items()}
+    out = {"design": "plan catalog_coverage step 43(2), target-level reading: log R against the control's ln MSE",
+           "R_median": {ax: round(float(np.exp(np.median([x[0] for x in r.values()]))), 3) for ax, r in rows.items()},
+           "control_mse_median": {ax: round(float(np.exp(np.median([x[1] for x in r.values()]))), 4) for ax, r in rows.items()}}
+    out.update(matched(rows, 1))
+    # the EE4 offset at a fixed control level: OLS log R = a + b ln MSE_control + c [EE4], c's bootstrap 90% interval
+    x = np.array([(v[1], ax == "EE4") for ax, r in rows.items() for v in r.values()], dtype=float)
+    y = np.array([v[0] for r in rows.values() for v in r.values()])
+    X = np.column_stack([np.ones(len(y)), x])
+    fit = lambda i: np.linalg.lstsq(X[i], y[i], rcond=None)[0]
+    b = fit(np.arange(len(y)))
+    rng = np.random.default_rng(0)
+    cs = [fit(rng.integers(0, len(y), len(y)))[2] for _ in range(2000)]
+    out["ols"] = {"slope_per_ln_mse": round(float(b[1]), 3), "ee4_offset_ratio": round(float(np.exp(b[2])), 3),
+                  "ee4_offset_ratio_90": [round(float(np.exp(q)), 3) for q in np.quantile(cs, [0.05, 0.95])],
+                  "raw_ee4_over_pp4": round(float(np.exp(np.median(y[x[:, 1] == 1]) - np.median(y[x[:, 1] == 0]))), 3)}
+    json.dump(out, open(os.path.join(DATA, "ee_gain_level.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
 if __name__ == "__main__":
-    {"pull": pull, "read": read}[sys.argv[1]]()
+    {"pull": pull, "read": read, "pull_kin": lambda: pull(kin=True), "read_kin": read_kin, "read_level": read_level}[sys.argv[1]]()

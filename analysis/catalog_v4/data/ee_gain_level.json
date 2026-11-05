@@ -1,0 +1,82 @@
+{
+ "design": "plan catalog_coverage step 43(2), target-level reading: log R against the control's ln MSE",
+ "R_median": {
+  "EE4": 0.182,
+  "PP4": 0.344
+ },
+ "control_mse_median": {
+  "EE4": 0.9886,
+  "PP4": 0.2568
+ },
+ "EE4": {
+  "n_classes": 115,
+  "spearman_logR": [
+   -0.486,
+   3.611390604735771e-08
+  ],
+  "median": -0.011
+ },
+ "PP4": {
+  "n_classes": 797,
+  "spearman_logR": [
+   -0.543,
+   2.8880855193178787e-62
+  ],
+  "median": -1.36
+ },
+ "pooled_spearman_logR": [
+  -0.571,
+  3.450710280143256e-80
+ ],
+ "matched_bins": [
+  {
+   "range": [
+    -10.164,
+    -2.642
+   ],
+   "n_EE4": 11,
+   "n_PP4": 217,
+   "R_EE4": 0.69,
+   "R_PP4": 0.602
+  },
+  {
+   "range": [
+    -2.642,
+    -1.165
+   ],
+   "n_EE4": 19,
+   "n_PP4": 209,
+   "R_EE4": 0.198,
+   "R_PP4": 0.396
+  },
+  {
+   "range": [
+    -1.165,
+    1.25
+   ],
+   "n_EE4": 39,
+   "n_PP4": 189,
+   "R_EE4": 0.196,
+   "R_PP4": 0.258
+  },
+  {
+   "range": [
+    1.25,
+    5.023
+   ],
+   "n_EE4": 46,
+   "n_PP4": 182,
+   "R_EE4": 0.144,
+   "R_PP4": 0.189
+  }
+ ],
+ "ols": {
+  "slope_per_ln_mse": -0.174,
+  "ee4_offset_ratio": 0.558,
+  "ee4_offset_ratio_90": [
+   0.446,
+   0.68
+  ],
+  "raw_ee4_over_pp4": 0.529
+ }
+}
