@@ -8807,8 +8807,8 @@ entries:
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
-    '56': FA-ccin2p3-18b98b55 FA-ccin2p3-b2538139 FA-ccin2p3-66c83df6 FA-ccin2p3-69001455 FA-ccin2p3-0208896e FA-ccin2p3-8ddc490b
-      FA-ccin2p3-dc9feba1 FA-ccin2p3-af09cad3 FA-ccin2p3-8833a131 FA-ccin2p3-481ad196
+    '56': the owner's detached signhead_pull (log 20261105-075027_signhead_pull.log); its DONE event resumes the owner to
+      read step 56 and ack E3671
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
     '43': FA-ccin2p3-5b5215b6 FA-ccin2p3-e184bbc5 FA-ccin2p3-ae39ee5a FA-ccin2p3-75ad7b20
