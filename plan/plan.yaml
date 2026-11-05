@@ -10540,6 +10540,20 @@ entries:
       (22.8 GB each, 68.5 GB); no live job mapped them (all 21 checked: step 56 and 6 warm_start in-memory; loader control
       f5ccb555/7d589cbf; 5 warm_start 04fb3b3d/deda9310). /sps/lpnhe 81%, 99 GB free. Left: tmp/ evalbest_* and f24net_* run
       dirs of other entries'' tools, not ours to prune.'
+  - at: '2026-11-05T06:59:39+00:00'
+    text: '2026-11-05 step 56 read (het_oneloop.py signhead @a0bdee35, data @6ec06b24 -> data/het_signhead.json; arm v4_het_control_signhead
+      seeds 42-45 FA-ccin2p3-18b98b55/b2538139/66c83df6/69001455 vs het magnitude reference 5abe4a0e/92207f6a/0208896e/8ddc490b;
+      sign vs MSE control v4_dimensionless_muon seeds 42-45). Verdict by the passed design: NO-SIGN, magnitude UNRESOLVED.
+      Sign (seed-mean wrong-sign share per pool, paired sign test): H5 21 pools: arm worse than the MSE control on 17 (p 0.0036),
+      median 13.3% vs 6.7%, not better than all-positive (12.2%; 11 better / 10 worse, p 0.5); HD5 19 classes: worse on 15
+      (p 0.0096), 18.3% vs 13.0%, all-positive 30.3% (12/7, p 0.18). Near zero (within 10x) worse too: H5 39.4 vs 28.6% (16/2),
+      HD5 31.7 vs 30.3% (15/2). Training sign accuracy is not the problem: median on the 63 signed train pools 0.99 at the
+      end for all 4 arm seeds, as the MSE control (0.985-0.995): the het sign head fits the training signs and transfers worse
+      zero-shot. Magnitude: pairing gate failed on seed 42 (paired ln sd HD5 0.577 > 0.43, H5 0.456 > 0.40; other pairs 0.53-0.89),
+      so unpaired: R HD5 1.03 [0.67, 1.42], H5 1.03 [0.64, 1.56] (widened 95%), inside the tolerance band -> UNRESOLVED; per-pair
+      R 0.73-1.24. Beside (paired): PP4 1.00, EE4 0.95 [0.92, 0.98], HD4 0.97, H1-H7c 0.97-1.04, all intervals contain 1 or
+      below. No blow-ups; 3 spikes recovered (18b98b55 step 1020, 69001455 step 935, 8ddc490b step 1360; best at 4250-4264).
+      By the design: report to Joaquin with the per-validation sign accuracy; a loss-weight change is his call (D241).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
