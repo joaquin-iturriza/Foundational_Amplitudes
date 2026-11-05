@@ -11369,10 +11369,7 @@ entries:
   decisions:
   - D282
   next:
-    1: 'C1 (share 0.25, 12 runs, design passed as part of the superset): on the ws_budget_window timer (about 23:29) site
-      pick FA --jobs 12 --mem 16G and submit the 12 arms of scripts/job_catalog_v3_short.sh @7f945910 with limits 2:15/2:27/2:49
-      (warm25 k533/1066/2132) and 2:11/2:23/2:45 (cont), record them, plan wait on all 12; then extract reads and add the
-      warm mode to mixture_ab.py'
+    1: C1 write-up in docs/results.tex (data/warm_start_C1.json @f0015680, figure warm_start_C1, % src/% claim lines)
     2: 'C2-C8 on Joaquin''s go (open ask): implement their arms (parent, recipe, target_stats per the design), C7/C8 only
       after catalog_coverage step 47 reads the magnitude het pair and shows a gain'
   done_when: null
@@ -11973,8 +11970,8 @@ entries:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
       if:
-      - 'MATCH at some k: report k/4264'
-      - 'no match: report g_k per k'
+      - 'written: plan done only after C2-C8 are run or declined'
+      - 'Joaquin declines C2-C8: write-up closes the entry'
     2:
       feeds: whether warm start reaches scratch across data, loss and target changes (D282 widened)
       if:
