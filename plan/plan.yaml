@@ -10131,6 +10131,15 @@ entries:
       excess on this 2->3 class). Cause: candidates'' sqrt(s_hat) log-uniform 30 GeV-6 TeV, lepton pair not drawn on the Z
       Breit-Wigner: 3.3% of candidates in the Z bin (default 76%), 23.5% of those above TOP; the selection keeps at most the
       candidates a bin has. Step 55 write-up committed 7c47ca2f (par:v4_length, notes-editor PASS).'
+  - at: '2026-11-05T02:15:12+00:00'
+    text: '2026-11-05 D287 design (het + sign head), reviewer FIX twice (second 02:13+): (1) the 4-seed magnitude no-worse
+      tolerance 1.25 is not resolvable: reviewer''s simulation (not a committed tool) from the magnitude pair''s HD5/H5 reads
+      gives the widened upper end median ~1.40 HD5 / 1.45 H5, <=1.25 in ~28% per read, so a cost-free head passes ~1 in 10;
+      options: tolerance ~1.5 with its reason, seed-paired contrast (arm seed k over reference seed k, checked on the first
+      pair), or more seeds (Joaquin''s call); (2) sign outcomes overlap at p 0.05-0.2 (trivial: YES at p >= 0.2). Revised
+      once as the rule allows; the remaining choice goes to Joaquin. Sampling proposal recorded as a next step (multichannel
+      candidates: Breit-Wigner channels from the diagram sidecars, initial-state collinear channel, channel shares adapted
+      by |M|^2; CPU check on 5 classes).'
   handoff:
     state: '2026-11-04 ~22:30. Done today: step 53 sampling figures a/b/c (sampling_example.py @f08c5ef3; flat part split
       by generator, splitter 0.394); step 32 length verdict YES (mixture_ab.py length @d3b90e0d, data/length_x16_over_x4.json:
