@@ -11118,12 +11118,10 @@ entries:
     '15': a day of live use of the registered notification hook (d2f7686d, 2026-11-04 ~22:00), then re-measure double wakes
       with main_turns.py
   owner:
-    agent: aff6191d332eec235
-    state: stopped
-    since: '2026-11-04T19:57:15+00:00'
-    state_at: '2026-11-04T20:26:08.744000+00:00'
-    context: 154362
-    context_at: '2026-11-04T20:15:57+00:00'
+    agent: a5124279150795f6d
+    state: working
+    since: '2026-11-05T06:14:05+00:00'
+    state_at: '2026-11-05T06:14:05+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
