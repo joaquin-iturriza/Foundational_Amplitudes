@@ -175,6 +175,11 @@ def pull_mse():
                   **mse_stats(r["mse_prepd"], r["sigma"])}
     if not res:
         sys.exit("pull_mse: nothing read: " + out[-800:])
+    path = os.path.join(DATA, "size_mse.json")
+    if os.path.exists(path):        # keep a trial's MSE added by eval_mse (DyHPO trials log no end-of-run evaluation)
+        for d, old in json.load(open(path))["runs"].items():
+            if old.get("mse_from_eval_run") and d in res and res[d].get("mse_logm2_gmean") is None:
+                res[d].update({k: v for k, v in old.items() if k.startswith("mse_") or k.startswith("n_")})
     json.dump({"source": "out_0.log 'MSE (prepd) val_<process>' (main run, best checkpoint) times sigma^2 of its "
                          "shared standardisation (data_stats.json prepd_std), every pool with a plain-log target (the "
                          "signed pools of data/signed_pools.json left out); 'Finished training' minutes; RUN_SUMMARY gpu; CC-IN2P3, read-only "
@@ -215,9 +220,11 @@ PRED_DIRS = ["runs/catalog_v4_long/v4_het_default25%s_w%d_x1" % (sfx, k) for k i
 
 def pull_preds():
     """pull_preds of the module docstring; one read-only `site run` on CC-IN2P3"""
-    b17 = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["17056"]["best"]["hp"]
-    trial = f"runs/{SWEEPS['17056']}/trial_{b17}"
-    dirs = PRED_DIRS + [f"runs/catalog_v4_long/best_{SWEEPS['17056']}_trial_{b17}"]
+    lb = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))
+    # each length's best trial, read by its eval re-read (catalog_v4_long/best_<sweep>_trial_<hp>, the sigma stage)
+    evals = {f"runs/catalog_v4_long/best_{SWEEPS[n]}_trial_{lb[n]['best']['hp']}": f"runs/{SWEEPS[n]}/trial_{lb[n]['best']['hp']}"
+             for n in ("17056", "68224")}
+    dirs = PRED_DIRS + list(evals)
     py = ("import json,sys\nimport numpy as np\n"
           "for r in sys.argv[1:]:\n"
           "    z=np.load(r+'/sigma_stage/preds_val.npz'); n=[str(x) for x in z['names']]; pid=z['process_id']\n"
@@ -237,7 +244,8 @@ def pull_preds():
     per = {l.split()[1]: dec.raw_decode(l.split(" ", 2)[2])[0] for l in out.splitlines() if l.startswith("PREDS runs/")}
     if len(per) != len(dirs):
         sys.exit(f"pull_preds: {len(per)} of {len(dirs)} runs read\n{out[-2000:]}")
-    per[trial] = per.pop(dirs[-1])        # the 4x best's eval re-read stands for its trial, as in size_mse.json
+    for ev, trial in evals.items():
+        per[trial] = per.pop(ev)          # a long best's eval re-read stands for its trial, as in size_mse.json
     signed = set(json.load(open(SIGNED))["signed"])
     sm = json.load(open(os.path.join(DATA, "size_mse.json")))["runs"]
     res = {}
@@ -257,6 +265,51 @@ def pull_preds():
                "non-finite events, sigma^2 x MSE of the standardized target]", "runs": res},
               open(os.path.join(DATA, "size_mse_preds.json"), "w"), indent=1)
     print(json.dumps({r: {k: v for k, v in x.items() if k != "pools"} for r, x in res.items()}, indent=1))
+
+
+def fit_points():
+    """(run dir, width, steps, C, MSE) of every run of the compute figure: the six 4264-step width runs and each
+    length's best trial (data/size_mse_preds.json, MSE of ln|M|^2 over every training pool, geometric mean)"""
+    sp = json.load(open(os.path.join(DATA, "size_mse_preds.json")))["runs"]
+    lb = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))
+    pts = [(d, k, 4264, d) for k in (8, 16, 32) for d in PRED_DIRS if d.endswith(f"_w{k}_x1")]
+    pts += [(f"runs/{SWEEPS[n]}/trial_{lb[n]['best']['hp']}", 8, int(n), None) for n in ("17056", "68224")]
+    return [(d, k, n, 6.0 * N_PARAMS[k] * n * BATCH, sp[d]["mse_logm2_gmean_all"]) for d, k, n, _ in pts]
+
+
+def scaling_fit():
+    """fit: L(C) = A C^(-alpha) + L_inf over fit_points (sweep/analyze_pretraining_scaling.fit_power_law_with_floor:
+    L_inf profiled on a grid, WLS in log(L - L_inf), 2% relative errors), and the bare power law beside as a
+    labelled diagnostic -> data/size_fit.json. Information only: the width runs are at the base HPs (one lr under
+    muP), the length points each the best of an eight-trial sweep at width 8, one seed, neither sweep converged."""
+    sys.path.insert(0, os.path.join(ROOT, "sweep"))
+    from analyze_pretraining_scaling import fit_power_law_with_floor
+    pts = fit_points()
+    c = np.array([p[3] for p in pts]); l = np.array([p[4] for p in pts])
+    f = fit_power_law_with_floor(c, l)
+    bare = np.polyfit(np.log(c), np.log(l), 1)
+    # per axis: width at 4264 steps (C proportional to N) and length at width 8 (C proportional to S)
+    axes = {"width_at_4264_steps": [i for i, p in enumerate(pts) if p[2] == 4264],
+            "length_at_width_8": [i for i, p in enumerate(pts) if p[1] == 8]}
+    per_axis = {}
+    for name, idx in axes.items():
+        fa = fit_power_law_with_floor(c[idx], l[idx])
+        ba = np.polyfit(np.log(c[idx]), np.log(l[idx]), 1)
+        per_axis[name] = {"n_points": len(idx),
+                          "fit": dict(zip(("A", "alpha", "L_inf", "chi2_red"), map(float, fa))) if fa else None,
+                          "bare_power_law_diagnostic": {"alpha": float(-ba[0]), "A": float(np.exp(ba[1]))}}
+    out = {"law": "L(C) = A C^(-alpha) + L_inf, C = 6 N S B (B = 16384 events per step), L = MSE of ln|M|^2, "
+                  "geometric mean over every training pool (size_mse_preds.json)",
+           "points": [{"run": d, "width": k, "steps": n, "C": x, "mse": y} for d, k, n, x, y in pts],
+           "fit": dict(zip(("A", "alpha", "L_inf", "chi2_red"), map(float, f))) if f else None,
+           "bare_power_law_diagnostic": {"alpha": float(-bare[0]), "A": float(np.exp(bare[1]))},
+           "per_axis": per_axis,
+           "caveat": "information: widths at base HPs (not tuned per width), lengths the best of 8 trials at width 8, "
+                     "seed 42 only, neither length sweep converged"}
+    json.dump(out, open(os.path.join(DATA, "size_fit.json"), "w"), indent=1)
+    print(json.dumps({**{k: v for k, v in out.items() if k != "points"},
+                      "mse": {f"w{p['width']}_s{p['steps']}_{i}": p["mse"] for i, p in enumerate(out["points"])}}))
+    return out
 
 
 def mse_stats(mse_prepd, sigma):
@@ -503,6 +556,10 @@ def figs():
             for k, wc, mk in ((8, ps.C.blue, "o"), (16, ps.C.green, "D"), (32, ps.C.vermillion, "^"))]   # the zero-shot figure's colours
     cats.append((NAME.format(w=8, ep=f"{ep_of['17056_trial_' + b17]:.2g}") + ", best tuned trial, not converged", 8,
                  [f"runs/{SWEEPS['17056']}/trial_{b17}"], ps.C.purple, "P"))
+    b68h = json.load(open(os.path.join(DATA, "long_sweeps_best.json")))["68224"]["best"]["hp"]
+    if f"68224_trial_{b68h}" in ep_of:
+        cats.append((NAME.format(w=8, ep=f"{ep_of['68224_trial_' + b68h]:.2g}") + ", best tuned trial, not converged",
+                     8, [f"runs/{SWEEPS['68224']}/trial_{b68h}"], ps.C.orange, "X"))
     # every run here is on a V100 (SXM2 or PCIe, not separated: Joaquin 2026-11-03), named on the wall-time axis
     fig, (axc, axw) = ps.figure(ncols=2)
     hs = []
@@ -518,6 +575,16 @@ def figs():
         report[f"mse {label}"] = {"run_dir": d, "mse_logm2_gmean": round(y, 5), "C": C(width, r["iterations"]),
                                   "train_hours": r["train_hours"], "gpu": r["gpu"],
                                   "of": {x: sp.get(x, {}).get("mse_logm2_gmean_all") for x in dirs}}
+    # the floor-aware law per axis (scaling_fit, data/size_fit.json): width at 4264 steps, length at width 8; dashed,
+    # information only (widths at base HPs, lengths the best of eight trials, one seed)
+    sf = scaling_fit()
+    for name, ls, lab in (("width_at_4264_steps", "--", "width"), ("length_at_width_8", ":", "length")):
+        f = sf["per_axis"][name]["fit"]
+        xs = [p["C"] for p in sf["points"] if (p["steps"] == 4264 if lab == "width" else p["width"] == 8)]
+        x = np.geomspace(min(xs), max(xs), 100)
+        axc.plot(x, f["A"] * x ** -f["alpha"] + f["L_inf"], color="k", ls=ls, lw=1)
+        hs.append(Line2D([], [], color="k", ls=ls, lw=1,
+                         label=rf"{lab}: $A C^{{-\alpha}}+L_\infty$, $\alpha={f['alpha']:.2f}$, $L_\infty={f['L_inf']:.3f}$"))
     for ax in (axc, axw):
         ax.set_xscale("log")
         ax.set_yscale("log")
@@ -525,13 +592,13 @@ def figs():
     axc.set_xlabel("compute [FLOP]")
     axw.set_xlabel("training wall time on one V100 [h]")
     from matplotlib.ticker import FixedLocator, FixedFormatter, NullFormatter
-    for ax, ticks in ((axw, (1, 2, 4)), (axc, None)):
+    for ax, ticks in ((axw, (1, 2, 4, 8, 16)), (axc, None)):
         if ticks:
             ax.xaxis.set_major_locator(FixedLocator(list(ticks)))
             ax.xaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in ticks]))
         ax.xaxis.set_minor_formatter(NullFormatter())
-        ax.yaxis.set_major_locator(FixedLocator([0.02, 0.03, 0.05, 0.08]))
-        ax.yaxis.set_major_formatter(FixedFormatter(["0.02", "0.03", "0.05", "0.08"]))
+        ax.yaxis.set_major_locator(FixedLocator([0.012, 0.02, 0.03, 0.05, 0.08]))
+        ax.yaxis.set_major_formatter(FixedFormatter(["0.012", "0.02", "0.03", "0.05", "0.08"]))
         ax.margins(x=0.12, y=0.12)
         ax.yaxis.set_minor_formatter(NullFormatter())
     for h in hs:            # empty proxies, read by ps.shared_legend
@@ -543,12 +610,13 @@ def figs():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=("pull", "pull_mse", "pull_signed", "pull_preds", "eval_mse", "figs", "best"))
+    ap.add_argument("cmd", choices=("pull", "pull_mse", "pull_signed", "pull_preds", "eval_mse", "figs", "best", "fit"))
     ap.add_argument("args", nargs="*", help="eval_mse: <eval run> <its log> <trial dir>")
     a = ap.parse_args()
     if a.cmd == "eval_mse":
         return eval_mse(*a.args)
-    {"pull": pull, "pull_mse": pull_mse, "pull_signed": pull_signed, "pull_preds": pull_preds, "figs": figs, "best": sweep_best}[a.cmd]()
+    {"pull": pull, "pull_mse": pull_mse, "pull_signed": pull_signed, "pull_preds": pull_preds, "figs": figs, "best": sweep_best,
+     "fit": scaling_fit}[a.cmd]()
 
 
 if __name__ == "__main__":

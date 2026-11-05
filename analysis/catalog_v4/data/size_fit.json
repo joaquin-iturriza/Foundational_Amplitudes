@@ -1,0 +1,100 @@
+{
+ "law": "L(C) = A C^(-alpha) + L_inf, C = 6 N S B (B = 16384 events per step), L = MSE of ln|M|^2, geometric mean over every training pool (size_mse_preds.json)",
+ "points": [
+  {
+   "run": "runs/catalog_v4_long/v4_het_default25_w8_x1",
+   "width": 8,
+   "steps": 4264,
+   "C": 744371144884224.0,
+   "mse": 0.09136570405045147
+  },
+  {
+   "run": "runs/catalog_v4_long/v4_het_default25_seed2_w8_x1",
+   "width": 8,
+   "steps": 4264,
+   "C": 744371144884224.0,
+   "mse": 0.09436142708282863
+  },
+  {
+   "run": "runs/catalog_v4_long/v4_het_default25_w16_x1",
+   "width": 16,
+   "steps": 4264,
+   "C": 2731376225550336.0,
+   "mse": 0.05094941410119691
+  },
+  {
+   "run": "runs/catalog_v4_long/v4_het_default25_seed2_w16_x1",
+   "width": 16,
+   "steps": 4264,
+   "C": 2731376225550336.0,
+   "mse": 0.04714079019249673
+  },
+  {
+   "run": "runs/catalog_v4_long/v4_het_default25_w32_x1",
+   "width": 32,
+   "steps": 4264,
+   "C": 1.0661154345713664e+16,
+   "mse": 0.028832367334662382
+  },
+  {
+   "run": "runs/catalog_v4_long/v4_het_default25_seed2_w32_x1",
+   "width": 32,
+   "steps": 4264,
+   "C": 1.0661154345713664e+16,
+   "mse": 0.02711230070388922
+  },
+  {
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_1262",
+   "width": 8,
+   "steps": 17056,
+   "C": 2977484579536896.0,
+   "mse": 0.020592594471631566
+  },
+  {
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_1262",
+   "width": 8,
+   "steps": 68224,
+   "C": 1.1909938318147584e+16,
+   "mse": 0.012260766197808075
+  }
+ ],
+ "fit": {
+  "A": 11279487.57544559,
+  "alpha": 0.5458540706534996,
+  "L_inf": 0.0,
+  "chi2_red": 2850.629513721705
+ },
+ "bare_power_law_diagnostic": {
+  "alpha": 0.545854070653499,
+  "A": 11279487.575445311
+ },
+ "per_axis": {
+  "width_at_4264_steps": {
+   "n_points": 6,
+   "fit": {
+    "A": 49667383.59239211,
+    "alpha": 0.5905683928076202,
+    "L_inf": 0.010995181225215797,
+    "chi2_red": 18.15357117595904
+   },
+   "bare_power_law_diagnostic": {
+    "alpha": 0.45060903428791177,
+    "A": 458489.8905661649
+   }
+  },
+  "length_at_width_8": {
+   "n_points": 4,
+   "fit": {
+    "A": 1.1708117771261072e+22,
+    "alpha": 1.5570632749651265,
+    "L_inf": 0.011163206042992244,
+    "chi2_red": 5.2101917837616005
+   },
+   "bare_power_law_diagnostic": {
+    "alpha": 0.7625990263476293,
+    "A": 18621368032.831406
+   }
+  }
+ },
+ "caveat": "information: widths at base HPs (not tuned per width), lengths the best of 8 trials at width 8, seed 42 only, neither length sweep converged"
+}
