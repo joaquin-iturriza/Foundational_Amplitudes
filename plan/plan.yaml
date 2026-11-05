@@ -3765,8 +3765,6 @@ entries:
       component (its candidates are half splitter, half RAMBO; bulk and forward use RAMBO only, mg5_pipeline_final.py:3425-3466);
       split the flat part into splitter and RAMBO candidates by replaying the generator''s seeded draws, report the realised
       splitter share among kept flat events, and label every component by what it is.'
-    55: 'Per-class read of the 16x-over-4x regression on the held-out 2->5 classes (H2p5, 38 classes, R 3.07 default-sampled
-      / 2.28 catalog-sampled, par:v4_length @7c47ca2f): which classes, whether level or shape, against their 4x errors'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
       rows mu, sigma, sign logit; experiment.py:2232 refusal removed; sigma stage trains the sigma row only; parent loading
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
@@ -9176,11 +9174,6 @@ entries:
       if:
       - 'replay recovers it: redraw'
       - 'it cannot: say why and add origin tagging to the generator'
-    55:
-      feeds: 'whether the 16x best becomes the foundation pretraining candidate (step 16 outcome: length yes -> to Joaquin)'
-      if:
-      - 'a level offset on most 2->5 classes: report it with the length verdict as the 16x cost, propose a level fix read'
-      - 'a few classes carry it: name them and their cause, the verdict stands as written'
     56:
       feeds: whether the het pretraining carries the sign head on the sign-changing one-loop pools (D287)
       if:
