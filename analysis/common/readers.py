@@ -144,7 +144,7 @@ def site_python(script, args, marker, site="ccin2p3", timeout=900):
     goes over as base64 into a $SCRATCH/zz_probe_ file, removed after the run."""
     import base64, subprocess, sys
     b64 = base64.b64encode(script.encode()).decode()
-    f = f"$SCRATCH/zz_probe_{marker.lower()}.py"
+    f = f"$SCRATCH/zz_probe_{marker.lower()}_$$.py"   # the remote shell's pid: two calls with one marker never share it
     cmd = f"echo {b64} | base64 -d > {f} && python {f} {' '.join(args)}; rm -f {f}"
     r = subprocess.run(["site", "--timeout", str(timeout), "run", site, "FA", "--", cmd], capture_output=True,
                        text=True, timeout=timeout + 100)
