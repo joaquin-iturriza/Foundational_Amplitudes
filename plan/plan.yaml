@@ -9314,12 +9314,10 @@ entries:
       - 'no live memmap job: delete and report'
       - 'a live job maps one: wait for its end'
   owner:
-    agent: a9187cc5d541864dd
-    state: closed
-    since: '2026-11-05T04:51:53+00:00'
-    state_at: '2026-11-05T05:13:24+00:00'
-    context: 227818
-    context_at: '2026-11-05T05:13:22+00:00'
+    agent: a9838af5fa2f7d0bb
+    state: working
+    since: '2026-11-05T05:33:54+00:00'
+    state_at: '2026-11-05T05:33:54+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
