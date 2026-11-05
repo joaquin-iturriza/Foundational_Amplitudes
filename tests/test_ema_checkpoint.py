@@ -26,6 +26,7 @@ import os, sys, tempfile, importlib.machinery, types, logging.handlers  # logger
 from unittest import mock
 import torch
 import torch.nn as nn
+from omegaconf import OmegaConf
 from torch_ema import ExponentialMovingAverage   # real: the test is about its state
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -71,7 +72,8 @@ class Tiny(nn.Module):
 def make_exp(run_dir, ema=True, seed=0, out=1):
     torch.manual_seed(seed)
     e = BaseExperiment.__new__(BaseExperiment)
-    e.cfg = types.SimpleNamespace(save=True, run_dir=run_dir, run_idx=0, training={"loss": "MSE"})
+    # training.loss: _load_pretrained_weights reads the child's loss (the HETEROSC readout branch)
+    e.cfg = types.SimpleNamespace(save=True, run_dir=run_dir, run_idx=0, training=OmegaConf.create({"loss": "MSE"}))
     e.device = torch.device("cpu")
     e.model = Tiny(out)
     e.ema = ExponentialMovingAverage(e.model.parameters(), decay=0.9) if ema else None
