@@ -8807,6 +8807,14 @@ entries:
       3.47 h with reads plus the cache build, so the reads finish inside it (the 10-31 arm was cut at a 2.5 h limit that counted
       training only); about 11 GPU-h of work, 15.3 at the limits. Disk: a 1e4 cache is about 2.3 GB (1/10 of the 23 GB whole-set
       cache); the key holds the RNG state, so one per seed, 4.6 GB against 87 GB free on /sps/lpnhe (read 2026-11-05 06:15).'
+    passed_at: '2026-11-05T05:20:14+00:00'
+    reviewer: '2nd review of step 43(1): four V100-only jobs at one commit (memmap and same-commit in-memory rerun per seed
+      42/43; SHORT_RERUN 4e152a6f changes only the run dir, SHORT_MEMMAP c04f1e82 only data.memmap; control node ccwgslurm0112
+      is gpu_v100); check 2: PP4 MSE 0.1216 vs 0.0876 = 1.39 against seed ratio 1.14 (arms_vs_het_control.json); check 3:
+      same-seed spread R_0 now measured by the reruns, bands from s = max|ln R_0| and g = ln 1.39, NOISE-LIMITED outcome if
+      s >= g/2 (prior rerun spread 25%, results.tex ~l.10546); outcomes CLEAR/IMPLICATED/NOISE-LIMITED/UNRESOLVED defined;
+      disk ~2.3 GB x2 against 87 GB free; 15.3 GPU-h at the limits; het loss; searched results.tex memmap, memory-mapped,
+      loading path, 1e4, events per process, site decisions memmap/in-memory: no prior run separates the keys.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
