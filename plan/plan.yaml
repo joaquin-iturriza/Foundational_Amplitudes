@@ -12859,6 +12859,17 @@ entries:
       step 3''s tuned confirmation runs (post-sigma parent). Implementation pending: a save-at-steps knob in base_experiment
       (EMA model at given steps) and arms v4_het_control_ckpt[_seed2] (rerun, training only) and v4_het_warm25t_k533_from{2132,3198,final}[_seed2]
       in job_catalog_v3_short.sh, in a worktree, with a CPU test of the knob.'
+  - at: '2026-11-05T04:39:29+00:00'
+    text: '2026-11-05: step 5 (D289) out: ws-ckpt merged after the repo-reviewer re-ran on 7af7c3cc..1cbe1dd7 (trunk merged
+      into the branch, advance from the worktree; the earlier pass had advanced from the main checkout, so its watermark landed
+      on trunk and git_verify_guard rightly refused). Reruns FA-ccin2p3-d521160b (s42), b688a859 (s43), arms v4_het_control_ckpt[_seed2],
+      limit 1:50; warm starts chained afterok: from2132 0898a7b0/a6834028, from3198 2a27e8a2/0259e865, final dd32a907/70c28bd9
+      (arms v4_het_warm25t_k533_from<x>[_seed2], limit 2:15), all scripts/job_catalog_v3_short.sh @d9e1af1f; 11.6 GPU-h. Step
+      4 (D285) design passed round 2; code merged @12f51879 (models/grow_width.py, fine_tune.grow_width, GROW_K, tests/test_grow_width.py
+      5 pass: exact to 1e-5 relative without noise, 4.5e-4 relative at noise 1e-3). Its 6 jobs (17.5 GPU-h by limits, 13.1
+      by wall) refused by submit_guard''s 60-min rolling item budget (31.7 > 30 with step 5''s batch in the window): submitted
+      whole once step 5''s submissions leave the window (after about 05:25 UTC). Submit with --hdr=--mem=46G --env LONG_HEADS=16
+      --env LONG_CKPT=true --env LONG_MEMMAP=true --env GROW_K=<k> on v4_het_default25[_seed2], limits 2:20/2:40/3:15.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
