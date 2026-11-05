@@ -9106,7 +9106,7 @@ entries:
     agent: a3a3edbd4a69bab1c
     state: closed
     since: '2026-11-05T03:56:39+00:00'
-    state_at: '2026-11-05T04:00:15.754000+00:00'
+    state_at: '2026-11-05T04:22:31+00:00'
     context: 260567
     context_at: '2026-11-05T04:13:57+00:00'
   findings:
