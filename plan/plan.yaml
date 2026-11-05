@@ -3734,9 +3734,6 @@ entries:
       (91.19-3000 GeV) where the catalog''s log-uniform sqrt(s) draw puts few; its pull fails: no v4_* train pools on CC''s
       DATA_DIR (only val/test smix found), so the catalog train sample must be read where training reads it (the composed
       pools / the recipe''s train path) or from the val smix pool (same sampling, D: every role samples the same distribution).'
-    44: 'Today''s deck (Joaquin 2026-11-03): sampling slide (default vs catalog mixture by component, pp example), width/length/zero-shot
-      with restored error bars, MSE log|M|^2 against compute and wall time, het. loss naming; plus a show/skip list of other
-      results since the last deck for Joaquin.'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
       rows mu, sigma, sign logit; experiment.py:2232 refusal removed; sigma stage trains the sigma row only; parent loading
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
@@ -9242,11 +9239,6 @@ entries:
       - '(1) CLEAR: the gap is data size, write up and tell warm_start'
       - '(1) IMPLICATED: bisect memmap vs in-memory on CPU'
       - '(2) gain correlates with the density ratio and explains EE4 vs PP4 at matched ratio: write up'
-    44:
-      feeds: Joaquin's presentation 2026-11-03
-      if:
-      - 'built and checked: sent with the list'
-      - 'a figure can''t be made today: say which and why'
     56:
       feeds: whether the het pretraining carries the sign head on the sign-changing one-loop pools (D287)
       if:
