@@ -8809,6 +8809,8 @@ entries:
       nothing else left in the step
     '43': FA-ccin2p3-5b5215b6 FA-ccin2p3-e184bbc5 FA-ccin2p3-ae39ee5a FA-ccin2p3-75ad7b20
     '60': Joaquin running or allowing scripts/remove_worktree.sh
+    '58': Joaquin's call on the failed multichannel check (keep multichannel and add candidates at the top, or another route),
+      asked 2026-11-05
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
