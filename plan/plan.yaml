@@ -8982,6 +8982,12 @@ entries:
     units: null
     start: '2026-11-05T04:14:46+00:00'
     at: '2026-11-05T04:14:46+00:00'
+  - batch: mse_control_hd5_sign_reads
+    wall_h: 0.05
+    jobs: 4
+    units: null
+    start: '2026-11-05T04:14:49+00:00'
+    at: '2026-11-05T04:14:49+00:00'
   step_why:
     32:
       feeds: whether training 16x (68224 steps) beats 4x (17056 steps) at tuned HPs, i.e. which length becomes the foundation
