@@ -12506,6 +12506,18 @@ entries:
       model, optimizer and scheduler state into models/model_run0*.pt); the warm starts still use a fresh optimizer (fine_tune
       builds its own). Ibrahim et al. 2024 (arXiv:2403.08763, App. A.4) found keeping or discarding optimizer state makes
       no difference, so this is not a gap in the comparison.'
+  - at: '2026-11-05T04:02:15+00:00'
+    text: 'Step 3 sweep ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml @dc24fa76; 8 trials COMPLETED 02:45-03:00,
+      about 21 min each; summary.txt on CC): best hp_1860 val_loss_no_reg -2.7576 (lr_scale 0.174, layer_decay 0.915, warmup
+      0.183, eta_min 3.2e-8, Muon decay 0.048, reg 1.3e-8, EMA on 0.956), against the untuned W_533 at seed 42 -2.639 and
+      scratch -2.911: about 44% of the W_533-to-scratch gap in NLL closed on the objective. The objective improves as lr_scale
+      falls: 6.67 -2.396, 2.22 -2.546, 1.28 -2.699, 0.873 -2.712, 0.383 -2.741, 0.36 -2.749, 0.332 -2.750, 0.174 -2.758; the
+      four best (0.17-0.38) lie within 0.016, flattening. The best sits in the bottom 20% (log) of the [0.1, 10] window; only
+      1 of the top 5 does, so the sampler''s auto-extension (3 of the top 5) would not fire; if confirmation is SHORT and
+      the design''s 8-trial extension runs, its lr_scale low edge goes to 0.01 (a 10x lower edge, as the trend is still falling
+      at the edge). The tuned warm start wants a lower lr than the parent''s (0.17x), not a more aggressive one. Confirmation
+      at seeds 42/43: FA-ccin2p3-56cca07a, 75d28cb4 (arm v4_het_warm25t_k533[_seed2], scripts/job_catalog_v3_short.sh @dab9ff19,
+      limit 2:15).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
