@@ -12012,11 +12012,6 @@ entries:
       1.19). On their end: check each step-0 validation (''Fine-tuning: validation before any update'') against the w8 parent''s
       best within 0.01, check two cache keys in the ''data.memmap'' lines, extract reads, run warm C10w, apply the rule, then
       delete the two new caches'
-    5: 'D289 running (reruns d521160b/b688a859, then warm starts from2132 0898a7b0/a6834028, from3198 2a27e8a2/0259e865, final
-      dd32a907/70c28bd9; wait on the six warm starts). Comparison entries in mixture_ab.py @7e2d97bc (warm C1ck2132, C1ck3198,
-      C1ckfinal). On their end: extract PP4 EE4 H1-H7c HD4 HD5 and val per run, run mixture_ab.py warm C1ck<x>, apply the
-      keep rule (better_than_final: R(W_ckpt/W_final) <= 0.90, widened interval below 1 on PP4 and EE4), report also against
-      step 3''s tuned runs'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -12981,11 +12976,6 @@ entries:
       - 'MATCH at some k: width growth is warm-startable at that fraction; next the w16->w32 pair on the same rule'
       - 'SHORT at every k: report g_k; tuning is the next call (Joaquin''s)'
       - 'step-0 validation off by more than 0.01: operator wrong, no read, fix and rerun'
-    5:
-      feeds: whether future pretrainings should keep a pre-decay checkpoint for later changes (D289)
-      if:
-      - 'a pre-decay checkpoint is resolved better on PP4 and EE4: keep one in every pretraining; report how much'
-      - 'no difference or worse: final model is the parent; report, a WSD pretraining only if Joaquin asks'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
