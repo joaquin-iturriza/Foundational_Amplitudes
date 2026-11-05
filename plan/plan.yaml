@@ -12633,6 +12633,14 @@ entries:
       than needed; the 2132 point says whether any k does, and the step-0 equality rules out a broken operator; tuning (D284''s
       sweep over the fine-tune space) is the next call. A step-0 validation off the parent''s by more than 0.01: the operator
       is wrong, no read, fix and rerun.'
+    passed_at: '2026-11-05T04:30:52+00:00'
+    reviewer: 'Round 2, width 8->16 growth vs width 16 from scratch: one change against B at B''s exact setup (only k and
+      the start differ, both untuned); measure moves, w16/w8 PP4 0.565 [0.522,0.614], EE4 0.562 [0.512,0.649] (width_x1.json),
+      A/B 1.77, and C1''s k-response 1.33/1.15/0.95; seeds 42/43 against 15-18% PP4 unpaired spread; yes bar now relative
+      to this gap, widened upper R(W_k/B) <= (A/B)^0.3 = 1.19 (>=70% of ln A/B); disk 2 new ~20 GB cache keys (rng_in per
+      seed, ft offshell in key, no steps or heads), 44.5 GB vs 88 GB free on /sps/lpnhe, shared key confirmed from first jobs''
+      logs; het loss, B''s preprocessing, C1''s reads; no sweep; 13.1 GPU-h. Searched results.tex, plan.yaml, site decisions
+      for grow, widen, hypercloning, net2, function-preserving, width growth: none.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
