@@ -358,6 +358,14 @@ ITERS=${ITERS_FIXED:-$(python -c "import math, sys, yaml; print(math.ceil(len(ya
 EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=false ++data.train_subsample=10000
        ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
 AXES=(H1 H2 H2p5 H3 H5 H6 H7E H7c "${CROSS[@]}"); [ "$ARM" = dimensionless_twin ] && AXES+=(H3p H4)
+# SHORT_MEMMAP=true (catalog_coverage step 43, the loading-path control): the short arm exactly as above (1e4 events
+# per process, 4264 steps) but loaded on the memmap path (data_mmap.py), its own run dir <arm>_memmap; against the
+# in-memory short arm of the same seed it separates the loading path from the data size of the 1x width cells
+if [ -n "$SHORT_MEMMAP" ]; then
+    case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "SHORT_MEMMAP only on v4_het_default25[_seed2]"; exit 1 ;; esac
+    EXTRA=("${EXTRA[@]/#++data.memmap=false/++data.memmap=true}")
+    OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_memmap"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_memmap"
+fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
 # LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; only the steps move: every cell trains on the whole train pool,
 # 1e5 events per tree process, 5e4 one-loop, and validates on 200 per process like the short arms, Joaquin D236), LONG_LR=<lr> (the 4x lr DyHPO's best, the law's scaling at 16x; 1x keeps the
