@@ -10544,6 +10544,17 @@ entries:
       (lock/logging edits keep the key, fails on the old hash; build/reduction/constant edits change it; entry edit changes
       species). Merged f56fd901 after repo-reviewer BLOCK (3 findings fixed) then PASS. Steps 37/38 asked to Joaquin (A exact
       draws, replay at open, per-job node-local momenta; or B per-event keyed draws in both paths).'
+  - at: '2026-11-05T05:32:54+00:00'
+    text: '2026-11-05 step 43(2) (ee_gain.py @4bf48e6c -> data/ee_gain_read.json; reads of mixture_ab.MIX_HET default25 vs
+      control, seeds'' geometric mean; catalog density from each class''s v4 val smix pool, as every role samples alike; the
+      train pools are not on CC): reading tested: e+e- gains most because the default share puts training events at the EE4
+      test events'' fixed energies, which the catalog''s log-uniform sqrt(s) draw covers thinly. Density gain at the test
+      events (median over events of log10 of the share-0.25 mixture''s over the catalog''s share within +-2% in sqrt(s)):
+      EE4 0.729 (x5.4) vs PP4 0.171 (x1.5); R EE4 0.182, PP4 0.344 (reproduces arms_vs_het_control). But within each set it
+      does not order the gain: Spearman(log R, gain) EE4 0.02 (p 0.83), PP4 +0.14 (wrong sign), pooled -0.04; and at matched
+      gain (top pooled quartile, gain 0.31-0.98: 115 EE4, 113 PP4 classes) EE4 R 0.182 vs PP4 0.396. So the sqrt(s) coverage
+      does not explain the EE4 advantage; open: other kinematic coverage (angles: the ee pools'' forward/collinear corners)
+      or the per-class target level; not yet tested.'
   handoff:
     state: '2026-11-05 ~06:40. Done this turn: step 54 (20448b14: run_metrics reads the sigma stage again per D276; width_x1.json
       re-read; width_x1_loss and length_w8_curves redrawn with sigma-stage tails; deck talks/progress_nov2026 rebuilt); step
