@@ -3783,6 +3783,12 @@ entries:
       seeds 42/43: v4_uux_epemg, uux_epemvevex (46% of pp events above the catalog max, 0 partons), uu_bbxuu (35%), us_ddxsu
       (32%), udx_csxvevex (31%); pass = share of the class''s MadEvent events above the kept flat max <= 0.1% and every kept
       bin up to the MadEvent 99.9% quantile of log|M|^2 >= 0.5 x the plateau, against the two seeds'' spread.'
+    58: 'Step 57 result to Joaquin (finding 2026-11-05, multichannel_check.json @3fdb914c): the multichannel candidates reach
+      the pp max on the three EW classes (above_max 0.49/0.39 -> <=0.0005) and pass the plateau rule only on v4_uux_epemg;
+      the top density stays capped by the candidates'' own density on all four others, and the two QCD 2->4 classes (uu_bbxuu,
+      us_ddxsu) still leave 2-10% of pp events above the max. Waiting on his call: keep multichannel (MC_TAIL 0.2, collinear
+      |eta| bound as stated) and add more candidates at the top (a second channel-share pass weighted to the top bins, or
+      a larger oversampling there), or another route'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -9200,6 +9206,11 @@ entries:
       if:
       - 'Joaquin agrees: implement in a worktree, design and pass the check, run it on CC (CPU), report before regenerating'
       - 'Joaquin prefers another route: record his words and redesign'
+    58:
+      feeds: how the catalog's flat part reaches the top of the pp |M|^2 before a regeneration
+      if:
+      - 'Joaquin picks a route: design it, rerun multichannel_check on the five classes'
+      - 'Joaquin says regenerate with multichannel as is: design the regeneration'
   owner:
     agent: a96709d13f776f50d
     state: working
