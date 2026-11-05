@@ -5288,8 +5288,18 @@ entries:
     at: '2026-11-05T06:12:16+00:00'
     searched: D288 approved building and checking it; no decision on what follows a failed check
     blocks: step 58 only
-    blocks_steps: &id001
+    blocks_steps:
     - 58
+  - ask: 'Sign output with the het. loss failed (wrong sign more often than the MSE model''s sign output: H5 13.3% vs 6.7%,
+      17 of 21 pools; HD5 18.3% vs 13.0%, 15 of 19; no better than always-positive on held-out), magnitude cost undecided
+      (R 1.03, interval 0.67 to 1.42). Next: (1) keep the het. magnitude target with no sign, (2) change the sign loss weight
+      or how the sign output attaches under het., or (3) take the sign from the MSE model?'
+    at: '2026-11-05T07:00:25+00:00'
+    searched: D287 asked to include the sign head with the het loss; D241 makes a loss-weight search Joaquin's call; nothing
+      settles what follows a failed sign read
+    blocks: step 56's follow-up only
+    blocks_steps: &id001
+    - 61
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -10572,12 +10582,14 @@ entries:
       data_mmap.py, tests/test_mmap_code_hash.py, scripts/job_catalog_v3_short.sh (SHORT_MEMMAP, SHORT_RERUN), docs/results.tex
       par:v4_width, ~/.local/bin/site (cmd_run options)
     written: '2026-11-05T05:33:08+00:00'
-  ask: 'Multichannel candidate check failed the plateau rule on 4 of 5 classes (it reaches the pp max on the electroweak classes
-    but too thinly at the top): keep multichannel and add candidates at the top (a second share pass weighted to the top bins,
-    or more oversampling there), or another route?'
-  waiting_since: '2026-11-05T06:12:16+00:00'
-  searched: D288 approved building and checking it; no decision on what follows a failed check
-  blocks: step 58 only
+  ask: 'Sign output with the het. loss failed (wrong sign more often than the MSE model''s sign output: H5 13.3% vs 6.7%,
+    17 of 21 pools; HD5 18.3% vs 13.0%, 15 of 19; no better than always-positive on held-out), magnitude cost undecided (R
+    1.03, interval 0.67 to 1.42). Next: (1) keep the het. magnitude target with no sign, (2) change the sign loss weight or
+    how the sign output attaches under het., or (3) take the sign from the MSE model?'
+  waiting_since: '2026-11-05T07:00:25+00:00'
+  searched: D287 asked to include the sign head with the het loss; D241 makes a loss-weight search Joaquin's call; nothing
+    settles what follows a failed sign read
+  blocks: step 56's follow-up only
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
