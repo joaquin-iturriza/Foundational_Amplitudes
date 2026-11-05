@@ -13154,6 +13154,13 @@ entries:
       of both defects about 4 GPU-h. Reviewer nit, not done: the same-width bypass could require the checkpoint''s own config
       to carry grow_width (a growth job pointed at a 16-head parent would quietly become a same-width warm start; the job
       script cannot produce it).'
+  - at: '2026-11-05T07:27:30+00:00'
+    text: '2026-11-05 step 5 (D289) read, mixture_ab.py warm C1ck2132/C1ck3198/C1ckfinal @e3eac2a4, written up par:v4_warm_start_tuned
+      @e1d0bc97: k=533 warm start at step 3''s tuned HPs from the rerun parent''s EMA checkpoints. R(W_ckpt/W_final): from
+      3198 PP4 1.02 [0.86, 1.20], EE4 1.00 [0.80, 1.25] (same); from 2132 PP4 1.23 [1.03, 1.47] (worse), EE4 1.15 [0.89, 1.48].
+      Keep rule (<=0.90, interval below 1) fails for both: no branch, the final model stays the parent. W_final reproduces
+      step 3''s tuned runs (PP4 1.00, EE4 0.99). R(W/B) PP4/EE4: from 2132 1.99/2.51, 3198 1.61/2.09, final 1.58/2.01 (all
+      SHORT). Every run read all probes; no blow-up. Caveat: each checkpoint retrained at the HPs tuned for the final model.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
