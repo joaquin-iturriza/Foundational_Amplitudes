@@ -12178,6 +12178,12 @@ entries:
     units: null
     start: '2026-11-04T21:24:12+00:00'
     at: '2026-11-04T21:24:12+00:00'
+  - batch: ws_c1_k533_hpo8
+    wall_h: 0.45
+    jobs: 8
+    units: null
+    start: '2026-11-05T02:11:52+00:00'
+    at: '2026-11-05T02:11:52+00:00'
   ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
     beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
     magnitude pair shows no gain). Go for that? And the changes left out: the eight catalog_v3 changes (Muon vs AdamW, GeV
