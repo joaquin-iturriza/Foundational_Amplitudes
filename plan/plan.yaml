@@ -174,14 +174,16 @@ entries:
   - D267
   - D271
   next:
-    10: '(b) more 6-particle training pools in the held-out multiplicity cells (D216), on catalog_v4: the 97 kept candidates
-      of the MadGraph existence check (analysis/catalog_v4/data/multext_checked.json; recipes/catalog_v4_multext*.yaml @07f2e008),
-      their class check (scripts/job_catalog_v4_multext_check.sh, CPU, not yet run), generated with the sampling that catalog_coverage''s
-      step 49 (the envelope redesign of the catalog sampling, to Joaquin) settles, so the generation waits on that design;
-      then one arm in the catalog_v4 het setup at the final share 0.25 (het loss, 1e4 per process, 4264 steps: the het share-0.25
-      arm FA-ccin2p3-f0156d88/df858d33 of catalog_coverage step 15, rerun at the arm''s commit as the matched control; the
-      het control pair FA-ccin2p3-87ea24d0/321a3de2, share 0, beside), seeds 42-45, read on H2 with multext_compare.py''s
-      r and s on the het reads; design, review, generation probe, GPU-h stated before submission.'
+    10: '(b) more 6-particle training pools in the held-out multiplicity cells (D216), on catalog_v4. Done: MadGraph existence
+      (125 of 147), held-out-family children dropped (97), v4 strings 97/97 and class check FA-ccin2p3-11fbcd25 (analysis/catalog_v4/data/multext_classcheck.json
+      @cb7de89a): 3 dropped as members of a held-out class (v4_ddx_mupmumvmvmx with H2 v4_ddx_epemvevex; v4_epem_ssxvmvmx
+      with H1 v4_epem_bbxvmvmx; v4_us_sssxu with H1 v4_ub_bbbxu), 94 kept (6qq 42, 6bq 20, 6ee 13, 6qg 8, 6bb 6, 6gg 3, 6bg
+      2), recipes regenerated @f6c378ec (14 classes of two candidates each, both members kept as the catalog keeps a class).
+      Waits on catalog_coverage''s step 49 (the envelope redesign of catalog sampling, to Joaquin): then the recipes re-written
+      at that sampling, generation probe, generation, sidecars, alphas; one arm in the catalog_v4 het setup at share 0.25
+      (1e4 per process, 4264 steps) against the het share-0.25 arm (FA-ccin2p3-f0156d88/df858d33) rerun at the arm''s commit
+      as matched control, the het control pair FA-ccin2p3-87ea24d0/321a3de2 beside, seeds 42-45, read on H2 absolute zero-shot
+      MSE (D274) with multext_compare''s r beside; design, review, GPU-h before submission.'
   done_when: 'site decisions --project FA | grep -q ''covers: v3_prep_explore closed'''
   match: zz_v3_prep*,runs/catalog_v3_short/dimensionless_shat*,catalog_v3_short/dimensionless_shat*,zz_v3_short_dimensionless_shat*,runs/catalog_v3_short/dimensionless_hybrid*,catalog_v3_short/dimensionless_hybrid*,zz_v3_short_dimensionless_hybrid*
   notes_ref: fig:v3_prep_shape
@@ -2550,11 +2552,11 @@ entries:
     at: '2026-10-29T05:33:23+00:00'
   step_why:
     10:
-      feeds: whether more same-multiplicity training data narrows the held-out multiplicity gap, and whether the pools join
-        the catalog's training set
+      feeds: whether more same-multiplicity training data lowers the held-out multiplicity zero-shot error, and whether the
+        pools join the catalog's training set
       if:
-      - 'step 49''s sampling settled: class check, generation probe, generation at that sampling, arm design to the reviewer'
-      - 'step 49 still open: nothing is generated; the class check alone may run'
+      - 'step 49''s sampling settled: recipes at that sampling, generation probe, generation, arm design to the reviewer'
+      - 'step 49 still open: nothing more moves in (b)'
   step_waits:
     '7': 'D78: the user''s hold on the full catalog pretraining''s design (step (a) is held there, nothing to launch until
       it is released)'
