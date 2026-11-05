@@ -10521,6 +10521,18 @@ entries:
       0.20/0.40, 0.20/0.26, highest 0.14/0.19. But level does not explain all of the EE4 advantage: OLS log R = a + b ln MSE_ctl
       + c[EE4]: b -0.174, EE4 offset at fixed control MSE x0.56 [0.45, 0.68] (bootstrap 90%), raw EE4/PP4 median ratio 0.53.
       Kinematic coverage (forward angle, collinear pair, log|M|^2, sqrt(s) in the CM frame) pull running (detached ee_kin).'
+  - at: '2026-11-05T05:40:46+00:00'
+    text: '2026-11-05 step 43(2) kinematic coverage (ee_gain.py pull_kin/read_kin @2d54636f, data @c3b19a85; 912 probes, none
+      missing; per test event log10 of the share-0.25 mixture''s over the catalog''s density in a window, CM frame, median
+      per probe, class mean): median gain EE4/PP4: sqrt(s) 0.73/0.17, most forward final log10(1-|cos|) 0.006/0.037, most
+      collinear pair 0.006/0.014, log10|M|^2 0.52/0.64. Angles: the default share adds no forward or collinear density (gain
+      ~1.0x) and does not order R (Spearman EE4 +0.15/-0.11, PP4 -0.18/-0.23). |M|^2: the default events sit where the catalog
+      is ~3-4x thinner in |M|^2, and that orders R within each set (Spearman EE4 -0.28, PP4 -0.58, pooled -0.51), but EE4
+      gets the smaller |M|^2 gain and still the larger improvement: at matched |M|^2 gain (pooled quartiles) R EE4/PP4 0.27/0.61,
+      0.17/0.48, 0.19/0.25, 0.11/0.22. Verdict by the step''s rule (gain orders R and explains EE4 vs PP4 at matched gain):
+      not met for any of the four variables nor the control level (EE4 x0.56 [0.45,0.68] at fixed control MSE). What orders
+      the gain within a set: the control''s MSE and the |M|^2 coverage; what makes EE4 gain ~2x more stays unexplained by
+      marginal coverage. Not taken further without a new reading (none on record).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
