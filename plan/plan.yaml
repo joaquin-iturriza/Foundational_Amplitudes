@@ -11110,9 +11110,9 @@ entries:
       with main_turns.py
   owner:
     agent: a4fac12b15e414c77
-    state: working
+    state: stopped
     since: '2026-11-05T06:18:42+00:00'
-    state_at: '2026-11-05T06:18:42+00:00'
+    state_at: '2026-11-05T06:19:16.062000+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
