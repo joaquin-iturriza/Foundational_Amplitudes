@@ -3707,9 +3707,6 @@ entries:
   - D258
   - D288
   next:
-    36: 'After both CC sweeps end (the freeze lifts): limit data_mmap._code_hash to the code that produces the cached arrays
-      (boost/augment, ordering, preprocessing, standardisation, tables), not the lock, logging or I/O, with a test that a
-      lock-only edit of data_mmap.py keeps the key.'
     37: 'After both CC sweeps end (data_mmap freeze): the memmap cache stores events BEFORE the random Lorentz augmentation,
       one cache for every seed; each event''s transform is drawn at read time from (run seed, event index), so a run sees
       exactly the transform it sees today; momentum standardisation stats computed at open from the seed. Equivalence test
@@ -9118,11 +9115,6 @@ entries:
     start: '2026-11-05T04:40:08+00:00'
     at: '2026-11-05T04:40:08+00:00'
   step_why:
-    36:
-      feeds: whether later code edits force new ~23 GB memmap caches
-      if:
-      - 'test passes: commit, repo-reviewer, note that the next run of each key rebuilds once'
-      - 'the array code cannot be separated cleanly: hash per function and list them in the test'
     37:
       feeds: one data cache per dataset, not per seed or code version
       if:
