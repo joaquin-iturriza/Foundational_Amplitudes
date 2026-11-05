@@ -8617,6 +8617,34 @@ entries:
       and bins below half, and the cause read from the channels; no regeneration. Current failing and multichannel failing
       alike: the draw does not reach the top, reported as such. Cost: 5 CPU jobs, 1 CPU each, about 5-15 min each (train-pool
       chunk times 47-70 s per build from the regen logs, x4 builds), no GPU, no stored pool.'
+    fix_at: '2026-11-05T04:38:27+00:00'
+    fix: 'Check 5 (prior, searched independently): the prior field says no multichannel check exists, which is true, but it
+      omits docs/results.tex''s prior work on the same question, covering resonances in the flat-in-log|M|^2 part by generation:
+      (a) the ee->uu Z-resonance study (paragraph ''Coverage validated on the ee->uu Z resonance, by generation rather than
+      resampling'', ~line 9194: resampling the RAMBO pool does not fix the pole, a pole-covering sqrt(s) proposal at generation
+      lifts pole coverage 0.4% -> 32%, 2.6x better on the log-flat metric); (b) the open item ''Resonance-aware generation''
+      (~lines 8151-8161): for internal-invariant-mass needles (4l, WWbb, mumutautau) ''resonance-aware phase-space sampling
+      (a la MadGraph channel mapping), the only real cure'', never tested; (c) the catalog''s adaptive sqrt(s) pass description
+      (~lines 292-298): ''Nothing reads a resonance mass; a level criterion ... does not find a pole''. Fix: re-record the
+      design with these three in prior, each with its result and how this design differs (Breit-Wigner channels on internal
+      invariant masses of 2->n finals, plus the initial-state collinear channel, against the sqrt(s)-only proposal that (a)
+      used and the control (c) still uses; (b) is the untested proposal this check tests). Terms searched: multichannel, multi-channel,
+      Breit, resonance, resonance channel, collinear channel, initial-state collinear, flat part, flat-in-log, kept flat,
+      VEGAS, importance sampl, pp_support, sampling_example; entry text; site decisions (D288). Check 4 (clarify, same revision):
+      min_over_plateau counts every bin from the kept minimum up, so a class can fail on a thin bottom-edge bin (the current
+      v4_uux_epemg replay has 341 kept at -9.00 against a 1334 plateau, sampling_shape_report.json) for a reason unrelated
+      to the top; state that a failure only below the plateau''s lower half is reported as a bottom-edge failure and not read
+      as ''does not reach the top''. Also state in the outcome that the pass rule is judged on pp events inside the catalog''s
+      support (sqrt(s_hat) window and cuts) rather than on all the class''s MadEvent events as the proposal Joaquin approved
+      worded it, with above_max_all reported beside: this isolates the sampler (uu_bbxuu has 1.3% of pp events outside the
+      support, 92% of them above the max, pp_support_reads.json, so all-events could never reach 0.1%), but it is a difference
+      from the approved wording and goes in the report. Everything else passes: one change (sampling.multichannel and its
+      channel inputs) against the catalog as built on the same chunks and seeds; the measure moves with the candidate draw
+      (current kept/candidates 1.0 above -1.75 dex, kept 35 at -1.25 against plateau 1334 on v4_uux_epemg; pp in-support share
+      above the catalog max 0.457 uux_epemvevex, 0.344 uu_bbxuu, 0.317 us_ddxsu, 0.313 udx_csxvevex in pp_support_reads.json
+      @07ab67cf); effects (30-46% to <=0.1%, 0.03 to >=0.5) far above seed noise with ~1000 kept per bin, both seeds required;
+      no training, no label in the sampler (it adapts on its own candidates), pp 13 TeV MadEvent test events as the question
+      asks, CPU only, no stored pool.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
