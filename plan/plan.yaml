@@ -11375,6 +11375,9 @@ entries:
     3: 'D284: C1 warm start fixed at k=533 (1/8), single-fidelity DyHPO of the warm arm over the fine-tune space (lr_scale,
       layer_decay, warmup, eta_min, muon decay, reg, EMA), no matched control (D286); best trial re-run at seeds 42/43 with
       the full reads, read as W/B; C2-C8 wait until it is done'
+    4: 'D285: design reuse of the pretrained model when the change alters parameter shapes (added input columns or heads zero-initialised,
+      width growth under muP, depth growth by identity blocks), from the literature check; which project changes need which,
+      what code exists (base_experiment._load_pretrained_weights)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -11987,6 +11990,11 @@ entries:
       if:
       - 'best k=533 trial MATCHes (W/B widened upper <= 1.35 on PP4, EE4): report, aggressive warm start is enough'
       - 'no MATCH after the sweep: report the best W/B with g, propose schedule change (WSD cooldown) as next call'
+    4:
+      feeds: whether shape-changing changes can also start from the pretrained model (D285)
+      if:
+      - 'a function-preserving init exists for a change: design its warm-start test like C1'
+      - 'none for width under muP: report what it needs to Joaquin'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
