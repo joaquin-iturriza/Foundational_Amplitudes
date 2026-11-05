@@ -2828,6 +2828,60 @@ settings tuned for the final model.
 % claim: k.533.W_over_tuned_post_sigma.EE4.0=0.99
 % allow: 0.25 533 8 0.17 1.35 1.33 1.51 0.55 0.66 42 43 2132 3198 0.65 0.20 0.90 1 d9e1af1f because they are the share, k, the trial count, the tuned lr scale, the rule bars, the untuned k=533 reads of par:v4_warm_start, the seeds, the checkpoint steps and their cosine lr fractions, and the job script commit
 
+\paragraph{Warm start across a width change: growing the pretrained model (2026-11-05).}\label{par:v4_warm_start_grow}
+The first change that alters parameter shapes [D285]: can a pretrained width-$8$ model ($8$ heads, \code{num\_heads}
+the $\mu$P width axis) be grown to width $16$ and retrained briefly to match width $16$ trained from scratch, and at
+what fraction of the compute? Without a function-preserving start, a shape change re-initialises every changed
+tensor at random. The growth (\code{models/grow\_width.py}, HyperCloning-style, Samragh et al.\ 2024,
+arXiv:2409.12903) duplicates every residual channel, head and MLP hidden unit, halves each consumer's input weights
+(the $\mu$P readout's are copied unhalved, as its $1/m$ doubles) and adds noise of $10^{-3}$ times the child's
+initial standard deviation to the second copies' incoming weights to break their symmetry. Design (passed review
+2026-11-05): the parent A is the width-$8$ cell of the width study (whole catalog\_v4 training set, share $0.25$, het
+loss, $4264$ steps; FA-ccin2p3-804a65bc, FA-ccin2p3-66e8c31f), B the width-$16$ cell from scratch
+(FA-ccin2p3-493c98db, FA-ccin2p3-7288b3fe), the warm start $W_k$ the grown parent retrained $k$ steps at B's exact
+setup with the schedule restarted and untuned (learning-rate scale $1$, no layer decay), $k\in\{533,1066,2132\}$,
+seeds $42$ and $43$ (k $533$: FA-ccin2p3-e046ac67, FA-ccin2p3-f35b6a78; $1066$: FA-ccin2p3-380c7b14,
+FA-ccin2p3-af86de05; $2132$: FA-ccin2p3-58723352, FA-ccin2p3-93479cde; \code{scripts/job\_catalog\_v3\_short.sh}
+@13fe9f64). Reads and $R$ as in par.~\ref{par:v4_warm_start}; the bar is set by this change's own gain ($R(B/A)$ PP4
+$0.565$, EE4 $0.562$): MATCH when the widened upper end of $R(W_k/B)$ is at most $(A/B)^{0.3}=1.19$ on PP4 and EE4,
+SHORT when its lower end is above $1$ on either. The growth is exact: before any update the grown model's validation
+loss equals the parent's best to $0.002$ at both seeds. All six runs read every probe and none blew up. The outcome took
+the SHORT branch at every $k$: $R(W_k/B)$ PP4 $1.75$ ($[1.44, 2.14]$), $1.59$ ($[1.32, 1.95]$), $1.29$ ($[1.07,
+1.57]$) and EE4 $1.76$ ($[1.56, 2.06]$), $1.62$ ($[1.39, 1.81]$), $1.33$ ($[1.20, 1.49]$) at $k=533$, $1066$, $2132$. As
+the share of the width gain reached, $g_k$ PP4 $-0.01$, $0.13$, $0.52$ and EE4 $-0.02$, $0.11$, $0.45$: after $533$
+steps the grown model still computes the parent's function, and half a pretraining recovers about half the gain. The
+same-shape data change of par.~\ref{par:v4_warm_start} reached $g$ $0.55$, $0.76$, $1.07$ on PP4 at these $k$, so the
+grown width is much slower to use than a new data share. Caveats: two seeds; untuned restarted schedule; the duplicated
+units start nearly identical and only the noise and the data separate them.
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C10w @9f4cae14
+% claim: B_over_A.PP4=0.565
+% claim: B_over_A.EE4=0.562
+% claim: k.533.W_over_B.PP4.0=1.75
+% claim: k.533.W_over_B.PP4.1.0=1.44
+% claim: k.533.W_over_B.PP4.1.1=2.14
+% claim: k.1066.W_over_B.PP4.0=1.59
+% claim: k.1066.W_over_B.PP4.1.0=1.32
+% claim: k.1066.W_over_B.PP4.1.1=1.95
+% claim: k.2132.W_over_B.PP4.0=1.29
+% claim: k.2132.W_over_B.PP4.1.0=1.07
+% claim: k.2132.W_over_B.PP4.1.1=1.57
+% claim: k.533.W_over_B.EE4.0=1.76
+% claim: k.533.W_over_B.EE4.1.0=1.56
+% claim: k.533.W_over_B.EE4.1.1=2.06
+% claim: k.1066.W_over_B.EE4.0=1.62
+% claim: k.1066.W_over_B.EE4.1.0=1.39
+% claim: k.1066.W_over_B.EE4.1.1=1.81
+% claim: k.2132.W_over_B.EE4.0=1.33
+% claim: k.2132.W_over_B.EE4.1.0=1.20
+% claim: k.2132.W_over_B.EE4.1.1=1.49
+% claim: k.533.g.PP4=-0.01
+% claim: k.1066.g.PP4=0.13
+% claim: k.2132.g.PP4=0.52
+% claim: k.533.g.EE4=-0.02
+% claim: k.1066.g.EE4=0.11
+% claim: k.2132.g.EE4=0.45
+% allow: 8 16 2409.12903 10 3 1 0.25 4264 533 1066 2132 42 43 0.3 1.19 0.002 0.55 0.76 1.07 13fe9f64 because they are the widths, the paper id, the noise, the share, steps, k, seeds, the bar's exponent and value, the step-0 check (finding on the entry, from the run logs), C1's g, and the job commit
+
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
 tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
