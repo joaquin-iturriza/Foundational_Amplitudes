@@ -307,10 +307,18 @@ def _jsonable(x):
     return x
 
 
+# what of this module the cached arrays come from: the streamed reductions and the build; not the lock, the logging,
+# the key's assembly (its inputs are in the key document itself), the open or the batch-time reader [step 36]
+ARRAY_CODE = ("F32FlatSum", "f32_mean_std", "_rowsum", "rows_mean_std", "_build")
+ARRAY_CONSTANTS = ("MMAP_VERSION", "CHUNK", "NP_BLOCK")
+
+
 def _code_hash():
-    """Hash of the code the cached arrays come from: this module, the preprocessing and particle tables, and the
-    experiment methods that load, boost, order and standardize (a change to any of them builds a new cache)."""
+    """Hash of the code the cached arrays come from: this module's reductions and build (ARRAY_CODE, ARRAY_CONSTANTS),
+    the preprocessing and particle tables, and the experiment functions that load, boost, order and standardize. A
+    change to any of them builds a new cache; an edit elsewhere in this module (the lock, logging, the open) does not."""
     import inspect
+    import sys
     import experiment
     import multiplicity_extrap
     import particle_ids
@@ -319,13 +327,16 @@ def _code_hash():
     E = experiment.AmplitudeExperiment
     import physics_scales
     import mg5_pipeline_final as mg
-    parts = [inspect.getsource(m) for m in (
-        __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition,
-        physics_scales)]
+    me = sys.modules[__name__]
+    parts = [inspect.getsource(getattr(me, n)) for n in ARRAY_CODE]
+    parts += ["%s = %r" % (n, getattr(me, n)) for n in ARRAY_CONSTANTS]
+    parts += [inspect.getsource(m) for m in (
+        preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition, physics_scales)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
         E._setup_offshell_masks, E._physics_logF, E._eikonal_logS, E._orders_of,
-        E._diagram_born_orders, E._target_orders_source, mg.sidecar_born_orders, mg.target_monomial_from_diagrams)]
+        E._diagram_born_orders, E._target_orders_source, mg.sidecar_born_orders, mg.target_monomial_from_diagrams,
+        experiment.recipe_process_cfg)]   # ordering: multiplicity_extrap.order_identical_particles, hashed whole above
     parts += [np.__version__, torch.__version__]
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
