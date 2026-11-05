@@ -1821,6 +1821,51 @@ def cmd_status(a):
         print("%-28s %-15s %s" % (eid, state, text))
 
 
+def sweep_summary(site, name):
+    """(evaluations, best val_loss) read from the sweep's summary.txt on its site, read only (`site run` names no work
+    item); (None, None) when unreadable."""
+    try:
+        r = subprocess.run(SITE + ["run", site, PROJECT, "--", "head", "-n", "4", "sweeps/%s/summary.txt" % name],
+                           capture_output=True, text=True, timeout=max(1, min(CHECK_TIMEOUT, budget())))
+    except subprocess.TimeoutExpired:
+        return None, None
+    ev = re.search(r"Evaluations completed:\s*(\d+)", r.stdout)
+    best = re.search(r"Best val_loss:\s*(\S+)", r.stdout)
+    return (int(ev.group(1)) if ev else None), (best.group(1) if best else None)
+
+
+def cmd_sweepends(a):
+    """For the supervisor: a JSON list of {entry, owner, owner_state, site, name, label, steps} for every sweep recorded
+    on an entry not done that has ended (no job in its site's queue, as `plan next` reads it) and that a step wait
+    (`plan wait`) names as `SITE:NAME` or by its name; with --read SITE:NAME, {evaluations, best_val_loss} from its
+    summary.txt instead. Read only."""
+    if a.read:
+        site, _, name = a.read.partition(":")
+        ev, best = sweep_summary(site, name)
+        print(json.dumps({"site": site, "name": name, "evaluations": ev, "best_val_loss": best}))
+        return
+    d, st = load()
+    rows = []
+    for e in d["entries"]:
+        if e.get("status") == "done" or not sweeps_of(st, e["id"]):
+            continue
+        waits = e.get("step_waits") or {}
+        sw = site_sweeps(want_of(st, [e["id"]]), all_sites=False)
+        ended, _, _ = sweep_status(e["id"], st, sw)
+        names = {sweep_label(x["name"], x["site"], (sw.get(x["site"]) or {"sweeps": {}})["sweeps"].get(x["name"]) or {}): x
+                 for x in sweeps_of(st, e["id"])}
+        for lab, _, _ in ended:
+            x = next((v for k, v in names.items() if lab.startswith(v["name"] + " (")), None)
+            if not x:
+                continue
+            steps = sorted(str(k) for k, w in waits.items()
+                           if re.search(r"(?<![\w-])(%s:)?%s(?![\w-])" % (re.escape(x["site"]), re.escape(x["name"])), str(w)))
+            o = owner_of(e)
+            rows.append({"entry": e["id"], "owner": o and o["agent"], "owner_state": owner_state(e), "site": x["site"],
+                         "name": x["name"], "label": lab, "steps": steps})
+    print(json.dumps(rows))
+
+
 def cmd_owners(a):
     """Per entry not done: its owner, the owner's state and the runs recorded on it (`plan run`), for the supervisor
     (one RUN_DONE event per entry per pass, muted while the owner works) and the waiter (quiet for a working owner)."""
@@ -2949,6 +2994,9 @@ def main(argv=None):
         A("--json", action="store_true", help="a JSON list of {entry, state, why} (the supervisor's pass reads it)"))
     cmd("owners", cmd_owners, "a JSON list of {entry, status, owner, owner_state, runs} for every entry not done "
         "(the supervisor's RUN_DONE events and the waiter read it)")
+    cmd("sweepends", cmd_sweepends, "a JSON list of the ended sweeps recorded on entries, with the steps whose wait names "
+        "them (the supervisor's sweep RUN_DONE reads it); --read SITE:NAME gives a sweep's evaluations and best result",
+        A("--read", help="SITE:NAME: read this sweep's summary.txt (read only)"))
     cmd("show", cmd_show, "print the entries; with an id, that one entry in full (read an entry this way, never by "
         "grepping plan/plan.yaml)",
         A("id", nargs="?", help="one entry, with its whole evidence, dead ends, quotes and design"),
