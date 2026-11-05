@@ -10509,6 +10509,14 @@ entries:
       56), 48, 49, 50, 52 (the envelope / IS-collinear / own-sampler proposals: superseded by Joaquin''s D288 item 2 ''Yes,
       build it and run the check'' on the multichannel proposal, built and checked as step 57, his call now step 58), 53 (done,
       finding 2026-11-04T19:59). None of 47-53 waits on him; what waits on him: 37/38 (cache A/B), 39(e), 58.'
+  - at: '2026-11-05T05:38:29+00:00'
+    text: '2026-11-05 step 43(2) target-level reading (ee_gain.py read_level @2d54636f -> data/ee_gain_level.json; default25
+      vs het control, mixture_ab.MIX_HET reads, trained classes EE4 115, PP4 797): the default share''s gain grows with how
+      badly the control does on the class: Spearman(log R, ln control MSE) EE4 -0.49, PP4 -0.54, pooled -0.57. The control
+      is ~4x worse on EE4 (median class MSE 0.99 vs 0.26). R by pooled quartile of control ln MSE (EE4/PP4): lowest 0.69/0.60,
+      0.20/0.40, 0.20/0.26, highest 0.14/0.19. But level does not explain all of the EE4 advantage: OLS log R = a + b ln MSE_ctl
+      + c[EE4]: b -0.174, EE4 offset at fixed control MSE x0.56 [0.45, 0.68] (bootstrap 90%), raw EE4/PP4 median ratio 0.53.
+      Kinematic coverage (forward angle, collinear pair, log|M|^2, sqrt(s) in the CM frame) pull running (detached ee_kin).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
