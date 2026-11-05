@@ -11974,6 +11974,52 @@ entries:
       Joaquin with costs (about 12 GPU-h each), alongside the 95 GPU-h request. Disk is about 46 GB against about 92 GB free.
       Searched: warm start, warm-start, warmstart, continu, resume, restart, pretrained_path, from scratch, LONG_CKPT (results.tex);
       warm, continu, resum, pretrain, from scratch (decisions, plan).'
+  - at: '2026-11-05T02:07:29+00:00'
+    question: 'D284 (Joaquin 2026-11-05: fix k at 1/8 and sweep, in particular lr, to see how aggressive the improvement can
+      be made): for C1 (share 0.25, het), does a warm start of the het control retrained k=533 steps (1/8 of the 4264-step
+      pretraining) at tuned hyperparameters reach share 0.25 from scratch, where the untuned restarted schedule (lr_scale
+      1, warmup 0.158, cosine) is SHORT (PP4 W/B 1.33 [1.30, 1.37], EE4 1.51 [1.37, 1.71])? No matched control (D286).'
+    prior: 'par:v4_warm_start (@1258ef73, warm_start_C1.json @f0015680): untuned W_533/B PP4 1.33, EE4 1.51 (SHORT), W_1066
+      1.15/1.23 (MATCH by the bound, resolved worse), W_2132 0.95/1.01 (equal); g_533 PP4 0.55, EE4 0.66. Fine-tune HP sweeps:
+      muon_hp_ft (sweep/sweep_config_ccin2p3_muon_hp_ft.yaml, lr_scale [0.1,10], layer_decay [0.75,1]) on catalog_v3 single-process
+      fine-tunes, a different task (new process, small D). HPO rule 4: best fine-tune lr ~ pretrain lr. Literature (lookup
+      from memory, ids not re-checked): Gupta et al. 2023 arXiv:2308.04014 and Ibrahim et al. 2024 arXiv:2403.08763 (re-warm
+      to about the original max lr then re-decay; peak lr the main knob, warmup length barely matters; optimizer state reset
+      is fine); Hu et al. 2024 arXiv:2404.06395 and Haegele et al. 2024 arXiv:2405.18392 (warmup-stable-decay: a short cooldown
+      brings most of the gain; not implemented here, schedulers are cosine/OneCycle/plateau only). Searched results.tex, plan,
+      site decisions: warm start, lr_scale, continual, re-warm, fine-tune sweep.'
+    measure: 'Sweep objective: each trial''s best-checkpoint val_loss_no_reg of the mean stage on the share-0.25 recipe''s
+      validation (the het NLL, sigma stage off in trials, as the long-run sweeps). Verdict read: the best trial''s HPs rerun
+      as the warm arm at seeds 42 and 43 (each from its seed''s parent), full job (sigma stage, D276; PP4, EE4, HD4, HD5,
+      H1-H7c), read by mixture_ab.py warm as R(W*/B) on PP4, EE4 (all classes), held-out default-sampled pooled and catalog-sampled
+      pooled, with g = ln R(W*/A)/ln R(B/A), and R(W*/W_533 untuned) beside.'
+    check: 'The objective moves with what is tested, on the C1 runs (mixture_ab.py val reads): best val_loss_no_reg of W_533,
+      W_1066, W_2132, B (seed 42/43) = -2.639/-2.586, -2.766/-2.686, -2.899/-2.839, -2.911/-2.900, monotone with R(W_k/B)
+      PP4 1.33, 1.15, 0.95 and EE4 1.51, 1.23, 1.01; the gap W_533 to B (~0.29 in NLL) is about 5x the seed spread (0.05),
+      so a trial closing a part of it is resolvable on one seed.'
+    fixed: 'Everything of the warm arm v4_het_warm25_k533 (scripts/job_catalog_v3_short.sh @7f945910; base_config runs/catalog_v4_short/v4_het_warm25_k533):
+      parent the het control''s best mean-stage model (EMA), its tokenizer and target stats (target_stats parent), share-0.25
+      recipe, 1e4 train / 200 val per pool in memory, width 8, MuonAdamW, batch 16384, HETEROSC, cosine scheduler, 533 steps,
+      seed 42 in the sweep. Searched (template fine-tune space, HPO rules 3-4): fine_tune.lr_scale log [0.1, 10] (lr 5e-4
+      to 5e-2 around the parent''s 4.997e-3), fine_tune.layer_decay [0.75, 1], training.cosanneal_warmup_frac [0.01, 0.2]
+      (low end below the template''s 0.05: the literature finds warmup length insensitive for a re-warm, and a 533-step run
+      spends 84 steps at 0.158), training.cosanneal_eta_min log [1e-10, 1e-7], training.muon_weight_decay log [1e-3, 0.3],
+      training.regularization_lambda log [1e-10, 1e-6], ema {false,true} x ema_decay [0.9, 0.999]. 8 trials, 3 random start-up,
+      waves [3,3,2], gp surrogate, 2000 candidates, objective_scale auto, range extension on lr_scale. Fresh optimizer (the
+      parent''s optimizer state is not saved).'
+    control: 'B: share 0.25 from scratch (f0156d88/df858d33, reads 9538e607/ed96b552), as in C1; A the het control at step
+      0; the untuned W_533 pair (341bf564/254abf4f) as the before. No matched C_k (D286: the gain is the change''s).'
+    seeds: 'Sweep trials seed 42 (parent seed 42). The best trial''s HPs rerun at seeds 42 and 43 (parent seed 43 = v4_het_control_seed2),
+      the seed-43 run free of the best-of-8 selection; both reported apart and as the pair. GPU-h: trial 533 steps at the
+      measured warm-arm rate (533 steps in 11.9 min incl. 55 validations on V100, 341bf564) + 11.7 min data load + 2 min end
+      = 0.45 h, 8 trials 3.6 GPU-h; one extension of 8 trials if no MATCH (3.6); 2 confirmation runs at the warm arm''s measured
+      1.45 h (23:38-01:05, 341bf564) = 2.9; total at most 10.1 GPU-h on CC-IN2P3, under 30.'
+    outcome: 'On the confirmation pair, as C1''s rule: MATCH when the widened upper end of R(W*/B) <= 1.35 on PP4 and EE4,
+      SHORT when the widened lower end > 1 on either, else INCONCLUSIVE; also resolved worse/equal listed. YES (tuned k=533
+      reaches scratch): report HPs (lr_scale etc.) and W*/B, the 1/8 warm start is enough; then C2-C8 at k=533 with those
+      HPs go to Joaquin. SHORT after 8 trials: extend once by 8 trials (same state) and re-confirm; still SHORT: report best
+      W*/B and g, with the WSD cooldown schedule (needs code) as the next call to Joaquin. The best trial''s lr_scale at the
+      window''s edge is reported (range extension may move it).'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
