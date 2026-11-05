@@ -10414,6 +10414,13 @@ entries:
       s/step); per doubling of width x1.73 then x2.02, not the overshooting width/checkpointing factor used then. Next width
       batch: time per unit from these runs (+ cache build 933-980 s and the reads from tools/short_wall.py), not a scaled
       estimate.'
+  - at: '2026-11-05T05:11:17+00:00'
+    text: '2026-11-05 step 36 done: data_mmap._code_hash hashes only the array-producing code (F32FlatSum, f32_mean_std, _rowsum,
+      rows_mean_std, _build, MMAP_VERSION/CHUNK/NP_BLOCK) plus the modules before and diagram_graphs; key_doc gains species_in
+      (catalog entry + recipe physics per pool, which shape tokens.npy and were unkeyed); tests/test_mmap_code_hash.py 3 cases
+      (lock/logging edits keep the key, fails on the old hash; build/reduction/constant edits change it; entry edit changes
+      species). Merged f56fd901 after repo-reviewer BLOCK (3 findings fixed) then PASS. Steps 37/38 asked to Joaquin (A exact
+      draws, replay at open, per-job node-local momenta; or B per-event keyed draws in both paths).'
   handoff:
     state: '2026-11-05 ~06:40. Done this turn: step 54 (20448b14: run_metrics reads the sigma stage again per D276; width_x1.json
       re-read; width_x1_loss and length_w8_curves redrawn with sigma-stage tails; deck talks/progress_nov2026 rebuilt); step
