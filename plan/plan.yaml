@@ -12101,7 +12101,7 @@ entries:
     - 3
   owner:
     agent: a0ca24cd204278468
-    state: working
+    state: closed
     since: '2026-11-05T05:42:16+00:00'
     state_at: '2026-11-05T09:21:37+00:00'
     context: 208237
@@ -13199,36 +13199,26 @@ entries:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
   handoff:
-    state: 'C1 written up (par:v4_warm_start @1258ef73). Step 3 (D284) read @7f47781a (warm_start_C1t.json): tuned k=533 (hp_1860)
-      SHORT, R(W/B) PP4 1.59, EE4 2.21, WORSE than untuned k=533 (R PP4 1.19, EE4 1.40) though its val_loss_no_reg objective
-      improved (-2.639 -> -2.758): the sweep objective disagrees with the deciding reads; the design''s SHORT branch (8-trial
-      extension, lr_scale low edge 0.01) is held on a question to Joaquin (run it as designed, or change the objective, or
-      go to a WSD cooldown) - not yet asked by the main session. Step 5 (D289) running: reruns d521160b/b688a859 (v4_het_control_ckpt[_seed2],
-      training normal, ~1.16 h), 6 warm starts chained afterok (from2132 0898a7b0/a6834028, from3198 2a27e8a2/0259e865, final
-      dd32a907/70c28bd9), wait on step 5; when they end: extract (PP4 EE4 H1-H7c HD4 HD5) + val per run, add a C1ck entry
-      to mixture_ab.py WARM (paired by seed W_x/W_final, plus W_x/B), apply the design''s rule. Step 4 (D285) running: width
-      growth w8->w16, design passed round 2 (MATCH bar widened upper R(W_k/B) <= 1.19 = (A/B)^0.3), code @12f51879, runs (GROW_K
-      env on v4_het_default25[_seed2], LONG_HEADS=16 LONG_CKPT LONG_MEMMAP, mem 46G) k533 93b037bb/ee8df686, k1066 69b7e27d/6954649e,
-      k2132 57802518/da290610, wait on step 4; when they end: check each step-0 validation (log ''Fine-tuning: validation
-      before any update'') against the w8 parent''s best within 0.01, check the two cache keys in ''data.memmap: opening/holding
-      the lock of <key>'' lines, delete the two new caches after the reads, extract reads, add a C10w WARM entry with B =
-      w16 cells (493c98db/7288b3fe), A = w8 cells (804a65bc/66e8c31f) and MATCH_HI 1.19 for it, read. C2-C8 wait on Joaquin''s
-      go.'
-    decisions: 'D284 tune k=533 by DyHPO; D286 no matched control; D289 pre-decay checkpoint test; D285 shape-changing reuse:
-      width doubling by function-preserving growth (HyperCloning-style; noise 1e-3 x child init std; exact to 1e-5 relative
-      without noise in tests). The merge refusal of ws-ckpt was the reviewer advancing its watermark from the main checkout:
-      re-reviewed after merging trunk into the branch, advance run from the worktree; the rule text for repo-reviewer.md and
-      the guard message was denied by the permission classifier (Joaquin''s call). submit_guard''s 60-min item budget delayed
-      step 4''s batch ~1 h behind step 5''s; sent whole at 05:35 UTC.'
-    ruled_out: C7 (no from-scratch gain); C9 (confound); catalog_v3 changes (pools deleted); the val_loss_no_reg-tuned low-lr
-      warm start as the way to close the k=533 gap (it widened it).
-    running: FA-ccin2p3-d521160b, b688a859 (step 5 reruns, intermediate); 0898a7b0, a6834028, 2a27e8a2, 0259e865, dd32a907,
-      70c28bd9 (step 5 warm starts, wait step 5); 93b037bb, ee8df686, 69b7e27d, 6954649e, 57802518, da290610 (step 4 width
-      growth, wait step 4)
-    files: analysis/catalog_v4/mixture_ab.py (warm, WARM table), analysis/catalog_v4/data/warm_start_C1.json, warm_start_C1t.json,
-      models/grow_width.py, tests/test_grow_width.py, tests/test_save_at_steps.py, scripts/job_catalog_v3_short.sh (GROW_K,
-      ckpt arms), base_experiment.py (_load_pretrained_weights grow_width, save_model_at_steps), worktrees/wt-ws-ckpt and
-      wt-ws-grow (merged, removal denied by the permission classifier)
-    written: '2026-11-05T05:40:42+00:00'
+    state: 'Written up: C1 (par:v4_warm_start @1258ef73), step 3 tuned k=533 and step 5 pre-decay checkpoints (par:v4_warm_start_tuned
+      @e1d0bc97), step 4 width growth (par:v4_warm_start_grow @97a69764). Step 3 (D284): tuned k=533 SHORT and worse than
+      untuned (R(W/B) PP4 1.59, EE4 2.21); its extension waits on Joaquin''s retune question (8-trial extension to lr_scale
+      0.01, a read-following objective, or WSD cooldown). Step 5 (D289) done: pre-decay checkpoints not better (3198 equal
+      1.02/1.00, 2132 worse PP4 1.23); final model stays the parent; step dropped. Step 4 (D285) done: grown w8->w16 SHORT
+      at every k (R(W/B) PP4 1.75/1.59/1.29, g 0.0/0.13/0.52); next (tune the grown warm start, w16->w32, or stop) is Joaquin''s
+      call. C2-C8 wait on Joaquin''s go. Nothing running.'
+    decisions: 'D284 tune k=533 by DyHPO (done, SHORT); D286 no matched control; D289 pre-decay checkpoint test (no branch);
+      D285 width growth by function-preserving duplication (HyperCloning-style, noise 1e-3 x child init std), exact at step
+      0 to 0.002. Two growth defects fixed in approved work: grow_width noise device (2d701b40) and the sigma stage re-growing
+      (b36bb809: sigma_stage_cfg turns grow_width off; loader loads a same-width checkpoint as is); reviewer nit not done:
+      tighten the same-width bypass to checkpoints whose own config carries grow_width.'
+    ruled_out: C7 (no from-scratch gain); C9 (confound); catalog_v3 changes; the val_loss_no_reg-tuned low-lr warm start as
+      the way to close the k=533 gap; a pre-decay checkpoint as a better warm-start parent (D289).
+    running: none
+    files: 'analysis/catalog_v4/mixture_ab.py (warm, WARM: C1, C1t, C1ck2132/3198/final, C10w), analysis/catalog_v4/data/warm_start_*.json,
+      analysis/catalog_v4/data/reads/, models/grow_width.py, tests/test_grow_width.py, run.py (sigma_stage_cfg), base_experiment.py
+      (_load_pretrained_weights grow_width), scripts/job_catalog_v3_short.sh (GROW_K, ckpt arms), docs/results.tex (par:v4_warm_start,
+      par:v4_warm_start_tuned, par:v4_warm_start_grow). Branch ws-grow-sigma merged but undeleted (needs git branch -D); worktrees/wt-ws-ckpt
+      and wt-ws-grow merged, removal pending.'
+    written: '2026-11-05T09:25:04+00:00'
   blocks: only the step-3 extension
   blocks_steps: *id002
