@@ -258,6 +258,8 @@ fine_tune:
  layer_decay: 1.0             # LLRD: lr = base_lr * lr_scale * layer_decay^depth (1.0 = no decay)
  freeze_blocks: []            # list of block indices to freeze, e.g. [0,1,2,3]
  reset_output_head: false     # re-init linear_out weights after loading
+ grow_width: false            # the parent has half this run's num_heads: grow it function-preservingly (models/grow_width.py, D285)
+ grow_noise: 1.0e-3           # symmetry-breaking noise on the duplicated units' incoming weights, x the child's init std
  linear_probe: false          # fit linear_out's channel 0 on the frozen trunk (ridge, leave-one-out) before fine-tuning (LP-FT, D120)
  lora:
   enabled: false
