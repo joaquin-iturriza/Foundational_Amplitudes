@@ -71,7 +71,7 @@ class Tiny(nn.Module):
 def make_exp(run_dir, ema=True, seed=0, out=1):
     torch.manual_seed(seed)
     e = BaseExperiment.__new__(BaseExperiment)
-    e.cfg = types.SimpleNamespace(save=True, run_dir=run_dir, run_idx=0)
+    e.cfg = types.SimpleNamespace(save=True, run_dir=run_dir, run_idx=0, training={"loss": "MSE"})
     e.device = torch.device("cpu")
     e.model = Tiny(out)
     e.ema = ExponentialMovingAverage(e.model.parameters(), decay=0.9) if ema else None

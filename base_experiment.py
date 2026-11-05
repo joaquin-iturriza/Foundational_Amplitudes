@@ -1450,21 +1450,36 @@ class BaseExperiment:
                     LOGGER.info(f"Fine-tuning: skipped {len(dropped)} shape-mismatched "
                                 f"pretrained tensors (e.g. {dropped[:2]}).")
             else:
-                # a parent not trained with HETEROSC under a HETEROSC child (readout rows mu, sigma): keep the parent's
-                # mu row (row 0) and start the sigma row as zero weights (sigma = softplus(0), a fresh model's), as
-                # analysis/divergences/grow_sigma_head.py does offline (the D47 het retrains of fine-tune cells). The
-                # parent's readout has 1 row (MSE) or 2 (sign_head: row 1 is its sign logit, not a sigma).
+                # a HETEROSC child: the readout rows are mapped by role (mu, sign, sigma). A parent not trained with
+                # HETEROSC has rows [mu] (MSE) or [mu, sign] (sign_head); a HETEROSC parent [mu, sigma], or [mu, sign,
+                # sigma] with the sign head (models/lloca.py sign_channel). The child's rows are [mu, sigma] or [mu,
+                # sign, sigma]; a role the parent lacks starts at zero weights (sigma = softplus(0), a fresh model's;
+                # sign logit 0), as analysis/divergences/grow_sigma_head.py does offline (the D47 het retrains of
+                # fine-tune cells); a parent's sign row the child has no place for is dropped.
                 if str(self.cfg.training.get("loss")) == "HETEROSC":
                     pcfg_f = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path))), "config.yaml")
-                    ploss = str(OmegaConf.load(pcfg_f).training.get("loss")) if os.path.exists(pcfg_f) else None
+                    pcfg = OmegaConf.load(pcfg_f) if os.path.exists(pcfg_f) else None
+                    ploss = str(pcfg.training.get("loss")) if pcfg is not None else None
+                    p_sign = bool(pcfg.training.get("sign_head", False)) if pcfg is not None else False
+                    own_roles = (["mu", "sign", "sigma"] if bool(self.cfg.model.net.get("sign_channel", False))
+                                 else ["mu", "sigma"])
                     own = self.model.state_dict()
                     for k in [k for k in state_dict if k.endswith("linear_out.weight") or k.endswith("linear_out.bias")]:
                         v = state_dict[k]
-                        if (ploss != "HETEROSC" and k in own and own[k].shape[0] == 2 and v.shape[0] in (1, 2)
-                                and v.shape[1:] == own[k].shape[1:]):
-                            state_dict[k] = torch.cat([v[:1], torch.zeros_like(v[:1])], 0)
-                            LOGGER.info(f"Fine-tuning: {k} from a {ploss} parent ({v.shape[0]} row(s)): mu row kept, "
-                                        "sigma row zeroed")
+                        if k not in own or v.shape[1:] != own[k].shape[1:]:
+                            continue
+                        if ploss == "HETEROSC":
+                            p_roles = ["mu", "sign", "sigma"] if v.shape[0] == 3 else ["mu", "sigma"]
+                        else:
+                            p_roles = ["mu", "sign"][:v.shape[0]] if v.shape[0] in (1, 2) else None
+                        if p_roles is None or len(p_roles) != v.shape[0] or own[k].shape[0] != len(own_roles):
+                            continue
+                        if p_roles == own_roles:
+                            continue
+                        rows = [v[p_roles.index(r)] if r in p_roles else torch.zeros_like(v[0]) for r in own_roles]
+                        state_dict[k] = torch.stack(rows, 0)
+                        LOGGER.info(f"Fine-tuning: {k} from a {ploss} parent{' with a sign head' if p_sign else ''} "
+                                    f"(rows {p_roles}) into rows {own_roles}: rows by role, missing ones zeroed")
                 self.model.load_state_dict(state_dict)
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
