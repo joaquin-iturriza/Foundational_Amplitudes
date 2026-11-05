@@ -12460,6 +12460,11 @@ entries:
       not match a cooldown). Growth: HyperCloning (Samragh et al. 2024 arXiv:2409.12903, function-preserving widening of a
       pretrained model), MSG (Yao et al. 2023 arXiv:2305.02869, masked growth operators preserving function whatever the new
       weights'' init).'
+  - at: '2026-11-05T04:01:36+00:00'
+    text: 'Correction to step 3''s design text: the parent''s optimizer state is saved (base_experiment._save_model writes
+      model, optimizer and scheduler state into models/model_run0*.pt); the warm starts still use a fresh optimizer (fine_tune
+      builds its own). Ibrahim et al. 2024 (arXiv:2403.08763, App. A.4) found keeping or discarding optimizer state makes
+      no difference, so this is not a gap in the comparison.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
