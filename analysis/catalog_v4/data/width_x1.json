@@ -16,40 +16,40 @@
  },
  "best": {
   "FA-ccin2p3-804a65bc": {
-   "index": 49,
-   "n_validations": 50,
-   "val_loss_no_reg": -2.8363681239101646,
-   "last": -2.8363681239101646
+   "index": 23,
+   "n_validations": 25,
+   "val_loss_no_reg": -2.8424159917294665,
+   "last": -2.8423888606057686
   },
   "FA-ccin2p3-66e8c31f": {
-   "index": 49,
-   "n_validations": 50,
-   "val_loss_no_reg": -2.8205760396204393,
-   "last": -2.8205760396204393
+   "index": 23,
+   "n_validations": 25,
+   "val_loss_no_reg": -2.8266772400077067,
+   "last": -2.8266346555408566
   },
   "FA-ccin2p3-493c98db": {
-   "index": 49,
-   "n_validations": 50,
-   "val_loss_no_reg": -3.205457360774217,
-   "last": -3.205457360774217
+   "index": 20,
+   "n_validations": 25,
+   "val_loss_no_reg": -3.2160550922628595,
+   "last": -3.216047719760535
   },
   "FA-ccin2p3-7288b3fe": {
-   "index": 49,
-   "n_validations": 50,
-   "val_loss_no_reg": -3.2447583607892794,
-   "last": -3.2447583607892794
+   "index": 7,
+   "n_validations": 25,
+   "val_loss_no_reg": -3.2538444954723134,
+   "last": -3.2523605435028315
   },
   "FA-ccin2p3-e26059bf": {
-   "index": 49,
-   "n_validations": 50,
-   "val_loss_no_reg": -3.5668335299770546,
-   "last": -3.5668335299770546
+   "index": 23,
+   "n_validations": 25,
+   "val_loss_no_reg": -3.5799580385180327,
+   "last": -3.579911976325298
   },
   "FA-ccin2p3-fd7fc137": {
-   "index": 49,
-   "n_validations": 50,
-   "val_loss_no_reg": -3.608913241864686,
-   "last": -3.608913241864686
+   "index": 24,
+   "n_validations": 25,
+   "val_loss_no_reg": -3.6256613309242574,
+   "last": -3.6256613309242574
   }
  },
  "arms": {
@@ -434,15 +434,15 @@
    "val_per_process": {
     "seed42": {
      "n_processes": 1153,
-     "median_delta_nll": -0.378,
-     "frac_lower": 0.9896,
-     "delta_aggregate": -0.3691
+     "median_delta_nll": -0.3825,
+     "frac_lower": 0.9844,
+     "delta_aggregate": -0.3736
     },
     "seed43": {
      "n_processes": 1153,
-     "median_delta_nll": -0.4327,
-     "frac_lower": 0.9809,
-     "delta_aggregate": -0.4242
+     "median_delta_nll": -0.4357,
+     "frac_lower": 0.9783,
+     "delta_aggregate": -0.4272
     }
    }
   },
@@ -827,15 +827,15 @@
    "val_per_process": {
     "seed42": {
      "n_processes": 1153,
-     "median_delta_nll": -0.7767,
-     "frac_lower": 0.9939,
-     "delta_aggregate": -0.7305
+     "median_delta_nll": -0.7774,
+     "frac_lower": 0.9922,
+     "delta_aggregate": -0.7375
     },
     "seed43": {
      "n_processes": 1153,
-     "median_delta_nll": -0.8405,
-     "frac_lower": 0.9948,
-     "delta_aggregate": -0.7883
+     "median_delta_nll": -0.8445,
+     "frac_lower": 0.9913,
+     "delta_aggregate": -0.799
     }
    }
   }
