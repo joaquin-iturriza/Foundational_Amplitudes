@@ -8464,6 +8464,24 @@ entries:
       span incl. the 12 axes reads, FA-ccin2p3-92207f6a 19:37-21:57) = about 14.4 GPU-h, plus 8 HD5 sign reads x about 0.5
       h = 4 GPU-h: about 18 GPU-h, under 30. Disk: 128 MB per run dir (du of the magnitude pair''s), 6 runs about 0.8 GB,
       against 89 GB free on /sps/lpnhe (df 2026-11-05).'
+    fix_at: '2026-11-05T02:14:46+00:00'
+    fix: 'Re-check of the 02:13 revision. Fixed since the last FIX: the reference''s own seed ratios stated, 4 seeds for the
+      arm and the het magnitude reference, the sign judged by a paired sign test against the MSE control''s 4 existing seeds
+      (v4_dimensionless_muon[_seed2-4], same catalog_v4_base_train recipe and 4264 steps), an UNRESOLVED branch, the HD5 sign
+      events named, disk (short arms run data.memmap=false, so there is no cache; 0.8 GB against 89 GB). Two problems remain.
+      (3) The magnitude tolerance cannot be resolved at 4 seeds. This is the reviewer''s estimate, a simulation on the committed
+      HD5/H5 reads of FA-ccin2p3-5abe4a0e and 92207f6a (a null arm; per-class noise and a per-seed common shift taken from
+      the reference''s seed-43-over-42 class ratios, per-class sd 0.57 HD5 and 0.53 H5, per-seed shift sd 0.18 and 0.24; then
+      the design''s 4-vs-4 class median, its bootstrap, and the widening by the 2-vs-2 shift). Under no cost, the widened
+      upper end has a median of about 1.40 on HD5 and 1.45 on H5, and it is at most 1.25 in only about 28% of draws on each
+      read. YES needs both reads, so a head that costs nothing passes in about 1 case in 10 and otherwise lands in UNRESOLVED.
+      Fix: compute this power from the existing reads with a committed tool. Then either set the tolerance the 4 seeds resolve
+      (about 1.5) and say why that size of cost is acceptable, or use a less noisy contrast. Arm and reference at the same
+      seed share initialisation and data order, so per-seed paired ratios (arm seed k over reference seed k) may remove most
+      of the 1.28/1.41 seed shift; check that on the first pair before relying on it. Or add seeds, which is Joaquin''s call
+      if more than 4. (4) The sign outcomes overlap: YES requires the one-sided sign test for arm worse at p >= 0.05, and
+      UNRESOLVED is p in 0.05-0.2, so a p of 0.1 is both. Make them disjoint (e.g. YES at p >= 0.2, or a stated non-inferiority
+      margin in wrong-sign points per pool above the 5.6-8.55% seed noise). Checks 1, 2, 5-14 hold.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
