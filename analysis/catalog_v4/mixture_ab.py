@@ -1065,6 +1065,29 @@ WARM = {"C1": {"W": {533: ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f"),
                 "ref": {"untuned": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f")},
                 "deciding": ("PP4", "EE4")}}
 WARM["C1t"].update(B=WARM["C1"]["B"], A=WARM["C1"]["A"])   # C1's from-scratch B and parent A
+# step 5 (D289, design passed 2026-11-05T04:06): the k=533 warm start at step 3's tuned HPs (hp_1860) from the rerun het
+# control's EMA model at step 2132, at step 3198 (pre-decay checkpoints, cosine lr about 0.65 and 0.20 of peak) and at
+# its final model (training only, so a pre-sigma start); reruns FA-ccin2p3-d521160b (s42), b688a859 (s43), arms
+# v4_het_control_ckpt[_seed2]; warm starts arms v4_het_warm25t_k533_from<x>[_seed2], scripts/job_catalog_v3_short.sh
+# @d9e1af1f. Each checkpoint read against W_final (same rerun; the design's keep rule) and against step 3's tuned
+# confirmation runs (post-sigma parent); B and A as C1
+_CK = {"final": ("FA-ccin2p3-dd32a907", "FA-ccin2p3-70c28bd9")}
+_TUNED = WARM["C1t"]["W"][533]
+for _x, _runs in (("2132", ("FA-ccin2p3-0898a7b0", "FA-ccin2p3-a6834028")),
+                  ("3198", ("FA-ccin2p3-2a27e8a2", "FA-ccin2p3-0259e865")), ("final", _CK["final"])):
+    WARM[f"C1ck{_x}"] = {"W": {533: _runs}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+                         "ref": dict({} if _x == "final" else _CK, tuned_post_sigma=_TUNED),
+                         "deciding": ("PP4", "EE4"), "keep_ref": None if _x == "final" else "final",
+                         "design": "plan warm_start step 5 (D289), design passed 2026-11-05T04:06"}
+# step 4 (D285, design passed round 2 2026-11-05T04:30): width growth w8 -> w16, the w8 cell's final model grown
+# function-preservingly (models/grow_width.py) and retrained k steps at the w16 cell's setup (GROW_K on
+# v4_het_default25[_seed2], LONG_HEADS=16 LONG_CKPT LONG_MEMMAP, scripts/job_catalog_v3_short.sh @12f51879), every read
+# from the run's own job; B = the w16 cell from scratch, A = the w8 parent; MATCH bar (A/B)^0.3 = 1.19 (width_x1.json)
+WARM["C10w"] = {"W": {533: ("FA-ccin2p3-93b037bb", "FA-ccin2p3-ee8df686"),
+                      1066: ("FA-ccin2p3-69b7e27d", "FA-ccin2p3-6954649e"),
+                      2132: ("FA-ccin2p3-57802518", "FA-ccin2p3-da290610")}, "C": {},
+                "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
+                "design": "plan warm_start step 4 (D285), design passed round 2 2026-11-05T04:30"}
 MATCH_HI, CARRY = 1.35, 0.90
 
 
@@ -1118,9 +1141,10 @@ def warm(change="C1"):
     ax_of = _held_axes(cls)
     trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
     d = WARM[change]
-    out = {"design": "plan warm_start, superset design passed 2026-11-04T21:51 (change %s)" % change,
+    hi_bar = d.get("match_hi", MATCH_HI)
+    out = {"design": d.get("design", "plan warm_start, superset design passed 2026-11-04T21:51") + " (change %s)" % change,
            "runs": {"W": d["W"], "C": d["C"], "B": d["B"], "A": d["A"]}, "steps_from_scratch": WARM_STEPS,
-           "rule": f"MATCH widened upper end of R(W_k/B) <= {MATCH_HI} on each deciding read {list(d['deciding'])}; "
+           "rule": f"MATCH widened upper end of R(W_k/B) <= {hi_bar} on each deciding read {list(d['deciding'])}; "
                    f"SHORT widened lower end > 1 on any; INCONCLUSIVE otherwise; carried R(W_k/C_k) <= {CARRY} with "
                    f"the widened interval below 1 on each; YES smallest k with MATCH and carried",
            "B_over_A": None, "k": {}}
@@ -1145,8 +1169,12 @@ def warm(change="C1"):
                                 for r in reads_named}
         wb = [_main_read(row["W_over_B"], r)["widened"] for r in d["deciding"]]
         wc = [_main_read(row["W_over_C"], r) for r in d["deciding"]] if "W_over_C" in row else []
-        row["outcome"] = "MATCH" if all(hi <= MATCH_HI for _, hi in wb) else \
+        row["outcome"] = "MATCH" if all(hi <= hi_bar for _, hi in wb) else \
             "SHORT" if any(lo > 1 for lo, _ in wb) else "INCONCLUSIVE"
+        if d.get("keep_ref"):
+            # D289's keep rule: the checkpoint start resolved better than the final-model start on each deciding read
+            kr = [_main_read(row[f"W_over_{d['keep_ref']}"], r) for r in d["deciding"]]
+            row["better_than_" + d["keep_ref"]] = all(x["R"] <= CARRY and x["widened"][1] < 1 for x in kr)
         row["carried"] = all(x["R"] <= CARRY and x["widened"][1] < 1 for x in wc) if wc else None   # None: no C_k (D286)
         # inside the equivalence bound and still resolved worse than B (widened lower end above 1): MATCH by the rule,
         # listed so a MATCH is never read as 'equal'
@@ -1164,6 +1192,7 @@ def warm(change="C1"):
     print(json.dumps({"B_over_A": {r: _main_read(ba, r)["R"] for r in reads_named},
                       "k": {k: {"outcome": x["outcome"], "carried": x["carried"], "g": x["g"],
                                 "worse": x["W_resolved_worse_than_B"],
+                                "keep": {n: v for n, v in x.items() if n.startswith("better_than_")},
                                 **{n: {r: (_main_read(x[n], r)["R"], _main_read(x[n], r)["widened"])
                                        for r in reads_named} for n in x if n.startswith(("W_over", "C_over"))}}
                             for k, x in out["k"].items()},
