@@ -3750,8 +3750,6 @@ entries:
       a stated fraction of the pp density; candidates: a component drawn from the pp sqrt(s) distribution, an initial-state
       collinear splitter branch for the 2->4 |M|^2 tail. Design only, with the fraction and the measured gap per class, to
       Joaquin before anything is built.'
-    50: 'Step 49 follow-up: Joaquin''s answer on the own-sampler envelope design (f 0.5; 0.70 own |M|^2-unweighted at pp''s
-      sqrt(s_hat) widened 0.05 dex + 0.30 current mixture with the initial-state collinear branch; about 800 core-h CPU)'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
       rows mu, sigma, sign logit; experiment.py:2232 refusal removed; sigma stage trains the sigma row only; parent loading
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
@@ -9277,12 +9275,6 @@ entries:
       if:
       - 'design ready: to Joaquin with the fraction and cost'
       - 'a candidate cannot reach 0% outside: say which classes and why'
-    50:
-      feeds: how catalog_v4 is sampled for pp classes
-      if:
-      - 'approved: design review, build the unweighting and the IS branch, validate_v4 envelope check, then the generation
-        queue'
-      - 'f or weights changed: rerun envelope_design.py own and re-propose'
     56:
       feeds: whether the het pretraining carries the sign head on the sign-changing one-loop pools (D287)
       if:
