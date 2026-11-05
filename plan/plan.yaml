@@ -11741,7 +11741,7 @@ entries:
     blocks_steps: &id001 []
   owner:
     agent: af3e3405e0def313b
-    state: working
+    state: closed
     since: '2026-11-05T00:48:17+00:00'
     state_at: '2026-11-05T04:06:34.283000+00:00'
     context: 272525
@@ -12624,28 +12624,33 @@ entries:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
   handoff:
-    state: 'Superset design passed 2026-11-04 (C1-C9, gate applied: C8 in, C7 no from-scratch gain, C9 dropped). C1 (default-sampled
-      share 0.25, het, warm start from the het control vs from-scratch share 0.25, matched control = same warm start on share
-      0) submitted 23:35 on CC: 12 runs FA-ccin2p3-341bf564, 254abf4f, ed946736, 8e41ac1e, f699e170, 04fc5b3b (warm25 k533,
-      k533_seed2, k1066, k1066_seed2, k2132, k2132_seed2), 343e3d58, c2acc1fc, aa64733e, c477a52c, 0564ad5b, a97e8083 (cont
-      same order), scripts/job_catalog_v3_short.sh @7f945910 (deployed cf87b124, script identical), --hdr=--mem=16G, limits
-      2:15/2:27/2:49 warm, 2:11/2:23/2:45 cont; plan wait on all 12. 341bf564 passed its start-up checks (WARM_START, V3_WALL).
-      Next when they end: mixture_ab.py extract each run''s PP4, EE4, HD4, HD5, H1-H7c reads and val curves; add a ''warm''
-      mode (W_k/B, W_k/C_k, W_k/A, g_k, widened intervals, MATCH/SHORT/INCONCLUSIVE per the design; B = f0156d88/df858d33
-      held reads and 9538e607/ed96b552 PP4/EE4/HD4, A = 87ea24d0/321a3de2 and 87aeabca/53b9ed56 for HD4); write up. C2-C6
-      and C8 (54 runs, 79.8 GPU-h) wait on Joaquin''s go, asked by the main session; their arms are not implemented yet.'
-    decisions: 'Test change for C1: share 0.25 (the one catalog_v4 change measured a win and kept, D229/D231), het loss (canonical).
-      Warm start via fine_tune.pretrained_path, lr_scale 1, layer_decay 1, parent''s schedule restarted (untuned; a NO goes
-      to Joaquin with a warm-start DyHPO as next call, D241). MATCH = widened upper end of R(W/B) <= 1.35 (resolvable by two
-      seeds; reviewer FIX round 1). Superset: every change with a catalog_v4 short from-scratch pair; target_stats parent
-      where pools and order match, parent_shared for new/re-targeted pools with an equivalence check on data_stats.json. C7
-      dropped by its gate (het_magnitude.json @74a30052: HD5 1.47 vs MSE), C8 in (HD5 0.097 vs het control). First C1 batch
-      (22:24) failed on a usage-string brace bug I introduced (fixed 7f945910); the 12th was refused by the site gate counting
-      rounded limits (31.0 > 30), so all 12 went after the 60-min window at minute-rounded limits (29.7).'
-    ruled_out: C9 whole-pool training set (data size and loading path confounded, catalog_coverage next 43; 20-22 GB memmap
-      cache per job); width (shapes); length (is the warm start); catalog_v3 changes (pools deleted on CC; ~12 GPU-h each
-      as new catalog_v4 pairs); older 32k-64k setups (not short runs).
-    running: the 12 C1 runs above on CC-IN2P3, plan wait step 1
-    files: scripts/job_catalog_v3_short.sh, analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/data/mixture_ab_het.json,
-      analysis/catalog_v4/data/het_magnitude.json, analysis/catalog_v4/data/pp_bound.json, tools/short_wall.py
-    written: '2026-11-04T22:38:43+00:00'
+    state: 'C1 done and written up (par:v4_warm_start @1258ef73): untuned restarted schedule YES at k=1066 by the 1.35 bound
+      (still resolved worse), equal at k=2132. Step 3 (D284): sweep ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
+      @dc24fa76) done, best hp_1860 val -2.758 (lr_scale 0.174, lower lr is better, best near the window''s bottom); confirmation
+      runs FA-ccin2p3-56cca07a (seed 42) and 75d28cb4 (seed 43), arm v4_het_warm25t_k533[_seed2] @dab9ff19, step 3 waits on
+      them. When they end: mixture_ab.py extract (PP4 EE4 H1-H7c HD4 HD5) and val for both, then ''mixture_ab.py warm C1t''
+      (@49787157, C1t entry ready) and C1''s MATCH rule; SHORT/INCONCLUSIVE -> 8-trial extension with lr_scale low edge 0.01.
+      Step 5 (D289, design passed round 2): code on branch ws-ckpt @8a18b4ec (worktree worktrees/wt-ws-ckpt): training.save_model_at_steps,
+      arms v4_het_control_ckpt[_seed2] (training only) and v4_het_warm25t_k533_from<2132|3198|final>[_seed2], tests/test_save_at_steps.py;
+      repo-reviewer PASSED it, but git_verify_guard refused the merge because the reviewer advanced its watermark to trunk
+      7af7c3cc, not past the branch commit: get the watermark onto the branch (re-run the reviewer, naming 8a18b4ec) or fold
+      the branch, merge, remove the worktree with scripts/remove_worktree.sh, site sync, then submit 2 reruns (limit about
+      1:50, wall 1.45 h) and, chained afterok on each, the 6 warm starts (limit 2:15, 1.45 h); 11.6 GPU-h. Step 4 (D285):
+      draft only, not recorded as a design (recording it would replace step 5''s passed design before its jobs go): width
+      8->16 growth is exactly function-preserving in this model by duplicating every residual-stream channel (BaselineLayerNorm
+      statistics unchanged), duplicating heads (per-head dim channels//num_heads fixed) and MLP hidden units, halving each
+      consumer''s fan-in weights, and compensating MuReadout''s 1/width_mult (x2), plus small noise (Muon); test pair: parent
+      w8 full-set 804a65bc/66e8c31f, B w16 493c98db/7288b3fe. Step 2 (C2-C8) waits on step 3 and Joaquin''s go.'
+    decisions: 'D284: tune the k=533 warm start by a DyHPO sweep (template fine-tune space, warmup low end 0.01 from Gupta
+      2023). D286: no matched control from now on. D289: test a pre-decay checkpoint, paired by seed, best against best if
+      no gain at hp_1860. Literature web-verified (finding 2026-11-05): Gupta 2308.04014, Ibrahim 2403.08763, MiniCPM 2404.06395
+      (title corrected; 10% decay suffices), Haegele 2405.18392 (weight averaging only partially substitutes a cooldown),
+      HyperCloning 2409.12903, MSG 2305.02869. Parent optimizer state is saved in model files (earlier text wrong); warm starts
+      use a fresh optimizer (no difference per Ibrahim). Repaired tests/test_ema_checkpoint.py fixture (failed on trunk: cfg.training.loss).'
+    ruled_out: C7 (no from-scratch gain); C9 (confound); catalog_v3 changes (pools deleted on CC); WSD schedule (not implemented;
+      next call if tuned k=533 stays SHORT).
+    running: FA-ccin2p3-56cca07a, FA-ccin2p3-75d28cb4 (step 3 confirmation, CC, plan wait step 3)
+    files: analysis/catalog_v4/mixture_ab.py (warm, C1t), analysis/catalog_v4/plot_warm_start.py, analysis/catalog_v4/data/warm_start_C1.json,
+      sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml, scripts/job_catalog_v3_short.sh, worktrees/wt-ws-ckpt (branch ws-ckpt
+      @8a18b4ec), docs/results.tex par:v4_warm_start
+    written: '2026-11-05T04:13:12+00:00'
