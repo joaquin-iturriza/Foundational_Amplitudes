@@ -12400,6 +12400,36 @@ entries:
       under C1''s MATCH rule); NO DIFFERENCE or WORSE: the final model stays the parent, reported; caveat that the HPs were
       tuned on the final model, so a checkpoint that is not better at them gets its own warm-start sweep only on Joaquin''s
       word.'
+    fix_at: '2026-11-05T04:04:18+00:00'
+    fix: 'Check 3 (seeds against the measured spread): the design widens R(W_x/W_final) by the W_final pair''s |ln R_seed|
+      but quotes the 3% PP4 half-width of R(W_533/B), which is widened by the from-scratch B pair''s seed ratio (0.996 PP4,
+      1.031 EE4; warm_start_C1.json). The only measured spread of a warm-start pair is C1''s matched-control pairs C_k (same
+      parent seeds 42/43, k steps): R_seed PP4 1.178/1.145/1.150, EE4 1.067/1.101/1.103 at k=533/1066/2132. Widened by about
+      15% on PP4, R=0.90 has an upper end near 1.06, so BETTER (R<=0.90, interval below 1) needs R near 0.85 or lower on PP4
+      and a 10% effect is not resolvable as claimed. Fix: either pair by seed (W_x and W_final at seed s share one parent
+      rerun, so R_s = W_x,s/W_final,s cancels the parent''s seed noise; widen by the two seeds'' disagreement |ln(R_43/R_42)|
+      and say so), or keep the unpaired rule and state the smallest resolvable effect (about 15% PP4, 10% EE4) with the outcome
+      thresholds set to it, or add seeds. Checks 1 and 4 (matched tuning, outcome for no): the warm-start HPs (hp_1860, lr_scale
+      0.174) were tuned on the final model only, so the checkpoint arms run at the control''s tuned HPs. Same HPs first is
+      the A/B protocol''s first step, but its second step (CLAUDE.md: else the same sweep for the feature, best against best)
+      is replaced by ''only on Joaquin''s word''. A pre-decay checkpoint (lr at 0.65 of peak) plausibly wants a different
+      lr_scale, so a NO DIFFERENCE/WORSE at final-tuned HPs does not answer D289 (''check ourselves how much of a difference
+      this makes''). Fix: the no branch runs the same 8-trial DyHPO as ws_c1_k533_hpo8 (same config, parent swapped to the
+      better-placed checkpoint, or both) and compares best against best with the seed-42/43 confirmations, with its GPU-h
+      added to the estimate (under 30 total or the go asked). Check 12 (only the asked axis moves) / fixed field: the design
+      says the rerun''s final is ''its best mean-stage checkpoint, as the parents of C1'', but C1''s parents were their post-sigma
+      models (job_catalog_v3_short.sh loads runs/catalog_v4_short/<parent>/models/model_run0_best.pt.gz and refuses a parent
+      without sigma_stage; D95, D276), and step 3''s HPs were tuned from that post-sigma parent. Within the design all three
+      starts are pre-sigma (matched, fine), but state it correctly, say the W_final arm differs from step 3''s tuned W in
+      the loaded sigma head, and note the script''s sigma_stage guard and parent path need the new knob (checkpoint path per
+      step). Minor: the parent wall time uses 1.34 s/step including validation; the target should be the plain training step
+      rate (CLAUDE.md wall-time rule). Passing: one change (checkpoint loaded, same rerun, same HPs, recipe, k); the measure
+      moves with the warm start''s starting point at fixed read (k=533/1066/2132 from the final model: PP4 1.33/1.15/0.95,
+      EE4 1.51/1.23/1.01, confirmed in warm_start_C1.json); outcomes stated for yes and no; D289''s comparison present; loss
+      HETEROSC; PP4/EE4 as C1; disk 1 GB against 89 GB free on /sps/lpnhe. Searched for check 5: results.tex for pre-decay,
+      predecay, intermediate checkpoint, WSD, cooldown, stable phase, save_intermediate, mid-training, earlier checkpoint,
+      re-warm (only an unrelated ''earlier checkpoints cannot warm-start'' at line 10139); site decisions for checkpoint,
+      WSD, cooldown, decay (D63, D85, D95: none on pre-decay warm starts). No repeat found.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
