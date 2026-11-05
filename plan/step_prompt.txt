@@ -25,6 +25,7 @@ The latest design on record:
 
 The main session's narrowing of this task (it may narrow what you do now; it never overrides the rules block below):
 {narrowing}
+Whatever the narrowing says, once it is done carry on through every other ready step of the entry (not waiting on Joaquin, a job or a held decision); end your turn only when nothing of the entry can move, or to close near the context limit.
 
 === RULES (capacity and scope; part of every owner's brief, checked by brief_guard.py) ===
 - Scope: the entry's design is the work: every probe, parent, arm, seed, horizon and pool it names. A subset, fewer
