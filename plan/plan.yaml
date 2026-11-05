@@ -12187,6 +12187,19 @@ entries:
       PP4 0.55, 0.76, 1.07; EE4 0.66, 0.84, 0.98; held-out default-sampled pooled 0.62, 0.80, 1.14 (W/B 1.19, 1.08, 0.94).
       Verdict by the design''s rule: YES at k=1066 (0.25 of the from-scratch steps); equal to scratch on every read only at
       k=2132 (0.50). Figure analysis/catalog_v4/figs/warm_start_C1.png.'
+  - at: '2026-11-05T02:10:25+00:00'
+    text: 'D285 first pass (no jobs, not yet a design). Today base_experiment._load_pretrained_weights drops every shape-mismatched
+      tensor and re-initialises it at random, keeping only the MSE->het readout (mu row kept, sigma row zero). So any change
+      that alters a shape currently loses the parent''s function in those tensors. Per kind, from the literature check (from
+      memory, ids not re-checked): added input columns (context vector, extra one-hot or scalar features) -> copy the old
+      columns and zero the new ones (exact; needs a slice-copy in the loader); added heads (sign-pair head) -> zero-init readout
+      (exact, the muP readout default); depth 8->16 blocks -> new blocks with zero-init attention/MLP output projections,
+      i.e. identity residual blocks (exact for pre-LN; depth-muP branch scaling if used); width 8->16/32 heads under muP ->
+      Net2Wider-style copy with outgoing halving plus noise (HyperCloning, arXiv:2409.12903), or MSG masks (arXiv:2305.02869),
+      with the muP multipliers recomputed for the new base shapes; Muon gives rank-deficient updates on duplicated rows unless
+      noise breaks the symmetry. The one shape change here with a from-scratch pair already on CC is width (1x width cells:
+      w8 804a65bc/66e8c31f as parent, w16 493c98db/7288b3fe and w32 e26059bf/fd7fc137 as B, whole training set, memmap), so
+      it is the natural first test. Depth and added inputs have no catalog_v4 from-scratch pair.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
   handoff:
