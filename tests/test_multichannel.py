@@ -50,7 +50,7 @@ def test_resonance_draw_massive_and_four_finals():
 
 def test_is_collinear_draw():
     rng = np.random.default_rng(2)
-    sq = np.exp(rng.uniform(np.log(100.0), np.log(3000.0), 4000))
+    sq = np.exp(rng.uniform(np.log(1600.0), np.log(6000.0), 4000))   # where |eta| 5 at pT 10 GeV is reachable
     masses = [0.0, 0.0, 0.0, 0.0]
     P = mg.is_collinear_draw(4000, sq, masses, (2, 3), 1e-6, rng)
     _check_ps(P, sq, masses)

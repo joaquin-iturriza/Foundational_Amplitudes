@@ -3415,14 +3415,19 @@ def resonance_draw(nb, sqrts, masses, S, M, G, y_lo, rng, tail=MC_TAIL):
 
 def is_collinear_draw(nb, sqrts, masses, partons, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX):
     """(nb, N, 4) finals in the partonic frame: one parton of the finals `partons` (indices, drawn uniformly) at pT
-    log-uniform from pt_lo up to the most the recoil allows at its eta, eta uniform in [-eta_max, eta_max], phi uniform; the other finals a splitter blob
+    log-uniform from pt_lo up to the most the recoil allows at its eta, eta uniform up to the kinematic limit at pT
+    pt_lo, at most in [-eta_max, eta_max], phi uniform; the other finals a splitter blob
     recoiling against it. An event whose recoil is below its least mass takes the plain splitter."""
     masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
     j = np.asarray(partons)[rng.integers(0, len(partons), nb)]
-    eta = rng.uniform(-eta_max, eta_max, nb); ph = rng.uniform(0.0, 2.0 * np.pi, nb)
-    # pT up to where the parton's energy leaves the recoil its least mass: E <= (s - least^2) / (2 sqrt s), E ~ pT cosh eta
+    # the parton's energy must leave the recoil its least mass: E <= E_max = (s - least^2) / (2 sqrt s), E ~ pT cosh eta;
+    # so |eta| up to min(eta_max, arccosh(E_max / pt_lo)) (the partonic frame reaches large |eta| at pT >= pt_lo only at
+    # large sqrt(s)), and pT log-uniform from pt_lo to E_max / cosh eta
     least_all = masses.sum() - masses[j] + sqrts * np.sqrt(y_lo)
-    pt_hi = np.maximum((sqrts ** 2 - least_all ** 2) / (2.0 * sqrts) / np.cosh(eta), pt_lo * (1 + 1e-9))
+    e_max = (sqrts ** 2 - least_all ** 2) / (2.0 * sqrts)
+    eta_lim = np.minimum(eta_max, np.arccosh(np.maximum(e_max / pt_lo, 1.0)))
+    eta = rng.uniform(-1.0, 1.0, nb) * eta_lim; ph = rng.uniform(0.0, 2.0 * np.pi, nb)
+    pt_hi = np.maximum(e_max / np.cosh(eta), pt_lo * (1 + 1e-9))
     pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_hi)))
     mj = masses[j]
     pj = np.stack([np.sqrt((pt * np.cosh(eta)) ** 2 + mj ** 2), pt * np.cos(ph), pt * np.sin(ph), pt * np.sinh(eta)], 1)
