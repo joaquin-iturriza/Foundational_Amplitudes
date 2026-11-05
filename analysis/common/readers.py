@@ -19,11 +19,9 @@ def read_jsonl(path):
 def run_metrics(path):
     """A run's per_process_metrics.json, the last one under `path` (the run's own).
 
-    The rule of analysis/catalog_v2/census.py metrics(), among the shallowest files only: a nested run directory
-    (a het run's sigma_stage/) holds its own metrics and sorts after plots_0/."""
-    js = glob.glob(os.path.join(path, "**", "per_process_metrics.json"), recursive=True)
-    depth = min((f.count(os.sep) for f in js), default=0)
-    js = sorted(f for f in js if f.count(os.sep) == depth)
+    The rule of analysis/catalog_v2/census.py metrics(). A HETEROSC run's sigma_stage/ sorts after plots_0/, so its
+    metrics are the ones read: the sigma fit is the end of the run's training, its model the run's model (D276)."""
+    js = sorted(glob.glob(os.path.join(path, "**", "per_process_metrics.json"), recursive=True))
     if not js:
         raise SystemExit(f"no per_process_metrics.json under {path}")
     with open(js[-1]) as f:

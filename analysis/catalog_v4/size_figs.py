@@ -373,7 +373,24 @@ def best(vals):
 
 
 def width_curve(run):
-    return json.load(open(os.path.join(DATA, "reads", f"{run}_val.json")))["blocks"][0]["vals"]
+    """A 1x run's validation curve to the end of its training: the main block, then its sigma stage (the end of a
+    HETEROSC run's training, D276) at the main block's last step plus the stage's step"""
+    b = json.load(open(os.path.join(DATA, "reads", f"{run}_val.json")))["blocks"]
+    return b[0]["vals"] + [[b[0]["iterations"] + s, x] for blk in b[1:2] for s, x in blk["vals"]]
+
+
+# a long sweep's best trial ran without its sigma stage (training.heterosc_sigma_stage_steps 0 in trials); the eval
+# job that read it ran the stage (job_catalog_v3_short.sh arm v4_het_long_best), whose curve continues the trial's
+LONG_BEST_SIGMA = {"17056_trial_1262": "FA-ccin2p3-6f8a1eed", "68224_trial_1262": "FA-ccin2p3-1a46f3e0"}   # mixture_ab
+
+
+def trial_curve(key, t):
+    """A trial's validation curve, followed by its eval job's sigma stage when it has one (LONG_BEST_SIGMA)"""
+    if key not in LONG_BEST_SIGMA:
+        return t["vals"]
+    b = json.load(open(os.path.join(DATA, "reads", f"{LONG_BEST_SIGMA[key]}_val.json")))["blocks"]
+    assert len(b) == 1 and b[0]["iterations"] == 250, (key, [x["iterations"] for x in b])
+    return t["vals"] + [[t["steps"] + s, x] for s, x in b[0]["vals"]]
 
 
 def lr_tex(x):
@@ -411,7 +428,7 @@ def figs():
     ax.set_xticks([8, 16, 32], ["8", "16", "32"])
     ax.minorticks_off()
     ax.set_xlabel("width (attention heads)")
-    ax.set_ylabel("best validation het. loss")
+    ax.set_ylabel("validation het. loss, end of training")
     ps.legend(ax, "upper right")
     ps.save(fig, os.path.join(FIGS, "width_x1_loss"))
 
@@ -441,13 +458,13 @@ def figs():
     for k in sorted(t4, key=lambda k: k != best4):
         t = tr[k]
         if k == best4:
-            draw(t["vals"], pre.format(ep=e4) + ", best tuned trial, not converged", color=ps.C.purple, zorder=3)
+            draw(trial_curve(k, t), pre.format(ep=e4) + ", best tuned trial, not converged", color=ps.C.purple, zorder=3)
         else:
             lab = pre.format(ep=e4) + ", other tuned trials"
             draw(t["vals"], lab if lab not in seen else None, color=ps.C.grey, alpha=0.5, lw=0.8)  # lw: emphasis
             seen.add(lab)
         report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
-                                "best": round(best(t["vals"])[1], 4)}
+                                "best": round(best(trial_curve(k, t))[1], 4)}
     # the 68224-step sweep once all its trials finished: its best trial (long_sweeps_best.json) bold, the others thin,
     # as the 17056-step sweep; while trials run, every trial orange (finished solid, running dashed)
     b68 = json.load(open(os.path.join(DATA, "long_sweeps_best.json"))).get("68224", {}).get("best") or {}
@@ -456,7 +473,7 @@ def figs():
     for k in sorted(t16, key=lambda k: (k != best16, not tr[k]["finished"])):
         t = tr[k]
         if k == best16:
-            draw(t["vals"], pre.format(ep=e16) + ", best tuned trial, not converged", color=ps.C.orange, zorder=3)
+            draw(trial_curve(k, t), pre.format(ep=e16) + ", best tuned trial, not converged", color=ps.C.orange, zorder=3)
             lab = None
         elif best16:
             lab = pre.format(ep=e16) + ", other tuned trials"
@@ -466,7 +483,7 @@ def figs():
             draw(t["vals"], lab if lab not in seen else None, color=ps.C.orange, ls="-" if t["finished"] else "--")
         seen.add(lab)
         report[f"curve {k}"] = {"lr": t["lr"], "last_step": t["vals"][-1][0], "finished": t["finished"],
-                                "best": round(best(t["vals"])[1], 4)}
+                                "best": round(best(trial_curve(k, t))[1], 4)}
     ax.set_xscale("log")
     ax.set_xlabel("training step")
     ax.set_ylabel("validation het. loss")
