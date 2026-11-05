@@ -108,6 +108,7 @@ class LLOCAMuPTransformer(nn.Module):
         bayesian_last_layer: bool = False,
         bnn_prior_prec: float = 1.0,
         bnn_logsig2_init: float = -9.0,
+        sign_channel: bool = False,
         # token_size: int = 0,
     ):
         super().__init__()
@@ -137,6 +138,15 @@ class LLOCAMuPTransformer(nn.Module):
         self.loss = loss
         self.out_shape = out_channels
         net_out_channels = 2 * out_channels if loss == "HETEROSC" else out_channels
+        # sign_channel (HETEROSC with training.sign_head; set by experiment.init_data): one more readout row, the sign
+        # logit, between mu and sigma: rows [mu (out_shape), sign (1), sigma (out_shape)], so the experiment's splits
+        # (sigma = the last out_shape channels, then the sign = the last remaining one) and the sigma stage (only the
+        # last out_shape rows train) read it by role. The net is built so that every parameter but the sign row, and
+        # the global RNG after construction, equal those of the same model without it (see _build_net).
+        self.sign_channel = bool(sign_channel)
+        assert not self.sign_channel or loss == "HETEROSC", "sign_channel is the HETEROSC readout's sign row"
+        # rows read from the live (non-detached) features: mu, and the sign logit when present
+        self.n_main = out_channels + (1 if self.sign_channel else 0)
 
         def equivectors_constructor(n_vectors):
             return EquiMLP(
@@ -157,20 +167,48 @@ class LLOCAMuPTransformer(nn.Module):
                 param.requires_grad = False
         #self.framesnet = IdentityFrames()
         self.trafo_fourmomenta = TensorRepsTransform(TensorReps("1x1n"))
-        self.net = MuPTransformer(
-            in_channels,
-            attn_reps,
-            net_out_channels,
-            num_blocks,
-            num_heads,
-            dropout_prob=dropout_prob,
-            checkpoint_blocks=checkpoint_blocks,
-            parametrization=parametrization,
-            # BNN last layer (draft Sec. 5, fig:bnn): net.linear_out becomes a variational μP readout; the KL term
-            # enters the training loss in experiment._reg_term, evaluation uses the posterior-mean weights
-            **({"bayesian_readout": True, "bnn_prior_prec": bnn_prior_prec, "bnn_logsig2_init": bnn_logsig2_init}
-               if bayesian_last_layer else {}),
-        )
+        def _build_net(n_out):
+            return MuPTransformer(
+                in_channels,
+                attn_reps,
+                n_out,
+                num_blocks,
+                num_heads,
+                dropout_prob=dropout_prob,
+                checkpoint_blocks=checkpoint_blocks,
+                parametrization=parametrization,
+                # BNN last layer (draft Sec. 5, fig:bnn): net.linear_out becomes a variational μP readout; the KL term
+                # enters the training loss in experiment._reg_term, evaluation uses the posterior-mean weights
+                **({"bayesian_readout": True, "bnn_prior_prec": bnn_prior_prec, "bnn_logsig2_init": bnn_logsig2_init}
+                   if bayesian_last_layer else {}),
+            )
+
+        if not self.sign_channel:
+            self.net = _build_net(net_out_channels)
+        else:
+            # The reference build (no sign row) draws the global RNG exactly as the het model without the head does;
+            # the (2k+1)-row build, made from the same RNG state, supplies the module (its μP infshapes) and the sign
+            # row; every other parameter and buffer is copied from the reference, and the RNG is left where the
+            # reference build left it, so the backbone, the mu and sigma rows and everything initialised after this
+            # (the wrapper's encoders) are bit-equal to the het model's at the same seed (tests/test_het_sign_head.py).
+            k = out_channels
+            rng = torch.random.get_rng_state()
+            ref = _build_net(net_out_channels)
+            rng_after = torch.random.get_rng_state()
+            torch.random.set_rng_state(rng)
+            self.net = _build_net(net_out_channels + 1)
+            torch.random.set_rng_state(rng_after)
+            ref_sd = ref.state_dict()
+            with torch.no_grad():
+                for name, t in self.net.state_dict(keep_vars=True).items():
+                    r = ref_sd[name]
+                    if t.shape == r.shape:
+                        t.copy_(r)
+                    else:                       # a readout tensor: rows [mu (k), sign (1), sigma (k)]
+                        assert name.startswith("linear_out.") and t.shape[0] == r.shape[0] + 1, (name, t.shape, r.shape)
+                        t[:k].copy_(r[:k])
+                        t[k + 1:].copy_(r[k:])
+            del ref
 
     def forward(
         self,
@@ -223,7 +261,7 @@ class LLOCAMuPTransformer(nn.Module):
             if self.detach_sigma_backbone:
                 h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask,
                              pair_ctx=pair_ctx, token_add=token_add, return_features=True)
-                mu = self.net.linear_out(h)[..., : self.out_shape]
+                mu = self.net.linear_out(h)[..., : self.n_main]          # mu (and the sign logit)
                 sig_logit = self.net.linear_out(h.detach())[..., -self.out_shape:]
                 return torch.cat([mu, sig_logit], dim=-1)
             # raw logits; the wrapper pools then softpluses
@@ -235,14 +273,14 @@ class LLOCAMuPTransformer(nn.Module):
             # not see sigma's gradient). See __init__ note.
             h = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask,
                          pair_ctx=pair_ctx, token_add=token_add, return_features=True)
-            mu = self.net.linear_out(h)[..., : self.out_shape]
+            mu = self.net.linear_out(h)[..., : self.n_main]
             sigma_raw = self.net.linear_out(h.detach())[..., -self.out_shape:]
             sigma = torch.clamp(F.softplus(sigma_raw), min=1e-6)
             return torch.cat([mu, sigma], dim=-1)
         out = self.net(features, frames, ptr=ptr, seq_lens=seq_lens, causal=self.causal_mask, pair_ctx=pair_ctx, token_add=token_add)
         if self.loss == "HETEROSC":
             # softplus the sigma channels for positivity (floored), matching MuMLP.
-            mu = out[..., : self.out_shape]
+            mu = out[..., : self.n_main]
             sigma = torch.clamp(F.softplus(out[..., -self.out_shape:]), min=1e-6)
             out = torch.cat([mu, sigma], dim=-1)
         return out

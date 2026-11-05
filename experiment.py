@@ -1382,8 +1382,9 @@ class AmplitudeExperiment(BaseExperiment):
             p.requires_grad_(False)
 
         def _zero_mu_rows(grad):
+            # every row but the last k (sigma): mu, and the sign row under sign_channel (rows [mu, sign, sigma])
             grad = grad.clone()
-            grad[:k] = 0.0
+            grad[:-k] = 0.0
             return grad
 
         for p in (lin.weight, lin.bias):
@@ -1395,7 +1396,7 @@ class AmplitudeExperiment(BaseExperiment):
         n_train = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
         LOGGER.info(
             f"HETEROSC σ-only: trunk + μ head frozen; {n_train} readout params trainable, "
-            f"μ rows [:{k}] grad-zeroed → only σ trains."
+            f"rows [:-{k}] (μ, and the sign row if any) grad-zeroed → only σ trains."
         )
 
     def _context_names(self):
@@ -2228,8 +2229,18 @@ class AmplitudeExperiment(BaseExperiment):
         self._sign_head = bool(self.cfg.training.get("sign_head", False))
         assert self._sign_head or not int(self.cfg.model.get("sign_pair_dim", 0) or 0), \
             "model.sign_pair_dim needs training.sign_head (its channels feed the sign logit)"
-        if self._sign_head:
-            assert self.cfg.training.loss != "HETEROSC", "sign_head and HETEROSC are not combined"
+        if self._sign_head and self.cfg.training.loss == "HETEROSC":
+            # HETEROSC with the sign head (D287): the readout gets a sign row between mu and sigma (rows [mu, sign,
+            # sigma], models/lloca.py sign_channel); out_channels stays the target's dimension, so the sigma split
+            # (the last out_shape channels), the sign split (the last remaining one) and the sigma stage (the last
+            # out_shape rows) read the rows by role
+            assert self.modelname == "LLOCAMuPTransformer", "sign_head under HETEROSC is implemented on the μP LLoCa net"
+            assert not int(self.cfg.model.get("sign_pair_dim", 0) or 0), \
+                "model.sign_pair_dim is not combined with HETEROSC (the pair channels would sit where sigma does)"
+            assert self.cfg.model.net.get("sigma_after_pool", True), "sign_head under HETEROSC needs sigma_after_pool"
+            with open_dict(self.cfg):
+                self.cfg.model.net.sign_channel = True
+        elif self._sign_head:
             assert self.modelname in ("LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"), \
                 "sign_head is implemented on the LLoCa path"
             # model.sign_pair_dim K > 0: K more per-particle channels feed the wrapper's pair sign head
@@ -3750,13 +3761,15 @@ class AmplitudeExperiment(BaseExperiment):
             out_shape = self.cfg.model.net.get("out_shape") or self.cfg.model.net.get("out_channels")
             sigma  = y_pred[..., -out_shape:]
             y_pred = y_pred[..., :-out_shape]
-            # β-invariant μ-quality metric (comparable across β and to MSE runs); detached.
-            mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
         # sign head: last output channel is the sign logit, second target column the sign
         self._last_sign = None
         if getattr(self, "_sign_head", False):
             self._last_sign = (y_pred[..., -1:], y[..., 1:])
             y_pred, y = y_pred[..., :-1], y[..., :1]
+        if sigma is not None:
+            # β-invariant μ-quality metric (comparable across β and to MSE runs); detached; after the sign split, so
+            # under the sign head it is mu's alone
+            mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
         return y_pred, y, process_ids, sigma, mse_val
 
     def _batch_loss_lloca(self, data):

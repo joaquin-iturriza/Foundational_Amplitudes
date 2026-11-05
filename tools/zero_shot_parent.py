@@ -205,12 +205,15 @@ def _read(recipe):
     exp._init_regularization()
     stages["weights"] = time.perf_counter() - _t; _t = time.perf_counter()
     with torch.no_grad():
-        hs, zs, ss = [], [], []
+        hs, zs, ss, lgs, sgs = [], [], [], [], []
         for data in loader:
             y_pred, y, _, sig, _ = exp._forward_lloca(data)
             hs.append(y_pred.reshape(-1).double().cpu()); zs.append(y.reshape(-1).double().cpu())
             if sig is not None:                       # HETEROSC: the per-event sigma, in the parent's standardized units
                 ss.append(sig.reshape(-1).double().cpu())
+            if getattr(exp, "_last_sign", None) is not None:   # a parent with a sign head: its logit, the true sign
+                lg, sg = exp._last_sign
+                lgs.append(lg.reshape(-1).double().cpu()); sgs.append(sg.reshape(-1).double().cpu())
     h, z = torch.cat(hs).numpy(), torch.cat(zs).numpy()
     stages["forward"] = time.perf_counter() - _t; _t = time.perf_counter()
     sig = torch.cat(ss).numpy() if ss else np.zeros(0)
@@ -246,6 +249,18 @@ def _read(recipe):
     at_floor = (t <= floor + 1e-4 * max(1.0, abs(floor))) if floor is not None else np.zeros(len(t), bool)
     if floor is not None:
         rec.update({"abslog_floor": float(floor), "frac_at_floor": float(np.mean(at_floor))})
+    # a sign-head parent on a sign-changing probe: the wrong-sign share, overall and on the events within a factor 10 of
+    # zero (|x| below a tenth of the probe's median |x|, the truth clipped at the floor), as tools/signed_ab_score.py
+    # metrics() defines them; on the scored split (--split), so a test-only pool (HD5) is read too
+    sgn_p = sgn_t = np.zeros(0, np.int8)
+    if floor is not None and lgs:
+        sgn_p = np.where(torch.cat(lgs).numpy() > 0, 1, -1).astype(np.int8)
+        sgn_t = np.where(torch.cat(sgs).numpy() > 0.5, 1, -1).astype(np.int8)
+        near = t < np.log(np.median(np.exp(t)) / 10)
+        wrong = sgn_p != sgn_t
+        rec.update({"wrong_sign": float(np.mean(wrong)), "near_share": float(np.mean(near)),
+                    "wrong_sign_near": float(np.mean(wrong[near])) if near.any() else None,
+                    "neg_share": float(np.mean(sgn_t < 0))})
     if mu_c is not None:
         q = mu_c + sd_c * h                                               # the zero-shot log|M|^2
         mse = float(np.mean((q - t) ** 2))
@@ -284,6 +299,7 @@ def _read(recipe):
                             q_own=(mu_p + sd_p * h).astype(np.float32), h=h.astype(np.float32),
                             mu_sd=np.array([mu_p, sd_p]), logF=logF, at_floor=at_floor, split=np.array(a.split),
                             sig=sig.astype(np.float32),     # raw, the parent's standardized units
+                            sign_pred=sgn_p, sign_true=sgn_t,   # +-1 per scored event (a sign-head parent, signed probe)
                             s=(sd_c * sig if (mu_c is not None and len(sig) == len(h)) else np.zeros(0)).astype(np.float32),
                             q=(q if mu_c is not None else np.zeros(0)).astype(np.float32),
                             # the physics check of this probe (tools/pool_physics.py); a mismatch read on purpose
