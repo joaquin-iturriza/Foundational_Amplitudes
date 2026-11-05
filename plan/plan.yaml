@@ -12554,6 +12554,27 @@ entries:
       change; the 2132 point says whether any k does, and the step-0 equality rules out a broken operator; tuning (D284''s
       sweep over the fine-tune space) is the next call. A step-0 validation off the parent''s by more than 0.01: the operator
       is wrong, no read, fix and rerun.'
+    fix_at: '2026-11-05T04:29:16+00:00'
+    fix: 'Check 14 (disk): the design gives 0.5 GB per run and no memmap cache. The runs use LONG_MEMMAP=true on the whole
+      training set, whose cache was measured at about 20 GB per key (2026-11-01). data_mmap.py keys the cache on the code
+      hash, the torch RNG state at load (so seeds 42 and 43 differ) and, for fine-tune starts, the parent''s offshell stats
+      and the fine-tune mode. So the warm runs may not open B''s cache (keys 746f01a3/85be0204/2eb370fa under SCRATCH/amp_mmap_cache)
+      and may build up to two new 20 GB caches. /sps/lpnhe has 87 GB free today (df, 2026-11-05), shared with step 5''s jobs.
+      Fix: state which cache key the 6 runs will open (one per seed, shared across k, shown by building the key twice on CPU
+      or from the first job''s ''data.memmap: opening/built the cache'' line), the disk that results (caches plus runs, plus
+      step 5''s), and the free disk read at submission. Check 4 (outcome): the yes bar is C1''s widened upper R(W_k/B) <=
+      1.35, but the width change is smaller than C1''s share change. From width_x1.json, B/A on PP4 is 0.565 and on EE4 0.562,
+      so A/B is about 1.77, against 2.22 for C1. A bound of 1.35 then leaves ln1.35/ln1.77 = 53% of the width gain unrecovered:
+      a warm start about halfway between the w8 parent and w16 from scratch (g about 0.5) would be declared YES, ''width growth
+      joins the warm-startable changes''. That is not ''matches pretraining from scratch'', and not ''relatively close'' (D284).
+      Fix: set the yes bar relative to this change''s gap, fixed before the read (e.g. widened upper R(W_k/B) <= (A/B)^0.3,
+      about 1.19, or g_k >= 0.8 on PP4 and EE4 with its interval), or say why C1''s absolute 1.35 is kept and report g_k as
+      the deciding number. Checks that hold: one change against B at B''s exact setup (only k and the start differ, untuned
+      both); the measure moves (w16/w8 PP4 0.565 [0.522, 0.614], EE4 0.562 [0.512, 0.649] widened, plus C1''s k-response 1.33/1.15/0.95);
+      seeds 42/43 against the 15-18% PP4 unpaired spread is enough for a 1.77x gap; no prior width growth found (searched
+      results.tex, plan.yaml, decisions for grow, widen, hypercloning, net2, function-preserving, width growth); het loss
+      and B''s preprocessing are kept; the reads are C1''s PP4/EE4 plus the default- and catalog-sampled held-out reads; no
+      sweep; 13.1 GPU-h.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
