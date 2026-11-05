@@ -3752,9 +3752,6 @@ entries:
       Joaquin before anything is built.'
     50: 'Step 49 follow-up: Joaquin''s answer on the own-sampler envelope design (f 0.5; 0.70 own |M|^2-unweighted at pp''s
       sqrt(s_hat) widened 0.05 dex + 0.30 current mixture with the initial-state collinear branch; about 800 core-h CPU)'
-    52: 'Envelope design redo, pending Joaquin''s word: keep the sampling study''s mixture (bulk RAMBO/democratic + flat-log|M|^2
-      admixture f 0.25-0.5 + forward), change the sqrt(s) draw to cover the pp range densely and continue wider; drop the
-      70% |M|^2-proportional component unless shown necessary.'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
       rows mu, sigma, sign logit; experiment.py:2232 refusal removed; sigma stage trains the sigma row only; parent loading
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
@@ -9286,11 +9283,6 @@ entries:
       - 'approved: design review, build the unweighting and the IS branch, validate_v4 envelope check, then the generation
         queue'
       - 'f or weights changed: rerun envelope_design.py own and re-propose'
-    52:
-      feeds: the catalog sampling redesign Joaquin asked for (cover the pp range and wider, enough data)
-      if:
-      - 'Joaquin agrees: redo step 49 that way'
-      - 'he sees it differently: follow his words'
     56:
       feeds: whether the het pretraining carries the sign head on the sign-changing one-loop pools (D287)
       if:
