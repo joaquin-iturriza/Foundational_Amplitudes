@@ -13122,6 +13122,17 @@ entries:
       by the site''s 60-min GPU-h gate (the failed batch''s estimates still in the window), submitted when it clears (07:38
       CET). Not tested: the CUDA path itself (no GPU on the laptop); the step-0 validation check of the design catches a wrong
       operator.'
+  - at: '2026-11-05T06:57:52+00:00'
+    text: '2026-11-05: second defect of step 4: the k533 runs 1b390f47/ea48ea8c trained (growth 8->16 heads, 70 tensors; step-0
+      val_loss_no_reg -2.8417) then failed in run.py''s in-process sigma-only stage, which inherited fine_tune.grow_width=true
+      and tried to grow its own 16-head model (''parent num_heads 16, this run 16''). The other four (5886a810 40c2939a 14f50a69
+      4e346a51) would have ended the same and were cancelled. Fix b36bb809 (merged 13fe9f64): sigma_stage_cfg turns grow_width
+      off, and the loader loads a checkpoint already at the run''s width as is (readers that inherit the config); tests/test_grow_width.py
+      7 pass (the new sigma test fails without the fix), test_ema_checkpoint 3 pass; repo-reviewer PASS. Resubmitted whole
+      at 13fe9f64: k533 e046ac67/f35b6a78, k1066 380c7b14/af86de05, k2132 58723352/93479cde (same arms, env and limits). Waste
+      of both defects about 4 GPU-h. Reviewer nit, not done: the same-width bypass could require the checkpoint''s own config
+      to carry grow_width (a growth job pointed at a 16-head parent would quietly become a same-width warm start; the job
+      script cannot produce it).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
