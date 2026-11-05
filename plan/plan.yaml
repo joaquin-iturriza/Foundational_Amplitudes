@@ -3707,12 +3707,6 @@ entries:
   - D258
   - D288
   next:
-    32: 'Long-run DyHPO sweeps on CC-IN2P3 at deb290bc (atomic-mkdir locks; generate_sweep + sweep_manager on the CC login
-      node, state on /sps; configs sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml / _x16.yaml @73073f7f, unchanged at
-      deb290bc; gpu_v100,gpu_h100, 46G, 5 CPUs, limits 08:03 / 28:42): ccin2p3:cov_v4_long_hpo8_cc_17056 (jobs 62936972-79)
-      and ccin2p3:cov_v4_long_hpo8_cc_68224 (62936980-87), waves 3,3,2 afterany-chained, submitted ~11:55 2026-11-02. Targets
-      16 h and 57 h (V100). When the first trials train: read their logs (step rate, TRIAL_GPU, the lock lines: one ''built
-      the cache'' per key), check /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache keys and df /sps/lpnhe (152G free at submit).'
     36: 'After both CC sweeps end (the freeze lifts): limit data_mmap._code_hash to the code that produces the cached arrays
       (boost/augment, ordering, preprocessing, standardisation, tables), not the lock, logging or I/O, with a test that a
       lock-only edit of data_mmap.py keeps the key.'
@@ -9122,12 +9116,6 @@ entries:
     start: '2026-11-05T04:40:08+00:00'
     at: '2026-11-05T04:40:08+00:00'
   step_why:
-    32:
-      feeds: whether training 16x (68224 steps) beats 4x (17056 steps) at tuned HPs, i.e. which length becomes the foundation
-        pretraining candidate (D242)
-      if:
-      - 'both sweeps done: eval reads of each best trial on its GPU type (REREAD), R 16x/4x on PP4, EE4, held-out'
-      - 'a trial broke: read its log, fix, extend the sweep with generate_sweep --extend'
     36:
       feeds: whether later code edits force new ~23 GB memmap caches
       if:
