@@ -10374,6 +10374,20 @@ entries:
       and the two long-best trials into their eval jobs'' sigma stages (reads/FA-ccin2p3-6f8a1eed_val.json, 1a46f3e0_val.json,
       mixture_ab val); deck talks/progress_nov2026 rebuilt with both. No het loss from these runs is quoted in docs/results.tex
       or the deck text.'
+  - at: '2026-11-05T04:44:03+00:00'
+    text: '2026-11-05 step 55 (length_h2p5.py -> data/length_h2p5.json, from the long-best evals'' saved zero-shot npz; commit
+      pending the repo-reviewer pass): the 16x-over-4x regression on H2p5 is broad, not a few classes: catalog-sampled 37
+      of 38 classes worse (median mse ratio 2.28 = par:v4_length''s R), default-sampled 38 of 38 (3.07). Split mse = level
+      (mean(q-t)^2) + shape (var(q-t)), one probe per class: catalog-sampled median level ratio 2.76, shape 2.41 (shape up
+      in 38/38, level in 33/38), level 46% of the summed mse increase, level share of mse 0.31 at both lengths; default-sampled
+      level 5.55, shape 2.60, level 78% of the increase, level share of mse 0.39 -> 0.57. Median absolute mse 4x 0.85 -> 16x
+      1.65 (catalog) and 0.86 -> 2.59 (default). Worst: v4_us_acdgh (default 18.7x, level 24x), v4_ucx_dggsxz (9.4x / 6.2x),
+      v4_us_cdghz, v4_uux_epemggh (catalog 8.5x). Ratio not tied to the 4x error (corr of log ratio with log 4x mse -0.17
+      / -0.26). Reading: on the default-sampled 2->5 probes most of the 16x cost is a level offset (one number per process
+      removes 78% of the increase); on the catalog-sampled ones level and shape grow alike. By the step''s rule: a level offset
+      on most 2->5 classes -> report with the length verdict as the 16x cost; a level-fix read (score with a per-process offset,
+      already the shape term here: shape-only 16x/4x median 2.60 default / 2.41 catalog) shows the 16x stays worse after removing
+      the level.'
   handoff:
     state: '2026-11-05 ~06:00. Step 56 SUBMITTED: sign head under HETEROSC implemented (models/lloca.py sign_channel, readout
       rows [mu, sign, sigma], backbone+RNG bit-equal to het model at a seed; wrappers/experiment/base_experiment splits by
