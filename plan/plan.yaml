@@ -10559,6 +10559,20 @@ entries:
       R 0.73-1.24. Beside (paired): PP4 1.00, EE4 0.95 [0.92, 0.98], HD4 0.97, H1-H7c 0.97-1.04, all intervals contain 1 or
       below. No blow-ups; 3 spikes recovered (18b98b55 step 1020, 69001455 step 935, 8ddc490b step 1360; best at 4250-4264).
       By the design: report to Joaquin with the per-validation sign accuracy; a loss-weight change is his call (D241).'
+  - at: '2026-11-05T07:51:38+00:00'
+    text: '2026-11-05 step 43(1) loader-control read (mixture_ab.py loader @0072d502 -> data/loader_control.json; arm v4_het_default25[_seed2]
+      @7c698864, V100, memmap 5b5215b6/e184bbc5 vs same-commit in-memory reruns ae39ee5a/75ad7b20; R_0 rerun over the 10-31
+      arm f0156d88/df858d33 with PP4/EE4 rereads 9538e607/ed96b552; class medians of class geometric-mean MSE ratios). R_L
+      memmap/rerun, seed 42 / 43: PP4 trained (797 classes) 1.059 / 0.981; EE4 trained (115) 1.043 / 0.959; held-out default-sampled
+      (558 classes, PP4/EE4 probes; these runs read no HD4/HD5) 1.034 / 0.897; beside held-out catalog-sampled (701) 1.053
+      / 0.944. R_0 rerun/10-31 arm: PP4 1.038 / 1.060, EE4 1.022 / 1.052, held default 1.038 / 1.099, so s = 0.094. g = ln
+      1.39 = 0.329. max |ln R_L| 0.109 (seed 43 held default, memmap better). Verdict by the rule: UNRESOLVED (CLEAR needs
+      every |ln R_L| <= max(s, 0.05) = 0.094 and < g/3 = 0.110; the one seed-43 held-default value 0.109 misses the first
+      bound; IMPLICATED needs ln R_L >= g/2 = 0.165 toward the full cells, nowhere: the largest positive is 0.057 on PP4 seed
+      42). Reading: the loading path moves PP4 by at most 6% (either sign across seeds) against the 39% gap between the full-set
+      w8 cell and the 1e4 arm; the gap is not the loader within these bounds. Best val_loss_no_reg sigma stage: memmap -2.8594
+      / -2.8802, rerun -2.8895 / -2.8821. Training 4264 steps in 69.1-69.8 min on every job (0.92-0.93 s/step, memmap and
+      in-memory alike); cache 3 GB per seed; no blow-ups (e184bbc5 spike at step 1105, recovered).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
