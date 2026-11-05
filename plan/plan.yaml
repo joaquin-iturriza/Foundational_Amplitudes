@@ -3743,6 +3743,10 @@ entries:
     60: 'Worktrees left after merge (remove_worktree.sh refused by the permission classifier for agents): worktrees/wt-ws-ckpt,
       wt-ws-grow (warm_start) and wt-multichannel; Joaquin was given the commands 2026-11-05; remove once he allows or runs
       them.'
+    61: 'Step 56 result to Joaquin (finding 2026-11-05, het_signhead.json @6ec06b24): het + sign head is NO-SIGN (worse wrong-sign
+      than the MSE control on H5 17/21, HD5 15/19; not better than all-positive) though it fits the training signs (0.99);
+      magnitude UNRESOLVED (pairing failed, R ~1.03 [0.64,1.56]). Waiting on his call: keep the het magnitude target without
+      a sign, change the sign loss weight or how the sign head is attached, or use the MSE model for the sign'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -9253,6 +9257,11 @@ entries:
       if:
       - 'removed: drop this step'
       - 'still refused: keep it listed for Joaquin'
+    61:
+      feeds: whether the het pretraining carries a usable sign on the sign-changing one-loop pools (D287)
+      if:
+      - 'Joaquin picks a change: design it under the same reads'
+      - 'Joaquin drops the sign under het: note it in results.tex with this read'
   owner:
     agent: a9838af5fa2f7d0bb
     state: working
