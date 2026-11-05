@@ -1,5 +1,5 @@
 """data_mmap._code_hash (plan catalog_coverage step 36): the memmap cache key follows only the code the cached arrays
-come from. An edit to the lock, the logging or the open in data_mmap.py keeps the key (no new ~23 GB cache); an edit to
+come from, and its key document holds the catalog entries the encoding species are read from. An edit to the lock, the logging or the open in data_mmap.py keeps the key (no new ~23 GB cache); an edit to
 the build, a streamed reduction or a constant of the format changes it.
 
 CPU only:  python tests/test_mmap_code_hash.py   (or pytest)"""
@@ -50,7 +50,29 @@ def test_build_reduction_and_format_edits_change_the_key():
     assert _hash_of(chunk, "chunk") != base
 
 
+def test_species_inputs_follow_the_catalog_entry():
+    """an entry edit that changes a pool's encoding species (a massless b, catalog_v4's beam_masses {}) changes the
+    key document's species_in, as the tokens it writes change"""
+    import data_mmap as dm
+    import particle_ids
+    import numpy as np
+    from experiment import recipe_process_cfg
+    import mg5_pipeline_final as mg
+    name = next(n for n, e in mg.PROCESSES.items() if n.startswith("v4_") and 5 in [abs(int(p)) for p in e["pdg_ids"]]
+                and e.get("beam_masses") == {})
+    spec = {"name": name}
+    entry = recipe_process_cfg(spec)
+    doc = lambda e: dm._jsonable([[e, None]])
+    massive = dict(entry, beam_masses={5: 4.7}, **({"m_finals": [4.7 if abs(int(p)) == 5 else m for p, m in
+                                                                 zip(entry["pdg_ids"][2:], entry["m_finals"])]}
+                                                    if "m_finals" in entry else {}))
+    pdgs = np.array([entry["pdg_ids"]])
+    assert (particle_ids.species_pdgs(pdgs, None, entry) != particle_ids.species_pdgs(pdgs, None, massive)).any()
+    assert doc(entry) != doc(massive)
+
+
 if __name__ == "__main__":
     test_lock_and_logging_edits_keep_the_key()
     test_build_reduction_and_format_edits_change_the_key()
-    print("test_mmap_code_hash: 2 tests passed")
+    test_species_inputs_follow_the_catalog_entry()
+    print("test_mmap_code_hash: 3 tests passed")
