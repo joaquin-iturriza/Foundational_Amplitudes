@@ -8817,6 +8817,8 @@ entries:
       asked 2026-11-05
     '37': 'Joaquin''s answer on the memmap cache: (A) keep today''s Lorentz draws exactly or (B) per-event keyed draws, asked
       2026-11-05'
+    '38': 'Joaquin''s answer on the memmap cache: (A) keep today''s Lorentz draws exactly or (B) per-event keyed draws, asked
+      2026-11-05'
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
