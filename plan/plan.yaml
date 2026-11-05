@@ -8585,6 +8585,38 @@ entries:
       Check 4: YES p >= 0.2, UNRESOLVED [0.05,0.2), NO p < 0.05: disjoint; magnitude YES / COST / UNRESOLVED disjoint; pairing
       fallback stated. Check 5 searched: sign head, sign_head, HETEROSC, het, signed_magnitude, D287, D288, wrong-sign; no
       het + sign head run exists.'
+  - at: '2026-11-05T04:34:46+00:00'
+    question: 'Step 57 (Joaquin 2026-11-05T03:52 ''2. Yes, build it and run the check''): does the multichannel draw of the
+      flat-in-log|M|^2 part''s candidates (RAMBO, splitter, one Breit-Wigner channel per s-channel Z/W/H/t propagator of the
+      class''s diagrams, an initial-state collinear channel; shares equal then adapted by 1/density(log|M|^2)) bring the kept
+      flat events to the top of the pp 13 TeV |M|^2 where the current candidates (half splitter, half RAMBO) stop, on the
+      five worst classes?'
+    prior: 'pp_support.py @07ab67cf: share of pp events above the catalog max: uux_epemvevex 46%, uu_bbxuu 35%, us_ddxsu 32%,
+      udx_csxvevex 31% (data/pp_support_reads.json); sampling_example.py shape @cf87b124 on v4_uux_epemg seed 42: kept flat
+      plateau 1010-1522 per 0.25 dex from -8.75 to -3.75, falling to 35 at -1.25, candidates'' own density above -2; cause:
+      lepton pair not on the Z Breit-Wigner (3.3% of candidates in the Z bin vs 76% of MadEvent events). No multichannel check
+      exists (searched multichannel, Breit-Wigner, resonance channel, collinear channel).'
+    measure: 'analysis/catalog_v4/multichannel_check.py @2466f283 per class, policy (current, multichannel) and seed: above_max
+      = share of the class''s pp MadEvent events (PP4 probe train+test, 12000) inside the catalog''s support (sqrt(s_hat)
+      window and partonic-frame cuts, pp_support''s mask) above the largest kept flat log10|M|^2; min_over_plateau = least
+      kept-flat count per 0.25-dex bin over their median, bins wholly between the kept minimum and the in-support pp 99.9%
+      quantile; reported beside: above_max_all, out_of_support, kept per channel, bins below half.'
+    check: 'On existing data the measure moves with the candidate draw: the current policy''s kept max is the candidates''
+      max (sampling_example shape: kept/candidates 1.0 above -1.75 dex on v4_uux_epemg), and pp_support''s above-max shares
+      31-46% on these classes are of the same measure; the replay of a pool equals the built pool to rtol 1e-9 (sampling_example
+      @94391873), so the current policy here is the catalog as built.'
+    fixed: 'Each class''s catalog_v4 train-pool entry without the default share (mix_compose.control_config), n_train, window,
+      chunk plan and seeds as the build; 6x oversampling, _flat_logm_select, bulk/forward/flat shares, sqrt(s) passes; only
+      sampling.multichannel (+ mc_resonances from the sidecar, mc_isc, mc_res_params from the entry''s physics) differs. Open
+      choices to report: MC_TAIL 0.2 log tail share; the collinear |eta| uniform to min(5, the kinematic limit at pT 10 GeV)
+      instead of uniform to 5.'
+    control: The current policy on the same class, chunks and seeds (the catalog as built).
+    seeds: 42 and 43 for both policies (the step's text).
+    outcome: 'PASS per class: multichannel above_max <= 0.001 and min_over_plateau >= 0.5 on both seeds -> report to Joaquin
+      before any pool is regenerated, with the two open choices. FAIL on a class: report which criterion, kept per channel
+      and bins below half, and the cause read from the channels; no regeneration. Current failing and multichannel failing
+      alike: the draw does not reach the top, reported as such. Cost: 5 CPU jobs, 1 CPU each, about 5-15 min each (train-pool
+      chunk times 47-70 s per build from the regen logs, x4 builds), no GPU, no stored pool.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
