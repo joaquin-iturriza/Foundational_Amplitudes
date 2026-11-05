@@ -10564,6 +10564,12 @@ entries:
       gain (top pooled quartile, gain 0.31-0.98: 115 EE4, 113 PP4 classes) EE4 R 0.182 vs PP4 0.396. So the sqrt(s) coverage
       does not explain the EE4 advantage; open: other kinematic coverage (angles: the ee pools'' forward/collinear corners)
       or the per-class target level; not yet tested.'
+  - at: '2026-11-05T05:35:30+00:00'
+    text: '2026-11-05 next-step audit against Joaquin''s words: dropped 44 (deck of 11-03 built and sent; D258-D260 are his
+      replies to it), 47 (run and read: het_magnitude.json @74a30052, finding 2026-11-04T21:10; followed by D287, now step
+      56), 48, 49, 50, 52 (the envelope / IS-collinear / own-sampler proposals: superseded by Joaquin''s D288 item 2 ''Yes,
+      build it and run the check'' on the multichannel proposal, built and checked as step 57, his call now step 58), 53 (done,
+      finding 2026-11-04T19:59). None of 47-53 waits on him; what waits on him: 37/38 (cache A/B), 39(e), 58.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
