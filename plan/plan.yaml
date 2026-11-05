@@ -8689,6 +8689,17 @@ entries:
       events (sqrt(s_hat) window and cuts) where Joaquin''s approved wording said ''the class''s MadEvent events'', because
       events outside the support (uu_bbxuu 1.3%, 92% of them above the max) no sampler reaches; the all-events share and the
       out-of-support floor are given beside. Cost: 5 CPU jobs, 1 CPU each, about 5-15 min each, no GPU, no stored pool.'
+    passed_at: '2026-11-05T04:40:15+00:00'
+    reviewer: 'Second review (04:39 revision of step 57). One change: sampling.multichannel and its channel inputs against
+      the catalog as built (replay = pool to rtol 1e-9 @94391873), same entry, chunks, seeds 42/43, shares, 6x and sqrt(s)
+      passes. Check 2: current kept/candidates 1.0 above -1.75 dex, top bin 35/1334 = 0.026 on v4_uux_epemg (sampling_shape_report.json);
+      in-support pp above catalog max 0.457/0.344/0.317/0.313 (pp_support_reads.json @07ab67cf). Check 3: deterministic replay,
+      both seeds must pass, ~1000 kept per bin (Poisson ~3%) against gaps 30-46% -> <=0.1% and 0.026 -> >=0.5. Check 4: PASS/FAIL
+      per class, bottom-edge-only failure read apart, in-support denominator disclosed against the approved wording with all-events
+      share and out-of-support floor beside. Check 5 searched multichannel, multi-channel, Breit, resonance, resonance channel,
+      collinear channel, initial-state collinear, flat part, flat-in-log, kept flat, VEGAS, importance sampl, pp_support,
+      sampling_example, D288: prior now names the ee->uu Z study, the open resonance-aware generation item and the sqrt(s)
+      pass; no channel-mapping test exists. CPU only, 5 jobs, no stored pool, no training.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
