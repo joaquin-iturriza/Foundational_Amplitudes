@@ -54,7 +54,7 @@ def grow_state(parent_sd, child_model, parent_heads, noise=1e-3, seed=0):
     for k, c in own.items():
         if k not in parent_sd:
             raise KeyError(f"grow_width: {k} is not in the parent's state")
-        p = parent_sd[k].to(c.dtype)
+        p = parent_sd[k].to(device=c.device, dtype=c.dtype)
         if tuple(p.shape) == tuple(c.shape):
             out[k] = p.clone()
             continue
@@ -76,7 +76,9 @@ def grow_state(parent_sd, child_model, parent_heads, noise=1e-3, seed=0):
             rows = _second_copy_rows(p.shape[0], parent_heads if qkv else None)
             std = float(c.float().std()) if c.numel() > 1 else 0.0
             t = t.clone()
-            t[rows] += noise * std * torch.randn(len(rows), t.shape[1], generator=g).to(t.dtype)
+            # drawn on the CPU generator (reproducible whatever the device), then moved to the tensor's device: the
+            # model lives on the GPU in a job (FA-ccin2p3-93b037bb and five others failed here, cuda:0 against cpu)
+            t[rows] += (noise * std * torch.randn(len(rows), t.shape[1], generator=g)).to(device=t.device, dtype=t.dtype)
         out[k] = t
         grown.append(k)
     return out, grown
