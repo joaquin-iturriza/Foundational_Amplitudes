@@ -11284,7 +11284,7 @@ entries:
   title: 'Two-loop amplitude datasets: what it takes'
   question: What does generating two-loop amplitude datasets for the catalog require (theory, tools, feasible processes, cost),
     so Joaquin can decide whether and how to do it?
-  status: running
+  status: waiting_user
   quotes: []
   decisions:
   - D266
@@ -11313,7 +11313,13 @@ entries:
     searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
       which ask for the explainer'
     blocks: nothing
-    blocks_steps: &id001 []
+    blocks_steps: []
+  - ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
+      form factors, checked against published NNLO coefficients); (2) label scheme: Catani remainder or MS-bar hard function,
+      and should one-loop pools get a remainder label too?'
+    at: '2026-11-05T00:28:20+00:00'
+    searched: D265/D266 opened the entry; no decision settles go, tier or scheme
+    holds_all: the entry's only next step is Joaquin's call
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -11341,15 +11347,11 @@ entries:
         against published NNLO coefficients'
       - 'no go: close the entry with the explainer as its result'
   ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
-    form factors, checked against published NNLO coefficients); (2) which label: Catani remainder or MS-bar hard function,
-    and should the one-loop pools get a remainder label in the same scheme (needs colour-correlated Borns beyond two coloured
-    legs)?'
-  waiting_since: '2026-11-04T18:09:07+00:00'
-  searched: 'site decisions --project FA, docs/results.tex and the plan searched for two-loop and label scheme: only D265/D266,
-    which ask for the explainer'
-  blocks: nothing
-  blocks_steps: *id001
-  checked_until: '2026-11-04T21:47:57+00:00'
+    form factors, checked against published NNLO coefficients); (2) label scheme: Catani remainder or MS-bar hard function,
+    and should one-loop pools get a remainder label too?'
+  waiting_since: '2026-11-05T00:28:20+00:00'
+  searched: D265/D266 opened the entry; no decision settles go, tier or scheme
+  holds_all: the entry's only next step is Joaquin's call
 - id: warm_start
   title: Warm start from a pretrained model against pretraining from scratch, for a new change
   question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
@@ -11395,7 +11397,7 @@ entries:
       D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
       change the scope)'
     blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
-    blocks_steps: &id002 []
+    blocks_steps: &id001 []
   owner:
     agent: ab46b28c7e6e33570
     state: closed
@@ -11984,7 +11986,7 @@ entries:
     D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
     change the scope)'
   blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
-  blocks_steps: *id002
+  blocks_steps: *id001
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
