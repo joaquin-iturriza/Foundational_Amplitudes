@@ -8830,6 +8830,8 @@ entries:
       2026-11-05'
     '38': 'Joaquin''s answer on the memmap cache: (A) keep today''s Lorentz draws exactly or (B) per-event keyed draws, asked
       2026-11-05'
+    '61': Joaquin's answer on the sign under het. (1 keep magnitude only, 2 change the sign loss weight or attachment, 3 take
+      the sign from the MSE model), asked 2026-11-05
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
