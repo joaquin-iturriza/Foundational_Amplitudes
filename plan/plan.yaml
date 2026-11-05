@@ -12030,7 +12030,7 @@ entries:
     blocks_steps: &id002 []
   owner:
     agent: a21a69297ccf65a6e
-    state: working
+    state: closed
     since: '2026-11-05T04:14:01+00:00'
     state_at: '2026-11-05T05:35:12+00:00'
     context: 230015
@@ -13100,33 +13100,34 @@ entries:
     '5': FA-ccin2p3-0898a7b0 FA-ccin2p3-a6834028 FA-ccin2p3-2a27e8a2 FA-ccin2p3-0259e865 FA-ccin2p3-dd32a907 FA-ccin2p3-70c28bd9
     '4': FA-ccin2p3-93b037bb FA-ccin2p3-ee8df686 FA-ccin2p3-69b7e27d FA-ccin2p3-6954649e FA-ccin2p3-57802518 FA-ccin2p3-da290610
   handoff:
-    state: 'C1 done and written up (par:v4_warm_start @1258ef73): untuned restarted schedule YES at k=1066 by the 1.35 bound
-      (still resolved worse), equal at k=2132. Step 3 (D284): sweep ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
-      @dc24fa76) done, best hp_1860 val -2.758 (lr_scale 0.174, lower lr is better, best near the window''s bottom); confirmation
-      runs FA-ccin2p3-56cca07a (seed 42) and 75d28cb4 (seed 43), arm v4_het_warm25t_k533[_seed2] @dab9ff19, step 3 waits on
-      them. When they end: mixture_ab.py extract (PP4 EE4 H1-H7c HD4 HD5) and val for both, then ''mixture_ab.py warm C1t''
-      (@49787157, C1t entry ready) and C1''s MATCH rule; SHORT/INCONCLUSIVE -> 8-trial extension with lr_scale low edge 0.01.
-      Step 5 (D289, design passed round 2): code on branch ws-ckpt @8a18b4ec (worktree worktrees/wt-ws-ckpt): training.save_model_at_steps,
-      arms v4_het_control_ckpt[_seed2] (training only) and v4_het_warm25t_k533_from<2132|3198|final>[_seed2], tests/test_save_at_steps.py;
-      repo-reviewer PASSED it, but git_verify_guard refused the merge because the reviewer advanced its watermark to trunk
-      7af7c3cc, not past the branch commit: get the watermark onto the branch (re-run the reviewer, naming 8a18b4ec) or fold
-      the branch, merge, remove the worktree with scripts/remove_worktree.sh, site sync, then submit 2 reruns (limit about
-      1:50, wall 1.45 h) and, chained afterok on each, the 6 warm starts (limit 2:15, 1.45 h); 11.6 GPU-h. Step 4 (D285):
-      draft only, not recorded as a design (recording it would replace step 5''s passed design before its jobs go): width
-      8->16 growth is exactly function-preserving in this model by duplicating every residual-stream channel (BaselineLayerNorm
-      statistics unchanged), duplicating heads (per-head dim channels//num_heads fixed) and MLP hidden units, halving each
-      consumer''s fan-in weights, and compensating MuReadout''s 1/width_mult (x2), plus small noise (Muon); test pair: parent
-      w8 full-set 804a65bc/66e8c31f, B w16 493c98db/7288b3fe. Step 2 (C2-C8) waits on step 3 and Joaquin''s go.'
-    decisions: 'D284: tune the k=533 warm start by a DyHPO sweep (template fine-tune space, warmup low end 0.01 from Gupta
-      2023). D286: no matched control from now on. D289: test a pre-decay checkpoint, paired by seed, best against best if
-      no gain at hp_1860. Literature web-verified (finding 2026-11-05): Gupta 2308.04014, Ibrahim 2403.08763, MiniCPM 2404.06395
-      (title corrected; 10% decay suffices), Haegele 2405.18392 (weight averaging only partially substitutes a cooldown),
-      HyperCloning 2409.12903, MSG 2305.02869. Parent optimizer state is saved in model files (earlier text wrong); warm starts
-      use a fresh optimizer (no difference per Ibrahim). Repaired tests/test_ema_checkpoint.py fixture (failed on trunk: cfg.training.loss).'
-    ruled_out: C7 (no from-scratch gain); C9 (confound); catalog_v3 changes (pools deleted on CC); WSD schedule (not implemented;
-      next call if tuned k=533 stays SHORT).
-    running: FA-ccin2p3-56cca07a, FA-ccin2p3-75d28cb4 (step 3 confirmation, CC, plan wait step 3)
-    files: analysis/catalog_v4/mixture_ab.py (warm, C1t), analysis/catalog_v4/plot_warm_start.py, analysis/catalog_v4/data/warm_start_C1.json,
-      sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml, scripts/job_catalog_v3_short.sh, worktrees/wt-ws-ckpt (branch ws-ckpt
-      @8a18b4ec), docs/results.tex par:v4_warm_start
-    written: '2026-11-05T04:13:12+00:00'
+    state: 'C1 written up (par:v4_warm_start @1258ef73). Step 3 (D284) read @7f47781a (warm_start_C1t.json): tuned k=533 (hp_1860)
+      SHORT, R(W/B) PP4 1.59, EE4 2.21, WORSE than untuned k=533 (R PP4 1.19, EE4 1.40) though its val_loss_no_reg objective
+      improved (-2.639 -> -2.758): the sweep objective disagrees with the deciding reads; the design''s SHORT branch (8-trial
+      extension, lr_scale low edge 0.01) is held on a question to Joaquin (run it as designed, or change the objective, or
+      go to a WSD cooldown) - not yet asked by the main session. Step 5 (D289) running: reruns d521160b/b688a859 (v4_het_control_ckpt[_seed2],
+      training normal, ~1.16 h), 6 warm starts chained afterok (from2132 0898a7b0/a6834028, from3198 2a27e8a2/0259e865, final
+      dd32a907/70c28bd9), wait on step 5; when they end: extract (PP4 EE4 H1-H7c HD4 HD5) + val per run, add a C1ck entry
+      to mixture_ab.py WARM (paired by seed W_x/W_final, plus W_x/B), apply the design''s rule. Step 4 (D285) running: width
+      growth w8->w16, design passed round 2 (MATCH bar widened upper R(W_k/B) <= 1.19 = (A/B)^0.3), code @12f51879, runs (GROW_K
+      env on v4_het_default25[_seed2], LONG_HEADS=16 LONG_CKPT LONG_MEMMAP, mem 46G) k533 93b037bb/ee8df686, k1066 69b7e27d/6954649e,
+      k2132 57802518/da290610, wait on step 4; when they end: check each step-0 validation (log ''Fine-tuning: validation
+      before any update'') against the w8 parent''s best within 0.01, check the two cache keys in ''data.memmap: opening/holding
+      the lock of <key>'' lines, delete the two new caches after the reads, extract reads, add a C10w WARM entry with B =
+      w16 cells (493c98db/7288b3fe), A = w8 cells (804a65bc/66e8c31f) and MATCH_HI 1.19 for it, read. C2-C8 wait on Joaquin''s
+      go.'
+    decisions: 'D284 tune k=533 by DyHPO; D286 no matched control; D289 pre-decay checkpoint test; D285 shape-changing reuse:
+      width doubling by function-preserving growth (HyperCloning-style; noise 1e-3 x child init std; exact to 1e-5 relative
+      without noise in tests). The merge refusal of ws-ckpt was the reviewer advancing its watermark from the main checkout:
+      re-reviewed after merging trunk into the branch, advance run from the worktree; the rule text for repo-reviewer.md and
+      the guard message was denied by the permission classifier (Joaquin''s call). submit_guard''s 60-min item budget delayed
+      step 4''s batch ~1 h behind step 5''s; sent whole at 05:35 UTC.'
+    ruled_out: C7 (no from-scratch gain); C9 (confound); catalog_v3 changes (pools deleted); the val_loss_no_reg-tuned low-lr
+      warm start as the way to close the k=533 gap (it widened it).
+    running: FA-ccin2p3-d521160b, b688a859 (step 5 reruns, intermediate); 0898a7b0, a6834028, 2a27e8a2, 0259e865, dd32a907,
+      70c28bd9 (step 5 warm starts, wait step 5); 93b037bb, ee8df686, 69b7e27d, 6954649e, 57802518, da290610 (step 4 width
+      growth, wait step 4)
+    files: analysis/catalog_v4/mixture_ab.py (warm, WARM table), analysis/catalog_v4/data/warm_start_C1.json, warm_start_C1t.json,
+      models/grow_width.py, tests/test_grow_width.py, tests/test_save_at_steps.py, scripts/job_catalog_v3_short.sh (GROW_K,
+      ckpt arms), base_experiment.py (_load_pretrained_weights grow_width, save_model_at_steps), worktrees/wt-ws-ckpt and
+      wt-ws-grow (merged, removal denied by the permission classifier)
+    written: '2026-11-05T05:40:42+00:00'
