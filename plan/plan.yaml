@@ -12430,6 +12430,55 @@ entries:
       predecay, intermediate checkpoint, WSD, cooldown, stable phase, save_intermediate, mid-training, earlier checkpoint,
       re-warm (only an unrelated ''earlier checkpoints cannot warm-start'' at line 10139); site decisions for checkpoint,
       WSD, cooldown, decay (D63, D85, D95: none on pre-decay warm starts). No repeat found.'
+  - at: '2026-11-05T04:05:12+00:00'
+    question: 'D289 (Joaquin 2026-11-05: ''I agree that we should probably save an earlier checkpoint too, though we should
+      check ourselves how much of a difference this makes''): for C1 (share 0.25, het), does a k=533 warm start from a checkpoint
+      of the parent taken before its cosine schedule has decayed (step 2132, lr about 0.65 of peak; step 3198, about 0.20)
+      reach share 0.25 from scratch better than the same warm start from the parent''s final model, and by how much, each
+      at its own best hyperparameters if the first comparison shows no gain?'
+    prior: 'par:v4_warm_start (C1 @1258ef73): from the final model, untuned W_533/B PP4 1.33, EE4 1.51. Step 3 (ws_c1_k533_hpo8
+      @dc24fa76): best trial hp_1860 lr_scale 0.174, val_loss_no_reg -2.758 (untuned -2.639, scratch -2.911); confirmation
+      runs FA-ccin2p3-56cca07a/75d28cb4 in flight. Literature (web-checked): Hu et al. 2024 arXiv:2404.06395 (WSD: branch
+      from a stable-phase checkpoint and decay on new data; a 10% decay matches or beats cosine), Ibrahim et al. 2024 arXiv:2403.08763
+      (re-warm and re-decay from the final model matches retraining). No pre-decay warm start found in results.tex, plan or
+      site decisions (searched: checkpoint, pre-decay, intermediate, save_intermediate, WSD, stable phase, cooldown).'
+    measure: 'As C1 (mixture_ab.py warm, a new change entry): each warm run''s final model after its own sigma stage (D276),
+      zero-shot MSE of log|M|^2 per probe on PP4, EE4 (all classes), held-out default-sampled pooled and catalog-sampled pooled.
+      Paired by seed: per seed s, per probe W_x,s / W_final,s (both from the same rerun at seed s, so the parent''s seed noise
+      cancels); R = median over classes of the class geometric mean of the probes'' two-seed geometric mean of those ratios;
+      95% class bootstrap widened by |ln(R_43/R_42)| (the paired seed disagreement). Beside: R(W_x/B) with C1''s MATCH rule,
+      g as C1.'
+    check: 'That the read moves with what the warm start begins from is shown on C1: from the same final model, k=533, 1066,
+      2132 give R(W/B) PP4 1.33, 1.15, 0.95 and EE4 1.51, 1.23, 1.01 with non-overlapping widened intervals. Unpaired warm-start
+      pairs disagree by seed by 15-18% on PP4 and 7-10% on EE4 (C1''s matched controls, warm_start_C1.json C_over_A R_seed),
+      so the design pairs by seed; the paired spread is measured on these runs and, if above 10%, it is the smallest effect
+      called BETTER or WORSE (stated in the result). Not checked: a pre-decay checkpoint''s read (none exists yet).'
+    fixed: 'Parent: the het control''s exact setup (scripts/job_catalog_v3_short.sh v4_het_control[_seed2]: share 0, 4264
+      steps, cosine with warmup 0.158, MuonAdamW lr 4.997e-3, width 8, HETEROSC, 1e4 train per pool), rerun at seeds 42/43
+      with a new save-at-steps knob writing the EMA model at steps 2132 and 3198; training only, no sigma stage, no reads.
+      All three starts are pre-sigma: the checkpoints at 2132, 3198 and the rerun''s best mean-stage checkpoint (the final).
+      This differs from C1 and step 3, whose parents were the het controls after their sigma stage (models/model_run0_best.pt.gz
+      promoted from sigma_stage, the script refusing a parent without one); within this test all three starts match, and the
+      new arms take their parent path from the rerun and skip that check. Warm starts: v4_het_warm25t_k533''s setup (share-0.25
+      recipe, 533 steps, step 3''s tuned HPs hp_1860: lr_scale 0.174, layer_decay 0.915, warmup 0.183, eta_min 3.2e-8, Muon
+      decay 0.048, reg 1.3e-8, EMA 0.956; tuned on the post-sigma final model), target_stats parent, fresh optimizer, differing
+      only in the checkpoint loaded.'
+    control: 'W_final: the same warm start from the rerun''s final (pre-sigma) model at the same seed, the matched control
+      of the checkpoint choice. B: share 0.25 from scratch (f0156d88/df858d33, reads 9538e607/ed96b552). The rerun''s final
+      is checked against the original het control (87ea24d0/321a3de2) on best val_loss_no_reg (within the seed spread 0.05).'
+    seeds: '42 and 43 (each warm start from the rerun at its seed). Runs: 2 parent reruns (4264 steps at the plain V100 training
+      rate 1.01 s/step, tools/short_wall.py, = 1.20 h + 15 min start-up = 1.45 h each) and 6 warm starts (1.45 h each, the
+      measured k=533 warm arm 341bf564) = 2.9 + 8.7 = 11.6 GPU-h. No branch (below): an 8-trial sweep per checkpoint as ws_c1_k533_hpo8
+      (8 x 0.45 h = 3.6 each, 7.2) plus seed 42/43 confirmations of each best (4 x 1.45 = 5.8): 13.0 more, 24.6 GPU-h at most,
+      under 30, on CC-IN2P3. Disk about 1.5 GB of 89 GB free.'
+    outcome: 'Per checkpoint x on PP4 and EE4 (all classes), paired: BETTER when R(W_x/W_final) <= 0.90 (or 1 minus the paired
+      spread if larger) with the widened interval below 1 on both; WORSE when the widened lower end is above 1 on either;
+      NO DIFFERENCE otherwise. BETTER at either checkpoint: future pretrainings keep that checkpoint (D289 answered, with
+      how much, and R(W_x/B) under C1''s MATCH rule). NO DIFFERENCE or WORSE at the final model''s HPs: per the feature rule
+      (best against best), the same 8-trial DyHPO sweep as ws_c1_k533_hpo8 from each checkpoint (seed 42 rerun), its best
+      confirmed at seeds 42/43, then read against the tuned final warm start (step 3''s confirmation runs, post-sigma parent:
+      the comparison is then best against best with that parent difference stated); BETTER there: keep the checkpoint, with
+      its HPs; else the final model stays the parent.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
