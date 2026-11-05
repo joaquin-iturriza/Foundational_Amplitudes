@@ -1442,13 +1442,22 @@ class BaseExperiment:
             state_dict = _merge_lora_state(state_dict, pretrained_path)
             ft = (self.cfg.get("fine_tune", None) if hasattr(self.cfg, "get")
                   else getattr(self.cfg, "fine_tune", None))   # a test's SimpleNamespace config has no .get
+            grow_heads = None
             if ft is not None and bool(ft.get("grow_width", False)):
+                pcfg_f = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path))), "config.yaml")
+                grow_heads = (int(OmegaConf.load(pcfg_f).model.net.num_heads), int(self.cfg.model.net.num_heads))
+                if grow_heads[0] == grow_heads[1]:
+                    # a grown run's own model read back at its width (its sigma stage, an eval or zero-shot read that
+                    # inherits the run's config): nothing to grow, loaded as is (plan warm_start step 4,
+                    # FA-ccin2p3-1b390f47 and ea48ea8c failed here, 16 -> 16 heads)
+                    LOGGER.info(f"Fine-tuning: grow_width set but the checkpoint is already at {grow_heads[1]} heads: "
+                                "loaded without growth")
+                    grow_heads = None
+            if grow_heads is not None:
                 # a parent of half this run's width (num_heads): its function carried into the wider model by
                 # duplicating units and halving their consumers' fan-in (models/grow_width.py, plan warm_start D285)
                 from models.grow_width import grow_state
-                pcfg_f = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path))), "config.yaml")
-                p_heads = int(OmegaConf.load(pcfg_f).model.net.num_heads)
-                c_heads = int(self.cfg.model.net.num_heads)
+                p_heads, c_heads = grow_heads
                 if c_heads != 2 * p_heads:
                     raise ValueError(f"fine_tune.grow_width: parent num_heads {p_heads}, this run {c_heads}: only a doubling")
                 state_dict, grown = grow_state(state_dict, self.model, p_heads, noise=float(ft.get("grow_noise", 1e-3)),

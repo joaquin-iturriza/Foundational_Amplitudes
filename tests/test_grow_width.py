@@ -91,3 +91,45 @@ def test_loader_grows(tmp_path):
         torch.manual_seed(0); yp = forward(parent.eval(), b)
         torch.manual_seed(0); yc = forward(child.eval(), b)
     assert (yp - yc).abs().max().item() / yp.abs().max().item() < 1e-5
+
+
+def test_sigma_stage_does_not_grow():
+    """The sigma-only stage that ends a HETEROSC run loads the run's own model, already at the grown width: it turns
+    grow_width off (FA-ccin2p3-1b390f47 and ea48ea8c failed there with 'parent num_heads 16, this run 16')."""
+    from omegaconf import OmegaConf
+    from run import sigma_stage_cfg
+    cfg = OmegaConf.create({"run_dir": "/tmp/x", "run_name": "x", "warm_start_idx": None, "ema": True,
+                            "data": {"amp_trafos": ["log", "standardization"]},
+                            "model": {"net": {"num_heads": 16}},
+                            "fine_tune": {"pretrained_path": "/p/models/model_run0_best.pt.gz", "grow_width": True,
+                                          "lr_scale": 1.0, "layer_decay": 1.0, "freeze_blocks": [],
+                                          "reset_output_head": False},
+                            "training": {"loss": "HETEROSC", "heterosc_sigma_stage_steps": 250},
+                            "evaluation": {}, "plotting": {}})
+    s = sigma_stage_cfg(cfg)
+    assert s.fine_tune.grow_width is False
+    assert s.fine_tune.pretrained_path == "/tmp/x/models/model_run0_best.pt"
+
+
+def test_loader_same_width_loads_as_is(tmp_path):
+    """grow_width on a checkpoint already at this run's width (a grown run's own model read back by a reader that
+    inherits its config): loaded unchanged, no growth, no error."""
+    from omegaconf import OmegaConf
+    from base_experiment import BaseExperiment
+    run_model, _ = build(False, seed=7, heads=4)
+    trained_like(run_model)
+    run = tmp_path / "run"
+    (run / "models").mkdir(parents=True)
+    OmegaConf.save(OmegaConf.create({"model": {"net": {"num_heads": 4}}, "training": {"loss": "HETEROSC"}}),
+                   run / "config.yaml")
+    torch.save({"model": run_model.state_dict()}, run / "models" / "model_run0_best.pt")
+    other, _ = build(False, seed=11, heads=4)
+    e = BaseExperiment.__new__(BaseExperiment)
+    e.cfg = OmegaConf.create({"seed": 42, "training": {"loss": "HETEROSC"},
+                              "model": {"net": {"num_heads": 4, "sign_channel": False}},
+                              "fine_tune": {"grow_width": True, "grow_noise": 1e-3}})
+    e.device = torch.device("cpu")
+    e.model = other
+    e._load_pretrained_weights(str(run / "models" / "model_run0_best.pt"))
+    for k, v in run_model.state_dict().items():
+        assert torch.equal(other.state_dict()[k], v), k
