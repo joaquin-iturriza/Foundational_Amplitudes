@@ -3727,13 +3727,13 @@ entries:
       never inside a GPU job; staging dirs unique per host and job, never another''s deleted; disk check and fallocate before
       the build; staging in RAM or node-local; LRU pruning; a canary check on open instead of the source hash. Equivalence
       test per seed.'
-    39: 'Tool follow-ups from 2026-11-02 (main session''s list): (a) generate_sweep reads a step suffix like _17056 as a counter
-      (made cov_v4_long_hpo8_17057); (b) site run silently sends a --timeout placed after the project name to the site as
-      the command; (c) lxplus sweep configs carry CC''s mem 46G (25.2 GB measured peak), so lxplus''s 3 GB/core rule makes
-      every job 16 CPUs: use the site''s own mem; (d) width-32 time limit 37 h against about 4.5 h needed (margin above 2x,
-      a finding): the width/checkpointing scaling in the estimate overshot; (e) repo-reviewer per-commit review of hot-path
-      and data code instead of only large batches (proposed to Joaquin); (f) Joaquin''s idea for later: a way to know when
-      a source (guidance, a report) is up to date before stating it as fact.'
+    39: 'Tool follow-ups from 2026-11-02, what is left: (e) repo-reviewer per-commit review of hot-path and data code instead
+      of only large batches (proposed to Joaquin, his call, not asked again without something new); (f) Joaquin''s idea for
+      later: a way to know when a source (guidance, a report) is up to date before stating it as fact. Done: (a) 8b7cd708;
+      (b) ~/.local/bin/site 2026-11-05 (options after <project> before ''--'' parsed as site run''s own, --timeout honoured;
+      refused without ''--'' or when unknown; tested on 5 cases, backup site.bak-20261105-runopts); (c) a03d9f99 set the long
+      sweep configs to mem 32G from the measured peak RSS, and lxplus gives every 1-GPU job 16 CPUs / 48000 MB whatever it
+      asks (site CONDOR_GPU_SHARE), so nothing left; (d) recorded as a finding with the measured per-width rates.'
     43: 'Open, to come back to (Joaquin 2026-11-02): (1) at width 8 and 4264 steps the full set (1e5/process, about 0.6 epoch,
       memmap) reads worse than 1e4/process (about 6 epochs, in memory): separate data size from loading path; (2) why e+e-
       gains most from the default share against the pure catalog-sampled control.'
@@ -9128,8 +9128,8 @@ entries:
     39:
       feeds: tooling defects found while sending the long runs
       if:
-      - 'each fixed with a test: done'
-      - 'not: listed as open'
+      - 'Joaquin answers (e): implement it or drop it'
+      - 'no answer: stays listed, nothing waits on it'
     43:
       feeds: open questions from the presentation figures
       if:
