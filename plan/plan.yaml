@@ -13184,6 +13184,14 @@ entries:
       of the grown w16 model -2.8418 (e046ac67, seed 42) against the w8 parent''s best -2.8424 (804a65bc), and -2.8247 (f35b6a78,
       seed 43) against -2.8267 (66e8c31f): within 0.002, under the 0.01 bar; the operator carries the parent''s function on
       GPU. Cache key 04fb3b3d reused.'
+  - at: '2026-11-05T09:24:40+00:00'
+    text: '2026-11-05 step 4 (D285) read, mixture_ab.py warm C10w @9f4cae14, written up par:v4_warm_start_grow @97a69764:
+      width growth w8->w16 (grown, untuned restarted schedule) SHORT at every k on the (A/B)^0.3=1.19 bar: R(W_k/B) PP4 1.75
+      [1.44,2.14], 1.59 [1.32,1.95], 1.29 [1.07,1.57]; EE4 1.76 [1.56,2.06], 1.62 [1.39,1.81], 1.33 [1.20,1.49] at k=533/1066/2132;
+      g PP4 -0.01/0.13/0.52, EE4 -0.02/0.11/0.45 (C1''s same-shape change: 0.55/0.76/1.07). Growth exact at step 0 (0.002);
+      every probe read, no blow-up (58723352 spiked at 672 and recovered). The two caches (deda9310, 04fb3b3d, 23 GB each)
+      deleted after the reads as designed. Design''s SHORT branch: tuning (D284''s sweep over the fine-tune space) is the
+      next call, Joaquin''s.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
