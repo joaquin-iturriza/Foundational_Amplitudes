@@ -3772,17 +3772,6 @@ entries:
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
       share 0, 4264 steps, seeds 42/43), read on HD5 and H5 with the sign read, against the het magnitude pair (het_magnitude.json
       @74a30052) and the MSE control. Design only until Joaquin sees it.'
-    57: 'Proposal to Joaquin (flat-part shape, finding 2026-11-04, step 49 redesign): give the flat part''s candidates a multichannel
-      draw: (1) resonance channels: for each s-channel propagator of a massive Z/W/H/t in the class''s diagram sidecar, the
-      finals it decays to drawn with their invariant mass on its Breit-Wigner (tan mapping, plus a log tail), the rest by
-      the splitter at the recoil mass; (2) an initial-state collinear channel for finals with partons (one parton pT log-uniform
-      from the 10 GeV cut, |eta| uniform to 5); (3) channel shares adapted by |M|^2 as the sqrt(s) pass is: first pass equal
-      over channels (RAMBO, splitter, each resonance, IS collinear), second pass by the 1/density(log|M|^2) weight each channel''s
-      candidates collected, with a floor; flat selection, 6x, shares, bulk, forward, default share unchanged. Check on drawn
-      samples before any pool is built: CPU replay (sampling_example.py shape generalised) of 5 classes, current vs proposed,
-      seeds 42/43: v4_uux_epemg, uux_epemvevex (46% of pp events above the catalog max, 0 partons), uu_bbxuu (35%), us_ddxsu
-      (32%), udx_csxvevex (31%); pass = share of the class''s MadEvent events above the kept flat max <= 0.1% and every kept
-      bin up to the MadEvent 99.9% quantile of log|M|^2 >= 0.5 x the plateau, against the two seeds'' spread.'
     58: 'Step 57 result to Joaquin (finding 2026-11-05, multichannel_check.json @3fdb914c): the multichannel candidates reach
       the pp max on the three EW classes (above_max 0.49/0.39 -> <=0.0005) and pass the plateau rule only on v4_uux_epemg;
       the top density stays capped by the candidates'' own density on all four others, and the two QCD 2->4 classes (uu_bbxuu,
@@ -8711,7 +8700,6 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '56': FA-ccin2p3-18b98b55 FA-ccin2p3-b2538139 FA-ccin2p3-66c83df6 FA-ccin2p3-69001455 FA-ccin2p3-0208896e FA-ccin2p3-8ddc490b
       FA-ccin2p3-dc9feba1 FA-ccin2p3-af09cad3 FA-ccin2p3-8833a131 FA-ccin2p3-481ad196
-    '57': FA-ccin2p3-12cb7292 FA-ccin2p3-37dd5af5 FA-ccin2p3-dee4b881 FA-ccin2p3-353e30f7 FA-ccin2p3-a5325d33
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -9200,12 +9188,6 @@ entries:
         for the signed pools'
       - 'sign accuracy worse or HD5 magnitude worse than the het magnitude pair: report the failure mode (sign collapse, sigma
         absorbing the sign loss) to Joaquin before any weight change'
-    57:
-      feeds: 'how the catalog''s flat-in-log|M|^2 part reaches the top of |M|^2 (Joaquin 2026-11-05: ''you are not really
-        saying what you are going to do''; step 49)'
-      if:
-      - 'Joaquin agrees: implement in a worktree, design and pass the check, run it on CC (CPU), report before regenerating'
-      - 'Joaquin prefers another route: record his words and redesign'
     58:
       feeds: how the catalog's flat part reaches the top of the pp |M|^2 before a regeneration
       if:
