@@ -12044,22 +12044,29 @@ entries:
     - FA-ccin2p3-2a27e8a2
     - FA-ccin2p3-341bf564
     - FA-ccin2p3-343e3d58
+    - FA-ccin2p3-380c7b14
     - FA-ccin2p3-56cca07a
+    - FA-ccin2p3-58723352
     - FA-ccin2p3-70c28bd9
     - FA-ccin2p3-75d28cb4
     - FA-ccin2p3-8e41ac1e
+    - FA-ccin2p3-93479cde
     - FA-ccin2p3-a6834028
     - FA-ccin2p3-a97e8083
     - FA-ccin2p3-aa64733e
+    - FA-ccin2p3-af86de05
     - FA-ccin2p3-c2acc1fc
     - FA-ccin2p3-c477a52c
     - FA-ccin2p3-dd32a907
+    - FA-ccin2p3-e046ac67
     - FA-ccin2p3-ed946736
+    - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f699e170
-    commit: e1d0bc97
+    commit: 97a69764
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
+    - analysis/catalog_v4/data/warm_start_C10w.json
     - analysis/catalog_v4/data/warm_start_C1ck2132.json
     - analysis/catalog_v4/data/warm_start_C1ck3198.json
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
