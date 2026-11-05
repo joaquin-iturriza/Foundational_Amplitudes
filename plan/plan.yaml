@@ -2562,9 +2562,9 @@ entries:
       it is released)'
   owner:
     agent: a3c87bc016f01a716
-    state: working
+    state: stopped
     since: '2026-11-04T18:50:51+00:00'
-    state_at: '2026-11-05T04:14:36+00:00'
+    state_at: '2026-11-05T04:16:35+00:00'
     context: 188568
     context_at: '2026-11-05T04:06:38+00:00'
   targets:
