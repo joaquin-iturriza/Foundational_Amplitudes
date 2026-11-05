@@ -11705,6 +11705,8 @@ entries:
     - FA-ccin2p3-254abf4f
     - FA-ccin2p3-341bf564
     - FA-ccin2p3-343e3d58
+    - FA-ccin2p3-56cca07a
+    - FA-ccin2p3-75d28cb4
     - FA-ccin2p3-8e41ac1e
     - FA-ccin2p3-a97e8083
     - FA-ccin2p3-aa64733e
@@ -11712,12 +11714,13 @@ entries:
     - FA-ccin2p3-c477a52c
     - FA-ccin2p3-ed946736
     - FA-ccin2p3-f699e170
-    commit: f0015680
+    commit: dab9ff19
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
+    - sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
   dead_ends: []
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
