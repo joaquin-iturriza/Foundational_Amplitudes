@@ -13114,6 +13114,7 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
+    '5': FA-ccin2p3-0898a7b0 FA-ccin2p3-a6834028 FA-ccin2p3-2a27e8a2 FA-ccin2p3-0259e865 FA-ccin2p3-dd32a907 FA-ccin2p3-70c28bd9
   handoff:
     state: 'C1 written up (par:v4_warm_start @1258ef73). Step 3 (D284) read @7f47781a (warm_start_C1t.json): tuned k=533 (hp_1860)
       SHORT, R(W/B) PP4 1.59, EE4 2.21, WORSE than untuned k=533 (R PP4 1.19, EE4 1.40) though its val_loss_no_reg objective
