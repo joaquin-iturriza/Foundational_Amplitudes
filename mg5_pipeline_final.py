@@ -3331,6 +3331,22 @@ MC_FLOOR = 0.1         # adapted channel shares: floor 0.1 x their mean, as the 
 MC_PARTONS = {1, 2, 3, 4, 5, 21}
 
 
+def mc_res_params(physics=None):
+    """{|pdg|: (M, G)} of the resonance channels for an entry: MC_RES, with the entry's physics masses and widths
+    (physics_to_generation's block: catalog_v3/v4's heavy-quark layer sets the top's mass and width) in their place.
+    A mass set without its width is refused: the Breit-Wigner would sit at the new mass with the card's width."""
+    out = dict(MC_RES)
+    physics = dict(physics or {})
+    ms = {abs(int(k)): float(v) for k, v in (physics.get("masses") or {}).items()}
+    ws = {abs(int(k)): float(v) for k, v in (physics.get("widths") or {}).items()}
+    for pdg in MC_RES:
+        if pdg in ms and pdg not in ws and ms[pdg] != MC_RES[pdg][0]:
+            raise ValueError(f"multichannel: physics sets the mass of {pdg} ({ms[pdg]}) without its width")
+        if pdg in ms or pdg in ws:
+            out[pdg] = (ms.get(pdg, MC_RES[pdg][0]), ws.get(pdg, MC_RES[pdg][1]))
+    return out
+
+
 def resonance_channels(diagrams, pdg_ids):
     """[(final indices (0-based among the finals, in the pool's slot order), propagator |pdg|)] of every s-channel
     propagator of a massive Z, W, H or top in a class's diagram sidecar (`diagrams`: the parsed
@@ -3450,11 +3466,13 @@ def is_collinear_draw(nb, sqrts, masses, partons, y_lo, rng, pt_lo=MC_PT_LO, eta
     return P
 
 
-def mc_channels(m_finals, pdg_ids, resonances, isc=True):
-    """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|) per resonance, ("isc",
-    parton indices) when a final is a parton and there are at least three finals"""
+def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None):
+    """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
+    `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
+    is a parton and there are at least three finals"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
-    ch = [("rambo",), ("splitter",)] + [("res", tuple(S), int(p)) for S, p in resonances]
+    rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
+    ch = [("rambo",), ("splitter",)] + [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
     partons = tuple(i for i in range(nf) if abs(pdg[2 + i]) in MC_PARTONS)
     if isc and partons and nf >= 3:
         ch.append(("isc", partons))
@@ -3470,7 +3488,7 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
     if ch[0] == "splitter":
         return democratic_draw(nb, sq, m_finals, y_lo, rng)
     if ch[0] == "res":
-        M, G = MC_RES[ch[2]]
+        M, G = ch[3], ch[4]
         return resonance_draw(nb, sq, m_finals, ch[1], M, G, y_lo, rng)
     return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
 
@@ -3661,7 +3679,11 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
         # equal shares in the first pass, shares adapted by mc_shares_from_pass in the second; absent, the draws as before
         mc = bool(pol.get("multichannel")) and len(m_finals) >= 3
         if mc:
-            chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)))
+            # mc_res_params: the entry's resonance masses and widths (mc_res_params(physics)), required with resonances
+            if pol.get("mc_resonances") and not pol.get("mc_res_params"):
+                raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
+            chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
+                                pol.get("mc_res_params"))
             sh1 = np.full(len(chans), 1.0 / len(chans))
             ev1, sq1, c1 = _candidates_mc(n1, uni, m_finals, pdg_ids, rng, cuts, chans, sh1, pol["y_lo"], fwd_cand,
                                           beam_mass)

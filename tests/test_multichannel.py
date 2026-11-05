@@ -92,6 +92,20 @@ def test_resonance_channels():
     assert mg.resonance_channels(sc, [2, -2, -11, 11, 21]) == [((0, 1), 23)]
 
 
+
+def test_mc_res_params():
+    # the heavy-quark layer's top (recipes/select_catalog_v4.py: mass with its LO width) moves the top channel
+    rp = mg.mc_res_params({"masses": {6: 300.0}, "widths": {6: 8.729709}})
+    assert rp[6] == (300.0, 8.729709) and rp[23] == mg.MC_RES[23]
+    ch = mg.mc_channels([0.0, 0.0, 0.0], [2, -2, -11, 11, 21], [((0, 1), 23)], res_params=mg.mc_res_params(None))
+    assert ch[2] == ("res", (0, 1), 23) + mg.MC_RES[23]
+    try:
+        mg.mc_res_params({"masses": {6: 300.0}})
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("a top mass without its width must be refused")
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"):
