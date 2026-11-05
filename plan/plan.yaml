@@ -12055,7 +12055,7 @@ entries:
     agent: a0ca24cd204278468
     state: stopped
     since: '2026-11-05T05:42:16+00:00'
-    state_at: '2026-11-05T06:58:08.831000+00:00'
+    state_at: '2026-11-05T06:59:12+00:00'
     context: 179493
     context_at: '2026-11-05T06:59:04+00:00'
   designs:
