@@ -1440,6 +1440,21 @@ class BaseExperiment:
                                    "entries (count or shapes differ), so its EMA weights cannot be rebuilt; refusing "
                                    "to start from its live weights (D63)")
             state_dict = _merge_lora_state(state_dict, pretrained_path)
+            ft = (self.cfg.get("fine_tune", None) if hasattr(self.cfg, "get")
+                  else getattr(self.cfg, "fine_tune", None))   # a test's SimpleNamespace config has no .get
+            if ft is not None and bool(ft.get("grow_width", False)):
+                # a parent of half this run's width (num_heads): its function carried into the wider model by
+                # duplicating units and halving their consumers' fan-in (models/grow_width.py, plan warm_start D285)
+                from models.grow_width import grow_state
+                pcfg_f = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(pretrained_path))), "config.yaml")
+                p_heads = int(OmegaConf.load(pcfg_f).model.net.num_heads)
+                c_heads = int(self.cfg.model.net.num_heads)
+                if c_heads != 2 * p_heads:
+                    raise ValueError(f"fine_tune.grow_width: parent num_heads {p_heads}, this run {c_heads}: only a doubling")
+                state_dict, grown = grow_state(state_dict, self.model, p_heads, noise=float(ft.get("grow_noise", 1e-3)),
+                                               seed=int(self.cfg.get("seed", 0)))
+                LOGGER.info(f"Fine-tuning: grew the parent's width {p_heads} -> {c_heads} heads ({len(grown)} tensors, "
+                            f"noise {float(ft.get('grow_noise', 1e-3))})")
             if reset_output_head:
                 # Drop any parameter whose shape differs from the current model (e.g. the
                 # readout when switching MSE 1-ch -> HETEROSC 2-ch): load the body strictly

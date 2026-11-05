@@ -373,6 +373,23 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     NORM+=(model.net.num_heads=$LH model.net.checkpoint_blocks=${LONG_CKPT:-false}); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
     AXES+=(HD4 HD5)
+    # width growth (plan warm_start step 4, D285): GROW_K=<533|1066|2132> with LONG_HEADS=16 starts from the 1x cell at
+    # half the width and the same seed (its final model, after its sigma stage), grown function-preservingly
+    # (fine_tune.grow_width, models/grow_width.py), and retrains GROW_K steps on the cell's own setup, the schedule
+    # restarted (lr_scale 1, layer_decay 1, fresh optimizer); its own run dir <arm>_w<heads>_grow_k<K>
+    if [ -n "$GROW_K" ]; then
+        case "$GROW_K" in 533|1066|2132) ;; *) echo "GROW_K must be 533, 1066 or 2132"; exit 1 ;; esac
+        [ "$LF" = 1 ] && [ -z "$LONG_LR" ] && [ $((LH % 2)) = 0 ] || { echo "GROW_K: 1x cells at an even LONG_HEADS only"; exit 1; }
+        GP="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w$((LH / 2))_x1"; GPT="$GP/models/model_run0_best.pt.gz"
+        [ -e "$GPT" ] || GPT="${GPT%.gz}"
+        [ -e "$GPT" ] && [ -e "$GP/sigma_stage" ] || { echo "GROW_K: no finished parent (model after its sigma stage) in $GP"; exit 1; }
+        ITERS=$GROW_K; ITERS_FIXED=$ITERS
+        EXTRA=("${EXTRA[@]/#training.iterations=*/training.iterations=$ITERS}")
+        NORM+=(++fine_tune.pretrained_path="$GPT" ++fine_tune.grow_width=true ++fine_tune.lr_scale=1.0 ++fine_tune.layer_decay=1.0
+               ++fine_tune.target_stats=parent ++fine_tune.offshell_stats=parent)
+        OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_grow_k${GROW_K}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_grow_k${GROW_K}"
+        echo "GROW parent=$GPT heads $((LH / 2)) -> $LH steps=$GROW_K"
+    fi
 fi
 [ -n "$SIGMA_FROM" ] && AXES+=(HD4 HD5)
 # mode eval may read a subset of the axes again (V3_AXES="H3p"), the trained model reused
