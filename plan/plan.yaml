@@ -12612,6 +12612,12 @@ entries:
       at the edge). The tuned warm start wants a lower lr than the parent''s (0.17x), not a more aggressive one. Confirmation
       at seeds 42/43: FA-ccin2p3-56cca07a, 75d28cb4 (arm v4_het_warm25t_k533[_seed2], scripts/job_catalog_v3_short.sh @dab9ff19,
       limit 2:15).'
+  - at: '2026-11-05T04:06:11+00:00'
+    text: 'D289 design passed review round 2 (2026-11-05). Adopted the reviewer''s recommendation for the no branch: each
+      checkpoint''s tuned best is read against this design''s own W_final (same rerun, pre-sigma start) as well as against
+      step 3''s tuned confirmation runs (post-sigma parent). Implementation pending: a save-at-steps knob in base_experiment
+      (EMA model at given steps) and arms v4_het_control_ckpt[_seed2] (rerun, training only) and v4_het_warm25t_k533_from{2132,3198,final}[_seed2]
+      in job_catalog_v3_short.sh, in a worktree, with a CPU test of the knob.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
