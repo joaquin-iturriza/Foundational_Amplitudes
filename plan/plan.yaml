@@ -9193,7 +9193,7 @@ entries:
       - 'Joaquin says regenerate with multichannel as is: design the regeneration'
   owner:
     agent: a96709d13f776f50d
-    state: working
+    state: closed
     since: '2026-11-05T04:23:56+00:00'
     state_at: '2026-11-05T04:24:05+00:00'
     context: 73139
@@ -10400,41 +10400,33 @@ entries:
       (_002...) as a counter; a name ending in a step count keeps it and gets _002 (tests/test_sweep_name.py, 2 cases: step
       suffix kept, counter advances). (b)-(f) open.'
   handoff:
-    state: '2026-11-05 ~06:00. Step 56 SUBMITTED: sign head under HETEROSC implemented (models/lloca.py sign_channel, readout
-      rows [mu, sign, sigma], backbone+RNG bit-equal to het model at a seed; wrappers/experiment/base_experiment splits by
-      role; mu-MSE after sign split), tests/test_het_sign_head.py 5 pass, repo-reviewer a59238dcc290acc8d PASS, merged 0e1b31b0;
-      zero_shot_parent now records wrong_sign/wrong_sign_near/near_share/neg_share and sign_pred/sign_true for sign-head parents
-      (HD5 sign reads); job script arms v4_het_control_signhead[_seed2-4] (SIGNHEAD=1: H5 signed_ab_score too) and v4_het_control_magnitude_seed3/4.
-      Runs at code 5fe373f2 on CC, --time 03:30:00 mem 16G: signhead s42 FA-ccin2p3-18b98b55, s43 b2538139, s44 66c83df6,
-      s45 69001455; magnitude s44 0208896e, s45 8ddc490b; MSE-control HD5 sign rereads (eval, V3_AXES=HD5, 15 min, 8G): s42
-      dc9feba1 (REREAD 339ec100), s43 af09cad3 (380842ed), s44 8833a131 (67ca3313), s45 481ad196 (e3506d57). plan wait step
-      56 on all 10; targets het_signhead_arms 2.8 h x6, mse_control_hd5_sign_reads 0.05 h x4; ~22 GPU-h. NEXT 56: on RUN_DONE
-      add het_oneloop.py ''signhead'' mode per the passed design (paired ln ratio arm seed k / magnitude seed k on HD5/H5,
-      pairing gate absolute paired sd <= 0.43 HD5 / 0.40 H5 on the first pair; sign: per pool seed-mean wrong-sign arm vs
-      MSE control, one-sided paired sign test, vs all-positive; H5 from signed_ab_score lines <pred>/H5_signed.txt, HD5 from
-      the zero_shot npz/records; beside PP4/EE4/HD4/H1-H7c), report against outcomes. Step 57: branch multichannel (worktree
-      worktrees/wt-multichannel, commits 54aa3ccd, 073fb4f4, + check tool): mg5_pipeline_final multichannel candidates (resonance_channels
-      from sidecars via leg_to_slot, resonance_draw BW+0.2 log tail, is_collinear_draw, _candidates_mc, mc_shares_from_pass,
-      MC_LAST diagnostics; pol keys multichannel/mc_resonances/mc_isc), tests/test_multichannel.py 5 pass; NOT yet repo-reviewed
-      nor merged. analysis/catalog_v4/multichannel_check.py drafted, not run: FIX first: pp probe of v4_uux_epemg is not pp13v4_uux_epemg
-      in catalog_v4_pp_test.yaml (find it via pp_support.classes()/mixture_ab.class_of); then repo-review the branch, merge,
-      sync, run ''run <class> <probe>'' per class on CC via tools/detach.py --each (site run, CPU), pull the 5 JSON to data/multichannel_check_reads/,
-      summary, report vs pass rule. Also owed per coordinator (Joaquin ''there are a ton of things to do''): step 54 (revert
-      44a02702 reader change per D276, re-read het losses, redraw width figure and deck slides), step 55 per-class H2p5 16x/4x
-      read, deck slide fixes; step 51 goes to a separate worker.'
-    decisions: 'D287/D288 implemented as the passed design (rows by role; seed-paired contrast). HD5 sign read done in zero_shot_parent
-      on the test split (HD5 pools are test-only; signed_ab_score reads val only) for both arm and MSE control, same scorer;
-      H5 sign via signed_ab_score as the existing control reads. Multichannel collinear channel: |eta| uniform to the kinematic
-      limit at pT 10 GeV (capped 5), pT log-uniform to E_max/cosh eta (uniform |eta| to 5 regardless made most draws infeasible
-      at low sqrt(s)).'
-    ruled_out: mse_val before the sign split (reviewer finding, fixed 4b0996d6); bit-equal outputs between 2- and 3-row readouts
-      (BLAS order; backbone and rows bit-equal, outputs to 1e-6)
+    state: '2026-11-05 ~06:40. Done this turn: step 54 (20448b14: run_metrics reads the sigma stage again per D276; width_x1.json
+      re-read; width_x1_loss and length_w8_curves redrawn with sigma-stage tails; deck talks/progress_nov2026 rebuilt); step
+      55 (a0bdee35, length_h2p5.py -> data/length_h2p5.json: the H2p5 16x/4x regression is broad, 37/38 and 38/38 classes,
+      level 78% of the increase on default-sampled, 46% on catalog-sampled); step 57 built, reviewed (repo-reviewer PASS 62c14cd7),
+      merged 2466f283, design PASS (2nd review), check run on CC (5 CPU jobs) -> data/multichannel_check.json @3fdb914c: PASS
+      only v4_uux_epemg; EW classes reach the max but the top density stays capped by candidates; QCD 2->4 still 2-10% above
+      the max; recorded as a new next step for Joaquin''s route call; step 39(a) fixed 8b7cd708. Step 56: het_oneloop.py signhead_pull/signhead
+      modes ready (repo-reviewer PASS; H5 all-positive from scored val rows, h5_neg_pull); its 10 jobs still SUBMITTED on
+      CC at 05:16 (plan wait step 56). NEXT on its RUN_DONE: python3 analysis/catalog_v4/het_oneloop.py signhead_pull, then
+      signhead -> data/het_signhead.json, report per the passed design. Ready and not started: steps 36-38 (memmap cache,
+      freeze lifted since both sweeps ended), 39(b)-(f), 40 (width write-up: width_x1.json now holds sigma-stage het losses;
+      L(C) fit). Worktree worktrees/wt-multichannel is merged but not removed: scripts/remove_worktree.sh was refused by the
+      permission classifier; needs Joaquin''s permission or a manual run.'
+    decisions: 'D276 applied to the readers: a het run''s reported het loss is its sigma stage''s (best checkpoint of the
+      stage; size_figs curves continue into the stage, the long-best trials into their eval jobs'' stages). multichannel:
+      resonance M and G from the entry''s physics (mc_res_params; heavy-quark tops get their own BW), refused without a width;
+      check judged on in-support pp events (design PASS, to be stated to Joaquin); bottom-edge vs top failures located against
+      the pp median. length_h2p5: mse per class geometric (reproduces R), level/shape arithmetic (additive).'
+    ruled_out: 'site run cat for pulling JSON (marker lines lost): analysis/common site_python instead; geometric means of
+      level and shape (do not add)'
     running: FA-ccin2p3-18b98b55 b2538139 66c83df6 69001455 0208896e 8ddc490b dc9feba1 af09cad3 8833a131 481ad196 (plan wait
       step 56)
-    files: 'models/lloca.py, wrappers.py, experiment.py, base_experiment.py, config/model/lloca.yaml, tests/test_het_sign_head.py,
-      tools/zero_shot_parent.py, scripts/job_catalog_v3_short.sh, worktrees/wt-multichannel: mg5_pipeline_final.py, tests/test_multichannel.py,
-      analysis/catalog_v4/multichannel_check.py; analysis/catalog_v4/het_oneloop.py (signhead mode to add)'
-    written: '2026-11-05T04:22:28+00:00'
+    files: analysis/common/readers.py (run_metrics, site_python), analysis/catalog_v4/size_figs.py, analysis/catalog_v4/length_h2p5.py,
+      analysis/catalog_v4/het_oneloop.py (signhead), analysis/catalog_v4/multichannel_check.py, scripts/job_multichannel_check.sh,
+      mg5_pipeline_final.py (multichannel), tests/test_multichannel.py, tests/test_sweep_name.py, sweep/generate_sweep.py,
+      data/{width_x1,length_h2p5,multichannel_check}.json
+    written: '2026-11-05T04:50:53+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
