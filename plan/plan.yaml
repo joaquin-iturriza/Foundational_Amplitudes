@@ -12479,6 +12479,17 @@ entries:
       confirmed at seeds 42/43, then read against the tuned final warm start (step 3''s confirmation runs, post-sigma parent:
       the comparison is then best against best with that parent difference stated); BETTER there: keep the checkpoint, with
       its HPs; else the final model stays the parent.'
+    passed_at: '2026-11-05T04:05:50+00:00'
+    reviewer: 'Round 2: one change (checkpoint loaded, same pre-sigma rerun, hp_1860, recipe, k=533), pre-sigma vs C1 post-sigma
+      parents now stated; measure moves with the start at fixed reads (warm_start_C1.json: R(W/B) k=533/1066/2132 PP4 1.33/1.15/0.95,
+      EE4 1.51/1.23/1.01, intervals apart); seeds: unpaired warm pairs disagree 15-18% PP4, 7-10% EE4 (C_k R_seed), so the
+      paired-by-seed ratio W_x,s/W_final,s widened by |ln(R_43/R_42)| with the threshold raised to the paired spread is measured
+      on the runs themselves; no branch runs the same 8-trial/3-start-up sweep as ws_c1_k533_hpo8 per checkpoint, best vs
+      best, 24.6 GPU-h max; outcomes for yes and no stated; HETEROSC, PP4/EE4 as C1; disk 1.5 GB of 89 GB free. Note: in the
+      no branch also read the checkpoint''s best against this design''s W_final (same rerun, pre-sigma) besides step 3''s
+      post-sigma confirmations. Searched: pre-decay, predecay, intermediate checkpoint, WSD, cooldown, stable phase, save_intermediate,
+      mid-training, earlier checkpoint, re-warm in results.tex; checkpoint, WSD, cooldown, decay in site decisions: no prior
+      work.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
