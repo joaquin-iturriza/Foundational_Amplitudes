@@ -3725,15 +3725,6 @@ entries:
       refused without ''--'' or when unknown; tested on 5 cases, backup site.bak-20261105-runopts); (c) a03d9f99 set the long
       sweep configs to mem 32G from the measured peak RSS, and lxplus gives every 1-GPU job 16 CPUs / 48000 MB whatever it
       asks (site CONDOR_GPU_SHARE), so nothing left; (d) recorded as a finding with the measured per-width rates.'
-    43: 'Step 43 (Joaquin 2026-11-02). (1) Loader control running (design passed 2026-11-05 2nd review): memmap FA-ccin2p3-5b5215b6
-      (seed 42), e184bbc5 (43); in-memory reruns ae39ee5a (42), 75ad7b20 (43); scripts/job_catalog_v3_short.sh @7c698864 arm
-      v4_het_default25[_seed2] with SHORT_MEMMAP / SHORT_RERUN, gpu_v100, limit 03:50. On their end: read their PP4, EE4,
-      held (mixture_ab read path: add the four to a loader mode), R_L = memmap/rerun, R_0 = rerun/10-31 arm (f0156d88, df858d33;
-      PP4 rereads 9538e607, ed96b552), verdict by the design''s rule. (2) Why e+e- gains most from the default share: analysis/catalog_v4/ee_gain.py
-      (uncommitted draft) tests the reading that the default share puts training events at the EE4 test events'' fixed energies
-      (91.19-3000 GeV) where the catalog''s log-uniform sqrt(s) draw puts few; its pull fails: no v4_* train pools on CC''s
-      DATA_DIR (only val/test smix found), so the catalog train sample must be read where training reads it (the composed
-      pools / the recipe''s train path) or from the val smix pool (same sampling, D: every role samples the same distribution).'
     58: 'Step 57 result to Joaquin (finding 2026-11-05, multichannel_check.json @3fdb914c): the multichannel candidates reach
       the pp max on the three EW classes (above_max 0.49/0.39 -> <=0.0005) and pass the plateau rule only on v4_uux_epemg;
       the top density stays capped by the candidates'' own density on all four others, and the two QCD 2->4 classes (uu_bbxuu,
@@ -8818,7 +8809,6 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
-    '43': FA-ccin2p3-5b5215b6 FA-ccin2p3-e184bbc5 FA-ccin2p3-ae39ee5a FA-ccin2p3-75ad7b20
     '60': Joaquin running or allowing scripts/remove_worktree.sh
     '58': Joaquin's call on the failed multichannel check (keep multichannel and add candidates at the top, or another route),
       asked 2026-11-05
@@ -9251,12 +9241,6 @@ entries:
       if:
       - 'Joaquin answers (e): implement it or drop it'
       - 'no answer: stays listed, nothing waits on it'
-    43:
-      feeds: open questions from the presentation figures; the warm_start whole-set change waits on (1)
-      if:
-      - '(1) CLEAR: the gap is data size, write up and tell warm_start'
-      - '(1) IMPLICATED: bisect memmap vs in-memory on CPU'
-      - '(2) gain correlates with the density ratio and explains EE4 vs PP4 at matched ratio: write up'
     58:
       feeds: how the catalog's flat part reaches the top of the pp |M|^2 before a regeneration
       if:
