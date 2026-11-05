@@ -36,7 +36,7 @@ LOGM_BINS = np.linspace(-20.0, 8.0, 113)          # log10 |M|^2 in 0.25 dex
 SEEDS = (42, 43)
 ROLE = "train"
 # the step-57 classes (the pp_support worst list, 2026-11-04, and the shape study's class) and their PP4 probes
-CLASSES = {"v4_uux_epemg": "pp13v4_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
+CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
            "v4_uu_bbxuu": "pp13v4_uu_bbxuu", "v4_us_ddxsu": "pp13v4_us_ddxsu",
            "v4_udx_csxvevex": "pp13_udx_csxvevex"}
 RECIPES = ["catalog_v4_base_train.yaml"] + [f"catalog_v4_heldout_{h}.yaml"
