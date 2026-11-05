@@ -3725,9 +3725,15 @@ entries:
       refused without ''--'' or when unknown; tested on 5 cases, backup site.bak-20261105-runopts); (c) a03d9f99 set the long
       sweep configs to mem 32G from the measured peak RSS, and lxplus gives every 1-GPU job 16 CPUs / 48000 MB whatever it
       asks (site CONDOR_GPU_SHARE), so nothing left; (d) recorded as a finding with the measured per-width rates.'
-    43: 'Open, to come back to (Joaquin 2026-11-02): (1) at width 8 and 4264 steps the full set (1e5/process, about 0.6 epoch,
-      memmap) reads worse than 1e4/process (about 6 epochs, in memory): separate data size from loading path; (2) why e+e-
-      gains most from the default share against the pure catalog-sampled control.'
+    43: 'Step 43 (Joaquin 2026-11-02). (1) Loader control running (design passed 2026-11-05 2nd review): memmap FA-ccin2p3-5b5215b6
+      (seed 42), e184bbc5 (43); in-memory reruns ae39ee5a (42), 75ad7b20 (43); scripts/job_catalog_v3_short.sh @7c698864 arm
+      v4_het_default25[_seed2] with SHORT_MEMMAP / SHORT_RERUN, gpu_v100, limit 03:50. On their end: read their PP4, EE4,
+      held (mixture_ab read path: add the four to a loader mode), R_L = memmap/rerun, R_0 = rerun/10-31 arm (f0156d88, df858d33;
+      PP4 rereads 9538e607, ed96b552), verdict by the design''s rule. (2) Why e+e- gains most from the default share: analysis/catalog_v4/ee_gain.py
+      (uncommitted draft) tests the reading that the default share puts training events at the EE4 test events'' fixed energies
+      (91.19-3000 GeV) where the catalog''s log-uniform sqrt(s) draw puts few; its pull fails: no v4_* train pools on CC''s
+      DATA_DIR (only val/test smix found), so the catalog train sample must be read where training reads it (the composed
+      pools / the recipe''s train path) or from the val smix pool (same sampling, D: every role samples the same distribution).'
     44: 'Today''s deck (Joaquin 2026-11-03): sampling slide (default vs catalog mixture by component, pp example), width/length/zero-shot
       with restored error bars, MSE log|M|^2 against compute and wall time, het. loss naming; plus a show/skip list of other
       results since the last deck for Joaquin.'
@@ -9248,10 +9254,11 @@ entries:
       - 'Joaquin answers (e): implement it or drop it'
       - 'no answer: stays listed, nothing waits on it'
     43:
-      feeds: open questions from the presentation figures
+      feeds: open questions from the presentation figures; the warm_start whole-set change waits on (1)
       if:
-      - 'explained with a run or read: written up'
-      - 'not yet: stays open'
+      - '(1) CLEAR: the gap is data size, write up and tell warm_start'
+      - '(1) IMPLICATED: bisect memmap vs in-memory on CPU'
+      - '(2) gain correlates with the density ratio and explains EE4 vs PP4 at matched ratio: write up'
     44:
       feeds: Joaquin's presentation 2026-11-03
       if:
