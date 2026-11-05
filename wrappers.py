@@ -945,7 +945,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         # its own readout either way.
         if getattr(self.net, "loss", None) == "HETEROSC" and getattr(self.net, "sigma_after_pool", False):
             k = self.net.out_shape
-            mu = pooled[..., :k]
+            mu = pooled[..., :-k]          # mu, and the sign logit under sign_channel (rows [mu, sign, sigma])
             sigma = torch.clamp(torch.nn.functional.softplus(pooled[..., -k:]), min=1e-6)
             pooled = torch.cat([mu, sigma], dim=-1)
         return pooled

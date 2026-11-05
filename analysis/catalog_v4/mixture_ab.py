@@ -1057,7 +1057,13 @@ WARM = {"C1": {"W": {533: ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f"),
                      2132: ("FA-ccin2p3-0564ad5b", "FA-ccin2p3-a97e8083")},
                "B": dict(MIX_HET["default25"], HD4=HD4_HET["default25"], HD5=HD5_HET["default25"]),
                "A": dict(MIX_HET["control"], HD4=HD4_HET["control"], HD5=HD5_HET["control"]),
-               "deciding": ("PP4", "EE4")}}
+               "deciding": ("PP4", "EE4")},
+        # step 3 (design passed 2026-11-05T02:09, D284): the tuned warm start at k=533, the best trial hp_1860 of the
+        # DyHPO sweep ws_c1_k533_hpo8 rerun at seeds 42 and 43 with the full job (arm v4_het_warm25t_k533[_seed2],
+        # scripts/job_catalog_v3_short.sh @dab9ff19); no matched control (D286); beside, R over the untuned W_533
+        "C1t": {"W": {533: ("FA-ccin2p3-56cca07a", "FA-ccin2p3-75d28cb4")}, "C": {},
+                "ref": {"untuned": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f")},
+                "deciding": ("PP4", "EE4")}}
 MATCH_HI, CARRY = 1.35, 0.90
 
 
@@ -1122,29 +1128,34 @@ def warm(change="C1"):
     out["B_over_A"] = ba
     runs += rr
     reads_named = ("PP4", "EE4", "held_default", "held")
-    for k in WARM_K:
+    for k in sorted(d["W"]):
         row = {"fraction": round(k / WARM_STEPS, 4)}
-        for name, (num, den) in {"W_over_B": (d["W"][k], d["B"]), "W_over_C": (d["W"][k], d["C"][k]),
-                                 "W_over_A": (d["W"][k], d["A"]), "C_over_A": (d["C"][k], d["A"])}.items():
+        pairs = {"W_over_B": (d["W"][k], d["B"]), "W_over_A": (d["W"][k], d["A"])}
+        if k in d["C"]:
+            pairs.update(W_over_C=(d["W"][k], d["C"][k]), C_over_A=(d["C"][k], d["A"]))
+        pairs.update({f"W_over_{n}": (d["W"][k], r) for n, r in d.get("ref", {}).items()})
+        for name, (num, den) in pairs.items():
             row[name], rr = _warm_ratio(num, den, cls, ax_of, trained)
             runs += rr
         row["g"] = {r: round(math.log(_main_read(row["W_over_A"], r)["R"]) / math.log(_main_read(ba, r)["R"]), 4)
                     for r in reads_named}
-        row["g_control"] = {r: round(math.log(_main_read(row["C_over_A"], r)["R"]) / math.log(_main_read(ba, r)["R"]), 4)
-                            for r in reads_named}
+        if "C_over_A" in row:
+            row["g_control"] = {r: round(math.log(_main_read(row["C_over_A"], r)["R"]) / math.log(_main_read(ba, r)["R"]), 4)
+                                for r in reads_named}
         wb = [_main_read(row["W_over_B"], r)["widened"] for r in d["deciding"]]
-        wc = [_main_read(row["W_over_C"], r) for r in d["deciding"]]
+        wc = [_main_read(row["W_over_C"], r) for r in d["deciding"]] if "W_over_C" in row else []
         row["outcome"] = "MATCH" if all(hi <= MATCH_HI for _, hi in wb) else \
             "SHORT" if any(lo > 1 for lo, _ in wb) else "INCONCLUSIVE"
-        row["carried"] = all(x["R"] <= CARRY and x["widened"][1] < 1 for x in wc)
+        row["carried"] = all(x["R"] <= CARRY and x["widened"][1] < 1 for x in wc) if wc else None   # None: no C_k (D286)
         # inside the equivalence bound and still resolved worse than B (widened lower end above 1): MATCH by the rule,
         # listed so a MATCH is never read as 'equal'
         row["W_resolved_worse_than_B"] = [r for r in reads_named if _main_read(row["W_over_B"], r)["widened"][0] > 1]
         out["k"][k] = row
-    yes = next((k for k in WARM_K if out["k"][k]["outcome"] == "MATCH" and out["k"][k]["carried"]), None)
+    ks = sorted(d["W"])
+    yes = next((k for k in ks if out["k"][k]["outcome"] == "MATCH" and out["k"][k]["carried"] is not False), None)
     v = f"YES at k={yes} ({yes / WARM_STEPS:.3f} of the from-scratch steps)" if yes else \
         "NO (no k up to 2132 matches at the restarted, untuned schedule)" if \
-        all(out["k"][k]["outcome"] == "SHORT" for k in WARM_K) else "not decided (no MATCH; INCONCLUSIVE at some k)"
+        all(out["k"][k]["outcome"] == "SHORT" for k in ks) else "not decided (no MATCH; INCONCLUSIVE at some k)"
     out["blowups"] = blowups(runs)
     out["verdict_on_reads"] = v
     out["verdict"] = None if out["blowups"]["flagged"] else v
@@ -1153,7 +1164,7 @@ def warm(change="C1"):
                       "k": {k: {"outcome": x["outcome"], "carried": x["carried"], "g": x["g"],
                                 "worse": x["W_resolved_worse_than_B"],
                                 **{n: {r: (_main_read(x[n], r)["R"], _main_read(x[n], r)["widened"])
-                                       for r in reads_named} for n in ("W_over_B", "W_over_C", "W_over_A", "C_over_A")}}
+                                       for r in reads_named} for n in x if n.startswith(("W_over", "C_over"))}}
                             for k, x in out["k"].items()},
                       "flagged": out["blowups"]["flagged"], "spiked": out["blowups"]["spiked_recovered"],
                       "verdict": out["verdict"]}))
