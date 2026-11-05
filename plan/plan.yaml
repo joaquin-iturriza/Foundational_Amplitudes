@@ -12024,8 +12024,6 @@ entries:
       Verdict by the design''s rule: YES at k=1066 (0.25 of the from-scratch steps); equal to scratch on every read only at
       k=2132 (0.50). Figure analysis/catalog_v4/figs/warm_start_C1.png.'
   step_waits:
-    '1': FA-ccin2p3-341bf564 FA-ccin2p3-254abf4f FA-ccin2p3-ed946736 FA-ccin2p3-8e41ac1e FA-ccin2p3-f699e170 FA-ccin2p3-04fc5b3b
-      FA-ccin2p3-343e3d58 FA-ccin2p3-c2acc1fc FA-ccin2p3-aa64733e FA-ccin2p3-c477a52c FA-ccin2p3-0564ad5b FA-ccin2p3-a97e8083
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
   handoff:
     state: 'Superset design passed 2026-11-04 (C1-C9, gate applied: C8 in, C7 no from-scratch gain, C9 dropped). C1 (default-sampled
