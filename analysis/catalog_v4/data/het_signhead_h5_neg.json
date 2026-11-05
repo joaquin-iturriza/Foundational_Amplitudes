@@ -1,0 +1,111 @@
+{
+ "source": "label < 0 share of each H5 pool's val file on ccin2p3 ($DATA_DIR)",
+ "neg": {
+  "v4_bbx_avevex_nlo_20-6000GeV": [
+   0.0115,
+   2000,
+   "v4_bbx_avevex_nlo_20-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_bbx_ccxh_nlo_145-6000GeV": [
+   0.141,
+   2000,
+   "v4_bbx_ccxh_nlo_145-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_bbx_gg_nlo_20-6000GeV": [
+   0.634,
+   2000,
+   "v4_bbx_gg_nlo_20-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_bg_ab_nlo_20-6000GeV": [
+   0.2965,
+   2000,
+   "v4_bg_ab_nlo_20-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_bg_bgg_nlo_30-6000GeV": [
+   0.5015,
+   2000,
+   "v4_bg_bgg_nlo_30-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_db_bdz_nlo_112-6000GeV": [
+   0.019,
+   2000,
+   "v4_db_bdz_nlo_112-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_dd_add_nlo_30-6000GeV": [
+   0.028,
+   2000,
+   "v4_dd_add_nlo_30-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_ddx_aaa_nlo_30-6000GeV": [
+   0.0035,
+   2000,
+   "v4_ddx_aaa_nlo_30-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_ddx_ag_nlo_20-6000GeV": [
+   1.0,
+   2000,
+   "v4_ddx_ag_nlo_20-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_ddx_bbxz_qcdborn_nlo_112-6000GeV": [
+   0.0535,
+   2000,
+   "v4_ddx_bbxz_qcdborn_nlo_112-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_ddx_epvewm_nlo_92-6000GeV": [
+   0.0,
+   2000,
+   "v4_ddx_epvewm_nlo_92-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_dg_dgz_nlo_112-6000GeV": [
+   0.1665,
+   2000,
+   "v4_dg_dgz_nlo_112-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_dg_uwm_nlo_92-6000GeV": [
+   0.0065,
+   2000,
+   "v4_dg_uwm_nlo_92-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_epem_ccxg_nlo_30-6000GeV": [
+   0.273,
+   2000,
+   "v4_epem_ccxg_nlo_30-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_epem_ddxz_nlo_112-6000GeV": [
+   0.145,
+   2000,
+   "v4_epem_ddxz_nlo_112-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_gg_bbxg_nlo_30-6000GeV": [
+   0.7645,
+   2000,
+   "v4_gg_bbxg_nlo_30-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_uc_cuz_nlo_112-6000GeV": [
+   0.014,
+   2000,
+   "v4_uc_cuz_nlo_112-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_ucx_cxhu_nlo_145-6000GeV": [
+   0.868,
+   2000,
+   "v4_ucx_cxhu_nlo_145-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_udx_agwp_nlo_101-6000GeV": [
+   0.1215,
+   2000,
+   "v4_udx_agwp_nlo_101-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_udx_ccxwp_nlo_101-6000GeV": [
+   0.046,
+   2000,
+   "v4_udx_ccxwp_nlo_101-6000GeV_val_amplitudes.npy"
+  ],
+  "v4_uux_ccxz_qcdborn_nlo_112-6000GeV": [
+   0.054,
+   2000,
+   "v4_uux_ccxz_qcdborn_nlo_112-6000GeV_val_amplitudes.npy"
+  ]
+ },
+ "missing": []
+}

@@ -1,0 +1,454 @@
+{
+"H5": {
+"v3_bg_bgg_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.564,
+"wrong_sign_near": 0.9627329192546584
+},
+"v3_dd_add_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.5595,
+"wrong_sign_near": 0.4
+},
+"v3_ddx_aaa_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.1575,
+"wrong_sign_near": 0.391304347826087
+},
+"v3_ddx_ag_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.522,
+"wrong_sign_near": null
+},
+"v3_ddx_epvewm_nlo_84-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.072,
+"wrong_sign_near": 0.2140468227424749
+},
+"v3_dg_ad_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.03,
+"wrong_sign_near": 0.509090909090909
+},
+"v3_dg_dgz_nlo_96-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.454,
+"wrong_sign_near": 0.5631067961165048
+},
+"v3_dg_uwm_nlo_84-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.255,
+"wrong_sign_near": 0.3793103448275862
+},
+"v3_epem_ccxg_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.6555,
+"wrong_sign_near": 0.7518248175182481
+},
+"v3_epem_ddxz_nlo_96-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.398,
+"wrong_sign_near": 0.5289256198347108
+},
+"v3_gg_bbxg_nlo_25-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.5485,
+"wrong_sign_near": 0.9454545454545454
+},
+"v3_uc_cuz_nlo_96-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.027,
+"wrong_sign_near": 0.12280701754385964
+},
+"v3_ucx_cxhu_nlo_131-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.139,
+"wrong_sign_near": 0.5896656534954408
+},
+"v3_udx_agwp_nlo_84-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.814,
+"wrong_sign_near": 0.6549295774647887
+},
+"v3_udx_ccxwp_nlo_84-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.2315,
+"wrong_sign_near": 0.4421768707482993
+},
+"v3_uux_ccxz_nlo_96-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.263,
+"wrong_sign_near": 0.4921875
+},
+"v3_uux_epemz_nlo_96-1000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0525,
+"wrong_sign_near": 0.06282722513089005
+},
+"v4_bbx_avevex_nlo_20-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.197,
+"wrong_sign_near": 0.14345114345114346
+},
+"v4_bbx_ccxh_nlo_145-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.031,
+"wrong_sign_near": 0.016548463356973995
+},
+"v4_bbx_gg_nlo_20-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0125,
+"wrong_sign_near": 0.24731182795698925
+},
+"v4_bg_ab_nlo_20-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0095,
+"wrong_sign_near": 0.16363636363636364
+},
+"v4_bg_bgg_nlo_30-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.2655,
+"wrong_sign_near": 0.5218855218855218
+},
+"v4_db_bdz_nlo_112-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.016,
+"wrong_sign_near": 0.07459207459207459
+},
+"v4_dd_add_nlo_30-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0155,
+"wrong_sign_near": 0.06806282722513089
+},
+"v4_ddx_aaa_nlo_30-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.16,
+"wrong_sign_near": 0.28
+},
+"v4_ddx_ag_nlo_20-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.487,
+"wrong_sign_near": null
+},
+"v4_ddx_bbxz_qcdborn_nlo_112-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.113,
+"wrong_sign_near": 0.308
+},
+"v4_ddx_epvewm_nlo_92-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.056,
+"wrong_sign_near": 0.14887640449438203
+},
+"v4_dg_dgz_nlo_112-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0515,
+"wrong_sign_near": 0.2275132275132275
+},
+"v4_dg_uwm_nlo_92-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0025,
+"wrong_sign_near": null
+},
+"v4_epem_ccxg_nlo_30-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.6845,
+"wrong_sign_near": 0.7941176470588235
+},
+"v4_epem_ddxz_nlo_112-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.3095,
+"wrong_sign_near": 0.41245136186770426
+},
+"v4_gg_bbxg_nlo_30-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.158,
+"wrong_sign_near": 0.5026178010471204
+},
+"v4_uc_cuz_nlo_112-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0105,
+"wrong_sign_near": 0.04918032786885246
+},
+"v4_ucx_cxhu_nlo_145-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.1915,
+"wrong_sign_near": 0.4631083202511774
+},
+"v4_udx_agwp_nlo_101-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0325,
+"wrong_sign_near": 0.15060240963855423
+},
+"v4_udx_ccxwp_nlo_101-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.041,
+"wrong_sign_near": 0.2694063926940639
+},
+"v4_uux_ccxz_qcdborn_nlo_112-6000GeV": {
+"neg_share": null,
+"wrong_sign": 0.0925,
+"wrong_sign_near": 0.2619047619047619
+}
+},
+"HD5": {},
+"run": "FA-ccin2p3-339ec100",
+"source": "site logs ZERO_SHOT/SIGNED_AB lines",
+"val_sign_acc": [
+[
+63,
+0.815,
+0.07
+],
+[
+63,
+0.92,
+0.205
+],
+[
+63,
+0.945,
+0.615
+],
+[
+63,
+0.945,
+0.65
+],
+[
+63,
+0.965,
+0.735
+],
+[
+63,
+0.965,
+0.76
+],
+[
+63,
+0.975,
+0.755
+],
+[
+63,
+0.96,
+0.805
+],
+[
+63,
+0.98,
+0.785
+],
+[
+63,
+0.985,
+0.765
+],
+[
+63,
+0.98,
+0.79
+],
+[
+63,
+0.985,
+0.83
+],
+[
+63,
+0.985,
+0.825
+],
+[
+63,
+0.975,
+0.855
+],
+[
+63,
+0.985,
+0.835
+],
+[
+63,
+0.98,
+0.835
+],
+[
+63,
+0.98,
+0.85
+],
+[
+63,
+0.985,
+0.85
+],
+[
+63,
+0.985,
+0.85
+],
+[
+63,
+0.985,
+0.855
+],
+[
+63,
+0.985,
+0.855
+],
+[
+63,
+0.99,
+0.86
+],
+[
+63,
+0.985,
+0.865
+],
+[
+63,
+0.99,
+0.86
+],
+[
+63,
+0.985,
+0.88
+],
+[
+63,
+0.985,
+0.87
+],
+[
+63,
+0.99,
+0.885
+],
+[
+63,
+0.99,
+0.89
+],
+[
+63,
+0.99,
+0.87
+],
+[
+63,
+0.99,
+0.89
+],
+[
+63,
+0.99,
+0.875
+],
+[
+63,
+0.99,
+0.9
+],
+[
+63,
+0.99,
+0.885
+],
+[
+63,
+0.995,
+0.875
+],
+[
+63,
+0.99,
+0.885
+],
+[
+63,
+0.99,
+0.895
+],
+[
+63,
+0.99,
+0.905
+],
+[
+63,
+0.99,
+0.9
+],
+[
+63,
+0.99,
+0.895
+],
+[
+63,
+0.995,
+0.895
+],
+[
+63,
+0.99,
+0.89
+],
+[
+63,
+0.995,
+0.895
+],
+[
+63,
+0.995,
+0.895
+],
+[
+63,
+0.995,
+0.89
+],
+[
+63,
+0.995,
+0.905
+],
+[
+63,
+0.995,
+0.9
+],
+[
+63,
+0.995,
+0.91
+],
+[
+63,
+0.995,
+0.91
+],
+[
+63,
+0.995,
+0.915
+],
+[
+63,
+0.995,
+0.915
+],
+[
+63,
+0.995,
+0.915
+]
+]
+}
