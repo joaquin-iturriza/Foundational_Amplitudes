@@ -10864,9 +10864,6 @@ entries:
       woke nothing). Look up (claude-code-guide, low effort) whether Claude Code offers a setting or hook to suppress or absorb
       a task-notification; try a Stop-hook route that holds the main turn''s end a few seconds when an agent handed back this
       turn and its notification has not arrived; test on the recorded double wakes (main_turns.py) and on a live agent end.'
-    16: 'Check that the GPU-hour gate on the sites uses the edited site_gate.py (93534946 changed ~/.local/bin/site_gate.py
-      on the laptop; siteconf.work_gate runs on the site): if the site copy differs, deploy it and run tests/test_site_gate_window.py
-      and the gate test in tests/test_hooks_real.py.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -11101,11 +11098,6 @@ entries:
       if:
       - 'a route removes the second wake: keep it, re-measure after a day'
       - 'none works: say which were tried, with evidence'
-    16:
-      feeds: making the failed-job budget fix actually apply where submissions are gated
-      if:
-      - 'same code on the site: drop this step'
-      - 'differs: deploy and test, then drop'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
