@@ -12355,6 +12355,47 @@ entries:
       auto, as cov_v4_long_hpo_x4 and D244/D245/D246; the conditional 8-trial extension is backed by D284; about 1.5 h of
       work in three waves, no deadline given. 14: 130 MB per warm run dir (du, k533 and k533_seed2), in-memory pools, no shared
       cache; /sps/lpnhe 88 GB free (df 2026-11-05), 10 jobs about 1.3 GB.'
+  - at: '2026-11-05T04:02:00+00:00'
+    question: 'D289 (Joaquin 2026-11-05: ''I agree that we should probably save an earlier checkpoint too, though we should
+      check ourselves how much of a difference this makes''): for C1 (share 0.25, het), does a k=533 warm start from a checkpoint
+      of the parent taken before its cosine schedule has decayed (step 2132, lr about 0.65 of peak; step 3198, about 0.20)
+      reach share 0.25 from scratch better than the same warm start from the parent''s final model, and by how much?'
+    prior: 'par:v4_warm_start (C1 @1258ef73): from the final model, untuned W_533/B PP4 1.33, EE4 1.51. Step 3 (ws_c1_k533_hpo8
+      @dc24fa76): best trial hp_1860 lr_scale 0.174, val_loss_no_reg -2.758 (untuned -2.639, scratch -2.911); its seed 42/43
+      confirmation runs FA-ccin2p3-56cca07a/75d28cb4 in flight. Literature (web-checked): Hu et al. 2024 arXiv:2404.06395
+      (WSD: branch from a stable-phase checkpoint and decay on new data; a 10% decay matches or beats cosine), Ibrahim et
+      al. 2024 arXiv:2403.08763 (re-warm and re-decay from the final model matches retraining). No pre-decay warm start found
+      in results.tex, plan or site decisions (searched: checkpoint, pre-decay, intermediate, save_intermediate, WSD, stable
+      phase).'
+    measure: 'As C1 (mixture_ab.py warm, a new change entry): each run''s final model after its sigma stage (D276), zero-shot
+      MSE of log|M|^2 per probe on PP4, EE4 (all classes), held-out default-sampled pooled and catalog-sampled pooled; R(W_2132/W_final),
+      R(W_3198/W_final) with the 95% class bootstrap widened by the W_final pair''s |ln R_seed|; R(W_x/B) for each x with
+      C1''s MATCH rule; g as C1.'
+    check: 'That the read moves with the parent checkpoint a warm start begins from is shown on C1: from the same final model,
+      k=533 vs k=1066 vs k=2132 (the parent plus more steps) gives R(W/B) PP4 1.33, 1.15, 0.95 and EE4 1.51, 1.23, 1.01 beyond
+      the widened intervals ([1.30,1.37], [1.13,1.18], [0.94,0.97]); the seed spread of a W pair (PP4 widened half-width about
+      3%) resolves a 10% difference. Not checked: a pre-decay checkpoint''s own read (none exists yet).'
+    fixed: 'Parent: the het control''s exact setup (scripts/job_catalog_v3_short.sh v4_het_control[_seed2]: share 0, 4264
+      steps, cosine with warmup 0.158, MuonAdamW lr 4.997e-3, width 8, HETEROSC, 1e4 train per pool), rerun at seeds 42/43
+      with a new save-at-steps knob writing the EMA model at steps 2132 and 3198 (training only, no reads, no sigma stage);
+      its final = its best mean-stage checkpoint, as the parents of C1. Warm starts: v4_het_warm25t_k533''s setup (share-0.25
+      recipe, 533 steps, step 3''s tuned HPs hp_1860: lr_scale 0.174, layer_decay 0.915, warmup 0.183, eta_min 3.2e-8, Muon
+      decay 0.048, reg 1.3e-8, EMA 0.956), target_stats parent, fresh optimizer, differing only in the checkpoint loaded (2132,
+      3198, final of the rerun). All three from the same rerun, so no rerun-vs-original confound.'
+    control: 'W_final: the same warm start from the rerun''s final model (the matched control of the checkpoint choice). B:
+      share 0.25 from scratch (f0156d88/df858d33, reads 9538e607/ed96b552). The rerun''s final is checked against the original
+      het control (87ea24d0/321a3de2) on best val_loss_no_reg (within the seed spread 0.05) to show the rerun reproduces the
+      parent.'
+    seeds: '42 and 43 (each warm start from the rerun at its seed). Runs: 2 parent reruns (4264 steps at 1.34 s/step incl.
+      validation, measured 533 steps in 11.9 min on V100 (341bf564), + 12 min data + 2 min = 1.85 h each) and 6 warm starts
+      (1.45 h each, the measured k=533 warm arm 341bf564) = 3.7 + 8.7 = 12.4 GPU-h on CC-IN2P3, under 30. Disk: 130 MB per
+      warm run dir plus 2 extra model files per parent (about 20 MB), about 1 GB.'
+    outcome: 'Per checkpoint x on PP4 and EE4 (all classes): BETTER when R(W_x/W_final) <= 0.90 with the widened interval
+      below 1 on both; WORSE when the widened lower end is above 1 on either; NO DIFFERENCE otherwise (reported with its R).
+      BETTER at either checkpoint: future pretrainings keep that checkpoint (D289 answered yes, with how much, and R(W_x/B)
+      under C1''s MATCH rule); NO DIFFERENCE or WORSE: the final model stays the parent, reported; caveat that the HPs were
+      tuned on the final model, so a checkpoint that is not better at them gets its own warm-start sweep only on Joaquin''s
+      word.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
