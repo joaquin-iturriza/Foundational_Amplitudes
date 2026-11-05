@@ -1064,6 +1064,7 @@ WARM = {"C1": {"W": {533: ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f"),
         "C1t": {"W": {533: ("FA-ccin2p3-56cca07a", "FA-ccin2p3-75d28cb4")}, "C": {},
                 "ref": {"untuned": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f")},
                 "deciding": ("PP4", "EE4")}}
+WARM["C1t"].update(B=WARM["C1"]["B"], A=WARM["C1"]["A"])   # C1's from-scratch B and parent A
 MATCH_HI, CARRY = 1.35, 0.90
 
 
