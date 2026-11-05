@@ -8832,6 +8832,7 @@ entries:
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
     '43': FA-ccin2p3-5b5215b6 FA-ccin2p3-e184bbc5 FA-ccin2p3-ae39ee5a FA-ccin2p3-75ad7b20
+    '60': Joaquin running or allowing scripts/remove_worktree.sh
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
