@@ -211,6 +211,9 @@ is `clean` or `nits only`, run as your final step:
 
     bash .claude/hooks/review_backlog.sh advance repo-reviewer
 
+If you reviewed a worktree branch (not the checkout you run from), advance at the commit you read, never at the
+head of the main checkout: `bash .claude/hooks/review_backlog.sh advance repo-reviewer --at <branch tip sha>`.
+
 If your verdict is `fix first`, do **not** run it: return the findings so they get fixed, and
 you will be re-run on the corrected backlog.
 

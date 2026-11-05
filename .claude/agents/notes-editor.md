@@ -203,6 +203,9 @@ final step:
 
     bash .claude/hooks/review_backlog.sh advance notes-editor
 
+If you reviewed a worktree branch (not the checkout you run from), advance at the commit you read, never at the
+head of the main checkout: `bash .claude/hooks/review_backlog.sh advance notes-editor --at <branch tip sha>`.
+
 Run it **after** your last edit. If there is a blocking problem you cannot fix mechanically,
 do **not** run it: return the findings and leave the backlog standing.
 

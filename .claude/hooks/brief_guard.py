@@ -36,9 +36,9 @@ CUTS = [r"\b(?:fewer|less)\s+(?:\w+\s+)?" + UNITS + r"\b",
         # "a subset per job" splits the work; a subset of the design's units cuts it (the night's replay, 2026-10-30)
         r"\b(?:run|use|take|only)\s+a\s+subset\b|\ba\s+subset\s+of\s+(?:the\s+)?(?:\w+\s+)?" + UNITS + r"\b",
         r"\b(?:another|other|different|shorter|smaller)\s+(?:horizon|pool)\b",
-        r"\bskip(?:ping|s)?\s+(?:the\s+)?(?:design|review|reviewer|site pick)",
-        r"\b(?:without|no need for|instead of)\s+(?:a\s+|the\s+)?(?:design|review|reviewer|site pick)",
-        r"\b(?:do not|don't|no need to)\s+(?:run|launch|wait for)\s+(?:the\s+)?(?:design\s+)?review"]
+        r"\bskip(?:ping|s)?\s+(?:the\s+)?(?:design|review|reviewer|site pick)\b",
+        r"\b(?:without|no need for|instead of)\s+(?:a\s+|the\s+)?(?:design|review|reviewer|site pick)\b",
+        r"\b(?:do not|don't|no need to)\s+(?:run|launch|wait for)\s+(?:the\s+)?(?:design\s+)?review\b"]
 
 
 def block():

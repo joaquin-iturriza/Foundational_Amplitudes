@@ -22,7 +22,7 @@
 # Modes:
 #   gate                  (PreToolUse(Edit|Write)) DENY edits to an over-threshold pillar
 #   begin <reviewer>      reviewer takes the lock: lifts `gate` so it can apply its own fixes
-#   advance <reviewer>    reviewer PASSED; resets its watermark and drops the lock
+#   advance <reviewer> [--at <commit>]  reviewer PASSED; resets its watermark (at HEAD, or at the commit it read) and drops the lock
 #   status                human-readable backlog table (also: what /review-now would run)
 #   init                  set every watermark to "everything so far is reviewed"
 #
@@ -153,7 +153,7 @@ pillar_for_path() {
 reset_pillar() {
   local who="$1" paths sha lines
   paths=$(pillar_field "$who" 4)
-  sha=$(git rev-parse HEAD)
+  sha=${2:-$(git rev-parse HEAD)}
   lines=$(pillar_size "$who" "$sha" "$paths")     # the uncommitted remainder just reviewed
   write_state "$who" "$sha" "$lines" 0 "$(reviewed_hash "$sha" "$paths")"
 }
@@ -204,11 +204,19 @@ case "$mode" in
 
   advance)
     who="${2:-}"
-    [ -z "$who" ] && { echo "usage: review_backlog.sh advance <reviewer>" >&2; exit 2; }
+    [ -z "$who" ] && { echo "usage: review_backlog.sh advance <reviewer> [--at <commit-or-branch>]" >&2; exit 2; }
     pillar_field "$who" 1 | grep -q . || { echo "unknown reviewer '$who'" >&2; exit 2; }
-    reset_pillar "$who"
+    at=""
+    if [ "${3:-}" = "--at" ]; then
+      [ -z "${4:-}" ] && { echo "usage: review_backlog.sh advance <reviewer> [--at <commit-or-branch>]" >&2; exit 2; }
+      at=$(git rev-parse --verify -q "$4^{commit}") || { echo "unknown commit '$4'" >&2; exit 2; }
+    elif [ -n "${3:-}" ]; then
+      echo "usage: review_backlog.sh advance <reviewer> [--at <commit-or-branch>]" >&2; exit 2
+    fi
+    # --at: the commit the reviewer read (a worktree branch's tip), not the head of the checkout it runs from
+    reset_pillar "$who" "$at"
     rm -f "$(lock_file "$who")"
-    echo "[review-backlog] $who watermark advanced to $(git rev-parse --short HEAD) — backlog cleared"
+    echo "[review-backlog] $who watermark advanced to $(git rev-parse --short "${at:-HEAD}") — backlog cleared"
     exit 0
     ;;
 
@@ -296,5 +304,5 @@ except Exception: print("")' 2>/dev/null)
     exit 0
     ;;
 
-  *) echo "usage: review_backlog.sh {gate|bashpre|begin <reviewer>|advance <reviewer>|status|init}" >&2; exit 2 ;;
+  *) echo "usage: review_backlog.sh {gate|bashpre|begin <reviewer>|advance <reviewer> [--at <commit>]|status|init}" >&2; exit 2 ;;
 esac

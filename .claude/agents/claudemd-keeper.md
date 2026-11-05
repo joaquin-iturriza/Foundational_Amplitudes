@@ -76,7 +76,7 @@ decides it.
 
 - Pass: one composition line, e.g. `pass · on-design 99.1% (rule 74.0%, orientation 9.5%, index 15.6%), reference
   0.9%, provenance 0.0%, duplicate 0.0%`, then, as your last step, `bash .claude/hooks/review_backlog.sh advance
-  claudemd-keeper`.
+  claudemd-keeper` (`--at <sha>` after the name when you read a worktree branch's tip: advance at the commit you read).
 - Block: the composition line, then only the offending passages, each as `file:line · quote · failure (kind / verbose /
   twice / grouping / composition / untrue) · the fix (the shorter text, or where it goes)`. Do not advance.
 

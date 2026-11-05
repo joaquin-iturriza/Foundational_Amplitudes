@@ -68,7 +68,20 @@ def test_drawing_sentence_is_not_a_cut():
     print("K7 ok: a drawing sentence passes, real cuts refused")
 
 
+def test_cut_patterns_need_a_closing_word_boundary():
+    """Incident I-3ca52fed: "instead of the reviewed branch tip" is not a cut; "without the review" still is."""
+    ok = "Advance the watermark at the branch tip, instead of the reviewed branch tip of trunk's head."
+    rc, err = guard(plan("brief", "agent_redesign", "--mechanical", ok))
+    assert rc == 0, err
+    for cut in ("Resubmit the job without the review.", "Skip the reviewer and go on.", "Do not run the review."):
+        rc, err = guard(plan("brief", "agent_redesign", "--mechanical", cut))
+        assert rc == 2 and "cuts the work" in err, (cut, err)
+    print("K8 ok: no false cut on a longer word, real cuts refused")
+
+
 if __name__ == "__main__":
     test_all()
     test_drawing_sentence_is_not_a_cut()
+    test_cut_patterns_need_a_closing_word_boundary()
     print("all ok")
+
