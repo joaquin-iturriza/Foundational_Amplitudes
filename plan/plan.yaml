@@ -8811,6 +8811,7 @@ entries:
     '60': Joaquin running or allowing scripts/remove_worktree.sh
     '58': Joaquin's call on the failed multichannel check (keep multichannel and add candidates at the top, or another route),
       asked 2026-11-05
+    '59': FA-ccin2p3-18b98b55 b2538139 66c83df6 69001455 0208896e 8ddc490b dc9feba1 af09cad3 8833a131 481ad196
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
