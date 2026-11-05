@@ -11369,7 +11369,7 @@ entries:
   decisions:
   - D282
   next:
-    1: C1 write-up in docs/results.tex (data/warm_start_C1.json @f0015680, figure warm_start_C1, % src/% claim lines)
+    1: C1 written up (par:v4_warm_start @1258ef73); plan done after C2-C8 are run or declined
     2: 'C2-C8 on Joaquin''s go (open ask): implement their arms (parent, recipe, target_stats per the design), C7/C8 only
       after catalog_coverage step 47 reads the magnitude het pair and shows a gain'
   done_when: null
@@ -11972,8 +11972,8 @@ entries:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
       if:
-      - 'written: plan done only after C2-C8 are run or declined'
-      - 'Joaquin declines C2-C8: write-up closes the entry'
+      - 'C2-C8 run: extend the write-up per change'
+      - 'Joaquin declines C2-C8: plan done with this write-up'
     2:
       feeds: whether warm start reaches scratch across data, loss and target changes (D282 widened)
       if:
