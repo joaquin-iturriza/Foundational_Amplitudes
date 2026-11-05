@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -58,7 +58,7 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++dat
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 # the Muon search's best (sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml, trial_1860; par:v3_muon, D155)
 MUON_BEST=(training.optimizer=MuonAdamW ++training.lr=0.004997423 ++training.muon_weight_decay=0.02171863)
-HET=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
+HET=; SIGNHEAD=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
 case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
     dimensionless)         NORM=("${DIM[@]}") ;;
@@ -223,11 +223,25 @@ PY
     # arms' sign-head target, no sign output: data.signed_magnitude_target) instead of signedlog; everything else the
     # het control's. Plan catalog_coverage step 47: whether the het arms' ~12x on the held-out one-loop pools (HD5) is
     # the loss or the signed pools' target; it reads HD4 and HD5 besides the control's axes
-    v4_het_control_magnitude|v4_het_control_magnitude_seed2)
+    # seeds 44, 45 (_seed3, _seed4) of it: the seed-paired reference of the sign-head arm below (D288)
+    v4_het_control_magnitude|v4_het_control_magnitude_seed2|v4_het_control_magnitude_seed3|v4_het_control_magnitude_seed4)
                             CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" ++data.signed_magnitude_target=true)
                             CROSS=(PP4 EE4 HD4 HD5); HET=1
-                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            ITERS_FIXED=4264
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
+    # the het magnitude control with the sign head on (D287, plan catalog_coverage step 56): readout rows [mu, sign,
+    # sigma] (models/lloca.py sign_channel), the MSE control's per-event sign cross-entropy on the 63 sign-changing
+    # one-loop pools at weight 1 (sign_near_weight 1, no pair head); everything else v4_het_control_magnitude's, seeds
+    # 42-45 paired with its seeds (same backbone initialisation at a seed, tests/test_het_sign_head.py)
+    v4_het_control_signhead|v4_het_control_signhead_seed2|v4_het_control_signhead_seed3|v4_het_control_signhead_seed4)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" ++data.signed_magnitude_target=true)
+                            CROSS=(PP4 EE4 HD4 HD5); HET=1; SIGNHEAD=1
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=true
+                                    ++training.sign_loss_weight=1.0 ++training.sign_near_weight=1.0 ++model.sign_pair_dim=0
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             ITERS_FIXED=4264
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
@@ -568,9 +582,9 @@ PY
     [ "${PIPESTATUS[0]}" = 0 ] || exit 1
     # H5's sign-changing pools: the sign head's own scoring too (magnitude and wrong-sign share, the signed A/B's metrics)
     # (not on TR: signed_ab_score reads the val split, the checkpoint-selection pool of a training process)
-    # (not on a het arm: it has no sign head)
-    # (not on HD5: its pools have a test split only)
-    if [ "$A" != TR ] && [ "$A" != HD5 ] && [ -z "$HET" ] && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
+    # (not on a het arm without a sign head: SIGNHEAD marks the one that has it)
+    # (not on HD5: its pools have a test split only; zero_shot_parent.py's read above records the sign there)
+    if [ "$A" != TR ] && [ "$A" != HD5 ] && { [ -z "$HET" ] || [ -n "$SIGNHEAD" ]; } && grep -qE "name: .*_(nlo|loop)$" "$AR"; then
         # the sign head's scoring on every H5 pool: signed_ab_score.py scores those the run resolves as sign-changing
         # (any role non-positive, its abslog transform) and lists the others as skipped
         python tools/signed_ab_score.py --run "$OUT" --arm head "${P[@]}" | tee "$PRED/${A}_signed.txt"
