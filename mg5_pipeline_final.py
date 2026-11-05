@@ -3315,6 +3315,215 @@ def democratic_draw(nb, sqrts, masses, y_lo, rng):
     return Pout
 
 
+# ---- multichannel flat-part candidates (plan catalog_coverage step 57, proposal of 2026-11-04; a policy key absent from
+# every pool built so far: pol["multichannel"]) ----------------------------------------------------------------------
+# Resonance channels: an s-channel propagator of a massive Z/W/H/t in the class's diagrams (resonance_channels) draws
+# the finals it decays to with their invariant mass on the propagator's Breit-Wigner (tan mapping), a share MC_TAIL of
+# them log-uniform in that mass instead (the off-shell tail); the decay is isotropic (two finals) or the splitter's (more),
+# the recoiling finals the splitter's at their own blob mass. Initial-state collinear channel (finals with a parton): one
+# parton's pT log-uniform from MC_PT_LO and its |eta| uniform up to MC_ETA_MAX in the partonic frame, the rest a
+# splitter blob recoiling against it. Masses and widths: the catalog's cards (fa-catalog-reference: MZ 91.188 / WZ
+# 2.441404, MW 80.419 / WW 2.0476, MH 125 / WH 6.382e-3, MT 172.5 / WT 1.4915).
+MC_RES = {23: (91.188, 2.441404), 24: (80.419, 2.0476), 25: (125.0, 6.382e-3), 6: (172.5, 1.4915)}
+MC_TAIL = 0.2          # share of a resonance channel's masses drawn log-uniform (the off-shell tail) [open]
+MC_PT_LO, MC_ETA_MAX = 10.0, 5.0   # the hadronic acceptance's pT and |eta| edges (V4_CUTS)
+MC_FLOOR = 0.1         # adapted channel shares: floor 0.1 x their mean, as the adaptive sqrt(s) proposal's
+MC_PARTONS = {1, 2, 3, 4, 5, 21}
+
+
+def resonance_channels(diagrams, pdg_ids):
+    """[(final indices (0-based among the finals, in the pool's slot order), propagator |pdg|)] of every s-channel
+    propagator of a massive Z, W, H or top in a class's diagram sidecar (`diagrams`: the parsed
+    <process>.diagrams.json; tools/dump_diagrams.py) that decays to at least two finals and leaves at least one final
+    out (a resonance holding every final sits at sqrt(s), which the adaptive sqrt(s) pass covers). The subprocess with
+    the pool's beams and finals (as multisets) is read; MadGraph's leg numbers are mapped to the pool's slots by
+    diagram_graphs.leg_to_slot (pdg and state; identical particles by slot order). Deduplicated over diagrams."""
+    from diagram_graphs import propagator_leg_sets, leg_to_slot
+    pdg = [int(x) for x in pdg_ids]; k = len(pdg)
+    want = (sorted(pdg[:2]), sorted(pdg[2:]))
+    subs = [sp for sp in diagrams.get("subprocesses", [])
+            if (sorted(int(e["pdg"]) for e in sp["external"] if e.get("state", "in" if e["number"] <= 2 else "out") == "in"),
+                sorted(int(e["pdg"]) for e in sp["external"] if e.get("state", "in" if e["number"] <= 2 else "out") == "out"))
+            == want]
+    if not subs:
+        raise ValueError(f"no subprocess with beams {want[0]} and finals {want[1]} in the sidecar")
+    ext = [dict(e, state=e.get("state", "in" if e["number"] <= 2 else "out")) for e in subs[0]["external"]]
+    slot = leg_to_slot(ext, pdg, 2)
+    finals = frozenset(range(2, k)); out = set()
+    for g in subs[0]["diagrams"]:
+        if g.get("diagram_type", "tree") != "tree":
+            continue
+        for _u, _v, legs, ap in propagator_leg_sets(g):
+            ap = abs(int(ap))
+            if ap not in MC_RES:
+                continue
+            sl = frozenset(slot[l] for l in legs)
+            side = sl if sl <= finals else (frozenset(range(k)) - sl)
+            if side <= finals and 2 <= len(side) < len(finals):
+                out.add((tuple(sorted(i - 2 for i in side)), ap))
+    return sorted(out)
+
+
+def _blob_decay(Pblob, Mblob, masses, y_lo, rng):
+    """the finals of `masses` from a blob of lab momentum Pblob (n,4) and mass Mblob (n,): one particle is the blob, two
+    an isotropic two-body decay, more the splitter in the blob's rest frame; (n, len(masses), 4)"""
+    masses = np.asarray(masses, float); n = len(Mblob)
+    if len(masses) == 1:
+        return Pblob[:, None, :].copy()
+    if len(masses) == 2:
+        qa, qb = _two_body(Mblob, masses[0], masses[1], rng)
+        return np.stack([_boost_from_rest(qa, Pblob), _boost_from_rest(qb, Pblob)], 1)
+    R = democratic_draw(n, Mblob, masses, y_lo, rng)
+    return np.stack([_boost_from_rest(R[:, i], Pblob) for i in range(len(masses))], 1)
+
+
+def resonance_draw(nb, sqrts, masses, S, M, G, y_lo, rng, tail=MC_TAIL):
+    """(nb, N, 4) finals in the partonic frame with the finals S (indices) from a resonance of mass M, width G: their
+    mass m_S on the Breit-Wigner (m^2 = M^2 + M G tan theta, theta uniform between the edges), a share `tail` of the
+    events log-uniform in m_S instead, inside [sum m_S + sqrt(s y_lo), sqrt(s) - (the recoil's least mass)]; the recoil
+    (the other finals) a blob of mass log-uniform above its least (or its one particle). An event with no room for
+    the resonance takes the plain splitter."""
+    masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
+    S = list(S); T = [i for i in range(N) if i not in S]
+    floor = sqrts * np.sqrt(y_lo)
+    mT_least = masses[T].sum() + (floor if len(T) > 1 else 0.0)
+    a = masses[S].sum() + floor; b = sqrts - mT_least
+    ok = b > a * (1 + 1e-9)
+    a_, b_ = np.where(ok, a, 1.0), np.where(ok, b, 2.0)
+    MG = M * G
+    th_a, th_b = np.arctan((a_ ** 2 - M ** 2) / MG), np.arctan((b_ ** 2 - M ** 2) / MG)
+    m_bw = np.sqrt(np.clip(M ** 2 + MG * np.tan(rng.uniform(th_a, th_b)), a_ ** 2, b_ ** 2))
+    m_lg = np.exp(rng.uniform(np.log(a_), np.log(b_)))
+    mS = np.where(rng.random(nb) < tail, m_lg, m_bw)
+    if len(T) == 1:
+        MT = np.full(nb, masses[T[0]])
+    else:
+        lo = masses[T].sum() + floor; hi = np.maximum(sqrts - mS, lo * (1 + 1e-9))
+        MT = np.exp(rng.uniform(np.log(lo), np.log(hi)))
+    ok &= sqrts > mS + MT
+    blob = np.zeros((nb, 4)); blob[:, 0] = sqrts
+    MT_ = np.where(ok, MT, 0.0); mS_ = np.where(ok, mS, sqrts * 0.5)
+    qR, qT = _two_body(sqrts, mS_, MT_, rng)
+    PR, PT = _boost_from_rest(qR, blob), _boost_from_rest(qT, blob)
+    P = np.zeros((nb, N, 4))
+    P[:, S] = _blob_decay(PR, mS_, masses[S], y_lo, rng)
+    P[:, T] = _blob_decay(PT, np.where(ok, MT, masses[T].sum() + floor + 1.0), masses[T], y_lo, rng)
+    if (~ok).any():
+        P[~ok] = democratic_draw(int((~ok).sum()), sqrts[~ok], masses, y_lo, rng)
+    return P
+
+
+def is_collinear_draw(nb, sqrts, masses, partons, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX):
+    """(nb, N, 4) finals in the partonic frame: one parton of the finals `partons` (indices, drawn uniformly) at pT
+    log-uniform from pt_lo up to the most the recoil allows at its eta, eta uniform in [-eta_max, eta_max], phi uniform; the other finals a splitter blob
+    recoiling against it. An event whose recoil is below its least mass takes the plain splitter."""
+    masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
+    j = np.asarray(partons)[rng.integers(0, len(partons), nb)]
+    eta = rng.uniform(-eta_max, eta_max, nb); ph = rng.uniform(0.0, 2.0 * np.pi, nb)
+    # pT up to where the parton's energy leaves the recoil its least mass: E <= (s - least^2) / (2 sqrt s), E ~ pT cosh eta
+    least_all = masses.sum() - masses[j] + sqrts * np.sqrt(y_lo)
+    pt_hi = np.maximum((sqrts ** 2 - least_all ** 2) / (2.0 * sqrts) / np.cosh(eta), pt_lo * (1 + 1e-9))
+    pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_hi)))
+    mj = masses[j]
+    pj = np.stack([np.sqrt((pt * np.cosh(eta)) ** 2 + mj ** 2), pt * np.cos(ph), pt * np.sin(ph), pt * np.sinh(eta)], 1)
+    P = np.zeros((nb, N, 4))
+    rest_P = np.stack([sqrts - pj[:, 0], -pj[:, 1], -pj[:, 2], -pj[:, 3]], 1)
+    M2 = rest_P[:, 0] ** 2 - (rest_P[:, 1:] ** 2).sum(1)
+    floor = sqrts * np.sqrt(y_lo)
+    bad = np.zeros(nb, bool)
+    for jj in np.unique(j):
+        e = j == jj; R = [i for i in range(N) if i != jj]
+        least = masses[R].sum() + (floor[e] if len(R) > 1 else 0.0)
+        okj = (rest_P[e, 0] > 0) & (M2[e] > least ** 2 * (1 + 1e-9)) if len(R) > 1 else np.zeros(int(e.sum()), bool)
+        idx = np.nonzero(e)[0]; good = idx[okj]
+        bad[idx[~okj]] = True
+        if len(good):
+            P[good, jj] = pj[good]
+            P[np.ix_(good, R)] = _blob_decay(rest_P[good], np.sqrt(M2[good]), masses[R], y_lo, rng)
+    if bad.any():
+        P[bad] = democratic_draw(int(bad.sum()), sqrts[bad], masses, y_lo, rng)
+    return P
+
+
+def mc_channels(m_finals, pdg_ids, resonances, isc=True):
+    """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|) per resonance, ("isc",
+    parton indices) when a final is a parton and there are at least three finals"""
+    pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
+    ch = [("rambo",), ("splitter",)] + [("res", tuple(S), int(p)) for S, p in resonances]
+    partons = tuple(i for i in range(nf) if abs(pdg[2 + i]) in MC_PARTONS)
+    if isc and partons and nf >= 3:
+        ch.append(("isc", partons))
+    return ch
+
+
+def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
+    """finals of one channel"""
+    N = len(m_finals)
+    if ch[0] == "rambo":
+        p_ml = _rambo_massless_batch(sq, N, rng)
+        return p_ml if np.all(np.asarray(m_finals) == 0) else _rambo_massive_batch(sq, m_finals, p_ml)
+    if ch[0] == "splitter":
+        return democratic_draw(nb, sq, m_finals, y_lo, rng)
+    if ch[0] == "res":
+        M, G = MC_RES[ch[2]]
+        return resonance_draw(nb, sq, m_finals, ch[1], M, G, y_lo, rng)
+    return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
+
+
+def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, shares, y_lo, frac_fwd=0.0,
+                   beam_mass=None):
+    """_candidates with the finals of each draw from a channel picked with probabilities `shares`; returns
+    (events, sqrt(s), channel index per event); cuts by rejection with top-up as _collect_with_cuts"""
+    m_finals = np.asarray(m_finals, float); pdg = np.asarray(pdg_ids, int)
+    shares = np.asarray(shares, float) / np.sum(shares)
+    def draw(n_draw):
+        sq = np.asarray(sqrts_draw(n_draw), float)
+        beams = _beams(sq, pdg, beam_mass)
+        c = rng.choice(len(channels), size=n_draw, p=shares)
+        F = np.zeros((n_draw, len(m_finals), 4))
+        for i, ch in enumerate(channels):
+            e = c == i
+            if e.any():
+                F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng)
+        P = np.concatenate([beams, F], axis=1)
+        if frac_fwd > 0:
+            r = rng.random(n_draw) < frac_fwd
+            if r.any():
+                P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng)
+        return P, sq, c
+    accP, accS, accC, got, acc = [], [], [], 0, 0.5
+    while got < nb:
+        need = nb - got
+        batch = int(min(max(need / max(acc, 0.03) * 1.3, need), need * 50)) + 32
+        P, sq, c = draw(batch)
+        m = fiducial_pass_mask(P, m_finals, pdg, cuts) if cuts is not None else np.ones(len(P), bool)
+        if m.any():
+            accP.append(P[m]); accS.append(sq[m]); accC.append(c[m]); got += int(m.sum())
+        acc = 0.85 * acc + 0.15 * (float(m.mean()) if m.size else acc)
+    P, sq, c = np.concatenate(accP)[:nb], np.concatenate(accS)[:nb], np.concatenate(accC)[:nb]
+    return [(P[i], pdg) for i in range(nb)], sq, c
+
+
+def mc_shares_from_pass(chan, logm, n_ch, n_logm_bins=60, floor=MC_FLOOR):
+    """second-pass channel shares: each first-pass candidate weighted by 1 / (density of its log|M|^2 in the pass), as
+    _sqrts_proposal_from_pass weights sqrt(s), summed per channel; floor `floor` x their mean"""
+    ok = np.isfinite(logm)
+    w_ch = np.zeros(n_ch)
+    if ok.any():
+        v = logm[ok]
+        edges = np.linspace(v.min(), v.max() + 1e-12, n_logm_bins + 1)
+        b = np.clip(np.searchsorted(edges, v, side="right") - 1, 0, n_logm_bins - 1)
+        dens = np.bincount(b, minlength=n_logm_bins).astype(float)
+        w_ch = np.bincount(chan[ok], weights=1.0 / dens[b], minlength=n_ch)
+    w_ch = w_ch + floor * max(w_ch.mean(), 1e-300)
+    return w_ch / w_ch.sum()
+
+
+# diagnostics of the last multichannel flat part (analysis/catalog_v4/multichannel_check.py): channels, shares of each
+# pass, the channel of every candidate and which were kept
+MC_LAST = {}
+
+
 def _adaptive_bins(n, cap, per_bin=50, floor=20):
     """Bin count scaled with the sample size (>= per_bin entries per bin on average): a
     chunked pool with few candidates must not turn the adaptive proposal into noise."""
@@ -3443,7 +3652,16 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
     if n_flat:
         n_cand = max(int(pol["oversample"]) * n_flat, n_flat)
         n1 = n_cand // 2 if pol["sqrts_adapt"] else n_cand
-        ev1, sq1 = _candidates(n1, uni, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand, beam_mass)
+        # pol["multichannel"] (plan catalog_coverage step 57): the candidates' finals from the channels of mc_channels,
+        # equal shares in the first pass, shares adapted by mc_shares_from_pass in the second; absent, the draws as before
+        mc = bool(pol.get("multichannel")) and len(m_finals) >= 3
+        if mc:
+            chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)))
+            sh1 = np.full(len(chans), 1.0 / len(chans))
+            ev1, sq1, c1 = _candidates_mc(n1, uni, m_finals, pdg_ids, rng, cuts, chans, sh1, pol["y_lo"], fwd_cand,
+                                          beam_mass)
+        else:
+            ev1, sq1 = _candidates(n1, uni, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand, beam_mass)
         me1 = np.asarray(label(ev1, sq1), float)
         cand, sq_c, me_c = ev1, sq1, me1
         if pol["sqrts_adapt"] and n_cand - n1 > 0:
@@ -3460,10 +3678,18 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
                 # no positive candidate (a signed target negative throughout, e.g. a synthetic one-loop pool): the
                 # proposal stays uniform in sqrt(s); every pool that has one is unchanged
                 edges, probs = np.linspace(t_lo, t_hi, nb_s + 1), np.full(nb_s, 1.0 / nb_s)
-            ev2, sq2 = _candidates(n_cand - n1, lambda n: itr(_draw_sqrts_from_bins(n, edges, probs, rng)),
-                                   m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand, beam_mass)
+            sq_draw2 = lambda n: itr(_draw_sqrts_from_bins(n, edges, probs, rng))
+            if mc:
+                sh2 = mc_shares_from_pass(c1, lg1, len(chans), n_logm_bins=_adaptive_bins(int(ok.sum()), 60, 100))
+                ev2, sq2, c2 = _candidates_mc(n_cand - n1, sq_draw2, m_finals, pdg_ids, rng, cuts, chans, sh2,
+                                              pol["y_lo"], fwd_cand, beam_mass)
+            else:
+                ev2, sq2 = _candidates(n_cand - n1, sq_draw2, m_finals, pdg_ids, rng, cuts, pol["democratic"],
+                                       pol["y_lo"], fwd_cand, beam_mass)
             me2 = np.asarray(label(ev2, sq2), float)
             cand, sq_c, me_c = ev1 + ev2, np.concatenate([sq1, sq2]), np.concatenate([me1, me2])
+            if mc:
+                c1 = np.concatenate([c1, c2]); MC_LAST.update(shares2=sh2.tolist())
         with np.errstate(divide="ignore", invalid="ignore"):
             logm = np.log(np.where(me_c > 0, me_c, np.nan))
         keep = _flat_logm_select(logm, n_flat, rng, n_bins=_adaptive_bins(len(cand), 60, 100))
@@ -3473,6 +3699,9 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
             rest = np.setdiff1d(np.arange(len(cand)), keep)
             keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
         ev_f = [cand[i] for i in keep]; sq_f = sq_c[keep]; me_f = me_c[keep]
+        if mc:
+            MC_LAST.update(channels=[list(map(lambda x: list(x) if isinstance(x, tuple) else x, c)) for c in chans],
+                           shares1=sh1.tolist(), chan=c1.copy(), keep=np.asarray(keep).copy())
         print(f"  [SAMPLE] mixture: bulk {n_bulk:,} + flat-log|M|^2 {len(keep):,} kept from {len(cand):,} candidates"
               f" (adaptive sqrt s: {pol['sqrts_adapt']}, democratic share {pol['democratic']})")
     events = ev_b + ev_f
