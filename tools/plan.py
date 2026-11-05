@@ -1367,6 +1367,10 @@ def entry_reason(e, st, msgs, t, d, checks, sweeps):
         if k in held or k in (e.get("step_waits") or {}) or str(k) in (e.get("step_waits") or {}):
             continue
         r = why_moves(e, st, msgs, t, d, checks, sweeps, key=k)
+        if r and r[0].startswith("nothing in flight"):
+            # per step (2026-11-05): a step with no wait and no hold, nothing of its own in flight, is READY whatever
+            # else the entry has live; a stopped owner that wrote after the switch-over date does not make it so
+            r = ("ready step %s of %s has no one working on it: %s" % (k, e["id"], r[0]), r[1])
         if r:
             return r
     return None
@@ -1416,7 +1420,7 @@ def owner_actions(d, st, t=None, msgs=None, events=None):
                 out.append((e, "resume", o["agent"], "open events %s: SendMessage to %s carrying them" % (
                     ", ".join(x[2] for x in evs[:5]) + (" and %d more" % (len(evs) - 5) if len(evs) > 5 else ""),
                     o["agent"])))
-            elif r and not (last and r[1] and r[1] <= last):
+            elif r and (r[0].startswith("ready step") or not (last and r[1] and r[1] <= last)):
                 out.append((e, "resume", o["agent"], r[0]))
             continue
         if evs or r:
