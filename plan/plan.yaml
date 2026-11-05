@@ -11991,10 +11991,11 @@ entries:
     4: 'D285: design reuse of the pretrained model when the change alters parameter shapes (added input columns or heads zero-initialised,
       width growth under muP, depth growth by identity blocks), from the literature check; which project changes need which,
       what code exists (base_experiment._load_pretrained_weights)'
-    5: 'D289: warm start from a pre-decay checkpoint of the parent against from its final model: rerun the het control (seeds
-      42/43) saving EMA models at steps 2132 and 3198 (cosine lr at about 0.65 and 0.20 of peak), then the k=533 warm start
-      at step 3''s tuned HPs from each of 2132, 3198 and the rerun''s final; needs a save-at-steps knob in base_experiment
-      and two arms in job_catalog_v3_short.sh; about 12.5 GPU-h'
+    5: 'D289 running (reruns d521160b/b688a859, then warm starts from2132 0898a7b0/a6834028, from3198 2a27e8a2/0259e865, final
+      dd32a907/70c28bd9; wait on the six warm starts). Comparison entries in mixture_ab.py @7e2d97bc (warm C1ck2132, C1ck3198,
+      C1ckfinal). On their end: extract PP4 EE4 H1-H7c HD4 HD5 and val per run, run mixture_ab.py warm C1ck<x>, apply the
+      keep rule (better_than_final: R(W_ckpt/W_final) <= 0.90, widened interval below 1 on PP4 and EE4), report also against
+      step 3''s tuned runs'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -12959,8 +12960,7 @@ entries:
     5:
       feeds: whether future pretrainings should keep a pre-decay checkpoint for later changes (D289)
       if:
-      - 'a pre-decay checkpoint is resolved better (R(W_ckpt/W_final) <= 0.90, interval below 1 on PP4 and EE4): keep one
-        in every pretraining; report how much'
+      - 'a pre-decay checkpoint is resolved better on PP4 and EE4: keep one in every pretraining; report how much'
       - 'no difference or worse: final model is the parent; report, a WSD pretraining only if Joaquin asks'
   targets:
   - batch: ws_k_ladder
@@ -13111,7 +13111,6 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
-    '5': FA-ccin2p3-0898a7b0 FA-ccin2p3-a6834028 FA-ccin2p3-2a27e8a2 FA-ccin2p3-0259e865 FA-ccin2p3-dd32a907 FA-ccin2p3-70c28bd9
     '4': FA-ccin2p3-93b037bb FA-ccin2p3-ee8df686 FA-ccin2p3-69b7e27d FA-ccin2p3-6954649e FA-ccin2p3-57802518 FA-ccin2p3-da290610
   handoff:
     state: 'C1 written up (par:v4_warm_start @1258ef73). Step 3 (D284) read @7f47781a (warm_start_C1t.json): tuned k=533 (hp_1860)
