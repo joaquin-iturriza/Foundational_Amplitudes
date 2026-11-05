@@ -10397,6 +10397,15 @@ entries:
     text: '2026-11-05 step 39(a) fixed (8b7cd708): generate_sweep.next_available_name reads only its own three-digit counter
       (_002...) as a counter; a name ending in a step count keeps it and gets _002 (tests/test_sweep_name.py, 2 cases: step
       suffix kept, counter advances). (b)-(f) open.'
+  - at: '2026-11-05T04:58:31+00:00'
+    text: '2026-11-05 step 40 done (size_figs.py fit @3a5131dc -> data/size_fit.json; write-up par:v4_width 5141135a, verify_claims
+      0 problems; figs/mse_vs_compute redrawn with the 16x best and the per-axis fits). 1x width R over width 8 (mixture_ab.py
+      width @20448b14): w16 PP4 0.565 [0.522,0.614], EE4 0.562, held default 0.660; w32 PP4 0.370 [0.334,0.413], EE4 0.374,
+      held default 0.528 [0.490,0.572]; H5 not moved (0.839 [0.713,1.107] at w32), H2p5 0.687 at w32, 1.03 at w16. All-pool
+      MSE ln|M|^2: w8 0.0914/0.0944, w16 0.0509/0.0471, w32 0.0288/0.0271, 4x best 0.0206, 16x best 0.0123. One L(C)=A C^-alpha+L_inf
+      over all 8 runs fails (L_inf -> 0, chi2r 2851 at 2% errors); per axis: width alpha 0.59 L_inf 0.011 chi2r 18; length
+      alpha 1.56 L_inf 0.011 chi2r 5.2 (1 dof). At about equal C, 16x w8 0.0123 vs w32 0.027-0.029: steps buy more than width
+      (length tuned, widths not).'
   handoff:
     state: '2026-11-05 ~06:40. Done this turn: step 54 (20448b14: run_metrics reads the sigma stage again per D276; width_x1.json
       re-read; width_x1_loss and length_w8_curves redrawn with sigma-stage tails; deck talks/progress_nov2026 rebuilt); step
