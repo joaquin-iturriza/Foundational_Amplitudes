@@ -8400,6 +8400,70 @@ entries:
       moves against v4_het_control_magnitude[_seed2] (scripts/job_catalog_v3_short.sh:226-233), HETEROSC per D71/D226, no
       prior het + sign head run (searched results.tex, the entry''s designs and decisions for sign head, sign_head, HETEROSC,
       het, signed_magnitude, D287).'
+  - at: '2026-11-05T02:13:18+00:00'
+    question: 'D287 (Joaquin 2026-11-05: ''include the sign head with the het loss in some way''), revised after the reviewer''s
+      FIX of 2026-11-05: with the het loss (HETEROSC + sigma stage), does adding the sign head on the 63 sign-changing one-loop
+      training pools (target log max(|x|,s) as under data.signed_magnitude_target, plus the sign logit trained by the MSE
+      arms'' per-event binary cross-entropy, weight 1) give the het model a sign as good as the MSE control''s, at no resolvable
+      cost to the magnitude on HD5 (28 default-sampled one-loop classes, 19 sign-changing) and H5 (28 catalog-sampled), and
+      none on the tree reads? Needs code first: experiment.py:2232 refuses sign_head under HETEROSC because both use the readout''s
+      last channel (sigma = the last out_shape pooled channels, wrappers.py:946; the sign logit = the last pooled channel,
+      wrappers.py:936). The change: readout rows (mu, sigma, sign logit) split by role in wrappers.py and models/lloca.py
+      (sigma_after_pool keeps sigma on detached features, the sign row on the main ones), the sigma stage trains only the
+      sigma row (mu and sign frozen), parents loaded by row role (base_experiment.py:1453-1468), new arms v4_het_control_signhead[_seed2,_seed3,_seed4]
+      and v4_het_control_magnitude_seed3/_seed4 in scripts/job_catalog_v3_short.sh. CPU tests: readout shape and split, the
+      BCE gradient reaching the sign row, the sigma stage leaving mu and sign rows bit-equal, sign_loss_weight 0 reproducing
+      the het magnitude arm''s loss on a fixed batch.'
+    prior: 'het_oneloop.py magnitude @74a30052 (step 47, data/het_magnitude.json): het magnitude pair (FA-ccin2p3-5abe4a0e/92207f6a)
+      on HD5 over the het signedlog control 0.097 [0.047,0.291], over the MSE control (FA-ccin2p3-c37a4b26/a1ea15aa, sign
+      head on) 1.47 [0.97,1.99] (loss and head differ together; no data yet on the head alone at a fixed target); H5 over
+      het control 0.18. The magnitude pair''s own seed-43-over-42 class-median ratio, computed by the design reviewer from
+      the committed reads (mixture_ab.class_ratios): 1.28 on HD5 (bootstrap [1.02,1.44]), 1.41 on H5 ([1.20,1.77]); het_magnitude.json''s
+      R_seed_het_pair (0.935 / 1.008) is the signedlog het pair''s, not this one''s. Sign seed noise: signext_compare.py (data/signext_compare.json,
+      catalog_v4 MSE sign-head control, seeds 42-45): held-out median wrong-sign shares 5.6, 8.55, 6.9, 7.05%; docs/results.tex
+      ~4988: 5.4% to 19.2% with the seed on catalog_v3. Signed pools A/B (2026-10-24, MSE): sign head vs signed log, signs
+      wrong 14% vs 18% held out. The sign head has only ever run on MSE (results.tex ~6830). Searched: sign head, sign_head,
+      HETEROSC, het, signed_magnitude, D287.'
+    measure: '(1) Magnitude: per probe MSE of log max(|x|,s) (abslog scoring, zero_shot_parent --signed-magnitude, mse_logm2_real,
+      2000 test events, as step 47) on HD5 and H5; per probe the geometric mean over the 4 seeds, per class the geometric
+      mean of arm/reference, R the median over classes; 95% class bootstrap widened on each side by the reference''s own 2-vs-2
+      seed spread |ln(gmean seeds 44,45 / gmean seeds 42,43)| of the het magnitude reference (measured on these runs, written
+      to the output; het_oneloop.py magnitude extended to emit it and the 42/43 ratio). (2) Sign: per pool the seed-mean wrong-sign
+      share (tools/signed_ab_score.py --arm head, as signext_compare''s H5_signed reads), arm vs MSE control (4 seeds each),
+      paired per pool with the one-sided sign test (ties out), and against the no-head baseline (all-positive, wrong on each
+      pool''s negative share): on the 21 H5 sign-changing pools (2000 validation events each, the existing H5_signed path)
+      and on the 19 HD5 sign-changing classes (2000 validation events of their default-sampled pools, signed_ab_score.py on
+      the HD5 recipes; eval-only for the 4 MSE control seeds, REREAD), whole pool and within a factor 10 of zero. (3) Beside:
+      PP4, EE4, HD4, H1-H7c over the het magnitude reference; blow-ups (mixture_ab.blowups) and the median sign accuracy on
+      the signed training pools per validation.'
+    check: 'Sign: the read separates heads and targets (14% vs 18% held out, signed A/B) and its seed noise is measured (MSE
+      control 4 seeds 5.6-8.55%), so it is judged by a paired sign test over pools at 4 seeds a side, not by a points threshold;
+      an all-positive prediction is wrong on each pool''s negative share, so a working head is visible. Magnitude: no existing
+      data moves it by the head alone, so the read is a no-worse-than test bounded by the reference''s measured seed noise
+      (single-seed ratio 1.28 HD5, 1.41 H5), which is why both arm and reference go to 4 seeds.'
+    fixed: 'Everything of arm v4_het_control_magnitude (scripts/job_catalog_v3_short.sh:226-233): catalog_v4 base train recipe,
+      share 0, 4264 steps, width 8, MUON_BEST HPs, DIM target, HETEROSC with loss_aggregation mean, the sigma stage (250 steps),
+      data.signed_magnitude_target, readers and probes; only training.sign_head=true (sign_loss_weight 1, sign_near_weight
+      1, sign_pair_dim 0, as the MSE control) changes. Reported models: the final one after the sigma stage (D276); signed_ab_score
+      reads the same model.'
+    control: 'Matched: the het magnitude reference, seeds 42/43 existing (FA-ccin2p3-5abe4a0e/92207f6a) plus 44/45 new (same
+      arm). Sign reference: the MSE control v4_dimensionless_muon[_seed2,_seed3,_seed4] (seeds 42-45, existing; H5_signed
+      reads exist, HD5 sign reads new, eval-only).'
+    seeds: '42, 43, 44, 45 for the arm (4 new jobs) and the het magnitude reference (44, 45 new: 2 jobs), as signext_compare''s
+      four seeds (D195); the MSE control''s four existing seeds.'
+    outcome: 'YES (het + sign head becomes the het setup for the signed pools): sign not worse than the MSE control (one-sided
+      sign test for arm worse p >= 0.05 on H5 and on HD5) and better than all-positive (p < 0.05 on both), AND magnitude no
+      worse: widened upper end of R over the het magnitude reference <= 1.25 on HD5 and on H5, AND PP4/EE4/H1-H7c widened
+      intervals containing 1 or below, no blow-up. NO-SIGN: arm worse than the MSE control with p < 0.05 on either set, or
+      not better than all-positive: report with the per-validation sign accuracy (collapse or slow learning) to Joaquin; a
+      loss-weight change is his call (D241). COST: widened lower end of R > 1 on HD5 or H5: the head costs magnitude; report
+      with the size, the het magnitude target stays unless Joaquin trades it for the sign. UNRESOLVED (widened upper end >
+      1.25 with the lower end <= 1, or the sign test p in 0.05-0.2): not resolved at 4 seeds; reported with the bounds, adoption
+      is Joaquin''s call, no more seeds without his word. A blow-up is listed apart with where, the verdict withheld. Cost
+      (estimates): code and CPU tests on the laptop; 6 training jobs x about 2.4 h on CC V100 (the het magnitude pair''s submit-to-reads
+      span incl. the 12 axes reads, FA-ccin2p3-92207f6a 19:37-21:57) = about 14.4 GPU-h, plus 8 HD5 sign reads x about 0.5
+      h = 4 GPU-h: about 18 GPU-h, under 30. Disk: 128 MB per run dir (du of the magnitude pair''s), 6 runs about 0.8 GB,
+      against 89 GB free on /sps/lpnhe (df 2026-11-05).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
