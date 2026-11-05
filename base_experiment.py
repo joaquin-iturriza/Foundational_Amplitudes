@@ -1440,7 +1440,8 @@ class BaseExperiment:
                                    "entries (count or shapes differ), so its EMA weights cannot be rebuilt; refusing "
                                    "to start from its live weights (D63)")
             state_dict = _merge_lora_state(state_dict, pretrained_path)
-            ft = self.cfg.get("fine_tune", None)
+            ft = (self.cfg.get("fine_tune", None) if hasattr(self.cfg, "get")
+                  else getattr(self.cfg, "fine_tune", None))   # a test's SimpleNamespace config has no .get
             if ft is not None and bool(ft.get("grow_width", False)):
                 # a parent of half this run's width (num_heads): its function carried into the wider model by
                 # duplicating units and halving their consumers' fan-in (models/grow_width.py, plan warm_start D285)

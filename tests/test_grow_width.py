@@ -63,3 +63,31 @@ def test_refuses_non_doubling():
     child, _ = build(False, seed=11, heads=3)
     with pytest.raises(ValueError):
         grow_state(parent.state_dict(), child, parent_heads=2)
+
+
+def test_loader_grows(tmp_path):
+    """base_experiment._load_pretrained_weights with fine_tune.grow_width: the parent's num_heads read from its run's
+    config.yaml, the grown model computes the parent's function (HETEROSC parent and child, readout rows unchanged)."""
+    import types
+    from omegaconf import OmegaConf
+    from base_experiment import BaseExperiment
+    parent, _ = build(False, seed=7, heads=2)
+    trained_like(parent)
+    run = tmp_path / "parent"
+    (run / "models").mkdir(parents=True)
+    OmegaConf.save(OmegaConf.create({"model": {"net": {"num_heads": 2}}, "training": {"loss": "HETEROSC"}}),
+                   run / "config.yaml")
+    torch.save({"model": parent.state_dict()}, run / "models" / "model_run0_best.pt")
+    child, _ = build(False, seed=11, heads=4)
+    e = BaseExperiment.__new__(BaseExperiment)
+    e.cfg = OmegaConf.create({"seed": 42, "training": {"loss": "HETEROSC"},
+                              "model": {"net": {"num_heads": 4, "sign_channel": False}},
+                              "fine_tune": {"grow_width": True, "grow_noise": 0.0}})
+    e.device = torch.device("cpu")
+    e.model = child
+    e._load_pretrained_weights(str(run / "models" / "model_run0_best.pt"))
+    b = batch()
+    with torch.no_grad():
+        torch.manual_seed(0); yp = forward(parent.eval(), b)
+        torch.manual_seed(0); yc = forward(child.eval(), b)
+    assert (yp - yc).abs().max().item() / yp.abs().max().item() < 1e-5
