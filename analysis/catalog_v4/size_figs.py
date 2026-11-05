@@ -293,9 +293,13 @@ def scaling_fit():
             "length_at_width_8": [i for i, p in enumerate(pts) if p[1] == 8]}
     per_axis = {}
     for name, idx in axes.items():
+        n_c = len(set(c[idx].tolist()))
         fa = fit_power_law_with_floor(c[idx], l[idx])
         ba = np.polyfit(np.log(c[idx]), np.log(l[idx]), 1)
-        per_axis[name] = {"n_points": len(idx),
+        # three parameters through n_c compute levels: with n_c <= 3 the law is not tested (its chi2 is the seed
+        # scatter of replicates at one C) and alpha, L_inf are not determined; kept only as an undetermined curve
+        per_axis[name] = {"n_points": len(idx), "n_distinct_C": n_c, "dof_over_distinct_C": n_c - 3,
+                          "determined": n_c > 3,
                           "fit": dict(zip(("A", "alpha", "L_inf", "chi2_red"), map(float, fa))) if fa else None,
                           "bare_power_law_diagnostic": {"alpha": float(-ba[0]), "A": float(np.exp(ba[1]))}}
     out = {"law": "L(C) = A C^(-alpha) + L_inf, C = 6 N S B (B = 16384 events per step), L = MSE of ln|M|^2, "
@@ -579,12 +583,18 @@ def figs():
     # information only (widths at base HPs, lengths the best of eight trials, one seed)
     sf = scaling_fit()
     for name, ls, lab in (("width_at_4264_steps", "--", "width"), ("length_at_width_8", ":", "length")):
-        f = sf["per_axis"][name]["fit"]
+        ax_fit = sf["per_axis"][name]
         xs = [p["C"] for p in sf["points"] if (p["steps"] == 4264 if lab == "width" else p["width"] == 8)]
         x = np.geomspace(min(xs), max(xs), 100)
-        axc.plot(x, f["A"] * x ** -f["alpha"] + f["L_inf"], color="k", ls=ls, lw=1)
-        hs.append(Line2D([], [], color="k", ls=ls, lw=1,
-                         label=rf"{lab}: $A C^{{-\alpha}}+L_\infty$, $\alpha={f['alpha']:.2f}$, $L_\infty={f['L_inf']:.3f}$"))
+        if ax_fit["determined"]:
+            f = ax_fit["fit"]
+            axc.plot(x, f["A"] * x ** -f["alpha"] + f["L_inf"], color="k", ls=ls, lw=1)
+            lab = rf"{lab}: $A C^{{-\alpha}}+L_\infty$, $\alpha={f['alpha']:.2f}$"
+        else:            # three compute levels: the floor law is not determined, the bare power law as a diagnostic
+            b = ax_fit["bare_power_law_diagnostic"]
+            axc.plot(x, b["A"] * x ** -b["alpha"], color="k", ls=ls, lw=1)
+            lab = rf"{lab}: $A C^{{-\alpha}}$ (diagnostic), $\alpha={b['alpha']:.2f}$"
+        hs.append(Line2D([], [], color="k", ls=ls, lw=1, label=lab))
     for ax in (axc, axw):
         ax.set_xscale("log")
         ax.set_yscale("log")

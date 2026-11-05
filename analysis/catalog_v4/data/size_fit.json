@@ -71,6 +71,9 @@
  "per_axis": {
   "width_at_4264_steps": {
    "n_points": 6,
+   "n_distinct_C": 3,
+   "dof_over_distinct_C": 0,
+   "determined": false,
    "fit": {
     "A": 49667383.59239211,
     "alpha": 0.5905683928076202,
@@ -84,6 +87,9 @@
   },
   "length_at_width_8": {
    "n_points": 4,
+   "n_distinct_C": 3,
+   "dof_over_distinct_C": 0,
+   "determined": false,
    "fit": {
     "A": 1.1708117771261072e+22,
     "alpha": 1.5570632749651265,
