@@ -1154,7 +1154,7 @@ def warm(change="C1"):
     ks = sorted(d["W"])
     yes = next((k for k in ks if out["k"][k]["outcome"] == "MATCH" and out["k"][k]["carried"] is not False), None)
     v = f"YES at k={yes} ({yes / WARM_STEPS:.3f} of the from-scratch steps)" if yes else \
-        "NO (no k up to 2132 matches at the restarted, untuned schedule)" if \
+        f"NO (no k up to {max(ks)} matches)" if \
         all(out["k"][k]["outcome"] == "SHORT" for k in ks) else "not decided (no MATCH; INCONCLUSIVE at some k)"
     out["blowups"] = blowups(runs)
     out["verdict_on_reads"] = v
