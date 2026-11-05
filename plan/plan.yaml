@@ -10531,6 +10531,11 @@ entries:
       not met for any of the four variables nor the control level (EE4 x0.56 [0.45,0.68] at fixed control MSE). What orders
       the gain within a set: the control''s MSE and the |M|^2 coverage; what makes EE4 gain ~2x more stays unexplained by
       marginal coverage. Not taken further without a new reading (none on record).'
+  - at: '2026-11-05T06:19:24+00:00'
+    text: '2026-11-05 step 59 done (E3661, /sps/lpnhe at 92%): deleted the three superseded memmap caches 2eb370fa/746f01a3/85be0204
+      (22.8 GB each, 68.5 GB); no live job mapped them (all 21 checked: step 56 and 6 warm_start in-memory; loader control
+      f5ccb555/7d589cbf; 5 warm_start 04fb3b3d/deda9310). /sps/lpnhe 81%, 99 GB free. Left: tmp/ evalbest_* and f24net_* run
+      dirs of other entries'' tools, not ours to prune.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
