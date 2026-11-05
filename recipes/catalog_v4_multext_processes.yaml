@@ -956,45 +956,6 @@ processes:
     v3_key: d d~ > e+ mu- ve vm~
     v3_name: v3_ddx_epmumvevmx
     why: multext
-  v4_ddx_mupmumvmvmx:
-    beam_masses: {}
-    diagrams_v3: 19
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    layer: 4
-    m_finals:
-    - 0.0
-    - 0.0
-    - 0.0
-    - 0.0
-    mg5_generate:
-    - generate d d~ > mu+ mu- vm vm~ QED<=4
-    model: sm-no_b_mass
-    multext: 6qq
-    nfinal: 4
-    param_card_patches:
-      MT: 172.5
-      WT: 1.4915
-      ymt: 172.5
-    pdg_ids:
-    - 1
-    - -1
-    - -13
-    - 13
-    - 14
-    - -14
-    qed_v3: 4
-    run_card_patches:
-      lpp1: '0'
-      lpp2: '0'
-    sqrts_measure: log
-    v3_key: d d~ > mu+ mu- vm vm~
-    v3_name: v3_ddx_mupmumvmvmx
-    why: multext
   v4_ddx_vmvmvmxvmx:
     beam_masses: {}
     diagrams_v3: 12
@@ -1668,45 +1629,6 @@ processes:
     sqrts_measure: log
     v3_key: e+ e- > s s s~ s~
     v3_name: v3_epem_sssxsx
-    why: multext
-  v4_epem_ssxvmvmx:
-    beam_masses: {}
-    diagrams_v3: 10
-    fiducial_cuts:
-      cos_max: 0.99
-      cut_pdgs: *id002
-      dr_min: 0.4
-      m_min: 10.0
-      pt_min: 10.0
-    layer: 4
-    m_finals:
-    - 0.0
-    - 0.0
-    - 0.0
-    - 0.0
-    mg5_generate:
-    - generate e+ e- > s s~ vm vm~ QED<=4
-    model: sm-no_b_mass
-    multext: 6ee
-    nfinal: 4
-    param_card_patches:
-      MT: 172.5
-      WT: 1.4915
-      ymt: 172.5
-    pdg_ids:
-    - 11
-    - -11
-    - 3
-    - -3
-    - 14
-    - -14
-    qed_v3: 4
-    run_card_patches:
-      lpp1: '0'
-      lpp2: '0'
-    sqrts_measure: log
-    v3_key: e+ e- > s s~ vm vm~
-    v3_name: v3_epem_ssxvmvmx
     why: multext
   v4_epem_ssxwpwm:
     beam_masses: {}
@@ -3064,46 +2986,6 @@ processes:
     sqrts_measure: log
     v3_key: c d > c d e+ e-
     v3_name: v3_us_mupmumsu
-    why: multext
-  v4_us_sssxu:
-    alphas_power: 4
-    beam_masses: {}
-    diagrams_v3: 14
-    fiducial_cuts:
-      cos_max: 0.9999092042625951
-      cut_pdgs: *id001
-      dr_min: 0.4
-      m_min: -1.0
-      pt_min: 10.0
-    layer: 4
-    m_finals:
-    - 0.0
-    - 0.0
-    - 0.0
-    - 0.0
-    mg5_generate:
-    - generate u s > s s s~ u QED<=4
-    model: sm-no_b_mass
-    multext: 6qq
-    nfinal: 4
-    param_card_patches:
-      MT: 172.5
-      WT: 1.4915
-      ymt: 172.5
-    pdg_ids:
-    - 2
-    - 3
-    - 3
-    - 3
-    - -3
-    - 2
-    qed_v3: 0
-    run_card_patches:
-      lpp1: '0'
-      lpp2: '0'
-    sqrts_measure: log
-    v3_key: c d > c d d d~
-    v3_name: v3_us_sssxu
     why: multext
   v4_us_suvmvmx:
     alphas_power: 2
