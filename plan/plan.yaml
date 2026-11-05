@@ -8574,6 +8574,19 @@ entries:
       code and CPU tests on the laptop; 6 jobs x about 2.4 h on CC V100 (FA-ccin2p3-92207f6a''s submit-to-reads span incl.
       12 axes reads) = 14.4 GPU-h, plus 8 HD5 sign reads x about 0.5 h = 4 GPU-h: about 18 GPU-h, under 30. Disk: 128 MB per
       run dir, 6 runs 0.8 GB, no memmap cache, against 89 GB free on /sps/lpnhe (df 2026-11-05).'
+    passed_at: '2026-11-05T03:55:25+00:00'
+    reviewer: 'Third review (03:54 revision, D288 seed-paired contrast). Only training.sign_head=true moves against v4_het_control_magnitude
+      (job_catalog_v3_short.sh:226-233); the MSE sign control v4_dimensionless_muon seeds 42-45 is on the same recipe and
+      steps; HETEROSC + sigma stage per D71/D226; no memmap cache, 0.8 GB against 89 GB; about 18 GPU-h. Check 2: the sign
+      read separates heads (14% vs 18%, against all-positive); the magnitude is a no-worse test. Check 3: the reference''s
+      unpaired seed noise is per-class ln sd 0.57 HD5 / 0.53 H5 per seed (ln seed-ratio sd 0.81 / 0.75 from the 5abe4a0e/92207f6a
+      reads). The reviewer simulated a null arm (an estimate): with paired ln-ratio sd at the gate''s 0.75 x 0.57 = 0.43,
+      the widened upper end has median 1.19 and is <= 1.25 in 72% per read; unpaired it would be 1.40 / 28%. The gate is the
+      absolute bound 0.43 HD5 / 0.40 H5 on the paired ln-ratio sd; the signhead tool must not apply 0.75 to the ratio sd 0.81
+      / 0.75 (that gate would admit 0.61, and 42% per read). Sign: 4 seeds a side, paired sign test, noise 5.6-8.55% (signext_compare.json).
+      Check 4: YES p >= 0.2, UNRESOLVED [0.05,0.2), NO p < 0.05: disjoint; magnitude YES / COST / UNRESOLVED disjoint; pairing
+      fallback stated. Check 5 searched: sign head, sign_head, HETEROSC, het, signed_magnitude, D287, D288, wrong-sign; no
+      het + sign head run exists.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
