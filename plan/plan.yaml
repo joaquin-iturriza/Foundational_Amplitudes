@@ -13082,6 +13082,16 @@ entries:
       by wall) refused by submit_guard''s 60-min rolling item budget (31.7 > 30 with step 5''s batch in the window): submitted
       whole once step 5''s submissions leave the window (after about 05:25 UTC). Submit with --hdr=--mem=46G --env LONG_HEADS=16
       --env LONG_CKPT=true --env LONG_MEMMAP=true --env GROW_K=<k> on v4_het_default25[_seed2], limits 2:20/2:40/3:15.'
+  - at: '2026-11-05T05:40:13+00:00'
+    text: '2026-11-05 step 3 (D284) read, mixture_ab.py warm C1t @7f47781a -> data/warm_start_C1t.json: the tuned k=533 warm
+      start (hp_1860, lr_scale 0.174; FA-ccin2p3-56cca07a s42, 75d28cb4 s43; every read at the sigma-stage model, no blow-up)
+      is SHORT: R(W/B) PP4 1.59 [1.54, 1.65], EE4 2.21 [1.87, 2.60] widened; g PP4 0.31, EE4 0.29 (untuned k=533: 1.33 / 1.51,
+      g 0.55 / 0.66). Against the untuned k=533 at the same seeds R PP4 1.19 [1.01, 1.39], EE4 1.40 [1.20, 1.67]: the tuning
+      made the zero-shot reads WORSE although its sweep objective (val_loss_no_reg, NLL on the share-0.25 validation pools)
+      improved from -2.639 to -2.758. The sweep''s best sits at the lowest lr (0.17x), which keeps the model nearer the parent
+      (W/A PP4 0.78 vs B/A 0.45): the objective rewards staying near the parent on the in-distribution validation (sigma calibration
+      in the NLL is a candidate cause, not checked) while the held-out reads ask for moving to B. The design''s SHORT branch
+      (8-trial extension, lr_scale low edge 0.01) would push further the way that hurt the reads.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
