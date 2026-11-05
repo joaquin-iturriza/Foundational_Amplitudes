@@ -11379,10 +11379,25 @@ entries:
   notes_ref: null
   match: warm_*,ws_*
   evidence:
-    runs: []
-    commit: 74a30052
+    runs:
+    - FA-ccin2p3-04fc5b3b
+    - FA-ccin2p3-0564ad5b
+    - FA-ccin2p3-254abf4f
+    - FA-ccin2p3-341bf564
+    - FA-ccin2p3-343e3d58
+    - FA-ccin2p3-8e41ac1e
+    - FA-ccin2p3-a97e8083
+    - FA-ccin2p3-aa64733e
+    - FA-ccin2p3-c2acc1fc
+    - FA-ccin2p3-c477a52c
+    - FA-ccin2p3-ed946736
+    - FA-ccin2p3-f699e170
+    commit: f0015680
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
+    - analysis/catalog_v4/data/warm_start_C1.json
+    - analysis/catalog_v4/mixture_ab.py
+    - analysis/catalog_v4/plot_warm_start.py
   dead_ends: []
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
