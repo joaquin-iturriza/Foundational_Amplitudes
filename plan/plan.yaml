@@ -9267,9 +9267,9 @@ entries:
       - 'still refused: keep it listed for Joaquin'
   owner:
     agent: a9838af5fa2f7d0bb
-    state: working
+    state: stopped
     since: '2026-11-05T05:33:54+00:00'
-    state_at: '2026-11-05T05:40:32+00:00'
+    state_at: '2026-11-05T05:41:13.679000+00:00'
     context: 99632
     context_at: '2026-11-05T05:40:24+00:00'
   findings:
