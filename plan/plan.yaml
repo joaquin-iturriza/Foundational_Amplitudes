@@ -8373,6 +8373,33 @@ entries:
       2.4 h on a CC V100 (estimate: the het magnitude pair''s submit-to-reads span, FA-ccin2p3-92207f6a 19:37-21:57 incl.
       the 12 axes reads; the head adds one readout row and a BCE) = about 5 GPU-h, plus 4 sign reads (estimate 0.5 h each,
       2 GPU-h): about 7 GPU-h, under the 30 GPU-h line.'
+    fix_at: '2026-11-05T02:11:36+00:00'
+    fix: '(3, 4) Seeds against spread, magnitude: the design widens by ''the het magnitude pair''s seed ratio'' without its
+      value; het_magnitude.json''s R_seed_het_pair (HD5 0.9353, H5 1.0075) is the signedlog het control''s seed ratio (het_oneloop.py
+      magnitude: med(h[1],h[0]) on HET_CTL), not the magnitude pair''s. The magnitude pair''s own seed 43 over seed 42, class
+      median from the committed reads (FA-ccin2p3-92207f6a over 5abe4a0e, mixture_ab.class_ratios), is 1.28 on HD5 (bootstrap
+      [1.02,1.44]) and 1.41 on H5 ([1.20,1.77]), class sd of log ratio 0.8. Widened by that, YES (widened upper <= 1.10) needs
+      a bootstrap upper end <= 0.86 on HD5 and <= 0.78 on H5: a head with no magnitude effect cannot pass, and COST (widened
+      lower > 1) needs about R > 1.3. The ''no cost'' tolerance of 10% sits below the two-seed noise of this very reference.
+      Fix: state the reference pair''s own seed ratio per read and use it; set a tolerance the seeds can resolve, or add seeds
+      (both arms, the reference included, e.g. 44/45 as signext_compare did) until the smallest cost worth acting on stands
+      above the spread. (3) Sign: the 1-point threshold on the median wrong-sign share is below the measured seed spread:
+      analysis/catalog_v4/data/signext_compare.json (4 seeds of the MSE sign-head control on catalog_v4) gives held-out medians
+      5.6, 8.55, 6.9, 7.05%; results.tex ~4988 says the median wrong-sign share ''is no stable number'' (5.4% to 19.2% with
+      the seed) and recommends the near-zero and axis shares. With 2 seeds per arm a null difference crosses 1 point often,
+      so NO-SIGN fires on noise. Fix: cite that spread, use the per-pool paired count (arm lower on k of n pools, sign test,
+      as signext_compare) and/or the near-zero and whole-axis shares, with a threshold above the spread at the seeds given.
+      (4) Outcome gap: a result with widened upper > 1.10 and widened lower <= 1 (or sign within the noise) is neither YES,
+      NO-SIGN nor COST; state what that result means and what it changes. (2) The magnitude check cites het magnitude over
+      the MSE control 1.47 [0.97,1.99], which changes the loss and the head together; say which existing data shows the HD5/H5
+      measure moving with adding a classification head at a fixed magnitude target, or state that none exists and that the
+      read is a non-inferiority bounded by the seed spread above. (10) The sign read on the 19 HD5 classes'' ''test events'':
+      tools/signed_ab_score.py scores each pool''s validation events; state which events and which tool path read HD5''s default-sampled
+      test events. (14) Disk: no disk per job or free-disk read; give the het magnitude pair''s disk per job (caches included)
+      and the site''s free disk for the 2 jobs plus 4 reads. Checks 1, 5, 6, 7, 8, 9, 11, 12, 13 hold: only training.sign_head=true
+      moves against v4_het_control_magnitude[_seed2] (scripts/job_catalog_v3_short.sh:226-233), HETEROSC per D71/D226, no
+      prior het + sign head run (searched results.tex, the entry''s designs and decisions for sign head, sign_head, HETEROSC,
+      het, signed_magnitude, D287).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
