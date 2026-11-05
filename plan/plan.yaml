@@ -10390,6 +10390,10 @@ entries:
       by the candidates'' density, as in the shape study. Verdict by the design: v4_uux_epemg PASS; the four others FAIL (top
       density; the two QCD 2->4 classes also the max). Open choices to report: MC_TAIL 0.2, collinear |eta| to min(5, kinematic
       limit at pT 10 GeV).'
+  - at: '2026-11-05T04:50:30+00:00'
+    text: '2026-11-05 step 39(a) fixed (8b7cd708): generate_sweep.next_available_name reads only its own three-digit counter
+      (_002...) as a counter; a name ending in a step count keeps it and gets _002 (tests/test_sweep_name.py, 2 cases: step
+      suffix kept, counter advances). (b)-(f) open.'
   handoff:
     state: '2026-11-05 ~06:00. Step 56 SUBMITTED: sign head under HETEROSC implemented (models/lloca.py sign_channel, readout
       rows [mu, sign, sigma], backbone+RNG bit-equal to het model at a seed; wrappers/experiment/base_experiment splits by
