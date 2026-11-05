@@ -1201,6 +1201,70 @@ def warm(change="C1"):
                       "verdict": out["verdict"]}))
 
 
+# step 43(1) loader control (design passed 2026-11-05T05:20): same arm v4_het_default25[_seed2], same commit, V100
+LOADER = {"memmap": ("FA-ccin2p3-5b5215b6", "FA-ccin2p3-e184bbc5"), "rerun": ("FA-ccin2p3-ae39ee5a", "FA-ccin2p3-75ad7b20"),
+          "arm_1031": {"PP4": MIX_HET["default25"]["PP4"], "EE4": MIX_HET["default25"]["EE4"],
+                       "held": MIX_HET["default25"]["held"]}}
+LOADER_GAP = math.log(1.39)          # the design's g: PP4 MSE w8_full over default25_1e4
+
+
+def loader():
+    """Step 43(1): per seed, R_L = memmap / in-memory rerun and R_0 = rerun / the 2026-10-31 in-memory arm, each the
+    median over classes of the class's geometric mean of the probe ratios, on PP4 (trained classes), EE4 (trained),
+    held-out default-sampled (the PP4/EE4 probes of held-out classes; these runs read no HD4/HD5) and, beside, the
+    catalog-sampled held-out pool; best sigma-stage val_loss_no_reg per run; the design's verdict
+    -> data/loader_control.json"""
+    cls = class_of()
+    ax_of = _held_axes(cls)
+    cl = lambda k: cls(probe_name(k))
+    def reads(run, ref_src):
+        out = {}
+        for r in ("PP4", "EE4"):
+            d = read_of(ref_src(r), r) if ref_src else read_of(run, r)
+            out[r + "_trained"] = {p: x for p, x in d.items() if cls(p) not in ax_of}
+            out.setdefault("held_default", {}).update({(r, p): x for p, x in d.items() if cls(p) in ax_of})
+        out["held_catalog"] = read_of(ref_src("held") if ref_src else run, "held")
+        return out
+    res = {"design": "plan catalog_coverage step 43(1), passed 2026-11-05T05:20", "runs": LOADER, "seeds": {}}
+    lnL, ln0 = {}, {}
+    for i, seed in enumerate((42, 43)):
+        m, rr = reads(LOADER["memmap"][i], None), reads(LOADER["rerun"][i], None)
+        a = reads(None, lambda r: LOADER["arm_1031"][r][i])
+        sd = {}
+        for q in m:
+            ks = sorted(set(m[q]) & set(rr[q]) & set(a[q]), key=str)
+            RL = float(np.median(list(class_ratios(m[q], rr[q], ks, cl).values())))
+            R0 = float(np.median(list(class_ratios(rr[q], a[q], ks, cl).values())))
+            mse = {w: float(np.median([gmean(v) for v in _by_class(d, ks, cl).values()]))
+                   for w, d in (("memmap", m[q]), ("rerun", rr[q]), ("arm_1031", a[q]))}
+            sd[q] = {"n_probes": len(ks), "n_classes": len({cl(k) for k in ks}), "R_L": round(RL, 4),
+                     "R_0": round(R0, 4), "mse_class_median": {w: float(f"{x:.5g}") for w, x in mse.items()}}
+            if q != "held_catalog":
+                lnL[(seed, q)], ln0[(seed, q)] = math.log(RL), math.log(R0)
+        best = {}
+        for w in ("memmap", "rerun"):
+            f = os.path.join(READS, f"{LOADER[w][i]}_val.json")
+            b = json.load(open(f))["blocks"]
+            best[w] = {"main_best": min(v for _, v in b[0]["vals"]), "sigma_best": min(v for _, v in b[-1]["vals"])}
+        sd["val_loss_no_reg"] = best
+        res["seeds"][seed] = sd
+    s = max(abs(x) for x in ln0.values())
+    g = LOADER_GAP
+    reads3 = ("PP4_trained", "EE4_trained", "held_default")
+    clear = all(abs(lnL[(sd, q)]) <= max(s, 0.05) and abs(lnL[(sd, q)]) < g / 3 for sd in (42, 43) for q in reads3)
+    impl = all(lnL[(sd, "PP4_trained")] >= g / 2 and lnL[(sd, "PP4_trained")] > 2 * s and
+               any(lnL[(sd, q)] >= g / 2 and lnL[(sd, q)] > 2 * s for q in reads3[1:]) for sd in (42, 43))
+    v = "LOADING PATH CLEAR" if clear else "LOADING PATH IMPLICATED" if impl else "NOISE-LIMITED" if s >= g / 2 \
+        else "UNRESOLVED"
+    res["rule"] = {"s_max_abs_ln_R0": round(s, 4), "g": round(g, 4), "g_over_3": round(g / 3, 4), "g_over_2": round(g / 2, 4),
+                   "max_abs_ln_RL": round(max(abs(x) for x in lnL.values()), 4)}
+    res["blowups"] = blowups(list(LOADER["memmap"]) + list(LOADER["rerun"]))
+    res["verdict"] = None if res["blowups"]["flagged"] else v
+    res["verdict_on_reads"] = v
+    json.dump(res, open(os.path.join(DATA, "loader_control.json"), "w"), indent=1)
+    print(json.dumps(res))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1219,6 +1283,7 @@ def main():
     sub.add_parser("width")
     sub.add_parser("arms")
     sub.add_parser("length")
+    sub.add_parser("loader")
     w = sub.add_parser("warm")
     w.add_argument("change", nargs="?", default="C1")
     ep = sub.add_parser("epochs")
@@ -1240,6 +1305,8 @@ def main():
         arms()
     elif a.cmd == "length":
         length()
+    elif a.cmd == "loader":
+        loader()
     elif a.cmd == "warm":
         warm(a.change)
     elif a.cmd == "epochs":

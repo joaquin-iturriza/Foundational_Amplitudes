@@ -1,0 +1,276 @@
+{
+ "design": "plan catalog_coverage step 43(1), passed 2026-11-05T05:20",
+ "runs": {
+  "memmap": [
+   "FA-ccin2p3-5b5215b6",
+   "FA-ccin2p3-e184bbc5"
+  ],
+  "rerun": [
+   "FA-ccin2p3-ae39ee5a",
+   "FA-ccin2p3-75ad7b20"
+  ],
+  "arm_1031": {
+   "PP4": [
+    "FA-ccin2p3-9538e607",
+    "FA-ccin2p3-ed96b552"
+   ],
+   "EE4": [
+    "FA-ccin2p3-9538e607",
+    "FA-ccin2p3-ed96b552"
+   ],
+   "held": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ]
+  }
+ },
+ "seeds": {
+  "42": {
+   "PP4_trained": {
+    "n_probes": 797,
+    "n_classes": 797,
+    "R_L": 1.0585,
+    "R_0": 1.0382,
+    "mse_class_median": {
+     "memmap": 0.095126,
+     "rerun": 0.09265,
+     "arm_1031": 0.087089
+    }
+   },
+   "held_default": {
+    "n_probes": 558,
+    "n_classes": 558,
+    "R_L": 1.0336,
+    "R_0": 1.0375,
+    "mse_class_median": {
+     "memmap": 0.63761,
+     "rerun": 0.62508,
+     "arm_1031": 0.59957
+    }
+   },
+   "EE4_trained": {
+    "n_probes": 115,
+    "n_classes": 115,
+    "R_L": 1.0426,
+    "R_0": 1.0218,
+    "mse_class_median": {
+     "memmap": 0.15114,
+     "rerun": 0.14791,
+     "arm_1031": 0.15384
+    }
+   },
+   "held_catalog": {
+    "n_probes": 701,
+    "n_classes": 701,
+    "R_L": 1.0527,
+    "R_0": 1.0235,
+    "mse_class_median": {
+     "memmap": 0.68312,
+     "rerun": 0.65537,
+     "arm_1031": 0.61801
+    }
+   },
+   "val_loss_no_reg": {
+    "memmap": {
+     "main_best": -2.854732,
+     "sigma_best": -2.859371
+    },
+    "rerun": {
+     "main_best": -2.884081,
+     "sigma_best": -2.889466
+    }
+   }
+  },
+  "43": {
+   "PP4_trained": {
+    "n_probes": 797,
+    "n_classes": 797,
+    "R_L": 0.9814,
+    "R_0": 1.0596,
+    "mse_class_median": {
+     "memmap": 0.094872,
+     "rerun": 0.09177,
+     "arm_1031": 0.085145
+    }
+   },
+   "held_default": {
+    "n_probes": 558,
+    "n_classes": 558,
+    "R_L": 0.8971,
+    "R_0": 1.0986,
+    "mse_class_median": {
+     "memmap": 0.5901,
+     "rerun": 0.67823,
+     "arm_1031": 0.64815
+    }
+   },
+   "EE4_trained": {
+    "n_probes": 115,
+    "n_classes": 115,
+    "R_L": 0.9592,
+    "R_0": 1.0524,
+    "mse_class_median": {
+     "memmap": 0.15089,
+     "rerun": 0.1589,
+     "arm_1031": 0.14577
+    }
+   },
+   "held_catalog": {
+    "n_probes": 701,
+    "n_classes": 701,
+    "R_L": 0.9437,
+    "R_0": 1.0595,
+    "mse_class_median": {
+     "memmap": 0.61907,
+     "rerun": 0.67061,
+     "arm_1031": 0.60683
+    }
+   },
+   "val_loss_no_reg": {
+    "memmap": {
+     "main_best": -2.876185,
+     "sigma_best": -2.880165
+    },
+    "rerun": {
+     "main_best": -2.87917,
+     "sigma_best": -2.882103
+    }
+   }
+  }
+ },
+ "rule": {
+  "s_max_abs_ln_R0": 0.094,
+  "g": 0.3293,
+  "g_over_3": 0.1098,
+  "g_over_2": 0.1647,
+  "max_abs_ln_RL": 0.1086
+ },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-5b5215b6": {
+    "train_run": "FA-ccin2p3-5b5215b6",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -0.9861923,
+      "early_max": 0.1690443,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -0.9861923
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.854705,
+      "early_max": null,
+      "best_step": 110,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.851272
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-75ad7b20": {
+    "train_run": "FA-ccin2p3-75ad7b20",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -1.024184,
+      "early_max": 0.1531048,
+      "best_step": 4264,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -1.024184
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.879141,
+      "early_max": null,
+      "best_step": 40,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.866173
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-ae39ee5a": {
+    "train_run": "FA-ccin2p3-ae39ee5a",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -1.039124,
+      "early_max": 11263920000.0,
+      "best_step": 4250,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -1.039124
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.884135,
+      "early_max": null,
+      "best_step": 80,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.870862
+     }
+    ],
+    "spiked_recovered": [],
+    "blew_up": null
+   },
+   "FA-ccin2p3-e184bbc5": {
+    "train_run": "FA-ccin2p3-e184bbc5",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -0.9815779,
+      "early_max": 341638500.0,
+      "best_step": 4264,
+      "spike_at": 1105,
+      "blew_up_at": null,
+      "at_value": 25.19386,
+      "max_after_ref": 25.19386
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.87615,
+      "early_max": null,
+      "best_step": 190,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.862188
+     }
+    ],
+    "spiked_recovered": [
+     {
+      "block": 0,
+      "step": 1105
+     }
+    ],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": [
+   "FA-ccin2p3-e184bbc5: training run FA-ccin2p3-e184bbc5 block 0 step 1105"
+  ]
+ },
+ "verdict": "UNRESOLVED",
+ "verdict_on_reads": "UNRESOLVED"
+}
