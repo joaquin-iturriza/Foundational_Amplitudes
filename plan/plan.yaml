@@ -13160,6 +13160,11 @@ entries:
       Keep rule (<=0.90, interval below 1) fails for both: no branch, the final model stays the parent. W_final reproduces
       step 3''s tuned runs (PP4 1.00, EE4 0.99). R(W/B) PP4/EE4: from 2132 1.99/2.51, 3198 1.61/2.09, final 1.58/2.01 (all
       SHORT). Every run read all probes; no blow-up. Caveat: each checkpoint retrained at the HPs tuned for the final model.'
+  - at: '2026-11-05T07:28:12+00:00'
+    text: '2026-11-05 step 4 growth check (the design''s pre-read gate) passed on the k533 reruns: step-0 val_loss_no_reg
+      of the grown w16 model -2.8418 (e046ac67, seed 42) against the w8 parent''s best -2.8424 (804a65bc), and -2.8247 (f35b6a78,
+      seed 43) against -2.8267 (66e8c31f): within 0.002, under the 0.01 bar; the operator carries the parent''s function on
+      GPU. Cache key 04fb3b3d reused.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
