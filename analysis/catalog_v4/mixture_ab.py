@@ -65,6 +65,10 @@ reported as information), with R_seed taken per read:
 A share WINS on GAIN and NO LOSS. Verdict: one winner -> it; both -> 0.25 unless 0.50's PP4 and EE4 widened intervals
 both lie below 0.25's R on the same read (then 0.50); no winner -> 'keep the current mixture' when no share has GAIN,
 else 'trade-off' (a GAIN with a LOSS or an undecided cost: the numbers go to Joaquin with the step-11 bound beside them).
+  warm [<change>]                   plan warm_start (superset design passed 2026-11-04T21:51): the warm starts W_k
+                                    and their matched controls C_k against the change from scratch B and the parent
+                                    A, per k in 533/1066/2132, MATCH/SHORT/INCONCLUSIVE and g_k (warm()) ->
+                                    data/warm_start_<change>.json
 """
 import argparse, json, math, os, re, sys
 
@@ -1038,6 +1042,123 @@ def length():
     print("verdict", v)
 
 
+# plan warm_start, change C1 (superset design passed 2026-11-04T21:51): the warm starts W_k (the het control's final
+# model, retrained k steps on the share-0.25 recipe, the parent's schedule restarted over k) and their matched controls
+# C_k (the same warm start on the parent's own recipe), scripts/job_catalog_v3_short.sh @7f945910 (deployed cf87b124),
+# every read from the run's own job at its sigma-stage model (D276); (seed 42, seed 43) per k. B = share 0.25 from
+# scratch (MIX_HET default25 with its HD4/HD5), A = the parent (the het control, step 0)
+WARM_K = (533, 1066, 2132)
+WARM_STEPS = 4264
+WARM = {"C1": {"W": {533: ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f"),
+                     1066: ("FA-ccin2p3-ed946736", "FA-ccin2p3-8e41ac1e"),
+                     2132: ("FA-ccin2p3-f699e170", "FA-ccin2p3-04fc5b3b")},
+               "C": {533: ("FA-ccin2p3-343e3d58", "FA-ccin2p3-c2acc1fc"),
+                     1066: ("FA-ccin2p3-aa64733e", "FA-ccin2p3-c477a52c"),
+                     2132: ("FA-ccin2p3-0564ad5b", "FA-ccin2p3-a97e8083")},
+               "B": dict(MIX_HET["default25"], HD4=HD4_HET["default25"], HD5=HD5_HET["default25"]),
+               "A": dict(MIX_HET["control"], HD4=HD4_HET["control"], HD5=HD5_HET["control"]),
+               "deciding": ("PP4", "EE4")}}
+MATCH_HI, CARRY = 1.35, 0.90
+
+
+def _side_table(runs):
+    """{PP4, EE4, held, HD4, HD5: (run 42, run 43)}: a warm or control pair reads every axis from its own job"""
+    return runs if isinstance(runs, dict) else {r: runs for r in ("PP4", "EE4", "held", "HD4", "HD5")}
+
+
+def _warm_ratio(num, den, cls, ax_of, trained):
+    """R(num/den) on each read as in mixture: per probe each side the geometric mean of its two seeds, class geometric
+    mean of the probe ratios, median over classes, 95% class bootstrap widened by |ln R_seed| of the denominator pair
+    (den seed 43 over seed 42). Reads: PP4 and EE4 (all classes; trained and not trained apart), the held-out classes
+    on default-sampled events (PP4/EE4 probes of held-out classes, HD4, HD5; pooled and per axis) and catalog-sampled
+    (H1-H7c pooled)"""
+    num, den = _side_table(num), _side_table(den)
+    table = {"num": {r: num[r] for r in ("PP4", "EE4", "held")}, "control": {r: den[r] for r in ("PP4", "EE4", "held")}}
+    reads, missing = _reads(table)
+    extra = {ax: {"num": num[ax], "control": den[ax]} for ax in ("HD4", "HD5")}
+    missing += [f"{w} {ax} {run}" for ax, t in extra.items() for w, runs in t.items() for run in runs
+                if read_of(run, ax) is None]
+    if missing:
+        sys.exit("warm: reads missing: " + "; ".join(missing))
+    c = reads["control"]
+    res = {}
+    for r in ("PP4", "EE4", "held"):
+        arm, ctl = side(reads["num"][r]), side(c[r])
+        keys = sorted(set(arm) & set(ctl), key=str)
+        parts = {"pooled": keys} if r == "held" else \
+            {"all": keys, "trained": [k for k in keys if cls(probe_name(k)) in trained],
+             "not_trained": [k for k in keys if cls(probe_name(k)) not in trained]}
+        res[r] = {n: compare(arm, ctl, c[r][0], c[r][1], ks, cls) for n, ks in parts.items() if ks}
+        res[r]["n_probes_unmatched"] = len(set(arm) ^ set(ctl))
+    res["held_default"], _ = _held_default(reads, "num", cls, ax_of, extra)
+    runs = [x for t in (num, den) for pair in t.values() for x in pair]
+    return res, runs
+
+
+def _main_read(res, r):
+    return res[r]["all"] if r in ("PP4", "EE4") else res[r]["pooled"]
+
+
+def warm(change="C1"):
+    """plan warm_start's outcome rule for one change -> data/warm_start_<change>.json. Per k: R(W_k/B), R(W_k/C_k),
+    R(W_k/A), R(C_k/A), and g_k = ln R(W_k/A) / ln R(B/A) per read (B/A the change's from-scratch gain over the parent;
+    g_k the share of it the warm start reaches; R(C_k/A) what k more steps on the parent's own setup give). On the
+    deciding reads (C1: PP4 and EE4, all classes): MATCH when the widened upper end of R(W_k/B) is <= 1.35 on each,
+    SHORT when its widened lower end is above 1 on any, INCONCLUSIVE otherwise; the change carried when R(W_k/C_k) <=
+    0.90 with the widened interval below 1 on each. YES: the smallest k with MATCH and the change carried, as
+    k/4264; NO: no k matches (a NO at the restarted, untuned schedule)"""
+    cls = class_of()
+    ax_of = _held_axes(cls)
+    trained = {cls(p["name"]) for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_base_train.yaml")))["processes"]}
+    d = WARM[change]
+    out = {"design": "plan warm_start, superset design passed 2026-11-04T21:51 (change %s)" % change,
+           "runs": {"W": d["W"], "C": d["C"], "B": d["B"], "A": d["A"]}, "steps_from_scratch": WARM_STEPS,
+           "rule": f"MATCH widened upper end of R(W_k/B) <= {MATCH_HI} on each deciding read {list(d['deciding'])}; "
+                   f"SHORT widened lower end > 1 on any; INCONCLUSIVE otherwise; carried R(W_k/C_k) <= {CARRY} with "
+                   f"the widened interval below 1 on each; YES smallest k with MATCH and carried",
+           "B_over_A": None, "k": {}}
+    runs = []
+    ba, rr = _warm_ratio(d["B"], d["A"], cls, ax_of, trained)
+    out["B_over_A"] = ba
+    runs += rr
+    reads_named = ("PP4", "EE4", "held_default", "held")
+    for k in WARM_K:
+        row = {"fraction": round(k / WARM_STEPS, 4)}
+        for name, (num, den) in {"W_over_B": (d["W"][k], d["B"]), "W_over_C": (d["W"][k], d["C"][k]),
+                                 "W_over_A": (d["W"][k], d["A"]), "C_over_A": (d["C"][k], d["A"])}.items():
+            row[name], rr = _warm_ratio(num, den, cls, ax_of, trained)
+            runs += rr
+        row["g"] = {r: round(math.log(_main_read(row["W_over_A"], r)["R"]) / math.log(_main_read(ba, r)["R"]), 4)
+                    for r in reads_named}
+        row["g_control"] = {r: round(math.log(_main_read(row["C_over_A"], r)["R"]) / math.log(_main_read(ba, r)["R"]), 4)
+                            for r in reads_named}
+        wb = [_main_read(row["W_over_B"], r)["widened"] for r in d["deciding"]]
+        wc = [_main_read(row["W_over_C"], r) for r in d["deciding"]]
+        row["outcome"] = "MATCH" if all(hi <= MATCH_HI for _, hi in wb) else \
+            "SHORT" if any(lo > 1 for lo, _ in wb) else "INCONCLUSIVE"
+        row["carried"] = all(x["R"] <= CARRY and x["widened"][1] < 1 for x in wc)
+        # inside the equivalence bound and still resolved worse than B (widened lower end above 1): MATCH by the rule,
+        # listed so a MATCH is never read as 'equal'
+        row["W_resolved_worse_than_B"] = [r for r in reads_named if _main_read(row["W_over_B"], r)["widened"][0] > 1]
+        out["k"][k] = row
+    yes = next((k for k in WARM_K if out["k"][k]["outcome"] == "MATCH" and out["k"][k]["carried"]), None)
+    v = f"YES at k={yes} ({yes / WARM_STEPS:.3f} of the from-scratch steps)" if yes else \
+        "NO (no k up to 2132 matches at the restarted, untuned schedule)" if \
+        all(out["k"][k]["outcome"] == "SHORT" for k in WARM_K) else "not decided (no MATCH; INCONCLUSIVE at some k)"
+    out["blowups"] = blowups(runs)
+    out["verdict_on_reads"] = v
+    out["verdict"] = None if out["blowups"]["flagged"] else v
+    json.dump(out, open(os.path.join(DATA, f"warm_start_{change}.json"), "w"), indent=1)
+    print(json.dumps({"B_over_A": {r: _main_read(ba, r)["R"] for r in reads_named},
+                      "k": {k: {"outcome": x["outcome"], "carried": x["carried"], "g": x["g"],
+                                "worse": x["W_resolved_worse_than_B"],
+                                **{n: {r: (_main_read(x[n], r)["R"], _main_read(x[n], r)["widened"])
+                                       for r in reads_named} for n in ("W_over_B", "W_over_C", "W_over_A", "C_over_A")}}
+                            for k, x in out["k"].items()},
+                      "flagged": out["blowups"]["flagged"], "spiked": out["blowups"]["spiked_recovered"],
+                      "verdict": out["verdict"]}))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1056,6 +1177,8 @@ def main():
     sub.add_parser("width")
     sub.add_parser("arms")
     sub.add_parser("length")
+    w = sub.add_parser("warm")
+    w.add_argument("change", nargs="?", default="C1")
     ep = sub.add_parser("epochs")
     ep.add_argument("run"); ep.add_argument("log")
     a = ap.parse_args()
@@ -1075,6 +1198,8 @@ def main():
         arms()
     elif a.cmd == "length":
         length()
+    elif a.cmd == "warm":
+        warm(a.change)
     elif a.cmd == "epochs":
         epochs(a.run, a.log)
     else:
