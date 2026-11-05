@@ -9083,7 +9083,7 @@ entries:
       - 'Joaquin prefers another route: record his words and redesign'
   owner:
     agent: a350a6cc3b59b136f
-    state: working
+    state: closed
     since: '2026-11-04T21:48:23+00:00'
     state_at: '2026-11-05T03:53:58+00:00'
     context: 221085
@@ -10246,29 +10246,34 @@ entries:
       candidates: Breit-Wigner channels from the diagram sidecars, initial-state collinear channel, channel shares adapted
       by |M|^2; CPU check on 5 classes).'
   handoff:
-    state: '2026-11-04 ~22:30. Done today: step 53 sampling figures a/b/c (sampling_example.py @f08c5ef3; flat part split
-      by generator, splitter 0.394); step 32 length verdict YES (mixture_ab.py length @d3b90e0d, data/length_x16_over_x4.json:
-      PP4 0.671, EE4 0.677, held-out default 0.921 widened [0.874,0.976]; H2p5 regresses 2.3-3.1; write-up in results.tex
-      pending, next step recorded); step 47 YES (het_oneloop.py magnitude @74a30052, data/het_magnitude.json: HD5 over het
-      control 0.097 [0.047,0.291], over MSE control 1.47); HPO landscape figures (long_hpo_landscape.py @f08c5ef3). IN PROGRESS:
-      Joaquin on figure c (''I don''t see how you call that uniform''; wants the cause of the shape: inside-range unevenness
-      and the top end, where default high-|M|^2 events sit in sqrt(s_hat), m_ll/m_Z, gluon pT/|y|/DeltaR vs the candidates,
-      what the 6x flat selection can reach; hypothesis Z resonance + initial-state collinear gluon). Code written, UNCOMMITTED
-      in analysis/catalog_v4/sampling_example.py (shape, pull_shape, shape_figs; the shape replay records _candidates and
-      _flat_logm_select per chunk). Commit was blocked by the review-backlog hook (repo-reviewer overdue); a repo-reviewer
-      was launched on the whole backlog (lock held). Next: once it PASSes, commit sampling_example.py, site sync ccin2p3 FA
-      --allow-dirty, tools/detach.py --entry catalog_coverage --name sampling_shape -- python3 analysis/catalog_v4/sampling_example.py
-      pull_shape; on its end shape_figs (local .venv-cpu), look once at figs/sampling_shape_a-f, commit data/sampling_shape.json
-      + sampling_shape_report.json, report to Joaquin: per-bin counts (recorded in the finding), the water-filling mechanism
-      kept=min(candidates, level) of _flat_logm_select (mg5_pipeline_final.py:3347-3358), and where the top events sit.'
-    decisions: 'D276 (het model after sigma fit) used in steps 32/47 reads; D278 flat part coloured by generator; step 49
-      envelope design on hold (Joaquin: not done talking about the sampling)'
-    ruled_out: 'stderr-cut hypothesis for E3584 (real cause: stale CC checkout)'
-    running: repo-reviewer backlog review (launched by this owner); no GPU jobs
-    files: analysis/catalog_v4/sampling_example.py, analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/het_oneloop.py,
-      analysis/catalog_v4/long_hpo_landscape.py, analysis/catalog_v4/data/length_x16_over_x4.json, analysis/catalog_v4/data/het_magnitude.json,
-      analysis/catalog_v4/data/sampling_example.json
-    written: '2026-11-04T21:46:54+00:00'
+    state: '2026-11-05 ~04:00. Done: step 55 write-up par:v4_length (7c47ca2f, notes-editor PASS; 16x/4x YES, PP4 0.671, EE4
+      0.677, held default 0.921, H2p5 3.07 cost); shape check of the flat part (finding 2026-11-04, data/sampling_shape*.json
+      @4e58eba1: top of |M|^2 is the Z resonance, 3.3% of candidates in the Z bin vs 76% of MadEvent). D287 design PASSED
+      2026-11-05 03:54 (design-reviewer a643a260816b3416b), under D288 (''1. Let''s do b) 2. Yes, build it and run the check'').
+      NEXT (a) step 56: implement training.sign_head under HETEROSC in a worktree per the passed design''s question (readout
+      rows mu/sigma/sign split by role in wrappers.py ~930-950 and models/lloca.py ~128-230, remove experiment.py:2232 assert,
+      sigma stage trains sigma row only, parent loading by row role base_experiment.py:1453-1468, backbone init equal at a
+      seed), CPU tests as listed, arms v4_het_control_signhead[_seed2,_seed3,_seed4] and v4_het_control_magnitude_seed3/_seed4
+      in scripts/job_catalog_v3_short.sh, het_oneloop.py ''signhead'' mode (pairing gate ABSOLUTE paired ln-ratio sd <= 0.43
+      HD5 / 0.40 H5, per the reviewer''s pass note, not 0.75 x the seed-ratio sd); HD5 sign reads with tools/signed_ab_score.py
+      on the HD5 recipes for the arm and the 4 MSE control seeds (REREAD); then site pick, plan target, submit the 6 jobs
+      whole (~2.4 h each, --hdr=--time to need, mem 16G in-memory arms) + reads, ~18 GPU-h. (b) step 57: build the multichannel
+      flat-part candidate draw in a worktree (mg5_pipeline_final.py _candidates/build_mixture_dataset ~3361-3475: Breit-Wigner
+      channels from the diagram sidecars on CC, initial-state collinear channel, channel shares adapted by |M|^2 like _sqrts_proposal_from_pass),
+      generalise sampling_example.py shape to replay current vs proposed on 5 classes (v4_uux_epemg, uux_epemvevex, uu_bbxuu,
+      us_ddxsu, udx_csxvevex) at seeds 42/43 on CC (CPU, site run or detach; the 2->3 replay took 24 s), no pool generation;
+      pass rule: <= 0.1% of the class''s MadEvent events above the kept flat max and every kept 0.25-dex bin up to MadEvent''s
+      99.9% log|M|^2 quantile >= 0.5 x plateau, against the two seeds'' spread; report against it.'
+    decisions: D287 (sign head with het), D288 (seed-paired magnitude contrast; build the multichannel draw and run the check,
+      no generation). D276 het model after sigma fit. Revised design YES at sign p >= 0.2 (disjoint outcomes).
+    ruled_out: unpaired 4-vs-4 magnitude test at tolerance 1.25 (passes a cost-free head ~1 in 10, reviewer estimate); initial-state
+      collinear as the cause of the uux_epemg top (gluon |y|, DeltaR of top events alike in all sets)
+    running: none
+    files: docs/results.tex (par:v4_length), analysis/catalog_v4/mixture_ab.py, analysis/catalog_v4/sampling_example.py, analysis/catalog_v4/data/sampling_shape.json,
+      sampling_shape_report.json, analysis/catalog_v4/het_oneloop.py, analysis/catalog_v4/signext_compare.py, tools/signed_ab_score.py,
+      scripts/job_catalog_v3_short.sh, experiment.py, wrappers.py, models/lloca.py, base_experiment.py, mg5_pipeline_final.py,
+      analysis/catalog_v4/data/pp_support.json
+    written: '2026-11-05T03:55:56+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
