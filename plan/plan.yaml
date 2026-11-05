@@ -11988,9 +11988,11 @@ entries:
     3: 'D284: C1 warm start fixed at k=533 (1/8), single-fidelity DyHPO of the warm arm over the fine-tune space (lr_scale,
       layer_decay, warmup, eta_min, muon decay, reg, EMA), no matched control (D286); best trial re-run at seeds 42/43 with
       the full reads, read as W/B; C2-C8 wait until it is done'
-    4: 'D285: design reuse of the pretrained model when the change alters parameter shapes (added input columns or heads zero-initialised,
-      width growth under muP, depth growth by identity blocks), from the literature check; which project changes need which,
-      what code exists (base_experiment._load_pretrained_weights)'
+    4: 'D285 width growth w8->w16 running (k533 93b037bb/ee8df686, k1066 69b7e27d/6954649e, k2132 57802518/da290610; wait
+      on the six). Comparison entry mixture_ab.py warm C10w @7e2d97bc (B w16 493c98db/7288b3fe, A w8 804a65bc/66e8c31f, MATCH_HI
+      1.19). On their end: check each step-0 validation (''Fine-tuning: validation before any update'') against the w8 parent''s
+      best within 0.01, check two cache keys in the ''data.memmap'' lines, extract reads, run warm C10w, apply the rule, then
+      delete the two new caches'
     5: 'D289 running (reruns d521160b/b688a859, then warm starts from2132 0898a7b0/a6834028, from3198 2a27e8a2/0259e865, final
       dd32a907/70c28bd9; wait on the six warm starts). Comparison entries in mixture_ab.py @7e2d97bc (warm C1ck2132, C1ck3198,
       C1ckfinal). On their end: extract PP4 EE4 H1-H7c HD4 HD5 and val per run, run mixture_ab.py warm C1ck<x>, apply the
@@ -12955,8 +12957,9 @@ entries:
     4:
       feeds: whether shape-changing changes can also start from the pretrained model (D285)
       if:
-      - 'a function-preserving init exists for a change: design its warm-start test like C1'
-      - 'none for width under muP: report what it needs to Joaquin'
+      - 'MATCH at some k: width growth is warm-startable at that fraction; next the w16->w32 pair on the same rule'
+      - 'SHORT at every k: report g_k; tuning is the next call (Joaquin''s)'
+      - 'step-0 validation off by more than 0.01: operator wrong, no read, fix and rerun'
     5:
       feeds: whether future pretrainings should keep a pre-decay checkpoint for later changes (D289)
       if:
@@ -13111,7 +13114,6 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
-    '4': FA-ccin2p3-93b037bb FA-ccin2p3-ee8df686 FA-ccin2p3-69b7e27d FA-ccin2p3-6954649e FA-ccin2p3-57802518 FA-ccin2p3-da290610
   handoff:
     state: 'C1 written up (par:v4_warm_start @1258ef73). Step 3 (D284) read @7f47781a (warm_start_C1t.json): tuned k=533 (hp_1860)
       SHORT, R(W/B) PP4 1.59, EE4 2.21, WORSE than untuned k=533 (R PP4 1.19, EE4 1.40) though its val_loss_no_reg objective
