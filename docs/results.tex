@@ -2503,10 +2503,12 @@ learnable parameters, $S$ the steps, $B$ the events per step; attention not coun
 validation MSE of $\ln|\mathcal M|^2$ over every training pool (geometric mean over pools, from the sigma stage's saved
 predictions): width $8$ $0.0914$ and $0.0944$, $16$ $0.0509$ and $0.0471$, $32$ $0.0288$ and $0.0271$; the $4\times$
 best $0.0206$, the $16\times$ best $0.0123$ (width $8$, seed $42$, each the best of its eight-trial sweep). One law over
-all eight runs does not fit: the floor-aware fit falls to $L_\infty=0$ with $\chi^2_{\rm red}=2851$ (at the fit's
-$2\%$ relative errors). Per axis it does: width at $4264$ steps $\alpha=0.59$, $L_\infty=0.011$
-($\chi^2_{\rm red}=18$, the seed scatter above the $2\%$ errors), length at width $8$ $\alpha=1.56$, $L_\infty=0.011$
-($\chi^2_{\rm red}=5.2$, one degree of freedom, so the floor is not determined). At nearly equal compute the
+all eight runs does not fit: the floor-aware fit falls to $L_\infty=0$, the edge of its grid, with
+$\chi^2_{\rm red}=2851$ (at the fit's $2\%$ relative errors). Per axis the law is not tested: each axis has three
+compute levels (width at $4264$ steps; length at width $8$, whose $1\times$ points are at base hyperparameters and its
+$4\times$ and $16\times$ points tuned), so three parameters pass through them with no freedom left, and $\alpha$ and
+$L_\infty$ are not determined on either; the bare power law, a labelled diagnostic only, gives $\alpha=0.45$ on width
+and $0.76$ on length. At nearly equal compute the
 $16\times$ width-$8$ run reads $0.0123$ against width $32$'s $0.0271$ and $0.0288$: steps buy far more than width
 here, though the length points are tuned and the width points are not (\code{figs/mse\_vs\_compute}; information,
 widths not tuned per width). It supports par.~\ref{par:v4_length}'s choice of length for the pretraining candidate;
@@ -2540,7 +2542,7 @@ width is the axis left once the length sweeps converge.
 % claim: arms.w32.held_default.H2p5.widened.0=0.512
 % claim: arms.w32.held_default.H2p5.widened.1=0.956
 % claim: arms.w16.held_default.H2p5.R=1.03
-% src: python3 analysis/catalog_v4/size_figs.py fit @3a5131dc
+% src: python3 analysis/catalog_v4/size_figs.py fit @92da0f89
 % claim: mse.w8_s4264_0=0.0914
 % claim: mse.w8_s4264_1=0.0944
 % claim: mse.w16_s4264_2=0.0509
@@ -2551,12 +2553,10 @@ width is the axis left once the length sweeps converge.
 % claim: mse.w8_s68224_7=0.0123
 % claim: fit.L_inf=0
 % claim: fit.chi2_red=2851
-% claim: per_axis.width_at_4264_steps.fit.alpha=0.59
-% claim: per_axis.width_at_4264_steps.fit.L_inf=0.011
-% claim: per_axis.width_at_4264_steps.fit.chi2_red=18
-% claim: per_axis.length_at_width_8.fit.alpha=1.56
-% claim: per_axis.length_at_width_8.fit.L_inf=0.011
-% claim: per_axis.length_at_width_8.fit.chi2_red=5.2
+% claim: per_axis.width_at_4264_steps.n_distinct_C=3
+% claim: per_axis.length_at_width_8.n_distinct_C=3
+% claim: per_axis.width_at_4264_steps.bare_power_law_diagnostic.alpha=0.45
+% claim: per_axis.length_at_width_8.bare_power_law_diagnostic.alpha=0.76
 % allow: 0.25 8 16 32 4264 42 43 95 1 6 2 4 because they are the mixture share, the widths, the steps and length multiples, the seeds, the interval's level, the bounds of the width-8 seed pair's subscript, the 6 of the 6NSB estimate and the fit's 2% relative error
 
 \paragraph{Width and length on the held-out multiplicity error (2026-11-04).}\label{par:v4_mult_width_length} The
