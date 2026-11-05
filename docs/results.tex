@@ -2769,6 +2769,65 @@ warm start on share $0$ ($C_k$), dashed the change from scratch (B), dotted the 
 bootstrap; seeds $42$ and $43$ combined; the two series are offset by $\pm3\%$ in $k$ for legibility.}\label{fig:v4_warm_start}
 \end{figure}
 
+\paragraph{A tuned short warm start, and warm starts from pre-decay checkpoints (2026-11-05).}\label{par:v4_warm_start_tuned}
+Two follow-ups to par.~\ref{par:v4_warm_start}, on the same change (share $0.25$), the same B and A and the same reads
+and $R$. First [D284]: can tuning the warm start close the gap at $k=533$ (an eighth of a pretraining), where the
+untuned one is SHORT? A single-fidelity DyHPO sweep of the $k=533$ warm start over the fine-tune space ($8$ trials,
+objective \code{val\_loss\_no\_reg} on the share-$0.25$ validation pools) chose a learning-rate scale of $0.17$; its best
+trial rerun at seeds $42$ and $43$ (FA-ccin2p3-56cca07a, FA-ccin2p3-75d28cb4) and read against B on the rule of
+par.~\ref{par:v4_warm_start} (MATCH at a widened upper end of $1.35$) is SHORT, and further from B than the untuned
+warm start: $R(W/B)$ PP4 $1.59$ ($[1.54, 1.65]$), EE4 $2.21$ ($[1.87, 2.60]$), against the untuned $1.33$ and $1.51$;
+over the untuned warm start at the same seeds PP4 $1.19$ ($[1.01, 1.39]$), EE4 $1.40$ ($[1.20, 1.67]$). It reaches a
+smaller share of the from-scratch gain, $g$ PP4 $0.31$ and EE4 $0.29$ (untuned $0.55$, $0.66$). The sweep's objective
+improved while these reads got worse: a low learning rate keeps the model near the parent, which the in-distribution
+validation NLL rewards and the held-out reads do not, so this objective does not pick warm-start settings for this
+question. Second [D289]: does a warm start from a checkpoint taken before the parent's learning rate has decayed
+adapt better than one from its final model? The parent was rerun (FA-ccin2p3-d521160b, FA-ccin2p3-b688a859, seeds
+$42$, $43$) saving its EMA model at steps $2132$ and $3198$ (cosine learning rate at about $0.65$ and $0.20$ of its
+peak); from each, and from the rerun's final model (before its sigma fit), the $k=533$ warm start ran at the tuned
+settings above (FA-ccin2p3-0898a7b0, FA-ccin2p3-a6834028 from $2132$; FA-ccin2p3-2a27e8a2, FA-ccin2p3-0259e865 from
+$3198$; FA-ccin2p3-dd32a907, FA-ccin2p3-70c28bd9 from the final model; \code{scripts/job\_catalog\_v3\_short.sh} @d9e1af1f). Rule fixed before the read: keep a pre-decay
+checkpoint in future pretrainings when $R(W_{\rm ckpt}/W_{\rm final})\le0.90$ with the widened interval below $1$ on PP4
+and EE4. Neither is better: from step $3198$ $R(W/W_{\rm final})$ is PP4 $1.02$ ($[0.86, 1.20]$), EE4 $1.00$ ($[0.80,
+1.25]$), the same; from step $2132$ PP4 $1.23$ ($[1.03, 1.47]$), worse, EE4 $1.15$ ($[0.89, 1.48]$). The outcome took the
+no branch: the final model stays the parent of a warm start. The final-model start of the rerun reproduces the tuned
+warm start of the first part (PP4 $1.00$, EE4 $0.99$ over it), though one starts before and one after the parent's
+sigma fit. All runs read every probe and none blew up. Caveats: two seeds; every checkpoint was retrained at the
+settings tuned for the final model.
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1t @e3eac2a4
+% claim: k.533.W_over_B.PP4.0=1.59
+% claim: k.533.W_over_B.PP4.1.0=1.54
+% claim: k.533.W_over_B.PP4.1.1=1.65
+% claim: k.533.W_over_B.EE4.0=2.21
+% claim: k.533.W_over_B.EE4.1.0=1.87
+% claim: k.533.W_over_B.EE4.1.1=2.60
+% claim: k.533.W_over_untuned.PP4.0=1.19
+% claim: k.533.W_over_untuned.PP4.1.0=1.01
+% claim: k.533.W_over_untuned.PP4.1.1=1.39
+% claim: k.533.W_over_untuned.EE4.0=1.40
+% claim: k.533.W_over_untuned.EE4.1.0=1.20
+% claim: k.533.W_over_untuned.EE4.1.1=1.67
+% claim: k.533.g.PP4=0.31
+% claim: k.533.g.EE4=0.29
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1ck3198 @e3eac2a4
+% claim: k.533.W_over_final.PP4.0=1.02
+% claim: k.533.W_over_final.PP4.1.0=0.86
+% claim: k.533.W_over_final.PP4.1.1=1.20
+% claim: k.533.W_over_final.EE4.0=1.00
+% claim: k.533.W_over_final.EE4.1.0=0.80
+% claim: k.533.W_over_final.EE4.1.1=1.25
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1ck2132 @e3eac2a4
+% claim: k.533.W_over_final.PP4.0=1.23
+% claim: k.533.W_over_final.PP4.1.0=1.03
+% claim: k.533.W_over_final.PP4.1.1=1.47
+% claim: k.533.W_over_final.EE4.0=1.15
+% claim: k.533.W_over_final.EE4.1.0=0.89
+% claim: k.533.W_over_final.EE4.1.1=1.48
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1ckfinal @e3eac2a4
+% claim: k.533.W_over_tuned_post_sigma.PP4.0=1.00
+% claim: k.533.W_over_tuned_post_sigma.EE4.0=0.99
+% allow: 0.25 533 8 0.17 1.35 1.33 1.51 0.55 0.66 42 43 2132 3198 0.65 0.20 0.90 1 d9e1af1f because they are the share, k, the trial count, the tuned lr scale, the rule bars, the untuned k=533 reads of par:v4_warm_start, the seeds, the checkpoint steps and their cosine lr fractions, and the job script commit
+
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
 tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
