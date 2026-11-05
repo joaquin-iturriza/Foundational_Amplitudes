@@ -150,6 +150,21 @@ def test_sigma_stage_trains_sigma_row_only():
             assert torch.equal(after[k], before[k]), k
 
 
+def test_forward_mu_mse_excludes_sign():
+    """experiment._forward_lloca: the HETEROSC mu-MSE (mse_val) is mu's alone under the sign head"""
+    bt = batch(seed=5)
+    b, _ = build(True)
+    s = stub(b, True)
+    s.device = torch.device("cpu")
+    s.mom_mean, s.mom_std = [0.0], [1.0]
+    y2 = torch.cat([bt["y"], bt["sgn"]], 1)
+    data = (bt["fm"], y2, bt["pt"], bt["order"], bt["ptr"], bt["pids"])
+    y_pred, y, _, sigma, mse_val = E._forward_lloca(s, data)
+    assert y_pred.shape == (24, 1) and y.shape == (24, 1) and sigma.shape == (24, 1)
+    assert torch.allclose(mse_val, ((y_pred - bt["y"]) ** 2).mean())
+    assert s._last_sign[0].shape == (24, 1) and torch.equal(s._last_sign[1], bt["sgn"])
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"):

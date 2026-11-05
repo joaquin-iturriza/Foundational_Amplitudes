@@ -3761,13 +3761,15 @@ class AmplitudeExperiment(BaseExperiment):
             out_shape = self.cfg.model.net.get("out_shape") or self.cfg.model.net.get("out_channels")
             sigma  = y_pred[..., -out_shape:]
             y_pred = y_pred[..., :-out_shape]
-            # β-invariant μ-quality metric (comparable across β and to MSE runs); detached.
-            mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
         # sign head: last output channel is the sign logit, second target column the sign
         self._last_sign = None
         if getattr(self, "_sign_head", False):
             self._last_sign = (y_pred[..., -1:], y[..., 1:])
             y_pred, y = y_pred[..., :-1], y[..., :1]
+        if sigma is not None:
+            # β-invariant μ-quality metric (comparable across β and to MSE runs); detached; after the sign split, so
+            # under the sign head it is mu's alone
+            mse_val = torch.nn.functional.mse_loss(y_pred, y).detach()
         return y_pred, y, process_ids, sigma, mse_val
 
     def _batch_loss_lloca(self, data):
