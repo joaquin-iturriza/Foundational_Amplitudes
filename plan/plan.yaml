@@ -3737,9 +3737,6 @@ entries:
     44: 'Today''s deck (Joaquin 2026-11-03): sampling slide (default vs catalog mixture by component, pp example), width/length/zero-shot
       with restored error bars, MSE log|M|^2 against compute and wall time, het. loss naming; plus a show/skip list of other
       results since the last deck for Joaquin.'
-    47: 'Het one-loop zero-shot (finding 2026-11-04, het_oneloop.py @fc71ee9e): the het arms'' 12x on HD5 follows the 63 sign-changing
-      one-loop training pools trained on signedlog (no sign head under HETEROSC). Proposed to Joaquin, not run: a het control
-      pair (share 0, seeds 42/43) with those pools on abslog (magnitude only), read on HD5 like the arms'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
       rows mu, sigma, sign logit; experiment.py:2232 refusal removed; sigma stage trains the sigma row only; parent loading
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
@@ -9250,11 +9247,6 @@ entries:
       if:
       - 'built and checked: sent with the list'
       - 'a figure can''t be made today: say which and why'
-    47:
-      feeds: whether the het loss itself costs the one-loop zero-shot, or only the signed pools' target
-      if:
-      - 'het on abslog reads HD5 within 1.5x of the MSE control: the 12x is the target, the deck says so'
-      - 'it stays above 3x: the het loss costs one-loop transfer, look at sigma weighting'
     56:
       feeds: whether the het pretraining carries the sign head on the sign-changing one-loop pools (D287)
       if:
