@@ -307,10 +307,18 @@ def _jsonable(x):
     return x
 
 
+# what of this module the cached arrays come from: the streamed reductions and the build; not the lock, the logging,
+# the key's assembly (its inputs are in the key document itself), the open or the batch-time reader [step 36]
+ARRAY_CODE = ("F32FlatSum", "f32_mean_std", "_rowsum", "rows_mean_std", "_build")
+ARRAY_CONSTANTS = ("MMAP_VERSION", "CHUNK", "NP_BLOCK")
+
+
 def _code_hash():
-    """Hash of the code the cached arrays come from: this module, the preprocessing and particle tables, and the
-    experiment methods that load, boost, order and standardize (a change to any of them builds a new cache)."""
+    """Hash of the code the cached arrays come from: this module's reductions and build (ARRAY_CODE, ARRAY_CONSTANTS),
+    the preprocessing and particle tables, and the experiment functions that load, boost, order and standardize. A
+    change to any of them builds a new cache; an edit elsewhere in this module (the lock, logging, the open) does not."""
     import inspect
+    import sys
     import experiment
     import multiplicity_extrap
     import particle_ids
@@ -318,14 +326,20 @@ def _code_hash():
     from lloca.utils import polar_decomposition, rand_transforms
     E = experiment.AmplitudeExperiment
     import physics_scales
+    import diagram_graphs           # the propagator masks behind the off-shell columns (_setup_offshell_masks)
     import mg5_pipeline_final as mg
-    parts = [inspect.getsource(m) for m in (
-        __import__(__name__), preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition,
-        physics_scales)]
+    me = sys.modules[__name__]
+    parts = [inspect.getsource(getattr(me, n)) for n in ARRAY_CODE]
+    parts += ["%s = %r" % (n, getattr(me, n)) for n in ARRAY_CONSTANTS]
+    parts += [inspect.getsource(m) for m in (
+        preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition, physics_scales,
+        diagram_graphs)]
     parts += [inspect.getsource(f) for f in (
         E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
         E._setup_offshell_masks, E._physics_logF, E._eikonal_logS, E._orders_of,
-        E._diagram_born_orders, E._target_orders_source, mg.sidecar_born_orders, mg.target_monomial_from_diagrams)]
+        E._diagram_born_orders, E._target_orders_source, mg.sidecar_born_orders, mg.target_monomial_from_diagrams,
+        experiment.recipe_process_cfg)]   # ordering: multiplicity_extrap.order_identical_particles, hashed whole above;
+    # the catalog entries' data the species read is in the key document (species_in), not here
     parts += [np.__version__, torch.__version__]
     return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 
@@ -360,6 +374,7 @@ def init_data_recipes_mmap(exp, c):
     frozen statistics (None when fitted here), amp_orders, n_order_features, cap_for, stats_path, stats_on_pool."""
     from particle_ids import global_encode
     from preprocessing import resolve_amp_trafos, preprocess_amplitude
+    from experiment import recipe_process_cfg
     cfg = exp.cfg
     names, roles, specs = c["names"], c["roles"], c["specs"]
 
@@ -395,6 +410,9 @@ def init_data_recipes_mmap(exp, c):
         "pools": {r: [_pool_doc(c["paths"][r][n]) for n in names] for r in roles},
         "caps": {r: c["cap_for"][r] for r in roles},
         "particle_order": _porder,
+        # the catalog entry and recipe physics each pool's encoding species come from (particle_ids.species_pdgs:
+        # heavy-quark tops, the massless b): an entry edit changes tokens.npy, so it changes the key
+        "species_in": _jsonable([[recipe_process_cfg(s), s.get("physics")] for s in specs]),
         "use_pids": bool(c["use_pids"]),
         "tokenizer0": sorted((int(k), int(v)) for k, v in exp.tokenizer._pdg_to_idx.items()),
         "rng_in": hashlib.sha256(torch.get_rng_state().numpy().tobytes()).hexdigest(),
