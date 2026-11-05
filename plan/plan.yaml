@@ -11691,6 +11691,10 @@ entries:
     4: 'D285: design reuse of the pretrained model when the change alters parameter shapes (added input columns or heads zero-initialised,
       width growth under muP, depth growth by identity blocks), from the literature check; which project changes need which,
       what code exists (base_experiment._load_pretrained_weights)'
+    5: 'D289: warm start from a pre-decay checkpoint of the parent against from its final model: rerun the het control (seeds
+      42/43) saving EMA models at steps 2132 and 3198 (cosine lr at about 0.65 and 0.20 of peak), then the k=533 warm start
+      at step 3''s tuned HPs from each of 2132, 3198 and the rerun''s final; needs a save-at-steps knob in base_experiment
+      and two arms in job_catalog_v3_short.sh; about 12.5 GPU-h'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -12372,6 +12376,12 @@ entries:
       if:
       - 'a function-preserving init exists for a change: design its warm-start test like C1'
       - 'none for width under muP: report what it needs to Joaquin'
+    5:
+      feeds: whether future pretrainings should keep a pre-decay checkpoint for later changes (D289)
+      if:
+      - 'a pre-decay checkpoint is resolved better (R(W_ckpt/W_final) <= 0.90, interval below 1 on PP4 and EE4): keep one
+        in every pretraining; report how much'
+      - 'no difference or worse: final model is the parent; report, a WSD pretraining only if Joaquin asks'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
