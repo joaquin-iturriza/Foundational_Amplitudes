@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -58,7 +58,7 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++dat
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 # the Muon search's best (sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml, trial_1860; par:v3_muon, D155)
 MUON_BEST=(training.optimizer=MuonAdamW ++training.lr=0.004997423 ++training.muon_weight_decay=0.02171863)
-HET=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
+HET=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; WS_CKPT=model_run0_best; WS_PRE_SIGMA=; TRAIN_ONLY=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
 case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
     dimensionless)         NORM=("${DIM[@]}") ;;
@@ -219,6 +219,17 @@ PY
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             ITERS_FIXED=4264
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
+    # the het control rerun keeping two models from before its cosine schedule has decayed (plan warm_start step 5,
+    # D289): the same setup, the EMA model also written at steps 2132 and 3198 (training.save_model_at_steps; lr at
+    # about 0.65 and 0.20 of peak); training only (no sigma stage, no reads): the parent of the from<step> warm starts
+    v4_het_control_ckpt|v4_het_control_ckpt_seed2)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" "++training.save_model_at_steps=[2132,3198]"
+                                          ++training.heterosc_sigma_stage_steps=0)
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            ITERS_FIXED=4264; TRAIN_ONLY=1
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
     # the het control with the 63 sign-changing one-loop training pools on their magnitude, log max(|x|, s) (the MSE
     # arms' sign-head target, no sign output: data.signed_magnitude_target) instead of signedlog; everything else the
     # het control's. Plan catalog_coverage step 47: whether the het arms' ~12x on the held-out one-loop pools (HD5) is
@@ -254,6 +265,22 @@ PY
     # the tuned warm start (warm_start step 3, D284): warm25 at K=533 with the best trial of the DyHPO sweep
     # ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml, hp_1860, val_loss_no_reg -2.75764), seed s
     # from the control at seed s
+    # step 5 (D289): the tuned warm start from the rerun v4_het_control_ckpt[_seed2], from its step-2132 or step-3198
+    # model or its final (best mean-stage) model; all three before any sigma stage, so the parent's sigma check is off
+    v4_het_warm25t_k533_from*) CAT=v4; CROSS=(PP4 EE4 HD4 HD5); HET=1
+                            NORM=("${DIM[@]}" training.optimizer=MuonAdamW ++training.lr=0.004997423
+                                  ++training.muon_weight_decay=0.048169382 ++training.regularization_lambda=1.3124888e-08
+                                  ++training.cosanneal_warmup_frac=0.18332261 ++training.cosanneal_eta_min=3.2344227e-08
+                                  ++ema=true ++training.ema_decay=0.95566309)
+                            WS_LR_SCALE=0.17409760; WS_LD=0.91532418; WS_PRE_SIGMA=1
+                            PAR=v4_het_control_ckpt; case "$ARM" in *_seed2) NORM+=(seed=43); PAR=v4_het_control_ckpt_seed2 ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            FROM=${ARM#v4_het_warm25t_k533_from}; FROM=${FROM%_seed2}
+                            case "$FROM" in 2132|3198) WS_CKPT=model_run0_step$FROM ;; final) WS_CKPT=model_run0_best ;;
+                                *) echo "warm_start arm $ARM: from must be 2132, 3198 or final"; exit 1 ;; esac
+                            K=533; WS_PARENT="$PAR"
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_default25_train.yaml" ;;
     v4_het_warm25t_k*)      CAT=v4; CROSS=(PP4 EE4 HD4 HD5); HET=1
                             NORM=("${DIM[@]}" training.optimizer=MuonAdamW ++training.lr=0.004997423
                                   ++training.muon_weight_decay=0.048169382 ++training.regularization_lambda=1.3124888e-08
@@ -286,11 +313,11 @@ esac
 if [ -n "$WS_PARENT" ]; then
     case "$K" in 533|1066|2132) ;; *) echo "warm_start arm $ARM: K must be 533, 1066 or 2132"; exit 1 ;; esac
     ITERS_FIXED=$K
-    WS_PT="$PROJECT_DIR/runs/catalog_v4_short/$WS_PARENT/models/model_run0_best.pt.gz"
+    WS_PT="$PROJECT_DIR/runs/catalog_v4_short/$WS_PARENT/models/$WS_CKPT.pt.gz"
     [ -e "$WS_PT" ] || [ -e "${WS_PT%.gz}" ] || { echo "warm_start arm $ARM: no parent model $WS_PT"; exit 1; }
     [ -e "$WS_PT" ] || WS_PT="${WS_PT%.gz}"
     # the parent must be the finished het control (its sigma stage promoted into models/, D276)
-    [ -e "$PROJECT_DIR/runs/catalog_v4_short/$WS_PARENT/sigma_stage" ] || { echo "warm_start arm $ARM: $WS_PARENT has no sigma stage"; exit 1; }
+    [ -n "$WS_PRE_SIGMA" ] || [ -e "$PROJECT_DIR/runs/catalog_v4_short/$WS_PARENT/sigma_stage" ] || { echo "warm_start arm $ARM: $WS_PARENT has no sigma stage"; exit 1; }
     NORM+=(++fine_tune.pretrained_path="$WS_PT" ++fine_tune.lr_scale=${WS_LR_SCALE:-1.0} ++fine_tune.layer_decay=${WS_LD:-1.0}
            ++fine_tune.target_stats=parent ++fine_tune.offshell_stats=parent)
     echo "WARM_START parent=$WS_PARENT pt=$WS_PT steps=$K recipe=$(basename "$TRAIN") lr_scale=${WS_LR_SCALE:-1.0} layer_decay=${WS_LD:-1.0}"
@@ -339,7 +366,9 @@ fi
 # the time limit must hold the training AND every zero-shot read (tools/short_wall.py; the step-11 and step-14 arms of
 # catalog_coverage were cut by TIMEOUT in their PP4/EE4 reads at a 2.5 h limit that counted training only): checked
 # before any GPU time is spent; submit with --hdr=--time=<its slurm_time>
-if [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
+if [ -n "$TRAIN_ONLY" ]; then
+    echo "V3_WALL training only ($ITERS_FIXED steps, no reads): 1.01 s/step + 15 min start-up (tools/short_wall.py rates)"
+elif [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
            $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
@@ -415,6 +444,11 @@ if [ "$MODE" != eval ]; then
             base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
             training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" "${EXTRA[@]}" || exit 1
     fi
+fi
+if [ -n "$TRAIN_ONLY" ]; then
+    ls "$OUT"/models/model_run0_best.pt* "$OUT"/models/model_run0_step2132.pt* "$OUT"/models/model_run0_step3198.pt* \
+        || { echo "$ARM: a saved model is missing in $OUT/models"; exit 1; }
+    echo "V3_SHORT_DONE $ARM (training only)"; exit 0
 fi
 # v4_het_long_best: the trial's sigma-only stage, in a dir of its own, once. As run.py runs it after a training run:
 # one process loads the trial's data with the trial's own config (so the memmap cache key is the trial's and the cache

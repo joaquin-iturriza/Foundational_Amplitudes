@@ -30,6 +30,7 @@ training:
  validate_every_n_steps: 100
  validate_frac: 0.01         # if > 0, overrides validate_every_n_steps: val_step = frac * iterations (0.01 -> 100 val points)
  save_intermediate: false
+ save_model_at_steps: []     # steps (1-based) at which models/model_run<idx>_step<N>.pt is written (D289)
  load_best_previous: true
  save_gradients: false
  save_weights: false

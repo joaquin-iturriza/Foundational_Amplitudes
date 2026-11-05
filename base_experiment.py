@@ -1152,6 +1152,9 @@ class BaseExperiment:
                     if self.cfg.training.save_weights and (step + 1) in iters_to_eval:
                         self._save_weights(step)
 
+            # --- the model at fixed steps (training.save_model_at_steps; plan warm_start D289) ---
+            self._save_at_step(step)
+
             # --- progress logging ---
             dt = time.time() - self.training_start_time
             log_steps = {0, 999} | set(round(x) for x in np.linspace(0, self.cfg.training.iterations - 1, num=10))
@@ -1769,6 +1772,16 @@ class BaseExperiment:
         if to_mlflow and self.cfg.use_mlflow:
             for key, value in flatten_dict(self.cfg).items():
                 log_mlflow(key, value, kind="param")
+
+    def _save_at_step(self, step):
+        """After training step `step` (0-based): when step + 1 is in training.save_model_at_steps, the model as
+        _save_model writes it (with EMA on, "model" the EMA weights validation scores, D63) to
+        models/model_run<idx>_step<step + 1>.pt, a warm-start parent from before the schedule has decayed (plan entry
+        warm_start, D289). Off by default (an empty list)."""
+        steps = getattr(self.cfg.training, "save_model_at_steps", None) or ()
+        if (step + 1) in set(int(x) for x in steps) and self.is_main_process():
+            self._save_model(step + 1, f"model_run{self.cfg.run_idx}_step{step + 1}.pt")
+            LOGGER.info(f"Saved the model at step {step + 1} (training.save_model_at_steps)")
 
     def _save_model(self, step="end", filename=None):
         if not self.cfg.save:
