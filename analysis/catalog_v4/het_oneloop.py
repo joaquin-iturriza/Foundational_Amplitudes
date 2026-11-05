@@ -362,6 +362,7 @@ def signhead_pull():
     pat = re.compile(rf"^(({tags}) ZERO_SHOT |SIGNED_AB |RUN_SUMMARY )|Starting to train for|Val loss \(combined\)|"
                      r"sign_head: sign accuracy on the")
     acc_re = re.compile(r"sign accuracy on the (\d+) signed pools: median ([0-9.]+), min ([0-9.]+)")
+    h5_pools = set()
     for kind in ("arm", "ref", "mse_hd5", "mse_train"):
         for run in SIGNHEAD[kind]:
             if kind == "ref" and run in MAG and os.path.exists(os.path.join(READS, f"{run}_H5.json")):
@@ -394,6 +395,35 @@ def signhead_pull():
             print(run, kind, {k: len(v) for k, v in sg.items()})
             if kind in ("arm", "mse_train") and not sg["val_sign_acc"]:
                 print(f"WARNING {run}: no 'sign_head: sign accuracy' line in its log")
+            if kind == "arm":
+                h5_pools |= set(sg["H5"])
+    h5_neg_pull(h5_pools)
+
+
+NEG_REMOTE = r'''
+import glob, json, os, sys
+import numpy as np
+out = {}
+for pool in sys.argv[1].split(","):
+    g = sorted(glob.glob(os.path.join(os.environ["DATA_DIR"], f"{pool}_val_*amplitudes.npy")))
+    if g:
+        lab = np.asarray(np.load(g[0], mmap_mode="r")[:2000, -1])   # the rows signed_ab_score reads (eval_subsample 2000: [:cap])
+        out[pool] = [float(np.mean(lab < 0)), int(len(lab)), os.path.basename(g[0])]
+print("H5_NEG " + json.dumps(out))
+'''
+
+
+def h5_neg_pull(pools):
+    """the negative share of each H5 pool's scored validation events (signed_ab_score: the first 2000 rows, experiment
+    cap_for / eval_subsample): what an
+    all-positive sign is wrong on, which SIGNED_AB records do not carry -> data/het_signhead_h5_neg.json"""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
+    from analysis.common import site_python
+    d = site_python(NEG_REMOTE, [",".join(sorted(pools))], "H5_NEG", timeout=600)
+    miss = sorted(set(pools) - set(d))
+    json.dump({"source": "label < 0 share of each H5 pool's val file on ccin2p3 ($DATA_DIR)", "neg": d, "missing": miss},
+              open(os.path.join(DATA, "het_signhead_h5_neg.json"), "w"), indent=1)
+    print("h5 neg", len(d), "missing", miss)
 
 
 def _sign_read(run):
@@ -457,8 +487,11 @@ def signhead():
     # sign
     sa = [_sign_read(r) for r in arm]
     ctl = {"HD5": [_sign_read(r)["HD5"] for r in SIGNHEAD["mse_hd5"]], "H5": [_mse_h5_sign(m) for m in SIGNHEAD["mse_h5"]]}
+    h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
     for ax in ("H5", "HD5"):
         A = [x[ax] for x in sa]; C = ctl[ax]
+        if ax == "H5":       # SIGNED_AB carries no negative share: the val pool's (h5_neg_pull)
+            A = [{p: dict(v, neg_share=h5neg[p][0]) for p, v in x.items() if p in h5neg} for x in A]
         pools = sorted(set.intersection(*[set(x) for x in A + C]))
         res = {"n_pools": len(pools)}
         for which in ("wrong_sign", "wrong_sign_near"):

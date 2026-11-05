@@ -136,3 +136,19 @@ def ratio_stats(num, den):
     return {"n": int(lr.size), "ratio": float(10 ** np.median(lr)),
             "ratio_q10_q90": [float(10 ** v) for v in np.quantile(lr, [0.1, 0.9])],
             "n_num_lower": int((lr < 0).sum()), "gap": float(np.median(np.abs(lr)))}
+
+
+def site_python(script, args, marker, site="ccin2p3", timeout=900):
+    """Run a short read-only Python `script` on a site's login node (site run, in the checkout, env active) with `args`
+    and return the JSON after the first output line starting with `marker` + " " (the script prints it). The script
+    goes over as base64 into a $SCRATCH/zz_probe_ file, removed after the run."""
+    import base64, subprocess, sys
+    b64 = base64.b64encode(script.encode()).decode()
+    f = f"$SCRATCH/zz_probe_{marker.lower()}.py"
+    cmd = f"echo {b64} | base64 -d > {f} && python {f} {' '.join(args)}; rm -f {f}"
+    r = subprocess.run(["site", "--timeout", str(timeout), "run", site, "FA", "--", cmd], capture_output=True,
+                       text=True, timeout=timeout + 100)
+    line = next((l for l in r.stdout.splitlines() if l.startswith(marker + " ")), None)
+    if line is None:
+        sys.exit(f"site_python: no {marker} line: " + (r.stdout + r.stderr)[-800:])
+    return json.loads(line.split(" ", 1)[1])

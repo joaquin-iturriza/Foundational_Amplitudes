@@ -342,7 +342,9 @@ def next_available_name(base_name, afs_sweep_dir):
     if not state_exists(base_name):
         return base_name
 
-    m = re.search(r"^(.*?)(_(\d+))$", base_name)
+    # only the counter this function appends (_002, _003, ...: three digits) is read as one; a name ending in a
+    # step count or other number (cov_v4_long_hpo8_cc_17056) keeps it and gets _002 (plan catalog_coverage step 39a)
+    m = re.search(r"^(.*?)(_(\d{3}))$", base_name)
     if m:
         stem, _, num = m.group(1), m.group(2), m.group(3)
         n = int(num)

@@ -45,16 +45,9 @@ print("H2P5_READS " + json.dumps(out))
 
 
 def pull():
-    import base64
-    b64 = base64.b64encode(REMOTE.encode()).decode()
-    cmd = f"echo {b64} | base64 -d > $SCRATCH/zz_probe_h2p5.py && python $SCRATCH/zz_probe_h2p5.py " \
-          f"'{json.dumps(RUNS)}' {','.join(AXES)}; rm -f $SCRATCH/zz_probe_h2p5.py"
-    r = subprocess.run(["site", "--timeout", "900", "run", "ccin2p3", "FA", "--", cmd], capture_output=True,
-                       text=True, timeout=1000)
-    line = next((l for l in r.stdout.splitlines() if l.startswith("H2P5_READS ")), None)
-    if line is None:
-        sys.exit("pull: no H2P5_READS line: " + (r.stdout + r.stderr)[-800:])
-    d = json.loads(line.split(" ", 1)[1])
+    sys.path.insert(0, ROOT)
+    from analysis.common import site_python
+    d = site_python(REMOTE, [f"'{json.dumps(RUNS)}'", ",".join(AXES)], "H2P5_READS")
     json.dump({"source": "q, t of the saved zero-shot npz on ccin2p3 (" + ", ".join(RUNS.values()) + "): "
                          "[mse, level, shape, n] per probe", "reads": d},
               open(os.path.join(DATA, "length_h2p5_reads.json"), "w"), indent=0)
