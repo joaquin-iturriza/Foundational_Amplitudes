@@ -4,6 +4,8 @@ recipes/catalog_v4_heldout_default_H5_test.yaml; slide 3 of the Nov 2026 deck, f
 data/shares_deck_mse_ref.json "hetctl" held_default H5 R 12.0). Joaquin 2026-11-04 (plan catalog_coverage step 45).
 
     python3 analysis/catalog_v4/het_oneloop.py pull     one read-only `site run` on CC-IN2P3 -> data/het_oneloop_reads.json
+    python3 analysis/catalog_v4/het_oneloop.py signhead_pull   step 56: logs of its runs -> data/reads/<run>_{axis,val,sign}.json
+    python3 analysis/catalog_v4/het_oneloop.py signhead        step 56's read -> data/het_signhead.json
     python3 analysis/catalog_v4/het_oneloop.py          the summary -> data/het_oneloop.json, figs/het_oneloop.{png,pdf}
 
 pull reads, for every share arm of both losses (control, 0.50, 0.25; seeds 42 and 43), the zero-shot predictions the
@@ -334,8 +336,196 @@ def figure(rows):
     ps.save(fig, os.path.join(FIGS, "het_oneloop"))
 
 
+# step 56 (D287/D288; design passed 2026-11-05T03:55): het + sign head against the het magnitude reference, seed-paired
+SIGNHEAD = {"arm": ("FA-ccin2p3-18b98b55", "FA-ccin2p3-b2538139", "FA-ccin2p3-66c83df6", "FA-ccin2p3-69001455"),
+            "ref": MAG + ("FA-ccin2p3-0208896e", "FA-ccin2p3-8ddc490b"),     # v4_het_control_magnitude[_seed2-4]
+            # the MSE control's training runs (their per-validation sign accuracy; REREAD sources of mse_hd5)
+            "mse_train": ("FA-ccin2p3-339ec100", "FA-ccin2p3-380842ed", "FA-ccin2p3-67ca3313", "FA-ccin2p3-e3506d57"),
+            "mse_hd5": ("FA-ccin2p3-dc9feba1", "FA-ccin2p3-af09cad3", "FA-ccin2p3-8833a131", "FA-ccin2p3-481ad196"),
+            # the MSE control's H5_signed reads (analysis/catalog_v3/data/short_reads/<arm>/H5_signed.txt, signext_compare)
+            "mse_h5": ("v4_dimensionless_muon", "v4_dimensionless_muon_seed2", "v4_dimensionless_muon_seed3",
+                       "v4_dimensionless_muon_seed4")}
+SH_SEEDS = (42, 43, 44, 45)
+SH_AXES = ("HD5", "H5", "PP4", "EE4", "HD4", "H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")
+PAIR_GATE = {"HD5": 0.43, "H5": 0.40}     # absolute bound on the sd over classes of the paired ln ratio (design check 3)
+TOL = 1.25                                # magnitude no-worse tolerance on the widened upper end
+
+
+def signhead_pull():
+    """Per run of SIGNHEAD: its job log's ZERO_SHOT, SIGNED_AB and validation lines (site logs), the zero-shot reads per
+    axis (mixture_ab extract -> data/reads/<run>_<axis>.json), the validation curve (mixture_ab val), and the sign
+    reads: HD5 from the ZERO_SHOT records (wrong_sign, wrong_sign_near, neg_share; test split), H5 from the SIGNED_AB
+    lines (signed_ab_score --arm head, val split) -> data/reads/<run>_sign.json"""
+    import re, tempfile
+    from mixture_ab import extract, val
+    tags = "|".join(SH_AXES)
+    pat = re.compile(rf"^(({tags}) ZERO_SHOT |SIGNED_AB |RUN_SUMMARY )|Starting to train for|Val loss \(combined\)|"
+                     r"sign_head: sign accuracy on the")
+    acc_re = re.compile(r"sign accuracy on the (\d+) signed pools: median ([0-9.]+), min ([0-9.]+)")
+    for kind in ("arm", "ref", "mse_hd5", "mse_train"):
+        for run in SIGNHEAD[kind]:
+            if kind == "ref" and run in MAG and os.path.exists(os.path.join(READS, f"{run}_H5.json")):
+                continue                         # seeds 42/43 of the reference were read at step 47
+            txt = subprocess.run(["site", "logs", run, "-n", "3000000"], capture_output=True, text=True,
+                                 timeout=1800).stdout
+            lines = [l for l in txt.splitlines() if pat.search(l)]
+            with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False) as f:
+                f.write("\n".join(lines) + "\n")
+            axes = {"mse_hd5": ("HD5",), "mse_train": ()}.get(kind, SH_AXES)
+            for ax in axes:
+                extract(run, f.name, ax)
+            if kind in ("arm", "ref"):
+                val(run, f.name)
+            # per validation of the training (main block, then the sigma stage): [n signed pools, median, min] accuracy
+            sg = {"HD5": {}, "H5": {}, "val_sign_acc": [[int(m.group(1)), float(m.group(2)), float(m.group(3))]
+                                                        for m in (acc_re.search(l) for l in lines) if m]}
+            for l in lines:
+                if l.startswith("HD5 ZERO_SHOT "):
+                    d = json.loads(l[len("HD5 ZERO_SHOT "):])
+                    if d.get("wrong_sign") is not None:
+                        sg["HD5"][d["probe"]] = {k: d.get(k) for k in ("wrong_sign", "wrong_sign_near", "neg_share", "n_val")}
+                elif l.startswith("SIGNED_AB "):
+                    d = json.loads(l[len("SIGNED_AB "):])
+                    if "wrong_sign" in d:
+                        sg["H5"][d["pool"]] = {k: d.get(k) for k in ("wrong_sign", "wrong_sign_near", "neg_share")}
+            json.dump({"run": run, "source": "site logs ZERO_SHOT/SIGNED_AB lines", **sg},
+                      open(os.path.join(READS, f"{run}_sign.json"), "w"), indent=0, sort_keys=True)
+            os.unlink(f.name)
+            print(run, kind, {k: len(v) for k, v in sg.items()})
+            if kind in ("arm", "mse_train") and not sg["val_sign_acc"]:
+                print(f"WARNING {run}: no 'sign_head: sign accuracy' line in its log")
+
+
+def _sign_read(run):
+    return json.load(open(os.path.join(READS, f"{run}_sign.json")))
+
+
+def _mse_h5_sign(arm):
+    from signext_compare import signed
+    return signed(arm, ("wrong_sign", "wrong_sign_near", "neg_share"))
+
+
+def _sign_test(k, n):
+    """one-sided sign test: P(at least k of n) under p = 1/2"""
+    from math import comb
+    return sum(comb(n, i) for i in range(k, n + 1)) / 2 ** n if n else 1.0
+
+
+def signhead():
+    """Step 56's read (design passed 2026-11-05T03:55) -> data/het_signhead.json.
+    (1) Magnitude, seed-paired (D288): per probe the ratio arm seed k / reference seed k (mse_logm2_real), per class the
+    geometric mean over its probes, per class the geometric mean over the four pairs, R the median over classes; 95%
+    class bootstrap widened on each side by the standard error over the pairs of the per-pair class-median ln ratio.
+    Pairing gate, on the first pair (seed 42): the sd over classes of the paired ln ratio <= PAIR_GATE (absolute) on
+    HD5 and H5; failed, the read falls back to the unpaired 4-vs-4 contrast (each side's geometric mean over seeds,
+    widened by the reference pair's seed-43-over-42 ratio) and a result inside the tolerance band is UNRESOLVED.
+    (2) Sign: per pool the seed-mean wrong-sign share (whole pool; within a factor 10 of zero beside), arm vs the MSE
+    control paired per pool, one-sided sign test for the arm worse (ties out), and the arm against all-positive (wrong
+    on the pool's negative share) one-sided for the arm better; H5 21 sign-changing pools (val), HD5 its sign-changing
+    classes (test). (3) Beside: PP4, EE4, HD4, H1-H7c paired as (1); blow-ups (mixture_ab.blowups)."""
+    import math
+    from mixture_ab import class_of, load, class_ratios, r_with_interval, blowups
+    cls = class_of()
+    arm, ref = SIGNHEAD["arm"], SIGNHEAD["ref"]
+    out = {"design": "plan catalog_coverage step 56 (D287, D288; passed 2026-11-05T03:55)", "runs": SIGNHEAD,
+           "seeds": SH_SEEDS, "magnitude": {}, "sign": {}}
+    med = lambda num, den, ks: float(np.median(list(class_ratios(num, den, ks, cls).values())))
+    for ax in SH_AXES:
+        a = [load(r, ax) for r in arm]; b = [load(r, ax) for r in ref]
+        ks = sorted(set.intersection(*[set(x) for x in a + b]))
+        per_pair = [class_ratios(a[i], b[i], ks, cls) for i in range(len(SH_SEEDS))]
+        classes = sorted(per_pair[0])
+        lnr = np.array([[math.log(pp[c]) for c in classes] for pp in per_pair])      # pairs x classes
+        paired = {c: math.exp(float(lnr[:, j].mean())) for j, c in enumerate(classes)}
+        pair_meds = [float(np.median(row)) for row in lnr]
+        se = float(np.std(pair_meds, ddof=1) / math.sqrt(len(pair_meds)))
+        x = r_with_interval(paired, math.exp(se))
+        x.update(per_pair_R={str(s): round(math.exp(m), 4) for s, m in zip(SH_SEEDS, pair_meds)},
+                 se_ln_pairs=round(se, 4), n_probes=len(ks),
+                 sd_paired_ln_ratio={str(s): round(float(np.std(lnr[i])), 4) for i, s in enumerate(SH_SEEDS)})
+        side = lambda xs: {k: gm([v[k] for v in xs]) for k in ks}
+        seed_r = med(b[1], b[0], ks)
+        x["unpaired"] = r_with_interval(class_ratios(side(a), side(b), ks, cls), seed_r)
+        x["unpaired"]["R_seed_ref"] = round(seed_r, 4)
+        lnu = [math.log(b[1][k] / b[0][k]) for k in ks]
+        x["ref_seed_ratio_sd_ln_per_class"] = round(float(np.std([math.log(v) for v in
+                                                                  class_ratios(b[1], b[0], ks, cls).values()])), 4)
+        out["magnitude"][ax] = x
+    gate = {ax: out["magnitude"][ax]["sd_paired_ln_ratio"]["42"] <= PAIR_GATE[ax] for ax in PAIR_GATE}
+    out["pairing_gate"] = {"bound": PAIR_GATE, "first_pair_sd": {ax: out["magnitude"][ax]["sd_paired_ln_ratio"]["42"]
+                                                                 for ax in PAIR_GATE}, "passed": all(gate.values())}
+    # sign
+    sa = [_sign_read(r) for r in arm]
+    ctl = {"HD5": [_sign_read(r)["HD5"] for r in SIGNHEAD["mse_hd5"]], "H5": [_mse_h5_sign(m) for m in SIGNHEAD["mse_h5"]]}
+    for ax in ("H5", "HD5"):
+        A = [x[ax] for x in sa]; C = ctl[ax]
+        pools = sorted(set.intersection(*[set(x) for x in A + C]))
+        res = {"n_pools": len(pools)}
+        for which in ("wrong_sign", "wrong_sign_near"):
+            ps = [p for p in pools if all(x[p].get(which) is not None for x in A + C)]
+            am = np.array([np.mean([x[p][which] for x in A]) for p in ps])
+            cm = np.array([np.mean([x[p][which] for x in C]) for p in ps])
+            neg = np.array([np.mean([x[p]["neg_share"] for x in A]) for p in ps])
+            worse, better = int((am > cm).sum()), int((am < cm).sum())
+            r = {"n": len(ps), "arm_worse": worse, "arm_better": better, "ties": len(ps) - worse - better,
+                 "p_arm_worse": round(_sign_test(worse, worse + better), 4),
+                 "median_arm_pct": round(100 * float(np.median(am)), 2) if len(ps) else None,
+                 "median_mse_ctl_pct": round(100 * float(np.median(cm)), 2) if len(ps) else None}
+            if which == "wrong_sign":
+                ap = neg      # all-positive is wrong on the pool's negative events
+                ab, aw = int((am < ap).sum()), int((am > ap).sum())
+                r.update(all_positive_median_pct=round(100 * float(np.median(ap)), 2), arm_better_than_allpos=ab,
+                         arm_worse_than_allpos=aw, p_arm_better_than_allpos=round(_sign_test(ab, ab + aw), 4))
+            r["per_pool_pct"] = {p: [round(100 * float(u), 2), round(100 * float(v), 2)] for p, u, v in zip(ps, am, cm)}
+            res[which] = r
+        res["n_pools_design"] = {"H5": 21, "HD5": 19}[ax]
+        if res["n_pools"] != res["n_pools_design"]:
+            print(f"WARNING sign {ax}: {res['n_pools']} pools read, the design names {res['n_pools_design']}")
+        out["sign"][ax] = res
+    # per-validation median sign accuracy on the signed training pools (measure 3; the NO-SIGN report)
+    acc = lambda runs: [[v[1] for v in _sign_read(r)["val_sign_acc"]] for r in runs]
+    out["val_sign_accuracy"] = {"arm": acc(arm), "mse_control": acc(SIGNHEAD["mse_train"]),
+                                "note": "per run (seeds 42-45), the median over the signed training pools per "
+                                        "validation (experiment.py sign_head line), main block then sigma stage"}
+    out["pairing_gate"]["pair_used"] = "seed 42 (the design: the first pair to finish, seed 42 or 43)"
+    out["blowups"] = blowups(list(arm) + list(ref[2:]))
+    # outcome (design 2026-11-05T03:54)
+    s5, sd5 = out["sign"]["H5"]["wrong_sign"], out["sign"]["HD5"]["wrong_sign"]
+    sign_p = [s5["p_arm_worse"], sd5["p_arm_worse"]]
+    allpos_p = [s5["p_arm_better_than_allpos"], sd5["p_arm_better_than_allpos"]]
+    m5, md5 = out["magnitude"]["H5"], out["magnitude"]["HD5"]
+    use = (lambda m: m) if out["pairing_gate"]["passed"] else (lambda m: m["unpaired"])
+    hi = [use(m)["widened"][1] for m in (md5, m5)]; lo = [use(m)["widened"][0] for m in (md5, m5)]
+    beside_ok = all(out["magnitude"][ax]["widened"][0] <= 1 for ax in ("PP4", "EE4", "H1", "H2", "H2p5", "H3", "H6",
+                                                                        "H7E", "H7c"))
+    v = []
+    if any(p < 0.05 for p in sign_p) or any(p >= 0.05 for p in allpos_p):
+        v.append("NO-SIGN")
+    if any(l > 1 for l in lo):
+        v.append("COST")
+    if any(0.05 <= p < 0.2 for p in sign_p) or any(h > TOL and l <= 1 for h, l in zip(hi, lo)) or \
+            (not out["pairing_gate"]["passed"] and any(l <= 1 <= h or h <= TOL for h, l in zip(hi, lo)) and "COST" not in v):
+        v.append("UNRESOLVED")
+    if not v:
+        v.append("YES" if all(p >= 0.2 for p in sign_p) and all(p < 0.05 for p in allpos_p) and all(h <= TOL for h in hi)
+                 and beside_ok else "UNRESOLVED")
+    out["outcome_inputs"] = {"sign_p_arm_worse": sign_p, "p_better_than_allpos": allpos_p, "mag_widened_hi": hi,
+                             "mag_widened_lo": lo, "paired": out["pairing_gate"]["passed"], "beside_contain_1_or_below": beside_ok}
+    out["verdict_on_reads"] = v
+    out["verdict"] = None if out["blowups"]["flagged"] else v
+    json.dump(out, open(os.path.join(DATA, "het_signhead.json"), "w"), indent=1)
+    print(json.dumps({"pairing": out["pairing_gate"], "outcome": out["outcome_inputs"], "verdict": out["verdict"],
+                      "mag": {ax: [m["R"], m["widened"], m["per_pair_R"]] for ax, m in out["magnitude"].items()},
+                      "sign": {ax: {k: v for k, v in r["wrong_sign"].items() if k != "per_pool_pct"}
+                               for ax, r in out["sign"].items()}}))
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["magnitude"]:
         magnitude()
+    elif sys.argv[1:] == ["signhead_pull"]:
+        signhead_pull()
+    elif sys.argv[1:] == ["signhead"]:
+        signhead()
     else:
         pull() if sys.argv[1:] == ["pull"] else summary()

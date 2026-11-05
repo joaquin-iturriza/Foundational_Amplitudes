@@ -28,13 +28,14 @@ EXT = ("v4_dimensionless_muon_more_signed", "v4_dimensionless_muon_more_signed_s
 AXES = ("H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c")
 
 
-def signed(arm):
+def signed(arm, fields=None):
+    """{pool: wrong_sign} of an arm's H5_signed.txt; with `fields`, {pool: {field: value}} of those record fields"""
     out = {}
     for line in open(os.path.join(READS, arm, "H5_signed.txt")):
         if line.startswith("SIGNED_AB "):
             r = json.loads(line[len("SIGNED_AB "):])
             if "wrong_sign" in r:
-                out[r["pool"]] = r["wrong_sign"]
+                out[r["pool"]] = r["wrong_sign"] if fields is None else {k: r.get(k) for k in fields}
     return out
 
 
