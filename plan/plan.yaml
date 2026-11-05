@@ -2557,7 +2557,6 @@ entries:
   step_waits:
     '7': 'D78: the user''s hold on the full catalog pretraining''s design (step (a) is held there, nothing to launch until
       it is released)'
-    '10': FA-ccin2p3-11fbcd25
   owner:
     agent: a3c87bc016f01a716
     state: working
