@@ -11414,7 +11414,7 @@ entries:
     agent: af3e3405e0def313b
     state: working
     since: '2026-11-05T00:48:17+00:00'
-    state_at: '2026-11-05T00:48:17+00:00'
+    state_at: '2026-11-05T00:55:07.943000+00:00'
     context: 126625
     context_at: '2026-11-05T00:55:09+00:00'
   designs:
