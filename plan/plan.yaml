@@ -5265,6 +5265,18 @@ entries:
     withdrawn_at: '2026-11-04T19:28:52+00:00'
     withdrawn_why: 'D276: the sigma fit is the final part of training, so the reported het. loss is the trained model''s,
       after the sigma fit; the 2026-11-02 reader change took the opposite view and is to be reverted'
+  - ask: 'Sign head with het (D287), magnitude test at 4 seeds cannot resolve a 1.25 no-worse tolerance (pair''s own seed
+      ratio 1.28/1.41): (a) accept ~1.5 tolerance, (b) seed-paired contrast checked on the first pair, or (c) more seeds at
+      ~5 GPU-h per extra pair? And the flat-part candidate change (multichannel: Breit-Wigner channels per s-channel propagator,
+      an initial-state collinear channel, shares adapted by |M|^2): go to implement it in a worktree and run the CPU check
+      on 5 classes, or another route?'
+    at: '2026-11-05T02:15:52+00:00'
+    searched: D287 asks for the combination but no seed count or tolerance; seeds/tolerance and the sampling redesign are
+      Joaquin's (scope rule; 'we are not done talking about the sampling')
+    blocks: steps 56 and 57 only
+    blocks_steps: &id001
+    - 56
+    - 57
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -10164,6 +10176,16 @@ entries:
       analysis/catalog_v4/long_hpo_landscape.py, analysis/catalog_v4/data/length_x16_over_x4.json, analysis/catalog_v4/data/het_magnitude.json,
       analysis/catalog_v4/data/sampling_example.json
     written: '2026-11-04T21:46:54+00:00'
+  ask: 'Sign head with het (D287), magnitude test at 4 seeds cannot resolve a 1.25 no-worse tolerance (pair''s own seed ratio
+    1.28/1.41): (a) accept ~1.5 tolerance, (b) seed-paired contrast checked on the first pair, or (c) more seeds at ~5 GPU-h
+    per extra pair? And the flat-part candidate change (multichannel: Breit-Wigner channels per s-channel propagator, an initial-state
+    collinear channel, shares adapted by |M|^2): go to implement it in a worktree and run the CPU check on 5 classes, or another
+    route?'
+  waiting_since: '2026-11-05T02:15:52+00:00'
+  searched: D287 asks for the combination but no seed count or tolerance; seeds/tolerance and the sampling redesign are Joaquin's
+    (scope rule; 'we are not done talking about the sampling')
+  blocks: steps 56 and 57 only
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -11618,7 +11640,7 @@ entries:
       D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
       change the scope)'
     blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
-    blocks_steps: &id001 []
+    blocks_steps: &id002 []
   owner:
     agent: af3e3405e0def313b
     state: working
@@ -12287,7 +12309,7 @@ entries:
     D282 approves the idea with short runs, no GPU-h figure, nothing covers 95 GPU-h; scope of which changes is his (never
     change the scope)'
   blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
-  blocks_steps: *id001
+  blocks_steps: *id002
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
