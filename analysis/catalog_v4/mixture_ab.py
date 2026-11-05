@@ -1081,11 +1081,12 @@ for _x, _runs in (("2132", ("FA-ccin2p3-0898a7b0", "FA-ccin2p3-a6834028")),
                          "design": "plan warm_start step 5 (D289), design passed 2026-11-05T04:06"}
 # step 4 (D285, design passed round 2 2026-11-05T04:30): width growth w8 -> w16, the w8 cell's final model grown
 # function-preservingly (models/grow_width.py) and retrained k steps at the w16 cell's setup (GROW_K on
-# v4_het_default25[_seed2], LONG_HEADS=16 LONG_CKPT LONG_MEMMAP, scripts/job_catalog_v3_short.sh @12f51879), every read
+# v4_het_default25[_seed2], LONG_HEADS=16 LONG_CKPT LONG_MEMMAP, scripts/job_catalog_v3_short.sh @2d701b40, the resubmission
+# after the grow_width device fix), every read
 # from the run's own job; B = the w16 cell from scratch, A = the w8 parent; MATCH bar (A/B)^0.3 = 1.19 (width_x1.json)
-WARM["C10w"] = {"W": {533: ("FA-ccin2p3-93b037bb", "FA-ccin2p3-ee8df686"),
-                      1066: ("FA-ccin2p3-69b7e27d", "FA-ccin2p3-6954649e"),
-                      2132: ("FA-ccin2p3-57802518", "FA-ccin2p3-da290610")}, "C": {},
+WARM["C10w"] = {"W": {533: ("FA-ccin2p3-1b390f47", "FA-ccin2p3-ea48ea8c"),
+                      1066: ("FA-ccin2p3-5886a810", "FA-ccin2p3-40c2939a"),
+                      2132: ("FA-ccin2p3-14f50a69", "FA-ccin2p3-da290610")}, "C": {},   # k2132 s43: da290610 failed, its resubmission replaces it
                 "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
                 "design": "plan warm_start step 4 (D285), design passed round 2 2026-11-05T04:30"}
 MATCH_HI, CARRY = 1.35, 0.90
