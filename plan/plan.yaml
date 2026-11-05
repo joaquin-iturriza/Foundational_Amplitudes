@@ -3774,6 +3774,9 @@ entries:
       have ended (they may map the old caches): delete the three superseded caches in /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
       (2eb370fa65ac80a347207f8a, 746f01a3cff290e21aad8172, 85be020425c11d39564f90bf, 23 GB each; /sps/lpnhe 87 GB free on
       2026-11-05 06:15), after checking no live job of any entry uses data.memmap, and report it'
+    60: 'Worktrees left after merge (remove_worktree.sh refused by the permission classifier for agents): worktrees/wt-ws-ckpt,
+      wt-ws-grow (warm_start) and wt-multichannel; Joaquin was given the commands 2026-11-05; remove once he allows or runs
+      them.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -9313,6 +9316,11 @@ entries:
       if:
       - 'no live memmap job: delete and report'
       - 'a live job maps one: wait for its end'
+    60:
+      feeds: keeping the trunk checkout clean so later merges and folds of results are not blocked by stale worktrees
+      if:
+      - 'removed: drop this step'
+      - 'still refused: keep it listed for Joaquin'
   owner:
     agent: a9838af5fa2f7d0bb
     state: working
