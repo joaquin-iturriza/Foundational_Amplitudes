@@ -3745,10 +3745,6 @@ entries:
       us_ddxsu) still leave 2-10% of pp events above the max. Waiting on his call: keep multichannel (MC_TAIL 0.2, collinear
       |eta| bound as stated) and add more candidates at the top (a second channel-share pass weighted to the top bins, or
       a larger oversampling there), or another route'
-    59: 'Step 36 merged (f56fd901, repo-reviewer PASS 070551cf): every memmap cache key changes once. When step 56''s 10 jobs
-      have ended (they may map the old caches): delete the three superseded caches in /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
-      (2eb370fa65ac80a347207f8a, 746f01a3cff290e21aad8172, 85be020425c11d39564f90bf, 23 GB each; /sps/lpnhe 87 GB free on
-      2026-11-05 06:15), after checking no live job of any entry uses data.memmap, and report it'
     60: 'Worktrees left after merge (remove_worktree.sh refused by the permission classifier for agents): worktrees/wt-ws-ckpt,
       wt-ws-grow (warm_start) and wt-multichannel; Joaquin was given the commands 2026-11-05; remove once he allows or runs
       them.'
@@ -8819,7 +8815,6 @@ entries:
     '60': Joaquin running or allowing scripts/remove_worktree.sh
     '58': Joaquin's call on the failed multichannel check (keep multichannel and add candidates at the top, or another route),
       asked 2026-11-05
-    '59': FA-ccin2p3-18b98b55 b2538139 66c83df6 69001455 0208896e 8ddc490b dc9feba1 af09cad3 8833a131 481ad196
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -9263,11 +9258,6 @@ entries:
       if:
       - 'Joaquin picks a route: design it, rerun multichannel_check on the five classes'
       - 'Joaquin says regenerate with multichannel as is: design the regeneration'
-    59:
-      feeds: disk on /sps for the next memmap runs
-      if:
-      - 'no live memmap job: delete and report'
-      - 'a live job maps one: wait for its end'
     60:
       feeds: keeping the trunk checkout clean so later merges and folds of results are not blocked by stale worktrees
       if:
