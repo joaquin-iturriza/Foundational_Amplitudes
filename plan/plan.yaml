@@ -12054,9 +12054,9 @@ entries:
     - 3
   owner:
     agent: a0ca24cd204278468
-    state: working
+    state: stopped
     since: '2026-11-05T05:42:16+00:00'
-    state_at: '2026-11-05T06:05:35+00:00'
+    state_at: '2026-11-05T06:12:47.249000+00:00'
     context: 144784
     context_at: '2026-11-05T06:11:23+00:00'
   designs:
