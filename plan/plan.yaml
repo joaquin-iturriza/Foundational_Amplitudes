@@ -3765,10 +3765,6 @@ entries:
       component (its candidates are half splitter, half RAMBO; bulk and forward use RAMBO only, mg5_pipeline_final.py:3425-3466);
       split the flat part into splitter and RAMBO candidates by replaying the generator''s seeded draws, report the realised
       splitter share among kept flat events, and label every component by what it is.'
-    54: 'Revert the 2026-11-02 reader change (44a02702, analysis/common/readers.py run_metrics) per D276: a het. run''s model
-      is the one after the sigma fit, so its reported het. loss is the final (sigma_stage) value; re-read every het. loss
-      quoted since at every width and length, redraw the width figure and the deck''s width and length slides. The checkpoint
-      rule needs no change.'
     55: 'Per-class read of the 16x-over-4x regression on the held-out 2->5 classes (H2p5, 38 classes, R 3.07 default-sampled
       / 2.28 catalog-sampled, par:v4_length @7c47ca2f): which classes, whether level or shape, against their 4x errors'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
@@ -9064,11 +9060,6 @@ entries:
       if:
       - 'replay recovers it: redraw'
       - 'it cannot: say why and add origin tagging to the generator'
-    54:
-      feeds: 'D276: the sigma fit is the end of training; the post-fit model is the only model'
-      if:
-      - 'reverted and re-read: corrected numbers to Joaquin'
-      - 'a quoted number cannot be re-read: say which'
     55:
       feeds: 'whether the 16x best becomes the foundation pretraining candidate (step 16 outcome: length yes -> to Joaquin)'
       if:
