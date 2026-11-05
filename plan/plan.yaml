@@ -12326,6 +12326,7 @@ entries:
       it is the natural first test. Depth and added inputs have no catalog_v4 from-scratch pair.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
+    '3': sweep ccin2p3:ws_c1_k533_hpo8 (8 trials, jobs 62974834-62974841, 3 waves)
   handoff:
     state: 'Superset design passed 2026-11-04 (C1-C9, gate applied: C8 in, C7 no from-scratch gain, C9 dropped). C1 (default-sampled
       share 0.25, het, warm start from the het control vs from-scratch share 0.25, matched control = same warm start on share
