@@ -10388,6 +10388,22 @@ entries:
       on most 2->5 classes -> report with the length verdict as the 16x cost; a level-fix read (score with a per-process offset,
       already the shape term here: shape-only 16x/4x median 2.60 default / 2.41 catalog) shows the 16x stays worse after removing
       the level.'
+  - at: '2026-11-05T04:50:04+00:00'
+    text: '2026-11-05 step 57 check (multichannel_check.py @3fdb914c -> data/multichannel_check.json; CC CPU jobs FA-ccin2p3-12cb7292
+      37dd5af5 dee4b881 353e30f7 a5325d33 at 5c87b025, each a few min, target 0.25 h): train pools replayed per class, current
+      vs multichannel, seeds 42/43, against the class''s 12000 pp 13 TeV MadEvent events in the catalog''s support. above_max
+      (in-support pp share above the kept flat max), current -> multichannel, seed 42/43: v4_uux_epemg 0.0003/0.0003 -> 0/0;
+      uux_epemvevex 0.488/0.350 -> 0.0002/0; udx_csxvevex 0.386/0.376 -> 0.0005/0.0001; uu_bbxuu 0.344/0.277 -> 0.094/0.021
+      (1.34% of pp events outside the support); us_ddxsu 0.317/0.152 -> 0.104/0.037 (0.29% outside). Plateau rule (every kept
+      0.25-dex bin up to the in-support pp 99.9% quantile >= 0.5 x median): PASS only v4_uux_epemg multichannel (min/plateau
+      0.60/0.60 vs current 0.004/0.009; Z channel). Fails elsewhere in the top, not only the bottom edge: from the pp median
+      bin up every bin is below half for all four (csxvevex/epemvevex 13 bins, bbxuu/ddxsu 18). Cause read from the counts
+      (seed 42): multichannel raises the candidates there (udx_csxvevex at log10|M|^2 -4.5: kept 74 vs 2 current, pp 1026;
+      epemvevex 71 vs 0, pp 1065; uu_bbxuu at 0.0: 14 vs 0, pp 595) but above about -5 (EW) or -1 (QCD 2->4) every candidate
+      is kept and the candidates fall about a decade per dex while the pp events peak there: the flat selection is capped
+      by the candidates'' density, as in the shape study. Verdict by the design: v4_uux_epemg PASS; the four others FAIL (top
+      density; the two QCD 2->4 classes also the max). Open choices to report: MC_TAIL 0.2, collinear |eta| to min(5, kinematic
+      limit at pT 10 GeV).'
   handoff:
     state: '2026-11-05 ~06:00. Step 56 SUBMITTED: sign head under HETEROSC implemented (models/lloca.py sign_channel, readout
       rows [mu, sign, sigma], backbone+RNG bit-equal to het model at a seed; wrappers/experiment/base_experiment splits by
