@@ -8815,6 +8815,8 @@ entries:
     '60': Joaquin running or allowing scripts/remove_worktree.sh
     '58': Joaquin's call on the failed multichannel check (keep multichannel and add candidates at the top, or another route),
       asked 2026-11-05
+    '37': 'Joaquin''s answer on the memmap cache: (A) keep today''s Lorentz draws exactly or (B) per-event keyed draws, asked
+      2026-11-05'
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
