@@ -1,0 +1,73 @@
+{
+ "design": "plan catalog_coverage step 43(2); runs mixture_ab.MIX_HET default25 vs control",
+ "window_rel": 0.02,
+ "EE4": {
+  "n_classes": 115,
+  "R_median": 0.182,
+  "gain_median": 0.729,
+  "c_zero_median": 0.0,
+  "spearman_logR_gain": [
+   0.02,
+   0.8290855852638804
+  ]
+ },
+ "PP4": {
+  "n_classes": 797,
+  "R_median": 0.344,
+  "gain_median": 0.171,
+  "c_zero_median": 0.0,
+  "spearman_logR_gain": [
+   0.14,
+   6.894054106134582e-05
+  ]
+ },
+ "pooled": {
+  "n_classes": 912,
+  "spearman_logR_gain": [
+   -0.037,
+   0.2641950702175985
+  ]
+ },
+ "matched_gain_bins": [
+  {
+   "gain": [
+    0.05,
+    0.13
+   ],
+   "n_EE4": 0,
+   "n_PP4": 228,
+   "R_EE4": null,
+   "R_PP4": 0.273
+  },
+  {
+   "gain": [
+    0.13,
+    0.187
+   ],
+   "n_EE4": 0,
+   "n_PP4": 228,
+   "R_EE4": null,
+   "R_PP4": 0.482
+  },
+  {
+   "gain": [
+    0.187,
+    0.311
+   ],
+   "n_EE4": 0,
+   "n_PP4": 228,
+   "R_EE4": null,
+   "R_PP4": 0.32
+  },
+  {
+   "gain": [
+    0.311,
+    0.983
+   ],
+   "n_EE4": 115,
+   "n_PP4": 113,
+   "R_EE4": 0.182,
+   "R_PP4": 0.396
+  }
+ ]
+}
