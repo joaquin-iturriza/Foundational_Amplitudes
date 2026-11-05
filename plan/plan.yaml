@@ -3745,11 +3745,6 @@ entries:
       pair the candidates (RAMBO, final-final splitter, one-final forward rotation) do not reach. Proposed to Joaquin, not
       built: an initial-state collinear branch of the splitter feeding the flat-in-log|M|^2 candidates, checked by rerunning
       pp_support.py on rebuilt 2->4 pools'
-    49: 'Envelope design (Joaquin 2026-11-04): redesign catalog sampling so that, per pp 13 TeV class, 0% of pp events fall
-      outside the catalog''s support and the catalog density in every (sqrt(s), log|M|^2) bin where pp events lie is at least
-      a stated fraction of the pp density; candidates: a component drawn from the pp sqrt(s) distribution, an initial-state
-      collinear splitter branch for the 2->4 |M|^2 tail. Design only, with the fraction and the measured gap per class, to
-      Joaquin before anything is built.'
     56: 'D287 (Joaquin 2026-11-05: include the sign head with the het loss): implement training.sign_head under HETEROSC (readout
       rows mu, sigma, sign logit; experiment.py:2232 refusal removed; sigma stage trains the sigma row only; parent loading
       by row role; CPU tests) and train the het magnitude control with the sign head on (arm v4_het_control_signhead[_seed2],
@@ -9270,11 +9265,6 @@ entries:
       if:
       - 'Joaquin says build it: implement, regenerate a probe set of the worst 2->4 classes, rerun pp_support'
       - 'Joaquin says no: the share-0.25 default component covers that tail in training; note the gap in results.tex'
-    49:
-      feeds: 'the catalog sampling design (catalog_v4''s successor): whether and how it envelops the pp beam sampling'
-      if:
-      - 'design ready: to Joaquin with the fraction and cost'
-      - 'a candidate cannot reach 0% outside: say which classes and why'
     56:
       feeds: whether the het pretraining carries the sign head on the sign-changing one-loop pools (D287)
       if:
