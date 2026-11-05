@@ -1086,7 +1086,7 @@ for _x, _runs in (("2132", ("FA-ccin2p3-0898a7b0", "FA-ccin2p3-a6834028")),
 # from the run's own job; B = the w16 cell from scratch, A = the w8 parent; MATCH bar (A/B)^0.3 = 1.19 (width_x1.json)
 WARM["C10w"] = {"W": {533: ("FA-ccin2p3-1b390f47", "FA-ccin2p3-ea48ea8c"),
                       1066: ("FA-ccin2p3-5886a810", "FA-ccin2p3-40c2939a"),
-                      2132: ("FA-ccin2p3-14f50a69", "FA-ccin2p3-da290610")}, "C": {},   # k2132 s43: da290610 failed, its resubmission replaces it
+                      2132: ("FA-ccin2p3-14f50a69", "FA-ccin2p3-4e346a51")}, "C": {},
                 "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
                 "design": "plan warm_start step 4 (D285), design passed round 2 2026-11-05T04:30"}
 MATCH_HI, CARRY = 1.35, 0.90
