@@ -13113,6 +13113,17 @@ entries:
       (W/A PP4 0.78 vs B/A 0.45): the objective rewards staying near the parent on the in-distribution validation (sigma calibration
       in the NLL is a candidate cause, not checked) while the held-out reads ask for moving to B. The design''s SHORT branch
       (8-trial extension, lr_scale low edge 0.01) would push further the way that hurt the reads.'
+  - at: '2026-11-05T06:11:56+00:00'
+    text: '2026-11-05: step 4''s six width-growth runs (93b037bb ee8df686 69b7e27d 6954649e 57802518 da290610) failed at model
+      init: models/grow_width.py:79 added CPU-drawn symmetry-breaking noise to the GPU state (RuntimeError cuda:0 vs cpu);
+      the CPU tests could not see it. Fix 2d701b40 (parent tensors and noise moved to the child''s device; noise still drawn
+      on the CPU generator, so seeds give the same noise), tests/test_grow_width.py 5 pass on CPU, repo-reviewer PASS, merged.
+      The two data caches were built before the failure (deda9310, 04fb3b3d: two keys for six runs as designed) and are reused.
+      Resubmitted at 2d701b40, scripts/job_catalog_v3_short.sh arms v4_het_default25[_seed2] with LONG_HEADS=16 LONG_CKPT
+      LONG_MEMMAP GROW_K, mem 46G: k533 1b390f47/ea48ea8c, k1066 5886a810/40c2939a, k2132 s42 14f50a69; k2132 s43 refused
+      by the site''s 60-min GPU-h gate (the failed batch''s estimates still in the window), submitted when it clears (07:38
+      CET). Not tested: the CUDA path itself (no GPU on the laptop); the step-0 validation check of the design catches a wrong
+      operator.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
