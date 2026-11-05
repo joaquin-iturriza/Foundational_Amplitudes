@@ -2594,6 +2594,106 @@ both best checkpoints at the last validation), so $R$ is not yet the asymptotic 
 % claim: held.H2p5.1.1=3.37
 % allow: 0.25 8 16 4 68224 17056 42 95 1 2 because they are the mixture share, the width, the length multiples and steps, the seed, the interval's level, the rule's bar and the bounds of the width-8 seed pair's subscript
 
+\paragraph{Warm start from the pretrained model against pretraining from scratch, share $0.25$ (2026-11-05).}\label{par:v4_warm_start}
+The user's question [D282]: when a change to the setup is good and allows it, does warm-starting an existing pretrained
+model and retraining it briefly under the change match pretraining from scratch with the change, and at what fraction
+of the compute? It decides whether a good change can be added to a pretraining without redoing it. The change here is
+the default-sampled share $0.25$ (het loss), the one catalog\_v4 change measured a gain and kept: from scratch over the
+het control it reads PP4 $R=0.450$ and EE4 $0.223$ (par.~\ref{par:v4_mixture}); no earlier warm start under a changed
+setup compared with the change from scratch was found (the add-W continual pretraining of sec.~\ref{sec:ladder} read
+its parents through fine-tunes, not against the change from scratch). Design (passed review 2026-11-04): the parent A
+is the het control (share $0$, $4264$ steps; FA-ccin2p3-87ea24d0, FA-ccin2p3-321a3de2); the warm start $W_k$ loads the
+parent's model and retrains it $k$ steps on the share-$0.25$ recipe, with the parent's schedule restarted over $k$, a
+fresh optimizer, learning-rate scale $1$, no layer decay and no frozen blocks (untuned for a warm start); its matched
+control $C_k$ is the same warm start on the parent's own recipe (share $0$), so $W_k$ and $C_k$ differ only in the
+change; B is share $0.25$ from scratch ($4264$ steps); $k\in\{533,1066,2132\}$, seeds $42$ and $43$ (each warm start
+from the parent of its seed), $12$ runs (\code{scripts/job\_catalog\_v3\_short.sh} @7f945910, arms
+\code{v4\_het\_warm25\_k*} and \code{v4\_het\_cont\_k*}). Every run is read as its final model (the mean at its best
+checkpoint, then the sigma fit [D276]) on the reads of par.~\ref{par:v4_mixture}, $R$ as there (seeds' geometric mean,
+median over classes of the class's geometric mean of probe ratios, $95\%$ class bootstrap widened by the denominator
+pair's $|\ln R_{\rm seed}|$). Rule fixed before the read, on PP4 and EE4 (all classes): MATCH when the widened upper
+end of $R(W_k/B)$ is at most $1.35$ on both, else SHORT when its widened lower end is above $1$ on either, otherwise
+INCONCLUSIVE (MATCH is tested first); the change is carried when $R(W_k/C_k)\le0.90$ with the widened interval below $1$; YES is the smallest
+$k$ with MATCH and the change carried. All $12$ runs read every probe and none blew up.
+Over the parent, the warm start falls toward the change from scratch as $k$ grows (fig.~\ref{fig:v4_warm_start}): PP4
+$R(W_k/A)=0.646$, $0.543$, $0.425$ and EE4 $0.373$, $0.285$, $0.229$ at $k=533$, $1066$, $2132$, against B's $0.450$ and
+$0.223$, while the matched control barely moves (PP4 $1.02$, $0.94$, $0.81$; EE4 $1.05$, $0.96$, $0.85$). Against the
+change from scratch, $R(W_k/B)$ is PP4 $1.33$ ($[1.30, 1.37]$), $1.15$ ($[1.13, 1.18]$), $0.95$ ($[0.94, 0.97]$) and
+EE4 $1.51$ ($[1.37, 1.71]$), $1.23$ ($[1.14, 1.33]$), $1.01$ ($[0.96, 1.07]$). The change is carried at every $k$
+($R(W_k/C_k)$ PP4 $0.62$, $0.59$, $0.56$; EE4 $0.36$, $0.30$, $0.27$). The outcome took the YES branch at $k=1066$, a
+quarter of a pretraining's steps: SHORT at $533$, MATCH at $1066$ and $2132$. The MATCH at $1066$ is the $1.35$
+equivalence bound's, not equality: there the warm start is still resolved worse than from scratch on both reads
+($15\%$ on PP4, $23\%$ on EE4, widened lower ends $1.13$ and $1.14$) and on the default-sampled held-out pool ($1.08$,
+$[1.03, 1.14]$); it equals the change from scratch only at $k=2132$, half a pretraining, where the held-out pool reads
+$0.94$ ($[0.89, 0.99]$). As the share of the from-scratch gain reached, $g_k=\ln R(W_k/A)/\ln R(B/A)$: PP4 $0.55$,
+$0.76$, $1.07$, EE4 $0.66$, $0.84$, $0.98$. Caveats: two seeds; the schedule is the parent's restarted and untuned,
+so a tuned warm start may get there sooner; the total compute of the warm-started model is the parent's $4264$ steps
+plus $k$, which pays off only when the parent already exists.
+This is the first change of the widened design (D282, every change tried that allows a warm start): the other
+data changes and the one-loop target change wait on the user's go for their GPU cost, and the loss change is not run
+because its from-scratch pair shows no gain on its deciding read; the answer here holds for this data change only.
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1 @f0015680
+% claim: B_over_A.PP4=0.450
+% claim: B_over_A.EE4=0.223
+% claim: k.533.W_over_A.PP4.0=0.646
+% claim: k.1066.W_over_A.PP4.0=0.543
+% claim: k.2132.W_over_A.PP4.0=0.425
+% claim: k.533.W_over_A.EE4.0=0.373
+% claim: k.1066.W_over_A.EE4.0=0.285
+% claim: k.2132.W_over_A.EE4.0=0.229
+% claim: k.533.C_over_A.PP4.0=1.02
+% claim: k.1066.C_over_A.PP4.0=0.94
+% claim: k.2132.C_over_A.PP4.0=0.81
+% claim: k.533.C_over_A.EE4.0=1.05
+% claim: k.1066.C_over_A.EE4.0=0.96
+% claim: k.2132.C_over_A.EE4.0=0.85
+% claim: k.533.W_over_B.PP4.0=1.33
+% claim: k.533.W_over_B.PP4.1.0=1.30
+% claim: k.533.W_over_B.PP4.1.1=1.37
+% claim: k.1066.W_over_B.PP4.0=1.15
+% claim: k.1066.W_over_B.PP4.1.0=1.13
+% claim: k.1066.W_over_B.PP4.1.1=1.18
+% claim: k.2132.W_over_B.PP4.0=0.95
+% claim: k.2132.W_over_B.PP4.1.0=0.94
+% claim: k.2132.W_over_B.PP4.1.1=0.97
+% claim: k.533.W_over_B.EE4.0=1.51
+% claim: k.533.W_over_B.EE4.1.0=1.37
+% claim: k.533.W_over_B.EE4.1.1=1.71
+% claim: k.1066.W_over_B.EE4.0=1.23
+% claim: k.1066.W_over_B.EE4.1.0=1.14
+% claim: k.1066.W_over_B.EE4.1.1=1.33
+% claim: k.2132.W_over_B.EE4.0=1.01
+% claim: k.2132.W_over_B.EE4.1.0=0.96
+% claim: k.2132.W_over_B.EE4.1.1=1.07
+% claim: k.533.W_over_C.PP4.0=0.62
+% claim: k.1066.W_over_C.PP4.0=0.59
+% claim: k.2132.W_over_C.PP4.0=0.56
+% claim: k.533.W_over_C.EE4.0=0.36
+% claim: k.1066.W_over_C.EE4.0=0.30
+% claim: k.2132.W_over_C.EE4.0=0.27
+% claim: k.1066.W_over_B.held_default.0=1.08
+% claim: k.1066.W_over_B.held_default.1.0=1.03
+% claim: k.1066.W_over_B.held_default.1.1=1.14
+% claim: k.2132.W_over_B.held_default.0=0.94
+% claim: k.2132.W_over_B.held_default.1.0=0.89
+% claim: k.2132.W_over_B.held_default.1.1=0.99
+% claim: k.533.g.PP4=0.55
+% claim: k.1066.g.PP4=0.76
+% claim: k.2132.g.PP4=1.07
+% claim: k.533.g.EE4=0.66
+% claim: k.1066.g.EE4=0.84
+% claim: k.2132.g.EE4=0.98
+% allow: 0.25 0 4264 533 1066 2132 42 43 12 1 95 1.35 0.90 15 23 7f945910 because they are the commit of the job script, the share, the steps, the k values, the seeds, the run count, the rule's bars and interval level, and the rounded excess of R(W/B) at k=1066 (1.15, 1.23)
+\begin{figure}[ht]
+\centering
+\includegraphics{../analysis/catalog_v4/figs/warm_start_C1.pdf}
+% src: python3 analysis/catalog_v4/plot_warm_start.py C1 @f0015680
+\caption{Warm start from the het control (share $0$) against share $0.25$ from scratch: $R$ over the parent on PP4
+(left) and EE4 (right), all classes, against $k/4264$; circles the warm start on share $0.25$ ($W_k$), squares the same
+warm start on share $0$ ($C_k$), dashed the change from scratch (B), dotted the parent; bars the widened $95\%$ class
+bootstrap; seeds $42$ and $43$ combined; the two series are offset by $\pm3\%$ in $k$ for legibility.}\label{fig:v4_warm_start}
+\end{figure}
+
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
 tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
