@@ -4142,7 +4142,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: 5141135a
+    commit: 2d54636f
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4436,6 +4436,7 @@ entries:
     - analysis/catalog_v4/data/short_run_bias_size.json
     - analysis/catalog_v4/data/size_fit.json
     - analysis/catalog_v4/data/validation.json
+    - analysis/catalog_v4/ee_gain.py
     - analysis/catalog_v4/fig_signext.py
     - analysis/catalog_v4/figs/census_diagrams.png
     - analysis/catalog_v4/figs/classes_roles.png
