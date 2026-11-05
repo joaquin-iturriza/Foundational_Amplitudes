@@ -12647,6 +12647,7 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': FA-ccin2p3-56cca07a FA-ccin2p3-75d28cb4
+    '5': FA-ccin2p3-0898a7b0 FA-ccin2p3-a6834028 FA-ccin2p3-2a27e8a2 FA-ccin2p3-0259e865 FA-ccin2p3-dd32a907 FA-ccin2p3-70c28bd9
   handoff:
     state: 'C1 done and written up (par:v4_warm_start @1258ef73): untuned restarted schedule YES at k=1066 by the 1.35 bound
       (still resolved worse), equal at k=2132. Step 3 (D284): sweep ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
