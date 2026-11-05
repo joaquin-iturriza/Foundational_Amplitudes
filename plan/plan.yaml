@@ -12576,6 +12576,63 @@ entries:
       results.tex, plan.yaml, decisions for grow, widen, hypercloning, net2, function-preserving, width growth); het loss
       and B''s preprocessing are kept; the reads are C1''s PP4/EE4 plus the default- and catalog-sampled held-out reads; no
       sweep; 13.1 GPU-h.'
+  - at: '2026-11-05T04:30:30+00:00'
+    question: 'D285, the first shape-changing case: for the width change (muP LLoCa width 8 -> 16 heads, same data, steps
+      and HPs), does a width-16 model grown function-preservingly from the trained width-8 model and retrained k steps reach
+      width 16 trained from scratch, and at which k (fraction of the 4264 from-scratch steps)?'
+    prior: 'par:v4_warm_start C1 (@1258ef73, same-shape change: share 0.25): untuned restarted schedule R(W_k/B) k=533/1066/2132
+      PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01 (SHORT, MATCH, MATCH); step 3 tuned k=533 (hp_1860) confirmations in flight.
+      Width cells of catalog_coverage (whole catalog_v4 training set, memmap, share-0.25 default mixture, 4264 steps, base
+      HPs, het): w8 804a65bc/66e8c31f, w16 493c98db/7288b3fe, w32 e26059bf/fd7fc137; width 16 over 8 (analysis/catalog_v4/data/width_x1.json)
+      PP4 R 0.565 [0.522, 0.614], EE4 0.562 [0.512, 0.649]. Today base_experiment._load_pretrained_weights loads strictly
+      (a width change errors) or, with reset_output_head, re-initialises shape-mismatched tensors at random: no function-preserving
+      path. Literature (web-checked 2026-11-05): HyperCloning (Samragh et al. 2024 arXiv:2409.12903, function-preserving widening,
+      duplicated units need noise to break symmetry), MSG (Yao et al. 2023 arXiv:2305.02869). No width growth found in results.tex,
+      the plan or site decisions (searched: net2, hypercloning, width growth, grow, widen, function-preserving).'
+    measure: 'As C1 (mixture_ab.py warm, a new change entry C10w): each warm run''s final model after its own sigma stage
+      (D276); zero-shot MSE of log|M|^2 per probe on PP4 and EE4 (all classes), beside the held-out default-sampled and catalog-sampled
+      pooled reads; R(W_k/B) = median over classes of the class geometric mean of the probes'' two-seed geometric mean ratios,
+      95% class bootstrap widened by the pair''s |ln R_seed|; g_k = ln(A/W_k)/ln(A/B), the share of the width gain reached,
+      A the w8 parent. Before any job: the growth operator''s exactness on CPU (tests/test_grow_width.py: grown w16 output
+      equals the w8 output to 1e-5 on random events without noise, to 1e-3 with the symmetry-breaking noise); on site, each
+      warm run''s step-0 validation val_loss_no_reg equals the parent''s best within 0.01 (logged, checked before reading).'
+    check: 'The read moves with the start''s quality at fixed reads on C1: R(W/B) at k=533/1066/2132 PP4 1.33/1.15/0.95, EE4
+      1.51/1.23/1.01, widened intervals not overlapping (warm_start_C1.json). The change itself moves it on the deciding reads:
+      w16 over w8 from scratch PP4 0.565 [0.522, 0.614], EE4 0.562 [0.512, 0.649] (width_x1.json), so A/B = 1.77 and g_k is
+      resolved. Seed spread of unpaired warm pairs 15-18% PP4, 7-10% EE4 (C1''s C_k R_seed), carried in the widening. Not
+      checked: a grown model''s read (none exists).'
+    fixed: 'Parent A: the w8 width cells after their sigma stage (runs/catalog_v4_long/v4_het_default25[_seed2]_w8_x1, final
+      model), seed s from parent at seed s. Child: B''s exact setup (job_catalog_v3_short.sh v4_het_default25 with LONG_HEADS=16
+      LONG_CKPT=true LONG_MEMMAP=true: whole training set, share-0.25 recipe, het, base HPs, validate_frac 0.02), only the
+      steps (k) and the start differ; schedule restarted as C1''s untuned arms (lr_scale 1, layer_decay 1, fresh optimizer,
+      cosine with the base warmup), target_stats parent, offshell_stats parent. Growth (new fine_tune.grow_width, models/grow_width.py,
+      called in base_experiment._load_pretrained_weights): every residual-stream channel, attention head (per-head dim fixed;
+      qkv rows laid out (3, d, H), head innermost) and MLP hidden unit duplicated, each consumer''s fan-in weights halved,
+      MuReadout''s columns copied unhalved (its 1/width_mult doubles), the second copies'' incoming weights perturbed by noise
+      1e-3 x the child''s init std of that tensor; muP base shapes of the w16 model. k in {533, 1066, 2132}, the C1 grid.'
+    control: 'B: w16 from scratch at the same seed (493c98db seed 42, 7288b3fe seed 43), the run each W_k is read against;
+      A (w8 parent) for g_k. No matched same-width continuation (D286).'
+    seeds: '42 and 43 (each from the parent at its seed). 6 runs: per run training k x 1.63 s/step (B''s measured w16 rate,
+      121.05 min for 4264 steps in out_0.log of 493c98db) + 0.47 h start-up and evaluation + 0.15 h sigma stage + 1.0 h reads
+      (B''s job 3.63 h minus its 2.49 h experiment and 0.15 h sigma stage) = 1.86, 2.10, 2.59 h for k=533/1066/2132; x2 seeds
+      = 13.1 GPU-h on CC-IN2P3, limits with 1.25 margin 2:20, 2:40, 3:15. Disk: the memmap cache key (data_mmap.init_data_recipes_mmap
+      key_doc) holds code hash, pools, frozen stats, the torch RNG state at load (data load precedes model build, so it is
+      the seed''s) and, for a fine-tune start, the offshell ft_mode and parent stats; it holds neither the steps nor num_heads.
+      So the three k at one seed share one key and B''s caches (746f01a3, 85be0204, 2eb370fa) are not reused: 2 new caches
+      of about 20 GB (the 2026-11-01 measure), one builder per key under dir_lock while the others wait. Total: 40 GB caches
+      + 6 runs x 0.5 GB + step 5''s 1.5 GB = 44.5 GB against 88 GB free on /sps/lpnhe (df 2026-11-05); the shared key is confirmed
+      by the first jobs'' ''data.memmap: opening the cache <key>'' lines (two keys for six runs), and the caches are deleted
+      after the reads (our own, cheap to rebuild). Code (grow_width, arms v4_het_default25_w16_grow_k<k>[_seed2], CPU test)
+      in a worktree, repo-reviewed before the jobs.'
+    outcome: 'A bar relative to this change''s gap, fixed before the read, on PP4 and EE4 (all classes): MATCH when the widened
+      upper end of R(W_k/B) is at most (A/B)^0.3 = 1.19 on both (A/B = 1.77 on each, width_x1.json; at that end at least 70%
+      of ln(A/B) is recovered), else SHORT when its widened lower end is above 1 on either, otherwise INCONCLUSIVE; YES is
+      the smallest k with MATCH; reported with g_k and the compute fraction (k x 1.63 s over 4264 x 1.63 s; the parent''s
+      4264 x 0.93 s stated beside). YES: width growth joins the warm-startable changes (a w16 pretraining from the w8 one
+      at that fraction); next the w16->w32 pair (e26059bf/fd7fc137) on the same rule. SHORT at every k: growth recovers less
+      than needed; the 2132 point says whether any k does, and the step-0 equality rules out a broken operator; tuning (D284''s
+      sweep over the fine-tune space) is the next call. A step-0 validation off the parent''s by more than 0.01: the operator
+      is wrong, no read, fix and rerun.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
