@@ -5284,9 +5284,17 @@ entries:
       D147 are cache deletions; nothing on augmentation draws or reproducibility); plan steps 37 and 38 ask for both 'exactly
       the transform it sees today' and 'per-event keyed draws', which cannot both hold
     blocks: the redesign of the memmap cache (steps 37, 38); step 36 (code hash) goes ahead
-    blocks_steps: &id001
+    blocks_steps:
     - 37
     - 38
+  - ask: 'Multichannel candidate check failed the plateau rule on 4 of 5 classes (it reaches the pp max on the electroweak
+      classes but too thinly at the top): keep multichannel and add candidates at the top (a second share pass weighted to
+      the top bins, or more oversampling there), or another route?'
+    at: '2026-11-05T06:12:16+00:00'
+    searched: D288 approved building and checking it; no decision on what follows a failed check
+    blocks: step 58 only
+    blocks_steps: &id001
+    - 58
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -10556,21 +10564,12 @@ entries:
       data_mmap.py, tests/test_mmap_code_hash.py, scripts/job_catalog_v3_short.sh (SHORT_MEMMAP, SHORT_RERUN), docs/results.tex
       par:v4_width, ~/.local/bin/site (cmd_run options)
     written: '2026-11-05T05:33:08+00:00'
-  ask: 'The memmap cache redesign (one cache for every seed, your ''one cache per seed is just dumb''): the random Lorentz
-    augmentation can''t be redrawn per event at read time and still be the transform a run gets today, because rand_lorentz
-    draws a whole pool at once (truncated-Gaussian boosts by rejection, then rotations), so where one event''s numbers sit
-    in the random stream depends on the whole pool. Two ways: (A) keep today''s draws exactly: the shared cache holds the
-    momenta before augmentation; each run replays its pools'' draws when it opens the cache (a few minutes) and writes its
-    own augmented momenta to node-local disk for that job only (about 10 GB, deleted at the end). Runs stay bitwise equal
-    to the in-memory path and to past runs at the same seed. (B) per-event keyed draws: each event''s transform comes from
-    (seed, pool, event index), applied per batch in both the memmap and in-memory paths. Same distribution, nothing per seed
-    on disk, no replay; but a new run at a given seed sees different draws (and a different model init) than an old run at
-    that seed, so new and old runs are no longer bitwise comparable, only statistically. Which do you want?'
-  waiting_since: '2026-11-05T05:04:39+00:00'
-  searched: CLAUDE.md (no rule on bitwise reproducibility against past runs) and site decisions --project FA (D84, D103, D147
-    are cache deletions; nothing on augmentation draws or reproducibility); plan steps 37 and 38 ask for both 'exactly the
-    transform it sees today' and 'per-event keyed draws', which cannot both hold
-  blocks: the redesign of the memmap cache (steps 37, 38); step 36 (code hash) goes ahead
+  ask: 'Multichannel candidate check failed the plateau rule on 4 of 5 classes (it reaches the pp max on the electroweak classes
+    but too thinly at the top): keep multichannel and add candidates at the top (a second share pass weighted to the top bins,
+    or more oversampling there), or another route?'
+  waiting_since: '2026-11-05T06:12:16+00:00'
+  searched: D288 approved building and checking it; no decision on what follows a failed check
+  blocks: step 58 only
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
