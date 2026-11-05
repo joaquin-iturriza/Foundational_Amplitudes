@@ -10398,6 +10398,13 @@ entries:
       over all 8 runs fails (L_inf -> 0, chi2r 2851 at 2% errors); per axis: width alpha 0.59 L_inf 0.011 chi2r 18; length
       alpha 1.56 L_inf 0.011 chi2r 5.2 (1 dof). At about equal C, 16x w8 0.0123 vs w32 0.027-0.029: steps buy more than width
       (length tuned, widths not).'
+  - at: '2026-11-05T05:00:53+00:00'
+    text: '2026-11-05 step 39(d): the 1x width cells'' limits overshot (w32 limit 37 h against 4.04/4.09 h measured). Measured
+      training wall on one V100 at 4264 steps, whole catalog_v4 default25 set, memmap, het (size_mse.json ''Finished training''
+      minutes, main block only): w8 1.160/1.164 h (0.98 s/step), w16 2.018/2.004 h (1.70 s/step), w32 4.086/4.044 h (3.43
+      s/step); per doubling of width x1.73 then x2.02, not the overshooting width/checkpointing factor used then. Next width
+      batch: time per unit from these runs (+ cache build 933-980 s and the reads from tools/short_wall.py), not a scaled
+      estimate.'
   handoff:
     state: '2026-11-05 ~06:40. Done this turn: step 54 (20448b14: run_metrics reads the sigma stage again per D276; width_x1.json
       re-read; width_x1_loss and length_w8_curves redrawn with sigma-stage tails; deck talks/progress_nov2026 rebuilt); step
