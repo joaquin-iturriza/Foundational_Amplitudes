@@ -8742,6 +8742,34 @@ entries:
       the in-memory one on CPU (test_memmap_data section 2 on this run''s config) before any further memmap run. Between:
       report as unresolved with the numbers. Cost: 2 GPU jobs, about 2.7 h of work each (4264 x 1.01 s + 2171 probes x 1.45
       s + sigma stage 20 min + start-up 15 min + a 1e4 cache build), limit 03:50:00, about 7 GPU-h.'
+    fix_at: '2026-11-05T05:18:47+00:00'
+    fix: '(1) Matched control: the control is the in-memory pair of 2026-10-31 (FA-ccin2p3-f0156d88/df858d33) at an older
+      commit and on an unrecorded GPU, while the memmap jobs would run at c04f1e82 on partition gpu_v100,gpu_h100 (whichever
+      starts first; TF32 is active on H100, and results.tex sec:tf32-a100 says the spread between GPUs is larger than on one
+      GPU). Training-path commits landed since the control (9a1a4aae sign head readout, 4b0996d6 het mu-MSE after the sign
+      split, f9822972 signed_magnitude_target, 8a18b4ec save_model_at_steps, ec21d8d8 grow_width, f0142f19 memmap dimless/orders).
+      So the memmap arm differs from its control in the loader, the code version and possibly the GPU. Fix: pin the GPU type
+      of the control (read it from the control''s node, ccwgslurm0112 for 62899732) and add the in-memory twin of each seed
+      at the same commit on the same GPU type, run beside the memmap pair; or show a training-path diff of zero between the
+      control''s commit and the launch commit. (3) Spread: the bands (|delta het NLL| <= 0.008, R within [1/1.07, 1.07]) assume
+      a same-seed rerun differs only by small GPU nondeterminism, but that spread is measured in results.tex and it is large:
+      a catalog trial rerun at its own HPs and seed moved 0.054 -> 0.068 (25%) from GPU nondeterminism (results.tex ~l.10546),
+      and per-process reruns moved 0.43-2.5x (~l.11684). The 0.016 used to set the NLL band is the seed-to-seed difference
+      of the full cells, not a same-seed rerun. With a same-seed spread near the seed ratio 1.14, an innocent loader fails
+      the 1.07 band. Fix: the in-memory same-seed reruns of fix (1) measure the same-seed spread for this measure at this
+      horizon (2 more jobs, about 5.4 GPU-h, about 12.5 GPU-h in all); set the bands from that spread and against the 1.39
+      PP4 gap the test is meant to explain (e.g. loader implicated if memmap/in-memory R on PP4 is beyond the rerun pair''s
+      ratio on both seeds, toward the full cells'' 1.39). (4) Outcome: restate yes/no/between with those bands; as written,
+      ''beyond the bounds toward the full cells'' on either seed sends you to a bisection that GPU noise alone could trigger,
+      and ''between'' is not defined. (14) Disk: not stated. Read 2026-11-05: /sps/lpnhe 87 GB free, the existing full memmap
+      caches 23 GB each (three of them). The cache key holds the caps and rng_in (data_mmap.py key_doc), so seeds 42 and 43
+      may build two caches; state the 1e4 cache''s size (from the full cache scaled by the cap, then read on the first job)
+      and whether the two seeds share one, against the free disk. Also: the control job 62899732 hit its time limit in its
+      PP4 read (its PP4 numbers come from rereads); size the limit (03:50 asked) so this run''s reads finish, or plan the
+      rereads. Passed: 2 (PP4 MSE 0.0876 vs 0.1216, ratio 1.39 against the seed ratio 1.14, arms_vs_het_control.json), 5 (searched
+      results.tex memmap/memory-mapped/loading path, site decisions memmap/in-memory/1e4/events per process: no earlier run
+      separates the two keys), 6, 7, 8, 9 (het loss, D71), 10 (PP4, EE4, held default as the control''s reads), 11, 12 (only
+      data.memmap moves in the script diff), 13 (no sweep).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
