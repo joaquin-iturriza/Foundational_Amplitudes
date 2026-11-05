@@ -3804,6 +3804,7 @@ entries:
     - FA-ccin2p3-10fd5e1a
     - FA-ccin2p3-11f983f4
     - FA-ccin2p3-12ace4c5
+    - FA-ccin2p3-12cb7292
     - FA-ccin2p3-13f9362e
     - FA-ccin2p3-144e2111
     - FA-ccin2p3-14fd54c7
@@ -3856,9 +3857,11 @@ entries:
     - FA-ccin2p3-339ec100
     - FA-ccin2p3-346fa3ff
     - FA-ccin2p3-34cd2590
+    - FA-ccin2p3-353e30f7
     - FA-ccin2p3-364000a3
     - FA-ccin2p3-3674cf83
     - FA-ccin2p3-37b4f377
+    - FA-ccin2p3-37dd5af5
     - FA-ccin2p3-37e06bc5
     - FA-ccin2p3-380842ed
     - FA-ccin2p3-38813a02
@@ -4030,6 +4033,7 @@ entries:
     - FA-ccin2p3-a30c4ec3
     - FA-ccin2p3-a387df71
     - FA-ccin2p3-a39b869e
+    - FA-ccin2p3-a5325d33
     - FA-ccin2p3-a5662880
     - FA-ccin2p3-a6d4fa4b
     - FA-ccin2p3-a82278d8
@@ -4107,6 +4111,7 @@ entries:
     - FA-ccin2p3-ddda2922
     - FA-ccin2p3-de1bc0f5
     - FA-ccin2p3-deaa1e84
+    - FA-ccin2p3-dee4b881
     - FA-ccin2p3-df7cc3db
     - FA-ccin2p3-df858d33
     - FA-ccin2p3-dfcae74f
@@ -4161,7 +4166,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: 20448b14
+    commit: 8b7cd708
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
