@@ -2484,6 +2484,81 @@ and more 6-particle training pools are being built.
 % claim: mb.median_abs_resid_parent_step=0.769
 % claim: mb.median_abs_resid_match_mean=2.042
 % allow: 42 43 because they are the seeds
+\paragraph{Width at $1\times$ length on the test and held-out reads, and the compute law (2026-11-05).}\label{par:v4_width}
+The question of catalog\_coverage's width cells [D248], read as information beside the length runs
+(par.~\ref{par:v4_length}): on catalog\_v4 at default share $0.25$ (het loss, the whole training set, $4264$ steps, the
+template's base hyperparameters at every width, one learning rate under $\mu$P), how far do widths $16$ and $32$ lower the
+MSE of $\log|\mathcal M|^2$ against width $8$, and does one law $L(C)=A\,C^{-\alpha}+L_\infty$ hold across width and
+length? Runs: widths $8$, $16$, $32$ on seeds $42$ and $43$ (FA-ccin2p3-804a65bc, FA-ccin2p3-66e8c31f, FA-ccin2p3-493c98db, FA-ccin2p3-7288b3fe,
+FA-ccin2p3-e26059bf, FA-ccin2p3-fd7fc137), each read as its final model (the mean at the best checkpoint, then the sigma fit [D276]). $R$ as
+in par.~\ref{par:v4_length}: the median over classes of the class's geometric mean of width $k$ over width $8$ (seed by
+seed, then the seeds' geometric mean), its $95\%$ class bootstrap widened by the width-$8$ seed pair's
+$|\ln R_{\rm seed}|$; no run blew up (two spiked and recovered, the best checkpoint after the spike). Width $16$: PP4
+$R=0.565$ ($[0.522, 0.614]$, $1301$ classes), EE4 $0.562$ ($[0.512, 0.649]$, $169$), held out default-sampled $0.660$
+($[0.623, 0.707]$, $700$). Width $32$: PP4 $0.370$ ($[0.334, 0.413]$), EE4 $0.374$ ($[0.333, 0.436]$), held out
+default-sampled $0.528$ ($[0.490, 0.572]$). The held-out gain is smaller than the test splits' at both widths; the one-loop
+H5 classes do not move ($0.839$, $[0.713, 1.107]$ at width $32$), and the $2\to5$ H2p5 classes fall only at width $32$
+($0.687$, $[0.512, 0.956]$; $1.03$ at $16$, unresolved), unlike length, which raised them. Compute, $C=6NSB$ ($N$ the
+learnable parameters, $S$ the steps, $B$ the events per step; attention not counted, an estimate), against the
+validation MSE of $\ln|\mathcal M|^2$ over every training pool (geometric mean over pools, from the sigma stage's saved
+predictions): width $8$ $0.0914$ and $0.0944$, $16$ $0.0509$ and $0.0471$, $32$ $0.0288$ and $0.0271$; the $4\times$
+best $0.0206$, the $16\times$ best $0.0123$ (width $8$, seed $42$, each the best of its eight-trial sweep). One law over
+all eight runs does not fit: the floor-aware fit falls to $L_\infty=0$ with $\chi^2_{\rm red}=2851$ (at the fit's
+$2\%$ relative errors). Per axis it does: width at $4264$ steps $\alpha=0.59$, $L_\infty=0.011$
+($\chi^2_{\rm red}=18$, the seed scatter above the $2\%$ errors), length at width $8$ $\alpha=1.56$, $L_\infty=0.011$
+($\chi^2_{\rm red}=5.2$, one degree of freedom, so the floor is not determined). At nearly equal compute the
+$16\times$ width-$8$ run reads $0.0123$ against width $32$'s $0.0271$ and $0.0288$: steps buy far more than width
+here, though the length points are tuned and the width points are not (\code{figs/mse\_vs\_compute}; information,
+widths not tuned per width). It supports par.~\ref{par:v4_length}'s choice of length for the pretraining candidate;
+width is the axis left once the length sweeps converge.
+% src: python3 analysis/catalog_v4/mixture_ab.py width @20448b14
+% claim: arms.w16.PP4.all.R=0.565
+% claim: arms.w16.PP4.all.widened.0=0.522
+% claim: arms.w16.PP4.all.widened.1=0.614
+% claim: arms.w16.PP4.all.n_classes=1301
+% claim: arms.w16.EE4.all.R=0.562
+% claim: arms.w16.EE4.all.widened.0=0.512
+% claim: arms.w16.EE4.all.widened.1=0.649
+% claim: arms.w16.EE4.all.n_classes=169
+% claim: arms.w16.held_default.pooled.R=0.660
+% claim: arms.w16.held_default.pooled.widened.0=0.623
+% claim: arms.w16.held_default.pooled.widened.1=0.707
+% claim: arms.w16.held_default.pooled.n_classes=700
+% claim: arms.w32.PP4.all.R=0.370
+% claim: arms.w32.PP4.all.widened.0=0.334
+% claim: arms.w32.PP4.all.widened.1=0.413
+% claim: arms.w32.EE4.all.R=0.374
+% claim: arms.w32.EE4.all.widened.0=0.333
+% claim: arms.w32.EE4.all.widened.1=0.436
+% claim: arms.w32.held_default.pooled.R=0.528
+% claim: arms.w32.held_default.pooled.widened.0=0.490
+% claim: arms.w32.held_default.pooled.widened.1=0.572
+% claim: arms.w32.held_default.H5.R=0.839
+% claim: arms.w32.held_default.H5.widened.0=0.713
+% claim: arms.w32.held_default.H5.widened.1=1.107
+% claim: arms.w32.held_default.H2p5.R=0.687
+% claim: arms.w32.held_default.H2p5.widened.0=0.512
+% claim: arms.w32.held_default.H2p5.widened.1=0.956
+% claim: arms.w16.held_default.H2p5.R=1.03
+% src: python3 analysis/catalog_v4/size_figs.py fit @3a5131dc
+% claim: mse.w8_s4264_0=0.0914
+% claim: mse.w8_s4264_1=0.0944
+% claim: mse.w16_s4264_2=0.0509
+% claim: mse.w16_s4264_3=0.0471
+% claim: mse.w32_s4264_4=0.0288
+% claim: mse.w32_s4264_5=0.0271
+% claim: mse.w8_s17056_6=0.0206
+% claim: mse.w8_s68224_7=0.0123
+% claim: fit.L_inf=0
+% claim: fit.chi2_red=2851
+% claim: per_axis.width_at_4264_steps.fit.alpha=0.59
+% claim: per_axis.width_at_4264_steps.fit.L_inf=0.011
+% claim: per_axis.width_at_4264_steps.fit.chi2_red=18
+% claim: per_axis.length_at_width_8.fit.alpha=1.56
+% claim: per_axis.length_at_width_8.fit.L_inf=0.011
+% claim: per_axis.length_at_width_8.fit.chi2_red=5.2
+% allow: 0.25 8 16 32 4264 42 43 95 1 6 2 4 because they are the mixture share, the widths, the steps and length multiples, the seeds, the interval's level, the bounds of the width-8 seed pair's subscript, the 6 of the 6NSB estimate and the fit's 2% relative error
+
 \paragraph{Width and length on the held-out multiplicity error (2026-11-04).}\label{par:v4_mult_width_length} The
 first of the two routes left for the held-out multiplicity pools (par.~\ref{par:v4_kshot_spread}), capacity and training
 length, read on the absolute zero-shot error, as the user asked (2026-11-04: ``the gap is not what we care about''):
