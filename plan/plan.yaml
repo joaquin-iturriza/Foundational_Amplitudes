@@ -10251,6 +10251,16 @@ entries:
       once as the rule allows; the remaining choice goes to Joaquin. Sampling proposal recorded as a next step (multichannel
       candidates: Breit-Wigner channels from the diagram sidecars, initial-state collinear channel, channel shares adapted
       by |M|^2; CPU check on 5 classes).'
+  - at: '2026-11-05T04:29:43+00:00'
+    text: '2026-11-05 step 54 done (20448b14): analysis/common/readers.py run_metrics reads the last per_process_metrics.json
+      again, so a het run''s sigma_stage/ (D276); mixture_ab.py width re-read -> data/width_x1.json: end-of-training het loss
+      (best of the sigma stage) w8 -2.8424/-2.8267, w16 -3.2161/-3.2538, w32 -3.5800/-3.6257 (seeds 42/43; before, main block
+      only: -2.8364/-2.8206, -3.2055/-3.2448, -3.5668/-3.6089); per-process median delta NLL over w8: w16 -0.3825/-0.4357
+      (98.4/97.8% of 1153 lower), w32 -0.7774/-0.8445; zero-shot R unchanged (reads untouched). size_figs.py figs: width_x1_loss
+      (y ''validation het. loss, end of training'') and length_w8_curves with the 1x curves continued into their sigma stage
+      and the two long-best trials into their eval jobs'' sigma stages (reads/FA-ccin2p3-6f8a1eed_val.json, 1a46f3e0_val.json,
+      mixture_ab val); deck talks/progress_nov2026 rebuilt with both. No het loss from these runs is quoted in docs/results.tex
+      or the deck text.'
   handoff:
     state: '2026-11-05 ~06:00. Step 56 SUBMITTED: sign head under HETEROSC implemented (models/lloca.py sign_channel, readout
       rows [mu, sign, sigma], backbone+RNG bit-equal to het model at a seed; wrappers/experiment/base_experiment splits by
