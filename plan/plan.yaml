@@ -12324,6 +12324,16 @@ entries:
       noise breaks the symmetry. The one shape change here with a from-scratch pair already on CC is width (1x width cells:
       w8 804a65bc/66e8c31f as parent, w16 493c98db/7288b3fe and w32 e26059bf/fd7fc137 as B, whole training set, memmap), so
       it is the natural first test. Depth and added inputs have no catalog_v4 from-scratch pair.'
+  - at: '2026-11-05T02:15:42+00:00'
+    text: 'Literature checked by web search (2026-11-05, abstracts and full text): Gupta et al. 2023 arXiv:2308.04014 (re-warming
+      to a higher max lr adapts more and forgets more; warmup length has no significant effect; Pythia 410M); Ibrahim et al.
+      2024 arXiv:2403.08763 (lr re-warming + re-decaying + replay matches retraining from scratch; peaks 0.5x-2x the original;
+      keeping or discarding optimizer states makes no difference; infinite schedules as an alternative); Hu et al. 2024 arXiv:2404.06395
+      (MiniCPM: WSD scheduler, a 10% decay suffices to match or beat cosine, 2.5% falls short); Haegele et al. 2024 arXiv:2405.18392
+      (cooldown of 10-20% of steps surpasses cosine; (1-sqrt) beats linear decay; weight averaging reduces the gap but does
+      not match a cooldown). Growth: HyperCloning (Samragh et al. 2024 arXiv:2409.12903, function-preserving widening of a
+      pretrained model), MSG (Yao et al. 2023 arXiv:2305.02869, masked growth operators preserving function whatever the new
+      weights'' init).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': sweep ccin2p3:ws_c1_k533_hpo8 (8 trials, jobs 62974834-62974841, 3 waves)
