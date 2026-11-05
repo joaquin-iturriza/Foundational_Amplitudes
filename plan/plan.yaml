@@ -9315,7 +9315,7 @@ entries:
       - 'a live job maps one: wait for its end'
   owner:
     agent: a9187cc5d541864dd
-    state: working
+    state: closed
     since: '2026-11-05T04:51:53+00:00'
     state_at: '2026-11-05T05:13:24+00:00'
     context: 227818
@@ -10556,33 +10556,28 @@ entries:
       does not explain the EE4 advantage; open: other kinematic coverage (angles: the ee pools'' forward/collinear corners)
       or the per-class target level; not yet tested.'
   handoff:
-    state: '2026-11-05 ~06:40. Done this turn: step 54 (20448b14: run_metrics reads the sigma stage again per D276; width_x1.json
-      re-read; width_x1_loss and length_w8_curves redrawn with sigma-stage tails; deck talks/progress_nov2026 rebuilt); step
-      55 (a0bdee35, length_h2p5.py -> data/length_h2p5.json: the H2p5 16x/4x regression is broad, 37/38 and 38/38 classes,
-      level 78% of the increase on default-sampled, 46% on catalog-sampled); step 57 built, reviewed (repo-reviewer PASS 62c14cd7),
-      merged 2466f283, design PASS (2nd review), check run on CC (5 CPU jobs) -> data/multichannel_check.json @3fdb914c: PASS
-      only v4_uux_epemg; EW classes reach the max but the top density stays capped by candidates; QCD 2->4 still 2-10% above
-      the max; recorded as a new next step for Joaquin''s route call; step 39(a) fixed 8b7cd708. Step 56: het_oneloop.py signhead_pull/signhead
-      modes ready (repo-reviewer PASS; H5 all-positive from scored val rows, h5_neg_pull); its 10 jobs still SUBMITTED on
-      CC at 05:16 (plan wait step 56). NEXT on its RUN_DONE: python3 analysis/catalog_v4/het_oneloop.py signhead_pull, then
-      signhead -> data/het_signhead.json, report per the passed design. Ready and not started: steps 36-38 (memmap cache,
-      freeze lifted since both sweeps ended), 39(b)-(f), 40 (width write-up: width_x1.json now holds sigma-stage het losses;
-      L(C) fit). Worktree worktrees/wt-multichannel is merged but not removed: scripts/remove_worktree.sh was refused by the
-      permission classifier; needs Joaquin''s permission or a manual run.'
-    decisions: 'D276 applied to the readers: a het run''s reported het loss is its sigma stage''s (best checkpoint of the
-      stage; size_figs curves continue into the stage, the long-best trials into their eval jobs'' stages). multichannel:
-      resonance M and G from the entry''s physics (mc_res_params; heavy-quark tops get their own BW), refused without a width;
-      check judged on in-support pp events (design PASS, to be stated to Joaquin); bottom-edge vs top failures located against
-      the pp median. length_h2p5: mse per class geometric (reproduces R), level/shape arithmetic (additive).'
-    ruled_out: 'site run cat for pulling JSON (marker lines lost): analysis/common site_python instead; geometric means of
-      level and shape (do not add)'
-    running: FA-ccin2p3-18b98b55 b2538139 66c83df6 69001455 0208896e 8ddc490b dc9feba1 af09cad3 8833a131 481ad196 (plan wait
-      step 56)
-    files: analysis/common/readers.py (run_metrics, site_python), analysis/catalog_v4/size_figs.py, analysis/catalog_v4/length_h2p5.py,
-      analysis/catalog_v4/het_oneloop.py (signhead), analysis/catalog_v4/multichannel_check.py, scripts/job_multichannel_check.sh,
-      mg5_pipeline_final.py (multichannel), tests/test_multichannel.py, tests/test_sweep_name.py, sweep/generate_sweep.py,
-      data/{width_x1,length_h2p5,multichannel_check}.json
-    written: '2026-11-05T04:50:53+00:00'
+    state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
+      step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
+      my own regression that broke site submit: the argv merge now only for cmd_run), (c) already fixed, (d) finding. Step
+      43(1): loader control running, 4 jobs (memmap 5b5215b6/e184bbc5, in-memory reruns ae39ee5a/75ad7b20; design PASS 2nd
+      review), plan wait step 43; on RUN_DONE: read their PP4/EE4/held with mixture_ab (add a loader mode: R_L = memmap/rerun,
+      R_0 = rerun/10-31 arm f0156d88,df858d33 with PP4 rereads 9538e607,ed96b552), verdict by the design''s rule (CLEAR/IMPLICATED/NOISE-LIMITED/UNRESOLVED);
+      check the reads finished inside 03:50 and the 1e4 cache size. Step 43(2): ee_gain.py @4bf48e6c: sqrt(s) density does
+      not explain the EE4 advantage (finding); next candidate readings untested. Step 59: delete the 3 superseded 23 GB memmap
+      caches once step 56''s jobs end. Step 56''s 10 jobs: 4 done, 6 running at 06:00 (plan wait step 56). Waiting on Joaquin:
+      37/38 (A/B cache, recorded ask), 39(e)(f), 58 (multichannel), 47-53 proposals.'
+    decisions: Per-axis floor laws reported undetermined at 3 compute levels (reviewer); cache key gets species_in and diagram_graphs
+      (reviewer); step 43(1) control is a same-commit same-GPU in-memory rerun pair with bands from the measured rerun spread
+      (design-reviewer FIX then PASS); ee_gain reads the catalog density from val pools (every role samples alike; train pools
+      not kept on CC).
+    ruled_out: one L(C) law across width and length (L_inf -> 0, chi2r 2851); sqrt(s) coverage at the test energies as the
+      cause of EE4's larger default-share gain (no within-set ordering; EE4 still 0.18 vs PP4 0.40 at matched gain)
+    running: FA-ccin2p3-5b5215b6 e184bbc5 ae39ee5a 75ad7b20 (step 43 wait); step 56's FA-ccin2p3-18b98b55 b2538139 66c83df6
+      69001455 0208896e 8ddc490b (step 56 wait)
+    files: analysis/catalog_v4/size_figs.py, analysis/catalog_v4/ee_gain.py, analysis/catalog_v4/data/{size_fit,ee_gain,ee_gain_read}.json,
+      data_mmap.py, tests/test_mmap_code_hash.py, scripts/job_catalog_v3_short.sh (SHORT_MEMMAP, SHORT_RERUN), docs/results.tex
+      par:v4_width, ~/.local/bin/site (cmd_run options)
+    written: '2026-11-05T05:33:08+00:00'
   ask: 'The memmap cache redesign (one cache for every seed, your ''one cache per seed is just dumb''): the random Lorentz
     augmentation can''t be redrawn per event at read time and still be the transform a run gets today, because rand_lorentz
     draws a whole pool at once (truncated-Gaussian boosts by rejection, then rotations), so where one event''s numbers sit
