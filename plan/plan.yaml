@@ -12088,6 +12088,24 @@ entries:
       HPs go to Joaquin. SHORT after 8 trials: extend once by 8 trials (same state) and re-confirm; still SHORT: report best
       W*/B and g, with the WSD cooldown schedule (needs code) as the next call to Joaquin. The best trial''s lr_scale at the
       window''s edge is reported (range extension may move it).'
+    passed_at: '2026-11-05T02:09:51+00:00'
+    reviewer: 'PASS. 1: tuned warm arm against fixed B (share 0.25 from scratch), the tuning is the question (D284 ''until
+      we get relatively close to the result we are trying to match''), no matched control by D286. 2: val reads confirmed
+      (reads/*_val.json, mean-stage best): W533 -2.639/-2.586, W1066 -2.766/-2.686, W2132 -2.899/-2.839, B -2.911/-2.900,
+      monotone with R(W_k/B); sigma stage moves val by <=0.008 and keeps the ranking on all 10 runs, so the sigma-off objective
+      is a fair proxy. 3: gap W533 to B 0.27-0.31 nats vs seed difference 0.011-0.053; C1''s widened intervals at k=1066 ([1.13,1.18]/[1.14,1.33])
+      resolve the 1.35 bound with two seeds; seed-43 rerun is free of best-of-8 selection. 4: MATCH/SHORT stated with actions
+      (INCONCLUSIVE has no action stated: treat as SHORT''s extension). 5: searched results.tex, plan, site decisions for
+      warm start, warm-start, lr_scale, layer_decay, re-warm, rewarm, continual, continued pretrain, muon_hp_ft, fine-tune
+      sweep, WSD, cooldown: only par:v4_warm_start (C1, named) and muon_hp_ft (named; its best lr_scale 0.343, layer_decay
+      0.825, gain 1.19 on catalog_v3 single-process fine-tunes, a different task); no repeat. 7: B from scratch included;
+      D283 others wait per D284. 8: no map. 9: HETEROSC (job_catalog_v3_short.sh v4_het_warm25_k*), D226. 10: reads as C1
+      (PP4, EE4, default- and catalog-sampled held-out). 11: dimensionless emission-scale target (qperp), parent''s stats,
+      settled by D234. 12: only HPs move; k, data, width, recipe fixed. 13: template coupled space (lr via lr_scale, muon
+      wd, reg, warmup, eta_min, EMA) plus rule-4 layer_decay; 8 trials, 3 start-up, waves [3,3,2], gp, 2000 candidates, objective_scale
+      auto, as cov_v4_long_hpo_x4 and D244/D245/D246; the conditional 8-trial extension is backed by D284; about 1.5 h of
+      work in three waves, no deadline given. 14: 130 MB per warm run dir (du, k533 and k533_seed2), in-memory pools, no shared
+      cache; /sps/lpnhe 88 GB free (df 2026-11-05), 10 jobs about 1.3 GB.'
   step_why:
     1:
       feeds: whether the data change can be added to the pretraining by a short warm start (D282)
