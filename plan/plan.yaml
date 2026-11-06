@@ -12020,14 +12020,15 @@ entries:
   decisions:
   - D282
   next:
-    1: C1 written up (par:v4_warm_start @1258ef73); plan done after C2-C8 are run or declined
-    2: 'C2-C8 on Joaquin''s go (open ask): implement their arms (parent, recipe, target_stats per the design), C7/C8 only
-      after catalog_coverage step 47 reads the magnitude het pair and shows a gain'
-    3: 'D284: C1 warm start fixed at k=533 (1/8), single-fidelity DyHPO of the warm arm over the fine-tune space (lr_scale,
-      layer_decay, warmup, eta_min, muon decay, reg, EMA), no matched control (D286); best trial re-run at seeds 42/43 with
-      the full reads, read as W/B; C2-C8 wait until it is done'
-    4: 'D285 width growth w8->w16 read (par:v4_warm_start_grow @97a69764): SHORT at every k (g PP4 -0.01/0.13/0.52). Next
-      is Joaquin''s call: tune the grown warm start (D284-style sweep), try w16->w32, or stop the shape-changing branch'
+    5: '(a) D291: split each ws_c1_k533_hpo8 trial''s validation NLL into the 1/sigma^2-weighted squared-error term and the
+      log sigma term (and the mean''s plain MSE), show which term decides the ranking and whether the MSE alone ranks the
+      trials differently'
+    6: '(b) D291: tune the k=533 warm start toward the held-out reads (objective that follows them, e.g. validation MSE of
+      the mean; the planned lr extension; a WSD cooldown, as judged best), confirm the winner at seeds 42/43 with the full
+      reads, then apply it to the data change (C1, k=533) and to the width growth 8->16'
+    7: '(c) D283: C2-C6 and C8 with the tuned recipe from (b), after (b); estimate to the main session first if above 30 GPU-h'
+    8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
+      validation loss curves side by side, and each arm''s per-class zero-shot MSE'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -13000,26 +13001,26 @@ entries:
       logs; het loss, B''s preprocessing, C1''s reads; no sweep; 13.1 GPU-h. Searched results.tex, plan.yaml, site decisions
       for grow, widen, hypercloning, net2, function-preserving, width growth: none.'
   step_why:
-    1:
-      feeds: whether the data change can be added to the pretraining by a short warm start (D282)
+    5:
+      feeds: why the val_loss_no_reg-tuned k=533 warm start went to low lr and lost on the held-out reads (D284 step 3)
       if:
-      - 'C2-C8 run: extend the write-up per change'
-      - 'Joaquin declines C2-C8: plan done with this write-up'
-    2:
-      feeds: whether warm start reaches scratch across data, loss and target changes (D282 widened)
+      - 'MSE ranks like NLL: the het loss is not the cause; the objective''s in-distribution validation is'
+      - 'MSE ranks differently (high lr better): the sigma term drove the choice; tune on the mean''s MSE'
+    6:
+      feeds: how to tune a warm start so it adapts to a change (D291), before judging any change warm-startable
       if:
-      - 'go: implement, submit at site pick width'
-      - 'no or a subset: record, run what he names'
-    3:
-      feeds: how far a tuned short warm start closes the gap to the change from scratch (D284)
+      - 'a tuning reaches MATCH or clearly beats untuned: it is the tuned recipe for C2-C8 and growth'
+      - 'nothing beats the untuned restarted schedule: untuned stays the recipe, reported with the numbers'
+    7:
+      feeds: whether warm start reaches scratch across data, loss and target changes (D282/D283)
       if:
-      - 'best k=533 trial MATCHes (W/B widened upper <= 1.35 on PP4, EE4): report, aggressive warm start is enough'
-      - 'no MATCH after the sweep: report the best W/B with g, propose schedule change (WSD cooldown) as next call'
-    4:
-      feeds: whether shape-changing changes can also start from the pretrained model (D285)
+      - 'run: extend the write-up per change'
+      - 'budget above 30 GPU-h with no decision covering it: main session asked before submission'
+    8:
+      feeds: how the results are shown to Joaquin (CLAUDE.md figures)
       if:
-      - 'Joaquin asks for tuning or w16->w32: design and run it like step 4'
-      - 'Joaquin stops it: drop this step'
+      - 'drawn: committed png+pdf, referenced in results.tex'
+      - 'a curve missing locally: fetch it from the site'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
