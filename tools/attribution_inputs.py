@@ -450,6 +450,10 @@ def main():
     rng = np.random.default_rng(args.seed)
     dataset_names = list(exp.cfg.data.dataset)
 
+    if getattr(exp, "_mmap_src", None) is not None:
+        # data.memmap (format 3) gathers the particles per batch; this tool reads the whole flat arrays
+        raise SystemExit("attribution_inputs: run it with data.memmap=false (the in-memory path holds the flat "
+                         "arrays it reads; the memmap path gathers them per batch)")
     scale_fm = exp.particles_flat.std(axis=0).astype(np.float32)   # (4,)
     all_props = exp.property_matrix[exp.tokens_flat].astype(np.float32)
     scale_pr = all_props.std(axis=0).astype(np.float32)            # (F,)

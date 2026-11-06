@@ -27,6 +27,8 @@ from multiplicity_extrap import order_identical_particles, fit_affine_multiplici
 
 from lloca.utils.rand_transforms import rand_lorentz
 from lloca.utils.polar_decomposition import restframe_boost
+import keyed_aug
+from keyed_aug import pool_identity
 
 import psutil, os
 
@@ -366,31 +368,31 @@ class AmplitudeExperiment(BaseExperiment):
             f"(seed={self.cfg.data.get('seed', 42)}; couplings on {n_cpl}/{len(names)} datasets)"
         )
 
-    def _boost_augment_momenta(self, particles, n_particles):
-        """COM-boost + random-Lorentz augment a raw momentum block (the
-        equivariant `prepare: lorentz` step). Returns the boosted/augmented
-        momenta as a numpy array (N, n_particles, 4); the global `/std`
-        standardization is applied separately so it can use one train-only scale
-        across all processes (see _init_data_recipes)."""
+    def _boost_com(self, particles, n_particles):
+        """A raw momentum block boosted to the centre-of-mass frame of its two incoming momenta (energies put on
+        shell from the stored masses first), (N, n_particles, 4) float32: the momenta every frame-independent
+        quantity (s_hat, the off-shellness, the target factors) is computed from, and what the augmentation
+        (_augment) transforms. The boost math in float64."""
         particles_t = torch.tensor(particles, dtype=torch.float64)
         particles_t = particles_t.reshape(-1, n_particles, 4)
-
         m2 = particles_t[..., 0] ** 2 - (particles_t[..., 1:] ** 2).sum(dim=-1)
         particles_t[..., 0] = torch.sqrt(
             (particles_t[..., 1:] ** 2).sum(dim=-1) + m2.clamp(min=0)
         )
-
-        lab_particles = particles_t[..., :2, :].sum(dim=-2)
-        to_com = restframe_boost(lab_particles)
-        trafo = rand_lorentz(
-            particles_t.shape[:-2], generator=None, dtype=particles_t.dtype
-        )
-        trafo = torch.einsum("...ij,...jk->...ik", trafo, to_com)
-        particles_t = torch.einsum("...ij,...kj->...ki", trafo, particles_t)
-        # Boost math is done in float64; store float32 — the model trains in
-        # float32 and this halves the in-memory momentum footprint (matters at
-        # the multi-million-event scale of the recipe pools).
+        to_com = restframe_boost(particles_t[..., :2, :].sum(dim=-2))
+        particles_t = torch.einsum("...ij,...kj->...ki", to_com, particles_t)
         return particles_t.numpy().astype(np.float32)
+
+    def _aug_seed(self):
+        """The seed of the per-event augmentation draws (keyed_aug): the run's seed, or when the run has none the
+        torch RNG's initial seed (random per process, as the unseeded draws were)"""
+        return int(self.cfg.seed) if self.cfg.get("seed", None) is not None else int(torch.initial_seed())
+
+    def _model_momenta(self, rec, mom_div=None):
+        """A store record's momenta as the network reads them, in chunks: its centre-of-mass momenta augmented
+        (keyed_aug, per event), per sqrt(s_hat) under dimensionless_inputs, / mom_div when given"""
+        return keyed_aug.model_momenta_chunks(rec["com"], self._aug_seed(), rec["uid"], rs=rec.get("rs"),
+                                              mom_div=mom_div)
 
     def _resolve_amp_orders(self, names):
         """Per-dataset coupling-order vector (see _AMP_ORDER_BY_NAME). An explicit, length-matched
@@ -688,10 +690,9 @@ class AmplitudeExperiment(BaseExperiment):
         is_lloca = self.modelname in (
             "LLOCATransformer", "LLOCAMuPTransformer", "MuPLGATr", "MuPLGATrSlim"
         )
-        LOGGER.info(
-            f"Combined dataset: {self.N_events} events, "
-            f"{self.particles_flat.shape[0]} total particles"
-        )
+        LOGGER.info(f"Combined dataset: {self.N_events} events"
+                    + (" (memmap: particles gathered per batch)" if getattr(self, "_mmap_src", None) is not None
+                       else f", {self.particles_flat.shape[0]} total particles"))
 
         # ------------------------------------------------------------------
         # Set model size — particle feature dimension depends on encoding mode
@@ -1725,8 +1726,12 @@ class AmplitudeExperiment(BaseExperiment):
                     # the causal mask's sequence order (multiplicity_extrap): identical outgoing particles
                     # trade slots, by p.P descending or at random; set before anything reads the momenta
                     particles = order_identical_particles(particles, pdg_ids, _porder, rng=_porder_rng)
+                com = self._boost_com(particles, n_particles)
+                # only the centre-of-mass momenta are kept (GeV): the frame-independent quantities read them, and the
+                # network's momenta (augmented, scaled) are made from them pool by pool at assembly (_model_momenta)
                 store[(role, name)] = {
-                    "momenta": self._boost_augment_momenta(particles, n_particles),
+                    "com":     com,
+                    "uid":     keyed_aug.pool_uid(pool_identity(paths[role][name])),
                     "tokens":  toks,
                     "raw_amp": amplitudes,
                 }
@@ -1757,12 +1762,12 @@ class AmplitudeExperiment(BaseExperiment):
         _dimless = bool(self.cfg.data.get("dimensionless_inputs", False))
         if _dimless:
             for k in store:
-                mm = store[k]["momenta"].astype(np.float64)
-                q = mm[:, 0] + mm[:, 1]
+                cm = store[k]["com"].astype(np.float64)       # s_hat is invariant: read in the centre-of-mass frame
+                q = cm[:, 0] + cm[:, 1]
                 rs = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
                 assert np.all(rs > 0), f"dimensionless_inputs: non-positive s_hat in {k}"
                 store[k]["rs"] = rs
-                store[k]["momenta"] = (mm / rs[:, None, None]).astype(np.float32)
+                del cm, q
             # the mass column log10(m / sqrt(s_hat)) is z-scored on its own statistics over the massive particles of
             # the train pools (the GeV column's frozen statistics would put it far off centre: the top at -4, the b
             # at -8 at sqrt(s_hat) = 1 TeV, and the massless neutral value above every massive one); frozen with the
@@ -1775,7 +1780,7 @@ class AmplitudeExperiment(BaseExperiment):
                 n1 = s1 = s2 = 0.0
                 for n in names:
                     rec = store[("train", n)]
-                    t = np.asarray(rec["tokens"]).reshape(rec["momenta"].shape[:2])
+                    t = np.asarray(rec["tokens"]).reshape(rec["com"].shape[:2])
                     v = (raw_lm[t] - np.log10(rec["rs"])[:, None])[(raw_lm[t] >= MASS_MASSLESS_LOG10_THR) & (t > 0)]
                     n1 += v.size; s1 += float(v.sum()); s2 += float((v.astype(np.float64) ** 2).sum())
                 mu = s1 / n1 if n1 else 0.0
@@ -1784,24 +1789,26 @@ class AmplitudeExperiment(BaseExperiment):
             LOGGER.info(f"dimensionless_inputs: log10(m / sqrt(s_hat)) over the massive train particles, mean "
                         f"{self._dimless_mass_stats[0]:.3f}, std {self._dimless_mass_stats[1]:.3f}")
         if mom_div is None:
-            train_mom = np.concatenate(
-                [store[("train", n)]["momenta"].reshape(-1, 4) for n in names], axis=0
-            )
-            mom_div  = float(train_mom.std())
-            scaled   = train_mom / mom_div
-            mom_mean = float(scaled.mean())
-            mom_std  = float(max(scaled.std(), 1e-2))
+            # np.std / np.mean of the concatenated train momenta as the network reads them (augmented, per sqrt(s_hat)
+            # under dimensionless_inputs), streamed pool by pool in numpy's own summation order (data_mmap.f32_mean_std)
+            from data_mmap import f32_mean_std
+            def _train_mom():
+                for n in names:
+                    for a in self._model_momenta(store[("train", n)]):
+                        yield a.reshape(-1, 4)
+            _, sd = f32_mean_std(_train_mom)
+            mom_div  = float(sd)
+            m_, s_ = f32_mean_std(_train_mom, scale=mom_div)
+            mom_mean = float(m_)
+            mom_std  = float(max(s_, 1e-2))
         self.mom_mean = [mom_mean]
         self.mom_std  = [mom_std]
         self.mom_div  = float(mom_div)   # physical scale (for data.mass_from_momenta)
-        for k in store:
-            store[k]["momenta"] = store[k]["momenta"] / mom_div
 
         def _phys(rec):
-            """(N, P, 4) momenta in GeV of a store record (undoes the global scale and, with dimensionless_inputs,
-            the per-event sqrt(s_hat))"""
-            pp = rec["momenta"].astype(np.float64) * mom_div
-            return pp * rec["rs"][:, None, None] if "rs" in rec else pp
+            """(N, P, 4) momenta in GeV of a store record: its centre-of-mass momenta, before the augmentation and the
+            scales (every quantity read from them is Lorentz invariant)"""
+            return rec["com"].astype(np.float64)
 
         # --- amplitude preprocessing: stats fitted on TRAIN, applied to all ---
         # --- target-side propagator subtraction (data.target_propagators): every event's
@@ -1969,7 +1976,7 @@ class AmplitudeExperiment(BaseExperiment):
         )
         amp_trafos, prepd_means, prepd_stds = self._resolve_amp_preprocessing(
             names, roles, lambda r, n: store[(r, n)]["raw_amp"] if (r, n) in store else None, train_raw,
-            lambda n: store[("train", n)]["momenta"].shape[1], per_dataset,
+            lambda n: store[("train", n)]["com"].shape[1], per_dataset,
             amp_trafos, amp_trafos_pp, prepd_means, prepd_stds)
 
         # --- assemble combined flat arrays, role-contiguous (train|val|test) ---
@@ -2017,7 +2024,7 @@ class AmplitudeExperiment(BaseExperiment):
             P_of = []
             for proc_idx, name in enumerate(names):
                 rec   = store[(role, name)]
-                parts = rec["momenta"]          # (N, P, 4)
+                parts = np.concatenate(list(self._model_momenta(rec, mom_div)), axis=0)   # (N, P, 4) float32
                 toks  = rec["tokens"]           # (N, P)
                 N, P  = parts.shape[0], parts.shape[1]
                 self._proc_npart[proc_idx] = int(P)
@@ -2085,6 +2092,7 @@ class AmplitudeExperiment(BaseExperiment):
                             idx  = np.argmin(np.abs(offs), axis=1)
                             cols[:, c] = offs[np.arange(N), idx]
                     ev_offshell.append(cols.astype(np.float32))
+                rec.pop("com", None)            # its network momenta are in ds_parts; nothing reads it further
                 part_base += N * P
 
             starts = np.concatenate(ev_starts)
@@ -2112,6 +2120,8 @@ class AmplitudeExperiment(BaseExperiment):
             role_counts[role] = offs.shape[0]
             self._role_perm[role] = perm
 
+        for k in store:
+            store[k].pop("com", None)
         # dtypes chosen so AmplitudeDataset (torch.as_tensor) shares these buffers
         # zero-copy across all loaders instead of copying per loader.
         self.particles_flat   = np.concatenate(role_particles, axis=0).astype(np.float32, copy=False)
@@ -2805,8 +2815,8 @@ class AmplitudeExperiment(BaseExperiment):
         def make_dataset(indices):
             if mm:
                 from data_mmap import MmapAmplitudeDataset
-                return MmapAmplitudeDataset(self.particles_flat, self.offsets, self.all_amplitudes, self.tokens_flat,
-                                            self.all_order_labels, self.dtype, self.all_process_ids, indices)
+                return MmapAmplitudeDataset(self._mmap_src, self.all_amplitudes, self.all_process_ids, self.dtype,
+                                            indices)
             return AmplitudeDataset(
                 particles_flat = self.particles_flat,
                 offsets        = self.offsets[indices],
