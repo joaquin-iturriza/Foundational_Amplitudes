@@ -15550,6 +15550,13 @@ entries:
       9 on all 54 step-7 runs. 13 step-7 runs had ended COMPLETED (C3/C4/C5 at k=533 both seeds, C5 k=1066, MSE C_k 533 and
       1066, C8 k=533, C2 k=533 ...): their logs, val curves and per-axis reads are being fetched (detach step7_reads_a, scratchpad
       read7.sh). To do: ws_stats_check.py C8 on the k=2132 pair once started.'
+  - at: '2026-11-06T11:25:15+00:00'
+    text: '2026-11-06 11:20 UTC duplicate: the launch ws_c8k2132_step10 fired at 11:20:40 while I ran its script by hand;
+      removing it (after my script ended) came too late, it had already started. Both runs passed launch_cc_only''s check
+      before either recorded, so v4_het_warm25e_k533[_seed2] went twice; kept the launch''s FA-ccin2p3-21a18a76 / 21674d1e
+      (RUNNING first), cancelled 5862b62e / d15462b0 before start. Fixed: per-key flock in scripts/launch_cc_only.sh @095733c4.
+      Step-10 runs now fbb16a33/cb458c82 (AdamW damped), 21a18a76/21674d1e (every group damped). Reads of 13 finished step-7
+      runs home (156 axis reads, 0 probes excluded).'
   step_waits:
     '10': FA-ccin2p3-fbb16a33 FA-ccin2p3-cb458c82 FA-ccin2p3-21a18a76 FA-ccin2p3-21674d1e
     '9': 'FA-ccin2p3-038f00fe FA-ccin2p3-040c3448 FA-ccin2p3-0d2a042d FA-ccin2p3-0fae36f3 FA-ccin2p3-11938ca8 FA-ccin2p3-1218b835
