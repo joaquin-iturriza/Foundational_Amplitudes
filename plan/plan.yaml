@@ -9277,6 +9277,17 @@ entries:
       the bins fill, widen the margin to cover them (per-source counts say whether it is the v3/v4 physics difference); else
       fix the proposal where they sit. NO, shortfall or a budget/no_steer stop: fix the proposal there. Cost: 10 CPU jobs,
       1 core, <= 15 min each, limit 00:40; no GPU.'
+    passed_at: '2026-11-06T05:17:46+00:00'
+    reviewer: 'Re-review after FIX: coverage now judged on held-out pp events never read for the range table (probe val +
+      dsh_ train/val/test, multichannel_check.py d4a4a50f: pp_sources/heldout_read, table shares flagged by_construction);
+      YES = 0 held-out in-support events outside the kept range on both seeds (3/N ~5.6e-5 at N~5.4e4) + 0 shortfall + 0 budget/no_steer
+      stops, missing pools give NO not YES; out-of-support split (window, partonic cuts) reported per source and the cut-frame
+      fix named in the regeneration design (1.34% uu_bbxuu, 0.29% us_ddxsu). Check 2: step-57 above-max 0.35-0.49 current
+      vs <=0.0005 multichannel (multichannel_check.json), held-out counts not fixed by construction. Check 3: pass/fail per
+      class and seed, seeds 42/43 as step 57. Control multichannel same job/node. Searched results.tex: quota, flat_range,
+      flat part, multichannel, uniform/flat in log, in-support; plan findings; decisions D269 D270 D294: no prior quota run.
+      Note: the code pools the probe val (v3 physics on 3 probes) and dsh_ (v4) into one held-out count, so the per-source
+      v3/v4 split the NO branch relies on must be re-read per file before a NO is interpreted.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
