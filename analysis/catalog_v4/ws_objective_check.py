@@ -15,6 +15,8 @@ For each comparison of WARM (mixture_ab.py) between a restart arm and its same-s
           from the end-of-run per-process metrics in the job log (`extract`, site side; MSE (prepd), L1, L1r,
             Mean |rel err| on the val split of every trained process): geometric mean over processes, all and split
             by initial state (pp: hadronic beams; ee: e+e-)
+          score_HD4: the sweep trial's form of the HD4 read, ln of the ratio of the geometric means over classes
+            of the class geometric mean MSE (trial_score)
           from the zero-shot reads of the held-out axes disjoint from PP4/EE4 (HD4: H2p5, H6, H7E, H7c; HD5: H5)
             and the catalog-sampled H1-H3 (the PP4/EE4 classes, other events): median over classes of the ratio
 A candidate tracks the reads when, on every resolved comparison, its ln ratio has the target's sign at both seeds.
@@ -164,6 +166,15 @@ def read_ratio(arm, ref, axis, cls):
     return math.log(float(np.median(list(r.values()))))
 
 
+def trial_score(mse, cls):
+    """One run's scalar on an axis, as a sweep trial would report it: the geometric mean over classes of the class
+    geometric mean of its probes' MSE of log|M|^2"""
+    by = {}
+    for p, x in mse.items():
+        by.setdefault(cls(p), []).append(math.log(x))
+    return math.exp(float(np.mean([np.mean(v) for v in by.values()])))
+
+
 def _resolved(entry, key, axis):
     f = os.path.join(DATA, f"warm_start_{entry}.json")
     d = json.load(open(f))["k"]["533"][key][axis]
@@ -203,6 +214,8 @@ def rank():
                 x = read_ratio(a, b, ax, cls)
                 if x is not None:
                     per.setdefault(f"read_{ax}", []).append(x)
+            per.setdefault("score_HD4", []).append(      # the trial objective's form: ln of the class-gmean ratio
+                math.log(trial_score(mab.load(a, "HD4"), cls) / trial_score(mab.load(b, "HD4"), cls)))
         row["cand"] = {k: [round(x, 4) for x in v] for k, v in per.items() if len(v) == len(arm)}
         rows[name] = row
     # a candidate tracks a set when on every resolved comparison of it it has the target's sign at both seeds;
