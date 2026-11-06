@@ -76,6 +76,32 @@ def test_warm_start_unrelated_or_one_part_refuses():
     assert not plan.ask_matches(WS, "Joaquin, (1) Should I run 4 more from-scratch seeds (44 to 47) of the one-loop magnitude-target change, at 9.4 GPU-h?")
 
 
+WS2 = {"id": "warm_start", "status": "running", "waiting_since": "2026-11-06T19:47:17+00:00", "next": ["a"],
+       "ask": ("One call on the warm start, a scope change (yours): the one-loop magnitude-target change (het) is not "
+               "decided at any retraining length because its from-scratch pair's two seeds disagree (seed ratio 1.28, "
+               "so the interval is widened by ln 1.28 = 0.25 on each side). My estimate, assuming the seed term "
+               "shrinks as sqrt(2/n): 4 more from-scratch seeds (44 to 47) take the upper end at 533 steps from 1.48 "
+               "to about 1.35, very likely a MATCH below the 1.35 bar, a YES at 1/8 of a pretraining. Cost 2.35 h per "
+               "run on a V100, 4 runs = 9.4 GPU-h (2 runs = 4.7 GPU-h, upper end about 1.38). 1066 steps stays "
+               "undecided at any seed count. Do you want 4 seeds, 2, or none (then the entry closes as written up)? "
+               "Your earlier question (2), whether the tuned growth should also run at 1066 and 2132 steps, is "
+               "withdrawn: the tuning read NOT BETTER at 533 steps (par:v4_warm_start_grow_tuned).")}
+WS2_MSG = ("Joaquin, one warm-start question, and only the entry's close waits on it. Do you want 4 more from-scratch "
+           "seeds for the one-loop magnitude target (9.4 GPU-h), 2 (4.7 GPU-h), or none, in which case the entry "
+           "closes as written up?")
+UNRELATED = "Joaquin, should I rerun the multichannel sweep at a lower learning rate, or keep the current one?"
+
+
+def test_three_incidents_pass_on_their_message_and_fail_otherwise():
+    for e, msgs in ((WS, [WS_MSG]), (CC, [CC_Q1]), (WS2, [WS2_MSG])):
+        assert plan.ask_matches_set(e, msgs)
+        assert plan.ask_matches_set(e, ["nothing new.", *msgs])
+        assert not plan.ask_matches_set(e, [UNRELATED])
+        assert not plan.ask_matches_set(e, [])
+    assert not plan.ask_matches_set(WS2, ["Joaquin, the warm start runs finished; nothing needs you."])
+    assert not plan.ask_matches_set(WS2, [WS_MSG])
+
+
 def test_margin():
     assert plan.ASK_MARGIN_MIN == 30
 

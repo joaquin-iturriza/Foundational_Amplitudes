@@ -438,6 +438,11 @@ def ask_matches(e, text):
     parts = ask_parts(e.get("ask"))
     if parts and all(any(part_asked(p, x) for x in sents) for p in parts):
         return True
+    # a single-question ask is asked by its question sentence too: the background before it (numbers, estimates, a
+    # withdrawn question) makes the whole ask long, and a message asking it in its own words shares under half of it
+    # (2026-11-06: "Do you want 4 seeds, 2, or none ..." asked as "4 more from-scratch seeds ..., 2, or none ...")
+    if not parts and not ask_questions(e.get("ask")) and any(part_asked(e.get("ask"), x) for x in sents):
+        return True
     for sent in re.split(r"(?<=[.?!;])\s+|\n+", text or ""):
         low = sent.lower()
         if "?" not in sent and not re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", low):
