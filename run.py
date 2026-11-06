@@ -41,6 +41,8 @@ def sigma_stage_cfg(cfg):
         s.fine_tune.moment_fill_steps = 0   # the stage starts from this run's model; no moment fill (D303)
         if "muon_warmup_steps" in s.fine_tune:
             s.fine_tune.muon_warmup_steps = 0   # the stage is its own optimizer on sigma; no Muon warmup (D303)
+        if "adamw_warmup_steps" in s.fine_tune:
+            s.fine_tune.adamw_warmup_steps = 0  # nor an AdamW one: the sigma stage trains its readout at full lr
         if "context_dropout" in s.model:
             s.model.context_dropout = 0.0          # mu frozen: every event keeps its trained c_p (D105)
         s.training.heterosc_sigma_only = True
