@@ -3119,7 +3119,7 @@ trial of the MSE sweep and the NLL sweep's trial nearest its learning-rate scale
 % src: python3 analysis/catalog_v4/plot_ws_c1m.py @2231aecd
 \caption{The $k=533$ warm starts with the default, the NLL-tuned and the mean-MSE-tuned restart, the pretrained start
 and the change from scratch. Left: the validation loss of the main stage (het NLL) against the restart's step, seed
-$42$, warm starts only. Middle and right: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4)
+$42$, warm starts only. Middle and right: per-class MSE of $\log|M|^2$ on the default-sampled test splits (trained and held-out classes alike) of the pp (PP4) and $e^+e^-$ (EE4)
 probes as a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_c1m}
 % allow: 533 42 2 because they are the retraining length, the seed and the square in |M|^2
@@ -3133,7 +3133,7 @@ probes as a cumulative fraction of classes, each probe the geometric mean of its
 % src: python3 analysis/catalog_v4/plot_ws_c1m.py --growth @2231aecd
 \caption{The width growth $8\to16$ at $k=533$ with the default and the mean-MSE-tuned restart, against widths $8$
 and $16$ from scratch. Left: the validation loss of the main stage (het NLL) against the restart's step, seed $42$,
-grown runs only. Middle and right: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4) probes as
+grown runs only. Middle and right: per-class MSE of $\log|M|^2$ on the default-sampled test splits (trained and held-out classes alike) of the pp (PP4) and $e^+e^-$ (EE4) probes as
 a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_c10wm}
 % allow: 533 42 8 16 2 because they are the retraining length, the seed, the widths and the square in |M|^2
@@ -3146,7 +3146,7 @@ a cumulative fraction of classes, each probe the geometric mean of its two seeds
 \caption{The $k=533$ restart with Muon's learning rate damped over its first $168$ steps against the default restart,
 seeds $42$ (solid) and $43$ (dashed). Top left: the gradient norm before clipping against the restart's step. Top
 right: the validation loss of the main stage (het NLL); the seed-$43$ damped run's excursions above $0.5$ are cut off.
-Bottom: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative fraction of
+Bottom: per-class MSE of $\log|M|^2$ on the default-sampled test splits (trained and held-out classes alike) of the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative fraction of
 classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_muon_damped}
 % allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
@@ -3155,7 +3155,7 @@ classes, each probe the geometric mean of its two seeds.}
 \paragraph{Which logged quantity ranks the restarts as the held-out reads do (2026-11-06).}\label{par:v4_warm_start_objective}
 The two tunings of par.~\ref{par:v4_warm_start_tuned} and par.~\ref{par:v4_warm_start_repairs} improved their sweep's
 objective (the validation NLL, then the validation MSE of the mean) and not the reads, so before the width growth is
-tuned [D285] the question is: which quantity a run logs moves with the zero-shot reads across restarts? Per comparison
+tuned [D285] the question is: which quantity a run logs moves with the PP4 and EE4 test reads across restarts? Per comparison
 and seed, arm over its same-seed reference, the deciding change is $\ln R$ on PP4 and EE4 (median over classes of the
 class geometric mean of the probe MSE ratios), and each candidate's change is $\ln(\text{arm}/\text{reference})$ (for
 an NLL, arm minus reference). A candidate tracks when, on every comparison whose two-seed $R$ is resolved, it has the
@@ -3214,7 +3214,7 @@ $0.535$ (FA-ccin2p3-e046ac67; $0.459$ at seed $43$).
 \includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_objective_b.pdf}\hfill
 \includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_objective_c.pdf}
 % src: python3 analysis/catalog_v4/plot_ws_objective.py @c6a0b124
-\caption{Logged quantities against the zero-shot reads across warm-start restarts, one point per comparison and seed,
+\caption{Logged quantities against the PP4 and EE4 test reads across warm-start restarts, one point per comparison and seed,
 arm over its same-seed reference. Horizontal: the mean of $\ln R$ over the pp (PP4) and $e^+e^-$ (EE4) probes, $R$ the median over
 classes of the class geometric mean of the probe MSE ratios. Vertical, left: $\ln(\mathrm{MSE}_\text{arm}/\mathrm{MSE}_\text{reference})$
 zero-shot on the default-sampled held-out tree classes (HD4); middle: the final validation het NLL, arm minus
@@ -3230,7 +3230,7 @@ par.~\ref{par:v4_warm_start_grow} at $k=533$ be tuned to read better than its de
 single-fidelity DyHPO sweep of $8$ trials around the default growth (\code{ws\_grow\_k533\_zeroshot\_hpo8\_rerun},
 \code{sweep/sweep\_config\_ccin2p3\_ws\_grow\_k533\_zeroshot\_hpo.yaml} @8f68ca8d, seed $42$, the fine-tune space of
 the sibling sweeps) observed each trial's HD4 score. Seven trials scored; one diverged at step $305$ and is listed
-apart. The best, trial~1860 (learning-rate scale $0.18$, layer decay $0.90$, EMA on, WSD), scored $0.476$, below the
+apart. The best, trial~1860 of this sweep (not the NLL sweep's trial of that id; learning-rate scale $0.18$, layer decay $0.90$, EMA on, WSD), scored $0.476$, below the
 default growth's $0.535$, and five trials sat within $0.476$ to $0.481$. Its settings were re-run at seeds $42$ and
 $43$ with every read (FA-ccin2p3-4442e786, FA-ccin2p3-3fae7799; \code{scripts/job\_catalog\_v3\_short.sh} @6454ecda,
 \code{GROW\_SWEEP}, \code{GROW\_HP=1860}), against the default growth pair (FA-ccin2p3-e046ac67, FA-ccin2p3-f35b6a78).
@@ -3240,7 +3240,7 @@ held-out default-sampled $1.025$. That is the NOT BETTER branch: neither upper e
 as the width-$8$ parent it grew from, $R(W/A)$ PP4 $0.999$, EE4 $1.000$, and is as far from width $16$ from scratch
 as the default growth, $R(W/B)$ PP4 $1.77$ ($[1.45, 2.15]$), EE4 $1.79$ ($[1.52, 2.01]$), SHORT. It is better than
 the mean-MSE-tuned growth ($R$ PP4 $0.951$, $[0.913, 0.992]$). The sweep's low learning rate leaves the grown model
-almost where it started: the validation loss shows no early jump and stays near the parent's value
+almost where it started, as $R(W/A)$ shows
 (fig.~\ref{fig:ws_c10wz}). The gain on the selection set HD4 does not carry to PP4 and EE4. So the growth
 stays at its default restart, and tuning it on a read-tracking objective is ruled out at $k=533$; what the growth lacks
 at $533$ steps is length, not its restart (par.~\ref{par:v4_warm_start_grow}, $g$ rising to about $0.5$ at $2132$).
@@ -3277,8 +3277,8 @@ at $533$ steps is length, not its restart (par.~\ref{par:v4_warm_start_grow}, $g
 \includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wz_c.pdf}
 % src: python3 analysis/catalog_v4/plot_ws_c1m.py --growth-zs @3da35e86
 \caption{The width growth $8\to16$ at $k=533$ with the default, the mean-MSE-tuned and the HD4-score-tuned restart,
-against widths $8$ and $16$ from scratch. Left: the validation loss of the main stage (het NLL) against the restart's
-step, seed $42$, grown runs only. Middle and right: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and
+against $8$ and $16$ heads from scratch. Left: the validation loss of the main stage (het NLL) against the restart's
+step, seed $42$, grown runs only. Middle and right: per-class MSE of $\log|M|^2$ on the default-sampled test splits (trained and held-out classes alike) of the pp (PP4) and
 $e^+e^-$ (EE4) probes as a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_c10wz}
 % allow: 533 42 8 16 2 because they are the retraining length, the seed, the widths and the square in |M|^2
@@ -3368,7 +3368,7 @@ default restart.
 \caption{The $k=533$ restart with AdamW's learning rate damped over its first $168$ steps and with every group's
 damped, against the default restart, seeds $42$ (solid) and $43$ (dashed). Top left: the gradient norm before clipping
 against the restart's step. Top right: the validation loss of the main stage (het NLL); excursions above $0.5$ are cut
-off. Bottom: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative
+off. Bottom: per-class MSE of $\log|M|^2$ on the default-sampled test splits (trained and held-out classes alike) of the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative
 fraction of classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_adamw_damped}
 % allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
