@@ -9527,6 +9527,12 @@ entries:
     units: null
     start: '2026-11-06T04:58:44+00:00'
     at: '2026-11-06T04:58:44+00:00'
+  - batch: sign_matched
+    wall_h: 2.33
+    jobs: 8
+    units: null
+    start: '2026-11-06T05:07:12+00:00'
+    at: '2026-11-06T05:07:12+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
