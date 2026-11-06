@@ -10378,6 +10378,63 @@ entries:
       the paper''s run-card section; sqrt(s_hat) from the LHE incoming momenta (read_lhe_pp keeps lab-frame incoming partons,
       invariant mass frame-free) is right; cost about 10 core-h, MadEvent work dirs node-local and deleted; no training, loss,
       preprocessing or sweep involved.'
+  - at: '2026-11-06T23:38:18+00:00'
+    question: 'Step 71, the e+e- collider anchor, revised after the design reviewer''s FIX (2026-11-07). D318 (Joaquin 2026-11-06
+      22:54: ''The e+e- data should be coherent to what we do with the rest of the data, flat in log M^2 plus sampling hard
+      regions the way we do for the others'') and D320 (22:57: ''The collider anchor sounds good''). The pp classes'' flat
+      range comes from default-sampled 13 TeV events with real beams (PDFs); the e+e- classes'' range came from MadEvent pools
+      at fixed energies with no ISR. Can our MadEvent setup (MG 3.7.0 on CC, lhe_probe/lhe_parts) produce e+e- default events
+      at real machines'' energies with their ISR (+ beamstrahlung) spectra, with the spectrum MadEvent ran with being the
+      one asked (banner), the beamstrahlung part visible beside ISR alone, and at what kept fraction after the class''s window
+      and cuts and time per kept event against the same run without ISR? Feeds: regenerating the e+e- default pools (dsh/ee4)
+      with the anchor, whose ranges set the e+e- flat range of step 68''s regeneration.'
+    prior: 'No ISR or beamstrahlung in any FA pool or in results.tex (grep ISR/beamstrahlung/initial-state radiation: only
+      the unrelated ''ISR arm'' of the transfer study, l.12731; the reviewer''s wider search found none either). The e+e-
+      default pools run lpp 0, pdlabel none at EE_ENERGIES 91.1876/240/365/500/1000/3000 (''open: the user''s call''); data/dsh_kept.json:
+      dsh_epem_bbxvevex keeps 1.0 at every energy (no event below the window or cut, fixed beams). Machine energies, read
+      2026-11-07: LEP2 to 209 GeV (Phys. Rept. 532 (2013) 119, arXiv:1302.3415); FCC-ee 91/160/240/365 (FCC CDR vol. 2, EPJ
+      ST 228 (2019) 261; arXiv:2203.08310 table 1); CEPC 91/160/240 (arXiv:1809.00285); ILC 200-500, extendable to 1 TeV (TDR
+      vol. 1, arXiv:1306.6327); CLIC 380/1500/3000 (CERN-2016-004, arXiv:1608.07537). Spectra (arXiv:2108.10261 sect. 6, table
+      1, read from the PDF): lpp +3 electron / -3 positron, pdlabel isronlyll (LL+LO ISR) or fcce240ll, fcce365ll, cepc240ll,
+      ilc500ll, clic3000ll (ISR + GuineaPig-fitted beamstrahlung, beam spread ignored); MG 3.7.0 on CC ships exactly these
+      (read 2026-11-07).'
+    measure: 'Per energy, MadEvent runs of 1000 events of dsh_epem_bbxvevex (the default-share pool of v4_epem_bbxvevex; tools/lhe_probe.py
+      run @be521c52): with the anchor''s spectrum (--ee-isr), without it (lpp 0), and at the four beamstrahlung energies (240/365/500/3000)
+      with ISR alone (--ee-isr --patch pdlabel=isronlyll). Per run: completes (events_returned, error, MG log tail on failure);
+      beam_card = lpp1, lpp2, pdlabel, pdlabel1, pdlabel2 read back from the run''s banner; seconds of output and generation,
+      s per kept event; kept fraction after the parent class''s window [20, 6000] GeV and catalog_v4 e+e- cuts in the partonic
+      frame (kept, below_window, cuts_partonic, cuts_lab, cuts_partonic_not_lab; accept_of maps a dsh_ pool to its parent);
+      sqrt(s_hat)/sqrt(s) quantiles (q01, q10, median, share below 0.99 and below 0.5, min).'
+    check: 'Acceptance fields on this pool, checked locally @be521c52: accept_of(''dsh_epem_bbxvevex'') = window 20-6000 GeV,
+      cuts pT>10, |cos|<0.99, dR>0.4, m>10 on b and tau; kept() on 2000 uncut phase-space events at 240 GeV gives kept 0.8315,
+      cuts_partonic 0.1685, cuts_lab 0.1685; after a longitudinal boost of rapidity 0.5 (as ISR gives) cuts_partonic stays
+      0.1685 and cuts_lab moves to 0.178 (cuts_partonic_not_lab 0.001): the fields come out and see the boost. Spectrum: without
+      ISR sqrt(s_hat)/sqrt(s) = 1 on every event; the leading-log density of arXiv:2108.10261 eqs. 45-48 (beta = alpha/pi
+      (ln(s/m_e^2) - 1) = 0.054 at 91 GeV, 0.070 at 3 TeV), sampled on both beams (leading term beta(1-z)^(beta-1), my committed-free
+      arithmetic, luminosity only): share of sqrt(z1 z2) < 0.99 = 0.35 at 91 GeV, 0.37 at 240, 0.39 at 500, 0.43 at 3000;
+      q10 0.78 / 0.76 / 0.75 / 0.71; the event share is that weighted by sigma(s_hat)/sigma(s), so the isronlyll runs are
+      expected in the tens of percent, below or near these.'
+    fixed: 'Pool dsh_epem_bbxvevex (beams e- e+: lpp1 +3, lpp2 -3 by ee_beam_patches from its pdg order), its cards (recipes/catalog_v4_ee),
+      1000 events per run, probe seed 9999, timeout 720 s per run, code trunk be521c52 synced to CC; energies EE_ANCHOR: 91.1876,
+      160, 209, 240, 365, 380, 500, 1000, 1500, 3000 GeV with pdlabel isronlyll, isronlyll, isronlyll, fcce240ll, fcce365ll,
+      isronlyll, ilc500ll, isronlyll, isronlyll, clic3000ll. Jobs: scripts/job_lhe_probe.sh PROBE_SHARD=eeisr PROBE_PROCESS=dsh_epem_bbxvevex,
+      one job per energy (10), the runs in parallel on 3 CPUs, CC htc, limit 00:30 (the 720 s timeouts in parallel plus output
+      and compile; earlier probe of this class: 800.9 s for 6 runs of 340 events, data/lhe_rates_dsh_ee4.json), target 0.4
+      h.'
+    control: 'In each job, same node, commit, pool, energy and seed: the run without the spectrum (lpp 0, pdlabel none, the
+      current pools'' setting); at 240/365/500/3000 also the run with ISR alone (isronlyll), the control that isolates beamstrahlung.'
+    seeds: 'One probe seed per run (lhe_probe''s 9999): a setup and spectrum-shape check; 1000 events give a share to +-0.016
+      (binomial at 0.3), +-0.02 for a difference of two runs'' shares.'
+    outcome: 'WORKS: at every energy the ISR run returns events, its banner''s lpp1/lpp2/pdlabel (and pdlabel1/2 where present)
+      equal EE_ANCHOR''s, its share below 0.99 is > 0 (0 without), and at each beamstrahlung energy the machine spectrum''s
+      share below 0.99 exceeds the isronlyll run''s by > 0.02 with a lower q10 -> design the regeneration of the 170 e+e-
+      classes'' default pools at the anchor energies with these spectra (cost from s per kept event over the no-ISR runs''),
+      then re-read the e+e- flat ranges (pp_support.py pull ee, tools/flat_range.py) for step 68. NO_BEAMSTRAHLUNG at an energy
+      (banner differs, or share not above isronlyll''s): read the banner and MG log; fix the card keys and re-run that energy;
+      if the grid cannot run, use isronlyll there, recorded as a gap. FAILS (no events, MG error, or share 0 with ISR): read
+      the log tail, fix the setup, re-run those energies. COST: an ISR run''s s per kept event > 2x the no-ISR run''s -> where
+      the time goes (survey/refine, kept fraction) before the regeneration design. 10 CPU jobs x 3 cores x <= 0.5 h, <= 15
+      core-h, no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
