@@ -13307,13 +13307,22 @@ entries:
     answers_after: '2026-11-06T19:47:17+00:00'
     covers:
     - warm_start
+  - said_at: '2026-11-06T19:52:41.245000+00:00'
+    text: In general it seems like the changes are all able to be added after the fact with this method, more or less, we
+      just need to fix the mechanism of how we warm start, so I wouldn't run more tests checking different changes until we
+      refine what we are doing first.
+    decision: D313
+    answers_after: '2026-11-06T19:47:17+00:00'
+    covers:
+    - warm_start
   decisions:
   - D282
   - D307
-  next:
-    11: 'On Joaquin''s answer: more from-scratch seeds of v4_het_control_magnitude (seeds 44-47 = 9.4 GPU-h, or 44-45 = 4.7)
-      to decide the one-loop magnitude-target change at k=533, under a new design line on how n seeds widen the interval;
-      else close the entry with the write-ups as they stand (par:v4_warm_start_changes, par:v4_warm_start_grow_tuned)'
+  - D313
+  next: 'Step 12 (D307, D308): the restart study on C1 (share 0.25, het, k=533): from the checkpoint rerun v4_het_control_ckpt[_seed2],
+    five restarts at seeds 42/43 (final model default restart = control; step-3198 default; step-3198 continued from its own
+    lr, no warmup; step-2132 continued; final model at 3x peak lr), read on the restart-jump gradient norm and PP4/EE4 against
+    the control and from-scratch B'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -15224,13 +15233,6 @@ entries:
       entry and site decisions for: zero-shot objective, zero_shot_score, zero_shot_objective, objective.*zero, growth sweep,
       grow.*sweep, sweep.*grow, HD4, proxy objective, held-out.*objective. Only the sign-head search came up (a val-loss objective),
       already named in the prior.'
-  step_why:
-    11:
-      feeds: whether the magnitude-target change's warm start at k=533 MATCHes its from-scratch pretraining (YES at 1/8 of
-        a pretraining) or stays undecided
-      if:
-      - 'MORE SEEDS: design line, review, submit, read with mixture_ab.py warm C8 against the widened interval'
-      - 'NONE: close the entry (plan done) with the existing write-ups'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
