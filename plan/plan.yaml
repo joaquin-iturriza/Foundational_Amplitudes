@@ -13244,6 +13244,7 @@ entries:
     - FA-ccin2p3-4ebff80f
     - FA-ccin2p3-51a88ce9
     - FA-ccin2p3-56cca07a
+    - FA-ccin2p3-577b97e2
     - FA-ccin2p3-58723352
     - FA-ccin2p3-5e02275b
     - FA-ccin2p3-70c28bd9
@@ -13288,6 +13289,7 @@ entries:
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k533_seed2
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k533_seed3
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k533_seed4
+    - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k1066_seed3
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k1066_seed4
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132_seed3
