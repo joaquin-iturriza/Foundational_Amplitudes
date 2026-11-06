@@ -3111,6 +3111,9 @@ def sampling_policy(cfg, role=None):
         # the quota-filled flat part's constants enter the policy, hence the recipe id (absent without flat_range)
         pol.setdefault("flat_dex_per_bin", FLAT_DEX_PER_BIN)
         pol.setdefault("flat_budget", FLAT_BUDGET)
+        if pol.get("flat_mcmc"):     # the Markov-chain flat part's constants, likewise (absent without flat_mcmc)
+            pol.setdefault("flat_mcmc_chains", FLAT_MCMC_CHAINS); pol.setdefault("flat_mcmc_lnf", FLAT_MCMC_LNF)
+            pol.setdefault("flat_mcmc_dmin", FLAT_MCMC_DMIN); pol.setdefault("flat_mcmc_thin", FLAT_MCMC_THIN)
     if float(pol.get("f_default", 0)) > 0:
         # the default-sampled share (D178): that fraction of the pool is the generator's own unweighted events, read
         # from the MadEvent pools of the lhe entry `default_source` (default_share_momenta); only in the mixture
@@ -3784,6 +3787,159 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
 FLAT_DEX_PER_BIN = 0.25    # bin width in log10|M|^2: the 0.25-dex bins the step-57/58 check judges flatness on
 FLAT_BUDGET = 50           # candidates labelled per flat event, at most: a stop, not a target [open]
 FLAT_LAST = {}             # diagnostics of the last quota-filled flat part (multichannel_check.py quota policy)
+# pol["flat_mcmc"] (plan catalog_coverage step 69; the <= 2x cost bound is that step's design, set after D317 refused the quota sampler's ~100x): the flat part's events from Markov chains instead
+# of rejection. One first round of candidates (the policy's proposal, as the quota part's first round); then
+# K = flat_mcmc_chains x n_flat chains, started from in-range first-round candidates drawn with weight 1 / (their bin's
+# count), each at its start's sqrt(s) (fixed). A step moves one random pair of finals: in the pair's rest frame its
+# direction is turned by a random rotation (isotropic axis, angle uniform in [-d, d], d log-uniform in
+# [flat_mcmc_dmin, pi]); the pair's mass, the other finals and the total momentum are unchanged, and the kernel is
+# symmetric under the uniform phase-space measure (dPhi_n = dPhi_{n-1} dm^2 dPhi_2, dPhi_2 uniform in the pair's solid
+# angle). Alternating pairs move every invariant. A move is accepted with min(1, w(y') / w(y)) (Metropolis), the weight a
+# function of the log|M|^2 bin only, w = 1 / g, ln g starting at ln(1 + the first round's count in the bin) and raised
+# by flat_mcmc_lnf at every chain's visit, accepted or not (Wang-Landau): the chains are pushed to the bins short of
+# their quota. A move out of the cuts or of the range is rejected. Collection: every flat_mcmc_thin steps each chain's
+# current state is collected if the chain moved since its last collected state (an unmoved chain adds nothing, so no
+# event is collected twice). What the collected events follow: at fixed sqrt(s), a symmetric kernel under a bin-only
+# weight leaves uniform phase space within a bin stationary, but the chains are short (tens to a few hundred steps)
+# from starts drawn from the first round's proposal, and a constant Wang-Landau increment is not stationary; so the
+# kept events are the proposal's starts carried by short correlated chains, not independent draws of uniform phase space
+# within the bin, and sqrt(s) takes one value per chain. Their spread within a bin is measured, not assumed
+# (multichannel_check.py diversity: near-duplicates, nearest-neighbour distance against the quota sampler at equal
+# count, distinct chains per bin). Steps stop when every bin holds its quota of collected states or
+# pol["flat_budget"] x n_flat labels are charged (first round included; K charged per step, a proposal that fails the
+# cuts included, so the labels made are at most that); then flat_quota_select keeps the quota per bin as the quota part
+# does. The chain constants enter the policy, hence the recipe id (sampling_policy).
+FLAT_MCMC_CHAINS = 0.2     # chains per flat event [open; toy, tests/test_flat_mcmc.py]
+FLAT_MCMC_LNF = 0.1        # Wang-Landau increment of ln g per chain visit [open]
+FLAT_MCMC_DMIN = 0.3       # smallest rotation-angle scale, rad [open; toy: 1e-4 made 38% near-copies]
+FLAT_MCMC_THIN = 2         # steps between two collections of a chain's state [open; toy]
+
+
+def _pair_rotate(P, i, j, rng, dmin=FLAT_MCMC_DMIN):
+    """P (K, n, 4) with finals i, j (slots) turned in their pair's rest frame by a random symmetric rotation"""
+    Q = P[:, i] + P[:, j]
+    Qr = Q.copy(); Qr[:, 1:] *= -1.0                         # boosting by -beta takes the pair to its rest frame
+    qi = _boost_from_rest(P[:, i], Qr)
+    K = len(P)
+    ax = rng.normal(size=(K, 3)); ax /= np.linalg.norm(ax, axis=1, keepdims=True)
+    d = np.exp(rng.uniform(np.log(dmin), np.log(np.pi), size=K))
+    a = rng.uniform(-1.0, 1.0, size=K) * d
+    v = qi[:, 1:]; c, s = np.cos(a)[:, None], np.sin(a)[:, None]
+    kv = (ax * v).sum(1, keepdims=True)
+    v2 = v * c + np.cross(ax, v) * s + ax * kv * (1.0 - c)     # Rodrigues
+    qn = np.concatenate([qi[:, :1], v2], 1)
+    Pn = P.copy()
+    Pn[:, i] = _boost_from_rest(qn, Q)
+    Pn[:, j] = Q - Pn[:, i]
+    return Pn
+
+
+def _flat_mcmc_part(n_flat, uni, m_finals, pdg_ids, rng, cuts, pol, label, fwd_cand, beam_mass):
+    """the flat part from Markov chains (the block above); (events, sqrt(s), |M|^2) of the kept part"""
+    edges, quota = flat_quota_bins(float(pol["flat_range"][0]), float(pol["flat_range"][1]), n_flat, rng,
+                                   float(pol["flat_dex_per_bin"]))
+    n_ch = float(pol.get("flat_mcmc_chains", FLAT_MCMC_CHAINS)); lnf = float(pol.get("flat_mcmc_lnf", FLAT_MCMC_LNF))
+    dmin = float(pol.get("flat_mcmc_dmin", FLAT_MCMC_DMIN)); thin = max(1, int(pol.get("flat_mcmc_thin", FLAT_MCMC_THIN)))
+    nb = len(quota)
+    budget = int(float(pol["flat_budget"]) * n_flat)
+    n0 = min(max(int(pol["oversample"]) * n_flat // 2, n_flat), budget)
+    mc = bool(pol.get("multichannel")) and len(m_finals) >= 3
+    if mc:
+        if pol.get("mc_resonances") and not pol.get("mc_res_params"):
+            raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
+        chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
+                            pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
+                            bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")))
+        ev0, sq0, c0 = _candidates_mc(n0, uni, m_finals, pdg_ids, rng, cuts, chans, np.full(len(chans), 1.0 / len(chans)),
+                                      pol["y_lo"], fwd_cand, beam_mass)
+    else:
+        ev0, sq0 = _candidates(n0, uni, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand, beam_mass)
+        c0 = np.zeros(n0, dtype=np.int64)
+    n_chan = len(chans) if mc else 1                   # chain states carry channel index n_chan ("chain")
+    me0 = np.asarray(label(ev0, sq0), float)
+    pdg = np.asarray(pdg_ids, int)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        y0 = np.log(np.where(me0 > 0, me0, np.nan))
+    binof = lambda y: np.where(np.isfinite(y) & (y >= edges[0]) & (y < edges[-1]),
+                               np.clip(np.searchsorted(edges, np.nan_to_num(y, nan=edges[0]), side="right") - 1, 0, nb - 1),
+                               -1)
+    cand_P = [e[0] for e in ev0]; cand_sq = list(sq0); cand_me = list(me0)
+    cand_chain = [-1] * len(ev0); cand_ch = list(np.asarray(c0, np.int64))
+    b0 = binof(y0); count = np.bincount(b0[b0 >= 0], minlength=nb).astype(float)
+    nfin = len(m_finals)
+    charged = n0; made = n0; steps = 0; acc = 0; collected = 0
+    rounds = [{"n": int(n0), "missing": int(np.maximum(quota - count, 0).sum()), "bins_short": int((count < quota).sum())}]
+    inr = np.nonzero(b0 >= 0)[0]
+    K = 0
+    if nfin >= 2 and len(inr) and charged < budget and (count < quota).any():
+        K = max(1, min(int(round(n_ch * n_flat)), budget - charged))
+        p = 1.0 / count[b0[inr]]; p /= p.sum()
+        st = rng.choice(inr, size=K, p=p)
+        P = np.stack([cand_P[i] for i in st]); sq = sq0[st]; y = y0[st]; b = b0[st]; me = me0[st]
+        moved = np.zeros(K, bool)
+        lng = np.log1p(count)          # Wang-Landau ln g per bin, from the first round's histogram
+        while charged + K <= budget and (count < quota).any():
+            i, j = (rng.permuted(np.tile(np.arange(nfin), (K, 1)), axis=1)[:, :2] + 2).T
+            Pn = np.empty_like(P)
+            for (a, c) in {(int(x), int(z)) for x, z in zip(i, j)}:
+                m = (i == a) & (j == c)
+                Pn[m] = _pair_rotate(P[m], a, c, rng, dmin)
+            ok = fiducial_pass_mask(Pn, m_finals, pdg, cuts) if cuts is not None else np.ones(K, bool)
+            men = np.full(K, np.nan)
+            if ok.any():
+                idx = np.nonzero(ok)[0]
+                men[idx] = np.asarray(label([(Pn[k], pdg) for k in idx], sq[idx]), float)
+                made += len(idx)
+            charged += K; steps += 1
+            with np.errstate(divide="ignore", invalid="ignore"):
+                yn = np.log(np.where(men > 0, men, np.nan))
+            bn = binof(yn)
+            dl = np.where(bn >= 0, lng[b] - lng[np.maximum(bn, 0)], -np.inf)     # ln w(y') - ln w(y), w = 1/g
+            take = (bn >= 0) & (np.log(rng.uniform(size=K)) < dl)
+            P[take] = Pn[take]; y[take] = yn[take]; b[take] = bn[take]; me[take] = men[take]
+            moved |= take; acc += int(take.sum())
+            np.add.at(lng, b, lnf)   # every chain's visit, accepted or not, raises its bin's ln g
+            if steps % thin == 0:
+                for k in np.nonzero(moved)[0]:
+                    cand_P.append(P[k].copy()); cand_sq.append(sq[k]); cand_me.append(me[k]); count[b[k]] += 1
+                    cand_chain.append(int(k)); cand_ch.append(n_chan)
+                collected += int(moved.sum()); moved[:] = False
+            if steps % 10 == 0:
+                rounds.append({"n": int(10 * K), "missing": int(np.maximum(quota - count, 0).sum()),
+                               "bins_short": int((count < quota).sum())})
+        if steps % 10:
+            rounds.append({"n": int((steps % 10) * K), "missing": int(np.maximum(quota - count, 0).sum()),
+                           "bins_short": int((count < quota).sum())})
+    me_c = np.asarray(cand_me, float); sq_c = np.asarray(cand_sq, float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        logm = np.log(np.where(me_c > 0, me_c, np.nan))
+    keep, take_b = flat_quota_select(logm, edges, quota, rng)
+    short = np.maximum(quota - take_b, 0)
+    stop = "quota" if short.sum() == 0 else "budget"
+    if len(keep) < n_flat:
+        rest = np.setdiff1d(np.nonzero(np.isfinite(logm))[0], keep)
+        if len(rest) < n_flat - len(keep):
+            rest = np.setdiff1d(np.arange(len(me_c)), keep)
+        keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
+    if stop != "quota":
+        print(f"  [WARN] flat mcmc: stopped at the budget ({charged:,} labels charged, {pol['flat_budget']} per flat "
+              f"event) with {int((short > 0).sum())} bins short by {int(short.sum())} events")
+    keep = np.asarray(keep)
+    chain_c = np.asarray(cand_chain, np.int64)
+    FLAT_LAST.clear()
+    FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take_b, cand_per_bin=np.bincount(
+                         binof(logm)[binof(logm) >= 0], minlength=nb), rounds=rounds, budget_hit=stop == "budget",
+                     stop=stop, n_candidates=int(len(me_c)), n_labels=int(made), n_labels_charged=int(charged),
+                     logm=logm, keep=keep, chan=np.asarray(cand_ch, np.int64),
+                     channels=([list(x) for x in chans] if mc else ["proposal"]) + ["chain"],
+                     kept_P=np.stack([cand_P[k] for k in keep]) if len(keep) else None, kept_sq=sq_c[keep],
+                     kept_chain=chain_c[keep],
+                     mcmc={"steps": steps, "accepted": acc, "chains": int(K), "collected": collected,
+                           "thin": thin, "dmin": dmin, "lnf": lnf, "chains_per_flat": n_ch})
+    print(f"  [SAMPLE] mixture: flat-log|M|^2 by mcmc {len(keep):,} kept, {made:,} labels ({charged:,} charged; {steps} "
+          f"steps x {K} chains, {acc:,} accepted, {collected:,} collected), {int((short > 0).sum())} of {nb} bins short "
+          f"({int(short.sum())} events)")
+    return [(cand_P[k], pdg) for k in keep], sq_c[keep], me_c[keep]
 
 
 def flat_quota_bins(lo, hi, n_flat, rng, dex_per_bin=FLAT_DEX_PER_BIN):
@@ -3956,8 +4112,10 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
     FLAT_LAST.clear()
     FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take, cand_per_bin=cnt, rounds=rounds, budget_hit=budget_hit, stop=stop,
-                     n_candidates=len(cand), logm=logm, keep=np.asarray(keep), chan=ch_c,
-                     channels=[list(x) for x in chans] if mc else None)
+                     n_candidates=len(cand), n_labels=len(cand), logm=logm, keep=np.asarray(keep), chan=ch_c,
+                     channels=[list(x) for x in chans] if mc else None,
+                     kept_P=np.stack([cand[i][0] for i in keep]) if len(keep) else None, kept_sq=sq_c[keep],
+                     kept_chain=np.full(len(keep), -1, np.int64))
     print(f"  [SAMPLE] mixture: flat-log|M|^2 by quota {len(keep):,} kept from {len(cand):,} candidates in "
           f"{len(rounds)} rounds, {int((short > 0).sum())} of {len(quota)} bins short ({int(short.sum())} events)")
     return [cand[i] for i in keep], sq_c[keep], me_c[keep]
@@ -4014,7 +4172,9 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
         ev_b = ev_b + ev_d; sq_b = np.concatenate([sq_b, sq_d])
         me_b = np.concatenate([me_b, np.asarray(label(ev_d, sq_d), float)])
     ev_f, sq_f, me_f = [], np.zeros(0), np.zeros(0)
-    if n_flat and pol.get("flat_range"):
+    if n_flat and pol.get("flat_range") and pol.get("flat_mcmc"):
+        ev_f, sq_f, me_f = _flat_mcmc_part(n_flat, uni, m_finals, pdg_ids, rng, cuts, pol, label, fwd_cand, beam_mass)
+    elif n_flat and pol.get("flat_range"):
         ev_f, sq_f, me_f = _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, pol, label,
                                             fwd_cand, beam_mass)
     elif n_flat:
