@@ -381,12 +381,28 @@ fi
 if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "LONG_* only on v4_het_default25[_seed2]"; exit 1 ;; esac
     LH=${LONG_HEADS:-8}; LF=${LONG_FACTOR:-1}
-    case "$LF" in 1|4|16) ;; *) echo "LONG_FACTOR must be 1, 4 or 16"; exit 1 ;; esac
+    case "$LF" in 1|2|4|8|16) ;; *) echo "LONG_FACTOR must be 1, 2, 4, 8 or 16"; exit 1 ;; esac
     ITERS=$((4264 * LF)); ITERS_FIXED=$ITERS
     EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=${LONG_MEMMAP:-false} ++data.train_subsample=null
            ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
     NORM+=(model.net.num_heads=$LH model.net.checkpoint_blocks=${LONG_CKPT:-false}); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
+    # LONG_HP=1262 (catalog_coverage step 64, D292/D293: the width x length map at >= 1 epoch): every cell at the long
+    # sweeps' best point, trial_1262 of cov_v4_long_hpo8_cc_17056 and _68224 (best of both; its config.yaml there:
+    # muon_weight_decay 0.04733132, regularization_lambda 9.114591e-08, cosanneal_warmup_frac 0.1800024,
+    # cosanneal_eta_min 1.376875e-08, ema false), its lr at the cell's steps from its two measured lrs, 7.82114e-3 at
+    # 17056 and 3.649139e-3 at 68224 (lr ~ steps^-0.55, the HPO surface's decay past t* ~ 3000); own run dir _hp1262
+    if [ -n "$LONG_HP" ]; then
+        [ "$LONG_HP" = 1262 ] || { echo "LONG_HP: only 1262"; exit 1; }
+        [ -z "$LONG_LR$GROW_K" ] || { echo "LONG_HP excludes LONG_LR and GROW_K"; exit 1; }
+        HLR=$(python -c "import math, sys; t = int(sys.argv[1]); a = math.log(7.82114e-3 / 3.649139e-3) / math.log(4); print(f'{7.82114e-3 * (t / 17056) ** -a:.7g}')" "$ITERS")
+        NORM=("${NORM[@]/#++training.lr=*/++training.lr=$HLR}")
+        NORM=("${NORM[@]/#++training.muon_weight_decay=*/++training.muon_weight_decay=0.04733132}")
+        NORM+=(++training.regularization_lambda=9.114591e-08 ++training.cosanneal_warmup_frac=0.1800024
+               ++training.cosanneal_eta_min=1.376875e-08 ema=false)
+        OUT="${OUT}_hp1262"; PRED="${PRED}_hp1262"
+        echo "LONG_HP 1262: steps $ITERS lr $HLR"
+    fi
     AXES+=(HD4 HD5)
     # width growth (plan warm_start step 4, D285): GROW_K=<533|1066|2132> with LONG_HEADS=16 starts from the 1x cell at
     # half the width and the same seed (its final model, after its sigma stage), grown function-preservingly
