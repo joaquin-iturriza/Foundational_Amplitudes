@@ -6,7 +6,7 @@ and the final loss; for the ws_c1_k533_hpo8 trials beside each its lr_scale and 
 checkpoint carries of optimizer state (number of AdamW and Muon state entries; the fine-tune path loads none of it).
 Usage: python3 analysis/catalog_v4/ws_restart_steps.py [--cached]   -> data/ws_restart_steps.json (--cached: reread it)
 The last line printed is the whole record as one JSON line (docs/results.tex claims)."""
-import json, os, sys
+import json, math, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
@@ -63,4 +63,19 @@ if __name__ == "__main__":
              "moment fill (k=533, s43)": "fill_s43", "default restart, same commit (k=533, s42)": "default_d303_s42",
              "default restart, same commit (k=533, s43)": "default_d303_s43",
              "Muon lr damped (k=533, s42)": "muon_damped_s42", "Muon lr damped (k=533, s43)": "muon_damped_s43"}
-    print(json.dumps({short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}))
+    res = {short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}
+    # step 8 (D303, design passed round 2 2026-11-06): Muon's share of the jump over steps 2-10,
+    # m = ln(G_ctrl / G_arm) / ln(G_ctrl / G_all), G_ctrl the same-seed default restart, G_all trial_1860's window max
+    # (every group damped, seed 42), scaled to seed 43 by the controls' ratio (an assumption: hpo8 ran seed 42 only)
+    g = lambda k: res.get(k, {}).get("grad_max_2_10")
+    if g("muon_damped_s42") and g("trial_1860"):
+        res["muon_share"] = {}
+        for s in ("s42", "s43"):
+            ctrl, arm = g("default_d303_" + s), g("muon_damped_" + s)
+            if not arm:
+                continue
+            g_all = g("trial_1860") * ctrl / g("default_d303_s42")
+            res["muon_share"][s] = {"G_ctrl": ctrl, "G_arm": arm, "G_all": g_all,
+                                    "m": math.log(ctrl / arm) / math.log(ctrl / g_all)}
+        print("muon_share", res["muon_share"])
+    print(json.dumps(res))
