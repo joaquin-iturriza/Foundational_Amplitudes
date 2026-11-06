@@ -2991,7 +2991,7 @@ units start nearly identical and only the noise and the data separate them.
 % claim: k.2132.g.EE4=0.45
 % allow: 8 16 2409.12903 10 3 1 0.25 4264 533 1066 2132 42 43 0.3 1.19 0.002 0.55 0.76 1.07 13fe9f64 because they are the widths, the paper id, the noise, the share, steps, k, seeds, the bar's exponent and value, the step-0 check (finding on the entry, from the run logs), C1's g, and the job commit
 
-\paragraph{Three repairs of the restart tried: the optimizer's state, a mean-MSE tuning, and the tuned growth (2026-11-06).}\label{par:v4_warm_start_repairs}
+\paragraph{Four repairs of the restart tried: the optimizer's state, a mean-MSE tuning, the tuned growth, and a damped Muon (2026-11-06).}\label{par:v4_warm_start_repairs}
 Tests of the cause suggested in par.~\ref{par:v4_warm_start_restart} and of a tuning objective that scores the held-out
 reads, all at $k=533$ (an eighth of a pretraining, D284), reads and $R$ as in par.~\ref{par:v4_warm_start}, seeds $42$
 and $43$, intervals the widened $95\%$ class bootstrap. First [D303]: is the empty optimizer what knocks the warm start
@@ -3016,9 +3016,20 @@ validation MSE of the mean is ruled out as a proxy for the held-out reads (fig.~
 same tuned recipe on the width growth $8\to16$ of par.~\ref{par:v4_warm_start_grow} (FA-ccin2p3-31359864,
 FA-ccin2p3-bfed460f) is worse than the growth with the default restart, $R$ PP4 $1.058$ ($[1.021, 1.097]$), EE4 $1.050$
 ($[0.959, 1.158]$), further from width $16$ from scratch ($R(W/B)$ PP4 $1.91$, EE4 $1.94$; untuned $1.75$, $1.76$) and
-no better than the width-$8$ parent it grew from ($R(W/A)$ PP4 $1.050$, EE4 $1.053$; fig.~\ref{fig:ws_c10wm}). So
-neither repair moves the reads; what is left of the cause is Muon's update size at the restart, tested by damping only
-Muon's learning rate over the first $168$ steps.
+no better than the width-$8$ parent it grew from ($R(W/A)$ PP4 $1.050$, EE4 $1.053$; fig.~\ref{fig:ws_c10wm}). Fourth
+[D303]: is the jump Muon's step, whose norm is set by the learning rate whatever the gradient? The arm multiplies only
+the Muon groups' learning rate by $\min(1, \text{step}/168)$ on top of the default restart, AdamW untouched
+(FA-ccin2p3-35f9a8a5, FA-ccin2p3-a0416422), against the same default restart pair as the fill. Muon's share of the
+jump, $m = \ln(G_\text{default}/G_\text{damped}) / \ln(G_\text{default}/G_\text{all})$ with $G$ the largest gradient
+norm over restart steps $2$ to $10$ and $G_\text{all}$ that of a restart with every group's learning rate at $0.174$ of
+the default (the sweep's trial~1860), is $-0.148$ at seed $42$ and $-0.059$ at seed $43$: the damped arm's peak is
+$1302$ and $1486$ against $994$ and $1334$, so damping Muon does not shrink the jump at all. The reads do not move
+either: $R(\text{damped}/\text{default})$ PP4 $1.032$ ($[0.866, 1.228]$), EE4 $1.045$ ($[0.911, 1.197]$), and against
+the change from scratch $R(W/B)$ PP4 $1.37$, EE4 $1.54$ (fig.~\ref{fig:ws_muon_damped}). The seed-$43$ damped run's
+validation NLL leaves the scale between steps $180$ and $420$ (at most $1.9\times10^{8}$ at step $300$) and recovers
+to $-2.576$ by step $533$, against $-2.585$ for its default restart; its reads are of its final model. So no repair
+moves the reads, and the jump is not the empty optimizer and not Muon's step: it is AdamW's share or the ramp of every
+group's learning rate. The untuned default restart stays the recipe for the other changes.
 % src: python3 analysis/catalog_v4/ws_restart_steps.py --cached @2231aecd
 % claim: fill_s42.grad_max20=1777
 % claim: fill_s43.grad_max20=1411
@@ -3065,7 +3076,27 @@ Muon's learning rate over the first $168$ steps.
 % claim: k.533.W_over_B.EE4.0=1.94
 % claim: k.533.W_over_A.PP4.0=1.050
 % claim: k.533.W_over_A.EE4.0=1.053
-% allow: 533 42 43 95 0 19 40 100 8 16 168 1.75 1.76 because they are k, the seeds, the interval's level, step windows, the fill length, the trial count, the widths, the Muon ramp length (the step-8 design) and the untuned growth's R(W/B) of par:v4_warm_start_grow
+% src: python3 analysis/catalog_v4/ws_restart_steps.py --cached @c14a07b0
+% claim: muon_share.s42.m=-0.148
+% claim: muon_share.s43.m=-0.059
+% claim: muon_damped_s42.grad_max_2_10=1302
+% claim: muon_damped_s43.grad_max_2_10=1486
+% claim: trial_1860.lr_scale=0.174
+% src: python3 analysis/catalog_v4/plot_ws_fill.py --damped --cached @e1b705f4
+% claim: arm_s43.val_max=1.9e8
+% claim: arm_s43.val_max_at=300
+% claim: arm_s43.val_last=-2.576
+% claim: default_s43.val_last=-2.585
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1u @c14a07b0
+% claim: k.533.W_over_default.PP4.0=1.032
+% claim: k.533.W_over_default.PP4.1.0=0.866
+% claim: k.533.W_over_default.PP4.1.1=1.228
+% claim: k.533.W_over_default.EE4.0=1.045
+% claim: k.533.W_over_default.EE4.1.0=0.911
+% claim: k.533.W_over_default.EE4.1.1=1.197
+% claim: k.533.W_over_B.PP4.0=1.37
+% claim: k.533.W_over_B.EE4.0=1.54
+% allow: 533 42 43 95 0 2 10 19 40 100 8 16 168 180 420 1.75 1.76 1 1860 because they are k, the seeds, the interval's level, step windows, the fill length, the trial count, the widths, the Muon ramp length (the step-8 design) and the untuned growth's R(W/B) of par:v4_warm_start_grow (and 1, 1860, 180, 420: the ramp cap min(1, .), the sweep trial id, the first and last off-scale steps)
 
 \begin{figure}[H]
 \centering
@@ -3107,6 +3138,20 @@ a cumulative fraction of classes, each probe the geometric mean of its two seeds
 \label{fig:ws_c10wm}
 % allow: 533 42 8 16 2 because they are the retraining length, the seed, the widths and the square in |M|^2
 \end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{../analysis/catalog_v4/figs/ws_muon_damped.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_fill.py --damped --cached @e1b705f4
+\caption{The $k=533$ restart with Muon's learning rate damped over its first $168$ steps against the default restart,
+seeds $42$ (solid) and $43$ (dashed). Top left: the gradient norm before clipping against the restart's step. Top
+right: the validation loss of the main stage (het NLL); the seed-$43$ damped run's excursions above $0.5$ are cut off.
+Bottom: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative fraction of
+classes, each probe the geometric mean of its two seeds.}
+\label{fig:ws_muon_damped}
+% allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
+\end{figure}
+
 
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
