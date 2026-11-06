@@ -12129,11 +12129,6 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
-    18: 'Review-state gap (catalog owner a8dc83fd21c2d8d4f, 2026-11-06): one watermark per pillar loses a branch''s pass when
-      another branch''s pass moves it, so the first branch''s merge is refused. Proposed: review_backlog.sh reset_pillar appends
-      every passed tip to .claude/.review_state/<pillar>.passed and never moves the watermark back on --at; tools/review_state.passed()
-      accepts a tip that is an ancestor of, or has the same pillar files as, a listed pass. The agent''s edit was refused
-      as self-modification; Joaquin told 2026-11-06. Apply when allowed, test on two branches passing in sequence.'
     19: 'Two growth data caches on CC-IN2P3 (/sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache/27a1422795e9872faa6b9eaf and
       0c897ca2d81c98d3828e2808, ~18 GB each, ours, rebuildable): their deletion through site run was refused for the warm_start
       agent by the permission check; Joaquin told 2026-11-06. Delete when he allows or does it.'
@@ -12392,11 +12387,6 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
-    18:
-      feeds: merges not refused after a passed review
-      if:
-      - 'applied and tested: drop'
-      - 'still refused: Joaquin applies it or allows it'
     19:
       feeds: disk on /sps/lpnhe (93 GB free)
       if:
@@ -12414,7 +12404,6 @@ entries:
       with main_turns.py
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
-    '18': Joaquin allowing the review tool change (asked 2026-11-06)
     '19': Joaquin allowing the cache deletion (asked 2026-11-06)
   owner:
     agent: a1319346e2069b331
