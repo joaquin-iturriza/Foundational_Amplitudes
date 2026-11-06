@@ -28,6 +28,10 @@ RUNS = {"warm start, default lr (k=533, s42)": "runs/catalog_v4_short/v4_het_war
         "every group damped (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25e_k533",
         "every group damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25e_k533_seed2"}
 RUNS.update({"hpo8 " + d.rsplit("/", 1)[1]: d for d in sorted(glob.glob("runs/ws_c1_k533_hpo8/trial_*"))})
+# step 12 (D307, D308): the restart study from the checkpoint rerun v4_het_control_ckpt[_seed2], arms v4_het_ws_*
+for _a in ("final_default", "step3198_default", "step3198_continue", "step2132_continue", "final_lr3x"):
+    for _s, _sfx in (("s42", ""), ("s43", "_seed2")):
+        RUNS["restart study " + _a + " " + _s] = "runs/catalog_v4_short/v4_het_ws_" + _a + _sfx
 out = {}
 for lab, d in RUNS.items():
     if not os.path.exists(d + "/train_steps.npz"):
@@ -69,7 +73,8 @@ if __name__ == "__main__":
              "Muon lr damped (k=533, s42)": "muon_damped_s42", "Muon lr damped (k=533, s43)": "muon_damped_s43",
              "AdamW lr damped (k=533, s42)": "adamw_damped_s42", "AdamW lr damped (k=533, s43)": "adamw_damped_s43",
              "every group damped (k=533, s42)": "all_damped_s42", "every group damped (k=533, s43)": "all_damped_s43"}
-    res = {short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}
+    res = {short.get(k, k.replace("hpo8 ", "").replace("restart study ", "ws_").replace(" ", "_").lstrip("_")): v
+           for k, v in out.items()}
     # step 8 (D303, design passed round 2 2026-11-06): Muon's share of the jump over steps 2-10,
     # m = ln(G_ctrl / G_arm) / ln(G_ctrl / G_all), G_ctrl the same-seed default restart, G_all trial_1860's window max
     # (every group damped, seed 42), scaled to seed 43 by the controls' ratio (an assumption: hpo8 ran seed 42 only)
@@ -100,4 +105,21 @@ if __name__ == "__main__":
                                      "a": math.log(ctrl / ad) / den if ad and den else None,
                                      "m_vs_both": math.log(ctrl / mu) / den if mu and den else None}
         print("step9_share", res["step9_share"])
+    # step 12 (D307, D308, design passed round 2): each arm's jump against the same-seed control (final_default),
+    # G = largest grad norm over restart steps 0-19; the jump moved when G_arm / G_ctrl < 0.5 or > 2 at both seeds
+    if res.get("ws_final_default_s42", {}).get("grad_max20"):
+        res["step12_jump"] = {}
+        for a in ("step3198_default", "step3198_continue", "step2132_continue", "final_lr3x"):
+            row = {}
+            for s in ("s42", "s43"):
+                c, r = res.get(f"ws_final_default_{s}", {}), res.get(f"ws_{a}_{s}", {})
+                if c.get("grad_max20") and r.get("grad_max20"):
+                    row[s] = {"G_ctrl": c["grad_max20"], "G_arm": r["grad_max20"],
+                              "G_ratio": r["grad_max20"] / c["grad_max20"],
+                              "loss0_ctrl": c["loss_0_2"][0], "loss_max40_ctrl": c["loss_max40"],
+                              "loss0_arm": r["loss_0_2"][0], "loss_max40_arm": r["loss_max40"]}
+            gr = [v["G_ratio"] for v in row.values()]
+            row["moved"] = len(gr) == 2 and (all(x < 0.5 for x in gr) or all(x > 2 for x in gr))
+            res["step12_jump"][a] = row
+        print("step12_jump", json.dumps(res["step12_jump"]))
     print(json.dumps(res))
