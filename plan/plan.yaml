@@ -14634,6 +14634,13 @@ entries:
       +0.634 at 20, ends -2.412 (untuned s43 spiked to 6.7e7 at step 200 and recovered, known). By the design''s rule: the
       untuned restarted schedule stays the recipe for C2-C8; the val MSE of the mean is ruled out as a proxy objective for
       the zero-shot reads (the 8-trial sweep''s best is at par with untuned). The growth read (C10wm) is pending (31359864/bfed460f).'
+  - at: '2026-11-06T08:25:30+00:00'
+    text: '2026-11-06 step 8 (damped-Muon restart, fine_tune.muon_warmup_steps=168, arm v4_het_warm25u_k533[_seed2]): design
+      passed round 2 (Muon''s share m of the steps 2-10 jump against trial_1860''s everything-damped 160; reviewer''s caveat:
+      m may read up to 1.25x high, report a MUON verdict near 0.7 with it). Code on branch muon-warmup @4a4d99c2 (repo-reviewer
+      PASS on it); the merge into trunk waits on the repo-reviewer''s backlog advance, held by its one BLOCK in a file of
+      catalog_coverage''s (ee_gain.py outcome_PP4, 142f98a0), routed to the main session. Not yet submitted. Step 7 waits
+      on step 8''s read (it may change the recipe); C1m chose the untuned restart until then.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
