@@ -15519,6 +15519,15 @@ entries:
       (CPU, scripts/job_mmap_prebuild.sh on the base run''s config) submitted, plan wait step 11 on it; the sweep goes after
       it ends rc 0 and after step 10''s reads. Not yet done: mixture_ab.py WARM C8 W[2132] and C1a/C1e (ids at the launch),
       plot_ws_fill.py with step 10''s arms, the GROW_HP=<trial>/GROW_SWEEP re-run arm.'
+  - at: '2026-11-06T11:08:33+00:00'
+    text: '2026-11-06 ~11:15 UTC: step 12 done: the objective-check finding written up as par:v4_warm_start_objective with
+      fig:ws_objective (f213c72f, notes-editor pass, verify_claims 0 problems; src ws_objective_check.py summary/score @e4f480e6,
+      a new summary mode printing the cached verdict); the figure relabelled again at c6a0b124 (y label ran into the x label;
+      x now 1/2(ln R_pp + ln R_ee), y without codes), data unchanged. Step 11: the memmap prebuild FA-ccin2p3-5e02275b COMPLETED,
+      its log: cache amp_mmap_cache/27a1422795e9872faa6b9eaf/trainall_val200_test200 is ready (the existing one, no new build);
+      the sweep waits only on step 10''s reads now. The re-run arm GROW_SWEEP=<sweep> GROW_HP=<idx> built on branch ws-grow-hp
+      @475c122c (tools/sweep_trial_hps.py reads the searched keys from the trial''s saved config.yaml; tests/test_sweep_trial_hps.py
+      3 pass), repo-reviewer running.'
   step_waits:
     '10': FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b
       FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7 FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e
