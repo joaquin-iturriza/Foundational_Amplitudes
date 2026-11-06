@@ -11084,6 +11084,9 @@ entries:
       plan_check.py and two tests of other workers. Find how (git add -A / commit -a during the merge, or files staged in
       the shared index), and add a check to the commit hook that refuses a commit (merge included) carrying a staged file
       the committing agent did not name; replay on 21648d10''s parent state.'
+    17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
+      plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
+      within 45 min; report to Joaquin either way.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -11323,6 +11326,11 @@ entries:
       if:
       - 'fixed and replayed: drop'
       - 'cannot tell who staged a file: say so and refuse merge commits with staged files outside the merged branch''s diff'
+    17:
+      feeds: 'Joaquin 2026-11-06: fixes must be shown to work, not claimed'
+      if:
+      - 'fired: report and drop'
+      - 'did not fire: trace and fix, replay again'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
