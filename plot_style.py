@@ -1026,9 +1026,14 @@ _CODE_TOKENS = [
 _CODE_RE = [(n, re.compile(r"(?<![A-Za-z0-9_=])" + p + r"(?![A-Za-z0-9_])")) for n, p in _CODE_TOKENS]
 
 
+#: Real names that look like codes; removed before the scan.
+_ALLOWED = re.compile(r"(?<![A-Za-z0-9_=])(?:L[12]|[AHV]\d{2,3}|SM|QCD|QED|NLO|NNLO|LO|MSE|NLL|EMA|LR|HPO|pp)(?![A-Za-z0-9_])")
+
+
 def code_in_label(text: str):
     """(kind, token) of the first code-like standalone token of `text` outside $...$ math, else None."""
     plain = re.sub(r"\$[^$]*\$", " ", str(text))
+    plain = _ALLOWED.sub(" ", plain)
     for kind, rx in _CODE_RE:
         m = rx.search(plain)
         if m:

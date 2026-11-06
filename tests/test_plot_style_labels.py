@@ -44,3 +44,13 @@ def test_codes_refused(t):
 @pytest.mark.parametrize("t", ["GeV", "val loss", "PP4"[:0] or "pp", "MSE of log", "step", r"$k=533$", "10 TeV"])
 def test_plain_allowed(t):
     assert ps.code_in_label(t) is None
+
+
+@pytest.mark.parametrize("t", ["AdamW L2 weight $\\lambda$", "training wall time on one V100 [h]", "A100 / H100", "NLO QCD MSE"])
+def test_real_names_allowed(t):
+    assert ps.code_in_label(t) is None
+
+
+@pytest.mark.parametrize("t", ["C1t", "parent A"])
+def test_still_refused(t):
+    assert ps.code_in_label(t) is not None
