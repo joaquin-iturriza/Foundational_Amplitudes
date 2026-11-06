@@ -717,7 +717,7 @@ DIV_DUP_EXCESS = 0.02    # near-duplicate share (weighted over in-range bins) ab
 DIV_DUP_TOP = 0.05       # near-duplicate share in any of the top 40% of in-range bins, at most
 DIV_NN_MED = 0.8         # median over in-range bins of the NN-distance ratio against the reference at equal count, at least
 DIV_NN_Q10 = 0.5         # its 10% quantile over in-range bins, at least
-COST_MAX = 2.0           # train-pool replay seconds over the old generation-log seconds (CLAUDE.md's 2x margin)
+COST_MAX = 2.0           # train-pool replay seconds over the old generation-log seconds (the step-69 design's bound)
 
 
 def step69():
