@@ -3774,6 +3774,7 @@ entries:
     - FA-ccin2p3-1b592055
     - FA-ccin2p3-1bb79f75
     - FA-ccin2p3-1bc24e50
+    - FA-ccin2p3-1c6caddf
     - FA-ccin2p3-1e3a5ffa
     - FA-ccin2p3-1e4f6802
     - FA-ccin2p3-1f9aa51a
@@ -3792,6 +3793,7 @@ entries:
     - FA-ccin2p3-263c862e
     - FA-ccin2p3-26468736
     - FA-ccin2p3-26b2426a
+    - FA-ccin2p3-2756bece
     - FA-ccin2p3-27bb2b45
     - FA-ccin2p3-27bcaacc
     - FA-ccin2p3-2a33d281
@@ -3826,6 +3828,7 @@ entries:
     - FA-ccin2p3-3aac22c2
     - FA-ccin2p3-3b5043a3
     - FA-ccin2p3-3b847ba3
+    - FA-ccin2p3-3bafdc58
     - FA-ccin2p3-3d47889b
     - FA-ccin2p3-3dc6cec1
     - FA-ccin2p3-3defa89a
@@ -3847,6 +3850,7 @@ entries:
     - FA-ccin2p3-4cfdaefd
     - FA-ccin2p3-4e3484a6
     - FA-ccin2p3-4e83293d
+    - FA-ccin2p3-4ea1c1eb
     - FA-ccin2p3-4eb2cbd0
     - FA-ccin2p3-4f945be2
     - FA-ccin2p3-50e87538
@@ -3984,6 +3988,7 @@ entries:
     - FA-ccin2p3-a30c4ec3
     - FA-ccin2p3-a387df71
     - FA-ccin2p3-a39b869e
+    - FA-ccin2p3-a52c9185
     - FA-ccin2p3-a5325d33
     - FA-ccin2p3-a5662880
     - FA-ccin2p3-a6d4fa4b
@@ -4030,6 +4035,7 @@ entries:
     - FA-ccin2p3-c1f1d80b
     - FA-ccin2p3-c26fc588
     - FA-ccin2p3-c2d4e70e
+    - FA-ccin2p3-c2e82e97
     - FA-ccin2p3-c3488b25
     - FA-ccin2p3-c3ebb517
     - FA-ccin2p3-c424046d
@@ -4056,6 +4062,7 @@ entries:
     - FA-ccin2p3-d4e2caa6
     - FA-ccin2p3-d626c4a9
     - FA-ccin2p3-d6379000
+    - FA-ccin2p3-d84270fc
     - FA-ccin2p3-d8b51095
     - FA-ccin2p3-dbca642d
     - FA-ccin2p3-dbf7e939
@@ -4074,6 +4081,7 @@ entries:
     - FA-ccin2p3-e2da5118
     - FA-ccin2p3-e3d6e947
     - FA-ccin2p3-e4c00db2
+    - FA-ccin2p3-e4e0f158
     - FA-ccin2p3-e5d74011
     - FA-ccin2p3-e61073d0
     - FA-ccin2p3-e7b3b340
@@ -4117,7 +4125,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: 437277e9
+    commit: b77d172d
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4390,6 +4398,8 @@ entries:
     - analysis/catalog_v4/data/complete_runs.json
     - analysis/catalog_v4/data/control_pool_ids_1d9d6a29.json
     - analysis/catalog_v4/data/density_check.json
+    - analysis/catalog_v4/data/ee_gain_events.json
+    - analysis/catalog_v4/data/ee_gain_mechanism.json
     - analysis/catalog_v4/data/het_uncertainty.json
     - analysis/catalog_v4/data/job_wall_split.json
     - analysis/catalog_v4/data/lhe_probe_by_energy.json
