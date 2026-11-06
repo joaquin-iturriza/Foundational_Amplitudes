@@ -9770,9 +9770,9 @@ entries:
       - 'above 30 GPU-h not covered: estimate to the main session'
   owner:
     agent: a8dc83fd21c2d8d4f
-    state: closed
+    state: stopped
     since: '2026-11-06T04:32:00+00:00'
-    state_at: '2026-11-06T05:18:08.060000+00:00'
+    state_at: '2026-11-06T05:22:18+00:00'
     context: 271802
     context_at: '2026-11-06T05:18:13+00:00'
   findings:
