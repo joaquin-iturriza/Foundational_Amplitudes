@@ -161,6 +161,44 @@ def test_multiperipheral_draw():
         assert acc > 0.7 and acc > 2 * acc_s
 
 
+PINNED_MPERI_PZ = [-5.884409088916563, 2.6553593937263056, 0.7716145554661688, 2.4574351397118717, -0.3205210552266862,
+                   -45.19052783313533, 136.19802666363015, -90.68697777526815, 704.8498443536913, -17.114595845210008,
+                   5.284393600968798, -693.0196421094499, -1110.8624996625797, -1222.7408353322023, 2497.99741511791,
+                   -164.39408012312714]
+
+
+def test_multiperipheral_edge():
+    """plan step 66: without `edge` the step-58 ladder's draws (pinned from trunk 1393e8e9); with it phase space exact,
+    inside |eta| < 5 and the acceptance as the old ladder's, and the corner (every pT at the cut, the span at the edge,
+    sqrt(s) ~ 2 x 10 GeV x cosh 5) proposed far more often"""
+    rng = np.random.default_rng(21)
+    P = mg.multiperipheral_draw(4, np.array([60.0, 300.0, 1450.0, 5000.0]), [0.0] * 4, 1e-6, rng)
+    np.testing.assert_allclose(P[:, :, 3].ravel(), PINNED_MPERI_PZ, rtol=1e-12)
+    rng = np.random.default_rng(5)
+    sq = np.exp(rng.uniform(np.log(50.0), np.log(6000.0), 4000))
+    for masses in ([0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 80.419]):
+        _check_ps(mg.multiperipheral_draw(4000, sq, masses, 1e-6, rng, edge=True), sq, masses)
+    masses, pdg, cuts = [0.0] * 4, np.array([2, 3, 1, -1, 3, 2]), mg.V4_CUTS["hadronic"]
+    corner = {}
+    for edge in (False, True):
+        sq = np.full(20000, 1450.0)
+        P = mg.multiperipheral_draw(20000, sq, masses, 1e-6, np.random.default_rng(1), edge=edge)
+        _check_ps(P, sq, masses)
+        pt = np.hypot(P[..., 1], P[..., 2]); pa = np.linalg.norm(P[..., 1:], axis=-1)
+        eta = np.abs(0.5 * np.log((pa + P[..., 3]) / (pa - P[..., 3])))
+        assert (eta.max(1) <= 5.0 + 1e-9).all()
+        acc = mg.fiducial_pass_mask(np.concatenate([mg._beams(sq, pdg, None), P], 1), np.zeros(4), pdg, cuts).mean()
+        corner[edge] = ((pt < 13.0).all(1) & (eta.max(1) > 4.8)).mean()
+        print(f"edge={edge}: acceptance {acc:.3f}, every pT < 13 GeV and max|eta| > 4.8: {corner[edge]:.4f}, "
+              f"first three pT < 11 GeV: {(pt[:, :3] < 11.0).all(1).mean():.4f}")
+        assert acc > 0.7
+    assert corner[True] > 0.03 and corner[True] > 20 * corner[False]
+    ch = mg.mc_channels([0.0] * 4, [2, 2, 5, -5, 2, 2], [], mperi=True, mperi_edge=True)
+    assert ch[-1] == ("mperi", "edge") and not any(c == ("mperi",) for c in ch)
+    sq = np.full(500, 1450.0)
+    _check_ps(mg._mc_draw(ch[-1], 500, sq, np.zeros(4), 1e-6, np.random.default_rng(2)), sq, masses)
+
+
 def test_mc_channels_flags():
     """res2 pairs only disjoint resonances; mperi needs two partons; both off by default"""
     res = [[(0, 1), 23], [(2, 3), 24], [(1, 2), 24]]

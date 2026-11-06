@@ -3525,9 +3525,17 @@ def resonance2_draw(nb, sqrts, masses, S1, M1, G1, S2, M2, G2, y_lo, rng, tail=M
 # GeV (uu_bbxuu) and 13.3/18.1/31.2 (us_ddxsu) at 10/50/90% (analysis/catalog_v4/data/quota_where/, multichannel_check
 # where @3a96f907), so pT log-uniform in [MC_PT_LO, 3.2 MC_PT_LO] [from those reads; the log-uniform shape open]
 MC_LADDER_PT_SPAN = 3.2
+# The ladder's "edge" variant (plan step 66): the top ~1 dex of the QCD 2->4 classes' log|M|^2 range sits at sqrt(s_hat)
+# ~1.4 TeV = 2 x 10 GeV x cosh 5, every pT at the cut and the span at the |eta| 5 edge (step 65's where reads), which the
+# fixed span and the outer end uniform in [4, 5) reach rarely. Per event the pT span is log-uniform in
+# [MC_LADDER_SPAN_LO, MC_LADDER_PT_SPAN] (the narrowest 5%: every pT within 5% of the cut) and the outer end is
+# eta_max - d, d log-uniform in MC_LADDER_EDGE_D (density toward the edge) [both ranges open]
+MC_LADDER_SPAN_LO = 1.05
+MC_LADDER_EDGE_D = (1e-3, 1.0)
 
 
-def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=MC_LADDER_PT_SPAN):
+def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=MC_LADDER_PT_SPAN,
+                         edge=False):
     """(nb, N, 4) finals in the partonic frame (plan step 58: the forward multiperipheral events at the top of the QCD
     classes' log|M|^2 range, sqrt(s_hat) 20-60x the window's edge, |eta| to 4.9, pT at the cut). The first N - 1
     finals at pT log-uniform in [pt_lo, pt_span pt_lo], phi uniform; the last balances their pT (so its pT is not
@@ -3537,9 +3545,11 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     stay inside eta_cap and the pT
     are scaled up (factor k) until the mass reaches sqrt(s) (wider angles at large sqrt(s)); y0 is recomputed at the
     final k, so a massive final can move it slightly. An event whose mass at Y = 0 already exceeds sqrt(s) takes the
-    plain splitter."""
+    plain splitter. With `edge` (plan step 66), each event's pT span is log-uniform in [MC_LADDER_SPAN_LO, pt_span]
+    and eta_cap = eta_max - d with d log-uniform in MC_LADDER_EDGE_D; without it the draws are the step-58 ladder's."""
     masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
-    pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_lo * pt_span), (nb, N - 1)))
+    span = (np.exp(rng.uniform(np.log(MC_LADDER_SPAN_LO), np.log(pt_span), (nb, 1))) if edge else pt_span)
+    pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_lo * span), (nb, N - 1)))
     ph = rng.uniform(0.0, 2.0 * np.pi, (nb, N - 1))
     px, py = pt * np.cos(ph), pt * np.sin(ph)
     px = np.concatenate([px, -px.sum(1, keepdims=True)], 1); py = np.concatenate([py, -py.sum(1, keepdims=True)], 1)
@@ -3570,7 +3580,10 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     # the boosted span max|y| >= Y (u spans [-1, 1]), so the largest span inside eta_max lies in [0, eta_max]
     # the capped ladder's outer end at eta_cap uniform in [eta_max - 1, eta_max) (inside the strict |cos theta| cut;
     # the unreached pp events' largest |eta| 4.2/4.6/4.9 at 10/50/90%) [the 1-unit band open]
-    cap = rng.uniform(eta_max - 1.0, eta_max - 1e-6, nb)
+    if edge:
+        cap = eta_max - np.exp(rng.uniform(np.log(MC_LADDER_EDGE_D[0]), np.log(MC_LADDER_EDGE_D[1]), nb))
+    else:
+        cap = rng.uniform(eta_max - 1.0, eta_max - 1e-6, nb)
     Yc = bisect(lambda Y: np.abs(parts(Y, ones)[1]).max(1) <= cap, np.zeros(nb), np.full(nb, eta_max))
     short = (Ym > Yc) & ~bad
     Y, k = np.where(short, Yc, Ym), ones.copy()
@@ -3586,14 +3599,14 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     return P
 
 
-def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False):
+def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False, mperi_edge=False):
     """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
     is a parton and there are at least three finals; with `res2`, ("res2", S1, p1, M1, G1, S2, p2, M2, G2) per pair of
     resonances on disjoint finals (both on shell together, plan step 58: the doubly resonant top of the electroweak
     classes' log|M|^2 range); with `mperi`, ("mperi",) when the beams and at least two finals are partons (every
     final at pT near the cut spread in rapidity to the acceptance edge: the forward multiperipheral top of the QCD
-    classes' range)"""
+    classes' range), ("mperi", "edge") instead with `mperi_edge` (multiperipheral_draw's edge variant, plan step 66)"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
     rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
     res = [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
@@ -3604,7 +3617,7 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
     if res2:
         ch += [("res2",) + a[1:] + b[1:] for i, a in enumerate(res) for b in res[i + 1:] if not set(a[1]) & set(b[1])]
     if mperi and len(partons) >= 2 and all(abs(q) in MC_PARTONS for q in pdg[:2]):   # hadronic beams only (|eta| < 5)
-        ch.append(("mperi",))
+        ch.append(("mperi", "edge") if mperi_edge else ("mperi",))
     return ch
 
 
@@ -3622,7 +3635,7 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
     if ch[0] == "res2":
         return resonance2_draw(nb, sq, m_finals, ch[1], ch[3], ch[4], ch[5], ch[7], ch[8], y_lo, rng)
     if ch[0] == "mperi":
-        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng)
+        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng, edge=ch[1:] == ("edge",))
     return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
 
 
@@ -3865,7 +3878,8 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         if pol.get("mc_resonances") and not pol.get("mc_res_params"):
             raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
         chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
-                            pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")))
+                            pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
+                            bool(pol.get("mc_mperi_edge")))
         shares = np.full(len(chans), 1.0 / len(chans))
     tr, itr = (np.log, np.exp) if log_s else ((lambda x: x), (lambda x: x))
     t_lo, t_hi = tr(lo), tr(hi)
@@ -3986,7 +4000,8 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
             if pol.get("mc_resonances") and not pol.get("mc_res_params"):
                 raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
             chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
-                                pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")))
+                                pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
+                                bool(pol.get("mc_mperi_edge")))
             sh1 = np.full(len(chans), 1.0 / len(chans))
             ev1, sq1, c1 = _candidates_mc(n1, uni, m_finals, pdg_ids, rng, cuts, chans, sh1, pol["y_lo"], fwd_cand,
                                           beam_mass)
