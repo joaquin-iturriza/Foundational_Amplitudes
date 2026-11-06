@@ -2780,7 +2780,8 @@ warm start: $R(W/B)$ PP4 $1.59$ ($[1.54, 1.65]$), EE4 $2.21$ ($[1.87, 2.60]$), a
 over the untuned warm start at the same seeds PP4 $1.19$ ($[1.01, 1.39]$), EE4 $1.40$ ($[1.20, 1.67]$). It reaches a
 smaller share of the from-scratch gain, $g$ PP4 $0.31$ and EE4 $0.29$ (untuned $0.55$, $0.66$). The sweep's objective
 improved while these reads got worse: a low learning rate keeps the model near the parent, which the in-distribution
-validation NLL rewards and the held-out reads do not, so this objective does not pick warm-start settings for this
+validation NLL rewards and the held-out reads do not (par.~\ref{par:v4_warm_start_restart} shows the NLL gain is a
+sharper $\sigma$), so this objective does not pick warm-start settings for this
 question. Second [D289]: does a warm start from a checkpoint taken before the parent's learning rate has decayed
 adapt better than one from its final model? The parent was rerun (FA-ccin2p3-d521160b, FA-ccin2p3-b688a859, seeds
 $42$, $43$) saving its EMA model at steps $2132$ and $3198$ (cosine learning rate at about $0.65$ and $0.20$ of its
@@ -2827,6 +2828,114 @@ settings tuned for the final model.
 % claim: k.533.W_over_tuned_post_sigma.PP4.0=1.00
 % claim: k.533.W_over_tuned_post_sigma.EE4.0=0.99
 % allow: 0.25 533 8 0.17 1.35 1.33 1.51 0.55 0.66 42 43 2132 3198 0.65 0.20 0.90 1 d9e1af1f because they are the share, k, the trial count, the tuned lr scale, the rule bars, the untuned k=533 reads of par:v4_warm_start, the seeds, the checkpoint steps and their cosine lr fractions, and the job script commit
+
+\paragraph{Why the tuned warm start reads worse, and what the restart does in its first steps (2026-11-06).}\label{par:v4_warm_start_restart}
+Two readings behind the tuned warm start of par.~\ref{par:v4_warm_start_tuned}, whose validation NLL improved while
+the held-out reads got worse. First [D291]: which term of the het loss did the tuning move? The validation NLL splits
+exactly into a $\sigma$-weighted error $\langle r^2/2\sigma^2\rangle$ (ideal $0.5$ for a calibrated $\sigma$) and a
+log-$\sigma$ term $\langle\log\sigma\rangle$, with $r$ the residual of the mean in the standardised target, each
+averaged over a process's validation events and then arithmetically over the $1153$ processes (share-$0.25$
+validation pools, the parent's target statistics). The three models the sweep kept were reread event by event
+(FA-ccin2p3-7a40c835, \code{scripts/job\_ws\_het\_split.sh} @daadd002): the pretrained start $0.727 + (-3.298) =
+-2.571$, MSE of the mean $0.0764$; the default-learning-rate warm start (after its sigma stage) $0.523 + (-3.169) =
+-2.646$, MSE $0.0555$; the NLL-tuned best trial (learning-rate scale $0.17$, its EMA weights) $0.524 + (-3.282) =
+-2.758$, MSE $0.0501$. The reread reproduces the logged NLL to $1.2\times10^{-4}$. Process by process, tuned minus
+default: the $\sigma$-weighted error has median $0.0036$ (below $0$ in a share $0.48$ of the processes), the log-$\sigma$ term median
+$-0.058$ (share below $0$: $0.75$), the MSE of the mean median $0.0000$ ($0.53$). Both warm starts are calibrated, and the median process fits the mean equally, though the tuned model's
+process-averaged MSE is lower (mean difference $-0.0054$), carried by a minority of processes. The tuning's NLL gain
+is a sharper $\sigma$ (log-$\sigma$ term mean difference $-0.113$, $\sigma$-weighted error $0.0009$), which the
+held-out reads (MSE of the mean) do not score, and on those reads the tuned model is worse
+(par.~\ref{par:v4_warm_start_tuned}; fig.~\ref{fig:ws_het_split}), so NLL is the wrong objective for tuning a
+warm start here (the next sweep minimises the validation MSE of the mean; D298 leaves the objective to us). The other seven trials' models were pruned by the sweep
+and not retrained. Second [D303]: what the restart's schedule does to the pretrained model. From each run's
+per-step log (seed $42$): the default warm start's learning rate is $0$, $5.9\times10^{-5}$, $1.2\times10^{-4}$ at
+steps $0$, $1$, $2$ (re-warming to the from-scratch peak $5.0\times10^{-3}$ at step $84$), its gradient norm $10.7$,
+$18.1$, $825$, largest over steps $0$ to $19$ $1591$; its training loss goes from $-2.577$ at step $0$ to a worst of
+$-1.21$ in the first $40$ steps and ends at $-2.641$. The grown width-$16$ start of par.~\ref{par:v4_warm_start_grow}
+jumps the same way ($23.1$, $11.1$, $858$; worst $-1.54$). Over the eight trials of the sweep the step-$2$ gradient
+norm follows the step-$2$ learning rate: $101$ at $1.6\times10^{-5}$, $339$ to $488$ at $5.2\times10^{-5}$ to
+$7.1\times10^{-5}$, $832$ at $1.3\times10^{-4}$, $2120$ at $3.4\times10^{-4}$, $3226$ at $5.2\times10^{-4}$, $4306$ at
+$6.9\times10^{-4}$, and the worst training loss over the first $40$ steps rises with it from $-2.47$ to $3.88$. So
+every restart's gradient norm jumps at step $2$, at a small fraction of the peak learning rate, all but the
+lowest-learning-rate trial lose a visible part of the pretrained fit within the first $40$ steps, and the
+low-learning-rate trials win the in-distribution NLL by losing least of the
+parent's fit. The suspected cause, from the code and not yet tested by a run: the fine-tune path starts AdamW and Muon
+with empty state, so the first updates have a size set by the learning rate, not by the gradient (Adam's
+bias-corrected first step moves each weight by about the learning rate; Muon's orthogonalised step has a fixed norm).
+The parent's checkpoint cannot supply that state: it holds $0$ Muon and $2$ AdamW state entries, as the sigma stage
+writes its own optimizer into the same model files. Resetting the optimizer state was taken to be harmless after Ibrahim et al.\ 2024 (arXiv:2403.08763), who
+studied re-warms over thousands of steps; here the jump is a real share of a $533$-step retraining.
+% src: python3 analysis/catalog_v4/ws_het_split.py summary --log analysis/catalog_v4/data/ws_hpo8/het_split_log.txt.gz @17195232
+% claim: rows.parent.W=0.727
+% claim: rows.parent.S=-3.298
+% claim: rows.parent.NLL=-2.571
+% claim: rows.parent.MSE=0.0764
+% claim: rows.untuned_k533.W=0.523
+% claim: rows.untuned_k533.S=-3.169
+% claim: rows.untuned_k533.NLL=-2.646
+% claim: rows.untuned_k533.MSE=0.0555
+% claim: rows.trial_1860.W=0.524
+% claim: rows.trial_1860.S=-3.282
+% claim: rows.trial_1860.NLL=-2.758
+% claim: rows.trial_1860.MSE=0.0501
+% claim: rows.parent.n_proc=1153
+% claim: reread_minus_logged=1.2e-4
+% claim: tuned_minus_default.W.median=0.0036
+% claim: tuned_minus_default.W.share_below0=0.48
+% claim: tuned_minus_default.S.median=-0.058
+% claim: tuned_minus_default.S.share_below0=0.75
+% claim: tuned_minus_default.MSE.median=0.0000
+% claim: tuned_minus_default.MSE.share_below0=0.53
+% claim: tuned_minus_default.MSE.mean=-0.0054
+% claim: tuned_minus_default.S.mean=-0.113
+% claim: tuned_minus_default.W.mean=0.0009
+% src: python3 analysis/catalog_v4/ws_restart_steps.py --cached @17195232
+% claim: default.lr_0_2.1=5.9e-5
+% claim: default.lr_0_2.2=1.2e-4
+% claim: default.peak_lr=5.0e-3
+% claim: default.peak_at=84
+% claim: default.grad_0_2.0=10.7
+% claim: default.grad_0_2.1=18.1
+% claim: default.grad_0_2.2=825
+% claim: default.grad_max20=1591
+% claim: default.loss_0_2.0=-2.577
+% claim: default.loss_max40=-1.21
+% claim: default.loss_end=-2.641
+% claim: grown.grad_0_2.0=23.1
+% claim: grown.grad_0_2.1=11.1
+% claim: grown.grad_0_2.2=858
+% claim: grown.loss_max40=-1.54
+% claim: trial_1860.grad_0_2.2=101
+% claim: trial_1860.lr_0_2.2=1.6e-5
+% claim: trial_0952.grad_0_2.2=339
+% claim: trial_0952.lr_0_2.2=5.2e-5
+% claim: trial_0871.grad_0_2.2=488
+% claim: trial_0871.lr_0_2.2=7.1e-5
+% claim: trial_1333.grad_0_2.2=832
+% claim: trial_1333.lr_0_2.2=1.3e-4
+% claim: trial_0400.grad_0_2.2=2120
+% claim: trial_0400.lr_0_2.2=3.4e-4
+% claim: trial_0818.grad_0_2.2=3226
+% claim: trial_0818.lr_0_2.2=5.2e-4
+% claim: trial_0353.grad_0_2.2=4306
+% claim: trial_0353.lr_0_2.2=6.9e-4
+% claim: trial_1860.loss_max40=-2.47
+% claim: trial_0353.loss_max40=3.88
+% claim: parent_optimizer_state.muon_state_entries=0
+% claim: parent_optimizer_state.adamw_state_entries=2
+% allow: 0 0.5 0.25 0.17 1 2 16 19 40 42 43 100 533 2403.08763 daadd002 because they are the calibrated value of the weighted error, the share, the tuned lr scale of par:v4_warm_start_tuned, step indices and windows, the seeds, the fill length, k, the paper id and the job commit
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.48\linewidth]{../analysis/catalog_v4/figs/ws_het_split_few_a.pdf}\hfill
+\includegraphics[width=0.48\linewidth]{../analysis/catalog_v4/figs/ws_het_split_few_b.pdf}
+\caption{The validation NLL split into its two terms for the pretrained start, the default-learning-rate warm start
+and the NLL-tuned warm start ($k=533$, seed $42$). Left: per process (small points) the $\sigma$-weighted error
+against the log-$\sigma$ term, each model's process mean as a large marker. Right: each model's validation MSE of the
+mean per process, as a cumulative fraction of processes.}
+\label{fig:ws_het_split}
+% allow: 533 42 because they are the retraining length and the seed
+\end{figure}
 
 \paragraph{Warm start across a width change: growing the pretrained model (2026-11-05).}\label{par:v4_warm_start_grow}
 The first change that alters parameter shapes [D285]: can a pretrained width-$8$ model ($8$ heads, \code{num\_heads}
