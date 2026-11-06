@@ -56,6 +56,7 @@ from keyed_aug import pool_identity
 # The format of the cached arrays. Bump it with any change to what _build_base or _build_features write (the
 # fingerprint in tests/test_mmap_key.py fails until it is bumped and re-recorded).
 MMAP_VERSION = 3
+BUILD_CHUNK = 1 << 18          # events per piece of a build (host memory bounded: about 0.5 GB at 10 particles)
 
 
 def format_fingerprint():
@@ -385,7 +386,6 @@ def base_key_doc(cfg, names, roles, paths):
                        for a in (_alphas_path(paths[r][n]) for n in names)] for r in roles},
         "particle_order": porder,
         # particle_order=shuffle draws the slot order from data.seed (a data choice, not the run's seed)
-        **({"particle_order_seed": int(cfg.data.get("seed", 42))} if porder == "shuffle" else {}),
     }
 
 
@@ -527,18 +527,46 @@ def _du(d):
     return sum(os.path.getsize(os.path.join(a, f)) for a, _, fs in os.walk(d) for f in fs)
 
 
+STAGE_STALE_S = 2 * 86400      # a staging dir older than this belongs to a build that died (a build takes < 1 h)
+TOUCH_EVERY_S = 1800           # a run refreshes its cache's last_used this often while it is open
+
+
+def _related(a, b):
+    """a is b, or one of them lies inside the other"""
+    a, b = os.path.abspath(a), os.path.abspath(b)
+    return a == b or a.startswith(b + os.sep) or b.startswith(a + os.sep)
+
+
+def _rm_stale_stages(root):
+    """Remove the staging dirs (.stage.*) under root's key dirs and depth dirs older than STAGE_STALE_S: builds that
+    died there (a live build's stage is younger: the build takes well under that)"""
+    for base, dirs, _ in os.walk(root):
+        if base.count(os.sep) - root.rstrip(os.sep).count(os.sep) > 2:
+            dirs[:] = []
+            continue
+        for dn in list(dirs):
+            if dn.startswith(".stage.") and time.time() - os.path.getmtime(os.path.join(base, dn)) > STAGE_STALE_S:
+                LOGGER.info(f"data.memmap: removing the stale staging dir {os.path.join(base, dn)}")
+                shutil.rmtree(os.path.join(base, dn), ignore_errors=True)
+                dirs.remove(dn)
+
+
 def prune(root, need_bytes, keep, min_idle_s):
-    """Remove the least recently used built depths under root (never `keep`, never one used within min_idle_s, never
-    a staging dir or a lock) until need_bytes are free on root's filesystem. Returns the removed dirs."""
+    """Remove the least recently used built depths under root (never `keep` nor a dir containing it or inside it,
+    never one used within min_idle_s: an open run refreshes its last_used every TOUCH_EVERY_S; never a lock) until
+    need_bytes are free on root's filesystem; stale staging dirs go first. Returns the removed dirs."""
+    if not os.path.isdir(root):
+        return []
+    _rm_stale_stages(root)
     cands = []
-    for k in os.listdir(root) if os.path.isdir(root) else []:
+    for k in os.listdir(root):
         kd = os.path.join(root, k)
         if not os.path.isdir(kd) or k.startswith("."):
             continue
         for dn in os.listdir(kd):
             d = os.path.join(kd, dn)
             if (dn.startswith(".") or dn.endswith(".lockdir") or not os.path.exists(os.path.join(d, "meta.json"))
-                    or os.path.abspath(d) == os.path.abspath(keep)):
+                    or _related(d, keep)):
                 continue
             cands.append((_last_used(d), d))
     removed = []
@@ -548,8 +576,11 @@ def prune(root, need_bytes, keep, min_idle_s):
         if time.time() - t < min_idle_s:
             continue
         LOGGER.info(f"data.memmap: pruning {d} (last used {time.ctime(t)}, {_du(d) / 1e9:.1f} GB)")
-        gone = d + f".pruned.{socket.gethostname()}.{os.getpid()}"
-        os.rename(d, gone)              # out of every opener's search at once; open maps keep their pages
+        gone = d + f".pruned.{_job_tag()}"
+        try:
+            os.rename(d, gone)          # out of every opener's search at once; open maps keep their pages
+        except FileNotFoundError:       # another prune took it first
+            continue
         shutil.rmtree(gone, ignore_errors=True)
         removed.append(d)
     return removed
@@ -593,10 +624,11 @@ def _publish(stage, final):
     """Move a finished staging dir to `final` with one rename on the cache's filesystem"""
     parent = os.path.dirname(final)
     if os.stat(stage).st_dev != os.stat(parent).st_dev:
-        local = stage
-        stage = os.path.join(parent, ".stage." + _job_tag() + ".copy")
-        shutil.copytree(local, stage)
-        shutil.rmtree(local, ignore_errors=True)
+        copy = os.path.join(parent, ".stage." + _job_tag() + ".copy")
+        shutil.copytree(stage, copy)
+        os.rename(copy, final)
+        shutil.rmtree(stage, ignore_errors=True)
+        return
     os.rename(stage, final)
 
 
@@ -619,7 +651,6 @@ def _build_base(exp, c, d, need, key_doc):
     cfg = exp.cfg
     names, roles, paths = c["names"], c["roles"], c["paths"]
     porder = key_doc["particle_order"]
-    porder_rng = np.random.default_rng(int(cfg.data.get("seed", 42))) if porder == "shuffle" else None
     _, M, N = _base_bytes(need, names, roles, paths)
     mom = _alloc(os.path.join(d, "mom.npy"), np.float32, (M, 4))
     pdg = _alloc(os.path.join(d, "pdg.npy"), np.int32, (M,))
@@ -634,30 +665,38 @@ def _build_base(exp, c, d, need, key_doc):
             k = need[(r, n)]
             src = np.load(paths[r][n], mmap_mode="r")
             P = (src.shape[1] - 1) // 5
-            raw = np.asarray(src[:k])
-            parts, pdgs = raw[:, :4 * P], raw[:, 4 * P:-1].astype(int)
-            if porder != "none":
-                parts = order_identical_particles(parts, pdgs, porder, rng=porder_rng)
-            com = exp._boost_com(parts, P)
-            cm = com.astype(np.float64)
-            q = cm[:, 0] + cm[:, 1]
-            mom[pb:pb + k * P] = com.reshape(k * P, 4)
-            pdg[pb:pb + k * P] = pdgs.reshape(k * P)
-            amp[eb:eb + k] = raw[:, -1]
-            rs[eb:eb + k] = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
-            evp[eb:eb + k] = pb + np.arange(k, dtype=np.int64) * P
+            first = {}
+            slot = []
+            for i in range(0, k, BUILD_CHUNK):        # in event chunks: host memory bounded whatever the pool
+                j = min(k, i + BUILD_CHUNK)
+                raw = np.asarray(src[i:j])
+                parts, pdgs = raw[:, :4 * P], raw[:, 4 * P:-1].astype(int)
+                if porder != "none":
+                    parts = order_identical_particles(parts, pdgs, porder)
+                com = exp._boost_com(parts, P)
+                cm = com.astype(np.float64)
+                q = cm[:, 0] + cm[:, 1]
+                o, e = pb + i * P, eb + i
+                mom[o:o + (j - i) * P] = com.reshape(-1, 4)
+                pdg[o:o + (j - i) * P] = pdgs.reshape(-1)
+                amp[e:e + j - i] = raw[:, -1]
+                rs[e:e + j - i] = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
+                evp[e:e + j - i] = o + np.arange(j - i, dtype=np.int64) * P
+                u, fi = np.unique(pdgs.reshape(-1), return_index=True)
+                for x, y in zip(u.tolist(), fi.tolist()):
+                    first.setdefault(int(x), i + int(y) // P)
+                if i == 0:
+                    slot = [int(x) for x in pdgs[0]]
+                del raw, parts, com, cm, q
             if alp is not None:
                 ap = _alphas_path(paths[r][n])
                 alp[eb:eb + k] = (np.asarray(np.load(ap, mmap_mode="r")[:k], dtype=np.float64)
                                   if key_doc["alphas"][r][ni] is not None else np.nan)
-            u, first = np.unique(pdgs.reshape(-1), return_index=True)
             segs.append({"role": r, "name": n, "ev0": eb, "n": int(k), "p0": pb, "P": int(P),
                          "uid": keyed_aug.pool_uid(key_doc["pools"][r][ni]),
-                         "pdg_first": [[int(a), int(b) // P] for a, b in zip(u, first)],
-                         "slot": [int(x) for x in pdgs[0]] if k else []})
+                         "pdg_first": [[x, first[x]] for x in sorted(first)], "slot": slot})
             LOGGER.info(f"  [{r}] {n}: {k} events -> memmap base")
             pb += k * P; eb += k
-            del raw, parts, com, cm
     for a in (mom, pdg, amp, rs, evp) + ((alp,) if alp is not None else ()):
         a.flush()
     arrays = ["mom", "pdg", "amp", "rs", "evp"] + (["alphas"] if alp is not None else [])
@@ -680,10 +719,10 @@ def _build_features(exp, c, d, meta, fd, fkey_doc, want_offshell):
     masks = exp._setup_offshell_masks(names) if want_offshell else None
     pidx = {n: i for i, n in enumerate(names)}
     dimless = bool(cfg.data.get("dimensionless_inputs", False))
-    for s in meta["segs"]:
-        k, P, e0, p0, name = s["n"], s["P"], s["ev0"], s["p0"], s["name"]
-        if k == 0:
-            continue
+    pieces = [(sg, i, min(sg["n"], i + BUILD_CHUNK)) for sg in meta["segs"] for i in range(0, sg["n"], BUILD_CHUNK)]
+    for sg, i, j in pieces:             # in event chunks: every derived input is per event
+        k, P, name = j - i, sg["P"], sg["name"]
+        e0, p0 = sg["ev0"] + i, sg["p0"] + i * P
         pp = np.asarray(mom[p0:p0 + k * P]).reshape(k, P, 4).astype(np.float64)
         if phys_on:
             a_s = None
@@ -691,7 +730,7 @@ def _build_features(exp, c, d, meta, fd, fkey_doc, want_offshell):
                 a_s = np.asarray(alp[e0:e0 + k]) if alp is not None else np.full(k, np.nan)
                 if np.isnan(a_s).all() and int(exp._orders_of(name)[2]) == 0:
                     a_s = np.ones(k)     # alpha_s power 0: the factor does not depend on alpha_s
-                assert not np.isnan(a_s).any(), f"data.target_physics_orders: no per-event alpha_s for {s['role']}/{name}"
+                assert not np.isnan(a_s).any(), f"data.target_physics_orders: no per-event alpha_s for {sg['role']}/{name}"
             logF[e0:e0 + k] = exp._physics_logF(name, pp, alphas=a_s)
         if want_offshell:
             cols = np.zeros((k, n_pdg), dtype=np.float64)
@@ -754,10 +793,15 @@ def _locked_build(final, need_bytes, root, build):
                                f"on its filesystem after pruning the caches idle for 48 h")
         t0 = time.time()
         stage = _staging(parent, need_bytes)
-        meta = build(stage)
-        with open(os.path.join(stage, "meta.json"), "w") as f:
-            json.dump(meta, f)
-        _publish(stage, final)
+        try:
+            meta = build(stage)
+            with open(os.path.join(stage, "meta.json"), "w") as f:
+                json.dump(meta, f)
+            _publish(stage, final)
+        except BaseException:           # this job's own stage (and copy) only, already allocated to full size
+            shutil.rmtree(stage, ignore_errors=True)
+            shutil.rmtree(os.path.join(parent, ".stage." + _job_tag() + ".copy"), ignore_errors=True)
+            raise
         LOGGER.info(f"data.memmap: built {final} in {time.time() - t0:.0f} s")
         return meta
 
@@ -785,6 +829,10 @@ def init_data_recipes_mmap(exp, c):
     exp._sign_head = False
     want_offshell = (exp._offshell_per_event and exp._use_internal_mass_scalars and bool(exp._internal_mass_pdgs))
     prebuild = bool(cfg.data.get("memmap_prebuild", False))
+    # particle_order=shuffle draws one RNG stream across the pools as they load, so its slot orders would depend on
+    # how deep the cache is (the in-memory path draws it only up to the run's caps)
+    assert str(cfg.data.get("particle_order", "none")) != "shuffle", \
+        "data.memmap: particle_order=shuffle is implemented on the in-memory path only"
 
     root = _cache_root(cfg)
     kdoc = base_key_doc(cfg, names, roles, paths)
@@ -804,6 +852,7 @@ def init_data_recipes_mmap(exp, c):
             json.dump(kdoc, f, indent=1)
     else:
         d, meta = found
+        _touch(d)                       # in use from now on: no prune may take it (a features build's prune included)
     # the slot order of every process (the off-shellness masks and the eikonal read it)
     exp._slot_pdgs_by_name = {**{s["name"]: s["slot"] for s in meta["segs"] if s["slot"]},
                               **getattr(exp, "_slot_pdgs_by_name", {})}
@@ -822,10 +871,70 @@ def init_data_recipes_mmap(exp, c):
             nb = meta["N"] * (8 + 4 * len(exp._internal_mass_pdgs))
             _locked_build(fdir, nb, root, lambda st: _build_features(exp, c, d, meta, st, fkd, want_offshell))
     if prebuild:
+        if c["mom_div"] is None and cfg.get("seed", None) is not None:
+            # the GPU run's momentum scale for the seed this prebuild was given (so the run does not hold its GPU
+            # for the augmentation passes)
+            mom_stats(d, meta, names, need, int(cfg.seed), bool(cfg.data.get("dimensionless_inputs", False)))
         LOGGER.info(f"data.memmap_prebuild: the cache {d} is ready{f' (derived inputs {fdir})' if fdir else ''}; "
                     f"exiting before the model")
         sys.exit(0)
     _open_run(exp, c, d, meta, fdir, need, want_offshell)
+
+
+def _keep_touching(d):
+    """Refresh d/last_used every TOUCH_EVERY_S while this process lives (a daemon thread), so no prune takes the
+    cache of a run that has it open"""
+    import threading
+
+    def beat():
+        while True:
+            time.sleep(TOUCH_EVERY_S)
+            try:
+                _touch(d)
+            except OSError:
+                pass
+    threading.Thread(target=beat, name="memmap-last-used", daemon=True).start()
+
+
+def mom_stats(d, meta, names, need, seed, dimless):
+    """(mom_div, mom_mean, mom_std) of a run's train selection at `seed`: np.std of its momenta as the network reads
+    them before the scale, then the mean and std after it, bitwise as the in-memory path reduces them. Kept beside
+    the cache in mom_stats/<key>.json (keyed by the selection, the seed and dimensionless_inputs): the prebuild job
+    writes it for the seed it is given, so a GPU run reads three numbers; a run with another seed computes it (four
+    augmentation passes over the train selection, threaded) and leaves it for the next."""
+    seg_of = {(s["role"], s["name"]): s for s in meta["segs"]}
+    sk = _hash({"seed": int(seed), "dimless": bool(dimless), "need": [need[("train", n)] for n in names],
+                "format": MMAP_VERSION})
+    sp = os.path.join(d, "mom_stats", sk + ".json")
+    if os.path.exists(sp):
+        return tuple(json.load(open(sp)))
+    mom, rs = _open(d, "mom"), _open(d, "rs")
+
+    def piece(job):
+        s, i, j = job
+        P = s["P"]
+        com = np.asarray(mom[s["p0"] + i * P:s["p0"] + j * P]).reshape(j - i, P, 4)
+        r_ = np.asarray(rs[s["ev0"] + i:s["ev0"] + j]) if dimless else None
+        return keyed_aug.model_momenta(com, seed, s["uid"], i, r_).reshape(-1, 4)
+    step_ev = 1 << 16
+    jobs = [(seg_of[("train", n)], i, min(need[("train", n)], i + step_ev))
+            for n in names for i in range(0, need[("train", n)], step_ev)]
+
+    def chunks():               # in order, computed by a few threads ahead (numpy releases the GIL)
+        return _ordered_map(piece, jobs)
+    t1 = time.time()
+    _, sd = f32_mean_std(chunks)
+    mom_div = float(sd)
+    mm_, ss_ = f32_mean_std(chunks, scale=mom_div)
+    out = (mom_div, float(mm_), float(max(ss_, 1e-2)))
+    os.makedirs(os.path.dirname(sp), exist_ok=True)
+    tmp = sp + "." + _job_tag()
+    with open(tmp, "w") as f:
+        json.dump(list(out), f)
+    os.replace(tmp, sp)
+    LOGGER.info(f"data.memmap: momentum scale over the train selection at seed {seed} in {time.time() - t1:.0f} s "
+                f"({sp})")
+    return out
 
 
 def _open_run(exp, c, d, meta, fdir, need, want_offshell):
@@ -872,45 +981,9 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
 
     # ---- momentum scale: the train selection's augmented momenta, as the in-memory path reduces them ----
     seed = exp._aug_seed()
-
-    def train_piece(job):
-        s, i, j = job
-        P = s["P"]
-        com = np.asarray(mom[s["p0"] + i * P:s["p0"] + j * P]).reshape(j - i, P, 4)
-        a = keyed_aug.augment(com, seed, s["uid"], np.arange(i, j, dtype=np.int64))
-        if dimless:
-            r_ = np.asarray(rs[s["ev0"] + i:s["ev0"] + j])
-            a = (a.astype(np.float64) / r_[:, None, None]).astype(np.float32)
-        return a.reshape(-1, 4)
-    step_ev = 1 << 16
-    jobs = [(seg_of[("train", n)], i, min(need[("train", n)], i + step_ev))
-            for n in names for i in range(0, need[("train", n)], step_ev)]
-
-    def train_chunks():         # in order, computed by a few threads ahead (numpy releases the GIL)
-        return _ordered_map(train_piece, jobs)
     mom_div, mom_mean, mom_std = c["mom_div"], c["mom_mean"], c["mom_std"]
     if mom_div is None:
-        # the run's own scale over its train selection and seed; kept beside the cache (a few numbers, keyed by the
-        # selection, the seed and dimensionless_inputs), so a second run on the same data and seed does not redo it
-        sk = _hash({"seed": seed, "dimless": dimless, "need": [need[("train", n)] for n in names],
-                    "format": MMAP_VERSION})
-        sp = os.path.join(d, "mom_stats", sk + ".json")
-        if os.path.exists(sp):
-            mom_div, mom_mean, mom_std = json.load(open(sp))
-        else:
-            t1 = time.time()
-            _, sd = f32_mean_std(train_chunks)
-            mom_div = float(sd)
-            mm_, ss_ = f32_mean_std(train_chunks, scale=mom_div)
-            mom_mean = float(mm_)
-            mom_std = float(max(ss_, 1e-2))
-            os.makedirs(os.path.dirname(sp), exist_ok=True)
-            tmp = sp + "." + _job_tag()
-            with open(tmp, "w") as f:
-                json.dump([mom_div, mom_mean, mom_std], f)
-            os.replace(tmp, sp)
-            LOGGER.info(f"data.memmap: momentum scale over the train selection at seed {seed} in "
-                        f"{time.time() - t1:.0f} s")
+        mom_div, mom_mean, mom_std = mom_stats(d, meta, names, need, seed, dimless)
     exp.mom_mean, exp.mom_std, exp.mom_div = [mom_mean], [mom_std], float(mom_div)
 
     # ---- dimensionless_inputs: the mass column's statistics over the massive train particles ----
@@ -1016,13 +1089,20 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
     exp._mmap_dir = d
     nbytes = _du(d)
     if bool(cfg.data.get("memmap_prefetch", True)):
-        # one sequential read of the arrays: the pages then sit in the page cache (file-backed, shared with the
-        # workers, reclaimable), and the shuffled batches do not fault them in one random page at a time
+        # one sequential read of the run's selection (a prefix of every segment; the cache may be deeper): the
+        # pages then sit in the page cache (file-backed, shared with the workers, reclaimable), and the shuffled
+        # batches do not fault them in one random page at a time
         t1 = time.time()
-        for a in ("mom", "pdg", "rs", "evp"):
-            with open(os.path.join(d, a + ".npy"), "rb", buffering=0) as fh:
-                while fh.read(64 << 20):
-                    pass
-        LOGGER.info(f"data.memmap: prefetched the batch arrays into the page cache in {time.time() - t1:.0f} s")
+        maps = {a_: _open(d, a_) for a_ in ("mom", "pdg", "rs", "evp")}
+        for sg in meta["segs"]:
+            k, P = need[(sg["role"], sg["name"])], sg["P"]
+            for a_, (lo, hi) in (("mom", (sg["p0"], sg["p0"] + k * P)), ("pdg", (sg["p0"], sg["p0"] + k * P)),
+                                 ("rs", (sg["ev0"], sg["ev0"] + k)), ("evp", (sg["ev0"], sg["ev0"] + k))):
+                step = max(1, (64 << 20) // maps[a_][:1].nbytes) if maps[a_].shape[0] else 1
+                for x in range(lo, hi, step):
+                    np.asarray(maps[a_][x:min(hi, x + step)]).sum()
+        del maps
+        LOGGER.info(f"data.memmap: prefetched the run's selection into the page cache in {time.time() - t1:.0f} s")
+    _keep_touching(d)
     LOGGER.info(f"data.memmap: {exp.N_events} events of {d} ({nbytes / 1e9:.2f} GB on disk), roles {exp._role_counts}; "
                 f"opened in {time.time() - t0:.0f} s (augmentation seed {seed}, momentum scale {mom_div:.6g})")

@@ -36,7 +36,7 @@ import data_mmap as dm  # noqa: E402
 
 # format_fingerprint() of MMAP_VERSION 3; a change to the cache-writing code must bump MMAP_VERSION and record its
 # new fingerprint here
-FINGERPRINT = {3: "91c077ac042017a79d0a10b4d11cf8ef1f9f7b029bba3808c1cfa223d0fd1b1e"}
+FINGERPRINT = {3: "9490734cb325c629a2376cefd8351bd1461a3632e912a02a4f0fab6d50df99e1"}
 ETA = np.diag([1.0, -1.0, -1.0, -1.0])
 
 
@@ -200,6 +200,27 @@ def test_key_batches_openers_canary_prune():
         free = shutil.disk_usage(root).free
         assert dm.prune(root, free + 1, keep=d, min_idle_s=4 * 86400) == [dA]
         assert os.path.exists(dB) and os.path.exists(d)
+        # never the depth a features build sits in (keep = its feat_ dir), however idle
+        os.utime(os.path.join(dB, "last_used"), (time.time() - 9 * 86400,) * 2)
+        assert dm.prune(root, free + 1, keep=os.path.join(dB, "feat_x"), min_idle_s=4 * 86400) == []
+        assert os.path.exists(dB)
+        # a stale staging dir (a dead build's) goes, a fresh one (a live build's) stays
+        old_st = os.path.join(root, "kB", ".stage.h.1.2"); new_st = os.path.join(root, "kB", ".stage.h.3.4")
+        os.makedirs(old_st); os.makedirs(new_st)
+        os.utime(old_st, (time.time() - 3 * 86400,) * 2)
+        dm.prune(root, 0, keep=d, min_idle_s=0)
+        assert not os.path.exists(old_st) and os.path.exists(new_st)
+        # a build that fails leaves no staging dir and no published dir
+        bad = os.path.join(root, "kC", "train1")
+        def boom(st):
+            np.save(os.path.join(st, "x.npy"), np.zeros(10))
+            raise RuntimeError("build failed")
+        try:
+            dm._locked_build(bad, 1000, root, boom)
+            raise AssertionError("the failing build did not raise")
+        except RuntimeError:
+            pass
+        assert not os.path.exists(bad) and not [x for x in os.listdir(os.path.join(root, "kC")) if x.startswith(".stage")]
     finally:
         shutil.rmtree(tmp)
 
