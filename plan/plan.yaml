@@ -11156,6 +11156,15 @@ entries:
       SHORT_TAG=keyed (run dirs <arm>_tagkeyed, never overwriting step 56''s), and read the matched arms against it; the MSE
       control and het magnitude reference stay the old runs (their gaps, 2x sign and R~1, are far beyond a re-seed), with
       the re-seed noted. Beam ablation (step 62) is at 5bf3e0f0, before (b): its 8 arms share one commit.'
+  - at: '2026-11-06T05:17:35+00:00'
+    text: '2026-11-06 (e) status: epoch count done (epoch_count.py @cf9f20c3, data/study_epochs.json @0da56903: one epoch
+      = 6707 batches of 16384; the six 1x width cells w8/16/32 seeds 42/43 at 4264 steps = 0.636 epoch; 4x sweep 2.54, 16x
+      10.17). Grid design drafted and its code merged (scaling-grid, repo-reviewer PASS 5bf3e0f0: LONG_HP=1262, LONG_FACTOR
+      2/8, width-aware short_wall): widths 8/16/32 x steps 4264x{2,4,8,16} x seeds 42/43 at trial_1262''s HPs (lr from the
+      window law, slope -0.55, censored at the window top), 22 new jobs, V100, 449.1 GPU-h (2x row = the six under-one-epoch
+      points redone at 1.27 epochs: 6 jobs, 39.0 GPU-h; 4x 61.8, 8x 126.2, 16x 222.2); limits from short_wall --width up to
+      84 h, CC gpu QoS MaxWall 168 h. Above the 30 GPU-h line with no decision giving a cost (D292/D293 approve the work,
+      not the cost): sent to the main session with the estimate before any design is recorded.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
