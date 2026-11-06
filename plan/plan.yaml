@@ -9509,6 +9509,52 @@ entries:
       spread <= 0.02 control, 0.02-0.06 budget 500, shortfall 0.137/0.138; one small seam: 3.96 >= 0.49 with 4.21 < 0.14 is
       read as MIDDLE. Searched docs/results.tex for multiperipheral, ladder, mperi, quota, flat_budget, edge variant, cosh;
       decisions D269 D270 D294: no prior run.'
+  - at: '2026-11-06T10:15:53+00:00'
+    question: 'Step 67 (D294/D269/D270; step 66 branches STRONG and guard-failed): with both ladders as two channels (the
+      step-58 ladder and its edge variant, sampling.mc_mperi_both), (i) at budget 50 does udx_csxvevex get back the old ladder''s
+      fill while uu_bbxuu and us_ddxsu keep the edge ladder''s top-bin fill, and (ii) at budget 750 (15x, from the measured
+      worst quota/kept inside the pp range) do the three ladder classes (uu_bbxuu, us_ddxsu, udx_csxvevex) fill every 0.25-dex
+      bin of the in-support pp range (+-0.5 dex) with 0 held-out in-support pp events outside the kept range? uux_epemg and
+      uux_epemvevex (no ladder channel) run as the identity check.'
+    prior: 'Step 66 (finding 2026-11-06, multichannel_check.json @f323ae6b), budget 50, edge ladder vs old ladder: uu_bbxuu
+      shortfall 0.137/0.138 -> 0.059/0.057, fill at 3.96 0.04 -> 1.00/0.99, 4.21 0.01/0.02 -> 0.79/0.82, 4.45 -> 0.20/0.25,
+      4.70 -> 0.065/0.067 (pp in-support max 4.75); us_ddxsu 0.114 -> 0.037/0.039, 4.34 -> 0.70/0.64, 4.59 -> 0.30/0.29, 4.84
+      -> 0.06/0.07; held-out outside kept 4/2 -> 1/1, 6/1 -> 1/1; udx_csxvevex shortfall 0.0666/0.0667 -> 0.0669/0.0725, fill
+      at -0.31 0.79 -> 0.65 (s43), 0.67 0.074 -> 0.057 (s42): the guard failed there. Step 65 old ladder at budget 500: uu_bbxuu
+      fill 0.49/0.14 at 3.96/4.21 at 8250 s; udx_csxvevex shortfall 0.005/0.007, uux_epemvevex YES. Searched docs/results.tex
+      (ladder, multiperipheral, quota, mperi): none on these channels; decisions D269 D270 D294; no prior run with both ladders.'
+    measure: 'As steps 65-66, per class, seed and policy (quota_ladder_res2, quota_ladder_edge_res2, quota_ladder_both_res2,
+      quota_ladder_both_res2_budget750): held-out in-support pp events outside the kept range (count, N, 3/N at 0); quota
+      shortfall share; fill_per_bin (sum min(kept, quota) / sum quota per 0.25-dex bin), separately for bins inside the pp
+      in-support range and the margin bins above it; chunks at the budget or no_steer; kept per channel (summary kept_per_channel_seed42);
+      seconds per replay on the same node. Figure fig_flat_quota.py with the curve ''both ladders, 15x budget''.'
+    check: 'Step 66 showed the measure moves with the ladder''s proposal: fill at uu_bbxuu 3.96 0.04 -> 1.0 and udx_csxvevex
+      shortfall 0.0667 -> 0.0725 between the two ladders at the same budget, job and node, with seed spread <= 0.02 (QCD top
+      bins) and <= 0.006 (udx shortfall); step 65 showed the budget moves it (fill at 3.96 0.04 -> 0.49 for 10x). The both-ladder
+      channel list is checked on CPU (tests/test_multichannel.py @919bc932: (''mperi'',) and (''mperi'',''edge'') both present;
+      draws exact). Not fixed by construction.'
+    fixed: 'Each class''s catalog_v4 train entry and chunk plan, multichannel channels as step 66 plus the second ladder in
+      the both policies (channel shares re-split uniformly over the longer list, inherent to adding a channel), oversample
+      6, bin width 0.25 dex, margin 0.5 dex, range table recipes/catalog_v4_flat_range.json; budget 50 except quota_ladder_both_res2_budget750
+      (750); code: trunk after merging ladder-both @919bc932 (repo-reviewer), synced to CC; scripts/job_multichannel_check.sh
+      with MCHECK_POLICIES=quota_ladder_res2+quota_ladder_edge_res2+quota_ladder_both_res2+quota_ladder_both_res2_budget750,
+      CC htc CPU, 1 core, 8G; wall target 2.8 h per QCD job (617 + 542 + ~600 s at budget 50, plus 15 x 542 = 8130 s at 750,
+      from step 66''s times), less on the EW ones (udx_csxvevex budget 500 took 1542-1757 s); limit 04:00 (1.4x).'
+    control: 'Within each job: the old ladder (quota_ladder_res2, the udx_csxvevex reference) and the edge ladder (quota_ladder_edge_res2,
+      the QCD reference) at budget 50, same commit, class, seed and node; the both-ladder policies differ from them only in
+      the channel list (and the budget for the 750 arm). Step 65''s old-ladder budget-500 read is the cost reference.'
+    seeds: 42 and 43 per class (10 jobs), as steps 57, 58, 65 and 66.
+    outcome: '(i) Budget 50, both ladders: GUARD passes when udx_csxvevex shortfall <= old ladder''s + 0.002 and its every
+      bin >= old - 0.06, and uu_bbxuu / us_ddxsu fill at 3.96/4.21 (4.09/4.34) >= the edge ladder''s - 0.06, on both seeds;
+      identity classes equal to the control. If the guard fails on the QCD side (halved edge share loses the top), the both
+      policy is still judged at 750 below; if it fails on udx_csxvevex, the two ladders'' effect on it is reported and the
+      regeneration choice per channel set goes to Joaquin. (ii) Budget 750, both ladders, per ladder class and seed: YES =
+      0 held-out in-support outside kept, 0 shortfall, 0 budget and no_steer stops -> design the regeneration of the 1301
+      hadronic tree classes with mc_mperi_both + mc_res2 at budget 750, the cost factor from the measured time over the multichannel
+      replay. NEAR = shortfall only in the margin bins above the pp in-support max, every bin inside it filled >= 0.95 and
+      held-out outside kept 0 -> Joaquin''s call (D269 ''not far below pp''): accept, or a heavier channel; the regeneration
+      design waits on it. SHORT = a bin inside the pp range below 0.95 -> where reads of that bin (multichannel_check where),
+      no further budget raise. Cost: 10 CPU jobs, 1 core, <= 2.8 h each, limit 04:00; no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
