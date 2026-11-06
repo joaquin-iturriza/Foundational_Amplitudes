@@ -16025,7 +16025,9 @@ entries:
       25 at limits, wall target 1.5 h, site pick then), wait on that fix and on the reviewer''s re-check. Parents'' checkpoints
       step 2132/3198/best exist for both seeds on CC. Interval construction now stated in par:v4_warm_start_grow_tuned and
       fig:ws_c10wz (588af4b0).'
-  step_waits: {}
+  step_waits:
+    '1': FA-ccin2p3-0de6be56 FA-ccin2p3-89ecbc1e FA-ccin2p3-1ef38bb2 FA-ccin2p3-c07e6ad5 FA-ccin2p3-4cb686ac FA-ccin2p3-1f7ae4ea
+      FA-ccin2p3-f3d6af3a FA-ccin2p3-32cb8805 FA-ccin2p3-ba567f27 FA-ccin2p3-166c6378
   handoff:
     state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
       at 0.125; C6 and C8 not decided, intervals too wide). Step 11: re-run sweep ws_grow_k533_zeroshot_hpo8_rerun ENDED,
