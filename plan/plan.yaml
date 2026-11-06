@@ -12475,6 +12475,19 @@ entries:
       but below YES. (3) Prior: name results.tex ''Coverage vs. emphasis, and the general default sampling'' (~l.10230-10250),
       which proposed adaptive importance sampling (VEGAS/foam) on |M|^2, and say why chains come first. Repo-reviewer verdict
       on flat-mcmc still pending.'
+  - at: '2026-11-06T23:06:45+00:00'
+    text: '2026-11-07 repo-reviewer BLOCK on branch flat-mcmc (a99a7aeb; lock not advanced). Fix before merge: (1) near-copies:
+      on the toy 38% of kept MCMC events (69% in the upper 40% of bins) have a same-bin near-duplicate, 502 distinct sqrt(s)
+      of 2000 kept (quota part 0%, 2000); collect with thinning or a minimum move, raise the lower end of d (44% of rotations
+      < 0.01 rad), record chain id and sqrt(s) per kept state, report the effective count beside fill, add a near-duplicate
+      assertion to tests/test_flat_mcmc.py. (2) multichannel_check.py:247-250 crashes on chan=None/channels=None for the mcmc
+      policy: write the first round''s channel array plus a sentinel, keep FLAT_LAST[''mcmc''] in qd. (3) FLAT_MCMC_CHAINS/LNF/DMIN
+      must enter pol via sampling_policy setdefault (recipe id). (4) the comment''s ''uniform phase space within a bin'' does
+      not hold for collected accepted states with non-stationary Wang-Landau: restate or change the collection. (5) D317 is
+      a forbid without a 2x: cite the 2x as the design''s threshold (mg5 comment, multichannel_check.py:203, prescreen_check.py
+      docstring). Non-blocking: restore the mc_resonances/mc_res_params ValueError, n_candidates counts unlabelled cut failures,
+      rounds misses the last partial block, harness n_candidates = collected states. seed_spread.py and prescreen_check.py
+      otherwise clean.'
   handoff:
     state: '2026-11-07 ~00:30. Tonight''s four points: (3) scaling grid seed 42 SUBMITTED under a passed design (design-reviewer
       PASS after one FIX): memmap prebuild FA-ccin2p3-bf203857 (CPU, slurm 62996664) then 10 GPU cells afterok on it, wait
