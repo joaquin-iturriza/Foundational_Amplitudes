@@ -11912,9 +11912,9 @@ entries:
     '18': Joaquin allowing the review tool change (asked 2026-11-06)
   owner:
     agent: a1319346e2069b331
-    state: working
+    state: stopped
     since: '2026-11-06T06:38:04+00:00'
-    state_at: '2026-11-06T06:38:04+00:00'
+    state_at: '2026-11-06T06:42:04.491000+00:00'
     context: 61824
     context_at: '2026-11-06T06:41:58+00:00'
   designs:
