@@ -12105,8 +12105,13 @@ entries:
     at: '2026-11-05T09:25:31+00:00'
     searched: D285 asked to test it; no decision covers what follows SHORT
     blocks: the width-growth follow-up only
-    blocks_steps: &id002
+    blocks_steps:
     - 4
+    answered_at: '2026-11-06T04:32:30+00:00'
+    decision: D291
+    withdrawn_at: '2026-11-06T04:32:30+00:00'
+    withdrawn_why: 'Joaquin (2026-11-06 04:28) puts tuning the warm start first and leaves the method to the owner: the grown
+      warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
   owner:
     agent: ada4972586c3395af
     state: working
@@ -13064,11 +13069,6 @@ entries:
     units: null
     start: '2026-11-05T04:36:37+00:00'
     at: '2026-11-05T04:36:37+00:00'
-  ask: 'Width growth 8 to 16 is SHORT at every retraining length: R(warm/scratch) on pp 1.75 / 1.59 / 1.29 at 533 / 1066 /
-    2132 steps (bar 1.19), gain reached -0.01 / 0.13 / 0.52 (data change reached 1.07 at 2132). Next: tune the grown warm
-    start with a sweep like step 3''s, try the 16 to 32 pair on the same rule, or stop the shape-changing branch here?'
-  waiting_since: '2026-11-05T09:25:31+00:00'
-  searched: D285 asked to test it; no decision covers what follows SHORT
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
@@ -13226,5 +13226,3 @@ entries:
       par:v4_warm_start_tuned, par:v4_warm_start_grow). Branch ws-grow-sigma merged but undeleted (needs git branch -D); worktrees/wt-ws-ckpt
       and wt-ws-grow merged, removal pending.'
     written: '2026-11-05T09:25:04+00:00'
-  blocks: the width-growth follow-up only
-  blocks_steps: *id002
