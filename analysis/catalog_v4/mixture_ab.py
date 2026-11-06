@@ -1122,6 +1122,22 @@ WARM["C10wz"] = {"W": {533: ("FA-ccin2p3-4442e786", "FA-ccin2p3-3fae7799")}, "C"
                  "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
                  "ref": {"default": WARM["C10w"]["W"][533], "mse_tuned": WARM["C10wm"]["W"][533]},
                  "design": "plan warm_start step 11 (D285, D291), design passed round 2 2026-11-06T10:54"}
+# step 12 (D307, D308, design passed round 2 2026-11-06): the restart study, k=533 from the checkpoint rerun
+# v4_het_control_ckpt[_seed2] (arms v4_het_ws_*, scripts/job_catalog_v3_short.sh @a1b0b899): each arm against the
+# same parent's final model at the default restart (C1r_ctrl, its own R beside the original parent's default restart);
+# BETTER when the widened upper end of R(arm/control) < 1 on PP4 or EE4 and above 1.05 on neither; B and A as C1
+_C1R = {"final_default": ("FA-ccin2p3-0de6be56", "FA-ccin2p3-89ecbc1e"),
+        "step3198_default": ("FA-ccin2p3-1ef38bb2", "FA-ccin2p3-c07e6ad5"),
+        "step3198_continue": ("FA-ccin2p3-4cb686ac", "FA-ccin2p3-1f7ae4ea"),
+        "step2132_continue": ("FA-ccin2p3-f3d6af3a", "FA-ccin2p3-32cb8805"),
+        "final_lr3x": ("FA-ccin2p3-ba567f27", "FA-ccin2p3-166c6378")}
+WARM["C1r_ctrl"] = {"W": {533: _C1R["final_default"]}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+                    "ref": {"default_original_parent": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f")},
+                    "deciding": ("PP4", "EE4"), "design": "plan warm_start step 12 (D307, D308), passed round 2"}
+for _k in ("step3198_default", "step3198_continue", "step2132_continue", "final_lr3x"):
+    WARM["C1r_" + _k] = {"W": {533: _C1R[_k]}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+                         "ref": {"control": _C1R["final_default"]},
+                         "deciding": ("PP4", "EE4"), "design": "plan warm_start step 12 (D307, D308), passed round 2"}
 # step 8 (D303, design passed round 2 2026-11-06): the k=533 default restart with only the Muon groups' lr damped at
 # its start (x min(1, step/168), fine_tune.muon_warmup_steps=168, arm v4_het_warm25u_k533[_seed2],
 # scripts/job_catalog_v3_short.sh @dbb8daf0) against the same-data default restart of the fill test; B and A as C1;
