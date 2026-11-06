@@ -15566,7 +15566,7 @@ entries:
       FA-ccin2p3-a6e4ee17 FA-ccin2p3-a767f033 FA-ccin2p3-ac7aa971 FA-ccin2p3-b4525f43 FA-ccin2p3-cf1e0cfc FA-ccin2p3-d26c43ba
       FA-ccin2p3-d38714af FA-ccin2p3-d54c9e94 FA-ccin2p3-d88a5db8 FA-ccin2p3-dd010506 FA-ccin2p3-ddf740e1 FA-ccin2p3-df7ec695
       FA-ccin2p3-e47ed26b FA-ccin2p3-e4eac156 FA-ccin2p3-f1390aa8 FA-ccin2p3-f14bc159 FA-ccin2p3-f9582bbb FA-ccin2p3-f968a51d '
-    '11': ccin2p3:ws_grow_k533_zeroshot_hpo8
+    '11': sweep ws_grow_k533_zeroshot_hpo8
   handoff:
     state: 'Step 8 read and written up: damped-Muon restart NOT MUON (m -0.148/-0.059) and NOT BETTER (C1u R PP4 1.032 [0.866,1.228],
       EE4 1.045 [0.911,1.197]; mixture_ab.py warm C1u @c14a07b0; fig ws_muon_damped via plot_ws_fill.py --damped @e1b705f4;
