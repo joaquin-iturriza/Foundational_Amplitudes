@@ -19,4 +19,6 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 PYTHONPATH=. python run.py "$@" ++data.memmap=true ++data.memmap_prebuild=true \
-    exp_name=zz_mmap_prebuild run_name="prebuild_${SLURM_JOB_ID:-$$}" training.num_workers=0
+    exp_name=zz_mmap_prebuild run_name="prebuild_${SLURM_JOB_ID:-$$}" training.num_workers=0; rc=$?
+[ "$rc" = 0 ] && echo "RUN_DONE"   # the end marker the supervisor reads (site projects.toml end_markers)
+exit $rc
