@@ -16525,6 +16525,15 @@ entries:
       reading NOT SUPPORTED (the jump moved 6-10x without the reads, as the every-group ramp); remaining gap is the retraining
       length (YES at k=1066). Confound in the continued arms: their start models are less trained (step 3198 / 2132 of 4264)
       and meet a fresh optimizer at full lr.'
+  - at: '2026-11-06T22:39:09+00:00'
+    text: '2026-11-06 ~23:50 CET: step 13 (D307, D308) design passed round 2 (round 1 FIX: prior lacked the sigma-overwritten
+      final checkpoint''s 0/2 optimizer entries, no yes/no on R(arm/fresh-optimizer arm), EMA-weights vs live-moments mismatch
+      unstated). fine_tune.load_optimizer_state (base_experiment._load_parent_optimizer_state, tests/test_load_optimizer_state.py,
+      guard against moment fill) merged 7b50861c after repo-reviewer PASS at 2db2cfb4. Step-3198 checkpoints read on CC: 32/32
+      Muon, 92/92 AdamW entries, both seeds. Submitted whole (site pick 2 jobs on ccin2p3 ~1.3 h): v4_het_ws_step3198_continue_optstate
+      FA-ccin2p3-05df656d (s42, code @4a92ec10), _seed2 FA-ccin2p3-07bfc8d7 (s43, @004c8119), scripts/job_catalog_v3_short.sh,
+      limit 02:30, 16G; target ws_optstate 1.5 h; plan wait on both. Read entry WARM C1r_step3198_continue_optstate. At read:
+      check the OPT_STATE line (32 + 92 entries) first.'
   step_waits:
     '1': FA-ccin2p3-05df656d FA-ccin2p3-07bfc8d7
   handoff:
