@@ -15,7 +15,8 @@ mix_compose.control_config), in a temporary folder, and the flat-in-log|M|^2 par
                range (sampling.flat_range from recipes/catalog_v4_flat_range.json, tools/flat_range.py; plan step 58,
                D294): rounds of candidates steered to the bins short of their quota until every bin holds it or
                sampling.flat_budget (mg.FLAT_BUDGET) candidates per flat event were labelled; per chunk the quota, the
-               kept count per bin, the rounds and the candidates are recorded (mg.FLAT_LAST)
+               kept count per bin, the rounds, the candidates and whether it stopped at the budget with bins short
+               are recorded (mg.FLAT_LAST); the range is the in-support pp events' (tools/flat_range.py)
 Every policy's chunks are timed (wall seconds of datagen.gen_chunk, the whole chunk: bulk, forward and flat parts).
 Everything else (6x oversampling, the flat selection, the shares of bulk, forward and flat, the sqrt(s) passes) is the
 entry's. Against the class's 13 TeV pp MadEvent events (its PP4 probe's train and test pools, as pp_support.py reads
@@ -160,6 +161,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                        "quota": np.asarray(d["quota"]).tolist(),
                                        "kept_per_bin": np.asarray(d["kept_per_bin"]).tolist(),
                                        "rounds": d["rounds"], "n_candidates": int(d["n_candidates"]),
+                                       "budget_hit": bool(d["budget_hit"]),
                                        "kept_per_channel": np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])],
                                                                        minlength=len(d["channels"])).tolist(),
                                        "channels": d["channels"]})
@@ -250,6 +252,7 @@ def quota_fill(r):
             "bins_short_log10": bins, "chunks_short": int(sum(any(k < x for k, x in zip(c["kept_per_bin"], c["quota"]))
                                                              for c in qc)),
             "n_chunks": len(qc), "rounds_max": max(len(c["rounds"]) for c in qc),
+            "chunks_budget_hit": int(sum(bool(c.get("budget_hit")) for c in qc)),
             "flat_cand_per_kept": sum(c["n_candidates"] for c in qc) / max(q, 1)}
 
 

@@ -1,6 +1,7 @@
 """CPU checks of the quota-filled flat part (mg5_pipeline_final: flat_quota_bins, flat_quota_weights, flat_quota_select,
 _flat_quota_part via build_mixture_dataset with pol["flat_range"]; plan catalog_coverage step 58): the quotas sum to the
-flat part; selection keeps exactly the quota per filled bin and spreads an unfilled bin's shortfall over bins with
+flat part and their remainder favours no bin over many chunks; the bin width and the budget enter the recipe id only
+with flat_range; a chunk stopped at the budget with bins short says so; selection keeps exactly the quota per filled bin and spreads an unfilled bin's shortfall over bins with
 spare candidates; an empty bin's deficit steers the candidates of the nearest occupied bin, and nothing is steered once
 every bin is full; on a toy 2 -> 3 label peaked in the collinear corner the rounds fill every bin up to a top bin the
 first pass misses, and the kept events pass the cuts.
@@ -17,11 +18,46 @@ import mg5_pipeline_final as mg  # noqa: E402
 
 
 def test_bins_and_quota():
-    e, q = mg.flat_quota_bins(-10.0, 0.0, 1003)
+    rng = np.random.default_rng(0)
+    e, q = mg.flat_quota_bins(-10.0, 0.0, 1003, rng)
     assert q.sum() == 1003 and q.max() - q.min() <= 1
-    assert len(q) == int(np.ceil(10.0 / (0.25 * np.log(10.0))))
-    e, q = mg.flat_quota_bins(-10.0, 0.0, 50)          # small chunk: at least FLAT_MIN_PER_BIN per bin
-    assert len(q) == 5 and q.sum() == 50
+    assert len(q) == int(np.ceil(10.0 / (0.25 * np.log(10.0)))) and np.isclose(e[0], -10.0) and np.isclose(e[-1], 0.0)
+    e, q = mg.flat_quota_bins(-10.0, 0.0, 10, rng)      # fewer events than bins: zeros in this chunk only
+    assert q.sum() == 10 and set(np.unique(q)) <= {0, 1}
+    e, q = mg.flat_quota_bins(-10.0, 0.0, 1003, rng, dex_per_bin=0.5)
+    assert len(q) == int(np.ceil(10.0 / (0.5 * np.log(10.0))))
+
+
+def test_remainder_not_biased():
+    """over many chunks the remainder lands on every bin alike: the top bins are not systematically short"""
+    rng = np.random.default_rng(5)
+    tot = sum(mg.flat_quota_bins(-10.0, 0.0, 1003, rng)[1] for _ in range(4000))
+    nb = len(tot); per = 1003 // nb; rem = 1003 - per * nb
+    extra = tot - 4000 * per                       # times each bin got the remainder's +1
+    exp = 4000 * rem / nb; sd = np.sqrt(4000 * (rem / nb) * (1 - rem / nb))
+    assert np.all(np.abs(extra - exp) < 5 * sd)
+    assert abs(extra[-nb // 4:].mean() - extra[:nb // 4].mean()) < 3 * sd
+
+
+def test_constants_in_recipe_id(monkeypatch):
+    """with flat_range the bin width and the budget are in the policy, so in the recipe id; without it neither is"""
+    base = next(n for n, c in mg.PROCESSES.items() if c.get("kind") not in ("virt", "lhe_pp") and c.get("pdg_ids")
+                and not mg.is_synthetic(n))
+    def rid(sampling):
+        monkeypatch.setitem(mg.PROCESSES, "zz_flat_quota_test", dict(mg.PROCESSES[base], sampling=sampling))
+        return mg.recipe_id(mg.variable_energy_recipe("zz_flat_quota_test", 100.0, 6000.0, 1000, role="train", seed=42))
+    s0 = {"mode": "mixture"}
+    assert "flat_budget" not in mg.sampling_policy({"sampling": s0}) and \
+        "flat_dex_per_bin" not in mg.sampling_policy({"sampling": s0})
+    s1 = dict(s0, flat_range=[-10.0, 0.0])
+    pol = mg.sampling_policy({"sampling": s1})
+    assert pol["flat_budget"] == mg.FLAT_BUDGET and pol["flat_dex_per_bin"] == mg.FLAT_DEX_PER_BIN
+    ids = {rid(s0), rid(s1), rid(dict(s1, flat_range=[-10.0, 1.0])), rid(dict(s1, flat_budget=40)),
+           rid(dict(s1, flat_dex_per_bin=0.5))}
+    assert len(ids) == 5
+    assert rid(s1) == rid(dict(s1, flat_budget=mg.FLAT_BUDGET, flat_dex_per_bin=mg.FLAT_DEX_PER_BIN))
+    monkeypatch.setattr(mg, "FLAT_BUDGET", 40)     # a changed module default changes the id too
+    assert rid(s1) == rid(dict(s1, flat_budget=40))
 
 
 def test_select_quota_and_waterfill():
@@ -73,23 +109,38 @@ def test_build_fills_every_bin(multichannel):
     rng = np.random.default_rng(1)
     pdg = [2, -2, -11, 11, 21]; mf = [0.0, 0.0, 0.0]
     cuts = {"pt_min": 10.0, "cos_max": float(np.tanh(5.0)), "dr_min": 0.4, "m_min": -1.0}
-    pol = dict(mg.DEFAULT_SAMPLING); pol.update(mode="mixture", f_flat=0.5, oversample=6)
+    samp = dict(mode="mixture", f_flat=0.5, oversample=6)
+    pol = dict(mg.DEFAULT_SAMPLING); pol.update(samp)
     # the range: the 1% quantile to the maximum of 60000 candidates (reachable by construction), so the top bins need
     # rounds beyond the first one's 1500
     sampler = mg._sqrts_sampler(30.0, 6000.0, "log", rng)
     ev, sq = mg._candidates(60000, sampler, mf, pdg, rng, cuts, 0.5, pol["y_lo"])
     lm = np.log(_toy_label(ev, sq))
-    pol["flat_range"] = [float(np.quantile(lm, 0.01)), float(lm.max())]
+    samp["flat_range"] = [float(np.quantile(lm, 0.01)), float(lm.max())]
     if multichannel:
-        pol.update(multichannel=True, mc_resonances=[[[0, 1], 23]], mc_isc=True, mc_res_params={23: mg.MC_RES[23]})
+        samp.update(multichannel=True, mc_resonances=[[[0, 1], 23]], mc_isc=True, mc_res_params={23: mg.MC_RES[23]})
+    pol = mg.sampling_policy({"sampling": samp})
     events, sqrts, me2 = mg.build_mixture_dataset(1000, 30.0, 6000.0, mf, pdg, rng, cuts, pol, _toy_label,
                                                   sqrts_measure="log")
     assert len(events) == 1000
     d = mg.FLAT_LAST
-    assert d["kept_per_bin"].sum() == 500 and np.all(d["kept_per_bin"] >= d["quota"])
+    assert d["kept_per_bin"].sum() == 500 and np.all(d["kept_per_bin"] >= d["quota"]) and not d["budget_hit"]
     assert len(d["rounds"]) >= 2 and d["rounds"][0]["bins_short"] > 0 and d["rounds"][-1]["missing"] == 0
     assert d["n_candidates"] <= mg.FLAT_BUDGET * 500
     P = np.stack([e[0] for e in events])
     assert mg.fiducial_pass_mask(P, mf, pdg, cuts).all()
     if multichannel:
         assert d["channels"] and len(np.unique(d["chan"])) == len(d["channels"])
+
+
+def test_budget_hit_reported(capsys):
+    """a range whose top no candidate reaches: the chunk stops at the budget and reports it"""
+    rng = np.random.default_rng(2)
+    pdg = [2, -2, -11, 11, 21]; mf = [0.0, 0.0, 0.0]
+    cuts = {"pt_min": 10.0, "cos_max": float(np.tanh(5.0)), "dr_min": 0.4, "m_min": -1.0}
+    pol = mg.sampling_policy({"sampling": dict(mode="mixture", f_flat=0.5, oversample=6, flat_range=[-30.0, 60.0],
+                                               flat_budget=8)})
+    mg.build_mixture_dataset(400, 30.0, 6000.0, mf, pdg, rng, cuts, pol, _toy_label, sqrts_measure="log")
+    d = mg.FLAT_LAST
+    assert d["budget_hit"] and d["n_candidates"] == 8 * 200 and d["kept_per_bin"].sum() == 200
+    assert "[WARN] flat quota: stopped at the budget" in capsys.readouterr().out

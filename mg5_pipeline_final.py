@@ -3107,6 +3107,10 @@ def sampling_policy(cfg, role=None):
     pol = dict(DEFAULT_SAMPLING); pol.update(cfg.get("sampling") or {})
     if cfg.get("kind") == "virt" or float(pol.get("f_flat", 0)) <= 0:
         pol["mode"] = "flat"
+    if pol.get("flat_range"):
+        # the quota-filled flat part's constants enter the policy, hence the recipe id (absent without flat_range)
+        pol.setdefault("flat_dex_per_bin", FLAT_DEX_PER_BIN)
+        pol.setdefault("flat_budget", FLAT_BUDGET)
     if float(pol.get("f_default", 0)) > 0:
         # the default-sampled share (D178): that fraction of the pool is the generator's own unweighted events, read
         # from the MadEvent pools of the lhe entry `default_source` (default_share_momenta); only in the mixture
@@ -3600,19 +3604,27 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
 # edge bins for this), and the next round's sqrt(s) proposal and channel shares follow those weights; rounds stop when
 # every bin holds its quota or pol["flat_budget"] candidates per flat event were labelled. Then exactly the quota is
 # kept per bin, uniformly at random within the bin; what unfilled bins leave is spread evenly over the bins with
-# candidates to spare, so the kept part stays as flat as the candidates allow.
-FLAT_DEX_PER_BIN = 0.25    # bin width in log10|M|^2 [open]
-FLAT_MIN_PER_BIN = 10      # least quota per bin: fewer bins when a chunk's flat part is small [open]
-FLAT_BUDGET = 50           # candidates labelled per flat event, at most (pol["flat_budget"]) [open]
+# candidates to spare, so the kept part stays as flat as the candidates allow; a chunk that stops at the budget with
+# bins short is reported ([WARN] line, FLAT_LAST["budget_hit"], multichannel_check's chunks_budget_hit), never filled
+# silently. sampling_policy writes the bin width and the budget into the policy whenever flat_range is set, so both
+# are part of the pool's recipe id.
+# Cost: the budget is only a stop against a bin no proposal reaches. A chunk that runs to it labels 50 candidates per
+# flat event against the mixture's 6; with the flat part 0.35 of a pool that is about 6.6x the chunk's labelling cost
+# for an expensive chunk (repo-reviewer's estimate, 2026-11-06); the step-58 check measures the real factor per class.
+# The quota per bin is n_flat / (number of bins), the remainder given to bins drawn from the chunk's own stream, so over
+# a pool's chunks no bin is favoured; a chunk whose flat part has fewer events than bins leaves some bins at 0 in that
+# chunk only.
+FLAT_DEX_PER_BIN = 0.25    # bin width in log10|M|^2: the 0.25-dex bins the step-57/58 check judges flatness on
+FLAT_BUDGET = 50           # candidates labelled per flat event, at most: a stop, not a target [open]
 FLAT_LAST = {}             # diagnostics of the last quota-filled flat part (multichannel_check.py quota policy)
 
 
-def flat_quota_bins(lo, hi, n_flat):
-    """edges of the quota bins over [lo, hi] (natural log |M|^2) and the quota of each (they sum to n_flat)"""
-    nb = int(np.ceil((hi - lo) / (FLAT_DEX_PER_BIN * np.log(10.0))))
-    nb = max(1, min(nb, n_flat // FLAT_MIN_PER_BIN))
+def flat_quota_bins(lo, hi, n_flat, rng, dex_per_bin=FLAT_DEX_PER_BIN):
+    """edges of the quota bins over [lo, hi] (natural log |M|^2, bins of dex_per_bin decades) and the quota of each:
+    n_flat // nb each, the remainder one each to bins drawn by rng.permutation (they sum to n_flat)"""
+    nb = max(1, int(np.ceil((hi - lo) / (dex_per_bin * np.log(10.0)))))
     q = np.full(nb, n_flat // nb, dtype=np.int64)
-    q[: n_flat - int(q.sum())] += 1          # the remainder to the lowest bins, deterministically
+    q[rng.permutation(nb)[: n_flat - int(q.sum())]] += 1
     return np.linspace(lo, hi, nb + 1), q
 
 
@@ -3714,9 +3726,10 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
     rounds of oversample/2 x n_flat candidates (the first as the first pass of the mixture: uniform channel shares and
     the pool's sqrt(s) measure), each next round's proposal from flat_quota_weights, until every bin holds its quota or
     pol["flat_budget"] x n_flat candidates were labelled. Returns (events, sqrt(s), |M|^2) of the kept part."""
-    edges, quota = flat_quota_bins(float(pol["flat_range"][0]), float(pol["flat_range"][1]), n_flat)
+    edges, quota = flat_quota_bins(float(pol["flat_range"][0]), float(pol["flat_range"][1]), n_flat, rng,
+                                   float(pol["flat_dex_per_bin"]))
     n_round = max(int(pol["oversample"]) * n_flat // 2, n_flat)
-    budget = int(float(pol.get("flat_budget", FLAT_BUDGET)) * n_flat)
+    budget = int(float(pol["flat_budget"]) * n_flat)
     mc = bool(pol.get("multichannel")) and len(m_finals) >= 3
     if mc:
         if pol.get("mc_resonances") and not pol.get("mc_res_params"):
@@ -3754,6 +3767,13 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             wc = wc + MC_FLOOR * max(wc.mean(), 1e-300)
             shares = wc / wc.sum()
     keep, take = flat_quota_select(logm, edges, quota, rng)
+    short = np.maximum(quota - take, 0)
+    budget_hit = bool(short.sum() > 0)
+    if budget_hit:
+        lo10 = edges[:-1][short > 0] / np.log(10.0)
+        print(f"  [WARN] flat quota: stopped at the budget ({len(cand):,} candidates, {pol['flat_budget']} per flat "
+              f"event) with {int((short > 0).sum())} bins short by {int(short.sum())} events (log10|M|^2 bins from "
+              f"{lo10.min():.2f} to {lo10.max():.2f}); their events taken from bins with candidates to spare")
     if len(keep) < n_flat:
         # fewer candidates in range than the flat part: the rest from the finite candidates outside it, then any
         rest = np.setdiff1d(np.nonzero(np.isfinite(logm))[0], keep)
@@ -3761,11 +3781,11 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             rest = np.setdiff1d(np.arange(len(cand)), keep)
         keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
     FLAT_LAST.clear()
-    FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take, cand_per_bin=cnt, rounds=rounds,
+    FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take, cand_per_bin=cnt, rounds=rounds, budget_hit=budget_hit,
                      n_candidates=len(cand), logm=logm, keep=np.asarray(keep), chan=ch_c,
                      channels=[list(x) for x in chans] if mc else None)
     print(f"  [SAMPLE] mixture: flat-log|M|^2 by quota {len(keep):,} kept from {len(cand):,} candidates in "
-          f"{len(rounds)} rounds, {int((take < quota).sum())} of {len(quota)} bins short ({int(np.maximum(quota - take, 0).sum())} events)")
+          f"{len(rounds)} rounds, {int((short > 0).sum())} of {len(quota)} bins short ({int(short.sum())} events)")
     return [cand[i] for i in keep], sq_c[keep], me_c[keep]
 
 
