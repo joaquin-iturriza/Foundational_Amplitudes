@@ -3410,11 +3410,7 @@ def resonance_draw(nb, sqrts, masses, S, M, G, y_lo, rng, tail=MC_TAIL):
     a = masses[S].sum() + floor; b = sqrts - mT_least
     ok = b > a * (1 + 1e-9)
     a_, b_ = np.where(ok, a, 1.0), np.where(ok, b, 2.0)
-    MG = M * G
-    th_a, th_b = np.arctan((a_ ** 2 - M ** 2) / MG), np.arctan((b_ ** 2 - M ** 2) / MG)
-    m_bw = np.sqrt(np.clip(M ** 2 + MG * np.tan(rng.uniform(th_a, th_b)), a_ ** 2, b_ ** 2))
-    m_lg = np.exp(rng.uniform(np.log(a_), np.log(b_)))
-    mS = np.where(rng.random(nb) < tail, m_lg, m_bw)
+    mS = _bw_mass(nb, a_, b_, M, G, rng, tail)
     if len(T) == 1:
         MT = np.full(nb, masses[T[0]])
     else:
@@ -3525,68 +3521,76 @@ def resonance2_draw(nb, sqrts, masses, S1, M1, G1, S2, M2, G2, y_lo, rng, tail=M
     return P
 
 
-def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=4.0):
-    """(nb, N, 4) finals in the partonic frame, every final at transverse mass sqrt(pT^2 + m^2) with pT log-uniform in
-    [pt_lo, pt_span pt_lo] (the last one balancing the others' pT), phi uniform, rapidities y_i = Y u_i with u_i
-    uniform, stretched to span [-1, 1] (the ladder's ends at -Y and +Y), and the span Y solved (bisection) so that
-    the invariant mass is sqrt(s), then boosted along z to zero total momentum (plan step 58: the forward multiperipheral events at the top of the QCD classes' log|M|^2
-    range, sqrt(s_hat) 20-60x the window's edge, |eta| to 4.9, pT at the cut). Y is capped at eta_max; an event whose
-    mass at Y = eta_max is short of sqrt(s) has its pT scaled up to reach it (wide-angle at large sqrt(s)); one whose
-    mass at Y = 0 already exceeds sqrt(s) takes the plain splitter."""
+# The ladder's pT span: the hardest cut leg of the held-out pp events above the quota's kept max has pT 13.6/19.0/32.0
+# GeV (uu_bbxuu) and 13.3/18.1/31.2 (us_ddxsu) at 10/50/90% (analysis/catalog_v4/data/quota_where/, multichannel_check
+# where @3a96f907), so pT log-uniform in [MC_PT_LO, 3.2 MC_PT_LO] [from those reads; the log-uniform shape open]
+MC_LADDER_PT_SPAN = 3.2
+
+
+def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=MC_LADDER_PT_SPAN):
+    """(nb, N, 4) finals in the partonic frame (plan step 58: the forward multiperipheral events at the top of the QCD
+    classes' log|M|^2 range, sqrt(s_hat) 20-60x the window's edge, |eta| to 4.9, pT at the cut). The first N - 1
+    finals at pT log-uniform in [pt_lo, pt_span pt_lo], phi uniform; the last balances their pT (so its pT is not
+    log-uniform and may fall under the cut). Rapidities y_i = Y u_i - y0, u_i uniform stretched to span [-1, 1] (the
+    ladder's ends), y0 the z boost to zero total momentum. Y solves (bisection) mass = sqrt(s); when the boosted
+    ladder would then pass |y| = eta_cap (uniform in [eta_max - 1, eta_max)), Y is the largest span whose boosted ends
+    stay inside eta_cap and the pT
+    are scaled up (factor k) until the mass reaches sqrt(s) (wider angles at large sqrt(s)); y0 is recomputed at the
+    final k, so a massive final can move it slightly. An event whose mass at Y = 0 already exceeds sqrt(s) takes the
+    plain splitter."""
     masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
     pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_lo * pt_span), (nb, N - 1)))
     ph = rng.uniform(0.0, 2.0 * np.pi, (nb, N - 1))
     px, py = pt * np.cos(ph), pt * np.sin(ph)
     px = np.concatenate([px, -px.sum(1, keepdims=True)], 1); py = np.concatenate([py, -py.sum(1, keepdims=True)], 1)
-    u = rng.uniform(-1.0, 1.0, (nb, N))      # stretched to [-1, 1]: the ladder's two ends at -Y and +Y
+    u = rng.uniform(-1.0, 1.0, (nb, N))
     u = 2.0 * (u - u.min(1, keepdims=True)) / (u.max(1, keepdims=True) - u.min(1, keepdims=True)) - 1.0
-
     ones = np.ones(nb)
 
-    def mass(Y, k=ones):
+    def parts(Y, k):
         mt = np.sqrt(k[:, None] ** 2 * (px ** 2 + py ** 2) + masses[None] ** 2)
         y = Y[:, None] * u
-        E, pz = (mt * np.cosh(y)).sum(1), (mt * np.sinh(y)).sum(1)
-        return np.sqrt(np.clip(E ** 2 - pz ** 2, 0, None))
+        E, pz = mt * np.cosh(y), mt * np.sinh(y)
+        M = np.sqrt(np.clip(E.sum(1) ** 2 - pz.sum(1) ** 2, 0, None))
+        y0 = np.arctanh(np.clip(pz.sum(1) / E.sum(1), -1 + 1e-15, 1 - 1e-15))
+        return M, y - y0[:, None], mt
 
-    bad = mass(0.0 * ones) >= sqrts
-    short = (mass(eta_max * ones) < sqrts) & ~bad
-    k = ones.copy()
-    if short.any():          # pT scaled up at Y = eta_max until the mass reaches sqrt(s) (the mass grows with k)
-        lo_k, hi_k = ones.copy(), ones.copy()
-        while True:
-            m = mass(eta_max * ones, hi_k) < sqrts
-            if not (m & short).any():
-                break
-            hi_k = np.where(m & short, hi_k * 2.0, hi_k)
+    def bisect(f, lo, hi):       # the largest x in [lo, hi] with f(x) True (f True at lo, False at hi)
         for _ in range(60):
-            mid = 0.5 * (lo_k + hi_k)
-            up = mass(eta_max * ones, mid) < sqrts
-            lo_k, hi_k = np.where(up, mid, lo_k), np.where(up, hi_k, mid)
-        k = np.where(short, 0.5 * (lo_k + hi_k), 1.0)
-    lo_Y, hi_Y = np.zeros(nb), np.full(nb, eta_max)
-    for _ in range(60):
-        mid = 0.5 * (lo_Y + hi_Y)
-        up = mass(mid, k) < sqrts
-        lo_Y, hi_Y = np.where(up, mid, lo_Y), np.where(up, hi_Y, mid)
-    Y = np.where(short, eta_max, 0.5 * (lo_Y + hi_Y))
-    mt = np.sqrt(k[:, None] ** 2 * (px ** 2 + py ** 2) + masses[None] ** 2)
-    y = Y[:, None] * u
-    E, pz = mt * np.cosh(y), mt * np.sinh(y)
-    y0 = np.arctanh(np.clip(pz.sum(1) / E.sum(1), -1 + 1e-15, 1 - 1e-15))     # boost along z to zero pz
-    y = y - y0[:, None]
+            mid = 0.5 * (lo + hi); t = f(mid)
+            lo, hi = np.where(t, mid, lo), np.where(t, hi, mid)
+        return lo
+
+    bad = parts(0.0 * ones, ones)[0] >= sqrts
+    # the mass grows with Y (M^2 = sum_ij mt_i mt_j cosh(Y (u_i - u_j)), the pT sum is 0) and with k
+    hiY = np.full(nb, eta_max)
+    for _ in range(8):
+        hiY = np.where(parts(hiY, ones)[0] < sqrts, 2.0 * hiY, hiY)
+    Ym = bisect(lambda Y: parts(Y, ones)[0] < sqrts, np.zeros(nb), hiY)
+    # the boosted span max|y| >= Y (u spans [-1, 1]), so the largest span inside eta_max lies in [0, eta_max]
+    # the capped ladder's outer end at eta_cap uniform in [eta_max - 1, eta_max) (inside the strict |cos theta| cut;
+    # the unreached pp events' largest |eta| 4.2/4.6/4.9 at 10/50/90%) [the 1-unit band open]
+    cap = rng.uniform(eta_max - 1.0, eta_max - 1e-6, nb)
+    Yc = bisect(lambda Y: np.abs(parts(Y, ones)[1]).max(1) <= cap, np.zeros(nb), np.full(nb, eta_max))
+    short = (Ym > Yc) & ~bad
+    Y, k = np.where(short, Yc, Ym), ones.copy()
+    if short.any():
+        hik = ones.copy()
+        for _ in range(40):
+            hik = np.where(short & (parts(Y, hik)[0] < sqrts), 2.0 * hik, hik)
+        k = np.where(short, bisect(lambda kk: parts(Y, kk)[0] < sqrts, ones.copy(), hik), 1.0)
+    _, y, mt = parts(Y, k)
     P = np.stack([mt * np.cosh(y), k[:, None] * px, k[:, None] * py, mt * np.sinh(y)], -1)
     if bad.any():
         P[bad] = democratic_draw(int(bad.sum()), sqrts[bad], masses, y_lo, rng)
     return P
-
 
 def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False):
     """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
     is a parton and there are at least three finals; with `res2`, ("res2", S1, p1, M1, G1, S2, p2, M2, G2) per pair of
     resonances on disjoint finals (both on shell together, plan step 58: the doubly resonant top of the electroweak
-    classes' log|M|^2 range); with `mperi`, ("mperi",) when at least two finals are partons (every final at pT near the
+    classes' log|M|^2 range); with `mperi`, ("mperi",) when the beams and at least two finals are partons (every final at pT near the
     cut spread in rapidity to the acceptance edge: the forward multiperipheral top of the QCD classes' range)"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
     rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
@@ -3597,7 +3601,7 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
         ch.append(("isc", partons))
     if res2:
         ch += [("res2",) + a[1:] + b[1:] for i, a in enumerate(res) for b in res[i + 1:] if not set(a[1]) & set(b[1])]
-    if mperi and len(partons) >= 2:
+    if mperi and len(partons) >= 2 and all(abs(q) in MC_PARTONS for q in pdg[:2]):   # hadronic beams only (|eta| < 5)
         ch.append(("mperi",))
     return ch
 

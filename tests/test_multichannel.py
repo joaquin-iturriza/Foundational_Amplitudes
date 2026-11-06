@@ -17,6 +17,10 @@ sys.path.insert(0, ROOT)
 import mg5_pipeline_final as mg  # noqa: E402
 
 
+# trunk's resonance_draw (inlined Breit-Wigner, @fcb06e7a) at default_rng(11), 5 events at 500 GeV: m(0, 1)
+PINNED_MLL = [88.46533766507697, 91.20103009081356, 91.60378136887829, 80.03982510431064, 36.696173689799515]
+
+
 def _mass(p):
     return np.sqrt(np.clip(p[..., 0] ** 2 - (p[..., 1:] ** 2).sum(-1), 0, None))
 
@@ -140,6 +144,21 @@ def test_multiperipheral_draw():
     eta = 0.5 * np.log((pa + P[..., 3]) / (pa - P[..., 3]))
     assert np.median(np.abs(eta).max(1)) > 3.5 and (np.abs(eta).max(1) > 4.5).mean() > 0.05
     assert np.median(pt.min(1)) < 25.0
+    # inside the acceptance after the boost, also where the span is capped (5 TeV), and above the splitter's there
+    pdg = np.array([2, 3, 1, -1, 3, 2])
+    cuts = mg.V4_CUTS["hadronic"]
+    for e in (1500.0, 5000.0):
+        sq = np.full(3000, e)
+        P = mg.multiperipheral_draw(3000, sq, masses, 1e-6, rng)
+        _check_ps(P, sq, masses)
+        pa = np.linalg.norm(P[..., 1:], axis=-1)
+        assert (np.abs(0.5 * np.log((pa + P[..., 3]) / (pa - P[..., 3]))).max(1) <= 5.0 + 1e-9).all()
+        full = np.concatenate([mg._beams(sq, pdg, None), P], 1)
+        acc = mg.fiducial_pass_mask(full, np.zeros(4), pdg, cuts).mean()
+        spl = mg.democratic_draw(3000, sq, masses, 1e-6, rng)
+        acc_s = mg.fiducial_pass_mask(np.concatenate([mg._beams(sq, pdg, None), spl], 1), np.zeros(4), pdg, cuts).mean()
+        print(f"ladder acceptance at {e:.0f} GeV {acc:.3f}, splitter {acc_s:.3f}")
+        assert acc > 0.7 and acc > 2 * acc_s
 
 
 def test_mc_channels_flags():
@@ -154,6 +173,14 @@ def test_mc_channels_flags():
     assert not any(c[0] == "mperi" for c in ch)          # no parton among the finals
     ch = mg.mc_channels([0.0] * 4, [2, 2, 5, -5, 2, 2], [], mperi=True)
     assert ch[-1] == ("mperi",)
+    assert not any(c[0] == "mperi" for c in mg.mc_channels([0.0] * 4, [11, -11, 1, -1, 2, -2], [], mperi=True))
+
+
+def test_resonance_draw_unchanged():
+    """resonance_draw through _bw_mass draws what the inlined Breit-Wigner drew (same order of draws): pinned values"""
+    rng = np.random.default_rng(11)
+    P = mg.resonance_draw(5, np.full(5, 500.0), [0.0] * 3, (0, 1), 91.188, 2.441404, 1e-6, rng)
+    np.testing.assert_allclose(_mass(P[:, 0] + P[:, 1]), PINNED_MLL, rtol=1e-12)
 
 
 if __name__ == "__main__":
