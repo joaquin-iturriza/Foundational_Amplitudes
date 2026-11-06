@@ -10181,6 +10181,35 @@ entries:
       a sqrt(s) move or default-event seeds), re-run on the short classes. NO: fill at 12 labels not above the quota sampler''s
       at 50 on the 2->4 classes: Markov chains recorded as a dead end with the numbers, next the importance-weighted alternative.
       10 CPU jobs, ~0.5 h each, no GPU.'
+    fix_at: '2026-11-06T23:05:46+00:00'
+    fix: '(1) Measure blind to what the change alters (check 2). Fill per bin counts kept events; the Markov chains make kept
+      events from successive accepted states of few chains (FLAT_MCMC_CHAINS 0.05: 100 chains for 2000 flat events in the
+      toy, 180 steps, 16659 accepted, rotation angle down to 1e-4 rad), so a bin can reach its quota with near-copies of one
+      chain''s state, and the fill read cannot tell. Reviewer''s own probe on the toy of tests/test_flat_mcmc.py @a99a7aeb
+      (not committed, throwaway): median over bins of the within-bin median nearest-neighbour distance in (log s_ij/s, log|t|/s,
+      log sqrt(s)) is 2.21 for the quota sampler at 50 and 2.22 at 12, 1.25 for the chains at 12, and 9% of the chains'' bins
+      have a median nearest-neighbour distance < 0.01 (none for quota). Also, only accepted states are collected (rejections,
+      which a Metropolis chain counts as repeats, are dropped) and the Wang-Landau weight keeps changing, so the within-bin
+      distribution is not the stated uniform phase space; untested. Fix: add a diversity/coverage read, committed, run on
+      the same jobs and shown to move on existing data: e.g. per in-range bin the nearest-neighbour distance among kept events
+      in the class''s invariants against the quota sampler at budget 750 (same class, seed), and kept events per chain; or
+      the held-out pp events'' distance to the nearest kept event per bin; plus a within-bin comparison of the chains'' kept
+      events against the quota sampler''s (KS on sqrt(s_hat), min pair mass/sqrt(s_hat), max|eta|), and state the threshold
+      for each in the outcome. The run must save what these reads need (kept momenta or invariants and chain index; the reads
+      today keep only log|M|^2). (2) Outcome (check 4): YES allows 5% of in-range bins below 0.95, and those can be exactly
+      the top QCD bins near the pp in-support max that the whole question is about (step 67''s verdict needed every in-range
+      bin >= 0.95); require every in-range bin, or name which bins may be short. Not every result maps to a branch: cost >
+      2.0 is in none (YES and PARTIAL need cost <= 2, NO is only about fill); fill above the quota sampler at 50 but below
+      YES with cost > 2 has no branch. State what each of these means for step 65. (3) Prior (check 5), searched results.tex
+      for Markov, MCMC, Wang-Landau, multicanonical, Metropolis, VEGAS, importance, reweight, flat in log: no earlier Markov
+      sampler, but the divergence-study paragraph ''Coverage vs. emphasis, and the general default sampling'' (results.tex
+      ~l.10230-10250) already named the way to get flat in log|M|^2: adaptive importance sampling (VEGAS/foam) guided by |M|^2;
+      the prior should name it and say why chains are tried first (the NO branch''s ''importance-weighted alternative'' is
+      that idea). Checks that hold: one change (flat part only, channels, chunk plan, range table, seeds fixed; old sampling
+      in the same job for cost); seeds 42/43 as every sibling class of steps 57-67, fill spread between seeds ~0.001-0.002
+      in shortfall (step 67 reads); toy numbers reproduced (quota 12: 0.8885, quota 50: 0.950, chains 12: 0.9375, 24000 labels);
+      held-out events are pp default-sampled (val + dsh) as D294 asks; D317''s <= 2x is the cost measure; no training, loss,
+      HPO or GPU disk question.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
