@@ -410,12 +410,34 @@ fi
 if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "LONG_* only on v4_het_default25[_seed2]"; exit 1 ;; esac
     LH=${LONG_HEADS:-8}; LF=${LONG_FACTOR:-1}
-    case "$LF" in 1|4|16) ;; *) echo "LONG_FACTOR must be 1, 4 or 16"; exit 1 ;; esac
+    case "$LF" in 1|2|4|8|16) ;; *) echo "LONG_FACTOR must be 1, 2, 4, 8 or 16"; exit 1 ;; esac
     ITERS=$((4264 * LF)); ITERS_FIXED=$ITERS
     EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=${LONG_MEMMAP:-false} ++data.train_subsample=null
            ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
     NORM+=(model.net.num_heads=$LH model.net.checkpoint_blocks=${LONG_CKPT:-false}); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
+    # LONG_HP=1262 (catalog_coverage step 64, D292/D293: the width x length map at >= 1 epoch): every cell at the long
+    # sweeps' best point, trial_1262 of cov_v4_long_hpo8_cc_17056 and _68224 (best of both; its config.yaml there:
+    # muon_weight_decay 0.04733132, regularization_lambda 9.114591e-08, cosanneal_warmup_frac 0.1800024,
+    # cosanneal_eta_min 1.376875e-08, ema false). Its lr at the cell's steps follows lr ~ steps^-0.55 through its
+    # 7.82114e-3 at 17056. The exponent is NOT measured here: both sweeps' lr windows were centred by
+    # tools/lr_surface_center.py with the fixed slope -0.55 (prin:invU, HPO rule 2; centres 2.633e-3 at 17056 and
+    # 1.228e-3 at 68224), and trial_1262 sits at the same normalized window position in both, so its two lrs are
+    # 4^0.55 apart by construction. The lr is censored at the window top (log position 0.9955 in both, best at the last
+    # validation): not converged, so every cell's lr is a lower bound on the optimum, not a tuned value. 1x refused
+    # (under one epoch, the point being redone). Own run dir _hp1262
+    if [ -n "$LONG_HP" ]; then
+        [ "$LONG_HP" = 1262 ] || { echo "LONG_HP: only 1262"; exit 1; }
+        [ -z "$LONG_LR$GROW_K" ] || { echo "LONG_HP excludes LONG_LR and GROW_K"; exit 1; }
+        [ "$LF" != 1 ] || { echo "LONG_HP: LONG_FACTOR 1 is 0.64 epoch of the whole set; use 2, 4, 8 or 16"; exit 1; }
+        HLR=$(python -c "import sys; t = int(sys.argv[1]); print(f'{7.82114e-3 * (t / 17056) ** -0.55:.7g}')" "$ITERS")
+        NORM=("${NORM[@]/#++training.lr=*/++training.lr=$HLR}")
+        NORM=("${NORM[@]/#++training.muon_weight_decay=*/++training.muon_weight_decay=0.04733132}")
+        NORM+=(++training.regularization_lambda=9.114591e-08 ++training.cosanneal_warmup_frac=0.1800024
+               ++training.cosanneal_eta_min=1.376875e-08 ema=false)
+        OUT="${OUT}_hp1262"; PRED="${PRED}_hp1262"
+        echo "LONG_HP 1262: steps $ITERS lr $HLR"
+    fi
     AXES+=(HD4 HD5)
     # width growth (plan warm_start step 4, D285): GROW_K=<533|1066|2132> with LONG_HEADS=16 starts from the 1x cell at
     # half the width and the same seed (its final model, after its sigma stage), grown function-preservingly
@@ -446,7 +468,7 @@ if [ -n "$TRAIN_ONLY" ]; then
 elif [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
-           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
+           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LH:+--width "$LH"} ${LIM:+--limit "$LIM"}) \
         || { case "$WALL" in *'"ok": false'*) echo "V3_WALL_SHORT $WALL" ;; *) echo "V3_WALL_ERROR tools/short_wall.py failed: $WALL" ;; esac; exit 1; }
     echo "V3_WALL $WALL"
 fi
