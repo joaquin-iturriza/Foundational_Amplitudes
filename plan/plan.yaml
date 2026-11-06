@@ -13694,12 +13694,17 @@ entries:
     - FA-ccin2p3-04fc5b3b
     - FA-ccin2p3-0564ad5b
     - FA-ccin2p3-0898a7b0
+    - FA-ccin2p3-0de6be56
     - FA-ccin2p3-159e0244
+    - FA-ccin2p3-166c6378
     - FA-ccin2p3-1e847591
+    - FA-ccin2p3-1ef38bb2
+    - FA-ccin2p3-1f7ae4ea
     - FA-ccin2p3-21674d1e
     - FA-ccin2p3-21a18a76
     - FA-ccin2p3-254abf4f
     - FA-ccin2p3-2a27e8a2
+    - FA-ccin2p3-32cb8805
     - FA-ccin2p3-341bf564
     - FA-ccin2p3-343e3d58
     - FA-ccin2p3-380c7b14
@@ -13709,6 +13714,7 @@ entries:
     - FA-ccin2p3-41729c67
     - FA-ccin2p3-43601c0a
     - FA-ccin2p3-4c4a5069
+    - FA-ccin2p3-4cb686ac
     - FA-ccin2p3-4ebff80f
     - FA-ccin2p3-51a88ce9
     - FA-ccin2p3-56cca07a
@@ -13722,6 +13728,7 @@ entries:
     - FA-ccin2p3-78576361
     - FA-ccin2p3-7a40c835
     - FA-ccin2p3-7b2d6c24
+    - FA-ccin2p3-89ecbc1e
     - FA-ccin2p3-8e41ac1e
     - FA-ccin2p3-93479cde
     - FA-ccin2p3-9cab9b5b
@@ -13733,6 +13740,8 @@ entries:
     - FA-ccin2p3-af86de05
     - FA-ccin2p3-b2c69c1a
     - FA-ccin2p3-b4525f43
+    - FA-ccin2p3-ba567f27
+    - FA-ccin2p3-c07e6ad5
     - FA-ccin2p3-c2acc1fc
     - FA-ccin2p3-c477a52c
     - FA-ccin2p3-c6d0c827
@@ -13746,10 +13755,11 @@ entries:
     - FA-ccin2p3-e47ed26b
     - FA-ccin2p3-ed946736
     - FA-ccin2p3-f35b6a78
+    - FA-ccin2p3-f3d6af3a
     - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
     - FA-ccin2p3-fbb16a33
-    commit: 6a03fdee
+    commit: 96ca381e
     paths:
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066_seed2
@@ -13783,16 +13793,23 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1ck3198.json
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
     - analysis/catalog_v4/data/warm_start_C1e.json
+    - analysis/catalog_v4/data/warm_start_C1r_ctrl.json
+    - analysis/catalog_v4/data/warm_start_C1r_final_lr3x.json
+    - analysis/catalog_v4/data/warm_start_C1r_step2132_continue.json
+    - analysis/catalog_v4/data/warm_start_C1r_step3198_continue.json
+    - analysis/catalog_v4/data/warm_start_C1r_step3198_default.json
     - analysis/catalog_v4/data/warm_start_C1t.json
     - analysis/catalog_v4/data/ws_hpo8/het_split.json
     - analysis/catalog_v4/data/ws_hpo8/het_split_log.txt.gz
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
     - analysis/catalog_v4/data/ws_objective_check.json
     - analysis/catalog_v4/data/ws_restart_steps.json
+    - analysis/catalog_v4/data/ws_restart_study_steps.json
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
     - analysis/catalog_v4/plot_warm_start_compare.py
     - analysis/catalog_v4/plot_ws_objective.py
+    - analysis/catalog_v4/plot_ws_restart.py
     - analysis/catalog_v4/signext_compare.py
     - analysis/catalog_v4/ws_het_split.py
     - analysis/catalog_v4/ws_objective_check.py
