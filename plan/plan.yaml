@@ -11106,10 +11106,6 @@ entries:
       woke nothing). Look up (claude-code-guide, low effort) whether Claude Code offers a setting or hook to suppress or absorb
       a task-notification; try a Stop-hook route that holds the main turn''s end a few seconds when an agent handed back this
       turn and its notification has not arrived; test on the recorded double wakes (main_turns.py) and on a live agent end.'
-    16: 'Merge commits sweep other agents'' uncommitted files: 21648d10 (merge ws-tune, warm_start owner) carried tools/plan.py,
-      plan_check.py and two tests of other workers. Find how (git add -A / commit -a during the merge, or files staged in
-      the shared index), and add a check to the commit hook that refuses a commit (merge included) carrying a staged file
-      the committing agent did not name; replay on 21648d10''s parent state.'
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
@@ -11347,11 +11343,6 @@ entries:
       if:
       - 'a route removes the second wake: keep it, re-measure after a day'
       - 'none works: say which were tried, with evidence'
-    16:
-      feeds: 'the commit rule: only your own files, named; Joaquin was told of the slip 2026-11-06'
-      if:
-      - 'fixed and replayed: drop'
-      - 'cannot tell who staged a file: say so and refuse merge commits with staged files outside the merged branch''s diff'
     17:
       feeds: 'Joaquin 2026-11-06: fixes must be shown to work, not claimed'
       if:
