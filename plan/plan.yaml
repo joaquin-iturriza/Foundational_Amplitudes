@@ -3727,6 +3727,13 @@ entries:
     65: (a) design the regeneration of the 1301 hadronic tree classes with sampling.multichannel + mc_mperi_both + mc_res2
       and the flat quota at the budget Joaquin picks (750, or ~3000 to fill the margin), the cost from the measured replay
       times (step 67 finding); repo-reviewer over fa872486..686c3241 first
+    66: '(f) e+e- classes in the regeneration (Joaquin 2026-11-06 ~19:50 ''If I asked for pp sampled data, why would you produce
+      e+e- datasets that are different in any way?''; D294''s rule applied to every beam): the regeneration design of step
+      65 covers every tree class, the 169 e+e- classes with EE4 default pools included, each flat in log|M|^2 over the log|M|^2
+      range of its own default-sampled events (in support) +-0.5 dex. Needs first: the e+e- range table (pp_support.py extended
+      to the ee4_ train+test pools at their fixed energies, the catalog''s e+e- cuts, read-only site run on CC) merged into
+      recipes/catalog_v4_flat_range.json by tools/flat_range.py; then the e+e- classes'' quota replay cost and coverage measured
+      with the hadronic ones in step 65''s design (two e+e- test classes beside the five).'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -10219,6 +10226,12 @@ entries:
       if:
       - 'Joaquin accepts the margin at 750: design at 750'
       - 'Joaquin pays to fill the margin: design at ~3000 (estimate: 4x the 750 time on uu_bbxuu-like classes)'
+    66:
+      feeds: 'the regeneration design (step 65): which classes and ranges the flat quota covers'
+      if:
+      - 'every e+e- class gets a range: step 65''s design covers 1301 + 169 classes'
+      - 'an e+e- class has no in-support default event: it gets no flat range and is listed, as the hadronic ones without
+        pp support'
   owner:
     agent: a8e0ed3e3a9c9cd8a
     state: working
