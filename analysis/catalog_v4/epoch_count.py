@@ -20,6 +20,11 @@
           rates; the job's time limit is short_wall.py --width's slurm_time (the job checks itself against it);
           GPU-h = 1 GPU x the job's work time; the cells already run (the sweeps' trial_1262 at 4x and 16x, width 8,
           seed 42) are reused -> data/scaling_grid_plan.json
+  fig     figs/scaling_grid: (a) the existing points (size_figs.fit_points: MSE of log|M|^2 over every training pool at
+          the best checkpoint, geometric mean, against C = 6 N S B), open where the run saw under one epoch, each
+          labelled with its epochs; ticks at the bottom: the planned cells' compute (dark: the 2x row, light: 4x-16x);
+          (b) the width x length map: per cell what exists and what the grid would run, with the new GPU-h of the cell
+          (both seeds, data/scaling_grid_plan.json)
 """
 import json, math, os, subprocess, sys
 
@@ -134,5 +139,63 @@ def grid():
               f"{'REUSED ' + c['reused'] if c['reused'] else ''}")
 
 
+def fig():
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    from matplotlib.lines import Line2D
+    from size_figs import fit_points
+    g = json.load(open(os.path.join(DATA, "scaling_grid_plan.json")))
+    ep = 4264 / g["batches_per_epoch"]
+    col = {8: ps.C.blue, 16: ps.C.green, 32: ps.C.vermillion}
+    fig, (ax, axm) = ps.figure(ncols=2)
+    for d, w, n, c, y in fit_points():
+        e = n / g["batches_per_epoch"]
+        ax.plot([c], [y], ls="", marker="o", ms=5, color=col[w], mfc="none" if e < 1 else col[w])
+        ax.annotate(f"{e:.2g} ep", (c, y), textcoords="offset points", xytext=(5, 2), fontsize=6)
+    lo = ax.get_ylim()[0]
+    for cell in g["cells"]:
+        if cell["reused"] is None:
+            ax.plot([cell["C_6NSB"]], [lo], ls="", marker="|", ms=9, color=col[cell["width"]],
+                    alpha=1.0 if cell["factor"] == 2 else 0.35)
+    ax.set_xscale("log"); ax.set_yscale("log")
+    ax.set_xlabel("training compute $6NSB$ [FLOP]")
+    ax.set_ylabel(r"MSE of $\log|\mathcal{M}|^2$, all pools")
+    hs = [Line2D([], [], ls="", marker="o", color=col[w], label=f"width {w}") for w in (8, 16, 32)]
+    hs += [Line2D([], [], ls="", marker="o", color="k", mfc="none", label="run, under one epoch"),
+           Line2D([], [], ls="", marker="|", ms=9, color="k", label="planned, 2x row"),
+           Line2D([], [], ls="", marker="|", ms=9, color="k", alpha=0.35, label="planned, 4x to 16x")]
+    ps.legend(ax, handles=hs, loc="upper right", fontsize=6)
+    # (b) the map
+    factors = (1, 2, 4, 8, 16); widths = (8, 16, 32)
+    gh = {}
+    for cell in g["cells"]:
+        if cell["reused"] is None:
+            gh[(cell["width"], cell["factor"])] = gh.get((cell["width"], cell["factor"]), 0) + cell["work_hours"]
+    for i, f in enumerate(factors):
+        for j, w in enumerate(widths):
+            if f == 1:
+                axm.plot(i, j, marker="s", ms=13, mfc="none", mec=ps.C.grey, ls="")
+                axm.text(i, j - 0.33, "0.64 ep", ha="center", fontsize=5.5)
+                continue
+            reused = w == 8 and f in (4, 16)
+            axm.plot(i, j, marker="s", ms=13, ls="", color=ps.C.vermillion if f == 2 else ps.C.orange,
+                     alpha=1.0 if f == 2 else 0.55)
+            if reused:
+                axm.plot(i, j, marker="o", ms=5, ls="", color="k")
+            axm.text(i, j - 0.33, f"{gh.get((w, f), 0):.0f} GPU-h", ha="center", fontsize=5.5)
+    axm.set_xticks(range(len(factors)))
+    axm.set_xticklabels([f"{f}x\n{f * ep:.2g} ep" for f in factors], fontsize=6)
+    axm.set_yticks(range(len(widths))); axm.set_yticklabels([str(w) for w in widths])
+    axm.set_xlim(-0.6, len(factors) - 0.4); axm.set_ylim(-0.7, len(widths) - 0.4)
+    axm.set_xlabel("training length (x 4264 steps), epochs")
+    axm.set_ylabel("width (attention heads)")
+    hm = [Line2D([], [], ls="", marker="s", mfc="none", mec=ps.C.grey, label="run, under one epoch (replaced)"),
+          Line2D([], [], ls="", marker="s", color=ps.C.vermillion, label="2x row: 6 jobs"),
+          Line2D([], [], ls="", marker="s", color=ps.C.orange, alpha=0.55, label="rest of the grid: 16 jobs"),
+          Line2D([], [], ls="", marker="o", color="k", ms=5, label="one seed exists (tuned trial)")]
+    ps.legend(axm, handles=hm, loc="upper left", fontsize=5.5)
+    ps.save(fig, os.path.join(HERE, "figs", "scaling_grid"))
+
+
 if __name__ == "__main__":
-    {"count": count, "grid": grid}[sys.argv[1]]()
+    {"count": count, "grid": grid, "fig": fig}[sys.argv[1]]()
