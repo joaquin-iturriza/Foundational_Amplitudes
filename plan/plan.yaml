@@ -3751,6 +3751,10 @@ entries:
       (add the mcmc policy), figure of fill per bin per policy beside cost. e+e- (D318, collider anchor approved): e+e- range
       from real lepton-collider energies (LEP 91-209 GeV, ILC/CLIC to 3 TeV, FCC-ee 91-365 GeV) with ISR and beamstrahlung,
       machine parameters cited; check MadGraph''s lepton ISR/beamstrahlung options in our setup.'
+    70: '(i) scaling grid seed 42: prebuild FA-ccin2p3-bf203857 then 10 GPU jobs (34cfff0c c53b8e51 ff309c2d 1b1a8f6e b07d6237
+      4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
+      (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
+      cache key and one GPU job''s key; record each cell''s GPU.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -10728,6 +10732,11 @@ entries:
         regeneration design for the 1301 hadronic and, with the forward channel to 1-|cos| 1e-8, the e+e- classes'
       - 'PARTIAL or NO: where read of the short bins, one revision within 2x (chains, increment, sqrt(s) move, default-event
         seeds), or a dead end and the importance-weighted alternative'
+    70:
+      feeds: the compute scaling at >= 1 epoch (D292, D293, D314)
+      if:
+      - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
+      - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
   owner:
     agent: a7be1d5c343ae02d7
     state: working
