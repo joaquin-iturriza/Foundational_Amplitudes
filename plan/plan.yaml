@@ -3730,6 +3730,10 @@ entries:
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
+    65: '(a) re-check, step 58 NO branch: the quota left the top of the log|M|^2 range unfilled on 4/5 classes (finding 2026-11-06);
+      multiperipheral ladder + joint-resonance channels on branch quota-channels @3f0e6980 (repo-reviewer, design-reviewer
+      running); on both PASS: merge, sync CC, 10 CPU jobs scripts/job_multichannel_check.sh MCHECK_POLICIES=multichannel+quota+quota_ladder_res2
+      MCHECK_SEED=42/43 (limit 00:40); pull multichannel+quota+quota_ladder_res2, summary, fig_flat_quota.py.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -9839,6 +9843,14 @@ entries:
       if:
       - 'estimate <= 30 GPU-h or covered by D292/D293: design, review, submit'
       - 'above 30 GPU-h not covered: estimate to the main session'
+    65:
+      feeds: 'D294: whether the flat-in-log|M|^2 quota with these channels covers the pp range, i.e. whether the 1301 hadronic
+        tree classes are regenerated with it'
+      if:
+      - 'YES on every class and seed: design the regeneration with mc_mperi/mc_res2 and the measured cost factor'
+      - 'NO, shortfall reduced and carried by the new channels: raise flat_budget by the measured candidates per kept event,
+        one more re-check'
+      - 'NO, shortfall unchanged: revise the channel from the per-channel kept counts and where reads'
   owner:
     agent: a6260bf506367ce73
     state: working
