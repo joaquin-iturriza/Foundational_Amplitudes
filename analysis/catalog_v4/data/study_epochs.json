@@ -1,0 +1,189 @@
+{
+ "source": "count   every point of par:v4_width / par:v4_mult_width_length / par:v4_length (the 1x width cells, both seeds, and\n          every trial of the 4x and 16x long sweeps): epochs = steps / batches per epoch (steps x 16384 events per step\n          over the training events; the batches are each run's 'Starting to train ... with B batches' line, read\n          into data/epochs.json by mixture_ab.py epochs and data/size_curves.json by size_figs.py pull)\n          -> data/study_epochs.json\n  grid    the width x length map at >= 1 epoch: widths 8, 16, 32 (LONG_HEADS) x lengths 4264 x {2, 4, 8, 16} steps,\n          seeds 42 and 43, every cell at the long sweeps' best hyperparameter point (trial_1262, best of both the\n          17056 and the 68224 sweep, its lr at the two lengths 7.82114e-3 and 3.649139e-3, i.e. lr ~ t^-0.55, the\n          HPO surface's decay; the lr at another length from that law). Training hours from the measured V100 rates per\n          width (data/size_mse.json 'Finished training' hours over iterations, main block, the 4264-step whole-set\n          runs); the rest of a job (start-up, default-share composition, sigma stage, the 2313 zero-shot probes) from\n          tools/short_wall.py's rates; GPU-h = 1 GPU x the job's work time; the cells already run (the sweeps'\n          trial_1262 at 4x and 16x, width 8, seed 42) are reused -> data/scaling_grid_plan.json",
+ "rows": [
+  {
+   "point": "width 8, 1x, seed 42",
+   "run": "FA-ccin2p3-804a65bc",
+   "width": 8,
+   "steps": 4264,
+   "batches_per_epoch": 6707,
+   "epochs": 0.6358
+  },
+  {
+   "point": "width 8, 1x, seed 43",
+   "run": "FA-ccin2p3-66e8c31f",
+   "width": 8,
+   "steps": 4264,
+   "batches_per_epoch": 6707,
+   "epochs": 0.6358
+  },
+  {
+   "point": "width 16, 1x, seed 42",
+   "run": "FA-ccin2p3-493c98db",
+   "width": 16,
+   "steps": 4264,
+   "batches_per_epoch": 6707,
+   "epochs": 0.6358
+  },
+  {
+   "point": "width 16, 1x, seed 43",
+   "run": "FA-ccin2p3-7288b3fe",
+   "width": 16,
+   "steps": 4264,
+   "batches_per_epoch": 6707,
+   "epochs": 0.6358
+  },
+  {
+   "point": "width 32, 1x, seed 42",
+   "run": "FA-ccin2p3-e26059bf",
+   "width": 32,
+   "steps": 4264,
+   "batches_per_epoch": 6707,
+   "epochs": 0.6358
+  },
+  {
+   "point": "width 32, 1x, seed 43",
+   "run": "FA-ccin2p3-fd7fc137",
+   "width": 32,
+   "steps": 4264,
+   "batches_per_epoch": 6707,
+   "epochs": 0.6358
+  },
+  {
+   "point": "width 8, 4x sweep trial_0331",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_0331",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_0353_r2",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_0353_r2",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_0753",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_0753",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_0849",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_0849",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_1176",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_1176",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_1262",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_1262",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_1333_r2",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_1333_r2",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 4x sweep trial_1860_r2",
+   "run": "runs/cov_v4_long_hpo8_cc_17056/trial_1860_r2",
+   "width": 8,
+   "steps": 17056,
+   "batches_per_epoch": 6707,
+   "epochs": 2.543
+  },
+  {
+   "point": "width 8, 16x sweep trial_0353_r2",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_0353_r2",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_0686",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_0686",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_0753",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_0753",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_0849",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_0849",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_1262",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_1262",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_1333_r2",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_1333_r2",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_1806",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_1806",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  },
+  {
+   "point": "width 8, 16x sweep trial_1860_r2",
+   "run": "runs/cov_v4_long_hpo8_cc_68224/trial_1860_r2",
+   "width": 8,
+   "steps": 68224,
+   "batches_per_epoch": 6707,
+   "epochs": 10.1721
+  }
+ ],
+ "under_one_epoch": [
+  "width 8, 1x, seed 42",
+  "width 8, 1x, seed 43",
+  "width 16, 1x, seed 42",
+  "width 16, 1x, seed 43",
+  "width 32, 1x, seed 42",
+  "width 32, 1x, seed 43"
+ ]
+}
