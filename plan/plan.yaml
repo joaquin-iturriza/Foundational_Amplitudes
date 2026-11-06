@@ -3679,6 +3679,13 @@ entries:
     answers_after: '2026-11-05T02:15:52+00:00'
     covers:
     - catalog_coverage
+  - said_at: '2026-11-06T22:54:34.376000+00:00'
+    text: The e+e- data should be coherent to what we do with the rest of the data, flat in log M^2 plus sampling hard regions
+      the way we do for the others.
+    decision: D318
+    answers_after: '2026-11-06T22:36:12+00:00'
+    covers:
+    - catalog_coverage
   decisions:
   - D127
   - D130
@@ -3706,6 +3713,7 @@ entries:
   - D254
   - D258
   - D288
+  - D318
   next:
     37: '(b) done: memmap format 3 merged d18e44f1 (finding 2026-11-06). Left: a memmap run now needs a CPU prebuild first
       (scripts/job_mmap_prebuild.sh with the run''s overrides and seed); time the first whole-set build and record it; section
@@ -5306,6 +5314,8 @@ entries:
     blocks_steps:
     - 37
     - 38
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'Multichannel candidate check failed the plateau rule on 4 of 5 classes (it reaches the pp max on the electroweak
       classes but too thinly at the top): keep multichannel and add candidates at the top (a second share pass weighted to
       the top bins, or more oversampling there), or another route?'
@@ -5314,6 +5324,8 @@ entries:
     blocks: step 58 only
     blocks_steps:
     - 58
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'Sign output with the het. loss failed (wrong sign more often than the MSE model''s sign output: H5 13.3% vs 6.7%,
       17 of 21 pools; HD5 18.3% vs 13.0%, 15 of 19; no better than always-positive on held-out), magnitude cost undecided
       (R 1.03, interval 0.67 to 1.42). Next: (1) keep the het. magnitude target with no sign, (2) change the sign loss weight
@@ -5324,6 +5336,8 @@ entries:
     blocks: step 56's follow-up only
     blocks_steps:
     - 61
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'Loader control: memmap moves the error by at most ~6% on pp (R_L 1.059/0.981) against the 39% full-set gap, but
       one value (held-out default-sampled, seed 43, 0.897, memmap better) falls just outside the rerun-noise bound 0.094,
       so the design''s rule reads UNRESOLVED. Take it as clear enough for the warm_start whole-set change, or settle it with
@@ -5346,6 +5360,8 @@ entries:
     blocks: step 64's submission
     blocks_steps:
     - 64
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: Will you allow the resubmission of the 12 sign-output jobs at 3:30 (28 GPU-h of work, design passed), which the automatic
       permission check refused for the agent?
     at: '2026-11-06T05:23:17+00:00'
@@ -5353,6 +5369,8 @@ entries:
     blocks: step 61's resubmission
     blocks_steps:
     - 61
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'Two calls: (1) the scaling grid costs 449 GPU-h: run the whole grid, only the 2x row (the six under-one-epoch points
       redone at 1.27 epochs, 39 GPU-h), or that row at the original settings? (2) will you allow the resubmission of the 12
       sign-output jobs at 3:30 (28 GPU-h of work), which the automatic permission check refused for the agent?'
@@ -5362,6 +5380,8 @@ entries:
     blocks_steps:
     - 61
     - 64
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's settings (39
       GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28
       GPU-h of work)?
@@ -5371,6 +5391,8 @@ entries:
     blocks_steps:
     - 61
     - 64
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings
       (39 GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30
       (28 GPU-h of work)? And for the sampling check: may udx_csxvevex get four more seeds (44-47, 4 CPU jobs of ~10 min,
@@ -5383,6 +5405,8 @@ entries:
     blocks_steps:
     - 61
     - 64
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: (1) For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row (39 GPU-h), or the 2x row at
       the original settings? (2) Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h of work)? (3)
       Should u d-bar to c s-bar nu nu-bar get four more seeds (4 CPU jobs of about 10 minutes)?
@@ -5393,6 +5417,8 @@ entries:
     blocks_steps:
     - 61
     - 64
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's settings (39
       GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28
       GPU-h of work)?
@@ -5402,6 +5428,8 @@ entries:
     blocks_steps:
     - 61
     - 64
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings
       (39 GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30
       (28 GPU-h of work)? And for the catalog regeneration: at budget 750 with both ladders, every log|M|^2 bin up to the
@@ -5417,6 +5445,8 @@ entries:
     - 61
     - 64
     - 65
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   - ask: 'Scope: which generation the e+e- classes keep. Should the e+e- classes go back exactly to how they were generated
       before catalog_v4 (sqrt(s) windows up to 1 TeV, the old angle cut), or stay as catalog_v4 made them (6 TeV window, |cos
       theta| < 0.99)?'
@@ -5424,8 +5454,10 @@ entries:
     searched: 'site decisions --project FA (D294, D295, D269/D270), docs/results.tex catalog_v4 generation, the plan''s catalog_coverage
       findings: none chose a sampling for the e+e- classes; the 6 TeV window was inherited from the pp coverage check'
     blocks: the e+e- part of the regeneration design
-    blocks_steps: &id001
+    blocks_steps:
     - 68
+    answered_at: '2026-11-06T22:54:33.969000+00:00'
+    decision: D318
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -12354,14 +12386,6 @@ entries:
       e+e- classes have no dsh pool, so their range comes from the 2000-event EE4 pool they are scored on (a label-in-inputs
       question: generate more default events for them, or accept). Repo-reviewer backlog holds 08e3091e..4c252c5f.'
     written: '2026-11-06T20:24:47+00:00'
-  ask: 'Scope: which generation the e+e- classes keep. Should the e+e- classes go back exactly to how they were generated
-    before catalog_v4 (sqrt(s) windows up to 1 TeV, the old angle cut), or stay as catalog_v4 made them (6 TeV window, |cos
-    theta| < 0.99)?'
-  waiting_since: '2026-11-06T22:36:12+00:00'
-  searched: 'site decisions --project FA (D294, D295, D269/D270), docs/results.tex catalog_v4 generation, the plan''s catalog_coverage
-    findings: none chose a sampling for the e+e- classes; the 6 TeV window was inherited from the pp coverage check'
-  blocks: the e+e- part of the regeneration design
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
@@ -12887,7 +12911,7 @@ entries:
     at: '2026-11-06T09:39:26+00:00'
     searched: agent permission refusals are the user's to clear
     blocks: steps 18 and 19
-    blocks_steps: &id002
+    blocks_steps: &id001
     - 18
     - 19
   step_why:
@@ -13663,7 +13687,7 @@ entries:
   waiting_since: '2026-11-06T09:39:26+00:00'
   searched: agent permission refusals are the user's to clear
   blocks: steps 18 and 19
-  blocks_steps: *id002
+  blocks_steps: *id001
   checked_until: '2026-11-06T18:46:56+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
