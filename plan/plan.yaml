@@ -14592,6 +14592,14 @@ entries:
       and tuning work of step 6 goes on, and its recipe, if one beats the default, is re-applied to the changes that read
       NO. Across changes: data changes (C2-C6) against the target change (C8) by g_k at equal k. A blow-up listed apart with
       where.'
+    passed_at: '2026-11-06T10:09:05+00:00'
+    reviewer: 'Round 2. The one defect is fixed: C1 is now stated as YES at k=1066 (R(W_k/B) PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01,
+      par:v4_warm_start, warm_start_C1.json @f0015680), and the k=533 repair reads are labelled as such. The rest is unchanged
+      from round 1 and verified there. Arms, seeds, reads and outcome are as passed 2026-11-04T21:51. 54 runs (6+6+12+6+6+6+12).
+      79.56 GPU-h by short_wall, within D300''s 79.8. Gates (het_magnitude.json): C8 HD5 0.097 [0.047, 0.291] passes; C7 1.47
+      [0.97, 1.99] dropped. Untuned restart: C1u R(damped/default) 1.032 [0.866, 1.228] / 1.045 [0.911, 1.197] and C1m 1.054/1.005,
+      both NOT BETTER. ws_stats_check.py @42c4aeab gates C5, C6, C8 at 1e-12. Disk: df 93G free against 46 GB. Searched: warm50,
+      warmmag, warmpp, warmsx, mse_cont, step 7, C2-C8 (results.tex); warm, restart, recipe, D282-D303 (site decisions).'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
