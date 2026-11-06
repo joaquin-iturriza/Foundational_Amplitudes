@@ -12918,9 +12918,9 @@ entries:
       warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
   owner:
     agent: ad75cab5b751353f4
-    state: stopped
+    state: working
     since: '2026-11-06T05:06:56+00:00'
-    state_at: '2026-11-06T05:46:39+00:00'
+    state_at: '2026-11-06T05:47:48+00:00'
     context: 241657
     context_at: '2026-11-06T05:47:42+00:00'
   designs:
