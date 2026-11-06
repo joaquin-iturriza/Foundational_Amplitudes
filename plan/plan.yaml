@@ -14412,6 +14412,19 @@ entries:
   - at: '2026-11-06T06:47:44+00:00'
     text: 'Correction to the previous finding: the non-memmap refusal of mode prebuild was not tested (the local dry run of
       v4_het_warm25m_k533 stopped earlier, on its missing parent model).'
+  - at: '2026-11-06T07:25:53+00:00'
+    text: '2026-11-06 step 6 moment-fill read (D303, design passed round 2 05:40; ws_restart_steps.py and mixture_ab.py warm
+      C1f @b28a8f2c, data/ws_restart_steps.json, data/warm_start_C1f.json): NO CAUSE, not BETTER. Max grad norm over steps
+      0-19, fill vs same-commit default restart: s42 1777 vs 994 (1.79x), s43 1411 vs 1334 (1.06x), bar 0.2x; worst training
+      loss over steps 0-39: fill +0.91 / +1.54 vs default -1.33 / -1.22 (bar parent start + 0.3 = -2.27): the fill made the
+      early jump larger, not smaller. Validation NLL (every 10 steps): fill s42 -2.571 at 10, +0.237 at 20, ends -2.668; default
+      s42 -2.571, -2.080, ends -2.662; s43 fill peak +0.775, ends -2.588; default peak -1.822, ends -2.585. Zero-shot R(fill/default)
+      PP4 1.005 [0.844, 1.199], EE4 1.016 [0.881, 1.168] (widened), held 1.000; R(fill/scratch with the change) PP4 1.32,
+      EE4 1.50 (SHORT, as the default restart). The step-2 norm itself varies with the data stream (same-commit default 269
+      / 543 against the older default''s 825). So the empty optimizer is not what knocks the warm start off the parent''s
+      minimum; per the design''s no-CAUSE branch the jump comes from the lr itself or Muon''s fixed-norm step (the hpo8 step-2
+      norm follows the step-2 lr, 101 at 1.6e-5 to 4310 at 6.9e-4). The fill is not added to the restart recipe; the 2026-11-05T04:01
+      finding (optimizer state makes no difference) stands for this setting.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
