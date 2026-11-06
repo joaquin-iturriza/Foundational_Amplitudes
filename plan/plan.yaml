@@ -15607,6 +15607,22 @@ entries:
       harmless to the reads; remaining gap at 533 is the retraining length. Step 11 growth sweep ws_grow_k533_zeroshot_hpo8
       submitted on CC at the default restart (8 trials, 3 chained waves, slurm 62994063-70, limit 00:50, 32G; sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml
       at a6b355c1; target ws_grow_zeroshot 0.9 h; df 78 GB free), step 11 waits on the sweep.'
+  - at: '2026-11-06T13:47:44+00:00'
+    text: '2026-11-06 ~13:50 UTC step 9 done: the 41 remaining step-7 reads home (9 re-read after ssh resets from 41 parallel
+      site logs; read7.sh now retries and fails on an empty log), C6''s 24 runs collected (collect_run.py), ws_stats_check.py
+      C8 ok on all 6 runs (1090 pools each). mixture_ab.py warm C1-C5, C8 and signext_compare.py warm @8293cab1, figure plot_warm_start.py
+      changes (figs/warm_start_changes_{legend,a,b,c}), write-up par:v4_warm_start_changes @7d288fee (notes-editor pass, verify_claims
+      0). Outcome: YES C2 (het share 0.50) at k=2132 (0.5), C3/C4 (MSE share 0.25/0.50) at 1066 (0.25), C5 (pp-mixed) at 533
+      (0.125); C6 and C8 not decided (INCONCLUSIVE at every k: point estimates 0.86-1.06 but widened upper ends 1.41-2.11;
+      g at 533 0.93/1.05). Carried everywhere. MSE changes end below B at 2132 partly from the unconverged MSE parent (R(C_k/A)
+      PP4 0.79). Step 11: the growth sweep ws_grow_k533_zeroshot_hpo8 failed whole (8 trials FAILED in 4-5 min, no result
+      file): the cache prebuild FA-ccin2p3-5e02275b run with --config-path the base run dir warm-started that dir and rewrote
+      its config.yaml (memmap_prebuild true, num_workers 0, exp_name/run_name/run_idx of the prebuild), so every trial opened
+      the cache and exited. Fixed @8f68ca8d: job_mmap_prebuild.sh passes ++warm_start_idx=null ++run_dir=null; the sweep re-runs
+      as ws_grow_k533_zeroshot_hpo8_rerun with data.memmap_prebuild false and training.num_workers 2 in fixed_params (slurm
+      62994102-09, waves, limit 00:50). NOT repaired: e046ac67''s own config.yaml on CC still holds the prebuild''s values
+      (config_1.yaml, out_1.log added); its original equals its seed-43 twin''s but seed 42, its own paths, exp_name dancat_het_pre,
+      num_workers 2, run_idx 0, no memmap_prebuild; restoring it is an edit on the cluster, left to Joaquin.'
   step_waits:
     '11': ccin2p3:ws_grow_k533_zeroshot_hpo8_rerun
   handoff:
