@@ -17213,6 +17213,16 @@ entries:
       over 10 prior pairs (mixture_ab.py seed_pairs @e0f3bd49, data/ws_seed_pairs.json): median |ln R43 - ln R42| PP4 0.003,
       EE4 0.044 (max 0.40/0.93 in the every-group-damped pair, a seed-43 blow-up): single-seed paired reads resolve 5-15%
       effects.'
+  - at: '2026-11-06T23:24:58+00:00'
+    text: '2026-11-07 ~00:25 CET: step 14 (D319, D315; design passed round 2 after a FIX on the single-seed widths, the branch''s
+      start weights and the WSD sweep prior; repo-reviewer clean at 3ae60b08, merged 80c9924c) submitted on CC, code @74aa4ce6,
+      scripts/job_catalog_v3_short.sh, 16G, limit 02:30: WSD parent v4_het_control_wsd FA-ccin2p3-dccb61e8 (train only); v4_het_wsx_default_rerun
+      FA-ccin2p3-238e6f81 (control), _shrinkperturb 71852916, _share50_k267 77e8bf2b; chained afterok on the parent: _wsdbranch25
+      85dd4eff, _wsdbranch50 a79d5b14, _wsdfinal_default 554f3ec5. Target ws_fix_study 3 h. The first submission of the six
+      at 02:00/01:45 was below the job''s own wall check (2.25 h / 2.16 h with the catalog held-out reads; I had estimated
+      with PP4/EE4/HD4/HD5 only): the three started ones failed at once (e1ab6bb9, 732f9787, 56a556f3, events E3916-E3918
+      acked), the three chained ones cancelled before start (a2605e80, 92db94f8, 21f645af); all resubmitted at 02:30. About
+      15 GPU-h at limits. Reads: mixture_ab.py warm_single (S14 filled @this commit), figure plot_ws_fixes.py.'
   step_waits:
     '1': FA-ccin2p3-05df656d FA-ccin2p3-07bfc8d7
     '9': FA-ccin2p3-238e6f81 FA-ccin2p3-71852916 FA-ccin2p3-77e8bf2b FA-ccin2p3-85dd4eff FA-ccin2p3-a79d5b14 FA-ccin2p3-554f3ec5
