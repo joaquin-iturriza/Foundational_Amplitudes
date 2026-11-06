@@ -431,11 +431,16 @@ def pull(policies=None):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        sys.argv.append("--help")
     if sys.argv[1] == "run":   # <policy> may join several with '+' (run on one node, so their times compare)
         run(sys.argv[2], sys.argv[3], *((tuple(sys.argv[4].split("+")), (int(sys.argv[5]),)) if len(sys.argv) > 5 else ()))
     elif sys.argv[1] == "where":   # where <class> <probe> <cut_log10>
         print("MCHECK_WHERE " + json.dumps(where(sys.argv[2], sys.argv[3], float(sys.argv[4]))))
     elif sys.argv[1] == "pull":
         pull(sys.argv[2] if len(sys.argv) > 2 else None)
-    else:
+    elif sys.argv[1] == "summary":
         summary()
+    else:   # an unknown argument (e.g. --help) once rewrote data/multichannel_check.json through summary()
+        sys.exit("usage: multichannel_check.py run <class> <probe> [<policies> <seed>] | pull [<policies>] | "
+                 "where <class> <probe> <cut_log10> | summary")
