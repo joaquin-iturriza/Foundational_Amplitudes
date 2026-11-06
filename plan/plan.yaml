@@ -12858,7 +12858,7 @@ entries:
     - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
-    commit: 117f19ca
+    commit: cec98490
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
@@ -12868,6 +12868,7 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
     - analysis/catalog_v4/data/warm_start_C1t.json
     - analysis/catalog_v4/data/ws_hpo8/het_split.json
+    - analysis/catalog_v4/data/ws_hpo8/het_split_log.txt.gz
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
     - analysis/catalog_v4/data/ws_restart_steps.json
     - analysis/catalog_v4/mixture_ab.py
