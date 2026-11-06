@@ -10,8 +10,12 @@ mixture_ab.WARM["C1f"] names them.
     plot_warm_start_compare.class_mse), the model after the sigma stage (D276).
 --damped: the same four panels for step 8 (D303), Muon's lr damped at the restart's start (fine_tune.muon_warmup_steps=
 168, v4_het_warm25u_k533[_seed2], mixture_ab.WARM["C1u"]) against the same default restart pair.
-Usage: python3 analysis/catalog_v4/plot_ws_fill.py [--cached] [--damped]
-    -> figs/ws_fill.{png,pdf}, data/ws_fill_steps.json (--damped: figs/ws_muon_damped, data/ws_muon_damped_steps.json)"""
+--step10: the same panels for step 10 (D303): AdamW's lr damped over the first 168 steps, Muon untouched
+(v4_het_warm25a_k533[_seed2], WARM["C1a"]), and every group damped (v4_het_warm25e_k533[_seed2], WARM["C1e"]), against
+the same default restart pair.
+Usage: python3 analysis/catalog_v4/plot_ws_fill.py [--cached] [--damped | --step10]
+    -> figs/ws_fill.{png,pdf}, data/ws_fill_steps.json (--damped: figs/ws_muon_damped, data/ws_muon_damped_steps.json;
+       --step10: figs/ws_adamw_damped, data/ws_adamw_damped_steps.json)"""
 import json, os, sys
 
 import numpy as np
@@ -29,20 +33,29 @@ DIRS = {"FA-ccin2p3-b2c69c1a": "runs/catalog_v4_short/v4_het_warm25f_k533",
         "FA-ccin2p3-0202ba7f": "runs/catalog_v4_short/v4_het_warm25_k533_tagd303",
         "FA-ccin2p3-7b2d6c24": "runs/catalog_v4_short/v4_het_warm25_k533_seed2_tagd303"}
 DAMPED = "--damped" in sys.argv
-if DAMPED:
+STEP10 = "--step10" in sys.argv
+NAME = "ws_adamw_damped" if STEP10 else ("ws_muon_damped" if DAMPED else "ws_fill")
+if STEP10:
+    DIRS = {**{r: f"runs/catalog_v4_short/v4_het_warm25{a}_k533{s}" for a, c in (("a", "C1a"), ("e", "C1e"))
+               for r, s in zip(WARM[c]["W"][533], ("", "_seed2"))},
+            **{r: d for r, d in DIRS.items() if r in WARM["C1f"]["ref"]["default"]}}
+elif DAMPED:
     DIRS = {WARM["C1u"]["W"][533][0]: "runs/catalog_v4_short/v4_het_warm25u_k533",
             WARM["C1u"]["W"][533][1]: "runs/catalog_v4_short/v4_het_warm25u_k533_seed2",
             **{r: d for r, d in DIRS.items() if r in WARM["C1f"]["ref"]["default"]}}
-ARMS = [("Muon lr damped first" if DAMPED else "optimizer filled first",
-         WARM["C1u" if DAMPED else "C1f"]["W"][533], ps.C.vermillion),
-        ("default restart", WARM["C1f"]["ref"]["default"], ps.C.blue)]
+ARMS = ([("AdamW lr damped first", WARM["C1a"]["W"][533], ps.C.vermillion),
+         ("every group's lr damped first", WARM["C1e"]["W"][533], ps.C.green)] if STEP10 else
+        [("Muon lr damped first" if DAMPED else "optimizer filled first",
+          WARM["C1u" if DAMPED else "C1f"]["W"][533], ps.C.vermillion)]) + \
+       [("default restart", WARM["C1f"]["ref"]["default"], ps.C.blue)]
 SCRIPT = r'''
 import json, numpy as np
 DIRS = %r
 out = {r: np.load(d + "/train_steps.npz")["grad_norm"][:41].tolist() for r, d in DIRS.items()}
 print("FILLSTEPS " + json.dumps(out))
 ''' % DIRS
-CACHE = os.path.join(HERE, "data", "ws_muon_damped_steps.json" if DAMPED else "ws_fill_steps.json")
+CACHE = os.path.join(HERE, "data", {"ws_fill": "ws_fill_steps", "ws_muon_damped": "ws_muon_damped_steps",
+                                    "ws_adamw_damped": "ws_adamw_damped_steps"}[NAME] + ".json")
 
 
 def main():
@@ -56,7 +69,7 @@ def main():
     (aG, aV), (aP, aE) = axs
     out = {}
     short = {}                       # the same numbers keyed without spaces (docs/results.tex claims): arm_s<seed>
-    for (lab, runs, col), tag in zip(ARMS, ("arm", "default")):
+    for (lab, runs, col), tag in zip(ARMS, ("arm", "arm2", "default") if STEP10 else ("arm", "default")):
         for i, (r, ls) in enumerate(zip(runs, ("-", "--"))):
             sl = f"{lab}, seed {42 + i}"
             aG.plot(np.arange(len(g[r])), g[r], color=col, ls=ls, label=sl)
@@ -81,7 +94,7 @@ def main():
         a.set_ylim(0, 1)
     # the one legend, on the gradient-norm panel (log y, room above the jump); colours are the arms in every panel
     ps.legend(aG, "upper right")
-    ps.save(fig, os.path.join(HERE, "figs", "ws_muon_damped" if DAMPED else "ws_fill"))
+    ps.save(fig, os.path.join(HERE, "figs", NAME))
     print(json.dumps(out, indent=0))
     print(json.dumps(short))
 
