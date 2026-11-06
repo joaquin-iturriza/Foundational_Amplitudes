@@ -12548,6 +12548,8 @@ entries:
       asking again; redo the per-run time for the tuned recipe and record targets'
     8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
       validation loss curves side by side, and each arm''s per-class zero-shot MSE'
+    9: Relabel warm_start_compare in words (no A/B, w8, k=533 codes; Joaquin 11-06) and resend once, saying what changed;
+      follow his lead that the lr or the scheduler is wrong in the warm runs.
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -13692,6 +13694,11 @@ entries:
       if:
       - 'drawn: committed png+pdf, referenced in results.tex'
       - 'a curve missing locally: fetch it from the site'
+    9:
+      feeds: Joaquin 11-06 on the warm-start figure
+      if:
+      - 'redrawn: main session resends'
+      - 'lr/schedule cause found: report with figure'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
