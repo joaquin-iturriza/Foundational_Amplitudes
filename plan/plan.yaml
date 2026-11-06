@@ -15757,6 +15757,52 @@ entries:
       1.237/1.619 damped, 1.23 from 2132; null-arm spread about +-0.17 (fill 1.005 [0.844,1.199]) at the siblings'' 2 seeds;
       HETEROSC; checkpoints present both seeds; 9 GB vs 76 GB free. Searched results.tex for mse_cont, warmsx, continu, pre-decay,
       lr_scale, lr scale, large lr, restart; plan show warm_start; site decisions D282-D313.'
+  - at: '2026-11-06T22:23:47+00:00'
+    question: 'Step 13 (D307, D308): does continuing the parent''s run from its step-3198 checkpoint, with the parent''s optimizer
+      state loaded (AdamW moments and step, Muon momentum), read better than the default restart from the final model at k=533
+      on the C1 change (share 0.25, het)? Step 12''s continued arm restarted with a fresh optimizer at the checkpoint''s full
+      lr (1.01e-3, no warmup) and its training loss jumped at step 1 to -0.317/-0.269 against the control''s worst -1.552/-1.458,
+      and read WORSE; this asks whether that jump, from the empty optimizer, is what made continuing worse.'
+    prior: 'par:v4_warm_start_valley (step 12, @96ca381e): R(arm/control) step-3198 default restart PP4 1.019 [0.870,1.192],
+      EE4 1.009 [0.854,1.194] NOT BETTER with G 0.16/0.10 of the control''s; step-3198 continued with a fresh optimizer 1.145
+      [0.972,1.346] / 1.226 [1.025,1.489] WORSE, worst training loss over steps 0-39 -0.317/-0.269 at step 1 (from -2.492/-2.365);
+      step-2132 continued WORSE 1.230/1.210; lr x3 NOT BETTER 1.093/1.052. par:v4_warm_start_repairs: moment fill (100 lr-0
+      batches filling the fresh optimizer''s moments) on the default restart from the final model did not move the reads (1.005
+      [0.844,1.199]); it was never tried on a continued schedule, where the lr is at its checkpoint value from step 0. Ibrahim
+      et al. 2024 (arXiv:2403.08763): keeping or discarding optimizer state made no difference with re-warming; untested here
+      without re-warming. Searched results.tex for optimizer state, moment fill, continu, load_optimizer; plan show warm_start;
+      site decisions D307, D308 (Joaquin: ''taking an earlier checkpoint where the lr hasn''t dropped to 0, and continuing
+      from there''), D312.'
+    measure: 'As step 12 (ws_restart_steps.py, mixture_ab.py warm): the worst training loss over restart steps 0-39 against
+      step 0 and G (largest grad norm over steps 0-19); deciding R(arm/control) on PP4 and EE4, the median over classes of
+      the class geometric mean of probe ratios, each probe the two-seed geometric mean, 95% class bootstrap widened on each
+      side by |ln R_seed|; beside: R(arm/fresh-optimizer continued arm), R(arm/B), held_default; figure: the step-12 figure
+      with this arm added (plot_ws_restart.py).'
+    check: 'The training-loss jump moves with the restart''s optimizer and lr at step 0 on existing runs: worst loss over
+      steps 0-39 minus step-0 loss is 1.13/1.11 (control, re-warm), 0.97/0.64 (step-3198 default), 2.17/2.10 (step-3198 continued,
+      fresh optimizer at full lr), 2.41/3.74 (lr x3) (data/ws_restart_study_steps.json); the reads move with the restart:
+      continued 1.145/1.226 vs step-3198 default 1.019/1.009 from the same start model; null spread about +-0.17 at 2 seeds
+      (moment fill 1.005 [0.844,1.199]). CPU test tests/test_load_optimizer_state.py: the loaded optimizer''s next step equals
+      the parent''s own next step rescaled by the lr, and a different parameter layout raises.'
+    fixed: 'Everything of step 12''s step3198_continue arm: parent v4_het_control_ckpt[_seed2] (FA-ccin2p3-d521160b / b688a859)
+      step-3198 model, share-0.25 recipe catalog_v4_default25_train.yaml, 533 steps, lr scale 0.20233, warmup 0, cosine to
+      ~0, the parent''s HPs (trial_0058), layer decay 1, parent target stats, sigma stage 250 steps, every read (PP4 EE4 HD4
+      HD5 and the catalog axes), scripts/job_catalog_v3_short.sh. One change: fine_tune.load_optimizer_state=true (base_experiment._load_parent_optimizer_state,
+      branch ws-optstate @7456a119: the checkpoint''s per-parameter optimizer state into the fresh optimizer, this run''s
+      param groups and schedule kept). Limit 02:30, 16G, CC-IN2P3.'
+    control: final_default (FA-ccin2p3-0de6be56 / 89ecbc1e), the same parent's final model at the default restart (step 12's
+      control, the deciding comparison); beside, the matched single-change pair step3198_continue (FA-ccin2p3-4cb686ac / 1f7ae4ea,
+      fresh optimizer); same data, seeds and code but the option (off by default, so step 12's runs are its off-state); B
+      and A as C1.
+    seeds: '42 and 43, from the parent at its seed (2 runs). Cost: 1.5 h each (step 12''s same-setup runs 1.5 h), 3 GPU-h,
+      5 at limits; disk 0.9 GB per run against the CC free space read at submission.'
+    outcome: 'Fixed before the read, against final_default: BETTER when the widened upper end of R(arm/control) is below 1
+      on PP4 or EE4 and above 1.05 on neither: it becomes the restart recipe, read against B (MATCH at upper end <= 1.35 on
+      both); WORSE when a lower end is above 1; else NOT BETTER. Mechanism: the jump is removed when the worst training loss
+      over steps 0-39 rises above step 0 by less than half the control''s rise (0.57/0.55) at both seeds. Jump removed and
+      not BETTER: the empty optimizer was not what kept continuing from beating the default restart; the start model''s shorter
+      training is left, the default restart stays and the D307 hold goes to Joaquin. Jump not removed: the loading did not
+      work as meant, read the log (OPT_STATE line) before anything else. A run that blows up is listed apart with where.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
