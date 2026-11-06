@@ -3585,6 +3585,7 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
         P[bad] = democratic_draw(int(bad.sum()), sqrts[bad], masses, y_lo, rng)
     return P
 
+
 def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False):
     """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
