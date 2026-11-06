@@ -9029,6 +9029,25 @@ entries:
       arm beats step 56 -> gradient share ruled out; next the attachment point, then the clipping regime. Blow-ups listed
       apart. Cost: 8 jobs x 1 V100, step 56 measured 2.32-2.34 h per job (0.928 s/step), limit 03:00 (tools/short_wall.py),
       18.7 GPU-h work / 24 at the limits; in memory, no cache.'
+    fix_at: '2026-11-06T05:05:26+00:00'
+    fix: 'Re-review of the 05:04 design. Fixed from the last review: the outcome now has a row for sign YES with H5/HD5 magnitude
+      unresolved, a SIGN YES / MAGNITUDE HURT row, and the attachment point explained; job script and experiment.py unchanged
+      between b3eb4156 and 897318b6. Still failing, checks 3 and 4 (the magnitude gate is set inside its own noise): the gate
+      is paired upper bound <= 1.10 on PP4, EE4, HD4 and the H1-H7c median. In step 56 (het_signhead.json, magnitude.*.widened,
+      se_ln_pairs) the arm whose only difference from the new arms is the sign weighting, i.e. the expected value for an arm
+      that does not hurt, already sits at HD4 R 0.974 upper 1.077 (se of ln over pairs 0.048) and H1-H7c median upper 1.089
+      (median R 0.984; per read se 0.028 to 0.118, H1 alone 1.108 at R 1.001). An arm that changes nothing would have to move
+      R by only about +2% on HD4 or +1% on the H median, about half a standard error, to cross 1.10, so a neutral arm reads
+      MAGNITUDE HURT roughly a third of the time on each of those two reads; that verdict cannot be told from seed noise.
+      PP4 (upper 1.039, se 0.030) and EE4 (upper 0.981, se 0.019) do resolve 1.10 at four seeds. Fix, one of: gate on PP4
+      and EE4 at 1.10 and report HD4 and H1-H7c with their intervals, not gating; or set each read''s margin from its measured
+      width (a neutral arm''s upper bound plus a stated effect worth acting on, e.g. HD4 and the H median at about 1.20) and
+      say what size of hurt each can then detect; or define HURT as the lower bound above 1 (shown worse) with the point estimate
+      above 1.10. Also say what ''the H1-H7c median'' is (median over the seven axes of R, of the upper bound, or a pooled
+      interval), and state that the gating intervals are the paired ones even though step 56''s pairing gate (defined on HD5
+      and H5) failed and its verdict used the unpaired intervals (het_oneloop.py:530), and why that is valid on these reads
+      (their paired sd of ln ratio 0.28 to 0.47 on PP4, EE4, H1-H3 against 0.52 to 0.88 on HD4). The sign part, controls,
+      cost and prior search pass as before.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
@@ -12421,9 +12440,9 @@ entries:
       warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
   owner:
     agent: ada4972586c3395af
-    state: closed
+    state: stopped
     since: '2026-11-06T04:32:03+00:00'
-    state_at: '2026-11-06T05:03:37.797000+00:00'
+    state_at: '2026-11-06T05:05:05+00:00'
     context: 247172
     context_at: '2026-11-06T05:01:49+00:00'
   designs:
