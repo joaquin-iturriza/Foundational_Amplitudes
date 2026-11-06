@@ -11752,6 +11752,30 @@ entries:
       7468-7780, udx_csxvevex 3206-3223, uux_epemvevex 387-482; at budget 50 both ladders 541-677 / 657 / 261; plain multichannel
       ~72 / ~50 / ~29 s (step 65). Note: the design''s parenthesis named uu_bbxuu [4.70,4.95) as in range from the held-out
       pp max 4.75; by its rule with the range table''s max (4.694) it is margin (0.91 filled).'
+  - at: '2026-11-06T18:57:28+00:00'
+    text: '2026-11-06 e+e- default-share mechanism (Joaquin''s ''this is still not explained''; D295; ee_gain.py pull_events/read_events/fig_mechanism
+      -> data/ee_gain_events.json, ee_gain_mechanism.json; figure figs/ee_mechanism_a..d + _legend). Re-read of step 62''s
+      saved EE4 predictions (the 8 beam-ablation runs'' own .npz, same 2000 scored test rows per probe, per-probe MSE = the
+      reads to 2e-7), no new run. Hypothesis CONFIRMED: the default-sampled e+e- test events sit where the catalog puts few
+      training events. Per trained e+e- class (115), test-pool median log10|M|^2 minus the catalog pool''s: +4.13 dex (q10
+      1.37, q90 5.67, positive in 115/115); KS catalog vs test 0.72 in log10|M|^2, 0.33 sqrt(s), 0.20 forward angle, 0.17
+      collinear angle, 0.25 ymin, so |M|^2 is the variable that differs most (unweighted MadEvent events follow |M|^2 dPhi
+      at the fixed collider energies; the catalog is log-uniform sqrt(s) to 6 TeV, 0.35 flat in log|M|^2, the rest phase-space
+      bulk). Half the test events (class median 0.50) sit in |M|^2 bins above the catalog median where the catalog density
+      is < 0.1 of the test density, none below. Error per bin of x = log10|M|^2 - catalog median (events pooled, seeds'' mean
+      MSE, control / both beams / e+e- only / pp only): x<0 (3% of test, 30% of catalog) 0.048/0.076/0.087/0.076; [0,2) 0.51/0.17/0.19/0.66;
+      [2,4) 2.35/0.65/0.75/2.86; [4,6) 4.73/1.19/1.32/4.20; [6,8) 28.3/3.8/4.1/17.8; [8,10) 77/3.1/5.1/61; 80% of test events
+      at x>=2, where the catalog has 18% of its events. Class median of arm MSE / control MSE per bin of log10(catalog density
+      / test density) at the event in |M|^2: <-2: both 0.12, e+e- only 0.15, pp only 0.80; [-2,-1.5) 0.22/0.25/0.93; [-1.5,-1)
+      0.29/0.34/0.94; [-1,-0.5) 0.40/0.47/1.05; [-0.5,0) 0.74/0.78/1.17; [0,0.5) 0.93/1.04/1.27; >0.5 1.34/1.33/1.29; joint
+      density (|M|^2, angles, ymin, sqrt(s), k=32 neighbours) the same shape (0.14 -> 1.38). Not uniform: the gain is where
+      the control had few events, and where the catalog was denser than the test the share costs ~30% (it replaces 25% of
+      the catalog events). Held-out e+e- classes (54, none of their own default events): same shape, weaker (e+e- only 0.38
+      at <-2 -> 1.39 at >0.5), i.e. the other classes'' default events teach the high-|M|^2 region generally. Not normalisation:
+      bias^2 is 14% of the control''s EE4 trained MSE (0.83), 1.4% after the share; correlation 0.957 -> 0.984, spread ratio
+      0.91 -> 0.995 (ZERO_SHOT records). Not event count: the share replaces, 1e4 events per class in every arm. Why EE4 more
+      than PP4: the control''s EE4 MSE is 0.99 vs 0.26 on PP4 (ee_gain_level.json), the e+e- test events being the farthest
+      from the catalog''s |M|^2 distribution.'
   handoff:
     state: '2026-11-06 ~17:30. (a) Coverage: step 67 read in full (finding 2026-11-06 ''step 67 verdict''; data/quota_coverage.json
       @686c3241; figs/quota_fill_a..e + legend). With both ladders (sampling.mc_mperi_both) and mc_res2 at flat_budget 750,
