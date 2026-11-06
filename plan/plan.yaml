@@ -14352,7 +14352,7 @@ entries:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '7': 'step 6''s sweep ws_c1_k533_mse_wsd_hpo8 (ccin2p3): C2-C8 go with its tuned recipe once it ends'
-    '6': FA-ccin2p3-b2c69c1a FA-ccin2p3-f5245570 FA-ccin2p3-0202ba7f FA-ccin2p3-7b2d6c24 ccin2p3:ws_c1_k533_mse_wsd_hpo8
+    '6': FA-ccin2p3-b2c69c1a FA-ccin2p3-f5245570 FA-ccin2p3-0202ba7f FA-ccin2p3-7b2d6c24
   handoff:
     state: 'D303 lead (step 6): the restarted warm starts jump off the pretrained minimum at step 2 (grad norm 18 -> 825 at
       lr 1.2e-4, 2.4% of peak; over hpo8''s trials the step-2 norm follows the step-2 lr, 101 at 1.6e-5 to 4310 at 6.9e-4;
