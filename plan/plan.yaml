@@ -11385,9 +11385,9 @@ entries:
       idle: event (or its absence after 45 min) is the trigger'
   owner:
     agent: acf9c54af46447317
-    state: working
+    state: stopped
     since: '2026-11-06T05:01:57+00:00'
-    state_at: '2026-11-06T05:01:57+00:00'
+    state_at: '2026-11-06T05:04:15+00:00'
     context: 25352
     context_at: '2026-11-06T05:03:48+00:00'
   designs:
