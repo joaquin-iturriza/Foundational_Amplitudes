@@ -15681,6 +15681,13 @@ entries:
       run_name prebuild_62990770 -> v4_het_default25_w16_grow_k533, run_idx 1 -> 0, training.num_workers 0 -> 2, data.memmap_prebuild
       removed. vs twin: only those 5 own keys. Damaged file kept as config.yaml.overwritten_0; config_1.yaml and out_1.log
       left in place.'
+  - at: '2026-11-06T16:24:09+00:00'
+    text: '2026-11-06 ~14:40 UTC step 11 sweep ws_grow_k533_zeroshot_hpo8_rerun ended: 7 of 8 trials scored (zero_shot_score,
+      HD4 test, lower better): hp1860 0.4761, hp1683 0.4791, hp0155 0.4800, hp0483 0.4804, hp0220 0.4807, hp1333 0.5516, hp1013
+      0.5621; trial_0001 FAILED, diverged (50 consecutive non-finite gradient steps at step 305, run.py exit 1; its hp index
+      is not in results). Best 0.476 is below the default growth''s same-seed 0.535 (ln -0.117, beyond the 0.011-0.022 same-seed
+      spread): the design''s re-run branch. Five trials sit within 0.476-0.481, so the bar is cleared by a plateau, not one
+      point.'
   step_waits: {}
   handoff:
     state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
