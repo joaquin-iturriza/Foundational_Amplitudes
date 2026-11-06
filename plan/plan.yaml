@@ -10874,9 +10874,9 @@ entries:
         recorded as the gap, then the same'
   owner:
     agent: a7863d6e79d5af06e
-    state: working
+    state: stopped
     since: '2026-11-06T23:06:36+00:00'
-    state_at: '2026-11-06T23:06:36+00:00'
+    state_at: '2026-11-06T23:24:46+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
