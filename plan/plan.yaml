@@ -9806,6 +9806,23 @@ entries:
       (multichannel_check where) on the short class, the e+e- channel set examined next (no budget raise without its own read).
       Cost: budget-750 seconds / current seconds per class, the e+e- ratio used in the total for the 169 e+e- classes. 8 CPU
       jobs, 1 core, <= 1.7 h each, no GPU.'
+    passed_at: '2026-11-06T20:21:30+00:00'
+    reviewer: 'Step (f) e+e- quota check, 4 trained e+e- classes x seeds 42/43, 8 CPU jobs. One change: the old sampling (current)
+      and plain multichannel replayed in the same job, seed, node and commit; budget 50 vs 750 differ only in budget; the
+      bundle new-vs-old is the stated question. Measure moves: quota_coverage.json uu_bbxuu shortfall 0.137 (old ladder) ->
+      0.059 (both, budget 50) -> 0.017/0.016 (750), seed spread <= 0.006; ee_support_reads.json logm_above 0.269/0.264/0.224/0.102
+      for taptamvevex/bbxvevex/ahvevex/vmvmxz confirmed (default max 2.20/-1.67/-4.38/3.07 nats vs catalog max -11.35/-10.63/-13.02/-3.59).
+      Seeds 42/43 as step 67''s sibling pp classes; seed spread of fill <= 0.02 against the 0.95 threshold; held-out bound
+      3/2000 stated. Outcome YES/NEAR/SHORT fixed before the run. Range from the dsh_ default-share pool alone, EE4 test pool
+      held out (pp_support.py @3c9b4b2d), so no label in the range; held-out events are default-sampled at the fixed collider
+      energies, matching D294 applied to e+e-. need() reproduced locally: 5701/6136/5321/5158 s, limits 02:30/02:40/02:20/02:10.
+      Disk: replays in temporary dirs, JSON out only. Searched results.tex (quota, flat quota, ladder, multichannel, ee_support,
+      flat_range, the four class names, sampling_cost, v4_ee_mechanism), the entry''s findings/dead ends and site decisions
+      (e+e-, pp sampled, cost): no earlier e+e- quota replay. Notes for the read: coverage() skips a class without the quota_ladder_res2
+      (''old'') policy, so it must be adapted before reading these classes; the ladder channels are off on e+e- beams (mc_channels
+      hadronic only), so ''both ladders'' is quota + two-resonance here; the cost for the 169 e+e- classes extrapolated from
+      four >=3-final worst-gap classes is an upper-side estimate and should say so (or go per multiplicity as the hadronic
+      one); for step 65, the 55 held-out e+e- classes'' ranges come from their scored EE4 test pool.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
