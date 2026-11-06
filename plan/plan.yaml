@@ -14123,6 +14123,62 @@ entries:
       the saved-state claim; disk 0.86 GB/job x4 vs 131 GB free; HETEROSC, PP4/EE4 reads as C1; code merged 117f19ca with
       the lr-0 no-op refusal. Searched: moment, optimizer state, optimiser state, fresh/empty optimizer, reset_optimizer,
       load_optimizer, Ibrahim, re-warm, warmup (results.tex, plan.yaml, site decisions).'
+  - at: '2026-11-06T08:19:26+00:00'
+    question: 'D303 (Joaquin: the lr or the scheduler is wrong in the warm runs), step 8, the moment fill''s no-CAUSE branch:
+      is Muon''s fixed-norm update what knocks the k=533 warm start off the pretrained minimum in its first steps, and does
+      damping only the Muon groups'' lr at the restart''s start (lr times min(1, step/168) on top of the schedule, fine_tune.muon_warmup_steps=168,
+      AdamW untouched) remove the jump and improve the zero-shot reads over the default restart at the same 533 steps (K fixed
+      at 1/8 by Joaquin, D284)?'
+    prior: 'Step 6''s moment fill (finding 2026-11-06, mixture_ab.py warm C1f @b28a8f2c, figs/ws_fill): filling AdamW''s moments
+      and Muon''s momentum at lr 0 for 100 batches did not remove the jump (max grad norm over steps 0-19 1777/1411 vs the
+      default''s 994/1334; worst training loss over 0-39 +0.91/+1.54 vs -1.33/-1.22) and left the reads unchanged (R fill/default
+      PP4 1.005 [0.84,1.20], EE4 1.016 [0.88,1.17]); with AdamW''s first steps made gradient-sized the jump stays, which points
+      at Muon: its orthogonalised step has the norm lr * muon_scale (rms 0.2 * sqrt(max fan) / sqrt(width mult), optim/muon.py)
+      whatever the gradient or momentum. Over hpo8''s 8 trials the step-2 grad norm follows the step-2 lr (101 at 1.6e-5 to
+      4310 at 6.9e-4; data/ws_restart_steps.json), so the size of the first updates sets the jump. Step 6''s C1m (@a7652956):
+      the mean-MSE-tuned restart (lr_scale 1.85, WSD) is not better than the untuned one (R PP4 1.054, EE4 1.005) and the
+      NLL-tuned low-lr restart is worse on the reads (0.355/0.935 class medians vs 0.285/0.770), so lowering the lr of every
+      group costs the reads; this arm lowers only Muon''s, only early. The 2026-11-05T04:01 finding (Ibrahim et al. 2024:
+      optimizer state does not matter for long continued pretraining) is about state, not Muon''s update size. Searched: muon
+      warmup, damp, muon_rms, Muon lr, lr_mult (results.tex, plan.yaml, site decisions): no earlier Muon-only warmup; D155/D158
+      put fine-tunes on MuonAdamW.'
+    measure: 'As the fill test (ws_restart_steps.py, one RUNS entry per new run): per run from train_steps.npz the grad norm
+      at steps 0-2 and its max over steps 0-19, the worst training loss over steps 0-39, the validation NLL curve (mixture_ab.py
+      val) against the parent''s -2.571 (s42) / -2.533 (s43); then each run''s final model after its own sigma stage (D276),
+      zero-shot MSE of log|M|^2 per probe on PP4 and EE4 (all classes), R(damped/default) = median over classes of the class
+      geometric mean of the probes'' two-seed geometric mean ratios, 95% class bootstrap widened by the pair''s |ln R_seed|
+      (mixture_ab.py warm, new entry C1u, ref the default restart pair 0202ba7f/7b2d6c24), R(damped/scratch with the change)
+      beside; figure of grad norm, val loss and per-class CDFs for both arms (plot_ws_fill.py pattern).'
+    check: 'Existing data: the step-2 grad norm moves with the size of the first update (hpo8: 101 at lr 1.6e-5 to 4310 at
+      6.9e-4, monotone over 8 trials); the fill test''s same-data pairs show the default restart''s steps 0-1 reproduce exactly
+      when the data stream is shared (the fill changed it) and its step-2 norm spreads with the data stream (269/543 same
+      commit vs 825 older), well inside the 0.2x bar (199/267). The reads moved with an earlier restart-recipe change: NLL-tuned
+      over default R PP4 1.19 [1.01,1.39], EE4 1.40 [1.20,1.67] (warm_start_C1t.json). Pairing check built into the run: the
+      damped arm takes the same batches as the control (same seed, recipe, no fill) and step 0 has lr 0 in both, so its grad
+      norms at steps 0 and 1 must equal the control''s (16.32 / 10.96 at s42, 8.10 / 113.3 at s43) up to float noise; a mismatch
+      voids the pairing and the reads fall back to unpaired with the widening. CPU test tests/test_muon_warmup.py (worktree
+      muon-warmup @4a4d99c2): multiplier 0 leaves the Muon matrix bit-identical and AdamW''s parameters as without it, 1 equals
+      the unmodified optimizer bit for bit, 0.25 moves the Muon matrix by a quarter of its full step.'
+    fixed: 'Everything of v4_het_warm25_k533[_seed2] as run in the fill test''s control (scripts/job_catalog_v3_short.sh;
+      parent the het control''s final model after its sigma stage at the run''s seed, target_stats parent, catalog_v4_default25_train,
+      533 steps, MUON_BEST lr 4.997e-3, warmup 0.158 = 84 steps, cosine, lr_scale 1, no layer decay, HETEROSC with its sigma
+      stage, every read). Only change: ++fine_tune.muon_warmup_steps=168 (arm v4_het_warm25u_k533[_seed2]), 168 = twice the
+      schedule''s warmup so Muon''s lr rises as step^2 to the peak''s half at step 84 and joins the schedule at 168; the sigma
+      stage runs it off. The code change is a no-op at 0 (multiplier 1.0, tested bit-identical), so the control at commit
+      117f19ca stands. Disk 0.86 GB per job (the k=533 runs), 2 jobs against /sps/lpnhe free space read at submission.'
+    control: The same-data default restart from the fill test, v4_het_warm25_k533[_seed2]_tagd303 (FA-ccin2p3-0202ba7f s42,
+      7b2d6c24 s43, commit 117f19ca, D290's mmap-keyed data path, same as this commit); the older pair 341bf564/254abf4f beside;
+      scratch with the change (share 0.25 het default25 pair) as the target.
+    seeds: '42 and 43, each from the parent at its seed. Cost: 2 runs x about 1.4 h (341bf564''s job 1.4 h; the control pair
+      ran 1.4-1.5 h), limit 2:15, about 2.8 GPU-h (4.5 at the limit) on CC-IN2P3, one wave.'
+    outcome: 'Fixed before the read: CAUSE when the damped arm''s max grad norm over steps 0-19 is under 0.2x the same-seed
+      control''s (994 -> 199 at s42, 1334 -> 267 at s43) at both seeds and its worst training loss over steps 0-39 stays below
+      the parent''s start + 0.3 (-2.27 s42, -2.23 s43); BETTER when the widened upper end of R(damped/default) is below 1
+      on PP4 or EE4 and above 1.05 on neither. CAUSE and BETTER: the Muon warmup joins the restart recipe for step 7 (C2-C6,
+      C8) and the growth. CAUSE without BETTER: the jump is Muon''s but not what costs the reads; the untuned restart stays
+      the recipe and step 7 goes with it. No CAUSE: the jump is AdamW''s share (head, vectors, the sigma-weighted loss''s
+      sharpness) or the lr ramp itself, not Muon''s; the untuned restart stays the recipe, step 7 goes with it, and the D303
+      lead is reported as an lr-sized jump that neither optimizer fix removes. A run that blows up is listed apart.'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
