@@ -11789,6 +11789,7 @@ entries:
     CPU budget for the regeneration), CLAUDE.md, plan entry findings of steps 65-67'
   blocks: step 64's submission, step 61's resubmission, step 65's regeneration design
   blocks_steps: *id001
+  checked_until: '2026-11-06T18:46:52+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
