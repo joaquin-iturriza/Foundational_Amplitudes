@@ -1089,6 +1089,15 @@ WARM["C10w"] = {"W": {533: ("FA-ccin2p3-e046ac67", "FA-ccin2p3-f35b6a78"),
                       2132: ("FA-ccin2p3-58723352", "FA-ccin2p3-93479cde")}, "C": {},
                 "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
                 "design": "plan warm_start step 4 (D285), design passed round 2 2026-11-05T04:30"}
+# step 6 (D303, design passed round 2 2026-11-06T05:40): the k=533 default restart with the optimizer's moments filled
+# at lr 0 for 100 batches before the ramp (arm v4_het_warm25f_k533[_seed2], fine_tune.moment_fill_steps=100) against
+# the same-commit default restart (v4_het_warm25_k533[_seed2], SHORT_TAG=d303), scripts/job_catalog_v3_short.sh
+# @117f19ca; BETTER when the widened upper end of R(W/default) < 1 on PP4 or EE4 and above 1.05 on neither; B and A as C1
+WARM["C1f"] = {"W": {533: ("FA-ccin2p3-b2c69c1a", "FA-ccin2p3-f5245570")}, "C": {},
+               "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+               "ref": {"default": ("FA-ccin2p3-0202ba7f", "FA-ccin2p3-7b2d6c24"),
+                       "default_older": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f")},
+               "deciding": ("PP4", "EE4"), "design": "plan warm_start step 6 (D303), design passed round 2 2026-11-06T05:40"}
 MATCH_HI, CARRY = 1.35, 0.90
 
 
