@@ -198,11 +198,21 @@
   "max_floor_rel": 0.0
  },
  "v4_het_warmmag_k2132": {
-  "ok": null,
-  "why": "no data_stats.json yet"
+  "ok": true,
+  "n_compared": 1090,
+  "n_mismatch": 0,
+  "mismatch_first": [],
+  "n_pools_w": 1153,
+  "n_pools_parent": 1153,
+  "max_floor_rel": 0.0
  },
  "v4_het_warmmag_k2132_seed2": {
-  "ok": null,
-  "why": "no data_stats.json yet"
+  "ok": true,
+  "n_compared": 1090,
+  "n_mismatch": 0,
+  "mismatch_first": [],
+  "n_pools_w": 1153,
+  "n_pools_parent": 1153,
+  "max_floor_rel": 0.0
  }
 }

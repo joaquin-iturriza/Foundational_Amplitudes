@@ -1,0 +1,182 @@
+{
+ "design": "plan warm_start step 7, change C6 (superset design passed 2026-11-04T21:51; D283, D300)",
+ "B": [
+  "v4_dimensionless_muon_more_signed",
+  "v4_dimensionless_muon_more_signed_seed2",
+  "v4_dimensionless_muon_more_signed_seed3",
+  "v4_dimensionless_muon_more_signed_seed4"
+ ],
+ "A": [
+  "v4_dimensionless_muon",
+  "v4_dimensionless_muon_seed2",
+  "v4_dimensionless_muon_seed3",
+  "v4_dimensionless_muon_seed4"
+ ],
+ "k": {
+  "533": {
+   "pools": 21,
+   "median_pct": {
+    "W": 3.07,
+    "C": 6.26,
+    "B": 2.91,
+    "A": 6.69
+   },
+   "W_over_B": {
+    "R": 1.0558,
+    "ci95": [
+     0.8026,
+     1.8636
+    ],
+    "widened": [
+     0.7092,
+     2.1091
+    ],
+    "B_seed_spread_abs_ln": 0.1238
+   },
+   "W_over_A": 0.4598,
+   "B_over_A": 0.4355,
+   "C_over_A": 0.9364,
+   "g": 0.9347,
+   "vs_C": {
+    "W_lower": 16,
+    "W_higher": 4,
+    "p_one_sided": 0.0059
+   },
+   "outcome": "INCONCLUSIVE",
+   "carried": true,
+   "mse_ratio": {
+    "H1": {
+     "probes": 62,
+     "median_W_over_B": 0.928,
+     "median_W_over_C": 1.135
+    },
+    "H2": {
+     "probes": 218,
+     "median_W_over_B": 0.927,
+     "median_W_over_C": 1.057
+    },
+    "H2p5": {
+     "probes": 38,
+     "median_W_over_B": 0.977,
+     "median_W_over_C": 0.976
+    },
+    "H3": {
+     "probes": 279,
+     "median_W_over_B": 0.95,
+     "median_W_over_C": 0.952
+    }
+   }
+  },
+  "1066": {
+   "pools": 21,
+   "median_pct": {
+    "W": 2.73,
+    "C": 5.79,
+    "B": 2.91,
+    "A": 6.69
+   },
+   "W_over_B": {
+    "R": 0.9356,
+    "ci95": [
+     0.6121,
+     1.5606
+    ],
+    "widened": [
+     0.5409,
+     1.7662
+    ],
+    "B_seed_spread_abs_ln": 0.1238
+   },
+   "W_over_A": 0.4075,
+   "B_over_A": 0.4355,
+   "C_over_A": 0.8654,
+   "g": 1.0801,
+   "vs_C": {
+    "W_lower": 18,
+    "W_higher": 3,
+    "p_one_sided": 0.0007
+   },
+   "outcome": "INCONCLUSIVE",
+   "carried": true,
+   "mse_ratio": {
+    "H1": {
+     "probes": 62,
+     "median_W_over_B": 0.804,
+     "median_W_over_C": 0.987
+    },
+    "H2": {
+     "probes": 218,
+     "median_W_over_B": 0.814,
+     "median_W_over_C": 0.984
+    },
+    "H2p5": {
+     "probes": 38,
+     "median_W_over_B": 0.93,
+     "median_W_over_C": 0.983
+    },
+    "H3": {
+     "probes": 279,
+     "median_W_over_B": 0.914,
+     "median_W_over_C": 0.967
+    }
+   }
+  },
+  "2132": {
+   "pools": 21,
+   "median_pct": {
+    "W": 2.69,
+    "C": 5.24,
+    "B": 2.91,
+    "A": 6.69
+   },
+   "W_over_B": {
+    "R": 0.9227,
+    "ci95": [
+     0.5374,
+     1.2424
+    ],
+    "widened": [
+     0.4748,
+     1.4061
+    ],
+    "B_seed_spread_abs_ln": 0.1238
+   },
+   "W_over_A": 0.4019,
+   "B_over_A": 0.4355,
+   "C_over_A": 0.7832,
+   "g": 1.0967,
+   "vs_C": {
+    "W_lower": 18,
+    "W_higher": 3,
+    "p_one_sided": 0.0007
+   },
+   "outcome": "INCONCLUSIVE",
+   "carried": true,
+   "mse_ratio": {
+    "H1": {
+     "probes": 62,
+     "median_W_over_B": 0.686,
+     "median_W_over_C": 1.045
+    },
+    "H2": {
+     "probes": 218,
+     "median_W_over_B": 0.714,
+     "median_W_over_C": 1.019
+    },
+    "H2p5": {
+     "probes": 38,
+     "median_W_over_B": 0.824,
+     "median_W_over_C": 1.058
+    },
+    "H3": {
+     "probes": 279,
+     "median_W_over_B": 0.824,
+     "median_W_over_C": 0.989
+    }
+   }
+  }
+ },
+ "verdict": "not decided",
+ "stats_check": true,
+ "verdict_on_reads": "not decided"
+}
