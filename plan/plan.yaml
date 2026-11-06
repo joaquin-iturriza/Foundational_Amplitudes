@@ -12278,7 +12278,9 @@ entries:
     6: '(b) D291: tune the k=533 warm start toward the held-out reads (objective that follows them, e.g. validation MSE of
       the mean; the planned lr extension; a WSD cooldown, as judged best), confirm the winner at seeds 42/43 with the full
       reads, then apply it to the data change (C1, k=533) and to the width growth 8->16'
-    7: '(c) D283: C2-C6 and C8 with the tuned recipe from (b), after (b); estimate to the main session first if above 30 GPU-h'
+    7: '(c) D283, D300: C2-C6 and C8 approved at their cost (79.8 GPU-h, 54 runs; Joaquin 2026-11-06 ''I approved everything
+      you gave me for the warm start changes''): run them with the tuned recipe from (b) as soon as (b) picks it, without
+      asking again; redo the per-run time for the tuned recipe and record targets'
     8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
       validation loss curves side by side, and each arm''s per-class zero-shot MSE'
     9: 'C2-C8 cost: Joaquin''s words of 2026-11-06 (''I approved everything you gave me for the warm start changes'', recorded)
@@ -13422,7 +13424,7 @@ entries:
       feeds: whether warm start reaches scratch across data, loss and target changes (D282/D283)
       if:
       - 'run: extend the write-up per change'
-      - 'budget above 30 GPU-h with no decision covering it: main session asked before submission'
+      - '(b) NOT BETTER: run them with the untuned restarted schedule (C1''s)'
     8:
       feeds: how the results are shown to Joaquin (CLAUDE.md figures)
       if:
@@ -13649,7 +13651,6 @@ entries:
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '5': FA-ccin2p3-c6d0c827
     '6': sweep ws_c1_k533_mse_wsd_hpo8
-    '7': 'step 6''s sweep ws_c1_k533_mse_wsd_hpo8 (ccin2p3) and its confirmations: C2-C8 use the tuned recipe'
   handoff:
     state: 'Written up: C1 (par:v4_warm_start @1258ef73), step 3 tuned k=533 and step 5 pre-decay checkpoints (par:v4_warm_start_tuned
       @e1d0bc97), step 4 width growth (par:v4_warm_start_grow @97a69764). Step 3 (D284): tuned k=533 SHORT and worse than
