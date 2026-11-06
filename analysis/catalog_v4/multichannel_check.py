@@ -72,7 +72,8 @@ SEEDS = (42, 43)
 # the flat part filled to a quota per bin; the second with the multiperipheral and joint-resonance channels (step 58
 # re-check), the third the same at a 10x candidate budget (step 65)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
-                  "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750")
+                  "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
+                  "mcmc_both_res2_budget12")
 ROLE = "train"
 # the step-57 classes (the pp_support worst list, 2026-11-04, and the shape study's class) and their PP4 probes
 CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
@@ -198,6 +199,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
             s.update(mc_mperi=True, mc_mperi_edge=True, mc_res2=True)
+        if policy == "mcmc_both_res2_budget12":
+            # D317 (<= 2x the old cost): the flat part from Wang-Landau Markov chains (sampling.flat_mcmc), the first
+            # round from both ladders' channels; at most 12 labels per flat event: 0.65 + 0.35 x 12 = 4.85 labels per
+            # pool event against the old 0.65 + 0.35 x 6 = 2.75, 1.76x
+            s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, flat_mcmc=True, flat_budget=12)
         if policy.startswith("quota_ladder_both_res2"):   # step 67: both ladders as two channels
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True)
         if policy == "quota_ladder_both_res2_fwdfree_budget750":
