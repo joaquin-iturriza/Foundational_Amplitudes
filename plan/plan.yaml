@@ -15641,6 +15641,13 @@ entries:
       62994102-09, waves, limit 00:50). NOT repaired: e046ac67''s own config.yaml on CC still holds the prebuild''s values
       (config_1.yaml, out_1.log added); its original equals its seed-43 twin''s but seed 42, its own paths, exp_name dancat_het_pre,
       num_workers 2, run_idx 0, no memmap_prebuild; restoring it is an edit on the cluster, left to Joaquin.'
+  - at: '2026-11-06T13:51:52+00:00'
+    text: '2026-11-06 ~13:55 UTC: e046ac67''s config.yaml restored on CC by tools/restore_run_config.py @18e47cf4 (CPU job
+      FA-ccin2p3-25051489, scripts/job_restore_config.sh): rebuilt from its seed-43 twin, taking its own seed, run_dir, run_name,
+      training.result_path and fine_tune.pretrained_path. Restored file vs damaged: exp_name zz_mmap_prebuild -> dancat_het_pre,
+      run_name prebuild_62990770 -> v4_het_default25_w16_grow_k533, run_idx 1 -> 0, training.num_workers 0 -> 2, data.memmap_prebuild
+      removed. vs twin: only those 5 own keys. Damaged file kept as config.yaml.overwritten_0; config_1.yaml and out_1.log
+      left in place.'
   step_waits: {}
   handoff:
     state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
