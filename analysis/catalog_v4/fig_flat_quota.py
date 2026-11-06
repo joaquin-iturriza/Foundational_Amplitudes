@@ -40,10 +40,13 @@ def main(seed=42):
         r = runs[c]; e = r["edges"]
         ax.stairs(per_dex(r["pp"]["hist_in_support"], e), e, color=ps.C.grey, label="pp 13 TeV")
         ax.stairs(per_dex(r[f"multichannel_{seed}"]["hist_kept"], e), e, color=ps.C.blue, label="multichannel")
-        ax.stairs(per_dex(r[f"quota_{seed}"]["hist_kept"], e), e, color=ps.C.vermillion, label="quota per bin")
+        ax.stairs(per_dex(r[f"quota_{seed}"]["hist_kept"], e), e, color=ps.C.vermillion, label="quota")
+        if f"quota_ladder_res2_budget500_{seed}" in r:
+            ax.stairs(per_dex(r[f"quota_ladder_res2_budget500_{seed}"]["hist_kept"], e), e, color=ps.C.purple,
+                      label="same, 10x candidate budget")
         if f"quota_ladder_res2_{seed}" in r:      # step 58 re-check: + ladder and joint-resonance channels
             ax.stairs(per_dex(r[f"quota_ladder_res2_{seed}"]["hist_kept"], e), e, color=ps.C.green,
-                      label="quota, + ladder and two-resonance channels")
+                      label="quota + ladder, pairs")
         qe = r[f"quota_{seed}"]["quota_chunks"][0]["edges_log10"]     # the quota's target range (pp range +- 0.5 dex)
         for x in (qe[0], qe[-1]):
             ax.axvline(x, color=ps.C.vermillion, ls="--", lw=0.8, label="quota range" if x == qe[0] else None)
