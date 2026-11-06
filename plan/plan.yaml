@@ -13239,6 +13239,7 @@ entries:
     - FA-ccin2p3-380c7b14
     - FA-ccin2p3-56cca07a
     - FA-ccin2p3-58723352
+    - FA-ccin2p3-5e02275b
     - FA-ccin2p3-70c28bd9
     - FA-ccin2p3-75d28cb4
     - FA-ccin2p3-7a40c835
@@ -13259,7 +13260,7 @@ entries:
     - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
-    commit: d6500bae
+    commit: f213c72f
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
@@ -13283,6 +13284,7 @@ entries:
     - analysis/catalog_v4/ws_restart_steps.py
     - analysis/catalog_v4/ws_stats_check.py
     - base_experiment.py
+    - docs/results.tex
     - models/grow_width.py
     - scripts/job_catalog_v3_short.sh
     - sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
