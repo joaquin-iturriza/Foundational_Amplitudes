@@ -11496,6 +11496,22 @@ entries:
       ~1.45 TeV = 2 x 10 GeV x cosh 5, the largest sqrt(s) at which every final can sit at the pT cut inside |eta| < 5; so
       the top is every pT at the cut and the span at the edge at sqrt(s) ~1.4 TeV, a corner the ladder reaches rarely (three
       free pT log-uniform over a factor 3.2, the outer end uniform in [4, 5)).'
+  - at: '2026-11-06T10:13:58+00:00'
+    text: '2026-11-06 (a) step 66 ladder edge variant read (multichannel_check.py pull quota_ladder_res2+quota_ladder_edge_res2
+      + summary @f323ae6b, data/multichannel_check.json, fill_per_bin = sum min(kept,quota)/sum quota over the 36 chunks;
+      figure figs/flat_quota_a..e + flat_quota_legend, fig_flat_quota.py @f323ae6b). Budget 50, control = current ladder in
+      the same job, seeds 42/43. QCD 2->4: uu_bbxuu shortfall 0.137/0.138 -> 0.059/0.057 (budget 500 old ladder 0.087), fill
+      at log10|M|^2 3.96 0.036/0.036 -> 1.00/0.99, 4.21 0.009/0.023 -> 0.79/0.82, 4.45 0.003/0.001 -> 0.20/0.25, 4.70 0.001
+      -> 0.065/0.067 (pp in-support max 4.75); us_ddxsu 0.114/0.114 -> 0.037/0.039 (budget 500: 0.063), fill 4.09 0.04/0.05
+      -> 0.97/0.97, 4.34 0.015/0.013 -> 0.70/0.64, 4.59 -> 0.30/0.29, 4.84 -> 0.06/0.07; held-out in-support outside kept
+      4/2 -> 1/1 (uu_bbxuu), 6/1 -> 1/1 (us_ddxsu); no lower bin worse; time per replay 542 vs 617 s (uu_bbxuu), 452 vs 558
+      (us_ddxsu); every chunk still at the budget; ladder carries 32989 of 34992 kept flat events. Branch STRONG on QCD (>=
+      0.49 at 3.96, >= 0.14 at 4.21), better than the old ladder at 10x budget (fill 0.49/0.14 at 3.96/4.21, 8250 s). Guard
+      fails on udx_csxvevex (EW, the ladder carries 587-667 of its kept events): shortfall 0.0666/0.0667 -> 0.0669/0.0725,
+      fill at -0.31 0.79 -> 0.65 (seed 43), at 0.67 0.074 -> 0.057 (seed 42). Identity check: uux_epemvevex and uux_epemg
+      shortfall and held-out identical to the control (no ladder channel). Per the passed design: keep both ladders as two
+      channels and re-check once; QCD budget from the measured quota/kept of bins still short inside the pp range (worst 4.70:
+      1/0.065 = 15.5x).'
   handoff:
     state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
       ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
