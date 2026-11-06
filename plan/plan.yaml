@@ -16943,6 +16943,17 @@ entries:
       FA-ccin2p3-05df656d (s42, code @4a92ec10), _seed2 FA-ccin2p3-07bfc8d7 (s43, @004c8119), scripts/job_catalog_v3_short.sh,
       limit 02:30, 16G; target ws_optstate 1.5 h; plan wait on both. Read entry WARM C1r_step3198_continue_optstate. At read:
       check the OPT_STATE line (32 + 92 entries) first.'
+  - at: '2026-11-06T23:09:40+00:00'
+    text: '2026-11-07 ~00:30 UTC: a read on existing runs answers the warm start''s gap at k=533 through the retraining''s
+      mixture (mixture_ab.py warm C1s50 @e84b7c7b, data/warm_start_C1s50.json): the share-0.50 warm starts (C2''s W_k, seeds
+      42/43) against the share-0.25 change from scratch (C1''s B): R(W/B) PP4 1.183 [1.161,1.204], EE4 1.204 [1.136,1.320]
+      at k=533 = MATCH (YES at 0.125 of a pretraining, against C1''s 0.25); 0.985/0.982 at 1066, 0.786/0.804 at 2132; catalog-sampled
+      held-out R(W/B) 1.087 at 533 (C1''s own warm start 1.074). Over C1''s share-0.25 warm start at 533: PP4 0.877 [0.753,1.023],
+      EE4 0.812 [0.712,0.929]. Share 0.50 from scratch over share 0.25 from scratch is PP4 1.08, EE4 0.93, so the warm start''s
+      gain is exposure to the default-sampled events, not a stronger change. Paired seed spread of arm/control reads at k=533
+      over 10 prior pairs (mixture_ab.py seed_pairs @e0f3bd49, data/ws_seed_pairs.json): median |ln R43 - ln R42| PP4 0.003,
+      EE4 0.044 (max 0.40/0.93 in the every-group-damped pair, a seed-43 blow-up): single-seed paired reads resolve 5-15%
+      effects.'
   step_waits:
     '1': FA-ccin2p3-05df656d FA-ccin2p3-07bfc8d7
   handoff:
