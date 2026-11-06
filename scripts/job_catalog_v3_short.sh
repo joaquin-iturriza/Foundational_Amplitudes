@@ -376,14 +376,14 @@ if [ -n "$SHORT_RERUN" ]; then
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_rerun"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_rerun"
 fi
 # SHORT_TAG=<tag> (catalog_coverage step 62, the beam ablation): the het share arms (control, default25 and its
-# eeonly/pponly beam arms) unchanged, in their own run dir <arm>_<tag>, so a same-commit set of arms never overwrites
-# an earlier run of the same arm
+# eeonly/pponly beam arms) unchanged, in their own run dir <arm>_tag<tag>; the fixed "_tag" marker is in no arm name nor
+# in the SHORT_MEMMAP/SHORT_RERUN dirs, so a tag can never resolve to another run's dir
 if [ -n "$SHORT_TAG" ]; then
     [ -n "$SHORT_MEMMAP$SHORT_RERUN$LONG_HEADS$LONG_FACTOR$LONG_LR" ] && { echo "SHORT_TAG excludes SHORT_MEMMAP, SHORT_RERUN and LONG_*"; exit 1; }
     case "$SHORT_TAG" in *[!a-z0-9]*|"") echo "SHORT_TAG: lower-case letters and digits only"; exit 1 ;; esac
     case "$ARM" in v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2) ;;
         *) echo "SHORT_TAG only on the het control and the default25 share arms"; exit 1 ;; esac
-    OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_${SHORT_TAG}"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_${SHORT_TAG}"
+    OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_tag${SHORT_TAG}"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_tag${SHORT_TAG}"
 fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
 # LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; only the steps move: every cell trains on the whole train pool,
