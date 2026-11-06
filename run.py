@@ -46,6 +46,8 @@ def sigma_stage_cfg(cfg):
         s.training.iterations = steps
         s.training.increment_steps = steps
         s.training.cosanneal_warmup_frac = 0.0
+        if s.training.scheduler == "WSD":
+            s.training.scheduler = "CosineAnnealingLR"  # the stage keeps the cosine a WSD main run would replace
         s.training.regularization_lambda = 0.0
         s.training.result_path = None
         # 25 validations by default (every 10 steps of 250, as in the D69 sweep); fewer for short runs

@@ -118,7 +118,7 @@ PROJECT = "FA"
 STATUSES = ("running", "waiting_user", "held", "done")
 SETTABLE = ("title", "question", "next")          # status, done_when and notes_ref have their own commands
 KINDS = ("approve", "scope", "prefer", "hold", "release", "forbid")
-ASK_MARGIN_MIN = 15          # a question written in the same reply as `plan ask`, or just before it, counts
+ASK_MARGIN_MIN = 30          # a question written in the same reply as `plan ask`, or just before it, counts
 STEP_MIN = 30                # a step agent started within this many minutes is the entry's work in flight
 CHECK_CACHE_MIN = 20         # an item check (sweep units on the sites) is rerun at most this often
 # seconds per item check; the Stop hook (plan_check) is registered with 300
@@ -370,6 +370,38 @@ def words(s):
 def overlap(ask, text):
     w = words(ask)
     return bool(w) and len(w & words(text)) >= 0.6 * len(w)
+
+
+ASK_STOP = {"the", "and", "for", "that", "this", "with", "from", "are", "was", "has", "have", "not", "but", "you",
+            "your", "can", "will", "should", "would", "could", "does", "which", "what", "when", "then", "than", "its",
+            "into", "over", "any", "all", "one", "per", "via", "also", "may", "use", "run", "need", "want", "ask"}
+
+
+def ask_terms(s):
+    return {w for w in re.findall(r"[a-z0-9]{3,}", (s or "").lower()) if w not in ASK_STOP}
+
+
+def ask_matches(e, text):
+    """True when a message to the user asks the entry's recorded question, in its words or others: it names the entry
+    and one of the steps the question holds (`warm_start step 1`), or it shares at least half of the question's
+    non-stopword terms (a question sent first and recorded later in other words was demanded again, 2026-11-05)."""
+    w = ask_terms(e.get("ask"))
+    eid = (e.get("id") or "").lower()
+    keys = blocked_steps(e) or set(step_keys(e))
+    # the two looser branches count only a sentence that asks: a "?" or words addressing the user's call
+    for sent in re.split(r"(?<=[.?!;])\s+|\n+", text or ""):
+        low = sent.lower()
+        if "?" not in sent and not re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", low):
+            continue
+        if overlap(e.get("ask"), sent):
+            return True
+        if w and len(w & ask_terms(sent)) >= 0.5 * len(w):
+            return True
+        if eid and (eid in low or eid.replace("_", " ") in low):
+            for m in re.finditer(r"(?i)\bsteps?\s+(" + STEP_LIST + r")", sent):
+                if {int(x) for x in re.findall(r"\d+", m.group(1))} & set(keys):
+                    return True
+    return False
 
 
 # ---------------------------------------------------------------- registry
@@ -2736,6 +2768,9 @@ def cmd_add_next(a):
     print_nexts(a.id)
 
 
+WAIT_USER_RE = re.compile(r"\bjoaquin\b|\bthe user\b|\b(?:his|the user's) (?:answer|call|go|decision|pick|choice|ok|yes)\b|\buser's\b", re.I)
+
+
 def cmd_wait(a):
     """Step N waits on something outside the turn (a cluster's state, another step's result): plan next and the stop
     check note it and never demand it, until plan unwait (the user, 2026-10-29: a hook must not loop on what the turn
@@ -2744,6 +2779,15 @@ def cmd_wait(a):
         e = entry(d, a.id)
         if a.n not in dict(nexts(e)):
             sys.exit("plan: %s has no next step %d" % (a.id, a.n))
+        if WAIT_USER_RE.search(a.on or "") and a.n not in blocked_steps(e):
+            sys.exit("plan: %s step %d would wait on the user (%r), but no open `plan ask` on %s holds step %d%s. A wait "
+                     "naming the user is the question's: send it as `plan ask %s --ask Q --searched S --blocks-steps %d`, "
+                     "which the user is shown; a wait the user never saw is lost (catalog_coverage and warm_start, "
+                     "2026-11-05: eight waits on Joaquin's answers, none asked, nothing woke the main session for 19 h)"
+                     % (a.id, a.n, a.on[:80], a.id, a.n,
+                        " (its open question holds steps %s)" % sorted(blocked_steps(e)) if blocked_steps(e) else
+                        " (no open question)" if not open_question(e) else "",
+                        a.id, a.n))
         e.setdefault("step_waits", {})[str(a.n)] = a.on
     print("plan: %s step %d waits on: %s" % (a.id, a.n, a.on))
     ids = wait_run_ids(a.on)
