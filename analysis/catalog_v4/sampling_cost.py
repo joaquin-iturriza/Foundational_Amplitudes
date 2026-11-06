@@ -233,7 +233,7 @@ def ee_fig():
     old = np.array([t[c]["old_all_s"] for c in EE_TEST]) / 3600
     new = np.array([t[c]["new_all_s"] for c in EE_TEST]) / 3600
     ax.bar(x - 0.2, old, 0.4, color=ps.C.grey, label="old sampling (as built)")
-    ax.bar(x + 0.2, new, 0.4, color=ps.C.vermillion, label="flat quota, budget 750 (estimate: old x train-replay ratio)")
+    ax.bar(x + 0.2, new, 0.4, color=ps.C.vermillion, label="flat quota, budget 750, estimated:\nnew = old $\\times$ (budget-750 replay time / old replay time)")
     for i, c in enumerate(EE_TEST):
         ax.text(x[i] + 0.2, new[i] * 1.3, f"{t[c]['ratio']:.0f}x", ha="center", fontsize=6)
     ax.set_yscale("log"); ax.set_ylim(top=new.max() * 8)
@@ -255,9 +255,9 @@ def ee_fig():
     from matplotlib.patches import Patch
     ax2.legend(handles=[Patch(facecolor=ps.C.grey, label="old (measured)"),
                         Patch(facecolor=ps.C.vermillion,
-                              label="new, upper-side estimate:\nlargest measured ratio at that final count"),
+                              label="new, upper-side estimate: new = old $\\times$ the largest\n(budget-750 replay time / old replay time) at that final count"),
                         Patch(facecolor=ps.C.vermillion, alpha=0.5, hatch="///", edgecolor=ps.C.vermillion,
-                              label="count not measured: largest of all four")], loc="upper left", fontsize=5)
+                              label="final count not measured: the largest of the four classes")], loc="upper left", fontsize=5)
     ps.save(fig, os.path.join(HERE, "figs", "sampling_cost_ee"))
 
 
