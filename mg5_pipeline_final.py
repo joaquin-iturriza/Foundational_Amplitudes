@@ -3470,16 +3470,135 @@ def is_collinear_draw(nb, sqrts, masses, partons, y_lo, rng, pt_lo=MC_PT_LO, eta
     return P
 
 
-def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None):
+def _bw_mass(nb, a, b, M, G, rng, tail=MC_TAIL):
+    """masses in [a, b] (arrays, b > a): on the Breit-Wigner of M, G (tan mapping), a share `tail` log-uniform"""
+    MG = M * G
+    th_a, th_b = np.arctan((a ** 2 - M ** 2) / MG), np.arctan((b ** 2 - M ** 2) / MG)
+    m_bw = np.sqrt(np.clip(M ** 2 + MG * np.tan(rng.uniform(th_a, th_b)), a ** 2, b ** 2))
+    m_lg = np.exp(rng.uniform(np.log(a), np.log(b)))
+    return np.where(rng.random(nb) < tail, m_lg, m_bw)
+
+
+def resonance2_draw(nb, sqrts, masses, S1, M1, G1, S2, M2, G2, y_lo, rng, tail=MC_TAIL):
+    """(nb, N, 4) finals in the partonic frame with two resonances on disjoint finals S1, S2 on shell together (plan
+    step 58): m_S1 on the Breit-Wigner of (M1, G1), then m_S2 on that of (M2, G2) in the room left (a share `tail` of
+    each log-uniform, as resonance_draw); the rest T, if any, a blob of mass log-uniform above its least. sqrt(s) ->
+    (S1+S2 blob, T) as two bodies (S1+S2's mass log-uniform in [m_S1 + m_S2, sqrt(s) - m_T]), the S1+S2 blob -> S1, S2,
+    each decayed by _blob_decay. An event with no room for both takes resonance_draw of S1 alone."""
+    masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
+    S1, S2 = list(S1), list(S2); T = [i for i in range(N) if i not in S1 + S2]
+    floor = sqrts * np.sqrt(y_lo)
+    least = lambda I: masses[I].sum() + (floor if len(I) > 1 else 0.0)
+    lT = least(T) if T else np.zeros(nb)
+    a1 = least(S1) * np.ones(nb); b1 = sqrts - lT - least(S2)
+    ok = b1 > a1 * (1 + 1e-9)
+    m1 = _bw_mass(nb, np.where(ok, a1, 1.0), np.where(ok, b1, 2.0), M1, G1, rng, tail)
+    a2 = least(S2) * np.ones(nb); b2 = sqrts - lT - m1
+    ok &= b2 > a2 * (1 + 1e-9)
+    m2 = _bw_mass(nb, np.where(ok, a2, 1.0), np.where(ok, b2, 2.0), M2, G2, rng, tail)
+    blob = np.zeros((nb, 4)); blob[:, 0] = sqrts
+    P = np.zeros((nb, N, 4))
+    if T:
+        if len(T) == 1:
+            MT = np.full(nb, masses[T[0]])
+        else:
+            hi = np.maximum(sqrts - m1 - m2, lT * (1 + 1e-9))
+            MT = np.exp(rng.uniform(np.log(lT), np.log(hi)))
+        ok &= sqrts > m1 + m2 + MT * (1 + 1e-9)
+        MT_ = np.where(ok, MT, 0.0)
+        lo12 = m1 + m2; hi12 = np.maximum(sqrts - MT_, lo12 * (1 + 1e-9))
+        M12 = np.where(ok, np.exp(rng.uniform(np.log(np.where(ok, lo12, 1.0)), np.log(np.where(ok, hi12, 2.0)))),
+                       sqrts * 0.5)
+        q12, qT = _two_body(sqrts, M12, MT_, rng)
+        P12, PT = _boost_from_rest(q12, blob), _boost_from_rest(qT, blob)
+        P[:, T] = _blob_decay(PT, np.where(ok, MT, masses[T].sum() + floor + 1.0), masses[T], y_lo, rng)
+    else:
+        ok &= sqrts > m1 + m2
+        M12, P12 = sqrts, blob
+    m1_ = np.where(ok, m1, M12 * 0.25); m2_ = np.where(ok, m2, M12 * 0.25)
+    q1, q2 = _two_body(M12 * np.ones(nb), m1_, m2_, rng)
+    P1, P2 = _boost_from_rest(q1, P12), _boost_from_rest(q2, P12)
+    P[:, S1] = _blob_decay(P1, m1_, masses[S1], y_lo, rng)
+    P[:, S2] = _blob_decay(P2, m2_, masses[S2], y_lo, rng)
+    if (~ok).any():
+        P[~ok] = resonance_draw(int((~ok).sum()), sqrts[~ok], masses, S1, M1, G1, y_lo, rng, tail)
+    return P
+
+
+def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=4.0):
+    """(nb, N, 4) finals in the partonic frame, every final at transverse mass sqrt(pT^2 + m^2) with pT log-uniform in
+    [pt_lo, pt_span pt_lo] (the last one balancing the others' pT), phi uniform, rapidities y_i = Y u_i with u_i
+    uniform, stretched to span [-1, 1] (the ladder's ends at -Y and +Y), and the span Y solved (bisection) so that
+    the invariant mass is sqrt(s), then boosted along z to zero total momentum (plan step 58: the forward multiperipheral events at the top of the QCD classes' log|M|^2
+    range, sqrt(s_hat) 20-60x the window's edge, |eta| to 4.9, pT at the cut). Y is capped at eta_max; an event whose
+    mass at Y = eta_max is short of sqrt(s) has its pT scaled up to reach it (wide-angle at large sqrt(s)); one whose
+    mass at Y = 0 already exceeds sqrt(s) takes the plain splitter."""
+    masses = np.asarray(masses, float); N = len(masses); sqrts = np.asarray(sqrts, float)
+    pt = np.exp(rng.uniform(np.log(pt_lo), np.log(pt_lo * pt_span), (nb, N - 1)))
+    ph = rng.uniform(0.0, 2.0 * np.pi, (nb, N - 1))
+    px, py = pt * np.cos(ph), pt * np.sin(ph)
+    px = np.concatenate([px, -px.sum(1, keepdims=True)], 1); py = np.concatenate([py, -py.sum(1, keepdims=True)], 1)
+    u = rng.uniform(-1.0, 1.0, (nb, N))      # stretched to [-1, 1]: the ladder's two ends at -Y and +Y
+    u = 2.0 * (u - u.min(1, keepdims=True)) / (u.max(1, keepdims=True) - u.min(1, keepdims=True)) - 1.0
+
+    ones = np.ones(nb)
+
+    def mass(Y, k=ones):
+        mt = np.sqrt(k[:, None] ** 2 * (px ** 2 + py ** 2) + masses[None] ** 2)
+        y = Y[:, None] * u
+        E, pz = (mt * np.cosh(y)).sum(1), (mt * np.sinh(y)).sum(1)
+        return np.sqrt(np.clip(E ** 2 - pz ** 2, 0, None))
+
+    bad = mass(0.0 * ones) >= sqrts
+    short = (mass(eta_max * ones) < sqrts) & ~bad
+    k = ones.copy()
+    if short.any():          # pT scaled up at Y = eta_max until the mass reaches sqrt(s) (the mass grows with k)
+        lo_k, hi_k = ones.copy(), ones.copy()
+        while True:
+            m = mass(eta_max * ones, hi_k) < sqrts
+            if not (m & short).any():
+                break
+            hi_k = np.where(m & short, hi_k * 2.0, hi_k)
+        for _ in range(60):
+            mid = 0.5 * (lo_k + hi_k)
+            up = mass(eta_max * ones, mid) < sqrts
+            lo_k, hi_k = np.where(up, mid, lo_k), np.where(up, hi_k, mid)
+        k = np.where(short, 0.5 * (lo_k + hi_k), 1.0)
+    lo_Y, hi_Y = np.zeros(nb), np.full(nb, eta_max)
+    for _ in range(60):
+        mid = 0.5 * (lo_Y + hi_Y)
+        up = mass(mid, k) < sqrts
+        lo_Y, hi_Y = np.where(up, mid, lo_Y), np.where(up, hi_Y, mid)
+    Y = np.where(short, eta_max, 0.5 * (lo_Y + hi_Y))
+    mt = np.sqrt(k[:, None] ** 2 * (px ** 2 + py ** 2) + masses[None] ** 2)
+    y = Y[:, None] * u
+    E, pz = mt * np.cosh(y), mt * np.sinh(y)
+    y0 = np.arctanh(np.clip(pz.sum(1) / E.sum(1), -1 + 1e-15, 1 - 1e-15))     # boost along z to zero pz
+    y = y - y0[:, None]
+    P = np.stack([mt * np.cosh(y), k[:, None] * px, k[:, None] * py, mt * np.sinh(y)], -1)
+    if bad.any():
+        P[bad] = democratic_draw(int(bad.sum()), sqrts[bad], masses, y_lo, rng)
+    return P
+
+
+def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False):
     """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
-    is a parton and there are at least three finals"""
+    is a parton and there are at least three finals; with `res2`, ("res2", S1, p1, M1, G1, S2, p2, M2, G2) per pair of
+    resonances on disjoint finals (both on shell together, plan step 58: the doubly resonant top of the electroweak
+    classes' log|M|^2 range); with `mperi`, ("mperi",) when at least two finals are partons (every final at pT near the
+    cut spread in rapidity to the acceptance edge: the forward multiperipheral top of the QCD classes' range)"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
     rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
-    ch = [("rambo",), ("splitter",)] + [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
+    res = [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
+    ch = [("rambo",), ("splitter",)] + res
     partons = tuple(i for i in range(nf) if abs(pdg[2 + i]) in MC_PARTONS)
     if isc and partons and nf >= 3:
         ch.append(("isc", partons))
+    if res2:
+        ch += [("res2",) + a[1:] + b[1:] for i, a in enumerate(res) for b in res[i + 1:] if not set(a[1]) & set(b[1])]
+    if mperi and len(partons) >= 2:
+        ch.append(("mperi",))
     return ch
 
 
@@ -3494,6 +3613,10 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
     if ch[0] == "res":
         M, G = ch[3], ch[4]
         return resonance_draw(nb, sq, m_finals, ch[1], M, G, y_lo, rng)
+    if ch[0] == "res2":
+        return resonance2_draw(nb, sq, m_finals, ch[1], ch[3], ch[4], ch[5], ch[7], ch[8], y_lo, rng)
+    if ch[0] == "mperi":
+        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng)
     return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
 
 
@@ -3736,7 +3859,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         if pol.get("mc_resonances") and not pol.get("mc_res_params"):
             raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
         chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
-                            pol.get("mc_res_params"))
+                            pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")))
         shares = np.full(len(chans), 1.0 / len(chans))
     tr, itr = (np.log, np.exp) if log_s else ((lambda x: x), (lambda x: x))
     t_lo, t_hi = tr(lo), tr(hi)
@@ -3857,7 +3980,7 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
             if pol.get("mc_resonances") and not pol.get("mc_res_params"):
                 raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
             chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
-                                pol.get("mc_res_params"))
+                                pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")))
             sh1 = np.full(len(chans), 1.0 / len(chans))
             ev1, sq1, c1 = _candidates_mc(n1, uni, m_finals, pdg_ids, rng, cuts, chans, sh1, pol["y_lo"], fwd_cand,
                                           beam_mass)
