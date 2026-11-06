@@ -3229,17 +3229,25 @@ def _sqrts_sampler(lo, hi, measure, rng):
     raise ValueError(f"unknown sqrts_measure {measure!r}")
 
 
-def rotate_forward(P, cos_cap, rng):
+def rotate_forward(P, cos_cap, rng, free=None, free_floor=None):
     """catalog_v4's forward component (D130; analysis/catalog_v3/coverage_check.py, which measured it): P (n, k, 4),
     beams in rows 0 and 1, the partonic rest frame. Per event one final particle at random is turned to an angle with
     1 - |cos theta| = exp(-u), u uniform in [0, log(1/(1 - cos_cap))], phi uniform, either hemisphere; the whole final
     state turns with it (one rotation), so momentum conservation and every mass shell hold. Nothing here knows which
-    process has a t-channel pole."""
+    process has a t-channel pole.
+    `free` (bool per final, fwd_free_mask) with `free_floor` (sampling.fwd_free_floor, plan catalog_coverage step (f)):
+    a picked final that no cut applies to (a neutrino, a massive final not in cut_pdgs) goes down to 1 - |cos theta| =
+    free_floor instead of the cut edge (the e+e- default events' forward bosons sit at 1e-3 to 1e-6 off the beam,
+    data/quota_where/v4_epem_*); absent, the draws are exactly the earlier ones."""
     n, k = P.shape[:2]
     j = rng.integers(2, k, n)
     p = P[np.arange(n), j, 1:]
     a = p / np.clip(np.linalg.norm(p, axis=1, keepdims=True), 1e-300, None)
-    u = rng.uniform(0.0, np.log(1.0 / (1.0 - cos_cap)), n)
+    if free is not None and free_floor:
+        u_hi = np.where(np.asarray(free, bool)[j - 2], np.log(1.0 / float(free_floor)), np.log(1.0 / (1.0 - cos_cap)))
+        u = rng.uniform(0.0, 1.0, n) * u_hi
+    else:
+        u = rng.uniform(0.0, np.log(1.0 / (1.0 - cos_cap)), n)
     c = (1.0 - np.exp(-u)) * np.where(rng.random(n) < 0.5, 1.0, -1.0)
     ph = rng.uniform(0.0, 2.0 * np.pi, n)
     s = np.sqrt(np.clip(1.0 - c ** 2, 0.0, None))
@@ -3258,6 +3266,18 @@ def rotate_forward(P, cos_cap, rng):
     Q = P.copy()
     Q[:, 2:, 1:] = np.einsum("nij,nkj->nki", R, P[:, 2:, 1:])
     return Q
+
+
+def fwd_free_mask(m_finals, pdg_ids, cuts, n_initial=2):
+    """per final, True when no cut applies to it (fiducial_pass_mask's rule: not a cut leg); None unless
+    cuts["fwd_free_floor"] is set (the sampling flag carried into the cuts by build_mixture_dataset)"""
+    if not cuts or not cuts.get("fwd_free_floor"):
+        return None
+    extra = {abs(int(p)) for p in (cuts.get("cut_pdgs") or ())}
+    m_finals = np.asarray(m_finals, float)
+    return np.array([abs(int(pdg_ids[n_initial + i])) in _NEUTRINOS
+                     or not (m_finals[i] == 0.0 or abs(int(pdg_ids[n_initial + i])) in extra)
+                     for i in range(len(m_finals))])
 
 
 def _random_dirs(n, rng):
@@ -3661,7 +3681,8 @@ def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, share
         if frac_fwd > 0:
             r = rng.random(n_draw) < frac_fwd
             if r.any():
-                P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng)
+                P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng, fwd_free_mask(m_finals, pdg, cuts),
+                                      cuts.get("fwd_free_floor"))
         return P, sq, c
     accP, accS, accC, got, acc = [], [], [], 0, 0.5
     while got < nb:
@@ -3860,7 +3881,8 @@ def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo, fr
         if frac_fwd > 0:
             r = rng.random(n_draw) < frac_fwd
             if r.any():
-                P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng)
+                P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng, fwd_free_mask(m_finals, pdg, cuts),
+                                      cuts.get("fwd_free_floor"))
         return P, sq
     P, sq = _collect_with_cuts(draw, nb, m_finals, pdg, cuts)
     return [(P[i], pdg) for i in range(nb)], sq
@@ -3955,6 +3977,9 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
     bulk. None (every earlier pool) draws exactly the random numbers it drew before."""
     lo, hi = float(sqrts_min), float(sqrts_max)
     f_fwd, fwd_cand = float(pol.get("f_fwd", 0.0)), float(pol.get("fwd_cand", 0.0))
+    if pol.get("fwd_free_floor") and cuts is not None:
+        # sampling.fwd_free_floor (off by default): the forward component's uncut finals down to this 1 - |cos theta|
+        cuts = dict(cuts, fwd_free_floor=float(pol["fwd_free_floor"]))
     n_flat = int(round(pol["f_flat"] * n_events)); n_fwd = int(round(f_fwd * n_events))
     n_def = 0 if default is None else len(default[0])
     n_bulk = n_events - n_flat - n_fwd - n_def

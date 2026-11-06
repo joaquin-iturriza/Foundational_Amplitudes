@@ -72,7 +72,7 @@ SEEDS = (42, 43)
 # the flat part filled to a quota per bin; the second with the multiperipheral and joint-resonance channels (step 58
 # re-check), the third the same at a 10x candidate budget (step 65)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
-                  "quota_ladder_both_res2", "quota_ladder_both_res2_budget750")
+                  "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750")
 ROLE = "train"
 # the step-57 classes (the pp_support worst list, 2026-11-04, and the shape study's class) and their PP4 probes
 CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
@@ -200,6 +200,12 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(mc_mperi=True, mc_mperi_edge=True, mc_res2=True)
         if policy.startswith("quota_ladder_both_res2"):   # step 67: both ladders as two channels
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True)
+        if policy == "quota_ladder_both_res2_fwdfree_budget750":
+            # step (f)'s SHORT branch on e+e-: the default events above the fill have a neutrino, Z or H at 1 - |cos|
+            # 1e-3..1e-6 at 1-3 TeV (data/quota_where/v4_epem_*), which the forward component's cut-edge cap (0.99)
+            # never reaches; uncut finals down to 1e-8 (below 2 m_Z^4 / s^2 ~ 1e-7 at the 6 TeV top, where a
+            # t-channel electron's pole flattens), at the same budget as the control
+            s.update(fwd_free_floor=1e-8, flat_budget=750)
         if policy == "quota_ladder_both_res2_budget750":
             # step 66's STRONG branch: the budget from the measured quota/kept of the QCD bins still short inside the pp
             # range, worst 1/0.065 = 15.5 at log10|M|^2 4.70 (uu_bbxuu, edge ladder at budget 50), so 15 x 50
@@ -483,7 +489,7 @@ def summary():
 
 # step 67's read (its passed design, 2026-11-06): the guard of both ladders at budget 50 and the coverage at 750
 STEP67 = {"old": "quota_ladder_res2", "edge": "quota_ladder_edge_res2", "both": "quota_ladder_both_res2",
-          "both750": "quota_ladder_both_res2_budget750"}
+          "both750": "quota_ladder_both_res2_budget750", "fwdfree750": "quota_ladder_both_res2_fwdfree_budget750"}
 
 
 def coverage():
@@ -553,17 +559,20 @@ def coverage():
                       "worst_bin": min(per_bin, key=lambda x: x["diff"]) if per_bin else None, "bins_failed": bad,
                       "pass": bool(short_ok and not bad)}
         o["guard_both_vs"] = g
-        if "both750" in P:
-            q = P["both750"]
-            held_ok = all(h is not None and h <= 2 for h in q["heldout_outside_kept"])
+        for key, suf in (("both750", "750"), ("fwdfree750", "fwdfree_750")):
+            if key not in P:
+                continue
+            q = P[key]
+            # e+e- (2000 held-out events): RESOLVED = 0 outside (the design of step (f)); pp (~53000): <= 2 (step 67)
+            held_ok = all(h is not None and h <= (0 if o["beam"] == "ee" else 2) for h in q["heldout_outside_kept"])
             in_ok = all(x["min"] >= 0.95 for x in q["bins"] if x["in_range"])
             mar_ok = all(x["min"] >= 0.95 for x in q["bins"] if not x["in_range"])
-            o["verdict_750"] = ("YES" if held_ok and in_ok and mar_ok and not any(q["chunks_no_steer"]) else
-                                "NEAR" if held_ok and in_ok and not any(q["chunks_no_steer"]) else "SHORT")
-            o["short_bins_750"] = [x for x in q["bins"] if x["min"] < 0.95]
+            o["verdict_" + suf] = ("YES" if held_ok and in_ok and mar_ok and not any(q["chunks_no_steer"]) else
+                                   "NEAR" if held_ok and in_ok and not any(q["chunks_no_steer"]) else "SHORT")
+            o["short_bins_" + suf] = [x for x in q["bins"] if x["min"] < 0.95]
             cur = o["seconds_same_job"].get("current")
             if cur and len(cur) == len(q["seconds"]) and None not in cur + q["seconds"]:
-                o["cost_750_over_current"] = [b / a for a, b in zip(cur, q["seconds"])]
+                o["cost_" + suf + "_over_current"] = [b / a for a, b in zip(cur, q["seconds"])]
         out["classes"][c] = o
         print(c, o.get("verdict_750"), {r: v["pass"] for r, v in g.items()}, o.get("short_bins_750"))
     json.dump(out, open(os.path.join(DATA, "quota_coverage.json"), "w"), indent=1)
