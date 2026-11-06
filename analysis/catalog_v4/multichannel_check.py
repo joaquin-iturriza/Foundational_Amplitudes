@@ -492,6 +492,48 @@ STEP67 = {"old": "quota_ladder_res2", "edge": "quota_ladder_edge_res2", "both": 
           "both750": "quota_ladder_both_res2_budget750", "fwdfree750": "quota_ladder_both_res2_fwdfree_budget750"}
 
 
+# step 66's e+e- reads (the budget-750 control's earlier run on the same seeds, plan step (f)); a later read of the same
+# policy and seed replaces it in the merged summary, so the reproduction check reads this file directly
+STEP66_EE_FILE = "{c}_current+multichannel+quota_ladder_both_res2+quota_ladder_both_res2_budget750_{s}.json"
+
+
+def _edge(bins):
+    """the lower edge of the first in-range bin with fill < 0.95 per seed (None: every in-range bin >= 0.95)"""
+    return [min((b["lo"] for b in bins[s] if b["in_range"] and b["fill"] < 0.95), default=None) for s in sorted(bins)]
+
+
+def _fwdfree_read(c, d, P, o):
+    """the outcome of step (f)'s forward check (design of 2026-11-06 ~22:20), budget 750 with the forward component's
+    uncut finals down to sampling.fwd_free_floor against the same policy without it: per seed the edge (first in-range
+    bin < 0.95) of each, its shift in dex; YES = held-out 0 (e+e-) and every in-range bin >= 0.95 on both seeds with
+    no no_steer stop and margin bins filled, NEAR = the same with a margin bin short, PARTIAL = not that but the edge
+    up >= 1 dex on both seeds, NO = less; control_reproduces_step66: the control's kept-per-bin and held-out count
+    equal step 66's read of the same seed (else the run is void)"""
+    per = {}
+    for k in ("both750", "fwdfree750"):
+        js = d[STEP67[k]]["seeds"]
+        per[k] = {s: [{"lo": float(b), "in_range": bool(float(b) <= o["pp_in_support_max_log10"]), "fill": v}
+                      for b, v in js[s]["fill_per_bin"].items()] for s in js}
+    eb, ef = _edge(per["both750"]), _edge(per["fwdfree750"])
+    top = o["pp_in_support_max_log10"] + 0.25
+    shift = [(f if f is not None else top) - b if b is not None else 0.0 for b, f in zip(eb, ef)]
+    v = o.get("verdict_fwdfree_750")
+    verdict = v if v in ("YES", "NEAR") else ("PARTIAL" if all(x >= 1.0 for x in shift) else "NO")
+    rep = []
+    for s in sorted(d[STEP67["both750"]]["seeds"]):
+        f = os.path.join(READS, STEP66_EE_FILE.format(c=c, s=s))
+        if not os.path.exists(f):
+            rep.append(None); continue
+        r66 = json.load(open(f))["runs"].get(f"{STEP67['both750']}_{s}")
+        rnow = d[STEP67["both750"]]["seeds"][s]
+        j66 = judge(r66, d["pp_q999_in_support"]) if r66 else None
+        rep.append(bool(j66 and j66["fill_per_bin"] == rnow["fill_per_bin"] and
+                        j66.get("heldout_outside_kept") == rnow.get("heldout_outside_kept")))
+    return {"edge_both750": eb, "edge_fwdfree750": ef, "edge_shift_dex": shift, "verdict": verdict,
+            "control_reproduces_step66": rep,
+            "void": any(x is False for x in rep)}
+
+
 def coverage():
     """data/multichannel_check.json -> data/quota_coverage.json: per class and policy, the fill per quota bin
     (sum over chunks of min(kept, quota) / sum of the quota; seeds' mean, min and max), each bin IN RANGE when its lower
@@ -573,8 +615,11 @@ def coverage():
             cur = o["seconds_same_job"].get("current")
             if cur and len(cur) == len(q["seconds"]) and None not in cur + q["seconds"]:
                 o["cost_" + suf + "_over_current"] = [b / a for a, b in zip(cur, q["seconds"])]
+        if "fwdfree750" in P and "both750" in P:
+            o["fwdfree_vs_both750"] = _fwdfree_read(c, d, P, o)
         out["classes"][c] = o
-        print(c, o.get("verdict_750"), {r: v["pass"] for r, v in g.items()}, o.get("short_bins_750"))
+        print(c, o.get("verdict_750"), o.get("fwdfree_vs_both750", {}).get("verdict"),
+              {r: v["pass"] for r, v in g.items()}, o.get("short_bins_750"))
     json.dump(out, open(os.path.join(DATA, "quota_coverage.json"), "w"), indent=1)
 
 
