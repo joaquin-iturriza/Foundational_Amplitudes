@@ -12222,6 +12222,20 @@ entries:
     text: '2026-11-06 note: the 12 step-61 sign-output resubmissions at 3:30 are approved by Joaquin (D309); 4 submitted (9079850b
       ebe4c4ed 297c4366 dce345d8), the other 8 refused by the permission classifier and with Joaquin; no longer an open question
       to him.'
+  - at: '2026-11-06T22:45:00+00:00'
+    text: '2026-11-07 seed-to-seed spread (Joaquin 2026-11-06 22:31, D315; seed_spread.py run+fig @fbfb4109 -> data/seed_spread.json,
+      figs/seed_spread). Selection: every existing catalog_v4 pair of runs that differ only in seed, from the run tables the
+      earlier comparisons used (mixture_ab MIX/MIX_HET/HD4/HD5/BOUND/WIDTH/LOADER/WARM, ee_gain BEAM_RUNS, het_oneloop SIGNHEAD
+      seeds 42-45), each pair once (warm-start controls shared by several changes deduplicated), none chosen by result; 0
+      blew up. 293 (arm, read) cells (20 MSE loss, 273 het; 215 of them warm-start pairs). Per cell: per class the geometric
+      mean over probes of MSE_A/MSE_B, then over classes. Results (median over cells, q10-q90): per-class |ln ratio| median
+      0.242 (0.156-0.341) = one class''s MSE moves by x1.27 between seeds; its 90th percentile over classes 0.763 (x2.14);
+      the class-median ratio R itself |ln R_seed| 0.103 (0.017-0.229) = 11% (q90 26%). By loss: MSE 0.244 / R 0.131 (20 cells),
+      het 0.242 / 0.102. By read (per-class median, R): pp test 0.224 / 0.140, e+e- test 0.179 / 0.097, held-out catalog-sampled
+      0.249 / 0.173, held-out default trees 0.278 / 0.186, held-out one-loop 0.305 / 0.055. By setup: 1e4/process 4264 steps
+      0.246 / 0.115; warm starts 0.246 / 0.111; whole set w8 memmap 0.176 / 0.053, in memory 0.126 / 0.047, w16 0.250 / 0.168,
+      w32 0.175 / 0.046. Equal weight per setup: 0.211 / 0.082. The number to quote: a class-median R between two arms at
+      one seed each carries ~11% seed noise (median; 26% at q90); one class''s MSE ~27% (x2.1 at q90 over classes).'
   handoff:
     state: '2026-11-06 ~22:00. (1) Cost of the new sampling done: sampling_cost.py @08e3091e (pull = catalog_v4 generation
       logs of the 12 job_catalog_v4_regen runs of 2026-10-26 -> data/sampling_cost_gen.json; summary -> data/sampling_cost.json;
