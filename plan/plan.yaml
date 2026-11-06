@@ -14150,6 +14150,13 @@ entries:
       state is not in its checkpoint (0 Muon, 2 AdamW state entries: the sigma stage shares and overwrites models/). The mu_mse/WSD
       sweep in flight varies lr_scale, warmup and decay, not the empty-optimizer start. Next: a restart that fills the optimizer
       moments at lr 0 before the ramp (or carries a parent''s moments), against the default restart at k=533.'
+  - at: '2026-11-06T05:35:44+00:00'
+    text: '2026-11-06 step 5 scope call (owner''s, inside approved work): the 7 hpo8 trials whose models the sweep pruned
+      are not retrained for the exact W/S split (3.2 GPU-h). Reason: the D303 restart reading explains the sweep''s preference
+      for low lr without it (the step-2 jump grows with the step-2 lr, so the low-lr trials lose least of the parent''s fit
+      on the in-distribution validation), and the three-model split in flight (NLL-tuned best trial, default restart, parent;
+      FA-ccin2p3-7a40c835) tells whether the sigma term or the mean moved; the 8-trial ranking stays the logged one (val MSE
+      of the mean nearly opposite to the NLL). Revisit if the three-model split contradicts the restart reading.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
