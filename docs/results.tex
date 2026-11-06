@@ -2705,8 +2705,8 @@ $0.76$, $1.07$, EE4 $0.66$, $0.84$, $0.98$. Caveats: two seeds; the schedule is 
 so a tuned warm start may get there sooner; the total compute of the warm-started model is the parent's $4264$ steps
 plus $k$, which pays off only when the parent already exists.
 This is the first change of the widened design (D282, every change tried that allows a warm start): the other
-data changes and the one-loop target change wait on the user's go for their GPU cost, and the loss change is not run
-because its from-scratch pair shows no gain on its deciding read; the answer here holds for this data change only.
+data changes and the one-loop target change are read in par.~\ref{par:v4_warm_start_changes}, and the loss change is not run
+because its from-scratch pair shows no gain on its deciding read.
 % src: python3 analysis/catalog_v4/mixture_ab.py warm C1 @f0015680
 % claim: B_over_A.PP4=0.450
 % claim: B_over_A.EE4=0.223
@@ -3312,6 +3312,162 @@ off. Bottom: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$
 fraction of classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_adamw_damped}
 % allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
+\end{figure}
+
+\paragraph{Warm start for the other changes (2026-11-06).}\label{par:v4_warm_start_changes}
+The question of par.~\ref{par:v4_warm_start} asked of every other change that allows a warm start [D283, D300], with
+C1 (share $0.25$, het loss; YES at $k=1066$) the earlier result each is set against: C2 the default-sampled share
+$0.50$ on the het loss, C3 and C4 the shares $0.25$ and $0.50$ on the MSE loss, C5 the pp-mixed training set (MSE), C6
+the one-loop sign extension (MSE, more sign-changing one-loop training pools), C8 the signed one-loop pools trained on
+their magnitude (het). Design (passed 2026-11-04T21:51, restated and passed again 2026-11-06): as
+par.~\ref{par:v4_warm_start}, at the untuned default restart that par.~\ref{par:v4_warm_start_ramp} kept as the recipe,
+$k\in\{533,1066,2132\}$ of the $4264$-step pretraining; the het changes start from the het control and share C1's
+matched controls $C_k$, the MSE changes start from the MSE control (\code{v4\_dimensionless\_muon}) with their own
+$C_k$ (\code{v4\_mse\_cont\_k*}); B is each change's from-scratch pair; seeds $42$ and $43$, C6 and the MSE $C_k$
+$42$ to $45$; $54$ runs of \code{scripts/job\_catalog\_v3\_short.sh} (job code @d5616629, the C8 pair at $k=2132$
+@2b82ebe0), arms \code{v4\_het\_warm50}, \code{v4\_mse\_warm25}, \code{v4\_mse\_warm50}, \code{v4\_mse\_warmpp},
+\code{v4\_mse\_warmsx}, \code{v4\_het\_warmmag}. Deciding reads, fixed before the read: C2 to C4 PP4 and EE4, C5 PP4
+on the classes it trains on pp events, C8 the default-sampled one-loop held-out pools (HD5), all as $R$ of
+par.~\ref{par:v4_warm_start}; C6 the zero-shot wrong-sign share on the $21$ sign-changing held-out one-loop pools, as a
+ratio of the medians over pools of the seed means, with a pool bootstrap widened by B's seed spread. Rule as
+par.~\ref{par:v4_warm_start} (C6 carried by a sign test against $C_k$ at $p<0.05$). The runs under a shared target
+standardization (C5, C6, C8) hold the parent's transform and statistics on every pool they share with it
+(\code{ws\_stats\_check.py}; C8 on its six runs, $1090$ pools each). All $54$ runs read every probe and none blew up;
+five spiked and recovered (C2 at $k=2132$, both seeds; C8 at $k=1066$, both seeds; C8 at $k=2132$, seed $43$).
+Every data change reaches its from-scratch read by half a pretraining's steps; the one-loop changes' point estimates do as well, with intervals that do not resolve (fig.~\ref{fig:v4_warm_start_changes}). C2:
+SHORT at $k=533$ (EE4 $R(W_k/B)=1.33$, $[1.04, 1.70]$; PP4 $1.10$, $[0.74, 1.63]$), INCONCLUSIVE at $1066$ (PP4
+$0.94$, $[0.63, 1.39]$; EE4 $1.07$, $[0.85, 1.35]$), MATCH at $2132$ (PP4 $0.74$, $[0.49, 1.11]$; EE4 $0.88$,
+$[0.69, 1.12]$): YES at $k/4264=0.5$, with the widest intervals of the data changes. C3: INCONCLUSIVE at $533$ (PP4
+$1.03$, $[0.84, 1.27]$; EE4 $1.16$, $[0.98, 1.39]$), MATCH at $1066$ (PP4 $0.85$, $[0.69, 1.04]$; EE4 $0.92$, $[0.77,
+1.09]$): YES at $0.25$. C4: INCONCLUSIVE at $533$ (PP4 $1.00$, $[0.80, 1.25]$; EE4 $1.07$, $[0.82, 1.41]$), MATCH at
+$1066$ (PP4 $0.81$, $[0.65, 1.01]$; EE4 $0.84$, $[0.64, 1.11]$): YES at $0.25$. C5: MATCH at $533$ already (PP4 trained
+classes $0.97$, $[0.87, 1.09]$): YES at $0.125$. The two one-loop changes are not decided: their point estimates sit at
+or below $1$ from $k=533$ on, but no interval comes under the bar. C8 on HD5: $0.93$ ($[0.63, 1.48]$), $0.89$ ($[0.54,
+1.74]$), $0.86$ ($[0.51, 1.47]$), INCONCLUSIVE at every $k$, the intervals widened by B's two seeds. C6: the wrong-sign
+median $3.07\%$, $2.73\%$, $2.69\%$ against B's $2.91\%$ and the parent's $6.69\%$, $R$ $1.06$ ($[0.71, 2.11]$), $0.94$
+($[0.54, 1.77]$), $0.92$ ($[0.47, 1.41]$), INCONCLUSIVE at every $k$ on $21$ pools. Every change is carried at every
+$k$: $R(W_k/C_k)$ on the deciding reads from $0.20$ to $0.74$ for C2 to C5 and $0.078$ to $0.095$ on HD5 for C8; C6's
+warm start is below its $C_k$ on $16$ of $20$ pools at $k=533$ ($p=0.006$) and on $18$ of $21$ at $1066$ and $2132$.
+As the share of the from-scratch gain reached at $k=533$, $g_k=\ln R(W_k/A)/\ln R(B/A)$: PP4 $0.55$ for C1, $0.83$
+for C2, $1.00$ for C3, $1.05$ for C4, $0.99$ for C5 (trained classes); HD5 $1.05$ for C8, the wrong-sign share $0.93$
+for C6. On $g$ at $k=533$ the target change is as fast as the fastest data changes (a point estimate; C8 is not decided)
+and C1 has the smallest share; by the deciding rule C2 is the slowest (YES at $0.5$). For the MSE changes the warm start ends below the change from scratch at $k=2132$ (PP4 C3 $0.68$, C4
+$0.65$, C5 $0.58$), because the MSE parent was not converged: $2132$ more steps on its own recipe alone give PP4
+$R(C_k/A)=0.79$, and the warm start has trained $4264+k$ steps against B's $4264$. Outcome by the design: YES for C2
+at $0.5$ of a pretraining, for C3 and C4 at $0.25$ and for C5 at $0.125$ (C1 at $0.25$); not decided for C6 and C8,
+whose reads cannot resolve the $1.35$ bound with B's seed spread. A data change of this kind can be added to an
+existing pretraining by retraining a quarter of its steps (an eighth for the pp-mixed set, half for the het share
+$0.50$); the one-loop changes reach their whole gain at an eighth, with intervals too wide to call it.
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C2 @8293cab1
+% claim: k.533.W_over_B.EE4.0=1.33
+% claim: k.533.W_over_B.EE4.1.0=1.04
+% claim: k.533.W_over_B.EE4.1.1=1.70
+% claim: k.533.W_over_B.PP4.0=1.10
+% claim: k.533.W_over_B.PP4.1.0=0.74
+% claim: k.533.W_over_B.PP4.1.1=1.63
+% claim: k.1066.W_over_B.PP4.0=0.94
+% claim: k.1066.W_over_B.PP4.1.0=0.63
+% claim: k.1066.W_over_B.PP4.1.1=1.39
+% claim: k.1066.W_over_B.EE4.0=1.07
+% claim: k.1066.W_over_B.EE4.1.0=0.85
+% claim: k.1066.W_over_B.EE4.1.1=1.35
+% claim: k.2132.W_over_B.PP4.0=0.74
+% claim: k.2132.W_over_B.PP4.1.0=0.49
+% claim: k.2132.W_over_B.PP4.1.1=1.11
+% claim: k.2132.W_over_B.EE4.0=0.88
+% claim: k.2132.W_over_B.EE4.1.0=0.69
+% claim: k.2132.W_over_B.EE4.1.1=1.12
+% claim: k.2132.W_over_C.EE4.0=0.20
+% claim: k.533.g.PP4=0.83
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C3 @8293cab1
+% claim: k.533.W_over_B.PP4.0=1.03
+% claim: k.533.W_over_B.PP4.1.0=0.84
+% claim: k.533.W_over_B.PP4.1.1=1.27
+% claim: k.533.W_over_B.EE4.0=1.16
+% claim: k.533.W_over_B.EE4.1.0=0.98
+% claim: k.533.W_over_B.EE4.1.1=1.39
+% claim: k.1066.W_over_B.PP4.0=0.85
+% claim: k.1066.W_over_B.PP4.1.0=0.69
+% claim: k.1066.W_over_B.PP4.1.1=1.04
+% claim: k.1066.W_over_B.EE4.0=0.92
+% claim: k.1066.W_over_B.EE4.1.0=0.77
+% claim: k.1066.W_over_B.EE4.1.1=1.09
+% claim: k.2132.W_over_B.PP4.0=0.68
+% claim: k.2132.C_over_A.PP4.0=0.79
+% claim: k.533.W_over_C.PP4.0=0.74
+% claim: k.533.g.PP4=1.00
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C4 @8293cab1
+% claim: k.533.W_over_B.PP4.0=1.00
+% claim: k.533.W_over_B.PP4.1.0=0.80
+% claim: k.533.W_over_B.PP4.1.1=1.25
+% claim: k.533.W_over_B.EE4.0=1.07
+% claim: k.533.W_over_B.EE4.1.0=0.82
+% claim: k.533.W_over_B.EE4.1.1=1.41
+% claim: k.1066.W_over_B.PP4.0=0.81
+% claim: k.1066.W_over_B.PP4.1.0=0.65
+% claim: k.1066.W_over_B.PP4.1.1=1.01
+% claim: k.1066.W_over_B.EE4.0=0.84
+% claim: k.1066.W_over_B.EE4.1.0=0.64
+% claim: k.1066.W_over_B.EE4.1.1=1.11
+% claim: k.2132.W_over_B.PP4.0=0.65
+% claim: k.533.g.PP4=1.05
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C5 @8293cab1
+% claim: k.533.W_over_B.PP4_trained.0=0.97
+% claim: k.533.W_over_B.PP4_trained.1.0=0.87
+% claim: k.533.W_over_B.PP4_trained.1.1=1.09
+% claim: k.2132.W_over_B.PP4_trained.0=0.58
+% claim: k.533.g.PP4_trained=0.99
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C8 @8293cab1
+% claim: k.533.W_over_B.HD5.0=0.93
+% claim: k.533.W_over_B.HD5.1.0=0.63
+% claim: k.533.W_over_B.HD5.1.1=1.48
+% claim: k.1066.W_over_B.HD5.0=0.89
+% claim: k.1066.W_over_B.HD5.1.0=0.54
+% claim: k.1066.W_over_B.HD5.1.1=1.74
+% claim: k.2132.W_over_B.HD5.0=0.86
+% claim: k.2132.W_over_B.HD5.1.0=0.51
+% claim: k.2132.W_over_B.HD5.1.1=1.47
+% claim: k.533.W_over_C.HD5.0=0.078
+% claim: k.1066.W_over_C.HD5.0=0.095
+% claim: k.533.g.HD5=1.05
+% src: python3 analysis/catalog_v4/signext_compare.py warm @8293cab1
+% claim: k.533.median_pct.W=3.07
+% claim: k.1066.median_pct.W=2.73
+% claim: k.2132.median_pct.W=2.69
+% claim: k.533.median_pct.B=2.91
+% claim: k.533.median_pct.A=6.69
+% claim: k.533.W_over_B.R=1.06
+% claim: k.533.W_over_B.widened.0=0.71
+% claim: k.533.W_over_B.widened.1=2.11
+% claim: k.1066.W_over_B.R=0.94
+% claim: k.1066.W_over_B.widened.0=0.54
+% claim: k.1066.W_over_B.widened.1=1.77
+% claim: k.2132.W_over_B.R=0.92
+% claim: k.2132.W_over_B.widened.0=0.47
+% claim: k.2132.W_over_B.widened.1=1.41
+% claim: k.533.pools=21
+% claim: k.533.vs_C.W_lower=16
+% claim: k.533.vs_C.p_one_sided=0.006
+% claim: k.1066.vs_C.W_lower=18
+% claim: k.2132.vs_C.W_lower=18
+% claim: k.533.g=0.93
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1 @8293cab1
+% claim: k.533.g.PP4=0.55
+% allow: 0.25 0.50 533 1066 2132 4264 42 43 45 54 1090 1.35 0.05 0.5 0.125 1 2 3 4 5 6 8 20 21 d5616629 2b82ebe0 2b because they are the shares, k and the pretraining's steps, the seeds, the run and pool counts, the rule's bars, the fractions k/4264, the change numbers, the pool counts of C6's sign test and the job script commits
+\begin{figure}[ht]
+\centering
+\includegraphics{../analysis/catalog_v4/figs/warm_start_changes_legend.pdf}\\
+\includegraphics{../analysis/catalog_v4/figs/warm_start_changes_a.pdf}\hfill
+\includegraphics{../analysis/catalog_v4/figs/warm_start_changes_b.pdf}\\[1ex]
+\includegraphics{../analysis/catalog_v4/figs/warm_start_changes_c.pdf}
+% src: python3 analysis/catalog_v4/plot_warm_start.py changes @8293cab1
+\caption{Warm start of each change against the change from scratch: $R(W_k/B)$ against $k/4264$ on each change's
+deciding read. (a) PP4, all classes (the pp-mixed set: the classes it trains on pp events); (b) EE4, all classes; (c)
+the magnitude target on the default-sampled one-loop held-out pools (HD5, zero-shot MSE) and the sign extension's
+wrong-sign share on the $21$ sign-changing held-out one-loop pools (ratio of medians). Bars the designs' widened
+$95\%$ intervals; dashed the MATCH bar, dotted equality; series offset in $k$ for legibility. The sign extension's
+points are over four seeds, the others over two.}\label{fig:v4_warm_start_changes}
+% allow: 4264 21 95 because they are the pretraining's steps, C6's pool count and the interval level
 \end{figure}
 
 
