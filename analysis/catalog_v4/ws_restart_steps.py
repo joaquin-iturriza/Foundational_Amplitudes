@@ -22,7 +22,11 @@ RUNS = {"warm start, default lr (k=533, s42)": "runs/catalog_v4_short/v4_het_war
         "default restart, same commit (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25_k533_tagd303",
         "default restart, same commit (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25_k533_seed2_tagd303",
         "Muon lr damped (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25u_k533",
-        "Muon lr damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25u_k533_seed2"}
+        "Muon lr damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25u_k533_seed2",
+        "AdamW lr damped (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25a_k533",
+        "AdamW lr damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25a_k533_seed2",
+        "every group damped (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25e_k533",
+        "every group damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25e_k533_seed2"}
 RUNS.update({"hpo8 " + d.rsplit("/", 1)[1]: d for d in sorted(glob.glob("runs/ws_c1_k533_hpo8/trial_*"))})
 out = {}
 for lab, d in RUNS.items():
@@ -62,7 +66,9 @@ if __name__ == "__main__":
              "pretrained start (het control, s42)": "parent", "moment fill (k=533, s42)": "fill_s42",
              "moment fill (k=533, s43)": "fill_s43", "default restart, same commit (k=533, s42)": "default_d303_s42",
              "default restart, same commit (k=533, s43)": "default_d303_s43",
-             "Muon lr damped (k=533, s42)": "muon_damped_s42", "Muon lr damped (k=533, s43)": "muon_damped_s43"}
+             "Muon lr damped (k=533, s42)": "muon_damped_s42", "Muon lr damped (k=533, s43)": "muon_damped_s43",
+             "AdamW lr damped (k=533, s42)": "adamw_damped_s42", "AdamW lr damped (k=533, s43)": "adamw_damped_s43",
+             "every group damped (k=533, s42)": "all_damped_s42", "every group damped (k=533, s43)": "all_damped_s43"}
     res = {short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}
     # step 8 (D303, design passed round 2 2026-11-06): Muon's share of the jump over steps 2-10,
     # m = ln(G_ctrl / G_arm) / ln(G_ctrl / G_all), G_ctrl the same-seed default restart, G_all trial_1860's window max
@@ -78,4 +84,20 @@ if __name__ == "__main__":
             res["muon_share"][s] = {"G_ctrl": ctrl, "G_arm": arm, "G_all": g_all,
                                     "m": math.log(ctrl / arm) / math.log(ctrl / g_all)}
         print("muon_share", res["muon_share"])
+    # step 9 (D303, step 8's NOT MUON branch): AdamW's share a = ln(G_ctrl / G_adamw) / ln(G_ctrl / G_both) and Muon's
+    # against the same reference, G_both the same-seed every-group-damped arm (same data stream); arm e's ratio to the
+    # control beside (the design's EVERY GROUP / NONE bar: below half the control's window max)
+    if g("all_damped_s42") or g("all_damped_s43"):
+        res["step9_share"] = {}
+        for s in ("s42", "s43"):
+            ctrl, ad, mu, both = (g("default_d303_" + s), g("adamw_damped_" + s), g("muon_damped_" + s),
+                                  g("all_damped_" + s))
+            if not (ctrl and both):
+                continue
+            den = math.log(ctrl / both)
+            res["step9_share"][s] = {"G_ctrl": ctrl, "G_adamw": ad, "G_muon": mu, "G_both": both,
+                                     "both_over_ctrl": both / ctrl,
+                                     "a": math.log(ctrl / ad) / den if ad and den else None,
+                                     "m_vs_both": math.log(ctrl / mu) / den if mu and den else None}
+        print("step9_share", res["step9_share"])
     print(json.dumps(res))
