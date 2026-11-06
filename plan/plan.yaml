@@ -14411,7 +14411,8 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
-    '7': 'step 6''s sweep ws_c1_k533_mse_wsd_hpo8 (ccin2p3): C2-C8 go with its tuned recipe once it ends'
+    '7': 'FA-ccin2p3-b2c69c1a f5245570 0202ba7f 7b2d6c24 4f9e0532 8cb6c7b5 f9c67e8a bfb41439: step 6 picks the restart recipe
+      C2-C8 use'
     '6': FA-ccin2p3-b2c69c1a FA-ccin2p3-f5245570 FA-ccin2p3-0202ba7f FA-ccin2p3-7b2d6c24 FA-ccin2p3-4f9e0532 FA-ccin2p3-8cb6c7b5
       FA-ccin2p3-f9c67e8a FA-ccin2p3-bfb41439
   handoff:
