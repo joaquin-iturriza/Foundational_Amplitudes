@@ -14811,6 +14811,17 @@ entries:
       longer pushed by it), data unchanged. Growth caches amp_mmap_cache/27a1422795e9872faa6b9eaf (prebuild) and 0c897ca2d81c98d3828e2808
       (built by the growth jobs themselves, read in their logs) NOT deleted: the rm through site run was refused by the auto-mode
       permission classifier; both are ours and rebuildable, about 18 GB each, 93 GB free on /sps/lpnhe.'
+  - at: '2026-11-06T09:36:33+00:00'
+    text: '2026-11-06 step 8 jump read (D303, design passed round 2 08:24; ws_restart_steps.py @579fa40f -> data/ws_restart_steps.json,
+      key muon_share): NOT MUON at both seeds. Window max grad norm over steps 2-10, damped Muon (FA-ccin2p3-35f9a8a5 s42,
+      a0416422 s43) against the same-commit default restart (0202ba7f/7b2d6c24): 1302 vs 994 (s42), 1486 vs 1334 (s43); everything-damped
+      reference 160 / 215 (scaled); m = ln(G_ctrl/G_arm)/ln(G_ctrl/G_all) = -0.148 (s42), -0.059 (s43), both below the 0.3
+      bar: damping Muon''s lr over the first 168 steps did not shrink the jump, it made it 31% / 11% larger. Pairing check
+      passed: steps 0/1 grad norms 16.38/10.95 vs 16.32/10.96 (s42), 8.20/113.3 vs 8.10/113.3 (s43). Worst training loss over
+      steps 2-10: -2.016 / -1.584 against the control''s -1.620 / -1.218, and over 0-39 -1.90 / -1.37 against -1.33 / -1.22
+      (the loss excursion is smaller although the grad norm peak is larger); final training loss -2.665 / -2.582 against -2.677
+      / -2.583. So the jump is AdamW''s share or the lr ramp of every group, not Muon''s. The zero-shot reads (C1u, which
+      decide the recipe for step 7) are still being written by the jobs (PP4 under way at 10:32).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
