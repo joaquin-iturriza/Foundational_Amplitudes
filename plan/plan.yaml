@@ -12741,9 +12741,6 @@ entries:
   decisions:
   - D282
   next:
-    5: '(a) D291: split each ws_c1_k533_hpo8 trial''s validation NLL into the 1/sigma^2-weighted squared-error term and the
-      log sigma term (and the mean''s plain MSE), show which term decides the ranking and whether the MSE alone ranks the
-      trials differently'
     6: '(b) D303 lead: what in the restart''s lr/schedule makes the warm runs'' validation loss behave as it does (default-lr
       warm start: val NLL -2.571 at step 10 rises to -1.926 at step 30 and ends -2.639 at 533; grown 8->16: starts -2.842,
       rises to -2.229 at 120 and ends -2.696 at 533, -2.779 at 1066, both worse than their start; 1066/2132 spike to 1e7 and
@@ -14006,11 +14003,6 @@ entries:
       or the lr itself; next an arm with Muon''s first steps damped (a longer warmup from a lower start), designed then. A
       run that blows up is listed apart.'
   step_why:
-    5:
-      feeds: why the val_loss_no_reg-tuned k=533 warm start went to low lr and lost on the held-out reads (D284 step 3)
-      if:
-      - 'MSE ranks like NLL: the het loss is not the cause; the objective''s in-distribution validation is'
-      - 'MSE ranks differently (high lr better): the sigma term drove the choice; tune on the mean''s MSE'
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
       if:
@@ -14275,7 +14267,6 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
-    '5': FA-ccin2p3-7a40c835
     '7': 'step 6''s sweep ws_c1_k533_mse_wsd_hpo8 (ccin2p3): C2-C8 go with its tuned recipe once it ends'
     '6': ccin2p3:ws_c1_k533_mse_wsd_hpo8
   handoff:
