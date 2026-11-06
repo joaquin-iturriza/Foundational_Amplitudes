@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -256,7 +256,9 @@ PY
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             ITERS_FIXED=4264
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
-    v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2)
+    # the beam ablation (catalog_coverage step 62, D295): the share 0.25 on the e+e- classes only (eeonly) or the
+    # hadronic classes only (pponly), every other class catalog-sampled; recipes catalog_v4_default25_<beam>_train.yaml
+    v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2)
                             CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4); HET=1
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
@@ -372,6 +374,16 @@ if [ -n "$SHORT_RERUN" ]; then
     [ -n "$SHORT_MEMMAP" ] && { echo "SHORT_RERUN and SHORT_MEMMAP are exclusive"; exit 1; }
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "SHORT_RERUN only on v4_het_default25[_seed2]"; exit 1 ;; esac
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_rerun"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_rerun"
+fi
+# SHORT_TAG=<tag> (catalog_coverage step 62, the beam ablation): the het share arms (control, default25 and its
+# eeonly/pponly beam arms) unchanged, in their own run dir <arm>_tag<tag>; the fixed "_tag" marker is in no arm name nor
+# in the SHORT_MEMMAP/SHORT_RERUN dirs, so a tag can never resolve to another run's dir
+if [ -n "$SHORT_TAG" ]; then
+    [ -n "$SHORT_MEMMAP$SHORT_RERUN$LONG_HEADS$LONG_FACTOR$LONG_LR" ] && { echo "SHORT_TAG excludes SHORT_MEMMAP, SHORT_RERUN and LONG_*"; exit 1; }
+    case "$SHORT_TAG" in *[!a-z0-9]*|"") echo "SHORT_TAG: lower-case letters and digits only"; exit 1 ;; esac
+    case "$ARM" in v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2) ;;
+        *) echo "SHORT_TAG only on the het control and the default25 share arms"; exit 1 ;; esac
+    OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_tag${SHORT_TAG}"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_tag${SHORT_TAG}"
 fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
 # LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; only the steps move: every cell trains on the whole train pool,

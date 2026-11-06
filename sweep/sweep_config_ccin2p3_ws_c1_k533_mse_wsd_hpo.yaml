@@ -10,8 +10,8 @@
 #     MSE best 0.0257), and the held-out reads followed the MSE (tuned 0.17x worse than untuned 1x, R PP4 1.19);
 # (2) the schedule is searched: CosineAnnealingLR or WSD (warmup, flat, (1-sqrt) cooldown over the last
 #     wsd_cooldown_frac in [0.1, 0.5]; Haegele et al. 2024 arXiv:2405.18392: 10-20% cooldown beats cosine).
-# 12 trials (hpo8's 8 for 8 HPs; two more HPs), waves [4, 4, 4]. Time per trial as hpo8's (0.45 h, limit 47 min):
-# 5.4 GPU-h.
+# 8 trials, 3 start-up, waves [3, 3, 2], as hpo8. Time per trial as hpo8's (0.45 h, limit 47 min):
+# 3.6 GPU-h.
 cluster:
   scheduler: slurm
   auto_submit: false
@@ -20,16 +20,16 @@ cluster:
   cpus_per_task: 5
   time: '00:47:00'
 paths: null
-sweep_name: ws_c1_k533_mse_wsd_hpo12
+sweep_name: ws_c1_k533_mse_wsd_hpo8
 base_config: ${PROJECT_DIR}/runs/catalog_v4_short/v4_het_warm25_k533
-n_trials: 12
+n_trials: 8
 dyhpo:
   surrogate: gp
   n_candidates: 2000
   objective_scale: auto      # the het NLL is signed
   seed: 42
   n_startup: 3
-  waves: [4, 4, 4]
+  waves: [3, 3, 2]
   total_budget: 10000
 fidelity_schedule:
   t_steps:

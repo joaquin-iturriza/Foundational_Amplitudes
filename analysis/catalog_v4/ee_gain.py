@@ -25,7 +25,15 @@ a measure-zero set for the catalog's draw; on pp sqrt(s_hat) is spread, partly c
   read_level   the per-class target level: log R against the control's own MSE of the class (does the default
          share help most where the control is worst, and is EE4 still ahead at matched control MSE)
          -> data/ee_gain_level.json
-    python3 analysis/catalog_v4/ee_gain.py pull | read | pull_kin | read_kin | read_level
+  beams   (step 62, D295: how could pp-beam data help e+e- events) what the default share contains per beam, from the
+         recipes alone: the training classes with a default source, split by the MadEvent pool their dsh_ entry reuses
+         (ee4_: e+e- at fixed collider energies; pp13v4_/pp13_: 13 TeV pp), their events per class (f_default x the
+         train_subsample of the short arms), the e+e- energies, whether a class's default events come from the same
+         generator setup as its EE4 test pool (cards, energies, model); then R (default25 over the het control,
+         mixture_ab.compare, MIX_HET runs) split four ways: EE4 and PP4 probes of trained classes (their own default
+         events in training) and of held-out classes (none of their own; only other classes' default events)
+         -> data/ee_gain_beams.json
+    python3 analysis/catalog_v4/ee_gain.py pull | read | pull_kin | read_kin | read_level | beams
 """
 import json, os, sys
 
@@ -289,5 +297,62 @@ def read_level():
     print(json.dumps(out))
 
 
+def beams():
+    import yaml
+    import mixture_ab as mab
+    R = os.path.join(ROOT, "recipes")
+    rec = yaml.safe_load(open(os.path.join(R, "catalog_v4_default25_train.yaml")))["processes"]
+    dsh = yaml.safe_load(open(os.path.join(R, "catalog_v4_default_processes.yaml")))["processes"]
+    ee4y = yaml.safe_load(open(os.path.join(R, "catalog_v4_ee_processes.yaml")))
+    ee4 = {k: {**v, "lhe": {**ee4y.get("lhe", {}), **v.get("lhe", {})}} for k, v in ee4y["processes"].items()}
+    sub = 10000                                    # the short arms' ++data.train_subsample (job_catalog_v3_short.sh)
+    beam_of = lambda src: "ee" if dsh[src]["reuse"].startswith("ee4_") else "pp"
+    out = {"design": "plan catalog_coverage step 62 (D295): the default share's content per beam and R split by beam "
+                     "and by whether the class's own default events were trained",
+           "recipe": "recipes/catalog_v4_default25_train.yaml", "train_classes": len(rec)}
+    by = {"ee": [], "pp": []}
+    for e in rec:
+        src = (e.get("sampling") or {}).get("default_source")
+        if src:
+            by[beam_of(src)].append((e, src))
+    n_all = len(rec) * sub
+    for b, lst in by.items():
+        f = sorted({x[0]["sampling"]["f_default"] for x in lst})
+        d = {"classes": len(lst), "f_default": f, "default_events_per_class_subsampled": int(f[0] * sub),
+             "default_events_total_subsampled": int(f[0] * sub * len(lst)),
+             "share_of_all_training_events": round(f[0] * sub * len(lst) / n_all, 4),
+             "catalog_sqrts_window_GeV": [min(x[0]["sqrts"][0] for x in lst), max(x[0]["sqrts"][1] for x in lst)]}
+        if b == "ee":
+            en = [tuple(dsh[s]["lhe"]["energies"]) for _, s in lst]
+            same = sum(1 for _, s in lst if dsh[s]["reuse"] in ee4 and all(
+                dsh[s]["lhe"].get(k) == ee4[dsh[s]["reuse"]]["lhe"].get(k)
+                for k in ("cards_dir", "run_card", "param_card", "model", "energies", "label_alphas"))
+                and dsh[s]["mg5_generate"] == ee4[dsh[s]["reuse"]]["mg5_generate"])
+            d.update(energies_GeV=sorted({x for t in en for x in t}),
+                     energies_per_class={str(k): v for k, v in sorted(
+                         {n: sum(1 for t in en if len(t) == n) for n in {len(t) for t in en}}.items())},
+                     same_generator_setup_as_its_EE4_pool=same)
+        else:
+            d["pools_reused"] = {k: sum(1 for _, s in lst if dsh[s]["reuse"].startswith(k + "_")) for k in ("pp13v4", "pp13")}
+        out[b] = d
+    out["classes_without_share"] = len(rec) - sum(len(v) for v in by.values())
+    trained = {x[0]["name"] for v in by.values() for x in v}
+    arm, ctl, cls = mab.MIX_HET["default25"], mab.MIX_HET["control"], mab.class_of()
+    out["runs"] = {"default25": arm, "control": ctl}
+    rs = {}
+    for ax in ("EE4", "PP4"):
+        a = [mab.read_of(r, ax) for r in arm[ax]]
+        c = [mab.read_of(r, ax) for r in ctl[ax]]
+        keys = set.intersection(*(set(x) for x in a + c))
+        for part, sel in (("trained", lambda p: cls(p) in trained), ("held_out", lambda p: cls(p) not in trained)):
+            k = sorted(p for p in keys if sel(p))
+            if k:
+                rs[f"{ax}_{part}"] = mab.compare(mab.side(a), mab.side(c), c[0], c[1], k, cls)
+    out["R_default25_over_control"] = rs
+    json.dump(out, open(os.path.join(DATA, "ee_gain_beams.json"), "w"), indent=1)
+    print(json.dumps(out))
+
+
 if __name__ == "__main__":
-    {"pull": pull, "read": read, "pull_kin": lambda: pull(kin=True), "read_kin": read_kin, "read_level": read_level}[sys.argv[1]]()
+    {"pull": pull, "read": read, "pull_kin": lambda: pull(kin=True), "read_kin": read_kin, "read_level": read_level,
+     "beams": beams}[sys.argv[1]]()

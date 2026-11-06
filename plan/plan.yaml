@@ -9382,9 +9382,9 @@ entries:
     agent: a8dc83fd21c2d8d4f
     state: working
     since: '2026-11-06T04:32:00+00:00'
-    state_at: '2026-11-06T04:44:10.675000+00:00'
-    context: 108495
-    context_at: '2026-11-06T04:44:47+00:00'
+    state_at: '2026-11-06T04:50:19+00:00'
+    context: 139489
+    context_at: '2026-11-06T04:49:05+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
@@ -10733,6 +10733,29 @@ entries:
       test_multichannel 5 pass. Check prepared: multichannel_check.py policy quota (scripts/job_multichannel_check.sh MCHECK_POLICIES=multichannel+quota
       MCHECK_SEED=42/43, 5 classes x 2 seeds = 10 CPU jobs), figure analysis/catalog_v4/fig_flat_quota.py; needs a passed
       design before submission.'
+  - at: '2026-11-06T04:51:03+00:00'
+    text: '(e) correction to the 2026-11-06 (e) finding: the lr exponent 0.55 of the drafted width x length map is NOT a measurement
+      from trial_1262''s two lrs. Both long sweeps'' lr windows were centred by tools/lr_surface_center.py with the fixed
+      slope -0.55 (prin:invU, HPO rule 2; centres 2.633e-3 at 17056, 1.228e-3 at 68224) and trial_1262 sits at the same normalized
+      position (0.9955, the window top) in both, so 7.82114e-3/3.649139e-3 = 4^0.55 by construction; that lr is censored at
+      the window top and not converged, so each cell''s lr is a lower bound on its optimum. Fixed on branch scaling-grid (11f6ddad
+      job script, 456b5233 epoch_count.py; LONG_FACTOR 1 refused under LONG_HP; short_wall.py --width with the measured per-width
+      V100 rates 31f0196d). CC-IN2P3 gpu QoS MaxWall 7-00:00:00 (sacctmgr, read 2026-11-06), so the 42-84 h cells fit without
+      a split.'
+  - at: '2026-11-06T04:51:09+00:00'
+    text: '(c) 2026-11-06 step 61 diagnosis (het_sign_diag.py pull/read over step 56''s job logs -> analysis/catalog_v4/data/het_sign_diag.json;
+      tool in the scratchpad until the repo-reviewer backlog gate clears, then committed): the het sign head is underweighted,
+      not failing to transfer. (1) The het loss''s main-block pre-clip gradient norm is 65-84x the MSE control''s (median
+      24-28 vs 0.315-0.369; seed geometric mean 75x), and the clip at 5 bounds 98.8-99.2% of het steps vs 5.5-6.0% of MSE
+      steps; adding the sign head does not move the het norm (arm 24.0-28.0 vs het magnitude reference 24.5-27.0), so at sign_loss_weight
+      1 the sign cross-entropy, whose per-event gradient is the same under both losses, is ~1/75 of the MSE control''s share
+      of the trunk gradient (an estimate: assumes the sign term a small part of both norms). (2) The het sign is worse in
+      distribution by the same factor as held out: wrong-sign arm/MSE on the 63 signed training pools'' validation 2.0x at
+      the median (1.0% vs 0.5%), 1.39x on the worst pool (13.4% vs 9.6%); held out H5 1.99x, HD5 1.41x. ''Fits the training
+      signs at 0.99'' hid that the MSE control fits them at 0.995. Fix implemented: training.sign_het_match (each event''s
+      sign BCE times the het NLL''s detached factor on its mu gradient, sigma^(2 beta)/(2 sigma^2), so the per-event sign:magnitude
+      gradient ratio is the MSE loss''s), commit 0e8bf38b on branch het-sign-weight (worktrees/wt-het-sign), test_het_sign_head
+      6 passed; not merged (repo-reviewer pending).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
@@ -11049,9 +11072,6 @@ entries:
       woke nothing). Look up (claude-code-guide, low effort) whether Claude Code offers a setting or hook to suppress or absorb
       a task-notification; try a Stop-hook route that holds the main turn''s end a few seconds when an agent handed back this
       turn and its notification has not arrived; test on the recorded double wakes (main_turns.py) and on a live agent end.'
-    16: 'After the repo-reviewer PASS on the current backlog: commit item 4 (tools/plan.py ask_matches, .claude/hooks/plan_check.py,
-      tests/test_plan_ask_matches.py; worker a9eb06278af98e7df) and remove the two dead keys in config/amplitudes.yaml (optimizer,
-      clip_grad_norm; same effective values, only key order changes: worker a7d5d29cd7e9d0753).'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -11286,11 +11306,6 @@ entries:
       if:
       - 'a route removes the second wake: keep it, re-measure after a day'
       - 'none works: say which were tried, with evidence'
-    16:
-      feeds: the repeated-question check fix and config hygiene Joaquin was told about on 2026-11-06
-      if:
-      - 'committed: drop this step'
-      - 'review FIX: apply the fixes first'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
@@ -11301,7 +11316,6 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '15': a day of live use of the registered notification hook (d2f7686d, 2026-11-04 ~22:00), then re-measure double wakes
       with main_turns.py
-    '16': the repo-reviewer a450d4efce9259486's verdict on the current code backlog
   owner:
     agent: a9eb06278af98e7df
     state: stopped
@@ -12293,8 +12307,8 @@ entries:
     state: working
     since: '2026-11-06T04:32:03+00:00'
     state_at: '2026-11-06T04:32:03+00:00'
-    context: 179135
-    context_at: '2026-11-06T04:44:14+00:00'
+    context: 226661
+    context_at: '2026-11-06T04:49:10+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
