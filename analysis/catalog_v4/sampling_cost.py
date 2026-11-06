@@ -233,7 +233,7 @@ def ee_fig():
     old = np.array([t[c]["old_all_s"] for c in EE_TEST]) / 3600
     new = np.array([t[c]["new_all_s"] for c in EE_TEST]) / 3600
     ax.bar(x - 0.2, old, 0.4, color=ps.C.grey, label="old sampling (as built)")
-    ax.bar(x + 0.2, new, 0.4, color=ps.C.vermillion, label="flat quota, budget 750")
+    ax.bar(x + 0.2, new, 0.4, color=ps.C.vermillion, label="flat quota, budget 750 (estimate: old x train-replay ratio)")
     for i, c in enumerate(EE_TEST):
         ax.text(x[i] + 0.2, new[i] * 1.3, f"{t[c]['ratio']:.0f}x", ha="center", fontsize=6)
     ax.set_yscale("log"); ax.set_ylim(top=new.max() * 8)
@@ -249,9 +249,15 @@ def ee_fig():
                 edgecolor="white" if b[k]["ratio_measured"] else ps.C.vermillion,
                 alpha=1.0 if b[k]["ratio_measured"] else 0.5)
         ax2.text(x2[i] + 0.2, n2[i] * 1.3, f"{n2[i]:.0f}", ha="center", fontsize=6)
-    ax2.set_yscale("log"); ax2.set_ylim(top=n2.max() * 8)
+    ax2.set_yscale("log"); ax2.set_ylim(top=n2.max() * 60)
     ax2.set_xticks(x2); ax2.set_xticklabels([f"{k} finals\n({b[k]['classes']})" for k in ks], fontsize=6)
     ax2.set_ylabel("core-hours, e+e- classes")
+    from matplotlib.patches import Patch
+    ax2.legend(handles=[Patch(facecolor=ps.C.grey, label="old (measured)"),
+                        Patch(facecolor=ps.C.vermillion,
+                              label="new, upper-side estimate:\nlargest measured ratio at that final count"),
+                        Patch(facecolor=ps.C.vermillion, alpha=0.5, hatch="///", edgecolor=ps.C.vermillion,
+                              label="count not measured: largest of all four")], loc="upper left", fontsize=5)
     ps.save(fig, os.path.join(HERE, "figs", "sampling_cost_ee"))
 
 
