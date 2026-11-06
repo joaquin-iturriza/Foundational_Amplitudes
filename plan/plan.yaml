@@ -15014,6 +15014,18 @@ entries:
       default growth''s same-seed score (e046ac67: 0.535, ws_objective_check.py score) the sweep found nothing and no re-run
       is made (NOT BETTER). A trial that blows up is listed apart with where; a trial whose read fails is a failed trial (DyHPO
       reuses the slot).'
+    passed_at: '2026-11-06T10:54:34+00:00'
+    reviewer: 'Round 2 of step 11 (the growth''s zero-shot-objective sweep). Matched control: e046ac67/f35b6a78 from the same
+      base config, only the searched HPs move. Measure: score_HD4 has the reads'' sign on every resolved comparison (r 0.94/0.92
+      selection, 0.97/0.98 check), growth hp_1333 over default +0.084/+0.157 in ln (corrected). Spread: 0.011-0.022 ln at
+      one seed, up to 0.15 between seeds, so the gate is same-seed (e046ac67 0.535). Two seeds against C10wm''s intervals
+      ([1.021,1.097] on PP4). 8 trials, 3 start-up, waves [3,3,2], as both sibling sweeps. Cache: a CPU prebuild (scripts/job_mmap_prebuild.sh
+      on the base run''s config) goes before the sweep, and the sweep goes only after it ends with rc 0. Disk: 28 GB against
+      87-88 GB free (my df read the same day), and step 7''s jobs build no cache. The new re-run arm (GROW_HP/GROW_SWEEP)
+      is reviewed before the re-runs. Finish about 1.7 h after the prebuild. k=533 rests on D284. Searched results.tex, the
+      entry and site decisions for: zero-shot objective, zero_shot_score, zero_shot_objective, objective.*zero, growth sweep,
+      grow.*sweep, sweep.*grow, HD4, proxy objective, held-out.*objective. Only the sign-head search came up (a val-loss objective),
+      already named in the prior.'
   step_why:
     9:
       feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
