@@ -176,8 +176,78 @@ def result_fields(res):
     return (v if name == "val_loss" else None), name, v
 
 
+def zero_shot_score(lines, classes):
+    """(score, per-probe MSE) from tools/zero_shot_parent.py's stdout: every ZERO_SHOT record must carry a finite
+    mse_logm2_real with its physics check ok (or allowed), else ValueError (a partial read would be another objective).
+    score: the geometric mean over classes of the class geometric mean of the probes' MSE of log|M|^2 (`classes`:
+    {probe: class}; a probe not in it is its own class). warm_start step 11 (analysis/catalog_v4/ws_objective_check.py,
+    score_HD4): this form of the read tracks the deciding PP4/EE4 reads across restarts, r 0.94/0.92 and 0.97/0.98."""
+    mse, bad = {}, {}
+    for line in lines:
+        if not line.startswith("ZERO_SHOT "):
+            continue
+        d = json.loads(line[len("ZERO_SHOT "):])
+        p, x = d.get("probe") or "?", d.get("mse_logm2_real")
+        st = (d.get("physics") or {}).get("status", "unchecked")
+        if "error" in d or x is None or not math.isfinite(x) or st not in ("ok", "allowed"):
+            bad[p] = d.get("error") or f"mse {x}, physics {st}"
+        else:
+            mse[p] = float(x)
+    if bad or not mse:
+        raise ValueError(f"zero-shot objective: {len(bad)} probes unread ({dict(list(bad.items())[:3])}), {len(mse)} read")
+    by = {}
+    for p, x in mse.items():
+        by.setdefault(classes.get(p, p), []).append(math.log(x))
+    return math.exp(float(np.mean([np.mean(v) for v in by.values()]))), mse
+
+
+def _probe_classes(project_dir):
+    """{probe: class} for the catalog_v4 probe names (prefix_<process>): the class of v4_<process> in
+    analysis/catalog_v4/census_classes.json (mixture_ab.class_of)"""
+    c = json.load(open(os.path.join(project_dir, "analysis", "catalog_v4", "census_classes.json")))["classes"]
+    m = {x: rep for rep, members in c.items() for x in members}
+    return lambda probe: m.get("v4_" + probe.split("_", 1)[1], "v4_" + probe.split("_", 1)[1])
+
+
+def _zero_shot_objective(zs, run_dir, project_dir):
+    """The trial's final model read zero-shot on `zs["recipe"]` (every probe, its `split`, default test) with
+    tools/zero_shot_parent.py, as the job scripts read an axis: one recipe file per probe, --signed-magnitude.
+    Returns {"score", "n_probes", "recipe", "split"}; the per-probe MSE goes to <run_dir>/zero_shot_objective.json."""
+    import tempfile
+    rec = yaml.safe_load(open(os.path.join(project_dir, zs["recipe"])))
+    top = {k: v for k, v in rec.items() if k != "processes"}
+    split = zs.get("split", "test")
+    with tempfile.TemporaryDirectory(prefix="zz_zs_objective_", dir=os.environ.get("SCRATCH")) as tmp:
+        files = []
+        for pr in rec["processes"]:
+            f = os.path.join(tmp, pr["name"] + ".yaml")
+            yaml.safe_dump({**top, "processes": [pr]}, open(f, "w"))
+            files.append(f)
+        cmd = [sys.executable, os.path.join(project_dir, "tools", "zero_shot_parent.py"), "--parent", run_dir,
+               "--split", split, "--eval-subsample", str(zs.get("eval_subsample", 2000)), "--signed-magnitude"] + files
+        print(f"[run_trial] zero-shot objective: {len(files)} probes of {zs['recipe']} ({split})", flush=True)
+        proc = subprocess.run(cmd, cwd=project_dir, capture_output=True, text=True)
+    sys.stdout.write("".join(l + "\n" for l in proc.stdout.splitlines() if l.startswith("ZERO_SHOT ")))
+    if proc.returncode != 0:
+        raise RuntimeError(f"zero_shot_parent.py exited {proc.returncode}: {proc.stderr[-800:]}")
+    cls = _probe_classes(project_dir)
+    lines = proc.stdout.splitlines()
+    probes = [json.loads(l[len("ZERO_SHOT "):]).get("probe") for l in lines if l.startswith("ZERO_SHOT ")]
+    score, mse = zero_shot_score(lines, {p: cls(p) for p in probes if p})
+    if len(mse) != len(files):
+        raise ValueError(f"zero-shot objective: {len(mse)} of {len(files)} probes read")
+    out = {"score": score, "n_probes": len(mse), "recipe": zs["recipe"], "split": split}
+    json.dump(dict(out, mse=mse), open(os.path.join(run_dir, "zero_shot_objective.json"), "w"), indent=0)
+    return out
+
+
 def _check_objective(cfg):
-    """val_total weighs the sign cross-entropy by training.sign_loss_weight: searched, DyHPO would drive it to 0."""
+    """val_total weighs the sign cross-entropy by training.sign_loss_weight: searched, DyHPO would drive it to 0.
+    zero_shot_score is the zero-shot read's score: it needs its zero_shot_objective block, and the block its objective."""
+    if (cfg.get("objective") == "zero_shot_score") != bool(cfg.get("zero_shot_objective")):
+        raise ValueError("objective zero_shot_score and a zero_shot_objective block go together")
+    if cfg.get("zero_shot_objective") and cfg.get("cells"):
+        raise ValueError("zero_shot_objective with cells: not implemented")
     if cfg.get("objective") == "val_total":
         searched = {e["name"] for e in cfg.get("search_space", [])}
         if "training.sign_loss_weight" in searched:
@@ -509,6 +579,14 @@ def main():
 
             with open(result_path) as f:
                 result = json.load(f)
+            # zero_shot_objective: {recipe, split, eval_subsample}: the trial's model read zero-shot on a held-out set
+            # (before _drop_last_model), its score the result's zero_shot_score (objective: zero_shot_score)
+            if cfg.get("zero_shot_objective"):
+                zs = _zero_shot_objective(cfg["zero_shot_objective"], run_dir, project_dir)
+                result["zero_shot_score"] = zs["score"]
+                result["zero_shot"] = zs
+                with open(result_path, "w") as f:
+                    json.dump(result, f, indent=2)
             # the objective DyHPO observes (val_loss_no_reg unless the config names another key) and, separately,
             # the best checkpoint's val_loss_no_reg: each reported under its own name, never one in the other's field
             obj_value       = _objective_value(cfg, result)
