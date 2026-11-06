@@ -1255,6 +1255,8 @@ class BaseExperiment:
                       "best_step": int(smallest_val_loss_step) + 1,
                       "validate_every": int(self.cfg.training.validate_every_n_steps),
                       "val_curve": [float(x) for x in self.val_loss_no_reg]}
+            if getattr(self, "moment_fill", None) is not None:
+                result["moment_fill"] = dict(self.moment_fill)
             if getattr(self, "val_loss_step0", None) is not None:
                 # a fine-tune's validation before any update (the parent's weights): not a checkpoint candidate
                 result["val_loss_step0"] = float(self.val_loss_step0)
@@ -1603,8 +1605,12 @@ class BaseExperiment:
                     self._per_process_step_grads(data)
                 else:
                     loss, _, _ = self._batch_loss(data)
+                    if self.ewc is not None:          # the gradient training will take, as _step
+                        loss = loss + (self.cfg.fine_tune.ewc.get("lambda", 1000.0) / 2.0) * self.ewc.penalty(self.model)
                     self.optimizer.zero_grad()
                     loss.backward()
+                if self.cfg.training.clip_grad_value is not None:
+                    torch.nn.utils.clip_grad_value_(self.model.parameters(), self.cfg.training.clip_grad_value)
                 gn = torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.cfg.training.clip_grad_norm,
                                                     error_if_nonfinite=False)
                 if not torch.isfinite(gn):
@@ -1619,6 +1625,9 @@ class BaseExperiment:
         LOGGER.info(f"MOMENT_FILL {taken}/{n} optimizer steps at lr 0 before training (weights moved by at most "
                     f"{moved:.3g})")
         self.moment_fill = {"asked": n, "taken": taken, "max_weight_change": moved}
+        if moved != 0.0:      # an optimizer whose lr-0 step is not a no-op (e.g. ScheduleFree's averaging)
+            raise RuntimeError(f"moment fill changed the starting weights by {moved:.3g}: "
+                               f"{type(self.optimizer).__name__} does not stand still at lr 0")
 
     def _step(self, data, step):
         # actual update step
