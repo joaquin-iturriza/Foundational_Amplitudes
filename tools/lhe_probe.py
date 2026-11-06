@@ -487,6 +487,13 @@ def cmd_run(a):
             res["s_per_kept_event"] = round(res["s_generate"] / (len(m) * k), 4) if len(m) and k else None
         else:
             res["events_returned"] = 0
+        # the beam settings MadEvent ran with, read back from the run's banner (an e+e- spectrum not passed on to the
+        # Fortran shows here: lpp, pdlabel and the per-beam pdlabel1/pdlabel2)
+        bs = sorted(glob.glob(f"{ev}/Events/probe/*_banner.txt"))
+        if bs:
+            bt = open(bs[0], errors="replace").read()
+            res["beam_card"] = {k: v for v, k in re.findall(r"^\s*(\S+)\s*=\s*(lpp1|lpp2|pdlabel|pdlabel1|pdlabel2)\b",
+                                                            bt, flags=re.M)}
         txt = open(log).read()
         res["fail_to_reach_target"] = "fail to reach target" in txt
         res["second_refine_skipped"] = "No need for second refine" in txt

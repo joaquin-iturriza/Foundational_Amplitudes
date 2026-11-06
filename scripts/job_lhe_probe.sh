@@ -23,14 +23,18 @@ fi
 if [ "$PROBE_SHARD" = eeisr ]; then
     # the e+e- collider anchor's probe (catalog_coverage step 71): one MadEvent run of PROBE_PROCESS at collider energy
     # PROBE_ENERGY with the machine's ISR (+ beamstrahlung) spectrum (lhe_probe run --ee-isr) beside the same run
-    # without it (the ee4_ pools' setting), on two cores in parallel; PROBE_EVENTS events each (default 1000)
-    for v in isr none; do
-        F=; [ $v = isr ] && F=--ee-isr
+    # without it (the ee4_ pools' setting), in parallel; PROBE_EVENTS events each (default 1000)
+    # at an energy whose spectrum adds beamstrahlung (EE_ANCHOR not isronlyll), a third run with ISR alone (same
+    # class, energy and seed), so the beamstrahlung part is seen apart from the ISR one; one core per run
+    PD=$(python -c "import sys; sys.path.insert(0, 'recipes'); import gen_catalog_v4_default as g; print(g.EE_ANCHOR[float(sys.argv[1])])" "${PROBE_ENERGY:?}")
+    V="isr none"; [ "$PD" != isronlyll ] && V="isr none isronly"
+    for v in $V; do
+        F=; [ $v = isr ] && F=--ee-isr; [ $v = isronly ] && F="--ee-isr --patch pdlabel=isronlyll"
         python tools/lhe_probe.py run --process "${PROBE_PROCESS:?}" --energy "${PROBE_ENERGY:?}" \
             --events "${PROBE_EVENTS:-1000}" $F > "eeisr_${PROBE_ENERGY}_$v.log" 2>&1 &
     done
     wait
-    grep -h PROBE_JSON eeisr_${PROBE_ENERGY}_isr.log eeisr_${PROBE_ENERGY}_none.log | sed "s/^PROBE_JSON /EEISR_JSON /"
+    for v in $V; do grep -h PROBE_JSON "eeisr_${PROBE_ENERGY}_$v.log" | sed "s/^PROBE_JSON /EEISR_JSON $v /"; done
     rm -f eeisr_${PROBE_ENERGY}_*.log
     echo "RUN_SUMMARY lhe_probe eeisr rc=$?"; exit 0
 fi
