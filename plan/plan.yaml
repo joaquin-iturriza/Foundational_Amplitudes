@@ -14460,6 +14460,7 @@ entries:
     '7': 'FA-ccin2p3-b2c69c1a f5245570 0202ba7f 7b2d6c24 4f9e0532 8cb6c7b5 f9c67e8a bfb41439: step 6 picks the restart recipe
       C2-C8 use'
     '6': FA-ccin2p3-4f9e0532 FA-ccin2p3-8cb6c7b5 FA-ccin2p3-31359864 FA-ccin2p3-bfed460f
+    '8': 'FA-ccin2p3-4f9e0532 8cb6c7b5: the tuned confirmation sets the base recipe'
   handoff:
     state: 'Step 6 in flight; step 6 waits on 8 runs (one RUN_DONE). (i) Moment fill (D303, design passed round 2 2026-11-06T05:40):
       fill FA-ccin2p3-b2c69c1a (s42), f5245570 (s43) vs same-commit default restart 0202ba7f (s42), 7b2d6c24 (s43). Read:
