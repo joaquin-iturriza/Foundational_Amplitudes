@@ -9720,6 +9720,49 @@ entries:
       max short) leads to regeneration, but D270 asked for ''the range the pp beams cover, but wider'', so a NEAR result goes
       to Joaquin with the margin fill shown, not absorbed. Searched docs/results.tex for ladder, multiperipheral, mperi, quota,
       both ladders; decisions D269 D270 D294: no prior run with both ladders.'
+  - at: '2026-11-06T20:17:32+00:00'
+    question: 'Step (f) (Joaquin 2026-11-06 ~19:50 ''If I asked for pp sampled data, why would you produce e+e- datasets that
+      are different in any way?''; D294''s rule on every beam): on e+e- classes, does the new flat-quota sampling (both ladders,
+      sampling.mc_mperi_both + mc_res2, at flat_budget 750 and 50) fill every 0.25-dex bin of the class''s own default-sampled
+      log|M|^2 range (+-0.5 dex) and leave no held-out default e+e- event outside the kept range, and what does it cost against
+      the old sampling? Feeds step 65''s regeneration design (which classes, at what CPU cost) and the total cost shown to
+      Joaquin.'
+    prior: 'Steps 65-67 on the five pp test classes (data/multichannel_check.json, quota_coverage.json @686c3241): at budget
+      750 with both ladders every in-range bin >= 0.95 on all five, held-out outside kept 1/1 on the ladder classes; cost
+      2.4x-162x the old (sampling_cost.py @08e3091e). e+e- side: par:v4_ee_mechanism (EE4 test median log10|M|^2 4.13 dex
+      above the catalog''s); ee_support_reads.json @3c9b4b2d: the default events'' max above the catalog''s by a median 0.77
+      dex, share above the catalog max up to 0.27 (taptamvevex). Searched docs/results.tex (quota, ladder, e+e- flat range,
+      ee_support), decisions D269 D270 D294 D295: no quota replay of any e+e- class.'
+    measure: 'As step 67 (multichannel_check.py summary/coverage), per class, seed and policy: fill_per_bin = sum over chunks
+      of min(kept, quota) / sum quota per 0.25-dex bin, split into bins inside the class''s default in-support range and the
+      +0.5-dex margin bins; quota shortfall share; held-out default events (the EE4 test pool, 2000 events at the fixed energies,
+      never read for the range) in support but outside the kept [min, max], count with 3/N; above_max of the table source
+      (dsh pool); chunks stopped at the budget or no_steer; seconds per train-pool replay (all chunks, one core). Cost = replay
+      seconds, budget-750 against current (the old sampling, timed in the same job) and against the generation-log time.'
+    check: 'The measure moves with the sampling on existing data: steps 66-67 on the pp classes, fill at uu_bbxuu 3.96 0.04
+      -> 1.00 between ladders at one budget and 0.04 -> 0.49 for 10x budget, seed spread <= 0.02; on e+e- the old catalog
+      pool leaves 0.27 / 0.26 / 0.22 / 0.10 of the four classes'' default events above its max (ee_support_reads.json logm_above),
+      which the current policy in the same job reproduces and the quota policies are judged against.'
+    fixed: 'Classes (EE_CLASSES, chosen as the pp five were, the worst by share above the catalog max): v4_epem_taptamvevex,
+      v4_epem_bbxvevex (its d and c flavour copies left out), v4_epem_ahvevex (4 finals), v4_epem_vmvmxz (3 finals, largest
+      share among 3-final). Each class''s catalog_v4 train entry and chunk plan, oversample 6, bin 0.25 dex, margin 0.5 dex,
+      range table recipes/catalog_v4_flat_range.json @3c9b4b2d (e+e- range from the dsh_ default-share pool alone); channels
+      as step 67; code trunk @3c9b4b2d synced to CC; scripts/job_multichannel_check.sh with MCHECK_POLICIES=current+multichannel+quota_ladder_both_res2+quota_ladder_both_res2_budget750,
+      CC htc CPU, 1 core, 8G; limit from multichannel_check.py need (no read of these classes: old train time from the generation
+      logs x the largest measured ratio per policy, 1.0/1.2/13.9/164.8, x1.5): taptamvevex 02:30, bbxvevex 02:40, ahvevex
+      02:20, vmvmxz 02:10; wall target 1.7 h (6136 s need, the largest).'
+    control: Within each job the old sampling (current) and plain multichannel on the same class, seed, node and commit; budget
+      50 against 750 differ only in the budget. The pp five of step 67 are the reference for what a pass looks like.
+    seeds: 42 and 43 on every class (8 jobs), as the sibling pp classes of step 67.
+    outcome: 'Definitions as step 67, fixed before the run: a bin is IN RANGE when its lower edge <= the class''s default
+      in-support max (range table max minus 0.5 dex), MARGIN above; held-out outside kept RESOLVED at <= 2 of 2000? no: at
+      2000 events 3/N = 1.5e-3, so RESOLVED = 0 events outside, SHORT at >= 1. YES = RESOLVED, every in-range bin >= 0.95
+      on both seeds, no no_steer stop: the e+e- classes go into step 65''s regeneration at budget 750 with their measured
+      cost ratio. NEAR = YES but margin bins short: as YES, margin fill reported to Joaquin with the hadronic one. SHORT =
+      an in-range bin < 0.95 or a held-out event outside: where reads of that bin (multichannel_check where) on the short
+      class, the e+e- channel set examined next (no budget raise without its own read). Cost: budget-750 seconds / current
+      seconds per class, the e+e- ratio used in the total for the 169 e+e- classes. 8 CPU jobs, 1 core, <= 1.7 h each, no
+      GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
