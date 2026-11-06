@@ -418,8 +418,9 @@ def ablation():
                                   "hurts (ln R_pp >= 2s)" if all(x >= 2 * s for x in pp) else "between")
     # PP4 with the roles swapped: is the PP4 gain the pp default events themselves, does e+e- data help pp
     pe, pf, pe_ee = lnR("pponly", "PP4_trained"), lnR("full", "PP4_trained"), lnR("eeonly", "PP4_trained")
+    cross_pp = any(all(x <= -2 * s for x in lnR("eeonly", part)) for part in ("PP4_trained", "PP4_held_out"))
     out["outcome_PP4"] = ("PP OWN EVENTS" if all(abs(a - b) <= s for a, b in zip(pe, pf)) and all(x > -s for x in pe_ee)
-                          else "CROSS-BEAM" if all(x <= -2 * s for x in pe_ee) else "UNRESOLVED")
+                          and not cross_pp else "CROSS-BEAM" if cross_pp else "UNRESOLVED")
     out["additivity"] = {part: {"ln_R_full": round(float(np.log(out["R"]["full"][part]["R"])), 4),
                                 "ln_R_ee_plus_ln_R_pp": round(float(np.log(out["R"]["eeonly"][part]["R"]) +
                                                                     np.log(out["R"]["pponly"][part]["R"])), 4)}
