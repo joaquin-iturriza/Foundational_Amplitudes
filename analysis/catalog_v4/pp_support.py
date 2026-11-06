@@ -224,6 +224,9 @@ def one(task):
             "part_eta_max": float(part_max_eta.max()) if slots else None,
             "outside_any": float(np.mean(~sup)),
             "logm_min": float(lm[fin].min()), "logm_max": float(lm[fin].max()),
+            # the in-support range (sqrt(s_hat) in the window and the catalog's cuts passed): tools/flat_range.py's range
+            "logm_min_in_support": float(lm[fin & sup].min()) if (fin & sup).any() else None,
+            "logm_max_in_support": float(lm[fin & sup].max()) if (fin & sup).any() else None,
             "logm_below": float(np.mean(lm[fin] < r["catalog"]["logm_min"])),
             "logm_above": float(np.mean(lm[fin] > r["catalog"]["logm_max"])),
             "logm_below_in_support": float(np.mean(lm[fin & sup] < r["catalog"]["logm_min"])) if (fin & sup).any() else None,
@@ -255,7 +258,10 @@ def pull(workers=8, limit=None):
     cmd = (f"F=$(mktemp /tmp/zz_probe_ppsup_XXXXXX.py); J=$(mktemp /tmp/zz_probe_ppsup_XXXXXX.json); cat > $F <<'PYEOF'\n{REMOTE}PYEOF\n"
            f"cat > $J <<'JEOF'\n{json.dumps(tasks)}\nJEOF\n"
            f"python3 $F $J {workers}; rm -f $F $J")
-    res = subprocess.run(["site", "--timeout", "3000", "run", "--item", "catalog_coverage", "ccin2p3", "FA", "--", cmd],
+    # the read's code goes inline (REMOTE), so a site checkout behind trunk only matters through mg5_pipeline_final's
+    # cut mask, which the read imports from it: --allow-stale, and the site commit is printed in the read's log
+    res = subprocess.run(["site", "--timeout", "3000", "run", "--item", "catalog_coverage", "ccin2p3", "FA", "--allow-stale",
+                          "--", cmd],
                          capture_output=True, text=True, timeout=3100)
     line = [l for l in res.stdout.splitlines() if l.startswith("PPSUP ")]
     if not line:
