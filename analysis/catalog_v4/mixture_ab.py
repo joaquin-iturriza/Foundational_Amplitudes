@@ -1403,6 +1403,12 @@ def loader():
     print(json.dumps(res))
 
 
+# step 14's prior (D319): the share-0.50 warm starts (C2's W_k, seeds 42 and 43) read against the share-0.25 change
+# from scratch (C1's B) and over C1's share-0.25 warm start at the same k: a richer retraining mixture toward the C1
+# change; C_k as C1 (share 0)
+WARM["C1s50"] = {"W": dict(WARM["C2"]["W"]), "C": WARM["C1"]["C"], "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+                 "ref": {"share25_k533": WARM["C1"]["W"][533]}, "deciding": ("PP4", "EE4"),
+                 "design": "plan warm_start step 14 prior (D319): C2's share-0.50 warm starts against C1's B"}
 # step 14 (D319; single seed, D315): warm starts toward the C1 change (share 0.25, het, k=533) at seed 42, each read
 # against the same-commit default restart (v4_het_wsx_default_rerun) on the seed-42 class ratios; the study's runs are
 # filled at submission ("" = not submitted). Arms of scripts/job_catalog_v3_short.sh v4_het_wsx_*; the share-0.50
