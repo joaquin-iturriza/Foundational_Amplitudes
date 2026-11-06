@@ -1,0 +1,60 @@
+{
+ "class": "v4_udx_csxvevex",
+ "files": [
+  "pp13_udx_csxvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+  "dsh_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+  "dsh_udx_csxvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+  "dsh_udx_csxvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+ ],
+ "cut_log10": 0.865,
+ "window": [
+  20.0,
+  6000.0
+ ],
+ "n": {
+  "above": 0,
+  "below": 54001
+ },
+ "quantiles_10_50_90": {
+  "sqrts_over_lo": {
+   "above": null,
+   "below": [
+    9.9857,
+    13.8588,
+    25.867
+   ]
+  },
+  "max_abs_eta": {
+   "above": null,
+   "below": [
+    0.6095,
+    1.2935,
+    2.2567
+   ]
+  },
+  "min_pt": {
+   "above": null,
+   "below": [
+    15.3941,
+    28.3272,
+    43.2938
+   ]
+  },
+  "min_dR": {
+   "above": null,
+   "below": [
+    1.558,
+    2.5711,
+    3.2441
+   ]
+  },
+  "min_pair_mass_over_sqrts": {
+   "above": null,
+   "below": [
+    0.0713,
+    0.1631,
+    0.2689
+   ]
+  }
+ }
+}

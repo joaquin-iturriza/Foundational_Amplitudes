@@ -1,0 +1,92 @@
+{
+ "class": "v4_uux_epemvevex",
+ "files": [
+  "pp13_uux_epemvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+  "dsh_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+  "dsh_uux_epemvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+  "dsh_uux_epemvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+ ],
+ "cut_log10": -3.4,
+ "window": [
+  20.0,
+  6000.0
+ ],
+ "n": {
+  "above": 6582,
+  "below": 47419
+ },
+ "quantiles_10_50_90": {
+  "sqrts_over_lo": {
+   "above": [
+    10.9515,
+    16.9224,
+    32.3328
+   ],
+   "below": [
+    8.6458,
+    11.0925,
+    19.1263
+   ]
+  },
+  "max_abs_eta": {
+   "above": [
+    0.3961,
+    0.9982,
+    1.9439
+   ],
+   "below": [
+    0.3033,
+    0.8106,
+    1.5837
+   ]
+  },
+  "min_pt": {
+   "above": [
+    13.4343,
+    23.0113,
+    33.5325
+   ],
+   "below": [
+    14.7229,
+    27.3293,
+    50.4422
+   ]
+  },
+  "min_dR": {
+   "above": [
+    1.1994,
+    2.5304,
+    3.6788
+   ],
+   "below": [
+    1.1671,
+    2.4812,
+    3.2461
+   ]
+  },
+  "min_pair_mass_over_sqrts": {
+   "above": [
+    0.0671,
+    0.1396,
+    0.234
+   ],
+   "below": [
+    0.0775,
+    0.1737,
+    0.2787
+   ]
+  },
+  "n_pairs_near_Z_or_W": {
+   "above": [
+    2.0,
+    2.0,
+    3.0
+   ],
+   "below": [
+    1.0,
+    2.0,
+    3.0
+   ]
+  }
+ }
+}

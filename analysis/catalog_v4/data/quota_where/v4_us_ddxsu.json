@@ -1,0 +1,80 @@
+{
+ "class": "v4_us_ddxsu",
+ "files": [
+  "pp13v4_us_ddxsu_13000-13000GeV_val_lhe_amplitudes.npy",
+  "dsh_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+  "dsh_us_ddxsu_13000-13000GeV_val_lhe_amplitudes.npy",
+  "dsh_us_ddxsu_13000-13000GeV_test_lhe_amplitudes.npy"
+ ],
+ "cut_log10": 3.2658,
+ "window": [
+  40.0,
+  6000.0
+ ],
+ "n": {
+  "above": 401,
+  "below": 53456
+ },
+ "quantiles_10_50_90": {
+  "sqrts_over_lo": {
+   "above": [
+    20.214,
+    31.7747,
+    49.9445
+   ],
+   "below": [
+    3.0373,
+    7.6756,
+    21.7522
+   ]
+  },
+  "max_abs_eta": {
+   "above": [
+    4.0538,
+    4.5753,
+    4.8948
+   ],
+   "below": [
+    1.4475,
+    2.6554,
+    3.8608
+   ]
+  },
+  "min_pt": {
+   "above": [
+    10.1509,
+    10.8847,
+    12.792
+   ],
+   "below": [
+    10.3075,
+    12.0994,
+    18.2893
+   ]
+  },
+  "min_dR": {
+   "above": [
+    0.4535,
+    0.8465,
+    2.9618
+   ],
+   "below": [
+    0.5506,
+    1.4074,
+    2.5924
+   ]
+  },
+  "min_pair_mass_over_sqrts": {
+   "above": [
+    0.0047,
+    0.0093,
+    0.0261
+   ],
+   "below": [
+    0.0235,
+    0.0754,
+    0.1796
+   ]
+  }
+ }
+}
