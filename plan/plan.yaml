@@ -13103,6 +13103,7 @@ entries:
   searched: agent permission refusals are the user's to clear
   blocks: steps 18 and 19
   blocks_steps: *id002
+  checked_until: '2026-11-06T18:46:56+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
