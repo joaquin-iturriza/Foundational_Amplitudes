@@ -12263,10 +12263,6 @@ entries:
     7: '(c) D283: C2-C6 and C8 with the tuned recipe from (b), after (b); estimate to the main session first if above 30 GPU-h'
     8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
       validation loss curves side by side, and each arm''s per-class zero-shot MSE'
-    9: 'Joaquin 2026-11-06 04:28, owner ada4972586c3395af: (a) split the tuning trials'' validation loss into the MSE/sigma^2
-      and log sigma terms to test the het.-loss claim; (b) tune the warm start toward the held-out reads (objective, extension,
-      WSD cooldown), apply to the data change and width growth; (c) C2-C8 (approved D283) with the tuned recipe, estimate
-      to the main session if >30 GPU-h; (d) figures for the checkpoint, tuned and growth results.'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -13411,11 +13407,6 @@ entries:
       if:
       - 'drawn: committed png+pdf, referenced in results.tex'
       - 'a curve missing locally: fetch it from the site'
-    9:
-      feeds: 'Joaquin''s 11-06 decision: tune warm starts before concluding'
-      if:
-      - 'done: reported with figures'
-      - 'blocked: the owner says why'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
