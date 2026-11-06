@@ -15693,6 +15693,12 @@ entries:
       is not in results). Best 0.476 is below the default growth''s same-seed 0.535 (ln -0.117, beyond the 0.011-0.022 same-seed
       spread): the design''s re-run branch. Five trials sit within 0.476-0.481, so the bar is cleared by a plateau, not one
       point.'
+  - at: '2026-11-06T16:34:42+00:00'
+    text: '2026-11-06: step 11 re-runs submitted at the sweep''s best trial hp1860 (lr_scale 0.181, layer_decay 0.899, muon_wd
+      0.0457, reg 5.8e-8, warmup 0.148, eta_min 3.3e-8, ema on 0.956, WSD cooldown 0.110; read from runs/ws_grow_k533_zeroshot_hpo8_rerun/trial_1860/config.yaml
+      by tools/sweep_trial_hps.py): FA-ccin2p3-4442e786 (s42), 3fae7799 (s43), scripts/job_catalog_v3_short.sh @6454ecda,
+      both RUNNING, V3_WALL 2.38 h within 02:30; site pick 2 jobs on ccin2p3 (~1.2 h), 77 GB free on /sps/lpnhe; plan wait
+      step 11 on both. Read entry C10wz and plot option --growth-zs at bffb6f13.'
   step_waits: {}
   handoff:
     state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
