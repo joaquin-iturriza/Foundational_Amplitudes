@@ -14650,8 +14650,7 @@ entries:
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
-    '7': 'step 8''s damped-Muon read (submitted after the ee_gain.py review fix merges): it may change the restart recipe
-      C2-C8 use'
+    '7': step 8's read of FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422 (it picks the restart recipe)
     '6': FA-ccin2p3-4f9e0532 FA-ccin2p3-8cb6c7b5 FA-ccin2p3-31359864 FA-ccin2p3-bfed460f
     '8': FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422
   handoff:
