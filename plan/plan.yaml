@@ -14445,6 +14445,14 @@ entries:
       LONG_MEMMAP GROW_K=533 GROW_HP=1333, limit 2:30, 46G, batch target ws_grow_hp1333 2.4 h. mixture_ab.py warm entries
       C1m and C10wm added (b28a8f2c). Not tested: the fix on the real arm''s prebuild (the CC login dry run was still running
       at submission).'
+  - at: '2026-11-06T07:29:39+00:00'
+    text: '2026-11-06 step 6 fill figure analysis/catalog_v4/figs/ws_fill.{png,pdf} (plot_ws_fill.py @97635cbd, data/ws_fill_steps.json):
+      (a) grad norm vs restart step 0-40, log y: both arms jump from 8-16 at step 0 to about 1e3 by step 3; filled peaks earlier
+      (step 4, 1777 / 1411) than default (step 6 / 10, 994 / 1334), then decays faster (median over steps 20-40: 18.3 / 18.0
+      filled vs 39.6 / 42.6 default). (b) val NLL: filled spikes to +0.24 / +0.78 at step 20 (default -1.82 at most), both
+      merge by step about 120 and end equal (-2.668 / -2.588 vs -2.662 / -2.585). (c, d) per-class zero-shot CDFs overlap:
+      median class MSE pp 0.290 vs 0.288, e+e- 0.785 vs 0.740. Also: the CC login dry run of the growth prebuild timed out
+      at 900 s (site run''s limit), so the clean-exit fix is still untested on the real arm.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
