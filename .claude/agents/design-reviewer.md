@@ -44,6 +44,10 @@ rules). You do not edit files and you do not submit anything. Reading state is f
    measure (seed-to-seed, binomial for a rate, run-to-run). The expected effect, or the smallest
    effect worth acting on, must stand above it with the seeds given; or the design says why
    fewer suffice. No spread measured anywhere: the design must include measuring it, or fail.
+   Seeds, trials, arms or horizons that differ from the sibling cells of the same comparison (one
+   class with more seeds than the others, a subset) are Joaquin's call (FA CLAUDE.md, scope): unless
+   a user quote or decision on the entry names them, the verdict is FIX, and a fix that needs more
+   seeds is worded as the question to ask him, never as "add seeds" (catalog_coverage step 67).
 4. **The outcome is stated before the run, for yes and for no.** What number means yes, what
    means no, and what each changes for the entry. An outcome that any result would confirm fails.
 5. **Not a repeat, searched independently.** Do not take the `prior` field on trust: search
