@@ -12915,12 +12915,10 @@ entries:
     withdrawn_why: 'Joaquin (2026-11-06 04:28) puts tuning the warm start first and leaves the method to the owner: the grown
       warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
   owner:
-    agent: ad75cab5b751353f4
-    state: stopped
-    since: '2026-11-06T05:06:56+00:00'
-    state_at: '2026-11-06T05:48:46+00:00'
-    context: 241657
-    context_at: '2026-11-06T05:47:42+00:00'
+    agent: a53040907e4c704f0
+    state: working
+    since: '2026-11-06T05:49:03+00:00'
+    state_at: '2026-11-06T05:49:03+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
