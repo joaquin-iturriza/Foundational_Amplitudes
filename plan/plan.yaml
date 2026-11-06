@@ -13431,7 +13431,7 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: a916bf7f64f62994d
-    state: working
+    state: closed
     since: '2026-11-06T13:19:22+00:00'
     state_at: '2026-11-06T16:23:47+00:00'
     context: 261328
@@ -15690,42 +15690,31 @@ entries:
       point.'
   step_waits: {}
   handoff:
-    state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
-      every-group arm 0.053 of default; neither arm BETTER, AdamW damped R PP4 1.017/EE4 1.012, every group worse 1.237/1.619;
-      par:v4_warm_start_objective @f213c72f: only the HD4 zero-shot score tracks the reads). Untuned default restart stays
-      the recipe. STEP 9 READY (all 54 step-7 runs ended, E3869): run list = scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step7_map.txt
-      (arm -> id, 52) plus the C8 k=2132 pair v4_het_warmmag_k2132 FA-ccin2p3-9e4bcd8c (s42) / _seed2 84059582 (s43); all
-      ids in mixture_ab.py WARM C2-C5, C8 (W[2132] filled), _MSE_C, and signext_compare.py (C6). 13 already read home (reads
-      committed 062991e1; list /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/done7.txt).
-      Read recipe: for each remaining run bash /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/read7.sh
-      <run> (site logs -n 3000000 to /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/logs7,
-      mixture_ab.py val, extract on every axis the log read), batched as one tools/detach.py --each job; then mixture_ab.py
-      warm C2 C3 C4 C5 C8 and signext_compare.py warm (C6); ws_stats_check.py C8 on the k=2132 pair (equivalence gate for
-      C8''s verdict, not yet run); figure of the compared reads (plot_warm_start.py family), write-up in par:v4_warm_start
-      with src/claim lines; outcome per change by the design (smallest k with MATCH and carried -> YES at k/4264). STEP 11:
-      growth sweep ws_grow_k533_zeroshot_hpo8 running on CC (slurm 62994063-70, 3 chained waves 3/3/2, limit 00:50, config
-      sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml at a6b355c1), step 11 waits on it; bar: best trial''s zero_shot_score
-      below the default growth''s 0.535 (seed 42, e046ac67; ws_objective_check.py score), else NOT BETTER and no re-run; if
-      below, re-run the best trial at seeds 42/43 with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8 GROW_HP=<idx> on arm v4_het_default25[_seed2]
-      LONG_HEADS=16 GROW_K=533 (merged 107e2bea, repo-reviewer PASS), read with mixture_ab.py warm as C10wm against e046ac67/f35b6a78.
-      OPEN: seed-43 pairing failure in step 10 (both arms step-1 grad norm 91.5 vs control 113.3 with step-0/1 training loss
-      equal to 1e-4, same GPU type V100-PCIE; cause not found: suspect a data-stream or pool change between the control''s
-      commit and 2b82ebe0) - the seed-42 verdict stands, worth checking before any later pairing against 0202ba7f/7b2d6c24.'
-    decisions: 'Step 10 outcome by its design: EVERY GROUP on the paired seed, neither BETTER -> untuned default restart stays
-      (growth sweep and step 7 at it); seed 43 voided by the failed pairing, shown beside. Growth sweep objective is the HD4
-      zero-shot score (no validation loss tracks the reads). Duplicate submission of v4_het_warm25e_k533[_seed2] resolved
-      by keeping the launch''s 21a18a76/21674d1e and cancelling 5862b62e/d15462b0; launch_cc_only.sh now locks the already-submitted
-      check per key (095733c4).'
-    ruled_out: C7; C9; catalog_v3 changes; NLL-tuned and mean-MSE-tuned restarts (C1, growth); optimizer moment fill; Muon
-      damping; AdamW-only damping and every-group damping as recipe changes (step 10); pre-decay parents (D289); lr_scale
-      0.01 extension; validation NLL / MSE of the mean as tuning objectives.
-    running: Growth sweep ws_grow_k533_zeroshot_hpo8 on CC-IN2P3 (slurm 62994063-62994070). Step-7 runs all ended.
-    files: analysis/catalog_v4/mixture_ab.py (WARM C1a, C1e, C2-C5, C8, _MSE_C); analysis/catalog_v4/signext_compare.py; analysis/catalog_v4/ws_stats_check.py;
-      analysis/catalog_v4/ws_restart_steps.py; analysis/catalog_v4/plot_ws_fill.py (--step10); analysis/catalog_v4/ws_objective_check.py
-      (summary, score); tools/sweep_trial_hps.py; scripts/job_catalog_v3_short.sh (GROW_SWEEP); scripts/launch_cc_only.sh;
-      docs/results.tex par:v4_warm_start_objective, par:v4_warm_start_ramp; scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step7_map.txt,
-      done7.txt, read7.sh, logs7/
-    written: '2026-11-06T13:18:42+00:00'
+    state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
+      at 0.125; C6 and C8 not decided, intervals too wide). Step 11: re-run sweep ws_grow_k533_zeroshot_hpo8_rerun ENDED,
+      best trial hp1860 zero_shot_score 0.4761 < 0.535 bar (default growth e046ac67, seed 42) -> NEXT: re-run hp1860 at seeds
+      42 and 43 under the passed step-11 design: scripts/job_catalog_v3_short.sh arm v4_het_default25 / v4_het_default25_seed2
+      with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun GROW_HP=1860 LONG_HEADS=16 GROW_K=533 (merged 107e2bea; tools/sweep_trial_hps.py
+      reads runs/ws_grow_k533_zeroshot_hpo8_rerun/trial_1860/config.yaml on CC, check it exists first), limit as the growth
+      runs (about 2.4 h, est 5 GPU-h for both), --mem 32G, site pick FA --jobs 2, plan target, plan wait step 11 on both ids;
+      then read with mixture_ab.py warm as a new WARM entry (like C10wm) against e046ac67/f35b6a78, w16 scratch 493c98db/7288b3fe
+      beside, outcome by the design (BETTER: widened upper end of R(best/default growth) below 1 on PP4 or EE4 and above 1.05
+      on neither), figure as plot_ws_c1m.py --growth, write-up beside par:v4_warm_start_grow.'
+    decisions: 'e046ac67''s config.yaml restored from its seed-43 twin by tools/restore_run_config.py @18e47cf4 (CPU job FA-ccin2p3-25051489;
+      damaged copy kept as config.yaml.overwritten_0), a repair inside approved work. The first growth sweep ws_grow_k533_zeroshot_hpo8
+      failed whole because the cache prebuild had rewritten the base config; job_mmap_prebuild.sh fixed @8f68ca8d; the re-run
+      sweep carries data.memmap_prebuild false and num_workers 2. Sweep result: 7 of 8 scored, trial_0001 diverged at step
+      305 (non-finite gradients), listed apart; five trials 0.476-0.481.'
+    ruled_out: C7; C9; catalog_v3 changes; NLL-tuned and mean-MSE-tuned restarts; optimizer moment fill; Muon damping; AdamW-only
+      and every-group damping; pre-decay parents; validation NLL / MSE of the mean as tuning objectives; more seeds for the
+      sign extension's from-scratch pair (its spread floor and 21-pool bootstrap keep it undecided)
+    running: none (sweep ws_grow_k533_zeroshot_hpo8_rerun ended; restore job ended)
+    files: 'analysis/catalog_v4/mixture_ab.py (WARM); analysis/catalog_v4/plot_warm_start.py (changes); analysis/catalog_v4/signext_compare.py;
+      tools/restore_run_config.py; scripts/job_restore_config.sh; scripts/job_mmap_prebuild.sh; sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml;
+      tools/sweep_trial_hps.py; scripts/job_catalog_v3_short.sh (GROW_SWEEP/GROW_HP); docs/results.tex par:v4_warm_start_changes.
+      Open ask on the entry (nothing waits): 4 more from-scratch seeds for the magnitude target (9.4 GPU-h), and the tuned
+      growth at 1066/2132.'
+    written: '2026-11-06T16:24:24+00:00'
   ask: 'Two calls on the warm start, both scope changes (yours): (1) The one-loop magnitude-target change (het) is not decided
     at any k because its from-scratch pair''s two seeds disagree (R_seed 1.28, so the 1.35-bar interval is widened by ln 1.28
     = 0.25 on each side). More from-scratch seeds of v4_het_control_magnitude would narrow that term. My estimate, assuming
