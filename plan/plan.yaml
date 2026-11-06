@@ -9991,6 +9991,32 @@ entries:
       alpha and L_inf per axis. NO: the joint law misfits while per-width length fits hold: reported per width, the compute-optimal
       width read from where the per-width curves cross; a cell more than 2 seed spreads above its neighbours'' trend is read
       for a defect (blow-up, lr) before it is used. 10 new V100 jobs, 211 GPU-h of work (approved by name, D314), one wave.'
+    fix_at: '2026-11-06T22:44:51+00:00'
+    fix: 'Check 4 (outcome) and the measure''s fits: (a) the design fits L(C)=A C^-alpha+L_inf per length over width on 3
+      points (widths 8/16/32) and promises ''alpha and L_inf per axis'' in YES; with 3 parameters on 3 points that fit is
+      exactly determined (0 degrees of freedom), the very defect results.tex par:v4_width records for the earlier axes (''three
+      parameters pass through them with no freedom left, alpha and L_inf not determined''). Fix: state that the width axis''s
+      alpha and L_inf come only from the joint fit (or a fit with a parameter shared across lengths, e.g. one alpha_N for
+      all four lengths, said before the run), and label the per-length 3-point fits as not a test; say the per-width length
+      fits have 4 points, 1 degree of freedom. (b) No branch for the case the earlier fit hit: per-width fits that also misfit
+      or put L_inf at 0 (the grid edge). Add what that result means (e.g. no floor resolved within 10 epochs at these widths:
+      candidate chosen by the measured cells directly, bare power law as a labelled diagnostic only) and what it changes for
+      the pretraining candidate. Check 14 (disk): the design states no disk. Read now on CC (site run df): /sps/lpnhe 72 GB
+      free of 512 (87% used); amp_mmap_cache already holds 46 GB (two 21 GB keys, two 2.5 GB); an earlier long cell needs
+      ~0.33 GB run dir (runs/catalog_v4_long/v4_het_default25_w32_x1) plus 0.73 GB predictions in SCRATCH/zz_v4_long_*, so
+      10 jobs ~11 GB plus at most one new 21 GB cache: fits (~32 of 72 GB). Record this in the design, say whether one of
+      the existing 21 GB keys is already this arm''s format-3 cache (prebuild log key), and confirm the key is shared: base_key_doc/features_key_doc
+      in data_mmap.py contain no model or training field, so all 10 cells (any width, any steps) open the one cache; quote
+      the prebuild''s key and one GPU job''s key in the read. Passing (no change needed): one change at a time (cells differ
+      in width and steps only, lr moves with steps by the window law ~steps^-0.55 that Joaquin approved with the grid, D314
+      ''Send the grid'', D236 full training set at every length kept); measure moves (results.tex par:v4_width: w8 0.0914
+      -> w16 0.0509 -> w32 0.0288, w8 1x 0.0914 -> 4x 0.0206 -> 16x 0.0123); seeds (one seed by D314/D315; seed-pair spread
+      3%/8%/6% against neighbour steps x1.3 to x1.8); het loss and emission-scale target (D52/D71, D234); reused cells trial_1262
+      confirmed same HPs at the same window position in both sweeps (long_sweeps_best.json, lr 0.00782114 and 0.003649139);
+      211 GPU-h for the 10 new seed-42 cells re-summed from scaling_grid_plan.json work_hours. Notes, not failures: the reused
+      4x/16x cells ran on gpu_h100 (TF32 active) and the new cells go to gpu_v100,gpu_h100 as given: record each cell''s GPU
+      in the read (TF32 on/off measured within run-to-run spread, results.tex sec:tf32-a100); state LONG_CKPT for widths 16/32
+      if the V100 needs it (math-neutral, time only).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
