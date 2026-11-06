@@ -223,6 +223,34 @@ def test_resonance_draw_unchanged():
     np.testing.assert_allclose(_mass(P[:, 0] + P[:, 1]), PINNED_MLL, rtol=1e-12)
 
 
+def test_rotate_forward_free_floor():
+    """sampling.fwd_free_floor (step (f)): the forward component's picked final reaches 1 - |cos theta| down to the floor
+    when no cut applies to it (a neutrino, a massive final), stays at the cut edge when it is a cut leg, keeps momentum
+    and mass shells; without the flag the draws are the earlier ones (same random stream)"""
+    m = [0.0, 0.0, 91.188]
+    pdg = [11, -11, 14, -14, 23]
+    cuts = dict(mg.V4_CUTS["ee"])
+    assert mg.fwd_free_mask(m, pdg, cuts) is None
+    free = mg.fwd_free_mask(m, pdg, dict(cuts, fwd_free_floor=1e-8))
+    assert free.tolist() == [True, True, True]
+    assert mg.fwd_free_mask([0.0, 0.0, 0.0], [11, -11, 15, -15, 22], dict(cuts, fwd_free_floor=1e-8)).tolist() == \
+        [False, False, False]
+    n, sq = 4000, np.full(4000, 3000.0)
+    F = mg.democratic_draw(n, sq, m, 1e-6, np.random.default_rng(3))
+    P = np.concatenate([mg._beams(sq, np.asarray(pdg), None), F], 1)
+    a = mg.rotate_forward(P, 0.99, np.random.default_rng(5))
+    b = mg.rotate_forward(P, 0.99, np.random.default_rng(5), None, None)
+    np.testing.assert_array_equal(a, b)
+    c = mg.rotate_forward(P, 0.99, np.random.default_rng(5), free, 1e-8)
+    _check_ps(c[:, 2:], sq, m)
+    cth = np.abs(c[:, 2:, 3]) / np.linalg.norm(c[:, 2:, 1:], axis=-1)
+    d = np.log10(1.0 - cth.max(1))
+    assert (d < -2).mean() > 0.5 and d.min() < -7.0          # 8 decades log-uniform: most below the 0.99 cut edge
+    cut_all = np.zeros(3, bool)
+    e = mg.rotate_forward(P, 0.99, np.random.default_rng(5), cut_all, 1e-8)
+    np.testing.assert_array_equal(e, a)                       # every final cut: the earlier draws exactly
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"):
