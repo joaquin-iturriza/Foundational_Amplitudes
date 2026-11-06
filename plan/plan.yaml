@@ -13131,7 +13131,7 @@ entries:
     agent: ab2ac29d837514673
     state: stopped
     since: '2026-11-06T09:38:05+00:00'
-    state_at: '2026-11-06T09:55:52+00:00'
+    state_at: '2026-11-06T09:56:08+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
