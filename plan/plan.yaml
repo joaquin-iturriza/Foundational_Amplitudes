@@ -8854,6 +8854,26 @@ entries:
       swapped; additivity R_full vs R_ee x R_pp reported. Otherwise UNRESOLVED with the numbers. Cost: 8 jobs x 1 V100, ~2.8
       h work each (tools/short_wall.py without margin), limit 03:30, 22 GPU-h work / 28 at the limits; in memory, no cache
       disk.'
+    fix_at: '2026-11-06T04:46:09+00:00'
+    fix: 'Check 5 (not a repeat, prior incomplete): the prior says ''no run separates the share by beam'' and omits the pure-default
+      bound arm of docs/results.tex par:v4_mixture (Table tab:v4_bound_shares, lines 3777-3800): FA-ccin2p3-afc96598 / d26f13aa,
+      re-read eval-only on EE4 as FA-ccin2p3-f8ec724f / 049b863e. That arm trains every hadronic tree class on its 13 TeV
+      MadEvent pp events only, with the e+e- classes sampled exactly as the control''s, i.e. it is the pp-only arm at share
+      1 under the MSE loss, and its EE4 read already answers part of D295: R = 1.216 [1.099, 1.355] over the MSE control (pp
+      default data made e+e- worse by a fifth; results.tex: ''a fifth above the control though its e+e- events are the control''s'').
+      Fix: name it in prior with its numbers, and state what the pp-only arm adds over it and why it matters (share 0.25 keeps
+      the catalog sampling on the hadronic classes, which the bound removed, so the bound confounds adding pp events with
+      removing catalog-sampled ones; het loss instead of MSE), and set the outcome''s expectation for R_pp on EE4 against
+      it (e.g. what a pp-only R_pp >= 1 on EE4 at 0.25 means next to the bound''s 1.216). The e+e--only arm has no prior run
+      (searched) and stands. Everything else checked and holds: one change (recipes catalog_v4_default25_eeonly/_pponly at
+      278ae072 differ from catalog_v4_default25_train.yaml only in which classes carry f_default 0.25: 115 + 797 = 912; the
+      job-script case block is shared with v4_het_default25; control and full share rerun at the same commit and GPU); measure
+      shown to move (ee_gain_beams.json: EE4 trained R 0.182 vs seed ratio 1.118, EE4 held-out 0.448 vs 1.137, PP4 trained
+      0.344 vs 1.140, PP4 held-out 0.680 vs 1.244); seeds 2 against rerun spread s about 0.094 (loader_control.json) with
+      thresholds s / 2s; outcomes stated both ways with UNRESOLVED; HETEROSC with sigma stage (D71, D276); same preprocessing
+      as the het control; no HP search (MUON_BEST for every arm, A/B step one); reads on default-sampled EE4/PP4 pools as
+      D227 asks; composed pools go to node-local TMPDIR as in the in-memory default25 reruns ae39ee5a / 75ad7b20 that completed,
+      no shared cache.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
