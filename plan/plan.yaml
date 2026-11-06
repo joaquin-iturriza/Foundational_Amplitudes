@@ -3724,13 +3724,6 @@ entries:
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
-    66: '(a) ladder change for the QCD top decade (step 65 at budget 500: only log10|M|^2 > ~3.7 of the QCD 2->4 classes short,
-      budget factor 28-700): in multiperipheral_draw (mg5_pipeline_final.py) draw each event''s pT span log-uniform in [1.05,
-      MC_LADDER_PT_SPAN] instead of fixed 3.2 (some events with every pT within 5% of the cut) and the outer end eta_max -
-      d with d log-uniform in [1e-3, 1] instead of uniform [4, 5) (density toward the edge), so the corner sqrt(s) ~1.4 TeV
-      / every pT at the cut / span at |eta| 5 is proposed often; worktree, tests (acceptance as now, plus share of events
-      with all pT < 11 GeV and max|eta| > 4.8), repo-reviewer, new design (control: quota_ladder_res2 at budget 50, same job),
-      the same 10 CPU jobs at budget 50 (and 500 if 50 leaves the top short).'
     67: '(a) step 66''s guard branch + STRONG budget: both ladders as two channels (sampling.mc_mperi_both, branch ladder-both
       @919bc932, repo review pending), re-check on the same 5 classes x seeds 42/43, policies quota_ladder_res2+quota_ladder_edge_res2+quota_ladder_both_res2+quota_ladder_both_res2_budget750
       in one CPU job each (10 jobs, limit 04:00)'
@@ -9522,8 +9515,6 @@ entries:
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
     '61': Joaquin allowing the refused resubmission (asked 2026-11-06)
-    '66': FA-ccin2p3-8fc25e12 FA-ccin2p3-df31e35b FA-ccin2p3-0435522c FA-ccin2p3-b1999bec FA-ccin2p3-8172a8b3 FA-ccin2p3-7cc24f37
-      FA-ccin2p3-5fbea4b8 FA-ccin2p3-b94947db FA-ccin2p3-7970178a FA-ccin2p3-eb17a4cc
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -9996,13 +9987,6 @@ entries:
       if:
       - 'estimate <= 30 GPU-h or covered by D292/D293: design, review, submit'
       - 'above 30 GPU-h not covered: estimate to the main session'
-    66:
-      feeds: 'D294: whether a flat log|M|^2 quota reaches the top of the QCD pp range at an affordable budget, i.e. what the
-        1301 hadronic classes are regenerated with'
-      if:
-      - 'QCD top bins fill at budget <= 500: design the regeneration with the measured time cost'
-      - 'still short: report to Joaquin the choice between accepting density >= pp''s in the top decade (D269 ''not far below
-        pp'') and a heavier channel'
     67:
       feeds: 'D294: what the 1301 hadronic classes are regenerated with (channels and flat budget)'
       if:
