@@ -15150,6 +15150,12 @@ entries:
     units: null
     start: '2026-11-06T10:34:32+00:00'
     at: '2026-11-06T10:34:32+00:00'
+  - batch: ws_grow_zeroshot
+    wall_h: 0.9
+    jobs: 8
+    units: null
+    start: '2026-11-06T13:09:41+00:00'
+    at: '2026-11-06T13:09:41+00:00'
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
