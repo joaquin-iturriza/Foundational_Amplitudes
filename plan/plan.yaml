@@ -13559,9 +13559,9 @@ entries:
     decision: D307
   owner:
     agent: a6f48d86491ded7e6
-    state: working
+    state: stopped
     since: '2026-11-06T16:25:21+00:00'
-    state_at: '2026-11-06T19:56:19+00:00'
+    state_at: '2026-11-06T20:04:59+00:00'
     context: 220002
     context_at: '2026-11-06T20:00:27+00:00'
   designs:
