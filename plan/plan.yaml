@@ -10285,6 +10285,17 @@ entries:
       read of the short bins (multichannel_check.py where), one revision inside 12 labels (chains, increment, a sqrt(s) move),
       re-run on the short classes. The KS statistics are descriptive (the two samplers'' within-bin laws differ by construction;
       D294 sets no within-bin law). 10 CPU jobs, <= 0.6 h each, ~6 core-h, no GPU.'
+    passed_at: '2026-11-06T23:17:21+00:00'
+    reviewer: 'Re-check after FIX: code d7e1bd5c read (thin 2, dmin 0.3, 0.2 chains; flat_diversity.py; multichannel_check.py
+      step69 rules match the outcome). Check 2: toy rerun here gives fill 0.906 chains vs 0.8885 quota at 12 labels, near-duplicate
+      share 0.002 (first version 0.176; my own probe on it: NN distance 1.25 vs 2.21), so the new diversity read moves with
+      the collection change; step69 reproduces step 67 on its reads (smoke). Check 3: seeds 42/43 as every sibling class,
+      fill spread between seeds ~0.001-0.002 in shortfall (step 67). Check 4: every in-range bin >= 0.95, branches YES/QUOTA12/NO/COST/PARTIAL
+      cover cost > 2 and diversity failure. Check 1: quota sampler at the same 12 labels in the same job as the matched control,
+      budget 50 as the diversity reference. Check 5 searched: Markov, MCMC, Wang-Landau, multicanonical, Metropolis, VEGAS,
+      importance, reweight, flat in log (results.tex VEGAS/foam paragraph now named, NO branch goes to it); no earlier Markov
+      sampler. Note: the 2x bar is attributed to CLAUDE.md''s margin rule, which is about wall time and events kept, not a
+      method''s cost; Joaquin''s D317 gives no number, so report 2x as the design''s bar, not his.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
