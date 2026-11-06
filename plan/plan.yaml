@@ -9424,6 +9424,32 @@ entries:
       top-bin fill unchanged (within the seed spread, fill difference <= 0.05): the corner is not the gap; read where the
       still-short events sit (multichannel_check where on the edge policy) before any other change. Cost: 10 CPU jobs, 1 core,
       <= 25 min each, limit 00:40; no GPU.'
+    fix_at: '2026-11-06T09:34:49+00:00'
+    fix: 'Check 4 (outcome stated for every result) fails; checks 1-3 and 5-14 hold. (a) YES cannot happen by the design''s
+      own control: it needs 0 shortfall and 0 budget stops on all five classes at budget 50, but the edge variant only touches
+      the ladder channel, which mc_channels adds only for hadronic beams with >= 2 parton finals (uu_bbxuu, us_ddxsu, udx_csxvevex),
+      so uux_epemvevex keeps step 65''s budget-50 shortfall 0.0275/0.0277 and 36/36 budget stops (multichannel_check.json).
+      Restate YES per class: the QCD 2->4 classes (and udx_csxvevex, which also gets the ladder) at budget 50, with the electroweak
+      classes taken from step 65''s budget-500 read, or say which budget the regeneration would use for them. (b) The two
+      NO branches leave a gap: control fill at budget 50 (my read of multichannel_check_reads, per-bin min(kept,quota)/quota
+      summed over 36 chunks) uu_bbxuu 0.04/0.04 in the bin from 3.96 and 0.01/0.02 from 4.21, budget 500 0.49/0.49 and 0.14/0.16;
+      ''unchanged'' is a difference <= 0.05 and the replace branch needs >= 0.49/0.14, so a fill of e.g. 0.2 at 3.96 has no
+      stated meaning or next step. Add the middle branch (top bins raised by more than the seed spread but below budget 500''s:
+      what is kept, what budget is read from the measured candidates per kept event, whether that is then affordable against
+      the 837 s / 8250 s cost reference). (c) The replace branch has no guard on what the edge ladder could lose: the old
+      ladder carried 33739 of 34992 kept flat events of uu_bbxuu, including the bins 2.97-3.71 where control fill is 0.98/0.67/0.32;
+      with acceptance 0.941 -> 0.875 and density moved to the corner, the lower bins, the held-out count outside the kept
+      range (4/2, 6/1) and udx_csxvevex (0.067 at budget 50) could get worse. State that the edge variant replaces the ladder
+      only if total shortfall and held-out outside counts are not worse than the control beyond the seed spread (shortfall
+      seeds 0.137/0.138, 0.114/0.114; per-bin fill seed differences <= 0.05), and what happens if the top improves while the
+      middle bins drop (e.g. both ladders as two channels). Minor, fix with it: the wall estimate ''<= 25 min each'' undercounts;
+      each job now runs quota_ladder_res2 (837 s on uu_bbxuu at budget 50) plus the edge policy, about 28 min if the edge
+      costs the same, under the 40 min limit at 1.4x; restate the target. Confirmed and fine: control same job/node/commit
+      differing only in sampling.mc_mperi_edge (8000f8b0, on trunk); test_multiperipheral_edge rerun here prints corner share
+      0.0549 vs 0.0003 and acceptance 0.875 vs 0.941; seed spread of the top-bin fill <= 0.02 (control) and 0.02-0.06 (budget
+      500); held-out events are the class''s pp MadEvent events (D269/D270). Searched docs/results.tex for multiperipheral,
+      ladder (only the size ladder and sec:ladder), mperi, quota, flat_budget, edge variant, cosh; decisions D269 D270 D294:
+      no prior run of this variant.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
