@@ -9,7 +9,7 @@ ws_c1_k533_hpo8 wins? Each trial's validation NLL at its best checkpoint is spli
 and the sweep's objective is val_loss_no_reg = mean_p NLL_p (HETEROSC aggregates by the arithmetic mean). So
 NLL = W + S with W = mean_p W_p, S = mean_p S_p, and the logged val_mse = mean_p MSE_p.
 
-    REREAD=<run> site submit ccin2p3 FA scripts/job_ws_het_split.sh     (GPU: the run part below)
+    site submit ccin2p3 FA scripts/job_ws_het_split.sh --item warm_start   (GPU: the run part below)
     python3 analysis/catalog_v4/ws_het_split.py fetch                 -> data/ws_hpo8/trial_curves.json (login node)
     python3 analysis/catalog_v4/ws_het_split.py summary --log <job log> -> data/ws_hpo8/het_split.json, figs/ws_het_split.{png,pdf}
 
@@ -81,6 +81,8 @@ def run(a):
         rec = {"model": tag, "run_dir": d, "ema": bool(ema), "names": names, "n": acc["n"].astype(int).tolist(),
                "W": (acc["w"] / n).tolist(), "S": (acc["s"] / n).tolist(), "MSE": (acc["mse"] / n).tolist()}
         print("WS_SPLIT " + json.dumps(rec), flush=True)
+    import shutil
+    shutil.rmtree(cfg.run_dir, ignore_errors=True)
 
 
 def fetch(a):
@@ -140,6 +142,11 @@ def summary(a):
            "spearman_vs_lr": {"NLL": spearman(nll, lr), "MSE": spearman(M, lr), "W": spearman(W, lr), "S": spearman(S, lr)},
            "best_nll": T[int(np.argmin(nll))], "best_mse": T[int(np.argmin(M))],
            "max_abs_reread_minus_logged": float(max(abs(rows[k]["NLL"] - rows[k]["logged_nll"]) for k in T))}
+    # the reread reproduces what was logged: each trial's best val_loss_no_reg, and the parent's the trials' step-0 one
+    step0 = float(np.median([tr[k]["val_loss_step0"] for k in T]))
+    out["parent_reread_minus_step0"] = rows["parent"]["NLL"] - step0 if "parent" in rows else None
+    out["reproduced"] = bool(out["max_abs_reread_minus_logged"] < 2e-3
+                             and (out["parent_reread_minus_step0"] is None or abs(out["parent_reread_minus_step0"]) < 2e-3))
     json.dump(out, open(os.path.join(DATA, "het_split.json"), "w"), indent=1)
     print(json.dumps({k: v for k, v in out.items() if k != "rows"}, indent=1))
     for k in sorted(rows, key=lambda k: rows[k].get("lr_scale", 99)):
@@ -159,7 +166,7 @@ def summary(a):
     a1.set_xscale("log"); a1.set_xlabel("fine_tune.lr_scale"); a1.set_ylabel("deviation from the 8-trial mean")
     a1.legend(fontsize=7)
     a2.plot(lr[o], M[o], "o-", label="trials")
-    for tag, mk in (("untuned_k533", "x"), ("parent", "+")):
+    for tag in ("untuned_k533", "parent"):
         if tag in rows:
             a2.axhline(rows[tag]["MSE"], ls=":", label=f"{tag} (lr_scale 1)" if tag != "parent" else "parent (step 0)")
     a2.set_xscale("log"); a2.set_yscale("log"); a2.set_xlabel("fine_tune.lr_scale"); a2.set_ylabel("validation MSE of the mean")
