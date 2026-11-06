@@ -10204,7 +10204,7 @@ entries:
       - 'Joaquin pays to fill the margin: design at ~3000 (estimate: 4x the 750 time on uu_bbxuu-like classes)'
   owner:
     agent: a3f721e0495643441
-    state: working
+    state: closed
     since: '2026-11-06T09:28:50+00:00'
     state_at: '2026-11-06T17:49:52+00:00'
     context: 232314
@@ -11754,30 +11754,30 @@ entries:
       ~72 / ~50 / ~29 s (step 65). Note: the design''s parenthesis named uu_bbxuu [4.70,4.95) as in range from the held-out
       pp max 4.75; by its rule with the range table''s max (4.694) it is margin (0.91 filled).'
   handoff:
-    state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
-      ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
-      step 65 re-check: shortfall QCD 0.38->0.14, EW 0.24->0.03, held-out outside 1176->4; at budget 500 (policy quota_ladder_res2_budget500
-      @45d39fe3): EW fill (uux_epemvevex YES, udx_csxvevex 0.5% left above pp max), QCD top ~1 dex (log10|M|^2 > 3.7) still
-      short at 10x time (8250 s vs 837). Next: the ladder change recorded as the new next step (per-event pT span log-uniform
-      [1.05,3.2], outer end eta_max - d with d log-uniform [1e-3,1]), then the same 10 CPU jobs. Figure figs/flat_quota_a..e
-      (pp, multichannel, quota, quota + ladder, pairs, same 10x budget). (d) step 62 beam ablation read and done (142f98a0,
-      ee_gain.py ablation, data/ee_gain_ablation.json, figs/beam_ablation_a..d): pp default share neutral on e+e- (R 0.97/0.99),
-      e+e- gain = e+e- default events (92% of log gain trained, 63% held-out), PP4 gain = pp default events; e+e- only costs
-      PP4 1.16/1.30. (b) memmap: step 37 unchanged (prebuild timing with the first memmap run). (c) step 61 and (e) step 64
-      wait on Joaquin''s calls (12 sign-output resubmissions at 3:30; scaling-grid size 449 vs 39 GPU-h).'
-    decisions: 'Budget-500 check taken without asking (design branch 2, coordinator); the 10x budget is not a solution for
-      QCD (factor 28-700 needed in the top bins). D294 asks for ''not complicated'': the two added channels are a stated complication,
-      reported. CC checkout: a regenerated multichannel_check.json of mine was set aside with git stash (zz_mcheck_summary_regen_by_catalog_coverage_owner_20261106)
-      to unblock site sync; multichannel_check.py now rewrites results only on ''summary''. Ladder constants: MC_LADDER_PT_SPAN
-      3.2 from where reads (hardest leg pT 90% ~32 GeV), outer end band [4,5) open.'
-    ruled_out: Raising the flat budget to fill the QCD top decade (needs 28-700x, 10x already costs 10x time); pp default
-      data as a help for e+e- (neutral).
+    state: '2026-11-06 ~17:30. (a) Coverage: step 67 read in full (finding 2026-11-06 ''step 67 verdict''; data/quota_coverage.json
+      @686c3241; figs/quota_fill_a..e + legend). With both ladders (sampling.mc_mperi_both) and mc_res2 at flat_budget 750,
+      every bin up to the pp in-support max is filled >= 0.95 on all 5 classes, held-out outside kept 1/1. The +0.5-dex margin
+      above it is short on the 3 ladder classes (uu_bbxuu 0.91/0.25, us_ddxsu 0.96, udx_csxvevex 0.91): NEAR. Step 65 (the
+      regeneration design) is held on Joaquin''s question (accept the margin at 750, ~120x multichannel replay time on QCD,
+      or ~3000 budget, ~4x more on uu_bbxuu-like classes). (b) Step 37, memmap prebuild timing and section 3: NOT started
+      on purpose. It is gated on the first memmap GPU batch, and none is planned (steps 61 and 64 wait on Joaquin). The cache
+      key is the run''s pool set, and data_mmap.py prunes caches idle 48 h, so a prebuild made now would likely be pruned
+      before its run. Do it chained before the first memmap batch (prebuild as --intermediate, timed from that job). (c) step
+      61 and (e) step 64 wait on Joaquin (combined plan ask).'
+    decisions: 'Both ladders, not the edge ladder alone: the edge alone failed the udx guard in step 66, both pass it (+0.0020
+      vs 2 SE 0.0031). The udx extra seeds 44-47 were cancelled (a scope call for Joaquin) and the question was then withdrawn
+      as moot. The in-range rule used the range-table pp max (uu_bbxuu 4.694), so [4.70,4.95) counts as margin, against the
+      design''s parenthesis (held-out max 4.75); said in the finding. The time limit now comes from multichannel_check.py
+      need (39383530), after step 67''s 04:00 timeout. design-reviewer.md got a seeds-vs-sibling-cells check (ac2eae83).'
+    ruled_out: Raising flat_budget with the old ladder (factor 28-700); the edge ladder alone (udx guard); extra seeds on
+      one class without Joaquin's yes.
     running: none
-    files: mg5_pipeline_final.py (multiperipheral_draw, resonance2_draw, _bw_mass, mc_channels res2/mperi, MC_LADDER_PT_SPAN),
-      analysis/catalog_v4/multichannel_check.py (policies quota_ladder_res2[_budget500], where), analysis/catalog_v4/fig_flat_quota.py,
-      analysis/catalog_v4/data/{multichannel_check.json,multichannel_check_reads/,quota_where/,ee_gain_ablation.json}, analysis/catalog_v4/ee_gain.py
-      (ablation, fig_ablation), tests/test_multichannel.py, scripts/job_multichannel_check.sh
-    written: '2026-11-06T09:27:57+00:00'
+    files: mg5_pipeline_final.py (multiperipheral_draw edge, mc_channels mperi_edge/mperi_both), analysis/catalog_v4/multichannel_check.py
+      (policies quota_ladder_*; summary fill_per_bin; coverage; need; pull extra seeds), analysis/catalog_v4/fig_quota_fill.py,
+      analysis/catalog_v4/fig_flat_quota.py, analysis/catalog_v4/data/{quota_coverage.json,multichannel_check.json,multichannel_check_reads/},
+      scripts/job_multichannel_check.sh, tests/test_multichannel.py. Repo-reviewer backlog still holds fa872486 and 39383530
+      (coverage, need), to be passed before the regeneration design merges.
+    written: '2026-11-06T17:50:23+00:00'
   ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings (39
     GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h
     of work)? And for the catalog regeneration: at budget 750 with both ladders, every log|M|^2 bin up to the highest pp event
