@@ -9136,6 +9136,27 @@ entries:
       the unreached pp events sit and fix the proposal there; the budget''s cost factor reported. Cost: 10 CPU jobs x 1 core,
       step 57''s jobs ran 4 policy-seed runs in < 5.5 min; at the budget the flat part costs up to ~8x, so <= 15 min each;
       limit 00:40; no GPU.'
+    fix_at: '2026-11-06T05:12:26+00:00'
+    fix: '(1) Check 2, measure by construction: the quota''s range (tools/flat_range.py) is the in-support log|M|^2 min/max
+      of each class''s PP4 probe train+test pools (12000 events) plus 0.5 dex, and multichannel_check.py _pp judges above_max/below_min
+      on exactly those same files, so whenever the top and bottom bins are filled the kept max sits at least 0.25 dex above
+      every one of them and above/below = 0 can only follow from quota_short = 0; it says nothing about whether the 0.5-dex
+      margin covers pp events not used to build the table, which is D269/D294''s question (0% of pp outside, the range of
+      the pp sampled process). The step-57 numbers (above_max 0.35-0.49 current vs <=0.0005 multichannel; 0.094/0.021 uu_bbxuu,
+      0.104/0.037 us_ddxsu) were measured before the range came from these events and do not transfer. Fix: judge above/below
+      on pp events not used for the table (the probes'' val pools, 2e3 each, and/or the classes'' dsh_ default-share pp pools
+      where they exist), keep quota_short/bins_short as the fill measure, and say which numbers are by construction. (2) Check
+      4, outcome threshold: YES is ''above/below <= 0.001'' while D269 says the share outside must be zero; on a held-out
+      sample state the rule in his terms (0 held-out events outside, and what 0 of N bounds) and what a non-zero count changes
+      (margin widened or sampler fixed). (3) Check 6, D269 ''0% of pp events outside'': the measure drops out-of-support pp
+      events (partonic-frame |eta|>5 with lab |eta|<5, sqrt(s_hat) outside the window): 1.34% on uu_bbxuu, 0.29% on us_ddxsu
+      (multichannel_check.json pp_out_of_support; 0.079% over all classes, step 46). YES leads straight to designing the regeneration,
+      which would carry that gap. Report out_of_support and above_max_all beside the in-support shares in the outcome, and
+      either fold the cut-frame fix into the regeneration design or name where it is handled; no plan step tracks it now.
+      Passing: one change against a matched control (multichannel vs multichannel+quota, same class, seed, job, node), seeds
+      42/43 adequate for a fill/no-fill outcome, no prior quota or flat_range run (searched results.tex: quota, flat_range,
+      flat part, multichannel, uniform/flat in log, in-support; plan findings; decisions D269 D270 D294), CPU only, no HPO,
+      disk trivial (temp dirs), test events are 13 TeV pp MadEvent default.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
