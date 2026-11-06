@@ -10742,6 +10742,20 @@ entries:
       job script, 456b5233 epoch_count.py; LONG_FACTOR 1 refused under LONG_HP; short_wall.py --width with the measured per-width
       V100 rates 31f0196d). CC-IN2P3 gpu QoS MaxWall 7-00:00:00 (sacctmgr, read 2026-11-06), so the 42-84 h cells fit without
       a split.'
+  - at: '2026-11-06T04:51:09+00:00'
+    text: '(c) 2026-11-06 step 61 diagnosis (het_sign_diag.py pull/read over step 56''s job logs -> analysis/catalog_v4/data/het_sign_diag.json;
+      tool in the scratchpad until the repo-reviewer backlog gate clears, then committed): the het sign head is underweighted,
+      not failing to transfer. (1) The het loss''s main-block pre-clip gradient norm is 65-84x the MSE control''s (median
+      24-28 vs 0.315-0.369; seed geometric mean 75x), and the clip at 5 bounds 98.8-99.2% of het steps vs 5.5-6.0% of MSE
+      steps; adding the sign head does not move the het norm (arm 24.0-28.0 vs het magnitude reference 24.5-27.0), so at sign_loss_weight
+      1 the sign cross-entropy, whose per-event gradient is the same under both losses, is ~1/75 of the MSE control''s share
+      of the trunk gradient (an estimate: assumes the sign term a small part of both norms). (2) The het sign is worse in
+      distribution by the same factor as held out: wrong-sign arm/MSE on the 63 signed training pools'' validation 2.0x at
+      the median (1.0% vs 0.5%), 1.39x on the worst pool (13.4% vs 9.6%); held out H5 1.99x, HD5 1.41x. ''Fits the training
+      signs at 0.99'' hid that the MSE control fits them at 0.995. Fix implemented: training.sign_het_match (each event''s
+      sign BCE times the het NLL''s detached factor on its mu gradient, sigma^(2 beta)/(2 sigma^2), so the per-event sign:magnitude
+      gradient ratio is the MSE loss''s), commit 0e8bf38b on branch het-sign-weight (worktrees/wt-het-sign), test_het_sign_head
+      6 passed; not merged (repo-reviewer pending).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
