@@ -9205,6 +9205,35 @@ entries:
       any YES or NO against it (4 jobs, about 9 GPU-h at its measured 2.3 to 2.7 h on V100), and otherwise the old MSE control
       stands. Everything else carries over from the passed 05:06 design (sign measure resolved at 4 seeds: H5 17/21 p 0.0036,
       HD5 15/19 p 0.0096; HETEROSC; no sweep; 9.3 GPU-h; in memory).'
+  - at: '2026-11-06T05:14:53+00:00'
+    question: 'Step 61 (c) repair: the same-code control for the matched sign-head arms already running (FA-ccin2p3-4ba2ae30
+      e19b83f5 b524a346 9b657718 1536ae83 86cb2686 00ca4119 91249877 at f21572a1, which contains (b)''s keyed-draw augmentation
+      d18e44f1, D290): rerun the step-56 arm v4_het_control_signhead seeds 42-45 at the same code so the matched arms differ
+      from their control only in the sign weighting.'
+    prior: 'The passed step-61 design of 2026-11-06T05:06; het_sign_diag.json @999e9742; het_signhead.json @6ec06b24 (step-56
+      weight-1 arm vs het magnitude reference: PP4 1.002, EE4 0.953, HD4 0.974); (b) finding 2026-11-06 (keyed draws change
+      augmentation and init vs older runs). git diff f21572a1..873458794c outside plan/: only the SHORT_TAG arm list of scripts/job_catalog_v3_short.sh
+      (7dbca1f4).'
+    measure: 'Sign: unchanged (H5/HD5 seed-mean wrong-sign shares, paired sign tests against the MSE control, the rerun and
+      all-positive; training-pool sign accuracy). Magnitude (gating): R = matched arm over this same-code rerun, het_oneloop''s
+      interval: PP4 and EE4 upper <= 1.10, HD4 and each H1-H7c shown worse only if lower > 1 and point > 1.10. The step-56
+      arm sat at R 1.002 (PP4) / 0.953 (EE4) against the het magnitude reference, so not worse than the rerun answers ''without
+      hurting the het magnitude''; the rerun''s R against the old het reference reported beside. Re-seed check: old step-56
+      runs vs the rerun on H5 and HD5, a per-pool paired sign test and the ratio of their median wrong-sign shares.'
+    check: 'As the passed step-61 design: four seeds resolved the het vs MSE sign gap (H5 p 0.0036, HD5 p 0.0096) and PP4/EE4
+      magnitude within +-4% (se ln 0.030/0.019).'
+    fixed: Everything of v4_het_control_signhead (width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, sign_loss_weight 1, no pair head, reads PP4/EE4/HD4/HD5 + H1-H7c),
+      code identical to the matched arms' f21572a1 (only the SHORT_TAG arm list differs), gpu_v100; run dirs <arm>_tagkeyed
+      (SHORT_TAG=keyed), step 56's dirs never overwritten.
+    control: This same-code rerun for both sign and magnitude; the MSE control (v4_dimensionless_muon seeds 42-45, old code)
+      for the sign non-inferiority, under the re-seed rule in the outcome.
+    seeds: 42-45 (4 jobs), matching the matched arms.
+    outcome: 'Re-seed rule first: if the old-vs-rerun median wrong-sign ratio on H5 or HD5 is outside [1/1.2, 1.2] or their
+      paired sign test gives p < 0.05, rerun the MSE control v4_dimensionless_muon seeds 42-45 at the same code (4 jobs, ~9
+      GPU-h, its own design) before any YES or NO against it; otherwise the old MSE control stands. Then the step-61 outcomes
+      (YES / SIGN YES MAGNITUDE HURT / PARTIAL / NO) with this rerun as the step-56 arm and the magnitude gate against the
+      rerun. Cost: 4 jobs x 1 V100, 2.33 h work each, limit 03:00, 9.3 GPU-h work / 12 at the limits; in memory.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
