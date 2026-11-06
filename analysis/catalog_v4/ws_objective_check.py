@@ -23,6 +23,7 @@ A candidate tracks the reads when, on every resolved comparison, its ln ratio ha
 
     python3 analysis/catalog_v4/ws_objective_check.py extract      -> data/ws_objective_logs.json (site, read-only)
     python3 analysis/catalog_v4/ws_objective_check.py rank         -> data/ws_objective_check.json
+    python3 analysis/catalog_v4/ws_objective_check.py score <run...>  the trial objective of finished runs (HD4)
 """
 import json
 import math
@@ -256,5 +257,16 @@ def rank():
     print(json.dumps({"out": OUT, "tracking_select": out["tracking_select"], "tracking_both": out["tracking_both"]}))
 
 
+def score(runs):
+    """The sweep trial's objective (trial_score on HD4) of finished runs, from their reads: the bar a growth sweep's
+    best trial must beat (the default growth's own score)"""
+    cls = mab.class_of()
+    out = {r: round(trial_score(mab.load(r, "HD4"), cls), 5) for r in runs}
+    print(json.dumps(out))
+
+
 if __name__ == "__main__":
-    {"extract": extract, "rank": rank}[sys.argv[1]]()
+    if sys.argv[1] == "score":
+        score(sys.argv[2:])
+    else:
+        {"extract": extract, "rank": rank}[sys.argv[1]]()
