@@ -5413,10 +5413,19 @@ entries:
     searched: 'D269 D270 D294 (D270: ''the range the pp beams cover, but wider''; none sets how full the margin must be or
       a CPU budget for the regeneration), CLAUDE.md, plan entry findings of steps 65-67'
     blocks: step 64's submission, step 61's resubmission, step 65's regeneration design
-    blocks_steps: &id001
+    blocks_steps:
     - 61
     - 64
     - 65
+  - ask: 'Scope: which generation the e+e- classes keep. Should the e+e- classes go back exactly to how they were generated
+      before catalog_v4 (sqrt(s) windows up to 1 TeV, the old angle cut), or stay as catalog_v4 made them (6 TeV window, |cos
+      theta| < 0.99)?'
+    at: '2026-11-06T22:36:12+00:00'
+    searched: 'site decisions --project FA (D294, D295, D269/D270), docs/results.tex catalog_v4 generation, the plan''s catalog_coverage
+      findings: none chose a sampling for the e+e- classes; the 6 TeV window was inherited from the pp coverage check'
+    blocks: the e+e- part of the regeneration design
+    blocks_steps: &id001
+    - 68
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -12181,19 +12190,14 @@ entries:
       e+e- classes have no dsh pool, so their range comes from the 2000-event EE4 pool they are scored on (a label-in-inputs
       question: generate more default events for them, or accept). Repo-reviewer backlog holds 08e3091e..4c252c5f.'
     written: '2026-11-06T20:24:47+00:00'
-  ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings (39
-    GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h
-    of work)? And for the catalog regeneration: at budget 750 with both ladders, every log|M|^2 bin up to the highest pp event
-    is filled on all five test classes, but the extra half decade above it is not quite (uu_bbxuu 0.91 and 0.25 in its last
-    two bins, the others 0.91-0.96): do we accept that (CPU time per pool about 120x plain multichannel on the QCD classes,
-    ~8600 s vs ~72 s), or pay to fill it (budget ~3000, an estimate of about 4x that again on uu_bbxuu-like classes, ~1.1x
-    on the others)?'
-  waiting_since: '2026-11-06T17:48:37+00:00'
-  searched: 'D269 D270 D294 (D270: ''the range the pp beams cover, but wider''; none sets how full the margin must be or a
-    CPU budget for the regeneration), CLAUDE.md, plan entry findings of steps 65-67'
-  blocks: step 64's submission, step 61's resubmission, step 65's regeneration design
+  ask: 'Scope: which generation the e+e- classes keep. Should the e+e- classes go back exactly to how they were generated
+    before catalog_v4 (sqrt(s) windows up to 1 TeV, the old angle cut), or stay as catalog_v4 made them (6 TeV window, |cos
+    theta| < 0.99)?'
+  waiting_since: '2026-11-06T22:36:12+00:00'
+  searched: 'site decisions --project FA (D294, D295, D269/D270), docs/results.tex catalog_v4 generation, the plan''s catalog_coverage
+    findings: none chose a sampling for the e+e- classes; the 6 TeV window was inherited from the pp coverage check'
+  blocks: the e+e- part of the regeneration design
   blocks_steps: *id001
-  checked_until: '2026-11-06T18:46:52+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
