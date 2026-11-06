@@ -3590,8 +3590,9 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
     is a parton and there are at least three finals; with `res2`, ("res2", S1, p1, M1, G1, S2, p2, M2, G2) per pair of
     resonances on disjoint finals (both on shell together, plan step 58: the doubly resonant top of the electroweak
-    classes' log|M|^2 range); with `mperi`, ("mperi",) when the beams and at least two finals are partons (every final at pT near the
-    cut spread in rapidity to the acceptance edge: the forward multiperipheral top of the QCD classes' range)"""
+    classes' log|M|^2 range); with `mperi`, ("mperi",) when the beams and at least two finals are partons (every
+    final at pT near the cut spread in rapidity to the acceptance edge: the forward multiperipheral top of the QCD
+    classes' range)"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
     rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
     res = [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
