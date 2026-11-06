@@ -231,7 +231,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 28.690805520061986,
+      "seconds": 17.88884921502904,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -325,7 +325,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 19.082910035955138,
+      "seconds": 18.310538641992025,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -671,7 +671,7 @@
       "pass": true,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 218.7815043549781,
+      "seconds": 143.01081658198382,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -746,7 +746,7 @@
       "pass": true,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 144.35793459801062,
+      "seconds": 144.13643157904153,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -813,6 +813,176 @@
     "kept_max": [
      0.9125759379601488,
      0.9122476243423319
+    ],
+    "channels": null,
+    "kept_per_channel_seed42": null
+   },
+   "quota_ladder_res2_budget500_outcome": {
+    "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
+    "yes": false,
+    "heldout": {
+     "42": [
+      1,
+      54001,
+      null
+     ],
+     "43": [
+      1,
+      54001,
+      null
+     ]
+    }
+   },
+   "quota_ladder_res2_budget500": {
+    "seeds": {
+     "42": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 40,
+      "pp_median_bin": -4.75,
+      "bins_from_pp_median": 13,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9494661921708185,
+      "plateau": 702.5,
+      "min_over_plateau": 0.9494661921708185,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 1542.1889531990455,
+      "n_events": 100000,
+      "n_candidates": 16919604,
+      "quota_events": 34992,
+      "quota_short": 176,
+      "quota_short_share": 0.005029721079103796,
+      "bins_short_log10": [
+       0.42,
+       0.67
+      ],
+      "chunks_short": 26,
+      "n_chunks": 36,
+      "rounds_max": 167,
+      "chunks_budget_hit": 26,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 483.52777777777777,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13_udx_csxvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 12000,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13_udx_csxvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_udx_csxvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_udx_csxvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 54001,
+        "n_in_support_outside_kept": 1,
+        "above_max": 0.0,
+        "below_min": 1.8518175589340937e-05,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 54001,
+      "heldout_outside_kept": 1,
+      "heldout_upper95": null,
+      "heldout_share": 1.8518175589340937e-05
+     },
+     "43": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 40,
+      "pp_median_bin": -4.75,
+      "bins_from_pp_median": 13,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9644886363636364,
+      "plateau": 704.0,
+      "min_over_plateau": 0.9559659090909091,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 1757.1641860210366,
+      "n_events": 100000,
+      "n_candidates": 17293824,
+      "quota_events": 34992,
+      "quota_short": 254,
+      "quota_short_share": 0.007258802011888432,
+      "bins_short_log10": [
+       0.18,
+       0.42,
+       0.67
+      ],
+      "chunks_short": 30,
+      "n_chunks": 36,
+      "rounds_max": 167,
+      "chunks_budget_hit": 30,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 494.22222222222223,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13_udx_csxvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 12000,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13_udx_csxvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_udx_csxvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_udx_csxvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_udx_csxvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 54001,
+        "n_in_support_outside_kept": 1,
+        "above_max": 0.0,
+        "below_min": 1.8518175589340937e-05,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 54001,
+      "heldout_outside_kept": 1,
+      "heldout_upper95": null,
+      "heldout_share": 1.8518175589340937e-05
+     }
+    },
+    "pass": true,
+    "kept_max": [
+     0.9138720572206515,
+     0.9127279733593219
     ],
     "channels": null,
     "kept_per_channel_seed42": null
@@ -1071,7 +1241,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 47.76155700498202,
+      "seconds": 51.71348188801494,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -1179,7 +1349,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 47.164047422018484,
+      "seconds": 51.71308923399192,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -1581,7 +1751,7 @@
       "pass": false,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 656.8550299830094,
+      "seconds": 667.8733193680382,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -1662,7 +1832,7 @@
       "pass": false,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 467.88876731596247,
+      "seconds": 668.8460150890023,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -1730,6 +1900,182 @@
     "pass": false,
     "kept_max": [
      4.629597949672283,
+     5.07720338320402
+    ],
+    "channels": null,
+    "kept_per_channel_seed42": null
+   },
+   "quota_ladder_res2_budget500_outcome": {
+    "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
+    "yes": false,
+    "heldout": {
+     "42": [
+      1,
+      53857,
+      null
+     ],
+     "43": [
+      1,
+      53857,
+      null
+     ]
+    }
+   },
+   "quota_ladder_res2_budget500": {
+    "seeds": {
+     "42": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 47,
+      "pp_median_bin": -0.75,
+      "bins_from_pp_median": 18,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9202797202797203,
+      "plateau": 715.0,
+      "min_over_plateau": 0.9202797202797203,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 6879.874966032032,
+      "n_events": 100000,
+      "n_candidates": 17496000,
+      "quota_events": 34992,
+      "quota_short": 2229,
+      "quota_short_share": 0.0637002743484225,
+      "bins_short_log10": [
+       3.6,
+       3.85,
+       4.09,
+       4.34,
+       4.59,
+       4.84
+      ],
+      "chunks_short": 36,
+      "n_chunks": 36,
+      "rounds_max": 167,
+      "chunks_budget_hit": 36,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 500.0,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13v4_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13v4_us_ddxsu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 11965,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.002916666666666667,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.002916666666666667,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13v4_us_ddxsu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_us_ddxsu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_us_ddxsu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 53857,
+        "n_in_support_outside_kept": 1,
+        "above_max": 1.8567688508457584e-05,
+        "below_min": 0.0,
+        "out_of_support_all": 0.002666617284865095,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.002666617284865095,
+        "above_max_all": 1.8518175589340937e-05,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 53857,
+      "heldout_outside_kept": 1,
+      "heldout_upper95": null,
+      "heldout_share": 1.8567688508457584e-05
+     },
+     "43": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 47,
+      "pp_median_bin": -0.75,
+      "bins_from_pp_median": 18,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9424157303370787,
+      "plateau": 712.0,
+      "min_over_plateau": 0.9353932584269663,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 6885.78633641699,
+      "n_events": 100000,
+      "n_candidates": 17496000,
+      "quota_events": 34992,
+      "quota_short": 2183,
+      "quota_short_share": 0.0623856881572931,
+      "bins_short_log10": [
+       3.85,
+       4.09,
+       4.34,
+       4.59,
+       4.84
+      ],
+      "chunks_short": 36,
+      "n_chunks": 36,
+      "rounds_max": 167,
+      "chunks_budget_hit": 36,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 500.0,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13v4_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13v4_us_ddxsu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 11965,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.002916666666666667,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.002916666666666667,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13v4_us_ddxsu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_us_ddxsu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_us_ddxsu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_us_ddxsu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 53857,
+        "n_in_support_outside_kept": 1,
+        "above_max": 1.8567688508457584e-05,
+        "below_min": 0.0,
+        "out_of_support_all": 0.002666617284865095,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.002666617284865095,
+        "above_max_all": 1.8518175589340937e-05,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 53857,
+      "heldout_outside_kept": 1,
+      "heldout_upper95": null,
+      "heldout_share": 1.8567688508457584e-05
+     }
+    },
+    "pass": true,
+    "kept_max": [
+     5.08677179275604,
      5.07720338320402
     ],
     "channels": null,
@@ -1976,7 +2322,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 69.80701765096455,
+      "seconds": 71.87667455500923,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -2081,7 +2427,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 70.2123786329903,
+      "seconds": 71.93204976801644,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -2488,7 +2834,7 @@
       "pass": false,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 538.466864069007,
+      "seconds": 836.7750365320389,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -2572,7 +2918,7 @@
       "pass": false,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 699.1998147449631,
+      "seconds": 835.8615044370381,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -2641,6 +2987,183 @@
     "kept_max": [
      4.714557169561931,
      4.895440420520661
+    ],
+    "channels": null,
+    "kept_per_channel_seed42": null
+   },
+   "quota_ladder_res2_budget500_outcome": {
+    "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
+    "yes": false,
+    "heldout": {
+     "42": [
+      1,
+      53345,
+      null
+     ],
+     "43": [
+      1,
+      53345,
+      null
+     ]
+    }
+   },
+   "quota_ladder_res2_budget500": {
+    "seeds": {
+     "42": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 44,
+      "pp_median_bin": -0.5,
+      "bins_from_pp_median": 18,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.7946084724005135,
+      "plateau": 779.0,
+      "min_over_plateau": 0.7946084724005135,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 8249.607198547019,
+      "n_events": 100000,
+      "n_candidates": 17496000,
+      "quota_events": 34992,
+      "quota_short": 3056,
+      "quota_short_share": 0.08733424782807499,
+      "bins_short_log10": [
+       3.71,
+       3.96,
+       4.21,
+       4.45,
+       4.7,
+       4.95
+      ],
+      "chunks_short": 36,
+      "n_chunks": 36,
+      "rounds_max": 167,
+      "chunks_budget_hit": 36,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 500.0,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13v4_uu_bbxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13v4_uu_bbxuu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 11839,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.013416666666666667,
+        "outside_window_all": 8.333333333333333e-05,
+        "fail_cuts_in_window_all": 0.013333333333333334,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13v4_uu_bbxuu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uu_bbxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_uu_bbxuu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uu_bbxuu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 53345,
+        "n_in_support_outside_kept": 1,
+        "above_max": 0.0,
+        "below_min": 1.8745899334520575e-05,
+        "out_of_support_all": 0.012147923186607656,
+        "outside_window_all": 0.0001481454047147275,
+        "fail_cuts_in_window_all": 0.011999777781892929,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 53345,
+      "heldout_outside_kept": 1,
+      "heldout_upper95": null,
+      "heldout_share": 1.8745899334520575e-05
+     },
+     "43": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 44,
+      "pp_median_bin": -0.5,
+      "bins_from_pp_median": 18,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.82798459563543,
+      "plateau": 779.0,
+      "min_over_plateau": 0.82798459563543,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 8246.87393101702,
+      "n_events": 100000,
+      "n_candidates": 17496000,
+      "quota_events": 34992,
+      "quota_short": 3046,
+      "quota_short_share": 0.08704846822130773,
+      "bins_short_log10": [
+       3.71,
+       3.96,
+       4.21,
+       4.45,
+       4.7,
+       4.95
+      ],
+      "chunks_short": 36,
+      "n_chunks": 36,
+      "rounds_max": 167,
+      "chunks_budget_hit": 36,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 500.0,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13v4_uu_bbxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13v4_uu_bbxuu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 11839,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.013416666666666667,
+        "outside_window_all": 8.333333333333333e-05,
+        "fail_cuts_in_window_all": 0.013333333333333334,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13v4_uu_bbxuu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uu_bbxuu_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_uu_bbxuu_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uu_bbxuu_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 53345,
+        "n_in_support_outside_kept": 1,
+        "above_max": 0.0,
+        "below_min": 1.8745899334520575e-05,
+        "out_of_support_all": 0.012147923186607656,
+        "outside_window_all": 0.0001481454047147275,
+        "fail_cuts_in_window_all": 0.011999777781892929,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 53345,
+      "heldout_outside_kept": 1,
+      "heldout_upper95": null,
+      "heldout_share": 1.8745899334520575e-05
+     }
+    },
+    "pass": true,
+    "kept_max": [
+     4.961134124889684,
+     4.9932834351326525
     ],
     "channels": null,
     "kept_per_channel_seed42": null
@@ -2773,7 +3296,7 @@
       "pass": true,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 18.043594136994216,
+      "seconds": 24.24560836602177,
       "n_events": 100000,
       "n_candidates": 209988,
       "pp_sources": {
@@ -2831,7 +3354,7 @@
       "pass": true,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 28.801905662025092,
+      "seconds": 25.407004367007175,
       "n_events": 100000,
       "n_candidates": 209988,
       "pp_sources": {
@@ -3107,7 +3630,7 @@
       "pass": true,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 40.79883459601842,
+      "seconds": 52.59240767300071,
       "n_events": 100000,
       "n_candidates": 524970,
       "quota_events": 34998,
@@ -3175,7 +3698,170 @@
       "pass": true,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 62.604118252012995,
+      "seconds": 56.577594320013304,
+      "n_events": 100000,
+      "n_candidates": 542469,
+      "quota_events": 34998,
+      "quota_short": 0,
+      "quota_short_share": 0.0,
+      "bins_short_log10": [],
+      "chunks_short": 0,
+      "n_chunks": 6,
+      "rounds_max": 6,
+      "chunks_budget_hit": 0,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 15.5,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13_uux_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13_uux_epemg_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 12000,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13_uux_epemg_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_uux_epemg_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemg_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 54001,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 54001,
+      "heldout_outside_kept": 0,
+      "heldout_upper95": 5.5554526768022814e-05,
+      "heldout_share": 0.0
+     }
+    },
+    "pass": true,
+    "kept_max": [
+     0.7732614034386703,
+     0.7724029968534606
+    ],
+    "channels": null,
+    "kept_per_channel_seed42": null
+   },
+   "quota_ladder_res2_budget500_outcome": {
+    "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
+    "yes": true,
+    "heldout": {
+     "42": [
+      0,
+      54001,
+      5.5554526768022814e-05
+     ],
+     "43": [
+      0,
+      54001,
+      5.5554526768022814e-05
+     ]
+    }
+   },
+   "quota_ladder_res2_budget500": {
+    "seeds": {
+     "42": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 24,
+      "pp_median_bin": -2.25,
+      "bins_from_pp_median": 6,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9809523809523809,
+      "plateau": 1155.0,
+      "min_over_plateau": 0.948051948051948,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 52.369867194996914,
+      "n_events": 100000,
+      "n_candidates": 524970,
+      "quota_events": 34998,
+      "quota_short": 0,
+      "quota_short_share": 0.0,
+      "bins_short_log10": [],
+      "chunks_short": 0,
+      "n_chunks": 6,
+      "rounds_max": 5,
+      "chunks_budget_hit": 0,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 15.0,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13_uux_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13_uux_epemg_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 12000,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13_uux_epemg_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemg_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_uux_epemg_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemg_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 54001,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 54001,
+      "heldout_outside_kept": 0,
+      "heldout_upper95": 5.5554526768022814e-05,
+      "heldout_share": 0.0
+     },
+     "43": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 24,
+      "pp_median_bin": -2.25,
+      "bins_from_pp_median": 6,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9612403100775194,
+      "plateau": 1161.0,
+      "min_over_plateau": 0.9612403100775194,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 67.05658227701497,
       "n_events": 100000,
       "n_candidates": 542469,
       "quota_events": 34998,
@@ -3491,7 +4177,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 33.266098776017316,
+      "seconds": 20.32865400899027,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -3589,7 +4275,7 @@
       "pass": false,
       "above_max_by_construction": false,
       "below_min": 0.0,
-      "seconds": 31.044014390965458,
+      "seconds": 28.13776666796184,
       "n_events": 100000,
       "n_candidates": 209952,
       "pp_sources": {
@@ -3963,7 +4649,7 @@
       "pass": true,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 134.7740690199571,
+      "seconds": 138.17353352101054,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -4036,7 +4722,7 @@
       "pass": true,
       "above_max_by_construction": true,
       "below_min": 0.0,
-      "seconds": 207.3847758780612,
+      "seconds": 175.7846069070074,
       "n_events": 100000,
       "n_candidates": 1749600,
       "quota_events": 34992,
@@ -4054,6 +4740,169 @@
       "chunks_budget_hit": 36,
       "chunks_no_steer": 0,
       "flat_cand_per_kept": 50.0,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13_uux_epemvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 12000,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13_uux_epemvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_uux_epemvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 54001,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 54001,
+      "heldout_outside_kept": 0,
+      "heldout_upper95": 5.5554526768022814e-05,
+      "heldout_share": 0.0
+     }
+    },
+    "pass": true,
+    "kept_max": [
+     -0.17208301789139854,
+     -0.1709217245207562
+    ],
+    "channels": null,
+    "kept_per_channel_seed42": null
+   },
+   "quota_ladder_res2_budget500_outcome": {
+    "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
+    "yes": true,
+    "heldout": {
+     "42": [
+      0,
+      54001,
+      5.5554526768022814e-05
+     ],
+     "43": [
+      0,
+      54001,
+      5.5554526768022814e-05
+     ]
+    }
+   },
+   "quota_ladder_res2_budget500": {
+    "seeds": {
+     "42": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 42,
+      "pp_median_bin": -4.75,
+      "bins_from_pp_median": 13,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.968944099378882,
+      "plateau": 724.5,
+      "min_over_plateau": 0.968944099378882,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 396.5382511550415,
+      "n_events": 100000,
+      "n_candidates": 5137992,
+      "quota_events": 34992,
+      "quota_short": 0,
+      "quota_short_share": 0.0,
+      "bins_short_log10": [],
+      "chunks_short": 0,
+      "n_chunks": 36,
+      "rounds_max": 80,
+      "chunks_budget_hit": 0,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 146.83333333333334,
+      "pp_sources": {
+       "table": {
+        "files": [
+         "pp13_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "pp13_uux_epemvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 12000,
+        "n_in_support": 12000,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": true
+       },
+       "heldout": {
+        "files": [
+         "pp13_uux_epemvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemvevex_13000-13000GeV_train_lhe_amplitudes.npy",
+         "dsh_uux_epemvevex_13000-13000GeV_val_lhe_amplitudes.npy",
+         "dsh_uux_epemvevex_13000-13000GeV_test_lhe_amplitudes.npy"
+        ],
+        "n": 54001,
+        "n_in_support": 54001,
+        "n_in_support_outside_kept": 0,
+        "above_max": 0.0,
+        "below_min": 0.0,
+        "out_of_support_all": 0.0,
+        "outside_window_all": 0.0,
+        "fail_cuts_in_window_all": 0.0,
+        "above_max_all": 0.0,
+        "by_construction": false
+       }
+      },
+      "heldout_n_in_support": 54001,
+      "heldout_outside_kept": 0,
+      "heldout_upper95": 5.5554526768022814e-05,
+      "heldout_share": 0.0
+     },
+     "43": {
+      "above_max": 0.0,
+      "above_max_all": 0.0,
+      "n_bins": 42,
+      "pp_median_bin": -4.75,
+      "bins_from_pp_median": 13,
+      "bins_below_half_from_pp_median": [],
+      "min_over_plateau_from_pp_median": 0.9723756906077348,
+      "plateau": 724.0,
+      "min_over_plateau": 0.9585635359116023,
+      "bins_below_half": [],
+      "pass": true,
+      "above_max_by_construction": true,
+      "below_min": 0.0,
+      "seconds": 552.9303412429581,
+      "n_events": 100000,
+      "n_candidates": 5184648,
+      "quota_events": 34992,
+      "quota_short": 0,
+      "quota_short_share": 0.0,
+      "bins_short_log10": [],
+      "chunks_short": 0,
+      "n_chunks": 36,
+      "rounds_max": 97,
+      "chunks_budget_hit": 0,
+      "chunks_no_steer": 0,
+      "flat_cand_per_kept": 148.16666666666666,
       "pp_sources": {
        "table": {
         "files": [

@@ -43,7 +43,7 @@ def main(seed=42):
         ax.stairs(per_dex(r[f"quota_{seed}"]["hist_kept"], e), e, color=ps.C.vermillion, label="quota")
         if f"quota_ladder_res2_budget500_{seed}" in r:
             ax.stairs(per_dex(r[f"quota_ladder_res2_budget500_{seed}"]["hist_kept"], e), e, color=ps.C.purple,
-                      label="same, 10x candidate budget")
+                      label="same, 10x budget")
         if f"quota_ladder_res2_{seed}" in r:      # step 58 re-check: + ladder and joint-resonance channels
             ax.stairs(per_dex(r[f"quota_ladder_res2_{seed}"]["hist_kept"], e), e, color=ps.C.green,
                       label="quota + ladder, pairs")
