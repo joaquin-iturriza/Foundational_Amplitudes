@@ -15335,6 +15335,22 @@ entries:
       max relative floor difference 1.2e-4), float roundoff of the floor''s fit: the check now compares floors relatively
       at 1e-3 (shift of a probe''s MSE <= delta^2 <= 1e-6) @this commit, and C5, C6 pass; no run cancelled. Deviation from
       the design''s literal rule (string equality) stated here.'
+  - at: '2026-11-06T10:43:24+00:00'
+    text: '2026-11-06 step 11 objective check (ws_objective_check.py rank @d6500bae on branch ws-objective -> data/ws_objective_check.json;
+      figure plot_ws_objective.py @d6500bae figs/ws_objective_{a,b,c}): per comparison and seed, arm over its same-seed reference,
+      the deciding reads'' ln R (PP4, EE4: median over classes of the class geometric mean of probe MSE ratios) against each
+      logged candidate''s change. Chosen on 6 restart-recipe comparisons (NLL-tuned/untuned, MSE-tuned/untuned, MSE-tuned/NLL-tuned,
+      moment fill, damped Muon, growth MSE-tuned/default; resolved: the first, third and last), confirmed on 7 others (retraining
+      length 1066/533 and 2132/1066 for the restart and the growth, change against no change at 533/1066/2132). Only the zero-shot
+      MSE on the default-sampled held-out tree classes HD4 (H2p5, H6, H7E, H7c; no PP4/EE4 class) tracks on both: same sign
+      on every resolved comparison at both seeds, Pearson r with PP4/EE4 ln R 0.98/0.97 (12 points) and 0.96/0.95 (14 points).
+      Every in-run validation quantity runs against the reads: final val NLL r -0.68/-0.80 and -0.83/-0.90, best val NLL -0.88/-0.96,
+      val MSE of the mean over the trained processes -0.46/-0.62 and -0.81/-0.88 (L1, L1r, rel err, pp/ee splits alike; val
+      MSE on e+e- processes tracks the recipes, r 0.94/0.91, but fails all three change-vs-no-change checks); the catalog-sampled
+      held-out axes H1-H3, H6, H7 fail too, HD5 (one-loop) tracks the recipes only (check r -0.08). Reading: the restarts
+      that read better on the default-sampled probes fit the catalog-sampled validation pools worse, so any objective on those
+      pools selects against the reads. Next: the growth sweep''s objective is the HD4 zero-shot MSE of each trial''s final
+      model (PP4/EE4 stay the deciding reads, unused in selection); its implementation in the sweep worker is the next piece.'
   step_waits:
     '10': FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b
       FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7 FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e
