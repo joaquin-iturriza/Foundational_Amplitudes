@@ -3724,6 +3724,9 @@ entries:
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
+    65: (a) design the regeneration of the 1301 hadronic tree classes with sampling.multichannel + mc_mperi_both + mc_res2
+      and the flat quota at the budget Joaquin picks (750, or ~3000 to fill the margin), the cost from the measured replay
+      times (step 67 finding); repo-reviewer over fa872486..686c3241 first
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -10179,6 +10182,11 @@ entries:
       if:
       - 'estimate <= 30 GPU-h or covered by D292/D293: design, review, submit'
       - 'above 30 GPU-h not covered: estimate to the main session'
+    65:
+      feeds: 'D294: what the hadronic classes are regenerated with'
+      if:
+      - 'Joaquin accepts the margin at 750: design at 750'
+      - 'Joaquin pays to fill the margin: design at ~3000 (estimate: 4x the 750 time on uu_bbxuu-like classes)'
   owner:
     agent: a3f721e0495643441
     state: working
