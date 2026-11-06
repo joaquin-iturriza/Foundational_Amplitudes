@@ -11381,6 +11381,8 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '15': a day of live use of the registered notification hook (d2f7686d, 2026-11-04 ~22:00), then re-measure double wakes
       with main_turns.py
+    '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
+      idle: event (or its absence after 45 min) is the trigger'
   owner:
     agent: acf9c54af46447317
     state: working
