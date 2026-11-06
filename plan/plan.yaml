@@ -13222,6 +13222,9 @@ entries:
       --config <it> then sweep_manager submit, 8 trials, about 6.7 GPU-h at limits, batch target ws_grow_zeroshot 0.30 h per
       trial; then the best trial''s HPs at seeds 42/43 with every read against the default growth e046ac67/f35b6a78 (bar:
       best trial''s score below the default growth''s own 0.535)'
+    12: Resend the objective-check figure (ws_objective_a/b/c) once relabelled with explicit ratio formulas (worker a8bcfbc070e3cc263),
+      saying it is the first send of that figure; and carry the finding (every validation loss moves against the zero-shot
+      reads; only the zero-shot error on held-out default-sampled tree classes tracks them) into docs/results.tex.
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -15045,6 +15048,11 @@ entries:
       if:
       - 'BETTER on PP4/EE4 over the default growth: the tuned recipe becomes the growth recipe, read against w16 from scratch'
       - 'NOT BETTER (or no trial below 0.535): the growth stays at its default restart, SHORT of w16 scratch at k=533'
+    12:
+      feeds: 'Joaquin 11-06: the growth sweep objective and the house HPO objective'
+      if:
+      - 'sent and written: drop'
+      - 'send check refuses again: fix the labels'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
