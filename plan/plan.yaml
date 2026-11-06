@@ -10349,7 +10349,7 @@ entries:
     agent: a8e0ed3e3a9c9cd8a
     state: stopped
     since: '2026-11-06T19:56:06+00:00'
-    state_at: '2026-11-06T20:24:04+00:00'
+    state_at: '2026-11-06T20:24:20+00:00'
     context: 232373
     context_at: '2026-11-06T20:13:31+00:00'
   findings:
