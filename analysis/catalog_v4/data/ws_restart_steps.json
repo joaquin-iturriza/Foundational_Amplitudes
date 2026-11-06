@@ -24,7 +24,10 @@
   "grad_max20": 1590.7462158203125,
   "grad_max20_at": 6,
   "loss_max40": -1.2117059230804443,
-  "loss_end": -2.6412625312805176
+  "loss_end": -2.6412625312805176,
+  "grad_max_2_10": 1590.7462158203125,
+  "grad_max_2_10_at": 6,
+  "loss_max_2_10": -1.2117059230804443
  },
  "grown 8 to 16, 533 steps (s42)": {
   "run_dir": "runs/catalog_v4_long/v4_het_default25_w16_grow_k533",
@@ -51,7 +54,10 @@
   "grad_max20": 1329.3594970703125,
   "grad_max20_at": 7,
   "loss_max40": -1.540664553642273,
-  "loss_end": -2.6870617866516113
+  "loss_end": -2.6870617866516113,
+  "grad_max_2_10": 1329.3594970703125,
+  "grad_max_2_10_at": 7,
+  "loss_max_2_10": -1.5654720067977905
  },
  "pretrained start (het control, s42)": {
   "run_dir": "runs/catalog_v4_short/v4_het_control",
@@ -78,7 +84,10 @@
   "grad_max20": 4748592807936.0,
   "grad_max20_at": 1,
   "loss_max40": 356423041024.0,
-  "loss_end": -2.919562578201294
+  "loss_end": -2.919562578201294,
+  "grad_max_2_10": 1008105750528.0,
+  "grad_max_2_10_at": 6,
+  "loss_max_2_10": 2205075200.0
  },
  "moment fill (k=533, s42)": {
   "run_dir": "runs/catalog_v4_short/v4_het_warm25f_k533",
@@ -105,7 +114,10 @@
   "grad_max20": 1777.4388427734375,
   "grad_max20_at": 4,
   "loss_max40": 0.9117066860198975,
-  "loss_end": -2.6881980895996094
+  "loss_end": -2.6881980895996094,
+  "grad_max_2_10": 1777.4388427734375,
+  "grad_max_2_10_at": 4,
+  "loss_max_2_10": 0.9117066860198975
  },
  "moment fill (k=533, s43)": {
   "run_dir": "runs/catalog_v4_short/v4_het_warm25f_k533_seed2",
@@ -132,7 +144,10 @@
   "grad_max20": 1411.3475341796875,
   "grad_max20_at": 4,
   "loss_max40": 1.5366325378417969,
-  "loss_end": -2.5983939170837402
+  "loss_end": -2.5983939170837402,
+  "grad_max_2_10": 1411.3475341796875,
+  "grad_max_2_10_at": 4,
+  "loss_max_2_10": 1.5366325378417969
  },
  "default restart, same commit (k=533, s42)": {
   "run_dir": "runs/catalog_v4_short/v4_het_warm25_k533_tagd303",
@@ -159,7 +174,10 @@
   "grad_max20": 993.9799194335938,
   "grad_max20_at": 6,
   "loss_max40": -1.3278863430023193,
-  "loss_end": -2.676661252975464
+  "loss_end": -2.676661252975464,
+  "grad_max_2_10": 993.9799194335938,
+  "grad_max_2_10_at": 6,
+  "loss_max_2_10": -1.6204794645309448
  },
  "default restart, same commit (k=533, s43)": {
   "run_dir": "runs/catalog_v4_short/v4_het_warm25_k533_seed2_tagd303",
@@ -186,7 +204,18 @@
   "grad_max20": 1334.451416015625,
   "grad_max20_at": 10,
   "loss_max40": -1.2179694175720215,
-  "loss_end": -2.5834360122680664
+  "loss_end": -2.5834360122680664,
+  "grad_max_2_10": 1334.451416015625,
+  "grad_max_2_10_at": 10,
+  "loss_max_2_10": -1.2179694175720215
+ },
+ "Muon lr damped (k=533, s42)": {
+  "run_dir": "runs/catalog_v4_short/v4_het_warm25u_k533",
+  "missing": true
+ },
+ "Muon lr damped (k=533, s43)": {
+  "run_dir": "runs/catalog_v4_short/v4_het_warm25u_k533_seed2",
+  "missing": true
  },
  "hpo8 trial_0353": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_0353",
@@ -213,7 +242,10 @@
   "grad_max20": 4306.287109375,
   "grad_max20_at": 2,
   "loss_max40": 3.8814985752105713,
-  "loss_end": -2.3862595558166504
+  "loss_end": -2.3862595558166504,
+  "grad_max_2_10": 4306.287109375,
+  "grad_max_2_10_at": 2,
+  "loss_max_2_10": 3.8814985752105713
  },
  "hpo8 trial_0400": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_0400",
@@ -240,7 +272,10 @@
   "grad_max20": 2119.56591796875,
   "grad_max20_at": 2,
   "loss_max40": 0.2106778621673584,
-  "loss_end": -2.7378432750701904
+  "loss_end": -2.7378432750701904,
+  "grad_max_2_10": 2119.56591796875,
+  "grad_max_2_10_at": 2,
+  "loss_max_2_10": 0.2106778621673584
  },
  "hpo8 trial_0818": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_0818",
@@ -267,7 +302,10 @@
   "grad_max20": 3374.260498046875,
   "grad_max20_at": 4,
   "loss_max40": 3.850034236907959,
-  "loss_end": -2.54799747467041
+  "loss_end": -2.54799747467041,
+  "grad_max_2_10": 3374.260498046875,
+  "grad_max_2_10_at": 4,
+  "loss_max_2_10": 3.850034236907959
  },
  "hpo8 trial_0871": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_0871",
@@ -294,7 +332,10 @@
   "grad_max20": 1029.7763671875,
   "grad_max20_at": 18,
   "loss_max40": -2.0029966831207275,
-  "loss_end": -2.7848596572875977
+  "loss_end": -2.7848596572875977,
+  "grad_max_2_10": 881.4327392578125,
+  "grad_max_2_10_at": 9,
+  "loss_max_2_10": -2.388366460800171
  },
  "hpo8 trial_0952": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_0952",
@@ -321,7 +362,10 @@
   "grad_max20": 721.72265625,
   "grad_max20_at": 15,
   "loss_max40": -1.970869779586792,
-  "loss_end": -2.7675564289093018
+  "loss_end": -2.7675564289093018,
+  "grad_max_2_10": 537.7489624023438,
+  "grad_max_2_10_at": 9,
+  "loss_max_2_10": -2.480497360229492
  },
  "hpo8 trial_1333": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_1333",
@@ -348,7 +392,10 @@
   "grad_max20": 1319.955810546875,
   "grad_max20_at": 9,
   "loss_max40": -1.5808672904968262,
-  "loss_end": -2.7212352752685547
+  "loss_end": -2.7212352752685547,
+  "grad_max_2_10": 1319.955810546875,
+  "grad_max_2_10_at": 9,
+  "loss_max_2_10": -1.8873130083084106
  },
  "hpo8 trial_1831": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_1831",
@@ -375,7 +422,10 @@
   "grad_max20": 914.4120483398438,
   "grad_max20_at": 18,
   "loss_max40": -2.086977481842041,
-  "loss_end": -2.7858083248138428
+  "loss_end": -2.7858083248138428,
+  "grad_max_2_10": 708.4343872070312,
+  "grad_max_2_10_at": 9,
+  "loss_max_2_10": -2.477797031402588
  },
  "hpo8 trial_1860": {
   "run_dir": "runs/ws_c1_k533_hpo8/trial_1860",
@@ -402,7 +452,10 @@
   "grad_max20": 431.80889892578125,
   "grad_max20_at": 18,
   "loss_max40": -2.469665288925171,
-  "loss_end": -2.7940924167633057
+  "loss_end": -2.7940924167633057,
+  "grad_max_2_10": 160.34469604492188,
+  "grad_max_2_10_at": 9,
+  "loss_max_2_10": -2.5785276889801025
  },
  "_parent_optimizer_state": {
   "muon_state_entries": 0,

@@ -20,7 +20,9 @@ RUNS = {"warm start, default lr (k=533, s42)": "runs/catalog_v4_short/v4_het_war
         "moment fill (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25f_k533",
         "moment fill (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25f_k533_seed2",
         "default restart, same commit (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25_k533_tagd303",
-        "default restart, same commit (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25_k533_seed2_tagd303"}
+        "default restart, same commit (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25_k533_seed2_tagd303",
+        "Muon lr damped (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25u_k533",
+        "Muon lr damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25u_k533_seed2"}
 RUNS.update({"hpo8 " + d.rsplit("/", 1)[1]: d for d in sorted(glob.glob("runs/ws_c1_k533_hpo8/trial_*"))})
 out = {}
 for lab, d in RUNS.items():
@@ -32,7 +34,9 @@ for lab, d in RUNS.items():
                 "warmup_frac": c["training"]["cosanneal_warmup_frac"], "peak_lr": float(lr.max()),
                 "peak_at": int(lr.argmax()), "lr_0_2": lr[:3].tolist(), "grad_0_2": g[:3].tolist(),
                 "loss_0_2": l[:3].tolist(), "grad_max20": float(g[:20].max()), "grad_max20_at": int(g[:20].argmax()),
-                "loss_max40": float(l[:40].max()), "loss_end": float(l[-1])}
+                "loss_max40": float(l[:40].max()), "loss_end": float(l[-1]),
+                "grad_max_2_10": float(g[2:11].max()), "grad_max_2_10_at": 2 + int(g[2:11].argmax()),
+                "loss_max_2_10": float(l[2:11].max())}
 ck = torch.load(gzip.open("runs/catalog_v4_short/v4_het_control/models/model_run0.pt.gz"), map_location="cpu",
                 weights_only=False)
 o = ck["optimizer"]
@@ -57,5 +61,6 @@ if __name__ == "__main__":
     short = {"warm start, default lr (k=533, s42)": "default", "grown 8 to 16, 533 steps (s42)": "grown",
              "pretrained start (het control, s42)": "parent", "moment fill (k=533, s42)": "fill_s42",
              "moment fill (k=533, s43)": "fill_s43", "default restart, same commit (k=533, s42)": "default_d303_s42",
-             "default restart, same commit (k=533, s43)": "default_d303_s43"}
+             "default restart, same commit (k=533, s43)": "default_d303_s43",
+             "Muon lr damped (k=533, s42)": "muon_damped_s42", "Muon lr damped (k=533, s43)": "muon_damped_s43"}
     print(json.dumps({short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}))
