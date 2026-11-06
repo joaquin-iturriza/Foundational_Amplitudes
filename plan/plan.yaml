@@ -15694,7 +15694,8 @@ entries:
       is not in results). Best 0.476 is below the default growth''s same-seed 0.535 (ln -0.117, beyond the 0.011-0.022 same-seed
       spread): the design''s re-run branch. Five trials sit within 0.476-0.481, so the bar is cleared by a plateau, not one
       point.'
-  step_waits: {}
+  step_waits:
+    '11': FA-ccin2p3-4442e786 FA-ccin2p3-3fae7799
   handoff:
     state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
       at 0.125; C6 and C8 not decided, intervals too wide). Step 11: re-run sweep ws_grow_k533_zeroshot_hpo8_rerun ENDED,
