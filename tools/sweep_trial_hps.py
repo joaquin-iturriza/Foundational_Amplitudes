@@ -51,4 +51,8 @@ def overrides(name, trial_cfg):
 
 
 if __name__ == "__main__":
-    print(" ".join(overrides(sys.argv[1], sys.argv[2])))
+    try:
+        print(" ".join(overrides(sys.argv[1], sys.argv[2])))
+    except SystemExit as e:          # the reason on stdout, where the job script's $(...) captures it
+        print(e.code)
+        sys.exit(1)
