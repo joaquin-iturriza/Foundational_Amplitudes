@@ -25,10 +25,33 @@ ARMS = {"C5": ("v4_mse_warmpp", ("", "_seed2"), "v4_dimensionless_muon"),
         "C6": ("v4_mse_warmsx", ("", "_seed2", "_seed3", "_seed4"), "v4_dimensionless_muon"),
         "C8": ("v4_het_warmmag", ("", "_seed2"), "v4_het_control")}
 TOL = 1e-12
+# the floor s of an abslog transform (log max(|x|, s)) is a float the transform string carries to 7 digits, fitted on
+# the pool's train split: the parent and a parent_shared W run on the same 1e4 subsample give the same mu/sigma to 1e-12
+# but floors that differ from the 5th digit on (2026-11-06, C5/C6: 39-45 of the compared pools, relative difference up to
+# 1.2e-4), a float roundoff, not a different transform. The floor moves the target only on events below it, and there by
+# delta = |ln(s_w / s_p)| in log|M|^2, so it adds at most delta^2 to a probe's MSE of log|M|^2: at a relative tolerance of
+# 1e-3, 1e-6, under the smallest class MSE the reads resolve (about 1e-4, figs/ws_c1m CDFs)
+FLOOR_RTOL = 1e-3
 
 SCRIPT = r'''
 import json, os, sys, yaml
 pairs, retarget = json.loads(sys.argv[1]), set(json.loads(sys.argv[2]))
+def same_trafo(a, b, rtol=%r):
+    """equal transform lists, an abslog floor equal to rtol (relative); returns (equal, relative floor difference)"""
+    if len(a) != len(b):
+        return False, None
+    worst = 0.0
+    for x, y in zip(a, b):
+        x, y = str(x), str(y)
+        if x.startswith("abslog:") and y.startswith("abslog:"):
+            fx, fy = float(x.split(":", 1)[1]), float(y.split(":", 1)[1])
+            r = abs(fx - fy) / max(abs(fy), 1e-300)
+            worst = max(worst, r)
+            if r > rtol:
+                return False, r
+        elif x != y:
+            return False, None
+    return True, worst
 base = "runs/catalog_v4_short"
 def load(arm, recipe=None):
     d = os.path.join(base, arm)
@@ -51,7 +74,7 @@ for arm, parent in pairs:
     (ws, wr), (ps, pr) = w, p
     # a name can recur in a recipe (one entry per window or sampling): an entry is matched by its whole content
     pidx = {json.dumps(e, sort_keys=True): i for i, e in enumerate(pr)}
-    n, bad = 0, []
+    n, bad, floor_rel = 0, [], 0.0
     for i, e in enumerate(wr):
         j = pidx.get(json.dumps(e, sort_keys=True))
         if j is None:
@@ -62,12 +85,14 @@ for arm, parent in pairs:
         n += 1
         wt = ws["amp_trafos_pp"][i]
         dm = abs(ws["prepd_mean"][i] - ps["prepd_mean"][j]); ds = abs(ws["prepd_std"][i] - ps["prepd_std"][j])
-        if wt != pt or dm > %r or ds > %r:
-            bad.append({"pool": e["name"], "w": wt, "parent": pt, "d_mean": dm, "d_std": ds})
+        eq, rel = same_trafo(wt, pt)
+        floor_rel = max(floor_rel, rel or 0.0)
+        if not eq or dm > %r or ds > %r:
+            bad.append({"pool": e["name"], "w": wt, "parent": pt, "d_mean": dm, "d_std": ds, "floor_rel": rel})
     out[arm] = {"ok": not bad, "n_compared": n, "n_mismatch": len(bad), "mismatch_first": bad[:10],
-                "n_pools_w": len(wr), "n_pools_parent": len(pr)}
+                "n_pools_w": len(wr), "n_pools_parent": len(pr), "max_floor_rel": floor_rel}
 print("WSSTATS " + json.dumps(out))
-''' % (TOL, TOL)
+''' % (FLOOR_RTOL, TOL, TOL)
 
 
 def arms_of(change):
