@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_signhead_matched_<event|const>[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_warm25f_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_signhead_matched_<event|const>[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_warm25f_k533[_seed2], v4_het_warm25m_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -58,6 +58,15 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++dat
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 # the Muon search's best (sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml, trial_1860; par:v3_muon, D155)
 MUON_BEST=(training.optimizer=MuonAdamW ++training.lr=0.004997423 ++training.muon_weight_decay=0.02171863)
+# the k=533 warm start tuned on the validation MSE of the mean (plan warm_start step 6, D291/D298): best trial hp_1333 of
+# sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml (ws_c1_k533_mse_wsd_hpo8, val MSE of mu 0.0283326), its
+# searched HPs with the WSD schedule and mu_mse checkpoint selection (the sigma stage still selects on nll, run.py);
+# lr_scale and layer_decay go through WS_LR_SCALE/WS_LD (warm arms) or the growth block (GROW_HP=1333)
+WS_M_HP=(++training.muon_weight_decay=0.16672539879714493 ++training.regularization_lambda=1.4854123504075623e-09
+         ++training.cosanneal_warmup_frac=0.12411841467022895 ++training.cosanneal_eta_min=4.786345804539106e-09
+         ema=false ++training.ema_decay=0.9250910269171 ++training.scheduler=WSD
+         ++training.wsd_cooldown_frac=0.1640708651393652 ++training.heterosc_select=mu_mse)
+WS_M_LR_SCALE=1.8477718659435107; WS_M_LD=0.8749838606454432
 HET=; SIGNHEAD=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; WS_CKPT=model_run0_best; WS_PRE_SIGMA=; WS_FILL=; TRAIN_ONLY=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
 case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
@@ -305,6 +314,17 @@ PY
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             K=533; WS_PARENT="$PAR"; WS_FILL=100
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_default25_train.yaml" ;;
+    # step 6 (D291/D298): warm25 at K=533 at the MSE-of-the-mean sweep's best trial (WS_M_HP above), seed s from the
+    # control at seed s; the full job (sigma stage, every read)
+    v4_het_warm25m_k533|v4_het_warm25m_k533_seed2)
+                            CAT=v4; CROSS=(PP4 EE4 HD4 HD5); HET=1
+                            NORM=("${DIM[@]}" training.optimizer=MuonAdamW ++training.lr=0.004997423 "${WS_M_HP[@]}")
+                            WS_LR_SCALE=$WS_M_LR_SCALE; WS_LD=$WS_M_LD
+                            PAR=v4_het_control; case "$ARM" in *_seed2) NORM+=(seed=43); PAR=v4_het_control_seed2 ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            K=533; WS_PARENT="$PAR"
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_default25_train.yaml" ;;
     # the tuned warm start (warm_start step 3, D284): warm25 at K=533 with the best trial of the DyHPO sweep
     # ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml, hp_1860, val_loss_no_reg -2.75764), seed s
     # from the control at seed s
@@ -466,7 +486,17 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
         NORM+=(++fine_tune.pretrained_path="$GPT" ++fine_tune.grow_width=true ++fine_tune.lr_scale=1.0 ++fine_tune.layer_decay=1.0
                ++fine_tune.target_stats=parent ++fine_tune.offshell_stats=parent)
         OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_grow_k${GROW_K}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_grow_k${GROW_K}"
-        echo "GROW parent=$GPT heads $((LH / 2)) -> $LH steps=$GROW_K"
+        # GROW_HP=1333 (plan warm_start step 6): the growth retrained at the MSE-of-the-mean sweep's best trial (WS_M_HP,
+        # its lr_scale and layer_decay) instead of the untuned restart; own run dir _hp1333
+        if [ -n "$GROW_HP" ]; then
+            [ "$GROW_HP" = 1333 ] && [ "$GROW_K" = 533 ] || { echo "GROW_HP: only 1333, at GROW_K=533"; exit 1; }
+            NORM=("${NORM[@]/#++fine_tune.lr_scale=*/++fine_tune.lr_scale=$WS_M_LR_SCALE}")
+            NORM=("${NORM[@]/#++fine_tune.layer_decay=*/++fine_tune.layer_decay=$WS_M_LD}")
+            NORM=("${NORM[@]/#++training.muon_weight_decay=*/}")
+            NORM=($(printf '%s\n' "${NORM[@]}" | grep -v '^$') "${WS_M_HP[@]}")
+            OUT="${OUT}_hp1333"; PRED="${PRED}_hp1333"
+        fi
+        echo "GROW parent=$GPT heads $((LH / 2)) -> $LH steps=$GROW_K${GROW_HP:+ hp $GROW_HP}"
     fi
 fi
 [ -n "$SIGMA_FROM" ] && AXES+=(HD4 HD5)

@@ -34,7 +34,8 @@ FIGS = os.path.join(HERE, "figs")
 SWEEP = "ws_c1_k533_hpo8"
 UNTUNED = "runs/catalog_v4_short/v4_het_warm25_k533"
 HPS = ("fine_tune.lr_scale", "fine_tune.layer_decay", "training.muon_weight_decay", "training.regularization_lambda",
-       "training.cosanneal_warmup_frac", "training.cosanneal_eta_min", "ema", "training.ema_decay")
+       "training.cosanneal_warmup_frac", "training.cosanneal_eta_min", "ema", "training.ema_decay",
+       "training.scheduler", "training.wsd_cooldown_frac", "training.heterosc_select")
 
 
 def run(a):
@@ -92,6 +93,9 @@ def run(a):
 
 
 def fetch(a):
+    """a.sweep (default ws_c1_k533_hpo8) -> a.out (default data/ws_hpo8/trial_curves.json)"""
+    sweep = a.sweep or SWEEP
+    dest = a.out or os.path.join(DATA, "trial_curves.json")
     sys.path.insert(0, ROOT)
     from analysis.common import site_python
     script = r'''
@@ -109,11 +113,11 @@ for f in sorted(glob.glob("sweeps/%s/results/*.json")):
         "val_curve": d["val_curve"], "val_mse_curve": d["val_mse_curve"], "val_loss_step0": d.get("val_loss_step0"),
         "hps": {k: get(k) for k in %r}}
 print("TRIALS " + json.dumps(out))
-''' % (SWEEP, SWEEP, HPS)
+''' % (sweep, sweep, HPS)
     out = site_python(script, [], "TRIALS")
-    os.makedirs(DATA, exist_ok=True)
-    json.dump(out, open(os.path.join(DATA, "trial_curves.json"), "w"), indent=1)
-    print(f"{len(out)} trials -> {os.path.join(DATA, 'trial_curves.json')}")
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    json.dump(out, open(dest, "w"), indent=1)
+    print(f"{len(out)} trials -> {dest}")
 
 
 def spearman(x, y):
@@ -260,7 +264,8 @@ def summary(a):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
-    sp.add_parser("run"); sp.add_parser("fetch")
+    sp.add_parser("run")
+    f = sp.add_parser("fetch"); f.add_argument("--sweep"); f.add_argument("--out")
     s = sp.add_parser("summary"); s.add_argument("--log", required=True)
     a = ap.parse_args()
     {"run": run, "fetch": fetch, "summary": summary}[a.cmd](a)
