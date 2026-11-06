@@ -8959,6 +8959,29 @@ entries:
       if neither arm beats step 56 -> gradient share ruled out; next the clipping regime. Blow-ups listed apart. Cost: 8 jobs
       x 1 V100, step 56 measured 2.32-2.34 h per job (0.928 s/step), limit 03:00 (tools/short_wall.py), 18.7 GPU-h work /
       24 at the limits; in memory, no cache.'
+    fix_at: '2026-11-06T05:03:46+00:00'
+    fix: 'Seeds against the measured spread and the stated outcome (checks 3 and 4), magnitude leg: YES needs the magnitude
+      R''s widened upper bound <= 1.25 on HD5 and H5 with seeds 42-45, but step 56 at the same 4 seeds and the same seed pairing
+      failed its pairing gate (first-pair sd of the paired ln ratio 0.58 on HD5, 0.46 on H5, against bounds 0.43 / 0.40; het_signhead.json
+      pairing_gate) and so fell back to the unpaired widened intervals [0.67, 1.42] on HD5 and [0.64, 1.56] on H5 (outcome_inputs.mag_widened_hi),
+      both above 1.25 for an arm with R ~1.03. A sign-weighted arm that moves the trunk further from the het reference will
+      pair no better, so with 4 seeds the YES is very likely unreachable whatever the sign does, and the design has no branch
+      for the most likely result (sign no worse than the MSE control, magnitude UNRESOLVED). ''Fewer seeds are not justified''
+      is not a reason that 4 suffice. Fix: either (a) compute from het_signhead.json (ref seed spread per class, unpaired
+      widened width against n) the seed count at which an arm at R = 1.03 gets an unpaired widened upper bound <= 1.25 on
+      HD5 and H5, and run that many seeds for both arms (and the het magnitude reference if its seeds bound the interval),
+      stating the GPU-h; or (b) keep 4 seeds and judge the magnitude on a read that 4 seeds resolve (e.g. the paired/unpaired
+      intervals on PP4, EE4, HD4, H1/H2, or the training pools'' val_loss_no_reg at the best checkpoint), saying why that
+      read answers ''without hurting the het magnitude''; and in either case add the outcome row for sign YES with magnitude
+      UNRESOLVED (what is adopted, what runs next). Also state in the design why the third candidate the step names (the sign
+      head''s attachment point) is not run now or is the next candidate on NO. Checks passed: one change against matched controls
+      (job_catalog_v3_short.sh @b3eb4156 lines 250-275: the new arms differ from v4_het_control_signhead only in sign_loss_weight
+      75 or sign_het_match; experiment.py:4121 implements the detached sigma^(2 beta)/(2 sigma^2) factor); the measure resolves
+      a 2x wrong-sign gap with 4 seeds (H5 17/21 worse, p 0.0036, median 13.3% vs 6.7%; HD5 15/19, p 0.0096); gradient-norm
+      ratio 75.1 (het_sign_diag.json); HETEROSC per the decisions; reads and preprocessing as step 56''s; no sweep; 18.7 GPU-h
+      in memory. Searched results.tex, the entry, site decisions for sign_loss_weight, sign weight, sign_het_match, matched_event/const,
+      het sign, sign head, gradient share: no het sign-weight run exists; the MSE sign-head search varied the pair head and
+      near-zero weighting only.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
