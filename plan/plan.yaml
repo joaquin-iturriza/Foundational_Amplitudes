@@ -13254,7 +13254,7 @@ entries:
     - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
-    commit: d5616629
+    commit: d6500bae
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
@@ -13266,12 +13266,15 @@ entries:
     - analysis/catalog_v4/data/ws_hpo8/het_split.json
     - analysis/catalog_v4/data/ws_hpo8/het_split_log.txt.gz
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
+    - analysis/catalog_v4/data/ws_objective_check.json
     - analysis/catalog_v4/data/ws_restart_steps.json
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
     - analysis/catalog_v4/plot_warm_start_compare.py
+    - analysis/catalog_v4/plot_ws_objective.py
     - analysis/catalog_v4/signext_compare.py
     - analysis/catalog_v4/ws_het_split.py
+    - analysis/catalog_v4/ws_objective_check.py
     - analysis/catalog_v4/ws_restart_steps.py
     - analysis/catalog_v4/ws_stats_check.py
     - base_experiment.py
