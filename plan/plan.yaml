@@ -8928,6 +8928,41 @@ entries:
       the pure-default bound (afc96598/d26f13aa, EE4 1.216 [1.099,1.355], share 1 under MSE) and sets the R_pp expectation
       against it; searched results.tex/plan/decisions for eeonly, ee-only, e+e--only, pponly, pp-only, pp only, per/by beam,
       beam ablation, cross-beam, default share, pure-default, D295.'
+  - at: '2026-11-06T05:01:25+00:00'
+    question: 'Step 61 (c), D287/D296: is the het sign head''s worse wrong-sign share (2.0x the MSE control on the signed
+      training pools, 1.99x on H5, 1.41x on HD5) caused by the sign loss''s ~75x smaller share of the shared network''s gradient
+      under het, and does matching that share make the het sign no worse than the MSE control''s without hurting the het magnitude?'
+    prior: 'Step 56 (het_signhead.json @6ec06b24): het + sign head at sign_loss_weight 1 (FA-ccin2p3-18b98b55/b2538139/66c83df6/69001455)
+      worse than the MSE control on H5 17/21 pools, HD5 15/19, magnitude UNRESOLVED (R ~1.03 [0.64,1.56]). Step 47: het magnitude
+      target YES. het_sign_diag.json @999e9742 (het_sign_diag.py @31a10318): het pre-clip median gradient norm 24-28 vs MSE
+      0.315-0.369, per-seed ratios 84.4/75.4/76.7/65.0 (geometric mean 75.1); clip at 5 binds on 98.8-99.2% of het steps vs
+      5.5-6.0% of MSE steps; adding the sign head does not move the het norm (24.0-28.0 vs 24.5-27.0 without); wrong-sign
+      het/MSE: training pools median 1.0% vs 0.5%, H5 13.3% vs 6.7%, HD5 18.3% vs 13.0%. The sign-head searches (sign_near,
+      pair head) were all under MSE. Searched results.tex (sign head, het sign, sign_loss_weight, sign_het_match), plan, site
+      decisions (sign): no het sign-weight run exists.'
+    measure: 'Step 56''s reads unchanged (het_oneloop.py signhead): per pool the seed-mean wrong-sign share on H5 (21 pools)
+      and HD5 (19 classes), paired sign tests against the MSE control, the step-56 arm and all-positive; the per-validation
+      sign accuracy on the 63 signed training pools; magnitude R against the het magnitude reference (5abe4a0e/92207f6a/0208896e/8ddc490b),
+      seed-paired with the pairing gate, on HD5, H5 and the side axes; pre-clip gradient norm from the log.'
+    check: 'On existing data the sign error moves with the sign loss''s gradient share: the MSE control (75x larger share)
+      has 2.0x / 1.99x / 1.41x fewer wrong signs on training / H5 / HD5 than the het arm at weight 1, and the het arm''s sign
+      term leaves its gradient norm unchanged (het_sign_diag.json).'
+    fixed: 'Everything of v4_het_control_signhead: width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, no pair head, reads PP4/EE4/HD4/HD5 + H1-H7c; scripts/job_catalog_v3_short.sh
+      at trunk b3eb4156; gpu_v100 (step 56''s GPU type). Arms: v4_het_signhead_matched_event (training.sign_het_match: each
+      event''s sign cross-entropy times the het NLL''s detached factor sigma^(2 beta)/(2 sigma^2) on its mu gradient, weight
+      1) and v4_het_signhead_matched_const (sign_loss_weight 75, the measured ratio; one value from a measured rule, not a
+      search). A detached sign head is not run: the trunk already gets almost no sign gradient, so detaching cannot fix it.'
+    control: The MSE control's sign reads (v4_dimensionless_muon seeds 42-45, HD5 rereads dc9feba1/af09cad3/8833a131/481ad196);
+      the step-56 arm at weight 1 (same seeds); the het magnitude reference for magnitude.
+    seeds: 42-45 for both arms (8 jobs), as step 56; its pairing gate failed, so fewer seeds are not justified.
+    outcome: 'Per arm: YES if not worse than the MSE control on H5 and HD5 (one-sided paired sign test p > 0.05 and median
+      wrong-sign within 1.2x of the control''s), better than the step-56 arm on H5 (p < 0.05), and magnitude R widened upper
+      bound <= 1.25 on HD5 and H5 -> adopt, write up. PARTIAL if better than step 56 but still worse than MSE -> the gradient
+      share is part of the cause, reported with numbers, next candidate the clipping regime (99% of het steps clipped). NO
+      if neither arm beats step 56 -> gradient share ruled out; next the clipping regime. Blow-ups listed apart. Cost: 8 jobs
+      x 1 V100, step 56 measured 2.32-2.34 h per job (0.928 s/step), limit 03:00 (tools/short_wall.py), 18.7 GPU-h work /
+      24 at the limits; in memory, no cache.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
