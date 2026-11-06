@@ -10435,6 +10435,19 @@ entries:
       the log tail, fix the setup, re-run those energies. COST: an ISR run''s s per kept event > 2x the no-ISR run''s -> where
       the time goes (survey/refine, kept fraction) before the regeneration design. 10 CPU jobs x 3 cores x <= 0.5 h, <= 15
       core-h, no GPU.'
+    passed_at: '2026-11-06T23:39:18+00:00'
+    reviewer: 'Step 71 revised (code be521c52): pool dsh_epem_bbxvevex now goes through accept_of (window 20-6000 GeV, e+e-
+      cuts in the partonic frame), owner''s local check kept 0.8315 / cuts_lab 0.1685 -> 0.178 under a rapidity-0.5 boost,
+      so kept and cost see what ISR changes; beam order [11,-11] gives lpp1 +3, lpp2 -3 (paper sect. 6); the banner read-back
+      (lpp1/lpp2/pdlabel/pdlabel1/pdlabel2, re imported) and the isronlyll control at 240/365/500/3000 (same pool, energy,
+      seed; --patch applied after the anchor patches) make a beamstrahlung grid that is silently not applied read NO_BEAMSTRAHLUNG,
+      not WORKS; LL expectation stated before the run (beta = alpha/pi (ln(s/m_e^2)-1), luminosity share below 0.99 0.35-0.43,
+      q10 0.78-0.71); spread binomial +-0.016 per share, +-0.02 per difference at 1000 events, the 0.02 threshold set on it;
+      control lpp 0 same job/node/seed; cost <= 15 core-h CPU, node-local work dirs deleted; earlier probe of this pool 128
+      s per 10881-event run (lhe_rates_dsh_ee4.json), 720 s timeout ample. Searched results.tex and the entry for ISR, beamstrahlung,
+      isronly, lpp, pdlabel, radiative return, beam spectrum, lepton/electron pdf, collider energ, shat_frac: only the unrelated
+      transfer-study ISR arm (l.12731). Note for the regeneration design, not this probe: D320''s approved proposal text is
+      not in the ledger, so the anchor energy list for the regeneration should be shown to Joaquin with it.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
