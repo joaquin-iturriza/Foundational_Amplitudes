@@ -13615,6 +13615,17 @@ entries:
       every probe read, no blow-up (58723352 spiked at 672 and recovered). The two caches (deda9310, 04fb3b3d, 23 GB each)
       deleted after the reads as designed. Design''s SHORT branch: tuning (D284''s sweep over the fine-tune space) is the
       next call, Joaquin''s.'
+  - at: '2026-11-06T05:01:35+00:00'
+    text: '2026-11-06 step (a) first read, from the logged curves (ws_het_split.py fetch @b9a3aed2 -> data/ws_hpo8/trial_curves.json):
+      over the 8 trials of ws_c1_k533_hpo8, the val MSE of mu at the best checkpoint ranks them nearly opposite to the val
+      NLL (the sweep objective): lr_scale 0.174 NLL -2.758 (best) MSE 0.0349 (2nd worst); lr_scale 2.22 NLL -2.546 MSE 0.0257
+      (best); 0.873 NLL -2.712 MSE 0.0279. The untuned k=533 run''s NLL curve (data/reads/FA-ccin2p3-341bf564_val.json) rises
+      from -2.57 at step 10 to about -1.95 near step 30 and recovers to -2.64 by 533, while the NLL-tuned run stays at -2.57..-2.76:
+      the re-warm disrupts the het calibration more than the mean. Exact split into W=<r^2/2sigma^2> and S=<log sigma>: reread
+      FA-ccin2p3-c6d0c827 (scripts/job_ws_het_split.sh @daadd002) in flight. Step (b): sweep ws_c1_k533_mse_wsd_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
+      @c0407056; objective val MSE of mu under D298, scheduler cosine or WSD) submitted, 8 trials in waves [3,3,2], slurm
+      62989766-73, 3.6 GPU-h. Tool fix: site pick''s verify timeout raised 90 -> 180 s in ~/.local/bin/site (CC''s setup.sh
+      --verify now takes 97 s; pick had allotted nothing).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
