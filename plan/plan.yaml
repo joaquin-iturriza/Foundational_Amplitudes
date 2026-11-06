@@ -12779,6 +12779,22 @@ entries:
       CDR 91/160/240; ILC TDR 250-500 (1 TeV upgrade); CLIC 380/1500/3000. Gap: no beamstrahlung grid in MG at 91, 160, 1000,
       1500 GeV (ISR only there; small at LEP/FCC-ee Z pole, not at 1-1.5 TeV linear colliders). Not yet checked: the run-card
       form (lpp1/lpp2 = -3/3 with pdlabel) running in our lhe_probe/lhe_parts setup.'
+  - at: '2026-11-06T23:40:58+00:00'
+    text: '2026-11-07 step 71 (j) e+e- collider anchor submitted (D318, D320). Machine energies checked against the documents:
+      LEP2 to 209 GeV (Phys. Rept. 532 (2013) 119, arXiv:1302.3415); FCC-ee 91/160/240/365 (FCC CDR vol. 2, EPJ ST 228 (2019)
+      261; arXiv:2203.08310 table 1); CEPC 91/160/240 (arXiv:1809.00285); ILC 200-500, to 1 TeV (arXiv:1306.6327); CLIC 380/1500/3000
+      (arXiv:1608.07537). MadGraph spectra (arXiv:2108.10261 sect. 6, table 1, read from the PDF): lpp +3 e- / -3 e+, pdlabel
+      isronlyll (LL ISR) or fcce240ll/fcce365ll/cepc240ll/ilc500ll/clic3000ll (ISR + beamstrahlung fitted to GuineaPig, beam
+      spread ignored); MG 3.7.0 on CC ships exactly these. Run card per energy = gen_catalog_v4_default.EE_ANCHOR/ee_beam_patches
+      @4354b762 (91.1876, 160, 209, 380, 1000, 1500 ISR only: no beamstrahlung fit exists there, a gap at the linear-collider
+      380/1000/1500 points). Probe design passed after one FIX (acceptance via the dsh pool; banner read-back; ISR-only control
+      at the four beamstrahlung energies), code be521c52, CC at 5ae41985: 10 CPU jobs scripts/job_lhe_probe.sh PROBE_SHARD=eeisr
+      PROBE_PROCESS=dsh_epem_bbxvevex, 3 CPUs, 00:30: 91.1876 6579d576, 160 cc877dee, 209 a609edba, 240 b3a1dac1, 365 dd9c0748,
+      380 d543defb, 500 79fc5d76, 1000 56ff1672, 1500 b972f424, 3000 ce420820; target ee_anchor_probe 0.4 h; wait on step
+      71. Expected ISR-only luminosity share of sqrt(s_hat)/sqrt(s) < 0.99 (LL, both beams): 0.35 at 91 GeV to 0.43 at 3 TeV.
+      Read: EEISR_JSON lines of each log (site logs <run>), per the design''s outcome. Reviewer note: the ten energies should
+      be shown to Joaquin with the regeneration design (the D320 proposal text is not in the ledger). Also: the step-69 sampler
+      check''s first job (3e7f56d9) ran end to end through the new diversity code.'
   handoff:
     state: '2026-11-07 ~00:30. Tonight''s four points: (3) scaling grid seed 42 SUBMITTED under a passed design (design-reviewer
       PASS after one FIX): memmap prebuild FA-ccin2p3-bf203857 (CPU, slurm 62996664) then 10 GPU cells afterok on it, wait
