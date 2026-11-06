@@ -9955,6 +9955,12 @@ entries:
     units: null
     start: '2026-11-06T06:42:20+00:00'
     at: '2026-11-06T06:42:20+00:00'
+  - batch: step66_ladder_edge
+    wall_h: 0.47
+    jobs: 10
+    units: null
+    start: '2026-11-06T09:36:02+00:00'
+    at: '2026-11-06T09:36:02+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
