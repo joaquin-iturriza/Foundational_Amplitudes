@@ -10590,6 +10590,19 @@ entries:
       median |log10 ratio| 0.031) over 6 decades. Both far below the 1.39 gap (full-set w8 over 1e4 per process). Superseded
       by (e): the full-set w8 gap was a run under one epoch (D293), so the loader question is closed; the per-seed UNRESOLVED
       read (seed 43 held 0.897) is within the pooled interval.'
+  - at: '2026-11-06T04:42:13+00:00'
+    text: '(d) step 62 default share per beam (ee_gain.py beams @278ae072 on branch wt-ee-beams -> data/ee_gain_beams.json;
+      recipes only, plus MIX_HET reads): the share-0.25 recipe gives a default source to 912 of 1153 training classes: 115
+      e+e- classes (dsh_ entries reusing the ee4_ pools: MadEvent e+e- at fixed collider energies 91.19/240/365/500/1000/3000
+      GeV, 3-6 energies per class past threshold) and 797 hadronic (13 TeV pp, reusing pp13v4_ 466 / pp13_ 331); 241 without
+      (one-loop, heavy-quark, alpha_s, cut-point). Under the short arms'' 1e4 subsample: 2500 default events per class, e+e-
+      287,500 (2.5% of all 11.53M training events), pp 1,992,500 (17.3%). All 115 e+e- classes'' default events come from
+      the same generator setup as their own EE4 test pool (cards, model, energies, process string; distinct iseeds): the default
+      share is not pp data for e+e-, it is EE4''s own test measure per trained e+e- class. R default25/het control (mixture_ab.compare,
+      seeds'' gmean, class medians): EE4 trained 0.182 [0.138,0.237] (115 classes, all below 1), EE4 held out 0.448 [0.277,0.854]
+      (54, 78% below 1; none of their own default events), PP4 trained 0.344 [0.283,0.420] (797), PP4 held out 0.680 [0.506,0.893]
+      (504). Open: whether the held-out e+e- gain comes from the other e+e- classes'' default events or from the pp ones;
+      the beam ablation (eeonly/pponly recipes, 278ae072) separates them.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
