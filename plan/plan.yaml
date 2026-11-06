@@ -9095,6 +9095,16 @@ entries:
       steps clipped). NO if neither arm beats step 56 -> gradient share ruled out; next the attachment point, then the clipping
       regime. Blow-ups listed apart. Cost: 8 jobs x 1 V100, step 56 measured 2.32-2.34 h per job (0.928 s/step), limit 03:00
       (tools/short_wall.py), 18.7 GPU-h work / 24 at the limits; in memory, no cache.'
+    passed_at: '2026-11-06T05:06:47+00:00'
+    reviewer: 'One change: new arms differ from step-56 arm only in sign weighting (job_catalog_v3_short.sh 250-275, experiment.py:4121;
+      unchanged b3eb4156..897318b6). Check 2: wrong-sign read resolved the 2x het/MSE gap at 4 seeds (H5 17/21 p 0.0036, HD5
+      15/19 p 0.0096). Check 3: magnitude gate now PP4/EE4 upper <= 1.10 where step 56 sat at 1.039 (se ln 0.030) and 0.981
+      (0.019), i.e. ~2 se and more of room; HD4 and H1-H7c only ''shown worse'' (lower > 1 and point > 1.10), which a neutral
+      arm (step 56: HD4 0.974, H axes 0.97-1.04, se 0.028-0.118) rarely reaches; the widened interval is het_oneloop''s paired-over-seeds
+      one (se from 4 pairs), valid without the HD5/H5 pairing gate. Outcome rows YES / SIGN YES MAGNITUDE HURT / PARTIAL /
+      NO each with next step. Searched sign_loss_weight, sign weight, sign_het_match, matched_event/const, het sign, sign
+      head, gradient share in results.tex, entry, decisions: no het sign-weight run. HETEROSC, step-56 preprocessing and reads,
+      no sweep, 18.7 GPU-h in memory.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
