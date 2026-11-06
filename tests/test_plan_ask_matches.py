@@ -52,6 +52,30 @@ def test_multipart_one_part_missing_refuses():
     assert not plan.ask_matches(MULTI, "Joaquin, the grid costs 449 GPU-h and the sign-output jobs need 3:30; nothing asked.")
 
 
+WS = {"id": "warm_start", "status": "running", "waiting_since": "2026-11-06T13:51:00+00:00", "next": ["a"],
+      "ask": "Two calls on the warm start, both scope changes (yours): (1) The one-loop magnitude-target change (het) is "
+             "not decided at any k because its from-scratch pair's two seeds disagree (R_seed 1.28, so the 1.35-bar "
+             "interval is widened by ln 1.28 = 0.25 on each side). More from-scratch seeds of v4_het_control_magnitude "
+             "would narrow that term. My estimate: n=3 seeds widens by x1.23, n=4 by x1.19. So 4 more seeds (44 to 47) "
+             "would very likely make k=533 a MATCH, a YES at 1/8 of a pretraining. Cost: 2.35 h per run on a V100, so "
+             "4 runs = 9.4 GPU-h. Do you want the 4 seeds (9.4 GPU-h) for the magnitude target, 2 seeds, or none? "
+             "(2) Asked 06:48, still open: should the tuned width growth also run at 1066 and 2132 steps, like the "
+             "untuned growth, or only at 533? (blocks: nothing; searched first: CLAUDE.md scope rule)"}
+WS_MSG = ("Joaquin, the two warm start questions, put as questions: (1) Should I run 4 more from-scratch seeds (44 to "
+          "47) of the one-loop magnitude-target change, at 9.4 GPU-h, to try to decide it at an eighth of a "
+          "pretraining? (2) Should the tuned width growth also run at 1066 and 2132 steps, or only at 533?")
+
+
+def test_warm_start_short_words_pass():
+    assert plan.ask_matches(WS, WS_MSG)
+
+
+def test_warm_start_unrelated_or_one_part_refuses():
+    assert not plan.ask_matches(WS, "Joaquin, should I rerun the multichannel sweep at a lower learning rate, or keep the current one?")
+    assert not plan.ask_matches(WS, "Joaquin, the warm start runs finished; nothing needs you.")
+    assert not plan.ask_matches(WS, "Joaquin, (1) Should I run 4 more from-scratch seeds (44 to 47) of the one-loop magnitude-target change, at 9.4 GPU-h?")
+
+
 def test_margin():
     assert plan.ASK_MARGIN_MIN == 30
 

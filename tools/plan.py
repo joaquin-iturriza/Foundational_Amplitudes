@@ -388,6 +388,19 @@ def ask_parts(ask):
     return [p for p in parts if ask_terms(p)] if len(parts) >= 2 else []
 
 
+def part_question(p):
+    """The sentence of a part that asks (its last one holding a "?"), else the whole part: a long part is asked by its
+    question, not by the background before it (2026-11-06: a two-line question put in 20 words was refused)."""
+    qs = [x for x in re.split(r"(?<=[.?!;])\s+|\n+", p or "") if "?" in x]
+    return qs[-1] if qs else p
+
+
+def part_asked(p, x):
+    a, b = ask_terms(p), ask_terms(x)
+    q = ask_terms(part_question(p))
+    return (len(a & b) >= 0.5 * len(a)) or (len(q) >= 3 and len(q & b) >= 0.5 * min(len(q), len(b)) and len(q & b) >= 4)
+
+
 def ask_matches(e, text):
     """True when a message to the user asks the entry's recorded question, in its words or others: it names the entry
     and one of the steps the question holds (`warm_start step 1`), or it shares at least half of the question's
@@ -401,7 +414,7 @@ def ask_matches(e, text):
     # a multi-part question is asked when each part is asked by some sentence (2026-11-06: two numbered questions,
     # each sharing under half of the whole question's terms, were refused)
     parts = ask_parts(e.get("ask"))
-    if parts and all(any(len(ask_terms(p) & ask_terms(x)) >= 0.5 * len(ask_terms(p)) for x in sents) for p in parts):
+    if parts and all(any(part_asked(p, x) for x in sents) for p in parts):
         return True
     for sent in re.split(r"(?<=[.?!;])\s+|\n+", text or ""):
         low = sent.lower()
