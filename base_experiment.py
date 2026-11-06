@@ -32,7 +32,7 @@ import logger
 from logger import LOGGER, MEMORY_HANDLER, FORMATTER
 from plots import plot_gradients, plot_weights
 #from mlflow_util import log_mlflow
-from misc import cosine_warmup_scheduler
+from misc import cosine_warmup_scheduler, wsd_scheduler
 
 from lion_pytorch import Lion
 import schedulefree
@@ -810,7 +810,7 @@ class BaseExperiment:
                 ),
             )
             LOGGER.info('Using OneCycleLR scheduler')
-        elif self.cfg.training.scheduler == "CosineAnnealingLR":
+        elif self.cfg.training.scheduler in ("CosineAnnealingLR", "WSD"):
             is_dyhpo_run = self.cfg.training.get("is_dyhpo_run", False)
             # increment_steps is the number of steps for this fidelity increment.
             # For DyHPO cold starts it equals training.iterations; for warm starts
@@ -831,12 +831,23 @@ class BaseExperiment:
             else:
                 warmup = self.cfg.training.cosanneal_warmup_steps
 
-            self.scheduler = cosine_warmup_scheduler(
-                self.optimizer,
-                warmup,
-                T_max=int(increment_steps * self.cfg.training.scheduler_scale),
-                eta_min=self.cfg.training.cosanneal_eta_min,
-            )
+            if self.cfg.training.scheduler == "WSD":
+                # the warmup and the floor as the cosine's (cosanneal_warmup_frac, cosanneal_eta_min); the
+                # cooldown is the last training.wsd_cooldown_frac of the steps
+                self.scheduler = wsd_scheduler(
+                    self.optimizer,
+                    warmup,
+                    T_max=int(increment_steps * self.cfg.training.scheduler_scale),
+                    cooldown_frac=float(self.cfg.training.get("wsd_cooldown_frac", 0.2)),
+                    eta_min=self.cfg.training.cosanneal_eta_min,
+                )
+            else:
+                self.scheduler = cosine_warmup_scheduler(
+                    self.optimizer,
+                    warmup,
+                    T_max=int(increment_steps * self.cfg.training.scheduler_scale),
+                    eta_min=self.cfg.training.cosanneal_eta_min,
+                )
             self._sched_summary = {"T_max": int(increment_steps * self.cfg.training.scheduler_scale),
                                    "warmup": int(warmup), "increment_steps": increment_steps}
             if is_dyhpo_run:
@@ -846,7 +857,7 @@ class BaseExperiment:
                     f' (DyHPO {run_kind}, increment={increment_steps} steps, warmup={warmup})'
                 )
             else:
-                LOGGER.info('Using CosineAnnealingLR scheduler')
+                LOGGER.info(f'Using {self.cfg.training.scheduler} scheduler')
         elif self.cfg.training.scheduler == "ReduceLROnPlateau":
             self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
                 self.optimizer,
@@ -1648,7 +1659,7 @@ class BaseExperiment:
         if self.ema is not None:
             self.ema.update()
 
-        if self.cfg.training.scheduler in ["OneCycleLR", "CosineAnnealingLR"]:
+        if self.cfg.training.scheduler in ["OneCycleLR", "CosineAnnealingLR", "WSD"]:
             self.scheduler.step()
 
         # collect metrics
