@@ -5312,6 +5312,13 @@ entries:
     withdrawn_why: 'Joaquin 2026-11-06 04:28: the whole-set points were under one epoch and are redone at >= 1 epoch (D293),
       so the loader-control gap is superseded by the epoch shortfall; the loader read is redrawn as a figure and recorded
       as superseded'
+  - ask: 'Scaling grid (widths 8/16/32 x 4264 steps x 2/4/8/16 x seeds 42/43) costs 449 GPU-h: run the whole grid, only the
+      2x row (the six under-one-epoch points redone at 1.27 epochs, 39 GPU-h), or that row at the old HPs instead of trial_1262''s?'
+    at: '2026-11-06T05:22:21+00:00'
+    searched: D292/D293 approve the epoch fix and the scaling map but name no cost; CLAUDE.md 30 GPU-h line
+    blocks: step 64's submission
+    blocks_steps: &id001
+    - 64
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -11218,6 +11225,12 @@ entries:
       (flat quota), data_mmap.py, keyed_aug.py, scripts/job_mmap_prebuild.sh, scripts/job_catalog_v3_short.sh (SHORT_TAG,
       beam/sign arms, LONG_HP), tools/short_wall.py --width, experiment.py (sign_het_match)
     written: '2026-11-06T05:21:37+00:00'
+  ask: 'Scaling grid (widths 8/16/32 x 4264 steps x 2/4/8/16 x seeds 42/43) costs 449 GPU-h: run the whole grid, only the
+    2x row (the six under-one-epoch points redone at 1.27 epochs, 39 GPU-h), or that row at the old HPs instead of trial_1262''s?'
+  waiting_since: '2026-11-06T05:22:21+00:00'
+  searched: D292/D293 approve the epoch fix and the scaling map but name no cost; CLAUDE.md 30 GPU-h line
+  blocks: step 64's submission
+  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
