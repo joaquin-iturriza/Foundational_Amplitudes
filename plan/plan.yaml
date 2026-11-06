@@ -12958,7 +12958,7 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: ac61c7e5ab7feddd5
-    state: working
+    state: closed
     since: '2026-11-06T07:08:58+00:00'
     state_at: '2026-11-06T08:27:26.883000+00:00'
     context: 224832
@@ -14654,37 +14654,35 @@ entries:
     '6': FA-ccin2p3-4f9e0532 FA-ccin2p3-8cb6c7b5 FA-ccin2p3-31359864 FA-ccin2p3-bfed460f
     '8': FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422
   handoff:
-    state: 'Step 6 in flight; step 6 waits on 8 runs (one RUN_DONE). (i) Moment fill (D303, design passed round 2 2026-11-06T05:40):
-      fill FA-ccin2p3-b2c69c1a (s42), f5245570 (s43) vs same-commit default restart 0202ba7f (s42), 7b2d6c24 (s43). Read:
-      python3 analysis/catalog_v4/ws_restart_steps.py (its RUNS already has the 4 dirs, keys fill_s42/fill_s43/default_d303_s42/default_d303_s43
-      in the last JSON line; c3fb2f14) -> CAUSE if fill max grad norm over steps 0-19 < 0.2x same-seed control at both seeds
-      and worst train loss 0-39 < parent start + 0.3; reads: mixture_ab.py warm C1f (entry added cec98490: W fill pair, ref
-      default = tagd303 pair, default_older = 341bf564/254abf4f), BETTER when widened upper R(fill/default) < 1 on PP4 or
-      EE4 and > 1.05 on neither. (ii) MSE-of-the-mean sweep ws_c1_k533_mse_wsd_hpo8 read (plot_ws_mse_sweep.py @30ea35ac,
-      figs/ws_mse_sweep_{a,b}): best hp_1333 lr_scale 1.85 WSD cooldown 0.164, val MSE of mu 0.0283; all 8 trials WSD (cosine
-      never drawn); the NLL sweep''s cosine trials reach 0.0257-0.0289 at lr 0.87-2.2. Confirmation (design passed 2026-11-06T04:48):
-      v4_het_warm25m_k533[_seed2] FA-ccin2p3-4f9e0532/8cb6c7b5 (2:15, 16G); growth GROW_HP=1333 FA-ccin2p3-f9c67e8a/bfb41439
-      (2:30, 46G) afterok on memmap prebuilds f7a03eee/a99f5106 (htc). Read them with new mixture_ab.py warm entries C1m (W
-      = warm25m pair, ref untuned 341bf564/254abf4f and NLL-tuned 56cca07a/75d28cb4, B/A as C1) and C10wm (W = the growth
-      pair, ref untuned grown e046ac67/f35b6a78, B = WIDTH w16, A = w8, match_hi 1.19), not yet added; rules in the design.
-      After the reads, delete the growth cache (key 0c897ca2d81c98d3828e2808 under /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache,
-      ~23 GB) as designed. Then pick the restart recipe (fill and/or hp_1333 or untuned) and run step 7 (C2-C6, C8, D300)
-      with it; write steps 6 up beside par:v4_warm_start_restart (whose ''test is running'' line was removed; add the fill
-      result there).'
-    decisions: 'D303 leads step 6. D284 K=533 for tuning arms. D291 method the owner''s; D298 another objective allowed (mu_mse
-      sweep). D300 C2-C8 approved at 79.8 GPU-h. Owner''s call: the 7 pruned hpo8 trials not retrained. Coordinator (2026-11-06):
-      run the hp_1333 confirmation and growth without waiting for the fill runs. GROW_HP only at k=533 (the sweep tuned at
-      533; repo-reviewer noted that tuned growth at 1066/2132 would need Joaquin''s word).'
-    ruled_out: C7; C9; catalog_v3 changes; the NLL-tuned low-lr warm start; pre-decay checkpoints as parent (D289); lr_scale
-      0.01 extension; retraining the pruned hpo8 trials.
-    running: FA-ccin2p3-b2c69c1a, f5245570, 0202ba7f, 7b2d6c24 (fill test, started 06:44 CET, target 1.6 h); 4f9e0532, 8cb6c7b5
-      (hp_1333 confirmation, started ~07:35); f7a03eee -> a99f5106 (CPU prebuilds) -> f9c67e8a, bfb41439 (growth at hp_1333).
-      Batch target ws_mse_confirm 1.7 h for 4 jobs.
-    files: docs/results.tex par:v4_warm_start_restart (99f37a7e); analysis/catalog_v4/ws_het_split.py (fetch --sweep/--out),
-      data/ws_hpo8/het_split_log.txt.gz, data/ws_mse_hpo8/trial_curves.json; analysis/catalog_v4/plot_ws_mse_sweep.py, figs/ws_mse_sweep_{a,b};
-      analysis/catalog_v4/ws_restart_steps.py (--cached); analysis/catalog_v4/mixture_ab.py (WARM C1f); scripts/job_catalog_v3_short.sh
-      (WS_M_HP, v4_het_warm25m_k533, GROW_HP=1333, mode prebuild); scripts/job_catalog_v3_short_prebuild.sh; sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
-    written: '2026-11-06T06:48:05+00:00'
+    state: 'Step 6 read except the tuned growth: moment fill NO CAUSE, not BETTER (C1f, figs/ws_fill); mean-MSE-tuned restart
+      hp_1333 NOT BETTER than untuned (C1m: R PP4 1.054, EE4 1.005; SHORT of scratch 1.42/1.58; figs/ws_c1m_{a,b,c}), so the
+      untuned restart is the recipe unless step 8 changes it. Pending in step 6: the tuned growth pair FA-ccin2p3-31359864/bfed460f
+      (GROW_HP=1333, design 04:48) -> read: fetch logs (site logs -n 1000000), mixture_ab.py extract per axis (PP4 EE4 H1
+      H2 H2p5 H3 H5 H6 H7E H7c HD4 HD5) and val, then mixture_ab.py warm C10wm (BETTER vs untuned grown by the C1 rule, MATCH
+      to w16 by 1.19; NOT BETTER -> a growth-own sweep is the next step); then delete the growth cache /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache/27a1422795e9872faa6b9eaf
+      (~18 GB, key changed from the one named earlier). Step 8 (damped-Muon restart, design passed round 2) submitted: FA-ccin2p3-35f9a8a5
+      (s42), a0416422 (s43), arms v4_het_warm25u_k533[_seed2] @dbb8daf0, control 0202ba7f/7b2d6c24. Read: extract reads as
+      above, ws_restart_steps.py (RUNS has the dirs; keys muon_damped_s42/s43; m = ln(G_ctrl/G_arm)/ln(G_ctrl/G_all) on grad_max_2_10,
+      G_ctrl 994/1334, G_all 160/215; MUON m>=0.7 both, NOT MUON <=0.3 both, else SHARED; caveat m may read up to 1.25x high
+      near 0.7), mixture_ab.py warm C1u (BETTER: widened upper R(damped/default) < 1 on PP4 or EE4, > 1.05 on neither), figure
+      plot_ws_fill.py --damped (do not quote its grad_max_0_19 as the measure). BETTER -> Muon warmup joins the recipe for
+      step 7; else untuned. Then step 7 (C2-C6, C8, D300 approved 79.8 GPU-h): redo per-run time for the recipe, record targets,
+      site pick, submit. Write-up of steps 5-8 beside par:v4_warm_start_restart still to do (fill result, C1m, step 8).'
+    decisions: 'D303 leads steps 6 and 8. D284 K=533. D291/D298 mu_mse objective tried: ruled out as a proxy (C1m). D300 C2-C8
+      approved at 79.8 GPU-h; step 7 waits on step 8''s read (owner''s call: step 8 may change the recipe; coordinator agreed
+      by its instruction to put step 7 on a wait). Owner: the fill is not in the recipe; the 04:01 optimizer-state finding
+      stands. GROW_HP only at k=533 (Joaquin''s open question on 1066/2132 blocks nothing).'
+    ruled_out: C7; C9; catalog_v3 changes; the NLL-tuned low-lr warm start; the mean-MSE-tuned restart (hp_1333) as recipe;
+      the optimizer moment fill; pre-decay checkpoints as parent (D289); lr_scale 0.01 extension; retraining the pruned hpo8
+      trials.
+    running: FA-ccin2p3-31359864, bfed460f (tuned growth, sigma stage at 09:20; step 6 wait); FA-ccin2p3-35f9a8a5, a0416422
+      (damped Muon, limit 2:15, target ws_muon_damped 1.5 h; step 8 wait, step 7 waits on its read).
+    files: analysis/catalog_v4/mixture_ab.py (WARM C1f, C1m, C10wm, C1u); analysis/catalog_v4/ws_restart_steps.py (steps 2-10
+      window, @310b2513); analysis/catalog_v4/plot_ws_fill.py (--damped); analysis/catalog_v4/plot_ws_c1m.py; data/warm_start_C1f.json,
+      warm_start_C1m.json, ws_restart_steps.json, ws_fill_steps.json; optim/muon.py muon_lr_mult, base_experiment.py fine_tune.muon_warmup_steps
+      and the clean SystemExit (4272209a); tests/test_muon_warmup.py, tests/test_clean_exit.py; scripts/job_catalog_v3_short.sh
+      arm v4_het_warm25u_k533; docs/results.tex par:v4_warm_start_restart
+    written: '2026-11-06T08:31:09+00:00'
   ask: Should the tuned width growth also run at 1066 and 2132 steps, like the untuned growth, or only at 533?
   waiting_since: '2026-11-06T06:48:34+00:00'
   searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
