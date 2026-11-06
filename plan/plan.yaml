@@ -12398,6 +12398,22 @@ entries:
       0.246 / 0.115; warm starts 0.246 / 0.111; whole set w8 memmap 0.176 / 0.053, in memory 0.126 / 0.047, w16 0.250 / 0.168,
       w32 0.175 / 0.046. Equal weight per setup: 0.211 / 0.082. The number to quote: a class-median R between two arms at
       one seed each carries ~11% seed noise (median; 26% at q90); one class''s MSE ~27% (x2.1 at q90 over classes).'
+  - at: '2026-11-06T23:03:37+00:00'
+    text: '2026-11-07 (D317, the flat sampling at <= 2x the old cost), what existing reads give (sampling_frontier.py @e3c1a514;
+      cost = policy train-pool replay s over the old generation-log s; fill over in-range 0.25-dex bins, quota 34992/bins):
+      old sampling fills 19-48% of bins to >= 0.95; quota at budget 50 with both ladders: bins >= 0.95 1.00/0.96/0.94/0.96/0.92
+      (uux_epemg, uux_epemvevex, uu_bbxuu, us_ddxsu, udx_csxvevex), shortfall 0.2-4%, cost 2.4/5.3/9.7/13.9/9.1x; budget 750:
+      1.00-1.00 at 2.4/14/125/158/112x. So the last 1-4% of the flat part (the top ~0.5-1 dex) costs the extra ~10x. D317''s
+      idea 1 (union with MadEvent''s own events, thinned flat): the top in-range bins hold 0-5 default events of 12000 against
+      a quota of ~700, so the union adds nothing at the top (offline, 20000 unused dsh events scaled: bins >= 0.95 unchanged
+      at budget 50); MadEvent costs 0.004-0.12 core-s per event against 0.0002-0.0007 s per label, so more MadEvent events
+      cannot buy the top either. Pre-screen by a propagator surrogate (prescreen_check.py @e82cec8c -> data/prescreen_check.json,
+      sum/max over tree diagrams of prod 1/((s-M^2)^2+M^2G^2), on the 45001 dsh events): Spearman 0.60-0.84, conditional spread
+      0.65-1.44 dex vs 0.25-dex bins, hit rate within +-1 bin 19-66% (top decile 2-75%): too weak on the QCD 2->4 classes.
+      Built instead: the flat part from Wang-Landau Markov chains (branch flat-mcmc a99a7aeb; pair rotations in the pair rest
+      frame, bin-only weight 1/g; at most 12 labels per flat event = 1.76x the old pool cost). Toy (tests/test_flat_mcmc.py):
+      0.938 of the quota at 12 labels per flat event against 0.888 for the quota sampler at 12 and 0.95 at 50. Real check
+      designed (5 classes x seeds 42/43, current + mcmc_both_res2_budget12), under design and repo review.'
   handoff:
     state: '2026-11-06 ~22:00. (1) Cost of the new sampling done: sampling_cost.py @08e3091e (pull = catalog_v4 generation
       logs of the 12 job_catalog_v4_regen runs of 2026-10-26 -> data/sampling_cost_gen.json; summary -> data/sampling_cost.json;
