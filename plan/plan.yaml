@@ -9555,6 +9555,30 @@ entries:
       held-out outside kept 0 -> Joaquin''s call (D269 ''not far below pp''): accept, or a heavier channel; the regeneration
       design waits on it. SHORT = a bin inside the pp range below 0.95 -> where reads of that bin (multichannel_check where),
       no further budget raise. Cost: 10 CPU jobs, 1 core, <= 2.8 h each, limit 04:00; no GPU.'
+    fix_at: '2026-11-06T10:17:16+00:00'
+    fix: 'Step 67 (both ladders). Checks 1, 2, 5-14 hold; checks 3 and 4 fail. Check 4, outcome (ii) at budget 750 has a gap
+      at the most likely result: YES needs 0 held-out in-support events outside the kept range, NEAR needs every in-range
+      bin >= 0.95 AND held-out outside 0, SHORT needs an in-range bin < 0.95. Every bin >= 0.95 with 1 held-out event outside
+      the kept range matches none of them, and step 66 measured exactly 1/1 on all three ladder classes (multichannel_check.json
+      @f323ae6b: uu_bbxuu, us_ddxsu, udx_csxvevex edge policy heldout_outside_kept 1, below_min 0). State what 1-2 held-out
+      events outside mean (for example, compare against 3/N, the bound the measure already reports) and what follows. Check
+      4 also: the boundary between ''in-range bins'' and ''margin bins'' is not defined for the bin that straddles the pp
+      in-support maximum: uu_bbxuu''s bin [4.70, 4.95) holds the pp max 4.75 (edge fill 0.065/0.067), us_ddxsu''s [4.84, 5.09)
+      likewise. NEAR vs SHORT turns on this bin, so say which side it falls on, or use partial-bin quota, before the run.
+      Check 3, guard (i) on udx_csxvevex is tighter than the spread you measured: tolerance shortfall <= old + 0.002, but
+      the design''s own check states a udx shortfall seed spread up to 0.006 (edge 0.0669/0.0725), and per-bin fill on udx''s
+      top bins differs by seed up to 0.10 (edge at -0.31: 0.75/0.65; old 0.74/0.79; at 0.67 edge 0.057/0.029), above the 0.06
+      per-bin tolerance taken from the QCD bins. Step 66''s own guard failure on udx is one seed (seed 42 shortfall 0.0666
+      -> 0.0669, its -0.31 bin 0.742 -> 0.753, better), so it may be noise. A guard that can fail on seed noise would send
+      the per-channel choice to Joaquin for nothing. Fix: set the udx tolerances from its measured spread (shortfall ~0.006,
+      top bins ~0.10), or add udx_csxvevex seeds (cheap: CPU, ~3 min per policy at budget 50) so the old-vs-edge-vs-both difference
+      is resolved, and say whether step 66''s udx failure stands against that spread. Confirmed fine: f323ae6b numbers (uu_bbxuu
+      edge fill 3.96 1.00/0.99, 4.21 0.79/0.82, 4.70 0.065/0.067, shortfall 0.059/0.057; us_ddxsu 0.037/0.039; seconds 542/543
+      and 458/445); controls in the same job, differing only in channel list (shares re-split stated) or budget; 750 = 1/0.065
+      from the measured worst in-range bin, and step 65 showed fill scales with budget about linearly (0.04 -> 0.49 at 10x);
+      wall 2.8 h against limit 04:00 (1.4x); code 15543a4c = merge of ladder-both, diff limited to mg5_pipeline_final.py,
+      multichannel_check.py, test. Searched docs/results.tex for ladder, multiperipheral, mperi, quota, both ladders; decisions
+      D269 D270 D294: no prior run with both ladders.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
