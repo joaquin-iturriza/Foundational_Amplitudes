@@ -20,9 +20,9 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE); sys.path.insert(0, ROOT)
 import plot_style as ps  # noqa: E402
 
-PANELS = [("read_HD4", "other held-out tree classes: ln MSE ratio"),
-          ("nll_final", "validation NLL: difference"),
-          ("val_mse", "validation MSE of the mean: ln ratio")]
+PANELS = [("read_HD4", r"$\ln(\mathrm{MSE}_{\mathrm{arm}}/\mathrm{MSE}_{\mathrm{reference}})$, held-out tree classes (default-sampled)"),
+          ("nll_final", r"final validation het. loss, $\mathrm{arm}-\mathrm{reference}$"),
+          ("val_mse", r"$\ln(\mathrm{MSE}_{\mathrm{arm}}/\mathrm{MSE}_{\mathrm{reference}})$, validation MSE of the mean")]
 
 
 def main():
@@ -40,7 +40,7 @@ def main():
                        label="restart recipes" if st == "select" else "length, change")
             print(key, st, "n", len(x), "pearson", round(float(np.corrcoef(x, y)[0, 1]), 3))
         ax.axhline(0, color="0.6", lw=0.6); ax.axvline(0, color="0.6", lw=0.6)
-        ax.set_xlabel(r"deciding reads: mean ln $R$ (pp, $e^+e^-$)"); ax.set_ylabel(ylab)
+        ax.set_xlabel(r"mean over pp and $e^+e^-$ test classes of $\ln(\mathrm{MSE}_{\mathrm{arm}}/\mathrm{MSE}_{\mathrm{reference}})$"); ax.set_ylabel(ylab)
         if key == "read_HD4":
             ps.legend(ax, "upper left")
     ps.save_panels(figs, os.path.join(HERE, "figs", "ws_objective"))
