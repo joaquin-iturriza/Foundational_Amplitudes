@@ -15542,9 +15542,7 @@ entries:
       fixed: sweep_trial_hps prints the failure reason on stdout). The best trial''s runs/<sweep>/trial_<idx>/config.yaml
       must exist on the site the re-runs go to (the sweep runs on CC-IN2P3, so the re-runs go there too).'
   step_waits:
-    '10': FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b
-      FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7 FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e
-      FA-ccin2p3-410e8632 FA-ccin2p3-78576361
+    '10': FA-ccin2p3-fbb16a33 FA-ccin2p3-cb458c82 FA-ccin2p3-5862b62e FA-ccin2p3-d15462b0
     '9': FA-ccin2p3-9a357af2 FA-ccin2p3-d26c43ba FA-ccin2p3-0d2a042d FA-ccin2p3-e4eac156 FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f
       FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7
       FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e FA-ccin2p3-410e8632 FA-ccin2p3-78576361
