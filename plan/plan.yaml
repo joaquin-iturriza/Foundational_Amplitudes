@@ -4132,7 +4132,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: b77d172d
+    commit: 51287ab0
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4407,6 +4407,7 @@ entries:
     - analysis/catalog_v4/data/density_check.json
     - analysis/catalog_v4/data/ee_gain_events.json
     - analysis/catalog_v4/data/ee_gain_mechanism.json
+    - analysis/catalog_v4/data/ee_support_reads.json
     - analysis/catalog_v4/data/het_uncertainty.json
     - analysis/catalog_v4/data/job_wall_split.json
     - analysis/catalog_v4/data/lhe_probe_by_energy.json
@@ -4450,6 +4451,7 @@ entries:
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/pp_trained_compare.py
     - analysis/catalog_v4/read_validation.py
+    - analysis/catalog_v4/sampling_cost.py
     - analysis/catalog_v4/size_figs.py
     - analysis/catalog_v4/v3_delete_manifest.py
     - analysis/catalog_v4/v3_delete_pools.py
