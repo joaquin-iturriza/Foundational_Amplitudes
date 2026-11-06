@@ -12706,8 +12706,6 @@ entries:
     7: '(c) D283, D300: C2-C6 and C8 approved at their cost (79.8 GPU-h, 54 runs; Joaquin 2026-11-06 ''I approved everything
       you gave me for the warm start changes''): run them with the tuned recipe from (b) as soon as (b) picks it, without
       asking again; redo the per-run time for the tuned recipe and record targets'
-    8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
-      validation loss curves side by side, and each arm''s per-class zero-shot MSE'
     9: Relabel warm_start_compare in words (no A/B, w8, k=533 codes; Joaquin 11-06) and resend once, saying what changed;
       follow his lead that the lr or the scheduler is wrong in the warm runs.
   done_when: null
@@ -13851,11 +13849,6 @@ entries:
       if:
       - 'run: extend the write-up per change'
       - '(b) NOT BETTER: run them with the untuned restarted schedule (C1''s)'
-    8:
-      feeds: how the results are shown to Joaquin (CLAUDE.md figures)
-      if:
-      - 'drawn: committed png+pdf, referenced in results.tex'
-      - 'a curve missing locally: fetch it from the site'
     9:
       feeds: Joaquin 11-06 on the warm-start figure
       if:
