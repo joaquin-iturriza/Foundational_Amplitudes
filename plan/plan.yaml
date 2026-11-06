@@ -11711,6 +11711,14 @@ entries:
       margin bin 0.67 0.93/0.89, held-out 1/1 of 54001 -> NEAR; uux_epemvevex YES (0 short, 0 held-out, 0 budget stops); uux_epemg
       YES. Time per replay at 750: us_ddxsu 7468/7780 s, udx_csxvevex 3223/3206 s (budget-50 both 657/261 s). uu_bbxuu both
       seeds TIMEOUT at 4 h (fix 39383530, resubmitted at 06:15: FA-ccin2p3-22cd09c8, 24e6b843).'
+  - at: '2026-11-06T14:34:56+00:00'
+    text: '2026-11-06 process: step 67''s uu_bbxuu jobs ran out at 04:00: the wall target (2.8 h) and limit took the per-replay
+      time from step 66''s node (542-617 s at budget 50) while step 65 had already measured 837 s for that class and ccwslurm0028
+      took ~795 s; the real need was 14990 s (4.16 h). Fix 39383530: multichannel_check.py need <class> <policies> sizes the
+      limit from the slowest measured budget-50 replay of the class over every read, times budget/50, times 1.5, and the job
+      script names it. Tested: uu_bbxuu (on the reads that existed at submission) need 15062 s -> 06:20, actual 14990; us_ddxsu
+      need 12039, actual ~9760; udx_csxvevex need 4697, actual ~4000. Not fixed: a new class with no budget-50 read (the tool
+      refuses, time from its own first jobs).'
   handoff:
     state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
       ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
