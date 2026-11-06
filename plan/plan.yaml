@@ -11828,6 +11828,21 @@ entries:
       at the median 117.5x of the four 2->4 test classes), bracket 377 (min 16x) to 3738 (max 162x). Budget = the most candidate
       events labelled per kept flat event (old 6, i.e. 6x oversampling; 750 the cap of the quota rounds). Default-share MadEvent
       events not counted (same in both).'
+  - at: '2026-11-06T20:09:38+00:00'
+    text: '2026-11-06 where the catalog''s e+e- sampling came from (Joaquin ~19:50 ''If I asked for pp sampled data, why would
+      you produce e+e- datasets that are different in any way?''; read from docs/results.tex, site decisions, git). (1) The
+      mixture (0.35 of a pool flat in log|M|^2 from 6x labelled candidates, the rest RAMBO bulk, sqrt(s) uniform in a per-process
+      window) is catalog_v2''s sampling policy from the divergence study (results.tex ''Sampling policy'', sec:div-sampling),
+      written there as ''a dataset convention, not a physical measure''; catalog_v3 kept it with windows [threshold, 1 TeV]
+      (D17 ''We''ll keep things as they are for now then''). (2) catalog_v4''s sqrt(s) log-uniform to 6 TeV and |eta|<5 came
+      from the 2026-10-25 coverage check (D126, decided D130 ''yes to 1 to 3''), which was judged on 13 TeV pp events only;
+      for e+e- the check changed only the angle (|cos theta|<0.99) and the same 6 TeV log-uniform window went to every class,
+      e+e- included; D119 had the e+e- pools compared ''on their windows''. (3) No default-sampled e+e- events existed until
+      the ee4_ MadEvent pools (2026-10-29, c865826b, fixed collider energies, for the default-share mixture). The catalog''s
+      e+e- sampling was never checked against them before the 2026-11-06 mechanism read (par:v4_ee_mechanism): the EE4 test
+      events'' median log10|M|^2 sits 4.13 dex above the catalog''s (positive on 115/115 trained classes, KS 0.72). So nothing
+      asked for e+e- sampled differently from its default events; the e+e- choice was inherited, not decided. Step (f) puts
+      the e+e- classes into the regeneration under D294''s rule.'
   handoff:
     state: '2026-11-06 ~17:30. (a) Coverage: step 67 read in full (finding 2026-11-06 ''step 67 verdict''; data/quota_coverage.json
       @686c3241; figs/quota_fill_a..e + legend). With both ladders (sampling.mc_mperi_both) and mc_res2 at flat_budget 750,
