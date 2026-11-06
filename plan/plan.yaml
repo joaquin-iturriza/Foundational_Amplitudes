@@ -13239,12 +13239,11 @@ entries:
   decisions:
   - D282
   next:
-    11: 'Step 11 (D285, D291), the width growth''s own sweep, re-run as ws_grow_k533_zeroshot_hpo8_rerun (sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml
-      @8f68ca8d; the first submission ws_grow_k533_zeroshot_hpo8 failed whole on the prebuild''s rewrite of the base config):
-      8 trials on CC slurm 62994102-09 (waves, limit 00:50, target ws_grow_zeroshot_rerun 0.30 h per trial). When it ends:
-      bar = best trial''s zero_shot_score below the default growth''s 0.535 (e046ac67, ws_objective_check.py score); if below,
-      re-run the best trial at seeds 42/43 with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun GROW_HP=<idx> on arm v4_het_default25[_seed2]
-      LONG_HEADS=16 GROW_K=533, read with mixture_ab.py warm as C10wm-style against e046ac67/f35b6a78'
+    11: 'Step 11 (D285, D291): the width growth re-run at the zero-shot sweep''s best trial (ws_grow_k533_zeroshot_hpo8_rerun
+      hp1860, score 0.476 < 0.535) at seeds 42/43: FA-ccin2p3-4442e786 (v4_het_default25) and FA-ccin2p3-3fae7799 (v4_het_default25_seed2),
+      scripts/job_catalog_v3_short.sh @6454ecda with LONG_HEADS=16 LONG_CKPT=true LONG_MEMMAP=true GROW_K=533 GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun
+      GROW_HP=1860, limit 02:30, 32G, target ws_grow_hp1860_rerun 2.4 h. When both end: fetch, mixture_ab.py warm C10wz (bffb6f13)
+      against e046ac67/f35b6a78, w16 scratch beside; plot_ws_c1m.py --growth-zs; write-up beside par:v4_warm_start_grow'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -15127,10 +15126,10 @@ entries:
       already named in the prior.'
   step_why:
     11:
-      feeds: 'D285: whether a shape-changing warm start can be tuned to reach width 16 from scratch'
+      feeds: whether the tuned growth becomes the growth recipe (BETTER) or the growth stays at its default restart (NOT BETTER)
       if:
-      - 'BETTER on PP4/EE4 over the default growth: the tuned recipe becomes the growth recipe, read against w16 from scratch'
-      - 'NOT BETTER (or no trial below 0.535): the growth stays at its default restart, SHORT of w16 scratch at k=533'
+      - 'BETTER: read against w16 scratch, MATCH at R(W/B)<=1.19 on both, else SHORT with its gap'
+      - 'NOT BETTER: growth tuning ruled out on a read-tracking objective; growth stays SHORT at k=533'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
@@ -15694,8 +15693,7 @@ entries:
       is not in results). Best 0.476 is below the default growth''s same-seed 0.535 (ln -0.117, beyond the 0.011-0.022 same-seed
       spread): the design''s re-run branch. Five trials sit within 0.476-0.481, so the bar is cleared by a plateau, not one
       point.'
-  step_waits:
-    '11': FA-ccin2p3-4442e786 FA-ccin2p3-3fae7799
+  step_waits: {}
   handoff:
     state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
       at 0.125; C6 and C8 not decided, intervals too wide). Step 11: re-run sweep ws_grow_k533_zeroshot_hpo8_rerun ENDED,
