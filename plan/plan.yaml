@@ -10588,6 +10588,12 @@ entries:
     units: null
     start: '2026-11-06T22:09:33+00:00'
     at: '2026-11-06T22:09:33+00:00'
+  - batch: scaling_grid_s42
+    wall_h: 67.03
+    jobs: 10
+    units: null
+    start: '2026-11-06T22:49:50+00:00'
+    at: '2026-11-06T22:49:50+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
