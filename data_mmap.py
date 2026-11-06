@@ -1,34 +1,45 @@
 """data.memmap: the recipe data path with host memory that scales with the batch, not the dataset.
 
-The in-memory path (experiment._init_data_recipes) holds every pool's boosted momenta, their concatenations and the
-per-event arrays in RAM at once, with several transient copies (tools/mem_profile_data.py measures them). Here each
-(role, process) pool is loaded, boosted and written once, in the same order and with the same draws of the torch RNG
-as the in-memory path, into flat arrays on disk; the statistics are reduced in chunks with the exact summation order
-numpy uses on the concatenated arrays (so they are bitwise the in-memory path's); the shuffled per-event arrays are
-written in their final order. The run then opens the arrays with np.load(mmap_mode="r") and every loader (and every
-dataloader worker, which shares the file pages) gathers its batch by index (MmapAmplitudeDataset).
+One data cache per pool set, shared by every run on it whatever its seed, caps or statistics (D290, 2026-11-06; the
+blind review of 2026-11-02). Two levels under $SCRATCH/amp_mmap_cache (data.memmap_dir overrides the root):
 
-The cache lives under $SCRATCH/amp_mmap_cache/<key> (data.memmap_dir overrides the root). The key is a hash of
-everything the arrays depend on: the pools (path, size, mtime, recipe_id), the per-role caps, the recipe's per-process
-order rows and propagator masks, the preprocessing flags, the frozen statistics a fine-tune / resume / rebuild loads
-(or "fit here"), the tokenizer's starting vocabulary and the torch RNG state at entry (which carries the run's seed and
-anything drawn before). The full key document is stored with the arrays and compared on every open, so a cache built
-from other inputs is never read. A cache hit restores the torch RNG state the build left, so the model initialisation
-draws what it would have drawn after the in-memory path.
+  <key>/<depth>/            the base arrays: every (role, process) pool's first `depth` events, in load order, as
+                            they are in the pool before anything a run chooses: the momenta boosted to the centre of
+                            mass of the incoming pair (float32, GeV), the raw PDG ids, the raw |M|^2, sqrt(s_hat) and
+                            the per-event alpha_s; meta.json holds the per-pool segments and canaries.
+  <key>/<depth>/feat_<fk>/  the frame-independent per-event inputs a configuration derives from them: the target
+                            factor's log (data.target_physics_factor) and the raw off-shellness columns
+                            (offshell_per_event), keyed by what they are computed from.
+
+<key> is the hash of the pools' content identities (keyed_aug.pool_identity: recipe_id, size, the bytes at both
+ends; never the path or mtime), the layout (roles, process order, particle_order) and MMAP_VERSION. <depth> is the
+largest per-role cap the cache was built for: a run with smaller caps reads a prefix of every pool (as the in-memory
+path does with [:cap]), so the train_subsample or eval_subsample of a run never builds a new cache. No seed, frozen
+statistic, tokenizer or source text enters either key: the run applies them when it opens the cache (the selection,
+the tokens, the amplitude transform and standardization, the off-shellness standardization, all fitted on its own
+train selection or taken frozen) and per batch (the random Lorentz augmentation drawn per event from
+(seed, pool, index) by keyed_aug, the momentum scale, the tokens, the order features). The in-memory path draws the
+same transforms, so both paths give the same batches for a seed.
+
+The cache is built by a CPU prebuild job (scripts/job_mmap_prebuild.sh: the run's own config with
+++data.memmap_prebuild=true), never inside a GPU job: a run that finds no cache refuses with the command that builds
+it (a build inside a GPU job holds its GPU idle for the build, and concurrent jobs would race to build it; falling back
+to the in-memory path would change the host memory the job was sized for). The build takes a lock per depth
+(dirlock), checks the free disk against the arrays' size and prunes the least recently used caches of the root when
+short, preallocates every file (posix_fallocate), stages in node-local $TMPDIR when it has room (else in a staging dir
+on the cache's filesystem) named by host, job and pid, and appears by one rename; it never deletes another job's
+staging dir. A run checks the canaries on open (array sizes and the bytes at both ends of every array, and the first
+and last |M|^2 of every pool segment against the pool file itself) and touches last_used, which the pruning reads.
 
 Not on this path (asserted): data.target_propagators, training.sign_head, data.resonance_per_event,
-data.phase_space_on_pool, data.target_physics_hybrid. data.target_physics_factor is: the factor multiplies |M|^2 as
-each pool loads and is kept per event in amp_factor.npy, in the final order, so the evaluation divides it out as on the
-in-memory path; with data.target_physics_orders it reads each pool's per-event alpha_s (<pool>.alphas.npy) as the
-in-memory path does. data.dimensionless_inputs is: each event's momenta in units of its own sqrt(s_hat) before the
-global scale, the off-shellness over s_hat (and data.dimless_offshell_eps), the mass statistics over the massive train
-particles, and log10 sqrt(s_hat) as one column past the order features, all as on the in-memory path.
+data.phase_space_on_pool, data.target_physics_hybrid.
 """
 import socket
 import hashlib
 import json
 import os
 import shutil
+import sys
 import time
 
 import numpy as np
@@ -39,8 +50,25 @@ import logging.handlers  # noqa: F401  (logger.py uses logging.handlers without 
 
 from logger import LOGGER
 from dirlock import dir_lock
+import keyed_aug
+from keyed_aug import pool_identity
 
-MMAP_VERSION = 2
+# The format of the cached arrays. Bump it with any change to what _build_base or _build_features write (the
+# fingerprint in tests/test_mmap_key.py fails until it is bumped and re-recorded).
+MMAP_VERSION = 3
+
+
+def format_fingerprint():
+    """sha256 of the code that writes the cached arrays (the base and derived builds, the centre-of-mass boost, the
+    target factor and the off-shellness masks): tests/test_mmap_key.py pins it to MMAP_VERSION, so a change to what
+    the cache holds fails the test until the version is bumped. The key itself never hashes source text."""
+    import inspect
+    import experiment
+    E = experiment.AmplitudeExperiment
+    me = sys.modules[__name__]
+    parts = [inspect.getsource(getattr(me, n)) for n in ("_build_base", "_build_features", "_alloc")]
+    parts += [inspect.getsource(f) for f in (E._boost_com, E._physics_logF, E._eikonal_logS, E._setup_offshell_masks)]
+    return hashlib.sha256("\n".join(parts).encode()).hexdigest()
 CHUNK = 1 << 22            # elements per streamed chunk (a multiple of the 8192-element reduction block)
 NP_BLOCK = 8192            # numpy's pairwise-sum block over a contiguous float reduction (NPY_BUFSIZE)
 
@@ -137,17 +165,75 @@ def rows_mean_std(chunks):
 
 # ----------------------------------------------------------------------------------------------------------------
 # Dataset and sampler over the memory-mapped arrays
-# ----------------------------------------------------------------------------------------------------------------
-class MmapAmplitudeDataset(Dataset):
-    """AmplitudeDataset over memory-mapped per-event / per-particle arrays, restricted to `rows` (a range, never
-    materialised, or an int64 array of rows). A batch is gathered from the maps (numpy reads only the pages it
-    touches; the pages are the file's, shared with every dataloader worker) and returned exactly as
-    AmplitudeDataset.__getitems__ returns it, the integer arrays widened to int64 and the floats cast to `dtype`."""
 
-    def __init__(self, particles_flat, offsets, amplitudes, tokens_flat, order_labels, dtype, process_ids, rows):
-        self.particles_flat, self.offsets, self.amplitudes = particles_flat, offsets, amplitudes
-        self.tokens_flat, self.order_labels, self.process_ids = tokens_flat, order_labels, process_ids
-        self.dtype = dtype
+
+# ----------------------------------------------------------------------------------------------------------------
+# The run's view of the cache: what a batch is gathered and computed from
+# ----------------------------------------------------------------------------------------------------------------
+class MmapSource:
+    """Everything a batch needs besides its rows: the base maps (momenta, PDG ids, sqrt(s_hat), each event's first
+    particle row), the run's event map (virtual row -> base event row), the per-segment keys of the augmentation, the
+    token table, the order rows, the off-shellness map and its standardization, the momentum scale and the seed."""
+
+    def __init__(self, d, fdir, meta, ev_rows, seed, mom_div, dimless, tok_U, tok_lut, order_rows,
+                 osh_stats, osh_eps, F):
+        self.mom, self.pdg, self.rs, self.evp = (_open(d, n) for n in ("mom", "pdg", "rs", "evp"))
+        segs = meta["segs"]
+        self.seg_ev0 = np.array([s["ev0"] for s in segs], dtype=np.int64)
+        self.seg_P = np.array([s["P"] for s in segs], dtype=np.int64)
+        self.seg_uid = np.array([s["uid"] for s in segs], dtype=np.uint64)
+        self.ev_rows = ev_rows
+        self.seed, self.mom_div, self.dimless = int(seed), float(mom_div), bool(dimless)
+        self.tok_U, self.tok_lut, self.order_rows = tok_U, tok_lut, order_rows
+        self.osh = _open(fdir, "osh") if osh_stats is not None else None
+        self.osh_mu, self.osh_sd = ((np.asarray(osh_stats[0], np.float64), np.asarray(osh_stats[1], np.float64))
+                                    if osh_stats is not None else (None, None))
+        self.osh_eps, self.F = osh_eps, int(F)
+
+    def osh_transformed(self, base_rows):
+        """sign(o) log1p|o| of the raw off-shellness of `base_rows` (o / eps under dimensionless_inputs), float64"""
+        o = np.asarray(self.osh[base_rows]).astype(np.float64)
+        if self.dimless:
+            o = o / self.osh_eps
+        return np.sign(o) * np.log1p(np.abs(o))
+
+    def gather(self, vrows, pid):
+        """(momenta (m, 4) float32, tokens (m,) int64, order (n, F[+1]) float32, counts (n,)) of the virtual rows"""
+        r = self.ev_rows[vrows]
+        seg = np.searchsorted(self.seg_ev0, r, side="right") - 1
+        P = self.seg_P[seg]
+        csum = np.cumsum(P)
+        total = int(csum[-1]) if len(csum) else 0
+        gather = np.repeat(np.asarray(self.evp[r]) - (csum - P), P) + np.arange(total, dtype=np.int64)
+        T = keyed_aug.trafo_components(self.seed, self.seg_uid[seg], r - self.seg_ev0[seg])
+        ev_of = np.repeat(np.arange(len(r)), P)
+        T = [[t[ev_of] for t in row] for row in T]
+        mom = keyed_aug.apply_components(T, np.asarray(self.mom[gather])).astype(np.float32)
+        if self.dimless:
+            rs_p = np.repeat(np.asarray(self.rs[r]), P)
+            mom = (mom.astype(np.float64) / rs_p[:, None]).astype(np.float32)
+        mom = mom / self.mom_div
+        pdg = np.asarray(self.pdg[gather])
+        tok = self.tok_lut[np.repeat(pid, P), np.searchsorted(self.tok_U, pdg)]
+        order = self.order_rows[pid]
+        if self.osh is not None:
+            n_pdg = self.osh.shape[1]
+            order[:, self.F - n_pdg:self.F] = ((self.osh_transformed(r) - self.osh_mu) / self.osh_sd).astype(np.float32)
+        if self.dimless:
+            lrs = np.log10(np.asarray(self.rs[r])).astype(np.float32)
+            order = np.concatenate([order, lrs[:, None]], axis=1)
+        return mom, tok, order, P
+
+
+class MmapAmplitudeDataset(Dataset):
+    """AmplitudeDataset over the run's view of the cache (MmapSource), restricted to `rows` (a range, never
+    materialised, or an int64 array of virtual rows). A batch is gathered from the maps (numpy reads only the pages it
+    touches; the pages are the file's, shared with every dataloader worker), augmented and scaled, and returned
+    exactly as AmplitudeDataset.__getitems__ returns it, the integers widened to int64 and the floats cast to
+    `dtype`."""
+
+    def __init__(self, src, amplitudes, process_ids, dtype, rows):
+        self.src, self.amplitudes, self.process_ids, self.dtype = src, amplitudes, process_ids, dtype
         self.rows = rows if isinstance(rows, range) else np.asarray(rows, dtype=np.int64)
 
     def __len__(self):
@@ -160,41 +246,36 @@ class MmapAmplitudeDataset(Dataset):
         return self.rows[idx]
 
     def _f(self, a):
-        a = np.ascontiguousarray(a)
-        return torch.from_numpy(a if a.flags.writeable else a.copy()).to(self.dtype)
+        return torch.from_numpy(np.ascontiguousarray(a)).to(self.dtype)
 
     def __getitems__(self, indices):
         from dataset import _Prebatched
         if os.environ.get("LLOCA_FETCH", "batch") == "item":
             return [self[int(i)] for i in indices]
-        idx = np.asarray(indices, dtype=np.int64)
-        r = self._rows(idx)
-        off = np.asarray(self.offsets[r])
-        starts = off[:, 0].astype(np.int64)
-        counts = (off[:, 1] - off[:, 0]).astype(np.int64)
-        csum = np.cumsum(counts)
-        total = int(csum[-1]) if len(csum) else 0
-        gather = np.repeat(starts - (csum - counts), counts) + np.arange(total, dtype=np.int64)
-        ptr = torch.zeros(len(idx) + 1, dtype=torch.long)
-        ptr[1:] = torch.from_numpy(csum)
+        v = self._rows(np.asarray(indices, dtype=np.int64))
+        pid = np.asarray(self.process_ids[v]).astype(np.int64)
+        mom, tok, order, P = self.src.gather(v, pid)
+        ptr = torch.zeros(len(v) + 1, dtype=torch.long)
+        ptr[1:] = torch.from_numpy(np.cumsum(P))
         return [_Prebatched((
-            self._f(self.particles_flat[gather]),
-            self._f(self.amplitudes[r]),
-            torch.from_numpy(np.asarray(self.tokens_flat[gather]).astype(np.int64)),
-            self._f(self.order_labels[r]),
+            self._f(mom),
+            self._f(np.asarray(self.amplitudes[v])),
+            torch.from_numpy(tok.astype(np.int64)),
+            self._f(order),
             ptr,
-            torch.from_numpy(np.asarray(self.process_ids[r]).astype(np.int64)),
+            torch.from_numpy(pid),
         ))]
 
     def __getitem__(self, i):
-        r = int(self._rows(np.int64(i)))
-        start, end = int(self.offsets[r, 0]), int(self.offsets[r, 1])
+        v = np.array([int(self._rows(np.int64(i)))], dtype=np.int64)
+        pid = np.asarray(self.process_ids[v]).astype(np.int64)
+        mom, tok, order, _ = self.src.gather(v, pid)
         return (
-            self._f(self.particles_flat[start:end]),
-            self._f(self.amplitudes[r]),
-            torch.from_numpy(np.asarray(self.tokens_flat[start:end]).astype(np.int64)),
-            self._f(self.order_labels[r]),
-            torch.tensor(int(self.process_ids[r]), dtype=torch.long),
+            self._f(mom),
+            self._f(np.asarray(self.amplitudes[v[0]])),
+            torch.from_numpy(tok.astype(np.int64)),
+            self._f(order[0]),
+            torch.tensor(int(pid[0]), dtype=torch.long),
         )
 
 
@@ -244,50 +325,11 @@ def first_k_per_process(process_ids, start, stop, n_proc, k):
 
 # ----------------------------------------------------------------------------------------------------------------
 # Cache build / open
+
+
 # ----------------------------------------------------------------------------------------------------------------
-def _pool_doc(path):
-    """A pool file's identity in the cache key: [path, size, mtime, recipe_id]; for a pool composed at load
-    (mix_compose, its sidecar's derived_from.composed_at_load) and its .alphas.npy, [basename, size, content sha256,
-    recipe_id] instead: the composed file is rewritten in node-local /tmp by every job, so path and mtime differ per job
-    (keyed on them, every job built its own ~20 GB cache; /sps/lpnhe filled on 2026-11-01)."""
-    st = os.stat(path)
-    rid, side_doc = None, None
-    is_alphas = path.endswith(".alphas.npy")
-    pool = path[:-len(".alphas.npy")] + ".npy" if is_alphas else path
-    sides = ((pool + ".recipe.json",) if is_alphas else
-             (path + ".recipe.json", os.path.splitext(path)[0] + ".recipe.json"))
-    for side in sides:
-        if os.path.exists(side):
-            try:
-                side_doc = json.load(open(side))
-                rid = side_doc.get("recipe_id")
-            except (OSError, ValueError):
-                pass
-            break
-    der = (side_doc or {}).get("derived_from") or {}
-    digest = der.get("alphas_sha256" if is_alphas else "rows_sha256") if der.get("composed_at_load") else None
-    if digest:
-        return [os.path.basename(path), int(st.st_size), "sha256:" + digest, rid]
-    if is_alphas:
-        rid = None                                  # as before: an alpha_s file keyed by itself
-    return [os.path.abspath(path), int(st.st_size), int(st.st_mtime_ns), rid]
-
-
-def _orders_inputs(exp, names):
-    import mg5_pipeline_final as mg
-    ddir = exp.cfg.model.get("diagrams_dir", "data/diagrams")
-    if not os.path.isabs(ddir):
-        ddir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
-    out = []
-    for n in names:
-        pc = mg.PROCESSES.get(n, {})
-        sc = exp._resolve_diagram_path(ddir, n)
-        out.append(_jsonable([list(exp._orders_of(n)),
-                              {k: pc.get(k) for k in ("kind", "order", "alphas_prefactor", "nfinal")},
-                              exp._diagram_born_orders(n), None if sc is None else _pool_doc(sc)[:3]]))
-    return out
-
-
+# Keys
+# ----------------------------------------------------------------------------------------------------------------
 def _alphas_path(pool):
     """the per-event alpha_s next to a pool (mg5_pipeline_final.build_lhe_pp; tools/recover_alphas.py)"""
     return pool[:-len(".npy")] + ".alphas.npy"
@@ -307,41 +349,11 @@ def _jsonable(x):
     return x
 
 
-# what of this module the cached arrays come from: the streamed reductions and the build; not the lock, the logging,
-# the key's assembly (its inputs are in the key document itself), the open or the batch-time reader [step 36]
-ARRAY_CODE = ("F32FlatSum", "f32_mean_std", "_rowsum", "rows_mean_std", "_build")
-ARRAY_CONSTANTS = ("MMAP_VERSION", "CHUNK", "NP_BLOCK")
-
-
-def _code_hash():
-    """Hash of the code the cached arrays come from: this module's reductions and build (ARRAY_CODE, ARRAY_CONSTANTS),
-    the preprocessing and particle tables, and the experiment functions that load, boost, order and standardize. A
-    change to any of them builds a new cache; an edit elsewhere in this module (the lock, logging, the open) does not."""
-    import inspect
-    import sys
-    import experiment
-    import multiplicity_extrap
-    import particle_ids
-    import preprocessing
-    from lloca.utils import polar_decomposition, rand_transforms
-    E = experiment.AmplitudeExperiment
-    import physics_scales
-    import diagram_graphs           # the propagator masks behind the off-shell columns (_setup_offshell_masks)
-    import mg5_pipeline_final as mg
-    me = sys.modules[__name__]
-    parts = [inspect.getsource(getattr(me, n)) for n in ARRAY_CODE]
-    parts += ["%s = %r" % (n, getattr(me, n)) for n in ARRAY_CONSTANTS]
-    parts += [inspect.getsource(m) for m in (
-        preprocessing, particle_ids, multiplicity_extrap, rand_transforms, polar_decomposition, physics_scales,
-        diagram_graphs)]
-    parts += [inspect.getsource(f) for f in (
-        E._boost_augment_momenta, E._order_row, E._resolve_amp_preprocessing, E._resolve_offshell_stats,
-        E._setup_offshell_masks, E._physics_logF, E._eikonal_logS, E._orders_of,
-        E._diagram_born_orders, E._target_orders_source, mg.sidecar_born_orders, mg.target_monomial_from_diagrams,
-        experiment.recipe_process_cfg)]   # ordering: multiplicity_extrap.order_identical_particles, hashed whole above;
-    # the catalog entries' data the species read is in the key document (species_in), not here
-    parts += [np.__version__, torch.__version__]
-    return hashlib.sha256("\n".join(parts).encode()).hexdigest()
+def _small_file_id(path):
+    """[basename, sha256 of the content] of a small input file (a diagram sidecar, the coupling table), or None"""
+    if path is None or not os.path.exists(path):
+        return None
+    return [os.path.basename(path), hashlib.sha256(open(path, "rb").read()).hexdigest()]
 
 
 def _file_digest(exp, path):
@@ -357,6 +369,72 @@ def experiment_file():
     return experiment.__file__
 
 
+def _hash(doc):
+    return hashlib.sha256(json.dumps(doc, sort_keys=True).encode()).hexdigest()[:24]
+
+
+def base_key_doc(cfg, names, roles, paths):
+    """What the base arrays are made of: the pools' content, their layout and the format. Nothing a run chooses."""
+    porder = str(cfg.data.get("particle_order", "none"))
+    return {
+        "format": MMAP_VERSION,
+        "roles": list(roles),
+        "names": list(names),
+        "pools": {r: [pool_identity(paths[r][n]) for n in names] for r in roles},
+        "alphas": {r: [pool_identity(a) if os.path.exists(a) else None
+                       for a in (_alphas_path(paths[r][n]) for n in names)] for r in roles},
+        "particle_order": porder,
+        # particle_order=shuffle draws the slot order from data.seed (a data choice, not the run's seed)
+        **({"particle_order_seed": int(cfg.data.get("seed", 42))} if porder == "shuffle" else {}),
+    }
+
+
+def _orders_inputs(exp, names):
+    import mg5_pipeline_final as mg
+    ddir = exp.cfg.model.get("diagrams_dir", "data/diagrams")
+    if not os.path.isabs(ddir):
+        ddir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
+    out = []
+    for n in names:
+        pc = mg.PROCESSES.get(n, {})
+        out.append(_jsonable([list(exp._orders_of(n)),
+                              {k: pc.get(k) for k in ("kind", "order", "alphas_prefactor", "nfinal")},
+                              exp._diagram_born_orders(n), _small_file_id(exp._resolve_diagram_path(ddir, n))]))
+    return out
+
+
+def features_key_doc(exp, names, want_offshell, sidecars):
+    """What the derived per-event inputs are computed from (besides the base arrays): the target factor's
+    definition and the off-shellness masks' inputs. Their standardization is the run's, at open."""
+    cfg = exp.cfg
+    phys_on = bool(cfg.data.get("target_physics_factor", False))
+    orders_on = bool(cfg.data.get("target_physics_orders", False))
+    return _jsonable({
+        "format": MMAP_VERSION,
+        "phys": ([float(cfg.data.get("target_physics_s0", 289.0)),
+                  str(cfg.data.get("target_physics_couplings", "default")),
+                  _file_digest(exp, cfg.data.get("target_physics_couplings",
+                                                 "analysis/catalog_daniel/data/diagram_couplings.json")),
+                  bool(cfg.data.get("target_physics_dim_only", False)),
+                  str(cfg.data.get("target_physics_dim_ref", "shat")),
+                  bool(cfg.data.get("target_physics_eikonal", False)),
+                  float(cfg.data.get("target_physics_qperp_tau", 0.3)),
+                  float(cfg.data.get("target_physics_alpha_inv", 132.507)),
+                  orders_on, exp._target_orders_source() if orders_on else None]
+                 if phys_on else None),
+        "orders_in": _orders_inputs(exp, names) if orders_on else None,
+        "offshell": ({
+            "pdgs": exp._internal_mass_pdgs,
+            "sidecars": [_small_file_id(p) for p in sidecars],
+            "internal_masses": getattr(exp, "_internal_mass_by_proc", None),
+            "per_shat": bool(cfg.data.get("dimensionless_inputs", False)),
+        } if want_offshell else None),
+    })
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# Cache directories: depth, disk, staging, pruning, canaries
+# ----------------------------------------------------------------------------------------------------------------
 def _cache_root(cfg):
     root = cfg.data.get("memmap_dir", None)
     if root in (None, "null", "none", ""):
@@ -368,16 +446,331 @@ def _open(d, name):
     return np.load(os.path.join(d, name + ".npy"), mmap_mode="r")
 
 
+def _cap(c):
+    return int(c) if c not in (None, "null", "none") else None
+
+
+def _need(cap_for, names, roles, paths):
+    """{(role, name): events the run reads from the pool (its first ones)}"""
+    out = {}
+    for r in roles:
+        cap = _cap(cap_for[r])
+        for n in names:
+            N0 = np.load(paths[r][n], mmap_mode="r").shape[0]
+            out[(r, n)] = N0 if cap is None else min(N0, cap)
+    return out
+
+
+def _depth_name(cap_for, roles):
+    return "_".join(f"{r}{_cap(cap_for[r]) if _cap(cap_for[r]) is not None else 'all'}" for r in roles)
+
+
+def _find_depth(kdir, need):
+    """The smallest built depth under kdir whose every segment holds at least the events the run reads, or None"""
+    best = None
+    if not os.path.isdir(kdir):
+        return None
+    for dn in sorted(os.listdir(kdir)):
+        mp = os.path.join(kdir, dn, "meta.json")
+        if dn.startswith(".") or not os.path.exists(mp):
+            continue
+        meta = json.load(open(mp))
+        if all(s["n"] >= need[(s["role"], s["name"])] for s in meta["segs"]):
+            tot = sum(s["n"] for s in meta["segs"])
+            if best is None or tot < best[0]:
+                best = (tot, os.path.join(kdir, dn), meta)
+    return None if best is None else best[1:]
+
+
+def _canary(d, arrays):
+    """{array: [size in bytes, sha256 of its first and last 64 KiB]} of the files in d"""
+    out = {}
+    for a in arrays:
+        p = os.path.join(d, a + ".npy")
+        size = os.path.getsize(p)
+        h = hashlib.sha256()
+        with open(p, "rb") as f:
+            h.update(f.read(1 << 16))
+            f.seek(max(0, size - (1 << 16)))
+            h.update(f.read(1 << 16))
+        out[a] = [int(size), h.hexdigest()]
+    return out
+
+
+def _check_canary(d, meta, paths):
+    now = _canary(d, list(meta["canary"]))
+    bad = [a for a in meta["canary"] if now[a] != meta["canary"][a]]
+    assert not bad, f"memmap cache {d}: {bad} differ from what the build wrote (truncated or overwritten); rebuild it"
+    amp = _open(d, "amp")
+    for s in meta["segs"]:
+        if s["n"] == 0:
+            continue
+        pool = np.load(paths[s["role"]][s["name"]], mmap_mode="r")
+        first, last = float(pool[0, -1]), float(pool[s["n"] - 1, -1])
+        assert first == float(amp[s["ev0"]]) and last == float(amp[s["ev0"] + s["n"] - 1]), \
+            f"memmap cache {d}: segment {s['role']}/{s['name']} does not match its pool {paths[s['role']][s['name']]}"
+
+
+def _touch(d):
+    p = os.path.join(d, "last_used")
+    with open(p, "a"):
+        pass
+    os.utime(p, None)
+
+
+def _last_used(d):
+    p = os.path.join(d, "last_used")
+    return os.path.getmtime(p) if os.path.exists(p) else os.path.getmtime(d)
+
+
+def _du(d):
+    return sum(os.path.getsize(os.path.join(a, f)) for a, _, fs in os.walk(d) for f in fs)
+
+
+def prune(root, need_bytes, keep, min_idle_s):
+    """Remove the least recently used built depths under root (never `keep`, never one used within min_idle_s, never
+    a staging dir or a lock) until need_bytes are free on root's filesystem. Returns the removed dirs."""
+    cands = []
+    for k in os.listdir(root) if os.path.isdir(root) else []:
+        kd = os.path.join(root, k)
+        if not os.path.isdir(kd) or k.startswith("."):
+            continue
+        for dn in os.listdir(kd):
+            d = os.path.join(kd, dn)
+            if (dn.startswith(".") or dn.endswith(".lockdir") or not os.path.exists(os.path.join(d, "meta.json"))
+                    or os.path.abspath(d) == os.path.abspath(keep)):
+                continue
+            cands.append((_last_used(d), d))
+    removed = []
+    for t, d in sorted(cands):
+        if shutil.disk_usage(root).free >= need_bytes:
+            break
+        if time.time() - t < min_idle_s:
+            continue
+        LOGGER.info(f"data.memmap: pruning {d} (last used {time.ctime(t)}, {_du(d) / 1e9:.1f} GB)")
+        gone = d + f".pruned.{socket.gethostname()}.{os.getpid()}"
+        os.rename(d, gone)              # out of every opener's search at once; open maps keep their pages
+        shutil.rmtree(gone, ignore_errors=True)
+        removed.append(d)
+    return removed
+
+
+def _job_tag():
+    job = os.environ.get("SLURM_JOB_ID") or os.environ.get("_CONDOR_JOB_AD", "").split("/")[-1] or "nojob"
+    return f"{socket.gethostname()}.{job}.{os.getpid()}"
+
+
+def _alloc(path, dtype, shape):
+    """np.lib.format.open_memmap(w+) with the file's blocks allocated up front (posix_fallocate), so a full disk
+    fails here and not halfway through the build"""
+    a = np.lib.format.open_memmap(path, "w+", dtype, shape)
+    try:
+        fd = os.open(path, os.O_RDWR)
+        try:
+            os.posix_fallocate(fd, 0, os.path.getsize(path))
+        finally:
+            os.close(fd)
+    except (OSError, AttributeError) as e:   # a filesystem without fallocate: the disk check above still holds
+        LOGGER.info(f"data.memmap: posix_fallocate not available on {path} ({e}); relying on the disk check")
+    return a
+
+
+def _staging(final_parent, need_bytes):
+    """A new staging dir for one build: in node-local $TMPDIR when it has room for the arrays and is another
+    filesystem, else beside the final dir; named by host, job and pid, so no two builds share one"""
+    tag = _job_tag()
+    tmp = os.environ.get("TMPDIR")
+    if tmp and os.path.isdir(tmp) and os.stat(tmp).st_dev != os.stat(final_parent).st_dev \
+            and shutil.disk_usage(tmp).free > 1.2 * need_bytes:
+        d = os.path.join(tmp, f"amp_mmap_stage.{tag}")
+    else:
+        d = os.path.join(final_parent, f".stage.{tag}")
+    os.makedirs(d)
+    return d
+
+
+def _publish(stage, final):
+    """Move a finished staging dir to `final` with one rename on the cache's filesystem"""
+    parent = os.path.dirname(final)
+    if os.stat(stage).st_dev != os.stat(parent).st_dev:
+        local = stage
+        stage = os.path.join(parent, ".stage." + _job_tag() + ".copy")
+        shutil.copytree(local, stage)
+        shutil.rmtree(local, ignore_errors=True)
+    os.rename(stage, final)
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# Build (CPU prebuild job only)
+# ----------------------------------------------------------------------------------------------------------------
+def _base_bytes(need, names, roles, paths):
+    M = N = 0
+    for r in roles:
+        for n in names:
+            ncol = np.load(paths[r][n], mmap_mode="r").shape[1]
+            P = (ncol - 1) // 5
+            N += need[(r, n)]; M += need[(r, n)] * P
+    return M * (16 + 4) + N * (8 * 4), M, N
+
+
+def _build_base(exp, c, d, need, key_doc):
+    """Write the base arrays of the pools' first need[(role, name)] events into d; returns the meta"""
+    from experiment import order_identical_particles
+    cfg = exp.cfg
+    names, roles, paths = c["names"], c["roles"], c["paths"]
+    porder = key_doc["particle_order"]
+    porder_rng = np.random.default_rng(int(cfg.data.get("seed", 42))) if porder == "shuffle" else None
+    _, M, N = _base_bytes(need, names, roles, paths)
+    mom = _alloc(os.path.join(d, "mom.npy"), np.float32, (M, 4))
+    pdg = _alloc(os.path.join(d, "pdg.npy"), np.int32, (M,))
+    amp = _alloc(os.path.join(d, "amp.npy"), np.float64, (N,))
+    rs = _alloc(os.path.join(d, "rs.npy"), np.float64, (N,))
+    evp = _alloc(os.path.join(d, "evp.npy"), np.int64, (N,))
+    has_alphas = any(a is not None for r in roles for a in key_doc["alphas"][r])
+    alp = _alloc(os.path.join(d, "alphas.npy"), np.float64, (N,)) if has_alphas else None
+    segs, pb, eb = [], 0, 0
+    for ri, r in enumerate(roles):
+        for ni, n in enumerate(names):
+            k = need[(r, n)]
+            src = np.load(paths[r][n], mmap_mode="r")
+            P = (src.shape[1] - 1) // 5
+            raw = np.asarray(src[:k])
+            parts, pdgs = raw[:, :4 * P], raw[:, 4 * P:-1].astype(int)
+            if porder != "none":
+                parts = order_identical_particles(parts, pdgs, porder, rng=porder_rng)
+            com = exp._boost_com(parts, P)
+            cm = com.astype(np.float64)
+            q = cm[:, 0] + cm[:, 1]
+            mom[pb:pb + k * P] = com.reshape(k * P, 4)
+            pdg[pb:pb + k * P] = pdgs.reshape(k * P)
+            amp[eb:eb + k] = raw[:, -1]
+            rs[eb:eb + k] = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
+            evp[eb:eb + k] = pb + np.arange(k, dtype=np.int64) * P
+            if alp is not None:
+                ap = _alphas_path(paths[r][n])
+                alp[eb:eb + k] = (np.asarray(np.load(ap, mmap_mode="r")[:k], dtype=np.float64)
+                                  if key_doc["alphas"][r][ni] is not None else np.nan)
+            u, first = np.unique(pdgs.reshape(-1), return_index=True)
+            segs.append({"role": r, "name": n, "ev0": eb, "n": int(k), "p0": pb, "P": int(P),
+                         "uid": keyed_aug.pool_uid(key_doc["pools"][r][ni]),
+                         "pdg_first": [[int(a), int(b) // P] for a, b in zip(u, first)],
+                         "slot": [int(x) for x in pdgs[0]] if k else []})
+            LOGGER.info(f"  [{r}] {n}: {k} events -> memmap base")
+            pb += k * P; eb += k
+            del raw, parts, com, cm
+    for a in (mom, pdg, amp, rs, evp) + ((alp,) if alp is not None else ()):
+        a.flush()
+    arrays = ["mom", "pdg", "amp", "rs", "evp"] + (["alphas"] if alp is not None else [])
+    return {"key_doc": key_doc, "segs": segs, "M": int(M), "N": int(N), "has_alphas": bool(alp is not None),
+            "canary": _canary(d, arrays), "built": time.strftime("%Y-%m-%dT%H:%M:%S"), "by": _job_tag()}
+
+
+def _build_features(exp, c, d, meta, fd, fkey_doc, want_offshell):
+    """Write the frame-independent derived inputs of every stored event into fd (logF, osh); returns their meta"""
+    cfg = exp.cfg
+    names = c["names"]
+    phys_on = fkey_doc["phys"] is not None
+    orders_on = bool(cfg.data.get("target_physics_orders", False))
+    mom, rs = _open(d, "mom"), _open(d, "rs")
+    alp = _open(d, "alphas") if meta["has_alphas"] else None
+    N = meta["N"]
+    logF = _alloc(os.path.join(fd, "logF.npy"), np.float64, (N,)) if phys_on else None
+    n_pdg = len(exp._internal_mass_pdgs) if want_offshell else 0
+    osh = _alloc(os.path.join(fd, "osh.npy"), np.float32, (N, n_pdg)) if want_offshell else None
+    masks = exp._setup_offshell_masks(names) if want_offshell else None
+    pidx = {n: i for i, n in enumerate(names)}
+    dimless = bool(cfg.data.get("dimensionless_inputs", False))
+    for s in meta["segs"]:
+        k, P, e0, p0, name = s["n"], s["P"], s["ev0"], s["p0"], s["name"]
+        if k == 0:
+            continue
+        pp = np.asarray(mom[p0:p0 + k * P]).reshape(k, P, 4).astype(np.float64)
+        if phys_on:
+            a_s = None
+            if orders_on:
+                a_s = np.asarray(alp[e0:e0 + k]) if alp is not None else np.full(k, np.nan)
+                if np.isnan(a_s).all() and int(exp._orders_of(name)[2]) == 0:
+                    a_s = np.ones(k)     # alpha_s power 0: the factor does not depend on alpha_s
+                assert not np.isnan(a_s).any(), f"data.target_physics_orders: no per-event alpha_s for {s['role']}/{name}"
+            logF[e0:e0 + k] = exp._physics_logF(name, pp, alphas=a_s)
+        if want_offshell:
+            cols = np.zeros((k, n_pdg), dtype=np.float64)
+            sel = masks[pidx[name]] if masks is not None else None
+            if sel is not None:
+                s_ev = np.asarray(rs[e0:e0 + k]) ** 2 if dimless else 1.0
+                for col, pdg in enumerate(exp._internal_mass_pdgs):
+                    props = sel.get(pdg, [])
+                    if not props:
+                        continue
+                    offs = []
+                    for mrow, mm in props:
+                        q = np.einsum("s,nsc->nc", mrow, pp)
+                        s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+                        offs.append((s_prop - mm) / s_ev)
+                    offs = np.stack(offs, axis=1)
+                    idx = np.argmin(np.abs(offs), axis=1)
+                    cols[:, col] = offs[np.arange(k), idx]
+            osh[e0:e0 + k] = cols.astype(np.float32)
+        del pp
+    arrays = (["logF"] if phys_on else []) + (["osh"] if want_offshell else [])
+    for a in (logF, osh):
+        if a is not None:
+            a.flush()
+    return {"key_doc": fkey_doc, "canary": _canary(fd, arrays), "built": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "by": _job_tag()}
+
+
+def _ordered_map(fn, items, workers=None, ahead=2):
+    """fn over items, yielded in order, computed by `workers` threads at most workers * ahead items ahead"""
+    from collections import deque
+    from concurrent.futures import ThreadPoolExecutor
+    workers = workers or max(1, min(8, len(os.sched_getaffinity(0))))
+    with ThreadPoolExecutor(workers) as ex:
+        q = deque()
+        it = iter(items)
+        for x in it:
+            q.append(ex.submit(fn, x))
+            if len(q) >= workers * ahead:
+                yield q.popleft().result()
+        while q:
+            yield q.popleft().result()
+
+
+def _locked_build(final, need_bytes, root, build):
+    """Build `final` once: under its lock, if no other job published it meanwhile; disk checked (pruning the least
+    recently used caches when short), staged, published by a rename. build(stage_dir) writes the arrays and returns
+    the meta."""
+    parent = os.path.dirname(final)
+    os.makedirs(parent, exist_ok=True)
+    with dir_lock(final, on_wait=lambda o: LOGGER.info(f"data.memmap: build of {final} held by {o}, waiting")):
+        if os.path.exists(os.path.join(final, "meta.json")):
+            return json.load(open(os.path.join(final, "meta.json")))
+        want = int(1.05 * need_bytes)
+        if shutil.disk_usage(parent).free < want:
+            prune(root, want, keep=final, min_idle_s=48 * 3600)
+        free = shutil.disk_usage(parent).free
+        if free < want:
+            raise RuntimeError(f"data.memmap: {need_bytes / 1e9:.1f} GB needed for {final}, {free / 1e9:.1f} GB free "
+                               f"on its filesystem after pruning the caches idle for 48 h")
+        t0 = time.time()
+        stage = _staging(parent, need_bytes)
+        meta = build(stage)
+        with open(os.path.join(stage, "meta.json"), "w") as f:
+            json.dump(meta, f)
+        _publish(stage, final)
+        LOGGER.info(f"data.memmap: built {final} in {time.time() - t0:.0f} s")
+        return meta
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# Entry: find (or, in a prebuild job, build) the cache, then open it for this run
+# ----------------------------------------------------------------------------------------------------------------
 def init_data_recipes_mmap(exp, c):
     """The memory-mapped twin of the tail of AmplitudeExperiment._init_data_recipes (from the per-role loads on).
     `c` holds the locals that function computed before: specs, names, roles, paths, use_pids, per_dataset, the
     frozen statistics (None when fitted here), amp_orders, n_order_features, cap_for, stats_path, stats_on_pool."""
-    from particle_ids import global_encode
-    from preprocessing import resolve_amp_trafos, preprocess_amplitude
-    from experiment import recipe_process_cfg
     cfg = exp.cfg
-    names, roles, specs = c["names"], c["roles"], c["specs"]
-
+    names, roles, paths = c["names"], c["roles"], c["paths"]
     assert not c["stats_on_pool"], "data.memmap: data.phase_space_on_pool is not implemented on the memmap path"
     assert not bool(cfg.data.get("target_physics_hybrid", False)), \
         "data.memmap: data.target_physics_hybrid (a per-process constant from its events) is implemented on the in-memory path only"
@@ -388,478 +781,248 @@ def init_data_recipes_mmap(exp, c):
     orders_on = bool(cfg.data.get("target_physics_orders", False))
     assert phys_on or not orders_on, \
         "data.target_physics_orders acts through the target factor: set data.target_physics_factor=true"
-    dimless = bool(cfg.data.get("dimensionless_inputs", False))
     exp._target_factor_on = phys_on
     exp._sign_head = False
-
-    _porder = str(cfg.data.get("particle_order", "none"))
     want_offshell = (exp._offshell_per_event and exp._use_internal_mass_scalars and bool(exp._internal_mass_pdgs))
-    # the propagator masks need the pools' slot PDGs (set while loading), so _build makes them; the key holds
-    # what they are made from: the diagram sidecars, the property-table flags and the scanned masses
+    prebuild = bool(cfg.data.get("memmap_prebuild", False))
+
+    root = _cache_root(cfg)
+    kdoc = base_key_doc(cfg, names, roles, paths)
+    kdir = os.path.join(root, _hash(kdoc))
+    need = _need(c["cap_for"], names, roles, paths)
+    found = _find_depth(kdir, need)
+    rebuild = ("PYTHONPATH=. python run.py <this run's overrides> ++data.memmap=true ++data.memmap_prebuild=true "
+               "(scripts/job_mmap_prebuild.sh)")
+    if found is None:
+        if not prebuild:
+            raise RuntimeError(f"data.memmap: no cache of this run's pools at {kdir} deep enough for its caps; build "
+                               f"it with a CPU prebuild job first: {rebuild}")
+        d = os.path.join(kdir, _depth_name(c["cap_for"], roles))
+        nb = _base_bytes(need, names, roles, paths)[0]
+        meta = _locked_build(d, nb, root, lambda st: _build_base(exp, c, st, need, kdoc))
+        with open(os.path.join(kdir, "key_doc.json"), "w") as f:
+            json.dump(kdoc, f, indent=1)
+    else:
+        d, meta = found
+    # the slot order of every process (the off-shellness masks and the eikonal read it)
+    exp._slot_pdgs_by_name = {**{s["name"]: s["slot"] for s in meta["segs"] if s["slot"]},
+                              **getattr(exp, "_slot_pdgs_by_name", {})}
     ddir = cfg.model.get("diagrams_dir", "data/diagrams")
     if not os.path.isabs(ddir):
         ddir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ddir)
     sidecars = [exp._resolve_diagram_path(ddir, n) for n in names] if want_offshell else []
-    order_rows = np.stack([exp._order_row(i, c["amp_orders"]) for i in range(len(names))]).astype(np.float32)
-    ft = cfg.get("fine_tune", None)
-    ft_on = ft is not None and ft.get("pretrained_path", None) is not None and not exp.warm_start
-    key_doc = {
-        "version": MMAP_VERSION,
-        "code": _code_hash(),
-        "names": names,
-        "pools": {r: [_pool_doc(c["paths"][r][n]) for n in names] for r in roles},
-        "caps": {r: c["cap_for"][r] for r in roles},
-        "particle_order": _porder,
-        # the catalog entry and recipe physics each pool's encoding species come from (particle_ids.species_pdgs:
-        # heavy-quark tops, the massless b): an entry edit changes tokens.npy, so it changes the key
-        "species_in": _jsonable([[recipe_process_cfg(s), s.get("physics")] for s in specs]),
-        "use_pids": bool(c["use_pids"]),
-        "tokenizer0": sorted((int(k), int(v)) for k, v in exp.tokenizer._pdg_to_idx.items()),
-        "rng_in": hashlib.sha256(torch.get_rng_state().numpy().tobytes()).hexdigest(),
-        "frozen": _jsonable({k: c[k] for k in ("mom_div", "mom_mean", "mom_std", "amp_trafos", "amp_trafos_pp",
-                                                "prepd_means", "prepd_stds")}),
-        "per_dataset": bool(c["per_dataset"]),
-        "base_trafos": list(cfg.data.amp_trafos),
-        "signedlog_quantile": exp._signedlog_quantile(),
-        "signedlog_scale_shift": exp._signedlog_scale_shift(),
-        # data.signed_magnitude_target (abslog for the signed pools, no sign head) only when on, so every other key
-        # stays as it was
-        **({"signed_magnitude_target": True} if bool(cfg.data.get("signed_magnitude_target", False)) else {}),
-        "shared_standardization": bool(cfg.data.get("shared_standardization", False)),
-        "affine_multiplicity_std": bool(cfg.data.get("affine_multiplicity_std", False)),
-        "target_physics_factor": ([float(cfg.data.get("target_physics_s0", 289.0)),
-                                   str(cfg.data.get("target_physics_couplings", "default")),
-                                   _file_digest(exp, cfg.data.get("target_physics_couplings",
-                                                                  "analysis/catalog_daniel/data/diagram_couplings.json")),
-                                   bool(cfg.data.get("target_physics_dim_only", False)),
-                                   str(cfg.data.get("target_physics_dim_ref", "shat")),
-                                   bool(cfg.data.get("target_physics_eikonal", False)),
-                                   float(cfg.data.get("target_physics_qperp_tau", 0.3)),
-                                   float(cfg.data.get("target_physics_alpha_inv", 132.507)),
-                                   orders_on, exp._target_orders_source() if orders_on else None]
-                                  if phys_on else None),
-        # the per-event alpha_s files the factor reads (data.target_physics_orders); None where a pool has none
-        "alphas": ({r: [_pool_doc(a) if os.path.exists(a) else None
-                        for a in (_alphas_path(c["paths"][r][n]) for n in names)] for r in roles}
-                   if orders_on else None),
-        # data.target_physics_orders: what the coupling monomial the target divides by is resolved from, per process
-        # (experiment._physics_logF): its order vector, the catalog entry's fields, the Born orders its diagram sidecar
-        # gives and that sidecar file itself (keyed here whatever offshell_per_event says)
-        "orders_in": (_orders_inputs(exp, names) if orders_on else None),
-        "dimless": ([float(cfg.data.get("dimless_offshell_eps", 1e-6)),
-                     _jsonable(c.get("dimless_mass_stats"))] if dimless else None),
-        "order_rows": _jsonable(order_rows),
-        "offshell": _jsonable({
-            "on": want_offshell, "pdgs": exp._internal_mass_pdgs,
-            "sidecars": [None if p is None else _pool_doc(p)[:3] for p in sidecars],
-            "table": {k: bool(cfg.data.get(k, dflt)) for k, dflt in (
-                ("spin_onehot", False), ("color_onehot", False), ("prop_is_massless", True),
-                ("standardize_props", True), ("generation_onehot", False), ("generation_feature", True))},
-            "k_pe": int((cfg.model.get("diagram_encoder", {}) or {}).get("k_pe", 8)),
-            "internal_masses": getattr(exp, "_internal_mass_by_proc", None),
-            "pinned": (None if cfg.data.get("offshell_stats", None) is None
-                       else np.asarray(cfg.data.offshell_stats, dtype=np.float64).tolist()),
-            "ft_mode": str(ft.get("offshell_stats", "parent")) if ft_on else None,
-            "parent": getattr(exp, "_parent_offshell", None) if ft_on else None,
-            "ft_parent_cfg": (None if not ft_on or ft.get("parent_offshell_stats", None) is None
-                              else np.asarray(ft.parent_offshell_stats, dtype=np.float64).tolist())}),
-    }
-    key = hashlib.sha256(json.dumps(key_doc, sort_keys=True).encode()).hexdigest()[:24]
-    root = _cache_root(cfg)
-    d = os.path.join(root, key)
-    os.makedirs(root, exist_ok=True)
-    # one builder per key; the others wait and then read it. An atomic-mkdir lock (dirlock.py): flock on CC-IN2P3's
-    # NFS /sps answers ENOLCK on some nodes (E3550, 2026-11-02)
-    LOGGER.info(f"data.memmap: waiting for the lock of {key} on {socket.gethostname()}")
-    with dir_lock(os.path.join(root, key),
-                  on_wait=lambda o: LOGGER.info(f"data.memmap: lock of {key} held by {o}, waiting")):
-        LOGGER.info(f"data.memmap: holding the lock of {key}")
-        meta_p = os.path.join(d, "meta.json")
-        built = not os.path.exists(meta_p)
-        if not built:
-            meta = json.load(open(meta_p))
-            assert meta["key_doc"] == json.loads(json.dumps(key_doc, sort_keys=True)), \
-                f"memmap cache {d}: stored key document differs from this run's (hash collision?)"
-            LOGGER.info(f"data.memmap: opening the cache {d}")
-        else:
-            t0 = time.time()
-            tmp = d + f".tmp{os.getpid()}"
-            # a builder that died left its staging dir; under the lock no other builder of this key is alive
-            for old in os.listdir(root):
-                if old.startswith(key + ".tmp"):
-                    shutil.rmtree(os.path.join(root, old), ignore_errors=True)
-            os.makedirs(tmp)
-            meta = _build(exp, c, tmp, key_doc, order_rows, want_offshell,
-                          global_encode, resolve_amp_trafos, preprocess_amplitude)
-            with open(os.path.join(tmp, "meta.json"), "w") as f:
-                json.dump(meta, f)
-            os.rename(tmp, d)
-            LOGGER.info(f"data.memmap: built the cache {d} in {time.time() - t0:.0f} s")
-    _apply(exp, c, d, meta, built)
+    fdir = None
+    if phys_on or want_offshell:
+        fkd = features_key_doc(exp, names, want_offshell, sidecars)
+        fdir = os.path.join(d, "feat_" + _hash(fkd))
+        if not os.path.exists(os.path.join(fdir, "meta.json")):
+            if not prebuild:
+                raise RuntimeError(f"data.memmap: the cache {d} has no derived inputs for this run's target factor / "
+                                   f"off-shellness ({fdir}); build them with a CPU prebuild job first: {rebuild}")
+            nb = meta["N"] * (8 + 4 * len(exp._internal_mass_pdgs))
+            _locked_build(fdir, nb, root, lambda st: _build_features(exp, c, d, meta, st, fkd, want_offshell))
+    if prebuild:
+        LOGGER.info(f"data.memmap_prebuild: the cache {d} is ready{f' (derived inputs {fdir})' if fdir else ''}; "
+                    f"exiting before the model")
+        sys.exit(0)
+    _open_run(exp, c, d, meta, fdir, need, want_offshell)
 
 
-def _build(exp, c, d, key_doc, order_rows, want_offshell, global_encode, resolve_amp_trafos,
-           preprocess_amplitude):
-    from experiment import order_identical_particles
-    from particle_ids import species_pdgs
+def _open_run(exp, c, d, meta, fdir, need, want_offshell):
+    """Point the experiment at the cache for this run: the selection, the tokens, the statistics (its own, or
+    frozen), the per-event arrays in the role's shuffled order, and the batch source."""
+    from particle_ids import global_encode, species_pdgs
+    from preprocessing import preprocess_amplitude
     from experiment import recipe_process_cfg
     cfg = exp.cfg
     names, roles, specs, paths = c["names"], c["roles"], c["specs"], c["paths"]
-    use_pids = c["use_pids"]
-    _porder = key_doc["particle_order"]
-    _porder_rng = np.random.default_rng(int(cfg.data.get("seed", 42))) if _porder == "shuffle" else None
+    t0 = time.time()
+    _check_canary(d, meta, paths)
+    if fdir is not None:
+        fmeta = json.load(open(os.path.join(fdir, "meta.json")))
+        now = _canary(fdir, list(fmeta["canary"]))
+        assert now == fmeta["canary"], f"memmap cache {fdir}: derived inputs differ from what the build wrote"
+    _touch(d)
+    phys_on = bool(cfg.data.get("target_physics_factor", False))
+    dimless = bool(cfg.data.get("dimensionless_inputs", False))
+    seg_of = {(s["role"], s["name"]): s for s in meta["segs"]}
+    pidx = {n: i for i, n in enumerate(names)}
+    mom, pdg, amp, rs = (_open(d, n) for n in ("mom", "pdg", "amp", "rs"))
+    logF = _open(fdir, "logF") if phys_on else None
 
-    # ---- pass 1: shapes (row counts from the .npy headers), so the flat files can be allocated up front ----
-    shape = {}
-    for role in roles:
-        cap = c["cap_for"][role]
-        cap = int(cap) if cap not in (None, "null", "none") else None
-        for n in names:
-            N0, ncol = np.load(paths[role][n], mmap_mode="r").shape
-            shape[(role, n)] = (min(N0, cap) if cap is not None else N0, (ncol - 1) // 5)
-    n_role = {r: sum(shape[(r, n)][0] for n in names) for r in roles}
-    m_role = {r: sum(shape[(r, n)][0] * shape[(r, n)][1] for n in names) for r in roles}
-    M, N = sum(m_role.values()), sum(n_role.values())
-    fmt = np.lib.format
-    particles = fmt.open_memmap(os.path.join(d, "particles.npy"), "w+", np.float32, (M, 4))
-    tokens = fmt.open_memmap(os.path.join(d, "tokens.npy"), "w+", np.int16, (M,))
-
-    # ---- pass 2: load, tokenize, boost + augment (the torch RNG draws in the in-memory order), write ----
-    raw_amp = {r: fmt.open_memmap(os.path.join(d, f"stage_amp_{r}.npy"), "w+", np.float64, (n_role[r], 1))
-               for r in roles}
-    phys_on = bool(exp.cfg.data.get("target_physics_factor", False))
-    orders_on = bool(exp.cfg.data.get("target_physics_orders", False))
-    dimless = bool(exp.cfg.data.get("dimensionless_inputs", False))
-    # dimensionless_inputs: each event's sqrt(s_hat) in GeV, in the role's load order (the off-shellness and the
-    # mass column need it), and the mass statistics' sums over the massive train particles (in memory's order)
-    rs_st = ({r: fmt.open_memmap(os.path.join(d, f"stage_rs_{r}.npy"), "w+", np.float64, (n_role[r],))
-              for r in roles} if dimless else None)
-    dms_frozen = c.get("dimless_mass_stats")
-    if dimless and dms_frozen is None:
-        from particle_ids import GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, MASS_MASSLESS_LOG10_THR
-        raw_lm = np.asarray(GLOBAL_PROPERTY_MATRIX)[:, PARTICLE_FEATURE_NAMES.index("log10_mass_gev")]
-    dms_n1 = dms_s1 = dms_s2 = 0.0
-    fac = ({r: fmt.open_memmap(os.path.join(d, f"stage_factor_{r}.npy"), "w+", np.float64, (n_role[r], 1))
-            for r in roles} if phys_on else None)
-    reg, slot_pdgs, npart = [], {}, {}
-    pbase = ebase = 0
-    seg = {}                                         # (role, name) -> (particle offset, event offset in the role, N, P)
-    for role in roles:
-        cap = c["cap_for"][role]
-        cap = int(cap) if cap not in (None, "null", "none") else None
-        er = 0
-        for s in specs:
-            name = s["name"]
-            if cap is not None:
-                data_raw = np.asarray(np.load(paths[role][name], mmap_mode="r")[:cap])
-            else:
-                data_raw = np.load(paths[role][name])
-            n_particles = (data_raw.shape[1] - 1) // 5
-            momenta_cols = n_particles * 4
-            parts = data_raw[:, :momenta_cols]
-            pdg_ids = data_raw[:, momenta_cols:-1].astype(int)
-            amplitudes = data_raw[:, [-1]]
-            if use_pids:
-                toks = exp.tokenizer.register_and_encode(pdg_ids)
-            else:
-                toks = global_encode(species_pdgs(pdg_ids, s.get("physics"), recipe_process_cfg(s)))   # heavy-quark tops, massless b: their mass
-                exp.tokenizer.register_and_encode(pdg_ids)
-            reg.append(np.unique(pdg_ids).tolist())
-            slot_pdgs.setdefault(name, [int(x) for x in pdg_ids[0]])
-            if _porder != "none":
-                parts = order_identical_particles(parts, pdg_ids, _porder, rng=_porder_rng)
-            mom = exp._boost_augment_momenta(parts, n_particles)
-            Nn, P = mom.shape[0], mom.shape[1]
-            assert (Nn, P) == shape[(role, name)]
-            if dimless:      # the in-memory path's operations, in its order (experiment._init_data_recipes)
-                mm = mom.astype(np.float64)
-                q = mm[:, 0] + mm[:, 1]
-                rs = np.sqrt(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1))
-                assert np.all(rs > 0), f"dimensionless_inputs: non-positive s_hat in {(role, name)}"
-                mom = (mm / rs[:, None, None]).astype(np.float32)
-                rs_st[role][er:er + Nn] = rs
-                if role == "train" and dms_frozen is None:
-                    t = np.asarray(toks).reshape(Nn, P)
-                    v = (raw_lm[t] - np.log10(rs)[:, None])[(raw_lm[t] >= MASS_MASSLESS_LOG10_THR) & (t > 0)]
-                    dms_n1 += v.size; dms_s1 += float(v.sum()); dms_s2 += float((v.astype(np.float64) ** 2).sum())
-                del mm, q
-            toks = np.asarray(toks).reshape(Nn * P)
-            assert toks.min() >= np.iinfo(np.int16).min and toks.max() <= np.iinfo(np.int16).max
-            particles[pbase:pbase + Nn * P] = mom.reshape(Nn * P, 4)
-            tokens[pbase:pbase + Nn * P] = toks
-            raw_amp[role][er:er + Nn] = amplitudes
-            seg[(role, name)] = (pbase, er, Nn, P)
-            npart[name] = int(P)
-            pbase += Nn * P; er += Nn
-            LOGGER.info(f"  [{role}] {name}: {Nn} events{f' (cap {cap})' if cap else ''} from {paths[role][name]}"
-                        f" -> memmap")
-            del data_raw, parts, mom, toks
-    exp._slot_pdgs_by_name = {**slot_pdgs, **getattr(exp, "_slot_pdgs_by_name", {})}
-    dimless_mass_stats = None
-    if dimless:
-        if dms_frozen is not None:
-            dimless_mass_stats = [float(dms_frozen[0]), float(dms_frozen[1])]
-        else:
-            mu = dms_s1 / dms_n1 if dms_n1 else 0.0
-            sd = float(np.sqrt(max(dms_s2 / dms_n1 - mu ** 2, 0.0))) if dms_n1 else 1.0
-            dimless_mass_stats = [mu, sd if sd > 1e-6 else 1.0]
-        exp._dimless_mass_stats = dimless_mass_stats
-        LOGGER.info(f"dimensionless_inputs (memmap): log10(m / sqrt(s_hat)) over the massive train particles, mean "
-                    f"{dimless_mass_stats[0]:.3f}, std {dimless_mass_stats[1]:.3f}")
-    offshell_masks = exp._setup_offshell_masks(names) if want_offshell else None
-    rng_out = torch.get_rng_state().numpy().copy()
-    np.save(os.path.join(d, "rng_out.npy"), rng_out)
-    tokens.flush(); del tokens
-
-    # ---- momentum scale: one global train-only std (bitwise the in-memory np.concatenate(...).std()) ----
-    mom_div, mom_mean, mom_std = c["mom_div"], c["mom_mean"], c["mom_std"]
-    m_tr = m_role["train"]
-
-    def train_chunks():
-        step = CHUNK // 4
-        for i in range(0, m_tr, step):
-            yield np.asarray(particles[i:min(m_tr, i + step)])
-    if mom_div is None:
-        _, sd = f32_mean_std(train_chunks)
-        mom_div = float(sd)
-        mm_, ss_ = f32_mean_std(train_chunks, scale=mom_div)
-        mom_mean = float(mm_)
-        mom_std = float(max(ss_, 1e-2))
-    for i in range(0, M, CHUNK // 4):                              # every block / mom_div, in place
-        j = min(M, i + CHUNK // 4)
-        particles[i:j] = np.asarray(particles[i:j]) / mom_div
-    particles.flush()
-
-    # ---- data.target_physics_factor: from the momenta in GeV rebuilt as the in-memory path's _phys does (the scaled
-    #      float32 momenta times mom_div, times sqrt(s_hat) under dimensionless_inputs), so the factor is bitwise its ----
-    if phys_on:
-        for role in roles:
-            cap = c["cap_for"][role]
-            cap = int(cap) if cap not in (None, "null", "none") else None
-            for name in names:
-                pb, er, Nn, P = seg[(role, name)]
-                pp = np.asarray(particles[pb:pb + Nn * P]).reshape(Nn, P, 4).astype(np.float64) * mom_div
-                if dimless:
-                    pp = pp * np.asarray(rs_st[role][er:er + Nn])[:, None, None]
-                a_s = None
-                if orders_on:    # each event's own alpha_s, read as the in-memory path reads it
-                    ap = _alphas_path(paths[role][name])
-                    if not os.path.exists(ap) and int(exp._orders_of(name)[2]) == 0:
-                        a_s = np.ones(Nn)    # alpha_s power 0: the factor does not depend on alpha_s
-                    else:
-                        assert os.path.exists(ap), f"data.target_physics_orders: no per-event alpha_s for {paths[role][name]}"
-                        a_s = np.load(ap, mmap_mode="r")
-                        a_s = np.asarray(a_s[:cap] if cap is not None else a_s, dtype=np.float64)
-                    assert a_s.shape[0] == Nn, (ap, a_s.shape, Nn)
-                F_ev = np.exp(exp._physics_logF(name, pp, alphas=a_s)).reshape(-1, 1)
-                raw_amp[role][er:er + Nn] = np.asarray(raw_amp[role][er:er + Nn]) * F_ev
-                fac[role][er:er + Nn] = F_ev
-                del pp
-
-    # ---- amplitude transform and statistics (per process; the shared helper of the in-memory path) ----
-    def get_amp(role, name):
-        _, er, Nn, _ = seg[(role, name)]
-        return np.asarray(raw_amp[role][er:er + Nn])
-    amp_min = min(float(np.min(raw_amp[r])) for r in roles)
-    per_dataset = c["per_dataset"]
-    amp_trafos, prepd_means, prepd_stds = exp._resolve_amp_preprocessing(
-        names, roles, get_amp, lambda: np.asarray(raw_amp["train"]), lambda n: npart[n], per_dataset,
-        c["amp_trafos"], c["amp_trafos_pp"], c["prepd_means"], c["prepd_stds"], global_min=amp_min)
-    trafos_pp = exp._amp_trafos_pp
-    affine = getattr(exp, "_affine_multiplicity", None)
-
-    # ---- per-event arrays in the role's shuffled order (rng seed 42 over train, val, test, as in memory) ----
-    F = order_rows.shape[1]
-    offsets = fmt.open_memmap(os.path.join(d, "offsets.npy"), "w+", np.int64, (N, 2))
-    amp_out = fmt.open_memmap(os.path.join(d, "amplitudes.npy"), "w+", np.float32, (N, 1))
-    fac_out = fmt.open_memmap(os.path.join(d, "amp_factor.npy"), "w+", np.float64, (N, 1)) if phys_on else None
-    pid_out = fmt.open_memmap(os.path.join(d, "process_ids.npy"), "w+", np.int32, (N,))
-    # dimensionless_inputs: one column past the order features, log10 sqrt(s_hat), which the wrapper takes off
-    order_out = fmt.open_memmap(os.path.join(d, "order_labels.npy"), "w+", np.float32, (N, F + int(dimless)))
-    n_pdg = len(exp._internal_mass_pdgs)
-    osh_raw = (fmt.open_memmap(os.path.join(d, "stage_offshell.npy"), "w+", np.float32, (N, n_pdg))
-               if want_offshell else None)
-    rng = np.random.default_rng(seed=42)
-    part_base = 0
-    row0 = 0
-    for role in roles:
-        nr = n_role[role]
-        st_amp = fmt.open_memmap(os.path.join(d, f"stage_prepd_{role}.npy"), "w+", np.float64, (nr, 1))
-        st_osh = (fmt.open_memmap(os.path.join(d, f"stage_osh_{role}.npy"), "w+", np.float32, (nr, n_pdg))
-                  if want_offshell else None)
-        ev_start = np.zeros(len(names) + 1, dtype=np.int64)     # first event of each process in the role
-        p_base = np.zeros(len(names), dtype=np.int64)           # its first particle in the flat array
-        p_np = np.zeros(len(names), dtype=np.int64)
-        for proc_idx, name in enumerate(names):
-            pb, er, Nn, P = seg[(role, name)]
-            exp._proc_npart[proc_idx] = int(P)
-            m = prepd_means[proc_idx] if per_dataset else prepd_means[0]
-            s_ = prepd_stds[proc_idx] if per_dataset else prepd_stds[0]
-            tr = trafos_pp[proc_idx] if trafos_pp else amp_trafos
-            ap, _, _ = preprocess_amplitude(get_amp(role, name), trafos=tr, mean=m, std=s_)
-            st_amp[er:er + Nn] = ap
-            ev_start[proc_idx + 1] = ev_start[proc_idx] + Nn
-            assert pb == part_base
-            p_base[proc_idx] = pb
-            p_np[proc_idx] = P
-            if want_offshell:
-                cols = np.zeros((Nn, n_pdg), dtype=np.float64)
-                sel = offshell_masks[proc_idx] if offshell_masks is not None else None
-                if sel is not None:
-                    # the momenta in GeV as the in-memory path rebuilds them (_phys: the scale, then sqrt(s_hat))
-                    pp = np.asarray(particles[pb:pb + Nn * P]).reshape(Nn, P, 4).astype(np.float64) * mom_div
-                    s_ev = 1.0
-                    if dimless:
-                        rs_ev = np.asarray(rs_st[role][er:er + Nn])
-                        pp = pp * rs_ev[:, None, None]
-                        s_ev = rs_ev ** 2         # (s_prop - M^2) / s_hat, a pure number like every other input
-                    for col, pdg in enumerate(exp._internal_mass_pdgs):
-                        props = sel.get(pdg, [])
-                        if not props:
-                            continue
-                        offs = []
-                        for mrow, mm in props:
-                            q = np.einsum("s,nsc->nc", mrow, pp)
-                            s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                            offs.append((s_prop - mm) / s_ev)
-                        offs = np.stack(offs, axis=1)
-                        idx = np.argmin(np.abs(offs), axis=1)
-                        cols[:, col] = offs[np.arange(Nn), idx]
-                st_osh[er:er + Nn] = cols.astype(np.float32)
-            part_base += Nn * P
-        perm = rng.permutation(nr)
-        np.save(os.path.join(d, f"perm_{role}.npy"), perm)
-        for i in range(0, nr, CHUNK):
-            src = perm[i:i + CHUNK]
-            p = np.searchsorted(ev_start, src, side="right") - 1
-            start = p_base[p] + (src - ev_start[p]) * p_np[p]
-            o = slice(row0 + i, row0 + i + len(src))
-            offsets[o] = np.stack([start, start + p_np[p]], axis=1)
-            amp_out[o] = np.asarray(st_amp[src]).astype(np.float32)
-            if phys_on:
-                fac_out[o] = np.asarray(fac[role][src])
-            pid_out[o] = p.astype(np.int32)
-            order_out[o, :F] = order_rows[p]
-            if dimless:
-                order_out[o, F] = np.log10(np.asarray(rs_st[role][src])).astype(np.float32)
-            if want_offshell:
-                osh_raw[o] = st_osh[src]
-        row0 += nr
-        del st_amp, st_osh, perm
-        for f in (f"stage_prepd_{role}.npy", f"stage_osh_{role}.npy"):
-            if os.path.exists(os.path.join(d, f)):
-                os.remove(os.path.join(d, f))
-    del raw_amp
+    # ---- tokens: the registrations the in-memory path makes as it loads (each pool's distinct ids, ascending, in
+    #      load order), then one table per process over every id of the cache ----
+    seen = []
     for r in roles:
-        os.remove(os.path.join(d, f"stage_amp_{r}.npy"))
+        for n in names:
+            k = need[(r, n)]
+            u = [p for p, first in seg_of[(r, n)]["pdg_first"] if first < k]
+            if u:
+                exp.tokenizer.register_and_encode(np.asarray(u, dtype=int))
+                seen += u
+    tok_U = np.unique(np.asarray(seen, dtype=np.int64))       # every id a selected event carries
+    tok_lut = np.zeros((len(names), len(tok_U)), dtype=np.int64)
+    for i, s in enumerate(specs):
+        if c["use_pids"]:
+            tok_lut[i] = exp.tokenizer.encode(tok_U)
+        else:
+            tok_lut[i] = global_encode(species_pdgs(tok_U, s.get("physics"), recipe_process_cfg(s)))
+    for i, n in enumerate(names):
+        exp._proc_npart[i] = int(seg_of[(roles[0], n)]["P"])
+
+    # ---- momentum scale: the train selection's augmented momenta, as the in-memory path reduces them ----
+    seed = exp._aug_seed()
+
+    def train_piece(job):
+        s, i, j = job
+        P = s["P"]
+        com = np.asarray(mom[s["p0"] + i * P:s["p0"] + j * P]).reshape(j - i, P, 4)
+        a = keyed_aug.augment(com, seed, s["uid"], np.arange(i, j, dtype=np.int64))
+        if dimless:
+            r_ = np.asarray(rs[s["ev0"] + i:s["ev0"] + j])
+            a = (a.astype(np.float64) / r_[:, None, None]).astype(np.float32)
+        return a.reshape(-1, 4)
+    step_ev = 1 << 16
+    jobs = [(seg_of[("train", n)], i, min(need[("train", n)], i + step_ev))
+            for n in names for i in range(0, need[("train", n)], step_ev)]
+
+    def train_chunks():         # in order, computed by a few threads ahead (numpy releases the GIL)
+        return _ordered_map(train_piece, jobs)
+    mom_div, mom_mean, mom_std = c["mom_div"], c["mom_mean"], c["mom_std"]
+    if mom_div is None:
+        # the run's own scale over its train selection and seed; kept beside the cache (a few numbers, keyed by the
+        # selection, the seed and dimensionless_inputs), so a second run on the same data and seed does not redo it
+        sk = _hash({"seed": seed, "dimless": dimless, "need": [need[("train", n)] for n in names],
+                    "format": MMAP_VERSION})
+        sp = os.path.join(d, "mom_stats", sk + ".json")
+        if os.path.exists(sp):
+            mom_div, mom_mean, mom_std = json.load(open(sp))
+        else:
+            t1 = time.time()
+            _, sd = f32_mean_std(train_chunks)
+            mom_div = float(sd)
+            mm_, ss_ = f32_mean_std(train_chunks, scale=mom_div)
+            mom_mean = float(mm_)
+            mom_std = float(max(ss_, 1e-2))
+            os.makedirs(os.path.dirname(sp), exist_ok=True)
+            tmp = sp + "." + _job_tag()
+            with open(tmp, "w") as f:
+                json.dump([mom_div, mom_mean, mom_std], f)
+            os.replace(tmp, sp)
+            LOGGER.info(f"data.memmap: momentum scale over the train selection at seed {seed} in "
+                        f"{time.time() - t1:.0f} s")
+    exp.mom_mean, exp.mom_std, exp.mom_div = [mom_mean], [mom_std], float(mom_div)
+
+    # ---- dimensionless_inputs: the mass column's statistics over the massive train particles ----
     if dimless:
-        lrs = np.asarray(order_out[::max(1, N // 1000000), F])      # a strided sample: the log line only
-        LOGGER.info(f"dimensionless_inputs ON (memmap): momenta per event / sqrt(s_hat), masses as "
-                    f"log10(m / sqrt(s_hat)), off-shellness / s_hat; sqrt(s_hat) {np.median(10 ** lrs):.4g} GeV median "
-                    f"over {len(lrs)} events "
-                    f"({np.percentile(10 ** lrs, 5):.4g} to {np.percentile(10 ** lrs, 95):.4g})")
-        del rs_st, lrs
-        for r in roles:
-            os.remove(os.path.join(d, f"stage_rs_{r}.npy"))
+        dms = c.get("dimless_mass_stats")
+        if dms is not None:
+            exp._dimless_mass_stats = [float(dms[0]), float(dms[1])]
+        else:
+            from particle_ids import GLOBAL_PROPERTY_MATRIX, PARTICLE_FEATURE_NAMES, MASS_MASSLESS_LOG10_THR
+            raw_lm = np.asarray(GLOBAL_PROPERTY_MATRIX)[:, PARTICLE_FEATURE_NAMES.index("log10_mass_gev")]
+            n1 = s1 = s2 = 0.0
+            for n in names:
+                s = seg_of[("train", n)]
+                k, P = need[("train", n)], s["P"]
+                pg = np.asarray(pdg[s["p0"]:s["p0"] + k * P])
+                t = tok_lut[pidx[n]][np.searchsorted(tok_U, pg)].reshape(k, P)
+                r_ = np.asarray(rs[s["ev0"]:s["ev0"] + k])
+                v = (raw_lm[t] - np.log10(r_)[:, None])[(raw_lm[t] >= MASS_MASSLESS_LOG10_THR) & (t > 0)]
+                n1 += v.size; s1 += float(v.sum()); s2 += float((v.astype(np.float64) ** 2).sum())
+            mu = s1 / n1 if n1 else 0.0
+            sdv = float(np.sqrt(max(s2 / n1 - mu ** 2, 0.0))) if n1 else 1.0
+            exp._dimless_mass_stats = [mu, sdv if sdv > 1e-6 else 1.0]
+        LOGGER.info(f"dimensionless_inputs (memmap): log10(m / sqrt(s_hat)) over the massive train particles, mean "
+                    f"{exp._dimless_mass_stats[0]:.3f}, std {exp._dimless_mass_stats[1]:.3f}")
+
+    # ---- amplitudes: the target factor, then the shared transform / standardization (frozen or fitted here) ----
+    raw, fac = {}, {}
+    for r in roles:
+        for n in names:
+            s, k = seg_of[(r, n)], need[(r, n)]
+            a = np.asarray(amp[s["ev0"]:s["ev0"] + k], dtype=np.float64).reshape(-1, 1)
+            if phys_on:
+                F = np.exp(np.asarray(logF[s["ev0"]:s["ev0"] + k])).reshape(a.shape)
+                fac[(r, n)] = F
+                a = a * F
+            raw[(r, n)] = a
     if phys_on:
-        fac_out.flush()
-        lf = np.log(np.asarray(fac["train"]).reshape(-1))
+        lf = np.concatenate([np.log(fac[("train", n)]).reshape(-1) for n in names])
         LOGGER.info(f"target_physics_factor ON (memmap): {len(names)} processes, mean log F over the train events "
                     f"{lf.mean():.3g}, 5-95% {np.percentile(lf, 5):.3g} to {np.percentile(lf, 95):.3g}")
-        del fac
-        for r in roles:
-            os.remove(os.path.join(d, f"stage_factor_{r}.npy"))
+        del lf
+    amp_min = min(float(np.min(v)) for v in raw.values() if v.size)
+    per_dataset = c["per_dataset"]
+    amp_trafos, prepd_means, prepd_stds = exp._resolve_amp_preprocessing(
+        names, roles, lambda r, n: raw.get((r, n)), lambda: np.concatenate([raw[("train", n)] for n in names], axis=0),
+        lambda n: seg_of[("train", n)]["P"], per_dataset,
+        c["amp_trafos"], c["amp_trafos_pp"], c["prepd_means"], c["prepd_stds"], global_min=amp_min)
+    trafos_pp = exp._amp_trafos_pp
 
-    offshell_stats = None
+    # ---- per-event arrays in each role's shuffled order (rng seed 42 over train, val, test, as in memory) ----
+    rng = np.random.default_rng(seed=42)
+    ev_rows, amps, pids, facs, counts = [], [], [], [], {}
+    exp._role_perm = {}
+    for r in roles:
+        rr, aa, pp_, ff = [], [], [], []
+        for n in names:
+            i = pidx[n]
+            s, k = seg_of[(r, n)], need[(r, n)]
+            m = prepd_means[i] if per_dataset else prepd_means[0]
+            sd_ = prepd_stds[i] if per_dataset else prepd_stds[0]
+            tr = trafos_pp[i] if trafos_pp else amp_trafos
+            ap, _, _ = preprocess_amplitude(raw.pop((r, n)), trafos=tr, mean=m, std=sd_)
+            aa.append(ap)
+            rr.append(s["ev0"] + np.arange(k, dtype=np.int64))
+            pp_.append(np.full(k, i, dtype=np.int32))
+            if phys_on:
+                ff.append(fac.pop((r, n)).reshape(-1))
+        perm = rng.permutation(sum(len(x) for x in rr))
+        exp._role_perm[r] = perm
+        counts[r] = len(perm)
+        ev_rows.append(np.concatenate(rr)[perm])
+        amps.append(np.concatenate(aa, axis=0)[perm].astype(np.float32))
+        pids.append(np.concatenate(pp_)[perm])
+        if phys_on:
+            facs.append(np.concatenate(ff)[perm])
+    ev_rows = np.concatenate(ev_rows)
+    exp.all_amplitudes = np.concatenate(amps, axis=0)
+    exp.all_process_ids = np.concatenate(pids)
+    exp.all_amp_factor = np.concatenate(facs) if phys_on else None
+    del amps, pids, facs
+
+    # ---- order features; the off-shellness columns' statistics over every role (as in memory) ----
+    order_rows = np.stack([exp._order_row(i, c["amp_orders"]) for i in range(len(names))]).astype(np.float32)
+    F = order_rows.shape[1]
+    osh_stats, eps = None, float(cfg.data.get("dimless_offshell_eps", 1e-6))
+    src = MmapSource(d, fdir if fdir is not None else d, meta, ev_rows, seed, mom_div, dimless, tok_U, tok_lut,
+                     order_rows, None, eps, F)
     if want_offshell:
-        eps = float(exp.cfg.data.get("dimless_offshell_eps", 1e-6))
-
-        def osh_chunks():
-            for i in range(0, N, CHUNK // max(n_pdg, 1)):
-                o = np.asarray(osh_raw[i:i + CHUNK // max(n_pdg, 1)]).astype(np.float64)
-                if dimless:      # log1p's unit, 1 GeV^2, becomes eps x s_hat (the in-memory path's)
-                    o = o / eps
-                yield np.sign(o) * np.log1p(np.abs(o))
-        mean0, std0 = rows_mean_std(osh_chunks)
-        mu, sd = exp._resolve_offshell_stats(lambda: (mean0, std0), n_pdg)
-        offshell_stats = [mu.tolist(), sd.tolist()]
-        i = 0
-        for t in osh_chunks():
-            order_out[i:i + len(t), F - n_pdg:F] = ((t - mu) / sd).astype(np.float32)
-            i += len(t)
-        del osh_raw
-        os.remove(os.path.join(d, "stage_offshell.npy"))
-    for a in (particles, offsets, amp_out, pid_out, order_out):
-        a.flush()
-    return {
-        "key_doc": json.loads(json.dumps(key_doc, sort_keys=True)),
-        "n_role": n_role, "m_role": m_role, "n_order_features": int(F),
-        "register": reg, "slot_pdgs": slot_pdgs, "npart": [npart[n] for n in names],
-        "mom_div": mom_div, "mom_mean": mom_mean, "mom_std": mom_std,
-        "amp_trafos": amp_trafos, "amp_trafos_pp": trafos_pp, "per_dataset": per_dataset,
-        "prepd_mean": [float(x) for x in prepd_means], "prepd_std": [float(x) for x in prepd_stds],
-        "affine_multiplicity": affine, "offshell_stats": offshell_stats,
-        "dimless_mass_stats": dimless_mass_stats,
-    }
-
-
-def _apply(exp, c, d, meta, built):
-    """Point the experiment at the cache: the arrays as read-only maps, the statistics and the side state
-    (tokenizer, slot PDGs, particle counts, the RNG state the build left) exactly as the in-memory path sets them."""
-    cfg = exp.cfg
-    names, roles = c["names"], c["roles"]
-    if not built:                    # the build registered them as it loaded; a hit replays the same calls
-        for pdgs in meta["register"]:
-            exp.tokenizer.register_and_encode(np.asarray(pdgs, dtype=int))
-    if not hasattr(exp, "_slot_pdgs_by_name"):
-        exp._slot_pdgs_by_name = {}
-    for n in names:
-        exp._slot_pdgs_by_name.setdefault(n, meta["slot_pdgs"][n])
-    for i, P in enumerate(meta["npart"]):
-        exp._proc_npart[i] = int(P)
-    torch.set_rng_state(torch.from_numpy(np.load(os.path.join(d, "rng_out.npy"))))
-
-    exp.mom_mean, exp.mom_std, exp.mom_div = [meta["mom_mean"]], [meta["mom_std"]], float(meta["mom_div"])
-    exp._amp_trafos_pp = [list(t) for t in meta["amp_trafos_pp"]] if meta["amp_trafos_pp"] else None
-    cfg.data.amp_trafos = meta["amp_trafos"]
-    exp.prepd_mean, exp.prepd_std = meta["prepd_mean"], meta["prepd_std"]
-    if meta.get("affine_multiplicity"):
-        exp._affine_multiplicity = meta["affine_multiplicity"]
-    if meta.get("offshell_stats") is not None:
-        exp._offshell_stats = meta["offshell_stats"]
-    if meta.get("dimless_mass_stats") is not None:
-        exp._dimless_mass_stats = [float(x) for x in meta["dimless_mass_stats"]]
-    if not built:
-        LOGGER.info(
-            f"Preprocessing amplitudes "
-            f"{'per-dataset (independent unit scale)' if meta['per_dataset'] else 'globally (shared scale)'} "
-            f"using trafos={meta['amp_trafos']} (train-only stats); "
-            f"means={[f'{m:.3f}' for m in meta['prepd_mean']]}")
-
-    exp.particles_flat = _open(d, "particles")
-    exp.tokens_flat = _open(d, "tokens")
-    exp.offsets = _open(d, "offsets")
-    exp.all_amplitudes = _open(d, "amplitudes")
-    exp.all_process_ids = _open(d, "process_ids")
-    exp.all_order_labels = _open(d, "order_labels")
-    exp.all_amp_factor = (np.asarray(_open(d, "amp_factor")).reshape(-1)      # (N,), the in-memory path's shape
-                          if os.path.exists(os.path.join(d, "amp_factor.npy")) else None)
-    assert (exp.all_amp_factor is not None) == bool(cfg.data.get("target_physics_factor", False)), \
-        "data.memmap: the cache's amp_factor does not match data.target_physics_factor"
-    exp._role_perm = {r: np.load(os.path.join(d, f"perm_{r}.npy"), mmap_mode="r") for r in roles}
-    exp.n_order_features = int(meta["n_order_features"])
-    exp.N_events = int(exp.offsets.shape[0])
-    exp._role_counts = tuple(int(meta["n_role"][r]) for r in roles)
+        src.osh = _open(fdir, "osh")
+        n_pdg = src.osh.shape[1]
+        step = CHUNK // max(n_pdg, 1)
+        mean0, std0 = rows_mean_std(lambda: (src.osh_transformed(ev_rows[i:i + step])
+                                             for i in range(0, len(ev_rows), step)))
+        mu, sdv = exp._resolve_offshell_stats(lambda: (mean0, std0), n_pdg)
+        exp._offshell_stats = [np.asarray(mu).tolist(), np.asarray(sdv).tolist()]
+        src.osh_mu, src.osh_sd = np.asarray(mu, np.float64), np.asarray(sdv, np.float64)
+        LOGGER.info(f"offshell_per_event ON (memmap): internal-mass slot ({n_pdg} col) filled per batch with "
+                    f"signed-log-standardized (s-M^2) for pdgs {exp._internal_mass_pdgs}")
+    exp._mmap_src = src
+    exp.n_order_features = int(F)
+    exp.N_events = int(len(ev_rows))
+    exp._role_counts = tuple(int(counts[r]) for r in roles)
     exp._mmap_dir = d
-    nbytes = sum(os.path.getsize(os.path.join(d, f)) for f in os.listdir(d))
+    nbytes = _du(d)
     if bool(cfg.data.get("memmap_prefetch", True)):
-        # one sequential read of every array: the pages then sit in the page cache (file-backed, shared with the
+        # one sequential read of the arrays: the pages then sit in the page cache (file-backed, shared with the
         # workers, reclaimable), and the shuffled batches do not fault them in one random page at a time
-        t0 = time.time()
-        for f in sorted(os.listdir(d)):
-            with open(os.path.join(d, f), "rb", buffering=0) as fh:
+        t1 = time.time()
+        for a in ("mom", "pdg", "rs", "evp"):
+            with open(os.path.join(d, a + ".npy"), "rb", buffering=0) as fh:
                 while fh.read(64 << 20):
                     pass
-        LOGGER.info(f"data.memmap: prefetched {nbytes / 1e9:.2f} GB into the page cache in {time.time() - t0:.0f} s")
-    LOGGER.info(f"data.memmap: {exp.N_events} events, {exp.particles_flat.shape[0]} particles mapped from {d} "
-                f"({nbytes / 1e9:.2f} GB on disk); roles {exp._role_counts}")
+        LOGGER.info(f"data.memmap: prefetched the batch arrays into the page cache in {time.time() - t1:.0f} s")
+    LOGGER.info(f"data.memmap: {exp.N_events} events of {d} ({nbytes / 1e9:.2f} GB on disk), roles {exp._role_counts}; "
+                f"opened in {time.time() - t0:.0f} s (augmentation seed {seed}, momentum scale {mom_div:.6g})")
