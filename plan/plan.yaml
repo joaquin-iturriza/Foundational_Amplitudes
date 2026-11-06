@@ -3725,9 +3725,6 @@ entries:
     58: '(a) Flat in log|M|^2 over the pp-sampled range (D294): adaptive per-bin oversampling, keep drawing candidates until
       every log|M|^2 bin up to the pp max is filled to its quota (top bins included), then generate; check on the five multichannel_check
       classes (0 pp events above the catalog max, per-bin density at quota), figure of the catalog vs pp log|M|^2 density.'
-    60: 'Worktrees left after merge (remove_worktree.sh refused by the permission classifier for agents): worktrees/wt-ws-ckpt,
-      wt-ws-grow (warm_start) and wt-multichannel; Joaquin was given the commands 2026-11-05; remove once he allows or runs
-      them.'
     61: '(c) Sign head under het (D287, D296): find why the het sign head fits the training signs (0.99) but transfers worse
       zero-shot than the MSE control (H5 17/21, HD5 15/19 worse); test the candidate causes (sign-loss weight, sign head on
       the het trunk gradient vs detached, attachment point), fix and rerun under the step-56 reads.'
@@ -8827,7 +8824,6 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
-    '60': Joaquin running or allowing scripts/remove_worktree.sh
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -9258,11 +9254,6 @@ entries:
       if:
       - 'every bin at quota on the five classes: design the regeneration'
       - 'a bin cannot be filled within the candidate budget: find why (phase-space measure of the top) and fix the proposal'
-    60:
-      feeds: keeping the trunk checkout clean so later merges and folds of results are not blocked by stale worktrees
-      if:
-      - 'removed: drop this step'
-      - 'still refused: keep it listed for Joaquin'
     61:
       feeds: whether het pretraining carries a usable sign on the one-loop pools
       if:
