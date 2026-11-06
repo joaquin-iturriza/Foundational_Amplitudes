@@ -14261,6 +14261,17 @@ entries:
       on the in-distribution validation), and the three-model split in flight (NLL-tuned best trial, default restart, parent;
       FA-ccin2p3-7a40c835) tells whether the sigma term or the mean moved; the 8-trial ranking stays the logged one (val MSE
       of the mean nearly opposite to the NLL). Revisit if the three-model split contradicts the restart reading.'
+  - at: '2026-11-06T05:40:55+00:00'
+    text: '2026-11-06 step 5 read (ws_het_split.py summary @0a048ee4 on FA-ccin2p3-7a40c835 -> data/ws_hpo8/het_split.json
+      @7d30b3e6; reproduced: reread minus logged NLL 1.2e-4, parent minus the trials'' step-0 7.7e-5). Exact split of the
+      validation NLL = <r^2/2sigma^2> (sigma-weighted error) + <log sigma> (log-sigma term), arithmetic mean over the 1153
+      processes, share-0.25 validation, parent''s target stats: pretrained start 0.727 + (-3.298) = -2.571, MSE of the mean
+      0.0764; default restart (model after its sigma stage) 0.523 + (-3.169) = -2.646, MSE 0.0555; NLL-tuned best trial hp_1860
+      (no sigma stage, EMA) 0.524 + (-3.282) = -2.758, MSE 0.0501. Per process, NLL-tuned minus default: weighted error median
+      +0.0036 (48% below 0), log-sigma median -0.058 (75% below 0, mean -0.113), MSE of the mean median 0.0000 (53% below
+      0). The tuning''s NLL gain is all in sharper sigma, not in the mean; both warm starts are calibrated (weighted error
+      near the ideal 0.5), so the NLL objective chose on sigma while the held-out reads score the mean. Only 3 of the 9 models
+      exist (the sweep kept only its best trial). Figure figs/ws_het_split_few_{a,b}.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
