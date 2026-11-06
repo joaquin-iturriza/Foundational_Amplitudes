@@ -353,6 +353,127 @@ def beams():
     print(json.dumps(out))
 
 
+# step 62's beam ablation (design passed 2026-11-06T04:47): four arms at one commit (5bf3e0f0), run dirs <arm>_tagbeams,
+# (seed 42, seed 43); every read from the run's own job (mixture_ab extract of its log)
+BEAM_RUNS = {"control": ("FA-ccin2p3-1c6caddf", "FA-ccin2p3-4ea1c1eb"),
+             "full": ("FA-ccin2p3-c2e82e97", "FA-ccin2p3-a52c9185"),
+             "eeonly": ("FA-ccin2p3-e4e0f158", "FA-ccin2p3-d84270fc"),
+             "pponly": ("FA-ccin2p3-2756bece", "FA-ccin2p3-3bafdc58")}
+
+
+def _default_classes():
+    """the training classes with a default source in the share-0.25 recipe, by beam (as beams())"""
+    import yaml
+    R = os.path.join(ROOT, "recipes")
+    rec = yaml.safe_load(open(os.path.join(R, "catalog_v4_default25_train.yaml")))["processes"]
+    dsh = yaml.safe_load(open(os.path.join(R, "catalog_v4_default_processes.yaml")))["processes"]
+    by = {"ee": set(), "pp": set()}
+    for e in rec:
+        src = (e.get("sampling") or {}).get("default_source")
+        if src:
+            by["ee" if dsh[src]["reuse"].startswith("ee4_") else "pp"].add(e["name"])
+    return by
+
+
+def ablation():
+    """R of each beam arm over the same-commit share-0 control (mixture_ab.compare: class medians of the seeds' geometric
+    mean ratio, bootstrap interval) on EE4 and PP4 split by whether the class's own default events are in the full
+    share's training (trained) or not (held_out), and on the held-out axes pooled; per seed alone too (the outcome asks
+    'on both seeds'); R_0 = the same-commit control over the step-15 het control (MIX_HET, the rerun spread) and
+    s = max(max |ln R_0|, 0.1); the design's outcome; additivity ln R_full against ln R_ee + ln R_pp
+    -> data/ee_gain_ablation.json"""
+    import mixture_ab as mab
+    cls = mab.class_of(); by = _default_classes(); trained = by["ee"] | by["pp"]
+    rd = {a: {ax: [mab.read_of(r, ax) for r in runs] for ax in ("EE4", "PP4", "held")} for a, runs in BEAM_RUNS.items()}
+    old = {ax: [mab.read_of(r, ax) for r in mab.MIX_HET["control"][ax]] for ax in ("EE4", "PP4", "held")}
+    parts = {"EE4_trained": ("EE4", lambda p: cls(p) in trained), "EE4_held_out": ("EE4", lambda p: cls(p) not in trained),
+             "PP4_trained": ("PP4", lambda p: cls(p) in trained), "PP4_held_out": ("PP4", lambda p: cls(p) not in trained),
+             "held_axes": ("held", lambda p: True)}
+    out = {"design": "plan catalog_coverage step 62 (D295), passed 2026-11-06T04:47", "runs": BEAM_RUNS,
+           "commit": "5bf3e0f0", "R": {}, "R_per_seed": {}, "R_0": {}}
+    def keys(ax, sel, *sides):
+        ks = set.intersection(*(set(x) for s in sides for x in s))
+        return sorted(k for k in ks if sel(mab.probe_name(k)))
+    for part, (ax, sel) in parts.items():
+        c = rd["control"][ax]
+        k0 = keys(ax, sel, c, old[ax])
+        if k0:
+            out["R_0"][part] = mab.compare(mab.side(c), mab.side(old[ax]), c[0], c[1], k0, cls)
+        for a in ("full", "eeonly", "pponly"):
+            k = keys(ax, sel, c, rd[a][ax])
+            if not k:
+                continue
+            out["R"].setdefault(a, {})[part] = mab.compare(mab.side(rd[a][ax]), mab.side(c), c[0], c[1], k, cls)
+            out["R_per_seed"].setdefault(a, {})[part] = [
+                round(float(np.median(list(mab.class_ratios(rd[a][ax][i], c[i], k, lambda q: cls(mab.probe_name(q))).values()))), 4)
+                for i in (0, 1)]
+    s = max([abs(np.log(v["R"])) for v in out["R_0"].values()] + [0.1])
+    out["s"] = round(float(s), 4)
+    lnR = lambda a, part: [float(np.log(x)) for x in out["R_per_seed"][a][part]]
+    ee, pp, full = lnR("eeonly", "EE4_trained"), lnR("pponly", "EE4_trained"), lnR("full", "EE4_trained")
+    own = all(abs(e - f) <= s for e, f in zip(ee, full)) and all(x > -s for x in pp)
+    cross = any(all(x <= -2 * s for x in lnR("pponly", part)) for part in ("EE4_trained", "EE4_held_out"))
+    out["outcome_EE4"] = ("E+E- OWN EVENTS" if own and not cross else "CROSS-BEAM" if cross else "UNRESOLVED")
+    out["pp_alongside_on_EE4"] = ("neutral (|ln R_pp| <= s)" if all(abs(x) <= s for x in pp) else
+                                  "hurts (ln R_pp >= 2s)" if all(x >= 2 * s for x in pp) else "between")
+    # PP4 with the roles swapped: is the PP4 gain the pp default events themselves, does e+e- data help pp
+    pe, pf, pe_ee = lnR("pponly", "PP4_trained"), lnR("full", "PP4_trained"), lnR("eeonly", "PP4_trained")
+    out["outcome_PP4"] = ("PP OWN EVENTS" if all(abs(a - b) <= s for a, b in zip(pe, pf)) and all(x > -s for x in pe_ee)
+                          else "CROSS-BEAM" if all(x <= -2 * s for x in pe_ee) else "UNRESOLVED")
+    out["additivity"] = {part: {"ln_R_full": round(float(np.log(out["R"]["full"][part]["R"])), 4),
+                                "ln_R_ee_plus_ln_R_pp": round(float(np.log(out["R"]["eeonly"][part]["R"]) +
+                                                                    np.log(out["R"]["pponly"][part]["R"])), 4)}
+                         for part in parts if all(part in out["R"][a] for a in ("full", "eeonly", "pponly"))}
+    json.dump(out, open(os.path.join(DATA, "ee_gain_ablation.json"), "w"), indent=1)
+    print(json.dumps({k: out[k] for k in ("s", "outcome_EE4", "pp_alongside_on_EE4", "outcome_PP4", "additivity")}))
+    for a, v in out["R"].items():
+        for part, r in v.items():
+            print(a, part, r, out["R_per_seed"][a][part])
+    for part, r in out["R_0"].items():
+        print("R_0", part, r)
+
+
+def fig_ablation():
+    """step 62's figure: per test class (the seeds' geometric mean MSE of log|M|^2, probes of one class pooled by their
+    geometric mean, as mixture_ab), each arm's zero-shot error against the class's rank in the share-0 control's error,
+    on the e+e- default test pools (EE4) and the 13 TeV pp test pools (PP4); below, each arm's error over the control's
+    per class (the ratio the R of `ablation` is the median of) -> figs/beam_ablation_<a..d>.{png,pdf} and a legend
+    strip figs/beam_ablation_legend"""
+    import mixture_ab as mab
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    cls = mab.class_of()
+    lab = {"control": "no default share", "full": "default share, both beams", "eeonly": "default share, e+e- only",
+           "pponly": "default share, pp only"}
+    col = {"control": ps.C.grey, "full": ps.C.blue, "eeonly": ps.C.vermillion, "pponly": ps.C.green}
+    figs = ps.panels(4)
+    for j, ax_name in enumerate(("EE4", "PP4")):
+        per = {}
+        for a, runs in BEAM_RUNS.items():
+            sd = mab.side([mab.read_of(r, ax_name) for r in runs])
+            by = {}
+            for p, x in sd.items():
+                by.setdefault(cls(p), []).append(x)
+            per[a] = {c: mab.gmean(v) for c, v in by.items()}
+        ks = sorted(set.intersection(*(set(v) for v in per.values())), key=lambda c: per["control"][c])
+        rank = np.arange(len(ks))
+        fig, ax = figs[j]
+        for a in ("control", "full", "eeonly", "pponly"):
+            ax.plot(rank, [per[a][c] for c in ks], ".", ms=2.5 if ax_name == "PP4" else 4, color=col[a], label=lab[a])
+        ax.set_yscale("log"); ax.set_xlabel("class, by the control's error"); ax.set_ylabel(r"MSE of $\log|\mathcal{M}|^2$")
+        ps.process_label(ax, "e$^+$e$^-$ test" if ax_name == "EE4" else "pp 13 TeV test", loc="upper left")
+        fig, ax = figs[j + 2]
+        ax.axhline(1.0, color=ps.C.grey, lw=0.8)
+        for a in ("full", "eeonly", "pponly"):
+            ax.plot(rank, [per[a][c] / per["control"][c] for c in ks], ".", ms=2.5 if ax_name == "PP4" else 4,
+                    color=col[a], label=lab[a])
+        ax.set_yscale("log"); ax.set_xlabel("class, by the control's error"); ax.set_ylabel("error over the control's")
+        ps.process_label(ax, "e$^+$e$^-$ test" if ax_name == "EE4" else "pp 13 TeV test", loc="upper left")
+    base = os.path.join(HERE, "figs", "beam_ablation")
+    ps.save_panels(figs, base)
+    ps.legend_strip(figs[0][1], base + "_legend", ncol=2)
+
+
 if __name__ == "__main__":
     {"pull": pull, "read": read, "pull_kin": lambda: pull(kin=True), "read_kin": read_kin, "read_level": read_level,
-     "beams": beams}[sys.argv[1]]()
+     "beams": beams, "ablation": ablation, "fig_ablation": fig_ablation}[sys.argv[1]]()
