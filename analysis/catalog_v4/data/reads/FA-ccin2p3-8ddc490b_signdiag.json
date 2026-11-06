@@ -1,0 +1,25 @@
+{
+"run": "FA-ccin2p3-8ddc490b",
+"kind": "het_ref",
+"source": "site logs",
+"grad_norm_main": [
+26.9,
+73.2,
+3360000000000000.0,
+98.3
+],
+"grad_norm_sigma_stage": [
+0.0977,
+0.17,
+687000000000.0,
+0.4
+],
+"val_sign_acc": [],
+"train_main": [
+4264,
+69.44,
+0.9299
+],
+"wall_h": 2.243,
+"gpu": "Tesla V100-SXM2-32GB"
+}

@@ -1,0 +1,351 @@
+{
+ "design": "plan catalog_coverage step 61 diagnosis (D287, D296); runs of step 56 (het_oneloop.SIGNHEAD)",
+ "per_run": {
+  "het_sign": [
+   {
+    "run": "FA-ccin2p3-18b98b55",
+    "grad_norm_main": [
+     26.6,
+     62.9,
+     8850000000000000.0,
+     99.1
+    ],
+    "train_main": [
+     4264,
+     69.31,
+     0.9283
+    ],
+    "wall_h": 2.322,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": [
+     63,
+     0.99,
+     0.87
+    ]
+   },
+   {
+    "run": "FA-ccin2p3-b2538139",
+    "grad_norm_main": [
+     26.0,
+     64.9,
+     1.71e+17,
+     98.8
+    ],
+    "train_main": [
+     4264,
+     69.25,
+     0.9276
+    ],
+    "wall_h": 2.329,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": [
+     63,
+     0.99,
+     0.87
+    ]
+   },
+   {
+    "run": "FA-ccin2p3-66c83df6",
+    "grad_norm_main": [
+     28.0,
+     74.2,
+     5e+17,
+     99.2
+    ],
+    "train_main": [
+     4264,
+     69.54,
+     0.9315
+    ],
+    "wall_h": 2.341,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": [
+     63,
+     0.99,
+     0.86
+    ]
+   },
+   {
+    "run": "FA-ccin2p3-69001455",
+    "grad_norm_main": [
+     24.0,
+     66.9,
+     1390000000000000.0,
+     98.8
+    ],
+    "train_main": [
+     4264,
+     69.25,
+     0.9275
+    ],
+    "wall_h": 2.326,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": [
+     63,
+     0.99,
+     0.865
+    ]
+   }
+  ],
+  "het_ref": [
+   {
+    "run": "FA-ccin2p3-5abe4a0e",
+    "grad_norm_main": [
+     26.5,
+     62.3,
+     4.35e+16,
+     98.9
+    ],
+    "train_main": [
+     4264,
+     69.88,
+     0.9359
+    ],
+    "wall_h": 2.33,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": null
+   },
+   {
+    "run": "FA-ccin2p3-92207f6a",
+    "grad_norm_main": [
+     24.5,
+     65.8,
+     2.88e+16,
+     98.8
+    ],
+    "train_main": [
+     4264,
+     69.78,
+     0.9343
+    ],
+    "wall_h": 2.326,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": null
+   },
+   {
+    "run": "FA-ccin2p3-0208896e",
+    "grad_norm_main": [
+     27.0,
+     68.4,
+     7940000000000000.0,
+     99.2
+    ],
+    "train_main": [
+     4264,
+     69.43,
+     0.9295
+    ],
+    "wall_h": 2.238,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": null
+   },
+   {
+    "run": "FA-ccin2p3-8ddc490b",
+    "grad_norm_main": [
+     26.9,
+     73.2,
+     3360000000000000.0,
+     98.3
+    ],
+    "train_main": [
+     4264,
+     69.44,
+     0.9299
+    ],
+    "wall_h": 2.243,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": null
+   }
+  ],
+  "mse_sign": [
+   {
+    "run": "FA-ccin2p3-339ec100",
+    "grad_norm_main": [
+     0.315,
+     2.23,
+     9790000.0,
+     5.6
+    ],
+    "train_main": [
+     4264,
+     24.35,
+     0.3266
+    ],
+    "wall_h": 1.563,
+    "gpu": "NVIDIA H100 NVL",
+    "val_sign_acc_last": [
+     63,
+     0.995,
+     0.915
+    ]
+   },
+   {
+    "run": "FA-ccin2p3-380842ed",
+    "grad_norm_main": [
+     0.345,
+     2.41,
+     590000.0,
+     5.6
+    ],
+    "train_main": [
+     4264,
+     24.33,
+     0.3263
+    ],
+    "wall_h": 1.565,
+    "gpu": "NVIDIA H100 NVL",
+    "val_sign_acc_last": [
+     63,
+     0.995,
+     0.9
+    ]
+   },
+   {
+    "run": "FA-ccin2p3-67ca3313",
+    "grad_norm_main": [
+     0.365,
+     2.53,
+     232000.0,
+     6.0
+    ],
+    "train_main": [
+     4264,
+     75.03,
+     1.0053
+    ],
+    "wall_h": 2.745,
+    "gpu": "Tesla V100-PCIE-32GB",
+    "val_sign_acc_last": [
+     63,
+     0.995,
+     0.91
+    ]
+   },
+   {
+    "run": "FA-ccin2p3-e3506d57",
+    "grad_norm_main": [
+     0.369,
+     2.24,
+     121000.0,
+     5.5
+    ],
+    "train_main": [
+     4264,
+     69.63,
+     0.9322
+    ],
+    "wall_h": 2.457,
+    "gpu": "Tesla V100-SXM2-32GB",
+    "val_sign_acc_last": [
+     63,
+     0.995,
+     0.89
+    ]
+   }
+  ]
+ },
+ "grad_norm_median": {
+  "het_sign": [
+   26.6,
+   26.0,
+   28.0,
+   24.0
+  ],
+  "het_ref": [
+   26.5,
+   24.5,
+   27.0,
+   26.9
+  ],
+  "mse_sign": [
+   0.315,
+   0.345,
+   0.365,
+   0.369
+  ]
+ },
+ "clip_bound_pct": {
+  "het_sign": [
+   99.1,
+   98.8,
+   99.2,
+   98.8
+  ],
+  "het_ref": [
+   98.9,
+   98.8,
+   99.2,
+   98.3
+  ],
+  "mse_sign": [
+   5.6,
+   5.6,
+   6.0,
+   5.5
+  ]
+ },
+ "het_over_mse_grad_norm": {
+  "per_seed": [
+   84.4,
+   75.4,
+   76.7,
+   65.0
+  ],
+  "geomean": 75.1
+ },
+ "wrong_sign": {
+  "train_pools_val_median_wrong": {
+   "het_sign": 0.01,
+   "mse_sign": 0.005
+  },
+  "train_pools_val_worst_pool_wrong": {
+   "het_sign": 0.1338,
+   "mse_sign": 0.0962
+  },
+  "ratio_arm_over_mse": {
+   "train_median": 2.0,
+   "train_worst": 1.39,
+   "H5_median": 1.99,
+   "HD5_median": 1.41
+  },
+  "note": "train: 1 - the last validation's median (worst-pool) sign accuracy over the 63 signed training pools (200 events each), seed mean; H5/HD5: the median over pools of the seed-mean wrong-sign share (het_signhead.json)"
+ },
+ "step_time_s": {
+  "het_sign": 0.9287,
+  "het_ref": 0.9324,
+  "mse_sign": 0.6476
+ },
+ "wall_h": {
+  "het_sign": [
+   2.322,
+   2.329,
+   2.341,
+   2.326
+  ],
+  "het_ref": [
+   2.33,
+   2.326,
+   2.238,
+   2.243
+  ],
+  "mse_sign": [
+   1.563,
+   1.565,
+   2.745,
+   2.457
+  ]
+ },
+ "gpu": {
+  "het_sign": [
+   "Tesla V100-SXM2-32GB"
+  ],
+  "het_ref": [
+   "Tesla V100-SXM2-32GB"
+  ],
+  "mse_sign": [
+   "NVIDIA H100 NVL",
+   "Tesla V100-PCIE-32GB",
+   "Tesla V100-SXM2-32GB"
+  ]
+ }
+}
