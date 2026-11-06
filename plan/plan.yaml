@@ -12582,6 +12582,30 @@ entries:
       docstring). Non-blocking: restore the mc_resonances/mc_res_params ValueError, n_candidates counts unlabelled cut failures,
       rounds misses the last partial block, harness n_candidates = collected states. seed_spread.py and prescreen_check.py
       otherwise clean.'
+  - at: '2026-11-06T23:24:07+00:00'
+    text: '2026-11-07 step 69 (h) revised and submitted. Both reviews of the first Markov-chain flat sampler (a99a7aeb) blocked
+      on one defect: it collected every accepted state, so 38% of kept toy events had a near-copy (69% in the upper 40% of
+      bins) and its 0.938 toy fill counted copies. Fixed at d7e1bd5c/bc1b291b/87766f90 (repo-reviewer PASS, watermark 87766f90;
+      design re-check PASS): chain state collected every 2 steps only after a move, rotation scale >= 0.3 rad, 0.2 chains
+      per flat event, chain constants in the recipe id, harness crash fixed, analysis/catalog_v4/flat_diversity.py (near-copy
+      share, NN distance against the quota sampler at budget 50 at equal count) run in-job, quota sampler at the same 12 labels
+      as matched-cost control, multichannel_check.py step69 read with the verdict rules (YES/QUOTA12/NO/COST/PARTIAL). Toy,
+      honest collection: chains 0.906 vs quota sampler 0.888 at 12 labels per flat event (0.950 at 50), near-copies 0.2%,
+      NN ratio median 0.95 but q10 0.27 (fails the design''s q10 >= 0.5): on the toy the chains'' real gain is small. The
+      <= 2x bound is the step-69 design''s own bar (D317 refused ~100x and names no number). Merged 74aa4ce6, CC synced; 10
+      CPU jobs at 74aa4ce6 (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+mcmc_both_res2_budget12):
+      uux_epemg 3e7f56d9/8f2ba5af (00:20), uux_epemvevex a3b08cbe/8eea9607 (00:30), uu_bbxuu ce73379e/dd311c0d (01:10), us_ddxsu
+      606a4b2f/0365f1a3 (01:00), udx_csxvevex effc39ea/ae19438c (00:30), seeds 42/43; target mcmc_check 0.6 h; wait on step
+      69. Read: multichannel_check.py pull current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+mcmc_both_res2_budget12
+      (per class, seeds 42,43), then step69 -> data/mcmc_check.json. e+e- groundwork (D318): MadGraph 3.7.0 on CC (read 2026-11-07
+      from its Template/Common/Source/PDF/lep_densities) ships lepton densities isronlyll (ISR only, LL), isrbetll/isrbetmll,
+      and ISR+beamstrahlung grids only for cepc240ll, fcce240ll, fcce365ll, ilc500ll, clic3000ll (the ''dressed'' densities;
+      reference believed to be Frixione-Mattelaer-Zaro-Zhao arXiv:2108.10261, not checked). The ee4_ default pools ran without
+      ISR at EE_ENERGIES 91.1876, 240, 365, 500, 1000, 3000 GeV (recipes/gen_catalog_v4_default.py, ''open: the user''s call'').
+      Machine energies to anchor on (from memory, documents not checked): LEP 88-209 GeV; FCC-ee CDR 91.2/160/240/365; CEPC
+      CDR 91/160/240; ILC TDR 250-500 (1 TeV upgrade); CLIC 380/1500/3000. Gap: no beamstrahlung grid in MG at 91, 160, 1000,
+      1500 GeV (ISR only there; small at LEP/FCC-ee Z pole, not at 1-1.5 TeV linear colliders). Not yet checked: the run-card
+      form (lpp1/lpp2 = -3/3 with pdlabel) running in our lhe_probe/lhe_parts setup.'
   handoff:
     state: '2026-11-07 ~00:30. Tonight''s four points: (3) scaling grid seed 42 SUBMITTED under a passed design (design-reviewer
       PASS after one FIX): memmap prebuild FA-ccin2p3-bf203857 (CPU, slurm 62996664) then 10 GPU cells afterok on it, wait
