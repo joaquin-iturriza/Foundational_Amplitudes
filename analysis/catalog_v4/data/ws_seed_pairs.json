@@ -122,6 +122,13 @@
    }
   }
  },
+ "blowup_pairs": [
+  "every group damped / default"
+ ],
+ "max_d_no_blowup": {
+  "PP4": 0.0505,
+  "EE4": 0.0809
+ },
  "median_d": {
   "PP4": 0.0032,
   "EE4": 0.0436
@@ -129,5 +136,25 @@
  "max_d": {
   "PP4": 0.3961,
   "EE4": 0.9326
+ },
+ "max_d_same_data": {
+  "PP4": 0.0157,
+  "EE4": 0.0669
+ },
+ "share_pair_d": {
+  "PP4": 0.0505,
+  "EE4": 0.0809
+ },
+ "parent_swap": {
+  "PP4": {
+   "R42": 0.9989,
+   "R43": 1.0101,
+   "max_abs_lnR": 0.01
+  },
+  "EE4": {
+   "R42": 0.9684,
+   "R43": 1.0375,
+   "max_abs_lnR": 0.0368
+  }
  }
 }

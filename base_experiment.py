@@ -1482,7 +1482,18 @@ class BaseExperiment:
             LOGGER.info(f"Fine-tuning: loading pretrained weights from {pretrained_path}")
             # the parent's weights as its validation scored them (its reported loss): with EMA on, the EMA average
             # (D63; docs/results.tex sec:ema-ckpt)
-            state_dict, source = _ckpt_scored_state(ck, [n for n, _ in self.model.named_parameters()])
+            _ft0 = (self.cfg.get("fine_tune", None) if hasattr(self.cfg, "get")
+                    else getattr(self.cfg, "fine_tune", None))
+            if _ft0 is not None and str(_ft0.get("start_weights", "scored")) == "live":
+                # fine_tune.start_weights=live (plan warm_start step 14): the checkpoint's live training weights, the
+                # ones its saved optimizer state belongs to, so a branch with fine_tune.load_optimizer_state continues
+                # the parent's run itself; a checkpoint without them is refused
+                if "model_live" not in ck:
+                    raise RuntimeError(f"fine_tune.start_weights=live: {pretrained_path} holds no model_live")
+                state_dict, source = _ckpt_live_state(ck), "model_live"
+                LOGGER.info("Fine-tuning: the parent's live weights (model_live, fine_tune.start_weights=live)")
+            else:
+                state_dict, source = _ckpt_scored_state(ck, [n for n, _ in self.model.named_parameters()])
             if source == "shadow":
                 LOGGER.info("Fine-tuning: the parent's EMA weights (its EMA shadow over its live weights)")
             elif source == "ema":
@@ -1584,7 +1595,7 @@ class BaseExperiment:
         which a run at the parent's seed would redraw). Buffers are left as loaded (Ash & Adams 2020; Zaidi et al.
         2022, whose lam 0.4, gamma 0.1 is the setting near Ash & Adams' best)."""
         seed = int(self.cfg.get("seed", 0)) + 1
-        with torch.random.fork_rng(devices=[]):
+        with torch.random.fork_rng(devices=list(range(torch.cuda.device_count()))):   # CPU and every CUDA stream restored
             torch.manual_seed(seed)
             fresh = instantiate(self.cfg.model)
             self._post_instantiate_model(fresh)

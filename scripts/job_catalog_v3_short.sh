@@ -94,9 +94,9 @@ wsx_setup() {   # plan warm_start step 14 (v4_het_wsx_*): seed 42, the het contr
             ++model.diagram_encoder_llm4lhc.bsm_labels=true)
     K=533; WS_PARENT=v4_het_control
 }
-wsx_branch() {  # the WSD parent's step-3731 model and optimizer state, (1 - sqrt) cooldown over all k steps, no warmup
+wsx_branch() {  # the WSD parent's step-3731 live weights and their optimizer state, (1 - sqrt) cooldown over all k steps, no warmup
     WS_PARENT=v4_het_control_wsd; WS_CKPT=model_run0_step3731; WS_PRE_SIGMA=1; WS_OPTSTATE=1
-    NORM+=(++training.scheduler=WSD ++training.wsd_cooldown_frac=1.0 ++training.cosanneal_warmup_frac=0.0
+    NORM+=(++fine_tune.start_weights=live ++training.scheduler=WSD ++training.wsd_cooldown_frac=1.0 ++training.cosanneal_warmup_frac=0.0
            ++training.cosanneal_warmup_steps=0)
 }
 ws_mse_setup() {

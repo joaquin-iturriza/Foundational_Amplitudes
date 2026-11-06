@@ -61,8 +61,11 @@ def test_shrink_perturb():
     fresh = dict(_Net().named_parameters())
     torch.manual_seed(7)
     before = torch.random.get_rng_state()
+    before_cuda = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
     s._shrink_perturb(0.4, 0.1)
     assert torch.equal(torch.random.get_rng_state(), before), "the global RNG stream moved"
+    if before_cuda is not None:
+        assert all(torch.equal(a, b) for a, b in zip(torch.cuda.get_rng_state_all(), before_cuda)), "a CUDA stream moved"
     for n, p in s.model.named_parameters():
         want = 0.4 * loaded[n] + 0.1 * fresh[n].detach()
         assert torch.allclose(p, want, atol=1e-6), n
