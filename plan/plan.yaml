@@ -4730,6 +4730,11 @@ entries:
       limit was taken from step 56''s 2.33 h of work instead of short_wall. No training ran. Resubmission at 03:30:00 was
       refused by the auto-mode permission classifier (no reason given); waits for the main session.'
     at: '2026-11-06T05:21:16+00:00'
+  - tried: step 67 extra seeds 44-47 of udx_csxvevex (FA-ccin2p3-a91ee51a, c9f8e41b, 66c0f4fd, 4eb3f12a; 3 budget-50 policies,
+      2026-11-06 ~11:25)
+    why: more seeds than the sibling classes is Joaquin's call (CLAUDE.md scope rule), taken on the design reviewer's suggestion
+      without asking; flagged by the repo-reviewer, cancelled before starting (no CPU used); asked instead
+    at: '2026-11-06T10:22:38+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
