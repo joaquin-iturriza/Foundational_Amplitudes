@@ -8928,11 +8928,48 @@ entries:
       the pure-default bound (afc96598/d26f13aa, EE4 1.216 [1.099,1.355], share 1 under MSE) and sets the R_pp expectation
       against it; searched results.tex/plan/decisions for eeonly, ee-only, e+e--only, pponly, pp-only, pp only, per/by beam,
       beam ablation, cross-beam, default share, pure-default, D295.'
+  - at: '2026-11-06T05:01:25+00:00'
+    question: 'Step 61 (c), D287/D296: is the het sign head''s worse wrong-sign share (2.0x the MSE control on the signed
+      training pools, 1.99x on H5, 1.41x on HD5) caused by the sign loss''s ~75x smaller share of the shared network''s gradient
+      under het, and does matching that share make the het sign no worse than the MSE control''s without hurting the het magnitude?'
+    prior: 'Step 56 (het_signhead.json @6ec06b24): het + sign head at sign_loss_weight 1 (FA-ccin2p3-18b98b55/b2538139/66c83df6/69001455)
+      worse than the MSE control on H5 17/21 pools, HD5 15/19, magnitude UNRESOLVED (R ~1.03 [0.64,1.56]). Step 47: het magnitude
+      target YES. het_sign_diag.json @999e9742 (het_sign_diag.py @31a10318): het pre-clip median gradient norm 24-28 vs MSE
+      0.315-0.369, per-seed ratios 84.4/75.4/76.7/65.0 (geometric mean 75.1); clip at 5 binds on 98.8-99.2% of het steps vs
+      5.5-6.0% of MSE steps; adding the sign head does not move the het norm (24.0-28.0 vs 24.5-27.0 without); wrong-sign
+      het/MSE: training pools median 1.0% vs 0.5%, H5 13.3% vs 6.7%, HD5 18.3% vs 13.0%. The sign-head searches (sign_near,
+      pair head) were all under MSE. Searched results.tex (sign head, het sign, sign_loss_weight, sign_het_match), plan, site
+      decisions (sign): no het sign-weight run exists.'
+    measure: 'Step 56''s reads unchanged (het_oneloop.py signhead): per pool the seed-mean wrong-sign share on H5 (21 pools)
+      and HD5 (19 classes), paired sign tests against the MSE control, the step-56 arm and all-positive; the per-validation
+      sign accuracy on the 63 signed training pools; magnitude R against the het magnitude reference (5abe4a0e/92207f6a/0208896e/8ddc490b),
+      seed-paired with the pairing gate, on HD5, H5 and the side axes; pre-clip gradient norm from the log.'
+    check: 'On existing data the sign error moves with the sign loss''s gradient share: the MSE control (75x larger share)
+      has 2.0x / 1.99x / 1.41x fewer wrong signs on training / H5 / HD5 than the het arm at weight 1, and the het arm''s sign
+      term leaves its gradient norm unchanged (het_sign_diag.json).'
+    fixed: 'Everything of v4_het_control_signhead: width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, no pair head, reads PP4/EE4/HD4/HD5 + H1-H7c; scripts/job_catalog_v3_short.sh
+      at trunk b3eb4156; gpu_v100 (step 56''s GPU type). Arms: v4_het_signhead_matched_event (training.sign_het_match: each
+      event''s sign cross-entropy times the het NLL''s detached factor sigma^(2 beta)/(2 sigma^2) on its mu gradient, weight
+      1) and v4_het_signhead_matched_const (sign_loss_weight 75, the measured ratio; one value from a measured rule, not a
+      search). A detached sign head is not run: the trunk already gets almost no sign gradient, so detaching cannot fix it.'
+    control: The MSE control's sign reads (v4_dimensionless_muon seeds 42-45, HD5 rereads dc9feba1/af09cad3/8833a131/481ad196);
+      the step-56 arm at weight 1 (same seeds); the het magnitude reference for magnitude.
+    seeds: 42-45 for both arms (8 jobs), as step 56; its pairing gate failed, so fewer seeds are not justified.
+    outcome: 'Per arm: YES if not worse than the MSE control on H5 and HD5 (one-sided paired sign test p > 0.05 and median
+      wrong-sign within 1.2x of the control''s), better than the step-56 arm on H5 (p < 0.05), and magnitude R widened upper
+      bound <= 1.25 on HD5 and H5 -> adopt, write up. PARTIAL if better than step 56 but still worse than MSE -> the gradient
+      share is part of the cause, reported with numbers, next candidate the clipping regime (99% of het steps clipped). NO
+      if neither arm beats step 56 -> gradient share ruled out; next the clipping regime. Blow-ups listed apart. Cost: 8 jobs
+      x 1 V100, step 56 measured 2.32-2.34 h per job (0.928 s/step), limit 03:00 (tools/short_wall.py), 18.7 GPU-h work /
+      24 at the limits; in memory, no cache.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
+    '62': FA-ccin2p3-1c6caddf FA-ccin2p3-4ea1c1eb FA-ccin2p3-c2e82e97 FA-ccin2p3-a52c9185 FA-ccin2p3-e4e0f158 FA-ccin2p3-d84270fc
+      FA-ccin2p3-2756bece FA-ccin2p3-3bafdc58
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -9342,6 +9379,12 @@ entries:
     units: null
     start: '2026-11-05T05:23:08+00:00'
     at: '2026-11-05T05:23:08+00:00'
+  - batch: beam_ablation
+    wall_h: 2.8
+    jobs: 8
+    units: null
+    start: '2026-11-06T04:58:44+00:00'
+    at: '2026-11-06T04:58:44+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
@@ -9383,8 +9426,8 @@ entries:
     state: working
     since: '2026-11-06T04:32:00+00:00'
     state_at: '2026-11-06T04:50:19+00:00'
-    context: 139489
-    context_at: '2026-11-06T04:49:05+00:00'
+    context: 212877
+    context_at: '2026-11-06T05:01:49+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
@@ -11072,6 +11115,13 @@ entries:
       woke nothing). Look up (claude-code-guide, low effort) whether Claude Code offers a setting or hook to suppress or absorb
       a task-notification; try a Stop-hook route that holds the main turn''s end a few seconds when an agent handed back this
       turn and its notification has not arrived; test on the recorded double wakes (main_turns.py) and on a live agent end.'
+    16: 'Merge commits sweep other agents'' uncommitted files: 21648d10 (merge ws-tune, warm_start owner) carried tools/plan.py,
+      plan_check.py and two tests of other workers. Find how (git add -A / commit -a during the merge, or files staged in
+      the shared index), and add a check to the commit hook that refuses a commit (merge included) carrying a staged file
+      the committing agent did not name; replay on 21648d10''s parent state.'
+    17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
+      plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
+      within 45 min; report to Joaquin either way.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -11306,6 +11356,16 @@ entries:
       if:
       - 'a route removes the second wake: keep it, re-measure after a day'
       - 'none works: say which were tried, with evidence'
+    16:
+      feeds: 'the commit rule: only your own files, named; Joaquin was told of the slip 2026-11-06'
+      if:
+      - 'fixed and replayed: drop'
+      - 'cannot tell who staged a file: say so and refuse merge commits with staged files outside the merged branch''s diff'
+    17:
+      feeds: 'Joaquin 2026-11-06: fixes must be shown to work, not claimed'
+      if:
+      - 'fired: report and drop'
+      - 'did not fire: trace and fix, replay again'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
@@ -12244,12 +12304,13 @@ entries:
     - FA-ccin2p3-af86de05
     - FA-ccin2p3-c2acc1fc
     - FA-ccin2p3-c477a52c
+    - FA-ccin2p3-c6d0c827
     - FA-ccin2p3-dd32a907
     - FA-ccin2p3-e046ac67
     - FA-ccin2p3-ed946736
     - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f699e170
-    commit: 97a69764
+    commit: c0407056
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
@@ -12258,11 +12319,15 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1ck3198.json
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
     - analysis/catalog_v4/data/warm_start_C1t.json
+    - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
+    - analysis/catalog_v4/plot_warm_start_compare.py
+    - analysis/catalog_v4/ws_het_split.py
     - models/grow_width.py
     - scripts/job_catalog_v3_short.sh
     - sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
+    - sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
     - tests/test_save_at_steps.py
   dead_ends: []
   asks:
@@ -12307,8 +12372,8 @@ entries:
     state: working
     since: '2026-11-06T04:32:03+00:00'
     state_at: '2026-11-06T04:32:03+00:00'
-    context: 226661
-    context_at: '2026-11-06T04:49:10+00:00'
+    context: 247172
+    context_at: '2026-11-06T05:01:49+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
@@ -13411,6 +13476,18 @@ entries:
     units: null
     start: '2026-11-05T04:36:37+00:00'
     at: '2026-11-05T04:36:37+00:00'
+  - batch: ws_het_split
+    wall_h: 0.35
+    jobs: 1
+    units: null
+    start: '2026-11-06T04:58:25+00:00'
+    at: '2026-11-06T04:58:25+00:00'
+  - batch: ws_c1_k533_mse_wsd_hpo8
+    wall_h: 0.45
+    jobs: 8
+    units: null
+    start: '2026-11-06T04:58:27+00:00'
+    at: '2026-11-06T04:58:27+00:00'
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
@@ -13543,9 +13620,29 @@ entries:
       every probe read, no blow-up (58723352 spiked at 672 and recovered). The two caches (deda9310, 04fb3b3d, 23 GB each)
       deleted after the reads as designed. Design''s SHORT branch: tuning (D284''s sweep over the fine-tune space) is the
       next call, Joaquin''s.'
+  - at: '2026-11-06T05:01:35+00:00'
+    text: '2026-11-06 step (a) first read, from the logged curves (ws_het_split.py fetch @b9a3aed2 -> data/ws_hpo8/trial_curves.json):
+      over the 8 trials of ws_c1_k533_hpo8, the val MSE of mu at the best checkpoint ranks them nearly opposite to the val
+      NLL (the sweep objective): lr_scale 0.174 NLL -2.758 (best) MSE 0.0349 (2nd worst); lr_scale 2.22 NLL -2.546 MSE 0.0257
+      (best); 0.873 NLL -2.712 MSE 0.0279. The untuned k=533 run''s NLL curve (data/reads/FA-ccin2p3-341bf564_val.json) rises
+      from -2.57 at step 10 to about -1.95 near step 30 and recovers to -2.64 by 533, while the NLL-tuned run stays at -2.57..-2.76:
+      the re-warm disrupts the het calibration more than the mean. Exact split into W=<r^2/2sigma^2> and S=<log sigma>: reread
+      FA-ccin2p3-c6d0c827 (scripts/job_ws_het_split.sh @daadd002) in flight. Step (b): sweep ws_c1_k533_mse_wsd_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
+      @c0407056; objective val MSE of mu under D298, scheduler cosine or WSD) submitted, 8 trials in waves [3,3,2], slurm
+      62989766-73, 3.6 GPU-h. Tool fix: site pick''s verify timeout raised 90 -> 180 s in ~/.local/bin/site (CC''s setup.sh
+      --verify now takes 97 s; pick had allotted nothing).'
+  - at: '2026-11-06T05:01:39+00:00'
+    text: '2026-11-06 step (d) figure analysis/catalog_v4/figs/warm_start_compare.png (plot_warm_start_compare.py @14fcc1cf
+      on ws-tune): rows tuned (D284) / checkpoint (D289) / growth (D285); columns val NLL curve (seed 42, main stage) and
+      per-class zero-shot MSE CDFs on PP4 and EE4 (two-seed geomean per probe, geomean per class). Per-class medians PP4 /
+      EE4: tuned row A 0.489/1.68, B 0.207/0.344, untuned W533 0.285/0.770, NLL-tuned 0.355/0.935; checkpoint row from 2132
+      0.422/1.118, from 3198 0.364/0.898, from final 0.353/0.887; growth row w8 A 0.276/0.441, w16 B 0.168/0.209, grown 533
+      0.277/0.412, 1066 0.250/0.383, 2132 0.204/0.328. Not yet in results.tex (goes in with the (a)/(b) write-up).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
+    '5': FA-ccin2p3-c6d0c827
+    '6': sweep ws_c1_k533_mse_wsd_hpo8
   handoff:
     state: 'Written up: C1 (par:v4_warm_start @1258ef73), step 3 tuned k=533 and step 5 pre-decay checkpoints (par:v4_warm_start_tuned
       @e1d0bc97), step 4 width growth (par:v4_warm_start_grow @97a69764). Step 3 (D284): tuned k=533 SHORT and worse than

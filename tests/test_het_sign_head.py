@@ -59,10 +59,11 @@ def forward(model, b):
     return model(b["fm"], b["pt"], 0.0, 1.0, b["ptr"], order_labels=b["order"])
 
 
-def stub(model, sign, w=1.0, sigma_only=False):
+def stub(model, sign, w=1.0, sigma_only=False, het_match=False, beta=0.0):
     s = types.SimpleNamespace()
     s.cfg = OmegaConf.create({"training": {"loss": "HETEROSC", "loss_aggregation": "mean", "sign_loss_weight": w,
-                                           "sign_near_weight": 1.0, "heterosc_sigma_only": sigma_only},
+                                           "sign_near_weight": 1.0, "heterosc_sigma_only": sigma_only,
+                                           "sign_het_match": het_match, "heterosc_beta": beta},
                               "model": {"net": {"out_channels": 1, "sign_channel": sign}},
                               "data": {"dataset": ["p0", "p1", "p2", "p3"]}})
     s.n_datasets = 4
@@ -170,3 +171,33 @@ if __name__ == "__main__":
         if name.startswith("test_"):
             f()
             print("ok", name)
+
+
+def test_sign_het_match_weights_bce_by_detached_inverse_two_sigma2():
+    """training.sign_het_match: the loss is the het loss plus w * mean over the signed events' BCE * sigma^(2 beta) /
+    (2 sigma^2), per process then over processes; the factor is detached (the BCE term sends no gradient to the sigma
+    row), and the default (off) is the plain-weight loss."""
+    bt = batch(seed=5)
+    b, _ = build(True)
+    out = forward(b, bt)
+    sigma, mu, logit = out[:, 2:3], out[:, 0:1], out[:, 1:2]
+    for beta in (0.0, 0.5):
+        het = (bt["y"] - mu) ** 2 / (2 * sigma ** 2) + torch.log(sigma)
+        if beta:
+            het = sigma.detach() ** (2 * beta) * het
+        bce = torch.nn.functional.binary_cross_entropy_with_logits(logit, bt["sgn"], reduction="none")
+        fac = sigma.detach() ** (2 * beta) / (2 * sigma.detach() ** 2)
+        signed = torch.as_tensor([0, 1, 0, 1], dtype=out.dtype)[bt["pids"]].reshape(-1, 1)
+        pe = (het + 0.7 * bce * fac * signed).reshape(-1)
+        want = torch.stack([pe[bt["pids"] == p].mean() for p in range(4)]).mean()
+        got = loss(stub(b, True, w=0.7, het_match=True, beta=beta), out, bt)
+        assert torch.allclose(got, want, rtol=1e-5), (beta, float(got), float(want))
+    off = loss(stub(b, True, w=0.7), out, bt)
+    assert not torch.allclose(off, got)
+    # detached: the BCE term sends no gradient to the sigma row, so its gradient does not depend on sign_het_match
+    grads = []
+    for hm in (False, True):
+        b.zero_grad(set_to_none=True)
+        loss(stub(b, True, w=0.7, het_match=hm), forward(b, bt), bt).backward()
+        grads.append(b.net.net.linear_out.weight.grad[2].clone())
+    assert torch.allclose(grads[0], grads[1], rtol=1e-5, atol=1e-8)

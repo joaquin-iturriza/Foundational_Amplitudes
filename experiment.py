@@ -4118,6 +4118,16 @@ class AmplitudeExperiment(BaseExperiment):
                 wn = float(self.cfg.training.get("sign_near_weight", 1.0))
                 near = (y.reshape(y.shape[0], -1)[:, 0] <= self._sign_near_thr_t[process_ids]).to(bce.dtype)
                 bce = bce * (1.0 + (wn - 1.0) * near) * self._sign_near_norm_t.to(bce.dtype)[process_ids]
+            if sigma is not None and bool(self.cfg.training.get("sign_het_match", False)):
+                # training.sign_het_match (HETEROSC): each event's sign cross-entropy times the factor the het NLL puts
+                # on that event's mu gradient over the MSE's, sigma^(2 beta) / (2 sigma^2) (d/dmu of r^2/(2 sigma^2) is
+                # that factor times d/dmu of r^2), detached: the sign:magnitude gradient ratio of every event is then
+                # the MSE control's, which under the plain weight the het loss shrinks by about the ratio of the two
+                # losses' gradient norms (plan catalog_coverage step 61)
+                beta = float(self.cfg.training.get("heterosc_beta", 0.0) or 0.0)
+                sc = torch.clamp(sigma.detach(), min=1e-15, max=1e5)
+                fac = (sc ** (2.0 * beta) / (2.0 * sc ** 2)).flatten(1).mean(dim=1)
+                bce = bce * fac.to(bce.dtype)
             per_event = per_event + w * bce * self._proc_signed_t.to(per_event.dtype)[process_ids]
         n_proc = self.n_datasets
         sums   = per_event.new_zeros(n_proc)
