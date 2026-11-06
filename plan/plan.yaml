@@ -14876,6 +14876,19 @@ entries:
       min in, run ws_stats_check.py C5 C6 C8 on the started W runs and cancel those W runs on a mismatch (the C_k rerun with
       parent_shared would need a new arm and review). If C1u is BETTER: WS_MUWARM=168 in ws_het_setup/ws_mse_setup, the het
       C_k (v4_het_cont_k*) rerun under it, a new repo review before submission.'
+  - at: '2026-11-06T10:00:56+00:00'
+    text: '2026-11-06 step 8 C1u read (D303, design passed round 2 08:24; mixture_ab.py warm C1u @c14a07b0 -> data/warm_start_C1u.json;
+      figure plot_ws_fill.py --damped @c14a07b0 figs/ws_muon_damped): the k=533 restart with Muon''s lr damped over its first
+      168 steps (FA-ccin2p3-35f9a8a5 s42, a0416422 s43) is NOT BETTER than the same-data default restart (0202ba7f/7b2d6c24):
+      R(damped/default) PP4 1.032 [0.866, 1.228], EE4 1.045 [0.911, 1.197], held_default 1.031, held 1.014 (widened); SHORT
+      of scratch with the change R(W/B) PP4 1.369 [1.338, 1.409], EE4 1.541 [1.427, 1.741]. Per-class median MSE of log|M|^2
+      PP4/EE4: damped 0.301/0.806, default 0.288/0.740. Validation NLL: s42 never above -2.196 (default -1.818), ends -2.659
+      (-2.662); s43 spikes off scale at steps 180 and 250-420 (max 1.86e8 at 300) and recovers to -2.576 at 533 (default -2.585,
+      no spike): listed apart, the reads are its final model after the sigma stage. Grad norm median over restart steps 20-40:
+      damped 240/350 vs default 40/43 (Muon damped, the trunk descends slower). Outcome map (NOT MUON, not BETTER): the untuned
+      default restart stays the recipe; step 7 goes with it now; D303''s answer: the jump is AdamW''s share or the lr ramp
+      of every group, not Muon''s. ws_fill redrawn at the same commit (legend to the grad-norm panel, val panel clipped above
+      0.5; data unchanged).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
