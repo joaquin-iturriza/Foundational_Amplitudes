@@ -12465,6 +12465,18 @@ entries:
       frame, bin-only weight 1/g; at most 12 labels per flat event = 1.76x the old pool cost). Toy (tests/test_flat_mcmc.py):
       0.938 of the quota at 12 labels per flat event against 0.888 for the quota sampler at 12 and 0.95 at 50. Real check
       designed (5 classes x seeds 42/43, current + mcmc_both_res2_budget12), under design and repo review.'
+  - at: '2026-11-06T23:06:18+00:00'
+    text: '2026-11-07 design-reviewer FIX on the Markov-chain flat-sampler check (recorded with plan design-fix). To revise
+      once: (1) add a committed diversity read in the same jobs and show it moves on existing data: per-bin nearest-neighbour
+      distance among kept events (reviewer''s one-off toy probe: median 2.21 quota at budget 50, 2.22 at 12, 1.25 chains at
+      12; 9% of chain bins below 0.01), kept events per chain, held-out-to-nearest-kept distance; within-bin KS against the
+      quota sampler on sqrt(s_hat), min pair mass/sqrt(s_hat), max|eta|; thresholds in the outcome; the jobs must save kept
+      invariants/momenta and the chain index. Chains collect only accepted states and adapt Wang-Landau weights, so the claim
+      that events within a bin follow uniform phase space is untested; consider larger moves and thinning. (2) Outcome: require
+      every in-range bin >= 0.95 (as step 67) or name the bins allowed short; map cost > 2 and fill above budget-50 quota
+      but below YES. (3) Prior: name results.tex ''Coverage vs. emphasis, and the general default sampling'' (~l.10230-10250),
+      which proposed adaptive importance sampling (VEGAS/foam) on |M|^2, and say why chains come first. Repo-reviewer verdict
+      on flat-mcmc still pending.'
   handoff:
     state: '2026-11-07 ~00:30. Tonight''s four points: (3) scaling grid seed 42 SUBMITTED under a passed design (design-reviewer
       PASS after one FIX): memmap prebuild FA-ccin2p3-bf203857 (CPU, slurm 62996664) then 10 GPU cells afterok on it, wait
