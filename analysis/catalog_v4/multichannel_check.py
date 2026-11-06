@@ -308,7 +308,7 @@ def where(name, probe, cut_log10):
     """where the held-out in-support pp events above `cut_log10` (the quota policy's kept max) sit, against those
     below it: per group the 10/50/90% quantiles, in the partonic frame, of sqrt(s_hat) over the window's lower edge,
     the least pT of the cut legs (massless, not neutrinos), the least Delta R between them, the least pair mass over
-    sqrt(s_hat), the largest |eta| (step 58's NO branch: the quota bins left short sit at the top of the range)"""
+    sqrt(s_hat), the largest |eta|, the pairs within 5 GeV of m_Z or m_W (step 58's NO branch: the quota bins left short sit at the top of the range)"""
     import mg5_pipeline_final as mg
     import mix_compose as mc
     p = _entry(name)
@@ -344,6 +344,8 @@ def where(name, probe, cut_log10):
     mij = [np.sqrt(np.clip((F[:, a, 0] + F[:, b, 0]) ** 2 - ((F[:, a, 1:] + F[:, b, 1:]) ** 2).sum(1), 0, None))
            for a, b in allp]
     feats["min_pair_mass_over_sqrts"] = np.min(mij, 0) / sq
+    # pairs of finals within 5 GeV of the Z or W mass (any pair, neutrinos too): resonances on shell together
+    feats["n_pairs_near_Z_or_W"] = np.sum([(np.abs(m - 91.1876) < 5) | (np.abs(m - 80.379) < 5) for m in mij], 0)
     groups = {"above": sup & (lm > cut_log10), "below": sup & (lm <= cut_log10)}
     out = {"class": name, "files": files, "cut_log10": cut_log10, "window": [lo, hi],
            "n": {g: int(m.sum()) for g, m in groups.items()}, "quantiles_10_50_90": {}}
