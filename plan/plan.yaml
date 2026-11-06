@@ -15323,7 +15323,6 @@ entries:
       at 1e-3 (shift of a probe''s MSE <= delta^2 <= 1e-6) @this commit, and C5, C6 pass; no run cancelled. Deviation from
       the design''s literal rule (string equality) stated here.'
   step_waits:
-    '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '7': step 8's read of FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422 (it picks the restart recipe)
     '8': FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422
