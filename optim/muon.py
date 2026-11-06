@@ -82,6 +82,9 @@ class MuonAdamW(torch.optim.Optimizer):
         defaults = dict(lr=lr, betas=tuple(betas), eps=eps, weight_decay=weight_decay, momentum=momentum,
                         nesterov=nesterov, ns_steps=ns_steps, rms=rms, use_muon=False)
         self._mup = mup
+        # a multiplier on the Muon groups' lr only (fine_tune.muon_warmup_steps, D303), set per step by the trainer;
+        # 1.0 leaves the update unchanged
+        self.muon_lr_mult = 1.0
         super().__init__(muon_groups + adam_groups, defaults)
         kw = {"fused": True} if fused else {}
         self._n_muon = len(muon_groups)
@@ -101,7 +104,7 @@ class MuonAdamW(torch.optim.Optimizer):
             with torch.enable_grad():
                 loss = closure()
         for g in self.param_groups[:self._n_muon]:
-            lr, wd, mu = g["lr"], g["weight_decay"], g["momentum"]
+            lr, wd, mu = g["lr"] * self.muon_lr_mult, g["weight_decay"], g["momentum"]
             for p in g["params"]:
                 if p.grad is None:
                     continue

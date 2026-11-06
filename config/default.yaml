@@ -265,6 +265,7 @@ fine_tune:
  grow_width: false            # the parent has half this run's num_heads: grow it function-preservingly (models/grow_width.py, D285)
  grow_noise: 1.0e-3           # symmetry-breaking noise on the duplicated units' incoming weights, x the child's init std
  moment_fill_steps: 0         # before the first update, N batches at lr 0: forward, backward, optimizer step with every group's lr 0, so AdamW's moments and Muon's momentum hold this run's gradients when the lr ramp starts (the restart's empty optimizer made its first steps lr-sized, D303); the model, EMA, scheduler and step count are untouched
+ muon_warmup_steps: 0         # the Muon groups' lr times min(1, step / N) on top of the schedule, AdamW untouched: damps Muon's fixed-norm first steps of a restart (D303); 0 off
  linear_probe: false          # fit linear_out's channel 0 on the frozen trunk (ridge, leave-one-out) before fine-tuning (LP-FT, D120)
  lora:
   enabled: false

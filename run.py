@@ -39,6 +39,8 @@ def sigma_stage_cfg(cfg):
         # grow it again (plan warm_start step 4: FA-ccin2p3-1b390f47, ea48ea8c failed here, 16 -> 16 heads)
         s.fine_tune.grow_width = False
         s.fine_tune.moment_fill_steps = 0   # the stage starts from this run's model; no moment fill (D303)
+        if "muon_warmup_steps" in s.fine_tune:
+            s.fine_tune.muon_warmup_steps = 0   # the stage is its own optimizer on sigma; no Muon warmup (D303)
         if "context_dropout" in s.model:
             s.model.context_dropout = 0.0          # mu frozen: every event keeps its trained c_p (D105)
         s.training.heterosc_sigma_only = True
