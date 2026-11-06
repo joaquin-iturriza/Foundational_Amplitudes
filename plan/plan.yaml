@@ -11331,6 +11331,27 @@ entries:
       45-48, uux_epemvevex 135-207 / 182-206 / 31-33, udx_csxvevex 144-219 / 123-191 / 18-29. Next (branch 2, budget raised
       by the measured factor): budget 500 (10x), expected to fill every EW bin and the QCD bins up to ~3.85; the top three
       QCD bins (factor 28-700) are expected to stay short.'
+  - at: '2026-11-06T07:55:24+00:00'
+    text: '2026-11-06 (d) step 62 beam ablation read (ee_gain.py ablation @142f98a0 -> data/ee_gain_ablation.json; figure
+      figs/beam_ablation_a..d + _legend, fig_ablation @142f98a0). Arms at 5bf3e0f0, seeds 42/43, het loss + sigma fit, reads
+      from each run''s own job: no default share (control, 1c6caddf/4ea1c1eb), share 0.25 on both beams (c2e82e97/a52c9185),
+      on the 115 e+e- classes only (e4e0f158/d84270fc), on the 797 hadronic classes only (2756bece/3bafdc58). R = class median
+      of arm MSE / control MSE (seeds'' gmean), bootstrap 95%; per seed in brackets. EE4 trained classes (115, own default
+      events in the both-beams share): both 0.260 [0.205,0.298] (0.233, 0.263), e+e- only 0.289 [0.233,0.338] (0.279, 0.311),
+      pp only 0.969 [0.914,1.046] (0.914, 0.999). EE4 held-out classes (54): both 0.604 [0.430,0.881], e+e- only 0.728 [0.514,0.955],
+      pp only 0.989 [0.850,1.155]. PP4 trained (797): both 0.534, pp only 0.518, e+e- only 1.158 [1.134,1.198]; PP4 held-out
+      (504): both 0.969, pp only 0.936, e+e- only 1.299 [1.244,1.367]. Catalog-sampled held-out axes H1-H7c (701): both 1.285,
+      e+e- only 1.280, pp only 1.215. Rerun spread R_0 = same-commit control over the step-15 het control 0.876-0.914, so
+      s = 0.132. Design outcome on EE4: UNRESOLVED by its letter: pp only is neutral on e+e- (|ln R| <= s on both seeds: ln
+      -0.090, -0.001), no cross-beam help (needs ln R_pp <= -2s), but |ln R_ee - ln R_full| = 0.18 / 0.17 on the two seeds,
+      just above s = 0.13: the e+e- default events give 92% of the log gain on trained e+e- classes (ln 1.24 of 1.35) and
+      63% on held-out ones (0.32 of 0.50), pp 2%; ln R_full vs ln R_ee + ln R_pp: -1.35 vs -1.27 (trained), -0.50 vs -0.33
+      (held-out). PP4 outcome: PP OWN EVENTS (pp only 0.518 vs both 0.534); e+e- default events alone cost pp 16% (trained)
+      and 30% (held-out), about as much as every share arm costs the catalog-sampled held-out axes (1.22-1.28), while the
+      pp default events bring PP4 held-out back to 0.94-0.97. Answer to D295: pp-sampled data does not help e+e- test classes
+      (R 0.97 trained, 0.99 held-out, inside the rerun spread); the e+e- gain is the e+e- default events: each class''s own
+      (trained) and, for held-out e+e- classes, the other e+e- classes'' default events (0.73 with e+e- only). Rest of the
+      held-out gain (0.60 both vs 0.73 e+e- only, ratio 0.83, inside the 95% intervals) not resolved by 2 seeds.'
   handoff:
     state: '2026-11-06 ~06:25. Reopened by D290-D296. (b) memmap keyed-draw cache merged d18e44f1 (repo-reviewer PASS; tests:
       memmap==in-memory bitwise for seeds 42/43 from one cache, also on CC real arm); left in step 37: chain the CPU prebuild
