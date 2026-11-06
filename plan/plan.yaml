@@ -14799,6 +14799,63 @@ entries:
       [0.97, 1.99] dropped. Untuned restart: C1u R(damped/default) 1.032 [0.866, 1.228] / 1.045 [0.911, 1.197] and C1m 1.054/1.005,
       both NOT BETTER. ws_stats_check.py @42c4aeab gates C5, C6, C8 at 1e-12. Disk: df 93G free against 46 GB. Searched: warm50,
       warmmag, warmpp, warmsx, mse_cont, step 7, C2-C8 (results.tex); warm, restart, recipe, D282-D303 (site decisions).'
+  - at: '2026-11-06T10:26:02+00:00'
+    question: 'D303 (Joaquin: something is not right with the lr or the scheduler in the warm runs), step 9, step 8''s NOT
+      MUON branch: the k=533 restart''s jump off the pretrained minimum (max grad norm about 1000-1300 over steps 2-10, from
+      about 10-16 at steps 0-1) is not the empty optimizer (moment fill) and not Muon''s step (Muon damped: m = -0.148/-0.059).
+      Is it AdamW''s share (head, vectors, embeddings), or only the ramp of every group together? Arms: AdamW groups'' lr
+      times min(1, step/168), Muon untouched (fine_tune.adamw_warmup_steps=168, v4_het_warm25a_k533[_seed2]); every group
+      damped the same way (adamw_warmup_steps=168 and muon_warmup_steps=168, v4_het_warm25e_k533[_seed2]). And does either
+      restart improve the zero-shot reads over the default restart at the same 533 steps (K fixed at 1/8, D284)?'
+    prior: 'Step 8 (par:v4_warm_start_repairs, ws_restart_steps.py @579fa40f, mixture_ab.py warm C1u @c14a07b0): damping only
+      Muon over 168 steps left the jump (1302/1486 vs 994/1334) and the reads (R PP4 1.032 [0.866,1.228], EE4 1.045 [0.911,1.197]);
+      its s43 run''s val NLL left the scale at steps 180-420 (1.9e8) and recovered. Moment fill (C1f): jump stays, reads R
+      1.005/1.016. hpo8 (ws_restart_steps.py): the window max follows the step-2 lr of every group (160 at 1.6e-5, trial_1860
+      lr_scale 0.174 every group, to 4306 at 6.9e-4); lowering every group''s lr for the whole run (NLL-tuned hp_1860) costs
+      the reads (R 1.19/1.40). C1 at the untuned restart: YES at k=1066 (R(W/B) PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01 at
+      533/1066/2132). Searched adamw_warmup, adamw damp, AdamW only, warm25a, warm25e, every group damped, longer warmup,
+      quadratic warmup in results.tex, plan, site decisions: none beyond trial_1860 (whole-run lower lr, not an early-only
+      damping).'
+    measure: 'As step 8 (ws_restart_steps.py, RUNS extended with the four dirs): per run from train_steps.npz the max grad
+      norm over the jump window steps 2-10 (G_arm), steps 0-19 and 0-39 beside, the worst training loss there. Shares: AdamW''s
+      a = ln(G_ctrl/G_adamw)/ln(G_ctrl/G_both), with G_ctrl the same-seed default restart (994 s42, 1334 s43) and G_both the
+      every-group-damped arm of the same seed (same data, replaces trial_1860''s scaled 160/215 as the reference; trial_1860
+      beside). Then the validation NLL curve (mixture_ab.py val), each run''s final model after its sigma stage (D276), zero-shot
+      MSE of log|M|^2 per probe on PP4 and EE4, R(arm/default) as in C1u (two-seed geometric mean, class geometric mean, median
+      over classes, 95% class bootstrap widened by the pair''s |ln R_seed|; mixture_ab.py warm, new entries C1a and C1e, ref
+      0202ba7f/7b2d6c24), R(arm/scratch with the change) beside; figure plot_ws_fill.py with both arms (grad norm steps 0-40,
+      val NLL, per-class CDFs).'
+    check: 'The window max moves with the first steps'' lr of every group on existing data (hpo8: 160 at lr_scale 0.174 to
+      4306 at 6.67, 8 trials); the Muon-only damping moved it by +31%/+11% (so the measure resolves changes of that size:
+      same-seed different-data spread |ln| 0.47; the arms share the control''s data stream, so the paired spread is smaller).
+      Pairing check built in: lr 0 at step 0 in all arms and the same batches, so steps 0 and 1 grad norms must equal the
+      control''s (16.32/10.96 s42, 8.10/113.3 s43; step 8''s arm matched to 0.1). The reads moved with an earlier restart
+      change (NLL-tuned over default R 1.19 [1.01,1.39], 1.40 [1.20,1.67]). CPU test tests/test_adamw_warmup.py (@ab487682,
+      repo-reviewer PASS): multiplier 0 leaves AdamW''s parameters bit-identical and Muon''s step as without it, 1 identical
+      to the unmodified optimizer, the scheduler''s lr restored exactly, both 0 freeze all.'
+    fixed: 'Everything of v4_het_warm25_k533[_seed2] as in step 8''s control (scripts/job_catalog_v3_short.sh at trunk 1b51878d
+      or later: parent the het control''s final model after its sigma stage at the run''s seed, target_stats parent, catalog_v4_default25_train,
+      533 steps, MUON_BEST lr 4.997e-3, warmup 0.158 = 84 steps, cosine, lr_scale 1, no layer decay, HETEROSC with its sigma
+      stage, every read). Only change: ++fine_tune.adamw_warmup_steps=168 (arm a), plus ++fine_tune.muon_warmup_steps=168
+      (arm e); the sigma stage runs both off (run.py). Stated confound, as step 8: the damping also cuts the damped groups''
+      cumulative update to 0.61 of the default over steps 0-168 and about 0.82 over the 533 steps, so a read change is not
+      separated from less early training unless the jump share is high. Limit 02:15 (step 8''s pair ran 1.4-1.5 h), --mem
+      16G; disk 0.86 GB x 4 against 93 GB free (df today).'
+    control: The same-data default restart of steps 6 and 8, v4_het_warm25_k533[_seed2]_tagd303 (FA-ccin2p3-0202ba7f s42,
+      7b2d6c24 s43), reused (the code is a no-op at 0, the pairing check verifies it); step 8's Muon-damped pair (35f9a8a5/a0416422)
+      beside, so a, the Muon share and their sum can be read against arm e; scratch with the change (share 0.25 het default25
+      pair) as the target.
+    seeds: '42 and 43, each from the parent at its seed (as step 8). Cost: 4 runs x about 1.5 h = 6 GPU-h (9 at the limits)
+      on CC-IN2P3, one wave; batch target ws_adamw_damped 1.5 h.'
+    outcome: 'Fixed before the read. Jump: ADAMW when a >= 0.7 at both seeds (damping AdamW alone removes most of what damping
+      every group removes); EVERY GROUP when a <= 0.3 at both and arm e''s window max is below half the control''s (neither
+      alone carries it, only the joint ramp); SHARED otherwise; NONE if arm e''s window max is not below half the control''s
+      at both seeds (then early damping of the lr does not remove the jump at all: the parent''s minimum is left by the data
+      change itself). A blow-up listed apart with where. Reads, per arm: BETTER when the widened upper end of R(arm/default)
+      is below 1 on PP4 or EE4 and above 1.05 on neither. Map: an arm BETTER: its damping joins the restart recipe for the
+      width growth and is re-applied to the step 7 changes that read NO (a new design with its cost); both BETTER: the one
+      with the lower PP4 and EE4 R. Neither BETTER: the untuned restart stays, the jump is reported as harmless to the reads
+      (with its attribution from a), and the warm start''s remaining gap at 533 is the retraining length (C1 YES at 1066).'
   step_why:
     9:
       feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
