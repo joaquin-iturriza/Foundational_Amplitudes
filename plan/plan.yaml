@@ -3717,9 +3717,6 @@ entries:
       refused without ''--'' or when unknown; tested on 5 cases, backup site.bak-20261105-runopts); (c) a03d9f99 set the long
       sweep configs to mem 32G from the measured peak RSS, and lxplus gives every 1-GPU job 16 CPUs / 48000 MB whatever it
       asks (site CONDOR_GPU_SHARE), so nothing left; (d) recorded as a finding with the measured per-width rates.'
-    58: '(a) Flat in log|M|^2 over the pp-sampled range (D294): adaptive per-bin oversampling, keep drawing candidates until
-      every log|M|^2 bin up to the pp max is filled to its quota (top bins included), then generate; check on the five multichannel_check
-      classes (0 pp events above the catalog max, per-bin density at quota), figure of the catalog vs pp log|M|^2 density.'
     61: '(c) Resubmit the 12 step-61 jobs whole at --hdr=--time=03:30:00 (short_wall''s slurm_time): v4_het_signhead_matched_<event|const>[_seed2-4]
       and, with SHORT_TAG=keyed, v4_het_control_signhead[_seed2-4], under the passed designs of 05:06 and 05:14 (code = f21572a1
       + only the SHORT_TAG arm list and analysis files); then plan wait 61 on the 12; read with het_oneloop.py signhead (re-seed
@@ -9845,11 +9842,6 @@ entries:
       if:
       - 'Joaquin answers (e): implement it or drop it'
       - 'no answer: stays listed, nothing waits on it'
-    58:
-      feeds: how the catalog's flat part reaches the top of the pp |M|^2 before a regeneration (D269, D294)
-      if:
-      - 'every bin at quota on the five classes: design the regeneration'
-      - 'a bin cannot be filled within the candidate budget: find why (phase-space measure of the top) and fix the proposal'
     61:
       feeds: whether het pretraining carries a usable sign on the one-loop pools (D287, D296)
       if:
