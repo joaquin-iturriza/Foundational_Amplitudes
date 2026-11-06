@@ -9243,6 +9243,40 @@ entries:
       verdict against it). Sign measure resolved at 4 seeds (H5 17/21 p 0.0036, HD5 15/19 p 0.0096). Searched as for the 05:06
       design (sign_loss_weight, sign_het_match, het sign, sign head, gradient share, keyed, tagkeyed): no same-code rerun
       exists. 9.3 GPU-h, in memory, HETEROSC.'
+  - at: '2026-11-06T05:17:11+00:00'
+    question: 'Step 58 (a), D294/D269/D270: does filling the flat part to a quota per 0.25-dex log|M|^2 bin over the class''s
+      in-support pp range (+-0.5 dex, the ''but wider'' of D270) reach every bin and leave 0 held-out in-support pp events
+      outside the kept range, on the step-57 classes (uux_epemg, uux_epemvevex, uu_bbxuu, us_ddxsu, udx_csxvevex)?'
+    prior: 'Step 57 (multichannel_check.json @3fdb914c): multichannel brought the table-pool above-max share from 0.35-0.49
+      to <= 0.0005 on the electroweak classes; uu_bbxuu 0.094/0.021, us_ddxsu 0.104/0.037 (seeds 42/43); only uux_epemg passed
+      the plateau rule. Out-of-support pp: 1.34% uu_bbxuu, 0.29% us_ddxsu, 0.079% over all classes (step 46). Joaquin D269,
+      D270, D294. Quota code merged (flat-quota, PASS 4737fea5), held-out read merged (mcheck-heldout, PASS e5bc5178); range
+      table recipes/catalog_v4_flat_range.json @ca55f28c from the probe''s train+test in-support events. Searched results.tex
+      (quota, flat_range, flat part, multichannel, uniform/flat in log, in-support), plan, decisions: no quota run before.'
+    measure: 'Per class, seed and policy (multichannel, quota): held-out in-support pp events outside the kept flat part''s
+      [min, max], count and N per class with 3/N at 0; held-out = the probe''s val pool + the class''s dsh_ train/val/test
+      default-share pools (54001 events per class on CC), never read for the range table. Beside it, over all events of each
+      source: out-of-support share (sqrt(s_hat) outside the window; cuts failed in the partonic frame) and above-max share.
+      Quota fill: shortfall share, short bins, chunks stopped at the budget or with nothing to steer by. Flat candidates per
+      kept event, rounds, chunk seconds per event against multichannel on the same node. Figure fig_flat_quota.py.'
+    check: 'On existing data the coverage moves with the proposal: step 57''s table-pool above-max 0.35-0.49 (current) vs
+      <= 0.0005 (multichannel) on the electroweak classes, 0.02-0.10 left on the QCD 2->4 classes. Fixed by construction under
+      the quota policy: the table-pool above/below shares (the range is those events'' min/max +- 0.5 dex), reported and flagged,
+      not judged; the held-out counts are not fixed by construction. Caveat: three probes (uux_epemg, uux_epemvevex, udx_csxvevex)
+      reuse pp13_ pools with catalog_v3 physics while dsh_ pools carry v4 physics, so the per-source counts are kept apart
+      to separate a physics difference from a sampling gap.'
+    fixed: Each class's catalog_v4 train entry and chunk plan, multichannel channels as step 57, oversample 6, flat_budget
+      50 (a reported stop), bin width 0.25 dex, margin 0.5 dex; code at trunk (mcheck-heldout merge) synced to CC; scripts/job_multichannel_check.sh,
+      MCHECK_POLICIES=multichannel+quota, CC htc CPU, 1 core, 8G.
+    control: The multichannel policy, same class, seed, job and node.
+    seeds: 42 and 43 per class (10 jobs), as step 57.
+    outcome: 'YES = on every class and seed: 0 held-out in-support events outside the kept range (95% bound 3/N reported,
+      ~5.6e-5 at N ~5.4e4), 0 quota shortfall, 0 chunks stopped at the budget or with nothing to steer by -> design the regeneration
+      of the 1301 hadronic tree classes with the cost factor from the measured time ratio, and the out-of-support share handled
+      there as the cut-frame fix (partonic vs lab |eta|). NO, non-zero held-out count: if those events are in support and
+      the bins fill, widen the margin to cover them (per-source counts say whether it is the v3/v4 physics difference); else
+      fix the proposal where they sit. NO, shortfall or a budget/no_steer stop: fix the proposal there. Cost: 10 CPU jobs,
+      1 core, <= 15 min each, limit 00:40; no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
