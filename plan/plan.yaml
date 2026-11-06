@@ -13341,8 +13341,8 @@ entries:
     state: stopped
     since: '2026-11-06T11:01:13+00:00'
     state_at: '2026-11-06T11:22:20+00:00'
-    context: 169687
-    context_at: '2026-11-06T11:15:10+00:00'
+    context: 197006
+    context_at: '2026-11-06T11:23:14+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
