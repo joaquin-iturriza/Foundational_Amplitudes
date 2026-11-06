@@ -729,6 +729,8 @@ def read_events():
                                 "mse_check_max_abs_dev", "error_split")}
     summ["R"] = {part: {v: [r["R_class_median"] for r in out[part][v]] for v in out[part]} for part in ("trained", "held_out")}
     summ["by_offset"] = g
+    # the full arm's class-median R per bin at the other neighbour counts and class floors (the choices K=32, min_n=20)
+    summ["sensitivity"] = {k: [r["R_class_median"]["full"] for r in rows] for k, rows in out["sensitivity"].items()}
     # the ablation's R (class medians, data/ee_gain_ablation.json from `ablation`), beside the mechanism
     ab = json.load(open(os.path.join(DATA, "ee_gain_ablation.json")))["R"]
     summ["ablation_R"] = {a: {pt: v[pt]["R"] for pt in ("EE4_trained", "EE4_held_out", "PP4_trained")} for a, v in ab.items()}
