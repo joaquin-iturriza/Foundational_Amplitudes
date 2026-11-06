@@ -1138,6 +1138,14 @@ for _k in ("step3198_default", "step3198_continue", "step2132_continue", "final_
     WARM["C1r_" + _k] = {"W": {533: _C1R[_k]}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
                          "ref": {"control": _C1R["final_default"]},
                          "deciding": ("PP4", "EE4"), "design": "plan warm_start step 12 (D307, D308), passed round 2"}
+# step 13 (D307, D308, design passed round 2 2026-11-06): step3198_continue with the parent's optimizer state loaded
+# (fine_tune.load_optimizer_state, arm v4_het_ws_step3198_continue_optstate[_seed2], scripts/job_catalog_v3_short.sh
+# @7b50861c): BETTER against the control as C1r_*; the mechanism read against the fresh-optimizer continued arm
+WARM["C1r_step3198_continue_optstate"] = {
+    "W": {533: ("FA-ccin2p3-05df656d", "FA-ccin2p3-07bfc8d7")}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+    "ref": {"control": _C1R["final_default"], "fresh_optimizer": _C1R["step3198_continue"],
+            "step3198_default": _C1R["step3198_default"]},
+    "deciding": ("PP4", "EE4"), "design": "plan warm_start step 13 (D307, D308), passed round 2"}
 # step 8 (D303, design passed round 2 2026-11-06): the k=533 default restart with only the Muon groups' lr damped at
 # its start (x min(1, step/168), fine_tune.muon_warmup_steps=168, arm v4_het_warm25u_k533[_seed2],
 # scripts/job_catalog_v3_short.sh @dbb8daf0) against the same-data default restart of the fill test; B and A as C1;
