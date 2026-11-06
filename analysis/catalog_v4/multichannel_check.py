@@ -304,6 +304,56 @@ def heldout_read(r):
     return out
 
 
+def where(name, probe, cut_log10):
+    """where the held-out in-support pp events above `cut_log10` (the quota policy's kept max) sit, against those
+    below it: per group the 10/50/90% quantiles, in the partonic frame, of sqrt(s_hat) over the window's lower edge,
+    the least pT of the cut legs (massless, not neutrinos), the least Delta R between them, the least pair mass over
+    sqrt(s_hat), the largest |eta| (step 58's NO branch: the quota bins left short sit at the top of the range)"""
+    import mg5_pipeline_final as mg
+    import mix_compose as mc
+    p = _entry(name)
+    lo, hi = map(float, p["sqrts"])
+    cfg = mc.control_config(name)
+    rows, files = _pp_rows(pp_sources(name, probe)["heldout"])
+    x = np.concatenate(rows)
+    k = (x.shape[1] - 1) // 5
+    P = x[:, :4 * k].reshape(-1, k, 4)
+    pdg = x[0, 4 * k:5 * k].astype(int)
+    mass = dict(zip((abs(int(q)) for q in cfg["pdg_ids"][2:]), (float(m) for m in cfg["m_finals"])))
+    mf = np.array([mass[abs(int(q))] for q in pdg[2:]])
+    Q = P[:, 0] + P[:, 1]
+    sq = np.sqrt(np.clip(Q[:, 0] ** 2 - (Q[:, 1:] ** 2).sum(1), 0, None))
+    Pp = mg.to_partonic_frame(P)
+    sup = mg.fiducial_pass_mask(Pp, mf, pdg, cfg["fiducial_cuts"]) & (sq >= lo) & (sq <= hi)
+    with np.errstate(divide="ignore"):
+        lm = np.log10(np.abs(x[:, -1]))
+    F = Pp[:, 2:]
+    leg = (mf == 0) & ~np.isin(np.abs(pdg[2:]), (12, 14, 16))
+    pt = np.hypot(F[..., 1], F[..., 2])
+    pz, pa = F[..., 3], np.sqrt((F[..., 1:] ** 2).sum(-1))
+    eta = 0.5 * np.log(np.clip(pa + pz, 1e-300, None) / np.clip(pa - pz, 1e-300, None))
+    phi = np.arctan2(F[..., 2], F[..., 1])
+    ii = np.nonzero(leg)[0]
+    feats = {"sqrts_over_lo": sq / lo, "max_abs_eta": np.abs(eta[:, ii]).max(1) if len(ii) else None,
+             "min_pt": pt[:, ii].min(1) if len(ii) else None}
+    pr = [(a, b) for j, a in enumerate(ii) for b in ii[j + 1:]]
+    if pr:
+        dr = [np.hypot(eta[:, a] - eta[:, b], (phi[:, a] - phi[:, b] + np.pi) % (2 * np.pi) - np.pi) for a, b in pr]
+        feats["min_dR"] = np.min(dr, 0)
+    allp = [(a, b) for a in range(k - 2) for b in range(a + 1, k - 2)]
+    mij = [np.sqrt(np.clip((F[:, a, 0] + F[:, b, 0]) ** 2 - ((F[:, a, 1:] + F[:, b, 1:]) ** 2).sum(1), 0, None))
+           for a, b in allp]
+    feats["min_pair_mass_over_sqrts"] = np.min(mij, 0) / sq
+    groups = {"above": sup & (lm > cut_log10), "below": sup & (lm <= cut_log10)}
+    out = {"class": name, "files": files, "cut_log10": cut_log10, "window": [lo, hi],
+           "n": {g: int(m.sum()) for g, m in groups.items()}, "quantiles_10_50_90": {}}
+    for f, v in feats.items():
+        if v is not None:
+            out["quantiles_10_50_90"][f] = {g: np.quantile(v[m], [0.1, 0.5, 0.9]).round(4).tolist() if m.any() else None
+                                            for g, m in groups.items()}
+    return out
+
+
 def quota_fill(r):
     """the quota policy's fill over the chunks: events short of the quota (unfilled bins) over the flat part, the bins
     short in any chunk (log10 lower edges), the rounds and candidates per flat event kept; {} for other policies"""
@@ -383,6 +433,8 @@ def pull(policies=None):
 if __name__ == "__main__":
     if sys.argv[1] == "run":   # <policy> may join several with '+' (run on one node, so their times compare)
         run(sys.argv[2], sys.argv[3], *((tuple(sys.argv[4].split("+")), (int(sys.argv[5]),)) if len(sys.argv) > 5 else ()))
+    elif sys.argv[1] == "where":   # where <class> <probe> <cut_log10>
+        print("MCHECK_WHERE " + json.dumps(where(sys.argv[2], sys.argv[3], float(sys.argv[4]))))
     elif sys.argv[1] == "pull":
         pull(sys.argv[2] if len(sys.argv) > 2 else None)
     else:
