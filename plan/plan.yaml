@@ -14267,6 +14267,18 @@ entries:
       Not BETTER: the untuned restart stays the recipe and step 7 goes with it at once; D303 reported as: MUON, the jump is
       Muon''s but removing it does not move the reads; SHARED, Muon carries part of it, the rest is AdamW''s (head, vectors,
       the sigma-weighted loss''s sharpness); NOT MUON, the jump is AdamW''s share or the lr ramp of every group, not Muon''s.'
+    passed_at: '2026-11-06T08:24:19+00:00'
+    reviewer: 'Round 2. Jump window steps 2-10 read from ws_restart_steps.json @310b2513: same-commit control 994 (s42) /
+      1334 (s43), trial_1860 (every group at lr_scale 0.174) 160, so ln(994/160)=1.83 is the full damping range. Muon''s share
+      m = ln(G_ctrl/G_arm)/ln(G_ctrl/G_all), bands 0.3/0.7, against a same-seed different-data spread of ln(1591/994)=0.47,
+      i.e. 0.26 in m (paired spread smaller). Caveat noted: trial_1860 ran on the older data stream, where the default gave
+      1591, not 994; scaled to this stream the reference would be about 100, so m may read up to about 1.25x high, inside
+      the stated 0.26 spread. Outcome map complete (BETTER whatever m; not BETTER per band). Confound of less Muon training
+      (0.61 over steps 0-168, 0.82 overall) stated. Reads R(damped/default) widened as in C1f; the earlier restart change
+      moved them 1.19/1.40. Arm differs from the control only by muon_warmup_steps=168 (diff 117f19ca..4a4d99c2 is a no-op
+      at 0); HETEROSC with sigma stage; PP4/EE4; parent target stats; no sweep; disk 0.86 GB x 2 vs 93 GB free. Searched:
+      muon warmup, muon_warmup, muon lr, damp, adamw-only, AdamW only, lr_mult, warm25u, muon restart in results.tex, plan.yaml,
+      site decisions: no earlier Muon-only damping.'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
