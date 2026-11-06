@@ -13443,7 +13443,13 @@ entries:
     - sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
     - tests/test_moment_fill.py
     - tests/test_save_at_steps.py
-  dead_ends: []
+  dead_ends:
+  - tried: 'Tuning the width growth 8->16 at k=533 on the HD4 zero-shot score (sweep ws_grow_k533_zeroshot_hpo8_rerun, best
+      trial 1860 re-run at seeds 42/43: 4442e786/3fae7799)'
+    why: 'NOT BETTER on the deciding reads: R(tuned/default growth) PP4 0.995 [0.959,1.031], EE4 0.989 [0.903,1.080]; the
+      low lr keeps the parent''s function (R(W/A) 1.00), the HD4 gain does not carry to PP4/EE4 (par:v4_warm_start_grow_tuned
+      @65fcb32d)'
+    at: '2026-11-06T19:46:43+00:00'
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
       beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
