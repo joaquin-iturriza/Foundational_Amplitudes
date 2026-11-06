@@ -10121,6 +10121,56 @@ entries:
       het loss (D52/D71), emission-scale target (D234); 211 GPU-h re-summed from scaling_grid_plan.json. Searched results.tex:
       v4_width, v4_length, v4_mult_width_length, epoch, scaling grid, loss_vs_compute, mse_vs_compute, tf32; plan evidence
       and dead ends; decisions D219 D236 D256 D292 D293 D314 D315.'
+  - at: '2026-11-06T23:02:55+00:00'
+    question: 'Joaquin 2026-11-06 22:31 (D317, refusing the ~100x cost of the quota sampler at budget 750): can the flat-in-log|M|^2
+      part of the hadronic catalog pools fill the class''s pp range (D294) at <= 2x the old catalog_v4 generation cost? Tested:
+      the flat part from Wang-Landau Markov chains (mg5_pipeline_final._flat_mcmc_part, sampling.flat_mcmc, branch flat-mcmc
+      a99a7aeb): pair rotations in the pair rest frame (symmetric under uniform phase space), acceptance by a bin-only weight
+      1/g learned by Wang-Landau, at most 12 labels per flat event (0.65 + 0.35 x 12 = 4.85 labels per pool event against
+      the old 2.75: 1.76x). Feeds the regeneration design (step 65; step 68''s e+e- classes under D318 use the same method).'
+    prior: 'Step 57-67 checks (data/multichannel_check_reads, frontier read 2026-11-07 from those files and data/sampling_cost.json
+      @08e3091e; cost = the policy''s train-pool replay seconds over the old generation-log seconds): old sampling fills 19-48%
+      of in-range bins to >= 0.95; quota at budget 50 with both ladders (quota_ladder_both_res2) 92-100% of bins, shortfall
+      0.2-4%, cost 2.4x (uux_epemg), 5.3x, 9.7x, 13.9x, 9.1x; budget 500/750 fills 98-100% at 14-158x. Union with 20000 unused
+      default-share MadEvent events (offline, scaled from the probe pools) adds nothing at the top: the top bins hold 0-5
+      default events against a quota of ~700 (D317''s idea 1 measured: cannot fill the top). Propagator surrogate as a pre-screen
+      (prescreen_check.py @e82cec8c -> data/prescreen_check.json, on the dsh_ default events): Spearman 0.60-0.84, conditional
+      spread 0.65-1.44 dex against 0.25-dex bins, top-decile hit rate 2-75%: too weak on the QCD classes (D317''s idea 2 not
+      pursued as a pre-screen). Searched results.tex (Markov, MCMC, Wang-Landau, multicanonical, quota), the entry''s findings/dead
+      ends, decisions: no earlier MCMC sampler.'
+    measure: 'As step 67 (multichannel_check.py summary/coverage per class, seed and policy): fill per 0.25-dex bin = sum
+      over chunks of min(kept, quota)/sum quota over in-range bins (lower edge <= the class''s default in-support max), share
+      of in-range bins >= 0.95, quota shortfall share, held-out pp events in support outside the kept [min, max] (probe val
+      + dsh pools), labels per flat event, chain steps and acceptance (FLAT_LAST mcmc); cost = the train-pool replay seconds
+      of the mcmc policy over the old sampling''s (current) in the same job and over the generation-log old time; within-bin
+      check: share of kept flat events that are distinct states (no duplicates by construction) and the share coming from
+      the first round vs chains.'
+    check: 'Toy check (tests/test_flat_mcmc.py @a99a7aeb, CPU, 2->4 massless toy |M|^2 = 1e8/(s23 s45 |t02|), range 1e-8..1e9,
+      2000 flat events): at 12 labels per flat event the chains fill 0.938 of the quota against 0.888 for the quota sampler
+      at the same 12, and the quota sampler needs 50 labels per flat event to reach 0.95; so the fill moves with the sampler
+      at fixed labels. The pair move keeps every mass, the pair mass, the other finals and the total momentum (test_pair_move_invariants).
+      Real classes: step 67''s reads give fill and cost of the quota sampler on the same five classes and seeds (frontier
+      above).'
+    fixed: The five step-57 pp classes (v4_uux_epemg, v4_uux_epemvevex, v4_uu_bbxuu, v4_us_ddxsu, v4_udx_csxvevex) with their
+      PP4 probes, each class's catalog_v4 train entry and chunk plan (36 chunks, 1e5 events, flat share 0.35, oversample 6,
+      fwd_cand 1/3, f_fwd 0.15), range table recipes/catalog_v4_flat_range.json, 0.25-dex bins, channels of the first round
+      as quota_ladder_both_res2 (rambo, splitter, res, res2, isc, both ladders), flat_budget 12, FLAT_MCMC_CHAINS 0.05, FLAT_MCMC_LNF
+      0.1, FLAT_MCMC_DMIN 1e-4; code trunk after merging flat-mcmc (repo-reviewer), synced to CC; scripts/job_multichannel_check.sh,
+      MCHECK_POLICIES=current+mcmc_both_res2_budget12, CC htc CPU, 1 core, 8G, limit 01:30:00 (old replay 25-70 s per train
+      pool, mcmc <= 2x of it plus the backend set-up), wall target 0.5 h.
+    control: 'In each job, same seed, node and commit: the old sampling (current) for the cost; the quota sampler at budget
+      50 and 750 with the same channels on the same classes and seeds from step 67''s reads (quota_ladder_both_res2, _budget750)
+      for fill against labels.'
+    seeds: 42 and 43 on every class (10 jobs), as steps 57-67 on these classes (the policy check's sibling seeds; D315 is
+      about training runs).
+    outcome: 'YES: on every class, in-range bins >= 0.95 on >= 0.95 of bins on both seeds, held-out outside kept 0 (or not
+      above step 67''s budget-750 count), and cost (mcmc replay over the old generation-log time, train pool) <= 2.0 on every
+      class: the method goes into step 65''s regeneration design for the 1301 hadronic classes (and step 68''s e+e- classes
+      with the forward channel) with the per-class cost. PARTIAL: cost <= 2 but fill below YES on some class: where read of
+      the short bins (multichannel_check.py where), then one revision inside the 2x budget (chains, Wang-Landau increment,
+      a sqrt(s) move or default-event seeds), re-run on the short classes. NO: fill at 12 labels not above the quota sampler''s
+      at 50 on the 2->4 classes: Markov chains recorded as a dead end with the numbers, next the importance-weighted alternative.
+      10 CPU jobs, ~0.5 h each, no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
