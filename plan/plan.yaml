@@ -14002,6 +14002,15 @@ entries:
       costs the reads; reported with the curves, the recipe unchanged. No CAUSE: the jump comes from Muon''s fixed-norm step
       or the lr itself; next an arm with Muon''s first steps damped (a longer warmup from a lower start), designed then. A
       run that blows up is listed apart.'
+    passed_at: '2026-11-06T05:40:58+00:00'
+    reviewer: 'Round 2: moment fill (100 batches at lr 0) against a same-commit rerun of the default k=533 restart, seeds
+      42/43, only change the fill (100 extra batches and shifted data stream stated); check 2: step-2 grad norm 101->4310
+      with lr over hpo8 (ws_restart_steps.json), reads moved with a restart-recipe change R 1.19/1.40 (warm_start_C1t.json);
+      check 3: step-2 norm reproduces within 1% at matched lr (825 vs 832), CAUSE bar 0.2x (318 vs 1591) far outside it, reads
+      widened by |ln R_seed|; prior now names the 04:01 Ibrahim/Gupta dismissal and why a 533-step restart differs, corrects
+      the saved-state claim; disk 0.86 GB/job x4 vs 131 GB free; HETEROSC, PP4/EE4 reads as C1; code merged 117f19ca with
+      the lr-0 no-op refusal. Searched: moment, optimizer state, optimiser state, fresh/empty optimizer, reset_optimizer,
+      load_optimizer, Ibrahim, re-warm, warmup (results.tex, plan.yaml, site decisions).'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
