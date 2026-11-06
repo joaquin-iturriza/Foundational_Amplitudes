@@ -14849,6 +14849,20 @@ entries:
       (the loss excursion is smaller although the grad norm peak is larger); final training loss -2.665 / -2.582 against -2.677
       / -2.583. So the jump is AdamW''s share or the lr ramp of every group, not Muon''s. The zero-shot reads (C1u, which
       decide the recipe for step 7) are still being written by the jobs (PP4 under way at 10:32).'
+  - at: '2026-11-06T09:47:10+00:00'
+    text: '2026-11-06 step 7 built (branch ws-step7 @03150e17, worktree worktrees/wt-ws-step7, repo-reviewer running): arms
+      in scripts/job_catalog_v3_short.sh v4_het_warm50_k<K>[_seed2] (C2), v4_het_warmmag_k<K>[_seed2] (C8, signed_magnitude_target,
+      target_stats parent_shared), v4_mse_cont_k<K>[_seed2|3|4] (MSE matched control), v4_mse_warm25/warm50_k<K>[_seed2] (C3/C4),
+      v4_mse_warmpp_k<K>[_seed2] (C5, parent_shared), v4_mse_warmsx_k<K>[_seed2|3|4] (C6, parent_shared); run count recounted
+      from the design''s seeds line: C2 6, C8 6, MSE C_k 12 (seeds 42-45 x 3 k), C3 6, C4 6, C5 6, C6 12 = 54. Per-run hours
+      (tools/short_wall.py, margin 1.25 incl.): het default50 2.25/2.44/2.81, het base 2.18/2.37/2.74, MSE base/pp 0.92/1.11/1.48,
+      MSE default25/50 0.99/1.18/1.55 at k 533/1066/2132: 79.6 GPU-h (D300: 79.8). Batch target ws_step7_changes 2.25 h (the
+      longest job''s work, het k=2132 2.81/1.25). Local bash dry run (python stubbed) resolved parent, seed, K, recipe, loss,
+      sign head, target_stats per arm; submit_guard arm_recipe resolves each to its recipe. Not tested: the jobs'' data loading
+      under parent_shared with the sign head (C5, C6) and with signed_magnitude_target (C8). Analysis: mixture_ab.py warm
+      C2-C5, C8 (B/A reproduce the design''s check: C2 PP4 0.505 EE4 0.220, C3 0.755/0.413, C4 0.682/0.401, C8 HD5 0.097;
+      C1 unchanged), signext_compare.py warm (C6; reproduces par:v4_signext with stand-ins). C5''s B held-out reads (afc96598/d26f13aa)
+      being extracted (detach c5_bound_held).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
