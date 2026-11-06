@@ -10767,12 +10767,10 @@ entries:
       - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
       - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
   owner:
-    agent: a7be1d5c343ae02d7
-    state: stopped
-    since: '2026-11-06T22:37:12+00:00'
-    state_at: '2026-11-06T23:05:27+00:00'
-    context: 308934
-    context_at: '2026-11-06T23:06:27+00:00'
+    agent: a7863d6e79d5af06e
+    state: working
+    since: '2026-11-06T23:06:36+00:00'
+    state_at: '2026-11-06T23:06:36+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
