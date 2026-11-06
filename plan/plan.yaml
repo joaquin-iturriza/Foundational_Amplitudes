@@ -15775,3 +15775,4 @@ entries:
     approves step 7 at its 54 runs, no extra seeds; D284 fixes k=533 for the tuned work); par:v4_warm_start_changes @7d288fee
   blocks: nothing
   blocks_steps: *id003
+  checked_until: '2026-11-06T18:46:59+00:00'
