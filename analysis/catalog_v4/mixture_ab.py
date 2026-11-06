@@ -1129,7 +1129,7 @@ for _c, _what in (("C1a", "AdamW damped"), ("C1e", "every group damped")):
                 "ref": {"default": WARM["C1f"]["ref"]["default"], "default_older": WARM["C1f"]["ref"]["default_older"]},
                 "deciding": ("PP4", "EE4"), "design": f"plan warm_start step 10 (D303), {_what}, design passed 2026-11-06"}
 WARM["C1a"]["W"][533] = ("FA-ccin2p3-fbb16a33", "FA-ccin2p3-cb458c82")   # v4_het_warm25a_k533[_seed2], submitted 2026-11-06
-WARM["C1e"]["W"][533] = ("FA-ccin2p3-5862b62e", "FA-ccin2p3-d15462b0")   # v4_het_warm25e_k533[_seed2]
+WARM["C1e"]["W"][533] = ("FA-ccin2p3-21a18a76", "FA-ccin2p3-21674d1e")   # v4_het_warm25e_k533[_seed2] (the launch's; the hand-submitted 5862b62e/d15462b0 duplicates cancelled before start)
 # step 7 (D283, D300; the superset design passed 2026-11-04T21:51): the other changes at k in 533/1066/2132, arms of
 # scripts/job_catalog_v3_short.sh (ws-step7). W and C are filled with the run ids at submission (empty: not submitted).
 # Het changes from the het control (A as C1, C_k C1's v4_het_cont_k*): C2 share 0.50 (B the het share-0.50 pair),
