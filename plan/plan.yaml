@@ -8933,6 +8933,8 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
+    '62': FA-ccin2p3-1c6caddf FA-ccin2p3-4ea1c1eb FA-ccin2p3-c2e82e97 FA-ccin2p3-a52c9185 FA-ccin2p3-e4e0f158 FA-ccin2p3-d84270fc
+      FA-ccin2p3-2756bece FA-ccin2p3-3bafdc58
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
