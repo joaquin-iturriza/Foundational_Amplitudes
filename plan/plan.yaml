@@ -12836,6 +12836,10 @@ entries:
     7: '(c) D283, D300: C2-C6 and C8 approved at their cost (79.8 GPU-h, 54 runs; Joaquin 2026-11-06 ''I approved everything
       you gave me for the warm start changes''): run them with the tuned recipe from (b) as soon as (b) picks it, without
       asking again; redo the per-run time for the tuned recipe and record targets'
+    8: 'Damped-Muon restart (the fill''s no-cause branch): once step 6''s tuned confirmation (C1m) is read, design a restart
+      that damps Muon''s first steps (e.g. Muon lr ramp from 0 over the warmup, or AdamW-only first N steps) against the default
+      restart at 533 steps, seeds 42/43; also fix the ws_fill figure''s pp panel y axis (legend pushed it to 1.4). Joaquin
+      told 2026-11-06.'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -14121,6 +14125,11 @@ entries:
       if:
       - 'run: extend the write-up per change'
       - '(b) NOT BETTER: run them with the untuned restarted schedule (C1''s)'
+    8:
+      feeds: 'Joaquin''s D303 lead: what in the restart''s lr/schedule knocks the warm start off its minimum'
+      if:
+      - 'damping removes the jump: read the zero-shot gain'
+      - 'no change: report and look at the lr ramp itself'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
