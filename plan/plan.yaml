@@ -12304,12 +12304,13 @@ entries:
     - FA-ccin2p3-af86de05
     - FA-ccin2p3-c2acc1fc
     - FA-ccin2p3-c477a52c
+    - FA-ccin2p3-c6d0c827
     - FA-ccin2p3-dd32a907
     - FA-ccin2p3-e046ac67
     - FA-ccin2p3-ed946736
     - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f699e170
-    commit: 97a69764
+    commit: c0407056
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
@@ -12318,11 +12319,15 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1ck3198.json
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
     - analysis/catalog_v4/data/warm_start_C1t.json
+    - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
+    - analysis/catalog_v4/plot_warm_start_compare.py
+    - analysis/catalog_v4/ws_het_split.py
     - models/grow_width.py
     - scripts/job_catalog_v3_short.sh
     - sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
+    - sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
     - tests/test_save_at_steps.py
   dead_ends: []
   asks:
