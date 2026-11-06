@@ -14425,6 +14425,16 @@ entries:
       minimum; per the design''s no-CAUSE branch the jump comes from the lr itself or Muon''s fixed-norm step (the hpo8 step-2
       norm follows the step-2 lr, 101 at 1.6e-5 to 4310 at 6.9e-4). The fill is not added to the restart recipe; the 2026-11-05T04:01
       finding (optimizer state makes no difference) stands for this setting.'
+  - at: '2026-11-06T07:25:55+00:00'
+    text: '2026-11-06 E3745: the seed-42 growth cache prebuild FA-ccin2p3-f7a03eee built the cache (ready 08:02) and then
+      failed rc 1 because BaseExperiment.__call__''s bare except caught data_mmap''s clean sys.exit(0). Fix 4272209a: SystemExit
+      with code 0/None re-raised (tests/test_clean_exit.py: SystemExit 0 and None -> 0, SystemExit 2 and RuntimeError -> 1).
+      Its chained jobs a99f5106, f9c67e8a, bfb41439 were DependencyNeverSatisfied and cancelled; the cache holds no per-seed
+      mom_stats (mom_div fixed), so both seeds share it and the growth pair at GROW_HP=1333 went out directly: FA-ccin2p3-31359864
+      (s42), bfed460f (s43), scripts/job_catalog_v3_short.sh @4272209a arms v4_het_default25[_seed2] with LONG_HEADS=16 LONG_CKPT
+      LONG_MEMMAP GROW_K=533 GROW_HP=1333, limit 2:30, 46G, batch target ws_grow_hp1333 2.4 h. mixture_ab.py warm entries
+      C1m and C10wm added (b28a8f2c). Not tested: the fix on the real arm''s prebuild (the CC login dry run was still running
+      at submission).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
