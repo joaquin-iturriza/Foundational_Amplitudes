@@ -14950,6 +14950,70 @@ entries:
       3 waves x 0.57 h after step 10''s reads; state it with the horizon''s grounding. k=533 only for the tuned growth rests
       on D284 (''fix it at 1/8 and do a bit of a sweep''); the open question to Joaquin of 06:48 on 1066/2132 stays open,
       and the design should say the re-runs extend if he answers yes.'
+  - at: '2026-11-06T10:54:00+00:00'
+    question: 'Step 11 (D285, D291), round 2 after the reviewer''s FIX (cache, a number, the re-run arm, the finish time):
+      can the width growth 8->16 heads at k=533 be tuned to read better than its default restart, with a sweep objective that
+      tracks the held-out reads? A single-fidelity DyHPO sweep (ws_grow_k533_zeroshot_hpo8, sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml,
+      trunk f5f9511c, repo-reviewer clean at a49b1de7) around the default growth (runs/catalog_v4_long/v4_het_default25_w16_grow_k533,
+      FA-ccin2p3-e046ac67), over the sibling sweeps'' fine-tune space (lr_scale, layer_decay, muon_weight_decay, reg lambda,
+      warmup frac, eta_min, ema, ema_decay, cosine or WSD, cooldown frac), observing zero_shot_score: each trial''s best-checkpoint
+      model read zero-shot on the default-sampled held-out tree classes HD4 (recipes/catalog_v4_heldout_default_test.yaml,
+      114 probes, test split, 2000 events), the geometric mean over classes of the class geometric mean MSE of log|M|^2 (sweep/run_trial.py
+      zero_shot_objective). Then the best trial''s HPs re-run at seeds 42 and 43 by the job script with every read (a new
+      growth arm, below), against the default growth pair.'
+    prior: 'Step 11''s objective check (ws_objective_check.py @619c6f25, data/ws_objective_check.json, finding 2026-11-06):
+      on 6 restart-recipe comparisons and 7 checks every in-run validation quantity runs against the PP4/EE4 reads (final
+      val NLL r -0.68/-0.80 and -0.83/-0.90; val MSE of the mean -0.46/-0.62 and -0.81/-0.88); the trial form of the HD4 read
+      (score_HD4) has the reads'' sign on every resolved comparison at both seeds, r 0.94/0.92 and 0.97/0.98. C10wm (par:v4_warm_start_grow):
+      growth at the mean-MSE-tuned hp_1333 read worse than the default growth (R PP4 1.058 [1.021,1.097], EE4 1.050 [0.959,1.158]);
+      default growth SHORT of w16 scratch (R(W/B) 1.749/1.756, bar 1.19). C1t/C1m: NLL-tuned restart worse (1.19/1.40), mean-MSE-tuned
+      at par. Searched results.tex, plan, site decisions for zero-shot objective, objective zero-shot, growth sweep, grow
+      hpo, proxy objective: only a sign-head search reading its best trial zero-shot after a val-loss objective.'
+    measure: 'Sweep: zero_shot_score per trial (lower better), best = lowest. Re-run of the best HPs (seeds 42, 43, every
+      read, sigma stage): per probe MSE of log|M|^2 on PP4 and EE4 (deciding), R(best/default growth) as C10wm (mixture_ab.py
+      warm, two-seed geometric mean, class geometric mean, median over classes, 95% class bootstrap widened by the pair''s
+      |ln R_seed|), R(best/w16 scratch 493c98db/7288b3fe) and R(best/w8 parent) beside, held_default pooled beside; HD4 is
+      the selection set from here on and is not reported as a held-out number for the tuned growth; val NLL curves; figure
+      of per-class CDFs on PP4/EE4 and the val curves, as plot_ws_c1m.py --growth.'
+    check: 'score_HD4 on existing runs (ws_objective_check.py score/rank @a49b1de7): growth hp_1333 over default ln +0.084/+0.157
+      where PP4 ln R +0.084/+0.033 (read_HD4 +0.031/+0.038); NLL-tuned over untuned of the reads'' sign; retraining length
+      and change-vs-no-change all of the reads'' sign, r 0.97/0.98. Spread: same-seed comparisons with no effect on the reads
+      (moment fill, damped Muon) move it 0.011-0.022 in ln; between seeds on growth runs up to 0.15 (default growth s42 0.535,
+      s43 0.459), so the gate against e046ac67 is same-seed (seed 42, as every trial). Code: tools/zero_shot_parent.py with
+      the job script''s HD4 flags (--split test, --signed-magnitude, one recipe per probe, 2000 events), tests/test_zero_shot_objective.py,
+      repo-reviewer clean (class map equal to mixture_ab.class_of on all 114 probes). Generator dry run: 8 jobs, the block
+      in sweep_config.yaml.'
+    fixed: 'Everything of the default growth''s config (base_config: w8 x1 cell''s final model grown by fine_tune.grow_width,
+      16 heads, 533 steps, het with nll checkpoint selection, catalog_v4_default25 recipe, whole training set, data.memmap
+      true, MuonAdamW, batch 16384, val subsample 200, validate_frac 0.02, seed 42); trial fixed params as sibling ws_c1_k533_mse_wsd_hpo8
+      but data.train_subsample and heterosc_select (the base''s); sigma stage off in trials (the score reads mu, which the
+      sigma stage freezes). 8 trials, 3 start-up, waves [3,3,2], GP, 2000 candidates. Limit 00:50:00, 32G (growth jobs'' sacct
+      peak 16.5-23.9 GB). Cache: the hp_1333 growth (same recipe, caps whole/200/200) opened amp_mmap_cache/0c897ca2d81c98d3828e2808/trainall_val200_test200
+      (its log); the two 21 GB caches 27a14/0c897 differ only in the pools'' alphas sidecar digests, so whether today''s pools
+      still resolve to 0c897 is not shown: a CPU prebuild (scripts/job_mmap_prebuild.sh with --config-path the base run dir,
+      ++data.eval_subsample=200, 1 h, 16G, idempotent: opens or builds, its log names the key) goes first, the sweep is submitted
+      only after it ends rc 0. Disk: at most 0.9 GB per trial run dir (step 10''s k533 het runs 0.86 GB with reads; trials
+      save no predictions) x 8 kept = 7.2 GB, the zero-shot temp dir KB, plus at most one new 21 GB cache: 28 GB against 87
+      GB free on /sps/lpnhe (df 2026-11-06 ~11:00 UTC), re-read at submission; step 7''s 52 jobs open the existing 2.5 GB
+      short caches (7d589cbf, f5ccb555) and build none, and a build prunes only when short of disk. Submitted after step 10''s
+      reads; an arm of step 10 BETTER puts its damping in the base config first (a new design line).'
+    control: The default growth pair at k=533 (FA-ccin2p3-e046ac67 s42, f35b6a78 s43), the same base config at its own HPs;
+      the hp_1333 growth pair (31359864/bfed460f) beside; w16 from scratch (493c98db/7288b3fe) as the target, w8 (804a65bc/66e8c31f)
+      as the parent.
+    seeds: 'Trials seed 42 (as both siblings); the best HPs re-run at 42 and 43, each from the parent at its seed, by a new
+      arm: GROW_HP=<the trial''s hp index> with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8 in scripts/job_catalog_v3_short.sh (today
+      only GROW_HP=1333 is accepted): it reads the trial''s HPs from the sweep''s results and passes them as the hp_1333 path
+      does; code and repo review before the re-runs. Re-runs at 1066/2132 too if Joaquin answers yes to the open question
+      of 06:48 (a new design line). Cost: prebuild CPU only; 8 trials x about 0.57 h = 4.6 GPU-h (6.7 at limits); re-runs
+      2 x 2.4 h = 4.8 (5.0 at limits): about 9.4 GPU-h (11.7 at limits) on CC-IN2P3. Finish: prebuild under 1 h, then 3 waves
+      x about 0.57 h = about 1.7 h after step 10''s reads (expected ~13:00 UTC), re-runs 2.4 h after the arm''s review.'
+    outcome: 'Fixed before the read. BETTER: the widened upper end of R(best/default growth) below 1 on PP4 or EE4 and above
+      1.05 on neither: the tuned recipe becomes the growth recipe and is read against w16 from scratch (MATCH at R(W/B) <=
+      1.19 on both, else SHORT with its gap). NOT BETTER: the growth stays at its default restart, SHORT of w16 scratch at
+      k=533 (1.749/1.756), its tuning ruled out on a read-tracking objective. If the best trial''s score is not below the
+      default growth''s same-seed score (e046ac67: 0.535, ws_objective_check.py score) the sweep found nothing and no re-run
+      is made (NOT BETTER). A trial that blows up is listed apart with where; a trial whose read fails is a failed trial (DyHPO
+      reuses the slot).'
   step_why:
     9:
       feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
