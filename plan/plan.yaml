@@ -14179,6 +14179,31 @@ entries:
       the recipe and step 7 goes with it. No CAUSE: the jump is AdamW''s share (head, vectors, the sigma-weighted loss''s
       sharpness) or the lr ramp itself, not Muon''s; the untuned restart stays the recipe, step 7 goes with it, and the D303
       lead is reported as an lr-sized jump that neither optimizer fix removes. A run that blows up is listed apart.'
+    fix_at: '2026-11-06T08:21:26+00:00'
+    fix: 'Check 2/4 (the CAUSE bar cannot be met even if Muon is the whole cause, so the outcome leans to no-CAUSE whatever
+      the result): the bar is max grad norm over steps 0-19 under 0.2x the same-seed control (199 s42, 267 s43). With fine_tune.muon_warmup_steps=168
+      the Muon lr at step s is 5e-3*s^2/(84*168), i.e. 1.28e-4 at step 19 and 3.5e-5 at step 10, close to the lowest-lr hpo8
+      trial, where every group is damped (trial_1860, lr_scale 0.174: 1.70e-4 at step 19, 8.9e-5 at step 10). data/ws_restart_steps.json
+      shows that trial still reaches max grad norm 432 over steps 0-19 (at step 18) with worst training loss -2.47. That is
+      0.43x of the 994 control and above both bars, with AdamW damped too. The damped arm keeps AdamW at full lr, so its max
+      over 0-19 should be at least about 300-430 even if Muon causes the whole jump. The no-CAUSE branch would then wrongly
+      report the jump as ''not Muon''s''. Fix: calibrate CAUSE on existing data. Either (a) measure over the jump window,
+      where the control peaks (steps 2-10, max at step 6 s42 and 10 s43) and the Muon multiplier is <=0.06, with the bar set
+      against the control''s 269/543 at step 2 and its peak; or (b) keep 0-19 but take trial_1860''s 432 / -2.47 as the ''everything
+      damped'' reference and say what a value between it and the control means. Check 4 (outcome map incomplete): BETTER without
+      CAUSE has no branch, though the reads can improve while the grad-norm bar fails. A partial drop (for example 0.3-0.6x)
+      falls into no-CAUSE, whose conclusion (''the jump is AdamW''s share or the lr ramp'') it does not support. State a branch
+      for each, including whether a BETTER arm without CAUSE joins the step 7 recipe. Also state that the 168-step damping
+      lowers Muon''s total update over the 533 steps (about the first third), so a read change can come from less Muon training
+      as well as from the removed jump. Checks that hold: 1 (arm v4_het_warm25u_k533 equals v4_het_warm25_k* except WS_MUWARM=168;
+      the training diff 117f19ca..4a4d99c2 is the multiplier, a no-op at 0, plus the SystemExit re-raise; pairing check at
+      steps 0-1); 3 (seed-to-seed spread of max20, 994 vs 1591 for the same seed on another data stream, is well inside a
+      0.2x bar; reads widened about +-18% as in C1f [0.84,1.20], stated); 5 (searched results.tex, plan.yaml and site decisions
+      for muon warmup, muon_warmup, muon lr, damp, AdamW only, lr_mult, warm25u, muon restart: no earlier Muon-only damping;
+      prior names the fill, C1m and C1t correctly); 6/7 (the step-8 request: damped Muon against the default restart at 533,
+      seeds 42/43, included); 8, 9 (HETEROSC with sigma stage), 10 (PP4/EE4 as in C1), 11 (parent target_stats, DIM), 12 (only
+      muon_warmup_steps moves), 13 (no sweep), 14 (0.86 GB x 2 jobs against 93 GB free on /sps/lpnhe, read now; no memmap
+      cache).'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
