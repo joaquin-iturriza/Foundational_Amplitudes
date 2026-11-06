@@ -3374,6 +3374,134 @@ fraction of classes, each probe the geometric mean of its two seeds.}
 % allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
 \end{figure}
 
+\paragraph{Leaving the parent: an earlier checkpoint or a larger learning rate (2026-11-06).}\label{par:v4_warm_start_valley}
+Joaquin's mechanism for the gap left at $k=533$ [D307]: the parent's cosine anneals its learning rate to $0$, which
+leaves it in an ever narrower valley, so any restart learning rate throws it out (the restart jump of
+par.~\ref{par:v4_warm_start_restart}). Two remedies were tested as one study on the C1 change (default-sampled share
+$0.25$, het loss, $533$ steps): start from a checkpoint taken before the parent's learning rate reached $0$ and
+continue from there [D308], or restart at a large learning rate to leave the valley. Design (passed round 2
+2026-11-06): five arms from one parent, the checkpoint rerun of the het control (FA-ccin2p3-d521160b,
+FA-ccin2p3-b688a859), each changing only the start model or the restart's learning-rate schedule against the control,
+the final model at the default restart (re-warm over $0.158$ of the steps, cosine to $0$): the step-3198 model
+(learning rate $0.202$ of peak) at the default restart; the step-3198 model continuing at its own learning rate with
+no re-warm (lr scale $0.20233$, cosine to $0$); the step-2132 model ($0.646$ of peak) continuing the same way (lr
+scale $0.64557$); the final model at the default restart with the learning rate $\times3$. Seeds $42$ and $43$, $10$
+runs (\code{scripts/job\_catalog\_v3\_short.sh} @a62c31d6, arms \code{v4\_het\_ws\_*}; control FA-ccin2p3-0de6be56,
+FA-ccin2p3-89ecbc1e; step-3198 default FA-ccin2p3-1ef38bb2, FA-ccin2p3-c07e6ad5; step-3198 continued
+FA-ccin2p3-4cb686ac, FA-ccin2p3-1f7ae4ea; step-2132 continued FA-ccin2p3-f3d6af3a, FA-ccin2p3-32cb8805; learning
+rate $\times3$ FA-ccin2p3-ba567f27, FA-ccin2p3-166c6378), fresh optimizer, every read at the model after the sigma
+stage (D276). The jump is $G$, the largest gradient norm before clipping over restart steps $0$ to $19$, and the
+worst training loss over steps $0$ to $39$. The deciding reads are $R(\text{arm}/\text{control})$ on PP4 and EE4, the
+median over classes of the class geometric mean of the probe ratios, each probe the two-seed geometric mean; each
+interval is the $95\%$ bootstrap over classes, widened on each side by the two seeds' $|\ln R_\text{seed}|$. Fixed
+before the read: BETTER when the upper end is below $1$ on PP4 or EE4 and above $1.05$ on neither, WORSE when a lower
+end is above $1$, else NOT BETTER; the jump moved when $G$ is below $0.5$ or above $2$ of the control's at both seeds;
+the valley reading is SUPPORTED when a continued arm has a smaller jump and is BETTER.
+The rerun parent is equivalent to the original: its default restart reads as the original parent's,
+$R$ PP4 $1.001$ ($[0.857, 1.168]$), EE4 $1.001$ ($[0.868, 1.146]$), and stands as far from the change from scratch,
+$R(W/B)$ PP4 $1.32$ ($[1.29, 1.36]$), EE4 $1.50$ ($[1.32, 1.64]$). No arm is BETTER (fig.~\ref{fig:ws_restart_study}).
+The step-3198 model at the default restart shrinks the jump to $0.161$ and $0.100$ of the control's ($G$ $102$ and
+$102$ against $631$ and $1016$), and reads the same: PP4 $1.019$ ($[0.870, 1.192]$), EE4 $1.009$ ($[0.854, 1.194]$),
+NOT BETTER. Continuing the step-3198 model at its own learning rate also lowers $G$ ($0.490$ and $0.313$ of the
+control's), but its training loss jumps further at the first step, to $-0.317$ and $-0.269$ against the control's
+worst $-1.552$ and $-1.458$ (the fresh optimizer meets a learning rate of $10^{-3}$ at once), and it reads WORSE: PP4
+$1.145$ ($[0.972, 1.346]$), EE4 $1.226$ ($[1.025, 1.489]$). It ends with the lowest validation loss of the five
+($-2.714$ and $-2.649$ against $-2.649$ and $-2.595$), one more case of the validation NLL running against the reads
+(par.~\ref{par:v4_warm_start_objective}). Continuing the step-2132 model reads WORSE on both: PP4 $1.230$
+($[1.045, 1.449]$), EE4 $1.210$ ($[1.008, 1.451]$); at seed $42$ it blew up at step $16$ (gradient norm $2.4\times
+10^{11}$, training loss $5.0\times10^{7}$) and recovered, at seed $43$ its $G$ is $0.153$ of the control's, so its
+jump did not move by the rule. The learning rate $\times3$ raises $G$ to $1.689$ of the control's at both seeds (not
+moved by the rule) and reads NOT BETTER: PP4 $1.093$ ($[0.919, 1.299]$), EE4 $1.052$ ($[0.836, 1.315]$), with the
+held-out default-sampled read $0.926$ beside; its training spiked above $0$ on $11$ single batches at each seed and
+recovered. The outcome is the design's ``no arm BETTER'' branch: the default restart from the final model stays the
+recipe. On the mechanism, the reads do not support the narrow valley as what limits the warm start. A start model
+whose learning rate never reached $0$, at the same restart, leaves with a jump $6$ to $10$ times smaller and reads
+as the annealed one; the jump moved without the reads, as the ramp of every group did
+(par.~\ref{par:v4_warm_start_ramp}), and the larger learning rate does not find a better minimum in $533$ steps. What
+the warm start lacks at $k=533$ is length: it matches the change from scratch at $k=1066$
+(par.~\ref{par:v4_warm_start}).
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1r_ctrl @cc6d768f
+% claim: k.533.W_over_default_original_parent.PP4.0=1.001
+% claim: k.533.W_over_default_original_parent.PP4.1.0=0.857
+% claim: k.533.W_over_default_original_parent.PP4.1.1=1.168
+% claim: k.533.W_over_default_original_parent.EE4.0=1.001
+% claim: k.533.W_over_default_original_parent.EE4.1.0=0.868
+% claim: k.533.W_over_default_original_parent.EE4.1.1=1.146
+% claim: k.533.W_over_B.PP4.0=1.32
+% claim: k.533.W_over_B.PP4.1.0=1.29
+% claim: k.533.W_over_B.PP4.1.1=1.36
+% claim: k.533.W_over_B.EE4.0=1.50
+% claim: k.533.W_over_B.EE4.1.0=1.32
+% claim: k.533.W_over_B.EE4.1.1=1.64
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1r_step3198_default @cc6d768f
+% claim: k.533.W_over_control.PP4.0=1.019
+% claim: k.533.W_over_control.PP4.1.0=0.870
+% claim: k.533.W_over_control.PP4.1.1=1.192
+% claim: k.533.W_over_control.EE4.0=1.009
+% claim: k.533.W_over_control.EE4.1.0=0.854
+% claim: k.533.W_over_control.EE4.1.1=1.194
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1r_step3198_continue @cc6d768f
+% claim: k.533.W_over_control.PP4.0=1.145
+% claim: k.533.W_over_control.PP4.1.0=0.972
+% claim: k.533.W_over_control.PP4.1.1=1.346
+% claim: k.533.W_over_control.EE4.0=1.226
+% claim: k.533.W_over_control.EE4.1.0=1.025
+% claim: k.533.W_over_control.EE4.1.1=1.489
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1r_step2132_continue @cc6d768f
+% claim: k.533.W_over_control.PP4.0=1.230
+% claim: k.533.W_over_control.PP4.1.0=1.045
+% claim: k.533.W_over_control.PP4.1.1=1.449
+% claim: k.533.W_over_control.EE4.0=1.210
+% claim: k.533.W_over_control.EE4.1.0=1.008
+% claim: k.533.W_over_control.EE4.1.1=1.451
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1r_final_lr3x @cc6d768f
+% claim: k.533.W_over_control.PP4.0=1.093
+% claim: k.533.W_over_control.PP4.1.0=0.919
+% claim: k.533.W_over_control.PP4.1.1=1.299
+% claim: k.533.W_over_control.EE4.0=1.052
+% claim: k.533.W_over_control.EE4.1.0=0.836
+% claim: k.533.W_over_control.EE4.1.1=1.315
+% claim: k.533.W_over_control.held_default.0=0.926
+% src: python3 analysis/catalog_v4/ws_restart_steps.py --cached @cc6d768f
+% claim: step12_jump.step3198_default.s42.G_ratio=0.161
+% claim: step12_jump.step3198_default.s43.G_ratio=0.100
+% claim: step12_jump.step3198_continue.s42.G_ratio=0.490
+% claim: step12_jump.step3198_continue.s43.G_ratio=0.313
+% claim: step12_jump.step2132_continue.s43.G_ratio=0.153
+% claim: step12_jump.final_lr3x.s42.G_ratio=1.689
+% claim: step12_jump.final_lr3x.s43.G_ratio=1.689
+% src: python3 analysis/catalog_v4/plot_ws_restart.py --cached @cc6d768f
+% claim: final_default_s42.grad_max_0_19=631
+% claim: final_default_s43.grad_max_0_19=1016
+% claim: step3198_default_s42.grad_max_0_19=102
+% claim: step3198_default_s43.grad_max_0_19=102
+% claim: final_default_s42.loss_max_0_39=-1.552
+% claim: final_default_s43.loss_max_0_39=-1.458
+% claim: step3198_continue_s42.loss_max_0_39=-0.317
+% claim: step3198_continue_s43.loss_max_0_39=-0.269
+% claim: step3198_continue_s42.val_last=-2.714
+% claim: step3198_continue_s43.val_last=-2.649
+% claim: final_default_s42.val_last=-2.649
+% claim: final_default_s43.val_last=-2.595
+% claim: step2132_continue_s42.grad_max_0_19=2.4e11
+% claim: step2132_continue_s42.loss_max_0_39=5.0e7
+% allow: 0 533 0.25 3198 2132 0.158 0.202 0.646 0.20233 0.64557 3 42 43 10 19 39 95 1 1.05 0.5 2 16 11 6 1066 a62c31d6 because they are the lr floor, the retraining length, the share, the checkpoint steps and their lr fractions and lr scales (the design's fixed, FA-ccin2p3-d521160b's schedule), the lr factor, the seeds, the run count and the 10^-3 lr, the windows, the interval level, the bars of the design's rule, the blow-up step and the spike count (data/ws_restart_study_steps.json loss_spikes_above_0), the jump factor (1/0.161, 1/0.100), the matching k (par:v4_warm_start) and the job script's commit
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../analysis/catalog_v4/figs/ws_restart_study.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_restart.py --cached @cc6d768f
+\caption{Five ways to leave the parent at $k=533$ on the C1 change, colour per arm, seed $42$ solid and $43$
+dashed. Top left: gradient norm before clipping against the restart's step, steps $0$ to $40$. Top right: training
+loss (het NLL per batch), a running median over $25$ steps. Middle left: validation loss of the main stage (het NLL);
+excursions above $0.5$ are cut off. Middle right: $R(\text{arm}/\text{control})$ on PP4 (circles) and EE4 (squares);
+each interval is the $95\%$ bootstrap over classes, widened on each side by the two seeds' $|\ln R_\text{seed}|$.
+Bottom: per-class MSE of $\log|M|^2$ on the default-sampled test splits of the pp (PP4) and $e^+e^-$ (EE4) probes as
+a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
+\label{fig:ws_restart_study}
+% allow: 533 42 43 0 40 25 0.5 95 2 because they are the retraining length, the seeds, the plotted window, the median window, the plot's cut, the interval level and the square in |M|^2
+\end{figure}
+
 \paragraph{Warm start for the other changes (2026-11-06).}\label{par:v4_warm_start_changes}
 The question of par.~\ref{par:v4_warm_start} asked of every other change that allows a warm start [D283, D300], with
 C1 (share $0.25$, het loss; YES at $k=1066$) the earlier result each is set against: C2 the default-sampled share
