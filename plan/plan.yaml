@@ -9107,6 +9107,35 @@ entries:
       NO each with next step. Searched sign_loss_weight, sign weight, sign_het_match, matched_event/const, het sign, sign
       head, gradient share in results.tex, entry, decisions: no het sign-weight run. HETEROSC, step-56 preprocessing and reads,
       no sweep, 18.7 GPU-h in memory.'
+  - at: '2026-11-06T05:10:15+00:00'
+    question: 'Step 58 (a), D294/D269/D270: does filling the flat part to a quota per 0.25-dex log|M|^2 bin over the class''s
+      in-support pp range (+-0.5 dex, the ''but wider'' of D270) reach every bin, with no in-support pp event above the catalog''s
+      max or below its min, on the step-57 classes (uux_epemg, uux_epemvevex, uu_bbxuu, us_ddxsu, udx_csxvevex)?'
+    prior: 'Step 57 (multichannel_check.json @3fdb914c): multichannel brought the share of pp events above the catalog max
+      from 0.35-0.49 to <= 0.0005 on the electroweak classes; uu_bbxuu stayed at 0.094/0.021 and us_ddxsu at 0.104/0.037 (seeds
+      42/43); only uux_epemg passed the plateau rule (min/plateau >= 0.5). Joaquin D269 (0% of pp outside, density not far
+      below pp''s), D270 (cover the pp range but wider), D294 (uniform in log|M|^2 over the pp range, simply). Quota code
+      merged at 897318b6 (flat-quota, repo-reviewer PASS 4737fea5); in-support range table recipes/catalog_v4_flat_range.json
+      @ca55f28c (1301 classes, median width 9.9 decades). Searched results.tex (flat part, quota, log|M|^2 flat, multichannel),
+      plan, decisions: no quota-filled flat part run before.'
+    measure: 'Per class and seed: share of in-support pp events above the kept flat part''s max and below its min; quota shortfall
+      share, bins short, chunks_budget_hit and chunks_no_steer; flat candidates per kept event and rounds; chunk wall seconds
+      per event of quota against multichannel, same job and node; figure fig_flat_quota.py: per class the share per decade
+      of pp in-support events, the multichannel flat part and the quota flat part.'
+    check: 'On existing data the above-max share moves with the proposal: 0.39-0.49 under the current proposal against <=
+      0.0005 under multichannel on the electroweak classes, and 0.02-0.10 left on the two QCD 2->4 classes (multichannel_check.json),
+      so the measure separates proposals and leaves room to show the quota''s effect.'
+    fixed: Each class's catalog_v4 train entry and chunk plan, multichannel channels as in step 57, oversample 6, flat_budget
+      50 (a stop, reported), bin width 0.25 dex, margin 0.5 dex, code at trunk 897318b6 or later, scripts/job_multichannel_check.sh,
+      CC htc CPU, 1 core, 8G.
+    control: The multichannel policy, same class, seed, job and node (MCHECK_POLICIES=multichannel+quota).
+    seeds: 42 and 43 per class (10 jobs), as step 57.
+    outcome: 'YES if every class and seed has 0 quota shortfall, 0 chunks at the budget or without steering, and above/below
+      shares <= 0.001 -> design the regeneration of the 1301 hadronic tree classes with the cost factor from the measured
+      time ratio. NO if a bin is short or a chunk stops at the budget -> read where in phase space (sqrt(s_hat), y_min, eta)
+      the unreached pp events sit and fix the proposal there; the budget''s cost factor reported. Cost: 10 CPU jobs x 1 core,
+      step 57''s jobs ran 4 policy-seed runs in < 5.5 min; at the budget the flat part costs up to ~8x, so <= 15 min each;
+      limit 00:40; no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
