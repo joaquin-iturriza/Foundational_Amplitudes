@@ -15298,6 +15298,24 @@ entries:
       the limit when the jump moved without the reads (as the every-group ramp); large lr supports leaving the valley when
       final_lr3x is BETTER. No arm BETTER: the default restart stays and the remaining gap is the retraining length (YES at
       1066). A run that blows up is listed apart with where; its reads are of its final model.'
+    fix_at: '2026-11-06T20:03:31+00:00'
+    fix: 'Check 5 (not a repeat, prior searched independently): the prior omits the one existing read of a restart above the
+      default learning rate, which is the nearest prior work on remedy (b). par:v4_warm_start_repairs (results.tex l.3006-3014):
+      the mean-MSE-tuned k=533 restart from the same kind of parent, learning-rate scale 1.85 (WSD, cooldown 0.164, layer
+      decay 0.875, its other tuned HPs; FA-ccin2p3-4f9e0532 / 8cb6c7b5) read NOT BETTER than the default restart, R PP4 1.054
+      [0.902, 1.235], EE4 1.005 [0.885, 1.159], R(W/B) 1.42 / 1.58. The design cites that paragraph only for the moment fill
+      and Muon damping. Also omitted as large-lr evidence: the NLL sweep ws_c1_k533_hpo8''s trials at lr scale 6.67 and 2.22
+      (val NLL -2.396, -2.546, worst of the eight; models pruned, no PP4/EE4 reads; finding 2026-11-05T04:02), which the design
+      uses only for the jump. Fix: add both to the prior and say what final_lr3x changes against them and why it can still
+      answer the question (lr scale 3.0 alone on the default cosine restart, every other setting the control''s, versus a
+      tuned bundle with WSD and layer decay 0.875 at 1.85; reads where the sweep had none) or, if that difference does not
+      matter, drop or re-aim the arm. Everything else held on this review: one change per arm against final_default from the
+      same rerun parent (script @5761fe0b: only WS_CKPT, WS_LR_SCALE and warmup 0 differ; continue = earlier checkpoint plus
+      its own lr, the remedy of D308 as stated); measure shown to move (G 1591 default vs 53 every-group ramp, 101 to 4306
+      with step-2 lr; reads 1.19 [1.01,1.39] / 1.40 [1.20,1.67] NLL-tuned, 1.237 / 1.619 every-group damped, 1.23 [1.03,1.47]
+      from 2132); null-arm spread about +-0.17 (fill 1.005 [0.844,1.199], Muon damped 1.032, AdamW damped 1.017 [0.853,1.213])
+      at the siblings'' two seeds; outcome stated both ways; HETEROSC; parent checkpoints model_run0_step2132/3198/best present
+      for both seeds on CC; 9 GB against 76 GB free on /sps/lpnhe.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
