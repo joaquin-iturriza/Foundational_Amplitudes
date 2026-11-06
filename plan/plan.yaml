@@ -15381,6 +15381,14 @@ entries:
       the limit when the jump moved without the reads (as the every-group ramp); large lr supports leaving the valley when
       final_lr3x is BETTER. No arm BETTER: the default restart stays and the remaining gap is the retraining length (YES at
       1066). A run that blows up is listed apart with where; its reads are of its final model.'
+    passed_at: '2026-11-06T20:04:31+00:00'
+    reviewer: 'Round 2: the prior now names the lr-1.85 mean-MSE-tuned restart (NOT BETTER 1.054/1.005) and the pruned high-lr
+      NLL trials, and says final_lr3x moves lr scale 3.0 alone on the control''s cosine with reads (the earlier 1.85 run moved
+      a tuned bundle). One change per arm vs final_default from the same rerun parent (script @5761fe0b: WS_CKPT, WS_LR_SCALE,
+      warmup 0 only); measure moves: G 1591 vs 53 (every-group ramp), 101-4306 with step-2 lr; reads 1.19/1.40 NLL-tuned,
+      1.237/1.619 damped, 1.23 from 2132; null-arm spread about +-0.17 (fill 1.005 [0.844,1.199]) at the siblings'' 2 seeds;
+      HETEROSC; checkpoints present both seeds; 9 GB vs 76 GB free. Searched results.tex for mse_cont, warmsx, continu, pre-decay,
+      lr_scale, lr scale, large lr, restart; plan show warm_start; site decisions D282-D313.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
