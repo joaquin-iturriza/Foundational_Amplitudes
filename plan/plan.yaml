@@ -3731,6 +3731,9 @@ entries:
       / every pT at the cut / span at |eta| 5 is proposed often; worktree, tests (acceptance as now, plus share of events
       with all pT < 11 GeV and max|eta| > 4.8), repo-reviewer, new design (control: quota_ladder_res2 at budget 50, same job),
       the same 10 CPU jobs at budget 50 (and 500 if 50 leaves the top short).'
+    67: '(a) step 66''s guard branch + STRONG budget: both ladders as two channels (sampling.mc_mperi_both, branch ladder-both
+      @919bc932, repo review pending), re-check on the same 5 classes x seeds 42/43, policies quota_ladder_res2+quota_ladder_edge_res2+quota_ladder_both_res2+quota_ladder_both_res2_budget750
+      in one CPU job each (10 jobs, limit 04:00)'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -10000,6 +10003,13 @@ entries:
       - 'QCD top bins fill at budget <= 500: design the regeneration with the measured time cost'
       - 'still short: report to Joaquin the choice between accepting density >= pp''s in the top decade (D269 ''not far below
         pp'') and a heavier channel'
+    67:
+      feeds: 'D294: what the 1301 hadronic classes are regenerated with (channels and flat budget)'
+      if:
+      - 'YES at budget 750 on the ladder classes: design the regeneration with mc_mperi_both + mc_res2 at 750, cost from measured
+        time'
+      - 'only bins above the pp in-support max short: Joaquin''s call (accept density >= pp vs a heavier channel)'
+      - 'bins inside the pp range short: where reads, no more budget'
   owner:
     agent: a3f721e0495643441
     state: working
