@@ -2846,7 +2846,7 @@ process-averaged MSE is lower (mean difference $-0.0054$), carried by a minority
 is a sharper $\sigma$ (log-$\sigma$ term mean difference $-0.113$, $\sigma$-weighted error $0.0009$), which the
 held-out reads (MSE of the mean) do not score, and on those reads the tuned model is worse
 (par.~\ref{par:v4_warm_start_tuned}; fig.~\ref{fig:ws_het_split}), so NLL is the wrong objective for tuning a
-warm start here (the next sweep minimises the validation MSE of the mean; D298 leaves the objective to us). The other seven trials' models were pruned by the sweep
+warm start here (the sweep of par.~\ref{par:v4_warm_start_repairs} minimises the validation MSE of the mean; D298 leaves the objective to us). The other seven trials' models were pruned by the sweep
 and not retrained. Second [D303]: what the restart's schedule does to the pretrained model. From each run's
 per-step log (seed $42$): the default warm start's learning rate is $0$, $5.9\times10^{-5}$, $1.2\times10^{-4}$ at
 steps $0$, $1$, $2$ (re-warming to the from-scratch peak $5.0\times10^{-3}$ at step $84$), its gradient norm $10.7$,
@@ -2859,7 +2859,7 @@ $6.9\times10^{-4}$, and the worst training loss over the first $40$ steps rises 
 every restart's gradient norm jumps at step $2$, at a small fraction of the peak learning rate, all but the
 lowest-learning-rate trial lose a visible part of the pretrained fit within the first $40$ steps, and the
 low-learning-rate trials win the in-distribution NLL by losing least of the
-parent's fit. The suspected cause, from the code and not yet tested by a run: the fine-tune path starts AdamW and Muon
+parent's fit. The cause suspected from the code, tested in par.~\ref{par:v4_warm_start_repairs}: the fine-tune path starts AdamW and Muon
 with empty state, so the first updates have a size set by the learning rate, not by the gradient (Adam's
 bias-corrected first step moves each weight by about the learning rate; Muon's orthogonalised step has a fixed norm).
 The parent's checkpoint cannot supply that state: it holds $0$ Muon and $2$ AdamW state entries, as the sigma stage
@@ -3150,6 +3150,78 @@ Bottom: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4
 classes, each probe the geometric mean of its two seeds.}
 \label{fig:ws_muon_damped}
 % allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
+\end{figure}
+
+\paragraph{Which logged quantity ranks the restarts as the held-out reads do (2026-11-06).}\label{par:v4_warm_start_objective}
+The two tunings of par.~\ref{par:v4_warm_start_tuned} and par.~\ref{par:v4_warm_start_repairs} improved their sweep's
+objective (the validation NLL, then the validation MSE of the mean) and not the reads, so before the width growth is
+tuned [D285] the question is: which quantity a run logs moves with the zero-shot reads across restarts? Per comparison
+and seed, arm over its same-seed reference, the deciding change is $\ln R$ on PP4 and EE4 (median over classes of the
+class geometric mean of the probe MSE ratios), and each candidate's change is $\ln(\text{arm}/\text{reference})$ (for
+an NLL, arm minus reference). A candidate tracks when, on every comparison whose two-seed $R$ is resolved, it has the
+reads' sign at both seeds. It is chosen on the $6$ restart-recipe comparisons of par.~\ref{par:v4_warm_start_tuned}
+and par.~\ref{par:v4_warm_start_repairs} (NLL-tuned and mean-MSE-tuned against untuned and against each other, the
+moment fill, the damped Muon, the mean-MSE-tuned growth; three resolved) and confirmed on $7$ others (retraining length
+$1066$ over $533$ and $2132$ over $1066$ for the restart and the growth, the change against no change at each $k$).
+Only the zero-shot MSE on the default-sampled held-out tree classes HD4 (no PP4 or EE4 class) tracks on both sets:
+Pearson $r$ with the PP4 and EE4 $\ln R$ is $0.98$ and $0.97$ over the $12$ points of the recipes and $0.96$ and $0.95$
+over the $14$ points of the checks; its form as a sweep trial's objective (the geometric mean over classes of the class
+geometric mean MSE) has $0.94$, $0.92$ and $0.97$, $0.98$ and tracks too. Every in-run validation quantity over all the trained processes runs
+against the reads: the final validation NLL $-0.68$, $-0.80$ (recipes) and $-0.83$, $-0.90$ (checks), the best
+validation NLL $-0.88$, $-0.96$ on the recipes, the validation MSE of the mean over the trained processes $-0.46$,
+$-0.62$ and $-0.81$, $-0.88$ (fig.~\ref{fig:ws_objective}). Its $e^+e^-$ part alone follows the recipes ($0.94$,
+$0.91$) but not the change ($-0.88$, $-0.92$ on the checks), and the one-loop held-out axis HD5 follows nothing on the
+checks ($-0.08$, $-0.02$). The restarts that read better on the default-sampled probes fit the catalog-sampled
+validation pools worse, so an objective on those pools selects against the reads. The growth's sweep observes the HD4
+score of each trial's best-checkpoint model; PP4 and EE4 stay the deciding reads, unused in selection, and HD4 is no
+longer a held-out read for the tuned growth. Its bar is the default growth's own score at the trials' seed $42$,
+$0.535$ (FA-ccin2p3-e046ac67; $0.459$ at seed $43$).
+% src: python3 analysis/catalog_v4/ws_objective_check.py summary @e4f480e6
+% claim: points.select=12
+% claim: points.check=14
+% claim: verdict.read_HD4.select.r.PP4=0.98
+% claim: verdict.read_HD4.select.r.EE4=0.97
+% claim: verdict.read_HD4.check.r.PP4=0.96
+% claim: verdict.read_HD4.check.r.EE4=0.95
+% claim: verdict.score_HD4.select.r.PP4=0.94
+% claim: verdict.score_HD4.select.r.EE4=0.92
+% claim: verdict.score_HD4.check.r.PP4=0.97
+% claim: verdict.score_HD4.check.r.EE4=0.98
+% claim: verdict.nll_final.select.r.PP4=-0.68
+% claim: verdict.nll_final.select.r.EE4=-0.80
+% claim: verdict.nll_final.check.r.PP4=-0.83
+% claim: verdict.nll_final.check.r.EE4=-0.90
+% claim: verdict.nll_best.select.r.PP4=-0.88
+% claim: verdict.nll_best.select.r.EE4=-0.96
+% claim: verdict.val_mse.select.r.PP4=-0.46
+% claim: verdict.val_mse.select.r.EE4=-0.62
+% claim: verdict.val_mse.check.r.PP4=-0.81
+% claim: verdict.val_mse.check.r.EE4=-0.88
+% claim: verdict.val_mse_ee.select.r.PP4=0.94
+% claim: verdict.val_mse_ee.select.r.EE4=0.91
+% claim: verdict.val_mse_ee.check.r.PP4=-0.88
+% claim: verdict.val_mse_ee.check.r.EE4=-0.92
+% claim: verdict.read_HD5.check.r.PP4=-0.08
+% claim: verdict.read_HD5.check.r.EE4=-0.02
+% src: python3 analysis/catalog_v4/ws_objective_check.py score FA-ccin2p3-e046ac67 FA-ccin2p3-f35b6a78 @e4f480e6
+% claim: FA-ccin2p3-e046ac67=0.535
+% claim: FA-ccin2p3-f35b6a78=0.459
+% allow: 6 7 533 1066 2132 42 43 because they are the comparison counts of the two sets, the retraining lengths and the seeds
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_objective_a.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_objective_b.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_objective_c.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_objective.py @c0317802
+\caption{Logged quantities against the zero-shot reads across warm-start restarts, one point per comparison and seed,
+arm over its same-seed reference. Horizontal: the mean of $\ln R$ over the pp (PP4) and $e^+e^-$ (EE4) probes, $R$ the median over
+classes of the class geometric mean of the probe MSE ratios. Vertical, left: $\ln(\mathrm{MSE}_\text{arm}/\mathrm{MSE}_\text{reference})$
+zero-shot on the default-sampled held-out tree classes (HD4); middle: the final validation het NLL, arm minus
+reference; right: $\ln(\mathrm{MSE}_\text{arm}/\mathrm{MSE}_\text{reference})$ of the validation MSE of the mean over
+the trained processes. Filled: the restart recipes the candidate was chosen on; open: the checks (retraining length,
+change against no change).}
+\label{fig:ws_objective}
 \end{figure}
 
 
