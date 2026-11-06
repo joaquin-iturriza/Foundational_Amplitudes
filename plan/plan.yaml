@@ -9185,6 +9185,26 @@ entries:
       If the rerun differs from the old step-56 runs by more than the four-seed interval on a read, that read''s comparisons
       to the old MSE control and het reference are flagged as re-seed-limited. Cost: 4 jobs x 1 V100, 2.33 h work each, limit
       03:00, 9.3 GPU-h work / 12 at the limits (with the 8 matched jobs, 21 GPU-h of work for the step); in memory.'
+    fix_at: '2026-11-06T05:14:22+00:00'
+    fix: 'Repair design of 05:13, the same-code rerun of the step-56 arm (v4_het_control_signhead seeds 42-45 at f21572a1,
+      which is the matched arms'' code: git diff f21572a1..87345879 outside plan touches only job_catalog_v3_short.sh''s arm
+      list). The rerun is the right control for the sign comparison against the step-56 arm, and reading old against rerun
+      as the re-seed spread is good. Two things fail. (1) One change at a time, magnitude: the measure keeps the magnitude
+      ratio R = matched arm over the het magnitude reference (5abe4a0e/92207f6a/0208896e/8ddc490b), runs from before the keyed-draw
+      augmentation (d18e44f1 changed experiment.py''s augmentation and init). The gating PP4/EE4 read and the shown-worse
+      rule then compare across two changes, the sign weighting and the code, and seed pairing across that change no longer
+      shares init or draws. Fix: gate the magnitude on the matched arms against this same-code rerun (both have the sign head;
+      they differ only in the weighting; step 56 already put the weight-1 arm at R 1.002 on PP4 and 0.953 on EE4 against the
+      het reference, so ''not worse than the rerun'' answers ''not hurting the het magnitude''), with R of the rerun against
+      the old het reference reported beside. Or rerun the het magnitude reference at f21572a1 as well (4 jobs, about 9.3 GPU-h)
+      and keep the measure as it was. (2) Outcome for the re-seed check is not stated as a decision (check 4): ''flagged as
+      re-seed-limited'' does not say what the verdict becomes. The MSE control is also old code, and the sign YES is a non-inferiority
+      call at 1.2x the control''s median wrong-sign share, so a re-seed shift of the same size decides it. State the number:
+      e.g. the per-pool sign test old step-56 against rerun and the ratio of their median wrong-sign shares on H5 and HD5;
+      if that ratio is outside [1/1.2, 1.2] or the sign test has p < 0.05, the MSE control is rerun at the same code before
+      any YES or NO against it (4 jobs, about 9 GPU-h at its measured 2.3 to 2.7 h on V100), and otherwise the old MSE control
+      stands. Everything else carries over from the passed 05:06 design (sign measure resolved at 4 seeds: H5 17/21 p 0.0036,
+      HD5 15/19 p 0.0096; HETEROSC; no sweep; 9.3 GPU-h; in memory).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
