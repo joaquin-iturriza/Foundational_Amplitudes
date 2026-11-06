@@ -9945,6 +9945,8 @@ entries:
       nothing else left in the step
     '61': Joaquin allowing the refused resubmission (asked 2026-11-06)
     '37': steps 61 and 64 of this entry (the first memmap GPU batch); the prebuild is chained before that batch
+    '67': FA-ccin2p3-99c626bb FA-ccin2p3-668b44ae FA-ccin2p3-c614f966 FA-ccin2p3-9facd90d FA-ccin2p3-918b84df FA-ccin2p3-9a1f489d
+      FA-ccin2p3-3a819881 FA-ccin2p3-9726c7c1
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
