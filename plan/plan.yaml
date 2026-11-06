@@ -10733,6 +10733,15 @@ entries:
       test_multichannel 5 pass. Check prepared: multichannel_check.py policy quota (scripts/job_multichannel_check.sh MCHECK_POLICIES=multichannel+quota
       MCHECK_SEED=42/43, 5 classes x 2 seeds = 10 CPU jobs), figure analysis/catalog_v4/fig_flat_quota.py; needs a passed
       design before submission.'
+  - at: '2026-11-06T04:51:03+00:00'
+    text: '(e) correction to the 2026-11-06 (e) finding: the lr exponent 0.55 of the drafted width x length map is NOT a measurement
+      from trial_1262''s two lrs. Both long sweeps'' lr windows were centred by tools/lr_surface_center.py with the fixed
+      slope -0.55 (prin:invU, HPO rule 2; centres 2.633e-3 at 17056, 1.228e-3 at 68224) and trial_1262 sits at the same normalized
+      position (0.9955, the window top) in both, so 7.82114e-3/3.649139e-3 = 4^0.55 by construction; that lr is censored at
+      the window top and not converged, so each cell''s lr is a lower bound on its optimum. Fixed on branch scaling-grid (11f6ddad
+      job script, 456b5233 epoch_count.py; LONG_FACTOR 1 refused under LONG_HP; short_wall.py --width with the measured per-width
+      V100 rates 31f0196d). CC-IN2P3 gpu QoS MaxWall 7-00:00:00 (sacctmgr, read 2026-11-06), so the 42-84 h cells fit without
+      a split.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
