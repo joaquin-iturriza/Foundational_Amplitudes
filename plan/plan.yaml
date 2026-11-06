@@ -9707,6 +9707,7 @@ entries:
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
     '61': Joaquin allowing the refused resubmission (asked 2026-11-06)
+    '37': steps 61 and 64 of this entry (the first memmap GPU batch); the prebuild is chained before that batch
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
