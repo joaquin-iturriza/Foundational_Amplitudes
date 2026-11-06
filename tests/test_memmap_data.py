@@ -139,7 +139,7 @@ def _build(sweep_config, n_procs, out, extra):
         "dimensionless_inputs", "target_physics_factor", "target_physics_orders", "offshell_per_event")}
     snap["perm"] = {r: np.asarray(v) for r, v in exp._role_perm.items()}
     it = iter(exp.train_loader)
-    snap["train"] = [next(it) for _ in range(4)]
+    snap["train"] = [b for _, b in zip(range(4), it)]      # up to 4 (a small selection has fewer)
     snap["n_train_batches"] = len(exp.train_loader)
     snap["val"] = list(exp.val_loader)
     snap["proc_val"] = {k: list(v) for k, v in exp.proc_val_loaders.items()}
