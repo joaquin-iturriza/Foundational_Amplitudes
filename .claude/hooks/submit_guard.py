@@ -20,6 +20,8 @@ A command is refused (exit 2, every reason found) when
              (items.est_gpu_hours, set from the decision that approved it) covers that total (CLAUDE.md rule 2).
              The early warning only: the budget is enforced at the site's submission gate (site_gate.py beside the
              site tool), which every sbatch / condor_submit passes, launch scripts and sweep_manager included.
+  epoch      a FA training job (job_catalog_v3_short-style scripts) whose steps x batch size is under its training set
+             (under one epoch), unless `--env SUBEPOCH_OK=1` (see epoch_count).
   data       a FA training job whose recipe's pools are not prebuilt on the named site (tools/check_site_data.py run
              there), unless it is chained afterok on that site's prebuild run of the recipe (see data()).
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
@@ -664,6 +666,127 @@ def data(segs):
     return out
 
 
+# ------------------------------------------------------------------ epoch (2026-11-06)
+def _submit_env(toks):
+    """{K: V} of the `--env K=V` options of one `site submit` segment."""
+    rest = cmdparse.strip_redirs(toks[2:])
+    rest = rest[:rest.index("--")] if "--" in rest else rest
+    env, k = {}, 0
+    while k < len(rest):
+        t = rest[k]
+        v = None
+        if t == "--env" and k + 1 < len(rest):
+            v, k = rest[k + 1], k + 1
+        elif t.startswith("--env="):
+            v = t[6:]
+        if v and "=" in v:
+            env[v.partition("=")[0]] = v.partition("=")[2]
+        k += 1
+    return env
+
+
+def _arm_branch(script_text, arm):
+    """the text of the `case "$ARM" in` branch whose patterns match `arm` (as arm_recipe picks it), else ''."""
+    import fnmatch
+    lines = script_text.splitlines()
+    start = next((i for i, l in enumerate(lines) if re.match(r'^case "\$ARM" in\s*$', l)), None)
+    if start is None:
+        return ""
+    branch, inside = [], False
+    for l in lines[start + 1:]:
+        if re.match(r"^esac\b", l):
+            break
+        m = re.match(r"^    ([^\s()#][^()]*)\)", l)
+        if m:
+            if inside:
+                break
+            inside = any(fnmatch.fnmatchcase(arm, q.strip()) for q in m.group(1).split("|"))
+        if inside:
+            branch.append(l)
+    return "\n".join(branch)
+
+
+def epoch_count(script_text, arm, env, repo=None):
+    """(epochs, steps, batch, train events) of a job_catalog_v3_short-style training job, read the way its script and
+    config resolve them: steps = the arm's ITERS_FIXED (LONG_FACTOR x 4264, or GROW_K, under the LONG_* block),
+    batch = training.batchsize (the script's override, else config/amplitudes.yaml, else config/default.yaml),
+    train events = sum over the arm's recipe pools of min(n_train, data.train_subsample) (null in the LONG block: the
+    whole set). None when it cannot be read from the repo (a recipe under $SCRATCH, no fixed steps). Gradient
+    accumulation and validate_frac are not applied."""
+    import yaml
+    repo = repo or REPO
+    m = re.findall(r"\bITERS_FIXED=(\d+)", _arm_branch(script_text, arm))
+    steps = int(m[-1]) if m else None
+    sub = re.search(r"data\.train_subsample=(\w+)", script_text)
+    sub = sub.group(1) if sub else "null"
+    long_ = re.search(r"^if \[ -n \"\$LONG_HEADS\$LONG_FACTOR\$LONG_LR\" \]", script_text, re.M) and \
+        any(env.get(k) for k in ("LONG_HEADS", "LONG_FACTOR", "LONG_LR"))
+    if long_:
+        lf = re.search(r"ITERS=\$\(\(\s*(\d+)\s*\*\s*LF\s*\)\)", script_text)
+        steps = int(lf.group(1)) * int(env.get("LONG_FACTOR") or 1) if lf else None
+        if env.get("GROW_K"):
+            steps = int(env["GROW_K"])
+        lsub = re.search(r"if \[ -n \"\$LONG_HEADS.*?data\.train_subsample=(\w+)", script_text, re.S)
+        sub = lsub.group(1) if lsub else sub
+    if steps is None:
+        return None
+    recipe = arm_recipe(script_text, arm)
+    if not recipe or "$" in recipe:
+        return None
+    try:
+        procs = yaml.safe_load(open(os.path.join(repo, recipe)))["processes"]
+    except (OSError, KeyError, TypeError, ValueError):
+        return None
+    cap = None if sub in ("null", "None", "") else int(float(sub))
+    total = sum(min(int(q.get("n_train") or 0), cap) if cap else int(q.get("n_train") or 0) for q in procs)
+    batch = None
+    bm = re.search(r"training\.batchsize=(\d+)", script_text)
+    if bm:
+        batch = int(bm.group(1))
+    for cfg in ("amplitudes.yaml", "default.yaml") if batch is None else ():
+        try:
+            batch = (yaml.safe_load(open(os.path.join(repo, "config", cfg))).get("training") or {}).get("batchsize")
+        except (OSError, ValueError):
+            batch = None
+        if batch:
+            break
+    if not batch or not total:
+        return None
+    return steps * batch / total, steps, int(batch), total
+
+
+def epoch(segs):
+    """A training job whose steps x batch size is below its training set (under one epoch) is refused unless its env
+    carries SUBEPOCH_OK=1 (`--env SUBEPOCH_OK=1`)."""
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["submit"]:
+            continue
+        rest = toks[2:]
+        if "--check" in rest or "--help" in rest or "-h" in rest:
+            continue
+        script, args, hdr = _submit_parts(toks)
+        pos = [t for t in cmdparse.strip_redirs(rest[:rest.index("--")] if "--" in rest else rest)
+               if not t.startswith("-")]
+        if not script or len(pos) < 2 or pos[1] != "FA" or not args or args[0] in ("smoke", "eval", "probe"):
+            continue
+        env = _submit_env(toks)
+        if env.get("SUBEPOCH_OK") == "1":
+            continue
+        try:
+            text = open(_path(script), errors="replace").read()
+        except OSError:
+            continue
+        if not asks_gpu(text) or not re.search(r"^TRAIN=", text, re.M):
+            continue
+        r = epoch_count(text, args[1] if args[0].startswith("-") else args[0], env)
+        if r and r[0] < 1.0:
+            out.append("epoch: %s %s trains %d steps x batch %d = %.3g events over a training set of %d events: %.2f "
+                       "epochs, under one. Pass --env SUBEPOCH_OK=1 if that is the design." % (
+                           script, args[0], r[1], r[2], r[1] * r[2], r[3], r[0]))
+    return out
+
+
 SUBMITTING = re.compile(r"\bsite\s+(?:submit|run|launch)\b|(^|[;&|(]|\$\()\s*(sbatch|condor_submit)", re.M)
 
 
@@ -713,7 +836,7 @@ def problems(inp):
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
               ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)),
-              ("expect", lambda: expect(segs)))
+              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)))
     out = []
     for name, f in checks:
         if only and name not in only:
