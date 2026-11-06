@@ -12016,10 +12016,18 @@ entries:
   title: 'Two-loop amplitude datasets: what it takes'
   question: What does generating two-loop amplitude datasets for the catalog require (theory, tools, feasible processes, cost),
     so Joaquin can decide whether and how to do it?
-  status: running
-  quotes: []
+  status: held
+  quotes:
+  - said_at: '2026-11-06T04:43:07.642000+00:00'
+    text: I didn't have time to read what you sent about it, so not yet, I'll bring it back when I do. No need to keep asking.
+      You can periodically remind me it's there in case I forget, but you don't have to bring it up on every message
+    decision: D299
+    answers_after: '2026-11-06T04:41:59+00:00'
+    covers:
+    - two_loop
   decisions:
   - D266
+  - D299
   next: Joaquin reads the two-loop explainer and calls go/tier and the label scheme
   done_when: null
   notes_ref: null
@@ -12046,19 +12054,25 @@ entries:
       which ask for the explainer'
     blocks: nothing
     blocks_steps: []
+    answered_at: '2026-11-06T04:43:07.642000+00:00'
+    decision: D299
   - ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
       form factors, checked against published NNLO coefficients); (2) label scheme: Catani remainder or MS-bar hard function,
       and should one-loop pools get a remainder label too?'
     at: '2026-11-05T00:28:20+00:00'
     searched: D265/D266 opened the entry; no decision settles go, tier or scheme
     holds_all: the entry's only next step is Joaquin's call
+    answered_at: '2026-11-06T04:43:07.642000+00:00'
+    decision: D299
   - ask: should we start on two-loop amplitudes? The suggested first step is e+e- -> q qbar and t tbar from closed-form form
       factors, checked against published NNLO coefficients.
     at: '2026-11-06T04:41:59+00:00'
     searched: no decision on two-loop scope in site decisions; the label scheme is a method choice, the owner's under CLAUDE.md:24
     blocks: the two_loop entry's first step
-    blocks_steps: &id001
+    blocks_steps:
     - 1
+    answered_at: '2026-11-06T04:43:07.642000+00:00'
+    decision: D299
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -12085,12 +12099,7 @@ entries:
       - 'go on the calibration tier: design a two-loop pipeline for ee->qq and ee->tt from closed-form form factors, certified
         against published NNLO coefficients'
       - 'no go: close the entry with the explainer as its result'
-  ask: should we start on two-loop amplitudes? The suggested first step is e+e- -> q qbar and t tbar from closed-form form
-    factors, checked against published NNLO coefficients.
-  waiting_since: '2026-11-06T04:41:59+00:00'
-  searched: no decision on two-loop scope in site decisions; the label scheme is a method choice, the owner's under CLAUDE.md:24
-  blocks: the two_loop entry's first step
-  blocks_steps: *id001
+  hold_decision: D299
 - id: warm_start
   title: Warm start from a pretrained model against pretraining from scratch, for a new change
   question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
