@@ -11646,9 +11646,6 @@ entries:
       every passed tip to .claude/.review_state/<pillar>.passed and never moves the watermark back on --at; tools/review_state.passed()
       accepts a tip that is an ancestor of, or has the same pillar files as, a listed pass. The agent''s edit was refused
       as self-modification; Joaquin told 2026-11-06. Apply when allowed, test on two branches passing in sequence.'
-    19: 'Wall-time limit below the job''s own need, twice on 2026-11-06 (catalog step 61: 12 jobs at 3:00 vs short_wall''s
-      3:30; warm_start growth: 2:20 vs 2.38 h): make submit_guard run tools/short_wall.py for job_catalog_v3_short.sh submissions
-      (arm, env, width) and refuse a --hdr=--time below its slurm_time, printing the right value. Replay on both real submissions.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -11900,11 +11897,6 @@ entries:
       if:
       - 'applied and tested: drop'
       - 'still refused: Joaquin applies it or allows it'
-    19:
-      feeds: no jobs lost to a time limit the job itself refuses
-      if:
-      - 'fixed and replayed: drop'
-      - 'short_wall cannot run on the laptop: say why'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
