@@ -390,12 +390,18 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     # LONG_HP=1262 (catalog_coverage step 64, D292/D293: the width x length map at >= 1 epoch): every cell at the long
     # sweeps' best point, trial_1262 of cov_v4_long_hpo8_cc_17056 and _68224 (best of both; its config.yaml there:
     # muon_weight_decay 0.04733132, regularization_lambda 9.114591e-08, cosanneal_warmup_frac 0.1800024,
-    # cosanneal_eta_min 1.376875e-08, ema false), its lr at the cell's steps from its two measured lrs, 7.82114e-3 at
-    # 17056 and 3.649139e-3 at 68224 (lr ~ steps^-0.55, the HPO surface's decay past t* ~ 3000); own run dir _hp1262
+    # cosanneal_eta_min 1.376875e-08, ema false). Its lr at the cell's steps follows lr ~ steps^-0.55 through its
+    # 7.82114e-3 at 17056. The exponent is NOT measured here: both sweeps' lr windows were centred by
+    # tools/lr_surface_center.py with the fixed slope -0.55 (prin:invU, HPO rule 2; centres 2.633e-3 at 17056 and
+    # 1.228e-3 at 68224), and trial_1262 sits at the same normalized window position in both, so its two lrs are
+    # 4^0.55 apart by construction. The lr is censored at the window top (log position 0.9955 in both, best at the last
+    # validation): not converged, so every cell's lr is a lower bound on the optimum, not a tuned value. 1x refused
+    # (under one epoch, the point being redone). Own run dir _hp1262
     if [ -n "$LONG_HP" ]; then
         [ "$LONG_HP" = 1262 ] || { echo "LONG_HP: only 1262"; exit 1; }
         [ -z "$LONG_LR$GROW_K" ] || { echo "LONG_HP excludes LONG_LR and GROW_K"; exit 1; }
-        HLR=$(python -c "import math, sys; t = int(sys.argv[1]); a = math.log(7.82114e-3 / 3.649139e-3) / math.log(4); print(f'{7.82114e-3 * (t / 17056) ** -a:.7g}')" "$ITERS")
+        [ "$LF" != 1 ] || { echo "LONG_HP: LONG_FACTOR 1 is 0.64 epoch of the whole set; use 2, 4, 8 or 16"; exit 1; }
+        HLR=$(python -c "import sys; t = int(sys.argv[1]); print(f'{7.82114e-3 * (t / 17056) ** -0.55:.7g}')" "$ITERS")
         NORM=("${NORM[@]/#++training.lr=*/++training.lr=$HLR}")
         NORM=("${NORM[@]/#++training.muon_weight_decay=*/++training.muon_weight_decay=0.04733132}")
         NORM+=(++training.regularization_lambda=9.114591e-08 ++training.cosanneal_warmup_frac=0.1800024
@@ -433,7 +439,7 @@ if [ -n "$TRAIN_ONLY" ]; then
 elif [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
-           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
+           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LH:+--width "$LH"} ${LIM:+--limit "$LIM"}) \
         || { case "$WALL" in *'"ok": false'*) echo "V3_WALL_SHORT $WALL" ;; *) echo "V3_WALL_ERROR tools/short_wall.py failed: $WALL" ;; esac; exit 1; }
     echo "V3_WALL $WALL"
 fi
