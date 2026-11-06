@@ -192,6 +192,9 @@ training:
  # with the sign accuracy on the signed pools logged. LLoCa path only.
  sign_head: false
  sign_loss_weight: 1.0
+ # HETEROSC only: each event's sign cross-entropy times the het NLL's weight on that event's mu gradient relative to the
+ # MSE's, detached sigma^(2 beta) / (2 sigma^2), so the sign:magnitude gradient ratio per event is the MSE loss's
+ sign_het_match: false
  # >1: the sign loss weighs the events within a factor sign_near_factor of zero (|x| below the pool's training
  # median over it) this many times the others, each pool's mean weight kept at 1 (in-memory data path only)
  sign_near_weight: 1.0
