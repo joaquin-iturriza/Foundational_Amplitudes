@@ -3707,10 +3707,11 @@ entries:
   - D258
   - D288
   next:
-    37: 'After both CC sweeps end (data_mmap freeze): the memmap cache stores events BEFORE the random Lorentz augmentation,
-      one cache for every seed; each event''s transform is drawn at read time from (run seed, event index), so a run sees
-      exactly the transform it sees today; momentum standardisation stats computed at open from the seed. Equivalence test
-      against the in-memory path per seed. Joaquin 2026-11-02: one cache per seed ''is just dumb''.'
+    37: '(b) Memmap cache per D290 (per-event keyed draws): one cache per pool set, keyed by pool content identity and a format
+      version, storing seed- and stats-independent arrays; standardisation and Lorentz augmentation applied per batch from
+      per-event keyed draws (run seed, event index) in BOTH the memmap and in-memory paths; CPU prebuild job; unique staging
+      per host/job; disk check + fallocate; canary check on open; LRU pruning. Tests: two seeds from one cache, memmap ==
+      in-memory per seed under the new draws, two concurrent openers.'
     38: 'After both CC sweeps end (data_mmap freeze): redesign the memmap cache from the blind review of 2026-11-02 (agent
       a7d466b9adb53c54d, transcript in the session''s subagents dir): key by pool content identity and an explicit format
       version (not path, mtime, seed, frozen stats, tokenizer, caps or source text); store seed- and stats-independent arrays,
@@ -9245,10 +9246,10 @@ entries:
     at: '2026-11-05T05:23:08+00:00'
   step_why:
     37:
-      feeds: one data cache per dataset, not per seed or code version
+      feeds: one shared data cache per dataset that a GPU job only opens
       if:
-      - 'equivalence test passes for two seeds from one cache: switch the default'
-      - 'it fails: fix before any new memmap run'
+      - 'tests pass: merge after repo-reviewer, switch the default'
+      - 'tests fail: fix before any memmap run'
     38:
       feeds: one shared data cache that a GPU job only opens
       if:
