@@ -11700,6 +11700,17 @@ entries:
       through: the design-reviewer''s checklist has no ''seeds/trials/horizons vs sibling cells and the user''s words'' item.
       Proposed to the main session as a diff to .claude/agents/design-reviewer.md (a design whose seeds, trials or arms differ
       from the sibling cells'' is FIX unless a user quote or decision names it).'
+  - at: '2026-11-06T14:34:54+00:00'
+    text: '2026-11-06 step 67 read, 8 of 10 jobs (pull + summary + coverage @fa872486 -> data/quota_coverage.json; figure
+      figs/quota_fill_a..d + quota_fill_legend, fig_quota_fill.py @fa872486; fill per bin = sum min(kept,quota)/sum quota
+      over 36 chunks, seeds'' mean and range; in range = bin lower edge <= pp in-support max from the flat range table). Guard
+      of both ladders at budget 50, paired over seeds 42/43: udx_csxvevex shortfall both - old +0.0020 (2 SE 0.0031) pass,
+      worst bin -0.56 -0.037; us_ddxsu both vs edge -0.002 pass, top bins 4.34 0.81/0.72 vs edge 0.70/0.64; identity classes
+      equal. Budget 750, both ladders: us_ddxsu shortfall 0.0003/0.0011, every in-range bin (<= 4.59) >= 0.95, margin bin
+      4.84 0.98/0.94, held-out outside kept 1/1 of 53857 -> NEAR; udx_csxvevex 0.0017/0.0026, in-range (<= 0.415) filled,
+      margin bin 0.67 0.93/0.89, held-out 1/1 of 54001 -> NEAR; uux_epemvevex YES (0 short, 0 held-out, 0 budget stops); uux_epemg
+      YES. Time per replay at 750: us_ddxsu 7468/7780 s, udx_csxvevex 3223/3206 s (budget-50 both 657/261 s). uu_bbxuu both
+      seeds TIMEOUT at 4 h (fix 39383530, resubmitted at 06:15: FA-ccin2p3-22cd09c8, 24e6b843).'
   handoff:
     state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
       ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
