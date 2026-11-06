@@ -3224,6 +3224,66 @@ change against no change).}
 \label{fig:ws_objective}
 \end{figure}
 
+\paragraph{The width growth tuned on the held-out score (2026-11-06).}\label{par:v4_warm_start_grow_tuned}
+With an objective that tracks the reads (par.~\ref{par:v4_warm_start_objective}), can the growth $8\to16$ of
+par.~\ref{par:v4_warm_start_grow} at $k=533$ be tuned to read better than its default restart [D285, D291]? A
+single-fidelity DyHPO sweep of $8$ trials around the default growth (\code{ws\_grow\_k533\_zeroshot\_hpo8\_rerun},
+\code{sweep/sweep\_config\_ccin2p3\_ws\_grow\_k533\_zeroshot\_hpo.yaml} @8f68ca8d, seed $42$, the fine-tune space of
+the sibling sweeps) observed each trial's HD4 score. Seven trials scored; one diverged at step $305$ and is listed
+apart. The best, trial~1860 (learning-rate scale $0.18$, layer decay $0.90$, EMA on, WSD), scored $0.476$, below the
+default growth's $0.535$, and five trials sat within $0.476$ to $0.481$. Its settings were re-run at seeds $42$ and
+$43$ with every read (FA-ccin2p3-4442e786, FA-ccin2p3-3fae7799; \code{scripts/job\_catalog\_v3\_short.sh} @6454ecda,
+\code{GROW\_SWEEP}, \code{GROW\_HP=1860}), against the default growth pair (FA-ccin2p3-e046ac67, FA-ccin2p3-f35b6a78).
+The re-runs reproduce the sweep's selection score, $0.476$ and $0.449$ against $0.535$ and $0.459$, but the reads do
+not move: $R(\text{tuned}/\text{default growth})$ PP4 $0.995$ ($[0.959, 1.031]$), EE4 $0.989$ ($[0.903, 1.080]$),
+held-out default-sampled $1.025$. That is the NOT BETTER branch: neither upper end is below $1$. The tuned growth reads
+as the width-$8$ parent it grew from, $R(W/A)$ PP4 $0.999$, EE4 $1.000$, and is as far from width $16$ from scratch
+as the default growth, $R(W/B)$ PP4 $1.77$ ($[1.45, 2.15]$), EE4 $1.79$ ($[1.52, 2.01]$), SHORT. It is better than
+the mean-MSE-tuned growth ($R$ PP4 $0.951$, $[0.913, 0.992]$). The sweep's low learning rate leaves the grown model
+almost where it started: the validation loss shows no early jump and stays near the parent's value
+(fig.~\ref{fig:ws_c10wz}). It is the gain on the selection set HD4 that does not carry to PP4 and EE4. So the growth
+stays at its default restart, and tuning it on a read-tracking objective is ruled out at $k=533$; what the growth lacks
+at $533$ steps is length, not its restart (par.~\ref{par:v4_warm_start_grow}, $g$ rising to about $0.5$ at $2132$).
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C10wz @3da35e86
+% claim: k.533.W_over_default.PP4.0=0.995
+% claim: k.533.W_over_default.PP4.1.0=0.959
+% claim: k.533.W_over_default.PP4.1.1=1.031
+% claim: k.533.W_over_default.EE4.0=0.989
+% claim: k.533.W_over_default.EE4.1.0=0.903
+% claim: k.533.W_over_default.EE4.1.1=1.080
+% claim: k.533.W_over_default.held_default.0=1.025
+% claim: k.533.W_over_A.PP4.0=0.999
+% claim: k.533.W_over_A.EE4.0=1.000
+% claim: k.533.W_over_B.PP4.0=1.77
+% claim: k.533.W_over_B.PP4.1.0=1.45
+% claim: k.533.W_over_B.PP4.1.1=2.15
+% claim: k.533.W_over_B.EE4.0=1.79
+% claim: k.533.W_over_B.EE4.1.0=1.52
+% claim: k.533.W_over_B.EE4.1.1=2.01
+% claim: k.533.W_over_mse_tuned.PP4.0=0.951
+% claim: k.533.W_over_mse_tuned.PP4.1.0=0.913
+% claim: k.533.W_over_mse_tuned.PP4.1.1=0.992
+% src: python3 analysis/catalog_v4/ws_objective_check.py score FA-ccin2p3-4442e786 FA-ccin2p3-3fae7799 FA-ccin2p3-e046ac67 FA-ccin2p3-f35b6a78 @3da35e86
+% claim: FA-ccin2p3-4442e786=0.476
+% claim: FA-ccin2p3-3fae7799=0.449
+% claim: FA-ccin2p3-e046ac67=0.535
+% claim: FA-ccin2p3-f35b6a78=0.459
+% allow: 8 16 533 42 43 7 305 1860 0.18 0.90 0.481 2132 0.5 1 8f68ca8d 6454ecda because they are the commits of the sweep config and the job script, the widths, k, the seeds, the trial count, the diverged trial's step, the best trial's id and its two settings, the plateau's upper score, the longer k and its g (par:v4_warm_start_grow), and the bar's 1 (sweep results file runs/ws_grow_k533_zeroshot_hpo8_rerun on CC-IN2P3, finding 2026-11-06T16:24)
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wz_a.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wz_b.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wz_c.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_c1m.py --growth-zs @3da35e86
+\caption{The width growth $8\to16$ at $k=533$ with the default, the mean-MSE-tuned and the HD4-score-tuned restart,
+against widths $8$ and $16$ from scratch. Left: the validation loss of the main stage (het NLL) against the restart's
+step, seed $42$, grown runs only. Middle and right: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and
+$e^+e^-$ (EE4) probes as a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
+\label{fig:ws_c10wz}
+% allow: 533 42 8 16 2 because they are the retraining length, the seed, the widths and the square in |M|^2
+\end{figure}
+
 \paragraph{The restart's jump: AdamW's share or the ramp of every group (2026-11-06).}\label{par:v4_warm_start_ramp}
 After par.~\ref{par:v4_warm_start_repairs} ruled out the empty optimizer and Muon's step [D303], two arms on the same
 default restart and data stream (FA-ccin2p3-0202ba7f, FA-ccin2p3-7b2d6c24) ask what is left: AdamW's learning rate
