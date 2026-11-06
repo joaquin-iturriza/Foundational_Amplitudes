@@ -2991,6 +2991,123 @@ units start nearly identical and only the noise and the data separate them.
 % claim: k.2132.g.EE4=0.45
 % allow: 8 16 2409.12903 10 3 1 0.25 4264 533 1066 2132 42 43 0.3 1.19 0.002 0.55 0.76 1.07 13fe9f64 because they are the widths, the paper id, the noise, the share, steps, k, seeds, the bar's exponent and value, the step-0 check (finding on the entry, from the run logs), C1's g, and the job commit
 
+\paragraph{Three repairs of the restart tried: the optimizer's state, a mean-MSE tuning, and the tuned growth (2026-11-06).}\label{par:v4_warm_start_repairs}
+Tests of the cause suggested in par.~\ref{par:v4_warm_start_restart} and of a tuning objective that scores the held-out
+reads, all at $k=533$ (an eighth of a pretraining, D284), reads and $R$ as in par.~\ref{par:v4_warm_start}, seeds $42$
+and $43$, intervals the widened $95\%$ class bootstrap. First [D303]: is the empty optimizer what knocks the warm start
+off the parent's minimum? The arm fills AdamW's moments and Muon's momentum at learning rate $0$ over $100$ batches,
+then runs the default restart (FA-ccin2p3-b2c69c1a, FA-ccin2p3-f5245570), against the default restart at the same
+commit and on the same data stream (FA-ccin2p3-0202ba7f, FA-ccin2p3-7b2d6c24). The fill does not remove the jump: the
+largest gradient norm over steps $0$ to $19$ is $1777$ and $1411$ with the fill against $994$ and $1334$ without, and
+the worst training loss over the first $40$ steps is $0.91$ and $1.54$ against $-1.33$ and $-1.22$. The reads do not
+move: $R(\text{fill}/\text{default})$ PP4 $1.005$ ($[0.844, 1.199]$), EE4 $1.016$ ($[0.881, 1.168]$), and against the
+change from scratch $R(W/B)$ PP4 $1.32$, EE4 $1.50$, SHORT as the default restart. The design's no-cause branch: the
+jump comes from the learning rate itself or from Muon's fixed-norm step, and the fill stays out of the recipe. Second
+[D291, D298]: tuned on the validation MSE of the mean instead of the NLL (par.~\ref{par:v4_warm_start_restart}), does
+the warm start read better? A single-fidelity DyHPO sweep of $8$ trials over the fine-tune space with the schedule
+cosine or WSD (\code{ws\_c1\_k533\_mse\_wsd\_hpo8}, seed $42$, objective and checkpoint selection the validation MSE
+of the mean) drew WSD in all $8$ trials, so it did not compare the schedules; its best is a learning-rate scale of
+$1.85$ with a cooldown fraction of $0.164$, validation MSE $0.0283$, where the NLL sweep's cosine trials reach $0.0257$
+at their NLL-selected checkpoint (fig.~\ref{fig:ws_mse_sweep}). At seeds $42$ and $43$ (FA-ccin2p3-4f9e0532,
+FA-ccin2p3-8cb6c7b5) it is not better than the untuned restart: $R$ PP4 $1.054$ ($[0.902, 1.235]$), EE4 $1.005$
+($[0.885, 1.159]$); it is better than the NLL-tuned one (PP4 $0.891$, EE4 $0.715$) and SHORT of the change from
+scratch ($R(W/B)$ PP4 $1.42$, EE4 $1.58$). The NOT BETTER branch: the untuned restart stays the recipe, and the
+validation MSE of the mean is ruled out as a proxy for the held-out reads (fig.~\ref{fig:ws_c1m}). Third [D285]: the
+same tuned recipe on the width growth $8\to16$ of par.~\ref{par:v4_warm_start_grow} (FA-ccin2p3-31359864,
+FA-ccin2p3-bfed460f) is worse than the growth with the default restart, $R$ PP4 $1.058$ ($[1.021, 1.097]$), EE4 $1.050$
+($[0.959, 1.158]$), further from width $16$ from scratch ($R(W/B)$ PP4 $1.91$, EE4 $1.94$; untuned $1.75$, $1.76$) and
+no better than the width-$8$ parent it grew from ($R(W/A)$ PP4 $1.050$, EE4 $1.053$; fig.~\ref{fig:ws_c10wm}). So
+neither repair moves the reads; what is left of the cause is Muon's update size at the restart, tested by damping only
+Muon's learning rate over the first $168$ steps.
+% src: python3 analysis/catalog_v4/ws_restart_steps.py --cached @2231aecd
+% claim: fill_s42.grad_max20=1777
+% claim: fill_s43.grad_max20=1411
+% claim: default_d303_s42.grad_max20=994
+% claim: default_d303_s43.grad_max20=1334
+% claim: fill_s42.loss_max40=0.91
+% claim: fill_s43.loss_max40=1.54
+% claim: default_d303_s42.loss_max40=-1.33
+% claim: default_d303_s43.loss_max40=-1.22
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1f @2231aecd
+% claim: k.533.W_over_default.PP4.0=1.005
+% claim: k.533.W_over_default.PP4.1.0=0.844
+% claim: k.533.W_over_default.PP4.1.1=1.199
+% claim: k.533.W_over_default.EE4.0=1.016
+% claim: k.533.W_over_default.EE4.1.0=0.881
+% claim: k.533.W_over_default.EE4.1.1=1.168
+% claim: k.533.W_over_B.PP4.0=1.32
+% claim: k.533.W_over_B.EE4.0=1.50
+% src: python3 analysis/catalog_v4/plot_ws_mse_sweep.py @2231aecd
+% claim: best.lr_scale=1.85
+% claim: best.cooldown=0.164
+% claim: best.mse_selected=0.0283
+% claim: best_nll_cosine_mse=0.0257
+% claim: n_wsd.mse_wsd=8
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1m @2231aecd
+% claim: k.533.W_over_untuned.PP4.0=1.054
+% claim: k.533.W_over_untuned.PP4.1.0=0.902
+% claim: k.533.W_over_untuned.PP4.1.1=1.235
+% claim: k.533.W_over_untuned.EE4.0=1.005
+% claim: k.533.W_over_untuned.EE4.1.0=0.885
+% claim: k.533.W_over_untuned.EE4.1.1=1.159
+% claim: k.533.W_over_nll_tuned.PP4.0=0.891
+% claim: k.533.W_over_nll_tuned.EE4.0=0.715
+% claim: k.533.W_over_B.PP4.0=1.42
+% claim: k.533.W_over_B.EE4.0=1.58
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C10wm @2231aecd
+% claim: k.533.W_over_untuned.PP4.0=1.058
+% claim: k.533.W_over_untuned.PP4.1.0=1.021
+% claim: k.533.W_over_untuned.PP4.1.1=1.097
+% claim: k.533.W_over_untuned.EE4.0=1.050
+% claim: k.533.W_over_untuned.EE4.1.0=0.959
+% claim: k.533.W_over_untuned.EE4.1.1=1.158
+% claim: k.533.W_over_B.PP4.0=1.91
+% claim: k.533.W_over_B.EE4.0=1.94
+% claim: k.533.W_over_A.PP4.0=1.050
+% claim: k.533.W_over_A.EE4.0=1.053
+% allow: 533 42 43 95 0 19 40 100 8 16 168 1.75 1.76 because they are k, the seeds, the interval's level, step windows, the fill length, the trial count, the widths, the Muon ramp length (the step-8 design) and the untuned growth's R(W/B) of par:v4_warm_start_grow
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.48\linewidth]{../analysis/catalog_v4/figs/ws_mse_sweep_a.pdf}\hfill
+\includegraphics[width=0.48\linewidth]{../analysis/catalog_v4/figs/ws_mse_sweep_b.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_mse_sweep.py @2231aecd
+\caption{The $k=533$ warm-start sweeps, seed $42$. Left: each trial's validation MSE of the mean at its selected
+checkpoint against its learning-rate scale, for the sweep on the MSE of the mean (WSD) and the earlier sweep on the
+NLL (cosine, read at its NLL-selected checkpoint). Right: the validation MSE of the mean over the steps for the best
+trial of the MSE sweep and the NLL sweep's trial nearest its learning-rate scale.}
+\label{fig:ws_mse_sweep}
+% allow: 533 42 because they are the retraining length and the seed
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c1m_a.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c1m_b.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c1m_c.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_c1m.py @2231aecd
+\caption{The $k=533$ warm starts with the default, the NLL-tuned and the mean-MSE-tuned restart, the pretrained start
+and the change from scratch. Left: the validation loss of the main stage (het NLL) against the restart's step, seed
+$42$, warm starts only. Middle and right: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4)
+probes as a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
+\label{fig:ws_c1m}
+% allow: 533 42 2 because they are the retraining length, the seed and the square in |M|^2
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wm_a.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wm_b.pdf}\hfill
+\includegraphics[width=0.32\linewidth]{../analysis/catalog_v4/figs/ws_c10wm_c.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_c1m.py --growth @2231aecd
+\caption{The width growth $8\to16$ at $k=533$ with the default and the mean-MSE-tuned restart, against widths $8$
+and $16$ from scratch. Left: the validation loss of the main stage (het NLL) against the restart's step, seed $42$,
+grown runs only. Middle and right: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4) probes as
+a cumulative fraction of classes, each probe the geometric mean of its two seeds.}
+\label{fig:ws_c10wm}
+% allow: 533 42 8 16 2 because they are the retraining length, the seed, the widths and the square in |M|^2
+\end{figure}
+
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
 tree group whose zero-shot offset has a sign, median $0.12$ with $0.642$ of the $218$ pools positive (the network
