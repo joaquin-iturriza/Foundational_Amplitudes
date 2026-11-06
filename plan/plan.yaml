@@ -14400,6 +14400,9 @@ entries:
       of the growth arm (overrides reach run.py with the prebuild flag, rc 0) and the refusal of a non-memmap arm. Prebuilds
       FA-ccin2p3-f7a03eee (s42, htc) and a99f5106 (s43, after it); growth FA-ccin2p3-f9c67e8a / bfb41439 afterok on them,
       limit 2:30, 46G.'
+  - at: '2026-11-06T06:47:44+00:00'
+    text: 'Correction to the previous finding: the non-memmap refusal of mode prebuild was not tested (the local dry run of
+      v4_het_warm25m_k533 stopped earlier, on its missing parent model).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
