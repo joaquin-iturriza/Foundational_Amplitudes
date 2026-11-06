@@ -13377,6 +13377,24 @@ entries:
     at: '2026-11-06T06:48:34+00:00'
     searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
     blocks: nothing
+    blocks_steps: []
+  - ask: 'Two calls on the warm start, both scope changes (yours): (1) The one-loop magnitude-target change (het) is not decided
+      at any k because its from-scratch pair''s two seeds disagree (R_seed 1.28, so the 1.35-bar interval is widened by ln
+      1.28 = 0.25 on each side). More from-scratch seeds of v4_het_control_magnitude would narrow that term. My estimate,
+      assuming the seed term shrinks as sqrt(2/n) and the class bootstrap stays as it is: n=3 seeds widens by x1.23, n=4 by
+      x1.19, n=5 by x1.17, n=6 by x1.15, against x1.28 now. The upper end at k=533 would go from 1.48 to 1.38 / 1.35 / 1.33
+      at 4/5/6 seeds; at k=2132 from 1.47 to 1.37 / 1.34 / 1.32. So 4 more seeds (44 to 47) would very likely make k=533 a
+      MATCH, a YES at 1/8 of a pretraining. Seeds 44 and 45 exist as arms (_seed3, _seed4); 46 and 47 need two new arm suffixes.
+      Cost: 2.35 h per run on a V100 (wall time of 5abe4a0e/92207f6a, reads included), so 4 runs = 9.4 GPU-h (2 runs = 4.7).
+      k=1066 stays undecided at any seed count, because its class bootstrap alone reaches 1.36. The rule would also need a
+      design line on how n seeds widen the interval. The sign extension cannot be decided by more seeds: its 4 from-scratch
+      seeds already set the spread, and the 21-pool bootstrap alone gives upper ends 1.86 / 1.56 / 1.24. Do you want the 4
+      seeds (9.4 GPU-h) for the magnitude target, 2 seeds, or none? (2) Asked 06:48, still open: should the tuned width growth
+      also run at 1066 and 2132 steps, like the untuned growth, or only at 533?'
+    at: '2026-11-06T13:51:48+00:00'
+    searched: CLAUDE.md scope rule (seeds and horizons beyond the design are Joaquin's call); site decisions D282-D303 (D300
+      approves step 7 at its 54 runs, no extra seeds; D284 fixes k=533 for the tuned work); par:v4_warm_start_changes @7d288fee
+    blocks: nothing
     blocks_steps: &id003 []
   owner:
     agent: a916bf7f64f62994d
@@ -15661,8 +15679,21 @@ entries:
       docs/results.tex par:v4_warm_start_objective, par:v4_warm_start_ramp; scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step7_map.txt,
       done7.txt, read7.sh, logs7/
     written: '2026-11-06T13:18:42+00:00'
-  ask: Should the tuned width growth also run at 1066 and 2132 steps, like the untuned growth, or only at 533?
-  waiting_since: '2026-11-06T06:48:34+00:00'
-  searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
+  ask: 'Two calls on the warm start, both scope changes (yours): (1) The one-loop magnitude-target change (het) is not decided
+    at any k because its from-scratch pair''s two seeds disagree (R_seed 1.28, so the 1.35-bar interval is widened by ln 1.28
+    = 0.25 on each side). More from-scratch seeds of v4_het_control_magnitude would narrow that term. My estimate, assuming
+    the seed term shrinks as sqrt(2/n) and the class bootstrap stays as it is: n=3 seeds widens by x1.23, n=4 by x1.19, n=5
+    by x1.17, n=6 by x1.15, against x1.28 now. The upper end at k=533 would go from 1.48 to 1.38 / 1.35 / 1.33 at 4/5/6 seeds;
+    at k=2132 from 1.47 to 1.37 / 1.34 / 1.32. So 4 more seeds (44 to 47) would very likely make k=533 a MATCH, a YES at 1/8
+    of a pretraining. Seeds 44 and 45 exist as arms (_seed3, _seed4); 46 and 47 need two new arm suffixes. Cost: 2.35 h per
+    run on a V100 (wall time of 5abe4a0e/92207f6a, reads included), so 4 runs = 9.4 GPU-h (2 runs = 4.7). k=1066 stays undecided
+    at any seed count, because its class bootstrap alone reaches 1.36. The rule would also need a design line on how n seeds
+    widen the interval. The sign extension cannot be decided by more seeds: its 4 from-scratch seeds already set the spread,
+    and the 21-pool bootstrap alone gives upper ends 1.86 / 1.56 / 1.24. Do you want the 4 seeds (9.4 GPU-h) for the magnitude
+    target, 2 seeds, or none? (2) Asked 06:48, still open: should the tuned width growth also run at 1066 and 2132 steps,
+    like the untuned growth, or only at 533?'
+  waiting_since: '2026-11-06T13:51:48+00:00'
+  searched: CLAUDE.md scope rule (seeds and horizons beyond the design are Joaquin's call); site decisions D282-D303 (D300
+    approves step 7 at its 54 runs, no extra seeds; D284 fixes k=533 for the tuned work); par:v4_warm_start_changes @7d288fee
   blocks: nothing
   blocks_steps: *id003
