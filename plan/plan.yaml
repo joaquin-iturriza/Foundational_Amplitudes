@@ -13326,9 +13326,9 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: a8b086e2910b999ed
-    state: closed
+    state: stopped
     since: '2026-11-06T09:57:23+00:00'
-    state_at: '2026-11-06T10:30:02+00:00'
+    state_at: '2026-11-06T10:30:29+00:00'
     context: 258564
     context_at: '2026-11-06T10:29:58+00:00'
   designs:
