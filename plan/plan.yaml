@@ -11947,7 +11947,7 @@ entries:
   title: 'Two-loop amplitude datasets: what it takes'
   question: What does generating two-loop amplitude datasets for the catalog require (theory, tools, feasible processes, cost),
     so Joaquin can decide whether and how to do it?
-  status: waiting_user
+  status: running
   quotes: []
   decisions:
   - D266
@@ -11983,6 +11983,13 @@ entries:
     at: '2026-11-05T00:28:20+00:00'
     searched: D265/D266 opened the entry; no decision settles go, tier or scheme
     holds_all: the entry's only next step is Joaquin's call
+  - ask: should we start on two-loop amplitudes? The suggested first step is e+e- -> q qbar and t tbar from closed-form form
+      factors, checked against published NNLO coefficients.
+    at: '2026-11-06T04:41:59+00:00'
+    searched: no decision on two-loop scope in site decisions; the label scheme is a method choice, the owner's under CLAUDE.md:24
+    blocks: the two_loop entry's first step
+    blocks_steps: &id001
+    - 1
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -12009,12 +12016,12 @@ entries:
       - 'go on the calibration tier: design a two-loop pipeline for ee->qq and ee->tt from closed-form form factors, certified
         against published NNLO coefficients'
       - 'no go: close the entry with the explainer as its result'
-  ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
-    form factors, checked against published NNLO coefficients); (2) label scheme: Catani remainder or MS-bar hard function,
-    and should one-loop pools get a remainder label too?'
-  waiting_since: '2026-11-05T00:28:20+00:00'
-  searched: D265/D266 opened the entry; no decision settles go, tier or scheme
-  holds_all: the entry's only next step is Joaquin's call
+  ask: should we start on two-loop amplitudes? The suggested first step is e+e- -> q qbar and t tbar from closed-form form
+    factors, checked against published NNLO coefficients.
+  waiting_since: '2026-11-06T04:41:59+00:00'
+  searched: no decision on two-loop scope in site decisions; the label scheme is a method choice, the owner's under CLAUDE.md:24
+  blocks: the two_loop entry's first step
+  blocks_steps: *id001
 - id: warm_start
   title: Warm start from a pretrained model against pretraining from scratch, for a new change
   question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
