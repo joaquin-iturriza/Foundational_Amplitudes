@@ -13337,12 +13337,10 @@ entries:
     blocks: nothing
     blocks_steps: &id003 []
   owner:
-    agent: ac0ced7d711b6fd5b
+    agent: a916bf7f64f62994d
     state: working
-    since: '2026-11-06T11:01:13+00:00'
-    state_at: '2026-11-06T13:18:50+00:00'
-    context: 253239
-    context_at: '2026-11-06T13:18:23+00:00'
+    since: '2026-11-06T13:19:22+00:00'
+    state_at: '2026-11-06T13:19:22+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
