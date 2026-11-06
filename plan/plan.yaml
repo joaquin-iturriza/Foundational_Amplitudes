@@ -11822,6 +11822,7 @@ entries:
       with main_turns.py
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
+    '18': Joaquin allowing the review tool change (asked 2026-11-06)
   owner:
     agent: a43a7a5f29cb3574b
     state: stopped
