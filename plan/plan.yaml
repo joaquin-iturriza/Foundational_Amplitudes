@@ -4725,6 +4725,12 @@ entries:
       showed UNKNOWN and the supervisor could not track them; fixed in ~/.local/bin/site (slurm: last line matching <digits>[;cluster]),
       resubmitted as FA-ccin2p3-5abe4a0e / 92207f6a at 80f98c55'
     at: '2026-11-04T18:37:54+00:00'
+  - tried: step 61 matched sign arms FA-ccin2p3-4ba2ae30 e19b83f5 b524a346 9b657718 1536ae83 86cb2686 00ca4119 91249877 and
+      same-code control reruns b2a60a6d 3633e626 a59a66d4 38ea1aee, submitted 2026-11-06 06:09-06:15 at --time=03:00:00
+    why: 'all 12 refused by the in-job wall check at start (tools/short_wall.py: 3.49 h needed, slurm_time 03:30:00); the
+      limit was taken from step 56''s 2.33 h of work instead of short_wall. No training ran. Resubmission at 03:30:00 was
+      refused by the auto-mode permission classifier (no reason given); waits for the main session.'
+    at: '2026-11-06T05:21:16+00:00'
   asks:
   - ask: 'CC''s /sps/lpnhe is 100% full (512G of 512G): nothing can be synced or run there. Free space (or say which of your
       sps data may go) so the catalog_v4 validation can run. Also: the energy hold-out H7E (1-10 TeV) now lies inside catalog_v4''s
