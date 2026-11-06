@@ -10101,6 +10101,8 @@ entries:
       FA-ccin2p3-3a819881 FA-ccin2p3-9726c7c1
     '68': FA-ccin2p3-99c626bb FA-ccin2p3-668b44ae FA-ccin2p3-c614f966 FA-ccin2p3-9facd90d FA-ccin2p3-918b84df FA-ccin2p3-9a1f489d
       FA-ccin2p3-3a819881 FA-ccin2p3-9726c7c1 (the forward check of step 67, whose outcome sets the e+e- sampling of the design)
+    '64': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
+      FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
