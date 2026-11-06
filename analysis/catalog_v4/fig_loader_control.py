@@ -88,7 +88,10 @@ def main():
     a.axhline(1.0, color=ps.C.grey, ls="--", label=r"$R=1$")
     a.axhline(res["gap"], color=ps.C.green, ls=":",
               label=r"full set / $10^4$ per process, PP4")
-    a.set_ylim(0.9, res["gap"] + 0.05)     # the gap line is part of the comparison, so it stays in range
+    # the range from the plotted data: every error bar and the gap line (part of the comparison) inside it
+    ends = [x for q, _ in READS3 for k in ("R_L", "R_0") for x in res["reads"][q][k][1:]] + [res["gap"], 1.0]
+    pad = 0.05 * (max(ends) - min(ends))
+    a.set_ylim(min(ends) - pad, max(ends) + pad)
     a.set_xticks(x)
     a.set_xticklabels([lab for _, lab in READS3])
     a.set_ylabel(r"median over classes of MSE ratio")

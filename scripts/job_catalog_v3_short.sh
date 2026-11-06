@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -256,7 +256,9 @@ PY
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             ITERS_FIXED=4264
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
-    v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2)
+    # the beam ablation (catalog_coverage step 62, D295): the share 0.25 on the e+e- classes only (eeonly) or the
+    # hadronic classes only (pponly), every other class catalog-sampled; recipes catalog_v4_default25_<beam>_train.yaml
+    v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2)
                             CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4); HET=1
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; esac
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
@@ -373,6 +375,16 @@ if [ -n "$SHORT_RERUN" ]; then
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "SHORT_RERUN only on v4_het_default25[_seed2]"; exit 1 ;; esac
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_rerun"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_rerun"
 fi
+# SHORT_TAG=<tag> (catalog_coverage step 62, the beam ablation): the het share arms (control, default25 and its
+# eeonly/pponly beam arms) unchanged, in their own run dir <arm>_tag<tag>; the fixed "_tag" marker is in no arm name nor
+# in the SHORT_MEMMAP/SHORT_RERUN dirs, so a tag can never resolve to another run's dir
+if [ -n "$SHORT_TAG" ]; then
+    [ -n "$SHORT_MEMMAP$SHORT_RERUN$LONG_HEADS$LONG_FACTOR$LONG_LR" ] && { echo "SHORT_TAG excludes SHORT_MEMMAP, SHORT_RERUN and LONG_*"; exit 1; }
+    case "$SHORT_TAG" in *[!a-z0-9]*|"") echo "SHORT_TAG: lower-case letters and digits only"; exit 1 ;; esac
+    case "$ARM" in v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2) ;;
+        *) echo "SHORT_TAG only on the het control and the default25 share arms"; exit 1 ;; esac
+    OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_tag${SHORT_TAG}"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_tag${SHORT_TAG}"
+fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
 # LONG_FACTOR=<1|4|16> (length: 4264 x factor steps; only the steps move: every cell trains on the whole train pool,
 # 1e5 events per tree process, 5e4 one-loop, and validates on 200 per process like the short arms, Joaquin D236), LONG_LR=<lr> (the 4x lr DyHPO's best, the law's scaling at 16x; 1x keeps the
@@ -381,12 +393,34 @@ fi
 if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "LONG_* only on v4_het_default25[_seed2]"; exit 1 ;; esac
     LH=${LONG_HEADS:-8}; LF=${LONG_FACTOR:-1}
-    case "$LF" in 1|4|16) ;; *) echo "LONG_FACTOR must be 1, 4 or 16"; exit 1 ;; esac
+    case "$LF" in 1|2|4|8|16) ;; *) echo "LONG_FACTOR must be 1, 2, 4, 8 or 16"; exit 1 ;; esac
     ITERS=$((4264 * LF)); ITERS_FIXED=$ITERS
     EXTRA=(training.validate_frac=0.02 training.iterations=$ITERS ++data.memmap=${LONG_MEMMAP:-false} ++data.train_subsample=null
            ++data.eval_subsample=200 evaluation.train_subsample=2000 data.processes_file="$TRAIN")
     NORM+=(model.net.num_heads=$LH model.net.checkpoint_blocks=${LONG_CKPT:-false}); [ -n "$LONG_LR" ] && NORM=("${NORM[@]/#++training.lr=*/++training.lr=$LONG_LR}")
     OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_x${LF}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_x${LF}"
+    # LONG_HP=1262 (catalog_coverage step 64, D292/D293: the width x length map at >= 1 epoch): every cell at the long
+    # sweeps' best point, trial_1262 of cov_v4_long_hpo8_cc_17056 and _68224 (best of both; its config.yaml there:
+    # muon_weight_decay 0.04733132, regularization_lambda 9.114591e-08, cosanneal_warmup_frac 0.1800024,
+    # cosanneal_eta_min 1.376875e-08, ema false). Its lr at the cell's steps follows lr ~ steps^-0.55 through its
+    # 7.82114e-3 at 17056. The exponent is NOT measured here: both sweeps' lr windows were centred by
+    # tools/lr_surface_center.py with the fixed slope -0.55 (prin:invU, HPO rule 2; centres 2.633e-3 at 17056 and
+    # 1.228e-3 at 68224), and trial_1262 sits at the same normalized window position in both, so its two lrs are
+    # 4^0.55 apart by construction. The lr is censored at the window top (log position 0.9955 in both, best at the last
+    # validation): not converged, so every cell's lr is a lower bound on the optimum, not a tuned value. 1x refused
+    # (under one epoch, the point being redone). Own run dir _hp1262
+    if [ -n "$LONG_HP" ]; then
+        [ "$LONG_HP" = 1262 ] || { echo "LONG_HP: only 1262"; exit 1; }
+        [ -z "$LONG_LR$GROW_K" ] || { echo "LONG_HP excludes LONG_LR and GROW_K"; exit 1; }
+        [ "$LF" != 1 ] || { echo "LONG_HP: LONG_FACTOR 1 is 0.64 epoch of the whole set; use 2, 4, 8 or 16"; exit 1; }
+        HLR=$(python -c "import sys; t = int(sys.argv[1]); print(f'{7.82114e-3 * (t / 17056) ** -0.55:.7g}')" "$ITERS")
+        NORM=("${NORM[@]/#++training.lr=*/++training.lr=$HLR}")
+        NORM=("${NORM[@]/#++training.muon_weight_decay=*/++training.muon_weight_decay=0.04733132}")
+        NORM+=(++training.regularization_lambda=9.114591e-08 ++training.cosanneal_warmup_frac=0.1800024
+               ++training.cosanneal_eta_min=1.376875e-08 ema=false)
+        OUT="${OUT}_hp1262"; PRED="${PRED}_hp1262"
+        echo "LONG_HP 1262: steps $ITERS lr $HLR"
+    fi
     AXES+=(HD4 HD5)
     # width growth (plan warm_start step 4, D285): GROW_K=<533|1066|2132> with LONG_HEADS=16 starts from the 1x cell at
     # half the width and the same seed (its final model, after its sigma stage), grown function-preservingly
@@ -417,7 +451,7 @@ if [ -n "$TRAIN_ONLY" ]; then
 elif [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
-           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LIM:+--limit "$LIM"}) \
+           $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LH:+--width "$LH"} ${LIM:+--limit "$LIM"}) \
         || { case "$WALL" in *'"ok": false'*) echo "V3_WALL_SHORT $WALL" ;; *) echo "V3_WALL_ERROR tools/short_wall.py failed: $WALL" ;; esac; exit 1; }
     echo "V3_WALL $WALL"
 fi

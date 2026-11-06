@@ -3712,9 +3712,6 @@ entries:
       per-event keyed draws (run seed, event index) in BOTH the memmap and in-memory paths; CPU prebuild job; unique staging
       per host/job; disk check + fallocate; canary check on open; LRU pruning. Tests: two seeds from one cache, memmap ==
       in-memory per seed under the new draws, two concurrent openers.'
-    38: '(f) Redraw the loader-control result (data/loader_control.json, step 43(1)) as a figure: per-class MSE memmap vs
-      in-memory rerun, both seeds, PP4/EE4/held default; record it as superseded by (e): the full-set w8 gap was under one
-      epoch (D293).'
     39: 'Tool follow-ups from 2026-11-02, what is left: (e) repo-reviewer per-commit review of hot-path and data code instead
       of only large batches (proposed to Joaquin, his call, not asked again without something new); (f) Joaquin''s idea for
       later: a way to know when a source (guidance, a report) is up to date before stating it as fact. Done: (a) 8b7cd708;
@@ -4128,7 +4125,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: 2d54636f
+    commit: 9641850c
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4423,6 +4420,7 @@ entries:
     - analysis/catalog_v4/data/size_fit.json
     - analysis/catalog_v4/data/validation.json
     - analysis/catalog_v4/ee_gain.py
+    - analysis/catalog_v4/fig_flat_quota.py
     - analysis/catalog_v4/fig_signext.py
     - analysis/catalog_v4/figs/census_diagrams.png
     - analysis/catalog_v4/figs/classes_roles.png
@@ -4449,6 +4447,7 @@ entries:
     - analysis/catalog_v4/validate_v4.py
     - analysis/storage/free_manifest_2026-10-26.tsv
     - analysis/storage/free_space.py
+    - mg5_pipeline_final.py
     - mix_compose.py
     - particle_ids.py
     - 'pp13v4 generation part 3 of 8 (commit c7ca7d55, before the beam_masses fix e7a1775d), TIMEOUT 2026-10-30 02:26 while
@@ -4485,6 +4484,7 @@ entries:
     - sweep/sweep_config_ccin2p3_cov_v4_long_hpo_x4.yaml
     - talks/progress_nov2026/main.tex
     - tests/test_default_share.py
+    - tests/test_flat_quota.py
     - tests/test_order_features.py
     - tests/test_orders_source.py
     - tests/test_particle_encoding.py
@@ -4493,6 +4493,7 @@ entries:
     - 'the lhe_parts gc job: 2435 directories trimmed to their logs, 122.4 GB; CC at 115G free'
     - tools/catalog_ft.py
     - tools/certify_v4_loops.py
+    - tools/flat_range.py
     - tools/lhe_probe.py
     - tools/mix_compose_check.py
     - tools/mixed_order_audit.py
@@ -8819,6 +8820,114 @@ entries:
       s >= g/2 (prior rerun spread 25%, results.tex ~l.10546); outcomes CLEAR/IMPLICATED/NOISE-LIMITED/UNRESOLVED defined;
       disk ~2.3 GB x2 against 87 GB free; 15.3 GPU-h at the limits; het loss; searched results.tex memmap, memory-mapped,
       loading path, 1e4, events per process, site decisions memmap/in-memory: no prior run separates the keys.'
+  - at: '2026-11-06T04:43:31+00:00'
+    question: 'Step 62 (d), D295: does the default share''s e+e- gain (EE4 R 0.18 on trained classes, 0.45 held-out) come
+      from the e+e- classes'' own default events (generated exactly as EE4''s test pools), or does 13 TeV pp default data
+      help e+e- events at all? Default share restricted to e+e- classes only and to pp classes only, against share 0 and the
+      full share 0.25.'
+    prior: 'arms_vs_het_control.json / mixture_ab.py: default25 vs het control R EE4 0.18, PP4 0.34. ee_gain.py (step 43(2)):
+      sqrt(s) density, forward/collinear/|M|^2 coverage and control level do not explain EE4''s ~2x larger gain (EE4 x0.56
+      [0.45,0.68] at fixed control MSE). ee_gain_beams.json @278ae072: the default share is 115 e+e- classes x 2500 events
+      (2.5% of 11.53M) from the same MadEvent setup as their EE4 test pools, 797 pp classes x 2500 (17.3%) at 13 TeV, 241
+      classes without; split reads EE4 trained 0.182 [0.138,0.237], EE4 held-out 0.448 [0.277,0.854] (54 classes), PP4 trained
+      0.344, PP4 held-out 0.680. Searched docs/results.tex par:v4_mixture, plan, site decisions (default share, beam, e+e-,
+      ee-only, pp-only): no run separates the share by beam.'
+    measure: 'Per seed, per read (EE4 trained 115, EE4 held-out 54, PP4 trained 797, PP4 held-out 504): R = median over classes
+      of the class geometric-mean MSE ratio of log|M|^2 (mixture_ab.compare), for R_ee (e+e--only arm), R_pp (pp-only), R_full
+      (default25), each over the same-commit het control; best aggregate val_loss_no_reg after the sigma stage (D276). Rerun
+      spread R_0 = new control / old control (87ea24d0, 321a3de2) and new default25 / old (f0156d88, df858d33 with rereads
+      9538e607, ed96b552).'
+    check: 'On existing data R_full moves far outside the seed spread on all four reads: EE4 trained 0.182 (ln -1.70) vs seed
+      ratio 1.12, EE4 held-out 0.45 vs 1.14, PP4 trained 0.34 vs 1.14, PP4 held-out 0.68 vs 1.24 (arms_vs_het_control.json,
+      ee_gain_beams.json).'
+    fixed: 'Everything of arm v4_het_default25: scripts/job_catalog_v3_short.sh at one commit, width 8, 4264 steps, train_subsample
+      1e4 per class, eval_subsample 200, het loss + sigma stage, MUON_BEST HPs, reads H1-H7c, PP4, EE4; every class''s event
+      count (1e4); gpu_v100 only. Only the set of classes whose f_default is 0.25 differs (recipes catalog_v4_default25_eeonly_train.yaml,
+      _pponly_train.yaml). Run dirs <arm>_beams (SHORT_TAG=beams).'
+    control: v4_het_control (share 0) rerun at the same commit and GPU type; the full share v4_het_default25 likewise; old
+      runs only for the rerun spread R_0.
+    seeds: 42 and 43 for all four arms (8 jobs).
+    outcome: 's = max(max |ln R_0|, 0.1). E+E- OWN EVENTS: on EE4 trained |ln R_ee - ln R_full| <= s and ln R_pp > -s on both
+      seeds -> the gain is the e+e- default events themselves; pp data does not help e+e-. CROSS-BEAM: ln R_pp <= -2s on EE4
+      trained or held-out on both seeds -> pp data helps e+e-; next a joint-variable reading of which e+e- classes gain (shared
+      final states). EE4 held-out read the same way separates transfer from e+e- vs pp default events; PP4 read with roles
+      swapped; additivity R_full vs R_ee x R_pp reported. Otherwise UNRESOLVED with the numbers. Cost: 8 jobs x 1 V100, ~2.8
+      h work each (tools/short_wall.py without margin), limit 03:30, 22 GPU-h work / 28 at the limits; in memory, no cache
+      disk.'
+    fix_at: '2026-11-06T04:46:09+00:00'
+    fix: 'Check 5 (not a repeat, prior incomplete): the prior says ''no run separates the share by beam'' and omits the pure-default
+      bound arm of docs/results.tex par:v4_mixture (Table tab:v4_bound_shares, lines 3777-3800): FA-ccin2p3-afc96598 / d26f13aa,
+      re-read eval-only on EE4 as FA-ccin2p3-f8ec724f / 049b863e. That arm trains every hadronic tree class on its 13 TeV
+      MadEvent pp events only, with the e+e- classes sampled exactly as the control''s, i.e. it is the pp-only arm at share
+      1 under the MSE loss, and its EE4 read already answers part of D295: R = 1.216 [1.099, 1.355] over the MSE control (pp
+      default data made e+e- worse by a fifth; results.tex: ''a fifth above the control though its e+e- events are the control''s'').
+      Fix: name it in prior with its numbers, and state what the pp-only arm adds over it and why it matters (share 0.25 keeps
+      the catalog sampling on the hadronic classes, which the bound removed, so the bound confounds adding pp events with
+      removing catalog-sampled ones; het loss instead of MSE), and set the outcome''s expectation for R_pp on EE4 against
+      it (e.g. what a pp-only R_pp >= 1 on EE4 at 0.25 means next to the bound''s 1.216). The e+e--only arm has no prior run
+      (searched) and stands. Everything else checked and holds: one change (recipes catalog_v4_default25_eeonly/_pponly at
+      278ae072 differ from catalog_v4_default25_train.yaml only in which classes carry f_default 0.25: 115 + 797 = 912; the
+      job-script case block is shared with v4_het_default25; control and full share rerun at the same commit and GPU); measure
+      shown to move (ee_gain_beams.json: EE4 trained R 0.182 vs seed ratio 1.118, EE4 held-out 0.448 vs 1.137, PP4 trained
+      0.344 vs 1.140, PP4 held-out 0.680 vs 1.244); seeds 2 against rerun spread s about 0.094 (loader_control.json) with
+      thresholds s / 2s; outcomes stated both ways with UNRESOLVED; HETEROSC with sigma stage (D71, D276); same preprocessing
+      as the het control; no HP search (MUON_BEST for every arm, A/B step one); reads on default-sampled EE4/PP4 pools as
+      D227 asks; composed pools go to node-local TMPDIR as in the in-memory default25 reruns ae39ee5a / 75ad7b20 that completed,
+      no shared cache.'
+  - at: '2026-11-06T04:46:48+00:00'
+    question: 'Step 62 (d), D295: does the default share''s e+e- gain (EE4 R 0.18 on trained classes, 0.45 held-out) come
+      from the e+e- classes'' own default events (generated exactly as EE4''s test pools), or does 13 TeV pp default data
+      help e+e- events at all? Default share restricted to e+e- classes only and to pp classes only, against share 0 and the
+      full share 0.25.'
+    prior: '(1) The pure-default bound arm (results.tex par:v4_mixture, tab:v4_bound_shares; FA-ccin2p3-afc96598, d26f13aa,
+      EE4 rereads f8ec724f, 049b863e): every hadronic class on 13 TeV pp default events only, e+e- classes as in the control,
+      MSE loss: EE4 R = 1.216 [1.099, 1.355], pp default data made e+e- a fifth worse. It is a pp-only arm at share 1, but
+      it mixes ''pp default events added'' with ''catalog events removed'' on the hadronic classes and uses MSE, not het.
+      The pp-only arm here keeps the catalog sampling (share 0.25) under het, so it isolates whether pp default events added
+      alongside the catalog help e+e-; the e+e--only arm has no earlier run. (2) arms_vs_het_control.json / mixture_ab.py:
+      default25 vs het control R EE4 0.18, PP4 0.34. (3) ee_gain.py (step 43(2)): sqrt(s) density, forward/collinear/|M|^2
+      coverage and control level do not explain EE4''s ~2x larger gain (EE4 x0.56 [0.45,0.68] at fixed control MSE). (4) ee_gain_beams.json
+      @278ae072: default share = 115 e+e- classes x 2500 events (2.5% of 11.53M) from the same MadEvent setup as their EE4
+      test pools, 797 pp classes x 2500 (17.3%) at 13 TeV, 241 without; split reads EE4 trained 0.182 [0.138,0.237], EE4 held-out
+      0.448 [0.277,0.854] (54), PP4 trained 0.344, PP4 held-out 0.680. Searched results.tex (eeonly, ee-only, pponly, pp-only,
+      per/by beam, beam ablation, cross-beam, default share, pure-default, D295), plan, site decisions: no run restricts the
+      0.25 share by beam.'
+    measure: 'Per seed, per read (EE4 trained 115, EE4 held-out 54, PP4 trained 797, PP4 held-out 504): R = median over classes
+      of the class geometric-mean MSE ratio of log|M|^2 (mixture_ab.compare), for R_ee (e+e--only arm), R_pp (pp-only), R_full
+      (default25), each over the same-commit het control; best aggregate val_loss_no_reg after the sigma stage (D276). Rerun
+      spread R_0 = new control / old control (87ea24d0, 321a3de2) and new default25 / old (f0156d88, df858d33 with rereads
+      9538e607, ed96b552).'
+    check: 'On existing data R_full moves far outside the seed spread on all four reads: EE4 trained 0.182 (ln -1.70) vs seed
+      ratio 1.12, EE4 held-out 0.45 vs 1.14, PP4 trained 0.34 vs 1.14, PP4 held-out 0.68 vs 1.24 (arms_vs_het_control.json,
+      ee_gain_beams.json); the bound arm moved EE4 by 1.216 [1.099,1.355], so a beam-restricted share can move EE4 either
+      way.'
+    fixed: 'Everything of arm v4_het_default25: scripts/job_catalog_v3_short.sh at one commit, width 8, 4264 steps, train_subsample
+      1e4 per class, eval_subsample 200, het loss + sigma stage, MUON_BEST HPs, reads H1-H7c, PP4, EE4; every class''s event
+      count (1e4); gpu_v100 only. Only the set of classes whose f_default is 0.25 differs (recipes catalog_v4_default25_eeonly_train.yaml,
+      _pponly_train.yaml). Run dirs <arm>_tagbeams (SHORT_TAG=beams, b1301562).'
+    control: v4_het_control (share 0) rerun at the same commit and GPU type; the full share v4_het_default25 likewise; old
+      runs only for the rerun spread R_0; the bound arm (afc96598, d26f13aa) as the earlier pp-only reference at share 1 under
+      MSE.
+    seeds: 42 and 43 for all four arms (8 jobs).
+    outcome: 's = max(max |ln R_0|, 0.1). E+E- OWN EVENTS: on EE4 trained |ln R_ee - ln R_full| <= s and ln R_pp > -s on both
+      seeds -> the gain is the e+e- default events themselves; pp data does not help e+e-. Expectation from the bound arm
+      (pp default replacing catalog, EE4 1.216): R_pp on EE4 near 1 (|ln| <= s) means pp default events added alongside the
+      catalog are neutral for e+e- and the bound''s loss came from removing catalog events; R_pp >= 1 + clearly above s (ln
+      R_pp >= 2s) means pp default events themselves hurt e+e-, as in the bound. CROSS-BEAM: ln R_pp <= -2s on EE4 trained
+      or held-out on both seeds -> pp data helps e+e-, contrary to the bound; next a joint-variable reading of which e+e-
+      classes gain (shared final states). EE4 held-out read the same way separates transfer from e+e- vs pp default events;
+      PP4 read with roles swapped; additivity R_full vs R_ee x R_pp reported. Otherwise UNRESOLVED with the numbers. Cost:
+      8 jobs x 1 V100, ~2.8 h work each (tools/short_wall.py without margin), limit 03:30, 22 GPU-h work / 28 at the limits;
+      in memory, no cache disk.'
+    passed_at: '2026-11-06T04:47:31+00:00'
+    reviewer: 'Beam ablation of the 0.25 default share (e+e--only, pp-only vs het control and full share, 2 seeds, 8 jobs):
+      recipes at 278ae072 differ only in which classes carry f_default 0.25 (115 + 797 = 912), the run directory is the only
+      script change in b1301562, same commit/GPU/HPs/het loss with its sigma fit, default-sampled EE4/PP4 reads (D227); check
+      2: ee_gain_beams.json R_full EE4 trained 0.182 vs seed ratio 1.118, held-out 0.448 vs 1.137, PP4 0.344 vs 1.140 / 0.680
+      vs 1.244; check 3: rerun spread s about 0.094 (loader_control.json), thresholds s and 2s on both seeds; prior now names
+      the pure-default bound (afc96598/d26f13aa, EE4 1.216 [1.099,1.355], share 1 under MSE) and sets the R_pp expectation
+      against it; searched results.tex/plan/decisions for eeonly, ee-only, e+e--only, pponly, pp-only, pp only, per/by beam,
+      beam ablation, cross-beam, default share, pure-default, D295.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
@@ -9239,11 +9348,6 @@ entries:
       if:
       - 'tests pass: merge after repo-reviewer, switch the default'
       - 'tests fail: fix before any memmap run'
-    38:
-      feeds: closing the loader question
-      if:
-      - 'figure made: finding recorded, superseded'
-      - 'data missing: re-read from the four runs'
     39:
       feeds: tooling defects found while sending the long runs
       if:
@@ -9278,9 +9382,9 @@ entries:
     agent: a8dc83fd21c2d8d4f
     state: working
     since: '2026-11-06T04:32:00+00:00'
-    state_at: '2026-11-06T04:37:17+00:00'
-    context: 93397
-    context_at: '2026-11-06T04:36:06+00:00'
+    state_at: '2026-11-06T04:50:19+00:00'
+    context: 139489
+    context_at: '2026-11-06T04:49:05+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
@@ -10590,6 +10694,68 @@ entries:
       median |log10 ratio| 0.031) over 6 decades. Both far below the 1.39 gap (full-set w8 over 1e4 per process). Superseded
       by (e): the full-set w8 gap was a run under one epoch (D293), so the loader question is closed; the per-seed UNRESOLVED
       read (seed 43 held 0.897) is within the pooled interval.'
+  - at: '2026-11-06T04:42:13+00:00'
+    text: '(d) step 62 default share per beam (ee_gain.py beams @278ae072 on branch wt-ee-beams -> data/ee_gain_beams.json;
+      recipes only, plus MIX_HET reads): the share-0.25 recipe gives a default source to 912 of 1153 training classes: 115
+      e+e- classes (dsh_ entries reusing the ee4_ pools: MadEvent e+e- at fixed collider energies 91.19/240/365/500/1000/3000
+      GeV, 3-6 energies per class past threshold) and 797 hadronic (13 TeV pp, reusing pp13v4_ 466 / pp13_ 331); 241 without
+      (one-loop, heavy-quark, alpha_s, cut-point). Under the short arms'' 1e4 subsample: 2500 default events per class, e+e-
+      287,500 (2.5% of all 11.53M training events), pp 1,992,500 (17.3%). All 115 e+e- classes'' default events come from
+      the same generator setup as their own EE4 test pool (cards, model, energies, process string; distinct iseeds): the default
+      share is not pp data for e+e-, it is EE4''s own test measure per trained e+e- class. R default25/het control (mixture_ab.compare,
+      seeds'' gmean, class medians): EE4 trained 0.182 [0.138,0.237] (115 classes, all below 1), EE4 held out 0.448 [0.277,0.854]
+      (54, 78% below 1; none of their own default events), PP4 trained 0.344 [0.283,0.420] (797), PP4 held out 0.680 [0.506,0.893]
+      (504). Open: whether the held-out e+e- gain comes from the other e+e- classes'' default events or from the pp ones;
+      the beam ablation (eeonly/pponly recipes, 278ae072) separates them.'
+  - at: '2026-11-06T04:42:35+00:00'
+    text: '(e) 2026-11-06 epochs of the width/length study points (analysis/catalog_v4/epoch_count.py count @cf9f20c3 -> data/study_epochs.json
+      @0da56903; epochs = steps / batches per epoch, batches from each run''s ''Starting to train ... with B batches'' line;
+      the whole catalog_v4 default25 training set is 6707 batches of 16384): the six 1x width cells (w8 804a65bc/66e8c31f,
+      w16 493c98db/7288b3fe, w32 e26059bf/fd7fc137; par:v4_width, par:v4_mult_width_length) ran 4264 steps = 0.636 epoch,
+      all under one epoch; every 4x sweep trial (17056 steps) 2.54 epochs, every 16x trial (68224) 10.17 epochs. So the width
+      axis of par:v4_width and the x1 point of the length axis compare models that never saw a third of their training set
+      against ones that saw it 2.5-10 times. Redo design drafted: width x length map at >= 1 epoch, widths 8/16/32 x 4264
+      x {2,4,8,16} steps (2x = 8528 = 1.27 epochs, the smallest of the study''s doubling schedule at >= 1 epoch), seeds 42/43,
+      every cell at trial_1262''s HPs (best of both long sweeps) with lr ~ steps^-0.55 from its two measured lrs; 22 new V100
+      jobs, 449 GPU-h (data/scaling_grid_plan.json; the redo of the six under-one-epoch points alone, the 2x row, 39.0 GPU-h);
+      job-script switch LONG_HP=1262 + LONG_FACTOR 2/8 on branch scaling-grid @68feafed (worktrees/wt-scaling-grid), not yet
+      reviewed or merged.'
+  - at: '2026-11-06T04:45:27+00:00'
+    text: '(a) 2026-11-06 step 58 built, not yet checked on MadGraph: branch flat-quota (worktrees/wt-flat-quota, e9a2eccd
+      + 9641850c, pushed, not merged: repo-reviewer not yet run). The flat part, when a recipe sets sampling.flat_range (absent
+      from every built pool, so their recipe ids and draws are unchanged), is n_flat events spread evenly over 0.25-dex bins
+      of log|M|^2 across the class''s pp range (recipes/catalog_v4_flat_range.json from tools/flat_range.py: pp_support_reads''
+      natural-log |M|^2 min/max over the PP4 probe''s 1.2e4 events, +-0.5 dex; 1301 hadronic classes, median width 10.0 dex);
+      candidates (multichannel proposals) drawn in rounds of oversample/2 x n_flat, each round''s sqrt(s) proposal and channel
+      shares weighted by the bins'' deficit/count (an empty bin''s deficit to the nearest occupied bin, out-of-range candidates
+      steering the edge bins), until every bin holds its quota or FLAT_BUDGET=50 candidates per flat event; then exactly the
+      quota per bin kept, shortfall water-filled over bins with spare. Tests tests/test_flat_quota.py 6 cases pass (.venv-cpu),
+      test_multichannel 5 pass. Check prepared: multichannel_check.py policy quota (scripts/job_multichannel_check.sh MCHECK_POLICIES=multichannel+quota
+      MCHECK_SEED=42/43, 5 classes x 2 seeds = 10 CPU jobs), figure analysis/catalog_v4/fig_flat_quota.py; needs a passed
+      design before submission.'
+  - at: '2026-11-06T04:51:03+00:00'
+    text: '(e) correction to the 2026-11-06 (e) finding: the lr exponent 0.55 of the drafted width x length map is NOT a measurement
+      from trial_1262''s two lrs. Both long sweeps'' lr windows were centred by tools/lr_surface_center.py with the fixed
+      slope -0.55 (prin:invU, HPO rule 2; centres 2.633e-3 at 17056, 1.228e-3 at 68224) and trial_1262 sits at the same normalized
+      position (0.9955, the window top) in both, so 7.82114e-3/3.649139e-3 = 4^0.55 by construction; that lr is censored at
+      the window top and not converged, so each cell''s lr is a lower bound on its optimum. Fixed on branch scaling-grid (11f6ddad
+      job script, 456b5233 epoch_count.py; LONG_FACTOR 1 refused under LONG_HP; short_wall.py --width with the measured per-width
+      V100 rates 31f0196d). CC-IN2P3 gpu QoS MaxWall 7-00:00:00 (sacctmgr, read 2026-11-06), so the 42-84 h cells fit without
+      a split.'
+  - at: '2026-11-06T04:51:09+00:00'
+    text: '(c) 2026-11-06 step 61 diagnosis (het_sign_diag.py pull/read over step 56''s job logs -> analysis/catalog_v4/data/het_sign_diag.json;
+      tool in the scratchpad until the repo-reviewer backlog gate clears, then committed): the het sign head is underweighted,
+      not failing to transfer. (1) The het loss''s main-block pre-clip gradient norm is 65-84x the MSE control''s (median
+      24-28 vs 0.315-0.369; seed geometric mean 75x), and the clip at 5 bounds 98.8-99.2% of het steps vs 5.5-6.0% of MSE
+      steps; adding the sign head does not move the het norm (arm 24.0-28.0 vs het magnitude reference 24.5-27.0), so at sign_loss_weight
+      1 the sign cross-entropy, whose per-event gradient is the same under both losses, is ~1/75 of the MSE control''s share
+      of the trunk gradient (an estimate: assumes the sign term a small part of both norms). (2) The het sign is worse in
+      distribution by the same factor as held out: wrong-sign arm/MSE on the 63 signed training pools'' validation 2.0x at
+      the median (1.0% vs 0.5%), 1.39x on the worst pool (13.4% vs 9.6%); held out H5 1.99x, HD5 1.41x. ''Fits the training
+      signs at 0.99'' hid that the MSE control fits them at 0.995. Fix implemented: training.sign_het_match (each event''s
+      sign BCE times the het NLL''s detached factor on its mu gradient, sigma^(2 beta)/(2 sigma^2), so the per-event sign:magnitude
+      gradient ratio is the MSE loss''s), commit 0e8bf38b on branch het-sign-weight (worktrees/wt-het-sign), test_het_sign_head
+      6 passed; not merged (repo-reviewer pending).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
@@ -10906,9 +11072,6 @@ entries:
       woke nothing). Look up (claude-code-guide, low effort) whether Claude Code offers a setting or hook to suppress or absorb
       a task-notification; try a Stop-hook route that holds the main turn''s end a few seconds when an agent handed back this
       turn and its notification has not arrived; test on the recorded double wakes (main_turns.py) and on a live agent end.'
-    16: 'After the repo-reviewer PASS on the current backlog: commit item 4 (tools/plan.py ask_matches, .claude/hooks/plan_check.py,
-      tests/test_plan_ask_matches.py; worker a9eb06278af98e7df) and remove the two dead keys in config/amplitudes.yaml (optimizer,
-      clip_grad_norm; same effective values, only key order changes: worker a7d5d29cd7e9d0753).'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -11143,11 +11306,6 @@ entries:
       if:
       - 'a route removes the second wake: keep it, re-measure after a day'
       - 'none works: say which were tried, with evidence'
-    16:
-      feeds: the repeated-question check fix and config hygiene Joaquin was told about on 2026-11-06
-      if:
-      - 'committed: drop this step'
-      - 'review FIX: apply the fixes first'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
@@ -11158,14 +11316,13 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '15': a day of live use of the registered notification hook (d2f7686d, 2026-11-04 ~22:00), then re-measure double wakes
       with main_turns.py
-    '16': the repo-reviewer a450d4efce9259486's verdict on the current code backlog
   owner:
     agent: a9eb06278af98e7df
-    state: working
+    state: stopped
     since: '2026-11-06T04:32:06+00:00'
-    state_at: '2026-11-06T04:38:20+00:00'
-    context: 91094
-    context_at: '2026-11-06T04:35:23+00:00'
+    state_at: '2026-11-06T04:44:51.071000+00:00'
+    context: 102078
+    context_at: '2026-11-06T04:44:55+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
@@ -11947,10 +12104,18 @@ entries:
   title: 'Two-loop amplitude datasets: what it takes'
   question: What does generating two-loop amplitude datasets for the catalog require (theory, tools, feasible processes, cost),
     so Joaquin can decide whether and how to do it?
-  status: waiting_user
-  quotes: []
+  status: held
+  quotes:
+  - said_at: '2026-11-06T04:43:07.642000+00:00'
+    text: I didn't have time to read what you sent about it, so not yet, I'll bring it back when I do. No need to keep asking.
+      You can periodically remind me it's there in case I forget, but you don't have to bring it up on every message
+    decision: D299
+    answers_after: '2026-11-06T04:41:59+00:00'
+    covers:
+    - two_loop
   decisions:
   - D266
+  - D299
   next: Joaquin reads the two-loop explainer and calls go/tier and the label scheme
   done_when: null
   notes_ref: null
@@ -11977,12 +12142,25 @@ entries:
       which ask for the explainer'
     blocks: nothing
     blocks_steps: []
+    answered_at: '2026-11-06T04:43:07.642000+00:00'
+    decision: D299
   - ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
       form factors, checked against published NNLO coefficients); (2) label scheme: Catani remainder or MS-bar hard function,
       and should one-loop pools get a remainder label too?'
     at: '2026-11-05T00:28:20+00:00'
     searched: D265/D266 opened the entry; no decision settles go, tier or scheme
     holds_all: the entry's only next step is Joaquin's call
+    answered_at: '2026-11-06T04:43:07.642000+00:00'
+    decision: D299
+  - ask: should we start on two-loop amplitudes? The suggested first step is e+e- -> q qbar and t tbar from closed-form form
+      factors, checked against published NNLO coefficients.
+    at: '2026-11-06T04:41:59+00:00'
+    searched: no decision on two-loop scope in site decisions; the label scheme is a method choice, the owner's under CLAUDE.md:24
+    blocks: the two_loop entry's first step
+    blocks_steps:
+    - 1
+    answered_at: '2026-11-06T04:43:07.642000+00:00'
+    decision: D299
   owner:
     agent: afe065cc8cddf65c1
     state: stopped
@@ -12009,12 +12187,7 @@ entries:
       - 'go on the calibration tier: design a two-loop pipeline for ee->qq and ee->tt from closed-form form factors, certified
         against published NNLO coefficients'
       - 'no go: close the entry with the explainer as its result'
-  ask: 'Two-loop: (1) go or no-go on a first step, and if go which tier (suggested: e+e- -> q qbar and t tbar from closed-form
-    form factors, checked against published NNLO coefficients); (2) label scheme: Catani remainder or MS-bar hard function,
-    and should one-loop pools get a remainder label too?'
-  waiting_since: '2026-11-05T00:28:20+00:00'
-  searched: D265/D266 opened the entry; no decision settles go, tier or scheme
-  holds_all: the entry's only next step is Joaquin's call
+  hold_decision: D299
 - id: warm_start
   title: Warm start from a pretrained model against pretraining from scratch, for a new change
   question: When a change to the setup is good and allows it, does warm-starting from an existing pretrained model with a
@@ -12134,8 +12307,8 @@ entries:
     state: working
     since: '2026-11-06T04:32:03+00:00'
     state_at: '2026-11-06T04:32:03+00:00'
-    context: 146803
-    context_at: '2026-11-06T04:38:16+00:00'
+    context: 226661
+    context_at: '2026-11-06T04:49:10+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
@@ -13016,6 +13189,153 @@ entries:
       seed, ft offshell in key, no steps or heads), 44.5 GB vs 88 GB free on /sps/lpnhe, shared key confirmed from first jobs''
       logs; het loss, B''s preprocessing, C1''s reads; no sweep; 13.1 GPU-h. Searched results.tex, plan.yaml, site decisions
       for grow, widen, hypercloning, net2, function-preserving, width growth: none.'
+  - at: '2026-11-06T04:42:30+00:00'
+    question: 'D291 step (b): tuned toward the held-out reads instead of the het NLL, does the k=533 (1/8) warm start of the
+      data change C1 (share 0.25) beat the untuned restarted schedule and approach scratch B, and does the winning recipe
+      carry to the width growth 8->16 at k=533? Tuning: single-fidelity DyHPO ws_c1_k533_mse_wsd_hpo12 over hpo8''s fine-tune
+      space plus the schedule (cosine or WSD with a (1-sqrt) cooldown fraction), objective and checkpoint selection the validation
+      MSE of the mean (training.heterosc_select=mu_mse).'
+    prior: 'par:v4_warm_start (C1 untuned, R(W533/B) PP4 1.33 EE4 1.51 SHORT; k=1066 MATCH by 1.35; k=2132 equal). par:v4_warm_start_tuned
+      (D284 hpo8 on val_loss_no_reg NLL: best hp_1860 lr_scale 0.174; reads WORSE than untuned, R(Wt/Wu) PP4 1.19 [1.01,1.39],
+      EE4 1.40 [1.20,1.67]; R(Wt/B) PP4 1.59 EE4 2.21). Step (a) on hpo8''s logged curves (analysis/catalog_v4/data/ws_hpo8/trial_curves.json,
+      ws_het_split.py fetch @b9a3aed2): the mean''s val MSE at the best checkpoint ranks the trials nearly opposite to the
+      NLL: lr_scale 0.174/0.332/0.36/0.383/0.873/1.28/2.22/6.67 -> NLL -2.758/-2.750/-2.749/-2.742/-2.712/-2.699/-2.546/-2.396,
+      MSE 0.0349/0.0364/0.0373/0.0296/0.0279/0.0289/0.0257/0.0278 (the NLL''s best is the MSE''s worst); sweep trials ran
+      with no sigma stage, so the NLL at 533 steps carries sigma calibration. The exact W/S split is the GPU reread of step
+      (a) (scripts/job_ws_het_split.sh), run beside. D289: pre-decay checkpoints no better. D285: growth untuned SHORT, R
+      PP4 1.75 at k=533. Literature: WSD (Hu et al. 2024 arXiv:2404.06395; Haegele et al. 2024 arXiv:2405.18392: 10-20% (1-sqrt)
+      cooldown matches or beats cosine); re-warming to a higher lr adapts more (Gupta et al. 2023 arXiv:2308.04014). Searched
+      results.tex, plan, site decisions for mu_mse objective / WSD / cooldown on warm starts: none beyond these.'
+    measure: 'As C1 (mixture_ab.py warm, new entries C1m for the tuned data change and C10wm for the tuned growth): each run''s
+      final model after its own sigma stage (D276); zero-shot MSE of log|M|^2 per probe on PP4 and EE4 (all classes), with
+      the held-out default- and catalog-sampled pooled reads beside; R(W/B) and R(W/W_untuned) = median over classes of the
+      class geometric mean of the probes'' two-seed geometric mean ratios, 95% class bootstrap widened by the pair''s |ln
+      R_seed|; g = ln(A/W)/ln(A/B). Sweep side: each trial''s val MSE of mu at its best checkpoint (the objective), with the
+      NLL beside.'
+    check: 'The reads move with the warm start''s tuning at fixed k: tuned (NLL, lr 0.174) over untuned (lr 1) R PP4 1.19
+      [1.01,1.39], EE4 1.40 [1.20,1.67] (warm_start_C1t.json). The proposed objective moves the same way as those reads on
+      existing data: val MSE of mu, tuned trial hp_1860 0.0349 (seed 42, same config as the tuned confirmation) against the
+      untuned k=533 lower (its log''s ''MSE (prepd) val combined'' 0.0275 at seed 42, 0.0329 at seed 43, an event-pooled aggregate,
+      approximate; the matched number is the reread''s untuned row), while the NLL moved the other way (-2.758 vs -2.639).
+      Not checked: whether in-distribution val MSE ranks warm starts the way PP4/EE4 do beyond these two points; the confirmation
+      reads decide.'
+    fixed: 'C1''s warm arm (runs/catalog_v4_short/v4_het_warm25_k533 config: het control''s best mean-stage model as parent,
+      target_stats parent, catalog_v4_default25_train, 1e4 train / 200 val per pool in memory, width 8, MuonAdamW, batch 16384,
+      HETEROSC, seed 42 in the sweep), k=533. Sweep: hpo8''s space (lr_scale [0.1,10] log with range extension, layer_decay
+      [0.75,1], muon_weight_decay, reg, warmup [0.01,0.2], eta_min, EMA, EMA decay) plus training.scheduler {CosineAnnealingLR,
+      WSD} and wsd_cooldown_frac [0.1,0.5]; heterosc_select mu_mse; sigma stage off and evaluate off in trials; 12 trials
+      waves [4,4,4]. Confirmation: the best trial''s HPs as the arm v4_het_warm25m_k533[_seed2] (scripts/job_catalog_v3_short.sh,
+      the full job: sigma stage, all reads), seeds 42/43. Growth: the same HPs applied to the width-growth k=533 arm (D285
+      step 4 setup: v4_het_default25 with LONG_HEADS=16 LONG_CKPT LONG_MEMMAP GROW_K=533, the w8 parent at its seed, whole
+      training set memmap), seeds 42/43.'
+    control: Untuned W533 (FA-ccin2p3-341bf564, 254abf4f) and the NLL-tuned W533 (56cca07a, 75d28cb4) for the data change;
+      scratch B (share 0.25 het default25 pair) as the target; for growth the untuned grown k=533 (e046ac67, f35b6a78) and
+      w16 from scratch (493c98db, 7288b3fe). No matched same-config continuation (D286).
+    seeds: 'Sweep seed 42 (as hpo8); confirmation and growth at seeds 42 and 43, each from the parent at its seed; seed spread
+      carried in the widening (C1''s unpaired 15-18% PP4). Cost: reread 0.5 GPU-h; sweep 12 x 0.45 h = 5.4 (hpo8''s measured
+      21 min + data load, limit 47 min); confirmation 2 x 1.7 h (C1t''s runs at the same k) = 3.4; growth 2 x 1.86 h (step
+      4''s k=533 rate) = 3.7; total 13.0 GPU-h on CC-IN2P3.'
+    outcome: 'Data change, fixed before the read: BETTER when the widened upper end of R(Wm/W_untuned) is below 1 on PP4 or
+      EE4 and above neither''s 1.05; MATCH (to scratch) when the widened upper end of R(Wm/B) <= 1.35 on both (C1''s bar).
+      BETTER or MATCH: the mu_mse-tuned recipe (with its schedule) is the tuned recipe for C2-C8 and the growth; NOT BETTER:
+      the untuned restarted schedule stays the recipe for C2-C8, reported with the sweep''s MSE surface; the val-MSE objective
+      is then ruled out as a proxy for the reads. Growth: BETTER than the untuned grown k=533 by the same rule, MATCH to w16
+      scratch by its (A/B)^0.3=1.19 bar; NOT BETTER: the transferred HPs do not carry and a growth-own sweep (same space,
+      same objective, on the growth setup) is the next step. A trial or run that blows up is listed apart.'
+    fix_at: '2026-11-06T04:45:47+00:00'
+    fix: 'Check 5 (not a repeat, prior incomplete): the prior says ''none beyond these'' for a mu_mse objective, but docs/results.tex
+      already has two studies of picking a het run''s checkpoint on the validation mu MSE instead of the NLL: D85 (24 cells
+      2->3/2->4, lines ~9161-9172: mu-MSE pick lower than NLL pick in 23 of 24, median ratio 0.81 / 0.90) and D89 (147 2->2
+      cells, ~9182-9195: inside one run the choice barely matters at 2->2, median 1.00; run-to-run factor ~2), and many tp3_*
+      het fine-tune sweeps already use training.heterosc_select=mu_mse as their DyHPO objective (e.g. sweep/sweep_config_tp3_hp58fte_ee_ttbar_d6_het.yaml).
+      D62 (''training.heterosc_select defaults to nll'') and D298 (Joaquin: checking a different objective is the owner''s
+      to do) also bear on it. Fix: name these in prior with their results and say how this design differs (a warm start after
+      a data change, judged on held-out zero-shot reads, not single-process fine-tunes judged on test |Delta|). Check 13 (HPO
+      layout): 12 trials in waves [4,4,4] against the sibling sweeps'' 8 trials, 3 start-up, waves [3,3,2] (the direct sibling
+      ws_c1_k533_hpo8 and the cov_v4_long_hpo sweeps; the rest 6), with no words of Joaquin''s asking for more; two added
+      dimensions are not his call for a larger budget. Fix: 8 trials, n_startup 3, waves [3,3,2], or quote his words for 12;
+      and state when the sweep finishes (3 waves x ~0.45 h plus queue) and when the confirmation and growth runs finish. Also
+      to state before resubmission (checks 1 and 14, hold otherwise): the confirmation arm v4_het_warm25m_k533[_seed2] and
+      the growth arm must carry the winning trial''s training.scheduler, wsd_cooldown_frac and training.heterosc_select=mu_mse
+      (the arm is not yet in scripts/job_catalog_v3_short.sh in wt-ws-tune); and the growth runs'' disk: two memmap caches
+      of ~23 GB (keys deda9310, 04fb3b3d, deleted after step 4) against /sps/lpnhe free 132 GB read 2026-11-06. Checks passed:
+      2 (trial_curves.json confirmed: val MSE of mu 0.0349 at lr_scale 0.174 vs 0.0257 at 2.22, NLL ranks opposite; reads
+      moved with tuning R PP4 1.19 [1.01,1.39]); 3 (two seeds, widened by |ln R_seed|, resolved a 1.19 effect before); 4,
+      6, 7 (D284 lr in the space, D291), 8, 9 (HETEROSC), 10, 11, 12 hold.'
+  - at: '2026-11-06T04:47:46+00:00'
+    question: 'D291 step (b): tuned toward the held-out reads instead of the het NLL, does the k=533 (1/8) warm start of the
+      data change C1 (share 0.25) beat the untuned restarted schedule and approach scratch B, and does the winning recipe
+      carry to the width growth 8->16 at k=533? Tuning: single-fidelity DyHPO ws_c1_k533_mse_wsd_hpo8 over hpo8''s fine-tune
+      space plus the schedule (cosine or WSD with a (1-sqrt) cooldown fraction), objective and checkpoint selection the validation
+      MSE of the mean (training.heterosc_select=mu_mse, an intentional check under D298; D62''s nll stays the default).'
+    prior: 'par:v4_warm_start (C1 untuned, R(W533/B) PP4 1.33 EE4 1.51 SHORT; k=1066 MATCH by 1.35; k=2132 equal). par:v4_warm_start_tuned
+      (D284 hpo8 on val_loss_no_reg NLL: best hp_1860 lr_scale 0.174; reads WORSE than untuned, R(Wt/Wu) PP4 1.19 [1.01,1.39],
+      EE4 1.40 [1.20,1.67]; R(Wt/B) PP4 1.59 EE4 2.21). Step (a) on hpo8''s logged curves (analysis/catalog_v4/data/ws_hpo8/trial_curves.json,
+      ws_het_split.py fetch @b9a3aed2): val MSE of mu at the best checkpoint ranks the trials nearly opposite to the NLL:
+      lr_scale 0.174/0.332/0.36/0.383/0.873/1.28/2.22/6.67 -> NLL -2.758/-2.750/-2.749/-2.742/-2.712/-2.699/-2.546/-2.396,
+      MSE 0.0349/0.0364/0.0373/0.0296/0.0279/0.0289/0.0257/0.0278; trials ran with no sigma stage. Exact W/S split: the step
+      (a) GPU reread, run beside. mu-MSE selection before, docs/results.tex: D85 (24 single-process het fine-tune cells at
+      2->3/2->4, same HPs/data/seeds, checkpoint on val mu MSE instead of NLL: lower mu error in 23 of 24, median ratio 0.81
+      at 2->3, 0.90 at 2->4; the NLL pick costs 16% in mu) and D89 (147 2->2 cells: inside one run the choice barely matters,
+      median 1.00, run-to-run factor about 2); the tp3_*_het single-process fine-tune sweeps already use heterosc_select=mu_mse
+      as their DyHPO objective (e.g. sweep/sweep_config_tp3_hp58fte_ee_ttbar_d6_het.yaml). D62: nll is the default selection;
+      D298 (2026-11-06): checking a different objective is the owner''s. What differs here: a 1153-process warm start after
+      a data change, the objective chosen across HP trials (not only the checkpoint inside one run), judged on held-out zero-shot
+      reads (PP4/EE4), not single-process test |Delta|. D289: pre-decay checkpoints no better. D285: growth untuned SHORT,
+      R PP4 1.75 at k=533. Literature: WSD (Hu et al. 2024 arXiv:2404.06395; Haegele et al. 2024 arXiv:2405.18392, 10-20%
+      (1-sqrt) cooldown matches or beats cosine); re-warming to a higher lr adapts more (Gupta et al. 2023 arXiv:2308.04014).
+      Searched results.tex, plan, site decisions (mu_mse, heterosc_select, wsd, cooldown, re-warm, warm start objective).'
+    measure: 'As C1 (mixture_ab.py warm, new entries C1m for the tuned data change and C10wm for the tuned growth): each run''s
+      final model after its own sigma stage (D276); zero-shot MSE of log|M|^2 per probe on PP4 and EE4 (all classes), with
+      the held-out default- and catalog-sampled pooled reads beside; R(W/B) and R(W/W_untuned) = median over classes of the
+      class geometric mean of the probes'' two-seed geometric mean ratios, 95% class bootstrap widened by the pair''s |ln
+      R_seed|; g = ln(A/W)/ln(A/B). Sweep side: each trial''s val MSE of mu at its best checkpoint (the objective), with the
+      NLL beside; wherever reported, the best is said to be selected on val mu MSE, never set beside hpo8''s NLL best without
+      saying so.'
+    check: 'The reads move with the warm start''s tuning at fixed k: tuned (NLL, lr 0.174) over untuned (lr 1) R PP4 1.19
+      [1.01,1.39], EE4 1.40 [1.20,1.67] (warm_start_C1t.json). The proposed objective moves the same way as those reads on
+      existing data: val MSE of mu, tuned trial hp_1860 0.0349 (seed 42, same config as the tuned confirmation) against the
+      untuned k=533 lower (its log''s ''MSE (prepd) val combined'' 0.0275 at seed 42, 0.0329 at seed 43, an event-pooled aggregate,
+      approximate; the matched number is the reread''s untuned row), while the NLL moved the other way (-2.758 vs -2.639).
+      Not checked: whether in-distribution val MSE ranks warm starts the way PP4/EE4 do beyond these two points; the confirmation
+      reads decide.'
+    fixed: 'C1''s warm arm (runs/catalog_v4_short/v4_het_warm25_k533 config: het control''s best mean-stage model as parent,
+      target_stats parent, catalog_v4_default25_train, 1e4 train / 200 val per pool in memory, width 8, MuonAdamW, batch 16384,
+      HETEROSC, seed 42 in the sweep), k=533. Sweep (sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml): hpo8''s space
+      (lr_scale [0.1,10] log with range extension, layer_decay [0.75,1], muon_weight_decay, reg, warmup [0.01,0.2], eta_min,
+      EMA, EMA decay) plus training.scheduler {CosineAnnealingLR, WSD} and wsd_cooldown_frac [0.1,0.5] (dead in cosine trials);
+      heterosc_select mu_mse; sigma stage off and evaluate off in trials; 8 trials, 3 start-up, waves [3,3,2], as its sibling
+      hpo8. Confirmation: new arm v4_het_warm25m_k533[_seed2] in scripts/job_catalog_v3_short.sh, added once the sweep ends,
+      carrying the best trial''s searched HPs including training.scheduler, wsd_cooldown_frac and training.heterosc_select=mu_mse
+      (the full job: sigma stage selecting on nll, all reads), seeds 42/43. Growth: the same HPs (scheduler, cooldown, mu_mse
+      included) on the width-growth k=533 setup (D285 step 4: v4_het_default25 with LONG_HEADS=16 LONG_CKPT LONG_MEMMAP GROW_K=533,
+      the w8 parent at its seed, whole training set memmap, mem 46G), seeds 42/43; the two memmap caches (one per seed, about
+      23 GB each, deleted after step 4) are rebuilt: 46 GB + 4 runs x 0.5 GB against 132 GB free on /sps/lpnhe (read 2026-11-06),
+      deleted after the reads.'
+    control: Untuned W533 (FA-ccin2p3-341bf564, 254abf4f) and the NLL-tuned W533 (56cca07a, 75d28cb4) for the data change;
+      scratch B (share 0.25 het default25 pair) as the target; for growth the untuned grown k=533 (e046ac67, f35b6a78) and
+      w16 from scratch (493c98db, 7288b3fe). No matched same-config continuation (D286).
+    seeds: 'Sweep seed 42 (as hpo8); confirmation and growth at seeds 42 and 43, each from the parent at its seed; seed spread
+      carried in the widening (C1''s unpaired 15-18% PP4). Cost: reread 0.5 GPU-h; sweep 8 x 0.45 h = 3.6 (hpo8''s measured
+      21 min + data load, limit 47 min); confirmation 2 x 1.7 h = 3.4; growth 2 x 1.86 h (step 4''s k=533) = 3.7; total 11.2
+      GPU-h on CC-IN2P3. Timeline: the sweep ends about 1.5 h after submission (3 waves x 0.45 h, queue as hpo8''s: 02:45-03:00
+      for its 8); the confirmation and growth runs go together once it ends and finish about 2 h later (one wave of 4), so
+      about 3.5-4 h after the sweep''s submission.'
+    outcome: 'Data change, fixed before the read: BETTER when the widened upper end of R(Wm/W_untuned) is below 1 on PP4 or
+      EE4 and above neither''s 1.05; MATCH (to scratch) when the widened upper end of R(Wm/B) <= 1.35 on both (C1''s bar).
+      BETTER or MATCH: the mu_mse-tuned recipe (with its schedule) is the tuned recipe for C2-C8 and the growth; NOT BETTER:
+      the untuned restarted schedule stays the recipe for C2-C8, reported with the sweep''s MSE surface; the val-MSE objective
+      is then ruled out as a proxy for the reads. Growth: BETTER than the untuned grown k=533 by the same rule, MATCH to w16
+      scratch by its (A/B)^0.3=1.19 bar; NOT BETTER: the transferred HPs do not carry and a growth-own sweep (same space,
+      same objective, on the growth setup) is the next step. A trial or run that blows up is listed apart.'
+    passed_at: '2026-11-06T04:48:22+00:00'
+    reviewer: 'Round 2: prior now names D85/D89 mu-MSE selection (0.81/0.90 at 2->3/2->4; 1.00 at 2->2), the tp3 het mu_mse
+      sweeps, D62, D298; sweep at ws-tune e2b650ed is 8 trials, 3 start-up, waves [3,3,2] as hpo8; confirmation and growth
+      arms carry scheduler, cooldown, mu_mse; disk 46 GB caches vs 132 GB free on /sps/lpnhe; timeline ~3.5-4 h; cost 11.2
+      GPU-h. Check 2: trial_curves.json val MSE of mu 0.0349 at lr_scale 0.174 vs 0.0257 at 2.22, NLL ranks opposite; reads
+      moved with tuning R(tuned/untuned) PP4 1.19 [1.01,1.39], EE4 1.40 [1.20,1.67]. Check 3: seeds 42/43 widened by |ln R_seed|,
+      the same reads resolved 1.19 before. Check 5 terms: wsd, cooldown, mu_mse, heterosc_select, warm start, re-warm, selects
+      on, objective in results.tex, decisions, entry evidence.'
   step_why:
     5:
       feeds: why the val_loss_no_reg-tuned k=533 warm start went to low lr and lost on the held-out reads (D284 step 3)

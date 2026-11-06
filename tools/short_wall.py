@@ -34,6 +34,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # kept; the jobs took 198 and 218 s against the 10 min the former 0.68 s and 1 min per axis planned (2.8x)
 S_ITER, S_PROBE, STARTUP_MIN, AXIS_MIN, MARGIN = 1.01, 0.40, 15.0, 0.4, 1.25
 SIGMA_STAGE_MIN = 20.0
+# S_ITER_WIDTH: --width <num_heads> (the long cells, LONG_HEADS): s per step of the whole catalog_v4 default25 set on one
+# V100 at that muP width, main block with its validations, the slower seed kept: 'Finished training' hours over 4264
+# iterations of the 1x width cells (analysis/catalog_v4/data/size_mse.json; w8 804a65bc/66e8c31f 1.1603/1.1643 h,
+# w16 493c98db/7288b3fe 2.0175/2.0037 h, w32 e26059bf/fd7fc137 4.0862/4.044 h; the rates epoch_count.py grid uses).
+# Without --width the short arms' S_ITER (width 8, 1e4 per process, in memory) stays.
+S_ITER_WIDTH = {8: 0.983, 16: 1.703, 32: 3.450}
 STARTUP_EVAL_MIN, S_PROBE_HET = 1.5, 1.45
 # S_COMPOSE: was 6.1 s per entry (serial compose, login node, 2026-10-31); the parallel compose now in run.py's load
 # took 170.3 + 19.8 + 19.7 s for the 912 default-share entries' train, val and test pools on 5 CPUs of a V100 node
@@ -97,7 +103,7 @@ def parse_limit(s):
     return int(d) * 24 + parts[0] + parts[1] / 60 + parts[2] / 3600
 
 
-def plan(train, cat, axes, eval_only=False, iters=None, sigma_stage=False, eval_stage=False):
+def plan(train, cat, axes, eval_only=False, iters=None, sigma_stage=False, eval_stage=False, width=None):
     """sigma_stage: a het arm (its sigma-only stage when it trains, the het per-probe rate in its reads).
     eval_stage: an eval job that first runs a trained run's sigma-only stage (the job script's v4_het_long_best): the
     training set loaded and composed as a training job's (STARTUP_MIN, S_COMPOSE), a memmap cache build in case the
@@ -106,7 +112,10 @@ def plan(train, cat, axes, eval_only=False, iters=None, sigma_stage=False, eval_
     it = 0 if eval_only else (iters if iters is not None else iterations(train))
     s_probe = S_PROBE_HET if sigma_stage else S_PROBE
     startup = STARTUP_MIN if eval_stage or not eval_only else STARTUP_EVAL_MIN
-    minutes = startup + it * S_ITER / 60 + sum(probes.values()) * s_probe / 60 + AXIS_MIN * len(axes)
+    if width is not None and width not in S_ITER_WIDTH:
+        raise SystemExit(f"short_wall: no measured step rate at width {width} (have {sorted(S_ITER_WIDTH)})")
+    s_iter = S_ITER_WIDTH[width] if width is not None else S_ITER
+    minutes = startup + it * s_iter / 60 + sum(probes.values()) * s_probe / 60 + AXIS_MIN * len(axes)
     if sigma_stage and (eval_stage or not eval_only):
         minutes += SIGMA_STAGE_MIN
     if eval_stage:
@@ -117,7 +126,7 @@ def plan(train, cat, axes, eval_only=False, iters=None, sigma_stage=False, eval_
     whole_min = math.ceil(hours * 60 / 15) * 15
     return {"hours": round(hours, 2), "slurm_time": f"{whole_min // 60:02d}:{whole_min % 60:02d}:00",
             "iterations": it, "composed_at_load": n_comp, "probes": probes, "n_probes": sum(probes.values()),
-            "rates": {"s_per_step": S_ITER, "s_per_probe": s_probe, "startup_min": startup, "margin": MARGIN, "s_per_composed_entry": S_COMPOSE,
+            "rates": {"s_per_step": s_iter, "width": width, "s_per_probe": s_probe, "startup_min": startup, "margin": MARGIN, "s_per_composed_entry": S_COMPOSE,
                       "sigma_stage_min": SIGMA_STAGE_MIN if sigma_stage and (eval_stage or not eval_only) else 0.0,
                       "cache_build_min": CACHE_BUILD_MIN if eval_stage else 0.0}}
 
@@ -133,9 +142,10 @@ def main(argv=None):
                     help="a HETEROSC arm: its sigma-only stage after training, and the het per-probe read rate")
     ap.add_argument("--eval-stage", action="store_true",
                     help="with --eval: the job first runs a trained run's sigma-only stage on its training set")
+    ap.add_argument("--width", type=int, help="the long cells' muP width (LONG_HEADS): its measured V100 step rate")
     ap.add_argument("--limit", help="the job's time limit (squeue %%l): exit 1 when below the plan")
     a = ap.parse_args(argv)
-    out = plan(a.train, a.cat, a.axes, a.eval, a.iters, a.sigma_stage, a.eval_stage)
+    out = plan(a.train, a.cat, a.axes, a.eval, a.iters, a.sigma_stage, a.eval_stage, a.width)
     if a.limit:
         out["limit_hours"] = round(parse_limit(a.limit), 2)
         out["ok"] = out["limit_hours"] >= out["hours"]
