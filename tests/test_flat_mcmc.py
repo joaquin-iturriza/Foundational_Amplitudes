@@ -1,12 +1,15 @@
 """The Markov-chain flat part (mg5_pipeline_final._flat_mcmc_part, sampling.flat_mcmc): the pair move keeps every
 mass, the pair's mass, the other finals and the total momentum; on a toy |M|^2 with a collinear and a soft-like pole
-the chains fill the flat quota where one round of the same proposal's candidates leaves the top bins short."""
+the chains, at the same label budget as the quota sampler, fill more of the quota without near-copies of one state
+(analysis/catalog_v4/flat_diversity.py: no more than 2% of kept events have another within 1% in every invariant)."""
 import os, sys
 
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import mg5_pipeline_final as mg  # noqa: E402
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "analysis", "catalog_v4"))
+import flat_diversity as fd  # noqa: E402
 
 M = [0.0, 0.0, 0.0, 0.0]
 PDG = [2, -2, 21, 21, 1, -1]
@@ -47,14 +50,18 @@ def fill(mcmc, budget, seed=3, n_flat=2000):
                   else mg._flat_quota_part(n_flat, 50.0, 3000.0, uni, True, M, PDG, rng, None, _pol(budget, False),
                                            toy_label, 0.0, None))
     d = mg.FLAT_LAST
-    return float(np.minimum(d["kept_per_bin"], d["quota"]).sum() / d["quota"].sum()), int(d["n_candidates"])
+    F = fd.features(d["kept_P"], d["kept_sq"])
+    pb = fd.per_bin(F, fd.bins_of(d["logm"][d["keep"]], d["edges"]), d["kept_chain"], len(d["quota"]))
+    dup = sum(x.get("dup", 0.0) * x["n"] for x in pb) / max(sum(x["n"] for x in pb), 1)
+    return float(np.minimum(d["kept_per_bin"], d["quota"]).sum() / d["quota"].sum()), int(d["n_labels"]), dup
 
 
 def test_mcmc_fills_toy():
-    f_q, n_q = fill(False, 12)
-    f_m, n_m = fill(True, 12)
-    print("quota budget 12", f_q, n_q, "| mcmc budget 12", f_m, n_m)
+    f_q, n_q, dup_q = fill(False, 12)
+    f_m, n_m, dup_m = fill(True, 12)
+    print("quota budget 12", f_q, n_q, dup_q, "| mcmc budget 12", f_m, n_m, dup_m)
     assert n_m <= 12 * 2000
+    assert dup_m <= 0.02
     assert f_m > f_q
 
 

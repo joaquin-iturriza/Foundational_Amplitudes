@@ -73,7 +73,10 @@ SEEDS = (42, 43)
 # re-check), the third the same at a 10x candidate budget (step 65)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
-                  "mcmc_both_res2_budget12")
+                  "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12")
+# the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
+# independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
+DIVERSITY_REF = "quota_ladder_both_res2"
 ROLE = "train"
 # the step-57 classes (the pp_support worst list, 2026-11-04, and the shape study's class) and their PP4 probes
 CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
@@ -172,6 +175,8 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
     import datagen
     import mg5_pipeline_final as mg
     import mix_compose as mc
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import flat_diversity as fdv
     p = _entry(name)
     lo, hi = map(float, p["sqrts"]); n = int(p["n_" + ROLE])
     cfg0 = mc.control_config(name)
@@ -188,6 +193,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
         sel.append((np.asarray(logm, float) / np.log(10.0), np.asarray(keep)))
         return keep
     datagen_ok = False
+    flat_kept = {}            # policy_seed -> (features, shape vars, bin, chain, edges log10) of the kept flat events
     for policy in policies:
         cfg = dict(cfg0); s = dict(cfg.get("sampling") or {})
         if policy in ("multichannel",) + QUOTA_POLICIES:
@@ -199,11 +205,14 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
             s.update(mc_mperi=True, mc_mperi_edge=True, mc_res2=True)
-        if policy == "mcmc_both_res2_budget12":
-            # D317 (<= 2x the old cost): the flat part from Wang-Landau Markov chains (sampling.flat_mcmc), the first
-            # round from both ladders' channels; at most 12 labels per flat event: 0.65 + 0.35 x 12 = 4.85 labels per
-            # pool event against the old 0.65 + 0.35 x 6 = 2.75, 1.76x
-            s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, flat_mcmc=True, flat_budget=12)
+        if policy in ("mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12"):
+            # plan catalog_coverage step 69 (cost bound: CLAUDE.md's 2x margin on a new method's cost; D317 refused the
+            # quota sampler's ~100x): at most 12 labels per flat event, 0.65 + 0.35 x 12 = 4.85 labels per pool event
+            # against the old 0.65 + 0.35 x 6 = 2.75 (1.76x); the flat part from Wang-Landau Markov chains
+            # (sampling.flat_mcmc), its first round from both ladders' channels, or the quota sampler at the same budget
+            s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, flat_budget=12)
+            if policy.startswith("mcmc"):
+                s.update(flat_mcmc=True)
         if policy.startswith("quota_ladder_both_res2"):   # step 67: both ladders as two channels
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True)
         if policy == "quota_ladder_both_res2_fwdfree_budget750":
@@ -223,7 +232,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(flat_budget=500)
         cfg["sampling"] = s
         for seed in seeds:
-            sel.clear(); diag = []; secs = []; qd = []
+            sel.clear(); diag = []; secs = []; qd = []; kept_ev = []
             with mc._Swap(name, cfg):
                 if not datagen_ok:
                     datagen.ensure_backend(name); datagen_ok = True
@@ -243,10 +252,17 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                        "quota": np.asarray(d["quota"]).tolist(),
                                        "kept_per_bin": np.asarray(d["kept_per_bin"]).tolist(),
                                        "rounds": d["rounds"], "n_candidates": int(d["n_candidates"]),
+                                       "n_labels": int(d.get("n_labels", d["n_candidates"])),
+                                       "n_labels_charged": int(d.get("n_labels_charged", d.get("n_labels", d["n_candidates"]))),
                                        "budget_hit": bool(d["budget_hit"]), "stop": d["stop"],
-                                       "kept_per_channel": np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])],
-                                                                       minlength=len(d["channels"])).tolist(),
-                                       "channels": d["channels"]})
+                                       "kept_per_channel": (np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])],
+                                                                        minlength=len(d["channels"])).tolist()
+                                                            if d.get("channels") is not None else None),
+                                       "channels": d["channels"], "mcmc": d.get("mcmc")})
+                            if d.get("kept_P") is not None:
+                                kept_ev.append((d["kept_P"], d["kept_sq"], d["kept_chain"],
+                                                fdv.bins_of(np.asarray(d["logm"])[np.asarray(d["keep"])], d["edges"]),
+                                                np.asarray(d["edges"]) / np.log(10.0)))
                         elif policy == "multichannel":
                             d = mg.MC_LAST
                             kc = np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])], minlength=len(d["channels"]))
@@ -258,8 +274,14 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                     mg._flat_logm_select = fs
             lm = np.concatenate([a for a, _ in sel]); kept = np.concatenate([a[k] for a, k in sel])
             fin = np.isfinite(lm)
+            if kept_ev:
+                Pk = np.concatenate([x[0] for x in kept_ev]); sqk = np.concatenate([x[1] for x in kept_ev])
+                flat_kept[f"{policy}_{seed}"] = (fdv.features(Pk, sqk), fdv.shape_vars(Pk, sqk),
+                                                 np.concatenate([x[3] for x in kept_ev]),
+                                                 np.concatenate([x[2] for x in kept_ev]), kept_ev[0][4])
             out["runs"][f"{policy}_{seed}"] = {
                 "n_chunks": len(tasks), "n_candidates": int(len(lm)), "n_kept": int(len(kept)),
+                "n_labels_flat": int(sum(q["n_labels"] for q in qd)) if qd else None,
                 "kept_min": float(np.nanmin(kept)), "kept_max": float(np.nanmax(kept)),
                 "cand_max": float(np.nanmax(lm[fin])),
                 "hist_kept": np.histogram(np.clip(kept, LOGM_BINS[0], LOGM_BINS[-1] - 1e-9), LOGM_BINS)[0].tolist(),
@@ -269,6 +291,15 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                 "seconds": float(sum(secs))}
             print(f"MCHECK {name} {policy} seed {seed}: {len(lm)} candidates, {len(kept)} kept, max "
                   f"{np.nanmax(kept):.3f}", flush=True)
+    for key, (F, V, b, ch, e10) in flat_kept.items():
+        nb = len(e10) - 1
+        r = out["runs"][key]
+        r["diversity"] = {"edges_log10": e10.tolist(), "per_bin": fdv.per_bin(F, b, ch, nb),
+                          "distinct_sqrts": int(len(np.unique(F[:, -1]))), "n": int(len(F))}
+        ref = f"{DIVERSITY_REF}_{key.rsplit('_', 1)[1]}"
+        if ref in flat_kept and ref != key and len(flat_kept[ref][4]) == len(e10):
+            Fr, Vr, br = flat_kept[ref][:3]
+            r["diversity"]["vs_ref"] = {"ref": ref, "per_bin": fdv.compare(F, V, b, Fr, Vr, br, nb)}
     src = {k: _pp(v, cfg0, lo, hi, f"{probe} {k}") for k, v in pp_sources(name, probe).items()}
     if src["table"] is None:
         raise SystemExit(f"{probe}: no train/test pool")
@@ -676,6 +707,106 @@ print("MCHECK_READ " + open(os.path.join(os.environ["SCRATCH"], "zz_mcheck", sys
 '''
 
 
+# step 69's read (plan catalog_coverage, design of 2026-11-07): the Markov-chain flat part at 12 labels per flat event
+# against the quota sampler at the same budget and at 50 (the diversity reference), same class, seed, job and commit
+STEP69 = {"mcmc12": "mcmc_both_res2_budget12", "quota12": "quota_ladder_both_res2_budget12",
+          "quota50": "quota_ladder_both_res2"}
+STEP69_TAG = "current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+mcmc_both_res2_budget12"
+DIV_DUP_EXCESS = 0.02    # near-duplicate share (weighted over in-range bins) above the reference's, at most
+DIV_DUP_TOP = 0.05       # near-duplicate share in any of the top 40% of in-range bins, at most
+DIV_NN_MED = 0.8         # median over in-range bins of the NN-distance ratio against the reference at equal count, at least
+DIV_NN_Q10 = 0.5         # its 10% quantile over in-range bins, at least
+COST_MAX = 2.0           # train-pool replay seconds over the old generation-log seconds (CLAUDE.md's 2x margin)
+
+
+def step69():
+    """data/multichannel_check_reads/<class>_<STEP69_TAG>_<seed>.json -> data/mcmc_check.json: per class, seed and
+    step-69 policy the fill per in-range quota bin (sum over chunks of min(kept, quota) / sum of quota; in range when
+    the bin's lower edge <= the class's pp in-support max, tools/flat_range.py), held-out pp events in support outside
+    the kept range, cost (train replay s over the old generation-log s, data/sampling_cost.json, and over the old
+    sampling's replay in the same job), labels per flat event, and the flat part's diversity over in-range bins
+    (flat_diversity.py); then the design's verdict:
+    YES = on every class and seed the chains fill every in-range bin >= 0.95, held-out outside kept <= max(0, step 67's
+    budget-750 count), cost <= COST_MAX, and diversity holds (near-duplicates <= reference + DIV_DUP_EXCESS, <= DIV_DUP_TOP
+    in each top-40% in-range bin, NN ratio median >= DIV_NN_MED and q10 >= DIV_NN_Q10);
+    QUOTA12 = the quota sampler at 12 meets the same fill, held-out and cost rules on every class and seed (chains not
+    needed); NO = the chains' diversity fails on a class, or their share of in-range bins >= 0.95 is not above the quota
+    sampler's at 12 on the 2->4 classes on both seeds; COST = fill and diversity as YES but cost > COST_MAX on a class
+    (the chains' overhead, not their labels: fix it and re-run); PARTIAL = otherwise with diversity holding and the
+    chains' share above the quota sampler's at 12 (where read of the short bins, one revision)"""
+    from tools.flat_range import ranges, MARGIN_DEX
+    rg = ranges()
+    cost = json.load(open(os.path.join(DATA, "sampling_cost.json")))["test_classes"]
+    cov = json.load(open(os.path.join(DATA, "quota_coverage.json")))["classes"]
+    out = {"source": "analysis/catalog_v4/multichannel_check.py step69", "rules": {
+        "dup_excess": DIV_DUP_EXCESS, "dup_top": DIV_DUP_TOP, "nn_med": DIV_NN_MED, "nn_q10": DIV_NN_Q10,
+        "cost_max": COST_MAX}, "classes": {}}
+    for c in CLASSES:
+        pp_max = rg[c][1] / np.log(10.0) - MARGIN_DEX
+        h750 = (cov.get(c, {}).get("policies", {}).get("both750") or {}).get("heldout_outside_kept")
+        o = {"pp_in_support_max_log10": pp_max, "heldout_750": h750, "seeds": {}}
+        for s in SEEDS:
+            f = os.path.join(READS, f"{c}_{STEP69_TAG}_{s}.json")
+            if not os.path.exists(f):
+                continue
+            R = json.load(open(f))["runs"]
+            cur = R[f"current_{s}"]["seconds"]
+            o["seeds"][s] = {}
+            for k, pol in STEP69.items():
+                r = R[f"{pol}_{s}"]
+                qc = r["quota_chunks"]
+                e = np.asarray(qc[0]["edges_log10"]); lo_e = e[:-1]
+                q = np.sum([x["quota"] for x in qc], 0); kp = np.sum([np.minimum(x["kept_per_bin"], x["quota"]) for x in qc], 0)
+                fill = kp / np.maximum(q, 1)
+                inr = lo_e <= pp_max
+                n_flat = int(q.sum())
+                row = {"fill_in_range": fill[inr].round(4).tolist(), "lo_in_range": lo_e[inr].round(3).tolist(),
+                       "every_bin_ge95": bool((fill[inr] >= 0.95).all()), "share_ge95": float((fill[inr] >= 0.95).mean()),
+                       "bins_short_lo": lo_e[inr & (fill < 0.95)].round(3).tolist(),
+                       "heldout_outside_kept": r["sources"]["heldout"]["n_in_support_outside_kept"],
+                       "cost_vs_old_log": r["seconds"] / cost[c]["old_train_s"], "cost_vs_current_same_job": r["seconds"] / cur,
+                       "labels_per_flat": sum(x["n_labels"] for x in qc) / max(n_flat, 1),
+                       "mcmc": [x.get("mcmc") for x in qc[:1]]}
+                dv = r.get("diversity")
+                if dv:
+                    pb = [x for x, ok in zip(dv["per_bin"], inr) if ok and "dup" in x]
+                    n = np.array([x["n"] for x in pb], float); dup = np.array([x["dup"] for x in pb])
+                    top = pb[int(0.6 * len(pb)):]
+                    row["dup"] = float((n * dup).sum() / max(n.sum(), 1))
+                    row["dup_top_max"] = float(max((x["dup"] for x in top), default=0.0))
+                    row["distinct_sqrts_share"] = dv["distinct_sqrts"] / max(dv["n"], 1)
+                    row["top_source_share_med"] = float(np.median([x["top_source_share"] for x in pb])) if pb else None
+                    vr = [x for x, ok in zip((dv.get("vs_ref") or {}).get("per_bin", []), inr) if ok and "nn_ratio" in x]
+                    if vr:
+                        rr = np.array([x["nn_ratio"] for x in vr])
+                        row.update(nn_ratio_med=float(np.median(rr)), nn_ratio_q10=float(np.quantile(rr, 0.1)),
+                                   ks_med={v: float(np.median([x[v] for x in vr])) for v in ("ks_sqrts", "ks_mpair", "ks_maxeta")})
+                o["seeds"][s][k] = row
+        out["classes"][c] = o
+    def ok_fill(row, c):
+        h = out["classes"][c]["heldout_750"]
+        hmax = max([0] + [x for x in (h or []) if x is not None])
+        return row["every_bin_ge95"] and row["heldout_outside_kept"] <= hmax
+    rows = [(c, s, d) for c, o in out["classes"].items() for s, d in o["seeds"].items()]
+    if not rows or any(len(o["seeds"]) < len(SEEDS) for o in out["classes"].values()):
+        out["verdict"] = None
+    else:
+        def div_ok(m, ref):
+            return (m["dup"] <= ref["dup"] + DIV_DUP_EXCESS and m["dup_top_max"] <= DIV_DUP_TOP and
+                    m.get("nn_ratio_med", 0) >= DIV_NN_MED and m.get("nn_ratio_q10", 0) >= DIV_NN_Q10)
+        div = all(div_ok(d["mcmc12"], d["quota50"]) for _, _, d in rows)
+        fill = all(ok_fill(d["mcmc12"], c) for c, _, d in rows)
+        cheap = all(d["mcmc12"]["cost_vs_old_log"] <= COST_MAX for _, _, d in rows)
+        q12 = all(ok_fill(d["quota12"], c) and d["quota12"]["cost_vs_old_log"] <= COST_MAX for c, _, d in rows)
+        above = all(d["mcmc12"]["share_ge95"] > d["quota12"]["share_ge95"] for c, _, d in rows
+                    if c not in ("v4_uux_epemg",))
+        out["checks"] = {"diversity": div, "fill": fill, "cost": cheap, "quota12_suffices": q12, "above_quota12": above}
+        out["verdict"] = ("QUOTA12" if q12 else "NO" if not div or not above else "YES" if fill and cheap
+                          else "COST" if fill else "PARTIAL")
+    json.dump(out, open(os.path.join(DATA, "mcmc_check.json"), "w"), indent=1)
+    print("STEP69", out.get("verdict"), out.get("checks"))
+
+
 def pull(policies=None, classes=None, seeds=SEEDS):
     """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
@@ -700,6 +831,8 @@ if __name__ == "__main__":
         # pull [<policies> [<class> <seed,seed,...>]]: extra seeds of one class (plan step 67)
         pull(sys.argv[2] if len(sys.argv) > 2 else None, *(([sys.argv[3]], tuple(int(x) for x in sys.argv[4].split(",")))
                                                           if len(sys.argv) > 4 else ()))
+    elif sys.argv[1] == "step69":
+        step69()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
