@@ -10349,6 +10349,35 @@ entries:
       fails while isronlyll works, use isronlyll there, recorded as a gap. COST: an ISR run''s s per kept event > 2x the no-ISR
       run''s at the same energy -> where the time goes (survey/refine, kept fraction) before the regeneration design. 10 CPU
       jobs x 2 cores x <= 0.5 h, ~10 core-h at most, no GPU.'
+    fix_at: '2026-11-06T23:35:17+00:00'
+    fix: 'Design reviewer FIX on step 71 (e+e- collider anchor probe). (1) Measure does not respond in part (check 2): the
+      design measures the kept fraction after the catalog''s e+e- acceptance in the partonic frame (kept, below/above window,
+      cuts) and the cost as s per kept event, but tools/lhe_probe.py accept_of (l.64-77, at 4354b762) returns None for any
+      name not starting with dsh_, so for ee4_epem_bbxvevex kept() returns only {kept: 1.0}: no window, no partonic-frame
+      cuts, and s per kept event = s per returned event in both arms. The one thing ISR changes in the acceptance (the longitudinal
+      boost moves events across the partonic-frame |cos theta|<0.99 cut and below the class''s 20 GeV window) is invisible,
+      and the COST outcome compares a number blind to it. Fix: probe the default-share pool of the same class (dsh_epem_bbxvevex,
+      which accept_of maps to its parent''s window and v4 e+e- cuts), or give ee4_ runs their parent class''s acceptance in
+      accept_of; show on one existing dsh e+e- probe or pool read that the fields come out (kept, below_window, cuts_partonic,
+      cuts_partonic_not_lab). (2) The YES outcome cannot see a wrong spectrum (checks 2 and 4): ''share of sqrt(s_hat)/sqrt(s)
+      below 0.99 > 0 at every energy'' is met by ISR alone, so a beamstrahlung grid that MadGraph silently does not apply
+      (pdlabel not propagated to pdlabel1/pdlabel2, fallback to isronlyll) reads WORKS, and the beamstrahlung half of the
+      question (fcce240ll, fcce365ll, ilc500ll, clic3000ll) goes unchecked; the ''check'' field argues by construction with
+      no number. Fix, cheap (CPU minutes): (a) read lpp1, lpp2, pdlabel (and pdlabel1/pdlabel2 if present) back from each
+      run''s banner (the as-run card) and require them equal to EE_ANCHOR''s; (b) at 240, 365, 500 and 3000 GeV add an isronlyll
+      run at the same energy, class and seed as a control for the beamstrahlung, YES there only if the machine spectrum''s
+      share below 0.99 (and its q10 lower) exceeds isronlyll''s by more than the binomial spread (+-0.02 at 1000 events),
+      NO otherwise (grid not in effect or negligible: recorded as such); (c) state before the run the expected isronlyll share
+      from the LL density in arXiv:2108.10261 eq. 45-48 (beta = 2 alpha/pi (ln(Q^2/m_e^2)-1), about 0.11 at 91 GeV and 0.14
+      at 3 TeV, luminosity share below 0.99 of order 0.4-0.6 before cross-section weighting) so a share far outside it is
+      a finding, not a pass. Checks that hold: matched control in the same job (lpp 0, pdlabel none, same node, commit, class,
+      energy, seed); seeds: one per run, binomial +-0.016 at 1000 events, enough for a spectrum-shape check; prior: searched
+      results.tex and the entry for ISR, beamstrahlung, isronly, lpp, pdlabel, radiative return, beam spectrum, lepton/electron
+      pdf, collider energ, shat_frac (only the unrelated transfer-study ISR arm, results.tex l.12731, and this entry''s 2026-11-07
+      groundwork finding), no repeat; scope matches next step 71 and D318/D320; lpp sign (+3 electron, -3 positron) matches
+      the paper''s run-card section; sqrt(s_hat) from the LHE incoming momenta (read_lhe_pp keeps lab-frame incoming partons,
+      invariant mass frame-free) is right; cost about 10 core-h, MadEvent work dirs node-local and deleted; no training, loss,
+      preprocessing or sweep involved.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
