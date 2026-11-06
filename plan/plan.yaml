@@ -3728,10 +3728,9 @@ entries:
     60: 'Worktrees left after merge (remove_worktree.sh refused by the permission classifier for agents): worktrees/wt-ws-ckpt,
       wt-ws-grow (warm_start) and wt-multichannel; Joaquin was given the commands 2026-11-05; remove once he allows or runs
       them.'
-    61: 'Step 56 result to Joaquin (finding 2026-11-05, het_signhead.json @6ec06b24): het + sign head is NO-SIGN (worse wrong-sign
-      than the MSE control on H5 17/21, HD5 15/19; not better than all-positive) though it fits the training signs (0.99);
-      magnitude UNRESOLVED (pairing failed, R ~1.03 [0.64,1.56]). Waiting on his call: keep the het magnitude target without
-      a sign, change the sign loss weight or how the sign head is attached, or use the MSE model for the sign'
+    61: '(c) Sign head under het (D287, D296): find why the het sign head fits the training signs (0.99) but transfers worse
+      zero-shot than the MSE control (H5 17/21, HD5 15/19 worse); test the candidate causes (sign-loss weight, sign head on
+      the het trunk gradient vs detached, attachment point), fix and rerun under the step-56 reads.'
     62: 'Step 43 results to Joaquin (findings 2026-11-05): (1) loader control UNRESOLVED by its rule only on one value (seed-43
       held-default memmap/rerun 0.897, |ln| 0.109 vs the 0.094 rerun-spread bound); PP4 R_L 1.059/0.981 against the 1.39 gap;
       his call whether that unblocks the warm_start whole-set change on this point. (2) e+e- larger default-share gain: ordered
@@ -9264,10 +9263,10 @@ entries:
       - 'removed: drop this step'
       - 'still refused: keep it listed for Joaquin'
     61:
-      feeds: whether the het pretraining carries a usable sign on the sign-changing one-loop pools (D287)
+      feeds: whether het pretraining carries a usable sign on the one-loop pools
       if:
-      - 'Joaquin picks a change: design it under the same reads'
-      - 'Joaquin drops the sign under het: note it in results.tex with this read'
+      - 'a variant is no worse than the MSE control''s sign: adopt it, write up'
+      - 'none is: report the cause found with numbers'
     62:
       feeds: whether the loading path is ruled out as the cause of the full-set w8 gap (warm_start waits on it)
       if:
