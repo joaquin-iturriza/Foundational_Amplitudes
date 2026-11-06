@@ -14383,7 +14383,7 @@ entries:
     agent: ada9f5a0be83f8559
     state: stopped
     since: '2026-11-06T22:56:00+00:00'
-    state_at: '2026-11-06T23:18:42.300000+00:00'
+    state_at: '2026-11-06T23:26:08+00:00'
     context: 190823
     context_at: '2026-11-06T23:06:29+00:00'
   designs:
