@@ -7,6 +7,8 @@ on the validation MSE of the mean (hp_1333: lr_scale 1.85, WSD cooldown 0.164) a
   --growth       C10wm (D285): the width growth 8->16 heads (GROW_HP=1333, 31359864 / bfed460f) against the same growth
                  with the default restart (e046ac67 / f35b6a78), width 8 from scratch (the parent, A) and width 16
                  from scratch (B) -> figs/ws_c10wm_{a,b,c}
+  --growth-zs    C10wz (step 11): the same growth at the zero-shot-objective sweep's best trial (hp 1860,
+                 4442e786 / 3fae7799) beside the default and MSE-tuned growths, A and B -> figs/ws_c10wz_{a,b,c}
 (a) validation loss of the main stage (het NLL, arithmetic mean over processes, share-0.25 validation) against the
     restart's step, seed 42, warm starts only (A and B validate on other data or target stats; the legend names every
     arm of b and c);
@@ -32,11 +34,17 @@ FIGS = {"ws_c1m": ([("pretrained start", WARM["C1"]["A"], False),
         "ws_c10wm": ([("width 8, scratch", WARM["C10wm"]["A"], False),
                       ("width 16, scratch", WARM["C10wm"]["B"], False),
                       ("grown 8$\\to$16, default lr", WARM["C10wm"]["ref"]["untuned"], True),
-                      ("grown 8$\\to$16, MSE-tuned", WARM["C10wm"]["W"][533], True)], -1.0)}
+                      ("grown 8$\\to$16, MSE-tuned", WARM["C10wm"]["W"][533], True)], -1.0),
+        "ws_c10wz": ([("width 8, scratch", WARM["C10wz"]["A"], False),
+                      ("width 16, scratch", WARM["C10wz"]["B"], False),
+                      ("grown 8$\\to$16, default lr", WARM["C10wz"]["ref"]["default"], True),
+                      ("grown 8$\\to$16, MSE-tuned", WARM["C10wz"]["ref"]["mse_tuned"], True),
+                      ("grown 8$\\to$16, zero-shot-tuned", WARM["C10wz"]["W"][533], True)], -1.0)}
 
 
 def main():
-    name = "ws_c10wm" if "--growth" in sys.argv[1:] else "ws_c1m"
+    argv = sys.argv[1:]
+    name = "ws_c10wz" if "--growth-zs" in argv else "ws_c10wm" if "--growth" in argv else "ws_c1m"
     arms, ytop = FIGS[name]
     cls = class_of()
     figs = ps.panels(3)

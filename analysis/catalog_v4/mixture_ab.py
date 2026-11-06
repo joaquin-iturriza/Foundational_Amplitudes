@@ -1113,6 +1113,15 @@ WARM["C10wm"] = {"W": {533: ("FA-ccin2p3-31359864", "FA-ccin2p3-bfed460f")}, "C"
                  "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
                  "ref": {"untuned": WARM["C10w"]["W"][533]},
                  "design": "plan warm_start step 6 (D291, D285), design passed 2026-11-06T04:48"}
+# step 11 (D285, D291, design passed round 2 2026-11-06T10:54): the width growth w8 -> w16 at k=533 re-run at the best
+# trial of its zero-shot-objective sweep (ws_grow_k533_zeroshot_hpo8_rerun trial 1860, zero_shot_score 0.476 against
+# the default growth's 0.535), v4_het_default25[_seed2] with LONG_HEADS=16 LONG_CKPT LONG_MEMMAP GROW_K=533
+# GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun GROW_HP=1860 (scripts/job_catalog_v3_short.sh @6454ecda); BETTER when the
+# widened upper end of R(W/default growth) < 1 on PP4 or EE4 and above 1.05 on neither; B, A and the MATCH bar as C10wm
+WARM["C10wz"] = {"W": {533: ("FA-ccin2p3-4442e786", "FA-ccin2p3-3fae7799")}, "C": {},
+                 "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
+                 "ref": {"default": WARM["C10w"]["W"][533], "mse_tuned": WARM["C10wm"]["W"][533]},
+                 "design": "plan warm_start step 11 (D285, D291), design passed round 2 2026-11-06T10:54"}
 # step 8 (D303, design passed round 2 2026-11-06): the k=533 default restart with only the Muon groups' lr damped at
 # its start (x min(1, step/168), fine_tune.muon_warmup_steps=168, arm v4_het_warm25u_k533[_seed2],
 # scripts/job_catalog_v3_short.sh @dbb8daf0) against the same-data default restart of the fill test; B and A as C1;
