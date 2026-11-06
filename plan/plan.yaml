@@ -12822,6 +12822,7 @@ entries:
   match: warm_*,ws_*
   evidence:
     runs:
+    - FA-ccin2p3-0202ba7f
     - FA-ccin2p3-0259e865
     - FA-ccin2p3-04fc5b3b
     - FA-ccin2p3-0564ad5b
@@ -12836,12 +12837,14 @@ entries:
     - FA-ccin2p3-70c28bd9
     - FA-ccin2p3-75d28cb4
     - FA-ccin2p3-7a40c835
+    - FA-ccin2p3-7b2d6c24
     - FA-ccin2p3-8e41ac1e
     - FA-ccin2p3-93479cde
     - FA-ccin2p3-a6834028
     - FA-ccin2p3-a97e8083
     - FA-ccin2p3-aa64733e
     - FA-ccin2p3-af86de05
+    - FA-ccin2p3-b2c69c1a
     - FA-ccin2p3-c2acc1fc
     - FA-ccin2p3-c477a52c
     - FA-ccin2p3-c6d0c827
@@ -12849,8 +12852,9 @@ entries:
     - FA-ccin2p3-e046ac67
     - FA-ccin2p3-ed946736
     - FA-ccin2p3-f35b6a78
+    - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
-    commit: d811a452
+    commit: 117f19ca
     paths:
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
@@ -12859,6 +12863,7 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1ck3198.json
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
     - analysis/catalog_v4/data/warm_start_C1t.json
+    - analysis/catalog_v4/data/ws_hpo8/het_split.json
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
     - analysis/catalog_v4/data/ws_restart_steps.json
     - analysis/catalog_v4/mixture_ab.py
@@ -12866,10 +12871,12 @@ entries:
     - analysis/catalog_v4/plot_warm_start_compare.py
     - analysis/catalog_v4/ws_het_split.py
     - analysis/catalog_v4/ws_restart_steps.py
+    - base_experiment.py
     - models/grow_width.py
     - scripts/job_catalog_v3_short.sh
     - sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml
     - sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
+    - tests/test_moment_fill.py
     - tests/test_save_at_steps.py
   dead_ends: []
   asks:
