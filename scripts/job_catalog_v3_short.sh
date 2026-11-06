@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_signhead_matched_<event|const>[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -253,6 +253,23 @@ PY
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
                             COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=true
                                     ++training.sign_loss_weight=1.0 ++training.sign_near_weight=1.0 ++model.sign_pair_dim=0
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            ITERS_FIXED=4264
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
+    # the het sign head with its gradient share matched to the MSE control's (plan catalog_coverage step 61, D296):
+    # step 56's arm had the het loss's gradient at ~75x the MSE control's (pre-clip median norm, het_sign_diag.json),
+    # so at sign_loss_weight 1 the sign cross-entropy, the same per event under both losses, was a ~75x smaller share
+    # of the trunk's gradient. _event: each event's cross-entropy times the het NLL's own factor on its mu gradient,
+    # detached sigma^(2 beta)/(2 sigma^2) (training.sign_het_match); _const: sign_loss_weight 75, the seed geometric
+    # mean of the het/MSE median gradient-norm ratio. Everything else v4_het_control_signhead's, seeds 42-45
+    v4_het_signhead_matched_event|v4_het_signhead_matched_event_seed2|v4_het_signhead_matched_event_seed3|v4_het_signhead_matched_event_seed4|v4_het_signhead_matched_const|v4_het_signhead_matched_const_seed2|v4_het_signhead_matched_const_seed3|v4_het_signhead_matched_const_seed4)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" ++data.signed_magnitude_target=true)
+                            CROSS=(PP4 EE4 HD4 HD5); HET=1; SIGNHEAD=1
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
+                            case "$ARM" in *matched_event*) SW=(++training.sign_loss_weight=1.0 ++training.sign_het_match=true) ;;
+                                           *) SW=(++training.sign_loss_weight=75.0 ++training.sign_het_match=false) ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=true
+                                    "${SW[@]}" ++training.sign_near_weight=1.0 ++model.sign_pair_dim=0
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             ITERS_FIXED=4264
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
