@@ -12958,9 +12958,9 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: ac61c7e5ab7feddd5
-    state: working
+    state: stopped
     since: '2026-11-06T07:08:58+00:00'
-    state_at: '2026-11-06T08:13:38+00:00'
+    state_at: '2026-11-06T08:25:48+00:00'
     context: 224832
     context_at: '2026-11-06T08:25:45+00:00'
   designs:
