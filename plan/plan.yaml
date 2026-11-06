@@ -15552,8 +15552,7 @@ entries:
       FA-ccin2p3-0fae36f3 FA-ccin2p3-74bb21ec FA-ccin2p3-4c4a5069 FA-ccin2p3-9cab9b5b FA-ccin2p3-a6e4ee17 FA-ccin2p3-51a88ce9
       FA-ccin2p3-88551ced FA-ccin2p3-ddf740e1 FA-ccin2p3-75f1d8c6 FA-ccin2p3-040c3448 FA-ccin2p3-df7ec695 FA-ccin2p3-3794e155
       FA-ccin2p3-41729c67 FA-ccin2p3-e47ed26b FA-ccin2p3-1e847591 FA-ccin2p3-038f00fe
-    '11': step 10's 4 restart-test runs, launched by the supervisor at 11:20 UTC (FA/ws_c8k2132_step10); the growth sweep
-      goes out after their read
+    '11': step 10's reads (its 4 runs FA-ccin2p3-fbb16a33 cb458c82 5862b62e d15462b0); prebuild done
   handoff:
     state: 'Step 8 read and written up: damped-Muon restart NOT MUON (m -0.148/-0.059) and NOT BETTER (C1u R PP4 1.032 [0.866,1.228],
       EE4 1.045 [0.911,1.197]; mixture_ab.py warm C1u @c14a07b0; fig ws_muon_damped via plot_ws_fill.py --damped @e1b705f4;
