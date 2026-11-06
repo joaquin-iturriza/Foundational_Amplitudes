@@ -10214,12 +10214,10 @@ entries:
       - 'Joaquin accepts the margin at 750: design at 750'
       - 'Joaquin pays to fill the margin: design at ~3000 (estimate: 4x the 750 time on uu_bbxuu-like classes)'
   owner:
-    agent: a54e1f5a4af4118a3
-    state: stopped
-    since: '2026-11-06T18:46:13+00:00'
-    state_at: '2026-11-06T19:06:05+00:00'
-    context: 220360
-    context_at: '2026-11-06T19:39:04+00:00'
+    agent: a8e0ed3e3a9c9cd8a
+    state: working
+    since: '2026-11-06T19:56:06+00:00'
+    state_at: '2026-11-06T19:56:06+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
