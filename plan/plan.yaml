@@ -8819,6 +8819,40 @@ entries:
       s >= g/2 (prior rerun spread 25%, results.tex ~l.10546); outcomes CLEAR/IMPLICATED/NOISE-LIMITED/UNRESOLVED defined;
       disk ~2.3 GB x2 against 87 GB free; 15.3 GPU-h at the limits; het loss; searched results.tex memmap, memory-mapped,
       loading path, 1e4, events per process, site decisions memmap/in-memory: no prior run separates the keys.'
+  - at: '2026-11-06T04:43:31+00:00'
+    question: 'Step 62 (d), D295: does the default share''s e+e- gain (EE4 R 0.18 on trained classes, 0.45 held-out) come
+      from the e+e- classes'' own default events (generated exactly as EE4''s test pools), or does 13 TeV pp default data
+      help e+e- events at all? Default share restricted to e+e- classes only and to pp classes only, against share 0 and the
+      full share 0.25.'
+    prior: 'arms_vs_het_control.json / mixture_ab.py: default25 vs het control R EE4 0.18, PP4 0.34. ee_gain.py (step 43(2)):
+      sqrt(s) density, forward/collinear/|M|^2 coverage and control level do not explain EE4''s ~2x larger gain (EE4 x0.56
+      [0.45,0.68] at fixed control MSE). ee_gain_beams.json @278ae072: the default share is 115 e+e- classes x 2500 events
+      (2.5% of 11.53M) from the same MadEvent setup as their EE4 test pools, 797 pp classes x 2500 (17.3%) at 13 TeV, 241
+      classes without; split reads EE4 trained 0.182 [0.138,0.237], EE4 held-out 0.448 [0.277,0.854] (54 classes), PP4 trained
+      0.344, PP4 held-out 0.680. Searched docs/results.tex par:v4_mixture, plan, site decisions (default share, beam, e+e-,
+      ee-only, pp-only): no run separates the share by beam.'
+    measure: 'Per seed, per read (EE4 trained 115, EE4 held-out 54, PP4 trained 797, PP4 held-out 504): R = median over classes
+      of the class geometric-mean MSE ratio of log|M|^2 (mixture_ab.compare), for R_ee (e+e--only arm), R_pp (pp-only), R_full
+      (default25), each over the same-commit het control; best aggregate val_loss_no_reg after the sigma stage (D276). Rerun
+      spread R_0 = new control / old control (87ea24d0, 321a3de2) and new default25 / old (f0156d88, df858d33 with rereads
+      9538e607, ed96b552).'
+    check: 'On existing data R_full moves far outside the seed spread on all four reads: EE4 trained 0.182 (ln -1.70) vs seed
+      ratio 1.12, EE4 held-out 0.45 vs 1.14, PP4 trained 0.34 vs 1.14, PP4 held-out 0.68 vs 1.24 (arms_vs_het_control.json,
+      ee_gain_beams.json).'
+    fixed: 'Everything of arm v4_het_default25: scripts/job_catalog_v3_short.sh at one commit, width 8, 4264 steps, train_subsample
+      1e4 per class, eval_subsample 200, het loss + sigma stage, MUON_BEST HPs, reads H1-H7c, PP4, EE4; every class''s event
+      count (1e4); gpu_v100 only. Only the set of classes whose f_default is 0.25 differs (recipes catalog_v4_default25_eeonly_train.yaml,
+      _pponly_train.yaml). Run dirs <arm>_beams (SHORT_TAG=beams).'
+    control: v4_het_control (share 0) rerun at the same commit and GPU type; the full share v4_het_default25 likewise; old
+      runs only for the rerun spread R_0.
+    seeds: 42 and 43 for all four arms (8 jobs).
+    outcome: 's = max(max |ln R_0|, 0.1). E+E- OWN EVENTS: on EE4 trained |ln R_ee - ln R_full| <= s and ln R_pp > -s on both
+      seeds -> the gain is the e+e- default events themselves; pp data does not help e+e-. CROSS-BEAM: ln R_pp <= -2s on EE4
+      trained or held-out on both seeds -> pp data helps e+e-; next a joint-variable reading of which e+e- classes gain (shared
+      final states). EE4 held-out read the same way separates transfer from e+e- vs pp default events; PP4 read with roles
+      swapped; additivity R_full vs R_ee x R_pp reported. Otherwise UNRESOLVED with the numbers. Cost: 8 jobs x 1 V100, ~2.8
+      h work each (tools/short_wall.py without margin), limit 03:30, 22 GPU-h work / 28 at the limits; in memory, no cache
+      disk.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
