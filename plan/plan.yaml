@@ -14465,6 +14465,19 @@ entries:
       merge by step about 120 and end equal (-2.668 / -2.588 vs -2.662 / -2.585). (c, d) per-class zero-shot CDFs overlap:
       median class MSE pp 0.290 vs 0.288, e+e- 0.785 vs 0.740. Also: the CC login dry run of the growth prebuild timed out
       at 900 s (site run''s limit), so the clean-exit fix is still untested on the real arm.'
+  - at: '2026-11-06T08:15:56+00:00'
+    text: '2026-11-06 step 6 C1m read (D291, design passed 04:48; mixture_ab.py warm C1m @a7652956 -> data/warm_start_C1m.json;
+      figure plot_ws_c1m.py @a7652956 figs/ws_c1m_{a,b,c}): the k=533 warm start tuned on the val MSE of the mean (hp_1333,
+      lr_scale 1.85, WSD cooldown 0.164; FA-ccin2p3-4f9e0532/8cb6c7b5) is NOT BETTER than the untuned restart: R(mean-MSE-tuned/untuned)
+      PP4 1.054 [0.902, 1.235], EE4 1.005 [0.885, 1.159] (widened), held 1.039; SHORT of scratch with the change: R(W/B) PP4
+      1.419 [1.385, 1.460], EE4 1.576 [1.429, 1.755] (bar 1.35). Against the NLL-tuned restart it is better: PP4 0.891 [0.737,
+      1.073], EE4 0.715 [0.602, 0.883]. Per-class median MSE of log|M|^2 PP4 / EE4: pretrained start 0.489 / 1.676, scratch
+      0.207 / 0.344, untuned 0.285 / 0.770, NLL-tuned 0.355 / 0.935, mean-MSE-tuned 0.292 / 0.615. Validation NLL (s42, every
+      10 steps): mean-MSE-tuned -2.571 at 10, -0.442 at 20, stays -1.8..-1.9 in its WSD flat phase, ends -2.481 after the
+      cooldown (untuned peaks -1.926 at 30, ends -2.639; NLL-tuned never above -2.568, ends -2.756); s43 mean-MSE-tuned peaks
+      +0.634 at 20, ends -2.412 (untuned s43 spiked to 6.7e7 at step 200 and recovered, known). By the design''s rule: the
+      untuned restarted schedule stays the recipe for C2-C8; the val MSE of the mean is ruled out as a proxy objective for
+      the zero-shot reads (the 8-trial sweep''s best is at par with untuned). The growth read (C10wm) is pending (31359864/bfed460f).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
