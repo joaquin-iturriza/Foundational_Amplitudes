@@ -10654,6 +10654,19 @@ entries:
       jobs, 449 GPU-h (data/scaling_grid_plan.json; the redo of the six under-one-epoch points alone, the 2x row, 39.0 GPU-h);
       job-script switch LONG_HP=1262 + LONG_FACTOR 2/8 on branch scaling-grid @68feafed (worktrees/wt-scaling-grid), not yet
       reviewed or merged.'
+  - at: '2026-11-06T04:45:27+00:00'
+    text: '(a) 2026-11-06 step 58 built, not yet checked on MadGraph: branch flat-quota (worktrees/wt-flat-quota, e9a2eccd
+      + 9641850c, pushed, not merged: repo-reviewer not yet run). The flat part, when a recipe sets sampling.flat_range (absent
+      from every built pool, so their recipe ids and draws are unchanged), is n_flat events spread evenly over 0.25-dex bins
+      of log|M|^2 across the class''s pp range (recipes/catalog_v4_flat_range.json from tools/flat_range.py: pp_support_reads''
+      natural-log |M|^2 min/max over the PP4 probe''s 1.2e4 events, +-0.5 dex; 1301 hadronic classes, median width 10.0 dex);
+      candidates (multichannel proposals) drawn in rounds of oversample/2 x n_flat, each round''s sqrt(s) proposal and channel
+      shares weighted by the bins'' deficit/count (an empty bin''s deficit to the nearest occupied bin, out-of-range candidates
+      steering the edge bins), until every bin holds its quota or FLAT_BUDGET=50 candidates per flat event; then exactly the
+      quota per bin kept, shortfall water-filled over bins with spare. Tests tests/test_flat_quota.py 6 cases pass (.venv-cpu),
+      test_multichannel 5 pass. Check prepared: multichannel_check.py policy quota (scripts/job_multichannel_check.sh MCHECK_POLICIES=multichannel+quota
+      MCHECK_SEED=42/43, 5 classes x 2 seeds = 10 CPU jobs), figure analysis/catalog_v4/fig_flat_quota.py; needs a passed
+      design before submission.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
