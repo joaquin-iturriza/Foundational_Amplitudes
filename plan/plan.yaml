@@ -14923,6 +14923,28 @@ entries:
       trial''s score is not below the default growth''s own HD4 score (e046ac67, from its reads) the sweep found nothing and
       the re-run is not made (NOT BETTER). A trial that blows up is listed apart with where; the score of a trial whose read
       fails is a failed trial (DyHPO reuses the slot).'
+    fix_at: '2026-11-06T10:51:27+00:00'
+    fix: 'Disk and cache (check 14) fail; everything else passes, with three small corrections. (1) Disk and data cache not
+      shown. This is the first sweep on the memmap path (the base config has data.memmap true), and a memmap run refuses to
+      start when it finds no cache. The design states no cache key, no disk per trial and no free disk. The default growth
+      e046ac67 opened cache 04fb3b3d9c4449e6fc631b44 (its out_0.log), which was deleted after step 4''s reads. On CC now there
+      are two 21 GB caches, 27a1422795e9872faa6b9eaf (the prebuild) and 0c897ca2d81c98d3828e2808 (built by the hp_1333 growth
+      jobs), and 88 GB free on /sps/lpnhe (df read 2026-11-06). Nothing shows the trials resolve to either key. To fix: on
+      the CC login node, compute the key a trial''s config opens (generate_sweep dry run, or the cache key computed from the
+      trial''s resolved config) and show it equals an existing cache, or add the CPU prebuild (scripts/job_catalog_v3_short_prebuild.sh
+      or job_mmap_prebuild.sh) to the plan before the first wave. State the disk per trial (run dir, zero-shot temp dir under
+      SCRATCH) times the 3 trials that run at once, plus the one shared cache, against the free disk at submission. Also say
+      that step 7''s 52 running jobs build no cache that could prune this one (LRU pruning in data_mmap). (2) The check quotes
+      a wrong number. data/ws_objective_check.json growth_mse_tuned_vs_default has score_HD4 +0.084/+0.157, not +0.03/+0.04
+      (that is read_HD4, +0.031/+0.038). Correct the number. The sign agrees, so the measure still responds. Also state the
+      score''s spread at one seed: the same-seed comparisons with no effect on the reads move it 0.011-0.022 in ln (moment
+      fill, damped Muon), and the score between seeds on growth runs moves up to 0.15 (growth_k1066_vs_k533 -0.196/-0.042),
+      so the gate on the best trial against e046ac67 is a same-seed comparison. (3) The re-run arm does not exist yet. scripts/job_catalog_v3_short.sh
+      accepts only GROW_HP=1333 (it exits otherwise), so re-running the best trial''s HPs needs a new GROW_HP path, reviewed
+      by the repo reviewer before the re-runs. Name it in the design. (4) Check 13 asks for when the sweep finishes: about
+      3 waves x 0.57 h after step 10''s reads; state it with the horizon''s grounding. k=533 only for the tuned growth rests
+      on D284 (''fix it at 1/8 and do a bit of a sweep''); the open question to Joaquin of 06:48 on 1066/2132 stays open,
+      and the design should say the re-runs extend if he answers yes.'
   step_why:
     9:
       feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
