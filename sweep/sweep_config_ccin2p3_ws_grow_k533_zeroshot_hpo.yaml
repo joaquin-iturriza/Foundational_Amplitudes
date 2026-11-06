@@ -20,7 +20,10 @@ cluster:
   cpus_per_task: 5
   time: '00:50:00'
 paths: null
-sweep_name: ws_grow_k533_zeroshot_hpo8
+# ws_grow_k533_zeroshot_hpo8 (2026-11-06 ~13:11 UTC) failed whole: its base run's config.yaml had been rewritten by
+# the cache prebuild (memmap_prebuild true, num_workers 0), so each trial opened the cache and exited with no result.
+# Re-run under a new name with the two keys set back to the run's own values (its seed-43 twin's config).
+sweep_name: ws_grow_k533_zeroshot_hpo8_rerun
 base_config: ${PROJECT_DIR}/runs/catalog_v4_long/v4_het_default25_w16_grow_k533
 objective: zero_shot_score
 zero_shot_objective:
@@ -52,6 +55,8 @@ fixed_params:
   evaluate: 'false'
   training.heterosc_sigma_stage_steps: 0
   model.net.num_heads: 16
+  data.memmap_prebuild: 'false'
+  training.num_workers: 2
   seed: 42
 range_extension:
   enabled: true
