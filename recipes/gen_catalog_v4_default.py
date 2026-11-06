@@ -19,6 +19,8 @@ RAMBO bulk (mg5_pipeline_final, "DEFAULT-SAMPLED SHARE"). This script writes the
   catalog_v4_default<f>_train.yaml   catalog_v4_base_train.yaml (the catalog-sampled recipe, select_catalog_v4.py)
                                      with every tree class that has a default source at f_default = f (one per arm);
                                      everything else as the base
+  catalog_v4_default25_<beam>_train.yaml   the beam ablation (BEAM_ARMS): the share at CHOSEN on the e+e- (eeonly) or
+                                     the hadronic (pponly) classes only, the others as the base
   catalog_v4_train.yaml              the catalog in use: the base at the chosen share CHOSEN (0.25: D229, D231, the
                                      mixture A/B of docs/results.tex par:v4_mixture)
 
@@ -44,6 +46,9 @@ from gen_catalog_v3_pp import PARTONS
 ARMS = (0.50, 0.25)                                    # the design's arms B and C (open: the user's call)
 CHOSEN = 0.25          # catalog_v4's default share (D229, D231): catalog_v4_train.yaml
 F_MAX = max(ARMS)
+# the beam ablation's arms (step 62): the default share on the e+e- classes only (their dsh pools reuse the ee4_ pools)
+# or on the hadronic classes only (reuse pp13v4_ / pp13_)
+BEAM_ARMS = {"eeonly": "ee4_", "pponly": "pp13"}
 ACCEPT_MARGIN = 0.10      # extra default events per role for those outside the pool's window or cuts (open, unsourced)
 # a class whose pool keeps less than 1 / (1 + ACCEPT_MARGIN) of its MadEvent events (e+e- with photons or leptons at the
 # Z pole: the cuts on pairs of different kinds, which an e+e- run card cannot apply, remove up to 0.38 there) is sized
@@ -525,6 +530,21 @@ def main():
                 f.write(HDR)
                 yaml.safe_dump({**{k: v for k, v in base.items() if k != "processes"}, "processes": procs}, f,
                                sort_keys=False)
+    # the beam ablation (plan catalog_coverage step 62, D295): the share at CHOSEN on one beam's classes only, every
+    # other class catalog-sampled as in the base (f_default 0); each class keeps its own event count, so the arms
+    # differ from the share-0 control and the full share only in which classes' events are default-sampled
+    for tag, prefix in BEAM_ARMS.items():
+        procs = []
+        for e in base["processes"]:
+            src = src_of.get(e["name"]) if not e.get("physics") and e.get("base", e["name"]) == e["name"] else None
+            if src and dsh[src]["reuse"].startswith(prefix):
+                procs.append({**e, "sampling": {**samp, "f_default": CHOSEN, "default_source": src}})
+            else:
+                procs.append(e)
+        with open(os.path.join(HERE, f"catalog_v4_default{int(round(100 * CHOSEN)):02d}_{tag}_train.yaml"), "w") as f:
+            f.write(HDR)
+            yaml.safe_dump({**{k: v for k, v in base.items() if k != "processes"}, "processes": procs}, f,
+                           sort_keys=False)
     n_shared = sum(1 for e in base["processes"] if e["name"] in src_of)
     print(json.dumps({"ee_classes": len(ee), "ee_below_every_energy": skipped, "dsh_entries": len(dsh),
                       "dsh_hadronic": sum(1 for e in dsh.values() if e["reuse"].startswith("pp13")),

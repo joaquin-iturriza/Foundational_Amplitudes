@@ -120,6 +120,7 @@ training:
  cosanneal_warmup_steps: 0
  cosanneal_warmup_frac: 0.0   # if > 0, overrides warmup_steps: warmup = frac * increment_steps
  cosanneal_eta_min: 0
+ wsd_cooldown_frac: null  # scheduler WSD (required there, no default): (1 - sqrt) cooldown over this last fraction of the steps; warmup and floor as the cosine's
  reduceplateau_factor: 0.1
  reduceplateau_patience: 50
  onecycle_max_lr: 10
