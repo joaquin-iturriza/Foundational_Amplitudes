@@ -10223,7 +10223,7 @@ entries:
     agent: a8e0ed3e3a9c9cd8a
     state: working
     since: '2026-11-06T19:56:06+00:00'
-    state_at: '2026-11-06T19:56:25+00:00'
+    state_at: '2026-11-06T20:00:14.566000+00:00'
     context: 114501
     context_at: '2026-11-06T20:00:20+00:00'
   findings:
@@ -12415,9 +12415,9 @@ entries:
     '19': Joaquin allowing the cache deletion (asked 2026-11-06)
   owner:
     agent: a1319346e2069b331
-    state: working
+    state: stopped
     since: '2026-11-06T06:38:04+00:00'
-    state_at: '2026-11-06T19:56:24+00:00'
+    state_at: '2026-11-06T19:59:23.436000+00:00'
     context: 104644
     context_at: '2026-11-06T20:00:21+00:00'
   designs:
