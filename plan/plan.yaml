@@ -13679,10 +13679,9 @@ entries:
   - D282
   - D307
   - D313
-  next: 'Step 13, waiting on Joaquin''s call (D307 hold): after the restart study (par:v4_warm_start_valley: no restart reads
-    better than the default, the narrow-valley reading not supported), either (a) take the default restart as the recipe and
-    lift D307 so the change tests resume at k=1066, or (b) one more mechanism test: continue from the step-3198 checkpoint
-    with the parent''s saved optimizer state (needs a fine_tune option to load it; 2 runs, about 3 GPU-h)'
+  next: 'Step 13 (D307, D308): the continued restart with the parent''s optimizer state: arm v4_het_ws_step3198_continue_optstate[_seed2]
+    (step-3198 model of v4_het_control_ckpt[_seed2], lr scale 0.20233, no re-warm, fine_tune.load_optimizer_state; branch
+    ws-optstate @7456a119), 2 runs, read against the control final_default and the fresh-optimizer step3198_continue (par:v4_warm_start_valley)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -16406,7 +16405,8 @@ entries:
     written: '2026-11-06T20:13:42+00:00'
   step_why:
     1:
-      feeds: how a warm start should leave its parent (D307), and whether the change tests resume
+      feeds: 'how a warm start should leave its parent (D307): whether continuing the parent''s run, optimizer included, beats
+        the default restart'
       if:
-      - 'Joaquin picks (a): close the mechanism question, the change tests resume at the default restart'
-      - 'Joaquin picks (b): implement optimizer-state loading in a worktree, design and review, 2 runs at seeds 42/43'
+      - 'BETTER than the default restart: it becomes the restart recipe, read against B for MATCH'
+      - 'not BETTER: the default restart stays; ask Joaquin to lift D307 so the change tests resume'
