@@ -1130,17 +1130,18 @@ WARM["C1u"] = {"W": {533: ("FA-ccin2p3-35f9a8a5", "FA-ccin2p3-a0416422")}, "C": 
 # the classes it trains on pp events). C6 (the sign extension) is read by signext_compare.py warm
 _HET_C = WARM["C1"]["C"]
 _MSE_A = dict(MIX["control"], HD4=HD4_MSE["control"], HD5=HD5_MSE["control"])
-_MSE_C = {}           # v4_mse_cont_k<K>[_seed2] (seeds 42, 43) per k, filled at submission
+_MSE_C = {533: ('FA-ccin2p3-ac7aa971', 'FA-ccin2p3-4ebff80f'), 1066: ('FA-ccin2p3-dd010506', 'FA-ccin2p3-39516188'), 2132: ('FA-ccin2p3-4c4a5069', 'FA-ccin2p3-9cab9b5b')}  # v4_mse_cont_k<K>[_seed2] (seeds 42, 43) per k, submitted 2026-11-06
 _D7 = "plan warm_start step 7 (D283, D300), superset design passed 2026-11-04T21:51"
-WARM["C2"] = {"W": {}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("PP4", "EE4"), "design": _D7,
+WARM["C2"] = {"W": {533: ('FA-ccin2p3-9a357af2', 'FA-ccin2p3-d26c43ba'), 1066: ('FA-ccin2p3-f968a51d', 'FA-ccin2p3-d88a5db8'), 2132: ('FA-ccin2p3-0fae36f3', 'FA-ccin2p3-74bb21ec')}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX_HET["default50"], HD4=HD4_HET["default50"], HD5=HD5_HET["default50"])}
-WARM["C8"] = {"W": {}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("HD5",), "design": _D7, "stats_check": True,
+# C8 k=2132 pair: held by the site gate's 60-min window at submission, added when submitted
+WARM["C8"] = {"W": {533: ('FA-ccin2p3-0d2a042d', 'FA-ccin2p3-e4eac156'), 1066: ('FA-ccin2p3-1218b835', 'FA-ccin2p3-7c2c1c71')}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("HD5",), "design": _D7, "stats_check": True,
               "B": {r: ("FA-ccin2p3-5abe4a0e", "FA-ccin2p3-92207f6a") for r in ("PP4", "EE4", "held", "HD4", "HD5")}}
-WARM["C3"] = {"W": {}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
+WARM["C3"] = {"W": {533: ('FA-ccin2p3-11938ca8', 'FA-ccin2p3-22afe10b'), 1066: ('FA-ccin2p3-a767f033', 'FA-ccin2p3-f9582bbb'), 2132: ('FA-ccin2p3-88551ced', 'FA-ccin2p3-ddf740e1')}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX["default25"], HD4=HD4_MSE["default25"], HD5=HD5_MSE["default25"])}
-WARM["C4"] = {"W": {}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
+WARM["C4"] = {"W": {533: ('FA-ccin2p3-f1390aa8', 'FA-ccin2p3-21fb7bd7'), 1066: ('FA-ccin2p3-57172f65', 'FA-ccin2p3-f14bc159'), 2132: ('FA-ccin2p3-75f1d8c6', 'FA-ccin2p3-040c3448')}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX["default50"], HD4=HD4_MSE["default50"], HD5=HD5_MSE["default50"])}
-WARM["C5"] = {"W": {}, "C": _MSE_C, "A": _MSE_A, "deciding": (("PP4", "trained"),), "trained_pp": True, "design": _D7,
+WARM["C5"] = {"W": {533: ('FA-ccin2p3-455bbfbd', 'FA-ccin2p3-2e583c2b'), 1066: ('FA-ccin2p3-26f62d9c', 'FA-ccin2p3-6f6df1b8'), 2132: ('FA-ccin2p3-df7ec695', 'FA-ccin2p3-3794e155')}, "C": _MSE_C, "A": _MSE_A, "deciding": (("PP4", "trained"),), "trained_pp": True, "design": _D7,
               "stats_check": True,
               "B": {"PP4": BOUND["arm"], "EE4": BOUND_DEFAULT["EE4"], "HD4": BOUND_DEFAULT["HD"], "HD5": BOUND_DEFAULT["HD"],
                     "held": ("FA-ccin2p3-afc96598", "FA-ccin2p3-d26f13aa")}}
