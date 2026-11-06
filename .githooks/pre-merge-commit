@@ -1,3 +1,27 @@
 #!/bin/sh
-# git pre-merge-commit: the same check on a merge's result (a merge of a branch that edited docs/results.tex).
+# git pre-merge-commit: (1) a merge commit may change, relative to HEAD, only paths in the merged branch's own diff
+# (git diff <merge-base> MERGE_HEAD): other agents' staged/uncommitted files in the shared checkout must not ride in
+# (21648d10 carried tools/plan.py and tests of other workers). A path the branch changed and HEAD did not must end
+# equal to MERGE_HEAD's blob. (2) then the same check as pre-commit (results.tex claims).
+gd=$(git rev-parse --git-dir) || exit 1
+if [ -f "$gd/MERGE_HEAD" ] && [ "$(wc -l < "$gd/MERGE_HEAD")" -eq 1 ]; then
+    mh=$(cat "$gd/MERGE_HEAD")
+    mb=$(git merge-base HEAD "$mh") || exit 1
+    branch=$(git diff --name-only "$mb" "$mh")
+    bad=""
+    for p in $(git diff --cached --name-only HEAD); do
+        if ! printf '%s\n' "$branch" | grep -qxF -- "$p"; then
+            bad="$bad $p"
+        elif [ "$(git rev-parse -q --verify "HEAD:$p")" = "$(git rev-parse -q --verify "$mb:$p")" ] \
+             && [ "$(git ls-files -s -- "$p" | cut -d' ' -f2)" != "$(git rev-parse -q --verify "$mh:$p")" ]; then
+            bad="$bad $p"
+        fi
+    done
+    if [ -n "$bad" ]; then
+        echo "pre-merge-commit: refused. The merge result differs from HEAD in paths that are not the merged branch's own change" >&2
+        echo "(other work in the shared index?):$bad" >&2
+        echo "Unstage them (git restore --staged <path>), then commit the merge again; never stash the shared checkout." >&2
+        exit 1
+    fi
+fi
 exec "$(dirname "$0")/pre-commit"
