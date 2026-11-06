@@ -1113,6 +1113,14 @@ WARM["C10wm"] = {"W": {533: ("FA-ccin2p3-31359864", "FA-ccin2p3-bfed460f")}, "C"
                  "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
                  "ref": {"untuned": WARM["C10w"]["W"][533]},
                  "design": "plan warm_start step 6 (D291, D285), design passed 2026-11-06T04:48"}
+# step 8 (D303, design passed round 2 2026-11-06): the k=533 default restart with only the Muon groups' lr damped at
+# its start (x min(1, step/168), fine_tune.muon_warmup_steps=168, arm v4_het_warm25u_k533[_seed2],
+# scripts/job_catalog_v3_short.sh @dbb8daf0) against the same-data default restart of the fill test; B and A as C1;
+# BETTER when the widened upper end of R(W/default) < 1 on PP4 or EE4 and above 1.05 on neither
+WARM["C1u"] = {"W": {533: ("FA-ccin2p3-35f9a8a5", "FA-ccin2p3-a0416422")}, "C": {},
+               "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+               "ref": {"default": WARM["C1f"]["ref"]["default"], "default_older": WARM["C1f"]["ref"]["default_older"]},
+               "deciding": ("PP4", "EE4"), "design": "plan warm_start step 8 (D303), design passed round 2 2026-11-06"}
 MATCH_HI, CARRY = 1.35, 0.90
 
 
