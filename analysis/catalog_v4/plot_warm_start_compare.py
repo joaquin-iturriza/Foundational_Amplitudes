@@ -7,6 +7,7 @@
            checkpoint against the warm start from the final model, not against the rerun);
   growth   (D285, par:v4_warm_start_grow): width 8 -> 16 grown and retrained 533 / 1066 / 2132 steps, w8 parent A,
            w16 from scratch B.
+Labels are words (every warm start of the tuned and ckpt rows retrains 533 steps).
 Columns: (1) the validation curve of the main training stage, val_loss_no_reg (het NLL, arithmetic mean over
 processes) against the run's own step, seed 42 (data/reads/<run>_val.json, mixture_ab.py val), a diagnostic only.
 Only runs on the same validation data and the same target standardization share a panel: in the tuned and ckpt
@@ -34,17 +35,20 @@ def pair(x, axis):
     return x[axis] if isinstance(x, dict) else x
 
 
+AXIS_WORDS = {"PP4": "pp probes", "EE4": r"$e^+e^-$ probes"}
 # (label, runs, on the NLL panel)
 GROUPS = {
-    "tuned": [("parent A", WARM["C1"]["A"], False), ("scratch B", WARM["C1"]["B"], False),
-              ("warm 533, untuned", WARM["C1"]["W"][533], True),
-              ("warm 533, NLL-tuned", WARM["C1t"]["W"][533], True)],
-    "ckpt": [("parent A", WARM["C1"]["A"], False), ("scratch B", WARM["C1"]["B"], False),
-             ("from step 2132", WARM["C1ck2132"]["W"][533], True),
-             ("from step 3198", WARM["C1ck3198"]["W"][533], True),
-             ("from final", WARM["C1ckfinal"]["W"][533], True)],
-    "growth": [("w8 parent A", WARM["C10w"]["A"], True), ("w16 scratch B", WARM["C10w"]["B"], True)]
-              + [(f"grown, {k} steps", WARM["C10w"]["W"][k], True) for k in (533, 1066, 2132)],
+    "tuned": [("pretrained start", WARM["C1"]["A"], False),
+              ("scratch with change", WARM["C1"]["B"], False),
+              ("warm start, default lr", WARM["C1"]["W"][533], True),
+              ("warm start, NLL-tuned lr", WARM["C1t"]["W"][533], True)],
+    "ckpt": [("pretrained start", WARM["C1"]["A"], False),
+             ("scratch with change", WARM["C1"]["B"], False),
+             ("warm start from step 2132", WARM["C1ck2132"]["W"][533], True),
+             ("warm start from step 3198", WARM["C1ck3198"]["W"][533], True),
+             ("warm start from final", WARM["C1ckfinal"]["W"][533], True)],
+    "growth": [("width 8 pretrained", WARM["C10w"]["A"], True), ("width 16 from scratch", WARM["C10w"]["B"], True)]
+              + [(f"grown 8 to 16, {k} steps", WARM["C10w"]["W"][k], True) for k in (533, 1066, 2132)],
 }
 
 
@@ -101,12 +105,12 @@ def main():
                                  q10=float(np.quantile(m, 0.1)), q90=float(np.quantile(m, 0.9)))
             out[g][lab] = rec
         axs[i, 0].set_ylim(min(lo) - 0.1, -1.5)
-        axs[i, 0].set_xscale("log"); axs[i, 0].set_xlabel("step"); axs[i, 0].set_ylabel("val NLL")
+        axs[i, 0].set_xscale("log"); axs[i, 0].set_xlabel("step"); axs[i, 0].set_ylabel("validation loss (het NLL)")
         for k in range(3):
-            axs[i, k].legend()
+            ps.legend(axs[i, k])
         for k, axis in enumerate(("PP4", "EE4")):
             a = axs[i, k + 1]
-            a.set_xscale("log"); a.set_xlabel(axis + r" class MSE of $\log|M|^2$"); a.set_ylim(0, 1)
+            a.set_xscale("log"); a.set_xlabel(AXIS_WORDS[axis] + r": class MSE of $\log|M|^2$"); a.set_ylim(0, 1)
             a.set_ylabel("fraction of classes")
     ps.save_panels([f[0] for f in figs], os.path.join(HERE, "figs", "warm_start_compare"))
     json.dump(out, open(os.path.join(HERE, "data", "warm_start_compare.json"), "w"), indent=1)

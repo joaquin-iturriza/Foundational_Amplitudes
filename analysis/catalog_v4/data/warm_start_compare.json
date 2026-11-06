@@ -1,6 +1,6 @@
 {
  "tuned": {
-  "parent A": {
+  "pretrained start": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-87ea24d0",
@@ -34,7 +34,7 @@
     "q90": 24.328276275550238
    }
   },
-  "scratch B": {
+  "scratch with change": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-9538e607",
@@ -68,7 +68,7 @@
     "q90": 4.702390336994124
    }
   },
-  "warm 533, untuned": {
+  "warm start, default lr": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-341bf564",
@@ -102,7 +102,7 @@
     "q90": 6.924155386779253
    }
   },
-  "warm 533, NLL-tuned": {
+  "warm start, NLL-tuned lr": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-56cca07a",
@@ -138,7 +138,7 @@
   }
  },
  "ckpt": {
-  "parent A": {
+  "pretrained start": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-87ea24d0",
@@ -172,7 +172,7 @@
     "q90": 24.328276275550238
    }
   },
-  "scratch B": {
+  "scratch with change": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-9538e607",
@@ -206,7 +206,7 @@
     "q90": 4.702390336994124
    }
   },
-  "from step 2132": {
+  "warm start from step 2132": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-0898a7b0",
@@ -240,7 +240,7 @@
     "q90": 15.176405136758055
    }
   },
-  "from step 3198": {
+  "warm start from step 3198": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-2a27e8a2",
@@ -274,7 +274,7 @@
     "q90": 14.402690516788818
    }
   },
-  "from final": {
+  "warm start from final": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-dd32a907",
@@ -310,7 +310,7 @@
   }
  },
  "growth": {
-  "w8 parent A": {
+  "width 8 pretrained": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-804a65bc",
@@ -344,7 +344,7 @@
     "q90": 5.3162532160025
    }
   },
-  "w16 scratch B": {
+  "width 16 from scratch": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-493c98db",
@@ -378,7 +378,7 @@
     "q90": 4.062490576217343
    }
   },
-  "grown, 533 steps": {
+  "grown 8 to 16, 533 steps": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-e046ac67",
@@ -412,7 +412,7 @@
     "q90": 5.56767797314016
    }
   },
-  "grown, 1066 steps": {
+  "grown 8 to 16, 1066 steps": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-380c7b14",
@@ -446,7 +446,7 @@
     "q90": 4.40540583086134
    }
   },
-  "grown, 2132 steps": {
+  "grown 8 to 16, 2132 steps": {
    "runs": {
     "PP4": [
      "FA-ccin2p3-58723352",
