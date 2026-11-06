@@ -12936,6 +12936,11 @@ entries:
     withdrawn_at: '2026-11-06T04:32:30+00:00'
     withdrawn_why: 'Joaquin (2026-11-06 04:28) puts tuning the warm start first and leaves the method to the owner: the grown
       warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
+  - ask: Should the tuned width growth also run at 1066 and 2132 steps, like the untuned growth, or only at 533?
+    at: '2026-11-06T06:48:34+00:00'
+    searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
+    blocks: nothing
+    blocks_steps: &id003 []
   owner:
     agent: a53040907e4c704f0
     state: stopped
@@ -14441,3 +14446,8 @@ entries:
       analysis/catalog_v4/ws_restart_steps.py (--cached); analysis/catalog_v4/mixture_ab.py (WARM C1f); scripts/job_catalog_v3_short.sh
       (WS_M_HP, v4_het_warm25m_k533, GROW_HP=1333, mode prebuild); scripts/job_catalog_v3_short_prebuild.sh; sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
     written: '2026-11-06T06:48:05+00:00'
+  ask: Should the tuned width growth also run at 1066 and 2132 steps, like the untuned growth, or only at 533?
+  waiting_since: '2026-11-06T06:48:34+00:00'
+  searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
+  blocks: nothing
+  blocks_steps: *id003
