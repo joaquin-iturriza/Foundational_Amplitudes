@@ -16,6 +16,11 @@ ITEM="$1"; EST="$2"; NOTE="$3"; JOB="$4"; shift 4
 # jobs and defers on a later one is retried whole by the supervisor, which otherwise submitted the earlier ones twice
 DONE="$HOME/.local/share/ccorch/launch/FA/$ITEM.cc_only.submitted"; KEY="${FA_HOLDOUT:+FA_HOLDOUT=$FA_HOLDOUT }${FA_SEED:+FA_SEED=$FA_SEED }${FA_ONLY:+FA_ONLY=$FA_ONLY }$JOB $*"
 # RESUBMIT=1 submits again on purpose (a run that failed and is to be redone)
+# the check and the record are one critical section per key (2026-11-06: a hand run of a launch script and the
+# supervisor's run of the same launch started together, both passed the check before either recorded, and two jobs
+# were submitted twice); held until exit, so the second run waits and then sees the first's record
+mkdir -p "$(dirname "$DONE")"
+exec 9>"$DONE.$(printf '%s' "$KEY" | md5sum | cut -c1-12).lock"; flock 9
 [ -z "$RESUBMIT" ] && grep -qxF "$KEY" "$DONE" 2>/dev/null && { echo "already submitted: $KEY"; exit 0; }
 p=$(timeout 250 site pick FA --only ccin2p3 --jobs 1 --mem "${MEM:-16G}" --cpus "${CPUS:-4}" ${GPUS:+--gpus $GPUS} --hours "$EST" 2>&1 | tail -1 | sed "s/^ *//")
 echo "$p"
