@@ -3745,6 +3745,12 @@ entries:
       step 67 settles; step 66 measured at budget 750 without the forward fix: SHORT, cost 105-111x the old, upper-side 375
       core-h over the 170 (old 3.38). Open inside it: the 55 held-out e+e- classes'' range comes from the 2000-event EE4 pool
       they are scored on (label-in-inputs: generate default events for them, or accept)'
+    69: '(h) D317 cheap flat sampling: merge flat-mcmc (a99a7aeb) after repo-reviewer PASS and design PASS, sync CC, submit
+      10 CPU jobs (5 check classes x seeds 42/43; scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+mcmc_both_res2_budget12,
+      limit 01:30:00, target 0.5 h), wait; read with multichannel_check.py pull/summary/coverage and sampling_frontier.py
+      (add the mcmc policy), figure of fill per bin per policy beside cost. e+e- (D318, collider anchor approved): e+e- range
+      from real lepton-collider energies (LEP 91-209 GeV, ILC/CLIC to 3 TeV, FCC-ee 91-365 GeV) with ISR and beamstrahlung,
+      machine parameters cited; check MadGraph''s lepton ISR/beamstrahlung options in our setup.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -10715,6 +10721,13 @@ entries:
       if:
       - 'step 67 YES/NEAR: e+e- classes in step 65''s design with the forward fix and its measured cost'
       - 'step 67 PARTIAL/NO: e+e- classes wait on the next channel read, hadronic regeneration not held by them'
+    69:
+      feeds: the regeneration design (steps 65, 68)
+      if:
+      - 'YES (fill >= 0.95 on >= 0.95 of in-range bins, cost <= 2x on all five): the Markov-chain flat part goes into the
+        regeneration design for the 1301 hadronic and, with the forward channel to 1-|cos| 1e-8, the e+e- classes'
+      - 'PARTIAL or NO: where read of the short bins, one revision within 2x (chains, increment, sqrt(s) move, default-event
+        seeds), or a dead end and the importance-weighted alternative'
   owner:
     agent: a7be1d5c343ae02d7
     state: working
