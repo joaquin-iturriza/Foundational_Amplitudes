@@ -55,7 +55,8 @@ def main():
     fig, axs = ps.figure(ncols=2, nrows=2)
     (aG, aV), (aP, aE) = axs
     out = {}
-    for lab, runs, col in ARMS:
+    short = {}                       # the same numbers keyed without spaces (docs/results.tex claims): arm_s<seed>
+    for (lab, runs, col), tag in zip(ARMS, ("arm", "default")):
         for i, (r, ls) in enumerate(zip(runs, ("-", "--"))):
             sl = f"{lab}, seed {42 + i}"
             aG.plot(np.arange(len(g[r])), g[r], color=col, ls=ls, label=sl)
@@ -64,6 +65,7 @@ def main():
             out[sl] = {"grad_max_0_19": max(g[r][:20]), "grad_median_20_40": float(np.median(g[r][20:41])),
                       "val_max": float(v.max()), "val_max_at": int(s[int(np.argmax(v))]),
                       "steps_off_scale": [int(x) for x in s[v > 0.5]], "val_last": float(v[-1])}
+            short[f"{tag}_s{42 + i}"] = out[sl]
         for a, axis in ((aP, "PP4"), (aE, "EE4")):
             m, _ = class_mse(runs, axis, cls)
             a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, label=lab)
@@ -81,6 +83,7 @@ def main():
     ps.legend(aG, "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "ws_muon_damped" if DAMPED else "ws_fill"))
     print(json.dumps(out, indent=0))
+    print(json.dumps(short))
 
 
 if __name__ == "__main__":
