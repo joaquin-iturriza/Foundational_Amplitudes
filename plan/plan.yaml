@@ -9519,6 +9519,8 @@ entries:
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
     '61': Joaquin allowing the refused resubmission (asked 2026-11-06)
+    '66': FA-ccin2p3-8fc25e12 FA-ccin2p3-df31e35b FA-ccin2p3-0435522c FA-ccin2p3-b1999bec FA-ccin2p3-8172a8b3 FA-ccin2p3-7cc24f37
+      FA-ccin2p3-5fbea4b8 FA-ccin2p3-b94947db FA-ccin2p3-7970178a FA-ccin2p3-eb17a4cc
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
