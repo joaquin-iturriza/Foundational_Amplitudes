@@ -11342,6 +11342,21 @@ entries:
       (R 0.97 trained, 0.99 held-out, inside the rerun spread); the e+e- gain is the e+e- default events: each class''s own
       (trained) and, for held-out e+e- classes, the other e+e- classes'' default events (0.73 with e+e- only). Rest of the
       held-out gain (0.60 both vs 0.73 e+e- only, ratio 0.83, inside the 95% intervals) not resolved by 2 seeds.'
+  - at: '2026-11-06T09:27:25+00:00'
+    text: '2026-11-06 (a) step 65 at budget 500 (10x) read (pull multichannel+quota_ladder_res2+quota_ladder_res2_budget500,
+      summary @ba50c2c2; figure figs/flat_quota_a..e, fifth curve ''same, 10x budget''): as predicted. Electroweak classes
+      fill: uux_epemvevex YES on both seeds (shortfall 0.0275 -> 0, 0 held-out outside of 54001, no budget stop); udx_csxvevex
+      shortfall 0.066 -> 0.005/0.007, left only in the bins above the pp in-support max 0.5 (fill 0.97/0.77 at 0.42/0.67),
+      1 held-out event below the kept min on each seed, 26/30 of 36 chunks at the budget; uux_epemg YES. QCD 2->4 still short
+      above log10|M|^2 ~3.7-3.85 (pp in-support max 4.75): uu_bbxuu shortfall 0.137 -> 0.087/0.086, fill 0.99/0.49/0.14/0.04/0.01
+      at 3.71/3.96/4.21/4.45/4.70; us_ddxsu 0.113 -> 0.063/0.062, fill 0.96/0.47/0.19/0.05/0.01 at 3.85-4.84; held-out outside
+      the kept range 1 of 53345 / 53857 on each seed; every chunk at the budget. Cost: 10x budget is 10x the time on QCD (uu_bbxuu
+      8250 s vs 837 s at budget 50, multichannel 72 s; us_ddxsu 6880 vs 668, 52), 3x on EW (uux_epemvevex 397-553 vs 138-176;
+      udx_csxvevex 1542-1757 vs 143). Branch: only the top ~1 dex of the QCD range stays short, and a budget cannot buy it
+      (factor 28-700 measured), so the ladder channel is changed next. Reading of where the top sits (where reads): sqrt(s_hat)
+      ~1.45 TeV = 2 x 10 GeV x cosh 5, the largest sqrt(s) at which every final can sit at the pT cut inside |eta| < 5; so
+      the top is every pT at the cut and the span at the edge at sqrt(s) ~1.4 TeV, a corner the ladder reaches rarely (three
+      free pT log-uniform over a factor 3.2, the outer end uniform in [4, 5)).'
   handoff:
     state: '2026-11-06 ~06:25. Reopened by D290-D296. (b) memmap keyed-draw cache merged d18e44f1 (repo-reviewer PASS; tests:
       memmap==in-memory bitwise for seeds 42/43 from one cache, also on CC real arm); left in step 37: chain the CPU prebuild
