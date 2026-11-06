@@ -15235,6 +15235,18 @@ entries:
       default restart stays the recipe; step 7 goes with it now; D303''s answer: the jump is AdamW''s share or the lr ramp
       of every group, not Muon''s. ws_fill redrawn at the same commit (legend to the grad-norm panel, val panel clipped above
       0.5; data unchanged).'
+  - at: '2026-11-06T10:24:46+00:00'
+    text: '2026-11-06 step 7 submitted: 52 of 54 runs on CC-IN2P3 (design re-passed round 2 today after a FIX on the prior:
+      C1 is YES at k=1066, R(W_k/B) PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01 at 533/1066/2132), scripts/job_catalog_v3_short.sh
+      at trunk 1b51878d..3f470852 (job code unchanged since d5616629 but for the no-op adamw_warmup_steps merge), arms as
+      in the design, limits from short_wall, --mem 16G; run ids in mixture_ab.py WARM C2-C5, C8, _MSE_C (@c1b7acad). Not yet
+      submitted: C8 at k=2132 (v4_het_warmmag_k2132[_seed2]): the site gate counts the batch at its time limits (81.8 GPU-h
+      in 60 min with the next job) against the item''s estimate 79.8 (D300, set today with site item set); they go once the
+      60-min window lets them, at the next wake. Equivalence check (ws_stats_check.py C5 C6 C8): C8 ok on 1090 pools (k 533,
+      1066); C5 and C6 first failed on 39-45 pools whose abslog floor differed in the 5th-7th digit (mu/sigma equal to 1e-12,
+      max relative floor difference 1.2e-4), float roundoff of the floor''s fit: the check now compares floors relatively
+      at 1e-3 (shift of a probe''s MSE <= delta^2 <= 1e-6) @this commit, and C5, C6 pass; no run cancelled. Deviation from
+      the design''s literal rule (string equality) stated here.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
