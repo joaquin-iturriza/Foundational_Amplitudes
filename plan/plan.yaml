@@ -9342,6 +9342,12 @@ entries:
     units: null
     start: '2026-11-05T05:23:08+00:00'
     at: '2026-11-05T05:23:08+00:00'
+  - batch: beam_ablation
+    wall_h: 2.8
+    jobs: 8
+    units: null
+    start: '2026-11-06T04:58:44+00:00'
+    at: '2026-11-06T04:58:44+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
