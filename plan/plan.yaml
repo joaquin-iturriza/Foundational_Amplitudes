@@ -14352,6 +14352,13 @@ entries:
       0). The tuning''s NLL gain is all in sharper sigma, not in the mean; both warm starts are calibrated (weighted error
       near the ideal 0.5), so the NLL objective chose on sigma while the held-out reads score the mean. Only 3 of the 9 models
       exist (the sweep kept only its best trial). Figure figs/ws_het_split_few_{a,b}.'
+  - at: '2026-11-06T05:55:23+00:00'
+    text: '2026-11-06 steps 5 and 6-lead written up: par:v4_warm_start_restart @99f37a7e (notes-editor PASS): het-loss split
+      (tuned vs default restart: sigma-weighted error equal, log-sigma mean -0.113, MSE of the mean median 0.0000 / mean -0.0054)
+      and the restart jump at step 2 (default: grad 825 at lr 1.2e-4; hpo8 step-2 norm 101..4306 with lr 1.6e-5..6.9e-4).
+      Claims from ws_het_split.py summary --log data/ws_hpo8/het_split_log.txt.gz and ws_restart_steps.py --cached @17195232.
+      Prepared for the fill read: ws_restart_steps.py RUNS has the 4 fill/tagd303 dirs (c3fb2f14), mixture_ab.py warm C1f
+      (cec98490); step 6 waits on the 4 runs.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
