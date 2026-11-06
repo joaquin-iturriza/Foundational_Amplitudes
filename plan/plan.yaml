@@ -13926,6 +13926,24 @@ entries:
       the jump was not what costs the reads; reported with the curves, the recipe unchanged. No CAUSE: the jump comes from
       Muon''s fixed-norm step or the lr itself; next an arm with Muon''s first steps damped (a longer warmup from a lower
       start), designed then. A run that blows up is listed apart.'
+    fix_at: '2026-11-06T05:39:34+00:00'
+    fix: 'Check 5 (not a repeat, prior work named): the prior says no earlier optimizer-state work was found in the plan,
+      but this entry''s own record already ruled on the question: finding 2026-11-05T04:01 (''the warm starts still use a
+      fresh optimizer ... Ibrahim et al. 2024 (arXiv:2403.08763, App. A.4) found keeping or discarding optimizer state makes
+      no difference, so this is not a gap in the comparison'') and step 3''s design prior (''optimizer state reset is fine'',
+      Gupta 2023 / Ibrahim 2024). The design tests exactly that dismissed point and must name it and say what is different
+      here and why it matters (e.g. a 533-step restart where the first ~20 steps'' jump is a measurable share of the run,
+      825 grad norm at step 2 and training loss -2.58 -> -1.21 in data/ws_restart_steps.json, against the long re-warms of
+      that literature), and correct the 04:01 statement that the parent''s optimizer state is saved (the design''s own reading:
+      0 Muon, 2 AdamW entries after the sigma stage). Check 14 (disk), passes in substance but is not in the design: add the
+      line, disk per job from the earlier same-setup runs on CC (run dir 130 MB plus scratch zz_v4_short_v4_het_warm25_k533
+      727 MB, about 0.86 GB per job, no shared cache), 4 jobs about 3.5 GB against 131 GB free on /sps/lpnhe read 2026-11-06.
+      Everything else holds: one change against a same-commit rerun of the default restart (the 100 extra batches stated);
+      measure moves (step-2 grad norm 101 to 4310 with step-2 lr over hpo8, the default restart''s max over steps 0-19 1591,
+      so CAUSE needs under 318, a 5x effect against step-0/1/2 grad norms that reproduce within about 1% across trials at
+      the same parent, 825 vs 832 at matching lr); the reads were seen to move with a restart-recipe change (tuned vs untuned
+      k=533 R PP4 1.19 [1.01,1.39], EE4 1.40 [1.20,1.67]); outcomes stated for CAUSE/BETTER/neither; HETEROSC with sigma stage;
+      reads PP4/EE4 as C1.'
   step_why:
     5:
       feeds: why the val_loss_no_reg-tuned k=533 warm start went to low lr and lost on the held-out reads (D284 step 3)
