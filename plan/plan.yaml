@@ -15775,6 +15775,16 @@ entries:
       by tools/sweep_trial_hps.py): FA-ccin2p3-4442e786 (s42), 3fae7799 (s43), scripts/job_catalog_v3_short.sh @6454ecda,
       both RUNNING, V3_WALL 2.38 h within 02:30; site pick 2 jobs on ccin2p3 (~1.2 h), 77 GB free on /sps/lpnhe; plan wait
       step 11 on both. Read entry C10wz and plot option --growth-zs at bffb6f13.'
+  - at: '2026-11-06T19:46:37+00:00'
+    text: '2026-11-06 step 11 done (D285, D291): the growth re-run at sweep trial 1860 (FA-ccin2p3-4442e786 s42, 3fae7799
+      s43, scripts/job_catalog_v3_short.sh @6454ecda) is NOT BETTER than the default growth (e046ac67/f35b6a78): R(tuned/default)
+      PP4 0.995 [0.959,1.031], EE4 0.989 [0.903,1.080], held_default 1.025; R(W/A) 0.999/1.000 (reads as the w8 parent), R(W/B)
+      1.77 [1.45,2.15] / 1.79 [1.52,2.01] SHORT; R over the MSE-tuned growth PP4 0.951. HD4 selection score reproduced (0.476/0.449
+      vs 0.535/0.459) but did not carry to PP4/EE4. mixture_ab.py warm C10wz @3da35e86; fig analysis/catalog_v4/figs/ws_c10wz_{a,b,c}
+      (plot_ws_c1m.py --growth-zs @3da35e86); write-up par:v4_warm_start_grow_tuned @65fcb32d (verify_claims 0). Process:
+      step 11''s plan wait was dropped by my own set-next restating the step (cmd_set_next popped the step''s wait); fixed
+      7f2f8475 (a rewritten step keeps its wait when the new text names the wait''s runs, else prints that it dropped it;
+      tests/test_plan_setnext_keeps_wait.py 4 pass).'
   step_waits: {}
   handoff:
     state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
