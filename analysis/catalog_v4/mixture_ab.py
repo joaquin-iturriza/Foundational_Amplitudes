@@ -1413,10 +1413,10 @@ WARM["C1s50"] = {"W": dict(WARM["C2"]["W"]), "C": WARM["C1"]["C"], "B": WARM["C1
 # against the same-commit default restart (v4_het_wsx_default_rerun) on the seed-42 class ratios; the study's runs are
 # filled at submission ("" = not submitted). Arms of scripts/job_catalog_v3_short.sh v4_het_wsx_*; the share-0.50
 # warm start at k=533 (C2's seed-42 run) is read beside from step 7.
-S14 = {"control": "FA-ccin2p3-e1ab6bb9",     # submitted 2026-11-07 @74aa4ce6; WSD parent FA-ccin2p3-dccb61e8
-       "arms": {"shrinkperturb": "FA-ccin2p3-732f9787", "share50_k267": "FA-ccin2p3-56a556f3",
-                "wsdbranch25": "FA-ccin2p3-a2605e80", "wsdbranch50": "FA-ccin2p3-92db94f8",
-                "wsdfinal_default": "FA-ccin2p3-21f645af", "share50_k533": "FA-ccin2p3-9a357af2"},
+S14 = {"control": "FA-ccin2p3-238e6f81",     # submitted 2026-11-07 @74aa4ce6 (limit 02:30); WSD parent FA-ccin2p3-dccb61e8
+       "arms": {"shrinkperturb": "FA-ccin2p3-71852916", "share50_k267": "FA-ccin2p3-77e8bf2b",
+                "wsdbranch25": "FA-ccin2p3-85dd4eff", "wsdbranch50": "FA-ccin2p3-a79d5b14",
+                "wsdfinal_default": "FA-ccin2p3-554f3ec5", "share50_k533": "FA-ccin2p3-9a357af2"},
        "control_older": "FA-ccin2p3-341bf564",           # the step-1 default restart at seed 42 (older commit)
        "B": "FA-ccin2p3-9538e607", "B_HD": "FA-ccin2p3-4dca09e5"}
 # each arm's widening over the control (design round 2): same parent and data -> the largest paired seed spread of
