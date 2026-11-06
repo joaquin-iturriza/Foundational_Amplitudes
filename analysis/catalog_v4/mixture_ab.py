@@ -1134,13 +1134,14 @@ _MSE_C = {}           # v4_mse_cont_k<K>[_seed2] (seeds 42, 43) per k, filled at
 _D7 = "plan warm_start step 7 (D283, D300), superset design passed 2026-11-04T21:51"
 WARM["C2"] = {"W": {}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX_HET["default50"], HD4=HD4_HET["default50"], HD5=HD5_HET["default50"])}
-WARM["C8"] = {"W": {}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("HD5",), "design": _D7,
+WARM["C8"] = {"W": {}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("HD5",), "design": _D7, "stats_check": True,
               "B": {r: ("FA-ccin2p3-5abe4a0e", "FA-ccin2p3-92207f6a") for r in ("PP4", "EE4", "held", "HD4", "HD5")}}
 WARM["C3"] = {"W": {}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX["default25"], HD4=HD4_MSE["default25"], HD5=HD5_MSE["default25"])}
 WARM["C4"] = {"W": {}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX["default50"], HD4=HD4_MSE["default50"], HD5=HD5_MSE["default50"])}
 WARM["C5"] = {"W": {}, "C": _MSE_C, "A": _MSE_A, "deciding": (("PP4", "trained"),), "trained_pp": True, "design": _D7,
+              "stats_check": True,
               "B": {"PP4": BOUND["arm"], "EE4": BOUND_DEFAULT["EE4"], "HD4": BOUND_DEFAULT["HD"], "HD5": BOUND_DEFAULT["HD"],
                     "held": ("FA-ccin2p3-afc96598", "FA-ccin2p3-d26f13aa")}}
 MATCH_HI, CARRY = 1.35, 0.90
@@ -1276,6 +1277,13 @@ def warm(change="C1"):
     out["blowups"] = blowups(runs)
     out["verdict_on_reads"] = v
     out["verdict"] = None if out["blowups"]["flagged"] else v
+    if d.get("stats_check"):
+        # the design's equivalence check on the parent_shared W runs (ws_stats_check.py): no verdict until it passes;
+        # a failed W run's C_k is rerun with parent_shared before W and C are compared
+        from ws_stats_check import status
+        out["stats_check"] = status(change)
+        if out["stats_check"] is not True:
+            out["verdict"] = None
     json.dump(out, open(os.path.join(DATA, f"warm_start_{change}.json"), "w"), indent=1)
     print(json.dumps({"B_over_A": {_read_label(r): _main_read(ba, r)["R"] for r in reads_named},
                       "k": {k: {"outcome": x["outcome"], "carried": x["carried"], "g": x["g"],
@@ -1285,7 +1293,7 @@ def warm(change="C1"):
                                        for r in reads_named} for n in x if n.startswith(("W_over", "C_over"))}}
                             for k, x in out["k"].items()},
                       "flagged": out["blowups"]["flagged"], "spiked": out["blowups"]["spiked_recovered"],
-                      "verdict": out["verdict"]}))
+                      "stats_check": out.get("stats_check"), "verdict": out["verdict"]}))
 
 
 # step 43(1) loader control (design passed 2026-11-05T05:20): same arm v4_het_default25[_seed2], same commit, V100

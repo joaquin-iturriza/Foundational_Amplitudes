@@ -68,6 +68,18 @@ WS_M_HP=(++training.muon_weight_decay=0.16672539879714493 ++training.regularizat
          ++training.wsd_cooldown_frac=0.1640708651393652 ++training.heterosc_select=mu_mse)
 WS_M_LR_SCALE=1.8477718659435107; WS_M_LD=0.8749838606454432
 HET=; SIGNHEAD=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; WS_CKPT=model_run0_best; WS_PRE_SIGMA=; WS_FILL=; WS_MUWARM=; WS_MSE=; WS_TSTATS=; TRAIN_ONLY=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
+# the sign extension's recipe ($TRAIN): the control's pools, in its order, then only one-loop extension pools
+signext_check() {
+    python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" <<'PY'
+import sys, yaml
+a, b = (yaml.safe_load(open(f)) for f in sys.argv[1:])
+n = len(b["processes"]); ext = a["processes"][n:]
+assert a["processes"][:n] == b["processes"] and {k: v for k, v in a.items() if k != "processes"} == \
+    {k: v for k, v in b.items() if k != "processes"}, "V4_SIGNEXT base recipe differs from catalog_v4_base_train.yaml"
+assert ext and all(p["name"].endswith("_nlo") for p in ext), "V4_SIGNEXT extension pools missing or not one-loop"
+print(f"V4_SIGNEXT_RECIPE {n} control pools + {len(ext)} sign-changing one-loop pools")
+PY
+}
 # step 7's warm arms (below): the het parent's setup, and the MSE parent's (seed suffix, parent, K)
 ws_het_setup() {
     CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4 HD4 HD5); HET=1
@@ -170,15 +182,7 @@ case "$ARM" in
                             case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
                             TRAIN="$SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml"; ITERS_FIXED=4264
                             # the control's pools, in its order, then only one-loop extension pools
-                            python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" <<'PY' || exit 1
-import sys, yaml
-a, b = (yaml.safe_load(open(f)) for f in sys.argv[1:])
-n = len(b["processes"]); ext = a["processes"][n:]
-assert a["processes"][:n] == b["processes"] and {k: v for k, v in a.items() if k != "processes"} == \
-    {k: v for k, v in b.items() if k != "processes"}, "V4_SIGNEXT base recipe differs from catalog_v4_base_train.yaml"
-assert ext and all(p["name"].endswith("_nlo") for p in ext), "V4_SIGNEXT extension pools missing or not one-loop"
-print(f"V4_SIGNEXT_RECIPE {n} control pools + {len(ext)} sign-changing one-loop pools")
-PY
+                            signext_check || exit 1
                             ;;
     # the one-loop sign transfer (docs/results.tex, par. The signed one-loop pools' data: the kinematics decide the
     # sign within a pool, the arms fail it zero-shot), each the baseline with one change, at its HPs:
@@ -416,15 +420,7 @@ PY
                             TRAIN="$SCRATCH/zz_v4_signext/catalog_v4_train_signext.yaml"
                             # the control's pools, in its order, then only one-loop extension pools (as the
                             # from-scratch arm v4_dimensionless_muon_more_signed checks)
-                            python - "$TRAIN" "$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" <<'PY' || exit 1
-import sys, yaml
-a, b = (yaml.safe_load(open(f)) for f in sys.argv[1:])
-n = len(b["processes"]); ext = a["processes"][n:]
-assert a["processes"][:n] == b["processes"] and {k: v for k, v in a.items() if k != "processes"} == \
-    {k: v for k, v in b.items() if k != "processes"}, "V4_SIGNEXT base recipe differs from catalog_v4_base_train.yaml"
-assert ext and all(p["name"].endswith("_nlo") for p in ext), "V4_SIGNEXT extension pools missing or not one-loop"
-print(f"V4_SIGNEXT_RECIPE {n} control pools + {len(ext)} sign-changing one-loop pools")
-PY
+                            signext_check || exit 1
                             ;;
     # a long-run DyHPO sweep's best trial read like the 1x width cells (catalog_coverage step 16's design: "Each
     # sweep's best trial (seed 42) is read like the other cells by an eval job (sigma-only stage plus every axis)"):

@@ -23,7 +23,8 @@ median ratio as the seed spread.
           SHORT when the widened lower end > 1, INCONCLUSIVE otherwise; g_k = ln(W_k/A) / ln(B/A) (ratios of
           medians); carried when W_k is lower than C_k on more pools than higher with the one-sided sign test
           p < 0.05; YES at the smallest k with MATCH and carried. Beside: the MSE of log|M|^2 on H1-H3, median per-probe
-          ratio of seed means W_k/B and W_k/C_k. -> data/warm_start_C6.json
+          ratio of seed means W_k/B and W_k/C_k. The verdict is withheld until ws_stats_check.py passes on every
+          W run. -> data/warm_start_C6.json
 """
 import glob
 import json
@@ -168,6 +169,12 @@ def warm():
     out["verdict"] = (f"YES at k={yes} ({yes / 4264:.3f} of the from-scratch steps)" if yes else
                       "NO (no k up to 2132 matches)" if len(done) == 3 and all(out["k"][k]["outcome"] == "SHORT" for k in done)
                       else "not decided" + ("" if len(done) == 3 else " (reads missing)"))
+    # the design's equivalence check on the parent_shared W runs (ws_stats_check.py): no verdict until it passes
+    from ws_stats_check import status
+    out["stats_check"] = status("C6")
+    out["verdict_on_reads"] = out["verdict"]
+    if out["stats_check"] is not True:
+        out["verdict"] = None
     json.dump(out, open(os.path.join(HERE, "data", "warm_start_C6.json"), "w"), indent=1)
     print(json.dumps(out))
 
