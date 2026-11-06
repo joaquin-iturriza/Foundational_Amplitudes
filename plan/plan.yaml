@@ -3738,6 +3738,9 @@ entries:
       then generate; (b) memmap cache with per-event keyed draws; (c) make the het. sign output transfer; (d) e+e- mechanism:
       default share per beam, e+e--only and pp-only default-share arms; (e) epochs of every width/length point, redo under-one-epoch
       points at >=1 epoch, extend the L(C) map; (f) loader-control figure. Each result with a figure of the compared quantities.'
+    64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
+      32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
+      = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -9275,6 +9278,11 @@ entries:
       if:
       - 'each part done: reported with its figure and dropped'
       - 'a part blocked: the owner says why and what it tried'
+    64:
+      feeds: the compute scaling of the v4 catalog pretraining at >= 1 epoch
+      if:
+      - 'estimate <= 30 GPU-h or covered by D292/D293: design, review, submit'
+      - 'above 30 GPU-h not covered: estimate to the main session'
   owner:
     agent: a8dc83fd21c2d8d4f
     state: working
