@@ -9863,7 +9863,7 @@ entries:
         pp'') and a heavier channel'
   owner:
     agent: a6260bf506367ce73
-    state: working
+    state: closed
     since: '2026-11-06T05:31:29+00:00'
     state_at: '2026-11-06T09:25:25+00:00'
     context: 245993
@@ -11358,34 +11358,30 @@ entries:
       the top is every pT at the cut and the span at the edge at sqrt(s) ~1.4 TeV, a corner the ladder reaches rarely (three
       free pT log-uniform over a factor 3.2, the outer end uniform in [4, 5)).'
   handoff:
-    state: '2026-11-06 ~06:25. Reopened by D290-D296. (b) memmap keyed-draw cache merged d18e44f1 (repo-reviewer PASS; tests:
-      memmap==in-memory bitwise for seeds 42/43 from one cache, also on CC real arm); left in step 37: chain the CPU prebuild
-      (scripts/job_mmap_prebuild.sh) before the first memmap run and time it, GPU section 3 with the first memmap job. (f)
-      loader figure analysis/catalog_v4/figs/loader_control.png @c01d70f2, superseded by (e). (d) beam ablation running: 8
-      jobs at 5bf3e0f0 (FA-ccin2p3-1c6caddf 4ea1c1eb c2e82e97 a52c9185 e4e0f158 d84270fc 2756bece 3bafdc58; wait step 62);
-      on RUN_DONE read with mixture_ab.compare on run dirs <arm>_tagbeams per the passed design (EE4/PP4 trained and held-out
-      splits, ee_gain.py beams). (a) quota sampler merged (flat-quota, mcheck-heldout); check running: 10 CPU jobs (wait step
-      58: f5574376 a9f943f2 5f7e0106 9bdbeead c6977aa4 b5f708f7 1f508d9b f6a1f630 2aeb8c01 4f66cfc7); on end: python3 analysis/catalog_v4/multichannel_check.py
-      pull multichannel+quota && summary && fig_flat_quota.py; a non-zero held-out count is re-read per file (probe val v3
-      physics vs dsh_ v4 physics). (c) diagnosis: het gradient 75x MSE''s, sign share ~1/75; fix training.sign_het_match merged;
-      12 jobs failed at start on the wall check (03:00 < short_wall 03:30), resubmission refused by the permission classifier:
-      step 61. (e) epoch count done (1x width cells 0.636 epoch); grid 449 GPU-h awaiting the main session''s cost call: step
-      64.'
-    decisions: 'Default share event matching: every class keeps its count, only which classes are default-sampled changes
-      (design PASS). Same-commit control and default25 reruns in the beam ablation (rerun spread 0.094, (b) changes draws).
-      Sign: matched arms vs a same-code rerun of the step-56 arm (keyed draws changed init), magnitude gated on PP4/EE4 (upper
-      <= 1.10) and shown-worse on HD4/H1-H7c; re-seed rule decides whether the MSE control must be rerun. Quota range from
-      in-support pp events +-0.5 dex (D270 ''wider''), judged on held-out pp (probe val + dsh_ pools). Memmap: GPU job refuses
-      without a prebuilt cache (no build inside GPU jobs, no in-memory fallback). Grid HPs: trial_1262 everywhere, lr by the
-      window law slope -0.55 (not measured, censored at window top).'
-    ruled_out: Sign head detached from the trunk as a fix (the trunk already gets ~1/75 of the sign gradient); 4 seeds resolving
-      H5/HD5 magnitude at 1.25 (needs ~16 seeds/arm).
-    running: beam ablation 8 GPU jobs (step 62 wait); quota check 10 CPU jobs (step 58 wait)
-    files: analysis/catalog_v4/{ee_gain.py,data/ee_gain_beams.json,het_sign_diag.py,data/het_sign_diag.json,multichannel_check.py,fig_flat_quota.py,fig_loader_control.py,epoch_count.py,data/study_epochs.json,data/scaling_grid_plan.json},
-      tools/flat_range.py, recipes/catalog_v4_flat_range.json, recipes/catalog_v4_default25_{eeonly,pponly}_train.yaml, mg5_pipeline_final.py
-      (flat quota), data_mmap.py, keyed_aug.py, scripts/job_mmap_prebuild.sh, scripts/job_catalog_v3_short.sh (SHORT_TAG,
-      beam/sign arms, LONG_HP), tools/short_wall.py --width, experiment.py (sign_het_match)
-    written: '2026-11-06T05:21:37+00:00'
+    state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
+      ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
+      step 65 re-check: shortfall QCD 0.38->0.14, EW 0.24->0.03, held-out outside 1176->4; at budget 500 (policy quota_ladder_res2_budget500
+      @45d39fe3): EW fill (uux_epemvevex YES, udx_csxvevex 0.5% left above pp max), QCD top ~1 dex (log10|M|^2 > 3.7) still
+      short at 10x time (8250 s vs 837). Next: the ladder change recorded as the new next step (per-event pT span log-uniform
+      [1.05,3.2], outer end eta_max - d with d log-uniform [1e-3,1]), then the same 10 CPU jobs. Figure figs/flat_quota_a..e
+      (pp, multichannel, quota, quota + ladder, pairs, same 10x budget). (d) step 62 beam ablation read and done (142f98a0,
+      ee_gain.py ablation, data/ee_gain_ablation.json, figs/beam_ablation_a..d): pp default share neutral on e+e- (R 0.97/0.99),
+      e+e- gain = e+e- default events (92% of log gain trained, 63% held-out), PP4 gain = pp default events; e+e- only costs
+      PP4 1.16/1.30. (b) memmap: step 37 unchanged (prebuild timing with the first memmap run). (c) step 61 and (e) step 64
+      wait on Joaquin''s calls (12 sign-output resubmissions at 3:30; scaling-grid size 449 vs 39 GPU-h).'
+    decisions: 'Budget-500 check taken without asking (design branch 2, coordinator); the 10x budget is not a solution for
+      QCD (factor 28-700 needed in the top bins). D294 asks for ''not complicated'': the two added channels are a stated complication,
+      reported. CC checkout: a regenerated multichannel_check.json of mine was set aside with git stash (zz_mcheck_summary_regen_by_catalog_coverage_owner_20261106)
+      to unblock site sync; multichannel_check.py now rewrites results only on ''summary''. Ladder constants: MC_LADDER_PT_SPAN
+      3.2 from where reads (hardest leg pT 90% ~32 GeV), outer end band [4,5) open.'
+    ruled_out: Raising the flat budget to fill the QCD top decade (needs 28-700x, 10x already costs 10x time); pp default
+      data as a help for e+e- (neutral).
+    running: none
+    files: mg5_pipeline_final.py (multiperipheral_draw, resonance2_draw, _bw_mass, mc_channels res2/mperi, MC_LADDER_PT_SPAN),
+      analysis/catalog_v4/multichannel_check.py (policies quota_ladder_res2[_budget500], where), analysis/catalog_v4/fig_flat_quota.py,
+      analysis/catalog_v4/data/{multichannel_check.json,multichannel_check_reads/,quota_where/,ee_gain_ablation.json}, analysis/catalog_v4/ee_gain.py
+      (ablation, fig_ablation), tests/test_multichannel.py, scripts/job_multichannel_check.sh
+    written: '2026-11-06T09:27:57+00:00'
   ask: For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's settings (39
     GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h
     of work)?
