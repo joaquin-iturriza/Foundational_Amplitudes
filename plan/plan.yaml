@@ -15626,7 +15626,7 @@ entries:
       FA-ccin2p3-a6e4ee17 FA-ccin2p3-a767f033 FA-ccin2p3-ac7aa971 FA-ccin2p3-b4525f43 FA-ccin2p3-cf1e0cfc FA-ccin2p3-d26c43ba
       FA-ccin2p3-d38714af FA-ccin2p3-d54c9e94 FA-ccin2p3-d88a5db8 FA-ccin2p3-dd010506 FA-ccin2p3-ddf740e1 FA-ccin2p3-df7ec695
       FA-ccin2p3-e47ed26b FA-ccin2p3-e4eac156 FA-ccin2p3-f1390aa8 FA-ccin2p3-f14bc159 FA-ccin2p3-f9582bbb FA-ccin2p3-f968a51d '
-    '11': sweep ws_grow_k533_zeroshot_hpo8
+    '11': ccin2p3:ws_grow_k533_zeroshot_hpo8_rerun
   handoff:
     state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
       every-group arm 0.053 of default; neither arm BETTER, AdamW damped R PP4 1.017/EE4 1.012, every group worse 1.237/1.619;
