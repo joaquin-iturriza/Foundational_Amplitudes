@@ -14856,6 +14856,20 @@ entries:
       width growth and is re-applied to the step 7 changes that read NO (a new design with its cost); both BETTER: the one
       with the lower PP4 and EE4 R. Neither BETTER: the untuned restart stays, the jump is reported as harmless to the reads
       (with its attribution from a), and the warm start''s remaining gap at 533 is the retraining length (C1 YES at 1066).'
+    passed_at: '2026-11-06T10:26:50+00:00'
+    reviewer: 'Step 9, AdamW-damped and every-group-damped restarts. Arm a differs from the reused same-data default restart
+      (0202ba7f/7b2d6c24) only by fine_tune.adamw_warmup_steps=168; arm e also sets muon_warmup_steps=168 (job_catalog_v3_short.sh
+      lines 352-358, 465; base_experiment.py 1041-1048, 1739; run.py turns it off in the sigma stage; trunk 1b51878d). The
+      built-in pairing check (step 0/1 grad norms 16.32/10.96, 8.10/113.3) guards against a code or data drift. The measure
+      moves: hpo8 window max 160 to 4306 with the step-2 lr; step 8 moved it +31%/+11%; the reads moved 1.19/1.40 with the
+      NLL-tuned restart. Spread: same-seed |ln| 0.47, about 0.26 in a against a full damping range ln(994/160)=1.83; the bands
+      are 0.3/0.7. Reads: R(arm/default) is widened by the pair''s R_seed of about 1.19 (C1u [0.866, 1.228]), so BETTER needs
+      about R<0.83. That is a large share of the 1.33/1.51 gap to scratch, which is the change worth acting on. Outcome stated
+      for each of ADAMW, EVERY GROUP, SHARED, NONE, BETTER and not BETTER, with the confound (0.61/0.82 cumulative update)
+      stated. HETEROSC with sigma stage, parent target stats. Not an HP search (an ablation flag at the step-8 value). 6 GPU-h.
+      Disk 0.86 GB x 4 against 93G free. Searched: adamw_warmup, adamw-only, adamw only, warm25a, warm25e, every group, all
+      groups, warmup_steps, lr ramp, damp (results.tex); adamw, damp, ramp (site decisions): only step 8''s Muon damping and
+      trial_1860''s whole-run lower lr, both in prior.'
   step_why:
     9:
       feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
