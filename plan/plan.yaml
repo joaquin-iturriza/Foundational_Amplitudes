@@ -11649,12 +11649,10 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
   owner:
-    agent: acf9c54af46447317
-    state: stopped
-    since: '2026-11-06T05:01:57+00:00'
-    state_at: '2026-11-06T05:04:15+00:00'
-    context: 25352
-    context_at: '2026-11-06T05:03:48+00:00'
+    agent: a3cab37160ae06157
+    state: working
+    since: '2026-11-06T05:14:31+00:00'
+    state_at: '2026-11-06T05:14:31+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
