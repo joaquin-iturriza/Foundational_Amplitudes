@@ -5332,6 +5332,15 @@ entries:
     at: '2026-11-06T05:23:32+00:00'
     searched: D292/D293 name no cost (30 GPU-h line); an agent's permission refusal is the user's to clear
     blocks: step 64's submission and step 61's resubmission
+    blocks_steps:
+    - 61
+    - 64
+  - ask: For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's settings (39
+      GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28
+      GPU-h of work)?
+    at: '2026-11-06T05:24:46+00:00'
+    searched: D292/D293 name no cost (30 GPU-h line); an agent's permission refusal is the user's to clear
+    blocks: step 64's submission and step 61's resubmission
     blocks_steps: &id001
     - 61
     - 64
@@ -11242,10 +11251,10 @@ entries:
       (flat quota), data_mmap.py, keyed_aug.py, scripts/job_mmap_prebuild.sh, scripts/job_catalog_v3_short.sh (SHORT_TAG,
       beam/sign arms, LONG_HP), tools/short_wall.py --width, experiment.py (sign_het_match)
     written: '2026-11-06T05:21:37+00:00'
-  ask: 'Two calls: (1) the scaling grid costs 449 GPU-h: run the whole grid, only the 2x row (the six under-one-epoch points
-    redone at 1.27 epochs, 39 GPU-h), or that row at the original settings? (2) will you allow the resubmission of the 12
-    sign-output jobs at 3:30 (28 GPU-h of work), which the automatic permission check refused for the agent?'
-  waiting_since: '2026-11-06T05:23:32+00:00'
+  ask: For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's settings (39
+    GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h
+    of work)?
+  waiting_since: '2026-11-06T05:24:46+00:00'
   searched: D292/D293 name no cost (30 GPU-h line); an agent's permission refusal is the user's to clear
   blocks: step 64's submission and step 61's resubmission
   blocks_steps: *id001
