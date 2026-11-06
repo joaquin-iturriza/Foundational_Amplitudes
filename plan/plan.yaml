@@ -13228,6 +13228,7 @@ entries:
     - FA-ccin2p3-04fc5b3b
     - FA-ccin2p3-0564ad5b
     - FA-ccin2p3-0898a7b0
+    - FA-ccin2p3-159e0244
     - FA-ccin2p3-21674d1e
     - FA-ccin2p3-21a18a76
     - FA-ccin2p3-254abf4f
@@ -13272,6 +13273,7 @@ entries:
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066_seed3
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066_seed4
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k2132_seed4
+    - analysis/catalog_v3/data/short_reads/v4_mse_cont_k533_seed3
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k533_seed4
     - analysis/catalog_v4/data/het_magnitude.json
