@@ -456,6 +456,82 @@ def summary():
     json.dump(out, open(os.path.join(DATA, "multichannel_check.json"), "w"), indent=1)
 
 
+# step 67's read (its passed design, 2026-11-06): the guard of both ladders at budget 50 and the coverage at 750
+STEP67 = {"old": "quota_ladder_res2", "edge": "quota_ladder_edge_res2", "both": "quota_ladder_both_res2",
+          "both750": "quota_ladder_both_res2_budget750"}
+
+
+def coverage():
+    """data/multichannel_check.json -> data/quota_coverage.json: per class and policy, the fill per quota bin
+    (sum over chunks of min(kept, quota) / sum of the quota; seeds' mean, min and max), each bin IN RANGE when its lower
+    edge is <= the class's pp in-support max (the flat range table's upper end minus its margin, tools/flat_range.py),
+    else MARGIN; the guard of the both-ladder policy at budget 50 (paired per seed: mean shortfall difference against
+    the old ladder <= max(0.002, 2 SE), every bin's mean fill difference >= -max(0.06, 2 SE), SE of the paired
+    differences over the seeds); the budget-750 verdict: YES = held-out outside kept <= 2 on every seed, every in-range
+    bin >= 0.95 on every seed, no no_steer stop, and margin bins filled too; NEAR = the same with a margin bin short;
+    SHORT = an in-range bin < 0.95 or held-out outside kept >= 3"""
+    from tools.flat_range import ranges, MARGIN_DEX
+    rng = ranges()
+    src = json.load(open(os.path.join(DATA, "multichannel_check.json")))["classes"]
+    out = {"source": "analysis/catalog_v4/multichannel_check.py coverage over data/multichannel_check.json",
+           "classes": {}}
+    for c, d in src.items():
+        if not all(STEP67[k] in d for k in ("old", "both")):
+            continue
+        pp_max = rng[c][1] / np.log(10.0) - MARGIN_DEX
+        o = {"pp_in_support_max_log10": pp_max, "policies": {}}
+        for k, pol in STEP67.items():
+            if pol not in d:
+                continue
+            js = d[pol]["seeds"]
+            bins = sorted({float(b) for j in js.values() for b in j["fill_per_bin"]})
+            f = {b: [js[s]["fill_per_bin"].get(f"{b:g}", js[s]["fill_per_bin"].get(str(b))) for s in sorted(js)]
+                 for b in bins}
+            o["policies"][k] = {
+                "policy": pol, "seeds": sorted(js),
+                "bins": [{"lo": b, "in_range": bool(b <= pp_max), "mean": float(np.mean(v)), "min": float(min(v)),
+                          "max": float(max(v))} for b, v in f.items() if None not in v],
+                "shortfall": [js[s]["quota_short_share"] for s in sorted(js)],
+                "heldout_outside_kept": [js[s]["heldout_outside_kept"] for s in sorted(js)],
+                "heldout_n_in_support": js[sorted(js)[0]]["heldout_n_in_support"],
+                "chunks_budget_hit": [js[s]["chunks_budget_hit"] for s in sorted(js)],
+                "chunks_no_steer": [js[s]["chunks_no_steer"] for s in sorted(js)],
+                "seconds": [js[s]["seconds"] for s in sorted(js)]}
+        def paired(a, b):           # b minus a, per seed: mean and 2 SE
+            x = np.asarray(b, float) - np.asarray(a, float)
+            return float(x.mean()), float(2 * x.std(ddof=1) / np.sqrt(len(x))) if len(x) > 1 else float("nan")
+        P = o["policies"]
+        g = {}
+        for ref in ("old", "edge"):
+            if ref not in P or "both" not in P or P[ref]["seeds"] != P["both"]["seeds"]:
+                continue
+            m, se2 = paired(P[ref]["shortfall"], P["both"]["shortfall"])
+            fr = {s: d[STEP67[ref]]["seeds"][s]["fill_per_bin"] for s in P[ref]["seeds"]}
+            fb = {s: d[STEP67["both"]]["seeds"][s]["fill_per_bin"] for s in P["both"]["seeds"]}
+            per_bin = []
+            for b in sorted(set.intersection(*(set(v) for v in list(fr.values()) + list(fb.values()))), key=float):
+                dm, dse = paired([fr[s][b] for s in sorted(fr)], [fb[s][b] for s in sorted(fb)])
+                per_bin.append({"lo": float(b), "diff": dm, "two_se": dse,
+                                "ok": bool(dm >= -max(0.06, dse if dse == dse else 0.0))})
+            short_ok = bool(m <= max(0.002, se2 if se2 == se2 else 0.0))
+            bad = [x for x in per_bin if not x["ok"]]
+            g[ref] = {"shortfall_diff": m, "shortfall_two_se": se2, "shortfall_ok": short_ok,
+                      "worst_bin": min(per_bin, key=lambda x: x["diff"]) if per_bin else None, "bins_failed": bad,
+                      "pass": bool(short_ok and not bad)}
+        o["guard_both_vs"] = g
+        if "both750" in P:
+            q = P["both750"]
+            held_ok = all(h is not None and h <= 2 for h in q["heldout_outside_kept"])
+            in_ok = all(x["min"] >= 0.95 for x in q["bins"] if x["in_range"])
+            mar_ok = all(x["min"] >= 0.95 for x in q["bins"] if not x["in_range"])
+            o["verdict_750"] = ("YES" if held_ok and in_ok and mar_ok and not any(q["chunks_no_steer"]) else
+                                "NEAR" if held_ok and in_ok and not any(q["chunks_no_steer"]) else "SHORT")
+            o["short_bins_750"] = [x for x in q["bins"] if x["min"] < 0.95]
+        out["classes"][c] = o
+        print(c, o.get("verdict_750"), {r: v["pass"] for r, v in g.items()}, o.get("short_bins_750"))
+    json.dump(out, open(os.path.join(DATA, "quota_coverage.json"), "w"), indent=1)
+
+
 PULL_REMOTE = r'''
 import json, os, sys
 print("MCHECK_READ " + open(os.path.join(os.environ["SCRATCH"], "zz_mcheck", sys.argv[1] + ".json")).read().strip())
@@ -487,6 +563,8 @@ if __name__ == "__main__":
                                                           if len(sys.argv) > 4 else ()))
     elif sys.argv[1] == "summary":
         summary()
+    elif sys.argv[1] == "coverage":
+        coverage()
     else:   # an unknown argument (e.g. --help) once rewrote data/multichannel_check.json through summary()
         sys.exit("usage: multichannel_check.py run <class> <probe> [<policies> <seed>] | pull [<policies>] | "
                  "where <class> <probe> <cut_log10> | summary")

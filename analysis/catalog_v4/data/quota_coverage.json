@@ -1,0 +1,5793 @@
+{
+ "source": "analysis/catalog_v4/multichannel_check.py coverage over data/multichannel_check.json",
+ "classes": {
+  "v4_udx_csxvevex": {
+   "pp_in_support_max_log10": 0.4146951924693596,
+   "policies": {
+    "old": {
+     "policy": "quota_ladder_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -11.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.46,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.72,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.98,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.77,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.03,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.54,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.81,
+       "in_range": true,
+       "mean": 0.9971,
+       "min": 0.9942,
+       "max": 1.0
+      },
+      {
+       "lo": -0.56,
+       "in_range": true,
+       "mean": 0.95765,
+       "min": 0.9562,
+       "max": 0.9591
+      },
+      {
+       "lo": -0.31,
+       "in_range": true,
+       "mean": 0.7664,
+       "min": 0.7424,
+       "max": 0.7904
+      },
+      {
+       "lo": -0.07,
+       "in_range": true,
+       "mean": 0.4581,
+       "min": 0.4541,
+       "max": 0.4621
+      },
+      {
+       "lo": 0.18,
+       "in_range": true,
+       "mean": 0.2392,
+       "min": 0.235,
+       "max": 0.2434
+      },
+      {
+       "lo": 0.42,
+       "in_range": false,
+       "mean": 0.12155,
+       "min": 0.1179,
+       "max": 0.1252
+      },
+      {
+       "lo": 0.67,
+       "in_range": false,
+       "mean": 0.0627,
+       "min": 0.0511,
+       "max": 0.0743
+      }
+     ],
+     "shortfall": [
+      0.06655807041609511,
+      0.06667238225880201
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      208.36340350208047,
+      199.8497418899933
+     ]
+    },
+    "edge": {
+     "policy": "quota_ladder_edge_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -11.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.46,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.72,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.98,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.77,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.03,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.54,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.81,
+       "in_range": true,
+       "mean": 0.9927,
+       "min": 0.9927,
+       "max": 0.9927
+      },
+      {
+       "lo": -0.56,
+       "in_range": true,
+       "mean": 0.9532499999999999,
+       "min": 0.9387,
+       "max": 0.9678
+      },
+      {
+       "lo": -0.31,
+       "in_range": true,
+       "mean": 0.6994,
+       "min": 0.6463,
+       "max": 0.7525
+      },
+      {
+       "lo": -0.07,
+       "in_range": true,
+       "mean": 0.4421,
+       "min": 0.4017,
+       "max": 0.4825
+      },
+      {
+       "lo": 0.18,
+       "in_range": true,
+       "mean": 0.2071,
+       "min": 0.1985,
+       "max": 0.2157
+      },
+      {
+       "lo": 0.42,
+       "in_range": false,
+       "mean": 0.1077,
+       "min": 0.0946,
+       "max": 0.1208
+      },
+      {
+       "lo": 0.67,
+       "in_range": false,
+       "mean": 0.04305,
+       "min": 0.0292,
+       "max": 0.0569
+      }
+     ],
+     "shortfall": [
+      0.06690100594421582,
+      0.07250228623685413
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      206.516930917016,
+      163.56923705500958
+     ]
+    },
+    "both": {
+     "policy": "quota_ladder_both_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -11.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.46,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.72,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.98,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.77,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.03,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.54,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.81,
+       "in_range": true,
+       "mean": 0.9926999999999999,
+       "min": 0.9883,
+       "max": 0.9971
+      },
+      {
+       "lo": -0.56,
+       "in_range": true,
+       "mean": 0.92035,
+       "min": 0.883,
+       "max": 0.9577
+      },
+      {
+       "lo": -0.31,
+       "in_range": true,
+       "mean": 0.76635,
+       "min": 0.754,
+       "max": 0.7787
+      },
+      {
+       "lo": -0.07,
+       "in_range": true,
+       "mean": 0.42974999999999997,
+       "min": 0.4155,
+       "max": 0.444
+      },
+      {
+       "lo": 0.18,
+       "in_range": true,
+       "mean": 0.2239,
+       "min": 0.223,
+       "max": 0.2248
+      },
+      {
+       "lo": 0.42,
+       "in_range": false,
+       "mean": 0.1099,
+       "min": 0.0975,
+       "max": 0.1223
+      },
+      {
+       "lo": 0.67,
+       "in_range": false,
+       "mean": 0.05615,
+       "min": 0.0511,
+       "max": 0.0612
+      }
+     ],
+     "shortfall": [
+      0.0701588934613626,
+      0.06712962962962964
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      260.7313496239949,
+      260.9683828259149
+     ]
+    },
+    "both750": {
+     "policy": "quota_ladder_both_res2_budget750",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -11.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.46,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.72,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.98,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.77,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.03,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.54,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.81,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.31,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.18,
+       "in_range": true,
+       "mean": 0.99925,
+       "min": 0.9985,
+       "max": 1.0
+      },
+      {
+       "lo": 0.42,
+       "in_range": false,
+       "mean": 0.98325,
+       "min": 0.9767,
+       "max": 0.9898
+      },
+      {
+       "lo": 0.67,
+       "in_range": false,
+       "mean": 0.90955,
+       "min": 0.8934,
+       "max": 0.9257
+      }
+     ],
+     "shortfall": [
+      0.0016575217192501142,
+      0.00257201646090535
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      10,
+      9
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      3223.0856063410465,
+      3206.380214058023
+     ]
+    }
+   },
+   "guard_both_vs": {
+    "old": {
+     "shortfall_diff": 0.002029035208047557,
+     "shortfall_two_se": 0.0031435756744398603,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -0.56,
+      "diff": -0.0373,
+      "two_se": 0.07759999999999989,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    },
+    "edge": {
+     "shortfall_diff": -0.0010573845450388558,
+     "shortfall_two_se": 0.008630544124371281,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -0.56,
+      "diff": -0.032899999999999985,
+      "two_se": 0.1038,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    }
+   },
+   "verdict_750": "NEAR",
+   "short_bins_750": [
+    {
+     "lo": 0.67,
+     "in_range": false,
+     "mean": 0.90955,
+     "min": 0.8934,
+     "max": 0.9257
+    }
+   ]
+  },
+  "v4_us_ddxsu": {
+   "pp_in_support_max_log10": 4.587828339860321,
+   "policies": {
+    "old": {
+     "policy": "quota_ladder_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -8.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.38,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.85,
+       "in_range": true,
+       "mean": 0.9984999999999999,
+       "min": 0.997,
+       "max": 1.0
+      },
+      {
+       "lo": 3.1,
+       "in_range": true,
+       "mean": 0.9368000000000001,
+       "min": 0.9254,
+       "max": 0.9482
+      },
+      {
+       "lo": 3.35,
+       "in_range": true,
+       "mean": 0.5783,
+       "min": 0.5529,
+       "max": 0.6037
+      },
+      {
+       "lo": 3.6,
+       "in_range": true,
+       "mean": 0.2655,
+       "min": 0.261,
+       "max": 0.27
+      },
+      {
+       "lo": 3.85,
+       "in_range": true,
+       "mean": 0.1164,
+       "min": 0.1082,
+       "max": 0.1246
+      },
+      {
+       "lo": 4.09,
+       "in_range": true,
+       "mean": 0.046049999999999994,
+       "min": 0.0377,
+       "max": 0.0544
+      },
+      {
+       "lo": 4.34,
+       "in_range": true,
+       "mean": 0.0143,
+       "min": 0.0134,
+       "max": 0.0152
+      },
+      {
+       "lo": 4.59,
+       "in_range": false,
+       "mean": 0.0022500000000000003,
+       "min": 0.0015,
+       "max": 0.003
+      },
+      {
+       "lo": 4.84,
+       "in_range": false,
+       "mean": 0.00225,
+       "min": 0.0,
+       "max": 0.0045
+      }
+     ],
+     "shortfall": [
+      0.11374028349336991,
+      0.11442615454961134
+     ],
+     "heldout_outside_kept": [
+      6,
+      1
+     ],
+     "heldout_n_in_support": 53857,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      526.0092737250088,
+      590.2704628790525
+     ]
+    },
+    "edge": {
+     "policy": "quota_ladder_edge_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -8.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.38,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.09,
+       "in_range": true,
+       "mean": 0.9721,
+       "min": 0.9698,
+       "max": 0.9744
+      },
+      {
+       "lo": 4.34,
+       "in_range": true,
+       "mean": 0.6689499999999999,
+       "min": 0.6364,
+       "max": 0.7015
+      },
+      {
+       "lo": 4.59,
+       "in_range": false,
+       "mean": 0.29059999999999997,
+       "min": 0.2853,
+       "max": 0.2959
+      },
+      {
+       "lo": 4.84,
+       "in_range": false,
+       "mean": 0.06384999999999999,
+       "min": 0.0625,
+       "max": 0.0652
+      }
+     ],
+     "shortfall": [
+      0.03695130315500686,
+      0.03878029263831733
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 53857,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      458.18987669300986,
+      445.1244529789983
+     ]
+    },
+    "both": {
+     "policy": "quota_ladder_both_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -8.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.38,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.09,
+       "in_range": true,
+       "mean": 0.9766,
+       "min": 0.9592,
+       "max": 0.994
+      },
+      {
+       "lo": 4.34,
+       "in_range": true,
+       "mean": 0.7644500000000001,
+       "min": 0.7168,
+       "max": 0.8121
+      },
+      {
+       "lo": 4.59,
+       "in_range": false,
+       "mean": 0.29064999999999996,
+       "min": 0.2778,
+       "max": 0.3035
+      },
+      {
+       "lo": 4.84,
+       "in_range": false,
+       "mean": 0.07145,
+       "min": 0.0621,
+       "max": 0.0808
+      }
+     ],
+     "shortfall": [
+      0.03400777320530407,
+      0.037637174211248285
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 53857,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      657.8121213700069,
+      657.3332026559947
+     ]
+    },
+    "both750": {
+     "policy": "quota_ladder_both_res2_budget750",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -8.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.38,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.86,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.35,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.09,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.59,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.84,
+       "in_range": false,
+       "mean": 0.9636,
+       "min": 0.9424,
+       "max": 0.9848
+      }
+     ],
+     "shortfall": [
+      0.0002857796067672611,
+      0.0010859625057155922
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 53857,
+     "chunks_budget_hit": [
+      3,
+      4
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      7467.890921656988,
+      7780.201803933989
+     ]
+    }
+   },
+   "guard_both_vs": {
+    "old": {
+     "shortfall_diff": -0.07826074531321445,
+     "shortfall_two_se": 0.002943529949702775,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -8.07,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    },
+    "edge": {
+     "shortfall_diff": -0.002043324188385917,
+     "shortfall_two_se": 0.0018004115226337434,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -8.07,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    }
+   },
+   "verdict_750": "NEAR",
+   "short_bins_750": [
+    {
+     "lo": 4.84,
+     "in_range": false,
+     "mean": 0.9636,
+     "min": 0.9424,
+     "max": 0.9848
+    }
+   ]
+  },
+  "v4_uux_epemg": {
+   "pp_in_support_max_log10": 0.2732887296599168,
+   "policies": {
+    "old": {
+     "policy": "quota_ladder_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -6.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.29,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.8,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.32,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.2,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.29,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.53,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      }
+     ],
+     "shortfall": [
+      0.0,
+      0.0
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      0,
+      0
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      61.64908774998912,
+      63.13799779699184
+     ]
+    },
+    "edge": {
+     "policy": "quota_ladder_edge_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -6.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.29,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.8,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.32,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.2,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.29,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.53,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      }
+     ],
+     "shortfall": [
+      0.0,
+      0.0
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      0,
+      0
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      61.47407242197369,
+      62.401891514018644
+     ]
+    },
+    "both": {
+     "policy": "quota_ladder_both_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -6.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.29,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.8,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.32,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.2,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.29,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.53,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      }
+     ],
+     "shortfall": [
+      0.0,
+      0.0
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      0,
+      0
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      61.54998268400959,
+      60.95067181898048
+     ]
+    },
+    "both750": {
+     "policy": "quota_ladder_both_res2_budget750",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -6.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.29,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.8,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.32,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.83,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.61,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.12,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.42,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.2,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.29,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.53,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      }
+     ],
+     "shortfall": [
+      0.0,
+      0.0
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      0,
+      0
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      61.648659512997256,
+      60.49351670798205
+     ]
+    }
+   },
+   "guard_both_vs": {
+    "old": {
+     "shortfall_diff": 0.0,
+     "shortfall_two_se": 0.0,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -6.78,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    },
+    "edge": {
+     "shortfall_diff": 0.0,
+     "shortfall_two_se": 0.0,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -6.78,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    }
+   },
+   "verdict_750": "YES",
+   "short_bins_750": []
+  },
+  "v4_uux_epemvevex": {
+   "pp_in_support_max_log10": -0.6706334593814729,
+   "policies": {
+    "old": {
+     "policy": "quota_ladder_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -12.24,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.5,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.76,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.52,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.27,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.55,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.81,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.31,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.82,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.16,
+       "in_range": true,
+       "mean": 0.96365,
+       "min": 0.9399,
+       "max": 0.9874
+      },
+      {
+       "lo": -0.91,
+       "in_range": true,
+       "mean": 0.8499,
+       "min": 0.8478,
+       "max": 0.852
+      },
+      {
+       "lo": -0.66,
+       "in_range": false,
+       "mean": 0.5339,
+       "min": 0.5112,
+       "max": 0.5566
+      },
+      {
+       "lo": -0.42,
+       "in_range": false,
+       "mean": 0.30565,
+       "min": 0.304,
+       "max": 0.3073
+      }
+     ],
+     "shortfall": [
+      0.02746342021033379,
+      0.027663465935070873
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      188.06497808001586,
+      188.19368585800112
+     ]
+    },
+    "edge": {
+     "policy": "quota_ladder_edge_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -12.24,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.5,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.76,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.52,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.27,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.55,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.81,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.31,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.82,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.16,
+       "in_range": true,
+       "mean": 0.96365,
+       "min": 0.9399,
+       "max": 0.9874
+      },
+      {
+       "lo": -0.91,
+       "in_range": true,
+       "mean": 0.8499,
+       "min": 0.8478,
+       "max": 0.852
+      },
+      {
+       "lo": -0.66,
+       "in_range": false,
+       "mean": 0.5339,
+       "min": 0.5112,
+       "max": 0.5566
+      },
+      {
+       "lo": -0.42,
+       "in_range": false,
+       "mean": 0.30565,
+       "min": 0.304,
+       "max": 0.3073
+      }
+     ],
+     "shortfall": [
+      0.02746342021033379,
+      0.027663465935070873
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      157.51500798801135,
+      157.37182164097612
+     ]
+    },
+    "both": {
+     "policy": "quota_ladder_both_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -12.24,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.5,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.76,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.52,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.27,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.55,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.81,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.31,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.82,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.16,
+       "in_range": true,
+       "mean": 0.96365,
+       "min": 0.9399,
+       "max": 0.9874
+      },
+      {
+       "lo": -0.91,
+       "in_range": true,
+       "mean": 0.8499,
+       "min": 0.8478,
+       "max": 0.852
+      },
+      {
+       "lo": -0.66,
+       "in_range": false,
+       "mean": 0.5339,
+       "min": 0.5112,
+       "max": 0.5566
+      },
+      {
+       "lo": -0.42,
+       "in_range": false,
+       "mean": 0.30565,
+       "min": 0.304,
+       "max": 0.3073
+      }
+     ],
+     "shortfall": [
+      0.02746342021033379,
+      0.027663465935070873
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      143.0828839980386,
+      161.56534411497705
+     ]
+    },
+    "both750": {
+     "policy": "quota_ladder_both_res2_budget750",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -12.24,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.5,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -11.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.76,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.52,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.27,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -10.02,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.78,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.53,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.28,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -9.04,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.79,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.55,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.3,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -8.05,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.81,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.56,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.31,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -7.07,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.82,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.58,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.33,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.08,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.84,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.59,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.34,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.1,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.85,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.6,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.36,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.11,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.87,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.62,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.37,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.13,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.88,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.63,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.39,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.65,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.91,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.66,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.42,
+       "in_range": false,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      }
+     ],
+     "shortfall": [
+      0.0,
+      0.0
+     ],
+     "heldout_outside_kept": [
+      0,
+      0
+     ],
+     "heldout_n_in_support": 54001,
+     "chunks_budget_hit": [
+      0,
+      0
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      386.7030301330524,
+      482.20560696101165
+     ]
+    }
+   },
+   "guard_both_vs": {
+    "old": {
+     "shortfall_diff": 0.0,
+     "shortfall_two_se": 0.0,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -12.24,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    },
+    "edge": {
+     "shortfall_diff": 0.0,
+     "shortfall_two_se": 0.0,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -12.24,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    }
+   },
+   "verdict_750": "YES",
+   "short_bins_750": []
+  }
+ }
+}
