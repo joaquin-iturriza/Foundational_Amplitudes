@@ -15887,6 +15887,17 @@ entries:
       checkpoint is ruled out). Jump not removed: read the OPT_STATE line first; then the EMA-weights / live-moments mismatch
       is the cause to rule out. A run whose OPT_STATE line shows fewer than 32 Muon and 92 AdamW entries is cancelled and
       the loader fixed. A run that blows up is listed apart with where.'
+    passed_at: '2026-11-06T22:30:15+00:00'
+    reviewer: 'Round 2: all three fixes are in. Prior now names the 0 Muon / 2 AdamW entries in the final checkpoint (overwritten
+      by the sigma stage); the step-3198 checkpoints read on CC hold 32/32 Muon and 92/92 AdamW entries, with model_live,
+      both seeds; a run whose OPT_STATE line shows fewer is cancelled. The mechanism yes/no is set on R(arm/step3198_continue)
+      together with the jump bar. The mismatch between EMA weights and live moments is stated in fixed and in the jump-not-removed
+      branch. One change against step3198_continue (branch diff: WS_OPTSTATE only; 2db2cfb4 adds a guard against moment fill).
+      Measure: recomputed data/ws_restart_study_steps.json, loss rise 1.13/1.11 control, 0.97/0.64 step3198 default, 2.17/2.10
+      fresh-optimizer continued, 2.41/3.74 lr x3; reads 1.145 vs 1.019 from the same start model. Seeds 2, as the sibling
+      cells (D307/D313), against a spread of about +-0.17. HETEROSC; parent target stats; no HPO; disk 2 x 0.9 GB with no
+      shared cache; CPU test passes. Searched results.tex for optimizer state, optimiser state, load_optimizer, optimizer_state,
+      moment fill, resume, continued, empty/fresh optimizer, model_live; plan show warm_start; decisions D300-D313.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
