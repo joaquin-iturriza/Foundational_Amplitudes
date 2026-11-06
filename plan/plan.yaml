@@ -14074,6 +14074,21 @@ entries:
       EE4: tuned row A 0.489/1.68, B 0.207/0.344, untuned W533 0.285/0.770, NLL-tuned 0.355/0.935; checkpoint row from 2132
       0.422/1.118, from 3198 0.364/0.898, from final 0.353/0.887; growth row w8 A 0.276/0.441, w16 B 0.168/0.209, grown 533
       0.277/0.412, 1066 0.250/0.383, 2132 0.204/0.328. Not yet in results.tex (goes in with the (a)/(b) write-up).'
+  - at: '2026-11-06T05:29:35+00:00'
+    text: '2026-11-06 step 6 lead (D303, Joaquin: the lr or the scheduler is wrong), ws_restart_steps.py @d811a452 -> data/ws_restart_steps.json:
+      every restarted warm start is knocked off the pretrained minimum in its first optimizer steps, at a tiny lr, before
+      the re-warm reaches any real lr. Default-lr warm start (k=533, s42): grad norm 10.7, 18.1, 825 at steps 0, 1, 2 with
+      lr 0, 5.9e-5, 1.2e-4 (2.4% of the 5e-3 peak), training loss -2.577 -> -1.212 by step 10; grown 8->16 the same (23.1,
+      11.1, 858; loss -2.804 -> -1.541). Over the 8 hpo8 trials the step-2 grad norm follows the step-2 lr: 1.6e-5 -> 101,
+      5e-5..7e-5 -> 340-490, 1.3e-4 -> 830, 3.4e-4 -> 2120, 5.2e-4 -> 3230, 6.9e-4 -> 4310; the worst training loss in the
+      first 40 steps goes from -2.47 (lowest lr) to +3.9 (highest). The pretrained model ended its own run at lr 1e-9 with
+      grad norm 7.0. Cause (reading of the code, not yet tested by a run): the fine-tune path starts AdamW and Muon with empty
+      state, so the first updates have a size set by the lr, not by the gradient (AdamW bias-corrected first steps about lr
+      per element; Muon''s orthogonalised step a fixed norm), and the restart then re-warms to the from-scratch peak 5e-3
+      in 84 steps (warmup fraction 0.158 of 533, against 675 steps in the parent''s run). The parent''s main-stage optimizer
+      state is not in its checkpoint (0 Muon, 2 AdamW state entries: the sigma stage shares and overwrites models/). The mu_mse/WSD
+      sweep in flight varies lr_scale, warmup and decay, not the empty-optimizer start. Next: a restart that fills the optimizer
+      moments at lr 0 before the ramp (or carries a parent''s moments), against the default restart at k=533.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
