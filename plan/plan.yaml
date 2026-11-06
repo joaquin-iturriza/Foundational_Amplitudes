@@ -17179,6 +17179,7 @@ entries:
       effects.'
   step_waits:
     '1': FA-ccin2p3-05df656d FA-ccin2p3-07bfc8d7
+    '9': FA-ccin2p3-238e6f81 FA-ccin2p3-71852916 FA-ccin2p3-77e8bf2b FA-ccin2p3-85dd4eff FA-ccin2p3-a79d5b14 FA-ccin2p3-554f3ec5
   handoff:
     state: 'Step 12 (D307, D308), the restart study on C1 (share 0.25, het, k=533 only, D312), design passed round 2, SUBMITTED
       whole 2026-11-06 ~20:40 UTC: 10 runs on CC from the checkpoint rerun v4_het_control_ckpt[_seed2], scripts/job_catalog_v3_short.sh
