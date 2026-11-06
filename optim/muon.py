@@ -85,6 +85,8 @@ class MuonAdamW(torch.optim.Optimizer):
         # a multiplier on the Muon groups' lr only (fine_tune.muon_warmup_steps, D303), set per step by the trainer;
         # 1.0 leaves the update unchanged
         self.muon_lr_mult = 1.0
+        # the same on the AdamW groups' lr (fine_tune.adamw_warmup_steps, D303 step 9); 1.0 leaves the update unchanged
+        self.adamw_lr_mult = 1.0
         super().__init__(muon_groups + adam_groups, defaults)
         kw = {"fused": True} if fused else {}
         self._n_muon = len(muon_groups)
@@ -120,7 +122,19 @@ class MuonAdamW(torch.optim.Optimizer):
                     p.mul_(1.0 - lr * wd)
                 p.add_(o.to(p.dtype), alpha=-lr * muon_scale(p, g["rms"], self._mup))
         if self._adamw is not None:
-            self._adamw.step()
+            if self.adamw_lr_mult != 1.0:
+                # scaled for this step only, the scheduler's lr restored exactly afterwards
+                groups = self.param_groups[self._n_muon:]
+                lrs = [g["lr"] for g in groups]
+                for g, lr in zip(groups, lrs):
+                    g["lr"] = lr * self.adamw_lr_mult
+                try:
+                    self._adamw.step()
+                finally:
+                    for g, lr in zip(groups, lrs):
+                        g["lr"] = lr
+            else:
+                self._adamw.step()
         return loss
 
     def state_dict(self):

@@ -1038,6 +1038,15 @@ class BaseExperiment:
         if self._muon_warmup > 0 and not hasattr(self.optimizer, "muon_lr_mult"):
             raise RuntimeError(f"fine_tune.muon_warmup_steps={self._muon_warmup} needs the MuonAdamW optimizer, "
                                f"not {type(self.optimizer).__name__}")
+        # fine_tune.adamw_warmup_steps (D303 step 9): the same multiplier min(1, step / N) on the AdamW groups' lr (head,
+        # vectors, embeddings), Muon untouched unless muon_warmup_steps is set too
+        self._adamw_warmup = int(_ft.get("adamw_warmup_steps", 0) or 0) if _ft is not None else 0
+        if self._adamw_warmup > 0 and not hasattr(self.optimizer, "adamw_lr_mult"):
+            raise RuntimeError(f"fine_tune.adamw_warmup_steps={self._adamw_warmup} needs the MuonAdamW optimizer, "
+                               f"not {type(self.optimizer).__name__}")
+        if self._adamw_warmup > 0:
+            LOGGER.info(f"ADAMW_WARMUP the AdamW groups' lr times min(1, step / {self._adamw_warmup}) on top of the "
+                        f"schedule (the logged lr is the schedule's)")
         if self._muon_warmup > 0:
             LOGGER.info(f"MUON_WARMUP the Muon groups' lr times min(1, step / {self._muon_warmup}) on top of the "
                         f"schedule (the logged lr is the schedule's)")
@@ -1727,6 +1736,8 @@ class BaseExperiment:
 
         if getattr(self, "_muon_warmup", 0) > 0:
             self.optimizer.muon_lr_mult = min(1.0, step / self._muon_warmup)
+        if getattr(self, "_adamw_warmup", 0) > 0:
+            self.optimizer.adamw_lr_mult = min(1.0, step / self._adamw_warmup)
         self.optimizer.step()
         if self.ema is not None:
             self.ema.update()
