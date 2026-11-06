@@ -35,11 +35,11 @@ FIGS = {"ws_c1m": ([("pretrained start", WARM["C1"]["A"], False),
                       ("width 16, scratch", WARM["C10wm"]["B"], False),
                       ("grown 8$\\to$16, default lr", WARM["C10wm"]["ref"]["untuned"], True),
                       ("grown 8$\\to$16, MSE-tuned", WARM["C10wm"]["W"][533], True)], -1.0),
-        "ws_c10wz": ([("width 8, scratch", WARM["C10wz"]["A"], False),
-                      ("width 16, scratch", WARM["C10wz"]["B"], False),
-                      ("grown 8$\\to$16, default lr", WARM["C10wz"]["ref"]["default"], True),
-                      ("grown 8$\\to$16, MSE-tuned", WARM["C10wz"]["ref"]["mse_tuned"], True),
-                      ("grown 8$\\to$16, zero-shot-tuned", WARM["C10wz"]["W"][533], True)], -1.0)}
+        "ws_c10wz": ([("8 heads, scratch", WARM["C10wz"]["A"], False),
+                      ("16 heads, scratch", WARM["C10wz"]["B"], False),
+                      ("grown, default", WARM["C10wz"]["ref"]["default"], True),
+                      ("grown, MSE-tuned", WARM["C10wz"]["ref"]["mse_tuned"], True),
+                      ("grown, zero-shot-tuned", WARM["C10wz"]["W"][533], True)], -1.0)}
 
 
 def main():
