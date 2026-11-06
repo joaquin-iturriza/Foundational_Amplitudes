@@ -11975,6 +11975,28 @@ entries:
       ladders'' is the quota + joint-resonance channel; the 169-class e+e- cost from these four worst classes is an upper-side
       estimate, to be split by final count; the 55 held-out e+e- classes'' range comes from the 2000-event EE4 pool they are
       scored on, a label-in-inputs question for step 65''s design.'
+  - at: '2026-11-06T21:58:32+00:00'
+    text: '2026-11-06 step 66 (f) e+e- quota check read (multichannel_check.py pull/summary/coverage @e0887519, coverage adapted
+      to classes without the old ladder; data/quota_coverage.json @9f6379ac; figures figs/ee_quota_fill_a..d + _legend, fig_quota_fill.py
+      ee @b21e3999). Verdict SHORT on all four e+e- classes at budget 750 (flat quota + joint-resonance channels; no ladder
+      on e+e-): every chunk stopped at the budget (36/36; vmvmxz 6/6), quota shortfall share 0.354/0.355 (ahvevex), 0.157/0.158
+      (bbxvevex), 0.228/0.229 (taptamvevex), 0.149/0.147 (vmvmxz), against 0.400/0.207/0.317/0.245 at budget 50. Fill is 1.0
+      up to an edge, then falls to ~0 over the top of each class''s default range: first bin < 0.95 at log10|M|^2 -6.11 /
+      -2.70 / -3.00 / -0.14 against the default-sampled max -1.90 / -0.73 / 0.96 / 1.34, i.e. the top 4.5 / 2.2 / 4.2 / 1.7
+      dex short (budget 50: 5.0 / 3.0 / 4.7 / 3.0). Held-out EE4 events in support outside the kept range (of 2000): ahvevex
+      43/31, taptamvevex 1/0, bbxvevex 0/0, vmvmxz 0/0 (budget 50: 308/307, 40/23, 4/3, 1/0). Where (multichannel_check.py
+      where @9f6379ac, data/quota_where/v4_epem_*): the default events above the fill edge sit at the top collider energies
+      (median sqrt(s) 3000 GeV, q10 1000-3000, against 240-500 below) with one final within 1-|cos theta| = 10^-2.9 / -2.8
+      / -3.2 / -4.8 (medians; below the edge 10^-1.0 to -1.3) of the beam: forward boson emission off the t-channel electron
+      (vmvmxz: the nu-nu pair on the Z, |cos| 1.0000, (m - mZ)/GammaZ -0.09). The catalog''s forward component caps every
+      final at the cut edge |cos| < 0.99 (rotate_forward(cos_cap)), neutrinos, Z and H included, which no cut applies to.
+      Cost (sampling_cost.py ee @b21e3999 -> data/sampling_cost_ee.json, figs/sampling_cost_ee): budget-750 seconds over the
+      old sampling''s in the same job: 105x (taptamvevex 113/97), 111x (bbxvevex), 109x (ahvevex), 111x (vmvmxz); old ~30
+      s per train pool (replay 22-33 s, generation logs 28-34 s). Upper-side estimate over the 170 e+e- classes of the range
+      table (old 3.38 core-h measured): new 375 core-h (2 finals, 8 classes: 0.06 -> 6.7, ratio not measured, the largest
+      111x used; 3 finals, 34: 0.34 -> 38; 4 finals, 128: 2.97 -> 330); upper side because these four are the classes farthest
+      above the catalog and every chunk hit the budget cap. Next per the design''s SHORT branch: the e+e- channel set examined:
+      forward component with uncut finals down to 1-|cos| = 1e-8 (sampling.fwd_free_floor, branch fwd-free 0f0b7b4e).'
   handoff:
     state: '2026-11-06 ~22:00. (1) Cost of the new sampling done: sampling_cost.py @08e3091e (pull = catalog_v4 generation
       logs of the 12 job_catalog_v4_regen runs of 2026-10-26 -> data/sampling_cost_gen.json; summary -> data/sampling_cost.json;
