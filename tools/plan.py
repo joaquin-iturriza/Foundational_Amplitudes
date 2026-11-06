@@ -1827,6 +1827,30 @@ def cmd_where(a):
     print("plan file %s\nstate     %s\nregistry  %s" % (PLAN_FILE, STATE_FILE, RUNS_DB))
 
 
+def recent_ended_sweeps(e, st, sweeps=None, hours=24):
+    """["sweep SITE:NAME ended (n of m results); read it and take the next step"] for the entry's recorded sweeps that
+    ended within `hours` (first seen ended in the site registry; 2026-11-06: a wait cleared while the owner worked
+    left the end of ws_grow_k533_zeroshot_hpo8_rerun reported as 'no step has a job')."""
+    if not sweeps_of(st, e["id"]):
+        return []
+    try:
+        sw = site_sweeps(want_of(st, [e["id"]]), all_sites=False) if sweeps is None else sweeps
+    except Exception:
+        return []
+    out = []
+    for x in sweeps_of(st, e["id"]):
+        data = sw.get(x["site"])
+        f = ((data or {}).get("sweeps") or {}).get(x["name"])
+        if not f or f.get("live"):
+            continue
+        at = parse(data["ended"].get(x["name"]))
+        if at and (now() - at).total_seconds() <= hours * 3600:
+            out.append("sweep %s:%s ended (%s of %s results); read it and take the next step" % (
+                x["site"], x["name"], "?" if f.get("results") is None else f["results"],
+                "?" if f.get("scripts") is None else f["scripts"]))
+    return out
+
+
 def entry_status(d, st, events=None):
     """[(entry id, 'MOVING'|'WAITING'|'WAITING ON YOU'|'STALLED', text)] for each running or waiting_user entry, in exactly one
     state, from live sources only: the run registry (job states), the owner's transcript, the entry's open ask and the
@@ -1867,6 +1891,10 @@ def entry_status(d, st, events=None):
         if timed and not evs and not ended:       # a wait that names no run (a day of clean running): not a stall
             out.append((eid, "WAITING", "; ".join(timed)))
             continue
+        if not why and not (e.get("step_waits") or {}):
+            recent = recent_ended_sweeps(e, st)
+            if recent:
+                why.append("; ".join(recent))
         if not why:
             why.append("no step has a job" if not (e.get("step_waits") or {}) else
                        "its waits name no live run, and nothing is working")
