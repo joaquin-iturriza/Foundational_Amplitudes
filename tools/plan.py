@@ -23,7 +23,7 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
   plan answer <id> --kind K --quote Q [--set title|question|next=V]   the user's words: typed after the entry's last
                                           ask or step (after the hold, for a release), then `site decide`, then the
                                           entry; all or nothing
-  plan ask <id> --ask Q --searched S [--blocks B --blocks-steps N,N | --holds-all WHY]   an open question on the entry: it stays running
+  plan ask <id> --ask "<Scope:|GPU budget:|Permission classifier refusal: `call`|Your hold:> Q" --searched S [--blocks B --blocks-steps N,N | --holds-all WHY]   an open question on the entry: it stays running
                                           and routed, its step prompt names the question and what waits on it (B);
                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
                                           it can move without the answer)
@@ -2086,9 +2086,41 @@ def _searched_ok(searched):
                  "and why none settles it), in at least %d characters" % SEARCHED_MIN)
 
 
+ASK_REASONS = (
+    ("scope", re.compile(r"^scope\b[^:]{0,20}:", re.I), None),
+    ("gpu", re.compile(r"^gpu budget\b[^:]{0,40}:", re.I), re.compile(r"\d+(\.\d+)?\s*gpu-?h", re.I)),
+    ("classifier", re.compile(r"^permission[- ]classifier refus\w*[^:]{0,20}:", re.I),
+     re.compile(r"`[^`]{12,}`|\"[^\"]{12,}\"")),
+    ("hold", re.compile(r"^(your|a) hold\b[^:]{0,40}:", re.I), None),
+)
+# deleting our own rebuildable debris is never the user's call (~/work/CLAUDE.md), whatever else the ask says
+ASK_OWN_DEBRIS = re.compile(r"\b(delet\w*|remov\w*)\b.*\b(cach\w*|rebuild\w*|debris|zz_probe\w*|duplicate)\b|"
+                            r"\b(cach\w*|rebuild\w*|debris|zz_probe\w*|duplicate)\b.*\b(delet\w*|remov\w*)\b", re.I | re.S)
+
+
+def ask_reason(ask):
+    """The reason an ask is the user's call, named first: 'Scope: ...' (a scope change), 'GPU budget: ...' (above 30 GPU-h,
+    10 on Jean Zay, with no decision covering it; the GPU-h figure named), 'Permission classifier refusal: ...' (quoting the
+    refused call in backticks or double quotes), 'Your hold: ...' (a hold of his). Returns the reason, or None."""
+    t = (ask or "").strip()
+    for name, head, need in ASK_REASONS:
+        if head.search(t) and (need is None or need.search(t)):
+            return name
+    return None
+
+
 def _ask_ok(ask):
     if len(words(ask)) < 3:
         sys.exit("plan: the question needs at least three words of five letters or more, to be found in a message")
+    if ASK_OWN_DEBRIS.search(ask or ""):
+        sys.exit("plan: not asked: deleting our own cheap-to-rebuild debris (a duplicate cache, zz_probe_*) is done and "
+                 "reported, never put to the user (~/work/CLAUDE.md); delete it with site run and report it")
+    if not ask_reason(ask):
+        sys.exit("plan: an ask must state first the one reason it is the user's call, as its opening words: "
+                 "'Scope: <the scope change>' | 'GPU budget: <N GPU-h> above 30 (10 on Jean Zay) with no decision "
+                 "covering it' | 'Permission classifier refusal: `<the refused call>`' (quote it) | 'Your hold: "
+                 "<his hold and the items it covers>'. Anything else is made, not asked (CLAUDE.md, Talking to me): "
+                 "a repair of approved work, a method, the next attempt, a deletion of our own debris")
 
 
 DESIGN_FIELDS = ("question", "prior", "measure", "check", "fixed", "control", "seeds", "outcome")

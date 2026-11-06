@@ -7,6 +7,9 @@ that file so there is one table) has passed a commit C when its watermark W (.cl
 main checkout) contains C (C is an ancestor of W), or when the pillar's files are the same at C as at W (the reviewer
 passed that content, committed later or elsewhere).
 
+    A pass is the watermark or any tip listed in .claude/.review_state/<pillar>.passed (every `advance` appends its tip), so
+    one branch's pass is not lost when another branch's pass moves the watermark.
+
     python3 tools/review_state.py unreviewed <base>..<tip> [--root R]   pillars whose files the range changes and
                                                                         whose review has not passed its tip
     python3 tools/review_state.py commit <sha> [--root R]               the same for one commit"""
@@ -50,13 +53,28 @@ def changed(root, rng, paths):
     return bool(git(root, "-c", "core.quotePath=false", "diff", "--name-only", rng, "--", *paths).stdout.strip())
 
 
-def passed(root, name, paths, tip):
+def passes(root, name):
+    """the watermark and every tip the pillar's reviewer passed (review_backlog.sh appends them to <pillar>.passed)"""
+    out = []
     w = watermark(root, name)
-    if not w or git(root, "cat-file", "-e", w + "^{commit}").returncode != 0:
-        return False
-    if git(root, "merge-base", "--is-ancestor", tip, w).returncode == 0:
-        return True
-    return git(root, "diff", "--quiet", w, tip, "--", *paths).returncode == 0
+    if w:
+        out.append(w)
+    try:
+        out += open(os.path.join(state_root(root), ".claude", ".review_state", name + ".passed")).read().split()
+    except OSError:
+        pass
+    return list(dict.fromkeys(out))
+
+
+def passed(root, name, paths, tip):
+    for w in passes(root, name):
+        if git(root, "cat-file", "-e", w + "^{commit}").returncode != 0:
+            continue
+        if git(root, "merge-base", "--is-ancestor", tip, w).returncode == 0:
+            return True
+        if git(root, "diff", "--quiet", w, tip, "--", *paths).returncode == 0:
+            return True
+    return False
 
 
 def unreviewed(rng, root=ROOT):

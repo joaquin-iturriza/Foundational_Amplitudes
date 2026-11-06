@@ -116,12 +116,12 @@ def test_ask_on_held_entry_and_no_step(tmp_path):
                 e.pop(k, None)
     yaml.safe_dump(d, open(p, "w"))
     plan = [sys.executable, os.path.join(REPO, "tools", "plan.py")]
-    r = subprocess.run(plan + ["ask", "agent_redesign", "--ask", "Fix the wait_guard watch regex during the hold?",
+    r = subprocess.run(plan + ["ask", "agent_redesign", "--ask", "Scope: fix the wait_guard watch regex during the hold?",
                                "--searched", "CLAUDE.md and site decisions FA: none on repairs during a hold",
                                "--blocks", "the wait_guard fix only", "--blocks-steps", "none"],
                        env=env, capture_output=True, text=True)
     assert r.returncode != 0 and "step numbers the answer gates" in r.stderr, r.stderr
-    r = subprocess.run(plan + ["ask", "agent_redesign", "--ask", "Fix the wait_guard watch regex during the hold?",
+    r = subprocess.run(plan + ["ask", "agent_redesign", "--ask", "Scope: fix the wait_guard watch regex during the hold?",
                                "--searched", "CLAUDE.md and site decisions FA: none on repairs during a hold",
                                "--blocks", "nothing", "--blocks-steps", "none"],
                        env=env, capture_output=True, text=True)
@@ -137,7 +137,7 @@ def test_ask_on_held_entry_and_no_step(tmp_path):
                   and isinstance(x.get("next"), dict) and len(x["next"]) > 1 and x["id"] != "agent_redesign"), None)
     if multi is None:
         return
-    q = ["--ask", "Is the second figure needed for the memo at all?", "--searched", "docs/results.tex, CLAUDE.md and site decisions FA: none settles it"]
+    q = ["--ask", "Scope: is the second figure needed for the memo at all?", "--searched", "docs/results.tex, CLAUDE.md and site decisions FA: none settles it"]
     r = subprocess.run(plan + ["ask", multi["id"]] + q, env=env, capture_output=True, text=True)
     assert r.returncode != 0 and "--blocks-steps none" in r.stderr, r.stderr
     r = subprocess.run(plan + ["ask", multi["id"]] + q + ["--blocks", "nothing", "--blocks-steps", "none"],

@@ -69,6 +69,34 @@ def test_advance_at_branch_tip():
         shutil.rmtree(d)
 
 
+def test_two_branches_passing_in_sequence():
+    d, g = make_repo()
+    try:
+        advance(d)
+        tips = []
+        for br, val in (("f1", "2"), ("f2", "3")):
+            g("checkout", "-q", "-b", br, "trunk")
+            open(os.path.join(d, "a.py"), "w").write("x = %s\n" % val)
+            g("commit", "-qam", br)
+            tips.append(g("rev-parse", "HEAD").stdout.strip())
+            g("checkout", "-q", "trunk")
+        advance(d, "--at", "f1")
+        advance(d, "--at", "f2")                    # moves the single watermark off f1's pass
+        assert watermark(d) == tips[1]
+        assert unreviewed(d, "trunk..f1") == 0      # f1 still passed (listed)
+        assert unreviewed(d, "trunk..f2") == 0
+        g("checkout", "-q", "-b", "f3", "trunk")
+        open(os.path.join(d, "a.py"), "w").write("x = 4\n")
+        g("commit", "-qam", "f3")
+        g("checkout", "-q", "trunk")
+        assert unreviewed(d, "trunk..f3") == 1      # never passed: refused
+        advance(d, "--at", "trunk")                 # an ancestor of the watermark's branch? trunk base is
+        assert watermark(d) == tips[1]              # an older tip never moves the watermark back
+    finally:
+        shutil.rmtree(d)
+
+
 if __name__ == "__main__":
     test_advance_at_branch_tip()
+    test_two_branches_passing_in_sequence()
     print("ok")

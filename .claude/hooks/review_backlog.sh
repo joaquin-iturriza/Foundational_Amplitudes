@@ -155,6 +155,15 @@ reset_pillar() {
   paths=$(pillar_field "$who" 4)
   sha=${2:-$(git rev-parse HEAD)}
   lines=$(pillar_size "$who" "$sha" "$paths")     # the uncommitted remainder just reviewed
+  # every passed tip is listed (tools/review_state.passed reads the list), so a pass of one branch survives another
+  # branch's pass moving the watermark; an explicit --at that is an ancestor of the watermark (an older branch's tip)
+  # never moves the watermark back
+  mkdir -p "$STATE_ROOT/$STATE_REL"
+  echo "$sha" >> "$STATE_ROOT/$STATE_REL/$who.passed"
+  if [ -n "${2:-}" ]; then
+    local cur; cur=$(read_state "$who" | awk '{print $1}')
+    [ -n "$cur" ] && git merge-base --is-ancestor "$sha" "$cur" 2>/dev/null && return 0
+  fi
   write_state "$who" "$sha" "$lines" 0 "$(reviewed_hash "$sha" "$paths")"
 }
 
