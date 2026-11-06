@@ -10346,12 +10346,10 @@ entries:
       - 'an e+e- class has no in-support default event: it gets no flat range and is listed, as the hadronic ones without
         pp support'
   owner:
-    agent: a8e0ed3e3a9c9cd8a
-    state: closed
-    since: '2026-11-06T19:56:06+00:00'
-    state_at: '2026-11-06T20:24:51+00:00'
-    context: 270003
-    context_at: '2026-11-06T20:24:30+00:00'
+    agent: a6b7f42be8bab4845
+    state: working
+    since: '2026-11-06T21:43:54+00:00'
+    state_at: '2026-11-06T21:43:54+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
