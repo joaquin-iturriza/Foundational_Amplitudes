@@ -9921,6 +9921,23 @@ entries:
       its own read. NO = the edge moves < 1 dex on every class: the forward mechanism is not what limits the fill; where read
       on the fwdfree kept set, recorded as a dead end. Control check: the both750 policy''s fill differs from step 66''s on
       the same seed -> the run is void (code path changed), investigated first. 8 CPU jobs, 1 core, <= 2.0 h each, no GPU.'
+    passed_at: '2026-11-06T22:04:40+00:00'
+    reviewer: 'Step (f) e+e- forward check, design 2026-11-06T21:59:53. One change: in each job the two budget-750 quota policies
+      differ only in sampling.fwd_free_floor=1e-8 (multichannel_check.py run(), fwd-free 0f0b7b4e); generation code between
+      step 66''s run (3c9b4b2d) and 0f0b7b4e differs only by the flag, so the control can reproduce step 66 exactly (f6794c52
+      checks it, void flag). Measure responds: step 66 where reads (data/quota_where/v4_epem_*) put the events above the fill
+      edge at 1-|cos| medians 10^-2.91/-2.80/-3.17/-4.82 vs -1.34/-1.04/-1.14/-1.27 below, past the 0.99 cap; reach with the
+      flag reproduced on CPU (rotate_forward, ee->nu nu Z at 3 TeV, 20000 draws: q10/median 10^-7.2/-4.0 on, 10^-1.9/-1.2
+      off); fill per bin is a direct count of kept events per bin, and step 66''s edge-ladder change moved it 0.036->1.00
+      in a bin, so channel changes reach it. Seeds: 42/43 as step 66 and step 67''s sibling classes; step 66 seed spread shortfall
+      0.354/0.355, 0.157/0.158, 0.228/0.229, 0.149/0.147, against an action threshold of 1 dex (4 bins) of edge shift; first
+      short bins confirmed in quota_coverage.json (-6.11, -2.70, -3.00, -0.14). Outcome YES/NEAR/PARTIAL/NO stated with actions;
+      note: the case in-range bins pass but held-out EE4 > 0 is not named in the text, f6794c52''s coverage maps it to PARTIAL/NO
+      by edge shift, which the read should state. Test events: EE4 default-sampled pools, range from dsh_ only (no label in
+      the range). CPU only, no training/HPO/disk issue. Searched: docs/results.tex (rotate_forward, fwd_free, free_floor,
+      forward component, cos_cap, uncut, cut edge, beyond the cut, forward boson, t-channel, 1e-8, neutrino), the entry''s
+      findings and 33 dead ends, site decisions (forward, collinear, t-channel, neutrino; D126, D178, D294, D295): no earlier
+      test of uncut finals beyond the cut edge.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
