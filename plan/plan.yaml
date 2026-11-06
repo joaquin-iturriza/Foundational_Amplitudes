@@ -13400,7 +13400,7 @@ entries:
     agent: a916bf7f64f62994d
     state: stopped
     since: '2026-11-06T13:19:22+00:00'
-    state_at: '2026-11-06T13:51:54+00:00'
+    state_at: '2026-11-06T13:52:09.134000+00:00'
     context: 241279
     context_at: '2026-11-06T13:48:59+00:00'
   designs:
