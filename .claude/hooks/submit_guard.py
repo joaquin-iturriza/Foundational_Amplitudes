@@ -22,6 +22,8 @@ A command is refused (exit 2, every reason found) when
              site tool), which every sbatch / condor_submit passes, launch scripts and sweep_manager included.
   epoch      a FA training job (job_catalog_v3_short-style scripts) whose steps x batch size is under its training set
              (under one epoch), unless `--env SUBEPOCH_OK=1` (see epoch_count).
+  wall       a job_catalog_v3_short.sh job whose --hdr=--time is below the wall time its own check (tools/short_wall.py, run
+             by the job at start) needs for the arm, the --env values (LONG_*, GROW_K, ...) and the mode (see wall_need).
   data       a FA training job whose recipe's pools are not prebuilt on the named site (tools/check_site_data.py run
              there), unless it is chained afterok on that site's prebuild run of the recipe (see data()).
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
@@ -787,6 +789,105 @@ def epoch(segs):
     return out
 
 
+# ------------------------------------------------------------------ wall (2026-11-06)
+def wall_need(script_text, arm, env, mode=None, repo=None):
+    """tools/short_wall.py's plan for a job_catalog_v3_short.sh job, read the way the script resolves its inputs:
+    the arm's case branch (CAT, CROSS, HET, SIGMA_FROM, ITERS_FIXED or K, TRAIN), plus HD4 HD5 under LONG_* and for
+    SIGMA_FROM arms, ITERS and width from LONG_FACTOR / LONG_HEADS / GROW_K, V3_AXES in mode eval. None when it cannot
+    be read here (training only, smoke or probe, a recipe under $SCRATCH, steps not fixed in the branch)."""
+    repo = repo or REPO
+    if mode in ("smoke", "probe"):
+        return None
+    br = _arm_branch(script_text, arm)
+    if not br or "TRAIN_ONLY=1" in br:
+        return None
+    recipe = arm_recipe(script_text, arm)
+    if not recipe or "$" in recipe:
+        return None
+    cat = re.findall(r"\bCAT=(\w+)", br)
+    cat = cat[-1] if cat else "v3"
+    cross = re.findall(r"\bCROSS=\(([^)]*)\)", br)
+    axes = "H1 H2 H2p5 H3 H5 H6 H7E H7c".split() + (cross[-1].split() if cross else [])
+    if arm == "dimensionless_twin":
+        axes += ["H3p", "H4"]
+    het = bool(re.search(r"\bHET=1", br))
+    sigma_from = bool(re.search(r"\bSIGMA_FROM=", br))
+    iters = None
+    m = re.findall(r"\bITERS_FIXED=(\d+)", br)
+    if m:
+        iters = int(m[-1])
+    elif re.search(r"\bWS_PARENT=", br):                    # warm-start arms: ITERS_FIXED=$K, K from the branch
+        k = re.findall(r"\bK=(\d+)\b", br)
+        kp = re.findall(r"\bK=\$\{ARM#([^}]+)\}", br)
+        if k:
+            iters = int(k[-1])
+        elif kp and arm.startswith(kp[-1]):
+            mm = re.match(r"\d+", arm[len(kp[-1]):])
+            iters = int(mm.group(0)) if mm else None
+    width = None
+    if re.search(r"^if \[ -n \"\$LONG_HEADS\$LONG_FACTOR\$LONG_LR\" \]", script_text, re.M) and \
+            any(env.get(k) for k in ("LONG_HEADS", "LONG_FACTOR", "LONG_LR")):
+        lf = re.search(r"ITERS=\$\(\(\s*(\d+)\s*\*\s*LF\s*\)\)", script_text)
+        if not lf:
+            return None
+        iters = int(lf.group(1)) * int(env.get("LONG_FACTOR") or 1)
+        if env.get("GROW_K"):
+            iters = int(env["GROW_K"])
+        width = int(env.get("LONG_HEADS") or 8)
+        axes += ["HD4", "HD5"]
+    if sigma_from:
+        axes += ["HD4", "HD5"]
+    if mode == "eval" and env.get("V3_AXES"):
+        axes = env["V3_AXES"].split()
+    if iters is None and mode != "eval":
+        return None
+    sys.path.insert(0, os.path.join(repo, "tools"))
+    import short_wall
+    return short_wall.plan(recipe, cat, axes, eval_only=(mode == "eval"), iters=iters, sigma_stage=het,
+                           eval_stage=sigma_from, width=width)
+
+
+def wall(segs):
+    """A job_catalog_v3_short.sh submission whose --hdr=--time (else the script's own #SBATCH --time) is below the
+    job's own wall check (tools/short_wall.py, which the job runs at start and refuses itself on, after queueing and
+    start-up) is refused with the value to use. 2026-11-06: catalog_coverage step 61's 12 sign-head jobs at 03:00 against
+    03:30 needed; warm_start's growth pair FA-ccin2p3-92d91c6f / 760744cb at 2:20 against 2.38 h."""
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["submit"]:
+            continue
+        rest = toks[2:]
+        if "--check" in rest or "--help" in rest or "-h" in rest:
+            continue
+        script, args, hdr = _submit_parts(toks)
+        if not script or os.path.basename(script) != "job_catalog_v3_short.sh" or not args:
+            continue
+        try:
+            text = open(_path(script), errors="replace").read()
+        except OSError:
+            continue
+        arm = args[1] if args[0].startswith("-") and len(args) > 1 else args[0]
+        mode = args[1] if len(args) > 1 and not args[0].startswith("-") else None
+        env = _submit_env(toks)
+        limit = next((h.split("=", 1)[1] for h in reversed(hdr) if h.startswith("--time=")), None)
+        if limit is None:
+            lm = re.search(r"^#SBATCH --time=(\S+)", text, re.M)
+            limit = lm.group(1) if lm else None
+        if not limit:
+            continue
+        need = wall_need(text, arm, env, mode)
+        if not need:
+            continue
+        sys.path.insert(0, os.path.join(REPO, "tools"))
+        import short_wall
+        if short_wall.parse_limit(limit) < need["hours"]:
+            out.append("wall: %s %s with --hdr=--time=%s is below the %.2f h its own wall check (tools/short_wall.py: %d steps, "
+                       "%d probes, width %s) needs and would refuse at start. Use --hdr=--time=%s." % (
+                           script, arm, limit, need["hours"], need["iterations"], need["n_probes"],
+                           need["rates"]["width"], need["slurm_time"]))
+    return out
+
+
 SUBMITTING = re.compile(r"\bsite\s+(?:submit|run|launch)\b|(^|[;&|(]|\$\()\s*(sbatch|condor_submit)", re.M)
 
 
@@ -836,7 +937,7 @@ def problems(inp):
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
               ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)),
-              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)))
+              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)), ("wall", lambda: wall(segs)))
     out = []
     for name, f in checks:
         if only and name not in only:
