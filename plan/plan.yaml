@@ -16525,7 +16525,8 @@ entries:
       reading NOT SUPPORTED (the jump moved 6-10x without the reads, as the every-group ramp); remaining gap is the retraining
       length (YES at k=1066). Confound in the continued arms: their start models are less trained (step 3198 / 2132 of 4264)
       and meet a fresh optimizer at full lr.'
-  step_waits: {}
+  step_waits:
+    '1': FA-ccin2p3-05df656d FA-ccin2p3-07bfc8d7
   handoff:
     state: 'Step 12 (D307, D308), the restart study on C1 (share 0.25, het, k=533 only, D312), design passed round 2, SUBMITTED
       whole 2026-11-06 ~20:40 UTC: 10 runs on CC from the checkpoint rerun v4_het_control_ckpt[_seed2], scripts/job_catalog_v3_short.sh
