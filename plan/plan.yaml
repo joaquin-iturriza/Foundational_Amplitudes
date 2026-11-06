@@ -13315,11 +13315,10 @@ entries:
   decisions:
   - D282
   next:
-    11: 'Step 11 (D285, D291): the width growth re-run at the zero-shot sweep''s best trial (ws_grow_k533_zeroshot_hpo8_rerun
-      hp1860, score 0.476 < 0.535) at seeds 42/43: FA-ccin2p3-4442e786 (v4_het_default25) and FA-ccin2p3-3fae7799 (v4_het_default25_seed2),
-      scripts/job_catalog_v3_short.sh @6454ecda with LONG_HEADS=16 LONG_CKPT=true LONG_MEMMAP=true GROW_K=533 GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun
-      GROW_HP=1860, limit 02:30, 32G, target ws_grow_hp1860_rerun 2.4 h. When both end: fetch, mixture_ab.py warm C10wz (bffb6f13)
-      against e046ac67/f35b6a78, w16 scratch beside; plot_ws_c1m.py --growth-zs; write-up beside par:v4_warm_start_grow'
+    11: 'Step 13 (on Joaquin''s answer): more from-scratch seeds of v4_het_control_magnitude (seeds 44-47 = 9.4 GPU-h, or
+      44-45 = 4.7) to decide the one-loop magnitude-target change at k=533, under a new design line on how n seeds widen the
+      interval; else close the entry with the write-ups as they stand (steps 9 and 11 written up: par:v4_warm_start_changes,
+      par:v4_warm_start_grow_tuned)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -15208,10 +15207,11 @@ entries:
       already named in the prior.'
   step_why:
     11:
-      feeds: whether the tuned growth becomes the growth recipe (BETTER) or the growth stays at its default restart (NOT BETTER)
+      feeds: whether the magnitude-target change's warm start at k=533 MATCHes its from-scratch pretraining (YES at 1/8 of
+        a pretraining) or stays undecided
       if:
-      - 'BETTER: read against w16 scratch, MATCH at R(W/B)<=1.19 on both, else SHORT with its gap'
-      - 'NOT BETTER: growth tuning ruled out on a read-tracking objective; growth stays SHORT at k=533'
+      - 'MORE SEEDS: design line, review, submit, read with mixture_ab.py warm C8 against the widened interval'
+      - 'NONE: close the entry (plan done) with the existing write-ups'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
