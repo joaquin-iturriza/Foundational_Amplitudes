@@ -386,6 +386,20 @@ def where(name, probe, cut_log10):
     # resonances on shell together. The 5 widths are a diagnostic choice, as tests/test_multichannel.py's
     (mz, gz), (mw, gw) = mg.MC_RES[23], mg.MC_RES[24]
     feats["n_pairs_near_Z_or_W"] = np.sum([(np.abs(m - mz) < 5 * gz) | (np.abs(m - mw) < 5 * gw) for m in mij], 0)
+    # every final's polar angle in the partonic frame, neutrinos and massive finals too (step (f)'s e+e- SHORT read:
+    # forward boson emission off a t-channel electron is not bounded by the cuts on these finals), and the polar
+    # angle of the pair of finals whose mass is nearest m_Z, with that distance in Z widths
+    cth = np.abs(F[..., 3]) / np.clip(np.sqrt((F[..., 1:] ** 2).sum(-1)), 1e-300, None)
+    feats["max_abs_cos_any_final"] = cth.max(1)
+    feats["min_1_minus_abs_cos_any_final_log10"] = np.log10(np.clip(1.0 - cth.max(1), 1e-12, None))
+    if allp:
+        j = np.argmin(np.abs(np.asarray(mij) - mz), 0)
+        a_, b_ = np.asarray(allp)[j, 0], np.asarray(allp)[j, 1]
+        r_ = np.arange(len(j))
+        S = F[r_, a_] + F[r_, b_]
+        feats["zpair_abs_cos"] = np.abs(S[:, 3]) / np.clip(np.sqrt((S[:, 1:] ** 2).sum(-1)), 1e-300, None)
+        feats["zpair_mass_minus_mz_over_width"] = (np.asarray(mij)[j, r_] - mz) / gz
+    feats["sqrts"] = sq
     if len(ii):
         feats["max_pt"] = pt[:, ii].max(1)      # the hardest cut leg (the ladder channel's pT span)
         feats["median_leg_pt"] = np.median(pt[:, ii], 1)
@@ -487,10 +501,19 @@ def coverage():
     out = {"source": "analysis/catalog_v4/multichannel_check.py coverage over data/multichannel_check.json",
            "classes": {}}
     for c, d in src.items():
-        if not all(STEP67[k] in d for k in ("old", "both")):
+        # step 67's pp classes carry the old ladder; step (f)'s e+e- classes have no ladder policy (mc_channels turns
+        # the ladders off on e+e- beams), so a class is read when it has the both-ladder policy at 50 and 750 or the
+        # old ladder beside both
+        if not (all(STEP67[k] in d for k in ("old", "both")) or all(STEP67[k] in d for k in ("both", "both750"))):
             continue
         pp_max = rng[c][1] / np.log(10.0) - MARGIN_DEX
-        o = {"pp_in_support_max_log10": pp_max, "policies": {}}
+        # the class's default-sampled in-support max (13 TeV pp events, or the e+e- default-share pool at its fixed
+        # energy); the key keeps its step-67 name
+        o = {"pp_in_support_max_log10": pp_max, "beam": "ee" if c.startswith("v4_epem_") else "pp", "policies": {}}
+        # the cost read in the same job, seed, node and commit: per-replay seconds of the old sampling (current) and
+        # plain multichannel beside the quota policies' (whose seconds are in "policies")
+        o["seconds_same_job"] = {pol: [d[pol]["seeds"][s]["seconds"] for s in sorted(d[pol]["seeds"])]
+                                 for pol in ("current", "multichannel") if pol in d}
         for k, pol in STEP67.items():
             if pol not in d:
                 continue
@@ -538,6 +561,9 @@ def coverage():
             o["verdict_750"] = ("YES" if held_ok and in_ok and mar_ok and not any(q["chunks_no_steer"]) else
                                 "NEAR" if held_ok and in_ok and not any(q["chunks_no_steer"]) else "SHORT")
             o["short_bins_750"] = [x for x in q["bins"] if x["min"] < 0.95]
+            cur = o["seconds_same_job"].get("current")
+            if cur and len(cur) == len(q["seconds"]) and None not in cur + q["seconds"]:
+                o["cost_750_over_current"] = [b / a for a, b in zip(cur, q["seconds"])]
         out["classes"][c] = o
         print(c, o.get("verdict_750"), {r: v["pass"] for r, v in g.items()}, o.get("short_bins_750"))
     json.dump(out, open(os.path.join(DATA, "quota_coverage.json"), "w"), indent=1)
