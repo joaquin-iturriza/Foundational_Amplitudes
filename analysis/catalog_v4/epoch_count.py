@@ -9,12 +9,17 @@
           -> data/study_epochs.json
   grid    the width x length map at >= 1 epoch: widths 8, 16, 32 (LONG_HEADS) x lengths 4264 x {2, 4, 8, 16} steps,
           seeds 42 and 43, every cell at the long sweeps' best hyperparameter point (trial_1262, best of both the
-          17056 and the 68224 sweep, its lr at the two lengths 7.82114e-3 and 3.649139e-3, i.e. lr ~ t^-0.55, the
-          HPO surface's decay; the lr at another length from that law). Training hours from the measured V100 rates per
-          width (data/size_mse.json 'Finished training' hours over iterations, main block, the 4264-step whole-set
-          runs); the rest of a job (start-up, default-share composition, sigma stage, the 2313 zero-shot probes) from
-          tools/short_wall.py's rates; GPU-h = 1 GPU x the job's work time; the cells already run (the sweeps'
-          trial_1262 at 4x and 16x, width 8, seed 42) are reused -> data/scaling_grid_plan.json
+          17056 and the 68224 sweep), its lr 7.82114e-3 at 17056 moved to the cell's steps by lr ~ t^-0.55. That
+          exponent is not measured: it is the fixed slope with which tools/lr_surface_center.py centred both sweeps'
+          windows (prin:invU, HPO rule 2; centres 2.633e-3 at 17056, 1.228e-3 at 68224), and trial_1262 sits at the
+          same normalized position (0.9955) in both, so its two lrs are 4^0.55 apart by construction; that position is
+          the window top (censored, best at the last validation): not converged, every cell's lr a lower bound on its
+          optimum. Training hours from the measured V100 rates per width (data/size_mse.json 'Finished training' hours
+          over iterations, main block, the 4264-step whole-set runs; tools/short_wall.py S_ITER_WIDTH); the rest of a
+          job (start-up, default-share composition, sigma stage, the 2313 zero-shot probes) from tools/short_wall.py's
+          rates; the job's time limit is short_wall.py --width's slurm_time (the job checks itself against it);
+          GPU-h = 1 GPU x the job's work time; the cells already run (the sweeps' trial_1262 at 4x and 16x, width 8,
+          seed 42) are reused -> data/scaling_grid_plan.json
 """
 import json, math, os, subprocess, sys
 
@@ -53,14 +58,22 @@ def count():
     print("under one epoch:", out["under_one_epoch"])
 
 
+LR_SLOPE = -0.55    # tools/lr_surface_center.py SLOPE: the window law, not a measurement (see the module docstring)
+
+
 def lr_at(steps):
-    # the two measured points fix the exponent: ln(7.82114/3.649139)/ln 4 = 0.550
+    """trial_1262's lr at 17056 moved along the window law; its 68224 lr is reproduced by construction (checked)"""
     a = math.log(LR_1262[17056] / LR_1262[68224]) / math.log(68224 / 17056)
-    return LR_1262[17056] * (steps / 17056) ** (-a), a
+    assert abs(a + LR_SLOPE) < 1e-3, a         # the two sweeps' windows share the law, so the pair carries no slope
+    return LR_1262[17056] * (steps / 17056) ** LR_SLOPE, -LR_SLOPE
 
 
 def overhead_hours():
-    """short_wall.py's hours for a het arm with the long cells' 12 axes, minus its training term, before the margin."""
+    """short_wall.py's hours for a het arm with the long cells' 12 axes, minus its training term, before the margin.
+    An estimate at every width: short_wall's read rate (1.45 s per het probe), start-up and sigma stage (20 min) were
+    measured on width-8 jobs only; the assumption is that they do not grow with width (a probe's forward pass and the
+    250-step sigma stage do grow, so the width-16 and width-32 cells' overhead is a lower bound: at the training
+    slowdown, x1.73 and x3.51 on the sigma stage's 250 steps, about 3 and 10 min more; the reads are not measured)."""
     axes = "H1 H2 H2p5 H3 H5 H6 H7E H7c PP4 EE4 HD4 HD5".split()
     o = json.loads(subprocess.run([sys.executable, os.path.join(ROOT, "tools", "short_wall.py"), "--train",
                                    os.path.join(ROOT, "recipes", "catalog_v4_default25_train.yaml"), "--cat", "v4",
@@ -82,6 +95,14 @@ def grid():
     assert len(batches) == 1, batches
     batches = batches.pop()
     oh, margin, n_probes = overhead_hours()
+    limits = {}
+    for f in FACTORS:
+        for w in WIDTHS:
+            o = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "short_wall.py"), "--train",
+                                os.path.join(ROOT, "recipes", "catalog_v4_default25_train.yaml"), "--cat", "v4", "--axes",
+                                *"H1 H2 H2p5 H3 H5 H6 H7E H7c PP4 EE4 HD4 HD5".split(), "--iters", str(BASE * f), "--het",
+                                "--width", str(w)], capture_output=True, text=True, check=True).stdout
+            limits[(w, f)] = json.loads(o.strip().splitlines()[-1])["slurm_time"]
     cells, tot, tot_new = [], 0.0, 0.0
     for f in FACTORS:
         steps = BASE * f
@@ -93,7 +114,7 @@ def grid():
                 reused = REUSED.get((w, f, s))
                 c = {"width": w, "factor": f, "steps": steps, "epochs": round(steps / batches, 3), "seed": s,
                      "lr": float(f"{lr:.6g}"), "train_hours": round(train_h, 2), "work_hours": round(work_h, 2),
-                     "limit_hours": round(work_h * margin, 2), "C_6NSB": 6 * N_PARAMS[w] * steps * BATCH,
+                     "limit_hours": round(work_h * margin, 2), "slurm_time": limits[(w, f)], "C_6NSB": 6 * N_PARAMS[w] * steps * BATCH,
                      "reused": reused}
                 cells.append(c)
                 tot += work_h
@@ -109,7 +130,7 @@ def grid():
     print(json.dumps({k: v for k, v in out.items() if k != "cells"}, indent=1))
     for c in cells:
         print(f"w{c['width']:2d} x{c['factor']:2d} s{c['seed']} steps {c['steps']:6d} ep {c['epochs']:6.2f} lr {c['lr']:.4g} "
-              f"train {c['train_hours']:6.2f} h work {c['work_hours']:6.2f} h limit {c['limit_hours']:6.2f} h "
+              f"train {c['train_hours']:6.2f} h work {c['work_hours']:6.2f} h limit {c['slurm_time']} "
               f"{'REUSED ' + c['reused'] if c['reused'] else ''}")
 
 
