@@ -9748,7 +9748,7 @@ entries:
     agent: a8dc83fd21c2d8d4f
     state: working
     since: '2026-11-06T04:32:00+00:00'
-    state_at: '2026-11-06T04:50:19+00:00'
+    state_at: '2026-11-06T05:17:19.574000+00:00'
     context: 258646
     context_at: '2026-11-06T05:15:29+00:00'
   findings:
