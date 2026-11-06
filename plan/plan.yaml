@@ -14508,6 +14508,26 @@ entries:
       as NO at the untuned restart with g_k; the restart-cause and tuning work of step 6 goes on, and its recipe, if one beats
       the default, is re-applied to the changes that read NO. Across changes: data changes (C2-C6) against the target change
       (C8) by g_k at equal k. A blow-up listed apart with where.'
+    fix_at: '2026-11-06T10:08:03+00:00'
+    fix: 'One defect, everything else verified and would pass. (Check 5, prior misstated) The question and prior say C1 (share
+      0.25, het) read ''NO at the untuned restart'' and ''the untuned restart gives NO (SHORT at k 533-2132 ...)''. docs/results.tex
+      par:v4_warm_start (mixture_ab.py warm C1 @f0015680, data/warm_start_C1.json) and the entry''s finding of 2026-11-05T00:54
+      record the opposite: YES at k=1066 by this same rule (R(W_k/B) PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01 at k 533/1066/2132;
+      SHORT only at 533, MATCH at 1066 by the 1.35 bound while still resolved worse, equal at 2132; g PP4 0.55/0.76/1.07).
+      Under the growth''s (A/B)^0.3 bar it would still MATCH at 1066. The ''R(W/B) 1.32-1.42 / 1.50-1.58'' numbers are k=533
+      only, across the restart variants. Fix: restate C1 as YES at k=1066 (equal only at 2132), with the k=533 SHORT for the
+      repairs kept as k=533 reads. This is the earlier result on the same question that the C2-C8 results will be set against,
+      and Joaquin would be told the wrong one. Nit, no fix needed: the GPU-h terms listed sum to 79.4. The exact per-run hours
+      give 79.56, so 79.6 stands. Verified, with no change needed: arms, seeds, reads and outcome match the design passed
+      2026-11-04T21:51 (C6 bootstrap ratio of medians kept; the change to the NO branch follows D291). The run count is 54
+      (6+6+12+6+6+6+12), matching the 21:53 correction (60 with C7). GPU-h from the short_wall per-run hours is 79.56, within
+      D300''s 79.8. The gates hold in het_magnitude.json: C8 HD5 R 0.0972, widened [0.047, 0.291], passes; C7 HD5 against
+      the MSE control 1.47 [0.97, 1.99], no gain, dropped. The recipe holds in warm_start_C1u.json: R(damped/default) PP4
+      1.032 [0.866, 1.228], EE4 1.045 [0.911, 1.197], NOT BETTER; with C1m 1.054/1.005 also NOT BETTER, step 7''s not-better
+      branch gives the untuned restart. ws_stats_check.py is on trunk @42c4aeab and checks transform and mu/sigma to 1e-12
+      on unchanged pools. Disk: df today 93G free on /sps/lpnhe, against 54 x 0.85 = 46 GB. Losses are each change''s pair;
+      target dimensionless. Searched: warm50, warmmag, warmpp, warmsx, mse_cont, step 7, C2-C8 in results.tex (no earlier
+      runs of these arms); warm, restart, recipe, D282-D303 in site decisions; the entry''s findings.'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
