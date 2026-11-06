@@ -389,7 +389,14 @@ def quota_fill(r):
     short = sum(int(np.maximum(np.asarray(c["quota"]) - np.asarray(c["kept_per_bin"]), 0).sum()) for c in qc)
     bins = sorted({round(c["edges_log10"][j], 2) for c in qc for j in range(len(c["quota"]))
                    if c["kept_per_bin"][j] < c["quota"][j]})
-    return {"quota_events": int(q), "quota_short": int(short), "quota_short_share": short / max(q, 1),
+    # fill per bin: sum over chunks of min(kept, quota) over the sum of the quota, keyed by the bin's log10 lower edge
+    fq, fk = {}, {}
+    for c in qc:
+        for j, (k, x) in enumerate(zip(c["kept_per_bin"], c["quota"])):
+            e = round(c["edges_log10"][j], 2)
+            fq[e] = fq.get(e, 0) + x; fk[e] = fk.get(e, 0) + min(k, x)
+    fill = {str(e): round(fk[e] / fq[e], 4) for e in sorted(fq) if fq[e] > 0}
+    return {"fill_per_bin": fill, "quota_events": int(q), "quota_short": int(short), "quota_short_share": short / max(q, 1),
             "bins_short_log10": bins, "chunks_short": int(sum(any(k < x for k, x in zip(c["kept_per_bin"], c["quota"]))
                                                              for c in qc)),
             "n_chunks": len(qc), "rounds_max": max(len(c["rounds"]) for c in qc),
@@ -415,7 +422,8 @@ def summary():
             if not all(f"{pol}_{s}" in d["runs"] for s in SEEDS):
                 continue
             js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in SEEDS}
-            ch = d["runs"][f"{pol}_{SEEDS[0]}"]["chunks"]
+            r0 = d["runs"][f"{pol}_{SEEDS[0]}"]
+            ch = r0.get("quota_chunks") or r0["chunks"]      # a quota policy's per-channel counts are in its quota chunks
             kc = np.sum([x["kept_per_channel"] for x in ch], 0).tolist() if ch else None
             if pol in QUOTA_POLICIES:
                 # step 58's outcome (D269): 0 held-out in-support pp events outside the kept range on both seeds, no

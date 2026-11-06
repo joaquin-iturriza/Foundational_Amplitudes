@@ -59,8 +59,8 @@ def main(seed=42):
         ax.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$")
         ax.set_ylabel("share per decade")
         ps.process_label(ax, LABEL[c])
-        if c == names[0]:
-            ps.legend(ax, "upper left")
+    # seven curves do not fit a panel's legend: one strip for the set (figs/flat_quota_legend)
+    ps.legend_strip(figs[0][1], os.path.join(HERE, "figs", "flat_quota_legend"), ncol=4)
     ps.save_panels(figs, os.path.join(HERE, "figs", "flat_quota"))
 
 
