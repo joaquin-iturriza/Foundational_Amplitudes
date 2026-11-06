@@ -11309,6 +11309,22 @@ entries:
       udx_csxvevex 189 vs 29). Next (design''s NO branch: fix the proposal where they sit): a multiperipheral forward channel
       for hadronic classes (all finals'' rapidities spread to the |eta|<5 edge, pT near the cut, high sqrt(s_hat)) and a joint-resonance
       channel (all compatible s-channel propagators of a diagram on shell together); then re-run the same 10-job check.'
+  - at: '2026-11-06T06:42:12+00:00'
+    text: '2026-11-06 (a) step 65 re-check read (pull multichannel+quota+quota_ladder_res2, summary @45d39fe3; figure figs/flat_quota_a..e
+      with the fourth curve ''quota + ladder, pairs''): NO, the shortfall reduced and carried by the new channels (the design''s
+      second branch). Quota shortfall plain -> with the ladder and two-resonance channels (seeds 42/43): uu_bbxuu 0.383/0.383
+      -> 0.137/0.138, us_ddxsu 0.327/0.333 -> 0.114/0.114, uux_epemvevex 0.237/0.240 -> 0.0275/0.0277, udx_csxvevex 0.255/0.246
+      -> 0.067/0.067; uux_epemg YES on both (unchanged). Held-out in-support pp events outside the kept range: uu_bbxuu 1176/1049
+      -> 4/2 of 53345, us_ddxsu 401/418 -> 6/1 of 53857, udx_csxvevex 1/2 -> 1/1, uux_epemvevex 0/0 -> 0/0; kept max now 4.71-5.08
+      against pp in-support max 4.75 (QCD). The new channels carry the kept flat events: ladder 33739/34992 (uu_bbxuu s42),
+      two-resonance 32706/34992 (uux_epemvevex), 32341 (udx_csxvevex). Still every chunk at the budget of 50. Bins still short
+      below the pp max, quota/kept: EW <= 2.0 (uux_epemvevex), <= 8.5 (udx_csxvevex); QCD 1.5-9.5 up to log10|M|^2 3.85, then
+      28-704 in the top three bins (pp in-support events there 16, 5, 1 of 12000 for uu_bbxuu). Kept share over pp share per
+      bin >= 1 everywhere except the top three QCD bins (uu_bbxuu 0.49, 0.20, 0.68; us_ddxsu top bin 0.68). Time per train-pool
+      replay, quota+channels / plain quota / multichannel: uu_bbxuu 538-699 / 436-463 / 70 s, us_ddxsu 468-657 / 334-340 /
+      45-48, uux_epemvevex 135-207 / 182-206 / 31-33, udx_csxvevex 144-219 / 123-191 / 18-29. Next (branch 2, budget raised
+      by the measured factor): budget 500 (10x), expected to fill every EW bin and the QCD bins up to ~3.85; the top three
+      QCD bins (factor 28-700) are expected to stay short.'
   handoff:
     state: '2026-11-06 ~06:25. Reopened by D290-D296. (b) memmap keyed-draw cache merged d18e44f1 (repo-reviewer PASS; tests:
       memmap==in-memory bitwise for seeds 42/43 from one cache, also on CC real arm); left in step 37: chain the CPU prebuild
