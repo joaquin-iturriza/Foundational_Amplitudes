@@ -17,4 +17,5 @@ echo "WS_HET_SPLIT code=$(git rev-parse --short HEAD) host=$(hostname)"
 T0=$(date +%s)
 python analysis/catalog_v4/ws_het_split.py run; rc=$?
 echo "RUN_SUMMARY {\"rc\": $rc, \"wall_s\": $(( $(date +%s) - T0 ))}"
+[ "$rc" = 0 ] && echo "RUN_DONE"   # the end marker the supervisor reads (site projects.toml end_markers)
 exit $rc

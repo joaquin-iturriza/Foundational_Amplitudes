@@ -121,7 +121,42 @@ def spearman(x, y):
     return float(np.corrcoef(rx, ry)[0, 1])
 
 
+LABELS = {"parent": "pretrained start", "untuned_k533": "warm start, default lr", "trial_1860": "warm start, NLL-tuned lr"}
+
+
+def _few_figure(rows):
+    """the exact split per model, process by process: (a) the sigma-weighted error <r^2/2 sigma^2> against the
+    log-sigma term <log sigma> (each point one process, its validation mean; the model's process mean as a large
+    marker), (b) each model's processes' MSE of the mean as a CDF. Labels in words; figs/ws_het_split_few_{a,b}"""
+    sys.path.insert(0, ROOT)
+    import plot_style as ps
+    recs = {}
+    for line in open(_LOG):
+        if line.startswith("WS_SPLIT "):
+            r = json.loads(line.split(" ", 1)[1]); recs[r["model"]] = r
+    figs = ps.panels(2)
+    (fa, aa), (fb, ab) = figs
+    for j, tag in enumerate(k for k in ("parent", "untuned_k533", "trial_1860") if k in recs):
+        r = recs[tag]; n = np.array(r["n"]); keep = n > 0
+        W, S, M = (np.array(r[k])[keep] for k in ("W", "S", "MSE"))
+        col = ps.CYCLE[j]
+        aa.scatter(S, W, s=4, color=col, alpha=0.35)
+        aa.scatter([S.mean()], [W.mean()], s=60, color=col, edgecolor="k", label=LABELS.get(tag, tag))
+        m = np.sort(M)
+        ab.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, label=LABELS.get(tag, tag))
+    aa.set_xlabel(r"log-$\sigma$ term $\langle\log\sigma\rangle$"); aa.set_yscale("log")
+    aa.set_ylabel(r"$\sigma$-weighted error $\langle r^2/2\sigma^2\rangle$")
+    ab.set_xscale("log"); ab.set_xlabel(r"validation MSE of the mean, per process"); ab.set_ylabel("fraction of processes")
+    ps.legend(aa); ps.legend(ab)
+    ps.save_panels(figs, os.path.join(FIGS, "ws_het_split_few"))
+
+
+_LOG = None
+
+
 def summary(a):
+    global _LOG
+    _LOG = a.log
     tr = json.load(open(os.path.join(DATA, "trial_curves.json")))
     recs = {}
     for line in open(a.log):
@@ -151,6 +186,18 @@ def summary(a):
         for k, r in rows.items():
             print(f"{k:14s} NLL {r['NLL']:.4f} (logged {r.get('logged_nll', float('nan')):.4f})  W {r['W']:.4f}"
                   f"  S {r['S']:.4f}  MSE {r['MSE']:.5f}")
+        _few_figure(rows)
+        # NLL-tuned best trial against the default restart, process by process (same validation, same target stats)
+        recs = {}
+        for line in open(a.log):
+            if line.startswith("WS_SPLIT "):
+                r = json.loads(line.split(" ", 1)[1]); recs[r["model"]] = r
+        if "trial_1860" in recs and "untuned_k533" in recs:
+            keep = (np.array(recs["trial_1860"]["n"]) > 0) & (np.array(recs["untuned_k533"]["n"]) > 0)
+            for k in ("W", "S", "MSE"):
+                d = np.array(recs["trial_1860"][k])[keep] - np.array(recs["untuned_k533"][k])[keep]
+                print(f"{k}: NLL-tuned minus default restart over {int(keep.sum())} processes: median {np.median(d):.4f},"
+                      f" mean {d.mean():.4f}, share below 0 {np.mean(d < 0):.2f}")
         return
     nll = np.array([rows[k]["NLL"] for k in T]); W = np.array([rows[k]["W"] for k in T])
     S = np.array([rows[k]["S"] for k in T]); M = np.array([rows[k]["MSE"] for k in T])
