@@ -16310,6 +16310,32 @@ entries:
       to Joaquin with the D307 hold (the change tests resume); if none is BETTER, share 0.50 at 533 (MATCH at two seeds already,
       C1s50) is the fix on record and goes to Joaquin as the recipe for data changes. A run that blows up is listed apart
       with where.'
+    fix_at: '2026-11-06T23:11:52+00:00'
+    fix: '(1) Seeds against spread (check 3): the single-seed interval is widened by the median paired seed spread of ten
+      prior k=533 pairs (data/ws_seed_pairs.json: PP4 0.0032, EE4 0.0436), but nine of those pairs share the parent and the
+      data stream with their control. The one pair that changes the retraining data, share 0.50 over share 0.25, has d PP4
+      0.0505 and EE4 0.0809 in the same file: 16x and 2x the medians used. Three arms change the data (share50_k267, wsdbranch50,
+      and share50_k533 read beside). The WSD-parent arms (wsdbranch25/50, wsdfinal_default) read against v4_het_wsx_default_rerun
+      come from a different pretraining run, and none of the ten pairs measures that spread. At PP4 0.0032, the EXPOSURE and
+      BRANCH readings (BETTER = upper end below 1) can be called on a 1-3% difference that a second seed would not hold. Fix:
+      widen each arm by the spread of its own kind. Data-changing arms take the share pair''s d (0.0505 / 0.0809). For the
+      WSD-parent arms against the default-restart control, use a measured spread between restarts from different parents,
+      or the largest measured d, and state which. Keep the same-parent median only for shrinkperturb against the control and
+      for wsdbranch against wsdfinal_default. Restate the outcome rules with those widths. (2) Matched branch (check 1): wsx_branch
+      loads model_run0_step3731 ''model'', which is the EMA weights, together with the optimizer state, whose moments belong
+      to the live weights. The design states this mismatch, but base_experiment._save_model writes the live weights into the
+      same checkpoint as ''model_live''. A continuation of the parent''s run (the D308 idea, Hu 2024 / Haegele 2024 cooldown)
+      starts from the live weights with their moments, so the arm as built tests ''branch + an EMA/moment mismatch''. Step
+      13 (05df656d / 07bfc8d7, same mismatch) is still running and unread, so nothing shows the mismatch is harmless. Fix:
+      start the branch arms from model_live (a loader flag, with a CPU test that the loaded weights equal the checkpoint''s
+      model_live), or keep EMA and cite a measured read showing the mismatch does not move the reads. (3) Prior (check 5,
+      minor; fold into the restated design): name ws_c1_k533_mse_wsd_hpo8 in prior as the earlier WSD-scheduled retraining
+      from the decayed parent (WSD in all 8 trials, cooldown fraction 0.164, R 1.054 NOT BETTER, par:v4_warm_start_repairs),
+      and say how branching a WSD parent before its decay differs. Checks that hold: one change per arm, with share50_k267''s
+      two-knob change stated as the exposure question. The measure moved on existing runs (share 0.50/0.25 PP4 0.853/0.897,
+      step-3198 continued 1.140/1.142, confirmed in ws_seed_pairs.json). Outcomes are fixed for yes and no. The design answers
+      D319/D308/D307 within scope. Het loss, DIM inputs, parent target stats and PP4/EE4 test pools are as the entry''s earlier
+      arms. There is no HP search. Disk: 6 GB against 72 GB free on /sps/lpnhe, memmap off, no shared cache.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
