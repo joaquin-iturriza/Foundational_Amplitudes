@@ -1050,6 +1050,8 @@ class BaseExperiment:
         if self._muon_warmup > 0:
             LOGGER.info(f"MUON_WARMUP the Muon groups' lr times min(1, step / {self._muon_warmup}) on top of the "
                         f"schedule (the logged lr is the schedule's)")
+        if _ft is not None and _ft.get("load_optimizer_state", False) and not self.warm_start:
+            self._load_parent_optimizer_state(_ft.get("pretrained_path"))
         n_fill = int(_ft.get("moment_fill_steps", 0) or 0) if _ft is not None else 0
         if n_fill > 0 and not self.warm_start:
             self._fill_optimizer_moments(iterator, n_fill)
@@ -1608,6 +1610,57 @@ class BaseExperiment:
         tmp = os.path.join(str(self.cfg.run_dir), "train_steps.tmp.npz")
         np.savez(tmp, step=a[:, 0].astype(np.int64), grad_norm=a[:, 1], loss=a[:, 2], lr=a[:, 3])
         os.replace(tmp, os.path.join(str(self.cfg.run_dir), "train_steps.npz"))
+
+    def _load_parent_optimizer_state(self, path):
+        """fine_tune.load_optimizer_state (plan warm_start step 13, D308): the parent checkpoint's optimizer state
+        (AdamW's exp_avg / exp_avg_sq / step and Muon's momentum buffers, per parameter) put into this run's freshly
+        built optimizer, so the restart continues the parent's optimizer instead of an empty one. Only the per-parameter
+        state is taken: this run's param groups (lr, initial_lr, weight decay, the schedule's settings) stay its own.
+        The parent's and this run's groups must hold the same number of parameters in the same order and every state
+        tensor must have its parameter's shape, else it raises (a layer-decay or grown model changes the layout)."""
+        if not path:
+            raise RuntimeError("fine_tune.load_optimizer_state needs fine_tune.pretrained_path")
+        parent = _torch_load(path, map_location=self.device, weights_only=False).get("optimizer")
+        if parent is None:
+            raise RuntimeError(f"fine_tune.load_optimizer_state: {path} holds no optimizer state")
+        cur = self.optimizer.state_dict()
+
+        def _check(p_sd, c_sd, params, what):
+            pl = [len(g["params"]) for g in p_sd["param_groups"]]
+            cl = [len(g["params"]) for g in c_sd["param_groups"]]
+            if pl != cl:
+                raise RuntimeError(f"fine_tune.load_optimizer_state: {what} groups differ, parent {pl} vs run {cl}")
+            idx = [i for g in c_sd["param_groups"] for i in g["params"]]
+            pidx = [i for g in p_sd["param_groups"] for i in g["params"]]
+            by_idx = dict(zip(idx, params))
+            out = {}
+            for pi, ci in zip(pidx, idx):
+                st = p_sd["state"].get(pi)
+                if st is None:
+                    continue
+                for k, v in st.items():
+                    if torch.is_tensor(v) and v.dim() > 0 and v.shape != by_idx[ci].shape:
+                        raise RuntimeError(f"fine_tune.load_optimizer_state: {what} state {k} of parameter {ci} has "
+                                           f"shape {tuple(v.shape)}, the parameter {tuple(by_idx[ci].shape)}")
+                out[ci] = st
+            return out
+
+        outer_params = [p for g in self.optimizer.param_groups for p in g["params"]]
+        new = dict(cur)
+        new["state"] = _check(parent, cur, outer_params, "optimizer")
+        n_inner = 0
+        inner_opt = getattr(self.optimizer, "_adamw", None)
+        if cur.get("adamw") is not None:
+            if parent.get("adamw") is None:
+                raise RuntimeError("fine_tune.load_optimizer_state: the parent has no AdamW part, this run has one")
+            inner_params = [p for g in inner_opt.param_groups for p in g["params"]]
+            new["adamw"] = dict(cur["adamw"])
+            new["adamw"]["state"] = _check(parent["adamw"], cur["adamw"], inner_params, "AdamW")
+            n_inner = len(new["adamw"]["state"])
+        self.optimizer.load_state_dict(new)
+        LOGGER.info(f"OPT_STATE loaded the parent's optimizer state from {path}: {len(new['state'])} entries"
+                    f" + {n_inner} AdamW entries; this run's param groups (lr, schedule) kept")
+        self.opt_state_loaded = {"entries": len(new["state"]), "adamw_entries": n_inner}
 
     def _fill_optimizer_moments(self, iterator, n):
         """fine_tune.moment_fill_steps (D303): n batches through the optimizer with every param group's lr set to 0
