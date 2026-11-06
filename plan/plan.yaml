@@ -15980,6 +15980,17 @@ entries:
       step 11''s plan wait was dropped by my own set-next restating the step (cmd_set_next popped the step''s wait); fixed
       7f2f8475 (a rewritten step keeps its wait when the new text names the wait''s runs, else prints that it dropped it;
       tests/test_plan_setnext_keeps_wait.py 4 pass).'
+  - at: '2026-11-06T20:04:54+00:00'
+    text: '2026-11-06 ~20:10 UTC: Joaquin''s answer recorded (D307/D308/D312; plan answer made D313, a duplicate of D307''s
+      words): no more change tests, no more seeds, the tuned growth only at 533; the open ask closed. Step 12, the restart
+      study, design PASSED round 2 (round 1 FIX: prior lacked the lr-scale-1.85 MSE-tuned restart and the NLL sweep''s high-lr
+      trials). Arms v4_het_ws_<final_default|step3198_default|step3198_continue|step2132_continue|final_lr3x>[_seed2] on branch
+      ws-restart @5761fe0b (worktree wt-ws-restart). Repo-reviewer: the arms are correct, but it holds the shared backlog
+      on catalog_coverage''s par:v4_ee_mechanism (ee_gain.py @38e63459: K=32, the 20-event floor and the windows have no source
+      in the notes), routed to its owner a8e0ed3e3a9c9cd8a. So the merge, and with it the 10 submissions (about 15 GPU-h,
+      25 at limits, wall target 1.5 h, site pick then), wait on that fix and on the reviewer''s re-check. Parents'' checkpoints
+      step 2132/3198/best exist for both seeds on CC. Interval construction now stated in par:v4_warm_start_grow_tuned and
+      fig:ws_c10wz (588af4b0).'
   step_waits: {}
   handoff:
     state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
