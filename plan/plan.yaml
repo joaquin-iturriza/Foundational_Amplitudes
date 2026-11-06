@@ -9279,12 +9279,10 @@ entries:
       - 'Joaquin takes it as clear: tell warm_start, write up par in results.tex'
       - 'Joaquin wants it resolved: more seeds of the pair, his call on cost'
   owner:
-    agent: a9838af5fa2f7d0bb
-    state: stopped
-    since: '2026-11-05T05:33:54+00:00'
-    state_at: '2026-11-05T07:52:20+00:00'
-    context: 177955
-    context_at: '2026-11-05T09:21:34+00:00'
+    agent: a8dc83fd21c2d8d4f
+    state: working
+    since: '2026-11-06T04:32:00+00:00'
+    state_at: '2026-11-06T04:32:00+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
