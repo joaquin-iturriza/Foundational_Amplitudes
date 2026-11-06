@@ -3590,6 +3590,90 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
     return idx_all[rng.choice(len(idx_all), size=n_keep, replace=False, p=w)]
 
 
+# ---- flat part filled to a quota per log|M|^2 bin (plan catalog_coverage step 58, Joaquin 2026-11-06: "uniform sampling
+# in logM^2 that covers the range of the pp sampled process"; a policy key absent from every pool built so far:
+# pol["flat_range"]) --------------------------------------------------------------------------------------------------
+# The flat part is n_flat events spread evenly over equal bins of log|M|^2 spanning pol["flat_range"] (natural log, the
+# pp events' range of the class with a margin: recipes/catalog_v4_flat_range.json). Candidates are drawn in rounds;
+# after each round every in-range candidate is weighted by its bin's deficit (quota - count) over its count, the weight
+# of an empty bin going to the candidates of the nearest bin that has some (out-of-range candidates count toward the
+# edge bins for this), and the next round's sqrt(s) proposal and channel shares follow those weights; rounds stop when
+# every bin holds its quota or pol["flat_budget"] candidates per flat event were labelled. Then exactly the quota is
+# kept per bin, uniformly at random within the bin; what unfilled bins leave is spread evenly over the bins with
+# candidates to spare, so the kept part stays as flat as the candidates allow.
+FLAT_DEX_PER_BIN = 0.25    # bin width in log10|M|^2 [open]
+FLAT_MIN_PER_BIN = 10      # least quota per bin: fewer bins when a chunk's flat part is small [open]
+FLAT_BUDGET = 50           # candidates labelled per flat event, at most (pol["flat_budget"]) [open]
+FLAT_LAST = {}             # diagnostics of the last quota-filled flat part (multichannel_check.py quota policy)
+
+
+def flat_quota_bins(lo, hi, n_flat):
+    """edges of the quota bins over [lo, hi] (natural log |M|^2) and the quota of each (they sum to n_flat)"""
+    nb = int(np.ceil((hi - lo) / (FLAT_DEX_PER_BIN * np.log(10.0))))
+    nb = max(1, min(nb, n_flat // FLAT_MIN_PER_BIN))
+    q = np.full(nb, n_flat // nb, dtype=np.int64)
+    q[: n_flat - int(q.sum())] += 1          # the remainder to the lowest bins, deterministically
+    return np.linspace(lo, hi, nb + 1), q
+
+
+def flat_quota_weights(logm, edges, quota):
+    """per-candidate steering weight: its bin's deficit / count; an empty bin's deficit goes to the candidates of the
+    nearest bin holding some, shared on a tie (candidates beyond the range count toward the edge bins); 0 where nothing is missing"""
+    nb = len(quota)
+    fin = np.isfinite(logm)
+    b = np.full(len(logm), -1)
+    b[fin] = np.clip(np.searchsorted(edges, logm[fin], side="right") - 1, 0, nb - 1)
+    inr = fin & (logm >= edges[0]) & (logm < edges[-1])
+    cnt = np.bincount(b[inr], minlength=nb).astype(float)
+    deficit = np.maximum(quota - cnt, 0.0)
+    steer = np.bincount(b[fin], minlength=nb).astype(float)     # who can carry weight: in range or clipped to an edge
+    occ = np.nonzero(steer > 0)[0]
+    per = np.zeros(nb)
+    if len(occ):
+        for j in np.nonzero(deficit > 0)[0]:
+            d = np.abs(occ - j); near = occ[d == d.min()]           # a tie (one on each side) shares the deficit
+            per[near] += deficit[j] / len(near)
+    w = np.zeros(len(logm))
+    w[fin] = per[b[fin]] / np.maximum(steer[b[fin]], 1.0)
+    return w, cnt, deficit
+
+
+def flat_quota_select(logm, edges, quota, rng):
+    """indices kept: min(quota, count) per bin uniformly at random within it, the shortfall of unfilled bins spread
+    evenly (water-filling) over bins with candidates to spare; (indices, per-bin kept counts)"""
+    nb = len(quota)
+    inr = np.isfinite(logm) & (logm >= edges[0]) & (logm < edges[-1])
+    idx = np.nonzero(inr)[0]
+    b = np.clip(np.searchsorted(edges, logm[idx], side="right") - 1, 0, nb - 1)
+    cnt = np.bincount(b, minlength=nb)
+    take = np.minimum(quota, cnt)
+    left = int(quota.sum() - take.sum())
+    while left > 0:
+        spare = np.nonzero(cnt > take)[0]
+        if not len(spare):
+            break
+        add = max(1, left // len(spare))
+        for j in spare:
+            a = min(add, int(cnt[j] - take[j]), left)
+            take[j] += a; left -= a
+            if left == 0:
+                break
+    keep = [rng.choice(idx[b == j], size=int(take[j]), replace=False) for j in range(nb) if take[j]]
+    keep = np.concatenate(keep) if keep else np.zeros(0, dtype=np.int64)
+    return keep, take
+
+
+def _sqrts_proposal_weighted(t_c, w, t_lo, t_hi, n_bins):
+    """sqrt(s) (or log sqrt(s)) proposal from per-candidate weights, floor 0.1 x the mean as _sqrts_proposal_from_pass"""
+    edges = np.linspace(t_lo, t_hi, n_bins + 1)
+    idx = np.clip(np.searchsorted(edges, t_c, side="right") - 1, 0, n_bins - 1)
+    per = np.bincount(idx, weights=w, minlength=n_bins)
+    if per.sum() <= 0:
+        per = np.ones(n_bins)
+    per = per + 0.1 * per.mean()
+    return edges, per / per.sum()
+
+
 def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo, frac_fwd=0.0, beam_mass=None):
     """nb candidate events with sqrt(s) from `sqrts_draw(n)`: 2->2 isotropic two-body; for
     n >= 3 a frac_dem share from the democratic splitter, the rest RAMBO. Fiducial cuts by
@@ -3622,6 +3706,67 @@ def _candidates(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, frac_dem, y_lo, fr
         return P, sq
     P, sq = _collect_with_cuts(draw, nb, m_finals, pdg, cuts)
     return [(P[i], pdg) for i in range(nb)], sq
+
+
+
+def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, pol, label, fwd_cand, beam_mass):
+    """the flat part filled to a quota per log|M|^2 bin over pol["flat_range"] (the block above flat_quota_bins):
+    rounds of oversample/2 x n_flat candidates (the first as the first pass of the mixture: uniform channel shares and
+    the pool's sqrt(s) measure), each next round's proposal from flat_quota_weights, until every bin holds its quota or
+    pol["flat_budget"] x n_flat candidates were labelled. Returns (events, sqrt(s), |M|^2) of the kept part."""
+    edges, quota = flat_quota_bins(float(pol["flat_range"][0]), float(pol["flat_range"][1]), n_flat)
+    n_round = max(int(pol["oversample"]) * n_flat // 2, n_flat)
+    budget = int(float(pol.get("flat_budget", FLAT_BUDGET)) * n_flat)
+    mc = bool(pol.get("multichannel")) and len(m_finals) >= 3
+    if mc:
+        if pol.get("mc_resonances") and not pol.get("mc_res_params"):
+            raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
+        chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
+                            pol.get("mc_res_params"))
+        shares = np.full(len(chans), 1.0 / len(chans))
+    tr, itr = (np.log, np.exp) if log_s else ((lambda x: x), (lambda x: x))
+    t_lo, t_hi = tr(lo), tr(hi)
+    draw_sq = uni
+    cand, sq_c, me_c, ch_c, rounds = [], np.zeros(0), np.zeros(0), np.zeros(0, dtype=np.int64), []
+    while True:
+        n = min(n_round, budget - len(cand))
+        if mc:
+            ev, sq, c = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"], fwd_cand,
+                                       beam_mass)
+        else:
+            ev, sq = _candidates(n, draw_sq, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand,
+                                 beam_mass)
+            c = np.zeros(n, dtype=np.int64)
+        me = np.asarray(label(ev, sq), float)
+        cand = cand + ev; sq_c = np.concatenate([sq_c, sq]); me_c = np.concatenate([me_c, me])
+        ch_c = np.concatenate([ch_c, c])
+        with np.errstate(divide="ignore", invalid="ignore"):
+            logm = np.log(np.where(me_c > 0, me_c, np.nan))
+        w, cnt, deficit = flat_quota_weights(logm, edges, quota)
+        rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum())})
+        if deficit.sum() == 0 or len(cand) >= budget or not w.any():
+            break
+        nb_s = _adaptive_bins(int((w > 0).sum()), int(pol["n_sqrts_bins"]))
+        e_s, p_s = _sqrts_proposal_weighted(tr(sq_c), w, t_lo, t_hi, nb_s)
+        draw_sq = lambda k, e_s=e_s, p_s=p_s: itr(_draw_sqrts_from_bins(k, e_s, p_s, rng))
+        if mc:
+            wc = np.bincount(ch_c, weights=w, minlength=len(chans))
+            wc = wc + MC_FLOOR * max(wc.mean(), 1e-300)
+            shares = wc / wc.sum()
+    keep, take = flat_quota_select(logm, edges, quota, rng)
+    if len(keep) < n_flat:
+        # fewer candidates in range than the flat part: the rest from the finite candidates outside it, then any
+        rest = np.setdiff1d(np.nonzero(np.isfinite(logm))[0], keep)
+        if len(rest) < n_flat - len(keep):
+            rest = np.setdiff1d(np.arange(len(cand)), keep)
+        keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
+    FLAT_LAST.clear()
+    FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take, cand_per_bin=cnt, rounds=rounds,
+                     n_candidates=len(cand), logm=logm, keep=np.asarray(keep), chan=ch_c,
+                     channels=[list(x) for x in chans] if mc else None)
+    print(f"  [SAMPLE] mixture: flat-log|M|^2 by quota {len(keep):,} kept from {len(cand):,} candidates in "
+          f"{len(rounds)} rounds, {int((take < quota).sum())} of {len(quota)} bins short ({int(np.maximum(quota - take, 0).sum())} events)")
+    return [cand[i] for i in keep], sq_c[keep], me_c[keep]
 
 
 def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng, cuts, pol, label,
@@ -3672,7 +3817,10 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
         ev_b = ev_b + ev_d; sq_b = np.concatenate([sq_b, sq_d])
         me_b = np.concatenate([me_b, np.asarray(label(ev_d, sq_d), float)])
     ev_f, sq_f, me_f = [], np.zeros(0), np.zeros(0)
-    if n_flat:
+    if n_flat and pol.get("flat_range"):
+        ev_f, sq_f, me_f = _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, pol, label,
+                                            fwd_cand, beam_mass)
+    elif n_flat:
         n_cand = max(int(pol["oversample"]) * n_flat, n_flat)
         n1 = n_cand // 2 if pol["sqrts_adapt"] else n_cand
         # pol["multichannel"] (plan catalog_coverage step 57): the candidates' finals from the channels of mc_channels,

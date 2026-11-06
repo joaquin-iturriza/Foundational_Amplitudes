@@ -11,6 +11,12 @@ mix_compose.control_config), in a temporary folder, and the flat-in-log|M|^2 par
                channel per s-channel Z/W/H/t propagator of the class's diagrams (mg.resonance_channels on
                data/diagrams/<class>.diagrams.json) and the initial-state collinear channel, equal shares in the first
                pass, shares adapted by the 1/density(log|M|^2) weight in the second (mg5_pipeline_final.py)
+  quota        the multichannel candidates with the flat part filled to a quota per log|M|^2 bin over the class's pp
+               range (sampling.flat_range from recipes/catalog_v4_flat_range.json, tools/flat_range.py; plan step 58,
+               D294): rounds of candidates steered to the bins short of their quota until every bin holds it or
+               sampling.flat_budget (mg.FLAT_BUDGET) candidates per flat event were labelled; per chunk the quota, the
+               kept count per bin, the rounds and the candidates are recorded (mg.FLAT_LAST)
+Every policy's chunks are timed (wall seconds of datagen.gen_chunk, the whole chunk: bulk, forward and flat parts).
 Everything else (6x oversampling, the flat selection, the shares of bulk, forward and flat, the sqrt(s) passes) is the
 entry's. Against the class's 13 TeV pp MadEvent events (its PP4 probe's train and test pools, as pp_support.py reads
 them, the same files; log10|M|^2 of the label), per seed and policy:
@@ -30,9 +36,12 @@ Resonance masses and widths: mg.mc_res_params of the entry's physics block.
                <class>_<policy>_<seed>.json
     python3 analysis/catalog_v4/multichannel_check.py pull                 local: $SCRATCH/zz_mcheck/<class>.json of each
                class from CC (site run cat) -> data/multichannel_check_reads/
+    python3 analysis/catalog_v4/multichannel_check.py run <class> <probe> multichannel+quota <seed>   CPU job, both
+               policies in one task on one node (their chunk times compare) -> <class>_multichannel+quota_<seed>.json
+    python3 analysis/catalog_v4/multichannel_check.py pull multichannel+quota   local: those per-seed files
     python3 analysis/catalog_v4/multichannel_check.py summary              local: data/multichannel_check_reads/*.json -> data/multichannel_check.json
 """
-import glob, json, os, sys, tempfile
+import glob, json, os, sys, tempfile, time
 
 import numpy as np
 
@@ -124,11 +133,14 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
     datagen_ok = False
     for policy in policies:
         cfg = dict(cfg0); s = dict(cfg.get("sampling") or {})
-        if policy == "multichannel":
+        if policy in ("multichannel", "quota"):
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
+        if policy == "quota":
+            from tools.flat_range import ranges
+            s.update(flat_range=ranges()[name])
         cfg["sampling"] = s
         for seed in seeds:
-            sel.clear(); diag = []
+            sel.clear(); diag = []; secs = []; qd = []
             with mc._Swap(name, cfg):
                 if not datagen_ok:
                     datagen.ensure_backend(name); datagen_ok = True
@@ -136,10 +148,22 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                 mg._flat_logm_select = fs_rec
                 try:
                     for t in tasks:
-                        mg.MC_LAST.clear()
+                        mg.MC_LAST.clear(); mg.FLAT_LAST.clear()
                         with tempfile.TemporaryDirectory(prefix="zz_probe_mcheck_") as td:
+                            t0 = time.perf_counter()
                             datagen.gen_chunk(dict(t, out_dir=td))
-                        if policy == "multichannel":
+                            secs.append(time.perf_counter() - t0)
+                        if policy == "quota":
+                            d = mg.FLAT_LAST
+                            sel.append((np.asarray(d["logm"], float) / np.log(10.0), np.asarray(d["keep"])))
+                            qd.append({"edges_log10": (np.asarray(d["edges"]) / np.log(10.0)).tolist(),
+                                       "quota": np.asarray(d["quota"]).tolist(),
+                                       "kept_per_bin": np.asarray(d["kept_per_bin"]).tolist(),
+                                       "rounds": d["rounds"], "n_candidates": int(d["n_candidates"]),
+                                       "kept_per_channel": np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])],
+                                                                       minlength=len(d["channels"])).tolist(),
+                                       "channels": d["channels"]})
+                        elif policy == "multichannel":
                             d = mg.MC_LAST
                             kc = np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])], minlength=len(d["channels"]))
                             diag.append({"channels": d["channels"], "shares1": d["shares1"],
@@ -156,7 +180,9 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                 "cand_max": float(np.nanmax(lm[fin])),
                 "hist_kept": np.histogram(np.clip(kept, LOGM_BINS[0], LOGM_BINS[-1] - 1e-9), LOGM_BINS)[0].tolist(),
                 "hist_cand": np.histogram(np.clip(lm[fin], LOGM_BINS[0], LOGM_BINS[-1] - 1e-9), LOGM_BINS)[0].tolist(),
-                "chunks": diag}
+                "chunks": diag, "quota_chunks": qd, "chunk_seconds": secs,
+                "n_events": int(sum(int(t["count"]) for t in tasks)),
+                "seconds": float(sum(secs))}
             print(f"MCHECK {name} {policy} seed {seed}: {len(lm)} candidates, {len(kept)} kept, max "
                   f"{np.nanmax(kept):.3f}", flush=True)
     lmp, sup = _pp(probe, cfg0, lo, hi)
@@ -170,6 +196,8 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
     for key, r in out["runs"].items():
         r["above_max"] = float(np.mean(lmp[sup] > r["kept_max"]))
         r["above_max_all"] = float(np.mean(lmp > r["kept_max"]))
+        r["below_min"] = float(np.mean(lmp[sup] < r["kept_min"]))
+        r["below_min_all"] = float(np.mean(lmp < r["kept_min"]))
     d = os.path.join(os.environ.get("SCRATCH") or "/tmp", "zz_mcheck"); os.makedirs(d, exist_ok=True)
     tag = name if (tuple(policies), tuple(seeds)) == (("current", "multichannel"), SEEDS) else \
         f"{name}_{'+'.join(policies)}_{'+'.join(map(str, seeds))}"
@@ -203,7 +231,26 @@ def judge(r, q999, pp_hist=None):
             "min_over_plateau_from_pp_median": float(min(h[i] for i in np.nonzero(inside)[0] if e[i] >= med) / plateau)
             if med is not None and top_all and plateau else None,
             "plateau": plateau, "min_over_plateau": mo, "bins_below_half": low,
-            "pass": bool(r["above_max"] <= 0.001 and mo is not None and mo >= 0.5)}
+            "pass": bool(r["above_max"] <= 0.001 and mo is not None and mo >= 0.5),
+            "below_min": r.get("below_min"), "seconds": r.get("seconds"), "n_events": r.get("n_events"),
+            "n_candidates": r.get("n_candidates"), **quota_fill(r)}
+
+
+def quota_fill(r):
+    """the quota policy's fill over the chunks: events short of the quota (unfilled bins) over the flat part, the bins
+    short in any chunk (log10 lower edges), the rounds and candidates per flat event kept; {} for other policies"""
+    qc = r.get("quota_chunks") or []
+    if not qc:
+        return {}
+    q = sum(sum(c["quota"]) for c in qc)
+    short = sum(int(np.maximum(np.asarray(c["quota"]) - np.asarray(c["kept_per_bin"]), 0).sum()) for c in qc)
+    bins = sorted({round(c["edges_log10"][j], 2) for c in qc for j in range(len(c["quota"]))
+                   if c["kept_per_bin"][j] < c["quota"][j]})
+    return {"quota_events": int(q), "quota_short": int(short), "quota_short_share": short / max(q, 1),
+            "bins_short_log10": bins, "chunks_short": int(sum(any(k < x for k, x in zip(c["kept_per_bin"], c["quota"]))
+                                                             for c in qc)),
+            "n_chunks": len(qc), "rounds_max": max(len(c["rounds"]) for c in qc),
+            "flat_cand_per_kept": sum(c["n_candidates"] for c in qc) / max(q, 1)}
 
 
 def summary():
@@ -219,7 +266,9 @@ def summary():
         q = d["pp"]["q999_in_support"]
         c = {"probe": d["probe"], "resonances": d["resonances"], "res_params": d.get("res_params"), "pp_n": d["pp"]["n"],
              "pp_out_of_support": d["pp"]["out_of_support"], "pp_q999_in_support": q}
-        for pol in ("current", "multichannel"):
+        for pol in ("current", "multichannel", "quota"):
+            if not all(f"{pol}_{s}" in d["runs"] for s in SEEDS):
+                continue
             js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in SEEDS}
             ch = d["runs"][f"{pol}_{SEEDS[0]}"]["chunks"]
             kc = np.sum([x["kept_per_channel"] for x in ch], 0).tolist() if ch else None
@@ -229,7 +278,7 @@ def summary():
         out["classes"][d["class"]] = c
         print(d["class"], {pol: (c[pol]["pass"], [(round(j["above_max"], 4), j["min_over_plateau"] and
                                                     round(j["min_over_plateau"], 3)) for j in c[pol]["seeds"].values()])
-                           for pol in ("current", "multichannel")})
+                           for pol in ("current", "multichannel", "quota") if pol in c})
     json.dump(out, open(os.path.join(DATA, "multichannel_check.json"), "w"), indent=1)
 
 
@@ -239,20 +288,22 @@ print("MCHECK_READ " + open(os.path.join(os.environ["SCRATCH"], "zz_mcheck", sys
 '''
 
 
-def pull():
-    """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/"""
+def pull(policies=None):
+    """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
+    with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
     from analysis.common import site_python
     os.makedirs(READS, exist_ok=True)
-    for name in CLASSES:
-        d = site_python(PULL_REMOTE, [name], "MCHECK_READ", timeout=300)
-        json.dump(d, open(os.path.join(READS, f"{name}.json"), "w"), separators=(",", ":"))
-        print("pulled", name, sorted(d["runs"]))
+    tags = [n for n in CLASSES] if policies is None else [f"{n}_{policies}_{s}" for n in CLASSES for s in SEEDS]
+    for tag in tags:
+        d = site_python(PULL_REMOTE, [tag], "MCHECK_READ", timeout=300)
+        json.dump(d, open(os.path.join(READS, f"{tag}.json"), "w"), separators=(",", ":"))
+        print("pulled", tag, sorted(d["runs"]))
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "run":
-        run(sys.argv[2], sys.argv[3], *(((sys.argv[4],), (int(sys.argv[5]),)) if len(sys.argv) > 5 else ()))
+    if sys.argv[1] == "run":   # <policy> may join several with '+' (run on one node, so their times compare)
+        run(sys.argv[2], sys.argv[3], *((tuple(sys.argv[4].split("+")), (int(sys.argv[5]),)) if len(sys.argv) > 5 else ()))
     elif sys.argv[1] == "pull":
-        pull()
+        pull(sys.argv[2] if len(sys.argv) > 2 else None)
     else:
         summary()
