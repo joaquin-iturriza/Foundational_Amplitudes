@@ -10603,6 +10603,19 @@ entries:
       (54, 78% below 1; none of their own default events), PP4 trained 0.344 [0.283,0.420] (797), PP4 held out 0.680 [0.506,0.893]
       (504). Open: whether the held-out e+e- gain comes from the other e+e- classes'' default events or from the pp ones;
       the beam ablation (eeonly/pponly recipes, 278ae072) separates them.'
+  - at: '2026-11-06T04:42:35+00:00'
+    text: '(e) 2026-11-06 epochs of the width/length study points (analysis/catalog_v4/epoch_count.py count @cf9f20c3 -> data/study_epochs.json
+      @0da56903; epochs = steps / batches per epoch, batches from each run''s ''Starting to train ... with B batches'' line;
+      the whole catalog_v4 default25 training set is 6707 batches of 16384): the six 1x width cells (w8 804a65bc/66e8c31f,
+      w16 493c98db/7288b3fe, w32 e26059bf/fd7fc137; par:v4_width, par:v4_mult_width_length) ran 4264 steps = 0.636 epoch,
+      all under one epoch; every 4x sweep trial (17056 steps) 2.54 epochs, every 16x trial (68224) 10.17 epochs. So the width
+      axis of par:v4_width and the x1 point of the length axis compare models that never saw a third of their training set
+      against ones that saw it 2.5-10 times. Redo design drafted: width x length map at >= 1 epoch, widths 8/16/32 x 4264
+      x {2,4,8,16} steps (2x = 8528 = 1.27 epochs, the smallest of the study''s doubling schedule at >= 1 epoch), seeds 42/43,
+      every cell at trial_1262''s HPs (best of both long sweeps) with lr ~ steps^-0.55 from its two measured lrs; 22 new V100
+      jobs, 449 GPU-h (data/scaling_grid_plan.json; the redo of the six under-one-epoch points alone, the 2x row, 39.0 GPU-h);
+      job-script switch LONG_HP=1262 + LONG_FACTOR 2/8 on branch scaling-grid @68feafed (worktrees/wt-scaling-grid), not yet
+      reviewed or merged.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
