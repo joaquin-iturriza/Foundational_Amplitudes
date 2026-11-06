@@ -15241,6 +15241,63 @@ entries:
       entry and site decisions for: zero-shot objective, zero_shot_score, zero_shot_objective, objective.*zero, growth sweep,
       grow.*sweep, sweep.*grow, HD4, proxy objective, held-out.*objective. Only the sign-head search came up (a val-loss objective),
       already named in the prior.'
+  - at: '2026-11-06T20:01:11+00:00'
+    question: 'Step 12 (D307, D308): how should the k=533 warm start leave its pretrained parent? Joaquin''s mechanism: cosine
+      annealing to lr 0 leaves the parent in an ever narrower valley, so any restart lr throws it out (the loss jump). Two
+      remedies, tested as one study on the C1 change (default-sampled share 0.25, het loss, k=533): (a) restart from a checkpoint
+      taken before the parent''s lr reached 0 and continue from there (D308, checkpoints saved under D289); (b) restart at
+      a large lr, leaving the valley for a possibly better minimum. Does either read better than the default restart, and
+      does the restart jump move with it?'
+    prior: 'par:v4_warm_start_tuned (D289): warm starts from the rerun''s step-2132 and step-3198 checkpoints, but at the
+      NLL-tuned settings (lr scale 0.17, layer decay 0.92, warmup 0.18), read R(W/W_final) 1.23 [1.03,1.47] / 1.15 [0.89,1.48]
+      (2132) and 1.02 [0.86,1.20] / 1.00 [0.80,1.25] (3198): not better; caveat there: every checkpoint retrained at settings
+      tuned for the final model. This design differs: the default restart and a continued schedule (lr starting at the checkpoint''s
+      own lr, no re-warm), and a large-lr arm. par:v4_warm_start_restart (D303): the restart jump: grad norm 10.7, 18.1, 825
+      at steps 0-2, largest over steps 0-19 1591, worst training loss over 40 steps -1.21 vs -2.577 at start; across the NLL
+      sweep''s 8 trials the step-2 grad norm follows the step-2 lr (101 at 1.6e-5 to 4306 at 6.9e-4). par:v4_warm_start_ramp:
+      damping every group''s lr shrinks the jump to 0.053 of the default but reads worse (PP4 1.237, EE4 1.619); AdamW damped
+      1.017/1.012; moment fill and Muon damping do not move the reads (par:v4_warm_start_repairs). par:v4_warm_start: default
+      restart R(W/B) 1.33/1.51 at 533, YES at 1066. Searched results.tex, plan show warm_start and site decisions for pre-decay,
+      from2132, from3198, earlier checkpoint, save_model_at_steps, large lr, lr_scale, restart jump, valley; decisions D289,
+      D303, D307, D308, D312.'
+    measure: 'Per run, from its per-step log (analysis/catalog_v4/ws_restart_steps.py): the restart jump G = largest gradient
+      norm before clipping over restart steps 0-19, and the worst training loss over steps 0-39 against step 0. Deciding:
+      per-probe zero-shot-scorer MSE of log|M|^2 on PP4 and EE4 test splits (mixture_ab.py warm, new entry C1r): R(arm/control)
+      = median over classes of the class geometric mean of the probe ratios, each probe the two-seed geometric mean, 95% class-bootstrap
+      interval widened on each side by |ln R_seed| (the two seeds'' log-ratio); R(arm/B) against the change from scratch beside,
+      the held-out default-sampled reads (held_default) beside; val NLL curves; figure: grad norm and val NLL against the
+      restart step, per-class CDFs on PP4/EE4, every caption and write-up stating in one line how the interval is built.'
+    check: 'Existing data shows both measures move with how the restart treats the parent: G over steps 0-19 is 1591 at the
+      default restart, 53 with every group''s lr ramped (0.053 of the default) and, across the NLL sweep''s trials, rises
+      with the restart''s step-2 lr from 101 to 4306 (ws_restart_steps.py, par:v4_warm_start_restart / _ramp); the reads move
+      with the restart recipe and the checkpoint: NLL-tuned over default PP4 1.19 [1.01,1.39], EE4 1.40 [1.20,1.67]; every
+      group damped 1.237 [1.028,1.489] / 1.619 [1.359,1.974]; step-2132 start over final 1.23 [1.03,1.47]. Same-recipe spread:
+      moment fill and Muon damping move them 1.005-1.045 with intervals about +-0.17.'
+    fixed: 'Parent: the checkpoint rerun v4_het_control_ckpt (seed 42) / _seed2 (43) (FA-ccin2p3-d521160b / b688a859; same
+      setup as the het control, 4264 steps, cosine with 675-step warmup, peak lr 4.997e-3; models before any sigma stage:
+      step 2132 at lr 3.23e-3 = 0.646 of peak, step 3198 at 1.01e-3 = 0.202, final model). Every arm: the share-0.25 recipe
+      catalog_v4_default25_train.yaml, 533 steps, the parent''s HPs from runs/dancat_het_pre/trial_0058 (EMA 0.941, eta_min
+      1.8e-10, Muon wd 0.0217), fresh optimizer, layer decay 1, parent target stats, sigma stage 250 steps, every read (PP4
+      EE4 HD4 HD5 and the catalog axes), scripts/job_catalog_v3_short.sh arms v4_het_ws_* (worktree wt-ws-restart @5761fe0b,
+      merged after repo review). Only the start model and the restart''s lr schedule differ: final_default (final, lr scale
+      1, re-warm 84 steps = 0.158 x 533, cosine to ~0); step3198_default (step-3198 model, the same); step3198_continue (step-3198
+      model, lr scale 0.20233, warmup 0: starts at the checkpoint''s own lr, cosine to ~0 over 533); step2132_continue (step-2132
+      model, lr scale 0.64557, warmup 0); final_lr3x (final model, lr scale 3.0, default re-warm; the NLL sweep''s trial with
+      step-2 lr 6.9e-4, about lr scale 5.8, trained through). Limit 02:30 (the script''s V3_WALL 2.25 h), 16G, CC-IN2P3.'
+    control: 'final_default: the same rerun parent''s final model at the default restart, same commit and data (matched control
+      for every arm). Beside: the default restart from the original control''s final model (341bf564/254abf4f; and the same-data
+      pair 0202ba7f/7b2d6c24) to show the rerun parent is equivalent; B = the change from scratch (WARM C1 B) and A = the
+      pretrained start (WARM C1 A) as in par:v4_warm_start.'
+    seeds: '42 and 43, each arm from the parent at its seed (5 arms x 2 seeds = 10 runs). Cost: about 1.5 h each (fbb16a33/cb458c82,
+      same setup, 1.51 h), 15 GPU-h, 25 at limits, CC-IN2P3; disk about 0.9 GB per run, 9 GB against 77 GB free.'
+    outcome: 'Fixed before the read, per arm against final_default: BETTER when the widened upper end of R(arm/control) is
+      below 1 on PP4 or EE4 and above 1.05 on neither: that restart becomes the recipe and is read against B (MATCH when the
+      widened upper end of R(arm/B) <= 1.35 on both, a YES at k=533, 1/8 of a pretraining); WORSE when the lower end is above
+      1 on either; else NOT BETTER. Mechanism, reported for each arm: the jump moved when G (steps 0-19) is below 0.5 or above
+      2 of the control''s at both seeds. Valley reading SUPPORTED when a continue arm has a smaller jump AND is BETTER; NOT
+      the limit when the jump moved without the reads (as the every-group ramp); large lr supports leaving the valley when
+      final_lr3x is BETTER. No arm BETTER: the default restart stays and the remaining gap is the retraining length (YES at
+      1066). A run that blows up is listed apart with where; its reads are of its final model.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
