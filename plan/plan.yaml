@@ -12938,7 +12938,7 @@ entries:
       warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
   owner:
     agent: a53040907e4c704f0
-    state: working
+    state: closed
     since: '2026-11-06T05:49:03+00:00'
     state_at: '2026-11-06T06:42:01+00:00'
     context: 208821
@@ -14410,36 +14410,34 @@ entries:
     '6': FA-ccin2p3-b2c69c1a FA-ccin2p3-f5245570 FA-ccin2p3-0202ba7f FA-ccin2p3-7b2d6c24 FA-ccin2p3-4f9e0532 FA-ccin2p3-8cb6c7b5
       FA-ccin2p3-f9c67e8a FA-ccin2p3-bfb41439
   handoff:
-    state: 'D303 lead (step 6): the restarted warm starts jump off the pretrained minimum at step 2 (grad norm 18 -> 825 at
-      lr 1.2e-4, 2.4% of peak; over hpo8''s trials the step-2 norm follows the step-2 lr, 101 at 1.6e-5 to 4310 at 6.9e-4;
-      data/ws_restart_steps.json, ws_restart_steps.py @d811a452); suspected cause the empty AdamW/Muon state of the fine-tune
-      path. Test in flight under design passed round 2 (2026-11-06): fine_tune.moment_fill_steps=100 (merged 117f19ca) arm
-      v4_het_warm25f_k533[_seed2] vs same-commit default restart v4_het_warm25_k533[_seed2] SHORT_TAG=d303, seeds 42/43, scripts/job_catalog_v3_short.sh
-      @117f19ca (CC checkout bb9eb420). When they end: python3 analysis/catalog_v4/ws_restart_steps.py after adding the 4
-      run dirs (runs/catalog_v4_short/v4_het_warm25f_k533[_seed2], v4_het_warm25_k533_tagd303[_seed2]) to its RUNS; CAUSE
-      when fill''s max grad norm over steps 0-19 < 0.2x the same-seed control''s at both seeds and worst train loss over 0-39
-      < parent start + 0.3; reads via mixture_ab.py warm with a new entry C1f (W = fill pair, ref = the tagd303 pair, B/A
-      as C1; add the reads with mixture_ab.py''s usual eval-read path), BETTER when widened upper R(fill/default) < 1 on PP4
-      or EE4 and > 1.05 on neither; draw curves + per-class CDFs in words (plot_warm_start_compare.py style). Step 5 done:
-      exact split (het_split.json @7d30b3e6): NLL-tuned vs default restart equal sigma-weighted error (0.524/0.523), the NLL
-      gap all log-sigma (-3.282/-3.169), mean MSE equal per process; figure figs/ws_het_split_few_{a,b}. Step 6''s other half:
-      sweep ws_c1_k533_mse_wsd_hpo8 (val MSE of the mean, cosine or WSD) on CC, read its summary.txt when it ends; then confirmation
-      and growth arms per the earlier (b) design, carrying the fill if CAUSE and BETTER. Step 7 (C2-C8, D300) runs with the
-      recipe step 6 picks. Figure warm_start_compare_{a,b,c} relabelled in words (0ff7bcb9) and sent.'
-    decisions: 'D303 (Joaquin: lr/scheduler wrong) leads step 6. D284 fixes K at 1/8 (533) for tuning arms (cited to repo-reviewer
-      for the K=533-only fill arm). D291 method is the owner''s; D298 another objective allowed (mu_mse sweep); D300 C2-C8
-      approved at cost. Owner''s call: the 7 pruned hpo8 trials are not retrained for the split (finding 2026-11-06). The
-      2026-11-05T04:01 finding (optimizer state reset fine, Ibrahim 2024) is under test and its claim that the parent''s optimizer
-      state is saved is wrong (0 Muon / 2 AdamW entries; the sigma stage overwrites models/).'
-    ruled_out: C7; C9; catalog_v3 changes; the NLL-tuned low-lr warm start (reads worse; its NLL gain is sharper sigma only);
-      pre-decay checkpoints as parent (D289); the lr_scale 0.01 extension; retraining the pruned hpo8 trials for the split.
-    running: 'FA-ccin2p3-b2c69c1a (fill s42), f5245570 (fill s43), 0202ba7f (default restart s42, tagd303), 7b2d6c24 (default
-      restart s43, tagd303): started 06:44, limit 2:15, target 1.6 h; step 6 waits on them plus the sweep ws_c1_k533_mse_wsd_hpo8
-      (CC, 2 jobs left at 06:45; its end may raise no event: python3 tools/plan.py sweeps).'
-    files: base_experiment.py (_fill_optimizer_moments); config/default.yaml (fine_tune.moment_fill_steps); run.py (sigma
-      stage fill 0); tests/test_moment_fill.py; scripts/job_catalog_v3_short.sh (v4_het_warm25f_k533, SHORT_TAG on v4_het_warm25_k533);
-      analysis/catalog_v4/ws_restart_steps.py, data/ws_restart_steps.json; analysis/catalog_v4/ws_het_split.py, data/ws_hpo8/het_split.json,
-      figs/ws_het_split_few_{a,b}; analysis/catalog_v4/plot_warm_start_compare.py, data/warm_start_compare.json, figs/warm_start_compare_{a,b,c};
-      analysis/catalog_v4/mixture_ab.py (WARM); sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml; scripts/job_ws_het_split.sh
-      (RUN_DONE marker); docs/results.tex (par:v4_warm_start, _tuned, _grow; steps 5 and 6 not yet written up).
-    written: '2026-11-06T05:48:29+00:00'
+    state: 'Step 6 in flight; step 6 waits on 8 runs (one RUN_DONE). (i) Moment fill (D303, design passed round 2 2026-11-06T05:40):
+      fill FA-ccin2p3-b2c69c1a (s42), f5245570 (s43) vs same-commit default restart 0202ba7f (s42), 7b2d6c24 (s43). Read:
+      python3 analysis/catalog_v4/ws_restart_steps.py (its RUNS already has the 4 dirs, keys fill_s42/fill_s43/default_d303_s42/default_d303_s43
+      in the last JSON line; c3fb2f14) -> CAUSE if fill max grad norm over steps 0-19 < 0.2x same-seed control at both seeds
+      and worst train loss 0-39 < parent start + 0.3; reads: mixture_ab.py warm C1f (entry added cec98490: W fill pair, ref
+      default = tagd303 pair, default_older = 341bf564/254abf4f), BETTER when widened upper R(fill/default) < 1 on PP4 or
+      EE4 and > 1.05 on neither. (ii) MSE-of-the-mean sweep ws_c1_k533_mse_wsd_hpo8 read (plot_ws_mse_sweep.py @30ea35ac,
+      figs/ws_mse_sweep_{a,b}): best hp_1333 lr_scale 1.85 WSD cooldown 0.164, val MSE of mu 0.0283; all 8 trials WSD (cosine
+      never drawn); the NLL sweep''s cosine trials reach 0.0257-0.0289 at lr 0.87-2.2. Confirmation (design passed 2026-11-06T04:48):
+      v4_het_warm25m_k533[_seed2] FA-ccin2p3-4f9e0532/8cb6c7b5 (2:15, 16G); growth GROW_HP=1333 FA-ccin2p3-f9c67e8a/bfb41439
+      (2:30, 46G) afterok on memmap prebuilds f7a03eee/a99f5106 (htc). Read them with new mixture_ab.py warm entries C1m (W
+      = warm25m pair, ref untuned 341bf564/254abf4f and NLL-tuned 56cca07a/75d28cb4, B/A as C1) and C10wm (W = the growth
+      pair, ref untuned grown e046ac67/f35b6a78, B = WIDTH w16, A = w8, match_hi 1.19), not yet added; rules in the design.
+      After the reads, delete the growth cache (key 0c897ca2d81c98d3828e2808 under /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache,
+      ~23 GB) as designed. Then pick the restart recipe (fill and/or hp_1333 or untuned) and run step 7 (C2-C6, C8, D300)
+      with it; write steps 6 up beside par:v4_warm_start_restart (whose ''test is running'' line was removed; add the fill
+      result there).'
+    decisions: 'D303 leads step 6. D284 K=533 for tuning arms. D291 method the owner''s; D298 another objective allowed (mu_mse
+      sweep). D300 C2-C8 approved at 79.8 GPU-h. Owner''s call: the 7 pruned hpo8 trials not retrained. Coordinator (2026-11-06):
+      run the hp_1333 confirmation and growth without waiting for the fill runs. GROW_HP only at k=533 (the sweep tuned at
+      533; repo-reviewer noted that tuned growth at 1066/2132 would need Joaquin''s word).'
+    ruled_out: C7; C9; catalog_v3 changes; the NLL-tuned low-lr warm start; pre-decay checkpoints as parent (D289); lr_scale
+      0.01 extension; retraining the pruned hpo8 trials.
+    running: FA-ccin2p3-b2c69c1a, f5245570, 0202ba7f, 7b2d6c24 (fill test, started 06:44 CET, target 1.6 h); 4f9e0532, 8cb6c7b5
+      (hp_1333 confirmation, started ~07:35); f7a03eee -> a99f5106 (CPU prebuilds) -> f9c67e8a, bfb41439 (growth at hp_1333).
+      Batch target ws_mse_confirm 1.7 h for 4 jobs.
+    files: docs/results.tex par:v4_warm_start_restart (99f37a7e); analysis/catalog_v4/ws_het_split.py (fetch --sweep/--out),
+      data/ws_hpo8/het_split_log.txt.gz, data/ws_mse_hpo8/trial_curves.json; analysis/catalog_v4/plot_ws_mse_sweep.py, figs/ws_mse_sweep_{a,b};
+      analysis/catalog_v4/ws_restart_steps.py (--cached); analysis/catalog_v4/mixture_ab.py (WARM C1f); scripts/job_catalog_v3_short.sh
+      (WS_M_HP, v4_het_warm25m_k533, GROW_HP=1333, mode prebuild); scripts/job_catalog_v3_short_prebuild.sh; sweep/sweep_config_ccin2p3_ws_c1_k533_mse_wsd_hpo.yaml
+    written: '2026-11-06T06:48:05+00:00'
