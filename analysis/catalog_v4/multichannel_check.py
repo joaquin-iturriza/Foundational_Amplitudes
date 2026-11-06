@@ -30,6 +30,14 @@ them, the same files; log10|M|^2 of the label), per seed and policy:
                over the plateau
   pass         above_max <= 0.001 and min_over_plateau >= 0.5 (the rule of the proposal, plan step 57), on both seeds
                (the step's "against the two seeds' spread" read as: the rule holds on each seed)
+  sources      per run, each pp source (pp_sources): `table` the probe's train + test pools, from which the quota
+               policy's range is read, so its above/below shares hold by construction for that policy (flagged
+               by_construction); `heldout` the probe's val pool and the class's dsh_ pools (default-share MadEvent
+               events), never read for the range: the in-support events outside the kept [min, max] (D269's count,
+               target 0) with 3/N, the 95% upper bound on the share when the count is 0; beside them, over every event,
+               the out-of-support share split into sqrt(s_hat) outside the window and cuts failed in the partonic frame,
+               and the above-max share
+  quota_outcome  step 58's rule per class: held-out count 0, no quota shortfall, no budget or no_steer stop, both seeds
 Resonance masses and widths: mg.mc_res_params of the entry's physics block.
 
     python3 analysis/catalog_v4/multichannel_check.py run <class> <probe> [<policy> <seed>]   CPU job
@@ -84,19 +92,29 @@ def _find(stem):
             return g[0]
 
 
-def _pp(probe, cfg, lo, hi):
-    """log10|M|^2 of the probe's train and test events (pp_support.py's files) and whether each lies in the catalog's
-    support: sqrt(s_hat) in [lo, hi] and the class's cuts passed in the partonic frame (pp_support.py's mask)"""
-    import mg5_pipeline_final as mg
+def _pp_rows(stems):
+    """the rows of the pools named by `stems` that exist (each through _find), and their file names"""
     rows, files = [], []
-    for role in ("train", "test"):
-        f = _find(f"{probe}_13000-13000GeV_{role}_lhe_amplitudes.npy")
-        if f is None:
-            raise SystemExit(f"{probe}: no {role} pool")
-        rows.append(np.asarray(np.load(f, mmap_mode="r"), dtype=np.float64)); files.append(f)
+    for stem in stems:
+        f = _find(stem)
+        if f is not None:
+            rows.append(np.asarray(np.load(f, mmap_mode="r"), dtype=np.float64)); files.append(os.path.basename(f))
+    return rows, files
+
+
+def _pp(stems, cfg, lo, hi, label):
+    """log10|M|^2 of the events of the pools `stems` (those that exist), whether each lies in the catalog's support
+    (sqrt(s_hat) in [lo, hi] and the class's cuts passed in the partonic frame, pp_support.py's mask), and the two
+    parts of the out-of-support share: sqrt(s_hat) outside the window, and inside it but failing the cuts in the
+    partonic frame (the lab card's |eta| < 5 does not bound the partonic |eta|). None when no pool exists."""
+    import mg5_pipeline_final as mg
+    rows, files = _pp_rows(stems)
+    if not rows:
+        print(f"MCHECK pp {label}: none of {stems}", flush=True)
+        return None
     x = np.concatenate(rows)
     k = (x.shape[1] - 1) // 5
-    assert x.shape[1] == 5 * k + 1, (probe, x.shape)
+    assert x.shape[1] == 5 * k + 1, (label, x.shape)
     P = x[:, :4 * k].reshape(-1, k, 4)
     pdg = x[0, 4 * k:5 * k].astype(int)
     mass = dict(zip((abs(int(q)) for q in cfg["pdg_ids"][2:]), (float(m) for m in cfg["m_finals"])))
@@ -104,12 +122,26 @@ def _pp(probe, cfg, lo, hi):
     q = P[:, 0] + P[:, 1]
     sq = np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0, None))
     ok = mg.fiducial_pass_mask(mg.to_partonic_frame(P), mf, pdg, cfg["fiducial_cuts"])
+    inw = (sq >= lo) & (sq <= hi)
     with np.errstate(divide="ignore"):
         lm = np.log10(np.abs(x[:, -1]))
     fin = np.isfinite(lm)
-    print(f"MCHECK pp {probe}: {len(lm)} events ({[os.path.basename(f) for f in files]}), {int((~fin).sum())} with "
-          f"|M|^2 0, {float(np.mean(~(ok & (sq >= lo) & (sq <= hi)))):.4f} outside the support", flush=True)
-    return lm[fin], ((sq >= lo) & (sq <= hi) & ok)[fin]
+    print(f"MCHECK pp {label}: {len(lm)} events ({files}), {int((~fin).sum())} with |M|^2 0, "
+          f"{float(np.mean(~(ok & inw))):.4f} outside the support", flush=True)
+    return {"lm": lm[fin], "sup": (inw & ok)[fin], "files": files, "outside_window": float(np.mean(~inw[fin])),
+            "fail_cuts_in_window": float(np.mean((inw & ~ok)[fin]))}
+
+
+def pp_sources(name, probe):
+    """the pp pools of a class, by role in the check: `table` the PP4 probe's train and test pools (what
+    tools/flat_range.py's range was read from: shares judged on them hold by construction for the quota policy);
+    `heldout` pp events the range never saw: the probe's val pool and the class's default-share MadEvent pools
+    (dsh_<x>, train, val and test; catalog_v4's physics, where a reused pp13_ probe carries catalog_v3's)"""
+    w = "13000-13000GeV"
+    dsh = "dsh_" + name[len("v4_"):]
+    return {"table": [f"{probe}_{w}_{r}_lhe_amplitudes.npy" for r in ("train", "test")],
+            "heldout": [f"{probe}_{w}_val_lhe_amplitudes.npy"] + [f"{dsh}_{w}_{r}_lhe_amplitudes.npy"
+                                                                  for r in ("train", "val", "test")]}
 
 
 def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
@@ -187,7 +219,10 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                 "seconds": float(sum(secs))}
             print(f"MCHECK {name} {policy} seed {seed}: {len(lm)} candidates, {len(kept)} kept, max "
                   f"{np.nanmax(kept):.3f}", flush=True)
-    lmp, sup = _pp(probe, cfg0, lo, hi)
+    src = {k: _pp(v, cfg0, lo, hi, f"{probe} {k}") for k, v in pp_sources(name, probe).items()}
+    if src["table"] is None:
+        raise SystemExit(f"{probe}: no train/test pool")
+    lmp, sup = src["table"]["lm"], src["table"]["sup"]
     if not sup.any():
         raise SystemExit(f"{probe}: no pp event in the catalog's support")
     out["pp"] = {"n": int(len(lmp)), "n_in_support": int(sup.sum()), "out_of_support": float(np.mean(~sup)),
@@ -200,6 +235,20 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
         r["above_max_all"] = float(np.mean(lmp > r["kept_max"]))
         r["below_min"] = float(np.mean(lmp[sup] < r["kept_min"]))
         r["below_min_all"] = float(np.mean(lmp < r["kept_min"]))
+        r["sources"] = {}
+        for k, v in src.items():
+            if v is None:
+                continue
+            ls, ss = v["lm"], v["sup"]
+            out_in = ss & ((ls > r["kept_max"]) | (ls < r["kept_min"]))
+            r["sources"][k] = {"files": v["files"], "n": int(len(ls)), "n_in_support": int(ss.sum()),
+                               "n_in_support_outside_kept": int(out_in.sum()),
+                               "above_max": float(np.mean(ls[ss] > r["kept_max"])) if ss.any() else None,
+                               "below_min": float(np.mean(ls[ss] < r["kept_min"])) if ss.any() else None,
+                               "out_of_support_all": float(np.mean(~ss)), "outside_window_all": v["outside_window"],
+                               "fail_cuts_in_window_all": v["fail_cuts_in_window"],
+                               "above_max_all": float(np.mean(ls > r["kept_max"])),
+                               "by_construction": k == "table" and key.startswith("quota")}
     d = os.path.join(os.environ.get("SCRATCH") or "/tmp", "zz_mcheck"); os.makedirs(d, exist_ok=True)
     tag = name if (tuple(policies), tuple(seeds)) == (("current", "multichannel"), SEEDS) else \
         f"{name}_{'+'.join(policies)}_{'+'.join(map(str, seeds))}"
@@ -234,8 +283,25 @@ def judge(r, q999, pp_hist=None):
             if med is not None and top_all and plateau else None,
             "plateau": plateau, "min_over_plateau": mo, "bins_below_half": low,
             "pass": bool(r["above_max"] <= 0.001 and mo is not None and mo >= 0.5),
+            "above_max_by_construction": bool(r.get("sources", {}).get("table", {}).get("by_construction")),
             "below_min": r.get("below_min"), "seconds": r.get("seconds"), "n_events": r.get("n_events"),
-            "n_candidates": r.get("n_candidates"), **quota_fill(r)}
+            "n_candidates": r.get("n_candidates"), **quota_fill(r), **heldout_read(r)}
+
+
+def heldout_read(r):
+    """D269's terms ("0% of pp events outside"): the held-out in-support pp events (never read for the range table)
+    outside the kept flat part's [min, max], target 0, and the 95% upper bound on that share when the count is 0 of N
+    (3/N, the rule of three); the table's own shares beside it, marked as holding by construction for the quota policy;
+    the out-of-support shares over every event of each source (what no sampler in the support reaches: sqrt(s_hat)
+    outside the window, or the cuts failed in the partonic frame)"""
+    src = r.get("sources") or {}
+    out = {"pp_sources": src}
+    h = src.get("heldout")
+    if h:
+        n, c = h["n_in_support"], h["n_in_support_outside_kept"]
+        out.update(heldout_n_in_support=n, heldout_outside_kept=c,
+                   heldout_upper95=(3.0 / n if n and c == 0 else None), heldout_share=(c / n if n else None))
+    return out
 
 
 def quota_fill(r):
@@ -276,6 +342,16 @@ def summary():
             js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in SEEDS}
             ch = d["runs"][f"{pol}_{SEEDS[0]}"]["chunks"]
             kc = np.sum([x["kept_per_channel"] for x in ch], 0).tolist() if ch else None
+            if pol == "quota":
+                # step 58's outcome (D269): 0 held-out in-support pp events outside the kept range on both seeds, no
+                # quota shortfall, no chunk stopped at the budget or with nothing to steer by
+                c["quota_outcome"] = {
+                    "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and "
+                            "chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
+                    "yes": all(j.get("heldout_outside_kept") == 0 and j.get("quota_short") == 0 and
+                               j.get("chunks_budget_hit") == 0 and j.get("chunks_no_steer") == 0 for j in js.values()),
+                    "heldout": {s: [j.get("heldout_outside_kept"), j.get("heldout_n_in_support"), j.get("heldout_upper95")]
+                                for s, j in js.items()}}
             c[pol] = {"seeds": js, "pass": all(j["pass"] for j in js.values()),
                       "kept_max": [d["runs"][f"{pol}_{s}"]["kept_max"] for s in SEEDS],
                       "channels": ch[0]["channels"] if ch else None, "kept_per_channel_seed42": kc}
