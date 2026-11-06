@@ -13210,10 +13210,6 @@ entries:
       submitted at the next wake once the site gate''s 60-min window allows), logs to scratch, mixture_ab.py val/extract per
       axis, mixture_ab.py warm C2 C3 C4 C5 C8, signext_compare.py warm (C6), ws_stats_check.py C8 on the k=2132 pair, figure
       of the compared reads, write-up in par:v4_warm_start'
-    10: 'Step 9 (D303, step 8''s NOT MUON branch): the remaining cause of the restart jump, AdamW''s share or the ramp of
-      every group: arms v4_het_warm25a_k533[_seed2] (AdamW lr x min(1, step/168), Muon untouched) and v4_het_warm25e_k533[_seed2]
-      (both groups damped), against the default restart pair 0202ba7f/7b2d6c24, seeds 42/43; code merged 1b51878d (repo-reviewer
-      PASS); design, review, submit with the C8 k=2132 pair'
     11: 'Step 11 (D285, D291), the width growth''s own sweep ws_grow_k533_zeroshot_hpo8 (sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml,
       trunk f5f9511c, repo-reviewer clean at a49b1de7): its objective found (ws_objective_check.py: only the HD4 zero-shot
       score tracks the PP4/EE4 reads, r 0.94-0.98; every validation loss runs against them) and wired into sweep/run_trial.py
@@ -15042,12 +15038,6 @@ entries:
       if:
       - 'MATCH and carried at some k: YES at the smallest such k'
       - 'no k matches: NO at the untuned restart, re-applied with step 9''s recipe if it is BETTER'
-    10:
-      feeds: 'D303: what in the restart''s lr makes the jump, and whether removing it improves the reads'
-      if:
-      - 'an arm BETTER on the reads: its damping joins the restart recipe for the growth and any change that read NO'
-      - 'neither BETTER: the jump is harmless to the reads; the untuned restart stays and the remaining gap is the retraining
-        length'
     11:
       feeds: 'D285: whether a shape-changing warm start can be tuned to reach width 16 from scratch'
       if:
