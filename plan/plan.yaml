@@ -10017,6 +10017,66 @@ entries:
       4x/16x cells ran on gpu_h100 (TF32 active) and the new cells go to gpu_v100,gpu_h100 as given: record each cell''s GPU
       in the read (TF32 on/off measured within run-to-run spread, results.tex sec:tf32-a100); state LONG_CKPT for widths 16/32
       if the V100 needs it (math-neutral, time only).'
+  - at: '2026-11-06T22:46:23+00:00'
+    question: 'Step 64 (D292, D293; Joaquin 2026-11-06 22:31 ''Send the grid, just one seed.'' D314, D315): on catalog_v4
+      at default share 0.25 (het loss, whole training set, memmap), with every cell at >= 1 epoch, how does the validation
+      MSE of ln|M|^2 fall with compute C = 6NSB along width (8/16/32) and length (2x, 4x, 8x, 16x of 4264 steps), and does
+      one law L(C) = A C^-alpha + L_inf hold across both axes? Feeds which width and length the pretraining candidate takes
+      at a given GPU budget, and the scaling section''s alpha and L_inf (not determinable from the earlier 3-point axes).'
+    prior: 'results.tex par:v4_width (mixture_ab.py width @20448b14): six 1x cells w8/16/32 seeds 42/43 at 4264 steps = 0.636
+      epoch (epoch_count.py @cf9f20c3, data/study_epochs.json), base HPs; val MSE ln|M|^2 w8 0.0914/0.0944, w16 0.0509/0.0471,
+      w32 0.0288/0.0271; 4x best 0.0206, 16x best 0.0123 (width 8, trial_1262, 2.54 and 10.17 epochs). One law over the eight
+      runs did not fit (L_inf fell to 0, chi2_red 2851); per axis three points, alpha and L_inf undetermined. par:v4_length
+      step 32: 16x over 4x R = 0.671 PP4. Plan finding 2026-11-06 05:17: grid designed (data/scaling_grid_plan.json, epoch_count.py
+      grid), code merged (LONG_HP=1262 switch, repo-reviewer PASS 5bf3e0f0), held on its cost (449 GPU-h at two seeds) until
+      D314. Differs: every cell >= 1.27 epoch, all at one HP point (trial_1262, lr ~ steps^-0.55), so width and length are
+      compared at equal HPs; one seed (D315). Searched results.tex (scaling grid, width x length, v4_width, loss_vs_compute,
+      mse_vs_compute), plan show, site decisions (D292, D293, D314, D315).'
+    measure: 'Per cell the final model (best checkpoint of lowest aggregate val_loss_no_reg, then the sigma fit, D276): validation
+      MSE of ln|M|^2 over every training pool (geometric mean over pools, sigma stage''s saved predictions, as par:v4_width),
+      best val_loss_no_reg (het NLL), and the test/held-out reads of the arm (PP4, EE4, HD4, HD5, H axes) as R against the
+      2x width-8 cell; each cell''s GPU model recorded. Fits of L(C) = A C^-alpha + L_inf, fixed before the run: (i) the joint
+      fit over the 12 cells, one A, alpha, L_inf (9 dof) - the test of one law, and the only source of a width-axis alpha
+      and L_inf; (ii) per width over length, 4 points, 1 dof each - a weak test of the law along length; (iii) per length
+      over width, 3 points: 0 dof, shown as a curve only, labelled not a test, no alpha or L_inf quoted from it; (iv) beside
+      (i), a shared-exponent fit (one alpha and L_inf, an A per width, 7 dof) to separate a width offset from a different
+      law. Errors: the relative seed spread from the existing seed pairs (seed_spread.py @fbfb4109: whole-set w8 class-median
+      5%, per-pool level from the 1x seed pairs 3-8%), the bare power law a labelled diagnostic only; blow-ups listed apart
+      with where.'
+    check: 'Existing data move with both axes at the measure''s resolution: width at 4264 steps w8 -> w16 -> w32 val MSE 0.0914
+      -> 0.0509 -> 0.0288 (seed 42), steps at width 8 0.0914 (1x) -> 0.0206 (4x) -> 0.0123 (16x); the seed pair''s spread
+      0.0914/0.0944 (3%), 0.0509/0.0471 (8%), 0.0288/0.0271 (6%) is far below each step of the axes (x1.3 to x4.4), so one
+      seed resolves every neighbouring pair of the grid.'
+    fixed: 'Arm v4_het_default25 of scripts/job_catalog_v3_short.sh with LONG_HEADS=8/16/32, LONG_FACTOR=2/4/8/16, LONG_HP=1262
+      (muon_weight_decay 0.04733132, regularization_lambda 9.114591e-08, warmup_frac 0.1800024, eta_min 1.376875e-08, ema
+      false; lr = 7.82114e-3 (steps/17056)^-0.55, censored at the window top, a lower bound), LONG_MEMMAP=true, LONG_CKPT=true
+      at widths 16 and 32 (as the 1x cells whose V100 rates the limits use; changes time only), batch 16384, whole catalog_v4
+      default25 train set (6707 batches per epoch), eval_subsample 200, MuonAdamW, het loss, code trunk at submission; gpu_v100,gpu_h100
+      as the site gives, mem 32G, limits = scaling_grid_plan.json slurm_time (short_wall.py --width, checked in-job). Memmap
+      cache: one CPU prebuild (scripts/job_catalog_v3_short_prebuild.sh, the arm''s own overrides, seed 42; its key functions
+      base_key_doc/features_key_doc hold no model or training field, so every width and length opens the one cache), the 10
+      GPU jobs depend on it afterok; the prebuild''s key and one GPU job''s key quoted in the read; if one of the two existing
+      21 GB format-3 keys (0c897ca2, 27a14227) is this arm''s the prebuild only opens it (idempotent), otherwise builds one.
+      Disk (read 2026-11-07 on CC): /sps/lpnhe 72 GB free of 512; the batch needs ~0.33 GB run dir + 0.73 GB predictions per
+      cell (earlier long cells) x 10 = ~11 GB plus at most one new 21 GB cache = ~32 GB, fits. Two cells reused, not rerun:
+      w8 4x = cov_v4_long_hpo8_cc_17056 trial_1262 and w8 16x = cov_v4_long_hpo8_cc_68224 trial_1262 (same arm, HPs and lr
+      law, seed 42, window position 0.9955 in both; earlier code (augmentation draws differ, D290) and H100 with TF32, stated
+      wherever they are shown).'
+    control: 'Within the grid: each width''s 2x cell is the control of its longer cells, each length''s width-8 cell the control
+      of its wider cells; same seed, HPs, data and code for the 10 new cells. The 1x cells of par:v4_width (base HPs, 0.64
+      epoch) shown beside, labelled, not fitted.'
+    seeds: 42 only, every cell (D314 'just one seed', D315); the seed spread from existing pairs (seed_spread.py) is the error
+      band.
+    outcome: 'YES (one law): joint fit (i) chi2_red <= 3 at the seed-spread error with L_inf inside its grid and away from
+      0: alpha and L_inf quoted from it, the pretraining candidate chosen on its compute frontier (width and steps at a GPU
+      budget). PARTIAL: (i) misfits but the shared-exponent fit (iv) holds (chi2_red <= 3): width shifts the curve, one alpha
+      and L_inf quoted, the candidate is the width with the lowest curve at the budget. NO: (i) and (iv) misfit, or per-width
+      fits (ii) misfit too, or L_inf falls to 0 / the grid edge (as the earlier fit): no saturating law is claimed on this
+      grid; alpha only as the bare power-law diagnostic, labelled; the candidate is chosen from the measured cells directly
+      (lowest loss per GPU-hour among cells at the budget), and the law''s failure (lr censored at the window top, one HP
+      point for all widths) is reported as the reason the map cannot be extrapolated; a cell more than 2 seed spreads off
+      its neighbours'' trend is read for a defect (blow-up, lr) before use. 10 new V100/H100 jobs + 1 CPU prebuild, 211 GPU-h
+      of work (approved by name, D314), one wave.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
