@@ -14865,6 +14865,17 @@ entries:
       C2-C5, C8 (B/A reproduce the design''s check: C2 PP4 0.505 EE4 0.220, C3 0.755/0.413, C4 0.682/0.401, C8 HD5 0.097;
       C1 unchanged), signext_compare.py warm (C6; reproduces par:v4_signext with stand-ins). C5''s B held-out reads (afc96598/d26f13aa)
       being extracted (detach c5_bound_held).'
+  - at: '2026-11-06T09:55:46+00:00'
+    text: '2026-11-06 step 7 code merged into trunk d5616629 (repo-reviewer PASS on 42c4aeab after one BLOCK: the design''s
+      parent_shared equivalence check was missing; now analysis/catalog_v4/ws_stats_check.py, which gates the C5/C6/C8 verdicts;
+      tested on CC: het cont vs parent 1153/1153 ok, warm25 241/241 ok, magnitude/pp/more_signed from scratch all mismatched
+      as expected). CC synced to d5616629. Submission plan once step 8''s C1u read picks the recipe: re-record the step 7
+      design (the 21:51 design restated with the arms, the recipe, C7 dropped by its gate) for the design reviewer, site pick
+      FA --jobs 54, submit whole with --hdr=--time= from short_wall per arm (het default50 2:30/2:30/3:00, het base 2:15/2:30/2:45,
+      MSE base and pp 1:00/1:15/1:30, MSE default25/50 1:00/1:15/1:45; signext from short_wall on CC), --mem=16G; about 15
+      min in, run ws_stats_check.py C5 C6 C8 on the started W runs and cancel those W runs on a mismatch (the C_k rerun with
+      parent_shared would need a new arm and review). If C1u is BETTER: WS_MUWARM=168 in ws_het_setup/ws_mse_setup, the het
+      C_k (v4_het_cont_k*) rerun under it, a new repo review before submission.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
