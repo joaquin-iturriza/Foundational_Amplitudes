@@ -14004,9 +14004,15 @@ entries:
   - D282
   - D307
   - D313
-  next: 'Step 13 (D307, D308): the continued restart with the parent''s optimizer state: arm v4_het_ws_step3198_continue_optstate[_seed2]
-    (step-3198 model of v4_het_control_ckpt[_seed2], lr scale 0.20233, no re-warm, fine_tune.load_optimizer_state; branch
-    ws-optstate @7456a119), 2 runs, read against the control final_default and the fresh-optimizer step3198_continue (par:v4_warm_start_valley)'
+  next:
+    1: 'Step 13 (D307, D308): the continued restart with the parent''s optimizer state: arm v4_het_ws_step3198_continue_optstate[_seed2]
+      (step-3198 model of v4_het_control_ckpt[_seed2], lr scale 0.20233, no re-warm, fine_tune.load_optimizer_state; branch
+      ws-optstate @7456a119), 2 runs, read against the control final_default and the fresh-optimizer step3198_continue (par:v4_warm_start_valley)'
+    9: 'Step 14 (D319, single seed D315): one study of new warm-start mechanisms toward the C1 change (share 0.25, het, k=533)
+      at seed 42, against the same-commit default restart and B: shrink-and-perturb of the parent (0.4 p + 0.1 fresh init),
+      share 0.50 for 267 steps, a WSD-scheduled parent branched at the end of its stable phase (step 3731, optimizer state)
+      with the cooldown on share 0.25 or 0.50, and the WSD parent''s final at the default restart; share 0.50 at 533 (C2 seed
+      42) read beside. Arms v4_het_control_wsd, v4_het_wsx_* (branch ws-fixes @e0f3bd49); reads mixture_ab.py warm_single'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -16895,3 +16901,8 @@ entries:
       if:
       - 'BETTER than the default restart: it becomes the restart recipe, read against B for MATCH'
       - 'not BETTER: the default restart stays; ask Joaquin to lift D307 so the change tests resume'
+    9:
+      feeds: 'which warm-start mechanism becomes the recipe (D307: the change tests resume once it is fixed)'
+      if:
+      - 'BETTER and MATCH-estimate: it becomes the restart recipe, to Joaquin with the D307 hold'
+      - 'none BETTER: the share lever (share 0.50 at 533, MATCH at two seeds already) is the remaining fix, to Joaquin'
