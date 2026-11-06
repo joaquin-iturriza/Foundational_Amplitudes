@@ -10347,9 +10347,9 @@ entries:
         pp support'
   owner:
     agent: a8e0ed3e3a9c9cd8a
-    state: stopped
+    state: working
     since: '2026-11-06T19:56:06+00:00'
-    state_at: '2026-11-06T20:24:20+00:00'
+    state_at: '2026-11-06T20:24:26.776000+00:00'
     context: 270003
     context_at: '2026-11-06T20:24:30+00:00'
   findings:
