@@ -50,6 +50,9 @@ def main(seed=42):
         if f"quota_ladder_edge_res2_{seed}" in r:   # step 66: the ladder's pT span and outer end drawn toward the corner
             ax.stairs(per_dex(r[f"quota_ladder_edge_res2_{seed}"]["hist_kept"], e), e, color=ps.C.orange,
                       label="same, ladder at the cut and edge")
+        if f"quota_ladder_both_res2_budget750_{seed}" in r:   # step 67: both ladders, 15x budget
+            ax.stairs(per_dex(r[f"quota_ladder_both_res2_budget750_{seed}"]["hist_kept"], e), e, color=ps.C.sky, ls="--",
+                      label="both ladders, 15x budget")
         qe = r[f"quota_{seed}"]["quota_chunks"][0]["edges_log10"]     # the quota's target range (pp range +- 0.5 dex)
         for x in (qe[0], qe[-1]):
             ax.axvline(x, color=ps.C.vermillion, ls="--", lw=0.8, label="quota range" if x == qe[0] else None)

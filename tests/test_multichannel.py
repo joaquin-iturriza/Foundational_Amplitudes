@@ -195,6 +195,8 @@ def test_multiperipheral_edge():
     assert corner[True] > 0.03 and corner[True] > 20 * corner[False]
     ch = mg.mc_channels([0.0] * 4, [2, 2, 5, -5, 2, 2], [], mperi=True, mperi_edge=True)
     assert ch[-1] == ("mperi", "edge") and not any(c == ("mperi",) for c in ch)
+    both = mg.mc_channels([0.0] * 4, [2, 2, 5, -5, 2, 2], [], mperi=True, mperi_both=True)
+    assert both[-2:] == [("mperi",), ("mperi", "edge")]
     sq = np.full(500, 1450.0)
     _check_ps(mg._mc_draw(ch[-1], 500, sq, np.zeros(4), 1e-6, np.random.default_rng(2)), sq, masses)
 

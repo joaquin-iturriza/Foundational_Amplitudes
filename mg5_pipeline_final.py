@@ -3599,14 +3599,17 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
     return P
 
 
-def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False, mperi_edge=False):
+def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=False, mperi=False, mperi_edge=False,
+                mperi_both=False):
     """the flat part's channels for a class: ("rambo",), ("splitter",), ("res", S, |pdg|, M, G) per resonance (M, G from
     `res_params` {|pdg|: (M, G)}, the entry's mc_res_params; MC_RES when absent), ("isc", parton indices) when a final
     is a parton and there are at least three finals; with `res2`, ("res2", S1, p1, M1, G1, S2, p2, M2, G2) per pair of
     resonances on disjoint finals (both on shell together, plan step 58: the doubly resonant top of the electroweak
     classes' log|M|^2 range); with `mperi`, ("mperi",) when the beams and at least two finals are partons (every
     final at pT near the cut spread in rapidity to the acceptance edge: the forward multiperipheral top of the QCD
-    classes' range), ("mperi", "edge") instead with `mperi_edge` (multiperipheral_draw's edge variant, plan step 66)"""
+    classes' range), ("mperi", "edge") instead with `mperi_edge` (multiperipheral_draw's edge variant, plan step 66),
+    both ("mperi",) and ("mperi", "edge") with `mperi_both` (plan step 67: the edge variant fills the QCD top but costs
+    the electroweak class udx_csxvevex part of its top bins)"""
     pdg = [int(x) for x in pdg_ids]; nf = len(pdg) - 2
     rp = {abs(int(k)): tuple(map(float, v)) for k, v in (res_params or MC_RES).items()}
     res = [("res", tuple(S), int(p)) + rp[int(p)] for S, p in resonances]
@@ -3617,7 +3620,7 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
     if res2:
         ch += [("res2",) + a[1:] + b[1:] for i, a in enumerate(res) for b in res[i + 1:] if not set(a[1]) & set(b[1])]
     if mperi and len(partons) >= 2 and all(abs(q) in MC_PARTONS for q in pdg[:2]):   # hadronic beams only (|eta| < 5)
-        ch.append(("mperi", "edge") if mperi_edge else ("mperi",))
+        ch += ([("mperi",), ("mperi", "edge")] if mperi_both else [("mperi", "edge")] if mperi_edge else [("mperi",)])
     return ch
 
 
@@ -3879,7 +3882,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
         chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
                             pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
-                            bool(pol.get("mc_mperi_edge")))
+                            bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")))
         shares = np.full(len(chans), 1.0 / len(chans))
     tr, itr = (np.log, np.exp) if log_s else ((lambda x: x), (lambda x: x))
     t_lo, t_hi = tr(lo), tr(hi)
@@ -4001,7 +4004,7 @@ def build_mixture_dataset(n_events, sqrts_min, sqrts_max, m_finals, pdg_ids, rng
                 raise ValueError("multichannel: mc_resonances given without mc_res_params (mc_res_params(physics))")
             chans = mc_channels(m_finals, pdg_ids, pol.get("mc_resonances") or [], bool(pol.get("mc_isc", True)),
                                 pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
-                                bool(pol.get("mc_mperi_edge")))
+                                bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")))
             sh1 = np.full(len(chans), 1.0 / len(chans))
             ev1, sq1, c1 = _candidates_mc(n1, uni, m_finals, pdg_ids, rng, cuts, chans, sh1, pol["y_lo"], fwd_cand,
                                           beam_mass)
