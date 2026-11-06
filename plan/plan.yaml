@@ -10347,7 +10347,7 @@ entries:
         pp support'
   owner:
     agent: a8e0ed3e3a9c9cd8a
-    state: working
+    state: closed
     since: '2026-11-06T19:56:06+00:00'
     state_at: '2026-11-06T20:24:26.776000+00:00'
     context: 270003
@@ -11978,30 +11978,43 @@ entries:
       estimate, to be split by final count; the 55 held-out e+e- classes'' range comes from the 2000-event EE4 pool they are
       scored on, a label-in-inputs question for step 65''s design.'
   handoff:
-    state: '2026-11-06 ~17:30. (a) Coverage: step 67 read in full (finding 2026-11-06 ''step 67 verdict''; data/quota_coverage.json
-      @686c3241; figs/quota_fill_a..e + legend). With both ladders (sampling.mc_mperi_both) and mc_res2 at flat_budget 750,
-      every bin up to the pp in-support max is filled >= 0.95 on all 5 classes, held-out outside kept 1/1. The +0.5-dex margin
-      above it is short on the 3 ladder classes (uu_bbxuu 0.91/0.25, us_ddxsu 0.96, udx_csxvevex 0.91): NEAR. Step 65 (the
-      regeneration design) is held on Joaquin''s question (accept the margin at 750, ~120x multichannel replay time on QCD,
-      or ~3000 budget, ~4x more on uu_bbxuu-like classes). (b) Step 37, memmap prebuild timing and section 3: NOT started
-      on purpose. It is gated on the first memmap GPU batch, and none is planned (steps 61 and 64 wait on Joaquin). The cache
-      key is the run''s pool set, and data_mmap.py prunes caches idle 48 h, so a prebuild made now would likely be pruned
-      before its run. Do it chained before the first memmap batch (prebuild as --intermediate, timed from that job). (c) step
-      61 and (e) step 64 wait on Joaquin (combined plan ask).'
-    decisions: 'Both ladders, not the edge ladder alone: the edge alone failed the udx guard in step 66, both pass it (+0.0020
-      vs 2 SE 0.0031). The udx extra seeds 44-47 were cancelled (a scope call for Joaquin) and the question was then withdrawn
-      as moot. The in-range rule used the range-table pp max (uu_bbxuu 4.694), so [4.70,4.95) counts as margin, against the
-      design''s parenthesis (held-out max 4.75); said in the finding. The time limit now comes from multichannel_check.py
-      need (39383530), after step 67''s 04:00 timeout. design-reviewer.md got a seeds-vs-sibling-cells check (ac2eae83).'
-    ruled_out: Raising flat_budget with the old ladder (factor 28-700); the edge ladder alone (udx guard); extra seeds on
-      one class without Joaquin's yes.
-    running: none
-    files: mg5_pipeline_final.py (multiperipheral_draw edge, mc_channels mperi_edge/mperi_both), analysis/catalog_v4/multichannel_check.py
-      (policies quota_ladder_*; summary fill_per_bin; coverage; need; pull extra seeds), analysis/catalog_v4/fig_quota_fill.py,
-      analysis/catalog_v4/fig_flat_quota.py, analysis/catalog_v4/data/{quota_coverage.json,multichannel_check.json,multichannel_check_reads/},
-      scripts/job_multichannel_check.sh, tests/test_multichannel.py. Repo-reviewer backlog still holds fa872486 and 39383530
-      (coverage, need), to be passed before the regeneration design merges.
-    written: '2026-11-06T17:50:23+00:00'
+    state: '2026-11-06 ~22:00. (1) Cost of the new sampling done: sampling_cost.py @08e3091e (pull = catalog_v4 generation
+      logs of the 12 job_catalog_v4_regen runs of 2026-10-26 -> data/sampling_cost_gen.json; summary -> data/sampling_cost.json;
+      fig -> figs/sampling_cost). Old 26.0 core-h over the 1301 hadronic classes (measured); new at budget 750 with both ladders
+      an ESTIMATE 2721 core-h (377-3738), per test class 2.4x-162x. Joaquin''s margin call (accept budget 750, ~2700 core-h,
+      or ~3000 budget) still open. (2) Scaling grid (step 64) described with figs/scaling_grid (epoch_count.py fig @a62c31d6);
+      Joaquin''s scope ask open: whole grid 449 GPU-h, the 2x row 39 GPU-h at the long sweep''s settings, or the 2x row at
+      the original settings. (3) e+e- origin traced (finding 2026-11-06); step 66 (f): e+e- ranges in recipes/catalog_v4_flat_range.json
+      (1471 classes, pp_support.py pull ee @3c9b4b2d, trained classes'' range from their dsh_ pool alone, EE4 test pool held
+      out). Step 66''s check is RUNNING: 8 CPU jobs (design PASS), wait on step 66. To read them: first adapt multichannel_check.py
+      coverage() (it drops classes without the quota_ladder_res2 ''old'' policy; these runs have current, multichannel, quota_ladder_both_res2,
+      quota_ladder_both_res2_budget750), then pull with ''multichannel_check.py pull current+multichannel+quota_ladder_both_res2+quota_ladder_both_res2_budget750''
+      (pull now includes EE_CLASSES), summary, coverage; judge by the design''s YES/NEAR/SHORT (held-out RESOLVED = 0 of 2000
+      outside kept); cost = budget-750 seconds over ''current'' seconds in the same job, the 169 e+e- classes'' cost reported
+      as an upper-side estimate split by final count (these four are the worst classes). On e+e- mc_channels turns the ladders
+      off (hadronic only), so ''both ladders'' = quota + joint-resonance channel there. (4) Step 61: the mechanical worker
+      submitted 4 of 12 sign-output jobs (9079850b ebe4c4ed 297c4366 dce345d8, recorded, target signhead_matched_resub 3.49
+      h / 12); the other 8 (matched_const arms, control_signhead SHORT_TAG=keyed) were refused by the permission classifier
+      and are left to Joaquin: no wait on step 61 until all 12 exist, do not resubmit them yourself. (5) Step 37 memmap prebuild
+      timing still gated on the first memmap GPU batch.'
+    decisions: 'Old cost from the generation logs, not a replay (the step-57 ''current'' replays were untimed; the plain multichannel
+      replay matches the logs within 4-10% on the QCD classes). Total over 1301 by final count: <=3 finals at the 2->3 class''s
+      2.4x, 4 finals at the median 117.5x of the four 2->4 test classes, bracket min/max. e+e- range: trained classes from
+      dsh_ alone so the EE4 test pool is held out; e+e- check classes = the four with the largest share above the catalog
+      max (distinct final families). need() for a class with no read: old train time x the largest measured ratio per policy
+      x1.5. par:v4_ee_mechanism notes fix (42ff9ff4) for the repo-reviewer, which then passed.'
+    ruled_out: Reading the e+e- range from the EE4 test pool plus dsh (left no held-out source); the d and c pair copies of
+      bbxvevex as check classes.
+    running: FA-ccin2p3-2d527e1a 6f353c1b (v4_epem_taptamvevex), 47e9979e d7fbcf39 (bbxvevex), bf8b8143 f75467b2 (ahvevex),
+      c8185150 40e1cf1d (vmvmxz), seeds 42/43, target ee_quota_check 1.7 h, wait on step 66; FA-ccin2p3-9079850b ebe4c4ed
+      297c4366 dce345d8 (step 61 sign-output, 4 of 12).
+    files: 'analysis/catalog_v4/sampling_cost.py, data/sampling_cost.json, data/sampling_cost_gen.json, figs/sampling_cost;
+      analysis/catalog_v4/epoch_count.py (fig), data/scaling_grid_plan.json, figs/scaling_grid; analysis/catalog_v4/pp_support.py
+      (pull ee), data/ee_support_reads.json, tools/flat_range.py, recipes/catalog_v4_flat_range.json; analysis/catalog_v4/multichannel_check.py
+      (EE_CLASSES, pp_sources ee branch, need fallback; coverage() to adapt). Open for step 65''s design: the 55 held-out
+      e+e- classes have no dsh pool, so their range comes from the 2000-event EE4 pool they are scored on (a label-in-inputs
+      question: generate more default events for them, or accept). Repo-reviewer backlog holds 08e3091e..4c252c5f.'
+    written: '2026-11-06T20:24:47+00:00'
   ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings (39
     GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h
     of work)? And for the catalog regeneration: at budget 750 with both ladders, every log|M|^2 bin up to the highest pp event
