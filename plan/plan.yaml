@@ -13214,9 +13214,14 @@ entries:
       every group: arms v4_het_warm25a_k533[_seed2] (AdamW lr x min(1, step/168), Muon untouched) and v4_het_warm25e_k533[_seed2]
       (both groups damped), against the default restart pair 0202ba7f/7b2d6c24, seeds 42/43; code merged 1b51878d (repo-reviewer
       PASS); design, review, submit with the C8 k=2132 pair'
-    11: 'Width growth 8->16''s own tuning sweep: after step 9 reads (it may change the restart recipe); its objective must
-      track the held-out reads, which neither the het NLL nor the validation MSE of the mean did on C1 (C1m: mean-MSE-tuned
-      at par with untuned), so the objective is designed first from the growth runs'' own logs (default vs hp1333 grown pairs)'
+    11: 'Step 11 (D285, D291), the width growth''s own sweep ws_grow_k533_zeroshot_hpo8 (sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml,
+      trunk f5f9511c, repo-reviewer clean at a49b1de7): its objective found (ws_objective_check.py: only the HD4 zero-shot
+      score tracks the PP4/EE4 reads, r 0.94-0.98; every validation loss runs against them) and wired into sweep/run_trial.py
+      (zero_shot_objective); design recorded 2026-11-06 ~10:47 UTC (design review running). Submit on PASS once step 10''s
+      reads are in (an arm BETTER puts its damping in the base config first): site run ccin2p3 FA -- python sweep/generate_sweep.py
+      --config <it> then sweep_manager submit, 8 trials, about 6.7 GPU-h at limits, batch target ws_grow_zeroshot 0.30 h per
+      trial; then the best trial''s HPs at seeds 42/43 with every read against the default growth e046ac67/f35b6a78 (bar:
+      best trial''s score below the default growth''s own 0.535)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -14960,8 +14965,8 @@ entries:
     11:
       feeds: 'D285: whether a shape-changing warm start can be tuned to reach width 16 from scratch'
       if:
-      - 'a tuned growth reads BETTER than the default growth: it becomes the growth recipe, re-read against w16 from scratch'
-      - 'no objective tracks the reads: report the growth as NO at the default restart with that limit stated'
+      - 'BETTER on PP4/EE4 over the default growth: the tuned recipe becomes the growth recipe, read against w16 from scratch'
+      - 'NOT BETTER (or no trial below 0.535): the growth stays at its default restart, SHORT of w16 scratch at k=533'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
