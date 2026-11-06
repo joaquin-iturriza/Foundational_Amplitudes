@@ -1098,6 +1098,21 @@ WARM["C1f"] = {"W": {533: ("FA-ccin2p3-b2c69c1a", "FA-ccin2p3-f5245570")}, "C": 
                "ref": {"default": ("FA-ccin2p3-0202ba7f", "FA-ccin2p3-7b2d6c24"),
                        "default_older": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f")},
                "deciding": ("PP4", "EE4"), "design": "plan warm_start step 6 (D303), design passed round 2 2026-11-06T05:40"}
+# step 6 (D291, D298, design passed 2026-11-06T04:48): the k=533 warm start at the val-MSE-of-the-mean sweep's best
+# trial hp_1333 (ws_c1_k533_mse_wsd_hpo8: lr_scale 1.85, WSD cooldown 0.164) rerun at seeds 42 and 43 with the full
+# job (arm v4_het_warm25m_k533[_seed2], scripts/job_catalog_v3_short.sh @30ea35ac); beside, R over the untuned W_533
+# and over the NLL-tuned one (C1t); B and A as C1
+WARM["C1m"] = {"W": {533: ("FA-ccin2p3-4f9e0532", "FA-ccin2p3-8cb6c7b5")}, "C": {},
+               "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+               "ref": {"untuned": ("FA-ccin2p3-341bf564", "FA-ccin2p3-254abf4f"), "nll_tuned": _TUNED},
+               "deciding": ("PP4", "EE4"), "design": "plan warm_start step 6 (D291), design passed 2026-11-06T04:48"}
+# the same tuned restart (GROW_HP=1333) on the width growth w8 -> w16 at k=533 (v4_het_default25[_seed2] with
+# LONG_HEADS=16 LONG_CKPT LONG_MEMMAP GROW_K=533, scripts/job_catalog_v3_short.sh @4272209a); beside, R over the
+# untuned grown k=533 pair; B, A and the MATCH bar as C10w
+WARM["C10wm"] = {"W": {533: ("FA-ccin2p3-31359864", "FA-ccin2p3-bfed460f")}, "C": {},
+                 "B": WIDTH["w16"], "A": WIDTH["w8"], "deciding": ("PP4", "EE4"), "match_hi": 1.19,
+                 "ref": {"untuned": WARM["C10w"]["W"][533]},
+                 "design": "plan warm_start step 6 (D291, D285), design passed 2026-11-06T04:48"}
 MATCH_HI, CARRY = 1.35, 0.90
 
 
