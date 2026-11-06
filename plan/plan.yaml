@@ -12697,9 +12697,12 @@ entries:
     5: '(a) D291: split each ws_c1_k533_hpo8 trial''s validation NLL into the 1/sigma^2-weighted squared-error term and the
       log sigma term (and the mean''s plain MSE), show which term decides the ranking and whether the MSE alone ranks the
       trials differently'
-    6: '(b) D291: tune the k=533 warm start toward the held-out reads (objective that follows them, e.g. validation MSE of
-      the mean; the planned lr extension; a WSD cooldown, as judged best), confirm the winner at seeds 42/43 with the full
-      reads, then apply it to the data change (C1, k=533) and to the width growth 8->16'
+    6: '(b) D303 lead: what in the restart''s lr/schedule makes the warm runs'' validation loss behave as it does (default-lr
+      warm start: val NLL -2.571 at step 10 rises to -1.926 at step 30 and ends -2.639 at 533; grown 8->16: starts -2.842,
+      rises to -2.229 at 120 and ends -2.696 at 533, -2.779 at 1066, both worse than their start; 1066/2132 spike to 1e7 and
+      recover), read from the logged lr, warmup and per-step loss of these runs; then D291: tune the k=533 warm start toward
+      the held-out reads (sweep ws_c1_k533_mse_wsd_hpo8, val MSE of the mean, cosine or WSD), confirm at seeds 42/43, apply
+      to the data change and the width growth 8->16'
     7: '(c) D283, D300: C2-C6 and C8 approved at their cost (79.8 GPU-h, 54 runs; Joaquin 2026-11-06 ''I approved everything
       you gave me for the warm start changes''): run them with the tuned recipe from (b) as soon as (b) picks it, without
       asking again; redo the per-run time for the tuned recipe and record targets'
@@ -13837,10 +13840,12 @@ entries:
       - 'MSE ranks like NLL: the het loss is not the cause; the objective''s in-distribution validation is'
       - 'MSE ranks differently (high lr better): the sigma term drove the choice; tune on the mean''s MSE'
     6:
-      feeds: how to tune a warm start so it adapts to a change (D291), before judging any change warm-startable
+      feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
       if:
-      - 'a tuning reaches MATCH or clearly beats untuned: it is the tuned recipe for C2-C8 and growth'
-      - 'nothing beats the untuned restarted schedule: untuned stays the recipe, reported with the numbers'
+      - 'the full re-warm to the parent''s peak lr is what destroys the parent''s fit: the recipe lowers or removes the re-warm
+        (lr_scale, warmup, WSD) and the sweep''s space is checked to cover it'
+      - 'the schedule is not the cause: the het sigma calibration is (step 5''s split), and the objective/selection change
+        carries the fix'
     7:
       feeds: whether warm start reaches scratch across data, loss and target changes (D282/D283)
       if:
@@ -14071,7 +14076,6 @@ entries:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '5': FA-ccin2p3-7a40c835
-    '6': sweep ws_c1_k533_mse_wsd_hpo8
     '7': 'step 6''s sweep ws_c1_k533_mse_wsd_hpo8 (ccin2p3): C2-C8 go with its tuned recipe once it ends'
   handoff:
     state: 'Steps (a)-(d) of D291 under way. (a) first read from logged curves: over ws_c1_k533_hpo8''s 8 trials the val MSE
