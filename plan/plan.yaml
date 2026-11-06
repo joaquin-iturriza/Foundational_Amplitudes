@@ -12125,6 +12125,17 @@ entries:
       111x used; 3 finals, 34: 0.34 -> 38; 4 finals, 128: 2.97 -> 330); upper side because these four are the classes farthest
       above the catalog and every chunk hit the budget cap. Next per the design''s SHORT branch: the e+e- channel set examined:
       forward component with uncut finals down to 1-|cos| = 1e-8 (sampling.fwd_free_floor, branch fwd-free 0f0b7b4e).'
+  - at: '2026-11-06T22:12:17+00:00'
+    text: '2026-11-06 ~23:00 step 67 (g) submitted: the e+e- forward check, 8 CPU jobs on CC htc at 1937efb6 (code 6c784cd6:
+      fwd-free merged after repo-reviewer PASS, watermark 6c784cd6; design PASS by the design reviewer), scripts/job_multichannel_check.sh,
+      MCHECK_POLICIES=current+quota_ladder_both_res2_budget750+quota_ladder_both_res2_fwdfree_budget750, seeds 42/43: taptamvevex
+      FA-ccin2p3-99c626bb/668b44ae (02:40), bbxvevex c614f966/9facd90d (03:00), ahvevex 918b84df/9a1f489d (02:40), vmvmxz
+      3a819881/9726c7c1 (02:30); limits from multichannel_check.py need, target ee_fwd_check 2.0 h; wait on step 67. Read:
+      pull <policies> per class with seeds 42,43, summary, coverage (fwdfree_vs_both750: edge per seed, shift, verdict, control_reproduces_step66/void),
+      fig_quota_fill.py ee, sampling_cost.py ee with the fwdfree policy. Reviewer notes for the read: PARTIAL needs the edge
+      to move >= 1 dex on both seeds (stricter than the design''s ''on a class''); in-range bins passing with a held-out event
+      outside is classed by the shift; a fully filled edge counts as the default max + 0.25 dex. For step 65''s design: check
+      that the pool cache key covers the sampling flags (fwd_free_floor) before a regeneration uses it.'
   handoff:
     state: '2026-11-06 ~22:00. (1) Cost of the new sampling done: sampling_cost.py @08e3091e (pull = catalog_v4 generation
       logs of the 12 job_catalog_v4_regen runs of 2026-10-26 -> data/sampling_cost_gen.json; summary -> data/sampling_cost.json;
