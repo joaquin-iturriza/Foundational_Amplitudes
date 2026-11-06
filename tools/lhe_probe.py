@@ -436,6 +436,10 @@ def cmd_run(a):
         patches = dict(runs[0][2])
         if a.energy:                                               # an e+e- pool's run at another of its energies
             patches.update({"ebeam1": a.energy / 2.0, "ebeam2": a.energy / 2.0})
+        if a.ee_isr:     # the collider anchor's beam spectrum at this energy (recipes/gen_catalog_v4_default.EE_ANCHOR)
+            sys.path.insert(0, os.path.join(ROOT, "recipes"))
+            from gen_catalog_v4_default import ee_beam_patches
+            patches.update(ee_beam_patches(a.energy, cfg["pdg_ids"][:2]))
         run_card, param_card = mg.lhe_cards(cfg)
         shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
         shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
@@ -473,6 +477,12 @@ def cmd_run(a):
                                                 m, aq, open(bs[0]).read() if bs else "")
             res["yield"] = len(m) / a.events
             res.update(kept(m, accept_of(name)))
+            if a.energy and len(m):     # sqrt(s_hat) over the nominal collider energy (1 without ISR)
+                q = np.asarray(m, float)[:, 0] + np.asarray(m, float)[:, 1]
+                x = np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None)) / a.energy
+                res["shat_frac"] = {"q01": float(np.quantile(x, 0.01)), "q10": float(np.quantile(x, 0.1)),
+                                    "q50": float(np.median(x)), "below_0.99": float(np.mean(x < 0.99)),
+                                    "below_0.5": float(np.mean(x < 0.5)), "min": float(x.min())}
             k = res.get("kept") or 0.0
             res["s_per_kept_event"] = round(res["s_generate"] / (len(m) * k), 4) if len(m) and k else None
         else:
@@ -483,6 +493,8 @@ def cmd_run(a):
     except Exception as e:
         res["error"] = f"{type(e).__name__}: {e}"
     finally:
+        if not res.get("events_returned") and os.path.exists(log):   # a failed run keeps its MadGraph log's tail
+            res["log_tail"] = open(log, errors="replace").read().splitlines()[-40:]
         shutil.rmtree(wd, ignore_errors=True)
     print("PROBE_JSON " + json.dumps(res), flush=True)
 
@@ -877,6 +889,8 @@ def main():
     s.add_argument("--seed", type=int, default=0, help="probe seed offset (iseed of seed 9999 + this)")
     s.add_argument("--patch", nargs="*", default=[], help="k=v run-card values (a hidden one is added to the card)")
     s.add_argument("--keep", default=None, help="save the run's events and banner under KEEP/<process>/")
+    s.add_argument("--ee-isr", action="store_true", help="e+e-: the collider anchor's ISR (+ beamstrahlung) spectrum "
+                   "at --energy (gen_catalog_v4_default.EE_ANCHOR)")
     s = sub.add_parser("gridpack"); s.add_argument("--process", required=True)
     s.add_argument("--grid-events", type=int, required=True, help="events of the run whose precision the grid has")
     s.add_argument("--runs", type=int, required=True); s.add_argument("--events", type=int, default=1000)

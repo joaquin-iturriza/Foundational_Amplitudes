@@ -20,6 +20,20 @@ if [ "${PROBE_SHARD:?}" = parts ]; then
     python tools/lhe_probe.py parts --queue ${PROBE_QUEUES:?} --out "$SCRATCH/lhe_probe/parts_${SLURM_JOB_ID}.json" ${PROBE_MATCH:+--match "$PROBE_MATCH"}
     echo "RUN_SUMMARY lhe_probe parts rc=$?"; exit 0
 fi
+if [ "$PROBE_SHARD" = eeisr ]; then
+    # the e+e- collider anchor's probe (catalog_coverage step 71): one MadEvent run of PROBE_PROCESS at collider energy
+    # PROBE_ENERGY with the machine's ISR (+ beamstrahlung) spectrum (lhe_probe run --ee-isr) beside the same run
+    # without it (the ee4_ pools' setting), on two cores in parallel; PROBE_EVENTS events each (default 1000)
+    for v in isr none; do
+        F=; [ $v = isr ] && F=--ee-isr
+        python tools/lhe_probe.py run --process "${PROBE_PROCESS:?}" --energy "${PROBE_ENERGY:?}" \
+            --events "${PROBE_EVENTS:-1000}" $F > "eeisr_${PROBE_ENERGY}_$v.log" 2>&1 &
+    done
+    wait
+    grep -h PROBE_JSON eeisr_${PROBE_ENERGY}_isr.log eeisr_${PROBE_ENERGY}_none.log | sed "s/^PROBE_JSON /EEISR_JSON /"
+    rm -f eeisr_${PROBE_ENERGY}_*.log
+    echo "RUN_SUMMARY lhe_probe eeisr rc=$?"; exit 0
+fi
 if [ "$PROBE_SHARD" = reread ]; then
     # par:v4_short_runs re-read (catalog_coverage): each committed measurement re-run on the files it saw (--before its
     # commit time) at 20000 relabellings, with the old unscaled run-level test and the scaled one (same relabellings, so

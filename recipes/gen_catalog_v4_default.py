@@ -60,6 +60,28 @@ ASSEMBLED = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_assembled.
 MIXFAIL = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_mixcheck_failing.json")
 PROBE_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields.json")
 EE_ENERGIES = (91.1876, 240.0, 365.0, 500.0, 1000.0, 3000.0)   # GeV (open: the user's call)
+# The e+e- collider anchor (D318, plan catalog_coverage step 71): nominal collider energies of real lepton colliders,
+# each with MadGraph's ISR (+ beamstrahlung) beam spectrum for that machine. Energies: LEP (LEP1 Z pole; LEP2 up to
+# 209 GeV, LEP EWWG, Phys. Rept. 532 (2013) 119, arXiv:1302.3415), FCC-ee (91, 160, 240, 365 GeV, FCC CDR vol. 2,
+# Eur. Phys. J. ST 228 (2019) 261; arXiv:2203.08310 table 1), CEPC (91, 160, 240 GeV, CDR vol. 1, arXiv:1809.00285),
+# ILC (200-500 GeV, extendable to 1 TeV, TDR vol. 1, arXiv:1306.6327), CLIC (380 GeV, 1.5 TeV, 3 TeV, CERN-2016-004,
+# arXiv:1608.07537). Spectra (Frixione, Mattelaer, Zaro, Zhao, arXiv:2108.10261, sect. 6 and table 1): lpp = +3 for
+# an electron beam, -3 for a positron beam, pdlabel = a directory of Source/PDF/lep_densities; isronlyll is the LL+LO
+# ISR density alone, and fcce240ll, fcce365ll, cepc240ll, ilc500ll, clic3000ll add beamstrahlung fitted to GuineaPig
+# runs with the machine parameters of their table 1 (beam-energy spread ignored). MadGraph 3.7.0 on CC ships exactly
+# these (read 2026-11-07). Energies without a fitted spectrum take ISR only: beamstrahlung there is not modelled
+# (a gap at 380, 1000 and 1500 GeV, where the linear colliders have it; 91-209 GeV circular, small, not quantified).
+# 240 GeV takes fcce240ll (cepc240ll is the other fit at the same energy).
+EE_ANCHOR = {91.1876: "isronlyll", 160.0: "isronlyll", 209.0: "isronlyll", 240.0: "fcce240ll", 365.0: "fcce365ll",
+             380.0: "isronlyll", 500.0: "ilc500ll", 1000.0: "isronlyll", 1500.0: "isronlyll", 3000.0: "clic3000ll"}
+
+
+def ee_beam_patches(energy, pdg_beams=(-11, 11)):
+    """The run-card values of an e+e- run at collider energy `energy` (a key of EE_ANCHOR) with its machine's ISR
+    (+ beamstrahlung) spectrum: lpp1/lpp2 (+3 electron, -3 positron, by the process's beam order), pdlabel, ebeam1/2"""
+    lpp = {11: 3, -11: -3}
+    return {"lpp1": lpp[int(pdg_beams[0])], "lpp2": lpp[int(pdg_beams[1])], "pdlabel": EE_ANCHOR[float(energy)],
+            "ebeam1": float(energy) / 2.0, "ebeam2": float(energy) / 2.0}
 EE_CARDS = "recipes/catalog_v4_ee"
 PP_CARDS = "recipes/catalog_v4_pp"
 SIZES = {"n_train": 100000, "n_val": 10000, "n_test": 10000}   # catalog_v4's tree pools
