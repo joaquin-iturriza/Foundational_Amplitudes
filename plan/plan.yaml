@@ -13206,14 +13206,12 @@ entries:
   decisions:
   - D282
   next:
-    11: 'Step 11 (D285, D291), the width growth''s own sweep ws_grow_k533_zeroshot_hpo8 (sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml,
-      trunk f5f9511c, repo-reviewer clean at a49b1de7): its objective found (ws_objective_check.py: only the HD4 zero-shot
-      score tracks the PP4/EE4 reads, r 0.94-0.98; every validation loss runs against them) and wired into sweep/run_trial.py
-      (zero_shot_objective); design recorded 2026-11-06 ~10:47 UTC (design review running). Submit on PASS once step 10''s
-      reads are in (an arm BETTER puts its damping in the base config first): site run ccin2p3 FA -- python sweep/generate_sweep.py
-      --config <it> then sweep_manager submit, 8 trials, about 6.7 GPU-h at limits, batch target ws_grow_zeroshot 0.30 h per
-      trial; then the best trial''s HPs at seeds 42/43 with every read against the default growth e046ac67/f35b6a78 (bar:
-      best trial''s score below the default growth''s own 0.535)'
+    11: 'Step 11 (D285, D291), the width growth''s own sweep, re-run as ws_grow_k533_zeroshot_hpo8_rerun (sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml
+      @8f68ca8d; the first submission ws_grow_k533_zeroshot_hpo8 failed whole on the prebuild''s rewrite of the base config):
+      8 trials on CC slurm 62994102-09 (waves, limit 00:50, target ws_grow_zeroshot_rerun 0.30 h per trial). When it ends:
+      bar = best trial''s zero_shot_score below the default growth''s 0.535 (e046ac67, ws_objective_check.py score); if below,
+      re-run the best trial at seeds 42/43 with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun GROW_HP=<idx> on arm v4_het_default25[_seed2]
+      LONG_HEADS=16 GROW_K=533, read with mixture_ab.py warm as C10wm-style against e046ac67/f35b6a78'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -15623,8 +15621,7 @@ entries:
       62994102-09, waves, limit 00:50). NOT repaired: e046ac67''s own config.yaml on CC still holds the prebuild''s values
       (config_1.yaml, out_1.log added); its original equals its seed-43 twin''s but seed 42, its own paths, exp_name dancat_het_pre,
       num_workers 2, run_idx 0, no memmap_prebuild; restoring it is an edit on the cluster, left to Joaquin.'
-  step_waits:
-    '11': ccin2p3:ws_grow_k533_zeroshot_hpo8_rerun
+  step_waits: {}
   handoff:
     state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
       every-group arm 0.053 of default; neither arm BETTER, AdamW damped R PP4 1.017/EE4 1.012, every group worse 1.237/1.619;
