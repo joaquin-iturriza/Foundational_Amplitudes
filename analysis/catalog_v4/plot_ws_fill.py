@@ -61,17 +61,24 @@ def main():
             aG.plot(np.arange(len(g[r])), g[r], color=col, ls=ls, label=sl)
             s, v = curve(r)
             aV.plot(s, v, color=col, ls=ls, label=sl)
-            out[sl] = {"grad_max_0_19": max(g[r][:20]), "val_max": float(v.max()), "val_last": float(v[-1])}
+            out[sl] = {"grad_max_0_19": max(g[r][:20]), "grad_median_20_40": float(np.median(g[r][20:41])),
+                      "val_max": float(v.max()), "val_max_at": int(s[int(np.argmax(v))]),
+                      "steps_off_scale": [int(x) for x in s[v > 0.5]], "val_last": float(v[-1])}
         for a, axis in ((aP, "PP4"), (aE, "EE4")):
             m, _ = class_mse(runs, axis, cls)
             a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, label=lab)
             out[f"{lab} {axis} median class MSE"] = float(np.median(m))
     aG.set_yscale("log"); aG.set_xlabel("step of the restart"); aG.set_ylabel("gradient norm")
+    # the y range of the curves' steps below 0 (a het NLL spike, e.g. the damped seed 43's 1.9e8 at step 300, goes
+    # off scale and is listed in the printed out instead of flattening the rest)
+    lo = min(min(v[v < 0]) for _, v in (curve(r) for _, rs, _ in ARMS for r in rs))
+    aV.set_ylim(lo - 0.1, 0.5)
     aV.set_xlabel("step of the restart"); aV.set_ylabel("validation loss (het NLL)")
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)
-    ps.legend(aV, "upper right")   # the one legend: colours are the arms in every panel (CDFs: both seeds)
+    # the one legend, on the gradient-norm panel (log y, room above the jump); colours are the arms in every panel
+    ps.legend(aG, "upper right")
     ps.save(fig, os.path.join(HERE, "figs", "ws_muon_damped" if DAMPED else "ws_fill"))
     print(json.dumps(out, indent=0))
 
