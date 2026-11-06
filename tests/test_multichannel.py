@@ -3,7 +3,8 @@ _candidates_mc, mc_shares_from_pass, resonance_channels; plan catalog_coverage s
 momentum and keeps every final on its mass shell; a resonance channel puts most of its events' pair mass within a few
 widths of the pole; the collinear channel reaches |eta| between 4 and 5 in the partonic frame; the second-pass
 shares favour the channel that holds the rare log|M|^2 values and keep the floor; resonance_channels finds an
-s-channel Z decaying to two of three finals in a hand-made diagram.
+s-channel Z decaying to two of three finals in a hand-made diagram; the joint-resonance and multiperipheral
+channels (step 58's re-check) are exact in phase space and reach their regions.
     .venv-cpu/bin/python -m pytest tests/test_multichannel.py
 """
 import os
@@ -14,6 +15,10 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import mg5_pipeline_final as mg  # noqa: E402
+
+
+# trunk's resonance_draw (inlined Breit-Wigner, @fcb06e7a) at default_rng(11), 5 events at 500 GeV: m(0, 1)
+PINNED_MLL = [88.46533766507697, 91.20103009081356, 91.60378136887829, 80.03982510431064, 36.696173689799515]
 
 
 def _mass(p):
@@ -105,6 +110,78 @@ def test_mc_res_params():
         pass
     else:
         raise AssertionError("a top mass without its width must be refused")
+
+
+def test_resonance2_draw():
+    """two resonances on disjoint finals on shell together: phase space exact, both pair masses near their poles"""
+    rng = np.random.default_rng(3)
+    sq = np.exp(rng.uniform(np.log(250.0), np.log(3000.0), 4000))
+    masses = [0.0, 0.0, 0.0, 0.0]
+    P = mg.resonance2_draw(4000, sq, masses, (0, 1), 91.188, 2.441404, (2, 3), 80.419, 2.0476, 1e-6, rng)
+    _check_ps(P, sq, masses)
+    both = (np.abs(_mass(P[:, 0] + P[:, 1]) - 91.188) < 5 * 2.441404) & \
+           (np.abs(_mass(P[:, 2] + P[:, 3]) - 80.419) < 5 * 2.0476)
+    assert both.mean() > 0.45      # 0.8 x 0.8 on both Breit-Wigners
+    # with a recoil final, and massive
+    masses = [0.0, 0.0, 0.0, 0.0, 172.5]
+    sq = np.exp(rng.uniform(np.log(500.0), np.log(3000.0), 2000))
+    P = mg.resonance2_draw(2000, sq, masses, (0, 1), 91.188, 2.441404, (2, 3), 91.188, 2.441404, 1e-6, rng)
+    _check_ps(P, sq, masses)
+
+
+def test_multiperipheral_draw():
+    """every final at pT near the cut, spread in rapidity to the acceptance edge at large sqrt(s); phase space exact"""
+    rng = np.random.default_rng(4)
+    sq = np.exp(rng.uniform(np.log(50.0), np.log(6000.0), 4000))
+    for masses in ([0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 80.419]):
+        P = mg.multiperipheral_draw(4000, sq, masses, 1e-6, rng)
+        _check_ps(P, sq, masses)
+    masses = [0.0] * 4
+    sq = np.full(3000, 1500.0)
+    P = mg.multiperipheral_draw(3000, sq, masses, 1e-6, rng)
+    _check_ps(P, sq, masses)
+    pt = np.hypot(P[..., 1], P[..., 2]); pa = np.linalg.norm(P[..., 1:], axis=-1)
+    eta = 0.5 * np.log((pa + P[..., 3]) / (pa - P[..., 3]))
+    assert np.median(np.abs(eta).max(1)) > 3.5 and (np.abs(eta).max(1) > 4.5).mean() > 0.05
+    assert np.median(pt.min(1)) < 25.0
+    # inside the acceptance after the boost, also where the span is capped (5 TeV), and above the splitter's there
+    pdg = np.array([2, 3, 1, -1, 3, 2])
+    cuts = mg.V4_CUTS["hadronic"]
+    for e in (1500.0, 5000.0):
+        sq = np.full(3000, e)
+        P = mg.multiperipheral_draw(3000, sq, masses, 1e-6, rng)
+        _check_ps(P, sq, masses)
+        pa = np.linalg.norm(P[..., 1:], axis=-1)
+        assert (np.abs(0.5 * np.log((pa + P[..., 3]) / (pa - P[..., 3]))).max(1) <= 5.0 + 1e-9).all()
+        full = np.concatenate([mg._beams(sq, pdg, None), P], 1)
+        acc = mg.fiducial_pass_mask(full, np.zeros(4), pdg, cuts).mean()
+        spl = mg.democratic_draw(3000, sq, masses, 1e-6, rng)
+        acc_s = mg.fiducial_pass_mask(np.concatenate([mg._beams(sq, pdg, None), spl], 1), np.zeros(4), pdg, cuts).mean()
+        print(f"ladder acceptance at {e:.0f} GeV {acc:.3f}, splitter {acc_s:.3f}")
+        assert acc > 0.7 and acc > 2 * acc_s
+
+
+def test_mc_channels_flags():
+    """res2 pairs only disjoint resonances; mperi needs two partons; both off by default"""
+    res = [[(0, 1), 23], [(2, 3), 24], [(1, 2), 24]]
+    pdg = [2, -2, 11, -11, 12, -12]
+    base = mg.mc_channels([0.0] * 4, pdg, res)
+    assert not any(c[0] in ("res2", "mperi") for c in base)
+    ch = mg.mc_channels([0.0] * 4, pdg, res, res2=True, mperi=True)
+    r2 = [c for c in ch if c[0] == "res2"]
+    assert len(r2) == 1 and r2[0][1] == (0, 1) and r2[0][5] == (2, 3)
+    assert not any(c[0] == "mperi" for c in ch)          # no parton among the finals
+    ch = mg.mc_channels([0.0] * 4, [2, 2, 5, -5, 2, 2], [], mperi=True)
+    assert ch[-1] == ("mperi",)
+    assert not any(c[0] == "mperi" for c in mg.mc_channels([0.0] * 4, [11, -11, 1, -1, 2, -2], [], mperi=True))
+
+
+def test_resonance_draw_unchanged():
+    """resonance_draw through _bw_mass draws what the inlined Breit-Wigner drew (same order of draws): pinned values"""
+    rng = np.random.default_rng(11)
+    P = mg.resonance_draw(5, np.full(5, 500.0), [0.0] * 3, (0, 1), 91.188, 2.441404, 1e-6, rng)
+    np.testing.assert_allclose(_mass(P[:, 0] + P[:, 1]), PINNED_MLL, rtol=1e-12)
+
 
 if __name__ == "__main__":
     for name, f in list(globals().items()):

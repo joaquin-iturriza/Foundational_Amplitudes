@@ -17,6 +17,9 @@ mix_compose.control_config), in a temporary folder, and the flat-in-log|M|^2 par
                sampling.flat_budget (mg.FLAT_BUDGET) candidates per flat event were labelled; per chunk the quota, the
                kept count per bin, the rounds, the candidates and whether it stopped at the budget with bins short
                are recorded (mg.FLAT_LAST); the range is the in-support pp events' (tools/flat_range.py)
+  quota_ladder_res2  quota with two more channels (sampling.mc_mperi, mc_res2; plan step 58's re-check): the
+               multiperipheral ladder (every final at pT near the cut, rapidities spread to the acceptance edge) and
+               one channel per pair of resonances on disjoint finals, on shell together
 Every policy's chunks are timed (wall seconds of datagen.gen_chunk, the whole chunk: bulk, forward and flat parts).
 Everything else (6x oversampling, the flat selection, the shares of bulk, forward and flat, the sqrt(s) passes) is the
 entry's. Against the class's 13 TeV pp MadEvent events (its PP4 probe's train and test pools, as pp_support.py reads
@@ -61,6 +64,8 @@ DATA = os.path.join(HERE, "data")
 READS = os.path.join(DATA, "multichannel_check_reads")
 LOGM_BINS = np.linspace(-20.0, 8.0, 113)          # log10 |M|^2 in 0.25 dex
 SEEDS = (42, 43)
+QUOTA_POLICIES = ("quota", "quota_ladder_res2")   # the flat part filled to a quota per bin; the second with the
+#                                                   multiperipheral and joint-resonance channels (step 58 re-check)
 ROLE = "train"
 # the step-57 classes (the pp_support worst list, 2026-11-04, and the shape study's class) and their PP4 probes
 CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
@@ -166,11 +171,13 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
     datagen_ok = False
     for policy in policies:
         cfg = dict(cfg0); s = dict(cfg.get("sampling") or {})
-        if policy in ("multichannel", "quota"):
+        if policy in ("multichannel",) + QUOTA_POLICIES:
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
-        if policy == "quota":
+        if policy in QUOTA_POLICIES:
             from tools.flat_range import ranges
             s.update(flat_range=ranges()[name])
+        if policy == "quota_ladder_res2":     # step 58's re-check: + the multiperipheral and joint-resonance channels
+            s.update(mc_mperi=True, mc_res2=True)
         cfg["sampling"] = s
         for seed in seeds:
             sel.clear(); diag = []; secs = []; qd = []
@@ -186,7 +193,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                             t0 = time.perf_counter()
                             datagen.gen_chunk(dict(t, out_dir=td))
                             secs.append(time.perf_counter() - t0)
-                        if policy == "quota":
+                        if policy in QUOTA_POLICIES:
                             d = mg.FLAT_LAST
                             sel.append((np.asarray(d["logm"], float) / np.log(10.0), np.asarray(d["keep"])))
                             qd.append({"edges_log10": (np.asarray(d["edges"]) / np.log(10.0)).tolist(),
@@ -308,7 +315,7 @@ def where(name, probe, cut_log10):
     """where the held-out in-support pp events above `cut_log10` (the quota policy's kept max) sit, against those
     below it: per group the 10/50/90% quantiles, in the partonic frame, of sqrt(s_hat) over the window's lower edge,
     the least pT of the cut legs (massless, not neutrinos), the least Delta R between them, the least pair mass over
-    sqrt(s_hat), the largest |eta|, the pairs within 5 GeV of m_Z or m_W (step 58's NO branch: the quota bins left short sit at the top of the range)"""
+    sqrt(s_hat), the largest |eta|, the pairs within 5 widths of m_Z or m_W, the largest and the median pT of the cut legs (step 58's NO branch: the quota bins left short sit at the top of the range)"""
     import mg5_pipeline_final as mg
     import mix_compose as mc
     p = _entry(name)
@@ -344,8 +351,13 @@ def where(name, probe, cut_log10):
     mij = [np.sqrt(np.clip((F[:, a, 0] + F[:, b, 0]) ** 2 - ((F[:, a, 1:] + F[:, b, 1:]) ** 2).sum(1), 0, None))
            for a, b in allp]
     feats["min_pair_mass_over_sqrts"] = np.min(mij, 0) / sq
-    # pairs of finals within 5 GeV of the Z or W mass (any pair, neutrinos too): resonances on shell together
-    feats["n_pairs_near_Z_or_W"] = np.sum([(np.abs(m - 91.1876) < 5) | (np.abs(m - 80.379) < 5) for m in mij], 0)
+    # pairs of finals within 5 widths of the Z or W pole (mg.MC_RES, the catalog's cards; any pair, neutrinos too):
+    # resonances on shell together. The 5 widths are a diagnostic choice, as tests/test_multichannel.py's
+    (mz, gz), (mw, gw) = mg.MC_RES[23], mg.MC_RES[24]
+    feats["n_pairs_near_Z_or_W"] = np.sum([(np.abs(m - mz) < 5 * gz) | (np.abs(m - mw) < 5 * gw) for m in mij], 0)
+    if len(ii):
+        feats["max_pt"] = pt[:, ii].max(1)      # the hardest cut leg (the ladder channel's pT span)
+        feats["median_leg_pt"] = np.median(pt[:, ii], 1)
     groups = {"above": sup & (lm > cut_log10), "below": sup & (lm <= cut_log10)}
     out = {"class": name, "files": files, "cut_log10": cut_log10, "window": [lo, hi],
            "n": {g: int(m.sum()) for g, m in groups.items()}, "quantiles_10_50_90": {}}
@@ -388,16 +400,16 @@ def summary():
         q = d["pp"]["q999_in_support"]
         c = {"probe": d["probe"], "resonances": d["resonances"], "res_params": d.get("res_params"), "pp_n": d["pp"]["n"],
              "pp_out_of_support": d["pp"]["out_of_support"], "pp_q999_in_support": q}
-        for pol in ("current", "multichannel", "quota"):
+        for pol in ("current", "multichannel") + QUOTA_POLICIES:
             if not all(f"{pol}_{s}" in d["runs"] for s in SEEDS):
                 continue
             js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in SEEDS}
             ch = d["runs"][f"{pol}_{SEEDS[0]}"]["chunks"]
             kc = np.sum([x["kept_per_channel"] for x in ch], 0).tolist() if ch else None
-            if pol == "quota":
+            if pol in QUOTA_POLICIES:
                 # step 58's outcome (D269): 0 held-out in-support pp events outside the kept range on both seeds, no
                 # quota shortfall, no chunk stopped at the budget or with nothing to steer by
-                c["quota_outcome"] = {
+                c[pol + "_outcome"] = {
                     "rule": "heldout_outside_kept == 0 and quota_short == 0 and chunks_budget_hit == 0 and "
                             "chunks_no_steer == 0, on both seeds; the table-pool shares hold by construction",
                     "yes": all(j.get("heldout_outside_kept") == 0 and j.get("quota_short") == 0 and
@@ -410,7 +422,7 @@ def summary():
         out["classes"][d["class"]] = c
         print(d["class"], {pol: (c[pol]["pass"], [(round(j["above_max"], 4), j["min_over_plateau"] and
                                                     round(j["min_over_plateau"], 3)) for j in c[pol]["seeds"].values()])
-                           for pol in ("current", "multichannel", "quota") if pol in c})
+                           for pol in ("current", "multichannel") + QUOTA_POLICIES if pol in c})
     json.dump(out, open(os.path.join(DATA, "multichannel_check.json"), "w"), indent=1)
 
 

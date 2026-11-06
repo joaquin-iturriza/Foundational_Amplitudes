@@ -2,7 +2,8 @@
 """Catalog flat part against the 13 TeV pp events in log10|M|^2, per class of the step-58 check (plan catalog_coverage,
 D294): the share of each sample per decade of log10|M|^2, in multichannel_check's 0.25-dex bins: the pp events in the
 catalog's support (the class's PP4 probe, train + test), the kept flat events of the multichannel policy (step 57) and
-of the quota policy (step 58), seed 42; dashed: the range the quota is meant to fill. Reads data/multichannel_check_reads/ (the per-seed files of `run ...
+of the quota policy (step 58) and, when read, of the quota policy with the ladder and two-resonance channels
+(step 58's re-check), seed 42; dashed: the range the quota is meant to fill. Reads data/multichannel_check_reads/ (the per-seed files of `run ...
 multichannel+quota <seed>`). One panel per class -> figs/flat_quota_<a..e>.{png,pdf}.
 
     python3 analysis/catalog_v4/fig_flat_quota.py [seed]
@@ -40,6 +41,9 @@ def main(seed=42):
         ax.stairs(per_dex(r["pp"]["hist_in_support"], e), e, color=ps.C.grey, label="pp 13 TeV")
         ax.stairs(per_dex(r[f"multichannel_{seed}"]["hist_kept"], e), e, color=ps.C.blue, label="multichannel")
         ax.stairs(per_dex(r[f"quota_{seed}"]["hist_kept"], e), e, color=ps.C.vermillion, label="quota per bin")
+        if f"quota_ladder_res2_{seed}" in r:      # step 58 re-check: + ladder and joint-resonance channels
+            ax.stairs(per_dex(r[f"quota_ladder_res2_{seed}"]["hist_kept"], e), e, color=ps.C.green,
+                      label="quota, + ladder and two-resonance channels")
         qe = r[f"quota_{seed}"]["quota_chunks"][0]["edges_log10"]     # the quota's target range (pp range +- 0.5 dex)
         for x in (qe[0], qe[-1]):
             ax.axvline(x, color=ps.C.vermillion, ls="--", lw=0.8, label="quota range" if x == qe[0] else None)
