@@ -430,7 +430,9 @@ def summary():
         for pol in ("current", "multichannel") + QUOTA_POLICIES:
             if not all(f"{pol}_{s}" in d["runs"] for s in SEEDS):
                 continue
-            js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in SEEDS}
+            # every seed run for the policy (42 and 43 always; more where a step added seeds, plan step 67)
+            ss = sorted({int(k[len(pol) + 1:]) for k in d["runs"] if k.startswith(pol + "_") and k[len(pol) + 1:].isdigit()})
+            js = {s: judge(d["runs"][f"{pol}_{s}"], q, d["pp"]["hist_in_support"]) for s in ss}
             r0 = d["runs"][f"{pol}_{SEEDS[0]}"]
             ch = r0.get("quota_chunks") or r0["chunks"]      # a quota policy's per-channel counts are in its quota chunks
             kc = np.sum([x["kept_per_channel"] for x in ch], 0).tolist() if ch else None
@@ -445,7 +447,7 @@ def summary():
                     "heldout": {s: [j.get("heldout_outside_kept"), j.get("heldout_n_in_support"), j.get("heldout_upper95")]
                                 for s, j in js.items()}}
             c[pol] = {"seeds": js, "pass": all(j["pass"] for j in js.values()),
-                      "kept_max": [d["runs"][f"{pol}_{s}"]["kept_max"] for s in SEEDS],
+                      "kept_max": [d["runs"][f"{pol}_{s}"]["kept_max"] for s in ss],
                       "channels": ch[0]["channels"] if ch else None, "kept_per_channel_seed42": kc}
         out["classes"][d["class"]] = c
         print(d["class"], {pol: (c[pol]["pass"], [(round(j["above_max"], 4), j["min_over_plateau"] and
@@ -460,12 +462,12 @@ print("MCHECK_READ " + open(os.path.join(os.environ["SCRATCH"], "zz_mcheck", sys
 '''
 
 
-def pull(policies=None):
+def pull(policies=None, classes=None, seeds=SEEDS):
     """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
     from analysis.common import site_python
     os.makedirs(READS, exist_ok=True)
-    tags = [n for n in CLASSES] if policies is None else [f"{n}_{policies}_{s}" for n in CLASSES for s in SEEDS]
+    tags = [n for n in CLASSES] if policies is None else [f"{n}_{policies}_{s}" for n in (classes or CLASSES) for s in seeds]
     for tag in tags:
         d = site_python(PULL_REMOTE, [tag], "MCHECK_READ", timeout=300)
         json.dump(d, open(os.path.join(READS, f"{tag}.json"), "w"), separators=(",", ":"))
@@ -480,7 +482,9 @@ if __name__ == "__main__":
     elif sys.argv[1] == "where":   # where <class> <probe> <cut_log10>
         print("MCHECK_WHERE " + json.dumps(where(sys.argv[2], sys.argv[3], float(sys.argv[4]))))
     elif sys.argv[1] == "pull":
-        pull(sys.argv[2] if len(sys.argv) > 2 else None)
+        # pull [<policies> [<class> <seed,seed,...>]]: extra seeds of one class (plan step 67)
+        pull(sys.argv[2] if len(sys.argv) > 2 else None, *(([sys.argv[3]], tuple(int(x) for x in sys.argv[4].split(",")))
+                                                          if len(sys.argv) > 4 else ()))
     elif sys.argv[1] == "summary":
         summary()
     else:   # an unknown argument (e.g. --help) once rewrote data/multichannel_check.json through summary()
