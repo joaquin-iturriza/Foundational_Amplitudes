@@ -9234,6 +9234,15 @@ entries:
       GPU-h, its own design) before any YES or NO against it; otherwise the old MSE control stands. Then the step-61 outcomes
       (YES / SIGN YES MAGNITUDE HURT / PARTIAL / NO) with this rerun as the step-56 arm and the magnitude gate against the
       rerun. Cost: 4 jobs x 1 V100, 2.33 h work each, limit 03:00, 9.3 GPU-h work / 12 at the limits; in memory.'
+    passed_at: '2026-11-06T05:15:07+00:00'
+    reviewer: 'Repair 05:14: rerun of the step-56 arm (het sign head weight 1, seeds 42-45) at f21572a1, the matched arms''
+      code (git diff f21572a1..87345879 outside plan: only the arm list of job_catalog_v3_short.sh), so sign and magnitude
+      are one change (the sign weighting); magnitude gated matched-vs-rerun (PP4/EE4 upper <= 1.10, step-56 se ln 0.030/0.019;
+      HD4/H1-H7c shown-worse), rerun vs old het reference beside (step 56: 1.002/0.953). Re-seed rule stated in numbers (old
+      vs rerun median wrong-sign ratio outside [1/1.2,1.2] or sign test p<0.05 -> MSE control rerun at same code before any
+      verdict against it). Sign measure resolved at 4 seeds (H5 17/21 p 0.0036, HD5 15/19 p 0.0096). Searched as for the 05:06
+      design (sign_loss_weight, sign_het_match, het sign, sign head, gradient share, keyed, tagkeyed): no same-code rerun
+      exists. 9.3 GPU-h, in memory, HETEROSC.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
