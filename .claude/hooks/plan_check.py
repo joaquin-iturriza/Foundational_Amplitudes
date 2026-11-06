@@ -114,7 +114,7 @@ def problems():
     for e in d["entries"]:
         if plan.open_question(e):                   # waiting, or running with a question open on part of it
             t0 = plan.parse(e.get("waiting_since")) - dt.timedelta(minutes=plan.ASK_MARGIN_MIN)
-            if not any(ts >= t0 and plan.ask_matches(e, text) for ts, text in sent):
+            if not plan.ask_matches_set(e, [text for ts, text in sent if ts >= t0]):
                 out.append("%s has a question open for the user, but no message sent to them asks: %s" % (
                     e["id"], e.get("ask")))
         if e.get("status") == "running":

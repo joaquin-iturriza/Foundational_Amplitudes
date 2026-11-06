@@ -401,6 +401,28 @@ def part_asked(p, x):
     return (len(a & b) >= 0.5 * len(a)) or (len(q) >= 3 and len(q & b) >= 0.5 * min(len(q), len(b)) and len(q & b) >= 4)
 
 
+def ask_questions(ask):
+    """The questions of an ask: its numbered parts, else (unnumbered, two or more) each sentence holding a "?"
+    (2026-11-06: three unnumbered questions, each asked in some message of the turn, were refused)."""
+    parts = ask_parts(ask)
+    if parts:
+        return parts
+    qs = [x for x in re.split(r"(?<=[.?!;])\s+|\n+", ask or "") if "?" in x and ask_terms(x)]
+    return qs if len(qs) >= 2 else []
+
+
+def ask_matches_set(e, texts):
+    """True when one message asks the whole question (ask_matches), or the messages together ask every question of a
+    multi-question ask, each by some sentence of some message."""
+    texts = list(texts)
+    if any(ask_matches(e, t) for t in texts):
+        return True
+    qs = ask_questions(e.get("ask"))
+    sents = [x for t in texts for x in re.split(r"(?<=[.?!;])\s+|\n+", t or "")
+             if "?" in x or re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", x.lower())]
+    return bool(qs) and all(any(part_asked(q, x) for x in sents) for q in qs)
+
+
 def ask_matches(e, text):
     """True when a message to the user asks the entry's recorded question, in its words or others: it names the entry
     and one of the steps the question holds (`warm_start step 1`), or it shares at least half of the question's

@@ -85,3 +85,35 @@ if __name__ == "__main__":
         if n.startswith("test_"):
             f()
     print("ok")
+
+
+CC = {"id": "catalog_coverage", "status": "running", "waiting_since": "2026-11-06T17:48:00+00:00", "next": ["a"],
+      "ask": ("For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's "
+              "settings (39 GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to "
+              "be resubmitted at 3:30 (28 GPU-h of work)? And for the catalog regeneration: at budget 750 with both "
+              "ladders, every log|M|^2 bin up to the highest pp event is filled on all five test classes, but the "
+              "extra half decade above it is not quite (uu_bbxuu 0.91 and 0.25 in its last two bins, the others "
+              "0.91-0.96): do we accept that (CPU time per pool about 120x plain multichannel on the QCD classes, "
+              "~8600 s vs ~72 s), or pay to fill it (budget ~3000, an estimate of about 4x that again on "
+              "uu_bbxuu-like classes, ~1.1x on the others)?")}
+CC_Q1 = ("Joaquin, three calls. 1. For the catalog regeneration, do we accept this margin at budget 750, or pay about "
+         "4x more on the QCD classes to fill it? 2. For the scaling grid, should we run the whole grid (449 GPU-h), "
+         "only the 2x row with the long sweep's settings (39 GPU-h), or the 2x row at the original settings? "
+         "3. Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h of work)?")
+CC_Q2 = ("Joaquin, the regeneration question again: at budget 750 with both ladders, every log|M|^2 bin up to the "
+         "highest pp event is filled, but the extra half decade above it is not quite. Do we accept that, at a CPU "
+         "time per pool of about 120x plain multichannel on the QCD classes, or pay to fill it with budget ~3000, "
+         "about 4x that again on classes like uu_bbxuu?")
+
+
+def test_unnumbered_ask_asked_across_messages_passes():
+    assert plan.ask_matches_set(CC, [CC_Q1])
+    assert plan.ask_matches_set(CC, ["nothing new.", CC_Q1, CC_Q2])
+
+
+def test_unnumbered_ask_missing_signoutput_refuses():
+    grid = CC_Q1.split("2. ")[1].split(" 3. ")[0]
+    assert not plan.ask_matches_set(CC, ["Joaquin, " + grid, CC_Q2])
+    assert not plan.ask_matches_set(CC, [CC_Q2])
+    assert not plan.ask_matches_set(CC, ["Joaquin, the grid costs 449 GPU-h; the jobs need 3:30; nothing asked."])
+    assert not plan.ask_matches_set(CC, [])
