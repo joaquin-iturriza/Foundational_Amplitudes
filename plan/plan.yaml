@@ -16232,6 +16232,84 @@ entries:
       cells (D307/D313), against a spread of about +-0.17. HETEROSC; parent target stats; no HPO; disk 2 x 0.9 GB with no
       shared cache; CPU test passes. Searched results.tex for optimizer state, optimiser state, load_optimizer, optimizer_state,
       moment fill, resume, continued, empty/fresh optimizer, model_live; plan show warm_start; decisions D300-D313.'
+  - at: '2026-11-06T23:09:12+00:00'
+    question: 'Step 14 (D319, D315 single seed): which new warm-start mechanism closes the k=533 gap to the C1 change from
+      scratch (share 0.25, het; default restart R(W/B) PP4 1.333, EE4 1.513, SHORT of the 1.35 bar)? Three directions, one
+      study at seed 42: (a) plasticity: shrink and perturb the parent before the default restart (p <- 0.4 p + 0.1 p0, p0
+      a fresh muP init at seed 43; Ash & Adams 2020 arXiv:1910.08475, setting of Zaidi et al. 2022 arXiv:2206.10011); (b)
+      exposure: the retraining sees more of what the change adds, share 0.50 for 267 steps (as many default-sampled batches
+      as share 0.25 over 533, half the compute) beside share 0.50 for 533 (C2''s existing seed-42 run); (c) branch before
+      the decay: a parent trained with a warmup-stable-decay schedule (cooldown the last 533 of 4264 steps), branched at step
+      3731 (lr still at peak) with its optimizer state, the 533-step cooldown run on share 0.25 or 0.50 (Hu et al. 2024 arXiv:2404.06395
+      and Haegele et al. 2024 arXiv:2405.18392: a new data mixture absorbed in the cooldown), with the WSD parent''s final
+      model at the default restart as the branch''s matched control.'
+    prior: 'par:v4_warm_start (C1 default restart, k=533 SHORT 1.33/1.51, MATCH at 1066); par:v4_warm_start_tuned (NLL-tuned
+      lr 0.17 worse 1.59/2.21; pre-decay checkpoints at tuned settings no better); par:v4_warm_start_restart (jump at step
+      2); par:v4_warm_start_repairs (moment fill 1.005, MSE-tuned 1.054, damped Muon 1.032: none better); par:v4_warm_start_ramp
+      (AdamW damped 1.017, every group damped 1.237 worse); par:v4_warm_start_valley (step 12: step-3198 default 1.019, step-3198
+      continued fresh optimizer 1.145 WORSE, step-2132 continued 1.230 WORSE, lr x3 1.093; valley reading not supported, gap
+      is length); step 13 (continued from 3198 with optimizer state, FA-ccin2p3-05df656d/07bfc8d7, running, read on end);
+      par:v4_warm_start_changes (C2, share 0.50 change: g at 533 0.83 vs C1 0.55). New read on existing runs (mixture_ab.py
+      warm C1s50 @e84b7c7b, data/warm_start_C1s50.json): the share-0.50 warm starts (C2''s W_k, 2 seeds) against the share-0.25
+      change from scratch: R(W/B) PP4 1.183 [1.161,1.204], EE4 1.204 [1.136,1.320] at k=533 = MATCH; 0.985/0.982 at 1066;
+      held catalog-sampled 1.087; over C1''s share-0.25 warm start at 533: 0.877/0.812. B share 0.50 from scratch over B share
+      0.25: PP4 1.08, EE4 0.93 (the share-0.50 change itself is not better on PP4), so the gain is the warm start''s exposure,
+      not a stronger change. Not done before: shrink-and-perturb, a WSD parent, share 0.50 at 267. Searched results.tex for
+      shrink, perturb, WSD, stable, cooldown, branch, share 0.50, warm50, exposure, replay; plan show warm_start; decisions
+      D282-D319. Not chosen: averaging the restarted model with the parent (WiSE-FT: moves toward a parent 1/0.65 worse on
+      the deciding reads, while the catalog-sampled held-out reads are not what is short: R(W/B) held 1.07); heads and embeddings
+      first (LP-FT protects features against distortion, the gap here is under-adaptation); replay of the old mixture (the
+      share-0.25 retraining is already 75% the old mixture).'
+    measure: 'mixture_ab.py warm_single (@e0f3bd49 + filled run ids), seed 42: R(arm/control) on PP4 and EE4 (deciding), the
+      median over classes of the class geometric mean of per-probe MSE ratios (MSE of log|M|^2, each run''s final model after
+      its sigma stage, D276); 95% class bootstrap widened on each side by the median paired seed spread d=|ln R43 - ln R42|
+      of the prior k=533 arm/control pairs (data/ws_seed_pairs.json: PP4 0.0032, EE4 0.0436; held, HD4, HD5 take 0.0436);
+      beside: catalog-sampled held-out (held, pooled), HD4, HD5; R(arm/B) at seed 42 and the estimate R(arm/B) ~ R(arm/control)
+      x 1.333 (PP4) / 1.513 (EE4), the two-seed step-1 R(W_533/B); for the branch, R(wsdbranch25/wsdfinal_default) on PP4/EE4
+      the same way; the restart jump G (largest grad norm over steps 0-19) and the worst training loss over steps 0-39 minus
+      step 0 (ws_restart_steps.py); figure: every arm''s training loss and validation loss curves side by side, the grad norm
+      over the first 40 steps, and per-class MSE CDFs on PP4 and EE4.'
+    check: 'The read moves with a warm-start change at one seed on existing runs: share 0.50 over share 0.25 at k=533, seed-level
+      R PP4 0.853 (s42) / 0.897 (s43), EE4 0.778 / 0.844; continued-from-3198 over control 1.140/1.142 and 1.203/1.269; the
+      paired seed spread d over 10 prior pairs has median PP4 0.0032, EE4 0.0436 (data/ws_seed_pairs.json, mixture_ab.py seed_pairs
+      @e0f3bd49), max 0.40/0.93 only in the every-group-damped pair whose seed-43 run spiked off scale (a blow-up, listed
+      apart): one seed resolves the 5-15% effects of interest. Code: tests/test_shrink_perturb.py (p = 0.4 parent + 0.1 fresh
+      at seed+1, fresh differs from own init, RNG untouched, missing param raises), tests/test_load_optimizer_state.py, tests/test_save_at_steps.py
+      pass; stubbed local dry run of the job script resolves each arm: WSD parent (scheduler WSD, cooldown 0.125, save at
+      [3731], no sigma stage, 4264 steps, base recipe), branches (step-3731 model, load_optimizer_state, WSD cooldown 1.0,
+      warmup 0, recipe default25/default50), shrinkperturb ([0.4,0.1], default25), share50_k267 (267 steps, default50); submit_guard.arm_recipe
+      resolves each arm''s recipe.'
+    fixed: 'Parent for the non-WSD arms: v4_het_control seed 42 (FA-ccin2p3-87ea24d0), its final model after the sigma stage
+      (as the step-1 warm starts); the WSD parent v4_het_control_wsd: the same setup (base recipe, 4264 steps, MUON_BEST HPs,
+      DIM inputs, het loss, seed 42) with only the schedule WSD (warmup as the parent, cooldown (1-sqrt) over the last 533
+      steps) and a step-3731 save. Every warm start: 533 steps (267 for share50_k267), MUON_BEST HPs, layer decay 1, parent
+      target stats, sigma stage 250 steps, reads PP4 EE4 HD4 HD5 and the catalog held-out axes, scripts/job_catalog_v3_short.sh
+      (branch ws-fixes, merged before submission), CC-IN2P3 V100, 16G. Default restart = lr scale 1, the parent''s warmup
+      fraction re-warm, cosine to ~0, fresh optimizer. Branch arms: lr scale 1 (the parent''s lr at 3731), no warmup, (1-sqrt)
+      decay to the floor over 533 steps, the parent''s optimizer state loaded (fine_tune.load_optimizer_state), start weights
+      the step-3731 EMA model (the fine-tune path loads the scored EMA weights; the loaded moments belong to the live weights:
+      the mismatch of step 13, stated). share50_k533 (FA-ccin2p3-9a357af2) is read from step 7 at an older commit (job code
+      @d5616629), read against both the new control and the step-1 seed-42 default restart (FA-ccin2p3-341bf564, same era).'
+    control: 'v4_het_wsx_default_rerun: v4_het_warm25_k533 rerun at this commit (seed 42, same parent, same data stream),
+      the deciding control for every arm; its reproducibility read against the step-1 run FA-ccin2p3-341bf564. For the branch
+      arms also the matched single-change control v4_het_wsx_wsdfinal_default (WSD parent''s final model at the default restart):
+      branching vs restarting at the same parent. B: share 0.25 from scratch seed 42 (FA-ccin2p3-9538e607, HD reads 4dca09e5).'
+    seeds: 'Seed 42 only (D315: no more multiple seeds; D319). 7 runs: WSD parent 1 (limit 02:30, work 1.45 h), then 3 runs
+      chained on it (afterok), 3 independent warm starts; 1.5 h each (step 12''s same-setup runs), share50_k267 ~1.3 h. About
+      12 GPU-h, 15 at limits, under 30 (no confirm). Wall-time target 3.0 h (the parent then a branch). Disk 0.9 GB per run,
+      ~6 GB, against CC free disk at submission.'
+    outcome: 'Fixed before the read, per arm against v4_het_wsx_default_rerun: BETTER when the widened upper end of R(arm/control)
+      is below 1 on PP4 or EE4 and above 1.05 on neither; WORSE when a lower end is above 1; else NOT BETTER. MATCH-estimate
+      when R(arm/control) x 1.333 and x 1.513 are both <= 1.35. A BETTER arm whose catalog-sampled held-out R has its lower
+      end above 1.05 is flagged as trading held-out catalog accuracy. Readings: shrink-and-perturb BETTER = plasticity is
+      what limits the restart; NOT BETTER/WORSE = ruled out. share50_k267: EXPOSURE supported when its interval contains 1
+      (as good as share 0.25 at 533 with half the steps) and share50_k533 is BETTER; then the recipe is a richer retraining
+      mixture and the compute fraction drops to 1/16. Branch: BRANCH works when wsdbranch25 is BETTER than wsdfinal_default
+      and than the control; wsdfinal_default within 5% of the control on both reads means the WSD parent is as good a parent.
+      Decision: the arm BETTER with MATCH-estimate and the smallest cost becomes the warm-start recipe candidate, reported
+      to Joaquin with the D307 hold (the change tests resume); if none is BETTER, share 0.50 at 533 (MATCH at two seeds already,
+      C1s50) is the fix on record and goes to Joaquin as the recipe for data changes. A run that blows up is listed apart
+      with where.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
