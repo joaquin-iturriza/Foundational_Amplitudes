@@ -161,7 +161,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                        "quota": np.asarray(d["quota"]).tolist(),
                                        "kept_per_bin": np.asarray(d["kept_per_bin"]).tolist(),
                                        "rounds": d["rounds"], "n_candidates": int(d["n_candidates"]),
-                                       "budget_hit": bool(d["budget_hit"]),
+                                       "budget_hit": bool(d["budget_hit"]), "stop": d["stop"],
                                        "kept_per_channel": np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])],
                                                                        minlength=len(d["channels"])).tolist(),
                                        "channels": d["channels"]})
@@ -253,6 +253,7 @@ def quota_fill(r):
                                                              for c in qc)),
             "n_chunks": len(qc), "rounds_max": max(len(c["rounds"]) for c in qc),
             "chunks_budget_hit": int(sum(bool(c.get("budget_hit")) for c in qc)),
+            "chunks_no_steer": int(sum(c.get("stop") == "no_steer" for c in qc)),
             "flat_cand_per_kept": sum(c["n_candidates"] for c in qc) / max(q, 1)}
 
 

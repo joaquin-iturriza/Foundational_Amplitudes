@@ -125,6 +125,7 @@ def test_build_fills_every_bin(multichannel):
     assert len(events) == 1000
     d = mg.FLAT_LAST
     assert d["kept_per_bin"].sum() == 500 and np.all(d["kept_per_bin"] >= d["quota"]) and not d["budget_hit"]
+    assert d["stop"] == "quota"
     assert len(d["rounds"]) >= 2 and d["rounds"][0]["bins_short"] > 0 and d["rounds"][-1]["missing"] == 0
     assert d["n_candidates"] <= mg.FLAT_BUDGET * 500
     P = np.stack([e[0] for e in events])
@@ -142,5 +143,25 @@ def test_budget_hit_reported(capsys):
                                                flat_budget=8)})
     mg.build_mixture_dataset(400, 30.0, 6000.0, mf, pdg, rng, cuts, pol, _toy_label, sqrts_measure="log")
     d = mg.FLAT_LAST
-    assert d["budget_hit"] and d["n_candidates"] == 8 * 200 and d["kept_per_bin"].sum() == 200
+    assert d["budget_hit"] and d["stop"] == "budget" and d["n_candidates"] == 8 * 200 and d["kept_per_bin"].sum() == 200
     assert "[WARN] flat quota: stopped at the budget" in capsys.readouterr().out
+
+
+def test_no_steer_reported(capsys):
+    """no candidate with a finite log|M|^2 (a label <= 0 everywhere): the rounds stop after the first, below the budget,
+    as no_steer, not as a budget hit; the flat part is still the right size"""
+    rng = np.random.default_rng(4)
+    pdg = [2, -2, -11, 11, 21]; mf = [0.0, 0.0, 0.0]
+    cuts = {"pt_min": 10.0, "cos_max": float(np.tanh(5.0)), "dr_min": 0.4, "m_min": -1.0}
+    pol = mg.sampling_policy({"sampling": dict(mode="mixture", f_flat=0.5, oversample=6, flat_range=[-30.0, 0.0])})
+    ev, sq, me = mg.build_mixture_dataset(400, 30.0, 6000.0, mf, pdg, rng, cuts, pol,
+                                          lambda e, s: np.zeros(len(e)), sqrts_measure="log")
+    d = mg.FLAT_LAST
+    assert len(ev) == 400 and d["stop"] == "no_steer" and not d["budget_hit"]
+    assert len(d["rounds"]) == 1 and d["n_candidates"] < mg.FLAT_BUDGET * 200
+    out = capsys.readouterr().out
+    assert "[WARN] flat quota: stopped with nothing to steer by" in out and "at the budget" not in out
+
+
+if __name__ == "__main__":
+    sys.exit(pytest.main([__file__, "-q"]))

@@ -3606,7 +3606,8 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
 # kept per bin, uniformly at random within the bin; what unfilled bins leave is spread evenly over the bins with
 # candidates to spare, so the kept part stays as flat as the candidates allow; a chunk that stops at the budget with
 # bins short is reported ([WARN] line, FLAT_LAST["budget_hit"], multichannel_check's chunks_budget_hit), never filled
-# silently. sampling_policy writes the bin width and the budget into the policy whenever flat_range is set, so both
+# silently; so is one whose rounds stop with bins short because no candidate has a finite log|M|^2 to steer by
+# (FLAT_LAST["stop"] == "no_steer", chunks_no_steer). sampling_policy writes the bin width and the budget into the policy whenever flat_range is set, so both
 # are part of the pool's recipe id.
 # Cost: the budget is only a stop against a bin no proposal reaches. A chunk that runs to it labels 50 candidates per
 # flat event against the mixture's 6; with the flat part 0.35 of a pool that is about 6.6x the chunk's labelling cost
@@ -3768,12 +3769,17 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             shares = wc / wc.sum()
     keep, take = flat_quota_select(logm, edges, quota, rng)
     short = np.maximum(quota - take, 0)
-    budget_hit = bool(short.sum() > 0)
-    if budget_hit:
+    # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
+    # (no finite log|M|^2 among them) with bins short and the budget not reached
+    stop = "quota" if short.sum() == 0 else ("budget" if len(cand) >= budget else "no_steer")
+    budget_hit = stop == "budget"
+    if stop != "quota":
         lo10 = edges[:-1][short > 0] / np.log(10.0)
-        print(f"  [WARN] flat quota: stopped at the budget ({len(cand):,} candidates, {pol['flat_budget']} per flat "
-              f"event) with {int((short > 0).sum())} bins short by {int(short.sum())} events (log10|M|^2 bins from "
-              f"{lo10.min():.2f} to {lo10.max():.2f}); their events taken from bins with candidates to spare")
+        why = (f"at the budget ({len(cand):,} candidates, {pol['flat_budget']} per flat event)" if budget_hit else
+               f"with nothing to steer by ({len(cand):,} candidates, none with a finite log|M|^2), budget not reached")
+        print(f"  [WARN] flat quota: stopped {why} with {int((short > 0).sum())} bins short by {int(short.sum())} "
+              f"events (log10|M|^2 bins from {lo10.min():.2f} to {lo10.max():.2f}); their events taken from bins with "
+              f"candidates to spare")
     if len(keep) < n_flat:
         # fewer candidates in range than the flat part: the rest from the finite candidates outside it, then any
         rest = np.setdiff1d(np.nonzero(np.isfinite(logm))[0], keep)
@@ -3781,7 +3787,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             rest = np.setdiff1d(np.arange(len(cand)), keep)
         keep = np.concatenate([keep, rng.choice(rest, size=n_flat - len(keep), replace=False)])
     FLAT_LAST.clear()
-    FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take, cand_per_bin=cnt, rounds=rounds, budget_hit=budget_hit,
+    FLAT_LAST.update(edges=edges, quota=quota, kept_per_bin=take, cand_per_bin=cnt, rounds=rounds, budget_hit=budget_hit, stop=stop,
                      n_candidates=len(cand), logm=logm, keep=np.asarray(keep), chan=ch_c,
                      channels=[list(x) for x in chans] if mc else None)
     print(f"  [SAMPLE] mixture: flat-log|M|^2 by quota {len(keep):,} kept from {len(cand):,} candidates in "
