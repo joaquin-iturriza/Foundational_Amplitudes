@@ -24,6 +24,7 @@ A candidate tracks the reads when, on every resolved comparison, its ln ratio ha
     python3 analysis/catalog_v4/ws_objective_check.py extract      -> data/ws_objective_logs.json (site, read-only)
     python3 analysis/catalog_v4/ws_objective_check.py rank         -> data/ws_objective_check.json
     python3 analysis/catalog_v4/ws_objective_check.py score <run...>  the trial objective of finished runs (HD4)
+    python3 analysis/catalog_v4/ws_objective_check.py summary      the cached verdict, one JSON line (results.tex)
 """
 import json
 import math
@@ -265,8 +266,19 @@ def score(runs):
     print(json.dumps(out))
 
 
+def summary():
+    """The cached rank verdict (data/ws_objective_check.json), as one JSON line: per candidate and set, Pearson r with
+    the PP4/EE4 ln R and whether it tracks; per set, the comparisons and the points (comparison x seed)"""
+    d = json.load(open(OUT))
+    n = {st: sum(len(r["target"]["PP4"]["ln_seed"]) for r in d["comparisons"].values() if r["set"] == st)
+         for st in ("select", "check")}
+    print(json.dumps({"points": n, "tracking_both": d["tracking_both"], "tracking_select": d["tracking_select"],
+                      "verdict": {c: {st: {"tracks": v[st]["tracks"], "r": v[st]["pearson"]} for st in v}
+                                  for c, v in d["verdict"].items()}}))
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "score":
         score(sys.argv[2:])
     else:
-        {"extract": extract, "rank": rank}[sys.argv[1]]()
+        {"extract": extract, "rank": rank, "summary": summary}[sys.argv[1]]()
