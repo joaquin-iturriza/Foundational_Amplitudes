@@ -65,5 +65,35 @@ def test_eval_with_sigma_stage_counts_load_stage_and_cache():
     assert abs(s["hours"] - e["hours"] - extra) < 0.02, (s, e, extra)
 
 
+LONG_AXES = ["H1", "H2", "H2p5", "H3", "H5", "H6", "H7E", "H7c", "PP4", "EE4", "HD4", "HD5"]
+
+
+def test_width_rates_from_the_1x_cells():
+    """--width: the long cells' measured V100 rates (size_mse.json, 4264 steps): w32 at 8528 steps needs its own 3.45
+    s/step, so the width-8 rate (1.01) would have passed a limit 2x too short"""
+    tr = "recipes/catalog_v4_default25_train.yaml"
+    base = sw.plan(tr, "v4", LONG_AXES, iters=8528, sigma_stage=True)
+    assert base["rates"]["s_per_step"] == sw.S_ITER and base["rates"]["width"] is None, base   # unchanged without --width
+    for w, rate, train_h in ((8, 0.983, 1.1643), (16, 1.703, 2.0175), (32, 3.450, 4.0862)):
+        p = sw.plan(tr, "v4", LONG_AXES, iters=4264, sigma_stage=True, width=w)
+        assert p["rates"]["s_per_step"] == rate and abs(4264 * rate / 3600 - train_h) < 0.01, (w, p)
+        q = sw.plan(tr, "v4", LONG_AXES, iters=8528, sigma_stage=True, width=w)
+        assert abs(q["hours"] - base["hours"] - 8528 * (rate - sw.S_ITER) / 3600 * sw.MARGIN) < 0.01, (w, q, base)
+    w32 = sw.plan(tr, "v4", LONG_AXES, iters=8528, sigma_stage=True, width=32)
+    assert w32["hours"] > 12.0, w32
+    args = ["--train", tr, "--axes", *LONG_AXES, "--iters", "8528", "--het", "--width", "32"]
+    try:
+        sw.main(args + ["--limit", base["slurm_time"]])          # the width-8 limit refused at width 32
+        raise AssertionError("width-8 limit accepted at width 32")
+    except SystemExit as e:
+        assert e.code == 1, e
+    assert sw.main(args + ["--limit", w32["slurm_time"]]) is None
+    try:
+        sw.plan(tr, "v4", LONG_AXES, iters=8528, width=64)
+        raise AssertionError("unmeasured width accepted")
+    except SystemExit as e:
+        assert "no measured step rate" in str(e), e
+
+
 if __name__ == "__main__":
-    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); test_eval_reread_fits_step20_times(); test_eval_mse_reread_within_2x_of_step23(); test_eval_with_sigma_stage_counts_load_stage_and_cache(); print("short_wall tests passed")
+    test_limits(); test_mixture_arm_needs_more_than_2p5h(); test_het_arm_counts_its_sigma_stage(); test_eval_reread_fits_step20_times(); test_eval_mse_reread_within_2x_of_step23(); test_eval_with_sigma_stage_counts_load_stage_and_cache(); test_width_rates_from_the_1x_cells(); print("short_wall tests passed")
