@@ -3239,6 +3239,1583 @@
     }
    ]
   },
+  "v4_uu_bbxuu": {
+   "pp_in_support_max_log10": 4.694052606703962,
+   "policies": {
+    "old": {
+     "policy": "quota_ladder_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -7.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.92,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.43,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.45,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.96,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.97,
+       "in_range": true,
+       "mean": 0.98065,
+       "min": 0.98,
+       "max": 0.9813
+      },
+      {
+       "lo": 3.22,
+       "in_range": true,
+       "mean": 0.6771499999999999,
+       "min": 0.6724,
+       "max": 0.6819
+      },
+      {
+       "lo": 3.47,
+       "in_range": true,
+       "mean": 0.3056,
+       "min": 0.2951,
+       "max": 0.3161
+      },
+      {
+       "lo": 3.71,
+       "in_range": true,
+       "mean": 0.116,
+       "min": 0.1056,
+       "max": 0.1264
+      },
+      {
+       "lo": 3.96,
+       "in_range": true,
+       "mean": 0.035750000000000004,
+       "min": 0.0356,
+       "max": 0.0359
+      },
+      {
+       "lo": 4.21,
+       "in_range": true,
+       "mean": 0.0157,
+       "min": 0.0085,
+       "max": 0.0229
+      },
+      {
+       "lo": 4.45,
+       "in_range": true,
+       "mean": 0.0021,
+       "min": 0.0014,
+       "max": 0.0028
+      },
+      {
+       "lo": 4.7,
+       "in_range": false,
+       "mean": 0.0014,
+       "min": 0.0014,
+       "max": 0.0014
+      },
+      {
+       "lo": 4.95,
+       "in_range": false,
+       "mean": 0.0,
+       "min": 0.0,
+       "max": 0.0
+      }
+     ],
+     "shortfall": [
+      0.13703132144490168,
+      0.1378029263831733
+     ],
+     "heldout_outside_kept": [
+      4,
+      2
+     ],
+     "heldout_n_in_support": 53345,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      617.8103738449718,
+      616.1415065549663
+     ]
+    },
+    "edge": {
+     "policy": "quota_ladder_edge_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -7.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.92,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.43,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.45,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.96,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.96,
+       "in_range": true,
+       "mean": 0.9943,
+       "min": 0.9886,
+       "max": 1.0
+      },
+      {
+       "lo": 4.21,
+       "in_range": true,
+       "mean": 0.8062,
+       "min": 0.7881,
+       "max": 0.8243
+      },
+      {
+       "lo": 4.45,
+       "in_range": true,
+       "mean": 0.22649999999999998,
+       "min": 0.1994,
+       "max": 0.2536
+      },
+      {
+       "lo": 4.7,
+       "in_range": false,
+       "mean": 0.06570000000000001,
+       "min": 0.0646,
+       "max": 0.0668
+      },
+      {
+       "lo": 4.95,
+       "in_range": false,
+       "mean": 0.014249999999999999,
+       "min": 0.01,
+       "max": 0.0185
+      }
+     ],
+     "shortfall": [
+      0.0586705532693187,
+      0.05721307727480567
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 53345,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      542.0597174439754,
+      543.0815741259721
+     ]
+    },
+    "both": {
+     "policy": "quota_ladder_both_res2",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -7.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.92,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.43,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.45,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.96,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.96,
+       "in_range": true,
+       "mean": 0.9784999999999999,
+       "min": 0.9641,
+       "max": 0.9929
+      },
+      {
+       "lo": 4.21,
+       "in_range": true,
+       "mean": 0.7205999999999999,
+       "min": 0.7129,
+       "max": 0.7283
+      },
+      {
+       "lo": 4.45,
+       "in_range": true,
+       "mean": 0.2286,
+       "min": 0.2108,
+       "max": 0.2464
+      },
+      {
+       "lo": 4.7,
+       "in_range": false,
+       "mean": 0.06775,
+       "min": 0.0588,
+       "max": 0.0767
+      },
+      {
+       "lo": 4.95,
+       "in_range": false,
+       "mean": 0.01645,
+       "min": 0.0158,
+       "max": 0.0171
+      }
+     ],
+     "shortfall": [
+      0.05964220393232739,
+      0.06004229538180155
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 53345,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      676.9354308199981,
+      541.1271213930304
+     ]
+    },
+    "both750": {
+     "policy": "quota_ladder_both_res2_budget750",
+     "seeds": [
+      "42",
+      "43"
+     ],
+     "bins": [
+      {
+       "lo": -7.14,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.89,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.64,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.4,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -6.15,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.9,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.66,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.41,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -5.16,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.92,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.67,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.43,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -4.18,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.93,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.69,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.44,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -3.19,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.95,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.7,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.45,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -2.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.96,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -1.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": -0.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.01,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.26,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.51,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 0.75,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.0,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.25,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.49,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.74,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 1.99,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.23,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.48,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.73,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 2.97,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.22,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.47,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.71,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 3.96,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.21,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.45,
+       "in_range": true,
+       "mean": 1.0,
+       "min": 1.0,
+       "max": 1.0
+      },
+      {
+       "lo": 4.7,
+       "in_range": false,
+       "mean": 0.9107000000000001,
+       "min": 0.8953,
+       "max": 0.9261
+      },
+      {
+       "lo": 4.95,
+       "in_range": false,
+       "mean": 0.2535,
+       "min": 0.231,
+       "max": 0.276
+      }
+     ],
+     "shortfall": [
+      0.0174039780521262,
+      0.016032235939643348
+     ],
+     "heldout_outside_kept": [
+      1,
+      1
+     ],
+     "heldout_n_in_support": 53345,
+     "chunks_budget_hit": [
+      36,
+      36
+     ],
+     "chunks_no_steer": [
+      0,
+      0
+     ],
+     "seconds": [
+      8700.63134642203,
+      8470.294221308926
+     ]
+    }
+   },
+   "guard_both_vs": {
+    "old": {
+     "shortfall_diff": -0.07757487425697301,
+     "shortfall_two_se": 0.00037151348879743695,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": -7.14,
+      "diff": 0.0,
+      "two_se": 0.0,
+      "ok": true
+     },
+     "bins_failed": [],
+     "pass": true
+    },
+    "edge": {
+     "shortfall_diff": 0.001900434385002283,
+     "shortfall_two_se": 0.0018575674439871915,
+     "shortfall_ok": true,
+     "worst_bin": {
+      "lo": 4.21,
+      "diff": -0.08560000000000006,
+      "two_se": 0.05159999999999998,
+      "ok": false
+     },
+     "bins_failed": [
+      {
+       "lo": 4.21,
+       "diff": -0.08560000000000006,
+       "two_se": 0.05159999999999998,
+       "ok": false
+      }
+     ],
+     "pass": false
+    }
+   },
+   "verdict_750": "NEAR",
+   "short_bins_750": [
+    {
+     "lo": 4.7,
+     "in_range": false,
+     "mean": 0.9107000000000001,
+     "min": 0.8953,
+     "max": 0.9261
+    },
+    {
+     "lo": 4.95,
+     "in_range": false,
+     "mean": 0.2535,
+     "min": 0.231,
+     "max": 0.276
+    }
+   ]
+  },
   "v4_uux_epemg": {
    "pp_in_support_max_log10": 0.2732887296599168,
    "policies": {
