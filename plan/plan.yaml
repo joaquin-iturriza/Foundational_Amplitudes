@@ -10739,9 +10739,9 @@ entries:
       - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
   owner:
     agent: a7be1d5c343ae02d7
-    state: closed
+    state: stopped
     since: '2026-11-06T22:37:12+00:00'
-    state_at: '2026-11-06T22:57:26.932000+00:00'
+    state_at: '2026-11-06T23:05:27+00:00'
     context: 250597
     context_at: '2026-11-06T22:57:34+00:00'
   findings:
