@@ -15551,7 +15551,7 @@ entries:
       1066, C8 k=533, C2 k=533 ...): their logs, val curves and per-axis reads are being fetched (detach step7_reads_a, scratchpad
       read7.sh). To do: ws_stats_check.py C8 on the k=2132 pair once started.'
   step_waits:
-    '10': FA-ccin2p3-fbb16a33 FA-ccin2p3-cb458c82 FA-ccin2p3-5862b62e FA-ccin2p3-d15462b0
+    '10': FA-ccin2p3-fbb16a33 FA-ccin2p3-cb458c82 FA-ccin2p3-21a18a76 FA-ccin2p3-21674d1e
     '9': 'FA-ccin2p3-038f00fe FA-ccin2p3-040c3448 FA-ccin2p3-0d2a042d FA-ccin2p3-0fae36f3 FA-ccin2p3-11938ca8 FA-ccin2p3-1218b835
       FA-ccin2p3-159e0244 FA-ccin2p3-1e847591 FA-ccin2p3-21fb7bd7 FA-ccin2p3-22afe10b FA-ccin2p3-26f62d9c FA-ccin2p3-2e583c2b
       FA-ccin2p3-3794e155 FA-ccin2p3-39516188 FA-ccin2p3-3c1ea279 FA-ccin2p3-410e8632 FA-ccin2p3-41729c67 FA-ccin2p3-43601c0a
