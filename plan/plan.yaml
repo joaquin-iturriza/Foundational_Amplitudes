@@ -12136,6 +12136,10 @@ entries:
       to move >= 1 dex on both seeds (stricter than the design''s ''on a class''); in-range bins passing with a held-out event
       outside is classed by the shift; a fully filled edge counts as the default max + 0.25 dex. For step 65''s design: check
       that the pool cache key covers the sampling flags (fwd_free_floor) before a regeneration uses it.'
+  - at: '2026-11-06T22:14:16+00:00'
+    text: '2026-11-06 note: the 12 step-61 sign-output resubmissions at 3:30 are approved by Joaquin (D309); 4 submitted (9079850b
+      ebe4c4ed 297c4366 dce345d8), the other 8 refused by the permission classifier and with Joaquin; no longer an open question
+      to him.'
   handoff:
     state: '2026-11-06 ~22:00. (1) Cost of the new sampling done: sampling_cost.py @08e3091e (pull = catalog_v4 generation
       logs of the 12 job_catalog_v4_regen runs of 2026-10-26 -> data/sampling_cost_gen.json; summary -> data/sampling_cost.json;
