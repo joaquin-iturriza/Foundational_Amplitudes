@@ -10948,6 +10948,32 @@ entries:
       sign BCE times the het NLL''s detached factor on its mu gradient, sigma^(2 beta)/(2 sigma^2), so the per-event sign:magnitude
       gradient ratio is the MSE loss''s), commit 0e8bf38b on branch het-sign-weight (worktrees/wt-het-sign), test_het_sign_head
       6 passed; not merged (repo-reviewer pending).'
+  - at: '2026-11-06T05:10:09+00:00'
+    text: '(b) step 37/38 done (2026-11-06; D290). Memmap cache format 3 merged into trunk at d18e44f1 (commits 32db317e,
+      653bb5b0, test fix baeb96ef; repo-reviewer BLOCK with 8 findings, all fixed, then PASS). One cache per pool set at $SCRATCH/amp_mmap_cache/<key>/<depth>.
+      The key is the pools'' content identity (keyed_aug.pool_identity: recipe_id, size, sha256 of both 64 KiB ends; for pools
+      composed at load, their rows digest), the layout and MMAP_VERSION=3. It carries no path, mtime, seed, caps, frozen stats,
+      tokenizer or source text; a fingerprint test pins the build code to the version. The base arrays hold the centre-of-mass
+      momenta before augmentation, raw ids, raw |M|^2, sqrt(s_hat) and alpha_s; the derived inputs are the target factor''s
+      log and the raw off-shellness. A run opens a prefix of a deep-enough depth. At open it fits or reads its statistics;
+      per batch it draws the Lorentz augmentation per event from (seed, pool, index) (keyed_aug), applies the scales, gathers
+      tokens from a table and builds the order features. The in-memory path draws the same transforms and computes s_hat,
+      the factor and the off-shellness from the centre-of-mass momenta, so both paths give the same batches per seed. Only
+      a CPU prebuild builds the cache (scripts/job_mmap_prebuild.sh = the run''s overrides + ++data.memmap_prebuild=true);
+      it also writes the run''s momentum scale for its seed. A GPU run without a cache refuses, naming the prebuild command.
+      Safeguards: disk check plus LRU prune (48 h idle; a run refreshes last_used every 30 min; never the cache being built
+      or one containing it), posix_fallocate, per host/job/pid staging removed on failure (stale stages > 2 days pruned),
+      canaries on open. Tests: tests/test_mmap_key.py (Lorentz; batch independence; distribution matches lloca rand_lorentz;
+      key independent of path, mtime and seed, changing with content and version; gather bitwise equal to the in-memory computation
+      for seeds 42/43 from one cache; two forked openers; canary; prune; stage cleanup); tests/test_pool_doc_composed.py;
+      tests/test_memmap_data.py section 2 locally (--synthetic, twice: off-shellness; then dimensionless + factor) and on
+      CC-IN2P3 on the real arm v4_het_default25 (12 processes, train_subsample 2000; dimensionless_inputs, target_physics_orders
+      with per-event alpha_s, off-shellness), all bitwise for seeds 42 and 43 from one cache, smaller caps and a fine-tune
+      opening the same cache. The exception is the float64 factor: 557/28800 events differ by at most 9.4e-13 relative, inside
+      the test''s 1e-10, as on format 2. Not tested: section 3 (GPU training), the prebuild''s wall time at the whole-set
+      size (unmeasured; to be set at the first build''s submission), the eikonal factor. Default change: the augmentation
+      no longer draws from the torch RNG, so new runs (both paths) differ from older ones at the same seed in augmentation
+      draws and model init (D290); old format-2 caches are never read again (prunable).'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
