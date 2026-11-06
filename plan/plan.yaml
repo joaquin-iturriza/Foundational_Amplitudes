@@ -3728,10 +3728,6 @@ entries:
     62: '(d) e+e- mechanism (D295): read what the default share contains per beam (e+e- vs pp processes, events, sqrt(s));
       then ablate the default share restricted to e+e- only and to pp only against share 0 (het control) and the full share
       0.25, same arm otherwise, reads EE4/PP4/held; then joint-variable coverage if needed.'
-    63: 'Joaquin 2026-11-06 04:28, owner a8dc83fd21c2d8d4f: (a) flat in log|M|^2 over the pp range by per-bin quota filling,
-      then generate; (b) memmap cache with per-event keyed draws; (c) make the het. sign output transfer; (d) e+e- mechanism:
-      default share per beam, e+e--only and pp-only default-share arms; (e) epochs of every width/length point, redo under-one-epoch
-      points at >=1 epoch, extend the L(C) map; (f) loader-control figure. Each result with a figure of the compared quantities.'
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
@@ -9411,11 +9407,6 @@ entries:
       if:
       - 'e+e--only share reproduces the EE4 gain: the gain is the e+e- default events themselves'
       - 'pp-only share also improves EE4: cross-beam transfer, then joint-variable coverage'
-    63:
-      feeds: Joaquin's 11-06 decisions on sampling, cache, sign head, e+e- mechanism and scaling
-      if:
-      - 'each part done: reported with its figure and dropped'
-      - 'a part blocked: the owner says why and what it tried'
     64:
       feeds: the compute scaling of the v4 catalog pretraining at >= 1 epoch
       if:
