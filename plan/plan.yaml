@@ -13321,10 +13321,10 @@ entries:
   - D282
   - D307
   - D313
-  next: 'Step 12 (D307, D308): the restart study on C1 (share 0.25, het, k=533): from the checkpoint rerun v4_het_control_ckpt[_seed2],
-    five restarts at seeds 42/43 (final model default restart = control; step-3198 default; step-3198 continued from its own
-    lr, no warmup; step-2132 continued; final model at 3x peak lr), read on the restart-jump gradient norm and PP4/EE4 against
-    the control and from-scratch B'
+  next: 'Step 12 (D307, D308): the restart study on C1 (share 0.25, het, k=533) from the checkpoint rerun v4_het_control_ckpt[_seed2]:
+    arms v4_het_ws_<final_default (control), step3198_default, step3198_continue, step2132_continue, final_lr3x>[_seed2] (worktree
+    wt-ws-restart @5761fe0b), 10 runs, read on the restart jump (largest grad norm over steps 0-19, worst training loss over
+    steps 0-39; ws_restart_steps.py) and PP4/EE4 R(arm/control) and R(arm/B)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -15841,3 +15841,9 @@ entries:
       Open ask on the entry (nothing waits): 4 more from-scratch seeds for the magnitude target (9.4 GPU-h), and the tuned
       growth at 1066/2132.'
     written: '2026-11-06T16:24:24+00:00'
+  step_why:
+    1:
+      feeds: how a warm start should leave its parent (the restart recipe for every later change, D307)
+      if:
+      - 'an arm BETTER than the default restart: it becomes the restart recipe, read against B for MATCH'
+      - 'no arm BETTER: the default restart stays; the valley reading is tested by whether the jump moved without the reads'
