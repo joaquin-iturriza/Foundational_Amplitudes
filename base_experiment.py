@@ -1026,6 +1026,10 @@ class BaseExperiment:
                 and self.is_main_process()):
             self.val_loss_step0 = self._validate_start()
 
+        n_fill = int(_ft.get("moment_fill_steps", 0) or 0) if _ft is not None else 0
+        if n_fill > 0 and not self.warm_start:
+            self._fill_optimizer_moments(iterator, n_fill)
+
         # --- evaluate at initialisation (step 0, before any gradient update) ---
         if self.is_main_process() and self.cfg.training.save_intermediate:
             self._evals(results, smallest_val_loss_step, step=0)
@@ -1578,6 +1582,43 @@ class BaseExperiment:
         tmp = os.path.join(str(self.cfg.run_dir), "train_steps.tmp.npz")
         np.savez(tmp, step=a[:, 0].astype(np.int64), grad_norm=a[:, 1], loss=a[:, 2], lr=a[:, 3])
         os.replace(tmp, os.path.join(str(self.cfg.run_dir), "train_steps.npz"))
+
+    def _fill_optimizer_moments(self, iterator, n):
+        """fine_tune.moment_fill_steps (D303): n batches through the optimizer with every param group's lr set to 0
+        (AdamW: p -= 0 * ..., decoupled decay p *= 1 - 0 * wd; Muon: the same), so AdamW's exp_avg / exp_avg_sq and
+        step count and Muon's momentum buffer hold this run's gradients before the first real update. The weights, the
+        EMA, the scheduler and the training step count are untouched; non-finite steps are skipped. Clipping as in
+        _step."""
+        groups = self.optimizer.param_groups
+        lrs = [g["lr"] for g in groups]
+        p0 = [p.detach().clone() for p in self.model.parameters()]
+        taken = 0
+        try:
+            for g in groups:
+                g["lr"] = 0.0
+            self.model.train()
+            for _ in range(n):
+                data = next(iterator)
+                if getattr(self, "_per_process_accum", False):
+                    self._per_process_step_grads(data)
+                else:
+                    loss, _, _ = self._batch_loss(data)
+                    self.optimizer.zero_grad()
+                    loss.backward()
+                gn = torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.cfg.training.clip_grad_norm,
+                                                    error_if_nonfinite=False)
+                if not torch.isfinite(gn):
+                    continue
+                self.optimizer.step()
+                taken += 1
+        finally:
+            for g, lr in zip(groups, lrs):
+                g["lr"] = lr
+            self.optimizer.zero_grad()
+        moved = max(float((p.detach() - q).abs().max()) for p, q in zip(self.model.parameters(), p0)) if p0 else 0.0
+        LOGGER.info(f"MOMENT_FILL {taken}/{n} optimizer steps at lr 0 before training (weights moved by at most "
+                    f"{moved:.3g})")
+        self.moment_fill = {"asked": n, "taken": taken, "max_weight_change": moved}
 
     def _step(self, data, step):
         # actual update step

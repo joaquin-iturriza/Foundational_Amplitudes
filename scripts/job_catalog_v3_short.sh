@@ -47,7 +47,7 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_signhead_matched_<event|const>[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
+ARM="${1:?baseline, baseline_sign_pairs, baseline_sign_pairs_bounded, baseline_sign_near, baseline_more_signed, baseline_seed2, baseline_more_signed_seed2, baseline_more_signed_seed2_steplog, baseline_more_signed_muon, dimensionless, dimensionless_shat, dimensionless_hybrid, dimensionless_blend050, dimensionless_blend025, dimensionless_context, dimensionless_twin, dimensionless_pp, dimensionless_muon, dimensionless_seed2, dimensionless_muon_seed2, muon_search_best_adamw, muon_search_best_muon, sign_search_best, dimensionless_muon_best_seed2, dimensionless_muon_best, v4_dimensionless_muon, v4_dimensionless_muon_seed2, v4_dimensionless_muon_pp, v4_dimensionless_muon_pp_seed2, v4_dimensionless_muon_default50[_seed2], v4_dimensionless_muon_default25[_seed2], v4_dimensionless_muon_more_signed, v4_dimensionless_muon_more_signed_seed2, v4_dimensionless_muon_more_signed_seed3, v4_dimensionless_muon_more_signed_seed4, v4_het_control[_seed2], v4_het_control_magnitude[_seed2|_seed3|_seed4], v4_het_control_signhead[_seed2|_seed3|_seed4], v4_het_signhead_matched_<event|const>[_seed2|_seed3|_seed4], v4_het_default50[_seed2], v4_het_default25[_seed2], v4_het_default25_eeonly[_seed2], v4_het_default25_pponly[_seed2], v4_het_warm25_k<533|1066|2132>[_seed2], v4_het_cont_k<533|1066|2132>[_seed2], v4_het_warm25t_k533[_seed2], v4_het_warm25f_k533[_seed2], v4_het_control_ckpt[_seed2], v4_het_warm25t_k533_from<2132|3198|final>[_seed2], v4_dimensionless_muon_seed3, v4_dimensionless_muon_seed4, sign_pair_best, sign_pair_best_seed2, sign_off_best or sign_off_best_seed2}"; MODE="${2:-}"
 SRC=runs/dancat_het_pre/trial_0058
 TRAIN="$PROJECT_DIR/recipes/catalog_v3_train.yaml"
 # the sign head for the signed one-loop pools; the diagram encoder's edge labels for the BSM layer's particles
@@ -58,7 +58,7 @@ DIM=(++data.target_physics_factor=true ++data.target_physics_dim_only=true ++dat
      ++data.shared_standardization=true ++data.affine_multiplicity_std=false)
 # the Muon search's best (sweep/sweep_config_ccin2p3_muon_test_search_muon.yaml, trial_1860; par:v3_muon, D155)
 MUON_BEST=(training.optimizer=MuonAdamW ++training.lr=0.004997423 ++training.muon_weight_decay=0.02171863)
-HET=; SIGNHEAD=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; WS_CKPT=model_run0_best; WS_PRE_SIGMA=; TRAIN_ONLY=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
+HET=; SIGNHEAD=; WS_PARENT=; K=; WS_LR_SCALE=; WS_LD=; WS_CKPT=model_run0_best; WS_PRE_SIGMA=; WS_FILL=; TRAIN_ONLY=; CAT=v3; CROSS=()   # HET: a het-loss arm (set by its case); the catalog whose held-out axes the arm reads; extra reads after them (XV3, XV4, PP: axis_recipe)
 case "$ARM" in
     baseline)              NORM=(++data.shared_standardization=true ++data.affine_multiplicity_std=false) ;;
     dimensionless)         NORM=("${DIM[@]}") ;;
@@ -295,6 +295,16 @@ PY
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true)
                             K=${ARM#v4_het_warm25_k}; K=${K%_seed2}; WS_PARENT="$PAR"
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_default25_train.yaml" ;;
+    # step 6 (D303): warm25 at K=533 with the optimizer's moments filled first: 100 batches at lr 0
+    # (fine_tune.moment_fill_steps, base_experiment._fill_optimizer_moments), then the same restarted schedule; the
+    # matched control is v4_het_warm25_k533[_seed2] rerun in the same batch at the same commit
+    v4_het_warm25f_k533|v4_het_warm25f_k533_seed2)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}"); CROSS=(PP4 EE4 HD4 HD5); HET=1
+                            PAR=v4_het_control; case "$ARM" in *_seed2) NORM+=(seed=43); PAR=v4_het_control_seed2 ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=false
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true)
+                            K=533; WS_PARENT="$PAR"; WS_FILL=100
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_default25_train.yaml" ;;
     # the tuned warm start (warm_start step 3, D284): warm25 at K=533 with the best trial of the DyHPO sweep
     # ws_c1_k533_hpo8 (sweep/sweep_config_ccin2p3_ws_c1_k533_hpo.yaml, hp_1860, val_loss_no_reg -2.75764), seed s
     # from the control at seed s
@@ -353,7 +363,8 @@ if [ -n "$WS_PARENT" ]; then
     [ -n "$WS_PRE_SIGMA" ] || [ -e "$PROJECT_DIR/runs/catalog_v4_short/$WS_PARENT/sigma_stage" ] || { echo "warm_start arm $ARM: $WS_PARENT has no sigma stage"; exit 1; }
     NORM+=(++fine_tune.pretrained_path="$WS_PT" ++fine_tune.lr_scale=${WS_LR_SCALE:-1.0} ++fine_tune.layer_decay=${WS_LD:-1.0}
            ++fine_tune.target_stats=parent ++fine_tune.offshell_stats=parent)
-    echo "WARM_START parent=$WS_PARENT pt=$WS_PT steps=$K recipe=$(basename "$TRAIN") lr_scale=${WS_LR_SCALE:-1.0} layer_decay=${WS_LD:-1.0}"
+    [ -n "$WS_FILL" ] && NORM+=(++fine_tune.moment_fill_steps=$WS_FILL)
+    echo "WARM_START parent=$WS_PARENT pt=$WS_PT steps=$K recipe=$(basename "$TRAIN") lr_scale=${WS_LR_SCALE:-1.0} layer_decay=${WS_LD:-1.0} moment_fill=${WS_FILL:-0}"
 fi
 OUT="$PROJECT_DIR/${OUT_FIXED:-runs/catalog_${CAT}_short/$ARM}"; PRED="$SCRATCH/zz_${CAT}_short_$ARM"
 [ -n "$SIGMA_FROM" ] && PRED="$SCRATCH/zz_v4_long_best_${LONG_BEST//\//_}"
@@ -392,14 +403,15 @@ if [ -n "$SHORT_RERUN" ]; then
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "SHORT_RERUN only on v4_het_default25[_seed2]"; exit 1 ;; esac
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_rerun"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_rerun"
 fi
-# SHORT_TAG=<tag> (catalog_coverage step 62, the beam ablation; step 61, the same-commit rerun of the step-56 sign-head arm): the het share arms (control, default25 and its
+# SHORT_TAG=<tag> (catalog_coverage step 62, the beam ablation; step 61, the same-commit rerun of the step-56 sign-head arm;
+# warm_start step 6, D303: the default-restart k=533 warm start rerun beside the moment-fill arm): the het share arms (control, default25 and its
 # eeonly/pponly beam arms) unchanged, in their own run dir <arm>_tag<tag>; the fixed "_tag" marker is in no arm name nor
 # in the SHORT_MEMMAP/SHORT_RERUN dirs, so a tag can never resolve to another run's dir
 if [ -n "$SHORT_TAG" ]; then
     [ -n "$SHORT_MEMMAP$SHORT_RERUN$LONG_HEADS$LONG_FACTOR$LONG_LR" ] && { echo "SHORT_TAG excludes SHORT_MEMMAP, SHORT_RERUN and LONG_*"; exit 1; }
     case "$SHORT_TAG" in *[!a-z0-9]*|"") echo "SHORT_TAG: lower-case letters and digits only"; exit 1 ;; esac
-    case "$ARM" in v4_het_control_signhead|v4_het_control_signhead_seed2|v4_het_control_signhead_seed3|v4_het_control_signhead_seed4|v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2) ;;
-        *) echo "SHORT_TAG only on the het control, its sign-head arm and the default25 share arms"; exit 1 ;; esac
+    case "$ARM" in v4_het_control_signhead|v4_het_control_signhead_seed2|v4_het_control_signhead_seed3|v4_het_control_signhead_seed4|v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2|v4_het_warm25_k533|v4_het_warm25_k533_seed2) ;;
+        *) echo "SHORT_TAG only on the het control, its sign-head arm, the default25 share arms and the k=533 warm start"; exit 1 ;; esac
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_tag${SHORT_TAG}"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_tag${SHORT_TAG}"
 fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and

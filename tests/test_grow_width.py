@@ -103,11 +103,13 @@ def test_sigma_stage_does_not_grow():
                             "model": {"net": {"num_heads": 16}},
                             "fine_tune": {"pretrained_path": "/p/models/model_run0_best.pt.gz", "grow_width": True,
                                           "lr_scale": 1.0, "layer_decay": 1.0, "freeze_blocks": [],
-                                          "reset_output_head": False},
-                            "training": {"loss": "HETEROSC", "heterosc_sigma_stage_steps": 250},
+                                          "reset_output_head": False, "moment_fill_steps": 100},
+                            "training": {"loss": "HETEROSC", "heterosc_sigma_stage_steps": 250,
+                                         "scheduler": "CosineAnnealingLR"},
                             "evaluation": {}, "plotting": {}})
     s = sigma_stage_cfg(cfg)
     assert s.fine_tune.grow_width is False
+    assert s.fine_tune.moment_fill_steps == 0          # the stage fills no moments (D303)
     assert s.fine_tune.pretrained_path == "/tmp/x/models/model_run0_best.pt"
 
 
