@@ -14528,6 +14528,70 @@ entries:
       on unchanged pools. Disk: df today 93G free on /sps/lpnhe, against 54 x 0.85 = 46 GB. Losses are each change''s pair;
       target dimensionless. Searched: warm50, warmmag, warmpp, warmsx, mse_cont, step 7, C2-C8 in results.tex (no earlier
       runs of these arms); warm, restart, recipe, D282-D303 in site decisions; the entry''s findings.'
+  - at: '2026-11-06T10:08:44+00:00'
+    question: 'D282, D283, D300, step 7: the superset design passed 2026-11-04T21:51, restated for submission now that the
+      restart recipe is settled. For each other change that allows a warm start, does warm-starting the pretrained model without
+      the change and retraining it k steps (k in 533, 1066, 2132 of the 4264-step pretraining) with the change reach the change''s
+      existing from-scratch run, and at what k/4264? Changes run: C2 default-sampled share 0.50, het (arm v4_het_warm50_k<K>[_seed2]);
+      C3 share 0.25, MSE (v4_mse_warm25_k<K>[_seed2]); C4 share 0.50, MSE (v4_mse_warm50_k<K>[_seed2]); C5 the pp-mixed training
+      set, MSE (v4_mse_warmpp_k<K>[_seed2]); C6 the one-loop sign extension, MSE (v4_mse_warmsx_k<K>[_seed2|3|4]); C8 the
+      signed one-loop pools'' target signedlog -> magnitude, het (v4_het_warmmag_k<K>[_seed2]); MSE matched control C_k (v4_mse_cont_k<K>[_seed2|3|4]).
+      C7 (MSE -> het) dropped by its own gate (magnitude het over the MSE control showed no gain); C8''s gate passed (magnitude
+      het over het control HD5 B/A 0.097). C1 (share 0.25 het) and its het C_k (v4_het_cont_k*) already ran (12 runs): YES
+      at k=1066 (par:v4_warm_start, mixture_ab.py warm C1 @f0015680: R(W_k/B) PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01 at k
+      533/1066/2132; SHORT only at 533, equal to scratch only at 2132).'
+    prior: 'The 21:51 design''s prior (add-W continual pretraining, each change''s from-scratch reference: C2 PP4 0.505 EE4
+      0.220; C3 0.755/0.413; C4 0.682/0.401; C5 PP4 trained classes 0.388; C6 wrong-sign median 6.69% -> 2.91%, p=0.001; C8
+      magnitude het HD5 0.097). Since then on C1 (par:v4_warm_start, par:v4_warm_start_restart, par:v4_warm_start_repairs
+      in docs/results.tex): the untuned restart gives YES at k=1066 (R(W_k/B) PP4 1.33/1.15/0.95, EE4 1.51/1.23/1.01 at k
+      533/1066/2132, warm_start_C1.json @f0015680: SHORT at 533, MATCH by the 1.35 bound at 1066, equal at 2132); at k=533
+      (D284''s 1/8) the restart variants read R(W/B) PP4 1.32-1.42, EE4 1.50-1.58, and four repairs of the restart left the
+      reads unchanged or worse: NLL-tuned low lr (worse, R 1.19/1.40), moment fill (R 1.005/1.016), mean-MSE-tuned (R 1.054/1.005),
+      Muon damped first 168 steps (R 1.032/1.045, @c14a07b0, NOT MUON m -0.148/-0.059). By the step 6 and step 8 outcome maps
+      the untuned default restart stays the recipe for C2-C8. Searched results.tex, plan, site decisions for warm start, restart,
+      recipe, C2-C8: nothing newer.)'
+    measure: 'As the 21:51 design: per change the from-scratch study''s reads on W_k, C_k, B, A: zero-shot MSE of log|M|^2
+      per probe of each run''s final model (het: best checkpoint then the sigma stage, D276; MSE: best checkpoint), R as in
+      mixture_ab.py (seeds'' geometric mean, class geometric mean, median over classes, 95% class bootstrap widened by |ln
+      R_seed|). Reads: C2-C4 PP4, EE4, held-out default-sampled pooled, held-out catalog-sampled pooled; C5 PP4 trained classes
+      and others apart; C6 the 21 held-out sign-changing one-loop pools'' wrong-sign share (signext_compare.py warm) and MSE
+      on H1-H3; C8 HD5 and H5. Per k: R(W_k/B), R(W_k/C_k), R(W_k/A), g_k = ln R(W_k/A)/ln R(B/A). Code: mixture_ab.py warm
+      C2 C3 C4 C5 C8, signext_compare.py warm (trunk d5616629, repo-reviewer PASS on 42c4aeab), the parent_shared equivalence
+      check analysis/catalog_v4/ws_stats_check.py.'
+    check: 'Each change moved its own reads from scratch beyond the seed spread (21:51 check, re-run at d5616629 by mixture_ab.py
+      warm: B/A C2 PP4 0.505 EE4 0.220, C3 0.755/0.413, C4 0.682/0.401, C8 HD5 0.097; C5 trained 0.388 [0.338, 0.446]; C6
+      p=0.001). The warm-start reads move with the restart: on C1, k 533 -> 2132 and recipe changes moved R(W/default) by
+      1.19/1.40 (NLL-tuned). ws_stats_check.py tested on CC: het cont vs parent 1153/1153 ok, warm25 241/241 ok, magnitude/pp/more_signed
+      from scratch mismatched as expected.'
+    fixed: 'Everything of each change''s parent and from-scratch runs (scripts/job_catalog_v3_short.sh @d5616629): width 8,
+      MuonAdamW at the Muon search best (lr 4.997e-3, warmup 0.158), cosine, batch 16384, dimensionless target, diagram encoder,
+      1e4 train / 200 val per pool in memory, each loss as its pair. Warm start: the parent''s final model (het: after its
+      sigma stage at the run''s seed; MSE: v4_dimensionless_muon[_seed2|3|4] best checkpoint), lr_scale 1, layer_decay 1,
+      no frozen blocks, the parent''s schedule restarted over k with a fresh optimizer: the untuned default restart (no moment
+      fill, muon_warmup_steps 0, no tuned HPs), the recipe steps 6 and 8 kept. target_stats parent for C2-C4 and the C_k;
+      parent_shared for C5, C6, C8, gated by ws_stats_check.py on each started W run (about 15 min in; a mismatch cancels
+      that W run, its C_k rerun with parent_shared would need a new arm and review). Time limits from tools/short_wall.py
+      (margin 1.25 incl.): het warm50 02:30/02:30/03:00, het warmmag 02:15/02:30/02:45, MSE cont, pp and signext 01:00/01:15/01:30
+      (signext read on CC today: 0.92/1.11/1.48 h), MSE warm25/50 01:00/01:15/01:45 at k 533/1066/2132; --mem=16G. Disk about
+      0.85 GB per job x 54 = 46 GB against 93 GB free on /sps/lpnhe (df, 2026-11-06 11:2x).'
+    control: 'C_k: the same warm start of the same parent, same k and schedule, on the parent''s own setup: het C_k the C1
+      runs v4_het_cont_k<K>[_seed2] (already run) for C2 and C8; MSE C_k v4_mse_cont_k<K>[_seed2|3|4] (new, seeds 42-45) for
+      C3-C6. B: each change''s from-scratch pair (C2 v4_het_default50 pair, C3/C4 the MSE share pairs, C5 the pp bound arm
+      afc96598/d26f13aa, C6 v4_dimensionless_muon_more_signed seeds 42-45, C8 v4_het_control_magnitude 5abe4a0e/92207f6a);
+      A: the parent.'
+    seeds: 'As each from-scratch study: 42 and 43; C6 and the MSE C_k 42-45. W_k and C_k at seed s start from the parent at
+      seed s. Runs: C2 6, C8 6, MSE C_k 12, C3 6, C4 6, C5 6, C6 12 = 54 (the 21:51 seeds line, C7 dropped). GPU-h at the
+      short_wall times: 15.0 + 14.6 + 14.0 + 7.4 + 7.4 + 7.0 + 14.0 = 79.6, covered by D300 (approved at 79.8). One wave on
+      CC-IN2P3 (the only site with the parents and pools); batch target ws_step7_changes 2.25 h recorded.'
+    outcome: 'As the 21:51 design. Per change and k on its deciding reads (C2-C4 PP4 and EE4; C5 PP4 trained classes; C8 HD5):
+      MATCH when the widened upper end of R(W_k/B) <= 1.35 on each; SHORT when the widened lower end > 1 on any; INCONCLUSIVE
+      otherwise (with g_k). C6: ratio of medians of the wrong-sign share W_k/B with a 95% pool bootstrap widened by B''s seed
+      spread, MATCH <= 1.35 upper, SHORT lower > 1. Change carried: R(W_k/C_k) <= 0.90 with the widened interval below 1 (C6:
+      sign test against C_k). YES: the smallest k with MATCH and carried, as k/4264. NO: no k up to 2132 matches, reported
+      as NO at the untuned restart with g_k (C1, the earlier result each is set against, is YES at k=1066); the restart-cause
+      and tuning work of step 6 goes on, and its recipe, if one beats the default, is re-applied to the changes that read
+      NO. Across changes: data changes (C2-C6) against the target change (C8) by g_k at equal k. A blow-up listed apart with
+      where.'
   step_why:
     6:
       feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
