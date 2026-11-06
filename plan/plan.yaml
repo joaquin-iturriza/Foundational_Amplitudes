@@ -10210,6 +10210,81 @@ entries:
       in shortfall (step 67 reads); toy numbers reproduced (quota 12: 0.8885, quota 50: 0.950, chains 12: 0.9375, 24000 labels);
       held-out events are pp default-sampled (val + dsh) as D294 asks; D317''s <= 2x is the cost measure; no training, loss,
       HPO or GPU disk question.'
+  - at: '2026-11-06T23:16:07+00:00'
+    question: 'Revised after the design reviewer''s and repo-reviewer''s FIX (2026-11-07 00:05). Joaquin refused the quota
+      sampler''s ~100x generation time (D317, 2026-11-06 22:31: ''this is not acceptable, 100 times more generation time?
+      ... I refuse to believe there isn''t a way to sample the regions we care about''); the <= 2x bound is CLAUDE.md''s margin
+      rule on a new method''s cost over the one it replaces. Can the flat-in-log|M|^2 part of the hadronic catalog pools fill
+      the class''s pp range (D294) at <= 2x the old catalog_v4 generation cost, with kept events as spread within each bin
+      as independent draws? Tested: the flat part from Wang-Landau Markov chains (mg5_pipeline_final._flat_mcmc_part, sampling.flat_mcmc,
+      branch flat-mcmc d7e1bd5c): pair rotations in the pair rest frame, bin-only weight 1/g learned by Wang-Landau, now collected
+      every 2 steps only from chains that moved (no near-copies), rotation scale >= 0.3 rad, 0.2 chains per flat event, at
+      most 12 labels per flat event (0.65 + 0.35 x 12 = 4.85 labels per pool event against the old 2.75: 1.76x). Beside it,
+      the quota sampler at the same 12 labels, the matched-cost control. Feeds step 65''s regeneration design (and step 68''s
+      e+e- classes).'
+    prior: 'Step 57-67 checks (data/multichannel_check_reads; frontier 2026-11-07, sampling_frontier.py @e3c1a514): old sampling
+      fills 19-48% of in-range bins to >= 0.95; the quota sampler with both ladders (quota_ladder_both_res2) at budget 50:
+      92-100% of bins, shortfall 0.2-4%, cost 2.4/5.3/9.7/13.9/9.1x; at 750: 98-100% at 14-158x. Union with default MadEvent
+      events and the propagator pre-screen measured and set aside (0-5 default events in the top bins vs quota ~700; surrogate
+      spread 0.65-1.44 dex). results.tex ''Coverage vs. emphasis, and the general default sampling'' (divergence study, ~l.10230-10250)
+      names adaptive importance sampling (VEGAS/foam) guided by |M|^2 as the way to flat in log|M|^2: not tried first because
+      VEGAS adapts a grid to a single target density (here 1/(local bin density), which changes as bins fill) and needs one
+      grid per channel, while the chains need no grid and the quota sampler''s rounds are already a crude adaptive importance
+      sampler (its sqrt(s) and channel shares re-weighted by bin deficit); the NO branch goes to it. Toy (tests/test_flat_mcmc.py,
+      the reviewers'' near-copy finding): the first version''s 0.938 fill at 12 labels had 38% of kept events with a near-copy
+      (69% in the upper 40% of bins); collected honestly (thin 2, dmin 0.3, 0.2 chains) the chains fill 0.906 against the
+      quota sampler''s 0.888 at the same 12 labels (0.950 at 50), near-copies 0.2% (quota 0%), NN-distance ratio against the
+      quota sampler at budget 50 at equal count: median 0.95, q10 0.27 over bins (the toy fails the q10 rule below). No earlier
+      Markov sampler in results.tex, the plan or decisions.'
+    measure: 'Per class, seed and policy (multichannel_check.py step69 @d7e1bd5c over the jobs'' reads): fill per 0.25-dex
+      quota bin = sum over chunks of min(kept, quota) / sum of quota, in range when the bin''s lower edge <= the class''s
+      pp in-support max (tools/flat_range.py, as step 67); whether every in-range bin is >= 0.95, the share that is, the short
+      bins'' edges; held-out in-support pp events (probe val + dsh pools) outside the kept range; cost = the policy''s train-pool
+      replay seconds over the old generation-log train seconds (data/sampling_cost.json) and over the old sampling''s replay
+      in the same job; labels made per flat event; chain steps, accepted and collected states. Diversity of the kept flat
+      events (flat_diversity.py, computed in the job on the kept momenta; features = logs of s_ij/s over final pairs, |t_{1i}|/s
+      over finals, sqrt(s)): per in-range bin the near-duplicate share (another kept event of the bin within 0.01 in every
+      log-invariant), the median nearest-neighbour distance, distinct sources (a chain counts once) and the largest one-source
+      share; against the quota sampler at budget 50 in the same job and seed (independent draws), per bin at equal count,
+      the NN-median ratio and descriptive KS statistics of sqrt(s), min pair mass/sqrt(s), max|eta|.'
+    check: 'The measure moves with the change on existing data: on the toy (tests/test_flat_mcmc.py @d7e1bd5c, flat_diversity.py)
+      the near-duplicate share is 0.176 (all bins; 0.334 in the upper 40%) for the first version''s collection (thin 1, dmin
+      1e-4) and 0.002 for the revised one, 0 for the quota sampler; the NN ratio median 0.53 / q10 0.01 for the first version
+      against 0.95 / 0.27 revised; fill 0.938 vs 0.906 (copies counted as fill before). On real data the read (step69) reproduces
+      step 67''s numbers when fed step 67''s quota_ladder_both_res2 reads (smoke run: uu_bbxuu seed 42 short bins at 4.207
+      and 4.454, held-out outside 1, cost 9.7x, as step 67). The pair move keeps every mass, the pair mass, the other finals
+      and the total momentum (test_pair_move_invariants).'
+    fixed: 'The five step-57 pp classes (v4_uux_epemg, v4_uux_epemvevex, v4_uu_bbxuu, v4_us_ddxsu, v4_udx_csxvevex) with their
+      PP4 probes, each class''s catalog_v4 train entry and chunk plan (36 chunks, 1e5 events, flat share 0.35, oversample
+      6, fwd_cand 1/3, f_fwd 0.15), range table recipes/catalog_v4_flat_range.json, 0.25-dex bins, the first round''s channels
+      as quota_ladder_both_res2 (rambo, splitter, res, res2, isc, both ladders), flat_budget 12 for both tested policies,
+      chain constants 0.2 chains per flat event, Wang-Landau increment 0.1, rotation scale >= 0.3 rad, collection every 2
+      steps (in the recipe id via sampling_policy); code trunk after merging flat-mcmc d7e1bd5c (repo-reviewer), synced to
+      CC; scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+mcmc_both_res2_budget12,
+      CC htc CPU, 1 core, 8G; limits from multichannel_check.py need plus 10 min for the backend set-up and the diversity
+      read: uux_epemg 00:20, uux_epemvevex 00:30, uu_bbxuu 01:10, us_ddxsu 01:00, udx_csxvevex 00:30; wall target 0.6 h (the
+      slowest class''s need, upper side).'
+    control: 'In each job, same seed, node and commit: the old sampling (current) for the same-job cost; the quota sampler
+      at the same 12 labels per flat event (quota_ladder_both_res2_budget12), the matched-cost control for fill; the quota
+      sampler at budget 50 (quota_ladder_both_res2), independent draws, the reference of the diversity read and a reproduction
+      of step 67''s numbers on the same seeds; step 67''s budget-750 held-out counts as the held-out bar.'
+    seeds: 42 and 43 on every class (10 jobs), as steps 57-67 on these classes; step 67 measured the fill spread between these
+      seeds at ~0.001-0.002 in shortfall.
+    outcome: 'Read by multichannel_check.py step69 (rules in its docstring, thresholds fixed now). YES: on every class and
+      both seeds the chains fill every in-range bin >= 0.95 (no bin excused: the top QCD bins near the pp max are the question),
+      held-out outside kept <= step 67''s budget-750 count (1 on bbxuu/ddxsu/csxvevex, 0 elsewhere), cost over the old generation-log
+      time <= 2.0, and diversity holds: near-duplicate share <= the budget-50 reference''s + 0.02 over in-range bins and <=
+      0.05 in each of the top 40% of in-range bins, NN ratio against the reference at equal count median >= 0.8 and q10 >=
+      0.5 -> the chains go into step 65''s regeneration design with the per-class cost. QUOTA12: the quota sampler at 12 alone
+      meets the fill, held-out and cost rules -> no chains, step 65 uses it. NO: the chains'' diversity fails on a class,
+      or their share of in-range bins >= 0.95 is not above the quota sampler''s at 12 on the four 2->4 classes on both seeds
+      -> Markov chains recorded as a dead end with the numbers; next the importance-weighted alternative (VEGAS-like grid
+      on 1/(bin density), the prior''s named method). COST: fill and diversity as YES but cost > 2 on a class -> the chains''
+      overhead (Python per step, small label batches), not their labels; fixed and re-run on those classes. PARTIAL: diversity
+      holds, the chains'' share above the quota sampler''s at 12, but a bin short or cost > 2 with the fill short -> where
+      read of the short bins (multichannel_check.py where), one revision inside 12 labels (chains, increment, a sqrt(s) move),
+      re-run on the short classes. The KS statistics are descriptive (the two samplers'' within-bin laws differ by construction;
+      D294 sets no within-bin law). 10 CPU jobs, <= 0.6 h each, ~6 core-h, no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
