@@ -9369,6 +9369,21 @@ entries:
       the bins still short, one more re-check. NO with the shortfall unchanged: the channels miss the region; read the kept
       per-channel counts and the where reads of the remaining short bins and revise the channel. Cost: 10 CPU jobs, 1 core,
       <= 20 min each, limit 00:40; no GPU.'
+    passed_at: '2026-11-06T05:45:19+00:00'
+    reviewer: 'Step-58 re-check (quota vs quota + ladder + joint-resonance channels, 5 classes x seeds 42/43, CPU only). Control
+      = quota policy at the same commit, class, seed, job and node; policies differ only in sampling.mc_mperi/mc_res2 (multichannel_check.py
+      diff @3f0e6980; channel shares re-split uniformly over the larger channel list, inherent to adding channels). Check
+      2: multichannel_check.json read: held-out in-support outside kept moves with the proposal, uu_bbxuu 5033/1084 (multichannel)
+      -> 1176/1049 (quota), us_ddxsu 5773/2164 -> 401/418; new channels'' reach reproduced in .venv-cpu at 3f0e6980 (ladder
+      at sqrt(s)=1500: max|eta| 3.71/4.26/4.82, min pT 10.2/12.9/20.2 GeV vs unreached pp 4.2/4.6/4.9 and 10.2/11.0/13.3;
+      joint-resonance both pairs within 5 widths 0.58). Check 3: seed spread of quota shortfall share <= 0.01 (0.255/0.246,
+      0.327/0.333, 0.383/0.383, 0.237/0.240), held-out counts 1176/1049, 401/418, against a YES at 0 (3/N 5.6e-5); two seeds
+      enough. Outcome YES/NO-reduced/NO-unchanged stated with actions. Test events: held-out pp 13 TeV MadEvent (probe val
+      + dsh_), as D269 asks. Searched results.tex for multiperipheral, ladder, joint/double/doubly resonan, multichannel,
+      quota, flat_range, mperi, res2, breit, forward component: none on these channels (results.tex:298 and :9540 are the
+      older process-agnostic sampling notes); plan entry evidence and decisions D269/D270/D294/D295: no prior run. Training-loss,
+      HPO, preprocessing and disk checks not applicable (CPU sampling check, temp outputs). Note for the report: D294 asks
+      for ''a not complicated way''; two more channels is the passed design''s NO branch, say so to Joaquin.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
