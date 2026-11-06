@@ -11220,6 +11220,29 @@ entries:
       points redone at 1.27 epochs: 6 jobs, 39.0 GPU-h; 4x 61.8, 8x 126.2, 16x 222.2); limits from short_wall --width up to
       84 h, CC gpu QoS MaxWall 168 h. Above the 30 GPU-h line with no decision giving a cost (D292/D293 approve the work,
       not the cost): sent to the main session with the estimate before any design is recorded.'
+  - at: '2026-11-06T05:38:06+00:00'
+    text: '2026-11-06 (a) step 58 quota check read (multichannel_check.py pull multichannel+quota + summary @075c4501, data/multichannel_check.json;
+      where reads @f1b7ab62 data/quota_where/; figure analysis/catalog_v4/figs/flat_quota_a..e.png, fig_flat_quota.py @075c4501):
+      outcome NO on 4 of 5 classes. YES only on uux_epemg (0 held-out in-support pp events outside the kept range of 54001
+      on both seeds, upper 5.6e-5; 0 shortfall; 0 budget stops; 15 candidates per kept flat event, min/plateau 0.95-0.96 vs
+      multichannel 0.60). The other four: every chunk (36/36, both seeds) stopped at FLAT_BUDGET=50 candidates per flat event
+      with the top of the range short; quota shortfall 24% (uux_epemvevex), 25% (udx_csxvevex), 33% (us_ddxsu), 38% (uu_bbxuu)
+      of the flat part, water-filled into the lower bins (fill 1.3-1.7x quota there). Fill per bin (seed 42): QCD 2->4 uu_bbxuu
+      1.0 at log10|M|^2 -0.2, 0.14 at 1.0, 0 above 2.5 (range top 5.2, kept max 2.97); us_ddxsu 0 above 2.9 (range top 5.1,
+      kept max 3.27); EW uux_epemvevex 0.97 at -3.9 falling to 0.01 at the range top -0.2 (kept reaches the top); udx_csxvevex
+      0.92 at -3.0, 0 above 0.2. Held-out in-support pp outside the kept range (seed 42/43; multichannel in brackets): uu_bbxuu
+      1176/1049 of 53345 (5033/1084), us_ddxsu 401/418 of 53857 (5773/2164), udx_csxvevex 1/2 of 54001 (22/1, below the min),
+      uux_epemvevex 0/0 (10/0). Held-out above-max share equals the table pools'' (uu_bbxuu 0.0220 vs 0.0224), so the gap
+      is sampling, not the v3/v4 physics difference. Where the unreached events sit (held-out in-support, 10/50/90% quantiles,
+      partonic frame): QCD 2->4 above the kept max: sqrt(s_hat)/lo 23/36/56 (below: 3.8/12/36), max|eta| 4.2/4.6/4.9 (1.8/3.2/4.3),
+      min pT 10.2/11.0/13.3 GeV (10.3/12.4/19.3), min pair mass/sqrt(s_hat) 0.004/0.009/0.024 (0.016/0.055/0.15): high-energy
+      forward multiperipheral events at the pT cut, which no channel proposes (the forward component turns one final only).
+      EW top bins (uux_epemvevex above -3.4, udx_csxvevex above -2.8): pairs of finals within 5 GeV of m_Z or m_W 2/2/3 (below
+      1/2/3), sqrt(s_hat) higher (17-27x lo vs 11-14x): doubly resonant events, while multichannel has one Breit-Wigner channel
+      per propagator. Time: quota chunks 5-7x multichannel''s on the same node (uu_bbxuu 352 s vs 70 s, us_ddxsu 331 vs 48,
+      udx_csxvevex 189 vs 29). Next (design''s NO branch: fix the proposal where they sit): a multiperipheral forward channel
+      for hadronic classes (all finals'' rapidities spread to the |eta|<5 edge, pT near the cut, high sqrt(s_hat)) and a joint-resonance
+      channel (all compatible s-channel propagators of a diagram on shell together); then re-run the same 10-job check.'
   handoff:
     state: '2026-11-06 ~06:25. Reopened by D290-D296. (b) memmap keyed-draw cache merged d18e44f1 (repo-reviewer PASS; tests:
       memmap==in-memory bitwise for seeds 42/43 from one cache, also on CC real arm); left in step 37: chain the CPU prebuild
