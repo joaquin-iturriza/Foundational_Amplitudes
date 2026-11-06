@@ -13315,10 +13315,9 @@ entries:
   decisions:
   - D282
   next:
-    11: 'Step 13 (on Joaquin''s answer): more from-scratch seeds of v4_het_control_magnitude (seeds 44-47 = 9.4 GPU-h, or
-      44-45 = 4.7) to decide the one-loop magnitude-target change at k=533, under a new design line on how n seeds widen the
-      interval; else close the entry with the write-ups as they stand (steps 9 and 11 written up: par:v4_warm_start_changes,
-      par:v4_warm_start_grow_tuned)'
+    11: 'On Joaquin''s answer: more from-scratch seeds of v4_het_control_magnitude (seeds 44-47 = 9.4 GPU-h, or 44-45 = 4.7)
+      to decide the one-loop magnitude-target change at k=533, under a new design line on how n seeds widen the interval;
+      else close the entry with the write-ups as they stand (par:v4_warm_start_changes, par:v4_warm_start_grow_tuned)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
