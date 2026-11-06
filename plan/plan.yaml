@@ -8982,6 +8982,53 @@ entries:
       in memory. Searched results.tex, the entry, site decisions for sign_loss_weight, sign weight, sign_het_match, matched_event/const,
       het sign, sign head, gradient share: no het sign-weight run exists; the MSE sign-head search varied the pair head and
       near-zero weighting only.'
+  - at: '2026-11-06T05:04:30+00:00'
+    question: 'Step 61 (c), D287/D296: is the het sign head''s worse wrong-sign share (2.0x the MSE control on the signed
+      training pools, 1.99x on H5, 1.41x on HD5) caused by the sign loss''s ~75x smaller share of the shared network''s gradient
+      under het, and does matching that share make the het sign no worse than the MSE control''s without hurting the het magnitude?'
+    prior: 'Step 56 (het_signhead.json @6ec06b24): het + sign head at sign_loss_weight 1 (FA-ccin2p3-18b98b55/b2538139/66c83df6/69001455)
+      worse than the MSE control on H5 17/21 pools (p 0.0036), HD5 15/19 (p 0.0096); magnitude on H5/HD5 UNRESOLVED (pairing
+      gate failed: first-pair paired ln sd 0.58 HD5, 0.46 H5 vs bounds 0.43/0.40; unpaired widened R 1.03 [0.67,1.42] HD5,
+      [0.64,1.56] H5); paired side reads resolved at 4 seeds: PP4 1.00, EE4 0.95 [0.92,0.98], HD4 0.97, H1-H7c 0.97-1.04.
+      Step 47: het magnitude target YES. het_sign_diag.json @999e9742 (het_sign_diag.py @31a10318): het pre-clip median gradient
+      norm 24-28 vs MSE 0.315-0.369, per-seed ratios 84.4/75.4/76.7/65.0 (geometric mean 75.1); clip binds on ~99% of het
+      steps vs ~6% of MSE steps; adding the sign head leaves the het norm unchanged; wrong-sign het/MSE: training median 1.0%
+      vs 0.5%, H5 13.3% vs 6.7%, HD5 18.3% vs 13.0%. The sign-head searches (sign_near, pair head) were all under MSE. Searched
+      results.tex (sign head, het sign, sign_loss_weight, sign_het_match, gradient share), plan, site decisions: no het sign-weight
+      run exists.'
+    measure: 'Sign (gating): step 56''s reads unchanged (het_oneloop.py signhead): per pool the seed-mean wrong-sign share
+      on H5 (21 pools) and HD5 (19 classes), paired sign tests against the MSE control, the step-56 arm and all-positive;
+      per-validation sign accuracy on the 63 signed training pools. Magnitude (gating): R against the het magnitude reference
+      (5abe4a0e/92207f6a/0208896e/8ddc490b), seed-paired, on the reads four seeds resolved in step 56: PP4, EE4, HD4 and H1-H7c
+      (the magnitude of log|M|^2 on trained and default-sampled held-out tree pools, where the shared network''s magnitude
+      lives; a sign weight that hurt the trunk shows there). Magnitude on H5/HD5 reported with its interval, not gating (step
+      56 showed four seeds do not resolve it: widened [0.64,1.56]; resolving 1.25 there needs ~(ln1.56/ln1.25)^2 = 4x the
+      seeds, ~16 per arm, ~75 GPU-h). Pre-clip gradient norm from the log.'
+    check: 'On existing data the sign error moves with the sign loss''s gradient share: the MSE control (75x larger share)
+      has 2.0x / 1.99x / 1.41x fewer wrong signs on training / H5 / HD5 than the het arm at weight 1, and four seeds resolved
+      that gap (p 0.0036, 0.0096). This compares two losses, so it shows the measure sees the effect, not the cause; the arms
+      test the cause. The gating magnitude reads resolved at four seeds in step 56 (EE4 [0.92,0.98]).'
+    fixed: 'Everything of v4_het_control_signhead: width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, no pair head, reads PP4/EE4/HD4/HD5 + H1-H7c; scripts/job_catalog_v3_short.sh
+      at trunk 897318b6 or later; gpu_v100 (step 56''s GPU type). Arms: v4_het_signhead_matched_event (training.sign_het_match:
+      each event''s sign cross-entropy times the het NLL''s detached factor sigma^(2 beta)/(2 sigma^2), weight 1) and v4_het_signhead_matched_const
+      (sign_loss_weight 75, the measured ratio, one value from a measured rule, not a search). Attachment point not tested
+      now: the diagnosis says the trunk gets ~1/75 of the sign gradient wherever the head is attached, so moving the head
+      does not change that share; it is the next candidate if the answer is NO or PARTIAL.'
+    control: The MSE control's sign reads (v4_dimensionless_muon seeds 42-45, HD5 rereads dc9feba1/af09cad3/8833a131/481ad196);
+      the step-56 arm at weight 1 (same seeds); the het magnitude reference for magnitude.
+    seeds: '42-45 for both arms (8 jobs), as step 56: four seeds resolved both the sign gap and the gating magnitude reads
+      there.'
+    outcome: 'Per arm: YES if sign not worse than the MSE control on H5 and HD5 (one-sided paired sign test p > 0.05 and median
+      wrong-sign within 1.2x of the control''s), better than the step-56 arm on H5 (p < 0.05), and gating magnitude R paired
+      upper bound <= 1.10 on PP4, EE4, HD4 and the H1-H7c median -> adopt that arm as the het sign head, write up, H5/HD5
+      magnitude reported as unresolved with its interval. SIGN YES, MAGNITUDE HURT: sign criteria met but a gating magnitude
+      read > 1.10 -> the matched weight trades magnitude for sign; report both, next the attachment point (sign head off a
+      detached copy of the last block) to separate them. PARTIAL if better than step 56 but still worse than MSE -> gradient
+      share is part of the cause; next the attachment point and the clipping regime (99% of het steps clipped). NO if neither
+      arm beats step 56 -> gradient share ruled out; next the attachment point, then the clipping regime. Blow-ups listed
+      apart. Cost: 8 jobs x 1 V100, step 56 measured 2.32-2.34 h per job (0.928 s/step), limit 03:00 (tools/short_wall.py),
+      18.7 GPU-h work / 24 at the limits; in memory, no cache.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
