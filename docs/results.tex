@@ -3241,7 +3241,7 @@ as the width-$8$ parent it grew from, $R(W/A)$ PP4 $0.999$, EE4 $1.000$, and is 
 as the default growth, $R(W/B)$ PP4 $1.77$ ($[1.45, 2.15]$), EE4 $1.79$ ($[1.52, 2.01]$), SHORT. It is better than
 the mean-MSE-tuned growth ($R$ PP4 $0.951$, $[0.913, 0.992]$). The sweep's low learning rate leaves the grown model
 almost where it started: the validation loss shows no early jump and stays near the parent's value
-(fig.~\ref{fig:ws_c10wz}). It is the gain on the selection set HD4 that does not carry to PP4 and EE4. So the growth
+(fig.~\ref{fig:ws_c10wz}). The gain on the selection set HD4 does not carry to PP4 and EE4. So the growth
 stays at its default restart, and tuning it on a read-tracking objective is ruled out at $k=533$; what the growth lacks
 at $533$ steps is length, not its restart (par.~\ref{par:v4_warm_start_grow}, $g$ rising to about $0.5$ at $2132$).
 % src: python3 analysis/catalog_v4/mixture_ab.py warm C10wz @3da35e86
