@@ -14357,6 +14357,19 @@ entries:
       Claims from ws_het_split.py summary --log data/ws_hpo8/het_split_log.txt.gz and ws_restart_steps.py --cached @17195232.
       Prepared for the fill read: ws_restart_steps.py RUNS has the 4 fill/tagd303 dirs (c3fb2f14), mixture_ab.py warm C1f
       (cec98490); step 6 waits on the 4 runs.'
+  - at: '2026-11-06T06:37:06+00:00'
+    text: '2026-11-06 step 6 sweep read (plot_ws_mse_sweep.py @30ea35ac, data/ws_mse_hpo8/trial_curves.json; figs/ws_mse_sweep_{a,b}):
+      ws_c1_k533_mse_wsd_hpo8 (objective and checkpoint the val MSE of the mean, seed 42, 533 steps) best hp_1333: lr_scale
+      1.85, WSD with cooldown 0.164, warmup 0.124, layer_decay 0.875, muon_wd 0.167, EMA off; val MSE of mu 0.0283 (NLL there
+      -2.442). All 8 trials drew WSD (candidates 992 WSD / 1008 cosine; the 3 start-up draws were WSD and the GP never moved),
+      so the sweep did not compare the schedules. Beside it the NLL sweep''s cosine trials (same warm start, data, seed),
+      read at their NLL-best checkpoint, reach val MSE 0.0257 at lr_scale 2.22, 0.0279 at 0.87, 0.0289 at 1.28: the WSD best
+      is no lower than cosine on its own objective; the WSD 1.85 curve is noisy in its flat phase (spike near step 320) and
+      drops in the cooldown, the cosine 2.22 curve settles smoothly. Confirmation under the design passed 2026-11-06T04:48
+      submitted @30ea35ac: v4_het_warm25m_k533[_seed2] FA-ccin2p3-4f9e0532/8cb6c7b5 (limit 2:15, 16G), growth GROW_HP=1333
+      on v4_het_default25[_seed2] FA-ccin2p3-7843dc36/af4685de (limit 2:30, 46G). The first growth pair 92d91c6f/760744cb
+      FAILED at once on the job''s own wall check (V3_WALL_SHORT: needs 2.38 h against the 2:20 limit; no GPU time spent)
+      and was resubmitted at 2:30. Cost about 9.5 GPU-h at the limits.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
