@@ -13241,6 +13241,7 @@ entries:
     - FA-ccin2p3-5e02275b
     - FA-ccin2p3-70c28bd9
     - FA-ccin2p3-75d28cb4
+    - FA-ccin2p3-78576361
     - FA-ccin2p3-7a40c835
     - FA-ccin2p3-7b2d6c24
     - FA-ccin2p3-8e41ac1e
@@ -13264,6 +13265,7 @@ entries:
     commit: 6a03fdee
     paths:
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k2132_seed4
+    - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k533_seed4
     - analysis/catalog_v4/data/het_magnitude.json
     - analysis/catalog_v4/data/warm_start_C1.json
     - analysis/catalog_v4/data/warm_start_C10w.json
