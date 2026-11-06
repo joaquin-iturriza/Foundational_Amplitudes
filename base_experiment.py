@@ -168,6 +168,12 @@ class BaseExperiment:
             LOGGER.exception(
                 "Tried to access key that is not specified in the config files"
             )
+        except SystemExit as e:
+            # a deliberate clean exit (data.memmap_prebuild: cache built, no model) is not a failure
+            if e.code in (0, None):
+                raise
+            failed = True
+            LOGGER.exception("Exiting with error")
         except:
             failed = True
             LOGGER.exception("Exiting with error")
