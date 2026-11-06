@@ -11967,6 +11967,16 @@ entries:
       65''s design: the e+e- classes'' quota replay (cost and fill at budget 750, two e+e- classes beside the five; multichannel_check.py''s
       held-out source for an e+e- class is its ee4/dsh pools, a code change), and whether the 55 held-out classes'' 2000-event
       range needs more default events.'
+  - at: '2026-11-06T20:24:00+00:00'
+    text: '2026-11-06 step 66 (f) submitted: the e+e- quota check, 8 CPU jobs on CC htc at 4c252c5f (code 3c9b4b2d), scripts/job_multichannel_check.sh,
+      MCHECK_POLICIES=current+multichannel+quota_ladder_both_res2+quota_ladder_both_res2_budget750, seeds 42/43: v4_epem_taptamvevex
+      FA-ccin2p3-2d527e1a/6f353c1b (02:30), v4_epem_bbxvevex 47e9979e/d7fbcf39 (02:40), v4_epem_ahvevex bf8b8143/f75467b2
+      (02:20), v4_epem_vmvmxz c8185150/40e1cf1d (02:10); limits from multichannel_check.py need (generation-log time x measured
+      max ratio x1.5), target 1.7 h. Design passed (design-reviewer). Reviewer notes for the read: coverage() skips classes
+      without quota_ladder_res2 and must be adapted; mc_channels turns the ladder on for hadronic beams only, so on e+e- ''both
+      ladders'' is the quota + joint-resonance channel; the 169-class e+e- cost from these four worst classes is an upper-side
+      estimate, to be split by final count; the 55 held-out e+e- classes'' range comes from the 2000-event EE4 pool they are
+      scored on, a label-in-inputs question for step 65''s design.'
   handoff:
     state: '2026-11-06 ~17:30. (a) Coverage: step 67 read in full (finding 2026-11-06 ''step 67 verdict''; data/quota_coverage.json
       @686c3241; figs/quota_fill_a..e + legend). With both ladders (sampling.mc_mperi_both) and mc_res2 at flat_budget 750,
