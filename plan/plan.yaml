@@ -9157,6 +9157,92 @@ entries:
       42/43 adequate for a fill/no-fill outcome, no prior quota or flat_range run (searched results.tex: quota, flat_range,
       flat part, multichannel, uniform/flat in log, in-support; plan findings; decisions D269 D270 D294), CPU only, no HPO,
       disk trivial (temp dirs), test events are 13 TeV pp MadEvent default.'
+  - at: '2026-11-06T05:13:39+00:00'
+    question: 'Step 61 (c) repair: the same-commit control for the matched sign-head arms already running (FA-ccin2p3-4ba2ae30
+      e19b83f5 b524a346 9b657718 1536ae83 86cb2686 00ca4119 91249877 at f21572a1). That commit contains (b)''s keyed-draw
+      augmentation (d18e44f1, D290), so their augmentation draws and model init differ from step 56''s runs at the same seed.
+      Rerun the step-56 arm v4_het_control_signhead seeds 42-45 at the same code so the matched arms differ from their control
+      only in the sign weighting.'
+    prior: 'The passed step-61 design of 2026-11-06T05:06 (matched_event / matched_const vs the step-56 arm FA-ccin2p3-18b98b55/b2538139/66c83df6/69001455,
+      the MSE control and the het magnitude reference); het_sign_diag.json @999e9742; het_signhead.json @6ec06b24; (b) finding
+      2026-11-06 (keyed draws change augmentation and init vs older runs). git diff f21572a1..873458794c outside plan/: only
+      scripts/job_catalog_v3_short.sh''s SHORT_TAG arm list (7dbca1f4), so the rerun runs the same code as the matched arms.'
+    measure: 'Unchanged from the passed step-61 design (sign: H5/HD5 wrong-sign shares, paired sign tests, training-pool sign
+      accuracy; magnitude: PP4/EE4 gating upper <= 1.10, HD4 and H1-H7c shown-worse rule), with the step-56 arm''s role taken
+      by this same-commit rerun; the old step-56 runs read beside it as the re-seed spread (old vs rerun) of the arm.'
+    check: 'As the passed step-61 design: four seeds resolved the het vs MSE sign gap (H5 p 0.0036, HD5 p 0.0096) and PP4/EE4
+      magnitude within +-4%. The rerun against the old step-56 runs measures how much the keyed-draw re-seed alone moves these
+      reads.'
+    fixed: Everything of v4_het_control_signhead (width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, sign_loss_weight 1, no pair head, reads PP4/EE4/HD4/HD5 + H1-H7c),
+      code identical to the matched arms' f21572a1 (only the SHORT_TAG arm list differs), gpu_v100; run dirs <arm>_tagkeyed
+      (SHORT_TAG=keyed) so step 56's dirs are never overwritten.
+    control: This rerun is the control of the matched arms; the MSE control (v4_dimensionless_muon seeds 42-45) and the het
+      magnitude reference stay the old runs, their gaps (2x sign, R ~1) being far beyond a re-seed, with the re-seed spread
+      from (old step-56 vs rerun) reported beside them.
+    seeds: 42-45 (4 jobs), matching the matched arms.
+    outcome: 'The step-61 outcomes (YES / SIGN YES MAGNITUDE HURT / PARTIAL / NO) read with this rerun as the step-56 arm.
+      If the rerun differs from the old step-56 runs by more than the four-seed interval on a read, that read''s comparisons
+      to the old MSE control and het reference are flagged as re-seed-limited. Cost: 4 jobs x 1 V100, 2.33 h work each, limit
+      03:00, 9.3 GPU-h work / 12 at the limits (with the 8 matched jobs, 21 GPU-h of work for the step); in memory.'
+    fix_at: '2026-11-06T05:14:22+00:00'
+    fix: 'Repair design of 05:13, the same-code rerun of the step-56 arm (v4_het_control_signhead seeds 42-45 at f21572a1,
+      which is the matched arms'' code: git diff f21572a1..87345879 outside plan touches only job_catalog_v3_short.sh''s arm
+      list). The rerun is the right control for the sign comparison against the step-56 arm, and reading old against rerun
+      as the re-seed spread is good. Two things fail. (1) One change at a time, magnitude: the measure keeps the magnitude
+      ratio R = matched arm over the het magnitude reference (5abe4a0e/92207f6a/0208896e/8ddc490b), runs from before the keyed-draw
+      augmentation (d18e44f1 changed experiment.py''s augmentation and init). The gating PP4/EE4 read and the shown-worse
+      rule then compare across two changes, the sign weighting and the code, and seed pairing across that change no longer
+      shares init or draws. Fix: gate the magnitude on the matched arms against this same-code rerun (both have the sign head;
+      they differ only in the weighting; step 56 already put the weight-1 arm at R 1.002 on PP4 and 0.953 on EE4 against the
+      het reference, so ''not worse than the rerun'' answers ''not hurting the het magnitude''), with R of the rerun against
+      the old het reference reported beside. Or rerun the het magnitude reference at f21572a1 as well (4 jobs, about 9.3 GPU-h)
+      and keep the measure as it was. (2) Outcome for the re-seed check is not stated as a decision (check 4): ''flagged as
+      re-seed-limited'' does not say what the verdict becomes. The MSE control is also old code, and the sign YES is a non-inferiority
+      call at 1.2x the control''s median wrong-sign share, so a re-seed shift of the same size decides it. State the number:
+      e.g. the per-pool sign test old step-56 against rerun and the ratio of their median wrong-sign shares on H5 and HD5;
+      if that ratio is outside [1/1.2, 1.2] or the sign test has p < 0.05, the MSE control is rerun at the same code before
+      any YES or NO against it (4 jobs, about 9 GPU-h at its measured 2.3 to 2.7 h on V100), and otherwise the old MSE control
+      stands. Everything else carries over from the passed 05:06 design (sign measure resolved at 4 seeds: H5 17/21 p 0.0036,
+      HD5 15/19 p 0.0096; HETEROSC; no sweep; 9.3 GPU-h; in memory).'
+  - at: '2026-11-06T05:14:53+00:00'
+    question: 'Step 61 (c) repair: the same-code control for the matched sign-head arms already running (FA-ccin2p3-4ba2ae30
+      e19b83f5 b524a346 9b657718 1536ae83 86cb2686 00ca4119 91249877 at f21572a1, which contains (b)''s keyed-draw augmentation
+      d18e44f1, D290): rerun the step-56 arm v4_het_control_signhead seeds 42-45 at the same code so the matched arms differ
+      from their control only in the sign weighting.'
+    prior: 'The passed step-61 design of 2026-11-06T05:06; het_sign_diag.json @999e9742; het_signhead.json @6ec06b24 (step-56
+      weight-1 arm vs het magnitude reference: PP4 1.002, EE4 0.953, HD4 0.974); (b) finding 2026-11-06 (keyed draws change
+      augmentation and init vs older runs). git diff f21572a1..873458794c outside plan/: only the SHORT_TAG arm list of scripts/job_catalog_v3_short.sh
+      (7dbca1f4).'
+    measure: 'Sign: unchanged (H5/HD5 seed-mean wrong-sign shares, paired sign tests against the MSE control, the rerun and
+      all-positive; training-pool sign accuracy). Magnitude (gating): R = matched arm over this same-code rerun, het_oneloop''s
+      interval: PP4 and EE4 upper <= 1.10, HD4 and each H1-H7c shown worse only if lower > 1 and point > 1.10. The step-56
+      arm sat at R 1.002 (PP4) / 0.953 (EE4) against the het magnitude reference, so not worse than the rerun answers ''without
+      hurting the het magnitude''; the rerun''s R against the old het reference reported beside. Re-seed check: old step-56
+      runs vs the rerun on H5 and HD5, a per-pool paired sign test and the ratio of their median wrong-sign shares.'
+    check: 'As the passed step-61 design: four seeds resolved the het vs MSE sign gap (H5 p 0.0036, HD5 p 0.0096) and PP4/EE4
+      magnitude within +-4% (se ln 0.030/0.019).'
+    fixed: Everything of v4_het_control_signhead (width 8, 4264 steps, catalog_v4_base_train, het loss + sigma stage, MUON_BEST
+      HPs, signed_magnitude_target, sign_near_weight 1, sign_loss_weight 1, no pair head, reads PP4/EE4/HD4/HD5 + H1-H7c),
+      code identical to the matched arms' f21572a1 (only the SHORT_TAG arm list differs), gpu_v100; run dirs <arm>_tagkeyed
+      (SHORT_TAG=keyed), step 56's dirs never overwritten.
+    control: This same-code rerun for both sign and magnitude; the MSE control (v4_dimensionless_muon seeds 42-45, old code)
+      for the sign non-inferiority, under the re-seed rule in the outcome.
+    seeds: 42-45 (4 jobs), matching the matched arms.
+    outcome: 'Re-seed rule first: if the old-vs-rerun median wrong-sign ratio on H5 or HD5 is outside [1/1.2, 1.2] or their
+      paired sign test gives p < 0.05, rerun the MSE control v4_dimensionless_muon seeds 42-45 at the same code (4 jobs, ~9
+      GPU-h, its own design) before any YES or NO against it; otherwise the old MSE control stands. Then the step-61 outcomes
+      (YES / SIGN YES MAGNITUDE HURT / PARTIAL / NO) with this rerun as the step-56 arm and the magnitude gate against the
+      rerun. Cost: 4 jobs x 1 V100, 2.33 h work each, limit 03:00, 9.3 GPU-h work / 12 at the limits; in memory.'
+    passed_at: '2026-11-06T05:15:07+00:00'
+    reviewer: 'Repair 05:14: rerun of the step-56 arm (het sign head weight 1, seeds 42-45) at f21572a1, the matched arms''
+      code (git diff f21572a1..87345879 outside plan: only the arm list of job_catalog_v3_short.sh), so sign and magnitude
+      are one change (the sign weighting); magnitude gated matched-vs-rerun (PP4/EE4 upper <= 1.10, step-56 se ln 0.030/0.019;
+      HD4/H1-H7c shown-worse), rerun vs old het reference beside (step 56: 1.002/0.953). Re-seed rule stated in numbers (old
+      vs rerun median wrong-sign ratio outside [1/1.2,1.2] or sign test p<0.05 -> MSE control rerun at same code before any
+      verdict against it). Sign measure resolved at 4 seeds (H5 17/21 p 0.0036, HD5 15/19 p 0.0096). Searched as for the 05:06
+      design (sign_loss_weight, sign_het_match, het sign, sign head, gradient share, keyed, tagkeyed): no same-code rerun
+      exists. 9.3 GPU-h, in memory, HETEROSC.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
@@ -9623,8 +9709,8 @@ entries:
     state: working
     since: '2026-11-06T04:32:00+00:00'
     state_at: '2026-11-06T04:50:19+00:00'
-    context: 242290
-    context_at: '2026-11-06T05:12:29+00:00'
+    context: 258646
+    context_at: '2026-11-06T05:15:29+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
@@ -11601,12 +11687,12 @@ entries:
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
   owner:
-    agent: acf9c54af46447317
+    agent: a3cab37160ae06157
     state: stopped
-    since: '2026-11-06T05:01:57+00:00'
-    state_at: '2026-11-06T05:04:15+00:00'
-    context: 25352
-    context_at: '2026-11-06T05:03:48+00:00'
+    since: '2026-11-06T05:14:31+00:00'
+    state_at: '2026-11-06T05:15:54.335000+00:00'
+    context: 30199
+    context_at: '2026-11-06T05:15:39+00:00'
   designs:
   - at: '2026-10-30T19:52:22+00:00'
     question: 'Can lxplus''s HTCondor GPU nodes run FA jobs: does the env activate, the GPU show, the xformers attention kernel
@@ -12500,6 +12586,8 @@ entries:
       asking again; redo the per-run time for the tuned recipe and record targets'
     8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
       validation loss curves side by side, and each arm''s per-class zero-shot MSE'
+    9: Relabel warm_start_compare in words (no A/B, w8, k=533 codes; Joaquin 11-06) and resend once, saying what changed;
+      follow his lead that the lr or the scheduler is wrong in the warm runs.
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -12593,9 +12681,9 @@ entries:
     agent: ad75cab5b751353f4
     state: working
     since: '2026-11-06T05:06:56+00:00'
-    state_at: '2026-11-06T05:12:21.932000+00:00'
-    context: 98291
-    context_at: '2026-11-06T05:12:32+00:00'
+    state_at: '2026-11-06T05:13:47.569000+00:00'
+    context: 115267
+    context_at: '2026-11-06T05:15:43+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
@@ -13644,6 +13732,11 @@ entries:
       if:
       - 'drawn: committed png+pdf, referenced in results.tex'
       - 'a curve missing locally: fetch it from the site'
+    9:
+      feeds: Joaquin 11-06 on the warm-start figure
+      if:
+      - 'redrawn: main session resends'
+      - 'lr/schedule cause found: report with figure'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25

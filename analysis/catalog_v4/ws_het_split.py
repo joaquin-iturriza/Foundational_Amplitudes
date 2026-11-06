@@ -43,7 +43,13 @@ def run(a):
     sys.path.insert(0, ROOT); sys.path.insert(0, os.path.join(ROOT, "tools"))
     from rebuild_run import _build, load_best_weights
     trials = sorted(glob.glob(os.path.join(ROOT, "runs", SWEEP, "trial_*")))
-    models = [(os.path.basename(t), t) for t in trials] + [("untuned_k533", os.path.join(ROOT, UNTUNED))]
+    # the sweep keeps only its best trial's model (the others' models/ are emptied): those are listed, not read
+    has = [t for t in trials if glob.glob(os.path.join(t, "models", "model_run0_best.pt*"))]
+    for t in trials:
+        if t not in has:
+            print("WS_SKIP " + json.dumps({"model": os.path.basename(t), "why": "no models/model_run0_best.pt[.gz]"}),
+                  flush=True)
+    models = [(os.path.basename(t), t) for t in has] + [("untuned_k533", os.path.join(ROOT, UNTUNED))]
     cfgs = {n: OmegaConf.load(os.path.join(d, "config.yaml")) for n, d in models}
     first = cfgs[models[0][0]]
     for n, c in cfgs.items():       # one data build serves every model only if every data block is the same
@@ -121,6 +127,7 @@ def summary(a):
     for line in open(a.log):
         if line.startswith("WS_SPLIT "):
             r = json.loads(line.split(" ", 1)[1]); recs[r["model"]] = r
+    skipped = [json.loads(l.split(" ", 1)[1]) for l in open(a.log) if l.startswith("WS_SKIP ")]
     rows = {}
     for tag, r in recs.items():
         n = np.array(r["n"]); keep = n > 0
@@ -132,11 +139,24 @@ def summary(a):
             rows[tag].update(logged_nll=t["val_loss"], logged_mse_at_best=t["val_mse_curve"][i],
                              min_logged_mse=float(np.min(t["val_mse_curve"])), lr_scale=t["hps"]["fine_tune.lr_scale"])
     T = sorted(k for k in rows if k in tr)
+    if len(T) < 3:      # too few trials for the across-trial split: the rows (exact W, S, MSE per model) only
+        out = {"rows": rows, "trials": T, "skipped": skipped,
+               "max_abs_reread_minus_logged": float(max(abs(rows[k]["NLL"] - rows[k]["logged_nll"]) for k in T)) if T else None}
+        step0 = float(np.median([t["val_loss_step0"] for t in tr.values()]))
+        out["parent_reread_minus_step0"] = rows["parent"]["NLL"] - step0 if "parent" in rows else None
+        out["reproduced"] = bool((out["max_abs_reread_minus_logged"] or 0) < 2e-3
+                                 and (out["parent_reread_minus_step0"] is None or abs(out["parent_reread_minus_step0"]) < 2e-3))
+        json.dump(out, open(os.path.join(DATA, "het_split.json"), "w"), indent=1)
+        print(json.dumps({k: v for k, v in out.items() if k != "rows"}, indent=1))
+        for k, r in rows.items():
+            print(f"{k:14s} NLL {r['NLL']:.4f} (logged {r.get('logged_nll', float('nan')):.4f})  W {r['W']:.4f}"
+                  f"  S {r['S']:.4f}  MSE {r['MSE']:.5f}")
+        return
     nll = np.array([rows[k]["NLL"] for k in T]); W = np.array([rows[k]["W"] for k in T])
     S = np.array([rows[k]["S"] for k in T]); M = np.array([rows[k]["MSE"] for k in T])
     lr = np.array([rows[k]["lr_scale"] for k in T])
     dn, dw, ds = nll - nll.mean(), W - W.mean(), S - S.mean()
-    out = {"rows": rows, "trials": T,
+    out = {"rows": rows, "trials": T, "skipped": skipped,
            "share_var_W": float(np.dot(dw, dn) / np.dot(dn, dn)), "share_var_S": float(np.dot(ds, dn) / np.dot(dn, dn)),
            "spearman_vs_nll": {"W": spearman(W, nll), "S": spearman(S, nll), "MSE": spearman(M, nll)},
            "spearman_vs_lr": {"NLL": spearman(nll, lr), "MSE": spearman(M, lr), "W": spearman(W, lr), "S": spearman(S, lr)},

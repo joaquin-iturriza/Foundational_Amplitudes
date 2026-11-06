@@ -53,7 +53,7 @@ for (fig, ax), (g, lab) in zip(figs, [(gs, "scratch"), (g9, "rung 9")]):
     ax.scatter(x, [v for *_, v in g], color=ps.C.green, label="cell")
     ks = [kk for kk in sorted(set(x)) if np.sum(x == kk) >= 3]      # a median of one or two cells is the cells
     ax.plot(ks, [np.median([v for (_, k, v) in g if k / 2 == kk]) for kk in ks], color=ps.C.vermillion,
-            marker="s", label="median at each D")
+            marker="s", label="median at each $D$")
     ax.axhline(0, color="0.5", ls="--", label="equal")
     ax.set_xlabel(r"$\log_{10} D$")
     ax.set_ylabel(rf"$\log_{{10}}(L_\mathrm{{{lab.replace(' ', '~')}}}/L_\mathrm{{synthetic}})$")

@@ -49,6 +49,7 @@ labels. If a metric needs explaining, put its formula on the axis instead of pro
 from __future__ import annotations
 
 import os
+import re
 from types import SimpleNamespace
 
 import matplotlib as mpl
@@ -1008,6 +1009,61 @@ def tidy_colorbars(fig) -> None:
         axis.set_major_formatter(fmt)
 
 
+class CodedLabel(ValueError):
+    """A figure text names a thing by a code (a lone capital letter, a run, decision or event id, an arm code,
+    k=533, w16) instead of what it is. `save` refuses the figure (nothing is written)."""
+
+
+_CODE_TOKENS = [
+    ("single capital letter", r"[A-Z]"),
+    ("decision/event id", r"[DE]\d+"),
+    ("run id", r"FA-[A-Za-z0-9]+-[0-9a-f]{6,}"),
+    ("run id (8 hex)", r"(?=[0-9a-f]*\d)(?=[0-9a-f]*[a-f])[0-9a-f]{8}"),
+    ("arm code", r"[A-Z]{1,3}\d+[a-z]?\d*[a-z]?"),
+    ("k=N", r"k=\d+"),
+    ("wN", r"w\d+"),
+]
+_CODE_RE = [(n, re.compile(r"(?<![A-Za-z0-9_=])" + p + r"(?![A-Za-z0-9_])")) for n, p in _CODE_TOKENS]
+
+
+#: Real names that look like codes; removed before the scan.
+_ALLOWED = re.compile(r"(?<![A-Za-z0-9_=])(?:L[12]|[AHV]\d{2,3}|SM|QCD|QED|NLO|NNLO|LO|MSE|NLL|EMA|LR|HPO|pp)(?![A-Za-z0-9_])")
+
+
+def code_in_label(text: str):
+    """(kind, token) of the first code-like standalone token of `text` outside $...$ math, else None."""
+    plain = re.sub(r"\$[^$]*\$", " ", str(text))
+    plain = _ALLOWED.sub(" ", plain)
+    for kind, rx in _CODE_RE:
+        m = rx.search(plain)
+        if m:
+            return kind, m.group(0)
+    return None
+
+
+def figure_texts(fig) -> list:
+    """Every legend label, axis label, title and free text of `fig` (tick labels excluded)."""
+    out = [t.get_text() for t in fig.texts]
+    for leg in fig.legends:
+        out += [t.get_text() for t in leg.get_texts()]
+    for ax in fig.axes:
+        out += [ax.get_xlabel(), ax.get_ylabel(), ax.get_title(), ax.get_title("left"), ax.get_title("right")]
+        out += [t.get_text() for t in ax.texts]
+        leg = ax.get_legend()
+        if leg is not None:
+            out += [t.get_text() for t in leg.get_texts()]
+    return [t for t in out if t and t.strip()]
+
+
+def check_labels(fig) -> None:
+    """Raise `CodedLabel` naming the first label that is, or contains, a code (see `code_in_label`)."""
+    for t in figure_texts(fig):
+        hit = code_in_label(t)
+        if hit:
+            raise CodedLabel(f"label {t!r} contains {hit[1]!r} ({hit[0]}): name the thing by what it is, "
+                             "not by a code")
+
+
 class LegendOverflow(ValueError):
     """A legend wider than its plot box: it hangs over the neighbouring panel or off the canvas. `save` refuses
     the figure (nothing is written) rather than warn: a warning was printed and the figure shipped anyway."""
@@ -1020,6 +1076,7 @@ def save(fig, base: str, repo: str | None = None) -> str:
     can find the repo root), it is resolved against the repo root. Runs the geometry
     solve first, so callers never need to.
     """
+    check_labels(fig)
     if not os.path.isabs(base):
         root = repo or os.path.dirname(os.path.abspath(__file__))
         base = os.path.join(root, base)
