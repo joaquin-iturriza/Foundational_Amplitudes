@@ -13626,6 +13626,13 @@ entries:
       @c0407056; objective val MSE of mu under D298, scheduler cosine or WSD) submitted, 8 trials in waves [3,3,2], slurm
       62989766-73, 3.6 GPU-h. Tool fix: site pick''s verify timeout raised 90 -> 180 s in ~/.local/bin/site (CC''s setup.sh
       --verify now takes 97 s; pick had allotted nothing).'
+  - at: '2026-11-06T05:01:39+00:00'
+    text: '2026-11-06 step (d) figure analysis/catalog_v4/figs/warm_start_compare.png (plot_warm_start_compare.py @14fcc1cf
+      on ws-tune): rows tuned (D284) / checkpoint (D289) / growth (D285); columns val NLL curve (seed 42, main stage) and
+      per-class zero-shot MSE CDFs on PP4 and EE4 (two-seed geomean per probe, geomean per class). Per-class medians PP4 /
+      EE4: tuned row A 0.489/1.68, B 0.207/0.344, untuned W533 0.285/0.770, NLL-tuned 0.355/0.935; checkpoint row from 2132
+      0.422/1.118, from 3198 0.364/0.898, from final 0.353/0.887; growth row w8 A 0.276/0.441, w16 B 0.168/0.209, grown 533
+      0.277/0.412, 1066 0.250/0.383, 2132 0.204/0.328. Not yet in results.tex (goes in with the (a)/(b) write-up).'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
