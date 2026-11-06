@@ -21,6 +21,8 @@ mix_compose.control_config), in a temporary folder, and the flat-in-log|M|^2 par
                multiperipheral ladder (every final at pT near the cut, rapidities spread to the acceptance edge) and
                one channel per pair of resonances on disjoint finals, on shell together
   quota_ladder_res2_budget500  the same at sampling.flat_budget 500 (10x; step 65's re-check)
+  quota_ladder_both_res2[_budget750]  both ladders as two channels (sampling.mc_mperi_both; plan step 67), at budget
+               50 and 750
   quota_ladder_edge_res2  quota_ladder_res2 with the ladder's edge variant (sampling.mc_mperi_edge; plan step 66):
                each event's pT span log-uniform in [1.05, 3.2], the outer end at 5 - d, d log-uniform in [1e-3, 1]
 Every policy's chunks are timed (wall seconds of datagen.gen_chunk, the whole chunk: bulk, forward and flat parts).
@@ -69,7 +71,8 @@ LOGM_BINS = np.linspace(-20.0, 8.0, 113)          # log10 |M|^2 in 0.25 dex
 SEEDS = (42, 43)
 # the flat part filled to a quota per bin; the second with the multiperipheral and joint-resonance channels (step 58
 # re-check), the third the same at a 10x candidate budget (step 65)
-QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2")
+QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
+                  "quota_ladder_both_res2", "quota_ladder_both_res2_budget750")
 ROLE = "train"
 # the step-57 classes (the pp_support worst list, 2026-11-04, and the shape study's class) and their PP4 probes
 CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
@@ -184,6 +187,12 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
             s.update(mc_mperi=True, mc_mperi_edge=True, mc_res2=True)
+        if policy.startswith("quota_ladder_both_res2"):   # step 67: both ladders as two channels
+            s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True)
+        if policy == "quota_ladder_both_res2_budget750":
+            # step 66's STRONG branch: the budget from the measured quota/kept of the QCD bins still short inside the pp
+            # range, worst 1/0.065 = 15.5 at log10|M|^2 4.70 (uu_bbxuu, edge ladder at budget 50), so 15 x 50
+            s.update(flat_budget=750)
         if policy == "quota_ladder_res2_budget500":
             # step 65's NO branch (shortfall reduced, carried by the new channels): the budget raised 10x, the measured
             # quota/kept of the bins still short below the pp max being <= 8.5 on the electroweak classes and <= 9.5 up
