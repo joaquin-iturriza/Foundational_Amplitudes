@@ -1563,6 +1563,11 @@ class BaseExperiment:
         except FileNotFoundError:
             raise FileNotFoundError(f"Pretrained checkpoint not found: {pretrained_path}")
 
+        ft_sp = (self.cfg.get("fine_tune", None) if hasattr(self.cfg, "get") else getattr(self.cfg, "fine_tune", None))
+        sp = ft_sp.get("shrink_perturb", None) if ft_sp is not None else None
+        if sp is not None:
+            self._shrink_perturb(float(sp[0]), float(sp[1]))
+
         if reset_output_head:
             head = self.model.net.net.linear_out
             nn.init.zeros_(head.weight)
@@ -1572,6 +1577,30 @@ class BaseExperiment:
 
         # No μP bookkeeping needed: base shapes were set when the backbone was
         # constructed and load_state_dict preserves the per-parameter infshapes.
+
+    def _shrink_perturb(self, lam: float, gamma: float):
+        """fine_tune.shrink_perturb (plan warm_start step 14): every parameter p <- lam * p + gamma * p0, p0 the same
+        parameter of a fresh model built from this run's config at seed + 1 (its muP init; not the parent's own init,
+        which a run at the parent's seed would redraw). Buffers are left as loaded (Ash & Adams 2020; Zaidi et al.
+        2022, whose lam 0.4, gamma 0.1 is the setting near Ash & Adams' best)."""
+        seed = int(self.cfg.get("seed", 0)) + 1
+        with torch.random.fork_rng(devices=[]):
+            torch.manual_seed(seed)
+            fresh = instantiate(self.cfg.model)
+            self._post_instantiate_model(fresh)
+            if self._is_mup_model():
+                mup_finalize(fresh)
+        fresh_params = dict(fresh.named_parameters())
+        n = 0
+        with torch.no_grad():
+            for name, p in self.model.named_parameters():
+                q = fresh_params.get(name)
+                if q is None or q.shape != p.shape:
+                    raise RuntimeError(f"fine_tune.shrink_perturb: no fresh parameter {name} of shape {tuple(p.shape)}")
+                p.mul_(lam).add_(q.to(device=p.device, dtype=p.dtype), alpha=gamma)
+                n += 1
+        del fresh   # the EMA is rebuilt on these weights before training (_restart_ema)
+        LOGGER.info(f"SHRINK_PERTURB lambda={lam} gamma={gamma} fresh_seed={seed} params={n}")
 
     def _init_ewc(self):
         self.ewc = None

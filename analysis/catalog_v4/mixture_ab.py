@@ -1403,6 +1403,107 @@ def loader():
     print(json.dumps(res))
 
 
+# step 14 (D319; single seed, D315): warm starts toward the C1 change (share 0.25, het, k=533) at seed 42, each read
+# against the same-commit default restart (v4_het_wsx_default_rerun) on the seed-42 class ratios; the study's runs are
+# filled at submission ("" = not submitted). Arms of scripts/job_catalog_v3_short.sh v4_het_wsx_*; the share-0.50
+# warm start at k=533 (C2's seed-42 run) is read beside from step 7.
+S14 = {"control": "", "arms": {"shrinkperturb": "", "share50_k267": "", "wsdbranch25": "", "wsdbranch50": "",
+                               "wsdfinal_default": "", "share50_k533": "FA-ccin2p3-9a357af2"},
+       "control_older": "FA-ccin2p3-341bf564",           # the step-1 default restart at seed 42 (older commit)
+       "B": "FA-ccin2p3-9538e607", "B_HD": "FA-ccin2p3-4dca09e5"}
+# prior two-seed paired comparisons at k=533 (arm pair, control pair), for the paired seed spread |ln R43 - ln R42|
+SEED_PAIRS = {"moment fill / default": ("C1f", "default"), "Muon damped / default": ("C1u", "default"),
+              "AdamW damped / default": ("C1a", "default"), "every group damped / default": ("C1e", "default"),
+              "MSE-tuned / untuned": ("C1m", "untuned"),
+              "step-3198 default / control": ("C1r_step3198_default", "control"),
+              "step-3198 continued / control": ("C1r_step3198_continue", "control"),
+              "step-2132 continued / control": ("C1r_step2132_continue", "control"),
+              "lr x3 / control": ("C1r_final_lr3x", "control")}
+
+
+def _one(num, den, read, cls):
+    """Seed-level R(num/den) on one read: per probe the ratio of the two runs' MSE, class geometric mean, median over
+    classes; with the class ratios (for a bootstrap)"""
+    a, c = read_of(num, read), read_of(den, read)
+    if a is None or c is None:
+        return None, None
+    keys = sorted(set(a) & set(c), key=str)
+    cr = class_ratios(a, c, keys, lambda k: cls(probe_name(k)))
+    return float(np.median(list(cr.values()))), cr
+
+
+def seed_pairs():
+    """The paired seed spread of the step-14 single-seed reads -> data/ws_seed_pairs.json: for each prior k=533
+    arm/control pair at seeds 42 and 43 (SEED_PAIRS, plus share 0.50 over share 0.25, C2/C1 at 533), the seed-level
+    R(arm/control) per seed on PP4 and EE4 and d = |ln R43 - ln R42|; the median d per read is the widening of the
+    single-seed interval; beside, the seed-42 R against the two-seed R"""
+    cls = class_of()
+    rows = {}
+    pairs = {n: (WARM[c]["W"][533], WARM[c]["ref"][r]) for n, (c, r) in SEED_PAIRS.items()}
+    pairs["share 0.50 / share 0.25"] = (WARM["C2"]["W"][533], WARM["C1"]["W"][533])
+    for n, (arm, ctl) in pairs.items():
+        row = {}
+        for read in ("PP4", "EE4"):
+            r42, _ = _one(arm[0], ctl[0], read, cls)
+            r43, _ = _one(arm[1], ctl[1], read, cls)
+            if r42 is None or r43 is None:
+                continue
+            row[read] = {"R42": round(r42, 4), "R43": round(r43, 4), "d": round(abs(math.log(r43 / r42)), 4)}
+        rows[n] = row
+    out = {"what": "paired seed spread d = |ln R(arm/control) seed 43 - ln R(arm/control) seed 42|, prior k=533 pairs",
+           "pairs": rows,
+           "median_d": {r: round(float(np.median([v[r]["d"] for v in rows.values() if r in v])), 4) for r in ("PP4", "EE4")},
+           "max_d": {r: round(float(np.max([v[r]["d"] for v in rows.values() if r in v])), 4) for r in ("PP4", "EE4")}}
+    json.dump(out, open(os.path.join(DATA, "ws_seed_pairs.json"), "w"), indent=1)
+    print(json.dumps(out, indent=1))
+
+
+def warm_single():
+    """Step 14's reads -> data/warm_start_S14.json. Per arm, seed 42: R(arm/control) on PP4 and EE4 (deciding), held
+    (catalog-sampled held-out, pooled), HD4, HD5; median over classes of the class geometric mean of probe ratios; 95%
+    class bootstrap widened on each side by the median paired seed spread of data/ws_seed_pairs.json (per read; HD4,
+    HD5 and held take the larger of PP4's and EE4's). Beside: R(arm/B) at seed 42 (B's seed-42 run; biased low, seed 42
+    is the favourable seed of the default restart: R(W/B) 1.22 / 1.47 at seed 42 against 1.33 / 1.51 over both), and
+    the estimate R(arm/B) ~ R(arm/control) x R(W_533/B) of the two-seed step-1 read (PP4 1.333, EE4 1.513). Rule fixed
+    in the design: BETTER when the widened upper end is below 1 on PP4 or EE4 and above 1.05 on neither; WORSE when a
+    lower end is above 1; else NOT BETTER; MATCH-ESTIMATE when the estimated R(arm/B) is <= 1.35 on both."""
+    cls = class_of()
+    sp = json.load(open(os.path.join(DATA, "ws_seed_pairs.json")))["median_d"]
+    w = {"PP4": sp["PP4"], "EE4": sp["EE4"]}
+    w.update({r: max(sp.values()) for r in ("held", "HD4", "HD5")})
+    est = {"PP4": 1.333, "EE4": 1.513}
+    ctl = S14["control"]
+    if not ctl:
+        sys.exit("warm_single: S14 control not filled")
+    out = {"design": "plan warm_start step 14 (D319, D315)", "control": ctl, "widening": w, "arms": {}}
+    arms = dict(S14["arms"], control_older=S14["control_older"])
+    for name, run in arms.items():
+        if not run:
+            continue
+        row = {"run": run}
+        for read in ("PP4", "EE4", "held", "HD4", "HD5"):
+            r, cr = _one(run, ctl, read, cls)
+            if r is None:
+                row[read] = None
+                continue
+            res = r_with_interval(cr, math.exp(w[read]))
+            bref = S14["B_HD"] if read in ("HD4", "HD5") else S14["B"]
+            rb, _ = _one(run, bref, read if read != "held" else "held", cls)
+            res["R_over_B_seed42"] = None if rb is None else round(rb, 4)
+            if read in est:
+                res["R_over_B_estimate"] = round(r * est[read], 4)
+            row[read] = res
+        dec = [row[r] for r in ("PP4", "EE4")]
+        if all(x is not None for x in dec):
+            hi = [x["widened"][1] for x in dec]; lo = [x["widened"][0] for x in dec]
+            row["outcome"] = ("BETTER" if min(hi) < 1 and max(hi) <= 1.05 else
+                              "WORSE" if max(lo) > 1 else "NOT BETTER")
+            row["match_estimate"] = all(x["R_over_B_estimate"] <= 1.35 for x in dec)
+        out["arms"][name] = row
+        print(name, run, {r: (row[r] or {}).get("R") for r in ("PP4", "EE4", "held", "HD4", "HD5")}, row.get("outcome"))
+    json.dump(out, open(os.path.join(DATA, "warm_start_S14.json"), "w"), indent=1)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1424,6 +1525,8 @@ def main():
     sub.add_parser("loader")
     w = sub.add_parser("warm")
     w.add_argument("change", nargs="?", default="C1")
+    sub.add_parser("seed_pairs")
+    sub.add_parser("warm_single")
     ep = sub.add_parser("epochs")
     ep.add_argument("run"); ep.add_argument("log")
     a = ap.parse_args()
@@ -1447,6 +1550,10 @@ def main():
         loader()
     elif a.cmd == "warm":
         warm(a.change)
+    elif a.cmd == "seed_pairs":
+        seed_pairs()
+    elif a.cmd == "warm_single":
+        warm_single()
     elif a.cmd == "epochs":
         epochs(a.run, a.log)
     else:
