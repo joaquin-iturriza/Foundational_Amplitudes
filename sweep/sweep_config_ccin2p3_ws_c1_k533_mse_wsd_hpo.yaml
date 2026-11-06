@@ -2,7 +2,9 @@
 # adapt to a change before concluding if something works or not"; the method is the owner's). Same search as
 # ws_c1_k533_hpo8 (sweep_config_ccin2p3_ws_c1_k533_hpo.yaml: the C1 warm start, het control's model retrained 533 steps
 # on the share-0.25 recipe, base run runs/catalog_v4_short/v4_het_warm25_k533), with two changes:
-# (1) the objective and checkpoint selection follow the mean, not the NLL: training.heterosc_select=mu_mse (the
+# (1) the objective and checkpoint selection follow the mean, not the NLL (D298, Joaquin 2026-11-06: optimizing on the
+#     het validation loss "doesn't mean that you can't intentionally check doing something different"; D62's nll stays
+#     the default everywhere else): training.heterosc_select=mu_mse (the
 #     validation MSE of mu, arithmetic mean over processes). Step (a) on hpo8's logged curves: val_mse at the best
 #     checkpoint ranks the trials opposite to the NLL (lr_scale 0.17: NLL best -2.758, MSE worst 0.0349; lr_scale 2.2:
 #     MSE best 0.0257), and the held-out reads followed the MSE (tuned 0.17x worse than untuned 1x, R PP4 1.19);
