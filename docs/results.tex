@@ -3224,6 +3224,96 @@ change against no change).}
 \label{fig:ws_objective}
 \end{figure}
 
+\paragraph{The restart's jump: AdamW's share or the ramp of every group (2026-11-06).}\label{par:v4_warm_start_ramp}
+After par.~\ref{par:v4_warm_start_repairs} ruled out the empty optimizer and Muon's step [D303], two arms on the same
+default restart and data stream (FA-ccin2p3-0202ba7f, FA-ccin2p3-7b2d6c24) ask what is left: AdamW's learning rate
+alone multiplied by $\min(1, \text{step}/168)$, Muon untouched (FA-ccin2p3-fbb16a33, FA-ccin2p3-cb458c82), and every
+group's learning rate damped the same way (FA-ccin2p3-21a18a76, FA-ccin2p3-21674d1e), at $k=533$, seeds $42$ and $43$.
+AdamW's share of the jump is $a = \ln(G_\text{default}/G_\text{AdamW}) / \ln(G_\text{default}/G_\text{every})$, $G$
+the largest gradient norm over restart steps $2$ to $10$. The pairing check holds at seed $42$ (steps $0$ and $1$:
+$16.25$, $10.96$ and $16.51$, $10.93$ against $16.32$, $10.96$) and fails at seed $43$, whose arms read $91.5$ and
+$91.4$ at step $1$ against $113.3$ with the training loss equal to $10^{-4}$; seed $43$ is shown beside, not counted.
+At seed $42$, $a=-0.018$: damping AdamW leaves the window's peak ($1047$ against $994$) and moves the excursion later
+(the largest norm over steps $0$ to $19$ is $1410$ at step $13$ against $994$ at step $6$), while damping every group
+brings it to $53$, $0.053$ of the default's. By the design's rule the jump is the ramp of every group together
+(EVERY GROUP; seed $43$ agrees: $a=0.194$, every group at $0.109$ of the default). The reads do not follow the jump.
+AdamW damped: $R(\text{arm}/\text{default})$ PP4 $1.017$ ($[0.853, 1.213]$), EE4 $1.012$ ($[0.886, 1.161]$).
+Every group damped reads worse: PP4 $1.237$ ($[1.028, 1.489]$), EE4 $1.619$ ($[1.359, 1.974]$), and further from the
+change from scratch ($R(W/B)$ PP4 $1.74$, EE4 $2.55$; default restart $1.33$, $1.51$). Its gradient norm does not
+stay low: over steps $20$ to $40$ its median is $524$ and $559$ against $40$ and $43$ for the default
+(fig.~\ref{fig:ws_adamw_damped}), so the ramp postpones the excursion to where the learning rate is high, and it also
+gives the damped groups less early training (the design's stated confound). The seed-$43$ validation NLL leaves the
+scale in both arms ($8.7\times10^{7}$ at step $310$ AdamW damped, $144$ at step $270$ every group) and recovers
+($-2.569$ and $-2.525$ at step $533$, default $-2.585$); their reads are of the final models. Neither arm is BETTER:
+the untuned default restart stays the recipe, the jump is harmless to the reads, and the warm start's remaining gap
+at $k=533$ is its retraining length (YES at $k=1066$, par.~\ref{par:v4_warm_start}). The growth's sweep runs on the
+default restart.
+% src: python3 analysis/catalog_v4/ws_restart_steps.py --cached @062991e1
+% claim: adamw_damped_s42.grad_0_2.0=16.25
+% claim: adamw_damped_s42.grad_0_2.1=10.96
+% claim: all_damped_s42.grad_0_2.0=16.51
+% claim: all_damped_s42.grad_0_2.1=10.93
+% claim: default_d303_s42.grad_0_2.0=16.32
+% claim: default_d303_s42.grad_0_2.1=10.96
+% claim: adamw_damped_s43.grad_0_2.1=91.5
+% claim: all_damped_s43.grad_0_2.1=91.4
+% claim: default_d303_s43.grad_0_2.1=113.3
+% claim: step9_share.s42.a=-0.018
+% claim: step9_share.s43.a=0.194
+% claim: step9_share.s42.G_adamw=1047
+% claim: step9_share.s42.G_ctrl=994
+% claim: step9_share.s42.G_both=53
+% claim: step9_share.s42.both_over_ctrl=0.053
+% claim: step9_share.s43.both_over_ctrl=0.109
+% claim: adamw_damped_s42.grad_max20=1410
+% claim: adamw_damped_s42.grad_max20_at=13
+% claim: default_d303_s42.grad_max20_at=6
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1a @062991e1
+% claim: k.533.W_over_default.PP4.0=1.017
+% claim: k.533.W_over_default.PP4.1.0=0.853
+% claim: k.533.W_over_default.PP4.1.1=1.213
+% claim: k.533.W_over_default.EE4.0=1.012
+% claim: k.533.W_over_default.EE4.1.0=0.886
+% claim: k.533.W_over_default.EE4.1.1=1.161
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1e @062991e1
+% claim: k.533.W_over_default.PP4.0=1.237
+% claim: k.533.W_over_default.PP4.1.0=1.028
+% claim: k.533.W_over_default.PP4.1.1=1.489
+% claim: k.533.W_over_default.EE4.0=1.619
+% claim: k.533.W_over_default.EE4.1.0=1.359
+% claim: k.533.W_over_default.EE4.1.1=1.974
+% claim: k.533.W_over_B.PP4.0=1.74
+% claim: k.533.W_over_B.EE4.0=2.55
+% src: python3 analysis/catalog_v4/plot_ws_fill.py --step10 --cached @062991e1
+% claim: arm2_s42.grad_median_20_40=524
+% claim: arm2_s43.grad_median_20_40=559
+% claim: default_s42.grad_median_20_40=40
+% claim: default_s43.grad_median_20_40=43
+% claim: arm_s43.val_max=8.7e7
+% claim: arm_s43.val_max_at=310
+% claim: arm2_s43.val_max=144
+% claim: arm2_s43.val_max_at=270
+% claim: arm_s43.val_last=-2.569
+% claim: arm2_s43.val_last=-2.525
+% claim: default_s43.val_last=-2.585
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1 @062991e1
+% claim: k.533.W_over_B.PP4.0=1.33
+% claim: k.533.W_over_B.EE4.0=1.51
+% allow: 168 533 42 43 2 10 0 1 19 20 40 1 4 1066 because they are the ramp length, k, the seeds, step windows and indices, the loss agreement's order, and C1's YES k of par:v4_warm_start
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{../analysis/catalog_v4/figs/ws_adamw_damped.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_fill.py --step10 --cached @062991e1
+\caption{The $k=533$ restart with AdamW's learning rate damped over its first $168$ steps and with every group's
+damped, against the default restart, seeds $42$ (solid) and $43$ (dashed). Top left: the gradient norm before clipping
+against the restart's step. Top right: the validation loss of the main stage (het NLL); excursions above $0.5$ are cut
+off. Bottom: per-class zero-shot MSE of $\log|M|^2$ on the pp (PP4) and $e^+e^-$ (EE4) probes as a cumulative
+fraction of classes, each probe the geometric mean of its two seeds.}
+\label{fig:ws_adamw_damped}
+% allow: 533 168 42 43 0.5 2 because they are the retraining length, the ramp length, the seeds, the plot's cut and the square in |M|^2
+\end{figure}
+
 
 \paragraph{The multiplicity axis's signed level bias (2026-10-29).}\label{par:v4_mult_bias} The question, from
 par.~\ref{par:v4_tree_newproc} and the user's first priority, the zero-shot bias: the multiplicity pools are the one
