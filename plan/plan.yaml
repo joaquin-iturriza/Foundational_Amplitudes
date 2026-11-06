@@ -9450,6 +9450,60 @@ entries:
       500); held-out events are the class''s pp MadEvent events (D269/D270). Searched docs/results.tex for multiperipheral,
       ladder (only the size ladder and sec:ladder), mperi, quota, flat_budget, edge variant, cosh; decisions D269 D270 D294:
       no prior run of this variant.'
+  - at: '2026-11-06T09:35:47+00:00'
+    question: 'Step 66 (D294/D269/D270, step 65''s NO branch: only the top ~1 dex of the QCD 2->4 classes'' log10|M|^2 range,
+      above ~3.7, stays short and a 10x budget cannot buy it): with the multiperipheral ladder''s edge variant (per-event
+      pT span log-uniform in [1.05, 3.2] instead of fixed 3.2; outer rapidity end at 5 - d, d log-uniform in [1e-3, 1] instead
+      of uniform [4, 5)), does the quota fill the top bins of uu_bbxuu and us_ddxsu at budget 50, and does it fill every 0.25-dex
+      bin of the in-support pp range (+-0.5 dex) with 0 held-out in-support pp events outside the kept range on the three
+      classes the ladder applies to (uu_bbxuu, us_ddxsu, udx_csxvevex: hadronic beams, >= 2 parton finals)? uux_epemg and
+      uux_epemvevex get no ladder channel (fewer than two parton finals) and run as an identity check.'
+    prior: 'Step 58 (quota alone): NO on 4/5, shortfall 0.24-0.38. Step 65 (quota + ladder + joint-resonance pairs, multichannel_check.json
+      @45d39fe3): shortfall uu_bbxuu 0.383->0.137, us_ddxsu 0.327->0.114, uux_epemvevex 0.237->0.028, udx_csxvevex 0.255->0.067;
+      held-out outside kept uu_bbxuu 1176->4, us_ddxsu 401->6; QCD top three bins quota/kept 28-704. Step 65 at budget 500
+      (@ba50c2c2): EW filled (uux_epemvevex YES, udx_csxvevex 0.005 above the pp max), QCD fill 0.99/0.49/0.14/0.04/0.01 at
+      log10|M|^2 3.71-4.70 (uu_bbxuu), at 10x the time (8250 vs 837 s). Where reads: the top sits at sqrt(s_hat) ~1.45 TeV
+      = 2x10 GeV cosh 5, every pT at the cut, span at the |eta| 5 edge. Searched docs/results.tex (ladder, multiperipheral,
+      quota: only unrelated ''size ladder'' and sec:ladder), plan entry, decisions D269 D270 D294: no prior run of this variant.'
+    measure: 'As step 65''s passed design, per class, seed and policy (quota_ladder_res2, quota_ladder_edge_res2): held-out
+      in-support pp events outside the kept range (count, N, 3/N at 0; held-out = probe val + dsh_, never read for the range);
+      quota shortfall share and fill per bin, especially the QCD bins above log10|M|^2 3.7; chunks stopped at the budget or
+      no_steer; kept events per channel (does the edge ladder carry the top bins); chunk seconds against the control on the
+      same node. Figure fig_flat_quota.py (pp, multichannel, quota, + ladder and pairs, + 10x budget, + the edge ladder; per
+      class, seed 42).'
+    check: 'On existing data the measure moves with the proposal: the ladder channel took step 58''s held-out outside-kept
+      1176->4 (uu_bbxuu) and shortfall 0.38->0.14, with the ladder carrying 33739 of 34992 kept flat events, so the ladder''s
+      proposal density sets the top-bin fill. The edge variant''s reach on CPU (tests/test_multichannel.py test_multiperipheral_edge
+      @8000f8b0, sqrt(s)=1450 GeV, 4 massless finals, 20000 events): share with every pT < 13 GeV and max|eta| > 4.8 is 0.0549
+      vs 0.0003 for the current ladder (180x), first three pT < 11 GeV 0.0565 vs 0.0001; acceptance 0.875 vs 0.941; phase
+      space exact; default draws bitwise as trunk''s. The held-out counts and the top-bin fill are not fixed by construction.'
+    fixed: 'Each class''s catalog_v4 train entry and chunk plan, multichannel channels as step 65 (res2 pairs included), oversample
+      6, flat_budget 50, bin width 0.25 dex, margin 0.5 dex, range table recipes/catalog_v4_flat_range.json; code: scripts/job_multichannel_check.sh
+      with MCHECK_POLICIES=quota_ladder_res2+quota_ladder_edge_res2, CC htc CPU, 1 core, 8G, limit 00:40; wall target ~28
+      min per job (control 837 s per replay on uu_bbxuu at budget 50, the edge policy about the same; margin 1.4x to the limit).
+      Code at trunk 437277e9 (8000f8b0 merged, synced to CC).'
+    control: quota_ladder_res2 (the current ladder) at the same commit, class, seed, job and node; the two policies differ
+      only in sampling.mc_mperi_edge. Step 65's budget-500 reads (@ba50c2c2) shown beside it as the cost reference.
+    seeds: 42 and 43 per class (10 jobs), as steps 57, 58 and 65.
+    outcome: 'Per class, both seeds, at budget 50. YES for a ladder class (uu_bbxuu, us_ddxsu, udx_csxvevex) = 0 held-out
+      in-support events outside the kept range, 0 shortfall, 0 budget or no_steer stops. uux_epemg and uux_epemvevex: no ladder
+      channel, so the edge policy must equal the control there (identity check; a difference is a bug to fix); they stand
+      as step 65 measured (uux_epemg YES at budget 50, uux_epemvevex YES at budget 500), and the regeneration would use budget
+      500 for the electroweak classes. GUARD for replacing the old ladder by the edge variant (both seeds): total shortfall
+      <= the control''s; held-out outside kept <= control + 2 (control 4/2 uu_bbxuu, 6/1 us_ddxsu, 1/1 udx_csxvevex); fill
+      of every bin below log10|M|^2 3.7 >= control - 0.06 (control uu_bbxuu 0.98/0.67/0.32 at 2.97-3.71; 0.06 = the largest
+      seed spread of top-bin fill seen). If the top improves but the guard fails: keep both ladders as two channels (mc_mperi
+      and its edge variant), one re-check of that. Branches on the QCD top bins (uu_bbxuu, us_ddxsu fill at 3.96 and 4.21;
+      control 0.04 at 3.96, budget-500 reference 0.49 / 0.14): (1) YES on all three ladder classes -> design the regeneration
+      of the hadronic tree classes with mc_mperi + edge + mc_res2, cost factor from the measured time ratio. (2) STRONG: fill
+      >= 0.49 at 3.96 and >= 0.14 at 4.21 but shortfall left -> edge replaces the old ladder (if the guard holds); flat_budget
+      set from the measured quota/kept of the bins still short; affordable if the projected chunk time is <= budget 500''s
+      (8250 s per replay on uu_bbxuu), then one re-check at that budget; above it, where reads of the short bins before anything
+      else. (3) MIDDLE: fill at 3.96 above control + 0.06 but below 0.49 -> edge replaces the old ladder if the guard holds;
+      read where the still-short events sit (multichannel_check where on the edge policy) and the kept per channel to set
+      the next draw change; if the short bins'' quota/kept is <= 10, also one re-check at budget 500 (cost 8250 s per replay).
+      (4) UNCHANGED: fill difference <= 0.06 -> the corner is not the gap; where reads before any other change. Cost: 10 CPU
+      jobs, 1 core, ~28 min each, limit 00:40; no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
