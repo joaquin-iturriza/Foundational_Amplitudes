@@ -567,7 +567,21 @@ if [ -n "$LONG_HEADS$LONG_FACTOR$LONG_LR" ]; then
         OUT="$PROJECT_DIR/runs/catalog_v4_long/${ARM}_w${LH}_grow_k${GROW_K}"; PRED="$SCRATCH/zz_v4_long_${ARM}_w${LH}_grow_k${GROW_K}"
         # GROW_HP=1333 (plan warm_start step 6): the growth retrained at the MSE-of-the-mean sweep's best trial (WS_M_HP,
         # its lr_scale and layer_decay) instead of the untuned restart; own run dir _hp1333
-        if [ -n "$GROW_HP" ]; then
+        # GROW_SWEEP=<sweep> GROW_HP=<trial index> (plan warm_start step 11): the growth retrained at that trial's
+        # searched HPs, read from the trial's own saved config (runs/<sweep>/trial_<idx>/config.yaml) for the keys of
+        # the sweep config's search_space; every other setting stays the default growth's; own run dir _<sweep>_hp<idx>
+        if [ -n "$GROW_SWEEP" ]; then
+            [ "$GROW_K" = 533 ] && [[ "$GROW_HP" =~ ^[0-9]+$ ]] || { echo "GROW_SWEEP: GROW_HP=<trial index>, at GROW_K=533"; exit 1; }
+            GTC="$PROJECT_DIR/runs/$GROW_SWEEP/trial_$(printf %04d "$GROW_HP")/config.yaml"
+            GHP=$(python tools/sweep_trial_hps.py "$GROW_SWEEP" "$GTC") || { echo "GROW_SWEEP: $GHP"; exit 1; }
+            read -ra GHPA <<< "$GHP"
+            for kv in "${GHPA[@]}"; do      # drop any override of a searched key, then add the trial's value
+                k="${kv%%=*}"; NORM=("${NORM[@]/#$k=*/}"); NORM=("${NORM[@]/#${k#++}=*/}")
+            done
+            NORM=($(printf '%s\n' "${NORM[@]}" | grep -v '^$') "${GHPA[@]}")
+            OUT="${OUT}_${GROW_SWEEP}_hp${GROW_HP}"; PRED="${PRED}_${GROW_SWEEP}_hp${GROW_HP}"
+            echo "GROW_SWEEP $GROW_SWEEP trial $GROW_HP: ${GHPA[*]}"
+        elif [ -n "$GROW_HP" ]; then
             [ "$GROW_HP" = 1333 ] && [ "$GROW_K" = 533 ] || { echo "GROW_HP: only 1333, at GROW_K=533"; exit 1; }
             NORM=("${NORM[@]/#++fine_tune.lr_scale=*/++fine_tune.lr_scale=$WS_M_LR_SCALE}")
             NORM=("${NORM[@]/#++fine_tune.layer_decay=*/++fine_tune.layer_decay=$WS_M_LD}")
