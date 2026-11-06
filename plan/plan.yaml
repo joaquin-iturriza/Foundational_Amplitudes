@@ -5375,9 +5375,24 @@ entries:
     at: '2026-11-06T14:35:06+00:00'
     searched: CLAUDE.md GPU budget rule, site decisions --project FA (D292 D293 approve the work, not its cost)
     blocks: step 64's submission and step 61's resubmission
+    blocks_steps:
+    - 61
+    - 64
+  - ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings
+      (39 GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30
+      (28 GPU-h of work)? And for the catalog regeneration: at budget 750 with both ladders, every log|M|^2 bin up to the
+      highest pp event is filled on all five test classes, but the extra half decade above it is not quite (uu_bbxuu 0.91
+      and 0.25 in its last two bins, the others 0.91-0.96): do we accept that (CPU time per pool about 120x plain multichannel
+      on the QCD classes, ~8600 s vs ~72 s), or pay to fill it (budget ~3000, an estimate of about 4x that again on uu_bbxuu-like
+      classes, ~1.1x on the others)?'
+    at: '2026-11-06T17:48:37+00:00'
+    searched: 'D269 D270 D294 (D270: ''the range the pp beams cover, but wider''; none sets how full the margin must be or
+      a CPU budget for the regeneration), CLAUDE.md, plan entry findings of steps 65-67'
+    blocks: step 64's submission, step 61's resubmission, step 65's regeneration design
     blocks_steps: &id001
     - 61
     - 64
+    - 65
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -11763,12 +11778,17 @@ entries:
       analysis/catalog_v4/data/{multichannel_check.json,multichannel_check_reads/,quota_where/,ee_gain_ablation.json}, analysis/catalog_v4/ee_gain.py
       (ablation, fig_ablation), tests/test_multichannel.py, scripts/job_multichannel_check.sh
     written: '2026-11-06T09:27:57+00:00'
-  ask: For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's settings (39
+  ask: 'For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep''s settings (39
     GPU-h), or the 2x row at the original settings? Will you allow the 12 sign-output jobs to be resubmitted at 3:30 (28 GPU-h
-    of work)?
-  waiting_since: '2026-11-06T14:35:06+00:00'
-  searched: CLAUDE.md GPU budget rule, site decisions --project FA (D292 D293 approve the work, not its cost)
-  blocks: step 64's submission and step 61's resubmission
+    of work)? And for the catalog regeneration: at budget 750 with both ladders, every log|M|^2 bin up to the highest pp event
+    is filled on all five test classes, but the extra half decade above it is not quite (uu_bbxuu 0.91 and 0.25 in its last
+    two bins, the others 0.91-0.96): do we accept that (CPU time per pool about 120x plain multichannel on the QCD classes,
+    ~8600 s vs ~72 s), or pay to fill it (budget ~3000, an estimate of about 4x that again on uu_bbxuu-like classes, ~1.1x
+    on the others)?'
+  waiting_since: '2026-11-06T17:48:37+00:00'
+  searched: 'D269 D270 D294 (D270: ''the range the pp beams cover, but wider''; none sets how full the margin must be or a
+    CPU budget for the regeneration), CLAUDE.md, plan entry findings of steps 65-67'
+  blocks: step 64's submission, step 61's resubmission, step 65's regeneration design
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
