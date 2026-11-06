@@ -11728,6 +11728,19 @@ entries:
       script names it. Tested: uu_bbxuu (on the reads that existed at submission) need 15062 s -> 06:20, actual 14990; us_ddxsu
       need 12039, actual ~9760; udx_csxvevex need 4697, actual ~4000. Not fixed: a new class with no budget-50 read (the tool
       refuses, time from its own first jobs).'
+  - at: '2026-11-06T17:48:03+00:00'
+    text: '2026-11-06 step 67 verdict (coverage @fa872486 over reads @686c3241, data/quota_coverage.json; figure figs/quota_fill_a..e
+      + legend, fig_quota_fill.py). Budget 750 with both ladders: every bin up to the pp in-support max (range-table max:
+      uu_bbxuu 4.69, us_ddxsu 4.59, udx_csxvevex 0.42) filled >= 0.95 on both seeds on all five classes; held-out in-support
+      pp events outside the kept range 1/1 on each ladder class (<= 2: resolved). Margin bins (the quota''s +0.5 dex above
+      the pp max) short: uu_bbxuu 4.70 0.91 (0.90-0.93), 4.95 0.25 (0.23-0.28); us_ddxsu 4.84 0.96 (0.94-0.98); udx_csxvevex
+      0.67 0.91 (0.89-0.93). Verdict NEAR on uu_bbxuu, us_ddxsu, udx_csxvevex; YES on uux_epemvevex, uux_epemg. Shortfall
+      at 750: uu_bbxuu 0.0174/0.0160, us_ddxsu 0.0003/0.0011, udx 0.0017/0.0026. Guard at budget 50: both vs old passes on
+      all classes (udx +0.0020 vs 2 SE 0.0031); both vs edge fails on uu_bbxuu at 4.21 (fill 0.72 vs 0.81, -0.086), the edge
+      ladder''s share being halved, which budget 750 recovers. Time per train-pool replay at 750: uu_bbxuu 8470-8701 s, us_ddxsu
+      7468-7780, udx_csxvevex 3206-3223, uux_epemvevex 387-482; at budget 50 both ladders 541-677 / 657 / 261; plain multichannel
+      ~72 / ~50 / ~29 s (step 65). Note: the design''s parenthesis named uu_bbxuu [4.70,4.95) as in range from the held-out
+      pp max 4.75; by its rule with the range table''s max (4.694) it is margin (0.91 filled).'
   handoff:
     state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
       ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
