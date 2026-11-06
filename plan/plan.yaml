@@ -13679,10 +13679,10 @@ entries:
   - D282
   - D307
   - D313
-  next: 'Step 12 (D307, D308): the restart study on C1 (share 0.25, het, k=533) from the checkpoint rerun v4_het_control_ckpt[_seed2]:
-    arms v4_het_ws_<final_default (control), step3198_default, step3198_continue, step2132_continue, final_lr3x>[_seed2] (worktree
-    wt-ws-restart @5761fe0b), 10 runs, read on the restart jump (largest grad norm over steps 0-19, worst training loss over
-    steps 0-39; ws_restart_steps.py) and PP4/EE4 R(arm/control) and R(arm/B)'
+  next: 'Step 13, waiting on Joaquin''s call (D307 hold): after the restart study (par:v4_warm_start_valley: no restart reads
+    better than the default, the narrow-valley reading not supported), either (a) take the default restart as the recipe and
+    lift D307 so the change tests resume at k=1066, or (b) one more mechanism test: continue from the step-3198 checkpoint
+    with the parent''s saved optimizer state (needs a fine_tune option to load it; 2 runs, about 3 GPU-h)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -16376,9 +16376,7 @@ entries:
       reading NOT SUPPORTED (the jump moved 6-10x without the reads, as the every-group ramp); remaining gap is the retraining
       length (YES at k=1066). Confound in the continued arms: their start models are less trained (step 3198 / 2132 of 4264)
       and meet a fresh optimizer at full lr.'
-  step_waits:
-    '1': FA-ccin2p3-0de6be56 FA-ccin2p3-89ecbc1e FA-ccin2p3-1ef38bb2 FA-ccin2p3-c07e6ad5 FA-ccin2p3-4cb686ac FA-ccin2p3-1f7ae4ea
-      FA-ccin2p3-f3d6af3a FA-ccin2p3-32cb8805 FA-ccin2p3-ba567f27 FA-ccin2p3-166c6378
+  step_waits: {}
   handoff:
     state: 'Step 12 (D307, D308), the restart study on C1 (share 0.25, het, k=533 only, D312), design passed round 2, SUBMITTED
       whole 2026-11-06 ~20:40 UTC: 10 runs on CC from the checkpoint rerun v4_het_control_ckpt[_seed2], scripts/job_catalog_v3_short.sh
@@ -16408,7 +16406,7 @@ entries:
     written: '2026-11-06T20:13:42+00:00'
   step_why:
     1:
-      feeds: how a warm start should leave its parent (the restart recipe for every later change, D307)
+      feeds: how a warm start should leave its parent (D307), and whether the change tests resume
       if:
-      - 'an arm BETTER than the default restart: it becomes the restart recipe, read against B for MATCH'
-      - 'no arm BETTER: the default restart stays; the valley reading is tested by whether the jump moved without the reads'
+      - 'Joaquin picks (a): close the mechanism question, the change tests resume at the default restart'
+      - 'Joaquin picks (b): implement optimizer-state loading in a worktree, design and review, 2 runs at seeds 42/43'
