@@ -13206,10 +13206,6 @@ entries:
   decisions:
   - D282
   next:
-    9: 'Step 7 reads (D283, D300; design re-passed 2026-11-06): when the 54 runs end (52 running, the C8 k=2132 pair v4_het_warmmag_k2132[_seed2]
-      submitted at the next wake once the site gate''s 60-min window allows), logs to scratch, mixture_ab.py val/extract per
-      axis, mixture_ab.py warm C2 C3 C4 C5 C8, signext_compare.py warm (C6), ws_stats_check.py C8 on the k=2132 pair, figure
-      of the compared reads, write-up in par:v4_warm_start'
     11: 'Step 11 (D285, D291), the width growth''s own sweep ws_grow_k533_zeroshot_hpo8 (sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml,
       trunk f5f9511c, repo-reviewer clean at a49b1de7): its objective found (ws_objective_check.py: only the HD4 zero-shot
       score tracks the PP4/EE4 reads, r 0.94-0.98; every validation loss runs against them) and wired into sweep/run_trial.py
@@ -15079,11 +15075,6 @@ entries:
       grow.*sweep, sweep.*grow, HD4, proxy objective, held-out.*objective. Only the sign-head search came up (a val-loss objective),
       already named in the prior.'
   step_why:
-    9:
-      feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
-      if:
-      - 'MATCH and carried at some k: YES at the smallest such k'
-      - 'no k matches: NO at the untuned restart, re-applied with step 9''s recipe if it is BETTER'
     11:
       feeds: 'D285: whether a shape-changing warm start can be tuned to reach width 16 from scratch'
       if:
@@ -15617,15 +15608,6 @@ entries:
       submitted on CC at the default restart (8 trials, 3 chained waves, slurm 62994063-70, limit 00:50, 32G; sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml
       at a6b355c1; target ws_grow_zeroshot 0.9 h; df 78 GB free), step 11 waits on the sweep.'
   step_waits:
-    '9': 'FA-ccin2p3-038f00fe FA-ccin2p3-040c3448 FA-ccin2p3-0d2a042d FA-ccin2p3-0fae36f3 FA-ccin2p3-11938ca8 FA-ccin2p3-1218b835
-      FA-ccin2p3-159e0244 FA-ccin2p3-1e847591 FA-ccin2p3-21fb7bd7 FA-ccin2p3-22afe10b FA-ccin2p3-26f62d9c FA-ccin2p3-2e583c2b
-      FA-ccin2p3-3794e155 FA-ccin2p3-39516188 FA-ccin2p3-3c1ea279 FA-ccin2p3-410e8632 FA-ccin2p3-41729c67 FA-ccin2p3-43601c0a
-      FA-ccin2p3-455bbfbd FA-ccin2p3-4c4a5069 FA-ccin2p3-4ebff80f FA-ccin2p3-51a88ce9 FA-ccin2p3-57172f65 FA-ccin2p3-577b97e2
-      FA-ccin2p3-6ca7a67e FA-ccin2p3-6f6df1b8 FA-ccin2p3-74bb21ec FA-ccin2p3-75f1d8c6 FA-ccin2p3-773e6a80 FA-ccin2p3-78576361
-      FA-ccin2p3-7c2c1c71 FA-ccin2p3-84059582 FA-ccin2p3-88551ced FA-ccin2p3-9a357af2 FA-ccin2p3-9cab9b5b FA-ccin2p3-9e4bcd8c
-      FA-ccin2p3-a6e4ee17 FA-ccin2p3-a767f033 FA-ccin2p3-ac7aa971 FA-ccin2p3-b4525f43 FA-ccin2p3-cf1e0cfc FA-ccin2p3-d26c43ba
-      FA-ccin2p3-d38714af FA-ccin2p3-d54c9e94 FA-ccin2p3-d88a5db8 FA-ccin2p3-dd010506 FA-ccin2p3-ddf740e1 FA-ccin2p3-df7ec695
-      FA-ccin2p3-e47ed26b FA-ccin2p3-e4eac156 FA-ccin2p3-f1390aa8 FA-ccin2p3-f14bc159 FA-ccin2p3-f9582bbb FA-ccin2p3-f968a51d '
     '11': ccin2p3:ws_grow_k533_zeroshot_hpo8_rerun
   handoff:
     state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
