@@ -16361,6 +16361,21 @@ entries:
       1ef38bb2/c07e6ad5, step3198_continue 4cb686ac/1f7ae4ea, step2132_continue f3d6af3a/32cb8805, final_lr3x ba567f27/166c6378
       (s42/s43). Logs: step3198_continue lr_scale 0.20233 from model_run0_step3198, final_lr3x lr_scale 3.0 from model_run0_best.
       plan wait on all 10. Read entries WARM C1r_* at e7393cef; G and loss jump via ws_restart_steps.py.'
+  - at: '2026-11-06T22:20:08+00:00'
+    text: '2026-11-06 step 12 done (D307, D308; design passed round 2): the restart study read, all 10 runs clean (V3_SHORT_DONE).
+      mixture_ab.py warm C1r_* @cc6d768f, ws_restart_steps.py --cached step12_jump, plot_ws_restart.py -> figs/ws_restart_study;
+      write-up par:v4_warm_start_valley @96ca381e (verify_claims 0). Rerun parent equivalent: control over the original parent''s
+      default restart PP4 1.001 [0.857,1.168], EE4 1.001 [0.868,1.146]; R(control/B) 1.32/1.50 SHORT. R(arm/control), 95%
+      class bootstrap widened by |ln R_seed|: step-3198 default restart PP4 1.019 [0.870,1.192], EE4 1.009 [0.854,1.194] NOT
+      BETTER, jump G 0.161/0.100 of the control''s (102/102 vs 631/1016): MOVED; step-3198 continued (lr scale 0.20233, no
+      re-warm) 1.145 [0.972,1.346] / 1.226 [1.025,1.489] WORSE, G 0.490/0.313 but training loss at step 1 -0.317/-0.269 vs
+      the control''s worst -1.552/-1.458 (fresh optimizer at lr 1e-3 at once), lowest final val NLL -2.714/-2.649; step-2132
+      continued 1.230 [1.045,1.449] / 1.210 [1.008,1.451] WORSE, s42 blew up at step 16 (grad 2.4e11, loss 5.0e7) and recovered,
+      s43 G 0.153 (not moved); lr x3 1.093 [0.919,1.299] / 1.052 [0.836,1.315] NOT BETTER, G 1.689 at both seeds (not moved),
+      held_default 0.926, 11 single-batch spikes per seed, recovered. Outcome: no arm BETTER, default restart stays; valley
+      reading NOT SUPPORTED (the jump moved 6-10x without the reads, as the every-group ramp); remaining gap is the retraining
+      length (YES at k=1066). Confound in the continued arms: their start models are less trained (step 3198 / 2132 of 4264)
+      and meet a fresh optimizer at full lr.'
   step_waits:
     '1': FA-ccin2p3-0de6be56 FA-ccin2p3-89ecbc1e FA-ccin2p3-1ef38bb2 FA-ccin2p3-c07e6ad5 FA-ccin2p3-4cb686ac FA-ccin2p3-1f7ae4ea
       FA-ccin2p3-f3d6af3a FA-ccin2p3-32cb8805 FA-ccin2p3-ba567f27 FA-ccin2p3-166c6378
