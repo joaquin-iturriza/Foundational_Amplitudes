@@ -4,6 +4,11 @@ catalog_coverage step 46: "The whole point was to envelop the pp beam range, but
 energy, the catalog sampling does that").
 
     python3 analysis/catalog_v4/pp_support.py pull    one read-only `site run` on CC-IN2P3 (CPU) -> data/pp_support_reads.json
+    python3 analysis/catalog_v4/pp_support.py pull ee the same read on the EE4 probes (recipes/catalog_v4_ee_test.yaml:
+               the e+e- classes' MadEvent ee4_ pools at their fixed collider energies, stored under the 13000-13000GeV
+               label, with the trained class's default-share pool dsh_<x> beside its 2000-event test pool, catalog_v4's
+               e+e- cuts in the e+e- rest frame) -> data/ee_support_reads.json (the e+e- classes'
+               flat ranges, tools/flat_range.py; plan catalog_coverage step (f))
     python3 analysis/catalog_v4/pp_support.py         the summary -> data/pp_support.json, figs/pp_support.{png,pdf}
 
 Classes: every probe of recipes/catalog_v4_pp_test.yaml (the PP4 read: 1301 hadronic catalog_v4 classes, pp13v4_<x>
@@ -43,8 +48,8 @@ SQ2_EDGES = np.arange(0.5, 4.15, 0.1)
 LM2_EDGES = np.arange(-150.0, 60.01, 2.0)
 
 
-def classes():
-    """[(probe, catalog class, (lo, hi), where)] for every PP4 probe"""
+def classes(test="catalog_v4_pp_test.yaml"):
+    """[(probe, catalog class, (lo, hi), where)] for every probe of the test recipe (PP4, or EE4)"""
     from mixture_ab import class_of
     cls = class_of()
     win = {e["name"]: (tuple(e["sqrts"]), "train") for e in
@@ -53,7 +58,7 @@ def classes():
         for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", f"catalog_v4_heldout_{h}.yaml")))["processes"]:
             win.setdefault(e["name"], (tuple(e["sqrts"]), h))
     out = []
-    for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", "catalog_v4_pp_test.yaml")))["processes"]:
+    for e in yaml.safe_load(open(os.path.join(ROOT, "recipes", test)))["processes"]:
         p = e["name"]
         c = cls(p)
         out.append([p, c] + ([list(win[c][0]), win[c][1]] if c in win else [None, None]))
@@ -126,11 +131,15 @@ def one(task):
                         # step 49 (envelope criterion): the pool's marginal densities on the shared grids
                         "hist_sqrts": np.histogram(np.log10(np.clip(sc, 1, None)), SQ_EDGES)[0].tolist(),
                         "hist_logm": np.histogram(lc, LM_EDGES)[0].tolist()}
-        rows = []
-        for role in ("train", "test"):
-            f = find(f"{probe}_13000-13000GeV_{role}_lhe_amplitudes.npy")
+        rows, used = [], []
+        stems = [f"{probe}_13000-13000GeV_{role}_lhe_amplitudes.npy" for role in ("train", "test")]
+        if probe.startswith("ee4_"):    # an e+e- probe has a test pool only; the trained class's default-share pool too
+            stems.append(f"dsh_{probe[4:]}_13000-13000GeV_train_lhe_amplitudes.npy")
+        for stem in stems:
+            f = find(stem)
             if f:
-                rows.append(np.asarray(np.load(f, mmap_mode="r"), dtype=np.float64))
+                rows.append(np.asarray(np.load(f, mmap_mode="r"), dtype=np.float64)); used.append(os.path.basename(f))
+        r["default_pools"] = used
         if not rows:
             raise RuntimeError("no pp pool")
         x = np.concatenate(rows)
@@ -253,8 +262,13 @@ if __name__ == "__main__":
 '''
 
 
-def pull(workers=8, limit=None):
-    tasks = classes()[:limit] if limit else classes()
+READ_SETS = {"pp": ("catalog_v4_pp_test.yaml", "pp_support_reads.json"),
+             "ee": ("catalog_v4_ee_test.yaml", "ee_support_reads.json")}
+
+
+def pull(workers=8, limit=None, which="pp"):
+    test, out = READ_SETS[which]
+    tasks = classes(test)[:limit] if limit else classes(test)
     cmd = (f"F=$(mktemp /tmp/zz_probe_ppsup_XXXXXX.py); J=$(mktemp /tmp/zz_probe_ppsup_XXXXXX.json); cat > $F <<'PYEOF'\n{REMOTE}PYEOF\n"
            f"cat > $J <<'JEOF'\n{json.dumps(tasks)}\nJEOF\n"
            f"python3 $F $J {workers}; rm -f $F $J")
@@ -269,13 +283,16 @@ def pull(workers=8, limit=None):
     rows = json.loads(line[-1][len("PPSUP "):])
     json.dump({"rows": sorted(rows, key=lambda r: r["probe"]), "sqrts_hist_edges_log10": SQ_EDGES.tolist(), "logm_hist_edges": LM_EDGES.tolist(),
                "hist2d_edges": [SQ2_EDGES.tolist(), LM2_EDGES.tolist()]},
-              open(os.path.join(DATA, "pp_support_reads.json"), "w"))
+              open(os.path.join(DATA, out), "w"))
     print(len(rows), sum("error" in r for r in rows))
 
 
 if __name__ == "__main__":
     if sys.argv[1:2] == ["pull"]:
-        pull(limit=int(sys.argv[2]) if len(sys.argv) > 2 else None)
+        rest = sys.argv[2:]
+        which = "ee" if "ee" in rest else "pp"
+        nums = [a for a in rest if a.isdigit()]
+        pull(limit=int(nums[0]) if nums else None, which=which)
 
 
 def summary():

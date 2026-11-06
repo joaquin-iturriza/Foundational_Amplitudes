@@ -16,23 +16,30 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 READS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "pp_support_reads.json")
+# the e+e- classes' range from their own default-sampled events (EE4 test pool and, for a trained class, its
+# default-share pool; pp_support.py pull ee): D294's rule applied to every beam (Joaquin 2026-11-06 ~19:50, "If I asked
+# for pp sampled data, why would you produce e+e- datasets that are different in any way?")
+EE_READS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "ee_support_reads.json")
 OUT = os.path.join(ROOT, "recipes", "catalog_v4_flat_range.json")
 # decades of |M|^2 beyond the in-support pp events' min and max: D270 ("sample in a way that covers the range the pp beams
 # cover, but wider") asks for a margin; 0.5 decade (two of the sampler's 0.25-dex bins) is the chosen width, not his number
 MARGIN_DEX = 0.5
 
 
-def ranges(reads=READS, margin_dex=MARGIN_DEX):
+def ranges(reads=(READS, EE_READS), margin_dex=MARGIN_DEX):
     """{class: [lo, hi]}: natural-log |M|^2 bounds of the in-support pp events over every probe of the class (a class with several probes takes the
     union), the margin added on both sides"""
     m = margin_dex * np.log(10.0)
     out = {}
-    for r in json.load(open(reads))["rows"]:
+    rows = []
+    for f in ([reads] if isinstance(reads, str) else reads):
+        rows += [dict(r, _src=f) for r in json.load(open(f))["rows"]]
+    for r in rows:
         d = r.get("default") or {}
         if r.get("class") is None:
             continue
         if "logm_min_in_support" not in d:
-            raise SystemExit(f"{reads}: no in-support range ({r['probe']}); re-read with pp_support.py pull")
+            raise SystemExit(f"{r['_src']}: no in-support range ({r['probe']}); re-read with pp_support.py pull")
         if d["logm_min_in_support"] is None:      # no pp event in the support: the class gets no flat range
             continue
         lo, hi = float(d["logm_min_in_support"]) - m, float(d["logm_max_in_support"]) + m
