@@ -15803,6 +15803,30 @@ entries:
       not BETTER: the empty optimizer was not what kept continuing from beating the default restart; the start model''s shorter
       training is left, the default restart stays and the D307 hold goes to Joaquin. Jump not removed: the loading did not
       work as meant, read the log (OPT_STATE line) before anything else. A run that blows up is listed apart with where.'
+    fix_at: '2026-11-06T22:28:30+00:00'
+    fix: 'Check 5 (prior incomplete): docs/results.tex par:v4_warm_start_repairs (around line 2866, claims parent_optimizer_state.muon_state_entries=0,
+      adamw_state_entries=2 from ws_restart_steps.py) found that the parent checkpoint used for warm starts held 0 Muon and
+      2 AdamW optimizer-state entries, because the sigma stage overwrote it. That is prior work on exactly whether a checkpoint
+      can supply the optimizer state, and the prior field leaves it out. The step-3198 file of v4_het_control_ckpt was written
+      by _save_at_step during main training with no sigma stage, so it probably holds the full state, but nothing shows that.
+      Fix: name that finding in prior, and before submitting read model_run0_step3198.pt.gz of both parents in a CPU read
+      on CC (as ws_restart_steps.py does): Muon entries equal to the number of Muon parameters, AdamW entries to the number
+      of AdamW parameters. Also state the rule that a run whose OPT_STATE line shows fewer entries is cancelled. Check 4 (no
+      yes/no for the question''s own mechanism half): the question asks whether the empty-optimizer jump is what made continuing
+      worse, but the outcome gives no bar on R(arm / fresh-optimizer step3198_continue) (and step3198_default beside it).
+      Fix: state the yes and no for that ratio, e.g. ''the jump caused it'' when it is removed AND the widened upper end of
+      R(arm/step3198_continue) is below 1 on PP4 or EE4 with the arm within step3198_default''s interval; ''not the cause''
+      when it is removed and that R interval holds 1. State what each answer means for the hold that goes to Joaquin. Check
+      1/4 (a state to declare, not a new arm): the loader starts from the step-3198 EMA weights (''model'', EMA decay 0.941,
+      log of 4cb686ac: ''Fine-tuning: the parent''s EMA weights''), while the loaded optimizer moments belong to the live
+      weights (''model_live''). So the arm is not literally the parent''s run continued. The matched pair is still one change,
+      because step3198_continue also started from the EMA weights. Fix: say so in fixed, and in the ''jump not removed'' branch
+      name the mismatch between EMA weights and live moments as a cause to rule out alongside the OPT_STATE line. Checks that
+      hold: one change against step3198_continue (diff of branch ws-optstate @7456a119 adds only WS_OPTSTATE to that arm''s
+      settings); measure responds (data/ws_restart_study_steps.json recomputed: rise 1.13/1.11 control, 0.97/0.64 step3198_default,
+      2.17/2.10 continued, 2.41/3.74 lr x3; the moment fill moved the same jump, +0.91/+1.54 vs -1.33/-1.22); 2 seeds as sibling
+      cells, with no more seeds per D307/D313; HETEROSC; parent target stats as in step 12; no HPO; disk 2 x 0.9 GB with no
+      shared cache; reads PP4/EE4 as in step 12; D307/D308 answered; tests/test_load_optimizer_state.py passes on CPU.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
