@@ -8830,7 +8830,6 @@ entries:
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
     '60': Joaquin running or allowing scripts/remove_worktree.sh
-    '62': Joaquin's answer on the loader-control result (clear enough, or more seeds), asked 2026-11-05
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
