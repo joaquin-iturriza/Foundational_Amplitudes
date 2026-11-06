@@ -15541,6 +15541,15 @@ entries:
     text: '2026-11-06: the GROW_SWEEP/GROW_HP re-run arm merged into trunk 107e2bea (repo-reviewer PASS at 475c122c; its nit
       fixed: sweep_trial_hps prints the failure reason on stdout). The best trial''s runs/<sweep>/trial_<idx>/config.yaml
       must exist on the site the re-runs go to (the sweep runs on CC-IN2P3, so the re-runs go there too).'
+  - at: '2026-11-06T11:21:49+00:00'
+    text: '2026-11-06 11:20 UTC: submitted by hand (the queued launch was not yet ready; launch FA/ws_c8k2132_step10 removed)
+      through its script, code @2b82ebe0: C8 k=2132 pair v4_het_warmmag_k2132 FA-ccin2p3-9e4bcd8c (s42), _seed2 84059582 (s43),
+      limit 02:45; step 10 v4_het_warm25a_k533 fbb16a33 / _seed2 cb458c82 (AdamW damped), v4_het_warm25e_k533 5862b62e / _seed2
+      d15462b0 (every group damped), limit 02:15; scripts/job_catalog_v3_short.sh, --mem 16G, site pick 6 jobs on ccin2p3
+      done in ~2.8 h. Ids in mixture_ab.py WARM C8 W[2132], C1a, C1e. Waits: step 10 and step 11 on the 4 step-10 runs, step
+      9 on all 54 step-7 runs. 13 step-7 runs had ended COMPLETED (C3/C4/C5 at k=533 both seeds, C5 k=1066, MSE C_k 533 and
+      1066, C8 k=533, C2 k=533 ...): their logs, val curves and per-axis reads are being fetched (detach step7_reads_a, scratchpad
+      read7.sh). To do: ws_stats_check.py C8 on the k=2132 pair once started.'
   step_waits:
     '10': FA-ccin2p3-fbb16a33 FA-ccin2p3-cb458c82 FA-ccin2p3-5862b62e FA-ccin2p3-d15462b0
     '9': 'FA-ccin2p3-038f00fe FA-ccin2p3-040c3448 FA-ccin2p3-0d2a042d FA-ccin2p3-0fae36f3 FA-ccin2p3-11938ca8 FA-ccin2p3-1218b835
