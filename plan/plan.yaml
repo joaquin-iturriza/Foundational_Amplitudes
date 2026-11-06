@@ -15506,6 +15506,17 @@ entries:
       that read better on the default-sampled probes fit the catalog-sampled validation pools worse, so any objective on those
       pools selects against the reads. Next: the growth sweep''s objective is the HD4 zero-shot MSE of each trial''s final
       model (PP4/EE4 stay the deciding reads, unused in selection); its implementation in the sweep worker is the next piece.'
+  - at: '2026-11-06T10:56:00+00:00'
+    text: '2026-11-06 ~10:58 UTC: the C8 k=2132 pair (v4_het_warmmag_k2132[_seed2], 02:45, est 2.74) and step 10''s 4 runs
+      (v4_het_warm25a/e_k533[_seed2], 02:15, est 1.5, batch target ws_adamw_damped 1.5 h) are queued as launch FA/ws_c8k2132_step10
+      (D303; ready at 11:20 UTC, when the step 7 batch leaves the site gate''s 60-min window: it was submitted 10:11-10:17
+      UTC), run by the supervisor through <scratchpad>/ws_launch_c8_step10.sh (launch_cc_only.sh, NOSYNC after one sync, plan
+      run per id, a DONE event on warm_start with the ids). Step 11: the objective check merged (trunk f5f9511c, repo-reviewer
+      clean at a49b1de7; worktree worktrees/wt-ws-objective merged, its removal by scripts/remove_worktree.sh refused by the
+      auto-mode classifier, left for the next owner or Joaquin); design round 2 PASS; the memmap cache prebuild FA-ccin2p3-5e02275b
+      (CPU, scripts/job_mmap_prebuild.sh on the base run''s config) submitted, plan wait step 11 on it; the sweep goes after
+      it ends rc 0 and after step 10''s reads. Not yet done: mixture_ab.py WARM C8 W[2132] and C1a/C1e (ids at the launch),
+      plot_ws_fill.py with step 10''s arms, the GROW_HP=<trial>/GROW_SWEEP re-run arm.'
   step_waits:
     '10': FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b
       FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7 FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e
