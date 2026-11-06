@@ -832,13 +832,14 @@ class BaseExperiment:
                 warmup = self.cfg.training.cosanneal_warmup_steps
 
             if self.cfg.training.scheduler == "WSD":
+                assert self.cfg.training.get("wsd_cooldown_frac") is not None, "scheduler WSD needs training.wsd_cooldown_frac"
                 # the warmup and the floor as the cosine's (cosanneal_warmup_frac, cosanneal_eta_min); the
                 # cooldown is the last training.wsd_cooldown_frac of the steps
                 self.scheduler = wsd_scheduler(
                     self.optimizer,
                     warmup,
                     T_max=int(increment_steps * self.cfg.training.scheduler_scale),
-                    cooldown_frac=float(self.cfg.training.get("wsd_cooldown_frac", 0.2)),
+                    cooldown_frac=float(self.cfg.training.wsd_cooldown_frac),
                     eta_min=self.cfg.training.cosanneal_eta_min,
                 )
             else:
@@ -849,11 +850,14 @@ class BaseExperiment:
                     eta_min=self.cfg.training.cosanneal_eta_min,
                 )
             self._sched_summary = {"T_max": int(increment_steps * self.cfg.training.scheduler_scale),
-                                   "warmup": int(warmup), "increment_steps": increment_steps}
+                                   "warmup": int(warmup), "increment_steps": increment_steps,
+                                   "scheduler": str(self.cfg.training.scheduler)}
+            if self.cfg.training.scheduler == "WSD":
+                self._sched_summary["cooldown_frac"] = float(self.cfg.training.wsd_cooldown_frac)
             if is_dyhpo_run:
                 run_kind = "resume" if self.warm_start else "cold start"
                 LOGGER.info(
-                    f'Using CosineAnnealingLR scheduler'
+                    f'Using {self.cfg.training.scheduler} scheduler'
                     f' (DyHPO {run_kind}, increment={increment_steps} steps, warmup={warmup})'
                 )
             else:
