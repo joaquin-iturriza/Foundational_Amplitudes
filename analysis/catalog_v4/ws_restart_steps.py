@@ -13,13 +13,19 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 from analysis.common import site_python  # noqa: E402
 
 SCRIPT = r'''
-import glob, gzip, json, numpy as np, torch, yaml
+import glob, gzip, json, os, numpy as np, torch, yaml
 RUNS = {"warm start, default lr (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25_k533",
         "grown 8 to 16, 533 steps (s42)": "runs/catalog_v4_long/v4_het_default25_w16_grow_k533",
-        "pretrained start (het control, s42)": "runs/catalog_v4_short/v4_het_control"}
+        "pretrained start (het control, s42)": "runs/catalog_v4_short/v4_het_control",
+        "moment fill (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25f_k533",
+        "moment fill (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25f_k533_seed2",
+        "default restart, same commit (k=533, s42)": "runs/catalog_v4_short/v4_het_warm25_k533_tagd303",
+        "default restart, same commit (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25_k533_seed2_tagd303"}
 RUNS.update({"hpo8 " + d.rsplit("/", 1)[1]: d for d in sorted(glob.glob("runs/ws_c1_k533_hpo8/trial_*"))})
 out = {}
 for lab, d in RUNS.items():
+    if not os.path.exists(d + "/train_steps.npz"):
+        out[lab] = {"run_dir": d, "missing": True}; continue
     z = np.load(d + "/train_steps.npz"); g, l, lr = z["grad_norm"], z["loss"], z["lr"]
     c = yaml.safe_load(open(d + "/config.yaml"))
     out[lab] = {"run_dir": d, "steps": len(g), "lr_scale": (c.get("fine_tune") or {}).get("lr_scale"),
@@ -42,12 +48,14 @@ if __name__ == "__main__":
         out = site_python(SCRIPT, [], "RESTART")
         json.dump(out, open(f, "w"), indent=1)
     for k, r in out.items():
-        if k.startswith("_"):
+        if k.startswith("_") or r.get("missing"):
             print(k, r); continue
         print(f"{k:42s} lr_scale {r['lr_scale']} lr@2 {r['lr_0_2'][2]:.2e} grad@0,1,2 "
               + " ".join(f"{x:.3g}" for x in r["grad_0_2"]) + f" gmax20 {r['grad_max20']:.3g}@{r['grad_max20_at']}"
               f" loss@0 {r['loss_0_2'][0]:.3f} max40 {r['loss_max40']:.3f} end {r['loss_end']:.3f}")
     # the last line, keyed without spaces for docs/results.tex claims: default, grown, parent, trial_NNNN
     short = {"warm start, default lr (k=533, s42)": "default", "grown 8 to 16, 533 steps (s42)": "grown",
-             "pretrained start (het control, s42)": "parent"}
+             "pretrained start (het control, s42)": "parent", "moment fill (k=533, s42)": "fill_s42",
+             "moment fill (k=533, s43)": "fill_s43", "default restart, same commit (k=533, s42)": "default_d303_s42",
+             "default restart, same commit (k=533, s43)": "default_d303_s43"}
     print(json.dumps({short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}))
