@@ -15327,6 +15327,9 @@ entries:
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '7': step 8's read of FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422 (it picks the restart recipe)
     '8': FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422
+    '10': FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b
+      FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7 FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e
+      FA-ccin2p3-410e8632 FA-ccin2p3-78576361
   handoff:
     state: 'Step 6 fully read: moment fill NO CAUSE (C1f), mean-MSE-tuned restart NOT BETTER (C1m), tuned growth NOT BETTER
       and SHORT (C10wm: R tuned/untuned grown PP4 1.058 [1.021,1.097], EE4 1.050; R(W/w16) 1.91/1.94; R(W/w8) 1.05/1.05; figs/ws_c10wm_{a,b,c}
