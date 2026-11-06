@@ -62,8 +62,7 @@ def main():
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)
-    ps.legend(aV, "upper right")
-    ps.legend(aP, "upper left")
+    ps.legend(aV, "upper right")   # the one legend: colours are the arms in every panel (CDFs: both seeds)
     ps.save(fig, os.path.join(HERE, "figs", "ws_fill"))
     print(json.dumps(out, indent=0))
 
