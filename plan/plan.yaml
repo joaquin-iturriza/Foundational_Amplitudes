@@ -13338,7 +13338,7 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: ac0ced7d711b6fd5b
-    state: working
+    state: closed
     since: '2026-11-06T11:01:13+00:00'
     state_at: '2026-11-06T13:18:19.304000+00:00'
     context: 253239
@@ -15576,34 +15576,42 @@ entries:
       FA-ccin2p3-e47ed26b FA-ccin2p3-e4eac156 FA-ccin2p3-f1390aa8 FA-ccin2p3-f14bc159 FA-ccin2p3-f9582bbb FA-ccin2p3-f968a51d '
     '11': sweep ws_grow_k533_zeroshot_hpo8
   handoff:
-    state: 'Step 8 read and written up: damped-Muon restart NOT MUON (m -0.148/-0.059) and NOT BETTER (C1u R PP4 1.032 [0.866,1.228],
-      EE4 1.045 [0.911,1.197]; mixture_ab.py warm C1u @c14a07b0; fig ws_muon_damped via plot_ws_fill.py --damped @e1b705f4;
-      par:v4_warm_start_repairs @cbd05702); untuned default restart stays the recipe. Step 7 (next 9): design re-passed round
-      2 (C1 is YES at k=1066), 52 of 54 runs running on CC (ids in mixture_ab.py WARM C2-C5, C8, _MSE_C @c1b7acad; map scratchpad
-      step7_map.txt); ws_stats_check.py C5 C6 C8 passes (abslog floor compared relatively at 1e-3 @55e8a0fe; C8 k=2132 pair
-      not yet checked). TO DO AT THE NEXT WAKE (the site gate''s 60-min window, est 79.8 = D300, counts jobs at their limits):
-      submit the C8 k=2132 pair with bash <scratchpad>/step7_submit.sh 2132 (skips submitted runs; site sync first; record
-      with plan run and add the pair to mixture_ab.py WARM C8 W[2132]) and step 10''s 4 runs (design passed 2026-11-06: v4_het_warm25a_k533[_seed2],
-      v4_het_warm25e_k533[_seed2], launch_cc_only.sh with NOSYNC=1 SYNC_FIRST=1 MEM=16G TIME=02:15:00 est 1.5; then add WARM
-      C1a/C1e in mixture_ab.py with ref default 0202ba7f/7b2d6c24, ws_restart_steps.py already has the dirs and step9_share
-      @eec7a6e1, plot_ws_fill.py needs the two arms). Step 10 waits on the 14 k=533 MSE runs (wake), step 9 on the 52. Step
-      11 (growth sweep''s objective design from the growth runs'' own logs: default e046ac67/f35b6a78 vs hp1333 31359864/bfed460f,
-      find a logged validation quantity that ranks them as the reads do) is ready work now, independent of step 10.'
-    decisions: D300 covers step 7 at 79.8 GPU-h (item est recorded today); the gate's limit-based count is routed around by
-      waiting the window, not by raising the estimate. Untuned default restart is the recipe for step 7 (step 6 and 8 maps).
-      Step 10 (AdamW vs every-group damping) passed design review; outcome NONE takes precedence over the share bands; a failed
-      pairing check voids the pairing. The growth sweep is not run on the validation MSE of the mean or the NLL (neither tracked
-      the reads on C1); its objective is designed first.
-    ruled_out: 'C7 (its gate: magnitude het over MSE control HD5 1.47 [0.97,1.99]); C9; catalog_v3 changes; NLL-tuned low-lr
-      restart; mean-MSE-tuned restart (C1, growth); optimizer moment fill; Muon''s step as the cause of the jump and Muon
-      damping as a recipe change; pre-decay parents (D289); lr_scale 0.01 extension.'
-    running: 52 step 7 runs on CC-IN2P3 (submitted 11:0x-11:2x 2026-11-06, longest limit 03:00); nothing else.
-    files: analysis/catalog_v4/mixture_ab.py; analysis/catalog_v4/ws_stats_check.py; analysis/catalog_v4/ws_restart_steps.py;
-      analysis/catalog_v4/plot_ws_fill.py; analysis/catalog_v4/signext_compare.py; analysis/catalog_v4/data/warm_start_C1u.json,
-      ws_stats_check.json, ws_restart_steps.json; scripts/job_catalog_v3_short.sh (arms warm25a/e); optim/muon.py, base_experiment.py
-      (adamw_warmup_steps); tests/test_adamw_warmup.py; docs/results.tex par:v4_warm_start_repairs; scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step7_submit.sh
-      and step7_map.txt; worktree worktrees/wt-adamw-warmup merged, to remove with scripts/remove_worktree.sh
-    written: '2026-11-06T10:30:10+00:00'
+    state: 'Steps 10 and 12 done and written up (par:v4_warm_start_ramp @6a03fdee: jump EVERY GROUP on paired seed 42, a=-0.018,
+      every-group arm 0.053 of default; neither arm BETTER, AdamW damped R PP4 1.017/EE4 1.012, every group worse 1.237/1.619;
+      par:v4_warm_start_objective @f213c72f: only the HD4 zero-shot score tracks the reads). Untuned default restart stays
+      the recipe. STEP 9 READY (all 54 step-7 runs ended, E3869): run list = scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step7_map.txt
+      (arm -> id, 52) plus the C8 k=2132 pair v4_het_warmmag_k2132 FA-ccin2p3-9e4bcd8c (s42) / _seed2 84059582 (s43); all
+      ids in mixture_ab.py WARM C2-C5, C8 (W[2132] filled), _MSE_C, and signext_compare.py (C6). 13 already read home (reads
+      committed 062991e1; list /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/done7.txt).
+      Read recipe: for each remaining run bash /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/read7.sh
+      <run> (site logs -n 3000000 to /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/logs7,
+      mixture_ab.py val, extract on every axis the log read), batched as one tools/detach.py --each job; then mixture_ab.py
+      warm C2 C3 C4 C5 C8 and signext_compare.py warm (C6); ws_stats_check.py C8 on the k=2132 pair (equivalence gate for
+      C8''s verdict, not yet run); figure of the compared reads (plot_warm_start.py family), write-up in par:v4_warm_start
+      with src/claim lines; outcome per change by the design (smallest k with MATCH and carried -> YES at k/4264). STEP 11:
+      growth sweep ws_grow_k533_zeroshot_hpo8 running on CC (slurm 62994063-70, 3 chained waves 3/3/2, limit 00:50, config
+      sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml at a6b355c1), step 11 waits on it; bar: best trial''s zero_shot_score
+      below the default growth''s 0.535 (seed 42, e046ac67; ws_objective_check.py score), else NOT BETTER and no re-run; if
+      below, re-run the best trial at seeds 42/43 with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8 GROW_HP=<idx> on arm v4_het_default25[_seed2]
+      LONG_HEADS=16 GROW_K=533 (merged 107e2bea, repo-reviewer PASS), read with mixture_ab.py warm as C10wm against e046ac67/f35b6a78.
+      OPEN: seed-43 pairing failure in step 10 (both arms step-1 grad norm 91.5 vs control 113.3 with step-0/1 training loss
+      equal to 1e-4, same GPU type V100-PCIE; cause not found: suspect a data-stream or pool change between the control''s
+      commit and 2b82ebe0) - the seed-42 verdict stands, worth checking before any later pairing against 0202ba7f/7b2d6c24.'
+    decisions: 'Step 10 outcome by its design: EVERY GROUP on the paired seed, neither BETTER -> untuned default restart stays
+      (growth sweep and step 7 at it); seed 43 voided by the failed pairing, shown beside. Growth sweep objective is the HD4
+      zero-shot score (no validation loss tracks the reads). Duplicate submission of v4_het_warm25e_k533[_seed2] resolved
+      by keeping the launch''s 21a18a76/21674d1e and cancelling 5862b62e/d15462b0; launch_cc_only.sh now locks the already-submitted
+      check per key (095733c4).'
+    ruled_out: C7; C9; catalog_v3 changes; NLL-tuned and mean-MSE-tuned restarts (C1, growth); optimizer moment fill; Muon
+      damping; AdamW-only damping and every-group damping as recipe changes (step 10); pre-decay parents (D289); lr_scale
+      0.01 extension; validation NLL / MSE of the mean as tuning objectives.
+    running: Growth sweep ws_grow_k533_zeroshot_hpo8 on CC-IN2P3 (slurm 62994063-62994070). Step-7 runs all ended.
+    files: analysis/catalog_v4/mixture_ab.py (WARM C1a, C1e, C2-C5, C8, _MSE_C); analysis/catalog_v4/signext_compare.py; analysis/catalog_v4/ws_stats_check.py;
+      analysis/catalog_v4/ws_restart_steps.py; analysis/catalog_v4/plot_ws_fill.py (--step10); analysis/catalog_v4/ws_objective_check.py
+      (summary, score); tools/sweep_trial_hps.py; scripts/job_catalog_v3_short.sh (GROW_SWEEP); scripts/launch_cc_only.sh;
+      docs/results.tex par:v4_warm_start_objective, par:v4_warm_start_ramp; scratchpad /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/step7_map.txt,
+      done7.txt, read7.sh, logs7/
+    written: '2026-11-06T13:18:42+00:00'
   ask: Should the tuned width growth also run at 1066 and 2132 steps, like the untuned growth, or only at 533?
   waiting_since: '2026-11-06T06:48:34+00:00'
   searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
