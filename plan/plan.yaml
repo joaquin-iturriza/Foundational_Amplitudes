@@ -14976,18 +14976,18 @@ entries:
     units: null
     start: '2026-11-06T09:46:57+00:00'
     at: '2026-11-06T09:46:57+00:00'
-  - batch: ws_adamw_damped
-    wall_h: 1.5
-    jobs: 4
-    units: null
-    start: '2026-11-06T10:27:23+00:00'
-    at: '2026-11-06T10:27:23+00:00'
   - batch: ws_step7_c8_k2132
     wall_h: 2.2
     jobs: 2
     units: null
     start: '2026-11-06T10:27:25+00:00'
     at: '2026-11-06T10:27:25+00:00'
+  - batch: ws_adamw_damped
+    wall_h: 1.5
+    jobs: 4
+    units: null
+    start: '2026-11-06T10:34:32+00:00'
+    at: '2026-11-06T10:34:32+00:00'
   findings:
   - at: '2026-11-04T21:53:41+00:00'
     text: 'C7/C8 gate applied (design passed 2026-11-04, its gate on catalog_coverage step 47''s reads; het_magnitude.json
