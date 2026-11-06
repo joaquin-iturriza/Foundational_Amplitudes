@@ -11829,6 +11829,9 @@ entries:
       every passed tip to .claude/.review_state/<pillar>.passed and never moves the watermark back on --at; tools/review_state.passed()
       accepts a tip that is an ancestor of, or has the same pillar files as, a listed pass. The agent''s edit was refused
       as self-modification; Joaquin told 2026-11-06. Apply when allowed, test on two branches passing in sequence.'
+    19: 'Two growth data caches on CC-IN2P3 (/sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache/27a1422795e9872faa6b9eaf and
+      0c897ca2d81c98d3828e2808, ~18 GB each, ours, rebuildable): their deletion through site run was refused for the warm_start
+      agent by the permission check; Joaquin told 2026-11-06. Delete when he allows or does it.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -12080,6 +12083,11 @@ entries:
       if:
       - 'applied and tested: drop'
       - 'still refused: Joaquin applies it or allows it'
+    19:
+      feeds: disk on /sps/lpnhe (93 GB free)
+      if:
+      - 'deleted: drop'
+      - 'disk below 10% free first: tell Joaquin again'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
