@@ -9327,6 +9327,44 @@ entries:
       flat part, multichannel, uniform/flat in log, in-support; plan findings; decisions D269 D270 D294: no prior quota run.
       Note: the code pools the probe val (v3 physics on 3 probes) and dsh_ (v4) into one held-out count, so the per-source
       v3/v4 split the NO branch relies on must be re-read per file before a NO is interpreted.'
+  - at: '2026-11-06T05:42:57+00:00'
+    question: 'Step 58 (a) re-check, D294/D269/D270, the passed design''s NO branch (''fix the proposal where they sit''):
+      with two channels added to the quota policy''s candidates, a multiperipheral ladder (every final at pT log-uniform in
+      [10, 40] GeV, rapidities spread to |eta| 5, span solved to sqrt(s)) and one joint-resonance channel per pair of resonances
+      on disjoint finals, does the quota fill every 0.25-dex log|M|^2 bin of the class''s in-support pp range (+-0.5 dex)
+      and leave 0 held-out in-support pp events outside the kept range, on the five step-57 classes (uux_epemg, uux_epemvevex,
+      uu_bbxuu, us_ddxsu, udx_csxvevex)?'
+    prior: 'Step 58 quota check (finding 2026-11-06, multichannel_check.json @075c4501, where reads data/quota_where @f1b7ab62):
+      NO on 4/5 classes; every chunk stopped at the budget of 50 candidates per flat event; shortfall 24% (uux_epemvevex),
+      25% (udx_csxvevex), 33% (us_ddxsu), 38% (uu_bbxuu), all at the top of the range; held-out outside kept 1176/1049 of
+      53345 (uu_bbxuu), 401/418 of 53857 (us_ddxsu), 1/2 (udx_csxvevex), 0/0 (uux_epemvevex); only uux_epemg YES. Unreached
+      QCD events: sqrt(s_hat)/lo median 36, max|eta| 4.6, min pT 11 GeV, min pair mass/sqrt(s) 0.009; EW top bins: two pairs
+      within 5 GeV of m_Z/m_W (90%: >= 2). Searched results.tex (quota, flat_range, multiperipheral, ladder, joint resonance,
+      double resonance), plan, decisions D269 D270 D294: no prior run of these channels.'
+    measure: 'As the passed step-58 design, per class, seed and policy (quota, quota_ladder_res2): held-out in-support pp
+      events outside the kept range (count, N, 3/N at 0; held-out = probe val + dsh_ train/val/test, never read for the range
+      table); quota shortfall share and short bins; chunks stopped at the budget or no_steer; kept events per channel (do
+      the new channels carry the top bins); flat candidates per kept event; chunk seconds per event against quota on the same
+      node. Figure fig_flat_quota.py (pp, multichannel, quota, quota with the new channels, per class, seed 42).'
+    check: 'On existing data the measure moves with the proposal: step 57-58 above-max share went 0.35-0.49 (current) -> <=0.0005
+      (multichannel) on the EW classes and held-out outside 5033 -> 1176 (uu_bbxuu, multichannel -> quota). The new channels''
+      reach was checked on CPU (tests/test_multichannel.py @3f0e6980): the ladder at sqrt(s)=1500 GeV gives max|eta| 3.7/4.3/4.8
+      and min pT 10.2/12.9/20.1 GeV (10/50/90%), matching the unreached pp events'' 4.2/4.6/4.9 and 10.2/11.0/13.3; the joint-resonance
+      channel puts both pairs within 5 widths of their poles in > 45% of events; phase space exact (momentum, mass shells).
+      The held-out counts are not fixed by construction.'
+    fixed: 'Each class''s catalog_v4 train entry and chunk plan, multichannel channels as step 57 plus the two new ones only
+      in quota_ladder_res2, oversample 6, flat_budget 50, bin width 0.25 dex, margin 0.5 dex, range table recipes/catalog_v4_flat_range.json;
+      code: branch quota-channels @3f0e6980 merged into trunk after the repo-reviewer, synced to CC; scripts/job_multichannel_check.sh
+      with MCHECK_POLICIES=multichannel+quota+quota_ladder_res2, CC htc CPU, 1 core, 8G, limit 00:40.'
+    control: The quota policy without the new channels (and multichannel), same class, seed, job and node.
+    seeds: 42 and 43 per class (10 jobs), as steps 57 and 58.
+    outcome: 'YES = on every class and seed: 0 held-out in-support events outside the kept range (3/N ~5.6e-5), 0 shortfall,
+      0 budget or no_steer stops -> design the regeneration of the 1301 hadronic tree classes with sampling.mc_mperi/mc_res2
+      and the cost factor from the measured time ratio; the out-of-support share handled there as the cut-frame fix. NO with
+      the shortfall reduced and carried by the new channels: raise flat_budget by the measured candidates per kept event of
+      the bins still short, one more re-check. NO with the shortfall unchanged: the channels miss the region; read the kept
+      per-channel counts and the where reads of the remaining short bins and revise the channel. Cost: 10 CPU jobs, 1 core,
+      <= 20 min each, limit 00:40; no GPU.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
