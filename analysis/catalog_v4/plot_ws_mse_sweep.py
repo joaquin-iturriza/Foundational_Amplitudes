@@ -24,6 +24,7 @@ LABEL = {"mse_wsd": "MSE objective, WSD", "nll_cosine": "NLL objective, cosine"}
 def rows(path):
     out = {}
     for k, t in json.load(open(path)).items():
+        assert t["best_step"] >= t["validate_every"], f"{k}: best_step {t['best_step']} before the first validation"
         i = t["best_step"] // t["validate_every"] - 1
         h = t["hps"]
         out[k] = {"lr_scale": h["fine_tune.lr_scale"], "scheduler": h.get("training.scheduler") or "CosineAnnealingLR",
