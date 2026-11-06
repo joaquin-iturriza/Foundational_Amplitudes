@@ -13709,6 +13709,7 @@ entries:
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '5': FA-ccin2p3-c6d0c827
     '6': sweep ws_c1_k533_mse_wsd_hpo8
+    '7': 'step 6''s sweep ws_c1_k533_mse_wsd_hpo8 (ccin2p3): C2-C8 go with its tuned recipe once it ends'
   handoff:
     state: 'Steps (a)-(d) of D291 under way. (a) first read from logged curves: over ws_c1_k533_hpo8''s 8 trials the val MSE
       of mu ranks opposite to the NLL objective (lr 0.174: NLL best -2.758, MSE 0.0349; lr 2.22: MSE best 0.0257); the untuned
