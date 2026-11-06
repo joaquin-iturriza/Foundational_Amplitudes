@@ -1128,6 +1128,8 @@ for _c, _what in (("C1a", "AdamW damped"), ("C1e", "every group damped")):
     WARM[_c] = {"W": {}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
                 "ref": {"default": WARM["C1f"]["ref"]["default"], "default_older": WARM["C1f"]["ref"]["default_older"]},
                 "deciding": ("PP4", "EE4"), "design": f"plan warm_start step 10 (D303), {_what}, design passed 2026-11-06"}
+WARM["C1a"]["W"][533] = ("FA-ccin2p3-fbb16a33", "FA-ccin2p3-cb458c82")   # v4_het_warm25a_k533[_seed2], submitted 2026-11-06
+WARM["C1e"]["W"][533] = ("FA-ccin2p3-5862b62e", "FA-ccin2p3-d15462b0")   # v4_het_warm25e_k533[_seed2]
 # step 7 (D283, D300; the superset design passed 2026-11-04T21:51): the other changes at k in 533/1066/2132, arms of
 # scripts/job_catalog_v3_short.sh (ws-step7). W and C are filled with the run ids at submission (empty: not submitted).
 # Het changes from the het control (A as C1, C_k C1's v4_het_cont_k*): C2 share 0.50 (B the het share-0.50 pair),
@@ -1142,7 +1144,7 @@ _D7 = "plan warm_start step 7 (D283, D300), superset design passed 2026-11-04T21
 WARM["C2"] = {"W": {533: ('FA-ccin2p3-9a357af2', 'FA-ccin2p3-d26c43ba'), 1066: ('FA-ccin2p3-f968a51d', 'FA-ccin2p3-d88a5db8'), 2132: ('FA-ccin2p3-0fae36f3', 'FA-ccin2p3-74bb21ec')}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX_HET["default50"], HD4=HD4_HET["default50"], HD5=HD5_HET["default50"])}
 # C8 k=2132 pair: held by the site gate's 60-min window at submission, added when submitted
-WARM["C8"] = {"W": {533: ('FA-ccin2p3-0d2a042d', 'FA-ccin2p3-e4eac156'), 1066: ('FA-ccin2p3-1218b835', 'FA-ccin2p3-7c2c1c71')}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("HD5",), "design": _D7, "stats_check": True,
+WARM["C8"] = {"W": {533: ('FA-ccin2p3-0d2a042d', 'FA-ccin2p3-e4eac156'), 1066: ('FA-ccin2p3-1218b835', 'FA-ccin2p3-7c2c1c71'), 2132: ('FA-ccin2p3-9e4bcd8c', 'FA-ccin2p3-84059582')}, "C": _HET_C, "A": WARM["C1"]["A"], "deciding": ("HD5",), "design": _D7, "stats_check": True,
               "B": {r: ("FA-ccin2p3-5abe4a0e", "FA-ccin2p3-92207f6a") for r in ("PP4", "EE4", "held", "HD4", "HD5")}}
 WARM["C3"] = {"W": {533: ('FA-ccin2p3-11938ca8', 'FA-ccin2p3-22afe10b'), 1066: ('FA-ccin2p3-a767f033', 'FA-ccin2p3-f9582bbb'), 2132: ('FA-ccin2p3-88551ced', 'FA-ccin2p3-ddf740e1')}, "C": _MSE_C, "A": _MSE_A, "deciding": ("PP4", "EE4"), "design": _D7,
               "B": dict(MIX["default25"], HD4=HD4_MSE["default25"], HD5=HD5_MSE["default25"])}
