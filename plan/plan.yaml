@@ -12330,9 +12330,6 @@ entries:
       asking again; redo the per-run time for the tuned recipe and record targets'
     8: '(d) Figures: redraw the checkpoint (D289), tuned (D284) and width-growth (D285) results as the compared quantities:
       validation loss curves side by side, and each arm''s per-class zero-shot MSE'
-    9: 'C2-C8 cost: Joaquin''s words of 2026-11-06 (''I approved everything you gave me for the warm start changes'', recorded)
-      cover them at the 79.8 GPU-h they were put to him at; submit after step 6''s tuned recipe without asking again; if the
-      re-estimate with the tuned recipe is far above 79.8 GPU-h, the new number goes to the main session first.'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -13477,11 +13474,6 @@ entries:
       if:
       - 'drawn: committed png+pdf, referenced in results.tex'
       - 'a curve missing locally: fetch it from the site'
-    9:
-      feeds: Joaquin's D283 scope and his 11-06 approval
-      if:
-      - 'submitted: record runs'
-      - 're-estimate well above 79.8: to the main session'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
