@@ -1849,10 +1849,20 @@ def cmd_where(a):
     print("plan file %s\nstate     %s\nregistry  %s" % (PLAN_FILE, STATE_FILE, RUNS_DB))
 
 
+def last_owner_activity(e, st):
+    """The latest time the entry carries for owner activity: its hand-off written, a finding, a step (None if none)."""
+    ts = [parse((e.get("handoff") or {}).get("written"))] + [parse(x.get("at")) for x in e.get("findings") or []]
+    ts.append(last_step(st, e["id"]))
+    ts = [t for t in ts if t]
+    return max(ts) if ts else None
+
+
 def recent_ended_sweeps(e, st, sweeps=None, hours=24):
     """["sweep SITE:NAME ended (n of m results); read it and take the next step"] for the entry's recorded sweeps that
     ended within `hours` (first seen ended in the site registry; 2026-11-06: a wait cleared while the owner worked
-    left the end of ws_grow_k533_zeroshot_hpo8_rerun reported as 'no step has a job')."""
+    left the end of ws_grow_k533_zeroshot_hpo8_rerun reported as 'no step has a job'). Only a sweep that ended after
+    the entry's last owner activity (last_owner_activity) is listed: one the owner already read is not repeated
+    (2026-11-06, E3887 listed two sweeps read hours before)."""
     if not sweeps_of(st, e["id"]):
         return []
     try:
@@ -1860,13 +1870,14 @@ def recent_ended_sweeps(e, st, sweeps=None, hours=24):
     except Exception:
         return []
     out = []
+    seen = last_owner_activity(e, st)
     for x in sweeps_of(st, e["id"]):
         data = sw.get(x["site"])
         f = ((data or {}).get("sweeps") or {}).get(x["name"])
         if not f or f.get("live"):
             continue
         at = parse(data["ended"].get(x["name"]))
-        if at and (now() - at).total_seconds() <= hours * 3600:
+        if at and (now() - at).total_seconds() <= hours * 3600 and not (seen and at <= seen):
             out.append("sweep %s:%s ended (%s of %s results); read it and take the next step" % (
                 x["site"], x["name"], "?" if f.get("results") is None else f["results"],
                 "?" if f.get("scripts") is None else f["scripts"]))
@@ -2826,6 +2837,16 @@ def cmd_set_next(a):
             items[k], why[k] = t, w
         e["step_why"] = why
         for k in keys:
+            # a rewritten step keeps its wait when its new text names every run the wait is on (the same work,
+            # restated); otherwise the wait is dropped, and said so (a silent drop once lost warm_start's RUN_DONE)
+            w = (e.get("step_waits") or {}).get(str(k))
+            ids = wait_run_ids(w) if w else []
+            if w and ids and all(i in items[k] or i.split("-")[-1] in items[k] for i in ids):
+                print("plan: step %s keeps its wait on %s (its new text names them)" % (k, " ".join(ids)))
+                continue
+            if w:
+                print("plan: note: step %s's wait on %r dropped with its old text; re-run plan wait if it still "
+                      "waits on them" % (k, w))
             (e.get("step_waits") or {}).pop(str(k), None)
         put_nexts(e, sorted(items.items()))
     print_nexts(a.id)
