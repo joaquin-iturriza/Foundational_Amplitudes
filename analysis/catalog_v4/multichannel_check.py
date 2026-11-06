@@ -78,6 +78,13 @@ ROLE = "train"
 CLASSES = {"v4_uux_epemg": "pp13_uux_epemg", "v4_uux_epemvevex": "pp13_uux_epemvevex",
            "v4_uu_bbxuu": "pp13v4_uu_bbxuu", "v4_us_ddxsu": "pp13v4_us_ddxsu",
            "v4_udx_csxvevex": "pp13_udx_csxvevex"}
+# the e+e- classes (plan step (f), D294's rule on every beam): the four trained classes with the largest share of their
+# default-sampled events above the catalog pool's largest log|M|^2 (data/ee_support_reads.json, logm_above), as the five
+# above were the pp_support worst list: the three 4-final ones of distinct final families (tau pair + neutrinos 0.27;
+# b pair + neutrinos 0.26, the d and c pairs 0.26 being its flavour copies; photon + Higgs + neutrinos 0.22) and the
+# 3-final one with the largest share (nu_mu pair + Z, 0.10)
+EE_CLASSES = {"v4_epem_taptamvevex": "ee4_epem_taptamvevex", "v4_epem_bbxvevex": "ee4_epem_bbxvevex",
+              "v4_epem_ahvevex": "ee4_epem_ahvevex", "v4_epem_vmvmxz": "ee4_epem_vmvmxz"}
 RECIPES = ["catalog_v4_base_train.yaml"] + [f"catalog_v4_heldout_{h}.yaml"
                                             for h in ("H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")]
 
@@ -151,6 +158,10 @@ def pp_sources(name, probe):
     (dsh_<x>, train, val and test; catalog_v4's physics, where a reused pp13_ probe carries catalog_v3's)"""
     w = "13000-13000GeV"
     dsh = "dsh_" + name[len("v4_"):]
+    if probe.startswith("ee4_"):
+        # an e+e- class: its range was read from its default-share pool (pp_support.py pull ee), its EE4 test pool
+        # (2000 MadEvent events at the fixed collider energies) is the held-out source
+        return {"table": [f"{dsh}_{w}_train_lhe_amplitudes.npy"], "heldout": [f"{probe}_{w}_test_lhe_amplitudes.npy"]}
     return {"table": [f"{probe}_{w}_{r}_lhe_amplitudes.npy" for r in ("train", "test")],
             "heldout": [f"{probe}_{w}_val_lhe_amplitudes.npy"] + [f"{dsh}_{w}_{r}_lhe_amplitudes.npy"
                                                                   for r in ("train", "val", "test")]}
@@ -542,10 +553,30 @@ def need(name, policies):
         for k, r in json.load(open(f))["runs"].items():
             if k.startswith("quota_ladder") and "budget" not in k and r.get("chunk_seconds"):
                 s50.append(sum(r["chunk_seconds"]))
-    if not s50:
-        sys.exit(f"need: no budget-50 ladder read of {name}: time it from its own first jobs")
     t = 0.0
-    for pol in policies:
+    if not s50:
+        # a class with no read (the e+e- classes of step (f)): its old train-pool time from catalog_v4's generation logs
+        # (sampling_cost.py, data/sampling_cost_gen.json) times, per policy, the largest ratio of that policy's replay
+        # seconds over the old train time measured on any class with a read of it
+        gen = json.load(open(os.path.join(DATA, "sampling_cost_gen.json")))["classes"]
+        if name not in gen:
+            sys.exit(f"need: no read and no generation time of {name}: time it from its own first jobs")
+        rat = {"current": 1.0}     # the old sampling is what the generation logs timed
+        for f in glob.glob(os.path.join(READS, "v4_*_*.json")):
+            c = json.load(open(f))
+            if c.get("class") not in gen:
+                continue
+            for k, r in c["runs"].items():
+                if r.get("chunk_seconds"):
+                    pol = k.rsplit("_", 1)[0]
+                    rat[pol] = max(rat.get(pol, 0.0), sum(r["chunk_seconds"]) / gen[c["class"]]["train"]["seconds"])
+        for pol in policies:
+            if pol not in rat:
+                sys.exit(f"need: no measured ratio for {pol}")
+            t += gen[name]["train"]["seconds"] * rat[pol]
+        s50 = [gen[name]["train"]["seconds"]]
+        print("RATIOS " + json.dumps({p: round(rat[p], 1) for p in policies}))
+    for pol in policies if not t else ():
         b = int(pol.rsplit("budget", 1)[1]) if "budget" in pol else 50
         t += max(s50) * b / 50.0
     lim = int(np.ceil(1.5 * t / 600.0)) * 600
@@ -564,7 +595,8 @@ def pull(policies=None, classes=None, seeds=SEEDS):
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
     from analysis.common import site_python
     os.makedirs(READS, exist_ok=True)
-    tags = [n for n in CLASSES] if policies is None else [f"{n}_{policies}_{s}" for n in (classes or CLASSES) for s in seeds]
+    tags = [n for n in CLASSES] if policies is None else [f"{n}_{policies}_{s}" for n in (classes or {**CLASSES, **EE_CLASSES})
+                                                           for s in seeds]
     for tag in tags:
         d = site_python(PULL_REMOTE, [tag], "MCHECK_READ", timeout=300)
         json.dump(d, open(os.path.join(READS, f"{tag}.json"), "w"), separators=(",", ":"))

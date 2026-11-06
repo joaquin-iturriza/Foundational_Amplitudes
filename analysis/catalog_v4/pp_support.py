@@ -6,8 +6,8 @@ energy, the catalog sampling does that").
     python3 analysis/catalog_v4/pp_support.py pull    one read-only `site run` on CC-IN2P3 (CPU) -> data/pp_support_reads.json
     python3 analysis/catalog_v4/pp_support.py pull ee the same read on the EE4 probes (recipes/catalog_v4_ee_test.yaml:
                the e+e- classes' MadEvent ee4_ pools at their fixed collider energies, stored under the 13000-13000GeV
-               label, with the trained class's default-share pool dsh_<x> beside its 2000-event test pool, catalog_v4's
-               e+e- cuts in the e+e- rest frame) -> data/ee_support_reads.json (the e+e- classes'
+               label; a trained class's default-share pool dsh_<x> in place of it, the test pool then held out;
+               catalog_v4's e+e- cuts in the e+e- rest frame) -> data/ee_support_reads.json (the e+e- classes'
                flat ranges, tools/flat_range.py; plan catalog_coverage step (f))
     python3 analysis/catalog_v4/pp_support.py         the summary -> data/pp_support.json, figs/pp_support.{png,pdf}
 
@@ -133,8 +133,12 @@ def one(task):
                         "hist_logm": np.histogram(lc, LM_EDGES)[0].tolist()}
         rows, used = [], []
         stems = [f"{probe}_13000-13000GeV_{role}_lhe_amplitudes.npy" for role in ("train", "test")]
-        if probe.startswith("ee4_"):    # an e+e- probe has a test pool only; the trained class's default-share pool too
-            stems.append(f"dsh_{probe[4:]}_13000-13000GeV_train_lhe_amplitudes.npy")
+        if probe.startswith("ee4_"):
+            # an e+e- probe has a 2000-event test pool only; a trained class's range comes from its default-share pool
+            # alone (~5.7e4 events), so the test pool stays held out for multichannel_check.py (plan step (f))
+            dsh = f"dsh_{probe[4:]}_13000-13000GeV_train_lhe_amplitudes.npy"
+            if find(dsh):
+                stems = [dsh]
         for stem in stems:
             f = find(stem)
             if f:
