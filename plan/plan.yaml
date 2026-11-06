@@ -14658,6 +14658,24 @@ entries:
       PASS on it); the merge into trunk waits on the repo-reviewer''s backlog advance, held by its one BLOCK in a file of
       catalog_coverage''s (ee_gain.py outcome_PP4, 142f98a0), routed to the main session. Not yet submitted. Step 7 waits
       on step 8''s read (it may change the recipe); C1m chose the untuned restart until then.'
+  - at: '2026-11-06T09:28:00+00:00'
+    text: '2026-11-06 step 6 C10wm read (D291, D285, design passed 04:48; mixture_ab.py warm C10wm @2231aecd -> data/warm_start_C10wm.json;
+      figure plot_ws_c1m.py --growth @2231aecd figs/ws_c10wm_{a,b,c}): the width growth 8->16 heads at k=533 restarted with
+      the mean-MSE-tuned recipe (hp_1333, lr_scale 1.85, WSD cooldown 0.164; FA-ccin2p3-31359864/bfed460f) is NOT BETTER than
+      the same growth with the default restart (e046ac67/f35b6a78): R(tuned/untuned) PP4 1.058 [1.021, 1.097], EE4 1.050 [0.959,
+      1.158], held 1.050 [1.014, 1.089], held_default 1.048 [1.031, 1.065] (widened). SHORT of width 16 from scratch: R(W/B)
+      PP4 1.906 [1.546, 2.349], EE4 1.935 [1.671, 2.222] (bar 1.19; the untuned growth was 1.749/1.756). Against width 8 from
+      scratch (the parent) R(W/A) PP4 1.050 [0.989, 1.115], EE4 1.053 [1.003, 1.115]: the tuned growth is no better than the
+      width-8 model it grew from (untuned 1.006/1.012). Per-class median MSE of log|M|^2 PP4 / EE4: w8 scratch 0.276 / 0.441,
+      w16 scratch 0.168 / 0.209, grown default 0.277 / 0.412, grown tuned 0.294 / 0.472. Validation NLL s42 (every 10 steps):
+      both start -2.842; tuned spikes to -0.626 at step 20, sits -1.7..-2.0 in the WSD flat phase, ends -2.515 after the cooldown;
+      default peaks -2.229 at 120, ends -2.696. No blow-up in either pair (the spikes listed are of the w16/w8 scratch references
+      493c98db step 850, 66e8c31f step 3060, known). By the design''s rule: the mean-MSE-tuned recipe is ruled out for the
+      growth too; the next growth step is a growth-own sweep (not launched: step 8''s damped-Muon read may change the restart
+      recipe first). Figure ws_c1m redrawn at the same commit: its one legend moved to panel a (the pp panel''s y axis no
+      longer pushed by it), data unchanged. Growth caches amp_mmap_cache/27a1422795e9872faa6b9eaf (prebuild) and 0c897ca2d81c98d3828e2808
+      (built by the growth jobs themselves, read in their logs) NOT deleted: the rm through site run was refused by the auto-mode
+      permission classifier; both are ours and rebuildable, about 18 GB each, 93 GB free on /sps/lpnhe.'
   step_waits:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
