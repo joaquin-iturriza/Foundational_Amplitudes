@@ -3720,9 +3720,10 @@ entries:
     58: '(a) Flat in log|M|^2 over the pp-sampled range (D294): adaptive per-bin oversampling, keep drawing candidates until
       every log|M|^2 bin up to the pp max is filled to its quota (top bins included), then generate; check on the five multichannel_check
       classes (0 pp events above the catalog max, per-bin density at quota), figure of the catalog vs pp log|M|^2 density.'
-    61: '(c) Sign head under het (D287, D296): find why the het sign head fits the training signs (0.99) but transfers worse
-      zero-shot than the MSE control (H5 17/21, HD5 15/19 worse); test the candidate causes (sign-loss weight, sign head on
-      the het trunk gradient vs detached, attachment point), fix and rerun under the step-56 reads.'
+    61: '(c) Resubmit the 12 step-61 jobs whole at --hdr=--time=03:30:00 (short_wall''s slurm_time): v4_het_signhead_matched_<event|const>[_seed2-4]
+      and, with SHORT_TAG=keyed, v4_het_control_signhead[_seed2-4], under the passed designs of 05:06 and 05:14 (code = f21572a1
+      + only the SHORT_TAG arm list and analysis files); then plan wait 61 on the 12; read with het_oneloop.py signhead (re-seed
+      rule first).'
     62: '(d) e+e- mechanism (D295): read what the default share contains per beam (e+e- vs pp processes, events, sqrt(s));
       then ablate the default share restricted to e+e- only and to pp only against share 0 (het control) and the full share
       0.25, same arm otherwise, reads EE4/PP4/held; then joint-variable coverage if needed.'
@@ -9753,10 +9754,10 @@ entries:
       - 'every bin at quota on the five classes: design the regeneration'
       - 'a bin cannot be filled within the candidate budget: find why (phase-space measure of the top) and fix the proposal'
     61:
-      feeds: whether het pretraining carries a usable sign on the one-loop pools
+      feeds: whether het pretraining carries a usable sign on the one-loop pools (D287, D296)
       if:
-      - 'a variant is no worse than the MSE control''s sign: adopt it, write up'
-      - 'none is: report the cause found with numbers'
+      - 'permission allowed: submit, wait, read'
+      - 'still refused: the main session submits or allows it'
     62:
       feeds: why the default share helps e+e- ~2x more than pp, and whether pp data helps e+e- at all
       if:
