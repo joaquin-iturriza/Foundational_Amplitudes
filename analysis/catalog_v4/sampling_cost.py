@@ -22,6 +22,13 @@ not counted here.
     python3 analysis/catalog_v4/sampling_cost.py pull      the generation logs (site logs) -> data/sampling_cost_gen.json
     python3 analysis/catalog_v4/sampling_cost.py summary   -> data/sampling_cost.json
     python3 analysis/catalog_v4/sampling_cost.py fig       -> figs/sampling_cost.{png,pdf}
+    python3 analysis/catalog_v4/sampling_cost.py ee        the e+e- classes (plan step (f)) -> data/sampling_cost_ee.json
+  ee   per e+e- class of the range table: old = its generation-log core-s (every role); new/old measured on the four
+       e+e- check classes in the same job (policy NEW_POLICY seconds over the old sampling's, 'current', same seed,
+       node and commit; seeds' mean); the total an UPPER-SIDE ESTIMATE: the four are the classes whose default events
+       lie farthest above the catalog's (data/ee_support_reads.json), so the largest measured ratio of a class with
+       the same final count is applied (2 and 5+ finals, none measured: the largest of all four)
+    python3 analysis/catalog_v4/sampling_cost.py ee_fig    -> figs/sampling_cost_ee.{png,pdf}
 """
 import json, os, re, subprocess, sys
 
@@ -42,6 +49,10 @@ NEW_POLICY = "quota_ladder_both_res2_budget750"
 NEW_FILE = "{c}_quota_ladder_res2+quota_ladder_edge_res2+quota_ladder_both_res2+quota_ladder_both_res2_budget750_{s}.json"
 PLAIN_FILE = "{c}_multichannel+quota_ladder_res2+quota_ladder_res2_budget500_{s}.json"
 TEST = ("v4_uux_epemg", "v4_uux_epemvevex", "v4_udx_csxvevex", "v4_us_ddxsu", "v4_uu_bbxuu")
+EE_PREFIX = "v4_epem_"
+EE_TEST = ("v4_epem_taptamvevex", "v4_epem_bbxvevex", "v4_epem_ahvevex", "v4_epem_vmvmxz")
+EE_FILE = "{c}_current+multichannel+quota_ladder_both_res2+quota_ladder_both_res2_budget750_{s}.json"
+OUT_EE = os.path.join(DATA, "sampling_cost_ee.json")
 ROLE_SCALE = 1.2          # (1e5 + 1e4 + 1e4) / 1e5: val and test sampled as train
 TIME_RE = re.compile(r"^\[TIME\] (\S+)\s+(train|val|test)\s+chunk\s+(\d+):\s+(\d+) events in\s+([\d.]+)s")
 
@@ -100,7 +111,7 @@ def _seconds(c, fname, policy):
 def summary():
     gen = json.load(open(GEN))["classes"]
     fr = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_flat_range.json")))
-    names = sorted(fr)
+    names = sorted(c for c in fr if not c.startswith(EE_PREFIX))     # the 1301 hadronic classes
     missing = [c for c in names if c not in gen or not all(r in gen[c] for r in ("train", "val", "test"))]
     nf = _nfinal(names)
     old = {c: sum(gen[c][r]["seconds"] for r in gen[c]) for c in names if c not in missing}
@@ -173,5 +184,76 @@ def fig():
     ps.save(fig, os.path.join(HERE, "figs", "sampling_cost"))
 
 
+def ee():
+    gen = json.load(open(GEN))["classes"]
+    fr = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_flat_range.json")))
+    names = sorted(c for c in fr if c.startswith(EE_PREFIX))
+    nf = _nfinal(names)
+    old = {c: sum(gen[c][r]["seconds"] for r in gen[c]) for c in names}
+    test = {}
+    for c in EE_TEST:
+        new, cur = _seconds(c, EE_FILE, NEW_POLICY), _seconds(c, EE_FILE, "current")
+        r = [a / b for a, b in zip(new, cur)]
+        test[c] = {"nfinal": nf[c], "old_all_s": round(old[c], 1), "old_train_gen_log_s": gen[c]["train"]["seconds"],
+                   "current_train_replay_s": cur, "new_train_s": new, "ratio_same_job": [round(x, 1) for x in r],
+                   "ratio": round(float(np.mean(r)), 1), "new_all_s": round(old[c] * float(np.mean(r)), 1)}
+    by_meas = {}
+    for c, t in test.items():
+        by_meas[t["nfinal"]] = max(by_meas.get(t["nfinal"], 0.0), t["ratio"])
+    top = max(by_meas.values())
+    by_n = {}
+    for c, s_ in old.items():
+        k = nf[c]
+        b = by_n.setdefault(k, {"classes": 0, "old_core_h": 0.0, "ratio_used": by_meas.get(k, top),
+                                "ratio_measured": k in by_meas})
+        b["classes"] += 1; b["old_core_h"] += s_ / 3600
+    for b in by_n.values():
+        b["new_core_h_upper"] = round(b["old_core_h"] * b["ratio_used"], 1); b["old_core_h"] = round(b["old_core_h"], 2)
+    tot = {"classes": len(old), "old_core_h": round(sum(old.values()) / 3600, 2),
+           "new_core_h_upper": round(sum(b["new_core_h_upper"] for b in by_n.values()), 1)}
+    res = {"definition": __doc__.split("  ee   ")[1].split("\n    python3")[0], "policy": NEW_POLICY,
+           "test_classes": test, "ratio_by_nfinal_measured": {str(k): v for k, v in sorted(by_meas.items())},
+           "by_nfinal": {str(k): by_n[k] for k in sorted(by_n)}, "total": tot,
+           "old_per_class_s": {c: round(s_, 1) for c, s_ in old.items()}, "nfinal": nf}
+    json.dump(res, open(OUT_EE, "w"), indent=1)
+    print(json.dumps({k: res[k] for k in ("test_classes", "by_nfinal", "total")}, indent=1))
+
+
+def ee_fig():
+    """left: per e+e- check class, core-hours of its three pools, old (generation logs) against new (old x the
+    same-job ratio, written above each pair); right: the e+e- classes by final count, old measured against new
+    upper-side estimate (hatched where the count's ratio was not measured)"""
+    import plot_style as ps
+    sys.path.insert(0, HERE)
+    from fig_quota_fill import EE_LABEL
+    d = json.load(open(OUT_EE))
+    t = d["test_classes"]
+    fig, (ax, ax2) = ps.figure(ncols=2)
+    x = np.arange(len(EE_TEST))
+    old = np.array([t[c]["old_all_s"] for c in EE_TEST]) / 3600
+    new = np.array([t[c]["new_all_s"] for c in EE_TEST]) / 3600
+    ax.bar(x - 0.2, old, 0.4, color=ps.C.grey, label="old sampling (as built)")
+    ax.bar(x + 0.2, new, 0.4, color=ps.C.vermillion, label="flat quota, budget 750")
+    for i, c in enumerate(EE_TEST):
+        ax.text(x[i] + 0.2, new[i] * 1.3, f"{t[c]['ratio']:.0f}x", ha="center", fontsize=6)
+    ax.set_yscale("log"); ax.set_ylim(top=new.max() * 8)
+    ax.set_xticks(x); ax.set_xticklabels([EE_LABEL[c] for c in EE_TEST], fontsize=6, rotation=20)
+    ax.set_ylabel("core-hours per class")
+    ps.legend(ax, loc="upper left", fontsize=6)
+    b = d["by_nfinal"]; ks = list(b)
+    x2 = np.arange(len(ks))
+    o2 = np.array([b[k]["old_core_h"] for k in ks]); n2 = np.array([b[k]["new_core_h_upper"] for k in ks])
+    ax2.bar(x2 - 0.2, o2, 0.4, color=ps.C.grey)
+    for i, k in enumerate(ks):
+        ax2.bar(x2[i] + 0.2, n2[i], 0.4, color=ps.C.vermillion, hatch=None if b[k]["ratio_measured"] else "///",
+                edgecolor="white" if b[k]["ratio_measured"] else ps.C.vermillion,
+                alpha=1.0 if b[k]["ratio_measured"] else 0.5)
+        ax2.text(x2[i] + 0.2, n2[i] * 1.3, f"{n2[i]:.0f}", ha="center", fontsize=6)
+    ax2.set_yscale("log"); ax2.set_ylim(top=n2.max() * 8)
+    ax2.set_xticks(x2); ax2.set_xticklabels([f"{k} finals\n({b[k]['classes']})" for k in ks], fontsize=6)
+    ax2.set_ylabel("core-hours, e+e- classes")
+    ps.save(fig, os.path.join(HERE, "figs", "sampling_cost_ee"))
+
+
 if __name__ == "__main__":
-    {"pull": pull, "summary": summary, "fig": fig}[sys.argv[1]]()
+    {"pull": pull, "summary": summary, "fig": fig, "ee": ee, "ee_fig": ee_fig}[sys.argv[1]]()
