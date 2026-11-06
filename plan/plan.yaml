@@ -10575,6 +10575,12 @@ entries:
       w8 cell and the 1e4 arm; the gap is not the loader within these bounds. Best val_loss_no_reg sigma stage: memmap -2.8594
       / -2.8802, rerun -2.8895 / -2.8821. Training 4264 steps in 69.1-69.8 min on every job (0.92-0.93 s/step, memmap and
       in-memory alike); cache 3 GB per seed; no blow-ups (e184bbc5 spike at step 1105, recovered).'
+  - at: '2026-11-06T04:36:23+00:00'
+    text: '2026-11-06 owner a8dc83fd: steps 37/38/58/61/62 reopened by Joaquin''s 11-06 decisions (D290 cache B, D292/D293
+      epochs and scaling, D294 flat log|M|^2, D295 e+e- mechanism, D296 sign head); loader-control question withdrawn under
+      D293. Work split across five helpers of the owner: (b) memmap keyed draws, (a) quota sampler, (c) het sign head, (d)
+      e+e- default-share read and ablation, (e)+(f) epoch count, scaling redo and loader figure; designs recorded and reviewed
+      serially by the owner. Step 60 dropped: wt-ws-ckpt, wt-ws-grow, wt-multichannel no longer exist under worktrees/.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
