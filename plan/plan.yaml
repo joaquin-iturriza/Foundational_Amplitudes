@@ -15323,7 +15323,6 @@ entries:
       at 1e-3 (shift of a probe''s MSE <= delta^2 <= 1e-6) @this commit, and C5, C6 pass; no run cancelled. Deviation from
       the design''s literal rule (string equality) stated here.'
   step_waits:
-    '8': FA-ccin2p3-35f9a8a5 FA-ccin2p3-a0416422
     '10': FA-ccin2p3-ac7aa971 FA-ccin2p3-4ebff80f FA-ccin2p3-159e0244 FA-ccin2p3-3c1ea279 FA-ccin2p3-11938ca8 FA-ccin2p3-22afe10b
       FA-ccin2p3-f1390aa8 FA-ccin2p3-21fb7bd7 FA-ccin2p3-455bbfbd FA-ccin2p3-2e583c2b FA-ccin2p3-773e6a80 FA-ccin2p3-6ca7a67e
       FA-ccin2p3-410e8632 FA-ccin2p3-78576361
