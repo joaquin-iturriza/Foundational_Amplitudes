@@ -381,6 +381,13 @@ def ask_terms(s):
     return {w for w in re.findall(r"[a-z0-9]{3,}", (s or "").lower()) if w not in ASK_STOP}
 
 
+def ask_parts(ask):
+    """The parts of a multi-part question: the texts after its `(1)`, `(2)` ... markers (a lead-in such as "Two calls:"
+    is dropped); [] when it holds fewer than two."""
+    parts = re.split(r"\(\d+\)", ask or "")[1:]
+    return [p for p in parts if ask_terms(p)] if len(parts) >= 2 else []
+
+
 def ask_matches(e, text):
     """True when a message to the user asks the entry's recorded question, in its words or others: it names the entry
     and one of the steps the question holds (`warm_start step 1`), or it shares at least half of the question's
@@ -389,6 +396,13 @@ def ask_matches(e, text):
     eid = (e.get("id") or "").lower()
     keys = blocked_steps(e) or set(step_keys(e))
     # the two looser branches count only a sentence that asks: a "?" or words addressing the user's call
+    sents = [x for x in re.split(r"(?<=[.?!;])\s+|\n+", text or "")
+             if "?" in x or re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", x.lower())]
+    # a multi-part question is asked when each part is asked by some sentence (2026-11-06: two numbered questions,
+    # each sharing under half of the whole question's terms, were refused)
+    parts = ask_parts(e.get("ask"))
+    if parts and all(any(len(ask_terms(p) & ask_terms(x)) >= 0.5 * len(ask_terms(p)) for x in sents) for p in parts):
+        return True
     for sent in re.split(r"(?<=[.?!;])\s+|\n+", text or ""):
         low = sent.lower()
         if "?" not in sent and not re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", low):

@@ -31,6 +31,27 @@ def test_never_sent_refuses():
     assert not plan.ask_matches(E, "Joaquin, multichannel step 7 finished its probe.")   # a step it does not hold
 
 
+MULTI = {"id": "catalog_coverage", "status": "running", "waiting_since": "2026-11-06T05:23:32+00:00",
+         "next": ["a"], "blocks_steps": [1],
+         "ask": "Two calls: (1) the scaling grid costs 449 GPU-h: run the whole grid, only the 2x row (the six "
+                "under-one-epoch points redone at 1.27 epochs, 39 GPU-h), or that row at the original settings? "
+                "(2) will you allow the resubmission of the 12 sign-output jobs at 3:30 (28 GPU-h of work), which the "
+                "automatic permission check refused for the agent?"}
+SENT = ("1. For the scaling grid, should we run the whole grid (449 GPU-h), only the 2x row with the long sweep's "
+        "settings (39 GPU-h), or the 2x row at the original settings?\n2. Will you allow the 12 sign-output jobs to be "
+        "resubmitted at 3:30 (28 GPU-h of work)? The automatic permission check refused that for the agent.")
+
+
+def test_multipart_asked_part_by_part():
+    assert plan.ask_matches(MULTI, "Joaquin, two calls.\n" + SENT)
+
+
+def test_multipart_one_part_missing_refuses():
+    assert not plan.ask_matches(MULTI, "Joaquin, " + SENT.split("\n")[0])
+    assert not plan.ask_matches(MULTI, "Joaquin, " + SENT.split("\n")[1])
+    assert not plan.ask_matches(MULTI, "Joaquin, the grid costs 449 GPU-h and the sign-output jobs need 3:30; nothing asked.")
+
+
 def test_margin():
     assert plan.ASK_MARGIN_MIN == 30
 
