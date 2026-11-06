@@ -86,7 +86,7 @@ def main():
     aR.plot([], [], "ks", ls="none", label=r"$e^+e^-$")
     aR.axhline(1, color=ps.C.grey, lw=0.8)
     aR.set_xticks(range(1, len(ARMS))); aR.set_xticklabels(["3198\ndefault", "3198\ncont.", "2132\ncont.", "lr x3"])
-    aR.set_ylabel("MSE ratio, arm over control")
+    aR.set_ylabel("MSE(restart arm) / MSE(default restart)")
     aG.plot([], [], "k-", label="seed 42"); aG.plot([], [], "k--", label="seed 43")
     aG.set_yscale("log"); aG.set_xlabel("step of the restart"); aG.set_ylabel("gradient norm")
     aL.set_xlabel("step of the restart"); aL.set_ylabel("training loss (het NLL)")
