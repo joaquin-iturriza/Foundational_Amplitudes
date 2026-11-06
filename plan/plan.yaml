@@ -11678,6 +11678,13 @@ entries:
       shortfall and held-out identical to the control (no ladder channel). Per the passed design: keep both ladders as two
       channels and re-check once; QCD budget from the measured quota/kept of bins still short inside the pp range (worst 4.70:
       1/0.065 = 15.5x).'
+  - at: '2026-11-06T10:22:56+00:00'
+    text: '2026-11-06 process: step 67''s design took the design reviewer''s suggestion ''add udx seeds'' (4 more seeds on
+      one class) without the CLAUDE.md check that more seeds than the sibling cells is Joaquin''s call; the design reviewer
+      passed it; the repo-reviewer caught it; the 4 jobs were cancelled before starting and the question asked. What let it
+      through: the design-reviewer''s checklist has no ''seeds/trials/horizons vs sibling cells and the user''s words'' item.
+      Proposed to the main session as a diff to .claude/agents/design-reviewer.md (a design whose seeds, trials or arms differ
+      from the sibling cells'' is FIX unless a user quote or decision names it).'
   handoff:
     state: '2026-11-06 ~10:30. (a) flat-in-log|M|^2 quota: step 58 plain quota NO (top of range unfilled); multiperipheral
       ladder + joint-resonance channels merged b3e4b554 (sampling.mc_mperi/mc_res2, off by default; repo-reviewer PASS e4d4366e);
