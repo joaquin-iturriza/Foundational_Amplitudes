@@ -13312,8 +13312,17 @@ entries:
     decision: D282
     covers:
     - warm_start
+  - said_at: '2026-11-06T19:52:41.245000+00:00'
+    text: In general it seems like the changes are all able to be added after the fact with this method, more or less, we
+      just need to fix the mechanism of how we warm start, so I wouldn't run more tests checking different changes until we
+      refine what we are doing first.
+    decision: D307
+    answers_after: '2026-11-06T19:47:17+00:00'
+    covers:
+    - warm_start
   decisions:
   - D282
+  - D307
   next:
     11: 'On Joaquin''s answer: more from-scratch seeds of v4_het_control_magnitude (seeds 44-47 = 9.4 GPU-h, or 44-45 = 4.7)
       to decide the one-loop magnitude-target change at k=533, under a new design line on how n seeds widen the interval;
@@ -13462,6 +13471,8 @@ entries:
       change the scope)'
     blocks: submission of C2-C8 and any of the left-out changes; C1 (share 0.25, 29.6 GPU-h) goes ahead
     blocks_steps: []
+    answered_at: '2026-11-06T19:52:40.785000+00:00'
+    decision: D307
   - ask: 'Tuned 533-step warm start came out SHORT and worse than untuned on the held-out reads (R(W/B) 1.59 pp / 2.21 e+e-,
       gain reached 0.31/0.29 vs untuned 0.55/0.66), while the sweep''s validation NLL improved. Next: (1) the designed 8-trial
       extension with lr_scale down to 0.01, (2) retune on an objective that follows the reads (e.g. the mean''s validation
@@ -13472,6 +13483,8 @@ entries:
     blocks: only the step-3 extension
     blocks_steps:
     - 3
+    answered_at: '2026-11-06T19:52:40.785000+00:00'
+    decision: D307
   - ask: 'Width growth 8 to 16 is SHORT at every retraining length: R(warm/scratch) on pp 1.75 / 1.59 / 1.29 at 533 / 1066
       / 2132 steps (bar 1.19), gain reached -0.01 / 0.13 / 0.52 (data change reached 1.07 at 2132). Next: tune the grown warm
       start with a sweep like step 3''s, try the 16 to 32 pair on the same rule, or stop the shape-changing branch here?'
@@ -13490,6 +13503,8 @@ entries:
     searched: 'CLAUDE.md scope rule: fewer lengths than the sibling cells is the user''s call'
     blocks: nothing
     blocks_steps: []
+    answered_at: '2026-11-06T19:52:40.785000+00:00'
+    decision: D307
   - ask: 'Two calls on the warm start, both scope changes (yours): (1) The one-loop magnitude-target change (het) is not decided
       at any k because its from-scratch pair''s two seeds disagree (R_seed 1.28, so the 1.35-bar interval is widened by ln
       1.28 = 0.25 on each side). More from-scratch seeds of v4_het_control_magnitude would narrow that term. My estimate,
@@ -13508,6 +13523,8 @@ entries:
       approves step 7 at its 54 runs, no extra seeds; D284 fixes k=533 for the tuned work); par:v4_warm_start_changes @7d288fee
     blocks: nothing
     blocks_steps: []
+    answered_at: '2026-11-06T19:52:40.785000+00:00'
+    decision: D307
   - ask: 'One call on the warm start, a scope change (yours): the one-loop magnitude-target change (het) is not decided at
       any retraining length because its from-scratch pair''s two seeds disagree (seed ratio 1.28, so the interval is widened
       by ln 1.28 = 0.25 on each side). My estimate, assuming the seed term shrinks as sqrt(2/n): 4 more from-scratch seeds
@@ -13520,8 +13537,10 @@ entries:
     searched: CLAUDE.md scope rule (seeds beyond the design are Joaquin's call); site decisions D282-D303 (D300 approves step
       7 at its 54 runs, no extra seeds); par:v4_warm_start_changes @7d288fee
     blocks: the magnitude-target seeds and the entry's close
-    blocks_steps: &id003
+    blocks_steps:
     - 11
+    answered_at: '2026-11-06T19:52:40.785000+00:00'
+    decision: D307
   owner:
     agent: a6f48d86491ded7e6
     state: stopped
@@ -15831,16 +15850,3 @@ entries:
       Open ask on the entry (nothing waits): 4 more from-scratch seeds for the magnitude target (9.4 GPU-h), and the tuned
       growth at 1066/2132.'
     written: '2026-11-06T16:24:24+00:00'
-  ask: 'One call on the warm start, a scope change (yours): the one-loop magnitude-target change (het) is not decided at any
-    retraining length because its from-scratch pair''s two seeds disagree (seed ratio 1.28, so the interval is widened by
-    ln 1.28 = 0.25 on each side). My estimate, assuming the seed term shrinks as sqrt(2/n): 4 more from-scratch seeds (44
-    to 47) take the upper end at 533 steps from 1.48 to about 1.35, very likely a MATCH below the 1.35 bar, a YES at 1/8 of
-    a pretraining. Cost 2.35 h per run on a V100, 4 runs = 9.4 GPU-h (2 runs = 4.7 GPU-h, upper end about 1.38). 1066 steps
-    stays undecided at any seed count. Do you want 4 seeds, 2, or none (then the entry closes as written up)? Your earlier
-    question (2), whether the tuned growth should also run at 1066 and 2132 steps, is withdrawn: the tuning read NOT BETTER
-    at 533 steps (par:v4_warm_start_grow_tuned).'
-  waiting_since: '2026-11-06T19:47:17+00:00'
-  searched: CLAUDE.md scope rule (seeds beyond the design are Joaquin's call); site decisions D282-D303 (D300 approves step
-    7 at its 54 runs, no extra seeds); par:v4_warm_start_changes @7d288fee
-  blocks: the magnitude-target seeds and the entry's close
-  blocks_steps: *id003
