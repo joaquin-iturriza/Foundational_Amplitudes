@@ -16421,6 +16421,18 @@ entries:
       BETTER arm with MATCH-estimate at the smallest cost becomes the warm-start recipe candidate, reported to Joaquin with
       the D307 hold (the change tests resume); if none is BETTER, share 0.50 at 533 (MATCH at two seeds already, C1s50) is
       the fix on record and goes to Joaquin as the recipe for data changes. A run that blows up is listed apart with where.'
+    passed_at: '2026-11-06T23:15:46+00:00'
+    reviewer: 'Round 2 re-check at ws-fixes @3ae60b08. All three round-1 fixes are in. (1) Each arm is widened by the measured
+      spread of its kind (ws_seed_pairs.json, confirmed): shrinkperturb by the largest same-data pair, PP4 0.0157 / EE4 0.0669;
+      the share arms by the share pair, 0.0505 / 0.0809; the WSD-parent arms against the control by the largest of any kind,
+      0.0505 / 0.0809, which exceeds the measured parent swap of 0.010 / 0.037. (2) The branch arms now start from model_live
+      with its own optimizer state (fine_tune.start_weights=live; tests/test_start_weights_live.py and test_shrink_perturb.py
+      pass on CPU), so there is no EMA/moment mismatch. (3) The prior now names ws_c1_k533_mse_wsd_hpo8 and says how the branch
+      differs. Check 2: share 0.50 over 0.25 PP4 0.853 / 0.897, EE4 0.778 / 0.844; step-3198 continued 1.140 / 1.142. Check
+      3: single seed under D315/D319, and the effects of interest (5-15%) exceed the widths. Searched results.tex for shrink,
+      perturb, WSD, warmup-stable, stable, cooldown, branch, share 0.50, warm50, exposure, replay, 1-sqrt, Ibrahim, Haegele;
+      plan show warm_start; decisions D276-D321. Het loss, DIM inputs, PP4/EE4 test pools, no sweep; disk 6 GB against 72
+      GB free on /sps/lpnhe.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
