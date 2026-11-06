@@ -11001,6 +11001,14 @@ entries:
       size (unmeasured; to be set at the first build''s submission), the eikonal factor. Default change: the augmentation
       no longer draws from the torch RNG, so new runs (both paths) differ from older ones at the same seed in augmentation
       draws and model init (D290); old format-2 caches are never read again (prunable).'
+  - at: '2026-11-06T05:11:30+00:00'
+    text: '2026-11-06 (c) repair: the 8 matched sign-head jobs (FA-ccin2p3-4ba2ae30 e19b83f5 b524a346 9b657718 1536ae83 86cb2686
+      00ca4119 91249877) run at f21572a1, which contains (b)''s keyed-draw augmentation (d18e44f1): augmentation draws and
+      model init differ from step 56''s runs at the same seed (D290), so the step-56 arm is no longer a same-setup control.
+      Repair inside the passed design: rerun the step-56 arm v4_het_control_signhead seeds 42-45 at the current commit with
+      SHORT_TAG=keyed (run dirs <arm>_tagkeyed, never overwriting step 56''s), and read the matched arms against it; the MSE
+      control and het magnitude reference stay the old runs (their gaps, 2x sign and R~1, are far beyond a re-seed), with
+      the re-seed noted. Beam ablation (step 62) is at 5bf3e0f0, before (b): its 8 arms share one commit.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
