@@ -5303,8 +5303,14 @@ entries:
     at: '2026-11-05T07:52:22+00:00'
     searched: design rule fixed before the read; no decision covers an UNRESOLVED loader read
     blocks: the warm_start whole-set change only
-    blocks_steps: &id001
+    blocks_steps:
     - 62
+    answered_at: '2026-11-06T04:32:59+00:00'
+    decision: D293
+    withdrawn_at: '2026-11-06T04:32:59+00:00'
+    withdrawn_why: 'Joaquin 2026-11-06 04:28: the whole-set points were under one epoch and are redone at >= 1 epoch (D293),
+      so the loader-control gap is superseded by the epoch shortfall; the loader read is redrawn as a figure and recorded
+      as superseded'
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -10602,14 +10608,6 @@ entries:
       data_mmap.py, tests/test_mmap_code_hash.py, scripts/job_catalog_v3_short.sh (SHORT_MEMMAP, SHORT_RERUN), docs/results.tex
       par:v4_width, ~/.local/bin/site (cmd_run options)
     written: '2026-11-05T05:33:08+00:00'
-  ask: 'Loader control: memmap moves the error by at most ~6% on pp (R_L 1.059/0.981) against the 39% full-set gap, but one
-    value (held-out default-sampled, seed 43, 0.897, memmap better) falls just outside the rerun-noise bound 0.094, so the
-    design''s rule reads UNRESOLVED. Take it as clear enough for the warm_start whole-set change, or settle it with more seeds
-    of the memmap/in-memory pair (about 2.7 GPU-h per job)?'
-  waiting_since: '2026-11-05T07:52:22+00:00'
-  searched: design rule fixed before the read; no decision covers an UNRESOLVED loader read
-  blocks: the warm_start whole-set change only
-  blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
