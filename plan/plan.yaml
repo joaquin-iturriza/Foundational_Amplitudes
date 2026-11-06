@@ -3734,6 +3734,10 @@ entries:
       to the ee4_ train+test pools at their fixed energies, the catalog''s e+e- cuts, read-only site run on CC) merged into
       recipes/catalog_v4_flat_range.json by tools/flat_range.py; then the e+e- classes'' quota replay cost and coverage measured
       with the hadronic ones in step 65''s design (two e+e- test classes beside the five).'
+    67: '(g) e+e- forward check (step 66''s SHORT branch): merge fwd-free (sampling.fwd_free_floor, repo-reviewer), sync CC,
+      submit 8 CPU jobs (4 e+e- classes x seeds 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2_budget750+quota_ladder_both_res2_fwdfree_budget750,
+      limits from multichannel_check.py need, target 2.0 h) under the design of 2026-11-06 ~22:20 once the design reviewer
+      passes; read with multichannel_check.py pull/summary/coverage, fig_quota_fill.py ee, sampling_cost.py ee (policy fwdfree)'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -10440,6 +10444,12 @@ entries:
       - 'every e+e- class gets a range: step 65''s design covers 1301 + 169 classes'
       - 'an e+e- class has no in-support default event: it gets no flat range and is listed, as the hadronic ones without
         pp support'
+    67:
+      feeds: 'step 65''s regeneration design: the e+e- classes'' sampling and CPU cost'
+      if:
+      - 'YES/NEAR: the flag into step 65''s e+e- design with its cost'
+      - 'PARTIAL: where read of the remaining short bins, next channel examined'
+      - 'NO: dead end, the forward mechanism is not the limit'
   owner:
     agent: a6b7f42be8bab4845
     state: working
