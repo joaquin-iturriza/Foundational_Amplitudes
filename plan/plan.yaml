@@ -10168,9 +10168,9 @@ entries:
       - 'bins inside the pp range short: where reads, no more budget'
   owner:
     agent: a3f721e0495643441
-    state: working
+    state: stopped
     since: '2026-11-06T09:28:50+00:00'
-    state_at: '2026-11-06T10:11:30+00:00'
+    state_at: '2026-11-06T10:23:20+00:00'
     context: 132237
     context_at: '2026-11-06T09:37:54+00:00'
   findings:
