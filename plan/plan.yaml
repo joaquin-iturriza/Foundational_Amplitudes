@@ -9638,6 +9638,18 @@ entries:
       choice (accept density >= pp share there, D269 ''not far below pp'', vs a heavier channel) goes to Joaquin with the
       kept/pp share per bin. Cost: 14 CPU jobs, 1 core, <= 2.8 h each (the 4 extra ~10 min), limit 04:00 (00:40 for the extra
       seeds); no GPU.'
+    passed_at: '2026-11-06T10:19:53+00:00'
+    reviewer: 'Re-check of step 67 after my FIX: (1) held-out outside kept RESOLVED at <= 2 of ~53000 (<= 3.8e-5, under 3/N
+      5.6e-5; step 66 measured 1/1 on every ladder class), SHORT at >= 3, so YES/NEAR/SHORT cover every result; (2) IN RANGE
+      = lower edge <= pp in-support max, fixed before the run (uu_bbxuu [4.70,4.95), us_ddxsu [4.84,5.09) in range); (3) udx_csxvevex
+      six seeds (44-47 added, budget-50 policies, ~10 min, limit 00:40), paired guard mean diff <= max(0.002, 2 SE) shortfall
+      and >= -max(0.06, 2 SE) per bin, against the measured spread (edge shortfall 0.0669/0.0725, top-bin fill up to 0.10
+      apart), and step 66''s edge failure re-tested on the same six. Check 2: step 66 @f323ae6b uu_bbxuu edge fill 3.96 1.00/0.99,
+      4.21 0.79/0.82, 4.70 0.065/0.067, budget-750 from 1/0.065. Controls same job/node/commit, differ only in channel list
+      or budget; code 15543a4c + summary 038c9691 (analysis only). Note for the reporting: NEAR (margin bins above the pp
+      max short) leads to regeneration, but D270 asked for ''the range the pp beams cover, but wider'', so a NEAR result goes
+      to Joaquin with the margin fill shown, not absorbed. Searched docs/results.tex for ladder, multiperipheral, mperi, quota,
+      both ladders; decisions D269 D270 D294: no prior run with both ladders.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
