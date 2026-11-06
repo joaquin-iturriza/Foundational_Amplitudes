@@ -12926,9 +12926,9 @@ entries:
       warm start is tuned with whatever wins step (b); w16->w32 and stopping wait on that.'
   owner:
     agent: a53040907e4c704f0
-    state: working
+    state: stopped
     since: '2026-11-06T05:49:03+00:00'
-    state_at: '2026-11-06T05:49:03+00:00'
+    state_at: '2026-11-06T05:55:13+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
