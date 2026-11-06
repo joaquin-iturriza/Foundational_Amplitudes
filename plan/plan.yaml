@@ -3707,11 +3707,9 @@ entries:
   - D258
   - D288
   next:
-    37: '(b) Memmap cache per D290 (per-event keyed draws): one cache per pool set, keyed by pool content identity and a format
-      version, storing seed- and stats-independent arrays; standardisation and Lorentz augmentation applied per batch from
-      per-event keyed draws (run seed, event index) in BOTH the memmap and in-memory paths; CPU prebuild job; unique staging
-      per host/job; disk check + fallocate; canary check on open; LRU pruning. Tests: two seeds from one cache, memmap ==
-      in-memory per seed under the new draws, two concurrent openers.'
+    37: '(b) done: memmap format 3 merged d18e44f1 (finding 2026-11-06). Left: a memmap run now needs a CPU prebuild first
+      (scripts/job_mmap_prebuild.sh with the run''s overrides and seed); time the first whole-set build and record it; section
+      3 of tests/test_memmap_data.py (GPU, off/on/off) with the first GPU job that uses memmap.'
     39: 'Tool follow-ups from 2026-11-02, what is left: (e) repo-reviewer per-commit review of hot-path and data code instead
       of only large batches (proposed to Joaquin, his call, not asked again without something new); (f) Joaquin''s idea for
       later: a way to know when a source (guidance, a report) is up to date before stating it as fact. Done: (a) 8b7cd708;
@@ -9543,8 +9541,8 @@ entries:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
       if:
-      - 'tests pass: merge after repo-reviewer, switch the default'
-      - 'tests fail: fix before any memmap run'
+      - 'first memmap batch: prebuild chained before it, its time recorded'
+      - 'section 3 differs off vs on beyond the off/off control: fix before any further memmap run'
     39:
       feeds: tooling defects found while sending the long runs
       if:
