@@ -13565,7 +13565,6 @@ entries:
     '2': Joaquin's go on C2-C6 and C8 (79.8 GPU-h, above the 30 GPU-h budget rule), asked 2026-11-04
     '3': Joaquin's answer to the retune question (extension down to lr_scale 0.01, a read-following objective, or a WSD cooldown)
     '5': FA-ccin2p3-c6d0c827
-    '6': ccin2p3:ws_c1_k533_mse_wsd_hpo8
   handoff:
     state: 'Written up: C1 (par:v4_warm_start @1258ef73), step 3 tuned k=533 and step 5 pre-decay checkpoints (par:v4_warm_start_tuned
       @e1d0bc97), step 4 width growth (par:v4_warm_start_grow @97a69764). Step 3 (D284): tuned k=533 SHORT and worse than
