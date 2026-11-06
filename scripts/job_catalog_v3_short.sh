@@ -507,7 +507,7 @@ fi
 # before any GPU time is spent; submit with --hdr=--time=<its slurm_time>
 if [ -n "$TRAIN_ONLY" ]; then
     echo "V3_WALL training only ($ITERS_FIXED steps, no reads): 1.01 s/step + 15 min start-up (tools/short_wall.py rates)"
-elif [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ]; then
+elif [ -n "$SLURM_JOB_ID" ] && [ "$MODE" != smoke ] && [ "$MODE" != probe ] && [ "$MODE" != prebuild ]; then
     LIM=$(squeue -h -j "$SLURM_JOB_ID" -o %l 2>/dev/null)
     WALL=$(python tools/short_wall.py --train "$TRAIN" --cat "$CAT" --axes "${AXES[@]}" \
            $([ "$MODE" = eval ] && echo --eval) ${SIGMA_FROM:+--eval-stage} ${ITERS_FIXED:+--iters $ITERS_FIXED} ${HET:+--het} ${LH:+--width "$LH"} ${LIM:+--limit "$LIM"}) \
@@ -556,6 +556,19 @@ fi
 # PROBE_CKPT=true (and LONG_CKPT=true for the long cells) gradient-checkpoints the transformer blocks
 # (model.net.checkpoint_blocks: one extra forward per step, the activations not kept), for widths 16/32 on a V100.
 # PROBE_MEMMAP=true loads on the memmap path (data_mmap.py; the cache under $SCRATCH/amp_mmap_cache, built on a miss).
+# mode prebuild (CPU, through scripts/job_catalog_v3_short_prebuild.sh): builds the memmap cache (data_mmap.py) of an
+# arm that loads on the memmap path (LONG_MEMMAP=true, SHORT_MEMMAP) with the arm's own overrides, so its key is the
+# GPU run's, and the momentum scale of the arm's seed; exits before the model (a GPU run without its cache refuses)
+if [ "$MODE" = prebuild ]; then
+    case " ${EXTRA[*]} " in *" ++data.memmap=true "*) ;; *) echo "mode prebuild: $ARM does not load on the memmap path"; exit 1 ;; esac
+    OUT="${SCRATCH:?SCRATCH unset}/zz_prebuild_${ARM}_${SLURM_JOB_ID:-$$}"
+    PYTHONPATH=. python run.py --config-path "$PROJECT_DIR/$SRC" --config-name config run_dir="$OUT" run_name=null \
+        warm_start_idx=null base_dir="$PROJECT_DIR" training.is_dyhpo_run=false training.increment_steps=null \
+        training.result_path="$OUT/result.json" plot=true "${COMMON[@]}" "${NORM[@]}" "${EXTRA[@]}" \
+        ++data.memmap_prebuild=true training.num_workers=0
+    RC=$?; rm -rf "$OUT"
+    echo "RUN_SUMMARY catalog_short prebuild $ARM rc=$RC"; exit "$RC"
+fi
 if [ "$MODE" = probe ]; then
     H="${PROBE_HEADS:?PROBE_HEADS=<num_heads> for mode probe}"
     OUT="$SCRATCH/zz_probe_long_w${H}_${SLURM_JOB_ID:-$$}"
