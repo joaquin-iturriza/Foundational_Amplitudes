@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Does a cheap propagator surrogate predict log|M|^2 well enough to decide, before the matrix element is computed,
 which phase-space candidates to label? (plan catalog_coverage; Joaquin 2026-11-06 22:31, D317, refused the quota sampler's
-~100x generation time; the <= 2x bound is CLAUDE.md's margin on a new method's cost over the one it replaces; the waste
+~100x generation time; the <= 2x bound is the step-69 design's; the waste
 today is the matrix elements of candidates the flat selection rejects.)
 
 Surrogate, per event, from the class's diagram sidecar (data/diagrams/<class>.diagrams.json, the subprocess with the

@@ -3787,8 +3787,7 @@ def _flat_logm_select(logm, n_keep, rng, n_bins=60):
 FLAT_DEX_PER_BIN = 0.25    # bin width in log10|M|^2: the 0.25-dex bins the step-57/58 check judges flatness on
 FLAT_BUDGET = 50           # candidates labelled per flat event, at most: a stop, not a target [open]
 FLAT_LAST = {}             # diagnostics of the last quota-filled flat part (multichannel_check.py quota policy)
-# pol["flat_mcmc"] (plan catalog_coverage step 69; the cost bound is CLAUDE.md's 2x margin on a new method's cost over
-# the one it replaces, after D317 refused the quota sampler's ~100x): the flat part's events from Markov chains instead
+# pol["flat_mcmc"] (plan catalog_coverage step 69; the <= 2x cost bound is that step's design, set after D317 refused the quota sampler's ~100x): the flat part's events from Markov chains instead
 # of rejection. One first round of candidates (the policy's proposal, as the quota part's first round); then
 # K = flat_mcmc_chains x n_flat chains, started from in-range first-round candidates drawn with weight 1 / (their bin's
 # count), each at its start's sqrt(s) (fixed). A step moves one random pair of finals: in the pair's rest frame its

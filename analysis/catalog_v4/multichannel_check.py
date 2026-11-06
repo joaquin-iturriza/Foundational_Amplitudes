@@ -206,7 +206,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
             s.update(mc_mperi=True, mc_mperi_edge=True, mc_res2=True)
         if policy in ("mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12"):
-            # plan catalog_coverage step 69 (cost bound: CLAUDE.md's 2x margin on a new method's cost; D317 refused the
+            # plan catalog_coverage step 69 (cost bound <= 2x: the step-69 design; D317 refused the
             # quota sampler's ~100x): at most 12 labels per flat event, 0.65 + 0.35 x 12 = 4.85 labels per pool event
             # against the old 0.65 + 0.35 x 6 = 2.75 (1.76x); the flat part from Wang-Landau Markov chains
             # (sampling.flat_mcmc), its first round from both ladders' channels, or the quota sampler at the same budget
@@ -260,7 +260,8 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                                             if d.get("channels") is not None else None),
                                        "channels": d["channels"], "mcmc": d.get("mcmc")})
                             if d.get("kept_P") is not None:
-                                kept_ev.append((d["kept_P"], d["kept_sq"], d["kept_chain"],
+                                kc = np.asarray(d["kept_chain"], np.int64)   # chain ids are per chunk: offset them
+                                kept_ev.append((d["kept_P"], d["kept_sq"], np.where(kc >= 0, kc + 1000000 * len(kept_ev), kc),
                                                 fdv.bins_of(np.asarray(d["logm"])[np.asarray(d["keep"])], d["edges"]),
                                                 np.asarray(d["edges"]) / np.log(10.0)))
                         elif policy == "multichannel":
