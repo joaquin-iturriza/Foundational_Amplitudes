@@ -1,29 +1,38 @@
-"""plan status and its Stop gate on a scratch copy of the live plan: catalog_coverage's owner stopped, its steps 11 and
-14 waiting on two runs that ended, no live job, no open event."""
+"""plan status and its Stop gate on a frozen plan fixture (tests/fixtures/plan_status): catalog_coverage's owner stopped,
+its steps 11 and 14 waiting on two runs that ended, no live job, no open event; independent of the live plan and runs.db."""
 import json, os, shutil, sqlite3, subprocess, sys
 import yaml
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENDED = ("FA-ccin2p3-f8d114ce", "FA-ccin2p3-37ebce98")
+FIXTURE = os.path.join(REPO, "tests", "fixtures", "plan_status")
+RUNS_SCHEMA = """CREATE TABLE runs (id TEXT PRIMARY KEY, project TEXT, site TEXT, branch TEXT, commit_sha TEXT,
+  job TEXT, sched_id TEXT, state TEXT, remote_path TEXT, submitted INTEGER, finished INTEGER, est_gpu_hours REAL,
+  note TEXT, item TEXT, expect TEXT, summary TEXT, summary_state TEXT, running_seen INTEGER, launch TEXT);
+CREATE TABLE events (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, project TEXT, item TEXT, kind TEXT,
+  key TEXT, msg TEXT, acked INTEGER, ack_note TEXT, mute_until INTEGER, tell TEXT);
+CREATE TABLE decisions (id TEXT PRIMARY KEY, project TEXT, kind TEXT, quote TEXT, said_at TEXT, covers TEXT,
+  note TEXT, recorded INTEGER, in_force INTEGER DEFAULT 1);
+CREATE TABLE items (project TEXT, id TEXT, title TEXT, decision TEXT, scope TEXT, est_gpu_hours REAL,
+  match TEXT, check_cmd TEXT, ready TEXT, notes TEXT, status TEXT, created INTEGER, updated INTEGER, progress TEXT,
+  waiting TEXT, PRIMARY KEY (project, id));"""
 
 
 def world(tmp_path):
     (tmp_path / "plan").mkdir()
     (tmp_path / ".claude").mkdir()
-    shutil.copy(os.path.join(REPO, "plan", "plan.yaml"), tmp_path / "plan")
-    shutil.copy(os.path.join(REPO, "plan", ".state.json"), tmp_path / "plan")
+    for f in ("plan.yaml", ".state.json"):
+        shutil.copy(os.path.join(FIXTURE, f), tmp_path / "plan")
     db = tmp_path / "runs.db"
-    shutil.copy(os.path.expanduser("~/.local/share/ccorch/runs.db"), db)
     c = sqlite3.connect(db)
-    c.execute("update runs set state='COMPLETED' where project='FA' and item='catalog_coverage'")
+    c.executescript(RUNS_SCHEMA)
+    for r in ENDED:
+        c.execute("insert into runs (id, project, site, state, item) values (?, 'FA', 'ccin2p3', 'COMPLETED', "
+                  "'catalog_coverage')", (r,))
+    c.execute("insert into decisions (id, project, kind, quote, said_at, covers, recorded, in_force) values "
+              "('D228', 'FA', 'approve', 'fix setup problems during the weekend hold', '2026-10-30T10:00:00+00:00', "
+              "'agent_redesign', 1700000000, 1)")
     c.commit()
-    d = yaml.safe_load(open(tmp_path / "plan" / "plan.yaml"))
-    for e in d["entries"]:
-        if e["id"] == "catalog_coverage":
-            e["owner"] = {"agent": "astopped0000", "state": "working", "since": "2026-10-30T18:15:20+00:00"}
-            e["step_waits"] = {11: "wait on " + ENDED[0], 14: "wait on " + ENDED[1]}
-            e.pop("ask", None)
-    yaml.safe_dump(d, open(tmp_path / "plan" / "plan.yaml", "w"))
     env = dict(os.environ, PLAN_TEST="1", PLAN_ROOT=str(tmp_path), PLAN_RUNS_DB=str(db), PLAN_EVENTS_CMD="true",
                PLAN_SITE_MODULE=shutil.which("site"))
     return env
@@ -37,7 +46,9 @@ def test_status_stalled_and_gate(tmp_path):
     assert "STALLED" in line and "steps 11, 14 wait on runs that ended" in line, out
     gate = os.path.join(REPO, ".claude", "hooks", "plan_check.py")
     r = subprocess.run([sys.executable, gate], input="{}", env=env, capture_output=True, text=True)
-    assert r.returncode == 2 and "catalog_coverage is STALLED" in r.stderr, r.stderr
+    # a stalled entry whose owner is stopped is a note (what it waits on is in its hand-back); one with no owner refuses
+    assert r.returncode == 2 and "multi_step is STALLED" in r.stderr, r.stderr
+    assert "catalog_coverage is STALLED" not in r.stderr, r.stderr
     r = subprocess.run([sys.executable, gate], input=json.dumps({"agent_id": "x"}), env=env, capture_output=True,
                        text=True)
     assert "STALLED" not in r.stderr

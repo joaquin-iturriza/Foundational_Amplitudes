@@ -1,0 +1,47 @@
+migrated_at: '2026-11-06T00:00:00+00:00'
+entries:
+- id: catalog_coverage
+  title: a stopped owner with two steps waiting on ended runs
+  question: Frozen test fixture entry, owner stopped, steps 11 and 14 wait on runs that ended?
+  status: running
+  decisions: []
+  quotes: []
+  next:
+    11: Step eleven, waits on a run.
+    14: Step fourteen, waits on a run.
+  match: zz_fix_cc_*
+  owner:
+    agent: astopped0000
+    state: working
+    since: '2026-10-30T18:15:20+00:00'
+  step_waits:
+    11: wait on FA-ccin2p3-f8d114ce
+    14: wait on FA-ccin2p3-37ebce98
+- id: agent_redesign
+  title: a timed wait that names no run
+  question: Frozen test fixture entry, one step on a timed wait?
+  status: running
+  decisions: []
+  quotes: []
+  next:
+    11: Close the entry.
+    12: A step on a timed wait.
+    14: Another step.
+  match: zz_fix_ar_*
+  owner:
+    agent: atimed00000
+    state: working
+    since: '2026-10-30T18:15:20+00:00'
+  step_waits:
+    12: a day of clean running of the switch-overs
+- id: multi_step
+  title: a running entry with several next steps
+  question: Frozen test fixture entry, several next steps?
+  status: running
+  decisions: []
+  quotes: []
+  next:
+    1: First step.
+    2: Second step.
+  match: zz_fix_ms_*
+  owner: null
