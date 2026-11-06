@@ -12734,6 +12734,7 @@ entries:
     - FA-ccin2p3-58723352
     - FA-ccin2p3-70c28bd9
     - FA-ccin2p3-75d28cb4
+    - FA-ccin2p3-7a40c835
     - FA-ccin2p3-8e41ac1e
     - FA-ccin2p3-93479cde
     - FA-ccin2p3-a6834028
@@ -12758,6 +12759,7 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1ckfinal.json
     - analysis/catalog_v4/data/warm_start_C1t.json
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
+    - analysis/catalog_v4/data/ws_restart_steps.json
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
     - analysis/catalog_v4/plot_warm_start_compare.py
