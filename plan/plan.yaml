@@ -3722,12 +3722,9 @@ entries:
       refused without ''--'' or when unknown; tested on 5 cases, backup site.bak-20261105-runopts); (c) a03d9f99 set the long
       sweep configs to mem 32G from the measured peak RSS, and lxplus gives every 1-GPU job 16 CPUs / 48000 MB whatever it
       asks (site CONDOR_GPU_SHARE), so nothing left; (d) recorded as a finding with the measured per-width rates.'
-    58: 'Step 57 result to Joaquin (finding 2026-11-05, multichannel_check.json @3fdb914c): the multichannel candidates reach
-      the pp max on the three EW classes (above_max 0.49/0.39 -> <=0.0005) and pass the plateau rule only on v4_uux_epemg;
-      the top density stays capped by the candidates'' own density on all four others, and the two QCD 2->4 classes (uu_bbxuu,
-      us_ddxsu) still leave 2-10% of pp events above the max. Waiting on his call: keep multichannel (MC_TAIL 0.2, collinear
-      |eta| bound as stated) and add more candidates at the top (a second channel-share pass weighted to the top bins, or
-      a larger oversampling there), or another route'
+    58: '(a) Flat in log|M|^2 over the pp-sampled range (D294): adaptive per-bin oversampling, keep drawing candidates until
+      every log|M|^2 bin up to the pp max is filled to its quota (top bins included), then generate; check on the five multichannel_check
+      classes (0 pp events above the catalog max, per-bin density at quota), figure of the catalog vs pp log|M|^2 density.'
     60: 'Worktrees left after merge (remove_worktree.sh refused by the permission classifier for agents): worktrees/wt-ws-ckpt,
       wt-ws-grow (warm_start) and wt-multichannel; Joaquin was given the commands 2026-11-05; remove once he allows or runs
       them.'
@@ -9257,10 +9254,10 @@ entries:
       - 'Joaquin answers (e): implement it or drop it'
       - 'no answer: stays listed, nothing waits on it'
     58:
-      feeds: how the catalog's flat part reaches the top of the pp |M|^2 before a regeneration
+      feeds: how the catalog's flat part reaches the top of the pp |M|^2 before a regeneration (D269, D294)
       if:
-      - 'Joaquin picks a route: design it, rerun multichannel_check on the five classes'
-      - 'Joaquin says regenerate with multichannel as is: design the regeneration'
+      - 'every bin at quota on the five classes: design the regeneration'
+      - 'a bin cannot be filled within the candidate budget: find why (phase-space measure of the top) and fix the proposal'
     60:
       feeds: keeping the trunk checkout clean so later merges and folds of results are not blocked by stale worktrees
       if:
