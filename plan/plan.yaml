@@ -9390,8 +9390,8 @@ entries:
     '62': FA-ccin2p3-1c6caddf FA-ccin2p3-4ea1c1eb FA-ccin2p3-c2e82e97 FA-ccin2p3-a52c9185 FA-ccin2p3-e4e0f158 FA-ccin2p3-d84270fc
       FA-ccin2p3-2756bece FA-ccin2p3-3bafdc58
     '61': Joaquin allowing the refused resubmission (asked 2026-11-06)
-    '65': 'FA-ccin2p3-92e2c145 FA-ccin2p3-b056798f FA-ccin2p3-28dba7da FA-ccin2p3-f101c96c FA-ccin2p3-b7f83400 FA-ccin2p3-7822cdb6
-      FA-ccin2p3-2521fe9d FA-ccin2p3-86b15f03 FA-ccin2p3-076dcd4c FA-ccin2p3-0917fe2c '
+    '65': 'FA-ccin2p3-fe0e11fe FA-ccin2p3-50239a4e FA-ccin2p3-e8ab3bee FA-ccin2p3-e309554b FA-ccin2p3-9936f469 FA-ccin2p3-3fa03e9c
+      FA-ccin2p3-ccd3f4cb FA-ccin2p3-52f60ad9 FA-ccin2p3-f9ac563f FA-ccin2p3-31fafb4f '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
