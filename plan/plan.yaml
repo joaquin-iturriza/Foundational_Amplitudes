@@ -13145,6 +13145,26 @@ entries:
       is then ruled out as a proxy for the reads. Growth: BETTER than the untuned grown k=533 by the same rule, MATCH to w16
       scratch by its (A/B)^0.3=1.19 bar; NOT BETTER: the transferred HPs do not carry and a growth-own sweep (same space,
       same objective, on the growth setup) is the next step. A trial or run that blows up is listed apart.'
+    fix_at: '2026-11-06T04:45:47+00:00'
+    fix: 'Check 5 (not a repeat, prior incomplete): the prior says ''none beyond these'' for a mu_mse objective, but docs/results.tex
+      already has two studies of picking a het run''s checkpoint on the validation mu MSE instead of the NLL: D85 (24 cells
+      2->3/2->4, lines ~9161-9172: mu-MSE pick lower than NLL pick in 23 of 24, median ratio 0.81 / 0.90) and D89 (147 2->2
+      cells, ~9182-9195: inside one run the choice barely matters at 2->2, median 1.00; run-to-run factor ~2), and many tp3_*
+      het fine-tune sweeps already use training.heterosc_select=mu_mse as their DyHPO objective (e.g. sweep/sweep_config_tp3_hp58fte_ee_ttbar_d6_het.yaml).
+      D62 (''training.heterosc_select defaults to nll'') and D298 (Joaquin: checking a different objective is the owner''s
+      to do) also bear on it. Fix: name these in prior with their results and say how this design differs (a warm start after
+      a data change, judged on held-out zero-shot reads, not single-process fine-tunes judged on test |Delta|). Check 13 (HPO
+      layout): 12 trials in waves [4,4,4] against the sibling sweeps'' 8 trials, 3 start-up, waves [3,3,2] (the direct sibling
+      ws_c1_k533_hpo8 and the cov_v4_long_hpo sweeps; the rest 6), with no words of Joaquin''s asking for more; two added
+      dimensions are not his call for a larger budget. Fix: 8 trials, n_startup 3, waves [3,3,2], or quote his words for 12;
+      and state when the sweep finishes (3 waves x ~0.45 h plus queue) and when the confirmation and growth runs finish. Also
+      to state before resubmission (checks 1 and 14, hold otherwise): the confirmation arm v4_het_warm25m_k533[_seed2] and
+      the growth arm must carry the winning trial''s training.scheduler, wsd_cooldown_frac and training.heterosc_select=mu_mse
+      (the arm is not yet in scripts/job_catalog_v3_short.sh in wt-ws-tune); and the growth runs'' disk: two memmap caches
+      of ~23 GB (keys deda9310, 04fb3b3d, deleted after step 4) against /sps/lpnhe free 132 GB read 2026-11-06. Checks passed:
+      2 (trial_curves.json confirmed: val MSE of mu 0.0349 at lr_scale 0.174 vs 0.0257 at 2.22, NLL ranks opposite; reads
+      moved with tuning R PP4 1.19 [1.01,1.39]); 3 (two seeds, widened by |ln R_seed|, resolved a 1.19 effect before); 4,
+      6, 7 (D284 lr in the space, D291), 8, 9 (HETEROSC), 10, 11, 12 hold.'
   step_why:
     5:
       feeds: why the val_loss_no_reg-tuned k=533 warm start went to low lr and lost on the held-out reads (D284 step 3)
