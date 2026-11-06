@@ -12851,8 +12851,6 @@ entries:
       that damps Muon''s first steps (e.g. Muon lr ramp from 0 over the warmup, or AdamW-only first N steps) against the default
       restart at 533 steps, seeds 42/43; also fix the ws_fill figure''s pp panel y axis (legend pushed it to 1.4). Joaquin
       told 2026-11-06.'
-    9: '(d) D303, the fill''s no-CAUSE branch: the k=533 default restart with Muon''s lr damped at its start (fine_tune.muon_warmup_steps=168,
-      arm v4_het_warm25u_k533[_seed2]) against the same-data default restart 0202ba7f/7b2d6c24'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -14143,11 +14141,6 @@ entries:
       if:
       - 'damping removes the jump: read the zero-shot gain'
       - 'no change: report and look at the lr ramp itself'
-    9:
-      feeds: the restart recipe of step 7 (C2-C6, C8, D300) and of the width growth
-      if:
-      - 'CAUSE and BETTER: the Muon warmup joins the restart recipe; step 7 runs with it'
-      - 'CAUSE without BETTER, or no CAUSE: the untuned restarted schedule stays the recipe; step 7 runs with it at once'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
