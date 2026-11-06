@@ -11149,6 +11149,7 @@ entries:
     '14': 'Joaquin bringing back the deck cold-read agent (D261: ''we will do it later'')'
     '15': a day of live use of the registered notification hook (d2f7686d, 2026-11-04 ~22:00), then re-measure double wakes
       with main_turns.py
+    '16': the repo-reviewer a450d4efce9259486's verdict on the current code backlog
   owner:
     agent: a9eb06278af98e7df
     state: stopped
