@@ -131,7 +131,7 @@ def _few_figure(rows):
     sys.path.insert(0, ROOT)
     import plot_style as ps
     recs = {}
-    for line in open(_LOG):
+    for line in _open_log(_LOG):
         if line.startswith("WS_SPLIT "):
             r = json.loads(line.split(" ", 1)[1]); recs[r["model"]] = r
     figs = ps.panels(2)
@@ -154,15 +154,21 @@ def _few_figure(rows):
 _LOG = None
 
 
+def _open_log(path):
+    """the job log, plain or gzipped (data/ws_hpo8/het_split_log.txt.gz holds the WS_ lines of FA-ccin2p3-7a40c835)"""
+    import gzip
+    return gzip.open(path, "rt") if path.endswith(".gz") else open(path)
+
+
 def summary(a):
     global _LOG
     _LOG = a.log
     tr = json.load(open(os.path.join(DATA, "trial_curves.json")))
     recs = {}
-    for line in open(a.log):
+    for line in _open_log(a.log):
         if line.startswith("WS_SPLIT "):
             r = json.loads(line.split(" ", 1)[1]); recs[r["model"]] = r
-    skipped = [json.loads(l.split(" ", 1)[1]) for l in open(a.log) if l.startswith("WS_SKIP ")]
+    skipped = [json.loads(l.split(" ", 1)[1]) for l in _open_log(a.log) if l.startswith("WS_SKIP ")]
     rows = {}
     for tag, r in recs.items():
         n = np.array(r["n"]); keep = n > 0
@@ -189,15 +195,22 @@ def summary(a):
         _few_figure(rows)
         # NLL-tuned best trial against the default restart, process by process (same validation, same target stats)
         recs = {}
-        for line in open(a.log):
+        for line in _open_log(a.log):
             if line.startswith("WS_SPLIT "):
                 r = json.loads(line.split(" ", 1)[1]); recs[r["model"]] = r
+        diff = {}
         if "trial_1860" in recs and "untuned_k533" in recs:
             keep = (np.array(recs["trial_1860"]["n"]) > 0) & (np.array(recs["untuned_k533"]["n"]) > 0)
             for k in ("W", "S", "MSE"):
                 d = np.array(recs["trial_1860"][k])[keep] - np.array(recs["untuned_k533"][k])[keep]
+                diff[k] = {"median": float(np.median(d)), "mean": float(d.mean()), "share_below0": float(np.mean(d < 0)),
+                           "n_proc": int(keep.sum())}
                 print(f"{k}: NLL-tuned minus default restart over {int(keep.sum())} processes: median {np.median(d):.4f},"
                       f" mean {d.mean():.4f}, share below 0 {np.mean(d < 0):.2f}")
+        # one line for docs/results.tex claims: per model W, S, NLL, MSE; per process NLL-tuned minus default restart
+        print(json.dumps({"rows": {k: {q: r[q] for q in ("W", "S", "NLL", "MSE", "n_proc")} for k, r in rows.items()},
+                          "tuned_minus_default": diff, "reread_minus_logged": out["max_abs_reread_minus_logged"],
+                          "parent_reread_minus_step0": out["parent_reread_minus_step0"]}))
         return
     nll = np.array([rows[k]["NLL"] for k in T]); W = np.array([rows[k]["W"] for k in T])
     S = np.array([rows[k]["S"] for k in T]); M = np.array([rows[k]["MSE"] for k in T])

@@ -4,7 +4,8 @@ Per run, from its train_steps.npz on CC (per-step lr, grad norm before clipping,
 loss at steps 0-2, the largest grad norm and training loss over the first 20 / 40 steps, the peak lr and its step,
 and the final loss; for the ws_c1_k533_hpo8 trials beside each its lr_scale and warmup fraction; and what the parent's
 checkpoint carries of optimizer state (number of AdamW and Muon state entries; the fine-tune path loads none of it).
-Usage: python3 analysis/catalog_v4/ws_restart_steps.py   -> data/ws_restart_steps.json"""
+Usage: python3 analysis/catalog_v4/ws_restart_steps.py [--cached]   -> data/ws_restart_steps.json (--cached: reread it)
+The last line printed is the whole record as one JSON line (docs/results.tex claims)."""
 import json, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -34,12 +35,19 @@ print("RESTART " + json.dumps(out))
 '''
 
 if __name__ == "__main__":
-    out = site_python(SCRIPT, [], "RESTART")
     f = os.path.join(HERE, "data", "ws_restart_steps.json")
-    json.dump(out, open(f, "w"), indent=1)
+    if "--cached" in sys.argv:      # reread the committed JSON (docs/results.tex claims), no site call
+        out = json.load(open(f))
+    else:
+        out = site_python(SCRIPT, [], "RESTART")
+        json.dump(out, open(f, "w"), indent=1)
     for k, r in out.items():
         if k.startswith("_"):
             print(k, r); continue
         print(f"{k:42s} lr_scale {r['lr_scale']} lr@2 {r['lr_0_2'][2]:.2e} grad@0,1,2 "
               + " ".join(f"{x:.3g}" for x in r["grad_0_2"]) + f" gmax20 {r['grad_max20']:.3g}@{r['grad_max20_at']}"
               f" loss@0 {r['loss_0_2'][0]:.3f} max40 {r['loss_max40']:.3f} end {r['loss_end']:.3f}")
+    # the last line, keyed without spaces for docs/results.tex claims: default, grown, parent, trial_NNNN
+    short = {"warm start, default lr (k=533, s42)": "default", "grown 8 to 16, 533 steps (s42)": "grown",
+             "pretrained start (het control, s42)": "parent"}
+    print(json.dumps({short.get(k, k.replace("hpo8 ", "").lstrip("_")): v for k, v in out.items()}))
