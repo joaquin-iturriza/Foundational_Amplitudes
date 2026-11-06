@@ -10077,6 +10077,18 @@ entries:
       point for all widths) is reported as the reason the map cannot be extrapolated; a cell more than 2 seed spreads off
       its neighbours'' trend is read for a defect (blow-up, lr) before use. 10 new V100/H100 jobs + 1 CPU prebuild, 211 GPU-h
       of work (approved by name, D314), one wave.'
+    passed_at: '2026-11-06T22:46:58+00:00'
+    reviewer: 'Re-check of the 22:46 revision after the 22:39 FIX: fits fixed before the run (joint 12-cell fit, 9 dof, the
+      only source of width-axis alpha/L_inf; per-width 4-point 1 dof; per-length 3-point labelled not a test; shared-exponent
+      fit beside), YES/PARTIAL/NO each with what it changes, NO covering misfit and L_inf at 0; disk recorded and checked
+      (CC /sps/lpnhe 72 GB free, ~11 GB for 10 cells + at most one 21 GB cache; cache key holds no model/training field, data_mmap.py
+      base_key_doc/features_key_doc). Check 2: par:v4_width val MSE ln|M|^2 w8 0.0914 -> w16 0.0509 -> w32 0.0288, width 8
+      1x 0.0914 -> 4x 0.0206 -> 16x 0.0123. Check 3: one seed by D314/D315; seed-pair spread 3/8/6% (seed_spread.py @fbfb4109)
+      against neighbour steps x1.3-x1.8. Only width and steps move (lr by the steps^-0.55 window law in the approved grid;
+      full set at every length, D236); reused trial_1262 cells same HPs at window position 0.9955 (long_sweeps_best.json);
+      het loss (D52/D71), emission-scale target (D234); 211 GPU-h re-summed from scaling_grid_plan.json. Searched results.tex:
+      v4_width, v4_length, v4_mult_width_length, epoch, scaling grid, loss_vs_compute, mse_vs_compute, tf32; plan evidence
+      and dead ends; decisions D219 D236 D256 D292 D293 D314 D315.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
