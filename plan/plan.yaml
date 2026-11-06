@@ -13206,19 +13206,17 @@ entries:
   decisions:
   - D282
   next:
-    6: '(b) D303 lead: what in the restart''s lr/schedule makes the warm runs'' validation loss behave as it does (default-lr
-      warm start: val NLL -2.571 at step 10 rises to -1.926 at step 30 and ends -2.639 at 533; grown 8->16: starts -2.842,
-      rises to -2.229 at 120 and ends -2.696 at 533, -2.779 at 1066, both worse than their start; 1066/2132 spike to 1e7 and
-      recover), read from the logged lr, warmup and per-step loss of these runs; then D291: tune the k=533 warm start toward
-      the held-out reads (sweep ws_c1_k533_mse_wsd_hpo8, val MSE of the mean, cosine or WSD), confirm at seeds 42/43, apply
-      to the data change and the width growth 8->16'
-    7: '(c) D283, D300: C2-C6 and C8 approved at their cost (79.8 GPU-h, 54 runs; Joaquin 2026-11-06 ''I approved everything
-      you gave me for the warm start changes''): run them with the tuned recipe from (b) as soon as (b) picks it, without
-      asking again; redo the per-run time for the tuned recipe and record targets'
-    8: 'Damped-Muon restart (the fill''s no-cause branch): once step 6''s tuned confirmation (C1m) is read, design a restart
-      that damps Muon''s first steps (e.g. Muon lr ramp from 0 over the warmup, or AdamW-only first N steps) against the default
-      restart at 533 steps, seeds 42/43; also fix the ws_fill figure''s pp panel y axis (legend pushed it to 1.4). Joaquin
-      told 2026-11-06.'
+    9: 'Step 7 reads (D283, D300; design re-passed 2026-11-06): when the 54 runs end (52 running, the C8 k=2132 pair v4_het_warmmag_k2132[_seed2]
+      submitted at the next wake once the site gate''s 60-min window allows), logs to scratch, mixture_ab.py val/extract per
+      axis, mixture_ab.py warm C2 C3 C4 C5 C8, signext_compare.py warm (C6), ws_stats_check.py C8 on the k=2132 pair, figure
+      of the compared reads, write-up in par:v4_warm_start'
+    10: 'Step 9 (D303, step 8''s NOT MUON branch): the remaining cause of the restart jump, AdamW''s share or the ramp of
+      every group: arms v4_het_warm25a_k533[_seed2] (AdamW lr x min(1, step/168), Muon untouched) and v4_het_warm25e_k533[_seed2]
+      (both groups damped), against the default restart pair 0202ba7f/7b2d6c24, seeds 42/43; code merged 1b51878d (repo-reviewer
+      PASS); design, review, submit with the C8 k=2132 pair'
+    11: 'Width growth 8->16''s own tuning sweep: after step 9 reads (it may change the restart recipe); its objective must
+      track the held-out reads, which neither the het NLL nor the validation MSE of the mean did on C1 (C1m: mean-MSE-tuned
+      at par with untuned), so the objective is designed first from the growth runs'' own logs (default vs hp1333 grown pairs)'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -14802,23 +14800,22 @@ entries:
       both NOT BETTER. ws_stats_check.py @42c4aeab gates C5, C6, C8 at 1e-12. Disk: df 93G free against 46 GB. Searched: warm50,
       warmmag, warmpp, warmsx, mse_cont, step 7, C2-C8 (results.tex); warm, restart, recipe, D282-D303 (site decisions).'
   step_why:
-    6:
-      feeds: which restart recipe (lr, warmup, schedule) the warm starts C1-C8 and the growth use
+    9:
+      feeds: 'D282/D283: per change, the smallest k/4264 at which a warm start matches the change from scratch'
       if:
-      - 'the full re-warm to the parent''s peak lr is what destroys the parent''s fit: the recipe lowers or removes the re-warm
-        (lr_scale, warmup, WSD) and the sweep''s space is checked to cover it'
-      - 'the schedule is not the cause: the het sigma calibration is (step 5''s split), and the objective/selection change
-        carries the fix'
-    7:
-      feeds: whether warm start reaches scratch across data, loss and target changes (D282/D283)
+      - 'MATCH and carried at some k: YES at the smallest such k'
+      - 'no k matches: NO at the untuned restart, re-applied with step 9''s recipe if it is BETTER'
+    10:
+      feeds: 'D303: what in the restart''s lr makes the jump, and whether removing it improves the reads'
       if:
-      - 'run: extend the write-up per change'
-      - '(b) NOT BETTER: run them with the untuned restarted schedule (C1''s)'
-    8:
-      feeds: 'Joaquin''s D303 lead: what in the restart''s lr/schedule knocks the warm start off its minimum'
+      - 'an arm BETTER on the reads: its damping joins the restart recipe for the growth and any change that read NO'
+      - 'neither BETTER: the jump is harmless to the reads; the untuned restart stays and the remaining gap is the retraining
+        length'
+    11:
+      feeds: 'D285: whether a shape-changing warm start can be tuned to reach width 16 from scratch'
       if:
-      - 'damping removes the jump: read the zero-shot gain'
-      - 'no change: report and look at the lr ramp itself'
+      - 'a tuned growth reads BETTER than the default growth: it becomes the growth recipe, re-read against w16 from scratch'
+      - 'no objective tracks the reads: report the growth as NO at the default restart with that limit stated'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
