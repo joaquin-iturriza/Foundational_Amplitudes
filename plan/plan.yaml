@@ -13277,6 +13277,7 @@ entries:
     - FA-ccin2p3-dd010506
     - FA-ccin2p3-dd32a907
     - FA-ccin2p3-e046ac67
+    - FA-ccin2p3-e47ed26b
     - FA-ccin2p3-ed946736
     - FA-ccin2p3-f35b6a78
     - FA-ccin2p3-f5245570
@@ -13300,6 +13301,7 @@ entries:
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k1066_seed3
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k1066_seed4
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132
+    - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132_seed2
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132_seed3
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k2132_seed4
     - analysis/catalog_v3/data/short_reads/v4_mse_warmsx_k533
