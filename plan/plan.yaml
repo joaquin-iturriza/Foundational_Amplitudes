@@ -11803,6 +11803,18 @@ entries:
       0.929. Sensitivity (read_events): class-median R per joint-density bin 0.146->1.27 at k=16, 0.132->1.43 at k=64 (0.139->1.38
       at k=32); per |M|^2-density bin 0.121->1.34 with a class floor of 10 events, 0.116->1.42 at 50 (0.120->1.34 at 20).
       knn self exclusion made exact (no number changed beyond the third digit).'
+  - at: '2026-11-06T20:04:35+00:00'
+    text: '2026-11-06 cost of the new sampling against the old (Joaquin ~19:50; sampling_cost.py @08e3091e -> data/sampling_cost.json,
+      figs/sampling_cost). Cost = CPU core-s of building a class''s train+val+test tree pools, sampling and matrix-element
+      labelling together (gen_chunk wall per chunk, one core). Old: measured from catalog_v4''s own generation logs (12 job_catalog_v4_regen
+      runs of 2026-10-26, [TIME] chunk lines; the plain multichannel replay agrees within 4-10% on the QCD classes: uu_bbxuu
+      69.6 vs 71.9 s train, us_ddxsu 47.2 vs 51.7). New: both ladders at flat_budget 750, train replay x1.2 for val/test.
+      Per class, old -> new core-s (ratio): uux_epemg 31 -> 73 (2.4x), uux_epemvevex 32 -> 521 (16x), udx_csxvevex 35 -> 3858
+      (112x), us_ddxsu 57 -> 9149 (162x), uu_bbxuu 83 -> 10303 (123x). Over the 1301 hadronic classes (43 with 2 finals, 257
+      with 3, 1001 with 4): old 26.0 core-h measured; new ESTIMATE 2721 core-h (<=3 finals at the 2->3 class''s 2.4x, 2->4
+      at the median 117.5x of the four 2->4 test classes), bracket 377 (min 16x) to 3738 (max 162x). Budget = the most candidate
+      events labelled per kept flat event (old 6, i.e. 6x oversampling; 750 the cap of the quota rounds). Default-share MadEvent
+      events not counted (same in both).'
   handoff:
     state: '2026-11-06 ~17:30. (a) Coverage: step 67 read in full (finding 2026-11-06 ''step 67 verdict''; data/quota_coverage.json
       @686c3241; figs/quota_fill_a..e + legend). With both ladders (sampling.mc_mperi_both) and mc_res2 at flat_budget 750,
