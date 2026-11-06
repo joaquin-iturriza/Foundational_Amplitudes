@@ -13600,7 +13600,7 @@ entries:
     decision: D307
   owner:
     agent: a6f48d86491ded7e6
-    state: working
+    state: closed
     since: '2026-11-06T16:25:21+00:00'
     state_at: '2026-11-06T20:13:25+00:00'
     context: 257705
@@ -16049,31 +16049,32 @@ entries:
     '1': FA-ccin2p3-0de6be56 FA-ccin2p3-89ecbc1e FA-ccin2p3-1ef38bb2 FA-ccin2p3-c07e6ad5 FA-ccin2p3-4cb686ac FA-ccin2p3-1f7ae4ea
       FA-ccin2p3-f3d6af3a FA-ccin2p3-32cb8805 FA-ccin2p3-ba567f27 FA-ccin2p3-166c6378
   handoff:
-    state: 'Step 9 done: par:v4_warm_start_changes @7d288fee (YES C2 share 0.50 het at 0.5, C3/C4 MSE shares at 0.25, C5 pp-mixed
-      at 0.125; C6 and C8 not decided, intervals too wide). Step 11: re-run sweep ws_grow_k533_zeroshot_hpo8_rerun ENDED,
-      best trial hp1860 zero_shot_score 0.4761 < 0.535 bar (default growth e046ac67, seed 42) -> NEXT: re-run hp1860 at seeds
-      42 and 43 under the passed step-11 design: scripts/job_catalog_v3_short.sh arm v4_het_default25 / v4_het_default25_seed2
-      with GROW_SWEEP=ws_grow_k533_zeroshot_hpo8_rerun GROW_HP=1860 LONG_HEADS=16 GROW_K=533 (merged 107e2bea; tools/sweep_trial_hps.py
-      reads runs/ws_grow_k533_zeroshot_hpo8_rerun/trial_1860/config.yaml on CC, check it exists first), limit as the growth
-      runs (about 2.4 h, est 5 GPU-h for both), --mem 32G, site pick FA --jobs 2, plan target, plan wait step 11 on both ids;
-      then read with mixture_ab.py warm as a new WARM entry (like C10wm) against e046ac67/f35b6a78, w16 scratch 493c98db/7288b3fe
-      beside, outcome by the design (BETTER: widened upper end of R(best/default growth) below 1 on PP4 or EE4 and above 1.05
-      on neither), figure as plot_ws_c1m.py --growth, write-up beside par:v4_warm_start_grow.'
-    decisions: 'e046ac67''s config.yaml restored from its seed-43 twin by tools/restore_run_config.py @18e47cf4 (CPU job FA-ccin2p3-25051489;
-      damaged copy kept as config.yaml.overwritten_0), a repair inside approved work. The first growth sweep ws_grow_k533_zeroshot_hpo8
-      failed whole because the cache prebuild had rewritten the base config; job_mmap_prebuild.sh fixed @8f68ca8d; the re-run
-      sweep carries data.memmap_prebuild false and num_workers 2. Sweep result: 7 of 8 scored, trial_0001 diverged at step
-      305 (non-finite gradients), listed apart; five trials 0.476-0.481.'
-    ruled_out: C7; C9; catalog_v3 changes; NLL-tuned and mean-MSE-tuned restarts; optimizer moment fill; Muon damping; AdamW-only
-      and every-group damping; pre-decay parents; validation NLL / MSE of the mean as tuning objectives; more seeds for the
-      sign extension's from-scratch pair (its spread floor and 21-pool bootstrap keep it undecided)
-    running: none (sweep ws_grow_k533_zeroshot_hpo8_rerun ended; restore job ended)
-    files: 'analysis/catalog_v4/mixture_ab.py (WARM); analysis/catalog_v4/plot_warm_start.py (changes); analysis/catalog_v4/signext_compare.py;
-      tools/restore_run_config.py; scripts/job_restore_config.sh; scripts/job_mmap_prebuild.sh; sweep/sweep_config_ccin2p3_ws_grow_k533_zeroshot_hpo.yaml;
-      tools/sweep_trial_hps.py; scripts/job_catalog_v3_short.sh (GROW_SWEEP/GROW_HP); docs/results.tex par:v4_warm_start_changes.
-      Open ask on the entry (nothing waits): 4 more from-scratch seeds for the magnitude target (9.4 GPU-h), and the tuned
-      growth at 1066/2132.'
-    written: '2026-11-06T16:24:24+00:00'
+    state: 'Step 12 (D307, D308), the restart study on C1 (share 0.25, het, k=533 only, D312), design passed round 2, SUBMITTED
+      whole 2026-11-06 ~20:40 UTC: 10 runs on CC from the checkpoint rerun v4_het_control_ckpt[_seed2], scripts/job_catalog_v3_short.sh
+      @a62c31d6 (arms merged a1b0b899), limit 02:30, 16G, target ws_restart_study 1.5 h; final_default (control) 0de6be56/89ecbc1e,
+      step3198_default 1ef38bb2/c07e6ad5, step3198_continue 4cb686ac/1f7ae4ea, step2132_continue f3d6af3a/32cb8805, final_lr3x
+      ba567f27/166c6378 (s42/s43); plan wait on step 1 (the entry''s next is a plain string). NEXT when all end: read7.sh-style
+      fetch (site logs -n 3000000 > log; mixture_ab.py val + extract per axis), ws_restart_steps.py for G (largest grad norm
+      steps 0-19) and worst training loss steps 0-39 per arm (extend it with the C1r runs if it lists runs by name), mixture_ab.py
+      warm C1r_ctrl / C1r_step3198_default / C1r_step3198_continue / C1r_step2132_continue / C1r_final_lr3x (e7393cef), outcome
+      per arm by the passed design (BETTER: widened upper end of R(arm/control) <1 on PP4 or EE4 and >1.05 on neither, then
+      MATCH vs B at <=1.35; valley reading SUPPORTED if a continue arm shrinks G (<0.5x at both seeds) AND is BETTER), figure
+      (grad norm and val NLL vs restart step, per-class CDFs PP4/EE4; extend plot_ws_fill.py or plot_ws_c1m.py), write-up
+      in docs/results.tex after par:v4_warm_start_ramp; every figure caption and write-up states in one line how the interval
+      is built (95% class bootstrap widened on each side by |ln R_seed|), Joaquin''s request.'
+    decisions: 'D307: no more change tests until the warm start mechanism is fixed; D308: earlier checkpoint where lr has
+      not reached 0, continue from there; D312: tuned growth only at 533; no more seeds for the magnitude target (the ask
+      closed; plan answer recorded D313, a duplicate of D307''s words). Step 11 done: zero-shot-tuned growth NOT BETTER (R
+      PP4 0.995 [0.959,1.031], EE4 0.989 [0.903,1.080]), par:v4_warm_start_grow_tuned. plan set-next fix 7f2f8475 (a restated
+      step keeps its wait when its text names the runs).'
+    ruled_out: 'C7; C9; catalog_v3 changes; NLL-tuned, mean-MSE-tuned and HD4-score-tuned restarts (the last on the growth);
+      optimizer moment fill; Muon damping; AdamW-only and every-group damping; pre-decay parents at the NLL-tuned settings;
+      validation NLL / MSE of the mean as tuning objectives; more seeds (Joaquin: no); further change tests (D307)'
+    running: the 10 step-12 runs above
+    files: scripts/job_catalog_v3_short.sh (v4_het_ws_*); analysis/catalog_v4/mixture_ab.py (WARM C1r_*, C10wz); analysis/catalog_v4/ws_restart_steps.py;
+      analysis/catalog_v4/plot_ws_c1m.py (--growth-zs); analysis/catalog_v4/plot_ws_fill.py; tools/plan.py (set-next wait
+      fix); scratchpad read7.sh; docs/results.tex par:v4_warm_start_grow_tuned, par:v4_warm_start_ramp
+    written: '2026-11-06T20:13:42+00:00'
   step_why:
     1:
       feeds: how a warm start should leave its parent (the restart recipe for every later change, D307)
