@@ -1050,6 +1050,10 @@ class BaseExperiment:
         if self._muon_warmup > 0:
             LOGGER.info(f"MUON_WARMUP the Muon groups' lr times min(1, step / {self._muon_warmup}) on top of the "
                         f"schedule (the logged lr is the schedule's)")
+        if (_ft is not None and _ft.get("load_optimizer_state", False)
+                and int(_ft.get("moment_fill_steps", 0) or 0) > 0):
+            raise RuntimeError("fine_tune.load_optimizer_state and fine_tune.moment_fill_steps together: the fill "
+                               "would overwrite the loaded moments")
         if _ft is not None and _ft.get("load_optimizer_state", False) and not self.warm_start:
             self._load_parent_optimizer_state(_ft.get("pretrained_path"))
         n_fill = int(_ft.get("moment_fill_steps", 0) or 0) if _ft is not None else 0
