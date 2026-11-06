@@ -10581,6 +10581,15 @@ entries:
       D293. Work split across five helpers of the owner: (b) memmap keyed draws, (a) quota sampler, (c) het sign head, (d)
       e+e- default-share read and ablation, (e)+(f) epoch count, scaling redo and loader figure; designs recorded and reviewed
       serially by the owner. Step 60 dropped: wt-ws-ckpt, wt-ws-grow, wt-multichannel no longer exist under worktrees/.'
+  - at: '2026-11-06T04:37:51+00:00'
+    text: '(f) 2026-11-06 loader control redrawn (fig_loader_control.py @53369324 -> figs/loader_control.{png,pdf}, data/loader_control_fig.json;
+      runs memmap 5b5215b6/e184bbc5 vs same-commit in-memory reruns ae39ee5a/75ad7b20, seeds pooled by per-class geometric
+      mean). Median over classes of MSE(memmap)/MSE(in-memory), bootstrap 95%: PP4 trained (797 classes) 1.026 [1.018, 1.034],
+      EE4 trained (115) 0.997 [0.981, 1.018], held-out default (558) 0.987 [0.946, 1.015]; rerun spread R_0 (rerun / 10-31
+      in-memory arm) 1.057, 1.056, 1.041, all larger than R_L; per-class PP4 MSE memmap vs in-memory on y=x (Spearman 0.997,
+      median |log10 ratio| 0.031) over 6 decades. Both far below the 1.39 gap (full-set w8 over 1e4 per process). Superseded
+      by (e): the full-set w8 gap was a run under one epoch (D293), so the loader question is closed; the per-seed UNRESOLVED
+      read (seed 43 held 0.897) is within the pooled interval.'
   handoff:
     state: '2026-11-05 ~07:00. Done this owner: step 40 (par:v4_width 5e7d905e; size_figs fit 92da0f89; repo-reviewer PASS),
       step 36 (memmap code hash, merged f56fd901, PASS 070551cf), step 39 (b) site run options (~/.local/bin/site; also fixed
