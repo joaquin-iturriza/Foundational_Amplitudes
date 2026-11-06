@@ -1,0 +1,143 @@
+{
+ "design": "plan catalog_coverage step 62 (D295): the default share's content per beam and R split by beam and by whether the class's own default events were trained",
+ "recipe": "recipes/catalog_v4_default25_train.yaml",
+ "train_classes": 1153,
+ "ee": {
+  "classes": 115,
+  "f_default": [
+   0.25
+  ],
+  "default_events_per_class_subsampled": 2500,
+  "default_events_total_subsampled": 287500,
+  "share_of_all_training_events": 0.0249,
+  "catalog_sqrts_window_GeV": [
+   10,
+   6000
+  ],
+  "energies_GeV": [
+   91.1876,
+   240.0,
+   365.0,
+   500.0,
+   1000.0,
+   3000.0
+  ],
+  "energies_per_class": {
+   "3": 4,
+   "4": 10,
+   "5": 55,
+   "6": 46
+  },
+  "same_generator_setup_as_its_EE4_pool": 115
+ },
+ "pp": {
+  "classes": 797,
+  "f_default": [
+   0.25
+  ],
+  "default_events_per_class_subsampled": 2500,
+  "default_events_total_subsampled": 1992500,
+  "share_of_all_training_events": 0.1728,
+  "catalog_sqrts_window_GeV": [
+   10,
+   6000
+  ],
+  "pools_reused": {
+   "pp13v4": 466,
+   "pp13": 331
+  }
+ },
+ "classes_without_share": 241,
+ "runs": {
+  "default25": {
+   "PP4": [
+    "FA-ccin2p3-9538e607",
+    "FA-ccin2p3-ed96b552"
+   ],
+   "EE4": [
+    "FA-ccin2p3-9538e607",
+    "FA-ccin2p3-ed96b552"
+   ],
+   "held": [
+    "FA-ccin2p3-f0156d88",
+    "FA-ccin2p3-df858d33"
+   ]
+  },
+  "control": {
+   "PP4": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ],
+   "EE4": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ],
+   "held": [
+    "FA-ccin2p3-87ea24d0",
+    "FA-ccin2p3-321a3de2"
+   ]
+  }
+ },
+ "R_default25_over_control": {
+  "EE4_trained": {
+   "R": 0.182,
+   "n_classes": 115,
+   "boot95": [
+    0.1543,
+    0.2116
+   ],
+   "widened": [
+    0.138,
+    0.2366
+   ],
+   "frac_classes_below_1": 1.0,
+   "n_probes": 115,
+   "R_seed": 1.1182
+  },
+  "EE4_held_out": {
+   "R": 0.4484,
+   "n_classes": 54,
+   "boot95": [
+    0.3153,
+    0.7513
+   ],
+   "widened": [
+    0.2772,
+    0.8544
+   ],
+   "frac_classes_below_1": 0.7778,
+   "n_probes": 54,
+   "R_seed": 1.1373
+  },
+  "PP4_trained": {
+   "R": 0.3438,
+   "n_classes": 797,
+   "boot95": [
+    0.323,
+    0.3685
+   ],
+   "widened": [
+    0.2834,
+    0.42
+   ],
+   "frac_classes_below_1": 0.9598,
+   "n_probes": 797,
+   "R_seed": 1.1398
+  },
+  "PP4_held_out": {
+   "R": 0.6802,
+   "n_classes": 504,
+   "boot95": [
+    0.6295,
+    0.7177
+   ],
+   "widened": [
+    0.506,
+    0.8928
+   ],
+   "frac_classes_below_1": 0.8016,
+   "n_probes": 504,
+   "R_seed": 1.244
+  }
+ }
+}
