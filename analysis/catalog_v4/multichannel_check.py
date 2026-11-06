@@ -532,6 +532,27 @@ def coverage():
     json.dump(out, open(os.path.join(DATA, "quota_coverage.json"), "w"), indent=1)
 
 
+def need(name, policies):
+    """the job's time limit for `policies` (one seed, one node) on class `name`: per policy, the slowest per-replay seconds
+    measured for the class at budget 50 over every read (any quota policy with the ladder, any node), times the policy's
+    budget over 50; summed, times 1.5 (plan step 67: a limit sized from one node's time ran out at 4 h, the job needing
+    4.2 h on a node 1.46x slower than step 66's) -> prints NEED_SECONDS and the slurm limit HH:MM:00"""
+    s50 = []
+    for f in glob.glob(os.path.join(READS, f"{name}_*.json")):
+        for k, r in json.load(open(f))["runs"].items():
+            if k.startswith("quota_ladder") and "budget" not in k and r.get("chunk_seconds"):
+                s50.append(sum(r["chunk_seconds"]))
+    if not s50:
+        sys.exit(f"need: no budget-50 ladder read of {name}: time it from its own first jobs")
+    t = 0.0
+    for pol in policies:
+        b = int(pol.rsplit("budget", 1)[1]) if "budget" in pol else 50
+        t += max(s50) * b / 50.0
+    lim = int(np.ceil(1.5 * t / 600.0)) * 600
+    print(f"NEED_SECONDS {t:.0f} (slowest budget-50 replay {max(s50):.0f} s over {len(s50)} reads) "
+          f"LIMIT {lim // 3600:02d}:{lim % 3600 // 60:02d}:00")
+
+
 PULL_REMOTE = r'''
 import json, os, sys
 print("MCHECK_READ " + open(os.path.join(os.environ["SCRATCH"], "zz_mcheck", sys.argv[1] + ".json")).read().strip())
@@ -565,6 +586,8 @@ if __name__ == "__main__":
         summary()
     elif sys.argv[1] == "coverage":
         coverage()
+    elif sys.argv[1] == "need":      # need <class> <policy+policy...>
+        need(sys.argv[2], sys.argv[3].split("+"))
     else:   # an unknown argument (e.g. --help) once rewrote data/multichannel_check.json through summary()
         sys.exit("usage: multichannel_check.py run <class> <probe> [<policies> <seed>] | pull [<policies>] | "
                  "where <class> <probe> <cut_log10> | summary")

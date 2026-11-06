@@ -11,6 +11,8 @@
 # replayed chunk by chunk into temporary dirs; nothing written to $DATA_DIR) -> $SCRATCH/zz_mcheck/<class>.json.
 # MCHECK_CLASS and MCHECK_PROBE name the class and its PP4 probe (multichannel_check.CLASSES); MCHECK_POLICIES (e.g.
 # multichannel+quota, plan step 58) and MCHECK_SEED run those policies at one seed -> <class>_<policies>_<seed>.json.
+# The time limit: `python3 analysis/catalog_v4/multichannel_check.py need <class> <policies>` (slowest measured replay x
+# budget/50, x1.5), passed as --hdr=--time=; the 00:40 default covers budget-50 policies only.
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
