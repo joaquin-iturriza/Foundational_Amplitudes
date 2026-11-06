@@ -10147,6 +10147,12 @@ entries:
     units: null
     start: '2026-11-06T10:19:46+00:00'
     at: '2026-11-06T10:19:46+00:00'
+  - batch: step67_uu_bbxuu_resubmit
+    wall_h: 4.2
+    jobs: 2
+    units: null
+    start: '2026-11-06T14:29:10+00:00'
+    at: '2026-11-06T14:29:10+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
