@@ -13036,6 +13036,59 @@ entries:
       seed, ft offshell in key, no steps or heads), 44.5 GB vs 88 GB free on /sps/lpnhe, shared key confirmed from first jobs''
       logs; het loss, B''s preprocessing, C1''s reads; no sweep; 13.1 GPU-h. Searched results.tex, plan.yaml, site decisions
       for grow, widen, hypercloning, net2, function-preserving, width growth: none.'
+  - at: '2026-11-06T04:42:30+00:00'
+    question: 'D291 step (b): tuned toward the held-out reads instead of the het NLL, does the k=533 (1/8) warm start of the
+      data change C1 (share 0.25) beat the untuned restarted schedule and approach scratch B, and does the winning recipe
+      carry to the width growth 8->16 at k=533? Tuning: single-fidelity DyHPO ws_c1_k533_mse_wsd_hpo12 over hpo8''s fine-tune
+      space plus the schedule (cosine or WSD with a (1-sqrt) cooldown fraction), objective and checkpoint selection the validation
+      MSE of the mean (training.heterosc_select=mu_mse).'
+    prior: 'par:v4_warm_start (C1 untuned, R(W533/B) PP4 1.33 EE4 1.51 SHORT; k=1066 MATCH by 1.35; k=2132 equal). par:v4_warm_start_tuned
+      (D284 hpo8 on val_loss_no_reg NLL: best hp_1860 lr_scale 0.174; reads WORSE than untuned, R(Wt/Wu) PP4 1.19 [1.01,1.39],
+      EE4 1.40 [1.20,1.67]; R(Wt/B) PP4 1.59 EE4 2.21). Step (a) on hpo8''s logged curves (analysis/catalog_v4/data/ws_hpo8/trial_curves.json,
+      ws_het_split.py fetch @b9a3aed2): the mean''s val MSE at the best checkpoint ranks the trials nearly opposite to the
+      NLL: lr_scale 0.174/0.332/0.36/0.383/0.873/1.28/2.22/6.67 -> NLL -2.758/-2.750/-2.749/-2.742/-2.712/-2.699/-2.546/-2.396,
+      MSE 0.0349/0.0364/0.0373/0.0296/0.0279/0.0289/0.0257/0.0278 (the NLL''s best is the MSE''s worst); sweep trials ran
+      with no sigma stage, so the NLL at 533 steps carries sigma calibration. The exact W/S split is the GPU reread of step
+      (a) (scripts/job_ws_het_split.sh), run beside. D289: pre-decay checkpoints no better. D285: growth untuned SHORT, R
+      PP4 1.75 at k=533. Literature: WSD (Hu et al. 2024 arXiv:2404.06395; Haegele et al. 2024 arXiv:2405.18392: 10-20% (1-sqrt)
+      cooldown matches or beats cosine); re-warming to a higher lr adapts more (Gupta et al. 2023 arXiv:2308.04014). Searched
+      results.tex, plan, site decisions for mu_mse objective / WSD / cooldown on warm starts: none beyond these.'
+    measure: 'As C1 (mixture_ab.py warm, new entries C1m for the tuned data change and C10wm for the tuned growth): each run''s
+      final model after its own sigma stage (D276); zero-shot MSE of log|M|^2 per probe on PP4 and EE4 (all classes), with
+      the held-out default- and catalog-sampled pooled reads beside; R(W/B) and R(W/W_untuned) = median over classes of the
+      class geometric mean of the probes'' two-seed geometric mean ratios, 95% class bootstrap widened by the pair''s |ln
+      R_seed|; g = ln(A/W)/ln(A/B). Sweep side: each trial''s val MSE of mu at its best checkpoint (the objective), with the
+      NLL beside.'
+    check: 'The reads move with the warm start''s tuning at fixed k: tuned (NLL, lr 0.174) over untuned (lr 1) R PP4 1.19
+      [1.01,1.39], EE4 1.40 [1.20,1.67] (warm_start_C1t.json). The proposed objective moves the same way as those reads on
+      existing data: val MSE of mu, tuned trial hp_1860 0.0349 (seed 42, same config as the tuned confirmation) against the
+      untuned k=533 lower (its log''s ''MSE (prepd) val combined'' 0.0275 at seed 42, 0.0329 at seed 43, an event-pooled aggregate,
+      approximate; the matched number is the reread''s untuned row), while the NLL moved the other way (-2.758 vs -2.639).
+      Not checked: whether in-distribution val MSE ranks warm starts the way PP4/EE4 do beyond these two points; the confirmation
+      reads decide.'
+    fixed: 'C1''s warm arm (runs/catalog_v4_short/v4_het_warm25_k533 config: het control''s best mean-stage model as parent,
+      target_stats parent, catalog_v4_default25_train, 1e4 train / 200 val per pool in memory, width 8, MuonAdamW, batch 16384,
+      HETEROSC, seed 42 in the sweep), k=533. Sweep: hpo8''s space (lr_scale [0.1,10] log with range extension, layer_decay
+      [0.75,1], muon_weight_decay, reg, warmup [0.01,0.2], eta_min, EMA, EMA decay) plus training.scheduler {CosineAnnealingLR,
+      WSD} and wsd_cooldown_frac [0.1,0.5]; heterosc_select mu_mse; sigma stage off and evaluate off in trials; 12 trials
+      waves [4,4,4]. Confirmation: the best trial''s HPs as the arm v4_het_warm25m_k533[_seed2] (scripts/job_catalog_v3_short.sh,
+      the full job: sigma stage, all reads), seeds 42/43. Growth: the same HPs applied to the width-growth k=533 arm (D285
+      step 4 setup: v4_het_default25 with LONG_HEADS=16 LONG_CKPT LONG_MEMMAP GROW_K=533, the w8 parent at its seed, whole
+      training set memmap), seeds 42/43.'
+    control: Untuned W533 (FA-ccin2p3-341bf564, 254abf4f) and the NLL-tuned W533 (56cca07a, 75d28cb4) for the data change;
+      scratch B (share 0.25 het default25 pair) as the target; for growth the untuned grown k=533 (e046ac67, f35b6a78) and
+      w16 from scratch (493c98db, 7288b3fe). No matched same-config continuation (D286).
+    seeds: 'Sweep seed 42 (as hpo8); confirmation and growth at seeds 42 and 43, each from the parent at its seed; seed spread
+      carried in the widening (C1''s unpaired 15-18% PP4). Cost: reread 0.5 GPU-h; sweep 12 x 0.45 h = 5.4 (hpo8''s measured
+      21 min + data load, limit 47 min); confirmation 2 x 1.7 h (C1t''s runs at the same k) = 3.4; growth 2 x 1.86 h (step
+      4''s k=533 rate) = 3.7; total 13.0 GPU-h on CC-IN2P3.'
+    outcome: 'Data change, fixed before the read: BETTER when the widened upper end of R(Wm/W_untuned) is below 1 on PP4 or
+      EE4 and above neither''s 1.05; MATCH (to scratch) when the widened upper end of R(Wm/B) <= 1.35 on both (C1''s bar).
+      BETTER or MATCH: the mu_mse-tuned recipe (with its schedule) is the tuned recipe for C2-C8 and the growth; NOT BETTER:
+      the untuned restarted schedule stays the recipe for C2-C8, reported with the sweep''s MSE surface; the val-MSE objective
+      is then ruled out as a proxy for the reads. Growth: BETTER than the untuned grown k=533 by the same rule, MATCH to w16
+      scratch by its (A/B)^0.3=1.19 bar; NOT BETTER: the transferred HPs do not carry and a growth-own sweep (same space,
+      same objective, on the growth setup) is the next step. A trial or run that blows up is listed apart.'
   step_why:
     5:
       feeds: why the val_loss_no_reg-tuned k=533 warm start went to low lr and lost on the held-out reads (D284 step 3)
