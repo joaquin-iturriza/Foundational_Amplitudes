@@ -920,6 +920,7 @@ class BaseExperiment:
             "scheduler_scale": t.get("scheduler_scale", 1),
             "T_max": sched.get("T_max"),
             "warmup": sched.get("warmup"),
+            "wsd_cooldown_frac": sched.get("cooldown_frac"),
             "lr": float(t.lr),
             "batchsize": int(t.batchsize),
             "ema": bool(self.cfg.get("ema", False)),
