@@ -10288,6 +10288,12 @@ entries:
     units: null
     start: '2026-11-06T20:00:45+00:00'
     at: '2026-11-06T20:00:45+00:00'
+  - batch: ee_quota_check
+    wall_h: 1.7
+    jobs: 8
+    units: null
+    start: '2026-11-06T20:20:46+00:00'
+    at: '2026-11-06T20:20:46+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
