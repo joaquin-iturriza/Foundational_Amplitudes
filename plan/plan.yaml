@@ -12941,6 +12941,16 @@ entries:
       a fixed norm, so a larger sign term takes its share from the magnitude: the sign gain (13.0 -> 8.4% median on H5, not
       significant) is bought with magnitude. Next per the design: the attachment point (sign head on a detached copy of the
       last block, so the sign gradient does not compete in the clipped trunk update), then the clipping regime.'
+  - at: '2026-11-07T01:14:20+00:00'
+    text: '2026-11-07 step 71 365 GeV rerun read (tools/lhe_probe.py eeisr-read with FA-ccin2p3-4390f747 replacing 22907651
+      -> data/ee_anchor_probe.json @901d600f, figs/ee_anchor_probe). 10000 events of dsh_epem_bbxvevex at 365 GeV: share of
+      events with sqrt(s_hat)/sqrt(s) < 0.99 is 0.273 with the FCC-ee 365 GeV spectrum (fcce365ll, banner right, kept 0.9998)
+      vs 0.277 with ISR only (q10 0.912 vs 0.910), 0 without spectrum; time per kept event 0.021 s both. Verdict stays NO_BEAMSTRAHLUNG:
+      at 365 GeV FCC-ee''s beamstrahlung does not move sqrt(s_hat) beyond ISR at +-0.006. Decision: keep fcce365ll at 365
+      GeV in EE_ANCHOR (it is the machine''s fitted spectrum, runs with the right card, costs the same, and is indistinguishable
+      from ISR only here), so the anchor list stands as the 10 energies with the machine spectrum where MadGraph has one (240
+      fcce240ll, 365 fcce365ll, 500 ilc500ll, 3000 clic3000ll) and ISR only elsewhere (91.1876, 160, 209, 380, 1000, 1500).
+      Step 71 WORKS at all 10 energies.'
   handoff:
     state: '2026-11-07 ~02:30. Step 69 (Markov-chain flat part) read: NO (data/mcmc_check.json, figs/mcmc_check_a-e). Step
       72 (channel-grid quota sampler, sampling.flat_grid, merged f8630100, repo-reviewer PASS watermark 65938f8c, design PASS)
