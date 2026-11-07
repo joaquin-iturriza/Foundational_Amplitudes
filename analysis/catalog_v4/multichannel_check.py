@@ -962,6 +962,50 @@ def step75r1():
     print("STEP75R1", verdict, json.dumps(fails))
 
 
+def step75r2_where():
+    """data/r1_where.json (plan step 75, r2's analysis of the r1 check): per class and seed of R1_CLASSES, for r1
+    (grid_r1_budget12), each margin bin r1_check.json lists short: quota, kept, candidates and kept per channel summed
+    over the chunks, and how the chunks stopped (quota, budget, stall); per class its cost split: label and proposal
+    seconds of r1 and of the old sampling (current) over the chunks, labels, candidates per kept event, and per
+    channel candidates and kept events (all bins)"""
+    chk = json.load(open(os.path.join(DATA, "r1_check.json")))
+    out = {}
+    for c in R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                continue
+            runs = json.load(open(f))["runs"]
+            r, cur = runs[f"grid_r1_budget12_{seed}"], runs.get(f"current_{seed}", {})
+            qc = r["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+            chs = next((x["channels"] for x in qc if x.get("channels")), None) or []
+            ch = [" ".join(str(x) for x in (k if isinstance(k, list) else [k])) for k in chs]
+            rec = {"channels": ch, "stops": {}, "short_bins": []}
+            for x in qc:
+                rec["stops"][x["stop"]] = rec["stops"].get(x["stop"], 0) + 1
+            for b in chk["classes"][c][f"grid_r1_budget12_{seed}"]["short"]:
+                j = int(np.argmin(np.abs(e[:-1] - b[0])))
+                rec["short_bins"].append({
+                    "lo": round(float(e[j]), 3), "fill": b[2], "kind": b[3],
+                    "quota": int(sum(x["quota"][j] for x in qc)), "kept": int(sum(x["kept_per_bin"][j] for x in qc)),
+                    "cand_by_channel": dict(zip(ch, np.sum([np.asarray(x["cand_per_channel_bin"])[:, j] for x in qc if x.get("cand_per_channel_bin")], 0).tolist())) if chs else {},
+                    "kept_by_channel": dict(zip(ch, np.sum([np.asarray(x["kept_per_channel_bin"])[:, j] for x in qc if x.get("kept_per_channel_bin")], 0).tolist())) if chs else {},
+                    "chunks_short": int(sum(x["kept_per_bin"][j] < x["quota"][j] for x in qc))})
+            tsum = lambda run, k: float(sum(x.get(k) or 0.0 for x in run.get("quota_chunks") or []))
+            rec["cost"] = {"vs_current": chk["classes"][c][f"grid_r1_budget12_{seed}"]["cost_vs_current"],
+                           "r1_s": r["seconds"], "current_s": cur.get("seconds"),
+                           "r1_t_label": tsum(r, "t_label"), "r1_t_propose": tsum(r, "t_propose"),
+                           "current_t_label": tsum(cur, "t_label"), "current_t_propose": tsum(cur, "t_propose"),
+                           "r1_labels": int(sum(x["n_labels"] for x in qc)),
+                           "current_labels": int(sum(x.get("n_labels") or 0 for x in cur.get("quota_chunks") or [])),
+                           "r1_cand_by_channel": dict(zip(ch, np.sum([np.asarray(x["cand_per_channel_bin"]).sum(1) for x in qc if x.get("cand_per_channel_bin")], 0).tolist())) if chs else {},
+                           "r1_kept_by_channel": dict(zip(ch, np.sum([x["kept_per_channel"] for x in qc if x.get("kept_per_channel")], 0).tolist())) if chs else {}}
+            out[f"{c}/{seed}"] = rec
+    with open(os.path.join(DATA, "r1_where.json"), "w") as fh:
+        json.dump(out, fh, indent=1)
+    print("STEP75R2_WHERE", len(out))
+
+
 def pull(policies=None, classes=None, seeds=SEEDS):
     """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
@@ -996,6 +1040,8 @@ if __name__ == "__main__":
         pull(R1_TAG, R1_CLASSES)
     elif sys.argv[1] == "step75r1":
         step75r1()
+    elif sys.argv[1] == "step75r2-where":
+        step75r2_where()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
