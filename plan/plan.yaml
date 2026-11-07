@@ -17552,7 +17552,7 @@ entries:
       acked), the three chained ones cancelled before start (a2605e80, 92db94f8, 21f645af); all resubmitted at 02:30. About
       15 GPU-h at limits. Reads: mixture_ab.py warm_single (S14 filled @this commit), figure plot_ws_fixes.py.'
   step_waits:
-    '1': FA-ccin2p3-05df656d FA-ccin2p3-07bfc8d7
+    '1': FA-ccin2p3-1c90ae73 FA-ccin2p3-013708af
     '9': FA-ccin2p3-238e6f81 FA-ccin2p3-0f346464 FA-ccin2p3-77e8bf2b FA-ccin2p3-85dd4eff FA-ccin2p3-a79d5b14 FA-ccin2p3-554f3ec5
   handoff:
     state: 'Step 14 (D319, D315 single seed; design passed round 2, code merged 80c9924c after repo-reviewer clean at 3ae60b08)
