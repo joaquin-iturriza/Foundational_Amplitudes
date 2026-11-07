@@ -1172,20 +1172,24 @@ def pull(policies=None, classes=None, seeds=SEEDS):
         print("pulled", tag, sorted(d["runs"]))
 
 
-def step78_where(classes=("v4_uux_bgtxwp", "v4_bbx_ccxh", "v4_bb_bb")):
+def step78_where(classes=("v4_uux_bgtxwp", "v4_bbx_ccxh", "v4_bb_bb"), check="r2_check.json", pol="grid_r2_budget18",
+                 tags=None, out_file="r2_where.json"):
     """data/r2_where.json (plan step 78, the NO branch of the r2 check): per class and seed, for every policy of the r1
     job (R1_TAG: old sampling, step-65 policy grid_both_res2f_budget12, r1) and of the r2 job (R2_TAG), its highest
     candidate (cand_max), its stops, and for each bin from 0.5 dex below r2_check.json's short bin up to the top edge:
     quota, kept, and candidates and kept events per channel summed over the chunks; the class's reach over every policy
-    of both jobs, beside the reach r2_check.json used (the r2 job's policies only)"""
-    chk = json.load(open(os.path.join(DATA, "r2_check.json")))
+    of both jobs, beside the reach r2_check.json used (the r2 job's policies only).
+    Parametrised for step 79 (step79-where): `check`'s short bins of policy `pol` over the jobs of `tags`
+    -> `out_file`"""
+    chk = json.load(open(os.path.join(DATA, check)))
+    tags = tags or (R1_TAG, R2_TAG)
     out = {}
     for c in classes:
         for seed in SEEDS:
-            r2c = chk["classes"][c][f"grid_r2_budget18_{seed}"]
+            r2c = chk["classes"][c][f"{pol}_{seed}"]
             lo_short = min([b[0] for b in r2c["short"]], default=None)
             rec = {"reach_r2_check": r2c["class_reach_log10"], "short_r2": r2c["short"], "policies": {}}
-            for tag in (R1_TAG, R2_TAG):
+            for tag in tags:
                 f = os.path.join(READS, f"{c}_{tag}_{seed}.json")
                 if not os.path.exists(f):
                     continue
@@ -1215,9 +1219,52 @@ def step78_where(classes=("v4_uux_bgtxwp", "v4_bbx_ccxh", "v4_bb_bb")):
             cm = [p["cand_max"] for p in rec["policies"].values() if p["cand_max"] is not None]
             rec["reach_all_jobs"] = max(cm) if cm else None
             out[f"{c}/{seed}"] = rec
-    with open(os.path.join(DATA, "r2_where.json"), "w") as fh:
+    with open(os.path.join(DATA, out_file), "w") as fh:
         json.dump(out, fh, indent=1)
     print("STEP78_WHERE", json.dumps({k: [v["reach_r2_check"], v["reach_all_jobs"]] for k, v in out.items()}))
+
+
+def step79_rounds(classes=("v4_uux_bgtxwp", "v4_uu_bbxuu"), pols=("grid_r2_budget18", "grid_r3_budget18")):
+    """data/r3_rounds.json (plan step 79, the NO branch of the r3 check): per class and seed, for r2 and r3 in the r3
+    jobs (R3_TAG), per chunk how it stopped and its labels; per short bin of r3_check.json its kept/quota in the chunks
+    of each stop kind and the chunks short in it; for the chunks that stopped on the budget the quota still missing at
+    the stop split into bins the check scores and bins it exempts (lower edge above the class's reach or upper edge
+    below its floor, r3_check.json's reach and floor): budget spent chasing exempt bins never fills a scored one"""
+    chk = json.load(open(os.path.join(DATA, "r3_check.json")))["classes"]
+    out = {}
+    for c in classes:
+        for seed in SEEDS:
+            runs = json.load(open(os.path.join(READS, f"{c}_{R3_TAG}_{seed}.json")))["runs"]
+            r3c = chk[c][f"grid_r3_budget18_{seed}"]
+            reach, floor = r3c["class_reach_log10"], r3c["class_floor_log10"]
+            rec = {}
+            for pol in pols:
+                qc = runs[f"{pol}_{seed}"]["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+                exempt = (e[:-1] > reach) | (e[1:] < floor)
+                stops = {}
+                for x in qc:
+                    stops[x["stop"]] = stops.get(x["stop"], 0) + 1
+                bins = []
+                for b in r3c["short"]:
+                    j = int(np.argmin(np.abs(e[:-1] - b[0])))
+                    by = {}
+                    for k in stops:
+                        xs = [x for x in qc if x["stop"] == k]
+                        by[k] = [int(sum(x["kept_per_bin"][j] for x in xs)), int(sum(x["quota"][j] for x in xs))]
+                    bins.append({"lo": b[0], "kept_quota_by_stop": by,
+                                 "chunks_short": int(sum(x["kept_per_bin"][j] < x["quota"][j] for x in qc)),
+                                 "kept_per_chunk": [int(x["kept_per_bin"][j]) for x in qc]})
+                miss = lambda x, m: int(sum(max(0, q - k) for q, k, ex in zip(x["quota"], x["kept_per_bin"], exempt)
+                                            if ex == m))
+                bud = [x for x in qc if x["stop"] == "budget"]
+                rec[pol] = {"stops": stops, "labels": int(sum(x["n_labels"] for x in qc)), "short_bins": bins,
+                            "budget_missing_scored": [miss(x, False) for x in bud],
+                            "budget_missing_exempt": [miss(x, True) for x in bud],
+                            "rounds_per_chunk": [len(x["rounds"]) for x in qc]}
+            out[f"{c}/{seed}"] = rec
+    json.dump(out, open(os.path.join(DATA, "r3_rounds.json"), "w"), indent=1)
+    print("STEP79_ROUNDS", json.dumps({k: {p: [v[p]["stops"], v[p]["labels"], sum(v[p]["budget_missing_scored"]),
+                                              sum(v[p]["budget_missing_exempt"])] for p in v} for k, v in out.items()}))
 
 
 if __name__ == "__main__":
@@ -1256,6 +1303,11 @@ if __name__ == "__main__":
                  design="plan catalog_coverage step 78 revision r3", reach_tags=(R1_TAG, R2_TAG))
     elif sys.argv[1] == "step78-where":
         step78_where()
+    elif sys.argv[1] == "step79-rounds":
+        step79_rounds()
+    elif sys.argv[1] == "step79-where":   # r3's short bins over the r2 and r3 jobs (plan step 79's NO branch)
+        step78_where(("v4_uux_bgtxwp", "v4_uu_bbxuu"), "r3_check.json", "grid_r3_budget18", (R2_TAG, R3_TAG),
+                     "r3_where.json")
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
