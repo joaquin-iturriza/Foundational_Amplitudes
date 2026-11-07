@@ -1,6 +1,6 @@
 """The quota sampler with channel grids (mg5_pipeline_final._flat_quota_part, sampling.flat_grid; plan catalog_coverage
 step 72): the grid map stays inside [0, 1) and is monotone; without flat_grid the quota sampler draws exactly what it
-drew before (same kept |M|^2 as trunk's module at the same seed, when trunk's copy is importable); on the toy |M|^2 of
+drew before (same kept |M|^2 as the module before the change, f414c171, at the same seed); on the toy |M|^2 of
 tests/test_flat_mcmc.py through the multichannel proposal, the grids at the same budget fill at least as much of the
 quota as the plain quota sampler, with independent draws (near-copy share <= 2%)."""
 import importlib.util, os, sys
@@ -45,12 +45,20 @@ def test_grid_map():
     assert np.mean(g.map(0, rng.random(20000)) < 0.1) > 0.3      # the grid follows the weights (uniform: 0.1)
 
 
-def test_unchanged_without_grid():
-    trunk = os.path.join(os.path.dirname(os.path.dirname(HERE)), "mg5_pipeline_final.py")
-    if not os.path.exists(trunk) or os.path.samefile(trunk, os.path.join(HERE, "mg5_pipeline_final.py")):
-        return
-    spec = importlib.util.spec_from_file_location("mg_trunk", trunk); mt = importlib.util.module_from_spec(spec)
-    sys.modules["mg_trunk"] = mt; spec.loader.exec_module(mt)
+BEFORE = "f414c171"    # trunk before sampling.flat_grid: its quota sampler is the reference the no-grid path must equal
+
+
+def test_unchanged_without_grid(tmp_path=None):
+    import subprocess, tempfile
+    src = subprocess.run(["git", "-C", HERE, "show", f"{BEFORE}:mg5_pipeline_final.py"], capture_output=True, text=True)
+    if src.returncode:
+        import pytest
+        pytest.skip(f"git show {BEFORE} failed: {src.stderr.strip()}")
+    old = os.path.join(tmp_path or tempfile.mkdtemp(prefix="zz_probe_grid_"), "mg_before.py")
+    open(old, "w").write(src.stdout)
+    sys.path.insert(0, HERE)       # the old module imports its siblings from the checkout
+    spec = importlib.util.spec_from_file_location("mg_before", old); mt = importlib.util.module_from_spec(spec)
+    sys.modules["mg_before"] = mt; spec.loader.exec_module(mt)
     a = run(mg, False, n_flat=500); b = run(mt, False, n_flat=500)
     assert np.array_equal(a[3], b[3])
 

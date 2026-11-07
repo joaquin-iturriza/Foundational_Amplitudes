@@ -828,17 +828,24 @@ STEP72_TAG = "current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+gri
 def step72():
     """data/grid_check.json: step69's per-class rows and verdict (YES / QUOTA12 / NO / COST / PARTIAL) once with the
     grids at 12 as the tested policy and once at 8 (verdict_by_test); YES at 8 or 12 = the grids fill every in-range
-    bin >= 0.95 at <= COST_MAX on every class and seed"""
+    bin >= 0.95 at <= COST_MAX on every class and seed; the top-level verdict is YES when either passes (passed_at the
+    lower budget), else the grids at 12's"""
     v = {}
     for t in ("grid12", "grid8"):
         step69(STEP72_TAG, STEP72, t, f"grid_check_{t}.json", "step72")
         v[t] = json.load(open(os.path.join(DATA, f"grid_check_{t}.json")))
-    out = dict(v["grid12"], test=None, verdict_by_test={t: v[t].get("verdict") for t in v},
-               checks_by_test={t: v[t].get("checks") for t in v})
+    vb = {t: v[t].get("verdict") for t in v}
+    # the design's rule: YES when the grids at 8 or at 12 pass (the lower budget preferred); otherwise the grids at 12
+    # decide (COST, PARTIAL, NO), the budget-8 row read beside it
+    top = (None if None in vb.values() else "YES" if "YES" in vb.values() else vb["grid12"])
+    out = dict(v["grid12"], test=None, verdict=top, passed_at=("grid8" if vb["grid8"] == "YES" else
+                                                                 "grid12" if vb["grid12"] == "YES" else None),
+               verdict_by_test=vb, checks_by_test={t: v[t].get("checks") for t in v})
+    out.pop("checks", None)
     json.dump(out, open(os.path.join(DATA, "grid_check.json"), "w"), indent=1)
     for t in v:
         os.remove(os.path.join(DATA, f"grid_check_{t}.json"))
-    print("STEP72", out["verdict_by_test"])
+    print("STEP72", out["verdict"], out["passed_at"], out["verdict_by_test"])
 
 
 def pull(policies=None, classes=None, seeds=SEEDS):

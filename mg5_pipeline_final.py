@@ -4189,6 +4189,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             wc = wc + MC_FLOOR * max(wc.mean(), 1e-300)
             shares = wc / wc.sum()
         if grids is not None:     # each channel's grid refitted to its candidates' uniform numbers, quota-weighted
+            t0 = time.perf_counter()     # (proposal time)
             for i, g in enumerate(grids):
                 idx = np.nonzero(ch_c == i)[0]
                 if len(idx):
@@ -4197,6 +4198,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
                     for r, k in enumerate(idx):
                         Y[r, :len(ys_c[k])] = ys_c[k]
                     g.fit(Y, w[idx])
+            t_prop += time.perf_counter() - t0
     keep, take = flat_quota_select(logm, edges, quota, rng)
     short = np.maximum(quota - take, 0)
     # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
