@@ -1087,13 +1087,20 @@ def cmd_shares(a):
 
 
 def part_energy_ok(path, run):
-    """An e+e- part (its run has ebeam1) holds events at its run's energy: the beams' energies sum to 2 x ebeam1."""
+    """An e+e- part (its run has ebeam1) holds events at its run's energy: the beams' energies sum to 2 x ebeam1. With
+    a beam spectrum (the run patches pdlabel) the beams radiate first: no event above 2 x ebeam1, and the highest at
+    least 0.99 of it (the step-71 probe: 55-96% of events within 1% of the collider energy at every anchor energy)."""
     if "ebeam1" not in run[2]:
         return True
     with np.load(path) as z:
         m = z["mom"]
     want = 2.0 * float(run[2]["ebeam1"])
-    return len(m) == 0 or abs(float(np.median(m[:, 0, 0] + m[:, 1, 0])) - want) <= 1e-6 * want
+    if not len(m):
+        return True
+    e = m[:, 0, 0] + m[:, 1, 0]
+    if run[2].get("pdlabel"):
+        return float(e.max()) <= want * (1 + 1e-6) and float(e.max()) >= 0.99 * want
+    return abs(float(np.median(e)) - want) <= 1e-6 * want
 
 
 def cmd_requeue(a):

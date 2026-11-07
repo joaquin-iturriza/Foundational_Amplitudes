@@ -1896,6 +1896,11 @@ def _load_catalog_2to4():
                                                 "catalog_v4_ee_processes.yaml"))
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
                                                 "catalog_v4_default_processes.yaml"))
+                       # the same at the e+e- collider anchor energies with their beam spectra (catalog_coverage step 74)
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_eea_processes.yaml"))
+                       + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
+                                                "catalog_v4_eea_default_processes.yaml"))
                        # default-sampled test pools of the held-out classes (recipes/gen_catalog_v4_heldout_default.py)
                        + _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "recipes",
                                                 "catalog_v4_heldout_default_processes.yaml"))
@@ -4854,6 +4859,10 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             **({"build": "parts"} if cfg["lhe"].get("parts") else {}),
             # an e+e- entry's fixed collider energies (lhe.energies), one MadEvent run each; absent for pp
             **({"energies": [float(e) for e in cfg["lhe"]["energies"]]} if cfg["lhe"].get("energies") else {}),
+            # lhe.beam_spectrum: the e+e- runs' lepton beam spectrum per collider energy (lhe_ee_patches); absent, fixed
+            # beams, so every pool built before keeps its identity
+            **({"beam_spectrum": {str(k): str(v) for k, v in sorted(cfg["lhe"]["beam_spectrum"].items())}}
+               if cfg["lhe"].get("beam_spectrum") else {}),
             **({"iseed_salt": int(cfg["lhe"]["iseed_salt"])} if cfg["lhe"].get("iseed_salt") else {}),
             **({"energy_runs": [int(x) for x in cfg["lhe"]["energy_runs"]]} if cfg["lhe"].get("energy_runs")
                else {}),
@@ -4907,10 +4916,40 @@ def lhe_runs(process, iseed, n_req):
         if len(nrs) != len(energies):
             raise ValueError(f"{process}: lhe.energy_runs has {len(nrs)} values for {len(energies)} energies")
         i0 = [sum(nrs[:j]) for j in range(len(nrs))]
-        return [(seed_k(i0[j] + k), sizes[j], {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{i0[j] + k + 1:02d}")
+        return [(seed_k(i0[j] + k), sizes[j], lhe_ee_patches(process, E), f"run_{i0[j] + k + 1:02d}")
                 for j, E in enumerate(energies) for k in range(nrs[j])]
-    return [(seed_k(j * n_runs + k), sizes[j], {"ebeam1": E / 2.0, "ebeam2": E / 2.0}, f"run_{j * n_runs + k + 1:02d}")
+    return [(seed_k(j * n_runs + k), sizes[j], lhe_ee_patches(process, E), f"run_{j * n_runs + k + 1:02d}")
             for j, E in enumerate(energies) for k in range(n_runs)]
+
+
+def ee_beam_lpp(proc_str):
+    """lpp1/lpp2 of an e+e- MadEvent run with a lepton beam spectrum: +3 for an electron beam, -3 for a positron beam
+    (arXiv:2108.10261 sect. 6), by the beam order of the MadGraph process string `proc_str` (its first two particles,
+    as MadEvent orders the beams). The pool's pdg_ids are not the beam order (ee4_/dsh_ pools generate 'e+ e- > ...'
+    and list [11, -11, ...]): taking them gave lpp1 +3 to the positron beam and a zero cross section (catalog_coverage
+    step 71's first probe, 2026-11-07)."""
+    lpp = {"e-": 3, "e+": -3}
+    b = proc_str.split(">")[0].split()
+    if len(b) != 2 or any(x not in lpp for x in b):
+        raise ValueError(f"ee_beam_lpp: beams of {proc_str!r} are not e+/e-")
+    return {"lpp1": lpp[b[0]], "lpp2": lpp[b[1]]}
+
+
+def lhe_ee_patches(process, E):
+    """Run-card patches of an e+e- entry's run at collider energy E: ebeam1 = ebeam2 = E / 2, and, for an entry with
+    lhe.beam_spectrum ({energy as f"{E:g}": pdlabel}, recipes/gen_catalog_v4_default.EE_ANCHOR), that energy's
+    lepton beam spectrum (lpp1/lpp2 by ee_beam_lpp, pdlabel: ISR, or ISR + the machine's beamstrahlung). Without
+    lhe.beam_spectrum the beams are fixed (lpp 0 from the card), as every pool built before."""
+    p = {"ebeam1": E / 2.0, "ebeam2": E / 2.0}
+    bs = PROCESSES[process]["lhe"].get("beam_spectrum")
+    if bs:
+        cfg = PROCESSES[process]
+        key = f"{float(E):g}"
+        if key not in bs:
+            raise ValueError(f"{process}: lhe.beam_spectrum has no spectrum at {key} GeV ({sorted(bs)})")
+        p.update(ee_beam_lpp(cfg.get("proc_str") or cfg["mg5_generate"][0].split(None, 1)[1]))
+        p["pdlabel"] = str(bs[key])
+    return p
 
 
 def lhe_energy_of_runs(runs):
@@ -5386,6 +5425,9 @@ def _lhe_virt_block(process, cfg, m, a_up, mom, aqcd, spare, need):
     m, a_up = np.array(m, copy=True), np.array(a_up, copy=True)
     amps, ok, born, a = lhe_label_virt(nlo, m, amz)
     ee = abs(int(cfg["pdg_ids"][0])) in (11, 13)
+    if cfg["lhe"].get("beam_spectrum"):
+        # ekey reads an event's collider energy as its sqrt(s_hat), which a beam spectrum lowers
+        raise NotImplementedError(f"{process}: one-loop labels (label_virt) of a pool with a beam spectrum")
 
     def ekey(x):        # e+e-: the collider energy of each event (its sqrt(s_hat)); pp: one class
         if not ee:
