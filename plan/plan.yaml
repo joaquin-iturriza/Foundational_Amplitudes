@@ -11528,13 +11528,13 @@ entries:
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
-    '78': 'FA-ccin2p3-7c7644c1 FA-ccin2p3-6e992564 FA-ccin2p3-9624f0cc FA-ccin2p3-02c7e590 FA-ccin2p3-62b751cd FA-ccin2p3-5a192ac0
+    '78': FA-ccin2p3-7c7644c1 FA-ccin2p3-6e992564 FA-ccin2p3-9624f0cc FA-ccin2p3-02c7e590 FA-ccin2p3-62b751cd FA-ccin2p3-5a192ac0
       FA-ccin2p3-ae80691e FA-ccin2p3-6db973ac FA-ccin2p3-b5e7e9ab FA-ccin2p3-cc20d8a4 FA-ccin2p3-798e8a68 FA-ccin2p3-296fc153
-      FA-ccin2p3-9007ed29 FA-ccin2p3-911a5829 FA-ccin2p3-ab9af1de FA-ccin2p3-982f7184 FA-ccin2p3-eb7f3afd FA-ccin2p3-2aaa4bb5
-      FA-ccin2p3-1789e7e2 FA-ccin2p3-c1c64f40 FA-ccin2p3-9b78d5e1 FA-ccin2p3-c01fef43 FA-ccin2p3-a48c9670 FA-ccin2p3-39191bd4
-      FA-ccin2p3-5c0169c3 FA-ccin2p3-424cafc6 FA-ccin2p3-eefc4ede FA-ccin2p3-c378054c FA-ccin2p3-cecb16f4 FA-ccin2p3-53885050
-      FA-ccin2p3-d982eb87 FA-ccin2p3-72e57eb5 FA-ccin2p3-e91ab729 FA-ccin2p3-f23dcf7e FA-ccin2p3-401f5840 FA-ccin2p3-0767a006
-      FA-ccin2p3-5ed59529 FA-ccin2p3-00789dbf '
+      FA-ccin2p3-ab9af1de FA-ccin2p3-982f7184 FA-ccin2p3-eb7f3afd FA-ccin2p3-2aaa4bb5 FA-ccin2p3-1789e7e2 FA-ccin2p3-c1c64f40
+      FA-ccin2p3-9b78d5e1 FA-ccin2p3-c01fef43 FA-ccin2p3-a48c9670 FA-ccin2p3-39191bd4 FA-ccin2p3-5c0169c3 FA-ccin2p3-424cafc6
+      FA-ccin2p3-eefc4ede FA-ccin2p3-c378054c FA-ccin2p3-cecb16f4 FA-ccin2p3-53885050 FA-ccin2p3-d982eb87 FA-ccin2p3-72e57eb5
+      FA-ccin2p3-e91ab729 FA-ccin2p3-f23dcf7e FA-ccin2p3-401f5840 FA-ccin2p3-0767a006 FA-ccin2p3-5ed59529 FA-ccin2p3-00789dbf  FA-ccin2p3-0f133452
+      FA-ccin2p3-ac96f65a
     '76': FA-ccin2p3-e22b4949 FA-ccin2p3-08ae487a FA-ccin2p3-81113f0a FA-ccin2p3-9cc1284c
   targets:
   - batch: gridpool_probe
