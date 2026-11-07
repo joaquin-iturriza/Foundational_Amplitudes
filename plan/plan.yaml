@@ -11928,7 +11928,7 @@ entries:
       - 'still short: Joaquin decides between dropping 160 GeV for them and accepting'
   owner:
     agent: adf30722a5f4efb5a
-    state: working
+    state: closed
     since: '2026-11-07T04:19:44+00:00'
     state_at: '2026-11-07T04:19:44+00:00'
   findings:
@@ -13971,29 +13971,40 @@ entries:
       197 of 213 classes with held-out events outside have the held-out max above the range top (median 0.14 dex, max 1.26):
       the range from 1.2e4 PP4 events + 0.5 dex is narrower than the 5.4e4 scored events reach.'
   handoff:
-    state: '2026-11-07 ~05:20. Step 74: stage 1 (170 eea_ anchor test pools) BUILT (finding 2026-11-07: spectrum in all 1364
-      pool-energies, bbxvevex vs probe |z|<=1.74, runs 35.6 core-h, allocation 116 core-h). Stage 2 RUNNING: queue catalog_v4_dsh_eea
-      (113 of 115 dsh_eea_ pools, 10259 runs + 192 gridpacks, est 266 core-h upper), 48 CC htc workers x 16 cores x 02:00
-      at 34a2d8f6, target eea_anchor_stage2 0.8 h, wait on step 74. On its end: lhe_parts status/shares --queue catalog_v4_dsh_eea,
-      lhe_probe mixcheck, part energy check, core-h vs 266 est and the design''s 92-237; then step 68 ranges (pp_support.py
-      pull ee, tools/flat_range.py). Step 76: the 2 pools left out (accxh, aepemh, kept <0.5 at 160 GeV). Step 65 read done:
-      SHORT (527 fill, 213 outside) and COST (median 1.86x, 473 >2x): step 75 next, COST first. Step 70 grid: two mmap caches
-      (0c897ca2 open by all 9 running grid jobs, 27a14227) deleted by a disk worker ~04:50 CET; the 9 still train at 05:12
-      CET; no rebuild done (36 GB); a grid job that breaks gets a prebuild of its arm then a restart.'
-    decisions: 'Stage 2 sized from stage 1''s measurements per the passed two-stage design (margin from kept per energy, complete
-      shares where eea_ ran the same gridpack layout, probe = worst energy''s kept x yield per repo-reviewer FIX); the 2 pools
-      over the 2x yield factor are deferred to a generation fix (CLAUDE.md: fix, never absorb), not cut. Zero spectrum share
-      at a class''s lowest energy just above its edge read as threshold suppression (min<1 there, normal at every higher energy).
-      Cache rebuild deferred: it serves only a restart, costs 36 GB of 60 free.'
-    ruled_out: 'Planning stage 2 with eea_''s own rates (1435 core-h: small-run integration overhead). bash -c through site
-      run (quoting lost: ran bare python and printed stale files).'
-    running: 48 lhe_parts workers FA-ccin2p3-e4edfe83 .. a135a639 (queue catalog_v4_dsh_eea, wait on step 74); 9 scaling-grid
-      GPU runs of step 70.
-    files: 'recipes/gen_catalog_v4_default.py (anchor_pools: EEA_STAGE1, EEA_PROBE, DSHA_RATES), tools/lhe_probe.py (parts:
-      shat_by_energy, complete_by_energy), analysis/catalog_v4/data/lhe_parts_eea_stage1.json, lhe_rates_eea.json, lhe_probe_yields_dsh_eea.json,
-      lhe_rates_dsh_eea.json, regen_g12_read.json, figs/regen_g12_fill.png, tests/test_ee_anchor.py. Branch eea-stage2 merged
-      8a242ed6, worktree removed, branch ref left (git branch -d refused as not fully merged though trunk contains it).'
-    written: '2026-11-07T04:17:35+00:00'
+    state: '2026-11-07 ~05:55. Step 75: profile and where reads done (finding 2026-11-07). Revision r1 implemented on branch
+      regen-rev (worktree worktrees/wt-regen-rev @7d00f36c, not merged): mg5_pipeline_final policy keys flat_stall 0.2 (stop
+      when a round fills < 0.2 x min(missing, labels/budget)), mc_solve_tol 1e-12, mc_mperi_all, mc_resladder (resladder_draw),
+      _smixr tag; datagen keeps rounds in flatfill.json; tools/flat_range.py --dsh -> recipes/catalog_v4_flat_range_dsh.json
+      (dsh_ train in-support extent joined; widens 659 tops, median 0.3 dex); tools/regen_recipes.py write --r1 -> recipes/catalog_v4_r1_regen.yaml;
+      multichannel_check.py policy grid_r1_budget12, source heldout_r1 (PP4 val + dsh_ val/test), R1_CLASSES (18), commands
+      step75r1-pull / step75r1 -> data/r1_check.json. Design of the 18-class check recorded ~05:50; design-reviewer (agent
+      a613d792f7b36ed10) and repo-reviewer (agent aa4bae7d4383c3f5a, reviewing trunk..a71d786e; tell it of 7d00f36c, the reader)
+      launched ~05:52, verdicts pending: continue them with SendMessage. On both PASS: merge regen-rev, site sync, site pick
+      FA --jobs 36, submit scripts/job_multichannel_check.sh per class x seed 42/43 (MCHECK_CLASS, MCHECK_PROBE from R1_CLASSES,
+      MCHECK_POLICIES=current+grid_both_res2f_budget12+grid_r1_budget12, MCHECK_SEED) --hdr=--time=00:45:00 (max class ~850
+      s for 3 policies), plan target r1_check 0.25 h --jobs 36, plan wait step 75; read with step75r1-pull then step75r1.
+      PASS -> regenerate all 1301 with the r1 recipe (32 shards, _smixr; disk re-read first, 43 GB per set) and extend regen_read.py
+      to r1''s rules (dsh range, core bins, heldout_r1). Step 76 not started (accxh/aepemh at 160 GeV): run card recipes/catalog_v4_ee/run_card.dat
+      has only same-type pair masses mmjj/mmaa/mmll, so mixed photon-quark / photon-lepton pair masses > 10 GeV are not expressed;
+      also check partonic-vs-lab frame (lhe_probe.kept''s cuts_partonic_not_lab); a cut-by-cut read on the eea_ parts at 160
+      GeV (lhe_probe cmd_parts machinery, byE per energy) is the next tool.'
+    decisions: 'Fill verdict for r1 judged on the core bins (range source''s pp extent), margin bins reported, because a 2->2
+      class''s |M|^2 is bounded (45 of 58 margin bins without any candidate) and the 0.5-dex margin is a chosen width; coverage
+      stays at D269''s zero, scored on events the range never read. Range joined with dsh_ train (a training input) rather
+      than extrapolated, so no scored event builds the range. Stall rule by the round''s yield, not its share of the missing:
+      a share rule would stop chunks whose missing is dominated by unreachable bins while reachable ones still fill (toy check);
+      on step 75''s grid runs no round ever filled < 0.5 of the missing. Whole-catalog regeneration proposed after the check
+      (the range table changes for ~660 classes).'
+    ruled_out: A stall rule on the share of missing in bins holding a candidate (never stops while the reach creeps into new
+      edge bins, toy). Pulling rounds from step-65 flatfill.json (rounds were not stored). Resolving pools after multichannel_check.where
+      in one login-node script (where re-registers the catalog entry, paths fall back to _smix).
+    running: design-reviewer and repo-reviewer subagents on the r1 design and branch regen-rev; no site jobs of this step;
+      step 74 stage 2 workers (queue catalog_v4_dsh_eea) and step 70 grid runs as before
+    files: 'worktrees/wt-regen-rev: mg5_pipeline_final.py, datagen.py, tools/flat_range.py, tools/regen_recipes.py, analysis/catalog_v4/multichannel_check.py,
+      analysis/catalog_v4/regen_profile.py, analysis/catalog_v4/regen_where.py, tests/test_flat_grid.py, recipes/catalog_v4_flat_range_dsh.json,
+      recipes/catalog_v4_r1_regen.yaml, analysis/catalog_v4/data/regen_g12_profile.json, regen_g12_where.json, regen_g12_where_pull.json,
+      dsh_train_support.json, regen_g12_read.json, regen_g12_pull.json'
+    written: '2026-11-07T04:47:39+00:00'
   ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
     61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
     one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
