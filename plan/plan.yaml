@@ -10941,6 +10941,49 @@ entries:
       regula, multiperipheral/ladder, grid_check, cos theta*: only the catalog''s forward component (a different mechanism)
       and a v1 pair-bias note; entry dead ends for res2/forward/grid/ladder/resonance: none on sampling; decisions D294, D317,
       D318: no comparison named that the design omits.'
+  - at: '2026-11-07T03:01:59+00:00'
+    question: 'Step 73 (step 61''s NO branch, D296 ''explore it''): with the het sign head''s logit computed by its own copy
+      of the last transformer block, fed the last block''s input and the frames detached and clipped as its own parameter
+      group (model.net.sign_branch, 47839345, repo-reviewed), so the sign cross-entropy never enters the shared trunk''s clipped
+      update, does the het-trained model predict one-loop signs not worse than the MSE-trained sign head and better than the
+      weight-1 het sign head, without hurting the magnitude? Feeds: how the het loss keeps a sign head (D287/D296).'
+    prior: 'Step 61 (data/het_signhead61.json @66f94590, figs/het_signhead61): NO. Median over pools of the seed-mean wrong-sign
+      share, catalog-sampled one-loop H5 (21 pools) / default-sampled HD5 (19 classes): MSE control 6.7/13.0%, weight-1 het
+      rerun 13.0/17.5%, matched per event 8.4/14.9% (vs rerun H5 p 0.058), weight 75 9.7/15.0%; both matched arms hurt magnitude
+      (per event 13-23%, weight 75 20-59%, R over rerun); clip at 5 binds on 98.6-99.6% of steps, so a larger sign term takes
+      its share from the magnitude. Step 56: weight-1 het sign head vs MSE sign head, 4 seeds, gap resolved p 0.0036. results.tex
+      searched for sign_branch, detached, sign head, clip: only steps 56/61 (par. het sign head). Decisions: D287, D296 (explore),
+      D315 (one seed in general; the seed count for this arm is asked of Joaquin, 2026-11-07T01:19). Differs from step 61
+      only in where the sign logit comes from (own detached block) at sign_loss_weight 1, no gradient matching.'
+    measure: 'analysis/catalog_v4/het_oneloop.py step61''s rules with the branch arm in place of the matched arms (a step73
+      reader: STEP73 = {branch: runs, rerun: STEP61 rerun}, same functions _sign_pair, _paired_mag, re-seed rule, blowups):
+      sign not worse than the MSE control on H5 and HD5 (one-sided p_arm_worse > 0.05 and median within 1.2x), better than
+      the weight-1 rerun on H5 (one-sided sign test p < 0.05); magnitude R = arm over rerun of the class-median MSE of log|M|^2,
+      seed-paired widened interval: PP4 and EE4 upper <= 1.10, none of HD4, H1-H7c shown worse (lower > 1 and R > 1.10); beside:
+      pre-clip gradient norm of the trunk and of the sign group, val sign accuracy, blow-ups. -> data/het_signhead73.json,
+      figure as step61_fig (wrong-sign share per pool, arm vs rerun vs MSE; magnitude R per axis).'
+    check: 'The measure moved with the sign training in steps 56 and 61 on existing runs: H5 median wrong-sign 6.7% (MSE)
+      vs 13.0% (weight-1 het rerun), p 0.0036 at 4 seeds; matched per event 8.4% (p 0.058); magnitude R separated weight 75
+      (PP4 1.39 [1.31,1.46]) from per event (1.13 [1.06,1.21]) and from the rerun. tests/test_sign_branch.py (on trunk): the
+      sign loss''s gradient reaches only the sign block''s parameters (trunk grads equal with and without the sign loss),
+      the sign block is clipped as its own group, off by default bitwise.'
+    fixed: 'Everything of v4_het_control_signhead (the weight-1 rerun''s arm): scripts/job_catalog_v3_short.sh arm v4_het_signhead_branch[_seed2-4],
+      catalog_v4_base_train.yaml, HETEROSC, loss_aggregation mean, sign_head true, sign_loss_weight 1.0, sign_near_weight
+      1.0, sign_pair_dim 0, bsm_labels, signed_magnitude_target, DIM + MUON_BEST HPs, ITERS_FIXED 4264, cross reads PP4 EE4
+      HD4 HD5 + H1-H7c, 1 V100 per run, --time from tools/short_wall.py (step 61: 3.49 h needed -> 03:30:00), code = trunk
+      at submission.'
+    control: 'The weight-1 het sign head rerun at the step-61 code (FA-ccin2p3-ac8d6fca 752344ce b13f456c 83dc9690, seeds
+      42-45) for better-than and magnitude; the MSE sign head control (step 56, its re-seed rule stood in step 61) for not-worse.
+      The re-seed rule is rerun: if the code since 66f94590 changes the control (arm off bitwise per tests), the rerun is
+      repeated at the same code before a verdict.'
+    seeds: '42, 43, 44, 45 as the control and rerun (4 V100 jobs, ~3.5 h each, ~14 GPU-h at the 03:30 limit, 9.3 GPU-h of
+      work) - OR seed 42 only if Joaquin answers one (D315): then the read is per pool at one seed against the seed-42 rerun
+      and MSE control, and only a gap above ~2x in sign and ~15% in magnitude can be called; the verdict names which.'
+    outcome: 'YES (sign not worse than MSE on H5 and HD5, better than the rerun on H5, magnitude gate holds) -> adopt sign_branch
+      for the het runs with a sign head. SIGN YES, MAGNITUDE HURT -> the branch costs magnitude despite the detachment: read
+      the shared-feature path, next the clipping regime. PARTIAL (better than rerun, worse than MSE) or NOT BETTER -> the
+      sign gap is not the gradient competition: next the clipping regime (clip 5 binds on 99% of het steps). Blow-up flagged
+      -> no verdict, listed apart.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
