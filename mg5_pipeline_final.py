@@ -4336,11 +4336,14 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum())})
         if deficit.sum() == 0 or len(cand) >= budget or not w.any():
             break
-        # pol["flat_stall"] (plan step 75's cost revision): stop once a round past the first fills less than that share
-        # of what was missing before it (the bins left are ones the proposal does not reach: their labels bought nothing)
-        if (pol.get("flat_stall") and len(rounds) >= 2
-                and rounds[-2]["missing"] - rounds[-1]["missing"] < float(pol["flat_stall"]) * rounds[-2]["missing"]):
-            break
+        # pol["flat_stall"] (plan step 75's cost revision): stop once a round past the first fills fewer events than
+        # flat_stall x the lesser of (what was missing before it) and (what its labels buy at the budget's mean rate,
+        # n / flat_budget): bins the proposal does not reach (above a class's kinematic maximum) stop the rounds instead
+        # of spending the budget on them, while a round that completes a nearly filled part still counts
+        if pol.get("flat_stall") and len(rounds) >= 2:
+            filled = rounds[-2]["missing"] - rounds[-1]["missing"]
+            if filled < float(pol["flat_stall"]) * min(rounds[-2]["missing"], n / float(pol["flat_budget"])):
+                break
         nb_s = _adaptive_bins(int((w > 0).sum()), int(pol["n_sqrts_bins"]))
         e_s, p_s = _sqrts_proposal_weighted(tr(sq_c), w, t_lo, t_hi, nb_s)
         draw_sq = lambda k, e_s=e_s, p_s=p_s: itr(_draw_sqrts_from_bins(k, e_s, p_s, rng))
