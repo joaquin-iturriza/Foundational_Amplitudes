@@ -11501,6 +11501,21 @@ entries:
       how many bins and classes it drops; a non-straddling bin short -> channel-by-bin and a revision of that channel; outside
       > 0 -> outside_dex against the candidates'' range; summed cost > 2x -> per-channel proposal and label seconds, the changes
       ranked by cost per bin filled. Job failures -> log read, fixed, rerun.'
+    passed_at: '2026-11-07T06:11:55+00:00'
+    reviewer: 'r2 (r1 + keep extremes + stall patience 2 + label budget 18) vs r1 and the old sampling in the same job, 19
+      classes x seeds 42/43, all else r1''s (sampler-r2 @c825cb19). Check 2 read in r1_rounds.json/r1_check.json: budget-stopped
+      chunks miss 1-52 events after a last round filling 11-60, same bins 1.0 in quota-stopped chunks (uu_bbxuu 5.127 0.26/0.40
+      budget vs 1.0); bgtxwp -1.206 0.08/0.09 in stall chunks vs 1.0/0.84; htaptam held-out top -4.4859 above r1 kept max
+      -4.4868/-4.4895, below r1 candidates (-4.479). Check 3: summed cost r1 1.473 (seed 42) vs 1.517 (seed 43), r2 estimate
+      1.637 vs bar 2.0; sum not dominated by one class (top class-seed 7% of old seconds). Cost bar per class -> sum: accepted,
+      the 2x is CLAUDE.md''s rule on a method''s cost and D317 is about total generation time; per-class granularity was never
+      Joaquin''s words, unlike the fill bar (D269/D294) whose earlier move was a FIX; stated openly, per-class ratios kept
+      and listed; the regeneration read must apply the same summed bar on the 1301. Bottom exemption = the earlier reviewer''s
+      own rule (exempt only bins no candidate of any policy reached), coded symmetrically in step75r2 (above: lower edge >
+      reach; below: upper edge < floor; straddling scored). Straddling bins bb_bb 8.34 (17% reachable) and bgtxwp -0.96 (9%)
+      will fail as designed: put their exemption to Joaquin by plan ask now, in parallel, not after the run. Disk 49 GB free
+      on /sps, 38 x 0.5 MB. Searched results.tex, plan, decisions for: patience, keep_ext, extreme, budget 18, flat_budget,
+      stall, summed, total cost, per class, r2: no earlier such revision; budget 50/750 were other samplers.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
