@@ -10862,6 +10862,66 @@ entries:
       anchor, eea_, initial-state radiation, ISR, collider energ, lpp; entry dead ends; D318, D320, D193: no prior anchor
       pools. Reminder: the 10 anchor energies (new 160, 209, 380, 1500) go to Joaquin in the submission message (D320''s proposal
       text not in the ledger).'
+  - at: '2026-11-07T02:17:16+00:00'
+    question: 'Step 75 (step 72''s PARTIAL branch: one revision, re-run once; D317 refused ~100x, the <= 2x bar is the step-69
+      design''s). Step 72''s channel grids filled every in-range bin of the three QCD classes at 12 labels per flat event
+      but left the two electroweak 2->4 classes short in their top 1 dex, and cost 2.1-3.0x on us_ddxsu/uu_bbxuu (proposal
+      time, 70% of it the ladder''s bisections). With (a) the joint-resonance channel''s forward variant (sampling.mc_res2_fwd:
+      the boson pair''s direction in its rest frame log-forward, 1-|cos theta*| = exp(-u), u uniform to 1e-6, under the grids)
+      and (b) the ladder''s solve made 4x faster (regula falsi to float resolution, momenta equal to the halvings'' to 1e-13),
+      do the grids at 12 or 8 labels per flat event fill every in-range 0.25-dex log10|M|^2 bin of each class''s pp flat range
+      to >= 0.95 at <= 2x the old sampling''s time on all 5 classes and both seeds? Code: branch res2-fwd 5ebbe8d6 (merged
+      into trunk after repo-reviewer PASS). Feeds: the sampling of the regeneration (step 65: 1301 hadronic tree classes;
+      step 68: 170 e+e- classes), at the lowest budget that passes.'
+    prior: 'Step 72 (data/grid_check.json @b3ba8b94, figs/grid_check_a-e): PARTIAL. Bins >= 0.95 share, seeds 42/43, grids12:
+      uux_epemg 1/1, uux_epemvevex 0.936/0.936, uu_bbxuu 1/1, us_ddxsu 1/1, udx_csxvevex 0.898/0.898; grids8 1/1, 0.872/0.894,
+      0.979/0.979, 1/1, 0.857/0.857; cost grids12 0.94-3.04x (us_ddxsu 3.04/2.14, uu_bbxuu 1.86/2.31), grids8 0.85-2.26x;
+      diversity holds. Where-read (data/quota_where/v4_udx_csxvevex_grid72.json, v4_uux_epemvevex_grid72.json, multichannel_check
+      where on held-out pp events above the short edge): udx_csxvevex above -0.81: sqrt(s_hat) 1.4-2.6 TeV, W and Z both on
+      shell, Z pair |cos| 0.9999; uux_epemvevex above -1.4: 0.6-1.5 TeV, pair |cos| 0.958-0.9999: high-energy diboson production
+      along the beam (t-channel quark exchange). The joint-resonance channel keeps 70-80% of these classes'' flat events but
+      draws the pair isotropically; a 100-bin grid resolves 1-|cos| only to ~0.01. Step 69 (data/mcmc_check.json): chains
+      NO; quota12 0.84-0.92 / quota50 0.92-0.98 shares at 1.3-3.5x / 1.9-14x. Step 67 (e+e-): forward-uncut finals fill the
+      Z/tau classes at budget 750 (~100x). results.tex searched (t-channel, forward pair, pair angle, res2): only the target''s
+      t-channel propagator feature (data.target_propagator_tchannel), not sampling; decisions: D317 (refuses ~100x), D294
+      (flat in log|M|^2 on every beam). This design differs from step 72 only in the extra res2f channel and the ladder solve.'''
+    measure: 'multichannel_check.py run per class and seed (scripts/job_multichannel_check.sh), read by multichannel_check.py
+      step75 (step 72''s reader generalised: step69''s rules with the grids-with-res2f at 12 and at 8 as the tested policies)
+      -> data/grid_fwd_check.json: per class and seed, share of in-range 0.25-dex bins with fill >= 0.95 and every_bin_ge95,
+      held-out events outside the kept range, cost_vs_old_log (train replay seconds over the old generation-log seconds) and
+      cost_vs_current_same_job, labels per flat event, t_propose/t_label, diversity (near-copy share vs quota50 + 0.02 and
+      <= 0.05 per top-40% bin; NN ratio median >= 0.8, q10 >= 0.5). New per chunk: candidates and kept per channel and quota
+      bin (which channel fills the top bins). Figure: fig_mcmc_check.py extended to grid_fwd_check (fill per bin per sampler,
+      cost in labels).'
+    check: 'Tests (tests/test_multichannel.py, test_flat_grid.py, test_flat_mcmc.py, test_flat_quota.py: 30 passed @5ebbe8d6):
+      the ladder''s solve equals the 60 halvings of b3ba8b94 to 1e-12 relative on 10 mass/variant sets (worst 1.1e-13 on 30
+      cases, 0.36 -> 0.10 s per 5000 draws; on CC''s us_ddxsu profile the ladder channels 0.57 -> 0.15 s per 2916 draws);
+      res2f: phase space exact, both poles as res2, half the pair draws at 1-|cos| < 1e-3 (isotropic 1e-3), down to 1e-5,
+      both hemispheres; without fwd draws unchanged bitwise; FLAT_LAST per-channel-bin counts sum to cand_per_bin and kept_per_bin;
+      the no-grid quota sampler equals f414c171''s to 1e-11 (was bitwise; rounding of the solve). The measure moves: step
+      72''s read separates grids12 from quota12 (0.898-1.0 vs 0.837-0.922 shares) and quota50 (cost 5.6-14x) with the same
+      reader; the forward corner''s held-out events (2-10 per class above the short edges) sit at pair 1-|cos| ~1e-4, a region
+      res2f''s draws reach at ~0.1 per decade instead of ~1e-4 total.'
+    fixed: 'Classes v4_uux_epemg, v4_uux_epemvevex, v4_uu_bbxuu, v4_us_ddxsu, v4_udx_csxvevex (multichannel_check.CLASSES,
+      probes as steps 69/72), train role 100000 events, chunk plan, flat ranges (tools/flat_range.py), 0.25-dex bins, both
+      ladders + joint resonances, FLAT_GRID_BINS 100, FLAT_GRID_FLOOR 0.2, MC_RES2_FWD_FLOOR 1e-6; code = trunk after merging
+      res2-fwd (repo-reviewer PASS) synced to CC; scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2f_budget12+grid_both_res2f_budget8,
+      1 CPU, CC htc; limits as step 72 (which all completed inside them; the solve only shortens them): uux_epemg 00:20, uux_epemvevex
+      00:30, uu_bbxuu 01:10, us_ddxsu 01:00, udx_csxvevex 00:30; target 0.8 h; 10 jobs, <= 7 core-h, no GPU.'
+    control: 'In the same job and seed: ''current'' (the old sampling, cost reference), the quota sampler at 12 and 50 (quota_ladder_both_res2[_budget12]:
+      the step-69/72 references, now with the faster ladder solve); step 72''s grids without res2f (data/grid_check.json)
+      as the before of the revision (same code but the solve, same seeds and classes).'
+    seeds: 42 and 43 (MCHECK_SEED), as steps 69 and 72 (the reader's rules are per seed).
+    outcome: 'YES (grids+res2f at 12 or 8 meet every step-72 rule on every class and seed: every in-range bin >= 0.95, held-out
+      outside kept <= step 67''s budget-750 count, cost <= 2.0, diversity) -> step 65''s regeneration design uses flat_grid
+      + mc_res2_fwd at the lowest budget that passed (cost from these jobs'' replay times), then the e+e- classes (step 68)
+      with it. COST (fill and diversity as YES, cost > 2 on a class) -> read t_propose vs t_label per class: labels -> the
+      budget-8 row decides if it fills; proposal -> where the remaining proposal time goes (per channel), reported, no further
+      re-run under this design. PARTIAL (bins still short on a class) -> the per-channel per-bin counts say which channel
+      reaches the short bins; recorded as the revision''s result (this design allows no second re-run): next a design for
+      a correlated proposal (a pairwise grid on sqrt(s) x the channel''s forward variable, or a normalising flow) on the same
+      harness. NO (grids+res2f fill less than step 72''s grids on a class, or diversity fails) -> res2f dead end recorded;
+      the electroweak top stays short and the next attempt is the correlated proposal.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
