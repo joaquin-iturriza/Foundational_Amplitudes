@@ -1,0 +1,205 @@
+{
+ "session": "71602535-0955-42ad-a58f-23dc320798dc",
+ "since": "2026-10-30T11:35:10Z",
+ "until": "2026-11-07T12:00:00Z",
+ "first": 1793360407.486,
+ "last": 1794051946.346,
+ "days": 8.0,
+ "tokens": "raw = input + cache read + cache write + output; wt = usage_report W",
+ "main": {
+  "wakes": 817,
+  "raw": 804879784,
+  "wt": 99619786.95000002,
+  "by_cause": {
+   "task_notification": {
+    "wakes": 111,
+    "raw": 10477917,
+    "wt": 1125853.4500000002
+   },
+   "site_event": {
+    "wakes": 126,
+    "raw": 141332213,
+    "wt": 19442362.950000007
+   },
+   "handback": {
+    "wakes": 396,
+    "raw": 398118641,
+    "wt": 46382636.25
+   },
+   "user": {
+    "wakes": 184,
+    "raw": 254951013,
+    "wt": 32668934.299999993
+   }
+  },
+  "windows": {
+   "0": {
+    "wakes": 817,
+    "raw_first_call_saved": 804879784,
+    "raw_max_member": 804879784,
+    "wt_first_call_saved": 99619786.95000002,
+    "wt_max_member": 99619786.95000002,
+    "n_cold": 0,
+    "delay_mean_min": 0.0,
+    "delay_max_min": 0.0,
+    "batched_members": 633
+   },
+   "5": {
+    "wakes": 469,
+    "raw_first_call_saved": 734140761,
+    "raw_max_member": 630451166,
+    "wt_first_call_saved": 91496684.60000001,
+    "wt_max_member": 79811255.75000003,
+    "n_cold": 1,
+    "delay_mean_min": 3.52,
+    "delay_max_min": 5.0,
+    "batched_members": 633
+   },
+   "10": {
+    "wakes": 380,
+    "raw_first_call_saved": 713237234,
+    "raw_max_member": 558045142,
+    "wt_first_call_saved": 89096648.29999998,
+    "wt_max_member": 71591186.40000002,
+    "n_cold": 1,
+    "delay_mean_min": 6.27,
+    "delay_max_min": 10.0,
+    "batched_members": 633
+   },
+   "20": {
+    "wakes": 314,
+    "raw_first_call_saved": 694683368,
+    "raw_max_member": 495562217,
+    "wt_first_call_saved": 86940607.49999997,
+    "wt_max_member": 64154873.4,
+    "n_cold": 4,
+    "delay_mean_min": 11.19,
+    "delay_max_min": 20.0,
+    "batched_members": 633
+   },
+   "30": {
+    "wakes": 285,
+    "raw_first_call_saved": 687240069,
+    "raw_max_member": 460335919,
+    "wt_first_call_saved": 86076998.85000002,
+    "wt_max_member": 59902623.60000001,
+    "n_cold": 11,
+    "delay_mean_min": 15.37,
+    "delay_max_min": 30.0,
+    "batched_members": 633
+   },
+   "60": {
+    "wakes": 243,
+    "raw_first_call_saved": 674308509,
+    "raw_max_member": 405275728,
+    "wt_first_call_saved": 84591338.70000005,
+    "wt_max_member": 53315822.149999976,
+    "n_cold": 44,
+    "delay_mean_min": 27.79,
+    "delay_max_min": 60.0,
+    "batched_members": 633
+   }
+  }
+ },
+ "owners": {
+  "wakes": 247,
+  "raw": 618161381,
+  "wt": 86825652.75000001,
+  "by_cause": {
+   "handback": {
+    "wakes": 169,
+    "raw": 459048975,
+    "wt": 62748011.90000001
+   },
+   "task_notification": {
+    "wakes": 49,
+    "raw": 47199994,
+    "wt": 7607057.900000003
+   },
+   "user": {
+    "wakes": 10,
+    "raw": 36868650,
+    "wt": 5987172.200000001
+   },
+   "main_message": {
+    "wakes": 9,
+    "raw": 27838936,
+    "wt": 3767066.5000000005
+   },
+   "site_event": {
+    "wakes": 10,
+    "raw": 47204826,
+    "wt": 6716344.25
+   }
+  },
+  "windows": {
+   "0": {
+    "wakes": 247,
+    "raw_first_call_saved": 618161381,
+    "raw_max_member": 618161381,
+    "wt_first_call_saved": 86825652.75000001,
+    "wt_max_member": 86825652.75000001,
+    "n_cold": 0,
+    "delay_mean_min": 0.0,
+    "delay_max_min": 0.0,
+    "batched_members": 237
+   },
+   "5": {
+    "wakes": 137,
+    "raw_first_call_saved": 596802953,
+    "raw_max_member": 528223001,
+    "wt_first_call_saved": 84244995.80000001,
+    "wt_max_member": 75677596.50000001,
+    "n_cold": 0,
+    "delay_mean_min": 3.89,
+    "delay_max_min": 5.0,
+    "batched_members": 237
+   },
+   "10": {
+    "wakes": 110,
+    "raw_first_call_saved": 591486109,
+    "raw_max_member": 481083031,
+    "wt_first_call_saved": 83487757.5,
+    "wt_max_member": 69325062.20000002,
+    "n_cold": 0,
+    "delay_mean_min": 7.75,
+    "delay_max_min": 10.0,
+    "batched_members": 237
+   },
+   "20": {
+    "wakes": 100,
+    "raw_first_call_saved": 589831837,
+    "raw_max_member": 458901741,
+    "wt_first_call_saved": 83293619.29999998,
+    "wt_max_member": 66701794.30000001,
+    "n_cold": 0,
+    "delay_mean_min": 16.15,
+    "delay_max_min": 20.0,
+    "batched_members": 237
+   },
+   "30": {
+    "wakes": 94,
+    "raw_first_call_saved": 588659067,
+    "raw_max_member": 449401735,
+    "wt_first_call_saved": 82634020.89999998,
+    "wt_max_member": 65282297.90000001,
+    "n_cold": 0,
+    "delay_mean_min": 24.3,
+    "delay_max_min": 30.0,
+    "batched_members": 237
+   },
+   "60": {
+    "wakes": 89,
+    "raw_first_call_saved": 587845622,
+    "raw_max_member": 433256030,
+    "wt_first_call_saved": 82530354.59999998,
+    "wt_max_member": 63169570.400000006,
+    "n_cold": 14,
+    "delay_mean_min": 50.95,
+    "delay_max_min": 60.0,
+    "batched_members": 237
+   }
+  }
+ },
+ "owners_resumed": 70
+}
