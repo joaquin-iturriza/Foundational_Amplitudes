@@ -192,4 +192,9 @@ def test_r3_empty_near_tag():
            "sampling": {"mode": "mixture", "flat_range": [0, 1], "flat_stall": 0.2, "flat_keep_ext": True,
                         "flat_empty_near": True}}
     assert mg.recipe_output_path(rec, "/d").endswith("_train_smixt_amplitudes.npy")
+    rec["sampling"].pop("flat_empty_near"); rec["sampling"].pop("flat_keep_ext"); rec["sampling"]["flat_stall_patience"] = 2
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixs_amplitudes.npy")     # any r2 key: never r1's _smixr
+    # the check's module compiles (a positional argument after a keyword one once broke every job and reader of it)
+    import py_compile
+    py_compile.compile(os.path.join(HERE, "analysis", "catalog_v4", "multichannel_check.py"), doraise=True)
 

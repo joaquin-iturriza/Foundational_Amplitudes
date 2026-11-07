@@ -1253,7 +1253,7 @@ if __name__ == "__main__":
         pull(R3_TAG, R1_CLASSES)
     elif sys.argv[1] == "step78r3":
         step75r2("grid_r3_budget18", "grid_r2_budget18", R3_TAG, out_file="r3_check.json",
-                 "plan catalog_coverage step 78 revision r3", reach_tags=(R1_TAG, R2_TAG))
+                 design="plan catalog_coverage step 78 revision r3", reach_tags=(R1_TAG, R2_TAG))
     elif sys.argv[1] == "step78-where":
         step78_where()
     elif sys.argv[1] == "summary":

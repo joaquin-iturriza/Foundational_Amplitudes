@@ -4906,7 +4906,8 @@ def recipe_output_path(recipe, out_dir):
         # patience, budget 18) its own: _smixs, and r3 (sampling.flat_empty_near: an empty bin steered by its nearest
         # candidates, plan step 78) its own: _smixt
         sp = recipe.get("sampling") or {}
-        samp_tag += ("t" if sp.get("flat_empty_near") else "s" if sp.get("flat_keep_ext") else
+        samp_tag += ("t" if sp.get("flat_empty_near") else
+                     "s" if any(sp.get(k) for k in ("flat_keep_ext", "flat_stall_patience")) else
                      "r" if any(sp.get(k) for k in ("flat_stall", "mc_solve_tol", "mc_mperi_all", "mc_resladder")) else "q")
     f_def =float((recipe.get("sampling") or {}).get("f_default", 0))
     if f_def > 0:
