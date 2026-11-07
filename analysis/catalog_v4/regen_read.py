@@ -31,10 +31,10 @@ FILL_BAR = 0.95            # steps 72/75: a bin is filled at >= 0.95 of its quot
 COST_BAR = 2.0             # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
 CHECK5 = ["v4_uux_epemg", "v4_uux_epemvevex", "v4_uu_bbxuu", "v4_us_ddxsu", "v4_udx_csxvevex"]   # step 75's classes
 STEP75 = {"lo": 0.78, "hi": 2.11}
-# D269 ("that percentage would be zero"): held-out in-support pp events outside the regenerated pools' log|M|^2 range; the
-# bar is step 67/75's passed rule (<= 2 per class: step 75 left 0-1 per class on 5 classes; the range table is read from
-# 1.2e4 PP4 events, so a held-out sample of similar size can pass its max by chance), above it the class is SHORT
-COVER_BAR = 2     # step 75's cost range over the old, seeds 42/43 (grid_fwd_check.json)
+# D269 ("there is no way "a few" events lie outside, be that 10%, 1%, or whatever, if you had done what I asked, that
+# percentage would be zero"): held-out in-support pp events outside the regenerated pools' log|M|^2 range; FILLED needs
+# none on every class, a class with one or more is SHORT with its count (a tolerance is Joaquin's call, never the read's)
+COVER_BAR = 0     # step 75's cost range over the old, seeds 42/43 (grid_fwd_check.json)
 
 PULL = r'''
 import json, os, sys, traceback
@@ -92,10 +92,21 @@ for p in reg("recipes/catalog_v4_g12_regen.yaml"):
             out["coverage"][n] = {"missing": True}; continue
         lm = np.concatenate(lm); lm = lm[np.isfinite(lm)]
         lo, hi = float(lm.min()), float(lm.max())
-        h = mcc._pp(mcc.pp_sources(n, probe[n])["heldout"], mg.PROCESSES[n], float(p["sqrts"][0]), float(p["sqrts"][1]), n)
-        if h is None:
+        # by source: the PP4 probe's val pool and the class's dsh_ pools apart (a SHORT revision may widen the range from
+        # the PP4 val events and is then scored on the dsh_ events only, never on the events it was widened from)
+        hs = mcc.pp_sources(n, probe[n])["heldout"]
+        by = {"pp4_val": mcc._pp(hs[:1], mg.PROCESSES[n], float(p["sqrts"][0]), float(p["sqrts"][1]), n + " pp4_val"),
+              "dsh": mcc._pp(hs[1:], mg.PROCESSES[n], float(p["sqrts"][0]), float(p["sqrts"][1]), n + " dsh")}
+        by = {k: v for k, v in by.items() if v is not None}
+        if not by:
             out["coverage"][n] = {"kept": [lo, hi], "heldout": None}; continue
-        ls, ss = h["lm"], h["sup"]
+        ls = np.concatenate([v["lm"] for v in by.values()]); ss = np.concatenate([v["sup"] for v in by.values()])
+        h = {"outside_window": float(np.mean([v["outside_window"] for v in by.values()])),
+             "fail_cuts_in_window": float(np.mean([v["fail_cuts_in_window"] for v in by.values()]))}
+        src_out = {k: {"n_in_support": int(v["sup"].sum()),
+                       "outside_kept": int((v["sup"] & ((v["lm"] < lo) | (v["lm"] > hi))).sum()),
+                       "max_in_support": float(v["lm"][v["sup"]].max()) if v["sup"].any() else None,
+                       "min_in_support": float(v["lm"][v["sup"]].min()) if v["sup"].any() else None} for k, v in by.items()}
         cat = np.histogram(np.clip(lm, B[0], B[-1] - 1e-9), B)[0] / len(lm)
         pp = np.histogram(np.clip(ls[ss], B[0], B[-1] - 1e-9), B)[0]
         m = pp >= 10
@@ -104,7 +115,7 @@ for p in reg("recipes/catalog_v4_g12_regen.yaml"):
         out["coverage"][n] = {"kept": [lo, hi], "n_heldout": int(len(ls)), "n_in_support": int(ss.sum()),
                               "outside_kept": int((ss & ((ls < lo) | (ls > hi))).sum()),
                               "above_kept": int((ss & (ls > hi)).sum()), "below_kept": int((ss & (ls < lo)).sum()),
-                              "outside_window_all": h["outside_window"], "fail_cuts_in_window_all": h["fail_cuts_in_window"],
+                              "by_source": src_out, "outside_window_all": h["outside_window"], "fail_cuts_in_window_all": h["fail_cuts_in_window"],
                               "density_ratio_min": float(ratio[i]) if i is not None else None,
                               "density_ratio_min_bin": [float(B[i]), float(B[i + 1])] if i is not None else None,
                               "density_ratio_median": float(np.median(ratio[m])) if m.any() else None}
