@@ -12447,7 +12447,7 @@ entries:
         the pool-level route'
   owner:
     agent: ae64b531b031096ce
-    state: working
+    state: closed
     since: '2026-11-07T07:52:30+00:00'
     state_at: '2026-11-07T08:47:15+00:00'
     context: 244537
@@ -14714,34 +14714,32 @@ entries:
       minus the reach, r3 dashed, r4 solid, four short classes; (b) per class and seed r4 time / old against r3 time / old
       (14 of 38 above equal cost).'
   handoff:
-    state: '2026-11-07 ~09:30. Step 79 (r3 sampler check): r3 = r2 + flat_empty_near (an empty quota bin steered by its deficit-many
-      nearest candidates in log|M|^2) merged bed989d2 (sampler-r3; repo-reviewer BLOCK then PASS at c293ed6a, design PASS);
-      38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r2_budget18+grid_r3_budget18, 19 classes
-      x seeds 42/43, --time 00:45:00, target r3_check 0.2 h) at bed989d2 running, step 79 waits on them. On end: python analysis/catalog_v4/multichannel_check.py
-      step78r3-pull then step78r3 -> data/r3_check.json (reach over the r1 and r2 jobs too); step78-where for any short bin
-      (edit its class list / reads tag if needed); then a figure like analysis/catalog_v4/r2_check_fig.py (plain-word labels:
-      the send check refuses code-like labels such as t_r2). Step 78 (r2 read, data/r2_check.json @adfa3b35, figure figs/r2_check.png
-      @4565fa7c): NO on fill only; outside 0; summed cost 1.527x; bgtxwp [-1.206,-0.96] a real short (steering: 10-11 of 36
-      chunks with 0-4 candidates stall), bb_bb 8.34 and bbx_ccxh -3.809 straddle the reach: HELD on Joaquin''s scope question
-      (plan ask re-recorded 2026-11-07 with r2 numbers). Step 76 done: 115 of 115 dsh_eea_ pools assembled, no short runs
-      in the two mixed-pair-cut pools. Step 73: sign-head arm FA-ccin2p3-54961d3e running (wait on step 73). Steps 64/70:
-      scaling grid GPU runs live. Step 68 waits on the sampler verdict (r3) and the straddle answer.'
-    decisions: 'bgtxwp''s -1.206 bin judged reachable from the step-65 policy''s candidates in the r1 job (-0.939), so not
-      a straddle: the reach is the highest candidate any policy drew; the r3 reader takes reach over the r1/r2 jobs (stricter
-      exemption, reviewer agreed). Revision r3 targets the steering of empty bins (per-chunk bimodality) rather than budget;
-      the channel route (res [0,1,3] share floor) is r3''s NO branch. Toy chunk did not settle r3 (2 of 4 seeds higher reach),
-      so no toy assertion; the 19-class check decides. ccxh''s short bin is a straddle (reach -3.795 in every job), added
-      to Joaquin''s question. Step 76 margin 0.10 (mean kept rule) kept: lhe_parts plan sizes runs from the worst-energy probe
-      kept (0.904), and no run came back short.'
-    ruled_out: Treating bgtxwp -1.206 as a straddle (r2 reader's own-job reach); more budget for bgtxwp (chunks stall with
-      0 candidates, not at budget); a toy-reach assertion in the r3 test (not a guaranteed property).
-    running: 38 r3 check jobs at bed989d2 (step 79 wait; ids in plan evidence, e.g. FA-ccin2p3-20ba5c1e, 610e981e); FA-ccin2p3-54961d3e
-      sign-head arm (step 73 wait); step 70 scaling-grid GPU runs as before
-    files: mg5_pipeline_final.py (flat_quota_weights empty_near, _smixt/_smixs tags), tools/regen_recipes.py (R3), analysis/catalog_v4/multichannel_check.py
-      (grid_r3_budget18, step75r2 parametrised, step78r3-pull/step78r3, step78-where), analysis/catalog_v4/r2_check_fig.py,
-      analysis/catalog_v4/data/{r2_check,r2_where}.json, analysis/catalog_v4/data/ee_mmin_probe_dsh_eea_epem_{accxh,aepemh}.json,
-      tests/test_flat_grid.py (test_r3_empty_near_tag)
-    written: '2026-11-07T07:15:22+00:00'
+    state: '2026-11-07 ~10:00. Flat sampler: r3 (r2 + flat_empty_near) NO (data/r3_check.json @014b20a0, figs/r3_check.png):
+      bgtxwp [-1.206,-0.96] 0.925/0.917 (r2 0.73/0.79), uu_bbxuu regressed to 0.90/0.80 (r2 1.0). r4 (r3 + flat_empty_unique,
+      merged 8c1757a3) NO (data/r4_check.json, r4_acted.json @f24bfe10, figs/r4_check.png): r4 acted on every chunk of the
+      short classes and made both worse (bbxuu 0.70/0.72, bgtxwp 0.835/0.809); outside 0 for r2-r4; summed cost r3 1.75-1.84x,
+      r4 1.75x (bar 2x). r4 dropped. Next: step 81 (t), design r5 (keep r3''s steering for bgtxwp, fix bbxuu''s budget stops),
+      check on the same 19 classes x seeds 42/43 with current + r3 + r5 per job. Straddling bins (bb_bb 8.34, bbx_ccxh -3.809,
+      bgtxwp -0.96) still wait on Joaquin''s scope question; it holds the 1301-class regeneration. Step 73 sign-head arm FA-ccin2p3-54961d3e
+      still RUNNING (zero-shot reads); on end: het_oneloop.py step73_pull then step73_one (one-seed reader @c7dcc0a8, D315:
+      vs seed 42 of rerun ac8d6fca and MSE control; gap called only beyond 2x sign / 15% magnitude) -> data/het_signhead73.json;
+      figure step61_fig adapted is not written yet. Steps 64/70 scaling grid GPU runs still running (7 RUNNING).'
+    decisions: 'r3/r4 read under their passed designs. r4 = r3 + de-stacking of adjacent empty bins (design FIX once by the
+      design reviewer: bgtxwp is a two-empty-bin case, bbxuu''s empty bins not shown; revised with bins_empty recorded per
+      round and step79r4-acted, PASS). The per-channel split of an empty bin''s deficit was ruled out before r4 (res [0,1,3]
+      present next to bgtxwp''s top in 0-2 of 36 chunks, data/r3_channel_presence.json). r3 is deterministic per seed (kept
+      per bin identical across r3 and r4 jobs), so r3 numbers can be reused; cost is compared only within a job (node spread
+      ~0.1-0.2x).'
+    ruled_out: 'flat_empty_by_channel (per-channel split; channel absent next to the top); flat_empty_unique (r4: worse on
+      bbxuu and bgtxwp); stacking as the cause of r3''s bbxuu regression (de-stacking made it worse); a chunk-carry-over of
+      quota (chunks are byte-determining and generated independently).'
+    running: FA-ccin2p3-54961d3e (step 73 sign-head arm, wait on its step); steps 64/70 scaling-grid GPU runs (4d6e9b06 a77e20b8
+      8b543518 8a523b67 4ba33195 b07d6237 1b1a8f6e ff309c2d)
+    files: mg5_pipeline_final.py (flat_quota_weights empty_near/unique, rounds bins_empty), tools/regen_recipes.py (R3, R4),
+      analysis/catalog_v4/multichannel_check.py (step78r3, step79-where/-rounds/-channel-presence, step79r4-pull/step79r4/step79r4-acted),
+      analysis/catalog_v4/r2_check_fig.py (modes r2/r3/r4), analysis/catalog_v4/het_oneloop.py (step73_pull, step73_one),
+      analysis/catalog_v4/data/{r3_check,r3_where,r3_rounds,r3_channel_presence,r4_check,r4_acted}.json, tests/test_flat_grid.py
+    written: '2026-11-07T08:56:18+00:00'
   ask: 'Scope: the fill bar on bins cut by the kinematic maximum (update with the r2 result). The check scores every 0.25-dex
     bin of log10|M|^2 at >= 0.95 of its quota and exempts bins wholly above the highest |M|^2 any sampler drew (the class''s
     reach). Two bins straddle the reach, so most of their width cannot be filled by any sampler: v4_bb_bb [8.34, 8.585] (reach
