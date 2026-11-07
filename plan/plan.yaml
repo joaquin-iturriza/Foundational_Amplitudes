@@ -10849,6 +10849,19 @@ entries:
       gridpack 794 s wall. Layout stage 1: 16 workers x 16 cores x 2 h on CC htc (site pick offers 32 at once; 16 x 16 cores
       = 256 cores give 126 core-h in 0.5 h), target 1.0 h; stage 2 at the width site pick then offers, target from stage 1''s
       measured rates.'
+    passed_at: '2026-11-07T01:52:54+00:00'
+    reviewer: 'Re-check after FIX: (1) probe: stage 1 (eea_, 170 pools, ~204 events per energy or complete runs of 200, every
+      class x anchor energy with its spectrum, kept 1 by construction: lhe_probe.accept_of returns None for non-dsh_ pools)
+      is the probe of stage 2 (dsh_eea_ planned with --probe from stage 1''s per-class yield, complete shares and kept per
+      energy); --probe '''' skips the gate for stage 1 only, stated. (2) carried_complete @fccf37a8 keeps the 11 probe-sized
+      pools'' measured shares (0.69-1.0, lhe_probe_by_energy.json) at shared energies, COMPLETE_SHARE elsewhere. (3) disk:
+      248 B/event (496128 B / 2000 checked) x ~7.7M events ~1.9 GB + parts ~2 GB + 332 gridpacks x <=7.6 MB <=2.5 GB = <=7
+      GB vs 67 GB free on /sps/lpnhe (df 2026-11-07); gc after assembly. Check 2: step-71 share below 0.99 is 0 without spectrum,
+      0.045-0.43 with (n=1000). Check 3: generation at seed 42, bbxvevex compared within binomial spread (<= +-0.016). Cost
+      42-126 + 92-237 core-h, stage 1 on 16 x 16 cores, target 1.0 h. Searched results.tex for beam spectrum, isronly, beamstrahl,
+      anchor, eea_, initial-state radiation, ISR, collider energ, lpp; entry dead ends; D318, D320, D193: no prior anchor
+      pools. Reminder: the 10 anchor energies (new 160, 209, 380, 1500) go to Joaquin in the submission message (D320''s proposal
+      text not in the ledger).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
