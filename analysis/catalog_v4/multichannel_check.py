@@ -1340,6 +1340,15 @@ def step79r4_acted(pols=("grid_r3_budget18", "grid_r4_budget18")):
                                         for k, v in out.items()}))
 
 
+def _chunk_sig(x):
+    """what makes two chunk records the same run of the rounds (repo review 2026-11-07): kept per bin alone is equal by
+    construction in a quota-stopped chunk whatever it drew; the rounds compared on the keys every policy's record
+    carries (n, missing, bins_short): the stall flag is never written without the stall rule, and bins_empty /
+    bins_empty_small are diagnostics added in the r4 / r5 jobs, absent from the r2 records of the r3 jobs"""
+    return (x["kept_per_bin"], x["n_labels_charged"], x["n_candidates"], x.get("kept_per_channel_bin"),
+            [(r["n"], r["missing"], r["bins_short"]) for r in x["rounds"]])
+
+
 def step81r5_acted():
     """data/r5_acted.json (plan step 81's r5): per class and seed of the r5 jobs (R5_TAG), for r3 and r5 the chunks with
     a round holding an empty bin whose nearest occupied bin(s) hold no more candidates than its deficit (rounds'
@@ -1365,7 +1374,7 @@ def step81r5_acted():
             f2 = os.path.join(READS, f"{c}_{R3_TAG}_{seed}.json")
             if os.path.exists(f2):
                 q2 = json.load(open(f2))["runs"][f"grid_r2_budget18_{seed}"]["quota_chunks"]
-                rec["chunks_all_small_equal_r2"] = int(sum(q5[i]["kept_per_bin"] == q2[i]["kept_per_bin"] for i in all_small))
+                rec["chunks_all_small_equal_r2"] = int(sum(_chunk_sig(q5[i]) == _chunk_sig(q2[i]) for i in all_small))
             out[f"{c}/{seed}"] = rec
     json.dump(out, open(os.path.join(DATA, "r5_acted.json"), "w"), indent=1)
     print("STEP81R5_ACTED", json.dumps({k: [v["chunks_with_small_empty_r5"], v["chunks_differing_r3_r5"],
@@ -1394,8 +1403,8 @@ def step82r6_stops(classes=None):
                 short |= {round(s[0], 3) for s in e.get("short", [])}
             rec = {"labels": {p: int(sum(x["n_labels_charged"] for x in v)) for p, v in q.items()},
                    "stops": {p: dict(collections.Counter(x["stop"] for x in v)) for p, v in q.items()},
-                   "equal_r5_r6": int(sum(a["kept_per_bin"] == b["kept_per_bin"] for a, b in zip(q["r5"], q["r6"]))),
-                   "r5_nonstall_equal": int(sum(a["kept_per_bin"] == b["kept_per_bin"] for a, b in zip(q["r5"], q["r6"])
+                   "equal_r5_r6": int(sum(_chunk_sig(a) == _chunk_sig(b) for a, b in zip(q["r5"], q["r6"]))),
+                   "r5_nonstall_equal": int(sum(_chunk_sig(a) == _chunk_sig(b) for a, b in zip(q["r5"], q["r6"])
                                                 if a["stop"] != "stall")),
                    "r5_nonstall": int(sum(a["stop"] != "stall" for a in q["r5"])), "short_bins": {}}
             for lo in sorted(short):
