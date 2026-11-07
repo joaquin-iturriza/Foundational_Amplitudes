@@ -251,6 +251,69 @@ def test_rotate_forward_free_floor():
     np.testing.assert_array_equal(e, a)                       # every final cut: the earlier draws exactly
 
 
+BEFORE_SOLVE = "b3ba8b94"   # trunk before the ladder's solve (plan step 72's cost fix): its 60 halvings are the reference
+
+
+def _module_at(rev, name):
+    import importlib.util, subprocess, tempfile
+    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    src = subprocess.run(["git", "-C", here, "show", f"{rev}:mg5_pipeline_final.py"], capture_output=True, text=True)
+    if src.returncode:
+        import pytest
+        pytest.skip(f"git show {rev} failed: {src.stderr.strip()}")
+    path = os.path.join(tempfile.mkdtemp(prefix="zz_probe_solve_"), f"{name}.py")
+    open(path, "w").write(src.stdout)
+    spec = importlib.util.spec_from_file_location(name, path); m = importlib.util.module_from_spec(spec)
+    sys.modules[name] = m; spec.loader.exec_module(m)
+    return m
+
+
+def test_multiperipheral_solve_equals_halvings():
+    """the ladder's regula-falsi solve returns the 60 halvings' momenta to rounding (same random numbers), on massless
+    and massive finals, 3 to 5 of them, both variants, sqrt(s) over the whole window"""
+    old = _module_at(BEFORE_SOLVE, "mg_before_solve")
+    for masses in ([0.0] * 4, [0.0] * 3, [0.0] * 5, [91.188, 0.0, 0.0], [80.419, 0.0, 0.0, 0.0]):
+        for edge in (False, True):
+            sq = np.exp(np.random.default_rng(7).uniform(np.log(40.0), np.log(6000.0), 3000))
+            a = old.multiperipheral_draw(3000, sq, masses, 1e-6, np.random.default_rng(5), edge=edge)
+            b = mg.multiperipheral_draw(3000, sq, masses, 1e-6, np.random.default_rng(5), edge=edge)
+            scale = np.abs(a).max(axis=(1, 2), keepdims=True)
+            assert np.max(np.abs(a - b) / scale) < 1e-12, (masses, edge)
+
+
+def test_resonance2_forward():
+    """res2f: phase space exact, both poles as the isotropic channel, the pair's direction log-forward (half of the
+    draws at 1 - |cos theta| < 1e-3 against 1e-3 isotropic, down to the floor); without fwd the draws are unchanged"""
+    rng = np.random.default_rng(3)
+    sq = np.exp(rng.uniform(np.log(250.0), np.log(3000.0), 4000))
+    masses = [0.0] * 4
+    P = mg.resonance2_draw(4000, sq, masses, (0, 1), 91.188, 2.441404, (2, 3), 80.419, 2.0476, 1e-6, rng, fwd=True)
+    _check_ps(P, sq, masses)
+    Z = P[:, 0] + P[:, 1]
+    both = (np.abs(_mass(Z) - 91.188) < 5 * 2.441404) & (np.abs(_mass(P[:, 2] + P[:, 3]) - 80.419) < 5 * 2.0476)
+    assert both.mean() > 0.45
+    one_m = 1.0 - np.abs(Z[:, 3]) / np.linalg.norm(Z[:, 1:], axis=1)
+    ok = both
+    assert 0.4 < (one_m[ok] < 1e-3).mean() < 0.6 and one_m[ok].min() < 1e-5
+    assert 0.4 < (Z[ok, 3] > 0).mean() < 0.6
+    a = mg.resonance2_draw(50, sq[:50], masses, (0, 1), 91.188, 2.441404, (2, 3), 80.419, 2.0476, 1e-6,
+                           np.random.default_rng(9))
+    b = mg.resonance2_draw(50, sq[:50], masses, (0, 1), 91.188, 2.441404, (2, 3), 80.419, 2.0476, 1e-6,
+                           np.random.default_rng(9), fwd=False)
+    assert np.array_equal(a, b)
+
+
+def test_mc_channels_res2_fwd():
+    """res2_fwd adds one res2f per joint pair, after the res2 ones; nothing without res2 or without a disjoint pair"""
+    res = [[(0, 1), 23], [(2, 3), 24], [(1, 2), 24]]
+    pdg = [2, -2, 11, -11, 12, -12]
+    ch = mg.mc_channels([0.0] * 4, pdg, res, res2=True, res2_fwd=True)
+    r2 = [c for c in ch if c[0] == "res2"]; r2f = [c for c in ch if c[0] == "res2f"]
+    assert len(r2f) == 1 and r2f[0][1:] == r2[0][1:]
+    assert ch == mg.mc_channels([0.0] * 4, pdg, res, res2=True) + r2f
+    assert not any(c[0] == "res2f" for c in mg.mc_channels([0.0] * 4, pdg, res, res2_fwd=True))
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"):

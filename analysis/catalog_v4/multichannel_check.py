@@ -25,6 +25,9 @@ mix_compose.control_config), in a temporary folder, and the flat-in-log|M|^2 par
                50 and 750
   quota_ladder_edge_res2  quota_ladder_res2 with the ladder's edge variant (sampling.mc_mperi_edge; plan step 66):
                each event's pT span log-uniform in [1.05, 3.2], the outer end at 5 - d, d log-uniform in [1e-3, 1]
+  grid_both_res2[f]_budget12|8  the quota sampler with each channel's uniform numbers through an adaptive grid
+               (sampling.flat_grid; plan step 72) at 12 and 8 labels per flat event; with res2f also the joint-resonance
+               channel's forward variant (sampling.mc_res2_fwd: the pair along the beam; plan step 75)
 Every policy's chunks are timed (wall seconds of datagen.gen_chunk, the whole chunk: bulk, forward and flat parts).
 Everything else (6x oversampling, the flat selection, the shares of bulk, forward and flat, the sqrt(s) passes) is the
 entry's. Against the class's 13 TeV pp MadEvent events (its PP4 probe's train and test pools, as pp_support.py reads
@@ -74,7 +77,7 @@ SEEDS = (42, 43)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
-                  "grid_both_res2_budget8")
+                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -220,6 +223,12 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             # (sampling.flat_grid), at the step-69 budget of 12 labels per flat event and at 8 (cost margin)
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, flat_grid=True,
                      flat_budget=12 if policy.endswith("12") else 8)
+        if policy in ("grid_both_res2f_budget12", "grid_both_res2f_budget8"):
+            # plan catalog_coverage step 72's PARTIAL branch (one revision): the step-72 grids plus the joint-resonance
+            # channel's forward variant (sampling.mc_res2_fwd: the boson pair along the beam, where the electroweak
+            # classes' short top bins sit, data/quota_where/v4_*_grid72.json)
+            s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, mc_res2_fwd=True, flat_grid=True,
+                     flat_budget=12 if policy.endswith("12") else 8)
         if policy.startswith("quota_ladder_both_res2"):   # step 67: both ladders as two channels
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True)
         if policy == "quota_ladder_both_res2_fwdfree_budget750":
@@ -267,7 +276,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                                             if d.get("channels") is not None else None),
                                        "channels": d["channels"], "mcmc": d.get("mcmc"),
                                        "t_propose": d.get("t_propose"), "t_label": d.get("t_label"),
-                                       "grid_dims": d.get("grid_dims")})
+                                       "grid_dims": d.get("grid_dims"),
+                                       "cand_per_channel_bin": (np.asarray(d["cand_per_channel_bin"]).tolist()
+                                                                if d.get("cand_per_channel_bin") is not None else None),
+                                       "kept_per_channel_bin": (np.asarray(d["kept_per_channel_bin"]).tolist()
+                                                                if d.get("kept_per_channel_bin") is not None else None)})
                             if d.get("kept_P") is not None:
                                 kc = np.asarray(d["kept_chain"], np.int64)   # chain ids are per chunk: offset them
                                 kept_ev.append((d["kept_P"], d["kept_sq"], np.where(kc >= 0, kc + 1000000 * len(kept_ev), kc),
@@ -825,27 +838,34 @@ STEP72 = {"grid12": "grid_both_res2_budget12", "grid8": "grid_both_res2_budget8"
 STEP72_TAG = "current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8"
 
 
-def step72():
+# plan step 75 (step 72's PARTIAL branch, its one revision re-run once): the grids with the forward joint-resonance
+# channel at 12 and 8, read by step 72's rules against the same quota references, -> data/grid_fwd_check.json
+STEP75 = {"grid12": "grid_both_res2f_budget12", "grid8": "grid_both_res2f_budget8",
+          "quota12": "quota_ladder_both_res2_budget12", "quota50": "quota_ladder_both_res2"}
+STEP75_TAG = "current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2f_budget12+grid_both_res2f_budget8"
+
+
+def step72(tag=STEP72_TAG, pols=STEP72, out="grid_check", source="step72"):
     """data/grid_check.json: step69's per-class rows and verdict (YES / QUOTA12 / NO / COST / PARTIAL) once with the
     grids at 12 as the tested policy and once at 8 (verdict_by_test); YES at 8 or 12 = the grids fill every in-range
     bin >= 0.95 at <= COST_MAX on every class and seed; the top-level verdict is YES when either passes (passed_at the
     lower budget), else the grids at 12's"""
     v = {}
     for t in ("grid12", "grid8"):
-        step69(STEP72_TAG, STEP72, t, f"grid_check_{t}.json", "step72")
-        v[t] = json.load(open(os.path.join(DATA, f"grid_check_{t}.json")))
+        step69(tag, pols, t, f"{out}_{t}.json", source)
+        v[t] = json.load(open(os.path.join(DATA, f"{out}_{t}.json")))
     vb = {t: v[t].get("verdict") for t in v}
     # the design's rule: YES when the grids at 8 or at 12 pass (the lower budget preferred); otherwise the grids at 12
     # decide (COST, PARTIAL, NO), the budget-8 row read beside it
     top = (None if None in vb.values() else "YES" if "YES" in vb.values() else vb["grid12"])
-    out = dict(v["grid12"], test=None, verdict=top, passed_at=("grid8" if vb["grid8"] == "YES" else
+    res = dict(v["grid12"], test=None, verdict=top, passed_at=("grid8" if vb["grid8"] == "YES" else
                                                                  "grid12" if vb["grid12"] == "YES" else None),
                verdict_by_test=vb, checks_by_test={t: v[t].get("checks") for t in v})
-    out.pop("checks", None)
-    json.dump(out, open(os.path.join(DATA, "grid_check.json"), "w"), indent=1)
+    res.pop("checks", None)
+    json.dump(res, open(os.path.join(DATA, f"{out}.json"), "w"), indent=1)
     for t in v:
-        os.remove(os.path.join(DATA, f"grid_check_{t}.json"))
-    print("STEP72", out["verdict"], out["passed_at"], out["verdict_by_test"])
+        os.remove(os.path.join(DATA, f"{out}_{t}.json"))
+    print(source.upper(), res["verdict"], res["passed_at"], res["verdict_by_test"])
 
 
 def pull(policies=None, classes=None, seeds=SEEDS):
@@ -876,6 +896,8 @@ if __name__ == "__main__":
         step69()
     elif sys.argv[1] == "step72":
         step72()
+    elif sys.argv[1] == "step75":
+        step72(STEP75_TAG, STEP75, "grid_fwd_check", "step75")
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":

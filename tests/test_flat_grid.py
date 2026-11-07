@@ -60,7 +60,9 @@ def test_unchanged_without_grid(tmp_path=None):
     spec = importlib.util.spec_from_file_location("mg_before", old); mt = importlib.util.module_from_spec(spec)
     sys.modules["mg_before"] = mt; spec.loader.exec_module(mt)
     a = run(mg, False, n_flat=500); b = run(mt, False, n_flat=500)
-    assert np.array_equal(a[3], b[3])
+    # equal to rounding: the ladder's solve (b3ba8b94 -> regula falsi, plan step 75) returns the halvings' momenta to
+    # ~1e-14, so the toy |M|^2 of the same events agree to ~1e-13 (bitwise before that change)
+    np.testing.assert_allclose(a[3], b[3], rtol=1e-11)
 
 
 def test_grid_fills_toy():
@@ -70,6 +72,16 @@ def test_grid_fills_toy():
           "dup", dg, "dims", d["grid_dims"], "t_prop/t_label", round(d["t_propose"], 2), round(d["t_label"], 2))
     assert ng <= 12 * 2000 and dg <= 0.02
     assert fg >= fq
+
+
+def test_channel_bin_record():
+    """FLAT_LAST's per channel and quota bin counts (plan step 75's where-read) sum to the in-range candidates and to
+    the kept per bin"""
+    d = run(mg, True, n_flat=500)[5]
+    cc, kc = np.asarray(d["cand_per_channel_bin"]), np.asarray(d["kept_per_channel_bin"])
+    assert cc.shape == kc.shape == (len(d["channels"]), len(d["quota"]))
+    assert np.array_equal(cc.sum(0), np.asarray(d["cand_per_bin"]))
+    assert np.array_equal(kc.sum(0), np.asarray(d["kept_per_bin"]))
 
 
 if __name__ == "__main__":
