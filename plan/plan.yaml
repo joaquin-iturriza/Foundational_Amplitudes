@@ -14646,12 +14646,10 @@ entries:
     answered_at: '2026-11-06T19:52:40.785000+00:00'
     decision: D307
   owner:
-    agent: ada9f5a0be83f8559
-    state: closed
-    since: '2026-11-06T22:56:00+00:00'
-    state_at: '2026-11-06T23:26:08+00:00'
-    context: 279922
-    context_at: '2026-11-06T23:26:18+00:00'
+    agent: a3d6689b938bd7f52
+    state: working
+    since: '2026-11-07T00:30:30+00:00'
+    state_at: '2026-11-07T00:30:30+00:00'
   designs:
   - at: '2026-11-04T21:14:59+00:00'
     question: 'D282: when a change to the pretraining is good and keeps the parameter shapes, does warm-starting the existing
