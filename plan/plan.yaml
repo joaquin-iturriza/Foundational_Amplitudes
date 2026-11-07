@@ -13476,6 +13476,25 @@ entries:
       minute, none claimed, specs moved to Q/unplanned/; replanned from catalog_v4_eea_test.yaml: 65 runs + 30 gridpacks.
       Workers 8b458405 8a160e7f e4bc9f56 aa482330 (16 cores, 01:00:00), target eea_stage1_short_fix 0.75 h (30 gridpacks at
       the old e+e- 712-1700 core-s each: 6-14 core-h), wait on step 74.'
+  - at: '2026-11-07T02:53:55+00:00'
+    text: '2026-11-07 step 75 read (multichannel_check.py step75 @fd151434 -> data/grid_fwd_check.json; figure figs/grid_fwd_check_a-e
+      via fig_mcmc_check.py grid_fwd: fill per in-range 0.25-dex log10|M|^2 bin, seed mean, each sampler''s seed-mean cost
+      over the old generation in its label). 10 CPU jobs (1b60b145 0387052d e9513eb9 f657333a f7d4e8b6 d8e3afc7 d996a248 83d25626
+      45f39aab 87ac1bbb) COMPLETED. Verdict by the fixed rules: COST (grids12 COST, grids8 PARTIAL; diversity holds, above
+      quota12 on every 2->4 class). Grids with the forward joint-resonance channel at 12 labels per flat event fill EVERY
+      in-range bin >= 0.95 on all 5 classes and both seeds (share 1.000 everywhere; step 72 without the forward channel: uux_epemvevex
+      0.936, udx_csxvevex 0.898), held-out outside kept 0-1 = step 67''s budget-750 count. Cost over the old sampling, seeds
+      42/43, grids12: uux_epemg 1.62/1.54, uux_epemvevex 0.78/1.18, uu_bbxuu 1.32/1.37, us_ddxsu 2.11/1.41, udx_csxvevex 1.32/0.81
+      (step 72: up to 3.04); grids8: 1.41/1.32, 0.80/1.18, 0.93/0.93, 1.64/1.04, 1.28/0.80, filling everything except uu_bbxuu''s
+      top bin (lower edge 4.454, fill 0.79/0.76). The only cost over 2 is us_ddxsu seed 42 grids12: labels 57 s + proposal
+      31 s of 100 s; the same job''s labels ran at 152 us per label in every policy vs 93 us in the seed-43 job (quota12:
+      419904 labels in both, 64 s vs 39 s), i.e. a slower node for identical work; at the seed-43 rates it would be ~1.5x
+      (estimate, scaling labels and proposal by the seed-43/seed-42 time ratios). The COST branch (labels dominate) -> budget
+      8 fills us_ddxsu at 1.64/1.04, but no single budget passes all rules on all 10 class-seeds: 12 fills all (one class-seed
+      5% over the bar on a slow node), 8 leaves uu_bbxuu''s top bin short. Next: the regeneration (steps 65, 68) with flat_grid
+      + mc_res2_fwd at budget 12, the only setting that fills every bin, after the sampling constants are written into the
+      sampling policy (reviewer note of step 75''s merge); its cost estimate from these replay times with the node spread
+      stated.'
   handoff:
     state: '2026-11-07 ~03:50. Step 74 stage 1: 164/170 eea_ pools assembled; the 5 short at 1500/3000 GeV (MadEvent fail-to-reach-target,
       pre-existing at high energy, not the spectrum) relaid by eea_short (complete gridpack layouts, merge a48af5bb, layouts
