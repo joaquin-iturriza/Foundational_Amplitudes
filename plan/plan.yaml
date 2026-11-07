@@ -11761,6 +11761,17 @@ entries:
       if r4 never acted on bbxuu (chunks identical to r3), its regression comes from r3''s single-bin rule itself: next r3''s
       nearest-candidate count raised (deficit-many -> the nearest occupied bin''s count when larger), one revision. Outside
       > 0 -> outside_dex. Summed cost > 2x -> per-channel seconds. Job failures -> log read, fixed, rerun.'
+    passed_at: '2026-11-07T08:14:03+00:00'
+    reviewer: 'Re-check of r4 v2 at sampler-r4 @a6908e10. Control: r3 and the old sampling in the same job; only flat_empty_unique
+      differs; R4 == dict(R3, flat_empty_unique=True); 10 tests pass at a6908e10. Check 2: fill per bin moved with empty-bin
+      steering (r2 to r3: bgtxwp''s bin 0.73 to 0.92, bbxuu''s 1.0 to 0.90, r3_check.json). bgtxwp is now named as a two-empty-bin
+      case: [-0.96,-0.714] is empty in 35/36 and 34/36 r3 chunks, and both top bins are empty in 1 and 2 chunks (r3 reads,
+      kept_per_bin). The new bins_empty round record matches flat_quota_weights'' steer==0 rule exactly and changes no sampling.
+      step79r4-acted plus r3''s per-seed determinism show whether r4 acted on bbxuu. Seeds 42/43 as in r1-r3; bar >= 0.95
+      on every seed, against about 0.1 seed-to-seed on bbxuu''s top bin. The outcome is scored against r3 in the same job,
+      with separate branches for bgtxwp losing r3''s pull and for bbxuu where r4 acted or never acted. Searched docs/results.tex,
+      the entry and site decisions FA for: empty bin, stack, unique, flat_empty, nearest candidates, smixu, r4, share floor;
+      nothing earlier. CPU only; about 0.5 MB per job.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
