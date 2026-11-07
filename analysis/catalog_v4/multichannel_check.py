@@ -1159,6 +1159,54 @@ def pull(policies=None, classes=None, seeds=SEEDS):
         print("pulled", tag, sorted(d["runs"]))
 
 
+def step78_where(classes=("v4_uux_bgtxwp", "v4_bbx_ccxh", "v4_bb_bb")):
+    """data/r2_where.json (plan step 78, the NO branch of the r2 check): per class and seed, for every policy of the r1
+    job (R1_TAG: old sampling, step-65 policy grid_both_res2f_budget12, r1) and of the r2 job (R2_TAG), its highest
+    candidate (cand_max), its stops, and for each bin from 0.5 dex below r2_check.json's short bin up to the top edge:
+    quota, kept, and candidates and kept events per channel summed over the chunks; the class's reach over every policy
+    of both jobs, beside the reach r2_check.json used (the r2 job's policies only)"""
+    chk = json.load(open(os.path.join(DATA, "r2_check.json")))
+    out = {}
+    for c in classes:
+        for seed in SEEDS:
+            r2c = chk["classes"][c][f"grid_r2_budget18_{seed}"]
+            lo_short = min([b[0] for b in r2c["short"]], default=None)
+            rec = {"reach_r2_check": r2c["class_reach_log10"], "short_r2": r2c["short"], "policies": {}}
+            for tag in (R1_TAG, R2_TAG):
+                f = os.path.join(READS, f"{c}_{tag}_{seed}.json")
+                if not os.path.exists(f):
+                    continue
+                for name, run in json.load(open(f))["runs"].items():
+                    qc = run.get("quota_chunks") or []
+                    if not qc:
+                        continue
+                    key = f"{name}@{tag.split('+')[1]}"
+                    e = np.asarray(qc[0]["edges_log10"])
+                    chs = next((x["channels"] for x in qc if x.get("channels")), None) or []
+                    ch = [" ".join(str(y) for y in (k if isinstance(k, list) else [k])) for k in chs]
+                    bins = [j for j in range(len(e) - 1) if lo_short is None or e[j] >= lo_short - 0.5 - 1e-9]
+                    stops = {}
+                    for x in qc:
+                        stops[x["stop"]] = stops.get(x["stop"], 0) + 1
+                    pr = {"cand_max": run.get("cand_max"), "kept_max": run.get("kept_max"), "stops": stops, "bins": []}
+                    for j in bins:
+                        cpb = [np.asarray(x["cand_per_channel_bin"])[:, j] for x in qc if x.get("cand_per_channel_bin")]
+                        kpb = [np.asarray(x["kept_per_channel_bin"])[:, j] for x in qc if x.get("kept_per_channel_bin")]
+                        cand = dict(zip(ch, np.sum(cpb, 0).tolist())) if cpb and ch else {}
+                        kept = dict(zip(ch, np.sum(kpb, 0).tolist())) if kpb and ch else {}
+                        pr["bins"].append({"lo": round(float(e[j]), 3), "quota": int(sum(x["quota"][j] for x in qc)),
+                                           "kept": int(sum(x["kept_per_bin"][j] for x in qc)),
+                                           "cand_by_channel": {k: v for k, v in cand.items() if v},
+                                           "kept_by_channel": {k: v for k, v in kept.items() if v}})
+                    rec["policies"][key] = pr
+            cm = [p["cand_max"] for p in rec["policies"].values() if p["cand_max"] is not None]
+            rec["reach_all_jobs"] = max(cm) if cm else None
+            out[f"{c}/{seed}"] = rec
+    with open(os.path.join(DATA, "r2_where.json"), "w") as fh:
+        json.dump(out, fh, indent=1)
+    print("STEP78_WHERE", json.dumps({k: [v["reach_r2_check"], v["reach_all_jobs"]] for k, v in out.items()}))
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.argv.append("--help")
@@ -1188,6 +1236,8 @@ if __name__ == "__main__":
         pull(R2_TAG, R1_CLASSES)
     elif sys.argv[1] == "step75r2":
         step75r2()
+    elif sys.argv[1] == "step78-where":
+        step78_where()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
