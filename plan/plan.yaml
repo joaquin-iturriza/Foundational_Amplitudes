@@ -11033,7 +11033,7 @@ entries:
         recorded as the gap, then the same'
   owner:
     agent: a7863d6e79d5af06e
-    state: working
+    state: closed
     since: '2026-11-06T23:06:36+00:00'
     state_at: '2026-11-07T00:11:15+00:00'
     context: 277866
@@ -12796,32 +12796,52 @@ entries:
       be shown to Joaquin with the regeneration design (the D320 proposal text is not in the ledger). Also: the step-69 sampler
       check''s first job (3e7f56d9) ran end to end through the new diversity code.'
   handoff:
-    state: '2026-11-07 ~00:30. Tonight''s four points: (3) scaling grid seed 42 SUBMITTED under a passed design (design-reviewer
-      PASS after one FIX): memmap prebuild FA-ccin2p3-bf203857 (CPU, slurm 62996664) then 10 GPU cells afterok on it, wait
-      on step 64, target scaling_grid_s42 67.03 h / 10 jobs, 211 GPU-h of work (D314). (2) seed spread DONE: seed_spread.py
-      @fbfb4109 -> data/seed_spread.json, figs/seed_spread.png; finding recorded (one class''s MSE x1.27 median, x2.14 at
-      q90 over classes; class-median R 11% median, 26% q90). (1) cheap flat sampling IN PROGRESS: frontier and dead ideas
-      measured (finding 2026-11-07); Wang-Landau Markov-chain flat part built on branch flat-mcmc a99a7aeb (worktrees/wt-flat-mcmc,
-      toy test passes); design recorded and design-reviewer launched; repo-reviewer launched on flat-mcmc (+ seed_spread.py,
-      prescreen_check.py) - both verdicts arrive to the main session/next owner: on both PASS merge flat-mcmc into trunk,
-      sync CC, submit the 10 CPU check jobs of next step (h) under the passed design (site pick FA --jobs 10 first; plan target
-      --batch mcmc_check --wall 0.5 --jobs 10), wait. (4) e+e- released (D318 + collider anchor approved): fold into step
-      68 after (1) as next step (h) says.'
-    decisions: 'Grid: LONG_MEMMAP=true, LONG_CKPT at widths 16/32, one prebuild shared by all cells (cache key holds no model
-      field), limits from scaling_grid_plan.json, --est-gpu-hours per cell = its work hours. Seed spread: pairs from the existing
-      run tables, each pair once, summary median over (arm, read) cells. Sampling: union with default events and the propagator
-      pre-screen measured and set aside (top bins hold 0-5 default events vs quota ~700; surrogate spread 0.65-1.44 dex);
-      MCMC at <= 12 labels per flat event (1.76x the old pool''s labels), FLAT_MCMC_CHAINS 0.05 and LNF 0.1 from the toy.'
-    ruled_out: Union of MadEvent default events thinned flat as the fix for the top bins (cannot fill); propagator surrogate
-      as a label pre-screen on the QCD 2->4 classes.
-    running: 'FA-ccin2p3-bf203857 (prebuild) and grid FA-ccin2p3-34cfff0c c53b8e51 ff309c2d 1b1a8f6e b07d6237 4ba33195 8a523b67
-      8b543518 4d6e9b06 a77e20b8 (wait on step 64); e+e- forward check of step 67 (ROUTINE ack only, D318 supersedes); step
-      61''s 12 sign-output jobs (main session). Reviewers in flight: design-reviewer on the MCMC design, repo-reviewer on
-      flat-mcmc.'
-    files: analysis/catalog_v4/seed_spread.py, data/seed_spread.json, figs/seed_spread; analysis/catalog_v4/sampling_frontier.py;
-      analysis/catalog_v4/prescreen_check.py, data/prescreen_check.json; worktrees/wt-flat-mcmc (mg5_pipeline_final.py _flat_mcmc_part/_pair_rotate,
-      multichannel_check.py mcmc_both_res2_budget12, tests/test_flat_mcmc.py); data/scaling_grid_plan.json
-    written: '2026-11-06T23:04:48+00:00'
+    state: '2026-11-07 ~01:00. Steps 69 and 71 have all 20 runs ended clean (E3944, NOT acked: the new owner reads, then acks).
+      STEP 69 (cheap flat sampler, D317; <= 2x is the step-69 design''s own bar, D317 names no number): Markov-chain flat
+      part revised after both reviewers'' BLOCK/FIX (old version''s toy fill 0.938 was near-copies: 38% of kept events), merged
+      74aa4ce6 (repo-reviewer PASS, watermark 87766f90; design PASS). Toy honest numbers: chains 0.906 vs quota sampler 0.888
+      at 12 labels/flat event (0.950 at 50), near-copies 0.2%, NN ratio q10 0.27 (fails the design''s 0.5 rule) - expect NO
+      or PARTIAL. Runs (seeds 42/43): uux_epemg 3e7f56d9/8f2ba5af, uux_epemvevex a3b08cbe/8eea9607, uu_bbxuu ce73379e/dd311c0d,
+      us_ddxsu 606a4b2f/0365f1a3, udx_csxvevex effc39ea/ae19438c. READ 69: python3 analysis/catalog_v4/multichannel_check.py
+      pull current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+mcmc_both_res2_budget12 <class> 42,43 for each of
+      the 5 classes (or without class args: pull <policies> loops CLASSES+EE_CLASSES, so pass each pp class), then python3
+      analysis/catalog_v4/multichannel_check.py step69 -> data/mcmc_check.json with verdict and checks; rules in step69()''s
+      docstring and constants DIV_DUP_EXCESS 0.02, DIV_DUP_TOP 0.05, DIV_NN_MED 0.8, DIV_NN_Q10 0.5, COST_MAX 2.0 (train replay
+      s over data/sampling_cost.json old_train_s); verdicts YES / QUOTA12 (quota sampler at 12 suffices) / NO (chains dead
+      end -> importance-weighted VEGAS-like alternative, results.tex divergence-study paragraph ~l.10230) / COST (overhead,
+      fix and re-run) / PARTIAL (where read of short bins, one revision). Also summary + coverage as step 67 (the new quota_ladder_both_res2
+      runs re-run step 67''s policy on the same seeds: should reproduce). FIGURE: fill per in-range bin per policy (mcmc12,
+      quota12, quota50) per class beside cost, extend analysis/catalog_v4/fig_quota_fill.py or sampling_frontier.py (add the
+      mcmc and quota12 policies), png+pdf. STEP 71 (e+e- collider anchor, D318 + D320 ''The collider anchor sounds good''):
+      design passed after one FIX; 10 CPU jobs at CC 5ae41985 (code be521c52), scripts/job_lhe_probe.sh PROBE_SHARD=eeisr
+      PROBE_PROCESS=dsh_epem_bbxvevex: 91.1876 6579d576, 160 cc877dee, 209 a609edba, 240 b3a1dac1, 365 dd9c0748, 380 d543defb,
+      500 79fc5d76, 1000 56ff1672, 1500 b972f424, 3000 ce420820. READ 71: site logs <run> -n 100000 | grep EEISR_JSON: lines
+      ''EEISR_JSON <isr|none|isronly> {json}'' with events_returned, error, log_tail, beam_card (lpp1/lpp2/pdlabel/pdlabel1/pdlabel2
+      from the banner), s_generate, s_per_kept_event, kept/below_window/cuts_partonic/cuts_lab, shat_frac {q01,q10,q50,below_0.99,below_0.5,min}.
+      Outcome rules (design 2026-11-06T23:38): WORKS = every energy''s isr run returns events, banner equals EE_ANCHOR (lpp1
+      +3, lpp2 -3: the dsh pool lists e- first), share below 0.99 > 0 (none run: 0), and at 240/365/500/3000 the machine spectrum''s
+      share below 0.99 > isronly run''s + 0.02 with lower q10 -> design the regeneration of the 170 e+e- default pools at
+      the anchor energies (cost = s per kept event isr over none), show Joaquin the energy list with it (D320''s proposal
+      text not in the ledger), then re-read e+e- flat ranges (pp_support.py pull ee, tools/flat_range.py) for step 68. NO_BEAMSTRAHLUNG
+      at an energy: read banner/log, fix card keys, re-run; else isronlyll there as a recorded gap. FAILS: log tail, fix setup,
+      re-run. COST: isr s/kept > 2x none -> where the time goes. Expected ISR-only luminosity share below 0.99: 0.35 (91)
+      to 0.43 (3000), q10 0.78-0.71, event share lower by sigma weighting. A committed reader for the EEISR lines does not
+      exist yet: write one (e.g. tools/lhe_probe.py eeisr-read <runs> -> analysis/catalog_v4/data/ee_anchor_probe.json) before
+      quoting numbers; figure: sqrt(s_hat)/sqrt(s) quantiles per energy, isr vs isronly vs none, png+pdf.'
+    decisions: 'Step 69: chain collection thinned (every 2 steps, only after a move), rotation >= 0.3 rad, 0.2 chains/flat
+      event, constants in the recipe id; quota sampler at the same 12 labels added as the matched-cost control; diversity
+      read flat_diversity.py in-job against the quota sampler at 50 (independent draws); the 2x is the design''s bar, not
+      Joaquin''s. Step 71: energies = documented machine points (EE_ANCHOR in recipes/gen_catalog_v4_default.py with citations),
+      240 GeV uses fcce240ll (cepc240ll the alternative), ISR only where MG has no beamstrahlung fit; probe on dsh_epem_bbxvevex
+      so the class window and cuts apply.'
+    ruled_out: 'First Markov-chain collection (every accepted state, dmin 1e-4): near-copies counted as fill. Plus the earlier
+      ones: union with MadEvent default events; propagator pre-screen.'
+    running: 'none (all 20 runs of steps 69 and 71 ended clean, E3944 unacked); still on other waits: scaling grid seed 42
+      (step 64/70, prebuild FA-ccin2p3-bf203857 + 10 GPU cells), step 61 sign-output jobs (main session).'
+    files: mg5_pipeline_final.py (_flat_mcmc_part, FLAT_MCMC_*), analysis/catalog_v4/flat_diversity.py, analysis/catalog_v4/multichannel_check.py
+      (step69, STEP69, DIVERSITY_REF), tests/test_flat_mcmc.py, recipes/gen_catalog_v4_default.py (EE_ANCHOR, ee_beam_patches),
+      tools/lhe_probe.py (run --ee-isr, beam_card, shat_frac), scripts/job_lhe_probe.sh (eeisr), the paper text /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/paper/p.txt
+    written: '2026-11-07T00:11:32+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
