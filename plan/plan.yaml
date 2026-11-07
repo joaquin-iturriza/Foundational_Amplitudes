@@ -14509,6 +14509,26 @@ entries:
       2''s assembly refusals, unchanged), assembled 115 of 115 (dsh_eea_epem_accxh and aepemh with the mixed-pair cut m >
       10 GeV at generation). lhe_parts yields --by-energy (lists every process with a short part): neither pool appears, so
       none of their 18 runs returned under its ask. All 115 dsh_eea_ default-share e+e- anchor pools are built.'
+  - at: '2026-11-07T08:02:41+00:00'
+    text: '2026-11-07 step 79 r3 check read (multichannel_check.py step78r3 @014b20a0 -> data/r3_check.json; 38 CPU jobs at
+      bed989d2, 19 classes x seeds 42/43, r3 = r2 + flat_empty_near against r2 and the old sampling in the same job; reach
+      and floor over the r1, r2 and r3 jobs): verdict NO on fill only. OUTSIDE: 0 held-out in-support pp events outside the
+      kept range on every class and seed. COST summed over the 38 jobs: r3 1.754x the old sampling, r2 1.699x in the same
+      jobs (bar 2x: pass; r2 read 1.527x in its own jobs: node-to-node spread); 16 class-seeds over 2x (r2 17 in the same
+      jobs). FILL: v4_uux_bgtxwp [-1.206,-0.96] (wholly reachable) 0.925/0.917 at seeds 42/43 (r2 0.734/0.79): chunks short
+      in it 3/3 of 36 (r2 10/8), but 2-3 chunks still at 0-1 kept (stall); r2 and r3 never draw above -1.152/-1.154 (cand_max),
+      so the bin is filled from its lowest 0.05 dex only, and only by the resl [0,3] ladder; the class''s reach -0.939 comes
+      from the step-65 policy''s res [0,1,3] channel; 27/24 r3 chunks run to the label budget, their missing quota all in
+      the straddling bin [-0.96,-0.714] (694/614 events). NEW REGRESSION: v4_uu_bbxuu (passed under r2) short at [5.127,5.373]
+      0.897/0.795 and at seed 43 [4.881,5.127] 0.929 (r2 1.0 in the same jobs): r3 sends 8/12 chunks to the budget (r2 1/0),
+      short in 8-12 chunks by a few events each (data/r3_rounds.json, step79-rounds), labels +19%/+21%; r3 kept fewer from
+      the resl [0,1] ladder (3229 vs 4846 at seed 43) and more from mperi: concentrating an empty bin''s deficit on deficit-many
+      candidates narrows the proposal. Straddling bins (Joaquin''s open scope question): bb_bb [8.34,8.585] 0.108/0.13 (r2
+      0.147/0.189), bbx_ccxh [-3.809,-3.56] 0.924/0.761 (r2 0.865/0.77). Next by the design''s NO branch: the channel route
+      (a share floor for the res [0,1,3] channel, the one that reaches bgtxwp''s top) and r3''s concentration revised so bbxuu
+      does not regress. Figure analysis/catalog_v4/figs/r3_check.png (r2_check_fig.py r3 @014b20a0): (a) fill per bin against
+      log|M|^2 minus the reach for r2 (dashed) and r3 (solid) on the four short classes, (b) per class and seed r3 time over
+      old against r2 time over old.'
   handoff:
     state: '2026-11-07 ~09:30. Step 79 (r3 sampler check): r3 = r2 + flat_empty_near (an empty quota bin steered by its deficit-many
       nearest candidates in log|M|^2) merged bed989d2 (sampler-r3; repo-reviewer BLOCK then PASS at c293ed6a, design PASS);
