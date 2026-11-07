@@ -11862,7 +11862,7 @@ entries:
       - 'still short: Joaquin decides between dropping 160 GeV for them and accepting'
   owner:
     agent: a10eccf640da955ae
-    state: working
+    state: closed
     since: '2026-11-07T03:44:16+00:00'
     state_at: '2026-11-07T03:48:14.990000+00:00'
     context: 115521
@@ -13887,31 +13887,29 @@ entries:
       at 34a2d8f6, FA-ccin2p3-e4edfe83 .. a135a639; target eea_anchor_stage2 0.8 h; disk 60 GB free at submission (~5 GB needed);
       wait on step 74.'
   handoff:
-    state: '2026-11-07 ~05:00. Step 65: hadronic regeneration (1301 classes, channel grids at 12 + forward channel, new _smixq
-      pools) RUNNING: 32 CC htc shards at ecc78b8b, target hadronic_regen_g12 0.35 h, wait on step 65; design v3 PASS (FILLED
-      = every bin >= 0.95 quota, 0 held-out pp events outside the range per D269, cost <= 2x per class named). On its end:
-      analysis/catalog_v4/regen_read.py pull/read/fig, verdict by the design. Step 74: stage 1 (170 eea_ anchor test pools)
-      all assembled; lhe_probe parts read (E4034, detached log ~/.local/share/ccorch/detached/*eea_stage1_parts.log) saved
-      as analysis/catalog_v4/data/lhe_parts_eea_stage1.json @committed: 170 pools, 170 assembled, 0 errors, yield min 0.9835
-      median 1.0, core-s per returned event median 0.188 max 2.33. NOT yet checked: spectrum share below 0.99 per pool and
-      energy (kept_by_energy / bbxvevex vs data/ee_anchor_probe.json within +-0.016), cost vs the 42-126 core-h estimate (lhe_rates
-      --prefix eea_). Then stage 2 (115 dsh_eea_ pools, recipes/catalog_v4_eea_default_processes.yaml / catalog_v4_eea_lhe.yaml)
-      planned with lhe_parts plan --probe <stage-1 yields file from lhe_probe kept --yields-out on queue catalog_v4_eea> under
-      the passed two-stage design (2026-11-07T01:52), at the site pick width, target from stage 1''s measured rates, plan
-      target + wait, then ack E4034 if not acked. Step 68 (e+e- in the regeneration) waits on stage 2 (ranges via pp_support.py
-      pull ee + tools/flat_range.py from the anchor pools), then tools/regen_recipes.py readers writes the training/held-out
-      _g12 recipes for both beams. Step 73 waits on Joaquin''s seed answer.'
-    decisions: Regeneration pools get their own path (_smixq) so old reads stay comparable; training/held-out _g12 recipes
-      refused until e+e- regenerated (Joaquin 2026-11-06 on coherent samplers); coverage bar 0 outside (D269), a tolerance
-      only by plan ask; SHORT revision widens from events it is not scored on (classes without dsh_ pools need a rule reading
-      none of their scored events).
-    ruled_out: 'Design v2 of step 65 (bar 2/class, widening from scored events): dead end. Reader copies with mixed samplers.'
-    running: 32 regen shards FA-ccin2p3-926ddf2e..7c4df684 (wait on step 65)
-    files: tools/regen_recipes.py, recipes/catalog_v4_g12_regen.yaml, analysis/catalog_v4/data/regen_g12_inputs.json, analysis/catalog_v4/regen_read.py,
-      datagen.py (_write_flat_fill), mg5_pipeline_final.py (recipe_output_path _smixq), tools/lhe_probe.py (accept_of eea_),
-      analysis/catalog_v4/data/lhe_parts_eea_stage1.json. Worktrees worktrees/mc-policy and worktrees/regen-g12 merged but
-      not removed (remove_worktree.sh refused by the permission classifier).
-    written: '2026-11-07T03:42:57+00:00'
+    state: '2026-11-07 ~05:20. Step 74: stage 1 (170 eea_ anchor test pools) BUILT (finding 2026-11-07: spectrum in all 1364
+      pool-energies, bbxvevex vs probe |z|<=1.74, runs 35.6 core-h, allocation 116 core-h). Stage 2 RUNNING: queue catalog_v4_dsh_eea
+      (113 of 115 dsh_eea_ pools, 10259 runs + 192 gridpacks, est 266 core-h upper), 48 CC htc workers x 16 cores x 02:00
+      at 34a2d8f6, target eea_anchor_stage2 0.8 h, wait on step 74. On its end: lhe_parts status/shares --queue catalog_v4_dsh_eea,
+      lhe_probe mixcheck, part energy check, core-h vs 266 est and the design''s 92-237; then step 68 ranges (pp_support.py
+      pull ee, tools/flat_range.py). Step 76: the 2 pools left out (accxh, aepemh, kept <0.5 at 160 GeV). Step 65 read done:
+      SHORT (527 fill, 213 outside) and COST (median 1.86x, 473 >2x): step 75 next, COST first. Step 70 grid: two mmap caches
+      (0c897ca2 open by all 9 running grid jobs, 27a14227) deleted by a disk worker ~04:50 CET; the 9 still train at 05:12
+      CET; no rebuild done (36 GB); a grid job that breaks gets a prebuild of its arm then a restart.'
+    decisions: 'Stage 2 sized from stage 1''s measurements per the passed two-stage design (margin from kept per energy, complete
+      shares where eea_ ran the same gridpack layout, probe = worst energy''s kept x yield per repo-reviewer FIX); the 2 pools
+      over the 2x yield factor are deferred to a generation fix (CLAUDE.md: fix, never absorb), not cut. Zero spectrum share
+      at a class''s lowest energy just above its edge read as threshold suppression (min<1 there, normal at every higher energy).
+      Cache rebuild deferred: it serves only a restart, costs 36 GB of 60 free.'
+    ruled_out: 'Planning stage 2 with eea_''s own rates (1435 core-h: small-run integration overhead). bash -c through site
+      run (quoting lost: ran bare python and printed stale files).'
+    running: 48 lhe_parts workers FA-ccin2p3-e4edfe83 .. a135a639 (queue catalog_v4_dsh_eea, wait on step 74); 9 scaling-grid
+      GPU runs of step 70.
+    files: 'recipes/gen_catalog_v4_default.py (anchor_pools: EEA_STAGE1, EEA_PROBE, DSHA_RATES), tools/lhe_probe.py (parts:
+      shat_by_energy, complete_by_energy), analysis/catalog_v4/data/lhe_parts_eea_stage1.json, lhe_rates_eea.json, lhe_probe_yields_dsh_eea.json,
+      lhe_rates_dsh_eea.json, regen_g12_read.json, figs/regen_g12_fill.png, tests/test_ee_anchor.py. Branch eea-stage2 merged
+      8a242ed6, worktree removed, branch ref left (git branch -d refused as not fully merged though trunk contains it).'
+    written: '2026-11-07T04:17:35+00:00'
   ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
     61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
     one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
