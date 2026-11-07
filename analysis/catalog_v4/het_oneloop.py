@@ -26,7 +26,7 @@ mse reproduced from the .npz), then per class the het-over-MSE ratio of the MSE 
 two seeds, as mixture_ab.side), split by the probe's pool sign (pool_nonpos > 0: sign-changing), the bias against the
 spread, and sigma against the error.
 """
-import json, os, subprocess, sys
+import json, math, os, subprocess, sys
 
 import numpy as np
 
@@ -891,6 +891,30 @@ def step73_fig():
 STEP80 = {"branch4": ("FA-ccin2p3-PENDING",), "branch1": STEP73["branch"]}
 
 
+def step80_bands():
+    """Step 80's one-seed bands, from the four-seed reads that exist: per arm and seed the median over pools of the
+    wrong-sign share on HD5 and H5 (as _sign_pair computes it); per read the pooled within-arm SD of ln(median) over the
+    het weight-1 rerun, the two matched arms and the MSE control (4 seeds each); the band for a one-run-vs-one-run gap,
+    exp(2 sqrt(2) SD); the het arms' lowest seed value and the MSE control's seed range."""
+    h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
+    arms = {"rerun": STEP61["rerun"], "matched_event": STEP61["matched_event"],
+            "matched_const": STEP61["matched_const"]}
+    out = {}
+    for ax in ("HD5", "H5"):
+        med = {a: [_sign_pair([_sign_read(r)[ax]], [_sign_read(r)[ax]], h5neg, ax)["median_a_pct"] for r in rs]
+               for a, rs in arms.items()}
+        mse = [_sign_read(r)["HD5"] for r in SIGNHEAD["mse_hd5"]] if ax == "HD5" else \
+              [_mse_h5_sign(r) for r in SIGNHEAD["mse_h5"]]
+        med["mse"] = [_sign_pair([m], [m], h5neg, ax)["median_a_pct"] for m in mse]
+        dev = [math.log(v) - np.mean(np.log(vs)) for vs in med.values() for v in vs]
+        dof = sum(len(vs) - 1 for vs in med.values())
+        sd = math.sqrt(sum(d * d for d in dev) / dof)
+        out[ax] = {"seed_medians_pct": med, "sd_ln": round(sd, 4), "band": round(math.exp(2 * math.sqrt(2) * sd), 3),
+                   "het_lowest_pct": min(v for a in arms for v in med[a]),
+                   "mse_range_pct": [min(med["mse"]), max(med["mse"])]}
+    return out
+
+
 def step80_one():
     """Step 80 at one seed -> data/het_signhead80.json. Sign on H5 and HD5 (per pool the wrong-sign share; median over
     pools; ratio of medians to each reference): against the one-block branch (the tested change: depth of the branch),
@@ -927,16 +951,28 @@ def step80_one():
          for ax in ("H5", "HD5")}
     mag_off = [ax for ax, m in out["magnitude_vs_branch1"].items()
                if m["R"] > STEP73_MAG_CALL or m["R"] < 1 / STEP73_MAG_CALL]
-    at_mse = all(q[ax]["vs_mse"] is not None and q[ax]["vs_mse"] <= 1.0 for ax in ("H5", "HD5"))
-    better = q["H5"]["vs_branch1"] is not None and q["H5"]["vs_branch1"] < 1 / STEP73_SIGN_CALL
-    worse = q["H5"]["vs_branch1"] is not None and q["H5"]["vs_branch1"] > STEP73_SIGN_CALL
+    # the verdict is HD5's (its seed spread is ~0.10 in ln, H5's ~0.36), against the four-seed bands (step80_bands)
+    bands = step80_bands()
+    out["bands"] = bands
+    hd5 = out["sign"]["HD5"]["vs_branch1"]["median_a_pct"]
+    k1_hd5 = out["sign"]["HD5"]["vs_branch1"]["median_c_pct"]
+    b = bands["HD5"]
+    yes = hd5 < b["het_lowest_pct"] and hd5 <= b["mse_range_pct"][1]
+    no = hd5 > k1_hd5 * b["band"]
+    h5_call = None
+    if q["H5"]["vs_branch1"] is not None:
+        if q["H5"]["vs_branch1"] < 1 / bands["H5"]["band"]:
+            h5_call = "H5 better than one block beyond its band"
+        elif q["H5"]["vs_branch1"] > bands["H5"]["band"]:
+            h5_call = "H5 worse than one block beyond its band"
     out["ratios"] = q
+    out["h5_call"] = h5_call
     out["magnitude_outside_band"] = mag_off
     out["verdict"] = (f"INCOMPLETE (reads missing: {missing})" if missing
                       else "FAULT (magnitude moved: the trunk should be the one-block run's)" if mag_off
-                      else "YES (at or below the MSE control on H5 and HD5)" if at_mse
-                      else "DEPTH HELPS (H5 beyond 2x better than one block, above the MSE control)" if better
-                      else "NO (worse than one block beyond 2x)" if worse else "NOT RESOLVED AT ONE SEED")
+                      else "YES (HD5 below every het seed and inside the MSE control's seed range)" if yes
+                      else "NO (HD5 worse than the one-block branch beyond its band)" if no
+                      else "NOT RESOLVED AT ONE SEED (HD5 within the het arms' seed range)")
     out["val_sign_accuracy"] = {r: [x[1] for x in _sign_read(r)["val_sign_acc"]][-1:] for r in (arm, k1)}
     out["grad_norm_main"] = {r: _sign_read(r)["grad_norm_main"] for r in (arm, k1)}
     out["blowups"] = blowups([arm, k1])
@@ -968,6 +1004,8 @@ if __name__ == "__main__":
         step61(STEP73, ("branch",), "het_signhead73.json", "plan catalog_coverage step 73 (D296, D315)")
     elif sys.argv[1:] == ["step80_pull"]:
         signhead_pull({"branch4": STEP80["branch4"], "branch1": STEP80["branch1"]})   # branch1 again for its step rate
+    elif sys.argv[1:] == ["step80_bands"]:
+        print(json.dumps(step80_bands(), indent=0))
     elif sys.argv[1:] == ["step80_one"]:
         step80_one()
     elif sys.argv[1:] == ["step73_fig"]:
