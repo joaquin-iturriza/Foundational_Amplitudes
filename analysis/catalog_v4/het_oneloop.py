@@ -918,7 +918,9 @@ def step80_bands():
 def step80_one():
     """Step 80 at one seed -> data/het_signhead80.json. Sign on H5 and HD5 (per pool the wrong-sign share; median over
     pools; ratio of medians to each reference): against the one-block branch (the tested change: depth of the branch),
-    the shared-trunk weight-1 head and the MSE control; a gap called only beyond STEP73_SIGN_CALL (2x, one seed).
+    the shared-trunk weight-1 head and the MSE control; the verdict on HD5 against the four-seed bands (step80_bands:
+    YES below every het seed and inside the MSE seed range, NO beyond the band above the one-block branch), H5 beside,
+    called only beyond its own band.
     Magnitude R = four-block over one-block branch per read (both trunks get no sign gradient, so R is an implementation
     check: outside 1/1.15..1.15 is a fault to trace before any verdict). Beside: validation sign accuracy, pre-clip norms,
     blow-ups."""
