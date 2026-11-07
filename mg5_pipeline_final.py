@@ -4972,11 +4972,13 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
     }
 
 
-def lhe_runs(process, iseed, n_req):
+def lhe_runs(process, iseed, n_req, lhe=None):
     """[(iseed, nevents, run-card patches, run name)] of an lhe entry's MadEvent runs. pp: lhe.n_runs runs of n_req at
     iseed + 7919 k (the runs every pp pool was built with). e+e- (lhe.energies): each energy E gets n_runs runs of
-    ceil(n_req / len(energies)) with ebeam1 = ebeam2 = E / 2, so the energies have equal shares of the events."""
-    l = PROCESSES[process]["lhe"]
+    ceil(n_req / len(energies)) with ebeam1 = ebeam2 = E / 2, so the energies have equal shares of the events.
+    lhe: the layout keys to read instead of the entry's own (an earlier plan's recipe identity, recipe["lhe"]:
+    tools/lhe_parts.py _adopt); the beam spectrum is always the entry's."""
+    l = PROCESSES[process]["lhe"] if lhe is None else lhe
     n_runs = int(l.get("n_runs", 1))
     seed_k = lambda k: (iseed + 7919 * k - 1) % 30000 + 1
     energies = [float(e) for e in (l.get("energies") or [])]
@@ -5673,14 +5675,15 @@ def lhe_part_paths(process, items):
     return [(os.path.join(d, f"{process}_{eid}_{r[3]}_seed{r[0]}_ev{r[1]}.npz"), r) for r in runs]
 
 
-def lhe_gridpacks(process, iseed, n_req):
+def lhe_gridpacks(process, iseed, n_req, lhe=None):
     """[(grid iseed, grid events, run-card patches, name)] of an lhe.gridpack entry's gridpacks: one per energy of an
     e+e- entry (the patches of that energy's runs), one for pp. A gridpack's iseed continues the run seeds' sequence
-    past its runs (seed_k with k = runs + j; 7919 and 30000 coprime, so no run and no other gridpack shares it)."""
-    l = PROCESSES[process]["lhe"]
+    past its runs (seed_k with k = runs + j; 7919 and 30000 coprime, so no run and no other gridpack shares it).
+    lhe: another layout's keys, as lhe_runs."""
+    l = PROCESSES[process]["lhe"] if lhe is None else lhe
     if not l.get("gridpack"):
         return []
-    runs = lhe_runs(process, iseed, n_req)
+    runs = lhe_runs(process, iseed, n_req, lhe=lhe)
     pats = list({json.dumps(r[2], sort_keys=True): r[2] for r in runs}.values())    # in run order, one per energy
     base = int(l.get("grid_seed_runs") or len(runs))       # pinned: the gridpacks of the layout the probe measured
     return [((iseed + 7919 * (base + j) - 1) % 30000 + 1, int(l["gridpack"]), dict(p), f"grid{j:02d}")

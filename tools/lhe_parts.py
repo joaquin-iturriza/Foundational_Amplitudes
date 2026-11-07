@@ -323,7 +323,7 @@ def _plan(a, D, items):
 
 def _adopt(D, name, its, other_specs=()):
     """Hard-link the part files of a process's previous plan (Q/specs) to its new names when the new layout changes only
-    the number of runs (lhe.n_runs raised or cut; with lhe.run_events unchanged, also the margin; no lhe.energies): run
+    the number of runs (lhe.n_runs raised or cut; with lhe.run_events unchanged, also the margin; e+e-: _adopt_ee): run
     k below both counts has the same run name, iseed and events, so the same MadEvent run. Nothing is deleted. Returns
     the parts linked."""
     # the process's previous plan: this queue's spec, else that of a queue it takes over (--skip-claimed)
@@ -340,7 +340,9 @@ def _adopt(D, name, its, other_specs=()):
     # lhe.complete_runs (identity "runs": "complete") changes which runs the assembly uses, not a run's events
     drop += ("runs",)
     strip = lambda r: {**r, "lhe": {k: v for k, v in r["lhe"].items() if k not in drop and k != "block"}}
-    if len(old) != len(new) or any(strip(a) != strip(b) for a, b in zip(old, new)) or new[0]["lhe"].get("energies"):
+    if new[0]["lhe"].get("energies"):
+        return _adopt_ee(name, old, new, its)
+    if len(old) != len(new) or any(strip(a) != strip(b) for a, b in zip(old, new)):
         return 0
     o_n, n_n = int(old[0]["lhe"].get("n_runs", 1)), int(new[0]["lhe"].get("n_runs", 1))
     o_id, n_id = mg._lhe_events_id(old[0]), mg._lhe_events_id(new[0])
@@ -593,6 +595,45 @@ def _tidy(wd, saved, tag, q):
     except Exception as e:
         print(f"  [TIDY] {tag}: not tidied ({type(e).__name__}: {e})", flush=True)
         return None
+
+
+def _adopt_ee(name, old, new, its):
+    """_adopt for an e+e- pool (lhe.energies) whose new layout differs from the previous plan's only in its runs per
+    energy (lhe.n_runs, lhe.energy_runs), in using only complete runs (lhe.complete_runs) or in pinning its gridpacks
+    (lhe.grid_seed_runs, lhe.gridpack_eid): each new run equal to an old one (iseed, events, run-card patches and run
+    name: so the same energy, spectrum and MadEvent run), drawn from the same gridpack where the pool has gridpacks,
+    gets the old run's part file hard-linked to its new name. A run index whose energy moved (runs added at an earlier
+    energy) has other patches and is made again. Nothing is deleted. Returns the parts linked."""
+    drop = ("n_runs", "energy_runs", "runs", "grid_seed_runs", "gridpack_eid", "block")
+    strip = lambda r: {**r, "lhe": {k: v for k, v in r["lhe"].items() if k not in drop}}
+    if len(old) != len(new) or any(strip(a) != strip(b) for a, b in zip(old, new)):
+        return 0
+    o_id, n_id = mg._lhe_events_id(old[0]), mg._lhe_events_id(new[0])
+    if o_id == n_id:
+        return 0
+    ol = old[0]["lhe"]
+    iseed, n_req = int(ol["iseed"]), int(ol["n_requested"])
+    parts = mg.lhe_part_paths(name, its)
+    if not parts:
+        return 0
+    d = os.path.dirname(parts[0][0])
+    if ol.get("gridpack"):
+        # the old runs were drawn from the old layout's gridpacks: the new runs must be drawn from those very files
+        g_old = ol.get("gridpack_eid") or o_id
+        old_grids = [os.path.join(d, f"{name}_{g_old}_{g[3]}_seed{g[0]}_ev{g[1]}_gridpack.tar.gz")
+                     for g in mg.lhe_gridpacks(name, iseed, n_req, lhe=ol)]
+        if [p for p, _ in mg.lhe_gridpack_paths(name, its)] != old_grids:
+            return 0
+    key = lambda r: json.dumps([r[0], r[1], r[2], r[3]], sort_keys=True)
+    old_runs = {key(r): os.path.join(d, f"{name}_{o_id}_{r[3]}_seed{r[0]}_ev{r[1]}.npz")
+                for r in mg.lhe_runs(name, iseed, n_req, lhe=ol)}
+    n = 0
+    for part, run in parts:
+        src = old_runs.get(key(run))
+        if src and os.path.exists(src) and not os.path.exists(part):
+            os.link(src, part)
+            n += 1
+    return n
 
 
 def _spec(D, name):
@@ -1031,21 +1072,45 @@ def cmd_status(a):
 
 
 def cmd_yields(a):
-    """process -> {asked, got} per run (got null: no part file) for every process of the queue with a short part."""
+    """process -> {asked, got} per run (got null: no part file) for every process of the queue with a short part; an
+    e+e- process (lhe.energies) also gets each run's collider energy and the layout they were made under: its events'
+    identity (eid), and the gridpacks' (gridpack_eid, grid_seed_runs: its pin, else this layout's own), so a layout
+    that adds runs can keep these parts and gridpacks (recipes/gen_catalog_v4_default.py eea_short, _adopt_ee).
+    --by-energy: one more key, "_by_energy": {energy: {runs, complete}} over every e+e- process of the queue (runs with
+    a part; complete: those that returned every event they asked)."""
     D = _dirs(a.queue)
-    out = {}
+    out, by_e = {}, {}
     for sf in sorted(glob.glob(os.path.join(D["specs"], "*.json"))):
         name = os.path.basename(sf)[:-5]
+        its = _spec(D, name)
+        parts = mg.lhe_part_paths(name, its)
         asked, got = [], []
-        for part, run in mg.lhe_part_paths(name, _spec(D, name)):
+        for part, run in parts:
             asked.append(int(run[1]))
             try:
                 with np.load(part) as z:
                     got.append(int(len(z["mom"])))
             except (FileNotFoundError, OSError, KeyError, ValueError):
                 got.append(None)
+        E = mg.lhe_energy_of_runs([r for _, r in parts])
+        ee = bool(E) and E[0] is not None
+        if ee:
+            for e, g, q in zip(E, got, asked):
+                if g is not None:
+                    b = by_e.setdefault(f"{e:g}", {"runs": 0, "complete": 0})
+                    b["runs"] += 1
+                    b["complete"] += int(g >= q)
         if any(g is not None and g < q for g, q in zip(got, asked)):
             out[name] = {"asked": asked, "got": got}
+            if ee:
+                r0 = its[0][0]
+                eid = mg._lhe_events_id(r0)
+                out[name].update(energy=[float(e) for e in E], eid=eid)
+                if r0["lhe"].get("gridpack"):
+                    out[name].update(gridpack_eid=r0["lhe"].get("gridpack_eid") or eid,
+                                     grid_seed_runs=int(r0["lhe"].get("grid_seed_runs") or len(parts)))
+    if a.by_energy:
+        out["_by_energy"] = by_e
     print(json.dumps(out, sort_keys=True))
 
 
@@ -1252,6 +1317,7 @@ def main():
     wdp = sub.add_parser("workdirs"); wdp.add_argument("--min-age", type=float, default=12.0)
     wdp.add_argument("--apply", action="store_true")
     y = sub.add_parser("yields"); y.add_argument("--queue", required=True)
+    y.add_argument("--by-energy", action="store_true", help="also every e+e- run's completeness per collider energy")
     sh = sub.add_parser("shares"); sh.add_argument("--queue", required=True); sh.add_argument("--requeue", action="store_true")
     rq = sub.add_parser("requeue"); rq.add_argument("--queue", required=True)
     rq.add_argument("--match", default=None, help="regex on a failed task's error (first line); none: no failed task")
