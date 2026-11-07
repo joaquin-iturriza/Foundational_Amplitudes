@@ -14134,6 +14134,21 @@ entries:
       mass: median 8.9 / 9.8 GeV, 10% quantile 4.8 / 5.2 GeV. Hypothesis confirmed. Fix: express the mixed-pair mass cut at
       generation (MadGraph''s user cut, SubProcesses/dummy_fct.f dummy_cuts: m(i,j) > 10 GeV for every cut-leg pair the card''s
       mm* does not cover), probe it at 160 GeV, then plan the two pools into catalog_v4_dsh_eea.'
+  - at: '2026-11-07T05:11:44+00:00'
+    text: '2026-11-07 step 74 stage 2 (queue catalog_v4_dsh_eea, 48 workers e4edfe83..a135a639) ended: 93 of 113 pools assembled,
+      20 not. Read (lhe_parts status: 10429 tasks done, 18 failed, 4 claimed; lhe_parts shares; lhe_parts yields --by-energy
+      @1bd372a2 -> data/lhe_run_yields_dsh_eea_stage2.json): the 18 failed tasks are all assemblies refused by lhe_equal_shares
+      (an energy short of its equal share); the short energies are 1000/1500/3000 GeV, where the layout put ONE MadEvent run
+      of ~6500-8200 events per energy and that run stopped short of its ask (e.g. accx 3000 GeV 95 of 6529, ccxgg 3000 36,
+      bbxddx 3000 55, taptam 3000 133, ataptam 206, uuuxux 398, mupmumzz 1500 407, ddxwpwm 1500 616; worst cost per returned
+      event 31 core-s ccxgg 3000), runs complete overall 1223/1302 at 3000, 1261/1302 at 1500, 1238/1265 at 1000. The other
+      2 (epepemem 1500+3000, aepemz 3000) have no part: their tasks sit in claimed/ from workers 62997327/62997333 that ended
+      (lost at the worker''s wall limit). Pools: aaepem abbxz accx aepemz aepvewm amupmum ataptam bbbxbx bbxddx ccxepem ccxgg
+      ccxuux ddxwpwm epepemem mupmumtaptam mupmumuux mupmumzz taptam uuuxux uuxvmvmx. Cause: stage 1 (eea_, 204 events per
+      energy) completed at these energies, so stage 2''s sizing saw no short runs; a short run is a biased sample (short_run_bias.py),
+      so these must be relaid as complete runs from gridpacks (the eea_short / complete_layout precedent, EEA_SHORT_RUN 200)
+      at the short energies, sized from these measured complete shares; also check that the 93 assembled pools hold no short
+      run (a run returning between the share and its ask passes lhe_equal_shares).'
   handoff:
     state: '2026-11-07 ~05:55. Step 75: profile and where reads done (finding 2026-11-07). Revision r1 implemented on branch
       regen-rev (worktree worktrees/wt-regen-rev @7d00f36c, not merged): mg5_pipeline_final policy keys flat_stall 0.2 (stop
