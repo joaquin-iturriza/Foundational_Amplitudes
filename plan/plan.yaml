@@ -14507,6 +14507,16 @@ entries:
       306-415 candidates in that bin, kept 76-98), which r1/r2''s channel shares leave at 0-1 candidates there. Next by the
       design''s NO branch: a revision r3 of the steering of empty bins; the straddling-bin question to Joaquin now covers
       bb_bb 8.34 and bbx_ccxh -3.809 (and bgtxwp -0.96, exempt by r2''s reader).'
+  - at: '2026-11-07T07:11:03+00:00'
+    text: '2026-11-07 step 79 (r3) submitted. Design PASS (design reviewer), repo-reviewer BLOCK then PASS at c293ed6a: (1)
+      multichannel_check.py did not compile at db973ca9 (a positional argument after a keyword one in the step78r3 call):
+      my sed edit made after the reproduction check, never re-run; it would have killed all 38 jobs and every reader. Fixed
+      c293ed6a, and tests/test_flat_grid.py now compiles the check module so this cannot pass the tests again; step75r2 with
+      defaults re-run at the tip reproduces r2_check.json exactly. (2) _smixs keyed on any r2 key (flat_keep_ext or flat_stall_patience),
+      no existing pool renamed. sampler-r3 merged bed989d2, synced CC. 38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r2_budget18+grid_r3_budget18,
+      19 classes x seeds 42/43, --time 00:45:00, 8G, target r3_check 0.2 h) at bed989d2; step 79 waits on them. Read: multichannel_check.py
+      step78r3-pull then step78r3 -> data/r3_check.json. Figure of the r2 check: analysis/catalog_v4/r2_check_fig.py @bed989d2
+      -> analysis/catalog_v4/figs/r2_check.{png,pdf}.'
   handoff:
     state: '2026-11-07 ~08:00. Step 78 (r2 sampler check): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18
       merged 56b3c909 (repo + design PASS; cost bar = summed seconds over the 38 jobs <= 2x current, per class listed); 38
