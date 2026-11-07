@@ -842,6 +842,104 @@ def test_layout_dead_claims_park_marker_accept_boundary():
     print("[dead claims + park marker + accept boundary] ok")
 
 
+def test_ee_adopt_and_eea_short():
+    """An e+e- pool whose runs stopped short at some energies (catalog_coverage step 74, the anchor queue): lhe_parts
+    yields records each run's energy and the layout's identities; gen_catalog_v4_default.eea_short lays it out by
+    complete_layout: a pool of runs integrated on their own moves to complete gridpack runs; a gridpack pool takes runs
+    per energy from its measured complete shares, keeps its gridpacks (pinned), and plan links every run made that the
+    new layout still has (same iseed, events, energy) and queues only the others (an index whose energy moved is made
+    again)."""
+    sys.path.insert(0, os.path.join(ROOT, "recipes"))
+    import gen_catalog_v4_default as gen
+    saved = (datagen.dest_for_role,)
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            datagen.dest_for_role = lambda role: os.path.join(d, "pools", role)
+            os.environ["AMP_LHE_PARTS_DIR"] = os.path.join(d, "parts_store")
+            spec = os.path.join(d, "spec.yaml")
+            yaml.safe_dump({"processes": [{"name": NAME, "sqrts": [13000, 13000], "n_train": 800, "n_val": 100,
+                                           "n_test": 100}]}, open(spec, "w"))
+            rates = os.path.join(d, "rates.json")
+            json.dump({"x": {"nfinal": 3, "core_s_per_event": 0.01}}, open(rates, "w"))
+            Es = [91.1876, 500.0, 3000.0]
+
+            def setup(qname, **kw):
+                q = os.path.join(d, qname)
+                plan = lambda: lhe_parts.cmd_plan(argparse.Namespace(specs=[spec], queue=q, seed=42, rates=rates,
+                                                                     cores=[], grid_cores=2))
+                _register(**kw)
+                mg.PROCESSES[NAME]["lhe"]["energies"] = list(Es)
+                return q, plan
+
+            def make(parts, got):
+                for (p, _), n in zip(parts, got):
+                    os.makedirs(os.path.dirname(p), exist_ok=True)
+                    np.savez(p, mom=np.zeros((n, K, 4)))
+
+            def apply(y):
+                l = {k: v for k, v in mg.PROCESSES[NAME]["lhe"].items()}
+                gen.eea_short(l, y, NAME)
+                mg.PROCESSES[NAME]["lhe"] = l
+                return l
+            # one run per energy integrated on its own (the probe-sized anchor pools), the 3 TeV run short: the pool
+            # moves to complete gridpack runs of 200 (the ee4_ precedent), its old parts not reused
+            q, plan = setup("q1", n_runs=1, run_events=None)
+            plan()
+            old = mg.lhe_part_paths(NAME, _items())
+            assert [r[1] for _, r in old] == [340] * 3
+            make(old, [340, 340, 90])
+            y = json.loads(_out(lambda: lhe_parts.cmd_yields(argparse.Namespace(queue=q, by_energy=True))))
+            assert y[NAME]["energy"] == Es and y[NAME]["got"] == [340, 340, 90] and "gridpack_eid" not in y[NAME]
+            assert y["_by_energy"] == {"91.1876": {"runs": 1, "complete": 1}, "500": {"runs": 1, "complete": 1},
+                                       "3000": {"runs": 1, "complete": 0}}
+            for f in os.listdir(os.path.join(q, "todo")):
+                os.remove(os.path.join(q, "todo", f))                 # the runs were made
+            l = apply(y[NAME])
+            assert (l["run_events"], l["n_runs"], l["gridpack"], l["complete_runs"]) == (200, 3, 13057, True)
+            assert "energy_runs" not in l
+            plan()
+            new = mg.lhe_part_paths(NAME, _items())
+            assert len(new) == 9 and not any(os.path.exists(p) for p, _ in new)
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            assert len(todo) == 12 and sum("__g" in f for f in todo) == 3
+            # a gridpack pool of 3 complete runs per energy, one 500 GeV run short (complete share 2/3): runs there
+            # from complete_layout's shares (ceil(334 / (min(0.8, 0.667 / 1.25) x 200)) = 4), the gridpacks pinned
+            # (same files, no gridpack task), the runs whose index keeps its energy linked, the others made
+            q, plan = setup("q3", n_runs=3, run_events=200, complete_runs=True)
+            mg.PROCESSES[NAME]["lhe"]["gridpack"] = 13057
+            plan()
+            old = mg.lhe_part_paths(NAME, _items())
+            grids = [p for p, _ in mg.lhe_gridpack_paths(NAME, _items())]
+            for g in grids:
+                open(g, "w").close()
+            make(old, [200, 200, 200, 200, 150, 200, 200, 200, 200])
+            for f in os.listdir(os.path.join(q, "todo")):
+                os.remove(os.path.join(q, "todo", f))
+            y = json.loads(_out(lambda: lhe_parts.cmd_yields(argparse.Namespace(queue=q, by_energy=False))))
+            assert y[NAME]["grid_seed_runs"] == 9 and y[NAME]["gridpack_eid"] == y[NAME]["eid"]
+            l = apply(y[NAME])
+            assert l["energy_runs"] == [3, 4, 3] and l["grid_seed_runs"] == 9 and l["gridpack"] == 13057
+            assert [p for p, _ in mg.lhe_gridpack_paths(NAME, _items())] == grids
+            new = mg.lhe_part_paths(NAME, _items())
+            assert len({r[0] for _, r in new} | {g[0] for _, g in mg.lhe_gridpack_paths(NAME, _items())}) == 13
+            plan()
+            linked = [k for k, (p, _) in enumerate(new) if os.path.exists(p)]
+            assert linked == [0, 1, 2, 3, 4, 5, 7, 8], linked
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            assert len(todo) == 2 and not any("__g" in f for f in todo)
+            # a share under 1/2 at an energy is refused (a larger gridpack, never more runs)
+            try:
+                apply({**y[NAME], "got": [200, 200, 200, 200, 150, 150, 200, 200, 200]})
+                raise AssertionError("a complete share of 1/3 was laid out with more runs")
+            except SystemExit as e:
+                assert "never more of them" in str(e), e
+    finally:
+        (datagen.dest_for_role,) = saved
+        os.environ.pop("AMP_LHE_PARTS_DIR", None)
+        mg.PROCESSES.pop(NAME, None)
+    print("[e+e- adopt + eea_short] ok")
+
+
 def _out(f):
     import io, contextlib
     b = io.StringIO()

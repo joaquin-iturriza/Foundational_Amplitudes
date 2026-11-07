@@ -102,6 +102,9 @@ ANCHOR_ENERGIES = tuple(sorted(EE_ANCHOR))
 # blocks left out of an anchor pool by a decision on its old pool: ee4_epem_cgsxwm's 3 TeV block, whose runs stop
 # short even from a gridpack (D193)
 EEA_DROPPED = {"v4_epem_cgsxwm": (3000.0,)}
+# the anchor queue's runs that stopped short of their ask (tools/lhe_parts.py yields --queue catalog_v4_eea, with each
+# run's energy and the layout's identities): those pools take eea_short's layout
+EEA_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_run_yields_eea.json")
 
 
 EE_CARDS = "recipes/catalog_v4_ee"
@@ -157,12 +160,43 @@ def carried_complete(c, old, energies):
     return dict(gridpack=c.get("gridpack", False), grid_events=c.get("grid_events"), shares=sh)
 
 
+# run size of an anchor pool moved to gridpack runs (eea_short): the old e+e- pools' (complete_runs.json moved
+# ee4_epem_bbbxbx, bbxgz, bbxwpwm and ccxgz, short at high energy, to gridpack runs of 200)
+EEA_SHORT_RUN = 200
+
+
+def eea_short(lhe, y, name):
+    """An anchor pool (lhe, in place) whose runs y (EEA_YIELDS: asked, got and energy per run, in run order, the
+    measurement this layout is sized from) stopped short at some energies, laid out by complete_layout as the old
+    e+e- pools short at high energy were (complete_runs.json): only complete runs assembled (a short run's sample is
+    biased, analysis/catalog_v4/short_run_bias.py), drawn from one gridpack per energy. A pool whose runs integrated on
+    their own (no gridpack) moves to gridpack runs of EEA_SHORT_RUN (the ee4_ precedent; its parts are not reused). A
+    gridpack pool keeps its run size, gridpack precision and gridpacks (pinned: lhe.grid_seed_runs, lhe.gridpack_eid
+    as y records them) and takes complete_layout's runs per energy from each energy's measured complete share
+    (complete runs over runs, sized with RUN_SAFETY; a share under 1/MAX_ASK_FACTOR is refused there: a larger
+    gridpack, never more runs); its runs made are kept where their index keeps its energy (tools/lhe_parts.py
+    _adopt_ee)."""
+    Es = [float(E) for E in lhe["energies"]]
+    if sorted(set(y["energy"])) != sorted(Es):
+        raise SystemExit(f"{name}: its yields' energies {sorted(set(y['energy']))} are not its energies {Es}")
+    if not lhe.get("gridpack"):
+        return complete_layout(lhe, EEA_SHORT_RUN, gridpack=True, name=name)
+    shares = {}
+    for E in Es:
+        rs = [(q, g) for q, g, e in zip(y["asked"], y["got"], y["energy"]) if float(e) == E and g is not None]
+        shares[f"{E:g}"] = sum(1 for q, g in rs if g >= q) / len(rs) if rs else COMPLETE_SHARE * RUN_SAFETY
+    pin = {"grid_seed_runs": y["grid_seed_runs"], "gridpack_eid": y["gridpack_eid"]}
+    return complete_layout(lhe, int(lhe["run_events"]), gridpack=True, shares=shares,
+                           grid_events=int(lhe["gridpack"]), name=name, pin=pin)
+
+
 def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, complete):
     """The anchor pools (step 74): {eea_<x>: entry} and {dsh_eea_<x>: entry}, entered in P. ee, dsh: the ee4_ and dsh_
     entries of this run (the old pools whose counterparts these are)."""
     a_lhe = {**ee_lhe, "source": "catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e- acceptance, "
                                  "each collider energy's beam spectrum (lhe.beam_spectrum, EE_ANCHOR)"}
     eea, dsha = {}, {}
+    eea_y = json.load(open(EEA_YIELDS)) if os.path.exists(EEA_YIELDS) else {}
     for n in trees:
         if not is_ee(n):
             continue
@@ -175,6 +209,9 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         if old in complete:
             l4 = complete_layout({**a_lhe, **l4}, complete[old]["run_events"], name=name,
                                  **carried_complete(complete[old], old, Es))
+            l4 = {k: v for k, v in l4.items() if k not in a_lhe or a_lhe[k] != v}
+        if name in eea_y:
+            l4 = eea_short({**a_lhe, **l4}, eea_y[name], name)
             l4 = {k: v for k, v in l4.items() if k not in a_lhe or a_lhe[k] != v}
         e = {**lhe_entry(mg, n, P[n], mg.V4_MODEL, l4), "parent": n, "split": T[n]["role"],
              "test_group": f"e+e- v4 anchor: {T[n].get('axis') or 'train'}", "standalone_of": old}
