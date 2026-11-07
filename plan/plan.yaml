@@ -11829,6 +11829,21 @@ entries:
       is wrong for it: read the rounds where it did. bgtxwp below r3''s: r5 took r2''s rule where r3''s helped (read bins_empty_small
       on its short chunks). Any other class newly short: rounds and where-read for that bin. Outside > 0 -> outside_dex. Summed
       cost > 2x -> per-channel seconds. Job failures -> log read, fixed, rerun.'
+    passed_at: '2026-11-07T09:07:31+00:00'
+    reviewer: 'PASS. One change: r5 = dict(R3, flat_empty_near_min=True) (tools/regen_recipes.py @d9fb42a2), the only branch
+      in flat_quota_weights; r3 and the old sampling in the same job, r3 deterministic per seed (bbxuu r3 rounds identical
+      in the r2+r3 and r3+r4 jobs). Measure moves with the steering rule (r2/r3/r4_check.json): bbxuu [5.127,5.373] 1.0/1.0
+      -> 0.897/0.795 -> 0.696/0.724; bgtxwp [-1.206,-0.96] 0.734/0.79 -> 0.925/0.917 -> 0.835/0.809; only fill fails in r2-r4
+      (outside, cost, missing empty). Corrected round-2 missing on bbxuu''s 36 chunks (round 1 identical across policies):
+      r2 41-126 median 81 (seed 42), 58-102 median 84.5 (43); r3 92-133 median 107.5 / 95-127 median 107.5; r4 102-146 median
+      123 / 107-146 median 126; r3 > r2 in 36/36 chunks at both seeds. Not shown on data and to be read first in r5_acted:
+      whether bgtxwp''s per-chunk nearest occupied bin holds more than its per-chunk deficit (~26) in the early rounds (the
+      ~900 quoted is a class total over 36 chunks); the r3 policy''s bins_empty_small in the same job gives that counterfactual,
+      and the NO branch covers it. Seeds 42/43 as r1-r4 and all 19 classes; the bar is absolute per class and seed. Outcome
+      states yes and each no. CPU only, 0 GPU-h, ~0.5 MB per job. Searched docs/results.tex (near_min, empty bin, nearest
+      occupied, nearest candidate, flat_empty, smixv, bbxuu, bgtxwp, flat sampler, steering: only the unrelated sigma-steering
+      layer), plan show catalog_coverage (steps 75-81, dead ends) and site decisions FA (sampler, empty, nearest, quota, straddl,
+      hard region: D17, D117, D178, D318, none on this rule): no prior rule of this kind.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
