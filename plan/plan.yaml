@@ -13886,6 +13886,14 @@ entries:
       h; site pick: 1178 free htc slots; 48 workers x 16 cores x 02:00:00 (scripts/job_lhe_parts.sh, LHE_QUEUE=catalog_v4_dsh_eea)
       at 34a2d8f6, FA-ccin2p3-e4edfe83 .. a135a639; target eea_anchor_stage2 0.8 h; disk 60 GB free at submission (~5 GB needed);
       wait on step 74.'
+  - at: '2026-11-07T04:18:36+00:00'
+    text: '2026-11-07 ~05:25: the coordinator asked to carry steps 75 and 76 now. Step 75: profile where the regeneration''s
+      time goes on the classes over 2x, and why the 527 short classes fall short, grouped by final-state count and channel
+      type, with which channel fills which bin; then one design-reviewed revision, checked on a sample of the worst classes
+      before the whole catalog. Step 76: check the mixed-pair mass-cut hypothesis for accxh and aepemh at 160 GeV. Not started:
+      this owner closed at 258k context. For step 76, a cut-by-cut read of the eea_ parts at 160 GeV needs a small committed
+      tool (lhe_probe.accept_of + mg.fiducial_pass_mask with one cut relaxed at a time, plus mixed-pair masses). The 160 GeV
+      parts are on CC under queue catalog_v4_eea (do not gc it before this read).'
   handoff:
     state: '2026-11-07 ~05:20. Step 74: stage 1 (170 eea_ anchor test pools) BUILT (finding 2026-11-07: spectrum in all 1364
       pool-energies, bbxvevex vs probe |z|<=1.74, runs 35.6 core-h, allocation 116 core-h). Stage 2 RUNNING: queue catalog_v4_dsh_eea
