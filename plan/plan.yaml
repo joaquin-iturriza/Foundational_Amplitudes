@@ -12742,7 +12742,7 @@ entries:
       - 'bgtxwp short at the budget: channels per bin before a budget change'
   owner:
     agent: af618fc9fa0eb9c9d
-    state: working
+    state: closed
     since: '2026-11-07T09:28:49+00:00'
     state_at: '2026-11-07T09:28:49+00:00'
   findings:
@@ -15071,36 +15071,32 @@ entries:
       near bin (a bin still filling, ~900 candidates by the end) from bbxuu''s (a bin that stays short): read bgtxwp''s rounds
       under r5 (bins_empty_small per round, near-bin count and quota) against r3''s first.'
   handoff:
-    state: '2026-11-07 ~11:30. Step 79 (flat sampler r5 = r3 + flat_empty_near_min: r3''s nearest-candidate steering of an
-      empty quota bin only where its nearest occupied bin holds more candidates than the deficit, else r2''s rule; merged
-      c40ab06d, design PASS, repo-reviewer PASS at d9fb42a2): 38 CPU check jobs at CC c40ab06d running (MCHECK_POLICIES=current+grid_r3_budget18+grid_r5_budget18,
-      19 classes x seeds 42/43, target r5_check 0.2 h), step 79 waits on them. On end: multichannel_check.py step81r5-pull,
-      step81r5 -> data/r5_check.json, step81r5-acted -> data/r5_acted.json (read bgtxwp''s bins_empty_small first: design
-      reviewer''s caveat that its per-chunk nearest bin may be small in early rounds, then r5 takes r2''s rule there), figure
-      r2_check_fig.py r5; outcome branches on the passed design. Step 73 read and recorded (data/het_signhead73.json @9db5cf44,
-      figs/het_signhead73.png @27f55f15): detached sign block, one seed: sign not resolved (H5 9.3% vs shared 8.6%, MSE 5.6%;
-      HD5 14.85 vs 16.2, MSE 11.15), magnitude better on all 12 reads (PP4 R 0.865 [0.839, 0.879]). Step 80 (next sign-head
-      revision, D296 mine to explore) not designed yet: candidates (1) sign gradient into the trunk under its own clip group
-      (two backward passes, cost bar 2x), (2) detached branch from an earlier block, (3) per-event match on the detached block
-      (likely inert: branch clipped as its own group). Read base_experiment._clip_grad_norm (~1766), experiment.py sign loss
-      (~4110-4140), models/transformer_lloca_mup.py sign_block (~468-610), scripts/job_catalog_v3_short.sh arms v4_het_signhead_branch/matched
-      (~300-330) first. Straddling-bin scope question still waits on Joaquin (blocks the 1301-class regeneration). Steps 64/70
-      scaling grid GPU runs still running.'
-    decisions: 'r5 chosen over a budget raise: on both short classes the fill moved monotonically with how few candidates
-      carry an empty bin''s deficit (bbxuu r2 1.0 > r3 0.90/0.80 > r4 0.70/0.72; bgtxwp r3 0.925 > r4 0.835 > r2 0.73), and
-      bbxuu''s round-2 missing is higher under r3 than r2 in 36/36 chunks at both seeds (round 1 identical), so the regression
-      opens while bins are empty, not at the budget. Step 73 read under its passed one-seed design (D315: sign called beyond
-      2x, magnitude beyond 15%).'
-    ruled_out: 'flat_empty_by_channel; flat_empty_unique (r4); stacking as the cause of r3''s bbxuu regression; chunk carry-over
-      of quota; for the sign head: upweighting the sign loss on the shared trunk (step 61: sign gain not significant, magnitude
-      +13-59%)'
-    running: 38 r5 check jobs (plan step 79 wait; ids in the step's wait; two unregistered duplicates from ssh timeouts, slurm
-      62998652 and 62998654, same code and class-seed as registered jobs); steps 64/70 scaling-grid GPU runs
-    files: mg5_pipeline_final.py (flat_quota_weights near_min, rounds bins_empty_small, _smixv tag), tools/regen_recipes.py
-      (R5), analysis/catalog_v4/multichannel_check.py (grid_r5_budget18, step81r5*, step81r5_acted), analysis/catalog_v4/r2_check_fig.py
-      (mode r5), tests/test_flat_grid.py (test_r5_empty_near_min), analysis/catalog_v4/het_oneloop.py (step73_one, step73_fig),
-      analysis/catalog_v4/data/het_signhead73.json
-    written: '2026-11-07T09:25:40+00:00'
+    state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
+      bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
+      cost 1.594x; every short bgtxwp chunk was a stall stop, every budget stop filled. Step 82 r6 = r5 without the stall
+      stop (flat_stall_off, _smixw; design PASS, repo PASS at 3219d30d, merged aae3fd1b): 38 check jobs being submitted by
+      the detached batch r6_submit (ids land in the scratchpad r6_runs.txt and plan run); next 83 says what to do on its DONE
+      event (wait on the ids) and on end (step82r6-pull, step82r6, step82r6-stops, r2_check_fig.py r6). Step 80 sign head:
+      v4_het_signhead_branch4 FA-ccin2p3-22bc476d running (4 detached blocks confirmed in its log: sign_block.blocks.0-3),
+      next 81 waits on it; read het_oneloop.py step80_pull, step80_one (HD5 verdict vs four-seed bands, step80_bands). Straddling-bin
+      scope question still waits on Joaquin.'
+    decisions: 'Sign head: the deeper detached branch (k=4) over a trunk-shared own clip group, because clip 5 against a het
+      pre-clip norm ~66 makes an own clip group a ~13x sign upweighting, the mechanism step 61 showed costs magnitude, and
+      Adam normalises after the clip; step 73''s magnitude ''gain'' (PP4 0.865) is the seed-42 pairing (4-seed shared vs no
+      head 0.987, seed 42 1.13). Verdict on HD5, whose four-seed SD of ln median is 0.086 (band 1.275) against H5''s 0.252
+      (band 2.04): YES HD5 < 13.0% (below every het seed, inside the MSE range 11.15-13.95). Sampler: r6 drops the stall stop
+      since the shortfall sits wholly in stall-stopped chunks and running them to the budget costs about +13% labels (estimate,
+      r5 1.594x -> ~1.8x).'
+    ruled_out: 'sign gradient into the trunk under its own clip group (= upweighting); per-event match on the detached block
+      (inert); flat_empty_near_min alone for bgtxwp (r5: round-1 empty bins are all small in every chunk, so r5 takes r2''s
+      rule there)'
+    running: FA-ccin2p3-22bc476d (step 80, ~2.9 h from 10:50 CET); the r6 submission batch and its 38 CPU jobs (step 83);
+      steps 64/70 scaling grid GPU runs
+    files: models/transformer_lloca_mup.py (sign_branch_blocks, _BlockStack), models/lloca.py, config/model/lloca.yaml, scripts/job_catalog_v3_short.sh
+      (v4_het_signhead_branch4), analysis/catalog_v4/het_oneloop.py (STEP80, step80_bands, step80_one, step80_pull), tests/test_sign_branch.py,
+      mg5_pipeline_final.py (flat_stall_off), tools/regen_recipes.py (R6), analysis/catalog_v4/multichannel_check.py (grid_r6_budget18,
+      _chunk_sig, step82r6*), analysis/catalog_v4/r2_check_fig.py (r6), tests/test_flat_grid.py
+    written: '2026-11-07T09:55:54+00:00'
   ask: 'Scope: the fill bar on bins cut by the kinematic maximum (update with the r2 result). The check scores every 0.25-dex
     bin of log10|M|^2 at >= 0.95 of its quota and exempts bins wholly above the highest |M|^2 any sampler drew (the class''s
     reach). Two bins straddle the reach, so most of their width cannot be filled by any sampler: v4_bb_bb [8.34, 8.585] (reach
