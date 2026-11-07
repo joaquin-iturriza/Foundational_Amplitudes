@@ -3748,12 +3748,6 @@ entries:
       per pool, regenerate recipes (gen_catalog_v4_default.py), check kept near 1; after the step-77 relay workers end: lhe_parts
       plan recipes/catalog_v4_eea_lhe.yaml --queue $SCRATCH/lhe_queue/catalog_v4_dsh_eea --grid-cores 16 --probe analysis/catalog_v4/data/lhe_probe_yields_dsh_eea.json
       --rates analysis/catalog_v4/data/lhe_rates_dsh_eea.json, site pick, target, submit workers.'
-    77: '(p) step 74 stage 2 repair: 20 dsh_eea_ pools unassembled (finding 2026-11-07, data/lhe_run_yields_dsh_eea_stage2.json):
-      one run per energy at 1000/1500/3000 GeV stopped short (biased). Relay them in recipes/gen_catalog_v4_default.py as
-      complete gridpack runs at the short energies (eea_short/complete_layout with these measured complete shares, a stage-2
-      yields file like EEA_YIELDS), requeue the 4 stale claimed tasks (epepemem, aepemz), check the 93 assembled pools for
-      runs with got < asked, lhe_parts plan --skip-claimed, site pick, target, submit; ack the 18 assembly-failure events
-      (E4096..E4119) with what was done.'
     78: '(q) step 75 r2 (after r1''s NO): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18 on branch sampler-r2
       @c825cb19 (worktrees/wt-r2; tools/regen_recipes.R2, policy grid_r2_budget18; readers multichannel_check.py step75r2-rounds
       -> data/r1_rounds.json, step75r2 -> data/r2_check.json). Design recorded 2026-11-07, design-reviewer and repo-reviewer
@@ -12161,11 +12155,6 @@ entries:
       if:
       - 'kept >= 0.9 at every energy with the cut: plan and generate them'
       - 'still kept < 0.5: read the cut pieces again with cutread on the probe''s events'
-    77:
-      feeds: the e+e- anchor default-share pools for step 68
-      if:
-      - 'all 20 assemble with complete runs: step 74 done, step 68 can read them'
-      - 'a complete share under 1/MAX_ASK_FACTOR at an energy: larger gridpack per complete_layout, never more runs'
     78:
       feeds: whether all 1301 hadronic classes are regenerated with the revised sampler before step 68's e+e- classes join
       if:
