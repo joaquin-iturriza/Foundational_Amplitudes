@@ -14458,10 +14458,13 @@ entries:
       (W filled), ws_restart_steps.py; read against the control final_default and the fresh-optimizer step3198_continue under
       the design of 2026-11-06T22:29'
     9: 'Step 14 (D319, single seed D315): one study of new warm-start mechanisms toward the C1 change (share 0.25, het, k=533)
-      at seed 42, against the same-commit default restart and B: shrink-and-perturb of the parent (0.4 p + 0.1 fresh init),
-      share 0.50 for 267 steps, a WSD-scheduled parent branched at the end of its stable phase (step 3731, optimizer state)
-      with the cooldown on share 0.25 or 0.50, and the WSD parent''s final at the default restart; share 0.50 at 533 (C2 seed
-      42) read beside. Arms v4_het_control_wsd, v4_het_wsx_* (branch ws-fixes @e0f3bd49); reads mixture_ab.py warm_single'
+      at seed 42, against the same-commit default restart (FA-ccin2p3-238e6f81) and B: shrink-and-perturb (rerun FA-ccin2p3-0f346464
+      after b91cf7c6, run dir v4_het_wsx_shrinkperturb_tagfix1; 71852916 shrank again in its sigma stage, not read), share
+      0.50 for 267 steps (FA-ccin2p3-77e8bf2b), the WSD parent (dccb61e8) branched at step 3731 with its optimizer state,
+      cooldown on share 0.25 (FA-ccin2p3-85dd4eff) or 0.50 (FA-ccin2p3-a79d5b14), and the WSD parent''s final at the default
+      restart (FA-ccin2p3-554f3ec5); share 0.50 at 533 (9a357af2) beside. Branch arms started after the fix was synced: check
+      their sigma stage logs no OPT_STATE and no live-weights line. Reads: read7.sh per run, mixture_ab.py warm_single (S14)
+      -> data/warm_start_S14.json, figure plot_ws_fixes.py'
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -17614,7 +17617,7 @@ entries:
       - 'NOT BETTER or WORSE: the optimizer state removes the jump without helping; the jump is ruled out as the cause, recorded
         in par:v4_warm_start_valley'
     9:
-      feeds: 'which warm-start mechanism becomes the recipe (D307: the change tests resume once it is fixed)'
+      feeds: 'the warm-start recipe (D319): which mechanism closes the k=533 gap to the change from scratch'
       if:
-      - 'BETTER and MATCH-estimate: it becomes the restart recipe, to Joaquin with the D307 hold'
-      - 'none BETTER: the share lever (share 0.50 at 533, MATCH at two seeds already) is the remaining fix, to Joaquin'
+      - 'an arm BETTER with MATCH-estimate: the cheapest such arm is the recipe candidate, to Joaquin with the D307 hold'
+      - 'none BETTER: share 0.50 retraining at 533 (C1s50, MATCH at two seeds) goes to Joaquin as the recipe for data changes'
