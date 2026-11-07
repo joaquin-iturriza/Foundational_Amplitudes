@@ -77,7 +77,7 @@ SEEDS = (42, 43)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
-                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8")
+                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -170,9 +170,13 @@ def pp_sources(name, probe):
         # an e+e- class: its range was read from its default-share pool (pp_support.py pull ee), its EE4 test pool
         # (2000 MadEvent events at the fixed collider energies) is the held-out source
         return {"table": [f"{dsh}_{w}_train_lhe_amplitudes.npy"], "heldout": [f"{probe}_{w}_test_lhe_amplitudes.npy"]}
+    # heldout_r1: what step 75's revision is scored on (its range also reads the dsh_ train pool,
+    # tools/flat_range.ranges_dsh): the probe's val pool and the dsh_ val and test pools
     return {"table": [f"{probe}_{w}_{r}_lhe_amplitudes.npy" for r in ("train", "test")],
             "heldout": [f"{probe}_{w}_val_lhe_amplitudes.npy"] + [f"{dsh}_{w}_{r}_lhe_amplitudes.npy"
-                                                                  for r in ("train", "val", "test")]}
+                                                                  for r in ("train", "val", "test")],
+            "heldout_r1": [f"{probe}_{w}_val_lhe_amplitudes.npy"] + [f"{dsh}_{w}_{r}_lhe_amplitudes.npy"
+                                                                     for r in ("val", "test")]}
 
 
 def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
@@ -203,8 +207,14 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
         if policy in ("multichannel",) + QUOTA_POLICIES:
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
         if policy in QUOTA_POLICIES:
-            from tools.flat_range import ranges
-            s.update(flat_range=ranges()[name])
+            from tools.flat_range import ranges, ranges_dsh
+            s.update(flat_range=(ranges_dsh() if policy == "grid_r1_budget12" else ranges())[name])
+        if policy == "grid_r1_budget12":
+            # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
+            # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
+            # with the dsh_ train pool (tools/flat_range.ranges_dsh)
+            from tools.regen_recipes import R1
+            s.update(R1)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant

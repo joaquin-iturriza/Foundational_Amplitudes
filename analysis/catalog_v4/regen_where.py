@@ -10,8 +10,9 @@ of the short region sit.
         events above the lower edge of the class's lowest short bin inside the held-out extent (the PP4 val pool and
         the dsh_ pools; sqrt(s_hat), pT, Delta R, |eta|, pair masses against the events below it)
         -> data/regen_g12_where_pull.json
-    python3 analysis/catalog_v4/regen_where.py pull-rounds   the same, every pool's chunks: the flat part's rounds
-        (labels drawn, events missing after each) -> data/regen_g12_rounds.json
+    python3 analysis/catalog_v4/regen_where.py pull-dsh   the in-support log10|M|^2 min and max of every class's dsh_
+        train pool (sqrt(s_hat) in the window, the cuts passed in the partonic frame, multichannel_check._pp)
+        -> data/dsh_train_support.json (the SHORT revision's range source, tools/flat_range.py)
     python3 analysis/catalog_v4/regen_where.py read   -> data/regen_g12_where.json: per class kind (regen_profile.py:
         only short beyond the held-out extent, or short inside it) and final-state count, the channel types' share of
         the candidates in the short bins against their share in the filled bins of the top 1 dex below them, and the
@@ -26,30 +27,36 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 DATA = os.path.join(HERE, "data")
 PULL_OUT = os.path.join(DATA, "regen_g12_where_pull.json")
 READ_OUT = os.path.join(DATA, "regen_g12_where.json")
-ROUNDS_OUT = os.path.join(DATA, "regen_g12_rounds.json")
+DSH_OUT = os.path.join(DATA, "dsh_train_support.json")
 
-# per chunk of every regenerated pool, its flat part's rounds (labels drawn, events still missing after the round): how
-# much each round past the first two filled, the basis of a stop when rounds stop filling (step 75's cost revision)
-ROUNDS = r'''
+# the in-support log|M|^2 extent of each class's dsh_ train pool (45001 default-sampled MadEvent events, a training
+# input of the default share, never scored for coverage once the range reads it): step 75's SHORT revision widens the
+# range table with it (tools/flat_range.py), coverage then scored on the PP4 val and dsh_ val/test events only
+DSH = r'''
 import json, os, sys
-sys.path.insert(0, os.getcwd())
-import yaml
-import mg5_pipeline_final as mg, datagen
+sys.path.insert(0, os.getcwd()); sys.path.insert(0, os.path.join(os.getcwd(), "analysis", "catalog_v4"))
+import numpy as np, yaml
+import mg5_pipeline_final as mg
+import multichannel_check as mcc
 s = yaml.safe_load(open("recipes/catalog_v4_g12_regen.yaml"))
 mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"]), "physics": p.get("physics"),
                                "sampling": p.get("sampling")} for p in s["processes"]], default_sampling=s.get("sampling"))
 out = {}
 for p in s["processes"]:
-    for role in ("train", "val", "test"):
-        try:
-            r = mg.variable_energy_recipe(p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]), int(p["n_" + role]), role=role, seed=42)
-            f = mg.recipe_output_path(r, datagen.dest_for_role(role))
-            out[p["name"] + "/" + role] = [[[x["n"], x["missing"]] for x in c["rounds"]]
-                                           for c in json.load(open(f[:-4] + ".flatfill.json"))["chunks"] if c]
-        except Exception as e:
-            out[p["name"] + "/" + role] = "%s: %s" % (type(e).__name__, str(e)[:200])
-print("REGEN_ROUNDS " + json.dumps(out))
+    n = p["name"]; stem = "dsh_" + n[len("v4_"):] + "_13000-13000GeV_train_lhe_amplitudes.npy"
+    try:
+        v = mcc._pp([stem], mg.PROCESSES[n], float(p["sqrts"][0]), float(p["sqrts"][1]), n + " dsh train")
+        if v is None:
+            continue
+        m = v["lm"][v["sup"]]
+        out[n] = {"n": int(len(v["lm"])), "n_in_support": int(len(m)), "file": v["files"][0],
+                  "logm10_min_in_support": float(m.min()) if len(m) else None,
+                  "logm10_max_in_support": float(m.max()) if len(m) else None}
+    except Exception as e:
+        out[n] = {"error": "%s: %s" % (type(e).__name__, str(e)[:200])}
+print("DSH_RANGE " + json.dumps(out))
 '''
+
 
 PULL = r'''
 import json, os, sys
@@ -64,11 +71,15 @@ mg.register_recipe_processes([{"name": p["name"], "base": p.get("base", p["name"
 procs = [p for p in s["processes"] if p["name"] in WANT]
 probe = {r["class"]: r["probe"] for r in json.load(open("analysis/catalog_v4/data/pp_support_reads.json"))["rows"]}
 out = {}
+# every pool path first: multichannel_check.where re-registers the class's catalog entry (mix_compose.control_config),
+# after which the recipe resolves to the old _smix pool
+paths = {p["name"]: mg.recipe_output_path(mg.variable_energy_recipe(p["name"], float(p["sqrts"][0]), float(p["sqrts"][1]),
+                                                                    int(p["n_train"]), role="train", seed=42),
+                                          datagen.dest_for_role("train")) for p in procs}
 for p in procs:
     n = p["name"]; d = {}
     try:
-        r = mg.variable_energy_recipe(n, float(p["sqrts"][0]), float(p["sqrts"][1]), int(p["n_train"]), role="train", seed=42)
-        f = mg.recipe_output_path(r, datagen.dest_for_role("train"))
+        f = paths[n]
         ch = [c for c in json.load(open(f[:-4] + ".flatfill.json"))["chunks"] if c]
         d["channels"] = ch[0]["channels"]; d["edges_log10"] = ch[0]["edges_log10"]
         d["quota"] = np.sum([c["quota"] for c in ch], 0).tolist()
@@ -109,10 +120,10 @@ def pull():
     json.dump(res, open(PULL_OUT, "w"))
 
 
-def pull_rounds():
+def pull_dsh():
     sys.path.insert(0, ROOT)
     from analysis.common.readers import site_python
-    json.dump(site_python(ROUNDS, [], "REGEN_ROUNDS", timeout=3000), open(ROUNDS_OUT, "w"))
+    json.dump(site_python(DSH, [], "DSH_RANGE", timeout=3000), open(DSH_OUT, "w"), indent=0)
 
 
 def ctype(c):
@@ -138,7 +149,7 @@ def read():
         top = sb[sb >= len(q) // 2]
         lowest = top.min() if len(top) else sb.min()
         fb = [j for j in range(len(q)) if fill[j] >= 0.95 and e[j] >= e[lowest] - 1.0 and j < lowest]
-        types = [ctype(x) for x in d["channels"]]
+        types = [ctype(x) for x in d["channels"]] if d["channels"] else ["proposal"]
         for j in sb:
             g["short_bins"] += 1; g["short_zero"] += int(tot[j] == 0)
             for i, t in enumerate(types):
@@ -163,4 +174,4 @@ def read():
 
 
 if __name__ == "__main__":
-    {"pull": pull, "read": read, "pull-rounds": pull_rounds}[sys.argv[1]]()
+    {"pull": pull, "read": read, "pull-dsh": pull_dsh}[sys.argv[1]]()
