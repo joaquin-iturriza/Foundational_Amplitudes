@@ -8,8 +8,10 @@ cores, MadEvent hours summed over its runs and its runs), and the total in core-
 
     python3 tools/regen_time.py [--rates analysis/catalog_v4/data/lhe_rates.json analysis/catalog_v4/data/lhe_rates_dsh_ee4.json]
                                 [--prefix pp13_ pp13v4_ dsh_ ee4_]
+    python3 tools/regen_time.py anchor     the e+e- pools at the collider anchor (recipes/catalog_v4_eea_*.yaml, plan
+                                           catalog_coverage step 74), estimated from the old pools they replace
 """
-import argparse, json, os
+import argparse, json, os, sys
 
 import numpy as np
 
@@ -39,7 +41,78 @@ def output_stats(path):
             "max_s": round(float(x.max()), 1), "total_core_h": round(float(x.sum()) / 3600, 1)}
 
 
+SPECTRUM_TIME = (0.67, 1.25)   # time per kept event with the beam spectrum over without, the step-71 probe's range
+                               # (analysis/catalog_v4/data/ee_anchor_probe.json, dsh_epem_bbxvevex at the 10 energies)
+
+
+def _runs(lhe):
+    """MadEvent runs of an lhe entry (lhe_runs' count)."""
+    if lhe.get("energy_runs"):
+        return sum(int(x) for x in lhe["energy_runs"])
+    return int(lhe.get("n_runs", 1)) * len(lhe.get("energies") or [1])
+
+
+def anchor_estimate(rates, gp_times, new_specs, old_specs):
+    """Core-hours of the anchor pools (an estimate). Runs: each new pool's runs at its old pool's measured core-seconds
+    per run (sidecar madevent_s x cores over its runs; old pool: eea_<x> -> ee4_<x>, dsh_eea_<x> -> dsh_<x>), times
+    the spectrum's time factor (low and high of SPECTRUM_TIME). Per run, not per event: a run is a survey plus its
+    events, and the survey does not shrink with the events (an eea run asks 204 events where an ee4 run asked 340, so
+    the per-run rate errs high there). Gridpacks: the new pools' gridpacks (one per energy of an lhe.gridpack pool) at
+    the measured e+e- gridpack tasks' wall x cores (median and mean of gp_times), not in the sidecars' madevent_s."""
+    import yaml
+    old = {}
+    for f in old_specs:
+        d = yaml.safe_load(open(f)); h = d.get("lhe") or {}
+        old.update({k: {**h, **(v.get("lhe") or {})} for k, v in d["processes"].items()})
+    new = {}
+    for f in new_specs:
+        d = yaml.safe_load(open(f)); h = d.get("lhe") or {}
+        new.update({k: {**h, **(v.get("lhe") or {})} for k, v in d["processes"].items()})
+    g = json.load(open(gp_times))
+    gw = np.array(list(g["wall_s"].values()), float) * int(g["cores"])
+    per_pool, missing, n_grid, n_runs_new, n_runs_old = {}, [], 0, 0, 0
+    for k, l in new.items():
+        o = ("ee4_" + k[len("eea_"):]) if k.startswith("eea_") else ("dsh_" + k[len("dsh_eea_"):])
+        r = rates.get(o)
+        if not r or o not in old:
+            missing.append(k); continue
+        per_run = r["madevent_s"] * r["mg_cores"] / len(r["events_per_run"])
+        n = _runs(l)
+        n_runs_new += n; n_runs_old += len(r["events_per_run"])
+        per_pool[k] = {"old": o, "old_core_s": r["madevent_s"] * r["mg_cores"], "per_run_s": per_run, "runs": n,
+                       "core_s": per_run * n}
+        if l.get("gridpack"):
+            n_grid += len(l.get("energies") or [1])
+    x = np.array([v["core_s"] for v in per_pool.values()])
+    old_cs = sum(v["old_core_s"] for v in per_pool.values())
+    top = max(per_pool, key=lambda k: per_pool[k]["per_run_s"])
+    by = lambda p: [v for k, v in per_pool.items() if k.startswith(p)]
+    return {"counted": "MadEvent runs at the old pools' measured core-s per run x the spectrum factor, plus gridpacks "
+                       "at the measured e+e- gridpack tasks (an estimate; not: output and compile, assembly)",
+            "pools": len(per_pool), "missing_rates": missing, "runs_new": n_runs_new, "runs_old": n_runs_old,
+            "old_core_h": round(old_cs / 3600, 1),
+            "runs_core_h": [round(float(x.sum()) * f / 3600, 1) for f in SPECTRUM_TIME],
+            "runs_core_h_by_prefix": {p: [round(sum(v["core_s"] for v in by(p)) * f / 3600, 1) for f in SPECTRUM_TIME]
+                                      for p in ("eea_", "dsh_eea_")},
+            "gridpacks": n_grid, "gridpack_core_s_median_mean": [round(float(np.median(gw))), round(float(gw.mean()))],
+            "gridpack_core_h": [round(n_grid * float(np.median(gw)) / 3600, 1), round(n_grid * float(gw.mean()) / 3600, 1)],
+            "longest_run": {"pool": top, "old_per_run_s": round(per_pool[top]["per_run_s"]),
+                            "with_spectrum_s": [round(per_pool[top]["per_run_s"] * f) for f in SPECTRUM_TIME]},
+            "longest_gridpack_wall_s": int(max(g["wall_s"].values()))}
+
+
 def main():
+    if sys.argv[1:2] == ["anchor"]:
+        R = os.path.join(ROOT, "recipes")
+        rates = {}
+        for f in ("lhe_rates.json", "lhe_rates_dsh_ee4.json"):
+            rates.update(json.load(open(os.path.join(DATA, f))))
+        print(json.dumps(anchor_estimate(rates, os.path.join(DATA, "ee_gridpack_times.json"),
+                                         [os.path.join(R, f) for f in ("catalog_v4_eea_processes.yaml",
+                                                                       "catalog_v4_eea_default_processes.yaml")],
+                                         [os.path.join(R, f) for f in ("catalog_v4_ee_processes.yaml",
+                                                                       "catalog_v4_default_processes.yaml")])))
+        return
     ap = argparse.ArgumentParser()
     ap.add_argument("--rates", nargs="+", default=[os.path.join(DATA, "lhe_rates.json"),
                                                    os.path.join(DATA, "lhe_rates_dsh_ee4.json")])
