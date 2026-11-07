@@ -160,32 +160,34 @@ def carried_complete(c, old, energies):
     return dict(gridpack=c.get("gridpack", False), grid_events=c.get("grid_events"), shares=sh)
 
 
+# run size of an anchor pool moved to gridpack runs (eea_short): the old e+e- pools' (complete_runs.json moved
+# ee4_epem_bbbxbx, bbxgz, bbxwpwm and ccxgz, short at high energy, to gridpack runs of 200)
+EEA_SHORT_RUN = 200
+
+
 def eea_short(lhe, y, name):
-    """An anchor pool (lhe, in place) whose runs y (EEA_YIELDS: asked, got and energy per run, in run order) stopped
-    short at some energies: only complete runs assembled (lhe.complete_runs: a short run's sample is biased,
-    analysis/catalog_v4/short_run_bias.py), and each energy whose complete runs hold less than its equal share of the
-    blocks gets as many more runs of its size as the gap needs (lhe.energy_runs; the runs made are kept,
-    tools/lhe_parts.py _adopt_ee). A gridpack pool keeps the gridpacks its runs were drawn from (lhe.grid_seed_runs,
-    lhe.gridpack_eid as y records them), so its runs added come from the same integration. A layout already made so
-    is reproduced (no energy short: the runs per energy y counts)."""
+    """An anchor pool (lhe, in place) whose runs y (EEA_YIELDS: asked, got and energy per run, in run order, the
+    measurement this layout is sized from) stopped short at some energies, laid out by complete_layout as the old
+    e+e- pools short at high energy were (complete_runs.json): only complete runs assembled (a short run's sample is
+    biased, analysis/catalog_v4/short_run_bias.py), drawn from one gridpack per energy. A pool whose runs integrated on
+    their own (no gridpack) moves to gridpack runs of EEA_SHORT_RUN (the ee4_ precedent; its parts are not reused). A
+    gridpack pool keeps its run size, gridpack precision and gridpacks (pinned: lhe.grid_seed_runs, lhe.gridpack_eid
+    as y records them) and takes complete_layout's runs per energy from each energy's measured complete share
+    (complete runs over runs, sized with RUN_SAFETY; a share under 1/MAX_ASK_FACTOR is refused there: a larger
+    gridpack, never more runs); its runs made are kept where their index keeps its energy (tools/lhe_parts.py
+    _adopt_ee)."""
     Es = [float(E) for E in lhe["energies"]]
     if sorted(set(y["energy"])) != sorted(Es):
         raise SystemExit(f"{name}: its yields' energies {sorted(set(y['energy']))} are not its energies {Es}")
-    need = sum(int(lhe.get(k, 0)) for k in ("n_val", "n_test", "n_train"))
-    share = int(math.ceil(need / len(Es)))
-    runs = []
+    if not lhe.get("gridpack"):
+        return complete_layout(lhe, EEA_SHORT_RUN, gridpack=True, name=name)
+    shares = {}
     for E in Es:
-        rs = [(q, g) for q, g, e in zip(y["asked"], y["got"], y["energy"]) if float(e) == E]
-        done = sum(q for q, g in rs if g is not None and g >= q)
-        size = max(q for q, _ in rs)
-        runs.append(len(rs) + max(0, int(math.ceil((share - done) / size))))
-    lhe["complete_runs"] = True
-    if len(set(runs)) > 1 or runs[0] != int(lhe.get("n_runs", 1)):
-        lhe["energy_runs"] = runs
-    if y.get("gridpack_eid"):
-        lhe["grid_seed_runs"] = int(y["grid_seed_runs"])
-        lhe["gridpack_eid"] = str(y["gridpack_eid"])
-    return lhe
+        rs = [(q, g) for q, g, e in zip(y["asked"], y["got"], y["energy"]) if float(e) == E and g is not None]
+        shares[f"{E:g}"] = sum(1 for q, g in rs if g >= q) / len(rs) if rs else COMPLETE_SHARE * RUN_SAFETY
+    pin = {"grid_seed_runs": y["grid_seed_runs"], "gridpack_eid": y["gridpack_eid"]}
+    return complete_layout(lhe, int(lhe["run_events"]), gridpack=True, shares=shares,
+                           grid_events=int(lhe["gridpack"]), name=name, pin=pin)
 
 
 def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, complete):

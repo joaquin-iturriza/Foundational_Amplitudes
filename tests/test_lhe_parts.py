@@ -844,11 +844,11 @@ def test_layout_dead_claims_park_marker_accept_boundary():
 
 def test_ee_adopt_and_eea_short():
     """An e+e- pool whose runs stopped short at some energies (catalog_coverage step 74, the anchor queue): lhe_parts
-    yields records each run's energy and the layout's identities; gen_catalog_v4_default.eea_short adds runs where the
-    complete runs miss the equal share and keeps only complete runs; plan then links every run made that the new layout
-    still has (same iseed, events, energy) and queues only the others: runs added at the last energy keep every part,
-    runs added at an earlier one move the later energies' run indices (those are made again); a gridpack pool keeps
-    its gridpacks (pinned) and is not queued gridpack tasks again; the rule reproduces its layout once applied."""
+    yields records each run's energy and the layout's identities; gen_catalog_v4_default.eea_short lays it out by
+    complete_layout: a pool of runs integrated on their own moves to complete gridpack runs; a gridpack pool takes runs
+    per energy from its measured complete shares, keeps its gridpacks (pinned), and plan links every run made that the
+    new layout still has (same iseed, events, energy) and queues only the others (an index whose energy moved is made
+    again)."""
     sys.path.insert(0, os.path.join(ROOT, "recipes"))
     import gen_catalog_v4_default as gen
     saved = (datagen.dest_for_role,)
@@ -881,7 +881,8 @@ def test_ee_adopt_and_eea_short():
                 gen.eea_short(l, y, NAME)
                 mg.PROCESSES[NAME]["lhe"] = l
                 return l
-            # one run per energy (the probe-sized anchor pools), the 3 TeV run short: one run added there, all kept
+            # one run per energy integrated on its own (the probe-sized anchor pools), the 3 TeV run short: the pool
+            # moves to complete gridpack runs of 200 (the ee4_ precedent), its old parts not reused
             q, plan = setup("q1", n_runs=1, run_events=None)
             plan()
             old = mg.lhe_part_paths(NAME, _items())
@@ -894,54 +895,44 @@ def test_ee_adopt_and_eea_short():
             for f in os.listdir(os.path.join(q, "todo")):
                 os.remove(os.path.join(q, "todo", f))                 # the runs were made
             l = apply(y[NAME])
-            assert l["energy_runs"] == [1, 1, 2] and l["complete_runs"] is True
-            new = mg.lhe_part_paths(NAME, _items())
-            plan()
-            assert all(os.path.samefile(a, b) for (a, _), (b, _) in zip(old, new[:3]))
-            assert os.listdir(os.path.join(q, "todo")) == [next(f for f in os.listdir(os.path.join(q, "todo")))]
-            assert json.load(open(os.path.join(q, "todo", os.listdir(os.path.join(q, "todo"))[0])))["k"] == 3
-            # applied again on the new layout's yields (the added run complete): the same layout
-            make(new[3:], [340])
-            y2 = json.loads(_out(lambda: lhe_parts.cmd_yields(argparse.Namespace(queue=q, by_energy=False))))
-            assert apply(y2[NAME]) == l and mg.lhe_part_paths(NAME, _items()) == new
-            # runs added at 500 GeV: the 3 TeV run's index moves, so it is made again (another iseed)
-            q, plan = setup("q2", n_runs=1, run_events=None)
-            plan()
-            old = mg.lhe_part_paths(NAME, _items())
-            make(old, [340, 90, 340])
-            for f in os.listdir(os.path.join(q, "todo")):
-                os.remove(os.path.join(q, "todo", f))
-            y = json.loads(_out(lambda: lhe_parts.cmd_yields(argparse.Namespace(queue=q, by_energy=False))))
-            assert apply(y[NAME])["energy_runs"] == [1, 2, 1]
+            assert (l["run_events"], l["n_runs"], l["gridpack"], l["complete_runs"]) == (200, 3, 13057, True)
+            assert "energy_runs" not in l
             plan()
             new = mg.lhe_part_paths(NAME, _items())
-            linked = [k for k, (p, _) in enumerate(new) if os.path.exists(p)]
-            assert linked == [0, 1] and len(os.listdir(os.path.join(q, "todo"))) == 2
-            # a gridpack pool of 2 complete runs per energy, one 500 GeV run short: a third run there, the gridpacks
-            # pinned (same files, no gridpack task), the runs at 3 TeV after it linked where their index kept its energy
-            q, plan = setup("q3", n_runs=2, run_events=200, complete_runs=True)
+            assert len(new) == 9 and not any(os.path.exists(p) for p, _ in new)
+            todo = sorted(os.listdir(os.path.join(q, "todo")))
+            assert len(todo) == 12 and sum("__g" in f for f in todo) == 3
+            # a gridpack pool of 3 complete runs per energy, one 500 GeV run short (complete share 2/3): runs there
+            # from complete_layout's shares (ceil(334 / (min(0.8, 0.667 / 1.25) x 200)) = 4), the gridpacks pinned
+            # (same files, no gridpack task), the runs whose index keeps its energy linked, the others made
+            q, plan = setup("q3", n_runs=3, run_events=200, complete_runs=True)
             mg.PROCESSES[NAME]["lhe"]["gridpack"] = 13057
             plan()
             old = mg.lhe_part_paths(NAME, _items())
             grids = [p for p, _ in mg.lhe_gridpack_paths(NAME, _items())]
             for g in grids:
                 open(g, "w").close()
-            make(old, [200, 200, 200, 150, 200, 200])
+            make(old, [200, 200, 200, 200, 150, 200, 200, 200, 200])
             for f in os.listdir(os.path.join(q, "todo")):
                 os.remove(os.path.join(q, "todo", f))
             y = json.loads(_out(lambda: lhe_parts.cmd_yields(argparse.Namespace(queue=q, by_energy=False))))
-            assert y[NAME]["grid_seed_runs"] == 6 and y[NAME]["gridpack_eid"] == y[NAME]["eid"]
+            assert y[NAME]["grid_seed_runs"] == 9 and y[NAME]["gridpack_eid"] == y[NAME]["eid"]
             l = apply(y[NAME])
-            # 500 GeV: 200 complete of the share ceil(1000 / 3) = 334: one more run of 200
-            assert l["energy_runs"] == [2, 3, 2] and l["grid_seed_runs"] == 6
+            assert l["energy_runs"] == [3, 4, 3] and l["grid_seed_runs"] == 9 and l["gridpack"] == 13057
             assert [p for p, _ in mg.lhe_gridpack_paths(NAME, _items())] == grids
             new = mg.lhe_part_paths(NAME, _items())
-            assert len({r[0] for _, r in new} | {g[0] for _, g in mg.lhe_gridpack_paths(NAME, _items())}) == 10
+            assert len({r[0] for _, r in new} | {g[0] for _, g in mg.lhe_gridpack_paths(NAME, _items())}) == 13
             plan()
             linked = [k for k, (p, _) in enumerate(new) if os.path.exists(p)]
-            assert linked == [0, 1, 2, 3, 5], linked
+            assert linked == [0, 1, 2, 3, 4, 5, 7, 8], linked
             todo = sorted(os.listdir(os.path.join(q, "todo")))
             assert len(todo) == 2 and not any("__g" in f for f in todo)
+            # a share under 1/2 at an energy is refused (a larger gridpack, never more runs)
+            try:
+                apply({**y[NAME], "got": [200, 200, 200, 200, 150, 150, 200, 200, 200]})
+                raise AssertionError("a complete share of 1/3 was laid out with more runs")
+            except SystemExit as e:
+                assert "never more of them" in str(e), e
     finally:
         (datagen.dest_for_role,) = saved
         os.environ.pop("AMP_LHE_PARTS_DIR", None)
