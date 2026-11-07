@@ -11840,7 +11840,7 @@ entries:
     agent: a10eccf640da955ae
     state: working
     since: '2026-11-07T03:44:16+00:00'
-    state_at: '2026-11-07T03:44:16+00:00'
+    state_at: '2026-11-07T03:48:14.990000+00:00'
     context: 115521
     context_at: '2026-11-07T03:48:18+00:00'
   findings:
