@@ -15458,7 +15458,7 @@ entries:
   match: zz_redesign_*
   evidence:
     runs: []
-    commit: eb2831c7
+    commit: 41b23ec1
     paths:
     - .claude/hooks/owner_handoff.py
     - '2026-11-04 owner aaf01b2d42241ffe1: next 1 cleanup done (lock_guard.py, reviewer_resume.py, handback_guard.py deleted;
@@ -15477,6 +15477,8 @@ entries:
     - analysis/agent_redesign/usage_report.json
     - analysis/agent_redesign/usage_report_v2.json
     - analysis/agent_redesign/usage_windows.json
+    - analysis/agent_redesign/wake_batching.json
+    - analysis/agent_redesign/wake_batching_all.json
     - 'double wake (next 15, D279), 2026-11-04: main-session record since 2026-10-31T04:22Z: 32 agent task-notifications started
       a turn of their own (the rest were folded mid-turn); the harness called the model on 4 (10-31 15:15, 19:31, 22:27 delivered-by-hand-back;
       23:06 waiting on its own work), none since 10-31T23:06; the other 28 were held without a call. Hand-back to notification
@@ -15563,6 +15565,7 @@ entries:
     - tests/test_owner_handoff.py
     - tools/model_trial.py
     - tools/push_replay.py
+    - tools/wake_batching.py
     - 'usage attribution (design passed 2026-10-31 ~03:50; tools/main_turns.py, commit waits on the repo-reviewer backlog,
       draft in the scratchpad): redesign era main session $49.05: per API call orchestration 48.4%, text-only replies 30.4%,
       reads 12.4%, inline 8.8% ($4.31); per turn inline 31% ($15.14, 34 turns: edits of hooks, site, site_gate, settings,
@@ -15579,6 +15582,14 @@ entries:
       ($1464) / 126M ($304) / 20M ($49), subagents 146M ($386) / 272M ($732) / 65M ($179), A/B replay sessions 15M ($52) in
       step agents, counted as main in v2. site sync: a site already ahead of the pushed commit on the local trunk''s history
       no longer fails (ff_verdict in ~/.local/bin/site, backup site.bak_20261031_ffahead)'
+    - 'wake batching (D323, tools/wake_batching.py @41b23ec1, session 71602535, redesign era 2026-10-30T11:35Z..2026-11-07T12:00Z,
+      8.0 days; tokens = input+cache read+cache write+output; non-user wakes merged per stream within the window, tokens between
+      two bounds: work kept (only each extra member''s first call saved) and largest member only): main session 817 wakes
+      / 804.9M (user 184/255.0M, owner hand-back 396/398.1M, site event 126/141.3M, task notification 111/10.5M); 5 min 469
+      wakes, 734-630M; 10 min 380, 713-558M; 20 min 314, 695-496M; 30 min 285, 687-460M; 60 min 243, 674-405M; mean delay
+      3.5/6.3/11.2/15.4/27.8 min. Owners (70 agents resumed) 247 resumes / 618.2M (hand-back 169/459.0M, task notification
+      49/47.2M, site event 10, main message 9, user 10): 5 min 137, 597-528M; 10 min 110, 591-481M; 20 min 100, 590-459M;
+      30 min 94, 589-449M; 60 min 89, 588-433M. Whole session (45 days) in wake_batching_all.json. Figure analysis/agent_redesign/figs/wake_batching.png'
     - 'write-up 2026-11-04 (docs/results.tex sec:agent-redesign, a72fb682; tools d30cb3aa: push_replay --revert/--until, main_turns
       --until, compaction_replay --until + JSON line, model_trial report JSON line): cut 1 over the 40 agents 2026-11-02T05:14Z..2026-11-04T19:00Z:
       replay/recorded 0.999, 0 off by 5%; per call 10802 -> 8111 tokens, median agent 6024 -> 4372, 17.13M -> 12.85M token-calls.
