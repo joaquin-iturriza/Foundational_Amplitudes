@@ -15112,6 +15112,29 @@ entries:
       running, analyze it, and that''s it for now''): no new designs or submissions on catalog_coverage, warm_start, agent_redesign,
       v3_prep_explore. What already runs is read when it ends: the deeper sign-branch run FA-ccin2p3-22bc476d (step 81) and
       the scaling-grid runs (steps 64/70). Then stop. Regeneration step 82 also waits on the open scope question.'
+  - at: '2026-11-07T15:47:43+00:00'
+    text: '2026-11-07 step 81 read (het_oneloop.py step80_pull, step80_one @45f34cb1 -> data/het_signhead80.json; figure step80_fig
+      -> figs/het_signhead80.png/.pdf). Question (D296): does a deeper detached sign branch (a copy of the last 4 of the 8
+      blocks, fed block 4''s output detached; arm v4_het_signhead_branch4 seed 42, FA-ccin2p3-22bc476d @7fd9221c, COMPLETED)
+      predict one-loop signs as well as the MSE-trained model, against step 73''s one-block branch FA-ccin2p3-54961d3e (same
+      code otherwise, seed 42)? Verdict by the passed rule: FAULT, checked before the sign verdict: the magnitude ratio R
+      = MSE(4-block) / MSE(1-block) (median over classes of the class''s geometric-mean MSE ratio of log|M|^2, class bootstrap
+      95%) leaves 1/1.15..1.15 on HD5: 1.259 [1.011, 1.400] (28 probes); the others PP4 1.071 [1.052, 1.087] (1301), EE4 1.145
+      [1.083, 1.198], HD4 1.140, H5 1.061, H1 0.985, H2 0.988, H2p5 1.045, H3 1.084, H6 1.139, H7E 1.032, H7c 1.060: 10 of
+      12 above 1. Final validation val_loss_no_reg (HETEROSC NLL, magnitude only) 4-block -2.8388 vs 1-block -2.8696. The
+      rule assumed both trunks are the same (init is forked and copied, sign branch clipped as its own group, no sign gradient
+      into the trunk), yet their validation curves already differ at the first validation (step 85: 0.0688 vs 0.0944), so
+      the trunks diverge from the start: GPU nondeterminism amplified by training, or a coupling not yet found; not traced
+      (needs the training logs or a same-config repeat, which D322''s hold does not allow). For scale: the same arm at seed
+      42 rerun after the keyed-draw change moved magnitude by 1.13 (PP4), 1.22 (HD4), 1.17 (H1) (het_signhead61.json per_pair_R),
+      so 1.15 is narrower than a re-trained trunk''s spread. SIGN, beside the withheld verdict, median over pools of the wrong-sign
+      share: default-sampled one-loop HD5 (19 classes) 4-block 14.05%, 1-block 14.85% (14.05/14.85 = 0.946; 11 worse, 6 better,
+      p 0.33), shared trunk 16.2%, MSE control 11.15% (14.05/11.15 = 1.26); rule bands YES < 13.0%, NOT RESOLVED 13.0-18.9%,
+      NO > 18.9%: 14.05% falls in NOT RESOLVED. Catalog-sampled H5 (21 pools) 8.1% vs 1-block 9.3% (0.871, band 2.04), MSE
+      5.6%. All-positive guess HD5 30.3%, H5 12.15%. No blow-ups; validation sign accuracy 0.995 vs 0.99; pre-clip norms alike
+      (median 63.6 vs 66.9); step time 4-block/1-block = 1.1312/0.9822 s = 1.152. Next (held by D322 until lifted): trace
+      the FAULT (do two same-config runs of the 1-block arm diverge as much; if yes, the 1.15 check is replaced by the same-config
+      spread and the sign reading stands at NOT RESOLVED; if no, find the coupling).'
   handoff:
     state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
       bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
