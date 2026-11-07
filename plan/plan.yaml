@@ -15809,11 +15809,9 @@ entries:
   - D307
   - D313
   next:
-    9: 'Step 15 (D319, seed 42, D315): the matched from-scratch control under WSD (v4_het_default25_wsd) and the WSD final
-      at the default restart on share 0.50 (v4_het_wsx_wsdfinal_default50); design recorded 2026-11-07, design reviewer and
-      repo reviewer of branch ws-wsd-match @809e45c7 running; on both PASS: merge, site sync, site pick FA --jobs 2, target
-      ws_wsd_match 3.6 h, submit (limits 03:45 and 02:30, 16G), fill S15 in mixture_ab.py, plan wait. Read: read7.sh per run,
-      mixture_ab.py warm_wsd -> data/warm_start_S15.json, figure, write-up after par:v4_warm_start_fixes'
+    9: Write up step 15 in docs/results.tex after par:v4_warm_start_fixes (src mixture_ab.py warm_wsd @1d49c55c, plot_ws_fixes.py
+      --s15 @1d49c55c; figure figs/ws_wsd_match), notes-editor review; then the recipe (WSD-pretrained parent, default restart
+      of its final model on share 0.50 for 1/8 of a pretraining) goes to Joaquin with the request to lift D307
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -19105,9 +19103,7 @@ entries:
     written: '2026-11-07T02:24:00+00:00'
   step_why:
     9:
-      feeds: the warm-start recipe (D319) and whether it matches pretraining from scratch at 1/8 of the compute under the
-        same schedule
+      feeds: the warm-start recipe (D319) and the lift of D307
       if:
-      - 'a share-0.50 WSD arm MATCH over B_wsd: the recipe (restart if within 5% of the branch, else branch) goes to Joaquin
-        with the request to lift D307'
-      - 'neither MATCH: the numbers go to Joaquin; the WSD gain reported as a pretraining-schedule finding'
+      - 'write-up committed and Joaquin lifts D307: change tests resume with the WSD recipe'
+      - 'Joaquin keeps the hold: close the entry with the write-up'
