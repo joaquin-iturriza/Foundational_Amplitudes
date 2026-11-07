@@ -14325,6 +14325,13 @@ entries:
       aepemh 1.0/1.0/1.0/1.0/0.998 at 160/240/365/380/500 (was 0.493). aepemh''s 209/1000/1500/3000 GeV logs were lost: jobs
       at the same energy share the checkout and one''s rm -f eeisr_<E>_*.log took the other''s; fixed e2f51bd9 (per-job log
       names), the 4 rerun as FA-ccin2p3-e22b4949 08ae487a 81113f0a 9cc1284c (wait on step 76).'
+  - at: '2026-11-07T06:30:05+00:00'
+    text: '2026-11-07 step 78: r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18 (sampler-r2 @c825cb19, repo-reviewer
+      PASS, merged 56b3c909; design PASS; cost bar on the sum over the 38 jobs, per class listed). 38 CPU jobs (scripts/job_multichannel_check.sh
+      MCHECK_POLICIES=current+grid_r1_budget12+grid_r2_budget18, 19 classes x seeds 42/43, --time 01:00:00, target r2_check
+      0.35 h) at CC 79f7d559/e00ab955; the two bbx_htaptam jobs broke on an emptied param card (two jobs re-patching one standalone''s
+      card at once; fixed f7dbc021, card restored) and reran at f7dbc021 as 0f133452/ac96f65a. Read: multichannel_check.py
+      step75r2-pull then step75r2 -> data/r2_check.json.'
   handoff:
     state: '2026-11-07 ~08:00. Step 77: the 20 stage-2 dsh_eea_ pools not assembled (18 one-run pools short at 1000/1500/3000
       GeV, epepemem and aepemz short too after rerun) relaid whole as complete gridpack runs of 200 (dsha_short in recipes/gen_catalog_v4_default.py,
