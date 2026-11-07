@@ -1302,6 +1302,31 @@ def step79_channel_presence(c="v4_uux_bgtxwp", lo=-1.452, top_channel="res [0, 1
                                             round(v["share_r4_rule_median"], 3)] for k, v in out.items()}))
 
 
+def step79r4_acted(pols=("grid_r3_budget18", "grid_r4_budget18")):
+    """data/r4_acted.json (plan step 79's r4): per class and seed of the r4 jobs (R4_TAG), per policy the chunks with a
+    round holding >= 2 empty bins (rounds' bins_empty: where flat_empty_unique can act), and the chunks whose kept per
+    bin differ between r3 and r4 (r4 is r3 bitwise in a chunk where it never acted)"""
+    out = {}
+    for c in R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R4_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                continue
+            runs = json.load(open(f))["runs"]
+            qcs = {p: runs[f"{p}_{seed}"]["quota_chunks"] for p in pols}
+            rec = {p: {"chunks_with_2plus_empty": int(sum(any((r.get("bins_empty") or 0) >= 2 for r in x["rounds"])
+                                                             for x in qc)),
+                       "rounds_with_2plus_empty": int(sum(sum((r.get("bins_empty") or 0) >= 2 for r in x["rounds"])
+                                                          for x in qc))} for p, qc in qcs.items()}
+            rec["chunks_differing"] = int(sum(a["kept_per_bin"] != b["kept_per_bin"] or len(a["rounds"]) != len(b["rounds"])
+                                              for a, b in zip(*qcs.values())))
+            rec["chunks"] = len(qcs[pols[0]])
+            out[f"{c}/{seed}"] = rec
+    json.dump(out, open(os.path.join(DATA, "r4_acted.json"), "w"), indent=1)
+    print("STEP79R4_ACTED", json.dumps({k: [v[pols[1]]["chunks_with_2plus_empty"], v["chunks_differing"]]
+                                        for k, v in out.items()}))
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.argv.append("--help")
@@ -1345,6 +1370,8 @@ if __name__ == "__main__":
                  design="plan catalog_coverage step 79 revision r4", reach_tags=(R1_TAG, R2_TAG, R3_TAG))
     elif sys.argv[1] == "step79-channel-presence":
         step79_channel_presence()
+    elif sys.argv[1] == "step79r4-acted":
+        step79r4_acted()
     elif sys.argv[1] == "step79-rounds":
         step79_rounds()
     elif sys.argv[1] == "step79-where":   # r3's short bins over the r2 and r3 jobs (plan step 79's NO branch)

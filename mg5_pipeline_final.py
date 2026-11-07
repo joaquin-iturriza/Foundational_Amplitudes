@@ -4383,7 +4383,12 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             logm = np.log(np.where(me_c > 0, me_c, np.nan))
         w, cnt, deficit = flat_quota_weights(logm, edges, quota, bool(pol.get("flat_empty_near")),
                                              bool(pol.get("flat_empty_unique")))
-        rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum())})
+        # bins_empty (plan step 79's r4 design review): short bins holding no finite candidate, in range or clipped to an
+        # edge bin, i.e. those flat_empty_near steers by its nearest candidates (r4 differs from r3 only with >= 2)
+        fb = np.clip(np.searchsorted(edges, logm[np.isfinite(logm)], side="right") - 1, 0, len(quota) - 1)
+        n_empty = int(((deficit > 0) & (np.bincount(fb, minlength=len(quota)) == 0)).sum())
+        rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum()),
+                       "bins_empty": n_empty})
         if deficit.sum() == 0 or len(cand) >= budget or not w.any():
             break
         # pol["flat_stall"] (plan step 75's cost revision): stop once a round past the first fills fewer events than
