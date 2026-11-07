@@ -19093,6 +19093,12 @@ entries:
       the from-scratch run. Recipe for Joaquin: pretrain with WSD (cooldown 1/8), warm start = default restart of its final
       model on share 0.50 for 1/8 of a pretraining; request to lift D307. Single seed 42 (favourable seed of the cosine default
       restart). Write-up in results.tex not done (next owner).'
+  - at: '2026-11-07T06:16:45+00:00'
+    text: '2026-11-07: step 15 written up (uncommitted, notes-editor review running): docs/results.tex par:v4_warm_start_wsd_match
+      after fig:ws_fixes, figure fig:ws_wsd_match = figs/ws_wsd_match_{a..e} (plot_ws_fixes.py --s15 @265f3bbf: five independent
+      panels instead of a 3x2 grid with a hole; keys B_cosine/B_wsd/<arm>.val_best for claims), src mixture_ab.py warm_wsd
+      @1d49c55c (reruns identical), verify_claims --worktree 0 problems. Outcome stated as the design''s YES branch; restart-over-branch
+      stated as a deviation from the literal 5% rule decided after the read.'
   step_waits: {}
   handoff:
     state: 'Step 15 read (finding 2026-11-07): under a matched WSD schedule the warm start MATCHES the change from scratch
