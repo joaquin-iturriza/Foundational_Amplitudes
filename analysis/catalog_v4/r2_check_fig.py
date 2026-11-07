@@ -73,17 +73,17 @@ def main():
     axb.plot(lim, lim, color=ps.C.blue, ls="-")
     axb.axhline(2.0, color=ps.C.vermillion, ls="--"); axb.axvline(2.0, color=ps.C.vermillion, ls="--")
     axb.set_xlim(lim)
-    axb.set_xlabel(r"$t_{\rm r1} / t_{\rm old}$")
-    axb.set_ylabel(r"$t_{\rm r2} / t_{\rm old}$")
+    axb.set_xlabel("time, first revision / old sampling")
+    axb.set_ylabel("time, second revision / old sampling")
     from matplotlib.lines import Line2D
     h = [Line2D([], [], color=c, marker="o", ls="") for _, c in SHORT.values()]
     h += [Line2D([], [], color=ps.C.grey, marker="o", ls=""),
           Line2D([], [], color="k", ls="--", marker="o", mfc="none"), Line2D([], [], color="k", ls="-", marker="o"),
           Line2D([], [], color=ps.C.grey, ls=":"), Line2D([], [], color=ps.C.grey, ls="-."),
           Line2D([], [], color=ps.C.vermillion, ls="--"), Line2D([], [], color=ps.C.blue)]
-    labs = [l for l, _ in SHORT.values()] + ["other classes", "r1", "r2", "fill 0.95", "reach", "cost 2x",
-                                             r"$t_{\rm r2}=t_{\rm r1}$"]
-    ps.legend(axb, "upper left", handles=h, labels=labs, ncol=2)
+    labs = [l for l, _ in SHORT.values()] + ["other classes", "first revision", "second revision", "fill 0.95", "reach",
+                                             "cost 2x", "equal cost"]
+    ps.legend(axa, "lower left", handles=h, labels=labs, ncol=2)
     base = os.path.join(HERE, "figs", "r2_check")
     os.makedirs(os.path.dirname(base), exist_ok=True)
     ps.save(fig, base)
