@@ -14004,6 +14004,14 @@ entries:
       uux_ahvevex, uux_bgtxwp) are not reached by the dsh range widening. (3) state wall target and disk (~0.5 MB JSON per
       job). Revise once, re-record the design, continue the same reviewer (a613d792f7b36ed10). Repo-reviewer (aa4bae7d4383c3f5a)
       verdict still pending.'
+  - at: '2026-11-07T04:49:29+00:00'
+    text: '2026-11-07 ~06:05 repo-reviewer PASS (nits only) on branch regen-rev at 7d00f36c (backlog advanced there). Nits
+      to fold in with the design-review revision before merge: (1) MC_SOLVE_TOL unused, R1 writes the literal; (2) the _smixr
+      tag should depend on any r1 key (flat_stall, mc_mperi_all, mc_resladder, mc_solve_tol), not flat_stall alone; (3) assert
+      bad_out given when multiperipheral_draw gets 2-D masses; (4) resladder_draw: a resonance taking every final gives a
+      one-rung ladder and NaN, send such events to resonance_draw (unreachable in the 1301 r1 recipes); (5) its docstring''s
+      ''same edges'' is wrong (no recoil floor term); (6) build_mixture_dataset and _flat_mcmc_part do not pass mc_solve_tol;
+      (7) a gap from before this branch: under flat_grid, an all-fallback channel draw records extra grid columns.'
   handoff:
     state: '2026-11-07 ~05:55. Step 75: profile and where reads done (finding 2026-11-07). Revision r1 implemented on branch
       regen-rev (worktree worktrees/wt-regen-rev @7d00f36c, not merged): mg5_pipeline_final policy keys flat_stall 0.2 (stop
