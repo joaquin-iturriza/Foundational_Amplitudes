@@ -11792,13 +11792,6 @@ entries:
       FA-ccin2p3-e91ab729 FA-ccin2p3-f23dcf7e FA-ccin2p3-401f5840 FA-ccin2p3-0767a006 FA-ccin2p3-5ed59529 FA-ccin2p3-00789dbf  FA-ccin2p3-0f133452
       FA-ccin2p3-ac96f65a
     '73': FA-ccin2p3-54961d3e
-    '79': 'FA-ccin2p3-04c53f81 FA-ccin2p3-dbfd95f6 FA-ccin2p3-03df7ede FA-ccin2p3-a1766d37 FA-ccin2p3-6bbcd1b6 FA-ccin2p3-2159c393
-      FA-ccin2p3-772745fe FA-ccin2p3-7062ea38 FA-ccin2p3-3ad1e340 FA-ccin2p3-de7c2dfd FA-ccin2p3-36fc1b3a FA-ccin2p3-b14f49c0
-      FA-ccin2p3-42b864bf FA-ccin2p3-dfb2b674 FA-ccin2p3-10d28902 FA-ccin2p3-4ff7194d FA-ccin2p3-087e23d6 FA-ccin2p3-26e81a42
-      FA-ccin2p3-97a07b3d FA-ccin2p3-53fac41e FA-ccin2p3-65ca8f23 FA-ccin2p3-7b994769 FA-ccin2p3-052c2e1f FA-ccin2p3-26ee0542
-      FA-ccin2p3-7068cc3a FA-ccin2p3-469160fa FA-ccin2p3-9e1942f5 FA-ccin2p3-333e7ef2 FA-ccin2p3-6aff1e88 FA-ccin2p3-128e42b4
-      FA-ccin2p3-e6e79b22 FA-ccin2p3-d015ce30 FA-ccin2p3-a33e3c0c FA-ccin2p3-aa7af73b FA-ccin2p3-a7bc2fef FA-ccin2p3-1f6e9ee3
-      FA-ccin2p3-87e3644f FA-ccin2p3-7d450d32 '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
