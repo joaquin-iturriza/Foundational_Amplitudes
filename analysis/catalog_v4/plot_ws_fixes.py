@@ -12,7 +12,7 @@ its cooldown on share 0.25 or 0.50, the WSD parent's final model at the default 
 Usage: python3 analysis/catalog_v4/plot_ws_fixes.py [--cached]
     -> figs/ws_fixes.{png,pdf}, data/ws_fixes_steps.json (per-step grad norm, loss and lr from CC)
        python3 analysis/catalog_v4/plot_ws_fixes.py --s15
-    -> figs/ws_wsd_match.{png,pdf}: step 15 (mixture_ab.S15, data/warm_start_S15.json): (a) validation loss of the
+    -> figs/ws_wsd_match_{a..e}.{png,pdf}: step 15 (mixture_ab.S15, data/warm_start_S15.json): (a) validation loss of the
     from-scratch runs (B cosine, B under WSD) over their 4264 steps; (b) validation loss of the WSD warm starts over
     their 533 steps; (c) R(arm/B_wsd) on PP4 and EE4 with the widened intervals and the 1.35 bar; (d, e) per-class MSE
     CDFs on PP4 and EE4, every model after its sigma stage (D276)."""
@@ -33,8 +33,8 @@ ARMS = [("default restart (control)", "control", "v4_het_wsx_default_rerun", ps.
         ("shrink and perturb", "shrinkperturb", "v4_het_wsx_shrinkperturb_tagfix1", ps.C.vermillion, 533),
         ("share 0.50, 267 steps", "share50_k267", "v4_het_wsx_share50_k267", ps.C.sky, 267),
         ("share 0.50, 533 steps", "share50_k533", "v4_het_warm50_k533", ps.C.green, 533),
-        ("WSD branch, share 0.25", "wsdbranch25", "v4_het_wsx_wsdbranch25", ps.C.orange, 533),
-        ("WSD branch, share 0.50", "wsdbranch50", "v4_het_wsx_wsdbranch50", ps.C.purple, 533),
+        ("branch, 0.25", "wsdbranch25", "v4_het_wsx_wsdbranch25", ps.C.orange, 533),
+        ("branch, 0.50", "wsdbranch50", "v4_het_wsx_wsdbranch50", ps.C.purple, 533),
         ("WSD final, default restart", "wsdfinal_default", "v4_het_wsx_wsdfinal_default", ps.C.grey, 533)]
 RUN = {k: (S14["control"] if k == "control" else S14["arms"][k]) for _, k, _, _, _ in ARMS}
 DIRS = {RUN[k]: f"runs/catalog_v4_short/{d}" for _, k, d, _, _ in ARMS if RUN[k]}
@@ -114,38 +114,36 @@ def main():   # dup-ok: one run per arm (seed 42 only), per-arm main-stage lengt
     print(json.dumps(short))
 
 
-S15_ARMS = [("WSD final, restart, share 0.50", "wsdfinal_default50", ps.C.green),
-            ("WSD branch, share 0.50", "wsdbranch50", ps.C.purple),
-            ("WSD final, restart, share 0.25", "wsdfinal_default", ps.C.grey),
-            ("WSD branch, share 0.25", "wsdbranch25", ps.C.orange)]
+S15_ARMS = [("restart, 0.50", "wsdfinal_default50", ps.C.green),
+            ("branch, 0.50", "wsdbranch50", ps.C.purple),
+            ("restart, 0.25", "wsdfinal_default", ps.C.grey),
+            ("branch, 0.25", "wsdbranch25", ps.C.orange)]
 
 
 def main_s15():
     cls = class_of()
     s15 = json.load(open(os.path.join(HERE, "data", "warm_start_S15.json")))
-    fig, axs = ps.figure(ncols=2, nrows=3)
-    (aS, aW), (aR, aX), (aP, aE) = axs
-    aX.axis("off")
+    (fS, aS), (fW, aW), (fR, aR), (fP, aP), (fE, aE) = ps.panels(5)
     out = {}
-    for lab, run, col, ls in (("share 0.25 from scratch, cosine", S14["B"]["PP4"], "k", ":"),
-                              ("share 0.25 from scratch, WSD", S15["B_wsd"], ps.C.blue, "-")):
+    for key, lab, run, col, ls in (("B_cosine", "scratch, cosine", S14["B"]["PP4"], "k", ":"),
+                                   ("B_wsd", "scratch, WSD", S15["B_wsd"], ps.C.blue, "-")):
         st, v = curve(run)
         aS.plot(st, v, color=col, ls=ls, label=lab)
-        out[f"{lab} val_best"] = float(v.min())
+        out[key] = {"val_best": round(float(v.min()), 4)}
         for a, axis in ((aP, "PP4"), (aE, "EE4")):
-            m, _ = class_mse((S14["B"][axis] if "cosine" in lab else run,), axis, cls)
-            a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, ls=ls)
-            out[f"{lab} {axis} median class MSE"] = float(np.median(m))
+            m, _ = class_mse((S14["B"][axis] if key == "B_cosine" else run,), axis, cls)
+            a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, ls=ls, label=lab)
+            out[key][f"{axis}_median_class_mse"] = round(float(np.median(m)), 4)
     ticks = []
     for j, (lab, k, col) in enumerate(S15_ARMS, 1):
         run = S15["arms"][k]
         st, v = curve(run)
         aW.plot(st, v, color=col, label=lab)
-        out[f"{k} val_best"] = float(v.min())
+        out[k] = {"val_best": round(float(v.min()), 4)}
         for a, axis in ((aP, "PP4"), (aE, "EE4")):
             m, _ = class_mse((run,), axis, cls)
-            a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col)
-            out[f"{k} {axis} median class MSE"] = float(np.median(m))
+            a.step(m, np.arange(1, len(m) + 1) / len(m), where="post", color=col, label=lab)
+            out[k][f"{axis}_median_class_mse"] = round(float(np.median(m)), 4)
         row = s15["arms"][k]
         for dx, axis, mk in ((-0.12, "PP4", "o"), (0.12, "EE4", "s")):
             rv, (l, h) = row[axis]["R"], row[axis]["widened"]
@@ -160,8 +158,12 @@ def main_s15():
     for a, w in ((aP, "pp"), (aE, r"$e^+e^-$")):
         a.set_xscale("log"); a.set_xlabel(w + r" classes: MSE of $\log|M|^2$"); a.set_ylabel("fraction of classes")
         a.set_ylim(0, 1)
-    ps.legend(aS, "upper right"); ps.legend(aW, "upper right"); ps.legend(aR, "upper left")
-    ps.save(fig, os.path.join(HERE, "figs", "ws_wsd_match"))
+    for a in (aS, aW):
+        ps.legend(a, "upper right")
+    ps.legend(aR, "upper left")
+    for a in (aP, aE):   # the classes' curves leave the upper left empty; the legend must not move the axis
+        ps.legend(a, "upper left"); a.set_ylim(0, 1)
+    ps.save_panels([fS, fW, fR, fP, fE], os.path.join(HERE, "figs", "ws_wsd_match"))
     print(json.dumps(out))
 
 
