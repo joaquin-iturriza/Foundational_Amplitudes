@@ -3735,10 +3735,6 @@ entries:
     65: (a) design the regeneration of the 1301 hadronic tree classes with sampling.multichannel + mc_mperi_both + mc_res2
       and the flat quota at the budget Joaquin picks (750, or ~3000 to fill the margin), the cost from the measured replay
       times (step 67 finding); repo-reviewer over fa872486..686c3241 first
-    67: '(g) e+e- forward check (step 66''s SHORT branch): merge fwd-free (sampling.fwd_free_floor, repo-reviewer), sync CC,
-      submit 8 CPU jobs (4 e+e- classes x seeds 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2_budget750+quota_ladder_both_res2_fwdfree_budget750,
-      limits from multichannel_check.py need, target 2.0 h) under the design of 2026-11-06 ~22:20 once the design reviewer
-      passes; read with multichannel_check.py pull/summary/coverage, fig_quota_fill.py ee, sampling_cost.py ee (policy fwdfree)'
     68: '(f) e+e- classes in the regeneration (Joaquin 2026-11-06 ~19:50 ''If I asked for pp sampled data, why would you produce
       e+e- datasets that are different in any way?''; D294 on every beam): step 65''s regeneration design covers all 170 e+e-
       tree classes of the range table too, each flat in log|M|^2 over its own default-sampled range +-0.5 dex, with the sampling
@@ -11077,12 +11073,6 @@ entries:
       if:
       - 'Joaquin accepts the margin at 750: design at 750'
       - 'Joaquin pays to fill the margin: design at ~3000 (estimate: 4x the 750 time on uu_bbxuu-like classes)'
-    67:
-      feeds: 'step 65''s regeneration design: the e+e- classes'' sampling and CPU cost'
-      if:
-      - 'YES/NEAR: the flag into step 65''s e+e- design with its cost'
-      - 'PARTIAL: where read of the remaining short bins, next channel examined'
-      - 'NO: dead end, the forward mechanism is not the limit'
     68:
       feeds: 'D294: what the e+e- classes are regenerated with'
       if:
