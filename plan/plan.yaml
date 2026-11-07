@@ -13314,6 +13314,29 @@ entries:
       from ISR only here), so the anchor list stands as the 10 energies with the machine spectrum where MadGraph has one (240
       fcce240ll, 365 fcce365ll, 500 ilc500ll, 3000 clic3000ll) and ISR only elsewhere (91.1876, 160, 209, 380, 1000, 1500).
       Step 71 WORKS at all 10 energies.'
+  - at: '2026-11-07T01:58:36+00:00'
+    text: '2026-11-07 step 74 stage 1 submitted. Beam spectra wired into production generation: lhe.beam_spectrum ({energy:
+      pdlabel}) makes every e+e- run carry lpp1/lpp2 by the process string''s beam order and its energy''s pdlabel (mg5_pipeline_final.lhe_ee_patches/ee_beam_lpp;
+      the probe''s ee_beam_patches now calls the same code), in the pool identity only when set (old ee4_/dsh_ ids and recipe
+      files unchanged), one-loop label_virt refused under a spectrum, lhe_parts.part_energy_ok accepts radiated beams. New
+      pools: eea_<x> (170 test pools, 2000 events, counterparts of ee4_) and dsh_eea_<x> (115 default-share pools, counterparts
+      of dsh_), at EE_ANCHOR''s 10 energies past each class''s edge (ttbar nu nu out at 365, cgsxwm out at 3 TeV per D193),
+      layouts as the old pools'' (42 in complete runs of 200 from per-energy gridpacks, the 11 probe-sized ones with their
+      old measured complete shares at shared energies); specs recipes/catalog_v4_eea_{processes,default_processes,test,lhe}.yaml;
+      tests/test_ee_anchor.py (6) + 4 touched test files, 48 passed (tests/test_default_share.py::test_lhe_runs fails identically
+      on trunk before this change, not fixed here). Repo-reviewer PASS (watermark fccf37a8), merged 8796df20. Design: FIX
+      once (no probe, per-energy shares dropped, no disk figure), PASS on the two-stage revision: stage 1 = the eea_ queue,
+      its own probe (probe-sized runs, keeps every event; planned with --probe ''''), stage 2 = dsh_eea_ planned with --probe
+      from stage 1''s numbers. Estimate (tools/regen_time.py anchor @fccf37a8; old per-run cost x spectrum factor 0.67-1.25;
+      gridpacks at the old e+e- gridpack tasks 712/1700 core-s; eea_epem_cgsxwm not estimated, no old rate): stage 1 42-126
+      core-h, stage 2 92-237 core-h, against the old 104 core-h of runs plus 206 gridpacks. Disk <= ~7 GB of 67 GB free. Queue
+      catalog_v4_eea planned on CC (1554 runs + 148 gridpacks); 16 htc workers x 16 cores x 02:00:00 at 7bc8aa5a: FA-ccin2p3-3f52168a
+      d032fe14 9bf01318 6b1e4583 d331758a 1a6b665e e7ecefee dfdbe821 de9bdad6 7540de48 7128b980 5b25c1b2 fd1b2867 22ca9d14
+      01271cae e7c8f317; target eea_anchor_stage1 1.0 h; wait on step 74. First gridpack with a spectrum built (eea_epem_aawpwm
+      grid00, 6.2 MB in 30 s). Read on its end: lhe_parts status/yields/shares --queue catalog_v4_eea, lhe_probe parts on
+      the queue (yield, complete share, kept under dsh_eea_''s window and cuts: needs a mapping eea_ -> dsh_eea_ accept in
+      lhe_probe parts, to add), spectrum share below 0.99 per pool and energy (bbxvevex vs data/ee_anchor_probe.json), core-h
+      via lhe_rates --prefix eea_; then stage 2.'
   handoff:
     state: '2026-11-07 ~03:00. Step 61 read: NO (data/het_signhead61.json, figs/het_signhead61, het_oneloop.py step61 @66f94590);
       findings recorded. Step 71 done: WORKS at all 10 anchor energies, 365 GeV keeps fcce365ll (finding). Step 73 (het sign
