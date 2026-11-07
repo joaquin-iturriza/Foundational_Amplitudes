@@ -86,3 +86,28 @@ def test_channel_bin_record():
 
 if __name__ == "__main__":
     test_grid_map(); test_unchanged_without_grid(); test_grid_fills_toy(); print("ok")
+
+
+def test_stall_stop():
+    """sampling.flat_stall (plan step 75's cost revision): a range whose top no candidate reaches stops once a round
+    fills less than the stall share of what was missing, before the budget, recorded as stop 'stall'; without the key
+    the same chunk runs to the budget"""
+    def go(stall):
+        rng = np.random.default_rng(3)
+        uni = lambda k: np.exp(rng.uniform(np.log(50.0), np.log(3000.0), size=k))
+        pol = dict(_pol(12, True), flat_range=[np.log(1e-8), np.log(1e30)])      # top 21 dex above the toy's reach
+        if stall:
+            pol["flat_stall"] = stall
+        mg._flat_quota_part(500, 50.0, 3000.0, uni, True, M, PDG, rng, None, pol, toy_label, 0.0, None)
+        return dict(mg.FLAT_LAST)
+    a, b = go(None), go(0.2)
+    assert a["stop"] == "budget" and b["stop"] == "stall"
+    assert b["n_labels"] < a["n_labels"] and len(b["rounds"]) == 2
+
+
+def test_solve_tol():
+    """sampling.mc_solve_tol: the ladder's momenta within 1e-10 sqrt(s) of the full collapse"""
+    rng = np.random.default_rng(1); sq = np.exp(rng.uniform(np.log(40), np.log(6000), 2000))
+    P0 = mg.multiperipheral_draw(2000, sq, np.zeros(4), 1e-6, np.random.default_rng(5), edge=True)
+    P1 = mg.multiperipheral_draw(2000, sq, np.zeros(4), 1e-6, np.random.default_rng(5), edge=True, solve_tol=1e-12)
+    assert (np.abs(P1 - P0).max((1, 2)) / sq).max() < 1e-10

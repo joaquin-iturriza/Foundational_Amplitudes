@@ -3609,11 +3609,16 @@ MC_LADDER_PT_SPAN = 3.2
 # [MC_LADDER_SPAN_LO, MC_LADDER_PT_SPAN] (the narrowest 5%: every pT within 5% of the cut) and the outer end is
 # eta_max - d, d log-uniform in MC_LADDER_EDGE_D (density toward the edge) [both ranges open]
 MC_LADDER_SPAN_LO = 1.05
+# pol["mc_solve_tol"] (plan step 75's cost revision; absent: 0, every pool built before): the ladder's solves stop at
+# this relative bracket or residual (log mass, rapidity) instead of collapsing the bracket to adjacent floats, which
+# took ~20 more halvings (one every third step) and most of the ladder's time; the momenta's own rounding is ~3e-11
+# relative in the mass already (measured at the full collapse), so 1e-12 changes nothing a label can see
+MC_SOLVE_TOL = 1e-12
 MC_LADDER_EDGE_D = (1e-3, 1.0)
 
 
 def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=MC_ETA_MAX, pt_span=MC_LADDER_PT_SPAN,
-                         edge=False):
+                         edge=False, solve_tol=0.0):
     """(nb, N, 4) finals in the partonic frame (plan step 58: the forward multiperipheral events at the top of the QCD
     classes' log|M|^2 range, sqrt(s_hat) 20-60x the window's edge, |eta| to 4.9, pT at the cut). The first N - 1
     finals at pT log-uniform in [pt_lo, pt_span pt_lo], phi uniform; the last balances their pT (so its pT is not
@@ -3676,7 +3681,11 @@ def multiperipheral_draw(nb, sqrts, masses, y_lo, rng, pt_lo=MC_PT_LO, eta_max=M
             lo, glo = np.where(t, x, lo), np.where(t, gx, glo)
             hi, ghi = np.where(t, hi, x), np.where(t, ghi, gx)
             side = np.where(t, 1, -1).astype(np.int8)
+            # converged: adjacent floats, or (solve_tol > 0, pol["mc_solve_tol"]) the bracket within solve_tol
+            # (relative) or lo's residual within it; the result is lo, on f's True side, either way
             done = (hi <= np.nextafter(lo, np.inf)) | (x == lo) & ~t | (x == hi) & t
+            if solve_tol > 0:
+                done |= (hi - lo <= solve_tol * np.maximum(1.0, np.abs(lo))) | (np.abs(glo) <= solve_tol)
             if done.any():
                 out[r[done]] = lo[done]
                 keep = ~done
@@ -3751,7 +3760,7 @@ def mc_channels(m_finals, pdg_ids, resonances, isc=True, res_params=None, res2=F
     return ch
 
 
-def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
+def _mc_draw(ch, nb, sq, m_finals, y_lo, rng, solve_tol=0.0):
     """finals of one channel"""
     N = len(m_finals)
     if ch[0] == "rambo":
@@ -3766,7 +3775,7 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
         return resonance2_draw(nb, sq, m_finals, ch[1], ch[3], ch[4], ch[5], ch[7], ch[8], y_lo, rng,
                                fwd=ch[0] == "res2f")
     if ch[0] == "mperi":
-        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng, edge=ch[1:] == ("edge",))
+        return multiperipheral_draw(nb, sq, m_finals, y_lo, rng, edge=ch[1:] == ("edge",), solve_tol=solve_tol)
     return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
 
 
@@ -3845,7 +3854,7 @@ class _GridRng:
 
 
 def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, shares, y_lo, frac_fwd=0.0,
-                   beam_mass=None, grids=None):
+                   beam_mass=None, grids=None, solve_tol=0.0):
     """_candidates with the finals of each draw from a channel picked with probabilities `shares`; returns
     (events, sqrt(s), channel index per event); cuts by rejection with top-up as _collect_with_cuts"""
     m_finals = np.asarray(m_finals, float); pdg = np.asarray(pdg_ids, int)
@@ -3860,10 +3869,10 @@ def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, share
             e = c == i
             if e.any():
                 if grids is None:
-                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng)
+                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng, solve_tol)
                 else:    # pol["flat_grid"]: the channel's uniform numbers through its grid, recorded per event
                     gr = _GridRng(rng, grids[i], int(e.sum()))
-                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, gr)
+                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, gr, solve_tol)
                     Y = np.hstack(gr.cols) if gr.cols else np.zeros((int(e.sum()), 0))
                     for r, k in enumerate(np.nonzero(e)[0]):
                         ys[k] = Y[r]
@@ -4268,11 +4277,11 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         t0 = time.perf_counter()
         if mc and grids is not None:
             ev, sq, c, ys = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"],
-                                           fwd_cand, beam_mass, grids=grids)
+                                           fwd_cand, beam_mass, grids=grids, solve_tol=float(pol.get("mc_solve_tol", 0.0)))
             ys_c += ys
         elif mc:
             ev, sq, c = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"], fwd_cand,
-                                       beam_mass)
+                                       beam_mass, solve_tol=float(pol.get("mc_solve_tol", 0.0)))
         else:
             ev, sq = _candidates(n, draw_sq, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand,
                                  beam_mass)
@@ -4287,6 +4296,11 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         w, cnt, deficit = flat_quota_weights(logm, edges, quota)
         rounds.append({"n": int(n), "missing": int(deficit.sum()), "bins_short": int((deficit > 0).sum())})
         if deficit.sum() == 0 or len(cand) >= budget or not w.any():
+            break
+        # pol["flat_stall"] (plan step 75's cost revision): stop once a round past the first fills less than that share
+        # of what was missing before it (the bins left are ones the proposal does not reach: their labels bought nothing)
+        if (pol.get("flat_stall") and len(rounds) >= 2
+                and rounds[-2]["missing"] - rounds[-1]["missing"] < float(pol["flat_stall"]) * rounds[-2]["missing"]):
             break
         nb_s = _adaptive_bins(int((w > 0).sum()), int(pol["n_sqrts_bins"]))
         e_s, p_s = _sqrts_proposal_weighted(tr(sq_c), w, t_lo, t_hi, nb_s)
@@ -4310,12 +4324,14 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
     short = np.maximum(quota - take, 0)
     # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
     # (no finite log|M|^2 among them) with bins short and the budget not reached
-    stop = "quota" if short.sum() == 0 else ("budget" if len(cand) >= budget else "no_steer")
+    stop = "quota" if short.sum() == 0 else ("budget" if len(cand) >= budget else
+                                              "stall" if pol.get("flat_stall") and w.any() else "no_steer")
     budget_hit = stop == "budget"
     if stop != "quota":
         lo10 = edges[:-1][short > 0] / np.log(10.0)
         why = (f"at the budget ({len(cand):,} candidates, {pol['flat_budget']} per flat event)" if budget_hit else
-               f"with nothing to steer by ({len(cand):,} candidates, none with a finite log|M|^2), budget not reached")
+               f"stalled ({len(cand):,} candidates; the last round filled < {pol['flat_stall']} of the missing)"
+               if stop == "stall" else f"with nothing to steer by ({len(cand):,} candidates, none with a finite log|M|^2), budget not reached")
         print(f"  [WARN] flat quota: stopped {why} with {int((short > 0).sum())} bins short by {int(short.sum())} "
               f"events (log10|M|^2 bins from {lo10.min():.2f} to {lo10.max():.2f}); their events taken from bins with "
               f"candidates to spare")
