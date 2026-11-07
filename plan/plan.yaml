@@ -3754,6 +3754,12 @@ entries:
       jobs). Design recorded 2026-11-07, design-reviewer and repo-reviewer running. On both PASS: merge, site sync, site pick
       FA --jobs 38, plan target --batch r3_check --wall 0.2 --jobs 38, submit 38 CPU jobs (scripts/job_multichannel_check.sh,
       MCHECK_POLICIES=current+grid_r2_budget18+grid_r3_budget18, seeds 42/43, --time 00:45:00), plan wait on them; read.'
+    80: '(s) step 79 r4 (after r3''s NO: data/r3_check.json @014b20a0, bgtxwp [-1.206,-0.96] 0.925/0.917, uu_bbxuu regressed
+      0.90/0.80): r4 = r3 + flat_empty_unique on branch sampler-r4 @f5917ca1 (worktrees/wt-r4; tools/regen_recipes.R4, policy
+      grid_r4_budget18, readers step79r4-pull then step79r4 -> data/r4_check.json). Design recorded 2026-11-07 ~09:10, design-reviewer
+      and repo-reviewer running. On both PASS: merge, site sync, site pick FA --jobs 38, plan target --batch r4_check --wall
+      0.2 --jobs 38, submit 38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r3_budget18+grid_r4_budget18,
+      seeds 42/43, --time 00:45:00), plan wait on them; read; figure r2_check_fig.py (add an r4 mode).'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12349,6 +12355,13 @@ entries:
       if:
       - 'PASS: straddling bins per Joaquin''s answer, then the 1301-class regeneration with R3'
       - 'NO: the design''s NO branch (channel route res [0,1,3] for bgtxwp, or revise r3''s weight concentration)'
+    80:
+      feeds: whether the 1301 hadronic classes are regenerated with the flat sampler (and which revision)
+      if:
+      - 'PASS: straddling bins per Joaquin''s answer, then regenerate the 1301 classes with R4 (pools _smixu), then step 68'
+      - 'NO with bgtxwp still short in 2-3 chunks at 0-1 kept: report the in-chunk steering limit to Joaquin, next the pool-level
+        route'
+      - 'NO with bbxuu still short: r4 dropped, next r2 plus a budget raise'
   owner:
     agent: ae64b531b031096ce
     state: working
