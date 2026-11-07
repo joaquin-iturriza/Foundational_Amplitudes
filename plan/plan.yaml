@@ -12093,7 +12093,7 @@ entries:
       - 'NO again: the failing kinds go to Joaquin with what an exemption or tolerance would drop'
   owner:
     agent: a40cd4bedffed9ceb
-    state: working
+    state: closed
     since: '2026-11-07T05:14:25+00:00'
     state_at: '2026-11-07T05:51:08+00:00'
     context: 235408
@@ -14239,29 +14239,35 @@ entries:
       read in step 77; queue at the last of them: todo 0, done 10427, failed 17, assembled 91 of 113. No other error. Those
       pools are among the 20 relaid by step 77 (merged ef2dccd6, 47 workers running).'
   handoff:
-    state: '2026-11-07 ~07:00. Step 75: r1 check design FIX once (core-only fill bar; no no-dsh_ outside class), revised (all
-      in-range bins incl. margin, exempt only bins above the class''s reach; +v4_uux_bgtxwp, 19 classes), design PASS, repo
-      PASS; regen-rev merged 9fa6af37; 38 CPU jobs submitted at CC 0196253e (list in finding 2026-11-07 ''step 75 r1 check
-      submitted''), target r1_check 0.25 h, wait on step 75. On RUN_DONE: python3 analysis/catalog_v4/multichannel_check.py
-      step75r1-pull then step75r1 -> data/r1_check.json; verdict by the passed design (PASS -> regenerate 1301 with recipes/catalog_v4_r1_regen.yaml,
-      extend regen_read.py to the same bar). Step 76: cause confirmed (only the mixed-pair m>10 GeV cut removes events, 0.564/0.507
-      at 160 GeV; data/ee_cutread160.json via lhe_probe cutread @1bd372a2); fix merged 59f58a60 (lhe.mixed_pair_mmin -> MadEvent
-      dummy_cuts; DSHA_MIXED_MMIN in gen_catalog_v4_default.py; local MG 3.7.0 test min photon-lepton mass 10.02 GeV); next:
-      regenerate recipes, probe the two pools with the cut, update the probe file, plan with step 77. Step 77 (new): stage
-      2 left 20 dsh_eea_ pools unassembled (one run per energy at 1000/1500/3000 GeV stopped short; 2 pools have stale claimed
-      tasks); relay as complete gridpack runs; 15 run events acked pointing to step 77.'
-    decisions: 'Exemption of short bins only above the class''s measured reach (max candidate over all policies/seeds), any
-      wider exemption via plan ask (design reviewer). Mixed-pair cut opt-in per pool (identity key only when set) so no built
-      pool changes identity; physics unchanged since the mixture already rejects those events (repo reviewer). Stage-2 short
-      runs are biased samples: relay as complete runs, not top-ups.'
-    ruled_out: Scoring only core bins for the r1 check (moves the bar after step 65's result). Treating the 160 GeV loss as
-      partonic-vs-lab |cos| (cos_partonic_not_lab 0 for both pools).
-    running: 38 CPU jobs of the r1 check (step 75 wait); step 70 grid GPU runs as before; no stage-2 workers
-    files: analysis/catalog_v4/multichannel_check.py (step75r1, R1_CLASSES), tools/lhe_probe.py (cutread), mg5_pipeline_final.py
-      (lhe_mixed_pair_cut), recipes/gen_catalog_v4_default.py (DSHA_MIXED_MMIN, anchor_pools), analysis/catalog_v4/data/ee_cutread160.json,
-      lhe_run_yields_dsh_eea_stage2.json; worktrees wt-regen-rev, wt-ee-cutread, wt-ee-mixcut merged but not removed (remove_worktree.sh
-      refused by the permission classifier)
-    written: '2026-11-07T05:13:08+00:00'
+    state: '2026-11-07 ~08:00. Step 77: the 20 stage-2 dsh_eea_ pools not assembled (18 one-run pools short at 1000/1500/3000
+      GeV, epepemem and aepemz short too after rerun) relaid whole as complete gridpack runs of 200 (dsha_short in recipes/gen_catalog_v4_default.py,
+      sized from stage 2''s per-energy complete share; data/lhe_run_yields_dsh_eea.json), repo-reviewer PASS e79f5ccf, merged
+      ef2dccd6; queue catalog_v4_dsh_eea replanned (22 processes, 8267 runs + 193 gridpacks, est 47 core-h, accxh/aepemh excluded),
+      47 workers (16 cores, --time 01:00:00), target dsha_relay 0.5 h, wait on step 77. On end: lhe_parts status (113 assembled
+      less the 2 excluded), ack events. Step 76: recipes now carry mixed_pair_mmin for accxh/aepemh; 18 probe jobs (job_lhe_probe.sh
+      PROBE_SHARD=eeisr PROBE_VARIANTS=isr, 1000 events, both pools x 9 energies) target mmin_probe 0.3 h, wait on step 76.
+      On end: python tools/lhe_probe.py eeisr-read <the 9 runs of a pool> --out analysis/catalog_v4/data/ee_mmin_probe_<pool>.json
+      per pool (run ids in the step-76 wait), regenerate recipes (gen_catalog_v4_default.py refuses a probe without the cut),
+      check kept near 1, then (after the relay workers end) lhe_parts plan recipes/catalog_v4_eea_lhe.yaml --queue $SCRATCH/lhe_queue/catalog_v4_dsh_eea
+      --grid-cores 16 --probe analysis/catalog_v4/data/lhe_probe_yields_dsh_eea.json --rates analysis/catalog_v4/data/lhe_rates_dsh_eea.json,
+      site pick, target, submit workers. Step 75: r1 check read NO (data/r1_check.json: 0 core shorts, top-margin shorts on
+      7 classes, 1 outside on bbx_htaptam, cost median 1.66x, 6 classes 2.0-2.7x); r2 analysis in data/r1_where.json (finding
+      2026-11-07): next is the r2 design (step ''q''). Step 74 workers read and unwaited.'
+    decisions: 'Relay whole pools, not only the short energies: lhe.gridpack and the events identity are per pool (repo reviewer
+      agreed). epepemem/aepemz relaid too: their reruns stopped short like the 18. Run counts from stage 2''s per-energy complete
+      share over all its runs (biased low, conservative). Mixed-pair cut stays opt-in on accxh/aepemh only: every other pool
+      keeps >= 0.647 and is sized from its measured kept (cut read finding). Bottom-margin bins no candidate of any policy
+      reached are the mirror of the reach exemption: to be stated in the r2 design for the reviewer, not applied to r1''s
+      verdict.'
+    ruled_out: Requeueing epepemem/aepemz's lost tasks as one-run tasks (they stop short). Treating the 3000 GeV |cos| loss
+      as a defect (all partonic-only, kept >= 0.894, under the 2x rule).
+    running: 47 relay workers FA-ccin2p3-a475b276 .. 2e9f7ca3 (step 77 wait); 18 mmin probes FA-ccin2p3-8a05275f .. 329d13c9
+      (step 76 wait); step 70 grid GPU runs as before
+    files: recipes/gen_catalog_v4_default.py (dsha_short, DSHA_YIELDS, DSHA_MMIN_PROBE), tools/lhe_probe.py (cmd_run mixed-pair
+      cut, eeisr-read), scripts/job_lhe_probe.sh (PROBE_VARIANTS), analysis/catalog_v4/multichannel_check.py (step75r1, step75r2-where),
+      analysis/catalog_v4/data/{lhe_run_yields_dsh_eea,ee_cutread_anchor,r1_check,r1_where}.json; worktrees wt-dsha-relay,
+      wt-regen-rev, wt-ee-cutread, wt-ee-mixcut merged but not removed
+    written: '2026-11-07T05:52:09+00:00'
   ask: 'Scope: seeds for the sign-head arm. Four seeds (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached
     sign-head arm, given that one seed can only show a sign gap larger than about 2x?'
   waiting_since: '2026-11-07T05:13:54+00:00'
