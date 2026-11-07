@@ -18311,7 +18311,8 @@ entries:
       on share 0.50 (lowest at equal 533 steps; two gains multiply: WSD parent ~0.76/0.83, share 0.50 ~0.87/0.81). Caveat:
       B (share 0.25 from scratch) is cosine; the matched from-scratch under WSD is not read. Write-up par:v4_warm_start_optstate
       + par:v4_warm_start_fixes (notes-editor review before commit). E4025/E4026 acked.'
-  step_waits: {}
+  step_waits:
+    '9': FA-ccin2p3-388dcd45 FA-ccin2p3-1e6646e2
   handoff:
     state: 'Step 13 done (finding 2026-11-07, dead end recorded): the optimizer-state continuation removes the restart jump
       but reads as the fresh-optimizer continuation, WORSE than the default restart on EE4 (1.240 [1.034,1.505]), PP4 1.148;
