@@ -11401,6 +11401,18 @@ entries:
       outside events > 0 -> how far above the kept max and whether the range covers them (range vs sampler reach; for no-dsh_
       classes a widening rule that reads no scored events), a tolerance only via plan ask; cost > 2x -> labels vs proposal
       per channel. Job failures -> log read, fixed, rerun.'
+    passed_at: '2026-11-07T04:51:37+00:00'
+    reviewer: 'Re-check after FIX (design 2026-11-07T04:51, reader multichannel_check.py step75r1 @7abcb409 on regen-rev).
+      The fill bar is step 65''s again: every in-range bin, margin included, at >= 0.95 of quota. The only exemption is a
+      bin whose lower edge lies above cand_max, the highest candidate (log10, the same units as edges_log10, line 319) any
+      channel of any of the three policies drew for the class at either seed. Wider exemptions go through plan ask. v4_uux_bgtxwp
+      (2 held-out outside, no dsh_ pool) is added at both seeds, so 19 classes and 38 jobs. Wall-time target 0.25 h, limit
+      00:45, disk about 0.5 MB per job. Check 2: grid_fwd_check.json, v4_udx_csxvevex top bins 0.04-0.11 of quota under the
+      quota sampler at budget 12 against 1.0 under the grid sampler at budget 12. Check 3: seeds 42/43 on every class, every
+      class and seed must pass; the cost ratio spread is 2.17 against 1.43 (us_ddxsu). Held-out scoring on PP4 val + dsh_
+      val/test, none of which builds the range. Check 5 searched: results.tex for stall, resonance ladder, resladder, smixr,
+      dsh_ train, solve_tol, mperi_all, margin; the entry''s dead ends and findings (step 65 v2/v3, step 67 verdict, step
+      65 read); site decisions D269, D270, D294, D317, D318. No repeat found.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
