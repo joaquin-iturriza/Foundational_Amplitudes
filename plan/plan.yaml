@@ -3738,14 +3738,6 @@ entries:
       4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
       (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
       cache key and one GPU job''s key; record each cell''s GPU.'
-    81: '(l3) het sign head step 80 running: FA-ccin2p3-22bc476d (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch4
-      @7fd9221c: the sign branch = a copy of the last 4 of 8 blocks on block 4''s output detached, ++model.net.sign_branch_blocks=4;
-      design PASS 2026-11-07, repo-reviewer PASS at 24021256; --time 03:30:00, target 2.9 h, 2.9 GPU-h). On end: het_oneloop.py
-      step80_pull then step80_one -> data/het_signhead80.json; verdict on HD5 against the four-seed bands (step80_bands: HD5
-      SD ln 0.086, band 1.275; H5 0.252, 2.04): YES HD5 < 13.0% (and <= 13.95%), NOT RESOLVED 13.0-18.9%, NO > 18.9%; INCOMPLETE
-      / FAULT (magnitude R 4-block/1-block outside 1/1.15..1.15 on any of 12 reads) first; report YES against the 16 het seeds
-      and MSE range, not as 4 blocks beating 1 (a 1.14x move is inside the band); record step_time_ratio; figure of per-class
-      wrong-sign shares and magnitude MSE beside.'
     82: '(t4) r6 passed the step-82 design on every non-straddling bin (finding 2026-11-07 step 83: bgtxwp 0.973/0.974, outside
       0, summed cost 1.621x). Regenerate the 1301 hadronic classes with R6 (tools/regen_recipes.R6, pools _smixw), read by
       regen_read.py with the same bars, then step 68. Waits on Joaquin: the straddling-bin scope answer (under r6 it reduces
@@ -12739,12 +12731,6 @@ entries:
       if:
       - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
       - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
-    81:
-      feeds: which sign head the het loss carries (D287, D296)
-      if:
-      - 'YES: het control carries the 4-block branch, report to Joaquin'
-      - 'NOT RESOLVED: design the trunk-shared sign gradient under its own optimizer moments, cost measured first (bar 2x)'
-      - 'NO: read val sign accuracy and per-class shares first'
     82:
       feeds: whether the catalog's hadronic pools are regenerated with the r6 sampler
       if:
