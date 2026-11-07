@@ -28,8 +28,12 @@ ARMS = [("final model, default restart (control)", "final_default", "C1r_ctrl", 
         ("step-3198 model, default restart", "step3198_default", "C1r_step3198_default", ps.C.sky),
         ("step-3198 model, continue its lr", "step3198_continue", "C1r_step3198_continue", ps.C.green),
         ("step-2132 model, continue its lr", "step2132_continue", "C1r_step2132_continue", ps.C.orange),
-        ("final model, lr x3", "final_lr3x", "C1r_final_lr3x", ps.C.vermillion)]
-DIRS = {r: f"runs/catalog_v4_short/v4_het_ws_{a}{sfx}"
+        ("final model, lr x3", "final_lr3x", "C1r_final_lr3x", ps.C.vermillion),
+        ("step-3198 model and optimizer state, continue its lr", "step3198_continue_optstate",
+         "C1r_step3198_continue_optstate", ps.C.purple)]
+# step 13's runs are the reruns after the sigma-stage fix b91cf7c6, in run dirs <arm>_tagfix1
+TAG = {"step3198_continue_optstate": "_tagfix1"}
+DIRS = {r: f"runs/catalog_v4_short/v4_het_ws_{a}{sfx}{TAG.get(a, '')}"
         for _, a, c, _ in ARMS for r, sfx in zip(WARM[c]["W"][533], ("", "_seed2"))}
 SCRIPT = r'''
 import json, numpy as np
@@ -85,7 +89,7 @@ def main():
     aR.plot([], [], "ko", ls="none", label="pp")
     aR.plot([], [], "ks", ls="none", label=r"$e^+e^-$")
     aR.axhline(1, color=ps.C.grey, lw=0.8)
-    aR.set_xticks(range(1, len(ARMS))); aR.set_xticklabels(["3198\ndefault", "3198\ncont.", "2132\ncont.", "lr x3"])
+    aR.set_xticks(range(1, len(ARMS))); aR.set_xticklabels(["3198\ndefault", "3198\ncont.", "2132\ncont.", "lr\nx3", "3198 cont.\n+opt."])
     aR.set_ylabel("MSE(restart arm) / MSE(default restart)")
     aG.plot([], [], "k-", label="seed 42"); aG.plot([], [], "k--", label="seed 43")
     aG.set_yscale("log"); aG.set_xlabel("step of the restart"); aG.set_ylabel("gradient norm")
@@ -98,7 +102,7 @@ def main():
         a.set_ylim(0, 1)
     ps.shared_legend(fig, aG, ncol=2)
     ps.legend(aR, "upper left")
-    ps.save(fig, os.path.join(HERE, "figs", "ws_restart_study"))
+    ps.save(fig, os.path.join(HERE, "figs", "ws_restart_study_s13"))   # step 12 plus step 13
     print(json.dumps(out, indent=0))
     print(json.dumps(short))
 
