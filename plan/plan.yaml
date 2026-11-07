@@ -3779,6 +3779,7 @@ entries:
     - FA-ccin2p3-0dea3852
     - FA-ccin2p3-0e8c605e
     - FA-ccin2p3-0ef20da7
+    - FA-ccin2p3-0f133452
     - FA-ccin2p3-10fd5e1a
     - FA-ccin2p3-11f983f4
     - FA-ccin2p3-12ace4c5
@@ -4158,7 +4159,7 @@ entries:
     - FA-ccin2p3-ffc3cd1c
     - FA-lxplus-f44c7c06
     - FA-lxplus-fdf08708
-    commit: c825cb19
+    commit: f7dbc021
     paths:
     - 'HAND-OFF (2026-10-30 06:30, gridpack queue step). (1) CODE on branch gridpack-queue, worktree worktrees/wt-gridpack-queue,
       commit 0e9dda71 rebased on trunk 4609381f (merged the conflict in lhe_parts main(): --grid-cores kept with upstream
@@ -4445,6 +4446,7 @@ entries:
     - analysis/catalog_v4/data/lhe_rates_hd_5body.json
     - analysis/catalog_v4/data/lhe_rates_hd_h5.json
     - analysis/catalog_v4/data/lhe_run_yields_dsh_eea.json
+    - analysis/catalog_v4/data/lhe_run_yields_dsh_eea_relay.json
     - analysis/catalog_v4/data/mixed_order_audit.json
     - analysis/catalog_v4/data/mixture_ab.json
     - analysis/catalog_v4/data/mixture_ab_het.json
