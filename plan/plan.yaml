@@ -14700,6 +14700,25 @@ entries:
       --time 00:45:00, --mem 8G, target r4_check 0.2 h) at CC 2a1f372b (code = 8c1757a3), e.g. FA-ccin2p3-04c53f81, dbfd95f6;
       step 80 waits on them. Read: multichannel_check.py step79r4-pull, step79r4 -> data/r4_check.json, step79r4-acted ->
       data/r4_acted.json.'
+  - at: '2026-11-07T08:55:31+00:00'
+    text: '2026-11-07 step 80 r4 check read (multichannel_check.py step79r4 and step79r4-acted @f24bfe10 -> data/r4_check.json,
+      r4_acted.json; 38 CPU jobs, r4 = r3 + flat_empty_unique against r3 and the old sampling in the same job): verdict NO
+      on fill; r4 is worse than r3 where it acts. OUTSIDE 0 on every class and seed. COST summed over the 38 jobs r4 1.751x,
+      r3 1.843x in the same jobs (bar 2x: pass); 18 class-seeds over 2x (r3 19). r3 is deterministic: its kept per bin is
+      identical in the r3 and r4 jobs on every chunk. WHERE r4 ACTED (rounds with >= 2 empty bins): every chunk of uu_bbxuu,
+      uux_bgtxwp, ug_auuux, us_ddxsu, uc_cuvevex, bb_bbvevex, dbx_hhtxu, dbx_ahtxu, uux_ddxwpwm (33-36 of 36), chunks differing
+      from r3 14-29 on the short classes. FILL: uu_bbxuu [5.127,5.373] 0.696/0.724 (r3 0.897/0.795, r2 1.0) and [4.881,5.127]
+      0.937/0.909, 20/18 chunks at the budget (r3 8/12): de-stacking acted and made it worse, so stacking was not the cause
+      of r3''s regression; uux_bgtxwp [-1.206,-0.96] 0.835/0.809 (r3 0.925/0.917): de-stacking cost the pull toward the top,
+      as the design''s branch foresaw; us_ddxsu newly short at seed 43 [5.285,5.532] 0.948; straddling bins bb_bb 0.108/0.13
+      (= r3), bbx_ccxh 0.768/0.653 (r3 0.924/0.761). So for both classes more concentration of an empty bin''s weight on the
+      nearest candidates fills the top better for bgtxwp but r2''s spread rule is the only one at 1.0 for bbxuu. Next by the
+      design''s outcome (bbxuu still short with r4 acted): r4 dropped; next revision r2 + a label-budget raise for chunks
+      still converging (bbxuu''s r3/r4 shortfall is budget stops), keeping in view that bgtxwp needs r3''s steering: candidate
+      r5 = r3 with a higher budget only for chunks still filling (or r2 for bins with candidates nearby), to be designed and
+      reviewed. Figure analysis/catalog_v4/figs/r4_check.png (r2_check_fig.py r4 @f24bfe10): (a) fill per bin against log|M|^2
+      minus the reach, r3 dashed, r4 solid, four short classes; (b) per class and seed r4 time / old against r3 time / old
+      (14 of 38 above equal cost).'
   handoff:
     state: '2026-11-07 ~09:30. Step 79 (r3 sampler check): r3 = r2 + flat_empty_near (an empty quota bin steered by its deficit-many
       nearest candidates in log|M|^2) merged bed989d2 (sampler-r3; repo-reviewer BLOCK then PASS at c293ed6a, design PASS);
