@@ -331,9 +331,19 @@ def test_sampling_policy_mc_constants():
         raise AssertionError("a floor other than the code's must be refused")
     except ValueError:
         pass
-    # json round trip of the policy (what recipe_id hashes) keeps it equal
-    import json
+    # round trips of the policy (the recipe sidecar sorts keys, YAML too) and int-for-float values are accepted
+    import json, yaml
     assert mg.sampling_policy({"sampling": json.loads(json.dumps(pol))}) == pol
+    assert mg.sampling_policy({"sampling": json.loads(json.dumps(pol, sort_keys=True))}) == pol
+    assert mg.sampling_policy({"sampling": yaml.safe_load(yaml.safe_dump(pol))}) == pol
+    assert mg.sampling_policy({"sampling": dict(base, multichannel=True, mc_pt_lo=10)})["mc_pt_lo"] == mg.MC_PT_LO
+    g = mg.sampling_policy({"sampling": dict(base, flat_range=[-5.0, 5.0], flat_grid=True)})
+    assert g["flat_grid_smooth"] == mg.FLAT_GRID_SMOOTH
+    try:
+        mg.sampling_policy({"sampling": dict(base, flat_range=[-5.0, 5.0], flat_grid=True, flat_grid_smooth=5)})
+        raise AssertionError("a smoothing other than the code's must be refused")
+    except ValueError:
+        pass
 
 
 if __name__ == "__main__":
