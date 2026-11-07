@@ -11549,6 +11549,59 @@ entries:
       will fail as designed: put their exemption to Joaquin by plan ask now, in parallel, not after the run. Disk 49 GB free
       on /sps, 38 x 0.5 MB. Searched results.tex, plan, decisions for: patience, keep_ext, extreme, budget 18, flat_budget,
       stall, summed, total cost, per class, r2: no earlier such revision; budget 50/750 were other samplers.'
+  - at: '2026-11-07T07:01:01+00:00'
+    question: 'Step 78 revision r3 of the flat sampler (after r2''s NO): r3 = r2 (tools/regen_recipes.R2) plus flat_empty_near:
+      in flat_quota_weights, a quota bin holding no candidate gives its deficit to the deficit-many finite candidates nearest
+      to it in log|M|^2 (one unit each) instead of spreading it over every candidate of the nearest occupied bin. Code: branch
+      sampler-r3 @db973ca9 (worktrees/wt-r3), tools/regen_recipes.R3, policy grid_r3_budget18, pools _smixt. Does r3, on the
+      same 19 classes x seeds 42/43, (1) fill every in-range 0.25-dex quota bin, margin included, at >= 0.95 of quota, exempting
+      bins whose lower edge lies above the class''s reach or whose upper edge lies below its floor, reach and floor now taken
+      over every policy of this job AND of the r1 and r2 jobs of the class (the highest / least candidate any policy drew;
+      r2''s read took its own job only, which put v4_uux_bgtxwp''s reach at -1.025 inside the reachable bin [-1.206, -0.96]
+      although the step-65 policy drew up to -0.939), straddling bins scored and listed with their reachable width share;
+      (2) leave ZERO scored held-out in-support pp events outside the kept range (D269); (3) cost summed over the 38 jobs
+      r3 seconds <= 2x the old sampling''s in the same jobs, per class listed? Feeds: whether the 1301 hadronic classes are
+      regenerated with r3 (pools _smixt) before step 68''s e+e- classes join; the straddling bins (bb_bb 8.34, bbx_ccxh -3.809,
+      uux_bgtxwp -0.96) wait on Joaquin''s scope answer and are reported, not decided, here.'
+    prior: 'r2 check (multichannel_check.py step75r2 @adfa3b35 -> data/r2_check.json): NO on fill only; outside 0 on every
+      class and seed; summed cost 1.527x (bar 2x), per class median 1.78, 15 of 38 over 2x. Short bins: bb_bb [8.34,8.585]
+      0.15/0.19 (17% reachable), bbx_ccxh [-3.809,-3.56] 0.87/0.77 (6% reachable), uux_bgtxwp [-1.206,-0.96] 0.73/0.79 (wholly
+      reachable by the r1 job''s step-65 policy, reach -0.939: a real short). Channel-by-bin (step78-where @adfa3b35 -> data/r2_where.json
+      and the per-chunk records): r2 fills bgtxwp''s bin only through the top resonance ladder resl [0,3]; 25 of 36 chunks
+      fill it to quota (111-937 candidates each), 10-11 chunks get 0-4 candidates and stop on two stalled rounds: bimodal
+      per chunk, steering not budget. The step-65 policy reached the bin''s top through res [0,1,3] (306-415 candidates).
+      r1 check (r1_check.json) NO; step 65 read (regen_g12_read.json) SHORT. Searched docs/results.tex, plan show catalog_coverage,
+      site decisions (D269, D294, D317, D318) for empty bin, nearest candidates, steering, flat_quota_weights, reach: no earlier
+      empty-bin steering revision.'
+    measure: 'analysis/catalog_v4/multichannel_check.py run <class> <probe> current+grid_r2_budget18+grid_r3_budget18 <seed>
+      (scripts/job_multichannel_check.sh, CPU, one job per class and seed, three policies on one node, the class''s train
+      pool replayed chunk by chunk) -> per policy kept/quota per bin per chunk, rounds and stops, candidates per channel and
+      bin, cand_max/cand_min, seconds; heldout_r1 with outside_dex. Read by multichannel_check.py step78r3-pull then step78r3
+      -> data/r3_check.json (the step75r2 reader parametrised: new grid_r3_budget18 vs old grid_r2_budget18, reach_tags =
+      the r1 and r2 jobs; with defaults it reproduces r2_check.json exactly, checked) and step78-where for any short bin.'
+    check: 'On existing data: r2''s per-chunk records of v4_uux_bgtxwp''s bin [-1.206,-0.96] (multichannel_check_reads, r2_where.json):
+      the chunks with 0-4 candidates in it after round 1 never get more (stall after 4 rounds) while chunks with any foothold
+      fill to quota, so the chunk fill of that bin moves with how an empty bin steers the proposal, which is what r3 changes.
+      The reader''s reach fix applied to r2''s own data (reach_tags=R1_TAG) moves bgtxwp''s short bin from straddling (share
+      0.737) to wholly reachable (1.0) and lists [-0.96,-0.714] as straddling (0.087), bb_bb and ccxh unchanged. tests/test_flat_grid.py
+      test_r3_empty_near_tag: the empty bins'' weight lands on the 10 highest toy candidates, occupied bins'' weights unchanged,
+      total weight equal, weights identical without the key, _smixt tag. Toy chunk (tests/test_flat_mcmc toy |M|^2, range
+      top 1e30 unreachable, 4 seeds): r3''s highest candidate vs r2''s 9.26 vs 10.33, 12.36 vs 12.32, 13.56 vs 8.72, 12.2
+      vs 7.74 log10; on a reachable range both fill every bin at all 4 seeds: the toy does not settle it, the 19-class check
+      does.'
+    fixed: 'Everything of r2 (R2: r1''s channels and ladders, keep extremes, stall 0.2 with patience 2, budget 18, grid constants,
+      range ranges_dsh), classes and probes (R1_CLASSES), data seeds, train role chunk plan; code = trunk after sampler-r3
+      merges (repo-reviewer PASS), one commit for all 38 jobs. CPU only, 0 GPU-h. Wall: r2''s three-policy jobs took up to
+      572 s of sampling: target 0.2 h, limit --time 00:45:00. Disk ~0.5 MB JSON per job (49 GB free on /sps at r2''s submission).'
+    control: r2 (grid_r2_budget18) and the old sampling (current) in the same job on the same node; r2's per-class numbers
+      of r2_check.json beside it.
+    seeds: Data seeds 42 and 43 (r1's and r2's), each class at both.
+    outcome: 'PASS (every class and seed: every scored non-straddling bin >= 0.95, 0 held-out outside, summed cost <= 2x)
+      -> the straddling bins as Joaquin answers; then regenerate the 1301 hadronic classes with R3 (regen_recipes write, pools
+      _smixt), read by regen_read.py with the same bars, then step 68. NO: bgtxwp still short with chunks at 0 candidates
+      -> the channel route (res [0,1,3] share floor, the channel the step-65 policy reached the top with), one more revision;
+      a class that passed under r2 now short -> r3''s concentration of weight on few candidates hurts it: read its rounds,
+      revise; outside > 0 -> outside_dex; summed cost > 2x -> per-channel seconds. Job failures -> log read, fixed, rerun.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
