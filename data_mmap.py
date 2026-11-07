@@ -575,6 +575,15 @@ def prune(root, need_bytes, keep, min_idle_s):
             break
         if time.time() - t < min_idle_s:
             continue
+        try:
+            sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tools"))
+            from cache_guard import site_users
+            users = site_users(os.path.basename(os.path.dirname(d)))
+        except Exception as e:                 # fails closed: a cache whose users cannot be read is kept
+            users = ["unreadable: %s" % e]
+        if users:
+            LOGGER.info(f"data.memmap: keeping {d}: live job(s) name its key ({users})")
+            continue
         LOGGER.info(f"data.memmap: pruning {d} (last used {time.ctime(t)}, {_du(d) / 1e9:.1f} GB)")
         gone = d + f".pruned.{_job_tag()}"
         try:

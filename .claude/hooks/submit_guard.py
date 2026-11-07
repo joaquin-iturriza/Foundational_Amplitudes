@@ -24,6 +24,8 @@ A command is refused (exit 2, every reason found) when
              (under one epoch), unless `--env SUBEPOCH_OK=1` (see epoch_count).
   wall       a job_catalog_v3_short.sh job whose --hdr=--time is below the wall time its own check (tools/short_wall.py, run
              by the job at start) needs for the arm, the --env values (LONG_*, GROW_K, ...) and the mode (see wall_need).
+  cache      a `site run <site> FA -- ... rm ... amp_mmap_cache/<key>` while a RUNNING or queued FA job on that site names
+             the key in its log or config (tools/cache_guard.py); a deletion of the whole root counts every such job.
   data       a FA training job whose recipe's pools are not prebuilt on the named site (tools/check_site_data.py run
              there), unless it is chained afterok on that site's prebuild run of the recipe (see data()).
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
@@ -888,6 +890,33 @@ def wall(segs):
     return out
 
 
+# ------------------------------------------------------------------ cache (2026-11-07)
+CACHE_RM = re.compile(r"\b(rm|rmdir|unlink|rmtree)\b|-delete\b", re.I)
+
+
+def cache_delete(segs, users=None):
+    """A `site run <site> FA -- <cmd>` that deletes under amp_mmap_cache is refused while an active FA job on the site
+    names the key (tools/cache_guard.py users); no readable key (a variable, a glob, the root) counts as the whole root."""
+    out = []
+    for toks in segs or []:
+        if not toks or os.path.basename(toks[0]) != "site" or toks[1:2] != ["run"] or "--" not in toks:
+            continue
+        pos = [t for t in toks[2:toks.index("--")] if not t.startswith("-")]
+        if len(pos) < 2:
+            continue
+        remote = " ".join(toks[toks.index("--") + 1:])
+        if "amp_mmap_cache" not in remote or not CACHE_RM.search(remote):
+            continue
+        keys = re.findall(r"amp_mmap_cache/+([0-9a-f]{8,})", remote) or ["amp_mmap_cache"]
+        sys.path.insert(0, os.path.join(REPO, "tools"))
+        import cache_guard
+        us = (users or cache_guard.users)(pos[0], keys)
+        for run, state, key, where in us:
+            out.append("cache: `%s` deletes %s on %s while %s (%s) names %s in its %s; wait until it ends, then delete" % (
+                remote[:90], ", ".join(keys), pos[0], run, state, key, where))
+    return out
+
+
 SUBMITTING = re.compile(r"\bsite\s+(?:submit|run|launch)\b|(^|[;&|(]|\$\()\s*(sbatch|condor_submit)", re.M)
 
 
@@ -937,7 +966,7 @@ def problems(inp):
 
     checks = (("placement", lambda: placement(cmd, scan)), ("hpo", lambda: hpo(cmd)), ("plot", lambda: plot(cmd, segs)),
               ("design", design_check), ("budget", lambda: budget(cmd, segs)), ("data", lambda: data(segs)),
-              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)), ("wall", lambda: wall(segs)))
+              ("expect", lambda: expect(segs)), ("epoch", lambda: epoch(segs)), ("wall", lambda: wall(segs)), ("cache", lambda: cache_delete(segs)))
     out = []
     for name, f in checks:
         if only and name not in only:
