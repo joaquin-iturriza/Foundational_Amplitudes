@@ -3728,9 +3728,6 @@ entries:
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
-    65: '(a) hadronic regeneration running (32 shards, wait on step 65). On its end: python3 analysis/catalog_v4/regen_read.py
-      pull, read, fig; verdict by the passed v3 design; finding with numbers. Training/held-out _g12 recipes only after step
-      68 (tools/regen_recipes.py readers).'
     68: '(f) e+e- classes in the regeneration (Joaquin 2026-11-06 ~19:50 ''If I asked for pp sampled data, why would you produce
       e+e- datasets that are different in any way?''; D294 on every beam): step 65''s regeneration design covers all 170 e+e-
       tree classes of the range table too, each flat in log|M|^2 over its own default-sampled range +-0.5 dex, with the sampling
@@ -11823,12 +11820,6 @@ entries:
       if:
       - 'estimate <= 30 GPU-h or covered by D292/D293: design, review, submit'
       - 'above 30 GPU-h not covered: estimate to the main session'
-    65:
-      feeds: whether catalog_v4's hadronic half meets D269/D294 with the channel-grid sampler
-      if:
-      - 'FILLED: step 68 (e+e-) the same way, then readers'
-      - 'SHORT: one revision for the listed classes under its own design (no widening from scored events)'
-      - 'COST over 2x: read where time goes before step 68'
     68:
       feeds: 'D294: what the e+e- classes are regenerated with'
       if:
