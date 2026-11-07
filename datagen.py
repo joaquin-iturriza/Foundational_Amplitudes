@@ -348,12 +348,35 @@ def gen_chunk(task):
     rng = np.random.default_rng(task["seed"])
     import time
     t0 = time.perf_counter()
+    mg.FLAT_LAST.clear()
     mg.build_dataset_variable_energy(
         task["count"], task["sqrts_min"], task["sqrts_max"],
         eff_dir, backend, subproc_dirs, driver_bin, cfg, out_path, rng=rng, role=task.get("role"),
         default_rows=task.get("default_rows"), default_seed=task.get("default_seed"))
     _report_chunk_time(task, time.perf_counter() - t0)
+    _write_flat_fill(out_path, time.perf_counter() - t0)
     return task["idx"], out_path
+
+
+FLAT_FILL_KEYS = ("quota", "kept_per_bin", "cand_per_bin", "budget_hit", "stop", "n_candidates", "n_labels",
+                  "t_propose", "t_label", "kept_per_channel_bin", "channels")
+
+
+def _write_flat_fill(out_path, secs):
+    """The quota-filled flat part's fill of this chunk (mg.FLAT_LAST, set by the quota sampler: a pool with
+    sampling.flat_range) beside the chunk, so the assembled pool carries it (<pool>.flatfill.json, finalize_dataset):
+    the regeneration's read of bins left short (plan catalog_coverage step 65). Nothing written for other pools."""
+    d = mg.FLAT_LAST
+    if "quota" not in d:
+        return
+    def _j(x):
+        x = x.tolist() if hasattr(x, "tolist") else x
+        return [_j(v) for v in x] if isinstance(x, (list, tuple)) else (bool(x) if isinstance(x, np.bool_) else x)
+    rec = {k: _j(d.get(k)) for k in FLAT_FILL_KEYS}
+    rec["edges_log10"] = (np.asarray(d["edges"], float) / np.log(10.0)).tolist()
+    rec["chunk_seconds"] = float(secs)
+    with open(out_path[:-len(".npy")] + ".flatfill.json", "w") as f:
+        json.dump(rec, f)
 
 
 def _chunk_done(out_path, count):
@@ -398,6 +421,11 @@ def finalize_dataset(process, sqrts_min, sqrts_max, n_events, role, seed,
     borns = [p[:-len(".npy")] + ".born.npy" for p in ordered_chunk_paths]
     if is_virt(process) and all(os.path.exists(b) for b in borns):
         np.save(final[:-len(".npy")] + ".born.npy", np.concatenate([np.load(b) for b in borns]))
+    # the quota-filled flat part's fill per chunk (_write_flat_fill), kept when every chunk wrote one
+    fills = [p[:-len(".npy")] + ".flatfill.json" for p in ordered_chunk_paths]
+    if fills and all(os.path.exists(f) for f in fills):
+        with open(final[:-len(".npy")] + ".flatfill.json", "w") as f:
+            json.dump({"chunks": [json.load(open(x)) for x in fills]}, f)
     full = dict(rec)
     full["effective_seed"] = seed + mg.ROLE_SEED_OFFSET.get(role, 0)
     full["chunked"]        = True
