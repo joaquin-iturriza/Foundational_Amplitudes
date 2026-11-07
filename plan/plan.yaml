@@ -3752,12 +3752,6 @@ entries:
       h; dsh_ e+e- 82 core-h, longest 14.1 h; tools/regen_time.py, lhe_rates_dsh_ee4.json) times the spectrum''s 0.67-1.25x
       per kept event, plus 4 more surveys per pool (465-720 s each in the probe); (4) show Joaquin the energy list with it;
       then the e+e- flat ranges for step 68 (pp_support.py pull ee, tools/flat_range.py).'
-    75: '(n) step 65 read done (finding 2026-11-07, data/regen_g12_read.json): SHORT on 527 classes (fill) + 213 (held-out
-      outside, 404 events), COST median 1.86x with 473 classes above 2x. COST first (design branch, before step 68): where
-      the time goes on the classes above 2x (labels vs proposal vs compile, per-class secs, 12272 chunks at the label budget);
-      then one SHORT revision for the short classes only (short bins by budget/channel; outside events by a widening rule
-      that reads no scored events, ~493 classes lack dsh_ pools), its own design and design review, regenerated, read by the
-      same rules.'
     76: '(o) step 76: cause found (mixed-pair mass cut, data/ee_cutread160.json). Fix on branch ee-mixcut (worktrees/wt-ee-mixcut
       @00e59616: lhe.mixed_pair_mmin -> MadEvent dummy_cuts; set on dsh_eea_epem_accxh/aepemh), repo review sent to repo-reviewer
       aa4bae7d4383c3f5a. On PASS: merge, regenerate recipes (gen_catalog_v4_default.py), probe both pools at their energies
@@ -11449,13 +11443,6 @@ entries:
       FA-ccin2p3-7f35c417 FA-ccin2p3-bf03c94a FA-ccin2p3-fd9f83ab FA-ccin2p3-d4b941ea FA-ccin2p3-c60d2484 FA-ccin2p3-fe0bdf65
       FA-ccin2p3-1944d66f FA-ccin2p3-174255b1 FA-ccin2p3-219f4929 FA-ccin2p3-d80ad99c FA-ccin2p3-e84dd8b4 FA-ccin2p3-57a1caaf
       FA-ccin2p3-297e72b0 FA-ccin2p3-87b7d6ee FA-ccin2p3-47b6b3ef FA-ccin2p3-038f4622 FA-ccin2p3-65c8f4f3 FA-ccin2p3-a135a639 '
-    '75': FA-ccin2p3-45490ecb FA-ccin2p3-a4d2920f FA-ccin2p3-9c8d4414 FA-ccin2p3-80db53a9 FA-ccin2p3-36cba1e1 FA-ccin2p3-8927532c
-      FA-ccin2p3-50dec618 FA-ccin2p3-c8e649a1 FA-ccin2p3-159b6e1b FA-ccin2p3-a887d3a7 FA-ccin2p3-366dd2a9 FA-ccin2p3-33ca285e
-      FA-ccin2p3-4c5609c2 FA-ccin2p3-08145531 FA-ccin2p3-d778bd05 FA-ccin2p3-7d804832 FA-ccin2p3-10f07108 FA-ccin2p3-6da2ba6c
-      FA-ccin2p3-e9a35a71 FA-ccin2p3-398d5148 FA-ccin2p3-f32d8870 FA-ccin2p3-4c22ec52 FA-ccin2p3-336a1ef2 FA-ccin2p3-3e2b3cc7
-      FA-ccin2p3-c8bce610 FA-ccin2p3-3a3ea92a FA-ccin2p3-1e3b9b9f FA-ccin2p3-50b3e49c FA-ccin2p3-c6c38394 FA-ccin2p3-8d5a5c56
-      FA-ccin2p3-f7a7ba9c FA-ccin2p3-f44964e5 FA-ccin2p3-0fe3062c FA-ccin2p3-d6d4dd8a FA-ccin2p3-3cebc1cf FA-ccin2p3-a0f896ee
-      FA-ccin2p3-19ee5ed5 FA-ccin2p3-55e054d8
     '77': 'FA-ccin2p3-a475b276 FA-ccin2p3-3037ff9d FA-ccin2p3-18bb3952 FA-ccin2p3-961cdc87 FA-ccin2p3-e6125676 FA-ccin2p3-a2d8579c
       FA-ccin2p3-ec957bd4 FA-ccin2p3-ea07c8cc FA-ccin2p3-034ee71f FA-ccin2p3-75025bf3 FA-ccin2p3-55a254e6 FA-ccin2p3-f607a41b
       FA-ccin2p3-62b0078a FA-ccin2p3-b611d43c FA-ccin2p3-d764d519 FA-ccin2p3-3e7dbaf7 FA-ccin2p3-a3f2ca70 FA-ccin2p3-49dcbd6f
@@ -12080,11 +12067,6 @@ entries:
       if:
       - 'design PASS: submit the e+e- default-pool queue at the width site pick offers'
       - 'design FIX: revise once'
-    75:
-      feeds: the catalog the next mixture and scaling runs train on
-      if:
-      - 'COST cause found and fixed: the SHORT revision designed and submitted'
-      - 'no fix within 2x: the cost and its cause go to Joaquin'
     76:
       feeds: whether the two pools join the e+e- anchor default shares
       if:
