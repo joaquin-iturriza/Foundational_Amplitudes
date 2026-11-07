@@ -103,7 +103,8 @@ ANCHOR_ENERGIES = tuple(sorted(EE_ANCHOR))
 # short even from a gridpack (D193)
 EEA_DROPPED = {"v4_epem_cgsxwm": (3000.0,)}
 # the anchor queue's runs that stopped short of their ask (tools/lhe_parts.py yields --queue catalog_v4_eea, with each
-# run's energy and the layout's identities): those pools take eea_short's layout
+# run's energy and the layout's identities): those pools take eea_short's layout. Only pools not assembled are kept
+# in it (an assembled pool keeps the layout it was built with; eea_epem_bgtxwp, assembled from its complete runs, left out)
 EEA_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_run_yields_eea.json")
 
 
