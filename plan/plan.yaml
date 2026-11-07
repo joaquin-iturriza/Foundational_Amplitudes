@@ -14237,9 +14237,6 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
-    20: 'Cache-deletion guard: before deleting an amp_mmap_cache/<key> on a site, a committed check greps every RUNNING or
-      queued FA job''s log and config there for the key and refuses while any uses it (2026-11-07: the two D310 caches were
-      deleted while the scaling grid used them, FA-ccin2p3-a77e20b8 on 0c897ca2). Test on that real case.'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -14499,11 +14496,6 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
-    20:
-      feeds: whether the setup prevents deleting data a running job needs
-      if:
-      - 'replay refuses the 2026-11-07 deletion: guard in place, step done'
-      - 'replay lets it through: fix the guard before any further cache deletion'
   step_waits:
     '1': a day of clean running of switch-overs A to D (applied 2026-10-30 about 12:30)
     '6': 10 new subagents to run after commit 85064616 (the live check needs their transcripts)
