@@ -3758,10 +3758,11 @@ entries:
       then one SHORT revision for the short classes only (short bins by budget/channel; outside events by a widening rule
       that reads no scored events, ~493 classes lack dsh_ pools), its own design and design review, regenerated, read by the
       same rules.'
-    76: '(o) step 74 stage 2 left out dsh_eea_epem_accxh and dsh_eea_epem_aepemh (kept 0.436 / 0.493 at 160 GeV, ask > 2x
-      what they keep: lhe_parts plan refused). Read the cause from their eea_ parts at 160 GeV cut by cut (pT, |cos|, Delta
-      R, same-type and mixed pair masses), make generation express the missing cut (suspected: m > 10 GeV on mixed photon-quark/photon-lepton
-      pairs, not in the run card), probe it, then plan them into catalog_v4_dsh_eea.'
+    76: '(o) step 76: cause found (mixed-pair mass cut, data/ee_cutread160.json). Fix on branch ee-mixcut (worktrees/wt-ee-mixcut
+      @00e59616: lhe.mixed_pair_mmin -> MadEvent dummy_cuts; set on dsh_eea_epem_accxh/aepemh), repo review sent to repo-reviewer
+      aa4bae7d4383c3f5a. On PASS: merge, regenerate recipes (gen_catalog_v4_default.py), probe both pools at their energies
+      with the cut (lhe_probe run --ee-isr, kept per energy), write the measured kept into the plan''s probe file, plan them
+      into catalog_v4_dsh_eea with the stage-2 repair (step 77) and submit.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12048,10 +12049,10 @@ entries:
       - 'COST cause found and fixed: the SHORT revision designed and submitted'
       - 'no fix within 2x: the cost and its cause go to Joaquin'
     76:
-      feeds: the e+e- default-sampled data at the anchor energies (step 68's flat ranges)
+      feeds: whether the two pools join the e+e- anchor default shares
       if:
-      - 'kept >= 0.5 at every energy after the fix: planned and built'
-      - 'still short: Joaquin decides between dropping 160 GeV for them and accepting'
+      - 'kept >= 0.9 at 160 GeV with the cut: plan and generate them'
+      - 'still kept < 0.5: read the cut pieces again with cutread on the probe''s events'
   owner:
     agent: a43d3315615ba19df
     state: working
