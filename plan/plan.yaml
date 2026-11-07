@@ -3743,6 +3743,11 @@ entries:
       regen_read.py with the same bars, then step 68. Waits on Joaquin: the straddling-bin scope answer (under r6 it reduces
       to bgtxwp [-0.96,-0.714], 0 filled, 8.7% reachable) and the summed-vs-per-class 2x cost bar (19 of 38 class-seeds over
       2x under r6). Before submit: design (batch sized from the r6 jobs'' per-class seconds), site pick, plan target.'
+    83: '(l4) Step 81''s FAULT (finding 2026-11-07 step 81: MSE(4-block)/MSE(1-block) on HD5 1.259 [1.011,1.400], trunks already
+      differ at the first validation, step 85: 0.0688 vs 0.0944). Held by D322 (weekend: read only). When lifted: first read
+      the two runs'' training logs for the first steps (equal loss at step 1 = same trunk start, divergence after = nondeterminism);
+      then, if needed, a same-config repeat of the 1-block arm (v4_het_signhead_branch seed 42, ~2.5 GPU-h) under a reviewed
+      design to measure the same-config magnitude spread.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12736,6 +12741,12 @@ entries:
       if:
       - 'straddling exempt or bgtxwp''s bin exempt, summed bar accepted: regenerate with R6'
       - 'per-class bar required: a per-class cost revision before regeneration'
+    83:
+      feeds: which sign head the het loss carries (D287, D296)
+      if:
+      - 'same-config spread covers 1.26 on HD5: replace the 1.15 check by that spread, sign reading NOT RESOLVED (HD5 14.05%),
+        next the trunk-shared sign gradient under its own optimizer moments'
+      - 'same-config runs agree within 1.15: find the coupling in the 4-block branch before any sign verdict'
   owner:
     agent: ae4ee7fc35b7e4306
     state: working
