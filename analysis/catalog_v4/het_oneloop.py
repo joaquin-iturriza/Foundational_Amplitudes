@@ -371,8 +371,9 @@ def signhead_pull(runs=None):
     import re, tempfile
     from mixture_ab import extract, val
     tags = "|".join(SH_AXES)
-    pat = re.compile(rf"^(({tags}) ZERO_SHOT |SIGNED_AB |RUN_SUMMARY )|Starting to train for|Val loss \(combined\)|"
+    pat = re.compile(rf"^(({tags}) ZERO_SHOT |SIGNED_AB |RUN_SUMMARY )|Starting to train for|Finished training: |Val loss \(combined\)|"
                      r"sign_head: sign accuracy on the|Grad-norm \(pre-clip\)")
+    it_re = re.compile(r"Finished training: .*\(avg ([0-9.]+)s/iter\)")
     acc_re = re.compile(r"sign accuracy on the (\d+) signed pools: median ([0-9.]+), min ([0-9.]+)")
     gn_re = re.compile(r"Grad-norm \(pre-clip\): median=([0-9.e+-]+) p90=([0-9.e+-]+) max=([0-9.e+-]+) \| clip=\S+ "
                        r"bound ([0-9.]+)% of steps")
@@ -396,7 +397,9 @@ def signhead_pull(runs=None):
             sg = {"HD5": {}, "H5": {}, "val_sign_acc": [[int(m.group(1)), float(m.group(2)), float(m.group(3))]
                                                         for m in (acc_re.search(l) for l in lines) if m],
                   # [median, p90, max, % of steps the clip bounds] of the main block (the first Grad-norm line)
-                  "grad_norm_main": [float(x) for x in gn[0]] if gn else None}
+                  "grad_norm_main": [float(x) for x in gn[0]] if gn else None,
+                  # s per training step of the main block (its 'Finished training' line, the first one; step 80)
+                  "s_per_iter_main": next((float(m.group(1)) for m in (it_re.search(l) for l in lines) if m), None)}
             for l in lines:
                 if l.startswith("HD5 ZERO_SHOT "):
                     d = json.loads(l[len("HD5 ZERO_SHOT "):])
@@ -735,10 +738,12 @@ def step73_one():
         A = [_sign_read(arm)[ax]]
         out["sign"][ax] = {"vs_rerun": _sign_pair(A, [_sign_read(rr)[ax]], h5neg, ax),
                            "vs_mse": _sign_pair(A, ctl[ax], h5neg, ax)}
+    out["magnitude_missing"] = []
     for ax in SH_AXES:
         try:
             a, b = load_read(arm, ax), load_read(rr, ax)
         except FileNotFoundError:
+            out["magnitude_missing"].append(ax)   # listed, so a missing read cannot pass unseen
             continue
         ks = sorted(set(a) & set(b))
         r = r_interval(class_ratios(a, b, ks, cls), 1.0)
@@ -906,15 +911,18 @@ def step80_one():
         out["sign"][ax] = {"vs_branch1": _sign_pair(A, [_sign_read(k1)[ax]], h5neg, ax),
                            "vs_shared": _sign_pair(A, [_sign_read(rr)[ax]], h5neg, ax),
                            "vs_mse": _sign_pair(A, ctl[ax], h5neg, ax)}
+    missing = []
     for ax in SH_AXES:
         try:
             a, b = load_read(arm, ax), load_read(k1, ax)
         except FileNotFoundError:
+            missing.append(ax)      # the design asks every read: a missing one makes the verdict INCOMPLETE
             continue
         ks = sorted(set(a) & set(b))
         r = r_interval(class_ratios(a, b, ks, cls), 1.0)
         r["n_probes"] = len(ks)
         out["magnitude_vs_branch1"][ax] = r
+    out["magnitude_missing"] = missing
     q = {ax: {k: out["sign"][ax][k]["median_ratio_a_over_c"] for k in ("vs_branch1", "vs_shared", "vs_mse")}
          for ax in ("H5", "HD5")}
     mag_off = [ax for ax, m in out["magnitude_vs_branch1"].items()
@@ -924,13 +932,18 @@ def step80_one():
     worse = q["H5"]["vs_branch1"] is not None and q["H5"]["vs_branch1"] > STEP73_SIGN_CALL
     out["ratios"] = q
     out["magnitude_outside_band"] = mag_off
-    out["verdict"] = ("FAULT (magnitude moved: the trunk should be the one-block run's)" if mag_off
+    out["verdict"] = (f"INCOMPLETE (reads missing: {missing})" if missing
+                      else "FAULT (magnitude moved: the trunk should be the one-block run's)" if mag_off
                       else "YES (at or below the MSE control on H5 and HD5)" if at_mse
                       else "DEPTH HELPS (H5 beyond 2x better than one block, above the MSE control)" if better
                       else "NO (worse than one block beyond 2x)" if worse else "NOT RESOLVED AT ONE SEED")
     out["val_sign_accuracy"] = {r: [x[1] for x in _sign_read(r)["val_sign_acc"]][-1:] for r in (arm, k1)}
     out["grad_norm_main"] = {r: _sign_read(r)["grad_norm_main"] for r in (arm, k1)}
     out["blowups"] = blowups([arm, k1])
+    # the branch's cost: s per training step of the main block, 4-block over 1-block (target 2.9 h; bar 2x)
+    sp = {r: _sign_read(r).get("s_per_iter_main") for r in (arm, k1)}
+    out["s_per_iter_main"] = sp
+    out["step_time_ratio"] = round(sp[arm] / sp[k1], 3) if sp[arm] and sp[k1] else None
     json.dump(out, open(os.path.join(DATA, "het_signhead80.json"), "w"), indent=1)
     brief = lambda r: {k: v for k, v in r.items() if k != "per_pool_pct"}
     print(json.dumps({"sign": {ax: {k: brief(v) for k, v in d.items()} for ax, d in out["sign"].items()},
@@ -954,7 +967,7 @@ if __name__ == "__main__":
     elif sys.argv[1:] == ["step73"]:
         step61(STEP73, ("branch",), "het_signhead73.json", "plan catalog_coverage step 73 (D296, D315)")
     elif sys.argv[1:] == ["step80_pull"]:
-        signhead_pull({"branch4": STEP80["branch4"]})
+        signhead_pull({"branch4": STEP80["branch4"], "branch1": STEP80["branch1"]})   # branch1 again for its step rate
     elif sys.argv[1:] == ["step80_one"]:
         step80_one()
     elif sys.argv[1:] == ["step73_fig"]:
