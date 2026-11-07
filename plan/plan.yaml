@@ -13461,6 +13461,23 @@ entries:
       is not written into the policy in sampling_policy (~mg5_pipeline_final.py:3115), so the recipe id would not follow it;
       put these constants into the policy first. Nit: tests/test_multichannel.py _module_at leaves a zz_probe_solve_* tmp
       dir.'
+  - at: '2026-11-07T02:48:41+00:00'
+    text: '2026-11-07 step 74 stage 1 (eea_ anchor test pools, queue catalog_v4_eea): 164 of 170 pools assembled; 5 failed
+      to assemble (E3998 E4002 E4005 E4007; eea_epem_bbxg in the same worker) because a MadEvent run stopped short of its
+      ask at 1500 or 3000 GeV: uuuxux 3000 55/204, bbxddx 3000 14/204, bbxg 1500 24/204 and 3000 170/204 (one run per energy,
+      own integration), bbxwpwm 1500 185/200 and ccxgz 3000 187/200 (gridpack pools, 2 runs per energy, complete runs below
+      the equal share 250/223); bgtxwp''s short run (167/200) left it assembled from complete runs. Runs complete per energy
+      over the queue (lhe_parts yields --by-energy -> data/lhe_run_yields_eea.json @2e510905): 3000 GeV 190/194, 1500 195/197,
+      1000 196/197, every run below 1 TeV. The old no-spectrum ee4_ pools stopped short at 3 TeV the same way (lhe_run_yields.json,
+      e.g. bbbxbx 49/340), so the cause is MadEvent''s high-energy ''fail to reach target'', not the beam spectrum. Fix (repo-reviewer
+      PASS after one FIX, merged a48af5bb): gen_catalog_v4_default.eea_short lays the short pools out by complete_layout:
+      own-integration pools -> complete gridpack runs of 200 (ee4_ precedent, asked/kept 2.0); gridpack pools -> runs per
+      energy from the measured complete share x RUN_SAFETY (bbxwpwm 1500: 4, ccxgz 3000: 3), gridpacks pinned; lhe_parts _adopt_ee
+      relinks runs made (32 parts), yields records energies and layout ids; lhe_parts unplan (2824b573). Mishap: the first
+      replan used catalog_v4_eea_lhe.yaml, which also lists the 115 stage-2 dsh_eea_ pools (10470 tasks); parked within a
+      minute, none claimed, specs moved to Q/unplanned/; replanned from catalog_v4_eea_test.yaml: 65 runs + 30 gridpacks.
+      Workers 8b458405 8a160e7f e4bc9f56 aa482330 (16 cores, 01:00:00), target eea_stage1_short_fix 0.75 h (30 gridpacks at
+      the old e+e- 712-1700 core-s each: 6-14 core-h), wait on step 74.'
   handoff:
     state: '2026-11-07 ~04:00. Step 72 read: PARTIAL (data/grid_check.json @b3ba8b94, figs/grid_check_a-e): channel grids
       at 12 labels fill every bin of the 3 QCD classes but leave the 2 electroweak 2->4 classes short in their top 1 dex (udx_csxvevex
