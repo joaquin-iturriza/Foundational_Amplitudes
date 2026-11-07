@@ -3742,11 +3742,12 @@ entries:
       block (its gradient never enters the clipped shared update), one seed (D315) against the weight-1 rerun FA-ccin2p3-ac8d6fca
       and the MSE control at seed 42; implement in a worktree, repo-reviewer, design, design-reviewer, submit. Then, if the
       sign still lags, the clipping regime (99% of het steps clipped).'
-    76: '(o) step 76: cause found (mixed-pair mass cut, data/ee_cutread160.json). Fix on branch ee-mixcut (worktrees/wt-ee-mixcut
-      @00e59616: lhe.mixed_pair_mmin -> MadEvent dummy_cuts; set on dsh_eea_epem_accxh/aepemh), repo review sent to repo-reviewer
-      aa4bae7d4383c3f5a. On PASS: merge, regenerate recipes (gen_catalog_v4_default.py), probe both pools at their energies
-      with the cut (lhe_probe run --ee-isr, kept per energy), write the measured kept into the plan''s probe file, plan them
-      into catalog_v4_dsh_eea with the stage-2 repair (step 77) and submit.'
+    76: '(o) step 76: mixed-pair mass cut (lhe.mixed_pair_mmin -> MadEvent dummy_cuts) merged, recipes carry it for dsh_eea_epem_accxh/aepemh;
+      18 probes (scripts/job_lhe_probe.sh PROBE_SHARD=eeisr PROBE_VARIANTS=isr, 1000 events, both pools x 9 energies, target
+      mmin_probe 0.3 h) queued at CC. On end: python tools/lhe_probe.py eeisr-read <the 9 runs of a pool> --out analysis/catalog_v4/data/ee_mmin_probe_<pool>.json
+      per pool, regenerate recipes (gen_catalog_v4_default.py), check kept near 1; after the step-77 relay workers end: lhe_parts
+      plan recipes/catalog_v4_eea_lhe.yaml --queue $SCRATCH/lhe_queue/catalog_v4_dsh_eea --grid-cores 16 --probe analysis/catalog_v4/data/lhe_probe_yields_dsh_eea.json
+      --rates analysis/catalog_v4/data/lhe_rates_dsh_eea.json, site pick, target, submit workers.'
     77: '(p) step 74 stage 2 repair: 20 dsh_eea_ pools unassembled (finding 2026-11-07, data/lhe_run_yields_dsh_eea_stage2.json):
       one run per energy at 1000/1500/3000 GeV stopped short (biased). Relay them in recipes/gen_catalog_v4_default.py as
       complete gridpack runs at the short energies (eea_short/complete_layout with these measured complete shares, a stage-2
@@ -11450,9 +11451,6 @@ entries:
       FA-ccin2p3-d973d438 FA-ccin2p3-10a44431 FA-ccin2p3-ff396d71 FA-ccin2p3-12b6b83e FA-ccin2p3-8941fd75 FA-ccin2p3-e2e01b7c
       FA-ccin2p3-862b2834 FA-ccin2p3-bf059677 FA-ccin2p3-9883a76b FA-ccin2p3-88bf3dcc FA-ccin2p3-f259f04f FA-ccin2p3-1456b3d7
       FA-ccin2p3-5f547283 FA-ccin2p3-b9a17428 FA-ccin2p3-22c1e2ef FA-ccin2p3-0a7c6cc3 FA-ccin2p3-2e9f7ca3 '
-    '76': 'FA-ccin2p3-8a05275f FA-ccin2p3-689503ab FA-ccin2p3-0806b674 FA-ccin2p3-e10695d8 FA-ccin2p3-7422704a FA-ccin2p3-d7a97518
-      FA-ccin2p3-902991de FA-ccin2p3-7480dcaf FA-ccin2p3-f46f5fa1 FA-ccin2p3-17d89d85 FA-ccin2p3-6921b3b7 FA-ccin2p3-a1585468
-      FA-ccin2p3-0c5a7122 FA-ccin2p3-f13fecbe FA-ccin2p3-eb26d389 FA-ccin2p3-9ac8faf9 FA-ccin2p3-7d3232d7 FA-ccin2p3-329d13c9 '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -12064,7 +12062,7 @@ entries:
     76:
       feeds: whether the two pools join the e+e- anchor default shares
       if:
-      - 'kept >= 0.9 at 160 GeV with the cut: plan and generate them'
+      - 'kept >= 0.9 at every energy with the cut: plan and generate them'
       - 'still kept < 0.5: read the cut pieces again with cutread on the probe''s events'
     77:
       feeds: the e+e- anchor default-share pools for step 68
