@@ -11240,14 +11240,14 @@ entries:
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
-    '74': FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
-      FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af FA-ccin2p3-013708af
+    '74': 'FA-ccin2p3-e4edfe83 FA-ccin2p3-ca226769 FA-ccin2p3-51300593 FA-ccin2p3-8dd43d8d FA-ccin2p3-f0e0bee7 FA-ccin2p3-d81798f5
+      FA-ccin2p3-b9b3ea92 FA-ccin2p3-716ef274 FA-ccin2p3-22263ce8 FA-ccin2p3-ca55ae7c FA-ccin2p3-aab2fcf9 FA-ccin2p3-d5a3171c
+      FA-ccin2p3-92853267 FA-ccin2p3-90252aa1 FA-ccin2p3-89a71cae FA-ccin2p3-f1c15a72 FA-ccin2p3-264bf0a5 FA-ccin2p3-faf8dc31
+      FA-ccin2p3-c4a9c5a1 FA-ccin2p3-b8ca5b17 FA-ccin2p3-9785fe66 FA-ccin2p3-271d8dc0 FA-ccin2p3-babc84aa FA-ccin2p3-0b96d8dc
+      FA-ccin2p3-34246ea6 FA-ccin2p3-ee228d29 FA-ccin2p3-880452a9 FA-ccin2p3-7fb17c51 FA-ccin2p3-a0b599fa FA-ccin2p3-66932ceb
+      FA-ccin2p3-7f35c417 FA-ccin2p3-bf03c94a FA-ccin2p3-fd9f83ab FA-ccin2p3-d4b941ea FA-ccin2p3-c60d2484 FA-ccin2p3-fe0bdf65
+      FA-ccin2p3-1944d66f FA-ccin2p3-174255b1 FA-ccin2p3-219f4929 FA-ccin2p3-d80ad99c FA-ccin2p3-e84dd8b4 FA-ccin2p3-57a1caaf
+      FA-ccin2p3-297e72b0 FA-ccin2p3-87b7d6ee FA-ccin2p3-47b6b3ef FA-ccin2p3-038f4622 FA-ccin2p3-65c8f4f3 FA-ccin2p3-a135a639 '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
