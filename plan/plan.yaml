@@ -18103,6 +18103,16 @@ entries:
       and from a live+optstate arm; a struct config without the keys). Synced to CC before step 14''s three chained branch
       arms started. Reruns under the passed designs (SHORT_TAG=fix1, run dirs <arm>_tagfix1): step 13 FA-ccin2p3-1c90ae73
       (s42), 013708af (s43); shrinkperturb FA-ccin2p3-0f346464. ws_restart_steps.py @97db372e.'
+  - at: '2026-11-07T02:23:31+00:00'
+    text: '2026-11-07 step 13 read (D307, D308; design 2026-11-06T22:29), reruns after b91cf7c6: FA-ccin2p3-1c90ae73 (s42),
+      013708af (s43), V3_SHORT_DONE, one OPT_STATE line each (main stage only), sigma stage first/last val -2.717/-2.721 and
+      -2.640/-2.645 (sane). mixture_ab.py warm C1r_step3198_continue_optstate @9d30a635: R(arm/control = final-model default
+      restart) PP4 1.148 [0.977,1.351], EE4 1.240 [1.034,1.505] WORSE (EE4 lower end above 1), held_default 1.117, held 1.029;
+      R(arm/fresh-optimizer continued) PP4 1.006 [0.854,1.184], EE4 1.009 [0.822,1.240]: identical; R(arm/step-3198 default
+      restart) 1.123/1.222; R(W/B) 1.521/1.813 SHORT. The optimizer state removes the jump (G 79/79 vs control 631/1016; worst
+      training loss over steps 0-39 -2.31/-2.27 vs -1.55/-1.46) and changes nothing downstream: the restart jump is ruled
+      out as the cause of the k=533 gap; the continued arms lose by their less-trained start model. Figure analysis/catalog_v4/figs/ws_restart_study_s13
+      (plot_ws_restart.py @9d30a635, step 12''s arms plus this one). Write-up with step 14''s, after par:v4_warm_start_valley.'
   step_waits:
     '1': FA-ccin2p3-1c90ae73 FA-ccin2p3-013708af
     '9': FA-ccin2p3-238e6f81 FA-ccin2p3-0f346464 FA-ccin2p3-77e8bf2b FA-ccin2p3-1354daee FA-ccin2p3-4dc35a98 FA-ccin2p3-9079718e
