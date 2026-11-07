@@ -11598,7 +11598,7 @@ entries:
     agent: a76916d3169a63af3
     state: working
     since: '2026-11-07T02:50:28+00:00'
-    state_at: '2026-11-07T02:50:28+00:00'
+    state_at: '2026-11-07T03:03:59.481000+00:00'
     context: 211393
     context_at: '2026-11-07T03:04:06+00:00'
   findings:
