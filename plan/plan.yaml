@@ -3763,6 +3763,12 @@ entries:
       aa4bae7d4383c3f5a. On PASS: merge, regenerate recipes (gen_catalog_v4_default.py), probe both pools at their energies
       with the cut (lhe_probe run --ee-isr, kept per energy), write the measured kept into the plan''s probe file, plan them
       into catalog_v4_dsh_eea with the stage-2 repair (step 77) and submit.'
+    77: '(p) step 74 stage 2 repair: 20 dsh_eea_ pools unassembled (finding 2026-11-07, data/lhe_run_yields_dsh_eea_stage2.json):
+      one run per energy at 1000/1500/3000 GeV stopped short (biased). Relay them in recipes/gen_catalog_v4_default.py as
+      complete gridpack runs at the short energies (eea_short/complete_layout with these measured complete shares, a stage-2
+      yields file like EEA_YIELDS), requeue the 4 stale claimed tasks (epepemem, aepemz), check the 93 assembled pools for
+      runs with got < asked, lhe_parts plan --skip-claimed, site pick, target, submit; ack the 18 assembly-failure events
+      (E4096..E4119) with what was done.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12053,6 +12059,11 @@ entries:
       if:
       - 'kept >= 0.9 at 160 GeV with the cut: plan and generate them'
       - 'still kept < 0.5: read the cut pieces again with cutread on the probe''s events'
+    77:
+      feeds: the e+e- anchor default-share pools for step 68
+      if:
+      - 'all 20 assemble with complete runs: step 74 done, step 68 can read them'
+      - 'a complete share under 1/MAX_ASK_FACTOR at an energy: larger gridpack per complete_layout, never more runs'
   owner:
     agent: a43d3315615ba19df
     state: working
