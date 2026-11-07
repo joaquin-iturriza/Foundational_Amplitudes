@@ -78,7 +78,7 @@ QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
                   "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12",
-                  "grid_r2_budget18", "grid_r3_budget18")
+                  "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -209,7 +209,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
         if policy in QUOTA_POLICIES:
             from tools.flat_range import ranges, ranges_dsh
-            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18", "grid_r3_budget18") else ranges())[name])
+            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18") else ranges())[name])
         if policy == "grid_r1_budget12":
             # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
             # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
@@ -226,6 +226,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             # candidates nearest to it in log|M|^2 (tools/regen_recipes.R3)
             from tools.regen_recipes import R3
             s.update(R3)
+        if policy == "grid_r4_budget18":
+            # plan step 79's r4 (after r3's NO, data/r3_check.json, r3_where.json, r3_rounds.json): r3 with no
+            # candidate steered by two empty bins (tools/regen_recipes.R4)
+            from tools.regen_recipes import R4
+            s.update(R4)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
@@ -912,6 +917,7 @@ R1_FILL = 0.95       # steps 72/75/65's bin bar
 R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
 R2_TAG = "current+grid_r1_budget12+grid_r2_budget18"
 R3_TAG = "current+grid_r2_budget18+grid_r3_budget18"
+R4_TAG = "current+grid_r3_budget18+grid_r4_budget18"
 
 
 def step75r1():
@@ -1267,6 +1273,60 @@ def step79_rounds(classes=("v4_uux_bgtxwp", "v4_uu_bbxuu"), pols=("grid_r2_budge
                                               sum(v[p]["budget_missing_exempt"])] for p in v} for k, v in out.items()}))
 
 
+def step79_channel_presence(c="v4_uux_bgtxwp", lo=-1.452, top_channel="res [0, 1, 3] 6 172.5 1.4915"):
+    """data/r3_channel_presence.json (plan step 79, an alternative r4 ruled out on existing data: an empty bin's deficit
+    split equally over the channels of the nearest occupied bin): in the r2 and r3 policies of the
+    r3 jobs, per chunk, the candidates per channel in bin [lo, lo + 0.25 dex) (the occupied bin under v4_uux_bgtxwp's
+    reachable top bin [-1.206, -0.96]); the share of an empty neighbour's deficit `top_channel` (the channel that
+    reached the class's top, -0.939, under step 65's policy) gets under r2's rule (its candidates / all in the bin) and
+    under the per-channel split (1 / channels present, when it is present), per chunk, with the medians"""
+    out = {}
+    for seed in SEEDS:
+        runs = json.load(open(os.path.join(READS, f"{c}_{R3_TAG}_{seed}.json")))["runs"]
+        for pol in ("grid_r2_budget18", "grid_r3_budget18"):
+            qc = runs[f"{pol}_{seed}"]["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+            j = int(np.argmin(np.abs(e[:-1] - lo)))
+            ch = [" ".join(str(y) for y in (k if isinstance(k, list) else [k])) for k in qc[0]["channels"]]
+            t = ch.index(top_channel)
+            r2s, r4s, present = [], [], 0
+            for x in qc:
+                n = np.asarray(x["cand_per_channel_bin"])[:, j]
+                r2s.append(float(n[t] / n.sum()) if n.sum() else 0.0)
+                r4s.append(float(1.0 / (n > 0).sum()) if n[t] > 0 else 0.0)
+                present += int(n[t] > 0)
+            out[f"{pol}_{seed}"] = {"bin_lo": round(float(e[j]), 3), "chunks": len(qc), "chunks_with_top_channel": present,
+                                    "share_r2_rule_median": float(np.median(r2s)), "share_r4_rule_median": float(np.median(r4s)),
+                                    "share_r2_rule": [round(v, 5) for v in r2s], "share_r4_rule": [round(v, 4) for v in r4s]}
+    json.dump(out, open(os.path.join(DATA, "r3_channel_presence.json"), "w"), indent=1)
+    print("STEP79_CHANNEL_PRESENCE", json.dumps({k: [v["chunks_with_top_channel"], round(v["share_r2_rule_median"], 5),
+                                            round(v["share_r4_rule_median"], 3)] for k, v in out.items()}))
+
+
+def step79r4_acted(pols=("grid_r3_budget18", "grid_r4_budget18")):
+    """data/r4_acted.json (plan step 79's r4): per class and seed of the r4 jobs (R4_TAG), per policy the chunks with a
+    round holding >= 2 empty bins (rounds' bins_empty: where flat_empty_unique can act), and the chunks whose kept per
+    bin differ between r3 and r4 (r4 is r3 bitwise in a chunk where it never acted)"""
+    out = {}
+    for c in R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R4_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                continue
+            runs = json.load(open(f))["runs"]
+            qcs = {p: runs[f"{p}_{seed}"]["quota_chunks"] for p in pols}
+            rec = {p: {"chunks_with_2plus_empty": int(sum(any((r.get("bins_empty") or 0) >= 2 for r in x["rounds"])
+                                                             for x in qc)),
+                       "rounds_with_2plus_empty": int(sum(sum((r.get("bins_empty") or 0) >= 2 for r in x["rounds"])
+                                                          for x in qc))} for p, qc in qcs.items()}
+            rec["chunks_differing"] = int(sum(a["kept_per_bin"] != b["kept_per_bin"] or len(a["rounds"]) != len(b["rounds"])
+                                              for a, b in zip(*qcs.values())))
+            rec["chunks"] = len(qcs[pols[0]])
+            out[f"{c}/{seed}"] = rec
+    json.dump(out, open(os.path.join(DATA, "r4_acted.json"), "w"), indent=1)
+    print("STEP79R4_ACTED", json.dumps({k: [v[pols[1]]["chunks_with_2plus_empty"], v["chunks_differing"]]
+                                        for k, v in out.items()}))
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.argv.append("--help")
@@ -1303,6 +1363,15 @@ if __name__ == "__main__":
                  design="plan catalog_coverage step 78 revision r3", reach_tags=(R1_TAG, R2_TAG))
     elif sys.argv[1] == "step78-where":
         step78_where()
+    elif sys.argv[1] == "step79r4-pull":
+        pull(R4_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step79r4":   # r4 against r3, the policy it changes, in the same job (r2 beside: r3_check.json)
+        step75r2("grid_r4_budget18", "grid_r3_budget18", R4_TAG, out_file="r4_check.json",
+                 design="plan catalog_coverage step 79 revision r4", reach_tags=(R1_TAG, R2_TAG, R3_TAG))
+    elif sys.argv[1] == "step79-channel-presence":
+        step79_channel_presence()
+    elif sys.argv[1] == "step79r4-acted":
+        step79r4_acted()
     elif sys.argv[1] == "step79-rounds":
         step79_rounds()
     elif sys.argv[1] == "step79-where":   # r3's short bins over the r2 and r3 jobs (plan step 79's NO branch)
