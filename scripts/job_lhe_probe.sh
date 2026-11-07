@@ -29,6 +29,7 @@ if [ "$PROBE_SHARD" = eeisr ]; then
     # seconds per run (default 720; the first ISR runs' surveys alone took 465-720 s, 2026-11-07)
     PD=$(python -c "import sys; sys.path.insert(0, 'recipes'); import gen_catalog_v4_default as g; print(g.EE_ANCHOR[float(sys.argv[1])])" "${PROBE_ENERGY:?}")
     V="isr none"; [ "$PD" != isronlyll ] && V="isr none isronly"
+    V="${PROBE_VARIANTS:-$V}"      # e.g. isr: the anchor's spectrum only (step 76's kept-fraction probe)
     for v in $V; do
         F=; [ $v = isr ] && F=--ee-isr; [ $v = isronly ] && F="--ee-isr --patch pdlabel=isronlyll"
         python tools/lhe_probe.py run --process "${PROBE_PROCESS:?}" --energy "${PROBE_ENERGY:?}" \

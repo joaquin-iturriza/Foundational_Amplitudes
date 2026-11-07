@@ -124,6 +124,14 @@ DSHA_MIXED_MMIN = ("v4_epem_accxh", "v4_epem_aepemh")
 # run's energy and the layout's identities): those pools take eea_short's layout. Only pools not assembled are kept
 # in it (an assembled pool keeps the layout it was built with; eea_epem_bgtxwp, assembled from its complete runs, left out)
 EEA_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_run_yields_eea.json")
+# stage 2's pools not assembled (plan step 77; tools/lhe_parts.py yields --by-energy --queue catalog_v4_dsh_eea, kept
+# only for those pools): one MadEvent run per energy that stopped short at 1000/1500/3000 GeV (a biased sample), or
+# whose run outlived its worker (no part). "_by_energy": every stage-2 run's completeness per energy, the gridpack runs
+# of EEA_SHORT_RUN included. Those pools take dsha_short's layout.
+DSHA_YIELDS = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_run_yields_dsh_eea.json")
+# the mixed-pair-cut pools' probe with the cut (plan step 76; tools/lhe_probe.py eeisr-read of PROBE_SHARD=eeisr jobs,
+# one file per pool): their kept per energy and yield replace stage 1's (measured without the cut)
+DSHA_MMIN_PROBE = os.path.join(ROOT, "analysis", "catalog_v4", "data", "ee_mmin_probe_{}.json")
 
 
 EE_CARDS = "recipes/catalog_v4_ee"
@@ -209,6 +217,28 @@ def eea_short(lhe, y, name):
                            grid_events=int(lhe["gridpack"]), name=name, pin=pin)
 
 
+def dsha_short(lhe, y, by_e, name):
+    """A dsh_eea_ pool (lhe, in place) not assembled in stage 2 (DSHA_YIELDS: y its runs, by_e the queue's runs'
+    completeness per energy): moved whole to complete gridpack runs of EEA_SHORT_RUN (eea_short's rule for a pool
+    whose runs integrated on their own; its parts are not reused), each energy's runs sized from the complete share
+    stage 2's runs measured at that energy over every pool (complete over runs), COMPLETE_SHARE x RUN_SAFETY where it
+    has none. Whole, not only the short energies: lhe.gridpack and the events' identity are per pool, so a pool cannot
+    keep its one-run parts at some energies and draw gridpack runs at others. The share counts every stage-2 run at that
+    energy, these pools' own short runs of ~6500 events among them (gridpack runs of 200 are not split out in the
+    yields file): lower than the 200-event runs' own, so a run or two more per energy, never fewer. Time: stage 2's 370
+    gridpacks at this precision took median 52 s, at most 1109 s on 16 cores (worker logs); epepemem's and aepemz's
+    short high-energy runs took 3372-3793 s for one run of ~7000 events, inside a 2 h worker."""
+    if lhe.get("gridpack"):
+        raise SystemExit(f"{name}: a gridpack pool in {DSHA_YIELDS}: only one-run pools are relaid")
+    if y.get("energy") and sorted(set(float(e) for e in y["energy"])) != sorted(float(E) for E in lhe["energies"]):
+        raise SystemExit(f"{name}: its yields' energies are not its energies {lhe['energies']}")
+    shares = {}
+    for E in lhe["energies"]:
+        b = by_e.get(f"{float(E):g}")
+        shares[f"{float(E):g}"] = b["complete"] / b["runs"] if b and b["runs"] else COMPLETE_SHARE * RUN_SAFETY
+    return complete_layout(lhe, EEA_SHORT_RUN, gridpack=True, shares=shares, name=name)
+
+
 def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, complete):
     """The anchor pools (step 74): {eea_<x>: entry} and {dsh_eea_<x>: entry}, entered in P. ee, dsh: the ee4_ and dsh_
     entries of this run (the old pools whose counterparts these are)."""
@@ -217,6 +247,7 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
     eea, dsha, probe = {}, {}, {}
     eea_y = json.load(open(EEA_YIELDS)) if os.path.exists(EEA_YIELDS) else {}
     s1 = json.load(open(EEA_STAGE1)) if os.path.exists(EEA_STAGE1) else {}
+    dsha_y = json.load(open(DSHA_YIELDS)) if os.path.exists(DSHA_YIELDS) else {}
     for n in trees:
         if not is_ee(n):
             continue
@@ -248,6 +279,20 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         rl = mg.lhe_layout(P[reuse])
         Es = list(P[reuse]["lhe"]["energies"])
         m1 = s1.get(reuse) or {}
+        mm = DSHA_MMIN_PROBE.format(name)
+        if n in DSHA_MIXED_MMIN and os.path.exists(mm):     # measured with the cut (step 76), not stage 1's
+            m1 = {"kept_by_energy": {}, "yield": 1.0}
+            for E, r in json.load(open(mm))["energies"].items():
+                isr = r.get("isr") or {}
+                if isr.get("kept") is None or not isr.get("events_returned"):
+                    raise SystemExit(f"{name}: no kept fraction at {E} GeV in {mm}")
+                if isr.get("mixed_pair_mmin") != float(mg.V4_CUTS["ee"]["m_min"]):     # a probe made without the cut
+                    raise SystemExit(f"{name}: {mm} at {E} GeV was not probed with the mixed-pair cut")
+                m1["kept_by_energy"][f"{float(E):g}"] = float(isr["kept"])
+                m1["yield"] = min(m1["yield"], float(isr["events_returned"]) / float(isr["events_asked"]))
+            if sorted(m1["kept_by_energy"], key=float) != [f"{float(E):g}" for E in Es]:
+                raise SystemExit(f"{name}: {mm} has energies {sorted(m1['kept_by_energy'], key=float)}, the pool {Es}")
+            m1["kept"] = sum(m1["kept_by_energy"].values()) / len(Es)
         if m1.get("kept_by_energy"):        # measured on the eea_ pool's own events, every energy
             am = accept_margin({name: {"kept": m1["kept"], "by_energy": m1["kept_by_energy"]}}, name, Es)
             # the worst energy's, as lhe_probe kept --yields-out gives a gridpack pool's: the plan's check sees the
@@ -274,6 +319,8 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
                 # the eea_ pool ran this layout (gridpack runs of this size) at every energy: its measured shares
                 cc["shares"] = {k: v["complete"] for k, v in m1["complete_by_energy"].items()}
             lhe = complete_layout(lhe, complete[name_old]["run_events"], name=name, **cc)
+        if name in dsha_y:
+            lhe = dsha_short(lhe, dsha_y[name], dsha_y.get("_by_energy", {}), name)
         lhe["parts"] = True
         e = lhe_entry(mg, n, P[n], mg.V4_MODEL, None)
         e.update(lhe=lhe, parent=n, reuse=reuse, split="train", test_group="catalog_v4 default share, e+e- anchor",

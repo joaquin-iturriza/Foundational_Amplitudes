@@ -131,6 +131,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 42
+      energy_runs:
+      - 42
+      - 42
+      - 42
+      - 42
+      - 42
+      - 42
+      - 43
+      - 43
+      - 43
+      - 45
+      gridpack: 13057
     parent: v4_epem_aaepem
     reuse: eea_epem_aaepem
     split: train
@@ -525,6 +540,20 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 45
+      energy_runs:
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 46
+      - 46
+      - 46
+      - 48
+      gridpack: 13057
     parent: v4_epem_abbxz
     reuse: eea_epem_abbxz
     split: train
@@ -588,6 +617,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_accx
     reuse: eea_epem_accx
     split: train
@@ -720,6 +764,7 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      mixed_pair_mmin: 10.0
     parent: v4_epem_accxh
     reuse: eea_epem_accxh
     split: train
@@ -913,6 +958,7 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      mixed_pair_mmin: 10.0
     parent: v4_epem_aepemh
     reuse: eea_epem_aepemh
     split: train
@@ -976,6 +1022,20 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 45
+      energy_runs:
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 46
+      - 46
+      - 46
+      - 48
+      gridpack: 13057
     parent: v4_epem_aepemz
     reuse: eea_epem_aepemz
     split: train
@@ -1039,6 +1099,20 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 45
+      energy_runs:
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 46
+      - 46
+      - 46
+      - 48
+      gridpack: 13057
     parent: v4_epem_aepvewm
     reuse: eea_epem_aepvewm
     split: train
@@ -1228,6 +1302,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_amupmum
     reuse: eea_epem_amupmum
     split: train
@@ -1426,6 +1515,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_ataptam
     reuse: eea_epem_ataptam
     split: train
@@ -2061,6 +2165,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_bbbxbx
     reuse: eea_epem_bbbxbx
     split: train
@@ -2191,6 +2310,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_bbxddx
     reuse: eea_epem_bbxddx
     split: train
@@ -2838,6 +2972,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_ccxepem
     reuse: eea_epem_ccxepem
     split: train
@@ -2903,6 +3052,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_ccxgg
     reuse: eea_epem_ccxgg
     split: train
@@ -3226,6 +3390,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_ccxuux
     reuse: eea_epem_ccxuux
     split: train
@@ -3669,6 +3848,19 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 51
+      energy_runs:
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 52
+      - 52
+      - 54
+      gridpack: 13057
     parent: v4_epem_ddxwpwm
     reuse: eea_epem_ddxwpwm
     split: train
@@ -4384,6 +4576,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_epepemem
     reuse: eea_epem_epepemem
     split: train
@@ -5332,6 +5539,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_mupmumtaptam
     reuse: eea_epem_mupmumtaptam
     split: train
@@ -5397,6 +5619,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_mupmumuux
     reuse: eea_epem_mupmumuux
     split: train
@@ -5519,6 +5756,19 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 51
+      energy_runs:
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 52
+      - 52
+      - 54
+      gridpack: 13057
     parent: v4_epem_mupmumzz
     reuse: eea_epem_mupmumzz
     split: train
@@ -5767,6 +6017,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_taptam
     reuse: eea_epem_taptam
     split: train
@@ -6271,6 +6536,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_uuuxux
     reuse: eea_epem_uuuxux
     split: train
@@ -6336,6 +6616,21 @@ processes:
         '1000': isronlyll
         '1500': isronlyll
         '3000': clic3000ll
+      complete_runs: true
+      run_events: 200
+      n_runs: 41
+      energy_runs:
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 41
+      - 42
+      - 43
+      gridpack: 13057
     parent: v4_epem_uuxvmvmx
     reuse: eea_epem_uuxvmvmx
     split: train

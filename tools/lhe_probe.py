@@ -482,6 +482,9 @@ def cmd_run(a):
         patches.update(extra)
         mg.patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(a.events), "iseed": int(iseed), **patches})
         mg.add_card_params(f"{ev}/Cards/run_card.dat", extra)
+        if cfg["lhe"].get("mixed_pair_mmin"):     # MadEvent's own mixed-pair mass cut, as the pool's runs have it
+            mg.lhe_mixed_pair_cut(ev, cfg["lhe"]["mixed_pair_mmin"])
+            res["mixed_pair_mmin"] = float(cfg["lhe"]["mixed_pair_mmin"])
         mg._set_me5_config(f"{ev}/Cards/me5_configuration.txt",
                            {"run_mode": 0, "nb_core": 1, "automatic_html_opening": "False"})
         res["patches"] = patches
@@ -1055,7 +1058,7 @@ def cmd_eeisr_read(a):
             v = "NO_BEAMSTRAHLUNG"
         elif none.get("s_per_kept_event") and (isr.get("s_per_kept_event") or 1e9) > COST_MAX * none["s_per_kept_event"]:
             v = "COST"
-        keep = ("run", "events_returned", "s_generate", "s_per_kept_event", "kept", "below_window", "cuts_partonic",
+        keep = ("run", "mixed_pair_mmin", "events_asked", "events_returned", "s_generate", "s_per_kept_event", "kept", "below_window", "cuts_partonic",
                 "cuts_lab", "shat_frac", "beam_card", "error", "timeout", "log_tail")
         out["energies"][E] = {"pdlabel": EE_ANCHOR.get(float(E)), "verdict": v, "expected_beams": want,
                               **{k: {x: r.get(x) for x in keep if x in r} for k, r in R.items()}}
