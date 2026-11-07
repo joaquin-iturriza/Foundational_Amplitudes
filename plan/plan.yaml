@@ -14451,9 +14451,12 @@ entries:
   - D307
   - D313
   next:
-    1: 'Step 13 (D307, D308): the continued restart with the parent''s optimizer state: arm v4_het_ws_step3198_continue_optstate[_seed2]
-      (step-3198 model of v4_het_control_ckpt[_seed2], lr scale 0.20233, no re-warm, fine_tune.load_optimizer_state; branch
-      ws-optstate @7456a119), 2 runs, read against the control final_default and the fresh-optimizer step3198_continue (par:v4_warm_start_valley)'
+    1: 'Step 13 (D307, D308) rerun after the sigma-stage fix b91cf7c6: arm v4_het_ws_step3198_continue_optstate[_seed2] with
+      SHORT_TAG=fix1 (run dirs _tagfix1), FA-ccin2p3-1c90ae73 (s42), FA-ccin2p3-013708af (s43); the first pair 05df656d/07bfc8d7
+      trained cleanly (jump removed, G 79/79 vs 631/1016) but its sigma stage moved mu. When they end: check the sigma stage
+      has no OPT_STATE line and its first validation is near the main stage''s; read7.sh, mixture_ab.py warm C1r_step3198_continue_optstate
+      (W filled), ws_restart_steps.py; read against the control final_default and the fresh-optimizer step3198_continue under
+      the design of 2026-11-06T22:29'
     9: 'Step 14 (D319, single seed D315): one study of new warm-start mechanisms toward the C1 change (share 0.25, het, k=533)
       at seed 42, against the same-commit default restart and B: shrink-and-perturb of the parent (0.4 p + 0.1 fresh init),
       share 0.50 for 267 steps, a WSD-scheduled parent branched at the end of its stable phase (step 3731, optimizer state)
@@ -17604,11 +17607,12 @@ entries:
     written: '2026-11-06T23:26:30+00:00'
   step_why:
     1:
-      feeds: 'how a warm start should leave its parent (D307): whether continuing the parent''s run, optimizer included, beats
-        the default restart'
+      feeds: whether the restart jump, not the start model, is what keeps the continued warm start short (the warm-start mechanism,
+        D307)
       if:
-      - 'BETTER than the default restart: it becomes the restart recipe, read against B for MATCH'
-      - 'not BETTER: the default restart stays; ask Joaquin to lift D307 so the change tests resume'
+      - 'BETTER than the control: the parent''s optimizer state is a recipe candidate, read beside step 14''s branch'
+      - 'NOT BETTER or WORSE: the optimizer state removes the jump without helping; the jump is ruled out as the cause, recorded
+        in par:v4_warm_start_valley'
     9:
       feeds: 'which warm-start mechanism becomes the recipe (D307: the change tests resume once it is fixed)'
       if:
