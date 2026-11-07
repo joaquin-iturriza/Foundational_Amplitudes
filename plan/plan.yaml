@@ -3754,6 +3754,14 @@ entries:
       and repo-reviewer running. On both PASS: merge, site sync, site pick FA --jobs 38, plan target --batch r4_check --wall
       0.2 --jobs 38, submit 38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r3_budget18+grid_r4_budget18,
       seeds 42/43, --time 00:45:00), plan wait on them; read; figure r2_check_fig.py (add an r4 mode).'
+    81: '(t) sampler r5 (after r4''s NO, data/r4_check.json @f24bfe10; r4 = r3 + flat_empty_unique dropped): design one revision
+      that keeps r3''s empty-bin steering for uux_bgtxwp (r3 0.925/0.917; r4''s de-stacking 0.835/0.809) and stops uu_bbxuu''s
+      regression (r2 1.0, r3 0.90/0.80, r4 0.70/0.72; its shortfall is chunks stopping at the label budget 18 while still
+      filling: r3 8/12, r4 20/18 budget stops; data/r3_rounds.json, r4_acted.json). Candidates to weigh with existing reads
+      before the design: a budget raise only for chunks whose last round still filled >= the stall share (r3 + adaptive budget),
+      or r3''s nearest-candidate rule only for a bin whose nearest occupied bin is the range''s last filled one. Same 19 classes
+      x seeds 42/43 check, three policies per job (current + r3 + r5), design-reviewer and repo-reviewer, step75r2 reader
+      parametrised.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12444,6 +12452,12 @@ entries:
       - 'NO with bgtxwp still short in 2-3 chunks at 0-1 kept: report the in-chunk steering limit to Joaquin, next the pool-level
         route'
       - 'NO with bbxuu still short: r4 dropped, next r2 plus a budget raise'
+    81:
+      feeds: whether the 1301 hadronic classes are regenerated with the flat sampler (and which revision)
+      if:
+      - 'r5 PASS: straddling bins per Joaquin''s answer, then regenerate the 1301 classes, then step 68'
+      - 'r5 NO with bgtxwp short only in chunks that never reach the bin: report the in-chunk steering limit to Joaquin, next
+        the pool-level route'
   owner:
     agent: ae64b531b031096ce
     state: working
