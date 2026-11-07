@@ -33,9 +33,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 6290
-      n_test: 4290
-      n_train: 62900
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -64,7 +64,7 @@ processes:
         '3000': clic3000ll
       complete_runs: true
       run_events: 200
-      n_runs: 46
+      n_runs: 41
       gridpack: 13057
     parent: v4_epem_aaccx
     reuse: eea_epem_aaccx
@@ -102,9 +102,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 6330
-      n_test: 4330
-      n_train: 63300
+      n_val: 5715
+      n_test: 3715
+      n_train: 57150
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -167,9 +167,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 6380
-      n_test: 4380
-      n_train: 63800
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -198,7 +198,7 @@ processes:
         '3000': clic3000ll
       complete_runs: true
       run_events: 200
-      n_runs: 47
+      n_runs: 41
       gridpack: 13057
     parent: v4_epem_aamupmum
     reuse: eea_epem_aamupmum
@@ -236,9 +236,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 6215
-      n_test: 4215
-      n_train: 62150
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -267,7 +267,7 @@ processes:
         '3000': clic3000ll
       complete_runs: true
       run_events: 200
-      n_runs: 46
+      n_runs: 41
       gridpack: 13057
     parent: v4_epem_aataptam
     reuse: eea_epem_aataptam
@@ -398,15 +398,6 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 51
-      energy_runs:
-      - 51
-      - 51
-      - 51
-      - 51
-      - 51
-      - 54
-      - 51
-      - 54
       gridpack: 13057
     parent: v4_epem_aawpwm
     reuse: eea_epem_aawpwm
@@ -442,9 +433,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5521
-      n_test: 3521
-      n_train: 55201
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -568,9 +559,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5505
-      n_test: 3505
-      n_train: 55050
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -633,9 +624,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5880
-      n_test: 3880
-      n_train: 58800
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -664,18 +655,7 @@ processes:
         '3000': clic3000ll
       complete_runs: true
       run_events: 200
-      n_runs: 43
-      energy_runs:
-      - 43
-      - 43
-      - 43
-      - 43
-      - 43
-      - 43
-      - 43
-      - 46
-      - 43
-      - 46
+      n_runs: 41
       gridpack: 13057
     parent: v4_epem_accxg
     reuse: eea_epem_accxg
@@ -713,9 +693,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5500
-      n_test: 3500
-      n_train: 55001
+      n_val: 5615
+      n_test: 3615
+      n_train: 56150
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -841,9 +821,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5601
-      n_test: 3601
-      n_train: 56001
+      n_val: 5545
+      n_test: 3545
+      n_train: 55450
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -906,9 +886,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5500
-      n_test: 3500
-      n_train: 55001
+      n_val: 5720
+      n_test: 3720
+      n_train: 57200
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -1095,9 +1075,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5500
-      n_test: 3500
-      n_train: 55001
+      n_val: 5601
+      n_test: 3601
+      n_train: 56001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -1219,9 +1199,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5531
-      n_test: 3531
-      n_train: 55301
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -1417,9 +1397,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5541
-      n_test: 3541
-      n_train: 55401
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -2247,9 +2227,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5515
-      n_test: 3515
-      n_train: 55150
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -2405,16 +2385,6 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 45
-      energy_runs:
-      - 45
-      - 45
-      - 45
-      - 45
-      - 45
-      - 45
-      - 45
-      - 45
-      - 55
       gridpack: 13057
     parent: v4_epem_bbxgz
     reuse: eea_epem_bbxgz
@@ -2452,9 +2422,9 @@ processes:
       run_card: run_card.dat
       param_card: param_card.dat
       model: sm-no_b_mass
-      n_val: 5525
-      n_test: 3525
-      n_train: 55250
+      n_val: 5500
+      n_test: 3500
+      n_train: 55001
       label_alphas: running_sqrt_shat
       parts: true
       source: catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e-
@@ -2616,9 +2586,9 @@ processes:
       - 51
       - 51
       - 51
-      - 62
       - 51
-      - 51
+      - 101
+      - 67
       gridpack: 13057
     parent: v4_epem_bbxwpwm
     reuse: eea_epem_bbxwpwm
@@ -3069,9 +3039,9 @@ processes:
       - 45
       - 45
       - 45
-      - 48
       - 45
       - 45
+      - 67
       gridpack: 13057
     parent: v4_epem_ccxgz
     reuse: eea_epem_ccxgz

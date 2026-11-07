@@ -122,6 +122,36 @@ def test_part_energy_ok_with_spectrum():
     assert not lhe_parts.part_energy_ok(part([120.0] * 3), run_fixed)
 
 
+def test_dsh_eea_sized_from_stage1():
+    """Stage 2 (dsh_eea_) is sized from stage 1's read (lhe_parts_eea_stage1.json): every dsh_eea_ pool measured there
+    is in the plan's probe file at its eea_ pool's worst energy's kept x yield, its margin follows the measured kept per energy, and
+    a complete-run pool whose eea_ counterpart ran the same layout takes that pool's complete share per energy."""
+    import json, math, yaml
+    import gen_catalog_v4_default as g
+    s1 = json.load(open(g.EEA_STAGE1))
+    probe = json.load(open(g.EEA_PROBE))
+    dsha = yaml.safe_load(open(os.path.join(os.path.dirname(g.__file__), "catalog_v4_eea_default_processes.yaml")))["processes"]
+    eea = yaml.safe_load(open(os.path.join(os.path.dirname(g.__file__), "catalog_v4_eea_processes.yaml")))["processes"]
+    assert set(probe) == {k for k, e in dsha.items() if s1.get(e["reuse"], {}).get("kept_by_energy")}
+    for k, y in probe.items():
+        m = s1[dsha[k]["reuse"]]
+        assert y == round(min(m["kept_by_energy"].values()) * m["yield"], 4)     # the worst energy's
+    assert probe["dsh_eea_epem_accxh"] < 0.5      # 0.436 at 160 GeV: the plan's YIELD_FACTOR check lists it
+    hit = 0
+    for k, e in dsha.items():
+        rr, l, m = eea[e["reuse"]]["lhe"], e["lhe"], s1.get(e["reuse"], {})
+        if not (l.get("complete_runs") and rr.get("complete_runs") and rr.get("gridpack") and m.get("complete_by_energy")):
+            continue
+        need = sum(int(l[s]) for s in ("n_train", "n_val", "n_test"))
+        per = math.ceil(need / len(l["energies"]))
+        runs = l.get("energy_runs") or [l["n_runs"]] * len(l["energies"])
+        for E, n in zip(l["energies"], runs):
+            x = m["complete_by_energy"][f"{float(E):g}"]["complete"]
+            assert n == math.ceil(per / (min(g.COMPLETE_SHARE, x / g.RUN_SAFETY) * int(l["run_events"])))
+            hit += x < g.COMPLETE_SHARE * g.RUN_SAFETY
+    assert hit >= 1      # some energy measured short (eea_epem_bbxwpwm 1500 GeV: 2 of 4 runs complete)
+
+
 if __name__ == "__main__":
     for k, v in list(globals().items()):
         if k.startswith("test_"):
