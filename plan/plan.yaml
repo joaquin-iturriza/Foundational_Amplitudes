@@ -11235,6 +11235,72 @@ entries:
       no dsh_ pool (808 named in recipes/catalog_v4_default_lhe.yaml), so for them widening from PP4 val leaves nothing unread
       to score on; that revision must widen by a rule that reads no scored events. Cosmetic: the COVER_BAR line still carries
       the cost-range comment.'
+  - at: '2026-11-07T04:45:35+00:00'
+    question: 'Step 75 revision r1 of step 65''s sampler, checked on 18 classes before the catalog: with r1 = step 65''s grid_both_res2f_budget12
+      plus (a) a stall stop (flat_stall 0.2: a round past the first that fills fewer than 0.2 x min(events missing before
+      it, its labels / flat_budget) ends the flat part), (b) the ladder solves stopped at 1e-12 (mc_solve_tol; momenta within
+      2e-11 sqrt(s) of the full collapse, tests/test_flat_grid.py), (c) both ladders on every hadronic class with >= 3 finals
+      (mc_mperi_all), (d) one resonance-ladder channel per resonance (mc_resladder: the edge ladder with the resonance''s
+      finals as one rung on its Breit-Wigner, then decayed), (e) the range joined with the in-support extent of the class''s
+      dsh_ train pool (45001 MadEvent events; tools/flat_range.py --dsh, recipes/catalog_v4_flat_range_dsh.json): does r1,
+      on the worst classes of every failure kind, (1) fill every 0.25-dex bin inside the range source''s pp extent (range
+      lo + 0.5 dex to hi - 0.5 dex) at >= 0.95 of quota, (2) leave ZERO scored held-out in-support pp events outside the kept
+      range (D269), scored on the PP4 val pool + dsh_ val + dsh_ test (the dsh_ train pool now builds the range, so it is
+      no longer scored), (3) cost <= 2x the old sampling per class on the same node? Feeds: whether all 1301 hadronic classes
+      are regenerated with r1 (pools _smixr) before step 68''s e+e- classes join.'
+    prior: 'Step 65 read (regen_read.py @8a1abe50, data/regen_g12_read.json): SHORT on 527 classes (a bin < 0.95), 213 classes
+      with held-out events outside (404 events), cost median 1.86x, 473 classes > 2x (total 1.74x). Step 75 profile (analysis/catalog_v4/regen_profile.py
+      @e42a04fa -> data/regen_g12_profile.json): over-2x classes spend label 1.42 + proposal 0.67 + rest 0.30 of the old core-s
+      (<= 2x classes 1.07/0.16/0.27); 357 of 473 hit the label budget (11.7 flat labels per flat event of 12); proposal 64.5
+      us per flat label on 4-final classes (cheap matrix elements: 118 us/label over 2x vs 164 under), 74 classes stay over
+      2x even at zero proposal. Short bins: 2852 in the top 0.5-dex margin, 729 in the next 0.5 dex, 414 interior, 76 bottom
+      margin; 232 classes short only above every held-out pp event (45 of 58 such 2->2 bins and 26 of 66 3-final bins hold
+      no candidate at all: bounded |M|^2), 295 short inside the held-out extent. Where (regen_where.py @a71d786e -> data/regen_g12_where.json,
+      527 classes): held-out events in the short top sit at sqrt(s_hat) 1.0-1.9 TeV (230-370 GeV below), max |eta| 3.4-4.1,
+      least pT 11-12 GeV, one final within 1-|cos| 1e-3..1e-4 of the beam, a Z/W pair on shell along the beam (|cos| 0.997-1.0);
+      the short bins'' candidates come from the resonance (41-71%), ladder and collinear channels; 3-final and one-parton
+      classes have no ladder. Coverage: 197 of 213 outside classes have held-out max above the range top (median 0.14 dex,
+      max 1.26), i.e. the range table (1.2e4 PP4 events + 0.5 dex) is narrower than the 5.4e4 scored events reach; 504 classes
+      without dsh_ pools: 4 with outside (0.01-0.13 dex). Step 75 (grid_fwd_check.json): grids12 + forward fill all bins on
+      5 classes, cost 0.78-2.11x; its rounds never filled < 0.5 of the missing (stall 0.1-0.3 changes nothing there). Searched
+      results.tex (stall, resonance ladder, smixr, dsh_ train), the entry, site decisions (regenerat, range, margin, fill,
+      cover): no earlier revision of this kind.'
+    measure: 'analysis/catalog_v4/multichannel_check.py run <class> <probe> current+grid_both_res2f_budget12+grid_r1_budget12
+      <seed> (scripts/job_multichannel_check.sh, CPU, one job per class and seed, the three policies on one node, the class''s
+      train pool replayed chunk by chunk as the generation builds it) -> per policy: kept per bin and quota per chunk, rounds,
+      stop, labels, channel-by-bin, chunk seconds; held-out sources table/heldout/heldout_r1 (in-support events outside the
+      kept [min, max]). Read by a committed reader (multichannel_check.py step75r1 -> data/r1_check.json, written before the
+      read): per class and seed (1) core fill = share of quota bins inside [range lo + 0.5 dex, range hi - 0.5 dex] at >=
+      0.95, margin bins'' fill listed apart; (2) heldout_r1 outside count; (3) cost = r1 seconds / current seconds in the
+      same job; the step-65 policy beside it (fill, outside on heldout_r1, cost) as the same-node control. Classes (18: worst
+      of each kind in data/regen_g12_profile.json): short inside the held-out extent v4_bbx_aazz, v4_dbx_hhtxu, v4_ddx_ghwpwm,
+      v4_dg_adwpwm, v4_dbx_ahtxu, v4_bb_bbvevex (4-final), v4_bbx_htaptam, v4_udx_vevexwp (3-final); short only beyond it
+      v4_bb_bb, v4_ddx_ttx (2->2), v4_ddx_btxwpz; held-out outside without a short bin v4_ug_auuux, v4_uux_ddxwpwm, v4_bbx_ccxh
+      (13 outside); cost worst v4_udx_cggsx (4.64x), v4_uc_cuvevex; step-75 controls v4_us_ddxsu, v4_uu_bbxuu.'
+    check: 'The tested changes move the measures on existing data: fill and the held-out count moved with the channel set
+      and range in steps 72 -> 75 (udx_csxvevex 0.898 -> 1.000; held-out counts 0-1 at budget 750 vs higher at 50); the short
+      top''s held-out events are where the new channels draw (resonance on shell along the beam, |eta| to 4, pT at the cut,
+      sqrt(s_hat) ~1.5 TeV; regen_g12_where.json) and none of the old channels put more than 0.29 of the short bins'' candidates
+      there except res; cost: the stall stop ends a toy chunk whose range top no candidate reaches after 2 rounds instead
+      of 4 (tests/test_flat_grid.py test_stall_stop), the solve at 1e-12 cuts the ladder 24 -> 16 us/event locally; locally
+      (fake labels) r1''s proposal per candidate on udx_cggsx 61 -> 106 us (3 resonance ladders), bb_bbvevex 35 -> 32, dbx_ahtxu
+      17 -> 47 us: the cost can go either way, hence measured. Range: joining dsh_ train widens 659 tops (median 0.3 dex,
+      max 1.76).'
+    fixed: Classes' windows, sizes, base/physics, mixture shares (f_flat 0.35, f_fwd 0.15, fwd_cand 1/3), cuts, budget 12,
+      grid constants, data seed as the chunk plan; the train role (1e5 events) as step 75's check; code = trunk after regen-rev
+      merges (repo-reviewer PASS), same commit for all 36 jobs. CPU only, 0 GPU-h.
+    control: 'The step-65 policy (grid_both_res2f_budget12) and the old sampling (current) in the same job on the same node:
+      r1 against both; on the step-75 classes us_ddxsu and uu_bbxuu r1 must keep fill 1.000 in the core bins.'
+    seeds: Data seeds 42 and 43 (step 75's), each class at both.
+    outcome: 'PASS (every class, both seeds: core fill >= 0.95 in every bin, 0 heldout_r1 events outside, r1 cost <= 2x current)
+      -> regenerate all 1301 hadronic classes with recipes/catalog_v4_r1_regen.yaml (tools/regen_recipes.py write --r1; _smixr
+      pools beside _smixq), 32 CPU shards, read by regen_read.py''s rules with r1''s range, core-bin fill and heldout_r1 scoring;
+      then step 68. Per failing kind (no): core bins short on a class -> which channel reaches its top (channel-by-bin) and
+      where its held-out top sits, one more revision of that channel; outside events > 0 -> how far above the kept max and
+      whether the core range covers them (range vs sampler reach), a tolerance only via plan ask to Joaquin; cost > 2x ->
+      labels vs proposal per channel. Margin bins short are reported (a bin above the class''s kinematic maximum, e.g. 2->2
+      tops, holds no candidate), never counted in the verdict: the 0.5-dex margin was a chosen width (tools/flat_range.MARGIN_DEX),
+      the coverage requirement (D269) is the scored count. Job failures -> log read, fixed, rerun.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
