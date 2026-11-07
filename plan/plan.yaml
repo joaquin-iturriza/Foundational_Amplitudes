@@ -3742,12 +3742,6 @@ entries:
       seed (D315): arm v4_het_signhead_branch seed 42 = FA-ccin2p3-54961d3e (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch
       at 411215ce, --time 03:30:00, --mem 16G, target signhead_branch_s42 3.49 h), against the weight-1 rerun FA-ccin2p3-ac8d6fca
       and the MSE control at seed 42. On end: read by step 61''s rules (het_oneloop.py step73).'
-    76: '(o) step 76: mixed-pair mass cut (lhe.mixed_pair_mmin -> MadEvent dummy_cuts) merged, recipes carry it for dsh_eea_epem_accxh/aepemh;
-      18 probes (scripts/job_lhe_probe.sh PROBE_SHARD=eeisr PROBE_VARIANTS=isr, 1000 events, both pools x 9 energies, target
-      mmin_probe 0.3 h) queued at CC. On end: python tools/lhe_probe.py eeisr-read <the 9 runs of a pool> --out analysis/catalog_v4/data/ee_mmin_probe_<pool>.json
-      per pool, regenerate recipes (gen_catalog_v4_default.py), check kept near 1; after the step-77 relay workers end: lhe_parts
-      plan recipes/catalog_v4_eea_lhe.yaml --queue $SCRATCH/lhe_queue/catalog_v4_dsh_eea --grid-cores 16 --probe analysis/catalog_v4/data/lhe_probe_yields_dsh_eea.json
-      --rates analysis/catalog_v4/data/lhe_rates_dsh_eea.json, site pick, target, submit workers.'
     78: '(q) step 75 r2 (after r1''s NO): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18 on branch sampler-r2
       @c825cb19 (worktrees/wt-r2; tools/regen_recipes.R2, policy grid_r2_budget18; readers multichannel_check.py step75r2-rounds
       -> data/r1_rounds.json, step75r2 -> data/r2_check.json). Design recorded 2026-11-07, design-reviewer and repo-reviewer
@@ -12287,11 +12281,6 @@ entries:
       if:
       - 'SIGN NOT WORSE THAN MSE, MAGNITUDE AS RERUN: adopt the detached head'
       - 'NO: clipping regime next'
-    76:
-      feeds: whether the two pools join the e+e- anchor default shares
-      if:
-      - 'kept >= 0.9 at every energy with the cut: plan and generate them'
-      - 'still kept < 0.5: read the cut pieces again with cutread on the probe''s events'
     78:
       feeds: whether all 1301 hadronic classes are regenerated with the revised sampler before step 68's e+e- classes join
       if:
