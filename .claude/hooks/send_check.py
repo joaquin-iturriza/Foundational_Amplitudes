@@ -15,6 +15,14 @@ the text holds, on any page:
   - a held-out axis code (H1..H9 with any suffix, H2p5, H7E, H7c, XV3, XV4) or a decision or event code (D12, E345);
   - a label with "ratio" or "gain" that is not written as a formula a/b, or a "/" with one side empty (a quantity is math, never spelled out in words)
     on one side.
+
+Axes rule (2026-11-07, the user: "what is the x axis in the top plots?"): a figure (.png, .pdf, .svg) sent with a
+`caption` is also refused unless the caption names both axes: an x description ("x axis", "x-axis", "x:",
+"horizontal", or an x followed later by "against") and a y description ("y axis", "y-axis", "y:", "vertical"); the
+pattern "<y quantity> against <x quantity>" gives both. When the caption names panels "(a)", "(b)", ..., each
+panel's text must do so (a text before the first letter counts for all panels, so a shared "x axis ..." sentence
+there is enough).
+
 A term listed in docs/glossary.txt (term<TAB>plain definition) is allowed, in its underscore or its spaced form.
 
 Read-only use: python3 .claude/hooks/send_check.py --scan FILE... prints the findings (a .txt file is read as one
@@ -116,12 +124,44 @@ def check(path, terms):
     return lines
 
 
-def sent_files(tool_input):
-    """Every .png/.pdf path in the tool input, whatever its field is called."""
+FIG_EXT = (".png", ".pdf", ".svg")
+X_AXIS = re.compile(r"\bx[\s-]*axis|\bx\s*:|horizontal|\bx\b.*\bagainst\b", re.I | re.S)
+Y_AXIS = re.compile(r"\by[\s-]*axis|\by\s*:|vertical", re.I)
+AGAINST = re.compile(r"\S.*\bagainst\b\s*\S", re.I | re.S)
+PANEL = re.compile(r"\(([a-h])\)")
+
+
+def has_axes(text):
+    return bool(AGAINST.search(text)) or (bool(X_AXIS.search(text)) and bool(Y_AXIS.search(text)))
+
+
+def axes_missing(caption):
+    """True when a caption does not name both axes (per panel when it names panels)."""
+    caption = caption or ""
+    parts = PANEL.split(caption)          # [shared, letter, text, letter, text, ...]
+    if len(parts) < 5:
+        return not has_axes(caption)
+    shared = parts[0]
+    return any(not has_axes(shared + " " + parts[i]) for i in range(2, len(parts), 2))
+
+
+def axes_findings(tool_input, cwd):
+    cap = tool_input.get("caption") if isinstance(tool_input, dict) else None
+    cap = cap if isinstance(cap, str) else ""
+    out = []
+    for p in sent_files(tool_input, FIG_EXT):
+        if axes_missing(cap):
+            out.append("%s: its caption must say what the x and y axes are (e.g. \"x axis: ..., y axis: ...\" or "
+                       "\"<y quantity> against <x quantity>\", for each panel)" % p)
+    return out
+
+
+def sent_files(tool_input, exts=(".png", ".pdf")):
+    """Every .png/.pdf path (or exts) in the tool input, whatever its field is called."""
     out = []
     def walk(x):
         if isinstance(x, str):
-            if x.lower().endswith((".png", ".pdf")):
+            if x.lower().endswith(exts):
                 out.append(x)
         elif isinstance(x, dict):
             for v in x.values():
@@ -149,8 +189,11 @@ def main(argv):
     bad = []
     for p in sent_files(ev.get("tool_input") or {}):
         bad += check(p if os.path.isabs(p) else os.path.join(cwd, p), terms)
+    ax = axes_findings(ev.get("tool_input") or {}, cwd)
+    if ax:
+        sys.stderr.write("send_check: a figure needs its axes named in the caption:\n  " + "\n  ".join(ax) + "\n")
     if not bad:
-        return 0
+        return 2 if ax else 0
     sys.stderr.write(
         "send_check: this file does not read on its own (CLAUDE.md 0e: plain names, no internal codes). Redraw it with "
         "plain words for each of these, or, for a term the user has accepted, add it with its plain definition to "
