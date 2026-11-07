@@ -12295,7 +12295,7 @@ entries:
       - 'NO: the design''s NO branch (channel route res [0,1,3] for bgtxwp, or revise r3''s weight concentration)'
   owner:
     agent: ac4ff72809f45ebbe
-    state: working
+    state: closed
     since: '2026-11-07T06:40:22+00:00'
     state_at: '2026-11-07T07:13:15+00:00'
     context: 240570
@@ -14512,28 +14512,34 @@ entries:
       10 GeV at generation). lhe_parts yields --by-energy (lists every process with a short part): neither pool appears, so
       none of their 18 runs returned under its ask. All 115 dsh_eea_ default-share e+e- anchor pools are built.'
   handoff:
-    state: '2026-11-07 ~08:00. Step 78 (r2 sampler check): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18
-      merged 56b3c909 (repo + design PASS; cost bar = summed seconds over the 38 jobs <= 2x current, per class listed); 38
-      CPU jobs running (36 at 79f7d559/e00ab955 + htaptam reruns 0f133452/ac96f65a at f7dbc021), wait on step 78. On end:
-      python analysis/catalog_v4/multichannel_check.py step75r2-pull then step75r2 -> data/r2_check.json; step 78 is HELD
-      only for the straddling-bin question to Joaquin (bb_bb 8.34, uux_bgtxwp -0.96). Step 76: accxh keeps 0.963-1.0 at all
-      9 energies with the mixed-pair cut, aepemh 0.998-1.0 at 160-500; aepemh 209/1000/1500/3000 probes rerun (log race fixed
-      e2f51bd9) FA-ccin2p3-e22b4949 08ae487a 81113f0a 9cc1284c, wait on step 76; on end: tools/lhe_probe.py eeisr-read per
-      pool -> data/ee_mmin_probe_<pool>.json, regenerate recipes, lhe_parts plan into catalog_v4_dsh_eea (queue now idle,
-      all 113 assembled), site pick, target, submit workers. Step 77 done (113/113 assembled). Step 73: detached sign-head
-      arm seed 42 FA-ccin2p3-54961d3e running, wait on step 73.'
-    decisions: 'Cost bar summed over the check''s jobs (CLAUDE.md 2x on a method''s cost, D317 on generation time; design
-      reviewer agreed; the regeneration read must use the same summed bar). Bottom exemption = reach rule mirrored. Straddling
-      bins scored, exemption asked of Joaquin. Kept the 2 short runs (<0.3 of ask) in bbxgz/wpwmzz 3000 GeV (<1% of one energy''s
-      events). Param-card race fixed by atomic, no-empty patching (f7dbc021). Sign head: one seed per D315.'
-    ruled_out: 'Round sizing to need (saves little: the hardest bin sets the round); dropping mperi_all on hhtxu/ahtxu (the
-      ladders fill their top bins); faster ladder solves (already regula falsi).'
-    running: 38 r2 check jobs (step 78 wait); 4 aepemh cut probes (step 76 wait); FA-ccin2p3-54961d3e sign-branch arm (step
-      73 wait); step 70 scaling grid GPU runs as before
-    files: mg5_pipeline_final.py (flat_quota_select keep_ext, stall patience, t_propose_by_channel, _smixs tag, patch_param_card_slha),
-      tools/regen_recipes.py (R2), analysis/catalog_v4/multichannel_check.py (grid_r2_budget18, step75r2-rounds, step75r2),
-      analysis/catalog_v4/data/{r1_rounds,lhe_run_yields_dsh_eea_relay}.json, scripts/job_lhe_probe.sh
-    written: '2026-11-07T06:37:25+00:00'
+    state: '2026-11-07 ~09:30. Step 79 (r3 sampler check): r3 = r2 + flat_empty_near (an empty quota bin steered by its deficit-many
+      nearest candidates in log|M|^2) merged bed989d2 (sampler-r3; repo-reviewer BLOCK then PASS at c293ed6a, design PASS);
+      38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r2_budget18+grid_r3_budget18, 19 classes
+      x seeds 42/43, --time 00:45:00, target r3_check 0.2 h) at bed989d2 running, step 79 waits on them. On end: python analysis/catalog_v4/multichannel_check.py
+      step78r3-pull then step78r3 -> data/r3_check.json (reach over the r1 and r2 jobs too); step78-where for any short bin
+      (edit its class list / reads tag if needed); then a figure like analysis/catalog_v4/r2_check_fig.py (plain-word labels:
+      the send check refuses code-like labels such as t_r2). Step 78 (r2 read, data/r2_check.json @adfa3b35, figure figs/r2_check.png
+      @4565fa7c): NO on fill only; outside 0; summed cost 1.527x; bgtxwp [-1.206,-0.96] a real short (steering: 10-11 of 36
+      chunks with 0-4 candidates stall), bb_bb 8.34 and bbx_ccxh -3.809 straddle the reach: HELD on Joaquin''s scope question
+      (plan ask re-recorded 2026-11-07 with r2 numbers). Step 76 done: 115 of 115 dsh_eea_ pools assembled, no short runs
+      in the two mixed-pair-cut pools. Step 73: sign-head arm FA-ccin2p3-54961d3e running (wait on step 73). Steps 64/70:
+      scaling grid GPU runs live. Step 68 waits on the sampler verdict (r3) and the straddle answer.'
+    decisions: 'bgtxwp''s -1.206 bin judged reachable from the step-65 policy''s candidates in the r1 job (-0.939), so not
+      a straddle: the reach is the highest candidate any policy drew; the r3 reader takes reach over the r1/r2 jobs (stricter
+      exemption, reviewer agreed). Revision r3 targets the steering of empty bins (per-chunk bimodality) rather than budget;
+      the channel route (res [0,1,3] share floor) is r3''s NO branch. Toy chunk did not settle r3 (2 of 4 seeds higher reach),
+      so no toy assertion; the 19-class check decides. ccxh''s short bin is a straddle (reach -3.795 in every job), added
+      to Joaquin''s question. Step 76 margin 0.10 (mean kept rule) kept: lhe_parts plan sizes runs from the worst-energy probe
+      kept (0.904), and no run came back short.'
+    ruled_out: Treating bgtxwp -1.206 as a straddle (r2 reader's own-job reach); more budget for bgtxwp (chunks stall with
+      0 candidates, not at budget); a toy-reach assertion in the r3 test (not a guaranteed property).
+    running: 38 r3 check jobs at bed989d2 (step 79 wait; ids in plan evidence, e.g. FA-ccin2p3-20ba5c1e, 610e981e); FA-ccin2p3-54961d3e
+      sign-head arm (step 73 wait); step 70 scaling-grid GPU runs as before
+    files: mg5_pipeline_final.py (flat_quota_weights empty_near, _smixt/_smixs tags), tools/regen_recipes.py (R3), analysis/catalog_v4/multichannel_check.py
+      (grid_r3_budget18, step75r2 parametrised, step78r3-pull/step78r3, step78-where), analysis/catalog_v4/r2_check_fig.py,
+      analysis/catalog_v4/data/{r2_check,r2_where}.json, analysis/catalog_v4/data/ee_mmin_probe_dsh_eea_epem_{accxh,aepemh}.json,
+      tests/test_flat_grid.py (test_r3_empty_near_tag)
+    written: '2026-11-07T07:15:22+00:00'
   ask: 'Scope: the fill bar on bins cut by the kinematic maximum (update with the r2 result). The check scores every 0.25-dex
     bin of log10|M|^2 at >= 0.95 of its quota and exempts bins wholly above the highest |M|^2 any sampler drew (the class''s
     reach). Two bins straddle the reach, so most of their width cannot be filled by any sampler: v4_bb_bb [8.34, 8.585] (reach
