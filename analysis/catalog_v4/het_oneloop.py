@@ -872,7 +872,7 @@ def step73_fig():
     e.axhline(1.0, color="k", lw=0.8)
     e.axhspan(1 / STEP73_MAG_CALL, STEP73_MAG_CALL, color="0.9", label="15% band")
     e.set_xticks(x); e.set_xticklabels([names[r] for r in reads], rotation=70, fontsize=7)
-    e.set_ylabel("MSE ratio, detached over shared")
+    e.set_ylabel("MSE(detached sign block) / MSE(shared-trunk sign head)", fontsize=7)
     h = a.get_legend_handles_labels()[0] + e.get_legend_handles_labels()[0]
     ps.legend(c, "upper left", handles=h)
     ps.save(fig, os.path.join(FIGS, "het_signhead73"))
