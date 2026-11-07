@@ -12092,12 +12092,10 @@ entries:
       - 'PASS: regenerate the 1301 classes (recipes/catalog_v4_r1_regen.yaml with r2), read by regen_read.py at the same bar'
       - 'NO again: the failing kinds go to Joaquin with what an exemption or tolerance would drop'
   owner:
-    agent: a40cd4bedffed9ceb
-    state: stopped
-    since: '2026-11-07T05:14:25+00:00'
-    state_at: '2026-11-07T05:52:20+00:00'
-    context: 235408
-    context_at: '2026-11-07T05:51:02+00:00'
+    agent: a1b86f13fe672cb82
+    state: working
+    since: '2026-11-07T05:55:16+00:00'
+    state_at: '2026-11-07T05:55:16+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
