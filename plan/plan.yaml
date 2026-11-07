@@ -12749,9 +12749,9 @@ entries:
       - 'same-config runs agree within 1.15: find the coupling in the 4-block branch before any sign verdict'
   owner:
     agent: ae4ee7fc35b7e4306
-    state: working
+    state: stopped
     since: '2026-11-07T10:26:39+00:00'
-    state_at: '2026-11-07T15:41:56+00:00'
+    state_at: '2026-11-07T15:48:08+00:00'
     context: 109919
     context_at: '2026-11-07T12:48:24+00:00'
   findings:
