@@ -3755,13 +3755,6 @@ entries:
       h; dsh_ e+e- 82 core-h, longest 14.1 h; tools/regen_time.py, lhe_rates_dsh_ee4.json) times the spectrum''s 0.67-1.25x
       per kept event, plus 4 more surveys per pool (465-720 s each in the probe); (4) show Joaquin the energy list with it;
       then the e+e- flat ranges for step 68 (pp_support.py pull ee, tools/flat_range.py).'
-    75: '(n) channel grids + forward joint-resonance channel (step 72''s PARTIAL revision, design 2026-11-07 ~03:30, branch
-      res2-fwd 5ebbe8d6): on design-reviewer PASS and repo-reviewer PASS merge res2-fwd, site sync ccin2p3, site pick FA --jobs
-      10, plan target catalog_coverage --batch grid_fwd_check --wall 0.8 --jobs 10, submit 10 CPU jobs scripts/job_multichannel_check.sh
-      (MCHECK_CLASS/MCHECK_PROBE per class as step 72, MCHECK_SEED 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2f_budget12+grid_both_res2f_budget8;
-      limits uux_epemg 00:20, uux_epemvevex 00:30, uu_bbxuu 01:10, us_ddxsu 01:00, udx_csxvevex 00:30), plan wait on this
-      step; read: multichannel_check.py pull <tag> <class> 42,43 per class, step75 -> data/grid_fwd_check.json, fig_mcmc_check.py
-      grid_fwd, per-channel per-bin counts of the short bins'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -11538,12 +11531,6 @@ entries:
       if:
       - 'design PASS: submit the e+e- default-pool queue at the width site pick offers'
       - 'design FIX: revise once'
-    75:
-      feeds: 'the sampler of the regeneration (steps 65/68): which flat sampler at which budget'
-      if:
-      - 'YES: step 65''s regeneration design with flat_grid + mc_res2_fwd at the lowest passing budget'
-      - 'PARTIAL/COST/NO: recorded; next a correlated proposal (pairwise grid on sqrt(s) x forward variable, or a flow) designed
-        on the same harness'
   owner:
     agent: a76916d3169a63af3
     state: working
