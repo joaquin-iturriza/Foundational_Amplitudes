@@ -889,7 +889,7 @@ def cmd_eeisr_read(a):
     (scripts/job_lhe_probe.sh PROBE_SHARD=eeisr; `site logs <run>`) -> one record per energy and spectrum (isr = the
     anchor's, none = lpp 0, isronly = ISR alone at a beamstrahlung energy), and the design's verdict per energy:
     FAILS = the isr run returned no events, errored, or has share(sqrt(s_hat)/sqrt(s) < 0.99) = 0;
-    BANNER = its banner's lpp1/lpp2/pdlabel differ from ee_beam_patches (the MadGraph process string's beam order) and
+    BANNER = its banner's lpp1/lpp2/pdlabel (and pdlabel1/pdlabel2 where present) differ from ee_beam_patches (the MadGraph process string's beam order) and
     EE_ANCHOR; NO_BEAMSTRAHLUNG = at a beamstrahlung energy the isr share below 0.99 is not above isronly's + BS_MIN or
     its q10 not lower; COST = the isr run's seconds per kept event > COST_MAX x the none run's; else WORKS.
     The whole probe WORKS when every energy does."""
@@ -917,7 +917,9 @@ def cmd_eeisr_read(a):
         if not isr.get("events_returned") or isr.get("error") or not sf.get("below_0.99"):
             v = "FAILS"
         elif {k: str(isr.get("beam_card", {}).get(k)) for k in ("lpp1", "lpp2", "pdlabel")} != \
-                {k: str(want[k]) for k in ("lpp1", "lpp2", "pdlabel")}:
+                {k: str(want[k]) for k in ("lpp1", "lpp2", "pdlabel")} or \
+                any(str(isr["beam_card"][k]) != str(want["pdlabel"]) for k in ("pdlabel1", "pdlabel2")
+                    if k in isr.get("beam_card", {})):    # the per-beam densities, where the banner has them
             v = "BANNER"
         elif iso is not None and not (iso.get("shat_frac") and sf["below_0.99"] > iso["shat_frac"]["below_0.99"] + BS_MIN
                                       and sf["q10"] < iso["shat_frac"]["q10"]):
