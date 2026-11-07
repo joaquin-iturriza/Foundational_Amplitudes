@@ -11547,12 +11547,10 @@ entries:
       - 'PARTIAL/COST/NO: recorded; next a correlated proposal (pairwise grid on sqrt(s) x forward variable, or a flow) designed
         on the same harness'
   owner:
-    agent: aeac6af2d84588c40
-    state: stopped
-    since: '2026-11-07T02:28:49+00:00'
-    state_at: '2026-11-07T02:49:35+00:00'
-    context: 238946
-    context_at: '2026-11-07T02:47:25+00:00'
+    agent: a76916d3169a63af3
+    state: working
+    since: '2026-11-07T02:50:28+00:00'
+    state_at: '2026-11-07T02:50:28+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
