@@ -7,6 +7,8 @@ from torch.utils.checkpoint import checkpoint
 import mup  # Microsoft μP library
 from mup import MuReadout, set_base_shapes, make_base_shapes
 
+from lloca.framesnet.frames import Frames
+
 from .attention_lloca_mup import LLoCaAttention, build_block_diagonal_bias
 from .bayesian_readout import MuBayesianReadout
 from lloca.reps.tensorreps import TensorReps
@@ -431,6 +433,8 @@ class MuPTransformer(nn.Module):
         bayesian_readout: bool = False,
         bnn_prior_prec: float = 1.0,
         bnn_logsig2_init: float = -9.0,
+        sign_branch: bool = False,
+        sign_index: int | None = None,
     ) -> None:
         super().__init__()
         self.parametrization = parametrization
@@ -461,6 +465,26 @@ class MuPTransformer(nn.Module):
                                                 prior_prec=bnn_prior_prec, logsig2_init=bnn_logsig2_init)
         else:
             self.linear_out = MuReadout(self.hidden_channels, out_channels, bias=True)
+        # sign_branch (models/lloca.py, HETEROSC + sign head): the readout's row sign_index (the sign logit) is read
+        # from sign_block, a copy of the last block fed the last block's input DETACHED and the frames DETACHED, so the
+        # sign loss's gradient reaches only sign_block and that readout row, never the trunk or the framesnet. Built
+        # under fork_rng and set to the last block's initial weights, so nothing else's initialisation moves.
+        self.sign_branch = bool(sign_branch)
+        self.sign_index = sign_index
+        if self.sign_branch:
+            assert sign_index is not None and 0 <= sign_index < out_channels, (sign_index, out_channels)
+            assert num_blocks >= 1
+            with torch.random.fork_rng(devices=[]):
+                self.sign_block = BaselineTransformerBlock(
+                    self.hidden_channels,
+                    attention=self.attention,
+                    num_heads=num_heads,
+                    attention_factor=attention_factor,
+                    mlp_factor=mlp_factor,
+                    multi_query=multi_query,
+                    dropout_prob=dropout_prob,
+                )
+            self.sign_block.load_state_dict(self.blocks[-1].state_dict())
         self.init_method = init_method_normal((encoder_var / in_channels)**0.5)
 
         self._reset_parameters()
@@ -469,6 +493,29 @@ class MuPTransformer(nn.Module):
         self.init_method(self.linear_in.weight)
         if self.linear_in.bias is not None:
             nn.init.zeros_(self.linear_in.bias)
+
+    # the attributes LLoCaAttention.prepare_frames sets (both the broadcast and the repeat path)
+    _FRAME_STATE = ("frames", "frames_qkv", "_frames_broadcast", "_bcast_qkv_mats", "_bcast_qkv_det",
+                    "_bcast_out_mats", "_bcast_out_det")
+
+    def _frame_state(self):
+        d = self.attention.__dict__
+        return {a: d[a] for a in self._FRAME_STATE if a in d}
+
+    def _set_frame_state(self, state):
+        for a, v in state.items():
+            setattr(self.attention, a, v)
+
+    def _sign_block_detached(self, x, detached_state, **attn_kwargs):
+        """sign_block on the shared attention with the DETACHED prepared frames, the live ones restored after (also
+        when a checkpointed trunk block recomputes in backward, it reads the live frames)."""
+        live = self._frame_state()
+        self._set_frame_state(detached_state)
+        try:
+            return self.sign_block(x, **attn_kwargs)
+        finally:
+            self._set_frame_state(live)
+
     def forward(self, inputs: torch.Tensor, frames, **attn_kwargs) -> torch.Tensor:
         """Forward pass.
 
@@ -527,7 +574,16 @@ class MuPTransformer(nn.Module):
         h = self.linear_in(inputs)
         if token_add is not None:
             h = h + token_add.to(h.dtype)
+        if self.sign_branch:
+            assert not return_features, "sign_branch: the return_features paths are not wired"
+            # the same frames with no graph to the framesnet, prepared once; the live prepared state is put back
+            live = self._frame_state()
+            self.attention.prepare_frames(_detach_frames(frames))
+            detached_state = self._frame_state()
+            self._set_frame_state(live)
+        h_prev = None
         for block in self.blocks:
+            h_prev = h
             if self.checkpoint_blocks:
                 fn = partial(block, **attn_kwargs)
                 # use_reentrant=False is required here: the block's attention reads
@@ -543,4 +599,22 @@ class MuPTransformer(nn.Module):
         if return_features:
             return h
         outputs = self.linear_out(h)
+        if self.sign_branch:
+            fn = partial(self._sign_block_detached, detached_state=detached_state, **attn_kwargs)
+            if self.checkpoint_blocks:
+                hs = checkpoint(fn, h_prev.detach(), use_reentrant=False)
+            else:
+                hs = fn(h_prev.detach())
+            k = self.sign_index
+            # the main readout's column k is dropped, so the sign row of linear_out gets its gradient only from hs,
+            # and the other rows none from hs
+            outputs = torch.cat([outputs[..., :k], self.linear_out(hs)[..., k:k + 1], outputs[..., k + 1:]], dim=-1)
         return outputs
+
+
+def _detach_frames(frames):
+    """A Frames with the same matrices, det and inv and no autograd graph (identity frames carry none)."""
+    if frames.is_identity:
+        return frames
+    return Frames(matrices=frames.matrices.detach(), is_global=frames.is_global,
+                  det=frames.det.detach(), inv=frames.inv.detach())
