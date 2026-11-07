@@ -11464,6 +11464,9 @@ entries:
       FA-ccin2p3-d973d438 FA-ccin2p3-10a44431 FA-ccin2p3-ff396d71 FA-ccin2p3-12b6b83e FA-ccin2p3-8941fd75 FA-ccin2p3-e2e01b7c
       FA-ccin2p3-862b2834 FA-ccin2p3-bf059677 FA-ccin2p3-9883a76b FA-ccin2p3-88bf3dcc FA-ccin2p3-f259f04f FA-ccin2p3-1456b3d7
       FA-ccin2p3-5f547283 FA-ccin2p3-b9a17428 FA-ccin2p3-22c1e2ef FA-ccin2p3-0a7c6cc3 FA-ccin2p3-2e9f7ca3 '
+    '76': 'FA-ccin2p3-8a05275f FA-ccin2p3-689503ab FA-ccin2p3-0806b674 FA-ccin2p3-e10695d8 FA-ccin2p3-7422704a FA-ccin2p3-d7a97518
+      FA-ccin2p3-902991de FA-ccin2p3-7480dcaf FA-ccin2p3-f46f5fa1 FA-ccin2p3-17d89d85 FA-ccin2p3-6921b3b7 FA-ccin2p3-a1585468
+      FA-ccin2p3-0c5a7122 FA-ccin2p3-f13fecbe FA-ccin2p3-eb26d389 FA-ccin2p3-9ac8faf9 FA-ccin2p3-7d3232d7 FA-ccin2p3-329d13c9 '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
