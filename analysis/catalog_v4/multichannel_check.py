@@ -73,7 +73,8 @@ SEEDS = (42, 43)
 # re-check), the third the same at a 10x candidate budget (step 65)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
-                  "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12")
+                  "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
+                  "grid_both_res2_budget8")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -213,6 +214,12 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, flat_budget=12)
             if policy.startswith("mcmc"):
                 s.update(flat_mcmc=True)
+        if policy in ("grid_both_res2_budget12", "grid_both_res2_budget8"):
+            # plan catalog_coverage step 72 (after step 69's NO; cost bound <= 2x: the step-69 design): the quota sampler
+            # with both ladders and joint resonances, each channel's uniform numbers through an adaptive grid
+            # (sampling.flat_grid), at the step-69 budget of 12 labels per flat event and at 8 (cost margin)
+            s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True, flat_grid=True,
+                     flat_budget=12 if policy.endswith("12") else 8)
         if policy.startswith("quota_ladder_both_res2"):   # step 67: both ladders as two channels
             s.update(mc_mperi=True, mc_mperi_both=True, mc_res2=True)
         if policy == "quota_ladder_both_res2_fwdfree_budget750":
@@ -258,7 +265,9 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                        "kept_per_channel": (np.bincount(np.asarray(d["chan"])[np.asarray(d["keep"])],
                                                                         minlength=len(d["channels"])).tolist()
                                                             if d.get("channels") is not None else None),
-                                       "channels": d["channels"], "mcmc": d.get("mcmc")})
+                                       "channels": d["channels"], "mcmc": d.get("mcmc"),
+                                       "t_propose": d.get("t_propose"), "t_label": d.get("t_label"),
+                                       "grid_dims": d.get("grid_dims")})
                             if d.get("kept_P") is not None:
                                 kc = np.asarray(d["kept_chain"], np.int64)   # chain ids are per chunk: offset them
                                 kept_ev.append((d["kept_P"], d["kept_sq"], np.where(kc >= 0, kc + 1000000 * len(kept_ev), kc),
@@ -720,7 +729,7 @@ DIV_NN_Q10 = 0.5         # its 10% quantile over in-range bins, at least
 COST_MAX = 2.0           # train-pool replay seconds over the old generation-log seconds (the step-69 design's bound)
 
 
-def step69():
+def step69(tag=STEP69_TAG, pols=STEP69, test="mcmc12", out_name="mcmc_check.json", source="step69"):
     """data/multichannel_check_reads/<class>_<STEP69_TAG>_<seed>.json -> data/mcmc_check.json: per class, seed and
     step-69 policy the fill per in-range quota bin (sum over chunks of min(kept, quota) / sum of quota; in range when
     the bin's lower edge <= the class's pp in-support max, tools/flat_range.py), held-out pp events in support outside
@@ -739,7 +748,7 @@ def step69():
     rg = ranges()
     cost = json.load(open(os.path.join(DATA, "sampling_cost.json")))["test_classes"]
     cov = json.load(open(os.path.join(DATA, "quota_coverage.json")))["classes"]
-    out = {"source": "analysis/catalog_v4/multichannel_check.py step69", "rules": {
+    out = {"source": f"analysis/catalog_v4/multichannel_check.py {source}", "test": test, "rules": {
         "dup_excess": DIV_DUP_EXCESS, "dup_top": DIV_DUP_TOP, "nn_med": DIV_NN_MED, "nn_q10": DIV_NN_Q10,
         "cost_max": COST_MAX}, "classes": {}}
     for c in CLASSES:
@@ -747,13 +756,13 @@ def step69():
         h750 = (cov.get(c, {}).get("policies", {}).get("both750") or {}).get("heldout_outside_kept")
         o = {"pp_in_support_max_log10": pp_max, "heldout_750": h750, "seeds": {}}
         for s in SEEDS:
-            f = os.path.join(READS, f"{c}_{STEP69_TAG}_{s}.json")
+            f = os.path.join(READS, f"{c}_{tag}_{s}.json")
             if not os.path.exists(f):
                 continue
             R = json.load(open(f))["runs"]
             cur = R[f"current_{s}"]["seconds"]
             o["seeds"][s] = {}
-            for k, pol in STEP69.items():
+            for k, pol in pols.items():
                 r = R[f"{pol}_{s}"]
                 qc = r["quota_chunks"]
                 e = np.asarray(qc[0]["edges_log10"]); lo_e = e[:-1]
@@ -767,7 +776,8 @@ def step69():
                        "heldout_outside_kept": r["sources"]["heldout"]["n_in_support_outside_kept"],
                        "cost_vs_old_log": r["seconds"] / cost[c]["old_train_s"], "cost_vs_current_same_job": r["seconds"] / cur,
                        "labels_per_flat": sum(x["n_labels"] for x in qc) / max(n_flat, 1),
-                       "mcmc": [x.get("mcmc") for x in qc[:1]]}
+                       "mcmc": [x.get("mcmc") for x in qc[:1]],
+                       "t_propose_s": sum(x.get("t_propose") or 0.0 for x in qc), "t_label_s": sum(x.get("t_label") or 0.0 for x in qc)}
                 dv = r.get("diversity")
                 if dv:
                     pb = [x for x, ok in zip(dv["per_bin"], inr) if ok and "dup" in x]
@@ -795,17 +805,47 @@ def step69():
         def div_ok(m, ref):
             return (m["dup"] <= ref["dup"] + DIV_DUP_EXCESS and m["dup_top_max"] <= DIV_DUP_TOP and
                     m.get("nn_ratio_med", 0) >= DIV_NN_MED and m.get("nn_ratio_q10", 0) >= DIV_NN_Q10)
-        div = all(div_ok(d["mcmc12"], d["quota50"]) for _, _, d in rows)
-        fill = all(ok_fill(d["mcmc12"], c) for c, _, d in rows)
-        cheap = all(d["mcmc12"]["cost_vs_old_log"] <= COST_MAX for _, _, d in rows)
+        div = all(div_ok(d[test], d["quota50"]) for _, _, d in rows)
+        fill = all(ok_fill(d[test], c) for c, _, d in rows)
+        cheap = all(d[test]["cost_vs_old_log"] <= COST_MAX for _, _, d in rows)
         q12 = all(ok_fill(d["quota12"], c) and d["quota12"]["cost_vs_old_log"] <= COST_MAX for c, _, d in rows)
-        above = all(d["mcmc12"]["share_ge95"] > d["quota12"]["share_ge95"] for c, _, d in rows
+        above = all(d[test]["share_ge95"] > d["quota12"]["share_ge95"] for c, _, d in rows
                     if c not in ("v4_uux_epemg",))
         out["checks"] = {"diversity": div, "fill": fill, "cost": cheap, "quota12_suffices": q12, "above_quota12": above}
         out["verdict"] = ("QUOTA12" if q12 else "NO" if not div or not above else "YES" if fill and cheap
                           else "COST" if fill else "PARTIAL")
-    json.dump(out, open(os.path.join(DATA, "mcmc_check.json"), "w"), indent=1)
-    print("STEP69", out.get("verdict"), out.get("checks"))
+    json.dump(out, open(os.path.join(DATA, out_name), "w"), indent=1)
+    print(source.upper(), test, out.get("verdict"), out.get("checks"))
+
+
+# step 72's read (plan catalog_coverage): the channel-grid quota sampler at 12 and at 8 labels per flat event against the
+# quota sampler at 12 (matched budget) and at 50 (diversity reference), same class, seed, job and commit; step69's rules
+STEP72 = {"grid12": "grid_both_res2_budget12", "grid8": "grid_both_res2_budget8",
+          "quota12": "quota_ladder_both_res2_budget12", "quota50": "quota_ladder_both_res2"}
+STEP72_TAG = "current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8"
+
+
+def step72():
+    """data/grid_check.json: step69's per-class rows and verdict (YES / QUOTA12 / NO / COST / PARTIAL) once with the
+    grids at 12 as the tested policy and once at 8 (verdict_by_test); YES at 8 or 12 = the grids fill every in-range
+    bin >= 0.95 at <= COST_MAX on every class and seed; the top-level verdict is YES when either passes (passed_at the
+    lower budget), else the grids at 12's"""
+    v = {}
+    for t in ("grid12", "grid8"):
+        step69(STEP72_TAG, STEP72, t, f"grid_check_{t}.json", "step72")
+        v[t] = json.load(open(os.path.join(DATA, f"grid_check_{t}.json")))
+    vb = {t: v[t].get("verdict") for t in v}
+    # the design's rule: YES when the grids at 8 or at 12 pass (the lower budget preferred); otherwise the grids at 12
+    # decide (COST, PARTIAL, NO), the budget-8 row read beside it
+    top = (None if None in vb.values() else "YES" if "YES" in vb.values() else vb["grid12"])
+    out = dict(v["grid12"], test=None, verdict=top, passed_at=("grid8" if vb["grid8"] == "YES" else
+                                                                 "grid12" if vb["grid12"] == "YES" else None),
+               verdict_by_test=vb, checks_by_test={t: v[t].get("checks") for t in v})
+    out.pop("checks", None)
+    json.dump(out, open(os.path.join(DATA, "grid_check.json"), "w"), indent=1)
+    for t in v:
+        os.remove(os.path.join(DATA, f"grid_check_{t}.json"))
+    print("STEP72", out["verdict"], out["passed_at"], out["verdict_by_test"])
 
 
 def pull(policies=None, classes=None, seeds=SEEDS):
@@ -834,6 +874,8 @@ if __name__ == "__main__":
                                                           if len(sys.argv) > 4 else ()))
     elif sys.argv[1] == "step69":
         step69()
+    elif sys.argv[1] == "step72":
+        step72()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
