@@ -3750,6 +3750,11 @@ entries:
       block (its gradient never enters the clipped shared update), one seed (D315) against the weight-1 rerun FA-ccin2p3-ac8d6fca
       and the MSE control at seed 42; implement in a worktree, repo-reviewer, design, design-reviewer, submit. Then, if the
       sign still lags, the clipping regime (99% of het steps clipped).'
+    74: '(m) e+e- regeneration design at the collider anchor energies (step 71 WORKS at all 10, data/ee_anchor_probe.json
+      @901d600f): the 170 e+e- default pools at EE_ANCHOR (91.1876 160 209 240 365 380 500 1000 1500 3000 GeV; machine spectrum
+      at 240/365/500/3000, ISR only elsewhere), cost per kept event 0.67-1.25x the no-spectrum runs; show Joaquin the energy
+      list with it (D320''s proposal text is not in the ledger); then re-read e+e- flat ranges (pp_support.py pull ee, tools/flat_range.py)
+      for step 68. The flat part''s sampler waits on step 72.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -11082,6 +11087,11 @@ entries:
       if:
       - 'SIGN NOT WORSE THAN MSE, MAGNITUDE AS RERUN: adopt the detached head'
       - 'NO: clipping regime next'
+    74:
+      feeds: the e+e- pools of the regeneration (D318, D320)
+      if:
+      - 'design PASS: submit the default-pool regeneration'
+      - 'design FIX: revise once'
   owner:
     agent: a3fc2aab45ed49d42
     state: working
