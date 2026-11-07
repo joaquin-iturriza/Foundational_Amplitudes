@@ -134,6 +134,7 @@ def cmd_parts(a):
                 continue
             asked, got, secs, cores, Ps = [], [], [], [], []
             byE = {}                                     # e+e-: up to 5 parts per collider energy
+            compE = {}                                   # e+e-: runs with a part and complete runs per energy
             for p, run in parts:
                 try:
                     with np.load(p) as z:
@@ -142,8 +143,13 @@ def cmd_parts(a):
                         asked.append(int(run[1]))
                         if len(Ps) < 20:
                             Ps.append(m)
-                        if run[2].get("ebeam1") is not None and len(byE.setdefault(2 * float(run[2]["ebeam1"]), [])) < 5:
-                            byE[2 * float(run[2]["ebeam1"])].append(m)
+                        if run[2].get("ebeam1") is not None:
+                            E = 2 * float(run[2]["ebeam1"])
+                            cE = compE.setdefault(f"{E:g}", [0, 0])
+                            cE[0] += 1
+                            cE[1] += int(len(m) >= int(run[1]))
+                            if len(byE.setdefault(E, [])) < 5:
+                                byE[E].append(m)
                 except (FileNotFoundError, OSError, KeyError, ValueError):
                     continue
             acc = accept_of(name)
@@ -158,6 +164,8 @@ def cmd_parts(a):
                 # the pool takes equal shares of the energies, so what it keeps is the mean over them of each one's
                 r["kept_by_energy"] = {f"{E:g}": kept(np.concatenate(ms), acc)["kept"] for E, ms in sorted(byE.items())}
                 r["energies"] = [float(e) for e in mg.PROCESSES[name]["lhe"]["energies"]]
+            if compE:   # share of runs that returned every event they asked, per energy (complete_layout's shares)
+                r["complete_by_energy"] = {E: {"runs": v[0], "complete": round(v[1] / v[0], 4)} for E, v in compE.items()}
             if byE:     # the beam spectrum seen per energy: share of events with sqrt(s_hat)/sqrt(s) < 0.99
                 r["shat_by_energy"] = {f"{E:g}": shat_frac(np.concatenate(ms), E) for E, ms in sorted(byE.items())}
             out[name] = r
