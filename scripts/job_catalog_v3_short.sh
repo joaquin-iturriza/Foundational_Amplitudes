@@ -568,15 +568,15 @@ if [ -n "$SHORT_RERUN" ]; then
     case "$ARM" in v4_het_default25|v4_het_default25_seed2) ;; *) echo "SHORT_RERUN only on v4_het_default25[_seed2]"; exit 1 ;; esac
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_rerun"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_rerun"
 fi
-# SHORT_TAG=<tag> (catalog_coverage step 62, the beam ablation; step 61, the same-commit rerun of the step-56 sign-head arm;
+# SHORT_TAG=<tag> (warm_start step 14: shrinkperturb rerun, its first sigma stage shrank it again; catalog_coverage step 62, the beam ablation; step 61, the same-commit rerun of the step-56 sign-head arm;
 # warm_start step 6, D303: the default-restart k=533 warm start rerun beside the moment-fill arm): the het share arms (control, default25 and its
 # eeonly/pponly beam arms) unchanged, in their own run dir <arm>_tag<tag>; the fixed "_tag" marker is in no arm name nor
 # in the SHORT_MEMMAP/SHORT_RERUN dirs, so a tag can never resolve to another run's dir
 if [ -n "$SHORT_TAG" ]; then
     [ -n "$SHORT_MEMMAP$SHORT_RERUN$LONG_HEADS$LONG_FACTOR$LONG_LR" ] && { echo "SHORT_TAG excludes SHORT_MEMMAP, SHORT_RERUN and LONG_*"; exit 1; }
     case "$SHORT_TAG" in *[!a-z0-9]*|"") echo "SHORT_TAG: lower-case letters and digits only"; exit 1 ;; esac
-    case "$ARM" in v4_het_control_signhead|v4_het_control_signhead_seed2|v4_het_control_signhead_seed3|v4_het_control_signhead_seed4|v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2|v4_het_warm25_k533|v4_het_warm25_k533_seed2) ;;
-        *) echo "SHORT_TAG only on the het control, its sign-head arm, the default25 share arms and the k=533 warm start"; exit 1 ;; esac
+    case "$ARM" in v4_het_control_signhead|v4_het_control_signhead_seed2|v4_het_control_signhead_seed3|v4_het_control_signhead_seed4|v4_het_control|v4_het_control_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2|v4_het_warm25_k533|v4_het_warm25_k533_seed2|v4_het_wsx_shrinkperturb) ;;
+        *) echo "SHORT_TAG only on the het control, its sign-head arm, the default25 share arms, the k=533 warm start and step 14's shrinkperturb (rerun after b91cf7c6)"; exit 1 ;; esac
     OUT="$PROJECT_DIR/runs/catalog_${CAT}_short/${ARM}_tag${SHORT_TAG}"; PRED="$SCRATCH/zz_${CAT}_short_${ARM}_tag${SHORT_TAG}"
 fi
 # the long runs (catalog_coverage step 16, D219, D235) on a het share arm: LONG_HEADS=<num_heads> (muP width) and
