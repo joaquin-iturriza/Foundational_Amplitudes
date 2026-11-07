@@ -3893,9 +3893,10 @@ class _GridRng:
 
 
 def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, shares, y_lo, frac_fwd=0.0,
-                   beam_mass=None, grids=None, solve_tol=0.0):
+                   beam_mass=None, grids=None, solve_tol=0.0, t_by_ch=None):
     """_candidates with the finals of each draw from a channel picked with probabilities `shares`; returns
-    (events, sqrt(s), channel index per event); cuts by rejection with top-up as _collect_with_cuts"""
+    (events, sqrt(s), channel index per event); cuts by rejection with top-up as _collect_with_cuts. `t_by_ch` (an
+    array, one per channel), when given, gets each channel's draw seconds added (diagnostics, no random numbers)"""
     m_finals = np.asarray(m_finals, float); pdg = np.asarray(pdg_ids, int)
     shares = np.asarray(shares, float) / np.sum(shares)
     def draw(n_draw):
@@ -3907,6 +3908,7 @@ def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, share
         for i, ch in enumerate(channels):
             e = c == i
             if e.any():
+                t0 = time.perf_counter()
                 if grids is None:
                     F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng, solve_tol)
                 else:    # pol["flat_grid"]: the channel's uniform numbers through its grid, recorded per event
@@ -3915,6 +3917,8 @@ def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, share
                     Y = np.hstack(gr.cols) if gr.cols else np.zeros((int(e.sum()), 0))
                     for r, k in enumerate(np.nonzero(e)[0]):
                         ys[k] = Y[r]
+                if t_by_ch is not None:
+                    t_by_ch[i] += time.perf_counter() - t0
         P = np.concatenate([beams, F], axis=1)
         if frac_fwd > 0:
             r = rng.random(n_draw) < frac_fwd
@@ -4213,9 +4217,12 @@ def flat_quota_weights(logm, edges, quota):
     return w, cnt, deficit
 
 
-def flat_quota_select(logm, edges, quota, rng):
+def flat_quota_select(logm, edges, quota, rng, keep_ext=False):
     """indices kept: min(quota, count) per bin uniformly at random within it, the shortfall of unfilled bins spread
-    evenly (water-filling) over bins with candidates to spare; (indices, per-bin kept counts)"""
+    evenly (water-filling) over bins with candidates to spare; (indices, per-bin kept counts). With `keep_ext`
+    (pol["flat_keep_ext"], plan step 75's r2), the highest and the lowest in-range candidate are always kept, each in
+    place of the first kept event of its bin (drawn uniformly, so no further random numbers): the kept range is then
+    the candidates' range (r1 left out the class's highest candidates, under which a held-out event sat)"""
     nb = len(quota)
     inr = np.isfinite(logm) & (logm >= edges[0]) & (logm < edges[-1])
     idx = np.nonzero(inr)[0]
@@ -4235,6 +4242,13 @@ def flat_quota_select(logm, edges, quota, rng):
                 break
     keep = [rng.choice(idx[b == j], size=int(take[j]), replace=False) for j in range(nb) if take[j]]
     keep = np.concatenate(keep) if keep else np.zeros(0, dtype=np.int64)
+    if keep_ext and len(keep) and len(idx):
+        kb = np.clip(np.searchsorted(edges, logm[keep], side="right") - 1, 0, nb - 1)
+        for x in (idx[np.argmax(logm[idx])], idx[np.argmin(logm[idx])]):
+            j = np.clip(np.searchsorted(edges, logm[x], side="right") - 1, 0, nb - 1)
+            if x in keep or not take[j]:
+                continue
+            keep[np.nonzero(kb == j)[0][0]] = x
     return keep, take
 
 
@@ -4311,16 +4325,18 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
     draw_sq = uni
     cand, sq_c, me_c, ch_c, rounds = [], np.zeros(0), np.zeros(0), np.zeros(0, dtype=np.int64), []
     t_prop = t_lab = 0.0
+    t_ch = np.zeros(len(chans)) if mc else None
     while True:
         n = min(n_round, budget - len(cand))
         t0 = time.perf_counter()
         if mc and grids is not None:
             ev, sq, c, ys = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"],
-                                           fwd_cand, beam_mass, grids=grids, solve_tol=float(pol.get("mc_solve_tol", 0.0)))
+                                           fwd_cand, beam_mass, grids=grids, solve_tol=float(pol.get("mc_solve_tol", 0.0)),
+                                           t_by_ch=t_ch)
             ys_c += ys
         elif mc:
             ev, sq, c = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"], fwd_cand,
-                                       beam_mass, solve_tol=float(pol.get("mc_solve_tol", 0.0)))
+                                       beam_mass, solve_tol=float(pol.get("mc_solve_tol", 0.0)), t_by_ch=t_ch)
         else:
             ev, sq = _candidates(n, draw_sq, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand,
                                  beam_mass)
@@ -4340,9 +4356,15 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         # flat_stall x the lesser of (what was missing before it) and (what its labels buy at the budget's mean rate,
         # n / flat_budget): bins the proposal does not reach (above a class's kinematic maximum) stop the rounds instead
         # of spending the budget on them, while a round that completes a nearly filled part still counts
+        # pol["flat_stall_patience"] (plan step 75's r2; absent: 1, r1's rule): the stop needs that many consecutive
+        # stalled rounds: in r1, 25 of v4_uux_bgtxwp's 36 chunks stopped after one stalled round with a bin at 0-8 of
+        # its 26 events, while the 11 that ran one more round filled it (data/r1_where.json, rounds per chunk)
         if pol.get("flat_stall") and len(rounds) >= 2:
             filled = rounds[-2]["missing"] - rounds[-1]["missing"]
-            if filled < float(pol["flat_stall"]) * min(rounds[-2]["missing"], n / float(pol["flat_budget"])):
+            rounds[-1]["stalled"] = bool(filled < float(pol["flat_stall"]) * min(rounds[-2]["missing"],
+                                                                                 n / float(pol["flat_budget"])))
+            pat = int(pol.get("flat_stall_patience", 1))
+            if len(rounds) >= pat + 1 and all(r.get("stalled") for r in rounds[-pat:]):
                 break
         nb_s = _adaptive_bins(int((w > 0).sum()), int(pol["n_sqrts_bins"]))
         e_s, p_s = _sqrts_proposal_weighted(tr(sq_c), w, t_lo, t_hi, nb_s)
@@ -4362,7 +4384,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
                         Y[r, :len(ys_c[k])] = ys_c[k]
                     g.fit(Y, w[idx])
             t_prop += time.perf_counter() - t0
-    keep, take = flat_quota_select(logm, edges, quota, rng)
+    keep, take = flat_quota_select(logm, edges, quota, rng, bool(pol.get("flat_keep_ext")))
     short = np.maximum(quota - take, 0)
     # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
     # (no finite log|M|^2 among them) with bins short and the budget not reached
@@ -4399,6 +4421,7 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
                      channels=[list(x) for x in chans] if mc else None,
                      kept_P=np.stack([cand[i][0] for i in keep]) if len(keep) else None, kept_sq=sq_c[keep],
                      kept_chain=np.full(len(keep), -1, np.int64), t_propose=t_prop, t_label=t_lab,
+                     t_propose_by_channel=t_ch.tolist() if t_ch is not None else None,
                      grid_dims=[len(g.edges) for g in grids] if grids is not None else None)
     print(f"  [SAMPLE] mixture: flat-log|M|^2 by quota {len(keep):,} kept from {len(cand):,} candidates in "
           f"{len(rounds)} rounds, {int((short > 0).sum())} of {len(quota)} bins short ({int(short.sum())} events)")
@@ -4860,7 +4883,11 @@ def recipe_output_path(recipe, out_dir):
         # the regeneration never overwrites the pool every earlier read used (same spec, other recipe id); step 75's
         # revision (sampling.flat_stall: the stall stop, ladders on every hadronic class, the resonance ladder, the
         # range joined with the dsh_ train pool) its own again, so step 65's _smixq pools stay as read
-        samp_tag += "r" if (recipe.get("sampling") or {}).get("flat_stall") else "q"
+        # (any of its keys, repo review 2026-11-07), and r2 (sampling.flat_keep_ext: the extremes kept, the stall
+        # patience, budget 18) its own: _smixs
+        sp = recipe.get("sampling") or {}
+        samp_tag += ("s" if sp.get("flat_keep_ext") else
+                     "r" if any(sp.get(k) for k in ("flat_stall", "mc_solve_tol", "mc_mperi_all", "mc_resladder")) else "q")
     f_def =float((recipe.get("sampling") or {}).get("f_default", 0))
     if f_def > 0:
         samp_tag += f"d{int(round(100 * f_def)):02d}"     # a default-share pool never shadows its catalog's _smix pool

@@ -104,6 +104,38 @@ def test_stall_stop():
     assert a["stop"] == "budget" and b["stop"] == "stall"
     assert b["n_labels"] < a["n_labels"] and len(b["rounds"]) == 2
 
+def test_r2_keep_ext_patience_tag():
+    """plan step 75's r2: flat_keep_ext keeps the highest and lowest in-range candidate (the same count per bin, and
+    without the key the selection is unchanged at the same seed); flat_stall_patience 2 runs one round past r1's stall
+    stop on a range whose top no candidate reaches and stops on the second stalled round; the per-channel proposal
+    seconds sum to at most the proposal time; a policy with flat_keep_ext gets the _smixs pool tag"""
+    edges = np.linspace(0.0, 4.0, 5); quota = np.array([10, 10, 10, 10])
+    logm = np.random.default_rng(0).uniform(0, 4, 400)
+    k0, t0 = mg.flat_quota_select(logm, edges, quota, np.random.default_rng(1))
+    k1, t1 = mg.flat_quota_select(logm, edges, quota, np.random.default_rng(1), keep_ext=True)
+    k2, _ = mg.flat_quota_select(logm, edges, quota, np.random.default_rng(1), keep_ext=False)
+    assert (k0 == k2).all() and (t0 == t1).all() and len(np.unique(k1)) == len(k1) == 40
+    assert logm[k1].max() == logm.max() and logm[k1].min() == logm.min()
+    b = lambda k: np.bincount(np.searchsorted(edges, logm[k], side="right") - 1, minlength=4)
+    assert (b(k1) == b(k0)).all() and len(set(k1) ^ set(k0)) <= 4
+
+    def go(pat):
+        rng = np.random.default_rng(3)
+        uni = lambda k: np.exp(rng.uniform(np.log(50.0), np.log(3000.0), size=k))
+        pol = dict(_pol(12, True), flat_range=[np.log(1e-8), np.log(1e30)], flat_stall=0.2)
+        if pat:
+            pol["flat_stall_patience"] = pat
+        mg._flat_quota_part(500, 50.0, 3000.0, uni, True, M, PDG, rng, None, pol, toy_label, 0.0, None)
+        return dict(mg.FLAT_LAST)
+    a, c = go(None), go(2)
+    assert a["stop"] == "stall" and len(a["rounds"]) == 2
+    assert c["stop"] == "stall" and len(c["rounds"]) == 3 and c["n_labels"] > a["n_labels"]
+    assert len(c["t_propose_by_channel"]) == len(c["channels"]) and 0 < sum(c["t_propose_by_channel"]) <= c["t_propose"]
+    rec = {"process": "x", "sqrts_min": 10, "sqrts_max": 20, "role": "train",
+           "sampling": {"mode": "mixture", "flat_range": [0, 1], "flat_stall": 0.2, "flat_keep_ext": True}}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixs_amplitudes.npy")
+
+
 
 def test_solve_tol():
     """sampling.mc_solve_tol: the ladder's momenta within 1e-10 sqrt(s) of the full collapse"""

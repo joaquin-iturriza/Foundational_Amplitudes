@@ -51,6 +51,14 @@ G12 = {"multichannel": True, "mc_isc": True, "mc_mperi": True, "mc_mperi_both": 
 # the ladder solves at 1e-12, both ladders on every hadronic class with >= 3 finals, one resonance-ladder channel per
 # resonance, the range joined with the dsh_ train pool (tools/flat_range.py --dsh); pools tagged _smixr
 R1 = dict(G12, flat_stall=0.2, mc_solve_tol=1e-12, mc_mperi_all=True, mc_resladder=True)
+# plan step 75's r2 (one revision after r1's NO; data/r1_check.json, r1_where.json, r1_rounds.json): r1 plus
+# - flat_keep_ext: the highest and lowest in-range candidate always kept (r1's one held-out event outside, on
+#   v4_bbx_htaptam, lay above the kept max but below r1's highest candidate at both seeds),
+# - flat_stall_patience 2: the stall stop after two consecutive stalled rounds (v4_uux_bgtxwp: the chunks that stopped
+#   after one left a margin bin at 0-8 of its 26 events, those that ran one more round filled it),
+# - flat_budget 18: two more rounds of oversample/2 x n_flat for chunks still converging at r1's budget (uu_bbxuu,
+#   us_ddxsu, bb_bbvevex, ug_auuux: missing at the stop and the last round's fill in r1_rounds.json); pools _smixs
+R2 = dict(R1, flat_keep_ext=True, flat_stall_patience=2, flat_budget=18)
 FLAT_RANGE_R1 = os.path.join(REC, "catalog_v4_flat_range_dsh.json")
 OUT_R1 = "catalog_v4_r1_regen.yaml"
 

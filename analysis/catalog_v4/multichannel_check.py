@@ -77,7 +77,8 @@ SEEDS = (42, 43)
 QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "quota_ladder_edge_res2",
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
-                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12")
+                  "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12",
+                  "grid_r2_budget18")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -208,13 +209,18 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             s.update(multichannel=True, mc_resonances=[[list(S), q] for S, q in res], mc_isc=True, mc_res_params=rp)
         if policy in QUOTA_POLICIES:
             from tools.flat_range import ranges, ranges_dsh
-            s.update(flat_range=(ranges_dsh() if policy == "grid_r1_budget12" else ranges())[name])
+            s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18") else ranges())[name])
         if policy == "grid_r1_budget12":
             # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
             # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
             # with the dsh_ train pool (tools/flat_range.ranges_dsh)
             from tools.regen_recipes import R1
             s.update(R1)
+        if policy == "grid_r2_budget18":
+            # plan step 75's r2 (after r1's NO, data/r1_check.json, r1_where.json, r1_rounds.json): r1 plus the
+            # extremes kept, the stall stop after two stalled rounds, budget 18 (tools/regen_recipes.R2)
+            from tools.regen_recipes import R2
+            s.update(R2)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
@@ -286,6 +292,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                                             if d.get("channels") is not None else None),
                                        "channels": d["channels"], "mcmc": d.get("mcmc"),
                                        "t_propose": d.get("t_propose"), "t_label": d.get("t_label"),
+                                       "t_propose_by_channel": d.get("t_propose_by_channel"),
                                        "grid_dims": d.get("grid_dims"),
                                        "cand_per_channel_bin": (np.asarray(d["cand_per_channel_bin"]).tolist()
                                                                 if d.get("cand_per_channel_bin") is not None else None),
@@ -316,7 +323,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                 "n_chunks": len(tasks), "n_candidates": int(len(lm)), "n_kept": int(len(kept)),
                 "n_labels_flat": int(sum(q["n_labels"] for q in qd)) if qd else None,
                 "kept_min": float(np.nanmin(kept)), "kept_max": float(np.nanmax(kept)),
-                "cand_max": float(np.nanmax(lm[fin])),
+                "cand_max": float(np.nanmax(lm[fin])), "cand_min": float(np.nanmin(lm[fin])),
                 "hist_kept": np.histogram(np.clip(kept, LOGM_BINS[0], LOGM_BINS[-1] - 1e-9), LOGM_BINS)[0].tolist(),
                 "hist_cand": np.histogram(np.clip(lm[fin], LOGM_BINS[0], LOGM_BINS[-1] - 1e-9), LOGM_BINS)[0].tolist(),
                 "chunks": diag, "quota_chunks": qd, "chunk_seconds": secs,
@@ -362,6 +369,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
                                "out_of_support_all": float(np.mean(~ss)), "outside_window_all": v["outside_window"],
                                "fail_cuts_in_window_all": v["fail_cuts_in_window"],
                                "above_max_all": float(np.mean(ls > r["kept_max"])),
+                               # how far outside the kept range each such event lies (dex; + above the max, - below
+                               # the min), the nearest 20 (plan step 75's r2 item 3)
+                               "outside_dex": sorted((np.concatenate([ls[ss & (ls > r["kept_max"])] - r["kept_max"],
+                                                                      ls[ss & (ls < r["kept_min"])] - r["kept_min"]])
+                                                      ).tolist(), key=abs)[:20],
                                "by_construction": k == "table" and key.startswith("quota")}
     d = os.path.join(os.environ.get("SCRATCH") or "/tmp", "zz_mcheck"); os.makedirs(d, exist_ok=True)
     tag = name if (tuple(policies), tuple(seeds)) == (("current", "multichannel"), SEEDS) else \
@@ -893,6 +905,7 @@ R1_CLASSES = {"v4_bbx_aazz": "pp13v4_bbx_aazz", "v4_dbx_hhtxu": "pp13v4_dbx_hhtx
 R1_TAG = "current+grid_both_res2f_budget12+grid_r1_budget12"
 R1_FILL = 0.95       # steps 72/75/65's bin bar
 R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
+R2_TAG = "current+grid_r1_budget12+grid_r2_budget18"
 
 
 def step75r1():
@@ -1006,6 +1019,133 @@ def step75r2_where():
     print("STEP75R2_WHERE", len(out))
 
 
+def step75r2_rounds():
+    """data/r1_rounds.json (plan step 75, r2's design): from r1's per-chunk rounds, per class and seed, how the chunks
+    stopped; for the budget stops the events still missing at the stop and what the last round filled; for the stall
+    stops what the stalled round filled; per short bin of r1_check.json its fill in the chunks that stopped on stall
+    against those that ran to the budget (did one more round fill it); the cost r1 / current per class and summed over
+    every class and seed (the method's generation time); and an ESTIMATE of r2's labels (assumption: a stall-stopped
+    chunk runs one more full round, a budget-stopped one rounds up to budget 18, the quota-stopped as in r1) and cost
+    (r1 seconds plus the label and proposal seconds in proportion to the labels added)"""
+    chk = json.load(open(os.path.join(DATA, "r1_check.json")))["classes"]
+    out, T = {}, {"r1": 0.0, "current": 0.0, "r2_est": 0.0, "step65": 0.0}
+    for c in R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                continue
+            runs = json.load(open(f))["runs"]
+            r, cur = runs[f"grid_r1_budget12_{seed}"], runs[f"current_{seed}"]["seconds"]
+            qc = r["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+            stops = {}
+            for x in qc:
+                stops[x["stop"]] = stops.get(x["stop"], 0) + 1
+            bud = [x for x in qc if x["stop"] == "budget"]; sta = [x for x in qc if x["stop"] == "stall"]
+            L = sum(sum(a["n"] for a in x["rounds"]) for x in qc)
+            add = sum(x["rounds"][0]["n"] for x in sta) + sum(max(0, 18 - 12) * sum(x["quota"]) for x in bud)
+            tlp = sum((x.get("t_label") or 0) + (x.get("t_propose") or 0) for x in qc)
+            est = r["seconds"] + tlp * add / L
+            bins = []
+            for b in chk[c][f"grid_r1_budget12_{seed}"]["short"]:
+                j = int(np.argmin(np.abs(e[:-1] - b[0])))
+                fl = lambda xs: (round(sum(x["kept_per_bin"][j] for x in xs) / max(sum(x["quota"][j] for x in xs), 1), 3)
+                                 if xs else None)
+                bins.append({"lo": b[0], "fill": b[2], "fill_stall_chunks": fl(sta), "fill_budget_chunks": fl(bud),
+                             "fill_quota_chunks": fl([x for x in qc if x["stop"] == "quota"])})
+            out[f"{c}/{seed}"] = {
+                "stops": stops, "short_bins": bins,
+                "budget_missing_at_stop": [x["rounds"][-1]["missing"] for x in bud],
+                "budget_last_round_filled": [x["rounds"][-2]["missing"] - x["rounds"][-1]["missing"] for x in bud],
+                "stall_round_filled": [x["rounds"][-2]["missing"] - x["rounds"][-1]["missing"] for x in sta],
+                "labels_r1": L, "labels_r2_est": L + add, "cost_r1": r["seconds"] / cur, "cost_r2_est": est / cur}
+            T["r1"] += r["seconds"]; T["current"] += cur; T["r2_est"] += est
+            T["step65"] += runs[f"grid_both_res2f_budget12_{seed}"]["seconds"]
+    res = {"classes": out, "total_seconds": T, "total_cost_r1": T["r1"] / T["current"],
+           "total_cost_step65": T["step65"] / T["current"], "total_cost_r2_est": T["r2_est"] / T["current"]}
+    json.dump(res, open(os.path.join(DATA, "r1_rounds.json"), "w"), indent=1)
+    print("STEP75R2_ROUNDS", json.dumps({k: round(v, 3) for k, v in res.items() if k.startswith("total_cost")}))
+
+
+def step75r2():
+    """data/r2_check.json: per class and seed of R1_CLASSES, r2 (grid_r2_budget18) and r1 (grid_r1_budget12) in the
+    same job as the old sampling (current): (1) fill of every in-range quota bin, margin included, at >= R1_FILL of
+    quota, exempt only bins whose lower edge lies above the class's reach (the highest candidate of any policy at either
+    seed) or whose upper edge lies below its floor (the least candidate of any policy at either seed: the reach rule's
+    mirror); a bin straddling the reach or the floor is scored and listed with the share of its width the candidates
+    reach; (2) the held-out in-support events outside the kept range (heldout_r1) with their distance; (3) the cost
+    r2 seconds / current seconds per class, and summed over every class and seed (the bar: the method's generation
+    time, <= R1_COST); per channel the proposal seconds. Verdict PASS when (1) and (2) hold on every class and seed and
+    the summed cost is <= R1_COST, else the failing kinds"""
+    sys.path.insert(0, ROOT)
+    from tools.flat_range import MARGIN_DEX, ranges_dsh
+    rg = ranges_dsh(); L = np.log(10.0)
+    rows, fails = {}, {"fill": [], "outside": [], "cost": [], "missing": []}
+    T = {"grid_r2_budget18": 0.0, "grid_r1_budget12": 0.0, "current": 0.0}
+    for c in R1_CLASSES:
+        files = [os.path.join(READS, f"{c}_{R2_TAG}_{seed}.json") for seed in SEEDS]
+        allr = [r for f in files if os.path.exists(f) for r in json.load(open(f))["runs"].values()]
+        reach = max([r["cand_max"] for r in allr if r.get("cand_max") is not None], default=None)
+        floor = min([r["cand_min"] for r in allr if r.get("cand_min") is not None], default=None)
+        for seed, f in zip(SEEDS, files):
+            if not os.path.exists(f):
+                fails["missing"].append(f"{c}/{seed}"); continue
+            runs = json.load(open(f))["runs"]
+            cur = runs.get(f"current_{seed}", {}).get("seconds")
+            for pol in ("grid_r2_budget18", "grid_r1_budget12"):
+                r = runs.get(f"{pol}_{seed}")
+                if r is None or cur is None:
+                    fails["missing"].append(f"{c}/{pol}/{seed}"); continue
+                qc = r["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+                q = np.sum([x["quota"] for x in qc], 0).astype(float); k = np.sum([x["kept_per_bin"] for x in qc], 0)
+                fill = np.where(q > 0, k / np.maximum(q, 1), 1.0)
+                lo, hi = rg[c][0] / L + MARGIN_DEX, rg[c][1] / L - MARGIN_DEX
+                core = (e[:-1] >= lo - 1e-9) & (e[1:] <= hi + 1e-9) & (q > 0)
+                above = (q > 0) & (e[:-1] > reach); below = (q > 0) & (e[1:] < floor)
+                scored = (q > 0) & ~above & ~below
+                straddle = scored & (((e[:-1] < reach) & (e[1:] > reach)) | ((e[:-1] < floor) & (e[1:] > floor)))
+                src = r["sources"].get("heldout_r1", {})
+                out = src.get("n_in_support_outside_kept")
+                ch = [" ".join(str(y) for y in (kk if isinstance(kk, list) else [kk])) for kk in (qc[0].get("channels") or [])]
+                tch = [x.get("t_propose_by_channel") for x in qc if x.get("t_propose_by_channel")]
+                d = {"bins": int(scored.sum()), "fill_share": float((fill[scored] >= R1_FILL).mean()) if scored.any() else 1.0,
+                     "short": [[round(e[i], 3), round(e[i + 1], 3), round(float(fill[i]), 3), "core" if core[i] else "margin",
+                                round(float((min(e[i + 1], reach) - max(e[i], floor)) / (e[i + 1] - e[i])), 3)
+                                if straddle[i] else 1.0]
+                               for i in np.nonzero(scored & (fill < R1_FILL))[0]],
+                     "exempt_above_reach": [[round(e[i], 3), round(e[i + 1], 3)] for i in np.nonzero(above)[0]],
+                     "exempt_below_floor": [[round(e[i], 3), round(e[i + 1], 3)] for i in np.nonzero(below)[0]],
+                     "class_reach_log10": reach, "class_floor_log10": floor,
+                     "outside_heldout_r1": out, "outside_dex": src.get("outside_dex"),
+                     "kept_min": r["kept_min"], "kept_max": r["kept_max"], "cand_max": r.get("cand_max"),
+                     "seconds": r["seconds"], "current_seconds": cur, "cost_vs_current": r["seconds"] / cur,
+                     "labels_flat": r.get("n_labels_flat"),
+                     "t_label": float(sum(x.get("t_label") or 0 for x in qc)),
+                     "t_propose": float(sum(x.get("t_propose") or 0 for x in qc)),
+                     "t_propose_by_channel": dict(zip(ch, np.sum(tch, 0).round(2).tolist())) if tch and ch else None,
+                     "stops": {}}
+                for x in qc:
+                    d["stops"][x["stop"]] = d["stops"].get(x["stop"], 0) + 1
+                rows.setdefault(c, {})[f"{pol}_{seed}"] = d
+                T[pol] += r["seconds"]
+                if pol == "grid_r2_budget18":
+                    T["current"] += cur
+                    if d["fill_share"] < 1.0:
+                        fails["fill"].append(f"{c}/{seed}")
+                    if out is None or out > 0:
+                        fails["outside"].append(f"{c}/{seed}")
+    tot = {p: T[p] / T["current"] if T["current"] else None for p in ("grid_r2_budget18", "grid_r1_budget12")}
+    if tot["grid_r2_budget18"] is None or tot["grid_r2_budget18"] > R1_COST:
+        fails["cost"].append(f"total {tot['grid_r2_budget18']}")
+    verdict = ("INCOMPLETE" if fails["missing"] else "PASS" if not any(fails[k] for k in ("fill", "outside", "cost"))
+               else "FAIL: " + ", ".join(k for k in ("fill", "outside", "cost") if fails[k]))
+    res = {"design": "plan catalog_coverage step 75 revision r2 (step 78)", "verdict": verdict, "fails": fails,
+           "total_cost": tot, "per_class_over_2x": sorted(f"{c}/{k}" for c, v in rows.items() for k, d in v.items()
+                                                          if k.startswith("grid_r2") and d["cost_vs_current"] > R1_COST),
+           "classes": rows}
+    json.dump(res, open(os.path.join(DATA, "r2_check.json"), "w"), indent=1)
+    print("STEP75R2", verdict, json.dumps(fails), json.dumps(tot))
+
+
 def pull(policies=None, classes=None, seeds=SEEDS):
     """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
@@ -1042,6 +1182,12 @@ if __name__ == "__main__":
         step75r1()
     elif sys.argv[1] == "step75r2-where":
         step75r2_where()
+    elif sys.argv[1] == "step75r2-rounds":
+        step75r2_rounds()
+    elif sys.argv[1] == "step75r2-pull":
+        pull(R2_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step75r2":
+        step75r2()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
