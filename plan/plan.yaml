@@ -14203,6 +14203,20 @@ entries:
       and aepemh exceed the 2x rule (kept < 0.5); every other pool asks at most 1.55x what it keeps and is sized from its
       measured kept, so nothing else changes; the mixed-pair cut (lhe.mixed_pair_mmin) stays opt-in for those two (assembled
       pools keep their identity).'
+  - at: '2026-11-07T05:46:03+00:00'
+    text: '2026-11-07 step 75 r1 check read (multichannel_check.py step75r1 @224b49db -> data/r1_check.json; 19 classes x
+      seeds 42/43, the step-65 policy and the old sampling in the same job): verdict NO by the passed design (fill, outside,
+      cost), but r1 is much better than the step-65 policy. FILL: every core bin of every class and seed filled (0 core shorts;
+      step-65 policy: 0.75-1.0 of bins); shorts only in margin bins on 9 classes: bottom-margin bins that no candidate of
+      any policy or seed reached (v4_ddx_ttx [-1.1, -0.85] fill 0, kept_min -0.71; v4_bb_bb [0.01, 0.26] fill 0, kept_min
+      0.27: |M|^2 bounded below, the mirror of the reach exemption, which the reader applies only above), and top-margin bins
+      under 0.95 (v4_bb_bbvevex 0.93, v4_ug_auuux 0.93-0.95, v4_us_ddxsu 0.82-0.95, v4_uu_bbxuu 0.65-0.95, v4_bbx_ccxh -3.81
+      dex 0.46-0.62, v4_uux_bgtxwp 0-0.46, v4_bb_bb 8.34 dex 0.07-0.11). OUTSIDE: 0 held-out events outside on 18 classes
+      (step-65 policy: 1-2 on 7); v4_bbx_htaptam 1 at both seeds (kept max -4.487, the class''s highest candidate -4.472).
+      COST (r1 seconds / old sampling''s, same node): median 1.66 (step-65 policy 1.86), 12 of 38 above 2x: v4_bb_bbvevex
+      2.20-2.72, v4_dbx_hhtxu 2.17, v4_dbx_ahtxu 2.12-2.19, v4_uc_cuvevex 2.24-2.29, v4_us_ddxsu 2.27, v4_uu_bbxuu 2.01-2.37.
+      Next by the design''s NO branch: one revision r2 (top-margin channel reach, the outside event''s distance, labels vs
+      proposal on the 6 costly classes), its own design and review.'
   handoff:
     state: '2026-11-07 ~07:00. Step 75: r1 check design FIX once (core-only fill bar; no no-dsh_ outside class), revised (all
       in-range bins incl. margin, exempt only bins above the class''s reach; +v4_uux_bgtxwp, 19 classes), design PASS, repo
