@@ -144,10 +144,17 @@ def ee_energies(mg, e, n=None, energies=EE_ENERGIES):
     return [E for E in energies if E > lo and E not in EE_ZERO_SURVEY.get(n, ())]
 
 
-def carried_complete(c):
-    """complete_layout's arguments for an anchor pool whose old pool is in COMPLETE (c: its entry): its run size,
-    gridpack and grid_events; not its per-energy shares, run sizes or gridpack pins (old energies, no spectrum)."""
-    return dict(gridpack=c.get("gridpack", False), grid_events=c.get("grid_events"))
+def carried_complete(c, old, energies):
+    """complete_layout's arguments for an anchor pool whose old pool `old` is in COMPLETE (c: its entry): its run size,
+    gridpack and grid_events; where its runs were sized from the probe's complete share (size_from_probe), that share
+    at the energies the old and new lists share, COMPLETE_SHARE elsewhere (no measurement there yet: the eea_ queue
+    measures every energy with its spectrum, step 74); not its run sizes or gridpack pins (old layout's gridpacks)."""
+    sh = None
+    if c.get("size_from_probe"):
+        by = (json.load(open(BY_ENERGY)) if os.path.exists(BY_ENERGY) else {}).get(old, {})
+        sh = {f"{float(E):g}": float(by[f"{float(E):g}"]["complete"]) if f"{float(E):g}" in by
+              else COMPLETE_SHARE * RUN_SAFETY for E in energies}
+    return dict(gridpack=c.get("gridpack", False), grid_events=c.get("grid_events"), shares=sh)
 
 
 def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, complete):
@@ -167,7 +174,7 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         l4 = {"energies": Es, "beam_spectrum": {f"{E:g}": EE_ANCHOR[E] for E in Es}}
         if old in complete:
             l4 = complete_layout({**a_lhe, **l4}, complete[old]["run_events"], name=name,
-                                 **carried_complete(complete[old]))
+                                 **carried_complete(complete[old], old, Es))
             l4 = {k: v for k, v in l4.items() if k not in a_lhe or a_lhe[k] != v}
         e = {**lhe_entry(mg, n, P[n], mg.V4_MODEL, l4), "parent": n, "split": T[n]["role"],
              "test_group": f"e+e- v4 anchor: {T[n].get('axis') or 'train'}", "standalone_of": old}
@@ -194,7 +201,8 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
                "n_val": new["val"], "n_test": new["test"], "n_train": new["train"]}
         run_layout(mg, lhe, rate)
         if name_old in complete:
-            lhe = complete_layout(lhe, complete[name_old]["run_events"], name=name, **carried_complete(complete[name_old]))
+            lhe = complete_layout(lhe, complete[name_old]["run_events"], name=name,
+                                  **carried_complete(complete[name_old], name_old, Es))
         lhe["parts"] = True
         e = lhe_entry(mg, n, P[n], mg.V4_MODEL, None)
         e.update(lhe=lhe, parent=n, reuse=reuse, split="train", test_group="catalog_v4 default share, e+e- anchor",

@@ -58,7 +58,9 @@ def anchor_estimate(rates, gp_times, new_specs, old_specs):
     the spectrum's time factor (low and high of SPECTRUM_TIME). Per run, not per event: a run is a survey plus its
     events, and the survey does not shrink with the events (an eea run asks 204 events where an ee4 run asked 340, so
     the per-run rate errs high there). Gridpacks: the new pools' gridpacks (one per energy of an lhe.gridpack pool) at
-    the measured e+e- gridpack tasks' wall x cores (median and mean of gp_times), not in the sidecars' madevent_s."""
+    the measured e+e- gridpack tasks' wall x cores (median and mean of gp_times, without spectrum: times the spectrum
+    factor as the runs), not in the sidecars' madevent_s. A new pool whose old pool has no measured rate is listed
+    (missing_rates), not estimated."""
     import yaml
     old = {}
     for f in old_specs:
@@ -70,7 +72,7 @@ def anchor_estimate(rates, gp_times, new_specs, old_specs):
         new.update({k: {**h, **(v.get("lhe") or {})} for k, v in d["processes"].items()})
     g = json.load(open(gp_times))
     gw = np.array(list(g["wall_s"].values()), float) * int(g["cores"])
-    per_pool, missing, n_grid, n_runs_new, n_runs_old = {}, [], 0, 0, 0
+    per_pool, missing, n_grid, n_runs_new, n_runs_old = {}, [], {"eea_": 0, "dsh_eea_": 0}, 0, 0
     for k, l in new.items():
         o = ("ee4_" + k[len("eea_"):]) if k.startswith("eea_") else ("dsh_" + k[len("dsh_eea_"):])
         r = rates.get(o)
@@ -82,7 +84,7 @@ def anchor_estimate(rates, gp_times, new_specs, old_specs):
         per_pool[k] = {"old": o, "old_core_s": r["madevent_s"] * r["mg_cores"], "per_run_s": per_run, "runs": n,
                        "core_s": per_run * n}
         if l.get("gridpack"):
-            n_grid += len(l.get("energies") or [1])
+            n_grid["dsh_eea_" if k.startswith("dsh_eea_") else "eea_"] += len(l.get("energies") or [1])
     x = np.array([v["core_s"] for v in per_pool.values()])
     old_cs = sum(v["old_core_s"] for v in per_pool.values())
     top = max(per_pool, key=lambda k: per_pool[k]["per_run_s"])
@@ -95,7 +97,10 @@ def anchor_estimate(rates, gp_times, new_specs, old_specs):
             "runs_core_h_by_prefix": {p: [round(sum(v["core_s"] for v in by(p)) * f / 3600, 1) for f in SPECTRUM_TIME]
                                       for p in ("eea_", "dsh_eea_")},
             "gridpacks": n_grid, "gridpack_core_s_median_mean": [round(float(np.median(gw))), round(float(gw.mean()))],
-            "gridpack_core_h": [round(n_grid * float(np.median(gw)) / 3600, 1), round(n_grid * float(gw.mean()) / 3600, 1)],
+            # low: the median gridpack at the spectrum's low factor; high: the mean at its high factor
+            "gridpack_core_h_by_prefix": {p: [round(n * float(np.median(gw)) * SPECTRUM_TIME[0] / 3600, 1),
+                                              round(n * float(gw.mean()) * SPECTRUM_TIME[1] / 3600, 1)]
+                                          for p, n in n_grid.items()},
             "longest_run": {"pool": top, "old_per_run_s": round(per_pool[top]["per_run_s"]),
                             "with_spectrum_s": [round(per_pool[top]["per_run_s"] * f) for f in SPECTRUM_TIME]},
             "longest_gridpack_wall_s": int(max(g["wall_s"].values()))}

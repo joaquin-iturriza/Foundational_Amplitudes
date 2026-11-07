@@ -398,6 +398,15 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 51
+      energy_runs:
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 54
+      - 51
+      - 54
       gridpack: 13057
     parent: v4_epem_aawpwm
     reuse: eea_epem_aawpwm
@@ -656,6 +665,17 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 43
+      energy_runs:
+      - 43
+      - 43
+      - 43
+      - 43
+      - 43
+      - 43
+      - 43
+      - 46
+      - 43
+      - 46
       gridpack: 13057
     parent: v4_epem_accxg
     reuse: eea_epem_accxg
@@ -1931,6 +1951,13 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 67
+      energy_runs:
+      - 67
+      - 67
+      - 67
+      - 67
+      - 67
+      - 72
       gridpack: 13057
     parent: v4_epem_awpwmz
     reuse: eea_epem_awpwmz
@@ -2378,6 +2405,16 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 45
+      energy_runs:
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 55
       gridpack: 13057
     parent: v4_epem_bbxgz
     reuse: eea_epem_bbxgz
@@ -2573,6 +2610,15 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 51
+      energy_runs:
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 62
+      - 51
+      - 51
       gridpack: 13057
     parent: v4_epem_bbxwpwm
     reuse: eea_epem_bbxwpwm
@@ -3016,6 +3062,16 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 45
+      energy_runs:
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 45
+      - 48
+      - 45
+      - 45
       gridpack: 13057
     parent: v4_epem_ccxgz
     reuse: eea_epem_ccxgz
@@ -4148,6 +4204,15 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 51
+      energy_runs:
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 58
+      - 51
+      - 51
       gridpack: 13057
     parent: v4_epem_epemwpwm
     reuse: eea_epem_epemwpwm
@@ -4274,6 +4339,15 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 51
+      energy_runs:
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 51
+      - 54
       gridpack: 13057
     parent: v4_epem_epemzz
     reuse: eea_epem_epemzz
@@ -7021,6 +7095,13 @@ processes:
       complete_runs: true
       run_events: 200
       n_runs: 67
+      energy_runs:
+      - 67
+      - 67
+      - 67
+      - 72
+      - 67
+      - 72
       gridpack: 13057
     parent: v4_epem_wpwmzz
     reuse: eea_epem_wpwmzz
