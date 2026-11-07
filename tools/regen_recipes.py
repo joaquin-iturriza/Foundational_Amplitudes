@@ -63,6 +63,12 @@ R2 = dict(R1, flat_keep_ext=True, flat_stall_patience=2, flat_budget=18)
 # r2_where.json): r2 plus flat_empty_near: an empty bin's deficit steers the proposal through the deficit-many candidates
 # nearest to it in log|M|^2, not through every candidate of the nearest occupied bin; pools _smixt
 R3 = dict(R2, flat_empty_near=True)
+# plan step 79's r4 (after r3's NO: v4_uux_bgtxwp's reachable bin [-1.206, -0.96] up from 0.73/0.79 to 0.925/0.917, but
+# v4_uu_bbxuu, at 1.0 under r2, down to 0.90/0.80 in its top bin, its chunks converging slower from the second round
+# with 3-9 top bins empty; data/r3_check.json, r3_rounds.json): r3 plus flat_empty_unique: each empty bin steers
+# through the deficit-many nearest candidates no other empty bin took, so adjacent empty bins never stack their units on
+# the same few candidates; pools _smixu
+R4 = dict(R3, flat_empty_unique=True)
 FLAT_RANGE_R1 = os.path.join(REC, "catalog_v4_flat_range_dsh.json")
 OUT_R1 = "catalog_v4_r1_regen.yaml"
 

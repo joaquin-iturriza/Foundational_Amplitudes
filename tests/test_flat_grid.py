@@ -198,3 +198,29 @@ def test_r3_empty_near_tag():
     import py_compile
     py_compile.compile(os.path.join(HERE, "analysis", "catalog_v4", "multichannel_check.py"), doraise=True)
 
+
+
+def test_r4_empty_unique_tag():
+    """plan step 79's r4: with flat_empty_unique (and flat_empty_near) adjacent empty bins steer through disjoint
+    candidates: each empty bin's deficit-many nearest candidates not taken by an earlier empty bin, one unit each; r3
+    stacks them on the same nearest few; the total weight equal, weights unchanged without the key; _smixu tag"""
+    edges = np.linspace(0.0, 4.0, 5); quota = np.array([10, 10, 10, 10])
+    logm = np.random.default_rng(0).uniform(0.0, 2.0, 30)          # bins 2 and 3 empty, 10 units each
+    w3, c3, d3 = mg.flat_quota_weights(logm, edges, quota, empty_near=True)
+    w4, c4, d4 = mg.flat_quota_weights(logm, edges, quota, empty_near=True, unique=True)
+    wf, _, _ = mg.flat_quota_weights(logm, edges, quota, empty_near=True, unique=False)
+    assert (w3 == wf).all() and (c3 == c4).all() and (d3 == d4).all()
+    assert np.isclose(w3.sum(), w4.sum())
+    b = np.searchsorted(edges, logm, side="right") - 1
+    own = np.where(d3[b] > 0, d3[b] / np.bincount(b, minlength=4)[b], 0.0)
+    order = np.argsort(logm)[::-1]
+    top10, next10, rest = order[:10], order[10:20], order[20:]
+    assert np.allclose(w3[top10], own[top10] + 2.0) and np.allclose(w3[next10], own[next10])    # r3: stacked
+    assert np.allclose(w4[top10], own[top10] + 1.0) and np.allclose(w4[next10], own[next10] + 1.0)
+    assert np.allclose(w4[rest], own[rest])
+    rec = {"process": "x", "sqrts_min": 10, "sqrts_max": 20, "role": "train",
+           "sampling": {"mode": "mixture", "flat_range": [0, 1], "flat_stall": 0.2, "flat_keep_ext": True,
+                        "flat_empty_near": True, "flat_empty_unique": True}}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixu_amplitudes.npy")
+    from tools.regen_recipes import R3, R4
+    assert R4 == dict(R3, flat_empty_unique=True)
