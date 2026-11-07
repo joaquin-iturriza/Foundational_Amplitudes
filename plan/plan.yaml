@@ -12072,6 +12072,13 @@ entries:
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
     '81': FA-ccin2p3-22bc476d
+    '83': 'FA-ccin2p3-9ad3192e FA-ccin2p3-6c6a6ed9 FA-ccin2p3-ec0136e8 FA-ccin2p3-64c350c0 FA-ccin2p3-c3d6066f FA-ccin2p3-6cdd6bc3
+      FA-ccin2p3-04ae649e FA-ccin2p3-8663d43d FA-ccin2p3-869da7c1 FA-ccin2p3-2b49b784 FA-ccin2p3-8d89f756 FA-ccin2p3-d395da0c
+      FA-ccin2p3-66392b61 FA-ccin2p3-a3198aa6 FA-ccin2p3-6e7b09ab FA-ccin2p3-546c40ae FA-ccin2p3-a717fdfa FA-ccin2p3-c3011153
+      FA-ccin2p3-615bf1b7 FA-ccin2p3-32dc4dbd FA-ccin2p3-15655fb7 FA-ccin2p3-186e6b05 FA-ccin2p3-24e4c087 FA-ccin2p3-a62104be
+      FA-ccin2p3-36502814 FA-ccin2p3-7d1161ac FA-ccin2p3-b8886f8e FA-ccin2p3-49a44a98 FA-ccin2p3-7e2ded3d FA-ccin2p3-e0d76f80
+      FA-ccin2p3-0b2b5239 FA-ccin2p3-68309a79 FA-ccin2p3-66f2c861 FA-ccin2p3-34bf3067 FA-ccin2p3-67cec879 FA-ccin2p3-8a654b44
+      FA-ccin2p3-405886b5 FA-ccin2p3-a71c217f '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
