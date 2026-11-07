@@ -102,6 +102,21 @@ def test_three_incidents_pass_on_their_message_and_fail_otherwise():
     assert not plan.ask_matches_set(WS2, [WS_MSG])
 
 
+SG = {"id": "catalog_coverage", "status": "running", "waiting_since": "2026-11-07T08:00:00+00:00", "next": ["a"],
+      "ask": ("Four seeds (4 V100 jobs, about 9.3 GPU-h; the weight-1 rerun and the MSE control already have four) or "
+              "one (2.3 GPU-h), accepting that one seed can only show a sign gap larger than about 2x and a magnitude "
+              "change larger than about 15%?")}
+SG_MSG = "Joaquin, should the new sign-output arm run at four seeds (about 10 GPU-h) or one (about 2.6 GPU-h)?"
+
+
+def test_fourth_incident_restated_in_fewer_words_passes():
+    assert plan.ask_matches_set(SG, [SG_MSG])
+    assert plan.ask_matches_set(SG, ["nothing new.", SG_MSG])
+    assert not plan.ask_matches_set(SG, [UNRELATED])
+    assert not plan.ask_matches_set(SG, [])
+    assert not plan.ask_matches_set(SG, ["Joaquin, the sign-output arm finished; nothing needs you."])
+
+
 def test_margin():
     assert plan.ASK_MARGIN_MIN == 30
 

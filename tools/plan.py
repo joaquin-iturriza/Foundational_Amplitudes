@@ -401,6 +401,25 @@ def part_asked(p, x):
     return (len(a & b) >= 0.5 * len(a)) or (len(q) >= 3 and len(q & b) >= 0.5 * min(len(q), len(b)) and len(q & b) >= 4)
 
 
+def core_terms(s):
+    """Content words of a sentence with its parentheticals and numbers removed (the detail a restatement drops)."""
+    s = re.sub(r"\([^()]*\)", " ", s or "")
+    s = re.sub(r"[a-z]*\d[\w.]*", " ", s.lower())
+    return {w for w in re.findall(r"[a-z]{4,}", s) if w not in ASK_STOP}
+
+
+def restated(ask, x):
+    """True when sentence x restates the question sentence of the ask in fewer (or more) words: parentheticals and
+    numbers stripped from both, at least 0.6 of the shorter side's content words are in the longer (2026-11-07: a
+    long question with parenthetical detail, asked in plain words, shared under half of its terms)."""
+    flat = re.sub(r"\([^()]*\)", " ", ask or "")   # a ";" inside a parenthetical is no sentence end
+    qs = [y for y in re.split(r"(?<=[.?!;])\s+|\n+", flat) if "?" in y]
+    a, b = core_terms(qs[-1] if qs else flat), core_terms(x)
+    if min(len(a), len(b)) < 4:
+        return False
+    return 5 * len(a & b) >= 3 * min(len(a), len(b))
+
+
 def ask_questions(ask):
     """The questions of an ask: its numbered parts, else (unnumbered, two or more) each sentence holding a "?"
     (2026-11-06: three unnumbered questions, each asked in some message of the turn, were refused)."""
@@ -448,6 +467,8 @@ def ask_matches(e, text):
         if "?" not in sent and not re.search(r"your (call|pick|go|choice|decision)|tell me|let me know|which (one|do)", low):
             continue
         if overlap(e.get("ask"), sent):
+            return True
+        if not parts and not ask_questions(e.get("ask")) and restated(e.get("ask"), sent):
             return True
         if w and len(w & ask_terms(sent)) >= 0.5 * len(w):
             return True
