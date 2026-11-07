@@ -14240,6 +14240,12 @@ entries:
       seed (the reach rule''s mirror); (2) the flat part''s channel weights per bin: route the stalled chunks'' rounds to
       the channels that hold candidates in the short top bins (mperi edge, resl, res) instead of ending on stall/budget; (3)
       cost: the proposal of mc_mperi_all on hhtxu/ahtxu (r1 2.12-2.19 against the step-65 policy''s 1.89-1.93).'
+  - at: '2026-11-07T05:51:48+00:00'
+    text: '2026-11-07 step 74 stage-2 workers'' end read (site logs of FA-ccin2p3-e4edfe83, ca226769, 51300593 FAILED; 8dd43d8d,
+      f0e0bee7, d81798f5 COMPLETED, all ended 05:09-05:10): every failure is an assembly refused by lhe_equal_shares on a
+      pool whose one run at a high energy stopped short (e.g. dsh_eea_epem_ataptam 3000 GeV 206 of 6401), the cause already
+      read in step 77; queue at the last of them: todo 0, done 10427, failed 17, assembled 91 of 113. No other error. Those
+      pools are among the 20 relaid by step 77 (merged ef2dccd6, 47 workers running).'
   handoff:
     state: '2026-11-07 ~07:00. Step 75: r1 check design FIX once (core-only fill bar; no no-dsh_ outside class), revised (all
       in-range bins incl. margin, exempt only bins above the class''s reach; +v4_uux_bgtxwp, 19 classes), design PASS, repo
