@@ -15181,6 +15181,7 @@ entries:
     cost bar, or lifts the hold for the repeat'
   blocks: the 1301-class regeneration (step 82) and the sign-branch fault trace (step 83)
   blocks_steps: *id001
+  checked_until: '2026-11-07T18:57:45+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
