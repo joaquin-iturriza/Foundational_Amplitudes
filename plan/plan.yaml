@@ -11098,12 +11098,10 @@ entries:
       - 'PARTIAL: where-read of the short bins, one revision'
       - 'NO: dead end recorded, then a foam or flow proposal on the same harness'
   owner:
-    agent: a8f345d56440782be
-    state: stopped
-    since: '2026-11-07T00:12:07+00:00'
-    state_at: '2026-11-07T00:44:39+00:00'
-    context: 246886
-    context_at: '2026-11-07T01:02:00+00:00'
+    agent: a3fc2aab45ed49d42
+    state: working
+    since: '2026-11-07T01:02:53+00:00'
+    state_at: '2026-11-07T01:02:53+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
