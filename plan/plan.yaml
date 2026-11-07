@@ -12742,9 +12742,9 @@ entries:
       - 'bgtxwp short at the budget: channels per bin before a budget change'
   owner:
     agent: af618fc9fa0eb9c9d
-    state: stopped
+    state: working
     since: '2026-11-07T09:28:49+00:00'
-    state_at: '2026-11-07T09:56:37+00:00'
+    state_at: '2026-11-07T09:57:59+00:00'
     context: 259611
     context_at: '2026-11-07T09:57:55+00:00'
   findings:
