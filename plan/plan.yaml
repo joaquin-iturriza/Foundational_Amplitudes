@@ -14821,6 +14821,13 @@ entries:
       was already costing the magnitude; detaching removes that cost, but does not by itself move the sign. Design reviewer''s
       caveat stands: with the branch detached the shared layers learn nothing for the sign. Next (D296, mine to explore):
       the step-61 per-event matched sign weight on the detached block, where the upweighting can no longer take from the magnitude.'
+  - at: '2026-11-07T09:29:12+00:00'
+    text: '2026-11-07 main session: two further calls put to Joaquin in conversation (not yet answered), besides the straddling-bin
+      question: (1) the flat sampler''s 2x cost bar was moved by the owner from per class to the sum over the check''s jobs
+      after r1''s per-class failure (r2 summed 1.53x, 15 of 38 class-seeds over 2x); Joaquin asked to accept the summed bar
+      or require per class. (2) two e+e- anchor pools kept a short run below the 0.3 rule (dsh_eea_epem_bbxgz 3000 GeV 20/200,
+      wpwmzz 3000 GeV 53/200, 0.3% and 0.7% of that energy''s events); Joaquin asked whether to regenerate both pools. Also
+      open on warm_start: lift D307.'
   handoff:
     state: '2026-11-07 ~11:30. Step 79 (flat sampler r5 = r3 + flat_empty_near_min: r3''s nearest-candidate steering of an
       empty quota bin only where its nearest occupied bin holds more candidates than the deficit, else r2''s rule; merged
