@@ -1142,7 +1142,9 @@ for _k in ("step3198_default", "step3198_continue", "step2132_continue", "final_
 # (fine_tune.load_optimizer_state, arm v4_het_ws_step3198_continue_optstate[_seed2], scripts/job_catalog_v3_short.sh
 # @7b50861c): BETTER against the control as C1r_*; the mechanism read against the fresh-optimizer continued arm
 WARM["C1r_step3198_continue_optstate"] = {
-    "W": {533: ("FA-ccin2p3-05df656d", "FA-ccin2p3-07bfc8d7")}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
+    # the reruns after b91cf7c6 (run dirs <arm>_tagfix1): the first pair (05df656d, 07bfc8d7) ended in a sigma stage that
+    # reloaded the run's own optimizer moments, which moved the frozen mu row (its first validation 2.3e8): not read
+    "W": {533: ("FA-ccin2p3-1c90ae73", "FA-ccin2p3-013708af")}, "C": {}, "B": WARM["C1"]["B"], "A": WARM["C1"]["A"],
     "ref": {"control": _C1R["final_default"], "fresh_optimizer": _C1R["step3198_continue"],
             "step3198_default": _C1R["step3198_default"]},
     "deciding": ("PP4", "EE4"), "design": "plan warm_start step 13 (D307, D308), passed round 2"}
@@ -1414,7 +1416,8 @@ WARM["C1s50"] = {"W": dict(WARM["C2"]["W"]), "C": WARM["C1"]["C"], "B": WARM["C1
 # filled at submission ("" = not submitted). Arms of scripts/job_catalog_v3_short.sh v4_het_wsx_*; the share-0.50
 # warm start at k=533 (C2's seed-42 run) is read beside from step 7.
 S14 = {"control": "FA-ccin2p3-238e6f81",     # submitted 2026-11-07 @74aa4ce6 (limit 02:30); WSD parent FA-ccin2p3-dccb61e8
-       "arms": {"shrinkperturb": "FA-ccin2p3-71852916", "share50_k267": "FA-ccin2p3-77e8bf2b",
+       "arms": {"shrinkperturb": "FA-ccin2p3-0f346464",  # rerun after b91cf7c6; 71852916 shrank again in its sigma stage
+                 "share50_k267": "FA-ccin2p3-77e8bf2b",
                 "wsdbranch25": "FA-ccin2p3-85dd4eff", "wsdbranch50": "FA-ccin2p3-a79d5b14",
                 "wsdfinal_default": "FA-ccin2p3-554f3ec5", "share50_k533": "FA-ccin2p3-9a357af2"},
        "control_older": "FA-ccin2p3-341bf564",           # the step-1 default restart at seed 42 (older commit)

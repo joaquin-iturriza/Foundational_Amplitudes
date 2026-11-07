@@ -29,7 +29,8 @@ RUNS = {"warm start, default lr (k=533, s42)": "runs/catalog_v4_short/v4_het_war
         "every group damped (k=533, s43)": "runs/catalog_v4_short/v4_het_warm25e_k533_seed2"}
 RUNS.update({"hpo8 " + d.rsplit("/", 1)[1]: d for d in sorted(glob.glob("runs/ws_c1_k533_hpo8/trial_*"))})
 # step 12 (D307, D308): the restart study from the checkpoint rerun v4_het_control_ckpt[_seed2], arms v4_het_ws_*
-for _a in ("final_default", "step3198_default", "step3198_continue", "step2132_continue", "final_lr3x"):
+for _a in ("final_default", "step3198_default", "step3198_continue", "step2132_continue", "final_lr3x",
+           "step3198_continue_optstate"):   # step 13 (D307, D308): continued with the parent's optimizer state
     for _s, _sfx in (("s42", ""), ("s43", "_seed2")):
         RUNS["restart study " + _a + " " + _s] = "runs/catalog_v4_short/v4_het_ws_" + _a + _sfx
 out = {}
@@ -44,7 +45,9 @@ for lab, d in RUNS.items():
                 "loss_0_2": l[:3].tolist(), "grad_max20": float(g[:20].max()), "grad_max20_at": int(g[:20].argmax()),
                 "loss_max40": float(l[:40].max()), "loss_end": float(l[-1]),
                 "grad_max_2_10": float(g[2:11].max()), "grad_max_2_10_at": 2 + int(g[2:11].argmax()),
-                "loss_max_2_10": float(l[2:11].max())}
+                "loss_max_2_10": float(l[2:11].max()), "grad_max_all": float(g.max()), "grad_max_all_at": int(g.argmax()),
+                "loss_max_all": float(l.max()), "loss_max_all_at": int(l.argmax()), "loss_0_60": l[:60].tolist(),
+                "grad_0_60": g[:60].tolist()}
 ck = torch.load(gzip.open("runs/catalog_v4_short/v4_het_control/models/model_run0.pt.gz"), map_location="cpu",
                 weights_only=False)
 o = ck["optimizer"]
@@ -109,7 +112,8 @@ if __name__ == "__main__":
     # G = largest grad norm over restart steps 0-19; the jump moved when G_arm / G_ctrl < 0.5 or > 2 at both seeds
     if res.get("ws_final_default_s42", {}).get("grad_max20"):
         res["step12_jump"] = {}
-        for a in ("step3198_default", "step3198_continue", "step2132_continue", "final_lr3x"):
+        for a in ("step3198_default", "step3198_continue", "step2132_continue", "final_lr3x",
+                  "step3198_continue_optstate"):
             row = {}
             for s in ("s42", "s43"):
                 c, r = res.get(f"ws_final_default_{s}", {}), res.get(f"ws_{a}_{s}", {})
