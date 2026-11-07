@@ -15077,6 +15077,31 @@ entries:
       time / old against r3 time / old: 26 of 38 below equal cost. Next by the design: a rule that tells bgtxwp''s early small
       near bin (a bin still filling, ~900 candidates by the end) from bbxuu''s (a bin that stays short): read bgtxwp''s rounds
       under r5 (bins_empty_small per round, near-bin count and quota) against r3''s first.'
+  - at: '2026-11-07T10:31:57+00:00'
+    text: '2026-11-07 step 83 r6 check read (multichannel_check.py step82r6, step82r6-stops @0c94ac5d -> data/r6_check.json,
+      r6_stops.json; 38 CPU jobs at aae3fd1b, 19 classes x seeds 42/43, r6 = r5 without the stall stop (flat_stall_off) against
+      r5 and the old sampling in the same job): verdict PASS on every scored non-straddling bin (the passed design''s PASS);
+      the tool''s FAIL lists only the three straddling bins. FILL: v4_uux_bgtxwp [-1.206,-0.96] 900/925 = 0.973 (seed 42),
+      894/918 = 0.974 (43), r5 in the same jobs 802/925 = 0.867, 799/918 = 0.870 (r3 0.925/0.917); every one of its 36 chunks
+      per seed now stops at the label budget (r5: stall 14/20, budget 22/16), one chunk still at 0-1 kept in the bin but the
+      class total fills. v4_uu_bbxuu stays at quota (no short bin), bitwise r5 in 36/36 chunks at both seeds. DETERMINISM:
+      r6 equals r5 (_chunk_sig) in every chunk that r5 stopped at quota or budget, on all 38 class-seeds (no fault). OUTSIDE:
+      0 held-out in-support pp events outside the kept range on every class and seed (D269). COST, summed sampling seconds
+      over the 38 jobs: r6/old = 1.621, r5/old = 1.672 in the same jobs (bar 2x: pass); labels r6/r5 = 14.750e6/13.015e6 =
+      1.133 (the design''s +13% estimate); class-seeds over 2x: 19 of 38 under r6 and 19 under r5 in the same jobs (r5''s
+      own jobs 15); seconds spread between bitwise-equal runs up to 2.467 vs 1.855 (bbxuu seed 43), so per-class seconds carry
+      ~25% node noise; the stalled classes'' own cost rises: bb_bb r6/old 2.53/4.19 (r5 1.74/2.68), bbx_htaptam 2.23/2.86
+      (2.11/2.00), ddx_ttx 2.07/2.54 (1.35/1.37), bbx_ccxh 2.99/3.03 (2.64/2.65), bgtxwp 3.38/2.86 (3.10/2.93). STRADDLING
+      BINS (Joaquin''s open scope question; kept/quota of the full bin, reachable share in brackets): bb_bb [8.34,8.585] 0.187/0.218
+      (0.171: 1.09/1.27 of the reachable share; r5 0.108/0.13), bbx_ccxh [-3.809,-3.56] 0.882/0.846 (0.058; r5 0.865/0.77),
+      bgtxwp [-0.96,-0.714] 0/0 (0.087; 0 under every revision: no r-sampler draws above -1.03, the reach -0.939 is the step-65
+      policy''s). So under r6 the question reduces to bgtxwp''s straddling bin: exempting straddling bins passes every class;
+      scoring them at the reachable share passes bb_bb and ccxh and fails only bgtxwp''s. Figure analysis/catalog_v4/figs/r6_check.png
+      (r2_check_fig.py r6 @ae493dce): (a) kept/quota per bin against log10|M|^2 minus the class''s highest drawn, fifth revision
+      dashed open, sixth solid, four classes: all ~1.0 below the highest drawn, bgtxwp''s last bin 0.87 -> 0.97; (b) per class
+      and seed sixth-revision time/old against fifth-revision time/old: 20 of 38 above the diagonal, most on it. Next by the
+      design''s PASS: regenerate the 1301 hadronic classes with R6 (_smixw), waiting on Joaquin''s straddling-bin answer and
+      his summed-vs-per-class cost bar call.'
   handoff:
     state: '2026-11-07 ~11:00. Step 79 r5 read (data/r5_check.json, r5_acted.json, figs/r5_check.png): FAIL on fill only:
       bbxuu back at quota (35/36 chunks bitwise r2 under _chunk_sig), bgtxwp [-1.206,-0.96] 0.867/0.870 (r3 0.925/0.917),
