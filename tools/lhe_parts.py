@@ -1045,6 +1045,22 @@ def cmd_workdirs(a):
                       "freed_gb": round(freed / 1e9, 2)}))
 
 
+def cmd_unplan(a):
+    """Take processes out of a queue that a plan put in by mistake (a spec listing pools not meant for this queue): the
+    specs of processes whose name starts with --prefix, and their unclaimed tasks, moved to Q/unplanned/<time>/
+    (nothing deleted; a claimed task is left to its worker). Prints what it moves, moves it with --apply."""
+    D = _dirs(a.queue)
+    dst = os.path.join(a.queue, "unplanned", time.strftime("%Y%m%d_%H%M%S"))
+    specs = [f for f in os.listdir(D["specs"]) if f.startswith(a.prefix) and f.endswith(".json")]
+    tasks = [f for f in os.listdir(D["todo"]) if f.split("__")[1:2] and f.split("__")[1].startswith(a.prefix)]
+    if a.apply:
+        for sub, fs in (("specs", specs), ("todo", tasks)):
+            os.makedirs(os.path.join(dst, sub), exist_ok=True)
+            for f in fs:
+                os.rename(os.path.join(D[sub], f), os.path.join(dst, sub, f))
+    print(json.dumps({"specs": len(specs), "todo": len(tasks), "to": dst, "applied": bool(a.apply)}))
+
+
 def cmd_park(a):
     """Move a queue's unclaimed tasks (todo/) to parked/<time>/, so its live workers claim nothing more and end with the
     runs they hold; nothing deleted. Their work is planned in another queue (plan --skip-claimed this queue)."""
@@ -1307,6 +1323,8 @@ def main():
     ay.add_argument("--ledger", default=LEDGER); ay.add_argument("--accepted")
     ly = sub.add_parser("layout"); ly.add_argument("--queue", required=True)
     pk = sub.add_parser("park"); pk.add_argument("--queue", required=True)
+    up = sub.add_parser("unplan"); up.add_argument("--queue", required=True); up.add_argument("--prefix", required=True)
+    up.add_argument("--apply", action="store_true")
     p.add_argument("--rates", default=os.path.join(ROOT, "analysis/catalog_v4/data/lhe_rates.json"))
     w = sub.add_parser("work"); w.add_argument("--queue", required=True)
     w.add_argument("--workers", type=int, default=int(os.environ.get("SLURM_CPUS_PER_TASK", 1)))
@@ -1326,7 +1344,7 @@ def main():
     a = ap.parse_args()
     if getattr(a, "queue", None):
         a.queue = queue_path(a.queue)
-    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "workdirs": cmd_workdirs, "yields": cmd_yields,
+    {"shortbuilt": cmd_shortbuilt, "plan": cmd_plan, "layout": cmd_layout, "accept-yield": cmd_accept_yield, "park": cmd_park, "unplan": cmd_unplan, "work": cmd_work, "status": cmd_status, "gc": cmd_gc, "workdirs": cmd_workdirs, "yields": cmd_yields,
      "shares": cmd_shares, "requeue": cmd_requeue}[a.cmd](a)
 
 
