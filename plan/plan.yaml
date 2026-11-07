@@ -11898,6 +11898,29 @@ entries:
       (the update = Adam(magnitude) + Adam(sign) scaled), its cost measured first (two backward passes, bar 2x). NO (worse
       beyond 2x): read the branch''s validation sign accuracy and the HD5 per-pool shares before anything else. FAULT (magnitude
       outside the band on any read): trace the trunk divergence (determinism, frames) before a verdict.'
+    fix_at: '2026-11-07T09:38:02+00:00'
+    fix: 'Check 3 (seeds against the measured spread) and check 4 (outcome) fail; the rest hold. (a) The H5 call cannot see
+      the effect at one seed. Per-seed H5 wrong-sign medians already exist (data/reads/<run>_sign.json): shared weight 1,
+      seeds 42-45: 8.6/9.95/6.05/14.05 (sd of ln about 0.36, so two one-seed runs differ by about 1.65x at one sigma); MSE
+      5.6/8.55/6.9/7.05; per-event match 9.15/8.35/7.35/11.3. The design''s YES needs H5 9.3 -> <=5.6, a 1.66x move, which
+      is less than its own one-seed call band (2x), and its DEPTH HELPS/NO/NOT RESOLVED branches are decided on H5 alone at
+      2x (about 1.4 sigma). So the whole effect sought on H5 (one-block 9.3 vs MSE 5.6) is inside one-seed noise, as step
+      73 already found. HD5 is much tighter: shared 16.2/14.9/14.9/18.65, MSE 11.15/12.2/13.95/11.2, per-event match 14.9/14.3/13.0/14.0
+      (sd of ln about 0.10); MSE and het seed ranges do not overlap, so HD5 can resolve a 1.3x move at one seed. Fix: base
+      the verdict on HD5 first, with the band taken from these per-seed spreads (write the numbers in the design and have
+      step80_one compute them from the 4-seed reads), with H5 as a secondary read under its own measured band. Keep D315 (one
+      seed). Do not add seeds: more seeds is Joaquin''s call. (b) The YES bar is the MSE control''s seed-42 value on both
+      reads, which is its best seed on each (5.6 of 5.6-8.55; 11.15 of 11.15-13.95). A branch as good as MSE in expectation
+      would usually miss it. State YES against the MSE seed range or band, for example HD5 inside MSE''s 4-seed range and
+      below every het arm''s (min 13.0). (c) Make the branches consistent: a YES called on a smaller H5 move (1.66x) than
+      DEPTH HELPS needs (2x) contradicts ''gaps called only beyond 2x''. Re-derive every branch threshold from the bands in
+      (a). Minor (check 14): say disk; the step-73 run had memmap false and no cache, one run directory. Passing: check 1
+      (only ++model.net.sign_branch_blocks=4 differs in the job script at 38fa76a1; the k=1 control is the same module; magnitude
+      R as an implementation check); check 2 (the HD5 sign read moves with how much of the net the sign shapes: MSE vs het
+      seed ranges disjoint, upweighting moved HD5 about 10%); check 5 (searched results.tex ''sign branch'', ''sign_branch'',
+      ''detached'', ''sign head'', ''parallel/separate trunk'', ''sign network'', ''wrong-sign'', ''pair head''; plan steps
+      56/61/73 and dead ends; site decisions ''sign'': no prior branch-depth work); checks 6, 7, 9 (HETEROSC mean), 10 (H5
+      catalog-sampled, HD5 default-sampled, both read), 11, 12, 13 (no HP search).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
