@@ -886,7 +886,10 @@ R1_CLASSES = {"v4_bbx_aazz": "pp13v4_bbx_aazz", "v4_dbx_hhtxu": "pp13v4_dbx_hhtx
               "v4_bbx_htaptam": "pp13v4_bbx_htaptam", "v4_udx_vevexwp": "pp13_udx_vevexwp", "v4_bb_bb": "pp13v4_bb_bb",
               "v4_ddx_ttx": "pp13v4_ddx_ttx", "v4_ddx_btxwpz": "pp13v4_ddx_btxwpz", "v4_ug_auuux": "pp13v4_ug_auuux",
               "v4_uux_ddxwpwm": "pp13v4_uux_ddxwpwm", "v4_bbx_ccxh": "pp13v4_bbx_ccxh", "v4_udx_cggsx": "pp13_udx_cggsx",
-              "v4_uc_cuvevex": "pp13v4_uc_cuvevex", "v4_us_ddxsu": "pp13v4_us_ddxsu", "v4_uu_bbxuu": "pp13v4_uu_bbxuu"}
+              "v4_uc_cuvevex": "pp13v4_uc_cuvevex", "v4_us_ddxsu": "pp13v4_us_ddxsu", "v4_uu_bbxuu": "pp13v4_uu_bbxuu",
+              # design review 2026-11-07 (FIX 2): held-out outside on a class without a dsh_ pool, whose range r1's
+              # dsh_ join leaves as it was (step 65: 2 events)
+              "v4_uux_bgtxwp": "pp13v4_uux_bgtxwp"}
 R1_TAG = "current+grid_both_res2f_budget12+grid_r1_budget12"
 R1_FILL = 0.95       # steps 72/75/65's bin bar
 R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
@@ -894,18 +897,25 @@ R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces a
 
 def step75r1():
     """data/r1_check.json: per class and seed, for r1 (grid_r1_budget12) and the step-65 policy (grid_both_res2f_budget12)
-    in the same job: core fill (the share of quota bins inside [range lo + 0.5 dex, range hi - 0.5 dex], the range
-    source's pp extent, at >= R1_FILL of quota, kept and quota summed over the chunks; each policy against its own
-    range table, tools/flat_range.ranges_dsh for r1, ranges for step 65), the margin bins' fills listed apart, the
-    held-out in-support events outside the kept [min, max] on heldout_r1 (PP4 val + dsh_ val + dsh_ test), the cost
-    (policy seconds / current seconds, same job), the labels and stops; verdict PASS when r1 has core fill 1.0,
-    0 outside and cost <= R1_COST on every class and seed, else the failing kinds"""
+    in the same job: fill of every in-range quota bin at >= R1_FILL of quota (kept and quota summed over the chunks;
+    each policy against its own range table, tools/flat_range.ranges_dsh for r1, ranges for step 65), step 65's bar
+    with the 0.5-dex margin included (design review 2026-11-07, FIX 1); exempt only a bin above the class's kinematic
+    reach, whose lower edge lies above every candidate any channel of any policy drew for the class at either seed
+    (cand_max over the job files), listed apart; the core bins ([range lo + 0.5 dex, range hi - 0.5 dex]) and margin
+    bins reported separately; the held-out in-support events outside the kept [min, max] on heldout_r1 (PP4 val + dsh_
+    val + dsh_ test); the cost (policy seconds / current seconds, same job), labels and stops; verdict PASS when r1
+    fills every non-exempt bin, leaves 0 outside and costs <= R1_COST on every class and seed, else the failing kinds"""
     sys.path.insert(0, ROOT)
     from tools.flat_range import MARGIN_DEX, ranges, ranges_dsh
     rg = {"grid_r1_budget12": ranges_dsh(), "grid_both_res2f_budget12": ranges()}
     L = np.log(10.0)
-    rows, fails = {}, {"core_fill": [], "outside": [], "cost": [], "missing": []}
+    rows, fails = {}, {"fill": [], "outside": [], "cost": [], "missing": []}
     for c in R1_CLASSES:
+        # the class's kinematic reach: the highest candidate of any policy and channel at either seed
+        reach = [r.get("cand_max") for seed in SEEDS
+                 for f in [os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")] if os.path.exists(f)
+                 for r in json.load(open(f))["runs"].values() if r.get("cand_max") is not None]
+        reach = max(reach) if reach else None
         for seed in SEEDS:
             f = os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")
             if not os.path.exists(f):
@@ -922,8 +932,14 @@ def step75r1():
                 lo, hi = rg[pol][c][0] / L + MARGIN_DEX, rg[pol][c][1] / L - MARGIN_DEX
                 core = (e[:-1] >= lo - 1e-9) & (e[1:] <= hi + 1e-9) & (q > 0)
                 marg = ~core & (q > 0)
+                exempt = (q > 0) & (e[:-1] > reach) if reach is not None else np.zeros_like(core)
+                scored = (q > 0) & ~exempt
                 out = r["sources"].get("heldout_r1", {}).get("n_in_support_outside_kept")
-                d = {"core_bins": int(core.sum()), "core_fill_share": float((fill[core] >= R1_FILL).mean()) if core.any() else 1.0,
+                d = {"bins": int(scored.sum()), "fill_share": float((fill[scored] >= R1_FILL).mean()) if scored.any() else 1.0,
+                     "short": [[round(e[i], 3), round(e[i + 1], 3), round(float(fill[i]), 3), "core" if core[i] else "margin"]
+                               for i in np.nonzero(scored & (fill < R1_FILL))[0]],
+                     "exempt_above_reach": [[round(e[i], 3), round(e[i + 1], 3)] for i in np.nonzero(exempt)[0]],
+                     "class_reach_log10": reach, "core_bins": int(core.sum()), "core_fill_share": float((fill[core] >= R1_FILL).mean()) if core.any() else 1.0,
                      "core_short": [[round(e[i], 3), round(e[i + 1], 3), round(float(fill[i]), 3)] for i in np.nonzero(core & (fill < R1_FILL))[0]],
                      "margin_fill": [[round(e[i], 3), round(float(fill[i]), 3)] for i in np.nonzero(marg)[0]],
                      "outside_heldout_r1": out, "outside_by_source": {k2: v.get("n_in_support_outside_kept") for k2, v in r["sources"].items()},
@@ -932,14 +948,14 @@ def step75r1():
                 d["stops"] = {str(a): int(b) for a, b in d["stops"].items()}
                 rows.setdefault(c, {})[f"{pol}_{seed}"] = d
                 if pol == "grid_r1_budget12":
-                    if d["core_fill_share"] < 1.0:
-                        fails["core_fill"].append(f"{c}/{seed}")
+                    if d["fill_share"] < 1.0:
+                        fails["fill"].append(f"{c}/{seed}")
                     if out is None or out > 0:
                         fails["outside"].append(f"{c}/{seed}")
                     if d["cost_vs_current"] is None or d["cost_vs_current"] > R1_COST:
                         fails["cost"].append(f"{c}/{seed}")
-    verdict = ("INCOMPLETE" if fails["missing"] else "PASS" if not any(fails[k] for k in ("core_fill", "outside", "cost"))
-               else "FAIL: " + ", ".join(k for k in ("core_fill", "outside", "cost") if fails[k]))
+    verdict = ("INCOMPLETE" if fails["missing"] else "PASS" if not any(fails[k] for k in ("fill", "outside", "cost"))
+               else "FAIL: " + ", ".join(k for k in ("fill", "outside", "cost") if fails[k]))
     res = {"design": "plan catalog_coverage step 75 revision r1 (design 2026-11-07)", "verdict": verdict, "fails": fails,
            "classes": rows}
     json.dump(res, open(os.path.join(DATA, "r1_check.json"), "w"), indent=1)
