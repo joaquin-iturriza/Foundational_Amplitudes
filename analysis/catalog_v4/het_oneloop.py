@@ -354,6 +354,9 @@ SH_SEEDS = (42, 43, 44, 45)
 STEP61 = {"matched_event": ("FA-ccin2p3-9079850b", "FA-ccin2p3-ebe4c4ed", "FA-ccin2p3-297c4366", "FA-ccin2p3-dce345d8"),
           "matched_const": ("FA-ccin2p3-e90fea9a", "FA-ccin2p3-14c988b0", "FA-ccin2p3-45b2d041", "FA-ccin2p3-04d27cd1"),
           "rerun": ("FA-ccin2p3-ac8d6fca", "FA-ccin2p3-752344ce", "FA-ccin2p3-b13f456c", "FA-ccin2p3-83dc9690")}
+# plan step 73 (step 61's NO branch): the sign logit from its own detached copy of the last block (model.net.sign_branch),
+# read by step 61's rules against the same weight-1 rerun and MSE control; runs filled in at submission
+STEP73 = {"branch": (), "rerun": STEP61["rerun"]}
 SH_AXES = ("HD5", "H5", "PP4", "EE4", "HD4", "H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")
 PAIR_GATE = {"HD5": 0.43, "H5": 0.40}     # absolute bound on the sd over classes of the paired ln ratio (design check 3)
 TOL = 1.25                                # magnitude no-worse tolerance on the widened upper end
@@ -623,7 +626,8 @@ MAG_UP = 1.10
 SIGN_TOL = 1.2                                # median wrong-sign within 1.2x the MSE control's; re-seed band [1/1.2, 1.2]
 
 
-def step61():
+def step61(table=None, arms=("matched_event", "matched_const"), out_name="het_signhead61.json",
+           design="plan catalog_coverage step 61 (D287, D296; passed 2026-11-06T05:06:47 and 05:15:07)"):
     """Step 61's read (designs passed 2026-11-06T05:06:47 and 05:15:07) -> data/het_signhead61.json.
     Re-seed rule first: the step-56 arm (old code) against its same-code rerun on H5 and HD5: per-pool two-sided sign
     test p < 0.05 or a median wrong-sign ratio outside [1/1.2, 1.2] -> the MSE control (old code) is rerun at the same
@@ -636,12 +640,13 @@ def step61():
     sign accuracy, blow-ups."""
     from mixture_ab import class_of, blowups
     cls = class_of()
-    rr, old = STEP61["rerun"], SIGNHEAD["arm"]
+    table = table or STEP61
+    rr, old = table["rerun"], SIGNHEAD["arm"]
     h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
     sr = lambda runs, ax: [_sign_read(r)[ax] for r in runs]
     ctl = {"HD5": sr(SIGNHEAD["mse_hd5"], "HD5"), "H5": [_mse_h5_sign(m) for m in SIGNHEAD["mse_h5"]]}
-    out = {"design": "plan catalog_coverage step 61 (D287, D296; passed 2026-11-06T05:06:47 and 05:15:07)",
-           "runs": STEP61, "old_step56_arm": old, "mse_control": {k: SIGNHEAD[k] for k in ("mse_train", "mse_hd5", "mse_h5")},
+    out = {"design": design,
+           "runs": table, "old_step56_arm": old, "mse_control": {k: SIGNHEAD[k] for k in ("mse_train", "mse_hd5", "mse_h5")},
            "het_magnitude_reference_old": SIGNHEAD["ref"], "seeds": SH_SEEDS}
     # re-seed rule
     rs = {ax: _sign_pair(sr(rr, ax), sr(old, ax), h5neg, ax) for ax in ("H5", "HD5")}
@@ -653,8 +658,8 @@ def step61():
     out["rerun_magnitude"] = {"vs_old_het_reference": {ax: _paired_mag(rr, SIGNHEAD["ref"], ax, cls) for ax in SH_AXES},
                               "vs_old_step56_arm": {ax: _paired_mag(rr, old, ax, cls) for ax in SH_AXES}}
     out["arms"], better_any = {}, False
-    for arm in ("matched_event", "matched_const"):
-        runs = STEP61[arm]
+    for arm in arms:
+        runs = table[arm]
         a = {"sign_vs_mse": {ax: _sign_pair(sr(runs, ax), ctl[ax], h5neg, ax) for ax in ("H5", "HD5")},
              "sign_vs_rerun": {ax: _sign_pair(sr(runs, ax), sr(rr, ax), h5neg, ax) for ax in ("H5", "HD5")},
              "magnitude_vs_rerun": {ax: _paired_mag(runs, rr, ax, cls) for ax in SH_AXES}}
@@ -683,10 +688,10 @@ def step61():
     out["rerun_val_sign_accuracy_last_main"] = [[x[1] for x in _sign_read(r)["val_sign_acc"]][50] for r in rr]
     out["step_verdict"] = "NO (neither arm beats the rerun on H5)" if not better_any else \
         "; ".join(f"{k}: {v['verdict']}" for k, v in out["arms"].items())
-    out["blowups"] = blowups([r for k in STEP61 for r in STEP61[k]])
+    out["blowups"] = blowups([r for k in table for r in table[k]])
     if out["blowups"]["flagged"]:
         out["step_verdict"] = None
-    json.dump(out, open(os.path.join(DATA, "het_signhead61.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(DATA, out_name), "w"), indent=1)
     brief = lambda r: {k: v for k, v in r.items() if k != "per_pool_pct"}
     print(json.dumps({"reseed": {ax: brief(out["reseed"][ax]) for ax in ("H5", "HD5")},
                       "rerun_vs_mse": {ax: brief(r) for ax, r in out["rerun_vs_mse"].items()},
@@ -760,6 +765,8 @@ if __name__ == "__main__":
         signhead_pull(STEP61)
     elif sys.argv[1:] == ["step61"]:
         step61()
+    elif sys.argv[1:] == ["step73"]:
+        step61(STEP73, ("branch",), "het_signhead73.json", "plan catalog_coverage step 73 (D296, D315)")
     elif sys.argv[1:] == ["step61_fig"]:
         step61_fig()
     elif sys.argv[1:] == ["signhead"]:
