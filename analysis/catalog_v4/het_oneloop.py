@@ -641,6 +641,9 @@ def step61(table=None, arms=("matched_event", "matched_const"), out_name="het_si
     from mixture_ab import class_of, blowups
     cls = class_of()
     table = table or STEP61
+    empty = [a for a in arms if not table.get(a)]
+    if empty:     # an arm with no runs yet would read as NaN seed means and a NO verdict (repo-reviewer, 2026-11-07)
+        sys.exit(f"step61: no runs recorded for arm(s) {empty}; fill the run table before reading")
     rr, old = table["rerun"], SIGNHEAD["arm"]
     h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
     sr = lambda runs, ax: [_sign_read(r)[ax] for r in runs]
