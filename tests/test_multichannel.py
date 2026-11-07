@@ -314,6 +314,38 @@ def test_mc_channels_res2_fwd():
     assert not any(c[0] == "res2f" for c in mg.mc_channels([0.0] * 4, pdg, res, res2_fwd=True))
 
 
+def test_sampling_policy_mc_constants():
+    """multichannel policies carry the proposal's constants (so the recipe id follows them); a policy naming another
+    value than the code's is refused; a policy without multichannel is unchanged"""
+    base = dict(mode="mixture", f_flat=0.5, oversample=6)
+    assert not any(k.startswith("mc_") for k in mg.sampling_policy({"sampling": base}))
+    pol = mg.sampling_policy({"sampling": dict(base, multichannel=True, mc_mperi_both=True, mc_res2_fwd=True)})
+    assert pol["mc_tail"] == mg.MC_TAIL and pol["mc_res2_fwd_floor"] == mg.MC_RES2_FWD_FLOOR
+    assert pol["mc_ladder_pt_span"] == mg.MC_LADDER_PT_SPAN and pol["mc_ladder_edge_d"] == list(mg.MC_LADDER_EDGE_D)
+    assert pol["mc_res_cards"]["23"] == list(mg.MC_RES[23])
+    plain = mg.sampling_policy({"sampling": dict(base, multichannel=True)})
+    assert "mc_res2_fwd_floor" not in plain and "mc_ladder_pt_span" not in plain and "mc_tail" in plain
+    assert mg.sampling_policy({"sampling": dict(base, multichannel=True, mc_tail=mg.MC_TAIL)})["mc_tail"] == mg.MC_TAIL
+    try:
+        mg.sampling_policy({"sampling": dict(base, multichannel=True, mc_res2_fwd=True, mc_res2_fwd_floor=1e-4)})
+        raise AssertionError("a floor other than the code's must be refused")
+    except ValueError:
+        pass
+    # round trips of the policy (the recipe sidecar sorts keys, YAML too) and int-for-float values are accepted
+    import json, yaml
+    assert mg.sampling_policy({"sampling": json.loads(json.dumps(pol))}) == pol
+    assert mg.sampling_policy({"sampling": json.loads(json.dumps(pol, sort_keys=True))}) == pol
+    assert mg.sampling_policy({"sampling": yaml.safe_load(yaml.safe_dump(pol))}) == pol
+    assert mg.sampling_policy({"sampling": dict(base, multichannel=True, mc_pt_lo=10)})["mc_pt_lo"] == mg.MC_PT_LO
+    g = mg.sampling_policy({"sampling": dict(base, flat_range=[-5.0, 5.0], flat_grid=True)})
+    assert g["flat_grid_smooth"] == mg.FLAT_GRID_SMOOTH
+    try:
+        mg.sampling_policy({"sampling": dict(base, flat_range=[-5.0, 5.0], flat_grid=True, flat_grid_smooth=5)})
+        raise AssertionError("a smoothing other than the code's must be refused")
+    except ValueError:
+        pass
+
+
 if __name__ == "__main__":
     for name, f in list(globals().items()):
         if name.startswith("test_"):

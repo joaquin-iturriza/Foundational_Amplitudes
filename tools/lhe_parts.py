@@ -1048,11 +1048,18 @@ def cmd_workdirs(a):
 def cmd_unplan(a):
     """Take processes out of a queue that a plan put in by mistake (a spec listing pools not meant for this queue): the
     specs of processes whose name starts with --prefix, and their unclaimed tasks, moved to Q/unplanned/<time>/
-    (nothing deleted; a claimed task is left to its worker). Prints what it moves, moves it with --apply."""
+    (nothing deleted). A process with a claimed task is left whole (its spec and its unclaimed tasks) and listed: its
+    worker reads the spec when a task starts and at assembly. Prints what it moves, moves it with --apply."""
     D = _dirs(a.queue)
     dst = os.path.join(a.queue, "unplanned", time.strftime("%Y%m%d_%H%M%S"))
-    specs = [f for f in os.listdir(D["specs"]) if f.startswith(a.prefix) and f.endswith(".json")]
-    tasks = [f for f in os.listdir(D["todo"]) if f.split("__")[1:2] and f.split("__")[1].startswith(a.prefix)]
+    proc = lambda f: f.split("__")[1] if f.split("__")[1:2] else None
+    # a process with a claimed task keeps its spec: the worker reads it when the task starts and at assembly
+    held = sorted({proc(f) for f in os.listdir(D["claimed"]) if proc(f) and proc(f).startswith(a.prefix)})
+    specs = [f for f in os.listdir(D["specs"]) if f.startswith(a.prefix) and f.endswith(".json")
+             and f[:-len(".json")] not in held]
+    tasks = [f for f in os.listdir(D["todo"]) if proc(f) and proc(f).startswith(a.prefix) and proc(f) not in held]
+    if held:
+        print(json.dumps({"kept_claimed": held}))
     if a.apply:
         for sub, fs in (("specs", specs), ("todo", tasks)):
             os.makedirs(os.path.join(dst, sub), exist_ok=True)

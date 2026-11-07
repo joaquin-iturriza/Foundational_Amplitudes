@@ -3121,6 +3121,31 @@ def sampling_policy(cfg, role=None):
             pol.setdefault("flat_mcmc_dmin", FLAT_MCMC_DMIN); pol.setdefault("flat_mcmc_thin", FLAT_MCMC_THIN)
         if pol.get("flat_grid"):     # the channel grids' constants, likewise (absent without flat_grid)
             pol.setdefault("flat_grid_bins", FLAT_GRID_BINS); pol.setdefault("flat_grid_floor", FLAT_GRID_FLOOR)
+            if pol.setdefault("flat_grid_smooth", FLAT_GRID_SMOOTH) != FLAT_GRID_SMOOTH:
+                raise ValueError(f"sampling.flat_grid_smooth = {pol['flat_grid_smooth']!r} differs from the code's "
+                                 f"{FLAT_GRID_SMOOTH}; the grid refit reads the code's")
+            pol["flat_grid_smooth"] = FLAT_GRID_SMOOTH     # the code's value, however a recipe spelled it
+    if pol.get("multichannel"):
+        # the multichannel proposal's constants enter the policy, hence the recipe id (absent without multichannel,
+        # which no pool built so far sets); the draws read the module constants, so a policy naming another value is
+        # refused rather than silently ignored
+        mc = {"mc_tail": MC_TAIL, "mc_floor": MC_FLOOR, "mc_pt_lo": MC_PT_LO, "mc_eta_max": MC_ETA_MAX,
+              "mc_res_cards": {str(k): list(v) for k, v in sorted(MC_RES.items(), key=lambda kv: str(kv[0]))}}
+        if pol.get("mc_mperi") or pol.get("mc_mperi_edge") or pol.get("mc_mperi_both"):
+            mc.update(mc_ladder_pt_span=MC_LADDER_PT_SPAN, mc_ladder_span_lo=MC_LADDER_SPAN_LO,
+                      mc_ladder_edge_d=list(MC_LADDER_EDGE_D))
+        if pol.get("mc_res2_fwd"):
+            mc["mc_res2_fwd_floor"] = MC_RES2_FWD_FLOOR
+        def _norm(x):     # key order, int/float and tuple/list do not count (recipe sidecars and YAML sort keys)
+            if isinstance(x, dict):
+                return {str(a): _norm(b) for a, b in x.items()}
+            if isinstance(x, (list, tuple)):
+                return [_norm(b) for b in x]
+            return float(x) if isinstance(x, (int, float)) and not isinstance(x, bool) else x
+        for k, v in mc.items():
+            if k in pol and json.dumps(_norm(pol[k]), sort_keys=True) != json.dumps(_norm(v), sort_keys=True):
+                raise ValueError(f"sampling.{k} = {pol[k]!r} differs from the code's {v!r}; the draws read the code's")
+            pol[k] = v
     if float(pol.get("f_default", 0)) > 0:
         # the default-sampled share (D178): that fraction of the pool is the generator's own unweighted events, read
         # from the MadEvent pools of the lhe entry `default_source` (default_share_momenta); only in the mixture
@@ -3759,6 +3784,7 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
 # constants enter the policy, hence the recipe id (sampling_policy).
 FLAT_GRID_BINS = 100       # bins per dimension of a channel's grid [open]
 FLAT_GRID_FLOOR = 0.2      # share of uniform mixed into every refitted grid [open]
+FLAT_GRID_SMOOTH = 3       # bins of the refit's moving average (odd; edges padded) [open]
 
 
 class _ChanGrid:
@@ -3784,7 +3810,8 @@ class _ChanGrid:
             if not ok.any():
                 continue
             h = np.bincount(np.minimum((y[ok] * K).astype(np.int64), K - 1), weights=w[ok], minlength=K)
-            h = np.convolve(np.pad(h, 1, mode="edge"), np.ones(3) / 3.0, mode="valid")
+            h = np.convolve(np.pad(h, FLAT_GRID_SMOOTH // 2, mode="edge"), np.ones(FLAT_GRID_SMOOTH) / FLAT_GRID_SMOOTH,
+                            mode="valid")
             dens = (1.0 - self.floor) * h / h.sum() + self.floor / K
             cdf = np.concatenate([[0.0], np.cumsum(dens)]); cdf /= cdf[-1]
             self.edges[d] = np.interp(np.linspace(0.0, 1.0, K + 1), cdf, np.linspace(0.0, 1.0, K + 1))
