@@ -16075,6 +16075,13 @@ entries:
     - 11
     answered_at: '2026-11-06T19:52:40.785000+00:00'
     decision: D307
+  - ask: 'Your hold: the warm start now matches from scratch at 533 steps when both sides use the WSD schedule (restart of
+      the WSD final model at share 0.50: pp 0.80, e+e- 0.94, bar 1.35). May I lift your hold on testing other changes (D307)
+      and resume them with this recipe: pretrain with WSD, restart the final model, retrain 533 steps at share 0.50?'
+    at: '2026-11-07T06:09:21+00:00'
+    searched: 'site decisions --project FA: D307 holds change tests until the warm start is fixed; no decision lifts it'
+    blocks: the change tests held by D307
+    blocks_steps: &id002 []
   owner:
     agent: aa91c448ea3a5ca1c
     state: stopped
@@ -19102,3 +19109,10 @@ entries:
       if:
       - 'write-up committed and Joaquin lifts D307: change tests resume with the WSD recipe'
       - 'Joaquin keeps the hold: close the entry with the write-up'
+  ask: 'Your hold: the warm start now matches from scratch at 533 steps when both sides use the WSD schedule (restart of the
+    WSD final model at share 0.50: pp 0.80, e+e- 0.94, bar 1.35). May I lift your hold on testing other changes (D307) and
+    resume them with this recipe: pretrain with WSD, restart the final model, retrain 533 steps at share 0.50?'
+  waiting_since: '2026-11-07T06:09:21+00:00'
+  searched: 'site decisions --project FA: D307 holds change tests until the warm start is fixed; no decision lifts it'
+  blocks: the change tests held by D307
+  blocks_steps: *id002
