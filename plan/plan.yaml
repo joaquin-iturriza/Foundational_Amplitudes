@@ -10522,6 +10522,8 @@ entries:
     '71': FA-ccin2p3-4390f747
     '72': FA-ccin2p3-0a3c7d19 FA-ccin2p3-d6afbf50 FA-ccin2p3-ab948eed FA-ccin2p3-3f659a1d FA-ccin2p3-e32a6f40 FA-ccin2p3-49c754da
       FA-ccin2p3-84ca2133 FA-ccin2p3-900855d4 FA-ccin2p3-5a859c8c FA-ccin2p3-2baa0d0b
+    '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
+      anchor energies'
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
