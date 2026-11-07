@@ -14978,6 +14978,24 @@ entries:
       or require per class. (2) two e+e- anchor pools kept a short run below the 0.3 rule (dsh_eea_epem_bbxgz 3000 GeV 20/200,
       wpwmzz 3000 GeV 53/200, 0.3% and 0.7% of that energy''s events); Joaquin asked whether to regenerate both pools. Also
       open on warm_start: lift D307.'
+  - at: '2026-11-07T09:41:20+00:00'
+    text: '2026-11-07 step 79 r5 check read (multichannel_check.py step81r5, step81r5-acted @7d5c074b -> data/r5_check.json,
+      r5_acted.json; 38 CPU jobs at c40ab06d, 19 classes x seeds 42/43, r5 = r3 + flat_empty_near_min against r3 and the old
+      sampling in the same job): verdict FAIL on fill only. OUTSIDE 0 on every class and seed. COST summed over the 38 jobs
+      r5 1.594x the old sampling, r3 1.843x in the same jobs (bar 2x: pass); 15 class-seeds over 2x (r3 20). FILL: v4_uu_bbxuu
+      back to quota: stops quota 35/36 (seed 42) and 36/36 (43) against r3''s 28/24 (budget 8/12); r5 equals r2 bitwise in
+      35 of 36 chunks at both seeds (every empty bin of every round small): the design''s YES for bbxuu. v4_uux_bgtxwp [-1.206,-0.96]
+      (wholly reachable) 0.867/0.870 at seeds 42/43: below r3''s 0.925/0.917 in the same jobs, above r2''s 0.734/0.79; every
+      one of its 36 chunks met a small empty bin in some round under r5 and 15-16 chunks differ from r3, none all-small: the
+      design reviewer''s caveat holds: the per-chunk nearest occupied bin is small in early rounds, so r5 took r2''s rule
+      there where r3''s helped (the design''s NO branch ''bgtxwp below r3''). Straddling bins (Joaquin''s open scope question),
+      unchanged in kind: bb_bb [8.34,8.585] 0.108/0.13 (17% reachable), bbx_ccxh [-3.809,-3.56] 0.865/0.77 (6%), bgtxwp [-0.96,-0.714]
+      0 (9%). No other class short. Figure analysis/catalog_v4/figs/r5_check.png (r2_check_fig.py r5): (a) kept / quota per
+      bin against log10|M|^2 minus the class''s reach, r3 dashed open, r5 solid: bbxuu''s top bins back to ~1.0 under r5 (mean
+      over seeds 0.987-0.998 vs r3 0.846-0.987), bgtxwp''s last reachable bin 0.869 vs r3 0.921; (b) per class and seed r5
+      time / old against r3 time / old: 26 of 38 below equal cost. Next by the design: a rule that tells bgtxwp''s early small
+      near bin (a bin still filling, ~900 candidates by the end) from bbxuu''s (a bin that stays short): read bgtxwp''s rounds
+      under r5 (bins_empty_small per round, near-bin count and quota) against r3''s first.'
   handoff:
     state: '2026-11-07 ~11:30. Step 79 (flat sampler r5 = r3 + flat_empty_near_min: r3''s nearest-candidate steering of an
       empty quota bin only where its nearest occupied bin holds more candidates than the deficit, else r2''s rule; merged
