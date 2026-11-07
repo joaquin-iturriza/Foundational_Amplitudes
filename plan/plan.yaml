@@ -13854,6 +13854,27 @@ entries:
       branches: SHORT revision for the 527 (short bins: budget or channel, read where the short bins sit and which classes
       hit the budget) and the 213 (widening rule that reads no scored events: ~493 classes lack dsh_ pools), and COST first
       (fixed before step 68): where the time goes (labels vs proposal vs compile) on the classes above 2x.'
+  - at: '2026-11-07T04:16:04+00:00'
+    text: '2026-11-07 step 74 stage 1 (170 eea_ anchor test pools) BUILT by the design''s rules; stage 2 submitted. Stage
+      1 read (tools/lhe_probe.py parts @9312002e -> data/lhe_parts_eea_stage1.json @8a1abe50; lhe_rates --prefix eea_ -> data/lhe_rates_eea.json):
+      170 assembled. Beam spectrum: every one of the 1364 pool-energies has radiated events (min sqrt(s_hat)/sqrt(s) < 1 everywhere);
+      share below 0.99 per energy, median over pools: 91 GeV 0.064, 160 0.237, 209 0.225, 240 0.242, 365 0.291, 380 0.289,
+      500 0.457, 1000 0.343, 1500 0.383, 3000 0.564; it is 0 in 9 pool-energies, each the class''s lowest energy just above
+      its edge (hZ classes at 240, aepemh/ahtaptam at 160, hwpwmz at 380; min 0.991-0.995 there, normal 0.11-0.78 at every
+      higher energy): threshold suppression, not a missing spectrum. dsh_epem_bbxvevex''s spectrum (eea_ 204 events per energy)
+      against the step-71 probe (1000-10000): |z| <= 1.74 at all 10 energies (e.g. 500 GeV 0.466 vs 0.434). Cost: MadEvent
+      runs 35.6 core-h (estimate 23.5-43.8); workers'' whole allocation 116 core-h (16 cores x wall of 20 workers, an upper
+      bound including gridpacks and idle tails) against 42-126. Stage 2 (dsh_eea_, 115 pools): sized from stage 1 (recipes/gen_catalog_v4_default.py
+      merged 8a242ed6, repo-reviewer PASS after one FIX: margin from the measured kept per energy, complete shares where eea_
+      ran the same gridpack layout (bbxwpwm 1500 GeV 2 of 4 runs complete -> 101 runs; ccxgz 3000 2 of 3 -> 67; shares rest
+      on 2-4 runs), plan probe = worst energy''s kept x yield, plan rates = old dsh_ rate x eea_/ee4_ ratio). lhe_parts plan
+      refused 2 pools asking more than 2x what they keep at 160 GeV: dsh_eea_epem_accxh (kept 0.436) and dsh_eea_epem_aepemh
+      (0.493); excluded from the queue pending a generation fix (suspected cause, not checked: the e+e- pair-mass cut m >
+      10 GeV on mixed photon-quark/photon-lepton pairs, which the run card''s mmjj/mmaa/mmll cannot express). Queue catalog_v4_dsh_eea
+      on CC: 113 pools, 10259 runs + 192 gridpacks, est 266 core-h (upper; old dsh_ e+e- runs 82 core-h), longest task 0.43
+      h; site pick: 1178 free htc slots; 48 workers x 16 cores x 02:00:00 (scripts/job_lhe_parts.sh, LHE_QUEUE=catalog_v4_dsh_eea)
+      at 34a2d8f6, FA-ccin2p3-e4edfe83 .. a135a639; target eea_anchor_stage2 0.8 h; disk 60 GB free at submission (~5 GB needed);
+      wait on step 74.'
   handoff:
     state: '2026-11-07 ~05:00. Step 65: hadronic regeneration (1301 classes, channel grids at 12 + forward channel, new _smixq
       pools) RUNNING: 32 CC htc shards at ecc78b8b, target hadronic_regen_g12 0.35 h, wait on step 65; design v3 PASS (FILLED
