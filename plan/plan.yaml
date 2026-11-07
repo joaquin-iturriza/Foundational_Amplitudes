@@ -11602,7 +11602,7 @@ entries:
       - 'design FIX: revise once'
   owner:
     agent: a76916d3169a63af3
-    state: working
+    state: closed
     since: '2026-11-07T02:50:28+00:00'
     state_at: '2026-11-07T03:03:59.481000+00:00'
     context: 211393
@@ -13561,26 +13561,34 @@ entries:
       does not alone rule out gradient competition: with the branch detached, the shared layers learn nothing for the sign,
       which the MSE control''s do.'
   handoff:
-    state: '2026-11-07 ~03:50. Step 74 stage 1: 164/170 eea_ pools assembled; the 5 short at 1500/3000 GeV (MadEvent fail-to-reach-target,
-      pre-existing at high energy, not the spectrum) relaid by eea_short (complete gridpack layouts, merge a48af5bb, layouts
-      2e510905), queue replanned (65 runs + 30 gridpacks), 4 workers on the step-74 wait, target 0.75 h; E3998 E4002 E4005
-      E4007 acked. eea_epem_abbxg run 018 still running on 1a6b665e (layout unchanged). On the wait''s end: lhe_parts status/shares
-      --queue catalog_v4_eea (all 170 assembled, shares ok); if a pool is short again, refresh data/lhe_run_yields_eea.json
-      from yields --by-energy (unassembled pools only) and rerun the generator. Then stage 2: add the eea_ -> dsh_eea_ mapping
-      to lhe_probe parts, write its probe file from stage 1, plan dsh_eea_ (spec catalog_v4_eea_lhe.yaml minus assembled eea;
-      NOTE it lists both stages) with --probe, site pick, target, submit. Step 75: 10 CPU jobs running (read per handoff of
-      04:00). Step 73: implementation (model.net.sign_branch, 47839345) already on trunk and reviewed; design + design-reviewer
-      not done yet; submission waits on Joaquin''s seed answer. Steps 64/70 on their waits.'
-    decisions: 'Short eea pools follow the ee4_ precedent (complete gridpack runs) instead of more runs of the same setup
-      (repo-reviewer FIX: complete_layout refuses a share under 1/2 with more runs). bgtxwp kept as assembled. bbxwpwm''s
-      2 complete 3 TeV runs are remade (index shift), accepted as stated cost.'
-    ruled_out: Adding runs of the same own-integration setup at a 0-of-1 complete energy (refused by the generation rule).
-    running: 'FA-ccin2p3-8b458405 8a160e7f e4bc9f56 aa482330 (eea stage-1 fix workers); 1a6b665e (stage-1 worker, abbxg);
-      step 75: 1b60b145 0387052d e9513eb9 f657333a f7d4e8b6 d8e3afc7 d996a248 83d25626 45f39aab 87ac1bbb'
-    files: recipes/gen_catalog_v4_default.py (eea_short, EEA_YIELDS), tools/lhe_parts.py (_adopt_ee, yields --by-energy, unplan),
-      mg5_pipeline_final.py (lhe_runs/lhe_gridpacks lhe=), analysis/catalog_v4/data/lhe_run_yields_eea.json, recipes/catalog_v4_eea_processes.yaml,
-      tests/test_lhe_parts.py::test_ee_adopt_and_eea_short
-    written: '2026-11-07T02:49:04+00:00'
+    state: '2026-11-07 ~05:10. Step 75 read: COST by the fixed rules (grids+forward channel at 12 fill every bin on all 5
+      classes x 2 seeds; cost 0.78-2.11x, only us_ddxsu seed 42 over 2, a slow node: 152 vs 93 us per label for identical
+      labels; grids at 8 leave uu_bbxuu''s top bin at 0.79/0.76); data/grid_fwd_check.json @fd151434, figs/grid_fwd_check_a-e,
+      cost estimate for the 1301 hadronic classes data/sampling_cost_grid12.json @f7dffe8f (old 26.0 core-h, new 32 [28-46]).
+      Step 75 dropped; step 65 rewritten: regeneration with grids at 12 + mc_res2_fwd. Branch mc-policy (worktree worktrees/mc-policy,
+      tip b36eaa67): sampling_policy writes the multichannel/grid constants into the policy (repo-reviewer PASS at c670290c
+      + nit 6a693b0a), lhe_parts unplan keeps claimed processes, het_oneloop step73 reader (b36eaa67, not yet reviewed). Merge
+      blocked: the repo-reviewer (lock held, agent a301374a596719149) will not advance while trunk''s warm_start commit 1e7042dd
+      carries its blocking item (analysis/catalog_v4/mixture_ab.py:1584 parents_val_last uses the last validation, not the
+      best checkpoint) - warm_start owner''s fix; then continue that reviewer (SendMessage) with b36eaa67 and the fix, advance,
+      merge mc-policy, remove worktree with scripts/remove_worktree.sh. Step 65 next: recipe writer for the hadronic tree
+      recipes (default25_train 797 classes, heldout_H*, rest of census 1301) with flat_range + multichannel + mc_res2 + mc_mperi_both
+      + mc_res2_fwd + flat_grid + flat_budget 12 and per-class mc_resonances from CC''s data/diagrams sidecars (152 local)
+      + mc_res_params(physics); then design + design-reviewer + shards. Step 73: design PASS, submit 4 (or 1) jobs of v4_het_signhead_branch
+      on Joaquin''s seed answer (after merging step73 reader); fill STEP73[''branch''] with the runs. Step 74: 169/170 eea
+      pools assembled; eea_epem_bbxwpwm relaid (4 runs at 3000 GeV, 272282a2), worker FA-ccin2p3-20d84aa0 on the step-74 wait
+      (target 0.25 h); then stage 2 (dsh_eea_) per the earlier hand-off. Steps 64/70 on their waits.'
+    decisions: 'Regeneration sampler = grids at 12 + forward joint-resonance channel: the only setting filling every in-range
+      bin on all class-seeds; its one cost excess (2.11x) is node speed (per-label time 1.6x the seed-43 job''s for identical
+      labels), seed-mean cost per class 0.98-1.76x. Constants of the multichannel proposal and the grid smoothing go into
+      the policy (recipe id) with a refusal of differing values. unplan never moves a process with a claimed task.'
+    ruled_out: Grids at 8 for the regeneration (uu_bbxuu top bin 0.79/0.76). The quota sampler at 12 (0.84-0.92 shares) or
+      50 (5-9x).
+    running: FA-ccin2p3-20d84aa0 (eea_epem_bbxwpwm 3000 GeV, step 74 wait); steps 64/70 jobs as recorded
+    files: analysis/catalog_v4/multichannel_check.py (step75), analysis/catalog_v4/fig_mcmc_check.py grid_fwd, analysis/catalog_v4/data/grid_fwd_check.json,
+      analysis/catalog_v4/sampling_cost.py (summary grid12), worktrees/mc-policy (mg5_pipeline_final.py sampling_policy, tests/test_multichannel.py,
+      tools/lhe_parts.py, analysis/catalog_v4/het_oneloop.py), recipes/catalog_v4_eea_processes.yaml, analysis/catalog_v4/data/lhe_run_yields_eea.json
+    written: '2026-11-07T03:13:38+00:00'
   ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
     61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
     one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
