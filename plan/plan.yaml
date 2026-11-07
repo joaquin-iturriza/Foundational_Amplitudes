@@ -11643,6 +11643,13 @@ entries:
       FA-ccin2p3-ac96f65a
     '73': FA-ccin2p3-54961d3e
     '76': FA-ccin2p3-76d5f550 FA-ccin2p3-1b593ca6
+    '79': 'FA-ccin2p3-20ba5c1e FA-ccin2p3-610e981e FA-ccin2p3-7bb88302 FA-ccin2p3-c362eabb FA-ccin2p3-9e66b1ca FA-ccin2p3-df33935e
+      FA-ccin2p3-8380a8be FA-ccin2p3-3bb48f95 FA-ccin2p3-bb73a3c3 FA-ccin2p3-a92a85ee FA-ccin2p3-837596c9 FA-ccin2p3-acfbffb5
+      FA-ccin2p3-108deda7 FA-ccin2p3-7de406a5 FA-ccin2p3-94cba7f8 FA-ccin2p3-74d0f5f2 FA-ccin2p3-2b776c17 FA-ccin2p3-f0b8c1ae
+      FA-ccin2p3-29b643cf FA-ccin2p3-ec2abd8a FA-ccin2p3-56d3bb88 FA-ccin2p3-84575161 FA-ccin2p3-0320aba4 FA-ccin2p3-0f704757
+      FA-ccin2p3-2bc055c8 FA-ccin2p3-ae3c24b3 FA-ccin2p3-4378e1ff FA-ccin2p3-46658a76 FA-ccin2p3-65b7c44f FA-ccin2p3-a6094ac8
+      FA-ccin2p3-7254715d FA-ccin2p3-f78e1558 FA-ccin2p3-0da93021 FA-ccin2p3-d1c95ab2 FA-ccin2p3-3fed1836 FA-ccin2p3-ae512169
+      FA-ccin2p3-41267b97 FA-ccin2p3-a90a5a54 '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
