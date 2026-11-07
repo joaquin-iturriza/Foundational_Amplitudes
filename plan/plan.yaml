@@ -14517,6 +14517,12 @@ entries:
       19 classes x seeds 42/43, --time 00:45:00, 8G, target r3_check 0.2 h) at bed989d2; step 79 waits on them. Read: multichannel_check.py
       step78r3-pull then step78r3 -> data/r3_check.json. Figure of the r2 check: analysis/catalog_v4/r2_check_fig.py @bed989d2
       -> analysis/catalog_v4/figs/r2_check.{png,pdf}.'
+  - at: '2026-11-07T07:14:52+00:00'
+    text: '2026-11-07 step 76 done: the 2 workers FA-ccin2p3-76d5f550 / 1b593ca6 (scripts/job_lhe_parts.sh @68c275df) COMPLETED;
+      queue catalog_v4_dsh_eea (lhe_parts status): todo 0, claimed 0, done 18909 (+18, the 18 planned tasks), failed 20 (stage
+      2''s assembly refusals, unchanged), assembled 115 of 115 (dsh_eea_epem_accxh and aepemh with the mixed-pair cut m >
+      10 GeV at generation). lhe_parts yields --by-energy (lists every process with a short part): neither pool appears, so
+      none of their 18 runs returned under its ask. All 115 dsh_eea_ default-share e+e- anchor pools are built.'
   handoff:
     state: '2026-11-07 ~08:00. Step 78 (r2 sampler check): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18
       merged 56b3c909 (repo + design PASS; cost bar = summed seconds over the 38 jobs <= 2x current, per class listed); 38
