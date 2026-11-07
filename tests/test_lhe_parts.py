@@ -1375,6 +1375,23 @@ def _capture(fn):
     return buf.getvalue().strip().splitlines()[-1]
 
 
+def test_unplan_keeps_claimed():
+    """unplan moves the specs and unclaimed tasks of the prefix's processes, but leaves a process with a claimed task
+    whole (its worker reads the spec at task start and at assembly)"""
+    with tempfile.TemporaryDirectory(prefix="zz_probe_unplan_") as q:
+        for d in ("todo", "claimed", "done", "failed", "assembled", "locks", "specs"):
+            os.makedirs(os.path.join(q, d))
+        for p in ("dsh_eea_a", "dsh_eea_b", "eea_c"):
+            open(os.path.join(q, "specs", p + ".json"), "w").write("{}")
+            open(os.path.join(q, "todo", f"00000001__{p}__1.json"), "w").write("{}")
+        open(os.path.join(q, "claimed", "00000001__dsh_eea_a__0.json.123"), "w").write("{}")
+        lhe_parts.cmd_unplan(argparse.Namespace(queue=q, prefix="dsh_eea_", apply=True))
+        assert sorted(os.listdir(os.path.join(q, "specs"))) == ["dsh_eea_a.json", "eea_c.json"]
+        assert sorted(os.listdir(os.path.join(q, "todo"))) == ["00000001__dsh_eea_a__1.json", "00000001__eea_c__1.json"]
+        (moved,) = glob.glob(os.path.join(q, "unplanned", "*"))
+        assert os.listdir(os.path.join(moved, "specs")) == ["dsh_eea_b.json"]
+
+
 if __name__ == "__main__":
     test_runs_and_identity()
     test_parts_equal_serial()
