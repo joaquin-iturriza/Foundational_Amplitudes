@@ -3748,6 +3748,12 @@ entries:
       running. On both PASS: merge, site sync, site pick FA --jobs 38, plan target --batch r2_check --wall 0.35 --jobs 38,
       submit 38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r1_budget12+grid_r2_budget18, seeds
       42/43, --time 01:00:00), plan wait 78 on them; read step75r2-pull then step75r2.'
+    79: '(t) sampler r5 check running: r5 = r3 + flat_empty_near_min (r3''s nearest-candidate steering of an empty quota bin
+      only where its nearest occupied bin holds more candidates than the deficit, r2''s rule otherwise), merged c40ab06d (design
+      PASS, repo-reviewer PASS at d9fb42a2). 38 CPU jobs at CC c40ab06d (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r3_budget18+grid_r5_budget18,
+      19 classes x seeds 42/43, --time 00:45:00, --mem 8G, target r5_check 0.2 h). On end: multichannel_check.py step81r5-pull,
+      step81r5 -> data/r5_check.json, step81r5-acted -> data/r5_acted.json (read bgtxwp''s bins_empty_small first: the design
+      reviewer''s caveat that its per-chunk nearest bin may be small in early rounds), figure r2_check_fig.py r5.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12513,6 +12519,12 @@ entries:
         to Joaquin'
       - 'NO only on the straddling bins (bb_bb 8.34, uux_bgtxwp -0.96): their exemption to Joaquin (plan ask)'
       - 'NO otherwise: the failing kind per the design''s NO branch'
+    79:
+      feeds: whether the 1301 hadronic classes are regenerated with r5 (_smixv) before step 68
+      if:
+      - 'PASS: straddling bins per Joaquin, then regenerate with R5'
+      - 'bbxuu fixed, bgtxwp < 0.95 with 2-3 stalled chunks: report, next the stall rule for those chunks'
+      - 'bbxuu still short or bgtxwp below r3: read rounds and bins_empty_small per the design''s outcome'
   owner:
     agent: a3c29bb8f4df74769
     state: working
