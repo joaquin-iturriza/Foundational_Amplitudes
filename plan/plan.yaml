@@ -13806,6 +13806,23 @@ entries:
       only on Joaquin''s seed answer (4 seeds ~14 GPU-h at the limit, or 1). Reviewer note for the write-up: a NOT BETTER
       does not alone rule out gradient competition: with the branch detached, the shared layers learn nothing for the sign,
       which the MSE control''s do.'
+  - at: '2026-11-07T03:40:42+00:00'
+    text: '2026-11-07 step 65 submitted. mc-policy merged b193d324 (repo-reviewer PASS at b36eaa67 after the warm_start fix
+      c68e5215). Branch regen-g12 merged 49ee3f89 (repo-reviewer FIX once: reader copies mixed e+e- on the old sampler with
+      pp on the new, against Joaquin''s 2026-11-06 words, and missed 4 reader recipes; fixed 555b2753, PASS): tools/regen_recipes.py
+      pull/write/readers/check (pull from CC: resonance channels of all 1301 classes, 0 errors, 115 of 1301 standalones built,
+      68 GB free -> data/regen_g12_inputs.json); recipes/catalog_v4_g12_regen.yaml (1301 classes from gen stages 1 and 5,
+      only the flat sampler''s keys added: grid_both_res2f_budget12 + flat_range + mc_resonances + mc_res_params); pools tagged
+      _smixq so the old _smix pools stay; per-chunk flat fill -> <pool>.flatfill.json. readers (the _g12 training/held-out
+      copies, 13 reader recipes found by scan) refuses until the e+e- classes are regenerated (step 68). Read tool analysis/catalog_v4/regen_read.py
+      @1abda20d. Design: FIX (D269 coverage count missing; step 75 COST verdict unstated), FIX (bar 2/class vs D269''s zero;
+      widening from scored events) -> v2 dead end, v3 PASS: FILLED = fill >= 0.95 every bin, 0 held-out in-support pp events
+      outside, cost <= 2x. 32 htc shards x 16 cores, --time 01:30:00 at ecc78b8b (scripts/job_catalog_v4_regen.sh, V4REGEN_RECIPES=recipes/catalog_v4_g12_regen.yaml,
+      V4REGEN_N=32): FA-ccin2p3-926ddf2e 6c4cda61 56029f51 b42efc50 4ef94a13 3479e257 8dacfaf8 2cca7331 662af294 16117a78
+      5fe14cb2 fea3782c 3e6a10c0 7965c060 ab5e7c66 ed2f5caa 04f03dac 3a586b8a 9d0b8ffd aad67a1b a171903e 309b38f4 12d716cd
+      9a978af6 bc99d6fe 9a01f0d5 759ae40e d5d68924 4f79ef12 d5f767ad 55eec0ff 7c4df684; target hadronic_regen_g12 0.35 h;
+      wait on step 65. 64 GB free at submission, ~43 GB expected. Reviewer note for a SHORT revision: ~493 of the 1301 classes
+      have no dsh_ pool, so their widening rule must read none of the events they are scored on.'
   handoff:
     state: '2026-11-07 ~05:10. Step 75 read: COST by the fixed rules (grids+forward channel at 12 fill every bin on all 5
       classes x 2 seeds; cost 0.78-2.11x, only us_ddxsu seed 42 over 2, a slow node: 152 vs 93 us per label for identical
