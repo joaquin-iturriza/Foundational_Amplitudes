@@ -12920,6 +12920,27 @@ entries:
       h, wait on step 71; if still not above ISR only, 365 takes isronlyll as a recorded gap (FCC-ee''s beamstrahlung at 365
       GeV is small, circular collider). Next on WORKS: the regeneration design of the 170 e+e- default pools at the anchor
       energies, cost ~1x the old per kept event, the energy list shown to Joaquin with it.'
+  - at: '2026-11-07T01:14:17+00:00'
+    text: '2026-11-07 step 61 read (het_oneloop.py step61 @66f94590 -> data/het_signhead61.json, figs/het_signhead61). Question
+      (D287/D296): does matching the sign loss''s share of the gradient under the het loss make the het sign head predict
+      one-loop signs as well as the MSE-trained sign head, without hurting the magnitude? Arms (4 seeds each, same code):
+      matched per event (sign BCE x the het NLL''s detached mu factor) FA-ccin2p3-9079850b ebe4c4ed 297c4366 dce345d8; constant
+      weight 75 e90fea9a 14c988b0 45b2d041 04d27cd1; control = the weight-1 sign head rerun at the same code ac8d6fca 752344ce
+      b13f456c 83dc9690. Re-seed rule passes: rerun vs the old step-56 runs, median wrong-sign ratio H5 0.97 (p 0.19), HD5
+      0.955 (p 0.36), so the old MSE control stands. Sign, median over pools of the seed-mean wrong-sign share, catalog-sampled
+      one-loop H5 (21 pools) / default-sampled one-loop HD5 (19 classes): MSE control 6.7 / 13.0%, weight-1 rerun 13.0 / 17.5%,
+      matched per event 8.4 / 14.9%, weight 75 9.7 / 15.0%; all-positive 12.2 / 30.3%. Matched per event vs rerun on H5: better
+      on 14, worse on 6, p 0.058 (design bar p < 0.05); vs MSE: H5 1.26x (12/9, p 0.33), HD5 1.14x but worse on 14 of 19 (p
+      0.032). Weight 75 vs rerun H5 11/9 (p 0.41). Magnitude, R = arm over rerun of the class-median MSE of log|M|^2, seed-paired
+      widened interval: per event PP4 1.13 [1.06, 1.21], EE4 1.06 [0.99, 1.16], shown worse on HD4 1.19, H1 1.19, H2 1.17,
+      H2p5 1.23, H3 1.14, H7E 1.17, H7c 1.16; weight 75 PP4 1.39 [1.31, 1.46], EE4 1.30, HD4 1.41, H1-H7c 1.20-1.59. Best
+      validation het NLL, seed mean: rerun -2.81, per event -2.74, weight 75 -2.60. Pre-clip gradient norm unchanged (median
+      23-27 in all three; clip at 5 binds on 98.6-99.6% of steps). No blow-ups; 11 of 12 runs spiked early and recovered (steps
+      595-2890). Verdict by the passed design: NO (neither arm beats the rerun on H5 at p < 0.05); both matched weights also
+      hurt the magnitude (event 13-23%, weight 75 20-59%). Reading: with the clip binding on ~99% of steps the update has
+      a fixed norm, so a larger sign term takes its share from the magnitude: the sign gain (13.0 -> 8.4% median on H5, not
+      significant) is bought with magnitude. Next per the design: the attachment point (sign head on a detached copy of the
+      last block, so the sign gradient does not compete in the clipped trunk update), then the clipping regime.'
   handoff:
     state: '2026-11-07 ~02:30. Step 69 (Markov-chain flat part) read: NO (data/mcmc_check.json, figs/mcmc_check_a-e). Step
       72 (channel-grid quota sampler, sampling.flat_grid, merged f8630100, repo-reviewer PASS watermark 65938f8c, design PASS)
