@@ -82,7 +82,7 @@ def main(rev="r2"):
             out[f"{cls}/{pol}"] = {"x": x[sel].round(3).tolist(), "fill_mean": m[sel].round(3).tolist()}
     axa.axhline(0.95, color=ps.C.grey, ls=":")
     axa.axvline(0.0, color=ps.C.grey, ls="-.")
-    axa.set_xlabel(r"$\log_{10}|\mathcal{M}|^2 - \log_{10}|\mathcal{M}|^2_{\rm reach}$")
+    axa.set_xlabel(r"$\log_{10}|\mathcal{M}|^2$ minus highest drawn")
     axa.set_ylabel(r"kept / quota per bin")
     # (b): every class and seed
     xs, ys, cs = [], [], []
@@ -100,14 +100,15 @@ def main(rev="r2"):
     axb.set_xlabel(f"time, {lab_old} / old sampling")
     axb.set_ylabel(f"time, {lab_new} / old sampling")
     from matplotlib.lines import Line2D
-    h = [Line2D([], [], color=c, marker="o", ls="") for _, c in short.values()]
-    h += [Line2D([], [], color=ps.C.grey, marker="o", ls=""),
-          Line2D([], [], color="k", ls="--", marker="o", mfc="none"), Line2D([], [], color="k", ls="-", marker="o"),
-          Line2D([], [], color=ps.C.grey, ls=":"), Line2D([], [], color=ps.C.grey, ls="-."),
-          Line2D([], [], color=ps.C.vermillion, ls="--"), Line2D([], [], color=ps.C.blue)]
-    labs = [l for l, _ in short.values()] + ["other classes", lab_old, lab_new, "fill 0.95", "reach",
-                                             "cost 2x", "equal cost"]
-    ps.legend(axa, "lower left", handles=h, labels=labs, ncol=2)
+    # line styles on (a), below its curves; the classes' colours on (b)
+    ha = [Line2D([], [], color="k", ls="--", marker="o", mfc="none"), Line2D([], [], color="k", ls="-", marker="o"),
+          Line2D([], [], color=ps.C.grey, ls=":"), Line2D([], [], color=ps.C.grey, ls="-.")]
+    ps.legend(axa, "lower left", handles=ha, labels=[lab_old, lab_new, "kept / quota = 0.95", "highest drawn"])
+    hb = [Line2D([], [], color=c, marker="o", ls="") for _, c in short.values()]
+    hb += [Line2D([], [], color=ps.C.grey, marker="o", ls=""), Line2D([], [], color=ps.C.vermillion, ls="--"),
+           Line2D([], [], color=ps.C.blue)]
+    ps.legend(axb, "upper left", handles=hb, labels=[l for l, _ in short.values()] +
+              ["other classes", "time / old sampling = 2", "equal time"], ncol=2)
     base = os.path.join(HERE, "figs", f"{rev}_check")
     os.makedirs(os.path.dirname(base), exist_ok=True)
     ps.save(fig, base)
