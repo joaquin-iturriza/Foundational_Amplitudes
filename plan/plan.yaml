@@ -3746,14 +3746,6 @@ entries:
       / FAULT (magnitude R 4-block/1-block outside 1/1.15..1.15 on any of 12 reads) first; report YES against the 16 het seeds
       and MSE range, not as 4 blocks beating 1 (a 1.14x move is inside the band); record step_time_ratio; figure of per-class
       wrong-sign shares and magnitude MSE beside.'
-    83: '(t3) r6 check (step 82, design PASS 2026-11-07T09:52, repo-reviewer PASS at 3219d30d, merged aae3fd1b, CC synced):
-      38 CPU jobs scripts/job_multichannel_check.sh MCHECK_POLICIES=current+grid_r5_budget18+grid_r6_budget18, 19 classes
-      x seeds 42/43, --time 00:45:00 --mem 8G, target r6_check 0.2 h, submitted by the detached batch r6_submit (run ids in
-      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/r6_runs.txt, each recorded with
-      plan run): on the batch''s DONE event put this step''s wait on those ids; check every one reached slurm (UNREG/FAILED
-      lines). On end: multichannel_check.py step82r6-pull, step82r6 -> data/r6_check.json, step82r6-stops -> data/r6_stops.json
-      (r6 bitwise r5 where r5 stopped at quota or budget: _chunk_sig), figure r2_check_fig.py r6; outcome branches on the
-      passed design.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12074,13 +12066,6 @@ entries:
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
     '81': FA-ccin2p3-22bc476d
-    '83': 'FA-ccin2p3-9ad3192e FA-ccin2p3-6c6a6ed9 FA-ccin2p3-ec0136e8 FA-ccin2p3-64c350c0 FA-ccin2p3-c3d6066f FA-ccin2p3-6cdd6bc3
-      FA-ccin2p3-04ae649e FA-ccin2p3-8663d43d FA-ccin2p3-869da7c1 FA-ccin2p3-2b49b784 FA-ccin2p3-8d89f756 FA-ccin2p3-d395da0c
-      FA-ccin2p3-66392b61 FA-ccin2p3-a3198aa6 FA-ccin2p3-6e7b09ab FA-ccin2p3-546c40ae FA-ccin2p3-a717fdfa FA-ccin2p3-c3011153
-      FA-ccin2p3-615bf1b7 FA-ccin2p3-32dc4dbd FA-ccin2p3-15655fb7 FA-ccin2p3-186e6b05 FA-ccin2p3-24e4c087 FA-ccin2p3-a62104be
-      FA-ccin2p3-36502814 FA-ccin2p3-7d1161ac FA-ccin2p3-b8886f8e FA-ccin2p3-49a44a98 FA-ccin2p3-7e2ded3d FA-ccin2p3-e0d76f80
-      FA-ccin2p3-0b2b5239 FA-ccin2p3-68309a79 FA-ccin2p3-66f2c861 FA-ccin2p3-34bf3067 FA-ccin2p3-67cec879 FA-ccin2p3-8a654b44
-      FA-ccin2p3-405886b5 FA-ccin2p3-a71c217f '
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
@@ -12744,11 +12729,6 @@ entries:
       - 'YES: het control carries the 4-block branch, report to Joaquin'
       - 'NOT RESOLVED: design the trunk-shared sign gradient under its own optimizer moments, cost measured first (bar 2x)'
       - 'NO: read val sign accuracy and per-class shares first'
-    83:
-      feeds: whether the 1301 hadronic classes are regenerated with r6 (_smixw) before step 68
-      if:
-      - 'PASS: straddling bins per Joaquin, then regenerate with R6'
-      - 'bgtxwp short at the budget: channels per bin before a budget change'
   owner:
     agent: ae4ee7fc35b7e4306
     state: working
