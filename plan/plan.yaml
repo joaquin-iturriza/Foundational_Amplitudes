@@ -10999,6 +10999,58 @@ entries:
       detach, own copy, sign head, clip apart/clip group: only steps 56/61 and the unrelated detached-sigma backbone. Caveat
       for the write-up: a NOT BETTER does not by itself rule out gradient competition, since the detached trunk also stops
       learning sign features.'
+  - at: '2026-11-07T03:27:24+00:00'
+    question: 'Step 65: regenerate catalog_v4''s 1301 hadronic tree classes (train 1e5 / val 1e4 / test 1e4 each, generation
+      stages 1 and 5) with the flat part filled flat in log|M|^2 over each class''s pp range (recipes/catalog_v4_flat_range.json,
+      D270/D294) by step 75''s sampler (channel grids at 12 matrix elements per flat event with the forward joint-resonance
+      channel: policy grid_both_res2f_budget12), every other field unchanged, as new pools (_smixq) beside the old ones. Does
+      the full catalog fill every in-range 0.25-dex log10|M|^2 bin of every class at the sampler''s quota, at a cost within
+      2x of the old generation? Feeds: the catalog the next mixture and scaling runs train and are scored on (recipes catalog_v4_g12_*),
+      and step 68 (e+e- the same way).'
+    prior: 'Step 72 (grid_check.json @b3ba8b94): grids without the forward channel left the electroweak 2->4 classes'' top
+      1 dex short (udx_csxvevex 0.898, uux_epemvevex 0.936). Step 75 (data/grid_fwd_check.json @fd151434, 5 classes x seeds
+      42/43, val role): grids12 + forward channel fill every in-range bin >= 0.95 on all 10 class-seeds (share 1.000), cost
+      over the old generation 0.78-2.11x (2.11 = us_ddxsu seed 42 on a node 1.6x slower per label for identical labels); grids8
+      leaves uu_bbxuu''s top bin at 0.79/0.76. Cost estimate for the 1301 (sampling_cost.py summary grid12 @f7dffe8f): old
+      26.0 core-h of tree pools, new 32 [28-46] core-h (an estimate: the 5 check classes'' ratios by final-state count). Searched
+      results.tex (flat_range, grid12, regenerat), the entry and site decisions: no earlier regeneration with this sampler;
+      D270/D294 set the range rule, D178 the priority.'
+    measure: 'tools/regen_read (to write, committed before the read) over the 3903 regenerated pools: (1) fill: from each
+      pool''s <pool>.flatfill.json (per chunk: quota, kept_per_bin, budget_hit; datagen._write_flat_fill @a7429daa) the share
+      of in-range bins with kept >= 0.95 quota, per class and role, and the list of classes with any short bin and where (bin
+      edges, which channel filled it); budget_hit chunks counted; (2) cost: core-s per class from the [TIME] chunk lines over
+      the old per-class core-s (sampling_cost_grid12.json old_per_class_s), median and spread by final-state count, total
+      core-h against the 32 [28-46] estimate, compile time apart (V4REGEN_PART_WALL_S, 1186 standalones to build); (3) integrity:
+      3903 pools with _smixq names and recipe ids equal to tools/regen_recipes.py check''s, row counts, finite |M|^2, per-event
+      alpha_s files written; (4) composition: mix_compose.ensure_composed of the default25 mixture on 5 classes (the step-75
+      five) matches every bulk and forward row of the new pool (the replay must still find them with the quota flat part).
+      -> analysis/catalog_v4/data/regen_g12_read.json, figure: per class share of bins filled (sorted) and per-class cost
+      ratio vs final-state count.'
+    check: 'The fill measure moved with the sampler on existing data: step 72 vs 75 on the same classes/seeds (udx_csxvevex
+      0.898 -> 1.000, uux_epemvevex 0.936 -> 1.000; quota12 0.837-0.922); the cost measure separated policies (grids12 0.78-2.11x
+      vs quota50 5-9x). The pool-path check (tools/regen_recipes.py check) passes: all 3903 pools _smixq, none at an old pool''s
+      path, every _g12 reader recipe resolves each hadronic pool to the regeneration''s recipe id and file.'
+    fixed: 'Classes, windows, sizes, base/physics, mixture shares (f_flat 0.35, f_fwd 0.15, fwd_cand 1/3), cuts, data seed
+      42 and chunking as generation stages 1 and 5; sampler constants in the policy (recipe id; mc-policy merged b193d324);
+      code = trunk at submission (regen-g12 merged after repo-reviewer PASS). Layout: scripts/job_catalog_v4_regen.sh with
+      V4REGEN_RECIPES=recipes/catalog_v4_g12_regen.yaml, V4REGEN_N=32, K=0..31 (backend groups whole per shard; per-shard
+      estimate max 2.64 core-h, mean 2.0, from old per-class core-s x 1.6 (2->2,3) / 1.8 (2->4, the check''s max) + 54 s compile
+      (q90, par:v4_regen_time) for the 1186 classes without a standalone; total 64 core-h upper), 32 htc jobs x 16 cores x
+      32G, --time 01:30:00; site pick FA --jobs 32 --gpus 0 --cpus 16 offers 1175 at once on CC: one wave. Target 0.35 h (the
+      old stage-5 shards: 0.17 h for 43 classes per shard, ~41 per shard here, x 1.8, plus the estimate''s 2.64 core-h / 16
+      cores = 0.17 h). Disk: pools 37.1 GB (rows (5n+1) x 8 B x 1.2e5 events per class) + alpha_s 1.2 GB + 1186 standalones
+      ~4 MB each = ~4.7 GB: ~43 GB of 68 GB free on /sps (DATA_DIR and SCRATCH one filesystem, read 2026-11-07 by tools/regen_recipes.py
+      pull). CPU only, 0 GPU-h.'
+    control: The old pools of the same classes (old_per_class_s for cost; the old _smix pools stay untouched for the comparison)
+      and step 75's check on the 5 classes at seed 42 (the regenerated val pools of uux_epemg, uux_epemvevex, uu_bbxuu, us_ddxsu,
+      udx_csxvevex must show the check's fill, 1.000 share of bins, and per-class cost within the check's 0.78-2.11x).
+    seeds: Data seed 42 (the catalog's); one generation, no repeats (a generation batch, not a training comparison).
+    outcome: 'FILLED (every class''s in-range bins >= 0.95 of quota in every role, cost total <= 2x old, i.e. <= 52 core-h
+      of sampling, integrity and composition pass) -> the _g12 recipes become the catalog: next runs train/score on catalog_v4_g12_*;
+      step 68 the same way for e+e-. SHORT on some classes (bins below 0.95) -> listed with where; one revision for those
+      classes only (budget or channel), regenerated, never padded. COST over 2x -> where the time goes (labels vs proposal
+      vs compile, node spread), fixed before the e+e- step. Composition fails -> fix mix_compose''s replay before any run
+      reads default25_g12. Job failures -> log read, fixed, rerun of the shard (resumable: built pools are cache hits).'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
