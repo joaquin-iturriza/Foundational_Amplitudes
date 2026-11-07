@@ -5565,8 +5565,19 @@ entries:
       scored; the design reviewer ruled any exemption beyond bins wholly above the reach is Joaquin''s call'
     blocks: the verdict on the straddling bins (step 78) and so the 1301-class regeneration with the sampler; the r3 revision
       for uux_bgtxwp's steering goes ahead meanwhile
-    blocks_steps: &id001
+    blocks_steps:
     - 78
+  - ask: 'Scope: before regenerating the 1301 hadronic classes with the sixth flat-sampler revision (passes on every non-edge
+      bin, 0 outside, total cost 1.62x the old): (1) bins cut by a class''s kinematic maximum (bb->bb 8.34, 17% reachable,
+      fill 0.19/0.22; bbx->ccxH -3.81, 6% reachable, 0.88/0.85; uux->bgtxW+ -0.96, 9% reachable, 0): exempt them, or score
+      them on their reachable share (then only the uux->bgtxW+ top bin fails)? (2) the 2x cost bar: on the total over the
+      check (1.62x, passes) or per class (19 of 38 class-seeds over 2x)?'
+    at: '2026-11-07T10:35:04+00:00'
+    searched: 'CLAUDE.md (2x margin rule on a method''s cost), site decisions D269, D294, D317: none settles the edge-bin
+      exemption or whether the 2x is per class'
+    blocks: the 1301-class regeneration with the sixth revision (step 82)
+    blocks_steps: &id001
+    - 82
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -15121,19 +15132,15 @@ entries:
       mg5_pipeline_final.py (flat_stall_off), tools/regen_recipes.py (R6), analysis/catalog_v4/multichannel_check.py (grid_r6_budget18,
       _chunk_sig, step82r6*), analysis/catalog_v4/r2_check_fig.py (r6), tests/test_flat_grid.py
     written: '2026-11-07T09:55:54+00:00'
-  ask: 'Scope: the fill bar on bins cut by the kinematic maximum (update with the r2 result). The check scores every 0.25-dex
-    bin of log10|M|^2 at >= 0.95 of its quota and exempts bins wholly above the highest |M|^2 any sampler drew (the class''s
-    reach). Two bins straddle the reach, so most of their width cannot be filled by any sampler: v4_bb_bb [8.34, 8.585] (reach
-    8.382, 16% of the bin reachable; r2 fills 0.15/0.19 of the full quota at seeds 42/43, i.e. 0.90/1.15 of the reachable
-    share) and v4_bbx_ccxh [-3.809, -3.56] (reach -3.795, 6% reachable; fills 0.87/0.77). The third, v4_uux_bgtxwp [-0.96,
-    -0.714] (9% reachable), is the one asked before. Exempt edge-straddling bins from the 0.95 bar like bins wholly above
-    the reach, or score them with the quota cut to the reachable share of the bin (then bb_bb at seed 42 is short, 0.90)?'
-  waiting_since: '2026-11-07T06:55:03+00:00'
-  searched: 'CLAUDE.md (2x margin rule; scope rules), site decisions --project FA: D269 (zero held-out events outside), D294
-    (same sampling on every beam), D317 (generation time), D318: none says how a bin cut by the kinematic maximum is scored;
-    the design reviewer ruled any exemption beyond bins wholly above the reach is Joaquin''s call'
-  blocks: the verdict on the straddling bins (step 78) and so the 1301-class regeneration with the sampler; the r3 revision
-    for uux_bgtxwp's steering goes ahead meanwhile
+  ask: 'Scope: before regenerating the 1301 hadronic classes with the sixth flat-sampler revision (passes on every non-edge
+    bin, 0 outside, total cost 1.62x the old): (1) bins cut by a class''s kinematic maximum (bb->bb 8.34, 17% reachable, fill
+    0.19/0.22; bbx->ccxH -3.81, 6% reachable, 0.88/0.85; uux->bgtxW+ -0.96, 9% reachable, 0): exempt them, or score them on
+    their reachable share (then only the uux->bgtxW+ top bin fails)? (2) the 2x cost bar: on the total over the check (1.62x,
+    passes) or per class (19 of 38 class-seeds over 2x)?'
+  waiting_since: '2026-11-07T10:35:04+00:00'
+  searched: 'CLAUDE.md (2x margin rule on a method''s cost), site decisions D269, D294, D317: none settles the edge-bin exemption
+    or whether the 2x is per class'
+  blocks: the 1301-class regeneration with the sixth revision (step 82)
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
