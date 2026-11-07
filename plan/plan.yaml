@@ -10750,6 +10750,33 @@ entries:
       0.67-1.25 on the old per-run cost; 11882 runs vs 10720 old), gridpacks 332 x 712-1700 core-s = 66-157 core-h; 155-324
       core-h in all vs the old 104 core-h of runs plus 206 gridpacks (41-97 core-h): 1.1-1.6x. Longest run 835-1557 s (dsh_eea_epem_epepemem),
       longest gridpack 794 s wall. Layout: 32 workers x 16 cores x 2 h at CC (site pick width), target 1.0 h.'
+    fix_at: '2026-11-07T01:48:59+00:00'
+    fix: '(1) Generation probe (CLAUDE.md batch rule ''generation keeps its probe''; fa-generation step 1 ''probe every process,
+      each energy of an e+e- pool''): the design plans the 285 pools with no probe and without saying so; kept fraction and
+      time come from the old fixed-beam pools at 6 energies plus one class (dsh_epem_bbxvevex) of the step-71 probe. Nothing
+      was measured per class at 160, 209, 380, 1500 GeV or with any class''s spectrum but one; accept_margin counts a missing
+      energy at the lowest measured one (an assumption), and 42 of the 285 old pools (15%) stopped short, which is exactly
+      what the probe finds. Fix, at no extra cost: run the eea_ queue first as the probe (its runs are probe-sized, ~204 events
+      per energy, every class at every anchor energy with its spectrum), write its kept fraction, time per event and per-energy
+      complete share into a probe file, and plan dsh_eea_ with lhe_parts plan --probe from it; say in the design why eea_
+      itself needs no separate probe (its runs are the probe''s size). Otherwise the skip is a rule deviation that goes to
+      Joaquin before submission. (2) Per-energy shares (point b): the 11 old e+e- complete-run pools with size_from_probe
+      have measured complete shares 0.69-1.0 (lhe_probe_by_energy.json; ee4_epem_abbxg 0.69 at 3000 GeV, dsh_epem_bbxgz 0.81
+      at 3000, dsh_epem_bbxwpwm 0.81 at 1000); dropping them asks COMPLETE_SHARE 0.8 everywhere, so those energies come back
+      short. With fix (1) the shares are re-measured at all 10 energies with the spectrum; without it, carry the old shares
+      at the shared energies as the estimate. Carrying run_events/gridpack/grid_events is fine. (3) Disk (check 14) not stated:
+      give disk per pool and per gridpack (old ee4_/dsh_epem_ pools on CC and the e+e- gridpacks, 332 of them) and the part
+      files, times the pools, against /sps/lpnhe free now: 67 GB of 512 (df read 2026-11-07); say where the gridpacks live
+      and when parts and gridpacks are deleted (lhe_parts gc). (4) Carry the step-71 reviewer note: the 10 anchor energies
+      (4 new: 160, 209, 380, 1500) are shown to Joaquin with this design''s submission message, since D320''s proposal text
+      is not in the ledger. Rest checked and fine: measure moves (step-71 share below 0.99: 0 without spectrum, 0.045-0.43
+      with, n=1000, binomial +-0.016 at most; 365 GeV 0.273 vs 0.277 at n=10000 does not affect the >0 test), outcome branches
+      for yes/partial/missing/cost, one change (energies plus spectrum = the anchor of D320; sizes, cards, cuts, layouts same),
+      cost estimate 155-324 core-h (1.1-1.6x old; spectrum factor from one class, per-run basis errs high) with a COST branch,
+      layout 32 x 16 cores (512 cores, 0.3-0.6 h of work plus a 794 s gridpack before its runs and a 1557 s longest run) under
+      the 1.0 h target. Prior searched: results.tex ''beam spectrum'', ''isronly'', ''beamstrahl'', ''anchor'', ''eea_'',
+      ''initial-state radiation'', ''ISR'', ''collider energ'', ''lpp'' (only the fixed-energy ee4_ mention at l.4671); entry
+      dead ends; decisions D318, D320, D193: no prior run of the anchor pools.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
