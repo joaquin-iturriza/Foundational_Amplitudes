@@ -46,7 +46,10 @@ REV = {"r2": (TAG, "r2_check.json", POL, ("first revision", "second revision"), 
               ("third revision", "fourth revision"), SHORT_R3),
        "r5": ("current+grid_r3_budget18+grid_r5_budget18", "r5_check.json",
               {"grid_r3_budget18": ("r3", "--", "o", "none"), "grid_r5_budget18": ("r5", "-", "o", None)},
-              ("third revision", "fifth revision"), SHORT_R3)}
+              ("third revision", "fifth revision"), SHORT_R3),
+       "r6": ("current+grid_r5_budget18+grid_r6_budget18", "r6_check.json",
+              {"grid_r5_budget18": ("r5", "--", "o", "none"), "grid_r6_budget18": ("r6", "-", "o", None)},
+              ("fifth revision", "sixth revision"), SHORT_R3)}
 
 
 def fill_per_bin(cls, pol, seed, tag=TAG):

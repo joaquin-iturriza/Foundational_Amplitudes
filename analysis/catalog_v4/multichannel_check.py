@@ -61,7 +61,7 @@ Resonance masses and widths: mg.mc_res_params of the entry's physics block.
     python3 analysis/catalog_v4/multichannel_check.py pull multichannel+quota   local: those per-seed files
     python3 analysis/catalog_v4/multichannel_check.py summary              local: data/multichannel_check_reads/*.json -> data/multichannel_check.json
 """
-import glob, json, os, sys, tempfile, time
+import collections, glob, json, os, sys, tempfile, time
 
 import numpy as np
 
@@ -78,7 +78,7 @@ QUOTA_POLICIES = ("quota", "quota_ladder_res2", "quota_ladder_res2_budget500", "
                   "quota_ladder_both_res2", "quota_ladder_both_res2_budget750", "quota_ladder_both_res2_fwdfree_budget750",
                   "mcmc_both_res2_budget12", "quota_ladder_both_res2_budget12", "grid_both_res2_budget12",
                   "grid_both_res2_budget8", "grid_both_res2f_budget12", "grid_both_res2f_budget8", "grid_r1_budget12",
-                  "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18", "grid_r5_budget18")
+                  "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18", "grid_r5_budget18", "grid_r6_budget18")
 # the flat-part diversity read (flat_diversity.py) of each quota policy against this one at the same seed in the same job:
 # independent draws (the quota sampler with both ladders at budget 50), plan catalog_coverage step 69
 DIVERSITY_REF = "quota_ladder_both_res2"
@@ -210,7 +210,7 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
         if policy in QUOTA_POLICIES:
             from tools.flat_range import ranges, ranges_dsh
             s.update(flat_range=(ranges_dsh() if policy in ("grid_r1_budget12", "grid_r2_budget18", "grid_r3_budget18", "grid_r4_budget18",
-                                         "grid_r5_budget18") else ranges())[name])
+                                         "grid_r5_budget18", "grid_r6_budget18") else ranges())[name])
         if policy == "grid_r1_budget12":
             # plan step 75's revision of step 65's sampler (tools/regen_recipes.R1): step 65's switches plus the stall
             # stop, the ladder solves at 1e-12, ladders on every hadronic class, the resonance ladder; the range joined
@@ -237,6 +237,11 @@ def run(name, probe, policies=("current", "multichannel"), seeds=SEEDS):
             # only where the nearest occupied bin holds more candidates than the empty bin's deficit (tools/regen_recipes.R5)
             from tools.regen_recipes import R5
             s.update(R5)
+        if policy == "grid_r6_budget18":
+            # plan step 82's r6 (after r5's NO on v4_uux_bgtxwp, data/r5_check.json): r5 without the stall stop
+            # (tools/regen_recipes.R6)
+            from tools.regen_recipes import R6
+            s.update(R6)
         if policy.startswith("quota_ladder_res2"):     # step 58's re-check: + the multiperipheral and joint-resonance channels
             s.update(mc_mperi=True, mc_res2=True)
         if policy == "quota_ladder_edge_res2":     # step 66: the same channels with the ladder's edge variant
@@ -925,6 +930,7 @@ R2_TAG = "current+grid_r1_budget12+grid_r2_budget18"
 R3_TAG = "current+grid_r2_budget18+grid_r3_budget18"
 R4_TAG = "current+grid_r3_budget18+grid_r4_budget18"
 R5_TAG = "current+grid_r3_budget18+grid_r5_budget18"
+R6_TAG = "current+grid_r5_budget18+grid_r6_budget18"
 
 
 def step75r1():
@@ -1367,6 +1373,40 @@ def step81r5_acted():
                                         for k, v in out.items()}))
 
 
+def step82r6_stops(classes=None):
+    """data/r6_stops.json (plan step 82's r6): per class and seed of the r6 jobs (R6_TAG), for r5 and r6 the chunks per
+    stop kind and, per short bin of r6_check.json or r5_check.json, kept/quota in the chunks of each stop kind; the
+    chunks equal between r5 and r6 (r6 is r5 bitwise in a chunk that stopped at quota or the budget under r5) and the
+    labels charged by each"""
+    chk = {k: json.load(open(os.path.join(DATA, f))) for k, f in (("r6", "r6_check.json"), ("r5", "r5_check.json"))}
+    out = {}
+    for c in classes or R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R6_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                continue
+            runs = json.load(open(f))["runs"]
+            q = {p: runs[f"grid_{p}_budget18_{seed}"]["quota_chunks"] for p in ("r5", "r6")}
+            edges = q["r6"][0]["edges_log10"]
+            short = set()
+            for k in ("r6", "r5"):
+                e = chk[k]["classes"].get(c, {}).get(f"grid_{k}_budget18_{seed}", {})
+                short |= {round(s[0], 3) for s in e.get("short", [])}
+            rec = {"labels": {p: int(sum(x["n_labels_charged"] for x in v)) for p, v in q.items()},
+                   "stops": {p: dict(collections.Counter(x["stop"] for x in v)) for p, v in q.items()},
+                   "equal_r5_r6": int(sum(a["kept_per_bin"] == b["kept_per_bin"] for a, b in zip(q["r5"], q["r6"]))),
+                   "r5_nonstall_equal": int(sum(a["kept_per_bin"] == b["kept_per_bin"] for a, b in zip(q["r5"], q["r6"])
+                                                if a["stop"] != "stall")),
+                   "r5_nonstall": int(sum(a["stop"] != "stall" for a in q["r5"])), "short_bins": {}}
+            for lo in sorted(short):
+                j = min(range(len(edges) - 1), key=lambda i: abs(edges[i] - lo))
+                rec["short_bins"][str(lo)] = {p: {st: sorted(x["kept_per_bin"][j] for x in v if x["stop"] == st)
+                                                  for st in {x["stop"] for x in v}} for p, v in q.items()}
+            out[f"{c}/{seed}"] = rec
+    json.dump(out, open(os.path.join(DATA, "r6_stops.json"), "w"), indent=1)
+    print("STEP82R6_STOPS", json.dumps({k: [v["stops"], v["equal_r5_r6"], v["r5_nonstall"]] for k, v in out.items()}))
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.argv.append("--help")
@@ -1415,6 +1455,13 @@ if __name__ == "__main__":
                  design="plan catalog_coverage step 81 revision r5", reach_tags=(R1_TAG, R2_TAG, R3_TAG, R4_TAG))
     elif sys.argv[1] == "step81r5-acted":
         step81r5_acted()
+    elif sys.argv[1] == "step82r6-pull":
+        pull(R6_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step82r6":   # r6 against r5 in the same job (r3 beside: r5_check.json)
+        step75r2("grid_r6_budget18", "grid_r5_budget18", R6_TAG, out_file="r6_check.json",
+                 design="plan catalog_coverage step 82 revision r6", reach_tags=(R1_TAG, R2_TAG, R3_TAG, R4_TAG, R5_TAG))
+    elif sys.argv[1] == "step82r6-stops":
+        step82r6_stops()
     elif sys.argv[1] == "step79-channel-presence":
         step79_channel_presence()
     elif sys.argv[1] == "step79r4-acted":

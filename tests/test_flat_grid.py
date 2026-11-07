@@ -252,3 +252,18 @@ def test_r5_empty_near_min():
     assert mg.recipe_output_path(rec, "/d").endswith("_train_smixv_amplitudes.npy")
     from tools.regen_recipes import R3, R5
     assert R5 == dict(R3, flat_empty_near_min=True)
+
+
+def test_r6_stall_off():
+    """plan step 82's r6: R6 = R5 + flat_stall_off; _smixw tag (r5's _smixv pools untouched); the stall test in the
+    rounds loop and the stop label skip it"""
+    from tools.regen_recipes import R5, R6
+    assert R6 == dict(R5, flat_stall_off=True)
+    rec = {"process": "x", "sqrts_min": 10, "sqrts_max": 20, "role": "train",
+           "sampling": {"mode": "mixture", "flat_range": [0, 1], **R6}}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixw_amplitudes.npy")
+    rec["sampling"] = {"mode": "mixture", "flat_range": [0, 1], **R5}
+    assert mg.recipe_output_path(rec, "/d").endswith("_train_smixv_amplitudes.npy")
+    import inspect
+    src = inspect.getsource(mg)
+    assert src.count('pol.get("flat_stall") and not pol.get("flat_stall_off")') == 2

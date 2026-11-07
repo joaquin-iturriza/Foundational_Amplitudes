@@ -76,6 +76,10 @@ R4 = dict(R3, flat_empty_unique=True)
 # it) and v4_uux_bgtxwp (r2 0.73/0.79, r3 0.925/0.917, r4 0.835/0.809; its nearest occupied bin ~900 candidates);
 # pools _smixv
 R5 = dict(R3, flat_empty_near_min=True)
+# plan step 82's r6 (after r5's NO on v4_uux_bgtxwp; data/r5_check.json, r5_acted.json): r5 without the stall stop, the
+# rounds ending at quota or the label budget 18: every chunk short in bgtxwp's reachable top bin stopped on the stall
+# rule under r3 and r5, every budget-stopped chunk filled it; pools _smixw
+R6 = dict(R5, flat_stall_off=True)
 FLAT_RANGE_R1 = os.path.join(REC, "catalog_v4_flat_range_dsh.json")
 OUT_R1 = "catalog_v4_r1_regen.yaml"
 

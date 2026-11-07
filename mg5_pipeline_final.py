@@ -4415,7 +4415,12 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
         # pol["flat_stall_patience"] (plan step 75's r2; absent: 1, r1's rule): the stop needs that many consecutive
         # stalled rounds: in r1, 25 of v4_uux_bgtxwp's 36 chunks stopped after one stalled round with a bin at 0-8 of
         # its 26 events, while the 11 that ran one more round filled it (data/r1_where.json, rounds per chunk)
-        if pol.get("flat_stall") and len(rounds) >= 2:
+        # pol["flat_stall_off"] (plan step 82's r6): no stall stop, the rounds end at quota or the budget: every
+        # v4_uux_bgtxwp chunk short in its reachable bin [-1.206, -0.96] under r3 and r5 stopped on the stall rule (r5
+        # 5/14 and 5/20 stalled chunks below 20 of ~26, r3 3/9 and 3/12), every budget-stopped chunk filled it (r5
+        # 22/22, 16/16; r3 27/27, 24/24); running the stalled chunks of the r5 jobs to the budget is +13% labels
+        # (data/r5_check.json reads)
+        if pol.get("flat_stall") and not pol.get("flat_stall_off") and len(rounds) >= 2:
             filled = rounds[-2]["missing"] - rounds[-1]["missing"]
             rounds[-1]["stalled"] = bool(filled < float(pol["flat_stall"]) * min(rounds[-2]["missing"],
                                                                                  n / float(pol["flat_budget"])))
@@ -4445,7 +4450,8 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
     # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
     # (no finite log|M|^2 among them) with bins short and the budget not reached
     stop = "quota" if short.sum() == 0 else ("budget" if len(cand) >= budget else
-                                              "stall" if pol.get("flat_stall") and w.any() else "no_steer")
+                                              "stall" if pol.get("flat_stall") and not pol.get("flat_stall_off")
+                                              and w.any() else "no_steer")
     budget_hit = stop == "budget"
     if stop != "quota":
         lo10 = edges[:-1][short > 0] / np.log(10.0)
@@ -4945,7 +4951,7 @@ def recipe_output_path(recipe, out_dir):
         # empty bins, plan step 79) its own: _smixu, and r5 (sampling.flat_empty_near_min: r3's rule only where the
         # nearest occupied bin holds more candidates than the deficit, plan step 81) its own: _smixv
         sp = recipe.get("sampling") or {}
-        samp_tag += ("v" if sp.get("flat_empty_near_min") else "u" if sp.get("flat_empty_unique") else "t" if sp.get("flat_empty_near") else
+        samp_tag += ("w" if sp.get("flat_stall_off") else "v" if sp.get("flat_empty_near_min") else "u" if sp.get("flat_empty_unique") else "t" if sp.get("flat_empty_near") else
                      "s" if any(sp.get(k) for k in ("flat_keep_ext", "flat_stall_patience")) else
                      "r" if any(sp.get(k) for k in ("flat_stall", "mc_solve_tol", "mc_mperi_all", "mc_resladder")) else "q")
     f_def =float((recipe.get("sampling") or {}).get("f_default", 0))
