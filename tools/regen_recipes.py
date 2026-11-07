@@ -69,6 +69,13 @@ R3 = dict(R2, flat_empty_near=True)
 # through the deficit-many nearest candidates no other empty bin took, so adjacent empty bins never stack their units on
 # the same few candidates; pools _smixu
 R4 = dict(R3, flat_empty_unique=True)
+# plan step 81's r5 (after r4's NO; data/r4_check.json, r4_acted.json, r3_rounds.json): r3 with its nearest-candidate
+# rule only for an empty bin whose nearest occupied bin(s) hold more candidates than its deficit, r2's rule (every
+# candidate of the nearest occupied bin) otherwise: the fill moved with how few candidates carry an empty bin's deficit
+# on both v4_uu_bbxuu (r2 1.0, r3 0.90/0.80, r4 0.70/0.72; its nearest occupied bin itself short, so r3 reached below
+# it) and v4_uux_bgtxwp (r2 0.73/0.79, r3 0.925/0.917, r4 0.835/0.809; its nearest occupied bin ~900 candidates);
+# pools _smixv
+R5 = dict(R3, flat_empty_near_min=True)
 FLAT_RANGE_R1 = os.path.join(REC, "catalog_v4_flat_range_dsh.json")
 OUT_R1 = "catalog_v4_r1_regen.yaml"
 

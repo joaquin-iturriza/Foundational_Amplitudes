@@ -10,6 +10,8 @@ reads in data/multichannel_check_reads/ of the r2 jobs, current+grid_r1_budget12
     python analysis/catalog_v4/r2_check_fig.py      -> analysis/catalog_v4/figs/r2_check.{png,pdf}
     python analysis/catalog_v4/r2_check_fig.py r4   -> figs/r4_check.{png,pdf} (plan step 80: r3 against r4 in the r4
         jobs, data/r4_check.json)
+    python analysis/catalog_v4/r2_check_fig.py r5   -> figs/r5_check.{png,pdf} (plan step 81: r3 against r5 in the r5
+        jobs, data/r5_check.json)
     python analysis/catalog_v4/r2_check_fig.py r3   -> analysis/catalog_v4/figs/r3_check.{png,pdf} (plan step 79: the
         r3 jobs, current+grid_r2_budget18+grid_r3_budget18, data/r3_check.json; r2 against r3, the reach of r3_check.json,
         taken over the r1, r2 and r3 jobs)
@@ -41,7 +43,10 @@ REV = {"r2": (TAG, "r2_check.json", POL, ("first revision", "second revision"), 
               ("second revision", "third revision"), SHORT_R3),
        "r4": ("current+grid_r3_budget18+grid_r4_budget18", "r4_check.json",
               {"grid_r3_budget18": ("r3", "--", "o", "none"), "grid_r4_budget18": ("r4", "-", "o", None)},
-              ("third revision", "fourth revision"), SHORT_R3)}
+              ("third revision", "fourth revision"), SHORT_R3),
+       "r5": ("current+grid_r3_budget18+grid_r5_budget18", "r5_check.json",
+              {"grid_r3_budget18": ("r3", "--", "o", "none"), "grid_r5_budget18": ("r5", "-", "o", None)},
+              ("third revision", "fifth revision"), SHORT_R3)}
 
 
 def fill_per_bin(cls, pol, seed, tag=TAG):
