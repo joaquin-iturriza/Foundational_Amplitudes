@@ -63,16 +63,25 @@ _WIN = None
 
 def accept_of(name):
     """(sqrts_lo, sqrts_hi, m_finals, pdg_ids, cuts) the mixture applies to a dsh pool's events (its parent class's
-    training window and cuts), None for a pool that keeps every event (pp13v4, ee4)."""
+    training window and cuts), None for a pool that keeps every event (pp13v4, ee4); an eea_ pool as its dsh_eea_
+    counterpart (the parent class's window and cuts) when the class is trained."""
     global _WIN
     cfg = mg.PROCESSES[name]
-    if not name.startswith("dsh_"):
-        return None
     if _WIN is None:
         _WIN = {e["name"]: e["sqrts"] for e in yaml.safe_load(open(TRAIN_RECIPE))["processes"]}
-    par = mg.PROCESSES[cfg["parent"]]
+    if name.startswith("eea_"):
+        # an anchor-energy test pool (step 74 stage 1) read as its dsh_eea_ counterpart would keep it: the class's
+        # training window and cuts; a class with no training window (held out) keeps every event
+        parent = "v4_" + name[len("eea_"):]
+        if parent not in _WIN or parent not in mg.PROCESSES:
+            return None
+    elif name.startswith("dsh_"):
+        parent = cfg["parent"]
+    else:
+        return None
+    par = mg.PROCESSES[parent]
     cuts = par.get("fiducial_cuts") or mg.V4_CUTS[mg.v4_cut_kind(par["pdg_ids"])]
-    lo, hi = _WIN[cfg["parent"]]
+    lo, hi = _WIN[parent]
     return float(lo), float(hi), [float(m) for m in par["m_finals"]], [int(p) for p in par["pdg_ids"]], cuts
 
 
