@@ -356,7 +356,7 @@ STEP61 = {"matched_event": ("FA-ccin2p3-9079850b", "FA-ccin2p3-ebe4c4ed", "FA-cc
           "rerun": ("FA-ccin2p3-ac8d6fca", "FA-ccin2p3-752344ce", "FA-ccin2p3-b13f456c", "FA-ccin2p3-83dc9690")}
 # plan step 73 (step 61's NO branch): the sign logit from its own detached copy of the last block (model.net.sign_branch),
 # read by step 61's rules against the same weight-1 rerun and MSE control; runs filled in at submission
-STEP73 = {"branch": (), "rerun": STEP61["rerun"]}
+STEP73 = {"branch": ("FA-ccin2p3-54961d3e",), "rerun": STEP61["rerun"]}
 SH_AXES = ("HD5", "H5", "PP4", "EE4", "HD4", "H1", "H2", "H2p5", "H3", "H6", "H7E", "H7c")
 PAIR_GATE = {"HD5": 0.43, "H5": 0.40}     # absolute bound on the sd over classes of the paired ln ratio (design check 3)
 TOL = 1.25                                # magnitude no-worse tolerance on the widened upper end
@@ -711,6 +711,65 @@ def step61(table=None, arms=("matched_event", "matched_const"), out_name="het_si
                       "verdict": out["step_verdict"]}, indent=0))
 
 
+STEP73_SIGN_CALL = 2.0     # one seed: a sign gap is called only beyond 2x either way (design passed 2026-11-07T03:04)
+STEP73_MAG_CALL = 1.15     # one seed: a magnitude shift is called only beyond 15% either way (same design)
+
+
+def step73_one():
+    """Step 73 at one seed (D315; design passed 2026-11-07T03:04, one-seed table of the 01:28 design) ->
+    data/het_signhead73.json: the branch arm at seed 42 against seed 42 of the weight-1 rerun and of the MSE control.
+    Sign on H5 and HD5: per pool the wrong-sign share, the median over pools and its ratio to each control's, the counts
+    above/below; called only beyond STEP73_SIGN_CALL (worse than the rerun by more than the 01:28 table's 1.16x is listed
+    beside). Magnitude R = branch over rerun, per read the median over classes of the class's geometric-mean probe MSE
+    ratio (class bootstrap beside, no seed widening: one pair), called only beyond STEP73_MAG_CALL. Beside: best val
+    curves, pre-clip gradient norms, blow-ups."""
+    from mixture_ab import class_of, blowups, class_ratios, r_with_interval as r_interval, load as load_read
+    cls = class_of()
+    arm, rr = STEP73["branch"][0], STEP61["rerun"][0]
+    h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
+    ctl = {"HD5": [_sign_read(SIGNHEAD["mse_hd5"][0])["HD5"]], "H5": [_mse_h5_sign(SIGNHEAD["mse_h5"][0])]}
+    out = {"design": "plan catalog_coverage step 73, one seed (D315; passed 2026-11-07T03:04)",
+           "runs": {"branch": arm, "rerun_seed42": rr, "mse_hd5_seed42": SIGNHEAD["mse_hd5"][0],
+                    "mse_h5_seed42": SIGNHEAD["mse_h5"][0]}, "sign": {}, "magnitude": {}}
+    for ax in ("H5", "HD5"):
+        A = [_sign_read(arm)[ax]]
+        out["sign"][ax] = {"vs_rerun": _sign_pair(A, [_sign_read(rr)[ax]], h5neg, ax),
+                           "vs_mse": _sign_pair(A, ctl[ax], h5neg, ax)}
+    for ax in SH_AXES:
+        try:
+            a, b = load_read(arm, ax), load_read(rr, ax)
+        except FileNotFoundError:
+            continue
+        ks = sorted(set(a) & set(b))
+        r = r_interval(class_ratios(a, b, ks, cls), 1.0)
+        r["n_probes"] = len(ks)
+        out["magnitude"][ax] = r
+    calls = []
+    for ax in ("H5", "HD5"):
+        for k in ("vs_rerun", "vs_mse"):
+            q = out["sign"][ax][k]["median_ratio_a_over_c"]
+            if q is not None and (q > STEP73_SIGN_CALL or q < 1 / STEP73_SIGN_CALL):
+                calls.append(f"sign {ax} {k} {'worse' if q > 1 else 'better'} ({q}x)")
+    for ax, m in out["magnitude"].items():
+        if m["R"] > STEP73_MAG_CALL or m["R"] < 1 / STEP73_MAG_CALL:
+            calls.append(f"magnitude {ax} {'worse' if m['R'] > 1 else 'better'} (R {m['R']})")
+    hurt = [c for c in calls if c.startswith("magnitude") and "worse" in c and (" PP4 " in c or " EE4 " in c)]
+    sign_worse = [c for c in calls if c.startswith("sign") and "vs_rerun" in c and "worse" in c]
+    sign_better = [c for c in calls if c.startswith("sign H5 vs_rerun better")]
+    out["calls"] = calls
+    out["beside_0128_table"] = {ax: out["sign"][ax]["vs_rerun"]["median_ratio_a_over_c"] for ax in ("H5", "HD5")}
+    out["verdict"] = ("NO (magnitude hurt on PP4/EE4)" if hurt else "NO (sign worse than the rerun)" if sign_worse
+                      else "SIGN BETTER THAN THE RERUN AT ONE SEED" if sign_better else "NOT RESOLVED AT ONE SEED")
+    out["val_sign_accuracy"] = {r: [x[1] for x in _sign_read(r)["val_sign_acc"]][-1:] for r in (arm, rr)}
+    out["grad_norm_main"] = {r: _sign_read(r)["grad_norm_main"] for r in (arm, rr)}
+    out["blowups"] = blowups([arm, rr])
+    json.dump(out, open(os.path.join(DATA, "het_signhead73.json"), "w"), indent=1)
+    brief = lambda r: {k: v for k, v in r.items() if k != "per_pool_pct"}
+    print(json.dumps({"sign": {ax: {k: brief(v) for k, v in d.items()} for ax, d in out["sign"].items()},
+                      "mag": {ax: [m["R"], m["boot95"]] for ax, m in out["magnitude"].items()},
+                      "calls": calls, "verdict": out["verdict"], "blowups": out["blowups"]["flagged"]}, indent=0))
+
+
 def step61_fig():
     """figs/het_signhead61: (a) H5 and (b) HD5 per pool the seed-mean wrong-sign share of the rerun (weight 1), the two
     matched arms, the MSE control and an all-positive sign, pools sorted by the MSE control; (c) per read the median over
@@ -768,6 +827,10 @@ if __name__ == "__main__":
         signhead_pull(STEP61)
     elif sys.argv[1:] == ["step61"]:
         step61()
+    elif sys.argv[1:] == ["step73_pull"]:
+        signhead_pull({"branch": STEP73["branch"]})
+    elif sys.argv[1:] == ["step73_one"]:
+        step73_one()
     elif sys.argv[1:] == ["step73"]:
         step61(STEP73, ("branch",), "het_signhead73.json", "plan catalog_coverage step 73 (D296, D315)")
     elif sys.argv[1:] == ["step61_fig"]:
