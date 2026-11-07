@@ -3744,15 +3744,6 @@ entries:
       19 classes x seeds 42/43, --time 00:45:00, --mem 8G, target r5_check 0.2 h). On end: multichannel_check.py step81r5-pull,
       step81r5 -> data/r5_check.json, step81r5-acted -> data/r5_acted.json (read bgtxwp''s bins_empty_small first: the design
       reviewer''s caveat that its per-chunk nearest bin may be small in early rounds), figure r2_check_fig.py r5.'
-    80: '(l2) het sign head after step 73 (read 2026-11-07, data/het_signhead73.json @9db5cf44: detached sign block, one seed:
-      sign not resolved (H5 wrong-sign median 9.3% vs shared trunk 8.6%, MSE 5.6%; HD5 14.85 vs 16.2, MSE 11.15), magnitude
-      better on all 12 reads, PP4 R 0.865 [0.839, 0.879]). D296 leaves the next attempt to me. Design one revision that gives
-      the sign loss trunk features without letting it take from the magnitude''s clipped update: candidates to weigh on existing
-      reads first: (1) sign gradient into the shared trunk with its own clip group (two backward passes; the per-step cost
-      to measure, bar 2x), (2) the detached branch from an earlier block (a copy of the last k blocks), (3) the step-61 per-event
-      match on the detached block (likely inert: the branch is clipped as its own group, so only the events'' relative weights
-      change). One seed (D315), against FA-ccin2p3-ac8d6fca, 54961d3e and the MSE control at seed 42; design-reviewer before
-      submit.'
     81: '(l3) het sign head step 80 running: FA-ccin2p3-22bc476d (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch4
       @7fd9221c: the sign branch = a copy of the last 4 of 8 blocks on block 4''s output detached, ++model.net.sign_branch_blocks=4;
       design PASS 2026-11-07, repo-reviewer PASS at 24021256; --time 03:30:00, target 2.9 h, 2.9 GPU-h). On end: het_oneloop.py
@@ -12682,11 +12673,6 @@ entries:
       - 'PASS: straddling bins per Joaquin, then regenerate with R5'
       - 'bbxuu fixed, bgtxwp < 0.95 with 2-3 stalled chunks: report, next the stall rule for those chunks'
       - 'bbxuu still short or bgtxwp below r3: read rounds and bins_empty_small per the design''s outcome'
-    80:
-      feeds: whether the het loss keeps a sign head that predicts one-loop signs as well as the MSE control's (D287/D296)
-      if:
-      - 'an arm reaches the MSE control''s sign without a magnitude loss beyond 15%: adopt it for the het catalog runs'
-      - 'none: report the sign gap with the magnitude gain of the detached block, Joaquin''s call'
     81:
       feeds: which sign head the het loss carries (D287, D296)
       if:
