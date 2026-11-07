@@ -12066,7 +12066,7 @@ entries:
       - 'a complete share under 1/MAX_ASK_FACTOR at an energy: larger gridpack per complete_layout, never more runs'
   owner:
     agent: a43d3315615ba19df
-    state: working
+    state: closed
     since: '2026-11-07T04:48:42+00:00'
     state_at: '2026-11-07T04:48:54+00:00'
   findings:
@@ -14162,40 +14162,29 @@ entries:
       at the short energies, sized from these measured complete shares; also check that the 93 assembled pools hold no short
       run (a run returning between the share and its ask passes lhe_equal_shares).'
   handoff:
-    state: '2026-11-07 ~05:55. Step 75: profile and where reads done (finding 2026-11-07). Revision r1 implemented on branch
-      regen-rev (worktree worktrees/wt-regen-rev @7d00f36c, not merged): mg5_pipeline_final policy keys flat_stall 0.2 (stop
-      when a round fills < 0.2 x min(missing, labels/budget)), mc_solve_tol 1e-12, mc_mperi_all, mc_resladder (resladder_draw),
-      _smixr tag; datagen keeps rounds in flatfill.json; tools/flat_range.py --dsh -> recipes/catalog_v4_flat_range_dsh.json
-      (dsh_ train in-support extent joined; widens 659 tops, median 0.3 dex); tools/regen_recipes.py write --r1 -> recipes/catalog_v4_r1_regen.yaml;
-      multichannel_check.py policy grid_r1_budget12, source heldout_r1 (PP4 val + dsh_ val/test), R1_CLASSES (18), commands
-      step75r1-pull / step75r1 -> data/r1_check.json. Design of the 18-class check recorded ~05:50; design-reviewer (agent
-      a613d792f7b36ed10) and repo-reviewer (agent aa4bae7d4383c3f5a, reviewing trunk..a71d786e; tell it of 7d00f36c, the reader)
-      launched ~05:52, verdicts pending: continue them with SendMessage. On both PASS: merge regen-rev, site sync, site pick
-      FA --jobs 36, submit scripts/job_multichannel_check.sh per class x seed 42/43 (MCHECK_CLASS, MCHECK_PROBE from R1_CLASSES,
-      MCHECK_POLICIES=current+grid_both_res2f_budget12+grid_r1_budget12, MCHECK_SEED) --hdr=--time=00:45:00 (max class ~850
-      s for 3 policies), plan target r1_check 0.25 h --jobs 36, plan wait step 75; read with step75r1-pull then step75r1.
-      PASS -> regenerate all 1301 with the r1 recipe (32 shards, _smixr; disk re-read first, 43 GB per set) and extend regen_read.py
-      to r1''s rules (dsh range, core bins, heldout_r1). Step 76 not started (accxh/aepemh at 160 GeV): run card recipes/catalog_v4_ee/run_card.dat
-      has only same-type pair masses mmjj/mmaa/mmll, so mixed photon-quark / photon-lepton pair masses > 10 GeV are not expressed;
-      also check partonic-vs-lab frame (lhe_probe.kept''s cuts_partonic_not_lab); a cut-by-cut read on the eea_ parts at 160
-      GeV (lhe_probe cmd_parts machinery, byE per energy) is the next tool.'
-    decisions: 'Fill verdict for r1 judged on the core bins (range source''s pp extent), margin bins reported, because a 2->2
-      class''s |M|^2 is bounded (45 of 58 margin bins without any candidate) and the 0.5-dex margin is a chosen width; coverage
-      stays at D269''s zero, scored on events the range never read. Range joined with dsh_ train (a training input) rather
-      than extrapolated, so no scored event builds the range. Stall rule by the round''s yield, not its share of the missing:
-      a share rule would stop chunks whose missing is dominated by unreachable bins while reachable ones still fill (toy check);
-      on step 75''s grid runs no round ever filled < 0.5 of the missing. Whole-catalog regeneration proposed after the check
-      (the range table changes for ~660 classes).'
-    ruled_out: A stall rule on the share of missing in bins holding a candidate (never stops while the reach creeps into new
-      edge bins, toy). Pulling rounds from step-65 flatfill.json (rounds were not stored). Resolving pools after multichannel_check.where
-      in one login-node script (where re-registers the catalog entry, paths fall back to _smix).
-    running: design-reviewer and repo-reviewer subagents on the r1 design and branch regen-rev; no site jobs of this step;
-      step 74 stage 2 workers (queue catalog_v4_dsh_eea) and step 70 grid runs as before
-    files: 'worktrees/wt-regen-rev: mg5_pipeline_final.py, datagen.py, tools/flat_range.py, tools/regen_recipes.py, analysis/catalog_v4/multichannel_check.py,
-      analysis/catalog_v4/regen_profile.py, analysis/catalog_v4/regen_where.py, tests/test_flat_grid.py, recipes/catalog_v4_flat_range_dsh.json,
-      recipes/catalog_v4_r1_regen.yaml, analysis/catalog_v4/data/regen_g12_profile.json, regen_g12_where.json, regen_g12_where_pull.json,
-      dsh_train_support.json, regen_g12_read.json, regen_g12_pull.json'
-    written: '2026-11-07T04:47:39+00:00'
+    state: '2026-11-07 ~07:00. Step 75: r1 check design FIX once (core-only fill bar; no no-dsh_ outside class), revised (all
+      in-range bins incl. margin, exempt only bins above the class''s reach; +v4_uux_bgtxwp, 19 classes), design PASS, repo
+      PASS; regen-rev merged 9fa6af37; 38 CPU jobs submitted at CC 0196253e (list in finding 2026-11-07 ''step 75 r1 check
+      submitted''), target r1_check 0.25 h, wait on step 75. On RUN_DONE: python3 analysis/catalog_v4/multichannel_check.py
+      step75r1-pull then step75r1 -> data/r1_check.json; verdict by the passed design (PASS -> regenerate 1301 with recipes/catalog_v4_r1_regen.yaml,
+      extend regen_read.py to the same bar). Step 76: cause confirmed (only the mixed-pair m>10 GeV cut removes events, 0.564/0.507
+      at 160 GeV; data/ee_cutread160.json via lhe_probe cutread @1bd372a2); fix merged 59f58a60 (lhe.mixed_pair_mmin -> MadEvent
+      dummy_cuts; DSHA_MIXED_MMIN in gen_catalog_v4_default.py; local MG 3.7.0 test min photon-lepton mass 10.02 GeV); next:
+      regenerate recipes, probe the two pools with the cut, update the probe file, plan with step 77. Step 77 (new): stage
+      2 left 20 dsh_eea_ pools unassembled (one run per energy at 1000/1500/3000 GeV stopped short; 2 pools have stale claimed
+      tasks); relay as complete gridpack runs; 15 run events acked pointing to step 77.'
+    decisions: 'Exemption of short bins only above the class''s measured reach (max candidate over all policies/seeds), any
+      wider exemption via plan ask (design reviewer). Mixed-pair cut opt-in per pool (identity key only when set) so no built
+      pool changes identity; physics unchanged since the mixture already rejects those events (repo reviewer). Stage-2 short
+      runs are biased samples: relay as complete runs, not top-ups.'
+    ruled_out: Scoring only core bins for the r1 check (moves the bar after step 65's result). Treating the 160 GeV loss as
+      partonic-vs-lab |cos| (cos_partonic_not_lab 0 for both pools).
+    running: 38 CPU jobs of the r1 check (step 75 wait); step 70 grid GPU runs as before; no stage-2 workers
+    files: analysis/catalog_v4/multichannel_check.py (step75r1, R1_CLASSES), tools/lhe_probe.py (cutread), mg5_pipeline_final.py
+      (lhe_mixed_pair_cut), recipes/gen_catalog_v4_default.py (DSHA_MIXED_MMIN, anchor_pools), analysis/catalog_v4/data/ee_cutread160.json,
+      lhe_run_yields_dsh_eea_stage2.json; worktrees wt-regen-rev, wt-ee-cutread, wt-ee-mixcut merged but not removed (remove_worktree.sh
+      refused by the permission classifier)
+    written: '2026-11-07T05:13:08+00:00'
   ask: 'Scope: seeds for the sign-head arm, and what ''wider'' than the pp range means for the fill verdict. (1) Four seeds
     (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached sign-head arm? (2) Should the extra half decade above
     the highest pp event count toward the regeneration''s pass or fail, or only be reported?'
