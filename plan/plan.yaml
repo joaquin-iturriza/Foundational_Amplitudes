@@ -3742,12 +3742,6 @@ entries:
       seed (D315): arm v4_het_signhead_branch seed 42 = FA-ccin2p3-54961d3e (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch
       at 411215ce, --time 03:30:00, --mem 16G, target signhead_branch_s42 3.49 h), against the weight-1 rerun FA-ccin2p3-ac8d6fca
       and the MSE control at seed 42. On end: read by step 61''s rules (het_oneloop.py step73).'
-    78: '(q) step 75 r2 (after r1''s NO): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18 on branch sampler-r2
-      @c825cb19 (worktrees/wt-r2; tools/regen_recipes.R2, policy grid_r2_budget18; readers multichannel_check.py step75r2-rounds
-      -> data/r1_rounds.json, step75r2 -> data/r2_check.json). Design recorded 2026-11-07, design-reviewer and repo-reviewer
-      running. On both PASS: merge, site sync, site pick FA --jobs 38, plan target --batch r2_check --wall 0.35 --jobs 38,
-      submit 38 CPU jobs (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r1_budget12+grid_r2_budget18, seeds
-      42/43, --time 01:00:00), plan wait 78 on them; read step75r2-pull then step75r2.'
     79: '(t) sampler r5 check running: r5 = r3 + flat_empty_near_min (r3''s nearest-candidate steering of an empty quota bin
       only where its nearest occupied bin holds more candidates than the deficit, r2''s rule otherwise), merged c40ab06d (design
       PASS, repo-reviewer PASS at d9fb42a2). 38 CPU jobs at CC c40ab06d (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r3_budget18+grid_r5_budget18,
@@ -11854,13 +11848,6 @@ entries:
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
-    '78': FA-ccin2p3-7c7644c1 FA-ccin2p3-6e992564 FA-ccin2p3-9624f0cc FA-ccin2p3-02c7e590 FA-ccin2p3-62b751cd FA-ccin2p3-5a192ac0
-      FA-ccin2p3-ae80691e FA-ccin2p3-6db973ac FA-ccin2p3-b5e7e9ab FA-ccin2p3-cc20d8a4 FA-ccin2p3-798e8a68 FA-ccin2p3-296fc153
-      FA-ccin2p3-ab9af1de FA-ccin2p3-982f7184 FA-ccin2p3-eb7f3afd FA-ccin2p3-2aaa4bb5 FA-ccin2p3-1789e7e2 FA-ccin2p3-c1c64f40
-      FA-ccin2p3-9b78d5e1 FA-ccin2p3-c01fef43 FA-ccin2p3-a48c9670 FA-ccin2p3-39191bd4 FA-ccin2p3-5c0169c3 FA-ccin2p3-424cafc6
-      FA-ccin2p3-eefc4ede FA-ccin2p3-c378054c FA-ccin2p3-cecb16f4 FA-ccin2p3-53885050 FA-ccin2p3-d982eb87 FA-ccin2p3-72e57eb5
-      FA-ccin2p3-e91ab729 FA-ccin2p3-f23dcf7e FA-ccin2p3-401f5840 FA-ccin2p3-0767a006 FA-ccin2p3-5ed59529 FA-ccin2p3-00789dbf  FA-ccin2p3-0f133452
-      FA-ccin2p3-ac96f65a
     '73': FA-ccin2p3-54961d3e
     '79': FA-ccin2p3-0c8b43fc FA-ccin2p3-04dc36dc FA-ccin2p3-5705873a FA-ccin2p3-01c79e51 FA-ccin2p3-bd8a5983 FA-ccin2p3-dcc07b5e
       FA-ccin2p3-5d00c2ae FA-ccin2p3-bdd729dd FA-ccin2p3-ca8d8d16 FA-ccin2p3-fa6d9387 FA-ccin2p3-711710b4 FA-ccin2p3-8c73b9ce
@@ -12519,13 +12506,6 @@ entries:
       if:
       - 'SIGN NOT WORSE THAN MSE, MAGNITUDE AS RERUN: adopt the detached head'
       - 'NO: clipping regime next'
-    78:
-      feeds: whether all 1301 hadronic classes are regenerated with the revised sampler before step 68's e+e- classes join
-      if:
-      - 'PASS: regenerate the 1301 classes with R2 (_smixs), read by regen_read.py at the same bar; per-class costs over 2x
-        to Joaquin'
-      - 'NO only on the straddling bins (bb_bb 8.34, uux_bgtxwp -0.96): their exemption to Joaquin (plan ask)'
-      - 'NO otherwise: the failing kind per the design''s NO branch'
     79:
       feeds: whether the 1301 hadronic classes are regenerated with r5 (_smixv) before step 68
       if:
