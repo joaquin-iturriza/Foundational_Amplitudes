@@ -1,0 +1,68 @@
+"""The quota sampler with channel grids (mg5_pipeline_final._flat_quota_part, sampling.flat_grid; plan catalog_coverage
+step 72): the grid map stays inside [0, 1) and is monotone; without flat_grid the quota sampler draws exactly what it
+drew before (same kept |M|^2 as trunk's module at the same seed, when trunk's copy is importable); on the toy |M|^2 of
+tests/test_flat_mcmc.py through the multichannel proposal, the grids at the same budget fill at least as much of the
+quota as the plain quota sampler, with independent draws (near-copy share <= 2%)."""
+import importlib.util, os, sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, HERE)
+import mg5_pipeline_final as mg  # noqa: E402
+sys.path.insert(0, os.path.join(HERE, "tests"))
+from test_flat_mcmc import M, PDG, toy_label, fd  # noqa: E402
+
+
+def _pol(budget, grid):
+    return dict(flat_range=[np.log(1e-8), np.log(1e9)], flat_dex_per_bin=0.25, flat_budget=budget, oversample=6,
+                y_lo=1e-6, democratic=0.5, multichannel=True, mc_resonances=[], mc_isc=True, mc_mperi=True,
+                mc_mperi_both=True, n_sqrts_bins=200, flat_grid=grid)
+
+
+def run(module, grid, budget=12, seed=3, n_flat=2000):
+    rng = np.random.default_rng(seed)
+    uni = lambda k: np.exp(rng.uniform(np.log(50.0), np.log(3000.0), size=k))
+    ev, sq, me = module._flat_quota_part(n_flat, 50.0, 3000.0, uni, True, M, PDG, rng, None, _pol(budget, grid),
+                                         toy_label, 0.0, None)
+    d = module.FLAT_LAST
+    F = fd.features(d["kept_P"], d["kept_sq"])
+    pb = fd.per_bin(F, fd.bins_of(d["logm"][d["keep"]], d["edges"]), d["kept_chain"], len(d["quota"]))
+    dup = sum(x.get("dup", 0.0) * x["n"] for x in pb) / max(sum(x["n"] for x in pb), 1)
+    fill = float(np.minimum(d["kept_per_bin"], d["quota"]).sum() / d["quota"].sum())
+    short = np.minimum(d["kept_per_bin"], d["quota"]) / np.maximum(d["quota"], 1)
+    return fill, int(d["n_labels"]), dup, np.asarray(me), float((short >= 0.95).mean()), d
+
+
+def test_grid_map():
+    g = mg._ChanGrid(20, 0.2)
+    rng = np.random.default_rng(0)
+    y = rng.random(5000) ** 4                      # mass near 0
+    g.fit(y[:, None], np.ones(len(y)))
+    u = np.linspace(0, 1 - 1e-12, 1001)
+    m = g.map(0, u)
+    assert (m >= 0).all() and (m < 1).all() and (np.diff(m) >= 0).all()
+    assert np.mean(g.map(0, rng.random(20000)) < 0.1) > 0.3      # the grid follows the weights (uniform: 0.1)
+
+
+def test_unchanged_without_grid():
+    trunk = os.path.join(os.path.dirname(os.path.dirname(HERE)), "mg5_pipeline_final.py")
+    if not os.path.exists(trunk) or os.path.samefile(trunk, os.path.join(HERE, "mg5_pipeline_final.py")):
+        return
+    spec = importlib.util.spec_from_file_location("mg_trunk", trunk); mt = importlib.util.module_from_spec(spec)
+    sys.modules["mg_trunk"] = mt; spec.loader.exec_module(mt)
+    a = run(mg, False, n_flat=500); b = run(mt, False, n_flat=500)
+    assert np.array_equal(a[3], b[3])
+
+
+def test_grid_fills_toy():
+    fq, nq, dq, _, sq, _ = run(mg, False)
+    fg, ng, dg, _, sg, d = run(mg, True)
+    print("quota12 fill", fq, "bins>=0.95", sq, "labels", nq, "| grid12 fill", fg, "bins>=0.95", sg, "labels", ng,
+          "dup", dg, "dims", d["grid_dims"], "t_prop/t_label", round(d["t_propose"], 2), round(d["t_label"], 2))
+    assert ng <= 12 * 2000 and dg <= 0.02
+    assert fg >= fq
+
+
+if __name__ == "__main__":
+    test_grid_map(); test_unchanged_without_grid(); test_grid_fills_toy(); print("ok")

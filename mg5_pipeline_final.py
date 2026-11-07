@@ -3114,6 +3114,8 @@ def sampling_policy(cfg, role=None):
         if pol.get("flat_mcmc"):     # the Markov-chain flat part's constants, likewise (absent without flat_mcmc)
             pol.setdefault("flat_mcmc_chains", FLAT_MCMC_CHAINS); pol.setdefault("flat_mcmc_lnf", FLAT_MCMC_LNF)
             pol.setdefault("flat_mcmc_dmin", FLAT_MCMC_DMIN); pol.setdefault("flat_mcmc_thin", FLAT_MCMC_THIN)
+        if pol.get("flat_grid"):     # the channel grids' constants, likewise (absent without flat_grid)
+            pol.setdefault("flat_grid_bins", FLAT_GRID_BINS); pol.setdefault("flat_grid_floor", FLAT_GRID_FLOOR)
     if float(pol.get("f_default", 0)) > 0:
         # the default-sampled share (D178): that fraction of the pool is the generator's own unweighted events, read
         # from the MadEvent pools of the lhe entry `default_source` (default_share_momenta); only in the mixture
@@ -3665,8 +3667,80 @@ def _mc_draw(ch, nb, sq, m_finals, y_lo, rng):
     return is_collinear_draw(nb, sq, m_finals, ch[1], y_lo, rng)
 
 
+# pol["flat_grid"] (plan catalog_coverage step 72, after the Markov-chain flat part's NO at step 69; the <= 2x cost bound
+# is that step's design, set after D317 refused the quota sampler's ~100x): the quota sampler's proposal adapted inside
+# each channel, VEGAS-like (results.tex 'Coverage vs. emphasis': adaptive importance sampling guided by |M|^2 toward
+# flat log|M|^2). Each channel's draw reads its uniform random numbers through _GridRng: every rng.random/uniform call
+# whose leading size is the channel's batch is one or more dimensions (call order x column, per draw), each mapped
+# through that channel's grid (a piecewise-linear map of [0, 1) onto itself); other calls pass through. After each
+# round every channel's grid is refitted to the uniform numbers its candidates drew, weighted by the quota weights
+# (flat_quota_weights: deficit over count of the candidate's bin, 0 in a full bin), one factorised density per
+# dimension on flat_grid_bins bins, smoothed over 3 bins and mixed with flat_grid_floor of uniform (no region starves).
+# The flat part keeps unweighted events per bin, so no Jacobian is needed: any map is a valid proposal and a wrong
+# dimension label costs efficiency only. Draws stay independent (no near-copies, unlike the chains of step 69). The
+# constants enter the policy, hence the recipe id (sampling_policy).
+FLAT_GRID_BINS = 100       # bins per dimension of a channel's grid [open]
+FLAT_GRID_FLOOR = 0.2      # share of uniform mixed into every refitted grid [open]
+
+
+class _ChanGrid:
+    """one channel's factorised grid: dimension -> equal-probability edges (K + 1) on [0, 1]"""
+    def __init__(self, K=FLAT_GRID_BINS, floor=FLAT_GRID_FLOOR):
+        self.K, self.floor, self.edges = int(K), float(floor), {}
+
+    def map(self, d, u):
+        e = self.edges.get(d)
+        if e is None:
+            return u
+        x = u * self.K; j = np.minimum(x.astype(np.int64), self.K - 1)
+        return e[j] + (x - j) * (e[j + 1] - e[j])
+
+    def fit(self, Y, w):
+        """Y (n, D) the uniform numbers the channel's candidates drew (NaN where a draw had fewer dimensions), w >= 0"""
+        w = np.asarray(w, float)
+        if not len(w) or w.sum() <= 0:
+            return
+        K = self.K
+        for d in range(Y.shape[1]):
+            y = Y[:, d]; ok = np.isfinite(y) & (w > 0)
+            if not ok.any():
+                continue
+            h = np.bincount(np.minimum((y[ok] * K).astype(np.int64), K - 1), weights=w[ok], minlength=K)
+            h = np.convolve(np.pad(h, 1, mode="edge"), np.ones(3) / 3.0, mode="valid")
+            dens = (1.0 - self.floor) * h / h.sum() + self.floor / K
+            cdf = np.concatenate([[0.0], np.cumsum(dens)]); cdf /= cdf[-1]
+            self.edges[d] = np.interp(np.linspace(0.0, 1.0, K + 1), cdf, np.linspace(0.0, 1.0, K + 1))
+
+
+class _GridRng:
+    """rng proxy for one channel draw of nb events (the block above _ChanGrid); .cols the mapped columns, in order"""
+    def __init__(self, rng, grid, nb):
+        self._rng, self._g, self._nb, self._k, self.cols = rng, grid, int(nb), 0, []
+
+    def __getattr__(self, a):
+        return getattr(self._rng, a)
+
+    def _u(self, shape):
+        u = self._rng.random(shape)
+        if len(shape) == 0 or shape[0] != self._nb or self._nb == 0:
+            return u
+        U = u.reshape(self._nb, -1).copy()
+        for c in range(U.shape[1]):
+            U[:, c] = self._g.map(self._k, U[:, c]); self._k += 1
+        self.cols.append(U)
+        return U.reshape(shape)
+
+    def random(self, size=None):
+        return self._u(() if size is None else tuple(np.atleast_1d(size)))
+
+    def uniform(self, low=0.0, high=1.0, size=None):
+        low, high = np.asarray(low, float), np.asarray(high, float)
+        shape = np.broadcast(low, high).shape if size is None else tuple(np.atleast_1d(size))
+        return low + (high - low) * self._u(shape)
+
+
 def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, shares, y_lo, frac_fwd=0.0,
-                   beam_mass=None):
+                   beam_mass=None, grids=None):
     """_candidates with the finals of each draw from a channel picked with probabilities `shares`; returns
     (events, sqrt(s), channel index per event); cuts by rejection with top-up as _collect_with_cuts"""
     m_finals = np.asarray(m_finals, float); pdg = np.asarray(pdg_ids, int)
@@ -3676,27 +3750,39 @@ def _candidates_mc(nb, sqrts_draw, m_finals, pdg_ids, rng, cuts, channels, share
         beams = _beams(sq, pdg, beam_mass)
         c = rng.choice(len(channels), size=n_draw, p=shares)
         F = np.zeros((n_draw, len(m_finals), 4))
+        ys = [None] * n_draw if grids is not None else None
         for i, ch in enumerate(channels):
             e = c == i
             if e.any():
-                F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng)
+                if grids is None:
+                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, rng)
+                else:    # pol["flat_grid"]: the channel's uniform numbers through its grid, recorded per event
+                    gr = _GridRng(rng, grids[i], int(e.sum()))
+                    F[e] = _mc_draw(ch, int(e.sum()), sq[e], m_finals, y_lo, gr)
+                    Y = np.hstack(gr.cols) if gr.cols else np.zeros((int(e.sum()), 0))
+                    for r, k in enumerate(np.nonzero(e)[0]):
+                        ys[k] = Y[r]
         P = np.concatenate([beams, F], axis=1)
         if frac_fwd > 0:
             r = rng.random(n_draw) < frac_fwd
             if r.any():
                 P[r] = rotate_forward(P[r], float(cuts["cos_max"]), rng, fwd_free_mask(m_finals, pdg, cuts),
                                       cuts.get("fwd_free_floor"))
-        return P, sq, c
-    accP, accS, accC, got, acc = [], [], [], 0, 0.5
+        return P, sq, c, ys
+    accP, accS, accC, accY, got, acc = [], [], [], [], 0, 0.5
     while got < nb:
         need = nb - got
         batch = int(min(max(need / max(acc, 0.03) * 1.3, need), need * 50)) + 32
-        P, sq, c = draw(batch)
+        P, sq, c, ys = draw(batch)
         m = fiducial_pass_mask(P, m_finals, pdg, cuts) if cuts is not None else np.ones(len(P), bool)
         if m.any():
             accP.append(P[m]); accS.append(sq[m]); accC.append(c[m]); got += int(m.sum())
+            if ys is not None:
+                accY += [ys[k] for k in np.nonzero(m)[0]]
         acc = 0.85 * acc + 0.15 * (float(m.mean()) if m.size else acc)
     P, sq, c = np.concatenate(accP)[:nb], np.concatenate(accS)[:nb], np.concatenate(accC)[:nb]
+    if grids is not None:
+        return [(P[i], pdg) for i in range(nb)], sq, c, accY[:nb]
     return [(P[i], pdg) for i in range(nb)], sq, c
 
 
@@ -4062,20 +4148,31 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
                             pol.get("mc_res_params"), bool(pol.get("mc_res2")), bool(pol.get("mc_mperi")),
                             bool(pol.get("mc_mperi_edge")), bool(pol.get("mc_mperi_both")))
         shares = np.full(len(chans), 1.0 / len(chans))
+    grids = ([_ChanGrid(pol.get("flat_grid_bins", FLAT_GRID_BINS), pol.get("flat_grid_floor", FLAT_GRID_FLOOR))
+              for _ in chans] if mc and pol.get("flat_grid") else None)
+    ys_c = []
     tr, itr = (np.log, np.exp) if log_s else ((lambda x: x), (lambda x: x))
     t_lo, t_hi = tr(lo), tr(hi)
     draw_sq = uni
     cand, sq_c, me_c, ch_c, rounds = [], np.zeros(0), np.zeros(0), np.zeros(0, dtype=np.int64), []
+    t_prop = t_lab = 0.0
     while True:
         n = min(n_round, budget - len(cand))
-        if mc:
+        t0 = time.perf_counter()
+        if mc and grids is not None:
+            ev, sq, c, ys = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"],
+                                           fwd_cand, beam_mass, grids=grids)
+            ys_c += ys
+        elif mc:
             ev, sq, c = _candidates_mc(n, draw_sq, m_finals, pdg_ids, rng, cuts, chans, shares, pol["y_lo"], fwd_cand,
                                        beam_mass)
         else:
             ev, sq = _candidates(n, draw_sq, m_finals, pdg_ids, rng, cuts, pol["democratic"], pol["y_lo"], fwd_cand,
                                  beam_mass)
             c = np.zeros(n, dtype=np.int64)
+        t1 = time.perf_counter(); t_prop += t1 - t0
         me = np.asarray(label(ev, sq), float)
+        t_lab += time.perf_counter() - t1
         cand = cand + ev; sq_c = np.concatenate([sq_c, sq]); me_c = np.concatenate([me_c, me])
         ch_c = np.concatenate([ch_c, c])
         with np.errstate(divide="ignore", invalid="ignore"):
@@ -4091,6 +4188,15 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
             wc = np.bincount(ch_c, weights=w, minlength=len(chans))
             wc = wc + MC_FLOOR * max(wc.mean(), 1e-300)
             shares = wc / wc.sum()
+        if grids is not None:     # each channel's grid refitted to its candidates' uniform numbers, quota-weighted
+            for i, g in enumerate(grids):
+                idx = np.nonzero(ch_c == i)[0]
+                if len(idx):
+                    D = max(len(ys_c[k]) for k in idx)
+                    Y = np.full((len(idx), D), np.nan)
+                    for r, k in enumerate(idx):
+                        Y[r, :len(ys_c[k])] = ys_c[k]
+                    g.fit(Y, w[idx])
     keep, take = flat_quota_select(logm, edges, quota, rng)
     short = np.maximum(quota - take, 0)
     # why the rounds stopped: every bin at quota, the budget reached, or no candidate left to steer the proposal by
@@ -4115,7 +4221,8 @@ def _flat_quota_part(n_flat, lo, hi, uni, log_s, m_finals, pdg_ids, rng, cuts, p
                      n_candidates=len(cand), n_labels=len(cand), logm=logm, keep=np.asarray(keep), chan=ch_c,
                      channels=[list(x) for x in chans] if mc else None,
                      kept_P=np.stack([cand[i][0] for i in keep]) if len(keep) else None, kept_sq=sq_c[keep],
-                     kept_chain=np.full(len(keep), -1, np.int64))
+                     kept_chain=np.full(len(keep), -1, np.int64), t_propose=t_prop, t_label=t_lab,
+                     grid_dims=[len(g.edges) for g in grids] if grids is not None else None)
     print(f"  [SAMPLE] mixture: flat-log|M|^2 by quota {len(keep):,} kept from {len(cand):,} candidates in "
           f"{len(rounds)} rounds, {int((short > 0).sum())} of {len(quota)} bins short ({int(short.sum())} events)")
     return [cand[i] for i in keep], sq_c[keep], me_c[keep]
