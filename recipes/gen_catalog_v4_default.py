@@ -97,6 +97,13 @@ def ee_beam_patches(energy, proc_str):
 # keeps that (run size, gridpack, grid_events), its per-energy probe shares, run sizes and gridpack pins (measured at
 # the old energies without spectrum) dropped. No training recipe reads them yet.
 EEA_PREFIX = "eea_"
+# stage 1 of the anchor pools read (tools/lhe_probe.py parts --queue catalog_v4_eea): per eea_<x> pool its yield,
+# the fraction of its events dsh_eea_<x>'s window and cuts keep, per energy (kept_by_energy), and each energy's
+# complete-run share (complete_by_energy). Stage 2 (dsh_eea_) is sized from it (the two-stage design of step 74):
+# accept_margin from the measured kept per energy, complete shares where the eea_ pool ran the same complete-run
+# layout (gridpack runs of the same size), and the plan's probe file (yield x kept per pool, EEA_PROBE).
+EEA_STAGE1 = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_parts_eea_stage1.json")
+EEA_PROBE = os.path.join(ROOT, "analysis", "catalog_v4", "data", "lhe_probe_yields_dsh_eea.json")
 DSHA_PREFIX = "dsh_eea_"
 ANCHOR_ENERGIES = tuple(sorted(EE_ANCHOR))
 # blocks left out of an anchor pool by a decision on its old pool: ee4_epem_cgsxwm's 3 TeV block, whose runs stop
@@ -196,8 +203,9 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
     entries of this run (the old pools whose counterparts these are)."""
     a_lhe = {**ee_lhe, "source": "catalog_v4's parameter card, the e+e- run card with catalog_v4's e+e- acceptance, "
                                  "each collider energy's beam spectrum (lhe.beam_spectrum, EE_ANCHOR)"}
-    eea, dsha = {}, {}
+    eea, dsha, probe = {}, {}, {}
     eea_y = json.load(open(EEA_YIELDS)) if os.path.exists(EEA_YIELDS) else {}
+    s1 = json.load(open(EEA_STAGE1)) if os.path.exists(EEA_STAGE1) else {}
     for n in trees:
         if not is_ee(n):
             continue
@@ -228,7 +236,12 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         name = DSHA_PREFIX + n[len("v4_"):]
         rl = mg.lhe_layout(P[reuse])
         Es = list(P[reuse]["lhe"]["energies"])
-        am = accept_margin(kept, name_old, Es)
+        m1 = s1.get(reuse) or {}
+        if m1.get("kept_by_energy"):        # measured on the eea_ pool's own events, every energy
+            am = accept_margin({name: {"kept": m1["kept"], "by_energy": m1["kept_by_energy"]}}, name, Es)
+            probe[name] = round(float(m1["kept"]) * float(m1["yield"]), 4)
+        else:
+            am = accept_margin(kept, name_old, Es)
         need = {r: int(math.ceil(F_MAX * SIZES[k] * (1.0 + am))) for r, k in (("train", "n_train"), ("val", "n_val"),
                                                                              ("test", "n_test"))}
         new = {r: max(0, need[r] - (rl[r][1] - rl[r][0])) for r in need}
@@ -239,8 +252,13 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
                "n_val": new["val"], "n_test": new["test"], "n_train": new["train"]}
         run_layout(mg, lhe, rate)
         if name_old in complete:
-            lhe = complete_layout(lhe, complete[name_old]["run_events"], name=name,
-                                  **carried_complete(complete[name_old], name_old, Es))
+            cc = carried_complete(complete[name_old], name_old, Es)
+            rr = P[reuse]["lhe"]
+            if (m1.get("complete_by_energy") and rr.get("complete_runs") and rr.get("gridpack")
+                    and cc["gridpack"] and int(rr["run_events"]) == int(complete[name_old]["run_events"])):
+                # the eea_ pool ran this layout (gridpack runs of this size) at every energy: its measured shares
+                cc["shares"] = {k: v["complete"] for k, v in m1["complete_by_energy"].items()}
+            lhe = complete_layout(lhe, complete[name_old]["run_events"], name=name, **cc)
         lhe["parts"] = True
         e = lhe_entry(mg, n, P[n], mg.V4_MODEL, None)
         e.update(lhe=lhe, parent=n, reuse=reuse, split="train", test_group="catalog_v4 default share, e+e- anchor",
@@ -253,6 +271,9 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         while seeds(name) & seeds(reuse):
             lhe["iseed_salt"] = int(lhe.get("iseed_salt", 0)) + 1
             assert lhe["iseed_salt"] < 20, f"{name}: no iseed salt clears {reuse}'s seeds"
+    if s1:
+        with open(EEA_PROBE, "w") as f:      # lhe_parts plan --probe of the dsh_eea_ queue
+            json.dump(dict(sorted(probe.items())), f, indent=1)
     with open(os.path.join(HERE, "catalog_v4_eea_processes.yaml"), "w") as f:
         f.write(HDR)
         yaml.safe_dump({"lhe": a_lhe, "processes": eea}, f, sort_keys=False)
