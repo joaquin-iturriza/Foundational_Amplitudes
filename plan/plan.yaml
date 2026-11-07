@@ -12748,12 +12748,10 @@ entries:
       - 'PASS: straddling bins per Joaquin, then regenerate with R6'
       - 'bgtxwp short at the budget: channels per bin before a budget change'
   owner:
-    agent: af618fc9fa0eb9c9d
-    state: stopped
-    since: '2026-11-07T09:28:49+00:00'
-    state_at: '2026-11-07T10:01:07+00:00'
-    context: 259611
-    context_at: '2026-11-07T09:57:55+00:00'
+    agent: ae4ee7fc35b7e4306
+    state: working
+    since: '2026-11-07T10:26:39+00:00'
+    state_at: '2026-11-07T10:26:39+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
