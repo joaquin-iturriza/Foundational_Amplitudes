@@ -3738,12 +3738,6 @@ entries:
       4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
       (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
       cache key and one GPU job''s key; record each cell''s GPU.'
-    79: '(t) sampler r5 check running: r5 = r3 + flat_empty_near_min (r3''s nearest-candidate steering of an empty quota bin
-      only where its nearest occupied bin holds more candidates than the deficit, r2''s rule otherwise), merged c40ab06d (design
-      PASS, repo-reviewer PASS at d9fb42a2). 38 CPU jobs at CC c40ab06d (scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+grid_r3_budget18+grid_r5_budget18,
-      19 classes x seeds 42/43, --time 00:45:00, --mem 8G, target r5_check 0.2 h). On end: multichannel_check.py step81r5-pull,
-      step81r5 -> data/r5_check.json, step81r5-acted -> data/r5_acted.json (read bgtxwp''s bins_empty_small first: the design
-      reviewer''s caveat that its per-chunk nearest bin may be small in early rounds), figure r2_check_fig.py r5.'
     81: '(l3) het sign head step 80 running: FA-ccin2p3-22bc476d (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch4
       @7fd9221c: the sign branch = a copy of the last 4 of 8 blocks on block 4''s output detached, ++model.net.sign_branch_blocks=4;
       design PASS 2026-11-07, repo-reviewer PASS at 24021256; --time 03:30:00, target 2.9 h, 2.9 GPU-h). On end: het_oneloop.py
@@ -12008,13 +12002,6 @@ entries:
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
-    '79': FA-ccin2p3-0c8b43fc FA-ccin2p3-04dc36dc FA-ccin2p3-5705873a FA-ccin2p3-01c79e51 FA-ccin2p3-bd8a5983 FA-ccin2p3-dcc07b5e
-      FA-ccin2p3-5d00c2ae FA-ccin2p3-bdd729dd FA-ccin2p3-ca8d8d16 FA-ccin2p3-fa6d9387 FA-ccin2p3-711710b4 FA-ccin2p3-8c73b9ce
-      FA-ccin2p3-18cc7d7a FA-ccin2p3-03b5af1d FA-ccin2p3-3aa51292 FA-ccin2p3-c29adbdf FA-ccin2p3-8ba53f32 FA-ccin2p3-08ed51ff
-      FA-ccin2p3-b21c0578 FA-ccin2p3-a0fcf6b3 FA-ccin2p3-d18c340d FA-ccin2p3-716e59e4 FA-ccin2p3-6dad6a37 FA-ccin2p3-389eedd1
-      FA-ccin2p3-7e413ae0 FA-ccin2p3-e3714af5 FA-ccin2p3-6675f944 FA-ccin2p3-ab51aa9c FA-ccin2p3-8367baad FA-ccin2p3-d9cbd256
-      FA-ccin2p3-e910fe6c FA-ccin2p3-91932ec8 FA-ccin2p3-fee922a5 FA-ccin2p3-69405053 FA-ccin2p3-6d180d0c FA-ccin2p3-4c5811a5
-      FA-ccin2p3-caa2785b FA-ccin2p3-5aa89fd6
     '81': FA-ccin2p3-22bc476d
   targets:
   - batch: gridpool_probe
@@ -12667,12 +12654,6 @@ entries:
       if:
       - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
       - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
-    79:
-      feeds: whether the 1301 hadronic classes are regenerated with r5 (_smixv) before step 68
-      if:
-      - 'PASS: straddling bins per Joaquin, then regenerate with R5'
-      - 'bbxuu fixed, bgtxwp < 0.95 with 2-3 stalled chunks: report, next the stall rule for those chunks'
-      - 'bbxuu still short or bgtxwp below r3: read rounds and bins_empty_small per the design''s outcome'
     81:
       feeds: which sign head the het loss carries (D287, D296)
       if:
