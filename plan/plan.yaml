@@ -13813,6 +13813,20 @@ entries:
       9a978af6 bc99d6fe 9a01f0d5 759ae40e d5d68924 4f79ef12 d5f767ad 55eec0ff 7c4df684; target hadronic_regen_g12 0.35 h;
       wait on step 65. 64 GB free at submission, ~43 GB expected. Reviewer note for a SHORT revision: ~493 of the 1301 classes
       have no dsh_ pool, so their widening rule must read none of the events they are scored on.'
+  - at: '2026-11-07T03:53:41+00:00'
+    text: '2026-11-07 ~04:50 CET: a disk-clearing worker deleted two memmap caches on /sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache
+      (27a1422795e9872faa6b9eaf, built by step 70''s prebuild FA-ccin2p3-bf203857; 0c897ca2d81c98d3828e2808, 18.03 GB, 110361200
+      events) under D310, which approved them as idle growth caches before the scaling grid reused the keys. Read at 04:51-04:53
+      CET (site runs, site logs): grid run 34cfff0c COMPLETED before; the other 9 (c53b8e51 ff309c2d 1b1a8f6e b07d6237 4ba33195
+      8a523b67 8b543518 4d6e9b06 a77e20b8) RUNNING, every one opened 0c897ca2 at 00:07 CET (none uses 27a14227; the prebuild''s
+      key differs from the GPU jobs''), last log lines 04:32-04:52 CET with no OSError/ESTALE/Traceback; c53b8e51 already
+      in its sigma stage (constructed dataloaders 04:52 after the deletion). No grid job is queued, so no later start depends
+      on the caches; a running job keeps its open memmap (risk: Isilon NFS may return ESTALE on a page not in the page cache;
+      the jobs prefetched their selection into the page cache at open). Cost so far: none. Rebuild NOT done now: 18 GB per
+      cache against 60 GB free (df 89%) while the hadronic regeneration (32 shards) is writing ~43 GB and stage 2 of the e+e-
+      anchor pools needs ~5 GB; rebuilding both (~36 GB) would fill the disk under the regeneration. A grid job that breaks
+      is restarted after a prebuild of its arm (scripts/job_catalog_v3_short_prebuild.sh <arm>) once the regeneration has
+      finished and freed its share.'
   handoff:
     state: '2026-11-07 ~05:00. Step 65: hadronic regeneration (1301 classes, channel grids at 12 + forward channel, new _smixq
       pools) RUNNING: 32 CC htc shards at ecc78b8b, target hadronic_regen_g12 0.35 h, wait on step 65; design v3 PASS (FILLED
