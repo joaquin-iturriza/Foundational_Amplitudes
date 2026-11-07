@@ -13958,6 +13958,18 @@ entries:
       this owner closed at 258k context. For step 76, a cut-by-cut read of the eea_ parts at 160 GeV needs a small committed
       tool (lhe_probe.accept_of + mg.fiducial_pass_mask with one cut relaxed at a time, plus mixed-pair masses). The 160 GeV
       parts are on CC under queue catalog_v4_eea (do not gc it before this read).'
+  - at: '2026-11-07T04:47:35+00:00'
+    text: '2026-11-07 step 75 profile of the step-65 regeneration (branch regen-rev @7d00f36c: analysis/catalog_v4/regen_profile.py
+      -> data/regen_g12_profile.json; regen_where.py -> data/regen_g12_where.json). COST: the 473 classes over 2x spend label
+      1.42 + proposal 0.67 + rest 0.30 of the old core-s (<= 2x: 1.07/0.16/0.27); 357 of them hit the label budget (11.7 of
+      12 flat labels per flat event); proposal 64.5 us per flat label on 4-final classes (ladder root solves; cut rejection
+      in resonance/splitter channels, 17-28 us per accepted draw); cheap matrix elements show it most; 74 classes stay over
+      2x even at zero proposal. SHORT: short bins 2852 in the top 0.5-dex margin, 729 next 0.5 dex, 414 interior, 76 bottom
+      margin; 232 classes short only above every held-out pp event (45 of 58 such 2->2 bins hold no candidate: bounded |M|^2);
+      295 short inside the held-out extent, where the held-out top events sit at sqrt(s_hat) 1.0-1.9 TeV (vs 230-370 GeV),
+      max |eta| 3.4-4.1, least pT 11-12 GeV, a Z/W pair on shell along the beam; one-parton classes have no ladder. COVERAGE:
+      197 of 213 classes with held-out events outside have the held-out max above the range top (median 0.14 dex, max 1.26):
+      the range from 1.2e4 PP4 events + 0.5 dex is narrower than the 5.4e4 scored events reach.'
   handoff:
     state: '2026-11-07 ~05:20. Step 74: stage 1 (170 eea_ anchor test pools) BUILT (finding 2026-11-07: spectrum in all 1364
       pool-energies, bbxvevex vs probe |z|<=1.74, runs 35.6 core-h, allocation 116 core-h). Stage 2 RUNNING: queue catalog_v4_dsh_eea
