@@ -11548,7 +11548,7 @@ entries:
         on the same harness'
   owner:
     agent: aeac6af2d84588c40
-    state: working
+    state: closed
     since: '2026-11-07T02:28:49+00:00'
     state_at: '2026-11-07T02:28:49+00:00'
     context: 238946
@@ -13479,27 +13479,26 @@ entries:
       Workers 8b458405 8a160e7f e4bc9f56 aa482330 (16 cores, 01:00:00), target eea_stage1_short_fix 0.75 h (30 gridpacks at
       the old e+e- 712-1700 core-s each: 6-14 core-h), wait on step 74.'
   handoff:
-    state: '2026-11-07 ~04:00. Step 72 read: PARTIAL (data/grid_check.json @b3ba8b94, figs/grid_check_a-e): channel grids
-      at 12 labels fill every bin of the 3 QCD classes but leave the 2 electroweak 2->4 classes short in their top 1 dex (udx_csxvevex
-      0.898, uux_epemvevex 0.936 bins >= 0.95), cost 0.9-3.0x (above 2 on us_ddxsu/uu_bbxuu from ladder bisection time). Where-read:
-      short bins = high-energy diboson with the pair along the beam (1-|cos| ~1e-4). E3990 acked. Step 75 (the design''s one
-      revision): forward joint-resonance channel + faster ladder solve, merged 8d1da5d8, 10 CPU jobs on CC on the step-75
-      wait. On its end: multichannel_check.py pull <tag> <class> 42,43 for the 5 classes (tag = current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2f_budget12+grid_both_res2f_budget8),
-      then step75 -> data/grid_fwd_check.json, fig_mcmc_check.py grid_fwd (look once low-res), read quota_chunks'' cand/kept_per_channel_bin
-      for the short bins; verdict by the design''s outcome (YES -> step 65 design with flat_grid + mc_res2_fwd, after putting
-      MC_RES2_FWD_FLOOR/MC_TAIL/MC_LADDER_* into sampling_policy). Step 74 stage 1 (eea_ queue, 16 workers) and steps 64/70
-      on their waits; step 73 waits on Joaquin''s seed answer.'
-    decisions: Step 72 verdict PARTIAL by its rule (fill and cost fail, diversity holds, grids above quota12 on all 2->4).
-      Revision chosen from the where-read (forward diboson corner unreachable by an isotropic pair under a 100-bin grid) rather
-      than 'more bins'; the cost fix (ladder solve) from the COST branch's t_propose reading, equal to rounding so no comparability
-      loss. Design PASS, repo PASS.
-    ruled_out: 'Channel grids alone at 12/8 labels (step 72): electroweak top 1 dex short.'
-    running: 'step 75: FA-ccin2p3-1b60b145 0387052d e9513eb9 f657333a f7d4e8b6 d8e3afc7 d996a248 83d25626 45f39aab 87ac1bbb
-      (CPU); step 74 stage 1 lhe_parts workers (CPU)'
-    files: mg5_pipeline_final.py (resonance2_draw fwd, _forward_dirs, MC_RES2_FWD_FLOOR, multiperipheral_draw solve, FLAT_LAST
-      per-channel bins), analysis/catalog_v4/multichannel_check.py (grid_both_res2f policies, STEP75, step72(tag,...)), analysis/catalog_v4/fig_mcmc_check.py
-      (grid, grid_fwd), data/grid_check.json, data/quota_where/v4_*_grid72.json, tests/test_multichannel.py, tests/test_flat_grid.py
-    written: '2026-11-07T02:25:52+00:00'
+    state: '2026-11-07 ~03:50. Step 74 stage 1: 164/170 eea_ pools assembled; the 5 short at 1500/3000 GeV (MadEvent fail-to-reach-target,
+      pre-existing at high energy, not the spectrum) relaid by eea_short (complete gridpack layouts, merge a48af5bb, layouts
+      2e510905), queue replanned (65 runs + 30 gridpacks), 4 workers on the step-74 wait, target 0.75 h; E3998 E4002 E4005
+      E4007 acked. eea_epem_abbxg run 018 still running on 1a6b665e (layout unchanged). On the wait''s end: lhe_parts status/shares
+      --queue catalog_v4_eea (all 170 assembled, shares ok); if a pool is short again, refresh data/lhe_run_yields_eea.json
+      from yields --by-energy (unassembled pools only) and rerun the generator. Then stage 2: add the eea_ -> dsh_eea_ mapping
+      to lhe_probe parts, write its probe file from stage 1, plan dsh_eea_ (spec catalog_v4_eea_lhe.yaml minus assembled eea;
+      NOTE it lists both stages) with --probe, site pick, target, submit. Step 75: 10 CPU jobs running (read per handoff of
+      04:00). Step 73: implementation (model.net.sign_branch, 47839345) already on trunk and reviewed; design + design-reviewer
+      not done yet; submission waits on Joaquin''s seed answer. Steps 64/70 on their waits.'
+    decisions: 'Short eea pools follow the ee4_ precedent (complete gridpack runs) instead of more runs of the same setup
+      (repo-reviewer FIX: complete_layout refuses a share under 1/2 with more runs). bgtxwp kept as assembled. bbxwpwm''s
+      2 complete 3 TeV runs are remade (index shift), accepted as stated cost.'
+    ruled_out: Adding runs of the same own-integration setup at a 0-of-1 complete energy (refused by the generation rule).
+    running: 'FA-ccin2p3-8b458405 8a160e7f e4bc9f56 aa482330 (eea stage-1 fix workers); 1a6b665e (stage-1 worker, abbxg);
+      step 75: 1b60b145 0387052d e9513eb9 f657333a f7d4e8b6 d8e3afc7 d996a248 83d25626 45f39aab 87ac1bbb'
+    files: recipes/gen_catalog_v4_default.py (eea_short, EEA_YIELDS), tools/lhe_parts.py (_adopt_ee, yields --by-energy, unplan),
+      mg5_pipeline_final.py (lhe_runs/lhe_gridpacks lhe=), analysis/catalog_v4/data/lhe_run_yields_eea.json, recipes/catalog_v4_eea_processes.yaml,
+      tests/test_lhe_parts.py::test_ee_adopt_and_eea_short
+    written: '2026-11-07T02:49:04+00:00'
   ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
     61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
     one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
