@@ -3741,11 +3741,6 @@ entries:
       4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
       (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
       cache key and one GPU job''s key; record each cell''s GPU.'
-    72: '(k) channel-grid flat sampler (step 72, design 2026-11-07, branch flat-grid 08458603): on design-reviewer PASS and
-      repo-reviewer PASS merge flat-grid, sync CC, site pick, plan target grid_check 0.8 h --jobs 10, submit 10 CPU jobs scripts/job_multichannel_check.sh
-      (MCHECK_CLASS/MCHECK_PROBE per class as step 69, MCHECK_SEED 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8;
-      limits uux_epemg 00:20, uux_epemvevex 00:30, uu_bbxuu 01:10, us_ddxsu 01:00, udx_csxvevex 00:30); plan wait; read: multichannel_check.py
-      pull <tag> <class> 42,43 per class, then step72 -> data/grid_check.json; figure: fig_mcmc_check.py extended to grid_check'
     73: '(l) het sign head, next attempt after step 61''s NO (D296: explore it): sign head on a detached copy of the last
       block (its gradient never enters the clipped shared update), one seed (D315) against the weight-1 rerun FA-ccin2p3-ac8d6fca
       and the MSE control at seed 42; implement in a worktree, repo-reviewer, design, design-reviewer, submit. Then, if the
@@ -10934,8 +10929,6 @@ entries:
       with'
     '70': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
-    '72': FA-ccin2p3-0a3c7d19 FA-ccin2p3-d6afbf50 FA-ccin2p3-ab948eed FA-ccin2p3-3f659a1d FA-ccin2p3-e32a6f40 FA-ccin2p3-49c754da
-      FA-ccin2p3-84ca2133 FA-ccin2p3-900855d4 FA-ccin2p3-5a859c8c FA-ccin2p3-2baa0d0b
     '68': 'the adaptive-grid sampler check (step 72) and the 365 GeV rerun of step 71: they choose the e+e- sampler and the
       anchor energies'
     '74': 'FA-ccin2p3-3f52168a FA-ccin2p3-d032fe14 FA-ccin2p3-9bf01318 FA-ccin2p3-6b1e4583 FA-ccin2p3-d331758a FA-ccin2p3-1a6b665e
@@ -11501,13 +11494,6 @@ entries:
       if:
       - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
       - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
-    72:
-      feeds: 'the sampling of step 65''s regeneration (D317: <= 2x the old cost)'
-      if:
-      - 'YES: step 65 design with flat_grid at the lowest passing budget'
-      - 'COST: fix proposal overhead from t_propose, re-run once'
-      - 'PARTIAL: where-read of the short bins, one revision'
-      - 'NO: dead end recorded, then a foam or flow proposal on the same harness'
     73:
       feeds: how the het loss keeps a sign head (D287/D296)
       if:
