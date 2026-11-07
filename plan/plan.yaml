@@ -17552,6 +17552,20 @@ entries:
       seed: seed 42 is the cosine default restart''s favourable seed (C1 R(W/B) per seed differs), so a MATCH near the bar
       is stated as such. A run that blows up is listed apart with where. The recipe then goes to Joaquin with the request
       to lift D307.'
+    passed_at: '2026-11-07T03:03:27+00:00'
+    reviewer: 'Step 15 PASS. One change: v4_het_default25_wsd differs from v4_het_default25 only by training.scheduler=WSD,
+      wsd_cooldown_frac 0.125 (the WSD parent v4_het_control_wsd''s schedule) plus HD4/HD5 reads, so B_wsd is the matched
+      from-scratch control for the WSD warm starts; restart-vs-branch on share 0.50 is a stated whole-recipe comparison against
+      4dc35a98 (same parent, data, steps). Check 2: par:v4_warm_start_fixes shows the probe-MSE read moves with the parent''s
+      schedule, WSD final at default restart over cosine restart PP4 0.759 [0.712,0.811], EE4 0.832 [0.732,0.957], parent
+      val -2.909 vs -2.858; share 0.50/0.25 0.853/0.897 PP4. Check 3: ws_seed_pairs.json widening PP4 0.0505, EE4 0.0809 (largest
+      of any kind, as step 14) against a 1.35 bar and effects of 15-35%; seed 42 only under D315/D319 like its sibling step-14
+      cells, favourable-seed caveat stated. Outcome MATCH/SHORT/INCONCLUSIVE and the 1/1.05-1.05 restart band fixed before
+      the read, coded in mixture_ab.py warm_wsd @809e45c7. Loss HETEROSC, DIM inputs, MUON_BEST HPs as the siblings; reads
+      PP4/EE4 as all prior steps; no sweep; CC /sps/lpnhe 64G free for 2 runs at ~1 GB. Check 5 searched results.tex for WSD,
+      warmup-stable, cooldown, default25_wsd, the entry''s evidence and dead ends (branch-before-cooldown dead end is share
+      0.25; this cell is share 0.50 and stated), decisions D282-D321: no from-scratch C1 run under WSD exists; D282''s ''compare
+      to the pretraining with the new change from scratch'' is answered by B_wsd.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
