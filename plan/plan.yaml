@@ -13551,6 +13551,15 @@ entries:
       + mc_res2_fwd at budget 12, the only setting that fills every bin, after the sampling constants are written into the
       sampling policy (reviewer note of step 75''s merge); its cost estimate from these replay times with the node spread
       stated.'
+  - at: '2026-11-07T03:13:35+00:00'
+    text: '2026-11-07 step 73 design PASS (design reviewer): sign head on its own detached copy of the last block (model.net.sign_branch
+      47839345), arm v4_het_signhead_branch[_seed2-4] of scripts/job_catalog_v3_short.sh, only ++model.net.sign_branch=true
+      differs from the weight-1 rerun''s arm; read by step 61''s rules (het_oneloop.py step73, branch mc-policy b36eaa67:
+      step61 generalised to a run table, reproduces data/het_signhead61.json exactly). Per job: ~3.49 h at short_wall (--time
+      03:30:00), disk ~0.86 GB (129 MB run dir + 727 MB scratch, the rerun''s), 4 jobs fit /sps (64 GB free). Submission waits
+      only on Joaquin''s seed answer (4 seeds ~14 GPU-h at the limit, or 1). Reviewer note for the write-up: a NOT BETTER
+      does not alone rule out gradient competition: with the branch detached, the shared layers learn nothing for the sign,
+      which the MSE control''s do.'
   handoff:
     state: '2026-11-07 ~03:50. Step 74 stage 1: 164/170 eea_ pools assembled; the 5 short at 1500/3000 GeV (MadEvent fail-to-reach-target,
       pre-existing at high energy, not the spectrum) relaid by eea_short (complete gridpack layouts, merge a48af5bb, layouts
