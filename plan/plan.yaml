@@ -12041,6 +12041,22 @@ entries:
       stalled chunks'' extra rounds) and a stall rule kept only where the bin is unreachable by the class''s reach. Any class
       newly short or not bitwise r5 where r5 stopped at quota/budget: a fault, traced in the rounds. Outside > 0 -> outside_dex.
       Job failures -> log read, fixed, rerun.'
+    passed_at: '2026-11-07T09:52:14+00:00'
+    reviewer: 'PASS step 82 r6 (r5 + flat_stall_off, wt-r6 @14b9789b: diff touches only the stall test, the stop label and
+      the _smixw tag; R6 = dict(R5, flat_stall_off=True); r5 control and old sampling in the same job, r5 deterministic so
+      r6 = r5 bitwise wherever r5 stopped at quota or budget). Check 2 reread from the r5 per-job reads: v4_uux_bgtxwp [-1.206,-0.96]
+      r5 stall 14 chunks (5 at 0,0,1,2,3 of ~26) / budget 22 all >=25 at seed 42, stall 20 (5 at 0-3) / budget 16 all >=25
+      at seed 43; r3 stall 9/12 (3 short each), budget 27/24 all >=25; the short stalled chunks sit at missing 51 (this bin
+      + the straddling bin) after 4 rounds of the 6 the budget allows, and 12-18 budget chunks per policy and seed had a stalled
+      round at missing >=45 and then filled the bin, so more rounds do move the measure. Cost reproduced: labels 13.01e6 ->
+      14.75e6 (x1.133; bgtxwp 1.11, ccxh 1.125, bb_bb 1.5, htaptam 1.5, ddx_ttx 2.0), r5 1.594x -> ~1.8x if seconds follow
+      labels (node spread ~5%: r3 1.754 vs 1.843 across jobs). Check 3: deterministic sampler, seeds 42/43 as r1-r5; needed
+      move 0.87 -> 0.95 against a 0.003-0.06 seed spread. Check 5 searched: stall, stall_off, patience, flat_budget, label
+      budget, quota sampler, bgtxwp in docs/results.tex (no hit on the sampler), plan show (r1 introduced the stall stop,
+      r2 patience 2, r1->r2 history cited in the code), site decisions (stall, budget, straddl, per class: none; D269 zero
+      outside, D317 cost). Disk: ~0.45 MB per read, 38 jobs, CC /sps/lpnhe 48G free. Open, not a fail: summed vs per-class
+      2x bar is Joaquin''s pending call (15 class-seeds over 2x under r5; bb_bb/htaptam/ddx_ttx per-class cost rises 1.5-2x
+      labels), and r6 no longer records the stalled flag per round.'''
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
