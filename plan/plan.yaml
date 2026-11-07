@@ -11838,7 +11838,7 @@ entries:
       - 'design FIX: revise once'
   owner:
     agent: a801d6643f39e8b3b
-    state: working
+    state: closed
     since: '2026-11-07T03:15:26+00:00'
     state_at: '2026-11-07T03:42:37+00:00'
     context: 254478
@@ -13814,34 +13814,31 @@ entries:
       wait on step 65. 64 GB free at submission, ~43 GB expected. Reviewer note for a SHORT revision: ~493 of the 1301 classes
       have no dsh_ pool, so their widening rule must read none of the events they are scored on.'
   handoff:
-    state: '2026-11-07 ~05:10. Step 75 read: COST by the fixed rules (grids+forward channel at 12 fill every bin on all 5
-      classes x 2 seeds; cost 0.78-2.11x, only us_ddxsu seed 42 over 2, a slow node: 152 vs 93 us per label for identical
-      labels; grids at 8 leave uu_bbxuu''s top bin at 0.79/0.76); data/grid_fwd_check.json @fd151434, figs/grid_fwd_check_a-e,
-      cost estimate for the 1301 hadronic classes data/sampling_cost_grid12.json @f7dffe8f (old 26.0 core-h, new 32 [28-46]).
-      Step 75 dropped; step 65 rewritten: regeneration with grids at 12 + mc_res2_fwd. Branch mc-policy (worktree worktrees/mc-policy,
-      tip b36eaa67): sampling_policy writes the multichannel/grid constants into the policy (repo-reviewer PASS at c670290c
-      + nit 6a693b0a), lhe_parts unplan keeps claimed processes, het_oneloop step73 reader (b36eaa67, not yet reviewed). Merge
-      blocked: the repo-reviewer (lock held, agent a301374a596719149) will not advance while trunk''s warm_start commit 1e7042dd
-      carries its blocking item (analysis/catalog_v4/mixture_ab.py:1584 parents_val_last uses the last validation, not the
-      best checkpoint) - warm_start owner''s fix; then continue that reviewer (SendMessage) with b36eaa67 and the fix, advance,
-      merge mc-policy, remove worktree with scripts/remove_worktree.sh. Step 65 next: recipe writer for the hadronic tree
-      recipes (default25_train 797 classes, heldout_H*, rest of census 1301) with flat_range + multichannel + mc_res2 + mc_mperi_both
-      + mc_res2_fwd + flat_grid + flat_budget 12 and per-class mc_resonances from CC''s data/diagrams sidecars (152 local)
-      + mc_res_params(physics); then design + design-reviewer + shards. Step 73: design PASS, submit 4 (or 1) jobs of v4_het_signhead_branch
-      on Joaquin''s seed answer (after merging step73 reader); fill STEP73[''branch''] with the runs. Step 74: 169/170 eea
-      pools assembled; eea_epem_bbxwpwm relaid (4 runs at 3000 GeV, 272282a2), worker FA-ccin2p3-20d84aa0 on the step-74 wait
-      (target 0.25 h); then stage 2 (dsh_eea_) per the earlier hand-off. Steps 64/70 on their waits.'
-    decisions: 'Regeneration sampler = grids at 12 + forward joint-resonance channel: the only setting filling every in-range
-      bin on all class-seeds; its one cost excess (2.11x) is node speed (per-label time 1.6x the seed-43 job''s for identical
-      labels), seed-mean cost per class 0.98-1.76x. Constants of the multichannel proposal and the grid smoothing go into
-      the policy (recipe id) with a refusal of differing values. unplan never moves a process with a claimed task.'
-    ruled_out: Grids at 8 for the regeneration (uu_bbxuu top bin 0.79/0.76). The quota sampler at 12 (0.84-0.92 shares) or
-      50 (5-9x).
-    running: FA-ccin2p3-20d84aa0 (eea_epem_bbxwpwm 3000 GeV, step 74 wait); steps 64/70 jobs as recorded
-    files: analysis/catalog_v4/multichannel_check.py (step75), analysis/catalog_v4/fig_mcmc_check.py grid_fwd, analysis/catalog_v4/data/grid_fwd_check.json,
-      analysis/catalog_v4/sampling_cost.py (summary grid12), worktrees/mc-policy (mg5_pipeline_final.py sampling_policy, tests/test_multichannel.py,
-      tools/lhe_parts.py, analysis/catalog_v4/het_oneloop.py), recipes/catalog_v4_eea_processes.yaml, analysis/catalog_v4/data/lhe_run_yields_eea.json
-    written: '2026-11-07T03:13:38+00:00'
+    state: '2026-11-07 ~05:00. Step 65: hadronic regeneration (1301 classes, channel grids at 12 + forward channel, new _smixq
+      pools) RUNNING: 32 CC htc shards at ecc78b8b, target hadronic_regen_g12 0.35 h, wait on step 65; design v3 PASS (FILLED
+      = every bin >= 0.95 quota, 0 held-out pp events outside the range per D269, cost <= 2x per class named). On its end:
+      analysis/catalog_v4/regen_read.py pull/read/fig, verdict by the design. Step 74: stage 1 (170 eea_ anchor test pools)
+      all assembled; lhe_probe parts read (E4034, detached log ~/.local/share/ccorch/detached/*eea_stage1_parts.log) saved
+      as analysis/catalog_v4/data/lhe_parts_eea_stage1.json @committed: 170 pools, 170 assembled, 0 errors, yield min 0.9835
+      median 1.0, core-s per returned event median 0.188 max 2.33. NOT yet checked: spectrum share below 0.99 per pool and
+      energy (kept_by_energy / bbxvevex vs data/ee_anchor_probe.json within +-0.016), cost vs the 42-126 core-h estimate (lhe_rates
+      --prefix eea_). Then stage 2 (115 dsh_eea_ pools, recipes/catalog_v4_eea_default_processes.yaml / catalog_v4_eea_lhe.yaml)
+      planned with lhe_parts plan --probe <stage-1 yields file from lhe_probe kept --yields-out on queue catalog_v4_eea> under
+      the passed two-stage design (2026-11-07T01:52), at the site pick width, target from stage 1''s measured rates, plan
+      target + wait, then ack E4034 if not acked. Step 68 (e+e- in the regeneration) waits on stage 2 (ranges via pp_support.py
+      pull ee + tools/flat_range.py from the anchor pools), then tools/regen_recipes.py readers writes the training/held-out
+      _g12 recipes for both beams. Step 73 waits on Joaquin''s seed answer.'
+    decisions: Regeneration pools get their own path (_smixq) so old reads stay comparable; training/held-out _g12 recipes
+      refused until e+e- regenerated (Joaquin 2026-11-06 on coherent samplers); coverage bar 0 outside (D269), a tolerance
+      only by plan ask; SHORT revision widens from events it is not scored on (classes without dsh_ pools need a rule reading
+      none of their scored events).
+    ruled_out: 'Design v2 of step 65 (bar 2/class, widening from scored events): dead end. Reader copies with mixed samplers.'
+    running: 32 regen shards FA-ccin2p3-926ddf2e..7c4df684 (wait on step 65)
+    files: tools/regen_recipes.py, recipes/catalog_v4_g12_regen.yaml, analysis/catalog_v4/data/regen_g12_inputs.json, analysis/catalog_v4/regen_read.py,
+      datagen.py (_write_flat_fill), mg5_pipeline_final.py (recipe_output_path _smixq), tools/lhe_probe.py (accept_of eea_),
+      analysis/catalog_v4/data/lhe_parts_eea_stage1.json. Worktrees worktrees/mc-policy and worktrees/regen-g12 merged but
+      not removed (remove_worktree.sh refused by the permission classifier).
+    written: '2026-11-07T03:42:57+00:00'
   ask: 'Scope: four seeds or one for the next het sign-head arm, against your D315 (one seed in general). The next try (step
     61 came out NO: up-weighting the sign loss bought an insignificant sign gain, 13.0% -> 8.4% median wrong-sign on the held-out
     one-loop pools, for 13-40% worse magnitude, because the gradient clip binds on 99% of het steps) is a sign head on its
