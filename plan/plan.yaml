@@ -15191,6 +15191,11 @@ entries:
     why: 'WORSE: R(arm/control) PP4 1.438 [1.386,1.505], EE4 1.360 [1.203,1.552]; the shrunk model diverges at the start (grad
       norm 3.0e15, loss above 0 through step 50) and 533 steps do not recover it (mixture_ab.py warm_single @1e7042dd)'
     at: '2026-11-07T02:57:37+00:00'
+  - tried: Branching a WSD-trained parent before its cooldown (step 3731, live weights + optimizer state) instead of restarting
+      its final model (step 14, FA-ccin2p3-1354daee vs 9079718e)
+    why: 'NOT BETTER than the default restart of the same WSD parent''s final model: PP4 1.016 [0.995,1.038], EE4 1.035 [0.948,1.126];
+      the gain of the WSD arms is the WSD parent itself (val -2.909 vs -2.858)'
+    at: '2026-11-07T02:57:40+00:00'
   asks:
   - ask: 'The widened warm-start test (every change tried that allows a warm start, design passed): C2-C8 cost about 95 GPU-h
       beyond the share-0.25 runs (66 GPU-h if the loss and one-loop target changes C7, C8 are not run because their from-scratch
