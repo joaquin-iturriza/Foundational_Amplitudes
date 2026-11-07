@@ -1,0 +1,949 @@
+{
+ "design": "plan catalog_coverage step 80, one seed (D315)",
+ "runs": {
+  "branch4": "FA-ccin2p3-22bc476d",
+  "branch1": "FA-ccin2p3-54961d3e",
+  "shared_weight1": "FA-ccin2p3-ac8d6fca",
+  "mse_hd5_seed42": "FA-ccin2p3-dc9feba1",
+  "mse_h5_seed42": "v4_dimensionless_muon"
+ },
+ "sign": {
+  "H5": {
+   "vs_branch1": {
+    "n": 21,
+    "a_above": 8,
+    "a_below": 13,
+    "ties": 0,
+    "p_a_above": 0.9054,
+    "p_a_below": 0.1917,
+    "p_two_sided": 0.3833,
+    "median_a_pct": 8.1,
+    "median_c_pct": 9.3,
+    "median_ratio_a_over_c": 0.871,
+    "all_positive_median_pct": 12.15,
+    "per_pool_pct": {
+     "v4_bbx_avevex_nlo_20-6000GeV": [
+      26.15,
+      41.6
+     ],
+     "v4_bbx_ccxh_nlo_145-6000GeV": [
+      2.55,
+      2.6
+     ],
+     "v4_bbx_gg_nlo_20-6000GeV": [
+      11.05,
+      19.1
+     ],
+     "v4_bg_ab_nlo_20-6000GeV": [
+      4.5,
+      7.65
+     ],
+     "v4_bg_bgg_nlo_30-6000GeV": [
+      29.25,
+      19.25
+     ],
+     "v4_db_bdz_nlo_112-6000GeV": [
+      1.65,
+      1.6
+     ],
+     "v4_dd_add_nlo_30-6000GeV": [
+      14.35,
+      1.8
+     ],
+     "v4_ddx_aaa_nlo_30-6000GeV": [
+      20.45,
+      10.0
+     ],
+     "v4_ddx_ag_nlo_20-6000GeV": [
+      47.9,
+      35.95
+     ],
+     "v4_ddx_bbxz_qcdborn_nlo_112-6000GeV": [
+      8.1,
+      7.35
+     ],
+     "v4_ddx_epvewm_nlo_92-6000GeV": [
+      5.5,
+      9.3
+     ],
+     "v4_dg_dgz_nlo_112-6000GeV": [
+      7.2,
+      12.3
+     ],
+     "v4_dg_uwm_nlo_92-6000GeV": [
+      0.75,
+      0.05
+     ],
+     "v4_epem_ccxg_nlo_30-6000GeV": [
+      57.4,
+      70.6
+     ],
+     "v4_epem_ddxz_nlo_112-6000GeV": [
+      14.2,
+      12.65
+     ],
+     "v4_gg_bbxg_nlo_30-6000GeV": [
+      19.4,
+      22.65
+     ],
+     "v4_uc_cuz_nlo_112-6000GeV": [
+      1.0,
+      1.2
+     ],
+     "v4_ucx_cxhu_nlo_145-6000GeV": [
+      17.35,
+      20.15
+     ],
+     "v4_udx_agwp_nlo_101-6000GeV": [
+      3.8,
+      4.05
+     ],
+     "v4_udx_ccxwp_nlo_101-6000GeV": [
+      3.95,
+      4.4
+     ],
+     "v4_uux_ccxz_qcdborn_nlo_112-6000GeV": [
+      4.3,
+      7.5
+     ]
+    }
+   },
+   "vs_shared": {
+    "n": 21,
+    "a_above": 9,
+    "a_below": 12,
+    "ties": 0,
+    "p_a_above": 0.8083,
+    "p_a_below": 0.3318,
+    "p_two_sided": 0.6636,
+    "median_a_pct": 8.1,
+    "median_c_pct": 8.6,
+    "median_ratio_a_over_c": 0.942,
+    "all_positive_median_pct": 12.15,
+    "per_pool_pct": {
+     "v4_bbx_avevex_nlo_20-6000GeV": [
+      26.15,
+      63.35
+     ],
+     "v4_bbx_ccxh_nlo_145-6000GeV": [
+      2.55,
+      8.6
+     ],
+     "v4_bbx_gg_nlo_20-6000GeV": [
+      11.05,
+      2.3
+     ],
+     "v4_bg_ab_nlo_20-6000GeV": [
+      4.5,
+      0.9
+     ],
+     "v4_bg_bgg_nlo_30-6000GeV": [
+      29.25,
+      23.25
+     ],
+     "v4_db_bdz_nlo_112-6000GeV": [
+      1.65,
+      1.45
+     ],
+     "v4_dd_add_nlo_30-6000GeV": [
+      14.35,
+      2.15
+     ],
+     "v4_ddx_aaa_nlo_30-6000GeV": [
+      20.45,
+      18.4
+     ],
+     "v4_ddx_ag_nlo_20-6000GeV": [
+      47.9,
+      11.55
+     ],
+     "v4_ddx_bbxz_qcdborn_nlo_112-6000GeV": [
+      8.1,
+      9.45
+     ],
+     "v4_ddx_epvewm_nlo_92-6000GeV": [
+      5.5,
+      1.25
+     ],
+     "v4_dg_dgz_nlo_112-6000GeV": [
+      7.2,
+      14.95
+     ],
+     "v4_dg_uwm_nlo_92-6000GeV": [
+      0.75,
+      1.45
+     ],
+     "v4_epem_ccxg_nlo_30-6000GeV": [
+      57.4,
+      72.35
+     ],
+     "v4_epem_ddxz_nlo_112-6000GeV": [
+      14.2,
+      13.85
+     ],
+     "v4_gg_bbxg_nlo_30-6000GeV": [
+      19.4,
+      22.7
+     ],
+     "v4_uc_cuz_nlo_112-6000GeV": [
+      1.0,
+      1.4
+     ],
+     "v4_ucx_cxhu_nlo_145-6000GeV": [
+      17.35,
+      18.45
+     ],
+     "v4_udx_agwp_nlo_101-6000GeV": [
+      3.8,
+      6.05
+     ],
+     "v4_udx_ccxwp_nlo_101-6000GeV": [
+      3.95,
+      4.2
+     ],
+     "v4_uux_ccxz_qcdborn_nlo_112-6000GeV": [
+      4.3,
+      6.1
+     ]
+    }
+   },
+   "vs_mse": {
+    "n": 21,
+    "a_above": 11,
+    "a_below": 10,
+    "ties": 0,
+    "p_a_above": 0.5,
+    "p_a_below": 0.6682,
+    "p_two_sided": 1.0,
+    "median_a_pct": 8.1,
+    "median_c_pct": 5.6,
+    "median_ratio_a_over_c": 1.446,
+    "all_positive_median_pct": 12.15,
+    "per_pool_pct": {
+     "v4_bbx_avevex_nlo_20-6000GeV": [
+      26.15,
+      19.7
+     ],
+     "v4_bbx_ccxh_nlo_145-6000GeV": [
+      2.55,
+      3.1
+     ],
+     "v4_bbx_gg_nlo_20-6000GeV": [
+      11.05,
+      1.25
+     ],
+     "v4_bg_ab_nlo_20-6000GeV": [
+      4.5,
+      0.95
+     ],
+     "v4_bg_bgg_nlo_30-6000GeV": [
+      29.25,
+      26.55
+     ],
+     "v4_db_bdz_nlo_112-6000GeV": [
+      1.65,
+      1.6
+     ],
+     "v4_dd_add_nlo_30-6000GeV": [
+      14.35,
+      1.55
+     ],
+     "v4_ddx_aaa_nlo_30-6000GeV": [
+      20.45,
+      16.0
+     ],
+     "v4_ddx_ag_nlo_20-6000GeV": [
+      47.9,
+      48.7
+     ],
+     "v4_ddx_bbxz_qcdborn_nlo_112-6000GeV": [
+      8.1,
+      11.3
+     ],
+     "v4_ddx_epvewm_nlo_92-6000GeV": [
+      5.5,
+      5.6
+     ],
+     "v4_dg_dgz_nlo_112-6000GeV": [
+      7.2,
+      5.15
+     ],
+     "v4_dg_uwm_nlo_92-6000GeV": [
+      0.75,
+      0.25
+     ],
+     "v4_epem_ccxg_nlo_30-6000GeV": [
+      57.4,
+      68.45
+     ],
+     "v4_epem_ddxz_nlo_112-6000GeV": [
+      14.2,
+      30.95
+     ],
+     "v4_gg_bbxg_nlo_30-6000GeV": [
+      19.4,
+      15.8
+     ],
+     "v4_uc_cuz_nlo_112-6000GeV": [
+      1.0,
+      1.05
+     ],
+     "v4_ucx_cxhu_nlo_145-6000GeV": [
+      17.35,
+      19.15
+     ],
+     "v4_udx_agwp_nlo_101-6000GeV": [
+      3.8,
+      3.25
+     ],
+     "v4_udx_ccxwp_nlo_101-6000GeV": [
+      3.95,
+      4.1
+     ],
+     "v4_uux_ccxz_qcdborn_nlo_112-6000GeV": [
+      4.3,
+      9.25
+     ]
+    }
+   }
+  },
+  "HD5": {
+   "vs_branch1": {
+    "n": 19,
+    "a_above": 11,
+    "a_below": 6,
+    "ties": 2,
+    "p_a_above": 0.1662,
+    "p_a_below": 0.9283,
+    "p_two_sided": 0.3323,
+    "median_a_pct": 14.05,
+    "median_c_pct": 14.85,
+    "median_ratio_a_over_c": 0.946,
+    "all_positive_median_pct": 30.3,
+    "per_pool_pct": {
+     "hd_bbx_ccxh_nlo": [
+      8.7,
+      7.95
+     ],
+     "hd_bbx_gg_nlo": [
+      11.95,
+      15.8
+     ],
+     "hd_bg_ab_nlo": [
+      1.55,
+      9.65
+     ],
+     "hd_bg_bgg_nlo": [
+      36.25,
+      22.55
+     ],
+     "hd_db_bdz_nlo": [
+      0.1,
+      0.1
+     ],
+     "hd_dd_add_nlo": [
+      57.0,
+      1.05
+     ],
+     "hd_ddx_aaa_nlo": [
+      30.35,
+      16.4
+     ],
+     "hd_ddx_ag_nlo": [
+      44.15,
+      32.3
+     ],
+     "hd_ddx_bbxz_qcdborn_nlo": [
+      64.15,
+      45.5
+     ],
+     "hd_dg_dgz_nlo": [
+      15.8,
+      19.3
+     ],
+     "hd_dg_uwm_nlo": [
+      11.7,
+      5.05
+     ],
+     "hd_epem_ccxg_nlo": [
+      14.2,
+      14.85
+     ],
+     "hd_epem_ddxz_nlo": [
+      19.95,
+      22.25
+     ],
+     "hd_gg_bbxg_nlo": [
+      14.05,
+      16.85
+     ],
+     "hd_uc_cuz_nlo": [
+      0.15,
+      0.15
+     ],
+     "hd_ucx_cxhu_nlo": [
+      0.4,
+      0.1
+     ],
+     "hd_udx_agwp_nlo": [
+      10.8,
+      6.25
+     ],
+     "hd_udx_ccxwp_nlo": [
+      8.95,
+      8.2
+     ],
+     "hd_uux_ccxz_qcdborn_nlo": [
+      45.85,
+      24.6
+     ]
+    }
+   },
+   "vs_shared": {
+    "n": 19,
+    "a_above": 8,
+    "a_below": 11,
+    "ties": 0,
+    "p_a_above": 0.8204,
+    "p_a_below": 0.3238,
+    "p_two_sided": 0.6476,
+    "median_a_pct": 14.05,
+    "median_c_pct": 16.2,
+    "median_ratio_a_over_c": 0.867,
+    "all_positive_median_pct": 30.3,
+    "per_pool_pct": {
+     "hd_bbx_ccxh_nlo": [
+      8.7,
+      17.85
+     ],
+     "hd_bbx_gg_nlo": [
+      11.95,
+      5.25
+     ],
+     "hd_bg_ab_nlo": [
+      1.55,
+      1.15
+     ],
+     "hd_bg_bgg_nlo": [
+      36.25,
+      30.5
+     ],
+     "hd_db_bdz_nlo": [
+      0.1,
+      0.15
+     ],
+     "hd_dd_add_nlo": [
+      57.0,
+      0.05
+     ],
+     "hd_ddx_aaa_nlo": [
+      30.35,
+      20.5
+     ],
+     "hd_ddx_ag_nlo": [
+      44.15,
+      8.75
+     ],
+     "hd_ddx_bbxz_qcdborn_nlo": [
+      64.15,
+      65.5
+     ],
+     "hd_dg_dgz_nlo": [
+      15.8,
+      16.2
+     ],
+     "hd_dg_uwm_nlo": [
+      11.7,
+      14.65
+     ],
+     "hd_epem_ccxg_nlo": [
+      14.2,
+      14.9
+     ],
+     "hd_epem_ddxz_nlo": [
+      19.95,
+      17.1
+     ],
+     "hd_gg_bbxg_nlo": [
+      14.05,
+      18.0
+     ],
+     "hd_uc_cuz_nlo": [
+      0.15,
+      0.35
+     ],
+     "hd_ucx_cxhu_nlo": [
+      0.4,
+      0.0
+     ],
+     "hd_udx_agwp_nlo": [
+      10.8,
+      16.35
+     ],
+     "hd_udx_ccxwp_nlo": [
+      8.95,
+      16.8
+     ],
+     "hd_uux_ccxz_qcdborn_nlo": [
+      45.85,
+      54.8
+     ]
+    }
+   },
+   "vs_mse": {
+    "n": 19,
+    "a_above": 11,
+    "a_below": 7,
+    "ties": 1,
+    "p_a_above": 0.2403,
+    "p_a_below": 0.8811,
+    "p_two_sided": 0.4807,
+    "median_a_pct": 14.05,
+    "median_c_pct": 11.15,
+    "median_ratio_a_over_c": 1.26,
+    "all_positive_median_pct": 30.3,
+    "per_pool_pct": {
+     "hd_bbx_ccxh_nlo": [
+      8.7,
+      9.15
+     ],
+     "hd_bbx_gg_nlo": [
+      11.95,
+      2.3
+     ],
+     "hd_bg_ab_nlo": [
+      1.55,
+      0.65
+     ],
+     "hd_bg_bgg_nlo": [
+      36.25,
+      30.85
+     ],
+     "hd_db_bdz_nlo": [
+      0.1,
+      0.05
+     ],
+     "hd_dd_add_nlo": [
+      57.0,
+      0.1
+     ],
+     "hd_ddx_aaa_nlo": [
+      30.35,
+      25.0
+     ],
+     "hd_ddx_ag_nlo": [
+      44.15,
+      46.85
+     ],
+     "hd_ddx_bbxz_qcdborn_nlo": [
+      64.15,
+      68.3
+     ],
+     "hd_dg_dgz_nlo": [
+      15.8,
+      15.75
+     ],
+     "hd_dg_uwm_nlo": [
+      11.7,
+      5.25
+     ],
+     "hd_epem_ccxg_nlo": [
+      14.2,
+      14.55
+     ],
+     "hd_epem_ddxz_nlo": [
+      19.95,
+      21.95
+     ],
+     "hd_gg_bbxg_nlo": [
+      14.05,
+      11.15
+     ],
+     "hd_uc_cuz_nlo": [
+      0.15,
+      0.15
+     ],
+     "hd_ucx_cxhu_nlo": [
+      0.4,
+      0.0
+     ],
+     "hd_udx_agwp_nlo": [
+      10.8,
+      5.9
+     ],
+     "hd_udx_ccxwp_nlo": [
+      8.95,
+      14.15
+     ],
+     "hd_uux_ccxz_qcdborn_nlo": [
+      45.85,
+      59.15
+     ]
+    }
+   }
+  }
+ },
+ "magnitude_vs_branch1": {
+  "HD5": {
+   "R": 1.2589,
+   "n_classes": 28,
+   "boot95": [
+    1.0112,
+    1.3995
+   ],
+   "widened": [
+    1.0112,
+    1.3995
+   ],
+   "frac_classes_below_1": 0.3214,
+   "n_probes": 28
+  },
+  "H5": {
+   "R": 1.0613,
+   "n_classes": 28,
+   "boot95": [
+    0.9749,
+    1.217
+   ],
+   "widened": [
+    0.9749,
+    1.217
+   ],
+   "frac_classes_below_1": 0.3571,
+   "n_probes": 28
+  },
+  "PP4": {
+   "R": 1.0709,
+   "n_classes": 1301,
+   "boot95": [
+    1.0515,
+    1.0865
+   ],
+   "widened": [
+    1.0515,
+    1.0865
+   ],
+   "frac_classes_below_1": 0.3713,
+   "n_probes": 1301
+  },
+  "EE4": {
+   "R": 1.1452,
+   "n_classes": 169,
+   "boot95": [
+    1.083,
+    1.1976
+   ],
+   "widened": [
+    1.083,
+    1.1976
+   ],
+   "frac_classes_below_1": 0.2899,
+   "n_probes": 169
+  },
+  "HD4": {
+   "R": 1.14,
+   "n_classes": 114,
+   "boot95": [
+    1.0482,
+    1.1984
+   ],
+   "widened": [
+    1.0482,
+    1.1984
+   ],
+   "frac_classes_below_1": 0.3246,
+   "n_probes": 114
+  },
+  "H1": {
+   "R": 0.985,
+   "n_classes": 62,
+   "boot95": [
+    0.9289,
+    1.0183
+   ],
+   "widened": [
+    0.9289,
+    1.0183
+   ],
+   "frac_classes_below_1": 0.5806,
+   "n_probes": 62
+  },
+  "H2": {
+   "R": 0.9884,
+   "n_classes": 218,
+   "boot95": [
+    0.9523,
+    1.0285
+   ],
+   "widened": [
+    0.9523,
+    1.0285
+   ],
+   "frac_classes_below_1": 0.5183,
+   "n_probes": 218
+  },
+  "H2p5": {
+   "R": 1.045,
+   "n_classes": 38,
+   "boot95": [
+    1.0079,
+    1.1071
+   ],
+   "widened": [
+    1.0079,
+    1.1071
+   ],
+   "frac_classes_below_1": 0.3158,
+   "n_probes": 38
+  },
+  "H3": {
+   "R": 1.0841,
+   "n_classes": 279,
+   "boot95": [
+    1.0378,
+    1.1149
+   ],
+   "widened": [
+    1.0378,
+    1.1149
+   ],
+   "frac_classes_below_1": 0.362,
+   "n_probes": 279
+  },
+  "H6": {
+   "R": 1.1388,
+   "n_classes": 8,
+   "boot95": [
+    0.8686,
+    1.3158
+   ],
+   "widened": [
+    0.8686,
+    1.3158
+   ],
+   "frac_classes_below_1": 0.375,
+   "n_probes": 8
+  },
+  "H7E": {
+   "R": 1.0323,
+   "n_classes": 34,
+   "boot95": [
+    0.9437,
+    1.1922
+   ],
+   "widened": [
+    0.9437,
+    1.1922
+   ],
+   "frac_classes_below_1": 0.4412,
+   "n_probes": 34
+  },
+  "H7c": {
+   "R": 1.0598,
+   "n_classes": 34,
+   "boot95": [
+    1.0287,
+    1.0929
+   ],
+   "widened": [
+    1.0287,
+    1.0929
+   ],
+   "frac_classes_below_1": 0.2941,
+   "n_probes": 34
+  }
+ },
+ "magnitude_missing": [],
+ "bands": {
+  "HD5": {
+   "seed_medians_pct": {
+    "rerun": [
+     16.2,
+     14.9,
+     14.9,
+     18.65
+    ],
+    "matched_event": [
+     14.9,
+     14.3,
+     13.0,
+     14.0
+    ],
+    "matched_const": [
+     15.3,
+     17.15,
+     16.5,
+     14.95
+    ],
+    "mse": [
+     11.15,
+     12.2,
+     13.95,
+     11.2
+    ]
+   },
+   "sd_ln": 0.086,
+   "band": 1.275,
+   "het_lowest_pct": 13.0,
+   "mse_range_pct": [
+    11.15,
+    13.95
+   ]
+  },
+  "H5": {
+   "seed_medians_pct": {
+    "rerun": [
+     8.6,
+     9.95,
+     6.05,
+     14.05
+    ],
+    "matched_event": [
+     9.15,
+     8.35,
+     7.35,
+     11.3
+    ],
+    "matched_const": [
+     7.9,
+     12.85,
+     9.05,
+     13.55
+    ],
+    "mse": [
+     5.6,
+     8.55,
+     6.9,
+     7.05
+    ]
+   },
+   "sd_ln": 0.2521,
+   "band": 2.04,
+   "het_lowest_pct": 6.05,
+   "mse_range_pct": [
+    5.6,
+    8.55
+   ]
+  }
+ },
+ "ratios": {
+  "H5": {
+   "vs_branch1": 0.871,
+   "vs_shared": 0.942,
+   "vs_mse": 1.446
+  },
+  "HD5": {
+   "vs_branch1": 0.946,
+   "vs_shared": 0.867,
+   "vs_mse": 1.26
+  }
+ },
+ "h5_call": null,
+ "magnitude_outside_band": [
+  "HD5"
+ ],
+ "verdict": "FAULT (magnitude moved: the trunk should be the one-block run's)",
+ "val_sign_accuracy": {
+  "FA-ccin2p3-22bc476d": [
+   0.995
+  ],
+  "FA-ccin2p3-54961d3e": [
+   0.99
+  ]
+ },
+ "grad_norm_main": {
+  "FA-ccin2p3-22bc476d": [
+   27.3,
+   63.6,
+   942000000000000.0,
+   98.5
+  ],
+  "FA-ccin2p3-54961d3e": [
+   28.1,
+   66.9,
+   2850000000000000.0,
+   98.9
+  ]
+ },
+ "blowups": {
+  "rule": "non-finite val_loss_no_reg, or after step 500 (a block shorter than that: after its first validation) above 10x the reference validation; het NLL: above the reference + 0.5 ln 10 = 1.151; blown up when the block's best checkpoint is before that validation, spiked and recovered (listed, not flagged) when it is after",
+  "runs": {
+   "FA-ccin2p3-22bc476d": {
+    "train_run": "FA-ccin2p3-22bc476d",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -0.9296757,
+      "early_max": 0.06878234,
+      "best_step": 4264,
+      "spike_at": 680,
+      "blew_up_at": null,
+      "at_value": 12252130000.0,
+      "max_after_ref": 12252130000.0
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.833444,
+      "early_max": null,
+      "best_step": 100,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.830217
+     }
+    ],
+    "spiked_recovered": [
+     {
+      "block": 0,
+      "step": 680
+     }
+    ],
+    "blew_up": null
+   },
+   "FA-ccin2p3-54961d3e": {
+    "train_run": "FA-ccin2p3-54961d3e",
+    "loss": "HETEROSC",
+    "blocks": [
+     {
+      "ref_step": 510,
+      "ref": -1.02955,
+      "early_max": 1701897.0,
+      "best_step": 4250,
+      "spike_at": 1020,
+      "blew_up_at": null,
+      "at_value": 14418730000.0,
+      "max_after_ref": 14418730000.0
+     },
+     {
+      "ref_step": 10,
+      "ref": -2.863565,
+      "early_max": null,
+      "best_step": 90,
+      "spike_at": null,
+      "blew_up_at": null,
+      "at_value": null,
+      "max_after_ref": -2.854191
+     }
+    ],
+    "spiked_recovered": [
+     {
+      "block": 0,
+      "step": 1020
+     }
+    ],
+    "blew_up": null
+   }
+  },
+  "flagged": [],
+  "spiked_recovered": [
+   "FA-ccin2p3-22bc476d: training run FA-ccin2p3-22bc476d block 0 step 680",
+   "FA-ccin2p3-54961d3e: training run FA-ccin2p3-54961d3e block 0 step 1020"
+  ]
+ },
+ "s_per_iter_main": {
+  "FA-ccin2p3-22bc476d": 1.1312,
+  "FA-ccin2p3-54961d3e": 0.9822
+ },
+ "step_time_ratio": 1.152
+}

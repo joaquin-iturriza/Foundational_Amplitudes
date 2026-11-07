@@ -823,7 +823,10 @@ def step61_fig():
     ps.save(fig, os.path.join(FIGS, "het_signhead61"))
 
 
-def step73_fig():
+def step73_fig(src="het_signhead73.json", runs=("branch", "rerun_seed42"), ref="vs_rerun", mag="magnitude",
+               labels=("detached sign block", "shared trunk"),
+               ratio_label="MSE(detached sign block) / MSE(shared-trunk sign head)", out="het_signhead73",
+               yes_line=False):
     """figs/het_signhead73 (plan step 73, one seed, D315): (a) catalog-sampled one-loop pools (H5) and (b)
     default-sampled one-loop classes (HD5): per pool the wrong-sign share of the sign head on its own detached copy of
     the last block, of the weight-1 sign head (same code, seed 42) and of the MSE-loss control (seed 42), pools sorted
@@ -833,20 +836,22 @@ def step73_fig():
     data/het_signhead73.json and data/reads/<run>_<read>.json."""
     import plot_style as ps
     from mixture_ab import class_of, load as load_read
-    d = json.load(open(os.path.join(DATA, "het_signhead73.json")))
-    arm, rr = d["runs"]["branch"], d["runs"]["rerun_seed42"]
+    d = json.load(open(os.path.join(DATA, src)))
+    arm, rr = d["runs"][runs[0]], d["runs"][runs[1]]
     fig, axs = ps.figure(ncols=2, nrows=2)
     a, b, c, e = axs.ravel()
-    lab = {"arm": "detached sign block", "rr": "shared trunk", "mse": "MSE loss"}
+    lab = {"arm": labels[0], "rr": labels[1], "mse": "MSE loss"}
     for ax, axn in ((a, "H5"), (b, "HD5")):
-        pa = d["sign"][axn]["vs_rerun"]["per_pool_pct"]; pm = d["sign"][axn]["vs_mse"]["per_pool_pct"]
+        pa = d["sign"][axn][ref]["per_pool_pct"]; pm = d["sign"][axn]["vs_mse"]["per_pool_pct"]
         pools = sorted(pm, key=lambda p: pm[p][1])
         x = np.arange(len(pools))
         ax.plot(x, [pm[p][1] for p in pools], "k_", ms=10, label=lab["mse"])
         ax.plot(x, [pa[p][1] for p in pools], "o", color=ps.C.blue, mfc="none", label=lab["rr"])
         ax.plot(x, [pa[p][0] for p in pools], "^", color=ps.C.vermillion, label=lab["arm"])
-        ax.axhline(d["sign"][axn]["vs_rerun"]["all_positive_median_pct"], color="0.6", ls=":",
+        ax.axhline(d["sign"][axn][ref]["all_positive_median_pct"], color="0.6", ls=":",
                    label="all positive")
+        if yes_line and axn == "HD5":
+            ax.axhline(d["bands"]["HD5"]["het_lowest_pct"], color=ps.C.green, ls="--", label="YES below (median)")
         ax.set_yscale("symlog", linthresh=1)
         ax.set_ylim(bottom=0)
         ax.set_xlabel({"H5": "catalog-sampled one-loop pool", "HD5": "default-sampled one-loop class"}[axn])
@@ -856,7 +861,7 @@ def step73_fig():
              "HD4": "held out, default", "H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$",
              "H3": "the top", "H6": r"$\alpha_s=0.13$", "H7E": "energy", "H7c": r"$p_T\geq30$ GeV"}
     cls = class_of()
-    reads = [r for r in SH_AXES if r in d["magnitude"]]
+    reads = [r for r in SH_AXES if r in d[mag]]
     med = {}
     for run in (rr, arm):
         med[run] = []
@@ -871,16 +876,16 @@ def step73_fig():
     c.plot(x + 0.12, med[arm], "^", color=ps.C.vermillion)
     c.set_yscale("log"); c.set_xticks(x); c.set_xticklabels([names[r] for r in reads], rotation=70, fontsize=7)
     c.set_ylabel(r"median class MSE of $\log|M|^2$")
-    R = [d["magnitude"][r]["R"] for r in reads]
-    lo = [d["magnitude"][r]["boot95"][0] for r in reads]; hi = [d["magnitude"][r]["boot95"][1] for r in reads]
+    R = [d[mag][r]["R"] for r in reads]
+    lo = [d[mag][r]["boot95"][0] for r in reads]; hi = [d[mag][r]["boot95"][1] for r in reads]
     e.errorbar(x, R, yerr=[np.subtract(R, lo), np.subtract(hi, R)], fmt="^", color=ps.C.vermillion)
     e.axhline(1.0, color="k", lw=0.8)
     e.axhspan(1 / STEP73_MAG_CALL, STEP73_MAG_CALL, color="0.9", label="15% band")
     e.set_xticks(x); e.set_xticklabels([names[r] for r in reads], rotation=70, fontsize=7)
-    e.set_ylabel("MSE(detached sign block) / MSE(shared-trunk sign head)", fontsize=7)
-    h = a.get_legend_handles_labels()[0] + e.get_legend_handles_labels()[0]
+    e.set_ylabel(ratio_label, fontsize=7)
+    h = b.get_legend_handles_labels()[0] + e.get_legend_handles_labels()[0]
     ps.legend(c, "upper left", handles=h)
-    ps.save(fig, os.path.join(FIGS, "het_signhead73"))
+    ps.save(fig, os.path.join(FIGS, out))
     print(json.dumps({"reads": reads, "median_class_mse_shared": [round(v, 5) for v in med[rr]],
                       "median_class_mse_detached": [round(v, 5) for v in med[arm]]}))
 
@@ -989,6 +994,15 @@ def step80_one():
                       "verdict": out["verdict"], "blowups": out["blowups"]["flagged"]}, indent=0))
 
 
+def step80_fig():
+    """figs/het_signhead80 (plan step 80, one seed): step73_fig's panels for the sign branch of the last 4 blocks
+    against step 73's branch of the last block (data/het_signhead80.json), the YES bar on (b), (d) MSE(4 blocks) /
+    MSE(1 block)."""
+    step73_fig(src="het_signhead80.json", runs=("branch4", "branch1"), ref="vs_branch1", mag="magnitude_vs_branch1",
+               labels=("sign branch, last 4 blocks", "sign branch, last block"),
+               ratio_label="MSE(4-block branch) / MSE(1-block branch)", out="het_signhead80", yes_line=True)
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["magnitude"]:
         magnitude()
@@ -1010,6 +1024,8 @@ if __name__ == "__main__":
         print(json.dumps(step80_bands(), indent=0))
     elif sys.argv[1:] == ["step80_one"]:
         step80_one()
+    elif sys.argv[1:] == ["step80_fig"]:
+        step80_fig()
     elif sys.argv[1:] == ["step73_fig"]:
         step73_fig()
     elif sys.argv[1:] == ["step61_fig"]:
