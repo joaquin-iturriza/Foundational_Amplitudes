@@ -2106,7 +2106,12 @@ def patch_param_card_slha(card_path, patches):
     set of keys that were NOT found."""
     want = {str(k).lower(): float(v) for k, v in patches.items()}
     out, done = [], set()
-    for line in open(card_path):
+    src = open(card_path).readlines()
+    if not src:
+        # a card read empty is never written back (catalog_coverage step 78: two jobs re-patching one standalone's card
+        # at once, one read it while the other had truncated it and wrote it back empty; the driver then threw)
+        raise RuntimeError(f"patch_param_card_slha: {card_path} is empty")
+    for line in src:
         if "#" in line and line.split("#", 1)[0].strip():
             code, comment = line.split("#", 1)
             name = comment.strip().split()[0].lower() if comment.strip() else ""
@@ -2120,8 +2125,11 @@ def patch_param_card_slha(card_path, patches):
                 done.add(name)
                 continue
         out.append(line)
-    with open(card_path, "w") as f:
-        f.writelines(out)
+    if out != src:      # unchanged (the usual re-apply on reuse): not rewritten; changed: replaced atomically, so a
+        tmp = f"{card_path}.tmp{os.getpid()}"     # driver or another job never reads a half-written card
+        with open(tmp, "w") as f:
+            f.writelines(out)
+        os.replace(tmp, card_path)
     missing = set(want) - done
     if missing:
         print(f"  [WARN] patch_param_card_slha: keys not found in {card_path}: {sorted(missing)}")
