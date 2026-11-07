@@ -3761,6 +3761,12 @@ entries:
       / FAULT (magnitude R 4-block/1-block outside 1/1.15..1.15 on any of 12 reads) first; report YES against the 16 het seeds
       and MSE range, not as 4 blocks beating 1 (a 1.14x move is inside the band); record step_time_ratio; figure of per-class
       wrong-sign shares and magnitude MSE beside.'
+    82: '(t2) sampler after r5 (read 2026-11-07, data/r5_check.json, r5_acted.json, figs/r5_check.png): r5 fixed bbxuu (35/36
+      chunks bitwise r2, quota stops 35/36 and 36/36) but bgtxwp [-1.206,-0.96] 0.867/0.870 < r3''s 0.925/0.917 (every chunk
+      met a small empty bin early; 15-16 chunks differ from r3). Design r6: a rule that tells bgtxwp''s early-small near bin
+      (still filling) from bbxuu''s (stays short): read bgtxwp''s and bbxuu''s rounds under r5 and r3 first (bins_empty_small
+      per round, near-bin count against quota, the round where r5 and r3 part), then design-reviewer, 38 CPU check jobs as
+      r5''s (target 0.2 h). Straddling bins wait on Joaquin''s scope answer.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12686,6 +12692,11 @@ entries:
       - 'YES: het control carries the 4-block branch, report to Joaquin'
       - 'NOT RESOLVED: design the trunk-shared sign gradient under its own optimizer moments, cost measured first (bar 2x)'
       - 'NO: read val sign accuracy and per-class shares first'
+    82:
+      feeds: whether the 1301 hadronic classes are regenerated with the sampler before step 68
+      if:
+      - 'r6 passes every non-straddling bin: regenerate per the design'
+      - 'r6 short: rounds read for that bin'
   owner:
     agent: af618fc9fa0eb9c9d
     state: working
