@@ -17551,6 +17551,21 @@ entries:
       with PP4/EE4/HD4/HD5 only): the three started ones failed at once (e1ab6bb9, 732f9787, 56a556f3, events E3916-E3918
       acked), the three chained ones cancelled before start (a2605e80, 92db94f8, 21f645af); all resubmitted at 02:30. About
       15 GPU-h at limits. Reads: mixture_ab.py warm_single (S14 filled @this commit), figure plot_ws_fixes.py.'
+  - at: '2026-11-07T00:46:35+00:00'
+    text: '2026-11-07 ~01:50 CET: step 13''s first pair (FA-ccin2p3-05df656d s42, 07bfc8d7 s43) is not readable: training
+      was clean (OPT_STATE 32 Muon + 92 AdamW; restart jump removed: largest grad norm over steps 0-19 79/79 vs the control''s
+      631/1016, worst training loss over steps 0-39 -2.31/-2.27 vs control -1.55/-1.46 and fresh-optimizer continued -0.32/-0.27;
+      final training loss -2.748/-2.667, as the fresh-optimizer continued arm), but the HETEROSC sigma stage inherited fine_tune.load_optimizer_state,
+      reloaded the run''s own moments and, with zero grads on the frozen mu row, AdamW''s moments moved mu at the stage''s
+      lr 0.01 (sigma-stage first validation 2.3e8, ends -0.96 against the main stage''s -2.7), and promote_final_model replaced
+      the pre-sigma model: R(arm/control) PP4 3.87, EE4 5.57 measure the defect, not the method. The same inheritance re-applied
+      fine_tune.shrink_perturb in step 14''s shrinkperturb sigma stage and in each of its 1367 probe reads (FA-ccin2p3-71852916),
+      and would have made the branch arms'' sigma stage load live weights. Fix b91cf7c6: base_experiment.clear_start_only
+      (shrink_perturb None, start_weights scored, load_optimizer_state False, moment_fill 0) in run.sigma_stage_cfg, tools/zero_shot_parent.py,
+      zero_shot_ft.py, kshot_context.py; tests/test_start_only_keys.py 2 pass (sigma stage clears the keys from a shrink arm
+      and from a live+optstate arm; a struct config without the keys). Synced to CC before step 14''s three chained branch
+      arms started. Reruns under the passed designs (SHORT_TAG=fix1, run dirs <arm>_tagfix1): step 13 FA-ccin2p3-1c90ae73
+      (s42), 013708af (s43); shrinkperturb FA-ccin2p3-0f346464. ws_restart_steps.py @97db372e.'
   step_waits:
     '1': FA-ccin2p3-1c90ae73 FA-ccin2p3-013708af
     '9': FA-ccin2p3-238e6f81 FA-ccin2p3-0f346464 FA-ccin2p3-77e8bf2b FA-ccin2p3-85dd4eff FA-ccin2p3-a79d5b14 FA-ccin2p3-554f3ec5
