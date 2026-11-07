@@ -17458,6 +17458,58 @@ entries:
       perturb, WSD, warmup-stable, stable, cooldown, branch, share 0.50, warm50, exposure, replay, 1-sqrt, Ibrahim, Haegele;
       plan show warm_start; decisions D276-D321. Het loss, DIM inputs, PP4/EE4 test pools, no sweep; disk 6 GB against 72
       GB free on /sps/lpnhe.'
+  - at: '2026-11-07T03:01:55+00:00'
+    question: 'Step 15 (D319, single seed D315): the step-14 warm starts from the WSD-trained parent read BETTER than the
+      cosine parent''s restart mainly because the WSD parent is itself better (its final model at the default restart 0.759/0.832
+      of the control; validation loss at 4264 -2.909 vs -2.858), so the from-scratch reference B (share 0.25, cosine) is no
+      longer matched. Under the WSD schedule throughout, does the warm start at k=533 (1/8 of a pretraining) match the C1
+      change pretrained from scratch with the same WSD schedule? And does the simplest WSD recipe, the WSD parent''s final
+      model at the default restart on share 0.50 (no saved pre-cooldown checkpoint needed), read as the branch on share 0.50?'
+    prior: 'par:v4_warm_start (cosine: default restart k=533 R(W/B) PP4 1.333, EE4 1.513 two seeds, SHORT; MATCH at 1066);
+      par:v4_warm_start_fixes (step 14, seed 42, over the cosine restart: WSD branch share 0.50 0.656/0.694, WSD branch share
+      0.25 0.775/0.853, WSD final default restart 0.759/0.832, share 0.50 k533 0.865/0.812, branch over WSD final restart
+      1.016/1.035; seed-42 R over cosine B for the WSD branch share 0.50 0.815/0.966, biased low since seed 42 is the default
+      restart''s favourable seed); par:v4_warm_start_optstate (dead end); par:v4_warm_start_repairs (ws_c1_k533_mse_wsd_hpo8:
+      WSD for the retraining only, from the cosine parent, not better). No from-scratch run of the C1 change under WSD exists
+      (searched results.tex for WSD, warmup-stable, cooldown, default25_wsd; plan show warm_start; decisions D282-D321).'
+    measure: 'mixture_ab.py warm_wsd (worktree ws-wsd-match @809e45c7, S15 filled at submission) -> data/warm_start_S15.json,
+      seed 42: R(arm/B_wsd) on PP4 and EE4 (deciding), held, HD4, HD5 for the WSD branch share 0.50 (FA-ccin2p3-4dc35a98),
+      the WSD final at the default restart on share 0.50 (new), and beside the WSD branch share 0.25 (1354daee) and WSD final
+      default restart share 0.25 (9079718e); median over classes of the class geometric mean of per-probe MSE ratios (MSE
+      of log|M|^2, each run''s final model after its sigma stage, D276); 95% class bootstrap widened on each side by the largest
+      measured paired seed spread of any kind (data/ws_seed_pairs.json: PP4 0.0505, EE4 0.0809; held/HD the larger), as step
+      14''s WSD arms. Beside: R(B_wsd/B) (the schedule''s gain from scratch, B = FA-ccin2p3-9538e607), R(WSD final share 0.50
+      / WSD branch share 0.50); the blow-up check; validation curves of B_wsd against B and against the WSD parent.'
+    check: 'The read moves with a change of this size on existing runs: step 14''s WSD arms over the cosine restart 0.66-0.85
+      with widened intervals clear of 1, and share 0.50 over 0.25 0.853/0.897 (PP4) per seed. warm_wsd smoke-tested with stand-ins
+      (B_wsd := cosine B 9538e607, wsdfinal_default50 := 9a357af2): it emits per-arm MATCH/SHORT/INCONCLUSIVE, R(B_wsd/B)
+      = 1.000 exactly with the stand-in, restart_over_branch50 and the blow-up block. Arms: bash -n passes; submit_guard.arm_recipe
+      resolves v4_het_default25_wsd to catalog_v4_default25_train.yaml (as v4_het_default25) and v4_het_wsx_wsdfinal_default50
+      to catalog_v4_default50_train.yaml; a stubbed dry run of wsdfinal_default50 resolves parent v4_het_control_wsd model_run0_best,
+      533 steps, recipe default50, optimizer_state 0 (stopped at the data sidecar check, which needs the site''s data).'
+    fixed: 'B_wsd = v4_het_default25_wsd: v4_het_default25''s setup exactly (base hparams MUON_BEST, DIM inputs, het loss,
+      4264 steps, seed 42, share 0.25 recipe, sigma stage) with only the schedule of the WSD parent v4_het_control_wsd (training.scheduler=WSD,
+      wsd_cooldown_frac 0.125, its warmup), reads PP4 EE4 HD4 HD5 and the catalog held-out axes in the same run. wsdfinal_default50
+      = v4_het_wsx_wsdfinal_default with the share-0.50 recipe: the WSD parent''s final EMA model (pre-sigma), the default
+      restart (lr scale 1, re-warm, cosine to ~0, fresh optimizer), 533 steps, sigma stage 250 steps. scripts/job_catalog_v3_short.sh
+      after merging ws-wsd-match, CC-IN2P3, 16G.'
+    control: B_wsd is the matched from-scratch control for every WSD warm start (same schedule as their parent, same data
+      change). For the restart-vs-branch read on share 0.50 the WSD branch on share 0.50 (4dc35a98, same parent, same data).
+      B (cosine, 9538e607) beside for the schedule's own gain.
+    seeds: 'Seed 42 only (D315, D319). 2 runs: B_wsd (work 3.56 h by short_wall incl. margin, limit 03:45) and wsdfinal_default50
+      (2.25 h, limit 02:30). About 5.8 GPU-h at limits, under 30. Wall-time target 3.6 h. Disk about 1 GB per run against
+      the free disk read at submission.'
+    outcome: 'Fixed before the read, rule of par:v4_warm_start on R(arm/B_wsd): MATCH when the widened upper end is at most
+      1.35 on PP4 and EE4; else SHORT when a widened lower end is above 1 on either; else INCONCLUSIVE. YES (the warm start
+      matches from-scratch at 1/8 of a pretraining under WSD) when the WSD branch on share 0.50 or the WSD final at the default
+      restart on share 0.50 is MATCH. Restart as good as branch when R(WSD final share 0.50 / WSD branch share 0.50) is within
+      [1/1.05, 1.05] on both reads: then the recipe is the simpler one (WSD-pretrained parent, default restart from its final
+      model, share 0.50, 533 steps); else the branch. If the share-0.25 WSD arms are MATCH too, the share-0.50 exposure is
+      not needed for the match and is reported as a margin. If neither share-0.50 arm is MATCH: SHORT/INCONCLUSIVE goes to
+      Joaquin with the numbers, and the WSD parent''s gain is reported as a pretraining-schedule finding (R(B_wsd/B)). Single
+      seed: seed 42 is the cosine default restart''s favourable seed (C1 R(W/B) per seed differs), so a MATCH near the bar
+      is stated as such. A run that blows up is listed apart with where. The recipe then goes to Joaquin with the request
+      to lift D307.'
   targets:
   - batch: ws_k_ladder
     wall_h: 2.25
