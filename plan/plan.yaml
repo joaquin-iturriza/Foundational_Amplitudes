@@ -14365,6 +14365,17 @@ entries:
       0.35 h) at CC 79f7d559/e00ab955; the two bbx_htaptam jobs broke on an emptied param card (two jobs re-patching one standalone''s
       card at once; fixed f7dbc021, card restored) and reran at f7dbc021 as 0f133452/ac96f65a. Read: multichannel_check.py
       step75r2-pull then step75r2 -> data/r2_check.json.'
+  - at: '2026-11-07T06:50:43+00:00'
+    text: '2026-11-07 step 76 probes read (tools/lhe_probe.py eeisr-read @68c275df -> analysis/catalog_v4/data/ee_mmin_probe_dsh_eea_epem_{accxh,aepemh}.json;
+      1000 events per energy, mixed-pair cut m > 10 GeV at generation): dsh_eea_epem_accxh keeps 1.0/1.0/1.0/0.999/0.999/0.997/0.997/0.988/0.963
+      at 160/209/240/365/380/500/1000/1500/3000 GeV (was 0.436 at 160 without the cut); aepemh 1.0/1.0/1.0/1.0/1.0/0.998/0.989/0.980/0.904
+      (reruns e22b4949 08ae487a 81113f0a 9cc1284c at 209/1000/1500/3000; was 0.493 at 160); every energy WORKS (beam spectrum
+      as expected), 1000 of 1000 events returned everywhere. Both pools now within the 2x rule (worst 1/0.904 = 1.11). Recipes
+      regenerated (gen_catalog_v4_default.py; margin 0.10, sizes 55001/5500/3500 from 56150/57200 at the old kept), probe
+      yields file worst-energy kept 0.963/0.904; committed 68c275df. lhe_parts plan into catalog_v4_dsh_eea: 2 processes,
+      18 tasks, est 0.3 core-h (measured rates), longest task 0.02 h. 2 workers (site pick: CC, one wave; 16 cores each, --time
+      00:45:00, target mmin_pools 0.1 h): FA-ccin2p3-76d5f550, FA-ccin2p3-1b593ca6 (scripts/job_lhe_parts.sh LHE_QUEUE=catalog_v4_dsh_eea
+      @68c275df); step 76 waits on them. On end: lhe_parts status (assembled 115 of 115), yields --by-energy for short runs.'
   handoff:
     state: '2026-11-07 ~08:00. Step 78 (r2 sampler check): r2 = r1 + flat_keep_ext + flat_stall_patience 2 + flat_budget 18
       merged 56b3c909 (repo + design PASS; cost bar = summed seconds over the 38 jobs <= 2x current, per class listed); 38
