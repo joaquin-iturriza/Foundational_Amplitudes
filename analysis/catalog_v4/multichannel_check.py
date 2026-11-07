@@ -878,6 +878,74 @@ def step72(tag=STEP72_TAG, pols=STEP72, out="grid_check", source="step72"):
     print(source.upper(), res["verdict"], res["passed_at"], res["verdict_by_test"])
 
 
+# plan step 75's revision r1 checked before the catalog (design 2026-11-07): the worst classes of every failure kind of
+# the step-65 regeneration (data/regen_g12_profile.json, regen_where.json) and step 75's two controls, each with its PP4
+# probe (data/pp_support_reads.json)
+R1_CLASSES = {"v4_bbx_aazz": "pp13v4_bbx_aazz", "v4_dbx_hhtxu": "pp13v4_dbx_hhtxu", "v4_ddx_ghwpwm": "pp13_ddx_ghwpwm",
+              "v4_dg_adwpwm": "pp13_dg_adwpwm", "v4_dbx_ahtxu": "pp13v4_dbx_ahtxu", "v4_bb_bbvevex": "pp13v4_bb_bbvevex",
+              "v4_bbx_htaptam": "pp13v4_bbx_htaptam", "v4_udx_vevexwp": "pp13_udx_vevexwp", "v4_bb_bb": "pp13v4_bb_bb",
+              "v4_ddx_ttx": "pp13v4_ddx_ttx", "v4_ddx_btxwpz": "pp13v4_ddx_btxwpz", "v4_ug_auuux": "pp13v4_ug_auuux",
+              "v4_uux_ddxwpwm": "pp13v4_uux_ddxwpwm", "v4_bbx_ccxh": "pp13v4_bbx_ccxh", "v4_udx_cggsx": "pp13_udx_cggsx",
+              "v4_uc_cuvevex": "pp13v4_uc_cuvevex", "v4_us_ddxsu": "pp13v4_us_ddxsu", "v4_uu_bbxuu": "pp13v4_uu_bbxuu"}
+R1_TAG = "current+grid_both_res2f_budget12+grid_r1_budget12"
+R1_FILL = 0.95       # steps 72/75/65's bin bar
+R1_COST = 2.0        # CLAUDE.md: a new method's cost over the one it replaces above 2x is a finding
+
+
+def step75r1():
+    """data/r1_check.json: per class and seed, for r1 (grid_r1_budget12) and the step-65 policy (grid_both_res2f_budget12)
+    in the same job: core fill (the share of quota bins inside [range lo + 0.5 dex, range hi - 0.5 dex], the range
+    source's pp extent, at >= R1_FILL of quota, kept and quota summed over the chunks; each policy against its own
+    range table, tools/flat_range.ranges_dsh for r1, ranges for step 65), the margin bins' fills listed apart, the
+    held-out in-support events outside the kept [min, max] on heldout_r1 (PP4 val + dsh_ val + dsh_ test), the cost
+    (policy seconds / current seconds, same job), the labels and stops; verdict PASS when r1 has core fill 1.0,
+    0 outside and cost <= R1_COST on every class and seed, else the failing kinds"""
+    sys.path.insert(0, ROOT)
+    from tools.flat_range import MARGIN_DEX, ranges, ranges_dsh
+    rg = {"grid_r1_budget12": ranges_dsh(), "grid_both_res2f_budget12": ranges()}
+    L = np.log(10.0)
+    rows, fails = {}, {"core_fill": [], "outside": [], "cost": [], "missing": []}
+    for c in R1_CLASSES:
+        for seed in SEEDS:
+            f = os.path.join(READS, f"{c}_{R1_TAG}_{seed}.json")
+            if not os.path.exists(f):
+                fails["missing"].append(f"{c}/{seed}"); continue
+            runs = json.load(open(f))["runs"]
+            cur = runs.get(f"current_{seed}", {}).get("seconds")
+            for pol in rg:
+                r = runs.get(f"{pol}_{seed}")
+                if r is None:
+                    fails["missing"].append(f"{c}/{pol}/{seed}"); continue
+                qc = r["quota_chunks"]; e = np.asarray(qc[0]["edges_log10"])
+                q = np.sum([x["quota"] for x in qc], 0).astype(float); k = np.sum([x["kept_per_bin"] for x in qc], 0)
+                fill = np.where(q > 0, k / np.maximum(q, 1), 1.0)
+                lo, hi = rg[pol][c][0] / L + MARGIN_DEX, rg[pol][c][1] / L - MARGIN_DEX
+                core = (e[:-1] >= lo - 1e-9) & (e[1:] <= hi + 1e-9) & (q > 0)
+                marg = ~core & (q > 0)
+                out = r["sources"].get("heldout_r1", {}).get("n_in_support_outside_kept")
+                d = {"core_bins": int(core.sum()), "core_fill_share": float((fill[core] >= R1_FILL).mean()) if core.any() else 1.0,
+                     "core_short": [[round(e[i], 3), round(e[i + 1], 3), round(float(fill[i]), 3)] for i in np.nonzero(core & (fill < R1_FILL))[0]],
+                     "margin_fill": [[round(e[i], 3), round(float(fill[i]), 3)] for i in np.nonzero(marg)[0]],
+                     "outside_heldout_r1": out, "outside_by_source": {k2: v.get("n_in_support_outside_kept") for k2, v in r["sources"].items()},
+                     "kept_max": r["kept_max"], "seconds": r["seconds"], "cost_vs_current": r["seconds"] / cur if cur else None,
+                     "labels_flat": r.get("n_labels_flat"), "stops": dict(zip(*np.unique([x["stop"] for x in qc], return_counts=True))) if qc else {}}
+                d["stops"] = {str(a): int(b) for a, b in d["stops"].items()}
+                rows.setdefault(c, {})[f"{pol}_{seed}"] = d
+                if pol == "grid_r1_budget12":
+                    if d["core_fill_share"] < 1.0:
+                        fails["core_fill"].append(f"{c}/{seed}")
+                    if out is None or out > 0:
+                        fails["outside"].append(f"{c}/{seed}")
+                    if d["cost_vs_current"] is None or d["cost_vs_current"] > R1_COST:
+                        fails["cost"].append(f"{c}/{seed}")
+    verdict = ("INCOMPLETE" if fails["missing"] else "PASS" if not any(fails[k] for k in ("core_fill", "outside", "cost"))
+               else "FAIL: " + ", ".join(k for k in ("core_fill", "outside", "cost") if fails[k]))
+    res = {"design": "plan catalog_coverage step 75 revision r1 (design 2026-11-07)", "verdict": verdict, "fails": fails,
+           "classes": rows}
+    json.dump(res, open(os.path.join(DATA, "r1_check.json"), "w"), indent=1)
+    print("STEP75R1", verdict, json.dumps(fails))
+
+
 def pull(policies=None, classes=None, seeds=SEEDS):
     """each class's $SCRATCH/zz_mcheck/<class>.json from CC (analysis/common site_python) -> data/multichannel_check_reads/;
     with `policies` (e.g. "multichannel+quota"), the per-seed files <class>_<policies>_<seed>.json of each seed"""
@@ -908,6 +976,10 @@ if __name__ == "__main__":
         step72()
     elif sys.argv[1] == "step75":
         step72(STEP75_TAG, STEP75, "grid_fwd_check", "step75")
+    elif sys.argv[1] == "step75r1-pull":
+        pull(R1_TAG, R1_CLASSES)
+    elif sys.argv[1] == "step75r1":
+        step75r1()
     elif sys.argv[1] == "summary":
         summary()
     elif sys.argv[1] == "coverage":
