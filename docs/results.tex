@@ -3502,6 +3502,210 @@ a cumulative fraction of classes, each probe the geometric mean of its two seeds
 % allow: 533 42 43 0 40 25 0.5 95 2 because they are the retraining length, the seeds, the plotted window, the median window, the plot's cut, the interval level and the square in |M|^2
 \end{figure}
 
+\paragraph{Continuing the parent's run with its optimizer state (2026-11-07).}\label{par:v4_warm_start_optstate}
+The continued arms of par.~\ref{par:v4_warm_start_valley} met a fresh optimizer at a learning rate well above $0$.
+Does continuing the step-3198 checkpoint with the parent's own optimizer state at that step, so that the run is the
+parent's run continued, read better [D307, D308]? Design (passed round 2 2026-11-06): the step-3198 continued arm of
+par.~\ref{par:v4_warm_start_valley} (lr scale $0.20233$, no re-warm, cosine to $0$ over $533$ steps on the C1 change)
+with \code{fine\_tune.load\_optimizer\_state}, seeds $42$ and $43$ (\code{v4\_het\_ws\_step3198\_continue\_optstate},
+FA-ccin2p3-1c90ae73, FA-ccin2p3-013708af), read against the same control, the fresh-optimizer continued arm and the
+step-3198 default restart, rule and intervals as par.~\ref{par:v4_warm_start_valley}. The first pair
+(FA-ccin2p3-05df656d, FA-ccin2p3-07bfc8d7) is not read: its sigma stage reloaded the run's optimizer state, which
+moved the frozen mean, and replaced the model (fixed in \code{base\_experiment.clear\_start\_only} @b91cf7c6, rerun).
+In the rerun both runs log one optimizer load ($32$ Muon and $92$ AdamW entries), in the main stage only. The
+optimizer state removes the restart jump: $G$ is $79$ and $79$ against the control's $631$ and $1016$, and the worst
+training loss over steps $0$ to $39$ is $-2.307$ and $-2.268$ against the control's $-1.552$ and $-1.458$. It changes
+nothing downstream: $R$ over the fresh-optimizer continued arm is PP4 $1.006$ ($[0.854, 1.184]$), EE4 $1.009$
+($[0.822, 1.240]$), and over the control PP4 $1.148$ ($[0.977, 1.351]$), EE4 $1.240$ ($[1.034, 1.505]$), WORSE
+(fig.~\ref{fig:ws_restart_study_s13}). The outcome is the design's ``WORSE'' branch, recorded as a dead end: the
+restart jump is not what keeps the warm start short at $k=533$, and the continued arms lose by their schedule: the
+same start model at the default restart reads as the control (par.~\ref{par:v4_warm_start_valley}).
+% src: python3 analysis/catalog_v4/mixture_ab.py warm C1r_step3198_continue_optstate @1e7042dd
+% claim: k.533.W_over_fresh_optimizer.PP4.0=1.006
+% claim: k.533.W_over_fresh_optimizer.PP4.1.0=0.854
+% claim: k.533.W_over_fresh_optimizer.PP4.1.1=1.184
+% claim: k.533.W_over_fresh_optimizer.EE4.0=1.009
+% claim: k.533.W_over_fresh_optimizer.EE4.1.0=0.822
+% claim: k.533.W_over_fresh_optimizer.EE4.1.1=1.240
+% claim: k.533.W_over_control.PP4.0=1.148
+% claim: k.533.W_over_control.PP4.1.0=0.977
+% claim: k.533.W_over_control.PP4.1.1=1.351
+% claim: k.533.W_over_control.EE4.0=1.240
+% claim: k.533.W_over_control.EE4.1.0=1.034
+% claim: k.533.W_over_control.EE4.1.1=1.505
+% src: python3 analysis/catalog_v4/plot_ws_restart.py --cached @1e7042dd
+% claim: step3198_continue_optstate_s42.grad_max_0_19=79
+% claim: step3198_continue_optstate_s43.grad_max_0_19=79
+% claim: final_default_s42.grad_max_0_19=631
+% claim: final_default_s43.grad_max_0_19=1016
+% claim: step3198_continue_optstate_s42.loss_max_0_39=-2.307
+% claim: step3198_continue_optstate_s43.loss_max_0_39=-2.268
+% claim: final_default_s42.loss_max_0_39=-1.552
+% claim: final_default_s43.loss_max_0_39=-1.458
+% allow: 0.20233 533 3198 42 43 32 92 0 39 2 b91cf7c6 because they are the design round, the lr scale, k, the checkpoint step, the seeds, the optimizer entries the run's OPT_STATE log line names (32 Muon, 92 AdamW), the loss window and the fix commit
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../analysis/catalog_v4/figs/ws_restart_study_s13.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_restart.py --cached @1e7042dd
+\caption{As fig.~\ref{fig:ws_restart_study}, with the step-3198 model continued with the parent's optimizer state
+added (purple).}
+\label{fig:ws_restart_study_s13}
+% allow: 3198 because it is the checkpoint step
+\end{figure}
+
+\paragraph{Shrink and perturb, a larger default-sampled share, and a parent trained with a warmup-stable-decay schedule (2026-11-07).}\label{par:v4_warm_start_fixes}
+After par.~\ref{par:v4_warm_start_optstate}, three other ways to close the gap at $k=533$ to the C1 change from
+scratch [D319] (default restart $R(W/B)$ PP4 $1.333$, EE4 $1.513$ at two seeds, SHORT of the $1.35$ bar of
+par.~\ref{par:v4_warm_start}): restoring plasticity (shrink and perturb the parent, $p\leftarrow0.4\,p+0.1\,p_0$ with
+$p_0$ a fresh $\mu$P initialisation; Ash and Adams, arXiv:1910.08475); more exposure to the default-sampled events
+(share $0.50$ in the retraining, for $267$ steps, as many default-sampled batches as share $0.25$ over $533$, or for
+$533$); and branching a parent that never decayed (a parent trained with a warmup-stable-decay (WSD) schedule, whose
+$(1-\sqrt{\cdot})$ cooldown is its last $533$ steps, branched at step $3731$ from its live weights and optimizer state
+with the cooldown run on share $0.25$ or $0.50$; Hu et al., arXiv:2404.06395, H\"agele et al., arXiv:2405.18392), with
+the WSD parent's final model at the default restart as the branch's matched control. Design (passed round 2
+2026-11-06): seed $42$ only [D315], every arm read against the same-commit default restart (control
+FA-ccin2p3-238e6f81; the share-$0.50$ run of plan step 7 is older, and the older seed-$42$ restart reads as this control, below) by $R(\text{arm}/\text{control})$ on PP4 and EE4 as par.~\ref{par:v4_warm_start}, on the
+seed-$42$ probes; each interval is the $95\%$ bootstrap over classes, widened on each side by the measured spread
+$|\ln R_{43}-\ln R_{42}|$ of prior two-seed pairs of the arm's kind (\code{data/ws\_seed\_pairs.json}): shrink and
+perturb by the largest same-data pair (PP4 $0.0157$, EE4 $0.0669$), the share arms by the share pair ($0.0505$,
+$0.0809$), the WSD arms by the largest of any kind ($0.0505$, $0.0809$). Runs (\code{scripts/job\_catalog\_v3\_short.sh}
+arms \code{v4\_het\_wsx\_*}, code @74aa4ce6 with the fix @b91cf7c6): shrink and perturb FA-ccin2p3-0f346464, share
+$0.50$ for $267$ steps FA-ccin2p3-77e8bf2b, WSD parent FA-ccin2p3-dccb61e8, WSD branch on share $0.25$
+FA-ccin2p3-1354daee and on $0.50$ FA-ccin2p3-4dc35a98, WSD final at the default restart FA-ccin2p3-9079718e; share
+$0.50$ for $533$ steps is FA-ccin2p3-9a357af2 from plan step 7. Fixed before the read: BETTER when the widened upper end is
+below $1$ on PP4 or EE4 and above $1.05$ on neither, WORSE when a lower end is above $1$, else NOT BETTER;
+MATCH-estimate when $R(\text{arm}/\text{control})\times1.333$ and $\times1.513$ are both at most $1.35$; the BETTER arm
+with MATCH-estimate at the smallest cost is the recipe candidate. Every model is read after its sigma stage (D276);
+the sigma stages load no optimizer state, no live weights and no shrinking (checked in each log).
+The control reproduces the seed-$42$ default restart of plan step 1: PP4 $1.009$ ($[0.988, 1.030]$), EE4 $1.027$ ($[0.948,
+1.115]$). Shrink and perturb is WORSE: PP4 $1.438$ ($[1.386, 1.505]$), EE4 $1.360$ ($[1.203, 1.552]$). It is listed
+apart as a run that diverged at the start: the shrunk model starts at a training loss of $0.872$ (the control
+$-2.682$), its gradient norm reaches $3.0\times10^{15}$ in the first steps and its training loss
+$1.1\times10^{11}$, the loss stays above $0$ through step $50$, and it ends at a validation loss of $-2.222$ (the
+control $-2.659$). Share $0.50$ for $267$ steps is NOT BETTER, PP4 $1.026$ ($[0.968, 1.086]$), EE4 $0.996$ ($[0.894,
+1.099]$), and share $0.50$ for $533$ steps is BETTER, PP4 $0.865$ ($[0.816, 0.922]$), EE4 $0.812$ ($[0.731, 0.899]$),
+MATCH-estimate ($1.153$, $1.228$): the exposure reading is supported, half the retraining at share $0.50$ reads as
+the share-$0.25$ restart. All three WSD arms are BETTER with MATCH-estimate (fig.~\ref{fig:ws_fixes}): the branch on
+share $0.25$ PP4 $0.775$ ($[0.724, 0.826]$), EE4 $0.853$ ($[0.765, 0.970]$); the branch on share $0.50$ PP4 $0.656$
+($[0.616, 0.702]$), EE4 $0.694$ ($[0.615, 0.784]$), estimate $R(\text{arm}/B)$ $0.875$ and $1.050$; the WSD final at
+the default restart PP4 $0.759$ ($[0.712, 0.811]$), EE4 $0.832$ ($[0.732, 0.957]$). None trades the catalog-sampled
+held-out reads ($0.822$, $0.844$, $0.829$). The branch itself adds nothing: over the WSD final at the default restart
+it reads PP4 $1.016$ ($[0.995, 1.038]$), EE4 $1.035$ ($[0.948, 1.126]$), NOT BETTER, though its jump is gone ($G$
+$61$ and $57$ against $181$ for the WSD final's restart and $1023$ for the control's); the branch on share $0.50$
+spiked on one batch at step $31$ (training loss $2.3\times10^{6}$) and recovered, and share $0.50$ for $267$ steps
+spiked in its validation loss at step $10$ and recovered (the validation blow-up check flags no run; it misses the
+shrunk run's divergence because that run starts above its own reference and only falls). What the WSD arms share is their
+parent, and it is a better pretrained model: its validation loss at step $4264$ is $-2.909$ against the cosine
+parent's $-2.858$, and its final model at the default restart reads $0.759$ and $0.832$ of the control, outside the
+$5\%$ band of the design's ``as good a parent'' reading. The
+outcome is the design's ``BETTER arm with MATCH-estimate'' branch, four arms at the same $533$ steps: the candidate is
+the branch on share $0.50$, chosen as the lowest on both reads (a tie-break added after the read: the rule's cost
+does not separate the four), made of two gains that multiply (the WSD parent, about $0.76$ and
+$0.83$; share $0.50$, about $0.87$ and $0.81$). Its MATCH-estimate scales the cosine parent's two-seed $R(W/B)$, and
+its seed-$42$ read over B is PP4 $0.815$, EE4 $0.966$ (biased low: seed $42$ is the default restart's favourable
+seed); but B was pretrained with the cosine schedule, and a parent that
+pretrains better under WSD makes a from-scratch change under WSD likely better as well, so whether the warm start
+matches the change from scratch under the same schedule is not yet read.
+% src: python3 analysis/catalog_v4/mixture_ab.py warm_single @1e7042dd
+% claim: estimate_factor_W533_over_B.PP4=1.333
+% claim: estimate_factor_W533_over_B.EE4=1.513
+% claim: widening_kinds.same.PP4=0.0157
+% claim: widening_kinds.same.EE4=0.0669
+% claim: widening_kinds.data.PP4=0.0505
+% claim: widening_kinds.data.EE4=0.0809
+% claim: widening_kinds.parent.PP4=0.0505
+% claim: widening_kinds.parent.EE4=0.0809
+% claim: arms.control_older.PP4.R=1.009
+% claim: arms.control_older.PP4.widened.0=0.988
+% claim: arms.control_older.PP4.widened.1=1.030
+% claim: arms.control_older.EE4.R=1.027
+% claim: arms.control_older.EE4.widened.0=0.948
+% claim: arms.control_older.EE4.widened.1=1.115
+% claim: arms.shrinkperturb.PP4.R=1.438
+% claim: arms.shrinkperturb.PP4.widened.0=1.386
+% claim: arms.shrinkperturb.PP4.widened.1=1.505
+% claim: arms.shrinkperturb.EE4.R=1.360
+% claim: arms.shrinkperturb.EE4.widened.0=1.203
+% claim: arms.shrinkperturb.EE4.widened.1=1.552
+% claim: arms.share50_k267.PP4.R=1.026
+% claim: arms.share50_k267.PP4.widened.0=0.968
+% claim: arms.share50_k267.PP4.widened.1=1.086
+% claim: arms.share50_k267.EE4.R=0.996
+% claim: arms.share50_k267.EE4.widened.0=0.894
+% claim: arms.share50_k267.EE4.widened.1=1.099
+% claim: arms.share50_k533.PP4.R=0.865
+% claim: arms.share50_k533.PP4.widened.0=0.816
+% claim: arms.share50_k533.PP4.widened.1=0.922
+% claim: arms.share50_k533.EE4.R=0.812
+% claim: arms.share50_k533.EE4.widened.0=0.731
+% claim: arms.share50_k533.EE4.widened.1=0.899
+% claim: arms.share50_k533.PP4.R_over_B_estimate=1.153
+% claim: arms.share50_k533.EE4.R_over_B_estimate=1.228
+% claim: arms.wsdbranch25.PP4.R=0.775
+% claim: arms.wsdbranch25.PP4.widened.0=0.724
+% claim: arms.wsdbranch25.PP4.widened.1=0.826
+% claim: arms.wsdbranch25.EE4.R=0.853
+% claim: arms.wsdbranch25.EE4.widened.0=0.765
+% claim: arms.wsdbranch25.EE4.widened.1=0.970
+% claim: arms.wsdbranch50.PP4.R=0.656
+% claim: arms.wsdbranch50.PP4.widened.0=0.616
+% claim: arms.wsdbranch50.PP4.widened.1=0.702
+% claim: arms.wsdbranch50.EE4.R=0.694
+% claim: arms.wsdbranch50.EE4.widened.0=0.615
+% claim: arms.wsdbranch50.EE4.widened.1=0.784
+% claim: arms.wsdbranch50.PP4.R_over_B_estimate=0.875
+% claim: arms.wsdbranch50.EE4.R_over_B_estimate=1.050
+% claim: arms.wsdbranch50.PP4.R_over_B_seed42=0.815
+% claim: arms.wsdbranch50.EE4.R_over_B_seed42=0.966
+% claim: arms.wsdfinal_default.PP4.R=0.759
+% claim: arms.wsdfinal_default.PP4.widened.0=0.712
+% claim: arms.wsdfinal_default.PP4.widened.1=0.811
+% claim: arms.wsdfinal_default.EE4.R=0.832
+% claim: arms.wsdfinal_default.EE4.widened.0=0.732
+% claim: arms.wsdfinal_default.EE4.widened.1=0.957
+% claim: arms.wsdbranch25.held.R=0.822
+% claim: arms.wsdbranch50.held.R=0.844
+% claim: arms.wsdfinal_default.held.R=0.829
+% claim: readings.branch_over_wsdfinal.PP4.R=1.016
+% claim: readings.branch_over_wsdfinal.PP4.widened.0=0.995
+% claim: readings.branch_over_wsdfinal.PP4.widened.1=1.038
+% claim: readings.branch_over_wsdfinal.EE4.R=1.035
+% claim: readings.branch_over_wsdfinal.EE4.widened.0=0.948
+% claim: readings.branch_over_wsdfinal.EE4.widened.1=1.126
+% claim: parents_val_last.wsd.val=-2.909
+% claim: parents_val_last.cosine.val=-2.858
+% src: python3 analysis/catalog_v4/plot_ws_fixes.py --cached @1e7042dd
+% claim: shrinkperturb.loss_0=0.872
+% claim: control.loss_0=-2.682
+% claim: shrinkperturb.grad_max_0_19=3.0e15
+% claim: shrinkperturb.loss_max_0_39=1.1e11
+% claim: shrinkperturb.val_last=-2.222
+% claim: control.val_last=-2.659
+% claim: wsdbranch25.grad_max_0_19=61
+% claim: wsdbranch50.grad_max_0_19=57
+% claim: wsdfinal_default.grad_max_0_19=181
+% claim: control.grad_max_0_19=1023
+% claim: wsdbranch50.loss_spikes_above_0.0=31
+% claim: wsdbranch50.loss_max_0_39=2.3e6
+% allow: 2 7 10 5 533 0.4 0.1 0 267 0.25 0.50 0.5 3731 1 42 95 43 1.35 1.05 4264 50 0.76 0.83 0.87 0.81 1910.08475 2404.06395 2405.18392 74aa4ce6 b91cf7c6 because they are the design round and the plan step of the share-0.50 run, k, the shrink and perturb factors, the shares and half-length, the branch step, the bars of the rule, the seeds and interval level, the pretraining length, the last step of the shrunk run's loss above 0 (data/ws_fixes_steps.json loss_spikes_above_0), the arXiv ids, the job commits, and the two gains rounded from the WSD final's and share 0.50's R over the control above
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../analysis/catalog_v4/figs/ws_fixes.pdf}
+% src: python3 analysis/catalog_v4/plot_ws_fixes.py --cached @1e7042dd
+\caption{Warm-start mechanisms toward the C1 change at $k=533$, seed $42$, colour per arm. Top left: gradient norm
+before clipping against the restart's step, steps $0$ to $40$. Top right: training loss (het NLL per batch), a running
+median over $25$ steps. Middle left: validation loss of the main stage (het NLL);
+excursions above $0.5$ are cut off. Middle right:
+$R(\text{arm}/\text{control})$, the control the default restart from the cosine parent, on PP4 (circles) and EE4
+(squares); each interval is the $95\%$ bootstrap over classes, widened on each side by the paired seed spread of the
+arm's kind. Bottom: per-class MSE of $\log|M|^2$ on the default-sampled test splits of the pp (PP4) and $e^+e^-$ (EE4)
+probes as a cumulative fraction of classes, with the share-$0.25$ change from scratch (B, seed $42$, dotted).}
+\label{fig:ws_fixes}
+% allow: 533 42 0 40 25 95 2 0.25 0.5 because they are the retraining length, the seed, the plotted window, the median window, the interval level, the square in |M|^2, the share and the plot's cut
+\end{figure}
+
 \paragraph{Warm start for the other changes (2026-11-06).}\label{par:v4_warm_start_changes}
 The question of par.~\ref{par:v4_warm_start} asked of every other change that allows a warm start [D283, D300], with
 C1 (share $0.25$, het loss; YES at $k=1066$) the earlier result each is set against: C2 the default-sampled share
