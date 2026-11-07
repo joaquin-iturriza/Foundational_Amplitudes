@@ -3121,6 +3121,21 @@ def sampling_policy(cfg, role=None):
             pol.setdefault("flat_mcmc_dmin", FLAT_MCMC_DMIN); pol.setdefault("flat_mcmc_thin", FLAT_MCMC_THIN)
         if pol.get("flat_grid"):     # the channel grids' constants, likewise (absent without flat_grid)
             pol.setdefault("flat_grid_bins", FLAT_GRID_BINS); pol.setdefault("flat_grid_floor", FLAT_GRID_FLOOR)
+    if pol.get("multichannel"):
+        # the multichannel proposal's constants enter the policy, hence the recipe id (absent without multichannel,
+        # which no pool built so far sets); the draws read the module constants, so a policy naming another value is
+        # refused rather than silently ignored
+        mc = {"mc_tail": MC_TAIL, "mc_floor": MC_FLOOR, "mc_pt_lo": MC_PT_LO, "mc_eta_max": MC_ETA_MAX,
+              "mc_res_cards": {str(k): list(v) for k, v in sorted(MC_RES.items())}}
+        if pol.get("mc_mperi") or pol.get("mc_mperi_edge") or pol.get("mc_mperi_both"):
+            mc.update(mc_ladder_pt_span=MC_LADDER_PT_SPAN, mc_ladder_span_lo=MC_LADDER_SPAN_LO,
+                      mc_ladder_edge_d=list(MC_LADDER_EDGE_D))
+        if pol.get("mc_res2_fwd"):
+            mc["mc_res2_fwd_floor"] = MC_RES2_FWD_FLOOR
+        for k, v in mc.items():
+            if k in pol and json.dumps(pol[k]) != json.dumps(v):
+                raise ValueError(f"sampling.{k} = {pol[k]!r} differs from the code's {v!r}; the draws read the code's")
+            pol[k] = v
     if float(pol.get("f_default", 0)) > 0:
         # the default-sampled share (D178): that fraction of the pool is the generator's own unweighted events, read
         # from the MadEvent pools of the lhe entry `default_source` (default_share_momenta); only in the mixture
