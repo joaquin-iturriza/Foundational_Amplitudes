@@ -10510,8 +10510,6 @@ entries:
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
     '39': Joaquin's calls on (e) per-commit review of hot-path code and (f) his later idea on knowing a source is current;
       nothing else left in the step
-    '61': FA-ccin2p3-9079850b FA-ccin2p3-ebe4c4ed FA-ccin2p3-297c4366 FA-ccin2p3-dce345d8 FA-ccin2p3-04d27cd1 FA-ccin2p3-14c988b0
-      FA-ccin2p3-45b2d041 FA-ccin2p3-752344ce FA-ccin2p3-83dc9690 FA-ccin2p3-ac8d6fca FA-ccin2p3-b13f456c FA-ccin2p3-e90fea9a
     '37': steps 61 and 64 of this entry (the first memmap GPU batch); the prebuild is chained before that batch
     '64': FA-ccin2p3-34cfff0c FA-ccin2p3-c53b8e51 FA-ccin2p3-ff309c2d FA-ccin2p3-1b1a8f6e FA-ccin2p3-b07d6237 FA-ccin2p3-4ba33195
       FA-ccin2p3-8a523b67 FA-ccin2p3-8b543518 FA-ccin2p3-4d6e9b06 FA-ccin2p3-a77e20b8
