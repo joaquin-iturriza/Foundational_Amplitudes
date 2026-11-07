@@ -10590,6 +10590,30 @@ entries:
       than the rerun): the shared update was not what held the sign back -> gradient share and attachment both ruled out;
       next the clipping regime on the whole het model, then the sign target (sign_near definition). Blow-ups listed apart.
       Cost: 4 jobs x 1 V100 x ~2.6 h = ~10.4 GPU-h of work, 14 at the limits.'
+    fix_at: '2026-11-07T01:27:43+00:00'
+    fix: 'The four-seed design passes every other check (one change: the arm differs from the weight-1 rerun v4_het_control_signhead
+      only by ++model.net.sign_branch=true in job_catalog_v3_short.sh @c4d5a900, the other training-code changes since the
+      rerun''s commit 7b50861c are warm-start options off by default; measure moved on existing data: rerun/MSE H5 1.94x seed-mean,
+      step 56 p 0.0036, magnitude 13% resolved at four seeds; HETEROSC; same reads H5/HD5 as step 61; in memory, no cache;
+      10.4 GPU-h). What fails is the one-seed branch, which is a live option until Joaquin answers (D315). (1) Outcome not
+      stated for one seed (outcome check): the YES/PARTIAL/NO rules are four-seed sign tests on seed means; for seed 42 alone
+      the design says only ''verdict only for effects beyond the per-seed spread (sign gap > 2x, magnitude > 15%)''. Recomputed
+      from reads/<run>_sign.json: per seed the rerun''s H5 median wrong-sign share over the MSE control''s is 1.54 (seed 42,
+      12/9 pools, p 0.33), 1.16, 0.88, 1.99; HD5 1.45 (seed 42, p 0.24), 1.22, 1.07, 1.67. The largest improvement the branch
+      can show is closing that gap, 1.94x seed-mean and 1.54x at seed 42, which is below the stated 2x threshold, so at one
+      seed neither YES nor PARTIAL nor the sign NO is reachable; only a magnitude hurt is. Write the one-seed outcome as its
+      own table: which numbers at seed 42 mean what (likely: sign ''not resolved'' whatever it reads unless the branch is
+      worse than the rerun by more than the 0.63-1.16x same-config spread; magnitude NO when PP4 or EE4 R > 1.15, the per-seed
+      pair range there being 0.85-1.13 / 0.80-1.14; HD4 and H1-H7c need about 1.3, their per-pair R 0.71-1.27), and what each
+      changes for the entry (e.g. not resolved -> seeds 43-45 asked again with the seed-42 numbers). The ''15%'' as written
+      holds for PP4/EE4 only. (2) The question to Joaquin (plan ask 2026-11-07T01:19) must say this plainly, since it is his
+      call: one seed cannot answer the sign question at all here (the gap the branch is meant to close is 1.54x at seed 42,
+      inside the one-seed resolution), it can only catch a magnitude regression; not only ''can only show a sign gap larger
+      than about 2x''. Re-record the design with the one-seed outcome table; the four-seed part needs no change. Searched
+      for repeats: results.tex ''sign branch'', ''sign_branch'', ''detach'', ''attachment'', ''own copy'', ''het ... sign
+      head'', ''wrong-sign'', ''clip per''; plan.yaml and catalog_coverage evidence/dead ends for sign_branch/detach/attach;
+      site decisions (D287, D296, D315): no earlier run of the sign head off the shared trunk; detach_sigma_backbone (results.tex
+      l.10395, 10475) is the sigma analogue and is named in prior.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
