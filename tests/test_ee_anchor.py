@@ -124,7 +124,7 @@ def test_part_energy_ok_with_spectrum():
 
 def test_dsh_eea_sized_from_stage1():
     """Stage 2 (dsh_eea_) is sized from stage 1's read (lhe_parts_eea_stage1.json): every dsh_eea_ pool measured there
-    is in the plan's probe file at its eea_ pool's kept x yield, its margin follows the measured kept per energy, and
+    is in the plan's probe file at its eea_ pool's worst energy's kept x yield, its margin follows the measured kept per energy, and
     a complete-run pool whose eea_ counterpart ran the same layout takes that pool's complete share per energy."""
     import json, math, yaml
     import gen_catalog_v4_default as g
@@ -135,7 +135,8 @@ def test_dsh_eea_sized_from_stage1():
     assert set(probe) == {k for k, e in dsha.items() if s1.get(e["reuse"], {}).get("kept_by_energy")}
     for k, y in probe.items():
         m = s1[dsha[k]["reuse"]]
-        assert y == round(m["kept"] * m["yield"], 4)
+        assert y == round(min(m["kept_by_energy"].values()) * m["yield"], 4)     # the worst energy's
+    assert probe["dsh_eea_epem_accxh"] < 0.5      # 0.436 at 160 GeV: the plan's YIELD_FACTOR check lists it
     hit = 0
     for k, e in dsha.items():
         rr, l, m = eea[e["reuse"]]["lhe"], e["lhe"], s1.get(e["reuse"], {})

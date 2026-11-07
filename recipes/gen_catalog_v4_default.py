@@ -246,7 +246,9 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         m1 = s1.get(reuse) or {}
         if m1.get("kept_by_energy"):        # measured on the eea_ pool's own events, every energy
             am = accept_margin({name: {"kept": m1["kept"], "by_energy": m1["kept_by_energy"]}}, name, Es)
-            probe[name] = round(float(m1["kept"]) * float(m1["yield"]), 4)
+            # the worst energy's, as lhe_probe kept --yields-out gives a gridpack pool's: the plan's check sees the
+            # energy that falls short, not the pool's mean (dsh_eea_epem_accxh: 0.917 on average, 0.436 at 160 GeV)
+            probe[name] = round(min(float(v) for v in m1["kept_by_energy"].values()) * float(m1["yield"]), 4)
         else:
             am = accept_margin(kept, name_old, Es)
         need = {r: int(math.ceil(F_MAX * SIZES[k] * (1.0 + am))) for r, k in (("train", "n_train"), ("val", "n_val"),
