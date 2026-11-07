@@ -15116,19 +15116,24 @@ entries:
     - FA-ccin2p3-07bfc8d7
     - FA-ccin2p3-0898a7b0
     - FA-ccin2p3-0de6be56
+    - FA-ccin2p3-0f346464
+    - FA-ccin2p3-1354daee
     - FA-ccin2p3-159e0244
     - FA-ccin2p3-166c6378
+    - FA-ccin2p3-1e6646e2
     - FA-ccin2p3-1e847591
     - FA-ccin2p3-1ef38bb2
     - FA-ccin2p3-1f7ae4ea
     - FA-ccin2p3-21674d1e
     - FA-ccin2p3-21a18a76
+    - FA-ccin2p3-238e6f81
     - FA-ccin2p3-254abf4f
     - FA-ccin2p3-2a27e8a2
     - FA-ccin2p3-32cb8805
     - FA-ccin2p3-341bf564
     - FA-ccin2p3-343e3d58
     - FA-ccin2p3-380c7b14
+    - FA-ccin2p3-388dcd45
     - FA-ccin2p3-39516188
     - FA-ccin2p3-3c1ea279
     - FA-ccin2p3-410e8632
@@ -15136,6 +15141,7 @@ entries:
     - FA-ccin2p3-43601c0a
     - FA-ccin2p3-4c4a5069
     - FA-ccin2p3-4cb686ac
+    - FA-ccin2p3-4dc35a98
     - FA-ccin2p3-4ebff80f
     - FA-ccin2p3-51a88ce9
     - FA-ccin2p3-56cca07a
@@ -15146,11 +15152,13 @@ entries:
     - FA-ccin2p3-70c28bd9
     - FA-ccin2p3-75d28cb4
     - FA-ccin2p3-773e6a80
+    - FA-ccin2p3-77e8bf2b
     - FA-ccin2p3-78576361
     - FA-ccin2p3-7a40c835
     - FA-ccin2p3-7b2d6c24
     - FA-ccin2p3-89ecbc1e
     - FA-ccin2p3-8e41ac1e
+    - FA-ccin2p3-9079718e
     - FA-ccin2p3-93479cde
     - FA-ccin2p3-9cab9b5b
     - FA-ccin2p3-a6834028
@@ -15170,6 +15178,7 @@ entries:
     - FA-ccin2p3-cf1e0cfc
     - FA-ccin2p3-d38714af
     - FA-ccin2p3-d54c9e94
+    - FA-ccin2p3-dccb61e8
     - FA-ccin2p3-dd010506
     - FA-ccin2p3-dd32a907
     - FA-ccin2p3-e046ac67
@@ -15180,7 +15189,7 @@ entries:
     - FA-ccin2p3-f5245570
     - FA-ccin2p3-f699e170
     - FA-ccin2p3-fbb16a33
-    commit: 96ca381e
+    commit: 3abe9aa7
     paths:
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066
     - analysis/catalog_v3/data/short_reads/v4_mse_cont_k1066_seed2
@@ -15220,6 +15229,7 @@ entries:
     - analysis/catalog_v4/data/warm_start_C1r_step3198_continue.json
     - analysis/catalog_v4/data/warm_start_C1r_step3198_default.json
     - analysis/catalog_v4/data/warm_start_C1t.json
+    - analysis/catalog_v4/data/warm_start_S14.json
     - analysis/catalog_v4/data/ws_hpo8/het_split.json
     - analysis/catalog_v4/data/ws_hpo8/het_split_log.txt.gz
     - analysis/catalog_v4/data/ws_hpo8/trial_curves.json
@@ -15229,6 +15239,7 @@ entries:
     - analysis/catalog_v4/mixture_ab.py
     - analysis/catalog_v4/plot_warm_start.py
     - analysis/catalog_v4/plot_warm_start_compare.py
+    - analysis/catalog_v4/plot_ws_fixes.py
     - analysis/catalog_v4/plot_ws_objective.py
     - analysis/catalog_v4/plot_ws_restart.py
     - analysis/catalog_v4/signext_compare.py
