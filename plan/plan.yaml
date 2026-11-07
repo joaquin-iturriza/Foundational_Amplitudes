@@ -11087,7 +11087,7 @@ entries:
     agent: a8f345d56440782be
     state: working
     since: '2026-11-07T00:12:07+00:00'
-    state_at: '2026-11-07T00:12:07+00:00'
+    state_at: '2026-11-07T00:31:12.141000+00:00'
     context: 197250
     context_at: '2026-11-07T00:30:21+00:00'
   findings:
