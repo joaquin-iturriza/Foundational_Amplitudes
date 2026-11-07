@@ -3741,11 +3741,6 @@ entries:
       4ba33195 8a523b67 8b543518 4d6e9b06 a77e20b8, afterok on the prebuild), wait on step 64; read per the passed design
       (joint 12-cell fit, shared-exponent fit, per-width length fits; reused w8 4x/16x trial_1262); quote the prebuild''s
       cache key and one GPU job''s key; record each cell''s GPU.'
-    71: '(j) e+e- collider anchor (D318), groundwork done (finding 2026-11-07; MG lepton-collider reference arXiv:2108.10261
-      exists, its beamstrahlung grids not yet read from the paper): check the machine documents (LEP, FCC-ee CDR, CEPC CDR,
-      ILC TDR, CLIC staging) for the energies; make the e+e- run card per energy (lpp -3/3, pdlabel ilc500ll / clic3000ll
-      / fcce240ll / fcce365ll where a beamstrahlung grid exists, isronlyll elsewhere) in recipes/gen_catalog_v4_default.py;
-      probe it with tools/lhe_probe.py on one class at each energy under a reviewed design'
     72: '(k) channel-grid flat sampler (step 72, design 2026-11-07, branch flat-grid 08458603): on design-reviewer PASS and
       repo-reviewer PASS merge flat-grid, sync CC, site pick, plan target grid_check 0.8 h --jobs 10, submit 10 CPU jobs scripts/job_multichannel_check.sh
       (MCHECK_CLASS/MCHECK_PROBE per class as step 69, MCHECK_SEED 42/43, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8;
@@ -11071,13 +11066,6 @@ entries:
       if:
       - 'one law fits (joint chi2_red <= 3): candidate on the fitted frontier'
       - 'misfit: per-width or shared-exponent read, candidate from the measured cells'
-    71:
-      feeds: 'step 68: the e+e- classes'' flat range for the regeneration (D318)'
-      if:
-      - 'probe runs and gives events at every energy: regenerate the ee4_/dsh e+e- default pools with ISR+beamstrahlung and
-        re-read the e+e- flat ranges (pp_support.py pull ee, tools/flat_range.py)'
-      - 'the lepton densities fail in our MadEvent setup or an energy lacks a grid: fix the setup or use isronlyll there,
-        recorded as the gap, then the same'
     72:
       feeds: 'the sampling of step 65''s regeneration (D317: <= 2x the old cost)'
       if:
