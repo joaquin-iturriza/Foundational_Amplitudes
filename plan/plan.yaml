@@ -11106,7 +11106,7 @@ entries:
     agent: a8f345d56440782be
     state: stopped
     since: '2026-11-07T00:12:07+00:00'
-    state_at: '2026-11-07T00:40:43+00:00'
+    state_at: '2026-11-07T00:41:17+00:00'
     context: 197250
     context_at: '2026-11-07T00:30:21+00:00'
   findings:
