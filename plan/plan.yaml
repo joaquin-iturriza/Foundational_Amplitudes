@@ -5526,8 +5526,20 @@ entries:
     searched: 'site decisions --project FA (D315 one seed in general), step-73 design: D315 is general and the sign question
       is noisier than its basis'
     blocks: the step-73 sign-head submission
-    blocks_steps: &id001
+    blocks_steps:
     - 73
+  - ask: 'Scope: exempting from the coverage bar the bins that straddle a class''s kinematic edge. On bb_bb (top bin, log10|M|^2
+      8.34-8.59) and uux_bgtxwp (top bin, -0.96 to -0.71) the highest |M|^2 any sampler ever drew sits inside the bin (8.38
+      and -0.94), so only 17% and 9% of the bin''s width is physically reachable and no sampler can fill it to 0.95 of a full-width
+      quota. Exempt such a bin like the bins wholly above the edge already are, or score it with its quota cut to the reachable
+      share of its width? In r1''s 19 test classes this is 2 bins in 2 classes; the r2 check lists every such bin.'
+    at: '2026-11-07T06:30:48+00:00'
+    searched: 'CLAUDE.md, site decisions --project FA (D269 zero outside, D294 uniform over the range, D317 cost), the passed
+      r1/r2 designs: the reach exemption covers bins wholly above the reach only; a wider exemption is Joaquin''s call per
+      those designs'
+    blocks: the verdict on those two bins in the r2 check and the 1301-class regeneration (the r2 jobs run meanwhile)
+    blocks_steps: &id001
+    - 78
   designs:
   - at: '2026-10-29T05:15:16+00:00'
     question: 'Build 13 TeV pp pools that carry catalog_v4''s |M|^2 function, so the pp comparisons (catalog_v4 against the
@@ -14362,12 +14374,16 @@ entries:
       analysis/catalog_v4/data/{lhe_run_yields_dsh_eea,ee_cutread_anchor,r1_check,r1_where}.json; worktrees wt-dsha-relay,
       wt-regen-rev, wt-ee-cutread, wt-ee-mixcut merged but not removed
     written: '2026-11-07T05:52:09+00:00'
-  ask: 'Scope: seeds for the sign-head arm. Four seeds (4 V100 jobs, about 9.3 GPU-h) or one (2.3 GPU-h) for the detached
-    sign-head arm, given that one seed can only show a sign gap larger than about 2x?'
-  waiting_since: '2026-11-07T05:13:54+00:00'
-  searched: 'site decisions --project FA (D315 one seed in general), step-73 design: D315 is general and the sign question
-    is noisier than its basis'
-  blocks: the step-73 sign-head submission
+  ask: 'Scope: exempting from the coverage bar the bins that straddle a class''s kinematic edge. On bb_bb (top bin, log10|M|^2
+    8.34-8.59) and uux_bgtxwp (top bin, -0.96 to -0.71) the highest |M|^2 any sampler ever drew sits inside the bin (8.38
+    and -0.94), so only 17% and 9% of the bin''s width is physically reachable and no sampler can fill it to 0.95 of a full-width
+    quota. Exempt such a bin like the bins wholly above the edge already are, or score it with its quota cut to the reachable
+    share of its width? In r1''s 19 test classes this is 2 bins in 2 classes; the r2 check lists every such bin.'
+  waiting_since: '2026-11-07T06:30:48+00:00'
+  searched: 'CLAUDE.md, site decisions --project FA (D269 zero outside, D294 uniform over the range, D317 cost), the passed
+    r1/r2 designs: the reach exemption covers bins wholly above the reach only; a wider exemption is Joaquin''s call per those
+    designs'
+  blocks: the verdict on those two bins in the r2 check and the 1301-class regeneration (the r2 jobs run meanwhile)
   blocks_steps: *id001
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
