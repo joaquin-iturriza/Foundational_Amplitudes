@@ -11554,6 +11554,7 @@ entries:
       FA-ccin2p3-e91ab729 FA-ccin2p3-f23dcf7e FA-ccin2p3-401f5840 FA-ccin2p3-0767a006 FA-ccin2p3-5ed59529 FA-ccin2p3-00789dbf  FA-ccin2p3-0f133452
       FA-ccin2p3-ac96f65a
     '73': FA-ccin2p3-54961d3e
+    '76': FA-ccin2p3-76d5f550 FA-ccin2p3-1b593ca6
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
