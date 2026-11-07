@@ -1,0 +1,674 @@
+{
+ "source": "tools/lhe_probe.py eeisr-read",
+ "rules": {
+  "bs_min": 0.02,
+  "cost_max": 2.0
+ },
+ "energies": {
+  "91.1876": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 45.5938,
+    "ebeam2": 45.5938
+   },
+   "isr": {
+    "run": "FA-ccin2p3-b947f0b6",
+    "events_returned": 1000,
+    "s_generate": 375.7,
+    "s_per_kept_event": 0.3757,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.9803314040897466,
+     "q10": 0.9950293250705254,
+     "q50": 0.9999831394788177,
+     "below_0.99": 0.045,
+     "below_0.5": 0.0,
+     "min": 0.9361239840496417
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-b947f0b6",
+    "events_returned": 1000,
+    "s_generate": 330.6,
+    "s_per_kept_event": 0.3306,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   }
+  },
+  "160.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 80.0,
+    "ebeam2": 80.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-ef79c5e2",
+    "events_returned": 1000,
+    "s_generate": 75.1,
+    "s_per_kept_event": 0.0751,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.842402661260176,
+     "q10": 0.960973765389094,
+     "q50": 0.9998319840667977,
+     "below_0.99": 0.228,
+     "below_0.5": 0.0,
+     "min": 0.5808613587378112
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-ef79c5e2",
+    "events_returned": 1000,
+    "s_generate": 75.1,
+    "s_per_kept_event": 0.0751,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   }
+  },
+  "209.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 104.5,
+    "ebeam2": 104.5
+   },
+   "isr": {
+    "run": "FA-ccin2p3-f40181a9",
+    "events_returned": 1000,
+    "s_generate": 75.0,
+    "s_per_kept_event": 0.075,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.8848961030530718,
+     "q10": 0.9616829958516565,
+     "q50": 0.999815501744553,
+     "below_0.99": 0.217,
+     "below_0.5": 0.0,
+     "min": 0.7703227188006847
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-f40181a9",
+    "events_returned": 1000,
+    "s_generate": 90.0,
+    "s_per_kept_event": 0.09,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   }
+  },
+  "240.0": {
+   "pdlabel": "fcce240ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "fcce240ll",
+    "ebeam1": 120.0,
+    "ebeam2": 120.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-c2a64023",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0901,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.7899711905116494,
+     "q10": 0.9272027001568439,
+     "q50": 0.9995516945947939,
+     "below_0.99": 0.29,
+     "below_0.5": 0.0,
+     "min": 0.6782795317428025
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "fcce240ll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-c2a64023",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0901,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   },
+   "isronly": {
+    "run": "FA-ccin2p3-c2a64023",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0901,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.8224611986886173,
+     "q10": 0.940477891017396,
+     "q50": 0.9998341221764981,
+     "below_0.99": 0.247,
+     "below_0.5": 0.0,
+     "min": 0.7594367458353591
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "365.0": {
+   "pdlabel": "fcce365ll",
+   "verdict": "NO_BEAMSTRAHLUNG",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "fcce365ll",
+    "ebeam1": 182.5,
+    "ebeam2": 182.5
+   },
+   "isr": {
+    "run": "FA-ccin2p3-22907651",
+    "events_returned": 1000,
+    "s_generate": 105.2,
+    "s_per_kept_event": 0.1053,
+    "kept": 0.999,
+    "below_window": 0.0,
+    "cuts_partonic": 0.001,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.6749667610789416,
+     "q10": 0.9165236406090915,
+     "q50": 0.9991123579766872,
+     "below_0.99": 0.311,
+     "below_0.5": 0.001,
+     "min": 0.38218945508034446
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "fcce365ll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-22907651",
+    "events_returned": 1000,
+    "s_generate": 105.1,
+    "s_per_kept_event": 0.1051,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   },
+   "isronly": {
+    "run": "FA-ccin2p3-22907651",
+    "events_returned": 1000,
+    "s_generate": 105.2,
+    "s_per_kept_event": 0.1053,
+    "kept": 0.999,
+    "below_window": 0.0,
+    "cuts_partonic": 0.001,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.6197687920242301,
+     "q10": 0.9195202316221589,
+     "q50": 0.9997030892575799,
+     "below_0.99": 0.295,
+     "below_0.5": 0.001,
+     "min": 0.4061513741185029
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "380.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 190.0,
+    "ebeam2": 190.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-46cfc529",
+    "events_returned": 1000,
+    "s_generate": 60.0,
+    "s_per_kept_event": 0.0601,
+    "kept": 0.999,
+    "below_window": 0.0,
+    "cuts_partonic": 0.001,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.6469625674997023,
+     "q10": 0.9259699192255396,
+     "q50": 0.9997002916590512,
+     "below_0.99": 0.257,
+     "below_0.5": 0.0,
+     "min": 0.5641891173179433
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-46cfc529",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0901,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   }
+  },
+  "500.0": {
+   "pdlabel": "ilc500ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "ilc500ll",
+    "ebeam1": 250.0,
+    "ebeam2": 250.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-29c4405a",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0901,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.6027304962295754,
+     "q10": 0.8903192293224919,
+     "q50": 0.9940614770572569,
+     "below_0.99": 0.434,
+     "below_0.5": 0.003,
+     "min": 0.44942852364950503
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "ilc500ll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-29c4405a",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0901,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   },
+   "isronly": {
+    "run": "FA-ccin2p3-29c4405a",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0902,
+    "kept": 0.999,
+    "below_window": 0.0,
+    "cuts_partonic": 0.001,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.5804330341001739,
+     "q10": 0.9145808698012905,
+     "q50": 0.9995813311883075,
+     "below_0.99": 0.282,
+     "below_0.5": 0.004,
+     "min": 0.42495681917495337
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  },
+  "1000.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 500.0,
+    "ebeam2": 500.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-32c90fcc",
+    "events_returned": 1000,
+    "s_generate": 75.1,
+    "s_per_kept_event": 0.0751,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.6875113168348125,
+     "q10": 0.9103077806815474,
+     "q50": 0.999579567954959,
+     "below_0.99": 0.277,
+     "below_0.5": 0.004,
+     "min": 0.2575464366051295
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-32c90fcc",
+    "events_returned": 1000,
+    "s_generate": 60.1,
+    "s_per_kept_event": 0.0601,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   }
+  },
+  "1500.0": {
+   "pdlabel": "isronlyll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "isronlyll",
+    "ebeam1": 750.0,
+    "ebeam2": 750.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-d5062c3c",
+    "events_returned": 1000,
+    "s_generate": 90.1,
+    "s_per_kept_event": 0.0902,
+    "kept": 0.999,
+    "below_window": 0.0,
+    "cuts_partonic": 0.001,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.574991280129987,
+     "q10": 0.9013345919410035,
+     "q50": 0.9994176074302397,
+     "below_0.99": 0.295,
+     "below_0.5": 0.008,
+     "min": 0.14185143082991322
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-d5062c3c",
+    "events_returned": 1000,
+    "s_generate": 75.1,
+    "s_per_kept_event": 0.0751,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   }
+  },
+  "3000.0": {
+   "pdlabel": "clic3000ll",
+   "verdict": "WORKS",
+   "expected_beams": {
+    "lpp1": -3,
+    "lpp2": 3,
+    "pdlabel": "clic3000ll",
+    "ebeam1": 1500.0,
+    "ebeam2": 1500.0
+   },
+   "isr": {
+    "run": "FA-ccin2p3-045ca31e",
+    "events_returned": 1000,
+    "s_generate": 135.3,
+    "s_per_kept_event": 0.1358,
+    "kept": 0.996,
+    "below_window": 0.0,
+    "cuts_partonic": 0.004,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.37725393464201523,
+     "q10": 0.8038403276241586,
+     "q50": 0.9957993899912152,
+     "below_0.99": 0.416,
+     "below_0.5": 0.017,
+     "min": 0.22778277583357404
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "clic3000ll"
+    }
+   },
+   "none": {
+    "run": "FA-ccin2p3-045ca31e",
+    "events_returned": 1000,
+    "s_generate": 120.2,
+    "s_per_kept_event": 0.1202,
+    "kept": 1.0,
+    "below_window": 0.0,
+    "cuts_partonic": 0.0,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 1.0,
+     "q10": 1.0,
+     "q50": 1.0,
+     "below_0.99": 0.0,
+     "below_0.5": 0.0,
+     "min": 1.0
+    },
+    "beam_card": {
+     "lpp1": "0",
+     "lpp2": "0",
+     "pdlabel": "none"
+    }
+   },
+   "isronly": {
+    "run": "FA-ccin2p3-045ca31e",
+    "events_returned": 1000,
+    "s_generate": 120.1,
+    "s_per_kept_event": 0.1203,
+    "kept": 0.998,
+    "below_window": 0.0,
+    "cuts_partonic": 0.002,
+    "cuts_lab": 0.0,
+    "shat_frac": {
+     "q01": 0.5731830270097082,
+     "q10": 0.9028017379060101,
+     "q50": 0.9995238975772721,
+     "below_0.99": 0.29,
+     "below_0.5": 0.006,
+     "min": 0.19106879328868615
+    },
+    "beam_card": {
+     "lpp1": "-3",
+     "lpp2": "3",
+     "pdlabel": "isronlyll"
+    }
+   }
+  }
+ },
+ "verdict": [
+  "NO_BEAMSTRAHLUNG"
+ ]
+}
