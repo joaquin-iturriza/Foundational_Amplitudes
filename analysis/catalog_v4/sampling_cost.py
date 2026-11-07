@@ -52,6 +52,8 @@ TEST = ("v4_uux_epemg", "v4_uux_epemvevex", "v4_udx_csxvevex", "v4_us_ddxsu", "v
 EE_PREFIX = "v4_epem_"
 EE_TEST = ("v4_epem_taptamvevex", "v4_epem_bbxvevex", "v4_epem_ahvevex", "v4_epem_vmvmxz")
 EE_FILE = "{c}_current+multichannel+quota_ladder_both_res2+quota_ladder_both_res2_budget750_{s}.json"
+# step 67's e+e- forward check: the forward-free policy beside current and budget 750 in one job
+EE_FILE_67 = "{c}_current+quota_ladder_both_res2_budget750+quota_ladder_both_res2_fwdfree_budget750_{s}.json"
 OUT_EE = os.path.join(DATA, "sampling_cost_ee.json")
 ROLE_SCALE = 1.2          # (1e5 + 1e4 + 1e4) / 1e5: val and test sampled as train
 TIME_RE = re.compile(r"^\[TIME\] (\S+)\s+(train|val|test)\s+chunk\s+(\d+):\s+(\d+) events in\s+([\d.]+)s")
@@ -184,7 +186,9 @@ def fig():
     ps.save(fig, os.path.join(HERE, "figs", "sampling_cost"))
 
 
-def ee():
+def ee(policy=None):
+    """policy: the quota policy timed (default NEW_POLICY); another policy writes OUT_EE with _<policy> before .json"""
+    pol = policy or NEW_POLICY
     gen = json.load(open(GEN))["classes"]
     fr = json.load(open(os.path.join(ROOT, "recipes", "catalog_v4_flat_range.json")))
     names = sorted(c for c in fr if c.startswith(EE_PREFIX))
@@ -192,7 +196,8 @@ def ee():
     old = {c: sum(gen[c][r]["seconds"] for r in gen[c]) for c in names}
     test = {}
     for c in EE_TEST:
-        new, cur = _seconds(c, EE_FILE, NEW_POLICY), _seconds(c, EE_FILE, "current")
+        fn = EE_FILE if pol == NEW_POLICY else EE_FILE_67
+        new, cur = _seconds(c, fn, pol), _seconds(c, fn, "current")
         r = [a / b for a, b in zip(new, cur)]
         test[c] = {"nfinal": nf[c], "old_all_s": round(old[c], 1), "old_train_gen_log_s": gen[c]["train"]["seconds"],
                    "current_train_replay_s": cur, "new_train_s": new, "ratio_same_job": [round(x, 1) for x in r],
@@ -211,11 +216,11 @@ def ee():
         b["new_core_h_upper"] = round(b["old_core_h"] * b["ratio_used"], 1); b["old_core_h"] = round(b["old_core_h"], 2)
     tot = {"classes": len(old), "old_core_h": round(sum(old.values()) / 3600, 2),
            "new_core_h_upper": round(sum(b["new_core_h_upper"] for b in by_n.values()), 1)}
-    res = {"definition": __doc__.split("  ee   ")[1].split("\n    python3")[0], "policy": NEW_POLICY,
+    res = {"definition": __doc__.split("  ee   ")[1].split("\n    python3")[0], "policy": pol,
            "test_classes": test, "ratio_by_nfinal_measured": {str(k): v for k, v in sorted(by_meas.items())},
            "by_nfinal": {str(k): by_n[k] for k in sorted(by_n)}, "total": tot,
            "old_per_class_s": {c: round(s_, 1) for c, s_ in old.items()}, "nfinal": nf}
-    json.dump(res, open(OUT_EE, "w"), indent=1)
+    json.dump(res, open(OUT_EE if not policy else OUT_EE.replace(".json", f"_{policy}.json"), "w"), indent=1)
     print(json.dumps({k: res[k] for k in ("test_classes", "by_nfinal", "total")}, indent=1))
 
 
@@ -262,4 +267,4 @@ def ee_fig():
 
 
 if __name__ == "__main__":
-    {"pull": pull, "summary": summary, "fig": fig, "ee": ee, "ee_fig": ee_fig}[sys.argv[1]]()
+    {"pull": pull, "summary": summary, "fig": fig, "ee": ee, "ee_fig": ee_fig}[sys.argv[1]](*sys.argv[2:])
