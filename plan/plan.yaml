@@ -3752,6 +3752,14 @@ entries:
       (still filling) from bbxuu''s (stays short): read bgtxwp''s and bbxuu''s rounds under r5 and r3 first (bins_empty_small
       per round, near-bin count against quota, the round where r5 and r3 part), then design-reviewer, 38 CPU check jobs as
       r5''s (target 0.2 h). Straddling bins wait on Joaquin''s scope answer.'
+    83: '(t3) r6 check (step 82, design PASS 2026-11-07T09:52, repo-reviewer PASS at 3219d30d, merged aae3fd1b, CC synced):
+      38 CPU jobs scripts/job_multichannel_check.sh MCHECK_POLICIES=current+grid_r5_budget18+grid_r6_budget18, 19 classes
+      x seeds 42/43, --time 00:45:00 --mem 8G, target r6_check 0.2 h, submitted by the detached batch r6_submit (run ids in
+      /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/r6_runs.txt, each recorded with
+      plan run): on the batch''s DONE event put this step''s wait on those ids; check every one reached slurm (UNREG/FAILED
+      lines). On end: multichannel_check.py step82r6-pull, step82r6 -> data/r6_check.json, step82r6-stops -> data/r6_stops.json
+      (r6 bitwise r5 where r5 stopped at quota or budget: _chunk_sig), figure r2_check_fig.py r6; outcome branches on the
+      passed design.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12738,6 +12746,11 @@ entries:
       if:
       - 'r6 passes every non-straddling bin: regenerate per the design'
       - 'r6 short: rounds read for that bin'
+    83:
+      feeds: whether the 1301 hadronic classes are regenerated with r6 (_smixw) before step 68
+      if:
+      - 'PASS: straddling bins per Joaquin, then regenerate with R6'
+      - 'bgtxwp short at the budget: channels per bin before a budget change'
   owner:
     agent: af618fc9fa0eb9c9d
     state: working
