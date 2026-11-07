@@ -104,6 +104,16 @@ def kept(P, acc):
             "cuts_partonic_not_lab": float((~cut & cut_lab).mean())}
 
 
+def shat_frac(m, energy):
+    """Quantiles of sqrt(s_hat)/sqrt(s) of e+e- events (momenta (N, n, 4), beams first) at collider energy `energy`:
+    1 for every event without a beam spectrum, below 1 for events whose beams radiated (ISR, beamstrahlung)."""
+    q = np.asarray(m, float)[:, 0] + np.asarray(m, float)[:, 1]
+    x = np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None)) / energy
+    return {"n": int(len(x)), "q01": float(np.quantile(x, 0.01)), "q10": float(np.quantile(x, 0.1)),
+            "q50": float(np.median(x)), "below_0.99": float(np.mean(x < 0.99)),
+            "below_0.5": float(np.mean(x < 0.5)), "min": float(x.min())}
+
+
 def cmd_list(a):
     for q, n in remaining(a.queue):
         print(n)
@@ -148,6 +158,8 @@ def cmd_parts(a):
                 # the pool takes equal shares of the energies, so what it keeps is the mean over them of each one's
                 r["kept_by_energy"] = {f"{E:g}": kept(np.concatenate(ms), acc)["kept"] for E, ms in sorted(byE.items())}
                 r["energies"] = [float(e) for e in mg.PROCESSES[name]["lhe"]["energies"]]
+            if byE:     # the beam spectrum seen per energy: share of events with sqrt(s_hat)/sqrt(s) < 0.99
+                r["shat_by_energy"] = {f"{E:g}": shat_frac(np.concatenate(ms), E) for E, ms in sorted(byE.items())}
             out[name] = r
     with open(a.out, "w") as f:
         json.dump(out, f, indent=0, sort_keys=True)
@@ -487,11 +499,7 @@ def cmd_run(a):
             res["yield"] = len(m) / a.events
             res.update(kept(m, accept_of(name)))
             if a.energy and len(m):     # sqrt(s_hat) over the nominal collider energy (1 without ISR)
-                q = np.asarray(m, float)[:, 0] + np.asarray(m, float)[:, 1]
-                x = np.sqrt(np.clip(q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(1), 0.0, None)) / a.energy
-                res["shat_frac"] = {"q01": float(np.quantile(x, 0.01)), "q10": float(np.quantile(x, 0.1)),
-                                    "q50": float(np.median(x)), "below_0.99": float(np.mean(x < 0.99)),
-                                    "below_0.5": float(np.mean(x < 0.5)), "min": float(x.min())}
+                res["shat_frac"] = shat_frac(m, a.energy)
             k = res.get("kept") or 0.0
             res["s_per_kept_event"] = round(res["s_generate"] / (len(m) * k), 4) if len(m) and k else None
         else:
