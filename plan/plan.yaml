@@ -15830,9 +15830,7 @@ entries:
   - D307
   - D313
   next:
-    9: Write up step 15 in docs/results.tex after par:v4_warm_start_fixes (src mixture_ab.py warm_wsd @1d49c55c, plot_ws_fixes.py
-      --s15 @1d49c55c; figure figs/ws_wsd_match), notes-editor review; then the recipe (WSD-pretrained parent, default restart
-      of its final model on share 0.50 for 1/8 of a pretraining) goes to Joaquin with the request to lift D307
+    9: Joaquin's answer to lifting D307 (asked 2026-11-07T06:09); write-up of step 15 is committed (7bd323c3, par:v4_warm_start_wsd_match)
   done_when: null
   notes_ref: null
   match: warm_*,ws_*
@@ -19128,10 +19126,12 @@ entries:
     written: '2026-11-07T06:08:48+00:00'
   step_why:
     9:
-      feeds: the warm-start recipe (D319) and the lift of D307
+      feeds: D307 lift; the warm-start recipe for new changes
       if:
-      - 'write-up committed and Joaquin lifts D307: change tests resume with the WSD recipe'
-      - 'Joaquin keeps the hold: close the entry with the write-up'
+      - 'yes: design the change tests (the other changes of par:v4_warm_start_changes) with the recipe (WSD-pretrained parent,
+        default restart of its final model on share 0.50, 533 steps) against each change pretrained from scratch under WSD,
+        design review, submit'
+      - 'no: close the entry with plan done --writeup 7bd323c3'
   ask: 'Your hold: the warm start now matches from scratch at 533 steps when both sides use the WSD schedule (restart of the
     WSD final model at share 0.50: pp 0.80, e+e- 0.94, bar 1.35). May I lift your hold on testing other changes (D307) and
     resume them with this recipe: pretrain with WSD, restart the final model, retrain 533 steps at share 0.50?'
