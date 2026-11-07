@@ -880,6 +880,64 @@ def step73_fig():
                       "median_class_mse_detached": [round(v, 5) for v in med[arm]]}))
 
 
+# step 80 (D296, D315): the sign branch deepened to a copy of the last 4 of the 8 blocks (model.net.sign_branch_blocks=4,
+# arm v4_het_signhead_branch4 seed 42), read against step 73's one-block branch (54961d3e, same code otherwise), the
+# shared-trunk weight-1 head (ac8d6fca) and the MSE control, all seed 42
+STEP80 = {"branch4": ("FA-ccin2p3-PENDING",), "branch1": STEP73["branch"]}
+
+
+def step80_one():
+    """Step 80 at one seed -> data/het_signhead80.json. Sign on H5 and HD5 (per pool the wrong-sign share; median over
+    pools; ratio of medians to each reference): against the one-block branch (the tested change: depth of the branch),
+    the shared-trunk weight-1 head and the MSE control; a gap called only beyond STEP73_SIGN_CALL (2x, one seed).
+    Magnitude R = four-block over one-block branch per read (both trunks get no sign gradient, so R is an implementation
+    check: outside 1/1.15..1.15 is a fault to trace before any verdict). Beside: validation sign accuracy, pre-clip norms,
+    blow-ups."""
+    from mixture_ab import class_of, blowups, class_ratios, r_with_interval as r_interval, load as load_read
+    cls = class_of()
+    arm, k1, rr = STEP80["branch4"][0], STEP80["branch1"][0], STEP61["rerun"][0]
+    h5neg = json.load(open(os.path.join(DATA, "het_signhead_h5_neg.json")))["neg"]
+    ctl = {"HD5": [_sign_read(SIGNHEAD["mse_hd5"][0])["HD5"]], "H5": [_mse_h5_sign(SIGNHEAD["mse_h5"][0])]}
+    out = {"design": "plan catalog_coverage step 80, one seed (D315)",
+           "runs": {"branch4": arm, "branch1": k1, "shared_weight1": rr, "mse_hd5_seed42": SIGNHEAD["mse_hd5"][0],
+                    "mse_h5_seed42": SIGNHEAD["mse_h5"][0]}, "sign": {}, "magnitude_vs_branch1": {}}
+    for ax in ("H5", "HD5"):
+        A = [_sign_read(arm)[ax]]
+        out["sign"][ax] = {"vs_branch1": _sign_pair(A, [_sign_read(k1)[ax]], h5neg, ax),
+                           "vs_shared": _sign_pair(A, [_sign_read(rr)[ax]], h5neg, ax),
+                           "vs_mse": _sign_pair(A, ctl[ax], h5neg, ax)}
+    for ax in SH_AXES:
+        try:
+            a, b = load_read(arm, ax), load_read(k1, ax)
+        except FileNotFoundError:
+            continue
+        ks = sorted(set(a) & set(b))
+        r = r_interval(class_ratios(a, b, ks, cls), 1.0)
+        r["n_probes"] = len(ks)
+        out["magnitude_vs_branch1"][ax] = r
+    q = {ax: {k: out["sign"][ax][k]["median_ratio_a_over_c"] for k in ("vs_branch1", "vs_shared", "vs_mse")}
+         for ax in ("H5", "HD5")}
+    mag_off = [ax for ax, m in out["magnitude_vs_branch1"].items()
+               if m["R"] > STEP73_MAG_CALL or m["R"] < 1 / STEP73_MAG_CALL]
+    at_mse = all(q[ax]["vs_mse"] is not None and q[ax]["vs_mse"] <= 1.0 for ax in ("H5", "HD5"))
+    better = q["H5"]["vs_branch1"] is not None and q["H5"]["vs_branch1"] < 1 / STEP73_SIGN_CALL
+    worse = q["H5"]["vs_branch1"] is not None and q["H5"]["vs_branch1"] > STEP73_SIGN_CALL
+    out["ratios"] = q
+    out["magnitude_outside_band"] = mag_off
+    out["verdict"] = ("FAULT (magnitude moved: the trunk should be the one-block run's)" if mag_off
+                      else "YES (at or below the MSE control on H5 and HD5)" if at_mse
+                      else "DEPTH HELPS (H5 beyond 2x better than one block, above the MSE control)" if better
+                      else "NO (worse than one block beyond 2x)" if worse else "NOT RESOLVED AT ONE SEED")
+    out["val_sign_accuracy"] = {r: [x[1] for x in _sign_read(r)["val_sign_acc"]][-1:] for r in (arm, k1)}
+    out["grad_norm_main"] = {r: _sign_read(r)["grad_norm_main"] for r in (arm, k1)}
+    out["blowups"] = blowups([arm, k1])
+    json.dump(out, open(os.path.join(DATA, "het_signhead80.json"), "w"), indent=1)
+    brief = lambda r: {k: v for k, v in r.items() if k != "per_pool_pct"}
+    print(json.dumps({"sign": {ax: {k: brief(v) for k, v in d.items()} for ax, d in out["sign"].items()},
+                      "mag": {ax: [m["R"], m["boot95"]] for ax, m in out["magnitude_vs_branch1"].items()},
+                      "verdict": out["verdict"], "blowups": out["blowups"]["flagged"]}, indent=0))
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["magnitude"]:
         magnitude()
@@ -895,6 +953,10 @@ if __name__ == "__main__":
         step73_one()
     elif sys.argv[1:] == ["step73"]:
         step61(STEP73, ("branch",), "het_signhead73.json", "plan catalog_coverage step 73 (D296, D315)")
+    elif sys.argv[1:] == ["step80_pull"]:
+        signhead_pull({"branch4": STEP80["branch4"]})
+    elif sys.argv[1:] == ["step80_one"]:
+        step80_one()
     elif sys.argv[1:] == ["step73_fig"]:
         step73_fig()
     elif sys.argv[1:] == ["step61_fig"]:

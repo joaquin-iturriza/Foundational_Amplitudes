@@ -327,6 +327,20 @@ case "$ARM" in
                                     ++model.diagram_encoder_llm4lhc.bsm_labels=true ++model.net.sign_branch=true)
                             ITERS_FIXED=4264
                             TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
+    # the het sign head on a deeper branch (plan catalog_coverage step 80, D296/D315): the sign logit from a copy of the
+    # LAST 4 of the 8 blocks fed block 4's output and the frames detached (model.net.sign_branch_blocks=4), clipped as its
+    # own group: half the network trained for the sign alone while the trunk stays the het magnitude's. Everything else
+    # v4_het_signhead_branch's (k = 1)
+    v4_het_signhead_branch4|v4_het_signhead_branch4_seed2|v4_het_signhead_branch4_seed3|v4_het_signhead_branch4_seed4)
+                            CAT=v4; NORM=("${DIM[@]}" "${MUON_BEST[@]}" ++data.signed_magnitude_target=true)
+                            CROSS=(PP4 EE4 HD4 HD5); HET=1; SIGNHEAD=1
+                            case "$ARM" in *_seed2) NORM+=(seed=43) ;; *_seed3) NORM+=(seed=44) ;; *_seed4) NORM+=(seed=45) ;; esac
+                            COMMON=(training.loss=HETEROSC ++training.loss_aggregation=mean ++training.sign_head=true
+                                    ++training.sign_loss_weight=1.0 ++training.sign_near_weight=1.0 ++model.sign_pair_dim=0
+                                    ++model.diagram_encoder_llm4lhc.bsm_labels=true ++model.net.sign_branch=true
+                                    ++model.net.sign_branch_blocks=4)
+                            ITERS_FIXED=4264
+                            TRAIN="$PROJECT_DIR/recipes/catalog_v4_base_train.yaml" ;;
     # the beam ablation (catalog_coverage step 62, D295): the share 0.25 on the e+e- classes only (eeonly) or the
     # hadronic classes only (pponly), every other class catalog-sampled; recipes catalog_v4_default25_<beam>_train.yaml
     v4_het_default50|v4_het_default50_seed2|v4_het_default25|v4_het_default25_seed2|v4_het_default25_eeonly|v4_het_default25_eeonly_seed2|v4_het_default25_pponly|v4_het_default25_pponly_seed2)

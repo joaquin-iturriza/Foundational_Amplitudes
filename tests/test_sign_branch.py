@@ -38,11 +38,13 @@ from test_het_sign_head import NUM_SCALARS, D_PARTICLE_HIDDEN, batch, forward  #
 REF = os.environ.get("SIGN_BRANCH_REF", "trunk")
 
 
-def build(sign=True, branch=False, seed=7, heads=2, ckpt=False, net_cls=LLOCAMuPTransformer):
+def build(sign=True, branch=False, seed=7, heads=2, ckpt=False, net_cls=LLOCAMuPTransformer, blocks=2, k=None):
     torch.manual_seed(seed)
     kw = {"sign_branch": True} if branch else {}
+    if k is not None:
+        kw["sign_branch_blocks"] = k
     net = net_cls(num_scalars=NUM_SCALARS, hidden_channels_mlp=128, num_layers_mlp=2, in_channels=NUM_SCALARS + 4,
-                  attn_reps="8x0n+2x1n", out_channels=1, num_blocks=2, num_heads=heads, loss="HETEROSC",
+                  attn_reps="8x0n+2x1n", out_channels=1, num_blocks=blocks, num_heads=heads, loss="HETEROSC",
                   sigma_after_pool=True, sign_channel=sign, checkpoint_blocks=ckpt, **kw)
     model = AmplitudeLLoCaWrapper(net, token_size=0, d_particle_hidden=D_PARTICLE_HIDDEN)
     model.setup_particle_features(use_pids=False, property_matrix=GLOBAL_PROPERTY_MATRIX)
@@ -106,6 +108,65 @@ def test_b_init():
         assert p.infshape.width_mult() == last[n].infshape.width_mult(), n
         assert p.infshape.ninf() == last[n].infshape.ninf(), n
     assert net.sign_block.attention.attention is net.attention    # the shared LLoCaAttention, as the trunk's
+
+
+@pytest.mark.parametrize("blocks,k", [(3, 2), (3, 3), (2, 1)])
+def test_b_init_k(blocks, k):
+    """sign_branch_blocks k (step 80): RNG and every trunk parameter as the flag-off model; the branch's blocks equal
+    the trunk's last k at init, copies with the same muP infshapes; at init the branch-on outputs equal the flag-off
+    model's (the sign logit then reads the same features as the trunk's), so the branch takes block (blocks - k)'s
+    input."""
+    a, rng_a = build(branch=False, blocks=blocks)
+    b, rng_b = build(branch=True, blocks=blocks, k=k)
+    assert torch.equal(rng_a, rng_b)
+    sa, sb = a.state_dict(), b.state_dict()
+    extra = {n for n in sb if ".sign_block." in n}
+    assert extra and set(sb) - extra == set(sa)
+    for n in sa:
+        assert torch.equal(sa[n], sb[n]), n
+    net = b.net.net
+    copies = [net.sign_block] if k == 1 else list(net.sign_block.blocks)
+    assert len(copies) == k
+    for c, t in zip(copies, net.blocks[blocks - k:]):
+        tp = dict(t.named_parameters())
+        for n, p in c.named_parameters():
+            assert torch.equal(p, tp[n]) and p.data_ptr() != tp[n].data_ptr(), n
+            assert p.infshape.width_mult() == tp[n].infshape.width_mult(), n
+        assert c.attention.attention is net.attention
+    bt = batch(seed=5)
+    a.eval(); b.eval()
+    with torch.no_grad():
+        oa, ob = forward(a, bt), forward(b, bt)
+    assert torch.allclose(oa, ob, rtol=1e-5, atol=1e-6), (oa - ob).abs().max()
+
+
+@pytest.mark.parametrize("ckpt", [False, True])
+def test_c_gradient_isolation_k(ckpt):
+    """k = 2 of 3 blocks: the sign logit's gradient reaches only the branch and the readout's sign row; mu's and
+    sigma's never reach the branch."""
+    bt = batch(seed=5)
+    m, _ = build(branch=True, ckpt=ckpt, blocks=3, k=2)
+    out = forward(m, bt)
+    out[:, 1].square().sum().backward()
+    g = _grads(m)
+    for n, t in g.items():
+        if ".sign_block." in n:
+            if n.endswith("weight"):
+                assert t.abs().sum() > 0, n
+            continue
+        if n in SIGN_ROW:
+            assert torch.count_nonzero(t[:1]) == 0 and torch.count_nonzero(t[2:]) == 0, n
+            continue
+        assert torch.count_nonzero(t) == 0, n
+    m.zero_grad(set_to_none=True)
+    out = forward(m, bt)
+    (out[:, 0].square().sum() + out[:, 2].sum()).backward()
+    g = _grads(m)
+    for n, t in g.items():
+        if ".sign_block." in n:
+            assert torch.count_nonzero(t) == 0, n
+    # the clip's sign group (base_experiment._clip_grad_norm: sign_block.parameters()) holds every block of the branch
+    assert {id(p) for p in m.net.net.sign_block.parameters()} >= {id(p) for p in m.net.net.sign_block.blocks[1].parameters()}
 
 
 def _grads(model):

@@ -435,6 +435,7 @@ class MuPTransformer(nn.Module):
         bnn_logsig2_init: float = -9.0,
         sign_branch: bool = False,
         sign_index: int | None = None,
+        sign_branch_blocks: int = 1,
     ) -> None:
         super().__init__()
         self.parametrization = parametrization
@@ -466,7 +467,7 @@ class MuPTransformer(nn.Module):
         else:
             self.linear_out = MuReadout(self.hidden_channels, out_channels, bias=True)
         # sign_branch (models/lloca.py, HETEROSC + sign head): the readout's row sign_index (the sign logit) is read
-        # from sign_block, a copy of the last block fed the last block's input DETACHED and the frames DETACHED, so the
+        # from sign_block, a copy of the last block (the last sign_branch_blocks blocks) fed the last block's input DETACHED and the frames DETACHED, so the
         # sign loss's gradient reaches only sign_block and that readout row, never the trunk or the framesnet. Built
         # under fork_rng and set to the last block's initial weights, so nothing else's initialisation moves.
         self.sign_branch = bool(sign_branch)
@@ -474,8 +475,14 @@ class MuPTransformer(nn.Module):
         if self.sign_branch:
             assert sign_index is not None and 0 <= sign_index < out_channels, (sign_index, out_channels)
             assert num_blocks >= 1
-            with torch.random.fork_rng(devices=[]):
-                self.sign_block = BaselineTransformerBlock(
+            # sign_branch_blocks k (plan catalog_coverage step 80): the branch is a copy of the LAST k blocks, fed the
+            # input of block num_blocks - k detached; k = 1 is step 73's branch, its module and parameter names unchanged
+            k_sb = int(sign_branch_blocks)
+            assert 1 <= k_sb <= num_blocks, (sign_branch_blocks, num_blocks)
+            self.sign_branch_blocks = k_sb
+
+            def _copy():
+                return BaselineTransformerBlock(
                     self.hidden_channels,
                     attention=self.attention,
                     num_heads=num_heads,
@@ -484,7 +491,13 @@ class MuPTransformer(nn.Module):
                     multi_query=multi_query,
                     dropout_prob=dropout_prob,
                 )
-            self.sign_block.load_state_dict(self.blocks[-1].state_dict())
+            with torch.random.fork_rng(devices=[]):
+                self.sign_block = _copy() if k_sb == 1 else _BlockStack([_copy() for _ in range(k_sb)])
+            if k_sb == 1:
+                self.sign_block.load_state_dict(self.blocks[-1].state_dict())
+            else:
+                for i, b in enumerate(self.sign_block.blocks):
+                    b.load_state_dict(self.blocks[num_blocks - k_sb + i].state_dict())
         self.init_method = init_method_normal((encoder_var / in_channels)**0.5)
 
         self._reset_parameters()
@@ -582,8 +595,10 @@ class MuPTransformer(nn.Module):
             detached_state = self._frame_state()
             self._set_frame_state(live)
         h_prev = None
-        for block in self.blocks:
-            h_prev = h
+        i_branch = len(self.blocks) - getattr(self, "sign_branch_blocks", 1)   # the branch's input: block i_branch's
+        for i, block in enumerate(self.blocks):
+            if i == i_branch:
+                h_prev = h
             if self.checkpoint_blocks:
                 fn = partial(block, **attn_kwargs)
                 # use_reentrant=False is required here: the block's attention reads
@@ -610,6 +625,19 @@ class MuPTransformer(nn.Module):
             # and the other rows none from hs
             outputs = torch.cat([outputs[..., :k], self.linear_out(hs)[..., k:k + 1], outputs[..., k + 1:]], dim=-1)
         return outputs
+
+
+class _BlockStack(nn.Module):
+    """The sign branch of sign_branch_blocks > 1: its blocks applied in order, each with the same attention kwargs."""
+
+    def __init__(self, blocks):
+        super().__init__()
+        self.blocks = nn.ModuleList(blocks)
+
+    def forward(self, x, **attn_kwargs):
+        for b in self.blocks:
+            x = b(x, **attn_kwargs)
+        return x
 
 
 def _detach_frames(frames):

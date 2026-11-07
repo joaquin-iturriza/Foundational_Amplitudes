@@ -110,6 +110,7 @@ class LLOCAMuPTransformer(nn.Module):
         bnn_logsig2_init: float = -9.0,
         sign_channel: bool = False,
         sign_branch: bool = False,
+        sign_branch_blocks: int = 1,
         # token_size: int = 0,
     ):
         super().__init__()
@@ -150,7 +151,8 @@ class LLOCAMuPTransformer(nn.Module):
         self.n_main = out_channels + (1 if self.sign_channel else 0)
         # sign_branch: the sign logit (readout row out_channels) is computed by a copy of the last transformer block on
         # detached features and frames (models/transformer_lloca_mup.py MuPTransformer.sign_block), so the sign loss
-        # never reaches the shared trunk nor its clipped update (plan catalog_coverage step 73)
+        # never reaches the shared trunk nor its clipped update (plan catalog_coverage step 73); sign_branch_blocks k:
+        # a copy of the last k blocks fed block num_blocks - k's input detached (step 80)
         self.sign_branch = bool(sign_branch)
         assert not self.sign_branch or (self.sign_channel and loss == "HETEROSC" and sigma_after_pool
                                         and not detach_sigma_backbone and not bayesian_last_layer), \
@@ -186,7 +188,8 @@ class LLOCAMuPTransformer(nn.Module):
                 dropout_prob=dropout_prob,
                 checkpoint_blocks=checkpoint_blocks,
                 parametrization=parametrization,
-                **({"sign_branch": True, "sign_index": out_channels} if self.sign_branch else {}),
+                **({"sign_branch": True, "sign_index": out_channels, "sign_branch_blocks": int(sign_branch_blocks)}
+                   if self.sign_branch else {}),
                 # BNN last layer (draft Sec. 5, fig:bnn): net.linear_out becomes a variational μP readout; the KL term
                 # enters the training loss in experiment._reg_term, evaluation uses the posterior-mean weights
                 **({"bayesian_readout": True, "bnn_prior_prec": bnn_prior_prec, "bnn_logsig2_init": bnn_logsig2_init}
