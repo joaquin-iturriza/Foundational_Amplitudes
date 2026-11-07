@@ -1418,8 +1418,9 @@ WARM["C1s50"] = {"W": dict(WARM["C2"]["W"]), "C": WARM["C1"]["C"], "B": WARM["C1
 S14 = {"control": "FA-ccin2p3-238e6f81",     # submitted 2026-11-07 @74aa4ce6 (limit 02:30); WSD parent FA-ccin2p3-dccb61e8
        "arms": {"shrinkperturb": "FA-ccin2p3-0f346464",  # rerun after b91cf7c6; 71852916 shrank again in its sigma stage
                  "share50_k267": "FA-ccin2p3-77e8bf2b",
-                "wsdbranch25": "FA-ccin2p3-85dd4eff", "wsdbranch50": "FA-ccin2p3-a79d5b14",
-                "wsdfinal_default": "FA-ccin2p3-554f3ec5", "share50_k533": "FA-ccin2p3-9a357af2"},
+                # resubmitted unchained (E3971; the chained 85dd4eff/a79d5b14/554f3ec5 never started)
+                "wsdbranch25": "FA-ccin2p3-1354daee", "wsdbranch50": "FA-ccin2p3-4dc35a98",
+                "wsdfinal_default": "FA-ccin2p3-9079718e", "share50_k533": "FA-ccin2p3-9a357af2"},
        "control_older": "FA-ccin2p3-341bf564",           # the step-1 default restart at seed 42 (older commit)
        "B": "FA-ccin2p3-9538e607", "B_HD": "FA-ccin2p3-4dca09e5"}
 # each arm's widening over the control (design round 2): same parent and data -> the largest paired seed spread of
