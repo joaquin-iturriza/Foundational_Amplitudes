@@ -3596,7 +3596,7 @@ $61$ and $57$ against $181$ for the WSD final's restart and $1023$ for the contr
 spiked on one batch at step $31$ (training loss $2.3\times10^{6}$) and recovered, and share $0.50$ for $267$ steps
 spiked in its validation loss at step $10$ and recovered (the validation blow-up check flags no run; it misses the
 shrunk run's divergence because that run starts above its own reference and only falls). What the WSD arms share is their
-parent, and it is a better pretrained model: its validation loss at step $4264$ is $-2.909$ against the cosine
+parent, and it is a better pretrained model: its validation loss at its best checkpoint, step $4264$, is $-2.909$ against the cosine
 parent's $-2.858$, and its final model at the default restart reads $0.759$ and $0.832$ of the control, outside the
 $5\%$ band of the design's ``as good a parent'' reading. The
 outcome is the design's ``BETTER arm with MATCH-estimate'' branch, four arms at the same $533$ steps: the candidate is
@@ -3607,7 +3607,7 @@ its seed-$42$ read over B is PP4 $0.815$, EE4 $0.966$ (biased low: seed $42$ is 
 seed); but B was pretrained with the cosine schedule, and a parent that
 pretrains better under WSD makes a from-scratch change under WSD likely better as well, so whether the warm start
 matches the change from scratch under the same schedule is not yet read.
-% src: python3 analysis/catalog_v4/mixture_ab.py warm_single @1e7042dd
+% src: python3 analysis/catalog_v4/mixture_ab.py warm_single @c68e5215
 % claim: estimate_factor_W533_over_B.PP4=1.333
 % claim: estimate_factor_W533_over_B.EE4=1.513
 % claim: widening_kinds.same.PP4=0.0157
@@ -3673,8 +3673,8 @@ matches the change from scratch under the same schedule is not yet read.
 % claim: readings.branch_over_wsdfinal.EE4.R=1.035
 % claim: readings.branch_over_wsdfinal.EE4.widened.0=0.948
 % claim: readings.branch_over_wsdfinal.EE4.widened.1=1.126
-% claim: parents_val_last.wsd.val=-2.909
-% claim: parents_val_last.cosine.val=-2.858
+% claim: parents_val_best.wsd.val=-2.909
+% claim: parents_val_best.cosine.val=-2.858
 % src: python3 analysis/catalog_v4/plot_ws_fixes.py --cached @1e7042dd
 % claim: shrinkperturb.loss_0=0.872
 % claim: control.loss_0=-2.682
