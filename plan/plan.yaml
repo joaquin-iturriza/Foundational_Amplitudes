@@ -11921,6 +11921,65 @@ entries:
       ''detached'', ''sign head'', ''parallel/separate trunk'', ''sign network'', ''wrong-sign'', ''pair head''; plan steps
       56/61/73 and dead ends; site decisions ''sign'': no prior branch-depth work); checks 6, 7, 9 (HETEROSC mean), 10 (H5
       catalog-sampled, HD5 default-sampled, both read), 11, 12, 13 (no HP search).'
+  - at: '2026-11-07T09:40:07+00:00'
+    question: 'Step 80 (D296, the het sign head is mine to make work), revised after the design reviewer''s FIX: does a deeper
+      detached sign branch, a copy of the LAST 4 of the 8 transformer blocks fed block 4''s output and the frames detached
+      (model.net.sign_branch_blocks=4, arm v4_het_signhead_branch4, seed 42), predict one-loop signs as well as the MSE-trained
+      head on the default-sampled one-loop classes (HD5), where every het sign head so far (shared trunk at weight 1, matched
+      per event, weight 75, one-block branch) did not, while the het magnitude trunk gets no sign gradient? Feeds: which sign
+      head the het loss carries.'
+    prior: 'Searched docs/results.tex (sign branch, sign_branch, detached, sign head, parallel trunk: the catalog_v3 sign-head
+      search and pair head, no branch depth), plan show catalog_coverage (steps 56, 61, 73) and site decisions FA (sign: D287,
+      D296, D315). Four-seed reads (het_oneloop.py step80_bands @branch signbranch-k, from data/reads/<run>_sign.json and
+      the MSE control''s H5_signed reads), median over pools of the wrong-sign share, seeds 42/43/44/45: HD5 shared weight
+      1 16.2/14.9/14.9/18.65%, matched per event 14.9/14.3/13.0/14.0, weight 75 15.3/17.15/16.5/14.95, MSE control 11.15/12.2/13.95/11.2
+      (the het and MSE seed ranges do not overlap); H5 shared 8.6/9.95/6.05/14.05, matched 9.15/8.35/7.35/11.3, weight 75
+      7.9/12.85/9.05/13.55, MSE 5.6/8.55/6.9/7.05. Step 73 one-block branch (seed 42): HD5 14.85%, H5 9.3%, val sign accuracy
+      0.99 (the gap is generalisation, not fit). Magnitude: shared weight 1 vs no head over 4 seeds PP4 R 0.987, per seed
+      1.13/0.85/0.99/1.00, so step 73''s PP4 0.865 was the seed-42 pairing, not an effect of detaching; upweighting on the
+      shared trunk cost magnitude 13-59%.'
+    measure: 'het_oneloop.py step80_pull (the new run and the one-block branch again, for its step rate) then step80_one ->
+      data/het_signhead80.json: HD5 (default-sampled one-loop classes, ZERO_SHOT test split) and H5 (21 catalog-sampled one-loop
+      pools, SIGNED_AB val split) per pool wrong-sign share, median over pools, ratios against the one-block branch FA-ccin2p3-54961d3e,
+      the shared weight-1 head FA-ccin2p3-ac8d6fca and the MSE control (seed 42); the four-seed bands step80_bands (pooled
+      within-arm SD of ln median over the 4 arms x 4 seeds: HD5 0.086, H5 0.252; one-run-vs-one-run band exp(2 sqrt2 SD):
+      HD5 1.275, H5 2.04); magnitude R 4-block / 1-block per read over all 12 reads (a missing read makes the verdict INCOMPLETE);
+      s per training step of both runs from their ''Finished training'' lines; val sign accuracy; pre-clip norms; blow-ups.'
+    check: 'Candidates weighed on existing reads: (1) sign gradient into the shared trunk under its own clip group: clip_grad_norm
+      5 against a het pre-clip median ~66 (98.8% of steps clipped, het_sign_diag.json), so its own group raises the sign''s
+      share of the trunk update ~13x over weight 1, the mechanism of step 61''s upweighting (HD5 moved to 13.0-14.9%, still
+      above every MSE seed but one, at a magnitude cost of 13-59%), and Adam normalises per parameter after the clip: dropped.
+      (3) per-event match on the detached block: own clip group and Adam''s scale invariance leave only relative event weights:
+      dropped. (2) the deeper detached branch: leaves the trunk exactly the het magnitude''s. HD5 moves with how much of the
+      network the sign shapes: MSE (sign a large share of the trunk) 11.15-13.95% vs every het arm 13.0-18.65%, upweighting
+      moved it ~10%, with a seed SD of 0.086 in ln; the branch depth varies that share without touching the trunk. Code (worktree
+      wt-signbranch4, 38fa76a1 + reader fixes df89cb98 and the band commit): sign_branch_blocks k, the branch = copies of
+      the last k blocks fed block (8-k)''s input and frames detached; k=1 is step 73''s module. tests/test_sign_branch.py
+      15 pass (flag off bit-equal to trunk; k in {1,2,3}: RNG and trunk parameters equal to flag-off, copies equal the last
+      k blocks with the same muP infshapes, outputs at init equal the flag-off model''s; sign gradient only into the branch
+      and sign row, mu/sigma never the branch, with and without checkpointing; the clip''s sign group holds every branch block).
+      Repo-reviewer: model, config, arm, tests correct; reader fixes for missing reads and step rate in df89cb98.'
+    fixed: 'Everything of v4_het_signhead_branch (step 73): catalog_v4_base_train recipe, HETEROSC mean aggregation, sign_head
+      weight 1, sign_near_weight 1, no pair head, bsm_labels, dimensionless inputs, MUON_BEST HPs, signed_magnitude_target,
+      4264 steps, seed 42, reads PP4 EE4 HD4 HD5 and the H axes; only ++model.net.sign_branch_blocks=4 differs. scripts/job_catalog_v3_short.sh
+      -- v4_het_signhead_branch4 at the merge commit. One V100 job, --time 03:30:00 (tools/short_wall.py, checked in the job);
+      target 2.9 h (the one-block run trained in 73 min at 0.98 s per step, the setup''s whole job 2.33 h, plus an estimated
+      +0.6 h for 4 more blocks forward and backward; the rate read from its own log). 1 job x 2.9 h = 2.9 GPU-h. Disk: one
+      run directory, memmap off, no cache (as step 73).'
+    control: 'The one-block branch FA-ccin2p3-54961d3e (k=1, seed 42): the matched control for the depth. Beside: shared weight-1
+      FA-ccin2p3-ac8d6fca and the MSE control at seed 42, and the four-seed ranges of the het arms and the MSE control. Implementation
+      control: neither run''s trunk gets sign gradient, so magnitude R 4-block / 1-block inside 1/1.15..1.15 on every read;
+      outside is a fault traced before any verdict.'
+    seeds: One seed (42), D315. The verdict is HD5's, read against the four-seed spreads (SD of ln 0.086, one-run band 1.275);
+      H5 is a second read called only beyond its own band 2.04.
+    outcome: 'Verdict on HD5 (step80_one): YES: HD5 median below every het arm''s seed value (13.0%) and inside the MSE control''s
+      seed range (<= 13.95%) -> the het control carries the 4-block branch; report to Joaquin with the numbers. NOT RESOLVED:
+      13.0% <= HD5 <= 18.9% (the one-block branch''s 14.85% times the band 1.275): the branch depth does not bring the sign
+      to the MSE''s level at one seed; next a trunk-shared design that keeps the magnitude''s Adam step (the sign gradient
+      on the trunk under its own optimizer moments), its cost measured first (two backward passes, bar 2x). NO: HD5 > 18.9%:
+      read the branch''s validation sign accuracy and per-class shares first. H5 listed beside, called only beyond 2.04x against
+      the one-block branch (9.3%: below 4.56% or above 19.0%). INCOMPLETE (a read missing) or FAULT (magnitude outside the
+      band on any read) come before any verdict.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
