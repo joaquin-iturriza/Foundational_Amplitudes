@@ -11140,6 +11140,24 @@ entries:
       class family over it) -> where the time goes (labels vs proposal vs compile), fixed before step 68. Composition fails
       -> mix_compose''s replay fixed before any recipe reads these pools. Job failures -> log read, fixed, rerun of the shard
       (resumable: built pools are cache hits).'
+    fix_at: '2026-11-07T03:33:01+00:00'
+    fix: 'Re-check of the revised step 65 design. Fixed: the cost prior now states step 75''s COST verdict and the same-node
+      ratio of 2.17, and every class over 2x is named in the read. The coverage count is implemented as described (regen_read.py
+      @4c0c7c82: held-out PP4 val and dsh_ in-support events outside the val+test log10|M|^2 range, out-of-window share, density
+      ratio per bin). One check still fails. (Check 7 / check 4) The coverage pass bar contradicts Joaquin''s words. D269
+      is ''there is no way "a few" events lie outside, be that 10%, 1%, or whatever, if you had done what I asked, that percentage
+      would be zero''. The design calls the outcome FILLED at up to 2 held-out events outside per class (COVER_BAR = 2). Across
+      1301 classes that allows up to 2602 events outside under a FILLED verdict. The 2-per-class bar comes from step 67/75
+      designs that a reviewer passed, never from Joaquin. Fix: FILLED requires outside_kept = 0 on every class, and any class
+      with 1 or more goes to SHORT with its count. If you think a finite-sample tolerance is justified (the range table rests
+      on 1.2e4 PP4 events), put that as a question to Joaquin (plan ask) with the counts once the read exists, and do not
+      apply it in the verdict. (Check 8, held-out integrity) The SHORT remedy ''range table widened from the held-out events''
+      fits the range to the very events it is then scored on, so a re-read of those classes would pass by construction. Fix:
+      widen by a rule that does not read the scored events (a larger margin applied by the same rule, or widening from the
+      PP4 val pool and then scoring on the dsh_ pools only), and state which events score the revision. Everything else holds
+      as in the first review: one change, the sampler and its pp range (D294); fill moved 0.898 to 1.000 and 0.936 to 1.000
+      from step 72 to step 75; one data seed for a generation batch; disk 43 GB against 64 GB free today with a 50 GB floor
+      at submission; the _g12 training and held-out copies are refused until step 68.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
