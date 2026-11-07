@@ -15147,6 +15147,7 @@ entries:
     or whether the 2x is per class'
   blocks: the 1301-class regeneration with the sixth revision (step 82)
   blocks_steps: *id001
+  checked_until: '2026-11-07T12:29:52+00:00'
 - id: muon_test
   title: 'Muon (decoupled weight decay, AdamW-matched update) against AdamW: short catalog_v3 pretraining, zero-shot reads,
     small-D fine-tunes'
