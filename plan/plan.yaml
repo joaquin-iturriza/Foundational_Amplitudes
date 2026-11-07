@@ -10448,6 +10448,55 @@ entries:
       isronly, lpp, pdlabel, radiative return, beam spectrum, lepton/electron pdf, collider energ, shat_frac: only the unrelated
       transfer-study ISR arm (l.12731). Note for the regeneration design, not this probe: D320''s approved proposal text is
       not in the ledger, so the anchor energy list for the regeneration should be shown to Joaquin with it.'
+  - at: '2026-11-07T00:29:16+00:00'
+    question: 'Step 72 (NO branch of step 69; D317 refused the quota sampler''s ~100x generation time, the <= 2x bar is the
+      step-69 design''s). Does the quota-filled flat part fill every in-range 0.25-dex log10|M|^2 bin of the class''s pp flat
+      range to >= 0.95 at <= 2x the old sampling''s generation time, with independent draws, when its proposal is adapted
+      inside each channel: every channel''s uniform random numbers mapped through a factorised per-dimension grid (VEGAS-like,
+      100 bins, 0.2 uniform floor) refitted after each round to the quota weights (deficit over count of the candidate''s
+      bin), code branch flat-grid 08458603 (sampling.flat_grid)? Feeds: the sampling of step 65''s regeneration (1301 hadronic
+      tree classes + 170 e+e- classes, D294/D318), at the lowest budget that passes.'
+    prior: 'Step 69 (data/mcmc_check.json @f414c171): NO. Share of in-range bins >= 0.95, seed 42, classes uux_epemg/uux_epemvevex/uu_bbxuu/us_ddxsu/udx_csxvevex:
+      Markov chains at 12 labels per flat event 1.00/0.83/0.81/0.80/0.76; quota sampler at 12 1.00/0.85/0.90/0.92/0.84 at
+      1.3-3.5x old cost; quota at 50 1.00/0.98/0.96/0.98/0.92 at 1.9-14x; at 750 every bin filled at up to 158x (step 66/67).
+      Shortfall always in the top 1-2 dex. Ruled out: union with MadEvent events (top bins hold 0-5 default events of 12000),
+      propagator pre-screen (Spearman 0.60-0.84, too weak on QCD 2->4), Markov chains (step 69). results.tex ''Coverage vs.
+      emphasis, and the general default sampling'' (~l.10246) proposed adaptive importance sampling (VEGAS/foam) guided by
+      |M|^2 toward flat log|M|^2, never built; results.tex ~l.9747 adaptive_ir.py is a training-time per-y_min-bin sampler,
+      not a generator (not wired). Today''s quota sampler steers only sqrt(s) and channel shares; nothing inside a channel.'
+    measure: 'Per class and seed (multichannel_check.py step72 -> data/grid_check.json, step69''s rules applied with the grids
+      at 12 and at 8 as the tested policy): fill per in-range bin (sum over chunks of min(kept, quota) / quota), share of
+      bins >= 0.95 and every bin >= 0.95, held-out pp events in support outside the kept range, cost = train replay seconds
+      over the old generation-log seconds (data/sampling_cost.json) and over ''current'' in the same job, labels per flat
+      event, seconds in proposal vs labelling (FLAT_LAST t_propose/t_label), flat-part diversity (flat_diversity.py: near-copy
+      share, NN-distance ratio against the quota sampler at 50 at equal count, median and q10 over in-range bins). Figure:
+      fill per bin per policy with cost in the legend (fig_mcmc_check.py extended to step 72), png+pdf.'
+    check: 'Toy (tests/test_flat_grid.py @08458603, the toy |M|^2 of tests/test_flat_mcmc.py through the multichannel proposal
+      with both ladders): grids at budget 12 fill 1.000 of the quota, every bin >= 0.95, stopping at quota after 18000 labels
+      (9 per flat event), against 0.915 and 87% of bins for the quota sampler at 12 (24000 labels); near-copy share 0.0; without
+      flat_grid the kept |M|^2 equal trunk''s module draw for draw; proposal time per candidate 71 us with grids vs 87 us
+      without. The measures move on existing data: step 69''s reads separate quota 12 from 50 by share >= 0.95 (0.84-0.92
+      vs 0.92-0.98) and by cost (1.3-3.5x vs 1.9-14x); the step69 reader, generalised, reproduces step 69''s verdict and checks
+      exactly.'
+    fixed: 'Classes v4_uux_epemg, v4_uux_epemvevex, v4_uu_bbxuu, v4_us_ddxsu, v4_udx_csxvevex (multichannel_check.CLASSES,
+      probes as step 69), train role 100000 events, chunk plan, flat ranges (tools/flat_range.py), 0.25-dex bins, both ladders
+      + joint resonances (as step 67/69), FLAT_GRID_BINS 100, FLAT_GRID_FLOOR 0.2, code = trunk after merging flat-grid (repo-reviewer
+      PASS) synced to CC; scripts/job_multichannel_check.sh, MCHECK_POLICIES=current+quota_ladder_both_res2+quota_ladder_both_res2_budget12+grid_both_res2_budget12+grid_both_res2_budget8,
+      1 CPU, CC htc; limits from multichannel_check.py need + 10 min: uux_epemg 00:20, uux_epemvevex 00:30, uu_bbxuu 01:10,
+      us_ddxsu 01:00, udx_csxvevex 00:30; target 0.8 h; 10 jobs, <= 7 core-h, no GPU.'
+    control: 'Same job, node, commit, class and seed: the quota sampler at 12 (matched label budget, the step-69 control),
+      at 50 (diversity reference, independent draws), and ''current'' (the old sampling, cost denominator in-job). The quota12/quota50
+      rows also re-measure step 69''s (should reproduce within seed noise).'
+    seeds: Seeds 42 and 43 per class, as steps 67 and 69; every rule must hold on both seeds.
+    outcome: 'YES (grids at 12 or at 8 meet every rule on every class and seed: every in-range bin >= 0.95, held-out outside
+      kept <= step 67''s budget-750 count, cost <= 2.0, diversity: near-copies <= quota50''s + 0.02 and <= 0.05 in each top-40%
+      bin, NN ratio median >= 0.8 and q10 >= 0.5) -> step 65''s regeneration design uses flat_grid at the lowest budget that
+      passed, then the e+e- classes (step 68) with it. COST (fill and diversity as YES, cost > 2 on a class) -> read t_propose
+      vs t_label: proposal overhead is fixed in code and re-run once; labels -> the budget-8 row decides. PARTIAL (grids''
+      share >= 0.95 above quota12''s on the 2->4 classes on both seeds, diversity holds, bins still short) -> where-read of
+      the short bins (which channel and dimensions their candidates came from), one revision (more grid bins or a pairwise
+      grid on the ladder''s pT/eta), re-run once. NO (grids not above quota12, or diversity fails) -> dead end recorded; next
+      attempt a cell-splitting (foam) or normalising-flow proposal on the same harness.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
