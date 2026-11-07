@@ -4214,7 +4214,9 @@ def flat_quota_weights(logm, edges, quota, empty_near=False, unique=False):
     bin: each empty bin, in order, takes the deficit-many nearest candidates no earlier empty bin took, so adjacent empty
     bins steer through as many candidates as their summed deficit instead of stacking every unit on the same few (r3
     converged slower than r2 on v4_uu_bbxuu, whose top 3-9 bins sit empty after a round, and regressed it from 1.0 to
-    0.90/0.80 in its top bin; data/r3_check.json, r3_rounds.json)"""
+    0.90/0.80 in its top bin; data/r3_check.json, r3_rounds.json). Empty bins are taken in ascending order; when fewer
+    free candidates remain than a bin's deficit, each takes more than one unit, and once none is free the bin stacks on
+    its nearest candidates as without `unique`""""
     nb = len(quota)
     fin = np.isfinite(logm)
     b = np.full(len(logm), -1)
