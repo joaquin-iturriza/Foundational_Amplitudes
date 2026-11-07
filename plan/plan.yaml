@@ -12095,9 +12095,9 @@ entries:
       - 'NO again: the failing kinds go to Joaquin with what an exemption or tolerance would drop'
   owner:
     agent: a40cd4bedffed9ceb
-    state: working
+    state: stopped
     since: '2026-11-07T05:14:25+00:00'
-    state_at: '2026-11-07T05:14:25+00:00'
+    state_at: '2026-11-07T05:50:47+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
