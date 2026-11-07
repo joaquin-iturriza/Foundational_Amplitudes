@@ -5059,6 +5059,10 @@ def lhe_pp_recipe(process, sqrts_min, sqrts_max, n_events, role=None, seed=None)
             # on its own differs from a large complete run (docs/results.tex par:v4_short_runs). In the identity: a
             # pool of gridpack runs never passes for one of runs integrated each on their own, nor one of another G
             **({"gridpack": int(cfg["lhe"]["gridpack"])} if cfg["lhe"].get("gridpack") else {}),
+            # lhe.mixed_pair_mmin = M: MadEvent cuts every pair of cut legs of different run-card categories (jet or
+            # b, photon, charged lepton) at m > M GeV (lhe_mixed_pair_cut), a pair mass the run card's mmjj, mmbb,
+            # mmaa, mmll cannot express; absent, every pool built before keeps its identity (plan step 76)
+            **({"mixed_pair_mmin": float(cfg["lhe"]["mixed_pair_mmin"])} if cfg["lhe"].get("mixed_pair_mmin") else {}),
         },
     }
 
@@ -5236,6 +5240,64 @@ def add_card_params(card_path, values):
             f.writelines(f"  {v} = {k}\n" for k, v in new.items())
 
 
+_MIXED_PAIR_CUT = """      logical FUNCTION dummy_cuts(P)
+C     catalog_v4 (mg5_pipeline_final.lhe_mixed_pair_cut): every pair of
+C     cut legs of different run-card categories (jet or b, photon,
+C     charged lepton) at m > MMIX GeV. P in the partonic rest frame.
+      IMPLICIT NONE
+      include 'genps.inc'
+      include 'nexternal.inc'
+      REAL*8 P(0:3,nexternal)
+      REAL*8 MMIX
+      PARAMETER (MMIX={mmin:.6f}D0)
+      LOGICAL  IS_A_J(NEXTERNAL),IS_A_L(NEXTERNAL)
+      LOGICAL  IS_A_B(NEXTERNAL),IS_A_A(NEXTERNAL),IS_A_ONIUM(NEXTERNAL)
+      LOGICAL  IS_A_NU(NEXTERNAL),IS_HEAVY(NEXTERNAL)
+      logical  do_cuts(nexternal)
+      COMMON /TO_SPECISA/IS_A_J,IS_A_A,IS_A_L,IS_A_B,IS_A_NU,IS_HEAVY,
+     & IS_A_ONIUM, do_cuts
+      INTEGER I, J, CC(NEXTERNAL)
+      REAL*8 M2
+      dummy_cuts=.true.
+      DO I=NINCOMING+1,NEXTERNAL
+        CC(I)=0
+        IF (IS_A_J(I).OR.IS_A_B(I)) CC(I)=1
+        IF (IS_A_A(I)) CC(I)=2
+        IF (IS_A_L(I)) CC(I)=3
+        IF (.NOT.DO_CUTS(I)) CC(I)=0
+      ENDDO
+      DO I=NINCOMING+1,NEXTERNAL-1
+        DO J=I+1,NEXTERNAL
+          IF (CC(I).GT.0.AND.CC(J).GT.0.AND.CC(I).NE.CC(J)) THEN
+            M2=(P(0,I)+P(0,J))**2-(P(1,I)+P(1,J))**2
+     &        -(P(2,I)+P(2,J))**2-(P(3,I)+P(3,J))**2
+            IF (M2.LT.MMIX**2) THEN
+              dummy_cuts=.false.
+              RETURN
+            ENDIF
+          ENDIF
+        ENDDO
+      ENDDO
+      RETURN
+      END
+"""
+
+
+def lhe_mixed_pair_cut(ev, mmin):
+    """Replace dummy_cuts in a MadEvent directory's SubProcesses/dummy_fct.f by the mixed-pair mass cut (lhe.
+    mixed_pair_mmin): the e+e- run card cuts pair masses of like categories only (mmjj, mmbb, mmaa, mmll), so a mixed
+    pair (photon-quark, photon-lepton, quark-lepton) is otherwise cut only by the mixture's rejection, which keeps
+    0.44-0.49 of eea_epem_accxh / aepemh at 160 GeV (data/ee_cutread160.json). MadGraph's own categories
+    (setcuts.f: is_a_j light quarks and gluon, b with maxjetflavor 5, is_a_l e, mu, tau; do_cuts) decide the legs."""
+    f = os.path.join(ev, "SubProcesses", "dummy_fct.f")
+    src = open(f).read()
+    m = re.search(r"^ +logical +FUNCTION +dummy_cuts\(P\).*?^ +end *$", src, flags=re.I | re.S | re.M)
+    if m is None:
+        raise RuntimeError(f"{f}: no dummy_cuts function to replace")
+    with open(f, "w") as fh:
+        fh.write(src[:m.start()] + _MIXED_PAIR_CUT.format(mmin=float(mmin)).rstrip("\n") + src[m.end():])
+
+
 def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name="run_01", patches=None):
     """generate_events in `ev` with the catalog's cards (nevents and iseed set). run_mode 0 (one core)
     unless mg_cores > 1. Returns (lhe_path, banner_path)."""
@@ -5244,6 +5306,8 @@ def lhe_run_madevent(process, ev, nevents, iseed, log_path, mg_cores=1, run_name
     shutil.copy2(param_card, f"{ev}/Cards/param_card.dat")
     shutil.copy2(run_card, f"{ev}/Cards/run_card.dat")
     patch_card(f"{ev}/Cards/run_card.dat", {"nevents": int(nevents), "iseed": int(iseed), **(patches or {})})
+    if cfg["lhe"].get("mixed_pair_mmin"):
+        lhe_mixed_pair_cut(ev, cfg["lhe"]["mixed_pair_mmin"])
     # AMP_LHE_SECOND_REFINE=T: MadEvent's hidden second_refine_treshold (default 0.9). It runs its second refine unless
     # the first refine's cross section is within T of the survey's; above 1 it always does, so a run whose maximum
     # weight is poorly known no longer stops short of the events it asks ("fail to reach target"). An execution

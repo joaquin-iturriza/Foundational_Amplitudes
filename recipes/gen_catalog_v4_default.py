@@ -116,6 +116,10 @@ ANCHOR_ENERGIES = tuple(sorted(EE_ANCHOR))
 # blocks left out of an anchor pool by a decision on its old pool: ee4_epem_cgsxwm's 3 TeV block, whose runs stop
 # short even from a gridpack (D193)
 EEA_DROPPED = {"v4_epem_cgsxwm": (3000.0,)}
+# default-share anchor pools whose mixed pairs (photon-quark, photon-lepton) the run card cannot cut at m > 10 GeV, so
+# the mixture kept 0.436 / 0.493 of their events at 160 GeV (plan step 76, data/ee_cutread160.json): MadEvent cuts
+# them itself (lhe.mixed_pair_mmin at the e+e- pair-mass cut, mg5_pipeline_final.lhe_mixed_pair_cut)
+DSHA_MIXED_MMIN = ("v4_epem_accxh", "v4_epem_aepemh")
 # the anchor queue's runs that stopped short of their ask (tools/lhe_parts.py yields --queue catalog_v4_eea, with each
 # run's energy and the layout's identities): those pools take eea_short's layout. Only pools not assembled are kept
 # in it (an assembled pool keeps the layout it was built with; eea_epem_bgtxwp, assembled from its complete runs, left out)
@@ -260,6 +264,8 @@ def anchor_pools(mg, P, T, trees, is_ee, ee_lhe, ee, dsh, rates, med, kept, comp
         lhe = {**ee_lhe, "source": a_lhe["source"], "energies": Es, "beam_spectrum": dict(P[reuse]["lhe"]["beam_spectrum"]),
                "n_val": new["val"], "n_test": new["test"], "n_train": new["train"]}
         run_layout(mg, lhe, rate)
+        if n in DSHA_MIXED_MMIN:
+            lhe["mixed_pair_mmin"] = float(mg.V4_CUTS["ee"]["m_min"])
         if name_old in complete:
             cc = carried_complete(complete[name_old], name_old, Es)
             rr = P[reuse]["lhe"]
