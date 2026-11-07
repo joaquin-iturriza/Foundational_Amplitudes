@@ -3752,6 +3752,12 @@ entries:
       h; dsh_ e+e- 82 core-h, longest 14.1 h; tools/regen_time.py, lhe_rates_dsh_ee4.json) times the spectrum''s 0.67-1.25x
       per kept event, plus 4 more surveys per pool (465-720 s each in the probe); (4) show Joaquin the energy list with it;
       then the e+e- flat ranges for step 68 (pp_support.py pull ee, tools/flat_range.py).'
+    75: '(n) step 65 read done (finding 2026-11-07, data/regen_g12_read.json): SHORT on 527 classes (fill) + 213 (held-out
+      outside, 404 events), COST median 1.86x with 473 classes above 2x. COST first (design branch, before step 68): where
+      the time goes on the classes above 2x (labels vs proposal vs compile, per-class secs, 12272 chunks at the label budget);
+      then one SHORT revision for the short classes only (short bins by budget/channel; outside events by a widening rule
+      that reads no scored events, ~493 classes lack dsh_ pools), its own design and design review, regenerated, read by the
+      same rules.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -11840,6 +11846,11 @@ entries:
       if:
       - 'design PASS: submit the e+e- default-pool queue at the width site pick offers'
       - 'design FIX: revise once'
+    75:
+      feeds: the catalog the next mixture and scaling runs train on
+      if:
+      - 'COST cause found and fixed: the SHORT revision designed and submitted'
+      - 'no fix within 2x: the cost and its cause go to Joaquin'
   owner:
     agent: a10eccf640da955ae
     state: working
