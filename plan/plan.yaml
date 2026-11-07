@@ -11553,6 +11553,12 @@ entries:
     units: null
     start: '2026-11-07T02:47:03+00:00'
     at: '2026-11-07T02:47:03+00:00'
+  - batch: eea_bbxwpwm_3tev
+    wall_h: 0.25
+    jobs: 1
+    units: null
+    start: '2026-11-07T03:10:29+00:00'
+    at: '2026-11-07T03:10:29+00:00'
   step_why:
     37:
       feeds: one shared data cache per dataset that a GPU job only opens
