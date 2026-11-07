@@ -11051,6 +11051,29 @@ entries:
       classes only (budget or channel), regenerated, never padded. COST over 2x -> where the time goes (labels vs proposal
       vs compile, node spread), fixed before the e+e- step. Composition fails -> fix mix_compose''s replay before any run
       reads default25_g12. Job failures -> log read, fixed, rerun of the shard (resumable: built pools are cache hits).'
+    fix_at: '2026-11-07T03:30:23+00:00'
+    fix: '(1) Check 7, the user''s acceptance criterion is missing from the measure and the outcome. Joaquin''s words on this
+      entry name the comparison: D269 ''... if you had done what I asked, that percentage would be zero'' (0% of pp events
+      outside the catalog''s range) and D227 ''the check has to be against data generated in the default way''; D264 names
+      both the target and the energy. Step 75''s own rules counted it (heldout_outside_kept: 1 per class on uu_bbxuu, us_ddxsu,
+      udx_csxvevex in grid_fwd_check.json; heldout_750 [1,1]). The regeneration read (fill, cost, integrity, composition)
+      drops it. Bin fill on recipes/catalog_v4_flat_range.json does not imply it: tools/flat_range.py builds the range from
+      the PP4 probe''s train and test pools, so the held-out default-sampled events (pp13_ val, dsh_) are not inside it by
+      construction. Fix: add to regen_read, per class, the count and share of held-out default-sampled pp events (the pools
+      step 75 used) outside the regenerated pools'' kept log|M|^2 range and outside their sqrt(s_hat) range, plus the catalog-to-pp
+      density ratio per in-range bin (D269 ''density not far below pp''s''). State the YES threshold (0, or at most step 75''s
+      per-class count, with the reason) and list the classes over it in the SHORT branch. (2) Check 5 and the prior: the prior
+      says grids12 ''fill ... cost 0.78-2.11x (2.11 = us_ddxsu seed 42 on a node 1.6x slower per label)'' and leaves out that
+      step 75''s recorded verdict for grid12 is COST (grid_fwd_check.json verdict_by_test grid12=COST). The node explanation
+      is not shown: the same-job ratio against ''current'' on the same node is also 2.17 (seed 43: 1.43), and a slower node
+      would cancel in that ratio. Fix: state the COST verdict, why the regeneration goes ahead on grid12 anyway (D317''s bar
+      is about 100x; the 2x bar is the design''s own), and keep a per-class cost list (classes over 2x named) in the read,
+      not only the total. Everything else holds. Check 1: only the flat part''s sampler and its pp flat range (D294) change,
+      the rest is kept (tools/regen_recipes.py g12_sampling, new _smixq paths). Check 2: fill moves with the sampler, step
+      72 to 75 udx_csxvevex 0.898 to 1.000 and uux_epemvevex 0.936 to 1.000 (grid_check.json, grid_fwd_check.json). Check
+      3: one data seed, as for a generation batch. Check 4: outcomes are stated. Check 14: disk is 43 GB against 64 GB free
+      on /sps/lpnhe, read 2026-11-07 (the design says 68), with the 2.3 MB standalone measure in results.tex; re-read it at
+      submission.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
