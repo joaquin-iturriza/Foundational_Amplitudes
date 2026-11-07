@@ -3746,6 +3746,11 @@ entries:
       / FAULT (magnitude R 4-block/1-block outside 1/1.15..1.15 on any of 12 reads) first; report YES against the 16 het seeds
       and MSE range, not as 4 blocks beating 1 (a 1.14x move is inside the band); record step_time_ratio; figure of per-class
       wrong-sign shares and magnitude MSE beside.'
+    82: '(t4) r6 passed the step-82 design on every non-straddling bin (finding 2026-11-07 step 83: bgtxwp 0.973/0.974, outside
+      0, summed cost 1.621x). Regenerate the 1301 hadronic classes with R6 (tools/regen_recipes.R6, pools _smixw), read by
+      regen_read.py with the same bars, then step 68. Waits on Joaquin: the straddling-bin scope answer (under r6 it reduces
+      to bgtxwp [-0.96,-0.714], 0 filled, 8.7% reachable) and the summed-vs-per-class 2x cost bar (19 of 38 class-seeds over
+      2x under r6). Before submit: design (batch sized from the r6 jobs'' per-class seconds), site pick, plan target.'
   done_when: test -s analysis/catalog_v4/data/mixture_ab.json && python3 -c "import json,sys; d=json.load(open('analysis/catalog_v4/data/mixture_ab.json'));
     sys.exit(0 if d.get('verdict') else 1)"
   notes_ref: null
@@ -12729,6 +12734,11 @@ entries:
       - 'YES: het control carries the 4-block branch, report to Joaquin'
       - 'NOT RESOLVED: design the trunk-shared sign gradient under its own optimizer moments, cost measured first (bar 2x)'
       - 'NO: read val sign accuracy and per-class shares first'
+    82:
+      feeds: whether the catalog's hadronic pools are regenerated with the r6 sampler
+      if:
+      - 'straddling exempt or bgtxwp''s bin exempt, summed bar accepted: regenerate with R6'
+      - 'per-class bar required: a per-class cost revision before regeneration'
   owner:
     agent: ae4ee7fc35b7e4306
     state: working
