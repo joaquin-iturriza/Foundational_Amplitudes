@@ -14794,6 +14794,31 @@ entries:
       r5_check 0.2 h) at c40ab06d; 21 of the first 38 parallel submissions timed out on ssh and were resubmitted 3 at a time;
       two timed-out ones reached slurm unregistered (62998652, 62998654: same code and class-seed as a registered job, deterministic,
       so at most a duplicate write of identical output). Step 79 waits on them.'
+  - at: '2026-11-07T09:23:08+00:00'
+    text: '2026-11-07 step 73 read (het_oneloop.py step73_pull, step73_one @9db5cf44 -> data/het_signhead73.json; figure step73_fig
+      -> figs/het_signhead73.png/.pdf). Question (D296, step 61''s NO branch): does putting the het sign head on its own detached
+      copy of the last block (model.net.sign_branch, so the sign loss no longer competes for the clipped trunk update) let
+      it predict one-loop signs as well as the MSE-trained head without hurting the magnitude? Design: arm v4_het_signhead_branch
+      seed 42 = FA-ccin2p3-54961d3e (scripts/job_catalog_v3_short.sh -- v4_het_signhead_branch at 411215ce; only ++model.net.sign_branch=true
+      differs) against seed 42 of the weight-1 rerun FA-ccin2p3-ac8d6fca (same code) and the MSE controls (HD5 FA-ccin2p3-dc9feba1,
+      H5 v4_dimensionless_muon); one seed (D315): a sign gap called only beyond 2x, a magnitude shift only beyond 15%. SIGN,
+      median over pools of the wrong-sign share: catalog-sampled one-loop H5 (21 pools) detached 9.3%, shared-trunk weight
+      1 8.6%, ratio 1.08 (8 pools worse, 13 better, p 0.38), against MSE 5.6% (1.66x, 12/8); default-sampled one-loop HD5
+      (19 classes) detached 14.85%, shared 16.2%, ratio 0.92 (7/12, p 0.36), against MSE 11.15% (1.33x); all-positive guess
+      12.15 / 30.3%. Within the one-seed 2x band: not resolved. MAGNITUDE, R = detached over shared, median over classes of
+      the class''s geometric-mean MSE of log|M|^2 ratio (class bootstrap 95%): below 1 on all 12 reads: pp trained PP4 0.865
+      [0.839, 0.879] (1301 probes), e+e- trained EE4 0.902 [0.865, 0.944], one-loop catalog H5 0.724 [0.616, 0.911], one-loop
+      default HD5 0.944 [0.637, 1.169], held-out default HD4 0.922, new combinations H1 0.840, 2->4 families H2 0.878, 2->5
+      H2p5 0.948, the top H3 0.852, alpha_s 0.13 H6 0.745, energy H7E 0.886, pT>=30 H7c 0.925; called better (beyond 15%)
+      on H5, PP4, H1, H3, H6. The median of class MSEs (figure panel c) agrees except EE4, where it is 1.67 detached vs 1.36
+      shared while the median per-class ratio is 0.90 (different median classes). No blow-ups; validation sign accuracy 0.99
+      both; pre-clip gradient norms alike (median 66.9 vs 66.7). Verdict by the passed design: NOT RESOLVED AT ONE SEED on
+      the sign, and magnitude better everywhere. Against step 61 (four seeds): upweighting the sign loss on the shared trunk
+      cut H5''s wrong-sign median (13.0 -> 8.4%, p 0.058) but cost magnitude 13-23% (per-event match) or 20-59% (weight 75);
+      the detached block costs no magnitude, it gains 5-28%. Reading: at weight 1 the sign gradient through the clipped trunk
+      was already costing the magnitude; detaching removes that cost, but does not by itself move the sign. Design reviewer''s
+      caveat stands: with the branch detached the shared layers learn nothing for the sign. Next (D296, mine to explore):
+      the step-61 per-event matched sign weight on the detached block, where the upweighting can no longer take from the magnitude.'
   handoff:
     state: '2026-11-07 ~10:00. Flat sampler: r3 (r2 + flat_empty_near) NO (data/r3_check.json @014b20a0, figs/r3_check.png):
       bgtxwp [-1.206,-0.96] 0.925/0.917 (r2 0.73/0.79), uu_bbxuu regressed to 0.90/0.80 (r2 1.0). r4 (r3 + flat_empty_unique,
