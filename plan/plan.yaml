@@ -14160,9 +14160,6 @@ entries:
     17: 'Live check of the idle wake (site idle_pass, fix of 2026-11-06 site.bak-20261106-idlelive): at the first real moment
       plan next lists RESUME/LAUNCH with nothing running, confirm a STALLED idle: event is opened by the running supervisor
       within 45 min; report to Joaquin either way.'
-    19: 'Two growth data caches on CC-IN2P3 (/sps/lpnhe/jiturrizaramirez01/tmp/amp_mmap_cache/27a1422795e9872faa6b9eaf and
-      0c897ca2d81c98d3828e2808, ~18 GB each, ours, rebuildable): their deletion through site run was refused for the warm_start
-      agent by the permission check; Joaquin told 2026-11-06. Delete when he allows or does it.'
     20: 'Cache-deletion guard: before deleting an amp_mmap_cache/<key> on a site, a committed check greps every RUNNING or
       queued FA job''s log and config there for the key and refuses while any uses it (2026-11-07: the two D310 caches were
       deleted while the scaling grid used them, FA-ccin2p3-a77e20b8 on 0c897ca2). Test on that real case.'
@@ -14425,11 +14422,6 @@ entries:
       if:
       - 'fired: report and drop'
       - 'did not fire: trace and fix, replay again'
-    19:
-      feeds: disk on /sps/lpnhe (93 GB free)
-      if:
-      - 'deleted: drop'
-      - 'disk below 10% free first: tell Joaquin again'
     20:
       feeds: whether the setup prevents deleting data a running job needs
       if:
@@ -14447,7 +14439,6 @@ entries:
       with main_turns.py
     '17': 'the first real idle moment: plan next listing RESUME/LAUNCH with no FA job live; the supervisor''s own STALLED
       idle: event (or its absence after 45 min) is the trigger'
-    '19': Joaquin allowing the cache deletion (asked 2026-11-06)
   owner:
     agent: a1319346e2069b331
     state: working
