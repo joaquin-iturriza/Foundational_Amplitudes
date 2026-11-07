@@ -12024,6 +12024,7 @@ entries:
       FA-ccin2p3-7e413ae0 FA-ccin2p3-e3714af5 FA-ccin2p3-6675f944 FA-ccin2p3-ab51aa9c FA-ccin2p3-8367baad FA-ccin2p3-d9cbd256
       FA-ccin2p3-e910fe6c FA-ccin2p3-91932ec8 FA-ccin2p3-fee922a5 FA-ccin2p3-69405053 FA-ccin2p3-6d180d0c FA-ccin2p3-4c5811a5
       FA-ccin2p3-caa2785b FA-ccin2p3-5aa89fd6
+    '81': FA-ccin2p3-22bc476d
   targets:
   - batch: gridpool_probe
     wall_h: 1.5
