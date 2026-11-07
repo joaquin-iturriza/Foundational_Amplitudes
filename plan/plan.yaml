@@ -12742,9 +12742,9 @@ entries:
       - 'bgtxwp short at the budget: channels per bin before a budget change'
   owner:
     agent: af618fc9fa0eb9c9d
-    state: closed
+    state: stopped
     since: '2026-11-07T09:28:49+00:00'
-    state_at: '2026-11-07T09:28:49+00:00'
+    state_at: '2026-11-07T09:55:58+00:00'
   findings:
   - at: '2026-10-30T12:48:57+00:00'
     text: 'catalog_v4_gridpack_last timing (E3014): 64 workers, all COMPLETED, first submitted 10:46 UTC, last finished 11:42
