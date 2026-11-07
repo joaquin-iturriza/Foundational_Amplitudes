@@ -3725,10 +3725,6 @@ entries:
       refused without ''--'' or when unknown; tested on 5 cases, backup site.bak-20261105-runopts); (c) a03d9f99 set the long
       sweep configs to mem 32G from the measured peak RSS, and lxplus gives every 1-GPU job 16 CPUs / 48000 MB whatever it
       asks (site CONDOR_GPU_SHARE), so nothing left; (d) recorded as a finding with the measured per-width rates.'
-    61: '(c) Resubmit the 12 step-61 jobs whole at --hdr=--time=03:30:00 (short_wall''s slurm_time): v4_het_signhead_matched_<event|const>[_seed2-4]
-      and, with SHORT_TAG=keyed, v4_het_control_signhead[_seed2-4], under the passed designs of 05:06 and 05:14 (code = f21572a1
-      + only the SHORT_TAG arm list and analysis files); then plan wait 61 on the 12; read with het_oneloop.py signhead (re-seed
-      rule first).'
     64: '(e) Epochs and scaling (D292, D293): count the epochs of every point of par:v4_width, par:v4_mult_width_length, step
       32/40; redo every point under one epoch at >= 1 epoch and extend the width x length map as one GPU-hour axis with L(C)
       = A C^-alpha + L_inf; GPU-h estimate before submit, above 30 GPU-h to the main session.'
@@ -11055,11 +11051,6 @@ entries:
       if:
       - 'Joaquin answers (e): implement it or drop it'
       - 'no answer: stays listed, nothing waits on it'
-    61:
-      feeds: whether het pretraining carries a usable sign on the one-loop pools (D287, D296)
-      if:
-      - 'permission allowed: submit, wait, read'
-      - 'still refused: the main session submits or allows it'
     64:
       feeds: the compute scaling of the v4 catalog pretraining at >= 1 epoch
       if:
