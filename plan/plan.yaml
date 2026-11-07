@@ -11616,6 +11616,62 @@ entries:
       r3 replaces) and the sigma-steering thread (unrelated); no earlier empty-bin steering revision. Note for the read: r3
       also re-steers the always-empty top-margin bins above reach on every class; a class regressing from r2 is in the NO
       branch.'
+  - at: '2026-11-07T08:07:49+00:00'
+    question: 'Step 79 revision r4 of the flat sampler (after r3''s NO): r4 = r3 (tools/regen_recipes.R3) plus flat_empty_unique:
+      in flat_quota_weights, with flat_empty_near, each empty quota bin takes the deficit-many nearest candidates that no
+      earlier empty bin took (one unit each), so adjacent empty bins steer through as many candidates as their summed deficit
+      instead of stacking every unit on the same nearest few. Code: branch sampler-r4 @f5917ca1 (worktrees/wt-r4), tools/regen_recipes.R4,
+      policy grid_r4_budget18, pools _smixu. Does r4, on the same 19 classes x seeds 42/43, (1) fill every in-range 0.25-dex
+      quota bin, margin included, at >= 0.95 of quota, exempting bins whose lower edge lies above the class''s reach or whose
+      upper edge lies below its floor (reach and floor over every policy of this job and of the r1, r2 and r3 jobs), straddling
+      bins scored and listed with their reachable width share; (2) leave ZERO scored held-out in-support pp events outside
+      the kept range (D269); (3) cost summed over the 38 jobs r4 seconds <= 2x the old sampling''s in the same jobs, per class
+      listed? In particular: does it keep r3''s gain on v4_uux_bgtxwp [-1.206,-0.96] (r3 0.925/0.917, r2 0.734/0.79) and undo
+      r3''s regression on v4_uu_bbxuu (r3 0.897/0.795 at [5.127,5.373], r2 1.0)? Feeds: whether the 1301 hadronic classes
+      are regenerated with r4 (pools _smixu) before step 68''s e+e- classes join; the straddling bins (bb_bb 8.34, bbx_ccxh
+      -3.809, uux_bgtxwp -0.96) wait on Joaquin''s scope answer and are reported, not decided, here.'
+    prior: 'r3 check (multichannel_check.py step78r3 @014b20a0 -> data/r3_check.json, figure figs/r3_check.png): NO on fill
+      only; outside 0 on every class and seed; summed cost r3 1.754x, r2 1.699x in the same jobs. bgtxwp [-1.206,-0.96] 0.925/0.917
+      (r2 0.734/0.79), short in 3/3 of 36 chunks (r2 10/8), 2-3 chunks still at 0-1 kept; uu_bbxuu regressed: [5.127,5.373]
+      0.897/0.795, [4.881,5.127] 0.929 at seed 43 (r2 1.0 in the same jobs), 8/12 chunks to the label budget (r2 1/0), short
+      by a few events in 8-12 chunks (data/r3_rounds.json, step79-rounds @014b20a0); per round r3 converges slower from round
+      2 on bbxuu (missing after round 2: 115/95/117/111/108/102 vs r2 86/88/102/91/58/94 on its first six chunks at seed 43,
+      6-9 bins short, the top bins empty). r2 check (r2_check.json) NO on bgtxwp; r1 NO; step 65 SHORT. Ruled out before this
+      design: an empty bin''s deficit split equally over the channels of the nearest occupied bin (the res [0,1,3] channel
+      that reached bgtxwp''s top under step 65''s policy is present in that bin in only 0-2 of 36 chunks under r2 and r3:
+      data/r3_channel_presence.json, step79-channel-presence @f5917ca1, so it could not steer to it). Searched docs/results.tex,
+      plan show catalog_coverage, site decisions for share floor, channel route, per channel, empty bin, stacking, unique:
+      no earlier revision of this kind.'
+    measure: 'analysis/catalog_v4/multichannel_check.py run <class> <probe> current+grid_r3_budget18+grid_r4_budget18 <seed>
+      (scripts/job_multichannel_check.sh, CPU, one job per class and seed, three policies on one node, the class''s train
+      pool replayed chunk by chunk) -> per policy kept/quota per bin per chunk, rounds and stops, candidates per channel and
+      bin, cand_max/cand_min, seconds; heldout_r1 with outside_dex. Read by multichannel_check.py step79r4-pull then step79r4
+      -> data/r4_check.json (the step75r2 reader with new grid_r4_budget18, old grid_r3_budget18, reach_tags r1/r2/r3 jobs);
+      r2''s numbers beside from r3_check.json (r2 is deterministic per seed: its per-bin kept were identical in the r2 and
+      r3 jobs); step78-where / step79-rounds for any short bin.'
+    check: 'On existing data: r3''s per-round records of v4_uu_bbxuu (multichannel_check_reads ..._grid_r3_budget18_43) converge
+      slower than r2''s from the second round with 6-9 bins short and the top bins empty after round 1, the situation where
+      r3 stacks several empty bins'' units on the same nearest candidates; r3''s v4_uux_bgtxwp gain (short chunks 10/8 ->
+      3/3) came from steering an empty bin through its nearest candidates, which r4 keeps for a single empty bin (r4 = r3
+      exactly when at most one bin is empty: tests/test_flat_grid.py test_r4_empty_unique_tag shows two empty bins take disjoint
+      candidates, 10 + 10 instead of 2 units each on the same 10; equal total weight; weights identical without the key; _smixu
+      tag; 10 tests pass @f5917ca1). The fill per bin and per chunk moves with the steering of empty bins (r2 -> r3 moved
+      bgtxwp''s bin 0.73 -> 0.92 and bbxuu''s 1.0 -> 0.90 in the same jobs), so the measure resolves this change.'
+    fixed: 'Everything of r3 (R3: r2''s channels and ladders, keep extremes, stall 0.2 with patience 2, budget 18, grid constants,
+      range ranges_dsh, flat_empty_near), classes and probes (R1_CLASSES), data seeds, train role chunk plan; code = trunk
+      after sampler-r4 merges (repo-reviewer PASS), one commit for all 38 jobs. CPU only, 0 GPU-h. Wall: r3''s three-policy
+      jobs took up to 638 s of sampling: target 0.2 h, limit --time 00:45:00, 8G. Disk ~0.5 MB JSON per job.'
+    control: r3 (grid_r3_budget18) and the old sampling (current) in the same job on the same node; r2's per-class numbers
+      from r3_check.json beside (deterministic per seed).
+    seeds: Data seeds 42 and 43 (r1's, r2's and r3's), each class at both.
+    outcome: 'PASS (every class and seed: every scored non-straddling bin >= 0.95, 0 held-out outside, summed cost <= 2x)
+      -> the straddling bins as Joaquin answers; then regenerate the 1301 hadronic classes with R4 (regen_recipes write, pools
+      _smixu), read by regen_read.py with the same bars, then step 68. NO with bbxuu fixed but bgtxwp still short in 2-3 chunks
+      at 0-1 kept: the in-chunk steering limit is reached (no chunk-independent steering fills a bin some chunks never reach):
+      report to Joaquin with the numbers, the next revision the pool-level route (chunks that reach a hard bin keep more than
+      their quota of it). NO with bbxuu still short: stacking was not the cause; read its rounds per bin, r4 dropped, next
+      r2 + a budget raise for chunks still converging. Outside > 0 -> outside_dex. Summed cost > 2x -> per-channel seconds.
+      Job failures -> log read, fixed, rerun.'
   step_waits:
     '6': catalog_coverage step 1's pp13v4 validation passing
     '8': the w3 and old generation workers ending (about 06:05 to 06:50); the generation owner takes it on their end events
