@@ -14976,12 +14976,6 @@ entries:
   - D307
   - D313
   next:
-    1: 'Step 13 (D307, D308) rerun after the sigma-stage fix b91cf7c6: arm v4_het_ws_step3198_continue_optstate[_seed2] with
-      SHORT_TAG=fix1 (run dirs _tagfix1), FA-ccin2p3-1c90ae73 (s42), FA-ccin2p3-013708af (s43); the first pair 05df656d/07bfc8d7
-      trained cleanly (jump removed, G 79/79 vs 631/1016) but its sigma stage moved mu. When they end: check the sigma stage
-      has no OPT_STATE line and its first validation is near the main stage''s; read7.sh, mixture_ab.py warm C1r_step3198_continue_optstate
-      (W filled), ws_restart_steps.py; read against the control final_default and the fresh-optimizer step3198_continue under
-      the design of 2026-11-06T22:29'
     9: 'Step 14 (D319, single seed D315): new warm-start mechanisms toward the C1 change (share 0.25, het, k=533) at seed
       42, against the same-commit default restart (FA-ccin2p3-238e6f81) and B: shrink-and-perturb (rerun FA-ccin2p3-0f346464
       after b91cf7c6; 71852916 not read), share 0.50 for 267 steps (FA-ccin2p3-77e8bf2b), the WSD parent (dccb61e8, trained
@@ -18114,7 +18108,6 @@ entries:
       out as the cause of the k=533 gap; the continued arms lose by their less-trained start model. Figure analysis/catalog_v4/figs/ws_restart_study_s13
       (plot_ws_restart.py @9d30a635, step 12''s arms plus this one). Write-up with step 14''s, after par:v4_warm_start_valley.'
   step_waits:
-    '1': FA-ccin2p3-1c90ae73 FA-ccin2p3-013708af
     '9': FA-ccin2p3-238e6f81 FA-ccin2p3-0f346464 FA-ccin2p3-77e8bf2b FA-ccin2p3-1354daee FA-ccin2p3-4dc35a98 FA-ccin2p3-9079718e
   handoff:
     state: 'Step 14 (D319, D315 single seed; design passed round 2, code merged 80c9924c after repo-reviewer clean at 3ae60b08)
@@ -18150,13 +18143,6 @@ entries:
       R42| PP4 0.003, EE4 0.044 (blow-up pair excluded): single seed resolves 5-15%.'
     written: '2026-11-06T23:26:30+00:00'
   step_why:
-    1:
-      feeds: whether the restart jump, not the start model, is what keeps the continued warm start short (the warm-start mechanism,
-        D307)
-      if:
-      - 'BETTER than the control: the parent''s optimizer state is a recipe candidate, read beside step 14''s branch'
-      - 'NOT BETTER or WORSE: the optimizer state removes the jump without helping; the jump is ruled out as the cause, recorded
-        in par:v4_warm_start_valley'
     9:
       feeds: 'the warm-start recipe (D319): which mechanism closes the k=533 gap to the change from scratch'
       if:
