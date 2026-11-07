@@ -14169,6 +14169,17 @@ entries:
       so these must be relaid as complete runs from gridpacks (the eea_short / complete_layout precedent, EEA_SHORT_RUN 200)
       at the short energies, sized from these measured complete shares; also check that the 93 assembled pools hold no short
       run (a run returning between the share and its ask passes lhe_equal_shares).'
+  - at: '2026-11-07T05:21:14+00:00'
+    text: '2026-11-07 step 76 cut-by-cut read of every e+e- anchor test pool (tools/lhe_probe.py cutread @1bd372a2, queue
+      catalog_v4_eea, 227 events per pool and energy -> data/ee_cutread_anchor.json @33cec0d6) at 91.1876, 160 and 3000 GeV.
+      At 91 and 160 GeV the only cut that removes events is the mixed-pair mass m > 10 GeV (photon-quark, photon-lepton, quark-lepton
+      pairs the e+e- run card cannot cut): 18 of 46 pools at 91 GeV keep < 0.97 (aaepem 0.647, aamupmum 0.672, aaccx 0.686
+      ... taptaptamtam 0.961), 17 of 79 at 160 GeV (accxh 0.436, aepemh 0.493, ahtaptam 0.617, aepvewm 0.714 ...). At 3000
+      GeV the only loss is |cos theta| < 0.99, all of it in the partonic frame only (the run card cuts the lab frame; the
+      ISR boost moves events across): 33 of 115 pools keep 0.894-0.969 (epemh 0.894, uuxvmvmx 0.897, aepemh 0.899). Only accxh
+      and aepemh exceed the 2x rule (kept < 0.5); every other pool asks at most 1.55x what it keeps and is sized from its
+      measured kept, so nothing else changes; the mixed-pair cut (lhe.mixed_pair_mmin) stays opt-in for those two (assembled
+      pools keep their identity).'
   handoff:
     state: '2026-11-07 ~07:00. Step 75: r1 check design FIX once (core-only fill bar; no no-dsh_ outside class), revised (all
       in-range bins incl. margin, exempt only bins above the class''s reach; +v4_uux_bgtxwp, 19 classes), design PASS, repo
